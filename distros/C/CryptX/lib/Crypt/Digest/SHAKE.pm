@@ -2,7 +2,7 @@ package Crypt::Digest::SHAKE;
 
 use strict;
 use warnings;
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
@@ -64,6 +64,8 @@ Crypt::Digest::SHAKE - Hash functions SHAKE128, SHAKE256 from SHA3 family
    my $file_part1 = $file_d->done(100);
 
 =head1 DESCRIPTION
+
+I<Since: CryptX-0.048>
 
 Provides an interface to the SHA3's sponge function SHAKE.
 

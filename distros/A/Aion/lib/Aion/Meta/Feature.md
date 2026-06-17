@@ -216,6 +216,10 @@ $::feature->stash('my_key', 'my_value');
 $::feature->stash('my_key') # -> 'my_value'
 ```
 
+## compare ($other)
+
+Сравнивает старую фичу с перезагружаемой. Если свойство `isa` указано и не совпадёт, то будет выброшено исключение.
+
 # AUTHOR
 
 Yaroslav O. Kosmina <dart@cpan.org>

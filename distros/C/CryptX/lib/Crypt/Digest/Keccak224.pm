@@ -4,7 +4,7 @@ package Crypt::Digest::Keccak224;
 
 use strict;
 use warnings;
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( keccak224 keccak224_hex keccak224_b64 keccak224_b64u keccak224_file keccak224_file_hex keccak224_file_b64 keccak224_file_b64u )] );
@@ -83,6 +83,8 @@ Crypt::Digest::Keccak224 - Hash function Keccak-224 [size: 224 bits]
    my $file_result_raw = Crypt::Digest::Keccak224->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
+
+I<Since: CryptX-0.059>
 
 Provides an interface to the Keccak224 digest algorithm.
 

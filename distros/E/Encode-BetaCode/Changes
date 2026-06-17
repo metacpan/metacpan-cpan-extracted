@@ -1,5 +1,8 @@
 Revision history for Perl module Encode::BetaCode
 
+0.12    2026-06-16 21:10
+    - Fixed another bug. Thanks to NM for spotting it!
+
 0.11    2022-02-03 09:00
     - Fixed another betacode decoding bug.
 

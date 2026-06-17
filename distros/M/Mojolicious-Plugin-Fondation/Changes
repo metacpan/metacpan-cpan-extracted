@@ -1,8 +1,9 @@
 Revision history for Mojolicious-Plugin-Fondation
 
-0.01      2026-06-13 20:17:03+02:00 Europe/Paris
-
-0.01      2026-06-10 17:18:18+02:00 Europe/Paris
+0.02      2026-06-16 14:42:08+02:00 Europe/Paris
+    - Fix Windows path separator issues
+    - Add missing dependency
+    - Refactor the documentation
 
 0.01  2026-06-07
     - Initial release

@@ -4,7 +4,7 @@ package Crypt::Digest::BLAKE2b_512;
 
 use strict;
 use warnings;
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( blake2b_512 blake2b_512_hex blake2b_512_b64 blake2b_512_b64u blake2b_512_file blake2b_512_file_hex blake2b_512_file_b64 blake2b_512_file_b64u )] );
@@ -83,6 +83,8 @@ Crypt::Digest::BLAKE2b_512 - Hash function BLAKE2b [size: 512 bits]
    my $file_result_raw = Crypt::Digest::BLAKE2b_512->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
+
+I<Since: CryptX-0.048>
 
 Provides an interface to the BLAKE2b_512 digest algorithm.
 

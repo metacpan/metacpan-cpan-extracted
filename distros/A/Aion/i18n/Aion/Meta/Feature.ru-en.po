@@ -119,6 +119,9 @@ msgid "## stash ($key; $val)\n"
 msgstr "## stash ($key; $val)\n"
 "Access the property store for the calling package."
 
+msgid "Сравнивает старую фичу с перезагружаемой. Если свойство `isa` указано и не совпадёт, то будет выброшено исключение."
+msgstr "Compares the old feature with the rebooted one. If the `isa` property is specified and does not match, an exception will be thrown."
+
 msgid "⚖ **GPLv3**"
 msgstr "⚖ **GPLv3**"
 

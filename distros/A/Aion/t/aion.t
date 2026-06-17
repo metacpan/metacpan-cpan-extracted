@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 1.8
+# 1.9
 # 
 # # SYNOPSIS
 # 
@@ -216,6 +216,14 @@ local ($::_g0 = do {$aspect_name}, $::_e0 = "lvalue"); ::ok $::_g0 eq $::_e0, '	
 
 	has moon => (is => "rw", lvalue => 1);
 }
+
+# 
+# ## pleroma ()
+# 
+# Возвращает локатор.
+# 
+::done_testing; }; subtest 'pleroma ()' => sub { 
+local ($::_g0 = do {Aion->pleroma->isa('Aion::Pleroma')}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Aion->pleroma->isa(\'Aion::Pleroma\')  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # SUBROUTINES IN CLASSES

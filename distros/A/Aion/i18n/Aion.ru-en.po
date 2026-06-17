@@ -64,6 +64,9 @@ msgstr ""
 "* `$feature` – meta-object describing the feature (`Aion::Meta::Feature`).\n"
 "* `$aspect_name` – aspect name."
 
+msgid "Возвращает локатор."
+msgstr "Returns the locator."
+
 msgid "Расширяет класс другим классом/классами. Он вызывает из каждого наследуемого класса метод `import_extends`, если он в нём есть."
 msgstr "Expands the class with another class/classes. It causes from each inherited class the method of `import_extends`, if it is in it."
 

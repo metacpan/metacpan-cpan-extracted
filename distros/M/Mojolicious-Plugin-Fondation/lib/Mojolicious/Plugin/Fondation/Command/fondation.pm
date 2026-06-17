@@ -240,7 +240,7 @@ Mojolicious::Plugin::Fondation::Command::fondation - Fondation orchestration com
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package Spreadsheet::ParseXLSX::Decryptor::Agile;
 use strict;
 use warnings;
 
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.37'; # VERSION
 
 # ABSTRACT: decryptor for files of version 4.4
 
@@ -119,7 +119,7 @@ Spreadsheet::ParseXLSX::Decryptor::Agile - decryptor for files of version 4.4
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =for Pod::Coverage   decrypt
   decryptFile
@@ -131,7 +131,7 @@ Jesse Luehrs <doy@tozt.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Jesse Luehrs.
+This software is Copyright (c) 2026 by Jesse Luehrs.
 
 This is free software, licensed under:
 

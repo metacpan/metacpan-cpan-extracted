@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>     nam a22      i 4500</leader>
+  <controlfield tag="001">nkc20162795077</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20250102104023.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">160429s2016    xr a   e      000 0 fre</controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb002795077</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-80-906112-5-2</subfield>
+    <subfield code="q">(František Havlůj - běžíliška ;</subfield>
+    <subfield code="q">vázáno)</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-2-36345-059-3</subfield>
+    <subfield code="q">(HDiffusion ;</subfield>
+    <subfield code="q">vázáno)</subfield>
+    <subfield code="z">978-2-3634505-9-3</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)970629778</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">BOA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">fre</subfield>
+    <subfield code="a">cze</subfield>
+    <subfield code="h">fre</subfield>
+  </datafield>
+  <datafield tag="044" ind1=" " ind2=" ">
+    <subfield code="a">xr</subfield>
+    <subfield code="a">fr</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">81</subfield>
+    <subfield code="x">Lingvistika. Jazyky</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">11</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">811.162.3</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">811.133.1</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">81´37-021.6</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0.062)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Gassin-Gradstein, Vincent</subfield>
+    <subfield code="7">xx0203260</subfield>
+    <subfield code="4">aut</subfield>
+    <subfield code="4">ill</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">18 vols/slov :</subfield>
+    <subfield code="b">letů/mots /</subfield>
+    <subfield code="c">Vincent Gassin-Gradstein, Veronika Doutlíková</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2=" ">
+    <subfield code="a">Osmnáct slov</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2=" ">
+    <subfield code="a">Osmnáct letů</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2=" ">
+    <subfield code="a">Dix-huit vols</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2=" ">
+    <subfield code="a">Dix-huit mots</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="0">
+    <subfield code="a">18 letů/mots</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">Vydání první</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Běžíliška ;</subfield>
+    <subfield code="a">Auxerre :</subfield>
+    <subfield code="b">HDiffusion,</subfield>
+    <subfield code="c">2016</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">36 nečíslovaných stran :</subfield>
+    <subfield code="b">ilustrace ;</subfield>
+    <subfield code="c">18 x 21 cm</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">statický obraz</subfield>
+    <subfield code="b">sti</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Obálkový podnázev: palindromes franco-tchèques = francouzsko-české obrácenky</subfield>
+  </datafield>
+  <datafield tag="546" ind1=" " ind2=" ">
+    <subfield code="a">Částečně český text, částečně souběžný český text</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">čeština</subfield>
+    <subfield code="7">ph135292</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">francouzština</subfield>
+    <subfield code="7">ph135297</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">palindromy</subfield>
+    <subfield code="7">ph894884</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Czech language</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">French language</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">palindromes</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">populárně-naučné publikace</subfield>
+    <subfield code="7">fd131864</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">popular works</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Doutlíková, Veronika,</subfield>
+    <subfield code="d">1971-</subfield>
+    <subfield code="7">xx0106253</subfield>
+    <subfield code="4">aut</subfield>
+    <subfield code="4">ill</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=002795077&amp;local_base=CNB</subfield>
+  </datafield>
+</record>
+
+</collection>

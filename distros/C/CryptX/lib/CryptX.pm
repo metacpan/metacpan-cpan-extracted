@@ -2,7 +2,7 @@ package CryptX;
 
 use strict;
 use warnings ;
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
@@ -123,6 +123,9 @@ on modern CPUs. Requires unique nonces; nonce reuse breaks the security entirely
 
 =item * B<AES-SIV> (L<Crypt::AuthEnc::SIV>) - Deterministic AEAD, nonce-misuse resistant.
 Slightly slower but safer when nonce uniqueness cannot be guaranteed.
+
+=item * B<AES-GCM-SIV> (L<Crypt::AuthEnc::GCMSIV>) - Nonce-misuse-resistant AEAD (RFC 8452).
+Faster than AES-SIV; pick this when you need GCM-like performance with nonce-reuse safety.
 
 =item * B<AES-OCB> (L<Crypt::AuthEnc::OCB>) - Very fast single-pass AEAD. Check patent status
 for your jurisdiction.
@@ -321,7 +324,7 @@ L<Crypt::PK>, L<Crypt::KeyDerivation>, L<Crypt::Misc>, L<Crypt::ASN1>
 
 =item * Symmetric ciphers
 
-L<Crypt::Cipher::AES>, L<Crypt::Cipher::Anubis>, L<Crypt::Cipher::Blowfish>, L<Crypt::Cipher::Camellia>, L<Crypt::Cipher::CAST5>, L<Crypt::Cipher::DES>,
+L<Crypt::Cipher::AES>, L<Crypt::Cipher::Anubis>, L<Crypt::Cipher::ARIA>, L<Crypt::Cipher::Blowfish>, L<Crypt::Cipher::Camellia>, L<Crypt::Cipher::CAST5>, L<Crypt::Cipher::DES>,
 L<Crypt::Cipher::DES_EDE>, L<Crypt::Cipher::IDEA>, L<Crypt::Cipher::KASUMI>, L<Crypt::Cipher::Khazad>, L<Crypt::Cipher::MULTI2>, L<Crypt::Cipher::Noekeon>,
 L<Crypt::Cipher::RC2>, L<Crypt::Cipher::RC5>, L<Crypt::Cipher::RC6>, L<Crypt::Cipher::SAFERP>, L<Crypt::Cipher::SAFER_K128>, L<Crypt::Cipher::SAFER_K64>,
 L<Crypt::Cipher::SAFER_SK128>, L<Crypt::Cipher::SAFER_SK64>, L<Crypt::Cipher::SEED>, L<Crypt::Cipher::SM4>, L<Crypt::Cipher::Serpent>, L<Crypt::Cipher::Skipjack>,
@@ -338,7 +341,7 @@ L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>, L<Crypt::Stream::Rabbit
 
 =item * Authenticated encryption modes
 
-L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::XChaCha20Poly1305>, L<Crypt::AuthEnc::SIV>
+L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::GCMSIV>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::XChaCha20Poly1305>, L<Crypt::AuthEnc::SIV>
 
 =item * Hash functions
 
@@ -349,7 +352,7 @@ L<Crypt::Digest::RIPEMD256>, L<Crypt::Digest::RIPEMD320>, L<Crypt::Digest::SHA1>
 L<Crypt::Digest::SHA512>, L<Crypt::Digest::SHA512_224>, L<Crypt::Digest::SHA512_256>, L<Crypt::Digest::Tiger192>, L<Crypt::Digest::Whirlpool>,
 L<Crypt::Digest::Keccak224>, L<Crypt::Digest::Keccak256>, L<Crypt::Digest::Keccak384>, L<Crypt::Digest::Keccak512>,
 L<Crypt::Digest::SHA3_224>, L<Crypt::Digest::SHA3_256>, L<Crypt::Digest::SHA3_384>, L<Crypt::Digest::SHA3_512>, L<Crypt::Digest::SHAKE>,
-L<Crypt::Digest::TurboSHAKE>, L<Crypt::Digest::KangarooTwelve>
+L<Crypt::Digest::TurboSHAKE>, L<Crypt::Digest::KangarooTwelve>, L<Crypt::Digest::SM3>
 
 =item * Checksums
 
@@ -357,8 +360,8 @@ L<Crypt::Checksum::Adler32>, L<Crypt::Checksum::CRC32>
 
 =item * Message authentication codes
 
-L<Crypt::Mac::BLAKE2b>, L<Crypt::Mac::BLAKE2s>, L<Crypt::Mac::F9>, L<Crypt::Mac::HMAC>, L<Crypt::Mac::OMAC>,
-L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>, L<Crypt::Mac::Poly1305>
+L<Crypt::Mac::BLAKE2b>, L<Crypt::Mac::BLAKE2s>, L<Crypt::Mac::F9>, L<Crypt::Mac::HMAC>, L<Crypt::Mac::KMAC>,
+L<Crypt::Mac::OMAC>, L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>, L<Crypt::Mac::Poly1305>
 
 =item * Public-key cryptography
 

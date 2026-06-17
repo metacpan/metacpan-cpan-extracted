@@ -1,5 +1,10 @@
 Revision history for perl module Net::RDAP:
 
+0.43 - 2026-06-17
+  - avoid writing cache files unless use_cache is specified.
+  - clean the cache upon destruction.
+  - thanks to Kent Oyer (@fkoyer) for reporting these issues.
+
 0.42 - 2026-05-07
   - use File::XDG to get the user's cache directory instead of using /tmp. Thanks
 	  to Dan Church (@h3xx) for reporting this issue, and Olaf Alders (@oalders)

@@ -16,6 +16,9 @@ msgstr "Returns the name of the package in which the function is declared."
 msgid "Возвращает имя функции."
 msgstr "Returns the name of the function."
 
+msgid "Возвращает строковое представление объекта."
+msgstr "Returns a string representation of an object."
+
 msgid "⚖ **GPLv3**"
 msgstr "⚖ **GPLv3**"
 

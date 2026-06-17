@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::Fondation::Helpers;
 # ABSTRACT: All Fondation helpers in one place -- keeps Fondation.pm minimal
-$Mojolicious::Plugin::Fondation::Helpers::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Helpers::VERSION = '0.02';
 use Mojo::Base -base, -signatures;
 use Mojo::ByteStream 'b';
 
@@ -40,7 +40,7 @@ sub register ($class, $app, $manager) {
     # ═══════════════════════════════════════════════════════════════════════
     # ── Route conditions ──
     # ── check_perm/check_group are no-ops above until Authorization plugin
-    # ── overrides them. fondation.authenticated is provided by Auth plugin.
+    # ── overrides them.
     # ═══════════════════════════════════════════════════════════════════════
 
     $app->routes->add_condition('fondation.perm' => sub {
@@ -126,7 +126,7 @@ Mojolicious::Plugin::Fondation::Helpers - All Fondation helpers in one place -- 
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

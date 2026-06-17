@@ -2,7 +2,7 @@ package Test::Pod::Coverage::TrustMe;
 use strict;
 use warnings;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.002002';
 $VERSION =~ tr/_//d;
 
 use File::Spec ();
@@ -187,7 +187,7 @@ sub all_pod_coverage_ok {
     $Test->plan( tests => scalar @modules );
 
     for my $module ( @modules ) {
-      pod_coverage_ok( $module, @_ ) or $ok = 0;
+      pod_coverage_ok( $module, \%opts, @_ ) or $ok = 0;
     }
   }
   else {

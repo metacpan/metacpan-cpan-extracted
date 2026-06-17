@@ -1,3 +1,8 @@
+0.22 2026-06-17T07:58:03+02:00
+ - Add error for bad dot in 080a field.
+ - Add error use case for bad apostrophe '´'.
+ - Add support for new check on 'date_entered_on_file' parameter.
+
 0.21 2026-05-06T08:20:20+02:00
  - Add error for bad apostrophe in 080a field.
  - Add error for bad quotation mark in 080a field.

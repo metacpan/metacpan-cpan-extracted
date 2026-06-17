@@ -8,19 +8,17 @@ App::Greple::xlate - tõlke tugimoodul greple jaoks
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> moodul leiab soovitud tekstiplokid ja asendab need tõlgitud tekstiga. Praegu on taustmootorina rakendatud DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) ja GPT-5 (F<gpt5.pm>) moodul.
+B<Greple> B<xlate> moodul leiab soovitud tekstiplokid ja asendab need tõlgitud tekstiga. Praegu on taustamootorina implementeeritud DeepL (F<deepl.pm>) ja GPT-5.5 (F<gpt5.pm>) moodul.
 
 Kui soovite tõlkida tavalisi tekstiplokke dokumendis, mis on kirjutatud Perli pod-stiilis, kasutage käsku B<greple> koos C<xlate::deepl> ja C<perl> mooduliga järgmiselt:
 
@@ -130,13 +128,11 @@ Praegu on saadaval järgmised mootorid
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 B<gpt-4o> liides on ebastabiilne ja praegu ei saa selle korrektset toimimist garanteerida.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -233,7 +229,7 @@ Sea see väärtus 1, kui soovid tõlkida ühe rea kaupa. See valik on ülimuslik
 
 =item B<--xlate-prompt>=I<text>
 
-Määra kohandatud viip, mis saadetakse tõlkemootorile. See valik on saadaval ainult ChatGPT mootorite (gpt3, gpt4, gpt4o) kasutamisel. Saad kohandada tõlke käitumist, andes mudelile konkreetsed juhised. Kui viip sisaldab C<%s>, asendatakse see sihtkeele nimega.
+Määrake tõlkemootorile saadetav kohandatud viip. See valik on saadaval ainult ChatGPT mootorite (gpt3, gpt4o, gpt5) kasutamisel. Saate tõlkekäitumist kohandada, andes tehisintellekti mudelile konkreetsed juhised. Kui viip sisaldab C<%s>, asendatakse see sihtkeele nimega.
 
 =item B<--xlate-context>=I<text>
 
@@ -373,7 +369,7 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head2 MODULES
 
-L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - xlate’i poolt konteineri toiminguteks kasutatav üldine Dockeri käitaja
 

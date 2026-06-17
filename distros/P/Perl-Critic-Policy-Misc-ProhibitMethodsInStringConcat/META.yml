@@ -1,0 +1,40 @@
+---
+abstract: 'Prohibit method calls in string concatenation'
+author:
+  - 'Dean Hamstead <dean@fragfest.com.au>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Perl::Critic: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-Misc-ProhibitMethodsInStringConcat
+no_index:
+  directory:
+    - t
+provides:
+  Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat:
+    file: lib/Perl/Critic/Policy/Misc/ProhibitMethodsInStringConcat.pm
+    version: '0.01'
+requires:
+  Perl::Critic: '0'
+  namespace::clean: '0'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/djzort/perl-critic-policy-prohibitmethodsinstringconcat/issues
+  homepage: https://github.com/djzort/perl-critic-policy-prohibitmethodsinstringconcat
+  repository: https://github.com/djzort/perl-critic-policy-prohibitmethodsinstringconcat.git
+version: '0.01'
+x_generated_by_perl: v5.40.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

@@ -7,8 +7,8 @@ eg/scal
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 lib/Date/Tolkien/Shire/Data.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json
@@ -26,6 +26,7 @@ t/month_name.t
 t/on_date.t
 t/on_date_accented.t
 t/quarter.t
+t/search_on_date.t
 t/trad_weekday_abbr.t
 t/trad_weekday_name.t
 t/trad_weekday_narrow.t

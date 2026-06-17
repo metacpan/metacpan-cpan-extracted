@@ -1063,9 +1063,9 @@ with this module.
 
 =head1 SUPPORT
 
-Support on this module may be obtained by emailing me.  However,
-I am not a developer on the other classes in the DateTime project.  For
-support on them, please see the support options in the DateTime documentation.
+Support is by the author. Please file bug reports at
+L<https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire/issues> or in
+electronic mail to the author.
 
 =head1 BIBLIOGRAPHY
 

@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "1.01";
+our $VERSION = "1.0201";
 
 =encoding utf-8
 
@@ -12,21 +12,19 @@ App::Greple::xlate - translation support module for greple
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
 B<Greple> B<xlate> module find desired text blocks and replace them by
-the translated text.  Currently DeepL (F<deepl.pm>), ChatGPT 4.1
-(F<gpt4.pm>), and GPT-5 (F<gpt5.pm>) module are implemented as a back-end engine.
+the translated text.  Currently DeepL (F<deepl.pm>) and GPT-5.5
+(F<gpt5.pm>) module are implemented as a back-end engine.
 
 If you want to translate normal text blocks in a document written in
 the Perl's pod style, use B<greple> command with C<xlate::deepl> and
@@ -185,14 +183,12 @@ At this time, the following engines are available
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 B<gpt-4o>'s interface is unstable and cannot be guaranteed to work
 correctly at the moment.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -309,7 +305,7 @@ option takes precedence over the C<--xlate-maxlen> option.
 =item B<--xlate-prompt>=I<text>
 
 Specify a custom prompt to be sent to the translation engine.  This option
-is only available when using ChatGPT engines (gpt3, gpt4, gpt4o).  You can
+is only available when using ChatGPT engines (gpt3, gpt4o, gpt5).  You can
 customize the translation behavior by providing specific instructions to the
 AI model.  If the prompt contains C<%s>, it will be replaced with the target
 language name.
@@ -490,7 +486,6 @@ L<https://github.com/tecolicom/App-gpty>
 =head2 MODULES
 
 L<App::Greple::xlate::deepl>,
-L<App::Greple::xlate::gpt4>,
 L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Generic Docker runner used by xlate for container operations

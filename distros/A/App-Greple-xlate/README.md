@@ -7,21 +7,19 @@ App::Greple::xlate - translation support module for greple
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 # VERSION
 
-Version 1.01
+Version 1.0201
 
 # DESCRIPTION
 
 **Greple** **xlate** module find desired text blocks and replace them by
-the translated text.  Currently DeepL (`deepl.pm`), ChatGPT 4.1
-(`gpt4.pm`), and GPT-5 (`gpt5.pm`) module are implemented as a back-end engine.
+the translated text.  Currently DeepL (`deepl.pm`) and GPT-5.5
+(`gpt5.pm`) module are implemented as a back-end engine.
 
 If you want to translate normal text blocks in a document written in
 the Perl's pod style, use **greple** command with `xlate::deepl` and
@@ -162,13 +160,12 @@ This interface is experimental and subject to change in the future.
 
     - **deepl**: DeepL API
     - **gpt3**: gpt-3.5-turbo
-    - **gpt4**: gpt-4.1
     - **gpt4o**: gpt-4o-mini
 
         **gpt-4o**'s interface is unstable and cannot be guaranteed to work
         correctly at the moment.
 
-    - **gpt5**: gpt-5
+    - **gpt5**: gpt-5.5
 
 - **--xlate-labor**
 - **--xlabor**
@@ -277,7 +274,7 @@ This interface is experimental and subject to change in the future.
 - **--xlate-prompt**=_text_
 
     Specify a custom prompt to be sent to the translation engine.  This option
-    is only available when using ChatGPT engines (gpt3, gpt4, gpt4o).  You can
+    is only available when using ChatGPT engines (gpt3, gpt4o, gpt5).  You can
     customize the translation behavior by providing specific instructions to the
     AI model.  If the prompt contains `%s`, it will be replaced with the target
     language name.
@@ -443,7 +440,6 @@ You have to install command line tools for DeepL and ChatGPT.
 ## MODULES
 
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl),
-[App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4),
 [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - Generic Docker runner used by xlate for container operations

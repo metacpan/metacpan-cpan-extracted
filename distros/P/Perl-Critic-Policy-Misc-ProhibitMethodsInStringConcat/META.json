@@ -1,0 +1,92 @@
+{
+   "abstract" : "Prohibit method calls in string concatenation",
+   "author" : [
+      "Dean Hamstead <dean@fragfest.com.au>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-Misc-ProhibitMethodsInStringConcat",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoBreakpoints" : "0.15",
+            "Test::NoTabs" : "0",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.024"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat" : {
+         "file" : "lib/Perl/Critic/Policy/Misc/ProhibitMethodsInStringConcat.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/djzort/perl-critic-policy-prohibitmethodsinstringconcat/issues"
+      },
+      "homepage" : "https://github.com/djzort/perl-critic-policy-prohibitmethodsinstringconcat",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/djzort/perl-critic-policy-prohibitmethodsinstringconcat.git",
+         "web" : "https://github.com/djzort/perl-critic-policy-prohibitmethodsinstringconcat"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.40.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "MIT"
+}
+

@@ -114,6 +114,11 @@ typedef struct cryptx_mac_blake2b_struct {
   blake2bmac_state state;
   int finalized;
 } *Crypt__Mac__BLAKE2b;
+typedef struct cryptx_mac_kmac_struct {
+  kmac_state state;
+  int finalized;
+  int variant;
+} *Crypt__Mac__KMAC;
 
 typedef struct cipher_struct {          /* used by Crypt::Cipher */
   symmetric_key skey;
@@ -1486,6 +1491,7 @@ INCLUDE: inc/CryptX_AuthEnc_OCB.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_CCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_SIV.xs.inc
+INCLUDE: inc/CryptX_AuthEnc_GCMSIV.xs.inc
 
 INCLUDE: inc/CryptX_Stream_ChaCha.xs.inc
 INCLUDE: inc/CryptX_Stream_XChaCha.xs.inc
@@ -1505,6 +1511,7 @@ INCLUDE: inc/CryptX_Mac_XCBC.xs.inc
 INCLUDE: inc/CryptX_Mac_Poly1305.xs.inc
 INCLUDE: inc/CryptX_Mac_BLAKE2s.xs.inc
 INCLUDE: inc/CryptX_Mac_BLAKE2b.xs.inc
+INCLUDE: inc/CryptX_Mac_KMAC.xs.inc
 
 INCLUDE: inc/CryptX_Mode_CBC.xs.inc
 INCLUDE: inc/CryptX_Mode_ECB.xs.inc

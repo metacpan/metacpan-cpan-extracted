@@ -17,14 +17,12 @@ lib/Mojolicious/Plugin/Fondation/Action/Static.pm
 lib/Mojolicious/Plugin/Fondation/Action/Templates.pm
 lib/Mojolicious/Plugin/Fondation/Command/fondation.pm
 lib/Mojolicious/Plugin/Fondation/Controller/Base.pm
-lib/Mojolicious/Plugin/Fondation/Controller/Debug.pm
 lib/Mojolicious/Plugin/Fondation/Controller/Welcome.pm
 lib/Mojolicious/Plugin/Fondation/Helpers.pm
 lib/Mojolicious/Plugin/Fondation/Manager.pm
 lib/Mojolicious/Plugin/Fondation/Resolver.pm
 lib/Mojolicious/Plugin/Fondation/TestHelper.pm
 lib/Mojolicious/Plugin/Fondation/Utils.pm
-share/templates/debug/registry.html.ep
 share/templates/welcome_en.html.ep
 share/templates/welcome_fr.html.ep
 t/01-load.t

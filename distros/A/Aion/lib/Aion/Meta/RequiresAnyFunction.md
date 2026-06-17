@@ -51,6 +51,11 @@ $any_function->pkg  # => My::Package
 my $any_function = Aion::Meta::RequiresAnyFunction->new(name => 'my_function');
 $any_function->name  # => my_function
 ```
+
+## stringify ()
+
+Возвращает строковое представление объекта.
+
 # AUTHOR
 
 Yaroslav O. Kosmina <dart@cpan.org>

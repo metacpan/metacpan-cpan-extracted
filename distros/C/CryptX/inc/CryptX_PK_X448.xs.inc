@@ -97,7 +97,10 @@ _import_pem(Crypt::PK::X448 self, SV * key_data, SV * passwd)
           rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, NULL);
        }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_pkcs failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_X448) croak("FATAL: pem_decode_pkcs decoded non-X448 key");
+        if (key_from_pem.id != LTC_PKA_X448) {
+          pka_key_free(&key_from_pem);
+          croak("FATAL: pem_decode_pkcs decoded non-X448 key");
+        }
         self->key = key_from_pem.u.x448;
         self->initialized = 1;
         XPUSHs(ST(0)); /* return self */
@@ -168,7 +171,7 @@ key2hash(Crypt::PK::X448 self)
         if (self->key.type == PK_PRIVATE) {
           blen = sizeof(buf);
           rv = base16_encode(self->key.priv, 56, buf, &blen, 0);
-          if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(buf, sizeof(buf)); croak("FATAL: base16_encode failed: %s", error_to_string(rv)); }
           not_used = hv_store(rv_hash, "priv", 4, newSVpv(buf, blen), 0);
         }
         else {
@@ -177,11 +180,12 @@ key2hash(Crypt::PK::X448 self)
         /* pub */
         blen = sizeof(buf);
         rv = base16_encode(self->key.pub, 56, buf, &blen, 0);
-        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) { zeromem(buf, sizeof(buf)); croak("FATAL: base16_encode failed: %s", error_to_string(rv)); }
         not_used = hv_store(rv_hash, "pub", 3, newSVpv(buf, blen), 0);
         /* curve */
         not_used = hv_store(rv_hash, "curve", 5, newSVpv("x448", 0), 0);
         LTC_UNUSED_PARAM(not_used);
+        zeromem(buf, sizeof(buf));
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL
@@ -197,12 +201,12 @@ export_key_der(Crypt::PK::X448 self, char * type)
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strEQ(type, "private")) {
           rv = x448_export(out, &out_len, PK_PRIVATE|PK_STD, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: x448_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: x448_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else if (strEQ(type, "public")) {
           rv = x448_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: x448_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: x448_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
@@ -224,12 +228,12 @@ export_key_raw(Crypt::PK::X448 self, char * type)
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strEQ(type, "private")) {
           rv = x448_export(out, &out_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: x448_export(PK_PRIVATE) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: x448_export(PK_PRIVATE) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else if (strEQ(type, "public")) {
           rv = x448_export(out, &out_len, PK_PUBLIC, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: x448_export(PK_PUBLIC) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: x448_export(PK_PUBLIC) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
@@ -249,7 +253,7 @@ shared_secret(Crypt::PK::X448 self, Crypt::PK::X448 pubkey)
         unsigned long int buffer_len = sizeof(buffer);
 
         rv = x448_shared_secret(&self->key, &pubkey->key, buffer, &buffer_len);
-        if (rv != CRYPT_OK) croak("FATAL: x448_shared_secret failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: x448_shared_secret failed: %s", error_to_string(rv)); }
         RETVAL = newSVpvn((char*)buffer, buffer_len);
         zeromem(buffer, sizeof(buffer));
     }

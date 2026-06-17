@@ -10,7 +10,7 @@ use Date::Tolkien::Shire::Data qw{
 };
 use Test::More 0.47;	# The best we can do with Perl 5.6.2.
 
-plan tests => 201;
+plan tests => 207;
 
 my $normal = {
     year	=> 1419,
@@ -77,6 +77,15 @@ is( __format( $normal,  '%Ea' ), 'Su', q<%Ea on 25 Rethe 1419> );
 is( __format( $holiday, '%Ea' ), 'Hi', q<%Ea on 1 Lithe 1419> );
 is( __format( $special, '%Ea' ), '', q<%Ea on Midyear's day 1419> );
 
+is( __format( $normal,  '%EL' ), 'Rethe 25', q<%EL on 25 Rethe 1419> );
+is( __format( $holiday, '%EL' ), '1 Lithe', q<%EL on 1 Lithe 1419> );
+is( __format( $special, '%EL' ), q<Midyear's day>,
+    q<%EL on Midyear's day 1419> );
+
+is( __format( $normal,  '%El' ), 'Ret 25', q<%El on 25 Rethe 1419> );
+is( __format( $holiday, '%El' ), '1Li', q<%El on 1 Lithe 1419> );
+is( __format( $special, '%El' ), 'Myd', q<%El on Midyear's day 1419> );
+
 # Brought forward because it effects %Ed
 is( __format( $normal,  '%En' ), '', q<%En on 25 Rethe 1419> );
 is( __format( $holiday, '%En' ), '', q<%En on 1 Lithe 1419> );
@@ -110,7 +119,7 @@ is( __format( $special, '%En%Ed%Ed' ),
 is( __format( $normal,  '%EE' ), '', q<%EE on 25 Rethe 1419> );
 is( __format( $holiday, '%EE' ), '1 Lithe', q<%EE on 1 Lithe 1419> );
 is( __format( $special, '%EE' ), q<Midyear's day>,
-    q<%EE on 1 Midyear's day 1419> );
+    q<%EE on Midyear's day 1419> );
 
 is( __format( $normal,  '%Ee' ), '', q<%Ee on 25 Rethe 1419> );
 is( __format( $holiday, '%Ee' ), '1Li', q<%Ee on 1 Lithe 1419> );

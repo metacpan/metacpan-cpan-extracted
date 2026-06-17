@@ -6,19 +6,17 @@ App::Greple::xlate — модуль поддержки перевода для g
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 # VERSION
 
-Version 1.01
+Version 1.0201
 
 # DESCRIPTION
 
-**Greple** **xlate** модуль находит нужные текстовые блоки и заменяет их переведенным текстом. В настоящее время модули DeepL (`deepl.pm`), ChatGPT 4.1 (`gpt4.pm`) и GPT-5 (`gpt5.pm`) реализованы как серверные движки.
+**Greple** **xlate** модуль находит нужные текстовые блоки и заменяет их переведенным текстом. В настоящее время DeepL (`deepl.pm`) и модуль GPT-5.5 (`gpt5.pm`) реализованы как серверный движок.
 
 Если вы хотите переводить обычные текстовые блоки в документе, написанном в стиле pod языка Perl, используйте команду **greple** с модулями `xlate::deepl` и `perl` следующим образом:
 
@@ -110,12 +108,11 @@ Version 1.01
 
     - **deepl**: DeepL API
     - **gpt3**: gpt-3.5-turbo
-    - **gpt4**: gpt-4.1
     - **gpt4o**: gpt-4o-mini
 
         Интерфейс **gpt-4o** нестабилен и на данный момент не гарантирует корректную работу.
 
-    - **gpt5**: gpt-5
+    - **gpt5**: gpt-5.5
 
 - **--xlate-labor**
 - **--xlabor**
@@ -204,7 +201,7 @@ Version 1.01
 
 - **--xlate-prompt**=_text_
 
-    Укажите пользовательский промпт, отправляемый в движок перевода. Эта опция доступна только при использовании движков ChatGPT (gpt3, gpt4, gpt4o). Вы можете настроить поведение перевода, предоставив конкретные инструкции модели ИИ. Если промпт содержит `%s`, он будет заменён названием целевого языка.
+    Укажите пользовательский prompt, который будет отправлен движку перевода. Этот параметр доступен только при использовании движков ChatGPT (gpt3, gpt4o, gpt5). Вы можете настроить поведение перевода, предоставив конкретные инструкции AI-модели. Если prompt содержит `%s`, он будет заменен названием целевого языка.
 
 - **--xlate-context**=_text_
 
@@ -329,7 +326,7 @@ Version 1.01
 
 ## MODULES
 
-[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl), [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4), [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
+[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl), [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo) — универсальный запускатель Docker, используемый xlate для операций с контейнерами
 

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation;
-$Mojolicious::Plugin::Fondation::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::VERSION = '0.02';
 # ABSTRACT: Hierarchical plugin loader with configuration priority and resource sharing
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -69,11 +69,6 @@ sub register ($self, $app, $config = {}) {
         action     => 'index'
         );
 
-    $app->routes->get('/fondation/debug/registry')->to(
-        controller => 'Debug',
-        action     => 'registry'
-        ) if $app->mode eq 'development';
-
     return $self;
 }
 
@@ -91,7 +86,7 @@ Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration p
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -160,10 +155,6 @@ Key features:
 
 =back
 
-=head1 NAME
-
-Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration priority and resource sharing
-
 =head1 LOADING ORDER
 
     1. load_plugin_recursive
@@ -211,11 +202,10 @@ Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration p
 
 =head1 CONFIGURATION PRIORITIES
 
-Configuration for each plugin is merged in this order (highest priority first):
+Each plugin receives a merged configuration built from three sources,
+combined with L<Hash::Merge>. The cascade priority is:
 
-=over 4
-
-=item 1. Direct configuration (passed in C<dependencies> array)
+=head3 1. Direct configuration (passed in C<dependencies> array)
 
     plugin 'Fondation' => {
         dependencies => [
@@ -223,7 +213,7 @@ Configuration for each plugin is merged in this order (highest priority first):
         ],
     };
 
-=item 2. Application configuration file (e.g. myapp.conf)
+=head3 2. Application configuration file (e.g. myapp.conf)
 
     {
         'Fondation::User' => {
@@ -231,7 +221,7 @@ Configuration for each plugin is merged in this order (highest priority first):
         }
     }
 
-=item 3. Plugin defaults (returned by C<fondation_meta>)
+=head3 3. Plugin defaults (returned by C<fondation_meta>)
 
     sub fondation_meta {
         return {
@@ -239,7 +229,29 @@ Configuration for each plugin is merged in this order (highest priority first):
         };
     }
 
+The merge rules are:
+
+=over 4
+
+=item * Scalars -- overwrite. The highest-priority non-empty value wins.
+
+=item * Hashes -- merged recursively. Keys present at multiple levels are resolved
+by priority; keys present at only one level survive untouched.
+
+=item * Arrays -- concatenated. All values from all levels are kept, ordered
+by priority: direct elements first, then app config, then defaults.
+
 =back
+
+Example: a plugin declares C<allowed_roles =E<gt> ['user']> in its defaults,
+the app config adds C<allowed_roles =E<gt> ['editor']>, and a direct dependency
+passes C<allowed_roles =E<gt> ['admin']>. The merged result is
+C<['admin', 'editor', 'user']> -- all three roles are available, with the
+highest-priority one first.
+
+The C<dependencies> key is not special -- it follows the same array
+concatenation rules. This means an app config can add extra dependencies
+without repeating those already declared.
 
 =head1 RESOURCE DIRECTORIES (share/)
 
@@ -284,45 +296,6 @@ plugin-provided actions from C<fondation_meta -> provides_actions>.
         actions      => ['Templates'],       # keep Templates, drop Controllers
         dependencies => ['MyPlugin'],        # MyAction auto-added if declared
     };
-
-=head2 Configuration merge
-
-Each plugin receives a merged configuration built from three sources,
-combined with L<Hash::Merge>. The cascade priority is:
-
-=over 4
-
-=item 1. Direct config -- passed inline in the C<dependencies> list (highest priority)
-
-=item 2. App config -- from C<myapp.conf> or C<$app-E<gt>config> via L<Mojolicious::Plugin::Config>
-
-=item 3. Plugin defaults -- from C<fondation_meta -> defaults> (lowest priority)
-
-=back
-
-The merge rules are:
-
-=over 4
-
-=item * Scalars -- overwrite. The highest-priority non-empty value wins.
-
-=item * Hashes -- merged recursively. Keys present at multiple levels are resolved
-by priority; keys present at only one level survive untouched.
-
-=item * Arrays -- concatenated. All values from all levels are kept, ordered
-by priority: direct elements first, then app config, then defaults.
-
-=back
-
-Example: a plugin declares C<allowed_roles =E<gt> ['user']> in its defaults,
-the app config adds C<allowed_roles =E<gt> ['editor']>, and a direct dependency
-passes C<allowed_roles =E<gt> ['admin']>. The merged result is
-C<['admin', 'editor', 'user']> -- all three roles are available, with the
-highest-priority one first.
-
-The C<dependencies> key is not special -- it follows the same array
-concatenation rules. This means an app config can add extra dependencies
-without repeating those already declared.
 
 =head2 Default Actions
 
@@ -377,63 +350,36 @@ resolves it automatically.
 If the action name does not start with C<Mojolicious::>, Fondation will
 prepend C<Mojolicious::Plugin::Fondation::Action::> to it as a fallback.
 
-=head1 THE fondation_meta METHOD
+=head1 PLUGIN REGISTRY
 
-All Fondation-aware plugins should define a class method C<fondation_meta>:
-
-    sub fondation_meta {
-        return {
-            dependencies     => ['XXX', 'YYY'],   # loaded before this plugin
-            provides_actions => ['MyAction'],       # optional custom action
-            defaults         => {
-                title => 'Default Title',
-            },
-        };
-    }
+After loading, every plugin is recorded in the registry — a hashref keyed by fully-qualified plugin name. Each entry stores:
 
 =over 4
 
-=item * C<dependencies> -> array of plugin names to load first
+=item * instance — the plugin object returned by register()
 
-=item * C<provides_actions> -> optional array of custom action short names
+=item * short_name — e.g. "Fondation::User"
 
-=item * C<defaults> -> fallback configuration values
+=item * share_dir — path to the plugin's share/ directory
 
-=back
+=item * config — merged configuration (direct > app > defaults)
 
-This method is called before C<register> to collect metadata without
-instantiating the plugin.
+=item * metadata — has_templates, has_assets flags
 
-=head1 THE return $self REQUIREMENT
-
-To fully participate in Fondation's features (especially C<fondation_finalyze>),
-a plugin **must return $self** from its C<register> method:
-
-  sub register ($self, $app, $conf) {
-      # Your code...
-      return $self;
-  }
-
-If you don't return $self:
-
-=over 4
-
-=item * Instance is not stored in the registry
-
-=item * C<fondation_finalyze> cannot be called
-
-=item * Plugin is still loaded and actions run, but finalyze features are skipped
+=item * fondation_meta — the raw return value of the plugin's fondation_meta()
 
 =back
+
+The Manager owns the registry. L<Mojolicious::Plugin::Fondation::API> exposes it for read-only access (same hashref, no copy). Post-load actions (Templates, Controllers, Static) iterate over it, as do zone helpers (render_zone, render_zone_js) and the finalyze phase.
 
 =head1 CREATING A FONDATION-AWARE PLUGIN
 
-1. **File structure**
+=head3 1. File structure
 
     lib/Mojolicious/Plugin/Fondation/MyPlugin.pm
     share/templates/myplugin/           (optional)
 
-2. **Minimal code**
+=head3 2. Minimal code
 
     package Mojolicious::Plugin::Fondation::MyPlugin;
     use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -458,7 +404,7 @@ If you don't return $self:
 
     1;
 
-3. **Loading**
+=head3 3. Loading
 
     In your Fondation config:
 
@@ -467,12 +413,50 @@ If you don't return $self:
             # or { 'MyPlugin' => { enable_feature => 0 } }
         ]
 
-4. **Testing**
+=head2 The C<fondation_meta> contract
 
-    - Check registry: C<< $app->manager->registry >>
-    - Check logs for contextual debug (C<< [$short] message >>)
-    - Verify templates are added
-    - Use C<< /fondation/debug/registry >> route (development mode) to inspect
+All Fondation-aware plugins must define a class method C<fondation_meta>:
+
+    sub fondation_meta {
+        return {
+            dependencies     => ['XXX', 'YYY'],   # loaded before this plugin
+            provides_actions => ['MyAction'],       # optional custom action
+            defaults         => {
+                title => 'Default Title',
+            },
+        };
+    }
+
+=over 4
+
+=item * C<dependencies> -> array of plugin names to load first
+
+=item * C<provides_actions> -> optional array of custom action short names
+
+=item * C<defaults> -> fallback configuration values (lowest priority)
+
+=back
+
+This method is called before C<register> to collect metadata without
+instantiating the plugin. It is the cornerstone of Fondation's composition
+model: every plugin declares what it needs and what it provides.
+
+=head2 Why C<return $self> is required
+
+To fully participate in Fondation's features (especially C<fondation_finalyze>),
+a plugin B<must return $self> from its C<register> method.
+
+If you don't return $self:
+
+=over 4
+
+=item * Instance is not stored in the registry
+
+=item * C<fondation_finalyze> cannot be called
+
+=item * Plugin is still loaded and actions run, but finalyze features are skipped
+
+=back
 
 =head1 HELPERS
 
@@ -523,6 +507,11 @@ the raw content instead of rendering through the template engine.
 
     %= render_zone 'header'
     %= render_zone_js 'footer'
+
+=head1 ABOUT THIS PROJECT
+
+Fondation and its plugin ecosystem were developed with significant
+assistance from an AI coding agent.
 
 =head1 AUTHOR
 

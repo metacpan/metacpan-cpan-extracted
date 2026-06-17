@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01681nas a2200433 i 4500</leader>
+  <controlfield tag="001">cps20010990644</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20230403120827.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">010226d20002011xr  x pe      0    0cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000990644</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">OLA001</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-xr---</subfield>
+    <subfield code="b">e-xr-pg</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">796</subfield>
+    <subfield code="x">Sport. Hry. Tělesná cvičení</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">20</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">050</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">351,7</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">796/799</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Sportovec Ministerstva vnitra :</subfield>
+    <subfield code="b">občasník : aktuality, rozhovory, výsledky, informace</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Ministerstvo vnitra ČR - Odbor sportu,</subfield>
+    <subfield code="c">2000-2011</subfield>
+  </datafield>
+  <datafield tag="264" ind1="3" ind2="1">
+    <subfield code="3">[2009?]-2011</subfield>
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Centrum sportu Ministerstva vnitra České republiky</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">12 sv. ;</subfield>
+    <subfield code="c">29 cm</subfield>
+  </datafield>
+  <datafield tag="310" ind1=" " ind2=" ">
+    <subfield code="a">Vychází nepravidelně</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="362" ind1="0" ind2=" ">
+    <subfield code="a">Roč. 1, č. 1 (2000)-roč. 12, č. 2 (2011)</subfield>
+  </datafield>
+  <datafield tag="588" ind1=" " ind2=" ">
+    <subfield code="a">Popsáno podle: Č. 4 (listopad 2000)</subfield>
+    <subfield code="5">CZ-PrNK</subfield>
+  </datafield>
+  <datafield tag="610" ind1="2" ind2="7">
+    <subfield code="a">Unie tělovýchovných organizací Policie České republiky</subfield>
+    <subfield code="7">kn20050802014</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="610" ind1="1" ind2="7">
+    <subfield code="a">Česko.</subfield>
+    <subfield code="b">Ministerstvo vnitra.</subfield>
+    <subfield code="b">Odbor sportu</subfield>
+    <subfield code="7">kn20050802015</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">sport</subfield>
+    <subfield code="7">ph116248</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">policie</subfield>
+    <subfield code="7">ph124228</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">specializované časopisy</subfield>
+    <subfield code="7">fd133565</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="772" ind1="0" ind2=" ">
+    <subfield code="t">Policista</subfield>
+    <subfield code="x">1211-7943</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="r">2000</subfield>
+    <subfield code="t">p</subfield>
+  </datafield>
+  <datafield tag="968" ind1=" " ind2=" ">
+    <subfield code="a">14a</subfield>
+  </datafield>
+  <datafield tag="969" ind1=" " ind2=" ">
+    <subfield code="a">b6</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="n">Ministerstvo vnitra ČR - Odbor sportu</subfield>
+    <subfield code="a">Za císařským mlýnem 1063, 170 06 Praha 7</subfield>
+  </datafield>
+  <datafield tag="979" ind1=" " ind2=" ">
+    <subfield code="n">Sportovec ministerstva vnitra - redakce</subfield>
+    <subfield code="i">David</subfield>
+    <subfield code="j">Oldřich</subfield>
+    <subfield code="e">02/61 43 62 62</subfield>
+    <subfield code="x">sportmv@mvcr.cz</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000990644</subfield>
+  </datafield>
+</record>
+
+</collection>

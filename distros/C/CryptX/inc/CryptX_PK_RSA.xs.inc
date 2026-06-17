@@ -96,7 +96,10 @@ _import_pem(Crypt::PK::RSA self, SV * key_data, SV * passwd)
           rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, NULL);
         }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_pkcs failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_RSA && key_from_pem.id != LTC_PKA_RSA_PSS) croak("FATAL: pem_decode_pkcs decoded non-RSA key");
+        if (key_from_pem.id != LTC_PKA_RSA && key_from_pem.id != LTC_PKA_RSA_PSS) {
+          pka_key_free(&key_from_pem);
+          croak("FATAL: pem_decode_pkcs decoded non-RSA key");
+        }
         self->key = key_from_pem.u.rsa;
         XPUSHs(ST(0)); /* return self */
     }
@@ -121,7 +124,10 @@ _import_openssh(Crypt::PK::RSA self, SV * key_data, SV * passwd)
           rv = pem_decode_openssh(data, (unsigned long)data_len, &key_from_pem, NULL);
         }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_openssh failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_RSA && key_from_pem.id != LTC_PKA_RSA_PSS) croak("FATAL: pem_decode_openssh decoded non-RSA key");
+        if (key_from_pem.id != LTC_PKA_RSA && key_from_pem.id != LTC_PKA_RSA_PSS) {
+          pka_key_free(&key_from_pem);
+          croak("FATAL: pem_decode_openssh decoded non-RSA key");
+        }
         self->key = key_from_pem.u.rsa;
         XPUSHs(ST(0)); /* return self */
     }
@@ -224,6 +230,7 @@ key2hash(Crypt::PK::RSA self)
         /* e */
         siz = (self->key.e) ? mp_ubin_size(self->key.e) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'e' too big number");
         }
         if (siz>0) {
@@ -236,6 +243,7 @@ key2hash(Crypt::PK::RSA self)
         /* d */
         siz = (self->key.d) ? mp_ubin_size(self->key.d) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'd' too big number");
         }
         if (siz>0) {
@@ -248,6 +256,7 @@ key2hash(Crypt::PK::RSA self)
         /* N */
         siz = (self->key.N) ? nsize : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'N' too big number");
         }
         if (siz>0) {
@@ -260,6 +269,7 @@ key2hash(Crypt::PK::RSA self)
         /* q */
         siz = (self->key.q) ? mp_ubin_size(self->key.q) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'q' too big number");
         }
         if (siz>0) {
@@ -272,6 +282,7 @@ key2hash(Crypt::PK::RSA self)
         /* p */
         siz = (self->key.p) ? mp_ubin_size(self->key.p) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'p' too big number");
         }
         if (siz>0) {
@@ -284,6 +295,7 @@ key2hash(Crypt::PK::RSA self)
         /* qP */
         siz = (self->key.qP) ? mp_ubin_size(self->key.qP) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'qP' too big number");
         }
         if (siz>0) {
@@ -296,6 +308,7 @@ key2hash(Crypt::PK::RSA self)
         /* dP */
         siz = (self->key.dP) ? mp_ubin_size(self->key.dP) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'dP' too big number");
         }
         if (siz>0) {
@@ -308,6 +321,7 @@ key2hash(Crypt::PK::RSA self)
         /* dQ */
         siz = (self->key.dQ) ? mp_ubin_size(self->key.dQ) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'dQ' too big number");
         }
         if (siz>0) {
@@ -322,6 +336,7 @@ key2hash(Crypt::PK::RSA self)
         /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         LTC_UNUSED_PARAM(not_used);
+        zeromem(buf, sizeof(buf));
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL
@@ -337,12 +352,12 @@ export_key_der(Crypt::PK::RSA self, char * type)
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strEQ(type, "private")) {
           rv = rsa_export(out, &out_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_export(PK_PRIVATE) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: rsa_export(PK_PRIVATE) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else if (strEQ(type, "public")) {
           rv = rsa_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: rsa_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
@@ -390,7 +405,7 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
           rsa_oparams.params.mgf1_hash_idx = mgf_hash_id;
           rsa_oparams.params.saltlen = 0;
           rv = rsa_encrypt_key_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_v2/oaep failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: rsa_encrypt_key_v2/oaep failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
@@ -403,13 +418,13 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
           rsa_oparams.params.mgf1_hash_idx = -1;     /* OAEP only */
           rsa_oparams.params.saltlen = 0;            /* PSS only */
           rv = rsa_encrypt_key_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_v2/v1.5 failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: rsa_encrypt_key_v2/v1.5 failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "none", 4)) {
           /* raw RSA */
           rv = ltc_mp.rsa_me(data_ptr, (unsigned long)data_len, buffer, &buffer_len, PK_PUBLIC, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: rsa_me failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else {
@@ -457,8 +472,8 @@ decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
           rsa_oparams.params.mgf1_hash_idx = mgf_hash_id;
           rsa_oparams.params.saltlen = 0;
           rv = rsa_decrypt_key_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &stat, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_v2 failed: %s", error_to_string(rv));
-          if (stat != 1) croak("FATAL: rsa_decrypt - not valid OAEP packet");
+          if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: rsa_decrypt_key_v2 failed: %s", error_to_string(rv)); }
+          if (stat != 1) { zeromem(buffer, sizeof(buffer)); croak("FATAL: rsa_decrypt - not valid OAEP packet"); }
           sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
@@ -471,14 +486,14 @@ decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
           rsa_oparams.params.mgf1_hash_idx = -1;     /* OAEP only */
           rsa_oparams.params.saltlen = 0;            /* PSS only */
           rv = rsa_decrypt_key_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &stat, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_v2 failed: %s", error_to_string(rv));
-          if (stat != 1) croak("FATAL: rsa_decrypt - invalid");
+          if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: rsa_decrypt_key_v2 failed: %s", error_to_string(rv)); }
+          if (stat != 1) { zeromem(buffer, sizeof(buffer)); croak("FATAL: rsa_decrypt - invalid"); }
           sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "none", 4)) {
           /* raw RSA */
           rv = ltc_mp.rsa_me(data_ptr, (unsigned long)data_len, buffer, &buffer_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: rsa_me failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else {
@@ -507,7 +522,7 @@ sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const
           hash_id = cryptx_internal_find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = hash_memory(hash_id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
-          if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(tmp, sizeof(tmp)); croak("FATAL: hash_memory failed: %s", error_to_string(rv)); }
           data_ptr = tmp;
           data_len = tmp_len;
         }
@@ -525,7 +540,11 @@ sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const
           rsa_oparams.params.mgf1_hash_idx = mgf_hash_id;
           rsa_oparams.params.saltlen = saltlen;
           rv = rsa_sign_hash_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_v2 failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            zeromem(buffer, sizeof(buffer));
+            zeromem(tmp, sizeof(tmp));
+            croak("FATAL: rsa_sign_hash_v2 failed: %s", error_to_string(rv));
+          }
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
@@ -540,7 +559,11 @@ sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const
           rsa_oparams.params.mgf1_hash_idx = -1;
           rsa_oparams.params.saltlen = 0;
           rv = rsa_sign_hash_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_v2 failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            zeromem(buffer, sizeof(buffer));
+            zeromem(tmp, sizeof(tmp));
+            croak("FATAL: rsa_sign_hash_v2 failed: %s", error_to_string(rv));
+          }
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5.na1", 8)) {
@@ -549,7 +572,11 @@ sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const
         else if (strnEQ(padding, "none", 4)) {
           /* raw RSA */
           rv = ltc_mp.rsa_me(data_ptr, (unsigned long)data_len, buffer, &buffer_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            zeromem(buffer, sizeof(buffer));
+            zeromem(tmp, sizeof(tmp));
+            croak("FATAL: rsa_me failed: %s", error_to_string(rv));
+          }
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else {
@@ -625,8 +652,10 @@ verify_hash(Crypt::PK::RSA self, SV * sig, SV * data, const char * hash_name = "
           rv = ltc_mp.rsa_me(sig_ptr, (unsigned long)sig_len, buffer, &buffer_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
           if (data_len <= buffer_len && buffer_len > 0 && data_len > 0) {
-            for (i = 0; i < buffer_len - data_len; i++) if (buffer[i] != 0) RETVAL = 0;
-            if (memNE(data_ptr, buffer + buffer_len - data_len, data_len)) RETVAL = 0;
+            unsigned char acc = 0;
+            for (i = 0; i < buffer_len - data_len; i++) acc |= buffer[i];
+            if (acc != 0) RETVAL = 0;
+            if (mem_neq(data_ptr, buffer + buffer_len - data_len, data_len)) RETVAL = 0;
           }
           else {
             RETVAL = 0;

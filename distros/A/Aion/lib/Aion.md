@@ -5,7 +5,7 @@ Aion - постмодернистская объектная система дл
 
 # VERSION
 
-1.9
+2.0
 
 # SYNOPSIS
 
@@ -216,6 +216,14 @@ package Example::Mars {
 
 	has moon => (is => "rw", lvalue => 1);
 }
+```
+
+## pleroma ()
+
+Возвращает локатор.
+
+```perl
+Aion->pleroma->isa('Aion::Pleroma')  # -> 1
 ```
 
 # SUBROUTINES IN CLASSES

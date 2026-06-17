@@ -26,7 +26,7 @@ sub add_to_cleanup {
 }
 
 sub author {
-    return 'Thomas R. Wyant, III F<wyant at cpan dot org>';
+    return 'Thomas R. Wyant, III F<harryfmudd at comcast dot net>';
 }
 
 sub build_requires {
@@ -66,9 +66,8 @@ sub meta_merge {
 	dynamic_config	=> 1,
 	resources	=> {
 	    bugtracker	=> {
-		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data',
-		# web	=> 'https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues',
-		mailto  => 'wyant@cpan.org',
+		web	=> 'https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues',
+		mailto  => 'harryfmudd@comcast.net',
 	    },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {
@@ -331,21 +330,20 @@ information makes it into F<META.yml>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data>,
-L<https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues>, or in
+L<https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2022, 2025 by Thomas R. Wyant, III
+Copyright (C) 2017-2022, 2025-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

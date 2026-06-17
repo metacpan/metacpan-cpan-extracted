@@ -1,3 +1,19 @@
+0.011		2026-06-16	T. R. Wyant
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net.
+
+    Repackage licenses so that GitHub can find them (maybe).
+    Thanks to Mikko Koivunalho (specifically his blog post
+    https://blogs.perl.org/users/mikko_koivunalho/2025/11/github-and-the-perl-license.html
+    for the how-to.
+
+    Add %EL and %El for day label (not name). This is month and day, or
+    holiday name for holidays. Not "name" because
+    %En was taken.
+
+    Add __search_on_date().
+
 0.010		2025-02-27	T. R. Wyant
     Add CONTRIBUTING and SECURITY.
     Correct spelling of 'Meriadoc' in 2/29 on_date. Thanks to Blaine

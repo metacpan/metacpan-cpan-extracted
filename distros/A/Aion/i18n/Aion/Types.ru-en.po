@@ -25,8 +25,14 @@ msgstr "`where` and `message` are syntactic sugar, and `subtype` can be used wit
 msgid "Используется с `subtype` для расширения создаваемого типа `$super_type`."
 msgstr "Used with `subtype` to extend the created `$super_type` type."
 
+msgid "`as` может принимать выражения из типов объединённые множественно-теоритическими операторами. Так же в нём допускаются параметры `A`, `B`, `C`, `D`, `ARGS`, `SELF`, `M` и `N`. `M` и `N` могут устанавливаться в секции `init_where` параметризированных типов входящих в `as`."
+msgstr "`as` can accept type expressions combined with set-theoretic operators. It also allows the parameters `A`, `B`, `C`, `D`, `ARGS`, `SELF`, `M` and `N`. `M` and `N` can be set in the `init_where` section of the parameterized types included in `as`."
+
 msgid "Инициализирует тип с новыми аргументами. Используется с `subtype`."
 msgstr "Initializes a type with new arguments. Used with `subtype`."
+
+msgid "Инициализация – ленивая. Это значит, что она сработает в методе `test` или подобном."
+msgstr "Initialization is lazy. This means that it will work in the `test` method or similar."
 
 msgid "Использует `$code` как тест. Значение для теста передаётся в `$_`."
 msgstr "Uses `$code` as a test. The value for the test is passed to `$_`."
@@ -46,14 +52,26 @@ msgstr "Current type. `SELF` is used in `init_where`, `where` and `awhere`."
 msgid "Аргументы текущего типа. В скалярном контексте возвращает ссылку на массив, а в контексте массива возвращает список. Используется в `init_where`, `where` и `awhere`."
 msgstr "Arguments of the current type. In a scalar context, it returns a reference to an array, and in an array context, it returns a list. Used in `init_where`, `where` and `awhere`."
 
-msgid "Первый, второй, третий и пятый аргумент типа."
-msgstr "The first, second, third and fifth type arguments."
+msgid "A, B, C, D – первый, второй, третий и пятый аргумент типа."
+msgstr "A, B, C, D – the first, second, third and fifth type argument."
 
 msgid "Используется в `init_where`, `where` и `awhere`."
 msgstr "Used in `init_where`, `where` and `awhere`."
 
+msgid "Второй аргумент типа."
+msgstr "Second type argument."
+
+msgid "Третий аргумент типа."
+msgstr "Third type argument."
+
+msgid "Четвёртый аргумент типа."
+msgstr "The fourth type argument."
+
 msgid "`M` и `N` сокращение для `SELF->{M}` и `SELF->{N}`."
 msgstr "`M` and `N` are shorthand for `SELF->{M}` and `SELF->{N}`."
+
+msgid "Сокращение для `SELF->{N}`."
+msgstr "Shorthand for `SELF->{N}`."
 
 msgid "Используется с `subtype` для вывода сообщения об ошибке, если значение исключает тип. В `$code` используется: `SELF` - текущий тип, `ARGS`, `A`, `B`, `C`, `D` - аргументы типа (если есть) и проверочное значение в `$_`. Его можно преобразовать в строку с помощью `SELF->val_to_str($_)`."
 msgstr "Used with `subtype` to print an error message if the value excludes the type. `$code` uses: `SELF` - the current type, `ARGS`, `A`, `B`, `C`, `D` - type arguments (if any) and a test value in `$_`. It can be converted to a string using `SELF->val_to_str($_)`."
@@ -79,6 +97,9 @@ msgstr "Checks the signature of a subroutine: arguments and results."
 msgid "Тип верхнего уровня в иерархии. Сопоставляет всё."
 msgstr "The top level type in the hierarchy. Compares everything."
 
+msgid "Нижний тип можно получить как `~Any`."
+msgstr "The bottom type can be obtained as `~Any`."
+
 msgid "Тип верхнего уровня в конструкторах иерархии создает новые типы из любых типов."
 msgstr "The top-level type in hierarchy constructors creates new types from any types."
 
@@ -88,11 +109,8 @@ msgstr "Union of several types. Similar to the `$type1 | $type2`."
 msgid "Пересечение нескольких типов. Аналогичен оператору `$type1 & $type2`."
 msgstr "The intersection of several types. Similar to the `$type1 & $type2` operator."
 
-msgid "Исключение нескольких типов. Аналогичен оператору `~ $type`."
-msgstr "Exclusion of several types. Similar to the `~$type` operator."
-
-msgid "Если `Exclude` имеет много аргументов, то это аналог `~ ($type1 | $type2 ...)`."
-msgstr "If `Exclude` has many arguments, then it is analogous to `~ ($type1 | $type2 ...)`."
+msgid "Исключение значения типа. Аналогичен оператору `~ $type`."
+msgstr "Type value exception. Similar to the `~$type` operator."
 
 msgid "Дополнительные ключи в `Dict`."
 msgstr "Additional keys in `Dict`."
@@ -130,8 +148,8 @@ msgstr "Everything except `undef`."
 msgid "Определённые значения без ссылок."
 msgstr "Defined values without references."
 
-msgid "Определяет значение длины от `from` до `to` или от 0 до `from`, если `to` отсутствует."
-msgstr "Specifies a length value from `from` to `to`, or from 0 to `from` if `to` is missing."
+msgid "Определяет значение длины от `from` или 0 до `to`."
+msgstr "Specifies a length value from `from` or 0 to `to`."
 
 msgid "Perl версии."
 msgstr "Perl version."
@@ -199,29 +217,32 @@ msgstr "Numbers."
 msgid "Положительные числа."
 msgstr "Positive numbers."
 
-msgid "Машинное число с плавающей запятой составляет 4 байта."
-msgstr "A machine floating point number is 4 bytes."
-
-msgid "Машинное число с плавающей запятой составляет 8 байт."
-msgstr "A machine floating point number is 8 bytes."
-
-msgid "Числа между `from` и `to`."
-msgstr "Numbers between `from` and `to`."
-
 msgid "Целые числа."
 msgstr "Whole numbers."
 
-msgid "Рассчитывает максимальное и минимальное числа, которые поместятся в `N` байт и проверяет ограничение между ними."
-msgstr "Calculates the maximum and minimum numbers that will fit in `N` bytes and checks the constraint between them."
+msgid "Целые числа 1+."
+msgstr "Integers 1+."
 
 msgid "Положительные целые числа."
 msgstr "Positive integers."
 
+msgid "Каноничное машинное число с плавающей запятой составляет 4 байта."
+msgstr "A canonical machine floating point number is 4 bytes."
+
+msgid "Каноничное машинное число с плавающей запятой составляет 8 байт."
+msgstr "The canonical machine floating point number is 8 bytes."
+
+msgid "Числа между `from` и `to` включительно."
+msgstr "Numbers between `from` and `to` inclusive."
+
+msgid "Открытая граница. Используется с `Range`."
+msgstr "Open border. Used with `Range`."
+
+msgid "Рассчитывает максимальное и минимальное числа, которые поместятся в `N` байт и проверяет ограничение между ними."
+msgstr "Calculates the maximum and minimum numbers that will fit in `N` bytes and checks the constraint between them."
+
 msgid "Рассчитывает максимальное число, которое поместится в `N` байт (полагая, что в байтах нет отрицательного бита) и проверяет ограничение от 0 до этого числа."
 msgstr "Calculates the maximum number that will fit in `N` bytes (assuming there is no negative bit in the bytes) and checks the limit from 0 to that number."
-
-msgid "Целые числа 1+."
-msgstr "Integers 1+."
 
 msgid "Ссылка."
 msgstr "Link."
@@ -286,8 +307,8 @@ msgstr "File descriptor."
 msgid "Ссылки на массивы."
 msgstr "Array references."
 
-msgid "Ограничивает массивы от `A` до `B` элементов или от 0 до `A`, если `B` отсутствует."
-msgstr "Limits arrays from `A` to `B` elements, or from 0 to `A` if `B` is missing."
+msgid "Ограничивает массивы от `from` или 0 до `to` элементов."
+msgstr "Limits arrays from `from` or 0 to `to` elements."
 
 msgid "Ссылки на хеши."
 msgstr "Links to hashes."
@@ -313,6 +334,9 @@ msgstr "Dictionary."
 msgid "Хэш имеет перечисленные свойства. Кроме них он может иметь и другие."
 msgstr "A hash has the following properties. In addition to them, he may have others."
 
+msgid "Ограничивает количество ключей в хеше от `from` или 0 до `to`."
+msgstr "Limits the number of keys in the hash from `from` or 0 to `to`."
+
 msgid "Объект или строка."
 msgstr "Object or string."
 
@@ -322,8 +346,8 @@ msgstr "An object or class has listed methods. In addition to them, there may be
 msgid "Объект или класс с перегруженными операторами."
 msgstr "An object or class with overloaded operators."
 
-msgid "И у него есть операторы указанные операторы."
-msgstr "And it has operators specified operators."
+msgid "И у него перегружены указанные операторы."
+msgstr "And the specified operators are overloaded."
 
 msgid "Класс или объект наследует классы из списка."
 msgstr "A class or object inherits classes from a list."

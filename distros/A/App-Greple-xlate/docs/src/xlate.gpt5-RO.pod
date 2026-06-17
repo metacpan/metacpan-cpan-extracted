@@ -8,19 +8,17 @@ App::Greple::xlate - modul de suport pentru traducere pentru greple
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> modulul găsește blocurile de text dorite și le înlocuiește cu textul tradus. În prezent, modulele DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) și GPT-5 (F<gpt5.pm>) sunt implementate ca motoare back-end.
+B<Greple> B<xlate> modulul găsește blocurile de text dorite și le înlocuiește cu textul tradus. În prezent, DeepL (F<deepl.pm>) și modulul GPT-5.5 (F<gpt5.pm>) sunt implementate ca motor back-end.
 
 Dacă doriți să traduceți blocuri de text normale într-un document scris în stilul pod al Perl, folosiți comanda B<greple> cu modulele C<xlate::deepl> și C<perl> astfel:
 
@@ -130,13 +128,11 @@ Specifică motorul de traducere care va fi folosit. Dacă specificați direct mo
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 Interfața lui B<gpt-4o> este instabilă și nu poate fi garantat că va funcționa corect în acest moment.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -233,7 +229,7 @@ Setați această valoare la 1 dacă doriți să traduceți câte o linie pe rân
 
 =item B<--xlate-prompt>=I<text>
 
-Specificați un prompt personalizat care să fie trimis motorului de traducere. Această opțiune este disponibilă doar atunci când folosiți motoarele ChatGPT (gpt3, gpt4, gpt4o). Puteți personaliza comportamentul traducerii oferind instrucțiuni specifice modelului AI. Dacă promptul conține C<%s>, acesta va fi înlocuit cu numele limbii țintă.
+Specificați un prompt personalizat care să fie trimis motorului de traducere. Această opțiune este disponibilă numai când se folosesc motoare ChatGPT (gpt3, gpt4o, gpt5). Puteți personaliza comportamentul traducerii furnizând instrucțiuni specifice modelului AI. Dacă promptul conține C<%s>, acesta va fi înlocuit cu numele limbii țintă.
 
 =item B<--xlate-context>=I<text>
 
@@ -373,7 +369,7 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head2 MODULES
 
-L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Runner Docker generic folosit de xlate pentru operațiuni cu containere
 

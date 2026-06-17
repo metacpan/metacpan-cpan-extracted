@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Scalar::Util ();
 
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.37'; # VERSION
 
 # ABSTRACT: wrapper class around L<Spreadsheet::ParseExcel::Worksheet>
 
@@ -45,7 +45,7 @@ Spreadsheet::ParseXLSX::Worksheet - wrapper class around L<Spreadsheet::ParseExc
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,7 @@ Jesse Luehrs <doy@tozt.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Jesse Luehrs.
+This software is Copyright (c) 2026 by Jesse Luehrs.
 
 This is free software, licensed under:
 

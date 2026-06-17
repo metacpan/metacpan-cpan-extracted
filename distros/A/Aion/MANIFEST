@@ -33,6 +33,8 @@ lib/Aion/Pleroma.md
 lib/Aion/Pleroma.pm
 lib/Aion/Type.md
 lib/Aion/Type.pm
+lib/Aion/Type/Lim.md
+lib/Aion/Type/Lim.pm
 lib/Aion/Types.md
 lib/Aion/Types.pm
 minil.toml
@@ -47,6 +49,7 @@ t/aion/meta/subroutine.t
 t/aion/meta/util.t
 t/aion/pleroma.t
 t/aion/type.t
+t/aion/type/lim.t
 t/aion/types.t
 META.yml
 MANIFEST

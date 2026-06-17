@@ -8,19 +8,17 @@ App::Greple::xlate - vertaalondersteuningsmodule voor greple
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> module zoek de gewenste tekstblokken en vervang ze door de vertaalde tekst. Momenteel zijn DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) en GPT-5 (F<gpt5.pm>) module geïmplementeerd als back-end engine.
+B<Greple> B<xlate>-module zoekt de gewenste tekstblokken en vervangt deze door de vertaalde tekst. Momenteel zijn de DeepL (F<deepl.pm>)- en GPT-5.5 (F<gpt5.pm>)-modules geïmplementeerd als back-end-engine.
 
 Als je normale tekstblokken wilt vertalen in een document dat geschreven is in de pod-stijl van Perl, gebruik dan het commando B<greple> met de module C<xlate::deepl> en C<perl> als volgt:
 
@@ -130,13 +128,11 @@ Op dit moment zijn de volgende engines beschikbaar
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 De interface van B<gpt-4o> is instabiel en er kan op dit moment niet gegarandeerd worden dat deze correct werkt.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -233,7 +229,7 @@ Stel deze waarde in op 1 als je één regel per keer wilt vertalen. Deze optie h
 
 =item B<--xlate-prompt>=I<text>
 
-Geef een aangepaste prompt op die naar de vertaalmachine moet worden gestuurd. Deze optie is alleen beschikbaar bij gebruik van ChatGPT engines (gpt3, gpt4, gpt4o). Je kunt het vertaalgedrag aanpassen door specifieke instructies te geven aan het AI-model. Als de prompt C<%s> bevat, wordt deze vervangen door de naam van de doeltaal.
+Geef een aangepaste prompt op die naar de vertaalengine moet worden verzonden. Deze optie is alleen beschikbaar bij gebruik van ChatGPT-engines (gpt3, gpt4o, gpt5). U kunt het vertaalgedrag aanpassen door specifieke instructies aan het AI-model te geven. Als de prompt C<%s> bevat, wordt dit vervangen door de naam van de doeltaal.
 
 =item B<--xlate-context>=I<text>
 
@@ -373,7 +369,7 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head2 MODULES
 
-L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Generieke Docker runner gebruikt door xlate voor containeroperaties
 

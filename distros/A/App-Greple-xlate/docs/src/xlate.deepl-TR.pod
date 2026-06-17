@@ -8,19 +8,17 @@ App::Greple::xlate - greple için çeviri destek modülü
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> modülü istenen metin bloklarını bulur ve bunları çevrilen metinle değiştirir. Şu anda DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) ve GPT-5 (F<gpt5.pm>) modülü bir arka uç motoru olarak uygulanmaktadır.
+B<Greple> B<xlate> modülü, istenen metin bloklarını bulur ve bunları çevrilmiş metinle değiştirir. Şu anda DeepL (F<deepl.pm>) ve GPT-5.5 (F<gpt5.pm>) modülleri arka uç motoru olarak uygulanmaktadır.
 
 Perl'ün pod stilinde yazılmış bir belgedeki normal metin bloklarını çevirmek istiyorsanız, B<greple> komutunu C<xlate::deepl> ve C<perl> modülü ile aşağıdaki gibi kullanın:
 
@@ -130,13 +128,11 @@ Kullanılacak çeviri motorunu belirtir. Motor modülünü C<-Mxlate::deepl> gib
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 B<gpt-4o>'nun arayüzü kararsızdır ve şu anda doğru çalışacağı garanti edilemez.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -233,7 +229,7 @@ Her seferinde bir satır çevirmek istiyorsanız bu değeri 1 olarak ayarlayın.
 
 =item B<--xlate-prompt>=I<text>
 
-Çeviri motoruna gönderilecek özel bir istem belirtin. Bu seçenek yalnızca ChatGPT motorları (gpt3, gpt4, gpt4o) kullanıldığında kullanılabilir. Yapay zeka modeline özel talimatlar sağlayarak çeviri davranışını özelleştirebilirsiniz. Komut istemi C<%s> içeriyorsa, hedef dil adı ile değiştirilecektir.
+Çeviri motoruna gönderilecek özel bir komut belirtin. Bu seçenek yalnızca ChatGPT motorları (gpt3, gpt4o, gpt5) kullanılırken kullanılabilir. AI modeline belirli talimatlar vererek çeviri davranışını özelleştirebilirsiniz. Komut satırı C<%s> içeriyorsa, bu hedef dil adıyla değiştirilecektir.
 
 =item B<--xlate-context>=I<text>
 
@@ -373,7 +369,7 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head2 MODULES
 
-L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - xlate tarafından konteyner işlemleri için kullanılan genel Docker çalıştırıcısı
 

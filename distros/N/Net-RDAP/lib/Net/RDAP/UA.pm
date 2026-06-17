@@ -40,6 +40,21 @@ sub request {
 }
 
 #
+# usage: $ua->get($url, $lang, %headers);
+#
+# this re-implements the parent get() method to provide a similar API to
+# mirror() (which accepts a $lang argument), so consumers don't have to
+# separately construct the correct header field value
+#
+sub get {
+    my ($self, $url, $lang, %headers) = @_;
+
+    $headers{q{accept-language}} = $lang if ($lang);
+
+    return $self->SUPER::get($url, %headers);
+}
+
+#
 # usage: $ua->mirror($url, $file, $ttl, $accept_language);
 #
 # this re-implements the parent mirror() method to avoid a network roundtrip if

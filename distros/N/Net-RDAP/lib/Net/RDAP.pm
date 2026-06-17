@@ -1,6 +1,7 @@
 package Net::RDAP;
 use Carp;
 use Digest::SHA qw(sha256_hex);
+use File::Glob qw(bsd_glob);
 use File::Path qw(make_path);
 use File::Slurp;
 use File::Spec;
@@ -32,7 +33,7 @@ use constant {
 use strict;
 use warnings;
 
-$VERSION = '0.42';
+$VERSION = '0.43';
 
 =pod
 
@@ -125,6 +126,10 @@ default this is one hour (3600 seconds).
 not provided, then the directory to use is determined using L<File::XDG>. Prior
 to v0.42, the value of C<L<File::Spec>-E<gt>tmpdir()> was used.
 
+=item * C<preserve_cache> - unless this option is set to a true value, any cache
+entry older than the specified TTL will be purged when the L<Net::RDAP> object
+is destroyed. You can manually clean the cache using the C<clean_cache()> method.
+
 =item * C<accept_language> - a string that will be passed to RDAP servers in
 the C<Accept-Language> header. If not provided, the default is "C<en>".
 
@@ -157,8 +162,8 @@ If there was an error, this method will return a L<Net::RDAP::Error>.
 
 Domain names which contain characters other than those from the ASCII-compatible
 range must be encoded into "A-label" (or "Punycode") format before being passed
-to L<Net::DNS::Domain>. You can use L<Net::LibIDN> or L<Net::LibIDN2> to
-perform this encoding:
+to L<Net::DNS::Domain>. You can use L<Net::LibIDN>, L<Net::LibIDN2>, or
+L<Net::IDN::PP> to perform this encoding, for example:
 
     use Net::LibIDN;
 
@@ -408,44 +413,76 @@ sub _head {
     }
 }
 
+sub _cache_dir {
+    my $self = shift;
+
+    return $self->{cache_dir} || File::XDG->new(path_class => 'File::Spec', name => ref($self))->cache_home;
+}
+
+sub _cache_ttl {
+    my $self = shift;
+
+    return $self->{'cache_ttl'} || DEFAULT_CACHE_TTL;
+}
+
+sub _cache_filename {
+    my ($self, $dir, $url, $lang) = @_;
+
+    return File::Spec->catfile($dir, sprintf('%s.json', sha256_hex(join(chr(0), ($VERSION, $url->canonical->as_string, $lang)))));
+}
+
+sub _accept_language {
+    my $self = shift;
+
+    return $self->{accept_language} || DEFAULT_ACCEPT_LANGUAGE;
+}
+
 sub _get {
     my ($self, $url, %args) = @_;
 
-    #
-    # this is how long we allow things to be cached before checking
-    # if they have been updated:
-    #
-    my $ttl = $self->{'use_cache'} ? ($self->{'cache_ttl'} || DEFAULT_CACHE_TTL) : 0;
+    my $lang = $self->_accept_language;
 
-    my $lang = $self->{accept_language} || DEFAULT_ACCEPT_LANGUAGE;
+    my ($response, $data, $file);
 
-    #
-    # path to local copy of the remote resource
-    #
+    if (!$self->{'use_cache'}) {
+        $response = $self->ua->get($url, $lang);
 
-    my $dir = $self->{cache_dir} || File::XDG->new(path_class => 'File::Spec', name => ref($self))->cache_home;
+        $data = eval { decode_json($response->decoded_content) };
 
-    #
-    # untaint $dir
-    #
-    if ($dir =~ /(.+)/) {
-        $dir = $1;
+    } else {
+        #
+        # this is how long we allow things to be cached before checking
+        # if they have been updated:
+        #
+        my $ttl = $self->_cache_ttl;
+
+        #
+        # path to local copy of the remote resource
+        #
+        my $dir = $self->_cache_dir;
+
+        #
+        # untaint $dir
+        #
+        if ($dir =~ /(.+)/) {
+            $dir = $1;
+        }
+
+        croak(sprintf("Unable to create '%s'", $dir)) if (!-d $dir && !make_path($dir, { mode => 0700 }));
+
+        $file = $self->_cache_filename($dir, $url, $lang);
+
+        #
+        # untaint file
+        #
+        if ($file =~ /(.+)/) {
+            $file = $1;
+        }
+
+        $response = $self->ua->mirror($url, $file, $ttl, $lang);
+
+        $data = eval { decode_json(scalar(read_file($file))) };
     }
-
-    croak(sprintf("Unable to create '%s'", $dir)) if (!-d $dir && !make_path($dir, { mode => 0700 }));
-
-    my $file = File::Spec->catfile($dir, sprintf('%s.json', sha256_hex(join(chr(0), ($VERSION, $url->canonical->as_string, $lang)))));
-
-    #
-    # untaint file
-    #
-    if ($file =~ /(.+)/) {
-        $file = $1;
-    }
-
-    my $response = $self->ua->mirror($url, $file, $ttl, $lang);
-
-    my $data = eval { decode_json(scalar(read_file($file))) };
 
     if ($response->code >= 400) {
         return $self->error_from_response($url, $response, $data);
@@ -454,7 +491,7 @@ sub _get {
         return $self->rdap_from_response($url, $response, $data, %args);
 
     } else {
-        unlink($file) if (-e $file);
+        unlink($file) if ($self->{'use_cache'} && -e $file);
 
         chomp($@);
 
@@ -661,6 +698,29 @@ sub error {
         },
         $params{'url'},
     );
+}
+
+sub clean_cache {
+    my $self = shift;
+    my $dir = $self->_cache_dir;
+    my $ttl = $self->_cache_ttl;
+    foreach my $file (bsd_glob(sprintf('%s/*.json', $dir))) {
+        if (stat($file)->mtime < time() - $ttl) {
+            #
+            # untaint file
+            #
+            if ($file =~ /(.+)/) {
+                $file = $1;
+            }
+
+            unlink($file);
+        }
+    }
+}
+
+sub DESTROY {
+    my $self = shift;
+    $self->clean_cache unless ($self->{preserve_cache});
 }
 
 1;

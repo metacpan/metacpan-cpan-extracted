@@ -4,7 +4,7 @@ package Crypt::Cipher::IDEA;
 
 use strict;
 use warnings;
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use base qw(Crypt::Cipher);
 
@@ -48,6 +48,8 @@ Crypt::Cipher::IDEA - Symmetric cipher IDEA, key size: 128 bits
   my $ciphertext = $cbc->encrypt("secret data");
 
 =head1 DESCRIPTION
+
+I<Since: CryptX-0.055>
 
 This module implements the IDEA cipher. Its interface is compatible with L<Crypt::CBC>.
 

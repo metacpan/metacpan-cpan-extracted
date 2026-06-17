@@ -20,17 +20,32 @@ eval {SpeakOfKitty->validate("abc", "This")}; local ($::_g0 = $@, $::_e0 = 'Spea
 
 
 BEGIN {
-	subtype IntOrArrayRef => as (Int | ArrayRef);
+	subtype 'IntOrArrayRef[len, B]',
+		as Int & Range[5, A]
+			| ArrayRef[B & Len[A]];
 }
 
-local ($::_g0 = do {[] ~~ IntOrArrayRef}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[] ~~ IntOrArrayRef  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {35 ~~ IntOrArrayRef}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '35 ~~ IntOrArrayRef  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {"" ~~ IntOrArrayRef}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"" ~~ IntOrArrayRef  # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {35 ~~ IntOrArrayRef[35, Tel]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '35 ~~ IntOrArrayRef[35, Tel] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {35 ~~ IntOrArrayRef[34, Tel]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '35 ~~ IntOrArrayRef[34, Tel] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {'+23456789'  ~~ Tel}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'+23456789\'  ~~ Tel # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'+234567890' ~~ Tel}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'+234567890\' ~~ Tel # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'+23456789'  ~~ (Tel & Len[9])}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'+23456789\'  ~~ (Tel & Len[9]) # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'+234567890' ~~ (Tel & Len[9])}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'+234567890\' ~~ (Tel & Len[9]) # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {['+23456789',  '+23456789'] ~~ IntOrArrayRef[9, Tel]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[\'+23456789\',  \'+23456789\'] ~~ IntOrArrayRef[9, Tel] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {['+234567890', '+23456789'] ~~ IntOrArrayRef[9, Tel]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[\'+234567890\', \'+23456789\'] ~~ IntOrArrayRef[9, Tel] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {"" ~~ IntOrArrayRef[8, Tel]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"" ~~ IntOrArrayRef[8, Tel]  # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 
-coerce IntOrArrayRef, from Num, via { int($_ + .5) };
+coerce IntOrArrayRef[35, Str], from Num, via { int($_ + .5) };
 
-local ($::_g0 = do {IntOrArrayRef->coerce(5.5)}, $::_e0 = "6"); ::ok $::_g0 eq $::_e0, 'IntOrArrayRef->coerce(5.5) # => 6' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {IntOrArrayRef([35, Str])->coerce(5.5)}, $::_e0 = "6"); ::ok $::_g0 eq $::_e0, 'IntOrArrayRef([35, Str])->coerce(5.5) # => 6' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {5.5 >> IntOrArrayRef[35, Str]}, $::_e0 = "6"); ::ok $::_g0 eq $::_e0, '5.5 >> IntOrArrayRef[35, Str] # => 6' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {(Tel & Len[9]) < (Tel & Len[10])}, $::_e0 = "1"); ::ok $::_g0 eq $::_e0, '(Tel & Len[9]) < (Tel & Len[10]) # => 1' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPTION
@@ -75,8 +90,9 @@ local ($::_g0 = do {IntOrArrayRef->coerce(5.5)}, $::_e0 = "6"); ::ok $::_g0 eq $
 # 					StrDate
 # 					StrDateTime
 # 					StrMatch[regexp]
-# 					ClassName
-# 					RoleName
+# 					PackageName
+# 						ClassName
+# 						RoleName
 # 					Join[separator]
 # 					Split[separator]
 # 					StrRat
@@ -102,34 +118,34 @@ local ($::_g0 = do {IntOrArrayRef->coerce(5.5)}, $::_e0 = "6"); ::ok $::_g0 eq $
 # 				GlobRef
 # 					FileHandle
 # 				ArrayRef`[A]
+# 					Tuple[A...]
+# 					CycleTuple[A...]
 # 				HashRef`[A]
+# 					Map[A => B]
+# 					Dict[k => A, ...]
 # 				Object`[class]
 # 					Me
 # 					Rat
-# 				Map[A => B]
-# 				Tuple[A...]
-# 				CycleTuple[A...]
-# 				Dict[k => A, ...]
 # 				RegexpLike
 # 				CodeLike
 # 				ArrayLike`[A]
-# 					Lim[from, to?]
+# 					Lim[from?, to]
 # 				HashLike`[A]
 # 					HasProp[p...]
-# 					LimKeys[from, to?]
+# 					LimKeys[from?, to]
 # 			Like
 # 				HasMethods[m...]
 # 				Overload`[m...]
 # 				InstanceOf[class...]
 # 				ConsumerOf[role...]
 # 				StrLike
-# 					Len[from, to?]
+# 					Len[from?, to]
 # 				NumLike
-# 					Float
-# 					Double
 # 					Range[from, to]
-# 					Bytes[n]
-# 					PositiveBytes[n]
+# 						Float
+# 						Double
+# 						Bytes[n]
+# 						PositiveBytes[n]
 
 # 
 # # SUBROUTINES
@@ -166,9 +182,43 @@ local ($::_g0 = do {2 ~~ Many}, $::_e0 = do {1}); ::ok defined($::_g0) == define
 # 
 # Используется с `subtype` для расширения создаваемого типа `$super_type`.
 # 
+# `as` может принимать выражения из типов объединённые множественно-теоритическими операторами. Так же в нём допускаются параметры `A`, `B`, `C`, `D`, `ARGS`, `SELF`, `M` и `N`. `M` и `N` могут устанавливаться в секции `init_where` параметризированных типов входящих в `as`.
+# 
+::done_testing; }; subtest 'as ($super_type)' => sub { 
+BEGIN {
+	subtype 'Top[to]', as Range[0, A];
+}
+
+local ($::_g0 = do {+3.0 ~~ Top[3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '+3.0 ~~ Top[3] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {+3.1 ~~ Top[3]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '+3.1 ~~ Top[3] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {+0.0 ~~ Top[3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '+0.0 ~~ Top[3] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-0.1 ~~ Top[3]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-0.1 ~~ Top[3] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+BEGIN {
+	subtype 'RedColor', as Enum['red'];
+	subtype 'BlueColor', as Enum['blue'];
+}
+BEGIN {
+	subtype 'RedBlue', as RedColor | BlueColor;
+}
+
+local ($::_g0 = do {'red'   ~~ RedBlue}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'red\'   ~~ RedBlue # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'blue'  ~~ RedBlue}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'blue\'  ~~ RedBlue # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'green' ~~ RedBlue}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'green\' ~~ RedBlue # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+BEGIN {
+	subtype 'RedBlueOther[colors...]', as ~RedBlue & Enum[ARGS];
+}
+
+local ($::_g0 = do {'red' ~~ RedBlueOther['red']}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'red\' ~~ RedBlueOther[\'red\'] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'green' ~~ RedBlueOther['red', 'green']}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'green\' ~~ RedBlueOther[\'red\', \'green\'] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
 # ## init_where ($code)
 # 
-# Инициализирует тип с новыми аргументами. Используется с `subtype`.
+# Инициализирует тип с новыми аргументами. Используется с `subtype`. 
+# 
+# Инициализация – ленивая. Это значит, что она сработает в методе `test` или подобном.
 # 
 ::done_testing; }; subtest 'init_where ($code)' => sub { 
 BEGIN {
@@ -241,11 +291,11 @@ local ($::_g0 = do {"ab" ~~ MyEnum[qw/ab cd/]}, $::_e0 = do {1}); ::ok defined($
 # 
 # Аргументы текущего типа. В скалярном контексте возвращает ссылку на массив, а в контексте массива возвращает список. Используется в `init_where`, `where` и `awhere`.
 # 
-# ## A, B, C, D
+# ## A
 # 
-# Первый, второй, третий и пятый аргумент типа.
+# A, B, C, D – первый, второй, третий и пятый аргумент типа.
 # 
-::done_testing; }; subtest 'A, B, C, D' => sub { 
+::done_testing; }; subtest 'A' => sub { 
 BEGIN {
 	subtype "Seria[a,b,c,d]", where { A < B && B < $_ && $_ < C && C < D };
 }
@@ -255,11 +305,23 @@ local ($::_g0 = do {2.5 ~~ Seria[1,2,3,4]}, $::_e0 = do {1}); ::ok defined($::_g
 # 
 # Используется в `init_where`, `where` и `awhere`.
 # 
-# ## M, N
+# # B
+# 
+# Второй аргумент типа.
+# 
+# # C
+# 
+# Третий аргумент типа.
+# 
+# # D
+# 
+# Четвёртый аргумент типа.
+# 
+# ## M
 # 
 # `M` и `N` сокращение для `SELF->{M}` и `SELF->{N}`.
 # 
-::done_testing; }; subtest 'M, N' => sub { 
+::done_testing; }; subtest 'M' => sub { 
 BEGIN {
 	subtype "BeginAndEnd[begin, end]",
 		init_where {
@@ -274,6 +336,10 @@ local ($::_g0 = do {"Hi my dear!" ~~ BeginAndEnd["Hi,", "!"];}, $::_e0 = do {""}
 
 local ($::_g0 = do {"" . BeginAndEnd["Hi,", "!"]}, $::_e0 = "BeginAndEnd['Hi,', '!']"); ::ok $::_g0 eq $::_e0, '"" . BeginAndEnd["Hi,", "!"] # => BeginAndEnd[\'Hi,\', \'!\']' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
+# 
+# ## N
+# 
+# Сокращение для `SELF->{N}`.
 # 
 # ## message ($code)
 # 
@@ -380,6 +446,8 @@ local ($::_g0 = do {half 4;}, $::_e0 = do {2}); ::ok defined($::_g0) == defined(
 # 
 # Тип верхнего уровня в иерархии. Сопоставляет всё.
 # 
+# Нижний тип можно получить как `~Any`.
+# 
 # ## Control
 # 
 # Тип верхнего уровня в конструкторах иерархии создает новые типы из любых типов.
@@ -390,8 +458,8 @@ local ($::_g0 = do {half 4;}, $::_e0 = do {2}); ::ok defined($::_g0) == defined(
 # 
 ::done_testing; }; subtest 'Union[A, B...]' => sub { 
 local ($::_g0 = do {33  ~~ Union[Int, Ref]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '33  ~~ Union[Int, Ref] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {[]  ~~ Union[Int, Ref]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[]  ~~ Union[Int, Ref]	# -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {"a" ~~ Union[Int, Ref]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"a" ~~ Union[Int, Ref]	# -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[]  ~~ Union[Int, Ref]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[]  ~~ Union[Int, Ref] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {"a" ~~ Union[Int, Ref]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"a" ~~ Union[Int, Ref] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## Intersection[A, B...]
@@ -402,23 +470,15 @@ local ($::_g0 = do {"a" ~~ Union[Int, Ref]}, $::_e0 = do {""}); ::ok defined($::
 local ($::_g0 = do {15 ~~ Intersection[Int, StrMatch[/5/]]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '15 ~~ Intersection[Int, StrMatch[/5/]] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## Exclude[A, B...]
+# ## Exclude[A]
 # 
-# Исключение нескольких типов. Аналогичен оператору `~ $type`.
+# Исключение значения типа. Аналогичен оператору `~ $type`.
 # 
-::done_testing; }; subtest 'Exclude[A, B...]' => sub { 
+::done_testing; }; subtest 'Exclude[A]' => sub { 
 local ($::_g0 = do {-5  ~~ Exclude[PositiveInt]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-5  ~~ Exclude[PositiveInt] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {"a" ~~ Exclude[PositiveInt]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"a" ~~ Exclude[PositiveInt] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {5   ~~ Exclude[PositiveInt]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '5   ~~ Exclude[PositiveInt] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {5.5 ~~ Exclude[PositiveInt]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '5.5 ~~ Exclude[PositiveInt] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-
-# 
-# Если `Exclude` имеет много аргументов, то это аналог `~ ($type1 | $type2 ...)`.
-# 
-
-local ($::_g0 = do {-5  ~~ Exclude[PositiveInt, Enum[-2]]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-5  ~~ Exclude[PositiveInt, Enum[-2]] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {-2  ~~ Exclude[PositiveInt, Enum[-2]]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-2  ~~ Exclude[PositiveInt, Enum[-2]] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {0   ~~ Exclude[PositiveInt, Enum[-2]]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '0   ~~ Exclude[PositiveInt, Enum[-2]] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## Option[A]
@@ -441,11 +501,11 @@ sub arr : Isa(PositiveInt => Wantarray[ArrayRef[PositiveInt], PositiveInt]) {
 	wantarray? 1 .. $n: $n
 }
 
-my @a = arr(3);
-my $s = arr(3);
+my @array = arr(3);
+my $scalar = arr(3);
 
-local ($::_g0 = do {\@a}, $::_e0 = do {[1,2,3]}); ::is_deeply $::_g0, $::_e0, '\@a # --> [1,2,3]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {$s}, $::_e0 = do {3}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$s  # -> 3' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {\@array}, $::_e0 = do {[1,2,3]}); ::is_deeply $::_g0, $::_e0, '\@array # --> [1,2,3]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$scalar}, $::_e0 = do {3}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$scalar  # -> 3' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## Item
@@ -502,6 +562,19 @@ local ($::_g0 = do {3 ~~ Enum[1,2,3];}, $::_e0 = do {1}); ::ok defined($::_g0) =
 local ($::_g0 = do {"cat" ~~ Enum["cat", "dog"];}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"cat" ~~ Enum["cat", "dog"]; # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {4 ~~ Enum[1,2,3];}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '4 ~~ Enum[1,2,3];            # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
+local ($::_g0 = do {Enum["cat"] <= Enum["cat", "dog"]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum["cat"] <= Enum["cat", "dog"] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Enum["cat", "dog"] <= Enum["cat", "dog"]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum["cat", "dog"] <= Enum["cat", "dog"] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {Enum(["cat", "dog"])->disjoint(Enum[1])}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum(["cat", "dog"])->disjoint(Enum[1]) # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Enum(["cat", "dog"])->disjoint(Enum["ret", "cat"])}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum(["cat", "dog"])->disjoint(Enum["ret", "cat"]) # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {Enum[1,2] <= Enum[1,2,3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum[1,2] <= Enum[1,2,3]          # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Enum[1,2] <= Enum[2,3]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum[1,2] <= Enum[2,3]            # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Enum[1,2] == Enum[2,1]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum[1,2] == Enum[2,1]            # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Enum[1,2] < Enum[1,2,3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum[1,2] < Enum[1,2,3]           # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Enum[1,2,3] > Enum[1,2]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum[1,2,3] > Enum[1,2]           # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Enum[1,2] == (Enum[1] | Enum[2])}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Enum[1,2] == (Enum[1] | Enum[2])  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
 # 
 # ## Maybe[A]
 # 
@@ -541,11 +614,11 @@ local ($::_g0 = do {\3 ~~ Value}, $::_e0 = do {""}); ::ok defined($::_g0) == def
 local ($::_g0 = do {undef ~~ Value}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'undef ~~ Value # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## Len[from, to?]
+# ## Len[from?, to]
 # 
-# Определяет значение длины от `from` до `to` или от 0 до `from`, если `to` отсутствует.
+# Определяет значение длины от `from` или 0 до `to`.
 # 
-::done_testing; }; subtest 'Len[from, to?]' => sub { 
+::done_testing; }; subtest 'Len[from?, to]' => sub { 
 local ($::_g0 = do {"1234" ~~ Len[3]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"1234" ~~ Len[3]   # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {"123" ~~ Len[3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"123" ~~ Len[3]    # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {"12" ~~ Len[3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"12" ~~ Len[3]     # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -554,6 +627,10 @@ local ($::_g0 = do {"1" ~~ Len[1, 2]}, $::_e0 = do {1}); ::ok defined($::_g0) ==
 local ($::_g0 = do {"12" ~~ Len[1, 2]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"12" ~~ Len[1, 2]  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {"123" ~~ Len[1, 2]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"123" ~~ Len[1, 2] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
+local ($::_g0 = do {Len[3] <= Len[3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Len[3] <= Len[3] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Len[3] <= Len[4]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Len[3] <= Len[4] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Len[3] <= Len[2]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Len[3] <= Len[2] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
 # 
 # ## Version
 # 
@@ -561,6 +638,7 @@ local ($::_g0 = do {"123" ~~ Len[1, 2]}, $::_e0 = do {""}); ::ok defined($::_g0)
 # 
 ::done_testing; }; subtest 'Version' => sub { 
 local ($::_g0 = do {1.1.0 ~~ Version}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '1.1.0 ~~ Version   # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {1.1.0.5 ~~ Version}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '1.1.0.5 ~~ Version # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {v1.1.0 ~~ Version}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'v1.1.0 ~~ Version  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {v1.1 ~~ Version}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'v1.1 ~~ Version    # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {v1 ~~ Version}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'v1 ~~ Version      # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -787,9 +865,53 @@ local ($::_g0 = do {-0.1 ~~ PositiveNum}, $::_e0 = do {""}); ::ok defined($::_g0
 local ($::_g0 = do {-0 ~~ PositiveNum}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-0 ~~ PositiveNum   # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
+# ## Int
+# 
+# Целые числа.
+# 
+::done_testing; }; subtest 'Int' => sub { 
+local ($::_g0 = do {123 ~~ Int}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '123 ~~ Int	# -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-12 ~~ Int}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-12 ~~ Int	# -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {5.5 ~~ Int}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '5.5 ~~ Int	# -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ## Nat
+# 
+# Целые числа 1+.
+# 
+::done_testing; }; subtest 'Nat' => sub { 
+local ($::_g0 = do {0 ~~ Nat}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '0 ~~ Nat # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {1 ~~ Nat}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '1 ~~ Nat # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {Nat->instanceof('Range')}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Nat->instanceof(\'Range\')  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Nat->instanceof('Int')}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Nat->instanceof(\'Int\')    # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {Nat <= Range[1, 'Inf']}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Nat <= Range[1, \'Inf\']    # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Nat <= Range[2, 'Inf']}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Nat <= Range[2, \'Inf\']    # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Nat <= Range[-100, 'Inf']}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Nat <= Range[-100, \'Inf\'] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ## PositiveInt
+# 
+# Положительные целые числа.
+# 
+::done_testing; }; subtest 'PositiveInt' => sub { 
+local ($::_g0 = do {+0 ~~ PositiveInt}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '+0 ~~ PositiveInt # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-0 ~~ PositiveInt}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-0 ~~ PositiveInt # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {55 ~~ PositiveInt}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '55 ~~ PositiveInt # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-1 ~~ PositiveInt}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-1 ~~ PositiveInt # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {Int <= Num}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Int <= Num           # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {PositiveInt <= Int}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'PositiveInt <= Int   # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Nat <= PositiveInt}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Nat <= PositiveInt   # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Int < Num}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Int < Num            # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Str <= Any}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Str <= Any           # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {None <= Any}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'None <= Any          # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
 # ## Float
 # 
-# Машинное число с плавающей запятой составляет 4 байта.
+# Каноничное машинное число с плавающей запятой составляет 4 байта.
 # 
 ::done_testing; }; subtest 'Float' => sub { 
 local ($::_g0 = do {-4.8 ~~ Float}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-4.8 ~~ Float             # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -800,12 +922,10 @@ local ($::_g0 = do {-3.402823467E+38 ~~ Float}, $::_e0 = do {""}); ::ok defined(
 # 
 # ## Double
 # 
-# Машинное число с плавающей запятой составляет 8 байт.
+# Каноничное машинное число с плавающей запятой составляет 8 байт.
 # 
 ::done_testing; }; subtest 'Double' => sub { 
-use Scalar::Util qw//;
-
-local ($::_g0 = do {-4.8 ~~ Double}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '                      -4.8 ~~ Double # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-4.8 ~~ Double}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-4.8 ~~ Double # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {'-1.7976931348623157e+308' ~~ Double}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'-1.7976931348623157e+308\' ~~ Double # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {'+1.7976931348623157e+308' ~~ Double}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'+1.7976931348623157e+308\' ~~ Double # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {'-1.7976931348623159e+308' ~~ Double}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'-1.7976931348623159e+308\' ~~ Double # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -813,7 +933,7 @@ local ($::_g0 = do {'-1.7976931348623159e+308' ~~ Double}, $::_e0 = do {""}); ::
 # 
 # ## Range[from, to]
 # 
-# Числа между `from` и `to`.
+# Числа между `from` и `to` включительно.
 # 
 ::done_testing; }; subtest 'Range[from, to]' => sub { 
 local ($::_g0 = do {1 ~~ Range[1, 3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '1 ~~ Range[1, 3]   # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -822,16 +942,24 @@ local ($::_g0 = do {3 ~~ Range[1, 3]}, $::_e0 = do {1}); ::ok defined($::_g0) ==
 local ($::_g0 = do {3.1 ~~ Range[1, 3]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '3.1 ~~ Range[1, 3] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {0.9 ~~ Range[1, 3]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '0.9 ~~ Range[1, 3] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-# 
-# ## Int
-# 
-# Целые числа.
-# 
-::done_testing; }; subtest 'Int' => sub { 
-local ($::_g0 = do {123 ~~ Int}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '123 ~~ Int	# -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {-12 ~~ Int}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-12 ~~ Int	# -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {5.5 ~~ Int}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '5.5 ~~ Int	# -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {1 ~~ Range[Opened[1], 3]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '1 ~~ Range[Opened[1], 3] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {2 ~~ Range[Opened[1], 3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '2 ~~ Range[Opened[1], 3] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
+local ($::_g0 = do {Range[1,5] <= Range[1,10]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Range[1,5] <= Range[1,10]         # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Range[1,5] <= Range[2,6]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Range[1,5] <= Range[2,6]          # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Range[Opened[1],5] <= Range[1,5]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Range[Opened[1],5] <= Range[1,5]  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Range[1,5] == Range[1,5]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Range[1,5] == Range[1,5]          # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Range[1,5] < Range[1,10]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Range[1,5] < Range[1,10]          # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+my $r1 = Range[Opened[1], Opened[5]];
+my $r2 = Range[2,4];
+local ($::_g0 = do {$r2 <= $r1;}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$r2 <= $r1;  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$r1 <= $r2;}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$r1 <= $r2;  # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ## Opened[num]
+# 
+# Открытая граница. Используется с `Range`.
 # 
 # ## Bytes[N]
 # 
@@ -844,11 +972,11 @@ local ($::_g0 = do {127 ~~ Bytes[1]}, $::_e0 = do {1}); ::ok defined($::_g0) == 
 local ($::_g0 = do {128 ~~ Bytes[1]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '128 ~~ Bytes[1]  # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 2 bits power of (8 bits * 8 bytes - 1)
-my $N = 1 << (8*8-1);
-local ($::_g0 = do {(-$N-1) ~~ Bytes[8]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '(-$N-1) ~~ Bytes[8] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {(-$N) ~~ Bytes[8]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '(-$N) ~~ Bytes[8]   # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {($N-1) ~~ Bytes[8]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '($N-1) ~~ Bytes[8]  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {$N ~~ Bytes[8]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$N ~~ Bytes[8]      # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+my $N = 1 << (8*3-1);
+local ($::_g0 = do {(-$N-1) ~~ Bytes[3]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '(-$N-1) ~~ Bytes[3] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {(-$N) ~~ Bytes[3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '(-$N) ~~ Bytes[3]   # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {($N-1) ~~ Bytes[3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '($N-1) ~~ Bytes[3]  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$N ~~ Bytes[3];}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$N ~~ Bytes[3];     # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 require Math::BigInt;
 
@@ -858,17 +986,6 @@ local ($::_g0 = do {((-$N17-1) . "") ~~ Bytes[17]}, $::_e0 = do {""}); ::ok defi
 local ($::_g0 = do {(-$N17 . "") ~~ Bytes[17]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '(-$N17 . "") ~~ Bytes[17]     # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {(($N17-1) . "") ~~ Bytes[17]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '(($N17-1) . "") ~~ Bytes[17]  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {($N17 . "") ~~ Bytes[17]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '($N17 . "") ~~ Bytes[17]      # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-
-# 
-# ## PositiveInt
-# 
-# Положительные целые числа.
-# 
-::done_testing; }; subtest 'PositiveInt' => sub { 
-local ($::_g0 = do {+0 ~~ PositiveInt}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '+0 ~~ PositiveInt # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {-0 ~~ PositiveInt}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-0 ~~ PositiveInt # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {55 ~~ PositiveInt}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '55 ~~ PositiveInt # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {-1 ~~ PositiveInt}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-1 ~~ PositiveInt # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## PositiveBytes[N]
@@ -892,15 +1009,6 @@ local ($::_g0 = do {($N8+1) . "" ~~ PositiveBytes[8]}, $::_e0 = do {""}); ::ok d
 
 local ($::_g0 = do {-1 ~~ PositiveBytes[17]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-1 ~~ PositiveBytes[17] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {0 ~~ PositiveBytes[17]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '0 ~~ PositiveBytes[17]  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-
-# 
-# ## Nat
-# 
-# Целые числа 1+.
-# 
-::done_testing; }; subtest 'Nat' => sub { 
-local ($::_g0 = do {0 ~~ Nat}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '0 ~~ Nat	# -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {1 ~~ Nat}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '1 ~~ Nat	# -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## Ref
@@ -1011,8 +1119,8 @@ format EXAMPLE_FMT =
 "left",   "middle", "right"
 .
 
-local ($::_g0 = do {*EXAMPLE_FMT{FORMAT} ~~ FormatRef}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '*EXAMPLE_FMT{FORMAT} ~~ FormatRef   # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {\1 ~~ FormatRef}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\1 ~~ FormatRef				# -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {*EXAMPLE_FMT{FORMAT} ~~ FormatRef}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '*EXAMPLE_FMT{FORMAT} ~~ FormatRef # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {\1 ~~ FormatRef}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\1 ~~ FormatRef	# -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## CodeRef
@@ -1195,11 +1303,11 @@ local ($::_g0 = do {[1, 1.1] ~~ ArrayRef[Num]}, $::_e0 = do {1}); ::ok defined($
 local ($::_g0 = do {[1, undef] ~~ ArrayRef[Num]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[1, undef] ~~ ArrayRef[Num]	# -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## Lim[A, B?]
+# ## Lim[from?, to]
 # 
-# Ограничивает массивы от `A` до `B` элементов или от 0 до `A`, если `B` отсутствует.
+# Ограничивает массивы от `from` или 0 до `to` элементов.
 # 
-::done_testing; }; subtest 'Lim[A, B?]' => sub { 
+::done_testing; }; subtest 'Lim[from?, to]' => sub { 
 local ($::_g0 = do {[] ~~ Lim[5]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[] ~~ Lim[5]     # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {[1..5] ~~ Lim[5]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[1..5] ~~ Lim[5] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {[1..6] ~~ Lim[5]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[1..6] ~~ Lim[5] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -1209,6 +1317,14 @@ local ($::_g0 = do {[1..6] ~~ Lim[1,5]}, $::_e0 = do {""}); ::ok defined($::_g0)
 
 local ($::_g0 = do {[1] ~~ Lim[1,5]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[1] ~~ Lim[1,5] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {[] ~~ Lim[1,5]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '[] ~~ Lim[1,5]  # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {Lim[0, 10] <= Lim[0, 20]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Lim[0, 10] <= Lim[0, 20]        # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Lim[10, 'Inf'] <= Lim[0, 'Inf']}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Lim[10, \'Inf\'] <= Lim[0, \'Inf\'] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {Lim[3] <= Lim[5]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Lim[3] <= Lim[5]          # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Lim[3] <= Lim[2]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Lim[3] <= Lim[2]          # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Lim[2,5] < Lim[1,6]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Lim[2,5] < Lim[1,6]       # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Lim[2,5] == Lim[2,5]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Lim[2,5] == Lim[2,5]      # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## HashRef`[H]
@@ -1242,9 +1358,9 @@ local ($::_g0 = do {bless(\(my $val=10), "A1") ~~ Object["B1"]}, $::_e0 = do {""
 # 
 ::done_testing; }; subtest 'Me' => sub { 
 package A1 {
- use Aion;
-local ($::_g0 = do {bless({}, __PACKAGE__) ~~ Me}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, ' bless({}, __PACKAGE__) ~~ Me  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {bless({}, "A2") ~~ Me}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, ' bless({}, "A2") ~~ Me         # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+	use Aion;
+local ($::_g0 = do {bless({}, __PACKAGE__) ~~ Me}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '	bless({}, __PACKAGE__) ~~ Me  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {bless({}, "A2") ~~ Me}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '	bless({}, "A2") ~~ Me         # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 # 
@@ -1308,6 +1424,26 @@ local ($::_g0 = do {{a => 1, c => 3} ~~ HasProp[qw/a b/]}, $::_e0 = do {""}); ::
 local ($::_g0 = do {bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
+# ## LimKeys[from?, to]
+# 
+# Ограничивает количество ключей в хеше от `from` или 0 до `to`.
+# 
+::done_testing; }; subtest 'LimKeys[from?, to]' => sub { 
+my %hash = (a => 1, b => 2);
+
+local ($::_g0 = do {\%hash ~~ LimKeys[1]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\%hash ~~ LimKeys[1] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {\%hash ~~ LimKeys[2]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\%hash ~~ LimKeys[2] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {\%hash ~~ LimKeys[3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\%hash ~~ LimKeys[3] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {\%hash ~~ LimKeys[3, 3]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\%hash ~~ LimKeys[3, 3] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {\%hash ~~ LimKeys[2, 3]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\%hash ~~ LimKeys[2, 3] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {\%hash ~~ LimKeys[2, 2]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\%hash ~~ LimKeys[2, 2] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {LimKeys[20, 'Inf'] <= LimKeys[2, 'Inf']}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'LimKeys[20, \'Inf\'] <= LimKeys[2, \'Inf\'] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {LimKeys[3] <= LimKeys[5]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'LimKeys[3] <= LimKeys[5]    # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {LimKeys[2,5] < LimKeys[1,6]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'LimKeys[2,5] < LimKeys[1,6] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
 # ## Like
 # 
 # Объект или строка.
@@ -1354,7 +1490,7 @@ local ($::_g0 = do {"A" ~~ Overload}, $::_e0 = do {""}); ::ok defined($::_g0) ==
 local ($::_g0 = do {bless({}, "A") ~~ Overload}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'bless({}, "A") ~~ Overload               # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# И у него есть операторы указанные операторы.
+# И у него перегружены указанные операторы.
 # 
 
 local ($::_g0 = do {"OverloadExample" ~~ Overload['""']}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"OverloadExample" ~~ Overload[\'""\'] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;

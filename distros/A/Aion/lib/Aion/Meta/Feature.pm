@@ -305,6 +305,10 @@ Access the property store for the calling package.
 	$::feature->stash('my_key', 'my_value');
 	$::feature->stash('my_key') # -> 'my_value'
 
+=head2 compare ($other)
+
+Compares the old feature with the rebooted one. If the C<isa> property is specified and does not match, an exception will be thrown.
+
 =head1 AUTHOR
 
 Yaroslav O. Kosmina L<mailto:dart@cpan.org>

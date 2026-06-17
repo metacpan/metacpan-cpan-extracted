@@ -4,11 +4,11 @@ use base qw(MARC::Validator::Abstract);
 use strict;
 use warnings;
 
-use Business::UDC 0.07;
+use Business::UDC 0.08;
 use Data::MARC::Validator::Report::Error 0.02;
 use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 
-our $VERSION = 0.21;
+our $VERSION = 0.22;
 
 sub module_name {
 	my $self = shift;
@@ -59,6 +59,14 @@ sub process {
 			} elsif ($udc_error eq 'Bad quotation mark character.') {
 				push @record_errors, Data::MARC::Validator::Report::Error->new(
 					'error' => "Field 080a has bad quotation mark character.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'character' => $udc_error_params{'character'},
+					},
+				);
+			} elsif ($udc_error eq 'Bad dot character in number.') {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has bad dot character.",
 					'params' => {
 						'field_080_a' => $field_080a,
 						'character' => $udc_error_params{'character'},

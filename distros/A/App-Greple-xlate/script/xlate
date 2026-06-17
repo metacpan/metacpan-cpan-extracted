@@ -73,7 +73,7 @@ xlate [ options ] -t LANG FILE [ greple options ]
 
 =head1 VERSION
 
-    Version 1.01
+    Version 1.0201
 
 =cut
 

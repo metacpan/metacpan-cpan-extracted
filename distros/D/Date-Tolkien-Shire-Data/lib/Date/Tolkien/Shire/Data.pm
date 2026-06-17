@@ -17,7 +17,7 @@ use Text::Abbrev();
 use Exporter ();
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 our @EXPORT_OK = qw{
     __am_or_pm
@@ -32,6 +32,7 @@ our @EXPORT_OK = qw{
     __on_date __on_date_accented
     __quarter __quarter_name __quarter_abbr
     __rata_die_to_year_day
+    __search_on_date
     __trad_weekday_abbr __trad_weekday_name __trad_weekday_narrow
     __valid_date_class
     __weekday_abbr __weekday_name __weekday_narrow
@@ -56,6 +57,7 @@ our %EXPORT_TAGS = (
 use constant ARRAY_REF	=> ref [];
 use constant CODE_REF	=> ref sub {};
 use constant HASH_REF	=> ref {};
+use constant REGEX_REF	=> ref qr/foo/;
 
 use constant DAY_OF_YEAR_MIDYEARS_DAY	=> 183;
 use constant DAY_OF_YEAR_OVERLITHE	=> 184;
@@ -233,6 +235,8 @@ sub _fmt_cond {
 		$_[0]->__fmt_shire_day() ) },
 	Ee	=> sub { __holiday_abbr( $_[0]->__fmt_shire_month() ? 0 :
 		$_[0]->__fmt_shire_day() ) },
+	El	=> sub { __format( $_[0], '%{{%b %d||%Ee}}' ) },
+	EL	=> sub { __format( $_[0], '%{{%B %d||%EE}}' ) },
 	En	=> sub { $_[1]{prefix_new_line_unless_empty}++; '' },
 	Eo	=> sub { __holiday_narrow( $_[0]->__fmt_shire_month() ? 0 :
 		$_[0]->__fmt_shire_day() ) },
@@ -703,44 +707,82 @@ sub _fmt_on_date {
 	return $on_date[$month][$day];
     }
 
+    sub __search_on_date {
+	my @criteria = @_;
+	foreach ( @criteria ) {
+	    if ( ref eq CODE_REF ) {
+		# Accept as-is
+	    } elsif ( ref eq REGEX_REF ) {
+		my $criterion = $_;
+		$_ = sub { m/$criterion/ };
+	    } elsif ( ref ) {
+		Carp::croak( ref, ' reference not supported' );
+	    } else {
+		my $criterion = $_;
+		$_ = sub { index( $_, $criterion ) >= 0 };
+	    }
+	}
+	my @rslt;
+	foreach my $month ( 0 .. $#on_date ) {
+	    $on_date[$month]
+		or next;
+	    foreach my $day ( 0 .. @{ $on_date[$month] } - 1 ) {
+		local $_ = $on_date[$month][$day]
+		    or next;
+		foreach my $criterion ( @criteria ) {
+		    $criterion->()
+			or next;
+		    push @rslt, [ $month, $day ];
+		    last;
+		}
+	    }
+	}
+
+	return @rslt;
+    }
+
     my @on_date_accented;
+
+    sub _make_on_date_accented {
+
+	# This would be much easier with 'use utf8;', but
+	# unfortunately this was broken under Perl 5.6.
+	my $E_acute	= "\N{LATIN CAPITAL LETTER E WITH ACUTE}";
+	my $e_acute	= "\N{LATIN SMALL LETTER E WITH ACUTE}";
+	my $o_acute	= "\N{LATIN SMALL LETTER O WITH ACUTE}";
+	my $u_acute	= "\N{LATIN SMALL LETTER U WITH ACUTE}";
+	my $u_circ	= "\N{LATIN SMALL LETTER U WITH CIRCUMFLEX}";
+
+	foreach my $month ( @on_date ) {
+	    push @on_date_accented, [];
+	    foreach my $day ( @{ $month } ) {
+		if ( $day ) {
+		    $day =~ s/ \b Anorien \b /An${o_acute}rien/smxgo;
+		    $day =~ s/ \b Annun \b /Ann${u_circ}n/smxgo;
+		    $day =~ s/ \b Barad-dur \b /Barad-d${u_circ}r/smxgo;
+		    $day =~ s/ \b Dunedain \b /D${u_acute}nedain/smxgo;
+		    $day =~ s/ \b Eomer \b /${E_acute}omer/smxgo;
+		    $day =~ s/ \b Eowyn \b /${E_acute}owyn/smxgo;
+		    $day =~ s/ \b Khazad-dum \b /Khazad-d${u_circ}m/smxgo;
+		    $day =~ s/ \b Lorien \b /L${o_acute}rien/smxgo;
+		    $day =~ s/ \b Nazgul \b /Nazg${u_circ}l/smxgo;
+		    $day =~ s/ \b Theoden \b /Th${e_acute}oden/smxgo;
+		    $day =~ s/ \b Theodred \b /Th${e_acute}odred/smxgo;
+		    $day =~ s/ \b Udun \b /Ud${u_circ}n/smxgo;
+		}
+		push @{ $on_date_accented[-1] }, $day;
+	    }
+	}
+	return;
+    }
 
     sub __on_date_accented {
 	my ( $month, $day ) = $validate->( @_ );
 	defined $day
 	    or ( $month, $day ) = ( 0, $month );
 
-	unless ( @on_date_accented ) {
-
-	    # This would be much easier with 'use utf8;', but
-	    # unfortunately this was broken under Perl 5.6.
-	    my $E_acute	= "\N{LATIN CAPITAL LETTER E WITH ACUTE}";
-	    my $e_acute	= "\N{LATIN SMALL LETTER E WITH ACUTE}";
-	    my $o_acute	= "\N{LATIN SMALL LETTER O WITH ACUTE}";
-	    my $u_acute	= "\N{LATIN SMALL LETTER U WITH ACUTE}";
-	    my $u_circ	= "\N{LATIN SMALL LETTER U WITH CIRCUMFLEX}";
-
-	    foreach my $month ( @on_date ) {
-		push @on_date_accented, [];
-		foreach my $day ( @{ $month } ) {
-		    if ( $day ) {
-			$day =~ s/ \b Anorien \b /An${o_acute}rien/smxgo;
-			$day =~ s/ \b Annun \b /Ann${u_circ}n/smxgo;
-			$day =~ s/ \b Barad-dur \b /Barad-d${u_circ}r/smxgo;
-			$day =~ s/ \b Dunedain \b /D${u_acute}nedain/smxgo;
-			$day =~ s/ \b Eomer \b /${E_acute}omer/smxgo;
-			$day =~ s/ \b Eowyn \b /${E_acute}owyn/smxgo;
-			$day =~ s/ \b Khazad-dum \b /Khazad-d${u_circ}m/smxgo;
-			$day =~ s/ \b Lorien \b /L${o_acute}rien/smxgo;
-			$day =~ s/ \b Nazgul \b /Nazg${u_circ}l/smxgo;
-			$day =~ s/ \b Theoden \b /Th${e_acute}oden/smxgo;
-			$day =~ s/ \b Theodred \b /Th${e_acute}odred/smxgo;
-			$day =~ s/ \b Udun \b /Ud${u_circ}n/smxgo;
-		    }
-		    push @{ $on_date_accented[-1] }, $day;
-		}
-	    }
-	}
+	@on_date_accented
+	    or _make_on_date_accented();
 
 	return $on_date_accented[$month][$day];
     }
@@ -1251,10 +1293,10 @@ between C<1> and C<365>, or C<366> in a leap year.
 
 This method formats a date, in a manner similar to C<strftime()>. The
 C<$date> is either an object that supports the necessary methods, or a
-reference to a hash having the necessary keys (same as the
-methods). The C<$pattern> is a string similar to the conversion
-specification passed to C<POSIX::strftime()>; see below for a fuller
-description.
+reference to a hash having the necessary keys (same as the methods,
+minus the C<'__fmt_shire_'> prefix). The C<$pattern> is a string similar
+to the conversion specification passed to C<POSIX::strftime()>; see
+below for a fuller description.
 
 The C<$date> methods used are:
 
@@ -1403,6 +1445,17 @@ The full holiday name, or C<''> for non-holidays.
 =item %Ee
 
 The abbreviated holiday name, or C<''> for non-holidays.
+
+=item %EL
+
+The full day label. This is the full month name and day number, or the
+full holiday name. It is equivalent to C<'%{{%B %d||%EE}}'>.
+
+=item %El
+
+The abbreviated day label. This is the abbreviated month name and day
+number, or the abbreviated holiday name. It is equivalent to
+C<'%{{%b %d||%Ee}}'>.
 
 =item %En
 
@@ -1638,7 +1691,7 @@ case you were wondering.
 
 =item 0 (zero)
 
-This flag specifies padding with zeroes. That is to say, on the first of
+This flag specifies padding with zeros. That is to say, on the first of
 the month, C<'%0e'> produce C<'01'>, not C<' 1'>. So does C<'%0d'>, in
 case you were wondering.
 
@@ -1808,6 +1861,41 @@ since December 31 of proleptic Gregorian year 0) you get back the
 Gregorian year and the day of that year (C<1-366>). If you feed it a
 so-called Shire Rata Die (i.e. days since 1 Yule of Shire year 0) you
 get back the Shire year and the day of that year.
+
+=head2 __search_on_date
+
+ my @dates = __search_on_date( 'depart' );
+ say __on_date( @$_ ) for @dates;
+
+This subroutine takes as its arguments zero or more search criteria, and
+returns an array of Shire dates whose B<unaccented> events match one or
+more of the given criteria.
+
+The Shire dates are represented as references to two-element arrays
+containing the month number and day number, with month zero representing
+a holiday.
+
+The search criteria can be one of the following:
+
+=over
+
+=item * A string
+
+This criterion is satisfied if the event contains the given string.
+
+=item * A Regexp reference
+
+This criterion is satisfied if the event matches the given regexp.
+
+=item * A CODE reference
+
+The code is called with the event in the topic variable (a.k.a. C<$_>).
+This criterion is satisfied if the code returns a true value.
+
+=back
+
+Any other search criterion is invalid, and will result in an exception
+being thrown.
 
 =head2 __trad_weekday_name
 
@@ -1990,21 +2078,20 @@ L<DateTime::Fiction::JRRTolkien::Shire|DateTime::Fiction::JRRTolkien::Shire>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data>,
-L<https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues>, or in
+L<https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2022, 2025 by Thomas R. Wyant, III
+Copyright (C) 2017-2022, 2025-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

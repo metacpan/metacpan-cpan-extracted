@@ -1,5 +1,19 @@
 Revision history for Perl extension App-Greple-xlate
 
+1.0201 2026-06-17T08:10:25Z
+
+    - Install libcrypt-dev in the Docker image so XS modules build against
+      perl 5.40+ (Ubuntu 26.04); fixes the image build broken by a missing
+      crypt.h
+
+1.02 2026-06-17T07:17:31Z
+
+    - Update the gpt5 engine to use OpenAI's gpt-5.5 model by default,
+      with reasoning_effort "none" and tuned batch and output token limits
+    - Make the gpt5 engine honor the --xlate-maxline option
+    - Remove the gpt4 engine from the documentation; the gpt4.pm module is
+      retained and still usable via --xlate-engine=gpt4
+
 1.01 2026-03-11T07:21:18Z
 
     - Replace embedded getoptlong.sh with Getopt::Long::Bash module

@@ -1,0 +1,71 @@
+## name method call on right of concat
+## failures 1
+## cut
+
+"Hello " . $obj->method();
+
+## name method call on left of concat
+## failures 1
+## cut
+
+$obj->method() . "Hello";
+
+## name both sides are method calls
+## failures 1
+## cut
+
+$a->foo() . $b->bar();
+
+## name chained method, one concat
+## failures 1
+## cut
+
+"x" . $obj->m1()->m2();
+
+## name no concat (just method call)
+## failures 0
+## cut
+
+$obj->method();
+
+## name scalar concat (no method)
+## failures 0
+## cut
+
+"Hello " . $scalar;
+
+## name dot in method args
+## failures 0
+## cut
+
+$obj->method( .5 );
+
+## name multi-concat with one method
+## failures 2
+## cut
+
+"a" . $obj->foo() . "b";
+
+## name no method bare concat
+## failures 0
+## cut
+
+$a . $b;
+
+## name bareword class method
+## failures 1
+## cut
+
+"x" . Class->method();
+
+## name method inside parens in concat
+## failures 2
+## cut
+
+'hello' . ( $foo->bar / 2 ) . 'there';
+
+## name float literal no method
+## failures 0
+## cut
+
+$x = .5; "x" . $x;

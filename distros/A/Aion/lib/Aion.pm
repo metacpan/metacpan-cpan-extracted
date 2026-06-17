@@ -2,7 +2,7 @@ package Aion;
 
 use common::sense;
 
-our $VERSION = "1.9";
+our $VERSION = "2.0";
 
 use Aion::Types qw//;
 use Aion::Meta::RequiresAnyFunction;
@@ -539,7 +539,7 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-1.9
+2.0
 
 =head1 SYNOPSIS
 
@@ -743,6 +743,12 @@ The creator of the aspect has the parameters:
 	
 		has moon => (is => "rw", lvalue => 1);
 	}
+
+=head2 pleroma ()
+
+Returns the locator.
+
+	Aion->pleroma->isa('Aion::Pleroma')  # -> 1
 
 =head1 SUBROUTINES IN CLASSES
 

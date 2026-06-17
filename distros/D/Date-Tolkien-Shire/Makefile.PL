@@ -24,7 +24,7 @@ my %args = (
     },
     AUTHOR => [
 	'Tom Braun <tbraun@pobox.com>',
-	'Tom Wyant (wyant at cpan dot org)',
+	'Tom Wyant (harryfmudd at comcast dot net)',
     ],
     ABSTRACT	=> 'Convert dates into the Shire Calendar.',
     realclean	=> {
@@ -46,9 +46,8 @@ if ( $mmv >= 6.4501 ) {
 	},
 	resources	=> {
 	    bugtracker	=> {
-		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire',
-		# web	=> 'https://github.com/trwyant/perl-Date-Tolkien-Shire/issues',
-                mailto  => 'wyant@cpan.org',
+		web	=> 'https://github.com/trwyant/perl-Date-Tolkien-Shire/issues',
+                mailto  => 'harryfmudd@comcast.net',
             },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {

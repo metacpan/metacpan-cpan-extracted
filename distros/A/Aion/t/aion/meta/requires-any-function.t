@@ -51,6 +51,11 @@ local ($::_g0 = do {$any_function->pkg}, $::_e0 = "My::Package"); ::ok $::_g0 eq
 my $any_function = Aion::Meta::RequiresAnyFunction->new(name => 'my_function');
 local ($::_g0 = do {$any_function->name}, $::_e0 = "my_function"); ::ok $::_g0 eq $::_e0, '$any_function->name  # => my_function' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
+# 
+# ## stringify ()
+# 
+# Возвращает строковое представление объекта.
+# 
 # # AUTHOR
 # 
 # Yaroslav O. Kosmina <dart@cpan.org>

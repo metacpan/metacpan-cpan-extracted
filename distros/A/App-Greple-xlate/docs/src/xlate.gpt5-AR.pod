@@ -8,19 +8,17 @@ App::Greple::xlate - وحدة دعم الترجمة لأداة greple
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> تعثر الوحدة على كتل النص المطلوبة وتستبدلها بالنص المُترجَم. حاليًا تم تنفيذ وحدات DeepL (F<deepl.pm>)، وChatGPT 4.1 (F<gpt4.pm>)، وGPT-5 (F<gpt5.pm>) كمحرّكات خلفية.
+B<Greple> B<xlate> تعثر الوحدة على كتل النص المطلوبة وتستبدلها بالنص المترجم. حاليًا تم تنفيذ DeepL (F<deepl.pm>) ووحدة GPT-5.5 (F<gpt5.pm>) كمحرك خلفي.
 
 إذا كنت تريد ترجمة كتل نصية عادية في مستند مكتوب بأسلوب POD الخاص بلغة Perl، فاستخدم أمر B<greple> مع الوحدة C<xlate::deepl> وC<perl> بهذا الشكل:
 
@@ -130,13 +128,11 @@ B<Greple> B<xlate> تعثر الوحدة على كتل النص المطلوبة
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 واجهة B<gpt-4o> غير مستقرة ولا يمكن ضمان عملها بشكل صحيح في الوقت الحالي.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -233,7 +229,7 @@ B<Greple> B<xlate> تعثر الوحدة على كتل النص المطلوبة
 
 =item B<--xlate-prompt>=I<text>
 
-حدد موجهًا مخصصًا ليُرسل إلى محرك الترجمة. هذا الخيار متاح فقط عند استخدام محركات ChatGPT (gpt3 وgpt4 وgpt4o). يمكنك تخصيص سلوك الترجمة بتقديم تعليمات محددة لنموذج الذكاء الاصطناعي. إذا كان الموجه يحتوي على C<%s>، فسيتم استبداله باسم اللغة المستهدفة.
+حدّد موجّهًا مخصصًا ليتم إرساله إلى محرك الترجمة. لا يتوفر هذا الخيار إلا عند استخدام محركات ChatGPT (gpt3، gpt4o، gpt5). يمكنك تخصيص سلوك الترجمة من خلال تقديم تعليمات محددة إلى نموذج الذكاء الاصطناعي. إذا كان الموجّه يحتوي على C<%s>، فسيُستبدل باسم اللغة الهدف.
 
 =item B<--xlate-context>=I<text>
 
@@ -373,7 +369,7 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head2 MODULES
 
-L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - مشغّل Docker عام يُستخدم بواسطة xlate لعمليات الحاويات
 

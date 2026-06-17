@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.37'; # VERSION
 
 # ABSTRACT: parse XLSX files
 
@@ -1149,8 +1149,9 @@ sub _new_twig {
       'http://schemas.openxmlformats.org/officeDocument/2006/relationships' => 'rels',
       'http://schemas.openxmlformats.org/drawingml/2006/main' => 'drawmain',
     },
-    no_xxe => 1,
-    keep_original_prefix => 1,
+    NoLWP => 1,
+    NoXxe => 1,
+    KeepOriginalPrefix => 1,
     %opts,
   );
 }
@@ -1170,7 +1171,7 @@ Spreadsheet::ParseXLSX - parse XLSX files
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -1411,7 +1412,7 @@ zhouzhen1 <zhouzhen1@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Jesse Luehrs.
+This software is Copyright (c) 2026 by Jesse Luehrs.
 
 This is free software, licensed under:
 

@@ -21,7 +21,7 @@ use Date::Tolkien::Shire::Data qw{
 use Time::Local;
 
 our $ERROR;
-our $VERSION = '1.906';
+our $VERSION = '1.907';
 
 sub new {
     my ( $class, $date, %arg ) = @_;
@@ -725,38 +725,40 @@ rather than common weekday names.
 
 =head1 NOTE: YEAR CALCULATION
 
-L<https://www.glyphweb.com/arda/f/fourthage.html> references a letter sent by
-Tolkien in 1958 in which he estimates approximately 6000 years have passed
-since the War of the Ring and the end of the Third Age.  (Thanks to Danny
-O'Brien from sending me this link).  I took this approximate as an exact
-and calculated back 6000 years from 1958 and set this as the start of the
-4th age (1422).  Thus the fourth age begins in our B.C 4042.
+L<https://encyclopedia-of-arda.com/f/fourthage.html> references a letter
+sent by Tolkien in 1958 in which he estimates approximately 6000 years
+have passed since the War of the Ring and the end of the Third Age.
+(Thanks to Danny O'Brien from sending me this link). I took this
+approximate as an exact and calculated back 6000 years from 1958 and set
+this as the start of the 4th age (1422). Thus the fourth age begins in
+our B.C 4042.
 
 According to Appendix D of the Lord of the Rings, leap years in the
-hobbits'
-calendar are every 4 years unless it is the turn of the century, in which
-case it is not a leap year.  Our calendar uses every 4 years unless it
-is
-100 years unless it is 400 years.  So, if no changes had been made to
-the hobbits' calendar since the end of the third age, their calendar would
-be about 15 days further behind ours now then when the War of the Ring took
-place.  Implementing this seemed to me to go against Tolkien's general habit
-of converting dates in the novel to our equivalents to give us a better
-sense of time.  My thoughts, at least right now, is that it is truer to the
-spirit of things for March 25 today to be about the same as March 25 was back
-then.  So instead, I have modified Tolkien's description of the hobbits'
-calendar so that leap years occur once every 4 years unless it is 100
-years unless it is 400 years, so that it matches our calendar in that
-regard.  These 100 and 400 year intervals occur at different times in
-the two calendars, however.  Thus the last day of our year is sometimes
-7 Afteryule, sometimes 8, and sometimes 9.
+hobbits' calendar are every 4 years unless it is the turn of the
+century, in which case it is not a leap year.  Our calendar uses every 4
+years unless it is 100 years unless it is 400 years.  So, if no changes
+had been made to the hobbits' calendar since the end of the third age,
+their calendar would be about 15 days further behind ours now then when
+the War of the Ring took place.  Implementing this seemed to me to go
+against Tolkien's general habit of converting dates in the novel to our
+equivalents to give us a better sense of time.  My thoughts, at least
+right now, is that it is truer to the spirit of things for March 25
+today to be about the same as March 25 was back then.  So instead, I
+have modified Tolkien's description of the hobbits' calendar so that
+leap years occur once every 4 years unless it is 100 years unless it is
+400 years, so that it matches our calendar in that regard.  These 100
+and 400 year intervals occur at different times in the two calendars,
+however.  Thus the last day of our year is sometimes 7 Afteryule,
+sometimes 8, and sometimes 9.
+
+I<The "I" in the above is Tom Braun -- TRW>
 
 =head1 BIBLIOGRAPHY
 
 Tolkien, J. R. R. I<Return of the King>.  New York: Houghton Mifflin Press,
 1955.
 
-L<https://www.glyphweb.com/arda/f/fourthage.html>
+L<https://encyclopedia-of-arda.com/f/fourthage.html>
 
 =head1 BUGS
 
@@ -767,21 +769,20 @@ module should automatically expand in available dates directly with epoch time
 support on your system.
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire>,
-L<https://github.com/trwyant/perl-Date-Tolkien-Shire/issues>, or in
+L<https://github.com/trwyant/perl-Date-Tolkien-Shire/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
 Tom Braun <tbraun@pobox.com>
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2001-2003, 2006 Tom Braun. All rights reserved.
 
-Copyright (C) 2017-2022, 2025 Thomas R. Wyant, III
+Copyright (C) 2017-2022, 2025-2026 Thomas R. Wyant, III
 
 The calendar implemented on this module was created by J.R.R. Tolkien,
 and the copyright is still held by his estate.  The license and
@@ -790,7 +791,7 @@ calendar itself.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

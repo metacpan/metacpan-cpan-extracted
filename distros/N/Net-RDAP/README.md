@@ -77,6 +77,14 @@ and [Net::RDAP::Values](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AValues).
 - `cache_ttl` - if set, specifies how long after a record has
 been cached before [Net::RDAP](https://metacpan.org/pod/Net%3A%3ARDAP) asks the server for any update. By
 default this is one hour (3600 seconds).
+- `cache_dir` - if set, specifies where [Net::RDAP](https://metacpan.org/pod/Net%3A%3ARDAP) stores its cache. If
+not provided, then the directory to use is determined using [File::XDG](https://metacpan.org/pod/File%3A%3AXDG). Prior
+to v0.42, the value of `[File::Spec](https://metacpan.org/pod/File%3A%3ASpec)->tmpdir()` was used.
+- `preserve_cache` - unless this option is set to a true value, any cache
+entry older than the specified TTL will be purged when the [Net::RDAP](https://metacpan.org/pod/Net%3A%3ARDAP) object
+is destroyed. You can manually clean the cache using the `clean_cache()` method.
+- `accept_language` - a string that will be passed to RDAP servers in
+the `Accept-Language` header. If not provided, the default is "`en`".
 
 ## Domain Lookup
 
@@ -95,8 +103,8 @@ If there was an error, this method will return a [Net::RDAP::Error](https://meta
 
 Domain names which contain characters other than those from the ASCII-compatible
 range must be encoded into "A-label" (or "Punycode") format before being passed
-to [Net::DNS::Domain](https://metacpan.org/pod/Net%3A%3ADNS%3A%3ADomain). You can use [Net::LibIDN](https://metacpan.org/pod/Net%3A%3ALibIDN) or [Net::LibIDN2](https://metacpan.org/pod/Net%3A%3ALibIDN2) to
-perform this encoding:
+to [Net::DNS::Domain](https://metacpan.org/pod/Net%3A%3ADNS%3A%3ADomain). You can use [Net::LibIDN](https://metacpan.org/pod/Net%3A%3ALibIDN), [Net::LibIDN2](https://metacpan.org/pod/Net%3A%3ALibIDN2), or
+[Net::IDN::PP](https://metacpan.org/pod/Net%3A%3AIDN%3A%3APP) to perform this encoding, for example:
 
     use Net::LibIDN;
 

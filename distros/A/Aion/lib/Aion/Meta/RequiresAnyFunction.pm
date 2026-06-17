@@ -74,6 +74,10 @@ Returns the name of the function.
 	my $any_function = Aion::Meta::RequiresAnyFunction->new(name => 'my_function');
 	$any_function->name  # => my_function
 
+=head2 stringify ()
+
+Returns a string representation of an object.
+
 =head1 AUTHOR
 
 Yaroslav O. Kosmina L<mailto:dart@cpan.org>

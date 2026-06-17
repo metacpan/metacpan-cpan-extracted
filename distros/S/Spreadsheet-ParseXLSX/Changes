@@ -1,5 +1,9 @@
 Revision history for Spreadsheet-ParseXLSX
 
+0.37  2026-06-16
+
+     - fixed build on open suse by adding NoLWP to XML::Twig constructor
+
 0.36  2025-01-24
 
       - removed tests from distro illustrationg memory bomb fixed in 0.28 (issue #21)

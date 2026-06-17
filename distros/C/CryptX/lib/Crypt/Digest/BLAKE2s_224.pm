@@ -4,7 +4,7 @@ package Crypt::Digest::BLAKE2s_224;
 
 use strict;
 use warnings;
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( blake2s_224 blake2s_224_hex blake2s_224_b64 blake2s_224_b64u blake2s_224_file blake2s_224_file_hex blake2s_224_file_b64 blake2s_224_file_b64u )] );
@@ -83,6 +83,8 @@ Crypt::Digest::BLAKE2s_224 - Hash function BLAKE2s [size: 224 bits]
    my $file_result_raw = Crypt::Digest::BLAKE2s_224->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
+
+I<Since: CryptX-0.048>
 
 Provides an interface to the BLAKE2s_224 digest algorithm.
 

@@ -8,19 +8,17 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> Das Modul findet die gewünschten Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind die Module DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) und GPT-5 (F<gpt5.pm>) als Backend-Engine implementiert.
+B<Greple> B<xlate> Das Modul sucht die gewünschten Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind DeepL (F<deepl.pm>) und das GPT-5.5-Modul (F<gpt5.pm>) als Backend-Engine implementiert.
 
 Wenn Sie normale Textblöcke in einem Dokument übersetzen wollen, das im Pod-Stil von Perl geschrieben ist, verwenden Sie den Befehl B<greple> mit dem Modul C<xlate::deepl> und C<perl> wie folgt:
 
@@ -130,13 +128,11 @@ Zur Zeit sind die folgenden Engines verfügbar
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 Die Schnittstelle von B<gpt-4o> ist instabil und es kann nicht garantiert werden, dass sie im Moment korrekt funktioniert.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -233,7 +229,7 @@ Setzen Sie diesen Wert auf 1, wenn Sie jeweils nur eine Zeile übersetzen wollen
 
 =item B<--xlate-prompt>=I<text>
 
-Geben Sie eine benutzerdefinierte Eingabeaufforderung an, die an die Übersetzungsmaschine gesendet werden soll. Diese Option ist nur bei Verwendung von ChatGPT-Engines (gpt3, gpt4, gpt4o) verfügbar. Sie können das Übersetzungsverhalten anpassen, indem Sie dem KI-Modell spezifische Anweisungen geben. Wenn die Eingabeaufforderung C<%s> enthält, wird sie durch den Namen der Zielsprache ersetzt.
+Geben Sie eine benutzerdefinierte Eingabeaufforderung an, die an die Übersetzungs-Engine gesendet werden soll. Diese Option ist nur bei Verwendung von ChatGPT-Engines (gpt3, gpt4o, gpt5) verfügbar. Sie können das Übersetzungsverhalten anpassen, indem Sie dem KI-Modell spezifische Anweisungen geben. Wenn die Eingabeaufforderung C<%s> enthält, wird diese durch den Namen der Zielsprache ersetzt.
 
 =item B<--xlate-context>=I<text>
 
@@ -373,7 +369,7 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head2 MODULES
 
-L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Generischer Docker-Runner, der von xlate für Container-Operationen verwendet wird.
 

@@ -1,0 +1,158 @@
+package Crypt::Cipher::ARIA;
+
+### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
+
+use strict;
+use warnings;
+our $VERSION = '0.090';
+
+use base qw(Crypt::Cipher);
+
+sub new {
+  my ($class, @args) = @_;
+  my $obj = Crypt::Cipher->new('ARIA', @args);
+  return bless $obj, $class;
+}
+
+sub blocksize      { Crypt::Cipher::blocksize('ARIA')      }
+sub keysize        { Crypt::Cipher::keysize('ARIA')        }
+sub max_keysize    { Crypt::Cipher::max_keysize('ARIA')    }
+sub min_keysize    { Crypt::Cipher::min_keysize('ARIA')    }
+sub default_rounds { Crypt::Cipher::default_rounds('ARIA') }
+
+1;
+
+=pod
+
+=head1 NAME
+
+Crypt::Cipher::ARIA - Symmetric cipher ARIA, key size: 128/192/256 bits
+
+=head1 SYNOPSIS
+
+  ### example 1
+  use Crypt::Mode::CBC;
+
+  my $key = '...'; # length must be a valid key size for this cipher
+  my $iv = '...';  # 16 bytes
+  my $cbc = Crypt::Mode::CBC->new('ARIA');
+  my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
+
+  ### example 2 (slower)
+  use Crypt::CBC;
+  use Crypt::Cipher::ARIA;
+
+  my $key = '...'; # length must be a valid key size for this cipher
+  my $iv = '...';  # 16 bytes
+  my $cbc = Crypt::CBC->new( -cipher=>'Cipher::ARIA', -key=>$key, -iv=>$iv );
+  my $ciphertext = $cbc->encrypt("secret data");
+
+=head1 DESCRIPTION
+
+I<Since: CryptX-0.090>
+
+This module implements the ARIA cipher. Its interface is compatible with L<Crypt::CBC>.
+
+B<Note:> This module only implements single-block encryption and decryption.
+For general data, use a block mode such as
+L<Crypt::Mode::CBC>, L<Crypt::Mode::CTR>, or L<Crypt::CBC> (which is slower).
+
+=head1 METHODS
+
+Unless noted otherwise, assume C<$c> is an existing cipher object created via
+C<new>, for example:
+
+ my $c = Crypt::Cipher::ARIA->new($key);
+
+=head2 new
+
+ my $c = Crypt::Cipher::ARIA->new($key);
+ #or
+ my $c = Crypt::Cipher::ARIA->new($key, $rounds);
+
+ # $key .... [binary string] key of an accepted length (see keysize, min_keysize, max_keysize)
+ # $rounds . [integer] optional, number of rounds (if supported by the cipher; croaks on invalid value)
+
+=head2 encrypt
+
+Encrypts exactly one block of plaintext. The length of C<$plaintext> must
+equal L</blocksize>; croaks otherwise. An empty string is accepted and
+returned unchanged.
+
+ my $ciphertext = $c->encrypt($plaintext);
+
+Returns the encrypted block as a binary string (raw bytes).
+
+=head2 decrypt
+
+Decrypts exactly one block of ciphertext. The length of C<$ciphertext> must
+equal L</blocksize>; croaks otherwise. An empty string is accepted and
+returned unchanged.
+
+ my $plaintext = $c->decrypt($ciphertext);
+
+Returns the decrypted block as a binary string (raw bytes).
+
+=head2 keysize
+
+Just an alias for C<max_keysize>.
+
+  $c->keysize;
+  #or
+  Crypt::Cipher::ARIA->keysize;
+  #or
+  Crypt::Cipher::ARIA::keysize;
+
+=head2 blocksize
+
+Returns the cipher block size (in bytes).
+
+  $c->blocksize;
+  #or
+  Crypt::Cipher::ARIA->blocksize;
+  #or
+  Crypt::Cipher::ARIA::blocksize;
+
+=head2 max_keysize
+
+Returns the maximum key size (in bytes).
+
+  $c->max_keysize;
+  #or
+  Crypt::Cipher::ARIA->max_keysize;
+  #or
+  Crypt::Cipher::ARIA::max_keysize;
+
+=head2 min_keysize
+
+Returns the minimum key size (in bytes).
+
+  $c->min_keysize;
+  #or
+  Crypt::Cipher::ARIA->min_keysize;
+  #or
+  Crypt::Cipher::ARIA::min_keysize;
+
+=head2 default_rounds
+
+Returns the cipher's default round count.
+
+  $c->default_rounds;
+  #or
+  Crypt::Cipher::ARIA->default_rounds;
+  #or
+  Crypt::Cipher::ARIA::default_rounds;
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<CryptX>, L<Crypt::Cipher>
+
+=item * L<https://en.wikipedia.org/wiki/ARIA_(cipher)>
+
+=item * L<https://www.rfc-editor.org/rfc/rfc5794>
+
+=back
+
+=cut

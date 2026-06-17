@@ -79,6 +79,8 @@ variant. Prefer over ChaCha20-Poly1305 when nonces are generated randomly.
 on modern CPUs. Requires unique nonces; nonce reuse breaks the security entirely.
 - **AES-SIV** ([Crypt::AuthEnc::SIV](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ASIV)) - Deterministic AEAD, nonce-misuse resistant.
 Slightly slower but safer when nonce uniqueness cannot be guaranteed.
+- **AES-GCM-SIV** ([Crypt::AuthEnc::GCMSIV](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AGCMSIV)) - Nonce-misuse-resistant AEAD (RFC 8452).
+Faster than AES-SIV; pick this when you need GCM-like performance with nonce-reuse safety.
 - **AES-OCB** ([Crypt::AuthEnc::OCB](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AOCB)) - Very fast single-pass AEAD. Check patent status
 for your jurisdiction.
 - **AES-EAX** ([Crypt::AuthEnc::EAX](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AEAX)) - Two-pass AEAD based on CTR+OMAC. No patents,
@@ -217,7 +219,7 @@ module POD when you need exact failure semantics.
 
 - Symmetric ciphers
 
-    [Crypt::Cipher::AES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAES), [Crypt::Cipher::Anubis](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAnubis), [Crypt::Cipher::Blowfish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ABlowfish), [Crypt::Cipher::Camellia](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACamellia), [Crypt::Cipher::CAST5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACAST5), [Crypt::Cipher::DES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES),
+    [Crypt::Cipher::AES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAES), [Crypt::Cipher::Anubis](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAnubis), [Crypt::Cipher::ARIA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AARIA), [Crypt::Cipher::Blowfish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ABlowfish), [Crypt::Cipher::Camellia](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACamellia), [Crypt::Cipher::CAST5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACAST5), [Crypt::Cipher::DES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES),
     [Crypt::Cipher::DES\_EDE](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES_EDE), [Crypt::Cipher::IDEA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AIDEA), [Crypt::Cipher::KASUMI](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKASUMI), [Crypt::Cipher::Khazad](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKhazad), [Crypt::Cipher::MULTI2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AMULTI2), [Crypt::Cipher::Noekeon](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ANoekeon),
     [Crypt::Cipher::RC2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC2), [Crypt::Cipher::RC5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC5), [Crypt::Cipher::RC6](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC6), [Crypt::Cipher::SAFERP](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFERP), [Crypt::Cipher::SAFER\_K128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K128), [Crypt::Cipher::SAFER\_K64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K64),
     [Crypt::Cipher::SAFER\_SK128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK128), [Crypt::Cipher::SAFER\_SK64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK64), [Crypt::Cipher::SEED](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASEED), [Crypt::Cipher::SM4](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASM4), [Crypt::Cipher::Serpent](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASerpent), [Crypt::Cipher::Skipjack](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASkipjack),
@@ -234,7 +236,7 @@ module POD when you need exact failure semantics.
 
 - Authenticated encryption modes
 
-    [Crypt::AuthEnc::CCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ACCM), [Crypt::AuthEnc::EAX](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AEAX), [Crypt::AuthEnc::GCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AGCM), [Crypt::AuthEnc::OCB](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AOCB), [Crypt::AuthEnc::ChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AChaCha20Poly1305), [Crypt::AuthEnc::XChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AXChaCha20Poly1305), [Crypt::AuthEnc::SIV](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ASIV)
+    [Crypt::AuthEnc::CCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ACCM), [Crypt::AuthEnc::EAX](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AEAX), [Crypt::AuthEnc::GCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AGCM), [Crypt::AuthEnc::GCMSIV](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AGCMSIV), [Crypt::AuthEnc::OCB](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AOCB), [Crypt::AuthEnc::ChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AChaCha20Poly1305), [Crypt::AuthEnc::XChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AXChaCha20Poly1305), [Crypt::AuthEnc::SIV](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ASIV)
 
 - Hash functions
 
@@ -245,7 +247,7 @@ module POD when you need exact failure semantics.
     [Crypt::Digest::SHA512](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA512), [Crypt::Digest::SHA512\_224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA512_224), [Crypt::Digest::SHA512\_256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA512_256), [Crypt::Digest::Tiger192](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ATiger192), [Crypt::Digest::Whirlpool](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AWhirlpool),
     [Crypt::Digest::Keccak224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKeccak224), [Crypt::Digest::Keccak256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKeccak256), [Crypt::Digest::Keccak384](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKeccak384), [Crypt::Digest::Keccak512](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKeccak512),
     [Crypt::Digest::SHA3\_224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA3_224), [Crypt::Digest::SHA3\_256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA3_256), [Crypt::Digest::SHA3\_384](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA3_384), [Crypt::Digest::SHA3\_512](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA3_512), [Crypt::Digest::SHAKE](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHAKE),
-    [Crypt::Digest::TurboSHAKE](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ATurboSHAKE), [Crypt::Digest::KangarooTwelve](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKangarooTwelve)
+    [Crypt::Digest::TurboSHAKE](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ATurboSHAKE), [Crypt::Digest::KangarooTwelve](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKangarooTwelve), [Crypt::Digest::SM3](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASM3)
 
 - Checksums
 
@@ -253,8 +255,8 @@ module POD when you need exact failure semantics.
 
 - Message authentication codes
 
-    [Crypt::Mac::BLAKE2b](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3ABLAKE2b), [Crypt::Mac::BLAKE2s](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3ABLAKE2s), [Crypt::Mac::F9](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AF9), [Crypt::Mac::HMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AHMAC), [Crypt::Mac::OMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AOMAC),
-    [Crypt::Mac::Pelican](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APelican), [Crypt::Mac::PMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APMAC), [Crypt::Mac::XCBC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AXCBC), [Crypt::Mac::Poly1305](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APoly1305)
+    [Crypt::Mac::BLAKE2b](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3ABLAKE2b), [Crypt::Mac::BLAKE2s](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3ABLAKE2s), [Crypt::Mac::F9](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AF9), [Crypt::Mac::HMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AHMAC), [Crypt::Mac::KMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AKMAC),
+    [Crypt::Mac::OMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AOMAC), [Crypt::Mac::Pelican](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APelican), [Crypt::Mac::PMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APMAC), [Crypt::Mac::XCBC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AXCBC), [Crypt::Mac::Poly1305](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APoly1305)
 
 - Public-key cryptography
 

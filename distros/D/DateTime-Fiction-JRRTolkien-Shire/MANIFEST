@@ -6,8 +6,8 @@ eg/README
 lib/DateTime/Fiction/JRRTolkien/Shire.pm
 lib/DateTime/Fiction/JRRTolkien/Shire/Duration.pm
 lib/DateTime/Fiction/JRRTolkien/Shire/Types.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json

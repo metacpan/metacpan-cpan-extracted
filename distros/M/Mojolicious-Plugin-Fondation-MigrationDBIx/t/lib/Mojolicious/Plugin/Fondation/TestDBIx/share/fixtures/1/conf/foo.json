@@ -1,0 +1,8 @@
+{
+   "sets": [
+      {
+         "class": "Foo",
+         "quantity": "all"
+      }
+   ]
+}

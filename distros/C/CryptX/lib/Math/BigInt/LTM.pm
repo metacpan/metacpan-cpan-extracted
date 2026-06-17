@@ -2,7 +2,7 @@ package Math::BigInt::LTM;
 
 use strict;
 use warnings;
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use CryptX;
 use Carp;
@@ -1036,9 +1036,9 @@ Math::BigInt::LTM - Use the libtommath library for Math::BigInt routines
 
 =head1 DESCRIPTION
 
-Provides big integer calculations using the libtommath C library.
-
 I<Since: CryptX-0.029>
+
+Provides big integer calculations using the libtommath C library.
 
 =head1 METHODS
 

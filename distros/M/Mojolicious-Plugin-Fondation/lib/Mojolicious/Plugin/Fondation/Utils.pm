@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Utils;
-$Mojolicious::Plugin::Fondation::Utils::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Utils::VERSION = '0.02';
 # ABSTRACT: Utility functions: config merge, name resolution, share directory helpers
 
 use Mojo::Base -strict, -signatures;
@@ -24,9 +24,11 @@ sub short_name {
 
 sub share_relative {
     my ($path) = @_;
-    my $pos = rindex($path, '/share/');
+    # Normalize to forward slashes (cross-platform: Windows uses backslashes)
+    (my $normalized = $path) =~ s{\\}{/}g;
+    my $pos = rindex($normalized, '/share/');
     return $path if $pos == -1;
-    return substr($path, $pos + 1);
+    return substr($normalized, $pos + 1);
 }
 
 sub find_share_dir ($class_name, $override = undef) {
@@ -85,7 +87,7 @@ Mojolicious::Plugin::Fondation::Utils - Utility functions: config merge, name re
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

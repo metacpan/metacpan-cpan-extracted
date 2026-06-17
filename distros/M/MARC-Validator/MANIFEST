@@ -32,6 +32,7 @@ t/data/cnb000396346-trailing_space_in_080a.xml
 t/data/cnb000425076-bad_quotation_mark_in_080a.xml
 t/data/cnb000545093-cnb001214971-duplicite_035a.xml
 t/data/cnb000564501-bad_first_character_on_045a.xml
+t/data/cnb000990644-bad_dot_character_in_080a.xml
 t/data/cnb001021906-bad_book_material_index-504a.xml
 t/data/cnb001410157-incorrect_field_020a_isbn_with_extra_characters.xml
 t/data/cnb001696044-bad_date2_in_currently_published.xml
@@ -42,6 +43,7 @@ t/data/cnb001920818-incorrect_field_008_syntax_quote_mark.xml
 t/data/cnb002172297-leader_desc_cataloging_form_coolidate_with_rda.xml
 t/data/cnb002220549-bad_quotation_mark_in_080a.xml
 t/data/cnb002703924-bad_apostrophe_in_080a.xml
+t/data/cnb002795077-bad_apostrophe_in_080a.xml
 t/data/cnb002880415-bad_apostrophe_in_080a.xml
 t/data/cnb002932107-incorrect_field_020a_isbn_formatting.xml
 t/data/cnb003160105-bad_book_material_index-500a.xml

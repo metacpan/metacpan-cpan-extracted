@@ -5,6 +5,7 @@ inc/CryptX_AuthEnc_CCM.xs.inc
 inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
 inc/CryptX_AuthEnc_EAX.xs.inc
 inc/CryptX_AuthEnc_GCM.xs.inc
+inc/CryptX_AuthEnc_GCMSIV.xs.inc
 inc/CryptX_AuthEnc_OCB.xs.inc
 inc/CryptX_AuthEnc_SIV.xs.inc
 inc/CryptX_BigInt_LTM.xs.inc
@@ -20,6 +21,7 @@ inc/CryptX_Mac_BLAKE2b.xs.inc
 inc/CryptX_Mac_BLAKE2s.xs.inc
 inc/CryptX_Mac_F9.xs.inc
 inc/CryptX_Mac_HMAC.xs.inc
+inc/CryptX_Mac_KMAC.xs.inc
 inc/CryptX_Mac_OMAC.xs.inc
 inc/CryptX_Mac_Pelican.xs.inc
 inc/CryptX_Mac_PMAC.xs.inc
@@ -53,6 +55,7 @@ lib/Crypt/AuthEnc/CCM.pm
 lib/Crypt/AuthEnc/ChaCha20Poly1305.pm
 lib/Crypt/AuthEnc/EAX.pm
 lib/Crypt/AuthEnc/GCM.pm
+lib/Crypt/AuthEnc/GCMSIV.pm
 lib/Crypt/AuthEnc/OCB.pm
 lib/Crypt/AuthEnc/SIV.pm
 lib/Crypt/AuthEnc/XChaCha20Poly1305.pm
@@ -62,6 +65,7 @@ lib/Crypt/Checksum/CRC32.pm
 lib/Crypt/Cipher.pm
 lib/Crypt/Cipher/AES.pm
 lib/Crypt/Cipher/Anubis.pm
+lib/Crypt/Cipher/ARIA.pm
 lib/Crypt/Cipher/Blowfish.pm
 lib/Crypt/Cipher/Camellia.pm
 lib/Crypt/Cipher/CAST5.pm
@@ -120,6 +124,7 @@ lib/Crypt/Digest/SHA512.pm
 lib/Crypt/Digest/SHA512_224.pm
 lib/Crypt/Digest/SHA512_256.pm
 lib/Crypt/Digest/SHAKE.pm
+lib/Crypt/Digest/SM3.pm
 lib/Crypt/Digest/Tiger192.pm
 lib/Crypt/Digest/TurboSHAKE.pm
 lib/Crypt/Digest/Whirlpool.pm
@@ -129,6 +134,7 @@ lib/Crypt/Mac/BLAKE2b.pm
 lib/Crypt/Mac/BLAKE2s.pm
 lib/Crypt/Mac/F9.pm
 lib/Crypt/Mac/HMAC.pm
+lib/Crypt/Mac/KMAC.pm
 lib/Crypt/Mac/OMAC.pm
 lib/Crypt/Mac/Pelican.pm
 lib/Crypt/Mac/PMAC.pm
@@ -177,6 +183,7 @@ src/ltc/ciphers/aes/aes_desc.c
 src/ltc/ciphers/aes/aes_tab.c
 src/ltc/ciphers/aes/aesni.c
 src/ltc/ciphers/anubis.c
+src/ltc/ciphers/aria.c
 src/ltc/ciphers/blowfish.c
 src/ltc/ciphers/camellia.c
 src/ltc/ciphers/cast5.c
@@ -231,6 +238,7 @@ src/ltc/encauth/gcm/gcm_memory.c
 src/ltc/encauth/gcm/gcm_mult_h.c
 src/ltc/encauth/gcm/gcm_process.c
 src/ltc/encauth/gcm/gcm_reset.c
+src/ltc/encauth/gcm_siv/gcm_siv.c
 src/ltc/encauth/ocb3/ocb3_add_aad.c
 src/ltc/encauth/ocb3/ocb3_decrypt.c
 src/ltc/encauth/ocb3/ocb3_decrypt_last.c
@@ -272,6 +280,7 @@ src/ltc/hashes/sha2/sha512_224.c
 src/ltc/hashes/sha2/sha512_256.c
 src/ltc/hashes/sha3.c
 src/ltc/hashes/sha3_test.c
+src/ltc/hashes/sm3.c
 src/ltc/hashes/tiger.c
 src/ltc/hashes/whirl/whirl.c
 src/ltc/hashes/whirl/whirltab.c
@@ -310,6 +319,10 @@ src/ltc/mac/hmac/hmac_init.c
 src/ltc/mac/hmac/hmac_memory.c
 src/ltc/mac/hmac/hmac_memory_multi.c
 src/ltc/mac/hmac/hmac_process.c
+src/ltc/mac/kmac/kmac.c
+src/ltc/mac/kmac/kmac_file.c
+src/ltc/mac/kmac/kmac_memory.c
+src/ltc/mac/kmac/kmac_memory_multi.c
 src/ltc/mac/omac/omac_done.c
 src/ltc/mac/omac/omac_file.c
 src/ltc/mac/omac/omac_init.c
@@ -864,6 +877,7 @@ t/auth_enc_eax.t
 t/auth_enc_eax_test_vector_ltc.t
 t/auth_enc_gcm.t
 t/auth_enc_gcm_test_vector_ltc.t
+t/auth_enc_gcmsiv.t
 t/auth_enc_ocb.t
 t/auth_enc_ocb_test_vectors_ietf.t
 t/auth_enc_siv.t
@@ -873,6 +887,7 @@ t/cipher_aes.t
 t/cipher_aes_test_vectors_bc.t
 t/cipher_anubis.t
 t/cipher_api.t
+t/cipher_aria.t
 t/cipher_blowfish.t
 t/cipher_camellia.t
 t/cipher_cast5.t
@@ -1212,6 +1227,7 @@ t/digest_sha512.t
 t/digest_sha512_224.t
 t/digest_sha512_256.t
 t/digest_shake.t
+t/digest_sm3.t
 t/digest_test_vectors_ltc.t
 t/digest_tiger192.t
 t/digest_turboshake.t
@@ -1226,6 +1242,7 @@ t/mac_f9.t
 t/mac_hmac.t
 t/mac_hmac_nist.t
 t/mac_hmac_test_vectors_ltc.t
+t/mac_kmac.t
 t/mac_omac.t
 t/mac_omac_test_vectors_ltc.t
 t/mac_pelican.t

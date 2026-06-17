@@ -13,6 +13,7 @@ WriteMakefile(
         'DateTime::Tiny'            => 0,
         'Digest::SHA'               => 0,
         'File::Basename'            => 0,
+        'File::Glob'                => 0,
         'File::Slurp'               => 0,
         'File::Spec'                => 0,
         'File::stat'                => 0,

@@ -8,19 +8,17 @@ App::Greple::xlate - модуль поддержки перевода для gre
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
-Модуль B<Greple> B<xlate> находит нужные текстовые блоки и заменяет их переведенным текстом. В настоящее время в качестве внутреннего движка реализованы модули DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) и GPT-5 (F<gpt5.pm>).
+B<Greple> B<xlate> модуль находит нужные текстовые блоки и заменяет их переведённым текстом. В настоящее время в качестве бэкэнд-движка реализованы модули DeepL (F<deepl.pm>) и GPT-5.5 (F<gpt5.pm>).
 
 Если вы хотите перевести обычные текстовые блоки в документе, написанном в стиле Perl's pod, используйте команду B<greple> с модулем C<xlate::deepl> и C<perl> следующим образом:
 
@@ -130,13 +128,11 @@ Version 1.01
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 Интерфейс B<gpt-4o> нестабилен и в настоящее время не может быть гарантированно корректной работы.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -233,7 +229,7 @@ Version 1.01
 
 =item B<--xlate-prompt>=I<text>
 
-Укажите пользовательскую подсказку, которая будет отправлена механизму перевода. Этот параметр доступен только при использовании движков ChatGPT (gpt3, gpt4, gpt4o). Вы можете настроить поведение переводчика, предоставив специальные инструкции модели искусственного интеллекта. Если подсказка содержит C<%s>, она будет заменена на название целевого языка.
+Укажите пользовательский запрос, который будет отправлен в механизм перевода. Эта опция доступна только при использовании механизмов ChatGPT (gpt3, gpt4o, gpt5). Вы можете настроить поведение перевода, предоставив конкретные инструкции модели ИИ. Если запрос содержит C<%s>, он будет заменен на название целевого языка.
 
 =item B<--xlate-context>=I<text>
 
@@ -373,7 +369,7 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head2 MODULES
 
-L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - общий Docker runner, используемый xlate для операций с контейнерами.
 

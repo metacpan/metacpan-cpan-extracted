@@ -58,8 +58,9 @@ subtest 'Plugin with share/templates directory' => sub {
 
     # Check that templates subdirectory exists
     ok(-d $template_dir, "Template directory exists at $template_dir");
+    (my $normalized = $template_dir->to_string) =~ s{\\}{/}g;
     like(
-        $template_dir,
+        $normalized,
         qr{t/share/fondation/user/templates$},
         "template_dir ends with t/share/fondation/user/templates"
         );
@@ -183,8 +184,12 @@ subtest 'Template priority: dependency plugin over parent plugin' => sub {
     my $role_index = -1;
     my $auth_index = -1;
     for my $i (0 .. $#{$paths}) {
-        $role_index = $i if $paths->[$i] eq $role_path;
-        $auth_index = $i if $paths->[$i] eq $auth_path;
+        $role_index = $i
+            if Mojo::Path->new($paths->[$i])->to_string eq
+               Mojo::Path->new($role_path)->to_string;
+        $auth_index = $i
+            if Mojo::Path->new($paths->[$i])->to_string eq
+               Mojo::Path->new($auth_path)->to_string;
     }
 
     ok($role_index >= 0, "Role template path found in renderer paths");

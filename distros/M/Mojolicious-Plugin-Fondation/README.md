@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration p
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 
@@ -63,10 +63,6 @@ Key features:
 - Deferred initialization via `fondation_finalyze`
 - Contextual logging via `$self->log` (Mojo::Log context)
 
-# NAME
-
-Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration priority and resource sharing
-
 # LOADING ORDER
 
     1. load_plugin_recursive
@@ -114,31 +110,50 @@ Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration p
 
 # CONFIGURATION PRIORITIES
 
-Configuration for each plugin is merged in this order (highest priority first):
+Each plugin receives a merged configuration built from three sources,
+combined with [Hash::Merge](https://metacpan.org/pod/Hash%3A%3AMerge). The cascade priority is:
 
-- 1. Direct configuration (passed in `dependencies` array)
+### 1. Direct configuration (passed in `dependencies` array)
 
-        plugin 'Fondation' => {
-            dependencies => [
-                { 'Fondation::User' => { title => 'Direct override' } },
-            ],
+    plugin 'Fondation' => {
+        dependencies => [
+            { 'Fondation::User' => { title => 'Direct override' } },
+        ],
+    };
+
+### 2. Application configuration file (e.g. myapp.conf)
+
+    {
+        'Fondation::User' => {
+            title => 'From config file',
+        }
+    }
+
+### 3. Plugin defaults (returned by `fondation_meta`)
+
+    sub fondation_meta {
+        return {
+            defaults => { title => 'Default value' },
         };
+    }
 
-- 2. Application configuration file (e.g. myapp.conf)
+The merge rules are:
 
-        {
-            'Fondation::User' => {
-                title => 'From config file',
-            }
-        }
+- Scalars -- overwrite. The highest-priority non-empty value wins.
+- Hashes -- merged recursively. Keys present at multiple levels are resolved
+by priority; keys present at only one level survive untouched.
+- Arrays -- concatenated. All values from all levels are kept, ordered
+by priority: direct elements first, then app config, then defaults.
 
-- 3. Plugin defaults (returned by `fondation_meta`)
+Example: a plugin declares `allowed_roles => ['user']` in its defaults,
+the app config adds `allowed_roles => ['editor']`, and a direct dependency
+passes `allowed_roles => ['admin']`. The merged result is
+`['admin', 'editor', 'user']` -- all three roles are available, with the
+highest-priority one first.
 
-        sub fondation_meta {
-            return {
-                defaults => { title => 'Default value' },
-            };
-        }
+The `dependencies` key is not special -- it follows the same array
+concatenation rules. This means an app config can add extra dependencies
+without repeating those already declared.
 
 # RESOURCE DIRECTORIES (share/)
 
@@ -173,33 +188,6 @@ plugin-provided actions from `fondation_meta -` provides\_actions>.
         actions      => ['Templates'],       # keep Templates, drop Controllers
         dependencies => ['MyPlugin'],        # MyAction auto-added if declared
     };
-
-## Configuration merge
-
-Each plugin receives a merged configuration built from three sources,
-combined with [Hash::Merge](https://metacpan.org/pod/Hash%3A%3AMerge). The cascade priority is:
-
-- 1. Direct config -- passed inline in the `dependencies` list (highest priority)
-- 2. App config -- from `myapp.conf` or `$app->config` via [Mojolicious::Plugin::Config](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AConfig)
-- 3. Plugin defaults -- from `fondation_meta -` defaults> (lowest priority)
-
-The merge rules are:
-
-- Scalars -- overwrite. The highest-priority non-empty value wins.
-- Hashes -- merged recursively. Keys present at multiple levels are resolved
-by priority; keys present at only one level survive untouched.
-- Arrays -- concatenated. All values from all levels are kept, ordered
-by priority: direct elements first, then app config, then defaults.
-
-Example: a plugin declares `allowed_roles => ['user']` in its defaults,
-the app config adds `allowed_roles => ['editor']`, and a direct dependency
-passes `allowed_roles => ['admin']`. The merged result is
-`['admin', 'editor', 'user']` -- all three roles are available, with the
-highest-priority one first.
-
-The `dependencies` key is not special -- it follows the same array
-concatenation rules. This means an app config can add extra dependencies
-without repeating those already declared.
 
 ## Default Actions
 
@@ -250,51 +238,27 @@ resolves it automatically.
 If the action name does not start with `Mojolicious::`, Fondation will
 prepend `Mojolicious::Plugin::Fondation::Action::` to it as a fallback.
 
-# THE fondation\_meta METHOD
+# PLUGIN REGISTRY
 
-All Fondation-aware plugins should define a class method `fondation_meta`:
+After loading, every plugin is recorded in the registry — a hashref keyed by fully-qualified plugin name. Each entry stores:
 
-    sub fondation_meta {
-        return {
-            dependencies     => ['XXX', 'YYY'],   # loaded before this plugin
-            provides_actions => ['MyAction'],       # optional custom action
-            defaults         => {
-                title => 'Default Title',
-            },
-        };
-    }
+- instance — the plugin object returned by register()
+- short\_name — e.g. "Fondation::User"
+- share\_dir — path to the plugin's share/ directory
+- config — merged configuration (direct > app > defaults)
+- metadata — has\_templates, has\_assets flags
+- fondation\_meta — the raw return value of the plugin's fondation\_meta()
 
-- `dependencies` -> array of plugin names to load first
-- `provides_actions` -> optional array of custom action short names
-- `defaults` -> fallback configuration values
-
-This method is called before `register` to collect metadata without
-instantiating the plugin.
-
-# THE return $self REQUIREMENT
-
-To fully participate in Fondation's features (especially `fondation_finalyze`),
-a plugin \*\*must return $self\*\* from its `register` method:
-
-    sub register ($self, $app, $conf) {
-        # Your code...
-        return $self;
-    }
-
-If you don't return $self:
-
-- Instance is not stored in the registry
-- `fondation_finalyze` cannot be called
-- Plugin is still loaded and actions run, but finalyze features are skipped
+The Manager owns the registry. [Mojolicious::Plugin::Fondation::API](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AFondation%3A%3AAPI) exposes it for read-only access (same hashref, no copy). Post-load actions (Templates, Controllers, Static) iterate over it, as do zone helpers (render\_zone, render\_zone\_js) and the finalyze phase.
 
 # CREATING A FONDATION-AWARE PLUGIN
 
-1\. \*\*File structure\*\*
+### 1. File structure
 
     lib/Mojolicious/Plugin/Fondation/MyPlugin.pm
     share/templates/myplugin/           (optional)
 
-2\. \*\*Minimal code\*\*
+### 2. Minimal code
 
     package Mojolicious::Plugin::Fondation::MyPlugin;
     use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -319,7 +283,7 @@ If you don't return $self:
 
     1;
 
-3\. \*\*Loading\*\*
+### 3. Loading
 
     In your Fondation config:
 
@@ -328,12 +292,38 @@ If you don't return $self:
             # or { 'MyPlugin' => { enable_feature => 0 } }
         ]
 
-4\. \*\*Testing\*\*
+## The `fondation_meta` contract
 
-    - Check registry: C<< $app->manager->registry >>
-    - Check logs for contextual debug (C<< [$short] message >>)
-    - Verify templates are added
-    - Use C<< /fondation/debug/registry >> route (development mode) to inspect
+All Fondation-aware plugins must define a class method `fondation_meta`:
+
+    sub fondation_meta {
+        return {
+            dependencies     => ['XXX', 'YYY'],   # loaded before this plugin
+            provides_actions => ['MyAction'],       # optional custom action
+            defaults         => {
+                title => 'Default Title',
+            },
+        };
+    }
+
+- `dependencies` -> array of plugin names to load first
+- `provides_actions` -> optional array of custom action short names
+- `defaults` -> fallback configuration values (lowest priority)
+
+This method is called before `register` to collect metadata without
+instantiating the plugin. It is the cornerstone of Fondation's composition
+model: every plugin declares what it needs and what it provides.
+
+## Why `return $self` is required
+
+To fully participate in Fondation's features (especially `fondation_finalyze`),
+a plugin **must return $self** from its `register` method.
+
+If you don't return $self:
+
+- Instance is not stored in the registry
+- `fondation_finalyze` cannot be called
+- Plugin is still loaded and actions run, but finalyze features are skipped
 
 # HELPERS
 
@@ -374,6 +364,11 @@ the raw content instead of rendering through the template engine.
 
     %= render_zone 'header'
     %= render_zone_js 'footer'
+
+# ABOUT THIS PROJECT
+
+Fondation and its plugin ecosystem were developed with significant
+assistance from an AI coding agent.
 
 # AUTHOR
 

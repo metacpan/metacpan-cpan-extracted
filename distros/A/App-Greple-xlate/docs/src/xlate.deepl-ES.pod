@@ -8,19 +8,17 @@ App::Greple::xlate - módulo de traducción para greple
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
-El módulo B<Greple> B<xlate> encuentra los bloques de texto deseados y los sustituye por el texto traducido. Actualmente DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>), y GPT-5 (F<gpt5.pm>) módulo se implementan como un motor de back-end.
+B<Greple> B<xlate> El módulo busca los bloques de texto deseados y los sustituye por el texto traducido. Actualmente, los módulos DeepL (F<deepl.pm>) y GPT-5.5 (F<gpt5.pm>) están implementados como motores de fondo.
 
 Si desea traducir bloques de texto normal en un documento escrito en el estilo vaina de Perl, utilice el comando B<greple> con el módulo C<xlate::deepl> y C<perl> de la siguiente manera:
 
@@ -130,13 +128,11 @@ En este momento, están disponibles los siguientes motores
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 La interfaz de B<gpt-4o> es inestable y no se puede garantizar que funcione correctamente por el momento.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -233,7 +229,7 @@ Establezca este valor en 1 si desea traducir una línea cada vez. Esta opción t
 
 =item B<--xlate-prompt>=I<text>
 
-Especifique un mensaje personalizado que se enviará al motor de traducción. Esta opción sólo está disponible cuando se utilizan motores ChatGPT (gpt3, gpt4, gpt4o). Puede personalizar el comportamiento de la traducción proporcionando instrucciones específicas al modelo de IA. Si la instrucción contiene C<%s>, se sustituirá por el nombre del idioma de destino.
+Especifica una indicación personalizada que se enviará al motor de traducción. Esta opción solo está disponible cuando se utilizan los motores de ChatGPT (gpt3, gpt4o, gpt5). Puedes personalizar el comportamiento de la traducción proporcionando instrucciones específicas al modelo de IA. Si la indicación contiene C<%s>, se sustituirá por el nombre del idioma de destino.
 
 =item B<--xlate-context>=I<text>
 
@@ -373,7 +369,7 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head2 MODULES
 
-L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Corredor Docker genérico utilizado por xlate para operaciones de contenedor.
 

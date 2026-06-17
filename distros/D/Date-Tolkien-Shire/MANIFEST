@@ -2,8 +2,8 @@ Changes
 CONTRIBUTING
 eg/on-date
 lib/Date/Tolkien/Shire.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json

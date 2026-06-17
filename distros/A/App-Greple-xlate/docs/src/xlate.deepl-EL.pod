@@ -8,19 +8,17 @@ App::Greple::xlate - ενότητα υποστήριξης μετάφρασης 
 
     greple -Mxlate::deepl --xlate pattern target-file
 
-    greple -Mxlate::gpt4 --xlate pattern target-file
-
     greple -Mxlate::gpt5 --xlate pattern target-file
 
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> Η ενότητα <m id=1 /> βρίσκει τα επιθυμητά τμήματα κειμένου και τα αντικαθιστά με το μεταφρασμένο κείμενο. Επί του παρόντος, η ενότητα DeepL (F<deepl.pm>), η ενότητα ChatGPT 4.1 (F<gpt4.pm>) και η ενότητα GPT-5 (F<gpt5.pm>) υλοποιούνται ως μηχανή back-end.
+B<Greple> B<xlate> Το module εντοπίζει τα επιθυμητά τμήματα κειμένου και τα αντικαθιστά με το μεταφρασμένο κείμενο. Προς το παρόν, τα modules DeepL (F<deepl.pm>) και GPT-5.5 (F<gpt5.pm>) έχουν υλοποιηθεί ως μηχανές back-end.
 
 Αν θέλετε να μεταφράσετε κανονικά μπλοκ κειμένου σε ένα έγγραφο γραμμένο στο στυλ pod της Perl, χρησιμοποιήστε την εντολή B<greple> με την ενότητα C<xlate::deepl> και C<perl> ως εξής:
 
@@ -130,13 +128,11 @@ B<Greple> B<xlate> Η ενότητα <m id=1 /> βρίσκει τα επιθυμ
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4.1
-
 =item * B<gpt4o>: gpt-4o-mini
 
 Η διεπαφή του B<gpt-4o> είναι ασταθής και δεν μπορεί να εγγυηθεί ότι θα λειτουργεί σωστά αυτή τη στιγμή.
 
-=item * B<gpt5>: gpt-5
+=item * B<gpt5>: gpt-5.5
 
 =back
 
@@ -233,7 +229,7 @@ B<Greple> B<xlate> Η ενότητα <m id=1 /> βρίσκει τα επιθυμ
 
 =item B<--xlate-prompt>=I<text>
 
-Καθορίστε μια προσαρμοσμένη προτροπή που θα αποστέλλεται στη μηχανή μετάφρασης. Αυτή η επιλογή είναι διαθέσιμη μόνο όταν χρησιμοποιείτε μηχανές ChatGPT (gpt3, gpt4, gpt4o). Μπορείτε να προσαρμόσετε τη συμπεριφορά της μετάφρασης παρέχοντας συγκεκριμένες οδηγίες στο μοντέλο τεχνητής νοημοσύνης. Εάν η προτροπή περιέχει C<%s>, θα αντικατασταθεί με το όνομα της γλώσσας-στόχου.
+Καθορίστε μια προσαρμοσμένη εντολή που θα σταλεί στον μηχανισμό μετάφρασης. Αυτή η επιλογή είναι διαθέσιμη μόνο όταν χρησιμοποιείτε μηχανισμούς ChatGPT (gpt3, gpt4o, gpt5). Μπορείτε να προσαρμόσετε τη συμπεριφορά της μετάφρασης παρέχοντας συγκεκριμένες οδηγίες στο μοντέλο τεχνητής νοημοσύνης. Εάν η εντολή περιέχει C<%s>, θα αντικατασταθεί με το όνομα της γλώσσας προορισμού.
 
 =item B<--xlate-context>=I<text>
 
@@ -373,7 +369,7 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head2 MODULES
 
-L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Γενικός δρομέας Docker που χρησιμοποιείται από το xlate για λειτουργίες εμπορευματοκιβωτίων
 

@@ -4,7 +4,7 @@ package Crypt::Cipher::Serpent;
 
 use strict;
 use warnings;
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use base qw(Crypt::Cipher);
 
@@ -48,6 +48,8 @@ Crypt::Cipher::Serpent - Symmetric cipher Serpent, key size: 128/192/256 bits
   my $ciphertext = $cbc->encrypt("secret data");
 
 =head1 DESCRIPTION
+
+I<Since: CryptX-0.055>
 
 This module implements the Serpent cipher. Its interface is compatible with L<Crypt::CBC>.
 

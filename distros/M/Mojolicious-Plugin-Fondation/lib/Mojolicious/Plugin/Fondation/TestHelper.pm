@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::TestHelper;
-$Mojolicious::Plugin::Fondation::TestHelper::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::TestHelper::VERSION = '0.02';
 # ABSTRACT: Test helpers for Fondation and its plugins
 
 use strict;
@@ -85,7 +85,7 @@ Mojolicious::Plugin::Fondation::TestHelper - Test helpers for Fondation and its 
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

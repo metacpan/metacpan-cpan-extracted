@@ -19,7 +19,7 @@ BEGIN {
     $extra = 1
         if eval { require Test::NoWarnings ;  Test::NoWarnings->import; 1 };
 
-    plan tests => 115 + $extra ;
+    plan tests => 113 + $extra ;
 
     use_ok('IO::Compress::Zip', qw(:all)) ;
     use_ok('IO::Uncompress::Unzip', qw(unzip $UnzipError)) ;
@@ -419,7 +419,6 @@ EOM
         my $name = $u->getHeaderInfo()->{Name};
 
         my $hdr = $u->getHeaderInfo();
-        is $hdr->{Name}, 'hello.txt', "Name is 'hello.txt'";
         is $hdr->{Time}, 0, "Time is zero";
     }
 
@@ -435,7 +434,6 @@ EOM
         my $name = $u->getHeaderInfo()->{Name};
 
         my $hdr = $u->getHeaderInfo();
-        is $hdr->{Name}, 'hello.txt', "Name is 'hello.txt'";
         is $hdr->{Time}, 0, "Time is zero";
     }
 
