@@ -1,5 +1,5 @@
 use v5.14.0;
-package JMAP::Tester::Logger::Null 0.109;
+package JMAP::Tester::Logger::Null 0.110;
 
 use Moo;
 with 'JMAP::Tester::Logger';
@@ -32,7 +32,7 @@ JMAP::Tester::Logger::Null
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 PERL VERSION
 

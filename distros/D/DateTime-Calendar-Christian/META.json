@@ -2,14 +2,14 @@
    "abstract" : "Dates in the Christian (combined Julian/Gregorian) calendar",
    "author" : [
       "Eugene van der Pijll <pijll@gmx.net>",
-      "Thomas R. Wyant, III <wyant at cpan dot org>",
+      "Thomas R. Wyant, III <harryfmudd at comcast dot net>",
       "realclean",
       {
          "FILES" : "cover_db"
       }
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -53,14 +53,14 @@
    "provides" : {
       "DateTime::Calendar::Christian" : {
          "file" : "lib/DateTime/Calendar/Christian.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Christian"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Christian/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -71,6 +71,6 @@
          "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Christian"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

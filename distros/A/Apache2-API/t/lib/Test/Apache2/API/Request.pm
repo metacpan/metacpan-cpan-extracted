@@ -285,7 +285,7 @@ sub referer { return( shift->_test({ method => 'referer', expect => 'https://exa
 
 sub remote_addr { return( shift->_test({ method => 'remote_addr', expect => 'APR::SockAddr', type => 'isa' }) ); }
 
-sub request_time { return( shift->_test({ method => 'request_time', expect => 'DateTime', type => 'isa' }) ); }
+sub request_time { return( shift->_test({ method => 'request_time', expect => 'DateTime::Lite', type => 'isa' }) ); }
 
 # requires
 # satisfies

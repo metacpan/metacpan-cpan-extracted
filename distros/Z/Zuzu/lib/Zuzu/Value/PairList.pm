@@ -2,7 +2,7 @@ package Zuzu::Value::PairList;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use Moo;
 
@@ -301,6 +301,7 @@ sub sorted_keys {
 sub length { scalar @{ $_[0]->list } }
 sub count { $_[0]->length }
 sub empty { $_[0]->length ? 0 : 1 }
+sub is_empty { $_[0]->empty }
 
 sub clear {
 	my ( $self ) = @_;

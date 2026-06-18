@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Apache2 API Framework - ~/lib/Apache2/API/DateTime.pm
-## Version v0.1.2
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Apache2 API Framework - ~/lib//mnt/src/perl/Apache2-API/lib/Apache2/API/DateTime.pm
+## Version v0.1.3
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2024/09/04
+## Modified 2026/06/17
 ## All rights reserved
 ## 
 ## 
@@ -21,8 +21,8 @@ BEGIN
 	use parent qw( Module::Generic );
 	use vars qw( $VERSION );
 	use APR::Date;
-	use DateTime;
-	our $VERSION = 'v0.1.2';
+	use DateTime::Lite;
+	our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -31,7 +31,7 @@ use warnings;
 sub format_datetime
 {
     my( $self, $dt ) = @_;
-    $dt = DateTime->now unless( defined( $dt ) );
+    $dt = DateTime::Lite->now unless( defined( $dt ) );
     $dt = $dt->clone->set_time_zone( 'GMT' );
     return( $dt->strftime( '%a, %d %b %Y %H:%M:%S GMT' ) );
 }
@@ -83,11 +83,11 @@ sub parse_datetime
         local $@;
         eval
         {
-            $dt = DateTime->from_epoch( epoch => $time );
+            $dt = DateTime::Lite->from_epoch( epoch => $time );
         };
         if( $@ )
         {
-            return( $self->error( "Error instantiating a DateTime object with the epoch value equivalent of the date provided $date: $@" ) );
+            return( $self->error( "Error instantiating a DateTime::Lite object with the epoch value equivalent of the date provided $date: $@" ) );
         }
         return( $dt );
     }
@@ -108,7 +108,7 @@ sub time2datetime
 	my $self = shift( @_ );
     my $time = shift( @_ );
     $time = time() unless( defined( $time ) );
-    my $dt = DateTime->from_epoch( epoch => $time );
+    my $dt = DateTime::Lite->from_epoch( epoch => $time );
 	$dt->set_formatter( $self );
 	return( $dt );
 }
@@ -144,10 +144,10 @@ Apache2::API::DateTime - HTTP DateTime Manipulation and Formatting
 
 	use Apache2::API::DateTime;
 	my $d = Apache2::API::DateTime->new( debug => 3 );
-	my $dt = DateTime->now;
+	my $dt = DateTime::Lite->now;
 	$dt->set_formatter( $d );
 	print( "$dt\n" );
-	## will produce
+	# will produce
 	Sun, 15 Dec 2019 15:32:12 GMT
 	
 	my( @parts ) = $d->parse_date( $date_string );
@@ -160,13 +160,13 @@ Apache2::API::DateTime - HTTP DateTime Manipulation and Formatting
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 
-This module contains methods to create and manipulate datetime representation from and to L<DateTime> object or unix timestamps.
+This module contains methods to create and manipulate datetime representation from and to L<DateTime::Lite> object or unix timestamps.
 
-When using it as a formatter to a L<DateTime> object, this will make sure it is properly formatted for its use in HTTP headers and cookies.
+When using it as a formatter to a L<DateTime::Lite> object, this will make sure it is properly formatted for its use in HTTP headers and cookies.
 
 =head1 METHODS
 
@@ -184,7 +184,7 @@ Optional. If set with a positive integer, this will activate verbose debugging m
 
 =head2 format_datetime
 
-Provided a L<DateTime> object, this returns a HTTP compliant string representation, such as:
+Provided a L<DateTime::Lite> object, this returns a HTTP compliant string representation, such as:
 
 	Sun, 15 Dec 2019 15:32:12 GMT
 
@@ -198,11 +198,11 @@ This is used by the method L</str2datetime>
 
 =head2 parse_datetime
 
-Provided with a date string, and this will parse it and return a L<DateTime> object, or sets an L<error|Module::Generic/error> and return C<undef> or an empty list depending on the context.
+Provided with a date string, and this will parse it and return a L<DateTime::Lite> object, or sets an L<error|Module::Generic/error> and return C<undef> or an empty list depending on the context.
 
 =head2 str2datetime
 
-Given a string that looks like a date, this will parse it and return a L<DateTime> object.
+Given a string that looks like a date, this will parse it and return a L<DateTime::Lite> object.
 
 =head2 str2time
 
@@ -212,7 +212,7 @@ In the background, it calls L</str2datetime> for parsing.
 
 =head2 time2datetime
 
-Given a unix timestamp in seconds since epoch, this returns a L<DateTime> object.
+Given a unix timestamp in seconds since epoch, this returns a L<DateTime::Lite> object.
 
 =head2 time2str
 
@@ -224,7 +224,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<DateTime>
+L<DateTime::Lite>
 
 =head1 COPYRIGHT & LICENSE
 

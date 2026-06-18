@@ -43,17 +43,48 @@ for ( let spelling in [
 	"≶",
 	"<=>",
 	"≷",
+	"∣",
+	"divides",
+	"∤",
 	"&",
 	"^",
 	"|",
+	"«",
+	"<<",
+	"»",
+	">>",
 	"⋀",
 	"and",
+	"⋀?",
+	"and?",
 	"⊼",
 	"nand",
+	"⊼?",
+	"nand?",
+	"⊭",
+	"butnot",
+	"⊭?",
+	"butnot?",
 	"⊻",
 	"xor",
+	"⊻?",
+	"xor?",
+	"⊽",
+	"nor",
+	"⊽?",
+	"nor?",
+	"↔",
+	"xnor",
+	"↔?",
+	"xnor?",
+	"⊨",
+	"onlyif",
+	"⊨?",
+	"onlyif?",
 	"⋁",
 	"or",
+	"⋁?",
+	"or?",
 	"⋃",
 	"union",
 	"⋂",
@@ -130,10 +161,30 @@ is( bitwise_prec{op}, "|", "bitwise or is the outer expression" );
 is( bitwise_prec{r}{op}, "^", "bitwise xor binds tighter than or" );
 is( bitwise_prec{r}{r}{op}, "&", "bitwise and binds tighter than xor" );
 
+let shift_prec := parse_one( p, "a & b « c" );
+is( shift_prec{op}, "&", "bitwise and is the outer expression" );
+is( shift_prec{r}{op}, "«", "shift binds tighter than bitwise and" );
+
+let set_shift_prec := parse_one( p, "a << b union c" );
+is( set_shift_prec{op}, "<<", "shift is the outer expression" );
+is( set_shift_prec{r}{op}, "union", "set union binds tighter than shift" );
+
+let concat_set_prec := parse_one( p, "\"a\" _ \"b\" union c" );
+is( concat_set_prec{op}, "union", "set union is the outer expression" );
+is( concat_set_prec{l}{op}, "_", "concatenation binds tighter than set union" );
+
 let logical_prec := parse_one( p, "a or b xor c and d" );
 is( logical_prec{op}, "or", "logical or is the outer expression" );
 is( logical_prec{r}{op}, "xor", "logical xor binds tighter than or" );
 is( logical_prec{r}{r}{op}, "and", "logical and binds tighter than xor" );
+
+let onlyif_prec := parse_one( p, "a or b onlyif c" );
+is( onlyif_prec{op}, "or", "logical or is the outer expression" );
+is( onlyif_prec{r}{op}, "onlyif", "logical onlyif binds tighter than or" );
+
+let onlyif_assoc := parse_one( p, "a onlyif b onlyif c" );
+is( onlyif_assoc{op}, "onlyif", "logical onlyif parses" );
+is( onlyif_assoc{r}{op}, "onlyif", "logical onlyif groups to the right" );
 
 let logical_sign_prec := parse_one( p, "a ⋁ b ⊻ c ⋀ d" );
 is( logical_sign_prec{op}, "⋁", "symbol logical or is the outer expression" );

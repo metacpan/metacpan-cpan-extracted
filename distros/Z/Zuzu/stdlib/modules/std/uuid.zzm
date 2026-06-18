@@ -123,7 +123,7 @@ function _bytes_to_binary ( Array bytes ) {
 function _timestamp_words () {
 	// Seconds between 1582-10-15 and 1970-01-01.
 	let epoch_offset := 12219292800;
-	let seconds := new Time().epoch() + epoch_offset;
+	let seconds := floor( new Time().epoch() ) + epoch_offset;
 	let ticks := _rand_int(10000000);
 
 	let words := [

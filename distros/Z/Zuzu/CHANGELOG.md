@@ -6,6 +6,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project roughly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 but using Perlish version numbers like `x.yyyzzz` instead of `x.y.z`.
 
+## 0.005000 - 2026-06-17
+
+### Added
+
+- `switch` case values can now override the switch comparator with a
+  comparison operator prefix, such as `case ~ /^Rob/` or `case eqi "Bob"`.
+- Added shared conformance coverage for dynamic method calls whose method
+  expression evaluates to either a method name or a Method value, including
+  named arguments and `std/eval`.
+- Added logical operators `nor`/`⊽`, `xnor`/`↔`, `onlyif`/`⊨`,
+  `butnot`/`⊭`, plus the value-preserving `and?`/`⋀?`, `or?`/`⋁?`,
+  `xor?`/`⊻?`, `xnor?`/`↔?`, `nand?`/`⊼?`, `nor?`/`⊽?`,
+  `onlyif?`/`⊨?`, and `butnot?`/`⊭?` variants.
+- `std/path/zz` ZZPath expressions now recognise and evaluate the new
+  language operators for bit shifts, divisibility, logical combinations, and
+  value-preserving logical combinations.
+
+### Fixed
+
+- Boolean `and`/`⋀` now returns a Boolean value instead of returning the raw
+  right operand.
+- `std/marshal` and its CBOR validator no longer depend on `POSIX`
+  exporting `isfinite`, fixing load failures on older Perl/POSIX module
+  combinations.
+- Collection parity fixes: `Array.join()` now supports an unstringable-value
+  substitute or callback, `PairList.enumerate()` returns an Array of pairs, and
+  `Bag.remove()` removes every matching value while `remove_first()` removes
+  only one. Arrays now also expose `to_Array()` and `slice()`, Dicts expose
+  `contains()`, Dict, Bag, and PairList expose `is_empty()`, and Bag/Set
+  expose `push_weak()` as an alias for `add_weak()`. `Array.get()` now requires
+  an index, `get()`/`set()`/`set_weak()` count negative indexes from the end,
+  Array callback methods reject missing or extra callback arguments, and
+  `sample()`/`shuffle()` return randomised non-mutating results.
+- Bare wordlike named-argument keys such as `length: 42` now parse like
+  the same unquoted keys in Dict and PairList literals.
+- TZ-dependent Perl runtime tests now skip their timezone-sensitive cases when
+  `TZ` is not set.
+- The Perl HTTP async overlap integration test now checks server-side
+  connection overlap instead of relying on a tight total wall-clock threshold.
+
 ## 0.004000 - 2026-06-12
 
 *stdlib tag 20260612, languagetests tag 20260612.*

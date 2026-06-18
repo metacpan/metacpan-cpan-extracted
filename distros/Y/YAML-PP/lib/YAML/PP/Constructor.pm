@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Constructor;
 
-our $VERSION = 'v0.40.0'; # VERSION
+our $VERSION = 'v0.41.0'; # VERSION
 
 use YAML::PP;
 use YAML::PP::Common qw/

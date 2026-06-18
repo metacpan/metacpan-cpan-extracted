@@ -17,8 +17,10 @@ in my usual way:
   includes language I believe to be equivalent to the above, plus the
   Perl-Foundation-recommended disclaimer;
 
-- A copy of the Gnu GPL version 1 as LICENSES/Copying;
+- A copy of the Gnu GPL version 1 as LICENSE-GPL;
 
-- A copy of the Artistic license as LICENSES/Artistic.
+- A copy of the Artistic license as LICENSE-Artistic.
+
+Tom Wyant
 
 # ex: set filetype=text textwidth=72 autoindent :

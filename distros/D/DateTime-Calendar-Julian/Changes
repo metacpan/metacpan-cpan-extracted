@@ -1,3 +1,12 @@
+0.108		2026-06-17	T. R. Wyant
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net.
+
+    Fix reliance on undocumented DateTime behaviour in t/6quarter.t.
+
+    Add CONTRIBUTING, SECURITY.
+
 0.107		2022-01-30	T. R. Wyant
     Add method calendar_name(), which returns 'Julian'.
 

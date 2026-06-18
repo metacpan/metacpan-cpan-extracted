@@ -1,6 +1,6 @@
 use v5.20.0;
 
-package JMAP::Tester::Result::Upload 0.109;
+package JMAP::Tester::Result::Upload 0.110;
 # ABSTRACT: what you get when you upload a blob
 
 use Moo;
@@ -12,8 +12,9 @@ use namespace::clean;
 
 #pod =head1 OVERVIEW
 #pod
-#pod This is what you get when you upload!  It's got an C<is_success> method.  It
-#pod returns true. It also has:
+#pod A JMAP::Tester::Result::Upload object represents the successful upload of a
+#pod JMAP blob.  It is a successful L<JMAP::Tester::Role::HTTPResult>, meaning it
+#pod has a C<http_response> method that returns an L<HTTP::Response> object.
 #pod
 #pod =method blob_id
 #pod
@@ -59,12 +60,13 @@ JMAP::Tester::Result::Upload - what you get when you upload a blob
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 OVERVIEW
 
-This is what you get when you upload!  It's got an C<is_success> method.  It
-returns true. It also has:
+A JMAP::Tester::Result::Upload object represents the successful upload of a
+JMAP blob.  It is a successful L<JMAP::Tester::Role::HTTPResult>, meaning it
+has a C<http_response> method that returns an L<HTTP::Response> object.
 
 =head1 PERL VERSION
 

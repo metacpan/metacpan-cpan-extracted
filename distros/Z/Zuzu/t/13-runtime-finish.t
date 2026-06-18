@@ -112,23 +112,28 @@ is(
 	'finish runs surviving demolish hook after scoped cleanup',
 );
 
-my $session_run = run_zuzu(
-	'stdlib/tests/std/web/session.zzs',
-	{
-		FIXTURE_DIR => File::Spec->catdir(
-			File::Spec->rel2abs(File::Spec->curdir),
-			'stdlib',
-			'test-fixtures',
-		),
-	},
-);
-is( $session_run->{exit}, 0, 'std/web/session ztest exits 0' )
-	or diag $session_run->{stdout}, $session_run->{stderr}, $session_run->{error};
-like( $session_run->{stdout}, qr/^1\.\.10$/m, 'session ztest prints TAP plan' );
-unlike(
-	$session_run->{stdout} . $session_run->{stderr},
-	qr/DESTROY created new reference to dead object/,
-	'session ztest has no global destruction resurrection warning',
-);
+SKIP: {
+	skip 'set TZ to run std/web/session finish test', 3
+		if !defined $ENV{TZ} or $ENV{TZ} eq '';
+
+	my $session_run = run_zuzu(
+		'stdlib/tests/std/web/session.zzs',
+		{
+			FIXTURE_DIR => File::Spec->catdir(
+				File::Spec->rel2abs(File::Spec->curdir),
+				'stdlib',
+				'test-fixtures',
+			),
+		},
+	);
+	is( $session_run->{exit}, 0, 'std/web/session ztest exits 0' )
+		or diag $session_run->{stdout}, $session_run->{stderr}, $session_run->{error};
+	like( $session_run->{stdout}, qr/^1\.\.10$/m, 'session ztest prints TAP plan' );
+	unlike(
+		$session_run->{stdout} . $session_run->{stderr},
+		qr/DESTROY created new reference to dead object/,
+		'session ztest has no global destruction resurrection warning',
+	);
+}
 
 done_testing;

@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Greple-xlate
 
+1.0202 2026-06-17T09:49:59Z
+
+    - Revert gpt5 default batch size to 3000 chars; 10000 made large
+      translations (e.g. FR/KO) exceed the gpty 60s timeout
+    - Install Docker Python tools (deepl, gpty, llm) into a venv so the image
+      builds on Ubuntu 26.04, whose system Python is externally-managed (PEP 668)
+
 1.0201 2026-06-17T08:10:25Z
 
     - Install libcrypt-dev in the Docker image so XS modules build against

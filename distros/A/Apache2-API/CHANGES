@@ -1,5 +1,9 @@
 Revision history for Perl module Apache2::API
 
+v0.5.4 2026-06-17T21:14:20+0900
+    - No API change.
+    - Updated dependencies for DateTime::Lite
+
 v0.5.3 2026-04-15T07:41:20+0900
     - Security fix (CVE-2026-5088): removed insecure fallback to rand() for salt generation in
       Apache2::API::Password. Methods _make_salt() and _make_salt_bcrypt() now require either

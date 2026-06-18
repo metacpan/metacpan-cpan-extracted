@@ -13,8 +13,65 @@ is( a.empty(), 0, "empty false" );
 is( [].is_empty(), 1, "is_empty true" );
 is( a.get( 0, 99 ), 0, "get existing" );
 is( a.get( 99, 42 ), 42, "get default" );
+isnt( exception( function () { [ 1 ].get(); } ), null, "get requires an index" );
+is( [ 10, 20, 30 ].get( -1, 0 ), 30, "get negative index counts from end" );
+is( [ 10, 20, 30 ].get( -4, "missing" ), "missing", "get negative index before start uses default" );
+is( [ 1, 2, 3 ].to_Array(), [ 1, 2, 3 ], "to_Array returns an Array copy" );
+is( [ 1, 2, 3, 4 ].slice(1), [ 2, 3, 4 ], "slice from start" );
+is( [ 1, 2, 3, 4 ].slice( 1, 3 ), [ 2, 3 ], "slice start and end" );
+is( [ 1, 2, 3, 4 ].slice( -2 ), [ 3, 4 ], "slice negative start" );
+is( [ 1, 2, 3, 4 ].slice( -4, -1 ), [ 1, 2, 3 ], "slice negative end" );
+is( [ 1, 2, 3, 4 ].slice( 3, 1 ), [ 2, 3 ], "slice reversed bounds" );
+is( [ 1, 2, 3, 4 ].slice( -99, 99 ), [ 1, 2, 3, 4 ], "slice clamps bounds" );
+is( [ "a", 2, true ].join(","), "a,2,true", "join stringable values" );
+is(
+	[ function () {}, function () {} ].join(",", "X"),
+	"X,X",
+	"join substitutes a string for unstringable values",
+);
+let join_replacements := 0;
+function join_replacement ( value ) {
+	join_replacements += 1;
+	return "F" _ join_replacements;
+}
+is(
+	[ function () {}, function () {} ].join(",", join_replacement),
+	"F1,F2",
+	"join calls a callback for unstringable values",
+);
+is( join_replacements, 2, "join callback is called once per unstringable value" );
+let push_result := [ 1 ];
+is( push_result.push(2), [ 1, 2 ], "push returns Array" );
+let unshift_result := [ 2 ];
+is( unshift_result.unshift(1), [ 1, 2 ], "unshift returns Array" );
+let reverse_source := [ 1, 2, 3 ];
+is( reverse_source.reverse(), [ 3, 2, 1 ], "reverse returns reversed Array" );
+is( reverse_source, [ 1, 2, 3 ], "reverse does not mutate source" );
+let sort_source := [ 3, 1, 2 ];
+is(
+	sort_source.sort( function ( x, y ) {
+		return x <=> y;
+	} ),
+	[ 1, 2, 3 ],
+	"sort returns sorted Array",
+);
+is( sort_source, [ 3, 1, 2 ], "sort does not mutate source" );
+is(
+	[ 10, 20 ].map( function ( value ) {
+		return value + 1;
+	} ),
+	[ 11, 21 ],
+	"map callback accepts one value argument",
+);
+is( [].reduce( function ( x, y ) { return x + y; } ), null, "reduce empty returns null" );
 a.set( 0, 9 );
 is( a.get( 0, 0 ), 9, "set" );
+let negative_set := [ 1, 2, 3 ];
+negative_set.set( -1, 8 );
+is( negative_set, [ 1, 2, 8 ], "set negative index counts from end" );
+negative_set.set_weak( -2, 7 );
+is( negative_set.get( -2, 0 ), 7, "set_weak negative index counts from end" );
+isnt( exception( function () { [ 1 ].set( -2, 9 ); } ), null, "set negative index before start throws" );
 let mapped := a.map( fn x -> x * 2 );
 is( mapped.get( 0, 0 ), 18, "map" );
 let grepped := a.grep( fn x -> x > 2 );
@@ -22,6 +79,18 @@ is( grepped.length(), 3, "grep" );
 is( a.any( fn x -> x = 4 ), 1, "any" );
 is( a.all( fn x -> x > -1 ), 1, "all" );
 is( a.first( fn x -> x > 2 ), 9, "first" );
+isnt( exception( function () { [ 1 ].head( 1, 2 ); } ), null, "head rejects extra arguments" );
+isnt( exception( function () { [ 1 ].tail( 1, 2 ); } ), null, "tail rejects extra arguments" );
+isnt( exception( function () { [ 1 ].map(); } ), null, "map requires a callback" );
+isnt( exception( function () { [ 1 ].map( fn x -> x, fn x -> x ); } ), null, "map rejects extra arguments" );
+isnt( exception( function () { [ 1 ].grep(); } ), null, "grep requires a callback" );
+isnt( exception( function () { [ 1 ].grep( fn x -> x, fn x -> x ); } ), null, "grep rejects extra arguments" );
+isnt( exception( function () { [ 1 ].first(); } ), null, "first requires a callback" );
+isnt( exception( function () { [ 1 ].first( fn x -> x, fn x -> x ); } ), null, "first rejects extra arguments" );
+isnt( exception( function () { [ 1 ].any(); } ), null, "any requires a callback" );
+isnt( exception( function () { [ 1 ].any( fn x -> x, fn x -> x ); } ), null, "any rejects extra arguments" );
+isnt( exception( function () { [ 1 ].all(); } ), null, "all requires a callback" );
+isnt( exception( function () { [ 1 ].all( fn x -> x, fn x -> x ); } ), null, "all rejects extra arguments" );
 a.remove( fn x -> x = 9 );
 is( a.contains(9), 0, "remove" );
 is( a.first_index( fn x -> x = 3 ), 2, "first_index" );
@@ -39,8 +108,29 @@ is( [ "1", "2", 3 ].sum(), 6, "sum casts" );
 is( [ "2", "3", 4 ].product(), 24, "product casts" );
 is( [ 1, 2, 3 ].head(2).length(), 2, "head" );
 is( [ 1, 2, 3 ].tail(2).get( 0, 0 ), 2, "tail" );
-is( [ 1, 2, 3 ].shuffle().length(), 3, "shuffle" );
-is( [ 1, 2, 3 ].sample(2).length(), 2, "sample" );
+let shuffle_source := [ 1, 2, 3, 4, 5, 6, 7, 8 ];
+let shuffled := shuffle_source.shuffle();
+is( shuffled.length(), 8, "shuffle keeps length" );
+is( shuffle_source, [ 1, 2, 3, 4, 5, 6, 7, 8 ], "shuffle leaves original unmodified" );
+is( shuffled.sortnum(), [ 1, 2, 3, 4, 5, 6, 7, 8 ], "shuffle keeps values" );
+let saw_shuffled_order := 0;
+for ( let i in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ] ) {
+	if ( shuffle_source.shuffle().join(",") ne "1,2,3,4,5,6,7,8" ) {
+		saw_shuffled_order := 1;
+	}
+}
+is( saw_shuffled_order, 1, "shuffle returns random order" );
+let sample_source := [ 1, 2, 3, 4, 5, 6, 7, 8 ];
+let sampled := sample_source.sample(4);
+is( sampled.length(), 4, "sample keeps requested length" );
+is( sample_source, [ 1, 2, 3, 4, 5, 6, 7, 8 ], "sample leaves original unmodified" );
+let saw_random_sample := 0;
+for ( let i in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ] ) {
+	if ( sample_source.sample(4).join(",") ne "1,2,3,4" ) {
+		saw_random_sample := 1;
+	}
+}
+is( saw_random_sample, 1, "sample returns random sample" );
 let visited := 0;
 [ 1, 2, 3 ].for_each_value( fn x -> visited := visited + x );
 is( visited, 6, "for_each_value" );

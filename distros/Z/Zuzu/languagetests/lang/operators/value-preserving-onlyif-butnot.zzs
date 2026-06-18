@@ -1,0 +1,14 @@
+from test/more import *;
+
+is( 7 onlyif? "right", "right", "onlyif? truthy left returns right" );
+is( 0 onlyif? "right", true, "onlyif? falsey left returns ⊤" );
+is( typeof( 0 onlyif? "right" ), "Boolean", "onlyif? falsey left returns Boolean" );
+is( 7 ⊨? 0, 0, "⊨? can return falsey right value" );
+
+is( 7 butnot? "right", false, "butnot? truthy truthy returns ⊥" );
+is( typeof( 7 butnot? "right" ), "Boolean", "butnot? truthy truthy returns Boolean" );
+is( 7 butnot? 0, 7, "butnot? truthy falsey returns left" );
+is( 0 butnot? "right", 0, "butnot? falsey left returns left" );
+is( "" ⊭? "right", "", "⊭? preserves falsey left value" );
+
+done_testing();

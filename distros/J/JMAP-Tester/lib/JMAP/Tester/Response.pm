@@ -1,6 +1,6 @@
 use v5.20.0;
 
-package JMAP::Tester::Response 0.109;
+package JMAP::Tester::Response 0.110;
 # ABSTRACT: what you get in reply to a succesful JMAP request
 
 use Moo;
@@ -36,10 +36,15 @@ use namespace::clean;
 #pod =head1 OVERVIEW
 #pod
 #pod A JMAP::Tester::Response object represents the successful response to a JMAP
-#pod call.  It is a successful L<JMAP::Tester::Result>.
+#pod request -- the kind where you've POSTed a JSON object with C<methodCalls>.  It
+#pod is a successful L<JMAP::Tester::Role::Result>.
 #pod
 #pod A Response is used mostly to contain the responses to the individual methods
-#pod passed in the request.
+#pod passed in the request.  For all of that interface, consult
+#pod L<JMAP::Tester::Role::SentenceCollection>.
+#pod
+#pod A Response is also a L<JMAP::Tester::Role::HTTPResult>, meaning it has a
+#pod C<http_response> method that returns an L<HTTP::Response> object.
 #pod
 #pod =cut
 
@@ -58,27 +63,11 @@ has wrapper_properties => (
 sub items ($self) { @{ $self->_items } }
 
 sub add_items ($self, @) {
-  $self->sentence_broker->abort("can't add items to " . __PACKAGE__);
+  $self->abort("can't add items to " . __PACKAGE__);
 }
 
-sub default_diagnostic_dumper {
-  state $default = do {
-    require JSON::MaybeXS;
-    state $json = JSON::MaybeXS->new->utf8->convert_blessed->pretty->canonical;
-    sub ($value) { $json->encode($value); }
-  };
-
-  return $default;
-}
-
-has _diagnostic_dumper => (
-  is => 'ro',
-  builder   => 'default_diagnostic_dumper',
-  init_arg  => 'diagnostic_dumper',
-);
-
-sub dump_diagnostic ($self, $value) {
-  $self->_diagnostic_dumper->($value);
+sub default_diagnostics ($self) {
+  return [ 'Response sentences', [ $self->sentences ] ];
 }
 
 1;
@@ -95,15 +84,20 @@ JMAP::Tester::Response - what you get in reply to a succesful JMAP request
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 OVERVIEW
 
 A JMAP::Tester::Response object represents the successful response to a JMAP
-call.  It is a successful L<JMAP::Tester::Result>.
+request -- the kind where you've POSTed a JSON object with C<methodCalls>.  It
+is a successful L<JMAP::Tester::Role::Result>.
 
 A Response is used mostly to contain the responses to the individual methods
-passed in the request.
+passed in the request.  For all of that interface, consult
+L<JMAP::Tester::Role::SentenceCollection>.
+
+A Response is also a L<JMAP::Tester::Role::HTTPResult>, meaning it has a
+C<http_response> method that returns an L<HTTP::Response> object.
 
 =head1 PERL VERSION
 

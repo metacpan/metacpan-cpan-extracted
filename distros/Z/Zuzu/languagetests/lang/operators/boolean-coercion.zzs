@@ -71,6 +71,10 @@ is( "x" xor 0, 1, "xor boolifies both operands" );
 is( "x" ⊻ 1, 0, "⊻ boolifies both operands" );
 is( "x" nand 1, 0, "nand boolifies both operands" );
 is( "" ⊼ "x", 1, "⊼ boolifies both operands" );
+is( typeof( "" and true ), "Boolean", "and returns Boolean after coercion" );
+is( typeof( false or "x" ), "Boolean", "or returns Boolean after coercion" );
+is( typeof( "x" xor 0 ), "Boolean", "xor returns Boolean after coercion" );
+is( typeof( "x" nand 1 ), "Boolean", "nand returns Boolean after coercion" );
 is( new Booleanish( value: false ) or false, 0, "or calls to_Boolean" );
 is( new Booleanish( value: true ) and true, 1, "and calls to_Boolean" );
 

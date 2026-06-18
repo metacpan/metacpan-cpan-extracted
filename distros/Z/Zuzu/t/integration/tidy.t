@@ -161,6 +161,8 @@ let cmp:=a<=10 and a>=1 or a<=>3 == 0 != false
 let sets:=<<1>> union <<2>> intersection <<2>>
 let diff:=<<1,2>> \ <<2>>
 let member:=1 in <<1>>
+let divisibility:=2 divides 6 and 4 ∤ 6
+let expanded_logic:=a nand? b nor? c xnor? d onlyif? e butnot? f
 for (let item in [1,2]){say item}
 4|>1+(2*^^)|>say(^^+^^)
 SRC
@@ -194,6 +196,11 @@ like $canonical_operator_tidy, qr/\nlet diff := << 1, 2 >> ∖ << 2 >>;\n/,
 	'canonical operator mode rewrites set difference alias';
 like $canonical_operator_tidy, qr/\nlet member := 1 ∈ << 1 >>;\n/,
 	'canonical operator mode rewrites binary in operator';
+like $canonical_operator_tidy, qr/\nlet divisibility := 2 ∣ 6 ⋀ 4 ∤ 6;\n/,
+	'canonical operator mode rewrites divisibility aliases';
+like $canonical_operator_tidy,
+	qr/\nlet expanded_logic := a ⊼\? b ⊽\? c ↔\? d ⊨\? e ⊭\? f;\n/,
+	'canonical operator mode rewrites expanded value-preserving logical aliases';
 like $canonical_operator_tidy, qr/\nfor \( let item in \[ 1, 2 \] \) \{\n/,
 	'canonical operator mode preserves for-loop in syntax';
 like $canonical_operator_tidy, qr/\n\t▷ 1 \+ \( 2 × \^\^ \)\n\t▷ say/,

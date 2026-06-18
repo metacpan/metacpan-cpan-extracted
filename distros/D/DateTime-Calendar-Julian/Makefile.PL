@@ -20,7 +20,7 @@ my %args = (
     ABSTRACT		=> 'DateTime object in the Julian calendar',
     AUTHOR		=> [
 	'Eugene van der Pijll <pijll@gmx.net>',
-	'Thomas R. Wyant, III <wyant at cpan dot org>',
+	'Thomas R. Wyant, III <harryfmudd at comcast dot net>',
     ],
     PL_FILES => {},	# Prevent old MakeMaker from running Build.PL
     realclean	=> {
@@ -42,9 +42,8 @@ if ( $mmv >= 6.4501 ) {
 	},
 	resources	=> {
 	    bugtracker	=> {
-		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Julian',
-		# web	=> 'https://github.com/trwyant/perl-DateTime-Calendar-Julian/issues',
-                mailto  => 'wyant@cpan.org',
+		web	=> 'https://github.com/trwyant/perl-DateTime-Calendar-Julian/issues',
+                mailto  => 'harryfmudd@comcast.net',
             },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {

@@ -2,7 +2,7 @@ package Zuzu::Parser::_Impl;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use Zuzu::AST::Block;
 use Zuzu::AST::Expr::Array;
@@ -1579,8 +1579,9 @@ sub parse_switch {
 	my $comparator = '==';
 	if ( $self->_maybe('OP', ':') ) {
 		my $tok = $self->{tok};
-		if ( $tok->is_OP or $tok->is_KW or $tok->is_IDENT ) {
-			$comparator = $tok->value;
+		my $operator = $self->_switch_comparator_from_token($tok);
+		if ( defined $operator ) {
+			$comparator = $operator;
 			$self->{tok} = $self->{lexer}->next_token;
 		}
 		else {
@@ -1597,9 +1598,9 @@ sub parse_switch {
 		$self->_err("Unterminated switch", $self->{tok}) if $self->{tok}->is_EOF;
 		if ( $self->{tok}->is_KW('case') ) {
 			my $case_kw = $self->_eat('KW', 'case');
-			my @values = ( $self->parse_expression );
+			my @values = ( $self->_parse_switch_case_value );
 			while ( $self->_maybe('OP', ',') ) {
-				push @values, $self->parse_expression;
+				push @values, $self->_parse_switch_case_value;
 			}
 			$self->_eat('OP', ':');
 			my $body = $self->_parse_switch_body_until_labels;
@@ -1631,6 +1632,55 @@ sub parse_switch {
 		cases => \@cases,
 		default_block => $default_block,
 	);
+}
+
+sub _parse_switch_case_value {
+	my ($self) = @_;
+
+	my $operator = $self->_switch_comparator_from_token($self->{tok});
+	if ( defined $operator ) {
+		$self->{tok} = $self->{lexer}->next_token;
+	}
+	my $value;
+	if ( defined $operator and $operator eq 'can' and ( $self->{tok}->is_IDENT or $self->{tok}->is_KW ) ) {
+		my $name_tok = $self->{tok};
+		$self->{tok} = $self->{lexer}->next_token;
+		$value = Zuzu::AST::Expr::Literal->new(
+			file => $name_tok->file,
+			line => $name_tok->line,
+			value => $name_tok->value,
+		);
+	}
+	else {
+		$value = $self->parse_expression;
+	}
+
+	return {
+		operator => $operator,
+		value => $value,
+	};
+}
+
+sub _switch_comparator_from_token {
+	my ( $self, $tok ) = @_;
+
+	return if !$tok;
+	return if !( $tok->is_OP or $tok->is_KW );
+	my $value = $tok->value;
+	return _is_switch_comparator($value) ? $value : undef;
+}
+
+sub _is_switch_comparator {
+	my ($value) = @_;
+
+	return !!{
+		map { $_ => 1 } qw(
+			> < >= ≤ <= ≥ = != ≠ == ≡ ≢ <=> ≶ ≷
+			eq ne gt ge lt le cmp eqi nei gti gei lti lei cmpi
+			in ∈ ∉ subsetof ⊂ supersetof ⊃ equivalentof ⊂⊃
+			instanceof does can ~ @? ∣ divides ∤
+		)
+	}->{$value};
 }
 
 sub _parse_switch_body_until_labels {
@@ -2047,35 +2097,41 @@ sub _parse_leftward_chain_rhs {
 sub _prec {
 	my ($self, $op) = @_;
 
-	return 1 if $op eq 'or' || $op eq '⋁';
+	return 1 if $op eq 'or' || $op eq '⋁' || $op eq 'or?' || $op eq '⋁?';
 
-	return 2 if $op eq 'xor' || $op eq '⊻';
+	return 2 if $op eq 'onlyif' || $op eq '⊨' || $op eq 'onlyif?' || $op eq '⊨?';
 
-	return 3 if $op eq 'and' || $op eq '⋀' || $op eq 'nand' || $op eq '⊼';
+	return 3 if $op eq 'xor' || $op eq '⊻' || $op eq 'xor?' || $op eq '⊻?'
+		|| $op eq 'nor' || $op eq '⊽' || $op eq 'nor?' || $op eq '⊽?'
+		|| $op eq 'xnor' || $op eq '↔' || $op eq 'xnor?' || $op eq '↔?';
 
-	return 4 if $op eq 'default';
+	return 4 if $op eq 'and' || $op eq '⋀' || $op eq 'and?' || $op eq '⋀?'
+		|| $op eq 'nand' || $op eq '⊼' || $op eq 'nand?' || $op eq '⊼?'
+		|| $op eq 'butnot' || $op eq '⊭' || $op eq 'butnot?' || $op eq '⊭?';
 
-	return 4 if $op eq '==' || $op eq '≡' || $op eq '!=' || $op eq '≢';
+	return 5 if $op eq 'default';
 
-	return 5 if $op eq '=' || $op eq '≠' || $op eq '<' || $op eq '>' || $op eq '<=' || $op eq '≤' || $op eq '>=' || $op eq '≥' || $op eq '<=>' || $op eq '≶' || $op eq '≷' || $op eq 'eq' || $op eq 'ne' || $op eq 'gt' || $op eq 'ge' || $op eq 'lt' || $op eq 'le' || $op eq 'cmp' || $op eq 'eqi' || $op eq 'nei' || $op eq 'gti' || $op eq 'gei' || $op eq 'lti' || $op eq 'lei' || $op eq 'cmpi' || $op eq 'in' || $op eq '∈' || $op eq '∉' || $op eq 'subsetof' || $op eq '⊂' || $op eq 'supersetof' || $op eq '⊃' || $op eq 'equivalentof' || $op eq '⊂⊃' || $op eq 'instanceof' || $op eq 'does' || $op eq 'can' || $op eq '~' || $op eq '@' || $op eq '@?' || $op eq '@@' || $op eq '∣' || $op eq 'divides' || $op eq '∤';
+	return 5 if $op eq '==' || $op eq '≡' || $op eq '!=' || $op eq '≢';
 
-	return 6 if $op eq '|';
+	return 6 if $op eq '=' || $op eq '≠' || $op eq '<' || $op eq '>' || $op eq '<=' || $op eq '≤' || $op eq '>=' || $op eq '≥' || $op eq '<=>' || $op eq '≶' || $op eq '≷' || $op eq 'eq' || $op eq 'ne' || $op eq 'gt' || $op eq 'ge' || $op eq 'lt' || $op eq 'le' || $op eq 'cmp' || $op eq 'eqi' || $op eq 'nei' || $op eq 'gti' || $op eq 'gei' || $op eq 'lti' || $op eq 'lei' || $op eq 'cmpi' || $op eq 'in' || $op eq '∈' || $op eq '∉' || $op eq 'subsetof' || $op eq '⊂' || $op eq 'supersetof' || $op eq '⊃' || $op eq 'equivalentof' || $op eq '⊂⊃' || $op eq 'instanceof' || $op eq 'does' || $op eq 'can' || $op eq '~' || $op eq '@' || $op eq '@?' || $op eq '@@' || $op eq '∣' || $op eq 'divides' || $op eq '∤';
 
-	return 7 if $op eq '^';
+	return 7 if $op eq '|';
 
-	return 8 if $op eq '&';
+	return 8 if $op eq '^';
 
-	return 8.5 if $op eq '<<' || $op eq '«' || $op eq '>>' || $op eq '»';
+	return 9 if $op eq '&';
 
-	return 9 if $op eq 'union' || $op eq '⋃' || $op eq 'intersection' || $op eq '⋂' || $op eq '\\' || $op eq '∖';
+	return 10 if $op eq '<<' || $op eq '«' || $op eq '>>' || $op eq '»';
 
-	return 10 if $op eq '_' ;
+	return 11 if $op eq 'union' || $op eq '⋃' || $op eq 'intersection' || $op eq '⋂' || $op eq '\\' || $op eq '∖';
 
-	return 11 if $op eq '+' || $op eq '-' ;
+	return 12 if $op eq '_' ;
 
-	return 12 if $op eq '*' || $op eq '/' || $op eq '×' || $op eq '÷' || $op eq 'mod';
+	return 13 if $op eq '+' || $op eq '-' ;
 
-	return 13 if $op eq '**';
+	return 14 if $op eq '*' || $op eq '/' || $op eq '×' || $op eq '÷' || $op eq 'mod';
+
+	return 15 if $op eq '**';
 
 	return 0;
 }
@@ -2108,8 +2164,12 @@ sub _parse_prec {
 		my $prec = $self->_prec($op);
 		last if $prec < $min_prec || $prec == 0;
 
-		# right-assoc power
-		my $next_min = ($op eq '**') ? $prec : ($prec + 1);
+		my $right_assoc = $op eq '**'
+			|| $op eq 'onlyif'
+			|| $op eq '⊨'
+			|| $op eq 'onlyif?'
+			|| $op eq '⊨?';
+		my $next_min = $right_assoc ? $prec : ($prec + 1);
 
 		$self->{tok} = $self->{lexer}->next_token; # consume op
 		my $right;
@@ -2901,6 +2961,22 @@ sub _parse_invocation_args {
 					expr => $expr,
 				),
 			];
+			$self->_maybe('OP', ',');
+			next;
+		}
+
+		if (
+			( $self->{tok}->is_IDENT or $self->{tok}->is_KW )
+			and $self->_peek_token->is_OP(':')
+		) {
+			my $name_tok = $self->{tok};
+			$self->{tok} = $self->{lexer}->next_token;
+			$self->_eat('OP', ':');
+			if ( $self->{tok}->is_OP('...') ) {
+				$self->_err("Spread arguments cannot be named", $self->{tok});
+			}
+			my $value_expr = $self->parse_expression;
+			push @args, [ $name_tok->value, $value_expr ];
 			$self->_maybe('OP', ',');
 			next;
 		}

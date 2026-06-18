@@ -7,7 +7,6 @@ MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
-Makefile.dev
 README.md
 SECURITY.md
 bin/yamlpp-events
@@ -19,6 +18,7 @@ dist.ini
 etc/generate-examples.pl
 etc/generate-grammar.pl
 etc/generate-schema-html.pl
+etc/get-tags.pl
 etc/grammar.yaml
 etc/json-numbers.pl
 etc/schema-test-yaml-modules.pl
@@ -215,6 +215,7 @@ t/valid/v034/in.yaml
 t/valid/v034/out.yaml
 t/valid/v034/test.event
 test-suite/README.md
+test-suite/tag_id.yaml
 test-suite/yaml-test-suite-data/229Q/===
 test-suite/yaml-test-suite-data/229Q/in.json
 test-suite/yaml-test-suite-data/229Q/in.yaml

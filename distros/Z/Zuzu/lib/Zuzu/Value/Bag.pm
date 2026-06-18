@@ -2,7 +2,7 @@ package Zuzu::Value::Bag;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use Moo;
 
@@ -78,7 +78,30 @@ sub add_weak {
 	return $self;
 }
 
+sub push_weak {
+	my ( $self, @vals ) = @_;
+
+	return $self->add_weak(@vals);
+}
+
 sub remove {
+	my ( $self, $needle ) = @_;
+	my @out;
+	my @weak;
+	for ( my $i = 0; $i < @{ $self->items }; $i++ ) {
+		my $v = $self->_value_at($i);
+		next if value_equal( $v, $needle );
+		push @out, undef;
+		push @weak, $self->weak->[$i] ? 1 : 0;
+		store_value( \$out[-1], $v, $weak[-1] );
+	}
+	$self->items( \@out );
+	$self->weak( \@weak );
+
+	return $self;
+}
+
+sub remove_first {
 	my ( $self, $needle ) = @_;
 	my @out;
 	my @weak;
@@ -97,12 +120,6 @@ sub remove {
 	$self->weak( \@weak );
 
 	return $self;
-}
-
-sub remove_first {
-	my ( $self, $needle ) = @_;
-
-	return $self->remove( $needle );
 }
 
 
@@ -276,6 +293,8 @@ sub sortnum {
 sub length { scalar @{ $_[0]->items } }
 
 sub empty { @{ $_[0]->items } ? 0 : 1 }
+
+sub is_empty { $_[0]->empty }
 
 sub clear {
 	$_[0]->items( [] );

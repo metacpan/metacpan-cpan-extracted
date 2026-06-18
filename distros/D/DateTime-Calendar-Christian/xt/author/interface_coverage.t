@@ -31,6 +31,46 @@ foreach my $pair ( pairs( qw{ DateTime::Calendar::Christian DateTime } ) ) {
 
 done_testing;
 
+# The Specio types leak through namespace::clean, at least as of April
+# 30 2022:
+#   namespace::clean 0.027
+#   Specio::Subs 0.47
+# The only thing I can think of to do is to add them to the cleanup.
+# The list is cut, pasted, and edited lightly from
+# Specio::Library::Builtins.
+
+my @specio;
+
+BEGIN {
+    foreach my $type ( qw{
+      Item
+          Bool
+          Maybe
+          Undef
+          Defined
+              Value
+                  Str
+                      Num
+                          Int
+                      ClassName
+              Ref
+                  ScalarRef
+                  ArrayRef
+                  HashRef
+                  CodeRef
+                  RegexpRef
+                  GlobRef
+                  FileHandle
+                  Object
+	
+	} )
+    {
+	foreach my $action ( qw{ assert force is to } ) {
+	    push @specio, "${action}_$type";
+	}
+    }
+}
+
 sub interface_hash {
     my ( $module ) = @_;
     # We consider only functions that begin with a lower-case letter to
@@ -41,7 +81,7 @@ sub interface_hash {
 	@{ Class::Inspector->functions( $module ) || [] }
     };
     # Certain functions are not part of the interface.
-    delete $rslt->{$_} for qw{ bootstrap };
+    delete $rslt->{$_} for qw{ bootstrap }, @specio;
     return $rslt;
 }
 

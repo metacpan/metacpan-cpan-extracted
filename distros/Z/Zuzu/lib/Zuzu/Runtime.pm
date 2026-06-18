@@ -2,7 +2,7 @@ package Zuzu::Runtime;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 our $DEBUG_LEVEL = 0;
 
 use Digest::MD5 qw( md5_hex );
@@ -74,10 +74,10 @@ my %DICT_MUTATING_METHOD = map { $_ => 1 } qw(
 	add add_weak set set_weak remove clear
 );
 my %SET_MUTATING_METHOD = map { $_ => 1 } qw(
-	add add_weak push remove clear remove_if
+	add add_weak push push_weak remove clear remove_if
 );
 my %BAG_MUTATING_METHOD = map { $_ => 1 } qw(
-	add add_weak push remove remove_first clear remove_if
+	add add_weak push push_weak remove remove_first clear remove_if
 );
 
 has 'lib' => ( is => 'rw', default => sub { [ @Zuzu::Runtime::DEFAULT_LIB ] } );
@@ -2180,13 +2180,66 @@ sub eval_switch {
 	my $fell_through = 0;
 	my $result;
 	my $cases = $node->cases // [];
+	my $dispatch = $self->_switch_dispatch_table( $node, $cases, $value );
+	if ( $dispatch and exists $dispatch->{case_index} ) {
+		my $start_index = $dispatch->{case_index};
+		for my $case ( @{$cases}[ $start_index .. $#$cases ] ) {
+			$fell_through = 0;
+
+			eval {
+				$result = $case->{body}->evaluate($self);
+				1;
+			} or do {
+				my $e = $@;
+				if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
+					$fell_through = 1;
+					next;
+				}
+				die $e;
+			};
+
+			return $result if !$fell_through;
+		}
+		if ( defined $node->default_block ) {
+			eval {
+				$result = $node->default_block->evaluate($self);
+				1;
+			} or do {
+				my $e = $@;
+				if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
+					return $result;
+				}
+				die $e;
+			};
+		}
+		return $result;
+	}
+	if ( $dispatch and $dispatch->{eligible} and defined $node->default_block ) {
+		eval {
+			$result = $node->default_block->evaluate($self);
+			1;
+		} or do {
+			my $e = $@;
+			if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
+				return $result;
+			}
+			die $e;
+		};
+		return $result;
+	}
 
 	CASE:
 	for my $case ( @$cases ) {
 		if ( !$matched ) {
-			for my $candidate_expr ( @{ $case->{values} // [] } ) {
+			for my $case_value ( @{ $case->{values} // [] } ) {
+				my $operator = $node->comparator;
+				my $candidate_expr = $case_value;
+				if ( ref($case_value) eq 'HASH' ) {
+					$operator = $case_value->{operator} // $operator;
+					$candidate_expr = $case_value->{value};
+				}
 				my $candidate = $candidate_expr->evaluate($self);
-				if ( $self->_switch_matches( $node->comparator, $value, $candidate, $node->file, $node->line ) ) {
+				if ( $self->_switch_matches( $operator, $value, $candidate, $node->file, $node->line ) ) {
 					$matched = 1;
 					last;
 				}
@@ -2225,6 +2278,67 @@ sub eval_switch {
 	}
 
 	return $result;
+}
+
+sub _switch_dispatch_table {
+	my ( $self, $node, $cases, $value ) = @_;
+
+	my $header_operator = $node->comparator // '==';
+	my %entries;
+	my $eligible = 0;
+	my $common_operator;
+	for my $case_index ( 0 .. $#$cases ) {
+		my $case = $cases->[$case_index];
+		for my $case_value ( @{ $case->{values} // [] } ) {
+			my $operator = $header_operator;
+			my $candidate_expr = $case_value;
+			if ( ref($case_value) eq 'HASH' ) {
+				$operator = $case_value->{operator} // $operator;
+				$candidate_expr = $case_value->{value};
+			}
+			return if $operator ne 'eq' and $operator ne 'eqi' and $operator ne '=';
+			$common_operator //= $operator;
+			return if $operator ne $common_operator;
+			return if !blessed($candidate_expr) or !$candidate_expr->isa('Zuzu::AST::Expr::Literal');
+			my $key = $self->_switch_dispatch_key_for_literal( $operator, $candidate_expr->value );
+			return if !defined $key;
+			return if exists $entries{$key};
+			$entries{$key} = $case_index;
+			$eligible = 1;
+		}
+	}
+	return if !$eligible;
+	my $subject_key = $self->_switch_dispatch_key_for_value( $common_operator, $value );
+	return { eligible => 1 } if !defined $subject_key;
+	return {
+		eligible => 1,
+		( exists $entries{$subject_key} ? ( case_index => $entries{$subject_key} ) : () ),
+	};
+}
+
+sub _switch_dispatch_key_for_literal {
+	my ( $self, $operator, $value ) = @_;
+
+	return 'q:' . $value if $operator eq 'eq';
+	return 'qi:' . CORE::fc($value) if $operator eq 'eqi';
+	if ( $operator eq '=' ) {
+		return if !defined $value or $value !~ /\A-?\d+\z/;
+		return 'i:' . ( 0 + $value );
+	}
+	return;
+}
+
+sub _switch_dispatch_key_for_value {
+	my ( $self, $operator, $value ) = @_;
+
+	return 'q:' . $self->_to_OperatorString($value) if $operator eq 'eq';
+	return 'qi:' . CORE::fc( $self->_to_OperatorString($value) ) if $operator eq 'eqi';
+	if ( $operator eq '=' ) {
+		my $number = $self->_to_Number($value);
+		return if $number != int($number);
+		return 'i:' . int($number);
+	}
+	return;
 }
 
 sub eval_function_def {
@@ -3675,7 +3789,14 @@ sub eval_binary {
 	if ($op eq 'and' || $op eq '⋀') {
 		my $l = $node->left->evaluate($self);
 
-		return $self->_to_Boolean($l) ? $node->right->evaluate($self) : $FALSE;
+		return $self->_to_Boolean($l)
+			? _boolify( $self->_to_Boolean( $node->right->evaluate($self) ) )
+			: $FALSE;
+	}
+	if ($op eq 'and?' || $op eq '⋀?') {
+		my $l = $node->left->evaluate($self);
+
+		return $self->_to_Boolean($l) ? $node->right->evaluate($self) : $l;
 	}
 	if ($op eq 'nand' || $op eq '⊼') {
 		my $l = $node->left->evaluate($self);
@@ -3684,16 +3805,92 @@ sub eval_binary {
 
 		return $self->_to_Boolean( $node->right->evaluate($self) ) ? $FALSE : $TRUE;
 	}
+	if ($op eq 'nand?' || $op eq '⊼?') {
+		my $l = $node->left->evaluate($self);
+		my $r = $node->right->evaluate($self);
+
+		return $self->_to_Boolean($l)
+			? ( $self->_to_Boolean($r) ? $FALSE : $TRUE )
+			: ( $self->_to_Boolean($r) ? $r : $TRUE );
+	}
 	if ($op eq 'xor' || $op eq '⊻') {
-		my $l = $self->_to_Boolean( $node->left->evaluate($self) ) ? $TRUE : $FALSE;
-		my $r = $self->_to_Boolean( $node->right->evaluate($self) ) ? $TRUE : $FALSE;
+		my $l = $self->_to_Boolean( $node->left->evaluate($self) ) ? 1 : 0;
+		my $r = $self->_to_Boolean( $node->right->evaluate($self) ) ? 1 : 0;
 
 		return ($l xor $r) ? $TRUE : $FALSE;
+	}
+	if ($op eq 'xor?' || $op eq '⊻?') {
+		my $l = $node->left->evaluate($self);
+		my $r = $node->right->evaluate($self);
+
+		return $self->_to_Boolean($l)
+			? ( $self->_to_Boolean($r) ? $FALSE : $l )
+			: ( $self->_to_Boolean($r) ? $r : $FALSE );
+	}
+	if ($op eq 'xnor' || $op eq '↔') {
+		my $l = $self->_to_Boolean( $node->left->evaluate($self) ) ? 1 : 0;
+		my $r = $self->_to_Boolean( $node->right->evaluate($self) ) ? 1 : 0;
+
+		return $l == $r ? $TRUE : $FALSE;
+	}
+	if ($op eq 'xnor?' || $op eq '↔?') {
+		my $l = $node->left->evaluate($self);
+		my $r = $node->right->evaluate($self);
+
+		return $self->_to_Boolean($l)
+			? $r
+			: ( $self->_to_Boolean($r) ? $l : $TRUE );
+	}
+	if ($op eq 'nor' || $op eq '⊽') {
+		my $l = $node->left->evaluate($self);
+
+		return $FALSE if $self->_to_Boolean($l);
+
+		return $self->_to_Boolean( $node->right->evaluate($self) ) ? $FALSE : $TRUE;
+	}
+	if ($op eq 'nor?' || $op eq '⊽?') {
+		my $l = $node->left->evaluate($self);
+		my $r = $node->right->evaluate($self);
+
+		return $self->_to_Boolean($l)
+			? ( $self->_to_Boolean($r) ? $FALSE : $r )
+			: ( $self->_to_Boolean($r) ? $l : $TRUE );
+	}
+	if ($op eq 'onlyif' || $op eq '⊨') {
+		my $l = $node->left->evaluate($self);
+
+		return $TRUE if !$self->_to_Boolean($l);
+
+		return _boolify( $self->_to_Boolean( $node->right->evaluate($self) ) );
+	}
+	if ($op eq 'onlyif?' || $op eq '⊨?') {
+		my $l = $node->left->evaluate($self);
+
+		return $self->_to_Boolean($l) ? $node->right->evaluate($self) : $TRUE;
+	}
+	if ($op eq 'butnot' || $op eq '⊭') {
+		my $l = $node->left->evaluate($self);
+
+		return $FALSE if !$self->_to_Boolean($l);
+
+		return $self->_to_Boolean( $node->right->evaluate($self) ) ? $FALSE : $TRUE;
+	}
+	if ($op eq 'butnot?' || $op eq '⊭?') {
+		my $l = $node->left->evaluate($self);
+
+		return $l if !$self->_to_Boolean($l);
+
+		return $self->_to_Boolean( $node->right->evaluate($self) ) ? $FALSE : $l;
 	}
 	if ($op eq 'or' || $op eq '⋁') {
 		my $l = $node->left->evaluate($self);
 
 		return $self->_to_Boolean($l) ? $TRUE : _boolify( $self->_to_Boolean( $node->right->evaluate($self) ) );
+	}
+	if ($op eq 'or?' || $op eq '⋁?') {
+		my $l = $node->left->evaluate($self);
+
+		return $self->_to_Boolean($l) ? $l : $node->right->evaluate($self);
 	}
 	if ( $op eq '▷' or $op eq '|>' or $op eq '◁' or $op eq '<|' ) {
 		return $self->_eval_chain_operator($node);
@@ -5206,10 +5403,13 @@ sub _array_method {
 	if ($m eq 'empty') { return $arr->empty; }
 	if ($m eq 'is_empty') { return $arr->is_empty; }
 	if ($m eq 'copy') { return $arr->copy; }
-	if ($m eq 'get') { return $arr->get( @$args ); }
-	if ($m eq 'set') { return $arr->set( @$args ); }
-	if ($m eq 'set_weak') { return $arr->set_weak( @$args ); }
+	if ($m eq 'to_Array') { return $arr->to_Array; }
+	if ($m eq 'get') { return $self->_array_get( $arr, $args, $file, $line ); }
+	if ($m eq 'set') { return $self->_array_set( $arr, $args, $file, $line, 0 ); }
+	if ($m eq 'set_weak') { return $self->_array_set( $arr, $args, $file, $line, 1 ); }
 	if ($m eq 'clear') { return $arr->clear; }
+	if ($m eq 'join') { return $self->_array_join( $arr, $args, $file, $line ); }
+	if ($m eq 'slice') { return $self->_array_slice( $arr, $args, $file, $line ); }
 	if ($m eq 'to_Set') { return $arr->to_Set; }
 	if ($m eq 'to_Bag') { return $arr->to_Bag; }
 	if ($m eq 'to_Iterator') {
@@ -5223,14 +5423,25 @@ sub _array_method {
 	if ($m eq 'sortstr') { return $arr->sortstr; }
 	if ($m eq 'sortnum') { return $arr->sortnum; }
 	if ($m eq 'reverse') { return $arr->reverse; }
-	if ($m eq 'head') { return $arr->head( $args->[0] ); }
-	if ($m eq 'tail') { return $arr->tail( $args->[0] ); }
+	if ($m eq 'head') {
+		$self->_require_method_arity_range( 'Array.head', $args, 0, 1, $file, $line );
+		return $arr->head( $args->[0] );
+	}
+	if ($m eq 'tail') {
+		$self->_require_method_arity_range( 'Array.tail', $args, 0, 1, $file, $line );
+		return $arr->tail( $args->[0] );
+	}
 	if ($m eq 'sum') { return $arr->sum; }
 	if ($m eq 'product') { return $arr->product; }
 	if ($m eq 'shuffle') { return $arr->shuffle; }
-	if ($m eq 'sample') { return $arr->sample( $args->[0] ); }
+	if ($m eq 'sample') {
+		$self->_require_method_arity_range( 'Array.sample', $args, 0, 1, $file, $line );
+		return $arr->sample( $args->[0] );
+	}
 	if ($m eq 'contains') { return $arr->contains( $args->[0] ); }
 	if ($m eq 'map' || $m eq 'grep' || $m eq 'any' || $m eq 'all' || $m eq 'first' || $m eq 'remove' || $m eq 'first_index' || $m eq 'for_each_value') {
+		$self->_require_method_arity( "Array.$m", $args, 1, $file, $line )
+			if $m eq 'map' || $m eq 'grep' || $m eq 'any' || $m eq 'all' || $m eq 'first';
 		return $arr->map( $self->_as_mapper_callback( $args->[0], $file, $line ) ) if $m eq 'map';
 		my $cb = $self->_as_predicate_callback( $args->[0], $file, $line );
 		return $arr->grep($cb) if $m eq 'grep';
@@ -5260,6 +5471,7 @@ sub _dict_method {
 	if ($m eq 'values') { return $d->values; }
 	if ($m eq 'enumerate') { return $self->_dict_enumerate($d); }
 	if ($m eq 'has') { return $d->contains_key( $args->[0] ); }
+	if ($m eq 'contains') { return $d->contains( $args->[0] ); }
 	if ($m eq 'exists') { return $d->exists( $args->[0] ); }
 	if ($m eq 'defined') { return $d->defined( $args->[0] ); }
 	if ($m eq 'copy') { return $d->copy; }
@@ -5283,6 +5495,7 @@ sub _dict_method {
 	if ($m eq 'length') { return $d->length; }
 	if ($m eq 'count') { return $d->count; }
 	if ($m eq 'empty') { return $d->empty; }
+	if ($m eq 'is_empty') { return $d->is_empty; }
 	if ($m eq 'clear') { return $d->clear; }
 	if ($m eq 'to_Array') { return $self->_dict_to_array($d); }
 	if ($m eq 'to_Iterator') {
@@ -5337,6 +5550,7 @@ sub _pairlist_method {
 	if ( $m eq 'length' ) { return $pairlist->length; }
 	if ( $m eq 'count' ) { return $pairlist->count; }
 	if ( $m eq 'empty' ) { return $pairlist->empty; }
+	if ( $m eq 'is_empty' ) { return $pairlist->is_empty; }
 	if ( $m eq 'clear' ) { return $pairlist->clear; }
 	if ( $m eq 'to_Array' ) { return $self->_pairlist_to_array($pairlist); }
 	if ( $m eq 'to_Iterator' ) {
@@ -5370,6 +5584,59 @@ sub _dict_enumerate {
 	return Zuzu::Value::Bag->new( items => \@pair_objects );
 }
 
+sub _require_method_arity {
+	my ( $self, $method, $args, $expected, $file, $line ) = @_;
+
+	die Zuzu::Error->new_runtime(
+		message => "$method expects $expected argument"
+			. ( $expected == 1 ? '' : 's' ),
+		file => $file,
+		line => $line,
+	) if @{ $args } != $expected;
+}
+
+sub _require_method_arity_range {
+	my ( $self, $method, $args, $min, $max, $file, $line ) = @_;
+
+	die Zuzu::Error->new_runtime(
+		message => "$method expects between $min and $max arguments",
+		file => $file,
+		line => $line,
+	) if @{ $args } < $min or @{ $args } > $max;
+}
+
+sub _array_index {
+	my ( $self, $arr, $index ) = @_;
+
+	my $idx = 0 + ( $index // 0 );
+	$idx += $arr->length if $idx < 0;
+
+	return $idx;
+}
+
+sub _array_get {
+	my ( $self, $arr, $args, $file, $line ) = @_;
+
+	$self->_require_method_arity_range( 'Array.get', $args, 1, 2, $file, $line );
+	my $idx = $self->_array_index( $arr, $args->[0] );
+
+	return $arr->get( $idx, $args->[1] );
+}
+
+sub _array_set {
+	my ( $self, $arr, $args, $file, $line, $weak ) = @_;
+
+	$self->_require_method_arity( $weak ? 'Array.set_weak' : 'Array.set', $args, 2, $file, $line );
+	my $idx = $self->_array_index( $arr, $args->[0] );
+	die Zuzu::Error->new_runtime(
+		message => 'Array index is out of range',
+		file => $file,
+		line => $line,
+	) if $idx < 0;
+
+	return $weak ? $arr->set_weak( $idx, $args->[1] ) : $arr->set( $idx, $args->[1] );
+}
+
 sub _pairlist_enumerate {
 	my ( $self, $pairlist ) = @_;
 
@@ -5382,7 +5649,66 @@ sub _pairlist_enumerate {
 		);
 	}
 
-	return Zuzu::Value::Bag->new( items => \@pair_objects );
+	return Zuzu::Value::Array->new( items => \@pair_objects );
+}
+
+sub _array_join {
+	my ( $self, $arr, $args, $file, $line ) = @_;
+
+	die Zuzu::Error->new_runtime(
+		message => 'Array.join expects one or two arguments',
+		file    => $file,
+		line    => $line,
+	) if @{ $args } < 1 or @{ $args } > 2;
+
+	my $separator = $self->_to_OperatorString( $args->[0], $file, $line );
+	my $fallback  = $args->[1];
+	my $has_fallback = @{ $args } == 2;
+	my $fallback_string;
+	my @parts;
+	for my $value ( $arr->resolved_items ) {
+		my $part = eval { $self->_to_OperatorString( $value, $file, $line ) };
+		if ( !defined $part and $@ ) {
+			die $@ if !$has_fallback;
+			if ( blessed($fallback) and $fallback->isa('Zuzu::Value::Function') ) {
+				my $replacement = $self->_await_callback_value(
+					$self->_call_function(
+						$fallback,
+						[ $value ],
+						$EMPTY_HASH,
+						$EMPTY_ARRAY,
+						$file,
+						$line,
+					),
+				);
+				$part = $self->_to_OperatorString(
+					$replacement,
+					$file,
+					$line,
+				);
+			}
+			else {
+				$fallback_string //=
+					$self->_to_OperatorString( $fallback, $file, $line );
+				$part = $fallback_string;
+			}
+		}
+		push @parts, $part;
+	}
+
+	return join $separator, @parts;
+}
+
+sub _array_slice {
+	my ( $self, $arr, $args, $file, $line ) = @_;
+
+	die Zuzu::Error->new_runtime(
+		message => 'Array.slice expects one or two arguments',
+		file    => $file,
+		line    => $line,
+	) if @{ $args } < 1 or @{ $args } > 2;
+
+	return $arr->slice( @{ $args } );
 }
 
 sub _make_pair_object {
@@ -5432,7 +5758,7 @@ sub _set_method {
 		if $SET_MUTATING_METHOD{$m};
 
 	if ($m eq 'add' || $m eq 'push') { return $set->add( @$args ); }
-	if ($m eq 'add_weak') { return $set->add_weak( @$args ); }
+	if ($m eq 'add_weak' || $m eq 'push_weak') { return $set->add_weak( @$args ); }
 	if ($m eq 'remove') { return $set->remove( $args->[0] ); }
 	if ($m eq 'length') { return $set->length; }
 	if ($m eq 'count') { return $set->count; }
@@ -5483,12 +5809,13 @@ sub _bag_method {
 		if $BAG_MUTATING_METHOD{$m};
 
 	if ($m eq 'add' || $m eq 'push') { return $bag->add( @$args ); }
-	if ($m eq 'add_weak') { return $bag->add_weak( @$args ); }
+	if ($m eq 'add_weak' || $m eq 'push_weak') { return $bag->add_weak( @$args ); }
 	if ($m eq 'remove') { return $bag->remove( $args->[0] ); }
 	if ($m eq 'remove_first') { return $bag->remove_first( $args->[0] ); }
 	if ($m eq 'length') { return $bag->length; }
 	if ($m eq 'count') { return $bag->count( @$args ); }
 	if ($m eq 'empty') { return $bag->empty; }
+	if ($m eq 'is_empty') { return $bag->is_empty; }
 	if ($m eq 'copy') { return $bag->copy; }
 	if ($m eq 'clear') { return $bag->clear; }
 	if ($m eq 'contains') { return $bag->contains( $args->[0] ); }

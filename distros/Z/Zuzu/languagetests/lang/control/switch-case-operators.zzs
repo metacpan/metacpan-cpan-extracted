@@ -1,0 +1,126 @@
+from test/more import *;
+
+plan(18);
+
+function classify_word ( value ) {
+	switch ( value : eq ) {
+		case "alpha": return "A";
+		case "beta", ~ /^g.mm.$/, eqi "DELTA": return "B";
+		default: return "other";
+	}
+}
+
+is( classify_word("alpha"), "A", "switch case inherits header comparator" );
+is( classify_word("gamma"), "B", "switch case can override with regexp matching" );
+is( classify_word("delta"), "B", "switch case can override with eqi matching" );
+
+function classify_number ( value ) {
+	switch ( value : = ) {
+		case < 0: return "negative";
+		case 0: return "zero";
+		case > 10: return "large";
+		default: return "other";
+	}
+}
+
+is( classify_number(-4), "negative", "switch case can override with numeric less-than" );
+is( classify_number(0), "zero", "switch case still supports literal numeric equality" );
+is( classify_number(12), "large", "switch case can override with numeric greater-than" );
+
+let cmp_match := "";
+switch ( "b" : eq ) {
+	case cmp "a": cmp_match := "cmp";
+	default: cmp_match := "default";
+}
+is( cmp_match, "cmp", "switch case can use three-way string comparison" );
+
+let set_match := "";
+switch ( 2 ) {
+	case in [ 1, 2, 3 ]: set_match := "in";
+	default: set_match := "default";
+}
+is( set_match, "in", "switch case can use in comparison" );
+
+let not_in_match := "";
+switch ( 4 ) {
+	case ∉ [ 1, 2, 3 ]: not_in_match := "not-in";
+	default: not_in_match := "default";
+}
+is( not_in_match, "not-in", "switch case can use not-in comparison" );
+
+let subset_match := "";
+switch ( << 1, 2 >> ) {
+	case subsetof << 1, 2, 3 >>: subset_match := "subset";
+	default: subset_match := "default";
+}
+is( subset_match, "subset", "switch case can use subset comparison" );
+
+let superset_match := "";
+switch ( << 1, 2, 3 >> ) {
+	case supersetof << 2 >>: superset_match := "superset";
+	default: superset_match := "default";
+}
+is( superset_match, "superset", "switch case can use superset comparison" );
+
+let equivalent_match := "";
+switch ( << 1, 2 >> ) {
+	case equivalentof << 2, 1 >>: equivalent_match := "equivalent";
+	default: equivalent_match := "default";
+}
+is( equivalent_match, "equivalent", "switch case can use equivalent comparison" );
+
+let path_match := "";
+switch ( { "store": { "book": { "title": "Zuzu" } } } ) {
+	case @? "/store/book/title": path_match := "path";
+	default: path_match := "default";
+}
+is( path_match, "path", "switch case can use path existence comparison" );
+
+trait SwitchCaseOperatorTrait {
+	method label () {
+		return "label";
+	}
+}
+
+class SwitchCaseOperatorBox with SwitchCaseOperatorTrait {
+	method open () {
+		return true;
+	}
+}
+
+let box := new SwitchCaseOperatorBox();
+
+let instanceof_match := "";
+switch ( box ) {
+	case instanceof SwitchCaseOperatorBox: instanceof_match := "class";
+	default: instanceof_match := "default";
+}
+is( instanceof_match, "class", "switch case can use instanceof comparison" );
+
+let does_match := "";
+switch ( box ) {
+	case does SwitchCaseOperatorTrait: does_match := "trait";
+	default: does_match := "default";
+}
+is( does_match, "trait", "switch case can use does comparison" );
+
+let can_match := "";
+switch ( box ) {
+	case can open: can_match := "can";
+	default: can_match := "default";
+}
+is( can_match, "can", "switch case can use can comparison" );
+
+let divides_match := "";
+switch ( 3 ) {
+	case ∣ 12: divides_match := "divides";
+	default: divides_match := "default";
+}
+is( divides_match, "divides", "switch case can use divides comparison" );
+
+let not_divides_match := "";
+switch ( 5 ) {
+	case ∤ 12: not_divides_match := "not-divides";
+	default: not_divides_match := "default";
+}
+is( not_divides_match, "not-divides", "switch case can use not-divides comparison" );

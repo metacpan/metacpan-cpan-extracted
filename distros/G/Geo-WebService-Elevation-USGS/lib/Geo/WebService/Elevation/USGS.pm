@@ -78,7 +78,7 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.201';
+our $VERSION = '0.202';
 
 # use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
 # use constant USGS_URL => 'https://nationalmap.gov/epqs/pqs.php';
@@ -846,26 +846,25 @@ the module should work and what it should actually be called.
 Michael R. Davis provided prompt and helpful feedback on a testing
 problem in my first module to rely heavily on Test::More.
 
-=head1 BUGS
+=head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-WebService-Elevation-USGS>,
-L<https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS/issues>, or in
-electronic mail to the author.
+L<https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS/issues>
+or in electronic mail to the author.
 
 =head1 SEE ALSO
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III; F<wyant at cpan dot org>
+Thomas R. Wyant, III; F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022, 2024-2025 Thomas R. Wyant, III
+Copyright (C) 2008-2022, 2024-2026 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

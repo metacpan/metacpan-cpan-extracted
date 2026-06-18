@@ -1,0 +1,14 @@
+from test/more import *;
+
+is( false or false, false, "or false false" );
+is( false or true, true, "or false true" );
+is( true or false, true, "or true false" );
+is( true or true, true, "or true true" );
+is( false ⋁ false, false, "⋁ false false" );
+is( false ⋁ true, true, "⋁ false true" );
+is( true ⋁ false, true, "⋁ true false" );
+is( true ⋁ true, true, "⋁ true true" );
+is( typeof( true or false ), "Boolean", "or returns Boolean" );
+is( typeof( true ⋁ false ), "Boolean", "⋁ returns Boolean" );
+
+done_testing();

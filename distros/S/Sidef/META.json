@@ -102,7 +102,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "26.05"
+         "version" : "26.06"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -277,7 +277,7 @@
       },
       "homepage" : "https://github.com/trizen/sidef",
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "type" : "git",
@@ -285,11 +285,11 @@
          "web" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "26.05",
+   "version" : "26.06",
    "x_authority" : "cpan:TRIZEN",
    "x_contributors" : [
       "Daniel Șuteu",
       "Ioana Fălcușan"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

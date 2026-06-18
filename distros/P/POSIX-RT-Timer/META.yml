@@ -6,18 +6,18 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Module::Build: '0.28'
   POSIX: '0'
   Test::Fatal: '0'
   Test::More: '0'
   Time::HiRes: '0'
   perl: '5.008001'
 configure_requires:
-  Devel::CheckLib: '0'
-  Module::Build: '0.28'
+  Dist::Build: '0.019'
+  Dist::Build::XS: '0'
+  Dist::Build::XS::Conf: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,11 +26,12 @@ name: POSIX-RT-Timer
 provides:
   POSIX::RT::Clock:
     file: lib/POSIX/RT/Clock.pm
-    version: '0.021'
+    version: '0.023'
   POSIX::RT::Timer:
     file: lib/POSIX/RT/Timer.pm
-    version: '0.021'
+    version: '0.023'
 requires:
+  Time::Spec: '0'
   XSLoader: '0'
   perl: '5.008001'
   strict: '0'
@@ -38,7 +39,8 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/posix-rt-timer/issues
   repository: git://github.com/Leont/posix-rt-timer.git
-version: '0.021'
-x_generated_by_perl: v5.40.1
+version: '0.023'
+x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 0

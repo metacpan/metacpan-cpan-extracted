@@ -1,0 +1,14 @@
+from test/more import *;
+
+is( false xor false, false, "xor false false" );
+is( false xor true, true, "xor false true" );
+is( true xor false, true, "xor true false" );
+is( true xor true, false, "xor true true" );
+is( false ⊻ false, false, "⊻ false false" );
+is( false ⊻ true, true, "⊻ false true" );
+is( true ⊻ false, true, "⊻ true false" );
+is( true ⊻ true, false, "⊻ true true" );
+is( typeof( true xor false ), "Boolean", "xor returns Boolean" );
+is( typeof( true ⊻ false ), "Boolean", "⊻ returns Boolean" );
+
+done_testing();

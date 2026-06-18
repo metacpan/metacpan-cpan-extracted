@@ -9,6 +9,14 @@ use lib "$Bin/../lib";
 use Zuzu::Lexer;
 use Zuzu::Parser;
 
+my %WORD_OPERATOR_KW = map { $_ => 1 } qw(
+	and and? or or? xor xor? nand nand? nor nor? xnor xnor? onlyif onlyif? butnot butnot? not
+	eq ne gt ge lt le cmp eqi nei gti gei lti lei cmpi
+	mod abs sqrt floor ceil round int length uc lc typeof instanceof does can
+	union intersection subsetof supersetof equivalentof divides
+	in
+);
+
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDERR, ':encoding(UTF-8)';
 
@@ -147,7 +155,9 @@ sub extract_lexeme {
 		return ( $rest =~ /\Anull/u ) ? 'null' : '';
 	}
 	if ( $type eq 'NUMBER' ) {
-		return ( $rest =~ /\A[0-9]+(?:\.[0-9]+)?/u ) ? $& : '';
+		return (
+			$rest =~ /\A(?:0x[0-9A-Fa-f]+|0b[01]+|0o[0-7]+|[0-9]+(?:\.[0-9]+)?(?:E[+-]?[0-9]+)?)/u
+		) ? $& : '';
 	}
 	if ( $type eq 'STRING' ) {
 		return ( $rest =~ /\A"""(?s:(?:\\.|(?!""").))*"""|\A"(?:\\.|[^"\\])*"?/u ) ? $& : '';
@@ -218,6 +228,9 @@ sub class_for_token {
 		return 'keyword'
 			if defined $next and $next->type eq 'OP' and ( $next->value // '' ) eq ':';
 
+		return 'operator';
+	}
+	if ( $type eq 'KW' and $WORD_OPERATOR_KW{ $tok->value // '' } ) {
 		return 'operator';
 	}
 	return 'keyword' if $type eq 'KW';

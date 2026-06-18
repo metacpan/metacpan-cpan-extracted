@@ -17,6 +17,7 @@ CVS/
 ^MYMETA\.yml$
 ^pm_to_blib$
 ^.git/
+^.github/
 ^.gitignore$
 \.old$
 ^pod2htm.\.tmp$

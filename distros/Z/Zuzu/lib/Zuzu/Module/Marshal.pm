@@ -2,9 +2,8 @@ package Zuzu::Module::Marshal;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
-use POSIX qw( isfinite );
 use Scalar::Util qw( blessed looks_like_number refaddr );
 
 use Zuzu::Marshal::CBOR qw(
@@ -28,6 +27,7 @@ use Zuzu::Util::NativeHelpers qw(
 	native_class
 	native_function
 );
+use Zuzu::Util::Number qw( is_finite_number );
 use Zuzu::Env;
 use Zuzu::Value::BinaryString;
 use Zuzu::Value::Boolean;
@@ -1123,7 +1123,15 @@ sub _source_expr {
 	elsif ( blessed($expr) and $expr->isa('Zuzu::AST::Expr::Binary') ) {
 		$prec = _source_binary_prec( $expr->op );
 		my $right_parent_prec =
-			( $expr->op eq '**' or $expr->op eq '◁' or $expr->op eq '<|' )
+			(
+				$expr->op eq '**'
+				or $expr->op eq '◁'
+				or $expr->op eq '<|'
+				or $expr->op eq 'onlyif'
+				or $expr->op eq '⊨'
+				or $expr->op eq 'onlyif?'
+				or $expr->op eq '⊨?'
+			)
 			? $prec - 1
 			: $prec;
 		$source = join(
@@ -1288,26 +1296,32 @@ sub _source_binary_prec {
 	my ( $op ) = @_;
 
 	return 0 if $op eq '▷' || $op eq '|>' || $op eq '◁' || $op eq '<|';
-	return 1 if $op eq 'or' || $op eq '⋁';
-	return 2 if $op eq 'xor' || $op eq '⊻';
-	return 3 if $op eq 'and' || $op eq '⋀' || $op eq 'nand' || $op eq '⊼';
-	return 4 if $op eq 'default';
-	return 4 if $op eq '==' || $op eq '≡' || $op eq '!=' || $op eq '≢';
-	return 5 if $op =~ /\A(?:=|eq|ne|gt|ge|lt|le|cmp)\z/;
-	return 5 if $op =~ /\A(?:eqi|nei|gti|gei|lti|lei|cmpi)\z/;
-	return 5 if $op =~ /\A(?:in|subsetof|supersetof|equivalentof)\z/;
-	return 5 if $op =~ /\A(?:instanceof|does|can|~|@|@\?|@@)\z/;
-	return 5 if $op =~ /\A(?:[<>]=?|<=>|[≤≥≠≶≷∈∉⊂⊃]|⊂⊃)\z/;
-	return 6 if $op eq '|';
-	return 7 if $op eq '^';
-	return 8 if $op eq '&';
-	return 9 if $op eq 'union' || $op eq 'intersection' || $op eq '\\';
-	return 9 if $op eq '⋃' || $op eq '⋂' || $op eq '∖';
-	return 10 if $op eq '_';
-	return 11 if $op eq '+' || $op eq '-';
-	return 12 if $op eq '*' || $op eq '/' || $op eq '×';
-	return 12 if $op eq '÷' || $op eq 'mod';
-	return 13 if $op eq '**';
+	return 1 if $op eq 'or' || $op eq '⋁' || $op eq 'or?' || $op eq '⋁?';
+	return 2 if $op eq 'onlyif' || $op eq '⊨' || $op eq 'onlyif?' || $op eq '⊨?';
+	return 3 if $op eq 'xor' || $op eq '⊻' || $op eq 'xor?' || $op eq '⊻?'
+		|| $op eq 'nor' || $op eq '⊽' || $op eq 'nor?' || $op eq '⊽?'
+		|| $op eq 'xnor' || $op eq '↔' || $op eq 'xnor?' || $op eq '↔?';
+	return 4 if $op eq 'and' || $op eq '⋀' || $op eq 'and?' || $op eq '⋀?'
+		|| $op eq 'nand' || $op eq '⊼' || $op eq 'nand?' || $op eq '⊼?'
+		|| $op eq 'butnot' || $op eq '⊭' || $op eq 'butnot?' || $op eq '⊭?';
+	return 5 if $op eq 'default';
+	return 5 if $op eq '==' || $op eq '≡' || $op eq '!=' || $op eq '≢';
+	return 6 if $op =~ /\A(?:=|eq|ne|gt|ge|lt|le|cmp)\z/;
+	return 6 if $op =~ /\A(?:eqi|nei|gti|gei|lti|lei|cmpi)\z/;
+	return 6 if $op =~ /\A(?:in|subsetof|supersetof|equivalentof)\z/;
+	return 6 if $op =~ /\A(?:instanceof|does|can|~|@|@\?|@@)\z/;
+	return 6 if $op =~ /\A(?:[<>]=?|<=>|[≤≥≠≶≷∈∉⊂⊃]|⊂⊃)\z/;
+	return 7 if $op eq '|';
+	return 8 if $op eq '^';
+	return 9 if $op eq '&';
+	return 10 if $op eq '<<' || $op eq '«' || $op eq '>>' || $op eq '»';
+	return 11 if $op eq 'union' || $op eq 'intersection' || $op eq '\\';
+	return 11 if $op eq '⋃' || $op eq '⋂' || $op eq '∖';
+	return 12 if $op eq '_';
+	return 13 if $op eq '+' || $op eq '-';
+	return 14 if $op eq '*' || $op eq '/' || $op eq '×';
+	return 14 if $op eq '÷' || $op eq 'mod';
+	return 15 if $op eq '**';
 
 	die "Unsupported binary operator for source extraction: $op";
 }
@@ -1389,7 +1403,7 @@ sub _number_to_cbor {
 	my ( $value ) = @_;
 
 	my $number = 0 + $value;
-	die "Number values must be finite" if !isfinite($number);
+	die "Number values must be finite" if !is_finite_number($number);
 
 	if ( _is_integral_number($number) and abs($number) <= MAX_SAFE_INTEGER ) {
 		return int($number);
@@ -1416,7 +1430,7 @@ sub _is_integer_value {
 
 sub _is_finite_number {
 	my ( $number ) = @_;
-	return isfinite($number) ? 1 : 0;
+	return is_finite_number($number) ? 1 : 0;
 }
 
 sub _is_negative_zero {

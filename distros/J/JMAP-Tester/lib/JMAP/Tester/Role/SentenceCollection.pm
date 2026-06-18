@@ -1,5 +1,5 @@
 use v5.20.0;
-package JMAP::Tester::Role::SentenceCollection 0.109;
+package JMAP::Tester::Role::SentenceCollection 0.110;
 
 use Moo::Role;
 
@@ -14,8 +14,6 @@ BEGIN {
     paragraph_for_items
 
     strip_json_types
-
-    abort
   )) {
     my $sub = sub ($self, @rest) {
       $self->sentence_broker->$m(@rest);
@@ -322,7 +320,7 @@ JMAP::Tester::Role::SentenceCollection
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 PERL VERSION
 

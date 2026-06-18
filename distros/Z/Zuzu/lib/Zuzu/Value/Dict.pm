@@ -2,7 +2,7 @@ package Zuzu::Value::Dict;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use Moo;
 
@@ -91,6 +91,12 @@ sub contains_key {
 	$key = _normalize_key($key);
 
 	return exists $map->{ $key } ? 1 : 0;
+}
+
+sub contains {
+	my ( $self, $key ) = @_;
+
+	return $self->contains_key($key);
 }
 
 sub exists {
@@ -268,6 +274,8 @@ sub length { scalar CORE::keys %{ $_[0]->map } }
 sub empty { scalar CORE::keys %{ $_[0]->map } ? 0 : 1 }
 
 sub count { $_[0]->length }
+
+sub is_empty { $_[0]->empty }
 
 sub clear {
 	my ( $self ) = @_;

@@ -1,5 +1,5 @@
 use v5.20.0;
-package JMAP::Tester::Logger 0.109;
+package JMAP::Tester::Logger 0.110;
 
 use Moo::Role;
 
@@ -52,6 +52,9 @@ sub write ($self, $string) {
 requires 'log_jmap_request';
 requires 'log_jmap_response';
 
+requires 'log_misc_request';
+requires 'log_misc_response';
+
 requires 'log_upload_request';
 requires 'log_upload_response';
 
@@ -72,7 +75,7 @@ JMAP::Tester::Logger
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 PERL VERSION
 

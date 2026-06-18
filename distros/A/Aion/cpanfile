@@ -34,6 +34,7 @@ on 'test' => sub {
 	requires 'open';
 };
 
+requires 'Aion::Env', '0.1';
 requires 'B';
 requires 'Exporter';
 requires 'List::Util', '1.68';
@@ -44,6 +45,6 @@ requires 'Scalar::Util', '1.63';
 requires 'Sub::Util', '1.63';
 requires 'bytes';
 requires 'common::sense', '3.75';
-requires 'config', '1.3';
 requires 'constant';
 requires 'overload';
+requires 'warnings';

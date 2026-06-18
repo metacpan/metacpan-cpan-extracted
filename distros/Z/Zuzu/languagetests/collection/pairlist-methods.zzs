@@ -5,6 +5,7 @@ let pl := {{ foo: 1, bar: 2, foo: 3, foo: 4 }};
 is( pl.length(), 4, "pairlist length includes duplicate keys" );
 is( pl.count(), 4, "pairlist count" );
 is( pl.empty(), 0, "pairlist is not empty" );
+is( pl.is_empty(), 0, "pairlist is_empty false" );
 is( pl.keys(), [ "foo", "bar", "foo", "foo" ], "pairlist keys keep order" );
 is( pl.values(), [ 1, 2, 3, 4 ], "pairlist values keep order" );
 is(
@@ -12,6 +13,7 @@ is(
 	2,
 	"pairlist enumerate exposes pairs",
 );
+ok( pl.enumerate() instanceof Array, "pairlist enumerate returns Array" );
 is( pl.has("foo"), 1, "pairlist has duplicate key" );
 is( pl.exists("bar"), 1, "pairlist exists" );
 is( pl.defined("foo"), 1, "pairlist defined" );
@@ -58,5 +60,6 @@ is( pl.kv(), [ "foo", 1, "foo", 3, "zap", 9 ], "pairlist remove callback filters
 pl.clear();
 is( pl.length(), 0, "pairlist clear" );
 is( pl.empty(), 1, "pairlist empty after clear" );
+is( pl.is_empty(), 1, "pairlist is_empty true" );
 
 done_testing();

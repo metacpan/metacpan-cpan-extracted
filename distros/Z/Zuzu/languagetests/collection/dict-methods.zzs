@@ -1,8 +1,12 @@
 from test/more import *;
 let d := { a: 1, b: 2, n: null };
 is( d.keys().length(), 3, "keys" );
+ok( d.keys() instanceof Set, "keys returns Set" );
 is( d.values().length(), 3, "values" );
+ok( d.values() instanceof Bag, "values returns Bag" );
 is( d.enumerate().length(), 3, "enumerate" );
+ok( d.enumerate() instanceof Bag, "enumerate returns Bag" );
+ok( d.to_Array() instanceof Array, "to_Array returns Array" );
 is( d.sorted_keys(), [ "a", "b", "n" ], "sorted_keys order" );
 is( d.kv(), [ "a", 1, "b", 2, "n", null ], "kv order" );
 is( d.to_Array().length(), 3, "to_Array count" );
@@ -14,6 +18,8 @@ is(
 	"enumerate exposes pairs",
 );
 is( d.has("a"), 1, "has" );
+is( d.contains("a"), 1, "contains" );
+is( d.contains("missing"), 0, "contains false" );
 is( d.exists("b"), 1, "exists" );
 is( d.defined("a"), 1, "defined true" );
 is( d.defined("n"), 0, "defined false for null" );
@@ -54,7 +60,9 @@ d.remove( fn p -> p.value >= 4 );
 is( d.sorted_keys(), [ "c", "n" ], "remove callback filters pairs" );
 is( d.count(), d.length(), "count" );
 is( d.empty(), 0, "empty false before clear" );
+is( d.is_empty(), 0, "is_empty false before clear" );
 d.clear();
 is( d.length(), 0, "clear" );
 is( d.empty(), 1, "empty true" );
+is( d.is_empty(), 1, "is_empty true" );
 done_testing();

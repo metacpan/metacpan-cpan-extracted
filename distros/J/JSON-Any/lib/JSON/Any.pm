@@ -1,9 +1,9 @@
-package JSON::Any; # git description: v1.39-25-gd13a0fd
+package JSON::Any; # git description: v1.40-5-g0826677
 
 use warnings;
 use strict;
 
-our $VERSION = '1.40';
+our $VERSION = '1.41';
 
 use Carp qw(croak carp);
 
@@ -443,8 +443,9 @@ sub _module_name_list {
 #pod
 #pod The one parameter that is universally supported (to the extent that is
 #pod supported by the underlying JSON modules) is C<utf8>. When this parameter is
-#pod enabled all resulting JSON will be marked as unicode, and all unicode strings
-#pod in the input data structure will be preserved as such.
+#pod enabled, all unicode strings in the input data structure will be preserved as such.
+#pod Note that this is the B<OPPOSITE> of the meaning of the underlying C<utf8> option
+#pod in many backends!
 #pod
 #pod Also note that the C<allow_blessed> parameter is recognised by all the modules
 #pod that throw exceptions when a blessed reference is given them meaning that
@@ -644,7 +645,7 @@ JSON::Any - (DEPRECATED) Wrapper Class for the various JSON classes
 
 =head1 VERSION
 
-version 1.40
+version 1.41
 
 =head1 SYNOPSIS
 
@@ -772,8 +773,9 @@ happen to have the same name.
 
 The one parameter that is universally supported (to the extent that is
 supported by the underlying JSON modules) is C<utf8>. When this parameter is
-enabled all resulting JSON will be marked as unicode, and all unicode strings
-in the input data structure will be preserved as such.
+enabled, all unicode strings in the input data structure will be preserved as such.
+Note that this is the B<OPPOSITE> of the meaning of the underlying C<utf8> option
+in many backends!
 
 Also note that the C<allow_blessed> parameter is recognised by all the modules
 that throw exceptions when a blessed reference is given them meaning that
@@ -836,6 +838,8 @@ underlying JSON module.
 
 =for stopwords Dimas Wistow mst
 
+=for Pod::Coverage DECODER ENCODER HANDLER
+
 This module came about after discussions on irc.perl.org about the fact
 that there were now six separate JSON perl modules with different interfaces.
 
@@ -846,6 +850,14 @@ Simon Wistow graciously supplied a patch for backwards compatibility with JSON::
 versions previous to 2.01.
 
 San Dimas High School Football Rules!
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Any>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Any>.
 
 =head1 SUPPORT
 

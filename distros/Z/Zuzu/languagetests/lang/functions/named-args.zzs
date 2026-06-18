@@ -92,4 +92,26 @@ let e := exception( function() {
 }
 );
 ok( e instanceof Exception, "can't pass named arguments to a function which doesn't accept them" );
+}{ function x7 ( ... PairList opts ) {
+	return opts;
+}
+
+class X7Receiver {
+	method capture ( ... PairList opts ) {
+		return opts;
+	}
+}
+
+let got := x7( length: 42, method: "GET", class: "Widget", "quoted": 7 );
+is( got{"length"}, 42, "keyword-like bare named argument key works" );
+is( got{"method"}, "GET", "method bare named argument key works" );
+is( got{"class"}, "Widget", "class bare named argument key works" );
+is( got{"quoted"}, 7, "quoted named argument key still works" );
+
+let receiver := new X7Receiver();
+let method_got := receiver.capture( length: 3, method: "POST" );
+is( method_got{"length"}, 3, "method call accepts keyword-like bare named key" );
+is( method_got{"method"}, "POST", "method call accepts method bare named key" );
+is( { length: 99 }{"length"}, 99, "Dict literal still accepts keyword-like bare key" );
+is( {{ length: 100 }}{"length"}, 100, "PairList literal accepts keyword-like bare key" );
 } done_testing();

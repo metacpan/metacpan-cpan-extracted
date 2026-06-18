@@ -8,6 +8,7 @@ requires 'Net::DNS';
 requires 'Net::SSLeay';
 requires 'URI';
 requires 'URI::Escape';
+requires 'URI::Template';
 requires 'IPC::Run';
 requires 'File::ShareDir';
 requires 'FFI::Platypus', '2.00';
@@ -43,4 +44,3 @@ on 'test' => sub {
 	requires 'Test2::Require::AuthorTesting';
 	requires 'HTTP::Request::Common';
 };
-requires 'URI::Template';

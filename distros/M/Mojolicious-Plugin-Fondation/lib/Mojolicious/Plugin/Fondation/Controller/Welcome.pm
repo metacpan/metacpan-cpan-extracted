@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Controller::Welcome;
-$Mojolicious::Plugin::Fondation::Controller::Welcome::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Controller::Welcome::VERSION = '0.03';
 # ABSTRACT: Welcome page controller with language-aware template selection
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -33,7 +33,7 @@ Mojolicious::Plugin::Fondation::Controller::Welcome - Welcome page controller wi
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

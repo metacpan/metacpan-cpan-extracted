@@ -1,4 +1,4 @@
-Geo-WebService-Elevation-USGS is Copyright (C) 2008-2022, 2024-2025 Thomas R. Wyant, III
+Geo-WebService-Elevation-USGS is Copyright (C) 2008-2022, 2024-2026 Thomas R. Wyant, III
 
 This package contains class Geo::WebService::Elevation::USGS, which
 interfaces with the United States Geological Service's elevation query
@@ -58,7 +58,7 @@ LICENSING INFORMATION
 
 This package is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files LICENSE-Artistic and LICENSE-GPL.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

@@ -64,6 +64,7 @@
             "Types::Serialiser" : "0",
             "URI" : "0",
             "URI::Escape" : "0",
+            "URI::Template" : "0",
             "XML::LibXML" : "0",
             "YAML::PP" : "0",
             "perl" : "5.014"
@@ -89,6 +90,6 @@
          "web" : "https://github.com/zuzuscript/zuzu-perl"
       }
    },
-   "version" : "0.004000",
+   "version" : "0.005000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

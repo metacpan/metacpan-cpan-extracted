@@ -61,7 +61,7 @@ subtest 'Plugin with share/public/ directory registers static paths' => sub {
     # public_dir stored in registry
     my $public_dir = $user_entry->{public_dir};
     ok($public_dir, 'public_dir is stored in registry entry');
-    is($public_dir->to_string, "$user_share_dir/public",
+    is($public_dir->to_string, Mojo::File->new($user_share_dir, 'public')->to_string,
        'public_dir path matches expected share/public/');
 
     # Static paths include the plugin's public directory
@@ -156,8 +156,8 @@ subtest 'Static priority: dependency plugin over parent plugin' => sub {
 
     # Role (dependency) path should appear BEFORE Authorization in static paths
     my $paths     = $app->static->paths;
-    my $role_path = "$role_share_dir/public";
-    my $auth_path = "$auth_share_dir/public";
+    my $role_path = Mojo::File->new($role_share_dir, 'public')->to_string;
+    my $auth_path = Mojo::File->new($auth_share_dir, 'public')->to_string;
 
     my $role_idx = _index_of_str($paths, $role_path);
     my $auth_idx = _index_of_str($paths, $auth_path);
@@ -211,8 +211,10 @@ done_testing();
 
 sub _index_of_str {
     my ($array, $value) = @_;
+    (my $norm_value = $value) =~ s{\\}{/}g;
     for my $i (0 .. $#$array) {
-        return $i if $array->[$i] eq $value;
+        (my $norm = $array->[$i]) =~ s{\\}{/}g;
+        return $i if $norm eq $norm_value;
     }
     return -1;
 }

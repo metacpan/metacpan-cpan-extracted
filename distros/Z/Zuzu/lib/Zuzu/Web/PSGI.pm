@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use Encode ();
 use Plack::MIME;

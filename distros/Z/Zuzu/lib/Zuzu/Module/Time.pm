@@ -2,7 +2,7 @@ package Zuzu::Module::Time;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use DateTime::Lite ();
 use DateTime::Lite::TimeZone ();

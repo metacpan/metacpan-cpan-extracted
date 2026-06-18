@@ -1,5 +1,14 @@
 Revision history for Perl module Crypt::OpenPGP
 
+1.21 -- Wed Jun 17 22:39:19 ADT 2026
+
+    [Changes since 1.19]
+    - Re-release 1.20 with correct git repo
+
+    [Detailed Changelog]
+    - 0449b82 Increment version
+    - 2616001 v1.20
+
 1.20 -- Tue Jun 16 05:17:00 ADT 2026
 
     [Changes since 1.19]

@@ -1,12 +1,7 @@
 package Time::Spec;
-$Time::Spec::VERSION = '0.007';
+$Time::Spec::VERSION = '0.008';
 use strict;
 use warnings;
-
-use overload
-	'0+'     => sub { $_[0]->to_float },
-	bool     => sub { 1 },
-	fallback => 1;
 
 use XSLoader;
 
@@ -28,7 +23,7 @@ Time::Spec - a wrapper around struct timespec
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package POSIX::RT::Clock;
-$POSIX::RT::Clock::VERSION = '0.021';
+$POSIX::RT::Clock::VERSION = '0.023';
 use 5.008;
 
 use strict;
@@ -23,7 +23,7 @@ POSIX::RT::Clock - POSIX real-time clocks
 
 =head1 VERSION
 
-version 0.021
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ Get the cpu-time clock for C<$id>. If C<$id> is an integer, it's interpreted as 
 
 =item * get_time()
 
-Get the time of this clock.
+Get the time of this clock as a L<Time::Spec>.
 
 =item * set_time($time)
 
@@ -129,6 +129,8 @@ A low-level interface to POSIX clocks is also provided by:
 =item * POSIX::2008
 
 =back
+
+Times are represented using L<Time::Spec>.
 
 =head1 AUTHOR
 

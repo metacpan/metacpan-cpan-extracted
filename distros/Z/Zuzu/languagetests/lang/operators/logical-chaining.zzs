@@ -1,0 +1,14 @@
+from test/more import *;
+
+is( true and true and false, false, "and chains left-to-right" );
+is( false or false or true, true, "or chains left-to-right" );
+is( true xor true xor true, true, "xor chains left-to-right" );
+is( true xnor true xnor false, false, "xnor chains left-to-right" );
+is( true butnot false butnot true, false, "butnot chains left-to-right" );
+
+is( 7 and? "middle" and? 9, 9, "and? chains values left-to-right" );
+is( 0 or? "" or? "fallback", "fallback", "or? chains values left-to-right" );
+is( 0 xor? "x" xor? 9, false, "xor? chains values left-to-right" );
+is( typeof( 0 xor? "x" xor? 9 ), "Boolean", "xor? chained result can be Boolean" );
+
+done_testing();

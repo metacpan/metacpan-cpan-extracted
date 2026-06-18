@@ -2,7 +2,7 @@ package Crypt::OpenPGP::ErrorHandler;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 our $ERROR;
 

@@ -2,7 +2,7 @@
 abstract: 'Dates in the Christian (combined Julian/Gregorian) calendar'
 author:
   - 'Eugene van der Pijll <pijll@gmx.net>'
-  - 'Thomas R. Wyant, III <wyant at cpan dot org>'
+  - 'Thomas R. Wyant, III <harryfmudd at comcast dot net>'
   - realclean
   -
     FILES: cover_db
@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   DateTime::Calendar::Christian:
     file: lib/DateTime/Calendar/Christian.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Carp: '0'
   DateTime: '1.53'
@@ -37,8 +37,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Christian
+  bugtracker: https://github.com/trwyant/perl-DateTime-Calendar-Christian/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-DateTime-Calendar-Christian.git
-version: '0.14'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

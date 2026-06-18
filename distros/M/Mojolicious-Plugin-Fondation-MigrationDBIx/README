@@ -1,5 +1,5 @@
 This archive contains the distribution Mojolicious-Plugin-Fondation-MigrationDBIx,
-version 0.01:
+version 0.02:
 
   Migration and fixture management for DBIx::Class backends
 

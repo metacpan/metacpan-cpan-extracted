@@ -39,7 +39,7 @@ sub zuzu_string {
 }
 
 sub start_delayed_http_server {
-	my ( $body, $delay ) = @_;
+	my ( $body, $delay, $accept_path ) = @_;
 
 	my $listen = IO::Socket::INET->new(
 		LocalAddr => '127.0.0.1',
@@ -59,6 +59,11 @@ sub start_delayed_http_server {
 		local $SIG{TERM} = sub { exit 0 };
 		my $client = $listen->accept();
 		if ($client) {
+			if ( defined $accept_path ) {
+				open my $fh, '>', $accept_path;
+				print {$fh} time if $fh;
+				close $fh if $fh;
+			}
 			while ( my $header = <$client> ) {
 				last if $header =~ /^\r?\n\z/;
 			}
@@ -75,6 +80,19 @@ sub start_delayed_http_server {
 	close $listen;
 
 	return ( $port, $pid, undef );
+}
+
+sub read_number_file {
+	my ( $path ) = @_;
+
+	return undef if !defined $path or !-e $path;
+	open my $fh, '<', $path
+		or return undef;
+	my $content = <$fh>;
+	close $fh;
+	return undef if !defined $content;
+	chomp $content;
+	return 0 + $content;
 }
 
 my ( $ok, $out, $err ) = run_zuzu( <<'ZZS' );
@@ -370,13 +388,19 @@ ok $ok, 'async file tasks ran successfully' or diag $err;
 is $out, "left:right\n", 'file async all() preserves read order';
 ok $elapsed < 0.65, 'file async tasks overlap while waiting for host I/O';
 
+my $http_delay = 0.75;
+my $http_timing_dir = tempdir( CLEANUP => 1 );
+my $http_left_accept = "$http_timing_dir/left.accept";
+my $http_right_accept = "$http_timing_dir/right.accept";
 my ( $http_left_port, $http_left_pid, $http_left_error ) = start_delayed_http_server(
 	"left",
-	0.35,
+	$http_delay,
+	$http_left_accept,
 );
 my ( $http_right_port, $http_right_pid, $http_right_error ) = start_delayed_http_server(
 	"right",
-	0.35,
+	$http_delay,
+	$http_right_accept,
 );
 if ( defined $http_left_error or defined $http_right_error ) {
 	if ( defined $http_left_pid ) {
@@ -416,10 +440,23 @@ ZZS
 	$elapsed = time - $start;
 	waitpid( $http_left_pid, 0 );
 	waitpid( $http_right_pid, 0 );
+	my $left_accept = read_number_file($http_left_accept);
+	my $right_accept = read_number_file($http_right_accept);
+	my $accept_delta = defined $left_accept && defined $right_accept
+		? abs( $left_accept - $right_accept )
+		: undef;
 
 	ok $ok, 'async HTTP tasks ran successfully' or diag $err;
 	is $out, "left:right\n", 'HTTP async all() preserves response order';
-	ok $elapsed < 0.65, 'HTTP async tasks overlap instead of running serially';
+	ok defined $accept_delta && $accept_delta < $http_delay,
+		'HTTP async tasks overlap instead of running serially'
+		or diag(
+			'elapsed=' . $elapsed,
+			'left_accept=' . ( $left_accept // '<missing>' ),
+			'right_accept=' . ( $right_accept // '<missing>' ),
+			'accept_delta=' . ( $accept_delta // '<missing>' ),
+			'delay=' . $http_delay,
+		);
 }
 
 $start = time;

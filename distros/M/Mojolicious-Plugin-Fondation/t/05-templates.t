@@ -178,18 +178,18 @@ subtest 'Template priority: dependency plugin over parent plugin' => sub {
 
     # Verify that Role template directory was added before Authorization
     my $paths = $app->renderer->paths;
-    my $role_path = "$role_share_dir/templates";
-    my $auth_path = "$auth_share_dir/templates";
+    my $role_path = Mojo::File->new($role_share_dir, 'templates')->to_string;
+    my $auth_path = Mojo::File->new($auth_share_dir, 'templates')->to_string;
+
+    # Normalize path separators for cross-platform comparison
+    my $norm = sub { (my $p = shift) =~ s{\\}{/}gr };
 
     my $role_index = -1;
     my $auth_index = -1;
     for my $i (0 .. $#{$paths}) {
-        $role_index = $i
-            if Mojo::Path->new($paths->[$i])->to_string eq
-               Mojo::Path->new($role_path)->to_string;
-        $auth_index = $i
-            if Mojo::Path->new($paths->[$i])->to_string eq
-               Mojo::Path->new($auth_path)->to_string;
+        my $np = $norm->($paths->[$i]);
+        $role_index = $i if $np eq $norm->($role_path);
+        $auth_index = $i if $np eq $norm->($auth_path);
     }
 
     ok($role_index >= 0, "Role template path found in renderer paths");

@@ -1,7 +1,7 @@
 package Crypt::OpenPGP::Key::Public::RSA;
 use strict;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Crypt::RSA::Key::Public;
 use Crypt::OpenPGP::Digest;

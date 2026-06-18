@@ -22,10 +22,10 @@
 8. [Strings](#8-strings)
 9. [Booleans](#9-booleans)
 10. [Operators and Expressions](#10-operators-and-expressions)
-11. [Operator Precedence — The Most Important Rule](#11-operator-precedence-the-most-important-rule)
+11. [Operator Precedence](#11-operator-precedence)
 12. [Printing Output](#12-printing-output)
 13. [Getting Input](#13-getting-input)
-14. [Control Flow — Making Decisions](#14-control-flow-making-decisions)
+14. [Control Flow](#14-control-flow)
 15. [Loops](#15-loops)
 16. [Functions](#16-functions)
 17. [Arrays](#17-arrays)
@@ -58,8 +58,8 @@ Sidef is a **modern, high-level programming language** that runs on top of Perl.
 ### A quick taste
 
 ```ruby
-# Print the first 10 prime numbers
-say 10.primes
+# Print the prime numbers <= 100
+say 100.primes
 
 # Exact decimal math (no floating-point surprises!)
 say (0.1 + 0.2 == 0.3)    # true
@@ -123,7 +123,7 @@ cpan -T Sidef
 
 ### Windows
 
-Download the ready-to-run executable from the [GitHub Releases page](https://github.com/trizen/sidef/releases). Unzip and run `sidef.exe` from the command prompt.
+Download the ready-to-run executable from the [GitHub Releases page](https://github.com/trizen/sidef/releases).
 
 ---
 
@@ -211,7 +211,7 @@ Run `sidef` with no arguments to enter the interactive prompt, where you type ex
 
 ```
 $ sidef
-Sidef 26.05, running on Linux, using Perl v5.42.1.
+Sidef 26.06, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
 > "Hello!"
 #1 = "Hello!"
@@ -876,7 +876,7 @@ say ("banana" > "apple")    # true  (alphabetically greater than)
 
 ---
 
-## 11. Operator Precedence - The Most Important Rule
+## 11. Operator Precedence
 
 > ⚠️ **This is the single most important rule to understand in Sidef.** Get this wrong and your programs will produce surprising results.
 
@@ -1019,7 +1019,7 @@ if (age >= 18) {
 
 ---
 
-## 14. Control Flow - Making Decisions
+## 14. Control Flow
 
 ### if / elsif / else
 
@@ -1811,7 +1811,7 @@ One of Sidef's greatest strengths is its built-in mathematical capabilities. Her
 
 ```ruby
 say 17.is_prime           # true
-say 10.primes             # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+say 30.primes             # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 say primes(100, 150)      # all primes between 100 and 150
 say 1000.prime            # 7919  (the 1000th prime)
 say prime_count(10**6)    # 78498 (number of primes up to a million)
@@ -2132,9 +2132,10 @@ You've covered the fundamentals! Here's where to go next.
 | Resource | Description |
 |----------|-------------|
 | 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
-| 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.05/sidef-book.pdf) | The full book in PDF format for offline reading |
-| 📝 [Advanced Tutorial](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
-| 🔢 [Number Theory Tutorial](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_TUTORIAL.md) | Deep dive into Sidef's mathematical superpowers |
+| 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.06/sidef-book.pdf) | The full book in PDF format for offline reading |
+| 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
+| 🔢 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
+| 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) | Complete function reference for number theory |
 
 ### Example Code
 

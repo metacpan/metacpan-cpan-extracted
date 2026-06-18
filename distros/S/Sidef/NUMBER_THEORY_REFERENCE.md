@@ -30,7 +30,7 @@ After [installing Sidef](https://github.com/trizen/sidef/blob/master/SIDEF_BEGIN
 
 ```
 $ sidef
-Sidef 26.05, running on Linux, using Perl v5.42.1.
+Sidef 26.06, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
 >
 ```
@@ -362,7 +362,7 @@ for n in (0..30) {
 
 This section briefly describes the built-in classes related to computational number theory.
 
-For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.05/sidef-book.pdf)).
+For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.06/sidef-book.pdf)).
 
 ## Mod class
 
@@ -1773,9 +1773,21 @@ If $n$ is less than $B^3$, and the function returns `true`, then $n$ is definite
 
 If the $B$ parameter is omitted, multiple limits are tested internally, trying to find a square factor of $n$, up to $B = 10^7$.
 
-# More examples
+### Official Documentation
 
-For more Sidef code examples, please see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+| Resource | Description |
+|----------|-------------|
+| 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
+| 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
+| 🔢 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
+| 🔢 [Computational Algebra Guide](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md) | Complete guide for computational algebra |
+
+### Example Code
+
+| Resource | Description |
+|----------|-------------|
+| 📂 [sidef-scripts](https://github.com/trizen/sidef-scripts) | Hundreds of real Sidef programs — the best way to learn by reading |
+| 🌹 [RosettaCode — Sidef](https://rosettacode.org/wiki/Sidef) | Classic programming tasks solved in Sidef, side-by-side with other languages |
 
 # The end
 

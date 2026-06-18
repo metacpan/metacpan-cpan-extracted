@@ -3,7 +3,7 @@ from test/more import *;
 
 ok( typeof Operator eq "Class", "Operator class is importable" );
 ok( typeof STANDARD_OPERATORS eq "Array", "STANDARD_OPERATORS is importable" );
-is( STANDARD_OPERATORS.length(), 73, "phase 4.8 operator table is populated" );
+is( STANDARD_OPERATORS.length(), 104, "operator table is populated" );
 
 function find_op ( spelling ) {
 	return STANDARD_OPERATORS.first( fn op → op.get_spelling() eq spelling );
@@ -26,7 +26,7 @@ for ( let spelling in [ "+", "-", "√", "!", "¬", "~" ] ) {
 	ok( op ≢ null, `unary ${spelling} operator exists` );
 	ok( op.is_unary(), `unary ${spelling} is marked unary` );
 	ok( not op.is_binary(), `unary ${spelling} is not binary` );
-	is( op.get_precedence(), 20, `unary ${spelling} precedence is set` );
+	is( op.get_precedence(), 40, `unary ${spelling} precedence is set` );
 	ok( op{f} ≢ null, `unary ${spelling} has implementation callback` );
 }
 
@@ -39,7 +39,7 @@ for ( let spelling in [ "**" ] ) {
 	let op := find_binary(spelling);
 	ok( op ≢ null, `binary ${spelling} operator exists` );
 	ok( op.is_binary(), `binary ${spelling} is marked binary` );
-	is( op.get_precedence(), 13, `binary ${spelling} precedence is set` );
+	is( op.get_precedence(), 26, `binary ${spelling} precedence is set` );
 	ok( op.is_right_associative(), `binary ${spelling} is right-associative` );
 	ok( op.requires_whitespace(), `binary ${spelling} enforces whitespace` );
 	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
@@ -49,7 +49,7 @@ for ( let spelling in [ "×", "*", "÷", "/", "mod" ] ) {
 	let op := find_binary(spelling);
 	ok( op ≢ null, `binary ${spelling} operator exists` );
 	ok( op.is_binary(), `binary ${spelling} is marked binary` );
-	is( op.get_precedence(), 12, `binary ${spelling} precedence is set` );
+	is( op.get_precedence(), 24, `binary ${spelling} precedence is set` );
 	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
 }
 
@@ -68,7 +68,7 @@ for ( let spelling in [ "+", "-" ] ) {
 	let op := find_binary(spelling);
 	ok( op ≢ null, `binary ${spelling} operator exists` );
 	ok( op.is_binary(), `binary ${spelling} is marked binary` );
-	is( op.get_precedence(), 11, `binary ${spelling} precedence is set` );
+	is( op.get_precedence(), 22, `binary ${spelling} precedence is set` );
 	ok( op.requires_whitespace(), `binary ${spelling} enforces whitespace` );
 	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
 }
@@ -85,11 +85,14 @@ for ( let spelling in [
 	"≶",
 	"<=>",
 	"≷",
+	"∣",
+	"divides",
+	"∤",
 ] ) {
 	let op := find_binary(spelling);
 	ok( op ≢ null, `binary ${spelling} operator exists` );
 	ok( op.is_binary(), `binary ${spelling} is marked binary` );
-	is( op.get_precedence(), 5, `binary ${spelling} precedence is set` );
+	is( op.get_precedence(), 10, `binary ${spelling} precedence is set` );
 	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
 }
 
@@ -109,12 +112,16 @@ ok(
 	find_binary("≷"){f} ≡ find_binary("<=>"){f},
 	"reverse numeric comparison alias shares an implementation callback",
 );
+ok(
+	find_binary("∣"){f} ≡ find_binary("divides"){f},
+	"divides aliases share an implementation callback",
+);
 
 {
 	let op := find_binary("_");
 	ok( op ≢ null, "binary _ operator exists" );
 	ok( op.is_binary(), "binary _ is marked binary" );
-	is( op.get_precedence(), 10, "binary _ precedence is set" );
+	is( op.get_precedence(), 21, "binary _ precedence is set" );
 	ok( op.requires_whitespace(), "binary _ enforces whitespace" );
 	ok( op{f} ≢ null, "binary _ has implementation callback" );
 }
@@ -139,7 +146,7 @@ for ( let spelling in [
 	let op := find_binary(spelling);
 	ok( op ≢ null, `binary ${spelling} operator exists` );
 	ok( op.is_binary(), `binary ${spelling} is marked binary` );
-	is( op.get_precedence(), 5, `binary ${spelling} precedence is set` );
+	is( op.get_precedence(), 10, `binary ${spelling} precedence is set` );
 	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
 }
 
@@ -150,9 +157,13 @@ ok(
 );
 
 for ( let spec in [
-	[ "&", 8 ],
-	[ "^", 7 ],
-	[ "|", 6 ],
+	[ "«", 18 ],
+	[ "<<", 18 ],
+	[ "»", 18 ],
+	[ ">>", 18 ],
+	[ "&", 16 ],
+	[ "^", 14 ],
+	[ "|", 12 ],
 ] ) {
 	let spelling := spec[0];
 	let op := find_binary(spelling);
@@ -162,15 +173,48 @@ for ( let spec in [
 	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
 }
 
+ok(
+	find_binary("«"){f} ≡ find_binary("<<"){f},
+	"left shift aliases share an implementation callback",
+);
+ok(
+	find_binary("»"){f} ≡ find_binary(">>"){f},
+	"right shift aliases share an implementation callback",
+);
+
 for ( let spec in [
-	[ "⋀", 3 ],
-	[ "and", 3 ],
-	[ "⊼", 3 ],
-	[ "nand", 3 ],
-	[ "⊻", 2 ],
-	[ "xor", 2 ],
-	[ "⋁", 1 ],
-	[ "or", 1 ],
+	[ "⋀", 7 ],
+	[ "and", 7 ],
+	[ "⋀?", 7 ],
+	[ "and?", 7 ],
+	[ "⊼", 7 ],
+	[ "nand", 7 ],
+	[ "⊼?", 7 ],
+	[ "nand?", 7 ],
+	[ "⊭", 7 ],
+	[ "butnot", 7 ],
+	[ "⊭?", 7 ],
+	[ "butnot?", 7 ],
+	[ "⊻", 5 ],
+	[ "xor", 5 ],
+	[ "⊻?", 5 ],
+	[ "xor?", 5 ],
+	[ "⊽", 5 ],
+	[ "nor", 5 ],
+	[ "⊽?", 5 ],
+	[ "nor?", 5 ],
+	[ "↔", 5 ],
+	[ "xnor", 5 ],
+	[ "↔?", 5 ],
+	[ "xnor?", 5 ],
+	[ "⊨", 4 ],
+	[ "onlyif", 4 ],
+	[ "⊨?", 4 ],
+	[ "onlyif?", 4 ],
+	[ "⋁", 2 ],
+	[ "or", 2 ],
+	[ "⋁?", 2 ],
+	[ "or?", 2 ],
 ] ) {
 	let spelling := spec[0];
 	let op := find_binary(spelling);
@@ -185,34 +229,98 @@ ok(
 	"logical and aliases share an implementation callback",
 );
 ok(
+	find_binary("⋀?"){f} ≡ find_binary("and?"){f},
+	"value-preserving logical and aliases share an implementation callback",
+);
+ok(
 	find_binary("⊼"){f} ≡ find_binary("nand"){f},
 	"logical nand aliases share an implementation callback",
+);
+ok(
+	find_binary("⊼?"){f} ≡ find_binary("nand?"){f},
+	"value-preserving logical nand aliases share an implementation callback",
+);
+ok(
+	find_binary("⊭"){f} ≡ find_binary("butnot"){f},
+	"logical butnot aliases share an implementation callback",
+);
+ok(
+	find_binary("⊭?"){f} ≡ find_binary("butnot?"){f},
+	"value-preserving logical butnot aliases share an implementation callback",
 );
 ok(
 	find_binary("⊻"){f} ≡ find_binary("xor"){f},
 	"logical xor aliases share an implementation callback",
 );
 ok(
+	find_binary("⊻?"){f} ≡ find_binary("xor?"){f},
+	"value-preserving logical xor aliases share an implementation callback",
+);
+ok(
+	find_binary("⊽"){f} ≡ find_binary("nor"){f},
+	"logical nor aliases share an implementation callback",
+);
+ok(
+	find_binary("⊽?"){f} ≡ find_binary("nor?"){f},
+	"value-preserving logical nor aliases share an implementation callback",
+);
+ok(
+	find_binary("↔"){f} ≡ find_binary("xnor"){f},
+	"logical xnor aliases share an implementation callback",
+);
+ok(
+	find_binary("↔?"){f} ≡ find_binary("xnor?"){f},
+	"value-preserving logical xnor aliases share an implementation callback",
+);
+ok(
+	find_binary("⊨"){f} ≡ find_binary("onlyif"){f},
+	"logical onlyif aliases share an implementation callback",
+);
+ok(
+	find_binary("⊨?"){f} ≡ find_binary("onlyif?"){f},
+	"value-preserving logical onlyif aliases share an implementation callback",
+);
+ok(
+	find_binary("⊨").is_right_associative(),
+	"logical onlyif sign is right-associative",
+);
+ok(
+	find_binary("onlyif").is_right_associative(),
+	"logical onlyif word is right-associative",
+);
+ok(
+	find_binary("⊨?").is_right_associative(),
+	"value-preserving logical onlyif sign is right-associative",
+);
+ok(
+	find_binary("onlyif?").is_right_associative(),
+	"value-preserving logical onlyif word is right-associative",
+);
+ok(
 	find_binary("⋁"){f} ≡ find_binary("or"){f},
 	"logical or aliases share an implementation callback",
 );
+ok(
+	find_binary("⋁?"){f} ≡ find_binary("or?"){f},
+	"value-preserving logical or aliases share an implementation callback",
+);
 
 for ( let spec in [
-	[ "⋃", 9 ],
-	[ "union", 9 ],
-	[ "⋂", 9 ],
-	[ "intersection", 9 ],
-	[ "∖", 9 ],
-	[ "\\", 9 ],
-	[ "∈", 5 ],
-	[ "in", 5 ],
-	[ "∉", 5 ],
-	[ "⊂", 5 ],
-	[ "subsetof", 5 ],
-	[ "⊃", 5 ],
-	[ "supersetof", 5 ],
-	[ "⊂⊃", 5 ],
-	[ "equivalentof", 5 ],
+	[ "⋃", 20 ],
+	[ "union", 20 ],
+	[ "⋂", 20 ],
+	[ "intersection", 20 ],
+	[ "∖", 20 ],
+	[ "\\", 20 ],
+	[ "∈", 10 ],
+	[ "in", 10 ],
+	[ "∉", 10 ],
+	[ "⊂", 10 ],
+	[ "subsetof", 10 ],
+	[ "⊃", 10 ],
+	[ "supersetof", 10 ],
+	[ "⊂⊃", 10 ],
+	[ "equivalentof", 10 ],
 ] ) {
 	let spelling := spec[0];
 	let op := find_binary(spelling);
@@ -253,11 +361,11 @@ ok(
 );
 
 for ( let spec in [
-	[ "≡", 4 ],
-	[ "==", 4 ],
-	[ "≢", 4 ],
-	[ "!=", 4 ],
-	[ "can", 5 ],
+	[ "≡", 8 ],
+	[ "==", 8 ],
+	[ "≢", 8 ],
+	[ "!=", 8 ],
+	[ "can", 10 ],
 ] ) {
 	let spelling := spec[0];
 	let op := find_binary(spelling);
@@ -296,7 +404,7 @@ for ( let spelling in [
 	let op := find_binary("?:");
 	ok( op ≢ null, "Elvis operator exists" );
 	is( op.get_kind(), "ELVIS", "Elvis operator kind is set" );
-	is( op.get_precedence(), 1, "Elvis operator precedence is set" );
+	is( op.get_precedence(), 2, "Elvis operator precedence is set" );
 	ok( op.lexer_should_ignore(), "Elvis is handled by the guarded lexer branch" );
 	is( op{f}, null, "Elvis operator uses parser and evaluator support" );
 }

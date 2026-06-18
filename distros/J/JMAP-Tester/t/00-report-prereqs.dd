@@ -6,7 +6,10 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Test::More' => '0',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0.94',
                                       'Test::Pod' => '1.41'
                                     }
                     },
@@ -30,6 +33,7 @@ do { my $x = {
                                       'Params::Util' => '0',
                                       'Safe::Isa' => '0',
                                       'Sub::Exporter' => '0',
+                                      'Sub::Install' => '0',
                                       'Throwable::Error' => '0',
                                       'URI' => '0',
                                       'URI::Escape' => '0',
@@ -48,9 +52,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'File::Temp' => '0',
                                    'HTTP::Response' => '0',
-                                   'IO::Handle' => '0',
-                                   'IPC::Open3' => '0',
                                    'JSON::Typist' => '0.005',
                                    'LWP::Protocol::PSGI' => '0',
                                    'Plack::Request' => '0',

@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Key::Public;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use parent qw( Crypt::OpenPGP::Key Crypt::OpenPGP::ErrorHandler );
 

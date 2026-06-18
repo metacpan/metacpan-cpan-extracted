@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4224'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
 keywords:
   - sidef
   - 'programming language'
@@ -32,7 +32,7 @@ no_index:
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '26.05'
+    version: '26.06'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -191,9 +191,9 @@ requires:
 resources:
   bugtracker: https://github.com/trizen/sidef/issues
   homepage: https://github.com/trizen/sidef
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef.git
-version: '26.05'
+version: '26.06'
 x_authority: cpan:TRIZEN
 x_contributors:
   - 'Daniel Șuteu'

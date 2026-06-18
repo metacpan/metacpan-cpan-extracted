@@ -12,7 +12,6 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#define NEED_mg_findext
 #include "ppport.h"
 
 #include <signal.h>
@@ -95,14 +94,23 @@ static clockid_t S_get_clockid(pTHX_ SV* clock_name) {
 
 #define NANO_SECONDS 1000000000
 
-static NV timespec_to_nv(struct timespec* time) {
-	return time->tv_sec + time->tv_nsec / (double)NANO_SECONDS;
+static SV* S_timespec_to_sv(pTHX_ struct timespec time) {
+	SV* result = newSV(0);
+	sv_setpvn(newSVrv(result, "Time::Spec"), (char*) &time, sizeof(struct timespec));
+	return result;
 }
+#define timespec_to_sv(time) S_timespec_to_sv(aTHX_ time)
 
-static void nv_to_timespec(NV input, struct timespec* output) {
-	output->tv_sec  = (time_t) floor(input);
-	output->tv_nsec = (long) ((input - output->tv_sec) * NANO_SECONDS);
+static void S_sv_to_timespec(pTHX_ SV* arg, struct timespec* output) {
+	if (SvROK(arg) && sv_derived_from(arg, "Time::Spec")) {
+		*output = *(struct timespec*)SvPV_nolen(SvRV(arg));
+	} else {
+		NV input = SvNV(arg);
+		output->tv_sec  = (time_t) floor(input);
+		output->tv_nsec = (long) ((input - output->tv_sec) * NANO_SECONDS);
+	}
 }
+#define sv_to_timespec(arg, output) S_sv_to_timespec(aTHX_ arg, output)
 
 #if defined(SIGEV_THREAD_ID) && defined(SYS_gettid)
 #include <sys/syscall.h>
@@ -171,7 +179,7 @@ static void S_timer_init_gather(pTHX_ timer_init* result, SV** begin, size_t ite
 			if (strEQ(current, "clock"))
 				result->clockid = SvROK(value) ? SvUV(SvRV(value)) : get_clockid(value);
 			else if (strEQ(current, "value"))
-				nv_to_timespec(SvNV(value), &result->itimer.it_value);
+				sv_to_timespec(value, &result->itimer.it_value);
 			else if (strEQ(current, "ident"))
 				result->ident = SvIV(value);
 			else
@@ -181,7 +189,7 @@ static void S_timer_init_gather(pTHX_ timer_init* result, SV** begin, size_t ite
 			result->signo = (SvIOK(value) || looks_like_number(value)) ? SvIV(value) : whichsig(SvPV_nolen(value));
 		else if (curlen == 8) {
 			if (strEQ(current, "interval"))
-				nv_to_timespec(SvNV(value), &result->itimer.it_interval);
+				sv_to_timespec(value, &result->itimer.it_interval);
 			else if (strEQ(current, "absolute"))
 				result->flags |= TIMER_ABSTIME;
 			else
@@ -231,12 +239,13 @@ static const struct timespec no_time = { 0, 0 };
 
 typedef timer_t POSIX__RT__Timer;
 typedef clockid_t POSIX__RT__Clock;
+typedef struct timespec* Time__Spec;
 
 #define XS_unpack_clockid_t(sv) get_clockid(sv)
 
 MODULE = POSIX::RT::Timer  PACKAGE = POSIX::RT::Timer
 
-PROTOTYPES: DISABLED
+PROTOTYPES: DISABLE
 
 POSIX::RT::Timer new(SV* class, timer_init args, ...)
 	CODE:
@@ -256,9 +265,9 @@ void get_timeout(POSIX::RT::Timer timer)
 	PPCODE:
 		if (timer_gettime(timer, &value) == -1)
 			die_sys("Couldn't get_time: %s");
-		mXPUSHn(timespec_to_nv(&value.it_value));
-		if (GIMME_V == G_ARRAY)
-			mXPUSHn(timespec_to_nv(&value.it_interval));
+		mXPUSHs(timespec_to_sv(value.it_value));
+		if (GIMME_V == G_LIST)
+			mXPUSHs(timespec_to_sv(value.it_interval));
 
 void set_timeout(POSIX::RT::Timer timer, struct timespec new_value, struct timespec new_interval = no_time, bool abstime = FALSE)
 	PREINIT:
@@ -267,9 +276,9 @@ void set_timeout(POSIX::RT::Timer timer, struct timespec new_value, struct times
 		struct itimerspec new_itimer = { new_value, new_interval };
 		if (timer_settime(timer, (abstime ? TIMER_ABSTIME : 0), &new_itimer, &old_itimer) == -1)
 			die_sys("Couldn't set_time: %s");
-		mXPUSHn(timespec_to_nv(&old_itimer.it_value));
-		if (GIMME_V == G_ARRAY)
-			mXPUSHn(timespec_to_nv(&old_itimer.it_interval));
+		mXPUSHs(timespec_to_sv(old_itimer.it_value));
+		if (GIMME_V == G_LIST)
+			mXPUSHs(timespec_to_sv(old_itimer.it_interval));
 
 IV get_overrun(POSIX::RT::Timer timer)
 	CODE:
@@ -284,8 +293,6 @@ void DESTROY(POSIX::RT::Timer timer)
 		timer_delete(timer);
 
 MODULE = POSIX::RT::Timer				PACKAGE = POSIX::RT::Clock
-
-PROTOTYPES: DISABLED
 
 POSIX::RT::Clock new(SV* class, clockid_t clockid = CLOCK_REALTIME)
 	CODE:
@@ -329,10 +336,13 @@ void get_clocks(...)
 			mXPUSHp(clocks[i].key, clocks[i].key_length);
 		PUTBACK;
 
-struct timespec get_time(POSIX::RT::Clock clockid)
+Time::Spec get_time(POSIX::RT::Clock clockid)
 	CODE:
-		if (clock_gettime(clockid, &RETVAL) == -1)
+		RETVAL = safecalloc(1, sizeof(struct timespec));
+		if (clock_gettime(clockid, RETVAL) == -1) {
+			Safefree(RETVAL);
 			die_sys("Couldn't get time: %s");
+		}
 	OUTPUT:
 		RETVAL
 
@@ -341,10 +351,13 @@ void set_time(POSIX::RT::Clock clockid, struct timespec time)
 		if (clock_settime(clockid, &time) == -1)
 			die_sys("Couldn't set time: %s");
 
-struct timespec get_resolution(POSIX::RT::Clock clockid)
+Time::Spec get_resolution(POSIX::RT::Clock clockid)
 	CODE:
-		if (clock_getres(clockid, &RETVAL) == -1)
+		RETVAL = safecalloc(1, sizeof(struct timespec));
+		if (clock_getres(clockid, RETVAL) == -1) {
+			Safefree(RETVAL);
 			die_sys("Couldn't get resolution: %s");
+		}
 	OUTPUT:
 		RETVAL
 
@@ -356,21 +369,20 @@ POSIX::RT::Timer timer(POSIX::RT::Clock clockid, timer_init args, ...)
 		RETVAL
 
 #if defined(_POSIX_CLOCK_SELECTION) && _POSIX_CLOCK_SELECTION >= 0
-struct timespec sleep(POSIX::RT::Clock clockid, struct timespec time, bool abstime = FALSE)
+Time::Spec sleep(POSIX::RT::Clock clockid, struct timespec time, bool abstime = FALSE)
 	PREINIT:
 		struct timespec remain_time;
 		int flags;
 	CODE:
+		RETVAL = safecalloc(1, sizeof(struct timespec));
 		flags = abstime ? TIMER_ABSTIME : 0;
 
 		if (clock_nanosleep(clockid, flags, &time, &remain_time) == EINTR)
-			RETVAL = abstime ? time : remain_time;
-		else 
-			RETVAL = no_time;
+			*RETVAL = abstime ? time : remain_time;
 	OUTPUT:
 		RETVAL
 
-NV sleep_deeply(POSIX::RT::Clock clockid, struct timespec time, bool abstime = FALSE)
+Time::Spec sleep_deeply(POSIX::RT::Clock clockid, struct timespec time, bool abstime = FALSE)
 	PREINIT:
 	CODE:
 		if (!abstime) {
@@ -380,7 +392,7 @@ NV sleep_deeply(POSIX::RT::Clock clockid, struct timespec time, bool abstime = F
 			timespec_add(&time, &current_time);
 		}
 		while (clock_nanosleep(clockid, TIMER_ABSTIME, &time, NULL) == EINTR);
-		RETVAL = 0;
+		RETVAL = safecalloc(1, sizeof(struct timespec));
 	OUTPUT:
 		RETVAL
 

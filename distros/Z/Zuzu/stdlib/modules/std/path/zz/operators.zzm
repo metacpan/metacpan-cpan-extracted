@@ -59,11 +59,11 @@ Returns: C<Boolean>. Tests whether built-in values support a method.
 
 Type: C<Array>. Complete ZZPath operator definition table.
 
-=item C<logical_negation>, C<logical_and>, C<logical_nand>, C<logical_xor>, C<logical_or>
+=item C<logical_negation>, C<logical_and>, C<logical_nand>, C<logical_butnot>, C<logical_xor>, C<logical_nor>, C<logical_xnor>, C<logical_onlyif>, C<logical_or>, C<logical_and_value>, C<logical_nand_value>, C<logical_butnot_value>, C<logical_xor_value>, C<logical_nor_value>, C<logical_xnor_value>, C<logical_onlyif_value>, C<logical_or_value>
 
 Type: C<Function>. Logical operator implementations.
 
-=item C<numeric_power>, C<numeric_multiplication>, C<numeric_division>, C<numeric_modulus>, C<numeric_addition>, C<numeric_subtraction>, C<numeric_equality>, C<numeric_inequality>, C<numeric_less_than>, C<numeric_greater_than>, C<numeric_less_than_or_equal>, C<numeric_greater_than_or_equal>, C<numeric_compare>
+=item C<numeric_power>, C<numeric_multiplication>, C<numeric_division>, C<numeric_modulus>, C<numeric_addition>, C<numeric_subtraction>, C<numeric_left_shift>, C<numeric_right_shift>, C<numeric_equality>, C<numeric_inequality>, C<numeric_less_than>, C<numeric_greater_than>, C<numeric_less_than_or_equal>, C<numeric_greater_than_or_equal>, C<numeric_compare>, C<numeric_divides>, C<numeric_not_divides>
 
 Type: C<Function>. Numeric operator implementations.
 
@@ -121,6 +121,22 @@ const numeric_modulus := function ( op, ev, ast, ctx, left, right ) {
 	const left_val  := op._handle_numeric_operand( ev, ctx, left );
 	const right_val := op._handle_numeric_operand( ev, ctx, right );
 	return op.wrap( left_val mod right_val );
+};
+
+const numeric_left_shift := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const first := left_vals.length() > 0 ? left_vals[0] : null;
+	const left_val := first ≡ null ? null : first.primitive_value();
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val « right_val );
+};
+
+const numeric_right_shift := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const first := left_vals.length() > 0 ? left_vals[0] : null;
+	const left_val := first ≡ null ? null : first.primitive_value();
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val » right_val );
 };
 
 const numeric_addition := function ( op, ev, ast, ctx, left, right ) {
@@ -189,6 +205,18 @@ const numeric_compare := function ( op, ev, ast, ctx, left, right ) {
 	const left_val  := op._handle_numeric_operand( ev, ctx, left );
 	const right_val := op._handle_numeric_operand( ev, ctx, right );
 	return op.wrap( left_val <=> right_val );
+};
+
+const numeric_divides := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( right_val mod left_val = 0 );
+};
+
+const numeric_not_divides := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( right_val mod left_val );
 };
 
 function string_operand ( ev, ctx, expr ) {
@@ -365,12 +393,47 @@ const logical_nand := function ( op, ev, ast, ctx, left, right ) {
 	return op.wrap( ev.truthy( first_eval_value(right_vals) ) ? false : true );
 };
 
+const logical_butnot := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	if ( not ev.truthy( first_eval_value(left_vals) ) ) {
+		return op.wrap(false);
+	}
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	return op.wrap( ev.truthy( first_eval_value(right_vals) ) ? false : true );
+};
+
 const logical_xor := function ( op, ev, ast, ctx, left, right ) {
 	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
 	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
 	const left_truth := ev.truthy( first_eval_value(left_vals) );
 	const right_truth := ev.truthy( first_eval_value(right_vals) );
 	return op.wrap( ( left_truth xor right_truth ) ? true : false );
+};
+
+const logical_nor := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	if ( ev.truthy( first_eval_value(left_vals) ) ) {
+		return op.wrap(false);
+	}
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	return op.wrap( ev.truthy( first_eval_value(right_vals) ) ? false : true );
+};
+
+const logical_xnor := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	const left_truth := ev.truthy( first_eval_value(left_vals) );
+	const right_truth := ev.truthy( first_eval_value(right_vals) );
+	return op.wrap( left_truth ≡ right_truth );
+};
+
+const logical_onlyif := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	if ( not ev.truthy( first_eval_value(left_vals) ) ) {
+		return op.wrap(true);
+	}
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	return op.wrap( ev.truthy( first_eval_value(right_vals) ) ? true : false );
 };
 
 const logical_or := function ( op, ev, ast, ctx, left, right ) {
@@ -380,6 +443,85 @@ const logical_or := function ( op, ev, ast, ctx, left, right ) {
 	}
 	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
 	return op.wrap( ev.truthy( first_eval_value(right_vals) ) ? true : false );
+};
+
+const logical_and_value := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	if ( ev.truthy( first_eval_value(left_vals) ) ) {
+		return ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	}
+	return left_vals;
+};
+
+const logical_nand_value := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const left_truth := ev.truthy( first_eval_value(left_vals) );
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	const right_truth := ev.truthy( first_eval_value(right_vals) );
+	if ( left_truth and right_truth ) {
+		return op.wrap(false);
+	}
+	return right_vals if not left_truth and right_truth;
+	return op.wrap(true);
+};
+
+const logical_butnot_value := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const left_truth := ev.truthy( first_eval_value(left_vals) );
+	return left_vals unless left_truth;
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	return ev.truthy( first_eval_value(right_vals) )
+		? op.wrap(false)
+		: left_vals;
+};
+
+const logical_xor_value := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	const left_truth := ev.truthy( first_eval_value(left_vals) );
+	const right_truth := ev.truthy( first_eval_value(right_vals) );
+	if ( left_truth xor right_truth ) {
+		return left_truth ? left_vals : right_vals;
+	}
+	return op.wrap(false);
+};
+
+const logical_nor_value := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	const left_truth := ev.truthy( first_eval_value(left_vals) );
+	const right_truth := ev.truthy( first_eval_value(right_vals) );
+	return op.wrap(false) if left_truth and right_truth;
+	return right_vals if left_truth and not right_truth;
+	return left_vals if not left_truth and right_truth;
+	return op.wrap(true);
+};
+
+const logical_xnor_value := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	const left_truth := ev.truthy( first_eval_value(left_vals) );
+	const right_truth := ev.truthy( first_eval_value(right_vals) );
+	if ( left_truth ≡ right_truth ) {
+		return left_truth ? right_vals : op.wrap(true);
+	}
+	return left_truth ? right_vals : left_vals;
+};
+
+const logical_onlyif_value := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	if ( not ev.truthy( first_eval_value(left_vals) ) ) {
+		return op.wrap(true);
+	}
+	return ev.eval_expr( right, ev.nested_ctx( ctx ) );
+};
+
+const logical_or_value := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	if ( ev.truthy( first_eval_value(left_vals) ) ) {
+		return left_vals;
+	}
+	return ev.eval_expr( right, ev.nested_ctx( ctx ) );
 };
 
 const set_union := function ( op, ev, ast, ctx, left, right ) {
@@ -496,7 +638,7 @@ const STANDARD_OPERATORS := [
 	new Operator(
 		spelling: "?:",
 		kind: "ELVIS",
-		precedence: 1,
+		precedence: 2,
 		lex_ignore: true,
 	),
 
@@ -504,7 +646,7 @@ const STANDARD_OPERATORS := [
 		spelling: "+",
 		kind: "UPLUS",
 		unary: true,
-		precedence: 20,
+		precedence: 40,
 		f: function ( op, ev, ast, ctx, expr ) {
 			const value := op._handle_numeric_operand( ev, ctx, expr );
 			return op.wrap( +value );
@@ -515,7 +657,7 @@ const STANDARD_OPERATORS := [
 		spelling: "-",
 		kind: "UMINUS",
 		unary: true,
-		precedence: 20,
+		precedence: 40,
 		f: function ( op, ev, ast, ctx, expr ) {
 			const value := op._handle_numeric_operand( ev, ctx, expr );
 			return op.wrap( -value );
@@ -526,7 +668,7 @@ const STANDARD_OPERATORS := [
 		spelling: "√",
 		kind: "SQRT",
 		unary: true,
-		precedence: 20,
+		precedence: 40,
 		f: function ( op, ev, ast, ctx, expr ) {
 			const value := op._handle_numeric_operand( ev, ctx, expr );
 			return op.wrap( sqrt value );
@@ -537,7 +679,7 @@ const STANDARD_OPERATORS := [
 		spelling: "!",
 		kind: "NOT",
 		unary: true,
-		precedence: 20,
+		precedence: 40,
 		f: logical_negation,
 	),
 
@@ -545,7 +687,7 @@ const STANDARD_OPERATORS := [
 		spelling: "¬",
 		kind: "NOTSYM",
 		unary: true,
-		precedence: 20,
+		precedence: 40,
 		f: logical_negation,
 	),
 
@@ -554,14 +696,14 @@ const STANDARD_OPERATORS := [
 		kind: "POW",
 		require_ws: true,
 		right_assoc: true,
-		precedence: 13,
+		precedence: 26,
 		f: numeric_power,
 	),
 
 	new Operator(
 		spelling: "×",
 		kind: "TIMES_SIGN",
-		precedence: 12,
+		precedence: 24,
 		f: numeric_multiplication,
 	),
 
@@ -569,7 +711,7 @@ const STANDARD_OPERATORS := [
 		spelling: "*",
 		kind: "TIMES",
 		require_ws: true,
-		precedence: 12,
+		precedence: 24,
 		lex_ignore: true,
 		alias: "STAR",
 		f: numeric_multiplication,
@@ -578,7 +720,7 @@ const STANDARD_OPERATORS := [
 	new Operator(
 		spelling: "÷",
 		kind: "DIVIDE_SIGN",
-		precedence: 12,
+		precedence: 24,
 		f: numeric_division,
 	),
 
@@ -586,7 +728,7 @@ const STANDARD_OPERATORS := [
 		spelling: "/",
 		kind: "DIVIDE",
 		require_ws: true,
-		precedence: 12,
+		precedence: 24,
 		lex_ignore: true,
 		alias: "SLASH",
 		f: numeric_division,
@@ -595,7 +737,7 @@ const STANDARD_OPERATORS := [
 	new Operator(
 		spelling: "mod",
 		kind: "MOD",
-		precedence: 12,
+		precedence: 24,
 		f: numeric_modulus,
 	),
 
@@ -603,7 +745,7 @@ const STANDARD_OPERATORS := [
 		spelling: "+",
 		kind: "PLUS",
 		require_ws: true,
-		precedence: 11,
+		precedence: 22,
 		f: numeric_addition,
 	),
 
@@ -611,316 +753,537 @@ const STANDARD_OPERATORS := [
 		spelling: "-",
 		kind: "MINUS",
 		require_ws: true,
-		precedence: 11,
+		precedence: 22,
 		f: numeric_subtraction,
 	),
 
 	new Operator(
 		spelling: "=",
 		kind: "EQ",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_equality,
 	),
 
 	new Operator(
 		spelling: "≠",
 		kind: "NE",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_inequality,
 	),
 
 	new Operator(
 		spelling: "<",
 		kind: "LT",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_less_than,
 	),
 
 	new Operator(
 		spelling: ">",
 		kind: "GT",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_greater_than,
 	),
 
 	new Operator(
 		spelling: "≤",
 		kind: "LE_SIGN",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_less_than_or_equal,
 	),
 
 	new Operator(
 		spelling: "<=",
 		kind: "LE",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_less_than_or_equal,
 	),
 
 	new Operator(
 		spelling: "≥",
 		kind: "GE_SIGN",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_greater_than_or_equal,
 	),
 
 	new Operator(
 		spelling: ">=",
 		kind: "GE",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_greater_than_or_equal,
 	),
 
 	new Operator(
 		spelling: "≶",
 		kind: "CMP_SIGN",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_compare,
 	),
 
 	new Operator(
 		spelling: "<=>",
 		kind: "CMP",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_compare,
 	),
 
 	new Operator(
 		spelling: "≷",
 		kind: "CMP_REV_SIGN",
-		precedence: 5,
+		precedence: 10,
 		f: numeric_compare,
+	),
+
+	new Operator(
+		spelling: "∣",
+		kind: "DIVIDES_SIGN",
+		precedence: 10,
+		f: numeric_divides,
+	),
+
+	new Operator(
+		spelling: "divides",
+		kind: "DIVIDES",
+		precedence: 10,
+		f: numeric_divides,
+	),
+
+	new Operator(
+		spelling: "∤",
+		kind: "NOT_DIVIDES_SIGN",
+		precedence: 10,
+		f: numeric_not_divides,
 	),
 
 	new Operator(
 		spelling: "_",
 		kind: "CONCAT",
 		require_ws: true,
-		precedence: 10,
+		precedence: 21,
 		f: string_concatenation,
 	),
 
 	new Operator(
 		spelling: "eq",
 		kind: "STR_EQ",
-		precedence: 5,
+		precedence: 10,
 		f: string_equality,
 	),
 
 	new Operator(
 		spelling: "ne",
 		kind: "STR_NE",
-		precedence: 5,
+		precedence: 10,
 		f: string_inequality,
 	),
 
 	new Operator(
 		spelling: "gt",
 		kind: "STR_GT",
-		precedence: 5,
+		precedence: 10,
 		f: string_greater_than,
 	),
 
 	new Operator(
 		spelling: "ge",
 		kind: "STR_GE",
-		precedence: 5,
+		precedence: 10,
 		f: string_greater_than_or_equal,
 	),
 
 	new Operator(
 		spelling: "lt",
 		kind: "STR_LT",
-		precedence: 5,
+		precedence: 10,
 		f: string_less_than,
 	),
 
 	new Operator(
 		spelling: "le",
 		kind: "STR_LE",
-		precedence: 5,
+		precedence: 10,
 		f: string_less_than_or_equal,
 	),
 
 	new Operator(
 		spelling: "cmp",
 		kind: "STR_CMP",
-		precedence: 5,
+		precedence: 10,
 		f: string_compare,
 	),
 
 	new Operator(
 		spelling: "eqi",
 		kind: "STR_EQI",
-		precedence: 5,
+		precedence: 10,
 		f: string_equality_insensitive,
 	),
 
 	new Operator(
 		spelling: "nei",
 		kind: "STR_NEI",
-		precedence: 5,
+		precedence: 10,
 		f: string_inequality_insensitive,
 	),
 
 	new Operator(
 		spelling: "gti",
 		kind: "STR_GTI",
-		precedence: 5,
+		precedence: 10,
 		f: string_greater_than_insensitive,
 	),
 
 	new Operator(
 		spelling: "gei",
 		kind: "STR_GEI",
-		precedence: 5,
+		precedence: 10,
 		f: string_greater_than_or_equal_insensitive,
 	),
 
 	new Operator(
 		spelling: "lti",
 		kind: "STR_LTI",
-		precedence: 5,
+		precedence: 10,
 		f: string_less_than_insensitive,
 	),
 
 	new Operator(
 		spelling: "lei",
 		kind: "STR_LEI",
-		precedence: 5,
+		precedence: 10,
 		f: string_less_than_or_equal_insensitive,
 	),
 
 	new Operator(
 		spelling: "cmpi",
 		kind: "STR_CMPI",
-		precedence: 5,
+		precedence: 10,
 		f: string_compare_insensitive,
 	),
 
 	new Operator(
 		spelling: "~",
 		kind: "REGEXP_MATCH",
-		precedence: 5,
+		precedence: 10,
 		f: regexp_match,
+	),
+
+	new Operator(
+		spelling: "«",
+		kind: "LSHIFT_SIGN",
+		precedence: 18,
+		f: numeric_left_shift,
+	),
+
+	new Operator(
+		spelling: "<<",
+		kind: "LSHIFT",
+		precedence: 18,
+		f: numeric_left_shift,
+	),
+
+	new Operator(
+		spelling: "»",
+		kind: "RSHIFT_SIGN",
+		precedence: 18,
+		f: numeric_right_shift,
+	),
+
+	new Operator(
+		spelling: ">>",
+		kind: "RSHIFT",
+		precedence: 18,
+		f: numeric_right_shift,
 	),
 
 	new Operator(
 		spelling: "&",
 		kind: "BAND",
-		precedence: 8,
+		precedence: 16,
 		f: bitwise_and,
 	),
 
 	new Operator(
 		spelling: "^",
 		kind: "BXOR",
-		precedence: 7,
+		precedence: 14,
 		f: bitwise_xor,
 	),
 
 	new Operator(
 		spelling: "|",
 		kind: "BOR",
-		precedence: 6,
+		precedence: 12,
 		f: bitwise_or,
 	),
 
 	new Operator(
 		spelling: "⋀",
 		kind: "LAND_SIGN",
-		precedence: 3,
+		precedence: 7,
 		f: logical_and,
 	),
 
 	new Operator(
 		spelling: "and",
 		kind: "LAND",
-		precedence: 3,
+		precedence: 7,
 		f: logical_and,
+	),
+
+	new Operator(
+		spelling: "⋀?",
+		kind: "LAND_VALUE_SIGN",
+		precedence: 7,
+		f: logical_and_value,
+	),
+
+	new Operator(
+		spelling: "and?",
+		kind: "LAND_VALUE",
+		precedence: 7,
+		f: logical_and_value,
 	),
 
 	new Operator(
 		spelling: "⊼",
 		kind: "LNAND_SIGN",
-		precedence: 3,
+		precedence: 7,
 		f: logical_nand,
 	),
 
 	new Operator(
 		spelling: "nand",
 		kind: "LNAND",
-		precedence: 3,
+		precedence: 7,
 		f: logical_nand,
+	),
+
+	new Operator(
+		spelling: "⊼?",
+		kind: "LNAND_VALUE_SIGN",
+		precedence: 7,
+		f: logical_nand_value,
+	),
+
+	new Operator(
+		spelling: "nand?",
+		kind: "LNAND_VALUE",
+		precedence: 7,
+		f: logical_nand_value,
+	),
+
+	new Operator(
+		spelling: "⊭",
+		kind: "LBUTNOT_SIGN",
+		precedence: 7,
+		f: logical_butnot,
+	),
+
+	new Operator(
+		spelling: "butnot",
+		kind: "LBUTNOT",
+		precedence: 7,
+		f: logical_butnot,
+	),
+
+	new Operator(
+		spelling: "⊭?",
+		kind: "LBUTNOT_VALUE_SIGN",
+		precedence: 7,
+		f: logical_butnot_value,
+	),
+
+	new Operator(
+		spelling: "butnot?",
+		kind: "LBUTNOT_VALUE",
+		precedence: 7,
+		f: logical_butnot_value,
 	),
 
 	new Operator(
 		spelling: "⊻",
 		kind: "LXOR_SIGN",
-		precedence: 2,
+		precedence: 5,
 		f: logical_xor,
 	),
 
 	new Operator(
 		spelling: "xor",
 		kind: "LXOR",
-		precedence: 2,
+		precedence: 5,
 		f: logical_xor,
+	),
+
+	new Operator(
+		spelling: "⊻?",
+		kind: "LXOR_VALUE_SIGN",
+		precedence: 5,
+		f: logical_xor_value,
+	),
+
+	new Operator(
+		spelling: "xor?",
+		kind: "LXOR_VALUE",
+		precedence: 5,
+		f: logical_xor_value,
+	),
+
+	new Operator(
+		spelling: "⊽",
+		kind: "LNOR_SIGN",
+		precedence: 5,
+		f: logical_nor,
+	),
+
+	new Operator(
+		spelling: "nor",
+		kind: "LNOR",
+		precedence: 5,
+		f: logical_nor,
+	),
+
+	new Operator(
+		spelling: "⊽?",
+		kind: "LNOR_VALUE_SIGN",
+		precedence: 5,
+		f: logical_nor_value,
+	),
+
+	new Operator(
+		spelling: "nor?",
+		kind: "LNOR_VALUE",
+		precedence: 5,
+		f: logical_nor_value,
+	),
+
+	new Operator(
+		spelling: "↔",
+		kind: "LXNOR_SIGN",
+		precedence: 5,
+		f: logical_xnor,
+	),
+
+	new Operator(
+		spelling: "xnor",
+		kind: "LXNOR",
+		precedence: 5,
+		f: logical_xnor,
+	),
+
+	new Operator(
+		spelling: "↔?",
+		kind: "LXNOR_VALUE_SIGN",
+		precedence: 5,
+		f: logical_xnor_value,
+	),
+
+	new Operator(
+		spelling: "xnor?",
+		kind: "LXNOR_VALUE",
+		precedence: 5,
+		f: logical_xnor_value,
+	),
+
+	new Operator(
+		spelling: "⊨",
+		kind: "LONLYIF_SIGN",
+		precedence: 4,
+		right_assoc: true,
+		f: logical_onlyif,
+	),
+
+	new Operator(
+		spelling: "onlyif",
+		kind: "LONLYIF",
+		precedence: 4,
+		right_assoc: true,
+		f: logical_onlyif,
+	),
+
+	new Operator(
+		spelling: "⊨?",
+		kind: "LONLYIF_VALUE_SIGN",
+		precedence: 4,
+		right_assoc: true,
+		f: logical_onlyif_value,
+	),
+
+	new Operator(
+		spelling: "onlyif?",
+		kind: "LONLYIF_VALUE",
+		precedence: 4,
+		right_assoc: true,
+		f: logical_onlyif_value,
 	),
 
 	new Operator(
 		spelling: "⋁",
 		kind: "LOR_SIGN",
-		precedence: 1,
+		precedence: 2,
 		f: logical_or,
 	),
 
 	new Operator(
 		spelling: "or",
 		kind: "LOR",
-		precedence: 1,
+		precedence: 2,
 		f: logical_or,
+	),
+
+	new Operator(
+		spelling: "⋁?",
+		kind: "LOR_VALUE_SIGN",
+		precedence: 2,
+		f: logical_or_value,
+	),
+
+	new Operator(
+		spelling: "or?",
+		kind: "LOR_VALUE",
+		precedence: 2,
+		f: logical_or_value,
 	),
 
 	new Operator(
 		spelling: "⋃",
 		kind: "SET_UNION_SIGN",
-		precedence: 9,
+		precedence: 20,
 		f: set_union,
 	),
 
 	new Operator(
 		spelling: "union",
 		kind: "SET_UNION",
-		precedence: 9,
+		precedence: 20,
 		f: set_union,
 	),
 
 	new Operator(
 		spelling: "⋂",
 		kind: "SET_INTERSECTION_SIGN",
-		precedence: 9,
+		precedence: 20,
 		f: set_intersection,
 	),
 
 	new Operator(
 		spelling: "intersection",
 		kind: "SET_INTERSECTION",
-		precedence: 9,
+		precedence: 20,
 		f: set_intersection,
 	),
 
 	new Operator(
 		spelling: "∖",
 		kind: "SET_DIFFERENCE_SIGN",
-		precedence: 9,
+		precedence: 20,
 		f: set_difference,
 	),
 
 	new Operator(
 		spelling: "\\",
 		kind: "SET_DIFFERENCE",
-		precedence: 9,
+		precedence: 20,
 		require_ws: true,
 		f: set_difference,
 	),
@@ -928,98 +1291,98 @@ const STANDARD_OPERATORS := [
 	new Operator(
 		spelling: "∈",
 		kind: "MEMBER_SIGN",
-		precedence: 5,
+		precedence: 10,
 		f: collection_membership,
 	),
 
 	new Operator(
 		spelling: "in",
 		kind: "MEMBER",
-		precedence: 5,
+		precedence: 10,
 		f: collection_membership,
 	),
 
 	new Operator(
 		spelling: "∉",
 		kind: "NOT_MEMBER_SIGN",
-		precedence: 5,
+		precedence: 10,
 		f: collection_non_membership,
 	),
 
 	new Operator(
 		spelling: "⊂",
 		kind: "SUBSETOF_SIGN",
-		precedence: 5,
+		precedence: 10,
 		f: set_subsetof,
 	),
 
 	new Operator(
 		spelling: "subsetof",
 		kind: "SUBSETOF",
-		precedence: 5,
+		precedence: 10,
 		f: set_subsetof,
 	),
 
 	new Operator(
 		spelling: "⊃",
 		kind: "SUPERSETOF_SIGN",
-		precedence: 5,
+		precedence: 10,
 		f: set_supersetof,
 	),
 
 	new Operator(
 		spelling: "supersetof",
 		kind: "SUPERSETOF",
-		precedence: 5,
+		precedence: 10,
 		f: set_supersetof,
 	),
 
 	new Operator(
 		spelling: "⊂⊃",
 		kind: "EQUIVALENTOF_SIGN",
-		precedence: 5,
+		precedence: 10,
 		f: set_equivalentof,
 	),
 
 	new Operator(
 		spelling: "equivalentof",
 		kind: "EQUIVALENTOF",
-		precedence: 5,
+		precedence: 10,
 		f: set_equivalentof,
 	),
 
 	new Operator(
 		spelling: "≡",
 		kind: "TYPE_EQ_SIGN",
-		precedence: 4,
+		precedence: 8,
 		f: type_aware_equality,
 	),
 
 	new Operator(
 		spelling: "==",
 		kind: "TYPE_EQ",
-		precedence: 4,
+		precedence: 8,
 		f: type_aware_equality,
 	),
 
 	new Operator(
 		spelling: "≢",
 		kind: "TYPE_NE_SIGN",
-		precedence: 4,
+		precedence: 8,
 		f: type_aware_inequality,
 	),
 
 	new Operator(
 		spelling: "!=",
 		kind: "TYPE_NE",
-		precedence: 4,
+		precedence: 8,
 		f: type_aware_inequality,
 	),
 
 	new Operator(
 		spelling: "can",
 		kind: "CAN",
-		precedence: 5,
+		precedence: 10,
 		f: object_can,
 	),
 
@@ -1027,7 +1390,7 @@ const STANDARD_OPERATORS := [
 		spelling: "~",
 		kind: "BNOT",
 		unary: true,
-		precedence: 20,
+		precedence: 40,
 		f: function ( op, ev, ast, ctx, expr ) {
 			const value := op._handle_numeric_operand( ev, ctx, expr );
 			return op.wrap( ~value );

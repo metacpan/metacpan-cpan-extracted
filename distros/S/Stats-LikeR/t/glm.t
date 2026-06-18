@@ -33,19 +33,17 @@ ok($res->{converged}, 'Logistic model converged successfully via IRLS');
 is($res->{family}, 'binomial', 'Family parameter tracked properly');
 
 # --- Test Case 3: Car Names Mapping (Row Names) ---
-#my $mtcars = {
-#  'row.names' => ['Mazda RX4', 'Mazda RX4 Wag', 'Datsun 710'],
-#  'am'        => [1, 1, 1],
-#  'wt'        => [2.620, 2.875, 2.320],
-#  'hp'        => [110, 110, 93]
-#};
+my $mtcars = {
+  'row.names' => ['Mazda RX4', 'Mazda RX4 Wag', 'Datsun 710'],
+  'am'        => [1, 1, 1],
+  'wt'        => [2.620, 2.875, 2.320],
+  'hp'        => [110, 110, 93]
+};
     
-#$res = glm(formula => 'am ~ wt + hp', data => $mtcars, family => 'gaussian');
+$res = glm(formula => 'am ~ wt + hp', data => $mtcars, family => 'gaussian');
 
-#use DDP;
-#p $res;
-#ok(exists $res->{'deviance.resid'}{'Mazda RX4'}, 'Residual keys map to car names, not integers');
-#ok(exists $res->{'fitted.values'}{'Datsun 710'}, "Fitted value keys map to car names, not integers");
+ok(exists $res->{'deviance.resid'}{'Mazda RX4'}, 'Residual keys map to car names, not integers');
+ok(exists $res->{'fitted.values'}{'Datsun 710'}, 'Fitted value keys map to car names, not integers');
 #=c
 # --- Test Case 4: Exception Handling & Leak Avoidance ---
 my $invalid_binomial_data = {

@@ -1,5 +1,9 @@
 Revision history for JSON-Any
 
+1.41      2026-06-18 03:44:01Z
+    - fix test error with allow_non-ref and Cpanel::JSON::XS >= 4.42
+      (RT#179192)
+
 1.40      2023-09-09 21:59:01Z
     - fix issues on perl 5.39.1 with 'import' subs
     - added support for JSON v3, v4, JSON::XS v4

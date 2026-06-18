@@ -1,3 +1,12 @@
+Wed Jun 17 15:12:01 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.0]:
+	* release-notes/release-notes-1.2.0.md: new
+	* release-notes.md: updated
+	* VERSION: bump
+	* lib/Amazon/S3/Lite.pm.in
+	(remove_bucket_notification_configuration): new
+
 Fri Jun 12 15:12:30 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.1.5]:

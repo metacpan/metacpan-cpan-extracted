@@ -1,10 +1,14 @@
 use v5.20.0;
 
-package JMAP::Tester::Result::Failure 0.109;
+package JMAP::Tester::Result::Failure 0.110;
 # ABSTRACT: what you get when your JMAP request utterly fails
 
 use Moo;
 with 'JMAP::Tester::Role::HTTPResult';
+
+use experimental 'signatures';
+
+use Sub::Install ();
 
 use namespace::clean;
 
@@ -26,6 +30,32 @@ sub is_success { 0 }
 
 has ident => (is => 'ro', predicate => 'has_ident');
 
+for my $method (qw(
+  sentence
+  sentences
+  single_sentence
+  sentence_named
+  assert_n_sentences
+  paragraph
+  paragraphs
+  assert_n_paragraphs
+  paragraph_by_client_id
+  as_triples
+  as_stripped_triples
+  as_pairs
+  as_stripped_pairs
+
+  wrapper_properties
+)) {
+  Sub::Install::install_sub({
+    into => __PACKAGE__,
+    as   => $method,
+    code => sub ($self, @) {
+      $self->abort("tried to call Response method $method on a Failure", [ Result => $self ]);
+    }
+  });
+}
+
 1;
 
 __END__
@@ -40,7 +70,7 @@ JMAP::Tester::Result::Failure - what you get when your JMAP request utterly fail
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 OVERVIEW
 

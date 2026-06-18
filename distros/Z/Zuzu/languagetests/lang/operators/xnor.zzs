@@ -1,0 +1,14 @@
+from test/more import *;
+
+is( false xnor false, true, "xnor false false" );
+is( false xnor true, false, "xnor false true" );
+is( true xnor false, false, "xnor true false" );
+is( true xnor true, true, "xnor true true" );
+is( false ↔ false, true, "↔ false false" );
+is( false ↔ true, false, "↔ false true" );
+is( true ↔ false, false, "↔ true false" );
+is( true ↔ true, true, "↔ true true" );
+is( typeof( true xnor true ), "Boolean", "xnor returns Boolean" );
+is( typeof( true ↔ true ), "Boolean", "↔ returns Boolean" );
+
+done_testing();

@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Key::Secret::DSA;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Crypt::DSA::GMP::Key;
 use Crypt::OpenPGP::Key::Public::DSA;

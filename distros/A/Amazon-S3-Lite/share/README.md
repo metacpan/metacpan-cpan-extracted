@@ -18,6 +18,7 @@
   * [create\_bucket](#create\bucket)
   * [put\_bucket\_notification\_configuration](#put\bucket\notification\configuration)
   * [get\_bucket\_notification\_configuration](#get\bucket\notification\configuration)
+  * [remove\_bucket\_notification\_configuration](#remove\bucket\notification\configuration)
 * [ERROR HANDLING](#error-handling)
 * [DEPENDENCIES](#dependencies)
 * [LAMBDA USAGE NOTES](#lambda-usage-notes)
@@ -604,6 +605,16 @@ Returns an arrayref of configuration hashrefs, each containing:
 
 Returns an empty arrayref if no notification configuration is set.
 Croaks on failure.
+
+## remove\_bucket\_notification\_configuration
+
+    $s3->remove_bucket_notification_configuration($bucket);
+
+Removes all notification configurations from `$bucket` by sending an
+empty `NotificationConfiguration` document to S3. After this call S3
+will no longer deliver any events for the bucket.
+
+Returns true on success. Croaks on failure.
 
 # ERROR HANDLING
 

@@ -1,5 +1,5 @@
 use v5.20.0;
-package JMAP::Tester::Response::Sentence 0.109;
+package JMAP::Tester::Response::Sentence 0.110;
 # ABSTRACT: a single triple within a JMAP response
 
 use Moo;
@@ -84,7 +84,7 @@ sub as_stripped_pair ($self) {
 
 sub as_set ($self) {
   unless ($self->name =~ m{/set$}) {
-    return $self->sentence_broker->abort(
+    return $self->sentence_broker->response->abort(
       sprintf(qq{tried to call ->as_set on sentence named "%s"}, $self->name)
     );
   }
@@ -113,7 +113,7 @@ sub assert_named ($self, $name) {
 
   return $self if $self->name eq $name;
 
-  $self->sentence_broker->abort(
+  $self->sentence_broker->response->abort(
     sprintf qq{expected sentence named "%s" but got "%s"}, $name, $self->name
   );
 }
@@ -136,7 +136,7 @@ JMAP::Tester::Response::Sentence - a single triple within a JMAP response
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 OVERVIEW
 

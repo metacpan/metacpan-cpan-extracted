@@ -2,10 +2,10 @@
    "abstract" : "DateTime object in the Julian calendar",
    "author" : [
       "Eugene van der Pijll <pijll@gmx.net>",
-      "Thomas R. Wyant, III <wyant at cpan dot org>"
+      "Thomas R. Wyant, III <harryfmudd at comcast dot net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -45,14 +45,14 @@
    "provides" : {
       "DateTime::Calendar::Julian" : {
          "file" : "lib/DateTime/Calendar/Julian.pm",
-         "version" : "0.107"
+         "version" : "0.108"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Julian"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Julian/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -63,6 +63,6 @@
          "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Julian"
       }
    },
-   "version" : "0.107",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.108",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

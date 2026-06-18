@@ -1,4 +1,5 @@
 from test/more import *;
+from std/eval import eval;
 
 class Adder {
 
@@ -10,4 +11,84 @@ class Adder {
 let method_name := "plus";
 let obj := new Adder();
 is( obj.(method_name)(5), 15, "dynamic member call syntax .(expr)(...) works" );
+
+class Recorder {
+	let name;
+	let value;
+
+	method set_value ( ... PairList opts ) {
+		self{value} := self{name} _ ":" _ opts.get( "set", "missing" );
+		return self{value};
+	}
+
+	method record ( String label, ... PairList opts ) {
+		self{value} := self{name} _ ":" _ label _ ":"
+			_ opts.get( "set", "missing" );
+		return self{value};
+	}
+
+	method get_value () {
+		return self{value};
+	}
+}
+
+let left := new Recorder( name: "left" );
+let right := new Recorder( name: "right" );
+let setter_name := "set_value";
+let record_method := right{"record"};
+let setter_method := right{"set_value"};
+
+is(
+	left.(setter_name)( set: "name" ),
+	"left:name",
+	"dynamic method names accept named arguments",
+);
+is(
+	left.(setter_name)( ...{{ set: "spread" }} ),
+	"left:spread",
+	"dynamic method names accept PairList spread",
+);
+is(
+	left.(record_method)( "method", set: "value" ),
+	"left:method:value",
+	"dynamic Method values use the syntactic receiver",
+);
+is(
+	right.get_value(),
+	null,
+	"dynamic Method values ignore the original bound receiver",
+);
+is(
+	left.(setter_method)( ...{{ set: "method-spread" }} ),
+	"left:method-spread",
+	"dynamic Method values accept PairList spread",
+);
+
+let make_count := 0;
+function make_left () {
+	make_count++;
+	return left;
+}
+
+is(
+	make_left().(setter_name)( set: "once" ),
+	"left:once",
+	"dynamic member calls accept expression receivers",
+);
+is(
+	make_count,
+	1,
+	"dynamic member calls evaluate the receiver once",
+);
+is(
+	eval("""left.(setter_name)( set: "eval-name" );"""),
+	"left:eval-name",
+	"eval preserves dynamic method names with named arguments",
+);
+is(
+	eval("""left.(record_method)( "eval-method", set: "value" );"""),
+	"left:eval-method:value",
+	"eval preserves dynamic Method values with named arguments",
+);
+
 done_testing();

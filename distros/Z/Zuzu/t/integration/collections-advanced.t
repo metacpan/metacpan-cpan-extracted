@@ -121,7 +121,11 @@ SRC
 is eval_src(<<'SRC'), 3, 'set to_Array and contains helpers work';
 let s := << 1, 2, 3 >>;
 let arr := s.to_Array();
-arr.contains(2) and arr.length();
+let found := 0;
+if ( arr.contains(2) ) {
+	found := arr.length();
+}
+found;
 SRC
 
 is eval_src(<<'SRC'), 0, 'array contains uses type-aware equality';

@@ -1,0 +1,13 @@
+from test/more import *;
+
+is( 7 and? "right", "right", "and? returns right when left is truthy" );
+is( 0 and? "right", 0, "and? returns left when left is falsey" );
+is( "" ⋀? 9, "", "⋀? returns falsey left value" );
+is( typeof( true and? false ), "Boolean", "and? can return Boolean right value" );
+
+is( "left" or? "right", "left", "or? returns left when left is truthy" );
+is( 0 or? "right", "right", "or? returns right when left is falsey" );
+is( null ⋁? 8, 8, "⋁? returns right when left is null" );
+is( typeof( false or? true ), "Boolean", "or? can return Boolean right value" );
+
+done_testing();

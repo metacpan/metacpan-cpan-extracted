@@ -1,0 +1,14 @@
+from test/more import *;
+
+is( false nand false, true, "nand false false" );
+is( false nand true, true, "nand false true" );
+is( true nand false, true, "nand true false" );
+is( true nand true, false, "nand true true" );
+is( false ⊼ false, true, "⊼ false false" );
+is( false ⊼ true, true, "⊼ false true" );
+is( true ⊼ false, true, "⊼ true false" );
+is( true ⊼ true, false, "⊼ true true" );
+is( typeof( true nand true ), "Boolean", "nand returns Boolean" );
+is( typeof( true ⊼ true ), "Boolean", "⊼ returns Boolean" );
+
+done_testing();

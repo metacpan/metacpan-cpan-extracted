@@ -1,15 +1,21 @@
 from test/more import *;
-is( not true, 0, "keyword not works" );
-is( !0, 1, "! unary alias works" );
-is( ¬false, 1, "¬ unary alias works" );
+is( not true, false, "keyword not works" );
+is( !0, true, "! unary alias works" );
+is( ¬false, true, "¬ unary alias works" );
+is( ⊤, true, "⊤ literal works" );
+is( ⊥, false, "⊥ literal works" );
 ok( true and true, "and works" );
 ok( not( true ⋀ false ), "⋀ works" );
-is( false or true, 1, "or works" );
-is( false ⋁ true, 1, "⋁ works" );
-is( true xor false, 1, "xor works" );
-is( true ⊻ true, 0, "⊻ works" );
-is( true nand true, 0, "nand works" );
-is( true ⊼ false, 1, "⊼ works" );
+is( false or true, true, "or works" );
+is( false ⋁ true, true, "⋁ works" );
+is( true xor false, true, "xor works" );
+is( true ⊻ true, false, "⊻ works" );
+is( true nand true, false, "nand works" );
+is( true ⊼ false, true, "⊼ works" );
+is( typeof( true and 5 ), "Boolean", "and returns Boolean" );
+is( typeof( false or 5 ), "Boolean", "or returns Boolean" );
+is( typeof( true xor 0 ), "Boolean", "xor returns Boolean" );
+is( typeof( true nand 5 ), "Boolean", "nand returns Boolean" );
 
 class Numeric {
 

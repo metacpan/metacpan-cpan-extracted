@@ -1,7 +1,7 @@
 package Crypt::OpenPGP::Key::Public::DSA;
 use strict;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Crypt::DSA::GMP::Key;
 use parent qw( Crypt::OpenPGP::Key::Public Crypt::OpenPGP::ErrorHandler );

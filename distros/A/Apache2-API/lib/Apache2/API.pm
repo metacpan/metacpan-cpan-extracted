@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/m
-## Version v0.5.3
+## Version v0.5.4
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2026/04/15
+## Modified 2026/06/17
 ## All rights reserved
 ## 
 ## 
@@ -41,7 +41,7 @@ BEGIN
     use Scalar::Util ();
     our @EXPORT = qw( apr1_md5 );
     $DEBUG   = 0;
-    $VERSION = 'v0.5.3';
+    $VERSION = 'v0.5.4';
 };
 
 use strict;
@@ -382,10 +382,10 @@ sub header_datetime
     if( @_ )
     {
         return( $self->error( "Date time provided (", ( $_[0] // 'undef' ), ") is not an object." ) ) if( !Scalar::Util::blessed( $_[0] ) );
-        return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime object." ) ) if( !$_[0]->isa( 'DateTime' ) );
+        return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime or DateTime::Lite object." ) ) if( !$_[0]->isa( 'DateTime' ) && !$_[0]->isa( 'DateTime::Lite' ) );
         $dt = shift( @_ );
     }
-    $dt = DateTime->now if( !defined( $dt ) );
+    $dt = DateTime::Lite->now if( !defined( $dt ) );
     my $fmt = Apache2::API::DateTime->new;
     $dt->set_formatter( $fmt );
     return( $dt );
@@ -1960,7 +1960,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.5.3
+    v0.5.4
 
 =head1 DESCRIPTION
 
@@ -2088,9 +2088,9 @@ Get the localised version of the string passed as an argument.
 
 This is supposed to be superseded by the package inheriting from L<Apache2::API>, if any.
 
-=head2 header_datetime( DateTime object )
+=head2 header_datetime( DateTime or DateTime::Lite object )
 
-Given a L<DateTime> object, this sets it to GMT time zone and set the proper formatter (L<Apache2::API::DateTime>) so that the stringification is compliant with HTTP headers standard.
+Given a L<DateTime> or L<DateTime::Lite> object, this sets it to GMT time zone and set the proper formatter (L<Apache2::API::DateTime>) so that the stringification is compliant with HTTP headers standard.
 
 =head2 htpasswd
 

@@ -117,6 +117,42 @@ When the target is a Hash of Arrays, incoming arrays are pushed onto the existin
 
 NB: If `add_data` is called on a completely empty target reference (e.g., `$data = {}` or `$data = []`), it will intelligently infer the required inner structure (Hashes vs Arrays) by inspecting the first valid row of the source data.
 
+## aoh2hoa
+
+`aoh2hoa($aoh)` — transpose an **array-of-hashes** (row-major) into a **hash-of-arrays** (column-major).
+
+    my $hoa = aoh2hoa([ { a => 1, b => 2 }, { a => 3 } ]);
+    # $hoa = { a => [1, 3], b => [2, undef] }
+
+Rows go in, columns come out: each distinct key across the input rows becomes one output column, and the values are gathered down that column in row order.
+
+### Arguments
+
+`$aoh` — an array ref of hash refs, one hash per row. This is the only argument, and it is required. Passing anything that is not an array ref is fatal:
+
+    aoh2hoa({ a => 1 });   # dies: argument must be an arrayref of hashrefs
+
+### Returns
+
+A hash ref of array refs. Each key is a column name (the union of all keys seen across the rows); each value is an array ref holding that column's cells. Every column has exactly `scalar @$aoh` elements, so the result is rectangular even when the input is ragged.
+
+### Behavior
+
+The column set is the **union** of every row's keys — a key that appears in only some rows still produces a full-length column, with `undef` in the rows that lacked it.
+
+Each column is padded to exactly the row count. Cells missing from a given row come through as `undef`, including trailing gaps (a column whose last contributing row is early still runs the full length). These absent cells are cheap holes in the array, not stored SVs.
+
+Values are **copied** (`newSVsv`), so the returned structure is independent of the input — mutating `$aoh` afterward won't disturb the result. The copy is shallow: a value that is itself a reference is copied the same way `$col->[$i] = $row->{$k}` would, i.e. the ref is duplicated but its referent is shared.
+
+Keys are handled SV-first (`hv_iterkeysv` / `hv_fetch_ent`), so UTF-8 and otherwise non-trivial hash keys round-trip correctly.
+
+A row that is **not** a hash ref is skipped rather than fatal: it contributes `undef` to every column at its index. So a stray `undef` or scalar in the input thins the columns at that position instead of dying.
+
+### Notes
+
+The output column order follows hash iteration order and is therefore not guaranteed — sort the keys if you need a stable layout. Round-tripping through `hoa2aoh` (or the reverse) reconstructs the data but not necessarily the original key/row ordering, and rows originally absent a key will gain it as an explicit `undef`.
+
+
 ## aov
 
 Warning: assumes normal distribution
@@ -625,6 +661,49 @@ or
 
     cov($array1, $array2, 'kendall')
 
+## csort
+
+Sort a table by a column or by a custom comparator. Works on both common Perl table shapes and can transpose between them on the way out. Stable, non-destructive.
+
+### Signature
+
+    my $sorted = csort($data, $by);
+    my $sorted = csort($data, $by, $output);
+
+- **`$data`** — your table, in either shape:
+  - **AoH** — arrayref of hashrefs (a list of rows): `[ {id=>1, v=>10}, {id=>2, v=>20} ]`
+  - **HoA** — hashref of arrayrefs (parallel columns): `{ id=>[1,2], v=>[10,20] }`
+- **`$by`** — *how* to sort:
+  - a **column name** (string), or
+  - a **comparator** coderef using `$a` / `$b`, just like Perl's `sort`
+- **`$output`** *(optional)* — `'aoh'` or `'hoa'` (case-insensitive). Defaults to the input shape; `undef` also means "same as input".
+
+Returns a **new** structure. The input is never modified.
+
+### What it does
+
+- **Column-name sort** — numeric if every defined value in that column looks like a number, otherwise string comparison. Missing / `undef` values sort **last** (matching R's `na.last`).
+- **Comparator sort** — `$a` and `$b` are set in the comparator's *own* package, so a named sub from another package still sees its own `$a`/`$b`. For AoH they're the row hashrefs; for HoA they're per-row hashref views synthesized from the columns.
+- **Stable** — equal keys keep their original order (merge sort, same as Perl `sort` and R `order()`).
+- **Shape control** — keep the input shape, or transpose: AoH→HoA builds the union of all row keys (ordered by first appearance, gaps filled with `undef`); HoA→AoH emits one hashref per row.
+
+### Examples
+
+    # by column, ascending numeric, AoH in / AoH out
+    my $rows = csort($aoh, 'score');
+
+    # custom comparator (descending), HoA in / HoA out
+    my $cols = csort($hoa, sub { $b->{score} <=> $a->{score} });
+
+    # sort an AoH but hand it back as columns (HoA)
+    my $cols = csort($aoh, 'name', 'hoa');
+
+### Notes
+
+- **Non-destructive:** AoH output reuses the original row hashrefs (re-ordered); HoA output permutes every column in lockstep.
+- Empty and single-row tables are handled for all four in/out combinations.
+- An invalid `$output` value croaks.
+
 ## dnorm
 
 gives the density of the normal distribution, with the specified mean and standard deviation.
@@ -667,9 +746,9 @@ The return value is a **new** data frame of the **same shape** as the input (AoH
 
 `col('name')` is a deferred reference to a column. It carries no data — only the column name — so it can be compared with a literal (or another value) to build a predicate that `filter` evaluates once per row.
 
-    filter($df, col('age') >= 18);   # keep rows where age >= 18
-    filter($df, col('sex') eq 'f');  # keep rows where sex is 'f'
-    filter($df, 18 <= col('age'));   # operands may be in either order
+    filter($df, col('age') >= 18);  # keep rows where age >= 18
+    filter($df, col('sex') eq 'f'); # keep rows where sex is 'f'
+    filter($df, 18 <= col('age'));  # operands may be in either order
 
 ### Comparison operators
 
@@ -998,17 +1077,79 @@ I feel that this is better, and more easily read, than what you get in R:
 
 ## ks_test
 
-The Kolmogorov-Smirnov test, which tests whether or not two arrays/lists of data are part of the same distribution is implemented simply:
+The Kolmogorov–Smirnov test checks whether two samples are drawn from the
+same distribution (two-sample), or whether a single sample is drawn from a
+given reference distribution (one-sample). It works by comparing the empirical
+cumulative distribution functions (ECDFs) and measuring the largest gap
+between them.
 
+Two-sample form — pass two array references:
+
+    $ks = ks_test(\@x, \@y);
     $ks = ks_test(\@x, \@y, alternative => 'greater');
 
-returning a hash reference.
+One-sample form — pass one array reference and the name of a reference CDF.
+Currently only `'pnorm'` is supported, i.e. the standard normal distribution
+(mean 0, standard deviation 1):
 
-Also, a single array can be tested against a normal distribution:
+    $ks = ks_test(\@x, 'pnorm');
 
-    $ks = ks_test($ksx, 'pnorm');
+Arguments may be given positionally (as above) or by name:
 
-The p-value precision is about 1e-8, which I want to improve, but am not sure how.
+    $ks = ks_test(x => \@x, y => \@y, alternative => 'less', exact => 1);
+
+Non-numeric and undefined elements are silently dropped before the test runs.
+
+`alternative` selects which gap between the ECDFs is measured:
+
+- `'two.sided'` (default) — the largest gap in either direction,
+  D = sup |F_x − F_y|.
+- `'greater'` — the largest gap where x's ECDF rises above the other,
+  D⁺ = sup (F_x − F_y).
+- `'less'` — the largest gap in the other direction, D⁻ = sup (F_y − F_x).
+
+These follow R's `ks.test` convention: `'greater'`/`'less'` describe which CDF
+lies *above* the other, which (because a higher CDF means smaller values) is
+the opposite of which sample tends to be larger.
+
+`exact` controls how the p-value is computed. Omit it to let the test choose:
+the exact distribution is used for small samples (two-sample when nx·ny 
+10000, one-sample when n < 100) and the asymptotic (Kolmogorov limiting)
+approximation otherwise. Pass `exact => 1` to force the exact computation or
+`exact => 0` to force the asymptotic one. Exact p-values cannot be computed
+when the data contain ties; if ties are present on the exact path, the test
+warns and falls back to the asymptotic p-value. (The exact one-sample test is
+only available for the two-sided alternative; a one-sided one-sample request
+also falls back to asymptotic.)
+
+### Return value
+
+`ks_test` returns a hash reference with four keys:
+
+- **`statistic`** — the KS statistic for the chosen `alternative`: D, D⁺, or
+  D⁻. It is the maximum distance between the two ECDFs (or, for the one-sample
+  test, between the ECDF and the reference CDF), always in the range [0, 1].
+  Larger values mean the distributions are further apart.
+- **`p_value`** — the probability, under the null hypothesis that the samples
+  share a distribution, of observing a statistic at least this large. It is
+  clamped to [0, 1]; a small value (e.g. < 0.05) is evidence against the null.
+- **`method`** — a human-readable description of exactly what was run, handy
+  for logging or reproducing a result. One of:
+  `"Two-sample Kolmogorov-Smirnov exact test"`,
+  `"Two-sample Kolmogorov-Smirnov test (asymptotic)"`,
+  `"One-sample Kolmogorov-Smirnov exact test"`, or
+  `"One-sample Kolmogorov-Smirnov test (asymptotic)"`.
+- **`alternative`** — the alternative hypothesis that was applied
+  (`'two.sided'`, `'greater'`, or `'less'`), echoed back so the result is
+  self-describing.
+
+For example:
+
+    my $ks = ks_test(\@x, \@y);
+    if ($ks->{p_value} < 0.05) {
+        printf "reject H0: D=%.4f, p=%.4g (%s)\n",
+            $ks->{statistic}, $ks->{p_value}, $ks->{method};
+    }
 
 ## ljoin
 
@@ -1130,76 +1271,121 @@ Takes either an array or an array reference, and returns an array of the most co
 
 ## oneway_test
 
-Like ANOVA/aov but does not assume normality
+A one-way test for equality of group means that, unlike `aov`/ANOVA, **does not
+assume equal variances**. By default it performs **Welch's one-way test** (the
+same default as R's `oneway.test`), so the residual degrees of freedom are
+usually fractional. Pass `var_equal => 1` for the classic equal-variance form.
 
-### hash of array input
+    use Stats::LikeR qw(oneway_test);
 
-    $test_data = oneway_test({
-    	yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
-    	ctrl  => [1,     1,   1,   0,   0,   0]
+### Input
+
+`oneway_test` accepts your data in one of three shapes. In every case each
+*group* is a vector of at least two numeric observations.
+
+| Shape | What it means | Group labels |
+|-------|---------------|--------------|
+| **Hash of arrays** `{ a => [...], b => [...] }` | Each key is a group (R's `stack()` view of a named list) | the hash keys |
+| **Array of arrays** `[ [...], [...] ]` | Each element is a group | `"Index 0"`, `"Index 1"`, … |
+| **Hash + `formula`** `{ resp => [...], grp => [...] }, formula => 'resp ~ grp'` | Long-format columns split by a factor column | the distinct values of the factor |
+
+### Options
+
+| Option | Default | Meaning |
+|--------|---------|---------|
+| `var_equal` (alias `var.equal`) | `0` (false) | `0` → Welch's test (unequal variances). `1` → pooled-variance test. |
+| `formula` | *none* | `'response ~ factor'`. Only valid with a **hash** input; an error with an array of arrays. |
+
+### Data validation
+
+Every observation must be **defined and numeric**; an `undef` or non-numeric
+cell makes the call `die` with the offending group and position. This matches
+the rest of `Stats::LikeR` (`mean`, `sum`, `cor`, … all die on `undef`) and
+prevents missing values from being silently treated as `0`.
+
+Each group needs at least two observations, and you need at least two groups.
+
+### Output
+
+A hash reference with three top-level keys:
+
+| Key | Value |
+|-----|-------|
+| *factor name* (`Group`, or the formula's factor, e.g. `supp`) | the between-groups row: `Df`, `Sum Sq`, `Mean Sq`, `F value`, `Pr(>F)` |
+| `Residuals` | the within-groups row: `Df`, `Sum Sq`, `Mean Sq` (`Df` is fractional under Welch) |
+| `group_stats` | `{ mean => { group => mean, … }, size => { group => n, … } }` |
+
+### Examples
+
+#### Hash of arrays (each key is a group)
+
+    my $res = oneway_test({
+        yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+        ctrl  => [1,   1,   1,   0,   0,   0  ],
     });
 
-which will output a hash reference:
-
     {
-    Group         {
-        Df          1,
-        "F value"   177.504798464491,
-        "Mean Sq"   61.6533333333333,
-        Pr(>F)      1.31343255160843e-07,
-        "Sum Sq"    61.6533333333333
-    },
-    group_stats   {
-        mean   {
-            ctrl    0.5,
-            yield   5.03333333333333
+        Group => {
+            Df        => 1,
+            "Sum Sq"  => 61.6533333333333,
+            "Mean Sq" => 61.6533333333333,
+            "F value" => 177.504798464491,
+            "Pr(>F)"  => 1.31343255160843e-07,
         },
-        size   {
-            ctrl    6,
-            yield   6
-        }
-    },
-    Residuals     {
-        Df          9.81767348326473,
-        "Mean Sq"   0.353783749200256,
-        "Sum Sq"    3.47333333333333
-    }
-}
-
-### array of array input
-
-    oneway_test([
-       [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
-       [1,     1,   1,   0,   0,   0]
-    	]);
-
-which will output a nearly identical hash reference as for hash of arrays:
-
-    {
-    Group         {
-        Df          1,
-        "F value"   177.504798464491,
-        "Mean Sq"   61.6533333333333,
-        Pr(>F)      1.31343255160843e-07,
-        "Sum Sq"    61.6533333333333
-    },
-    group_stats   {
-        mean   {
-            "Index 0"   5.03333333333333,
-            "Index 1"   0.5
+        Residuals => {
+            Df        => 9.81767348326473,   # fractional: Welch correction
+            "Sum Sq"  => 3.47333333333333,
+            "Mean Sq" => 0.353783749200256,
         },
-        size   {
-            "Index 0"   6,
-            "Index 1"   6
-        }
-    },
-    Residuals     {
-        Df          9.81767348326473,
-        "Mean Sq"   0.353783749200256,
-        "Sum Sq"    3.47333333333333
-    }
+        group_stats => {
+            mean => { ctrl => 0.5, yield => 5.03333333333333 },
+            size => { ctrl => 6,   yield => 6 },
+        },
     }
 
+#### Array of arrays (groups named by index)
+
+    my $res = oneway_test([
+        [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+        [1,   1,   1,   0,   0,   0  ],
+    ]);
+
+Identical to the hash form, except `group_stats` is keyed by position:
+
+    group_stats => {
+        mean => { "Index 0" => 5.03333333333333, "Index 1" => 0.5 },
+        size => { "Index 0" => 6,                "Index 1" => 6   },
+    }
+
+#### Long format with a formula
+
+When your data is in columns rather than pre-split groups, name the response
+and factor columns with a formula. The factor's *values* become the groups and
+the factor's *name* becomes the top-level key:
+
+    my $res = oneway_test(
+        {
+            len  => [4.2, 11.5, 7.3, 16.5, 17.3, 13.6, 23.6, 18.5, 33.9],
+            supp => [qw(VC VC VC OJ OJ OJ HI HI HI)],
+        },
+        formula => 'len ~ supp',
+    );
+    # $res->{supp}, $res->{Residuals}, $res->{group_stats} ...
+
+### Classic equal-variance form
+
+    my $res = oneway_test(\%groups, var_equal => 1);   # or 'var.equal' => 1
+
+### Notes
+
+- The default (Welch) does **not** require equal group sizes or equal variances;
+  the pooled form (`var_equal => 1`) assumes equal variances.
+- `formula` is only meaningful for a hash input. Passing it with an array of
+  arrays is an error.
+- Group order in the output is not guaranteed for hash inputs (it follows hash
+  iteration order); read results by name, not position.
+- Avoid naming a factor `Residuals` or `group_stats` in a formula, since those
+  are reserved top-level keys in the result.
 
 ## p_adjust
 
@@ -1759,10 +1945,11 @@ All arguments after the data reference are optional name/value pairs.
 | Argument        | Default | Meaning                                                                 |
 |-----------------|---------|-------------------------------------------------------------------------|
 | `n`             | `6`     | Number of rows to show. `n` greater than the table shows everything.    |
+| `rows`          | `6`     | Number of rows to show. `n` greater than the table shows everything  (synonymous with `n`)|
 | `cols` / `columns` | —    | Array ref pinning column order (and which columns appear).              |
 | `row.names`     | —       | Column to use as the row label (for `aoh`/`hoa`). See ordering note.    |
 | `na`            | `'NA'`  | Token printed for undefined cells.                                      |
-| `max_width`     | `50`    | Truncate any cell wider than this (column names are never truncated).   |
+| `max_width`     | `80`    | Truncate any cell wider than this (column names are never truncated).   |
 | `ellipsis`      | `'...'` | Marker appended to truncated cells.                                     |
 | `gap`           | `2`     | Spaces between columns.                                                 |
 | `to`            | STDOUT  | Filehandle to print to.                                                 |
@@ -1807,7 +1994,55 @@ structure types, `n` boundaries, alignment, `NA` rendering, truncation,
     	[0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29]
     );
 
-It fully supports paired tests (`paired => 1`) and can calculate exact p-values (the default for `N < 50` without ties). If ties are encountered, it automatically switches to an approximation with continuity correction.
+Computes the Wilcoxon rank-sum / Mann-Whitney test (two samples) or the Wilcoxon signed-rank test (one sample or paired), following R's `wilcox.test` conventions.
+This is an alternative to the t-test, that does not assume a normal distribution.
+With two array refs and no `paired` flag it runs the two-sample rank-sum test; with a single sample, or with `paired => 1`, it runs the signed-rank test. It calculates exact p-values by default for `N < 50` without ties; when ties (or, for the signed-rank case, zero differences) are present it automatically switches to the normal approximation with continuity correction.
+
+### Calling conventions
+
+The first one or two array-ref arguments are taken positionally as `x` and `y`; everything after that is parsed as `key => value` pairs. The named forms `x =>` and `y =>` are also accepted and override the positional values. The flat argument list following the positional refs must contain an even number of elements, or the call dies with a usage message.
+
+    # positional
+    wilcox_test(\@x, \@y, paired => 1);
+
+    # fully named
+    wilcox_test(x => \@x, y => \@y, alternative => "greater", exact => 0);
+
+### Input parameters
+
+| Parameter     | Type            | Default      | Description |
+|---------------|-----------------|--------------|-------------|
+| `x`           | ARRAY ref       | *(required)* | The first sample. Passed positionally or as `x =>`. Non-numeric and undefined elements are silently dropped; an empty or all-missing `x` is fatal. In the two-sample test `mu` is subtracted from each `x` value. |
+| `y`           | ARRAY ref       | `undef`      | The second sample. If present and `paired` is false, a two-sample rank-sum test is run. If `paired` is true, `y` is required and must be the same length as `x`. Omit it for the one-sample signed-rank test. |
+| `paired`      | boolean         | `0` (false)  | Run a paired signed-rank test on the per-element differences `x[i] - y[i] - mu`. Requires `y` of equal length. |
+| `correct`     | boolean         | `1` (true)   | Apply the continuity correction (±0.5) when using the normal approximation. Ignored when an exact p-value is computed. |
+| `mu`          | number          | `0.0`        | Null-hypothesis location shift. Subtracted from `x` (two-sample) or from each difference (one-sample / paired). |
+| `exact`       | boolean / undef | `undef` (auto) | Tri-state. `undef` (or absent) selects exact automatically: when both group sizes are `< 50` and there are no ties (two-sample), or `n < 50` with no ties (signed-rank). A true value forces the exact test, a false value forces the approximation. Exact is impossible with ties — or, for the signed-rank test, with zero differences — and falls back to the approximation with a warning. |
+| `alternative` | string          | `"two.sided"` | One of `"two.sided"`, `"less"`, or `"greater"`. Selects the tail(s) used for the p-value. |
+
+### Output
+
+Returns a hash ref with the following keys:
+
+| Key           | Type   | Description |
+|---------------|--------|-------------|
+| `statistic`   | number | The test statistic. For the two-sample test this is the Mann-Whitney **W** (the `x` rank sum minus `nx*(nx+1)/2`). For the signed-rank test it is **V**, the sum of the ranks assigned to the positive differences. |
+| `p_value`     | number | The p-value for the chosen `alternative`, capped at `1.0`. Two-sided p-values are `2 * min(p_less, p_greater)`. |
+| `method`      | string | A human-readable description of the exact test variant that was run (see below). |
+| `alternative` | string | Echoes the `alternative` actually used (`"two.sided"`, `"less"`, or `"greater"`). |
+
+The `method` string reports which path executed:
+
+- Two-sample: `"Wilcoxon rank sum exact test"`, `"Wilcoxon rank sum test with continuity correction"`, or `"Wilcoxon rank sum test"`.
+- One-sample / paired: `"Wilcoxon exact signed rank test"`, `"Wilcoxon signed rank test with continuity correction"`, or `"Wilcoxon signed rank test"`.
+
+### Notes and edge cases
+
+Missing data is handled by listwise removal of non-numeric / undefined cells before ranking; in the paired case a pair is dropped if either member is missing. An empty `x` (or, in the two-sample case, an empty `y`) after this filtering is fatal.
+
+For the signed-rank test, exact zero differences are discarded before ranking (matching R), and their presence disables the exact computation. Both empty-after-filtering and all-zero-difference inputs are fatal.
+
+Ties are detected during ranking and trigger the tie-corrected variance in the normal approximation; they also rule out the exact p-value. When `exact` is left on auto, the size thresholds (`< 50` per group, or `< 50` differences) are what gate the exact vs. approximate decision.
 
 ## write_table
 
@@ -1831,6 +2066,205 @@ Args can also be accepted:
 
 # changes
 
+## 0.16
+
+changes to dist.ini, the minimum Perl version disappeared when I fixed other problems
+
+clarifications between run time and test dependencies
+
+addition of `csort` function to sort AoH and HoA
+
+addition of `aoh2hoa` to translate array of hashes into a hash of arrays
+
+fix of long double functions: https://www.cpantesters.org/cpan/report/5d5d9836-6a5f-11f1-aadb-63fd6d8775ea
+
+### `glm`
+
+output residual keys now use names, not integers
+
+### `lm`
+
+### Bug fixes
+
+**Memory leak on the zero-degrees-of-freedom error path.** When
+`valid_n <= p`, the cleanup freed the `valid_row_names` *array* but not the
+per-row name strings it held (those had been transferred out of `row_names`,
+whose own array was already freed). The strings leaked on every such error.
+Added the per-entry `Safefree` loop before freeing the array, matching the
+normal path.
+
+**HoH input validated only the first row.** Only the first hash value was
+checked to be a `HASHREF`; subsequent values were `SvRV`'d unconditionally, so
+a malformed row (`{ a => {...}, b => 5 }`) dereferenced a non-reference. Every
+row is now validated, with the partial allocations cleaned up before the
+`croak`, mirroring the existing AoH path.
+
+**`isspace` on a possibly-signed `char`.** `isspace(*src)` is undefined for
+byte values ≥ 0x80 on platforms where `char` is signed. Cast to
+`(unsigned char)` before the call.
+
+### Speed / RAM improvements
+
+**Formula buffer is now heap-allocated to fit.** `char f_cpy[512]` silently
+truncated any longer formula. Replaced with a buffer sized to
+`strlen(formula) + 1`, so there is no fixed limit and no truncation.
+
+**`.`-expansion buffer is now a growable heap buffer.** `char rhs_expanded[2048]`
+silently dropped expanded terms once full. It is now a buffer that doubles on
+demand. Appends also went from `strcat` (which rescans from the start every
+time — O(n²) over many columns) to an O(1) amortised append that tracks the
+write position.
+
+**No more per-row scratch allocation in matrix construction.** The original
+`safemalloc`'d a `row_x` buffer, filled it, copied it into `X`, and freed it
+*for every row* — `n` allocations plus `n*p` copies. Each candidate row is now
+written straight into `X` at its prospective commit slot; a row that fails
+listwise deletion is simply overwritten by the next candidate. This removes the
+`n` allocate/free cycles and the copy loop entirely.
+
+**Categorical levels sorted with `qsort`.** The level list used an O(n²) bubble
+sort; replaced with `qsort` (relevant only for high-cardinality factors).
+
+**Unused tail of `X` reclaimed after listwise deletion.** `X` is allocated for
+all `n` rows up front (`valid_n` is unknown until rows are scanned). When rows
+are dropped, `X` is now `Renew`ed down to `valid_n * p`, returning the unused
+tail to the allocator before the OLS phase.
+
+**Minor robustness.** The argument-parsing index was widened from
+`unsigned short` to `I32` to match `items`, and the HoH row count now uses
+`HvUSEDKEYS` rather than relying on `hv_iterinit`'s return value.
+
+### Known limitations (left unchanged)
+
+- A multi-way term such as `a*b*c` is split only on the first `*`, so it yields
+  `a`, `b*c`, and `a:b*c` rather than a full three-way expansion. Deeper
+  interactions silently fail (the unparsable term evaluates to `NaN` and the
+  rows are dropped). This matches the documented two-way `*` support.
+- HoA input takes the row count from the first column; columns shorter than
+  that simply contribute dropped rows rather than raising an error.
+
+### `oneway_test`
+
+#### Bug fixes
+
+**Memory leaks on error paths.** Nearly every `croak` after an allocation
+leaked memory. `croak` does a `longjmp`, so anything allocated but not yet
+freed is lost. Affected paths:
+
+- AoA and hash first-pass errors leaked `sizes` and any `gnames[]` entries
+  allocated so far.
+- Formula-mode "not found as an array ref" errors leaked `lhs` and `rhs`.
+
+All post-allocation errors now route through a single `fail:` label that frees
+every pointer unconditionally. Pointers are initialised to `NULL` and `gnames`
+is zero-allocated with `Newxz`, so the cleanup is always safe to run.
+
+**Undefined and non-numeric cells silently coerced to `0.0`.** The original
+second pass used `(svp && *svp) ? SvNV(*svp) : 0.0`, meaning an `undef` or
+non-numeric cell was quietly treated as zero, silently corrupting the
+F-statistic. Each cell is now validated with `SvOK` and `looks_like_number`;
+the call dies naming the group and observation index, consistent with the rest
+of `Stats::LikeR` (`mean`, `sum`, `cor`, etc.).
+
+**Unsigned wraparound on empty array input.** `k = (size_t)av_len(in_av) + 1`
+cast to `size_t` *before* adding, so an empty array (`av_len` returns `-1`)
+produced `SIZE_MAX` rather than `0`. Changed to
+`k = (size_t)(av_len(in_av) + 1)` so the `+1` is done in signed arithmetic
+before the cast.
+
+**Unreliable group count from `hv_iterinit`.** `hv_iterinit` returns the
+number of buckets in use rather than the number of keys for tied hashes.
+Replaced with `HvUSEDKEYS`, which always returns the correct key count.
+
+#### Improvements
+
+**`var.equal` accepted as an alias for `var_equal`.** R users write
+`var.equal`; the argument parser now accepts both spellings.
+
+**Perl memory API used throughout.** `safemalloc` and manual `memcpy` replaced
+with `Newx`, `Newxz`, `savepv`, and `savepvn`. `savepvn` additionally
+preserves embedded NUL bytes in group key strings, which the previous
+`strlen`-based copies silently truncated.
+
+#### Known limitations (not changed)
+
+- A factor column named `Residuals` or `group_stats` in a formula call will
+  collide with reserved top-level keys in the result hash.
+- Group names containing an embedded NUL are stored correctly but are still
+  truncated at `strlen` when written into the output hash keys.
+
+### `view`
+
+default view shifted to 80 characters to match Linux window length
+
+#### New features
+
+- **`rows` is accepted as a synonym for `n`** (the number of rows shown).
+  Passing both `n` and `rows` is an error.
+- **Unknown arguments are now rejected.** `view` validates its argument names
+  against the documented set (`n`, `rows`, `na`, `max_width`, `ellipsis`,
+  `gap`, `cols`, `columns`, `to`, `return_only`, `row.names`, `row_names`) and
+  dies listing any it does not recognise, so a misspelt option (e.g. `widht`)
+  is caught instead of silently ignored.
+- **`n` / `rows` is validated.** It must be a non-negative integer; `undef` or
+  a non-numeric value now dies with a clear message instead of producing
+  warnings and being treated as `0`.
+- **flat/simple hashes are accepted as input**
+
+#### Bug fixes
+
+- **`n => 0` now still prints the column header.** Column names were collected
+  only from the rows being shown, so requesting zero rows produced an empty
+  header line. At least one row is now scanned (when data exists) so the
+  header always lists the columns.
+- **An empty hash (`{}`) no longer dies.** It was rejected as
+  *"neither ARRAY nor HASH"*; it is now shown as an empty table
+  (`0 rows x 0 cols`), matching the handling of an empty array.
+- **The `row_names` alias now drives the Hash-of-Hashes label header.** The
+  header for the row-label column consulted only `row.names`, so
+  `row_names => 'id'` displayed `row_name` instead of `id`. Both spellings are
+  now honoured consistently.
+- **Malformed nested values degrade gracefully.** A Hash-of-Arrays column or
+  Hash-of-Hashes row whose value is not actually an array/hash reference now
+  renders as empty cells rather than throwing a dereference error.
+
+#### Performance
+
+- Column gathering no longer sorts once per scanned row. Unique column names
+  are collected across the scanned rows and sorted a single time (same output
+  order), and the ellipsis length is computed once rather than per cell.
+
+#### Tests
+
+- `t/view.t` is self-contained (the `view` implementation is inlined; it loads
+  no other files) and covers the new argument handling, the bug fixes above,
+  and the existing AoH / HoA / HoH behaviour, alignment, truncation, and
+  output-path handling.
+
+### `wilcox_test`
+
+Corrected four bugs in the `wilcox_test` XSUB plus a portability fix in its exact signed-rank helper. Behaviour on valid input is unchanged: the R-agreement cases (unpaired `W = 58`, `p = 0.13292`; paired one-sided `V = 40`, `p = 0.019531`; separated exact `W = 0`, `p = 0.028571`) all still match R's `wilcox.test`.
+
+#### Bug fixes
+
+- **Invalid `alternative` is now rejected.** Any value other than `less` or `greater` previously fell through to the two-sided branch and returned a two-sided result mislabelled with the bad string, so a typo like `alternative => "twosided"` silently "worked". It now croaks unless `alternative` is one of `two.sided`, `less`, `greater`.
+- **Zero/negative variance is guarded.** When every observation is tied the approximation's variance collapses to 0 and the old code divided by `sqrt(0)`: `wilcox_test([5,5,5], [5,5,5])` returned `p = 0` (a "significant" difference between identical samples). It now warns and returns `p = 1`.
+- **Two-sided continuity correction at `z = 0`.** R uses `sign(z) * 0.5`, so the correction is `0` when the statistic sits exactly on its mean; the old code used `-0.5`. Example: `wilcox_test([1,4], [2,3], exact => 0)` changed from `p = 0.698535` to `p = 1` (matches R).
+- **`exp` no longer shadows libm.** The local `exp` accumulator (mean of the statistic) shadowed the C library `exp()`; renamed to `mean_w` (two-sample) and `mean_v` (signed-rank). No active miscompute, removed as a latent hazard.
+
+#### Cosmetic
+
+- Collapsed a no-op ternary that assigned the same signed-rank exact method string on both branches; the `method` field is now simply `Wilcoxon signed rank exact test`.
+
+#### Portability (exact signed-rank helper)
+
+- **`exact_psignrank` no longer calls `powl()`.** The `2^n` normaliser is now built by exact repeated doubling, which has no long-double libm dependency. This fixes an `Undefined symbol "powl"` load failure reported by a CPAN smoker (FreeBSD, perl 5.20, `nvtype=double`) whose libm lacks the long-double math functions; the symbol resolved on glibc, which is why local builds passed. `long double` accumulation in the DP is retained — only the `powl` call was at fault.
+- **`int` → `size_t`** for `n`, `max_v`, and the DP loop counters, which also removes a `size_t`-to-`int` narrowing at the call site. The `floor()` result (`k`) stays signed so its negative-`q` sentinel still fires, and is cast to `size_t` only after the `k < 0` check.
+
+#### Tests
+
+- Added `t/wilcox_test.t` (flat, no subtests): R-agreement cases, option handling (`paired`, `correct`, `exact`, `mu`, named/positional `x`/`y`, NA dropping), regressions for all four bug fixes, argument-error and `alternative`-validation checks, output shape, and `no_leaks_ok` coverage of the two-sample, exact, and paired allocation paths.
+
 ## 0.15
 
 `view` function added, similar to R's `head`
@@ -1849,6 +2283,114 @@ Numerous changes to prevent quadmath/long double CPAN test failures
 Minimum Scalar::Util version in dist.ini is now 1.22, see https://www.cpantesters.org/cpan/report/6b682236-6567-11f1-a3bc-a055f9c4ba34
 
 `Digest::SHA` is no longer needed, and removed as a dependency
+
+### `read_table`
+
+#### Bug fixes
+
+- **A comment-prefixed header is now read correctly.** `read_table` strips a
+  leading comment marker from the header line (so a file may begin with
+  `#id,val`), but that strip was dead code: the XS parser skipped *every* line
+  beginning with the comment string before the callback ever saw it, so a
+  commented header was silently dropped and the first data row was mistaken for
+  the header. The parser now delivers the first content line even when it
+  begins with the comment marker, and only skips comment lines after the header
+  has been seen.
+
+- **Carriage returns inside quoted fields are preserved.** The parser stripped
+  `\r` unconditionally, so a quoted value such as `"x\ry"` lost its carriage
+  return and would not survive a `write_table` -> `read_table` round-trip. `\r`
+  is now stripped only as part of a trailing CRLF line ending and as a stray CR
+  *outside* quotes; inside quotes it is literal data.
+
+- **Duplicate column names no longer corrupt `hoa` output.** With
+  `output.type => 'hoa'`, a repeated column name pushed the same cell once per
+  occurrence, so the affected columns came out longer than the others and the
+  arrays no longer lined up by row. Columns are now keyed by unique header name
+  (first-seen order preserved, later values win, one warning emitted).
+
+- **A defined non-CODE callback is now an error.** Passing a defined argument
+  that was not a CODE reference silently fell through to slurp mode and ignored
+  the argument; it now croaks
+  (*"callback must be a CODE reference"*).
+
+- **An undefined/empty `hoh` row-name now dies instead of keying on `""`.**
+  With `output.type => 'hoh'`, a row whose row-name column was empty/undef was
+  stored under the `''` key and raised *"uninitialized value"* warnings. It now
+  dies, naming the column and the offending data row.
+
+- **A numeric filter key past the last column now dies.** A 1-based numeric
+  filter key greater than the column count was accepted, then silently extended
+  every row through the `$_` write-back. It is now rejected up front with a
+  message naming the column count.
+
+- **`sep` and `delim` together now die.** Supplying both silently preferred
+  `delim`; passing both is now an explicit error (`delim` remains an alias for
+  `sep` when used alone).
+
+- **The library no longer prints to STDOUT.** The unknown-argument path used
+  `say` to dump the offending names to STDOUT before dying; the names are now
+  carried in the `die` message itself.
+
+#### Better diagnostics
+
+- Alignment errors now report **which data row** is ragged
+  (*"Alignment error on FILE data row N (X fields vs Y headers)"*), instead of
+  only the field/header counts.
+
+#### Memory-leak fixes (exception paths)
+
+The parser allocated its working buffers (`current_row`, `field`, and — in
+slurp mode — `data`) in the XS `INIT:` block, i.e. *before* any validation, and
+freed them only by falling off the end of the function. Any non-local exit
+therefore leaked:
+
+- the open-failure `croak` leaked the row buffer and field (and the slurp
+  accumulator);
+- far more commonly, a `die` thrown **inside the row callback** — which
+  `read_table` does routinely on alignment errors, bad row names, and filter
+  exceptions — unwound straight out of the XS frame and leaked the field, the
+  current row, the line buffer, the slurp accumulator, *and the open file
+  handle*.
+
+Allocations now happen in `CODE:` after every croak-able check, and every
+long-lived resource (the file handle via `SAVEDESTRUCTOR_X`, the buffers via
+`SAVEFREESV`) is tied to the save stack, which an exception unwinds. Measured
+with `Test::LeakTrace`: a `die` mid-file went from 5 leaked SVs to 0, and an
+open failure from 2 to 0. This is the likely source of the constant-size leaks
+seen in CPAN-tester reports for the exception-path tests.
+
+#### Performance
+
+- **~2.5x faster parsing** (57 -> 145 MB/s on a 100k-row quoted file). The core
+  loop appended one character at a time with `sv_catpvn(field, &ch, 1)`; it now
+  scans runs of ordinary bytes with `memchr` / a bounded scan and appends each
+  run in a single `sv_catpvn`, copying field contents in bulk rather than byte
+  by byte.
+
+#### Internal / non-behavioral
+
+- XS declarations moved from `INIT:` to `PREINIT:`; allocations deferred into
+  `CODE:` (see the leak fixes above).
+- The filter loop now aliases the row hash with `local *_ = \%line_hash`
+  instead of copying it with `local %_ = %line_hash`. This removes a full
+  per-row hash copy for every filtered row and fixes a latent staleness bug:
+  after a filter mutated `$_` and the change was written back, `%_` still
+  reflected the pre-mutation copy, so a subsequent filter in the same row saw
+  stale values. With aliasing, `%_` *is* the row, so write-backs are always
+  visible.
+
+#### Known limitation (not changed)
+
+- **`undef.val` does not round-trip back to `undef`.** `write_table` renders an
+  `undef` cell as an empty field by default, and `read_table` maps an empty
+  field back to `undef`, so the *default* round-trip is clean. But if a file is
+  written with a token such as `'undef.val' => 'NA'`, `read_table` has no
+  inverse option and reads `NA` back as the string `'NA'`. `read_table` also
+  cannot distinguish a deliberately quoted empty string (`""`) from a missing
+  value -- both become `undef`. Adding an `na.strings`-style option to
+  `read_table` (mapping configurable tokens and/or empty fields to `undef`)
+  would close this gap.
 
 ### `write_table`
 

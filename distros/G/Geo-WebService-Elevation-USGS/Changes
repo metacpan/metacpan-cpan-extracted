@@ -1,3 +1,17 @@
+0.202		2026-06-17	T. R. Wyant
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net.
+
+    Repackage licenses so that GitHub can find them (maybe).
+    Thanks to Mikko Koivunalho (specifically his blog post
+    https://blogs.perl.org/users/mikko_koivunalho/2025/11/github-and-the-perl-license.html
+    for the how-to.
+
+    Document eg/usgs_ele 'elevation' command.
+
+    No functional changes.
+
 0.201		2025-01-25	T. R. Wyant
     Add a tolerance to the elevations tested in t/elev.t.
     On January 18 2025 I experienced sporadic test failures. Direct queries

@@ -23,11 +23,22 @@ plan skip_all => 'Cpanel::JSON::XS nor JSON::XS are installed', 1
 
     my ($json);
     ok( $json = JSON::Any->new(), 'got a JSON::Any object' );
-    like(
-        exception { $json->encode("dahut") },
-        qr/use allow_nonref/,
-        'trapped a failure because of a non-reference',
-    );
+
+    my $exception = exception { $json->encode("dahut") };
+    if (Cpanel::JSON::XS->VERSION >= '4.42') {
+        is(
+            $exception,
+            undef,
+            'no failure with non-reference',
+        );
+    }
+    else {
+        like(
+            $exception,
+            qr/use allow_nonref/,
+            'trapped a failure because of a non-reference',
+        );
+    }
 
     $ENV{JSON_ANY_CONFIG} = 'allow_nonref=1';
     ok( $json = JSON::Any->new(), 'got another JSON::Any object' );

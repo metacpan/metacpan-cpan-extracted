@@ -10,7 +10,7 @@ BEGIN
     # 2021-11-1T167:12:10+0900
     use Test::Time time => 1635754330;
     use ok( 'Apache2::API::DateTime' );
-    use ok( 'DateTime' ) || bail_out( "No DateTime module installed" );
+    use ok( 'DateTime::Lite' ) || bail_out( "No DateTime::Lite module installed" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     require( "./t/env.pl" ) if( -e( "t/env.pl" ) );
 };
@@ -31,7 +31,7 @@ can_ok( $fmt, 'str2time' );
 can_ok( $fmt, 'time2datetime' );
 can_ok( $fmt, 'time2str' );
 
-my $dt = DateTime->now;
+my $dt = DateTime::Lite->now;
 $dt->set_formatter( $fmt );
 is( $dt->stringify, 'Mon, 01 Nov 2021 08:12:10 GMT', 'format_datetime' );
 my @tests = (

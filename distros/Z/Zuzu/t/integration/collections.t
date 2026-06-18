@@ -74,7 +74,7 @@ let s := ∅;
 s.empty();
 SRC
 
-is eval_src(<<'SRC'), 2, 'bag conversion exists from array';
+is eval_src(<<'SRC'), 1, 'bag conversion exists from array';
 let b := [ 1, 2, 2 ].to_Bag();
 b.remove(2);
 b.length();

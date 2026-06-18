@@ -1,4 +1,4 @@
-package JMAP::Tester 0.109;
+package JMAP::Tester 0.110;
 # ABSTRACT: a JMAP client made for testing JMAP servers
 
 use v5.20.0;
@@ -431,7 +431,10 @@ sub request ($self, $input_request) {
     unless ($res->is_success) {
       $self->_logger->log_jmap_response($self, { http_response => $res });
       return Future->fail(
-        JMAP::Tester::Result::Failure->new({ http_response => $res })
+        JMAP::Tester::Result::Failure->new({
+          http_response => $res,
+          diagnostic_dumper => $self->default_diagnostic_dumper,
+        })
       );
     }
 
@@ -475,6 +478,7 @@ sub _jresponse_from_hresponse ($self, $http_res) {
     items => $items,
     http_response       => $http_res,
     wrapper_properties  => $props,
+    diagnostic_dumper   => $self->default_diagnostic_dumper,
   });
 }
 
@@ -553,7 +557,10 @@ sub upload ($self, $arg) {
     unless ($res->is_success) {
       $self->_logger->log_upload_response($self, { http_response => $res });
       return Future->fail(
-        JMAP::Tester::Result::Failure->new({ http_response => $res })
+        JMAP::Tester::Result::Failure->new({
+          http_response => $res,
+          diagnostic_dumper => $self->default_diagnostic_dumper,
+        })
       );
     }
 
@@ -573,6 +580,7 @@ sub upload ($self, $arg) {
       JMAP::Tester::Result::Upload->new({
         http_response => $res,
         payload       => $blob,
+        diagnostic_dumper => $self->default_diagnostic_dumper,
       })
     );
   });
@@ -691,12 +699,18 @@ sub download ($self, $uri_arg, $arg = undef) {
 
     unless ($res->is_success) {
       return Future->fail(
-        JMAP::Tester::Result::Failure->new({ http_response => $res })
+        JMAP::Tester::Result::Failure->new({
+          http_response => $res,
+          diagnostic_dumper => $self->default_diagnostic_dumper,
+        })
       );
     }
 
     return Future->done(
-      JMAP::Tester::Result::Download->new({ http_response => $res })
+      JMAP::Tester::Result::Download->new({
+        http_response => $res,
+        diagnostic_dumper => $self->default_diagnostic_dumper,
+      })
     );
   });
 
@@ -769,6 +783,7 @@ sub _get_client_session_future ($self, $auth_uri = undef) {
         JMAP::Tester::Result::Failure->new({
           ident         => 'failure to get updated authentication data',
           http_response => $res,
+          diagnostic_dumper => $self->default_diagnostic_dumper,
         })
       );
     }
@@ -778,6 +793,7 @@ sub _get_client_session_future ($self, $auth_uri = undef) {
     my $auth = JMAP::Tester::Result::Auth->new({
       http_response   => $res,
       client_session  => $client_session,
+      diagnostic_dumper => $self->default_diagnostic_dumper,
     });
 
     return Future->done($auth);
@@ -909,6 +925,7 @@ sub logout ($self) {
       JMAP::Tester::Result::Failure->new({
         ident => "failed to log out",
         http_response => $res,
+        diagnostic_dumper => $self->default_diagnostic_dumper,
       })
     );
   });
@@ -935,7 +952,12 @@ sub logout ($self) {
 #pod =cut
 
 sub http_request ($self, $http_request) {
-  my $future = $self->ua->request($self, $http_request, 'misc');
+  my $future = $self->ua->request($self, $http_request, 'misc')->then(sub {
+    my ($res) = @_;
+    $self->_logger->log_misc_response($self, { http_response => $res });
+    return Future->done($res);
+  });
+
   return $self->should_return_futures ? $future : $future->$Failsafe->get;
 }
 
@@ -976,6 +998,15 @@ sub http_post ($self, $url, $body, $headers = undef) {
   return $self->http_request($req);
 }
 
+has default_diagnostic_dumper => (
+  is => 'ro',
+  default => sub {
+    require JSON::MaybeXS;
+    state $json = JSON::MaybeXS->new->utf8->convert_blessed->pretty->canonical;
+    sub ($value) { $json->encode($value); }
+  },
+);
+
 1;
 
 __END__
@@ -990,7 +1021,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 OVERVIEW
 

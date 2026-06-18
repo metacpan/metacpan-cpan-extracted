@@ -1,4 +1,7 @@
 Revision history for Mojolicious-Plugin-Fondation-MigrationDBIx
 
+0.02      2026-06-17 14:02:51+02:00 Europe/Paris
+        - Fix fixture versioning: use DB version, add fixtures_loaded tracking, protect bootstrap-schema
+
 0.01      2026-06-16 17:21:09+02:00 Europe/Paris
         - Initial release: db prepare, install, status, populate for DBIx::Class

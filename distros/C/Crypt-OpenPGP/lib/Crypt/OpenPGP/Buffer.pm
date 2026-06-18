@@ -3,7 +3,7 @@ package Crypt::OpenPGP::Buffer;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use parent qw( Data::Buffer );
 

@@ -2,7 +2,7 @@ package Aion;
 
 use common::sense;
 
-our $VERSION = "2.0";
+our $VERSION = "2.2";
 
 use Aion::Types qw//;
 use Aion::Meta::RequiresAnyFunction;
@@ -15,7 +15,7 @@ use Aion::Meta::Subroutine;
 #   wo - только при установке
 #   rw - при выдаче и уcтановке
 #   no - никогда не проверять
-use config ISA => 'rw';
+use Aion::Env AION_ISA => (default => 'rw');
 
 sub export($@);
 
@@ -121,9 +121,9 @@ sub isa_aspect {
 
 	$feature->{isa} = Aion::Types::External[$isa];
 
-	$construct->add_release("${\$feature->meta}\{isa}->validate(\$val, 'Get feature $name');") if ISA =~ /ro|rw/;
+	$construct->add_release("${\$feature->meta}\{isa}->validate(\$val, 'Get feature $name');") if AION_ISA =~ /ro|rw/;
 
-	$construct->add_preset("${\$feature->meta}\{isa}->validate(\$val, 'Set feature $name');") if ISA =~ /wo|rw/;
+	$construct->add_preset("${\$feature->meta}\{isa}->validate(\$val, 'Set feature $name');") if AION_ISA =~ /wo|rw/;
 }
 
 # coerce => 1
@@ -134,7 +134,7 @@ sub coerce_aspect {
 
 	die "coerce: isa not present!" unless $feature->{isa};
 
-	$feature->{construct}->add_preset("\$val = ${\$feature->meta}\{isa}->coerce(\$val);", 1) if ISA =~ /wo|rw/;
+	$feature->{construct}->add_preset("\$val = ${\$feature->meta}\{isa}->coerce(\$val);", 1) if AION_ISA =~ /wo|rw/;
 }
 
 my $pleroma;
@@ -539,7 +539,7 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-2.0
+2.2
 
 =head1 SYNOPSIS
 

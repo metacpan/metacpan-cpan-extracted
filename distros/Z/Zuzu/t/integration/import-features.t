@@ -610,8 +610,12 @@ is $builtin_runtime->call( 'io_line_count' ), 2,
 is $builtin_runtime->call( 'io_next_line_returns_null' ), 1,
 	'builtin IO module next_line returns null at EOF';
 
-my $time_ast = $parser->parse(
-	<<'SRC',
+SKIP: {
+	skip 'set TZ to run builtin Time import tests', 6
+		if !defined $ENV{TZ} or $ENV{TZ} eq '';
+
+	my $time_ast = $parser->parse(
+		<<'SRC',
 from std/time import Time, TimeParser;
 let t0 := new Time(2);
 
@@ -639,36 +643,37 @@ function parsed_time_day_of_month () {
 	return t.day_of_month();
 }
 SRC
-	'builtin-time.zzs',
-);
-$builtin_runtime->evaluate( $time_ast );
-is $builtin_runtime->call( 'time_epoch_plus_minute' ), 62,
-	'builtin Time module supports add_minutes arithmetic';
-is $builtin_runtime->call( 'time_day_of_month' ), 1,
-	'builtin Time module exposes long-form day_of_month';
-like $builtin_runtime->call( 'time_format_from_to_string' ),
-	qr/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\z/,
-	'builtin Time module to_String uses ISO-like datetime format';
-is $builtin_runtime->call( 'parsed_time_year' ), 1943,
-	'builtin TimeParser parses with strptime format string';
-is $builtin_runtime->call( 'parsed_time_day_of_month' ), 3,
-	'builtin TimeParser parse result exposes long-form day_of_month';
+		'builtin-time.zzs',
+	);
+	$builtin_runtime->evaluate( $time_ast );
+	is $builtin_runtime->call( 'time_epoch_plus_minute' ), 62,
+		'builtin Time module supports add_minutes arithmetic';
+	is $builtin_runtime->call( 'time_day_of_month' ), 1,
+		'builtin Time module exposes long-form day_of_month';
+	like $builtin_runtime->call( 'time_format_from_to_string' ),
+		qr/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\z/,
+		'builtin Time module to_String uses ISO-like datetime format';
+	is $builtin_runtime->call( 'parsed_time_year' ), 1943,
+		'builtin TimeParser parses with strptime format string';
+	is $builtin_runtime->call( 'parsed_time_day_of_month' ), 3,
+		'builtin TimeParser parse result exposes long-form day_of_month';
 
-my $no_short_alias_ast = $parser->parse(
-	<<'SRC',
+	my $no_short_alias_ast = $parser->parse(
+		<<'SRC',
 from std/time import Time;
 let t := new Time(2);
 function short_alias_value () {
 	return t.mday();
 }
 SRC
-	'builtin-time-no-short-alias.zzs',
-);
-$builtin_runtime->evaluate( $no_short_alias_ast );
-like dies {
-	$builtin_runtime->call( 'short_alias_value' );
-}, qr/Unknown method 'mday'/,
-	'builtin Time module does not expose short alias mday';
+		'builtin-time-no-short-alias.zzs',
+	);
+	$builtin_runtime->evaluate( $no_short_alias_ast );
+	like dies {
+		$builtin_runtime->call( 'short_alias_value' );
+	}, qr/Unknown method 'mday'/,
+		'builtin Time module does not expose short alias mday';
+}
 
 my $proc_ast = $parser->parse(
 	<<'SRC',

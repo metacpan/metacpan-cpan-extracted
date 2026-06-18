@@ -47,7 +47,7 @@ EOD
     for my $t (@tests) {
         my $expect = delete $t->{expect};
 
-        my $dt = DateTime::Calendar::Julian->new($t);
+        my $dt = DateTime::Calendar::Julian->new( %$t );
 
         my $is = $dt->is_last_day_of_quarter;
         ok( ( $expect ? $is : !$is ), '->is_last_day_of_quarter' );

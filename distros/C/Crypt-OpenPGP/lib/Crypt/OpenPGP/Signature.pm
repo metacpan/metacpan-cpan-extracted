@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Signature;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Crypt::OpenPGP::Digest;
 use Crypt::OpenPGP::Signature::SubPacket;

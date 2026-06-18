@@ -2,14 +2,14 @@ package Zuzu::Marshal::CBOR;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use Exporter qw( import );
 use B qw( SVf_IOK SVf_NOK SVf_POK svref_2object );
 use Encode ();
-use POSIX qw( isfinite );
 use Scalar::Util qw( blessed );
 use Types::Serialiser ();
+use Zuzu::Util::Number qw( is_finite_number );
 
 use CBOR::Free ();
 use CBOR::Free::Decoder ();
@@ -230,7 +230,7 @@ sub _scan_simple_or_float {
 		die "Invalid Zuzu Marshal CBOR: NaN is invalid"
 			if $float != $float;
 		die "Invalid Zuzu Marshal CBOR: infinite float is invalid"
-			if !isfinite($float);
+			if !is_finite_number($float);
 		return $offset + 8;
 	}
 

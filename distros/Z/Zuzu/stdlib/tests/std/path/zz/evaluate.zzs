@@ -19,6 +19,8 @@ let data := {
 	lower_word: "alpha",
 	next_word: "beta",
 	suffix: "Beta",
+	empty_string: "",
+	bytes: to_binary(" \x01"),
 	pattern: "^(Al)",
 	mask: 5,
 	mask2: 3,
@@ -77,6 +79,10 @@ is( ( new ZZPath( path: "four >= four" ) ).first(data), true, "binary >= compare
 is( ( new ZZPath( path: "two ≶ three" ) ).first(data), -1, "binary ≶ compares numerically" );
 is( ( new ZZPath( path: "three <=> three" ) ).first(data), 0, "binary <=> compares numerically" );
 is( ( new ZZPath( path: "four ≷ three" ) ).first(data), 1, "binary ≷ compares numerically" );
+is( ( new ZZPath( path: "two ∣ six" ) ).first(data), true, "binary ∣ tests divisibility" );
+is( ( new ZZPath( path: "four ∣ six" ) ).first(data), false, "binary ∣ rejects non-divisors" );
+is( ( new ZZPath( path: "two divides six" ) ).first(data), true, "binary divides tests divisibility" );
+is( ( new ZZPath( path: "four ∤ six" ) ).first(data), 2, "binary ∤ returns the remainder" );
 
 is( ( new ZZPath( path: "word _ suffix" ) ).first(data), "AlphaBeta", "binary _ concatenates" );
 is( ( new ZZPath( path: "word eq \"Alpha\"" ) ).first(data), true, "binary eq compares strings" );
@@ -112,6 +118,20 @@ is( ( new ZZPath( path: "mask & mask2" ) ).first(data), 1, "binary & bitwise-and
 is( ( new ZZPath( path: "mask ^ mask2" ) ).first(data), 6, "binary ^ bitwise-xors numbers" );
 is( ( new ZZPath( path: "mask | mask3" ) ).first(data), 13, "binary | bitwise-ors numbers" );
 is( ( new ZZPath( path: "one | two & three" ) ).first(data), 3, "bitwise precedence is applied" );
+is( ( new ZZPath( path: "two « three" ) ).first(data), 16, "binary « left-shifts numbers" );
+is( ( new ZZPath( path: "two << three" ) ).first(data), 16, "binary << left-shifts numbers" );
+is( ( new ZZPath( path: "ten » one" ) ).first(data), 5, "binary » right-shifts numbers" );
+is( ( new ZZPath( path: "ten >> one" ) ).first(data), 5, "binary >> right-shifts numbers" );
+is(
+	to_string( ( new ZZPath( path: "bytes « one" ) ).first(data) ),
+	"@\x02",
+	"binary « left-shifts BinaryString bytes",
+);
+is(
+	to_string( ( new ZZPath( path: "bytes » one" ) ).first(data) ),
+	"\x10\x00",
+	"binary » right-shifts BinaryString bytes",
+);
 is( ( new ZZPath( path: "one and two" ) ).first(data), 2, "binary and returns truthy RHS" );
 is(
 	( new ZZPath( path: "zero and two" ) ).first(data),
@@ -121,8 +141,16 @@ is(
 is( ( new ZZPath( path: "one ⋀ three" ) ).first(data), 3, "binary ⋀ returns truthy RHS" );
 is( ( new ZZPath( path: "one nand zero" ) ).first(data), true, "binary nand negates and" );
 is( ( new ZZPath( path: "one ⊼ two" ) ).first(data), false, "binary ⊼ negates and" );
+is( ( new ZZPath( path: "one butnot zero" ) ).first(data), true, "binary butnot subtracts truthiness" );
+is( ( new ZZPath( path: "one ⊭ two" ) ).first(data), false, "binary ⊭ subtracts truthiness" );
 is( ( new ZZPath( path: "one xor zero" ) ).first(data), true, "binary xor compares truthiness" );
 is( ( new ZZPath( path: "one ⊻ two" ) ).first(data), false, "binary ⊻ compares truthiness" );
+is( ( new ZZPath( path: "zero nor zero" ) ).first(data), true, "binary nor negates or" );
+is( ( new ZZPath( path: "one ⊽ zero" ) ).first(data), false, "binary ⊽ negates or" );
+is( ( new ZZPath( path: "one xnor two" ) ).first(data), true, "binary xnor compares truthiness" );
+is( ( new ZZPath( path: "one ↔ zero" ) ).first(data), false, "binary ↔ compares truthiness" );
+is( ( new ZZPath( path: "one onlyif zero" ) ).first(data), false, "binary onlyif implies RHS" );
+is( ( new ZZPath( path: "zero ⊨ one" ) ).first(data), true, "binary ⊨ accepts falsey LHS" );
 is( ( new ZZPath( path: "zero or two" ) ).first(data), true, "binary or boolifies RHS" );
 is( ( new ZZPath( path: "one ⋁ zero" ) ).first(data), true, "binary ⋁ short-circuits truthy LHS" );
 is(
@@ -130,6 +158,28 @@ is(
 	true,
 	"logical and binds tighter than xor",
 );
+is( ( new ZZPath( path: "one and? word" ) ).first(data), "Alpha", "binary and? returns truthy RHS" );
+is( ( new ZZPath( path: "zero and? word" ) ).first(data), 0, "binary and? preserves falsey LHS" );
+is( ( new ZZPath( path: "zero nand? suffix" ) ).first(data), "Beta", "binary nand? returns truthy RHS" );
+is( ( new ZZPath( path: "one nand? suffix" ) ).first(data), false, "binary nand? returns false for two truthy values" );
+is( ( new ZZPath( path: "one nand? zero" ) ).first(data), true, "binary nand? returns true for truthy falsey" );
+is( ( new ZZPath( path: "one butnot? zero" ) ).first(data), 1, "binary butnot? returns truthy LHS" );
+is( ( new ZZPath( path: "zero butnot? suffix" ) ).first(data), 0, "binary butnot? preserves falsey LHS" );
+is( ( new ZZPath( path: "one butnot? suffix" ) ).first(data), false, "binary butnot? returns false for two truthy values" );
+is( ( new ZZPath( path: "one xor? zero" ) ).first(data), 1, "binary xor? returns lone truthy LHS" );
+is( ( new ZZPath( path: "zero xor? suffix" ) ).first(data), "Beta", "binary xor? returns lone truthy RHS" );
+is( ( new ZZPath( path: "one xor? suffix" ) ).first(data), false, "binary xor? returns false for two truthy values" );
+is( ( new ZZPath( path: "one nor? zero" ) ).first(data), 0, "binary nor? returns falsey RHS" );
+is( ( new ZZPath( path: "zero nor? suffix" ) ).first(data), 0, "binary nor? returns falsey LHS" );
+is( ( new ZZPath( path: "zero nor? empty_string" ) ).first(data), true, "binary nor? returns true for two falsey values" );
+is( ( new ZZPath( path: "one xnor? suffix" ) ).first(data), "Beta", "binary xnor? returns truthy RHS" );
+is( ( new ZZPath( path: "one xnor? zero" ) ).first(data), 0, "binary xnor? returns falsey RHS" );
+is( ( new ZZPath( path: "zero xnor? suffix" ) ).first(data), 0, "binary xnor? returns falsey LHS" );
+is( ( new ZZPath( path: "zero xnor? empty_string" ) ).first(data), true, "binary xnor? returns true for two falsey values" );
+is( ( new ZZPath( path: "one onlyif? zero" ) ).first(data), 0, "binary onlyif? returns RHS" );
+is( ( new ZZPath( path: "zero onlyif? suffix" ) ).first(data), true, "binary onlyif? returns true for falsey LHS" );
+is( ( new ZZPath( path: "word or? suffix" ) ).first(data), "Alpha", "binary or? preserves truthy LHS" );
+is( ( new ZZPath( path: "zero or? suffix" ) ).first(data), "Beta", "binary or? returns falsey fallback" );
 
 let unioned := ( new ZZPath( path: "left_values union right_values" ) ).first(data);
 ok( unioned.contains(3), "binary union includes RHS values" );

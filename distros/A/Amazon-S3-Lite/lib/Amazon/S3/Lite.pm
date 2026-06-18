@@ -22,7 +22,7 @@ use Readonly;
 Readonly our $TRUE  => 1;
 Readonly our $FALSE => 0;
 
-our $VERSION = '1.1.5';
+our $VERSION = '1.2.0';
 
 ########################################################################
 sub new {
@@ -848,6 +848,33 @@ sub put_bucket_notification_configuration {
   my $response = $self->_request( 'PUT', $url, \%headers, $xml );
 
   $self->_croak_on_error( $response, 'put_bucket_notification_configuration' );
+
+  return $TRUE;
+}
+
+########################################################################
+sub remove_bucket_notification_configuration {
+########################################################################
+  my ( $self, $bucket ) = @_;
+
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  my $xml = <<'END_XML';
+<NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
+END_XML
+
+  my $url = $self->_endpoint($bucket) . q{?notification=};
+
+  my %headers = (
+    'Content-Type'   => 'application/xml',
+    'Content-Length' => length $xml,
+    'Content-MD5'    => encode_base64( md5($xml), q{} ),
+  );
+
+  my $response = $self->_request( 'PUT', $url, \%headers, $xml );
+
+  $self->_croak_on_error( $response, 'remove_bucket_notification_configuration' );
 
   return $TRUE;
 }
@@ -1741,6 +1768,16 @@ and C<value>.
 
 Returns an empty arrayref if no notification configuration is set.
 Croaks on failure.
+
+=head2 remove_bucket_notification_configuration
+
+  $s3->remove_bucket_notification_configuration($bucket);
+
+Removes all notification configurations from C<$bucket> by sending an
+empty C<NotificationConfiguration> document to S3. After this call S3
+will no longer deliver any events for the bucket.
+
+Returns true on success. Croaks on failure.
 
 =head1 ERROR HANDLING
 

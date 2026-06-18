@@ -2,7 +2,7 @@ package Zuzu::Value::Array;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use Moo;
 
@@ -286,6 +286,26 @@ sub tail {
 	return Zuzu::Value::Array->new( items => \@out );
 }
 
+sub slice {
+	my ( $self, $start, $end ) = @_;
+
+	my @items = $self->resolved_items;
+	my $length = scalar @items;
+	$start = 0 + ( $start // 0 );
+	$end = defined $end ? 0 + $end : $length;
+	$start += $length if $start < 0;
+	$end += $length if $end < 0;
+	$start = 0 if $start < 0;
+	$end = 0 if $end < 0;
+	$start = $length if $start > $length;
+	$end = $length if $end > $length;
+
+	my ( $from, $to ) = $start <= $end ? ( $start, $end ) : ( $end, $start );
+	my @out = $from < $to ? @items[ $from .. $to - 1 ] : ();
+
+	return Zuzu::Value::Array->new( items => \@out );
+}
+
 sub shuffle {
 	my ( $self ) = @_;
 	my @out = $self->resolved_items;
@@ -388,6 +408,8 @@ sub to_Bag {
 
 	return Zuzu::Value::Bag->new( items => [ $self->resolved_items ] );
 }
+
+sub to_Array { $_[0]->copy }
 
 sub length { scalar @{ $_[0]->items } }
 

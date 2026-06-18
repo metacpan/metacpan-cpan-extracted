@@ -103,6 +103,7 @@ is_match(
 
 # No supported items => '' (not undef)
 {
+    no warnings 'Apache2::API';
     my $ac = Apache2::API::Headers::Accept->new( 'text/html' );
     is( scalar( $ac->match( [] ) ), '', 'Empty supported => empty string' );
 }
@@ -143,7 +144,10 @@ subtest 'edge cases' => sub
     ok( !$ac->preferences->[0], 'Invalid header: empty preferences' );
 
     # Test empty supported
-    is( $ac->match([]), '', 'Empty supported: empty string' );
+    {
+        no warnings 'Apache2::API';
+        is( $ac->match([]), '', 'Empty supported: empty string' );
+    }
 
     # Test error handling
     $ac = Apache2::API::Headers::Accept->new( 'text/html', debug => $DEBUG );

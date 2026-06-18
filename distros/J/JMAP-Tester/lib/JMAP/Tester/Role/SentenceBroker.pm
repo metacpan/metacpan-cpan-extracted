@@ -1,5 +1,5 @@
 use v5.20.0;
-package JMAP::Tester::Role::SentenceBroker 0.109;
+package JMAP::Tester::Role::SentenceBroker 0.110;
 
 use Moo::Role;
 
@@ -8,8 +8,6 @@ requires 'sentence_for_item';
 requires 'paragraph_for_items';
 
 requires 'strip_json_types';
-
-requires 'abort';
 
 1;
 
@@ -25,7 +23,7 @@ JMAP::Tester::Role::SentenceBroker
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 PERL VERSION
 

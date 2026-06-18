@@ -31,6 +31,7 @@ can_ok( $al, 'locales' );
 
 sub is_match
 {
+    no warnings 'Apache2::API';
     my( $hdr, $offers, $expect, $name ) = @_;
     my $al = Apache2::API::Headers::AcceptLanguage->new( $hdr, debug => $DEBUG );
     my $got = $al->match( $offers );
@@ -161,11 +162,17 @@ subtest 'edge cases' => sub
     is_deeply( $al->preferences, ['en'], 'Keeps highest q for duplicate' );
 
     # Test invalid locale
-    $al = Apache2::API::Headers::AcceptLanguage->new('invalid;q=1', debug => $DEBUG);
-    ok( !$al->preferences->[0], 'Invalid locale ignored' );
+    {
+        no warnings 'Apache2::API';
+        $al = Apache2::API::Headers::AcceptLanguage->new('invalid;q=1', debug => $DEBUG);
+        ok( !$al->preferences->[0], 'Invalid locale ignored' );
+    }
 
     # Test empty supported
-    is( $al->match([]), '', 'Empty supported: empty string' );
+    {
+        no warnings 'Apache2::API';
+        is( $al->match([]), '', 'Empty supported: empty string' );
+    }
 
     # Test 0.01 style priority
     local $Apache2::API::Headers::AcceptLanguage::MATCH_PRIORITY_0_01_STYLE = 1;

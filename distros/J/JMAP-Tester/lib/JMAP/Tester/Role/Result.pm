@@ -1,12 +1,13 @@
 use v5.20.0;
 use warnings;
-package JMAP::Tester::Role::Result 0.109;
+package JMAP::Tester::Role::Result 0.110;
 # ABSTRACT: the kind of thing that you get back for a request
 
 use Moo::Role;
 
 use experimental 'signatures';
 
+use Data::OptList ();
 use JMAP::Tester::Abort ();
 
 use namespace::clean;
@@ -70,6 +71,50 @@ sub assert_single_successful_set ($self, $name = undef) {
   $self->assert_successful->single_sentence($name)->as_set->assert_no_errors;
 }
 
+has diagnostic_dumper => (
+  is => 'ro',
+  required => 1,
+);
+
+sub dump_diagnostic ($self, $value) {
+  $self->diagnostic_dumper->($value);
+}
+
+sub default_diagnostics ($self) {
+  return;
+}
+
+sub abort ($self, $string, $diag_spec = undef) {
+  $diag_spec //= $self->default_diagnostics;
+
+  my @diagnostics;
+
+  if ($diag_spec) {
+    my $todo = Data::OptList::mkopt($diag_spec);
+
+    PAIR: for my $pair (@$todo) {
+      my ($label, $value) = @$pair;
+
+      if (not defined $value) {
+        push @diagnostics, "$label\n";
+        next PAIR;
+      }
+
+      if (ref $value) {
+        $value = $self->dump_diagnostic($value);
+      }
+
+      push @diagnostics, "$label: $value";
+      $diagnostics[-1] .= "\n" unless $value =~ /\n\z/;
+    }
+  }
+
+  die JMAP::Tester::Abort->new({
+    message => $string,
+    (@diagnostics ? (diagnostics => \@diagnostics) : ()),
+  });
+}
+
 1;
 
 __END__
@@ -84,7 +129,7 @@ JMAP::Tester::Role::Result - the kind of thing that you get back for a request
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 OVERVIEW
 

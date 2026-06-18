@@ -140,7 +140,6 @@ subtest "uploading blobs" => sub {
   is($upload->size,    18,            "got the size we expect");
 };
 
-
 subtest 'http logger' => sub {
   my @lines;
 
@@ -152,6 +151,20 @@ subtest 'http logger' => sub {
   like($lines[0], qr/BEGIN JMAP REQUEST/, 'got our begin log line');
   like($lines[1], qr/Foo\/bar.*baz/, 'got our request');
   like($lines[2], qr/END JMAP REQUEST/, 'got our end log line');
+};
+
+subtest 'misc http logger' => sub {
+  my @lines;
+
+  local $tester->{_logger} = JMAP::Tester::Logger::HTTP->new({
+    writer => sub { push @lines, shift },
+  });
+
+  $tester->http_get($tester->authentication_uri);
+  like($lines[0], qr/BEGIN MISC REQUEST/,  'got our begin request log line');
+  like($lines[2], qr/END MISC REQUEST/,    'got our end request log line');
+  like($lines[3], qr/BEGIN MISC RESPONSE/, 'got our begin response log line');
+  like($lines[5], qr/END MISC RESPONSE/,   'got our end response log line');
 };
 
 done_testing;

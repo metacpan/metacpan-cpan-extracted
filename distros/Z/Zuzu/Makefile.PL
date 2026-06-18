@@ -56,6 +56,7 @@ WriteMakefile(
 		'Types::Serialiser' => 0,
 		'URI' => 0,
 		'URI::Escape' => 0,
+		'URI::Template' => 0,
 		'XML::LibXML' => 0,
 		'YAML::PP' => 0,
 	},

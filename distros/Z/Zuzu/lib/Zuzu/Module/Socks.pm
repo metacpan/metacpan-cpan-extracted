@@ -2,7 +2,7 @@ package Zuzu::Module::Socks;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use IO::Socket::INET ();
 use IO::Socket::UNIX ();

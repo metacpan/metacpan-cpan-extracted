@@ -121,7 +121,6 @@ META.json
 META.yml
 NUMBER_THEORY_GUIDE.md
 NUMBER_THEORY_REFERENCE.md
-NUMBER_THEORY_TUTORIAL.md
 README.md
 scripts/absolute_string.sf
 scripts/abstract_type.sf
@@ -1011,6 +1010,7 @@ scripts/Tests/prime_signature_numbers.sf
 scripts/Tests/problem_of_apollonius.sf
 scripts/Tests/pseudoprimes.sf
 scripts/Tests/pythagorean_means.sf
+scripts/Tests/quadratic_element.sf
 scripts/Tests/quadratic_integers.sf
 scripts/Tests/quadratic_nonresidue.sf
 scripts/Tests/quaternion_integers.sf

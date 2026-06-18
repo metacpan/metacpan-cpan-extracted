@@ -3,25 +3,22 @@ package Aion::Pleroma;
 
 use common::sense;
 
-use config {
-	INI => 'etc/annotation/eon.ann',
-	PLEROMA => {},
-	AUTOWARE => 1,
-};
+use Aion::Env AION_PLEROMA_INI => (default => 'etc/annotation/eon.ann');
+use Aion::Env AION_PLEROMA_AUTOWARE => (default => 1);
 
 use Aion;
 
 # Файл с аннотациями
-has ini => (is => 'ro', isa => Maybe[Str], default => INI);
+has ini => (is => 'ro', isa => Maybe[Str], default => AION_PLEROMA_INI);
 
 # Конфигурация: ключ => класс#метод_класса
 has pleroma => (is => 'ro', isa => HashRef[Str], default => sub {
 	my ($self) = @_;
 	
-	my %pleroma = (%{&PLEROMA}, 'Aion::Pleroma' => 'Aion::Pleroma#new');
+	my %pleroma = ('Aion::Pleroma' => 'Aion::Pleroma#new');
 	return \%pleroma unless defined $self->ini and -e $self->ini;
 
-	open my $f, '<:utf8', INI or die "Not open ${\$self->ini}: $!";
+	open my $f, '<:utf8', $self->ini or die "Not open ${\$self->ini}: $!";
 	while(<$f>) {
 		close($f), die "${\$self->ini} corrupt at line $.: $_" unless /^([\w:]+)#(\w*),\d+=(.*)$/;
 		my ($pkg, $sub, $key) = ($1, $2, $3);
@@ -54,7 +51,7 @@ sub get {
 		eval "require $pkg" or die unless $pkg->can('new') || $pkg->can('does');
 		$self->{eon}{$key} = $pkg->$method;
 	}
-	elsif(AUTOWARE and $key =~ /^([\w:]+)(#\w+)?$/ and eval "require $1") { $self->autoware($key)->get($key) }
+	elsif(AION_PLEROMA_AUTOWARE and $key =~ /^([\w:]+)(#\w+)?$/ and eval "require $1") { $self->autoware($key)->get($key) }
 	else { undef }
 }
 
@@ -112,15 +109,13 @@ The configuration for creating eons is obtained from the C<PLEROMA> config and t
 
 =head1 CONFIG
 
-Module settings that can be set in C<.config.pm>:
+Module settings that can be set in C<.env>:
 
 =over
 
-=item * INI => 'etc/annotation/eon.ann' – annotation file.
+=item * AION_PLEROMA_INI – annotation file. Defaults to C<etc/annotation/eon.ann>.
 
-=item * PLEROMA => {} – additional set of eons.
-
-=item * AUTOWARE => 1 – load modules automatically, even if they are not specified in the configuration.
+=item * AION_PLEROMA_AUTOWARE – load modules automatically, even if they are not specified in the configuration. Default is C<1>.
 
 =back
 

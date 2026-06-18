@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Compressed;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Compress::Zlib;
 use Crypt::OpenPGP::Buffer;

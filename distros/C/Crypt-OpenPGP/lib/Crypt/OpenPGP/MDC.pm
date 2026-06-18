@@ -2,7 +2,7 @@ package Crypt::OpenPGP::MDC;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Crypt::OpenPGP::Digest;
 use parent qw( Crypt::OpenPGP::ErrorHandler );

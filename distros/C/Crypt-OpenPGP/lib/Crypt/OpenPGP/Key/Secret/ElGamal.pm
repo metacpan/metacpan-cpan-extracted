@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Key::Secret::ElGamal;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Crypt::OpenPGP::Key::Public::ElGamal;
 use parent qw( Crypt::OpenPGP::Key::Secret Crypt::OpenPGP::ErrorHandler );

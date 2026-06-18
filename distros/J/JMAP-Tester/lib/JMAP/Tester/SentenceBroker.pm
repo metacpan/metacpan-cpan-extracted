@@ -1,5 +1,5 @@
 use v5.20.0;
-package JMAP::Tester::SentenceBroker 0.109;
+package JMAP::Tester::SentenceBroker 0.110;
 
 use Moo;
 with 'JMAP::Tester::Role::SentenceBroker';
@@ -37,41 +37,6 @@ sub paragraph_for_items ($self, $items_ref) {
   });
 }
 
-sub abort ($self, $string, $diag_spec = undef) {
-  $diag_spec //= [ 'Response sentences', sub { [ $_[0]->sentences ] } ];
-
-  my @diagnostics;
-
-  if ($diag_spec) {
-    my $todo = Data::OptList::mkopt($diag_spec);
-
-    PAIR: for my $pair (@$todo) {
-      my ($label, $value) = @$pair;
-
-      if (not defined $value) {
-        push @diagnostics, "$label\n";
-        next PAIR;
-      }
-
-      if (ref $value) {
-        if (ref $value eq 'CODE') {
-          $value = $value->($self->response);
-        }
-
-        $value = $self->response->dump_diagnostic($value);
-      }
-
-      push @diagnostics, "$label: $value";
-      $diagnostics[-1] .= "\n" unless $value =~ /\n\z/;
-    }
-  }
-
-  die JMAP::Tester::Abort->new({
-    message => $string,
-    (@diagnostics ? (diagnostics => \@diagnostics) : ()),
-  });
-}
-
 sub strip_json_types ($self, $struct) {
   state $typist = JSON::Typist->new;
   $typist->strip_types($struct);
@@ -92,7 +57,7 @@ JMAP::Tester::SentenceBroker
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 PERL VERSION
 

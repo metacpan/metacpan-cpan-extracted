@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Key::Secret::RSA;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Crypt::RSA::Key::Private;
 use Crypt::OpenPGP::Key::Public::RSA;

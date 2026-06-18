@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Armour;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Crypt::OpenPGP;
 use MIME::Base64;

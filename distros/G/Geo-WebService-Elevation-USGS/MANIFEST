@@ -6,8 +6,8 @@ eg/usgs_ele
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 lib/Geo/WebService/Elevation/USGS.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP

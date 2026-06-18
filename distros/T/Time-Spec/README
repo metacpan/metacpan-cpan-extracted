@@ -1,5 +1,5 @@
 This archive contains the distribution Time-Spec,
-version 0.007:
+version 0.008:
 
   a wrapper around struct timespec
 

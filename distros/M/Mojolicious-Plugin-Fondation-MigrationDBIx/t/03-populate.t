@@ -50,6 +50,12 @@ sub build_app {
 {
     my ($app, $dbfile) = build_app;
     $app->commands->run('db', 'prepare', '-y');
+
+    # Fixtures should be in the schema version directory (v1)
+    my $fix_v1 = $app->home->child('share', 'fixtures', '1');
+    ok(-d $fix_v1, 'fixtures in v1 directory');
+    ok(-f $fix_v1->child('conf', 'foo.json'), 'foo fixture config in v1');
+
     $app->commands->run('db', 'install');
 
     my $out = '';
@@ -78,6 +84,12 @@ sub build_app {
 {
     my ($app, $dbfile) = build_app;
     $app->commands->run('db', 'prepare', '-y');
+
+    # Fixtures should be in the schema version directory (v1)
+    my $fix_v1 = $app->home->child('share', 'fixtures', '1');
+    ok(-d $fix_v1, 'fixtures in v1 directory');
+    ok(-f $fix_v1->child('conf', 'foo.json'), 'foo fixture config in v1');
+
     $app->commands->run('db', 'install');
 
     my $out = '';

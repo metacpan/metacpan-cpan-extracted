@@ -53,6 +53,7 @@ requires:
   Types::Serialiser: '0'
   URI: '0'
   URI::Escape: '0'
+  URI::Template: '0'
   XML::LibXML: '0'
   YAML::PP: '0'
   perl: '5.014'
@@ -60,5 +61,5 @@ resources:
   bugtracker: https://github.com/zuzuscript/zuzu-perl/issues
   homepage: https://zuzulang.org/
   repository: https://github.com/zuzuscript/zuzu-perl
-version: '0.004000'
+version: '0.005000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Manager;
-$Mojolicious::Plugin::Fondation::Manager::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Manager::VERSION = '0.03';
 # ABSTRACT: Plugin registry, post-load actions, and finalyze initialization
 
 use Mojo::Base -base, -signatures;
@@ -111,7 +111,7 @@ sub _run_post_load_actions_for ($self, $long, $conf = {}) {
         };
 
         my ($action_short) = $action_class =~ /::Action::(.+)$/;
-        my $action_log = $self->app->log->context("[$action_short Action]");
+        my $action_log = $self->app->log->context("[$action_short >]");
 
         my $action = $action_class->new(
             manager => $self,
@@ -181,7 +181,7 @@ Mojolicious::Plugin::Fondation::Manager - Plugin registry, post-load actions, an
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

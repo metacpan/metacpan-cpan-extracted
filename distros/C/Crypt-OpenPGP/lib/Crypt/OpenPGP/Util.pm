@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Util;
 use strict;
 use warnings;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 # For some reason, FastCalc causes problems. Restrict to one of these 3 backends
 use Math::BigInt only => 'Pari,GMP,Calc';

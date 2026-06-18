@@ -1,0 +1,25 @@
+from test/more import *;
+
+is( 7 xor? "x", false, "xor? truthy truthy returns ⊥" );
+is( typeof( 7 xor? "x" ), "Boolean", "xor? truthy truthy returns Boolean" );
+is( 7 xor? 0, 7, "xor? truthy falsey returns left" );
+is( 0 xor? "x", "x", "xor? falsey truthy returns right" );
+is( 0 ⊻? "", false, "⊻? falsey falsey returns ⊥" );
+
+is( 7 xnor? "x", "x", "xnor? truthy truthy returns right" );
+is( 7 xnor? 0, 0, "xnor? truthy falsey returns right" );
+is( 0 xnor? "x", 0, "xnor? falsey truthy returns left" );
+is( 0 ↔? "", true, "↔? falsey falsey returns ⊤" );
+is( typeof( 0 ↔? "" ), "Boolean", "↔? falsey falsey returns Boolean" );
+
+is( 7 nand? "x", false, "nand? truthy truthy returns ⊥" );
+is( 7 nand? 0, true, "nand? truthy falsey returns ⊤" );
+is( 0 nand? "x", "x", "nand? falsey truthy returns right" );
+is( 0 ⊼? "", true, "⊼? falsey falsey returns ⊤" );
+
+is( 7 nor? "x", false, "nor? truthy truthy returns ⊥" );
+is( 7 nor? 0, 0, "nor? truthy falsey returns right" );
+is( 0 nor? "x", 0, "nor? falsey truthy returns left" );
+is( 0 ⊽? "", true, "⊽? falsey falsey returns ⊤" );
+
+done_testing();

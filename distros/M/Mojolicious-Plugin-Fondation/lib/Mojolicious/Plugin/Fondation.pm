@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation;
-$Mojolicious::Plugin::Fondation::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::VERSION = '0.03';
 # ABSTRACT: Hierarchical plugin loader with configuration priority and resource sharing
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -86,7 +86,7 @@ Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration p
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

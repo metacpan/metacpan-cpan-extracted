@@ -18,10 +18,14 @@ t/02-install.t
 t/03-populate.t
 t/04-status.t
 t/05-upgrade-downgrade.t
+t/06-upgrade-populate.t
 t/lib/Mojolicious/Plugin/Fondation/TestDBIx.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIx/Schema/Result/Foo.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIx/share/fixtures/1/conf/foo.json
 t/lib/Mojolicious/Plugin/Fondation/TestDBIx/share/fixtures/1/foo/foos/1.fix
+t/lib/Mojolicious/Plugin/Fondation/TestDBIx2.pm
+t/lib/Mojolicious/Plugin/Fondation/TestDBIx2/share/fixtures/1/bars/bars/1.fix
+t/lib/Mojolicious/Plugin/Fondation/TestDBIx2/share/fixtures/1/conf/bars.json
 t/lib/TestSchema.pm
 t/lib/TestSchema/Result/Foo.pm
 t/lib/TestSchemaV2.pm

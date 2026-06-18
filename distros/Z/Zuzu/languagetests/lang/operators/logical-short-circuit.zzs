@@ -1,0 +1,46 @@
+from test/more import *;
+
+let hits := 0;
+
+function probe ( value ) {
+	hits += 1;
+	return value;
+}
+
+is( probe(true) nor probe(false), false, "nor short-circuits when left is truthy" );
+is( hits, 1, "nor skipped right operand" );
+is( probe(false) nor probe(false), true, "nor evaluates right when left is falsey" );
+is( hits, 3, "nor evaluated both operands when needed" );
+
+is( probe(false) onlyif probe(false), true, "onlyif short-circuits when left is falsey" );
+is( hits, 4, "onlyif skipped right operand" );
+is( probe(true) onlyif probe(false), false, "onlyif evaluates right when left is truthy" );
+is( hits, 6, "onlyif evaluated both operands when needed" );
+
+is( probe(false) butnot probe(false), false, "butnot short-circuits when left is falsey" );
+is( hits, 7, "butnot skipped right operand" );
+is( probe(true) butnot probe(false), true, "butnot evaluates right when left is truthy" );
+is( hits, 9, "butnot evaluated both operands when needed" );
+
+is( probe(false) and? probe("right"), false, "and? short-circuits when left is falsey" );
+is( hits, 10, "and? skipped right operand" );
+is( probe(true) and? probe("right"), "right", "and? evaluates right when left is truthy" );
+is( hits, 12, "and? evaluated both operands when needed" );
+
+is( probe("left") or? probe("right"), "left", "or? short-circuits when left is truthy" );
+is( hits, 13, "or? skipped right operand" );
+is( probe(0) or? probe("right"), "right", "or? evaluates right when left is falsey" );
+is( hits, 15, "or? evaluated both operands when needed" );
+
+is( probe(true) xnor probe(true), true, "xnor evaluates both operands" );
+is( hits, 17, "xnor evaluated right operand" );
+is( probe(true) xor? probe(false), true, "xor? evaluates both operands" );
+is( hits, 19, "xor? evaluated right operand" );
+is( probe(false) xnor? probe(false), true, "xnor? evaluates both operands" );
+is( hits, 21, "xnor? evaluated right operand" );
+is( probe(false) nand? probe("right"), "right", "nand? evaluates both operands" );
+is( hits, 23, "nand? evaluated right operand" );
+is( probe(true) nor? probe(0), 0, "nor? evaluates both operands" );
+is( hits, 25, "nor? evaluated right operand" );
+
+done_testing();

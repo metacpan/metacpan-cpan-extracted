@@ -1,7 +1,7 @@
 package Crypt::OpenPGP::Key::Public::ElGamal;
 use strict;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Crypt::OpenPGP::Util qw( bitsize);
 use parent qw( Crypt::OpenPGP::Key::Public Crypt::OpenPGP::ErrorHandler );

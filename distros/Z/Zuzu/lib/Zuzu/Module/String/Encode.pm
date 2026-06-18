@@ -2,7 +2,7 @@ package Zuzu::Module::String::Encode;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use Encode ();
 use Scalar::Util qw( blessed );

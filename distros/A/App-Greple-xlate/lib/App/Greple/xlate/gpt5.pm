@@ -1,6 +1,6 @@
 package App::Greple::xlate::gpt5;
 
-our $VERSION = "1.0201";
+our $VERSION = "1.0202";
 
 =head1 NAME
 
@@ -142,7 +142,7 @@ This module uses the following default parameters:
 
 =item * B<temperature>: 1 (fixed for GPT-5.5)
 
-=item * B<max_length>: 10000 characters per batch
+=item * B<max_length>: 3000 characters per batch
 
 =item * B<reasoning_effort>: none (for translation tasks; fastest)
 
@@ -166,7 +166,7 @@ L<App::Greple::xlate> command-line options, not environment variables:
 =over 4
 
 =item * B<--xlate-maxlen>=I<chars> - Maximum characters sent per request
-(defaults to this engine's value of 10000 when unset)
+(defaults to this engine's value of 3000 when unset)
 
 =item * B<--xlate-maxline>=I<n> - Maximum lines sent per request
 (default 0 = unlimited); useful as a safety valve if a large batch causes a
@@ -240,7 +240,7 @@ our $auth_key;
 our $method = __PACKAGE__ =~ s/.*://r;
 
 my %param = (
-    gpt5 => { engine => 'gpt-5.5', temp => '1', max => 10000, sub => \&gpty,
+    gpt5 => { engine => 'gpt-5.5', temp => '1', max => 3000, sub => \&gpty,
               reasoning_effort => 'none', verbosity => 'low', max_completion_tokens => 16000,
 	      prompt => <<END
 Translate the following JSON array into %s.

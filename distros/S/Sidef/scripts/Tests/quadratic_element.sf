@@ -1,0 +1,134 @@
+#!/usr/bin/ruby
+
+var x = Quadratic(3, 4, -1, 0)
+var y = Quadratic(1, -2, -1, 0)
+
+assert_eq(x.to_n, 3+4i)
+assert_eq(y.to_n, 1 - 2i)
+
+var g = x.gcd(y)
+assert_eq(g.to_n, 1 - 2i)
+assert_eq(g, y)
+
+var t = Quadratic(0, 1, 1, 1)
+
+assert_eq(t**10, t.pow(10))
+assert_eq((t**-10)%97, t.powmod(-10, 97))
+assert_eq(t**10, t.powmod(10, 97))
+assert_eq(t.powmod(10, 43), (t**10) % 43)
+assert_eq(t.powmod(-10, 97), (t**-10) % 97)
+
+assert_eq(
+    10.of { t**_ -> b },
+    10.of { .fib }
+)
+
+with (Quadratic(1, 1, 2, 0)) {|q|
+    assert_eq(
+        15.of { q.pow(_).a }        #=> A001333
+        %n[1, 1, 3, 7, 17, 41, 99, 239, 577, 1393, 3363, 8119, 19601, 47321, 114243]
+    )
+    assert_eq(
+        15.of { q.pow(_).b }        #=> A000129
+        %n[0, 1, 2, 5, 12, 29, 70, 169, 408, 985, 2378, 5741, 13860, 33461, 80782]
+    )
+}
+
+func Eisenstein(a, b) {
+    Quadratic(a, b, -1, -1)
+}
+
+do {
+    var w = Eisenstein(0, 1)
+    assert_eq(
+        10.by {|n| (1 - w)**n - 1 -> norm.is_prime },   # A066408
+        %n[2, 5, 7, 11, 17, 19, 79, 163, 193, 239]
+    )
+}
+
+# Determine if a given number is probably a prime number.
+func is_quadratic_pseudoprime (n) {
+
+    return false if (n <= 1)
+    return true  if (n <= 3)
+
+    for r in ([-5, -3]) {
+
+        var x = Quadratic(r, 1, r+2, 1-r).powmod(n, n)
+
+        (x.a + x.b == n) || (x.a + r.abs == n) || return false
+
+        var y = Quadratic(r, -1, r+2, 1-r).powmod(n, n)
+
+        (x.b + y.b == n) || return false
+    }
+
+    return true
+}
+
+assert(is_quadratic_pseudoprime(43))
+assert(is_quadratic_pseudoprime(97))
+
+do {
+    var n = (274177-1)
+    var m = (2**64 + 1)
+
+    with (Quadratic(3, 4, 2, 0)) {|q|
+        var r = q.powmod(n, m)
+        assert_eq(gcd(r.a-1, m), 274177)
+        assert_eq(gcd(r.b, m), 274177)
+    }
+}
+
+do {
+    var a = Quadratic(5, 8, 13, -3)
+    var b = Quadratic(3, 9, 13, -3)
+
+    assert(a > b)
+    assert(!(a < b))
+    assert(b < a)
+    assert(!(b > a))
+    assert(a == a)
+    assert(!(a != a))
+    assert(b == b)
+    assert(a != b)
+    assert(b != a)
+    assert(!(b == a))
+
+    assert_eq(a, a)
+    assert_eq(b, b)
+    assert_ne(b, a)
+    assert_ne(a, b)
+
+    assert(a > 4)
+    assert(a >= 5)
+    assert(a < 6)
+
+    assert_eq(a.a, 5)
+    assert_eq(a.b, 8)
+    assert_eq(a.p, 13)
+    assert_eq(a.q, -3)
+
+    assert_eq(a+5, Quadratic(a.a+5, a.b, a.p, a.q))
+    assert_eq(a-5, Quadratic(a.a-5, a.b, a.p, a.q))
+    assert_eq(a*5, Quadratic(a.a*5, a.b*5, a.p, a.q))
+    assert_eq(a/5, Quadratic(a.a/5, a.b/5, a.p, a.q))
+
+    assert_eq(a+b, Quadratic(a.a + b.a, a.b + b.b, a.p, a.q))
+    assert_eq(a*b, Quadratic(a.a*b.a + a.b*b.b*a.p, a.a*b.b + a.b*b.a + a.b*b.b*a.q, a.p, a.q))
+
+    assert_eq(a.inv, a**(-1))
+    assert_eq(b.inv, b**(-1))
+
+    assert_eq(a.invmod(43), a.powmod(-1, 43))
+    assert_eq(b.invmod(97), b.powmod(-1, 97))
+    assert_eq(b.invmod(146).sqr.mod(146), b.powmod(-2, 146))
+    assert_eq(b.sqr.invmod(146), b.powmod(-2, 146))
+
+    assert_eq(a+b -> to_n.round(-30), a.to_n+b.to_n -> round(-30))
+    assert_eq(a-b -> to_n.round(-30), a.to_n-b.to_n -> round(-30))
+    assert_eq(a*b -> to_n.round(-30), a.to_n*b.to_n -> round(-30))
+    assert_eq(a/b -> to_n.round(-30), a.to_n/b.to_n -> round(-30))
+}
+
+say "** Tests passed!"

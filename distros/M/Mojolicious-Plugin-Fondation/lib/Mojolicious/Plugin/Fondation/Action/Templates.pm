@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Action::Templates;
-$Mojolicious::Plugin::Fondation::Action::Templates::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Action::Templates::VERSION = '0.03';
 # ABSTRACT: Registers templates and zones from plugin share directories
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Action::Base', -signatures;
@@ -67,7 +67,8 @@ sub _register_zones ($self, $long, $short, $templates_dir) {
         return unless $basename =~ /\.(html|js)\.ep$/i;
 
         my $type = lc $1;
-        my $rel  = Mojo::Path->new($file->to_rel($templates_dir)->to_string)->to_string;
+        # Normalize Windows backslashes to forward slashes for regex matching below
+        (my $rel = $file->to_rel($templates_dir)->to_string) =~ s{\\}{/}g;
         my ($zone) = $rel =~ m{^zones/$type/(.+)/[^/]+$};
 
         $entry->{zones}{$type} //= {};
@@ -101,7 +102,7 @@ Mojolicious::Plugin::Fondation::Action::Templates - Registers templates and zone
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

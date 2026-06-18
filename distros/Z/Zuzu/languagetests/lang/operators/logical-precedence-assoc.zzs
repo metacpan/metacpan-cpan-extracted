@@ -1,0 +1,34 @@
+from test/more import *;
+
+is(
+	false onlyif true onlyif false,
+	true,
+	"onlyif is right-associative",
+);
+is(
+	false onlyif true xor true,
+	true,
+	"xor binds tighter than onlyif",
+);
+is(
+	true or true onlyif false,
+	true,
+	"onlyif binds tighter than or",
+);
+is(
+	false or true xor true and false,
+	true,
+	"and binds tighter than xor, which binds tighter than or",
+);
+is(
+	false onlyif true ⊻ true,
+	true,
+	"symbol xor binds tighter than onlyif",
+);
+is(
+	0 onlyif? 7 xor? 9,
+	true,
+	"value-preserving xor tier binds tighter than onlyif?",
+);
+
+done_testing();

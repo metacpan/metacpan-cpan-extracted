@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
-## Version v0.4.1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Apache2 API Framework - ~/lib//mnt/src/perl/Apache2-API/lib/Apache2/API/Request.pm
+## Version v0.4.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2026/03/19
+## Modified 2026/06/17
 ## All rights reserved
 ## 
 ## 
@@ -46,7 +46,7 @@ BEGIN
     use Apache2::API::Query;
     use Apache2::API::Status;
     use Cookie::Jar;
-    use DateTime;
+    use DateTime::Lite;
     use Encode ();
     use File::Which ();
     use HTTP::AcceptLanguage;
@@ -55,7 +55,7 @@ BEGIN
     use Scalar::Util;
     use URI;
     use URI::Escape;
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.4.2';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -1193,7 +1193,7 @@ sub request_time
 {
     my $self = shift( @_ );
     my $t = $self->request->request_time;
-    my $dt = DateTime->from_epoch( epoch => $t );
+    my $dt = DateTime::Lite->from_epoch( epoch => $t );
     # An Apache2::API::DateTime object
     my $fmt = $self->datetime;
     $dt->set_formatter( $fmt );
@@ -1791,7 +1791,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
     # Apache2::RequestRec
     my $r = $req->request;
     my $scheme = $req->request_scheme;
-    # DateTime object
+    # DateTime::Lite object
     my $dt = $req->request_time;
     my $uri = $req->request_uri;
     my $filename = $req->script_filename;
@@ -1841,7 +1841,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.4.1
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -2741,7 +2741,7 @@ This is the same as L</connection_id>
 
 =head2 if_modified_since
 
-Returns the value of the HTTP header If-Modified-Since as a C<DateTime> object.
+Returns the value of the HTTP header If-Modified-Since as a L<DateTime::Lite> object.
 
 If no such header exists, it returns C<undef> or an empty list depending on the context.
 
@@ -3447,7 +3447,7 @@ Gets or sets the environment variable C<REQUEST_SCHEME>
 
 Read-only.
 
-Returns the time when the request started as a L<DateTime> object with L<Apache2::API::DateTime> as the formatter.
+Returns the time when the request started as a L<DateTime::Lite> object with L<Apache2::API::DateTime> as the formatter.
 
 =head2 request_uri
 

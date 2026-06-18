@@ -5,7 +5,8 @@
 use strict;
 use warnings;
 
-use ExtUtils::MakeMaker;
+use 5.010;
+use ExtUtils::MakeMaker 6.48;
 
 use Config;
 my $std = ($Config{gccversion} || $Config{cc} =~ /\b(?:g?cc|clang)\b/) ? ' -std=gnu99' : '';
@@ -14,20 +15,23 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Get basic statistical functions, like in R, but with Perl using XS for performance",
   "AUTHOR" => "David E. Condon <dec986\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => "6.48"
   },
   "DISTNAME" => "Stats-LikeR",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Stats::LikeR",
   "PREREQ_PM" => {
     "Devel::Confess" => 0,
     "Scalar::Util" => "1.22",
-    "Test::Exception" => 0,
-    "Test::LeakTrace" => 0,
-    "Test::More" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.15",
+  "TEST_REQUIRES" => {
+    "Test::Exception" => 0,
+    "Test::LeakTrace" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,6 +40,7 @@ my %WriteMakefileArgs = (
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
     CCFLAGS => $Config::Config{ccflags} . $std,
+    LIBS => ['-lm'],
 );
 
 my %FallbackPrereqs = (

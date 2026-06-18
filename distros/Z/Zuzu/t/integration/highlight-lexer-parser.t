@@ -35,6 +35,11 @@ collect(...items);
 let floored := ⌊1.8⌋;
 let ceiled := ⌈1.2⌉;
 let chained := 4 ▷ ^^ + 1;
+let numeric := [ 0x1F, 0b1111, 0o100, 1E3, 2.5E-7 ];
+let divided := 2 divides 6 and 2 ∣ 6 and 4 ∤ 6;
+let logical := true nor? false xnor true onlyif? true butnot false;
+let symbolic := true ⊽? false ↔ true ⊨? true ⊭ false;
+let named := collect( length: 42, method: "GET", class: "Widget" );
 let { host, "for": for_id, Number port := 1234, (`x`): x_key but weak } :=
 	{ host: "localhost", "for": 1, port: 8080, x: null };
 async function demo (value) {
@@ -93,6 +98,34 @@ like $html, qr{<span class="operator">▷</span>},
 	'chain operator is classified as operator';
 like $html, qr{<span class="ident">\^\^</span>},
 	'chain placeholder is classified as identifier';
+like $html, qr{<span class="number">0o100</span>},
+	'octal source literal is classified as number';
+like $html, qr{<span class="number">1E3</span>},
+	'uppercase exponent source literal is classified as number';
+like $html, qr{<span class="operator">divides</span>},
+	'divides word operator is classified as operator';
+like $html, qr{<span class="operator">∣</span>},
+	'divides symbol operator is classified as operator';
+like $html, qr{<span class="operator">∤</span>},
+	'not-divides symbol operator is classified as operator';
+like $html, qr{<span class="operator">nor\?</span>},
+	'value-preserving nor word operator is classified as operator';
+like $html, qr{<span class="operator">xnor</span>},
+	'xnor word operator is classified as operator';
+like $html, qr{<span class="operator">onlyif\?</span>},
+	'value-preserving onlyif word operator is classified as operator';
+like $html, qr{<span class="operator">butnot</span>},
+	'butnot word operator is classified as operator';
+like $html, qr{<span class="operator">⊽\?</span>},
+	'value-preserving nor symbol operator is classified as operator';
+like $html, qr{<span class="operator">↔</span>},
+	'xnor symbol operator is classified as operator';
+like $html, qr{<span class="operator">⊨\?</span>},
+	'value-preserving onlyif symbol operator is classified as operator';
+like $html, qr{<span class="operator">⊭</span>},
+	'butnot symbol operator is classified as operator';
+like $html, qr{<span class="operator">length</span><span class="operator">:</span>},
+	'wordlike named argument key remains parseable';
 like $html, qr{<span class="keyword">let</span>\s*<span class="operator">\{</span>},
 	'declaration unpacking starts with highlighted let and brace tokens';
 like $html, qr{<span class="string">"for"</span><span class="operator">:</span>},

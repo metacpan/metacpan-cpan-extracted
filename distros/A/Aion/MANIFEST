@@ -6,6 +6,7 @@ README.md
 cpanfile
 doc/badges/total.svg
 i18n/Aion.ru-en.po
+i18n/Aion/Env.ru-en.po
 i18n/Aion/Meta/Feature.ru-en.po
 i18n/Aion/Meta/FeatureConstruct.ru-en.po
 i18n/Aion/Meta/RequiresAnyFunction.ru-en.po

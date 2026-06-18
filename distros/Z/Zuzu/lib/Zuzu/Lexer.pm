@@ -2,7 +2,7 @@ package Zuzu::Lexer;
 
 use utf8;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 
 use Zuzu::Token ();
 use Zuzu::Util ();
@@ -549,7 +549,17 @@ sub next_token {
 				if ($id eq 'false' || $id eq '⊥') { return $self->_emit('BOOL', 0, $line, $col); }
 				if ($id eq 'null') { return $self->_emit('NULL', undef, $line, $col); }
 
-				return $self->_emit('KW', $id, $line, $col) if Zuzu::Util::is_keyword($id);
+				if ( Zuzu::Util::is_keyword($id) ) {
+					if (
+						$id =~ /\A(?:and|or|xor|xnor|nand|nor|onlyif|butnot)\z/
+						and $self->_peek(1) eq '?'
+					) {
+						$self->_adv(1);
+						$id .= '?';
+					}
+
+					return $self->_emit('KW', $id, $line, $col);
+				}
 
 				return $self->_emit('IDENT', $id, $line, $col);
 			}
@@ -581,7 +591,7 @@ sub next_token {
 			'⌊', '⌋', '⌈', '⌉',
 		);
 		# plus unicode aliases you mentioned (not exhaustive)
-			push @ops, qw( × ÷ ≠ ≤ ≥ ≡ ≢ ≶ ≷ ⋀ ⋁ ⊻ ⊼ ¬ ∈ ∉ ⋃ ⋂ ⊂ ⊃ ∖ );
+			push @ops, qw( × ÷ ≠ ≤ ≥ ≡ ≢ ≶ ≷ ⋀ ⋁ ⊻ ⊼ ⊽ ↔ ⊨ ⊭ ¬ ∈ ∉ ⋃ ⋂ ⊂ ⊃ ∖ );
 			push @ops, '\\';
 			push @ops, qw(▷ ◁ ∣ ∤ );
 		# sort by length desc for greedy match
@@ -590,6 +600,10 @@ sub next_token {
 		for my $op (@ops) {
 			if ($self->_peek(length($op)) eq $op) {
 				$self->_adv(length($op));
+				if ( $op =~ /\A(?:⋀|⋁|⊻|↔|⊼|⊽|⊨|⊭)\z/ and $self->_peek(1) eq '?' ) {
+					$self->_adv(1);
+					$op .= '?';
+				}
 
 				return $self->_emit('OP', $op, $line, $col);
 			}

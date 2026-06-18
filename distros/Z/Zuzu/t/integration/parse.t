@@ -202,7 +202,7 @@ let obj := {};
 let method_name := "method";
 class Thing;
 foo(...items);
-foo(1, name: 2, ("other"): 3, ...items);
+foo(1, name: 2, length: 3, ("other"): 4, ...items);
 obj.method(...items);
 obj.(method_name)(...items);
 new Thing(...opts);
@@ -216,13 +216,14 @@ isa_ok $call_spread->args->[0][1]->expr, ['Zuzu::AST::Expr::Var'], 'spread wraps
 is $call_spread->args->[0][1]->expr->name, 'items', 'spread inner expression is preserved';
 
 my $mixed_call = $ast_spread_args->statements->[7]->expr;
-is scalar @{ $mixed_call->args }, 4, 'mixed call keeps all arguments';
+is scalar @{ $mixed_call->args }, 5, 'mixed call keeps all arguments';
 is $mixed_call->args->[0][0], undef, 'ordinary positional argument stays positional';
 is $mixed_call->args->[1][0], 'name', 'named argument label is preserved';
-ok $mixed_call->args->[2][2], 'computed named argument is marked as computed';
-isa_ok $mixed_call->args->[2][0], ['Zuzu::AST::Expr::Literal'],
+is $mixed_call->args->[2][0], 'length', 'keyword named argument label is preserved';
+ok $mixed_call->args->[3][2], 'computed named argument is marked as computed';
+isa_ok $mixed_call->args->[3][0], ['Zuzu::AST::Expr::Literal'],
 	'computed named argument label expression is preserved';
-isa_ok $mixed_call->args->[3][1], ['Zuzu::AST::Expr::Spread'], 'mixed call has spread marker';
+isa_ok $mixed_call->args->[4][1], ['Zuzu::AST::Expr::Spread'], 'mixed call has spread marker';
 
 my $member_spread = $ast_spread_args->statements->[8]->expr;
 isa_ok $member_spread, ['Zuzu::AST::Expr::MemberCall'], 'method spread call';

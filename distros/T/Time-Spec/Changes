@@ -1,5 +1,10 @@
 Revision history for Time-Spec
 
+0.008     2026-06-17 18:42:37+02:00 Europe/Brussels
+          - Move overloads to XS
+          - Add addition and substraction overloads
+          - Explicitly disable static install
+
 0.007     2026-01-29 00:52:12+01:00 Europe/Brussels
           - Avoid using POSIX::round() for backwards compatability
 
