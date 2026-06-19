@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use List::Util qw(uniq);
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 Travel::Status::DE::DBRIS::Formation::Group->mk_ro_accessors(
 	qw(designation name train_no train_type description desc_short destination has_sectors model series start_percent end_percent)
@@ -330,6 +330,7 @@ my %model_name = (
 	'442'      => [ 'Talent 2',            'BR 442' ],
 	'445'      => [ 'Twindexx Vario',      'BR 445' ],
 	'446'      => [ 'Twindexx Vario',      'BR 446' ],
+	'445446'   => [ 'Stadler KISS',        'BR 445' ],
 	'462'      => [ 'Desiro HC',           'BR 462' ],
 	'463'      => [ 'Mireo',               'BR 463' ],
 	'475'      => [ 'TGV',                 'BR 475' ],
@@ -467,6 +468,7 @@ sub parse_model {
 		'442'      => 0,
 		'445'      => 0,
 		'446'      => 0,
+		'445446'   => 0,
 		'462'      => 0,
 		'463'      => 0,
 		'475'      => 0,
@@ -597,6 +599,9 @@ sub parse_model {
 			or $carriage->model == 863 )
 		{
 			$ml{'463'}++;
+		}
+		elsif ( substr($carriage->uic_id, 5, 4) =~ m{ 44 [56] [16] }x ) {
+			$ml{'445446'}++;
 		}
 		elsif ( $carriage->model == 445 ) {
 			$ml{'445'}++;

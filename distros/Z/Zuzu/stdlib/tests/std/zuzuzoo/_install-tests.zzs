@@ -22,11 +22,14 @@ function root () {
 	let lib := dir.child("lib");
 	let bin := dir.child("bin");
 	let meta := dir.child("meta");
+	let home := dir.child("home");
 	ensure_dir(lib);
 	ensure_dir(bin);
 	ensure_dir(meta);
+	ensure_dir(home);
 	return {
 		dir_obj: dir,
+		home_obj: home,
 		lib_dir: lib.to_String(),
 		bin_dir: bin.to_String(),
 		meta_dir: meta.to_String(),
@@ -165,7 +168,7 @@ function zoo_for ( target, zuzu ) {
 		lib_dir: target{lib_dir},
 		bin_dir: target{bin_dir},
 		meta_dir: target{meta_dir},
-		home: Path.tempdir().to_String(),
+		home: target{home_obj}.to_String(),
 		zuzu_command: zuzu,
 	);
 }
@@ -213,8 +216,9 @@ ok(
 );
 
 let skip_all_root := root();
+let skip_all_archive := skip_all_archive_path();
 let skip_all_result := zoo_for( skip_all_root, zuzu ).install(
-	skip_all_archive_path().to_String(),
+	skip_all_archive.to_String(),
 );
 ok( skip_all_result{ok}, "TAP skip-all test plan allows install" );
 is( skip_all_result{tests}.length(), 1, "skip-all test run is recorded" );

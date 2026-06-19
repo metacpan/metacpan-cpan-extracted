@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::ASN1::Time::UTC;
-$Crypt::OpenSSL3::ASN1::Time::UTC::VERSION = '0.006';
+$Crypt::OpenSSL3::ASN1::Time::UTC::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::ASN1::Time::UTC - An ASN1 utc time
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 METHODS
 

@@ -23,7 +23,7 @@ must be set to a non empty string of one character.
 
 ## Sorting
 
-This module allows sorting your list on all kinds of paramenters,
+This module allows sorting your list on all kinds of parameters,
 like sorting on column, ascending or descending. Furthemore you 
 can choose sort fields like '-data', '-name', or '-text'.
 
@@ -50,9 +50,11 @@ as well as on the side columns.
 
 Following Perl modules must be installed:
 
+    * Convert::Color
     * Math::Round
     * Test::Tk
     * Tk
+    * Tk::PopList
 
 # Installation
 
@@ -66,6 +68,10 @@ For visual inspection before install you can do any of:
     perl -Mblib t/1-Tk-ListBrowser.t show
     perl -Mblib t/2-Tk-ListBrowser-columns-headers.t show
     perl -Mblib t/3-Tk-ListBrowser-hlist-tree.t show
+    perl -Mblib t/4-Tk-ListBrowser-priorities.t show
+    perl -Mblib t/5-Tk-ListBrowser-insert.t show
+    perl -Mblib t/6-Tk-ListBrowser-refreshSingle.t show
+    perl -Mblib t/7Tk-ListBrowser-autorefresh.t show
 
 These also provide a nice demo program.
 

@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION =  0.09;
+$VERSION =  0.10;
 use Carp;
 use Math::Round;
 
@@ -48,83 +48,10 @@ sub AUTOLOAD {
 	return $self->{LISTBROWSER}->$AUTOLOAD(@_);
 }
 
-sub cellSize {
-	my $self = shift;
-
-	my $cellheight = 0;
-	my $cellwidth = 0;
-	my $imageheight = 0;
-	my $imagewidth = 0;
-	my $textheight = 0;
-	my $textwidth = 0;
-	my @pool = $self->getPool;
-	for (@pool) {
-		my $entry = $_;
-		if ($self->hierarchy) {
-		}
-		my ($iw, $ih, $tw, $th) = $entry->minCellSize($self->cget('-itemtype'));
-		$imageheight = $ih if $ih > $imageheight;
-		$imagewidth = $iw if $iw > $imagewidth;
-		$textheight = $th if $th > $textheight;
-		$textwidth = $tw if $tw > $textwidth;
-		for ($self->columnList) {
-			my $col = $_;
-			my $type = $self->columnCget($col, '-itemtype');
-			my $item = $self->itemGet($entry->name, $col);
-			if (defined $item) {
-				my ($iw, $ih, $tw, $th) = $entry->minCellSize($type);
-				$imageheight = $ih if $ih > $imageheight;
-				$textheight = $th if $th > $textheight;
-			}
-			
-		}
-	}
-	my $itemtype = $self->cget('-itemtype');
-	if ($itemtype eq 'image') {
-		$cellheight = $imageheight;
-		$cellwidth = $imagewidth;
-	} elsif ($itemtype eq 'text') {
-		$cellheight = $textheight;
-		$cellwidth = $textwidth;
-	} else {
-		my $textside = $self->cget('-textside');
-		if (($textside eq 'top') or ($textside eq 'bottom')) {
-			$cellheight = $imageheight + $textheight;
-			$cellwidth = $imagewidth;
-			$cellwidth = $textwidth if $textwidth > $cellwidth;
-		} elsif (($textside eq 'left') or ($textside eq 'right')) {
-			$cellheight = $imageheight;
-			$cellheight = $textheight if $textheight > $cellheight;
-			$cellwidth = $imagewidth + $textwidth;
-		}
-	}
-	$self->cellHeight($cellheight);
-	$self->cellImageHeight($imageheight);
-	$self->cellImageWidth($imagewidth);
-	$self->cellTextHeight($textheight);
-	$self->cellTextWidth($textwidth);
-	$self->cellWidth($cellwidth);
-	$self->listWidth($cellwidth);
-	return ($cellwidth, $cellheight)
-}
-
 sub draw {
 	my ($self, $item, $x, $y, $column, $row) = @_;
-	$item->draw($x, $y, $column, $row, $self->cget('-itemtype'))
-}
-
-sub getPool {
-	my $self = shift;
-	my @pool;
-	if ($self->hierarchy) {
-		my @root = $self->infoRoot;
-		for (@root) {
-			push @pool, $self->get($_);
-		}
-	} else {
-		@pool = $self->getAll;
-	}
-	return @pool;
+	$item->draw($x, $y, $column, $row, $self->cget('-itemtype'));
+	$self->maxXYCalculate($item);
 }
 
 sub initColumns {
@@ -132,27 +59,37 @@ sub initColumns {
 
 sub listbrowser { return $_[0]->{LISTBROWSER} }
 
-sub maxXY {
-	my $self = shift;
-	my $maxc = 0;
-	my $maxr = 0;
-	my @pool = $self->getAll;
-	for (@pool) {
-		next if ($_->hidden or (not $_->openedparent));
-		my $c = $_->column;
-		$maxc = $c if ((defined $c) and ($c > $maxc));
-		my $r = $_->row;
-		$maxr = $r if ((defined $r) and ($r > $maxr));
+sub maxXYCalculate {
+	my ($self, $item, $entry) = @_;
+	my $target = $item;
+	$target = $entry if defined $entry;
+	my $prev = $self->infoPrevVisible($target->name);
+	my ($x1, $y1, $x2, $y2) = $item->region;
+	if (defined $prev) {
+		my $p = $target->get($prev);
+		my $mx = $p->maxX;
+		if ($x2 > $mx) {
+			$target->maxX($x2)
+		} else {
+			$target->maxX($mx)
+		}
+		my $my = $p->maxY;
+		if ($y2 > $my) {
+			$target->maxY($y2)
+		} else {
+			$target->maxY($my)
+		}
+		
+	} else {
+		$item->maxX($x2);
+		$item->maxY($y2);
 	}
-	my $maxx = ($maxc + 1) * ($self->cellWidth + 1) + $self->cget('-marginleft') + $self->cget('-marginright');
-	my $maxy = ($maxr + 1) * ($self->cellHeight + 1) + $self->cget('-margintop') + $self->cget('-marginbottom');
-	return ($maxx, $maxy);
 }
 
 sub nextPosition {
 	my ($self, $x, $y, $column, $row) = @_;
-	my $cellheight = $self->cellHeight;
-	my $cellwidth = $self->cellWidth;
+	my $cellheight = $self->cget('-cellheight');
+	my $cellwidth = $self->cget('-cellwidth');
 	my $newx = $x + ($cellwidth * 2);
 	my ($cwidth, $cheight) = $self->canvasSize;
 	if ($newx >= $cwidth) {
@@ -177,15 +114,14 @@ sub refresh {
 	my ($x, $y) = $self->startXY;
 	my $column = 0;
 	my $row = 0;
-	my $fontdescent = $self->fontMetrics($self->cget('-font'), '-descent');
 	for (@pool) {
 		my $item = $_;
-		next if ($item->hidden or (not $item->openedparent));
+		next if $item->noshow;
 		$self->draw($item, $x, $y, $column, $row);
 
 		($x, $y, $column, $row) = $self->nextPosition($x, $y, $column, $row);
 	}
-	$self->configure(-scrollregion => [0, 0, $self->maxXY]);
+	$self->setScrollRegion
 }
 
 sub scroll {
@@ -194,8 +130,15 @@ sub scroll {
 
 sub startXY {
 	my $self = shift;
-	return ($self->cget('-marginleft'), $self->cget('-margintop'))
+	$self->{STARTXY} = [@_] if @_;
+	my $sxy = $self->{STARTXY};
+	return ($self->cget('-marginleft'), $self->cget('-margintop')) unless defined $sxy;
+	return @$sxy
 }
+#sub startXY {
+#	my $self = shift;
+#	return ($self->cget('-marginleft'), $self->cget('-margintop'))
+#}
 
 sub type {
 	return 'row'

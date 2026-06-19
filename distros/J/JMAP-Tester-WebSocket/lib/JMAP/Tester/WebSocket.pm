@@ -1,7 +1,7 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester::WebSocket 0.005;
+package JMAP::Tester::WebSocket 0.006;
 # ABSTRACT: a WebSocket JMAP client made for testing JMAP servers
 
 use Moo;
@@ -244,6 +244,7 @@ sub _jresponse_from_wsresponse {
 
   if (defined $error) {
     return JMAP::Tester::WebSocket::Result::Failure->new(
+      diagnostic_dumper => $self->default_diagnostic_dumper,
       ws_response => $ws_res,
       ident => $error,
     );
@@ -261,6 +262,7 @@ sub _jresponse_from_wsresponse {
   }
 
   return JMAP::Tester::WebSocket::Response->new({
+    diagnostic_dumper => $self->default_diagnostic_dumper,
     items               => $items,
     ws_response         => $ws_res,
     wrapper_properties  => $props,
@@ -279,7 +281,7 @@ JMAP::Tester::WebSocket - a WebSocket JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -307,6 +309,12 @@ L<JMAP::Tester> - a JMAP client made for testing JMAP servers
 =head1 AUTHOR
 
 Matthew Horsfall <wolfsage@gmail.com>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -275,7 +275,7 @@ function _xik_xml_pi_to_kdl ( xml_node ) {
 function _xik_xml_doctype_to_kdl ( xml_node ) {
 	return new KDLNode(
 		name: "!doctype",
-		args: [ _xik_kdl_value( xml_node.nodeValue() ?: xml_node.nodeName() ) ],
+		args: [ _xik_kdl_value( xml_node.nodeValue() or? xml_node.nodeName() ) ],
 	);
 }
 

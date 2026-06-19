@@ -2,7 +2,7 @@ package Zuzu::AST::Expr::Literal;
 
 use utf8;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.006000';
 
 use Moo;
 

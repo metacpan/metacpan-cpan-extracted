@@ -3,7 +3,7 @@ package Tk::ListBrowser::FilterEntry;
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.09;
+$VERSION =  0.10;
 
 use base qw(Tk::Derived Tk::Entry);
 
@@ -85,7 +85,6 @@ sub KeyRelease {
 	} else {
 		$self->activate if $key ne ''
 	}
-#	$self->icursor(0);
 }
 
 sub reset {

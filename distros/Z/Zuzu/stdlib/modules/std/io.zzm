@@ -119,6 +119,13 @@ Static helpers:
 
 =item * C<Path.tempfile(...)>, C<Path.tempdir(...)>
 
+These return C<Path> objects that own the created temporary filesystem
+entry. The temporary file is deleted when the returned C<Path> object is
+demolished. Temporary directories and their contents are deleted
+recursively at the same point. If the C<Path> object is returned or
+otherwise still referenced, cleanup is deferred until that owning object
+would normally run C<__demolish__>.
+
 =item * C<Path.glob(pattern, options?)>
 
 =item * C<Path.join(parts)>

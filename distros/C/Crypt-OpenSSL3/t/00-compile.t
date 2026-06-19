@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 45 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 56 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Crypt/OpenSSL3.pm',
@@ -33,6 +33,8 @@ my @module_files = (
     'Crypt/OpenSSL3/MAC/Context.pm',
     'Crypt/OpenSSL3/MD.pm',
     'Crypt/OpenSSL3/MD/Context.pm',
+    'Crypt/OpenSSL3/NID.pm',
+    'Crypt/OpenSSL3/PKCS7.pm',
     'Crypt/OpenSSL3/PKey.pm',
     'Crypt/OpenSSL3/PKey/Context.pm',
     'Crypt/OpenSSL3/Random.pm',
@@ -43,13 +45,22 @@ my @module_files = (
     'Crypt/OpenSSL3/SSL/Method.pm',
     'Crypt/OpenSSL3/SSL/Session.pm',
     'Crypt/OpenSSL3/Signature.pm',
+    'Crypt/OpenSSL3/Timestamp/Accuracy.pm',
+    'Crypt/OpenSSL3/Timestamp/Imprint.pm',
+    'Crypt/OpenSSL3/Timestamp/Request.pm',
+    'Crypt/OpenSSL3/Timestamp/Response.pm',
+    'Crypt/OpenSSL3/Timestamp/StatusInfo.pm',
+    'Crypt/OpenSSL3/Timestamp/TokenInfo.pm',
+    'Crypt/OpenSSL3/Timestamp/Verifier.pm',
     'Crypt/OpenSSL3/X509.pm',
     'Crypt/OpenSSL3/X509/Algorithm.pm',
     'Crypt/OpenSSL3/X509/Attribute.pm',
     'Crypt/OpenSSL3/X509/Extension.pm',
+    'Crypt/OpenSSL3/X509/GeneralName.pm',
     'Crypt/OpenSSL3/X509/Name.pm',
     'Crypt/OpenSSL3/X509/Name/Entry.pm',
     'Crypt/OpenSSL3/X509/Request.pm',
+    'Crypt/OpenSSL3/X509/Stack.pm',
     'Crypt/OpenSSL3/X509/Store.pm',
     'Crypt/OpenSSL3/X509/VerifyParam.pm',
     'Crypt/OpenSSL3/X509/VerifyResult.pm'

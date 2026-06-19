@@ -35,8 +35,8 @@ lib/Astro/Coord/ECI/Sun.pm
 lib/Astro/Coord/ECI/TLE.pm
 lib/Astro/Coord/ECI/TLE/Set.pm
 lib/Astro/Coord/ECI/Utils.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json

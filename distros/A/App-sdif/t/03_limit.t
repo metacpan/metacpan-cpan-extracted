@@ -3,11 +3,22 @@ use warnings;
 use Test::More;
 use File::Spec;
 use File::Temp qw(tempfile);
+use Command::Run::Tmpfile;
 
 my $lib    = File::Spec->rel2abs('lib');
 my $script = File::Spec->rel2abs('script');
 my $sdif   = "$script/sdif";
 my $cdif   = "$script/cdif";
+
+# Skip on systems where /dev/fd/N (N>2) is unavailable, e.g. FreeBSD
+# without fdescfs mounted.
+{
+    my $probe = Command::Run::Tmpfile->new;
+    my $path  = $probe->path;
+    unless (defined $path and -r $path) {
+	plan skip_all => 'no /dev/fd or /proc/self/fd path available';
+    }
+}
 
 sub run_with_input {
     my($input, @cmd) = @_;

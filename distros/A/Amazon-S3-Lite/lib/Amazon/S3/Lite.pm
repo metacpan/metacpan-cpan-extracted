@@ -18,34 +18,27 @@ use URI::Escape qw(uri_escape_utf8);
 use XML::Twig;
 
 use Readonly;
-
 Readonly our $TRUE  => 1;
 Readonly our $FALSE => 0;
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.2.2';
 
 ########################################################################
 sub new {
 ########################################################################
-  my ( $class, $args ) = @_;
+  my ( $class, @args ) = @_;
 
-  $args //= {};
+  my $options = ref $args[0] ? $args[0] : {@args};
 
-  croak 'new() requires a hashref'
-    if ref $args ne 'HASH';
+  my $self = bless $options, $class;
 
-  croak 'region is required'
-    if !$args->{region};
+  $self->{host}    //= 's3.amazonaws.com';
+  $self->{secure}  //= $TRUE;
+  $self->{timeout} //= 30;
+  $self->{region}  //= 'us-east-1';
 
-  my $self = bless {}, $class;
-
-  $self->{region}  = $args->{region};
-  $self->{host}    = $args->{host}    // 's3.amazonaws.com';
-  $self->{secure}  = $args->{secure}  // 1;
-  $self->{timeout} = $args->{timeout} // 30;
-
-  $self->_init_logger( $args->{logger} );
-  $self->_init_credentials($args);
+  $self->_init_logger;
+  $self->_init_credentials;
   $self->_init_ua;
 
   return $self;
@@ -58,28 +51,40 @@ sub new {
 ########################################################################
 sub _init_logger {
 ########################################################################
-  my ( $self, $logger ) = @_;
+  my ($self) = @_;
 
-  if ($logger) {
+  my $logger = $self->{logger};
+
+  if ( $logger && blessed $logger ) {
     # Validate it quacks like a logger
     for my $method (qw(trace debug info warn error)) {
       croak "logger object must implement '$method'"
         if !$logger->can($method);
     }
-    $self->{logger} = $logger;
+
     return;
   }
 
-  if ( eval { require Log::Log4perl; 1 } ) {
+  my $log4perl = eval {
+    require Log::Log4perl;
+    1;
+  };
+
+  my $log_level = $self->{log_level} // 'warn';
+  $self->{log_level} = $log_level;
+
+  if ($log4perl) {
     if ( !Log::Log4perl->initialized ) {
-      Log::Log4perl->easy_init($Log::Log4perl::WARN);
+      Log::Log4perl->easy_init( { level => uc $log_level } );
     }
-    $self->{logger} = Log::Log4perl->get_logger(__PACKAGE__);
+    else {
+      $self->{logger} = Log::Log4perl->get_logger(__PACKAGE__);
+    }
     return;
   }
 
   # Fall back to minimal STDERR logger
-  $self->{logger} = Amazon::S3::Lite::Logger->new;
+  $self->{logger} = Amazon::S3::Lite::Logger->new( log_level => $log_level );
 
   return;
 }
@@ -91,10 +96,10 @@ sub _init_logger {
 ########################################################################
 sub _init_credentials {
 ########################################################################
-  my ( $self, $args ) = @_;
+  my ($self) = @_;
 
   # 1. Caller-supplied credentials object (duck-typed)
-  if ( my $creds = $args->{credentials} ) {
+  if ( my $creds = $self->{credentials} ) {
     croak "credential object is not blessed.\n"
       if !blessed $creds;
 
@@ -111,11 +116,11 @@ sub _init_credentials {
   }
 
   # 2. Explicit constructor args
-  if ( $args->{aws_access_key_id} && $args->{aws_secret_access_key} ) {
+  if ( $self->{aws_access_key_id} && $self->{aws_secret_access_key} ) {
     $self->{credentials} = Amazon::S3::Lite::Credentials->new(
-      aws_access_key_id     => $args->{aws_access_key_id},
-      aws_secret_access_key => $args->{aws_secret_access_key},
-      token                 => $args->{token},
+      aws_access_key_id     => delete $self->{aws_access_key_id},
+      aws_secret_access_key => delete $self->{aws_secret_access_key},
+      token                 => delete $self->{token},
     );
     return;
   }
@@ -162,6 +167,7 @@ sub _init_ua {
 # Accessors
 ########################################################################
 sub logger      { return $_[0]->{logger} }
+sub log_level   { return $_[0]->{log_level}; }
 sub ua          { return $_[0]->{ua} }
 sub region      { return $_[0]->{region} }
 sub host        { return $_[0]->{host} }
@@ -995,16 +1001,22 @@ sub _create_notification_configuration {
     push @filter_rules, $self->_resolve( $templates->{'filter-rule'}, filter_name => $name, filter => $value );
   }
 
+  my $filters = @filter_rules ? $self->_resolve( $templates->{'filters'}, filter_rules => "@filter_rules" ) : q{};
+
   my $xml = $templates->{ $options{type} . '-event' };
 
-  return $self->_resolve(
+  my $resolved_xml = $self->_resolve(
     $xml,
-    id           => $id,
-    lambda_arn   => $options{lambda_arn},
-    queue_arn    => $options{queue_arn},
-    events       => "@event_xml",
-    filter_rules => "@filter_rules"
+    id         => $id,
+    lambda_arn => $options{lambda_arn},
+    queue_arn  => $options{queue_arn},
+    events     => "@event_xml",
+    filters    => $filters,
   );
+
+  $self->logger->debug( Dumper( [ resolved_xml => $resolved_xml ] ) );
+
+  return $resolved_xml;
 }
 
 my %TEMPLATES;
@@ -1102,6 +1114,12 @@ sub _croak_on_error {
 ## no critic (RequirePodSections)
 
 __DATA__
+:filters
+<Filter>
+  <S3Key>
+    @filter_rules@
+  </S3Key>
+</Filter>
 :filter-rule
 <FilterRule>
   <Name>@filter_name@</Name>
@@ -1111,16 +1129,12 @@ __DATA__
 <Event>@event@</Event>
 :lambda-event
 <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-  <LambdaFunctionConfiguration>
+  <CloudFunctionConfiguration>
     <Id>@id@</Id>
-    <LambdaFunctionArn>@lambda_arn@</LambdaFunctionArn>
+    <CloudFunction>@lambda_arn@</CloudFunction>
     @events@
-    <Filter>
-      <S3Key>
-        @filter_rules@
-      </S3Key>
-    </Filter>
-  </LambdaFunctionConfiguration>
+    @filters@
+  </CloudFunctionConfiguration>
 </NotificationConfiguration>
 :sqs-event
 <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
@@ -1128,11 +1142,7 @@ __DATA__
     <Id>@id@</Id>
     <Queue>@queue_arn@</Queue>
     @events@
-    <Filter>
-      <S3Key>
-        @filter_rules@
-      </S3Key>
-    </Filter>
+    @filters@
   </QueueConfiguration>
 </NotificationConfiguration>
 
@@ -1279,7 +1289,7 @@ Returns a new C<Amazon::S3::Lite> object. Options:
 
 =over 4
 
-=item region (required)
+=item region (options, default: us-east-1)
 
 The AWS region for your bucket, e.g. C<us-east-1>.
 
@@ -1319,9 +1329,9 @@ An object providing the standard log methods:
   $logger->error(...)
 
 If not supplied, the module looks for L<Log::Log4perl>. If available,
-it calls C<Log::Log4perl::easy_init> with level WARN and logs to
-STDERR.  If Log::Log4perl is not installed, a minimal internal logger
-is used that prints WARN and above to STDERR.
+it calls C<Log::Log4perl::easy_init> with the configure log level (or
+WARN) and logs to STDERR.  If Log::Log4perl is not installed, a
+minimal internal logger.
 
 =item host
 
@@ -1459,6 +1469,13 @@ L</list_objects_v2> directly.
 Returns a (possibly empty) list of object hashrefs, each with the same
 fields as the elements of C<objects> in the C<list_objects_v2>
 response.
+
+=item log_level
+
+Log level for the internal logger. Accepted values: C<trace>, C<debug>,
+C<info>, C<warn>, C<error>, C<fatal>. Default is C<warn>. Only consulted
+when no C<logger> object is supplied and Log::Log4perl is not available
+or not yet initialized.
 
 =head2 get_object
 

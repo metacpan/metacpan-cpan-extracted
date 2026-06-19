@@ -63,11 +63,12 @@ Archive.dump(
 );
 
 let target := root();
+let home := Path.tempdir();
 let result := ( new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: home.to_String(),
 	zuzu_command: ( new Path( path: Env.get( "ZUZU", "./bin/zuzu" ) ) ).to_String(),
 ) ).install( archive.to_String(), { dry_run: true } );
 

@@ -85,11 +85,12 @@ write_installed(
 	[ script_entry( "remove-tool.zzs", [ "remove-tool.cmd" ] ) ],
 );
 
+let home := Path.tempdir();
 let zoo := new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: home.to_String(),
 );
 let result := zoo.remove("remove/app");
 
@@ -126,13 +127,14 @@ write_installed(
 	[ module_entry("missing/file.zzm") ],
 	[],
 );
+let missing_home := Path.tempdir();
 let top_result := remove(
 	"missing/file",
 	{
 		lib_dir: missing{lib_dir},
 		bin_dir: missing{bin_dir},
 		meta_dir: missing{meta_dir},
-		home: Path.tempdir().to_String(),
+		home: missing_home.to_String(),
 	},
 );
 ok( top_result{ok}, "top-level remove wrapper works" );

@@ -10,8 +10,6 @@ use List::Util 1.55 qw{ uniqint };
 use Test2::V0;
 
 use constant VISUAL_NAME	=> 'visual.txt';
-use constant VISUAL_URL		=> 
-    'http://celestrak.org/SpaceTrack/query/' . VISUAL_NAME;
 
 note <<'EOD';
 
@@ -26,19 +24,22 @@ do './tools/heavens-above-mag'
 
 my %canned = Astro::Coord::ECI::TLE->magnitude_table( 'show' );
 
-my $resp = heavens_above_mag::get_cached( VISUAL_NAME, VISUAL_URL );
+my $resp = heavens_above_mag::get_cached(
+    VISUAL_NAME,
+    heavens_above_mag::VISUAL_URL(),
+);
 
 my %visual = heavens_above_mag::parse_visual( $resp );
 
 foreach my $oid (
-    map { sprintf '%05d', $_ }
+    map { sprintf '%d', $_ }
     sort { $a <=> $b }
     uniqint( keys %visual, keys %canned)
 ) {
     if ( ! exists $canned{$oid} ) {
 	fail "OID $oid is in canned magnitudes";
     } elsif ( ! exists $visual{$oid} ) {
-	fail "OID $oid is in current @{[ VISUAL_NAME ]}";
+	fail "OID $oid is in current Celestrak 'visual' data set}";
     } else {
 	my @rslt = heavens_above_mag::process_get( $oid );
 	my $want = format_mag( $rslt[0][2] );
@@ -52,7 +53,9 @@ passing()
 
 
 The canned magnitude table in lib/Astro/Coord/ECI/TLE.pm needs to be
-regenerated.
+regenerated. Run
+
+   $ tools/heavens-above-mag --celestrak --update
 
 EOD
 

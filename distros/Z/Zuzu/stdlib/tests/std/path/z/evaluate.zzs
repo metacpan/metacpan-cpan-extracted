@@ -63,7 +63,13 @@ let elvis_p := new Parser(
 {
 	let ast := parse_one( elvis_p, "0 ?: 7" );
 	let got := e.eval_expr( ast, null );
-	is( got[0].primitive_value, 7, "opt-in Elvis evaluates fallback for falsey left side" );
+	is( got[0].primitive_value, 0, "opt-in Elvis preserves defined falsey left side" );
+}
+
+{
+	let ast := parse_one( elvis_p, "null() ?: 7" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, 7, "opt-in Elvis evaluates fallback for null left side" );
 }
 
 {

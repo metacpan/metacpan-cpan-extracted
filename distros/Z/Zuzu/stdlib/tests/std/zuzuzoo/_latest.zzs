@@ -66,11 +66,15 @@ let ua := new FakeUserAgent(
 		},
 	),
 );
+let lib_root := Path.tempdir();
+let bin_root := Path.tempdir();
+let meta_root := Path.tempdir();
+let home := Path.tempdir();
 let opts := {
-	lib_dir: Path.tempdir().to_String(),
-	bin_dir: Path.tempdir().to_String(),
-	meta_dir: Path.tempdir().to_String(),
-	home: Path.tempdir().to_String(),
+	lib_dir: lib_root.to_String(),
+	bin_dir: bin_root.to_String(),
+	meta_dir: meta_root.to_String(),
+	home: home.to_String(),
 	base_url: "https://packages.example/",
 	user_agent: ua,
 };

@@ -1,7 +1,7 @@
 {
    "abstract" : "Classes and app to compute satellite visibility",
    "author" : [
-      "Tom Wyant (wyant at cpan dot org)"
+      "Tom Wyant (harryfmudd at comcast dot net)"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4234",
@@ -62,42 +62,42 @@
    "provides" : {
       "Astro::Coord::ECI" : {
          "file" : "lib/Astro/Coord/ECI.pm",
-         "version" : "0.134"
+         "version" : "0.135"
       },
       "Astro::Coord::ECI::Mixin" : {
          "file" : "lib/Astro/Coord/ECI/Mixin.pm",
-         "version" : "0.134"
+         "version" : "0.135"
       },
       "Astro::Coord::ECI::Moon" : {
          "file" : "lib/Astro/Coord/ECI/Moon.pm",
-         "version" : "0.134"
+         "version" : "0.135"
       },
       "Astro::Coord::ECI::Star" : {
          "file" : "lib/Astro/Coord/ECI/Star.pm",
-         "version" : "0.134"
+         "version" : "0.135"
       },
       "Astro::Coord::ECI::Sun" : {
          "file" : "lib/Astro/Coord/ECI/Sun.pm",
-         "version" : "0.134"
+         "version" : "0.135"
       },
       "Astro::Coord::ECI::TLE" : {
          "file" : "lib/Astro/Coord/ECI/TLE.pm",
-         "version" : "0.134"
+         "version" : "0.135"
       },
       "Astro::Coord::ECI::TLE::Set" : {
          "file" : "lib/Astro/Coord/ECI/TLE/Set.pm",
-         "version" : "0.134"
+         "version" : "0.135"
       },
       "Astro::Coord::ECI::Utils" : {
          "file" : "lib/Astro/Coord/ECI/Utils.pm",
-         "version" : "0.134"
+         "version" : "0.135"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -108,6 +108,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI"
       }
    },
-   "version" : "0.134",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.135",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

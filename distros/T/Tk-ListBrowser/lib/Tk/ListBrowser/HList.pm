@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.09;
+$VERSION =  0.10;
 
 use Math::Round qw(round);
 
@@ -39,75 +39,13 @@ sub new {
 	return $self;
 }
 
-sub cellSize {
-	my $self = shift;
-
-	my $cellheight = 0;
-	my $cellwidth = 0;
-	my $imageheight = 0;
-	my $imagewidth = 0;
-	my $textheight = 0;
-	my $textwidth = 0;
-	my $indent = 0;
-	my @pool = $self->getAll;
-	for (@pool) {
-		my $entry = $_;
-
-		#calculate max indent
-		my $name = $entry->name;
-		my $i = 0;
-		my $sep = quotemeta($self->cget('-separator'));
-		while ($name =~ /$sep/g) {	$i ++	}
-		$indent = $i if $i > $indent;
-		
-
-		#calculate cell size
-		my ($iw, $ih, $tw, $th) = $entry->minCellSize($self->cget('-itemtype'));
-		$imageheight = $ih if $ih > $imageheight;
-		$imagewidth = $iw if $iw > $imagewidth;
-		$textheight = $th if $th > $textheight;
-		$textwidth = $tw if $tw > $textwidth;
-		for ($self->columnList) {
-			my $col = $_;
-			my $type = $self->columnCget($col, '-itemtype');
-			my $item = $self->itemGet($entry->name, $col);
-			if (defined $item) {
-				my ($iw, $ih, $tw, $th) = $entry->minCellSize($type);
-				$imageheight = $ih if $ih > $imageheight;
-				$textheight = $th if $th > $textheight;
-			}
-			
-		}
-	}
-	my $itemtype = $self->cget('-itemtype');
-	if ($itemtype eq 'image') {
-		$cellheight = $imageheight;
-		$cellwidth = $imagewidth;
-	} elsif ($itemtype eq 'text') {
-		$cellheight = $textheight;
-		$cellwidth = $textwidth;
-	} else {
-		my $textside = $self->cget('-textside');
-		if (($textside eq 'top') or ($textside eq 'bottom')) {
-			$cellheight = $imageheight + $textheight;
-			$cellwidth = $imagewidth;
-			$cellwidth = $textwidth if $textwidth > $cellwidth;
-		} elsif (($textside eq 'left') or ($textside eq 'right')) {
-			$cellheight = $imageheight;
-			$cellheight = $textheight if $textheight > $cellheight;
-			$cellwidth = $imagewidth + $textwidth;
-		}
-	}
-	my $indentwidth = $indent * $self->cget('-indent');
-	$self->cellHeight($cellheight);
-	$self->cellImageHeight($imageheight);
-	$self->cellImageWidth($imagewidth);
-	$self->cellTextHeight($textheight);
-	$self->cellTextWidth($textwidth);
-	$self->cellWidth($cellwidth);
-	$self->listWidth($cellwidth + $indentwidth - $self->cget('-indent'));
-	$self->maxIndent($indentwidth);
-	return ($cellwidth, $cellheight)
+sub calculateDepth {
+	my ($self, $item) = @_;
+	my $name = $item->name;
+	my $i = 0;
+	my $sep = quotemeta($self->cget('-separator'));
+	while ($name =~ /$sep/g) {	$i ++	}
+	return $i
 }
 
 sub draw {
@@ -115,15 +53,12 @@ sub draw {
 
 	#calculate indent
 	my $indentsize = $self->cget('-indent');
+	$x = $self->cget('-marginleft');
+	$x = $x + $indentsize if ref $self eq 'Tk::ListBrowser::Tree';
 	my $entry = $item->name;
 	my $sep = quotemeta($self->cget('-separator'));
-	my $count = 0;
-	my $e = $entry;
-	while ($e =~ s/^[^$sep]*$sep//) {
-		$count ++
-	}
-#	($x) = $self->startXY;
-	$x = $x + ($count * $indentsize);
+	my $depth = $self->calculateDepth($item);
+	$x = $x + ($depth * $indentsize);
 
 	#draw entry
 	$self->SUPER::draw($item, $x, $y, $column, $row);
@@ -147,7 +82,7 @@ sub draw {
 			-tags => ['main', 'guides'],
 		);
 		$item->cguideH($guideh);
-		$c->lower($guideh);
+#		$c->lower($guideh);
 
 		#draw vertical guide
 		my $vx1 = $hx1;
@@ -159,7 +94,14 @@ sub draw {
 			-tags => ['main', 'guides'],
 		);
 		$item->cguideV($guidev);
-		$c->lower($guidev);
+#		$c->lower($guidev);
+
+#		my @sel = $c->find('withtag', 'sel');
+#		my @ind = $c->find('withtag', 'indicator');
+#		for (@ind) {
+#			$c->raise($_, $guideh);
+#			$c->raise($_, $guidev);
+#		}
 	}
 }
 

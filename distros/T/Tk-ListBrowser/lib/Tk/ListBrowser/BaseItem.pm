@@ -11,7 +11,7 @@ use warnings;
 use vars qw($VERSION $AUTOLOAD);
 use Carp;
 
-$VERSION =  0.04;
+$VERSION =  0.10;
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ Provides a base class for modules L<Tk::ListBrowser::Item> and L<Tk::ListBrowser
 It provides a method overload to the L<Tk::ListBrowser> object.
 
 Available options are I<background>, I<font>, I<foreground>, I<-owner>, I<itemtype>, I<textanchor>,
-I<textjustify>, I<textside> and I<wraplength>.
+I<textjustify>, I<textlength>,  I<textside> and I<wraplength>.
 
 The I<-owner> option is not a standard option. It specifies which object (side column or ListBrowser widget)
 is holding this item. By default it is set to the ListBrowser widget.
@@ -98,7 +98,7 @@ sub cget {
 	if ($self->can($option)) {
 		return $self->$option
 	} else {
-		croak "Option '$option' not valid"
+		return $self->listbrowser->cget("-$option")
 	}
 }
 
@@ -135,8 +135,7 @@ sub configure {
 		if ($self->can($option)) {
 			$self->$option($value)
 		} else {
-			croak "Option '$option' not valid";
-			return;
+			$self->listbrowser->configure("-$option", $value)
 		}
 	}
 }
@@ -226,6 +225,13 @@ sub textjustify {
 	$self->{TEXTJUSTIFY} = shift if @_;
 	return $self->{TEXTJUSTIFY} if defined $self->{TEXTJUSTIFY};
 	return $self->owner->cget('-textjustify')
+}
+
+sub textlength {
+	my $self = shift;
+	$self->{TEXTLENGTH} = shift if @_;
+	return $self->{TEXTLENGTH} if defined $self->{TEXTLENGTH};
+	return $self->owner->cget('-textlength')
 }
 
 sub textside {

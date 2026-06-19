@@ -16,8 +16,15 @@ is(
 let elvis := new ZZTemplate( string: "{{ zero ?: fallback }}" );
 is(
 	elvis.process( { zero: 0, fallback: "fallback" } ),
+	"0",
+	"ZZTemplate expressions preserve defined falsey values with ZZPath Elvis",
+);
+
+let null_elvis := new ZZTemplate( string: "{{ missing ?: fallback }}" );
+is(
+	null_elvis.process( { missing: null, fallback: "fallback" } ),
 	"fallback",
-	"ZZTemplate expressions use ZZPath Elvis operator",
+	"ZZTemplate expressions use ZZPath Elvis fallback for null",
 );
 
 let function_template := new ZZTemplate(

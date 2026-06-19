@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 101;
+use Test::More tests => 93;
 use Test::Tk;
 require Tk::Photo;
 require Tk::LabFrame;
@@ -41,7 +41,7 @@ if (opendir( my $dh, 't/icons')) {
 } else {
 	warn 'cannot open icons folder'
 }
-@images = sort @images;
+@images = sort { lc($a) cmp lc($b) }@images;
 
 my $ib;
 my $item;
@@ -106,6 +106,12 @@ if (defined $app) {
 			print "refresh took $tt\n";
 		},
 		-text => 'Refresh',
+	)->pack(-side => 'left');
+	$bf->Button(
+		-command => sub {
+			$ib->refreshPurge;
+		},
+		-text => 'Refresh purge',
 	)->pack(-side => 'left');
 	$bf->Button(
 		-command => sub { $ib->selectAll },
@@ -261,14 +267,12 @@ if (defined $app) {
 	pause(200);
 }
 
-testaccessors($ib, qw/cellHeight cellImageHeight cellImageWidth
-	cellTextHeight cellTextWidth cellWidth forceWidth header listWidth
+testaccessors($ib, qw/cellheight cellwidth forceWidth header listWidth
 	pool priorityMax refreshLoopActive refreshPos/);
 testaccessors($item, qw/background cguideH cguideV cimage cindicator column cimage 
 	crect	ctext data font foreground hidden imageX imageY itemtype opened owner priority 
 	rectX	rectY row textanchor textjustify textside textX textY/);
-testaccessors($handler, qw/cellHeight cellImageHeight cellImageWidth 
-	cellTextHeight cellTextWidth cellWidth/);
+testaccessors($handler, qw/cellheight cellwidth/);
 
 push @tests, (
 	[ sub { return defined $ib }, 1, 'ListBrowser widget created' ],
@@ -382,7 +386,7 @@ push @tests, (
 		$ib->selectionSet('edit-find.png', 'document-new.png');
 		my @l = $ib->selectionGet;
 		return \@l
-	}, ['document-new.png', 'document-save.png', 'edit-cut.png', 'edit-find.png'], 'selectionGet' ],
+	}, ['document-new.png', 'Document-save.png', 'edit-cut.png', 'edit-find.png'], 'selectionGet' ],
 	[ sub {
 		$ib->selectionClear;
 		my @l = $ib->selectionGet;
@@ -448,7 +452,7 @@ push @tests, (
 	}, 1, 'refresh' ],
 	[ sub {
 		return $ib->indexColumnRow(0, 0);
-		}, 0, 'indexColumnRow' ],
+	}, 0, 'indexColumnRow' ],
 );
 
 starttesting;

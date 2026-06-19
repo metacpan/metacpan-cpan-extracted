@@ -3,7 +3,7 @@ package Tk::ListBrowser::LBHeader;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.09;
+$VERSION = 0.10;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'LBHeader';
@@ -69,7 +69,7 @@ sub Populate {
 		$item->bind('<Button-3>', [$self, 'Callback', '-contextcall', Ev('x'), Ev('y')]);
 #		$item->bind('<Button-1>', [$self, 'SortClick']);
 		$item->bind('<B1-Motion>', [$self, 'B1Motion', $item, Ev('x')]);
-		$item->bind('<ButtonRelease-1>', [$self, 'B1Release', $item, Ev('x')]);
+		$item->bind('<Button-1>', [$self, 'B1', $item, Ev('x')]);
 	}
 
 	my $fg = $sort->cget('-foreground');
@@ -102,6 +102,18 @@ sub Populate {
 	return $self;
 }
 
+sub B1 {
+	my $self = shift;
+	if (exists $self->{CURSORSAVE}) {
+		my $c = $self->{CURSORSAVE};
+		$self->configure(-cursor => $c);
+		delete $self->{CURSORSAVE};
+		$self->Callback('-releasecall');
+	} else {
+		$self->SortClick;
+	}
+}
+
 sub B1Motion {
 	my ($self, $item, $x) = @_;
 	return if $self->column eq '';
@@ -111,18 +123,6 @@ sub B1Motion {
 	}
 	$x = $x + $item->x unless $item eq $self;
 	$self->Callback('-motioncall', $self->column, $x);
-}
-
-sub B1Release {
-	my $self = shift;
-	if (exists $self->{CURSORSAVE}) {
-		my $c = $self->{CURSORSAVE};
-		$self->configure(-cursor => $c);
-		delete $self->{CURSORSAVE};
-		$self->Callback('-releasecall', $self->column);
-	} else {
-		$self->SortClick;
-	}
 }
 
 sub column { return $_[0]->{COLUMN} }
@@ -225,7 +225,7 @@ sub SizerRelease {
 	delete $self->{'needle'};
 	delete $self->{'needlepos'};
 	$c->delete($needle);
-	$lb->refresh;
+	$lb->refreshPurge;
 }
 
 my %sortmatrix = (

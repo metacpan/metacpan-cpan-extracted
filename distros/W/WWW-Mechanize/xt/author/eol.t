@@ -28,6 +28,7 @@ my @files = (
     't/content.t',
     't/cookies.t',
     't/credentials-api.t',
+    't/credentials-unscoped-warning.t',
     't/credentials.t',
     't/die.t',
     't/dump.t',

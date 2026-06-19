@@ -5,7 +5,7 @@ use warnings;
 use vars qw($VERSION);
 use Convert::Color;
 
-$VERSION =  0.08;
+$VERSION =  0.10;
 
 sub new {
 	my ($class, $lb) = @_;
@@ -27,9 +27,11 @@ sub offset {
 }
 
 sub selectimage {
-	my ($self, $x1, $y1, $x2, $y2) = @_;
+	my ($self, $x1, $y1, $x2, $y2, $left, $right) = @_;
 	$x2 ++;
 	$y2 ++;
+	$left = 1 unless defined $left;
+	$right = 1 unless defined $right;
 
 	my $width = $x2 - $x1;
 	my $height = $y2 - $y1;
@@ -91,18 +93,32 @@ static char * select_draft_xpm[] = {
 	#create top line
 	$xpm = "$xpm$base";
 	for (1 .. $width - 2) { $xpm = "$xpm "}
-	$xpm = "$xpm$end";
+	if ($right) {
+		$xpm = "$xpm$end";
+	} else {
+		$xpm = "$xpm \",\n"
+	}
+
 	#create body
-	my $line = $base;
+	my $line ="\"+";
+	$line = $base if $left;
 	for (1 .. $width - 2) { $line = "$line+"}
-	$line = "$line$end";
+	if ($right) {
+		$line = "$line$end";
+	} else {
+		$line = "$line+\",\n"
+	}
 	for (1 .. $height - 2) { $xpm = "$xpm$line" }
+
 	#create bottom line
-	$xpm = "$xpm$base";
+	if ($left) {
+		$xpm = "$xpm$base";
+	} else {
+		$xpm = "$xpm\"."
+	}
 	for (1 .. $width - 2) { $xpm = "$xpm."}
 	$xpm = "$xpm$end";
-
-#	my $pixmap = $lb->Pixmap(-data => $xpm);
+	
 	my $pixmap = $lb->Pixmap(-data => $xpm);
 	my $c = $lb->Subwidget('Canvas');
 	my $image = $c->createImage($x1, $y1,
@@ -110,7 +126,6 @@ static char * select_draft_xpm[] = {
 		-anchor => 'nw',
 		-tags => ['sel'],
 	);
-#	print "image '$image'\n";
 	return $image
 }
 

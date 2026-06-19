@@ -137,7 +137,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.134';
+our $VERSION = '0.135';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -429,7 +429,7 @@ The inputs are a Perl date and time; $mon is in the range 0 -
 11, and $yr is from 1900, with earlier years being negative. The year 1
 BC is represented as -1900.
 
-If less than 6 arguments are provided, zeroes will be prepended to the
+If less than 6 arguments are provided, zeros will be prepended to the
 argument list as needed.
 
 The date is presumed to be in the Gregorian calendar. If the resultant
@@ -485,7 +485,7 @@ This is a convenience routine that converts the given date to seconds
 since the epoch, going through date2jd() to do so. The arguments are the
 same as those of date2jd().
 
-If less than 6 arguments are provided, zeroes will be prepended to the
+If less than 6 arguments are provided, zeros will be prepended to the
 argument list as needed.
 
 The functionality is similar to C<Time::Local::timegm()>, but the
@@ -1684,24 +1684,23 @@ a separate entity in 2021, but their publications, including Dr. Meeus'
 book, are still available through Sky and Telescope's Willmann-Bell
 imprint at L<https://shopatsky.com/collections/willmann-bell>.
 
-=head1 BUGS
+=head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
-L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
+L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2025 by Thomas R. Wyant, III
+Copyright (C) 2005-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

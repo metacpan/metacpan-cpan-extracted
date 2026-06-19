@@ -82,21 +82,20 @@ let valid := archive_path(
 );
 
 let dist := load_distribution(valid.to_String());
-let abstract_dist := load_distribution(
-	archive_path(
-		[
-			{
-				path: "abstract-dist-1.0.0/zuzu-distribution.json",
-				data: meta(
-					"abstract-dist",
-					"1.0.0",
-					",\"abstract\":\"Short package description\"," _
-					"\"repo\":\"https://github.com/example/abstract-dist\"",
-				),
-			},
-		],
-	).to_String(),
+let abstract_archive := archive_path(
+	[
+		{
+			path: "abstract-dist-1.0.0/zuzu-distribution.json",
+			data: meta(
+				"abstract-dist",
+				"1.0.0",
+				",\"abstract\":\"Short package description\"," _
+				"\"repo\":\"https://github.com/example/abstract-dist\"",
+			),
+		},
+	],
 );
+let abstract_dist := load_distribution(abstract_archive.to_String());
 is( dist{root_name}, "valid-dist-1.0.0", "valid archive root is reported" );
 is( dist{metadata}{name}, "valid-dist", "source metadata is loaded" );
 is(

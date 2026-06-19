@@ -2,7 +2,7 @@ package Zuzu::Module::Archive;
 
 use utf8;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.006000';
 
 use Archive::Tar ();
 use Archive::Zip qw( :ERROR_CODES );

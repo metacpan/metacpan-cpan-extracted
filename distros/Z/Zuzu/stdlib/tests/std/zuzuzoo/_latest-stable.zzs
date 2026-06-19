@@ -107,11 +107,12 @@ function ua_for ( metadata ) {
 let target := root();
 write_installed( target, "stable-app", "2.0.0", "stable/app" );
 
+let current_home := Path.tempdir();
 let current := new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: current_home.to_String(),
 	base_url: "https://packages.example",
 	user_agent: ua_for(
 		{
@@ -126,11 +127,12 @@ let current := new Zuzuzoo(
 is( current{status}, "current", "latest reports current versions" );
 is( current{can_upgrade}, false, "current cannot upgrade" );
 
+let newer_home := Path.tempdir();
 let newer_local := new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: newer_home.to_String(),
 	base_url: "https://packages.example",
 	user_agent: ua_for(
 		{
@@ -144,13 +146,14 @@ let newer_local := new Zuzuzoo(
 ).latest("stable/app");
 is( newer_local{status}, "newer-local", "latest reports newer local versions" );
 
+let trial_home := Path.tempdir();
 let trial_error := exception(
 	function () {
 		new Zuzuzoo(
 			lib_dir: target{lib_dir},
 			bin_dir: target{bin_dir},
 			meta_dir: target{meta_dir},
-			home: Path.tempdir().to_String(),
+			home: trial_home.to_String(),
 			base_url: "https://packages.example",
 			user_agent: ua_for(
 				{

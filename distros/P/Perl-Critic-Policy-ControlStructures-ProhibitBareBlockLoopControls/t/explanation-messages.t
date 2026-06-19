@@ -103,8 +103,8 @@ use constant REQUIRE_LABEL  => 'require_label';
         'next',
         BLOCK_MAP_GREP, FORBID
     );
-    like( $exp, qr/next element/, '_make_explanation: map block' );
-    like( $exp, qr/"for" loop/,   '_make_explanation: map block for' );
+    like( $exp, qr/escapes to the nearest/, '_make_explanation: map block escapes' );
+    like( $exp, qr/"for" loop/,             '_make_explanation: map block for' );
 }
 
 {
@@ -128,7 +128,7 @@ use constant REQUIRE_LABEL  => 'require_label';
         'next', BLOCK_BARE,
         FORBID
     );
-    like( $exp, qr/just exits the block/, '_make_explanation: bare block forbid next' );
+    like( $exp, qr/exits the block/, '_make_explanation: bare block forbid next' );
 }
 
 {
@@ -136,7 +136,7 @@ use constant REQUIRE_LABEL  => 'require_label';
         'last', BLOCK_BARE,
         FORBID
     );
-    like( $exp, qr/just exits the block/, '_make_explanation: bare block forbid last' );
+    like( $exp, qr/exits the block/, '_make_explanation: bare block forbid last' );
 }
 
 {
@@ -144,7 +144,7 @@ use constant REQUIRE_LABEL  => 'require_label';
         'redo', BLOCK_BARE,
         FORBID
     );
-    like( $exp, qr/restarts the block/, '_make_explanation: bare block forbid redo' );
+    like( $exp, qr/re-executes the block/, '_make_explanation: bare block forbid redo' );
 }
 
 {

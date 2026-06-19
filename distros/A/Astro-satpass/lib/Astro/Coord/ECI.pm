@@ -92,7 +92,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.134';
+our $VERSION = '0.135';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
@@ -4195,7 +4195,7 @@ Geocentric to Geodetic Coordinates", at
 L<http://www.astro.uni.torun.pl/~kb/Papers/geod/Geod-BG.htm>,
 was used for transforming geocentric to geodetic coordinates.
 
-Dominik Brodowski (L<https://www.brodo.de/>), whose SGP C-lib
+Dominik Brodowski (L<https://www.uni-saarland.de/lehrstuhl/brodowski/team/prof-dr-dominik-brodowski-llm-upenn.html>), whose SGP C-lib
 (available at L<https://www.brodo.de/space/sgp/>) provided a
 reference implementation that I could easily run, and pick
 apart to help get B<Astro::Coord::ECI::TLE> working. Dominik based
@@ -4242,14 +4242,13 @@ Dr. Kevin Cornelius of Ouachita Baptist University, whose handout
 velocity conversion from spherical to Cartesian (and vice versa) than my
 own ancient and rickety matrix math.
 
-=head1 BUGS
+=head1 SUPPORT
 
 Functionality involving velocities is B<untested>, and is quite likely
 to be wrong.
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
-L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
+L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues> or in
 electronic mail to the author.
 
 =head1 SEE ALSO
@@ -4277,15 +4276,15 @@ this code, but does provide similar functionality.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2025 by Thomas R. Wyant, III
+Copyright (C) 2005-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

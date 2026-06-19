@@ -28,7 +28,7 @@ BEGIN {
 	or constant->import( DEBUG => 0 );
 }
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 my @basic_export = qw{
     SUN_CLASS
@@ -91,7 +91,7 @@ EOD
     if ( $sun->isa( SUN_CLASS ) ) {
 	# We call __model as a subroutine because the Earth's model
 	# parameters are hung on the Sun, but if we call it as a method
-	# we get the Sun's model, which always returns zeroes.
+	# we get the Sun's model, which always returns zeros.
 	( $Le, $Be, $Re ) = __model( SUN_CLASS, $time,
 	    model_cutoff_definition	=> $sun->model_cutoff_definition( $cutoff ),
 	);
@@ -452,7 +452,7 @@ BEGIN {
     my @model = (
 
 	# The following are from the IAU SOFA module src/nut80.c, from
-	# http://www.iausofa.org/2018_0130_C/sofa_c-20180130.tar.gz
+	# https://www.iausofa.org/2023-10-11c
 	# The only edit is the change from curly to square brackets and
 	# the brute-force conversion of C comments to Perl comments. The
 	# columns are:
@@ -1026,7 +1026,7 @@ provides three such subclasses:
 
 This is a subclass of L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun>.
 The L<__model()|/__model> method (private to this distribution) simply
-returns zeroes. But this class carries the model parameters for the
+returns zeros. But this class carries the model parameters for the
 Earth, which are subtracted from whatever L<__model()|/__model> returns
 to get Geocentric coordinates.
 
@@ -1130,8 +1130,8 @@ examples. The implementation itself actually comes from Meeus chapter
 22. The model parameters were not transcribed from that source, however,
 but were taken from the source IAU C reference implementation of the
 algorithm, F<src/nut80.c>, with the minimum modifications necessary to
-make the C code into Perl code. This file is contained in
-L<http://www.iausofa.org/2018_0130_C/sofa_c-20180130.tar.gz>.
+make the C code into Perl code. This file can be obtained as part of a
+tarball from L<https://www.iausofa.org/2023-10-11c>.
 
 This method is exportable, either by name or via the C<:mixin> or
 C<:sun> tags.
@@ -1357,21 +1357,20 @@ for daily events involving astronomical bodies.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87D>,
-L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues>, or in
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2022, 2024 by Thomas R. Wyant, III
+Copyright (C) 2018-2022, 2024-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

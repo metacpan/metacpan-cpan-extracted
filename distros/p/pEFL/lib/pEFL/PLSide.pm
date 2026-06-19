@@ -493,6 +493,24 @@ sub register_ecore_event_handler_cb {
 }
 
 ##############################
+# Ecore EventHandler
+#############################
+
+our @EcoreFileMonitor_Cbs;
+
+sub register_ecore_file_monitor_cb {
+	my ($path,$func, $data) = @_;
+	
+	my $struct = {	path => $path,
+			function => $func,
+			data => $data};
+	push @EcoreFileMonitor_Cbs, $struct;
+
+	return $#EcoreFileMonitor_Cbs;
+
+}
+
+##############################
 # Ecore Tasks (Timer, idler, poller, animator, etc)
 #############################
 
@@ -507,6 +525,11 @@ sub register_ecore_task_cb {
 
 	return $#EcoreTask_Cbs;
 
+}
+
+sub unregister_ecore_task_cb {
+	my ($id) = @_;
+	$EcoreTask_Cbs[$id] = undef;
 }
 
 # TODO: Passe das an den Array Aufbau an und Add this to a ecore_timer_del etc.

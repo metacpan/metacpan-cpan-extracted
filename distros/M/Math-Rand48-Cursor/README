@@ -1,0 +1,93 @@
+NAME
+
+    Math::Rand48::Cursor - Move forward and backward in the drand48/rand()
+    sequence
+
+SYNOPSIS
+
+        use Math::Rand48::Cursor;
+    
+        # Recover the generator state from one observed rand() output:
+        my $obs = rand;
+        my $rng = Math::Rand48::Cursor->from_rand($obs);
+    
+        $rng->rand;                 # == $obs
+        $rng->forward->rand;        # the next rand() output
+        $rng->backward->rand;       # the previous one
+    
+        $rng->seek(1_000_000);      # jump a million steps ahead
+        $rng->seek(-1_000_000);     # and back
+
+DESCRIPTION
+
+    Perl's rand is drand48(3), a 48-bit linear congruential generator. Its
+    steps can be run in reverse, so a single rand() output is enough to
+    recover the full internal state. From there you can jump to any point
+    in the sequence.
+
+METHODS
+
+ new
+
+        my $rng = Math::Rand48::Cursor->new( state => $x );
+
+    Construct a cursor at an explicit 48-bit state (integer, string, or
+    Math::BigInt). Defaults to 0.
+
+ from_rand
+
+        my $rng = Math::Rand48::Cursor->from_rand($observed);
+
+    Construct a cursor at the state that produced a single observed rand()
+    output.
+
+ from_seed48
+
+        my $rng   = Math::Rand48::Cursor->from_seed48($seed);
+        my $first = $rng->forward->rand;    # the first rand() after srand($seed)
+
+    Construct a cursor at the state set by srand($seed), before the first
+    output.
+
+  Seed handling
+
+    $seed follows Perl's srand coercion rules, so from_seed48 inverts
+    srand:
+
+      * Fractional seeds truncate toward zero (3.7 becomes 3).
+
+      * Negative seeds use their absolute value (-1 seeds like 1),
+      following Perl rather than libc's srand48.
+
+      * Only the low 32 bits matter, so seeds >= 2**32 wrap.
+
+      * NaN and Inf are rejected with croak.
+
+ state
+
+    The current 48-bit state as a Math::BigInt.
+
+ rand
+
+    The float rand() would return for the current state.
+
+ seek
+
+        $rng->seek($n);
+
+    Move $n steps along the sequence; negative $n seeks backward. Mutates
+    the cursor and returns it (chainable).
+
+ forward / backward
+
+    Shorthand for seek(1) and seek(-1).
+
+AUTHOR
+
+    Stig Palmquist <stig@stig.io>
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

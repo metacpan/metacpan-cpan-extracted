@@ -13,8 +13,12 @@ use pEFL::Ecore::Poller;
 use pEFL::Ecore::Time;
 use pEFL::Ecore::Timer;
 use pEFL::Ecore::Event;
+use pEFL::Ecore::EventType;
 use pEFL::Ecore::EventFilter;
 use pEFL::Ecore::EventHandler;
+use pEFL::Ecore::File;
+use pEFL::Ecore::FileMonitor;
+use pEFL::Ecore::FdHandler;
 use pEFL::Ecore::Event::Key;
 use pEFL::Ecore::Event::MouseButton;
 use pEFL::Ecore::Event::MouseMove;
@@ -119,6 +123,18 @@ our @EXPORT = qw(
 	ECORE_EVAS_AVOID_DAMAGE_NONE
 	ECORE_EVAS_AVOID_DAMAGE_EXPOSE
 	ECORE_EVAS_AVOID_DAMAGE_BUILT_IN
+	ECORE_FILE_EVENT_NONE
+	ECORE_FILE_EVENT_CREATED_FILE
+	ECORE_FILE_EVENT_CREATED_DIRECTORY
+	ECORE_FILE_EVENT_DELETED_FILE
+	ECORE_FILE_EVENT_DELETED_DIRECTORY
+	ECORE_FILE_EVENT_DELETED_SELF
+	ECORE_FILE_EVENT_MODIFIED
+	ECORE_FILE_EVENT_CLOSED
+	ECORE_FD_READ
+	ECORE_FD_WRITE
+	ECORE_FD_ERROR
+	ECORE_FD_ALWAYS 
 );
 
 

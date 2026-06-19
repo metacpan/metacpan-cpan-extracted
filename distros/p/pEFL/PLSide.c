@@ -330,7 +330,7 @@ void del_tooltip(void *data, Evas_Object *obj, void *event_info) {
 }
 
 
-void call_perl_edje_message_handler(void *data, Evas_Object *obj, int type, int id,void *msg) {
+void call_perl_edje_message_handler(void *data, Evas_Object *obj, Edje_Message_Type type, int id,void *msg) {
 	dTHX;
 	dSP;
 
@@ -1471,7 +1471,7 @@ Eina_Bool call_perl_ecore_event_handler_cb(void *data, int type, void *event) {
 
 		XPUSHs(s_data);
 		XPUSHs(s_type);
-		XPUSHs(s_event);
+		XPUSHs(sv_2mortal(s_event));
 
 		PUTBACK;
 
@@ -1498,6 +1498,18 @@ Eina_Bool call_perl_ecore_event_handler_cb(void *data, int type, void *event) {
 
 	return e_bool;
 	}
+}
+
+void ecore_event_perl_free_cb(void *data, void *event) {
+    dTHX;
+    PerlEvent *pe = (PerlEvent*) event;
+    printf("Freeing PerlEvent Data\n");
+    if (pe) {
+        if (pe->perl_sv) {
+            SvREFCNT_dec(pe->perl_sv); // Perl-Objekt freigeben
+        }
+        Safefree(pe); // Das C-Struct freigeben
+    }
 }
 
 // --------------------------------------
@@ -1560,7 +1572,148 @@ Eina_Bool call_perl_task_cb(void *data) {
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
-
+	
+	// ==========================================
+	// Important: If the timer returns 0 (e_bool == EINA_FALSE),
+	// the handler is on C-Side not valid anymore and there
+	// automatically cleaned up. We have to do this here on Perl, too
+	// ==========================================
+	if (e_bool == EINA_FALSE) {
+		AV *Task_Cbs = get_av("pEFL::PLSide::EcoreTask_Cbs", 0);
+		if (Task_Cbs) {
+			av_store(Task_Cbs, (I32)item_id, newSV(0));
+		}
+	}
+	
 	return e_bool;
 	}
+}
+
+
+// --------------------------------------
+// Ecore File Monitor Handler
+// --------------------------------------
+
+HV* _get_file_monitor_hash(pTHX_ int item_id) {
+	AV *FileMonitor_Cbs = get_av("pEFL::PLSide::EcoreFileMonitor_Cbs", 0);
+	if (FileMonitor_Cbs == NULL) {
+		croak("pEFL::PLSide::EcoreFileMonitor_Cbs array does not exist\n");
+	}
+
+	SV** FileMonitor_Ptr = av_fetch(FileMonitor_Cbs, (I32) item_id,FALSE);
+	HV *FileMonitor = (HV*) (SvRV(*FileMonitor_Ptr));
+	return FileMonitor;
+}
+
+void call_perl_ecore_file_monitor_cb(void *data, Ecore_File_Monitor *em, Ecore_File_Event event, const char* path) {
+	dTHX;
+	dSP;
+	int n, count;
+	SV *s_bool; Eina_Bool e_bool;
+
+	int item_id = (intptr_t) data;
+	HV *FileMonitor = _get_file_monitor_hash(aTHX_ item_id);
+
+	// Data
+	SV *s_data = *( hv_fetch(FileMonitor,"data",4, FALSE) );
+	
+	//
+	SV *s_obj = newSV(0);
+	sv_setref_pv(s_obj, "pEFL::Ecore::FileMonitor", em);
+
+	// File-Event
+	// instead create a new SvIV?
+	SV *s_file_event = newSViv(event);
+
+	//Get func
+	SV *func = *( hv_fetch(FileMonitor,"function",8, FALSE) );
+	
+	// path
+	SV *s_path = newSVpvn(path,strlen(path));
+
+	if (func && SvOK(func)) {
+		ENTER;
+		SAVETMPS;
+
+		PUSHMARK(SP);
+
+		XPUSHs(s_data);
+		XPUSHs(sv_2mortal(s_obj));
+		XPUSHs(sv_2mortal(s_file_event));
+		XPUSHs(sv_2mortal(s_path));
+
+		PUTBACK;
+
+		count = call_sv(func, G_DISCARD);
+
+		FREETMPS;
+		LEAVE;
+	}
+}
+
+Eina_Bool call_perl_ecore_fd_cb(void *data, Ecore_Fd_Handler *fd_handler) {
+	dTHX;
+	dSP;
+	int n, count;
+	SV *s_bool; Eina_Bool e_bool;
+	
+	if (SvTRUE(get_sv("pEFL::Debug",0)))
+			fprintf(stderr, "FD EVENT fired up\n");
+
+	int item_id = (intptr_t) data;
+	HV *Task = _get_task_hash(aTHX_ item_id);
+
+	// Object
+	SV *s_data = *( hv_fetch(Task,"data",4, FALSE) );
+
+	//Get func
+	SV *func = *( hv_fetch(Task,"function",8, FALSE) );
+
+	if (func && SvOK(func)) {
+		ENTER;
+		SAVETMPS;
+
+		PUSHMARK(SP);
+
+		XPUSHs(s_data);
+
+		PUTBACK;
+
+		count = call_sv(func, G_SCALAR);
+
+		SPAGAIN;
+
+		if (count != 1) {
+			croak("Expected 1 value got %d\n", count);
+		}
+
+		s_bool = POPs;
+
+		if (SvTRUE(s_bool) ) {
+		e_bool = EINA_TRUE;
+	}
+	else {
+		e_bool = EINA_FALSE;
+	}
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+
+	
+	}
+	
+	// ==========================================
+	// Important: If the timer returns 0 (e_bool == EINA_FALSE),
+	// the handler is on C-Side not valid anymore and there
+	// automatically cleaned up. We have to do this here on Perl, too
+	// ==========================================
+	if (e_bool == EINA_FALSE) {
+		AV *Task_Cbs = get_av("pEFL::PLSide::EcoreTask_Cbs", 0);
+		if (Task_Cbs) {
+			av_store(Task_Cbs, (I32)item_id, newSV(0));
+		}
+	}
+	
+	return e_bool;
 }

@@ -93,11 +93,12 @@ function archive_path () {
 let target := root();
 let zuzu := ( new Path( path: Env.get( "ZUZU", "./bin/zuzu" ) ) ).to_String();
 let archive := archive_path();
+let home := Path.tempdir();
 let zoo := new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: home.to_String(),
 	zuzu_command: zuzu,
 );
 let result := zoo.install(archive.to_String());
@@ -158,13 +159,14 @@ like(
 );
 
 let second := root();
+let second_home := Path.tempdir();
 let top_result := install(
 	archive.to_String(),
 	{
 		lib_dir: second{lib_dir},
 		bin_dir: second{bin_dir},
 		meta_dir: second{meta_dir},
-		home: Path.tempdir().to_String(),
+		home: second_home.to_String(),
 		zuzu_command: zuzu,
 		no_test: true,
 	},

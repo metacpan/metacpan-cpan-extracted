@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::SSL::Session;
-$Crypt::OpenSSL3::SSL::Session::VERSION = '0.006';
+$Crypt::OpenSSL3::SSL::Session::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::SSL::Session - SSL Session state
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 
@@ -30,6 +30,10 @@ This is a class containing the current TLS/SSL session details for a connection:
 =head1 METHODS
 
 =head2 new
+
+=head2 read_der
+
+=head2 write_der
 
 =head2 dup
 

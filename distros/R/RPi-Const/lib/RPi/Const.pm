@@ -3,7 +3,7 @@ package RPi::Const;
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 require Exporter;
 use base qw( Exporter );
@@ -231,6 +231,39 @@ use constant {
 }
 
 use constant {
+    # Bank A pin numbers (pins 0-7)
+    A0 => 0,
+    A1 => 1,
+    A2 => 2,
+    A3 => 3,
+    A4 => 4,
+    A5 => 5,
+    A6 => 6,
+    A7 => 7,
+
+    # Bank B pin numbers (pins 8-15)
+    B0 => 8,
+    B1 => 9,
+    B2 => 10,
+    B3 => 11,
+    B4 => 12,
+    B5 => 13,
+    B6 => 14,
+    B7 => 15,
+};
+
+{ # MCP23017 named pin numbers (bank A pins 0-7, bank B pins 8-15)
+
+    my @const = qw(
+        A0 A1 A2 A3 A4 A5 A6 A7
+        B0 B1 B2 B3 B4 B5 B6 B7
+    );
+
+    push @EXPORT_OK, @const;
+    $EXPORT_TAGS{mcp23017_pins} = \@const;
+}
+
+use constant {
     WPI_PIN_BCM => 1,
     WPI_PIN_WPI => 2,
 };
@@ -400,6 +433,20 @@ Hardware register locations and related info for the MCP23107 GPIO Expander
     
     MCP23017_INPUT      => 1,
     MCP23017_OUTPUT     => 0
+
+=head2 :mcp23017_pins
+
+Named pin numbers for the MCP23017 GPIO Expander. C<A0-A7> are the bank A pins
+(C<0-7>) and C<B0-B7> are the bank B pins (C<8-15>).
+
+    A0 => 0,    B0 => 8,
+    A1 => 1,    B1 => 9,
+    A2 => 2,    B2 => 10,
+    A3 => 3,    B3 => 11,
+    A4 => 4,    B4 => 12,
+    A5 => 5,    B5 => 13,
+    A6 => 6,    B6 => 14,
+    A7 => 7,    B7 => 15
 
 =head2 :wpi_pin
 

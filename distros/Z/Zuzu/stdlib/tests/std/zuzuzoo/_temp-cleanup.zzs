@@ -129,11 +129,12 @@ Archive.dump(
 
 let target := root();
 let temp_root := Path.tempdir();
+let home := Path.tempdir();
 let result := ( new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: home.to_String(),
 ) ).install(
 	archive.to_String(),
 	{
@@ -163,13 +164,14 @@ is(
 
 let trial_temp_root := Path.tempdir();
 let trial_root := root();
+let trial_home := Path.tempdir();
 let trial_error := "";
 try {
 	( new Zuzuzoo(
 		lib_dir: trial_root{lib_dir},
 		bin_dir: trial_root{bin_dir},
 		meta_dir: trial_root{meta_dir},
-		home: Path.tempdir().to_String(),
+		home: trial_home.to_String(),
 		base_url: "https://packages.test",
 		user_agent: new FakeUserAgent(
 			payloads: {

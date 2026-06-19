@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.08;
+$VERSION = 0.10;
 
 use base qw(Tk::ListBrowser::Item);
 
@@ -49,6 +49,8 @@ sub new {
 	$self->hidden(0) unless defined $self->hidden;
 	$self->priority(0) unless defined $self->priority;
 	$self->opened(1);
+	$self->maxX(0);
+	$self->maxY(0);
 	$self->{ANCHOR} = 0;
 	$self->{SELECTED} = 0;
 	
@@ -103,7 +105,7 @@ sub cindicator {
 sub clear {
 	my $self = shift;
 	my $c = $self->Subwidget('Canvas');
-	for ($self->canchor, $self->cguideH, $self->cguideV, $self->cindicator, $self->cselect) {
+	for ($self->canchor, $self->cguideH, $self->cguideV, $self->cindicator, $self->cselectl, $self->cselectr) {
 		$c->delete($_) if defined $_;
 	}
 
@@ -118,14 +120,23 @@ sub clear {
 	$self->cguideH(undef);
 	$self->cguideV(undef);
 	$self->cindicator(undef);
-	$self->cselect(undef);
+	$self->cselectl(undef);
+	$self->cselectr(undef);
+	$self->maxX(0);
+	$self->maxY(0);
 	$self->SUPER::clear;
 }
 
-sub cselect {
+sub cselectl {
 	my $self = shift;
-	$self->{CSELECT} = shift if @_;
-	return $self->{CSELECT}
+	$self->{CSELECTL} = shift if @_;
+	return $self->{CSELECTL}
+}
+
+sub cselectr {
+	my $self = shift;
+	$self->{CSELECTR} = shift if @_;
+	return $self->{CSELECTR}
 }
 
 sub ctext {
@@ -144,34 +155,17 @@ sub deleteAnchor {
 	$self->canchor(undef);
 }
 
-sub deleteSelect {
+sub draw {
 	my $self = shift;
-	my $r = $self->cselect;
-	return unless defined $r;
-	
-	my $c = $self->Subwidget('Canvas');
-	$c->delete($r);
-	$self->cselect(undef);
-
-	my $t = $self->ctext;
-	$c->itemconfigure($t,
-		-fill => $self->cget('-foreground'),
-	) if defined $t;
-
-	my @columns = $self->columnList;
-	for (@columns) {
-		my $i = $self->itemGet($self->name, $_);
-		$c->itemconfigure($i->ctext, 
-			-fill => $self->cget('-foreground'),
-		) if (defined $i) and (defined $i->ctext);
-	}
+	$self->SUPER::draw(@_);
+	$self->drawAnchor if $self->anchored
 }
 
 sub drawAnchor {
 	my ($self, $force) = @_;
 	return unless $self->ismapped;
 	
-	my @coords = $self->region;
+	my @coords = $self->getRegion;
 	$self->deleteAnchor;
 	my $c = $self->Subwidget('Canvas');
 	if ($self->listMode) {
@@ -185,52 +179,50 @@ sub drawAnchor {
 		-fill => undef,
 		-dash => [3, 2],
 	);
+	for ($self->crect, $self->cselectl, $self->cselectr, $self->ctext, $self->cimage) {
+		$c->raise($a, $_) if defined $_
+	}
 	$self->canchor($a);
 }
 
 sub drawSelect {
 	my $self = shift;
-	return unless $self->ismapped;
-	$self->deleteSelect;
 	my $c = $self->Subwidget('Canvas');
-	my $r = $self->crect;
-	my $t = $self->ctext;
-	my @columns = $self->columnList;
-	my @coords = $self->region;
-	if ($self->listMode) {
-		my $lb = $self->listbrowser;
-		my ($cw) = $self->canvasSize;
-		my $yscroll = $self->Subwidget('YScrollbar');
-		$cw = $cw - $yscroll->width if $yscroll->ismapped;
-		$coords[0] = 0;
-		$coords[2] = $cw - 4;
-	}
-
 	my $lb = $self->listbrowser;
 	my $si = Tk::ListBrowser::SelectXPM->new($lb);
-	my $a = $si->selectimage(@coords);
-	$self->cselect($a);
-	$c->raise($self->cimage, $a);
-	$c->raise($t, $a);
-	my @guides = $c->find('withtag', 'guides');
-	for (@guides) {
-		$c->raise($_, $a);
+	my @coords = $self->getRegion;
+	unless ($self->listMode) {
+		my $a = $si->selectimage(@coords);
+		$self->setRegion(@coords);
+		$self->crect($a);
+		return
 	}
-	$c->raise($self->cindicator, $a);
-	$c->raise($self->canchor, $a) if defined $self->canchor;
-	$c->itemconfigure($t,
-		-fill => $lb->cget('-selectforeground'),
-	);
-	for (@columns) {
-		my $i = $self->itemGet($self->name, $_);
-		if ((defined $i) and (defined $i->ctext)) {
-			$c->raise($i->ctext, $a) if defined $i->ctext;
-			$c->raise($i->cimage, $a) if defined $i->cimage;
-			$c->itemconfigure($i->ctext, 
-				-fill => $lb->cget('-selectforeground'),
-			);
-		}
-	}
+
+	#draw centerpiece
+	$self->SUPER::drawSelect;
+
+	#draw left piece
+	my $lx = $coords[0];
+	$lx++ if $lx eq 0;
+	my $sl = $si->selectimage(0, $coords[1], $lx, $coords[3], 1, 0);
+	$self->cselectl($sl);
+	
+	#draw right piece
+	my ($cw) = $self->canvasSize;
+	my $yscroll = $self->Subwidget('YScrollbar');
+	$cw = $cw - $yscroll->width if $yscroll->ismapped;
+	my $rx1 = $coords[2];
+	my $rx2 = $cw - 4;
+	$rx1 -- if $rx1 eq $rx2;
+	my $sr = $si->selectimage($rx1, $coords[1], $rx2, $coords[3], 0, 1);
+	$self->cselectr($sr);
+}
+
+sub hasChildren {
+	my $self = shift;
+	my @c = $self->infoChildren($self->name);
+	my $ch = @c;
+	return $ch
 }
 
 sub hidden {
@@ -247,6 +239,23 @@ sub inindicator {
 	my @coords = $c->coords($i);
 	return 1 if ($coords[0] > $x) and ($coords[2] < $x) and ($coords[1] > $y) and ($coords[3] < $y);
 	return ''
+}
+
+sub maxX {
+	my $self = shift;
+	$self->{MAXX} = shift if @_;
+	return $self->{MAXX}
+}
+
+sub maxY {
+	my $self = shift;
+	$self->{MAXY} = shift if @_;
+	return $self->{MAXY}
+}
+
+sub noshow {
+	my $self = shift;
+	return (($self->hidden) or (not $self->openedparent))
 }
 
 sub opened {
@@ -281,14 +290,10 @@ sub priority {
 sub select {
 	my ($self, $flag) = @_;
 	$flag = 1 unless defined $flag;
-	my $lb = $self->listbrowser;
-	if ($flag) {
-		return if $self->selected;
-		$self->drawSelect
-	} else {
-		$self->deleteSelect
-	}
+	return if $flag and $self->selected;
+	return if (not $flag) and (not $self->selected);
 	$self->{SELECTED} = $flag;
+	$self->refreshSingle($self->name) if $self->ismapped;
 }
 
 sub selected { return $_[0]->{SELECTED} }

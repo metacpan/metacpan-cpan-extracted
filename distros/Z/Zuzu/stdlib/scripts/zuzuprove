@@ -312,7 +312,7 @@ function __main__ ( argv ) {
 		let status_text := file_ok ? _paint( "PASS", _GREEN, colour_enabled )
 			: _paint( "FAIL", _RED, colour_enabled );
 		let counts_text := sprint(
-			`total:%3d  pass:%3d  fail:%3d  todo:%3d  skip:%3d`
+			`total:%3d  pass:%3d  fail:%3d  todo:%3d  skip:%3d`,
 			summary{top_level}{total},
 			summary{top_level}{passed},
 			summary{top_level}{failed},

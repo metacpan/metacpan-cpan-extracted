@@ -1,16 +1,16 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Perl module for performing WHOIS IP lookups",
    "author" : [
-      "unknown"
+      "Ben Schmitz <ben@foink.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Whois-IP",
    "no_index" : {
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Regexp::IPv6" : "0.02"
+            "Regexp::IPv6" : "0.02",
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -31,9 +32,13 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Exporter" : "0",
+            "IO::Socket" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.19"
+   "version" : "1.20",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

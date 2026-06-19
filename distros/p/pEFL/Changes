@@ -145,3 +145,15 @@ Revision history for Perl extension pEFL.
 	- Code cleaning
 	- Add pEFL::Ecore::Event::type_flush_internal()
 	- Add support of ElmPalette
+0.77	
+	- Fix compile issue of edje_object_message_handler_set pEFL/Edje/Object.xs
+	- Fix pEFL::Elm::List->items_get_pv();
+	- Add pEFL::Elm::Box->children_get(_pv)
+	- Add pEFL::Ecore::File (only rudimentary at the moment) and pEFL::Ecore::FileMonitor
+	- Add basic support of pEFL::Ecore::FDHandler
+	- Add pEFL::Elm::App
+	- Add cleanup for pEFL::Ecore::Timer, pEFL::Ecore::FDHandler, pEFL::Ecore::Idler and pEFL::Ecore::Poller callbacks (automatically in call_perl... functions and in del())
+	- Fix memory lack in call_perl_ecore_event_handler_cb (PLSide.c): Make s_event mortal
+	- Several minor fixes
+	- Implement ecore_event_add_pv and pEFL::Ecore::Event::PerlEvent to make it possible to send events in Perl
+	- Fix memory allocation in pEFL::Edje::Messages::* Modules

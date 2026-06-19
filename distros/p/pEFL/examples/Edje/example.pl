@@ -55,14 +55,14 @@ sub create_my_group {
 	my $edje = pEFL::Edje::Object->add($canvas);
 	
 	if (!$edje) {
-		my $err = $edje_obj->load_error_get();
+		my $err = $edje->load_error_get();
 		my $errstr = pEFL::Edje::load_error_str($err);
 		warn "Could not create edje object: $errstr\n";
 		return undef;
 	}
 	
 	if (!$edje->file_set("./example.edj","my_group")) {
-		my $err = $edje_obj->load_error_get();
+		my $err = $edje->load_error_get();
 		my $errstr = pEFL::Edje::load_error_str($err);
 		warn "Could not load 'my_group' from example.edj: $errstr\n";
 		$edje->del();

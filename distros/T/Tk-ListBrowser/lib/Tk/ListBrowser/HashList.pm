@@ -5,7 +5,7 @@ use warnings;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION =  0.09;
+$VERSION =  0.10;
 
 sub new {
 	my $class = shift;
@@ -25,14 +25,11 @@ sub add {
 	}
 	my $l = $self->{LIST};
 	my $h = $self->{INDEX};
-	if (defined $index) {
-		$h->{$entry->name} = $index;
-		splice(@$l, $index, 0, $entry);
-		$self->build($index);
-	} else {
-		$h->{$entry->name} = @$l;
-		push @$l, $entry;
-	}
+	$index = @$l unless defined $index;
+	
+	$h->{$entry->name} = $index;
+	splice(@$l, $index, 0, $entry);
+	$self->build($index);
 }
 
 sub build {
@@ -73,6 +70,7 @@ sub first {
 
 sub get {
 	my ($self, $name) = @_;
+	return undef unless defined $name;
 	my $l = $self->{LIST};
 	my $i = $self->{INDEX}->{$name};
 	return $l->[$i] if defined $i;

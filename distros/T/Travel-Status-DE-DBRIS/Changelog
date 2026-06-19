@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.31 - Thu Jun 18 2026
+
+    * Handle unusually-formatted UIC carriage IDs when requesting carriage
+      formation data.
+
 Travel::Status::DE::DBRIS 0.30 - Sat Jun 13 2026
 
     * Fix each request being delayed for 10 seconds by Akamai BMP

@@ -167,6 +167,7 @@ function _colour_initial_value ( PairList p ) {
 }
 
 function _colour_default_value ( PairList p ) {
+	// The parser returns null for invalid input; valid colours are values.
 	return _parse_colour_or_null( p.get( "value", "#000000" ) ) ?: "#000000";
 }
 

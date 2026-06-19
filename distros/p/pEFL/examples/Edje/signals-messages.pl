@@ -64,7 +64,7 @@ if (!$edje_obj->file_set($edje_file,"example_group")) {
 
 $edje_obj->signal_callback_add("mouse,wheel,*","part_left",\&on_mouse_wheel,undef);
 $edje_obj->signal_callback_add("mouse,over", "part_right", \&on_mouse_over,undef);
-#$edje_obj->message_handler_set(\&_message_handle, undef);
+$edje_obj->message_handler_set(\&_message_handle, undef);
 
 $edje_obj->move(20,20);
 $edje_obj->resize($width-40,$height-40);

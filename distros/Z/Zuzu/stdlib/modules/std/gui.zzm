@@ -1098,7 +1098,7 @@ function _xml_error ( String code, String message ) {
 }
 
 function _xml_tag_name ( node ) {
-	return node.localName() ?: node.nodeName();
+	return node.localName() or? node.nodeName();
 }
 
 function _xml_assert_namespace ( node ) {
@@ -1728,6 +1728,7 @@ function _xml_join_ints ( Array values ) {
 }
 
 function _xml_meta_attrs ( Widget widget ) {
+	// These metadata slots are null or arrays; empty arrays are values.
 	let keys := widget.meta( "__xml_meta_keys" ) ?: [];
 	let out := "";
 	for ( let key in keys ) {
@@ -1737,6 +1738,7 @@ function _xml_meta_attrs ( Widget widget ) {
 }
 
 function _xml_style_attrs ( Widget widget ) {
+	// These metadata slots are null or arrays; empty arrays are values.
 	let keys := widget.meta( "__xml_style_keys" ) ?: [];
 	let out := "";
 	for ( let key in keys ) {

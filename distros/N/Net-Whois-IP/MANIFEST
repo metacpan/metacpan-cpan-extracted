@@ -19,4 +19,5 @@ t/test2.pl
 t/test3.pl
 t/testx.t
 test.pl
+t/01-whoisip-query.t
 META.json                                Module JSON meta-data (added by MakeMaker)

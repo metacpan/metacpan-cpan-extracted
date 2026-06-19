@@ -206,11 +206,12 @@ let app_archive := archive_path(
 	"{\"dep/lib\":\"1.0.0\"}",
 );
 
+let home := Path.tempdir();
 let zoo := new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: home.to_String(),
 	base_url: "https://packages.test",
 	user_agent: ua,
 	dependency_roots: [ other ],
@@ -253,11 +254,12 @@ let same_archive := archive_path(
 	[ "same/app" ],
 	[],
 );
+let reinstall_home := Path.tempdir();
 let reinstall_plan := ( new Zuzuzoo(
 	lib_dir: reinstall_target{lib_dir},
 	bin_dir: reinstall_target{bin_dir},
 	meta_dir: reinstall_target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: reinstall_home.to_String(),
 ) ).plan_install(same_archive.to_String());
 is(
 	reinstall_plan{removals}[0]{name},

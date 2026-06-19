@@ -17,3 +17,49 @@ Revision history for Perl extension Net::Whois::IP.
 	-no bug reports for a year... ready for release
 1.10 Mon Sep 6 8:55:33 2010
 	- added case-insensitive flag to pattern match for orgid
+1.19_01 2026-06-12 - jseymour
+    - Fixed whoisip_query() list/scalar return behavior to match documentation
+    - Fixed typo in "Failed to Connect" message in _get_connect()
+    - Fixed possible undef dereference in _do_processing()
+    - Fixed operator-precedence ambiguity in conditional statement in
+      _do_processing()
+
+    - Added guard against unknown WHOIS registrar in _do_lookup()
+    - Eliminated hard-coded WHOIS server query options in favor
+      of centralized hash table lookups
+    - Replaced enumerated registrar check in _do_processing() with
+      registrar hash table lookup test
+    - Replaced hard-coded ARIN "exact match prefix" with defined
+      constant
+    - Replaced simple sleep() call for throttling with per-server
+      throttling mechanism
+
+    - Added synthesized parent/ancestor WHOIS response records for
+      certain ARIN hierarchy queries, normalized into standard WHOIS
+      response-hash format.
+
+    - Renamed "do_debug()" to "_do_debug()"
+    - Renamed debugging statements to use quieter mixed-case names and added
+      a debugging switch instead of requiring commenting/uncommenting code
+    - Replaced debugging output of array reference addresses with
+      actual array values
+    - Eliminated redundant "Flag set/unset" debugging output
+    - Added registrar query debug statement
+    - Added debugging helpers to inspect WHOIS responses and WHOIS
+      response arrays
+
+    - Added deterministic Test::More-based regression tests
+
+    - Cleaned up POD documentation and relocated to top of file for
+      easier discovery
+    - Removed obsolete commented-out code
+    - Cleaned up visual structure by separating some loop and
+      conditional bodies from surrounding code and normalized
+      indentation—both to better visualize flow
+    - Changed string quoting from double quotes to single quotes where
+      there was no variable interpolation, as per current Perl best
+      practices
+1.20 2026-06-18 - jseymour
+    - Promoted 1.19_01 to 1.20
+    - Added release tarball to repo
+

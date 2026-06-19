@@ -116,11 +116,12 @@ write_installed( target, "old-any", "0.1.0", "any/mod" );
 write_installed( target, "too-old", "1.0.0", "min/mod" );
 write_installed( custom, "new-enough", "1.2.3", "min/mod" );
 
+let home := Path.tempdir();
 let zoo := new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: home.to_String(),
 	dependency_roots: [
 		{
 			name: "custom",

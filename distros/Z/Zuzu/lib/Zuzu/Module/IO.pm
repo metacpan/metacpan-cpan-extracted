@@ -2,7 +2,7 @@ package Zuzu::Module::IO;
 
 use utf8;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.006000';
 
 use Encode qw( decode_utf8 );
 use Errno qw( EEXIST );
@@ -68,9 +68,9 @@ sub _has_named_temp_option {
 }
 
 sub _new_path_object {
-	my ( $class_obj, $path_obj ) = @_;
+	my ( $class_obj, $path_obj, $demolish_hook ) = @_;
 
-	return native_object(
+	my $object = native_object(
 		class => $class_obj,
 		slots => {
 			_path_tiny => $path_obj,
@@ -85,6 +85,28 @@ sub _new_path_object {
 			_line_mode => 0,
 		},
 	);
+	$object->demolish_hook($demolish_hook)
+		if ref($demolish_hook) eq 'CODE';
+
+	return $object;
+}
+
+sub _temp_path_cleanup {
+	my ( $path_obj, $recursive ) = @_;
+
+	return sub {
+		local $@;
+		eval {
+			if ($recursive) {
+				$path_obj->remove_tree({ safe => 0 });
+			}
+			else {
+				$path_obj->remove;
+			}
+			1;
+		};
+		return;
+	};
 }
 
 sub _new_path_array {
@@ -764,7 +786,12 @@ sub IMPORT {
 			my ( $self, @args ) = @_;
 			push @args, UNLINK => 0
 				if not _has_named_temp_option( \@args, 'UNLINK' );
-			return _new_path_object( $path_class, tempfile( @args ) );
+			my $path = tempfile( @args );
+			return _new_path_object(
+				$path_class,
+				$path,
+				_temp_path_cleanup( $path, 0 ),
+			);
 		},
 	);
 	$path_class->static_methods->{tempdir} = native_function(
@@ -773,7 +800,12 @@ sub IMPORT {
 			my ( $self, @args ) = @_;
 			push @args, CLEANUP => 0
 				if not _has_named_temp_option( \@args, 'CLEANUP' );
-			return _new_path_object( $path_class, tempdir( @args ) );
+			my $path = tempdir( @args );
+			return _new_path_object(
+				$path_class,
+				$path,
+				_temp_path_cleanup( $path, 1 ),
+			);
 		},
 	);
 	$path_class->static_methods->{glob} = native_function(

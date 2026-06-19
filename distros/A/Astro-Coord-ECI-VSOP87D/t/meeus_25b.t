@@ -24,7 +24,7 @@ use Time::Local qw{ timegm };
     );
 
     # Calling __model as a subroutine because the Sun carries the model
-    # of the Earth, but its __model() is overridden to return zeroes.
+    # of the Earth, but its __model() is overridden to return zeros.
     my ( $L, $B, $R ) = __model( SUN_CLASS, $time,
 	model_cutoff_definition	=> $sun->model_cutoff_definition(),
     );

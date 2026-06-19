@@ -43,6 +43,25 @@ CODE:
 OUTPUT:
 	RETVAL
 
+void
+DESTROY(message) 
+    EdjeMessageStringSet *message
+PREINIT:
+	int index;
+CODE:
+	/* Da wir in _new() jeden String mit savepvn() kopiert haben,
+	müssen wir hier in einer Schleife JEDEN einzelnen String freigeben. */
+	if (message) {
+		for (index = 0; index < message->count; index++) {
+			if (message->str[index]) {
+				Safefree(message->str[index]);
+			}
+		}
+		/* Erst wenn alle Strings gelöscht sind, löschen wir die Struktur */
+		Safefree(message);
+	}
+
+
 MODULE = pEFL::Edje::Message::StringSet		PACKAGE = EdjeMessageStringSetPtr
 
 int
@@ -68,14 +87,3 @@ PPCODE:
     for (index = 0; index <count; index ++) {
     	PUSHs( sv_2mortal( newSVpv( vals[index], 0 ) ));
 	}
-	
-void
-DESTROY(message) 
-    EdjeMessageStringSet *message
-PREINIT:
-	int count;
-	char **vals;
-	int index;
-CODE:
-	Safefree(message);
-	//printf("Freeing Message_String_Set\n");

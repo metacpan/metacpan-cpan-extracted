@@ -62,6 +62,7 @@ Archive.dump(
 let target := root();
 target{lib_obj}.child("block").spew_utf8("not a directory\n");
 
+let child_home := Path.tempdir();
 let child := Path.tempfile();
 child.spew_utf8(
 	"from std/zuzuzoo import Zuzuzoo;\n" _
@@ -69,7 +70,7 @@ child.spew_utf8(
 	"  lib_dir: \"" _ target{lib_dir} _ "\",\n" _
 	"  bin_dir: \"" _ target{bin_dir} _ "\",\n" _
 	"  meta_dir: \"" _ target{meta_dir} _ "\",\n" _
-	"  home: \"" _ Path.tempdir().to_String() _ "\"\n" _
+	"  home: \"" _ child_home.to_String() _ "\"\n" _
 	") ).install( \"" _ archive.to_String() _ "\", { no_test: true } );\n",
 );
 

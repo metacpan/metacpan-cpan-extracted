@@ -2,7 +2,7 @@ package Zuzu::Parser;
 
 use utf8;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.006000';
 
 use Zuzu::Error;
 use Zuzu::Lexer;

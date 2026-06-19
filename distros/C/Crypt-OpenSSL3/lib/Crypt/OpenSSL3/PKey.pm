@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::PKey;
-$Crypt::OpenSSL3::PKey::VERSION = '0.006';
+$Crypt::OpenSSL3::PKey::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::PKey - An assymetrical key
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -60,9 +60,17 @@ A PKey can be any kind of assymetrical key. This is a fat interface: no single k
 
 =head2 new_raw_public_key
 
+=head2 read_der_private_key
+
+=head2 read_der_public_key
+
 =head2 read_pem_private_key
 
 =head2 read_pem_public_key
+
+=head2 write_der_private_key
+
+=head2 write_der_public_key
 
 =head2 write_pem_private_key
 

@@ -139,12 +139,14 @@ function first_arg_node ( name, ev, ctx, args ) {
 
 function first_number_arg ( name, ev, ctx, args ) {
 	const node := first_arg_node( name, ev, ctx, args );
+	// Numeric coercion may produce 0; only null falls back.
 	return ev.to_number(node) ?: 0;
 }
 
 function nth_number_arg ( name, ev, ctx, args, i ) {
 	die `Not enough arguments for ${name}()` if args.length() <= i;
 	const got := ev.eval_expr( args[i], ev.nested_ctx( ctx ) );
+	// Numeric coercion may produce 0; only null falls back.
 	return ev.to_number( got.get( 0, null ) ) ?: 0;
 }
 

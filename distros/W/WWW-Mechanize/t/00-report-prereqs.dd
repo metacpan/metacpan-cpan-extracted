@@ -20,6 +20,7 @@ do { my $x = {
                                       'Perl::Critic' => '1.132',
                                       'Perl::Tidy' => '20180220',
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Tidy' => '0',
                                       'Test::Code::TidyAll' => '0.50',
                                       'Test::EOL' => '0',
                                       'Test::Memory::Cycle' => '0',

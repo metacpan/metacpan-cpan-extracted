@@ -2,7 +2,7 @@ package Zuzu::Runtime;
 
 use utf8;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.006000';
 our $DEBUG_LEVEL = 0;
 
 use Digest::MD5 qw( md5_hex );
@@ -3769,12 +3769,14 @@ sub eval_ternary {
 	my ($self, $node) = @_;
 
 	my $cond_value = $node->cond->evaluate($self);
-	if ( $self->_to_Boolean($cond_value) ) {
-		if (defined $node->if_true) {
-			return $node->if_true->evaluate($self);
-		}
+	if (!defined $node->if_true) {
+		return defined($cond_value)
+			? $cond_value
+			: $node->if_false->evaluate($self);
+	}
 
-		return $cond_value;
+	if ( $self->_to_Boolean($cond_value) ) {
+		return $node->if_true->evaluate($self);
 	}
 
 	return $node->if_false->evaluate($self);

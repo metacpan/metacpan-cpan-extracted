@@ -7,7 +7,7 @@ use warnings;
 
 use base qw{ Astro::Coord::ECI::VSOP87D::_Inferior };
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 sub __model_definition {
     my ( undef, $key ) = @_;
@@ -1898,21 +1898,20 @@ L<Astro::Coord::ECI::VSOP87D|Astro::Coord::ECI::VSOP87D>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87D>,
-L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues>, or in
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2022, 2024 by Thomas R. Wyant, III
+Copyright (C) 2018-2022, 2024-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

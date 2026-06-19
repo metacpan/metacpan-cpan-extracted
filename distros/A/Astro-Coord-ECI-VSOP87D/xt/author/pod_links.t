@@ -12,7 +12,11 @@ eval {
     1;
 } or plan skip_all => 'Unable to load Test::Pod::LinkCheck::Lite';
 
-Test::Pod::LinkCheck::Lite->new()->all_pod_files_ok(
+Test::Pod::LinkCheck::Lite->new(
+    ignore_url	=> [
+	'https://www.caglow.com/info/compute/vsop87',	# Flaky
+    ],
+)->all_pod_files_ok(
     qw{ blib eg tools },
 );
 

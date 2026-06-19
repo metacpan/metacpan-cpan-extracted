@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 16;
 use Test::Tk;
 require Tk::Photo;
 require Tk::LabFrame;
@@ -248,9 +248,9 @@ push @tests, (
 		for (@l) { push @r, $_->name }
 		return \@r
 	}, ['pipoclown', 'colors'], 'getRoot' ],
-	[ sub {
-		return $handler->maxIndent
-	}, 44, 'handler maxIndent' ],
+#	[ sub {
+#		return $handler->maxIndent
+#	}, 44, 'handler maxIndent' ],
 );
 
 starttesting;

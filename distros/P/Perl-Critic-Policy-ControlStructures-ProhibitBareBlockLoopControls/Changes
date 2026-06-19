@@ -1,5 +1,17 @@
 Revision history for Perl-Critic-Policy-ControlStructures-ProhibitBareBlockLoopControls
 
+0.06    2026-06-18
+    - Restructured POD DESCRIPTION to separate bare-block (real loops, surprising
+      semantics) from non-loop constructs (controls leak or fail at runtime).
+    - Acknowledged map/grep as iteration constructs while explaining loop controls
+      escape rather than targeting the map/grep iteration.
+    - Fixed _make_explanation for map/grep blocks (previously claimed controls
+      "skip to the next element" — incorrect).
+    - Added fatal-error-at-runtime mention to sub/eval/do explanations.
+    - Added outer-loop capture scenario to bare-block forbid messages.
+    - Added action-at-a-distance examples for do {} and map/grep with enclosing
+      loops.
+
 0.05    2026-06-15
     - Changed bare_block default from require_label to follow (defers to per-keyword defaults).
     - Fixed labeled loop detection: labels are now skipped when identifying compound types.

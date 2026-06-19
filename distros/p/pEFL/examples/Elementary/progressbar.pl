@@ -8,7 +8,7 @@ use pEFL::Elm;
 pEFL::Elm::init($#ARGV, \@ARGV);
 
 pEFL::Elm::policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
-my $win = pEFL::Elm::Win->util_standard_add("hello", "Hello, World!");
+my $win = pEFL::Elm::Win->util_standard_add("progressbar", "Progressbar example");
 $win->autodel_set(1);
 
 # win 400x400

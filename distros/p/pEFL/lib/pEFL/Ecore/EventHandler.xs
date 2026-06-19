@@ -49,12 +49,17 @@ CODE:
 	free( (void*) data);
 	
 	
-#void *
-#ecore_event_handler_data_get(eh)
-#	EcoreEventHandler *eh
+int
+_ecore_event_handler_data_get(eh)
+	EcoreEventHandler *eh
+CODE: 
+	void *data;
+	int index;
+	
+	data = ecore_event_handler_data_get(eh);
+	index = (intptr_t) data;
+	
+	RETVAL = index;
+OUTPUT:
+	RETVAL
 
-
-#void *
-#ecore_event_handler_data_set(eh,data)
-#	EcoreEventHandler *eh
-#	const void *data

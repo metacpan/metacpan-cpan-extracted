@@ -1,3 +1,44 @@
+Thu Jun 18 16:13:55 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.2]:
+	* release-notes/release-notes-1.2.2.md: new
+	* release-notes.md: updated
+	* VERSION: bump
+	* lib/Amazon/S3/Lite.pm.in
+	(new)
+	- allow ref or list
+	- make us-east-1 default region
+	(init_logger)
+	- set default log level to warn
+	- set log_level
+	(_init_credentials): refactored
+	(log_level): new
+	(_create_noitification_configuration)
+	- use new filters template
+	- set filter to q{} if no filter
+	(__DATA__): +:filters
+	* lib/Amazon/S3/Lite/Logger.pm.in
+	(new)
+	- accept log_level option
+	- refactored
+	(_log_level): new
+	(debug): actually implement log levels
+	(error): likewise
+	(info): likewise
+	(warn): likewise
+	(trace): liewise
+	* t/01-s3-lite.t: remove test for region required
+
+Thu Jun 18 14:26:43 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.1]:
+	* release-notes/release-notes-1.2.1.md: new
+	* release-notes.md: updated
+	* VERSION: bump
+	* lib/Amazon/S3/Lite.pm.in
+	(_create_notification_configuration): capture resolved_xml
+	(__DATA__): lambda event XML use CloudFunctionConfiguration/CloudFunction
+
 Wed Jun 17 15:12:01 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.2.0]:

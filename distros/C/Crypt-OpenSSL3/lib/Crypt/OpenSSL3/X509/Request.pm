@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::Request;
-$Crypt::OpenSSL3::X509::Request::VERSION = '0.006';
+$Crypt::OpenSSL3::X509::Request::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -19,9 +19,11 @@ Crypt::OpenSSL3::X509::Request - A X509 / PKCS10 certificate signing request
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 METHODS
+
+=head2 new
 
 =head2 add_attr
 
@@ -61,7 +63,9 @@ version 0.006
 
 =head2 get_version
 
-=head2 new
+=head2 read_der
+
+=head2 read_pem
 
 =head2 set_distinguishing_id
 
@@ -80,6 +84,10 @@ version 0.006
 =head2 sign_ctx
 
 =head2 verify
+
+=head2 write_der
+
+=head2 write_pem
 
 =head1 AUTHOR
 

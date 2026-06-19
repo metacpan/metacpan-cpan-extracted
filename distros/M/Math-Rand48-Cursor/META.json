@@ -1,0 +1,51 @@
+{
+   "abstract" : "Move forward and backward in the drand48/rand() sequence",
+   "author" : [
+      "Stig Palmquist <stig@stig.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.051",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Rand48-Cursor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.051"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::BigFloat" : "0",
+            "Math::BigInt" : "0",
+            "perl" : "5.034"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Rand48::Cursor" : {
+         "file" : "lib/Math/Rand48/Cursor.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

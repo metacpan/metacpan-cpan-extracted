@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use vars qw ($VERSION);
 use Carp;
-$VERSION =  0.09;
+$VERSION =  0.10;
 
 use base qw(Tk::ListBrowser::BaseItem);
 
@@ -26,7 +26,14 @@ This module creates an object that holds all information of every entry.
 You will never need to create an side column object yourself.
 
 Besides the options in it's parent, you can use the I<-sortcase>,
-I<-sortfield> and I<-sortnumerical> options.
+I<-sortfield>,and I<-sortnumerical> options.
+
+Furthermore you can set the I<-cellwidth>, I<-imagecellwidth> and I<-textcellwidth> options.
+The height options are not available since the height is determined by the main entry.
+
+There is also the I<-drawrect> option. By default it is set to 0. If you set it the column will
+draw a background rectangle in the background color. Do not use this in tree mode. It will clutter
+your display when activating indicators.
 
 =cut
 
@@ -35,25 +42,28 @@ sub new {
 	
 
 	my $self = $class->SUPER::new(@_);
-	bless $self, $class;
 
 	$self->filterfield('text') unless defined $self->filterfield;
 	$self->itemtype('text') unless defined $self->itemtype;
+	$self->drawrect(0) unless defined $self->drawrect;
 	$self->sortcase('') unless defined $self->sortcase;
 	$self->sortfield('text') unless defined $self->sortfield;
 	$self->sortnumerical('') unless defined $self->sortnumerical;
+	$self->cellimagewidth(0);
+	$self->celltextwidth(0);
+	$self->cellwidth(100);
 	$self->{VALUES} = {};
 
 	return $self
 }
 
-sub cellImageWidth {
+sub cellimagewidth {
 	my $self = shift;
 	$self->{IMAGEWIDTH} = shift if @_;
 	return $self->{IMAGEWIDTH}
 }
 
-sub cellTextWidth {
+sub celltextwidth {
 	my $self = shift;
 	$self->{TEXTWIDTH} = shift if @_;
 	return $self->{TEXTWIDTH}
@@ -69,7 +79,7 @@ sub cellSize {
 	my $values = $self->{VALUES};
 	for (keys %$values) {
 		my $item = $values->{$_};
-		my ($iw, $ih, $tw, $th) = $item->minCellSize($self->cget('-itemtype'));
+		my ($cw, $ch, $iw, $ih, $tw, $th) = $item->requestedSize;
 		$imagewidth = $iw if $iw > $imagewidth;
 		$textwidth = $tw if $tw > $textwidth;
 		my $itemtype = $self->cget('-itemtype');
@@ -88,13 +98,13 @@ sub cellSize {
 			}
 		}
 	}
-	$self->cellWidth($cellwidth);
-	$self->cellImageWidth($imagewidth);
-	$self->cellTextWidth($textwidth);
+	$self->cellwidth($cellwidth);
+	$self->cellimagewidth($imagewidth);
+	$self->celltextwidth($textwidth);
 	return $cellwidth;
 }
 
-sub cellWidth {
+sub cellwidth {
 	my $self = shift;
 	$self->{CELLWIDTH} = shift if @_;
 	my $fw = $self->forceWidth;
@@ -111,7 +121,7 @@ sub clear {
 
 sub draw {
 	my $self = shift;
-
+	return unless $self->drawrect;
 	my $c = $self->Subwidget('Canvas');
 	my @region = $self->region;
 	my $rtag = $c->createRectangle($self->region,
@@ -120,6 +130,12 @@ sub draw {
 	);
 	$c->lower($rtag);
 	$self->crect($rtag);
+}
+
+sub drawrect {
+	my $self = shift;
+	$self->{DRAWRECT} = shift if @_;
+	return $self->{DRAWRECT}
 }
 
 sub filterfield {

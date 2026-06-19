@@ -29,8 +29,22 @@ function make_temp () {
 	return 1;
 }
 
+function make_returned_temp () {
+	let t := new Temp( marker: "kept" );
+	return t;
+}
+
+function hold_returned_temp () {
+	let t := make_returned_temp();
+	is( __global__{demolish_seen}, 1, "__demolish__ not called while returned object is referenced" );
+	is( t{marker}, "kept", "returned object remains usable in caller scope" );
+}
+
 is( __global__{demolish_seen}, 0, "__demolish__ not called while alive" );
 make_temp();
 is( __global__{demolish_seen}, 1, "__demolish__ runs at garbage collection" );
 is( __global__{demolish_marker}, "bye", "__demolish__ can inspect fields" );
+hold_returned_temp();
+is( __global__{demolish_seen}, 2, "__demolish__ runs when returned object owner leaves scope" );
+is( __global__{demolish_marker}, "kept", "__demolish__ sees returned object state" );
 done_testing();

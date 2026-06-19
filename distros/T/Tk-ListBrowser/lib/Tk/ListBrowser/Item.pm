@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.09;
+$VERSION = 0.10;
 
 use base qw(Tk::ListBrowser::BaseItem);
 
@@ -144,12 +144,13 @@ sub draw {
 	my @textcavity = (0, 0, 0, 0);
 
 	my $owner = $self->owner;
-	my $cellheight = $owner->cellHeight;
-	my $cellwidth = $owner->cellWidth;
-	my $imageheight = $owner->cellImageHeight;
-	my $imagewidth = $owner->cellImageWidth;
-	my $textheight = $owner->cellTextHeight;
-	my $textwidth = $owner->cellTextWidth;
+
+	my $cellheight = $owner->cget('-cellheight');
+	my $cellwidth = $owner->cget('-cellwidth');
+	my $imageheight = $owner->cget('-cellimageheight');
+	my $imagewidth = $owner->cget('-cellimagewidth');
+	my $textheight = $owner->cget('-celltextheight');
+	my $textwidth = $owner->cget('-celltextwidth');
 
 	my $itemtype = $owner->cget('-itemtype');
 	if ($itemtype eq 'image') {
@@ -221,7 +222,8 @@ sub draw {
 	$self->textX($x + $textoffsetx);
 	$self->textY($y + $textoffsety);
 
-	$self->drawRect;
+	$self->drawRect unless $self->selected;
+	$self->drawSelect if $self->selected;
 	$self->drawImage;
 	$self->drawText;
 
@@ -254,28 +256,28 @@ sub drawRect {
 	my $owner = $self->owner;
 	my $c = $self->Subwidget('Canvas');
 
-	my $x = $self->rectX;
-	my $y = $self->rectY;
-	my $dx = $x + $owner->cellWidth;
-	my $dy = $y + $owner->cellHeight;
+	my ($x, $y, $dx, $dy) = $self->getRegion;
 	my $rtag = $c->createRectangle($x, $y, $dx, $dy,
 		-fill => $self->background,
 		-outline => $self->background,
 		-tags => $self->tags,
 	);
 
-	if (($owner eq $self->listbrowser) and ($self->columnCapable)) {
-		my @columns = $self->columnList;
-		for (@columns) {
-			my $col = $self->columnGet($_);
-			$dx = $dx + $col->cellWidth + 1;
-		}
-	}
-	$self->region($x, $y, $dx, $dy);
+	$self->setRegion($x, $y, $dx, $dy);
 	$self->crect($rtag);
+}
 
-	$c->raise($self->cimage) if defined $self->cimage;
-	$c->raise($self->ctext) if defined $self->ctext;
+sub drawSelect {
+	my $self = shift;
+	my $owner = $self->owner;
+	my $lb = $self->listbrowser;
+	my $si = Tk::ListBrowser::SelectXPM->new($lb);
+
+	my @coords = $self->getRegion;
+	my $a = $si->selectimage(@coords, 0, 0);
+	my ($x1, $y1, $x2, $y2) = @coords;
+	$self->setRegion(@coords);
+	$self->crect($a);
 }
 
 sub drawText {
@@ -283,14 +285,17 @@ sub drawText {
 	my $text = $self->textFormatted;
 	return unless defined $text;
 	return unless $self->itemtype =~ /text/;
+	my $lb = $self->listbrowser;
 	$self->deleteText;
 	my $x = $self->textX;
 	my $y = $self->textY;
+	my $fill = $self->foreground;
+	$fill = $lb->cget('-selectforeground') if $self->selected;
 
 	my $ttag;
 	my $c = $self->Subwidget('Canvas');
 	$ttag = $c->createText($x, $y,
-		-fill => $self->foreground,
+		-fill => $fill,
 		-text => $text,
 		-justify => $self->textjustify,
 		-anchor => 'nw',
@@ -300,6 +305,26 @@ sub drawText {
 
 	$self->ctext($ttag);
 
+	if ($self->columnCapable) {
+		my $owner = $self->owner;
+		my @cl = $self->columnList;
+		if ($owner eq $lb) {
+			for (@cl) {
+				my $col = $self->columnGet($_);
+				my $colrect = $col->crect;
+			}
+		}
+	}
+}
+
+sub getRegion {
+	my $self = shift;
+	my $owner = $self->owner;
+	my $x1 = $self->rectX;
+	my $y1 = $self->rectY;
+	my $x2 = $x1 + $owner->cget('-cellwidth');
+	my $y2 = $y1 + $owner->cget('-cellheight');
+	return ($x1, $y1, $x2, $y2)
 }
 
 sub image {
@@ -338,35 +363,6 @@ sub isentry {
 	return $self->owner eq $self->listbrowser;
 }
 
-sub minCellSize {
-	my ($self, $itemtype) = @_;
-	$itemtype = 'imagetext' unless defined $itemtype;
-	my $cellheight = 0;
-	my $cellwidth = 0;;
-	my $imageheight = 0;
-	my $imagewidth = 0;
-	my $textheight = 0;
-	my $textwidth = 0;
-	my $image = $self->image;
-	if (defined $image) {
-		$imageheight = $image->height;
-		$imagewidth = $image->width;
-	}
-	my $text = $self->text;
-	if (defined $text) {
-		$text = $self->textFormat($text);
-		$textheight = $self->textHeight($text);
-		$textwidth = $self->textWidth($text);
-	}
-	my $pad = 6;
-#	$pad = 6 if $itemtype ne 'imagetext';
-	$imageheight = $imageheight + $pad;
-	$imagewidth = $imagewidth + $pad;
-	$textheight = $textheight + $pad;
-	$textwidth = $textwidth + $pad;
-	return ($imagewidth, $imageheight, $textwidth, $textheight)
-}
-
 sub name { return $_[0]->{NAME} }
 
 sub rectX {
@@ -388,10 +384,79 @@ sub region {
 	return @$r;
 }
 
+sub requestedSize {
+	my $self = shift;
+	my $cellheight = 0;
+	my $cellwidth = 0;;
+	my $imageheight = 0;
+	my $imagewidth = 0;
+	my $textheight = 0;
+	my $textwidth = 0;
+	my $image = $self->image;
+	if (defined $image) {
+		$imageheight = $image->height;
+		$imagewidth = $image->width;
+	}
+	my $text = $self->text;
+	if (defined $text) {
+		$text = $self->textFormat($text);
+		$textheight = $self->textHeight($text);
+		$textwidth = $self->textWidth($text);
+	}
+	my $pad = 6;
+#	$pad = 6 if $itemtype ne 'imagetext';
+	$imageheight = $imageheight + $pad if $imageheight > 0;
+	$imagewidth = $imagewidth + $pad if $imagewidth > 0;
+	$textheight = $textheight + $pad if $textheight > 0;
+	$textwidth = $textwidth + $pad if $textwidth > 0;
+	my $itemtype = $self->cget('-itemtype');
+
+	if ($itemtype eq 'image') {
+		$cellheight = $imageheight;
+		$cellwidth = $imagewidth;
+	} elsif ($itemtype eq 'text') {
+		$cellheight = $textheight;
+		$cellwidth = $textwidth;
+	} else {
+		my $textside = $self->cget('-textside');
+		if (($textside eq 'top') or ($textside eq 'bottom')) {
+			$cellheight = $imageheight + $textheight;
+			$cellwidth = $imagewidth;
+			$cellwidth = $textwidth if $textwidth > $cellwidth;
+		} elsif (($textside eq 'left') or ($textside eq 'right')) {
+			$cellheight = $imageheight;
+			$cellheight = $textheight if $textheight > $cellheight;
+			$cellwidth = $imagewidth + $textwidth;
+		}
+	}
+
+	return ($cellwidth, $cellheight, $imagewidth, $imageheight, $textwidth, $textheight)
+}
+
 sub row {
 	my $self = shift;
 	$self->{ROW} = shift if @_;
 	return $self->{ROW}
+}
+
+sub selected {
+	my $self = shift;
+	my $item = $self;
+	$item = $self->get($self->name) if $self->owner ne $self->listbrowser;
+	return $item->{SELECTED}
+}
+
+sub setRegion {
+	my ($self, $x, $y, $dx, $dy) = @_;
+	my $owner = $self->owner;
+	if (($owner eq $self->listbrowser) and ($self->columnCapable)) {
+		my @columns = $self->columnList;
+		for (@columns) {
+			my $col = $self->columnGet($_);
+			$dx = $dx + $col->cget('-cellwidth') + 1;
+		}
+	}
+	$self->region($x, $y, $dx, $dy);
 }
 
 sub tags {
@@ -419,6 +484,28 @@ sub text {
 	return $self->{TEXT}
 }
 
+=item B<textAbbreviate>I<($string, ?$size?, ?$firstsize?)>
+
+Shortens $string to $size by leaving out a middle part. Then returns it.
+$size is set to 30 unless you specify it. $firstsize is set to 25% of $size
+unless you set it.
+
+=cut
+
+sub textAbbreviate {
+	my ($self, $string, $size, $firstsize) = @_;
+	$size = 30 unless defined $size;
+	$firstsize = int($size / 4) unless defined $firstsize;
+	my $length = length($string);
+	if ($length > $size) {
+		my $first = substr($string, 0, $firstsize) . ' ... ';
+		my $lastsize = $size - $firstsize - 5;
+		my $last = substr($string, $length - $lastsize, $lastsize);
+		$string = $first . $last;
+	}
+	return $string;
+}
+
 sub textFormatted {
 	my $self = shift;
 	$self->{TEXTFORMATTED} = shift if @_;
@@ -437,6 +524,8 @@ sub textFormat {
 	my ($self, $text) = @_;
 	my $wraplength = $self->wraplength;
 	my $font = $self->font;
+	my $length = $self->textlength;
+	$text = $self->textAbbreviate($text, $length) if $length > 0;
 	return $text if $wraplength eq 0;
 	my @lines = split (/\n/, $text);
 	my @out;

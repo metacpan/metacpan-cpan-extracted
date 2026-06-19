@@ -1,0 +1,93 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 02aca7b0cbbdb681f3e7b7c8b0a6bdb70512a0fca97f0b3ae7effab452173b98 Changes
+SHA256 fd80c63b331d6adacabd3b09cae443135d130c79d0f9edd97613cdd3c6d44ed7 LICENSE
+SHA256 abe9d591e9a455b8d83c5185c47623da28e092087c653a3fbc377064f1b2833b MANIFEST
+SHA256 567ac171c889292302d1a9b89ac256ffa6ba89b0acf30f9302e91fd6bd728509 META.yml
+SHA256 c446e3d41449068cb118c00a239e6b19c0251b68abd41755262bc0c10be64cb9 Makefile.PL
+SHA256 a5267a9e77564a5cc49e14e288762fc6caee3340a133cfea60f13ea6c8ced0a3 README
+SHA256 0e6e9a8ad243bc059366d8c1db01a41aa945cbc5ca56d34b40196b2141be33f8 Test.pm
+SHA256 d598da53dcb367818560efa914623021deb1284c9dddb3186f7dd1ceb8ac7429 Test/0_1_0.pm
+SHA256 989b1ea2dfaf21003a592ae7ce9ed62bf5840824055f77fad8f68d8b6d236bbb Test/0_1_0/Result/Person.pm
+SHA256 4eef50bcec355d4eb212ecc27625edf2c69f0c4c176e30fcb7127ad95b6253d8 Test/0_2_0.pm
+SHA256 7a4f02e737d0d61b17e4a5952e79dc0a000d92c41e62372f37ab2bc69bbef9cf Test/0_2_0/Result/Person.pm
+SHA256 da97c5192a828dcfe3af1b8f5f093896ae280b470e5e26c83a1f2d1da39d9a9b Test/0_3_0.pm
+SHA256 a8d2ed9d37732679dded20280018876ac48a1ab3226a674e67d71fe8661fa72b Test/0_3_0/Result/Address.pm
+SHA256 6138e2a674a56304d4d10fa8fd685472b251991ca6d6b05ab596aa42aeadc8ec Test/0_3_0/Result/Person.pm
+SHA256 0e411ca088d7e22d824b59e9bbce16dad167c3a22059812f5279726ebf15832d examples/schema_test_versions.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 b986592700675e11c2c62cb41fa24d9f4d15e077a0d317f372efcaa78d68a1d9 inc/Module/Install/Share.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 65934f1542eb73e86180feb78fdb960c1152c42edd16fb93325fab4ffa7ce12c share/versions.txt
+SHA256 2ebcbba66bdacad10cea6bc9a614368ede2057fd6509653da666b62b31de653b t/Schema-Test-0_1_0-Result-Person/01-use.t
+SHA256 5aba0ecb84faad5f986dc2775d73d83ca1d2ba5fcfd67c4d17af7426e130f48c t/Schema-Test-0_1_0-Result-Person/02-version.t
+SHA256 7d6dc2542457d724ae4ceb8ada09074989da9ee65b77dbb629f9cd058db6c888 t/Schema-Test-0_1_0-Result-Person/03-new.t
+SHA256 e68a8172d4b9447307cc8bcf8ec8e0ea1b69b1a98c688289f579d2c648fc4969 t/Schema-Test-0_1_0-Result-Person/04-table.t
+SHA256 370d6d211cb37d650aa1dffa9d7b1cde0cef87ba186903199c641369fcb7cee9 t/Schema-Test-0_1_0/01-use.t
+SHA256 d06f284baca35856cf60928ef25928e35eb04b11d97f0c8726277d255a90eca7 t/Schema-Test-0_1_0/02-version.t
+SHA256 46a7eb37b8d932b6a572bbe1130df8e770c7a93437b92b38ba00f5b4de9abe19 t/Schema-Test-0_2_0-Result-Person/01-use.t
+SHA256 dcc77c1e8cb33749ef4ee9a8a129ae6c909af57ead071facaaa2bda1c62ba0f5 t/Schema-Test-0_2_0-Result-Person/02-version.t
+SHA256 18bdf85af5ac5ab3c69f21f707805f7e339eb7ff38a44667d384051ee0f4dc79 t/Schema-Test-0_2_0/01-use.t
+SHA256 a61564a0dafe0cc9c5eb528a1c70084dede3578501b112392b8395fc6a771555 t/Schema-Test-0_2_0/02-version.t
+SHA256 38f35067f360ab3f6a83c4546f537fe353b1bb17cf0dc90383a13f782b3d73ce t/Schema-Test-0_3_0-Result-Address/01-use.t
+SHA256 4c117b75d236c3e5c467a8fbe300c70b57c74817281334165052aed7a63fabc0 t/Schema-Test-0_3_0-Result-Address/02-version.t
+SHA256 7edcb3ffe83ea47e1965ef8830db223adb41bbefbf9fc1b185b1cd40d3651405 t/Schema-Test-0_3_0-Result-Address/03-person.t
+SHA256 1f3b65ea18b8a8659d2d79a5d3025771794ed738726432d06664fd3da8750987 t/Schema-Test-0_3_0-Result-Person/01-use.t
+SHA256 ec91e508112ed66dc6ee24b71ab8e778122539ccc71064cc4404bc7f40cee2bf t/Schema-Test-0_3_0-Result-Person/02-version.t
+SHA256 3fe9d7f58adb6bc059fbce8a03fe6c73f56985d3e78b6bace744ca721f238a7b t/Schema-Test-0_3_0/01-use.t
+SHA256 df8c566e577ec1473aed9e50386f3fb3c8f9cbb092cd2cc04b862dbef5659551 t/Schema-Test-0_3_0/02-version.t
+SHA256 eee88c9734abe4468f94ecd88e0ecd6dcb9030d93b1efc5d9a3ed701492c9564 t/Schema-Test/01-use.t
+SHA256 e1e5aa8b025826cf22a025a16b94c812fb8a4520404b10776030977aa0ca10b5 t/Schema-Test/02-version.t
+SHA256 1f138656487cbd26e89ee079d9e0ede41fbdd3c34aad8c89b2f1532cbc457761 xt/Schema-Test-0_1_0-Result-Person/01-pod_coverage.t
+SHA256 d52cb6affad6863e0506254a52aa39849ac0c69d05dd06cb141bd191bd7af9ee xt/Schema-Test-0_1_0-Result-Person/02-pod.t
+SHA256 d4c9db0ab09a8acd66499a6f61e85ff52cd618a9bafa9cd44a7bf3fa74235e1f xt/Schema-Test-0_1_0/01-pod_coverage.t
+SHA256 41715963cfa7722db46fe7b4db6fd1263945c646ae0e6f9cb88d9d8de06eed94 xt/Schema-Test-0_1_0/02-pod.t
+SHA256 023da8efbc91b372507148df8be028d3f477823c0bc38efdd3b854413803838c xt/Schema-Test-0_2_0-Result-Person/01-pod_coverage.t
+SHA256 503415f1c9bed034630bfd17f239d0ed95bce09fe0018a758e6bcebb47798d7b xt/Schema-Test-0_2_0-Result-Person/02-pod.t
+SHA256 ea4dc419436d1d270b4bd676b5e34a8dea085c5637ce8b37647aac8d086f81b8 xt/Schema-Test-0_2_0/01-pod_coverage.t
+SHA256 646f31a81c714e77c5777b85fbc35d7ec15e2dea183c0584b15060b62e726e73 xt/Schema-Test-0_2_0/02-pod.t
+SHA256 e6a8bfa2250b7c78d43f40a819ab76df6ca6bd7506dbf9cbe2638b7489b816b8 xt/Schema-Test-0_3_0-Result-Address/01-pod_coverage.t
+SHA256 6b5058346a134dee9bb4224e022aae933341a03e945fa81c9668577e584e4b58 xt/Schema-Test-0_3_0-Result-Address/02-pod.t
+SHA256 7b5c4bbfdfe36d0a607d96fba7c94f9fabcb0277c7be97ff04514a13082a51af xt/Schema-Test-0_3_0-Result-Person/01-pod_coverage.t
+SHA256 2d18a51f8ef0134db76752bb4294966e24d61d146c6dc356b4d9074ed15cd71d xt/Schema-Test-0_3_0-Result-Person/02-pod.t
+SHA256 5361698cbd60c2374a274f84180a949631222362ca5a7c7c0ede5150dc4a7ba2 xt/Schema-Test-0_3_0/01-pod_coverage.t
+SHA256 a8beab51ea3d2795ab6641cc080e1e231e4771773035095eb03bf42a85f2cc30 xt/Schema-Test-0_3_0/02-pod.t
+SHA256 cb81ed6b99e5122ce32750f044471eb45826b23dc7ff3173982948bb16a11dd3 xt/Schema-Test/01-pod_coverage.t
+SHA256 e965329538e92fab1f12f59c3b811ea4f2eaaf3667ec7442d2833a9a9a488538 xt/Schema-Test/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEECAMiMrHl7JYa0rZPZ58rGyDXs5UFAmo0ESQACgkQZ58rGyDX
+s5UnTwwA4RH0Bv7pqvoelJ6+PQJS3UyLEodXGk3+FWNZiYvOGhq+MmIF/J4n843g
+fVSwGkTchaib3UzKo7uxdOg2qQm+vLD7ifeQawMT/yCbp+sm4bt1eqDlPo3gfAD1
+StwPLUFZvE5iOUYpGr9zH7D/q8OLT/rV+aJe6wWTbRfbxWHPvw4wKA0C9vubgzns
+Ms9088E22O27l/sE3BvXHtTbbtuzcBhEbrkee589EL3UT/N2xRWKlE28fcKaBPdg
+W/vPRrcJjZ6oL3mhzpMOH60T5rEDWdTRqAH61nN1UAuG0kf0vcRRYRHsdPuHUNiS
+ivc4AUWzCOEFW/Wn19PqhzwAg/8v9C0oxqB/H6yxyI4LSiKW0F2lO5XOjeylYSxJ
+fPogrTUmhS9Kx/vkzaoL95iUgnSY1KaPSdtrYPA5X0638EpBHumlsTCSM56NfNdw
+28r47eEjb18vkBiwJcswQUigV2NFeBIkSbaiKWFoDuM2Ly5z5CcDuoHhhpySzkm4
+pQUSL70m
+=zJC/
+-----END PGP SIGNATURE-----

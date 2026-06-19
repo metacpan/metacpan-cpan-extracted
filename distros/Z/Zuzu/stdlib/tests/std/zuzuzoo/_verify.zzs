@@ -103,11 +103,12 @@ write_installed(
 	],
 );
 
+let home := Path.tempdir();
 let zoo := new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: home.to_String(),
 );
 let result := zoo.verify("verify/app");
 
@@ -124,13 +125,14 @@ like(
 	"format_json aliases canonical pretty JSON",
 );
 
+let top_home := Path.tempdir();
 let top := verify(
 	"verify/app",
 	{
 		lib_dir: target{lib_dir},
 		bin_dir: target{bin_dir},
 		meta_dir: target{meta_dir},
-		home: Path.tempdir().to_String(),
+		home: top_home.to_String(),
 	},
 );
 ok( top{ok}, "top-level verify wrapper works" );

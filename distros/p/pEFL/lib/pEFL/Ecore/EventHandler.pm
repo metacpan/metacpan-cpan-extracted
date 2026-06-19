@@ -43,6 +43,25 @@ sub prepend {
      return $widget;
 }
 
+package EcoreEventHandlerPtr;
+
+our @ISA = qw();
+
+sub data_get {
+	my ($event_handler) = @_;
+	my $index = $event_handler->_data_get();
+	my $data = $pEFL::PLSide::EcoreEventHandler_Cbs[$index];
+	return $data;
+}
+
+sub data_set {
+	my ($event_handler, $data) = @_;
+	my $index = $event_handler->_data_get();
+	my $previous_data = $pEFL::PLSide::EcoreEventHandler_Cbs[$index];
+	$pEFL::PLSide::EcoreEventHandler_Cbs[$index] = $data;
+	return $previous_data;
+}
+
 # Preloaded methods go here.
 
 1;

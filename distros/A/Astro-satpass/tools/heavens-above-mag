@@ -9,11 +9,13 @@ use warnings;
 
 use Getopt::Long 2.33 qw{ :config auto_version };
 use HTML::TreeBuilder;
+use HTTP::Date qw{ time2str };
+use JSON;
 use LWP::UserAgent;
 use Pod::Usage;
 use YAML 1.25 qw{ Dump Load };
 
-our $VERSION = '0.134';
+our $VERSION = '0.135';
 
 use constant CACHE_DIR	=> 'cache';
 
@@ -25,7 +27,7 @@ use constant MODIFY_FILE	=> 'lib/Astro/Coord/ECI/TLE.pm';
 
 use constant REF_CODE	=> sub {};
 
-use constant VISUAL_URL	=> 'https://celestrak.org/SpaceTrack/query/visual.txt';
+use constant VISUAL_URL	=> 'https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=JSON';
 use constant VISUAL_YML	=> 'visual.yml';
 
 my %opt = (
@@ -131,12 +133,14 @@ sub get_cached {
     $resp->is_success()
 	or die "Failed to fetch $uri: ", $resp->status_line();
     my ( $last_modified ) = $resp->header( 'Last-Modified' );
+    unless ( defined $last_modified ) {
+	# The Celestrak API does not provide this, so we do the best we
+	# can.
+	$last_modified = time2str( time );
+	$resp->header( 'Last-Modified' => $last_modified );
+    }
     my $content = $resp->decoded_content();
     $content =~ s/ \r (?= \n ) //smxg;
-    my $data = {
-	last_modified	=> $last_modified,
-	content		=> $content,
-    };
     open my $fh, '>:encoding(utf-8)', $path
 	or die "Failed to open $path for output: $!\n";
     print { $fh } Dump( $resp );
@@ -178,9 +182,9 @@ sub print_perl {
     my ( $oid, $name, $mag ) = @_;
     if ( defined $mag ) {
 	# die "Debug - $oid ($name) '$mag'";
-	printf "  '%05d' => %5.1f, # %s\n", $oid, $mag, $name;
+	printf "  '%d' => %5.1f, # %s\n", $oid, $mag, $name;
     } else {
-	printf "  '%05d' => undef, # %s has no recorded magnitude\n", $oid, $name;
+	printf "  '%d' => undef, # %s has no recorded magnitude\n", $oid, $name;
     }
     return;
 }
@@ -239,16 +243,16 @@ EOD
 
 sub parse_visual {
     my ( $resp ) = @_;
-    my $content = $resp->decoded_content();
-    local $_ = undef;	# while (<>) ... does not localize $_.
+
+    my $data = decode_json( $resp->decoded_content() );
     my %oid;
-    open my $fh, '<', \$content;
-    local $_ = undef;  # while (<>) ... does not localize $_.
-    while ( <$fh> ) {
-	my ( $id, $name ) = unpack 'A5A*';
-	$oid{$id} = $name;
+    foreach my $obj ( @$data ) {
+	local $_ = $obj->{OBJECT_NAME};
+	s/ \A \s+ //smx;	# Paranoia
+	s/ \s+ \z //smx;	# Ditto
+	$oid{$obj->{NORAD_CAT_ID}} = $_;
     }
-    close $fh;
+
     foreach (
 	[ '53807', 'Bluewalker 3' ],
     ) {
@@ -410,11 +414,11 @@ cache directory will be created if necessary.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2021-2025 by Thomas R. Wyant, III
+Copyright (C) 2021-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the Artistic

@@ -59,7 +59,7 @@ sub item_new {
 sub _list_item_cb {
 	my ($data, $obj, $ev_info) = @_;
 	
-	return if ($list_mouse_down > 0);
+	#return if ($list_mouse_down > 0);
 	
 	my $ctxpopup = pEFL::Elm::Ctxpopup->add($obj);
 	$ctxpopup->smart_callback_add("dismissed", \&_dismissed_cb, undef);

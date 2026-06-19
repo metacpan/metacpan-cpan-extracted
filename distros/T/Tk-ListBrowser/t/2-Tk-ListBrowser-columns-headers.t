@@ -57,6 +57,7 @@ if (defined $app) {
 		-textjustify => 'left',
 		-selectmode => 'multiple',
 		-filtercolumns => 1,
+		-sortcase => 0,
 
 #		-marginleft => 80,
 #		-margintop => 80,
@@ -93,6 +94,12 @@ if (defined $app) {
 		-text => 'Refresh',
 	)->pack(-side => 'left');
 	$bf->Button(
+		-command => sub {
+			$ib->refreshPurge;
+		},
+		-text => 'Refresh purge',
+	)->pack(-side => 'left');
+	$bf->Button(
 		-command => sub { $ib->selectAll },
 		-text => 'Select all',
 	)->pack(-side => 'left');
@@ -127,7 +134,7 @@ if (defined $app) {
 	$app->geometry('500x400+200+200');
 }
 
-testaccessors($sc, qw/background cellImageWidth cellTextWidth cellWidth forceWidth foreground header itemtype/);
+testaccessors($sc, qw/background cellimagewidth celltextwidth cellwidth forceWidth foreground header itemtype/);
 
 push @tests, (
 	[ sub {

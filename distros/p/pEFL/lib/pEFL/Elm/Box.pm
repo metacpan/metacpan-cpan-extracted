@@ -41,7 +41,32 @@ sub add {
 
 package ElmBoxPtr;
 
+use pEFL::Eina;
+use pEFL::PLSide;
+
 our @ISA = qw(ElmObjectPtr EvasObjectPtr);
+
+sub children_get_pv {
+    my ($obj) = @_;
+    my $list = $obj->children_get();
+    my @array = pEFL::Eina::list2array($list,"ElmObjectPtr");
+    
+    # try to autobless the elements
+    foreach my $element (@array) {
+    	my $class = $element->widget_type_get();
+		if ($class =~ /^Elm_/) {
+			my $pclass = $class;
+			$pclass =~ s/_//g;
+			$pclass = $pclass . "Ptr";
+			bless($element,$pclass);
+		}
+		else {
+			bless($element, "EvasObjectPtr");
+		}
+    }
+    
+    return @array;
+}
 
 # Preloaded methods go here.
 

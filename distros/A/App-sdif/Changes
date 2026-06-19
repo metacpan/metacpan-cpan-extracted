@@ -1,5 +1,15 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.4701 2026-06-19T04:59:32Z
+
+    - Skip mecab test when mecab has no usable dictionary
+
+4.46 2026-04-27T04:45:28Z
+
+    - Require Command::Run 1.00 for the fixed /dev/fd path detection
+    - Skip diff-based tests when /dev/fd/N (N>2) is unavailable, e.g.
+      on FreeBSD without fdescfs mounted (issue #6)
+
 4.4501 2026-03-24T06:56:56Z
 
     - Require Getopt::EX::Hashed 1.0702 to fix --limit default

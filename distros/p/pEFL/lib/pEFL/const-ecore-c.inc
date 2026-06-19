@@ -143,41 +143,48 @@ constant_21 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      ECORE_CALLBACK_CANCEL ECORE_EVAS_ENGINE_DRM ECORE_EVAS_ENGINE_EWS
-     ECORE_EVENT_LOCK_CAPS ECORE_EVENT_MOUSE_OUT */
-  /* Offset 18 gives the best switch position.  */
-  switch (name[18]) {
-  case 'A':
-    if (memEQ(name, "ECORE_EVENT_LOCK_CAPS", 21)) {
-    /*                                 ^         */
-      *iv_return = ECORE_EVENT_LOCK_CAPS;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'C':
+     ECORE_EVENT_LOCK_CAPS ECORE_EVENT_MOUSE_OUT ECORE_FILE_EVENT_NONE */
+  /* Offset 19 gives the best switch position.  */
+  switch (name[19]) {
+  case 'E':
     if (memEQ(name, "ECORE_CALLBACK_CANCEL", 21)) {
-    /*                                 ^         */
+    /*                                  ^        */
       *iv_return = ECORE_CALLBACK_CANCEL;
       return PERL_constant_ISIV;
     }
     break;
-  case 'D':
+  case 'N':
+    if (memEQ(name, "ECORE_FILE_EVENT_NONE", 21)) {
+    /*                                  ^        */
+      *iv_return = ECORE_FILE_EVENT_NONE;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'P':
+    if (memEQ(name, "ECORE_EVENT_LOCK_CAPS", 21)) {
+    /*                                  ^        */
+      *iv_return = ECORE_EVENT_LOCK_CAPS;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'R':
     if (memEQ(name, "ECORE_EVAS_ENGINE_DRM", 21)) {
-    /*                                 ^         */
+    /*                                  ^        */
       *iv_return = ECORE_EVAS_ENGINE_DRM;
       return PERL_constant_ISIV;
     }
     break;
-  case 'E':
-    if (memEQ(name, "ECORE_EVAS_ENGINE_EWS", 21)) {
-    /*                                 ^         */
-      *iv_return = ECORE_EVAS_ENGINE_EWS;
+  case 'U':
+    if (memEQ(name, "ECORE_EVENT_MOUSE_OUT", 21)) {
+    /*                                  ^        */
+      *iv_return = ECORE_EVENT_MOUSE_OUT;
       return PERL_constant_ISIV;
     }
     break;
-  case 'O':
-    if (memEQ(name, "ECORE_EVENT_MOUSE_OUT", 21)) {
-    /*                                 ^         */
-      *iv_return = ECORE_EVENT_MOUSE_OUT;
+  case 'W':
+    if (memEQ(name, "ECORE_EVAS_ENGINE_EWS", 21)) {
+    /*                                  ^        */
+      *iv_return = ECORE_EVAS_ENGINE_EWS;
       return PERL_constant_ISIV;
     }
     break;
@@ -234,7 +241,7 @@ constant_23 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      ECORE_EVENT_LOCK_SCROLL ECORE_EVENT_MOUSE_WHEEL ECORE_EVENT_POWER_STATE
-     ECORE_EVENT_SIGNAL_EXIT ECORE_EVENT_SIGNAL_USER */
+     ECORE_EVENT_SIGNAL_EXIT ECORE_EVENT_SIGNAL_USER ECORE_FILE_EVENT_CLOSED */
   /* Offset 19 gives the best switch position.  */
   switch (name[19]) {
   case 'E':
@@ -252,6 +259,13 @@ constant_23 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "ECORE_EVENT_MOUSE_WHEEL", 23)) {
     /*                                  ^          */
       *iv_return = ECORE_EVENT_MOUSE_WHEEL;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'O':
+    if (memEQ(name, "ECORE_FILE_EVENT_CLOSED", 23)) {
+    /*                                  ^          */
+      *iv_return = ECORE_FILE_EVENT_CLOSED;
       return PERL_constant_ISIV;
     }
     break;
@@ -348,27 +362,34 @@ constant_25 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      ECORE_EVAS_ENGINE_PSL1GHT ECORE_EVENT_MODIFIER_CAPS
-     ECORE_EVENT_MODIFIER_CTRL */
-  /* Offset 24 gives the best switch position.  */
-  switch (name[24]) {
-  case 'L':
-    if (memEQ(name, "ECORE_EVENT_MODIFIER_CTR", 24)) {
-    /*                                       L      */
-      *iv_return = ECORE_EVENT_MODIFIER_CTRL;
+     ECORE_EVENT_MODIFIER_CTRL ECORE_FILE_EVENT_MODIFIED */
+  /* Offset 23 gives the best switch position.  */
+  switch (name[23]) {
+  case 'E':
+    if (memEQ(name, "ECORE_FILE_EVENT_MODIFIED", 25)) {
+    /*                                      ^        */
+      *iv_return = ECORE_FILE_EVENT_MODIFIED;
       return PERL_constant_ISIV;
     }
     break;
-  case 'S':
-    if (memEQ(name, "ECORE_EVENT_MODIFIER_CAP", 24)) {
-    /*                                       S      */
+  case 'H':
+    if (memEQ(name, "ECORE_EVAS_ENGINE_PSL1GHT", 25)) {
+    /*                                      ^        */
+      *iv_return = ECORE_EVAS_ENGINE_PSL1GHT;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'P':
+    if (memEQ(name, "ECORE_EVENT_MODIFIER_CAPS", 25)) {
+    /*                                      ^        */
       *iv_return = ECORE_EVENT_MODIFIER_CAPS;
       return PERL_constant_ISIV;
     }
     break;
-  case 'T':
-    if (memEQ(name, "ECORE_EVAS_ENGINE_PSL1GH", 24)) {
-    /*                                       T      */
-      *iv_return = ECORE_EVAS_ENGINE_PSL1GHT;
+  case 'R':
+    if (memEQ(name, "ECORE_EVENT_MODIFIER_CTRL", 25)) {
+    /*                                      ^        */
+      *iv_return = ECORE_EVENT_MODIFIER_CTRL;
       return PERL_constant_ISIV;
     }
     break;
@@ -516,55 +537,73 @@ constant_29 (pTHX_ const char *name, IV *iv_return) {
      ECORE_EVAS_ENGINE_OPENGL_GLEW ECORE_EVAS_ENGINE_SOFTWARE_FB
      ECORE_EVAS_ENGINE_WAYLAND_EGL ECORE_EVAS_ENGINE_WAYLAND_SHM
      ECORE_EVAS_ENGINE_XRENDER_X11 ECORE_EVAS_ENGINE_XRENDER_XCB
-     ECORE_EVENT_MOUSE_BUTTON_DOWN */
-  /* Offset 27 gives the best switch position.  */
-  switch (name[27]) {
+     ECORE_EVENT_MOUSE_BUTTON_DOWN ECORE_FILE_EVENT_CREATED_FILE
+     ECORE_FILE_EVENT_DELETED_FILE ECORE_FILE_EVENT_DELETED_SELF */
+  /* Offset 28 gives the best switch position.  */
+  switch (name[28]) {
   case '1':
-    if (memEQ(name, "ECORE_EVAS_ENGINE_XRENDER_X11", 29)) {
-    /*                                          ^        */
+    if (memEQ(name, "ECORE_EVAS_ENGINE_XRENDER_X1", 28)) {
+    /*                                           1      */
       *iv_return = ECORE_EVAS_ENGINE_XRENDER_X11;
       return PERL_constant_ISIV;
     }
     break;
-  case 'C':
-    if (memEQ(name, "ECORE_EVAS_ENGINE_XRENDER_XCB", 29)) {
-    /*                                          ^        */
+  case 'B':
+    if (memEQ(name, "ECORE_EVAS_ENGINE_SOFTWARE_F", 28)) {
+    /*                                           B      */
+      *iv_return = ECORE_EVAS_ENGINE_SOFTWARE_FB;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "ECORE_EVAS_ENGINE_XRENDER_XC", 28)) {
+    /*                                           B      */
       *iv_return = ECORE_EVAS_ENGINE_XRENDER_XCB;
       return PERL_constant_ISIV;
     }
     break;
   case 'E':
-    if (memEQ(name, "ECORE_EVAS_ENGINE_OPENGL_GLEW", 29)) {
-    /*                                          ^        */
-      *iv_return = ECORE_EVAS_ENGINE_OPENGL_GLEW;
+    if (memEQ(name, "ECORE_FILE_EVENT_CREATED_FIL", 28)) {
+    /*                                           E      */
+      *iv_return = ECORE_FILE_EVENT_CREATED_FILE;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "ECORE_FILE_EVENT_DELETED_FIL", 28)) {
+    /*                                           E      */
+      *iv_return = ECORE_FILE_EVENT_DELETED_FILE;
       return PERL_constant_ISIV;
     }
     break;
   case 'F':
-    if (memEQ(name, "ECORE_EVAS_ENGINE_SOFTWARE_FB", 29)) {
-    /*                                          ^        */
-      *iv_return = ECORE_EVAS_ENGINE_SOFTWARE_FB;
+    if (memEQ(name, "ECORE_FILE_EVENT_DELETED_SEL", 28)) {
+    /*                                           F      */
+      *iv_return = ECORE_FILE_EVENT_DELETED_SELF;
       return PERL_constant_ISIV;
     }
     break;
-  case 'G':
-    if (memEQ(name, "ECORE_EVAS_ENGINE_WAYLAND_EGL", 29)) {
-    /*                                          ^        */
+  case 'L':
+    if (memEQ(name, "ECORE_EVAS_ENGINE_WAYLAND_EG", 28)) {
+    /*                                           L      */
       *iv_return = ECORE_EVAS_ENGINE_WAYLAND_EGL;
       return PERL_constant_ISIV;
     }
     break;
-  case 'H':
-    if (memEQ(name, "ECORE_EVAS_ENGINE_WAYLAND_SHM", 29)) {
-    /*                                          ^        */
+  case 'M':
+    if (memEQ(name, "ECORE_EVAS_ENGINE_WAYLAND_SH", 28)) {
+    /*                                           M      */
       *iv_return = ECORE_EVAS_ENGINE_WAYLAND_SHM;
       return PERL_constant_ISIV;
     }
     break;
-  case 'W':
-    if (memEQ(name, "ECORE_EVENT_MOUSE_BUTTON_DOWN", 29)) {
-    /*                                          ^        */
+  case 'N':
+    if (memEQ(name, "ECORE_EVENT_MOUSE_BUTTON_DOW", 28)) {
+    /*                                           N      */
       *iv_return = ECORE_EVENT_MOUSE_BUTTON_DOWN;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'W':
+    if (memEQ(name, "ECORE_EVAS_ENGINE_OPENGL_GLE", 28)) {
+    /*                                           W      */
+      *iv_return = ECORE_EVAS_ENGINE_OPENGL_GLEW;
       return PERL_constant_ISIV;
     }
     break;
@@ -818,6 +857,18 @@ my @names = (qw(ECORE_EVENT_COUNT ECORE_EVENT_HOSTNAME_CHANGED
             {name=>"ECORE_EVENT_MOUSE_MOVE", type=>"IV", macro=>"1"},
             {name=>"ECORE_EVENT_MOUSE_OUT", type=>"IV", macro=>"1"},
             {name=>"ECORE_EVENT_MOUSE_WHEEL", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FD_ALWAYS", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FD_ERROR", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FD_READ", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FD_WRITE", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FILE_EVENT_CLOSED", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FILE_EVENT_CREATED_DIRECTORY", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FILE_EVENT_CREATED_FILE", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FILE_EVENT_DELETED_DIRECTORY", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FILE_EVENT_DELETED_FILE", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FILE_EVENT_DELETED_SELF", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FILE_EVENT_MODIFIED", type=>"IV", macro=>"1"},
+            {name=>"ECORE_FILE_EVENT_NONE", type=>"IV", macro=>"1"},
             {name=>"ECORE_LAST", type=>"IV", macro=>"1"},
             {name=>"ECORE_MODE", type=>"IV", macro=>"1"},
             {name=>"ECORE_NONE", type=>"IV", macro=>"1"},
@@ -871,6 +922,39 @@ __END__
   case 12:
     if (memEQ(name, "ECORE_SCROLL", 12)) {
       *iv_return = ECORE_SCROLL;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 13:
+    if (memEQ(name, "ECORE_FD_READ", 13)) {
+      *iv_return = ECORE_FD_READ;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 14:
+    /* Names all of length 14.  */
+    /* ECORE_FD_ERROR ECORE_FD_WRITE */
+    /* Offset 12 gives the best switch position.  */
+    switch (name[12]) {
+    case 'O':
+      if (memEQ(name, "ECORE_FD_ERROR", 14)) {
+      /*                           ^        */
+        *iv_return = ECORE_FD_ERROR;
+        return PERL_constant_ISIV;
+      }
+      break;
+    case 'T':
+      if (memEQ(name, "ECORE_FD_WRITE", 14)) {
+      /*                           ^        */
+        *iv_return = ECORE_FD_WRITE;
+        return PERL_constant_ISIV;
+      }
+      break;
+    }
+    break;
+  case 15:
+    if (memEQ(name, "ECORE_FD_ALWAYS", 15)) {
+      *iv_return = ECORE_FD_ALWAYS;
       return PERL_constant_ISIV;
     }
     break;
@@ -977,6 +1061,27 @@ __END__
     break;
   case 33:
     return constant_33 (aTHX_ name, iv_return);
+    break;
+  case 34:
+    /* Names all of length 34.  */
+    /* ECORE_FILE_EVENT_CREATED_DIRECTORY ECORE_FILE_EVENT_DELETED_DIRECTORY */
+    /* Offset 17 gives the best switch position.  */
+    switch (name[17]) {
+    case 'C':
+      if (memEQ(name, "ECORE_FILE_EVENT_CREATED_DIRECTORY", 34)) {
+      /*                                ^                       */
+        *iv_return = ECORE_FILE_EVENT_CREATED_DIRECTORY;
+        return PERL_constant_ISIV;
+      }
+      break;
+    case 'D':
+      if (memEQ(name, "ECORE_FILE_EVENT_DELETED_DIRECTORY", 34)) {
+      /*                                ^                       */
+        *iv_return = ECORE_FILE_EVENT_DELETED_DIRECTORY;
+        return PERL_constant_ISIV;
+      }
+      break;
+    }
     break;
   case 35:
     return constant_35 (aTHX_ name, iv_return);

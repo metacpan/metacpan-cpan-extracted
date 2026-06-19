@@ -26,6 +26,7 @@
 * [SEE ALSO](#see-also)
 * [AUTHOR](#author)
 * [LICENSE](#license)
+* [POD ERRORS](#pod-errors)
 # NAME
 
 Amazon::S3::Lite - A lightweight Amazon S3 client for common
@@ -163,7 +164,7 @@ you need the broader feature set or prefer direct HTTP access,
 
 Returns a new `Amazon::S3::Lite` object. Options:
 
-- region (required)
+- region (options, default: us-east-1)
 
     The AWS region for your bucket, e.g. `us-east-1`.
 
@@ -203,9 +204,9 @@ Returns a new `Amazon::S3::Lite` object. Options:
         $logger->error(...)
 
     If not supplied, the module looks for [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl). If available,
-    it calls `Log::Log4perl::easy_init` with level WARN and logs to
-    STDERR.  If Log::Log4perl is not installed, a minimal internal logger
-    is used that prints WARN and above to STDERR.
+    it calls `Log::Log4perl::easy_init` with the configure log level (or
+    WARN) and logs to STDERR.  If Log::Log4perl is not installed, a
+    minimal internal logger.
 
 - host
 
@@ -322,6 +323,13 @@ all matching keys. Hierarchical directory-style traversal using
 Returns a (possibly empty) list of object hashrefs, each with the same
 fields as the elements of `objects` in the `list_objects_v2`
 response.
+
+- log\_level
+
+    Log level for the internal logger. Accepted values: `trace`, `debug`,
+    `info`, `warn`, `error`, `fatal`. Default is `warn`. Only consulted
+    when no `logger` object is supplied and Log::Log4perl is not available
+    or not yet initialized.
 
 ## get\_object
 
@@ -704,3 +712,15 @@ Rob Lauer <rlauer@treasurersbriefcase.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 1473:
+
+    '=item' outside of any '=over'
+
+- Around line 1480:
+
+    You forgot a '=back' before '=head2'

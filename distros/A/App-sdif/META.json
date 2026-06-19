@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Command::Run" : "0",
+            "Command::Run" : "1.00",
             "Getopt::EX" : "v1.25.0",
             "Getopt::EX::Hashed" : "1.0702",
             "Getopt::EX::termcolor" : "1.07",
@@ -86,7 +86,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "4.4501"
+         "version" : "4.4701"
       },
       "App::sdif::LabelStack" : {
          "file" : "lib/App/sdif/LabelStack.pm"
@@ -119,7 +119,7 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.4501",
+   "version" : "4.4701",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+lib/Math/Rand48/Cursor.pm
+t/00-load.t
+t/01-lcg.t
+t/02-rand.t
+t/03-seed48.t
+t/04-bad-seek.t
+t/05-corpus.t
+t/06-seed-corner-cases.t

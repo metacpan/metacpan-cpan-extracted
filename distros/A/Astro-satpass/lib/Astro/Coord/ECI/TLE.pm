@@ -229,7 +229,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.134';
+our $VERSION = '0.135';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -8180,23 +8180,23 @@ sub _next_elevation_screen {
 #
 #   $ tools/heavens-above-mag --celestrak --update
 #
-# Last-Modified: Sun, 07 Sep 2025 20:59:52 GMT
+# Last-Modified: Wed, 10 Jun 2026 12:43:29 GMT
 
 %magnitude_table = (
-  '00694' =>   2.7, # ATLAS CENTAUR 2 R/B
-  '00733' =>   4.2, # THOR AGENA D R/B
-  '00877' =>   4.2, # SL-3 R/B
-  '02802' =>   4.7, # SL-8 R/B
-  '03230' =>   5.2, # SL-8 R/B
-  '03597' =>   5.7, # OAO 2
-  '03669' =>   8.2, # ISIS 1
-  '04327' =>   5.7, # SERT 2
-  '05118' =>   4.2, # SL-3 R/B
-  '05560' =>   4.2, # ASTEX 1
-  '05730' =>   4.2, # SL-8 R/B
-  '06153' =>   5.2, # OAO 3 (COPERNICUS)
-  '06155' =>   4.2, # ATLAS CENTAUR R/B
-  '08459' =>   5.2, # SL-8 R/B
+  '694' =>   2.7, # ATLAS CENTAUR 2 R/B
+  '733' =>   4.2, # THOR AGENA D R/B
+  '877' =>   4.2, # SL-3 R/B
+  '2802' =>   4.7, # SL-8 R/B
+  '3230' =>   5.2, # SL-8 R/B
+  '3597' =>   5.7, # OAO 2
+  '3669' =>   8.2, # ISIS 1
+  '4327' =>   5.7, # SERT 2
+  '5118' =>   4.2, # SL-3 R/B
+  '5560' =>   4.2, # ASTEX 1
+  '5730' =>   4.2, # SL-8 R/B
+  '6153' =>   5.2, # OAO 3 (COPERNICUS)
+  '6155' =>   4.2, # ATLAS CENTAUR R/B
+  '8459' =>   5.2, # SL-8 R/B
   '10114' =>   4.7, # SL-3 R/B
   '10967' =>   3.2, # SEASAT 1
   '11267' =>   4.7, # SL-14 R/B
@@ -8204,7 +8204,6 @@ sub _next_elevation_screen {
   '11672' =>   4.2, # SL-14 R/B
   '12139' =>   4.2, # SL-8 R/B
   '12465' =>   4.2, # SL-3 R/B
-  '12585' =>   5.2, # METEOR PRIRODA
   '12904' =>   4.2, # SL-3 R/B
   '13068' =>   4.2, # SL-3 R/B
   '13154' =>   4.7, # SL-3 R/B
@@ -8223,7 +8222,6 @@ sub _next_elevation_screen {
   '16792' =>   4.7, # SL-14 R/B
   '16882' =>   4.7, # SL-14 R/B
   '16908' =>   4.2, # EGS (AJISAI)
-  '17295' =>   4.2, # COSMOS 1812
   '17567' =>   4.7, # SL-14 R/B
   '17589' =>   4.7, # COSMOS 1833
   '17590' =>   3.2, # SL-16 R/B
@@ -8231,7 +8229,6 @@ sub _next_elevation_screen {
   '17973' =>   4.2, # COSMOS 1844
   '18153' =>   4.7, # SL-14 R/B
   '18187' =>   4.2, # COSMOS 1867
-  '18421' =>   4.2, # COSMOS 1892
   '18749' =>   4.7, # SL-14 R/B
   '18958' =>   4.7, # COSMOS 1933
   '19046' =>   4.2, # SL-3 R/B
@@ -8292,8 +8289,6 @@ sub _next_elevation_screen {
   '25994' =>   2.7, # TERRA
   '26070' =>   2.7, # SL-16 R/B
   '26474' =>   2.7, # TITAN 4B R/B
-  '26905' =>   3.7, # USA 160
-  '26907' =>   3.7, # USA 160 DEB
   '27386' =>   3.7, # ENVISAT
   '27422' =>   3.2, # IDEFIX/ARIANE 42P
   '27424' =>   4.7, # AQUA
@@ -8324,7 +8319,6 @@ sub _next_elevation_screen {
   '41038' => undef, # YAOGAN 29 has no recorded magnitude
   '41337' => undef, # ASTRO H has no recorded magnitude
   '42758' => undef, # HXMT has no recorded magnitude
-  '43521' => undef, # CZ-2C R/B has no recorded magnitude
   '43641' => undef, # SAOCOM 1-A has no recorded magnitude
   '43682' => undef, # H-2A R/B has no recorded magnitude
   '46265' => undef, # SAOCOM 1-B has no recorded magnitude
@@ -8332,9 +8326,12 @@ sub _next_elevation_screen {
   '48865' => undef, # COSMOS 2550 has no recorded magnitude
   '52794' => undef, # CZ-2C R/B has no recorded magnitude
   '53807' =>   3.5, # BLUEWALKER 3
+  '54039' => undef, # CZ-2C R/B has no recorded magnitude
   '54149' => undef, # GSLV R/B has no recorded magnitude
   '57800' => undef, # XRISM has no recorded magnitude
   '59588' =>   2.0, # ACS 3
+  '66004' => undef, # CZ-8A R/B has no recorded magnitude
+  '66515' => undef, # SZ-21 MODULE has no recorded magnitude
 );
 
 # $$ END
@@ -8751,7 +8748,7 @@ The default is 1 (i.e. true).
 
 The author wishes to acknowledge the following individuals.
 
-Dominik Brodowski (L<https://www.brodo.de/>), whose SGP C-lib
+Dominik Brodowski (L<https://www.uni-saarland.de/lehrstuhl/brodowski/team/prof-dr-dominik-brodowski-llm-upenn.html>), whose SGP C-lib
 (available at L<https://www.brodo.de/space/sgp/>) provided a
 reference implementation that I could easily run, and pick
 apart to help get my own code working. Dominik based his work
@@ -8788,21 +8785,20 @@ elements are tweaked for use by the models implemented in this package.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
-L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
+L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2025 by Thomas R. Wyant, III
+Copyright (C) 2005-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

@@ -15,7 +15,7 @@ use Astro::Coord::ECI::Utils qw{ PI find_first_true mod2pi };
 use Astro::Coord::ECI::VSOP87D qw{ :mixin };
 use Carp;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 sub new {
     my ( $class, %arg ) = @_;
@@ -308,8 +308,8 @@ examples. The implementation itself actually comes from Meeus chapter
 22. The model parameters were not transcribed from that source, however,
 but were taken from the source IAU C reference implementation of the
 algorithm, F<src/nut80.c>, with the minimum modifications necessary to
-make the C code into Perl code. This file is contained in
-L<http://www.iausofa.org/2018_0130_C/sofa_c-20180130.tar.gz>.
+make the C code into Perl code. This file can be obtained as part of a
+tarball from L<https://www.iausofa.org/2023-10-11c>.
 
 =head2 obliquity
 
@@ -412,21 +412,20 @@ L<Astro::Coord::ECI::VSOP87D|Astro::Coord::ECI::VSOP87D>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87D>,
-L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues>, or in
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2022, 2024 by Thomas R. Wyant, III
+Copyright (C) 2018-2022, 2024-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

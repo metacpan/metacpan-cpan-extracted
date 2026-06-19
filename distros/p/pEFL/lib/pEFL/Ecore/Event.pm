@@ -29,6 +29,15 @@ our @EXPORT = qw(
 require XSLoader;
 XSLoader::load('pEFL::Ecore::Event');
 
+sub add_pv {
+	my ($class,$type,$ev_info) = @_;
+     my $widget = _ecore_event_add_pv($type, $ev_info);
+     return $widget;
+}
+
+package EcoreEventPtr;
+
+our @ISA = qw();
 
 # Preloaded methods go here.
 

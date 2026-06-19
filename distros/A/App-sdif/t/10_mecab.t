@@ -25,13 +25,21 @@ sub mecab {
 }
 
 my $mecab = "mecab";
-eval {
-     system "$mecab --version";
-     $? == 0;
+
+##
+## `mecab --version' does not read the dictionary, so it succeeds even
+## when no dictionary is installed.  Probe an actual analysis instead:
+## without a usable dictionary mecab reports
+##     param.cpp(69) [ifs] no such file or directory: .../dicrc
+## (often on stdout, and even exiting with status 0), which would
+## otherwise pollute the results.
+##
+{
+    my $probe = `echo a | $mecab 2>&1`;
+    if ($? != 0 or $probe =~ /no such file or directory/) {
+	plan skip_all => "`$mecab' is not available or has no usable dictionary.";
+    }
 }
-or do {
-    plan skip_all => "No `$mecab' command available.";
-};
 
 mecab "a b c\n",
     [ "a", " ", "b", " ", "c", "\n" ];

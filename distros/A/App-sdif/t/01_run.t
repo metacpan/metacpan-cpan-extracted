@@ -3,6 +3,7 @@ use warnings;
 use utf8;
 use Test::More;
 use File::Spec;
+use Command::Run::Tmpfile;
 
 my $lib       = File::Spec->rel2abs('lib');
 my $script    = File::Spec->rel2abs('script');
@@ -12,6 +13,16 @@ my $watchdiff = "$script/watchdiff";
 
 $ENV{PATH} .= ":$script";
 $ENV{PERL5LIB} .= ":$lib";
+
+# Skip on systems where /dev/fd/N (N>2) is unavailable, e.g. FreeBSD
+# without fdescfs mounted.
+{
+    my $probe = Command::Run::Tmpfile->new;
+    my $path  = $probe->path;
+    unless (defined $path and -r $path) {
+	plan skip_all => 'no /dev/fd or /proc/self/fd path available';
+    }
+}
 
 for my $data (qw(t/DIFF.out t/DIFF-c.out t/DIFF-u.out t/DIFF-graph.out)) {
     is(sdif('-W160', $data), 0);

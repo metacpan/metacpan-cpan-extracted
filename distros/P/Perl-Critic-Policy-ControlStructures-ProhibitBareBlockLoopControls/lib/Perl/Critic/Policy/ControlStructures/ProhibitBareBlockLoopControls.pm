@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls;
-$Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls::VERSION = '0.05';
+$Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls::VERSION = '0.06';
 use parent 'Perl::Critic::Policy';
 
 use Perl::Critic::Utils qw(:severities);
@@ -354,40 +354,50 @@ sub _make_explanation {
 
     if ( $block_type eq BLOCK_DO ) {
         return
-              qq{"$keyword" inside a "do" block targets the nearest real loop }
-            . q{--- "do" itself is not a loop. When no enclosing loop exists, }
-            . q{this is a fatal error.};
+              qq{"$keyword" inside a "do" block escapes to the nearest }
+            . q{enclosing real loop --- "do" is not a loop. When no }
+            . q{enclosing loop exists, this is a fatal error at runtime.};
     }
     if ( $block_type eq BLOCK_SUB ) {
         return
-              qq{"$keyword" inside an anonymous subroutine targets the nearest }
-            . q{enclosing real loop --- subroutines are not loops. Use an }
-            . q{explicit label to target an outer loop.};
+              qq{"$keyword" inside an anonymous subroutine escapes to the }
+            . q{nearest enclosing real loop --- subroutines are not loops. }
+            . q{When no enclosing loop exists, this is a fatal error at }
+            . q{runtime. Use an explicit label to target an outer loop.};
     }
     if ( $block_type eq BLOCK_EVAL ) {
         return
-              qq{"$keyword" inside an "eval" block targets the nearest }
-            . q{enclosing real loop --- "eval" is not a loop. Use an }
-            . q{explicit label to target an outer loop.};
+              qq{"$keyword" inside an "eval" block escapes to the nearest }
+            . q{enclosing real loop --- "eval" is not a loop. When no }
+            . q{enclosing loop exists, this is a fatal error at runtime. }
+            . q{Use an explicit label to target an outer loop.};
     }
     if ( $block_type eq BLOCK_MAP_GREP ) {
         return
-              qq{"$keyword" in a map/grep block skips to the next element }
-            . q{rather than exiting the block. Use a "for" loop for }
-            . q{clearer loop semantics.};
+              qq{"$keyword" in a map/grep block does not affect the }
+            . q{map/grep iteration --- it escapes to the nearest enclosing }
+            . q{real loop. Map/grep are iteration constructs but are not }
+            . q{loop targets; when no enclosing loop exists, this is a }
+            . q{fatal error at runtime. Use an explicit "for" loop }
+            . q{for loop control.};
     }
 
     # BLOCK_BARE
     if ( $effective eq FORBID ) {
         if ( $keyword eq 'redo' ) {
             return
-                  q{"redo" in a bare block restarts the block indefinitely }
-                . q{--- bare blocks execute only once. Use a "for" or }
+                  q{"redo" in a bare block always re-executes the block }
+                . q{indefinitely --- bare blocks execute only once, so }
+                . q{any continue block or subsequent code is skipped. }
+                . q{Inside a real loop, an unlabeled "redo" targets the }
+                . q{bare block, not the outer loop. Use a "for" or }
                 . q{"while" loop instead.};
         }
         return
-              qq{"$keyword" in a bare block just exits the block --- bare }
-            . q{blocks execute only once. Use a "for" or "while" loop }
+              qq{"$keyword" in a bare block exits the block --- bare }
+            . q{blocks execute only once. Inside a real loop, an }
+            . qq{unlabeled "$keyword" targets the bare block, }
+            . q{not the outer loop. Use a "for" or "while" loop }
             . q{if you need iteration.};
     }
 
@@ -409,28 +419,58 @@ Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls - Prohibi
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 
 This policy flags C<next>, C<last>, and C<redo> when used inside blocks that
-are not real loops or where control flow is confusing (bare C<{}> blocks,
-C<do {}> blocks, anonymous subroutines, C<eval {}>, C<map>/C<grep>).
+are not real loops or where their loop-control semantics are surprising
+(bare C<{}> blocks, C<do {}> blocks, anonymous subroutines, C<eval {}>,
+C<map>/C<grep>).
 
-Why these blocks are problematic:
+The hazards fall into two distinct categories.
+
+=head2 Bare C<{}> blocks (real loops with surprising semantics)
+
+Bare C<{}> blocks I<are> real loops -- C<next>, C<last>, and C<redo> work
+correctly within them.  The danger is that readers often do not recognise
+a bare block as a looping construct:
 
 =over
 
-=item * Bare C<{}> blocks are loops that execute once, so C<next> and C<last>
-both exit the block; C<next> additionally runs any attached C<continue> block.
+=item * A bare block executes exactly once, so C<next> exits the block
+(it does not restart it).  C<last> also exits; C<redo> re-executes the
+single pass and skips any code that would follow.
 
-=item * C<do {}> blocks are I<not> loops -- control keywords target the nearest
-enclosing real loop instead of the C<do> block itself.
+=item * Inside a real loop, an unlabeled C<next> / C<last> / C<redo>
+targets the bare block, I<not> the outer loop.  This is almost always
+unintentional and can mask subtle bugs when the block is added during
+refactoring.
 
-=item * Anonymous subroutines C<sub {}> and C<eval {}> are not loops either.
+=item * A C<continue> block attached to a bare block runs after C<next>,
+which further surprises readers who think of the block as a one-shot
+scope.
 
-=item * C<map {}> / C<grep {}> blocks are expression blocks -- loop controls
-do not behave as expected.
+=back
+
+=head2 Non-loop constructs (controls leak or fail at runtime)
+
+C<do {}>, C<sub {}>, C<eval {}>, C<map {}>, and C<grep {}> are I<not>
+loops.  Loop controls inside them either leak to an enclosing real loop
+or cause a runtime error:
+
+=over
+
+=item * C<do {}>, C<sub {}>, C<eval {}> -- the control escapes to the
+nearest enclosing real loop (Perl emits C<"Exiting %s via %s"> at the
+C<warnings> level).  If no enclosing loop exists, Perl dies with
+C<Can't "%s" outside a loop block>.
+
+=item * C<map {}> / C<grep {}> -- these I<are> iteration constructs
+(the block runs once per element, just like C<for my $x (@list)>), but
+they are not loop-control targets.  C<next> does not skip to the next
+map element; it escapes to the nearest enclosing real loop (or is a
+runtime error).  Use an explicit C<for> loop when you need loop control.
 
 =back
 
@@ -496,11 +536,17 @@ The following examples illustrate the default configuration.
 =head2 C<do { }> blocks
 
     do {
-        next;           # not ok
+        next;           # not ok - fatal error at runtime (no enclosing loop)
     };
 
+    while (1) {
+        do {
+            next;       # not ok - exits the while, not the do (action-at-a-distance)
+        };
+    }
+
     do {
-        last LOOP;      # not ok (label does not help -- do is not a loop)
+        last LOOP;      # not ok (label does not help --- do is not a loop)
     };
 
 =head2 Anonymous subroutines (C<sub { }>)
@@ -521,8 +567,19 @@ The following examples illustrate the default configuration.
 
 =head2 C<map> and C<grep> blocks
 
-    map  { next; } @list;    # not ok
+    map  { next; } @list;    # not ok - fatal error at runtime (no enclosing loop)
+
+    while (<$fh>) {
+        my @words = map { last; } split;  # not ok - exits the while, not the map
+    }
+
     grep { redo; } @list;    # not ok
+
+Use a C<for> loop when you need loop control:
+
+    for my $elem (@list) {
+        next if cond($elem);  # ok
+    }
 
 =head2 Real loops (always safe)
 

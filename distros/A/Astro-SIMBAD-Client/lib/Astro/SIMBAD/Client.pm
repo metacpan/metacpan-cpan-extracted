@@ -126,7 +126,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 
@@ -341,7 +341,7 @@ VOTables back (rather than a parse error) if that is what the input
 contains.
 
 This is B<not> a full-grown VOTable parser capable of handling
-the full spec (see L<https://www.ivoa.net/documents/latest/VOT.html>).
+the full spec (see L<https://www.ivoa.net/documents/VOTable/>).
 It is oriented toward returning E<lt>TABLEDATAE<gt> contents, and the
 metadata that can reasonably be associated with those contents.
 
@@ -1707,17 +1707,16 @@ server.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SIMBAD-Client>,
-L<https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues>, or in
+L<https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2025 by Thomas R. Wyant, III
+Copyright (C) 2005-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

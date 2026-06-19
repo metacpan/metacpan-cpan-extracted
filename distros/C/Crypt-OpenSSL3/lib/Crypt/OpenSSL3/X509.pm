@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509;
-$Crypt::OpenSSL3::X509::VERSION = '0.006';
+$Crypt::OpenSSL3::X509::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::X509 - An X509 certificate
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 METHODS
 
@@ -52,6 +52,8 @@ version 0.006
 =head2 digest
 
 =head2 digest_sig
+
+=head2 get_authority_issuer
 
 =head2 get_authority_key_id
 
@@ -117,6 +119,8 @@ version 0.006
 
 =head2 pubkey_digest
 
+=head2 read_der
+
 =head2 read_pem
 
 =head2 self_signed
@@ -150,6 +154,8 @@ version 0.006
 =head2 subject_name_hash
 
 =head2 verify
+
+=head2 write_der
 
 =head2 write_pem
 

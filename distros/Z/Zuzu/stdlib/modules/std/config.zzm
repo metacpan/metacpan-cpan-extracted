@@ -666,7 +666,7 @@ class Config extends Node {
 			return self.get(pathish);
 		}
 		die(
-			message ?:
+			message or?
 			`std/config required setting not found at '${pathish}'`
 		);
 	}
@@ -775,7 +775,7 @@ class Config extends Node {
 
 	method encode ( format?, options? ) {
 		let chosen := _normalize_format(
-			format ?: _format ?: "json"
+			format or? ( _format or? "json" )
 		);
 		return _codec_for_format( chosen, options ).encode( self.raw );
 	}
@@ -783,8 +783,8 @@ class Config extends Node {
 	method save ( destination, options? ) {
 		let path := _ensure_path_object(destination);
 		let chosen := _normalize_format(
-			_opt( options, "format", null ) ?:
-			Config.detect_format( path, _format ?: "json" )
+			_opt( options, "format", null ) or?
+			Config.detect_format( path, _format or? "json" )
 		);
 		_codec_for_format( chosen, options ).dump( path, self.raw );
 		return path;
@@ -797,7 +797,7 @@ class Config extends Node {
 		}
 
 		let chosen := _normalize_format(
-			_opt( options, "format", null ) ?:
+			_opt( options, "format", null ) or?
 			Config.detect_format(path)
 		);
 		die `std/config could not determine format for '${path}'`

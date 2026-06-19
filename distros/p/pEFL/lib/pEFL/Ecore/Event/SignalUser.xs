@@ -11,7 +11,7 @@ typedef Ecore_Event_Signal_User EcoreEventSignalUser;
 
 
 
-MODULE = pEFL::Ecore::Event::SignalUser		PACKAGE = EvasEventSignalUserPtr
+MODULE = pEFL::Ecore::Event::SignalUser		PACKAGE = EcoreEventSignalUserPtr
 
 int
 number(event)

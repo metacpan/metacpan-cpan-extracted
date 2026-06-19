@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::Cipher::Context;
-$Crypt::OpenSSL3::Cipher::Context::VERSION = '0.006';
+$Crypt::OpenSSL3::Cipher::Context::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::Cipher::Context - An instance of a symmetric encryption
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 METHODS
 
@@ -38,6 +38,8 @@ version 0.006
 =head2 final
 
 =head2 get_aead_tag
+
+=head2 get_algor
 
 =head2 get_block_size
 

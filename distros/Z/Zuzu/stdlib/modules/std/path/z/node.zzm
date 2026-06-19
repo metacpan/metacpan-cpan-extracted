@@ -1295,7 +1295,7 @@ class WidgetNode extends Node {
 	}
 
 	method name () {
-		return class_name( self.raw() ) ?: "Widget";
+		return class_name( self.raw() ) or? "Widget";
 	}
 
 	method can_have_named_children () {
@@ -1314,7 +1314,7 @@ class WidgetNode extends Node {
 		let out := [];
 		let i := 0;
 		for ( let child in self.raw().children() ) {
-			let nm := class_name(child) ?: "Widget";
+			let nm := class_name(child) or? "Widget";
 			out.push( Node.wrap( child, self, nm, i ) );
 			i++;
 		}
@@ -1451,5 +1451,6 @@ function determine_class ( obj ) {
 		Klass := XmlNodeNode if _zpath_is_xml_node(real_obj);
 	}
 	
+	// The dispatch probe returns a class object or null.
 	return Klass ?: Node;
 }

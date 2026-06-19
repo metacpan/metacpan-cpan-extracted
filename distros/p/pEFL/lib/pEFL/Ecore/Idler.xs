@@ -57,20 +57,140 @@ OUTPUT:
 
 MODULE = pEFL::Ecore::Idler		PACKAGE = EcoreIdlerPtr   PREFIX = ecore_idler_
 
-void *
+int
 ecore_idler_del(idler)
 	EcoreIdler *idler
+CODE:
+	void * data;
+	int id;
+	AV *Task_Cbs;
+	data = ecore_idler_del(idler);
+	id = (int)(intptr_t) data;
+	Task_Cbs = get_av("pEFL::PLSide::EcoreTask_Cbs", 0);
+	if (Task_Cbs) {
+		// if data is an index > 0, always cleanup perl array element
+		if (data != NULL) {
+			id = (int)(intptr_t)data;
+			// Important in av_store we should not use PL_sv_undef
+			// see https://perldoc.perl.org/perlguts
+			av_store(Task_Cbs, (I32)id, newSV(0));
+			RETVAL = id;
+		}
+		// Shit, data == 0, that means NULL (= error) or 0 (= first element
+		// in the callback array). How can we differ?
+		else {
+			// Let's look for the first element in the array
+			SV** first_element = av_fetch(Task_Cbs, 0, 0);
+			
+			// Oh, it's a valid perl value, that means it isn't automatically
+			// cleaned up in perl_call_task_cb or the similiar function
+			// We have to clean up here
+			if (first_element && SvOK(*first_element)) {
+				av_store(Task_Cbs, 0, newSV(0));
+				id = 0;
+				RETVAL = id;
+			}
+			else {
+				// The idler isn't valid any more and doesn't need to be deleted
+				// in fact we cannot delete it anymore, return undef (so as C does with NULL)
+				XSRETURN_UNDEF;
+			}
+		}
+	}
+	RETVAL=id;
+OUTPUT:
+	RETVAL
 	
 	
 MODULE = pEFL::Ecore::Idler		PACKAGE = EcoreIdleEntererPtr   PREFIX = ecore_idle_enterer_
 
-void *
+int
 ecore_idle_enterer_del(idler)
 	EcoreIdleEnterer *idler
+CODE:
+	void * data;
+	int id;
+	AV *Task_Cbs;
+	data = ecore_idle_enterer_del(idler);
+	id = (int)(intptr_t) data;
+	Task_Cbs = get_av("pEFL::PLSide::EcoreTask_Cbs", 0);
+	if (Task_Cbs) {
+		// if data is an index > 0, always cleanup perl array element
+		if (data != NULL) {
+			id = (int)(intptr_t)data;
+			// Important in av_store we should not use PL_sv_undef
+			// see https://perldoc.perl.org/perlguts
+			av_store(Task_Cbs, (I32)id, newSV(0));
+			RETVAL = id;
+		}
+		// Shit, data == 0, that means NULL (= error) or 0 (= first element
+		// in the callback array). How can we differ?
+		else {
+			// Let's look for the first element in the array
+			SV** first_element = av_fetch(Task_Cbs, 0, 0);
+			
+			// Oh, it's a valid perl value, that means it isn't automatically
+			// cleaned up in perl_call_task_cb or the similiar function
+			// We have to clean up here
+			if (first_element && SvOK(*first_element)) {
+				av_store(Task_Cbs, 0, newSV(0));
+				id = 0;
+				RETVAL = id;
+			}
+			else {
+				// The idler isn't valid any more and doesn't need to be deleted
+				// in fact we cannot delete it anymore, return undef (so as C does with NULL)
+				XSRETURN_UNDEF;
+			}
+		}
+	}
+	RETVAL=id;
+OUTPUT:
+	RETVAL
 	
 	
 MODULE = pEFL::Ecore::Idler		PACKAGE = EcoreIdleExiterPtr   PREFIX = ecore_idle_exiter_
 
-void *
+int
 ecore_idle_exiter_del(idler)
 	EcoreIdleExiter *idler
+CODE:
+	void * data;
+	int id;
+	AV *Task_Cbs;
+	data = ecore_idle_exiter_del(idler);
+	id = (int)(intptr_t) data;
+	Task_Cbs = get_av("pEFL::PLSide::EcoreTask_Cbs", 0);
+	if (Task_Cbs) {
+		// if data is an index > 0, always cleanup perl array element
+		if (data != NULL) {
+			id = (int)(intptr_t)data;
+			// Important in av_store we should not use PL_sv_undef
+			// see https://perldoc.perl.org/perlguts
+			av_store(Task_Cbs, (I32)id, newSV(0));
+			RETVAL = id;
+		}
+		// Shit, data == 0, that means NULL (= error) or 0 (= first element
+		// in the callback array). How can we differ?
+		else {
+			// Let's look for the first element in the array
+			SV** first_element = av_fetch(Task_Cbs, 0, 0);
+			
+			// Oh, it's a valid perl value, that means it isn't automatically
+			// cleaned up in perl_call_task_cb or the similiar function
+			// We have to clean up here
+			if (first_element && SvOK(*first_element)) {
+				av_store(Task_Cbs, 0, newSV(0));
+				id = 0;
+				RETVAL = id;
+			}
+			else {
+				// The idler isn't valid any more and doesn't need to be deleted
+				// in fact we cannot delete it anymore, return undef (so as C does with NULL)
+				XSRETURN_UNDEF;
+			}
+		}
+	}
+	RETVAL=id;
+OUTPUT:
+	RETVAL

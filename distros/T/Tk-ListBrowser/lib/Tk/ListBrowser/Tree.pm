@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.09;
+$VERSION =  0.10;
 
 use Math::Round qw(round);
 
@@ -41,10 +41,10 @@ sub cellSize {
 sub draw {
 	my ($self, $item, $x, $y, $column, $row) = @_;
 	my $indent = $self->cget('-indent');
-	$x = $x + $indent;
+	$x = $self->cget('-marginleft') + $indent;
 	$self->SUPER::draw($item, $x, $y, $column, $row);
 	my $entry = $item->name;
-	if ($self->infoChildren($entry)) {
+	if ($item->hasChildren) {
 		my $ind;
 		my $c = $self->Subwidget('Canvas');
 		my @eregion = $item->region;
@@ -53,31 +53,23 @@ sub draw {
 		if ($item->opened) {
 			$ind = $c->createImage($ix, $iy,
 				-image => $self->cget('-indicatorminusimg'),
-				-tags => ['main', 'indicator'],
+				-tags => ['main', 'indicator', $entry],
 			);
-			$c->bind($ind, '<1>', sub { $self->entryClose($entry) });
 		} else {
 			$ind = $c->createImage($ix, $iy,
 				-image => $self->cget('-indicatorplusimg'),
-				-tags => ['main','indicator'],
+				-tags => ['main','indicator', $entry],
 			);
-			$c->bind($ind, '<1>', sub { $self->entryOpen($entry) });
+		}
+		$c->bind($ind, '<ButtonRelease-1>', sub { $self->indicatorActivate($entry) });
+		my @guides = $c->find('withtag', 'guides');
+		for (@guides) {
+			$c->raise($ind, $_);
 		}
 		$item->cindicator($ind);
 	}
 }
 
-sub entryClose {
-	my ($self, $entry) = @_;
-	$self->close($entry);
-	$self->refreshPurge($self->index($entry), 1);
-}
-
-sub entryOpen {
-	my ($self, $entry) = @_;
-	$self->open($entry);
-	$self->refreshPurge($self->index($entry), 1);
-}
 
 =head1 LICENSE
 

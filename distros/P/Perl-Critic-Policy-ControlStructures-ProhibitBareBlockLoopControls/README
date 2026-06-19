@@ -1,5 +1,5 @@
 This archive contains the distribution Perl-Critic-Policy-ControlStructures-ProhibitBareBlockLoopControls,
-version 0.05:
+version 0.06:
 
   Prohibit unlabeled loop controls in non-loop blocks
 

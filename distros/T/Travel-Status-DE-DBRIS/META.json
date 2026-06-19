@@ -39,7 +39,7 @@
             "DateTime" : "0",
             "DateTime::Format::Strptime" : "0",
             "Getopt::Long" : "0",
-            "HTTP::Request" : "7.00",
+            "HTTP::Request" : "6.39",
             "IO::Uncompress::Brotli" : "0.004_002",
             "JSON" : "0",
             "LWP::Protocol::https" : "0",
@@ -53,39 +53,39 @@
    "provides" : {
       "Travel::Status::DE::DBRIS" : {
          "file" : "lib/Travel/Status/DE/DBRIS.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Travel::Status::DE::DBRIS::Formation" : {
          "file" : "lib/Travel/Status/DE/DBRIS/Formation.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Travel::Status::DE::DBRIS::Formation::Carriage" : {
          "file" : "lib/Travel/Status/DE/DBRIS/Formation/Carriage.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Travel::Status::DE::DBRIS::Formation::Group" : {
          "file" : "lib/Travel/Status/DE/DBRIS/Formation/Group.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Travel::Status::DE::DBRIS::Formation::Sector" : {
          "file" : "lib/Travel/Status/DE/DBRIS/Formation/Sector.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Travel::Status::DE::DBRIS::Journey" : {
          "file" : "lib/Travel/Status/DE/DBRIS/Journey.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Travel::Status::DE::DBRIS::JourneyAtStop" : {
          "file" : "lib/Travel/Status/DE/DBRIS/JourneyAtStop.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Travel::Status::DE::DBRIS::Location" : {
          "file" : "lib/Travel/Status/DE/DBRIS/Location.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Travel::Status::DE::DBRIS::Operators" : {
          "file" : "lib/Travel/Status/DE/DBRIS/Operators.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       }
    },
    "release_status" : "stable",
@@ -97,6 +97,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-DBRIS"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -154,23 +154,55 @@ Presents a L<Tk::Tree> like hierarchical interface.
 
 =back
 
+=item Switch B<-autorefresh>
+
+Default value 0. If set B<refreshPurge> is called every time you add or remove an entry.
+You have to make sure the cell dimensions are correctly set in the I<-cell....> options.
+See also the B<cellSize> method.
+
 =item Switch B<-browsecmd>
 
 Callback, called when an is selected. Gets the selection list as parameters.
 
+=item Switch B<-cellheight>
+
+Sets the cell height. Default value is 0. See also the B<cellSize> method.
+
+=item Switch B<-cellimageheight>
+
+Sets the height of the image in every cell. Default value is 0. See also the B<cellSize> method.
+
+=item Switch B<-cellimagewidth>
+
+Sets the width of the image in every cell. Default value is 0. See also the B<cellSize> method.
+
+=item Switch B<-celltextheight>
+
+Sets the height of the text in every cell. Default value is 0. See also the B<cellSize> method.
+Text can be a multiline string.
+
+=item Switch B<-celltextwidth>
+
+Sets the width of the text in every cell. Default value is 0. See also the B<cellSize> method.
+Text can be a multiline string.
+
+=item Switch B<-cellwidth>
+
+Sets the cell width. Default value is 0. See also the B<cellSize> method.
+
 =item Switch B<-command>
 
 Callback, called when an entry is double clicked or return was pressed. Gets the selection list as parameters.
+
+=item Switch B<-entryclass>
+
+Default value I<Tk::ListBrowser::Entry>. You can set it to any class that inherits this.
 
 =item Switch B<-filtercolumns>
 
 By default false. If you set it a button will appear
 next to the filter entry that allows you to select
 a column.
-
-=item Name B<filterDelay>
-
-=item Class B<FilterDelay>
 
 =item Switch B<-filterdelay>
 
@@ -190,6 +222,8 @@ Default value I<false>. If set the filter entry will allways be visible.
 =item Switch B<-filteron>
 
 Default value I<main>, which is the main entry list. You may also set it to a valid column.
+
+=item Switch B<-font>
 
 =item Name B<headerBorderWidth>
 
@@ -214,6 +248,13 @@ Default value 32.
 =item Switch B<-headerrelief>
 
 Default value 'raised'.
+
+=item Switch B<-indicatorprecmd>
+
+=item Switch B<-indicatorpostcmd>
+
+Callback, executed when the user click in indicator in
+tree mode. Gets the name of the entry as parameter.
 
 =item Switch B<-indicatorminusimg>
 
@@ -332,7 +373,7 @@ Are you handling even lower numbers? You can adjust it here.
 
 =item Switch B<-sortcase>
 
-Default value false. You can set it if you require case independent sort.
+Default value false. You can set it if you require case dependent sort.
 
 =item Switch B<-sortfield>
 
@@ -364,6 +405,11 @@ wind directions. They tell where to position the text in it's cavity.
 Default value I<center>. Can be I<center>, I<left> or I<right>. Specifies
 how multiline or wrapped text is justified.
 
+=item Switch B<-textlength>
+
+Default value I<0>. If you set it to a positive integer it shortens the text by leaving out the middle part.
+The unit is characters.
+
 =item Switch B<-textside>
 
 Default value I<bottom>. Possible values are I<bottom>, I<top>, I<left>, I<right>,
@@ -381,7 +427,9 @@ If you change this option on the fly you have to call I<refresh> to see the chan
 
 If you try to set it to a lower value than 40, you will be overruled.
 This is to prevent the wrap length to become smaller that the with of one character, which
-would freeze you application. This also means watching out for using very big fonts.
+would freeze your application. This also means watching out for using very big fonts.
+
+The unit is pixels.
 
 =back
 
@@ -438,7 +486,7 @@ sub Populate {
 	$self->Advertise('HeaderFrame', $hf);
 
 	#mouse bindings
-	$c->Tk::bind('<Button-1>', [ $self, 'Button1', Ev('x'), Ev('y') ]);
+	$c->Tk::bind('<ButtonPress-1>', [ $self, 'Button1', Ev('x'), Ev('y') ]);
 	$c->Tk::bind('<Control-Button-1>', [ $self, 'Button1Control', Ev('x'), Ev('y') ]);
 	$c->Tk::bind('<Double-Button-1>', [ $self, 'Button1Double', Ev('x'), Ev('y') ]);
 	$c->Tk::bind('<Shift-Button-1>', [ $self, 'Button1Shift', Ev('x'), Ev('y') ]);
@@ -451,12 +499,12 @@ sub Populate {
 	$self->{ARRANGE} = undef;
 	$self->{COLUMNS} = [];
 	$self->{HANDLER} = undef;
-	$self->{INDENT} = 0;
 	$self->{POOL} = new Tk::ListBrowser::HashList;
-	$self->{PRIORITYMAX} = 0;
-	$self->{REFRESHLOOPACTIVE} = 0;
-	$self->{REFRESHPOS} = 0;
 	$self->{SORTACTIVE} = '';
+	$self->listWidth(100);
+	$self->priorityMax(0);
+	$self->refreshLoopActive(0);
+	$self->refreshPos(0);
 
 	$self->bind('<Configure>', [ $self, 'OnConfigure' ]);
 
@@ -465,8 +513,16 @@ sub Populate {
 	$self->ConfigSpecs(
 		#general
 		-arrange => ['METHOD', undef, undef, 'row'],
+		-autorefresh => ['PASSIVE', undef, undef, 0],
 		-browsecmd => ['CALLBACK'],
+		-cellwidth => ['METHOD', undef, undef, 0],
+		-cellheight => ['METHOD', undef, undef, 0],
+		-cellimagewidth => ['PASSIVE', undef, undef, 0],
+		-cellimageheight => ['PASSIVE', undef, undef, 0],
+		-celltextwidth => ['PASSIVE', undef, undef, 0],
+		-celltextheight => ['PASSIVE', undef, undef, 0],
 		-command => ['CALLBACK'],
+		-entryclass => ['PASSIVE', undef, undef, 'Tk::ListBrowser::Entry'],
 		-font => ['PASSIVE', 'font', 'Font', 'Arial 9'],
 		-indent => ['PASSIVE', 'indent', 'Indent', 22],
 		-motionselect => ['PASSIVE', undef, undef, ''],
@@ -497,6 +553,8 @@ sub Populate {
 		-headerrelief => ['PASSIVE', 'headerRelief', 'HeaderRelief', 'raised'],
 
 		#indicators
+		-indicatorprecmd => ['CALLBACK'],
+		-indicatorpostcmd => ['CALLBACK'],
 		-indicatorminusimg => ['PASSIVE', undef, undef, $minusbmp],
 		-indicatorplusimg => ['PASSIVE', undef, undef, $plusbmp],
 
@@ -505,7 +563,9 @@ sub Populate {
 		-itempady => ['PASSIVE', 'itemPadY', 'ItemPadY', 0],
 		-itemtype => ['PASSIVE', undef, undef, 'imagetext'],
 
-		#margins
+		#margins & sizes
+		-fixedcellheight => ['PASSIVE'],
+		-fixedcellwidth => ['PASSIVE'],
 		-marginleft => ['PASSIVE', 'marginLeft', 'MarginLeft', 0],
 		-marginright => ['PASSIVE', 'marginRight', 'MarginRight', 0],
 		-margintop => ['PASSIVE', 'marginTop', 'MarginTop', 0],
@@ -521,6 +581,7 @@ sub Populate {
 
 		#text
 		-textanchor => ['PASSIVE', undef, undef, ''],
+		-textlength => ['PASSIVE', undef, undef, 0],
 		-textjustify => ['PASSIVE', undef, undef, 'center'],
 		-textside => ['PASSIVE', undef, undef, 'bottom'],
 		-wraplength => ['METHOD', undef, undef, 0],
@@ -552,7 +613,7 @@ sub Populate {
 	return $self
 }
 
-sub _handler { return $_[0]->{HANDLER} }
+sub handler { return $_[0]->{HANDLER} }
 
 =item B<add>I<(?$name?, %options)>
 
@@ -687,7 +748,8 @@ sub add {
 	$after = delete $options{'-after'};
 	$before = delete $options{'-before'};
 
-	my $item = new Tk::ListBrowser::Entry(
+	my $class = $self->cget('-entryclass');
+	my $item = new $class(
 		%options,
 		-listbrowser => $self,
 		-name => $name,
@@ -700,6 +762,7 @@ sub add {
 		$index = $self->index($before);
 	}
 	$pool->add($item, $index);
+	$self->refreshCheck($item, $index) if $self->cget('-autorefresh');
 	return $item
 }
 
@@ -714,7 +777,6 @@ sub addGrep {
 	my @le = grep { $priority <= $self->get($_)->priority } @list;
 	if (@le) {
 		my $i = $list[@le + 1];
-#		my $i = pop @le;
 		return ($pos, $self->get($i)->name) if defined $i;
 	}
 	return ()
@@ -846,22 +908,12 @@ sub Button1 {
 	$self->CanvasFocus;
 	my $c = $self->Subwidget('Canvas');
 
-	#return if an indicator was clicked
-	my @ind = $c->find('withtag', 'indicator');
-	for (@ind) {
-		my ($ix, $iy) = $c->coords($_);
-		my $img = $self->cget('-indicatorplusimg');
-		my $half = int($img->width / 2) + 2;
-		my ($x1, $y1, $x2, $y2) = $c->coords($_);
-		return if ($ix - $half <= $x) and ($ix + $half >= $x)
-			and ($iy - $half <= $y) and ($iy + $half >= $y);
-	}
-
 	my $item = $self->initem($x, $y);
 	if (defined $item) {
+		return if $item->selected;
 		$self->selectionClear;
-		$item->select(1);
 		$self->anchorSet($item->name);
+		$item->select(1);
 		$self->Callback('-browsecmd', $item->name);
 		return
 	} else {
@@ -936,8 +988,8 @@ sub Button2Motion {
 	my $dx = $mx - $x;
 	my $dy = $my - $y;
 
-	$self->xviewScroll(-$dx, 'units') if $self->_handler->scroll eq 'horizontal';
-	$self->yviewScroll(-$dy, 'units') if $self->_handler->scroll eq 'vertical';
+	$self->xviewScroll(-$dx, 'units') if $self->handler->scroll eq 'horizontal';
+	$self->yviewScroll(-$dy, 'units') if $self->handler->scroll eq 'vertical';
 }
 
 sub Button2Release {
@@ -953,38 +1005,17 @@ sub canvasSize {
 	return ($self->width - $offset, $self->height - $offset);
 }
 
-sub cellHeight {
+sub cellheight {
 	my $self = shift;
 	$self->{CELLHEIGHT} = shift if @_;
+	if ($self->columnCapable) {
+		my $fh = $self->forceHeight;
+		return $fh if defined $fh;
+	}
 	return $self->{CELLHEIGHT}
 }
 
-sub cellImageHeight {
-	my $self = shift;
-	$self->{IMAGEHEIGHT} = shift if @_;
-	return $self->{IMAGEHEIGHT}
-}
-
-sub cellImageWidth {
-	my $self = shift;
-	$self->{IMAGEWIDTH} = shift if @_;
-	return $self->{IMAGEWIDTH}
-}
-
-sub cellTextHeight {
-	my $self = shift;
-	$self->{TEXTHEIGHT} = shift if @_;
-	return $self->{TEXTHEIGHT}
-}
-
-sub cellTextWidth {
-	my $self = shift;
-	$self->{TEXTWIDTH} = shift if @_;
-	return $self->{TEXTWIDTH}
-}
-
-
-sub cellWidth {
+sub cellwidth {
 	my $self = shift;
 	$self->{CELLWIDTH} = shift if @_;
 	if ($self->columnCapable) {
@@ -992,6 +1023,62 @@ sub cellWidth {
 		return $fw if defined $fw;
 	}
 	return $self->{CELLWIDTH}
+}
+
+=item B<cellSize>I<(?$entryobj?)>
+
+Calculates the optimal cell size for I<$entryobj> and sets all I<-cell...> options accordingly.
+If you do not specify I<$entryobj> it will iterate over the present list to find the optimal cell size.
+The B<refresh> method calls this by default, so you do not have to worry about the cell size. If you
+only use B<refreshPurge>, use this method to determine the correct cell size first.
+
+=cut
+
+sub cellSize {
+	my ($self, $item) = @_;
+
+	my $cellheight = 0;
+	my $cellwidth = 0;
+	my $imageheight = 0;
+	my $imagewidth = 0;
+	my $textheight = 0;
+	my $textwidth = 0;
+
+	my @pool;
+	if (defined $item) {
+		push @pool, $item
+	} else {
+		@pool = $self->getPool
+	}
+	for (@pool) {
+		my $entry = $_;
+		my ($cw, $ch, $iw, $ih, $tw, $th) = $entry->requestedSize;
+		$cellheight = $ch if $ch > $cellheight;
+		$cellwidth = $cw if $cw > $cellwidth;
+		$imageheight = $ih if $ih > $imageheight;
+		$imagewidth = $iw if $iw > $imagewidth;
+		$textheight = $th if $th > $textheight;
+		$textwidth = $tw if $tw > $textwidth;
+		for ($self->columnList) {
+			my $col = $_;
+			my $type = $self->columnCget($col, '-itemtype');
+			my $item = $self->itemGet($entry->name, $col);
+			if (defined $item) {
+				my ($cw, $ch, $iw, $ih, $tw, $th) = $item->requestedSize;
+				$imageheight = $ih if $ih > $imageheight;
+				$textheight = $th if $th > $textheight;
+			}
+			
+		}
+	}
+	$self->configure(-cellheight => $cellheight);
+	$self->configure(-cellwidth => $cellwidth);
+	$self->configure(-cellimageheight => $imageheight);
+	$self->configure(-cellimagewidth => $imagewidth);
+	$self->configure(-celltextheight => $textheight);
+	$self->configure(-celltextwidth => $textwidth);
+	$self->listWidth($cellwidth);
+	return ($cellwidth, $cellheight)
 }
 
 =item B<clear>
@@ -1004,7 +1091,6 @@ sub clear {
 	my $self = shift;
 
 	$self->anchorClear;
-	$self->selectionClear;
 
 	grep { $_->clear } $self->getAll;
 
@@ -1034,6 +1120,7 @@ sub close {
 		return
 	}
 	$i->opened(0);
+	$self->selectionClearChildren($entry);
 }
 
 =item B<closeAll>
@@ -1059,7 +1146,9 @@ Returns true if I<-arrange> is set to 'hlist', 'list' or 'tree'.
 
 sub columnCapable {
 	my $self = shift;
-	return exists $columnCapable{$self->cget('-arrange')}
+	my $a = $self->cget('-arrange');
+	return 0 unless defined $a;
+	return exists $columnCapable{$a}
 }
 
 =item B<columnCget>I<($name, $option)>
@@ -1294,13 +1383,13 @@ sub delete {
 	my ($self, $name) = @_;
 	my $index = $self->index($name);
 	if (defined $index) {
-		my $pool = $self->pool;
-		my $del = $pool->delete($name);
+		my $del = $self->pool->delete($name);
 		$del->clear;
 		my @columns = $self->columnList;
 		for (@columns) {
 			$self->itemRemove($name, $_);
 		}
+		$self->refreshCheck($del, $index) if $self->cget('-autorefresh');
 		return
 	}
 	croak "Entry '$name' not found"
@@ -1308,14 +1397,14 @@ sub delete {
 
 =item B<deleteAll>
 
-Deletes all entries. Call I<refresh> or I<refreshPurge> to see your changes.
+Deletes all entries.
 
 =cut
 
 sub deleteAll {
 	my $self = shift;
-	my $pool = $self->pool;
-	grep { $self->delete($_->name) } $pool->getAll;
+	$self->clear;
+	$self->{POOL} = new Tk::ListBrowser::HashList;
 }
 
 =item B<entryCget>I<($name, $option)>
@@ -1495,6 +1584,12 @@ sub filterShow {
 
 sub focus { $_[0]->CanvasFocus }
 
+sub forceHeight {
+	my $self = shift;
+	$self->{FORCEHEIGHT} = shift if @_;
+	return $self->{FORCEHEIGHT}
+}
+
 sub forceWidth {
 	my $self = shift;
 	$self->{FORCEWIDTH} = shift if @_;
@@ -1568,6 +1663,20 @@ Returns a reference to the L<Tk::ListBrowser::Item> object at index I<$index>.
 sub getIndex {
 	my ($self, $index) = @_;
 	return $self->pool->getIndex($index)
+}
+
+sub getPool {
+	my $self = shift;
+	my @pool;
+	if ($self->hierarchy) {
+		my @root = $self->infoRoot;
+		for (@root) {
+			push @pool, $self->get($_);
+		}
+	} else {
+		@pool = $self->getAll;
+	}
+	return @pool;
 }
 
 =item B<getRoot>
@@ -1707,7 +1816,7 @@ sub headerCreate {
 	my $hf= $self->Subwidget('HeaderFrame');
 	my $h = $hf->LBHeader(
 		-motioncall => ['headerMotion', $self],
-		-releasecall => ['refresh', $self],
+		-releasecall => ['refreshPurge', $self],
 		-relief => $self->cget('-headerrelief'),
 		-borderwidth => $self->cget('-headerborderwidth'),
 		-listbrowser => $self,
@@ -1823,10 +1932,11 @@ sub headerPlace {
 	my @columns = $self->columnList;
 	for (@columns) {
 		my $col = $self->columnGet($_);
+		my $w = $col->cget('-cellwidth');
 		if (my $h = $self->headerGet($_)) {
-			$h->place(-x => $x, -y => 0, -height => $hheight, -width => $col->cellWidth);
+			$h->place(-x => $x, -y => 0, -height => $hheight, -width => $w);
 		}
-		$x = $x + $col->cellWidth + 1;
+		$x = $x + $w + 1;
 	}
 
 	#configure right margin
@@ -1927,6 +2037,22 @@ Returns the numerical index of the last entry in the list.
 sub indexLast {
 	my $self = shift;
 	return $self->pool->indexLast
+}
+
+sub indicatorActivate {
+	my ($self, $entry) = @_;
+	my $obj = $self->get($entry);
+	if ($obj->opened) {
+		$self->Callback('-indicatorprecmd', $entry, 'close');
+		$self->close($entry);
+		$self->refreshPurge($self->index($entry), 1);
+		$self->Callback('-indicatorpostcmd', $entry, 'close');
+	} else {
+		$self->Callback('-indicatorprecmd', $entry, 'open');
+		$self->open($entry);
+		$self->refreshPurge($self->index($entry), 1);
+		$self->Callback('-indicatorpostcmd', $entry, 'open');
+	}
 }
 
 =item B<infoAnchor>
@@ -2261,10 +2387,19 @@ sub infoSelection {	return $_[0]->selectionGet }
 
 sub infoSize {	return $_[0]->pool->size }
 
-sub indent {
-	my $self = shift;
-	$self->{INDENT} = shift if @_;
-	return $self->{INDENT}
+sub inIndicator {
+	my ($self, $x, $y) = @_;
+	my $c = $self->Subwidget('Canvas');
+
+	my @ind = $c->find('withtag', 'indicator');
+	for (@ind) {
+		my ($ix, $iy) = $c->coords($_);
+		my $img = $self->cget('-indicatorplusimg');
+		my $half = int($img->width / 2) + 2;
+		my ($x1, $y1, $x2, $y2) = $c->coords($_);
+		return $_ if ($ix - $half <= $x) and ($ix + $half >= $x)	and ($iy - $half <= $y) and ($iy + $half >= $y);
+	}
+	return undef
 }
 
 sub initem {
@@ -2279,6 +2414,19 @@ sub initem {
 
 	}
 	return undef
+}
+
+=item B<insert>I<($entryobj, ?$index?)>
+
+Directly inject a list element object into the list. If I<$index> is
+ommitted the object is added to the end of the list.
+
+=cut
+
+sub insert {
+	my ($self, $item, $index) = @_;
+	$self->pool->add($item, $index);
+	$self->refreshCheck($item, $index) if $self->cget('-autorefresh');
 }
 
 =item B<itemCget>I<($name, $column, $option)>
@@ -2502,7 +2650,7 @@ sub KeyLastColumn {
 sub KeyPress {
 	my ($self, $key) = @_;
 	my @pool = $self->getAll;
-	my $h = $self->_handler;
+	my $h = $self->handler;
 	return unless @pool;
 
 	if ($key eq 'Return') {
@@ -2536,7 +2684,6 @@ sub KeyPress {
 	if ($key eq 'Control-End') {
 		my $name = $self->infoLastVisible;
 		$self->see($name);
-#		$self->after(50, sub { $self->anchorSet($name) });
 		return
 	}
 	if ($key eq 'Home') {
@@ -2746,7 +2893,6 @@ sub OnConfigure {
 	if ($self->listMode) {
 		$self->headerPlace;
 		$self->anchorRefresh;
-		$self->selectionRefresh;
 	}
 
 	if (my $id = $self->{'timer_id'}) {
@@ -2817,6 +2963,60 @@ sub priorityMax {
 	return $self->{PRIORITYMAX}
 }
 
+sub prioritySection {
+	my ($self, $priority, $list) = @_;
+
+	my $start;
+	my $p = $list->[0]->priority;
+	$start = 0 if $p eq $priority;
+	return (undef, undef) if $p < $priority; # section not available
+
+	unless (defined $start) {
+		my $first = 0;
+		my $last = @$list - 1;
+		while (not defined $start) {
+			my $middle = int(($last - $first)/2) + $first;
+			#$middle is inside or past requested section
+			if ($list->[$middle]->priority <= $priority) {
+				$last = $middle
+			#$middle is before requested section
+			} elsif  ($list->[$middle]->priority > $priority) {
+				$first = $middle
+			}
+			if ($last - $first == 1) {
+				$start = $last if $list->[$last]->priority == $priority;
+				$start = $first if $list->[$first]->priority == $priority;
+				last;
+			}
+		}
+	}
+
+	my $last = @$list - 1;
+	return ($start, $last) if $priority eq 0;
+	return ($start, $last) if $priority eq $list->[$last]->priority;
+	
+	my $first = $start;
+
+	my $end;
+	while (not defined $end) {
+		my $middle = int(($last - $first)/2) + $first;
+		#middle is past requested section
+		if ($list->[$middle]->priority < $priority) {
+			$last = $middle
+		#middle is inside requested section
+		} elsif ($list->[$middle]->priority == $priority) {
+			$first = $middle
+		}
+		if ($last - $first == 1) {
+			$end = $first if $list->[$first]->priority == $priority;
+			$end = $last if $list->[$last]->priority == $priority;
+			last;
+		}
+	}
+
+	return ($start, $end);
+}
+
 sub prioritySet {
 	my ($self, $priority) = @_;
 	my $max = $self->priorityMax;
@@ -2836,7 +3036,7 @@ sub refresh {
 	my $anch = $self->anchorGet;
 	$self->refreshSaveView;
 
-	$self->_handler->refresh;
+	$self->handler->refresh;
 
 	$self->refreshRestoreView;
 	for (@sel) {
@@ -2845,17 +3045,24 @@ sub refresh {
 	$self->anchorSet($anch) if defined $anch;
 }
 
+sub refreshCheck {
+	my ($self, $entry, $index) = @_;
+	return if $entry->noshow;
+	$self->refreshPurge($index)
+}
+
 sub refreshLoop {
 	my $self = shift;
-	my $handler = $self->_handler;
+	my $handler = $self->handler;
 	my $epc = $self->cget('-refreshentriespercycle');
 	for (1 .. $epc) {
 		my $pos = $self->refreshPos;
 		if ($pos <= $self->indexLast) {
 			$self->refreshLoopActive(1);
 			my $entry = $self->getIndex($pos);
-			unless (($entry->hidden) or (not $entry->openedparent)) {
+			unless ($entry->noshow) {
 				my @params = $self->refreshParams;
+				my $sel;
 				my $entry = $self->getIndex($pos);
 				$handler->draw($entry, @params);
 				@params = $handler->nextPosition(@params);
@@ -2864,15 +3071,14 @@ sub refreshLoop {
 			$pos ++;
 			$self->refreshPos($pos);
 		} else {
-			my ($mx, $my) = $handler->maxXY;
-			my $last = $self->infoLastVisible;
-			if (defined $last) {
-				my @region = $self->get($last)->region;
-				$my = $region[3] + $self->cget('-marginbottom') + 1;
-			}
-			$self->configure(-scrollregion => [0, 0, $mx, $my]);
+			$self->setScrollRegion;
 			$self->refreshLoopActive(0);
+			$self->refreshPos(0);
 			$self->refreshRestoreView;
+			if ($self->columnCapable) {
+				my $last = $self->infoLastVisible;
+				my $l = $self->get($last);
+			}
 		}
 		last unless $self->refreshLoopActive;
 	}
@@ -2903,7 +3109,7 @@ sub refreshPos {
 Same as refresh, but does not calculate cell sizes. Can be used after
 an initializing call to I<refresh> has been made. If you specify I<$index>
 the refresh is done from the entry at the index, going downward. It is
-operated in a background job cycle, so it is non blocking.
+operated in a non blocking background job cycle.
 
 if the I<$nosave> flag is set, the xview and yview of the canvas are not saved
 before the refresh starts.
@@ -2912,7 +3118,11 @@ before the refresh starts.
 
 sub refreshPurge {
 	my ($self, $index, $nosave) = @_;
+
 	$index = 0 unless defined $index;
+	my $pos = $self->refreshPos;
+	return if ($index > $pos) and $self->refreshLoopActive;
+
 	$nosave = 0 unless defined $nosave;
 	if ($nosave) {
 		$self->refreshView(undef, undef);
@@ -2926,7 +3136,7 @@ sub refreshPurge {
 		$entry->clear;
 	}
 
-	my $handler = $self->_handler;
+	my $handler = $self->handler;
 	my $entry = $self->getIndex($index);
 	my ($x, $y) = $handler->startXY;
 	my @params = ($x, $y, 0 , 0);
@@ -2937,9 +3147,13 @@ sub refreshPurge {
 		@params = $handler->nextPosition(@params);
 		$params[0] = $x if $self->listMode;
 	}
+	push @params, $entry if $entry->selected;
 	$self->refreshParams(@params);
 	$self->refreshPos($index);
-	$self->after($self->cget('-refreshinterval'), ['refreshLoop', $self]) unless $self->refreshLoopActive;
+	unless ($self->refreshLoopActive) {
+		$self->refreshLoopActive(1);
+		$self->after($self->cget('-refreshinterval'), ['refreshLoop', $self]) 
+	}
 }
 
 sub refreshRestoreView {
@@ -2956,6 +3170,31 @@ sub refreshSaveView {
 	my ($xview) = $c->xview;
 	my ($yview) = $c->yview;
 	$self->refreshView($xview, $yview);
+}
+
+=item B<refreshSingle>I<($entry)>
+
+Refreshes a single entry.
+
+=cut
+
+sub refreshSingle {
+	my ($self, $entry) = @_;
+	my $e = $self->get($entry);
+	unless (defined $e) {
+		croak "Entry '$entry' does not exist";
+		return
+	}
+
+	my $x = $e->rectX;
+	if ($self->cget('-arrange') eq 'tree') {
+		$x = $x - $self->cget('-indent');
+	}
+	my $y = $e->rectY;
+	my $c = $e->column;
+	my $r = $e->row;
+	$e->clear;
+	$self->handler->draw($e, $x, $y, $c, $r);
 }
 
 sub refreshView {
@@ -2983,7 +3222,7 @@ sub see {
 	my ($cwidth, $cheight) = $self->canvasSize;
 	my ($ix1, $iy1, $ix2, $iy2) = $i->region;
 
-	my $h = $self->_handler;
+	my $h = $self->handler;
 	#horizontal
 	if ($h->scroll eq 'horizontal') {
 		my ($vl, $vr) = $self->xview;
@@ -3037,6 +3276,15 @@ sub selectionClear {
 	grep { $_->select(0) } @pool;
 }
 
+sub selectionClearChildren {
+	my ($self, $entry) = @_;
+	my @c = $self->getChildren($entry);
+	for (@c) {
+		$_->select(0);
+		$self->selectionClearChildren($_->name);
+	}
+}
+
 sub selectionFlip {
 	my ($self, $begin, $end) = @_;
 	($begin, $end) = $self->selectionIndex($begin, $end);
@@ -3079,15 +3327,6 @@ sub selectionIndex {
 	return ($begin, $end)
 }
 
-sub selectionRefresh {
-	my $self = shift;
-	my @sel = $self->selectionGet;
-	for (@sel) {
-		my $i = $self->get($_);
-		$i->drawSelect;
-	}
-}
-
 =item B<selectionSet>I<($begin, ?$end?)>
 
 Selects entry I<$begin>. If you specify I<$end> the
@@ -3104,7 +3343,7 @@ sub selectionSet {
 		my @pool = $self->getAll;
 		for ($begin .. $end) {
 			my $i = $pool[$_];
-			$i->select(1) unless $i->hidden or (not $i->openedparent);
+			$i->select(1) unless $i->noshow;
 		}
 	}
 }
@@ -3131,6 +3370,27 @@ sub selectionUnSet {
 	for ($begin .. $end) {
 		my $i = $pool[$_];
 		$i->select(0) unless $i->hidden;
+	}
+}
+
+sub setScrollRegion {
+	my $self = shift;
+	my $last = $self->infoLastVisible;
+	if (defined $last) {
+		my $l = $self->get($last);
+		my $x = $l->maxX;
+		my $y = $l->maxY;
+
+		my ($sx, $sy) = $self->canvasSize;
+		my $xscroll = $self->Subwidget('XScrollbar');
+		$sy = $sy - $xscroll->width if $xscroll->ismapped;
+		my $yscroll = $self->Subwidget('YScrollbar');
+		$sx = $sx - $yscroll->width if $yscroll->ismapped;
+
+		$x = $sx if $x < $sx;
+		$y = $sy if $y < $sy;
+
+		$self->configure(-scrollregion => [0, 0, $x, $y]);
 	}
 }
 
@@ -3178,20 +3438,20 @@ sub sortArray {
 				if ($order eq 'ascending') {
 					@sorted = sort { $self->entryCget($a->name, $sortfield) <=> $self->entryCget($b->name, $sortfield) } @pool
 				} else {
-					@sorted = sort { $self->entryCget($b->name, $on, $sortfield) <=> $self->entryCget($a->name, $sortfield) } @pool
+					@sorted = sort { $self->entryCget($b->name, $sortfield) <=> $self->entryCget($a->name, $sortfield) } @pool
 				}
 		} else {
 			if ($sortcase) {
 				if ($order eq 'ascending') {
-					@sorted = sort { lc($self->entryCget($a->name, $sortfield)) cmp lc($self->entryCget($b->name, $sortfield)) } @pool
+					@sorted = sort { $self->entryCget($a->name, $sortfield) cmp $self->entryCget($b->name, $sortfield) } @pool
 				} else {
-					@sorted = sort { lc($self->entryCget($b->name, $sortfield)) cmp lc($self->entryCget($a->name, $sortfield)) } @pool
+					@sorted = sort { $self->entryCget($b->name, $sortfield) cmp $self->entryCget($a->name, $sortfield) } @pool
 				}
 			} else {
 				if ($order eq 'ascending') {
-					@sorted = sort { $self->entryCget($a->name, $sortfield) cmp $self->entryCget($b->name, $sortfield) } @pool
+					@sorted = sort { lc($self->entryCget($a->name, $sortfield)) cmp lc($self->entryCget($b->name, $sortfield)) } @pool
 				} else {
-					@sorted = sort { $self->entryCget($b->name, $on, $sortfield) cmp $self->entryCget($a->name, $sortfield) } @pool
+					@sorted = sort { lc($self->entryCget($b->name, $sortfield)) cmp lc($self->entryCget($a->name, $sortfield)) } @pool
 				}
 			}
 		}
@@ -3205,15 +3465,15 @@ sub sortArray {
 		} else {
 			if ($sortcase) {
 				if ($order eq 'ascending') {
-					@sorted = sort { lc($self->itemCget($a->name, $on, $sortfield)) cmp lc($self->itemCget($b->name, $on, $sortfield)) } @pool
-				} else {
-					@sorted = sort { lc($self->itemCget($b->name, $on, $sortfield)) cmp lc($self->itemCget($a->name, $on, $sortfield)) } @pool
-				}
-			} else {
-				if ($order eq 'ascending') {
 					@sorted = sort { $self->itemCget($a->name, $on, $sortfield) cmp $self->itemCget($b->name, $on, $sortfield) } @pool
 				} else {
 					@sorted = sort { $self->itemCget($b->name, $on, $sortfield) cmp $self->itemCget($a->name, $on, $sortfield) } @pool
+				}
+			} else {
+				if ($order eq 'ascending') {
+					@sorted = sort { lc($self->itemCget($a->name, $on, $sortfield)) cmp lc($self->itemCget($b->name, $on, $sortfield)) } @pool
+				} else {
+					@sorted = sort { lc($self->itemCget($b->name, $on, $sortfield)) cmp lc($self->itemCget($a->name, $on, $sortfield)) } @pool
 				}
 			}
 		}
@@ -3344,8 +3604,6 @@ Same as Perl.
 Hans Jeuken (hanje at cpan dot org)
 
 =head1 TODO
-
-Not having to call I<refresh> all the time would be nice.
 
 =head1 BUGS AND CAVEATS
 

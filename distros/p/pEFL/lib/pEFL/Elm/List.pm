@@ -79,14 +79,14 @@ sub item_append {
 sub items_get_pv {
     my ($obj) = @_;
     my $list = $obj->items_get();
-    my @array = pEFL::Eina::list2array($list,"ElmListItem");
+    my @array = pEFL::Eina::list2array($list,"ElmListItemPtr");
     return @array;
 }
 
 sub selected_items_get_pv {
     my ($obj) = @_;
     my $list = $obj->selected_items_get();
-    my @array = pEFL::Eina::list2array($list,"ElmListItem");
+    my @array = pEFL::Eina::list2array($list,"ElmListItemPtr");
     return @array;
 }
 

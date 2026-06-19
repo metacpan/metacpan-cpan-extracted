@@ -122,6 +122,7 @@ class Ctx {
 	}
 
 	method nested ( extras? ) {
+		// Extras is optional metadata; an empty map is still a value.
 		let extra_meta := extras ?: {};
 
 		let next_meta := {

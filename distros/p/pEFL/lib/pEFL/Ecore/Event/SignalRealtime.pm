@@ -5,13 +5,13 @@ use warnings;
 
 require Exporter;
 
-our @ISA = qw(Exporter EvasEventSignalRealtimePtr);
+our @ISA = qw(Exporter EcoreEventSignalRealtimePtr);
 
 require XSLoader;
 XSLoader::load('pEFL::Ecore::Event::SignalRealtime');
 
 
-package EvasEventSignalRealtimePtr;
+package EcoreEventSignalRealtimePtr;
 
 
 

@@ -38,13 +38,13 @@ no_index:
 provides:
   WWW::Mechanize:
     file: lib/WWW/Mechanize.pm
-    version: '2.21'
+    version: '2.22'
   WWW::Mechanize::Image:
     file: lib/WWW/Mechanize/Image.pm
-    version: '2.21'
+    version: '2.22'
   WWW::Mechanize::Link:
     file: lib/WWW/Mechanize/Link.pm
-    version: '2.21'
+    version: '2.22'
 recommends:
   Compress::Zlib: '0'
 requires:
@@ -71,7 +71,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/WWW-Mechanize/issues
   homepage: https://github.com/libwww-perl/WWW-Mechanize
   repository: https://github.com/libwww-perl/WWW-Mechanize.git
-version: '2.21'
+version: '2.22'
 x_Dist_Zilla:
   perl:
     version: '5.042002'
@@ -476,7 +476,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.21
+          tag: v2.22
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

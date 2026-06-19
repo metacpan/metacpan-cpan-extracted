@@ -62,11 +62,12 @@ Archive.dump(
 );
 
 let target := root();
+let install_home := Path.tempdir();
 let result := ( new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: install_home.to_String(),
 ) ).install( archive.to_String(), { no_test: true } );
 ok( result{ok}, "install writes metadata" );
 
@@ -95,11 +96,12 @@ is(
 	"script sha256 is computed from installed file",
 );
 
+let query_home := Path.tempdir();
 let zoo := new Zuzuzoo(
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: query_home.to_String(),
 );
 is(
 	zoo.list_installed()[0]{name},

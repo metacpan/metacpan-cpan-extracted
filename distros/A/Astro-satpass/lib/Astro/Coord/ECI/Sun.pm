@@ -49,7 +49,7 @@ package Astro::Coord::ECI::Sun;
 use strict;
 use warnings;
 
-our $VERSION = '0.134';
+our $VERSION = '0.135';
 
 use base qw{Astro::Coord::ECI};
 
@@ -598,7 +598,7 @@ Edition, Chapter 27 ("Equinoxes and Solstices), pages 278ff.
 
 THIS METHOD IS UNSUPPORTED. I understand the temptation to call it if
 all you want are the seasons, but if possible I would like to be able to
-remove it if its use in next_quarter() turns out to e a bad idea. I am
+remove it if its use in next_quarter() turns out to be a bad idea. I am
 not unwilling to support it; if you want me to, please contact me.
 
 Because it is unsupported, its name may change without warning if
@@ -864,21 +864,20 @@ functionality similar to B<Astro-Sunrise>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
-L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
+L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2025 by Thomas R. Wyant, III
+Copyright (C) 2005-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

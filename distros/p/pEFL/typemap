@@ -11,7 +11,7 @@ Elm_Ctxpopup_Direction				T_IV
 Elm_Scroller_Policy 				T_IV
 Evas_BiDi_Direction 				T_IV
 Evas_Aspect_Control 				T_IV
-sssas
+
 ElmActionslider *					T_EVAS_OBJECT
 const ElmActionslider * 			T_EVAS_OBJECT
 ElmWin *							T_EVAS_OBJECT
@@ -213,6 +213,7 @@ EcoreEventMouseMove *				T_EVAS_OBJECT
 EcoreEventSignalExit *				T_EVAS_OBJECT
 EcoreEventSignalRealtime *			T_EVAS_OBJECT
 EcoreEventSignalUser *				T_EVAS_OBJECT
+EcoreEventPerlEvent *				T_EVAS_OBJECT
 EcoreEvas * 						T_EVAS_OBJECT
 const EcoreEvas *					T_EVAS_OBJECT
 EcoreTimer *						T_EVAS_OBJECT
@@ -222,6 +223,10 @@ EcoreIdleEnterer *					T_EVAS_OBJECT
 EcoreIdleExiter *					T_EVAS_OBJECT
 EcorePoller *						T_EVAS_OBJECT
 const EcorePoller *					T_EVAS_OBJECT
+EcoreFileMonitor *					T_EVAS_OBJECT
+const EcoreFileMonitor				T_EVAS_OBJECT
+EcoreFdHandler *					T_EVAS_OBJECT
+const EcoreFdHandler				T_EVAS_OBJECT
 
 #############
 # Others

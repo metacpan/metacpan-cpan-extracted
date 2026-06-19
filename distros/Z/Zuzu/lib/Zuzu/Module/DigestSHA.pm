@@ -2,7 +2,7 @@ package Zuzu::Module::DigestSHA;
 
 use utf8;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.006000';
 
 use Digest::SHA qw(
 	hmac_sha1

@@ -9,7 +9,7 @@ use warnings;
 
 use Carp qw(croak);
 
-our $VERSION = '1.1.6';
+our $VERSION = '1.2.2';
 
 sub new {
   my ( $class, %args ) = @_;

@@ -25,8 +25,17 @@ WriteMakefile(
 		INC 		  => '-Wall -I. ' . $elm_pkg_info{'cflags'} . $evas_pkg_info{'cflags'},
 	},
 	xs => {
+		'lib/pEFL/Ecore/FdHandler' => {
+			OBJECT => 'lib/pEFL/Ecore/FdHandler$(OBJ_EXT) PLSide$(OBJ_EXT)',
+		},
+		'lib/pEFL/Ecore/FileMonitor' => {
+			OBJECT => 'lib/pEFL/Ecore/FileMonitor$(OBJ_EXT) PLSide$(OBJ_EXT)',
+		},
 		'lib/pEFL/Ecore/EventHandler' => {
 			OBJECT => 'lib/pEFL/Ecore/EventHandler$(OBJ_EXT) PLSide$(OBJ_EXT)',
+		},
+		'lib/pEFL/Ecore/Event' => {
+			OBJECT => 'lib/pEFL/Ecore/Event$(OBJ_EXT) PLSide$(OBJ_EXT)',
 		},
 		'lib/pEFL/Ecore/Evas' => {
 			OBJECT => 'lib/pEFL/Ecore/Evas$(OBJ_EXT) PLSide$(OBJ_EXT)',

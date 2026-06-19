@@ -1,0 +1,10 @@
+0.02 2026-06-18T17:39:15+02:00
+ - Add 0.3.0 version with new table address.
+ - Add doc.
+ - Add tests.
+ - Remove obsolete code.
+ - Update copyright years.
+ - Update to Module::Install@1.21.
+
+0.01 2024-04-25T09:32:22+02:00
+ - First version.

@@ -24,7 +24,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 require XSLoader;
 XSLoader::load('pEFL', $VERSION);
@@ -32,6 +32,15 @@ XSLoader::load('pEFL', $VERSION);
 # Preloaded methods go here.
 
 our $Debug = 0;
+
+sub ev_info2pv {
+	my ($ev_info) = shift;
+	
+	my $s_ev = pEFL::ev_info2obj($ev_info, "pEFL::Ecore::Event::PerlEvent");
+	my $perl_sv = $s_ev->perl_sv();
+	
+	return $perl_sv
+}
 
 
 1;
@@ -98,6 +107,8 @@ If a method returns an C<Eina_List> there usually is a version with the suffix C
 
 Sometimes a method returns an C<EvasObject> which can be any Elm Widget Type (e.g. C<< $nav->item_pop() >>, C<< $object->content_get >>, C<< $object_item->content_get() >>). In this case there will be a "Perl Value"-version that tries to bless the returned variable to the appropriate Perl class, too (e.g. C<< $naviframe->item_pop_pv() >>, C<< $object->[part_]content_get_pv() >>, C<< $object_item->[part_]content_get_pv() >>).
 
+Starting with version 0.77, it is possible to trigger Ecore events directly from Perl using C<< $pEFL::Ecore::Event->add_pv($type, $event_info) >>. To get the perl value of $event_info in the event handler, see C<< pEFL::ev_info2pv($event_info) >>.
+
 =head2 Output Parameters
 
 L<pEFL> sometimes uses output parameters. See for example C<< void elm_calendar_min_max_year_get(Evas_Object *obj,int *min,int *max) >>, where you have to pass in C a pointer to max and min. In Perl this is translated to C<< my ($min, $max) = $calendar->min_max_year_get() >>. Sometimes the C function returns a status or similar as in C<< Eina_Bool elm_entry_cursor_geometry_get(Evas_Object *obj,int *x,int *y,int *w,int *h) >>. In Perl this status variable is given, too. So the function C<< elm_entry_cursor_geometry_get >> for example is translated into C<< my ($status,$x,$y,$w,$h) = $entry->cursor_geometry_get >>.
@@ -156,7 +167,15 @@ if C<$event_info> contains the address to a C struct, this function converts the
 
 =item * Evas_Textblock_Rectangle (aka pEFL::Evas::TextblockRectangle)
 
+=item * and more...
+
 =back
+
+=over 4
+
+=item C<< pEFL::ev_info2pv($event_info) >>
+
+Starting with version 0.77, it is possible to trigger events directly from Perl using C<< $pEFL::Ecore::Event->add_pv($type, $event_info) >>. Of course, only a Perl variable can be passed as C<< $event_info >> (i.e., an SV * in Perl XS). pEFL stores this scalar in a C<< struct PerlEvent >> (accessible in Perl via the C<< pEFL::Ecore::Event::PerlEvent >> module). The C<< pEFL::ev_info2pv >> function is intended as a shortcut for retrieving the Perl variable from C<< $event_info >>.  
 
 =back
 
@@ -166,7 +185,7 @@ The provision of Perl classes for event_info C structs is work in progress. If y
 
 =head1 STATE OF THE BINDING
 
-The Perl binding is in an early development state. So things may change in the future and some functionalities are missing at the moment. Nevertheless especially the Elementary binding is very usable and complete.
+Of course, the integration of a set of libraries is always a work in progress and never truly complete. Although some features are certainly still missing (in particular, creating SmartClasses in Perl is not yet possible), the Perl binding is now stable, well-tested and mature. Don't expect any major changes to the API, too (especially since the binding is deliberately modeled closely after the C API and translates the corresponding C calls with as little “magic” as possible to ensure a low-maintenance interface). Minor changes, fixes, and adjustments are, of course, still possible, but we hardly try to avoid them.
 
 If you miss something or find issues, please report it to L<Github|https://github.com/MaxPerl/Perl-EFL>. 
 

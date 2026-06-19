@@ -10,6 +10,7 @@
 
 typedef Elm_Box ElmBox;
 typedef Evas_Object EvasObject;
+typedef Eina_List EinaList;
 
 MODULE = pEFL::Elm::Box		PACKAGE = pEFL::Elm::Box
 
@@ -114,5 +115,7 @@ void
 elm_box_clear(obj)
 	ElmBox *obj
 
-
+EinaList *
+elm_box_children_get(obj)
+	ElmBox *obj
 

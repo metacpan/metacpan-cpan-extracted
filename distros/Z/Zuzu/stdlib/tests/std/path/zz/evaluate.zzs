@@ -262,13 +262,18 @@ is(
 );
 is(
 	( new ZZPath( path: "zero ?: two" ) ).first(data),
-	2,
-	"Elvis ternary uses fallback for falsey condition",
+	0,
+	"Elvis ternary preserves defined falsey condition",
 );
 is(
 	( new ZZPath( path: "one ?: two" ) ).first(data),
 	1,
 	"Elvis ternary keeps truthy condition",
+);
+is(
+	( new ZZPath( path: "null() ?: two" ) ).first(data),
+	2,
+	"Elvis ternary uses fallback for null condition",
 );
 
 let filtered := ( new ZZPath( path: "/items/*[!n]/n" ) ).query(data);

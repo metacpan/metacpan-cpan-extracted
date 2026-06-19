@@ -33,7 +33,7 @@ void call_perl_evas_event_cb(void *data, Evas *e, Evas_Object *obj, void *event_
 Evas_Object* call_perl_tooltip_content_cb(void *data, Evas_Object *obj, Evas_Object *tooltip);
 void del_tooltip(void *data, Evas_Object *obj, void *event_info);
 
-void call_perl_edje_message_handler(void *data, Evas_Object *obj, int type, int id, void *msg);
+void call_perl_edje_message_handler(void *data, Evas_Object *obj, Edje_Message_Type type, int id, void *msg);
 
 //
 // used by ElmSlider and ElmProgressbar (and in the future hopefully ElmCalendar)
@@ -115,6 +115,17 @@ Eina_Bool call_perl_task_cb(void *data);
 
 // Ecore Event Handler
 Eina_Bool call_perl_ecore_event_handler_cb(void *data, int type, void *event);
+
+typedef struct {
+    SV *perl_sv;
+} PerlEvent;
+
+void ecore_event_perl_free_cb(void *data, void *event);
+
+// Ecore Ecore File Monitor
+void call_perl_ecore_file_monitor_cb(void *data, Ecore_File_Monitor *em, Ecore_File_Event event, const char* path);
+
+Eina_Bool call_perl_ecore_fd_cb(void *data, Ecore_Fd_Handler *fd_handler);
 
 #define H_PLSIDE
 #endif

@@ -608,6 +608,19 @@ my @names_ecore = (
 	{name => 'ECORE_EVAS_AVOID_DAMAGE_NONE', 'macro' => 1},
 	{name => 'ECORE_EVAS_AVOID_DAMAGE_EXPOSE', 'macro' => 1},
 	{name => 'ECORE_EVAS_AVOID_DAMAGE_BUILT_IN', 'macro' => 1},
+	#
+	{name => 'ECORE_FILE_EVENT_NONE', 'macro' => 1},
+	{name => 'ECORE_FILE_EVENT_CREATED_FILE', 'macro' => 1},
+	{name => 'ECORE_FILE_EVENT_CREATED_DIRECTORY', 'macro' => 1},
+	{name => 'ECORE_FILE_EVENT_DELETED_FILE', 'macro' => 1},
+	{name => 'ECORE_FILE_EVENT_DELETED_DIRECTORY', 'macro' => 1},
+	{name => 'ECORE_FILE_EVENT_DELETED_SELF', 'macro' => 1},
+	{name => 'ECORE_FILE_EVENT_MODIFIED', 'macro' => 1},
+	{name => 'ECORE_FILE_EVENT_CLOSED', 'macro' => 1},
+	{name => 'ECORE_FD_READ', 'macro' => 1},
+	{name => 'ECORE_FD_WRITE', 'macro' => 1},
+	{name => 'ECORE_FD_ERROR', 'macro' => 1},
+	{name => 'ECORE_FD_ALWAYS', 'macro' => 1},
     );
     
     ExtUtils::Constant::WriteConstants(

@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::ASN1::Integer;
-$Crypt::OpenSSL3::ASN1::Integer::VERSION = '0.006';
+$Crypt::OpenSSL3::ASN1::Integer::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::ASN1::Integer - An ASN1 integer
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 METHODS
 
@@ -38,6 +38,8 @@ version 0.006
 =head2 set_int64
 
 =head2 set_uint64
+
+=head2 set_buffer
 
 =head1 AUTHOR
 

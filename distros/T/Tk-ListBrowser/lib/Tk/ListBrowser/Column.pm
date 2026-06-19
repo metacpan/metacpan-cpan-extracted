@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.09;
+$VERSION =  0.10;
 
 use base qw(Tk::ListBrowser::Row);
 
@@ -38,8 +38,8 @@ sub new {
 
 sub nextPosition {
 	my ($self, $x, $y, $column, $row) = @_;
-	my $cellheight = $self->cellHeight;
-	my $cellwidth = $self->cellWidth;
+	my $cellheight = $self->cget('-cellheight');
+	my $cellwidth = $self->cget('-cellwidth');
 	my $newy = $y + ($cellheight * 2);
 	my ($cwidth, $cheight) = $self->canvasSize;
 	if ($newy >= $cheight) {

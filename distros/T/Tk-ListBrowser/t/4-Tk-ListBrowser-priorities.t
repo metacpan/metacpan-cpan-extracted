@@ -5,6 +5,8 @@ use Test::Tk;
 use Cwd;
 use Config;
 use Tk;
+use POSIX qw( strftime );
+use File::Spec;
 require Tk::Photo;
 require Tk::LabFrame;
 require Tk::ListBrowser;
@@ -50,9 +52,34 @@ my $loaddir = cwd;
 my $ib;
 
 sub add {
-	my ($name, %options) = @_;
-	print "$name\n";
-	$ib->add($name, %options)
+	my ($full, %options) = @_;
+	print "'$full'\n";
+	my $name = substr($full, length($loaddir) + 1, length($full));
+	$ib->add($name, %options);
+	my ($accessed, $modified, $created) = loadStat($full);
+	$ib->itemCreate($name, 'Modified',
+		-text => dateString($modified),
+		-data => $modified,
+	);
+	$ib->itemCreate($name, 'Created',
+		-text => dateString($created),
+		-data => $created,
+	);
+	$ib->itemCreate($name, 'Accessed',
+		-text => dateString($accessed),
+		-data => $accessed,
+	);
+}
+
+sub dateString {
+	my $raw = shift;
+	return strftime("%Y-%m-%d %H:%M", localtime($raw))
+}
+
+sub loadStat {
+	my $item = shift;
+	my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = lstat($item);
+	return ($atime, $mtime, $ctime)
 }
 
 sub load {
@@ -69,17 +96,16 @@ sub load {
 		for (@items) {
 			my $item = $_;
 			my $full = "$dir$sep$item";
-			my $name = substr($full, length($loaddir) + 1, length($full));
 			next if $item =~ /^\.[^\.]+/; #no secret files
 			if ($item =~ /^\.+$/) {
-				add($name, -text => $item, -image => $dirimg, -priority => 2, -background => '#FFFF80');
+				add($full, -text => $item, -image => $dirimg, -priority => 2, -background => '#FFFF80');
 			} elsif (-l $full) {
-				add($name, -text => $item, -foreground => '#0000FF', -image => $filimg, -priority => 0);
+				add($full, -text => $item, -foreground => '#0000FF', -image => $filimg, -priority => 0);
 			} elsif (-d $full) {
-				add($name, -text => $item, -image => $dirimg, -priority => 1, -opened => 0);
+				add($full, -text => $item, -image => $dirimg, -priority => 1, -opened => 0);
 				load($full);
 			} else {
-				add($name, -text => $item, -image => $filimg, -priority => 0);
+				add($full, -text => $item, -image => $filimg, -priority => 0);
 			}
 		}
 	}
@@ -112,7 +138,7 @@ if (defined $app) {
 			print "\n";
 		},
 	)->pack(-expand =>1, -fill => 'both');
-	$ib->forceWidth(200);
+#	$ib->forceWidth(200);
 	$ib->headerCreate('',
 		-text => 'Name',
 		-sortable => 1,
@@ -123,9 +149,9 @@ if (defined $app) {
 		my $col = $ib->columnCreate($_,
 			-itemtype => 'text',
 			-filterfield => 'text',
-			-sortfield => 'text',
+			-sortfield => 'data',
 		);
-		$col->forceWidth(100);
+#		$col->forceWidth(100);
 		$ib->headerCreate($_,
 			-text => $_,
 			-sortable => 1,
@@ -149,7 +175,7 @@ if (defined $app) {
 			$opt{'-image'} = $dirimg;
 			$opt{'-background'} = '#FFFF80';
 		}
-		add($name, %opt);
+		$ib->add($name, %opt);
 	}
 
 	#set up tools

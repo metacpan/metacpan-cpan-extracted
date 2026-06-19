@@ -1764,6 +1764,7 @@ stdlib/tests/std/io/_async.zzs
 stdlib/tests/std/io/_binarystring.zzs
 stdlib/tests/std/io/_binarystring_rollout.zzs
 stdlib/tests/std/io/_phase1_path_semantics.zzs
+stdlib/tests/std/io/_temp_cleanup.zzs
 stdlib/tests/std/io/socks.zzs
 stdlib/tests/std/lingua/en.zzs
 stdlib/tests/std/log.zzs

@@ -88,9 +88,6 @@ sub mock_request {
 ########################################################################
 
 subtest 'constructor' => sub {
-  # region required
-  eval { Amazon::S3::Lite->new( {} ) };
-  like $@, qr/region is required/, 'croaks without region';
 
   # no credentials — stub _init_credentials so the test is immune to whether
   # Amazon::Credentials is installed or finds real creds (e.g. on an EC2 instance)

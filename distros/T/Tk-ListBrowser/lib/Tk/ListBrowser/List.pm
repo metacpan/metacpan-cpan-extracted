@@ -26,14 +26,14 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION = 0.09;
+$VERSION = 0.10;
 
 use base qw(Tk::ListBrowser::Row);
 
 
 sub draw {
 	my ($self, $item, $x, $y, $column, $row) = @_;
-	$self->SUPER::draw($item, $x, $y, $column, $row);
+	$item->draw($x, $y, $column, $row, $self->cget('-itemtype'));
 	my $entry = $item->name;
 	my $cx;
 	my $last;
@@ -41,7 +41,7 @@ sub draw {
 	for (@columns) {
 		my $col = $self->columnGet($_);
 		if (defined $cx) {
-			$cx = $cx + $last->cellWidth + 1;
+			$cx = $cx + $last->cget('-cellwidth') + 1;
 		} else {
 			$cx = $self->listWidth + 1 + $self->cget('-marginleft');
 		}
@@ -50,6 +50,7 @@ sub draw {
 		$i = $self->itemCreate($entry, $_) unless defined $i;
 		$i->draw($cx, $y, $column, $row, $col->cget('-itemtype'));
 	}
+	$self->maxXYCalculate($item);
 }
 
 sub initColumns {
@@ -65,9 +66,9 @@ sub initColumns {
 	my ($x, $y) = $self->startXY;
 	my $rows = 0;
 	for (@pool) {
-		$rows ++ unless ($_->hidden) or (not $_->openedparent)
+		$rows ++ unless $_->noshow
 	}
-	my $maxy = $y + ($rows * ($self->cellHeight + 1));
+	my $maxy = $y + ($rows * ($self->cget('-cellheight') + 1));
 
 	my $ml = $self->cget('-marginleft');
 	my $mr = $self->cget('-marginright');
@@ -78,15 +79,13 @@ sub initColumns {
 	my $canvas = $self->Subwidget('Canvas');
 	for (@columns) {
 		my $c = $self->columnGet($_);
-		my $dx = $maxx + $c->cellWidth;
+		my $dx = $maxx + $c->cget('-cellwidth');
 		$c->region($maxx, $y, $dx, $maxy);
 		$c->draw;
-		$canvas->raise($c->crect, $above->crect) if defined $above;
+		$canvas->raise($c->crect, $above->crect) if (defined $above) and (defined $c->crect);
 		$above = $c;
 		$maxx = $dx + 1;
 	}
-
-	$self->maxXY($maxx + $self->cget('-marginright'), $maxy + $self->cget('-marginbottom'));
 }
 
 sub listHeight {
@@ -99,16 +98,24 @@ sub maxIndent {
 	return 0
 }
 
-sub maxXY {
-	my $self = shift;
-	$self->{MAXXY} = [@_] if @_;
-	my $m = $self->{MAXXY};
-	return @$m
+sub maxXYCalculate {
+	my ($self, $item) = @_;
+	my @col = $self->columnList;
+	my $i;
+	for (reverse @col) {
+		my $last = $_;
+		my $cl = $self->itemGet($item->name, $last);
+		next unless defined $cl;
+		$i = $cl;
+		last
+	}
+	$i = $item unless defined $i;
+	$self->SUPER::maxXYCalculate($i, $item);
 }
 
 sub nextPosition {
 	my ($self, $x, $y, $column, $row) = @_;
-	my $cellheight = $self->cellHeight;
+	my $cellheight = $self->cget('-cellheight');
 	$y = $y + $cellheight + 1;
 	$row ++;
 	return ($x, $y, $column, $row)
@@ -145,13 +152,6 @@ sub refresh {
 
 sub scroll {
 	return 'vertical'
-}
-
-sub startXY {
-	my $self = shift;
-	$self->{STARTXY} = [@_] if @_;
-	my $sxy = $self->{STARTXY};
-	return @$sxy
 }
 
 sub type {

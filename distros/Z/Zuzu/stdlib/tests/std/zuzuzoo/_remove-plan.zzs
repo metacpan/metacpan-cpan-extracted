@@ -92,11 +92,12 @@ write_installed(
 	[ script_entry("script-only.zzs") ],
 );
 
+let home := Path.tempdir();
 let opts := {
 	lib_dir: target{lib_dir},
 	bin_dir: target{bin_dir},
 	meta_dir: target{meta_dir},
-	home: Path.tempdir().to_String(),
+	home: home.to_String(),
 };
 let zoo := new Zuzuzoo(
 	lib_dir: opts{lib_dir},

@@ -255,6 +255,7 @@ const STANDARD_FUNCTIONS := [
 				n += got.length;
 			}
 			else {
+				// Parentset can be an empty array; only null falls back.
 				const cur := ctx.parentset ?: ctx.nodeset;
 				n := cur.length;
 			}

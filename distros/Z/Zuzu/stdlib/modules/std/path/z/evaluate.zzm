@@ -159,7 +159,8 @@ class Evaluator {
 				return self.eval_expr( ast{(ab)}, ctx );
 			case "elvis":
 				let left := self.eval_expr( ast{c}, ctx );
-				return left if self.truthy( left.get(0) );
+				let first := left.get( 0, null );
+				return left if first ≢ null and first.primitive_value() ≢ null;
 				return self.eval_expr( ast{b}, ctx );
 			default:
 				die "Panic! Unknown AST node type!";
@@ -444,6 +445,7 @@ class Evaluator {
 	method eval_fn ( fn_ast, ctx ) {
 		const name := fn_ast{n};
 		const fn_def := self.function_definitions().first( fn f → f.has_name(name) );
+		// Function-argument ASTs are null or arrays; empty arrays are values.
 		return fn_def{f}( fn_def, self, fn_ast, ctx, fn_ast{a} ?: [] ) if fn_def;
 		return [];
 	}
@@ -464,6 +466,7 @@ class Evaluator {
 		let seen := {};
 		let out := [];
 		for ( let n in nodes ) {
+			// Node ids are null or stable identifiers; only null needs anon keys.
 			let key := n.id ?: ( "anon:" _ out.length() _ ":" _ ( "" _ n.raw() ) );
 			if ( not seen.exists(key) ) {
 				seen.set( key, true );

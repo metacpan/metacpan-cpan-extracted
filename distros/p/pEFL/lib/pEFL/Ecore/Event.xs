@@ -8,6 +8,8 @@
 #include <Ecore.h>
 #include <Ecore_Input.h>
 
+#include "PLSide.h"
+
 typedef Ecore_Event EcoreEvent;
 typedef int intArray;
 
@@ -16,6 +18,8 @@ intArray * intArrayPtr (int num) {
 	New(0,array,num,intArray);
 	return array;
 }
+
+typedef PerlEvent EcoreEventPerlEvent;
 
 MODULE = pEFL::Ecore::Event		PACKAGE = pEFL::Ecore::Event   PREFIX = ecore_event_
 
@@ -32,6 +36,25 @@ ecore_event_shutdown()
 #	SV *func_free
 #	void *data
 
+EcoreEvent *
+_ecore_event_add_pv(type,ev)
+	int type
+	SV *ev
+CODE:
+	PerlEvent *pe;
+	SV *perl_sv = newSVsv(ev);
+	
+	// Allocate memory
+	Newx(pe, 1, PerlEvent);
+	pe->perl_sv = perl_sv;
+	
+	RETVAL = ecore_event_add(type, (void*)pe, ecore_event_perl_free_cb, NULL);
+OUTPUT:
+	RETVAL
+	
+	
+	
+	
 int
 ecore_event_type_new()
 

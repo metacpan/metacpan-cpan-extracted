@@ -1,7 +1,7 @@
 {
    "abstract" : "Fetch astronomical data from SIMBAD 4.",
    "author" : [
-      "Tom Wyant (wyant at cpan dot org)"
+      "Tom Wyant (harryfmudd at comcast dot net)"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4234",
@@ -56,18 +56,18 @@
    "provides" : {
       "Astro::SIMBAD::Client" : {
          "file" : "lib/Astro/SIMBAD/Client.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       },
       "Astro::SIMBAD::Client::WSQueryInterfaceService" : {
          "file" : "lib/Astro/SIMBAD/Client/WSQueryInterfaceService.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SIMBAD-Client"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -78,6 +78,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SIMBAD-Client"
       }
    },
-   "version" : "0.048",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.049",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

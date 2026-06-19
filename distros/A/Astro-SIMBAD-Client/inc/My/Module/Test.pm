@@ -515,17 +515,16 @@ comparison is done with C<is>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SIMBAD-Client>,
-L<https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues>, or in
+L<https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2025 by Thomas R. Wyant, III
+Copyright (C) 2011-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

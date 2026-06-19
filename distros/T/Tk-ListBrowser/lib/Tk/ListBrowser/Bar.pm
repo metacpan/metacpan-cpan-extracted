@@ -38,7 +38,7 @@ sub new {
 
 sub nextPosition {
 	my ($self, $x, $y, $column, $row) = @_;
-	my $cellwidth = $self->cellWidth;
+	my $cellwidth = $self->cget('-cellwidth');
 	$x = $x + $cellwidth + 1;
 	$column ++;
 	return ($x, $y, $column, $row)
