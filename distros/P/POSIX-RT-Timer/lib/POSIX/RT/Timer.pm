@@ -1,12 +1,12 @@
 package POSIX::RT::Timer;
-$POSIX::RT::Timer::VERSION = '0.023';
+$POSIX::RT::Timer::VERSION = '0.024';
 use 5.008001;
 
 use strict;
 use warnings FATAL => 'all';
 
 use XSLoader ();
-use Time::Spec;
+use Time::Spec 0.004;
 
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
 
@@ -26,7 +26,7 @@ POSIX::RT::Timer - POSIX real-time timers
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

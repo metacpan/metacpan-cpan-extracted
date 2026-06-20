@@ -1,3 +1,15 @@
+0.316     2026-06-19 14:52:42Z
+
+  - Add Gitea/Forgejo repository metadata support via the new
+    Dist::Zilla::Plugin::Author::GETTY::GiteaMeta (the Gitea/Forgejo counterpart
+    of GithubMeta — repository/bugtracker/homepage derived offline from the git
+    remote, no API token). For dists with no GitHub remote, the bundle emits
+    this META when the remote host is a known Gitea host (codeberg.org and the
+    author's own instance) or when the new "gitea = 1" bundle option is set
+    (for any other self-hosted Gitea/Forgejo). Purely additive: GitHub-hosted
+    distributions are unaffected; everything else still falls back to
+    [Repository].
+
 0.315     2026-05-27 01:49:07Z
 
   - Add shared composite GitHub Action (.github/actions/dzil-test) that

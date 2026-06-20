@@ -17,7 +17,6 @@ use Web::Mention;
 
 use Readonly;
 Readonly my $WPM => 200; # The words-per-minute reading speed to assume
-Readonly my $WEBMENTIONS_STORE_FILENAME => 'webmentions.json';
 
 has 'plerd' => (
     is => 'ro',
@@ -50,6 +49,12 @@ has 'body' => (
 );
 
 has 'stripped_body' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy_build => 1,
+);
+
+has 'stripped_title' => (
     is => 'ro',
     isa => 'Str',
     lazy_build => 1,
@@ -169,67 +174,6 @@ has 'socialmeta_mode' => (
     default => 'summary',
 );
 
-has 'webmentions_by_source' => (
-    is => 'ro',
-    isa => 'HashRef',
-    lazy_build => 1,
-);
-
-has 'likes' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    lazy_build => 1,
-    traits => ['Array'],
-    handles => {
-        like_count => 'count',
-    },
-);
-
-has 'reposts' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    lazy_build => 1,
-    traits => ['Array'],
-    handles => {
-        repost_count => 'count',
-    },
-);
-
-has 'replies' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    traits => ['Array'],
-    lazy_build => 1,
-    handles => {
-        reply_count => 'count',
-    },
-);
-
-has 'quotations' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    traits => ['Array'],
-    lazy_build => 1,
-    handles => {
-        quotation_count => 'count',
-    },
-);
-
-has 'mentions' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    traits => ['Array'],
-    lazy_build => 1,
-    handles => {
-        mention_count => 'count',
-    },);
-
-has 'json' => (
-    is => 'ro',
-    isa => 'JSON',
-    default => sub { JSON->new->convert_blessed },
-);
-
 sub _build_publication_file {
     my $self = shift;
 
@@ -267,13 +211,9 @@ sub _build_published_filename {
 sub _build_uri {
     my $self = shift;
 
-    my $base_uri = $self->plerd->base_uri;
-    if ($base_uri =~ /[^\/]$/) {
-        $base_uri .= '/';
-    }
     return URI->new_abs(
         $self->published_filename,
-        $base_uri,
+        $self->plerd->base_uri_with_slash,
     );
 }
 
@@ -296,6 +236,8 @@ sub _build_updated_timestamp {
 sub _build_newer_post {
     my $self = shift;
 
+    return $self->_neighbor_post( -1 ) unless $self->plerd->has_posts;
+
     my $index = $self->plerd->index_of_post_with_guid->{ $self->guid };
 
     my $newer_post;
@@ -309,11 +251,36 @@ sub _build_newer_post {
 sub _build_older_post {
     my $self = shift;
 
+    return $self->_neighbor_post( +1 ) unless $self->plerd->has_posts;
+
     my $index = $self->plerd->index_of_post_with_guid->{ $self->guid };
 
     my $older_post = $self->plerd->posts->[ $index + 1 ];
 
     return $older_post;
+}
+
+# Resolve a neighbor post (offset -1 = newer, +1 = older) from the blog's
+# post index, constructing only that one neighbor. Used during an incremental
+# publish, when the full post list isn't in memory. Returns undef at the ends
+# of the blog or if the neighbor's source file has since vanished.
+sub _neighbor_post {
+    my $self = shift;
+    my ( $offset ) = @_;
+
+    my $basename = $self->plerd->neighbor_basename(
+        $self->source_file->basename,
+        $offset,
+    );
+    return unless defined $basename;
+
+    my $file = $self->plerd->source_directory->file( $basename );
+    return unless -e $file;
+
+    return Plerd::Post->new(
+        plerd       => $self->plerd,
+        source_file => $file,
+    );
 }
 
 sub _build_published_timestamp {
@@ -342,13 +309,24 @@ sub _build_reading_time {
 sub _build_stripped_body {
     my $self = shift;
 
-    my $stripper = HTML::Strip->new;
-    my $body = $stripper->parse( $self->body );
+    return $self->_strip_html( $self->body );
+}
+
+sub _build_stripped_title {
+    my $self = shift;
+
+    return $self->_strip_html( $self->title );
+}
+
+sub _strip_html {
+    my ($self, $raw_text) = @_;
+
+    my $stripped = HTML::Strip->new->parse( $raw_text );
 
     # Clean up apparently orphaned punctuation
-    $body =~ s{ ([;.,\?\!])}{$1}g;
+    $stripped =~ s{ ([;.,\?\!])}{$1}g;
 
-    return $body;
+    return $stripped;
 }
 
 sub _build_socialmeta {
@@ -437,7 +415,7 @@ sub _process_source_file {
     while ( my $line = <$fh> ) {
         chomp $line;
         last unless $line =~ /\S/;
-        my ($key, $value) = $line =~ /^\s*(\w+?)\s*:\s*(.*)$/;
+        my ($key, $value) = $line =~ /^\s*(\w+?)\s*:\s*(.*?)\s*$/;
         if ( $key ) {
             $key = lc $key;
             $attributes{ $key } = $value;
@@ -557,15 +535,6 @@ sub _process_source_file {
         $attributes_need_to_be_written_out = 1;
     }
 
-    if ( $attributes{ tags } ) {
-        my @tag_names = split /\s*,\s*/, $attributes{ tags };
-        for my $tag_name (@tag_names) {
-            my $tag = $self->plerd->tag_named( $tag_name );
-            $tag->add_post( $self );
-            push @{ $self->tag_objects }, $tag;
-        }
-    }
-
     if ( $attributes{ published_filename } ) {
         $self->published_filename( $attributes{ published_filename } );
     }
@@ -581,6 +550,15 @@ sub _process_source_file {
         $attributes{ guid } = Data::GUID->new;
         $self->guid( $attributes{ guid } );
         $attributes_need_to_be_written_out = 1;
+    }
+
+    if ( $attributes{ tags } ) {
+        my @tag_names = split /\s*,\s*/, $attributes{ tags };
+        for my $tag_name (@tag_names) {
+            my $tag = $self->plerd->tag_named( $tag_name );
+            $tag->add_post( $self );
+            push @{ $self->tag_objects }, $tag;
+        }
     }
 
     if ( $attributes_need_to_be_written_out ) {
@@ -602,21 +580,16 @@ sub publish {
     my $stripped_title = $self->title;
     $stripped_title =~ s{</?(em|strong)>}{}g;
 
-    my $html_fh = $self->publication_file->openw;
-    my $template_fh = $self->plerd->post_template_file->openr;
-    foreach( $html_fh, $template_fh ) {
-	$_->binmode(':utf8');
-    }
-    $self->plerd->template->process(
-        $template_fh,
+    $self->plerd->_publish_template_to_file(
+        $self->plerd->post_template_file,
         {
             plerd => $self->plerd,
             posts => [ $self ],
             title => $stripped_title,
             context_post => $self,
         },
-	    $html_fh,
-    ) || $self->plerd->_throw_template_exception( $self->plerd->post_template_file );
+        $self->publication_file,
+    );
 
 }
 
@@ -646,148 +619,12 @@ sub send_webmentions {
     return (\%report);
 }
 
-sub add_webmention {
-    my $self = shift;
-    my ( $webmention ) = @_;
-
-    $self->webmentions_by_source->{ $webmention->source } = $webmention;
-    $self->serialize_webmentions;
-}
-
-sub update_webmention {
-    return add_webmention( @_ );
-}
-
-sub delete_webmention {
-    my $self = shift;
-    my ( $webmention ) = @_;
-
-    delete $self->webmentions_by_source->{ $webmention->source };
-    $self->serialize_webmentions;
-}
-
-sub serialize_webmentions {
-    my $self = shift;
-
-    $self->_store( $WEBMENTIONS_STORE_FILENAME, $self->webmentions_by_source );
-}
-
-sub ordered_webmentions {
-    my $self = shift;
-
-    return sort
-        {$a->time_published <=> $b->time_published }
-        values( %{ $self->webmentions_by_source } )
-    ;
-}
-
-sub webmention_count {
-    my $self = shift;
-
-    return scalar keys %{ $self->webmentions_by_source };
-}
-
-sub _build_webmentions_by_source {
-    my $self = shift;
-
-    my $webmentions_ref =
-        $self->_retrieve(
-            $WEBMENTIONS_STORE_FILENAME,
-        )
-        || {}
-    ;
-
-    for my $source_url ( keys( %{ $webmentions_ref } ) ) {
-        my $webmention = Web::Mention->FROM_JSON(
-            $webmentions_ref->{ $source_url }
-        );
-        $webmentions_ref->{ $source_url } = $webmention;
-    }
-
-    return $webmentions_ref;
-}
-
-sub _store {
-    my $self = shift;
-    my ($filename, $data_ref) = @_;
-
-    my $post_dir =  Path::Class::Dir->new(
-        $self->plerd->database_directory,
-        $self->guid,
-    );
-
-    unless ( -e $post_dir ) {
-        $post_dir->mkpath;
-    }
-
-    my $file = Path::Class::File->new(
-        $post_dir,
-        $filename,
-    );
-    $file->spew( $self->json->encode( $data_ref ) );
-}
-
-sub _retrieve {
-    my $self = shift;
-    my ($filename) = @_;
-
-    my $file = Path::Class::File->new(
-        $self->plerd->database_directory,
-        $self->guid,
-        $filename,
-    );
-
-    if ( -e $file ) {
-        return $self->json->utf8->decode( $file->slurp );
-    }
-    else {
-        return undef;
-    }
-}
-
 sub _build_utc_date {
     my $self = shift;
 
     my $dt = $self->date->clone;
     $dt->set_time_zone( 'UTC' );
     return $dt;
-}
-
-sub _build_likes {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'like' );
-}
-
-sub _build_mentions {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'mention' );
-}
-
-sub _build_replies {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'reply' );
-}
-
-sub _build_quotations {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'quotation' );
-}
-
-sub _build_reposts {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'repost' );
-}
-
-sub _grep_webmentions {
-    my ( $self, $webmention_type ) = @_;
-    return [
-        grep { $_->type eq $webmention_type } $self->ordered_webmentions
-    ];
 }
 
 sub tags {

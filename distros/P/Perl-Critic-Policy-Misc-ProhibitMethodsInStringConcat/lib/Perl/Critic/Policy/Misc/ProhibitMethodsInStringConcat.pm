@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat;
-$Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat::VERSION = '0.01';
+$Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat::VERSION = '0.02';
 use parent 'Perl::Critic::Policy';
 
 use Perl::Critic::Utils qw(:severities);
@@ -43,8 +43,8 @@ sub violates {
 
     return $self->violation(
         'Method call used in string concatenation',
-        'Assign the method result to a variable first, or use printf/sprintf instead.  '
-            . 'Method calls in string concatenation lose the variable name in undef warnings -- '
+        'Assign the method result to a variable first.  '
+            . 'Method calls in string concatenation lose the variable name in undef warnings - '
             . 'Perl can only say "uninitialized value" without naming which call returned undef, '
             . 'making debugging harder.',
         $elem,
@@ -65,7 +65,7 @@ Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat - Prohibit method call
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 
@@ -99,27 +99,25 @@ Perl names the variable:
 
 The variable name pinpoints the source of C<undef> immediately.
 
-This difference matters because method calls are opaque -- the call
+This difference matters because method calls are opaque - the call
 expression has no name that Perl can surface in the diagnostic.  A
 scalar variable, on the other hand, carries its identifier through to
 the warning.
 
-Using C<printf> / C<sprintf> avoids the problem altogether by
-separating the template from the value list, making each argument a
-distinct expression on its own line or position.
+Note that method calls passed as arguments to C<printf> / C<sprintf>
+suffer from the same problem - Perl's warning will not name which
+argument returned C<undef>.  Assigning to a variable first is the only
+way to get a named warning.
 
 =head2 Remediation
 
-    # Instead of -- method call hidden inside concat:
+    # Instead of - method call hidden inside concat:
     my $result = "Name: " . $obj->name() . " Age: " . $obj->age();
 
-    # Option 1 -- unload to a variable first:
+    # Unload to a variable first (fixes the warning):
     my $name = $obj->name();
     my $age  = $obj->age();
     my $result = "Name: " . $name . " Age: " . $age;
-
-    # Option 2 -- use sprintf (separates template from data):
-    my $result = sprintf 'Name: %s Age: %s', $obj->name(), $obj->age();
 
 =head1 EXAMPLES
 
@@ -129,10 +127,8 @@ distinct expression on its own line or position.
 
     my $x = 'hello' . ( $foo->bar / 2 ) . 'there';  # not ok (method in parens)
 
-    my $name = $obj->name();              # ok -- unload to variable first
+    my $name = $obj->name();              # ok - unload to variable first
     my $x    = "Hello " . $name;
-
-    my $x = sprintf 'Hello %s', $obj->name();  # ok -- use sprintf
 
 The policy traverses into parentheses, so method calls nested inside
 parenthesized sub-expressions within a concatenation are also flagged.
@@ -141,17 +137,26 @@ parenthesized sub-expressions within a concatenation are also flagged.
 
 The C<.=> operator is not flagged when used with a single method call:
 
-    $x .= $obj->method();   # ok -- single method, clear intent
+    $x .= $obj->method();   # ok - single method, clear intent
 
 However, when the right side of C<.=> itself contains C<.> concatenation
 with method calls, those inner C<.> operators are flagged:
 
     $x .= $obj->method() . $obj->other();   # not ok (inner .)
-    $x .= "Name: " . $obj->method();          # not ok (inner .)
+    $x .= "Name: " . $obj->method();        # not ok (inner .)
 
 =head1 CONFIGURATION
 
 This policy does not accept any configuration parameters.
+
+=head1 RELATED POLICIES
+
+L<Perl::Critic::Policy::ControlStructures::ProhibitMultipleSubscripts> follows
+the same principle of extracting intermediate results into named variables
+rather than inlining complex expressions in a loop.  Just as this policy flags
+method calls inside string concatenation (assign to a variable first for
+better diagnostics), C<ProhibitMultipleSubscripts> flags repeated subscript
+lookups in a loop (assign to a variable first for efficiency and clarity).
 
 =head1 SEE ALSO
 

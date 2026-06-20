@@ -9,9 +9,18 @@
 #if PERL_VERSION < 16
 #  define pad_add_name_pvn(name, len, flags, typestash, ourstash) \
        Perl_pad_add_name(aTHX_ (name), (len), (flags), (typestash), (ourstash))
+/* pad_findmy_pvn is the 5.15.1 rename of pad_findmy; the 5.14 function takes the
+ * identical (name, len, flags) arguments. */
+#  define pad_findmy_pvn(name, len, flags) \
+       Perl_pad_findmy(aTHX_ (name), (len), (flags))
 #endif
 
 #define MAX_ARMS 4096
+
+/* Shared compile-time destructuring engine (dd_pat / dd_parse_pattern / dd_emit
+ * and the dd_tail / dd_hrest custom ops). Powers the `case PAT -> [..]` binding
+ * bridge below. Must come after the pad_add_name_pvn shim above. */
+#include "destructure.h"
 
 /* Previous keyword plugin in the chain. */
 static int (*sd_next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
@@ -423,10 +432,11 @@ static void sd_lex_scalar_var(pTHX_ SDVar *v) {
 		 * than holding the value - reading it as a plain PADSV is wrong. Resolve
 		 * it to the package scalar it really is, qualified by the `our`'s own
 		 * stash so the lookup neither trips strict 'vars' nor guesses the wrong
-		 * package. */
-		PADNAME *pn = PadnamelistARRAY(PL_comppad_name)[off];
-		if (pn && PadnameIsOUR(pn)) {
-			HV *stash = PadnameOURSTASH(pn);
+		 * package. The PAD_COMPNAME_* macros take the offset directly and are
+		 * stable from 5.8 through current perl, so this is one path on every
+		 * version - unlike the PADNAME API, which only exists from 5.18. */
+		if (PAD_COMPNAME_FLAGS_isOUR(off)) {
+			HV *stash = PAD_COMPNAME_OURSTASH(off);
 			SV *q = newSVpvs("");
 			if (stash && HvNAME(stash))
 				sv_catpvf(q, "%s::", HvNAME(stash));
@@ -780,6 +790,76 @@ static OP *sd_simplify_block(pTHX_ OP *block, int *simple) {
 
 /* Parse a whole `switch (EXPR) { ... }` construct (the lexer is positioned
  * just after the `switch` keyword) and return its value-producing op tree. */
+/* Parse  -> PATTERN { BODY }  for a case arm and return the block op with the
+ * destructured topic bound as lexicals visible inside BODY. The `->` has
+ * already been consumed. The bindings are prepended to BODY inside the block's
+ * own lexical scope (so each arm's bindings are private to that arm and vanish
+ * at the closing brace).
+ *
+ * A flat array pattern lowers to a single native `my (...) = @{$topic // []}`
+ * list-assignment - the same fast path the `let` keyword uses; hash, nested and
+ * default patterns capture the topic once into a hidden temp and bind per
+ * element via dd_emit(). */
+static OP *sd_parse_bound_block(pTHX_ SDTopic *topic) {
+	dd_pat pat;
+	I32 floor;
+	OP *seq, *body, *blk, *lhs, *store;
+	PADOFFSET src;
+	I32 c;
+
+	lex_read_space(0);
+	c = lex_peek_unichar(0);
+	if (c != '[' && c != '{')
+		croak("switch: expected '[' or '{' pattern after '->'");
+
+	dd_parse_pattern(aTHX_ &pat);
+	if (pat.shape == DD_LIST) {       /* not reachable via [ / { but be explicit */
+		dd_free_pat(aTHX_ &pat);
+		croak("switch: list patterns '(...)' are not allowed in a case binding");
+	}
+
+	lex_read_space(0);
+	if (lex_peek_unichar(0) != '{') {
+		dd_free_pat(aTHX_ &pat);
+		croak("switch: expected '{' to open the case block after the '->' pattern");
+	}
+
+	/* Open an outer block scope to hold the destructured lexicals so they are
+	 * private to this arm (and vanish at its closing brace). The arm's own
+	 * block is parsed inside it and its statements can see the bindings. */
+	floor = Perl_block_start(aTHX_ TRUE);
+
+	/* The fast path derefs the topic as @{ <topic> // [] }. A constant topic
+	 * would constant-fold to a symbolic deref (@{"str"}) and die at compile
+	 * time under strict, so a constant scrutinee (which can never be an aref,
+	 * and whose arm therefore never matches a [..] pattern) takes the general
+	 * runtime-deref path instead. */
+	if (dd_is_listassign(&pat) && topic->kind != SDT_CONST) {
+		/* Fast path: my (LHS) = @{ <topic> // [] }; one native list-assignment. */
+		OP *llist = dd_listassign_lhs(aTHX_ &pat);
+		OP *rv = newUNOP(OP_RV2AV, 0,
+		                 newLOGOP(OP_DOR, 0, sd_topic(aTHX_ topic),
+		                          dd_empty_aref(aTHX)));
+		seq = newSTATEOP(0, NULL, newASSIGNOP(OPf_STACKED, llist, 0, rv));
+	}
+	else {
+		/* General path: my $src = <topic>; then per-element binds. */
+		src = dd_temp(aTHX);
+		lhs = dd_padsv(aTHX_ src);
+		lhs->op_private |= OPpLVAL_INTRO;
+		store = newSTATEOP(0, NULL,
+		                   newASSIGNOP(OPf_STACKED, lhs, 0, sd_topic(aTHX_ topic)));
+		seq = store;
+		dd_emit(aTHX_ &pat, src, &seq);
+	}
+	dd_free_pat(aTHX_ &pat);
+
+	body = parse_block(0);           /* consumes the whole { ... } */
+	seq  = op_append_list(OP_LINESEQ, seq, body);
+	blk  = Perl_block_end(aTHX_ floor, seq);
+	return op_scope(blk);
+}
+
 static OP *sd_parse_switch(pTHX) {
 	OP *scrutinee;
 	OP *conds[MAX_ARMS];
@@ -900,9 +980,18 @@ static OP *sd_parse_switch(pTHX) {
 					newUNOP(OP_DEFINED, 0, sd_topic(aTHX_ &topic)),
 					cond);
 			lex_read_space(0);
-			if (lex_peek_unichar(0) != '{')
-				croak("switch: expected '{' after case pattern");
-			blk = sd_simplify_block(aTHX_ parse_block(0), &simple);
+			/* Optional `-> PATTERN` destructuring bind before the arm block. */
+			if (lex_peek_unichar(0) == '-' && PL_parser->bufptr[1] == '>') {
+				lex_read_unichar(0);   /* - */
+				lex_read_unichar(0);   /* > */
+				blk = sd_parse_bound_block(aTHX_ &topic);
+				simple = 0;            /* a bound block always carries lexicals */
+			}
+			else {
+				if (lex_peek_unichar(0) != '{')
+					croak("switch: expected '{' after case pattern");
+				blk = sd_simplify_block(aTHX_ parse_block(0), &simple);
+			}
 			all_simple &= simple;
 			conds[narms]  = cond;
 			blocks[narms] = blk;
@@ -1088,6 +1177,14 @@ BOOT:
 	XopENTRY_set(&sd_rxmatch_xop, xop_desc, "Switch::Declare =~ match");
 	XopENTRY_set(&sd_rxmatch_xop, xop_class, OA_BINOP);
 	Perl_custom_op_register(aTHX_ sd_pp_rxmatch, &sd_rxmatch_xop);
+	XopENTRY_set(&dd_tail_xop, xop_name, "dd_tail");
+	XopENTRY_set(&dd_tail_xop, xop_desc, "Switch::Declare bind slurpy tail");
+	XopENTRY_set(&dd_tail_xop, xop_class, OA_BINOP);
+	Perl_custom_op_register(aTHX_ dd_pp_tail, &dd_tail_xop);
+	XopENTRY_set(&dd_hrest_xop, xop_name, "dd_hrest");
+	XopENTRY_set(&dd_hrest_xop, xop_desc, "Switch::Declare bind hash %rest");
+	XopENTRY_set(&dd_hrest_xop, xop_class, OA_LISTOP);
+	Perl_custom_op_register(aTHX_ dd_pp_hrest, &dd_hrest_xop);
 
 bool
 _isa(obj, klass)

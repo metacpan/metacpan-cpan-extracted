@@ -1,5 +1,5 @@
 package Algorithm::QuadTree::PP;
-$Algorithm::QuadTree::PP::VERSION = '0.5';
+$Algorithm::QuadTree::PP::VERSION = '0.6';
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -67,21 +67,21 @@ sub _loopOnNodesInCircle
 		my ($cxmin, $cymin, $cxmax, $cymax) = @{$current->{AREA}};
 
 		my $cx = $coords[0] < $cxmin
-			? $cxmin
+			? $cxmin - $coords[0]
 			: $coords[0] > $cxmax
-				? $cxmax
-				: $coords[0]
+				? $cxmax - $coords[0]
+				: 0
 		;
 
 		my $cy = $coords[1] < $cymin
-			? $cymin
+			? $cymin - $coords[1]
 			: $coords[1] > $cymax
-				? $cymax
-				: $coords[1]
+				? $cymax - $coords[1]
+				: 0
 		;
 
 		# first check if obj overlaps current segment.
-		next if ($coords[0] - $cx) ** 2 + ($coords[1] - $cy) ** 2
+		next if $cx ** 2 + $cy ** 2
 			> $radius_squared;
 
 		$current->{HAS_OBJECTS} = 1 if !$finding;
@@ -201,7 +201,7 @@ sub _AQT_delete
 	return unless exists $self->{BACKREF}{$object};
 
 	for my $node (@{$self->{BACKREF}{$object}}) {
-		$node->{OBJECTS} = [ grep {$_ ne $object} @{$node->{OBJECTS}} ];
+		@{$node->{OBJECTS}} = grep {$_ ne $object} @{$node->{OBJECTS}};
 		_clearHasObjects($node) if !@{$node->{OBJECTS}};
 	}
 
@@ -212,12 +212,18 @@ sub _AQT_clear
 {
 	my ($self) = @_;
 
-	for my $key (keys %{$self->{BACKREF}}) {
-		for my $node (@{$self->{BACKREF}{$key}}) {
-			$node->{OBJECTS} = [];
-			_clearHasObjects($node);
+	my @loopargs = $self->{ROOT};
+	while (my $current = shift @loopargs) {
+		next unless $current->{HAS_OBJECTS};
+		$current->{HAS_OBJECTS} = 0;
+
+		if ($current->{CHILDREN}) {
+			push @loopargs, @{$current->{CHILDREN}};
+		} else {
+			@{$current->{OBJECTS}} = ();
 		}
 	}
+
 	$self->{BACKREF} = {};
 }
 

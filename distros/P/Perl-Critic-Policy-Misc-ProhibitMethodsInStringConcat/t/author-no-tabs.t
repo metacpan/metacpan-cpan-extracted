@@ -38,6 +38,7 @@ my @files = (
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
+    't/check-warnings.pl',
     't/release-kwalitee.t',
     't/release-pause-permissions.t',
     't/release-test-legal.t',

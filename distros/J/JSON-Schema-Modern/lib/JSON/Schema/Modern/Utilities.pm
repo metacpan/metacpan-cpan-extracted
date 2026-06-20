@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.640';
+our $VERSION = '0.641';
 
 use 5.020;
 use strictures 2;
@@ -390,10 +390,8 @@ sub jsonp_set ($data, $pointer, $value) {
     # use this existing hash key or array index location, or create new position
     use autovivification 'store';
     $curp = \(
-      ref $curp->$* eq 'HASH' || $key !~ /^(?:\d+|-)\z/a
-        ? $curp->$*->{$key}
-        : $key =~ /^\d+\z/a
-        ? $curp->$*->[$key]
+      ref $curp->$* eq 'HASH' || $key !~ /^(?:\d+|-)\z/a ? $curp->$*->{$key}
+        : $key =~ /^\d+\z/a ? $curp->$*->[$key]
         : $curp->$*->[$curp->$*->$#* + 1]);
   }
 
@@ -695,6 +693,8 @@ sub core_formats_type () {
   # finds best match for a media-type against a list of media-types. if parameter(s) are included in
   # the media-type to be matched, all parameters must be present in the match value.
   sub match_media_type ($media_type_string, $media_types = []) {
+    return if not length $media_type_string;
+
     # return immediately if exact match exists
     return $media_type_string
       if @$media_types and any { $_ eq $media_type_string } @$media_types
@@ -790,7 +790,7 @@ sub E ($state, $error_string, @args) {
   my $uri = [ $state->@{qw(initial_schema_uri keyword_path)}, $state->{keyword}//(), @keyword_path_suffix ];
 
   my $keyword_location = $state->{traversed_keyword_path}
-    .jsonp($state->@{qw(keyword_path keyword)}, @keyword_path_suffix);
+    .jsonp($state->{keyword_path}, $state->{keyword}//(), @keyword_path_suffix);
 
   require JSON::Schema::Modern::Error;
   push $state->{errors}->@*, JSON::Schema::Modern::Error->new(
@@ -960,7 +960,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.640
+version 0.641
 
 =head1 SYNOPSIS
 

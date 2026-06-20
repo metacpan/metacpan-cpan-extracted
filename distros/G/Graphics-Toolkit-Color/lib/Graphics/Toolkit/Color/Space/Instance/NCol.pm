@@ -63,6 +63,7 @@ sub to_rgb {
 
 Graphics::Toolkit::Color::Space->new(
          name => 'NCol',
+       family => 'HWB',
          axis => [qw/hue whiteness blackness/],
          type => [qw/angular linear linear/],
         range => [600, 100, 100],

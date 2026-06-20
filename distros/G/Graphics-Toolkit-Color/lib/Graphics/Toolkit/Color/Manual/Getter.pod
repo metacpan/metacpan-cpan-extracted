@@ -1,0 +1,236 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Getter - reference of value access or value calculating methods
+
+=head1 SYNOPSIS
+
+This L<manual|Graphics::Toolkit::Color::Manual> page contains the most
+detailed description of the five methods:
+L</values>, L</name>, L</closest_name>, L</distance> and L</is_in_gamut>.
+These methods return various information about a color, but not a GTC object. 
+They might trigger an L<error|Graphics::Toolkit::Color::Manual::Error> if called incorrectly.
+
+=head1 METHODS
+
+=head2 values
+
+C<values> is the universal getter for numerical color values. It can be used 
+to convert, quantize or reformat the values of the color held by the object.
+The method accepts six optional, named arguments:
+C<in>, C<as>, C<raw>, C<range>, C<precision> and C<suffix>.
+If none are provided, the method returns a list with the 
+L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB> values
+in default range (0 .. 255), since I<RGB> is the default color space for IO.
+If one positional argument is provided, it is understood as the named
+argument L<in|Graphics::Toolkit::Color::Manual::Argument/in>, the
+name of the color space the values will be converted into. 
+
+L<as|Graphics::Toolkit::Color::Manual::Argument/as> lets you select the
+output L<format|Graphics::Toolkit::Color::Manual::Format> of the color
+definition, which defaults to I<'list'>. Other options are: C<'hash'>, 
+C<'char_hash'>, C<'named_array'>, C<'nested_array'>, C<'named_string'>, 
+C<'css_string'>, C<'array'> (RGB only) and C<'hex_string'> (RGB only).
+
+L<raw|Graphics::Toolkit::Color::Manual::Argument/raw> awaits a pseudo
+boolean which defaults to false. When false, the values will be clamped
+into range, which is either the default range of the selected color space (C<in>)
+or the range set by the user (C<range>).
+
+L<range|Graphics::Toolkit::Color::Manual::Argument/range> requires a range
+definition (follow the link for details about that). It will define the
+minimum and maximum value per axis.
+
+C<precision> needs a precision definition, that determines how many decimals 
+the result values will have. Use 5 to require five decimals (and so forth), 
+insert 0 to get no decimals (int) and -1 to get all the decimals (max. 15).
+If every value should have a different amount, use an ARRAY reference
+and put inside a precision number for each axis in the same order as in
+a range definition: C<< precision => [1,2,3] >>.
+
+C<suffix> accepts a suffix definition, which is a string or an ARRAY reference
+with strings (one per axis), pretty much like a C<precision> definition.
+That string will be attached to the value(s) in question, which is in many
+cases a percent sign I<'%'>. For instance an output in 
+L<HSL|Graphics::Toolkit::Color::Manual::Space/HSL> space will have
+I<saturation> and I<lightness> values with a suffix of I<'%'>. 
+This can be suppressed by adding C<< suffix => '' >>.
+
+    $blue->values();                                        # 0, 0, 255
+    $blue->values( in => 'RGB', as => 'list');              # 0, 0, 255 # explicit arguments
+    $blue->values(              as => 'array');             # [0, 0, 255] - RGB only
+    $blue->values( in => 'RGB', as => 'named_array');       # ['RGB', 0, 0, 255]
+    $blue->values( in => 'RGB', as => 'hash');              # { red => 0, green => 0, blue => 255}
+    $blue->values( in => 'RGB', as => 'char_hash');         # { r => 0, g => 0, b => 255}
+    $blue->values( in => 'RGB', as => 'named_string');      # 'rgb: 0, 0, 255'
+    $blue->values( in => 'RGB', as => 'css_string');        # 'rgb( 0, 0, 255)'
+    $blue->values(              as => 'hex_string');        # '#0000ff' - RGB only
+    $blue->values(           range => 2**16-1 );            # 0, 0, 65535 - RGB16 values
+    $blue->values('HSL');                                   # 240, 100, 50
+    $blue->values( in => 'HSL',suffix => ['', '%','%']);    # 240, '100%', '50%'
+    $blue->values( in => 'HSB',  as => 'hash')->{'hue'};    # 240
+   ($blue->values( 'HSB'))[0];                              # 240
+    $blue->values( in => 'XYZ', range => 1, precision => 2);# normalized, 2 decimals max.
+
+
+=head2 name
+
+C<name> returns a string with the name of the color or an empty string
+if the color held by the object has no name. This name will be normalized
+(lower case, no special character - read more 
+L<here|Graphics::Toolkit::Color::Manual::Name/SYNTAX>).
+In rare cases the method might return more than one color name. 
+It accepts four named, optional arguments: C<from>, C<full>, C<all> and C<distance>. 
+If only one, positional argument
+is provided, then it is understood as the C<from> value.
+
+L<from|Graphics::Toolkit::Color::Manual::Argument/from> selects the 
+L<color scheme|Graphics::Toolkit::Color::Manual::Name/SCHEME> the color
+names have to come from. Follow the last link to read what color schemes
+are and how to install them. The options are: I<Crayola>, I<CSS>, I<EmergyC>, 
+I<GrayScale>, I<HTML>, I<IE>, I<Mozilla>, I<Netscape>, I<Pantone>, 
+I<PantoneReport>, I<SVG>, I<VACCC>, I<Werner>, I<Windows> and I<WWW>.
+It is possible to select more than one scheme by providing an ARRAY reference
+with several scheme names. If no scheme name is provided, then the
+L<default scheme|Graphics::Toolkit::Color::Manual::Name/DEFAULT> is selected.
+Please note that even if the color object is created by numeric values,
+C<name> will return a color name.
+
+C<full> receives a pseudo boolean that defaults to false (0). 
+When set to true (1), the method will return full color names which are
+explained L<here|Graphics::Toolkit::Color::Manual::Name/SYNTAX>.
+In short: if C<< $color->name(from => 'SVG') >> returns I<'green'>,
+C<< $color->name(from => 'SVG', full => 1) >> will return I<'SVG:green'>.
+Colors from the default scheme will never contain a scheme name.
+
+C<all> gets also a pseudo boolean that defaults to false (0). 
+When set to true (1), the method might return several color names that
+identify the same color, like I<'gray'> and I<'gray50'>. This might be 
+the case if the default color scheme is selected or several schemes are
+chosen. In the latter case it is helpful to add the argument C<full>.
+
+C<distance> (or short C<d>) expects a number which defaults to 0.
+When set to a number larger than zero, the method will search for names
+of colors that are part of the chosen color scheme and that have a smaller
+or equal L</distance> to the color held by the object. It is very useful
+to combine it with the C<all> argument. The names will be sorted by 
+distance (closest first) or it will return the name of the closest color.
+But this ordering is not guaranteed when searching across several schemes.
+However, all returned names will always be unique, which is another
+reason to use C<full>.
+
+    $blue->name();                                   # 'blue'
+    $blue->name('SVG');                              # 'blue'
+    $blue->name( from => [qw/CSS X/], all => 1);     # 'blue', 'blue1'
+    $blue->name( from => 'CSS', full => 1);          # 'CSS:blue'
+    $blue->name( distance => 3, all => 1) ;          # all names within the distance
+
+
+=head2 closest_name
+
+C<closest_name> will always return one and only one color name, 
+which has the shortest L</distance> in L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB>
+to the current color. However, should you provide a self made, empty color scheme
+and you insist on only using this one, this method will return an empty string.
+In list context the caller will receive a second return value, which is the
+distance between the current color and the color whose name was found.
+The method accepts three named, optional arguments: C<from>, C<full> and C<all>,
+which work almost identically as for the method L</name>. 
+If only one, positional argument is provided, then it is understood as the C<from> value.
+
+C<all> has a slightly different meaning here, since there can be only one
+closest color. But this color can have several names. Get all of them 
+by switching this argument to true (1).
+
+    my $name = $red_like->closest_name;              # closest name in default scheme
+    my $name = $red_like->closest_name('HTML');      # closest HTML constant
+    ($red_name, $distance) = $red_like->closest_name( from => 'Pantone', all => 1 );
+
+
+=head2 distance
+
+C<distance> returns a floating point number that measures the Euclidean 
+distance between two colors, which represent two points in a color space. 
+One color is the calling object itself and the second one has to be provided 
+as either the only positional argument or the named argument C<to>, 
+which is the only required one. The other three, optional arguments are:
+C<only> (alias C<select>), C<range> and C<in>.
+
+L<to|Graphics::Toolkit::Color::Manual::Argument/to> receives a color
+definition in any format or a GTC object.
+
+L<only|Graphics::Toolkit::Color::Manual::Argument/only> selects along
+which color space dimension the distance will be measured. The default
+is all dimensions. It requires one or several (in a ARRAY reference) 
+axis names (long or short). For instance if you want to know only the 
+difference in brightness between two colors, you choose C<< only => 'lightness' >> 
+or C<< only => 'l' >>. This naturally works only if you did also select
+I<OKLAB> as the color space or something similar that has a I<lightness> 
+axis like I<CIELAB> or I<HSL>. It is allowed to repeat axis names to 
+weight their influence on the outcome. For instance to reproduce the formula:
+C<< $distance =  sqrt( 3 * $delta_red**2 + 4 * $delta_green**2 + 2 * $delta_blue**2) >>
+insert C<< only => [qw/ r r r g g g g b b/] >>.
+
+L<range|Graphics::Toolkit::Color::Manual::Argument/range> requires a range
+definition (follow the link for details about that). It will define the
+minimum and maximum value per axis and thus greatly change the result.
+Please note that this has nothing to do with how the color definition
+of the second color is read. Use constructor arguments and provide
+the object if the second color uses non-default ranges. This
+argument enables you for instance to calculate the distance
+in L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB> as if the
+values were normalized. In that case use C<< range => 1 >>.
+
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> sets the color space
+the L</distance> is calculated in. For compatibility it still defaults
+to L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB>, 
+but this will change with version 3.0. Please use the I<OKLAB> (better) 
+or I<CIELUV> space, if you are interested in getting a result that matches 
+the human perception.
+
+    my $d = $blue->distance( 'lapisblue' );                   # how close is blue to lapis?
+    $d = $blue->distance(  to => 'airyblue', only => 'b');    # have they the same amount of blue?
+    $d = $color->distance( to => $c2, in => 'HSL', only => 'hue' ); # same hue?
+    $d = $color->distance( to => $c2, range => 'normal' );    # distance with values in 0 .. 1 range
+    $d = $color->distance( to => $c2, only => [qw/r g b b/]); # double the weight of blue value differences
+
+
+=head2 is_in_gamut
+
+C<is_in_gamut> returns a perlish pseudo boolean (zero or one). It will 
+tell you, if a color is within the gamut (
+L<value range|Graphics::Toolkit::Color::Manual::Argument/range>) of a color space.
+It exists as method and as an importable subroutine. 
+
+The method has one optional default argument: 
+L<in|Graphics::Toolkit::Color::Manual::Argument/in>
+which defaults to the space the color was defined in. If a space name
+is provided the method asks the question, can I convert into that space
+without clamping?
+
+The subroutine has only one positional argument which works like the named
+argument L<color|Graphics::Toolkit::Color::Manual::Argument/color>, only
+with L<raw|Graphics::Toolkit::Color::Manual::Argument/raw> set to 1 (true). 
+
+    $color->is_in_gamut( in => 'okLab');                    # is $color in OKLAB gamut?
+
+    use Graphics::Toolkit::Color qw/is_in_gamut/;
+    is_in_gamut([ RGB =>  255, 0, 0]);                      # is it in RGB gamut ? 
+    if (is_in_gamut('rgb: 0, 0, 300')){...}                 # false, 300 has to be clamped to 255
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -6,7 +6,13 @@ use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Space 'max';
 
-sub from_rgb {
+sub from_cmyk {
+    my ($c, $m, $y, $k) = @{$_[0]};
+    return ( [(1-$c) * (1-$k) ,
+              (1-$m) * (1-$k) ,
+              (1-$y) * (1-$k) ] );
+}
+sub to_cmyk {
     my ($r, $g, $b) = @{$_[0]};
     my $km = max($r, $g, $b);
     return ([0,0,0,1]) unless $km; # prevent / 0
@@ -16,15 +22,9 @@ sub from_rgb {
                  1 - $km ]
     );
 }
-sub to_rgb {
-    my ($c, $m, $y, $k) = @{$_[0]};
-    return ( [(1-$c) * (1-$k) ,
-              (1-$m) * (1-$k) ,
-              (1-$y) * (1-$k) ] );
-}
 
 Graphics::Toolkit::Color::Space->new (
        axis => [qw/cyan magenta yellow key/],
-    convert => {RGB => [\&to_rgb, \&from_rgb]},
+    convert => {RGB => [\&from_cmyk, \&to_cmyk]},
 
 );

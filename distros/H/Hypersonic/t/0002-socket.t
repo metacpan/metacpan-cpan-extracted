@@ -6,6 +6,33 @@ use IO::Socket::INET;
 
 use Hypersonic::Socket;
 
+# Find a free TCP port by binding ephemerally.
+#
+# Pre-0.19 every subtest hard-coded `<base> + ($$ % 1000)` which
+# collides whenever two CPAN tester runs of the same perl get
+# matching PIDs in the same minute (which happens regularly on the
+# cpansmoker-1023 host; see Hypersonic 0.18 reports for perl 5.20.0
+# and 5.22.2: `bind(port=23789) failed: Address already in use` and
+# `bind(port=22803) failed: Address already in use`). Asking the
+# kernel to pick the port via bind(0) and then closing the probe
+# socket is the standard "find me an unused TCP port" idiom and
+# avoids the collision entirely. TIME_WAIT can still racily re-use
+# the port, but in practice the window between close() here and the
+# Hypersonic::Socket::create_listen_socket call below is small
+# enough that this is essentially free.
+sub find_free_port {
+    my $sock = IO::Socket::INET->new(
+        LocalAddr => '127.0.0.1',
+        LocalPort => 0,
+        Proto     => 'tcp',
+        Listen    => 1,
+        ReuseAddr => 1,
+    ) or die "Cannot find free port: $!";
+    my $port = $sock->sockport;
+    close $sock;
+    return $port;
+}
+
 # Test platform detection
 subtest 'Platform detection' => sub {
     my $platform = Hypersonic::Socket::platform();
@@ -23,7 +50,7 @@ subtest 'Platform detection' => sub {
 # Test socket creation
 subtest 'Socket creation and lifecycle' => sub {
     # Find an available port
-    my $port = 22000 + ($$ % 1000);
+    my $port = find_free_port();
 
     my $listen_fd = Hypersonic::Socket::create_listen_socket($port);
     ok($listen_fd > 0, "create_listen_socket returned valid fd: $listen_fd");
@@ -35,7 +62,7 @@ subtest 'Socket creation and lifecycle' => sub {
 
 # Test http_accept with actual connection
 subtest 'http_accept with connection' => sub {
-    my $port = 22300 + ($$ % 1000);
+    my $port = find_free_port();
 
     my $listen_fd = Hypersonic::Socket::create_listen_socket($port);
     ok($listen_fd > 0, 'listen socket created');
@@ -80,7 +107,7 @@ subtest 'http_accept with connection' => sub {
 
 # Test http_recv
 subtest 'http_recv parsing' => sub {
-    my $port = 22400 + ($$ % 1000);
+    my $port = find_free_port();
 
     my $listen_fd = Hypersonic::Socket::create_listen_socket($port);
 
@@ -138,7 +165,7 @@ subtest 'http_recv parsing' => sub {
 
 # Test http_send
 subtest 'http_send' => sub {
-    my $port = 22500 + ($$ % 1000);
+    my $port = find_free_port();
 
     my $listen_fd = Hypersonic::Socket::create_listen_socket($port);
 
@@ -190,7 +217,7 @@ subtest 'http_send' => sub {
 
 # Test http_send with custom content type
 subtest 'http_send with JSON content type' => sub {
-    my $port = 22600 + ($$ % 1000);
+    my $port = find_free_port();
 
     my $listen_fd = Hypersonic::Socket::create_listen_socket($port);
 
@@ -241,7 +268,7 @@ subtest 'http_send with JSON content type' => sub {
 
 # Test http_send_404
 subtest 'http_send_404' => sub {
-    my $port = 22700 + ($$ % 1000);
+    my $port = find_free_port();
 
     my $listen_fd = Hypersonic::Socket::create_listen_socket($port);
 
@@ -308,7 +335,7 @@ subtest 'Error handling' => sub {
 
 # Test port already in use
 subtest 'Port already in use' => sub {
-    my $port = 22800 + ($$ % 1000);
+    my $port = find_free_port();
 
     my $fd1 = Hypersonic::Socket::create_listen_socket($port);
     ok($fd1 > 0, 'First socket created');

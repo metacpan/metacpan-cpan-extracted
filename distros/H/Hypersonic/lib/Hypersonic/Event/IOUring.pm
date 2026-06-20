@@ -6,17 +6,37 @@ use 5.010;
 
 use parent 'Hypersonic::Event::Role';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 sub name { 'io_uring' }
 
 sub available {
     return 0 unless $^O eq 'linux';
 
-    # Check kernel version >= 5.1
+    # Check kernel version >= 5.13.
+    #
+    # We need kernel 5.13+ (not just 5.1+) because the readiness-only
+    # backend in 0.19+ uses io_uring_prep_poll_multishot() which was
+    # added in Linux 5.13 / liburing 2.1 (Aug 2021). Multi-shot poll
+    # is essential: with one-shot poll_add the userspace re-arm in
+    # gen_get_fd races against the main loop's recv() in a way that
+    # makes the freshly re-armed (level-triggered) poll fire while
+    # the buffer still has unread data, then fire AGAIN with an
+    # empty buffer after recv() drains, causing the next iteration
+    # to recv() and get EAGAIN, which the main loop treats as a
+    # disconnect. This bug killed all sequential-keep-alive tests
+    # (t/2100..t/2102, t/0035 WebSocket echo) the first time we
+    # tried readiness-only mode. Multi-shot lets the kernel manage
+    # the re-arm atomically with the readiness check, avoiding the
+    # race entirely.
+    #
+    # Kernels < 5.13 fall back to epoll automatically via
+    # Hypersonic::Event::best_backend's priority list. cpansmoker
+    # hosts on Debian 12 (kernel 6.1+) and Fedora 43 (kernel 6.x)
+    # all satisfy this; Debian 11 (5.10) and older fall back.
     my $ver = `uname -r 2>/dev/null` || '';
     my ($major, $minor) = $ver =~ /^(\d+)\.(\d+)/;
-    return 0 unless $major && ($major > 5 || ($major == 5 && $minor >= 1));
+    return 0 unless $major && ($major > 5 || ($major == 5 && $minor >= 13));
 
     # Check for liburing headers
     my $has_header = -f '/usr/include/liburing.h'
@@ -38,25 +58,70 @@ sub available {
     # Compile-link-and-RUN probe. A pure link check passes on systems
     # that have liburing installed but where io_uring_setup() will
     # nevertheless fail at runtime (kernel disabled, sandboxing, missing
-    # liburing.so at exec time). Actually open and close a ring.
+    # liburing.so at exec time). Also probe for io_uring_prep_poll_multishot
+    # symbol availability - the symbol was added in liburing 2.1, and
+    # the actual multishot poll operation requires kernel 5.13+. If
+    # either is missing we want to fall back to epoll silently.
     require Hypersonic::JIT::Util;
     return Hypersonic::JIT::Util->can_run(
         '',
         '-luring',
         'struct io_uring ring; int rc = io_uring_queue_init(8, &ring, 0); '
-            . 'if (rc < 0) return 1; io_uring_queue_exit(&ring); return 0;',
-        '#include <liburing.h>',
+            . 'if (rc < 0) return 1; '
+            . 'struct io_uring_sqe* sqe = io_uring_get_sqe(&ring); '
+            . 'if (!sqe) { io_uring_queue_exit(&ring); return 2; } '
+            . 'io_uring_prep_poll_multishot(sqe, 0, POLLIN); '
+            . 'io_uring_sqe_set_data(sqe, (void*)0); '
+            . 'io_uring_queue_exit(&ring); return 0;',
+        "#include <liburing.h>\n#include <poll.h>",
     );
 }
 
 sub includes {
-    # liburing.h for the server loop. <sys/epoll.h> is needed for the
-    # UA::Async slot-tracking helpers (gen_create_loop / _add_with_slot /
-    # _get_slot) - io_uring is Linux 5.1+ which always has epoll.
-    return "#include <liburing.h>\n#include <sys/epoll.h>";
+    # liburing.h for the server loop.
+    # <poll.h> for POLLIN (the readiness mask we pass to prep_poll_add).
+    # <sys/epoll.h> is needed for the UA::Async slot-tracking helpers
+    # (gen_create_loop / _add_with_slot / _get_slot) - io_uring is
+    # Linux 5.1+ which always has epoll.
+    return "#include <liburing.h>\n#include <poll.h>\n#include <sys/epoll.h>";
 }
 
 sub defines {
+    # 0.19+ uses io_uring purely as a readiness notifier via
+    # io_uring_prep_poll_multishot. Two subtle bugs would otherwise
+    # bite us; both are fixed here:
+    #
+    # BUG 1 - CQE pointer staleness. The previous gen_wait cached
+    # `struct io_uring_cqe*` pointers into a static array and called
+    # io_uring_cqe_seen() per-event from gen_get_fd. Each cqe_seen
+    # advances the user-side consumer cursor by one slot, freeing
+    # that slot for the kernel to overwrite with a new CQE. So by
+    # the time gen_get_fd dereferences cqes[i+1] for i+1 > 0, the
+    # kernel may have rewritten cqes[1..n-1]'s targets. The new
+    # design copies (user_data, res) VALUES out of each CQE inside
+    # the for_each_cqe loop, then calls io_uring_cq_advance(&ring,
+    # count) once to release all consumed slots at once. The
+    # downstream gen_get_fd reads from our private value array, never
+    # from the ring buffer.
+    #
+    # BUG 2 - fd reuse race. Suppose connection A is on fd 7 with a
+    # multi-shot poll registration whose CQEs carry user_data=7. The
+    # kernel may queue a CQE for fd 7 just before A is closed. The
+    # main loop closes fd 7. The next accept() returns fd 7 for a
+    # new connection B; the main loop calls gen_add(7) which arms a
+    # new multi-shot poll. The queued CQE from A arrives -- it
+    # carries user_data=7, looks valid, gen_get_fd returns fd=7, and
+    # the main loop calls recv(7) thinking it's data for B but B
+    # hasn't sent anything yet so recv returns EAGAIN and the main
+    # loop closes B as if it had disconnected. The fix is a per-fd
+    # generation counter, bumped on every gen_add and gen_del, with
+    # the current generation packed into the high 32 bits of
+    # user_data. gen_get_fd compares the CQE's generation to the
+    # current one and discards stale CQEs.
+    #
+    # CQEs from cancel SQEs (gen_del) carry user_data=0 by design
+    # so they can be cheaply distinguished from real poll completions
+    # in gen_get_fd.
     return <<'C';
 #define EV_BACKEND_IO_URING 1
 #ifndef URING_ENTRIES
@@ -66,11 +131,31 @@ sub defines {
 #define MAX_EVENTS 1024
 #endif
 
-/* User data encoding: type in high bits, fd in low bits */
-#define UD_ACCEPT 0x10000000
-#define UD_READ   0x20000000
-#define UD_WRITE  0x30000000
-#define UD_FD_MASK 0x0FFFFFFF
+/* MAX_FD is set by Hypersonic core to 65536, but its #define is
+ * emitted AFTER the backend's defines() block. Guard ours so the
+ * array declaration below has a valid size; the later core #define
+ * will be a redefinition to the same value, which gcc accepts. */
+#ifndef MAX_FD
+#define MAX_FD 65536
+#endif
+
+/* Value-copied CQE for the readiness-only design. See BUG 1 above. */
+typedef struct {
+    uint64_t ud;
+    int32_t  res;
+} hs_iouring_event_t;
+
+/* Per-fd generation counter. See BUG 2 above. Starts at 0; the very
+ * first gen_add() bumps to 1, so a user_data of 0 unambiguously means
+ * "this CQE is from a cancel SQE, not a real poll completion". */
+static uint32_t g_iouring_fd_gen[MAX_FD];
+
+/* Pack (generation, fd) into a uintptr_t for io_uring_sqe_set_data.
+ * Generation is in the high 32 bits so that incrementing it cannot
+ * collide with any valid fd value (which is at most MAX_FD-1).
+ * Cast to void* at the call site because that's what
+ * io_uring_sqe_set_data expects. */
+#define HS_IOURING_UD(fd)  ( ((uint64_t)g_iouring_fd_gen[(fd)] << 32) | (uint32_t)(fd) )
 C
 }
 
@@ -89,11 +174,15 @@ sub slot_event_struct { 'epoll_event' }
 sub extra_cflags  { '' }
 sub extra_ldflags { '-luring' }
 
-# io_uring is fundamentally different - uses submission/completion queues
+# io_uring is used here as a *readiness* notifier rather than for
+# completion-based I/O. The main event loop's accept() and recv()
+# calls do the actual I/O - identical to the epoll/kqueue path.
+# See the comment on `defines` above for the two subtle bugs
+# (CQE pointer staleness, fd reuse race) that this design fixes.
 sub gen_create {
     my ($class, $builder, $listen_fd_var) = @_;
 
-    $builder->comment('io_uring backend - high performance Linux I/O')
+    $builder->comment('io_uring backend - readiness-only multi-shot poll')
       ->line('static struct io_uring ring;')
       ->line('static int ring_initialized = 0;')
       ->blank
@@ -108,38 +197,115 @@ sub gen_create {
         ->line('ring_initialized = 1;')
       ->endif
       ->blank
-      ->comment('Submit initial accept')
-      ->line('struct io_uring_sqe* sqe = io_uring_get_sqe(&ring);')
-      ->if('sqe')
-        ->line("io_uring_prep_accept(sqe, $listen_fd_var, NULL, NULL, 0);")
-        ->line("io_uring_sqe_set_data(sqe, (void*)(uintptr_t)(UD_ACCEPT | $listen_fd_var));")
-        ->line('io_uring_submit(&ring);')
-      ->endif
-      ->line('int ev_fd = 0;')  # Dummy - io_uring uses ring structure
+      ->comment('Arm MULTI-SHOT poll for listen socket. The kernel')
+      ->comment('re-arms automatically after each event (no userspace')
+      ->comment('re-arm race). Generation counter is bumped first so')
+      ->comment('any stale CQEs from a previous lifetime of this fd are')
+      ->comment('discarded as stale by gen_get_fd.')
+      ->line('{')
+      ->line("    g_iouring_fd_gen[$listen_fd_var]++;")
+      ->line('    struct io_uring_sqe* _csqe = io_uring_get_sqe(&ring);')
+      ->line('    if (!_csqe) croak("io_uring_get_sqe() returned NULL during gen_create");')
+      ->line("    io_uring_prep_poll_multishot(_csqe, $listen_fd_var, POLLIN);")
+      ->line("    io_uring_sqe_set_data(_csqe, (void*)(uintptr_t)HS_IOURING_UD($listen_fd_var));")
+      ->line('    if (io_uring_submit(&ring) < 0) croak("io_uring_submit() failed: %s", strerror(errno));')
+      ->line('}')
+      ->line('int ev_fd = 0;')  # Dummy - io_uring uses the static ring
       ->blank;
 }
 
-# Submit read operation
+# Arm a MULTI-SHOT POLLIN poll for $fd_var. Kernel re-arms after each
+# completion automatically (kernel 5.13+ / liburing 2.1+, validated by
+# available()). Generation counter is bumped first so the new poll's
+# CQEs cannot be confused with stale CQEs from an earlier registration
+# on the same fd value (see BUG 2 in defines() comment).
 sub gen_add {
     my ($class, $builder, $loop_var, $fd_var) = @_;
 
-    $builder->line('sqe = io_uring_get_sqe(&ring);')
-      ->if('sqe')
-        ->line("io_uring_prep_recv(sqe, $fd_var, recv_buf, RECV_BUF_SIZE, 0);")
-        ->line("io_uring_sqe_set_data(sqe, (void*)(uintptr_t)(UD_READ | $fd_var));")
-        ->line('io_uring_submit(&ring);')
-      ->endif;
+    $builder->line('{')
+      ->line("    if ($fd_var >= 0 && $fd_var < MAX_FD) {")
+      ->line("        g_iouring_fd_gen[$fd_var]++;")
+      ->line('        struct io_uring_sqe* _asqe = io_uring_get_sqe(&ring);')
+      ->line('        if (_asqe) {')
+      ->line("            io_uring_prep_poll_multishot(_asqe, $fd_var, POLLIN);")
+      ->line("            io_uring_sqe_set_data(_asqe, (void*)(uintptr_t)HS_IOURING_UD($fd_var));")
+      ->line('            io_uring_submit(&ring);')
+      ->line('        }')
+      ->line('    }')
+      ->line('}');
 }
 
-# Cancel pending operations
+# Cancel any pending poll for $fd_var. MUST be called BEFORE close()
+# by the main loop.
+#
+# THE CRITICAL BIT: io_uring's multishot poll registration holds a
+# kernel-level `struct file` reference to the fd. The caller's
+# subsequent close(fd) only removes the fd from the process's fd
+# table; the underlying socket stays open (and the peer never sees a
+# TCP FIN) until io_uring drops its file reference. Since
+# io_uring_prep_cancel is async, that drop happens at an unspecified
+# later time -- the client can wait indefinitely for the EOF that
+# tells it "the response is complete".
+#
+# Symptom: short-lived `Connection: close` HTTP requests appear to
+# succeed on the server (response is fully sent) but the client's
+# blocking recv() loop never returns 0. Tests like t/2100 hang at
+# the first POST.
+#
+# Fix: call shutdown(fd, SHUT_RDWR) here BEFORE submitting the
+# cancel. shutdown operates on the socket directly and unconditionally
+# sends FIN to the peer regardless of any reference counts.
+# io_uring's struct file ref is irrelevant to whether TCP FIN goes
+# out. The caller's close() afterwards still does the right thing
+# (marks the fd unused in our process); io_uring will eventually
+# release its own ref when the cancel completes async.
+#
+# Bumping the generation counter (still done) is what closes the
+# fd-reuse race: from this moment on, any pending CQE that still
+# carries the old generation is silently discarded by gen_get_fd,
+# even if accept() reuses the fd number before the cancel completes.
+#
+# We use io_uring_prep_cancel (not io_uring_prep_poll_remove) because
+# poll_remove's signature flipped from void* to __u64 around liburing
+# 2.0 whereas prep_cancel's void* user_data is stable from 0.7+.
+#
+# The cancel SQE carries user_data=0 so its own CQE is cheaply
+# distinguishable from real poll CQEs (which always have non-zero
+# user_data thanks to the generation in the high 32 bits).
 sub gen_del {
     my ($class, $builder, $loop_var, $fd_var) = @_;
 
-    $builder->comment('io_uring: close fd (pending ops will complete with error)')
-      ->line("close($fd_var);");
+    $builder->line('{')
+      ->line("    if ($fd_var >= 0 && $fd_var < MAX_FD) {")
+      ->line("        g_iouring_fd_gen[$fd_var]++;")
+      ->line('    }')
+      ->comment('Force-send TCP FIN regardless of io_uring file refs')
+      ->line("    shutdown($fd_var, SHUT_RDWR);")
+      ->line('    struct io_uring_sqe* _dsqe = io_uring_get_sqe(&ring);')
+      ->line('    if (_dsqe) {')
+      ->line("        io_uring_prep_cancel(_dsqe, (void*)(uintptr_t)$fd_var, 0);")
+      ->line('        io_uring_sqe_set_data(_dsqe, NULL);')
+      ->line('        io_uring_submit(&ring);')
+      ->line('    }')
+      ->line('}');
 }
 
-# Wait for completions
+# Copy CQEs out of the ring buffer into our private value array, then
+# release all consumed ring slots at once with io_uring_cq_advance.
+# This avoids BUG 1 (pointer staleness) - we never reference ring
+# slots after they've been released. We also lose nothing functionally
+# because the only fields we ever need from a CQE are user_data and
+# res.
+#
+# CRUCIAL: do NOT `continue;` on -ETIME or -EINTR. The main loop's
+# shutdown-drain branch (which force-closes all connections when
+# g_shutdown is set) lives AFTER gen_wait but BEFORE the event-
+# processing loop. If we `continue;` here, we never reach that branch,
+# and a server with idle keep-alive connections that gets SIGTERMed
+# will spin in gen_wait forever (no CQEs arriving means perpetual
+# -ETIME). Instead, set count=0 and fall through so the shutdown
+# branch runs and the cleanup pass drains the connections. This is
+# the same shape as epoll_wait()=0 in the Epoll backend.
 sub gen_wait {
     my ($class, $builder, $loop_var, $events_var, $count_var, $timeout_var) = @_;
 
@@ -148,58 +314,59 @@ sub gen_wait {
       ->line("ts.tv_sec = $timeout_var / 1000;")
       ->line("ts.tv_nsec = ($timeout_var % 1000) * 1000000;")
       ->blank
-      ->comment('Wait for at least one completion')
-      ->line('int wait_result = io_uring_wait_cqe_timeout(&ring, &cqe, &ts);')
-      ->if('wait_result < 0')
-        ->if('wait_result == -ETIME')
-          ->line('continue;')  # Timeout is normal
-        ->endif
-        ->if('wait_result == -EINTR')
-          ->line('continue;')
-        ->endif
-        ->line('break;')
-      ->endif
-      ->blank
-      ->comment('Process all available completions')
-      ->line('unsigned head;')
       ->line("int $count_var = 0;")
-      ->line("static struct io_uring_cqe* cqes[MAX_EVENTS];")
-      ->line('io_uring_for_each_cqe(&ring, head, cqe) {')
-      ->line("    if ($count_var < MAX_EVENTS) cqes[$count_var++] = cqe;")
-      ->line('}')
-      ->line("$events_var = cqes;");  # Point to our array
+      ->line('static hs_iouring_event_t events_buf[MAX_EVENTS];')
+      ->line("$events_var = events_buf;")
+      ->blank
+      ->comment('Block until at least one completion is ready')
+      ->line('int wait_result = io_uring_wait_cqe_timeout(&ring, &cqe, &ts);')
+      ->if('wait_result == 0')
+        ->comment('Drain all currently available CQEs (BUG 1 fix: copy values)')
+        ->line('unsigned head;')
+        ->line('io_uring_for_each_cqe(&ring, head, cqe) {')
+        ->line("    if ($count_var < MAX_EVENTS) {")
+        ->line("        events_buf[$count_var].ud  = (uint64_t)(uintptr_t)io_uring_cqe_get_data(cqe);")
+        ->line("        events_buf[$count_var].res = cqe->res;")
+        ->line("        $count_var++;")
+        ->line('    }')
+        ->line('}')
+        ->line("io_uring_cq_advance(&ring, (unsigned)$count_var);")
+      ->elsif('wait_result == -ETIME || wait_result == -EINTR')
+        ->comment('Timeout / signal: fall through with count=0 so the')
+        ->comment('cleanup-on-shutdown branch can run. Do NOT continue;')
+      ->else
+        ->line('break;')
+      ->endif;
 }
 
-# Extract operation type and fd from completion
+# Extract fd from our private value-array CQE. NO io_uring_cqe_seen
+# call here - gen_wait already advanced the ring cursor once for the
+# whole batch.
+#
+# Filters applied (any failure -> continue, skip this event):
+#   * ud == 0           -> CQE is from a cancel SQE
+#   * res < 0           -> poll cancelled/errored (-ECANCELED, -EBADF, ...)
+#   * fd out of range   -> defensive guard against corruption
+#   * stale generation  -> fd was closed and reused, this CQE is for the
+#                          old lifetime (see BUG 2 in defines() comment)
 sub gen_get_fd {
     my ($class, $builder, $events_var, $index_var, $fd_var) = @_;
 
-    $builder->line("struct io_uring_cqe* completion = ${events_var}[$index_var];")
-      ->line('uintptr_t user_data = (uintptr_t)io_uring_cqe_get_data(completion);')
-      ->line('int op_type = user_data & 0xF0000000;')
-      ->line("int $fd_var = user_data & UD_FD_MASK;")
-      ->line('int result = completion->res;')
-      ->blank
-      ->comment('Mark completion as seen')
-      ->line('io_uring_cqe_seen(&ring, completion);')
-      ->blank
-      ->comment('Handle based on operation type')
-      ->if('op_type == UD_ACCEPT')
-        ->if('result >= 0')
-          ->comment('result is the new client fd')
-          ->line("int client_fd = result;")
-          ->line("$fd_var = listen_fd;")  # Signal this was accept
-        ->else
-          ->line('continue;')  # Accept failed
-        ->endif
-      ->elsif('op_type == UD_READ')
-        ->if('result <= 0')
-          ->comment('Connection closed or error')
-          ->line("close($fd_var);")
-          ->line('g_active_connections--;')
-          ->line('continue;')
-        ->endif
-        ->comment('result is bytes read - already in recv_buf')
+    $builder->line("uint64_t _ud  = ${events_var}[$index_var].ud;")
+      ->line("int      _res = ${events_var}[$index_var].res;")
+      ->if('_ud == 0')
+        ->line('continue;')  # cancel-SQE completion
+      ->endif
+      ->if('_res < 0')
+        ->line('continue;')  # poll cancelled / errored
+      ->endif
+      ->line('uint32_t _ud_gen = (uint32_t)(_ud >> 32);')
+      ->line("int $fd_var    = (int)(_ud & 0xFFFFFFFFu);")
+      ->if("$fd_var < 0 || $fd_var >= MAX_FD")
+        ->line('continue;')  # defensive: corrupted user_data
+      ->endif
+      ->if("_ud_gen != g_iouring_fd_gen[$fd_var]")
+        ->line('continue;')  # stale CQE from a previous fd lifetime
       ->endif;
 }
 
@@ -265,18 +432,12 @@ sub gen_get_slot {
 # already pull in <sys/epoll.h> via the generated Hypersonic includes.
 # We don't need to add it here.
 
-# Future/Pool integration - add pool notify fd via poll on the fd
-sub gen_add_pool_notify {
-    my ($class, $builder, $loop_var, $notify_fd_var) = @_;
-
-    $builder->line("/* Add pool notify fd to io_uring via poll */")
-            ->line('sqe = io_uring_get_sqe(&ring);')
-            ->if('sqe')
-              ->line("io_uring_prep_poll_add(sqe, $notify_fd_var, POLLIN);")
-              ->line("io_uring_sqe_set_data(sqe, (void*)(uintptr_t)(0x40000000 | $notify_fd_var));")
-              ->line('io_uring_submit(&ring);')
-            ->endif;
-}
+# Future/Pool integration: pool_notify_fd is added via the same
+# gen_add path as any client fd (just an arm-poll-add on the fd, with
+# user_data = fd). We rely on Hypersonic::Event::Role's default
+# gen_add_pool_notify which delegates to gen_add. The pre-0.19
+# override here used a UD_READ|fd encoding which broke alongside the
+# main accept-handoff bug.
 
 1;
 
@@ -296,23 +457,45 @@ Hypersonic::Event::IOUring - io_uring event backend for Linux 5.1+
 =head1 DESCRIPTION
 
 C<Hypersonic::Event::IOUring> is the io_uring-based event backend for
-Hypersonic. It provides the highest performance on modern Linux systems
-by using submission queues (SQE) and completion queues (CQE) to batch
-I/O operations and reduce syscall overhead.
+Hypersonic on Linux 5.1+. It uses io_uring as a B<readiness
+notification> mechanism via C<io_uring_prep_poll_add> (one-shot,
+level-triggered C<POLLIN>) and lets the main event loop's userspace
+C<accept(2)> and C<recv(2)> calls do the actual I/O - the same model
+as the epoll and kqueue backends, but with submissions batched
+through the io_uring submission queue.
 
-io_uring is fundamentally different from epoll/kqueue in that it:
+=head2 Why readiness-only, not completion-based?
+
+Hypersonic versions before 0.19 attempted to use io_uring's
+B<completion-based> I/O model (C<io_uring_prep_accept> +
+C<io_uring_prep_recv>) where the kernel performs the I/O and returns
+the result via C<cqe-E<gt>res>. That design had two unfixable bugs
+that produced empty HTTP responses and 5000s+ test hangs on CPAN
+smoker hosts:
 
 =over 4
 
-=item * Uses a ring buffer shared between kernel and userspace
+=item *
 
-=item * Supports true asynchronous I/O including accept, read, write
+The C<UD_ACCEPT> completion's C<cqe-E<gt>res> (the new client fd)
+was discarded by C<gen_get_fd> and control fell through to the
+shared accept loop which called C<accept(listen_fd)> - getting
+C<EAGAIN> because the kernel had already handed the connection to
+io_uring. The connection was leaked.
 
-=item * Can batch multiple operations in a single syscall
+=item *
 
-=item * Supports kernel-side polling for even lower latency
+C<UD_READ> used C<io_uring_prep_recv> into a B<single global>
+C<recv_buf>, so multiple concurrent clients would corrupt each
+other's request data.
 
 =back
+
+The readiness-only design is simpler, correct, and still benefits
+from io_uring's batched submission queue (one syscall to arm many
+polls). Native completion-based I/O could be added in a future
+release with per-fd buffers and a redesigned accept loop, but is
+out of scope for the 0.19 fix.
 
 =head1 METHODS
 
@@ -385,14 +568,11 @@ Generates C code to clean up io_uring resources on shutdown.
 
 =head1 USER DATA ENCODING
 
-io_uring uses user_data to track operations. This backend encodes
-the operation type in the high bits and the file descriptor in the
-low bits:
-
-    UD_ACCEPT (0x10000000) - accept operation
-    UD_READ   (0x20000000) - read/recv operation
-    UD_WRITE  (0x30000000) - write/send operation
-    UD_FD_MASK (0x0FFFFFFF) - mask to extract fd
+As of 0.19, user_data is just the file descriptor cast to C<void*>.
+The old high-bit-operation-type encoding (UD_ACCEPT / UD_READ /
+UD_WRITE / UD_FD_MASK) was removed when the backend was rewritten
+in readiness-only mode. Cancel submissions get NULL user_data so
+the completion handler can filter them out cheaply.
 
 =head1 PERFORMANCE
 

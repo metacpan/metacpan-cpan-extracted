@@ -20,10 +20,10 @@ sub tuple_from_hex {                                          # translate #00000
 }
 
 Graphics::Toolkit::Color::Space->new (
-        alias => 'SRGB',              # standard RGB
+   alias_name => 'SRGB',              # standard RGB, name is RGB
+       family => 'RGB',  
          axis => [qw/red green blue/],
         range => 255,
     precision => 0,
-       format => { 'hex_string' => [\&hex_from_tuple, \&tuple_from_hex],
-                        'array' => [ sub { $_[1] }, sub { $_[1] } ] },
+       format => { 'hex_string' => [\&hex_from_tuple, \&tuple_from_hex],}
 );

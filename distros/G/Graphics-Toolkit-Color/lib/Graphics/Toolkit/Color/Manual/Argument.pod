@@ -1,0 +1,264 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Argument - shape, content and meaning of recurring method arguments                                             
+
+=head1 SYNOPSIS
+
+As explained on the L<philosophy page|Graphics::Toolkit::Color::Manual::Philosophy/API>,
+GTC tries to reuse argument names as much as possible to lower the
+cognitive footprint of the API. On this page of the
+L<Manual|Graphics::Toolkit::Color::Manual> are the most comprehensive 
+explanations of all the arguments that are shared by at least two methods.
+All the remaining Arguments are explained in the context of their method.
+See a condensed overview of the here presented argument names on the 
+L<cheat sheet|Graphics::Toolkit::Color::Manual::CheatSheet/ARGUMENTS>.
+
+Please note that you do not have to wrap the named args in curly braces 
+(HASH ref) but you may if you prefer to do so. All GTC methods take
+named arguments, but also almost all methods have a default argument
+that can be used as a positional if it is the only argument.
+
+
+=head1 ARGUMENTS
+
+=head2 in
+
+C<in> selects a L<color space|Graphics::Toolkit::Color::Manual::Space>
+in which the operation will be calculated or in which the result will be
+delivered. The argument expects a string with the name of a color space.
+The options are currently: I<RGB>, I<LinearRGB>, I<CMY>, I<CMYK>, I<HSL>, 
+I<HSV>, I<HSB>, I<HWB>, I<NCol>, I<YIQ>, I<YUV>, I<CIEXYZ>, I<CIELAB>, 
+I<HunterLAB>, I<CIELUV>, I<CIELCHab>, I<CIELCHuv>, I<CIERGB>, I<AdobeRGB>,
+I<AppleRGB>, I<ProPhotoRGB>, I<WideGamutRGB>, I<DisplayP3>, I<DisplayP3Linear>,
+I<DCIP3>, I<DCIP3Linear>, I<Rec709>, I<Rec2020>, I<OKLAB>, I<OKLCH>, 
+I<OKHSL>, I<OKHSV>, I<OKHWB>. These spaces have alias names that are
+also acceptable: I<SRGB>, I<LinRGB>, I<YPbPr>, I<XYZ>, I<LAB>, I<LUV>,
+I<LCH>, I<LCHuv>, I<opRGB>, I<ROMMRGB>, I<P3>, I<LinearDisplayP3>,
+I<SMPTEP3>, I<LinearDCIP3>, I<BT709>, I<BT2020>. Please note that there
+is a great degree of freedom with which a color space name can be written.
+The user is free to use upper and lower case characters or to insert 
+special characters for better readability, such as whitespace I<' '>, 
+underscore I<'_'>, dash I<'-'> and dot I<'.'>.
+
+The default color space for input and output is I<RGB>, but most
+calculating methods default to I<OKLAB> or I<OKHSL> if a cylindrical
+option is needed (C<complement>).
+
+C<in> is understood by all methods except C<name> and C<closest_name>:
+L<new|Graphics::Toolkit::Color::Manual::Constructor/new>, 
+L<is_in_gamut|Graphics::Toolkit::Color::Manual::Getter/is_in_gamut>, 
+L<values|Graphics::Toolkit::Color::Manual::Getter/values>, 
+L<distance|Graphics::Toolkit::Color::Manual::Getter/distance>, 
+L<lighten|Graphics::Toolkit::Color::Manual::Calculation/lighten>, 
+L<darken|Graphics::Toolkit::Color::Manual::Calculation/darken>, 
+L<saturate|Graphics::Toolkit::Color::Manual::Calculation/saturate>, 
+L<desaturate|Graphics::Toolkit::Color::Manual::Calculation/desaturate>, 
+L<tint|Graphics::Toolkit::Color::Manual::Calculation/tint>, 
+L<tone|Graphics::Toolkit::Color::Manual::Calculation/tone>, 
+L<shade|Graphics::Toolkit::Color::Manual::Calculation/shade>,
+L<apply|Graphics::Toolkit::Color::Manual::Calculation/apply>, 
+L<set_value|Graphics::Toolkit::Color::Manual::Calculation/set_value>, 
+L<add_value|Graphics::Toolkit::Color::Manual::Calculation/add_value>,
+L<mix|Graphics::Toolkit::Color::Manual::Calculation/mix>, 
+L<invert|Graphics::Toolkit::Color::Manual::Calculation/invert>, 
+L<complement|Graphics::Toolkit::Color::Manual::Set/complement>, 
+L<analogous|Graphics::Toolkit::Color::Manual::Set/analogous>, 
+L<gradient|Graphics::Toolkit::Color::Manual::Set/gradient>, 
+L<cluster|Graphics::Toolkit::Color::Manual::Set/cluster>.
+The C<values> method also expects C<in> as a positional argument if it
+is the only one, since conversion into that space is the main purpose 
+of that method.
+
+
+=head2 by
+
+C<by> expects a number, which has to be a floating point 
+number between zero and one. The meaning of the value depends on the 
+method, but zero means this operation is not carried out and one means
+it is carried out to the maximum. C<by> is mostly used for the rather 
+simple methods of the high level (designer) API:
+L<lighten|Graphics::Toolkit::Color::Manual::Calculation/lighten>, 
+L<darken|Graphics::Toolkit::Color::Manual::Calculation/darken>, 
+L<saturate|Graphics::Toolkit::Color::Manual::Calculation/saturate>, 
+L<desaturate|Graphics::Toolkit::Color::Manual::Calculation/desaturate>, 
+L<tint|Graphics::Toolkit::Color::Manual::Calculation/tint>, 
+L<tone|Graphics::Toolkit::Color::Manual::Calculation/tone>, 
+L<shade|Graphics::Toolkit::Color::Manual::Calculation/shade>,
+L<mix|Graphics::Toolkit::Color::Manual::Calculation/mix>. 
+The value may also be provided as a positional argument if it is the
+only one in all the methods except C<mix>. There you can also use the
+alias C<amount> instead of C<by>.
+
+
+=head2 to
+
+C<to> expects a color since it is used for methods that calculate a
+relation between that color and the one held by the object. 
+Other methods that accept C<to> calculate color(s) that are the result
+of those two. The value of this argument can be provided as a GTC object
+or a color definition (color name or values).
+(See L<formats page|Graphics::Toolkit::Color::Manual::Format> on how to 
+write a color definition.)
+Please note that only scalar color definitions can work in this context.
+The following methods accept the C<to> argument:  
+L<distance|Graphics::Toolkit::Color::Manual::Getter/distance>, 
+L<mix|Graphics::Toolkit::Color::Manual::Calculation/mix>, 
+L<analogous|Graphics::Toolkit::Color::Manual::Set/analogous>, 
+L<gradient|Graphics::Toolkit::Color::Manual::Set/gradient>.
+
+C<mix> and C<gradient> can handle also an ARRAY that contains any number
+of colors, which can be formatted independently.
+
+
+=head2 color
+
+C<color> is the pendant to the argument L</to> and receives the same input.
+It only uses a different word to communicate the different role of the
+color in question. Whereas C<to> implies a "target", "the other", 
+"that color", just C<color> implies "this color", "here". Because GTC
+tries to have an API that speaks in plain English, that difference is not
+reducible. This argument is currently used in 
+L<new|Graphics::Toolkit::Color::Manual::Constructor> and
+L<is_in_gamut|Graphics::Toolkit::Color::Manual::Getter/is_in_gamut>.
+
+
+=head2 range
+
+C<range> sets the minimal and maximal value limits on each axis. Those are
+normally prescribed by the color space the color was defined in or the
+color space the operation is performed in (see argument L</in>).
+But those limits can be overruled with a custom range definition that is
+provided via the C<range> argument, which is especially handy if reading a 
+color definition via C<new> or C<is_in_gamut> that uses non-standard ranges, 
+so it can be interpreted as intended.
+
+A range definition can have many forms since there are two mechanisms in 
+place to shorten them. But for clarity let's look at a full-fledged range
+definition first:
+
+ range => [[0, 100], [0, 100], [0, 100]],
+ 
+This range definition is for a space with three axes. On each axis the
+minimum limit will be set to zero and the maximum to 100. Please note 
+that the axes have a fixed order. In I<RGB> for instance, red is the
+axis number one, green is number two and blue is three. Thus the first
+C<[0, 100]> would set the red axis and so forth. But since in this example
+every axis is set to the same limits, the user is free to shorten
+range definition to C<[0, 100]>. And because a minimum of zero is default,
+the range definition can be further shortened just to C<100> or C<'percent'> 
+which is an alias to C<[0, 100]>, same as C<'normal'> is an alias to C<[0, 1]>.
+There are only those two aliases at the moment. So in order to read a
+I<RGB16> color definition that uses ranges of C<0 .. 65535> instead of 
+C<0 .. 255> one might use the argument C<< range => 65535 >> or 
+C<< range => 2**16-1 >> or C<< range => (2**16)-1 >>. 
+Alternatively there is a HASH syntax too, using long or short axes names:
+
+ range => {r => 'percent', g => [-1,1], b => 500},
+
+Please note that a valid range definition has to cover the minimum and
+maximum of each axis of the current color space.
+The following methods accept the I<range> argument: 
+L<new|Graphics::Toolkit::Color::Manual::Constructor>, 
+L<values|Graphics::Toolkit::Color::Manual::Getter/values>,
+L<is_in_gamut|Graphics::Toolkit::Color::Manual::Getter/is_in_gamut>, 
+L<distance|Graphics::Toolkit::Color::Manual::Getter/distance>.
+
+
+=head2 raw
+
+C<raw> expects a perlish pseudo boolean (0 or 1). When set to true,
+GTC will not change the color values even if they are out of L</range>.
+Values on angular axes might still get put into range, because a rotation
+of 360 degrees is no change in mathematical-geometric meaning.
+
+I<raw> is set off (false) by default for IO methods, because this is usually
+the expected behaviour by the user and by the calculation methods. They might
+create unexpected results when getting fed out of gamut colors as input.
+Here it is mostly useful in debugging scenarios.
+
+I<raw> is set on (true) by default at the I<is_in_gamut> method, because 
+in most cases it does not make sense to clamp a color into gamut and then
+ask if it is in gamut, which would be always true. However - it can be 
+useful to set it there to false in combination with the L</in> argument. 
+It can be a valid question to ask if a color, 
+that got clamped into range in its original space, gets out of gamut
+when converted into another space.
+
+The I<raw> argument can be used in:
+L<new|Graphics::Toolkit::Color::Manual::Constructor>, 
+L<values|Graphics::Toolkit::Color::Manual::Getter/values>, 
+
+
+=head2 steps
+
+C<steps> is an argument of color set producing methods that defines how
+many colors will be produced. It expects a positive integer value.
+The following methods accept C<steps>:
+L<complement|Graphics::Toolkit::Color::Manual::Set/complement>, 
+L<analogous|Graphics::Toolkit::Color::Manual::Set/analogous>, 
+L<gradient|Graphics::Toolkit::Color::Manual::Set/gradient>.
+The method C<analogous> might produce fewer than the required amount
+of colors, if a resulting color would be out of L</range>.
+
+
+=head2 tilt
+
+C<tilt> is another argument of color set producing methods that influences
+all colors except the first and last one. All methods that employ C<tilt>
+compute colors that are located along a line or curve, however that curve
+may be shaped. The C<tilt> factor moves the colors along this curve toward
+one end. Because in case of the C<complement> method the curve is a circle,
+the mentioned ends are the starting color and its opposite, THE complement.
+C<tilt> expects a floating point number. If it is positive, 
+the computed colors will congregate toward the target color and if it
+is negative they congregate toward the start color. The greater the absolute
+C<tilt> value, the greater the effect. Due to the nature of the C<analogous> 
+algorithm that projects the curve in the direction of the target color 
+and draws it far beyond, a positive C<tilt> will increase the drive in 
+that direction and a negative C<tilt> will let it decrease.
+The following methods accept C<tilt>:
+L<complement|Graphics::Toolkit::Color::Manual::Set/complement>, 
+L<analogous|Graphics::Toolkit::Color::Manual::Set/analogous>, 
+L<gradient|Graphics::Toolkit::Color::Manual::Set/gradient>. 
+
+
+=head2 only
+
+C<only> will limit the scope of the operation to selected axes.
+It expects one or several (in an ARRAY ref) axis names (long or short).
+The following methods accept C<only>:
+L<distance|Graphics::Toolkit::Color::Manual::Getter/distance>, 
+L<invert|Graphics::Toolkit::Color::Manual::Calculation/invert>.
+The C<distance> method uses also the alias C<select>, which has the 
+same meaning as C<only>.
+
+
+=head2 from
+
+C<from> selects a color scheme which is a set of color names with associated 
+SRGB values. C<from> expects a name of a color scheme which is usually 
+the name of a standard like I<HTML>, I<SVG> or others. 
+Read all about them L<on this page|Graphics::Toolkit::Color::Manual::Name>.
+Every color scheme is provided by a L<Graphics::ColorNames> module.
+The easiest way is to install them all via L<Bundle::Graphics::ColorNames>.
+The following methods accept C<from>:
+L<name|Graphics::Toolkit::Color::Manual::Getter/name> and
+L<closest_name|Graphics::Toolkit::Color::Manual::Getter/closest_name>.
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -125,7 +125,7 @@ sub basis           { $_[0]{'basis'}}
 sub is_axis_numeric {
     my ($self, $axis_nr) = @_;
     return 0 if not defined $axis_nr or not exists $self->{'type'}[$axis_nr];
-    $self->{'type'}[$axis_nr] == 2 ? 0 : 1;
+    $self->{'type'}[$axis_nr] < 2 ? 1 : 0;
 
 }
 sub is_axis_euclidean {
@@ -133,6 +133,11 @@ sub is_axis_euclidean {
     return 0 if not defined $axis_nr or not exists $self->{'type'}[$axis_nr];
     $self->{'type'}[$axis_nr] == 1 ? 1 : 0;
 
+}
+sub is_axis_angular {
+    my ($self, $axis_nr) = @_;
+    return 0 if not defined $axis_nr or not exists $self->{'type'}[$axis_nr];
+    $self->{'type'}[$axis_nr] == 0 ? 1 : 0;
 }
 sub axis_value_max { # --> +value
     my ($self, $axis_nr, $range) = @_;
@@ -262,25 +267,22 @@ sub clamp { # change values if outside of range to nearest boundary, angles get 
     return $range unless ref $range;
     $tuple = [] unless ref $tuple eq 'ARRAY';
     pop  @$tuple     while @$tuple > $self->basis->axis_count;
+    $tuple = [@$tuple];
+
     for my $axis_nr ($self->basis->axis_iterator){
-        next unless $self->is_axis_numeric( $axis_nr ); # touch only numeric values
+        next unless $self->is_axis_numeric( $axis_nr );
         if (not defined $tuple->[$axis_nr]){
             my $default_value = 0;
             $default_value = $range->[$axis_nr][0] if $default_value < $range->[$axis_nr][0]
                                                    or $default_value > $range->[$axis_nr][1];
             $tuple->[$axis_nr] = $default_value;
-            next;
-        }
-        if ($self->{'type'}[$axis_nr]){
-            $tuple->[$axis_nr] = $range->[$axis_nr][0] if $tuple->[$axis_nr] < $range->[$axis_nr][0];
-            $tuple->[$axis_nr] = $range->[$axis_nr][1] if $tuple->[$axis_nr] > $range->[$axis_nr][1];
         } else {
-            my $delta = $range->[$axis_nr][1] - $range->[$axis_nr][0];
-            $tuple->[$axis_nr] += $delta while $tuple->[$axis_nr] < $range->[$axis_nr][0];
-            $tuple->[$axis_nr] -= $delta while $tuple->[$axis_nr] > $range->[$axis_nr][1];
-            $tuple->[$axis_nr] = $range->[$axis_nr][0] if $tuple->[$axis_nr] == $range->[$axis_nr][1];
-        }
+            next unless $self->is_axis_euclidean( $axis_nr );
+			$tuple->[$axis_nr] = $range->[$axis_nr][0] if $tuple->[$axis_nr] < $range->[$axis_nr][0];
+			$tuple->[$axis_nr] = $range->[$axis_nr][1] if $tuple->[$axis_nr] > $range->[$axis_nr][1];
+		}
     }
+    $tuple = $self->rotate($tuple, $range);
     if ($self->has_constraints){
 		$tuple = $self->normalize( $tuple, $range);
 		for my $constraint (values %{$self->{'constraint'}}){
@@ -288,6 +290,28 @@ sub clamp { # change values if outside of range to nearest boundary, angles get 
 		}
 		$tuple = $self->denormalize( $tuple, $range);
 	}    
+    return $tuple;
+}
+sub rotate { # rotate values of circular dimensions into range
+    my ($self, $tuple, $range) = @_;
+    return unless $self->basis->is_number_tuple( $tuple );
+    $range = $self->try_check_range_definition( $range );
+    return $range unless ref $range;
+    $tuple = [@$tuple];
+    for my $axis_nr ($self->basis->axis_iterator){
+        next unless $self->is_axis_angular( $axis_nr );
+        if (not defined $tuple->[$axis_nr]){
+            my $default_value = 0;
+            $default_value = $range->[$axis_nr][0] if $default_value < $range->[$axis_nr][0]
+                                                   or $default_value > $range->[$axis_nr][1];
+            $tuple->[$axis_nr] = $default_value;
+        } else {
+			my $delta = $range->[$axis_nr][1] - $range->[$axis_nr][0];
+			$tuple->[$axis_nr] += $delta while $tuple->[$axis_nr] < $range->[$axis_nr][0];
+			$tuple->[$axis_nr] -= $delta while $tuple->[$axis_nr] > $range->[$axis_nr][1];
+			$tuple->[$axis_nr] = $range->[$axis_nr][0] if $tuple->[$axis_nr] == $range->[$axis_nr][1];
+		}
+    }
     return $tuple;
 }
 

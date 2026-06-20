@@ -54,6 +54,7 @@
             "Encode" : "0",
             "ExtUtils::HasCompiler" : "0.014",
             "File::Spec" : "0",
+            "Getopt::Long::Descriptive" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Net::IDN::Encode" : "0",
@@ -86,7 +87,6 @@
             "Exporter" : "0",
             "Feature::Compat::Try" : "0",
             "File::ShareDir" : "0",
-            "Getopt::Long::Descriptive" : "0",
             "JSON::PP" : "4.11",
             "List::Util" : "1.55",
             "MIME::Base64" : "0",
@@ -101,7 +101,6 @@
             "Moo" : "0",
             "Moo::Role" : "0",
             "MooX::TypeTiny" : "0.002002",
-            "Safe::Isa" : "1.000008",
             "Scalar::Util" : "0",
             "Types::Common::Numeric" : "0",
             "Types::Standard" : "1.016003",
@@ -128,6 +127,7 @@
             "Data::Validate::URI" : "0",
             "DateTime::Format::RFC3339" : "0",
             "Email::Address::XS" : "1.04",
+            "Getopt::Long::Descriptive" : "0",
             "Net::IDN::Encode" : "0",
             "Sereal" : "0",
             "Time::Moment" : "0",
@@ -248,67 +248,67 @@
    "provides" : {
       "JSON::Schema::Modern" : {
          "file" : "lib/JSON/Schema/Modern.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Annotation" : {
          "file" : "lib/JSON/Schema/Modern/Annotation.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Document" : {
          "file" : "lib/JSON/Schema/Modern/Document.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Error" : {
          "file" : "lib/JSON/Schema/Modern/Error.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Result" : {
          "file" : "lib/JSON/Schema/Modern/Result.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::ResultNode" : {
          "file" : "lib/JSON/Schema/Modern/ResultNode.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Utilities" : {
          "file" : "lib/JSON/Schema/Modern/Utilities.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Vocabulary" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Vocabulary::Applicator" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Applicator.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Vocabulary::Content" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Content.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Vocabulary::Core" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Core.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAnnotation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAssertion" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Vocabulary::MetaData" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/MetaData.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Vocabulary::Unevaluated" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       },
       "JSON::Schema::Modern::Vocabulary::Validation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Validation.pm",
-         "version" : "0.640"
+         "version" : "0.641"
       }
    },
    "release_status" : "stable",
@@ -323,7 +323,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern"
       }
    },
-   "version" : "0.640",
+   "version" : "0.641",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.043010"
@@ -450,7 +450,7 @@
                }
             },
             "name" : "@Author::ETHER/generate CONTRIBUTING",
-            "version" : "0.015"
+            "version" : "0.016"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
@@ -1219,7 +1219,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.640",
+                  "tag" : "v0.641",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1426,7 +1426,8 @@
                      "Email::Address::XS",
                      "Net::IDN::Encode",
                      "Sereal",
-                     "Cpanel::JSON::XS"
+                     "Cpanel::JSON::XS",
+                     "Getopt::Long::Descriptive"
                   ],
                   "modules_from_features" : null,
                   "to_relationship" : "suggests"
@@ -1549,7 +1550,7 @@
       "Test::Mojo::Role::OpenAPI::Modern" : "< 0.007"
    },
    "x_generated_by_perl" : "v5.43.10",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.41",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0,
    "x_use_unsafe_inc" : 0

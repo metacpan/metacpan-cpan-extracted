@@ -1,0 +1,412 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Space - details about supported color spaces
+
+=head1 SYNOPSIS
+
+GTC supports 33 color spaces. This 
+L<manual|Graphics::Toolkit::Color::Manual> page lists them all and displays 
+their name, alias name, family name, axis names (long, short and role)
+and all other properties that might help GTC users, like I<shape>, I<gamma>, 
+I<white point> and so on. These terms are explained L<here|/TERMS>. 
+Some sections about a specific color space are enriched by useful 
+background information and historical context.
+See a condensed overview of the color spaces, sorted by family at the
+L<CheatSheet|Graphics::Toolkit::Color::Manual::CheatSheet/SPACES>.
+
+=head1 INTRODUCTION
+
+Color spaces are mathematical-geometrical constructs that associate each
+color with a point inside a coordinate system. The numerical values of a 
+color definition are viewed as coordinates associated with the axes that 
+express different properties. The closer two colors are along an axis the 
+more similar they are in that property. That is also why the ordering of
+the values does matter. Axes have a canonical order which in most cases 
+is reflected in the space name. The values have to be in that same order.
+For the majority of spaces, axes have a long name, often an English word,
+and a short name that is one letter. More often than not the first 
+character of the long name is the short name.
+
+All color spaces are finite and only certain value ranges along an
+axis are acceptable. In other words: there is a mandatory minimum and 
+maximum value for each axis. A I<normal> axis simply has an associated 
+minimum value of zero and maximum of one.
+L<Color definitions|Graphics::Toolkit::Color::Manual::Format> 
+that do not obey this restriction are out of 
+I<gamut> (L<is_in_gamut|Graphics::Toolkit::Color::Manual::Getter/is_in_gamut>).
+And while there might be sometimes subtle differences between value range
+and gamut, these are no subject of consideration here.
+
+Almost all spaces have 3 dimensions (axes), only I<CMYK> has four.
+And most spaces are completely linear like in Euclidean (everyday) geometry,
+but some spaces are cylindrical. 
+That means only two axes are straight lines and one is angular (circle shaped),
+because the associated value describes an angle. Some spaces have additional
+constraints about their shape. For instance L</HSV> has the shape of a
+cone and not of a cylinder and also L</HWB> is not a cylinder since
+the sum of I<whiteness> and I<blackness> should never exceed 100%.
+
+While the author acknowledges that some of the spaces below should be called 
+systems to be technically correct, they still will be called spaces here,
+because one goal of this software is a seamless interoperability between them.
+
+=head1 FAMILY
+
+Another approach to heighten the interoperability is to group them into 
+families of similar spaces. Every family has a representative color space,
+which lends its name as family name. The other members of the family need 
+to provide a way to map their axes to the axes of the representative.
+This is achieved either by having the same long axis names (like I<HSL>
+and I<OKHSL>) or by assigning a role name to each axis. For instance 
+the I<chroma> axis of the I<LCH> space has the role name I<saturation> 
+so GTC can treat the I<chroma> the same way as an I<HSL> I<saturation> value. 
+The spaces on this page are grouped by family (for better orientation), 
+but not every color space belongs to a family, hence the chapter L</Other>.
+
+=head1 ORDER
+
+Please note the ordering of spaces within each family. That corresponds 
+to the internal search order. That means if you define a color with values 
+in L<hash format|Graphics::Toolkit::Color::Manual::Format/hash>, 
+a HASH reference with values under the keys of I<red>, I<green> and I<blue>,
+they will be understood as standard L</RGB> values. I<RGB> is also the 
+first entry here for the I<RGB family>. This is especially noteworthy 
+since many operations default to OK-type spaces like L<OKLAB> or L<OKHSL>,
+but L<CIELAB> and L<HSL> are higher in search order.
+
+=head1 SYNTAX
+
+Whenever a color space name is used within a 
+L<color definition|Graphics::Toolkit::Color::Manual::Format>, it has to
+be written as shown here in the chapter headings. But there is a rather 
+great degree of freedom to write the name in various ways. First of all
+the name and its alias can be used synonymously by the user. Only when
+GTC writes a color definition, it never uses alias names. Secondly,
+upper and lower case are acceptable. Although some formats will force
+the output to be in a certain casing style. Thirdly, there is a list of
+acceptable, special characters as: underscore I<'_'>, dash I<'-'>,
+whitespace I<' '> and dot I<'.'>. They might be inserted into names to
+write them like I<'BT.2020'>, but that's optional.
+
+=head1 TERMS
+
+The L</SYNTAX> section already explained the relation between a B<name>
+and B<alias name> and the section before laid out what a space 
+L</FAMILY> is and why there is the concept of an B<axis role>.
+The L</INTRODUCTION> told about long and short B<axes names>, 
+axis B<ranges>, I<normal> ranges and B<gamut>.
+Large gamut just means a space encompasses more colors than other spaces.
+The B<whitepoint> is the set of values that represent pure white in a certain space.
+The conversion between spaces is always a mathematical algorithm, but 
+some conversions are simpler than others. Some are fulfilled by just one 
+operation. There the values of the color are taken as vector that gets
+multiplied with a B<conversion matrix> to obtain the values in the target 
+space. And sometimes conversions consist just of scaling, where a gamma
+value gets applied to every color value: C<$value = $value ** $gamma>. 
+In some cases there are some additional operations to smooth out the edges of 
+the curve. But in any case this procedure is called B<transfer function>.
+
+
+=head1 RGB family
+
+=head2 RGB
+
+(alias name is B<SRGB> - standard RGB) is the default color space of this 
+module internally and for input and output.
+It is used by most computer hardware like monitors and follows the logic of 
+additive color mixing as produced by an overlay of three colored light beams.
+The sum of all colors will be white, as opposed to subtractive mixing. 
+I<RGB> is a completely Cartesian (Euclidean) 3D space and thus an I<RGB>
+tuple consists of three integer values:
+
+B<red> (short B<r>) range: 0 .. 255, B<green> (short B<g>) range: 0 .. 255
+and B<blue> (short B<b>) range: 0 .. 255.
+A higher value means that a stronger amount of that base color flows into 
+the mix that is displayed on a black background. Therefore black is (0, 0, 0), 
+white (255, 255, 255) and a pure red (fully saturated color) is (255, 0, 0). 
+RGB has a gamma of 2.4, but a piecewise transfer function, which is 
+clipped at the corners (around the normalized values of zero and one).
+
+=head2 LinearRGB
+
+(alias name is B<LinRGB>)
+Same as L</RGB> but with normal value ranges (0 .. 1) and removed piecewise
+gamma correction. That means there is a linear correlation between the 
+shown values and the RGB brightness of the pixel on the screen without
+any adaptation to human sensibilities. Its alias name is B<LinRGB>.
+
+
+=head2 CIEXYZ
+
+this space (alias B<XYZ>) has the axis B<X>, B<Y> and B<Z> (long and short
+axis names are this time the same), that refer to the red, green and blue 
+receptors (cones) in the retina (on the back side of the eye). Because 
+those cones measure a lot more left and right than just exactly those colors,
+they got these technical names. The values in that space tell you about 
+the amount of chemical and neurological activity a color produces inside
+the eye. The values ranges are always from zero and reach 95.047 on the
+C<X> - axis, 100 on C<Y> and 108.883 on C<Z>, due to the used white
+point of I<D65> which has these values divided by 100. The illuminant
+I<D65> is standard for all CIE spaces except I<CIERGB>.
+
+=head2 CIERGB
+
+1931 standardized, normal valued (0 .. 1) space with same axis as L</RGB>:
+I<red> (I<r>), I<green> (I<g>) and I<blue> (I<b>). 
+It has the illuminant E and no gamma (linear RGB).
+
+=head2 AdobeRGB
+
+(alias name B<opRGB>) is a normalized L</RGB> variant with the 
+CIE white point D65 a gamma of about 2.2.
+
+=head2 AppleRGB
+
+normal L</RGB> variant with white point of D65 and gamma is 1.8.
+It is the legacy color space Apple used in the 90ies.
+
+=head2 ProPhotoRGB
+
+(alias name B<ROMMRGB>) normal L</RGB> variant with a white point of
+D50, gamma = 1.8 and a wide gamut.
+
+=head2 WideGamutRGB
+
+Even greater gamut then previous spaces with white point D50 and gamma of ~2.2.
+
+=head2 Display P3
+
+wide gamut RGB variant with same gamma function as L</RGB>, 
+has alias name B<P3>.
+
+=head2 Display P3 Linear
+
+P3 variant without any gamma - wider gamut variant of L<\LinearRGB>.
+
+=head2 DCI-P3
+
+Simply I<Display P3 Linear> with a gamma of 2.4, has alias name B<SMPTE P3>.
+
+=head2 DCI-P3 Linear
+
+DCI variant without gamma
+
+=head2 Rec.709
+
+RGB space, has alias name B<BT.709>.
+
+=head2 Rec.2020
+
+RGB space, has alias name B<BT.2020>.
+
+
+=head1 LAB family
+
+=head2 CIELAB
+
+(alias B<LAB>) is a derivate of L</CIEXYZ> that reorders the colors along
+axis that reflect how the brain processes them. It uses three information
+channels. One named B<L> (lightness) with a real value range of (0 .. 100).
+Second is channel B<a>, that reaches from red to green (-500 .. 500) and
+thirdly B<b> from yellow to blue (-200 .. 200). Values will be displayed
+with three decimals. The long names of the axis names contain a '*'
+and are thus: B<L*>, B<a*> and B<b*>. The I<a> and I<b> axis reflect the
+opponent color theory.
+
+=head2 HunterLAB
+
+predecessor of L</CIELAB> by Richard S. Hunter with no alias name and
+slightly different color transitions on yellow-blue-direction.
+The axis have same long and short names: B<L> with normal values (0 .. 1),
+B<a> -172.30 .. 172.30 and B<b> -67.20 .. 67.20.
+
+=head2 CIELUV
+
+(alias B<LUV>) is a more perceptually uniform version of L</CIELAB> and
+the axis I<a> and I<b> got renamed to I<u> and I<v> (see L</YUV>) but
+did not change their meaning. It has also three Cartesian dimension named
+B<L*>, B<u*> and B<v*>, (short names have only the first letter of these names).
+They have real valued ranges, which are 0 .. 100, -134 .. 220 and
+-140 .. 122.
+
+
+=head2 OKLAB
+
+is a modern improvement of L</CIELAB> by Bjoern Ottosson with no alias name
+and for nicer color transitions and better numeric behaviour.
+The axis long names are same as the same ones: B<L> with values (0 .. 1),
+B<a> and B<b> with both (-0.5 .. 0.5). If you want to use it like in B<CSS>,
+just add C<< range => [100, [-120,120], [-120,120]], suffix => '%' >>.
+
+=head2 YIQ
+
+Is a space developed for I<NTSC> to broadcast a colored television signal,
+which is still compatible with black and white TV. It achieves this by
+sending the B<luminance> (short I<y>) (sort of brightness with real range
+of 0 .. 1) in channel number one, which is all black and white TV needs.
+Additionally we have the axis of B<in-phase> (short B<i>)
+(cyan - orange - balance, range -0.5959 .. 0.5959) and
+B<quadrature> (short B<q>) (magenta - green - balance, range: -0.5227 .. 0.5227).
+
+=head2 YPbPr
+
+Is a slightly altered version of L<YIQ> for the I<PAL> TV standard.
+We use a variant called B<YUV>, which can also be used as space name.
+It has computation friendly value ranges and is still relevant in video
+and image formats and compression algorithms, but under the name I<YCbCr>.
+The only difference is that I<YCbCr> works with digital values but
+this module computes with real (analogue) values to enable any precision
+the user might prefer. To make this clear, this space holds the name B<YPbPr>.
+It has three Cartesian axis: 1. B<luma> (short B<y>) with a real value
+range of 0..1, 2. B<Pb> (short I<u>, -0.5 .. 0.5) and 3. B<Pr>
+(short I<v>, -0.5 .. 0.5). (see also L</CIELUV>)
+
+
+=head1 HSL family
+
+=head2 HSL
+
+.. is a cylindrical space that orders colors along cognitive properties.
+The first dimension is the angular one and it rotates in 360 degrees around
+the rainbow of fully saturated colors: 0 = red, 15 approximates orange,
+60 - yellow 120 - green, 180 - cyan, 240 - blue, 270 - violet,
+300 - magenta, 330 - pink. 0 and 360 points to the same coordinate.
+This module only outputs 0, even if accepting 360 as input. The second,
+linear dimension (axis) measures the distance between a point the center
+column of the cylinder at the same height, no matter in which direction.
+The center column has the value 0 (white .. gray .. black) and the outer
+mantle of the cylinder contains the most saturated, purest colors.
+The third, vertical axis reaches from bottom value 0 (always black no
+matter the other values) to 100 (always white no matter the other values).
+In summary: HSL needs three integer values: B<hue> (short B<h>) (0 .. 360),
+B<saturation> (short B<s>) (0 .. 100) and B<lightness> (short B<l>) (0 .. 100).
+
+=head2 OKHSL
+
+B<OKHSL> is a variant of I<HSL> for perceptual uniformity by Bjoern Ottosson. 
+It has no alias name and the same axis names: B<hue> (short B<h>) (0 .. 360),
+B<saturation> (short B<s>) (0 .. 1) and B<lightness> (short B<l>) (0 .. 1).
+
+=head2 CIELCHab
+
+(alias B<LCH>) is the cylindrical version of the L</CIELAB> with the
+dimensions B<luminance>, B<chroma> and B<hue> - in short  B<l>,  B<c> and B<h>,
+with the roles of B<lightness>, B<saturation> and B<hue>.
+The real valued ranges are from zero to 100, 539 and 360 respectively.
+Like with the L</HSL> and L</HSV>, hue is the circular dimension and its
+value is meant as degrees in a circle. For gray colors in the middle
+column the value I<hue> has no importance and will in this implementation 
+always be zero.
+
+=head2 CIELCHuv
+
+(alias B<LCHuv>) is the cylindrical version of the L</CIELUV> and works 
+similar to L<CIELCHab> except the real valued range of B<chroma> is 
+(0 .. 261) and the space has no alias name.
+
+
+=head2 OKLCH
+
+is the cylindrical variant of L</OKLAB> just parallels L</CIELCHab>.
+The axis names are again: B<luminance>, B<chroma> and B<hue> - in short:
+B<l>,  B<c> and B<h> with the roles of B<lightness>, B<saturation> and B<hue>. 
+Value ranges are similar as in C<OKLAB>:
+I<luminance> 0 .. 1 (normal), I<chroma> 0 .. 0.5 and I<hue> are angles
+of 0 .. 360 degrees. Also if you prefer a B<CSS> compatible format,
+use C<< range => [100, 120, 360] >> and a preferred suffix.
+
+
+=head1 HSV family
+
+=head2 HSV
+
+... is also cylindrical but is shaped like a cone.
+Similar to HSL we have B<hue> and B<saturation>, but the third axis is
+named B<value> (short B<v>). In L<HSL> we always get white, when I<lightness>
+is 100. In HSV additionally I<saturation> has to be zero to get white.
+When I<saturation> is 100 and I<value> is 100 we have the purest, most
+saturated color of whatever I<hue> sets. So unlike in C<HSL>, here every
+color has its unique coordinates.
+
+=head2 HSB
+
+Is an alias to L</HSV>, just the I<value> axis is renamed with B<brightness> (B<b>).
+
+=head2 OKHSV
+
+B<OKHSL> is a variant of I<HSV> for percepual uniformity. It has no alias 
+name and the same axis names: B<hue> (short B<h>) (0 .. 360),
+B<saturation> (short B<s>) (0 .. 1) and B<value> (short B<v>) (0 .. 1).
+
+
+=head1 HWB family
+
+=head2 HWB
+
+An inverted L</HSV>, where the saturated, pure colors are on the center
+column of the cylinder. It still has the same circular B<hue> dimension
+with an integer range of 0 .. 360. The other two, linear dimensions
+(also 0 .. 100 integer range with optional suffix '%') are B<whiteness>
+(B<w>) and B<blackness> (B<b>). They describe how much white or black
+are mixed into the pure hue. If both are zero, you get a pure color.
+I<whiteness> of 100 always leads to white and I<blackness> of 100 always
+leads to black. The space is truncated as a cone so the sum of I<whiteness>
+and I<blackness> can never be greater than 100.
+
+=head2 NCol
+
+Is a more human readable variant of the L</HWB> space with an altered
+B<hue> values, that consists of a letter and two digits.
+The letter demarks one of the six areas around the rainbow. B<R> is I<Red>,
+B<Y> (I<Yellow>), B<G> (I<Green>), B<C> (I<Cyan>), B<B> (I<Blue>),
+B<M> (I<Magenta>). The two digits after this letter are an angular value,
+measuring the distance between the pure color (as stated by the letter)
+and the described color (toward the next color on the rainbow).
+The B<whiteness> and B<blackness> axis have integer values with the
+suffix I<'%'>, since they are percentual values as well.
+
+=head2 OKHWB
+
+B<OKHWB> is a variant of I<HWB> for percepual uniformity. It has no alias 
+name and the same axis names: B<hue> (short B<h>) (0 .. 360),
+B<whiteness> (short B<w>) (0 .. 1) and B<blackness> (short B<b>) (0 .. 1).
+
+
+=head1 Other
+
+=head2 CMY
+
+is the opposite of L</RGB> since it follows the logic of subtractive
+color mixing as used in printing. Think of it as the amount of colored
+ink on white paper, so that white is (0,0,0) and black (1,1,1).
+It uses normalized real value ranges: 0 .. 1.
+An CMY tuple has also three values:
+
+B<cyan> (short B<c>) is the inverse of I<red>,
+B<magenta> (short B<m> ) is inverse to I<green> and
+B<yellow> (short B<y>) is inverse of I<blue>.
+
+=head2 CMYK
+
+is an extension of L</CMY> with a fourth value named B<key> (short B<k>),
+which is the amount of black ink mixed into the CMY color.
+It also has an normalized range of 0 .. 1. This should not bother you
+since you are free to change the range at your preference.
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

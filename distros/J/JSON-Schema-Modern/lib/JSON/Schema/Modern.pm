@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.639-11-g6ce510f0
+package JSON::Schema::Modern; # git description: v0.640-7-g1b0501d9
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.640';
+our $VERSION = '0.641';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -24,9 +24,8 @@ use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint pairmap uniqstr min);
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
-use builtin::compat qw(refaddr load_module);
+use builtin::compat qw(refaddr load_module blessed);
 use Mojo::URL;
-use Safe::Isa;
 use Mojo::File 'path';
 use Clone 'clone';
 use File::ShareDir 'dist_dir';
@@ -152,6 +151,8 @@ around BUILDARGS => sub ($orig, $class, @args) {
 
   return $args;
 };
+
+my $_isa = sub ($obj, $class) { blessed($obj) && $obj->isa($class) };
 
 sub add_schema {
   croak 'insufficient arguments' if @_ < 2;
@@ -1293,7 +1294,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.640
+version 0.641
 
 =head1 SYNOPSIS
 

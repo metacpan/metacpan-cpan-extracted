@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.95';
+our $VERSION = '1.96';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -299,6 +299,8 @@ This distribution has the following dependencies
 
 =item * L<OpenSSL.org|https://www.openssl.org/>
 
+=item * L<Wikipedia: OpenSSL|https://en.wikipedia.org/wiki/OpenSSL>
+
 =item * L<Wikipedia: PKCS12|https://en.wikipedia.org/wiki/PKCS_12>
 
 =item * L<RFC:7292: "PKCS #12: Personal Information Exchange Syntax v1.1"|https://datatracker.ietf.org/doc/html/rfc7292>
@@ -387,7 +389,7 @@ In alphabetical order, contributors, bug reporters and all
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2004-2024 by Dan Sully
+Copyright 2004 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

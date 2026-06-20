@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.315';
+our $VERSION = '0.316';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -133,6 +133,55 @@ has _has_github_remote => (
     }
     close $fh;
     return 0;
+  },
+);
+
+has gitea => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{gitea} },
+);
+
+# Known Gitea/Forgejo forge hosts for this author — these get GiteaMeta without
+# any per-dist flag: Codeberg (Forgejo) and the author's own instance.
+my @KNOWN_GITEA_HOSTS = qw( codeberg.org src.ci );
+
+# Host of the dist's first git remote (parsed from .git/config in the cwd,
+# which dzil sets to the dist root). Undef when there is no remote.
+has _remote_host => (
+  is      => 'ro',
+  isa     => 'Maybe[Str]',
+  lazy    => 1,
+  default => sub {
+    my $config = '.git/config';
+    return undef unless -e $config;
+    open my $fh, '<', $config or return undef;
+    my $url;
+    while (my $line = <$fh>) {
+      if ($line =~ m{^\s*url\s*=\s*(\S+)}) { $url = $1; last }
+    }
+    close $fh;
+    return undef unless defined $url;
+    my ($host) = $url =~ m{(?: ^\w+:// (?:[^/\@]+\@)? | ^[^/\@]+\@ ) ([^/:]+)}x;
+    return $host;
+  },
+);
+
+# True when the dist should get Gitea/Forgejo metadata (Author::GETTY::GiteaMeta)
+# instead of the generic [Repository]: a known Gitea host, or an explicit
+# gitea = 1 flag. Requires a usable remote host and no GitHub remote (GitHub
+# always wins). Additive — GitHub dists are unaffected.
+has _is_gitea_remote => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub {
+    my $self = shift;
+    return 0 unless $self->no_github;
+    my $host = $self->_remote_host or return 0;
+    return 1 if $self->gitea;
+    return ( grep { lc($host) eq $_ } @KNOWN_GITEA_HOSTS ) ? 1 : 0;
   },
 );
 
@@ -480,7 +529,22 @@ sub configure {
     }
   ]);
 
-  $self->add_plugins($self->no_github ? 'Repository' : [ 'GithubMeta' => { issues => 1 } ]);
+  # Repository metadata. Three-way, additive: GitHub dists keep GithubMeta
+  # exactly as before; Gitea/Forgejo dists (a known host, or gitea = 1) get
+  # proper forge URLs via Author::GETTY::GiteaMeta built for the actual remote
+  # host; anything else falls back to the generic Repository.
+  if (!$self->no_github) {
+    $self->add_plugins([ 'GithubMeta' => { issues => 1 } ]);
+  }
+  elsif ($self->_is_gitea_remote) {
+    $self->add_plugins([ 'Author::GETTY::GiteaMeta' => {
+      issues => 1,
+      host   => $self->_remote_host,
+    } ]);
+  }
+  else {
+    $self->add_plugins('Repository');
+  }
 
   # Add IRC metadata if configured
   if ($self->irc) {
@@ -624,7 +688,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.315
+version 0.316
 
 =head1 SYNOPSIS
 
@@ -793,6 +857,24 @@ found — e.g. the dist lives on GitLab, Codeberg, a private Gitea, or has no
 remote at all — C<no_github> defaults to 1 so that the GitHub-specific plugins
 are skipped entirely. Set C<no_github = 0> explicitly to force GitHub plugins
 on even without a detected remote.
+
+For repository metadata in the no-GitHub case the bundle is forge-aware: a
+remote pointing at a Gitea/Forgejo host gets proper C<repository>/
+C<bugtracker>/C<homepage> resources via
+L<Dist::Zilla::Plugin::Author::GETTY::GiteaMeta> (the Gitea/Forgejo counterpart
+of L<Dist::Zilla::Plugin::GithubMeta>); anything else falls back to the generic
+L<Dist::Zilla::Plugin::Repository>. The known Gitea hosts (C<codeberg.org> and
+the author's own instance) are detected automatically; for any other
+self-hosted Gitea/Forgejo instance set L</gitea>. Purely additive —
+GitHub-hosted distributions are unaffected.
+
+=head2 gitea
+
+If set to 1, the dist's git remote host is treated as a Gitea/Forgejo instance
+and gets C<repository>/C<bugtracker>/C<homepage> META via
+L<Dist::Zilla::Plugin::Author::GETTY::GiteaMeta>, built for that host. Use this
+for a self-hosted Gitea/Forgejo that is not one of the auto-detected known
+hosts. Has no effect when a GitHub remote is present (GitHub wins).
 
 =head2 no_github_release
 
@@ -1127,6 +1209,8 @@ L<Dist::Zilla::Plugin::MetaProvides::Package>
 L<Dist::Zilla::Plugin::PodWeaver>
 
 L<Dist::Zilla::Plugin::Repository>
+
+L<Dist::Zilla::Plugin::Author::GETTY::GiteaMeta>
 
 L<Dist::Zilla::Plugin::Run>
 

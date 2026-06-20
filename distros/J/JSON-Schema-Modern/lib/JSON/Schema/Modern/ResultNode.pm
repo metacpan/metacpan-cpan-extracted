@@ -4,7 +4,7 @@ package JSON::Schema::Modern::ResultNode;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Common code for nodes of a JSON::Schema::Modern::Result
 
-our $VERSION = '0.640';
+our $VERSION = '0.641';
 
 use 5.020;
 use Moo::Role;
@@ -18,7 +18,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
-use Safe::Isa;
 use Types::Standard qw(Str Undef InstanceOf);
 use Types::Common::Numeric 'PositiveOrZeroInt';
 use JSON::Schema::Modern::Utilities qw(jsonp json_pointer_type);
@@ -121,7 +120,7 @@ JSON::Schema::Modern::ResultNode - Common code for nodes of a JSON::Schema::Mode
 
 =head1 VERSION
 
-version 0.640
+version 0.641
 
 =head1 SYNOPSIS
 

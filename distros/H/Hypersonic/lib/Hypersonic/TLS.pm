@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # JIT-compiled TLS/HTTPS support for Hypersonic
 # Uses OpenSSL for TLS support (via Alien::OpenSSL when available)

@@ -1,0 +1,5 @@
+Revision history for DBIx-Class-Relationship-ManyToMany-Async
+
+0.01      2026-06-19 20:45:53+02:00 Europe/Paris
+        - Initial release (experimental).
+        - Async many_to_many accessors for DBIx::Class::Async:

@@ -13,9 +13,14 @@ lib/Mojolicious/Plugin/Fondation/Model/DBIx/Async.pm
 lib/Mojolicious/Plugin/Fondation/Model/DBIx/Async/Action/DBIx.pm
 t/01-model-helper.t
 t/02-action-dbix.t
+t/03-relations.t
 t/03-shutdown.t
 t/lib/DBIxTestHelper.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxAsync.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxAsync/Schema/Result/Article.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxAsync/Schema/Result/User.pm
+t/lib/Mojolicious/Plugin/Fondation/TestDBIxRelation.pm
+t/lib/Mojolicious/Plugin/Fondation/TestDBIxRelation/Schema/Result/Group.pm
+t/lib/Mojolicious/Plugin/Fondation/TestDBIxRelation/Schema/Result/User.pm
+t/lib/Mojolicious/Plugin/Fondation/TestDBIxRelation/Schema/Result/UserGroup.pm
 t/lib/TestDBIxAsyncSchema.pm

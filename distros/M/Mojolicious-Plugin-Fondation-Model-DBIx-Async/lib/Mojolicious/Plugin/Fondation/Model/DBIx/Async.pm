@@ -1,8 +1,6 @@
 package Mojolicious::Plugin::Fondation::Model::DBIx::Async;
-$Mojolicious::Plugin::Fondation::Model::DBIx::Async::VERSION = '0.01';
-# ABSTRACT: Fondation plugin exposing DBIx::Class::Async natively —
-# ResultSets, Futures, worker pool. No hashref wrapper or Future→Mojo::Promise
-# conversion. 100% async.
+$Mojolicious::Plugin::Fondation::Model::DBIx::Async::VERSION = '0.02';
+# ABSTRACT: Fondation plugin exposing DBIx::Class::Async natively
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
@@ -257,11 +255,11 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Fondation::Model::DBIx::Async - Fondation plugin exposing DBIx::Class::Async natively —
+Mojolicious::Plugin::Fondation::Model::DBIx::Async - Fondation plugin exposing DBIx::Class::Async natively
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

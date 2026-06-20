@@ -5,6 +5,9 @@
 #include "ppport.h"
 
 #define CHILDREN_PER_NODE 4
+#define MAX_SIZE_INITIAL 4
+#define MAX_SIZE_GROWTH 2
+#define MAX_SIZE_CLEAR 32
 
 typedef struct QuadTreeNode QuadTreeNode;
 typedef struct QuadTreeRootNode QuadTreeRootNode;
@@ -70,19 +73,36 @@ void destroy_array_SV(DynArr* arr)
 	destroy_array(arr);
 }
 
+void clear_array_SV(DynArr *arr)
+{
+	int i;
+	for (i = 0; i < arr->count; ++i) {
+		SvREFCNT_dec((SV*) arr->ptr[i]);
+	}
+
+	arr->count = 0;
+
+	if (arr->max_size >= MAX_SIZE_CLEAR) {
+		arr->max_size = 0;
+		free(arr->ptr);
+	}
+}
+
 void push_array(DynArr *arr, void *ptr)
 {
-	if (arr->max_size == 0) {
-		arr->max_size = 2;
-		arr->ptr = malloc(arr->max_size * sizeof *arr->ptr);
-	}
-	else if (arr->count == arr->max_size) {
-		arr->max_size *= 2;
+	if (arr->count == arr->max_size) {
+		if (arr->max_size == 0) {
+			arr->max_size = MAX_SIZE_INITIAL;
+			arr->ptr = malloc(arr->max_size * sizeof *arr->ptr);
+		}
+		else {
+			arr->max_size *= MAX_SIZE_GROWTH;
 
-		void *enlarged = realloc(arr->ptr, arr->max_size * sizeof *arr->ptr);
-		assert(enlarged != NULL);
+			void *enlarged = realloc(arr->ptr, arr->max_size * sizeof *arr->ptr);
+			assert(enlarged != NULL);
 
-		arr->ptr = enlarged;
+			arr->ptr = enlarged;
+		}
 	}
 
 	arr->ptr[arr->count] = ptr;
@@ -197,21 +217,18 @@ bool is_within_node_rect(QuadTreeNode *node, double xmin, double ymin, double xm
 bool is_within_node_circ(QuadTreeNode *node, double x, double y, double radius)
 {
 	double check_x = x < node->xmin
-		? node->xmin
+		? node->xmin - x
 		: x > node->xmax
-			? node->xmax
-			: x
+			? node->xmax - x
+			: 0
 	;
 
 	double check_y = y < node->ymin
-		? node->ymin
+		? node->ymin - y
 		: y > node->ymax
-			? node->ymax
-			: y
+			? node->ymax - y
+			: 0
 	;
-
-	check_x -= x;
-	check_y -= y;
 
 	return check_x * check_x + check_y * check_y <= radius * radius;
 }
@@ -263,6 +280,38 @@ void fill_nodes(QuadTreeRootNode *root, QuadTreeNode *node, SV *value, Shape *pa
 	}
 }
 
+void clear_node(QuadTreeNode *node)
+{
+	if (!node->has_objects) return;
+	node->has_objects = false;
+
+	if (node->values != NULL) {
+		clear_array_SV(node->values);
+	}
+	else {
+		int i;
+		for (i = 0; i < CHILDREN_PER_NODE; ++i) {
+			clear_node(&node->children[i]);
+		}
+	}
+}
+
+void clear_tree(QuadTreeRootNode *root)
+{
+	clear_node(root->node);
+
+	char *key;
+	I32 retlen;
+	SV *value;
+
+	hv_iterinit(root->backref);
+	while ((value = hv_iternextsv(root->backref, &key, &retlen)) != NULL) {
+		destroy_array((DynArr*) SvIV(value));
+	}
+
+	hv_clear(root->backref);
+}
+
 /* XS helpers */
 
 SV* get_hash_key (HV* hash, const char* key)
@@ -278,29 +327,6 @@ QuadTreeRootNode* get_root_from_perl(SV *self)
 	HV *params = (HV*) SvRV(self);
 
 	return (QuadTreeRootNode*) SvIV(get_hash_key(params, "ROOT"));
-}
-
-void clear_tree(QuadTreeRootNode *root)
-{
-		char *key;
-		I32 retlen;
-		SV *value;
-		int i;
-
-		hv_iterinit(root->backref);
-		while ((value = hv_iternextsv(root->backref, &key, &retlen)) != NULL) {
-			DynArr *list = (DynArr*) SvIV(value);
-			for (i = 0; i < list->count; ++i) {
-				QuadTreeNode *node = (QuadTreeNode*) list->ptr[i];
-				destroy_array_SV(node->values);
-				node->values = create_array();
-				clear_has_objects(node);
-			}
-
-			destroy_array(list);
-		}
-
-		hv_clear(root->backref);
 }
 
 /* proper XS Code starts here */

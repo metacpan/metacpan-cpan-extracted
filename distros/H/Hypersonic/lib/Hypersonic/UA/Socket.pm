@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use constant MAX_SOCKETS => 65536;
 use constant RECV_BUF_SIZE => 65536;

@@ -8,7 +8,13 @@ use Graphics::Toolkit::Color::Space qw/round_decimals/;
 
 my $TAU = 6.283185307;
 
-sub from_luv {
+sub from_lch {
+    my ($lch) = shift;
+    my $u = $lch->[1] * cos($lch->[2] * $TAU) * 261;
+    my $v = $lch->[1] * sin($lch->[2] * $TAU) * 261;
+    return ([$lch->[0], ($u+134) / 354, ($v+140) / 262 ]);
+}
+sub to_lch {
     my ($luv) = shift;
     my $u = $luv->[1] *  354 - 134;
     my $v = $luv->[2] *  262 - 140;
@@ -19,19 +25,15 @@ sub from_luv {
     $h += $TAU if $h < 0;
     return ([$luv->[0], $c / 261, $h / $TAU ]);
 }
-sub to_luv {
-    my ($lch) = shift;
-    my $u = $lch->[1] * cos($lch->[2] * $TAU) * 261;
-    my $v = $lch->[1] * sin($lch->[2] * $TAU) * 261;
-    return ([$lch->[0], ($u+134) / 354, ($v+140) / 262 ]);
-}
 
 Graphics::Toolkit::Color::Space->new(
-       name => 'CIELCHuv',
-      alias => 'LCHuv',
-       axis => [qw/luminance chroma hue/],
-       type => [qw/linear linear angular/],
-      range => [100, 261, 360],
-  precision => 3,
-    convert => {LUV => [\&to_luv, \&from_luv]},
+           name => 'CIELCHuv',
+     alias_name => 'LCHuv',
+         family => 'HSL',
+           axis => [qw/luminance chroma hue/],
+           role => [qw/lightness saturation hue/],
+           type => [qw/linear linear angular/],
+          range => [100, 261, 360],
+      precision => 3,
+        convert => {LUV => [\&from_lch, \&to_lch]},
 );

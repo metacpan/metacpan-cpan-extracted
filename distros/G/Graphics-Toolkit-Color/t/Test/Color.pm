@@ -4,7 +4,7 @@
 package Test::Color;
 use v5.12;
 use warnings;
-require Exporter;
+use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(is_tuple);
 use Test::Builder;

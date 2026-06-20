@@ -1,5 +1,28 @@
 Revision history for Switch-Declare
 
+0.06    2026-06-19
+        - New `case PATTERN -> [..] / {..}` destructuring bind: a matching arm
+          can destructure the topic into lexicals private to that arm's block.
+          Supports the full Destructure::Declare grammar (nested patterns,
+          `undef` holes, `//` defaults, trailing `@rest` / `%rest`). The topic
+          is read once into a hidden temp; bindings lower to plain
+          `my $x = $tmp->[i]` statements with no cost until the arm runs. A flat
+          array binding takes a fast path - a single native
+          `my (...) = @{$topic // []}` list-assignment - so it runs at
+          hand-written speed (a constant scrutinee, which can never match a
+          [..] arm, keeps the safe per-element path).
+        - The destructuring engine is Destructure::Declare's destructure.h,
+          pulled in at build time via ExtUtils::Depends.
+
+0.05    2026-06-19
+        - Fix compile failure on perl 5.14 and 5.16 introduced by the 0.04
+          scalar-variable patterns (`case == $x` / `case eq $x` / `case =~ $rx`):
+          * pad_findmy_pvn (5.15.1+) is now shimmed back to Perl_pad_findmy on
+            5.14, matching the existing pad_add_name_pvn shim.
+          * the `our` pad-name resolution no longer uses the PADNAME API
+            (5.18+); it now uses the version-stable PAD_COMPNAME_FLAGS_isOUR /
+            PAD_COMPNAME_OURSTASH macros, a single code path on all perls.
+
 0.04    2026-06-14
         - New patterns:
           * `case FOO`             - a bareword naming an inlinable `use constant`

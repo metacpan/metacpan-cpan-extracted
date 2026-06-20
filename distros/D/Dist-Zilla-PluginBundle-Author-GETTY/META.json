@@ -67,21 +67,25 @@
       }
    },
    "provides" : {
+      "Dist::Zilla::Plugin::Author::GETTY::GiteaMeta" : {
+         "file" : "lib/Dist/Zilla/Plugin/Author/GETTY/GiteaMeta.pm",
+         "version" : "0.316"
+      },
       "Dist::Zilla::PluginBundle::Author::GETTY" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GETTY.pm",
-         "version" : "0.315"
+         "version" : "0.316"
       },
       "Dist::Zilla::PluginBundle::Author::GETTY::Docker" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GETTY/Docker.pm",
-         "version" : "0.315"
+         "version" : "0.316"
       },
       "Pod::Elemental::Transformer::Author::GETTY" : {
          "file" : "lib/Pod/Elemental/Transformer/Author/GETTY.pm",
-         "version" : "0.315"
+         "version" : "0.316"
       },
       "Pod::Weaver::PluginBundle::Author::GETTY" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/GETTY.pm",
-         "version" : "0.315"
+         "version" : "0.316"
       }
    },
    "release_status" : "stable",
@@ -96,7 +100,7 @@
          "web" : "https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty"
       }
    },
-   "version" : "0.315",
+   "version" : "0.316",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -466,7 +470,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.315",
+                  "tag" : "0.316",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -552,7 +556,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
             "name" : "@Author::GETTY/GitHub::CreateRelease",
-            "version" : "0.0008"
+            "version" : "0.0009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

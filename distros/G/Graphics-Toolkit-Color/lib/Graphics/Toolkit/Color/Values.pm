@@ -11,7 +11,7 @@ my $RGB = Graphics::Toolkit::Color::Space::Hub::default_space();
 
 #### constructor #######################################################
 sub new_from_any_input { #  values => %space_name => tuple ,   ~origin_space, ~color_name
-    my ($pkg, $color_def, $range_def, $raw) = @_;
+    my ($pkg, $color_def, $space_name, $range_def, $raw) = @_;
     return "Can not create color value object without color definition!" unless defined $color_def;
     if (not ref $color_def) { # try to resolve color name
         my $rgb = Graphics::Toolkit::Color::Name::get_values( $color_def );
@@ -20,9 +20,11 @@ sub new_from_any_input { #  values => %space_name => tuple ,   ~origin_space, ~c
             return bless { color_name => $color_def, rgb_tuple => $rgb, source_tuple => '', source_space_name => ''};
         }
     }
-    my ($tuple, $space_name) = Graphics::Toolkit::Color::Space::Hub::deformat( $color_def );
-    return "could not recognize color value format or color name: $color_def" unless ref $tuple;
-    new_from_tuple( '', $tuple, $space_name, $range_def, $raw);
+    my ($tuple, $found_space_name, $format) = (defined $space_name)
+                                            ? Graphics::Toolkit::Color::Space::Hub::deformat( $color_def, $space_name )
+                                            : Graphics::Toolkit::Color::Space::Hub::deformat_search( $color_def );
+    return $tuple unless ref $tuple;
+    new_from_tuple( '', $tuple, $found_space_name, $range_def, $raw);
 }
 sub new_from_tuple { #
     my ($pkg, $tuple, $space_name, $range_def, $raw) = @_;
@@ -64,12 +66,12 @@ sub shaped  { # in any color space, range and precision
                                                                or (defined $range_def and not defined $precision_def);
     return $tuple;
 }
-sub formatted { # in shape values in any format # _ -- ~space, @~|~format, @~|~range, @~|~suffix
+sub formatted { # in shape values in any format # _ -- ~space, @~|~format, @~|~range, @~|~suffix --> @|%|$
     my ($self, $space_name, $format_name, $suffix_def, $range_def, $precision_def, $raw) = @_;
     my $color_space = Graphics::Toolkit::Color::Space::Hub::try_get_space( $space_name );
-    return $color_space unless ref $color_space;
+    return \$color_space unless ref $color_space;
     my $tuple = $self->shaped( $color_space->name, $range_def, $precision_def, $raw );
-    return $tuple unless ref $tuple;
+    return \$tuple unless ref $tuple;
     return $color_space->format( $tuple, $format_name, $suffix_def );
 }
 sub name { $_[0]->{'color_name'} }

@@ -24,7 +24,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.77';
+our $VERSION = '0.7701';
 
 require XSLoader;
 XSLoader::load('pEFL', $VERSION);
@@ -183,9 +183,11 @@ Some events pass an Elementary Widget or an Evas Object as C<$event_info>. Of co
 
 The provision of Perl classes for event_info C structs is work in progress. If you need a specific binding for a C struct that is not supported at the moment, please send an issue report.
 
+=back
+
 =head1 STATE OF THE BINDING
 
-Of course, the integration of a set of libraries is always a work in progress and never truly complete. Although some features are certainly still missing (in particular, creating SmartClasses in Perl is not yet possible), the Perl binding is now stable, well-tested and mature. Don't expect any major changes to the API, too (especially since the binding is deliberately modeled closely after the C API and translates the corresponding C calls with as little “magic” as possible to ensure a low-maintenance interface). Minor changes, fixes, and adjustments are, of course, still possible, but we hardly try to avoid them.
+Of course, the integration of a set of libraries is always a work in progress and never truly complete. Although some features are certainly still missing (in particular, creating SmartClasses in Perl is not yet possible), the Perl binding is now stable, well-tested and mature. Don't expect any major changes to the API, too (especially since the binding is deliberately modeled closely after the C API and translates the corresponding C calls with as little "magic" as possible to ensure a low-maintenance interface). Minor changes, fixes, and adjustments are, of course, still possible, but we hardly try to avoid them.
 
 If you miss something or find issues, please report it to L<Github|https://github.com/MaxPerl/Perl-EFL>. 
 

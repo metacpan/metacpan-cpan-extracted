@@ -1,0 +1,102 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Name - GTC color name handling
+
+=head1 SYNOPSIS
+
+This L<manual|Graphics::Toolkit::Color::Manual> page explains all there 
+is to know when using color names in GTC. The first chapter describes 
+their role in the overall functionality of the library. 
+The second defines their L<syntax|/SYNTAX>. (How to write them?)
+The next outlines the coverage of the built-in names (L<default scheme|/DEFAULT>).
+And the last chapter illustrates the concept of a L<color scheme|/SCHEME> 
+and how to use them. 
+This is important background to understand the results and inner workings 
+of the methods: L<name|Graphics::Toolkit::Color::Manual::Getter/name> and 
+L<closest_name|Graphics::Toolkit::Color::Manual::Getter/closest_name>.
+
+
+=head1 ROLE
+
+Because it is intuitive and relatively effortless for humans to refer to 
+colors by name, GTC can interpret them as a convenience.
+But after the name is read, it gets translated into 
+L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB> values, 
+since most GTC functionality is about calculating numeric color values. 
+So color names are just one L<format|Graphics::Toolkit::Color::Manual::Format>
+among many and thus mostly a part of the IO layer.
+
+
+=head1 SYNTAX
+
+Color names are mere strings that get normalized to allow a greater flexibility
+in usage.
+Upper and lower case can be chosen freely. And also some special characters
+like the underscore I<'_'>, dash I<'-'>, whitespace I<' '>, the apostrophe I<'> 
+and the dot I<'.'>, that are even sometimes part of the official name,
+may be inserted or removed. That can sometimes improve readability (C<'true_red'>) 
+or help you to adapt the spelling of color names to local standards without
+additional effort. GTC output will always contain normalized names without
+special characters and in complete lowercase.
+
+There is only one character in GTC color names that holds a special meaning, 
+which is the colon I<':'>. It separates the scheme name on the left side 
+from the actual color name on the right (I<'SVG:green'>). You might think
+of schemes as name spaces for color names. Color names without a colon
+are from the L<default scheme|/DEFAULT> (I<'blue'>).
+
+
+=head1 DEFAULT
+
+The default scheme contains 716 color names which all can be retrieved with:
+
+  my @names = Graphics::Toolkit::Color::Name::all();
+
+But they can also be seen by name and with their color displayed under: 
+L<Graphics::Toolkit::Color::Name::Constant/NAMES>.
+They are assembled from the I<X11> and I<HTML> (I<SVG>) standard,
+which are most of the commonly used color names on the internet.
+But a lot of them are not aesthetically pleasing. For that reason also
+the colors of the Pantone reports were added. They often have longer,
+more complicated names but they are picked by designers.
+
+Because the default scheme contains so many names, some colors end
+up with having several names. For that reason the names are grouped
+by importance, so if you ask for just one color name, you will
+get the better known one (for instance I<'gray'> and not I<'gray50'>).
+
+=head1 SCHEME
+
+Besides the just mentioned default color name scheme, there are no other
+schemes that come with GTC. They have to be obtained separately. 
+For instance to access the names of the I<SVG> standard, you have to install
+the module L<Graphics::ColorNames::SVG>, which of course
+depends on the module L<Graphics::ColorNames>. The list of available 
+schemes includes: I<Crayola>, I<CSS>, I<EmergyC>, I<GrayScale>, I<HTML>, 
+I<IE>, I<Mozilla>, I<Netscape>, I<Pantone>, I<PantoneReport>, I<SVG>, 
+I<VACCC>, I<Werner>, I<Windows> and I<WWW>. The following code will check
+what is already installed:
+
+   my @schemes = Graphics::ColorNames::all_schemes();
+
+Conveniently all modules can be installed at once with 
+L<Bundle::Graphics::ColorNames> and you can also create your own,
+which is explained L<here|Graphics::Toolkit::Color::Manual::Plugin/COLOR-SCHEME>.
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

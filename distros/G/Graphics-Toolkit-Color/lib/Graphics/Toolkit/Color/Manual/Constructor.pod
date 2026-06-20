@@ -1,0 +1,159 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Constructor - GTC object creation reference
+
+=head1 SYNOPSIS
+
+This L<manual|Graphics::Toolkit::Color::Manual> page contains the most
+detailed description about all the ways a GTC object can be created.
+This is, as to be expected, the method L</new>, but also the L</color> routine 
+and implicitly the arguments L<color|Graphics::Toolkit::Color::Manual::Argument/color>
+and L<to|Graphics::Toolkit::Color::Manual::Argument/to>. They too
+might trigger an L<error|Graphics::Toolkit::Color::Manual::Error>. 
+
+=head1 OPTIONS
+
+=head2 new
+
+The GTC L<philosophy|Graphics::Toolkit::Color::Manual::Philosophy/API>
+tells that the API is optimized to be memorable and convenient and consistent. 
+For that reason there is only one constructor method and all the necessary
+complexity is in the arguments, which are mostly optional and combinable. 
+And there are only 4: C<color>, C<range>, C<raw> and C<in> which are seldom needed.
+In most cases it is enough to use C<color> as the only positional argument,
+which is also the only required argument.
+
+L<color|Graphics::Toolkit::Color::Manual::Argument/color> expects a 
+color definition in one of many acceptable 
+L<formats|Graphics::Toolkit::Color::Manual::Format>.
+This multitude is one source of perceived complexity, but it is really just
+an offer to serve convenience. Users can select the preferred format and
+forget about the rest or use this ability to convert between formats (and spaces at once). 
+Independent of that, there is the complexity of supporting many color 
+L<spaces|Graphics::Toolkit::Color::Manual::Space>, which means there
+are many color space names and axis names. Again, these are a major 
+source of usefulness one just has to look up the needed ones.
+Last not least there is great convenience in using 
+L<color names|Graphics::Toolkit::Color::Manual::Name>, especially
+the ones from the L<default scheme|Graphics::Toolkit::Color::Manual::Name/DEFAULT>.
+
+    my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
+    my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
+                          ... ->new( Red => 255, Green => 0, Blue => 0); # also fine
+              ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # same color
+                  ... ->new( Hue => 0, whiteness => 0, blackness => 0 ); # still the same
+                  
+    my $red = Graphics::Toolkit::Color->new(          255, 0, 0 );
+    my $red = Graphics::Toolkit::Color->new(         [255, 0, 0]);       # does the same
+    my $red = Graphics::Toolkit::Color->new( 'RGB',   255, 0, 0 );       # named list syntax
+    my $red = Graphics::Toolkit::Color->new(  RGB =>  255, 0, 0 );       # with fat comma
+    my $red = Graphics::Toolkit::Color->new([ RGB =>  255, 0, 0]);       # named ARRAY
+    my $red = Graphics::Toolkit::Color->new(  RGB => [255, 0, 0]);       # separate name and values
+    my $red = Graphics::Toolkit::Color->new([ RGB => [255, 0, 0]]);      # even inside an ARRAY
+    my $red = Graphics::Toolkit::Color->new(  YUV => .299,-0.168736, .5);# same color in YUV
+
+    my $red = Graphics::Toolkit::Color->new(  'rgb(255 0 0)' );         # comma optional
+    my $blue = Graphics::Toolkit::Color->new( 'hsv(240, 100%, 100%)' );
+    my $blue = Graphics::Toolkit::Color->new( 'hsv(240, 100, 100)' );   # works too
+
+    my $red = Graphics::Toolkit::Color->new(  'rgb: 255, 0, 0' );
+    my $blue = Graphics::Toolkit::Color->new( 'HSV: 240, 100, 100' );
+
+    my $color = Graphics::Toolkit::Color->new('#FF0000');
+    my $color = Graphics::Toolkit::Color->new('#f00');    # short version
+
+    my $color = Graphics::Toolkit::Color->new('Emerald');
+    my $color = Graphics::Toolkit::Color->new('SVG:green');
+
+L<range|Graphics::Toolkit::Color::Manual::Argument/range> expects a range
+definition, that alters the acceptable minimum and maximum values on each
+L<color space|Graphics::Toolkit::Color::Manual::Space/INTRODUCTION> axis.
+If you got for instance some I<AppleRGB> colors encoded as RGB32 
+(three 32-bit integers). In order to read them you need to write:
+
+    my $color = Graphics::Toolkit::Color->new( 
+                 color => [AppleRGB => [1438, 374, 8285]], range => 2**32-1
+    );
+
+L<raw|Graphics::Toolkit::Color::Manual::Argument/raw> expects a pseudo boolean
+that defaults to false (0). If true (1) the color definition will be read as is,
+but if false (0) the values will be clamped into range. This is either 
+the default range of the color space, the color is defined in or the 
+given C<range>. If you want to read an out of gamut color to maybe convert
+it later into a wide gamut space, where it is in range you have to use:
+
+    my $color = Graphics::Toolkit::Color->new( 
+                 color => {r => 0, g => 0, b => 256}, raw => 1
+    );
+
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> expects a 
+color space name that serves only for disambiguation, since most color
+definitions already contain the name of the chosen color space. But
+formats like in the following example I<hash> can be highly ambiguous.
+Please note also that the values in I<AppleRGB> space are normal (0..1).
+
+    my $color = Graphics::Toolkit::Color->new( 
+                 color => {r => 0, g => 0, b => 1}, in => 'AppleRGB'    # or:
+    );
+    Graphics::Toolkit::Color->new( color => [0,0,1], in => 'AppleRGB' );
+
+
+=head2 color
+
+The regular constructor
+
+    Graphics::Toolkit::Color->new( ...);
+
+is rather bulky and requires much typing and space, which might become inconvenient.
+In that case you might import the subroutine C<color>, which works exactly
+like the L<color|Graphics::Toolkit::Color::Manual::Argument/color> argument
+of the constructor. You cannot use the arguments C<range> and C<raw> 
+here but all the color definition L<formats|Graphics::Toolkit::Color::Manual::Format>
+the constructor L</new> accepts, including I<list>, which cannot work for
+the constructor argument C<color>, that has to take scalar values.
+
+    use Graphics::Toolkit::Color qw/color/;
+    my $green = color('green');
+    my $darkblue = color(20, 20, 250);         # list format
+    my $darkblue = color([20, 20, 250]);       # array format
+
+
+=head2 is_in_gamut
+
+The routine L<is_in_gamut|Graphics::Toolkit::Color::Manual::Getter/is_in_gamut>
+takes color definitions like a constructor, but with 
+L<raw|Graphics::Toolkit::Color::Manual::Argument/raw> turned on and returning
+just a pseudo bool.
+
+
+=head2 arguments
+
+The argument L<to|Graphics::Toolkit::Color::Manual::Argument/to> 
+works the same way as L<color|Graphics::Toolkit::Color::Manual::Argument/color>, 
+which is used by:
+L<distance|Graphics::Toolkit::Color::Manual::Getter/distance>, 
+L<mix|Graphics::Toolkit::Color::Manual::Calculation/mix>, 
+L<analogous|Graphics::Toolkit::Color::Manual::Set/analogous> and
+L<gradient|Graphics::Toolkit::Color::Manual::Set/gradient>.
+The only difference is, C<to> accepts also GTC objects.
+These arguments are also a convenience service preventing unnecessary
+constructor calls.
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

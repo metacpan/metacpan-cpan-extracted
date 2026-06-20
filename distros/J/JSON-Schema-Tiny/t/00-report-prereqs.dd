@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.170',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.172',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -30,7 +30,8 @@ do { my $x = {
                                       'Test::Pod::Coverage::TrustMe' => '0.002001',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.17',
-                                      'strict' => '0'
+                                      'autovivification' => '0',
+                                      'strictures' => '2'
                                     }
                     },
        'runtime' => {
@@ -40,15 +41,12 @@ do { my $x = {
                                       'Exporter' => '5.57',
                                       'Feature::Compat::Try' => '0',
                                       'JSON::PP' => '0',
-                                      'List::Util' => '1.50',
                                       'Math::BigFloat' => '0',
                                       'Mojo::JSON' => '0',
                                       'Mojo::JSON::Pointer' => '0',
                                       'Mojo::URL' => '0',
                                       'Mojolicious' => '7.23',
-                                      'Ref::Util' => '0.100',
                                       'Scalar::Util' => '0',
-                                      'Storable' => '0',
                                       'autovivification' => '0',
                                       'builtin::compat' => '0.003003',
                                       'constant' => '0',
@@ -57,12 +55,11 @@ do { my $x = {
                                       'namespace::clean' => '0',
                                       'perl' => '5.020',
                                       'stable' => '0.031',
-                                      'strictures' => '2',
+                                      'strict' => '0',
                                       'warnings' => '0'
                                     },
                       'suggests' => {
-                                      'Cpanel::JSON::XS' => '0',
-                                      'Ref::Util::XS' => '0'
+                                      'Cpanel::JSON::XS' => '0'
                                     }
                     },
        'test' => {
@@ -75,7 +72,7 @@ do { my $x = {
                                    'List::Util' => '1.50',
                                    'Math::BigInt' => '0',
                                    'Module::Metadata' => '0',
-                                   'Path::Tiny' => '0',
+                                   'Mojo::File' => '0',
                                    'Test2::API' => '0',
                                    'Test2::V0' => '0',
                                    'Test2::Warnings' => '0',
@@ -85,7 +82,6 @@ do { my $x = {
                                    'lib' => '0',
                                    'open' => '0',
                                    'perl' => '5.020',
-                                   'strict' => '0',
                                    'utf8' => '0'
                                  }
                  },

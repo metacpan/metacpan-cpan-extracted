@@ -26,7 +26,7 @@ sub add_to_cleanup {
 }
 
 sub author {
-    return 'Tom Wyant (wyant at cpan dot org)';
+    return 'Tom Wyant (harryfmudd at comcast dot net)';
 }
 
 sub build_requires {
@@ -53,7 +53,6 @@ sub distribution {
     return $self->{distribution};
 }
 
-
 sub license {
     return 'perl';
 }
@@ -67,9 +66,8 @@ sub meta_merge {
 	dynamic_config	=> 1,
 	resources	=> {
 	    bugtracker	=> {
-		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Win32API-File-Time',
-		# web	=> 'https://github.com/trwyant/perl-Win32API-File-Time/issues',
-		mailto  => 'wyant@cpan.org',
+		web	=> 'https://github.com/trwyant/perl-Win32API-File-Time/issues',
+		mailto  => 'harryfmudd@comcast.net',
 	    },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {
@@ -81,7 +79,6 @@ sub meta_merge {
 	@extra,
     };
 }
-
 
 sub module_name {
     return 'Win32API::File::Time';
@@ -348,21 +345,20 @@ information makes it into F<META.yml>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Win32API-File-Time>,
-L<https://github.com/trwyant/perl-Win32API-File-Time/issues>, or in
+L<https://github.com/trwyant/perl-Win32API-File-Time/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2011, 2013-2014, 2016-2017, 2019-2021 by Thomas R. Wyant, III
+Copyright (C) 2010-2011, 2013-2014, 2016-2017, 2019-2022, 2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

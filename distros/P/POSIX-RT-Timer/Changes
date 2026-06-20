@@ -1,5 +1,8 @@
 Revision history for POSIX-RT-Timer
 
+0.024     2026-06-19 13:30:03+02:00 Europe/Brussels
+          - Increase Time::Spec dependency to 0.004
+
 0.023     2026-06-18 11:43:09+02:00 Europe/Brussels
           - Check for timers instead of clocks in librt check
 

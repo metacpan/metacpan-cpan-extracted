@@ -1,0 +1,123 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual - GTC documentation hub
+
+=head1 INTRODUCTION
+
+Welcome to the documentation of the Perl module I<Graphics::Toolkit::Color>.
+It is an all-in-one solution to compute color sets, single colors,
+handle color names and to convert and reformat color definitions.
+It is mostly aimed toward the needs of a graphics programmer and designer 
+but also contains color science and math. This page gives you an overview 
+where to find what information about this library. If you do not find the
+needed information, please open a request on 
+L<github|https://github.com/lichtkind/Graphics-Toolkit-Color>.
+
+=head1 INDEX
+
+The manual encompasses the following pages:
+
+=over 4
+
+=item *
+
+Overviews
+
+=over 4
+
+=item *
+
+L<Overview|Graphics::Toolkit::Color> - of the public API, short desciption of methods
+
+=item *
+
+L<CheatSheet|Graphics::Toolkit::Color::Manual::CheatSheet> - all methods, args and spaces on one page
+
+=item *
+
+L<Cookbook|Graphics::Toolkit::Color::Manual::Cookbook> - code examples to solve real life problems
+
+=item *
+
+L<Philosophy|Graphics::Toolkit::Color::Manual::Philosophy> - explaining the design and the mindest behind it
+
+=back
+
+
+=item *
+
+Reference
+
+=over 4
+
+=item *
+
+L<Constructor|Graphics::Toolkit::Color::Manual::Constructor> - ways to create a color object
+
+=item *
+
+L<Getter|Graphics::Toolkit::Color::Manual::Getter> - methods that return information, but not a color object
+
+=item *
+
+L<Calculation|Graphics::Toolkit::Color::Manual::Calculation> - methods that calculate one related color
+
+=item *
+
+L<Set|Graphics::Toolkit::Color::Manual::Set> - methods that calculate sets of colors
+
+=item *
+
+L<Argument|Graphics::Toolkit::Color::Manual::Argument> - explaining all arguments than several methods share
+
+=back
+
+
+=item *
+
+Topics 
+
+=over 4
+
+=item *
+
+L<Name|Graphics::Toolkit::Color::Manual::Name> - about color names
+
+=item *
+
+L<Space|Graphics::Toolkit::Color::Manual::Space> - list of all supported color spaces with detailed informations
+
+=item *
+
+L<Format|Graphics::Toolkit::Color::Manual::Format> - input and output formats
+
+=item *
+
+L<Error|Graphics::Toolkit::Color::Manual::Error> - ways to do error handling
+
+=item *
+
+L<Plugin|Graphics::Toolkit::Color::Manual::Plugin> - How to extend the library ?
+
+=item *
+
+L<Deprecation|Graphics::Toolkit::Color::Manual::Deprecation> - What key words will go?
+
+=back
+
+=back
+
+=head1 GUIDE
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=cut

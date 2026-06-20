@@ -1,0 +1,161 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Format - shapes of acceptable color definitions
+
+=head1 SYNOPSIS
+
+This L<manual|Graphics::Toolkit::Color::Manual> page lists and describes
+all forms a I<color definition> may have. A color definition is a 
+piece of data that defines a color unambiguously and from which GTC 
+can create a color object. It is a rule of the GTC
+L<philosophy|Graphics::Toolkit::Color::Manual::Philosophy/FUNCTIONALITY>
+that every format that can be read should also be produced as output
+and vice versa. This principle is held up with the exception of the
+C<list> and C<array> formats. Values from any color space can be written
+in these formats but when read, L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB>
+is assumed, because there is no attached information about the color space.
+See a quick overview of all formats 
+L<here|Graphics::Toolkit::Color::Manual::CheatSheet/FORMATS>.
+
+This page is especially important to understand the capabilities of the methods
+L<new|Graphics::Toolkit::Color::Manual::Constructor> and 
+L<values|Graphics::Toolkit::Color::Manual::Getter/values>.
+
+
+=head1 FORMATS
+
+=head2 name
+
+The format C<name> refers to a color name string like:
+
+    'blue'
+
+and a I<full_name> contains also a color scheme name like in:
+
+    'SVG:green'
+
+Read all about them under L<Graphics::Toolkit::Color::Manual::Name/SYNTAX>.
+They are read by the constructor but written by
+L<name|Graphics::Toolkit::Color::Manual::Getter/name> and 
+L<closest_name|Graphics::Toolkit::Color::Manual::Getter/closest_name>.
+There you can provide the argument C<full> to get a full name.
+
+=head2 hex_string
+
+A C<hex_string> starts with the pound sign I<'#'> followed by three
+(short version) or six (long version) hexadecimal digits that might
+be written in upper or lower case. It always depicts an 
+L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB> color.
+The following examples represent the same color:
+
+    '#123'
+    '#112233'
+
+=head2 named_string
+
+C<named_string> is GTC's own simple string format for data serialisation.
+Similar to a C<full_name> it has the color space name on the left side 
+of the colon in lower case and without any special characters.
+Right of the colon are the comma separated values. The placement of any
+whitespace is optional but the commas are not. Also optional are value
+suffixes like I<'%'> in I<HWB>.
+
+    'rgb: 1, 2, 3'
+
+=head2 css_string
+
+C<css_string> is a format standardized by the W3C that is closely related
+to a C<named_string> with a few important differences. Here are the commas
+and the suffix optional. But if you omit the commas, you have to separate 
+the values by whitespace. And the values have to be encompassed by round 
+braces. GTC does not yet support a C<css_string> that includes an alpha 
+channel.
+
+    'rgb( 1, 2, 3)'
+
+=head2 list
+
+C<list> is the default format of the 
+L<values|Graphics::Toolkit::Color::Manual::Getter/values> method.
+It is simply a list with the color values. They follow the same order
+as the axis names. If used as an input, GTC reads them as standard
+L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB> values.
+
+    (1,2,3)
+  
+=head2 array
+
+C<array> is just a list inside square brackets (ARRAY reference), 
+hence almost the same rules apply as for C<list> (it's read as I<RGB> by default). 
+This format has the sole advantage over a C<list>, that it is from a Perl 
+perspective a scalar and can be therefore used for an argument like 
+L<to|Graphics::Toolkit::Color::Manual::Argument/to>
+in methods like L<distance|Graphics::Toolkit::Color::Manual::Getter/distance>.
+You may use it for values in other spaces too but then you have to provide
+the space name via the argument 
+L<in|Graphics::Toolkit::Color::Manual::Argument/in>.
+
+    [1,2,3]
+
+=head2 named_array
+
+C<named_array> fixes the disadvantage of the C<array> format by prepending
+the color space name in front of the values. Color space names can be
+written with a great degree of freedom, which is explained 
+L<here|Graphics::Toolkit::Color::Manual::Space/SYNTAX>. Please note
+the usage of a fat comma for your own convenience. Both examples are
+semantically identical.
+
+    [ RGB =>  1,2,3 ]
+    ['RGB',   1,2,3 ]
+    
+=head2 nested_array
+
+C<nested_array> is just a variation on a C<named_array>, where the values
+are enclosed in another ARRAY reference. To some people it just makes
+intuitively more sense.
+
+    [RGB => [1,2,3]]
+
+=head2 hash
+
+C<hash> is the most expressive and spacious format. It is a HASH reference
+with long axis names as keys. It requires all axes to be presented by name,
+even if GTC will accept any mix of long and short axis names.
+If you order C<hash> as output format you will get long axis names only.
+The biggest downside of this format is its ambiguity, especially because
+GTC supports over 10 L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB> spaces.
+Please read about the L<search order|Graphics::Toolkit::Color::Manual::Space/ORDER>
+to see which and how spaces get overshadowed by others. In short, 
+look at the name of a color space family to see which space is dominant.
+If you want to define a color in a color space that is not dominant, 
+you have to either use another format that contains the color space name
+or you provide the space name via the argument 
+L<in|Graphics::Toolkit::Color::Manual::Argument/in>.
+
+    {red => 1, green => 2, blue => 3}
+    
+=head2 char_hash
+
+C<char_hash> is the format name to make sure the output of 
+L<values|Graphics::Toolkit::Color::Manual::Getter/values> is a HASH
+with short axis names as keys. Other than that - it's the same as C<hash>.
+         
+    {r => 1, g => 2, b => 3}
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

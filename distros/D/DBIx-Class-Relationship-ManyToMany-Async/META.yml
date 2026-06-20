@@ -1,0 +1,26 @@
+---
+abstract: 'many_to_many for DBIx::Class::Async — generates Future-returning'
+author:
+  - 'Daniel Brosseau <dab@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Relationship-ManyToMany-Async
+requires:
+  DBD::SQLite: '0'
+  DBIx::Class: '0'
+  DBIx::Class::Async: v1.0.4
+  Future: '0'
+resources:
+  homepage: https://github.com/Dabg/DBIx-Class-Relationship-ManyToMany-Async
+  repository: https://github.com/Dabg/DBIx-Class-Relationship-ManyToMany-Async.git
+version: '0.01'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,0 +1,18 @@
+Revision history for Destructure-Declare
+
+0.01    2026-06-19
+        First version.
+        - compile-time `let` keyword (lexical pragma), lowered to a plain optree
+        - array patterns [ ... ] over an arrayref; hash patterns { ... } over a hashref
+        - nested patterns, holes (undef), per-slot // defaults (lazy)
+        - list patterns ( ... ) destructure a list (list-context RHS)
+        - trailing slurpy: @rest / %rest on array & list patterns, %rest
+          (remaining keys) on hash patterns (custom ops)
+        - right-hand side evaluated exactly once
+        - fast path: a flat array/list pattern (plain scalars, holes, optional
+          trailing slurpy; no defaults or nesting) lowers to a single native
+          list-assignment, matching hand-written `my (...) = ...` speed; the
+          `( )` list form skips the arrayref copy entirely. xt/bench.pl covers it.
+        - publishes its compile-time engine (include/destructure.h) via
+          ExtUtils::Depends, so dependent dists (e.g. Switch::Declare) can
+          #include it rather than carrying a copy

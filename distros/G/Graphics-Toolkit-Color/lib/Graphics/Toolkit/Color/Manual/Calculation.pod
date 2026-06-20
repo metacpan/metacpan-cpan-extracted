@@ -1,0 +1,256 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Calculation - reference of single color calculation methods
+
+=head1 SYNOPSIS
+
+This L<manual|Graphics::Toolkit::Color::Manual> page contains the most
+detailed description of the seven color calculation methods of the high
+level API: L</lighten>, L</darken>, L</saturate>, L</desaturate>,
+L</tint>, L</tone>, L</shade> and the five methods of the low level API: 
+L</apply>, L</set_value>, L</add_value>, L</mix> and L</invert>. Every
+L<argument|Graphics::Toolkit::Color::Manual::Argument> and important 
+argument combination will be explained as well. All methods return one 
+GTC object that is related to the one held by the calling object
+unless a typo or data type mismatch triggers an 
+L<error|Graphics::Toolkit::Color::Manual::Error>. 
+This allows method chaining like:
+
+    $color->add_value( saturation => 5 )->invert->mix( to => 'green' );
+
+
+=head1 METHODS
+
+The following seven methods have a lot in common. They all belong to the 
+high-level I<designer API> and produce a color that is a result of moving 
+the original color in a certain direction in some color space. 
+They also take only two named arguments: C<by> and C<in>.
+The first is required and might be provided as a positional argument if 
+it is the only one. It is always expected to be in the range of 0 .. 1.
+The second argument (C<in>) is optional and designates the 
+color space the operation is calculated in, which defaults here in any case
+to I<OKHSL>. C<tint>, C<tone> and C<shade> can be computed in any space,
+but C<lighten> and C<darken> work only in a space that has an axis
+that can fulfill the I<role> of an I<lightness> axis. Similarly 
+C<saturate> and C<desaturate> need a space with an axis that is declared
+to fulfill the I<saturation> I<role>, which also encompasses all spaces 
+of the L<HSL|Graphics::Toolkit::Color::Manual::Space/HSL> 
+and the L<HSV|Graphics::Toolkit::Color::Manual::Space/HSV> family.
+
+=head2 lighten 
+
+C<lighten> produces a brighter color, unless you pass a negative value via
+the C<by> argument. That value is interpreted as percentages on an absolute scale.
+Let's assume the given color is a mid blue which has a lightness that
+is 46% of the maximum I<lightness>. Calling:
+
+  $midblue->lighten( 0.13 );
+  $midblue->lighten( by => 0.13 ); # same thing
+  
+produces a color with a lightness that is 59% (46 + 13) of the maximum
+value (100%). If the resulting lightness would be above 100% or below
+0% it will be clamped into that range.
+
+=head2 darken
+
+C<darken> works exactly like C<lighten>, just in the opposite direction,
+producing a darker color unless a negative C<by> value is passed.
+This method is not strictly necessary but helps the API expressivity.
+
+=head2 saturate
+
+C<saturate> produces a more saturated, more colorful color, unless the
+amount is negative. Again the value provided by the C<by> argument is
+understood as percentage added on an absolute scale that gets clamped
+into range.
+
+  $midblue->saturate( by => 0.13, in => 'HSL' );
+
+=head2 desaturate
+
+C<desaturate> is the antagonist of C<saturate> like C<darken> is the
+opposite of C<lighten>.
+
+  $midblue->desaturate( by => -0.13, in => 'HSL' ); # same as above
+
+=head2 tint
+
+C<tint> produces a color that is a mix between white and the current color.
+The argument C<by> states how much percentage white has in the mix.
+Values above 1 have the same result as 1: a pure white and values of zero
+and below will return the same color as the calling object holds.
+
+=head2 tone
+
+C<tone> produces a color that is a mix between mid grey and the current color.
+Mid grey is a 1:1 mix between white and black. Values above 1 have the 
+same result as 1: mid grey and values of zero and below will return the
+same color as the calling object holds.
+
+=head2 shade
+
+C<shade> produces a color that is a mix between black and the current color.
+Values above 1 have the same result as 1: full black and values of zero
+and below will return the same color as the calling object holds.
+
+
+=head2 tone_curve
+
+C<apply> calculates a gamma correction, which is just a power function on
+normalized color values (range 0 .. 1). Gamma is in this context the name 
+of a variable that contains the power. (C<$value = $value ** $gamma;>)
+The method expects two named arguments: C<gamma> and C<in>. The first one
+is required and second one is optional. There is no rule that allows for
+a lone positional argument.
+
+C<gamma> has to be either a floating point number or a HASH reference
+that contains a gamma value per axis. Long or short axis names can be used
+as keys. A gamma correction is reversed with the same function, 
+just with an inverted gamma value (C<1 / $gamma>). Even if some 
+implementations apply the inverted gamma, GTC uses the gamma value as given,
+to not further complicate things because there is no I<'invert'> argument.
+Just prepend the C<gamma> with C<< 1 / >>.
+
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> sets the color space
+the values will be first converted to. Then these values will be normalized,
+before the gamma value is applied. C<in> defaults to 
+L<LinearRGB|Graphics::Toolkit::Color::Manual::Space/LinearRGB>
+since this is the default IO space with gamma removed, ready for a custom
+gamma correction. Applying gamma makes only sense in Euclidean spaces 
+with the origin in one corner of the space like I<RGB> or I<CIEXYZ>.
+These are with minor exceptions only the spaces from the 
+L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB> family, since even 
+I<LAB> type spaces do not fit. They are Euclidean, but their origin is not
+in one corner but the center of one face.
+
+
+    my $linear_blue = $blue->apply( gamma => 2.2 );         # is the same as :
+    my $linear_blue = $blue->apply( gamma => {r => 2.2, g =>2.2, b => 2.2}, in => 'LinearRGB' );
+
+
+=head2 set_value
+
+C<set_value> creates a new GTC color object that shares some values with
+the current one, but differs in others. It is NOT a setter, since it
+doesn't change the values of the calling object. The replaced values are 
+provided as absolute numbers with their associated axis names (long or short).
+The named arguments have to be axis names of one 
+L<color space|Graphics::Toolkit::Color::Manual::Space>. 
+If that is too ambiguous, you may add the named argument 
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> to specify the space by name.
+This space defines the acceptable value ranges.
+If the resulting color will be outside those ranges, 
+the values will be clamped so it will become a regular (in range) color.
+A mix of axis names from different spaces or a lack of any axis name as
+argument will result in an L<error|Graphics::Toolkit::Color::Manual::Error> message.
+
+
+    my $blue = $black->set_value( blue => 255 );                   # same as #0000ff
+    # setting saturation in OKHSL (due to internal search order)
+    my $pale_blue = $blue->set_value( saturation => 50 );          # $c->( s => 50) works too
+    my $color = $blue->set_value( saturation => 50, in => 'HSV' ); # now in HSV
+
+
+=head2 add_value
+
+C<add_value> creates a new GTC color object that shares some values with 
+the current one, but differs in others. It does NOT alter the values of 
+the calling object (invocant). The arguments work exactly as described
+in L</set_value>. The only difference is that a new value is not the given,
+but the sum of the old one and the given. C<add_value> calculates values
+in the default ranges of the given color space, whereas lightweight methods 
+like L</lighten> add percentages (a normalized value).
+
+
+    my $blue = Graphics::Toolkit::Color->new('blue');
+    my $darkblue = $blue->add_value( Lightness => -25 );    # get a darker tone
+    my $blue2 = $blue->add_value( blue => 10 );             # bluer than blue ?
+    my $blue3 = $blue->add_value( l => 10, in => 'LAB' );   # lighter color according to CIELAB
+
+
+=head2 mix
+
+C<mix> creates a new color, that has the average values between the calling
+object and another color (or several colors). It accepts three named
+arguments: C<to>, C<by> and C<in>, but only the first one is required 
+and can be also provided as the only positional argument. For compatibility
+C<amount> can be used as an alias for C<by>.
+
+The L<to|Graphics::Toolkit::Color::Manual::Argument/to> argument works 
+like in other methods, with the exception that it also accepts an ARRAY
+ref (square brackets) with several color definitions or GTC color objects.
+
+L<by|Graphics::Toolkit::Color::Manual::Argument/by> designates the mix amount
+of the other color(s) (C<to>) in percent.
+A value of 0.2 means that the other color or any of the other colors gets 20%.
+The calling color receives whatever is left percentage wise, which might be nothing. 
+Per default C<mix> computes a 50-50 (1:1 or 0.5-0.5) mix between all involved colors.
+If C<to> has several colors assigned, then also C<by> might receive an ARRAY
+reference with several percentage values that have to be provided in the same
+order as the colors. If the sum of the percentage values exceeds one (100%)
+then only the ratio between the other colors gets preserved and the caller
+gets overlooked.
+
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> sets the color space
+the values will be mixed in, which is per default I<OKLAB>.
+
+
+    $blue->mix( $silver );                                     # 50% silver, 50% blue
+    $blue->mix( to => 'silver',           by =>  .6 );         # 60% silver, 40% blue
+    $blue->mix( to => [qw/silver green/], by => [.1, .2]);     # 10% silver, 20% green, 70% blue
+    $blue->mix( to => [qw/silver green/], by => [.3, .9]);     # 25% silver, 75% green,  0% blue
+    $blue->mix( to => [qw/silver green/], by =>  .3);          # 30% silver, 30% green, 40% blue
+    $blue->mix( to => [qw/silver green/] );                    # 33% silver, 33% green, 33% blue
+    $blue->mix( to => {H => 120, S =>100, L => 50}, in => 'HSV' ); # teal =  50% green, 50% blue
+    # the other color in the last example was defined in HSL but mixed in HSV
+
+
+=head2 invert
+
+C<invert> computes a new color, where all or some values are inverted 
+according to the ranges of the chosen color space. To invert means in
+a Euclidean space that the value has after the operation the same
+absolute difference to the maximal value as it had before the operation to
+the minimal value. On an angular axis it is a rotation of 180 degrees,
+which means adding half the maximum. The method accepts two named 
+arguments: C<only> and C<in>. The first one can be provided as a positional
+argument if it is the only one.
+
+L<only|Graphics::Toolkit::Color::Manual::Argument/only> restricts the
+operation to the axes named by C<only> (long or short axis name). 
+You may provide several axis names within an ARRAY reference, as long
+they belong to one color space. The default is to invert all values of a color.
+
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> sets the color space
+the values will be inverted in, which is per default I<OKHSL>. But please
+note that the method tries to get hints from the C<only> argument in order
+to determine the color space. There will be an 
+L<error|Graphics::Toolkit::Color::Manual::Error>
+if the axis names provided by C<only> do not match the space given by C<in>.
+
+
+    my $black = $white->invert();                      # to state the obvious
+    my $gray = $gray50->invert();                      # changed nothing
+    my $blue = $yellow->invert( in => 'LUV' );         # invert in LUV space
+    $color->invert( 'red' );                           # invert only red value
+    $color->invert( only => 'red' );                   # same but explicit
+    $yellow->invert( in => 'HSL', only => 'hue' );     # same result as $yellow->complement();
+    $yellow->invert( in => 'HSL', only => [qw/s l/] ); # invert only saturation and lightness
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

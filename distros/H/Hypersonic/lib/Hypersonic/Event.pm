@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # Hypersonic::Event - Event backend registry and selection
 #
@@ -23,7 +23,34 @@ my %BACKENDS = (
     select      => 'Hypersonic::Event::Select',      # Universal (Windows support)
 );
 
-# Priority order for auto-selection (first available wins)
+# Priority order for auto-selection (first available wins).
+#
+# io_uring is first on Linux because it batches submissions through
+# the SQ ring (one syscall per arm-poll batch vs one syscall per
+# epoll_ctl), but as of 0.19 it operates in *readiness-only* mode -
+# we use io_uring_prep_poll_add (level-triggered POLLIN) as a pure
+# notification mechanism and let the main event loop's userspace
+# accept()/recv() do the actual I/O, exactly like the epoll path.
+#
+# Pre-0.19 attempted to use io_uring's completion-based I/O
+# (io_uring_prep_accept + io_uring_prep_recv) where the kernel did
+# the I/O and returned the result via cqe->res, but that had two
+# unfixable bugs:
+#   (a) gen_get_fd discarded the accepted client_fd from cqe->res
+#       for UD_ACCEPT and set fd=listen_fd, so the main loop's
+#       accept(listen_fd) returned EAGAIN (kernel already had it)
+#       and broke - leaking the connection.
+#   (b) prep_recv used a single GLOBAL recv_buf shared across all
+#       concurrent clients, corrupting each other's request data.
+# This produced the "empty body + 18 SIGKILL cascade + 5140s
+# wallclock" pattern in CPAN tester reports for Hypersonic 0.18 on
+# cpansmoker-1023 (perl 5.38..5.43). The readiness-only design in
+# 0.19 sidesteps both bugs.
+#
+# If a user's kernel doesn't behave as expected, the env var
+# HYPERSONIC_EVENT_BACKEND=epoll (or any registered backend) and
+# the constructor option `event_backend => 'epoll'` both override
+# auto-detection.
 my @PRIORITY = qw(io_uring epoll kqueue iocp event_ports poll select);
 
 # Check if io_uring is available (Linux 5.1+ with liburing)
@@ -50,6 +77,22 @@ sub _has_io_uring {
 # Select best available backend for this platform
 sub best_backend {
     my $class = shift;
+
+    # Explicit override via env var. Useful for (a) developers who
+    # know io_uring works on their kernel and want the throughput,
+    # and (b) test runners that need to pin a known-good backend.
+    # Validated against the registered backend list - a bogus value
+    # falls back to auto-detection rather than dying, so a typo in
+    # a user's shell rc doesn't blow up production.
+    if (my $forced = $ENV{HYPERSONIC_EVENT_BACKEND}) {
+        if ($BACKENDS{$forced}) {
+            my $mod = $BACKENDS{$forced};
+            eval "require $mod";
+            return $forced if !$@ && $mod->available;
+            # Fall through to auto-detect if the requested backend
+            # isn't actually loadable / available on this host.
+        }
+    }
 
     # Windows prefers IOCP (falls back to select if unavailable)
     if ($^O eq 'MSWin32') {

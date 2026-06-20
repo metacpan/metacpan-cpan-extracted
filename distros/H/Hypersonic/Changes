@@ -1,5 +1,8 @@
 Revision history for Hypersonic
 
+0.19    2026-06-02
+	- Various fixes for cpan testers
+
 0.18    2026-05-29
 	- MAJOR: Hypersonic compile() now derives the JIT module id
 	  from a Digest::MD5 hash of the generated C source instead

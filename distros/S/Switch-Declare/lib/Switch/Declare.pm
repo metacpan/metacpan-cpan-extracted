@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Switch::Declare', $VERSION);
@@ -50,6 +50,14 @@ Switch::Declare - compile-time, lexically-scoped C<switch>/C<case>
 		default  { "other" }
 	};
 
+	# destructuring bind - `-> PATTERN` binds the matched topic into lexicals
+	# that are visible inside (and private to) the arm block
+	switch ($node) {
+		case ref(ARRAY) -> [$head, @rest]      { ... }   # $node->@*
+		case ref(HASH)  -> {type => $t, %rest} { ... }   # $node->%*
+		default { ... }
+	}
+
 =head1 DESCRIPTION
 
 C<Switch::Declare> installs a C<switch> keyword that parses an entire
@@ -67,6 +75,27 @@ there is no implicit fallthrough. A trailing C<default> matches when no C<case>
 did. Used as an expression the construct yields the value of the executed block
 (C<undef> if nothing matched and there is no C<default>); used as a statement
 it simply runs the matched block.
+
+=head2 Destructuring bind (C<< -> PATTERN >>)
+
+A C<case> arm may follow its pattern with C<< -> PATTERN >> to destructure the
+matched B<topic> into fresh lexicals that are visible inside, and private to,
+that arm's block:
+
+	switch ($node) {
+		case ref(ARRAY) -> [$head, @rest]       { ... }
+		case ref(HASH)  -> {type => $t, %rest}  { ... }
+		default { ... }
+	}
+
+C<< [ ... ] >> destructures the topic as an arrayref and C<< { ... } >> as a
+hashref. The full pattern grammar of L<Destructure::Declare> is supported -
+nested patterns, C<undef> holes, C<//> defaults (C<< $x = EXPR >>), and a
+trailing C<@rest> / C<%rest> slurpy. The topic is read once into a hidden temp
+and the bindings are lowered to ordinary C<my $x = $tmp-E<gt>[i]> statements
+prepended to the block, so each arm's bindings cost nothing until that arm runs
+and vanish at its closing brace. List patterns (C<( ... )>) are not allowed
+here, since the topic is a single value.
 
 =head2 Pattern kinds
 

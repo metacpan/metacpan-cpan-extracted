@@ -1,6 +1,6 @@
 package Pod::Elemental::Transformer::Author::GETTY;
 # ABSTRACT: Transform custom POD commands to =head1 and =head2
-our $VERSION = '0.315';
+our $VERSION = '0.316';
 use Moose;
 with 'Pod::Elemental::Transformer';
 
@@ -70,7 +70,7 @@ Pod::Elemental::Transformer::Author::GETTY - Transform custom POD commands to =h
 
 =head1 VERSION
 
-version 0.315
+version 0.316
 
 =head1 SYNOPSIS
 

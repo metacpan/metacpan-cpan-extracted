@@ -1,3 +1,6 @@
-{{$NEXT}}
+0.02      2026-06-19 20:56:47+02:00 Europe/Paris
+    - use DBIx::Class::Relationship::ManyToMany::Async
+
+0.01  2026-06-16
     - Initial release: DBIx::Class::Async plugin for Fondation
       with schema_class, schema, and model helpers.

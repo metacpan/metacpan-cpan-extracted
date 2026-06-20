@@ -4,7 +4,7 @@
 package Graphics::Toolkit::Color::Space::Instance::Rec2020;
 use v5.12;
 use warnings;
-use Graphics::Toolkit::Color::Space qw/gamma_correct/;
+use Graphics::Toolkit::Color::Space qw/spow/;
 
 
 my $alpha = 1.09929682680944;
@@ -16,17 +16,18 @@ my $gamma = 0.45;
 sub from_lrgb {
 	my $lrgb = shift;
     return [ map {(abs($_) <= $beta) ? ($_ * $lin_factor) 
-		                             : ((gamma_correct($_, $gamma) *  $alpha) - $alpha + 1)} @$lrgb];
+		                             : ((spow($_, $gamma) *  $alpha) - $alpha + 1)} @$lrgb];
 }
 sub to_lrgb {
 	my $rgb = shift;
 	return [ map {(abs($_) <= $beta_inv) ? ($_ / $lin_factor) 
-		                                 : gamma_correct(($_ + $alpha - 1) / $alpha, 1 / $gamma)} @$rgb];
+		                                 : spow(($_ + $alpha - 1) / $alpha, 1 / $gamma)} @$rgb];
 }
  
 Graphics::Toolkit::Color::Space->new(
         name => 'Rec.2020',
-       alias => 'BT.2020',
+  alias_name => 'BT.2020',
+      family => 'RGB',  
         axis => [qw/red green blue/],
    precision => 6,
      convert => {LinearRGB => [\&to_lrgb, \&from_lrgb]},

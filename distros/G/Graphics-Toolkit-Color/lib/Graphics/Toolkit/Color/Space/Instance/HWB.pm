@@ -1,5 +1,5 @@
 
-# HWB color space specific code
+# HWB color space
 
 package Graphics::Toolkit::Color::Space::Instance::HWB;
 use v5.12;
@@ -46,10 +46,11 @@ sub to_rgb {
 }
 
 Graphics::Toolkit::Color::Space->new(
+           family => 'HWB',
             axis => [qw/hue whiteness blackness/],
+            type => [qw/angular linear linear/],
            range => [360, 100, 100],
        precision => 0,
-            type => [qw/angular linear linear/],
           suffix => ['', '%', '%'],
          convert => {RGB => [\&to_rgb, \&from_rgb]},
       constraint => {cone => {checker => '$_[0][1] + $_[0][2] <= 1',

@@ -137,7 +137,7 @@ use warnings;
 
 use base qw{ Astro::Coord::ECI::TLE };
 
-our $VERSION = '0.132';
+our $VERSION = '0.133';
 
 use Astro::Coord::ECI::Utils 0.091 qw{:all};
 use Carp;
@@ -452,7 +452,8 @@ says are spares. I have skipped the spares by default because I do not
 know that their attitudes are maintained to the requisite precision,
 though perhaps they would be, to demonstrate that the spares are
 functional. This software currently uses the Iridium status from
-CelesTrak (L<http://celestrak.com/SpaceTrack/query/iridium.txt>), since
+CelesTrak (C<http://celestrak.com/SpaceTrack/query/iridium.txt>) (no
+longer extant), since
 it represents one-stop shopping, and Dr. Kelso has expressed the intent
 to check with Iridium Satellite LLC monthly for status. Mike McCants'
 "Status of Iridium Payloads" at
@@ -1886,24 +1887,23 @@ Iridium Flares page (L<http://www.satobs.org/iridium.html>),
 which provided the background for the entire Iridium flare
 effort.
 
-=head1 BUGS
+=head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-TLE-Iridium>,
-L<https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues>, or in
-electronic mail to the author.
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues> or
+in electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2022 by Thomas R. Wyant, III
+Copyright (C) 2005-2022, 2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

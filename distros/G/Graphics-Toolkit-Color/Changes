@@ -1,13 +1,42 @@
+2.21   2026-06-21   lichtkind
+-------
+    * = minor fix release
+    * ? various POD fixes
+
+2.20   2026-06-20   lichtkind
+-------
+    * = big feature release: +3 spaces, +8 methods, +7 args, new docs, error handling
+    * * add methods lighten / darken, saturate / desaturate, 
+    * * add methods tint (white) / shade (black) / tone (grey)
+    * * new 16 Page doc in GTC::Manual with Reference, Topics, CookBook, CheatSheet
+    * + spaces: 'OKHSL', 'OKHSV', 'OKHWB' 
+    * + color space property: 'family', 'role'
+    * + method 'analogous' with args: 'to', 'in', 'steps' and 'tilt'
+    * + method alias 'tone_curve' for 'apply'
+    * + argument 'in' to method 'complement' (selectable cylindrical space)
+    * + argument 'in' to method 'new' disambiguate color spaces
+    * + argument 'skew' to method 'complement' (move circle along color-target axis)
+    * + argument 'by' as alias of 'amount' argument for 'mix' 
+    * + reestablish optional Carp error messages + 4 other modes
+    * + format: 'nested_array'
+    * ~ change default color space for most methods to 'OKLAB' or 'OKHSL'
+    * ~ change name and name alias in 'YUV' space now 'YPbPr' space
+    * ~ change default argument of 'invert' from 'in' to 'only'
+    * ~ rename method 'apply' to 'tone_curve', keeping 'apply' as alias til 3.0
+    * ~ amount argument has now 0 .. 1 range, instead of 0 .. 100
+    * ~ reduce arguments of the 'color' routine to work like the 'color' argument of 'new'
+    * - reduce arguments of 'is_in_gamut' to 1 ('in') in method mode and 1 as routine ('color')
+    * ! HSB constraints removal was mistake, constraint was reestablished
+
 2.11   2026-05-08   lichtkind
 -------
     * = bug fix release
     * ! fix hash in scalar context bug while arg spltting in new
     * ! HSB should never have had constraints as HSV
 
-
 2.1    2026-05-05   lichtkind
 -------
-    * = big feature release: +12 spaces, +6 args, +2 features
+    * = big feature release: +12 spaces, +7 args, +2 features
     * * add color spaces: LinearRGB, CIERGB, Adobe 98 RGB, Apple RGB,
                           ProPhoto RGB, Wide Gamut RGB,      Rec.709, Rec.2020,
                           Linear Display P3, Display P3, Linear DCI P3, DCI P3
@@ -20,7 +49,7 @@
     * + added ouput format ARRAY (tuple) (output only)
     * + can insert ' ', '-', '_' and '.' into color space names
     * ? document the 'only' argument of 'invert'
-    * & compact test suite with custom color tuple test function
+    * & compact test suite with custom color 'is_tuple' test function
     * ~ CIEXYZ converts now from and to linearRGB
     * ! HSB, HWB and NCol space got same constraints as HSV
 

@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/CommonPrefixUtils.pm','script/remove-common-prefix','script/strip-common-prefix'];
+my $filenames = ['lib/App/CommonPrefixUtils.pm','script/common-prefix','script/majority-prefix','script/remove-common-prefix','script/strip-common-prefix'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

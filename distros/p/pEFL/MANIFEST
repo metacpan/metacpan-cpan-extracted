@@ -1,6 +1,9 @@
 Changes
 CONSTANTS.pl
 examples/Ecore-Evas/basic-example.pl
+examples/Ecore/ecore_event1.pl
+examples/Ecore/ecore_event2.pl
+examples/Ecore/filemonitor.pl
 examples/Edje/basic.edc
 examples/Edje/basic.pl
 examples/Edje/basic2.edc
@@ -45,6 +48,7 @@ examples/Elementary/panes.pl
 examples/Elementary/popup.pl
 examples/Elementary/popup2.pl
 examples/Elementary/progressbar.pl
+examples/Elementary/progressbar_with_fork.pl
 examples/Elementary/radio.pl
 examples/Elementary/slider.pl
 examples/Emotion/emotion_basic.pl
@@ -79,6 +83,8 @@ lib/pEFL/Ecore/Event/MouseMove.pm
 lib/pEFL/Ecore/Event/MouseMove.xs
 lib/pEFL/Ecore/Event/MouseWheel.pm
 lib/pEFL/Ecore/Event/MouseWheel.xs
+lib/pEFL/Ecore/Event/PerlEvent.pm
+lib/pEFL/Ecore/Event/PerlEvent.xs
 lib/pEFL/Ecore/Event/SignalExit.pm
 lib/pEFL/Ecore/Event/SignalExit.xs
 lib/pEFL/Ecore/Event/SignalRealtime.pm
@@ -89,6 +95,14 @@ lib/pEFL/Ecore/EventFilter.pm
 lib/pEFL/Ecore/EventFilter.xs
 lib/pEFL/Ecore/EventHandler.pm
 lib/pEFL/Ecore/EventHandler.xs
+lib/pEFL/Ecore/EventType.pm
+lib/pEFL/Ecore/EventType.xs
+lib/pEFL/Ecore/FdHandler.pm
+lib/pEFL/Ecore/FdHandler.xs
+lib/pEFL/Ecore/File.pm
+lib/pEFL/Ecore/File.xs
+lib/pEFL/Ecore/FileMonitor.pm
+lib/pEFL/Ecore/FileMonitor.xs
 lib/pEFL/Ecore/Idler.pm
 lib/pEFL/Ecore/Idler.xs
 lib/pEFL/Ecore/Mainloop.pm
@@ -128,6 +142,8 @@ lib/pEFL/Elm.xs
 lib/pEFL/Elm/.directory
 lib/pEFL/Elm/Actionslider.pm
 lib/pEFL/Elm/Actionslider.xs
+lib/pEFL/Elm/App.pm
+lib/pEFL/Elm/App.xs
 lib/pEFL/Elm/Bg.pm
 lib/pEFL/Elm/Bg.xs
 lib/pEFL/Elm/Box.pm
@@ -210,6 +226,8 @@ lib/pEFL/Elm/Object.pm
 lib/pEFL/Elm/Object.xs
 lib/pEFL/Elm/ObjectItem.pm
 lib/pEFL/Elm/ObjectItem.xs
+lib/pEFL/Elm/Palette.pm
+lib/pEFL/Elm/Palette.xs
 lib/pEFL/Elm/Panel.pm
 lib/pEFL/Elm/Panel.xs
 lib/pEFL/Elm/Panes.pm

@@ -1,3 +1,4 @@
+CLAUDE.md
 Changes
 LICENSE
 META.json
@@ -13,10 +14,11 @@ lib/Plerd/Post.pm
 lib/Plerd/SmartyPants.pm
 lib/Plerd/Tag.pm
 lib/Plerd/Util.pm
-lib/Plerd/WebmentionQueue.pm
 minil.toml
+t/atomic_publish.t
 t/basic.t
 t/daemon.t
+t/incremental.t
 t/init.t
 t/source_model/1999-01-01-backdated.md
 t/source_model/1999-01-02-unicode.md

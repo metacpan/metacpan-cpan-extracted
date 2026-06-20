@@ -1,4 +1,7 @@
 Revision history for Perl-Critic-Policy-Misc-ProhibitMethodsInStringConcat
 
+0.02    2026-06-20
+    - Correct POD: printf/sprintf does not avoid undef warning problem
+
 0.01    2026-06-15
     - Initial release. Author Dean Hamstead

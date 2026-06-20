@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Fondation plugin exposing DBIx::Class::Async natively \x{2014}",
+  "ABSTRACT" => "Fondation plugin exposing DBIx::Class::Async natively",
   "AUTHOR" => "Daniel Brosseau <dab\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,12 +18,13 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "DBIx::Class" => 0,
     "DBIx::Class::Async" => "1.0.4",
+    "DBIx::Class::Relationship::ManyToMany::Async" => "0.01",
     "IO::Async::Loop::Mojo" => 0,
     "Mojolicious" => "9.46",
     "Mojolicious::Plugin::Fondation" => "0.01",
     "SQL::Translator" => "0.11018"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "DBIx::Class" => 0,
   "DBIx::Class::Async" => "1.0.4",
+  "DBIx::Class::Relationship::ManyToMany::Async" => "0.01",
   "IO::Async::Loop::Mojo" => 0,
   "Mojolicious" => "9.46",
   "Mojolicious::Plugin::Fondation" => "0.01",

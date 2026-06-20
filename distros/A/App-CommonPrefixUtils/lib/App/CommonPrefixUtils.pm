@@ -1,11 +1,55 @@
 package App::CommonPrefixUtils;
 
+use 5.010001;
 use strict;
+use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-16'; # DATE
+our $DATE = '2026-06-03'; # DATE
 our $DIST = 'App-CommonPrefixUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
+
+our %SPEC;
+
+$SPEC{common_prefix} = {
+    v => 1.1,
+    summary => 'Calculate common prefix from supplied strings',
+    args => {
+        strings => {
+            schema => ['array*', of=>'str*'],
+            cmdline_src => 'stdin_or_args',
+            pos => 0,
+            slurpy => 1,
+        },
+    },
+};
+sub common_prefix {
+    require String::CommonPrefix;
+
+    my %args = @_;
+
+    [200, "OK", String::CommonPrefix::common_prefix(@{ $args{strings} // [] })];
+}
+
+$SPEC{majority_prefix} = {
+    v => 1.1,
+    summary => 'Calculate majority prefix from supplied strings',
+    args => {
+        strings => {
+            schema => ['array*', of=>'str*'],
+            cmdline_src => 'stdin_or_args',
+            pos => 0,
+            slurpy => 1,
+        },
+    },
+};
+sub majority_prefix {
+    require String::CommonPrefix;
+
+    my %args = @_;
+
+    [200, "OK", String::CommonPrefix::majority_prefix(@{ $args{strings} // [] })];
+}
 
 1;
 # ABSTRACT: Utilities related to common prefix
@@ -22,15 +66,96 @@ App::CommonPrefixUtils - Utilities related to common prefix
 
 =head1 VERSION
 
-This document describes version 0.001 of App::CommonPrefixUtils (from Perl distribution App-CommonPrefixUtils), released on 2024-05-16.
+This document describes version 0.002 of App::CommonPrefixUtils (from Perl distribution App-CommonPrefixUtils), released on 2026-06-03.
 
 =head1 SYNOPSIS
 
-See the included scripts.
+See the included scripts:
+
+=over
+
+=item * L<common-prefix>
+
+=item * L<majority-prefix>
+
+=item * L<remove-common-prefix>
+
+=item * L<strip-common-prefix>
+
+=back
 
 =head1 DESCRIPTION
 
 This distribution includes the following CLI scripts related to common prefix.
+
+=head1 FUNCTIONS
+
+
+=head2 common_prefix
+
+Usage:
+
+ common_prefix(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Calculate common prefix from supplied strings.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<strings> => I<array[str]>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 majority_prefix
+
+Usage:
+
+ majority_prefix(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Calculate majority prefix from supplied strings.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<strings> => I<array[str]>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
 
 =for Pod::Coverage ^(.+)$
 
@@ -52,6 +177,12 @@ L<App::CommonSuffixUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 =head1 CONTRIBUTING
 
 
@@ -72,7 +203,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

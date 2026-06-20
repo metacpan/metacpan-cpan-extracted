@@ -24,6 +24,7 @@ t/apps/empty.wav
 t/apps/lite_app.pl
 t/apps/mojolicious.png
 t/apps/stdio.pl
+t/auth_scopes_app.t
 t/lib/MCPStdioTest.pm
 t/lite_app.t
 t/pod.t

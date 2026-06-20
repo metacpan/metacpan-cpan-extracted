@@ -157,3 +157,6 @@ Revision history for Perl extension pEFL.
 	- Several minor fixes
 	- Implement ecore_event_add_pv and pEFL::Ecore::Event::PerlEvent to make it possible to send events in Perl
 	- Fix memory allocation in pEFL::Edje::Messages::* Modules
+0.7701
+	- Fix pod error in pEFL.pm
+	- Add new modules and examples to MANIFEST so that they really are in the tardist :-S

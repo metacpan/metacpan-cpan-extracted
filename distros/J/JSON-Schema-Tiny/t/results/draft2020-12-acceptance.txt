@@ -1,5 +1,5 @@
-generated with:              Test::JSON::Schema::Acceptance 1.034
-with commit:                 8da0a7bcb23f3516590e70bc5c3e396400c27741 (Test-JSON-Schema-Acceptance-1.033)
+generated with:              Test::JSON::Schema::Acceptance 1.037
+with commit:                 75995a1c8112322024d5c04a5eac27813aeb46f0 (Test-JSON-Schema-Acceptance-1.035-20-g75995a1)
 from repository:             /Volumes/chambord/Users/ether/git/JSON-Schema-Test-Suite.git
 specification version:       draft2020-12
 optional tests included:     yes
@@ -19,12 +19,12 @@ default.json                                 7          0     0
 defs.json                                    1          1     0
 dependentRequired.json                      20          0     0
 dependentSchemas.json                       20          0     0
-dynamicRef.json                             22         20     0
+dynamicRef.json                             23         21     0
 enum.json                                   45          0     0
 exclusiveMaximum.json                        4          0     0
 exclusiveMinimum.json                        4          0     0
 format.json                                133          0     0
-if-then-else.json                           26          0     0
+if-then-else.json                           30          0     0
 infinite-loop-detection.json                 2          0     0
 items.json                                  29          0     0
 maxContains.json                            12          0     0
@@ -67,4 +67,4 @@ optional/non-bmp-regex.json                 12          0     0
 optional/refOfUnknownKeyword.json           10          0     0
 optional/unknownKeyword.json                 2          1     0
 ---------------------------------------------------------------
-TOTAL                                     1229        202     0
+TOTAL                                     1234        203     0

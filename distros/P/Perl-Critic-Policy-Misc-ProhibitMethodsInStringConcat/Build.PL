@@ -19,7 +19,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "Perl-Critic-Policy-Misc-ProhibitMethodsInStringConcat",
-  "dist_version" => "0.01",
+  "dist_version" => "0.02",
   "license" => "mit",
   "module_name" => "Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat",
   "recursive_test_files" => 1,

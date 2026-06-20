@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # Use Hypersonic::Event for backend detection
 use Hypersonic::Event;

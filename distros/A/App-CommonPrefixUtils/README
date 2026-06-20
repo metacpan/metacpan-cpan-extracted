@@ -2,15 +2,82 @@ NAME
     App::CommonPrefixUtils - Utilities related to common prefix
 
 VERSION
-    This document describes version 0.001 of App::CommonPrefixUtils (from
-    Perl distribution App-CommonPrefixUtils), released on 2024-05-16.
+    This document describes version 0.002 of App::CommonPrefixUtils (from
+    Perl distribution App-CommonPrefixUtils), released on 2026-06-03.
 
 SYNOPSIS
-    See the included scripts.
+    See the included scripts:
+
+    *   common-prefix
+
+    *   majority-prefix
+
+    *   remove-common-prefix
+
+    *   strip-common-prefix
 
 DESCRIPTION
     This distribution includes the following CLI scripts related to common
     prefix.
+
+FUNCTIONS
+  common_prefix
+    Usage:
+
+     common_prefix(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Calculate common prefix from supplied strings.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   strings => *array[str]*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  majority_prefix
+    Usage:
+
+     majority_prefix(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Calculate majority prefix from supplied strings.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   strings => *array[str]*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -27,6 +94,9 @@ SEE ALSO
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
@@ -45,7 +115,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

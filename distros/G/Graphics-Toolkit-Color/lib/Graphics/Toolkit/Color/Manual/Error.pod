@@ -1,0 +1,64 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Error - GTC error handling
+
+=head1 SYNOPSIS
+
+This L<manual|Graphics::Toolkit::Color::Manual> page explains how GTC 
+error messages behave and how to change it to a preferred behaviour.
+
+=head1 MODES
+
+If a user does misspell a method argument or passes bad data, he will
+get an error. But GTC knows 5 ways to deliver that error.
+
+=head2 carp
+
+Warning with a stack trace from the perspective of the GTC caller via
+C<carp> (L<Carp>). This is the default mode.
+
+=head2 croak
+
+Exception with a stack trace that has to be dealt with using something 
+alike L<Try::Tiny> or C<eval>.
+
+=head2 say
+
+Normal string to I<STDOUT> from the perspective of the GTC method that
+has the issue with bad input.
+
+=head2 die
+
+Exception with info from the perspective of the GTC method.
+
+=head2 quiet
+
+The error will be suppressed. Please check if there is at least a GTC
+object returned.
+
+=head1 SETUP
+
+The error is chosen with the use-statement that is also responsible for
+all symbol imports.
+
+  use Graphics::Toolkit::Color qw/color/, error => 'quiet';
+
+
+=head1 INTRODUCTION
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

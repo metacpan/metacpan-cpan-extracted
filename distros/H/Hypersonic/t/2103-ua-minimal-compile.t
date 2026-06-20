@@ -30,7 +30,13 @@ sub start_test_server {
         $server->run(port => $PORT, workers => 1);
     });
 
-    wait_for_port($PORT, { pid => $server_pid, log => $server_log, tries => 50 })
+    # tries => 50 was 10s, which timed out on the ANDK k93msid
+    # DEBUGGING perl 5.24.0 smoker (Hypersonic 0.18 report
+    # 404e86a8) with `Child server still alive but not listening on
+    # port 34861`. Raise to 600 (120s) and let HypersonicTest's
+    # 60s floor + PERL_TEST_TIME_OUT_FACTOR scaling handle the rest.
+    # This is the same budget t/0035-e2e-streaming.t uses.
+    wait_for_port($PORT, { pid => $server_pid, log => $server_log, tries => 600, sleep => 0.2 })
         or die "Server failed to start";
     return 1;
 }

@@ -26,5 +26,5 @@ requires:
   perl: '5.016000'
 resources:
   repository: https://github.com/yaml/yamlstar.git
-version: v0.1.3
+version: v0.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

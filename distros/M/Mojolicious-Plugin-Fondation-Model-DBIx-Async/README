@@ -1,7 +1,7 @@
 This archive contains the distribution Mojolicious-Plugin-Fondation-Model-DBIx-Async,
-version 0.01:
+version 0.02:
 
-  Fondation plugin exposing DBIx::Class::Async natively —
+  Fondation plugin exposing DBIx::Class::Async natively
 
 This software is copyright (c) 2026 by Daniel Brosseau.
 

@@ -1,3 +1,8 @@
+0.002   2026-06-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLIs: common-prefix, majority-prefix.
+
+
 0.001   2024-05-16  Released-By: PERLANCAR
 
         - First release.

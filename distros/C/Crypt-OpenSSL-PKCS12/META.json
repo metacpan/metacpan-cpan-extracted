@@ -4,7 +4,7 @@
       "Dan Sully"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
          "web" : "https://github.com/dsully/perl-crypt-openssl-pkcs12"
       }
    },
-   "version" : "1.95",
+   "version" : "1.96",
    "x_contributors" : [
       "@mmuehlenhoff",
       "@sectokia",

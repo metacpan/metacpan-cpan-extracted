@@ -1,0 +1,27 @@
+Changes
+Declare.xs
+include/destructure.h
+lib/Destructure/Declare.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+t/00-load.t
+t/01-array-basic.t
+t/02-hash-basic.t
+t/03-nested.t
+t/04-defaults.t
+t/05-slurpy-array.t
+t/06-holes.t
+t/07-eval-once.t
+t/08-scope.t
+t/09-errors.t
+t/10-codegen.t
+t/11-slurpy-hash.t
+t/12-list-form.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/bench.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

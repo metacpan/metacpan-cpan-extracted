@@ -1,19 +1,33 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+# 1.96 2026-06-19, security release, update recommended
+
+- Security: fix [CVE-2026-9265](https://www.cve.org/CVERecord?id=CVE-2026-9265) — heap out-of-bounds read in `print_attribute`
+  UTF8STRING path. Reported and fixed by @timlegge via PR [#59](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/59).
+
+- Fix [#55](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/55): missing length guard in BMPSTRING branch of `print_attribute`.
+
+- Fix [#56](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/56): buffer too small for attribute types with names longer than 4 characters;
+  switched `strncpy` to `memcpy` in the UTF8STRING path.
+
+- Fix potential memory leak on a croak in `print_attribute`.
+
+- Fix broken builds caused by version mismatch in extra `Makefile.PL`.
+
 # 1.95 2026-05-17, security release, update recommended
 
-- Security: fix CVE-2026-8507 — integer overflow in `print_attribute` leading to
+- Security: fix [CVE-2026-8507](https://www.cve.org/CVERecord?id=CVE-2026-8507) — integer overflow in `print_attribute` leading to
   heap out-of-bounds write when an OCTET STRING or BIT STRING attribute length
   overflows `int * 4`. Lengths > `INT_MAX/4` now croak explicitly.
 
-- Security (CVE-2026-8721): length-aware password handling across all XS entry points.
+- Security ([CVE-2026-8721](https://www.cve.org/CVERecord?id=CVE-2026-8721)): length-aware password handling across all XS entry points.
   Passwords are now extracted with `SvPV` (preserving the full Perl string length)
   rather than relying on `strlen`. APIs that accept an explicit length
   (`PKCS12_verify_mac`, `dump_certs_keys_p12`) receive the true byte count;
   APIs that use `strlen` internally (`PKCS12_create`, `PKCS12_newpass`) now
   croak with a clear diagnostic if the password contains an embedded NUL byte.
 
-  Thanks to the CPANsec team for reporting and assisting with these issues: https://security.metacpan.org
+  Thanks to the [CPANsec team](https://security.metacpan.org) for reporting and assisting with these issues.
 
 # 1.94 2024-10-01
 

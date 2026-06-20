@@ -1,0 +1,65 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Cookbook - examples that solve practical issues
+
+=head1 SYNOPSIS
+
+This L<manual|Graphics::Toolkit::Color::Manual> page answers practical 
+problems with multi line code examples and their detailed explanation
+with some added background knowledge.
+This is complementary to the reference pages that contain only one line
+examples that showcase a single method or argument.
+
+=head1 RECIPES
+
+=head2 How to convert color values?
+
+GTC has no dedicated converter methods in the style of rgb2hsl because it
+supports 33 color spaces, which would result in 33 * 32 = 1056 methods. 
+GTC objects represent a color independent of a 
+L<color space|Graphics::Toolkit::Color::Manual::Space>. That is why
+the L<constructor|Graphics::Toolkit::Color::Manual::Constructor> will accept
+colors defined in all supported spaces and the method
+L<values|Graphics::Toolkit::Color::Manual::Getter/values> will give you
+a numeric output in the desired color space set by the argument
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> and many
+L<formats|Graphics::Toolkit::Color::Manual::Format>.
+A conversion of an ordinary CSS color will therefore look like:
+
+  use Graphics::Toolkit::Color qw/color/;
+  my $okhsl = color('rgb(34, 56, 123)')->values( in => 'OKHSL', as => 'css_string');
+
+
+
+=head2 How to translate a CSS color name into values and back?
+
+  my $color = color('CSS:blue');
+  $color->name(from => 'CSS');
+    
+
+=head2 How to get a split complementary palette?
+
+
+  my @colors = $color->complement( steps => 3, tilt => 3.42 );  
+  my @colors = $color->complement( steps => 4, tilt => 1.585 ); 
+
+
+=head2 How to get a monochrome palette?
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -53,52 +53,52 @@ no_index:
 provides:
   JSON::Schema::Modern:
     file: lib/JSON/Schema/Modern.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Annotation:
     file: lib/JSON/Schema/Modern/Annotation.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Document:
     file: lib/JSON/Schema/Modern/Document.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Error:
     file: lib/JSON/Schema/Modern/Error.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Result:
     file: lib/JSON/Schema/Modern/Result.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::ResultNode:
     file: lib/JSON/Schema/Modern/ResultNode.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Utilities:
     file: lib/JSON/Schema/Modern/Utilities.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Vocabulary:
     file: lib/JSON/Schema/Modern/Vocabulary.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Vocabulary::Applicator:
     file: lib/JSON/Schema/Modern/Vocabulary/Applicator.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Vocabulary::Content:
     file: lib/JSON/Schema/Modern/Vocabulary/Content.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Vocabulary::Core:
     file: lib/JSON/Schema/Modern/Vocabulary/Core.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Vocabulary::FormatAnnotation:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Vocabulary::FormatAssertion:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Vocabulary::MetaData:
     file: lib/JSON/Schema/Modern/Vocabulary/MetaData.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Vocabulary::Unevaluated:
     file: lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm
-    version: '0.640'
+    version: '0.641'
   JSON::Schema::Modern::Vocabulary::Validation:
     file: lib/JSON/Schema/Modern/Vocabulary/Validation.pm
-    version: '0.640'
+    version: '0.641'
 requires:
   B: '0'
   Carp: '0'
@@ -107,7 +107,6 @@ requires:
   Exporter: '0'
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
-  Getopt::Long::Descriptive: '0'
   JSON::PP: '4.11'
   List::Util: '1.55'
   MIME::Base64: '0'
@@ -122,7 +121,6 @@ requires:
   Moo: '0'
   Moo::Role: '0'
   MooX::TypeTiny: '0.002002'
-  Safe::Isa: '1.000008'
   Scalar::Util: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '1.016003'
@@ -145,7 +143,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Modern/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Modern
   repository: https://github.com/karenetheridge/JSON-Schema-Modern.git
-version: '0.640'
+version: '0.641'
 x_Dist_Zilla:
   perl:
     version: '5.043010'
@@ -245,7 +243,7 @@ x_Dist_Zilla:
           repo_root: .
           version: '0.009'
       name: '@Author::ETHER/generate CONTRIBUTING'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::InstallGuide
       config:
@@ -829,7 +827,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.640
+          tag: v0.641
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -984,6 +982,7 @@ x_Dist_Zilla:
             - Net::IDN::Encode
             - Sereal
             - Cpanel::JSON::XS
+            - Getopt::Long::Descriptive
           modules_from_features: ~
           to_relationship: suggests
       name: Prereqs::Soften

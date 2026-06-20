@@ -8,6 +8,8 @@ use Test::More 0.88;
 use Astro::Coord::ECI::TLE::Iridium;
 use Astro::Coord::ECI::Utils qw{ time_gm };
 
+plan skip_all	=> 'Kelso dropped Iridium status 2024-04-26';
+
 eval {
     require LWP::UserAgent;
     1;

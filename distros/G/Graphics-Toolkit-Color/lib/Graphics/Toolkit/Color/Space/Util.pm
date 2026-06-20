@@ -5,7 +5,7 @@ package Graphics::Toolkit::Color::Space::Util;
 use v5.12;
 use warnings;
 use Exporter 'import';
-our @EXPORT_OK = qw/min max uniq round_int round_decimals mod_real gamma_correct mult_matrix_vector_3 is_nr number_re/;
+our @EXPORT_OK = qw/min max uniq round_int round_decimals mod_real spow mult_matrix_vector_3 is_nr number_re/;
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 #### lists #############################################################
@@ -47,7 +47,7 @@ sub mod_real { # real value modulo
     return  $_[0] - (int($_[0] / $_[1]) * $_[1]);
 }
 
-sub gamma_correct { # spow: sign preserving power function
+sub spow { # sign preserving power function
     my ($base, $exponent) = @_;
     return $base ** $exponent if $base >= 0;
     return -((-$base) ** $exponent);

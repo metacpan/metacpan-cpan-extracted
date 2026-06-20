@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Modern
 
+0.641     2026-06-19 20:01:55Z
+          - removed hard dependency on Getopt::Long::Descriptive and all uses
+            of Safe::Isa
+
 0.640     2026-05-30 17:45:48Z
           - fix application/x-www-form-urlencoded encoding of array values
           - media-type handling fixes in anticipation of multipart support

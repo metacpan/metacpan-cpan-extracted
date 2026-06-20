@@ -61,6 +61,7 @@ my %bindings = (
     floor  => sub { $bf->floor($_[0]) },
     ceil   => sub { $bf->ceil($_[0]) },
     round  => sub { $bf->round($_[0]) },
+    to_fixed => sub { $bf->to_fixed(@_) },
 
     # The Mojo renderer emits native lc()/uc(); Xslate emits $bf.lc /
     # $bf.uc. The helper methods wrap CORE::lc/uc, so binding them
@@ -92,6 +93,11 @@ my %bindings = (
     arr => sub { [@_] },
     # Mirrors the Mojo inline `[grep { $_ } @{...}]` for filter(Boolean).
     filter_truthy => sub { [grep { $_ } @{ $_[0] }] },
+
+    # searchParams().get(key) (#1922) via the lazy factory consumers use.
+    # No divergence entry: get() returns undef for an absent key (~ JS null)
+    # and '' for present-but-empty, so the Perl backend matches JS exactly.
+    search_params_get => sub { BarefootJS->search_params($_[0])->get($_[1]) },
 
     # Higher-order entries arrive in the canonical projection form
     # (spec: items + field [+ value]); the closures below rebuild the

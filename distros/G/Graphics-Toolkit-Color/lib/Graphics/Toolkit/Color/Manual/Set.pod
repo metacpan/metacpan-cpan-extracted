@@ -1,0 +1,205 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Set - reference of color set creation methods
+
+=head1 SYNOPSIS
+
+This L<manual|Graphics::Toolkit::Color::Manual> page contains the most
+detailed description of the four color set creation methods: 
+L</complement>, L</analogous>, L</gradient> and L</cluster> with an 
+explanation of all L<arguments|Graphics::Toolkit::Color::Manual::Argument> 
+they provide. All methods return a list of GTC objects unless a typo or
+data type mismatch triggers an L<error|Graphics::Toolkit::Color::Manual::Error>.
+
+=head1 METHODS
+
+=head2 complement
+
+C<complement> computes complementary colors (GTC objects). These are colors 
+that are as colorful (saturated) and bright (lightness) as the original color (invocant), 
+but have a difference in hue that is optimized for contrast. The method
+accepts five named and optional arguments: C<steps>, C<in>, C<target>, C<tilt>
+and C<skew>. The last three extend the described concept greatly. 
+If no argument is provided, THE single complementary color will be computed, 
+which has the opposite hue as the original. 
+You may use C<steps> as the only positional argument.
+
+L<steps|Graphics::Toolkit::Color::Manual::Argument/steps> prescribes the amount
+of colors produced. It has to be a positive integer, which defaults to one.
+Since C<complement> works only in cylindrical spaces of the I<HSL> family,
+imagine a horizontal circle in I<HSL> space around the middle column. 
+C<complement> simply divides this circle into equally sized slices and 
+every point where the circle is cut becomes a complementary color. 
+The color (point) on the opposite side of the original color is THE complement. 
+If you choose two steps (cut the circle in two) you get THE complementary 
+and the original, with three steps you get triadic colors, with four you 
+get tetradic (quadratic) colors and so forth. For values greater than one,
+the invocant will always be the last color returned.
+
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> sets the color space
+the C<complement> will be computed in, which is 
+L<OKHSL|Graphics::Toolkit::Color::Manual::Space/OKHSL> per default. 
+It has to be a space of the 
+L<HSL family|Graphics::Toolkit::Color::Manual::Space/HSL-family>.
+
+C<target> moves THE complement and thus the whole circle of complementary colors.
+Only the given color stays unaltered and part of the circle.
+The argument expects a HASH reference which contains some or all axis
+names (short or long) of the chosen color space (argument C<in>).
+The values associated with the axis names will be added to the values of 
+THE complement (target color) the same way 
+L<add_value|Graphics::Toolkit::Color::Manual::Calculation/add_value> would do.
+
+L<tilt|Graphics::Toolkit::Color::Manual::Argument/tilt> moves the colors
+along the described circle of complements. The expected floating point 
+number describes how much they are moved toward THE complement (target) 
+if positive and toward the original color if negative. 
+What is traditionally meant by split-complementary colors you will
+get with a C<tilt> factor of around 3.42 with three C<steps> or
+1.585 and four C<steps> (depending on whether you need THE complement in your set).
+C<tilt> defaults to zero.
+
+C<skew> rotates the circle of complementary colors around the axis that
+pierces through the original color and THE complement. This will result
+in stronger differences of I<lightness> between the complementary colors.
+C<skew> expects a floating point number. If that is positive, the right 
+side of the circle (looking toward THE complement) is moved up (toward white)
+and vice versa. C<skew> defaults to zero. Please note that C<skew>
+(like C<target>) expects absolute values, which need to be different
+from color space to color space to produce the same results.
+
+    my @colors = $c->complement( 4 );                          # 'quadratic' colors
+    my @colors = $c->complement( steps => 4, tilt => 1.585 );  # split-complementary colors
+    my @colors = $c->complement( steps => 3, tilt => 2, target => { l => -10 } );
+    my @colors = $c->complement( steps => 3, tilt => 2, target => { h => 20, s=> -5, l => -10 });
+
+
+
+=head2 analogous
+
+C<analogous> computes analogous colors (GTC objects). These are series of
+colors, where every pair of neighbours differs the same way from each other. 
+This method may be used to produce a L</gradient> or
+L<complementary|/complement> colors but it works differently in edge cases 
+and has generally fewer options to shape the result than any of these methods. 
+Its strength comes from being able to interpolate from two given colors 
+without having to do much additional computation. The method accepts four 
+named arguments: C<to>, C<steps>, C<in> and C<tilt>. Only C<to> is required 
+and can be provided as a positional argument if it is the only one.
+
+L<to|Graphics::Toolkit::Color::Manual::Argument/to> expects a color object
+or scalar color definition, which will be the color most similar to the 
+starting one (invocant). It will be called here the I<second color>.
+
+L<steps|Graphics::Toolkit::Color::Manual::Argument/steps> requires a positive
+integer, which will be the maximal amount of colors produced. The method
+stops as soon as the generated color is out of range. C<steps> defaults to four.
+
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> sets the color space
+the C<analogous> colors will be computed in, which is 
+L<OKHSL|Graphics::Toolkit::Color::Manual::Space/OKHSL> per default. 
+
+L<tilt|Graphics::Toolkit::Color::Manual::Argument/tilt> helps to differ
+from the default behavior, where the 
+L<distance|Graphics::Toolkit::Color::Manual::Getter/distance> between
+two neighbouring colors is always the same. If C<tilt> is a positive
+floating point number, this distance will increase and when it is negative 
+it will shrink. C<tilt> defaults to zero. The distance between the starting 
+color and the I<second color> is always taken as 100%. If C<tilt> is for
+instance 0.2, the distance between the second and the third color will be
+120% or it will be 80% if C<tilt> is -0.2. The distance between the third
+and fourth color will be 1.2 * 120 = 144% or 64% respectively. In any
+case all four colors will be located on one line. Please note this line
+might be curved if the color space is cylindrical.
+
+    my @colors = $c->analogous( $second_color );             # 4 analogous colors
+    my @colors = $c->analogous( to => 'black', steps => 6, in => 'OKLCH', tilt => 0.05 );
+
+
+
+=head2 gradient
+
+C<gradient> creates a gradient (a list of color objects that build a transition)
+between the current color held by the object and a second color,
+provided by the named argument C<to>. That is required and may be provided
+as a positional argument if it is the only one. The optional arguments are: 
+C<steps>, C<in> and C<tilt>.
+
+L<to|Graphics::Toolkit::Color::Manual::Argument/to> expects a color object
+or scalar color definition, which will be the end color of the gradient.
+The calling object represents the starting color. You may provide an ARRAY
+reference (square braces) with several independently formatted colors for 
+custom gradients that will incorporate these colors in the order you inserted
+them into the ARRAY.
+
+L<steps|Graphics::Toolkit::Color::Manual::Argument/steps> requires a positive
+integer, which will be the amount of colors produced. C<steps> defaults to ten.
+
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> sets the color space
+the C<gradient> colors will be computed in, which is 
+L<OKLAB|Graphics::Toolkit::Color::Manual::Space/OKLAB> per default. 
+
+L<tilt|Graphics::Toolkit::Color::Manual::Argument/tilt> moves the colors
+of the gradient toward the end color or the starting color. The former will
+happen if the floating point C<tilt> value is positive and the latter if 
+it is negative. The greater the absolute C<tilt> value the greater the effect.
+C<tilt> defaults to zero, which results in a gradient of colors with equal
+L<distance|Graphics::Toolkit::Color::Manual::Getter/distance> between them.
+Please note that the effect of C<tilt> is exponential (it is accelerating).
+
+    # we turn to grey
+    my @colors = $c->gradient( to => 'grey50', steps => 5);
+    # non-linear gradient in HSL space :
+    @colors = $c1->gradient( to =>[14,10,222], steps => 10, tilt => 1, in => 'HSL' );
+    @colors = $c1->gradient( to =>['blue', 'brown', {h => 30, s => 44, l => 50}] );
+
+
+=head2 cluster
+
+C<cluster> computes a set of colors that are similar but not too similar.
+The calling object will sit in the center of the cluster and is always 
+part of the result. The amount of resulting colors depends on the
+arguments and can greatly vary.
+The method accepts three named arguments: C<radius>, C<minimal_distance>
+and C<in>, of which the first two are required. C<radius> can be abbreviated 
+as C<r> and C<minimal_distance> as C<min_d>.
+
+C<radius> determines the size of the cluster, the maximal 
+L<distance|Graphics::Toolkit::Color::Manual::Getter/distance> between
+a color of the cluster and the center. If C<radius> is a floating point 
+number, the cluster will be ball-shaped and packed in a cuboctahedral grid.
+If the C<radius> is provided in form of an ARRAY that contains a floating 
+point number for each axis, there will be a cubic packing that extends 
+on each dimension only as far as the given number for this axis allows.
+
+C<minimal_distance> requires one floating point number that determines
+the density of the packing, which is the minimal
+L<distance|Graphics::Toolkit::Color::Manual::Getter/distance> in any direction
+of two neighbouring colors.
+
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> sets the color space
+the C<cluster> colors will be computed in, which is 
+L<OKLAB|Graphics::Toolkit::Color::Manual::Space/OKLAB> per default.
+Please note that cuboctahedral packing (radius is a single number) does
+not work in L<CMYK|Graphics::Toolkit::Color::Manual::Space/CMYK> space.
+
+    my @blues = $blue->cluster( radius => 4, minimal_distance => 0.3 );
+    my @c = $color->cluster( r => [2,2,3], min_d => 0.4, in => 'YUV' );
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

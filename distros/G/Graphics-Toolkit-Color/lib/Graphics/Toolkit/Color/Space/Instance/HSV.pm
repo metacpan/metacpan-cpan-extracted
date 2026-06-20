@@ -37,13 +37,14 @@ sub to_rgb {
 }
 
 Graphics::Toolkit::Color::Space->new (
+          family => 'HSV',
             axis => [qw/hue saturation value/],
            range => [360, 100, 100],
        precision => 0,
             type => [qw/angular linear linear/],
         # suffix => ['', '%', '%'],
       constraint => {cone => {checker => '$_[0][1] <= $_[0][2]',
-                             error    => 'Saturation can not be greater than Value',
+                             error    => 'saturation can not be greater than value',
 		                     remedy   => '[$_[0][0], $_[0][2], $_[0][2]]', }},
          convert => {RGB => [\&to_rgb, \&from_rgb]},
 );

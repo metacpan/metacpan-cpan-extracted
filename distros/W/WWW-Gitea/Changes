@@ -1,0 +1,12 @@
+Revision history for WWW-Gitea
+
+0.001     2026-06-19 15:10:02Z
+    - Initial release
+    - WWW::Gitea: Moo client for the Gitea REST API (api/v1) with token or
+      basic auth. Resource controllers for repos, issues, pull requests,
+      labels, milestones, releases, organizations and users, plus version /
+      current-user helpers.
+    - Operation dispatch via pre-computed OpenAPI operation tables
+      (WWW::Gitea::Role::OpenAPI), no runtime spec parsing.
+    - Lightweight entity wrappers exposing the commonly needed fields and
+      lifecycle methods, with the raw decoded JSON kept on ->data.

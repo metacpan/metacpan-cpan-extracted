@@ -15,18 +15,21 @@ meta-spec:
   version: '1.4'
 name: Dist-Zilla-PluginBundle-Author-GETTY
 provides:
+  Dist::Zilla::Plugin::Author::GETTY::GiteaMeta:
+    file: lib/Dist/Zilla/Plugin/Author/GETTY/GiteaMeta.pm
+    version: '0.316'
   Dist::Zilla::PluginBundle::Author::GETTY:
     file: lib/Dist/Zilla/PluginBundle/Author/GETTY.pm
-    version: '0.315'
+    version: '0.316'
   Dist::Zilla::PluginBundle::Author::GETTY::Docker:
     file: lib/Dist/Zilla/PluginBundle/Author/GETTY/Docker.pm
-    version: '0.315'
+    version: '0.316'
   Pod::Elemental::Transformer::Author::GETTY:
     file: lib/Pod/Elemental/Transformer/Author/GETTY.pm
-    version: '0.315'
+    version: '0.316'
   Pod::Weaver::PluginBundle::Author::GETTY:
     file: lib/Pod/Weaver/PluginBundle/Author/GETTY.pm
-    version: '0.315'
+    version: '0.316'
 requires:
   Alien::Build: '1.00'
   App::cpanminus: '1.7049'
@@ -60,7 +63,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues
   homepage: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty
   repository: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
-version: '0.315'
+version: '0.316'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -346,7 +349,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.315'
+          tag: '0.316'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -409,7 +412,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHub::CreateRelease
       name: '@Author::GETTY/GitHub::CreateRelease'
-      version: '0.0008'
+      version: '0.0009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

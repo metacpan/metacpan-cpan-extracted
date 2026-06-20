@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.640';
+our $VERSION = '0.641';
 
 use 5.020;
 use Moo;
@@ -158,7 +158,7 @@ sub _traverse_keyword_schema ($class, $schema, $state) {
     else {
       ($spec_version, $vocabularies) = $state->{evaluator}->_fetch_vocabulary_data({ %$state,
           keyword => '$vocabulary', initial_schema_uri => Mojo::URL->new($schema->{'$schema'}),
-          traversed_keyword_path => jsonp($state->{traversed_keyword_path}.$state->{keyword_path}, $state->{keyword}) },
+          traversed_keyword_path => jsonp($state->{traversed_keyword_path}.$state->{keyword_path}, $state->{keyword}//()) },
         $schema_info);
     }
   }
@@ -421,7 +421,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.640
+version 0.641
 
 =head1 DESCRIPTION
 

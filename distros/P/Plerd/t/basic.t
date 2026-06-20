@@ -6,6 +6,7 @@ use Path::Class::Dir;
 use Path::Class::File;
 use URI;
 use DateTime;
+use JSON;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -82,6 +83,11 @@ my $post = Path::Class::File->new( $docroot_dir, '1999-01-01-backdated.html' )->
 like ( $post,
        qr{an <em>example</em> of a “backdated},
        'Post title is formatted.'
+     );
+my $json = Path::Class::File->new( $docroot_dir, 'feed.json' )->slurp;
+like ( $json,
+       qr{A good source file},
+       'JSON Feed file has HTML-stripped titles.',
      );
 }
 
@@ -387,6 +393,161 @@ like( $post,
     'Metatags: Defined default alt-text',
 );
 
+}
+
+### Test that the JSON feed is valid even when a post body contains
+### characters that need JSON-escaping (backslashes, quotes, tabs).
+# (Regression: the old hand-rolled `json` filter escaped only " and \n,
+#  producing invalid JSON for bodies containing backslashes etc.)
+{
+my $tricky_file = Path::Class::File->new( $source_dir, 'tricky-json.md' );
+$tricky_file->spew( iomode => '>:encoding(utf8)', <<'EOF' );
+title: Tricky JSON
+
+A Windows path in a code span: `C:\Users\test\file.txt`, plus a stray
+backslash \ and a "quoted" phrase, for good measure.
+EOF
+
+my $json_plerd = Plerd->new(
+    path         => $blog_dir->stringify,
+    title        => 'Test Blog',
+    author_name  => 'Nobody',
+    author_email => 'nobody@example.com',
+    base_uri     => URI->new( 'http://blog.example.com/' ),
+);
+$json_plerd->publish_all;
+
+my $json_text = Path::Class::File->new( $docroot_dir, 'feed.json' )
+    ->slurp( iomode => '<:encoding(utf8)' );
+my $decoded = eval { JSON->new->decode( $json_text ) };
+ok( $decoded,
+    'JSON feed is valid even with backslashes and quotes in a post body.' )
+    or diag( "JSON decode failed: $@" );
+
+unlink $tricky_file;
+}
+
+### Test that tag URLs respect a base_uri that has a path and no trailing
+### slash. (Regression: Tag and tag-index URIs used to drop the
+### base_uri's path component, breaking blogs hosted in a subdirectory.)
+{
+my $subdir_plerd = Plerd->new(
+    path         => $blog_dir->stringify,
+    title        => 'Test Blog',
+    author_name  => 'Nobody',
+    author_email => 'nobody@example.com',
+    base_uri     => URI->new( 'http://www.example.com/blog' ),
+);
+
+is( $subdir_plerd->base_uri_with_slash->as_string,
+    'http://www.example.com/blog/',
+    'base_uri_with_slash appends a missing trailing slash.',
+);
+is( $subdir_plerd->tags_index_uri->as_string,
+    'http://www.example.com/blog/tags/',
+    'Tag-index URI preserves the base_uri path.',
+);
+
+$subdir_plerd->publish_all;
+my $tag_index_content =
+    Path::Class::File->new( $docroot_dir, 'tags', 'index.html' )->slurp;
+like( $tag_index_content,
+    qr{http://www\.example\.com/blog/tags/},
+    'Generated tag links preserve the base_uri path.',
+);
+}
+
+### Test that publishing (re)creates the index.html symlink even when a
+### stale index.html already exists in the docroot.
+# (Regression: symlink() silently fails when the destination already
+#  exists, so a stale or incorrect index.html was never corrected.)
+{
+my $index_file = Path::Class::File->new( $docroot_dir, 'index.html' );
+$index_file->remove if -e $index_file || -l $index_file;
+# Plant a stale regular file where the symlink should go.
+$index_file->spew( iomode => '>:encoding(utf8)', 'STALE' );
+
+my $symlink_plerd = Plerd->new(
+    path         => $blog_dir->stringify,
+    title        => 'Test Blog',
+    author_name  => 'Nobody',
+    author_email => 'nobody@example.com',
+    base_uri     => URI->new( 'http://blog.example.com/' ),
+);
+$symlink_plerd->publish_all;
+
+my $recent_content =
+    Path::Class::File->new( $docroot_dir, 'recent.html' )->slurp;
+is( $index_file->slurp, $recent_content,
+    'Publishing replaces a stale index.html with the recent-posts page.' );
+}
+
+### Test incremental publishing via publish_file.
+{
+my $inc_source = Path::Class::File->new( $source_dir, 'incremental-post.md' );
+$inc_source->spew( iomode => '>:encoding(utf8)',
+    "title: Incremental original title\n\nThe original body text.\n" );
+
+my $inc_plerd = Plerd->new(
+    path         => $blog_dir->stringify,
+    title        => 'Test Blog',
+    author_name  => 'Nobody',
+    author_email => 'nobody@example.com',
+    base_uri     => URI->new( 'http://blog.example.com/' ),
+);
+
+# The first publish_file sees no stored hash, so it republishes everything
+# and records a metadata hash for every source file.
+$inc_plerd->publish_file( $inc_source );
+
+my $posts_json = Path::Class::File->new( $blog_dir, 'db', 'posts.json' );
+ok( -e $posts_json, 'db/posts.json exists after an initial publish_file.' );
+
+my $hashes = JSON->new->decode(
+    scalar $posts_json->slurp( iomode => '<:encoding(utf8)' ) );
+ok( exists $hashes->{ 'incremental-post.md' },
+    'posts.json has an entry for the changed source file.' );
+ok( scalar( keys %$hashes ) > 1,
+    "posts.json has entries for the blog's other source files too." );
+
+# Discover the post's published (date-prefixed) HTML filename.
+my ( $published_filename ) =
+    $inc_source->slurp( iomode => '<:encoding(utf8)' )
+        =~ /published_filename:\s*(\S+)/;
+my $post_html = Path::Class::File->new( $docroot_dir, $published_filename );
+my $archive_html = Path::Class::File->new( $docroot_dir, 'archive.html' );
+
+# Editing only the body leaves the metadata block (and its hash) untouched,
+# so the archive page should not be rewritten.
+my $archive_mtime_before = $archive_html->stat->mtime;
+{
+    my $content = $inc_source->slurp( iomode => '<:encoding(utf8)' );
+    $content =~ s/The original body text\./An edited body, same metadata./;
+    $inc_source->spew( iomode => '>:encoding(utf8)', $content );
+}
+$inc_plerd->publish_file( $inc_source );
+
+is( $archive_html->stat->mtime, $archive_mtime_before,
+    'A body-only edit does not rewrite the archive page (partial publish).' );
+like( $post_html->slurp( iomode => '<:encoding(utf8)' ),
+      qr/An edited body, same metadata\./,
+      'A body-only edit still republishes the post itself.' );
+
+# Editing the title changes the metadata block, so the whole blog should be
+# republished (rewriting the archive page).
+sleep 1;    # mtime has 1-second resolution; ensure a rewrite looks newer.
+$archive_mtime_before = $archive_html->stat->mtime;
+{
+    my $content = $inc_source->slurp( iomode => '<:encoding(utf8)' );
+    $content =~ s/title: Incremental original title/title: Incremental NEW title/;
+    $inc_source->spew( iomode => '>:encoding(utf8)', $content );
+}
+$inc_plerd->publish_file( $inc_source );
+
+isnt( $archive_html->stat->mtime, $archive_mtime_before,
+    'A title edit triggers a full republish (archive page rewritten).' );
+
+unlink $inc_source;
 }
 
 done_testing();

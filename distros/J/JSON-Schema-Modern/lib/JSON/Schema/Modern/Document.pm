@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.640';
+our $VERSION = '0.641';
 
 use 5.020;
 use Moo;
@@ -22,7 +22,6 @@ use Mojo::URL;
 use Carp 'croak';
 use List::Util 1.29 'pairs';
 use builtin::compat qw(refaddr blessed);
-use Safe::Isa 1.000008;
 use MooX::TypeTiny;
 use Types::Standard 1.016003 qw(InstanceOf HashRef Str Map Dict ArrayRef Enum ClassName Undef Slurpy Optional Bool);
 use Types::Common::Numeric 'PositiveOrZeroInt';
@@ -41,7 +40,7 @@ has canonical_uri => (
   isa => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
   lazy => 1,
   default => sub { Mojo::URL->new },
-  coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
+  coerce => sub { blessed($_[0]) && $_[0]->isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
 );
 
 # this is also known as the retrieval uri in the OpenAPI specification
@@ -55,7 +54,7 @@ has original_uri => (
 has metaschema_uri => (
   is => 'rwp',
   isa => InstanceOf['Mojo::URL'],
-  coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
+  coerce => sub { blessed($_[0]) && $_[0]->isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
   predicate => '_has_metaschema_uri',
   # default not defined here, but might be defined in a subclass
 );
@@ -312,7 +311,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.640
+version 0.641
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,276 @@
+
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::Plugin - how to extend GTC
+
+=head1 SYNOPSIS
+
+This L<manual|Graphics::Toolkit::Color::Manual> page explains in detail
+the two mechanisms by which the user might add GTC functionality without
+submitting a L<pull request|https://github.com/lichtkind/Graphics-Toolkit-Color/pulls>: 
+
+One mechanism is color name schemes. These are sets of color names that
+translate to L<RGB|Graphics::Toolkit::Color::Manual::Space/RGB> values.
+
+The more powerful mechanism is color spaces. They define numerically 
+sets of colors that are arranged along axes in space.
+
+=head1 COLOR SCHEME
+
+=head2 Runtime
+
+The easier way to create a color name scheme ad hoc is to create a 
+C<GTC::Name::Scheme> object:
+
+  my $scheme = Graphics::Toolkit::Color::Name::Scheme->new();
+  $scheme->add_color( 'best_blue', [20, 30, 250]);            # name and RGB triplet
+  ...                                                         # add more colors
+  Graphics::Toolkit::Color::Name::add_scheme( $scheme, 'mycolors' );
+
+This will allow the user to L<create|Graphics::Toolkit::Color::Manual::Constructor>
+a GTC object with:
+
+  use Graphics::Toolkit::Color qw/color/;
+  my $color = color('mycolors:best_blue');
+  
+It also opens the possibility to search inside the crafted color set by:
+
+  my @names = $color->name( from => 'mycolors', distance => 10);
+  my $name  = $color->closest_name( from => 'mycolors');
+
+
+=head2 Module
+
+A more permanent solution will be to create your own C<Graphics::ColorNames>
+package. Please read the documentation of L<the module|Graphics::ColorNames>.
+Then create a module which might be named C<Graphics::ColorNames::MyColors>.
+Once this module is accessible for your local perl interpreter you can use:
+
+  my $color = color('MyColors:best_blue');
+  my @names = $color->name( from => 'MyColors', distance => 10);
+  my $name  = $color->closest_name( from => 'MyColors');
+
+Read more about color names L<here|Graphics::Toolkit::Color::Manual::Name>.
+
+
+=head1 COLOR SPACE
+
+Because color spaces are in GTC such a huge topic they got their own 
+L<manual page|Graphics::Toolkit::Color::Manual::Space>. Please read that first.
+Spaces are C<Graphics::Toolkit::Color::Space> objects which have to be
+known by the C<Graphics::Toolkit::Color::Space::Hub>. But calling 
+
+  my $success = Graphics::Toolkit::Color::Space::Hub::add_space( $my_space );
+
+is the easiest part. This section will show how to create such an object.
+Once you created the object and added it to the C<Hub>, every color can 
+be converted to and from this space and GTC will be able to read and write
+colors that are defined in that new space.
+
+=head2 Construction
+
+The only C<GTC::Space> method to call is C<new>. Once you created the 
+object you announce it to the space hub as mentioned above.
+The many arguments C<new> accepts function like a small I<DSL>, a domain
+specific language that allows you to define a space with as little typing
+as possible. Only very few arguments (the last four) require some amount
+of coding. Helper functions that are very useful in that endeavour like 
+C<spow> or matrix multiplication can be imported from C<GTC::Space>.
+
+
+    use Graphics::Toolkit::Color::Space qw/:all/;
+    Graphics::Toolkit::Color::Space->new (
+              name => 'demo',                # space name, defaults to concatenated short axis names
+        alias_name => 'alias',               # second, user set space name, often a shortcut
+              axis => [qw/light dark blue/], # long axis names, required !
+             short => [qw/a b c/],           # short names, defaults to first char of long
+              type => [qw/linear circular angular/],   # axis type
+             range => [1, [-2, 2], [-3, 3]],           # axis value range
+         precision => [-1, 0, 1],                      # axis value precision of value output
+            suffix => ['', '', '%'],                   # axis value suffix of value in and output
+        value_form => ['\d{3}','\d{1,3}','\d{1,3}'],   # special axis value shape
+            values => {read => \&read, write => \&write}, # translate values to numbers and back
+           convert => {RGB => [\&from_demo, \&to_demo]}, # converter CODE, required !
+            format => {'hex_string'=> [\&hex_from_tuple,\&tuple_from_hex]}, # custom IO format
+        constraint => {cone => {checker => '$_[0][1] + $_[0][2] <= 1',
+	                           error    => 'The sum of whiteness and blackness can not exceed 100%.',
+		                       remedy   => 'my $s = $_[0][1] + $_[0][2];[$_[0][0], $_[0][1]/$s, $_[0][2]/$s]', }},
+    );
+
+
+Let us go through the named arguments of C<new> in detail. 
+Of these 13 only two are required: C<axis> and C<convert>.
+
+=head3 name
+
+The argument C<name> expects a string with the primary name to identify
+the space in combination with the argument L<in|Graphics::Toolkit::Color::Manual::Argument/in>
+and within some color definition L<formats|Graphics::Toolkit::Color::Manual::Format>. 
+It is case insensitive and the characters whitespace I<' '>, underscore I<'_'>, 
+dash I<'-'> and dot I<'.'> might be inserted for better readability but 
+will not be part of the name in any GTC output. It defaults to a 
+concatenation of the short axis names ( {r => 0, g => 0, b => 0} --> RGB).
+
+=head3 alias_name
+
+The argument C<alias_name> expects a string which can also be used to
+identify the space in combination with the argument
+L<in|Graphics::Toolkit::Color::Manual::Argument/in> and within color 
+definitions fed to GTC. But it will never be used by GTC in an output. 
+Same syntactical freedoms apply as with the C<name>. 
+It defaults to an empty string.
+
+=head3 axis
+
+Expects an ARRAY reference with the long names of all axes in the canonical
+order. Any axis names can be used case insensitive. It is a required argument.
+
+=head3 short
+
+The C<short> argument expects an ARRAY reference with the short axis names 
+of all axes in the canonical order. They default to the first letter of
+the long C<axis> names.
+
+=head3 type
+
+The C<type> argument expects an ARRAY reference with the axis types in 
+canonical axis order. An axis can either be I<'linear'> or I<'angular'> 
+(I<'circular'> is an alias). The default for all axes is I<'linear'>. 
+
+=head3 range
+
+The C<range> argument expects a range definition, which has a syntax that 
+is explained L<here|Graphics::Toolkit::Color::Manual::Argument/range>.
+It defaults to I<'normal'> ranges.
+
+=head3 precision
+
+The C<precision> argument expects an ARRAY reference with an integer
+value for each axis that defines how many decimals a standard output
+will have. It defaults to -1 which means all available decimals.
+If the precision for all axes is the same, then a single number will suffice.
+
+=head3 suffix
+
+The C<suffix> argument expects an ARRAY reference with a short string per axis.
+When GTC outputs a color definition it will append to each value the string
+assigned to that axis. These strings are also expected when reading color
+definitions although they are optional here. The default is to have no C<suffix>.
+
+=head3 value_form
+
+The C<value_form> argument expects an ARRAY reference with a regular 
+expression string per axis. This regex has to match in order that an axis 
+value is to be accepted. The default is to have no C<value_form>.
+
+=head3 values
+
+The C<values> argument expects a HASH reference with the keys I<read>
+and I<write> that hold a CODE reference. These references point to
+routines that can transform non-numeric values into numeric
+values that can be handled like any other and vice versa. Please
+note that these routines have to accept and return a tuple, an ARRAY
+reference with the values of a color in canonical order.
+This argument was especially created for the I<NCol> space which has
+hue values like I<Y20>.
+The default is to have no C<values> transformer.
+
+=head3 convert
+
+The C<convert> argument expects a HASH reference with one key, which
+is the name of an already known color space (conversion parent),
+color values can be converted to and from. The value that is associated
+to that key has to be an ARRAY reference with two CODE references. 
+The first provides a function that converts value tuples from the defined
+space to the conversion parent. The second CODE reference points to a 
+function that works in reverse. 
+Both functions have to expect an ARRAY with the color values as first
+argument and return the same data format. This argument is required.
+
+=head3 format
+
+The C<format> argument expects a similar data format as C<convert>. The 
+difference is that there may be several HASH keys which are names of color
+definition formats the user wishes to add. To each key belongs again an 
+ARRAY reference with two CODE references that can read (first) and write (second) 
+this new format. The default is to add no C<format>.
+
+=head3 constraint
+
+The C<constraint> argument expects a HASH reference with one or more keys,
+that are the names of the space constraints and which can be chosen freely. 
+Constraints are borders to geometric areas of this space that are excluded 
+from the definition of this space. A constraint definition empowers GTC to
+handle color values that violate that constraint. 
+Every constraint name (HASH key) has to point to a constraint definition, 
+a HASH with three keys: I<checker>, I<error> and I<remedy>.
+I<checker> provides a CODE ref that returns a pseudo boolean that is false (0)
+if a color tuple (first argument) violates the constraint. I<error> provides
+a string that announces which constraint was violated and maybe why.
+I<remedy> provides a CODE reference that can take the violating color
+tuple as argument and hopefully corrects the values without making too
+drastic changes. The default is to have no C<constraint>.
+
+
+GTC already includes over 30 color spaces. You might want to read
+their source code under C<Graphics::Toolkit::Color::Space::Instance::*>
+to get some more inspiration.
+
+=head2 helper
+
+When writing converter functions the author can rely upon a host of 
+importable helper routines, that will make his life much easier.
+
+=head3 mult_matrix_vector_3
+
+Multiplies a 3x3 Matrix (first argument: ARRAY of ARRAYs (rows)) with 
+a three element vector (arguments 2 - 4). The resulting vector comes
+also as a list.
+
+=head3 spow
+
+This is the I<sign preserving power function>. It takes two arguments,
+a base and an exponent. In normal cases this will work as any power function.
+But if the base is negative, its sign will be reversed and the result gets
+reversed again.
+
+=head3 min max
+
+Both C<min> and C<max> take a list of numeric values and return the smallest
+(min) or the largest (max) value of them all. 
+It is just a replacement for L<List::Util>.
+
+=head3 mod_real
+
+This is a modulo that works on floating point numbers and returns 
+floating point values as remainder.
+
+    my $result = mod_real(5.3, 2.1);   # it's 1.1
+
+=head3 round_decimals
+
+This is a primitive rounding function that takes the number as first 
+argument and the number of desired decimals as second argument.
+
+=head3 is_nr
+
+This is a simple check if the argument looks like a number and returns a
+pseudo boolean as result.
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -1,30 +1,31 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
-use strictures 2;
-package JSON::Schema::Tiny; # git description: v0.030-3-g571c24a
+use strict;
+use warnings;
+use if $ENV{AUTHOR_TESTING}, strictures => version => 2;
+package JSON::Schema::Tiny; # git description: v0.032-2-g832c892
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.031';
+our $VERSION = '0.033';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use stable 0.031 'postderef';
 use experimental 0.026 qw(signatures args_array_with_signatures);
-no autovivification warn => qw(fetch store exists delete);
+use if $ENV{AUTHOR_TESTING}, autovivification => warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use B;
-use Ref::Util 0.100 qw(is_plain_arrayref is_plain_hashref is_ref is_plain_arrayref);
 use Mojo::URL;
 use Mojo::JSON::Pointer;
 use Carp qw(croak carp);
-use Storable 'dclone';
 use Mojo::JSON ();  # for JSON_XS, MOJO_NO_JSON_XS environment variables
 use Feature::Compat::Try;
 use JSON::PP ();
-use List::Util 1.33 qw(any none);
+use if "$]" < 5.041010, 'List::Util' => 'any';
+use if "$]" >= 5.041010, experimental => 'keyword_any';
 use Scalar::Util 'looks_like_number';
 use builtin::compat qw(blessed created_as_number);
 use if "$]" >= 5.022, POSIX => 'isinf';
@@ -69,7 +70,7 @@ sub evaluate {
     $SPECIFICATION_VERSION = 'draft'.$SPECIFICATION_VERSION
       if $SPECIFICATION_VERSION !~ /^draft/ and any { 'draft'.$SPECIFICATION_VERSION eq $_ } values %version_uris;
 
-    croak '$SPECIFICATION_VERSION value is invalid' if none { $SPECIFICATION_VERSION eq $_ } values %version_uris;
+    croak '$SPECIFICATION_VERSION value is invalid' if not any { $SPECIFICATION_VERSION eq $_ } values %version_uris;
   }
 
   croak 'insufficient arguments' if @_ < 2;
@@ -93,7 +94,7 @@ sub evaluate {
     $valid = _eval_subschema($data, $schema, $state)
   }
   catch ($e) {
-    if (is_plain_hashref($e)) {
+    if (ref $e eq 'HASH') {
       push $state->{errors}->@*, $e;
     }
     else {
@@ -416,7 +417,7 @@ sub _eval_keyword_defs ($data, $schema, $state) {
 }
 
 sub _eval_keyword_type ($data, $schema, $state) {
-  if (is_plain_arrayref($schema->{type})) {
+  if (ref $schema->{type} eq 'ARRAY') {
     abort($state, 'type array is empty') if not $schema->{type}->@*;
     foreach my $type ($schema->{type}->@*) {
       abort($state, 'unrecognized type "%s"', $type//'<null>')
@@ -803,7 +804,7 @@ sub _eval_keyword_prefixItems ($data, $schema, $state) {
 }
 
 sub _eval_keyword_items ($data, $schema, $state) {
-  if (is_plain_arrayref($schema->{items})) {
+  if (ref $schema->{items} eq 'ARRAY') {
     abort($state, 'array form of "items" not supported in %s', $state->{spec_version})
       if ($state->{spec_version}//'') eq 'draft2020-12';
 
@@ -1044,10 +1045,10 @@ sub is_type ($type, $value) {
     return is_bool($value);
   }
   if ($type eq 'object') {
-    return is_plain_hashref($value);
+    return ref $value eq 'HASH';
   }
   if ($type eq 'array') {
-    return is_plain_arrayref($value);
+    return ref $value eq 'ARRAY';
   }
 
   if ($type eq 'string' or $type eq 'number' or $type eq 'integer') {
@@ -1061,7 +1062,7 @@ sub is_type ($type, $value) {
 
     if ($type eq 'string') {
       # like created_as_string, but rejects dualvars with stringwise-unequal string and numeric parts
-      return !is_ref($value)
+      return !length ref($value)
         && $flags & B::SVf_POK
         && (!($flags & (B::SVf_IOK | B::SVf_NOK))
           || do { no warnings 'numeric'; 0+$value eq $value });
@@ -1092,14 +1093,13 @@ sub is_type ($type, $value) {
 # we do NOT check $STRINGY_NUMBERS here -- you must do that in the caller
 # copied from JSON::Schema::Modern::Utilities::get_type
 sub get_type ($value) {
-  return 'object' if is_plain_hashref($value);
+  return 'object' if ref $value eq 'HASH';
   return 'boolean' if is_bool($value);
   return 'null' if not defined $value;
-  return 'array' if is_plain_arrayref($value);
+  return 'array' if ref $value eq 'ARRAY';
 
   # floats in json will always be parsed into Math::BigFloat, when allow_bignum is enabled
-  if (is_ref($value)) {
-    my $ref = ref($value);
+  if (length(my $ref = ref $value)) {
     return $ref eq 'Math::BigInt' ? 'integer'
       : $ref eq 'Math::BigFloat' ? ($value->is_int ? 'integer' : 'number')
       : (defined blessed($value) ? '' : 'reference to ').$ref;
@@ -1255,7 +1255,7 @@ sub canonical_uri ($state, @extra_path) {
 sub E ($state, $error_string, @args) {
   # sometimes the keyword shouldn't be at the very end of the schema path
   my $sps = delete $state->{_schema_path_suffix};
-  my @schema_path_suffix = defined $sps && is_plain_arrayref($sps) ? $sps->@* : $sps//();
+  my @schema_path_suffix = defined $sps && ref $sps eq 'ARRAY' ? $sps->@* : $sps//();
 
   my $uri = canonical_uri($state, $state->{keyword}, @schema_path_suffix);
 
@@ -1366,7 +1366,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 
@@ -1452,12 +1452,6 @@ a hash, e.g.: C<< JSON::Schema::Tiny->new(boolean_result => 1, max_traversal_dep
 When true, L</evaluate> will return a true or false result only, with no error strings. This enables
 short-circuit mode internally as this cannot affect results except get there faster. Defaults to false.
 
-=head2 C<$SHORT_CIRCUIT>
-
-When true, L</evaluate> will return from evaluating each subschema as soon as a true or false result
-can be determined. When C<$BOOLEAN_RESULT> is false, an incomplete list of errors will be returned.
-Defaults to false.
-
 =head2 C<$MAX_TRAVERSAL_DEPTH>
 
 The maximum number of levels deep a schema traversal may go, before evaluation is halted. This is to
@@ -1469,6 +1463,39 @@ other, or badly-written schemas that could be optimized. Defaults to 50.
 When true, any value that is expected to be a boolean B<in the instance data> may also be expressed as
 the scalar references C<\0> or C<\1> (which are serialized as booleans by JSON backends).
 Defaults to false.
+
+=head2 C<$SHORT_CIRCUIT>
+
+When true, L</evaluate> will return from evaluating each subschema as soon as a true or false result
+can be determined. When C<$BOOLEAN_RESULT> is false, an incomplete list of errors will be returned.
+Defaults to false.
+
+=head2 C<$SPECIFICATION_VERSION>
+
+When set, the version of the draft specification is locked to one particular value, and use of
+keywords inconsistent with that specification version will result in an error. Will be set
+internally automatically with the use of the C<$schema> keyword. When not set, all keywords will be
+honoured (when otherwise supported).
+
+Supported values for this option, and the corresponding values for the C<$schema> keyword, are:
+
+=over 4
+
+=item *
+
+L<C<draft2020-12> or C<2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>
+
+=item *
+
+L<C<draft2019-09> or C<2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>
+
+=item *
+
+L<C<draft7> or C<7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
+
+=back
+
+Defaults to undef.
 
 =head2 C<$STRINGY_NUMBERS>
 
@@ -1522,33 +1549,6 @@ This allows you to write a schema like this (which validates a string representi
 Such keywords are only applied if the value looks like a number, and do not generate a failure
 otherwise. Values are determined to be numbers via L<perlapi/looks_like_number>.
 Defaults to false.
-
-=head2 C<$SPECIFICATION_VERSION>
-
-When set, the version of the draft specification is locked to one particular value, and use of
-keywords inconsistent with that specification version will result in an error. Will be set
-internally automatically with the use of the C<$schema> keyword. When not set, all keywords will be
-honoured (when otherwise supported).
-
-Supported values for this option, and the corresponding values for the C<$schema> keyword, are:
-
-=over 4
-
-=item *
-
-L<C<draft2020-12> or C<2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>
-
-=item *
-
-L<C<draft2019-09> or C<2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>
-
-=item *
-
-L<C<draft7> or C<7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
-
-=back
-
-Defaults to undef.
 
 =head1 UNSUPPORTED JSON SCHEMA FEATURES
 

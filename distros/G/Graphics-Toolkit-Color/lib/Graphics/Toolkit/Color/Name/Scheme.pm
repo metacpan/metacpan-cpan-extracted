@@ -21,7 +21,7 @@ sub add_color {
     $self->{'shaped'}{'values'}{$name} = $values;
     $self->{'shaped'}{'name'}[$values->[0]][$values->[1]][$values->[2]] =
         (exists $self->{'shaped'}{'name'}[$values->[0]][$values->[1]][$values->[2]])
-       ? [@{$self->{'shaped'}{'name'}[$values->[0]][$values->[1]][$values->[2]]}, $name]
+       ? [ @{$self->{'shaped'}{'name'}[$values->[0]][$values->[1]][$values->[2]]}, $name ]
        : [$name];
     1;
 }
@@ -40,11 +40,11 @@ sub values_from_name {
 }
 sub names_from_values {
     my ($self, $values) = @_;
-    return '' unless ref $values eq 'ARRAY' and @$values == 3;
-    return '' unless exists $self->{'shaped'}{'name'}[$values->[0]];
-    return '' unless exists $self->{'shaped'}{'name'}[$values->[0]][$values->[1]];
-    return '' unless exists $self->{'shaped'}{'name'}[$values->[0]][$values->[1]][$values->[2]];
-    return                  $self->{'shaped'}{'name'}[$values->[0]][$values->[1]][$values->[2]];
+    return '' unless ref $values eq 'ARRAY' and @$values == 3
+              and exists ($self->{'shaped'}{'name'}[$values->[0]])
+              and exists ($self->{'shaped'}{'name'}[$values->[0]][$values->[1]])
+              and exists ($self->{'shaped'}{'name'}[$values->[0]][$values->[1]][$values->[2]]);
+    return                $self->{'shaped'}{'name'}[$values->[0]][$values->[1]][$values->[2]];
 }
 
 #### nearness methods ##################################################
@@ -68,7 +68,7 @@ sub closest_names_from_values {
         $sqr_min = $temp_sqr_sum;
     }
     return '' unless @names;
-    # restore as much order as possible
+    # keep names in insert possible
     @names = map { @{$self->names_from_values( $self->values_from_name($_))} } @names;
     @names = uniq( @names );
     return (\@names, sqrt($sqr_min));
@@ -77,7 +77,7 @@ sub closest_names_from_values {
 sub names_in_range {
     my ($self, $values, $range) = @_;
     my @names;
-    my $sqr_max  = $range ** 2;
+    my $sqr_max = $range ** 2;
     my $all_values = $self->{'shaped'}{'values'};
     for my $index_name (keys %$all_values){
         my $index_values = $all_values->{ $index_name };
@@ -87,10 +87,11 @@ sub names_in_range {
         next if $temp_sqr_sum > $sqr_max;
         $temp_sqr_sum += ($index_values->[2] - $values->[2]) ** 2;
         next if $temp_sqr_sum > $sqr_max;
-        push @names, $index_name;
+        push @names, [$index_name, $temp_sqr_sum];
     }
     return '' unless @names;
-    # restore as much order as possible
+    @names = map { $_->[0] } sort { $a->[1] <=> $b->[1] } @names;
+    # keep names in insert possible
     @names = map { @{$self->names_from_values( $self->values_from_name($_))} } @names;
     return [ uniq( @names ) ];
 }
@@ -98,93 +99,8 @@ sub names_in_range {
 #### util ##############################################################
 sub _clean_name {
     my $name = shift;
-    $name =~ tr/_'\///d;
+    $name =~ tr/_ '.\/-//d;
     lc $name;
 }
 
 1;
-
-__END__
-
-=pod
-
-=head1 NAME
-
-Graphics::Toolkit::Color::Name::Scheme - a name space for color names
-
-
-=head1 SYNOPSIS
-
-    use Graphics::Toolkit::Color::Name::Scheme;
-    my $scheme = Graphics::Toolkit::Color::Name::Scheme->new();
-    $scheme->add_color( $_->{'name'}, $_->{'rgb_values'} ) for @colors;
-    say for $scheme->all_names();
-    my $values = $scheme->values_from_name( 'blue' );          # tuple = 3 element ARRAY
-    my $names = $scheme->names_from_values( $values );         # tuple -> ARRAY of names
-    my ($names, $distance) = $scheme->closest_name( $values ); # tuple -> \@names, $distance
-
-
-=head1 DESCRIPTION
-
-This module is mainly for internal usage to model name spaces for HTML,
-SVG, Pantone ... colors. You may use it to create your own set of color
-names or to give color name constants a slightly different value.
-
-
-=head1 ROUTINES
-
-=head2 new
-
-Needs no arguments.
-
-
-=head2 sub add_color
-
-takes two positional arguments, a color name a n ARRAY with three
-RGB values in range of 0 .. 255.
-
-
-=head2 all_names
-
-List of all names held by the scheme.
-
-
-=head2 is_name_taken
-
-Pseudo boolean tells you if given name is already held.
-
-
-=head2 values_from_name
-
-Returns the value tuple associated with the name.
-
-
-=head2 names_from_values
-
-Returns ARRAY ref with all names associated with these RGB values or an
-empty string if none.
-
-
-=head2 closest_names
-
-Returns ARRAY ref with all names associated with RGB values from this
-scheme that are the closest. Second return value is the distance between
-these closest names and the given value tuple (irst and only parameter).
-
-
-=head1 SEE ALSO
-
-L<Color::Library>
-
-L<Graphics::ColorNamesLite::All>
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2025-26 Herbert Breunung.
-
-This program is free software; you can redistribute it and/or modify it
-under same terms as Perl itself.
-
-=head1 AUTHOR
-
-Herbert Breunung, <lichtkind@cpan.org>

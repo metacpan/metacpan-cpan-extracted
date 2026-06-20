@@ -1,0 +1,71 @@
+=pod
+
+=head1 NAME
+
+Graphics::Toolkit::Color::Manual::CheatSheet - GTC keywords at a glance
+
+=head1 METHODS
+
+   Value:      is_in_gamut
+               values               name / closest_name      
+               distance
+
+   Color:      lighten / darken     saturate / desaturate    tint / tone / shade
+               tone_curve           set_value / add_value
+               mix                  invert
+
+    Sets:      complement / analogous / gradient / cluster
+
+
+=head1 ARGUMENTS
+
+     in        : (all except)            name closest_name
+     from      :                         name closest_name
+     color     :                   new   
+     raw       : new  values             
+     range     : new  values  distance
+     only      :              distance   invert
+     to        :              distance   mix          analogous  gradient
+     steps     :                         complement   analogous  gradient 
+     tilt      :                         complement   analogous  gradient 
+
+
+=head1 FORMATS
+
+              list  (1,2,3)
+             array  [1,2,3]
+       named_array  [RGB =>  1,2,3 ]
+      nested_array  [RGB => [1,2,3]]
+              hash  {red => 1, green => 2, blue => 3}
+         char_hash  {r   => 1, g     => 2, b    => 3}
+      named_string  'rgb: 1, 2, 3'  
+        css_string  'rgb( 1, 2, 3)' 
+        hex_string  '#010203' '#123'
+
+
+=head1 SPACES
+
+      RGB : RGB / LinearRGB / CIEXYZ / CIERGB 
+            AdobeRGB / AppleRGB / ProPhotoRGB / WideGamutRGB 
+            Display P3 / Display P3 Linear / DCI-P3 / Display P3 Linear / Rec.709 / Rec.2020
+      LAB : OKLAB / CIELAB / HunterLAB / CIELUV / YIQ / YUV
+      HSL : OKHSL / OKLCH / HSL / CIELCHab / CIELCHuv
+      HSV : OKHSV / HSV / HSB
+      HWB : OKHWB / HWB / NCol
+    other : CMY / CMYK
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2026 Herbert Breunung.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

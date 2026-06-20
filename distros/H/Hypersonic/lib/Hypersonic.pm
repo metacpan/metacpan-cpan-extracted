@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Scalar::Util qw(blessed);
 use Config ();
@@ -1114,6 +1114,13 @@ C
       ->line('static void handle_shutdown_signal(int sig) {')
       ->line('    (void)sig;')
       ->line('    g_shutdown = 1;')
+      ->line('    if (getenv("HYPERSONIC_SHUTDOWN_DIAG")) {')
+      ->line('        char msg[128];')
+      ->line('        int n = snprintf(msg, sizeof(msg),')
+      ->line('            "[hypersonic %d] SIGTERM received; g_active_connections=%d\n",')
+      ->line('            (int)getpid(), g_active_connections);')
+      ->line('        (void)!write(2, msg, n);')
+      ->line('    }')
       ->line('}')
       ->blank;
     
@@ -1798,8 +1805,10 @@ sub _gen_event_loop {
         # epoll's gen_create already declares 'ev'
         $builder->line('struct epoll_event events[MAX_EVENTS];');
     } elsif ($backend_name eq 'io_uring') {
-        # io_uring uses completion queue entries
-        $builder->line('struct io_uring_cqe** events = NULL;');
+        # io_uring backend uses a value-copy ring buffer (hs_iouring_event_t
+        # is defined in IOUring->defines). gen_wait drains all available
+        # CQEs into a static array of these values and assigns it here.
+        $builder->line('hs_iouring_event_t* events = NULL;');
     } else {
         # poll/select manage their own fd arrays internally
         # Declare a dummy events pointer to satisfy gen_wait signature
@@ -1831,14 +1840,25 @@ sub _gen_event_loop {
         ->line('g_current_time = now;')
         ->blank;
 
-    # Keep-alive cleanup
-    $builder->comment('Periodic keep-alive timeout cleanup')
-      ->if('now - last_cleanup >= 5')
+    # Keep-alive cleanup. During graceful shutdown the
+    # `now - last_cleanup >= 5` throttle is bypassed AND the per-conn
+    # idle-time threshold is dropped to 0, so ALL connections are
+    # drained in the next loop iteration after SIGTERM. Without this,
+    # a server with an idle keep-alive connection from a client whose
+    # process is hung in waitpid() on the server's exit would itself
+    # hang for the full KEEPALIVE_TIMEOUT (30s default) before the
+    # main loop's exit condition (!g_shutdown || g_active_connections > 0)
+    # becomes false. This bit users of t/2100..t/2103 hard with io_uring
+    # specifically, but the latent bug is in the cleanup loop itself
+    # and affects every backend equally.
+    $builder->comment('Periodic keep-alive timeout cleanup (forced during shutdown)')
+      ->if('g_shutdown || now - last_cleanup >= 5')
         ->declare('int', 'cleanup_i', '0')
+        ->declare('time_t', 'idle_threshold', 'g_shutdown ? 0 : KEEPALIVE_TIMEOUT')
         ->for('cleanup_i = 0', 'cleanup_i < MAX_FD', 'cleanup_i++')
           ->if('g_conn_time[cleanup_i] > 0')
-            ->if('now - g_conn_time[cleanup_i] > KEEPALIVE_TIMEOUT')
-              ->comment('Close idle connection')
+            ->if('now - g_conn_time[cleanup_i] >= idle_threshold')
+              ->comment('Close idle (or shutdown-forced) connection')
               ->line('int idle_fd = cleanup_i;');
 
     # Backend-specific: Remove idle connection
