@@ -12,6 +12,12 @@ my @tests = (
     { cmd => [ '--verbose', '-g', '-s', '$url', '--buffer' ] },
     { cmd => [ '--verbose', '-g', '-s', '$url', '--show-error' ] },
     { cmd => [ '--verbose', '-g', '-s', '$url', '-S' ] },
+
+    # We can't test that conveniently, since curl reopens STDIN when asking
+    # for a password...
+    #{ cmd => [ '--verbose', '-g', '-s', '--user', 'nobody', '$url' ] },
+    { cmd => [ '--verbose', '-g', '-s', '--user', 'nobody:', '$url' ] },
+    { cmd => [ '--verbose', '-g', '-s', '--user', 'nobody:pass', '$url' ] },
     { cmd => [ '--verbose', '-s', '-g', '--compressed', '$url' ],
       ignore => ['Accept-Encoding'], # this somewhat defeats this test but at least
       # we check we don't crash. Available compressions might differ between

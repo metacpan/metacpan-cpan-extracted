@@ -24,6 +24,7 @@ t/curl-identity-options.t
 t/curl-identity-post.t
 t/curl-identity-quirky.t
 t/curl-identity.t
+t/curl-ignored.t
 t/curl-multi-2.t
 t/curl-multi-dryrun.t
 t/curl-multi.t

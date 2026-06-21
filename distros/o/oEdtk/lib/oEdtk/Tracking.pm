@@ -28,7 +28,6 @@ BEGIN {
 	};
 }
 
-
 use strict;
 use warnings;
 
@@ -43,7 +42,7 @@ use DBI;
 #use JSON;
 use Exporter;
 
-our $VERSION		= 1.6031;
+our $VERSION		= 2.1061;
 our @ISA			= qw(Exporter);
 our @EXPORT_OK		= qw(stats_iddest stats_week stats_month);
 #my  @JSON_TRACE;
@@ -254,15 +253,17 @@ sub track {
 		undef ($values->{'ED_MESSAGE'});
 	}
 
+	my $dbh		= $self->{'dbh'};
 	my @cols	= keys(%$values);
 	my $table	= $self->{'table'};
+	$table 		= uc ($table) if ($dbh->{'Driver'}->{'Name'} eq 'mysql') ;
+
 	my $sql	= "INSERT INTO $table (" . join(', ', @cols) . ") VALUES (" .
 	    join(', ', ('?') x @cols) . ")";
 
 	#warn "sql = $sql \n";
-	#sql = INSERT INTO EDTK_TRACKING (ED_JOB_EVT, ED_APP, ED_CORP, ED_OBJ_TYP, ED_USER, ED_MESSAGE, ED_TSTAMP, ED_SNGL_ID, ED_OBJ_COUNT, ED_MOD_ED, ED_SOURCE, ED_SEQ, ED_HOST) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+	#sql = insert into edtk_tracking (ed_job_evt, ed_app, ed_corp, ed_obj_typ, ed_user, ed_message, ed_tstamp, ed_sngl_id, ed_obj_count, ed_mod_ed, ed_source, ed_seq, ed_host) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
 
-	my $dbh	= $self->{'dbh'};
 	my $sth	= $dbh->prepare($sql);
 	$sth->execute(values(%$values)) or die $sth->errstr;
 
@@ -300,26 +301,26 @@ sub stats_week {
 	my ($dbh, $cfg, $start, $end, $excluded_users) = @_;
 
 	my $table = $cfg->{'EDTK_STATS_TRACKING'};
-	my $innersql = "SELECT ED_CORP, ED_APP, "
-			. "'S' || TO_CHAR(TO_DATE(ED_TSTAMP, 'YYYYMMDDHH24MISS'), 'IW') AS ED_WEEK "
-			. "FROM $table "
-			. "WHERE ED_JOB_EVT = 'D' AND ED_TSTAMP >= ? ";
+	my $innersql = "select ed_corp, ed_app, "
+			. "'s' || to_char(to_date(ed_tstamp, 'YYYYMMDDHH24MISS'), 'IW') as ed_week "
+			. "from $table "
+			. "where ed_job_evt = 'd' and ed_tstamp >= ? ";
 	my @vals = ($start);
 	if (defined($end)) {
-		$innersql .= " AND ED_TSTAMP <= ? ";
+		$innersql .= " and ed_tstamp <= ? ";
 		push(@vals, $end);
 	}
 
 	if (defined $excluded_users ) {
 		my @excluded = split (/,\s*/, $excluded_users);
 		for (my $i =0 ; $i <= $#excluded ; $i++ ){
-			$innersql .= " AND ED_USER != ? "; 
+			$innersql .= " and ed_user != ? "; 
 		}
 		push(@vals, @excluded);
 	}
 
-	my $sql = "SELECT i.ED_CORP, i.ED_APP, i.ED_WEEK, COUNT(*) AS ED_COUNT " .
-	    "FROM ($innersql) i GROUP BY ED_CORP, ED_APP, ED_WEEK ";
+	my $sql = "select i.ed_corp, i.ed_app, i.ed_week, count(*) as ed_count " .
+	    "from ($innersql) i group by ed_corp, ed_app, ed_week ";
 
 #	warn "\nINFO : $sql \n";
 #SELECT i.ED_CORP, i.ED_APP, i.ED_WEEK, COUNT(*) AS ED_COUNT 
@@ -348,32 +349,32 @@ sub stats_iddest {
 	my ($dbh, $cfg, $start, $end, $excluded_users, $ed_app) = @_;
 
 	my $table = $cfg->{'EDTK_STATS_TRACKING'};
-	my $innersql = "SELECT ED_CORP, ED_K1_VAL AS ED_EMET, ED_K0_VAL AS ED_IDDEST, ED_APP, "
-			. "'S' || TO_CHAR(TO_DATE(ED_TSTAMP, 'YYYYMMDDHH24MISS'), 'IW') AS ED_WEEK "
-			. "FROM $table "
-			. "WHERE ED_JOB_EVT = 'D' AND ED_TSTAMP >= ? ";
+	my $innersql = "select ed_corp, ed_k1_val as ed_emet, ed_k0_val as ed_iddest, ed_app, "
+			. "'s' || to_char(to_date(ed_tstamp, 'YYYYMMDDHH24MISS'), 'IW') as ed_week "
+			. "from $table "
+			. "where ed_job_evt = 'd' and ed_tstamp >= ? ";
 	my @vals = ($start);
 	if (defined($end)) {
-		$innersql .= " AND ED_TSTAMP <= ? ";
+		$innersql .= " and ed_tstamp <= ? ";
 		push(@vals, $end);
 	}
 
 	if (defined $excluded_users ) {
 		my @excluded = split (/,\s*/, $excluded_users);
 		for (my $i =0 ; $i <= $#excluded ; $i++ ){
-			$innersql .= " AND ED_USER != ? "; 
+			$innersql .= " and ed_user != ? "; 
 		}
 		push(@vals, @excluded);
 	}
 
 	if (defined $ed_app ) {
-		$innersql .= " AND ED_APP = ? "; 
+		$innersql .= " and ed_app = ? "; 
 		push(@vals, $ed_app);
 	}
 
 
-	my $sql = "SELECT i.ED_CORP, i.ED_EMET, i.ED_IDDEST, i.ED_APP, i.ED_WEEK, COUNT(*) AS ED_COUNT " .
-	    "FROM ($innersql) i GROUP BY i.ED_CORP, i.ED_EMET, i.ED_IDDEST, i.ED_APP, i.ED_WEEK ";
+	my $sql = "select i.ed_corp, i.ed_emet, i.ed_iddest, i.ed_app, i.ed_week, count(*) as ed_count " .
+	    "from ($innersql) i group by i.ed_corp, i.ed_emet, i.ed_iddest, i.ed_app, i.ed_week ";
 	    
 #	warn "INFO : $sql \n";
 #	warn "INFO : @vals \n";
@@ -407,26 +408,26 @@ sub stats_month {
 	my ($dbh, $cfg, $start, $end, $excluded_users) = @_;
 
 	my $table = $cfg->{'EDTK_STATS_TRACKING'};
-	my $innersql = "SELECT ED_APP, ED_CORP, ED_K1_VAL AS ED_EMET, "
-			. "'M' || TO_CHAR(TO_DATE(ED_TSTAMP, 'YYYYMMDDHH24MISS'), 'MM') AS ED_MONTH "
-			. "FROM $table WHERE ED_JOB_EVT = 'D' AND ED_TSTAMP >= ? "; # AND ED_K1_NAME = 'SECTION'
+	my $innersql = "select ed_app, ed_corp, ed_k1_val as ed_emet, "
+			. "'m' || to_char(to_date(ed_tstamp, 'YYYYMMDDHH24MISS'), 'MM') as ed_month "
+			. "from $table where ed_job_evt = 'd' and ed_tstamp >= ? "; 
 	my @vals = ($start);
 
 	if (defined($end)) {
-		$innersql .= " AND ED_TSTAMP <= ? ";
+		$innersql .= " and ed_tstamp <= ? ";
 		push(@vals, $end);
 	}
 				
 	if (defined $excluded_users ) {
 		my @excluded = split (/,\s*/, $excluded_users);
 		for (my $i =0 ; $i <= $#excluded ; $i++ ){
-			$innersql .= " AND ED_USER != ? "; 
+			$innersql .= " and ed_user != ? "; 
 		}
 		push(@vals, @excluded);
 	}
 
-	my $sql = "SELECT i.ED_APP, i.ED_CORP, i.ED_EMET, i.ED_MONTH, COUNT(*) AS ED_COUNT " .
-	    "FROM ($innersql) i GROUP BY ED_APP, ED_CORP, ED_EMET, ED_MONTH ";
+	my $sql = "select i.ed_app, i.ed_corp, i.ed_emet, i.ed_month, count(*) as ed_count " .
+	    "from ($innersql) i group by ed_app, ed_corp, ed_emet, ed_month ";
 
 	my $rows = $dbh->selectall_arrayref($sql, { Slice => {} }, @vals);
 
@@ -441,9 +442,6 @@ sub stats_month {
 	return $rows;
 }
 
-
-
-#my $_PRGNAME;
 
 sub _validate_event {
 	# Job Event : looking for one of the following : 

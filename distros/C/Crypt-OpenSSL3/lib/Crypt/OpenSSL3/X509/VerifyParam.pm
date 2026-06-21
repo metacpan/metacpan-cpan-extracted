@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::VerifyParam;
-$Crypt::OpenSSL3::X509::VerifyParam::VERSION = '0.007';
+$Crypt::OpenSSL3::X509::VerifyParam::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::X509::VerifyParam - X509 Verification parameters
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 
@@ -78,6 +78,78 @@ version 0.007
 =head2 set_time
 
 =head2 set_trust
+
+=head1 CONSTANTS
+
+=over 4
+
+=item PURPOSE_ANY
+
+=item PURPOSE_CODE_SIGN
+
+=item PURPOSE_CRL_SIGN
+
+=item PURPOSE_NS_SSL_SERVER
+
+=item PURPOSE_OCSP_HELPER
+
+=item PURPOSE_SMIME_ENCRYPT
+
+=item PURPOSE_SMIME_SIGN
+
+=item PURPOSE_SSL_CLIENT
+
+=item PURPOSE_SSL_SERVER
+
+=item PURPOSE_TIMESTAMP_SIGN
+
+=item V_FLAG_ALLOW_PROXY_CERTS
+
+=item V_FLAG_CHECK_SS_SIGNATURE
+
+=item V_FLAG_CRL_CHECK
+
+=item V_FLAG_CRL_CHECK_ALL
+
+=item V_FLAG_EXPLICIT_POLICY
+
+=item V_FLAG_EXTENDED_CRL_SUPPORT
+
+=item V_FLAG_IGNORE_CRITICAL
+
+=item V_FLAG_INHIBIT_ANY
+
+=item V_FLAG_INHIBIT_MAP
+
+=item V_FLAG_NOTIFY_POLICY
+
+=item V_FLAG_NO_ALT_CHAINS
+
+=item V_FLAG_NO_CHECK_TIME
+
+=item V_FLAG_OCSP_RESP_CHECK
+
+=item V_FLAG_OCSP_RESP_CHECK_ALL
+
+=item V_FLAG_PARTIAL_CHAIN
+
+=item V_FLAG_POLICY_CHECK
+
+=item V_FLAG_SUITEB_128_LOS
+
+=item V_FLAG_SUITEB_128_LOS_ONLY
+
+=item V_FLAG_SUITEB_192_LOS
+
+=item V_FLAG_TRUSTED_FIRST
+
+=item V_FLAG_USE_CHECK_TIME
+
+=item V_FLAG_USE_DELTAS
+
+=item V_FLAG_X509_STRICT
+
+=back
 
 =head1 AUTHOR
 

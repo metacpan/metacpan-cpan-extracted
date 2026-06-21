@@ -63,6 +63,11 @@ sub add_value { # .values, %newval -- ~space_name --> _
 }
 
 
+sub derive {
+    my ($color_values, $mult, $add, $set, $raw, $space_name) = @_;
+}
+
+
 #### light designer API ################################################
 sub _clear_values_amount_space_name {
     my ($color_values, $amount, $space_name, @more) = @_;
@@ -101,6 +106,26 @@ sub mix_with {
     my ($color_values, $amount, $color_space, $tuple) = _clear_values_amount_space_name(@_);
     return $color_values unless ref $color_values;
     return mix( $color_values, [Graphics::Toolkit::Color::Values->new_from_tuple( $tuple )], $amount, $color_space);
+}
+
+sub brightness {
+    my ($color_values, $mult, $add, $set, $space_name) = @_;
+
+} 
+
+sub saturation {
+    my ($color_values, $mult, $add, $set, $space_name) = @_;
+
+}
+
+sub contrast {
+    my ($color_values, $mult, $add, $set, $space_name) = @_;
+
+}
+
+sub vibrance {
+    my ($color_values, $mult, $add, $set, $space_name) = @_;
+
 }
 
 #### deep designer methods #############################################

@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::PKey;
-$Crypt::OpenSSL3::PKey::VERSION = '0.007';
+$Crypt::OpenSSL3::PKey::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Crypt::OpenSSL3;
 
 1;
 
-# ABSTRACT: An assymetrical key
+# ABSTRACT: An asymmetric key
 
 __END__
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Crypt::OpenSSL3::PKey - An assymetrical key
+Crypt::OpenSSL3::PKey - An asymmetric key
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ version 0.007
 
 =head1 DESCRIPTION
 
-A PKey can be any kind of assymetrical key. This is a fat interface: no single key type supports all possible operations, and most operations aren't supported by all key types. At its core the operations are:
+A C<PKey> can be any kind of asymmetric key. This is a fat interface: no single key type supports all possible operations, and most operations aren't supported by all key types. At its core the operations are:
 
 =over 4
 

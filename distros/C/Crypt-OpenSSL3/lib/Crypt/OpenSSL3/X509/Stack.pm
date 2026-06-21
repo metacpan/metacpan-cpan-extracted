@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::Stack;
-$Crypt::OpenSSL3::X509::Stack::VERSION = '0.007';
+$Crypt::OpenSSL3::X509::Stack::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::X509::Stack - A stack of X509 certificates
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 
@@ -29,15 +29,11 @@ version 0.007
 
 =head2 delete
 
-=head2 delete_ptr
-
 =head2 find
 
 =head2 find_all
 
 =head2 find_ex
-
-=head2 free
 
 =head2 insert
 

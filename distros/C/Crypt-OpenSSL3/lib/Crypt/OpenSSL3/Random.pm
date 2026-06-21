@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::Random;
-$Crypt::OpenSSL3::Random::VERSION = '0.007';
+$Crypt::OpenSSL3::Random::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::Random - A kind of a random number generator
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

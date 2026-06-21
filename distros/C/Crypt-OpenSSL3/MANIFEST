@@ -66,6 +66,10 @@ lib/Crypt/OpenSSL3/X509/Name/Entry.pm
 lib/Crypt/OpenSSL3/X509/Request.pm
 lib/Crypt/OpenSSL3/X509/Stack.pm
 lib/Crypt/OpenSSL3/X509/Store.pm
+lib/Crypt/OpenSSL3/X509/Store/Context.pm
+lib/Crypt/OpenSSL3/X509/Transparency/Evaluator.pm
+lib/Crypt/OpenSSL3/X509/Transparency/LogStore.pm
+lib/Crypt/OpenSSL3/X509/Transparency/Timestamp.pm
 lib/Crypt/OpenSSL3/X509/VerifyParam.pm
 lib/Crypt/OpenSSL3/X509/VerifyResult.pm
 ppport.h

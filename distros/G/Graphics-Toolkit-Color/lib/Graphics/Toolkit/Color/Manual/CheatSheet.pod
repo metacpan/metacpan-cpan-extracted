@@ -19,15 +19,15 @@ Graphics::Toolkit::Color::Manual::CheatSheet - GTC keywords at a glance
 
 =head1 ARGUMENTS
 
-     in        : (all except)            name closest_name
-     from      :                         name closest_name
-     color     :                   new   
+     in        : (all except)                name closest_name
+     from      :                             name closest_name
+     color     : new  is_in_gamut (sub)
      raw       : new  values             
-     range     : new  values  distance
-     only      :              distance   invert
-     to        :              distance   mix          analogous  gradient
-     steps     :                         complement   analogous  gradient 
-     tilt      :                         complement   analogous  gradient 
+     range     : new  values      distance
+     only      :                  distance   invert
+     to        :                  distance   mix          analogous  gradient
+     steps     :                             complement   analogous  gradient 
+     tilt      :                             complement   analogous  gradient 
 
 
 =head1 FORMATS
@@ -40,7 +40,7 @@ Graphics::Toolkit::Color::Manual::CheatSheet - GTC keywords at a glance
          char_hash  {r   => 1, g     => 2, b    => 3}
       named_string  'rgb: 1, 2, 3'  
         css_string  'rgb( 1, 2, 3)' 
-        hex_string  '#010203' '#123'
+        hex_string  '#010203' '#123' (RGB only)
 
 
 =head1 SPACES

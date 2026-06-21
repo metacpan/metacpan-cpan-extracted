@@ -1,25 +1,32 @@
-package oEdtk::logger2;
-use strict;
-use warnings;
-#use Data::Dumper qw(Dumper);
-use POSIX qw(strftime);
-#réinitialiser $! à une valeur "propre" ou "neutre" qui dépend de la plate-forme
-use IO::Handle;
-STDERR->clearerr();  # Réinitialiser $! pour le gestionnaire STDERR
+package oEdtk::logger;
 
-use Exporter;
-our @ISA	= qw(Exporter);
-our @EXPORT	= qw(logger logger_help logger_rc_list *LOGGER_OUT _LEVEL_ _HELP_ _FAIL_ _SUCCESS_ _EXEC_ _WARN_ _INFO_ _FOLLW_ _CONTXT_ _DEBUG_);
-our @EXPORT_OK = qw($VERSION $LOGGERLEVEL $WARN2LOGGER);
+BEGIN {
+		use Exporter   ();
+		use vars       qw($VERSION @ISA @EXPORT @EXPORT_OK); #backward compatibility for Perls under 5.6 
+
+		$VERSION     = 1.9062;
+		@ISA         = qw(Exporter);
+		@EXPORT	= qw(logger logger_help logger_rc_list *LOGGER_OUT set_warn_to_logger set_logger_level _LEVEL_ _HELP_ _FAIL_ _SUCCESS_ _EXEC_ _WARN_ _INFO_ _FOLLW_ _CONTXT_ _DEBUG_);
+		@EXPORT_OK = qw($VERSION $LOGGERLEVEL $WARN2LOGGER);
+
+		use strict;
+		use warnings;
+		use Data::Dumper qw(Dumper);
+		use POSIX qw(strftime);
+
+		#réinitialiser $! à une valeur "propre" ou "neutre" qui dépend de la plate-forme
+		use IO::Handle;
+		STDERR->clearerr();  # Réinitialiser $! pour le gestionnaire STDERR
+	}
+
 #utilisation :
-#use logger2 qw(:DEFAULT);
+#use logger qw(:DEFAULT);
 # logger (_LEVEL_, "message");
 
 {
-	our $VERSION     = 1.8083;
 	our $LOGGERLEVEL = 1;
 	our $WARN2LOGGER = 0;
-	*LOGGER_OUT = *STDERR;
+	*LOGGER_OUT = *STDERR; # raison qui empêche la remontée des messages dans le tracking ?
 
 	use constant _LEVEL_	=> -2; # en cas de mauvaise usage
 	use constant _HELP_		=> -2;
@@ -29,8 +36,25 @@ our @EXPORT_OK = qw($VERSION $LOGGERLEVEL $WARN2LOGGER);
 	use constant _WARN_		=> 4;
 	use constant _INFO_		=> 5;
 	use constant _FOLLW_	=> 6;
-	use constant _CONTXT_	=> 7;
-	use constant _DEBUG_	=> 8;
+	use constant _DEBUG_	=> 7;
+	use constant _CONTXT_	=> 8;
+
+	my %hLETTER_LEVEL = (
+		H => _HELP_,    # -2
+		F => _FAIL_,    # -1
+		C => _FAIL_,    # -1
+		E => _FAIL_,    # -1
+		S => _SUCCESS_, #  0
+		X => _EXEC_,    #  1
+		W => _WARN_,    #  4
+		A => _WARN_,    #  4
+		I => _INFO_,    #  5
+		P => _INFO_,    #  5
+		L => _FOLLW_,   #  6
+		C => _CONTXT_,  #  7
+		D => _DEBUG_,   #  7
+		U => _CONTXT_,  #  8
+	);
 
 	use File::Basename;
 	my $PROG=basename($0, "");
@@ -39,10 +63,34 @@ our @EXPORT_OK = qw($VERSION $LOGGERLEVEL $WARN2LOGGER);
 	$label_LEVEL[_FAIL_] = 'FAILED';
 	$label_LEVEL[_HELP_] = 'HELP';
 
+	sub set_logger_level($){
+		$LOGGERLEVEL=shift;
+		1;
+	}
+	
+	sub set_warn_to_logger(){
+		$WARN2LOGGER=1;
+		1;
+	}
 
 	sub logger(@){
 		my ($messLevel, $logMess, $modifier, @rcLogger) = @_;
-		$LOGGERLEVEL= ($modifier || $LOGGERLEVEL);
+
+		# Normalisation : lettre -> niveau entier
+		if (defined $messLevel && $messLevel =~ /^([A-Z])$/i) {
+			my $key = uc($messLevel);
+			if (exists $hLETTER_LEVEL{$key}) {
+				$messLevel = $hLETTER_LEVEL{$key};
+			} else {
+				$messLevel = _LEVEL_; # niveau "mauvais usage"
+				logger_help(0);
+			}
+		}
+
+		if (defined $modifier && $modifier =~ /^([A-Z])$/i) {
+			$modifier = $hLETTER_LEVEL{uc($modifier)} // $LOGGERLEVEL;
+		}
+		$LOGGERLEVEL = ($modifier || $LOGGERLEVEL);
 
 		# SI LE MESSAGE EST EN DEHORS DES LIMITES DEFINIES, ON NE PERD PAS DE TEMPS ON SORT
 		if ($messLevel > $LOGGERLEVEL && $messLevel ne _FAIL_) {
@@ -59,28 +107,33 @@ our @EXPORT_OK = qw($VERSION $LOGGERLEVEL $WARN2LOGGER);
 			$| = 1; 
 
 		} elsif ($messLevel== _HELP_){
-			&usage_logger();
+			&logger_help();
 			exit _SUCCESS_;
 
 		} else {
 			$rcLogger[0]="000";
 		}
 
-		$rcLogger[1]= sprintf (" %s |", (strftime "%Y-%m-%d %H:%M:%S", localtime));
-		$rcLogger[2]= sprintf (" %-7s| %s |", $label_LEVEL[$messLevel]||'ND', $logMess);
-		$rcLogger[3]= sprintf (" FH-%07d | last RC: %0.3d %s | PID-%s ", ($. || 0), $!, $!, $$);
+		$rcLogger[1]= sprintf ("\>%s|", (strftime "%Y-%m-%d %H:%M:%S", localtime));
+		$rcLogger[2]= sprintf (" %-7s|FH-%07d|PID-%s|last RC: %0.3d|", $label_LEVEL[$messLevel]||'ND', ($. || 0), $$, $! );
+		$rcLogger[3]= sprintf ( " %s|last RC: %0.3d-%s", $logMess, $!, $!);
 
 		if ($messLevel <= $LOGGERLEVEL && $messLevel > _FAIL_) {
-			print LOGGER_OUT $rcLogger[2] . $rcLogger[1] . $rcLogger[3] ."\n";
+			print LOGGER_OUT join('', @rcLogger) ."\n";
 	#	} elsif ($messLevel == _FAIL_) {
 	#		print $rcLogger[0] . $rcLogger[1] ."\n";
 		}
-			
-	return @rcLogger;
+
+		if ($messLevel == _FAIL_) {
+			# Pour die : on retourne UNE chaîne qui contient tout
+			return wantarray ? @rcLogger : join('', @rcLogger);
+		}
+
+	return wantarray ? @rcLogger : $rcLogger[0];
 	}
 
-
-	sub logger_help(){
+	sub logger_help($){
+		my $call_rc_list=shift || 0;
 		print STDOUT << "EOF";
 HELP FOR LOGGER USE, AND RETURN CODES LIST.
 
@@ -110,7 +163,7 @@ Third parameter is used to change \$LOGGERLEVEL value.
 
 EOF
 
-	logger_rc_list();
+	logger_rc_list() if ($call_rc_list);
 }
 
 	sub logger_rc_list() {

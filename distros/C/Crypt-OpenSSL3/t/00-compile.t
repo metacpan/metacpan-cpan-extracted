@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 56 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 60 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Crypt/OpenSSL3.pm',
@@ -62,6 +62,10 @@ my @module_files = (
     'Crypt/OpenSSL3/X509/Request.pm',
     'Crypt/OpenSSL3/X509/Stack.pm',
     'Crypt/OpenSSL3/X509/Store.pm',
+    'Crypt/OpenSSL3/X509/Store/Context.pm',
+    'Crypt/OpenSSL3/X509/Transparency/Evaluator.pm',
+    'Crypt/OpenSSL3/X509/Transparency/LogStore.pm',
+    'Crypt/OpenSSL3/X509/Transparency/Timestamp.pm',
     'Crypt/OpenSSL3/X509/VerifyParam.pm',
     'Crypt/OpenSSL3/X509/VerifyResult.pm'
 );

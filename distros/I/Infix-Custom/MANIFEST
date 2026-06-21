@@ -1,0 +1,20 @@
+Changes
+Custom.xs
+lib/Infix/Custom.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+t/00-load.t
+t/01-spike.t
+t/02-lexical.t
+t/03-longest-match.t
+t/04-native.t
+t/05-build-op.t
+t/06-no.t
+t/07-optional-chain.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,18 @@
+Changes
+lib/Syntax/Infix/OptionalChain.pm
+Makefile.PL
+OptionalChain.xs
+ppport.h
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-navigate.t
+t/10-moo.t
+t/11-moose.t
+t/12-mouse.t
+t/13-object-proto.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

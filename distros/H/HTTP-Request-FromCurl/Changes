@@ -1,3 +1,7 @@
+0.57 2026-06-21
+    * Fix Authorization header with empty passwords, C<--user> option
+    * Add support for (ignored) C<--follow> option
+
 0.56 2026-01-25
     * Fix case-insensitive command line options. This broke the -H option
       of Curl on the command line, confused with '-h' (for help). Reported

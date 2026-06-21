@@ -1,0 +1,504 @@
+## name while loop next bare (mode=always)
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    next;
+}
+
+## name while loop next labeled (mode=always)
+## parms { mode => 'always' }
+## failures 0
+## cut
+
+LOOP: while (1) {
+    next LOOP;
+}
+
+## name loop has label but break is bare
+## failures 1
+## cut
+
+LOOP: while (1) {
+    next;
+}
+
+## name last bare
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    last;
+}
+
+## name redo bare
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    redo;
+}
+
+## name for loop next bare
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+for my $x (@a) {
+    next;
+}
+
+## name foreach loop
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+foreach my $x (@a) {
+    next;
+}
+
+## name until loop
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+until ($done) {
+    next;
+}
+
+## name if block (not a loop) no violation
+## failures 0
+## cut
+
+if ($x) {
+    1;
+}
+
+## name loop with no break keywords
+## failures 0
+## cut
+
+while (1) {
+    1;
+}
+
+## name next in if block inside loop
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    if ($x) {
+        next;
+    }
+}
+
+## name next if conditional form
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    next if $x;
+}
+
+## name next EXPR with dynamic label (treated as labeled)
+## failures 0
+## cut
+
+my $label = 'LOOP';
+LOOP: while (1) {
+    next $label;
+}
+
+## name multiple bare breaks
+## parms { mode => 'always' }
+## failures 3
+## cut
+
+while (1) {
+    next;
+    last;
+}
+
+## name labeled for loop with labeled break
+## failures 0
+## cut
+
+LOOP: for my $x (@a) {
+    next LOOP;
+}
+
+## name break targets outer label inner loop still needs label
+## parms { mode => 'always' }
+## failures 1
+## cut
+
+OUTER: while (1) {
+    while (1) {
+        next OUTER;
+    }
+}
+
+## name c-style for loop next bare
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+for (my $i = 0; $i < 10; $i++) {
+    next;
+}
+
+## name mode nested single loop no violation
+## parms { mode => 'nested' }
+## failures 0
+## cut
+
+while (1) {
+    next;
+}
+
+## name mode nested inner loop flagged
+## parms { mode => 'nested' }
+## failures 2
+## cut
+
+while (1) {
+    while (1) {
+        next;
+    }
+}
+
+## name mode nested inner loop has label but break bare
+## parms { mode => 'nested' }
+## failures 1
+## cut
+
+while (1) {
+    INNER: while (1) {
+        next;
+    }
+}
+
+## name mode nested inner loop labeled break ok
+## parms { mode => 'nested' }
+## failures 0
+## cut
+
+while (1) {
+    INNER: while (1) {
+        next INNER;
+    }
+}
+
+## name mode nested top-level but long body flagged by max_lines
+## parms { mode => 'nested', max_lines => 3 }
+## failures 2
+## cut
+
+while (1) {
+    print "a";
+    print "b";
+    next;
+}
+
+## name mode nested top-level short body not flagged
+## parms { mode => 'nested', max_lines => 3 }
+## failures 0
+## cut
+
+while (1) {
+    next;
+}
+
+## name mode max_lines short loop no violation
+## parms { mode => 'max_lines', max_lines => 5 }
+## failures 0
+## cut
+
+while (1) {
+    next;
+}
+
+## name mode max_lines long loop
+## parms { mode => 'max_lines', max_lines => 2 }
+## failures 3
+## cut
+
+while (1) {
+    next;
+    last;
+}
+
+## name mode max_lines exactly at threshold
+## parms { mode => 'max_lines', max_lines => 3 }
+## failures 0
+## cut
+
+while (1) {
+    next;
+}
+
+## name cascade outer labeled inner bare break
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+OUTER: while (1) {
+    while (1) {
+        next;
+    }
+}
+
+## name cascade outer labeled triple nested
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+OUTER: while (1) {
+    while (1) {
+        while (1) {
+            next;
+        }
+    }
+}
+
+## name cascade all loops labeled innermost break bare
+## parms { mode => 'nested' }
+## failures 1
+## cut
+
+OUTER: while (1) {
+    MIDDLE: while (1) {
+        INNER: while (1) {
+            next;
+        }
+    }
+}
+
+## name outer and inner both labeled everything fine
+## parms { mode => 'nested' }
+## failures 0
+## cut
+
+OUTER: while (1) {
+    INNER: while (1) {
+        next INNER;
+    }
+}
+
+## name mode always all unlabeled nested
+## parms { mode => 'always' }
+## failures 4
+## cut
+
+while (1) {
+    next;
+    while (1) {
+        next;
+    }
+}
+
+## name bare block inside loop break in scope
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    {
+        next;
+    }
+}
+
+## name until outer loop with nested inner
+## parms { mode => 'nested' }
+## failures 2
+## cut
+
+until ($done) {
+    while (1) {
+        next;
+    }
+}
+
+## name redo with label reference
+## parms { mode => 'always' }
+## failures 0
+## cut
+
+LOOP: while (1) {
+    redo LOOP;
+}
+
+## name anonymous sub inside loop
+## failures 0
+## cut
+
+while (1) {
+    my $sub = sub {
+        next;
+    };
+}
+
+## name continue bare break mode always
+## parms { mode => 'always' }
+## failures 3
+## cut
+
+while (1) {
+    # no breaks in body
+} continue {
+    next;
+    last;
+}
+
+## name continue labeled loop bare breaks
+## failures 2
+## cut
+
+LOOP: while (1) {
+} continue {
+    next;
+    last;
+}
+
+## name continue labeled loop labeled breaks
+## failures 0
+## cut
+
+LOOP: while (1) {
+} continue {
+    next LOOP;
+    last LOOP;
+}
+
+## name continue nested inner loop mode always
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+} continue {
+    while (1) {
+        next;
+    }
+}
+
+## name continue mode nested short body
+## failures 0
+## cut
+
+while (1) {
+} continue {
+    next;
+}
+
+## name for as inner nested loop
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    for my $x (@a) {
+        next;
+    }
+}
+
+## name foreach as inner nested with last redo
+## parms { mode => 'always' }
+## failures 3
+## cut
+
+while (1) {
+    foreach my $x (@a) {
+        last;
+        redo;
+    }
+}
+
+## name do while not flagged
+## failures 0
+## cut
+
+do {
+    1;
+} while 0;
+
+## name for without iterator
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+for (@a) {
+    next;
+}
+
+## name while continue no breaks
+## failures 0
+## cut
+
+while (1) {
+} continue {
+    1;
+}
+
+## name last in nested while
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    while (1) {
+        last;
+    }
+}
+
+## name redo in nested while
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    while (1) {
+        redo;
+    }
+}
+
+## name eval block inside loop
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    eval { next; };
+}
+
+## name next plus operator (unary + before label means EXPR, not label ref)
+## parms { mode => 'always' }
+## failures 2
+## cut
+
+while (1) {
+    next +OUTER;
+}
+
+## name mode nested max_lines zero
+## parms { mode => 'nested', max_lines => 0 }
+## failures 2
+## cut
+
+while (1) {
+    next;
+}
+
+## name next bogus label (non-existent label still counts as labeled)
+## parms { mode => 'always' }
+## failures 1
+## cut
+
+while (1) {
+    next BOGUS;
+}

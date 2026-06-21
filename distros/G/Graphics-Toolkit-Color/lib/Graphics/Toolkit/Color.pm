@@ -2,7 +2,7 @@
 # public user level API: doc summary, help msg and arg cleaning
 
 package Graphics::Toolkit::Color;
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Error       qw/error/;
@@ -31,7 +31,7 @@ sub new {
 	my ($color_def, $space_name, $range_def, $is_raw);
     if (@args > 0 and not @args % 2){
 		my %h = @args;
-		return error('got an argument twice') if int(%h) * 2 < int(@args);
+		return error('got an argument twice') if keys(%h) * 2 < int(@args);
 		($color_def, $space_name, $range_def, $is_raw) = ($h{'color'}, $h{'in'}, $h{'range'}, $h{'raw'} // 0);
 	}
     $color_def = _color_def_into_scalar( @args ) unless defined $color_def;
@@ -190,7 +190,7 @@ sub distance {
 }
 
 ## single color creation methods #######################################
-# lightweight designer API
+# --- lightweight designer API ---
 my $design_default = 'OKHSL';
 sub lighten {
     my ($self, @args) = @_;
@@ -234,6 +234,10 @@ sub shade {
     return "The only argument or named argument 'by' has to be a number between 0 and 1!" unless ref $arg;
 	_new_from_value_obj( Graphics::Toolkit::Color::Calculator::shade( $self->values_object, $arg->{'by'}, $arg->{'in'} ) );
 }
+
+# --- low level complex API ---
+
+sub apply { tone_curve(@_) }
 sub tone_curve { 
     my ($self, @args) = @_;
     my $arg = _split_named_args( \@args, undef, ['gamma'], {in => 'LinearRGB'} ); 
@@ -246,7 +250,6 @@ sub tone_curve {
     return error($result.$help.$POD_link) unless ref $result;
     return _new_from_value_obj( $result );
 }
-sub apply { tone_curve(@_) }
 
 sub set_value {
     my ($self, @args) = @_;
@@ -745,7 +748,7 @@ It has three named arguments:
 L<to|Graphics::Toolkit::Color::Manual::Argument/to>,
 L<by|Graphics::Toolkit::Color::Manual::Argument/by> and
 L<in|Graphics::Toolkit::Color::Manual::Argument/in>.
-The first one is the only required and also the default argument.
+The first one (C<to>) is the only required one and also the default argument.
 C<by> defaults to a 50:50 blend and C<in> to I<OKLAB>.
 
     $blue->mix( $silver );                                     # 50% silver, 50% blue

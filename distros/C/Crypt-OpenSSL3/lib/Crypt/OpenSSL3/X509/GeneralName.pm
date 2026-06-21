@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::GeneralName;
-$Crypt::OpenSSL3::X509::GeneralName::VERSION = '0.007';
+$Crypt::OpenSSL3::X509::GeneralName::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::X509::GeneralName - An X509 generalized name
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 

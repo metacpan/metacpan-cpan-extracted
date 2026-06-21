@@ -1,0 +1,98 @@
+#!perl
+
+use v5.28.0;
+use warnings;
+
+use Test2::V0;
+
+use Weasel;
+use Weasel::Session;
+use Weasel::Driver::Selenium4;
+
+my $weasel = Weasel->new(
+    default_session => 'default',
+    sessions => {
+        default => Weasel::Session->new(
+            poll_delay => 0.1,
+            retry_timeout => 120,
+            driver => Weasel::Driver::Selenium4->new(
+                wait_timeout => '3000',
+                window_size => '1024x1280',
+                caps => {
+                    host => 'localhost',
+                    port => '4444',
+                    driver => 'Auto',
+                    browser => 'chrome',
+                    extra_capabilities => {
+                        'goog:chromeOptions' => {
+                            args => [ '--headless=new' ]
+                        }
+                    }
+                }
+            )
+        )
+    });
+
+ok($weasel, 'Weasel correctly allocated');
+
+my $started = lives { $weasel->session->start }; # <-- NOT IN THE DOCS YET?!
+my $gotten = lives { $weasel->session->get('https://example.com'); };
+ok($gotten, 'Correctly retrieved https://example.com');
+
+my @body;
+my $finders = lives { @body = $weasel->session->page->find_all( 'body', scheme => 'css' ) };
+ok( $finders, 'Correctly searched for <body>' );
+ok( (@body == 1), 'Correctly found <body>' );
+
+my ($body) = @body;
+my $clicked = lives { $body->click };
+ok( $clicked, 'Successfully clicked <body>' );
+
+$clicked = lives { $weasel->session->click }; # just click where the mouse is
+ok( $clicked, 'Successfully clicked where the mouse is' );
+
+my $dblclicked = lives { $weasel->session->double_click }; # just click where the mouse is
+ok( $clicked, 'Successfully double-clicked where the mouse is' );
+
+my $sourced = lives {
+    open my $fh, '>:encoding(UTF-8)', \my $out;
+    my $source = $weasel->session->get_page_source( $fh );
+};
+ok( $sourced, 'Successfully sourced the page' );
+
+my $textified = lives {
+    $body->get_text;
+};
+ok( $textified, 'Successfully requested page text' );
+
+my $displayed = lives {
+    $body->is_displayed;
+};
+ok( $displayed, 'Successfully requested "is_displayed"' );
+
+$displayed = lives {
+    $body->get_attribute( 'selected' );
+};
+ok( $displayed, 'Successfully requested "get_selected"' );
+
+my $screenshotted = lives {
+    open my $fh, '>:encoding(UTF-8)', \my $out;
+    $weasel->session->screenshot( $fh );
+};
+ok( $screenshotted, 'Successfully requested screenshot' );
+
+my $keyed = lives {
+    $weasel->session->send_keys( $body, 'a', 'b', 'def' );
+};
+ok( $keyed, 'Successfully sent keys (input) to <body>' );
+
+my $tag;
+my $tagged = lives {
+    $tag = $body->tag_name;
+};
+ok( $tagged, 'Successfully gotten element tag name' );
+is( $tag, 'body', 'tag name equals "body"' );
+
+$weasel = undef;
+
+done_testing;

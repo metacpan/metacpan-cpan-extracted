@@ -95,6 +95,7 @@ The following `curl` options are recognized but largely ignored:
 - ` --disable `
 - ` --dump-header `
 - ` --include `
+- ` --follow `
 - ` --location `
 - ` --progress-bar `
 - ` --show-error `

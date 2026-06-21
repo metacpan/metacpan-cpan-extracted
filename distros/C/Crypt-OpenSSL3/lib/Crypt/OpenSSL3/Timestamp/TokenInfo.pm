@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::Timestamp::TokenInfo;
-$Crypt::OpenSSL3::Timestamp::TokenInfo::VERSION = '0.007';
+$Crypt::OpenSSL3::Timestamp::TokenInfo::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::Timestamp::TokenInfo - A Timestamp Protocol token information o
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 

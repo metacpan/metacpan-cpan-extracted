@@ -11,7 +11,7 @@ enhancement of data tracking and knowledge for industrial printing
 processing.
 
 
-    oEdtk Copyright (C) 2005-2025 G Chaillou Domingo, D Aunay, M Henrion, G Ballin
+    oEdtk Copyright (C) 2005-2024 G Chaillou Domingo, D Aunay, M Henrion, G Ballin
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ applications to produce reports such as documents, mailings, invoices, banking
 statement, etc. 
 
 You can contact us at 
-	oedtk at free.fr
+	edtk at free.fr
 reference site is cpan.org
 
 
@@ -65,8 +65,7 @@ make install
 make clean
 
 
-CONTENT OF THIS ARC oEdtk is Copyright (C) 2005-2025, D Aunay, G Chaillou Domingo, M Henrion, G Ballin
-
+CONTENT OF THIS ARC oEdtk is Copyright (C) 2005-2024, D Aunay, G Chaillou Domingo, M Henrion, G Ballin
 HIVE
 ***************************************************************************
 /lib/oEdtk.pm					main module dedicated for documentation
@@ -131,3 +130,6 @@ XML::LibXML			(for XML data inputs)
 XML::XPath
 XML::Writer
 
+
+
+ oEdtk is Copyright (C) 2005-2024, G Chaillou Domingo, D Aunay, M Henrion, G Ballin

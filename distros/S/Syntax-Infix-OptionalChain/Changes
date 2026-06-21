@@ -1,0 +1,13 @@
+Revision history for Syntax-Infix-OptionalChain
+
+0.01    2026-06-20
+        First version.
+        - Lexically-scoped `?->` safe-navigation operator, built on Infix::Custom.
+        - Per-step navigator implemented in XS (OptionalChain.xs), dispatching by
+          run-time type: blessed object with the method -> method call, HASH ref
+          -> hash element, ARRAY ref -> array element. A blessed object lacking
+          the method falls through to structural access.
+        - Short-circuits to undef on an undef invocant; combines with // for
+          defaults. Missing hash keys / out-of-range indices are undef; an
+          unknown method, or a defined but un-navigable value, is an error.
+        - Requires perl 5.38+ (the PL_infix_plugin hook); inert below that.

@@ -1,6 +1,16 @@
 #ifndef DD_DESTRUCTURE_H
 #define DD_DESTRUCTURE_H
 
+/* op_convert_list() is the 5.21.6 public rename of the older core function
+ * convert() (identical signature). ppport.h knows the symbol but cannot
+ * emulate it, so on pre-5.21.6 perls map it to Perl_convert() directly --
+ * the long Perl_-prefixed name (with aTHX_) is used because the short
+ * convert() macro is not exposed to non-core XS, whereas Perl_convert is
+ * declared in proto.h and exported from libperl. */
+#ifndef op_convert_list
+#  define op_convert_list(type, flags, o) Perl_convert(aTHX_ (type), (flags), (o))
+#endif
+
 #define DD_MAX_ELEMS 4096
 /* ---- pattern model ---------------------------------------------------------
  *

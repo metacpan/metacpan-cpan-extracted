@@ -1,0 +1,7 @@
+Revision history for Syntax-Infix-ConditionalSplice
+
+0.01    2026-06-20
+        First version.
+        - Lexically-scoped `?|` conditional-splice operator: `COND ?| LIST`
+          yields LIST when COND is true, else the empty list.
+        - Requires perl 5.38+ (the PL_infix_plugin hook); does not install below.

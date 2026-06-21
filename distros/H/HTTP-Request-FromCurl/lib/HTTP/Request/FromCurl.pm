@@ -1,4 +1,4 @@
-package HTTP::Request::FromCurl 0.56;
+package HTTP::Request::FromCurl 0.57;
 use 5.020;
 use File::Basename 'basename';
 use HTTP::Request;
@@ -125,6 +125,8 @@ The following C<curl> options are recognized but largely ignored:
 
 =item C< --include >
 
+=item C< --follow >
+
 =item C< --location >
 
 =item C< --progress-bar >
@@ -162,7 +164,7 @@ our @option_spec = (
     'user-agent|A=s',
     'verbose|v',         # ignored
     'show-error|S',      # ignored
-    'fail|f',            # ignored
+    'fail|f',
     'silent|s',          # ignored
     'anyauth',           # ignored
     'basic',
@@ -182,6 +184,7 @@ our @option_spec = (
     'disable|q!',        # ignored
     'dump-header|D=s',   # ignored
     'referrer|e=s',
+    'follow',            # ignored, we always follow redirects
     'form|F=s@',
     'form-string=s@',
     'get|G',
@@ -206,7 +209,7 @@ our @option_spec = (
     'next',                      # ignored
     'parallel|Z',                # ignored
     'parallel-immediate',        # ignored
-    'parallel-max',              # ignored
+    'parallel-max=i',            # ignored
     'junk-session-cookies|j',    # ignored, must be set in code using the HTTP request
     'unix-socket=s',
     'url=s@',
@@ -515,6 +518,11 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             } else {
                 # $options->{basic} or none at all
                 my $info = delete $options->{'user'};
+                if( $info !~ /:/ ) {
+                    # No password given, so append it
+                    $info .= ':';
+                };
+
                 # We need to bake this into the header here?!
                 push @headers, sprintf 'Authorization: Basic %s', encode_base64( $info );
             }

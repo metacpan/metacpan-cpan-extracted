@@ -1,5 +1,12 @@
 Revision history for Crypt-OpenSSL3
 
+0.008     2026-06-20 18:57:07+02:00 Europe/Brussels
+          - Add Crypt::OpenSSL3::X509::Store::Context
+          - Add SCT support
+          - Add subject_alt_names and issuer_alt_names to X509
+          - Increment ParseXS dependency to deal with INTERFACE issues
+          - Add to_time_t to ASN1::Time
+
 0.007     2026-06-18 14:09:12+02:00 Europe/Brussels
           - Add more serialization methods
           - Add Crypt::OpenSSL3::X509::Stack

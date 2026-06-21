@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::ASN1::String;
-$Crypt::OpenSSL3::ASN1::String::VERSION = '0.007';
+$Crypt::OpenSSL3::ASN1::String::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::ASN1::String - An ASN1 string
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 

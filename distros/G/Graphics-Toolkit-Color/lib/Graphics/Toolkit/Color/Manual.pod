@@ -29,7 +29,7 @@ Overviews
 
 =item *
 
-L<Overview|Graphics::Toolkit::Color> - of the public API, short desciption of methods
+L<Overview|Graphics::Toolkit::Color> - of the public API, short description of methods
 
 =item *
 
@@ -41,10 +41,9 @@ L<Cookbook|Graphics::Toolkit::Color::Manual::Cookbook> - code examples to solve 
 
 =item *
 
-L<Philosophy|Graphics::Toolkit::Color::Manual::Philosophy> - explaining the design and the mindest behind it
+L<Philosophy|Graphics::Toolkit::Color::Manual::Philosophy> - explaining the design and the mindset behind it
 
 =back
-
 
 =item *
 
@@ -70,10 +69,9 @@ L<Set|Graphics::Toolkit::Color::Manual::Set> - methods that calculate sets of co
 
 =item *
 
-L<Argument|Graphics::Toolkit::Color::Manual::Argument> - explaining all arguments than several methods share
+L<Argument|Graphics::Toolkit::Color::Manual::Argument> - explaining all arguments that several methods share
 
 =back
-
 
 =item *
 
@@ -87,7 +85,7 @@ L<Name|Graphics::Toolkit::Color::Manual::Name> - about color names
 
 =item *
 
-L<Space|Graphics::Toolkit::Color::Manual::Space> - list of all supported color spaces with detailed informations
+L<Space|Graphics::Toolkit::Color::Manual::Space> - list of all supported color spaces with detailed information
 
 =item *
 
@@ -99,7 +97,7 @@ L<Error|Graphics::Toolkit::Color::Manual::Error> - ways to do error handling
 
 =item *
 
-L<Plugin|Graphics::Toolkit::Color::Manual::Plugin> - How to extend the library ?
+L<Plugin|Graphics::Toolkit::Color::Manual::Plugin> - How to extend the library?
 
 =item *
 

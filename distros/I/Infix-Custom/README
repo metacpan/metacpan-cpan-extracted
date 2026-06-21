@@ -1,0 +1,54 @@
+Infix-Custom
+
+Lexically-scoped custom infix operators for Perl.
+
+Infix::Custom owns core's single PL_infix_plugin hook and exposes a small
+declarative API for adding your own binary infix operators, scoped lexically
+the way the rest of the *::Declare family scopes its keywords. A declared
+operator is parsed at compile time and lowered to an ordinary optree -- either
+a sub call or a native binary op -- so there is no residual runtime overhead
+beyond the work the operator names.
+
+    use utf8;
+    use Infix::Custom op => '+|', call => \&merge, prec => 'add';
+    my $set = $a +| $b;          # merge($a, $b)
+
+    # or lower straight to a native op (no sub-call overhead):
+    use Infix::Custom op => '×', binop => '*', prec => 'mul';
+    my $area = $w × $h;          # native multiply
+
+The operator is active only inside the lexical scope that declared it, can be
+rebound in nested scopes, and is an ordinary unknown-operator parse error
+outside that scope.
+
+REQUIREMENTS
+
+Requires perl 5.38 or newer -- the PL_infix_plugin hook that makes ambient
+infix operators possible was added to core in 5.38, so the distribution does
+not install on older perls. No non-core dependencies.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Infix::Custom
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

@@ -252,9 +252,9 @@ SINGLE COLOR
 
   mix
     mix computes a color that is a blend between two or more other colors.
-    It has three named arguments: to, by and in. The first one is the only
-    required and also the default argument. "by" defaults to a 50:50 blend
-    and "in" to *OKLAB*.
+    It has three named arguments: to, by and in. The first one ("to") is the
+    only required one and also the default argument. "by" defaults to a
+    50:50 blend and "in" to *OKLAB*.
 
         $blue->mix( $silver );                                     # 50% silver, 50% blue
         $blue->mix( to => 'silver', by => .6 );                    # 60% silver, 40% blue

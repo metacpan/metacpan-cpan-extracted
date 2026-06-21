@@ -54,4 +54,23 @@ Test::MemoryGrowth::no_growth {
 }
 calls => 50, 'quad tree operations do not leak';
 
+my $qt = Algorithm::QuadTree->new(
+	-xmin  => 0,
+	-xmax  => AREA_SIZE,
+	-ymin  => 0,
+	-ymax  => AREA_SIZE,
+	-depth => $QuadTreeUtils::DEPTH
+);
+
+Test::MemoryGrowth::no_growth {
+	init_zones $qt;
+
+	my $clearer = loop_zones {
+		$qt->delete(object_name(@_));
+	};
+
+	$clearer->();
+}
+calls => 50, 'deleting objects does not leak';
+
 done_testing;

@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::Timestamp::Verifier;
-$Crypt::OpenSSL3::Timestamp::Verifier::VERSION = '0.007';
+$Crypt::OpenSSL3::Timestamp::Verifier::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::Timestamp::Verifier - A Timestamp Protocol verifier
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 
@@ -42,6 +42,8 @@ version 0.007
 =head2 set_store
 
 =head2 verify_response
+
+=head2 verify_token
 
 =head2 CONSTANTS
 

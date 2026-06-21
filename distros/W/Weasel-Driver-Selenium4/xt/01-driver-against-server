@@ -1,0 +1,87 @@
+#!perl
+
+use v5.28.0;
+use warnings;
+
+use Test2::V0;
+
+use Weasel::Driver::Selenium4;
+
+my $drv = Weasel::Driver::Selenium4->new(
+    caps => {
+        remote_server_addr => 'localhost',
+        port => 4444,
+        driver => 'Auto',
+        browser => 'chrome',
+        extra_capabilities => {
+            'goog:chromeOptions' => {
+                args => [ '--headless=new' ]
+            }
+        }
+    });
+
+ok($drv, 'Driver correctly allocated');
+
+my $started = lives { $drv->start; };
+ok($started, 'Driver correctly started');
+
+my $gotten = lives { $drv->get('https://example.com'); };
+ok($gotten, 'Correctly retrieved https://example.com');
+
+my @body;
+my $finders = lives { @body = $drv->find_all( '/html', 'body', 'css' ) };
+ok( $finders, 'Correctly searched for <body>' );
+ok( (@body == 1), 'Correctly found <body>' );
+
+my ($body) = @body;
+my $clicked = lives { $drv->click( $body ) };
+ok( $clicked, 'Successfully clicked <body>' );
+
+$clicked = lives { $drv->click }; # just click where the mouse is
+ok( $clicked, 'Successfully clicked where the mouse is' );
+
+my $dblclicked = lives { $drv->double_click }; # just click where the mouse is
+ok( $clicked, 'Successfully double-clicked where the mouse is' );
+
+
+my $sourced = lives {
+    open my $fh, '>:encoding(UTF-8)', \my $out;
+    my $source = $drv->get_page_source( $fh );
+};
+ok( $sourced, 'Successfully sourced the page' );
+
+my $textified = lives {
+    $drv->get_text( $body );
+};
+ok( $textified, 'Successfully requested page text' );
+
+my $displayed = lives {
+    $drv->is_displayed( $body );
+};
+ok( $displayed, 'Successfully requested "is_displayed"' );
+
+
+my $displayed = lives {
+    $drv->get_selected( $body );
+};
+ok( $displayed, 'Successfully requested "get_selected"' );
+
+my $screenshotted = lives {
+    open my $fh, '>:encoding(UTF-8)', \my $out;
+    $drv->screenshot( $fh );
+};
+ok( $screenshotted, 'Successfully requested screenshot' );
+
+my $keyed = lives {
+    $drv->send_keys( $body, 'a', 'b', 'def' );
+};
+ok( $keyed, 'Successfully sent keys (input) to <body>' );
+
+my $tag;
+my $tagged = lives {
+    $tag = $drv->tag_name( $body );
+};
+ok( $tagged, 'Successfully gotten element tag name' );
+is( $tag, 'body', 'tag name equals "body"' );
+
+done_testing;

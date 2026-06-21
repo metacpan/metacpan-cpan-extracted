@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::ASN1::Time;
-$Crypt::OpenSSL3::ASN1::Time::VERSION = '0.007';
+$Crypt::OpenSSL3::ASN1::Time::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::ASN1::Time - An ASN1 Time
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 
@@ -52,6 +52,8 @@ version 0.007
 =head2 set_string_X509
 
 =head2 to_generalizedtime
+
+=head2 to_time_t
 
 =head2 to_tm
 

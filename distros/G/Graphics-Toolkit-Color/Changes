@@ -1,9 +1,15 @@
-2.21   2026-06-21   lichtkind
+2.22   2026-06-20   lichtkind
+-------
+    * = minor fix release
+    * ! fix hash in scalar context bug while arg splitting in new
+    * ? various POD fixes
+
+2.21   2026-06-20   lichtkind
 -------
     * = minor fix release
     * ? various POD fixes
 
-2.20   2026-06-20   lichtkind
+2.20   2026-06-19   lichtkind
 -------
     * = big feature release: +3 spaces, +8 methods, +7 args, new docs, error handling
     * * add methods lighten / darken, saturate / desaturate, 
@@ -31,7 +37,7 @@
 2.11   2026-05-08   lichtkind
 -------
     * = bug fix release
-    * ! fix hash in scalar context bug while arg spltting in new
+    * ! fix hash in scalar context bug while arg splitting in new
     * ! HSB should never have had constraints as HSV
 
 2.1    2026-05-05   lichtkind

@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::Error;
-$Crypt::OpenSSL3::Error::VERSION = '0.007';
+$Crypt::OpenSSL3::Error::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::Error - Cryptography error values
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 

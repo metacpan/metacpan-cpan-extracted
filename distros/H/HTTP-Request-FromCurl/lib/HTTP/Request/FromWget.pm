@@ -1,4 +1,4 @@
-package HTTP::Request::FromWget 0.56;
+package HTTP::Request::FromWget 0.57;
 use 5.020;
 use HTTP::Request;
 use HTTP::Request::Common;

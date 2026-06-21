@@ -78,7 +78,7 @@
          "web" : "https://github.com/Corion/HTTP-Request-FromCurl"
       }
    },
-   "version" : "0.56",
+   "version" : "0.57",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

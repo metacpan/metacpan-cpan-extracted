@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::PKCS7;
-$Crypt::OpenSSL3::PKCS7::VERSION = '0.007';
+$Crypt::OpenSSL3::PKCS7::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::PKCS7 - A PKCS7 envelope
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 
@@ -75,7 +75,17 @@ version 0.007
 
 =item * NOCERTS
 
+=item * NOCHAIN
+
+=item * NOCRL
+
+=item * NOINTERN
+
+=item * NOSIGS
+
 =item * NOSMIMECAP
+
+=item * NOVERIFY
 
 =item * STREAM
 

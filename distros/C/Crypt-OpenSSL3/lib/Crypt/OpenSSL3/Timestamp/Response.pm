@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::Timestamp::Response;
-$Crypt::OpenSSL3::Timestamp::Response::VERSION = '0.007';
+$Crypt::OpenSSL3::Timestamp::Response::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -21,13 +21,15 @@ Crypt::OpenSSL3::Timestamp::Response - A Timestamp Protocol response
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 METHODS
 
 =head2 new
 
 =head2 get_status_info
+
+=head2 get_token
 
 =head2 get_tst_info
 

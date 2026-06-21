@@ -1,0 +1,23 @@
+Revision history for Infix-Custom
+
+0.01    2026-06-20
+        First version.
+        - Lexically-scoped custom binary infix operators, built on core's
+          PL_infix_plugin hook (perl 5.38+), installed via wrap_infix_plugin.
+        - Declarative import API:
+            use Infix::Custom op => '<glyph>', call => \&sub, prec => '<tier>';
+          plus the shorthand  ('<glyph>' => \&sub, ...).
+        - Lowering modes: call mode (LHS op RHS -> sub(LHS, RHS)), op mode
+          (binop => '+' lowers to a native binary op, no call overhead), method
+          mode (method => 1: RHS read as a bareword method name via a parse
+          stage, so safe-navigation `$o ?-> meth` works under strict), and a
+          C-level build_op escape hatch (pass a function-pointer IV) for XS
+          authors who want to emit a custom optree.
+        - import()/unimport() are implemented in XS: argument parsing, the
+          precedence vocabulary, glyph validation, registration and the lexical
+          %^H hint are all done in C; only the bootstrap stays in Perl.
+        - Precedence by friendly name mapping to core's INFIX_PREC_* ladder;
+          associativity follows the chosen tier.
+        - Lexical scope and nested rebinding via %^H; an out-of-scope glyph is
+          an ordinary parse error. Longest-match resolution between glyphs.
+        - Requires perl 5.38+ (the PL_infix_plugin hook); does not install below.

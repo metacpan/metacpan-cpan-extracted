@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "A modern OpenSSL wrapper",
   "AUTHOR" => "Leon Timmermans <fawaka\@gmail.com>",
   "BUILD_REQUIRES" => {
-    "ExtUtils::ParseXS" => "3.60"
+    "ExtUtils::ParseXS" => "3.63"
   },
   "CONFIGURE_REQUIRES" => {
     "Crypt::OpenSSL::Guess" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "version" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
-  "ExtUtils::ParseXS" => "3.60",
+  "ExtUtils::ParseXS" => "3.63",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

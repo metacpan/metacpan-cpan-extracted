@@ -27,17 +27,17 @@ DESCRIPTION
 
 RECENT CHANGES
 
-    Changes for version 0.007 (2026-06-18)
+    Changes for version 0.008 (2026-06-20)
 
-      * Add more serialization methods
+      * Add Crypt::OpenSSL3::X509::Store::Context
 
-      * Add Crypt::OpenSSL3::X509::Stack
+      * Add SCT support
 
-      * Add PKCS7 support
+      * Add subject_alt_names and issuer_alt_names to X509
 
-      * Add Timestamp Protocol support
+      * Increment ParseXS dependency to deal with INTERFACE issues
 
-      * Add NID class
+      * Add to_time_t to ASN1::Time
 
     See the Changes file for more details.
 

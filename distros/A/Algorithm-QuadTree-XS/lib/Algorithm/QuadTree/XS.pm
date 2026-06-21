@@ -1,5 +1,5 @@
 package Algorithm::QuadTree::XS;
-$Algorithm::QuadTree::XS::VERSION = '0.06';
+$Algorithm::QuadTree::XS::VERSION = '0.07';
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -12,6 +12,30 @@ our @EXPORT = qw(
 	_AQT_delete
 	_AQT_clear
 );
+
+# NOTE: this implementation lives here for XS to load properly, but a separate
+# file including this module is present to allow regular perl module loading to
+# find it by name
+package Algorithm::QuadTree::XS::NoBackRefs;
+$Algorithm::QuadTree::XS::NoBackRefs::VERSION = '0.07';
+use strict;
+use warnings;
+use Exporter qw(import);
+use Carp qw(croak);
+
+our @EXPORT = qw(
+	_AQT_init
+	_AQT_deinit
+	_AQT_addObject
+	_AQT_findObjects
+	_AQT_delete
+	_AQT_clear
+);
+
+sub _AQT_delete
+{
+	croak 'delete is not supported with ' . __PACKAGE__;
+}
 
 require XSLoader;
 XSLoader::load('Algorithm::QuadTree::XS', $Algorithm::QuadTree::XS::VERSION);
@@ -39,27 +63,38 @@ This implementation is compatible with C<Algorithm::QuadTree::PP>.
 
 Generated using C<tools/benchmark.pl> available in the GitHub repository. Tree depth was 6.
 
-B<XS>
+L<Algorithm::QuadTree::XS::NoBackRefs>
 
 	Benchmark: ran clear, find_circle, find_rectangle, insert_circles, insert_rectangles.
-	            clear: 9.1155e-05 +- 6.2e-08 wallclock secs (0.0680%) @ (10970.3 +-    7.5)/s (n=207)
-	      find_circle: 5.4967e-05 +- 2.5e-08 wallclock secs (0.0455%) @ (18192.9 +-    8.3)/s (n=204)
-	   find_rectangle: 4.7784e-05 +- 2.0e-08 wallclock secs (0.0419%) @ (20927.4 +-    8.7)/s (n=205)
-	   insert_circles: 2.36597e-04 +- 9.6e-08 wallclock secs (0.0406%) @ (4226.6 +-   1.7)/s (n=208)
-	insert_rectangles: 2.15474e-04 +- 7.3e-08 wallclock secs (0.0339%) @ (4640.9 +-   1.6)/s (n=201)
+	            clear: 1.68907e-05 +- 1.3e-09 wallclock secs (0.00770%) @ (59204.2 +-    4.7)/s (n=211)
+	      find_circle: 3.5331e-05 +- 1.1e-08 wallclock secs (0.0311%) @ (28303.6 +-    8.6)/s (n=201)
+	   find_rectangle: 3.6176e-05 +- 1.3e-08 wallclock secs (0.0359%) @ (27643 +-    10)/s (n=203)
+	   insert_circles: 1.03584e-04 +- 1.7e-08 wallclock secs (0.0164%) @ ( 9654 +-   1.6)/s (n=204)
+	insert_rectangles: 1.01218e-04 +- 1.3e-08 wallclock secs (0.0128%) @ (9879.7 +-   1.3)/s (n=202)
 
-B<PP>
+B<Algorithm::QuadTree::XS>
 
 	Benchmark: ran clear, find_circle, find_rectangle, insert_circles, insert_rectangles.
-	            clear: 2.2492e-03 +- 1.3e-06 wallclock secs (0.0578%) @ (444.61 +-  0.26)/s (n=204)
-	      find_circle: 2.59805e-04 +- 7.9e-08 wallclock secs (0.0304%) @ ( 3849 +-   1.2)/s (n=208)
-	   find_rectangle: 1.64389e-04 +- 5.4e-08 wallclock secs (0.0328%) @ (6083.1 +-     2)/s (n=208)
-	   insert_circles: 5.7887e-03 +- 1.8e-06 wallclock secs (0.0311%) @ (172.75 +-  0.054)/s (n=202)
-	insert_rectangles: 1.80404e-03 +- 3.2e-07 wallclock secs (0.0177%) @ (554.311 +-  0.097)/s (n=206)
+	            clear: 5.7209e-05 +- 4.6e-08 wallclock secs (0.0804%) @ (17480 +-    14)/s (n=203)
+	      find_circle: 3.3665e-05 +- 3.0e-08 wallclock secs (0.0891%) @ (29705 +-    26)/s (n=205)
+	   find_rectangle: 2.7731e-05 +- 1.9e-08 wallclock secs (0.0685%) @ (36061 +-    25)/s (n=269)
+	   insert_circles: 1.46677e-04 +- 5.8e-08 wallclock secs (0.0395%) @ (6817.7 +-   2.7)/s (n=207)
+	insert_rectangles: 1.35100e-04 +- 3.4e-08 wallclock secs (0.0252%) @ (7401.9 +-   1.9)/s (n=211)
+
+B<Algorithm::QuadTree::PP>
+
+	Benchmark: ran clear, find_circle, find_rectangle, insert_circles, insert_rectangles.
+	            clear: 1.40270e-03 +- 1.6e-07 wallclock secs (0.0114%) @ (712.91 +-  0.084)/s (n=212)
+	      find_circle: 1.58290e-04 +- 2.9e-08 wallclock secs (0.0183%) @ (6317.5 +-   1.2)/s (n=207)
+	   find_rectangle: 1.01350e-04 +- 3.5e-08 wallclock secs (0.0345%) @ (9866.8 +-   3.4)/s (n=207)
+	   insert_circles: 3.59243e-03 +- 4.4e-07 wallclock secs (0.0122%) @ (278.363 +-  0.034)/s (n=208)
+	insert_rectangles: 1.129783e-03 +- 9.4e-08 wallclock secs (0.00832%) @ (885.125 +-  0.074)/s (n=210)
 
 =head1 SEE ALSO
 
 L<Algorithm::QuadTree>
+
+L<Algorithm::QuadTree::XS::NoBackRefs>
 
 =head1 AUTHOR
 
