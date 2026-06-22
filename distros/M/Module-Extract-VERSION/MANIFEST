@@ -4,6 +4,9 @@ corpus/Dotted_5_14_braces.pm
 corpus/Easy.pm
 corpus/Easy_5_12.pm
 corpus/Easy_5_14_braces.pm
+corpus/QV.pm
+corpus/QV_double.pm
+corpus/QV_single.pm
 corpus/RCSKeywords.pm
 corpus/ToTk.pm
 corpus/Underscore.pm

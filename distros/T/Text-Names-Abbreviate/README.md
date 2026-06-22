@@ -1,140 +1,151 @@
-[![CPAN version](https://badge.fury.io/pl/Text-Names-Abbreviate.svg)](https://metacpan.org/pod/Text::Names::Abbreviate)
-![Ubuntu CI](https://github.com/nigelhorne/Text-Names-Abbreviate/actions/workflows/ubuntu.yml/badge.svg)
-
 # NAME
 
 Text::Names::Abbreviate - Create abbreviated name formats from full names
 
 ## VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
     use Text::Names::Abbreviate qw(abbreviate);
 
-    say abbreviate("John Quincy Adams");           # "J. Q. Adams"
-    say abbreviate("Adams, John Quincy");         # "J. Q. Adams"
-    say abbreviate("George R R Martin", { format => 'initials' }); # "G.R.R.M."
+    say abbreviate('John Quincy Adams');                            # J. Q. Adams
+    say abbreviate('Adams, John Quincy');                          # J. Q. Adams
+    say abbreviate('George R R Martin', { format => 'initials' }); # G.R.R.M.
 
 # DESCRIPTION
 
-This module provides simple abbreviation logic for full personal names,
-with multiple formatting options and styles.
-
-The input is expected to be a personal name consisting of one or more
-whitespace-separated components. These are typically interpreted as:
+This module provides simple abbreviation logic for full personal names with
+multiple formatting options and styles.  Input is expected to be a personal
+name consisting of one or more whitespace-separated components interpreted as:
 
     First [Middle ...] Last
 
-Names consisting of a single component are treated as a single name,
-and no abbreviation of given names is possible.
+Names consisting of a single component are returned unchanged.
 
 # SUBROUTINES/METHODS
 
 ## abbreviate
 
-Make the abbreviation.
-It takes the following optional arguments:
+Produce an abbreviated form of a personal name.
 
-- format
+### Purpose
 
-    One of: default, initials, compact, shortlast
+Accept a full name in either `First Middle Last` or `Last, First Middle`
+form and return a formatted abbreviated string according to the requested
+`format`, `style`, and `separator`.
 
-    `Shortlast` produces initials followed by the full last name, ignoring style reordering.
-    This is similar to the default format but does not support `last_first` output.
+### Args
 
-- style
+- name (required)
 
-    One of: first\_last, last\_first
+    Non-empty string.  Accepted in two forms:
 
-- separator
+    - `First [Middle ...] Last`
+    - `Last, First [Middle ...]`
 
-    String used between initials (default: ".").
+    A leading comma (`", John"`) signals that no last name is present; only
+    initials are produced.
 
-    Note that spacing between initials is handled separately depending on
-    the selected format.
+- format (optional, default `default`)
 
-### Name Formats
+    One of `default`, `initials`, `compact`, `shortlast`.
 
-The function recognizes names in both of the following forms:
+    - `default`   -- `J. Q. Adams`
+    - `initials`  -- `J.Q.A.`
+    - `compact`   -- `JQA`
+    - `shortlast` -- initials then full last name; honours `last_first` style
+    (e.g. `Adams, J. Q.`).
 
-- `First Middle Last`
-- `Last, First Middle`
+- style (optional, default `first_last`)
 
-In the latter case, the name will be normalized internally before
-abbreviation.
+    One of `first_last`, `last_first`.  All formats honour this option.
 
-If the input begins with a comma (e.g., `", John"`), it is interpreted
-as having no last name, and only initials will be produced.
+- separator (optional, default `.`)
 
-### Errors
+    String appended after each initial.  Empty string removes all punctuation.
 
-The function will throw an exception (via `croak`) if:
+### Returns
 
-- The `name` parameter is missing or undefined
-- The `name` parameter is an empty string
-- An invalid value is provided for `format` or `style`
+A plain string.  Returns `''` for inputs that normalise to nothing (e.g. a
+bare comma).
 
-# EXAMPLES
+### Side Effects
 
-    abbreviate("Madonna")
-    # "Madonna"
+None.  The function is purely functional with no persistent state.
 
-    abbreviate("Adams, John Quincy")
-    # "J. Q. Adams"
+### Usage
 
-    abbreviate("John Quincy Adams", { style => 'last_first' })
-    # "Adams, J. Q."
+    # Positional
+    my $abbrev = abbreviate('John Quincy Adams');
 
-    abbreviate("John Quincy Adams", { format => 'compact' })
-    # "JQA"
-
-### Notes
-
-Abbreviation formats such as `compact` and `initials` are lossy
-transformations. They discard structural information about the original
-name.
-
-As a result, passing the output of `abbreviate()` back into the function
-may not yield equivalent results:
-
-    abbreviate("George R R Martin", { format => 'compact' })   # "GRRM"
-    abbreviate("GRRM", { format => 'initials' })                  # "G."
-
-In such cases, the input is treated as a single name.
-
-Initials are derived by taking the first character of each name component verbatim.
-No filtering is applied,
-so non-alphabetic characters (such as punctuation or digits) will be included as-is.
+    # Options hashref
+    my $abbrev = abbreviate('John Quincy Adams', {
+        format    => 'initials',
+        style     => 'last_first',
+        separator => '-',
+    });
 
 ### API SPECIFICATION
 
-#### INPUT
-
+    INPUT
     {
-      'name' => { 'type' => 'string', 'min' => 1, 'optional' => 0 },
-      'format' => {
-        'type' => 'string',
-        'memberof' => [ 'default', 'initials', 'compact', 'shortlast' ],
-        'optional' => 1
-      }, 'style' => {
-        'type' => 'string',
-        'memberof' => [ 'first_last', 'last_first' ],
-        'optional' => 1
-      }, 'separator' => {
-        'type' => 'string',
-        'optional' => 1
-      }
+      name      => { type => 'string', min => 1, optional => 0 },
+      format    => { type => 'string',
+                     memberof => [qw(default initials compact shortlast)],
+                     optional => 1 },
+      style     => { type => 'string',
+                     memberof => [qw(first_last last_first)],
+                     optional => 1 },
+      separator => { type => 'string', optional => 1 },
     }
 
-#### OUTPUT
+    OUTPUT
+    { type => 'string' }    # croaks on argument error
 
-Argument error: croak
+### MESSAGES
 
-    {
-      'type' => 'string',
-    }
+    Error                                    Meaning / Resolution
+    ---------------------------------------  -----------------------------------------------
+    name parameter missing or undefined      Called without a name argument; supply one.
+    name must be a non-empty string          Passed '' or undef; supply a non-empty string.
+    format must be one of: ...               Invalid format constant; see API SPECIFICATION.
+    style must be one of: ...               Invalid style constant; see API SPECIFICATION.
+
+### PSEUDOCODE
+
+    FUNCTION abbreviate(name, options):
+       Validate parameters via %PARAM_SCHEMA       (croak on violation)
+       Assign defaults: format=default, style=first_last, sep="."
+       _normalize_name(name):
+           - collapse consecutive commas
+           - detect and reorder "Last, First" form
+           - track $had_leading_comma (input had no last-name component)
+           - collapse internal whitespace; trim
+       Return '' if normalized name is empty
+       _extract_parts(name, had_leading_comma, format, style):
+           - tokenize on whitespace
+           - pop last token as $last_name (unless leading-comma form)
+           - build @initials from remaining tokens (first char each)
+           - if style=last_first and format!=default: unshift last initial, clear $last_name
+           - filter empty initials
+       Format result:
+           compact   -> join('', @initials, first($last_name))
+           initials  -> join($sep, @all_letters) . $sep
+           shortlast -> join(' ', map {"$_$sep"} @initials) . " $last_name"
+           default   -> joined initials; prepend/append $last_name per $style
+
+# LIMITATIONS
+
+- Honorifics (`Dr.`, `Prof.`) and suffixes (`Jr.`, `III`) are not
+detected or stripped; they are treated as name components.
+- Initials are taken verbatim from the first character of each token.
+Non-alphabetic leading characters (digits, punctuation) are included as-is.
+- Multiple consecutive commas collapse to a single comma before parsing.
+Names with two legitimate comma-separated clauses are not supported.
+- `compact` and `initials` formats are lossy: passing their output back into
+`abbreviate` does not reproduce the original result.
 
 # AUTHOR
 
@@ -142,41 +153,68 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
+Please report bugs to `bug-text-names-abbreviate at rt.cpan.org` or via
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Names-Abbreviate](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Names-Abbreviate).
+
 # REPOSITORY
 
 [https://github.com/nigelhorne/Text-Names-Abbreviate](https://github.com/nigelhorne/Text-Names-Abbreviate)
+
+# SEE ALSO
+
+- [Test Dashboard](https://nigelhorne.github.io/Text-Names-Abbreviate/coverage/)
 
 # SUPPORT
 
 This module is provided as-is without any warranty.
 
-Please report any bugs or feature requests to `bug-text-names-abbreviate at rt.cpan.org`,
-or through the web interface at
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Names-Abbreviate](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Names-Abbreviate).
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-You can find documentation for this module with the perldoc command.
-
     perldoc Text::Names::Abbreviate
 
-You can also look for information at:
+- MetaCPAN: [https://metacpan.org/dist/Text-Names-Abbreviate](https://metacpan.org/dist/Text-Names-Abbreviate)
+- RT tracker: [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Names-Abbreviate](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Names-Abbreviate)
+- CPAN Testers: [http://matrix.cpantesters.org/?dist=Text-Names-Abbreviate](http://matrix.cpantesters.org/?dist=Text-Names-Abbreviate)
 
-- MetaCPAN
+# FORMAL SPECIFICATION
 
-    [https://metacpan.org/dist/Text-Names-Abbreviate](https://metacpan.org/dist/Text-Names-Abbreviate)
+## abbreviate
 
-- RT: CPAN's request tracker
+    Let Sigma* denote the set of all Unicode strings.
+    Let epsilon denote the empty string.
 
-    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Names-Abbreviate](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Names-Abbreviate)
+    Sigma+ = Sigma* \ {epsilon}
+    Format = {default, initials, compact, shortlast}
+    Style  = {first_last, last_first}
 
-- CPAN Testers' Matrix
+    collapse(s) -- replace runs of whitespace with a single space, then trim
 
-    [http://matrix.cpantesters.org/?dist=Text-Names-Abbreviate](http://matrix.cpantesters.org/?dist=Text-Names-Abbreviate)
+    normalize : Sigma+ -> Sigma* x Bool
+    normalize(n) =
+      let n1 = gsub(n, ",+", ",")
+      if "," not-in n1 then (collapse(n1), false)
+      else
+        let (L, R) = split(n1, ",", 2) each trimmed
+        case
+          L = epsilon ^ R != epsilon  ->  (collapse(R), true)
+          L != epsilon ^ R != epsilon ->  (collapse(R ++ " " ++ L), false)
+          L != epsilon ^ R = epsilon  ->  (collapse(L), false)
+          L = epsilon ^ R = epsilon   ->  (epsilon, false)
+        end
 
-- CPAN Testers Dependencies
+    extract : Sigma* x Bool x Format x Style -> (seq Sigma) x Sigma*
+    extract(n, leading, fmt, sty) =
+      let ps = tokenize(n)    -- split on whitespace
+      if ps = [] then ([], epsilon)
+      else if leading then
+        ([ first(p) | p <- ps ], epsilon)
+      else
+        let last  = ps[#ps]
+            inits = [ first(p) | p <- ps[1..#ps-1] ]
+        if sty = last_first ^ fmt != default ^ last != epsilon
+          then ([first(last)] ++ inits, epsilon)
+          else (inits, last)
 
-    [http://deps.cpantesters.org/?module=Text::Names::Abbreviate](http://deps.cpantesters.org/?module=Text::Names::Abbreviate)
+    abbreviate : Sigma+ x Format x Style x Sigma* -> Sigma*
+    abbreviate = format_result . extract . normalize
 
 # LICENCE AND COPYRIGHT
 

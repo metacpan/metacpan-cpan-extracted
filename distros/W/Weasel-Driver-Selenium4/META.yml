@@ -28,7 +28,9 @@ requires:
 resources:
   bugtracker: https://github.com/perl-weasel/weasel-driver-selenium4/issues
   repository: https://github.com/perl-weasel/weasel-driver-selenium4.git
-version: '0.01'
+version: '0.02'
+x_contributors:
+  - 'renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

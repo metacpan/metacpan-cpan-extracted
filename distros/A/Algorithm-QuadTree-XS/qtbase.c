@@ -172,42 +172,35 @@ void node_add_level(QuadTreeNode* node, double xmin, double ymin, double xmax, d
 	}
 }
 
-bool is_within_node_rect(QuadTreeNode *node, double xmin, double ymin, double xmax, double ymax)
+bool is_within_node(QuadTreeNode *node, Shape *s)
 {
-	return (xmin <= node->xmax && xmax >= node->xmin)
-		&& (ymin <= node->ymax && ymax >= node->ymin);
-}
+	switch (s->type) {
+		case shape_rectangle: {
+			return (s->x <= node->xmax && s->x2 >= node->xmin)
+				&& (s->y <= node->ymax && s->y2 >= node->ymin);
+		}
 
-bool is_within_node_circ(QuadTreeNode *node, double x, double y, double radius)
-{
-	double check_x = x < node->xmin
-		? node->xmin - x
-		: x > node->xmax
-			? node->xmax - x
-			: 0
-	;
+		case shape_circle: {
+			double check_x = s->x < node->xmin
+				? node->xmin - s->x
+				: s->x > node->xmax
+					? node->xmax - s->x
+					: 0
+			;
 
-	double check_y = y < node->ymin
-		? node->ymin - y
-		: y > node->ymax
-			? node->ymax - y
-			: 0
-	;
+			double check_y = s->y < node->ymin
+				? node->ymin - s->y
+				: s->y > node->ymax
+					? node->ymax - s->y
+					: 0
+			;
 
-	return check_x * check_x + check_y * check_y <= radius * radius;
-}
-
-bool is_within_node(QuadTreeNode *node, Shape *param)
-{
-	switch (param->type) {
-		case shape_rectangle:
-			return is_within_node_rect(node, param->dimensions[0], param->dimensions[1], param->dimensions[2], param->dimensions[3]);
-		case shape_circle:
-			return is_within_node_circ(node, param->dimensions[0], param->dimensions[1], param->dimensions[2]);
+			return check_x * check_x + check_y * check_y <= s->radius_sq;
+		}
 	}
 }
 
-void find_nodes(QuadTreeNode *node, AV *ret, Shape *param)
+void find_nodes(QuadTreeNode *node, HV *ret, Shape *param)
 {
 	if (!node->has_objects || !is_within_node(node, param)) return;
 
@@ -217,7 +210,7 @@ void find_nodes(QuadTreeNode *node, AV *ret, Shape *param)
 		for (i = 0; i < node->values->count; ++i) {
 			SV *fetched = (SV*) node->values->ptr[i];
 			SvREFCNT_inc(fetched);
-			av_push(ret, fetched);
+			hv_store_ent(ret, fetched, fetched, 0);
 		}
 	}
 	else {
@@ -231,42 +224,42 @@ bool fill_nodes_nobackref(QuadTreeNode *node, SV *value, Shape *param)
 {
 	if (!is_within_node(node, param)) return false;
 
-	node->has_objects = true;
 	if (node->values != NULL) {
 		push_array(node->values, value);
-		return true;
 	}
 	else {
 		int i;
-		bool result = false;
 		for (i = 0; i < CHILDREN_PER_NODE; ++i) {
-			result = fill_nodes_nobackref(&node->children[i], value, param) || result;
+			fill_nodes_nobackref(&node->children[i], value, param);
 		}
-
-		return result;
 	}
+
+	/* NOTE: only first level result is important, since if the object fits in
+	 * the tree area at all, it must fit into one of the leaves */
+	node->has_objects = true;
+	return true;
 }
 
 bool fill_nodes(QuadTreeRootNode *root, QuadTreeNode *node, SV *value, Shape *param)
 {
 	if (!is_within_node(node, param)) return false;
 
-	node->has_objects = true;
 	if (node->values != NULL) {
 		push_array(node->values, value);
 		if (root->backref != NULL)
 			store_backref(root, node, value);
-		return true;
 	}
 	else {
 		int i;
-		bool result = false;
 		for (i = 0; i < CHILDREN_PER_NODE; ++i) {
-			result = fill_nodes(root, &node->children[i], value, param) || result;
+			fill_nodes(root, &node->children[i], value, param);
 		}
-
-		return result;
 	}
+
+	/* NOTE: only first level result is important, since if the object fits in
+	 * the tree area at all, it must fit into one of the leaves */
+	node->has_objects = true;
+	return true;
 }
 
 void clear_node(QuadTreeNode *node)
@@ -320,5 +313,20 @@ QuadTreeRootNode* get_root_from_perl(SV *self)
 	HV *params = (HV*) SvRV(self);
 
 	return (QuadTreeRootNode*) SvIV(get_hash_key(params, "ROOT"));
+}
+
+AV* get_hash_values (HV* hash)
+{
+	AV *ret = newAV();
+	HE *he;
+
+	hv_iterinit(hash);
+	while ((he = hv_iternext(hash)) != NULL) {
+		SV *fetched = HeVAL(he);
+		SvREFCNT_inc(fetched);
+		av_push(ret, fetched);
+	}
+
+	return ret;
 }
 

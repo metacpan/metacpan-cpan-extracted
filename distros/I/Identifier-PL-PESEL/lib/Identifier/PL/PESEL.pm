@@ -11,11 +11,11 @@ Identifier::PL::PESEL - Validator for polish PESEL number.
 
 =head1 VERSION
 
-Version 0.2
+Version 0.3
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 SYNOPSIS
 
@@ -79,8 +79,6 @@ sub validate {
 =head1 AUTHOR
 
 Andrzej Cholewiusz
-
-Private website: L<http://cholewiusz.com>
 
 =head1 COPYRIGHT
 

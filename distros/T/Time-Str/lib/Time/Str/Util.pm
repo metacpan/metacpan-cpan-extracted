@@ -7,7 +7,7 @@ use Carp     qw[croak];
 use Exporter qw[import];
 
 BEGIN {
-  our $VERSION     = '0.91';
+  our $VERSION     = '0.92';
   our @EXPORT_OK   = qw[ binary_search
                          lower_bound
                          range_bounds

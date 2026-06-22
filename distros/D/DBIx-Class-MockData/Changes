@@ -1,5 +1,12 @@
 Revision history for DBIx::Class::MockData
 
+v1.0.0  2026-06-21
+        [ENHANCEMENTS]
+        - Switched to dotted-decimal versioning (v-strings).
+
+        [DOCUMENTATION]
+        - Small pod changes.
+
 0.05  2026-03-23
 
       [NEW FEATURES]

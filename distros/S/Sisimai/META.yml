@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v5.6.0
+    version: v5.7.0
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -53,6 +53,8 @@ provides:
     file: lib/Sisimai/Lhost/Biglobe.pm
   Sisimai::Lhost::Courier:
     file: lib/Sisimai/Lhost/Courier.pm
+  Sisimai::Lhost::DeutscheTelekom:
+    file: lib/Sisimai/Lhost/DeutscheTelekom.pm
   Sisimai::Lhost::Domino:
     file: lib/Sisimai/Lhost/Domino.pm
   Sisimai::Lhost::DragonFly:
@@ -286,7 +288,7 @@ requires:
   Time::Local: '1.19'
   Time::Piece: '1.29'
   perl: v5.26.0
-version: v5.6.0
+version: v5.7.0
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'

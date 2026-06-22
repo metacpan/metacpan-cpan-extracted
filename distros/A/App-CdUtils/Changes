@@ -1,3 +1,8 @@
+0.016   2026-06-22  Released-By: PERLANCAR; Urgency: medium
+
+        - [doc] Fix quoting.
+
+
 0.015   2026-04-07  Released-By: PERLANCAR; Urgency: medium
 
         [utilities cd{next,prev}sibling]

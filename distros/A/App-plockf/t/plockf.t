@@ -103,7 +103,12 @@ my $signal_file = "$FindBin::RealBin/plockf.signal";
     my($ret, undef, $stderr) = run(\@cmd);
     is $ret, 75, 'lock error on -t 0'
 	or diag "Time since run_blocking_process: " . (time-$t0);
-    defined $stderr and like $stderr, qr{^plockf: .*plockf.lck: already locked$};
+    if (defined $stderr) {
+	if ($^O eq 'MSWin32') {
+	    $stderr =~ s{\r}{}g;
+	}
+	like $stderr, qr{^plockf: .*plockf.lck: already locked$};
+    }
     if ($^O ne 'MSWin32') { # SIGTERM is problematic on Windows: http://stackoverflow.com/a/33216565/2332415
 	kill TERM => $pid;
     }
@@ -133,7 +138,12 @@ my $signal_file = "$FindBin::RealBin/plockf.signal";
     my($ret, undef, $stderr) = run(\@cmd);
     is $ret, 75, 'lock error on -t > 0s'
 	or diag "Time since run_blocking_process: " . (time-$t0);
-    defined $stderr and like $stderr, qr{^plockf: .*plockf.lck: already locked$};
+    if (defined $stderr) {
+	if ($^O eq 'MSWin32') {
+	    $stderr =~ s{\r}{}g;
+	}
+	like $stderr, qr{^plockf: .*plockf.lck: already locked$};
+    }
     if ($^O ne 'MSWin32') {
 	kill TERM => $pid;
     }

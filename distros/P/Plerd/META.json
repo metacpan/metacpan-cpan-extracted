@@ -71,7 +71,7 @@
    "provides" : {
       "Plerd" : {
          "file" : "lib/Plerd.pm",
-         "version" : "1.900"
+         "version" : "1.901"
       },
       "Plerd::Init" : {
          "file" : "lib/Plerd/Init.pm"
@@ -101,7 +101,7 @@
          "web" : "https://github.com/jmacdotorg/plerd"
       }
    },
-   "version" : "1.900",
+   "version" : "1.901",
    "x_authority" : "cpan:JMAC",
    "x_contributors" : [
       "Christian Sánchez <sanchezchristian@gmail.com>",

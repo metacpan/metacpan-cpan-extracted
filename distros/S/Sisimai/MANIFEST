@@ -27,6 +27,7 @@ lib/Sisimai/Lhost/AmazonSES.pm
 lib/Sisimai/Lhost/ApacheJames.pm
 lib/Sisimai/Lhost/Biglobe.pm
 lib/Sisimai/Lhost/Courier.pm
+lib/Sisimai/Lhost/DeutscheTelekom.pm
 lib/Sisimai/Lhost/Domino.pm
 lib/Sisimai/Lhost/DragonFly.pm
 lib/Sisimai/Lhost/EZweb.pm
@@ -201,6 +202,9 @@ set-of-emails/maildir/bsd/lhost-courier-01.eml
 set-of-emails/maildir/bsd/lhost-courier-02.eml
 set-of-emails/maildir/bsd/lhost-courier-03.eml
 set-of-emails/maildir/bsd/lhost-courier-04.eml
+set-of-emails/maildir/bsd/lhost-deutschetelekom-01.eml
+set-of-emails/maildir/bsd/lhost-deutschetelekom-02.eml
+set-of-emails/maildir/bsd/lhost-deutschetelekom-03.eml
 set-of-emails/maildir/bsd/lhost-domino-01.eml
 set-of-emails/maildir/bsd/lhost-domino-02.eml
 set-of-emails/maildir/bsd/lhost-domino-03.eml
@@ -657,7 +661,6 @@ set-of-emails/maildir/bsd/rfc3464-29.eml
 set-of-emails/maildir/bsd/rfc3464-34.eml
 set-of-emails/maildir/bsd/rfc3464-35.eml
 set-of-emails/maildir/bsd/rfc3464-36.eml
-set-of-emails/maildir/bsd/rfc3464-37.eml
 set-of-emails/maildir/bsd/rfc3464-38.eml
 set-of-emails/maildir/bsd/rfc3464-39.eml
 set-of-emails/maildir/bsd/rfc3464-40.eml
@@ -947,6 +950,7 @@ set-of-emails/maildir/tmp/lhost-exim-07.eml
 set-of-emails/maildir/tmp/rfc3464-37.eml
 set-of-emails/maildir/tmp/rfc3464-38.eml
 set-of-emails/maildir/tmp/rfc3464-39.eml
+set-of-emails/should-not-crash/p5-664-iomart-mail-filter.eml
 set-of-emails/to-be-debugged-because/something-is-wrong/issue-106-01.eml
 set-of-emails/to-be-debugged-because/something-is-wrong/issue-106-02.eml
 set-of-emails/to-be-debugged-because/something-is-wrong/issue-106-03.eml
@@ -1015,6 +1019,7 @@ t/620-lhost-barracuda.t
 t/621-lhost-bigfoot.t
 t/622-lhost-biglobe.t
 t/630-lhost-courier.t
+t/637-lhost-deutschetelekom.t
 t/640-lhost-domino.t
 t/641-lhost-dragonfly.t
 t/650-lhost-einsundeins.t
@@ -1052,6 +1057,7 @@ t/793-lhost-trendmicro.t
 t/800-cannot-parse-yet.t
 t/801-reason-is-undefined.t
 t/802-reason-is-onhold.t
+t/803-should-not-crash.t
 t/820-lhost-v5sendmail.t
 t/821-lhost-verizon.t
 t/850-lhost-yahoo.t
@@ -1080,6 +1086,7 @@ xt/620-lhost-barracuda.t
 xt/621-lhost-bigfoot.t
 xt/622-lhost-biglobe.t
 xt/630-lhost-courier.t
+xt/637-lhost-deutschetelekom.t
 xt/640-lhost-domino.t
 xt/641-lhost-dragonfly.t
 xt/650-lhost-einsundeins.t

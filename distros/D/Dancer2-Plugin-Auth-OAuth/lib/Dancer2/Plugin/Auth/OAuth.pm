@@ -2,7 +2,7 @@ package Dancer2::Plugin::Auth::OAuth;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Dancer2::Plugin;
 use Module::Load;
@@ -374,13 +374,13 @@ any route preamble to validate 'oauth'.
 
 =head1 AUTHOR
 
-Menno Blom E<lt>blom@cpan.orgE<gt>
+Menno Blom
 
 =head1 COPYRIGHT
 
 Copyright 2014-2020 - Menno Blom
 
-2020- Maintained by Biafra E<lt>biafra@cpan.orgE<gt>
+2020- Maintained by Biafra E<lt>biafra@moosaico.comE<gt>
 
 =head1 LICENSE
 

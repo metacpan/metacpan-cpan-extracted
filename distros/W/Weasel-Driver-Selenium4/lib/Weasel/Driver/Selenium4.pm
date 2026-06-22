@@ -4,7 +4,7 @@ Weasel::Driver::Selenium4 - Weasel driver wrapping Selenium::Client
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ This module wraps Selenium::Client for WebDriver / Selenium 4.
 =cut
 
 
-package Weasel::Driver::Selenium4 0.01;
+package Weasel::Driver::Selenium4 0.02;
 
 use strict;
 use warnings;
@@ -361,7 +361,10 @@ sub _walk_args {
 
 sub execute_script {
     my ($self, $script, @args) = @_;
-    return $self->_driver->ExecuteScript(script => $script, args => _walk_args( \@args ));
+    return $self->_driver->ExecuteScript(
+        script => $script,
+        # work around missing mapping of elements in @args in Selenium::Client
+        args => _walk_args( \@args ));
 }
 
 =item get_attribute($id, $att_name)
@@ -525,9 +528,7 @@ sub set_wait_timeout {
     my $driver = $self->_driver;
 
     if (defined $driver) {
-        eval { $driver->set_timeouts(implicit => $value); 1 }
-            or eval { $driver->timeouts->implicit_wait($value); 1 }
-            or eval { $driver->set_implicit_wait_timeout($value); 1 };
+        $driver->SetTimeouts(implicit => int($value));
     }
     return $self->_set_wait_timeout($value);
 }
@@ -546,8 +547,7 @@ sub set_window_size {
 
     if (defined $driver) {
         my ($height, $width) = split /x/, $value;
-        eval { $driver->set_window_rect(width => $width, height => $height); 1 }
-            or eval { $driver->set_window_size($width, $height); 1 };
+        $driver->SetWindowRect(width => int($width), height => int($height));
     }
     return $self->_set_window_size($value);
 }

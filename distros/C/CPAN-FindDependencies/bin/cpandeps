@@ -84,9 +84,11 @@ specified, it defaults to 5.005.  Three part version numbers
 
 A directory to use for caching.  It defaults to no caching.  Even if
 caching is turned on, this is only for META.yml or Makefile.PL files.
-
 The cache is never automatically cleared out. It is your responsibility
 to clear out old data.
+
+If the directory doesn't exist we will try to create it. If we can't,
+or it exists but isn't readable and writeable, that is a fatal error.
 
 =item maxdepth
 
@@ -195,7 +197,7 @@ L<http://deps.cpantesters.org/>
 
 =head1 AUTHOR, LICENCE and COPYRIGHT
 
-Copyright 2007 - 2020 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2007 - 2026 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

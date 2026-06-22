@@ -40,8 +40,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1",
-            "version" : "0.86"
+            "Test::More" : "1"
          }
       }
    },
@@ -57,6 +56,6 @@
          "web" : "https://github.com/briandfoy/module-extract-version"
       }
    },
-   "version" : "1.119",
+   "version" : "1.121",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

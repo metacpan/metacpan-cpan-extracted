@@ -11,7 +11,7 @@ use FFI::CheckLib ();
 use FFI::Platypus;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.1.7';
+our $VERSION = '0.1.8';
 
 our $libyamlstar_version = $VERSION;
 
@@ -45,6 +45,16 @@ my $yamlstar_load = $ffi->function(
 
 my $yamlstar_load_all = $ffi->function(
     yamlstar_load_all =>
+        ['sint64', 'string'] => 'string',
+);
+
+my $yamlstar_dump = $ffi->function(
+    yamlstar_dump =>
+        ['sint64', 'string'] => 'string',
+);
+
+my $yamlstar_dump_all = $ffi->function(
+    yamlstar_dump_all =>
         ['sint64', 'string'] => 'string',
 );
 
@@ -121,6 +131,50 @@ sub load_all {
 
     my $resp = Cpanel::JSON::XS::decode_json(
         $yamlstar_load_all->(${$self->isolatethread}, $yaml)
+    );
+
+    return $resp->{data} if exists $resp->{data};
+
+    if ($self->error($resp->{error})) {
+        die "libyamlstar: " . $self->error->{cause};
+    }
+
+    die "Unexpected response from 'libyamlstar'";
+}
+
+# Dump a single JSON-compatible value:
+sub dump {
+    my ($self, $value) = @_;
+
+    $self->error(undef);
+
+    my $resp = Cpanel::JSON::XS::decode_json(
+        $yamlstar_dump->(
+            ${$self->isolatethread},
+            Cpanel::JSON::XS::encode_json($value),
+        )
+    );
+
+    return $resp->{data} if exists $resp->{data};
+
+    if ($self->error($resp->{error})) {
+        die "libyamlstar: " . $self->error->{cause};
+    }
+
+    die "Unexpected response from 'libyamlstar'";
+}
+
+# Dump all JSON-compatible values:
+sub dump_all {
+    my ($self, $values) = @_;
+
+    $self->error(undef);
+
+    my $resp = Cpanel::JSON::XS::decode_json(
+        $yamlstar_dump_all->(
+            ${$self->isolatethread},
+            Cpanel::JSON::XS::encode_json($values),
+        )
     );
 
     return $resp->{data} if exists $resp->{data};

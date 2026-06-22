@@ -1,10 +1,11 @@
 package DBIx::Class::MockData;
 
-$DBIx::Class::MockData::VERSION   = '0.05';
-$DBIx::Class::MockData::AUTHORITY = 'cpan:MANWAR';
-
 use strict;
 use warnings;
+use version;
+
+our $VERSION   = qv('v1.0.0');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding UTF-8
 
@@ -14,7 +15,7 @@ DBIx::Class::MockData - Generate mock test data for DBIx::Class schemas
 
 =head1 VERSION
 
-Version 0.05
+Version 1.0.0
 
 =head1 SYNOPSIS
 
@@ -1114,8 +1115,11 @@ without manual intervention.
 This distribution ships with a command-line tool B<dbic-mockdata> in the
 C<script/> directory, installed into your C<PATH> by C<make install>.
 
-    dbic-mockdata --schema-dir t/lib --namespace MyApp::Schema \
-                  --dsn "dbi:SQLite:dbname=test.db" --deploy --rows 5
+    dbic-mockdata --schema-dir t/lib \
+                  --namespace MyApp::Schema \
+                  --dsn "dbi:SQLite:dbname=test.db" \
+                  --rows 5 \
+                  --deploy
 
 Run C<dbic-mockdata --help> for the full list of options, or see
 L<dbic-mockdata> for the complete manual.

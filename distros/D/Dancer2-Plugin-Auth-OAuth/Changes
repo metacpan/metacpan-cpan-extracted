@@ -1,5 +1,9 @@
 Revision history for Dancer2-Plugin-Auth-OAuth
 
+0.23  2026-06-22 09:08:21 WEST
+
+        - Generate state on OAuth2 as CSRF defense (RFC 6749 §10.12) CVE-2026-12746
+
 0.22  2026-06-10 14:39:03 WEST
 
         - Generate nonce from a secure source of randomness - CVE-2026-11832

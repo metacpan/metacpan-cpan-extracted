@@ -20,9 +20,11 @@ specified, it defaults to 5.005.  Three part version numbers
 
 A directory to use for caching.  It defaults to no caching.  Even if
 caching is turned on, this is only for META.yml or Makefile.PL files.
-
 The cache is never automatically cleared out. It is your responsibility
 to clear out old data.
+
+If the directory doesn't exist we will try to create it. If we can't,
+or it exists but isn't readable and writeable, that is a fatal error.
 
 =item maxdepth
 

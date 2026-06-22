@@ -28,8 +28,6 @@ sub inquire {
     };
     state $messagesof = {
         "userunknown"  => ["because the address couldn't be found. Check for typos or unnecessary spaces and try again."],
-        "notaccept"    => ["Null MX"],
-        "networkerror" => [" had no relevant answers.", " responded with code NXDOMAIN"],
     };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -74,9 +72,6 @@ sub inquire {
 
     $dscontents->[0]->{'diagnosis'} = $entiremesg;
     for my $e ( @$dscontents ) {
-        # Tidy up the error message in e.Diagnosis, Try to detect the bounce reason.
-        $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
-
         for my $r ( keys %$messagesof ) {
             # Guess an reason of the bounce
             next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
@@ -123,7 +118,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017-2025 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2026 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

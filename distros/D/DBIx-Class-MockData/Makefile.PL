@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+#
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -12,6 +14,7 @@ WriteMakefile(
     EXE_FILES        => ['script/dbic-mockdata'],
 
     PREREQ_PM => {
+        'version'      => '0.77',
         'DBIx::Class'  => '0.082841',
         'Carp'         => 0,
         'File::Spec'   => 0,

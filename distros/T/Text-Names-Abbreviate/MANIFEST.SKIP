@@ -68,3 +68,6 @@
 Text-.*
 .test-script-*
 typescript
+mutation.json
+CLAUDE.md
+\.claude

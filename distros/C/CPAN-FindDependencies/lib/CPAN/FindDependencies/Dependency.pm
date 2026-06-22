@@ -104,7 +104,7 @@ L<http://deps.cpantesters.org/>
 
 =head1 AUTHOR, LICENCE and COPYRIGHT
 
-Copyright 2007 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2007 - 2026 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

@@ -1,5 +1,8 @@
 Revision history for plockf.
 
+0.05	2026-06-21
+	- just a test fix for Windows; no real code changes
+
 0.04	2017-03-19
 	- cleanup only if lock file was successfully acquired
 	- make sure O_RDONLY is everywhere specified

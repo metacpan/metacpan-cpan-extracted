@@ -4,11 +4,12 @@ use strict;
 use warnings;
 
 use Test::Needs {
-	'App::Test::Generator' => '0.27',
+	'App::Test::Generator' => '0.33',
 	'perl' => 5.036,	# Later A::T::G need this version
 };
 
 use Test::Which 'fuzz-harness-generator';
+# use Test::DescribeMe qw(extended);
 use FindBin qw($Bin);
 use IPC::Run3;
 use IPC::System::Simple qw(system);
@@ -31,17 +32,17 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 			ok($? == 0, 'Generated test script exits successfully');
 
 			if($? == 0) {
+				diag($stderr) if(length($stderr));
 				ok($stdout =~ /^Result: PASS/ms);
 				if($stdout =~ /Files=1, Tests=(\d+)/ms) {
 					diag("$filepath: $1 tests run");
 				}
 			} else {
-				diag("$filepath: STDOUT:\n$stdout");
+				diag("$filepath: STDOUT:\n$stdout") if(!$ENV{AUTOMATED_TESTING});
 				diag($stderr) if(length($stderr));
 				diag("$filepath Failed");
 				last;
 			}
-			diag($stderr) if(length($stderr));
 		}
 	}
 	closedir($dh);

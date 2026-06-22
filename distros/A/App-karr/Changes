@@ -1,3 +1,20 @@
+0.302     2026-06-21 23:04:42Z
+
+    - `karr board` now renders a compact, Markdown-flavoured plaintext board
+      (board name as `#`, each status as `## Section`, one
+      `- id | title | meta...` line per task) instead of the coloured column
+      dashboard. The output stays clean when piped or redirected — colour is
+      added only when stdout is a terminal and `NO_COLOR` is unset. Default
+      (`medium`) priority is suppressed, and a new `--tags` flag prints each
+      task's tags on an extra indented line.
+    - Fix releasing a claim or unblocking a task leaving a null `claimed_by`,
+      `claimed_at`, or `blocked` field behind. Clearing now uses real Moo
+      clearers so the predicate drops and the field is omitted from the task
+      file, instead of being written as an explicit null that reloaded as
+      "still set" — which made `handoff` reject released tasks and `pick`
+      treat them as claimed. Explicit nulls in already-written or external
+      task files are normalized to "unset" on load.
+
 0.301     2026-06-04 22:35:33Z
 
     - karr-foundation: stream agent output to the terminal when interactive

@@ -12,12 +12,14 @@ build_requires:
   IPC::System::Simple: '0'
   JSON::MaybeXS: '0'
   POSIX: '0'
-  Readonly: '0'
   Test::DescribeMe: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::Returns: '0'
   Test::Which: '0'
+  Test::Without::Module: '0'
   autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -35,11 +37,12 @@ no_index:
 requires:
   Carp: '0'
   Params::Get: '0.13'
-  Params::Validate::Strict: '0.13'
+  Params::Validate::Strict: '0.34'
+  Readonly: '0'
   perl: '5.008'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Name-Abbreviate
   homepage: https://metacpan.org/pod/Text::Names::Abbreviate
   repository: git://github.com/nigelhorne/Text-Name-Abbreviate.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

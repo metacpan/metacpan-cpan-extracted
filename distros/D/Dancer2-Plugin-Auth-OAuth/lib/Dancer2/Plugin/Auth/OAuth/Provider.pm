@@ -128,12 +128,21 @@ sub authentication_url {
         }
     } else {
         # oAuth 2 and up
+        # CSRF defense (RFC 6749 §10.12): generate a CSPRNG-backed
+        # state token, store it in the Dancer2 session keyed by
+        # provider name, send it to the upstream so the callback can
+        # verify the response was initiated by THIS browser session.
+        my $state = unpack("H*", random_bytes(16));
+        my $provider = lc $self->_provider;
+        $self->{dsl}->app->session->write(
+            "oauth.${provider}.state" => $state );
         my $uri = URI->new( $self->provider_settings->{urls}{authorize_url} );
         my %query = (
           client_id     => $self->provider_settings->{tokens}{client_id},
           redirect_uri  => $self->_callback_url,
           %{ $self->provider_settings->{query_params}{authorize} || {} },
         );
+        $query{state} = $state;
         $uri->query_form( %query );
         return $uri->as_string;
     }
@@ -163,6 +172,29 @@ sub refresh {
 }
 sub callback {
   my ($self, $request, $session) = @_;
+
+  # CSRF defense (RFC 6749 §10.12): the callback must carry the same
+  # `state` we issued in authentication_url() and stored in the
+  # session. Mismatch / absence => login-CSRF attempt; refuse.
+  # OAuth 1.0a flows do not use `state` (signature-based replay
+  # defense via Net::OAuth instead); only enforce for v2+.
+  if( $self->protocol_version >= 2 ) {
+      my $provider = lc $self->_provider;
+      my $session_key = "oauth.${provider}.state";
+      my $expected_state = $session->read( $session_key );
+      my $req_state      = $request->param('state');
+      if ( !defined($expected_state)
+           || !defined($req_state)
+           || $expected_state ne $req_state ) {
+          $self->{dsl}->app->log(debug =>
+              "Auth::OAuth::Provider::".$self->_provider.": "
+              . "OAuth 2.0 state mismatch (login-CSRF defense): "
+              . "expected=" . ($expected_state // 'undef')
+              . " got=" . ($req_state // 'undef'));
+          return undef;
+      }
+      $session->write( $session_key => undef );
+  }
   _get_token(@_, { "code" => $request->param('code'), grant_type => 'authorization_code' });
 }
 sub _get_token {

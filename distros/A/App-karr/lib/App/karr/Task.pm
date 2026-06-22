@@ -1,7 +1,7 @@
 # ABSTRACT: Task object representing a single kanban card
 
 package App::karr::Task;
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 use Moo;
 use YAML::XS qw( Load Dump );
 use Path::Tiny;
@@ -13,22 +13,37 @@ has id         => ( is => 'ro', required => 1 );
 has title      => ( is => 'rw', required => 1 );
 has status     => ( is => 'rw', default => sub { 'backlog' } );
 has priority   => ( is => 'rw', default => sub { 'medium' } );
-has assignee   => ( is => 'rw', predicate => 1 );
+has assignee   => ( is => 'rw', predicate => 1, clearer => 1 );
 has tags       => ( is => 'rw', default => sub { [] } );
-has due        => ( is => 'rw', predicate => 1 );
-has estimate   => ( is => 'rw', predicate => 1 );
+has due        => ( is => 'rw', predicate => 1, clearer => 1 );
+has estimate   => ( is => 'rw', predicate => 1, clearer => 1 );
 has class      => ( is => 'rw', default => sub { 'standard' } );
-has parent     => ( is => 'rw', predicate => 1 );
+has parent     => ( is => 'rw', predicate => 1, clearer => 1 );
 has depends_on => ( is => 'rw', default => sub { [] } );
 has body       => ( is => 'rw', default => sub { '' } );
 has created    => ( is => 'ro', default => sub { gmtime->datetime . 'Z' } );
 has updated    => ( is => 'rw', default => sub { gmtime->datetime . 'Z' } );
-has claimed_by => ( is => 'rw', predicate => 1 );
-has claimed_at => ( is => 'rw', predicate => 1 );
-has blocked    => ( is => 'rw', predicate => 1 );
-has started    => ( is => 'rw', predicate => 1 );
-has completed  => ( is => 'rw', predicate => 1 );
+has claimed_by => ( is => 'rw', predicate => 1, clearer => 1 );
+has claimed_at => ( is => 'rw', predicate => 1, clearer => 1 );
+has blocked    => ( is => 'rw', predicate => 1, clearer => 1 );
+has started    => ( is => 'rw', predicate => 1, clearer => 1 );
+has completed  => ( is => 'rw', predicate => 1, clearer => 1 );
 has file_path  => ( is => 'rw', predicate => 1 );
+
+# Optional fields are addressed through their predicate everywhere (pick,
+# board, list, show, handoff all treat has_X as "is this set"). Clearing one
+# by assigning undef would leave the predicate true, so callers must use the
+# generated clear_X. This guards the load path: a file that carries an
+# explicit null (our own older writes, or an external kanban-md edit) is
+# normalized back to "unset" instead of lingering as has_X-true-but-undef.
+sub BUILD {
+  my ($self) = @_;
+  for my $attr (qw( assignee due estimate parent claimed_by claimed_at blocked started completed )) {
+    my $clearer = "clear_$attr";
+    my $has     = "has_$attr";
+    $self->$clearer if $self->$has && !defined $self->$attr;
+  }
+}
 
 sub slug {
   my ($self) = @_;
@@ -124,7 +139,7 @@ App::karr::Task - Task object representing a single kanban card
 
 =head1 VERSION
 
-version 0.301
+version 0.302
 
 =head1 SYNOPSIS
 

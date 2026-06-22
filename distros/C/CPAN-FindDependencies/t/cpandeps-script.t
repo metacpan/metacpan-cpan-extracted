@@ -37,87 +37,150 @@ SKIP: {
     skip "Script works but tests don't on Windows.  Dunno why.", 1
         if(Devel::CheckOS::os_is('MicrosoftWindows'));
 
-my($stdout, $stderr) = capture { system(
-    $Config{perlpath}, (map { "-I$_" } (@INC)),
-    qw(
-        blib/script/cpandeps
-        help
-    )
-)};
-$stderr =~ s/stty: (standard input: Not a tty|stdin isn't a terminal)\s+//;
-is($stderr, '', "... no unexpected whining on STDERR");
-like($stdout, qr/cpandeps.*perl.*5.8.8.*CPAN::FindDependencies/, "Can spew out some help");
+SKIP: {
+    skip "Can't be root for these tests", 1
+        if($< == 0);
 
-($stdout, $stderr) = capture { system(
-    $Config{perlpath}, (map { "-I$_" } (@INC)),
-    qw(
-        blib/script/cpandeps
-        Tie::Scalar::Decay
-        mirror DEFAULT,t/cache/Tie-Scalar-Decay-1.1.1/02packages.details.txt.gz
-        cachedir t/cache/Tie-Scalar-Decay-1.1.1
-    )
-)};
-$stderr = join("\n", grep { $_ !~ / ^ Devel::Hide.*Test.Pod /x } split(/[\r\n]+/, $stderr));
-eq_or_diff($stderr, '', "no errors reported");
-eq_or_diff($stdout, "*Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1.1.1.tar.gz)\n",
-    "got Tie::Scalar::Decay right not using Makefile.PL");
+    subtest "Can't create the cachedir", sub {
+        my $fail_to_create_dir = '/foo';
+        $fail_to_create_dir .= 'x' while(-e $fail_to_create_dir);
+        my ($stdout, $stderr, $exit) = capture { system(
+            $Config{perlpath}, (map { "-I$_" } (@INC)),
+            qw(
+                blib/script/cpandeps
+                Tie::Scalar::Decay
+                mirror DEFAULT,t/cache/Tie-Scalar-Decay-1.1.1/02packages.details.txt.gz
+                cachedir
+            ),
+            $fail_to_create_dir
+        )};
+        $stderr = join("\n", grep { $_ !~ / ^ Devel::Hide.*Test.Pod /x } split(/[\r\n]+/, $stderr));
+        eq_or_diff($stderr, "Bad cachedir: $fail_to_create_dir", "Error message when can't create cachedir");
+        ok($exit, "Got non-zero exit code");
+        eq_or_diff($stdout, "", "Nothing on STDOUT");
+    };
+};
 
-($stdout, $stderr) = capture { system(
-    $Config{perlpath}, (map { "-I$_" } (@INC)),
-    qw(
-        blib/script/cpandeps
-        Tie::Scalar::Decay
-        --mirror DEFAULT,t/cache/Tie-Scalar-Decay-1.1.1/02packages.details.txt.gz
-        cachedir t/cache/Tie-Scalar-Decay-1.1.1
-        --showmoduleversions
-        usemakefilepl 1
-    )
-)};
-is($stderr, '', "... no whining on STDERR");
-eq_or_diff($stdout, 'Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1.1.1.tar.gz)
-  Time::HiRes (dist: J/JH/JHI/Time-HiRes-1.9719.tar.gz, mod ver: 1.2)
-', "got Tie::Scalar::Decay right using Makefile.PL and --showmoduleversions (and cope with other --args too)");
+subtest "cachedir doesn't exist but can be created", sub {
+    my $can_create_dir= "/tmp/CPAN-FindDependencies-cachedir-create-test/OMG";
+    $can_create_dir .= 'x' while(-e $can_create_dir);
 
-# same as previous test, but with args in different order
+    my ($stdout, $stderr, $exit) = capture { system(
+        $Config{perlpath}, (map { "-I$_" } (@INC)),
+        qw(
+            blib/script/cpandeps
+            Tie::Scalar::Decay
+            --mirror DEFAULT,t/cache/Tie-Scalar-Decay-1.1.1/02packages.details.txt.gz
+            --showmoduleversions
+            usemakefilepl 1
+            cachedir
+        ),
+        $can_create_dir
+    )};
+    eq_or_diff($stdout,
+        join("\n",
+            'Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1.1.1.tar.gz)',
+            '  Time::HiRes (dist: J/JH/JHI/Time-HiRes-1.9719.tar.gz, mod ver: 1.2)',
+            ''
+        ),
+        "similar to previous, but with args in different order"
+    );
+    ok(
+        ($stderr eq '' || $stderr =~ /^Devel::Cover: Deleting old coverage/),
+        "... no whining on STDERR"
+    );
+    ok($exit == 0, "... zero exit code");
+    ok(-e "$can_create_dir/Tie-Scalar-Decay-1.1.1.MakefilePL",
+        "... and the cache was used");
+};
+
+# similar to previous test, but with args in different order
 # see https://github.com/DrHyde/perl-modules-CPAN-FindDependencies/issues/13
-($stdout, $stderr) = capture { system(
-    $Config{perlpath}, (map { "-I$_" } (@INC)),
-    qw(
-        blib/script/cpandeps
-        --mirror DEFAULT,t/cache/Tie-Scalar-Decay-1.1.1/02packages.details.txt.gz
-        cachedir t/cache/Tie-Scalar-Decay-1.1.1
-        --showmoduleversions
-        usemakefilepl 1
-        Tie::Scalar::Decay
-    )
-)};
-is($stderr, '', "... no whining on STDERR");
-eq_or_diff($stdout, 'Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1.1.1.tar.gz)
-  Time::HiRes (dist: J/JH/JHI/Time-HiRes-1.9719.tar.gz, mod ver: 1.2)
-', "same again, but with args in different order");
+subtest "order of arguments", sub {
+    my ($stdout, $stderr) = capture { system(
+        $Config{perlpath}, (map { "-I$_" } (@INC)),
+        qw(
+            blib/script/cpandeps
+            --mirror DEFAULT,t/cache/Tie-Scalar-Decay-1.1.1/02packages.details.txt.gz
+            cachedir t/cache/Tie-Scalar-Decay-1.1.1
+            --showmoduleversions
+            usemakefilepl 1
+            Tie::Scalar::Decay
+        )
+    )};
+    eq_or_diff($stdout,
+        join("\n",
+            'Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1.1.1.tar.gz)',
+            '  Time::HiRes (dist: J/JH/JHI/Time-HiRes-1.9719.tar.gz, mod ver: 1.2)',
+            ''
+        ),
+        "similar to previous, but with args in different order"
+    );
+    ok(
+        ($stderr eq '' || $stderr =~ /^Devel::Cover: Deleting old coverage/),
+        "... no whining on STDERR"
+    );
+};
 
-($stdout, $stderr) = capture { system(
-    $Config{perlpath}, (map { "-I$_" } (@INC)),
-    qw(
-        blib/script/cpandeps
-        CPAN::FindDependencies
-        cachedir t/cache/CPAN-FindDependencies-1.1/
-        mirror DEFAULT,t/cache/CPAN-FindDependencies-1.1/02packages.details.txt.gz
-    )
-)};
-is($stderr, '', "... no whining on STDERR");
-eq_or_diff($stdout, 'CPAN::FindDependencies (dist: D/DC/DCANTRELL/CPAN-FindDependencies-1.1.tar.gz)
-  CPAN (dist: A/AN/ANDK/CPAN-1.9205.tar.gz)
-    File::Temp (dist: T/TJ/TJENNESS/File-Temp-0.19.tar.gz)
-      File::Spec (dist: K/KW/KWILLIAMS/PathTools-3.25.tar.gz)
-        ExtUtils::CBuilder (dist: K/KW/KWILLIAMS/ExtUtils-CBuilder-0.21.tar.gz)
-        Module::Build (dist: K/KW/KWILLIAMS/Module-Build-0.2808.tar.gz)
-        Scalar::Util (dist: G/GB/GBARR/Scalar-List-Utils-1.19.tar.gz)
-      Test::More (dist: M/MS/MSCHWERN/Test-Simple-0.72.tar.gz)
-        Test::Harness (dist: A/AN/ANDYA/Test-Harness-3.03.tar.gz)
-  *LWP::UserAgent (dist: G/GA/GAAS/libwww-perl-5.808.tar.gz)
-  YAML (dist: I/IN/INGY/YAML-0.66.tar.gz)
-', "got CPAN::FindDependencies right");
+subtest "help", sub {
+    my ($stdout, $stderr) = capture { system(
+        $Config{perlpath}, (map { "-I$_" } (@INC)),
+        qw(
+            blib/script/cpandeps
+            help
+        )
+    )};
+    $stderr =~ s/stty: (standard input: Not a tty|stdin isn't a terminal)\s+//;
+    like($stdout, qr/cpandeps.*perl.*5.8.8.*CPAN::FindDependencies/, "Can spew out some help");
+    is($stderr, '', "... no unexpected whining on STDERR");
+};
+
+subtest "get simple module deps without using Makefile.PL", sub {
+    my ($stdout, $stderr) = capture { system(
+        $Config{perlpath}, (map { "-I$_" } (@INC)),
+        qw(
+            blib/script/cpandeps
+            Tie::Scalar::Decay
+            mirror DEFAULT,t/cache/Tie-Scalar-Decay-1.1.1/02packages.details.txt.gz
+            cachedir t/cache/Tie-Scalar-Decay-1.1.1
+        )
+    )};
+    $stderr = join("\n", grep { $_ !~ / ^ Devel::Hide.*Test.Pod /x } split(/[\r\n]+/, $stderr));
+    eq_or_diff($stderr, '', "no errors reported");
+    eq_or_diff($stdout, "*Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1.1.1.tar.gz)\n",
+        "got Tie::Scalar::Decay right not using Makefile.PL");
+};
+
+
+subtest "complex deps without using Makefile.PL", sub {
+    my ($stdout, $stderr) = capture { system(
+        $Config{perlpath}, (map { "-I$_" } (@INC)),
+        qw(
+            blib/script/cpandeps
+            CPAN::FindDependencies
+            cachedir t/cache/CPAN-FindDependencies-1.1/
+            mirror DEFAULT,t/cache/CPAN-FindDependencies-1.1/02packages.details.txt.gz
+        )
+    )};
+    is($stderr, '', "... no whining on STDERR");
+    eq_or_diff($stdout,
+        join("\n",
+            'CPAN::FindDependencies (dist: D/DC/DCANTRELL/CPAN-FindDependencies-1.1.tar.gz)',
+            '  CPAN (dist: A/AN/ANDK/CPAN-1.9205.tar.gz)',
+            '    File::Temp (dist: T/TJ/TJENNESS/File-Temp-0.19.tar.gz)',
+            '      File::Spec (dist: K/KW/KWILLIAMS/PathTools-3.25.tar.gz)',
+            '        ExtUtils::CBuilder (dist: K/KW/KWILLIAMS/ExtUtils-CBuilder-0.21.tar.gz)',
+            '        Module::Build (dist: K/KW/KWILLIAMS/Module-Build-0.2808.tar.gz)',
+            '        Scalar::Util (dist: G/GB/GBARR/Scalar-List-Utils-1.19.tar.gz)',
+            '      Test::More (dist: M/MS/MSCHWERN/Test-Simple-0.72.tar.gz)',
+            '        Test::Harness (dist: A/AN/ANDYA/Test-Harness-3.03.tar.gz)',
+            '  *LWP::UserAgent (dist: G/GA/GAAS/libwww-perl-5.808.tar.gz)',
+            '  YAML (dist: I/IN/INGY/YAML-0.66.tar.gz)',
+            ''
+        ),
+        "got CPAN::FindDependencies right"
+    );
+};
 
 
 if($ENV{AUTHOR_TESTING}) {

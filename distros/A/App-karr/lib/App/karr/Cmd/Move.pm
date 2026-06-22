@@ -1,7 +1,7 @@
 # ABSTRACT: Change a task's status
 
 package App::karr::Cmd::Move;
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -119,7 +119,7 @@ App::karr::Cmd::Move - Change a task's status
 
 =head1 VERSION
 
-version 0.301
+version 0.302
 
 =head1 SYNOPSIS
 

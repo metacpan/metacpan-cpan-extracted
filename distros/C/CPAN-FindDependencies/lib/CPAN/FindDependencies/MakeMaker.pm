@@ -141,7 +141,7 @@ L<http://deps.cpantesters.org>
 
 =head1 AUTHOR, LICENCE and COPYRIGHT
 
-Copyright 2009 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt> based largely
+Copyright 2009 - 2026 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt> based largely
 on code by Ian Tegebo (see L<http://rt.cpan.org/Public/Bug/Display.html?id=34814>)
 
 This software is free-as-in-speech software, and may be used,

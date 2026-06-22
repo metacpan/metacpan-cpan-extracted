@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.15] - 2026-06-21 Extension points implementation
+
+- Added support for registering additional functions that can be used to 
+  extend beyond the standard OIDC specification where needed (see [README.md](README.md#advanced-topics)):
+  - custom user claims provider
+  - custom scope handler
+
 ## [0.14] - 2026-06-03 Fix JWT signature verification and CSRF behaviour
 
 - **Fixed JWT signature verification failures with external clients** (JWT.pm):
@@ -11,7 +18,7 @@ All notable changes to this project will be documented in this file.
   cryptography) verify tokens issued by the provider.
 
 - **Disabled unnecessary CSRF check on /token endpoint**
-  This caused login issues when using Catalist::Plugin::CSRF configured with
+  This caused login issues when using Catalyst::Plugin::CSRF configured with
   auto_check => 1
 
 ## [0.13] - 2026-06-02 Fixed CPAN test failures

@@ -1,16 +1,16 @@
 {
    "abstract" : "Validator for polish PESEL number.",
    "author" : [
-      "Andrzej Cholewiusz <cholewiusz@gmail.com>"
+      "Andrzej Cholewiusz"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Identifier-PL-PESEL",
    "no_index" : {
@@ -39,5 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.2"
+   "version" : "0.3",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

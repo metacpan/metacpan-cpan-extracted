@@ -1,0 +1,28 @@
+---
+abstract: 'unsupervised anomaly detection via Isolation Forest or Extended Isolation Forest'
+author:
+  - 'Zane C. Bowers-Hadley <vvelox@vvelox.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Classifier-IsolationForest
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::Cmd: '0'
+  File::Slurp: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/LilithSec/Algorithm-Classifier-IsolationForest
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

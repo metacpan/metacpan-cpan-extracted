@@ -4,6 +4,12 @@ use Moose;
 use namespace::autoclean;
 use Catalyst::Plugin::OpenIDConnect::Utils::Store;
 
+# Per-application-class storage for extension-point callbacks.
+# Keyed by the consuming application class name so that multiple Catalyst apps
+# loaded in the same interpreter each hold their own handlers.
+my %_scope_handler_by_class;
+my %_claims_provider_by_class;
+
 =head1 NAME
 
 Catalyst::Plugin::OpenIDConnect::Context - OIDC provider context object
@@ -109,6 +115,77 @@ sub get_client {
     return $client;
 }
 
+=head2 scope_handler($handler)
+
+Sets or retrieves the custom scope validation/processing handler.
+
+When a handler is set, it is called during authorization after the built-in
+scope intersection with the client's registered scopes.  The handler receives
+the Catalyst context object and the effective, space-separated scope string,
+and must return a list of scopes.  Throwing an exception from the handler
+will reject the authorization request with an C<invalid_scope> error.
+
+Handlers are stored per consuming application class, so setting a handler
+once (e.g. during application startup) applies to all subsequent requests.
+
+    $c->openidconnect->scope_handler(sub {
+        my ($c, $scope_string) = @_;
+        my @scopes = split /\s+/, $scope_string;
+        for my $scope (@scopes) {
+            die "Unknown scope: $scope" unless valid_scope($scope);
+        }
+        return @scopes;
+    });
+
+=cut
+
+sub scope_handler {
+    my ( $self, $handler ) = @_;
+    my $class = ref( $self->catalyst ) || $self->catalyst;
+    if ( @_ > 1 ) {
+        die 'scope_handler must be a code reference'
+            if defined $handler && ref $handler ne 'CODE';
+        $_scope_handler_by_class{$class} = $handler;
+        return $self;
+    }
+    return $_scope_handler_by_class{$class};
+}
+
+=head2 claims_provider($provider)
+
+Sets or retrieves the custom claims provider.
+
+When a provider is set, it is called by C<get_user_claims()> instead of the
+default config-based field mapping.  The provider receives the Catalyst
+context object and the user object (hash reference or object with accessors),
+and must return a hash reference of JWT claims.
+
+Providers are stored per consuming application class, so setting a provider
+once (e.g. during application startup) applies to all subsequent requests.
+
+    $c->openidconnect->claims_provider(sub {
+        my ($c, $user) = @_;
+        return {
+            sub          => $user->id,
+            name         => $user->full_name,
+            custom_claim => $user->some_attribute,
+        };
+    });
+
+=cut
+
+sub claims_provider {
+    my ( $self, $provider ) = @_;
+    my $class = ref( $self->catalyst ) || $self->catalyst;
+    if ( @_ > 1 ) {
+        die 'claims_provider must be a code reference'
+            if defined $provider && ref $provider ne 'CODE';
+        $_claims_provider_by_class{$class} = $provider;
+        return $self;
+    }
+    return $_claims_provider_by_class{$class};
+}
+
 =head2 get_user_claims($user)
 
 Extracts user claims based on the configured user_claims mapping.
@@ -121,6 +198,12 @@ sub get_user_claims {
     my ( $self, $user ) = @_;
 
     $self->catalyst->log->debug('Extracting user claims') if $self->config->{debug};
+
+    # Delegate to the custom claims provider when one has been registered.
+    if ( my $provider = $self->claims_provider ) {
+        $self->catalyst->log->debug('Using custom claims provider') if $self->config->{debug};
+        return $provider->( $self->catalyst, $user );
+    }
 
     my $claims_config = $self->config->{user_claims} || {
         sub      => 'id',

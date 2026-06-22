@@ -1,5 +1,33 @@
 Revision history for Text-Names-Abbreviate
 
+0.03	Sun Jun 21 07:08:25 EDT 2026
+	[ Enhancements ]
+	- Extract _normalize_name and _extract_parts as private helpers
+	- Add Readonly constants for all format/style/separator magic strings
+	- Enforce encapsulation with Sub::Private on internal helpers
+	- Add full POD: LIMITATIONS, MESSAGES, FORMAL SPECIFICATION, PSEUDOCODE
+	- Add locale test suite (t/locales.t) with BAIL_OUT sanity, per-locale croak checks
+	[ Bug Fixes ]
+	- abbreviate(): default format dropped a last name of literally "0"
+	  (e.g. "John 0" gave "J." instead of "J. 0"). The final ternary was
+	  gating on the truthiness of $last_name instead of length($last_name);
+	  "0" is the one non-empty Perl string that is falsy. Found via mutation
+	  testing (xt/mutant_*.t survivor COND_INV_362_2)
+	[ Tests ]
+	- Latest test dashboard
+	- Remove hardcoded test count from t/30-basics.t
+	- Remove redundant Test::Exception from t/extended_tests.t
+	- Remove redundant Test::Deep from t/function.t
+	- Fix missing semicolon in t/extended_tests.t
+	- Add t/mutant_killers.t: regression tests for the "0" last-name fix
+	  above, plus a property-based guard documenting that COND_INV_362_2 is
+	  an equivalent mutant once the fix is applied
+	- Skip the "alarm not cancelled by abbreviate" subtest in t/unit.t on
+	  Windows, where alarm() is not reliably implemented
+	[ Build ]
+	- Move Readonly to PREREQ_PM (used in module, not just tests)
+	- Add Sub::Private to PREREQ_PM
+
 0.02	Mon Apr 20 20:25:46 EDT 2026
 	Use Params::Get
 	Added fuzz testing in GitHub Actions

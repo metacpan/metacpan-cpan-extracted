@@ -161,6 +161,12 @@ use Sisimai::RFC791;
 # X.3.5  ---    System incorrectly configured:(RFC 3463)
 #                 The system is not configured in a manner that will permit it to accept this
 #                 message.
+#
+# X.3.6  250    Requested priority was changed:(RFC 6710)
+#        251      The message was accepted for relay/delivery, but the requested priority (possibly
+#                 the implied default) was not honored. The human readable text after the status
+#                 code contains the new priority, followed by SP (space) and explanatory human
+#                 readable text.
 # -------------------------------------------------------------------------------------------------
 # X.4.0  ---    Other or undefined network or routing status:(RFC 3463)
 #                 Something went wrong with the networking, but it is not clear what the problem is,
@@ -397,7 +403,7 @@ use Sisimai::RFC791;
 #        5xx      temporary, for example the server is operating in a mode where only higher
 #                 priority messages below certain size are accepted for transfer and delivery.
 #
-# X.7.17 5xx    Mailbox owner has changed:(RFC 6710)
+# X.7.17 5xx    Mailbox owner has changed:(RFC 7293)
 #                 This status code is returned when a message is received with a
 #                 Require-Recipient-Valid-Since field or RRVS extension and the receiving system is
 #                 able to determine that the intended recipient mailbox has not been under
@@ -915,14 +921,14 @@ C<prefer()> method returns the preferred value selected from the arguments.
     print Sisimai::SMTP::Status->prefer("5.2.1", "5.0.0");      # "5.2.1"
     print Sisimai::SMTP::Status->prefer("4.4.7", "5.1.1", 421); # "4.4.7"
 
-=head2 C<B<is_explicit(I<delivery status code>)
+=head2 C<B<is_explicit(I<delivery status code>)>>
 
 C<is_explicit()> method returns 0 if the delivery status code is empty or is an internal code
 
     print Sisimai::SMTP::Status->is_explicit("5.9.301"); # 0
     print Sisimai::SMTP::Status->is_explicit("5.7.625"); # 1
 
-=head2 C<B<is_ambiguous(I<delivery status code>)
+=head2 C<B<is_ambiguous(I<delivery status code>)>>
 
 C<is_ambiguous()> method returns 1 if the delivery status code is not empty and ends with ".0.0".
 

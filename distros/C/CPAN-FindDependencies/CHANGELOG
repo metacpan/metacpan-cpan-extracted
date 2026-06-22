@@ -1,3 +1,12 @@
+3.14    2026-06-21
+
+- Try to create cachedir if it doesn't exist;
+- Fatal error if the cachedir isn't readable/writeable or can't be created
+
+3.13    2022-05-24
+
+- If LWP can't talk https, try shelling out to wget instead
+
 3.12    2022-04-12
 
 - Fix a minor bug in the tests that caused failures when nothing was actually wrong

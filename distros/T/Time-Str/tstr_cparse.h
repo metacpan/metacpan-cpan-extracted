@@ -10,6 +10,10 @@ tstr_parse_result_t tstr_cparse_asn1gt(const char *p,
                                        size_t len,
                                        tstr_parsed_t *parsed);
 
+tstr_parse_result_t tstr_cparse_datetime(const char *p,
+                                         size_t len,
+                                         tstr_parsed_t *parsed);
+
 tstr_parse_result_t tstr_cparse_ecmascript(const char *p,
                                            size_t len,
                                            tstr_parsed_t *parsed);
@@ -49,6 +53,8 @@ static inline tstr_parse_result_t tstr_cparse_dispatch(const char *s,
   switch (fmt) {
     case TSTR_FORMAT_ASN1GT:
       return tstr_cparse_asn1gt(s, len, parsed);
+    case TSTR_FORMAT_DATETIME:
+      return tstr_cparse_datetime(s, len, parsed);
     case TSTR_FORMAT_ECMASCRIPT:
       return tstr_cparse_ecmascript(s, len, parsed);
     case TSTR_FORMAT_ISO8601:

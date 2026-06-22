@@ -26,7 +26,6 @@ sub inquire {
         'message' => ['This message was created automatically by mail delivery software'],
         'error'   => ['For the following reason:'],
     };
-    state $messagesof = {'emailtoolarge' => ['Mail size limit exceeded']};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
@@ -95,21 +94,13 @@ sub inquire {
             my $p1 = index($e->{'diagnosis'}, 'host: ');
             my $p2 = index($e->{'diagnosis'}, ' reason:');
 
-            $e->{'rhost'}   = Sisimai::String->sweep(substr($e->{'diagnosis'}, $p1 + 6, $p2 - $p1 - 6));
+            $e->{'rhost'}   = substr($e->{'diagnosis'}, $p1 + 6, $p2 - $p1 - 6);
             $e->{'command'} = 'DATA' if index($e->{'diagnosis'}, 'for TEXT command') > -1;
             $e->{'spec'}    = 'SMTP' if index($e->{'diagnosis'}, 'SMTP error')       > -1;
             $e->{'status'}  = Sisimai::SMTP::Status->find($e->{'diagnosis'});
         } else {
             # For the following reason:
             substr($e->{'diagnosis'}, 0, length $startingof->{'error'}->[0], '');
-        }
-        $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
-
-        SESSION: for my $r ( keys %$messagesof ) {
-            # Verify each regular expression of session errors
-            next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
-            $e->{'reason'} = $r;
-            last;
         }
     }
     return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
@@ -152,7 +143,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2026 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

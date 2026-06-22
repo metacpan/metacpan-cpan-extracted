@@ -28,15 +28,16 @@ no_index:
 provides:
   DBIx::Class::MockData:
     file: lib/DBIx/Class/MockData.pm
-    version: '0.05'
+    version: v1.0.0
 requires:
   Carp: '0'
   DBIx::Class: '0.082841'
   File::Spec: '0'
   Scalar::Util: '0'
   perl: '5.016'
+  version: '0.77'
 resources:
   bugtracker: https://github.com/manwar/DBIx-Class-MockData/issues
   repository: https://github.com/manwar/DBIx-Class-MockData.git
-version: '0.05'
+version: v1.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

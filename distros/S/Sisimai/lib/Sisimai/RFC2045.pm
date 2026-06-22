@@ -152,6 +152,7 @@ sub haircut {
 
     my($upperchunk, $lowerchunk) = split("\n\n", $$block, 2);
     return ['', ''] unless $upperchunk;
+    return ['', ''] unless $lowerchunk;
     return ['', ''] unless index($upperchunk, 'Content-Type:') > -1;
 
     my $headerpart = ['', ''];  # ["text/plain; charset=iso-2022-jp; ...", "quoted-printable"]
@@ -266,7 +267,7 @@ sub makeflat {
     my $class = shift;
     my $argv0 = shift // return undef;
     my $argv1 = shift // return undef;
-    return undef if index($argv0, 'multipart/') < 0 || index($argv0, 'boundary=')  < 0;
+    return undef if index(lc $argv0, 'multipart/') < 0 || index(lc $argv0, 'boundary=') < 0;
 
     my $iso2022set = qr/charset=["']?(iso-2022-[-a-z0-9]+)['"]?\b/;
     my $multiparts = __PACKAGE__->levelout($argv0, $argv1);
@@ -447,7 +448,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016,2018-2025 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018-2026 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

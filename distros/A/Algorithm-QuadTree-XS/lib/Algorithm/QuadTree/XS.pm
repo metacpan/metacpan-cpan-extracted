@@ -1,5 +1,5 @@
 package Algorithm::QuadTree::XS;
-$Algorithm::QuadTree::XS::VERSION = '0.07';
+$Algorithm::QuadTree::XS::VERSION = '0.09';
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -13,11 +13,13 @@ our @EXPORT = qw(
 	_AQT_clear
 );
 
+use constant UNIQUE_RESULTS => 1;
+
 # NOTE: this implementation lives here for XS to load properly, but a separate
 # file including this module is present to allow regular perl module loading to
 # find it by name
 package Algorithm::QuadTree::XS::NoBackRefs;
-$Algorithm::QuadTree::XS::NoBackRefs::VERSION = '0.07';
+$Algorithm::QuadTree::XS::NoBackRefs::VERSION = '0.09';
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -31,6 +33,8 @@ our @EXPORT = qw(
 	_AQT_delete
 	_AQT_clear
 );
+
+use constant UNIQUE_RESULTS => 1;
 
 sub _AQT_delete
 {
@@ -61,34 +65,49 @@ This implementation is compatible with C<Algorithm::QuadTree::PP>.
 
 =head1 BENCHMARK
 
-Generated using C<tools/benchmark.pl> available in the GitHub repository. Tree depth was 6.
+	# backend: Algorithm::QuadTree::XS::NoBackRefs
 
-L<Algorithm::QuadTree::XS::NoBackRefs>
+	     clear: 1.460114e-05 +- 9.1e-10 wallclock secs (0.00623%) @ (68487.8 +-    4.3)/s (n=201)
+	  find_100: 2.96563e-05 +- 8.4e-09 wallclock secs (0.0283%) @ (33719.6 +-    9.6)/s (n=203)
+	insert_100: 1.22024e-04 +- 3.6e-08 wallclock secs (0.0295%) @ (8195.1 +-   2.4)/s (n=216)
 
-	Benchmark: ran clear, find_circle, find_rectangle, insert_circles, insert_rectangles.
-	            clear: 1.68907e-05 +- 1.3e-09 wallclock secs (0.00770%) @ (59204.2 +-    4.7)/s (n=211)
-	      find_circle: 3.5331e-05 +- 1.1e-08 wallclock secs (0.0311%) @ (28303.6 +-    8.6)/s (n=201)
-	   find_rectangle: 3.6176e-05 +- 1.3e-08 wallclock secs (0.0359%) @ (27643 +-    10)/s (n=203)
-	   insert_circles: 1.03584e-04 +- 1.7e-08 wallclock secs (0.0164%) @ ( 9654 +-   1.6)/s (n=204)
-	insert_rectangles: 1.01218e-04 +- 1.3e-08 wallclock secs (0.0128%) @ (9879.7 +-   1.3)/s (n=202)
+	# backend: Algorithm::QuadTree::XS
 
-B<Algorithm::QuadTree::XS>
+	     clear: 5.5851e-05 +- 6.8e-08 wallclock secs (0.122%) @ (17905 +-    22)/s (n=206)
+	  find_100: 2.79711e-05 +- 4.0e-09 wallclock secs (0.0143%) @ (35751.2 +-    5.2)/s (n=202)
+	insert_100: 1.7825e-04 +- 1.2e-07 wallclock secs (0.0673%) @ (5610.2 +-   3.7)/s (n=228)
 
-	Benchmark: ran clear, find_circle, find_rectangle, insert_circles, insert_rectangles.
-	            clear: 5.7209e-05 +- 4.6e-08 wallclock secs (0.0804%) @ (17480 +-    14)/s (n=203)
-	      find_circle: 3.3665e-05 +- 3.0e-08 wallclock secs (0.0891%) @ (29705 +-    26)/s (n=205)
-	   find_rectangle: 2.7731e-05 +- 1.9e-08 wallclock secs (0.0685%) @ (36061 +-    25)/s (n=269)
-	   insert_circles: 1.46677e-04 +- 5.8e-08 wallclock secs (0.0395%) @ (6817.7 +-   2.7)/s (n=207)
-	insert_rectangles: 1.35100e-04 +- 3.4e-08 wallclock secs (0.0252%) @ (7401.9 +-   1.9)/s (n=211)
+	# backend: Algorithm::QuadTree::PP
 
-B<Algorithm::QuadTree::PP>
+	     clear: 1.43388e-03 +- 2.4e-07 wallclock secs (0.0167%) @ (697.41 +-  0.12)/s (n=200)
+	  find_100: 2.57478e-04 +- 5.6e-08 wallclock secs (0.0217%) @ (3883.82 +-   0.85)/s (n=201)
+	insert_100: 2.29717e-03 +- 2.0e-07 wallclock secs (0.00871%) @ (435.318 +-  0.038)/s (n=211)
 
-	Benchmark: ran clear, find_circle, find_rectangle, insert_circles, insert_rectangles.
-	            clear: 1.40270e-03 +- 1.6e-07 wallclock secs (0.0114%) @ (712.91 +-  0.084)/s (n=212)
-	      find_circle: 1.58290e-04 +- 2.9e-08 wallclock secs (0.0183%) @ (6317.5 +-   1.2)/s (n=207)
-	   find_rectangle: 1.01350e-04 +- 3.5e-08 wallclock secs (0.0345%) @ (9866.8 +-   3.4)/s (n=207)
-	   insert_circles: 3.59243e-03 +- 4.4e-07 wallclock secs (0.0122%) @ (278.363 +-  0.034)/s (n=208)
-	insert_rectangles: 1.129783e-03 +- 9.4e-08 wallclock secs (0.00832%) @ (885.125 +-  0.074)/s (n=210)
+
+Generated using C<tools/benchmark.pl> available in the GitHub repository. Tree
+depth was 6.
+
+=over
+
+=item * benchmark C<clear>
+
+Inserts into a tree a giant object which spans the entire area, then clear the
+tree. This forces clearing procedure to go into each leaf and clear it, which
+is worst-case scenario.
+
+=item * benchmark C<find_100>
+
+A predeclared tree exists with 10 elements inserted in the middle of the area.
+Tree is queried 10 times, 5 times with rectangular coordinates and 5 times with
+circular coordinates. All 10 items are returned each time, resulting in 100
+items returned total.
+
+=item * benchmark C<insert_100>
+
+Clears a tree and inserts 50 circles and 50 rectangles to it. Those objects are
+placed in a way so that none of them overlap.
+
+=back
 
 =head1 SEE ALSO
 

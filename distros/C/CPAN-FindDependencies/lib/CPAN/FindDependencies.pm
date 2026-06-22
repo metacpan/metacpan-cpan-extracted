@@ -7,6 +7,7 @@ use vars qw(@net_log $VERSION @ISA @EXPORT_OK);
 use Archive::Tar;
 use Archive::Zip;
 use Env::Path;
+use Path::Tiny;
 use File::Temp qw(tempfile);
 use File::Type;
 use LWP::UserAgent;
@@ -22,9 +23,11 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(finddeps);
 
-$VERSION = '3.12';
+$VERSION = '3.14';
 
 use constant MAXINT => ~0;
+
+eval 'use LWP::Protocol::https';
 
 =head1 NAME
 
@@ -97,9 +100,11 @@ specified, it defaults to 5.005.  Three part version numbers
 
 A directory to use for caching.  It defaults to no caching.  Even if
 caching is turned on, this is only for META.yml or Makefile.PL files.
-
 The cache is never automatically cleared out. It is your responsibility
 to clear out old data.
+
+If the directory doesn't exist we will try to create it. If we can't,
+or it exists but isn't readable and writeable, that is a fatal error.
 
 =item maxdepth
 
@@ -252,7 +257,7 @@ L<http://metacpan.org>
 
 =head1 AUTHOR, LICENCE and COPYRIGHT
 
-Copyright 2007 - 2019 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2007 - 2026 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU
@@ -320,6 +325,12 @@ sub finddeps {
             };
         } elsif(grep { $_ eq $option } @valid_params) {
             $self->{$option} = shift(@args);
+            if($option eq 'cachedir' && !(-d $self->{$option} && -r $self->{$option} && -w $self->{$option}) ) {
+                # bad cachedir, try to create
+                eval { path($self->{$option})->mkdir(); };
+                die("Bad cachedir: $self->{$option}\n")
+                    unless(-d $self->{$option} && -r $self->{$option} && -w $self->{$option});
+            }
         } elsif(!$module) {
             $module = $option
         } else {
@@ -397,15 +408,26 @@ sub _yell {
 sub _get {
     my $self = shift;
     my $url = shift;
-    my $ua = LWP::UserAgent->new();
-    $ua->env_proxy();
-    $ua->agent(__PACKAGE__."/$VERSION");
+
     push @net_log, $url;
-    my $response = $ua->get($url);
-    if($response->is_success()) {
-        return $response->content();
-    } else {
+
+    if($LWP::Protocol::https::VERSION || $url !~ /^https:/) {
+        my $ua = LWP::UserAgent->new();
+        $ua->env_proxy();
+        $ua->agent(__PACKAGE__."/$VERSION");
+        my $response = $ua->get($url);
+        if($response->is_success()) {
+            return $response->content();
+        }
         return undef;
+    } elsif((my $wget) = grep { -x "$_/wget" } Env::Path->PATH->List) {
+        open(my $wget_fh, '-|', 'wget', '--no-check-certificate', '-qO', '-', $url) || do {
+            warn("Couldn't wget: $!\n");
+            return undef;
+        };
+        return join('', <$wget_fh>);
+    } else {
+        die("Ohnoes! No LWP::Protocol::https and couldn't wget either.\n");
     }
 }
 

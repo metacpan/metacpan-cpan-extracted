@@ -23,6 +23,7 @@ sub match {
         "access denied (in reply to mail from command)",
         "administrative prohibition",
         "all recipient addresses rejected : access denied",
+        "badsendermx", # BadSenderMX
         "backscatter protection detected an invalid or expired email address", # MDaemon
         "by non-member to a members-only list",
         "can't determine purported responsible address",
@@ -35,10 +36,12 @@ sub match {
         "empty envelope senders not allowed",
         "from: domain is invalid. please provide a valid from:",
         "fully qualified email address required",   # McAfee
+        "has an outgoing mail suspension",
         "invalid sender",
         "is not a registered gateway user",
         "mail from not owned by user",
         "mailfrom domain is listed in spamhaus",
+        "not member article from ", # FML
         "null sender is not allowed",
         "returned mail not accepted here",
         "sending this from a different address or alias using the ",
@@ -47,8 +50,10 @@ sub match {
         "sender domain is empty",
         "sender domain listed at ",
         "sender verify failed",     # Exim callout
+        "sendernoa",                # SenderNoA
         "server does not accept mail from",
         "spam reporting address",   # SendGrid|a message to an address has previously been marked as Spam by the recipient.
+        "too many spam complaints",
         "unroutable sender address",
         "you are not allowed to post to this mailing list",
         "your access to submit messages to this e-mail system has been rejected",
@@ -59,6 +64,7 @@ sub match {
         ["after mail from:", ".", " does not exist"],
         ["domain ", " is a dead domain"],
         ["email address ", "is not "],
+        ["reject mail from ", "@"], # FML
         ["send", "blacklisted"],
         ["sender", " rejected"],
         ["sender is", " list"],

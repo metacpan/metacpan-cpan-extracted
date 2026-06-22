@@ -36,21 +36,6 @@ sub inquire {
         ],
         'securityerror' => ['Security Alert'],
     };
-    state $errortable = {
-        'rejected' => [
-            ' header may cause mail loop',
-            'NOT MEMBER article from ',
-            'reject mail from ',
-            'reject spammers:',
-            'You are not a member of this mailing list',
-        ],
-        'notcompliantrfc' => ['Duplicated Message-ID'],
-        'securityerror' => ['Security alert:'],
-        'systemerror' => [
-            ' has detected a loop condition so that',
-            'Loop Back Warning:',
-        ],
-    };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
@@ -85,16 +70,6 @@ sub inquire {
     return undef unless $recipients;
 
     for my $e ( @$dscontents ) {
-        $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
-
-        for my $f ( keys %$errortable ) {
-            # Try to match with error messages defined in $errortable
-            next unless grep { index($e->{'diagnosis'}, $_) > -1 } $errortable->{ $f }->@*;
-            $e->{'reason'} = $f;
-            last;
-        }
-        next if $e->{'reason'};
-
         # Error messages in the message body did not matched
         for my $f ( keys %$errortitle ) {
             # Try to match with the Subject string
@@ -143,7 +118,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017-2021,2023-2025 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2021,2023-2026 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

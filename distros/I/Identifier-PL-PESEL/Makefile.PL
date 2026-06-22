@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'Identifier::PL::PESEL',
-    AUTHOR           => q{Andrzej Cholewiusz <cholewiusz@gmail.com>},
+    AUTHOR           => q{Andrzej Cholewiusz},
     VERSION_FROM     => 'lib/Identifier/PL/PESEL.pm',
     ABSTRACT_FROM    => 'lib/Identifier/PL/PESEL.pm',
     LICENSE          => 'artistic_2',

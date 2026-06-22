@@ -18,7 +18,8 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Carp' => 0,
 		'Params::Get' => 0.13,
-		'Params::Validate::Strict' => 0.13
+		'Params::Validate::Strict' => 0.34,
+		'Readonly' => 0,
 	}, TEST_REQUIRES => {
 		'autodie' => 0,
 		'Class::Simple' => 0,
@@ -29,12 +30,14 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,
 		'JSON::MaybeXS' => 0,
 		'POSIX' => 0,
-		'Readonly' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Memory::Cycle' => 0,
+		'Test::Mockingbird' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::Returns' => 0,
-		'Test::Which' => 0
+		'Test::Which' => 0,
+		'Test::Without::Module' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Text-Names-Abbreviate-*' },
 	# META_ADD => {

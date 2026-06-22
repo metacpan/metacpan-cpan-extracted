@@ -1,0 +1,7 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Algorithm::Classifier::IsolationForest::App;
+Algorithm::Classifier::IsolationForest::App->run;

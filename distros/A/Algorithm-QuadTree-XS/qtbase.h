@@ -40,7 +40,11 @@ enum ShapeType {
 
 struct Shape {
 	ShapeType type;
-	double dimensions[4];
+	double x;
+	double y;
+	double x2;
+	double y2;
+	double radius_sq;
 };
 
 
@@ -57,7 +61,7 @@ QuadTreeRootNode* create_root();
 QuadTreeRootNode* create_root_nobackref();
 void store_backref(QuadTreeRootNode *root, QuadTreeNode* node, SV *value);
 void node_add_level(QuadTreeNode* node, double xmin, double ymin, double xmax, double ymax, int depth);
-void find_nodes(QuadTreeNode *node, AV *ret, Shape *param);
+void find_nodes(QuadTreeNode *node, HV *ret, Shape *param);
 bool fill_nodes(QuadTreeRootNode *root, QuadTreeNode *node, SV *value, Shape *param);
 bool fill_nodes_nobackref(QuadTreeNode *node, SV *value, Shape *param);
 void clear_tree(QuadTreeRootNode *root);
@@ -66,6 +70,7 @@ void clear_tree(QuadTreeRootNode *root);
 
 SV* get_hash_key (HV* hash, const char* key);
 QuadTreeRootNode* get_root_from_perl(SV *self);
+AV* get_hash_values (HV* hash);
 
 #endif
 

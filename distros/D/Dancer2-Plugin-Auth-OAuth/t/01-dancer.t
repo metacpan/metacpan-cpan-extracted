@@ -108,10 +108,25 @@ test_psgi
                 ok($got_uri->$_ eq $wanted_uri->$_, "[$provider] Redirect URL ($_)");
             }
 
-            is_deeply( +{ $got_uri->query_form }, +{ $wanted_uri->query_form }, "[$provider] Redirect URL (query)" );
+            my %got_query = $got_uri->query_form;
+            # For OAuth2 providers, state is generated randomly; include it in
+            # the expected set so is_deeply passes, then verify its format.
+            if ( defined $got_query{state} ) {
+                $wanted_q{$provider}{state} = $got_query{state};
+                $wanted_uri->query_form( $wanted_q{$provider} );
+                like( $got_query{state}, qr/^[0-9a-f]{32}$/, "[$provider] state is 32 hex chars" );
+            }
+            is_deeply( \%got_query, +{ $wanted_uri->query_form }, "[$provider] Redirect URL (query)" );
+
+            # Grab the login session cookie so the callback shares the same session
+            # (needed for state validation introduced by the CSRF defense).
+            my $login_cookie = $res->header('Set-Cookie') // '';
+            $login_cookie =~ s/;.*$//;
 
             ### callback
-            $res = $cb->(GET "/auth_test/$provider/callback?oauth_token=foo&oauth_verifier=bar&code=foobar"); # mixing oauth versions
+            my $state_param = defined $got_query{state} ? "&state=$got_query{state}" : '';
+            $res = $cb->(GET "/auth_test/$provider/callback?oauth_token=foo&oauth_verifier=bar&code=foobar${state_param}",
+                         Cookie => $login_cookie); # mixing oauth versions
             ok($res->code == 302, "[$provider][cb] Response code (302)");
 
             # Dancer2 v0.300001 moved to RFC 7231 behavior for redirects

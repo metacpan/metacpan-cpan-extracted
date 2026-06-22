@@ -114,6 +114,8 @@ t/32-show.t
 t/33-foundation-run.t
 t/34-foundation-command.t
 t/35-sync-error.t
+t/36-task-clear.t
+t/37-board-render.t
 t/author-pod-syntax.t
 t/lib/MockStore.pm
 t/lib/TestGit.pm

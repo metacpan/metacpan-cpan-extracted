@@ -67,5 +67,7 @@ t/cache/CPAN-FindDependencies-1.1-no_index-twice/Test-Harness-3.03.meta
 t/cache/CPAN-FindDependencies-1.1-no_index-twice/Test-Simple-0.72.meta
 t/cache/CPAN-FindDependencies-1.1-no_index-twice/YAML-0.66.meta
 t/cache/CPAN-FindDependencies-1.1-no_index-twice/libwww-perl-5.808.meta
+t/no-LWP-protocol-https-network-tests.t
+t/no-LWP-protocol-https-file-tests.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,7 +7,6 @@ use Capture::Tiny qw(capture);
 use Config;
 use CPAN::FindDependencies;
 use File::Find::Rule;
-use LWP::Simple;
 use Text::Diff;
 
 # generate help before chdir()ing. can't assume `perldoc` is in the path. Yuck.
@@ -219,7 +218,7 @@ Bug reports should be made on Github or by email.
 
 =head1 AUTHOR, LICENCE and COPYRIGHT
 
-Copyright 2007 - 2020 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2007 - 2026 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

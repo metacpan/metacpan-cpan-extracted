@@ -1,7 +1,7 @@
 # ABSTRACT: Generate board context summary for embedding
 
 package App::karr::Cmd::Context;
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -211,7 +211,7 @@ App::karr::Cmd::Context - Generate board context summary for embedding
 
 =head1 VERSION
 
-version 0.301
+version 0.302
 
 =head1 SYNOPSIS
 

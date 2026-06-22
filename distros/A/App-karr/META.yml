@@ -19,112 +19,112 @@ name: App-karr
 provides:
   App::karr:
     file: lib/App/karr.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::ActivityLog:
     file: lib/App/karr/ActivityLog.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::BoardStore:
     file: lib/App/karr/BoardStore.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::AgentName:
     file: lib/App/karr/Cmd/AgentName.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Archive:
     file: lib/App/karr/Cmd/Archive.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Backup:
     file: lib/App/karr/Cmd/Backup.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Board:
     file: lib/App/karr/Cmd/Board.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Config:
     file: lib/App/karr/Cmd/Config.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Context:
     file: lib/App/karr/Cmd/Context.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Create:
     file: lib/App/karr/Cmd/Create.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Delete:
     file: lib/App/karr/Cmd/Delete.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Destroy:
     file: lib/App/karr/Cmd/Destroy.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Edit:
     file: lib/App/karr/Cmd/Edit.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::GetRefs:
     file: lib/App/karr/Cmd/GetRefs.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Handoff:
     file: lib/App/karr/Cmd/Handoff.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Init:
     file: lib/App/karr/Cmd/Init.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::List:
     file: lib/App/karr/Cmd/List.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Log:
     file: lib/App/karr/Cmd/Log.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Move:
     file: lib/App/karr/Cmd/Move.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Pick:
     file: lib/App/karr/Cmd/Pick.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Restore:
     file: lib/App/karr/Cmd/Restore.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::SetRefs:
     file: lib/App/karr/Cmd/SetRefs.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Show:
     file: lib/App/karr/Cmd/Show.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Skill:
     file: lib/App/karr/Cmd/Skill.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Cmd::Sync:
     file: lib/App/karr/Cmd/Sync.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Config:
     file: lib/App/karr/Config.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Foundation:
     file: lib/App/karr/Foundation.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Git:
     file: lib/App/karr/Git.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Lock:
     file: lib/App/karr/Lock.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Role::BoardAccess:
     file: lib/App/karr/Role/BoardAccess.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Role::BoardDiscovery:
     file: lib/App/karr/Role/BoardDiscovery.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Role::ClaimTimeout:
     file: lib/App/karr/Role/ClaimTimeout.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Role::Output:
     file: lib/App/karr/Role/Output.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Role::SyncLifecycle:
     file: lib/App/karr/Role/SyncLifecycle.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::SyncGuard:
     file: lib/App/karr/SyncGuard.pm
-    version: '0.301'
+    version: '0.302'
   App::karr::Task:
     file: lib/App/karr/Task.pm
-    version: '0.301'
+    version: '0.302'
 requires:
   File::ShareDir: '0'
   Git::Libgit2: '0.004'
@@ -145,7 +145,7 @@ resources:
   bugtracker: https://github.com/Getty/karr/issues
   homepage: https://github.com/Getty/karr
   repository: https://github.com/Getty/karr.git
-version: '0.301'
+version: '0.302'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -424,7 +424,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.301'
+          tag: '0.302'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

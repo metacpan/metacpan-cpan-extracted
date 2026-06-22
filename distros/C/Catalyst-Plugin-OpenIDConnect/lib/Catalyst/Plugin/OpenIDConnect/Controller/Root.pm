@@ -213,6 +213,28 @@ sub authorize : Local {
             if $config->{debug};
     }
 
+    # Apply the custom scope handler if one has been registered.  It runs
+    # after the built-in intersection so the handler only ever sees scopes
+    # that are already permitted for the client.  If the handler throws, the
+    # request is rejected with an invalid_scope error.
+    if ( my $handler = $c->openidconnect->scope_handler ) {
+        my @processed;
+        try {
+            @processed = $handler->( $c, $scope );
+        }
+        catch {
+            ( my $msg = $_ ) =~ s/\s+at\s+\S.*//s;    # strip file/line from die message
+            $c->log->warn("Scope handler rejected request: $msg");
+            return $self->_error_response(
+                $c, $redirect_uri, 'invalid_scope',
+                "Scope validation failed: $msg", $state
+            );
+        };
+        if (@processed) {
+            $scope = join ' ', grep { defined $_ && length $_ } @processed;
+        }
+    }
+
     # Check if user is authenticated
     unless ( $c->user ) {
         $c->log->debug('User not authenticated, redirecting to login') if $config->{debug};

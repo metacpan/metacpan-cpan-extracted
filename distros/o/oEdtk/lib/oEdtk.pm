@@ -6,7 +6,7 @@ BEGIN {
 		use strict;
 
 		# a.ammr a.a année écoulées, mm mois, r release
-		$VERSION	= 2.1064;
+		$VERSION	= 2.1065;
 		$YEAR	= '2026';
 		@ISA		= qw(Exporter);
 		@EXPORT	= qw(oEdtk_release);
@@ -46,7 +46,7 @@ here.
 
 =head1 LICENCE
 
-    oEdtk Copyright (C) 2005-2024 G Chaillou Domingo, D Aunay, M Henrion, G Ballin
+    oEdtk Copyright (C) 2005-2026 G Chaillou Domingo, D Aunay, M Henrion, G Ballin
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

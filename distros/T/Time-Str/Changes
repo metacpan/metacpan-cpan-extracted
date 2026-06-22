@@ -1,3 +1,8 @@
+0.92 2026-06-21
+  - Add a native Ragel-based C parser for the DateTime format, 
+    delivering approximately 20x better performance than the 
+    regexp parser.
+
 0.91 2026-06-09
   - Add Time::Str::TimeZone for resolving IANA Time Zone Database
     names (and the special name 'local') to cached Time::TZif

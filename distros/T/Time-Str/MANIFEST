@@ -73,6 +73,7 @@ tstr_calendar.h
 tstr_carp.h
 tstr_cparse.h
 tstr_cparse_asn1gt.c
+tstr_cparse_datetime.c
 tstr_cparse_ecmascript.c
 tstr_cparse_iso8601.c
 tstr_cparse_iso9075.c

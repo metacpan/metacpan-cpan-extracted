@@ -1,7 +1,7 @@
 # ABSTRACT: Hand off a task for review
 
 package App::karr::Cmd::Handoff;
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -92,8 +92,8 @@ sub execute {
 
   # Release claim if requested
   if ($self->release) {
-    $task->claimed_by(undef);
-    $task->claimed_at(undef);
+    $task->clear_claimed_by;
+    $task->clear_claimed_at;
   }
 
   $self->save_task($task);
@@ -127,7 +127,7 @@ App::karr::Cmd::Handoff - Hand off a task for review
 
 =head1 VERSION
 
-version 0.301
+version 0.302
 
 =head1 SYNOPSIS
 

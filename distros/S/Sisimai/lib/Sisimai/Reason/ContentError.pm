@@ -15,6 +15,7 @@ sub match {
     my $argv1 = shift // return 0;
 
     state $index = [
+        "charset not supported",
         "executable files are not allowed in compressed files",
         "header error",
         "header size exceeds maximum permitted",
@@ -28,6 +29,7 @@ sub match {
         "message mime complexity exceeds the policy maximum",
         "message was blocked because its content presents a potential", # https://support.google.com/mail/answer/6590
         "routing loop detected -- too many received: headers",
+        'too many "received" headers', # Exim/deliver.c:5425
         "we do not accept messages containing images or other attachments",
     ];
     return 1 if grep { rindex($argv1, $_) > -1 } @$index;

@@ -1,5 +1,5 @@
 package Algorithm::QuadTree;
-$Algorithm::QuadTree::VERSION = '0.6';
+$Algorithm::QuadTree::VERSION = '0.7';
 use strict;
 use warnings;
 use Carp;
@@ -20,13 +20,18 @@ use Carp;
 #
 ###############################
 
+my $backend;
 BEGIN {
 	require Algorithm::QuadTree::PP;
-	my $backend = 'Algorithm::QuadTree::PP';
+	$backend = 'Algorithm::QuadTree::PP';
 
+	my $backend_requested = defined $ENV{ALGORITHM_QUADTREE_BACKEND};
 	my $check_backend = $ENV{ALGORITHM_QUADTREE_BACKEND} || 'Algorithm::QuadTree::XS';
 	if (eval "require $check_backend; 1;") {
 		$backend = $check_backend;
+	}
+	elsif ($backend_requested) {
+		die $@;
 	}
 
 	$backend->import;
@@ -34,6 +39,7 @@ BEGIN {
 
 # List::Util 1.45 added 'uniqstr'
 use constant HAS_LIST_UTIL => eval { require List::Util; List::Util->VERSION('1.45'); 1 };
+use constant BACKEND_UNIQUE_RESULTS => $backend->can('UNIQUE_RESULTS') ? $backend->UNIQUE_RESULTS : 0;
 
 sub new
 {
@@ -131,7 +137,12 @@ sub getEnclosedObjects
 	@coords = $self->_adjustCoords(@coords)
 		unless $self->{SCALE} == 1;
 
-	return _uniq(_AQT_findObjects($self, @coords));
+	if (BACKEND_UNIQUE_RESULTS) {
+		return _AQT_findObjects($self, @coords);
+	}
+	else {
+		return _uniq(_AQT_findObjects($self, @coords));
+	}
 
 	# PS. I don't check explicitly if those objects
 	# are enclosed in the given area. They are just

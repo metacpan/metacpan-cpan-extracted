@@ -22,6 +22,7 @@ WriteMakefile(
     'CPAN::Meta'              => 0,
     'Env::Path'               => 0.19,
     'Devel::CheckOS'          => 1.52,
+    'Devel::Hide'             => 0,
     'File::Find::Rule'        => 0,
     'File::Path'              => '2.17',
     'File::Temp'              => 0.19,
@@ -32,6 +33,7 @@ WriteMakefile(
     'LWP::Simple'             => 0,
     'Module::CoreList'        => '5.20200920',
     'Parse::CPAN::Packages'   => 2.31,
+    'Path::Tiny'              => '0.150',
     'Pod::Perldoc'            => 3.23, # some earlier versions whine about groff on Mac
     'Scalar::Util'            => 1.14,
     'Test::Differences'       => 0,

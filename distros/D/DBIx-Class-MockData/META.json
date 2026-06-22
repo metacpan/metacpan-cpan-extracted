@@ -36,7 +36,8 @@
             "DBIx::Class" : "0.082841",
             "File::Spec" : "0",
             "Scalar::Util" : "0",
-            "perl" : "5.016"
+            "perl" : "5.016",
+            "version" : "0.77"
          }
       },
       "test" : {
@@ -55,7 +56,7 @@
    "provides" : {
       "DBIx::Class::MockData" : {
          "file" : "lib/DBIx/Class/MockData.pm",
-         "version" : "0.05"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
@@ -69,6 +70,6 @@
          "web" : "https://github.com/manwar/DBIx-Class-MockData"
       }
    },
-   "version" : "0.05",
+   "version" : "v1.0.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

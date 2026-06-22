@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Version
 
+1.121 2026-06-21T19:43:16Z
+	* support the old qv() syntax from version.pm
+
 1.119 2025-04-14T18:42:03Z
 	* require a newer version.pm for v5.10.1 tests
 
