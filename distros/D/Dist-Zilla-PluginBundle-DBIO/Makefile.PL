@@ -6,11 +6,18 @@ use 5.020;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Dist::Zilla plugin bundle for DBIO distributions",
-  "AUTHOR" => "DBIO & DBIx::Class Authors",
+  "AUTHOR" => "DBIO Authors",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-DBIO",
   "LICENSE" => "perl",
@@ -20,22 +27,27 @@ my %WriteMakefileArgs = (
     "Dist::Zilla" => "6.000",
     "Dist::Zilla::Plugin::Bootstrap::lib" => 0,
     "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => 0,
-    "Dist::Zilla::Plugin::GithubMeta" => 0,
     "Dist::Zilla::Plugin::MakeMaker::Awesome" => 0,
     "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
     "Dist::Zilla::Plugin::PodWeaver" => 0,
     "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
+    "Dist::Zilla::Plugin::ShareDir" => 0,
     "Dist::Zilla::Plugin::VersionFromMainModule" => 0,
     "Dist::Zilla::PluginBundle::Git" => 0,
     "Dist::Zilla::PluginBundle::Git::VersionManager" => 0,
     "Moose" => 0,
+    "Path::Tiny" => 0,
     "Pod::Weaver" => 0,
     "Pod::Weaver::Section::GenerateSection" => 0
   },
   "TEST_REQUIRES" => {
+    "Dist::Zilla::Tester" => 0,
+    "PPI" => 0,
+    "Pod::Elemental" => 0,
+    "Software::License::Perl_5" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900001",
+  "VERSION" => "0.900002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,17 +58,22 @@ my %FallbackPrereqs = (
   "Dist::Zilla" => "6.000",
   "Dist::Zilla::Plugin::Bootstrap::lib" => 0,
   "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => 0,
-  "Dist::Zilla::Plugin::GithubMeta" => 0,
   "Dist::Zilla::Plugin::MakeMaker::Awesome" => 0,
   "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
   "Dist::Zilla::Plugin::PodWeaver" => 0,
   "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
+  "Dist::Zilla::Plugin::ShareDir" => 0,
   "Dist::Zilla::Plugin::VersionFromMainModule" => 0,
   "Dist::Zilla::PluginBundle::Git" => 0,
   "Dist::Zilla::PluginBundle::Git::VersionManager" => 0,
+  "Dist::Zilla::Tester" => 0,
   "Moose" => 0,
+  "PPI" => 0,
+  "Path::Tiny" => 0,
+  "Pod::Elemental" => 0,
   "Pod::Weaver" => 0,
   "Pod::Weaver::Section::GenerateSection" => 0,
+  "Software::License::Perl_5" => 0,
   "Test::More" => "0.98"
 );
 
@@ -71,3 +88,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

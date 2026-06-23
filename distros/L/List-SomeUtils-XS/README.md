@@ -4,25 +4,24 @@ List::SomeUtils::XS - XS implementation for List::SomeUtils
 
 # VERSION
 
-version 0.58
+version 0.59
 
 # DESCRIPTION
 
-There are no user-facing parts here. See [List::SomeUtils](https://metacpan.org/pod/List::SomeUtils) for API details.
+There are no user-facing parts here. See [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) for API details.
 
 You shouldn't have to install this module directly. When you install
-[List::SomeUtils](https://metacpan.org/pod/List::SomeUtils), it checks whether your system has a compiler. If it does,
-then it adds a dependency on this module so that it gets installed and you
-have the faster XS implementation.
+[List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils), it checks whether your system has a compiler. If it does,
+then it adds a dependency on this module so that it gets installed and you have
+the faster XS implementation.
 
-This distribution requires [List::SomeUtils](https://metacpan.org/pod/List::SomeUtils) but to avoid a circular
-dependency, that dependency is explicitly left out from the this
-distribution's metadata. However, without LSU already installed this module
-cannot function.
+This distribution requires [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) but to avoid a circular
+dependency, that dependency is explicitly left out from the this distribution's
+metadata. However, without LSU already installed this module cannot function.
 
 # SEE ALSO
 
-[List::Util](https://metacpan.org/pod/List::Util), [List::AllUtils](https://metacpan.org/pod/List::AllUtils)
+[List::Util](https://metacpan.org/pod/List%3A%3AUtil), [List::AllUtils](https://metacpan.org/pod/List%3A%3AAllUtils)
 
 # HISTORICAL COPYRIGHT
 
@@ -35,8 +34,6 @@ Copyright 2013 - 2015 by Jens Rehsack
 # SUPPORT
 
 Bugs may be submitted at [https://github.com/houseabsolute/List-SomeUtils-XS/issues](https://github.com/houseabsolute/List-SomeUtils-XS/issues).
-
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
 # SOURCE
 
@@ -57,7 +54,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://houseabsolute.com/foss-donations/](https://houseabsolute.com/foss-donations/).
 
 # AUTHOR
 
@@ -65,7 +62,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2026 by Dave Rolsky.
 
 This is free software, licensed under:
 

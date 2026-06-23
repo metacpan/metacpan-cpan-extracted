@@ -1,6 +1,6 @@
 package BibTeX::Parser::Entry;
 {
-  $BibTeX::Parser::Entry::VERSION = '1.93';
+  $BibTeX::Parser::Entry::VERSION = '1.94';
 }
 
 use warnings;
@@ -421,7 +421,7 @@ Can take values 'Uppercase' (the default), 'Lowercase' or 'Titlecase'
 
 =head1 VERSION
 
-version 1.93
+version 1.94
 
 =head1 AUTHOR
 
@@ -431,7 +431,7 @@ Karl Berry <karl@freefriends.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2025 Gerhard Gossen, Boris Veytsman, Karl Berry
+Copyright 2013-2026 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

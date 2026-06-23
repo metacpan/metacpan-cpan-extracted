@@ -1,5 +1,10 @@
 Revision history for Markdown-Simple
 
+0.15    2026-06-22
+        - Fix "unsupported TLS program header" load failure on OpenBSD.
+        - Fix more C89 build failures 
+        - Fix LTO probe to detect old-clang.
+
 0.14    2026-06-05
         - Fix C89 issues
 

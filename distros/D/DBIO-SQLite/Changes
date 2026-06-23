@@ -1,0 +1,28 @@
+Revision history for DBIO-SQLite
+
+0.900000  2026-06-23
+    First release. SQLite driver for DBIO with native deploy, introspect,
+    diff and DDL generation -- no SQL::Translator.
+
+    * Storage
+        - DBIO::SQLite::Storage, autodetected for dbi:SQLite: DSNs via the
+          driver registry; force-on multicolumn IN where supported
+        - Savepoints, deferred foreign-key checks, and the
+          foreign_keys PRAGMA via connect_call_use_foreign_keys
+        - Native database backup; DateTime::Format::SQLite for inflation
+        - DBIO::SQLite::SQLMaker (no SELECT ... FOR UPDATE on SQLite)
+    * Deploy / DDL / Introspect / Diff
+        - DBIO::SQLite::Deploy: install/diff/apply/upgrade via
+          test-deploy-and-compare against an in-memory :memory: target
+        - DBIO::SQLite::DDL: generate DDL from Result classes, with
+          INTEGER PRIMARY KEY AUTOINCREMENT inline and CREATE VIEW output
+        - DBIO::SQLite::Introspect: read schema via sqlite_master and
+          PRAGMA (tables, columns, indexes, foreign keys)
+        - DBIO::SQLite::Diff: table/column/index diffing with columns
+          inlined on CREATE TABLE and drop-then-create on index changes
+    * Result / shortcuts
+        - DBIO::SQLite::Result component with sqlite_index declaration
+        - use DBIO Schema => -sqlite shortcut to pin the SQLite storage
+    * Misc
+        - AccessBroker support for SQLite connections
+        - Requires Perl 5.36+ and DBD::SQLite

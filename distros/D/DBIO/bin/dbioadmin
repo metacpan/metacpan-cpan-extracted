@@ -1,0 +1,412 @@
+#!/usr/bin/env perl
+# PODNAME: dbioadmin
+# ABSTRACT: CLI for DBIO schema administration
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+sub usage {
+  my ($exit_code) = @_;
+  $exit_code = 1 unless defined $exit_code;
+
+  print <<'USAGE';
+Usage: dbioadmin [OPTIONS]
+
+Actions (pick one):
+  --create            Create DDL files / diffs
+  --upgrade           Upgrade the database to the current schema
+  --install           Install schema version metadata
+  --deploy            Deploy the schema to the database
+  --select            Select data from a resultset
+  --insert            Insert data into a resultset
+  --update            Update rows in a resultset
+  --delete            Delete rows from a resultset
+  --op=ACTION         Compatibility alias for action flags
+
+Arguments:
+  --schema-class=CLASS  Schema class (required)
+  --schema=CLASS        Alias for --schema-class
+  --connect=JSON        connect_info as JSON, e.g. ["dsn","user","pass",{}]
+  --connect-info        connect_info as key=value pairs (dsn=... user=...)
+  --config=FILE         Config file parsable by Config::Any
+  --config-stanza=PATH  Stanza path for connect_info (e.g. Model::DB)
+  --resultset=CLASS     Resultset to operate on for select/insert/update/delete
+  --class=CLASS         Alias for --resultset
+  --sql-dir=DIR         SQL directory for create/upgrade/deploy
+  --sql-type=TYPE       SQL translator type for create
+  --version=VERSION     Version for install
+  --preversion=VERSION  Previous version for create-diff
+  --mode=MODE           upgrade mode: auto|native|legacy (default: auto)
+  --set=JSON            JSON payload for insert/update
+  --attrs=JSON          JSON attrs hash for search
+  --where=JSON          JSON where hash for search
+  --format=FMT          select output format: tsv|csv (default: tsv)
+  --force               Skip confirmation prompts for destructive actions
+  --trace               Enable DBIO SQL trace output
+  --quiet               Reduce output
+  -I PATH               Prepend PATH to \@INC (repeatable)
+  --help                Show this help
+USAGE
+
+  exit $exit_code;
+}
+
+my %opts;
+my @include_paths;
+
+GetOptions(
+  'create'          => \$opts{create},
+  'upgrade'         => \$opts{upgrade},
+  'install'         => \$opts{install},
+  'deploy'          => \$opts{deploy},
+  'select'          => \$opts{select},
+  'insert'          => \$opts{insert},
+  'update'          => \$opts{update},
+  'delete'          => \$opts{delete},
+  'op=s'            => \$opts{op},
+  'schema-class|schema=s' => \$opts{schema_class},
+  'connect=s'       => \$opts{connect},
+  'connect-info=s%' => \$opts{connect_info_hash},
+  'config|config-file=s' => \$opts{config_file},
+  'config-stanza=s' => \$opts{config_stanza},
+  'resultset|resultset-class|class=s' => \$opts{resultset},
+  'sql-dir=s'       => \$opts{sql_dir},
+  'sql-type=s'      => \$opts{sql_type},
+  'version=s'       => \$opts{version},
+  'preversion=s'    => \$opts{preversion},
+  'mode=s'          => \$opts{mode},
+  'set=s'           => \$opts{set},
+  'attrs=s'         => \$opts{attrs},
+  'where=s'         => \$opts{where},
+  'format=s'        => \$opts{format},
+  'force'           => \$opts{force},
+  'trace'           => \$opts{trace},
+  'quiet'           => \$opts{quiet},
+  'I=s@'            => \@include_paths,
+  'help'            => \$opts{help},
+) or usage(1);
+
+usage(0) if $opts{help};
+
+if (@include_paths) {
+  require lib;
+  lib->import(@include_paths);
+}
+
+require DBIO::Admin;
+
+my $action;
+for my $act (qw(create upgrade install deploy select insert update delete)) {
+  if ($opts{$act}) {
+    die "Multiple actions specified\n" if $action;
+    $action = $act;
+  }
+}
+
+if ($opts{op}) {
+  die "Multiple actions specified\n" if $action;
+  $action = $opts{op};
+}
+
+die "No action specified. Use --help for usage.\n" unless $action;
+die "No --schema-class specified. Use --help for usage.\n" unless $opts{schema_class};
+
+my %admin_args = (schema_class => $opts{schema_class});
+
+if ($opts{connect}) {
+  $admin_args{connect_info} = $opts{connect};
+}
+elsif ($opts{connect_info_hash}) {
+  $admin_args{connect_info} = $opts{connect_info_hash};
+}
+
+for my $key (qw(config_file config_stanza resultset sql_dir sql_type
+                version preversion mode set attrs where force trace quiet)) {
+  $admin_args{$key} = $opts{$key} if defined $opts{$key};
+}
+
+my $admin = DBIO::Admin->new(%admin_args);
+print "Performing action $action...\n" if !$opts{quiet};
+
+my $res = eval { $admin->$action(); };
+if (my $err = $@) {
+  die $err;
+}
+
+if ($action eq 'select') {
+  my $format = lc($opts{format} || 'tsv');
+  die "Invalid --format '$format' (expected tsv|csv)\n"
+    unless $format =~ /\A(?:tsv|csv)\z/;
+
+  if ($format eq 'tsv') {
+    for my $row (@{$res||[]}) {
+      my @vals = map { defined $_ ? $_ : '' } @$row;
+      print join("\t", @vals), "\n";
+    }
+  }
+  else {
+    require Text::CSV;
+    my $csv = Text::CSV->new({ binary => 1 })
+      or die "Failed to create Text::CSV object\n";
+    for my $row (@{$res||[]}) {
+      $csv->combine(map { defined $_ ? $_ : '' } @$row);
+      print $csv->string, "\n";
+    }
+  }
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dbioadmin - CLI for DBIO schema administration
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 SYNOPSIS
+
+    dbioadmin --schema-class=MyApp::Schema \
+              --connect='["dbi:Pg:dbname=myapp","user","pass",{}]' \
+              --deploy
+
+    dbioadmin --schema-class=MyApp::Schema \
+              --connect='["dbi:Pg:dbname=myapp","user","pass",{}]' \
+              --upgrade
+
+    dbioadmin --schema-class=MyApp::Schema \
+              --connect='["dbi:Pg:dbname=myapp","user","pass",{}]' \
+              --create --sql-dir=./sql --sql-type=PostgreSQL
+
+    dbioadmin --schema-class=MyApp::Schema \
+              --connect='["dbi:Pg:dbname=myapp","user","pass",{}]' \
+              --select --resultset=User --where='{"active":1}'
+
+    dbioadmin --schema-class=MyApp::Schema \
+              --connect='["dbi:Pg:dbname=myapp","user","pass",{}]' \
+              --insert --resultset=User --set='{"name":"Alice","email":"alice@example.com"}'
+
+    dbioadmin --schema-class=MyApp::Schema \
+              --connect='["dbi:Pg:dbname=myapp","user","pass",{}]' \
+              --delete --resultset=User --where='{"active":0}' --force
+
+=head1 DESCRIPTION
+
+C<dbioadmin> is the CLI frontend for L<DBIO::Admin>. It connects to a
+database using a DBIO schema class and performs administrative operations:
+DDL generation, schema deployment and upgrade, and basic data manipulation.
+
+For programmatic use, see L<DBIO::Admin>.
+
+=head1 OPTIONS
+
+=head2 Actions
+
+Exactly one action must be specified per invocation.
+
+=over 4
+
+=item B<--deploy>
+
+Deploy the schema to the database. Runs C<CREATE TABLE> statements for all
+result sources defined in the schema class.
+
+=item B<--upgrade>
+
+Upgrade the database to the current schema version. The upgrade strategy is
+controlled by C<--mode>.
+
+=item B<--create>
+
+Generate DDL files (and optionally diff files) into C<--sql-dir>. Requires
+C<--sql-dir>. Pass C<--preversion> to generate a diff from a previous version.
+
+=item B<--install>
+
+Install schema version metadata into the database without running DDL. Use
+C<--version> to specify the version to record.
+
+=item B<--select>
+
+Select rows from a resultset and print them to stdout. Use C<--where> to
+filter and C<--attrs> for additional search attributes. Output format is
+controlled by C<--format>.
+
+=item B<--insert>
+
+Insert a row into a resultset. Requires C<--resultset> and C<--set>.
+
+=item B<--update>
+
+Update rows in a resultset. Requires C<--resultset> and C<--set>. Use
+C<--where> to restrict which rows are affected. Prompts for confirmation
+unless C<--force> is given.
+
+=item B<--delete>
+
+Delete rows from a resultset. Requires C<--resultset>. Use C<--where> to
+restrict which rows are deleted. Prompts for confirmation unless C<--force>
+is given.
+
+=item B<--op=ACTION>
+
+Compatibility alias for the action flags above. C<--op=deploy> is equivalent
+to C<--deploy>.
+
+=back
+
+=head2 Connection
+
+=over 4
+
+=item B<--schema-class=CLASS> (required)
+
+The DBIO schema class to load, e.g. C<MyApp::Schema>.
+
+=item B<--schema=CLASS>
+
+Alias for C<--schema-class>.
+
+=item B<--connect=JSON>
+
+Connection info as a JSON array, e.g.
+C<'["dbi:Pg:dbname=myapp","user","pass",{}]'>. The four elements are DSN,
+username, password, and DBI attributes.
+
+=item B<--connect-info key=value>
+
+Connection info as individual key-value pairs. Pass multiple times:
+C<--connect-info dsn=dbi:Pg:dbname=myapp --connect-info user=me>.
+
+=item B<--config=FILE>
+
+Config file parseable by L<Config::Any> (YAML, JSON, etc.). Used together
+with C<--config-stanza> to locate connection info.
+
+=item B<--config-stanza=PATH>
+
+Path within the config file to the connection info, using C<::> as separator,
+e.g. C<Model::DB>.
+
+=back
+
+=head2 Schema and Resultset
+
+=over 4
+
+=item B<--resultset=CLASS>
+
+Resultset (source name) to operate on for C<--select>, C<--insert>,
+C<--update>, and C<--delete>, e.g. C<User>.
+
+=item B<--class=CLASS>
+
+Alias for C<--resultset>.
+
+=item B<--where=JSON>
+
+JSON hash used as the C<WHERE> condition for C<--select>, C<--update>, and
+C<--delete>, e.g. C<'{"active":1}'>.
+
+=item B<--set=JSON>
+
+JSON hash of column values for C<--insert> and C<--update>,
+e.g. C<'{"name":"Alice"}'>.
+
+=item B<--attrs=JSON>
+
+JSON hash of search attributes (C<order_by>, C<columns>, etc.) for
+C<--select> and C<--delete>.
+
+=back
+
+=head2 DDL Options
+
+=over 4
+
+=item B<--sql-dir=DIR>
+
+Directory for reading and writing SQL files. Required for C<--create>;
+optional for C<--upgrade> and C<--deploy>.
+
+=item B<--sql-type=TYPE>
+
+SQL translator type for C<--create>, e.g. C<PostgreSQL>, C<MySQL>, C<SQLite>.
+
+=item B<--version=VERSION>
+
+Version string to record when using C<--install>.
+
+=item B<--preversion=VERSION>
+
+Previous version when generating a diff with C<--create>.
+
+=item B<--mode=MODE>
+
+Upgrade strategy. One of C<auto> (default), C<native>, or C<legacy>.
+C<auto> uses a native driver upgrade path when available and falls back to
+the legacy C<DBIO::Schema::Versioned> path otherwise. C<native> requires
+native driver support. C<legacy> requires C<DBIO::Schema::Versioned>.
+
+=back
+
+=head2 Output and Misc
+
+=over 4
+
+=item B<--format=FMT>
+
+Output format for C<--select>: C<tsv> (tab-separated, default) or C<csv>
+(requires L<Text::CSV>).
+
+=item B<--force>
+
+Skip confirmation prompts for destructive operations (C<--update>,
+C<--delete>, C<--install> with C<--force>).
+
+=item B<--trace>
+
+Enable DBIO SQL trace output (prints all generated SQL to stderr).
+
+=item B<--quiet>
+
+Suppress informational output.
+
+=item B<-I PATH>
+
+Prepend C<PATH> to C<@INC> before loading the schema class. May be given
+multiple times.
+
+=item B<--help>
+
+Print a usage summary and exit.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBIO::Admin>, L<dbiogen>
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

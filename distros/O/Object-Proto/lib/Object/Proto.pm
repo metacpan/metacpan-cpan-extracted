@@ -1,7 +1,7 @@
 package Object::Proto;
 use strict;
 use warnings;
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use DynaLoader;
 our @ISA = ('DynaLoader');
@@ -1182,7 +1182,7 @@ Multiple modifiers can be stacked:
 
 =head1 AUTHOR
 
-LNATION E<email@lnation.org>
+LNATION C<< <email@lnation.org> >>
 
 =head1 LICENSE
 

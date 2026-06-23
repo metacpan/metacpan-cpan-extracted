@@ -1,0 +1,51 @@
+# Reference manifest for manual debugging.
+# The actual pods are created programmatically via IO::K8s objects.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/mysql-pod.yaml -n dbic-test-xxx
+#   kubectl port-forward -n dbic-test-xxx svc/mysql-svc 3306:3306
+#   DBICTEST_MYSQL_DSN='dbi:mysql:database=dbic_test;host=127.0.0.1;port=3306' \
+#     DBICTEST_MYSQL_USER=root DBICTEST_MYSQL_PASS=dbictest \
+#     prove -l t/71mysql.t
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+    role: dbic-test-db
+spec:
+  containers:
+    - name: mysql
+      image: mysql:8.0
+      ports:
+        - containerPort: 3306
+      env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: dbictest
+        - name: MYSQL_DATABASE
+          value: dbic_test
+      readinessProbe:
+        exec:
+          command:
+            - mysqladmin
+            - ping
+            - -h
+            - localhost
+        initialDelaySeconds: 10
+        periodSeconds: 3
+        timeoutSeconds: 2
+        failureThreshold: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-svc
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP

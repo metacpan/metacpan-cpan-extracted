@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make)",
+      "Bash(RPI_RTC=1 perl -Mblib t/50-temp.t)"
+    ]
+  }
+}

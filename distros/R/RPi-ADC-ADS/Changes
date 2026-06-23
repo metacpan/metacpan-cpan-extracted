@@ -1,5 +1,31 @@
 Revision history for Perl extension RPi::ADC::ADS
 
+1.03    2026-06-22
+        - Added conversion averaging. volts(), percent() and raw() take an
+          optional trailing $samples count, and new(samples => N) / samples()
+          set a per-object default (default 1 = unchanged single-read
+          behaviour). The mean of N conversions is computed in the XS over a
+          single i2c bus session, which recovers a stable reading from a noisy
+          or ripple-laden input (e.g. an RC-filtered PWM feedback signal) far
+          more cheaply than N separate reads
+        - Fix unused read() calls warning
+        - fetch() now retries a conversion on a transient i2c error (e.g. the
+          Pi's intermittent EREMOTEIO) instead of aborting, bailing only if the
+          bus stays unresponsive past MAX_I2C_ATTEMPTS. Without this, the new
+          read-return checks turned an occasional bus glitch into a hard exit,
+          which averaging (many conversions per call) made likely
+        - Fixed new() ignoring the gain => argument: it passed $args{mode} to
+          gain() instead of $args{gain}, so a gain => in the constructor was
+          dropped and a mode => corrupted the gain. Added t/02-new_gain.t
+        - volts() and percent() now scale by the programmed PGA full-scale
+          range instead of a constant 4.096V, so they are correct at any gain
+          (previously every non-default gain was mis-scaled). The PGA is read
+          from the config register; default-gain (1, +/-4.096V) output is
+          unchanged. Added t/41-volts_gain.t
+        - Doc fixes: corrected the GAIN AMPLIFIER table (gain 3 is +/-1.024V,
+          was +/-2.024V) and the differential-MUX binary comment for channel 5
+          (0x1000 is 00010000, was 00100000)
+
 1.02    2017-07-20
         - if in single-ended mode, we now return 0 for all fetch methods, as
           sometimes a single-ended check can result in a negative number

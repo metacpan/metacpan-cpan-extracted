@@ -140,21 +140,23 @@ typedef void (*s_bsdipa_io_gut_fun)(struct s_bsdipa_io_cookie *io_cookie);
 
 # ifdef s_BSDIPA_IO_WRITE
 /* I/O write hook.
- * If is_last is set the hook will not be called again; in this case len may be 0.
- * If try_oneshot was given to an I/O layer to which it matters it will try to invoke the hook only once;
- * if a negative try_oneshot was given, and if the layer succeeds to comply, then is_last will also be
- * negative and the ownership of dat is transferred to the hook by definition -- and only then:
- * in fact the absolute value of is_last is the buffer size, of which len bytes are useful;
- * Note that *only* in this case the buffer size is at least one greater than len! */
+ * If is_last is set the hook will not be called again; in this case len may be 0. */
 typedef enum s_bsdipa_state (*s_bsdipa_io_write_ptf)(void *hook_cookie, uint8_t const *dat, s_bsdipa_off_t len,
 		s_bsdipa_off_t is_last);
+
+/* I/O write function, as provided by the I/O layer.
+ * If try_oneshot was given to an I/O layer to which it matters it will try to invoke the hook only once;
+ * if a negative try_oneshot was given, and if the layer succeeds to comply, then the hook's is_last will also
+ * be negative and the ownership of dat is transferred to the hook by definition -- and only then:
+ * in fact the absolute value of is_last is the buffer size, of which len bytes are useful;
+ * Note that *only* in this case the buffer size is at least one greater than len! */
 typedef enum s_bsdipa_state (*s_bsdipa_io_write_fun)(struct s_bsdipa_diff_ctx const *dcp,
 		s_bsdipa_io_write_ptf hook, void *hook_cookie, int try_oneshot,
 		struct s_bsdipa_io_cookie *io_cookie_or_null);
 # endif
 
 # ifdef s_BSDIPA_IO_READ
-/* I/O read hook.
+/* I/O read function, as provided by the I/O layer.
  * It is assumed that pcp->pc_patch_dat and .pc_patch_len represent the entire (constant) patch data.
  * Output is allocated via .pc_mem, and stored in .pc_restored_dat and .pc_restored_len as a continuous chunk.
  * .pc_max_allowed_restored_len must also be set as it is already evaluated as documented.

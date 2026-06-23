@@ -38,26 +38,44 @@
 #define RTC_AM_PM   0x05
 #define RTC_12_24   0x06
 
+/* ---------- BCD field helpers (single source of BCD policy) ----------
+ * DS3231 time/date registers hold BCD values, some sharing a register with
+ * flag bits (Month 0x05 bit7 = Century; Hours 0x02 bits6-5 = 12/24 + AM/PM).
+ * Every BCD read/write routes through these two, so encoding can never be
+ * applied inconsistently (the bug that produced raw-not-BCD month/hour writes).
+ *   setBcdField: preserve the `keep` bits, BCD-encode `value` into the rest.
+ *   getBcdField: read `mask` bits, BCD-decode.
+ * Masks are per the DS3231 datasheet (Rev 2; 6/05, Figure 1).
+ */
+int setBcdField (int fd, int reg, int value, int keep, char* name){
+    int preserved = getRegister(fd, reg) & keep;
+    return setRegister(fd, reg, preserved | dec2bcd(value), name);
+}
+
+int getBcdField (int fd, int reg, int mask){
+    return bcd2dec(getRegister(fd, reg) & mask);
+}
+
 int getSeconds (int fd){
-    return bcd2dec(getRegister(fd, RTC_SEC));
+    return getBcdField(fd, RTC_SEC, 0x7F);
 }
 
 void setSeconds (int fd, int value){
     if (value < 0 || value > 59){
         croak("seconds parameter out of bounds. Must be between 0-59\n");
     }
-    setRegister(fd, RTC_SEC, dec2bcd(value), "seconds");
+    setBcdField(fd, RTC_SEC, value, 0x00, "seconds");
 }
 
 int getMinutes (int fd){
-    return bcd2dec(getRegister(fd, RTC_MIN));
+    return getBcdField(fd, RTC_MIN, 0x7F);
 }
 
 void setMinutes (int fd, int value){
     if (value < 0 || value > 59){
         croak("minutes parameter out of bounds. Must be between 0-59\n");
     }
-    setRegister(fd, RTC_MIN, dec2bcd(value), "minutes");
+    setBcdField(fd, RTC_MIN, value, 0x00, "minutes");
 }
 
 int getHour (int fd){
@@ -87,7 +105,8 @@ void setHour (int fd, int value){
 
             croak(error);
         }
-        setRegisterBits(fd, RTC_HOUR, 0, 5, value, "hour");
+        /* 12-h: keep bit6 (12/24 select) + bit5 (AM/PM); BCD hour into bits0-4 */
+        setBcdField(fd, RTC_HOUR, value, 0x60, "hour");
     }
     else {
         // 24 hour clock
@@ -99,8 +118,8 @@ void setHour (int fd, int value){
 
             croak(error);
         }
-        value = dec2bcd(value);
-        setRegister(fd, RTC_HOUR, value, "hour");
+        /* 24-h: full BCD (bit6 = 0 selects 24-hour) */
+        setBcdField(fd, RTC_HOUR, value, 0x00, "hour");
     }
 }
 
@@ -115,11 +134,11 @@ void setDayOfWeek (int fd, int value){
         croak("Day of week (%d) out of bounds. Must be 1-7 (Mon-Sun)\n", value);
     }
 
-    setRegister(fd, RTC_WDAY, dec2bcd(value), "wday");
+    setBcdField(fd, RTC_WDAY, value, 0x00, "wday");
 }
 
 int getDayOfMonth (int fd){
-    return(bcd2dec(getRegister(fd, RTC_MDAY)));
+    return getBcdField(fd, RTC_MDAY, 0x3F);
 }
 
 void setDayOfMonth (int fd, int value){
@@ -128,14 +147,11 @@ void setDayOfMonth (int fd, int value){
         croak("Month day (%d) out of range. Must be between 1-31\n", value);
     }
 
-    setRegister(fd, RTC_MDAY, dec2bcd(value), "dayofmonth");
+    setBcdField(fd, RTC_MDAY, value, 0x00, "dayofmonth");
 }
 
 int getMonth (int fd){
-
-    int regVal = getRegister(fd, RTC_MONTH);
-    int century = regVal & 0b10000000;
-    return bcd2dec(regVal & 0b01111111);
+    return getBcdField(fd, RTC_MONTH, 0x1F);
 }
 
 void setMonth (int fd, int value){
@@ -144,11 +160,12 @@ void setMonth (int fd, int value){
         croak("Month (%d) out of range. Must be between 1-12\n", value);
     }
 
-    setRegisterBits(fd, RTC_MONTH, 0, 7, value, "month");
+    /* keep bit7 (Century); BCD month into bits0-4 */
+    setBcdField(fd, RTC_MONTH, value, 0x80, "month");
 }
 
 int getYear (int fd){
-    return bcd2dec(getRegister(fd, RTC_YEAR)) + 2000;
+    return getBcdField(fd, RTC_YEAR, 0xFF) + 2000;
 }
 
 void setYear (int fd, int value){
@@ -159,7 +176,7 @@ void setYear (int fd, int value){
 
     int year = value - 2000;
 
-    setRegister(fd, RTC_YEAR, dec2bcd(year), "year");
+    setBcdField(fd, RTC_YEAR, year, 0x00, "year");
 }
 
 float getTemp (int fd){
@@ -167,7 +184,10 @@ float getTemp (int fd){
     int msb = getRegister(fd, RTC_TEMP_MSB);
     int lsb = getRegister(fd, RTC_TEMP_LSB);
 
-    float celcius = ((((short)msb << 8) | (short)lsb) >> 6) / 4.0;
+    /* 0x11 is a signed 8-bit two's-complement integer (deg C); 0x12 bits 7-6
+       are the 0.25-deg fraction. Read the MSB as int8_t so sub-zero temps
+       sign-extend correctly (DS3231 Rev 2 temperature registers). */
+    float celcius = (int8_t)msb + (lsb >> 6) * 0.25;
 
     return celcius;
 }

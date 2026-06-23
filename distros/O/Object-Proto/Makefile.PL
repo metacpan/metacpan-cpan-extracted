@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Object/Proto.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.010000',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     OBJECT           => 'object$(OBJ_EXT)',
     C                => ['object.c'],
     XS               => {},

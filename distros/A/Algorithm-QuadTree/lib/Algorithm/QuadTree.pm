@@ -1,5 +1,5 @@
 package Algorithm::QuadTree;
-$Algorithm::QuadTree::VERSION = '0.7';
+$Algorithm::QuadTree::VERSION = '0.8';
 use strict;
 use warnings;
 use Carp;

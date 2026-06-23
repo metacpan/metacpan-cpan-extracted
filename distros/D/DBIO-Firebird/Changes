@@ -1,0 +1,38 @@
+Revision history for DBIO-Firebird
+
+0.900000  2026-06-23
+    First release. Firebird and InterBase database driver for DBIO.
+
+    * Storage
+        - DBD::Firebird storage (driver "Firebird") and DBD::InterBase
+          storage variant (driver "InterBase"), auto-detected from the DSN
+        - shared Firebird/InterBase storage base with generator-based
+          autoincrement, savepoint support, and server-version detection
+        - ODBC connection variant supported via the InterBase storage path
+        - softcommit and datetime connect-calls, SQL dialect 3 forcing
+        - quoted identifiers and INSERT ... RETURNING
+
+    * SQLMaker
+        - Firebird FIRST/SKIP limit dialect via apply_limit
+
+    * Schema component and shortcut
+        - DBIO::Firebird schema component pinning the storage type
+        - "use DBIO -fb" shortcut (DBIO::Shortcut::fb)
+
+    * Types and DateTime
+        - Firebird type-system mapping for introspection and DDL
+        - DateTime formatter for Firebird / InterBase
+
+    * Introspection
+        - native introspection via RDB$ system tables: tables, columns,
+          indexes, foreign keys, and unique constraints
+
+    * DDL and deploy
+        - native DDL generation from DBIO Result classes, deduping sources
+          that share a physical table, skipping subquery/view sources,
+          dereferencing literal table names, and emitting CREATE VIEW for
+          non-virtual views
+        - desired-state deploy and upgrade via test-deploy-and-compare
+
+    * Diff
+        - native model diff for tables, columns, and indexes

@@ -57,12 +57,27 @@ setting('workers')->{'no_manager'} = 1
 # so we parse the field ourselves.
 my $max_workers = parse_max_workers( setting('workers')->{tasks} ) || 0;
 
+my @task_names   = qw/ scheduler manager poller /;
+my @task_workers = ( 1, 1, $max_workers );
+my @task_roles   = (_mk_wkr('Scheduler'), _mk_wkr('Manager'), _mk_wkr('Poller'));
+
+if (!defined setting('schedule')) {
+  shift @task_names; shift @task_workers; shift @task_roles;
+}
+
+warning sprintf "mode: %s%s | host: %s",
+  (!defined setting('schedule') ? 'worker-only'
+   : $max_workers == 0          ? 'scheduler'
+   :                              'scheduler+worker'),
+  ($max_workers ? " | workers: $max_workers" : ''),
+  (setting('workers')->{'BACKEND'} || 'unknown');
+
 mce_flow {
-  task_name => [qw/ scheduler manager poller /],
-  max_workers => [ 1, 1, $max_workers ],
-  tmp_dir => $tmp_dir,
+  task_name    => \@task_names,
+  max_workers  => \@task_workers,
+  tmp_dir      => $tmp_dir,
   on_post_exit => sub { MCE->restart_worker },
-}, _mk_wkr('Scheduler'), _mk_wkr('Manager'), _mk_wkr('Poller');
+}, @task_roles;
 
 sub _mk_wkr {
   my $role = shift;

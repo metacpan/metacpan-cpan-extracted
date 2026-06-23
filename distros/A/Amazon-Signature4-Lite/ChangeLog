@@ -1,3 +1,16 @@
+Mon Jun 22 13:08:08 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* VERSION: bump
+	* release-notes.md: new
+	* release-notes/release-notes-1.0.1.md: new
+	* lib/Amazon/Signature4/Lite.pm.in
+	(sign)
+	- + add_sha256_header option (default: true)
+	- path must at least '/'
+	- optionally add x-amz-content-sha256 (required for s3)
+	- make sure query values are unescaped before escaping them
+
 Thu Apr 30 16:44:05  Rob Lauer  rclauer@gmail.com
 
 	[1.0.0]:

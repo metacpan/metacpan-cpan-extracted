@@ -3,7 +3,7 @@ package Markdown::Simple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 use Exporter ();
 our @ISA = qw(Exporter);
 
@@ -24,7 +24,7 @@ Markdown::Simple - Markdown to HTML
 
 =head1 VERSION
 
-Version 0.11
+Version 0.15
 
 =cut
 

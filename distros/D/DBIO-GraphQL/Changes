@@ -1,0 +1,38 @@
+Revision history for DBIO-GraphQL
+
+0.900000  2026-06-23
+    First release. Auto-generate an executable GraphQL schema from a connected DBIO schema.
+
+    * Schema generation
+        - DBIO::GraphQL->to_graphql($schema) introspects every source and
+          returns an executable GraphQL::Schema with object types and
+          relationship fields
+        - One scalar field per column, typed (Int/Float/Boolean/String) from
+          the column's data_type
+        - Relationship fields: has_many resolves to a list, belongs_to and
+          might_have to a single object
+        - Composite primary keys supported throughout
+
+    * Queries
+        - Root Query with singular lookups and plural allXs queries
+        - Nested per-column filtering (eq/not/gt/gte/lt/lte/in/like/contains/
+          startsWith/endsWith/isNull) with recursive AND/OR combinators,
+          mirroring the DBIO search-condition format
+        - Per-scalar typed input filters (IntFilter, FloatFilter,
+          StringFilter, BoolFilter); operator set follows the column type
+        - Ordering (ASC/DESC) and both offset (page) and cursor pagination
+
+    * Mutations
+        - Root Mutation with createX, updateX, and deleteX per source
+
+    * Architecture
+        - Thin orchestrator over four focused modules: DBIO::GraphQL::ScalarMap
+          (data_type to GraphQL scalar), DBIO::GraphQL::Filter (with ::Search
+          and ::Null adapters, per-source filter input),
+          DBIO::GraphQL::Relationship (relationship field resolution with
+          strict relationship_info contract validation), and
+          DBIO::GraphQL::Mutation
+
+    * Acknowledgements
+        - DBIO port of DBIx::Class::Schema::GraphQL by Mohammad Sajid Anwar
+          (MANWAR); see ACKNOWLEDGEMENTS in the POD

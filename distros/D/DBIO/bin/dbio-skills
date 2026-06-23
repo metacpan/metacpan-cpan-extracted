@@ -1,0 +1,266 @@
+#!/usr/bin/env perl
+# ABSTRACT: List or deploy the DBIO agent skills available to your app
+# PODNAME: dbio-skills
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Path qw(make_path);
+use File::Spec;
+use Cwd ();
+
+use DBIO::Skills ();
+
+Getopt::Long::Configure('bundling');
+
+my @modules;
+my ($deploy, $all, $force, $list, $dir);
+GetOptions(
+  'M|module=s@' => \@modules,
+  'deploy'      => \$deploy,
+  'all'         => \$all,
+  'force'       => \$force,
+  'list'        => \$list,
+  'dir=s'       => \$dir,
+) or die "Usage: dbio-skills [-MModule ...] [--all] [--deploy [--dir PATH] [--force]] [skill ...]\n";
+
+my @filters = @ARGV;
+
+# --- Load the requested modules and register the distributions they imply ---
+
+for my $mod (@modules) {
+  load_module($mod);
+  register_module($mod);
+}
+
+# Pick up any DBIO drivers that loading the above dragged in (e.g. a schema
+# that does `use DBIO -pg` will have loaded DBIO::PostgreSQL::Storage).
+for my $inc (keys %INC) {
+  next unless $inc =~ m{\ADBIO/([^/]+)\.pm\z};
+  my $name = $1;
+  DBIO::Skills->register_dist("DBIO-$name")
+    if $INC{"DBIO/$name/Storage.pm"};
+}
+
+register_all_installed() if $all;
+
+# --- Resolve the set of skills we will act on ---
+
+my @available = DBIO::Skills->skills;
+
+my @selected;
+if (@filters) {
+  my %want = map { DBIO::Skills->canonical_name($_) => 1 } @filters;
+  @selected = grep { $want{$_} } @available;
+  for my $f (@filters) {
+    my $c = DBIO::Skills->canonical_name($f);
+    warn "No such skill available: $f (looked for '$c')\n"
+      unless grep { $_ eq $c } @available;
+  }
+} else {
+  @selected = @available;
+}
+
+unless (@selected) {
+  die "No skills available. Did you name a DBIO module with -M (or pass --all)?\n";
+}
+
+# --- List (default) or deploy ---
+
+if (!$deploy) {
+  print "$_\n" for @selected;
+  exit 0;
+}
+
+my $target = $dir
+  ? File::Spec->rel2abs($dir)
+  : File::Spec->catdir(Cwd::cwd(), '.claude', 'skills');
+
+my ($wrote, $skipped) = (0, 0);
+for my $name (@selected) {
+  my $markdown = DBIO::Skills->skill($name);
+  unless (defined $markdown) {
+    warn "Skipping $name: no content found\n";
+    next;
+  }
+
+  my $skill_dir = File::Spec->catdir($target, $name);
+  my $file      = File::Spec->catfile($skill_dir, 'SKILL.md');
+
+  if (-e $file && !$force) {
+    print "exists  $name (use --force to overwrite)\n";
+    $skipped++;
+    next;
+  }
+
+  make_path($skill_dir) unless -d $skill_dir;
+  open my $fh, '>:encoding(UTF-8)', $file
+    or die "Cannot write $file: $!\n";
+  print {$fh} $markdown;
+  close $fh;
+
+  print "deploy  $name\n";
+  $wrote++;
+}
+
+print "\n$wrote written, $skipped skipped -> $target\n";
+exit 0;
+
+# --- helpers ---
+
+# Runtime-load a user-named module by translating it to a path. This is
+# legitimate runtime plugin loading (the module is only known at run time),
+# not lazy `require`.
+sub load_module {
+  my ($mod) = @_;
+  $mod =~ /\A[A-Za-z_][\w:]*\z/
+    or die "Invalid module name: $mod\n";
+  (my $file = $mod) =~ s{::}{/}g;
+  require "$file.pm";
+  return $mod;
+}
+
+# Register whatever distribution a loaded module implies.
+sub register_module {
+  my ($mod) = @_;
+
+  # Bare driver module: DBIO::Oracle -> DBIO-Oracle
+  if ($mod =~ /\ADBIO::([^:]+)\z/) {
+    DBIO::Skills->register_dist("DBIO-$1");
+  }
+
+  # Deeper DBIO class: DBIO::Oracle::Storage -> DBIO-Oracle
+  DBIO::Skills->register_class($mod);
+
+  # Schema class: derive the driver from storage_type without connecting.
+  if ($mod->can('isa') && $mod->isa('DBIO::Schema')) {
+    my $st = $mod->storage_type;
+    if (defined $st && !ref $st) {
+      (my $sc = $st) =~ s/\A\+//;
+      $sc =~ s/\A::/DBIO::Storage::/;
+      DBIO::Skills->register_class($sc);
+    }
+  }
+}
+
+# Discover every installed DBIO distribution by scanning the installed
+# sharedirs (auto/share/dist/DBIO-*), and register each.
+sub register_all_installed {
+  my %seen;
+  for my $inc (@INC) {
+    next if ref $inc;
+    my $base = File::Spec->catdir($inc, qw(auto share dist));
+    opendir my $dh, $base or next;
+    for my $entry (readdir $dh) {
+      next unless $entry =~ /\ADBIO-/;
+      next if $seen{$entry}++;
+      DBIO::Skills->register_dist($entry)
+        if -d File::Spec->catdir($base, $entry);
+    }
+    closedir $dh;
+  }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dbio-skills - List or deploy the DBIO agent skills available to your app
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 SYNOPSIS
+
+    # List every skill exposed by your schema and its driver(s)
+    dbio-skills -MMyApp::Schema
+
+    # Deploy them into ./.claude/skills/ so an agent finds them in this project
+    dbio-skills -MMyApp::Schema --deploy
+
+    # Deploy a single skill, overwriting an existing copy
+    dbio-skills -MMyApp::Schema --deploy --force postgresql-database
+
+    # Deploy skills from every installed DBIO distribution
+    dbio-skills --all --deploy
+
+    # Load several modules and deploy into a custom directory
+    dbio-skills -MDBIO::PostgreSQL -MDBIO::SQLite --deploy --dir /tmp/skills
+
+=head1 DESCRIPTION
+
+Each DBIO distribution ships the agent skills it owns in its sharedir (see
+L<DBIO::Skills> and L<Dist::Zilla::Plugin::DBIO::GatherSkills>). C<dbio-skills>
+loads the modules you name, works out which DBIO distributions are therefore in
+play, and either lists their bundled skills or writes them into a
+C<.claude/skills/> tree so a coding agent picks them up in your own project.
+
+The driver behind a schema is resolved from its C<storage_type> B<without
+connecting to a database>, so C<-MMyApp::Schema> is enough to expose that
+schema's driver skills.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-M>I<Module>, B<--module>=I<Module>
+
+Load I<Module> (repeatable). A schema class contributes its driver's skills; a
+driver module (e.g. C<DBIO::PostgreSQL>) contributes its own.
+
+=item B<--deploy>
+
+Write the selected skills into the target directory as
+C<< <dir>/<skill-name>/SKILL.md >>. Without this flag the skills are only
+listed.
+
+=item B<--all>
+
+Also expose the skills of B<every installed DBIO distribution> (discovered by
+scanning the installed sharedirs), not just the ones reachable from the loaded
+modules.
+
+=item B<--dir>=I<PATH>
+
+Target directory for C<--deploy>. Defaults to C<.claude/skills> under the
+current working directory.
+
+=item B<--force>
+
+Overwrite an existing C<SKILL.md>. Without it, skills already present in the
+target directory are left untouched.
+
+=item B<--list>
+
+List the available skills (the default when C<--deploy> is not given).
+
+=back
+
+Any non-option arguments are treated as skill-name filters; only matching
+skills are listed or deployed. The leading C<dbio-> is optional.
+
+=head1 SEE ALSO
+
+L<DBIO::Skills>, L<DBIO>, L<dbiogen>
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

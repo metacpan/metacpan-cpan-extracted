@@ -10,6 +10,8 @@
  *@   With s_BSDIPA_32 the overhead can almost be halved.
  *@ - If s_BSDIPA_SMALL is defined, libdivsufsort is not actually used,
  *@   but only the original BSDiff algorithm of Colin Percival.
+ *@ - If s_BSDIPA_TEXT is defined, alternatively selectable text (linewise)
+ *@   differential approach (nothing special, but produces same patch format.)
  *@ - Code requires an ISO STD C99 environment.
  *@
  *@ Changes to original bsdiff / libdivsufsort:
@@ -132,7 +134,7 @@
 #ifndef s_BSDIPA_LIB_H
 #define s_BSDIPA_LIB_H
 
-/* s_BSDIPA_{VERSION,CONTACT} and s_BSDIPA_{32,MAGIC_WINDOW,SMALL}.
+/* s_BSDIPA_{VERSION,CONTACT} and s_BSDIPA_{32,MAGIC_WINDOW,SMALL,TEXT}.
  * The latter series must be tested via defined(). */
 #include <s-bsdipa-config.h>
 
@@ -166,6 +168,11 @@ enum s_bsdipa_state{
 	s_BSDIPA_NOMEM, /* Allocation failure. */
 	s_BSDIPA_INVAL /* Any other error. */
 };
+
+#ifdef s_BSDIPA_TEXT
+/* Only with s_BSDIPA_TEXT; alternative text hasher callback; see s_bsdipa_diff_ctx:dc_text_mode. */
+typedef uint32_t (*s_bsdipa_hash_ptf)(void *user_cookie, uint8_t const *dat, size_t len);
+#endif
 
 /* Memory accessor with two possibilities:
  * - .mc_alloc is not NULL, then .mc_free has to be set, too.
@@ -210,13 +217,23 @@ struct s_bsdipa_diff_ctx{
 	uint64_t dc_before_len;
 	uint8_t const *dc_after_dat; /* New data after changes, plus length. */
 	uint64_t dc_after_len;
+#ifdef s_BSDIPA_TEXT
+	s_bsdipa_hash_ptf dc_hash; /* Only with s_BSDIPA_TEXT; only with .dc_text_mode: optional hasher */
+	void *dc_hash_cookie; /* Only with s_BSDIPA_TEXT; cookie passed through to a set .dc_hash */
+#endif
 	/* Number of bytes in "a window".  If <=0 s_BSDIPA_MAGIC_WINDOW is assigned and used.
 	 * For binary data sizeof(void*) is useful, higher values (16, 32) may benefit text (better).
 	 * "No maximum" (only within 7-bit useful), but note integer overflow checks are *not* performed! */
 	int32_t dc_magic_window;
-	int8_t dc__dummy[3];
+	/* Only checked with s_BSDIPA_TEXT: whether a simple line-based diff instead of BSDiff is to be used.
+	 * Line endings are not normalized!
+	 * If set, .dc_hash is tested and used if set: by default Chris Torek's hash is used, the resulting
+	 * hash is stirred as shown by Bret Mulvey; this achieves good results, but is not proof against
+	 * "algorithmic complexity attacks"; for that algorithms like SipHash have to be used */
+	int8_t dc_text_mode;
+	int8_t dc__dummy[2];
 	/* Outputs: (allocated result data; freed by s_bsdipa_diff_free()). */
-	int8_t dc_is_equal_data; /* Whether .dc_before_dat and .dc_after_dat and their lengths are equal */
+	int8_t dc_is_equal_data; /* Whether .dc_before_dat and .dc_after_dat and their lengths are equal. */
 	s_bsdipa_off_t dc_ctrl_len; /* Sum of dc_ctrl lengths.  (Struct field offset used - do not move!) */
 	s_bsdipa_off_t dc_diff_len; /* Length of .dc_diff_dat. */
 	s_bsdipa_off_t dc_extra_len; /* Length of .dc_extra_dat. */

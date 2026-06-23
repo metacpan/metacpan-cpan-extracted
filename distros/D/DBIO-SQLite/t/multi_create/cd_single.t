@@ -1,0 +1,33 @@
+use strict;
+use warnings;
+
+use Test::More;
+use DBIO::SQLite::Test;
+my $schema = DBIO::SQLite::Test->init_schema();
+
+eval {
+  my $cd = $schema->resultset('CD')->first;
+  my $track = $schema->resultset('Track')->new_result({
+    cd => $cd,
+    title => 'Multicreate rocks',
+    cd_single => {
+      artist => $cd->artist,
+      year => 2008,
+      title => 'Disemboweling MultiCreate',
+    },
+  });
+
+  isa_ok ($track, 'DBIO::Test::Track', 'Main Track object created');
+
+  $track->insert;
+
+  ok(1, 'created track');
+
+  is($track->title, 'Multicreate rocks', 'Correct Track title');
+
+  my $single = $track->cd_single;
+
+  ok($single->cdid, 'Got cdid');
+};
+
+done_testing;

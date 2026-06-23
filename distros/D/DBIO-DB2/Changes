@@ -1,0 +1,41 @@
+Revision history for DBIO-DB2
+
+0.900000  2026-06-23
+    First release. IBM DB2 driver for DBIO with native introspection, diff,
+    DDL generation and test-deploy-and-compare deployment.
+
+    * Storage
+        - DB2 storage driver, autodetected from dbi:DB2: DSNs
+        - -db2 shortcut and DBIO::DB2 schema component pin the driver
+        - DateTime::Format::DB2 datetime parsing, "-quoted identifiers,
+          schema-qualified table references, last_insert_id support
+
+    * SQLMaker
+        - DB2 LIMIT/OFFSET dialect via apply_limit: ROW_NUMBER() OVER()
+          for offset, FETCH FIRST n ROWS ONLY otherwise
+
+    * Introspect (SYSCAT + information_schema)
+        - tables, columns, indexes and foreign keys from SYSCAT
+        - GENERATED AS IDENTITY captured as is_auto_increment for
+          DBIO::Generate
+        - PK-backing index tagged origin=>'pk' so inherited table_uniq_info
+          drops it; built on DBIO::Introspect::Base canonical shape
+
+    * Diff
+        - native DB2 model diff (table/column/index/foreign key) on
+          DBIO::Diff::Op, using changed_column_fields / changed_index_fields
+          / changed_fk_fields from DBIO::Diff::Compare
+        - foreign-key changes on existing tables emitted as ALTER TABLE
+          ADD/DROP CONSTRAINT (drop-then-add for a changed FK)
+
+    * DDL
+        - generate DB2 DDL from Result classes
+        - emit named inline FOREIGN KEY constraints (deterministic
+          fk_<table>_<cols> names) that round-trip through introspection
+        - emit CREATE VIEW for non-virtual views (from view_definition)
+          after all tables
+
+    * Deploy
+        - test-deploy-and-compare deployment on DBIO::Deploy::Base
+          (install/diff/apply/upgrade), with DB2-specific target model
+          built via a throwaway CREATE SCHEMA

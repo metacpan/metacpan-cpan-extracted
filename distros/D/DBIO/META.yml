@@ -1,0 +1,876 @@
+---
+abstract: 'Native relational mapping for Perl, built on DBI'
+author:
+  - 'DBIO & DBIx::Class Authors'
+build_requires:
+  DBD::SQLite: '1.29'
+  File::Temp: '0.22'
+  Package::Stash: '0.28'
+  Test::Deep: '0.101'
+  Test::Exception: '0.31'
+  Test::More: '0.94'
+  Test::Warn: '0.21'
+configure_requires:
+  ExtUtils::MakeMaker: '6.78'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIO
+no_index:
+  namespace:
+    - DBIO::Test::DeployComponent
+    - DBIO::Test::DynamicForeignCols
+    - DBIO::Test::ErrorComponent
+    - DBIO::Test::FakeComponent
+    - DBIO::Test::ForeignComponent
+    - DBIO::Test::Namespace
+    - DBIO::Test::OptionalComponent
+    - DBIO::Test::ResultSetManager
+    - DBIO::Test::Schema
+    - DBIO::Test::SyntaxErrorComponent1
+    - DBIO::Test::SyntaxErrorComponent2
+    - DBIO::Test::SyntaxErrorComponent3
+    - DBIO::Test::Taint
+  package:
+    - DBIO::Test::Storage::FakeCursor
+    - DBIO::Test::Storage::FakeSth
+provides:
+  DBIO:
+    file: lib/DBIO.pm
+    version: '0.900000'
+  DBIO::AccessBroker:
+    file: lib/DBIO/AccessBroker.pm
+    version: '0.900000'
+  DBIO::AccessBroker::HostBound:
+    file: lib/DBIO/AccessBroker/HostBound.pm
+    version: '0.900000'
+  DBIO::AccessBroker::Static:
+    file: lib/DBIO/AccessBroker/Static.pm
+    version: '0.900000'
+  DBIO::AccessBroker::Vault:
+    file: lib/DBIO/AccessBroker/Vault.pm
+    version: '0.900000'
+  DBIO::Adapter::Base:
+    file: lib/DBIO/Adapter/Base.pm
+    version: '0.900000'
+  DBIO::Admin:
+    file: lib/DBIO/Admin.pm
+    version: '0.900000'
+  DBIO::Base:
+    file: lib/DBIO/Base.pm
+    version: '0.900000'
+  DBIO::Cake:
+    file: lib/DBIO/Cake.pm
+    version: '0.900000'
+  DBIO::Candy:
+    file: lib/DBIO/Candy.pm
+    version: '0.900000'
+  DBIO::Candy::Exports:
+    file: lib/DBIO/Candy/Exports.pm
+    version: '0.900000'
+  DBIO::Carp:
+    file: lib/DBIO/Carp.pm
+    version: '0.900000'
+  DBIO::ChangeLog:
+    file: lib/DBIO/ChangeLog.pm
+    version: '0.900000'
+  DBIO::ChangeLog::Entry:
+    file: lib/DBIO/ChangeLog/Entry.pm
+    version: '0.900000'
+  DBIO::ChangeLog::Schema:
+    file: lib/DBIO/ChangeLog/Schema.pm
+    version: '0.900000'
+  DBIO::ChangeLog::Set:
+    file: lib/DBIO/ChangeLog/Set.pm
+    version: '0.900000'
+  DBIO::ChangeLog::Table:
+    file: lib/DBIO/ChangeLog/Table.pm
+    version: '0.900000'
+  DBIO::Componentised:
+    file: lib/DBIO/Componentised.pm
+    version: '0.900000'
+  DBIO::Core:
+    file: lib/DBIO/Core.pm
+    version: '0.900000'
+  DBIO::Cursor:
+    file: lib/DBIO/Cursor.pm
+    version: '0.900000'
+  DBIO::Deploy::Base:
+    file: lib/DBIO/Deploy/Base.pm
+    version: '0.900000'
+  DBIO::Deploy::Base::TempDatabase:
+    file: lib/DBIO/Deploy/Base/TempDatabase.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler:
+    file: lib/DBIO/DeploymentHandler.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler::Dad:
+    file: lib/DBIO/DeploymentHandler/Dad.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler::DeployMethod::Native:
+    file: lib/DBIO/DeploymentHandler/DeployMethod/Native.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler::HandlesDeploy:
+    file: lib/DBIO/DeploymentHandler/HandlesDeploy.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler::HandlesVersionStorage:
+    file: lib/DBIO/DeploymentHandler/HandlesVersionStorage.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler::HandlesVersioning:
+    file: lib/DBIO/DeploymentHandler/HandlesVersioning.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler::VersionHandler::Monotonic:
+    file: lib/DBIO/DeploymentHandler/VersionHandler/Monotonic.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler::VersionStorage::Standard:
+    file: lib/DBIO/DeploymentHandler/VersionStorage/Standard.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler::VersionStorage::Standard::Component:
+    file: lib/DBIO/DeploymentHandler/VersionStorage/Standard/Component.pm
+    version: '0.900000'
+  DBIO::DeploymentHandler::VersionStorage::Standard::VersionResult:
+    file: lib/DBIO/DeploymentHandler/VersionStorage/Standard/VersionResult.pm
+    version: '0.900000'
+  DBIO::Diff::Base:
+    file: lib/DBIO/Diff/Base.pm
+    version: '0.900000'
+  DBIO::Diff::Compare:
+    file: lib/DBIO/Diff/Compare.pm
+    version: '0.900000'
+  DBIO::Diff::Op:
+    file: lib/DBIO/Diff/Op.pm
+    version: '0.900000'
+  DBIO::EncodedColumn:
+    file: lib/DBIO/EncodedColumn.pm
+    version: '0.900000'
+  DBIO::Exception:
+    file: lib/DBIO/Exception.pm
+    version: '0.900000'
+  DBIO::FilterColumn:
+    file: lib/DBIO/FilterColumn.pm
+    version: '0.900000'
+  DBIO::Future:
+    file: lib/DBIO/Future.pm
+    version: '0.900000'
+  DBIO::Generate:
+    file: lib/DBIO/Generate.pm
+    version: '0.900000'
+  DBIO::Generate::Relationships:
+    file: lib/DBIO/Generate/Relationships.pm
+    version: '0.900000'
+  DBIO::Generate::Style::Cake:
+    file: lib/DBIO/Generate/Style/Cake.pm
+    version: '0.900000'
+  DBIO::Generate::Style::Candy:
+    file: lib/DBIO/Generate/Style/Candy.pm
+    version: '0.900000'
+  DBIO::Generate::Style::Moo:
+    file: lib/DBIO/Generate/Style/Moo.pm
+    version: '0.900000'
+  DBIO::Generate::Style::Moose:
+    file: lib/DBIO/Generate/Style/Moose.pm
+    version: '0.900000'
+  DBIO::Generate::Style::Vanilla:
+    file: lib/DBIO/Generate/Style/Vanilla.pm
+    version: '0.900000'
+  DBIO::HashAccessor:
+    file: lib/DBIO/HashAccessor.pm
+    version: '0.900000'
+  DBIO::InflateColumn:
+    file: lib/DBIO/InflateColumn.pm
+    version: '0.900000'
+  DBIO::InflateColumn::DateTime:
+    file: lib/DBIO/InflateColumn/DateTime.pm
+    version: '0.900000'
+  DBIO::InflateColumn::Serializer:
+    file: lib/DBIO/InflateColumn/Serializer.pm
+    version: '0.900000'
+  DBIO::InflateColumn::Serializer::JSON:
+    file: lib/DBIO/InflateColumn/Serializer/JSON.pm
+    version: '0.900000'
+  DBIO::InflateColumn::Serializer::MessagePack:
+    file: lib/DBIO/InflateColumn/Serializer/MessagePack.pm
+    version: '0.900000'
+  DBIO::InflateColumn::Serializer::YAML:
+    file: lib/DBIO/InflateColumn/Serializer/YAML.pm
+    version: '0.900000'
+  DBIO::Introspect::Base:
+    file: lib/DBIO/Introspect/Base.pm
+    version: '0.900000'
+  DBIO::Introspect::DBI:
+    file: lib/DBIO/Introspect/DBI.pm
+    version: '0.900000'
+  DBIO::Moo:
+    file: lib/DBIO/Moo.pm
+    version: '0.900000'
+  DBIO::Moose:
+    file: lib/DBIO/Moose.pm
+    version: '0.900000'
+  DBIO::Optional::Dependencies:
+    file: lib/DBIO/Optional/Dependencies.pm
+    version: '0.900000'
+  DBIO::Ordered:
+    file: lib/DBIO/Ordered.pm
+    version: '0.900000'
+  DBIO::PK:
+    file: lib/DBIO/PK.pm
+    version: '0.900000'
+  DBIO::PK::Auto:
+    file: lib/DBIO/PK/Auto.pm
+    version: '0.900000'
+  DBIO::PopulateMore:
+    file: lib/DBIO/PopulateMore.pm
+    version: '0.900000'
+  DBIO::Relationship:
+    file: lib/DBIO/Relationship.pm
+    version: '0.900000'
+  DBIO::Relationship::Base:
+    file: lib/DBIO/Relationship/Base.pm
+    version: '0.900000'
+  DBIO::Relationship::BelongsTo:
+    file: lib/DBIO/Relationship/BelongsTo.pm
+    version: '0.900000'
+  DBIO::Relationship::CascadeActions:
+    file: lib/DBIO/Relationship/CascadeActions.pm
+    version: '0.900000'
+  DBIO::Relationship::Codegen:
+    file: lib/DBIO/Relationship/Codegen.pm
+    version: '0.900000'
+  DBIO::Relationship::HasMany:
+    file: lib/DBIO/Relationship/HasMany.pm
+    version: '0.900000'
+  DBIO::Relationship::HasOne:
+    file: lib/DBIO/Relationship/HasOne.pm
+    version: '0.900000'
+  DBIO::Relationship::Helpers:
+    file: lib/DBIO/Relationship/Helpers.pm
+    version: '0.900000'
+  DBIO::Relationship::ManyToMany:
+    file: lib/DBIO/Relationship/ManyToMany.pm
+    version: '0.900000'
+  DBIO::Replicated:
+    file: lib/DBIO/Replicated.pm
+    version: '0.900000'
+  DBIO::Replicated::Backend:
+    file: lib/DBIO/Replicated/Backend.pm
+    version: '0.900000'
+  DBIO::Replicated::Backend::Master:
+    file: lib/DBIO/Replicated/Backend/Master.pm
+    version: '0.900000'
+  DBIO::Replicated::Backend::Replicant:
+    file: lib/DBIO/Replicated/Backend/Replicant.pm
+    version: '0.900000'
+  DBIO::Replicated::Balancer:
+    file: lib/DBIO/Replicated/Balancer.pm
+    version: '0.900000'
+  DBIO::Replicated::Balancer::First:
+    file: lib/DBIO/Replicated/Balancer/First.pm
+    version: '0.900000'
+  DBIO::Replicated::Balancer::Random:
+    file: lib/DBIO/Replicated/Balancer/Random.pm
+    version: '0.900000'
+  DBIO::Replicated::DebugProxy:
+    file: lib/DBIO/Replicated/DebugProxy.pm
+    version: '0.900000'
+  DBIO::Replicated::Pool:
+    file: lib/DBIO/Replicated/Pool.pm
+    version: '0.900000'
+  DBIO::Replicated::Storage:
+    file: lib/DBIO/Replicated/Storage.pm
+    version: '0.900000'
+  DBIO::ResultClass::HashRefInflator:
+    file: lib/DBIO/ResultClass/HashRefInflator.pm
+    version: '0.900000'
+  DBIO::ResultSet:
+    file: lib/DBIO/ResultSet.pm
+    version: '0.900000'
+  DBIO::ResultSet::Pager:
+    file: lib/DBIO/ResultSet/Pager.pm
+    version: '0.900000'
+  DBIO::ResultSetColumn:
+    file: lib/DBIO/ResultSetColumn.pm
+    version: '0.900000'
+  DBIO::ResultSource:
+    file: lib/DBIO/ResultSource.pm
+    version: '0.900000'
+  DBIO::ResultSource::RowParser:
+    file: lib/DBIO/ResultSource/RowParser.pm
+    version: '0.900000'
+  DBIO::ResultSource::RowParser::Util:
+    file: lib/DBIO/ResultSource/RowParser/Util.pm
+    version: '0.900000'
+  DBIO::ResultSource::Table:
+    file: lib/DBIO/ResultSource/Table.pm
+    version: '0.900000'
+  DBIO::ResultSource::View:
+    file: lib/DBIO/ResultSource/View.pm
+    version: '0.900000'
+  DBIO::ResultSourceHandle:
+    file: lib/DBIO/ResultSourceHandle.pm
+    version: '0.900000'
+  DBIO::ResultSourceProxy:
+    file: lib/DBIO/ResultSourceProxy.pm
+    version: '0.900000'
+  DBIO::Row:
+    file: lib/DBIO/Row.pm
+    version: '0.900000'
+  DBIO::SQL::Util:
+    file: lib/DBIO/SQL/Util.pm
+    version: '0.900000'
+  DBIO::SQLMaker:
+    file: lib/DBIO/SQLMaker.pm
+    version: '0.900000'
+  DBIO::SQLMaker::ClassicExtensions:
+    file: lib/DBIO/SQLMaker/ClassicExtensions.pm
+    version: '0.900000'
+  DBIO::Schema:
+    file: lib/DBIO/Schema.pm
+    version: '0.900000'
+  DBIO::Schema::ModelCompiler:
+    file: lib/DBIO/Schema/ModelCompiler.pm
+    version: '0.900000'
+  DBIO::Schema::Type:
+    file: lib/DBIO/Schema/Type.pm
+    version: '0.900000'
+  DBIO::Schema::Versioned:
+    file: lib/DBIO/Schema/Versioned.pm
+    version: '0.900000'
+  DBIO::Skills:
+    file: lib/DBIO/Skills.pm
+    version: '0.900000'
+  DBIO::StartupCheck:
+    file: lib/DBIO/StartupCheck.pm
+    version: '0.900000'
+  DBIO::Storage:
+    file: lib/DBIO/Storage.pm
+    version: '0.900000'
+  DBIO::Storage::Async:
+    file: lib/DBIO/Storage/Async.pm
+    version: '0.900000'
+  DBIO::Storage::BlockRunner:
+    file: lib/DBIO/Storage/BlockRunner.pm
+    version: '0.900000'
+  DBIO::Storage::DBI:
+    file: lib/DBIO/Storage/DBI.pm
+    version: '0.900000'
+  DBIO::Storage::DBI::AccessBroker:
+    file: lib/DBIO/Storage/DBI/AccessBroker.pm
+    version: '0.900000'
+  DBIO::Storage::DBI::AutoCast:
+    file: lib/DBIO/Storage/DBI/AutoCast.pm
+    version: '0.900000'
+  DBIO::Storage::DBI::Capabilities:
+    file: lib/DBIO/Storage/DBI/Capabilities.pm
+    version: '0.900000'
+  DBIO::Storage::DBI::Cursor:
+    file: lib/DBIO/Storage/DBI/Cursor.pm
+    version: '0.900000'
+  DBIO::Storage::DBI::DataTypeClassifier:
+    file: lib/DBIO/Storage/DBI/DataTypeClassifier.pm
+    version: '0.900000'
+  DBIO::Storage::DBI::IdentityInsert:
+    file: lib/DBIO/Storage/DBI/IdentityInsert.pm
+    version: '0.900000'
+  DBIO::Storage::DBI::NoBindVars:
+    file: lib/DBIO/Storage/DBI/NoBindVars.pm
+    version: '0.900000'
+  DBIO::Storage::DBI::ODBC:
+    file: lib/DBIO/Storage/DBI/ODBC.pm
+    version: '0.900000'
+  DBIO::Storage::DBI::UniqueIdentifier:
+    file: lib/DBIO/Storage/DBI/UniqueIdentifier.pm
+    version: '0.900000'
+  DBIO::Storage::DateTimeFormat:
+    file: lib/DBIO/Storage/DateTimeFormat.pm
+    version: '0.900000'
+  DBIO::Storage::Debug::PrettyTrace:
+    file: lib/DBIO/Storage/Debug/PrettyTrace.pm
+    version: '0.900000'
+  DBIO::Storage::Pool:
+    file: lib/DBIO/Storage/Pool.pm
+    version: '0.900000'
+  DBIO::Storage::PoolBase:
+    file: lib/DBIO/Storage/PoolBase.pm
+    version: '0.900000'
+  DBIO::Storage::QueryRewrite:
+    file: lib/DBIO/Storage/QueryRewrite.pm
+    version: '0.900000'
+  DBIO::Storage::Statistics:
+    file: lib/DBIO/Storage/Statistics.pm
+    version: '0.900000'
+  DBIO::Storage::TxnScopeGuard:
+    file: lib/DBIO/Storage/TxnScopeGuard.pm
+    version: '0.900000'
+  DBIO::Test:
+    file: lib/DBIO/Test.pm
+    version: '0.900000'
+  DBIO::Test::BaseResult:
+    file: lib/DBIO/Test/BaseResult.pm
+    version: '0.900000'
+  DBIO::Test::BaseResultSet:
+    file: lib/DBIO/Test/BaseResultSet.pm
+    version: '0.900000'
+  DBIO::Test::Cursor:
+    file: lib/DBIO/Test/Cursor.pm
+    version: '0.900000'
+  DBIO::Test::DateTimeParser:
+    file: lib/DBIO/Test/DateTimeParser.pm
+    version: '0.900000'
+  DBIO::Test::DeployComponent:
+    file: lib/DBIO/Test/DeployComponent.pm
+    version: '0.900000'
+  DBIO::Test::ErrorComponent:
+    file: lib/DBIO/Test/ErrorComponent.pm
+    version: '0.900000'
+  DBIO::Test::FakeComponent:
+    file: lib/DBIO/Test/FakeComponent.pm
+    version: '0.900000'
+  DBIO::Test::ForeignComponent:
+    file: lib/DBIO/Test/ForeignComponent.pm
+    version: '0.900000'
+  DBIO::Test::Future:
+    file: lib/DBIO/Test/Future.pm
+    version: '0.900000'
+  DBIO::Test::Kubernetes:
+    file: lib/DBIO/Test/Kubernetes.pm
+    version: '0.900000'
+  DBIO::Test::OptionalComponent:
+    file: lib/DBIO/Test/OptionalComponent.pm
+    version: '0.900000'
+  DBIO::Test::ResultSetManager:
+    file: lib/DBIO/Test/ResultSetManager.pm
+    version: '0.900000'
+  DBIO::Test::SQLMRebase:
+    file: lib/DBIO/Test/SQLMRebase.pm
+    version: '0.900000'
+  DBIO::Test::Schema:
+    file: lib/DBIO/Test/Schema.pm
+    version: '0.900000'
+  DBIO::Test::Storage:
+    file: lib/DBIO/Test/Storage.pm
+    version: '0.900000'
+  DBIO::Test::SyntaxErrorComponent1:
+    file: lib/DBIO/Test/SyntaxErrorComponent1.pm
+    version: '0.900000'
+  DBIO::Test::SyntaxErrorComponent2:
+    file: lib/DBIO/Test/SyntaxErrorComponent2.pm
+    version: '0.900000'
+  DBIO::Test::SyntaxErrorComponent3:
+    file: lib/DBIO/Test/SyntaxErrorComponent3.pm
+    version: '0.900000'
+  DBIO::Test::Util:
+    file: lib/DBIO/Test/Util.pm
+    version: '0.900000'
+  DBIO::Test::Util::LeakTracer:
+    file: lib/DBIO/Test/Util/LeakTracer.pm
+    version: '0.900000'
+  DBIO::Test::Util::OverrideRequire:
+    file: lib/DBIO/Test/Util/OverrideRequire.pm
+    version: '0.900000'
+  DBIO::Test::Util::UmaskGuard:
+    file: lib/DBIO/Test/Util/UmaskGuard.pm
+    version: '0.900000'
+  DBIO::Timestamp:
+    file: lib/DBIO/Timestamp.pm
+    version: '0.900000'
+  DBIO::UUIDColumns:
+    file: lib/DBIO/UUIDColumns.pm
+    version: '0.900000'
+  DBIO::Util:
+    file: lib/DBIO/Util.pm
+    version: '0.900000'
+  DBIO::Version:
+    file: lib/DBIO/Version.pm
+    version: '0.900000'
+  DBIO::Version::Table:
+    file: lib/DBIO/Version/Table.pm
+    version: '0.900000'
+  DBIOx:
+    file: lib/DBIOx.pm
+    version: '0.900000'
+recommends:
+  Crypt::URandom: '0'
+  Lingua::EN::Inflect: '0'
+requires:
+  Class::Accessor::Grouped: '0.10012'
+  Class::C3::Componentised: '1.0009'
+  Context::Preserve: '0.01'
+  DBI: '1.57'
+  DateTime: '0.55'
+  DateTime::Format::Strptime: '1.2'
+  Devel::GlobalDestruction: '0.09'
+  File::ShareDir: '0'
+  Hash::Merge: '0.12'
+  JSON::MaybeXS: '0'
+  Lingua::EN::Inflect::Phrase: '0'
+  Lingua::EN::Tagger: '0'
+  MRO::Compat: '0.12'
+  Module::Find: '0.07'
+  SQL::Abstract: '2.000001'
+  String::ToIdentifier::EN: '0'
+  String::ToIdentifier::EN::Unicode: '0'
+  Sub::Exporter: '0.982'
+  Sub::Util: '1.40'
+  Try::Tiny: '0.07'
+  namespace::clean: '0.24'
+  perl: '5.008001'
+resources:
+  bugtracker: https://codeberg.org/dbio/dbio/issues
+  homepage: https://codeberg.org/dbio/dbio
+  repository: https://codeberg.org/dbio/dbio.git
+version: '0.900000'
+x_Dist_Zilla:
+  perl:
+    version: '5.036000'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::DBIO::SetMeta
+      name: '@DBIO/DBIO::SetMeta'
+      version: ~
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - .dir-locals.el
+            - .gitattributes
+            - .mailmap
+            - .proverc
+            - CLAUDE.md
+            - Dockerfile
+            - Features_09
+            - MANIFEST
+            - META.json
+            - META.yml
+            - README
+            - README.md
+            - TODO
+          exclude_match:
+            - ^\.claude/
+            - ^cover_db/
+            - ^inc/
+            - ^maint/
+            - ^t/var/
+            - docker-compose
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: '@DBIO/Git::GatherDir'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@DBIO/PruneCruft'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::DBIO::GatherSkills
+      name: '@DBIO/DBIO::GatherSkills'
+      version: ~
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@DBIO/ShareDir'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@DBIO/MetaJSON'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@DBIO/MetaYAML'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@DBIO/MetaConfig'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@DBIO/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.037'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@DBIO/MetaProvides::Package'
+      version: '2.004003'
+    -
+      class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
+      name: '@DBIO/Prereqs::FromCPANfile'
+      version: '0.08'
+    -
+      class: Dist::Zilla::Plugin::VersionFromMainModule
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@DBIO/VersionFromMainModule'
+      version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugins:
+            - '@DBIO::Heritage'
+          finder:
+            - ':InstallModules'
+            - ':PerlExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@DBIO/SingleEncoding'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@DBIO/Name'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@DBIO/Version'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@DBIO/Prelude'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@DBIO/Synopsis'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@DBIO/Description'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@DBIO/Overview'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@DBIO/Stability'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: '@DBIO/Attributes'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: '@DBIO/Methods'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@DBIO/Leftovers'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@DBIO/Postlude'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@DBIO/Authors'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: '@DBIO/Legal'
+              version: '4.020'
+      name: '@DBIO/PodWeaver'
+      version: '4.010'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@DBIO/ExtraTests'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker::Awesome
+      config:
+        Dist::Zilla::Plugin::MakeMaker:
+          make_path: make
+          version: '6.037'
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+          version: '6.037'
+      name: '@DBIO/MakeMaker::Awesome'
+      version: '0.49'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@DBIO/ExecDir'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@DBIO/Readme'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@DBIO/ManifestSkip'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@DBIO/Manifest'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::DBIO::CodebergMeta
+      name: '@DBIO/DBIO::CodebergMeta'
+      version: ~
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - cpanfile
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+      name: '@DBIO/Git::Check'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
+      config:
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+      name: '@DBIO/Git::CheckFor::CorrectBranch'
+      version: '0.014'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@DBIO/NextRelease'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@DBIO/ConfirmRelease'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@DBIO/UploadToCPAN'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%V%n%n%c
+          signoff: 0
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - cpanfile
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@DBIO/Git::Commit'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: v0.900000
+          tag_format: v%V
+          tag_message: v%V
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@DBIO/Git::Tag'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+      name: '@DBIO/Git::Push'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: MetaNoIndex
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@DBIO/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.037'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: '6.037'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

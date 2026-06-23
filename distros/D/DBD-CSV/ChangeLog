@@ -1,3 +1,9 @@
+0.63	- 2026-06-22, H.Merijn Brand
+    * It's 2026
+    * New test for DBI-1.648 CVE fix
+    * Minor typo in doc
+    * Raise recommended versions for fixed CVE's
+
 0.62	- 2025-01-13, H.Merijn Brand
     * doc should not be part of test
 

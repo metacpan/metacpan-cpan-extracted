@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -49,14 +49,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/davorg/svg-timeline/issues"
+         "web" : "https://github.com/davorg-cpan/svg-timeline/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/davorg/svg-timeline.git",
-         "web" : "https://github.com/davorg/svg-timeline"
+         "url" : "git://github.com/davorg-cpan/svg-timeline.git",
+         "web" : "https://github.com/davorg-cpan/svg-timeline"
       }
    },
-   "version" : "v0.1.3",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.2.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

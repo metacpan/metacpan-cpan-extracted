@@ -1,4 +1,7 @@
 Revision history for Algorithm-Classifier-IsolationForest
 
+0.1.0   2026-06-23/03:15
+        - add csv2plot helper command for graphing
+
 0.0.1   2026-06-21/21:45
         - initial release

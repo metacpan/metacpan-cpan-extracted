@@ -43,9 +43,19 @@ register_worker({ phase => 'main', driver => 'snmp' }, sub {
         $device->ip);
   }
 
+  if ($job->params->{skip_neighbor_queue} or not setting('queue_neighbors')) {
+      config->{'discover_only'} = $device->ip;
+      debug sprintf ' [%s] neigh - neighbors will be discovered but not queued',
+        $device->ip;
+  }
+
+  # do not remove. not used directly in this worker
+  # but is used in store_neighbors()
   my $snmp = App::Netdisco::Transport::SNMP->reader_for($device)
     or return Status->defer("discover failed: could not SNMP connect to $device");
 
+  # store_neighbors() will update neighbors on ports, in the database
+  # might return empty set if config or other reasons deny neighbor discovery
   my @to_discover = store_neighbors($device);
   my (%seen_id, %seen_ip) = ((), ());
 

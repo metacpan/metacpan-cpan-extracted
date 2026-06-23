@@ -56,7 +56,7 @@ WWW::Gitea::API::Misc - Instance-level Gitea endpoints (version, current user)
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

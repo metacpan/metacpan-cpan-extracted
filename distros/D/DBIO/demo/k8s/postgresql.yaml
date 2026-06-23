@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-demo-pg
+  labels:
+    app: dbio-demo-pg
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: dbio-demo-pg
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbio-demo-pg
+  labels:
+    app: dbio-demo-pg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dbio-demo-pg
+  template:
+    metadata:
+      labels:
+        app: dbio-demo-pg
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: dbio_demo
+            - name: POSTGRES_USER
+              value: dbio
+            - name: POSTGRES_PASSWORD
+              value: dbio
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "dbio", "-d", "dbio_demo"]
+            initialDelaySeconds: 5
+            periodSeconds: 5

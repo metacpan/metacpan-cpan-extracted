@@ -3,7 +3,7 @@ package RPi::RTC::DS3231;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('RPi::RTC::DS3231', $VERSION);
@@ -27,7 +27,11 @@ sub new {
 sub temp {
     my ($self, $output) = @_;
     my $celcius =  getTemp($self->_fd);
-    return defined $output && $output eq 'f' ? $celcius * 9/5 + 32 : $celcius;
+    my $temp = defined $output && $output eq 'f' ? $celcius * 9/5 + 32 : $celcius;
+
+    # Normalize to two decimal places so the return value is consistent
+    # regardless of scale (Fahrenheit conversion can yield a single decimal).
+    return sprintf "%.2f", $temp;
 }
 
 # time/date methods
@@ -279,7 +283,7 @@ RPi::RTC::DS3231 - Interface to the DS3231 Real-Time Clock IC over I2C
 
     my $meridien = $rtc->am_pm;
 
-    $rtc->am_pm('AM'); # or 'PM' # only available in 24 hr clock mode
+    $rtc->am_pm('AM'); # or 'PM' # only available in 12 hr clock mode
 
     # get temperature
 
@@ -514,7 +518,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Steve Bertrand.
+Copyright 2026 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

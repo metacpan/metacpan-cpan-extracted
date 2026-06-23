@@ -16,70 +16,74 @@ name: WWW-Gitea
 provides:
   WWW::Gitea:
     file: lib/WWW/Gitea.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::API::Issues:
     file: lib/WWW/Gitea/API/Issues.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::API::Labels:
     file: lib/WWW/Gitea/API/Labels.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::API::Milestones:
     file: lib/WWW/Gitea/API/Milestones.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::API::Misc:
     file: lib/WWW/Gitea/API/Misc.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::API::Orgs:
     file: lib/WWW/Gitea/API/Orgs.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::API::PullRequests:
     file: lib/WWW/Gitea/API/PullRequests.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::API::Releases:
     file: lib/WWW/Gitea/API/Releases.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::API::Repos:
     file: lib/WWW/Gitea/API/Repos.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::API::Users:
     file: lib/WWW/Gitea/API/Users.pm
-    version: '0.001'
+    version: '0.003'
+  WWW::Gitea::Attachment:
+    file: lib/WWW/Gitea/Attachment.pm
+    version: '0.003'
   WWW::Gitea::Comment:
     file: lib/WWW/Gitea/Comment.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::Issue:
     file: lib/WWW/Gitea/Issue.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::Label:
     file: lib/WWW/Gitea/Label.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::Milestone:
     file: lib/WWW/Gitea/Milestone.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::Org:
     file: lib/WWW/Gitea/Org.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::PullRequest:
     file: lib/WWW/Gitea/PullRequest.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::Release:
     file: lib/WWW/Gitea/Release.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::Repo:
     file: lib/WWW/Gitea/Repo.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::Role::HTTP:
     file: lib/WWW/Gitea/Role/HTTP.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::Role::OpenAPI:
     file: lib/WWW/Gitea/Role/OpenAPI.pm
-    version: '0.001'
+    version: '0.003'
   WWW::Gitea::User:
     file: lib/WWW/Gitea/User.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   Carp: '0'
   HTTP::Request: '0'
+  HTTP::Request::Common: '0'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
@@ -94,7 +98,7 @@ resources:
   bugtracker: https://codeberg.org/getty/p5-www-gitea/issues
   homepage: https://codeberg.org/getty/p5-www-gitea
   repository: https://codeberg.org/getty/p5-www-gitea.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -368,7 +372,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

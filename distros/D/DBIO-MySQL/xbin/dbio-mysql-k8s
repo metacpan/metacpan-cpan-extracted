@@ -1,0 +1,196 @@
+#!/usr/bin/env perl
+# xbin/dbio-mysql-k8s — run a command with a live MySQL or MariaDB pod on Kubernetes
+#
+# Reads DBIO_TEST_KUBECONFIG (path to a kubeconfig file).
+# Starts a MySQL or MariaDB pod, sets DBIO_TEST_MYSQL_DSN/_USER/_PASS internally,
+# runs the given command, then stops the pod on exit.
+#
+# Usage:
+#   DBIO_TEST_KUBECONFIG=~/.kube/myconfig xbin/dbio-mysql-k8s prove -l t/
+#   DBIO_TEST_KUBECONFIG=~/.kube/myconfig xbin/dbio-mysql-k8s --mariadb prove -l t/
+#   DBIO_TEST_KUBECONFIG=~/.kube/myconfig xbin/dbio-mysql-k8s dzil test
+#
+# Without a command: starts the pod and blocks until Ctrl-C, then stops.
+#
+# Options:
+#   --mariadb   Use MariaDB instead of MySQL (image: mariadb:11)
+#   --mysql     Use MySQL (image: mysql:8); default is MariaDB
+#
+# DBD::MariaDB is used for both flavors — it bundles the MariaDB Connector/C
+# and works with MySQL 5.7+ and MariaDB 10+. DBD::mysql requires system
+# MySQL/MariaDB client libraries and is not used by default.
+
+use strict;
+use warnings;
+use Kubernetes::REST::Kubeconfig;
+use IO::K8s;
+use Time::HiRes ();
+use POSIX ();
+
+my $kubeconfig_path = $ENV{DBIO_TEST_KUBECONFIG}
+  or die "DBIO_TEST_KUBECONFIG is not set\n";
+
+# Parse --mariadb / --mysql flag before the command (default: mariadb)
+my $mariadb = 1;
+while (@ARGV && $ARGV[0] =~ /^--(mariadb|mysql)$/) {
+  $mariadb = ($1 eq 'mariadb') ? 1 : 0;
+  shift @ARGV;
+}
+
+my $k8s  = Kubernetes::REST::Kubeconfig->new(kubeconfig_path => $kubeconfig_path)->api;
+my $io   = IO::K8s->new;
+
+my $ns       = 'dbio-test';
+my $flavor   = $mariadb ? 'mariadb' : 'mysql';
+my $name     = "dbio-$flavor";
+my $image    = $mariadb ? 'mariadb:11' : 'mysql:8';
+my $db_user  = 'dbio';
+my $db_pass  = 'dbio_test_secret';
+my $db_root  = 'dbio_root_secret';
+my $db_name  = 'dbio_test';
+my $db_port  = 3306;
+
+_ensure_namespace($k8s, $io, $ns);
+_create_pod($k8s, $io, $ns, $name, $image, $db_user, $db_pass, $db_root, $db_name);
+_create_service($k8s, $io, $ns, $name, $db_port);
+my ($host, $port) = _wait_for_ready($k8s, $ns, $name, $db_user);
+
+# Always use DBD::MariaDB — it bundles its own connector and works with both
+$ENV{DBIO_TEST_MYSQL_DSN}  = "dbi:MariaDB:database=$db_name;host=$host;port=$port";
+$ENV{DBIO_TEST_MYSQL_USER} = $db_user;
+$ENV{DBIO_TEST_MYSQL_PASS} = $db_pass;
+
+my $exit = 0;
+
+if (@ARGV) {
+  $exit = system(@ARGV);
+  $exit = $exit >> 8;
+}
+else {
+  print STDERR "\u${flavor} ready at $host:$port (namespace $ns)\n";
+  print STDERR "DSN: $ENV{DBIO_TEST_MYSQL_DSN}\n";
+  print STDERR "Press Ctrl-C to stop.\n";
+  local $SIG{INT} = sub { };
+  POSIX::pause();
+}
+
+_stop($k8s, $ns, $name);
+exit $exit;
+
+sub _stop {
+  my ($k8s, $ns, $name) = @_;
+  print STDERR "Stopping $name...\n";
+  eval { $k8s->delete($k8s->get('Pod',     name => $name, namespace => $ns)) };
+  eval { $k8s->delete($k8s->get('Service', name => $name, namespace => $ns)) };
+}
+
+sub _ensure_namespace {
+  my ($k8s, $io, $ns) = @_;
+  return if eval { $k8s->get('Namespace', name => $ns); 1 };
+  $k8s->create($io->new_object('Namespace',
+    metadata => { name => $ns },
+  ));
+}
+
+sub _create_pod {
+  my ($k8s, $io, $ns, $name, $image, $user, $pass, $root_pass, $db) = @_;
+  if (eval { $k8s->get('Pod', name => $name, namespace => $ns); 1 }) {
+    $k8s->delete($k8s->get('Pod', name => $name, namespace => $ns));
+    print STDERR "Waiting for old pod to terminate";
+    my $deadline = time + 60;
+    while (time < $deadline) {
+      last unless eval { $k8s->get('Pod', name => $name, namespace => $ns); 1 };
+      print STDERR '.';
+      Time::HiRes::sleep(2);
+    }
+    print STDERR "\n";
+  }
+  $k8s->create($io->new_object('Pod',
+    metadata => { name => $name, namespace => $ns, labels => { app => $name } },
+    spec     => {
+      containers => [{
+        name  => $name,
+        image => $image,
+        env   => [
+          { name => 'MYSQL_USER',          value => $user      },
+          { name => 'MYSQL_PASSWORD',      value => $pass      },
+          { name => 'MYSQL_ROOT_PASSWORD', value => $root_pass },
+          { name => 'MYSQL_DATABASE',      value => $db        },
+        ],
+        ports          => [{ containerPort => 3306 }],
+        readinessProbe => {
+          tcpSocket           => { port => 3306 },
+          initialDelaySeconds => 15,
+          periodSeconds       => 3,
+        },
+      }],
+    },
+  ));
+}
+
+sub _create_service {
+  my ($k8s, $io, $ns, $name, $port) = @_;
+  eval { $k8s->delete($k8s->get('Service', name => $name, namespace => $ns)) };
+  $k8s->create($io->new_object('Service',
+    metadata => { name => $name, namespace => $ns },
+    spec     => {
+      type     => 'NodePort',
+      selector => { app => $name },
+      ports    => [{ port => $port, targetPort => $port }],
+    },
+  ));
+}
+
+sub _wait_for_ready {
+  my ($k8s, $ns, $name, $user) = @_;
+  print STDERR "Waiting for pod $name to be ready";
+  my $deadline = time + 300;
+  my $last_phase = '';
+  while (time < $deadline) {
+    my $pod = eval { $k8s->get('Pod', name => $name, namespace => $ns) };
+    if ($pod) {
+      return _get_service_endpoint($k8s, $ns, $name) if _pod_ready($pod);
+      my $phase = eval { $pod->status->phase } // '?';
+      # Show phase changes and any waiting reason (e.g. ErrImagePull)
+      my $reason = eval {
+        my $cs = $pod->status->containerStatuses // [];
+        @$cs ? ($cs->[0]->state->waiting // {})->{reason} // '' : ''
+      } // '';
+      my $status = $reason ? "$phase/$reason" : $phase;
+      if ($status ne $last_phase) {
+        print STDERR " [$status]";
+        $last_phase = $status;
+      }
+    }
+    print STDERR '.';
+    Time::HiRes::sleep(3);
+  }
+  print STDERR "\n";
+  die "Timed out waiting for pod $name\n";
+}
+
+sub _pod_ready {
+  my ($pod) = @_;
+  my $conditions = $pod->status->conditions // [];
+  return grep { $_->type eq 'Ready' && $_->status eq 'True' } @$conditions;
+}
+
+sub _get_service_endpoint {
+  my ($k8s, $ns, $name) = @_;
+  my $svc       = $k8s->get('Service', name => $name, namespace => $ns);
+  my $node_port = $svc->spec->ports->[0]->nodePort
+    or die "No nodePort assigned to service $name\n";
+
+  my $nodes  = $k8s->list('Node');
+  my ($node) = grep { _node_ready($_) } @{ $nodes->items };
+  die "No ready nodes found\n" unless $node;
+
+  my ($addr) = grep { $_->type eq 'InternalIP' } @{ $node->status->addresses };
+  return ($addr->address, $node_port);
+}
+
+sub _node_ready {
+  my ($node) = @_;
+  my $conditions = $node->status->conditions // [];
+  return grep { $_->type eq 'Ready' && $_->status eq 'True' } @$conditions;
+}

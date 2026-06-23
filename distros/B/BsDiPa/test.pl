@@ -31,7 +31,7 @@ use BsDiPa;
 #print BsDiPa::COPYRIGHT;
 
 # io_cookie's
-our ($cJ,$cj,$cR,$cZ,$cz) = (undef,undef,undef,undef,undef);
+our ($cJ,$cj,$cR,$cZ,$cz,$mag) = (undef,undef,undef,undef,undef,undef);
 
 sub doit{
 	my ($t, $b, $a, $eq) = @_;
@@ -41,83 +41,83 @@ sub doit{
 
 	my ($pJ,$pj,$pR,$pZ,$pz, $rJ,$rj,$rR,$rZ,$rz) = (0,0,0,0,0, 0,0,0,0,0);
 
-	ok(BsDiPa::core_diff_zlib(undef, $a, \$pz) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_zlib(undef, $a, \$pz, $mag) eq BsDiPa::INVAL);
 	ok(!defined $pz);
-	ok(BsDiPa::core_diff_zlib($b, undef, \$pz) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_zlib($b, undef, \$pz, $mag) eq BsDiPa::INVAL);
 	ok(!defined $pz);
-	ok(BsDiPa::core_diff_zlib($b, $a, undef) eq BsDiPa::INVAL);
-	ok(BsDiPa::core_diff_zlib($b, $a, $pz) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_zlib($b, $a, undef, $mag) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_zlib($b, $a, $pz, $mag) eq BsDiPa::INVAL);
 	BsDiPa::core_diff_level_set(3);
-	ok(BsDiPa::core_diff_zlib($b, $a, \$pz, undef, undef, $cz) eq BsDiPa::OK);
+	ok(BsDiPa::core_diff_zlib($b, $a, \$pz, $mag, undef, $cz) eq BsDiPa::OK);
 	ok(defined $pz);
 	BsDiPa::core_diff_level_set(0);
-	ok(BsDiPa::core_diff_zlib($b, $a, \$pz, undef, $iseq, $cz) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_zlib($b, $a, \$pz, $mag, $iseq, $cz) eq BsDiPa::INVAL);
 	ok(!defined $pz);
-	ok(BsDiPa::core_diff_zlib($b, $a, \$pz, undef, \$iseq, $cz) eq BsDiPa::OK);
+	ok(BsDiPa::core_diff_zlib($b, $a, \$pz, $mag, \$iseq, $cz) eq BsDiPa::OK);
 	ok(defined $pz);
 	ok($eq == $iseq);
 
 	if(BsDiPa::HAVE_BZ2()){
-		ok(BsDiPa::core_diff_bz2(undef, $a, \$pj) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_bz2(undef, $a, \$pj, $mag) eq BsDiPa::INVAL);
 		ok(!defined $pj);
-		ok(BsDiPa::core_diff_bz2($b, undef, \$pj) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_bz2($b, undef, \$pj, $mag) eq BsDiPa::INVAL);
 		ok(!defined $pj);
-		ok(BsDiPa::core_diff_bz2($b, $a, undef) eq BsDiPa::INVAL);
-		ok(BsDiPa::core_diff_bz2($b, $a, $pj) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_bz2($b, $a, undef, $mag) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_bz2($b, $a, $pj, $mag) eq BsDiPa::INVAL);
 		BsDiPa::core_diff_level_set(3);
-		ok(BsDiPa::core_diff_bz2($b, $a, \$pj, undef, undef, $cj) eq BsDiPa::OK);
+		ok(BsDiPa::core_diff_bz2($b, $a, \$pj, $mag, undef, $cj) eq BsDiPa::OK);
 		ok(defined $pj);
 		BsDiPa::core_diff_level_set(0);
-		ok(BsDiPa::core_diff_bz2($b, $a, \$pj, undef, $iseq, $cj) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_bz2($b, $a, \$pj, $mag, $iseq, $cj) eq BsDiPa::INVAL);
 		ok(!defined $pj);
-		ok(BsDiPa::core_diff_bz2($b, $a, \$pj, undef, \$iseq, $cj) eq BsDiPa::OK);
+		ok(BsDiPa::core_diff_bz2($b, $a, \$pj, $mag, \$iseq, $cj) eq BsDiPa::OK);
 		ok(defined $pj);
 		ok($eq == $iseq);
 	}
 
 	if(BsDiPa::HAVE_XZ()){
-		ok(BsDiPa::core_diff_xz(undef, $a, \$pJ) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_xz(undef, $a, \$pJ, $mag) eq BsDiPa::INVAL);
 		ok(!defined $pJ);
-		ok(BsDiPa::core_diff_xz($b, undef, \$pJ) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_xz($b, undef, \$pJ, $mag) eq BsDiPa::INVAL);
 		ok(!defined $pJ);
-		ok(BsDiPa::core_diff_xz($b, $a, undef) eq BsDiPa::INVAL);
-		ok(BsDiPa::core_diff_xz($b, $a, $pJ) eq BsDiPa::INVAL);
-		ok(BsDiPa::core_diff_xz($b, $a, \$pJ, undef, undef, $cJ) eq BsDiPa::OK);
+		ok(BsDiPa::core_diff_xz($b, $a, undef, $mag) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_xz($b, $a, $pJ, $mag) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_xz($b, $a, \$pJ, $mag, undef, $cJ) eq BsDiPa::OK);
 		ok(defined $pJ);
-		ok(BsDiPa::core_diff_xz($b, $a, \$pJ, undef, $iseq, $cJ) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_xz($b, $a, \$pJ, $mag, $iseq, $cJ) eq BsDiPa::INVAL);
 		ok(!defined $pJ);
-		ok(BsDiPa::core_diff_xz($b, $a, \$pJ, undef, \$iseq, $cJ) eq BsDiPa::OK);
+		ok(BsDiPa::core_diff_xz($b, $a, \$pJ, $mag, \$iseq, $cJ) eq BsDiPa::OK);
 		ok(defined $pJ);
 		ok($eq == $iseq);
 	}
 
 	if(BsDiPa::HAVE_ZSTD()){
-		ok(BsDiPa::core_diff_zstd(undef, $a, \$pZ) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_zstd(undef, $a, \$pZ, $mag) eq BsDiPa::INVAL);
 		ok(!defined $pZ);
-		ok(BsDiPa::core_diff_zstd($b, undef, \$pZ) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_zstd($b, undef, \$pZ, $mag) eq BsDiPa::INVAL);
 		ok(!defined $pZ);
-		ok(BsDiPa::core_diff_zstd($b, $a, undef) eq BsDiPa::INVAL);
-		ok(BsDiPa::core_diff_zstd($b, $a, $pZ) eq BsDiPa::INVAL);
-		ok(BsDiPa::core_diff_zstd($b, $a, \$pZ, undef, undef, $cZ) eq BsDiPa::OK);
+		ok(BsDiPa::core_diff_zstd($b, $a, undef, $mag) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_zstd($b, $a, $pZ, $mag) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_zstd($b, $a, \$pZ, $mag, undef, $cZ) eq BsDiPa::OK);
 		ok(defined $pZ);
-		ok(BsDiPa::core_diff_zstd($b, $a, \$pZ, undef, $iseq, $cZ) eq BsDiPa::INVAL);
+		ok(BsDiPa::core_diff_zstd($b, $a, \$pZ, $mag, $iseq, $cZ) eq BsDiPa::INVAL);
 		ok(!defined $pZ);
-		ok(BsDiPa::core_diff_zstd($b, $a, \$pZ, undef, \$iseq, $cZ) eq BsDiPa::OK);
+		ok(BsDiPa::core_diff_zstd($b, $a, \$pZ, $mag, \$iseq, $cZ) eq BsDiPa::OK);
 		ok(defined $pZ);
 		ok($eq == $iseq);
 	}
 
-	ok(BsDiPa::core_diff_raw(undef, $a, \$pR) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_raw(undef, $a, \$pR, $mag) eq BsDiPa::INVAL);
 	ok(!defined $pR);
-	ok(BsDiPa::core_diff_raw($b, undef, \$pR) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_raw($b, undef, \$pR, $mag) eq BsDiPa::INVAL);
 	ok(!defined $pR);
-	ok(BsDiPa::core_diff_raw($b, $a, undef) eq BsDiPa::INVAL);
-	ok(BsDiPa::core_diff_raw($b, $a, $pR) eq BsDiPa::INVAL);
-	ok(BsDiPa::core_diff_raw($b, $a, \$pR, undef, undef, $cR) eq BsDiPa::OK);
+	ok(BsDiPa::core_diff_raw($b, $a, undef, $mag) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_raw($b, $a, $pR, $mag) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_raw($b, $a, \$pR, $mag, undef, $cR) eq BsDiPa::OK);
 	ok(defined $pR);
-	ok(BsDiPa::core_diff_raw($b, $a, \$pR, undef, $iseq, $cR) eq BsDiPa::INVAL);
+	ok(BsDiPa::core_diff_raw($b, $a, \$pR, $mag, $iseq, $cR) eq BsDiPa::INVAL);
 	ok(!defined $pR);
-	ok(BsDiPa::core_diff_raw($b, $a, \$pR, undef, \$iseq, $cR) eq BsDiPa::OK);
+	ok(BsDiPa::core_diff_raw($b, $a, \$pR, $mag, \$iseq, $cR) eq BsDiPa::OK);
 	ok(defined $pR);
 	ok($eq == $iseq);
 
@@ -303,6 +303,41 @@ sub ckit{
 	doit('equal-1 small', $b, $a)
 }
 
+sub txtckit{ # XXX data too simple
+	my ($b, $a);
+
+	#
+	($b, $a) = ("abcdefg\n" x 3, "abcdefg\n" x 3);
+	#print 'Equal: ', length($b), ' / ', length($a), "\n";
+	doit('equal tiny', $b, $a, 1);
+
+	($b, $a) = ("abcdefg\n" x 3000, "abcdefg\n" x 3000);
+	#print 'Equal: ', length($b), ' / ', length($a), "\n";
+	doit('equal small', $b, $a, 1);
+
+	($b, $a) = ("abc\n" x 9000 . "\n", "abc\n" x 9000 . "\n");
+	#print 'Equal: ', length($b), ' / ', length($a), "\n";
+	doit('equal medium', $b, $a, 1);
+
+	#
+	($b, $a) = ("abcdefg\n" x 3, "abcdefg\n" x 3 . "h");
+	#print 'Equal+1: ', length($b), ' / ', length($a), "\n";
+	doit('equal+1 tiny', $b, $a);
+
+	($b, $a) = ("abcdefg\n" x 3000, "abcdefg\n" x 3000 . "h");
+	#print 'Equal+1: ', length($b), ' / ', length($a), "\n";
+	doit('equal+1 small', $b, $a);
+
+	#
+	($b, $a) = ("abcdefg\n" x 3, "abcdefg\n" x 2 . "abcdef\n");
+	#print 'Equal-1: ', length($b), ' / ', length($a), "\n";
+	doit('equal-1 tiny', $b, $a);
+
+	($b, $a) = ("abcdefg\n" x 3000, "abcdefg\n" x 2999 . "abcdef\n");
+	#print 'Equal-1: ', length($b), ' / ', length($a), "\n";
+	doit('equal-1 small', $b, $a)
+}
+
 ckit();
 
 $cJ = BsDiPa::core_io_cookie_new_xz() if BsDiPa::HAVE_XZ;
@@ -313,7 +348,20 @@ ckit();
 BsDiPa::core_try_oneshot_set(1);
 ckit();
 BsDiPa::core_try_oneshot_set(-1);
-for(my $i = 0; $i < 3; ++$i) {ckit()}
+for(my $i = 0; $i < 3; ++$i){
+	if($i == 0){
+		$mag = 0
+	#}elsif($i == 1){
+	#	$mag = -1 # no, \0s shorten string
+	}else{
+		$mag = undef
+	}
+	ckit()
+}
+
+$mag = -1;
+txtckit();
+$mag = undef;
 
 BsDiPa::core_io_cookie_gut($cZ) if BsDiPa::HAVE_ZSTD;
 BsDiPa::core_io_cookie_gut($cJ) if BsDiPa::HAVE_XZ;

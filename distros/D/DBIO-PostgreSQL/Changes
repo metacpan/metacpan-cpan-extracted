@@ -1,0 +1,48 @@
+Revision history for DBIO-PostgreSQL
+
+0.900000  2026-06-23
+    First release. The PostgreSQL driver for DBIO: PostgreSQL-native
+    storage, SQL generation, schema introspection, diff, DDL and
+    desired-state deployment.
+
+    * Storage
+        - DBIO::PostgreSQL::Storage, registered for dbi:Pg: DSNs and
+          autodetected by core via the driver registry
+        - Loadable as a schema component (load_components('PostgreSQL'))
+          or via the use DBIO Schema => -pg shortcut, which pins
+          +DBIO::PostgreSQL::Storage as the storage type
+        - RETURNING on INSERT/UPDATE/DELETE, last_insert_id via sequences,
+          AccessBroker connect support
+        - DBIO::PostgreSQL::Result component and the -pg Result shortcut
+          for PostgreSQL-native column/source features (schemas, indexes)
+
+    * SQL Generation
+        - DBIO::PostgreSQL::SQLMaker with native JSONB operators:
+          @> / <@ containment (auto-serializes hashref/arrayref to JSON),
+          @? / @@ JSONPath (PG 12+), and ? / ?| / ?& key existence
+          (rewritten as jsonb_exists*() to avoid the DBI placeholder clash)
+        - DBIO::PostgreSQL::JSONB jsonb() path-expression DSL:
+          eq/ne/lt/le/gt/ge/like/ilike/is_null/is_not_null/as_order
+
+    * Introspection
+        - DBIO::PostgreSQL::Introspect builds a live model from pg_catalog:
+          schemas, tables, columns, indexes, sequences, foreign keys,
+          check constraints, functions, triggers, types/enums, extensions
+          and row-level-security policies
+
+    * Diff and DDL
+        - DBIO::PostgreSQL::Diff compares two introspected models per
+          object class (Schema/Table/Column/Index/Type/Function/Trigger/
+          Policy/Extension) and emits the ALTER/CREATE/DROP statements
+        - DBIO::PostgreSQL::DDL generates PostgreSQL-native DDL from the
+          schema, including a CREATE TYPE enum pre-pass, schema-qualified
+          CREATE VIEW for non-virtual views, and physical-table dedupe
+
+    * Deploy
+        - DBIO::PostgreSQL::Deploy orchestrates test-deploy-and-compare:
+          introspect live, deploy desired to a temporary schema,
+          re-introspect, diff, then drop the temp schema; supports
+          install, diff, apply and upgrade
+        - Storage declares dbio_deploy_class so DBIO::Schema->deploy()
+          routes through DBIO::PostgreSQL::Deploy rather than
+          SQL::Translator

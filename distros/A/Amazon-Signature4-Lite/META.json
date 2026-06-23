@@ -48,7 +48,7 @@
    "provides" : {
       "Amazon::Signature4::Lite" : {
          "file" : "lib/Amazon/Signature4/Lite.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/rlauer6/Amazon-Signature4-Lite"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,34 @@
+Revision history for DBIO-MySQL
+
+0.900000  2026-06-23
+    First release. MySQL and MariaDB driver for DBIO, with native schema
+    deployment, introspection, diffing and DDL generation.
+
+    * Driver
+        - MySQL/MariaDB storage with autodetection of dbi:mysql: DSNs via
+          the DBIO driver registry
+        - DBIO::MySQL schema component and -mysql shortcut
+        - DBIO::MySQL::Storage and DBIO::MySQL::Storage::MariaDB
+        - DateTime::Format::MySQL datetime parsing
+
+    * SQLMaker
+        - DBIO::MySQL::SQLMaker with apply_limit() (LIMIT ?, ? syntax) and
+          FOR SHARE locking
+        - DBIO::MySQL::SQLMaker::MariaDB maps FOR SHARE to LOCK IN SHARE
+          MODE for MariaDB
+
+    * Schema management
+        - DBIO::MySQL::Introspect (Tables, Columns, Indexes, ForeignKeys)
+          via information_schema
+        - DBIO::MySQL::DDL generator from Result classes with
+          ENGINE/CHARSET/COLLATE handling, view and shared-table handling
+        - DBIO::MySQL::Diff (Table, Column, Index, ForeignKey) with inlined
+          columns on CREATE TABLE and full MODIFY COLUMN support
+        - DBIO::MySQL::Deploy: install/diff/apply/upgrade via test-deploy-
+          and-compare against a temporary database
+        - Storage routes DBIO::Schema->deploy() through DBIO::MySQL::Deploy
+
+    * Result component
+        - DBIO::MySQL::Result with mysql_engine, mysql_charset,
+          mysql_collate and mysql_index declarations consumed by the DDL
+          generator

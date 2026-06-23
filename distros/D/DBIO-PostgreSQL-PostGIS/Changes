@@ -1,0 +1,35 @@
+Revision history for DBIO-PostgreSQL-PostGIS
+
+0.900000  2026-06-23
+    First release. PostGIS spatial extension support layered on DBIO::PostgreSQL.
+
+    * Result component
+        - load_components('PostgreSQL::PostGIS') auto-inflates geometry and
+          geography columns to DBIO::PostgreSQL::PostGIS::Geometry objects and
+          deflates them back to EWKT on write
+        - column metadata carries geometry_type and srid; auto-detection
+          overridable via inflate_geometry on the column
+        - promotes the result source's resultset_class to the PostGIS
+          ResultSet on first spatial column, leaving custom subclasses alone
+
+    * Geometry value object
+        - constructors: point, linestring, polygon, bbox_polygon, from_wkt,
+          from_ewkt, from_ewkb_hex, from_geojson, from_lat_lon
+        - accessors: srid, geometry_type, wkt, ewkt, ewkb_hex, x, y, z,
+          coordinates, bbox, is_empty, to_geojson
+        - lazy WKT/WKB parsing delegated to the codec chain
+
+    * Codecs
+        - WKT/EWKT parser and builder
+        - EWKB-hex decoder with bounds checking
+
+    * Spatial ResultSet helpers
+        - within_distance, nearest_to, order_by_distance, with_distance
+        - bbox_intersects (&&), KNN ordering (<->)
+        - predicates: intersects, contains, within, touches, crosses, overlaps
+
+    * Storage, Introspection and Deploy
+        - Storage: ensure_postgis, postgis_version
+        - Introspect: augments geometry/geography columns by parsing
+          data_type (e.g. geometry(Point,4326)) into geometry_type and srid
+        - Deploy: PostGIS-aware introspection for diff/install round-trips

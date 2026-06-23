@@ -7,7 +7,8 @@ use Test::Warnings 0.006;
 BEGIN {
     eval 'use List::SomeUtils 0.56';
     if ($@) {
-        plan skip_all => 'These tests require that List::SomeUtils 0.56 already be installed';
+        plan skip_all =>
+            'These tests require that List::SomeUtils 0.56 already be installed';
     }
 }
 

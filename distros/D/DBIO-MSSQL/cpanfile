@@ -1,0 +1,11 @@
+requires 'perl', '5.020';
+requires 'DBIO', '0.900000';
+
+# Only the DBD::Sybase/FreeTDS connection path (DBIO::MSSQL::Storage::Sybase)
+# needs this; the default ODBC path does not. Keep it optional so ODBC-only
+# users are not forced to build DBD::Sybase.
+recommends 'DBIO::Sybase', '0.900000';
+
+on test => sub {
+  requires 'Test::More', '0.98';
+};

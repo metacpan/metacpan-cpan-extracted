@@ -25,6 +25,7 @@ for (qw(
   WWW::Gitea::Release
   WWW::Gitea::Org
   WWW::Gitea::Comment
+  WWW::Gitea::Attachment
 )) {
     use_ok($_);
 }

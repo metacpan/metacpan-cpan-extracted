@@ -7,13 +7,15 @@
 #@    that FreeBSD replaced the original algorithm of Colin Percival with.
 #@    The original is small and faster for small files (emails, for example).
 #@    libdivsufsort is larger, but faster for larger files.
-#@ - pass -DNDEBUG via $CFLAGS to disable some redundant expensive cleanups.
-#@   Note $CFLAGS must come from environment *not* via make(1) command line!
+#@  - pass s_BSDIPA_TEXT non-empty to add an alternatively selectable textual
+#@    line-based (non-BSDiff) approach.
+#@  - pass -DNDEBUG via $CFLAGS to disable some redundant expensive cleanups.
+#@    Note $CFLAGS must come from environment *not* via make(1) command line!
 #@ [- pass s_BSDIPA_CFLAGS='$(SUFX)' for lots of compiler flags.]
 #@
 #@ Examples:
-#@	CFLAGS='-O1 -DNDEBUG'  make s_BSDIPA_32=y s_BSDIPA_CFLAGS='$(SUFX)' all
-#@	CFLAGS='-O3 -DNDEBUG'  make s_BSDIPA_SMALL=y' test
+#@	CFLAGS='-O1 -DNDEBUG' make s_BSDIPA_32=y s_BSDIPA_CFLAGS='$(SUFX)' all
+#@	CFLAGS='-O2 -DNDEBUG' make s_BSDIPA_SMALL=y s_BSDIPA_TEXT=y test
 
 RM ?= rm
 
@@ -61,11 +63,12 @@ OBJS = $(SRCS:.c=.o)
 
 all: $(LIB)
 $(CONFIGH):
-	v1= v2= v3=;\
+	v1= v2= v3= v4=;\
 	[ -n "$(s_BSDIPA_32)" ] && v1=s_BSDIPA_32="$(s_BSDIPA_32)";\
 	[ -n "$(s_BSDIPA_MAGIC_WINDOW)" ] && v2=s_BSDIPA_MAGIC_WINDOW="$(s_BSDIPA_MAGIC_WINDOW)";\
 	[ -n "$(s_BSDIPA_SMALL)" ] && v3=s_BSDIPA_SMALL=y;\
-	./configh.sh "$$v1" "$$v2" "$$v3"
+	[ -n "$(s_BSDIPA_TEXT)" ] && v4=s_BSDIPA_TEXT=y;\
+	./configh.sh "$$v1" "$$v2" "$$v3" "$$v4"
 $(LIB): $(CONFIGH) $(OBJS)
 	$(AR) crs $(@) $(OBJS)
 test: all

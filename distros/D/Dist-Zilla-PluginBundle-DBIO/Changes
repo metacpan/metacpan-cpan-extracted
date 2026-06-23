@@ -1,11 +1,17 @@
 Release history for Dist-Zilla-PluginBundle-DBIO
 
+0.900002  2026-06-23
+    - DBIO::CodebergMeta replaces GithubMeta: repository/bugtracker/homepage resources derived offline from the codeberg.org git remote, no token or network; GithubMeta dependency dropped
+    - author and license set automatically via DBIO::SetMeta: heritage => "DBIO & DBIx::Class Authors", default => "DBIO Authors", license always Perl_5; no author =/license = needed in dist.ini
+    - $VERSION rewritten only in the distribution's main module; sub-modules no longer versioned
+    - DBIO::GatherSkills + [ShareDir] ship a distribution's owned agent skills (.claude/skills/) into the dist sharedir, selected via share_skill
+    - ExecDir uses bin/ instead of script/, so bundled executables are installed
+    - .proverc excluded from distributed tarballs (it sets workspace-local -I paths)
+
 0.900001  2026-03-29
     - Expanded POD documentation: per-section descriptions for driver/heritage/core workflows
     - =attr heritage now documents @DBIO::Heritage PodWeaver bundle explicitly
     - Clarified first_version 0.900000 only applies to brand-new distributions without tags
-
-0.900001  2026-03-29
     - copyright_holder set automatically: heritage => "DBIO & DBIx::Class Authors", default => "DBIO Authors"
     - LICENSE always gathered from git; [License] plugin removed
     - @DBIO::Heritage PodWeaver subclass for DBIx::Class attribution in POD

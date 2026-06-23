@@ -55,7 +55,7 @@ sub run_tests {
             sort_by
             true
             uniq
-            ),
+        ),
         qw(
             bsearch_index
             distinct
@@ -69,7 +69,7 @@ sub run_tests {
             only_result
             only_value
             zip
-            )
+        )
     );
     done_testing();
 }

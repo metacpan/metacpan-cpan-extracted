@@ -1,5 +1,5 @@
 Revision history for Syntax-Infix-EqualityInsensitive
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.03    2026-06-22
+        - Pass real end pointers to foldEQ_utf8 in pp_eqi and pp_nei.
 

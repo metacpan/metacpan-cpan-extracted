@@ -1,0 +1,51 @@
+DBIO Demo
+=========
+
+Interactive demonstration of DBIO capabilities.
+
+Running locally
+---------------
+
+  # SQLite in-memory (default)
+  perl demo/dbio-demo
+
+  # SQLite file
+  perl demo/dbio-demo dbi:SQLite:demo.db
+
+  # PostgreSQL
+  perl demo/dbio-demo dbi:Pg:dbname=test user pass
+
+  # MySQL
+  perl demo/dbio-demo dbi:mysql:dbname=test user pass
+
+Running with Kubernetes
+-----------------------
+
+The k8s/ directory contains manifests for deploying test databases.
+
+  # Deploy all databases
+  kubectl apply -f demo/k8s/
+
+  # Or individually
+  kubectl apply -f demo/k8s/postgresql.yaml
+  kubectl apply -f demo/k8s/mysql.yaml
+
+  # Wait for pods to be ready
+  kubectl wait --for=condition=ready pod -l app=dbio-demo-pg --timeout=60s
+  kubectl wait --for=condition=ready pod -l app=dbio-demo-mysql --timeout=60s
+
+  # Port-forward to access locally
+  kubectl port-forward svc/dbio-demo-pg 5432:5432 &
+  kubectl port-forward svc/dbio-demo-mysql 3306:3306 &
+
+  # Run demo against PostgreSQL
+  perl demo/dbio-demo dbi:Pg:dbname=dbio_demo;host=127.0.0.1 dbio dbio
+
+  # Run demo against MySQL
+  perl demo/dbio-demo dbi:mysql:dbname=dbio_demo;host=127.0.0.1 dbio dbio
+
+  # Run demo against PostgreSQL (async)
+  perl demo/dbio-demo-async dbi:Pg:dbname=dbio_demo;host=127.0.0.1 dbio dbio
+
+  # Cleanup
+  kubectl delete -f demo/k8s/

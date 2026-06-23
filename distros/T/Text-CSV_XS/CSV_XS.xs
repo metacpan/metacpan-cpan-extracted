@@ -21,10 +21,10 @@
 #include "ppport.h"
 #define is_utf8_sv(s) is_utf8_string ((U8 *)SvPV_nolen (s), SvCUR (s))
 
-#define MAINT_DEBUG	0
-#define MAINT_DEBUG_EOL	0
+#define MAINT_DEBUG		0
+#define MAINT_DEBUG_EOL		0
 
-#define BUFFER_SIZE	1024
+#define BUFFER_SIZE		1024
 
 #define CSV_XS_TYPE_WARN	1
 #define CSV_XS_TYPE_PV		0
@@ -32,7 +32,7 @@
 #define CSV_XS_TYPE_NV		2
 
 /* maximum length for EOL, SEP, and QUOTE - keep in sync with .pm */
-#define MAX_ATTR_LEN	16
+#define MAX_ATTR_LEN		16
 
 #define CSV_FLAGS_QUO		0x0001
 #define CSV_FLAGS_BIN		0x0002
@@ -489,6 +489,22 @@ static char *cx_xs_cache_get_eolt (pTHX_ HV *hv) {
     return NULL;
     } /* cx_xs_cache_get_eolt */
 
+/* Hold an SV alive across cache memcpy ()s so the raw PV pointer we
+ * stash in csv->{undef_str,comment_str,types} stays valid even if
+ * the user mutates the public hash entry. The "_*_HELD" private
+ * hash key carries the refcount; the SV is freed automatically when
+ * csv->self is destroyed (or the key is overwritten/deleted). */
+#define hold_sv(hv,key,val)	cx_hold_sv (aTHX_ hv, key, sizeof (key) - 1, val)
+static void cx_hold_sv (pTHX_ HV *hv, const char *key, I32 klen, SV *val) {
+    if (val == NULL) {
+	(void)hv_delete (hv, key, klen, G_DISCARD);
+	return;
+	}
+    SvREFCNT_inc (val);
+    unless (hv_store (hv, key, klen, val, 0))
+	SvREFCNT_dec (val);
+    } /* cx_hold_sv */
+
 #define xs_cache_set(hv,idx,val)	cx_xs_cache_set (aTHX_ hv, idx, val)
 static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
     SV    **svp;
@@ -565,16 +581,19 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
 
 	/* string */
 	case CACHE_ID_sep:
+	    if (len > MAX_ATTR_LEN) croak ("INI - SEP too long");   /* 1006 */
 	    (void)memcpy (csv->sep, cp, len);
 	    csv->sep_len = len == 1 ? 0 : len;
 	    break;
 
 	case CACHE_ID_quo:
+	    if (len > MAX_ATTR_LEN) croak ("INI - QUOTE too long"); /* 1007 */
 	    (void)memcpy (csv->quo, cp, len);
 	    csv->quo_len = len == 1 ? 0 : len;
 	    break;
 
 	case CACHE_ID_eol:
+	    if (len > MAX_ATTR_LEN) croak ("INI - EOL too long");   /* 1005 */
 	    (void)memcpy (csv->eol, cp, len);
 	    csv->eol_len   =  len;
 	    csv->eol_type  =  len == 0                 ? EOL_TYPE_UNDEF
@@ -593,26 +612,37 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
 
 	case CACHE_ID_undef_str:
 	    if (*cp) {
+		hold_sv (csv->self, "_UNDEF_STR_HELD", val);
 		csv->undef_str = (byte *)cp;
 		if (SvUTF8 (val))
 		    csv->undef_flg = 3;
 		}
 	    else {
+		hold_sv (csv->self, "_UNDEF_STR_HELD", NULL);
 		csv->undef_str = NULL;
 		csv->undef_flg = 0;
 		}
 	    break;
 
 	case CACHE_ID_comment_str:
-	    csv->comment_str = *cp ? (byte *)cp : NULL;
+	    if (*cp) {
+		hold_sv (csv->self, "_COMMENT_STR_HELD", val);
+		csv->comment_str = (byte *)cp;
+		}
+	    else {
+		hold_sv (csv->self, "_COMMENT_STR_HELD", NULL);
+		csv->comment_str = NULL;
+		}
 	    break;
 
 	case CACHE_ID_types:
 	    if (cp && len) {
+		hold_sv (csv->self, "_TYPES_HELD", val);
 		csv->types     = cp;
 		csv->types_len = len;
 		}
 	    else {
+		hold_sv (csv->self, "_TYPES_HELD", NULL);
 		csv->types     = NULL;
 		csv->types_len = 0;
 		}
@@ -751,6 +781,7 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 	    CH_SEP = *SvPV (*svp, len);
 	if ((svp = hv_fetchs (self, "sep",            FALSE)) && *svp && SvOK (*svp)) {
 	    ptr = SvPV (*svp, len);
+	    if (len > MAX_ATTR_LEN) croak ("INI - SEP too long");   /* 1006 */
 	    (void)memcpy (csv->sep, ptr, len);
 	    if (len > 1)
 		csv->sep_len = len;
@@ -767,6 +798,7 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 	    }
 	if ((svp = hv_fetchs (self, "quote",          FALSE)) && *svp && SvOK (*svp)) {
 	    ptr = SvPV (*svp, len);
+	    if (len > MAX_ATTR_LEN) croak ("INI - QUOTE too long"); /* 1007 */
 	    (void)memcpy (csv->quo, ptr, len);
 	    if (len > 1)
 		csv->quo_len = len;
@@ -784,6 +816,7 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 
 	if ((svp = hv_fetchs (self, "eol",            FALSE)) && *svp && SvOK (*svp)) {
 	    char *eol = SvPV (*svp, len);
+	    if (len > MAX_ATTR_LEN) croak ("INI - EOL too long");   /* 1005 */
 	    (void)memcpy (csv->eol, eol, len);
 	    csv->eol_len = len;
 	    if (len == 1 && *eol == CH_CR) {
@@ -800,19 +833,27 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 	if ((svp = hv_fetchs (self, "undef_str",      FALSE)) && *svp && SvOK (*svp)) {
 		/*if (sv && (SvOK (sv) || (
 			(SvGMAGICAL (sv) && (mg_get (sv), 1) && SvOK (sv))))) {*/
+	    hold_sv (self, "_UNDEF_STR_HELD", *svp);
 	    csv->undef_str = (byte *)SvPV_nolen (*svp);
 	    if (SvUTF8 (*svp))
 		csv->undef_flg = 3;
 	    }
-	else
+	else {
+	    hold_sv (self, "_UNDEF_STR_HELD", NULL);
 	    csv->undef_str = NULL;
+	    }
 
-	if ((svp = hv_fetchs (self, "comment_str",    FALSE)) && *svp && SvOK (*svp))
+	if ((svp = hv_fetchs (self, "comment_str",    FALSE)) && *svp && SvOK (*svp)) {
+	    hold_sv (self, "_COMMENT_STR_HELD", *svp);
 	    csv->comment_str = (byte *)SvPV_nolen (*svp);
-	else
+	    }
+	else {
+	    hold_sv (self, "_COMMENT_STR_HELD", NULL);
 	    csv->comment_str = NULL;
+	    }
 
 	if ((svp = hv_fetchs (self, "_types",         FALSE)) && *svp && SvOK (*svp)) {
+	    hold_sv (self, "_TYPES_HELD", *svp);
 	    csv->types = SvPV (*svp, len);
 	    csv->types_len = len;
 	    }
@@ -1346,6 +1387,8 @@ static void cx_ParseError (pTHX_ csv_t *csv, int xse, STRLEN pos, int line) {
 	csv->has_error_input = 1;
 	if (hv_store (csv->self, "_ERROR_INPUT", 12, csv->tmp, 0))
 	    SvREFCNT_inc (csv->tmp);
+	else
+	    SvREFCNT_dec (csv->tmp);
 	}
     (void)SetDiagL (csv, xse, line);
     } /* ParseError */
@@ -1569,7 +1612,7 @@ static char *_sep_string (csv_t *csv) {
     if (csv->sep_len) {
 	int x;
 	for (x = 0; x < csv->sep_len; x++)
-	    (void)sprintf (_sep + x * x, "%02x ", csv->sep[x]);
+	    (void)sprintf (_sep + x * 3, "%02x ", csv->sep[x]);
 	}
     else
 	(void)sprintf (_sep, "'%c' (0x%02x)", CH_SEP, CH_SEP);
@@ -2009,8 +2052,8 @@ EOLX:
 			(csv->bptr[1] == 'e' || csv->bptr[1] == 'E') &&
 			(csv->bptr[2] == 'p' || csv->bptr[2] == 'P') &&
 			 csv->bptr[3] == '=') {
-		    char *sep = csv->bptr + 4;
-		    int   lnu = csv->used - 5;
+		    char   *sep = csv->bptr + 4;
+		    STRLEN  lnu = csv->used > 5 ? csv->used - 5 : 0;
 		    if (lnu <= MAX_ATTR_LEN) {
 			sep[lnu] = (char)0;
 			(void)memcpy (csv->sep, sep, lnu);

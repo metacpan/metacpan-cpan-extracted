@@ -1,0 +1,160 @@
+#!/usr/bin/env perl
+# xbin/dbio-pg-k8s — run a command with a live PostgreSQL pod on Kubernetes
+#
+# Reads DBIO_TEST_KUBECONFIG (path to a kubeconfig file).
+# Starts a PostgreSQL pod, sets DBIO_TEST_PG_DSN/_USER/_PASS internally,
+# runs the given command, then stops the pod on exit.
+#
+# Usage:
+#   DBIO_TEST_KUBECONFIG=~/.kube/myconfig xbin/dbio-pg-k8s prove -l t/
+#   DBIO_TEST_KUBECONFIG=~/.kube/myconfig xbin/dbio-pg-k8s dzil test
+#
+# Without a command: starts the pod and blocks until Ctrl-C, then stops.
+
+use strict;
+use warnings;
+use Kubernetes::REST::Kubeconfig;
+use IO::K8s;
+use Time::HiRes ();
+
+my $kubeconfig_path = $ENV{DBIO_TEST_KUBECONFIG}
+  or die "DBIO_TEST_KUBECONFIG is not set\n";
+
+my $k8s  = Kubernetes::REST::Kubeconfig->new(kubeconfig_path => $kubeconfig_path)->api;
+my $io   = IO::K8s->new;
+
+my $ns      = 'dbio-test';
+my $name    = 'dbio-postgresql';
+my $pg_user = 'dbio';
+my $pg_pass = 'dbio_test_secret';
+my $pg_db   = 'dbio_test';
+
+_ensure_namespace($k8s, $io, $ns);
+_create_pod($k8s, $io, $ns, $name, $pg_user, $pg_pass, $pg_db);
+_create_service($k8s, $io, $ns, $name);
+my ($host, $port) = _wait_for_ready($k8s, $ns, $name);
+
+$ENV{DBIO_TEST_PG_DSN}  = "dbi:Pg:dbname=$pg_db;host=$host;port=$port";
+$ENV{DBIO_TEST_PG_USER} = $pg_user;
+$ENV{DBIO_TEST_PG_PASS} = $pg_pass;
+
+my $exit = 0;
+
+if (@ARGV) {
+  $exit = system(@ARGV);
+  $exit = $exit >> 8;
+}
+else {
+  print STDERR "PostgreSQL ready at $host:$port (namespace $ns)\n";
+  print STDERR "Press Ctrl-C to stop.\n";
+  local $SIG{INT} = sub { };
+  POSIX::pause();
+}
+
+_stop($k8s, $ns, $name);
+exit $exit;
+
+sub _stop {
+  my ($k8s, $ns, $name) = @_;
+  print STDERR "Stopping $name...\n";
+  eval { $k8s->delete($k8s->get('Pod',     name => $name, namespace => $ns)) };
+  eval { $k8s->delete($k8s->get('Service', name => $name, namespace => $ns)) };
+}
+
+sub _ensure_namespace {
+  my ($k8s, $io, $ns) = @_;
+  return if eval { $k8s->get('Namespace', name => $ns); 1 };
+  $k8s->create($io->new_object('Namespace',
+    metadata => { name => $ns },
+  ));
+}
+
+sub _create_pod {
+  my ($k8s, $io, $ns, $name, $user, $pass, $db) = @_;
+  if (eval { $k8s->get('Pod', name => $name, namespace => $ns); 1 }) {
+    $k8s->delete($k8s->get('Pod', name => $name, namespace => $ns));
+    print STDERR "Waiting for old pod to terminate";
+    my $deadline = time + 60;
+    while (time < $deadline) {
+      last unless eval { $k8s->get('Pod', name => $name, namespace => $ns); 1 };
+      print STDERR '.';
+      Time::HiRes::sleep(2);
+    }
+    print STDERR "\n";
+  }
+  $k8s->create($io->new_object('Pod',
+    metadata => { name => $name, namespace => $ns, labels => { app => $name } },
+    spec     => {
+      containers => [{
+        name  => 'postgres',
+        image => 'src.ci/srv/postgres:18',
+        env   => [
+          { name => 'POSTGRES_USER',     value => $user },
+          { name => 'POSTGRES_PASSWORD', value => $pass },
+          { name => 'POSTGRES_DB',       value => $db   },
+        ],
+        ports          => [{ containerPort => 5432 }],
+        readinessProbe => {
+          exec                => { command => ['pg_isready', '-U', $user] },
+          initialDelaySeconds => 5,
+          periodSeconds       => 3,
+        },
+      }],
+    },
+  ));
+}
+
+sub _create_service {
+  my ($k8s, $io, $ns, $name) = @_;
+  eval { $k8s->delete($k8s->get('Service', name => $name, namespace => $ns)) };
+  $k8s->create($io->new_object('Service',
+    metadata => { name => $name, namespace => $ns },
+    spec     => {
+      type     => 'NodePort',
+      selector => { app => $name },
+      ports    => [{ port => 5432, targetPort => 5432 }],
+    },
+  ));
+}
+
+sub _wait_for_ready {
+  my ($k8s, $ns, $name) = @_;
+  print STDERR "Waiting for pod $name to be ready";
+  my $deadline = time + 120;
+  while (time < $deadline) {
+    my $pod = eval { $k8s->get('Pod', name => $name, namespace => $ns) };
+    if ($pod && _pod_ready($pod)) {
+      print STDERR " ready\n";
+      return _get_service_endpoint($k8s, $ns, $name);
+    }
+    print STDERR '.';
+    Time::HiRes::sleep(3);
+  }
+  die "\nTimed out waiting for pod $name\n";
+}
+
+sub _pod_ready {
+  my ($pod) = @_;
+  my $conditions = $pod->status->conditions // [];
+  return grep { $_->type eq 'Ready' && $_->status eq 'True' } @$conditions;
+}
+
+sub _get_service_endpoint {
+  my ($k8s, $ns, $name) = @_;
+  my $svc       = $k8s->get('Service', name => $name, namespace => $ns);
+  my $node_port = $svc->spec->ports->[0]->nodePort
+    or die "No nodePort assigned to service $name\n";
+
+  my $nodes  = $k8s->list('Node');
+  my ($node) = grep { _node_ready($_) } @{ $nodes->items };
+  die "No ready nodes found\n" unless $node;
+
+  my ($addr) = grep { $_->type eq 'InternalIP' } @{ $node->status->addresses };
+  return ($addr->address, $node_port);
+}
+
+sub _node_ready {
+  my ($node) = @_;
+  my $conditions = $node->status->conditions // [];
+  return grep { $_->type eq 'Ready' && $_->status eq 'True' } @$conditions;
+}

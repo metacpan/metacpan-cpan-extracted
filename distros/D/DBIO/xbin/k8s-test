@@ -1,0 +1,245 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+=head1 NAME
+
+k8s-test - Run DBIO tests against Kubernetes-provisioned databases
+
+=head1 SYNOPSIS
+
+    # Set kubeconfig (or use KUBECONFIG / default ~/.kube/config)
+    export DBIO_TEST_KUBECONFIG=~/.kube/config
+
+    # Local mode (default): port-forward, run prove on your machine
+    maint/k8s-test                           # run all tests
+    maint/k8s-test t/72pg.t t/71mysql.t      # specific tests
+    maint/k8s-test --keep                    # don't delete namespace after
+
+    # In-cluster mode: build image, run as Job inside the cluster
+    maint/k8s-test --mode cluster
+    maint/k8s-test --mode cluster --image my-registry/dbio-test:v1
+
+    # Coverage
+    maint/k8s-test --cover                   # run with Devel::Cover
+    maint/k8s-test --cover t/72pg.t          # coverage for specific tests
+
+    # Options
+    --mode local|cluster    Test execution mode (default: local)
+    --keep                  Don't delete namespace after tests
+    --cover                 Run with Devel::Cover and generate report
+    --namespace NAME        Use specific namespace name
+    --image IMAGE           Docker image for cluster mode (default: dbio-test:latest)
+    --db pg,mysql,pg-ext,duckdb  Which databases to provision (default: pg,mysql)
+    --timeout SECS          Readiness timeout in seconds (default: 120)
+
+=head1 DESCRIPTION
+
+Provisions temporary PostgreSQL and MySQL pods in a Kubernetes cluster,
+then runs the DBIO test suite against them. Cleans up automatically unless
+C<--keep> is specified.
+
+Uses L<Kubernetes::REST> and L<IO::K8s> for all API interactions (no kubectl
+shelling out, except for port-forward in local mode).
+
+=cut
+
+use Getopt::Long qw(:config pass_through);
+use File::Basename qw(dirname);
+use Cwd qw(abs_path);
+
+# Ensure we can find DBIO::Test::Kubernetes
+my $dbio_root = abs_path(dirname(dirname(__FILE__)));
+unshift @INC, "$dbio_root/lib";
+
+require DBIO::Test::Kubernetes;
+
+# Parse our options; anything left over goes to prove
+my $mode      = 'local';
+my $keep      = 0;
+my $cover     = 0;
+my $namespace = undef;
+my $image     = 'dbio-test:latest';
+my $db_list   = 'pg,mysql';
+my $timeout   = 120;
+
+GetOptions(
+    'mode=s'      => \$mode,
+    'keep'        => \$keep,
+    'cover'       => \$cover,
+    'namespace=s' => \$namespace,
+    'image=s'     => \$image,
+    'db=s'        => \$db_list,
+    'timeout=i'   => \$timeout,
+) or die "Usage: $0 [options] [prove args...]\n";
+
+my @prove_args = @ARGV;
+
+die "Invalid mode: $mode (use: local, cluster)\n"
+    unless $mode =~ /^(local|cluster)$/;
+
+my @databases = split /,/, $db_list;
+
+# ============================================================================
+# MAIN
+# ============================================================================
+
+my $k8s = DBIO::Test::Kubernetes->new(
+    ($namespace ? (namespace => $namespace) : ()),
+    databases => \@databases,
+);
+
+my $exit_code = 1;
+
+# Install cleanup handler
+my $cleanup = sub {
+    if ($keep) {
+        print "\n--keep specified, namespace preserved: " . $k8s->namespace . "\n";
+        print "To delete: kubectl delete namespace " . $k8s->namespace . "\n";
+    } else {
+        $k8s->cleanup;
+    }
+};
+
+$SIG{INT} = sub {
+    print "\nCaught interrupt, cleaning up...\n";
+    $cleanup->();
+    exit 130;
+};
+
+$SIG{TERM} = sub {
+    $cleanup->();
+    exit 143;
+};
+
+eval {
+    # Step 1: Deploy databases
+    $k8s->deploy_databases;
+
+    # Step 2: Wait for readiness
+    $k8s->wait_for_ready(timeout => $timeout);
+
+    if ($mode eq 'local') {
+        $exit_code = run_local($k8s, \@prove_args, $cover);
+    } else {
+        $exit_code = run_cluster($k8s, \@prove_args, $cover);
+    }
+};
+if ($@) {
+    print STDERR "Error: $@\n";
+    $exit_code = 1;
+}
+
+$cleanup->();
+exit $exit_code;
+
+# ============================================================================
+# LOCAL MODE
+# ============================================================================
+
+sub run_local {
+    my ($k8s, $prove_args, $cover) = @_;
+
+    # Step 3: Set up port forwards
+    $k8s->setup_port_forwards;
+
+    # Step 4: Build env vars
+    my %env = $k8s->env_vars(mode => 'local');
+
+    # Set environment
+    @ENV{keys %env} = values %env;
+
+    print "\nEnvironment:\n";
+    for my $key (sort keys %env) {
+        print "  $key=$env{$key}\n";
+    }
+    print "\n";
+
+    # Step 5: Run prove (with optional coverage)
+    my @cmd;
+    if ($cover) {
+        # Use cover -test which wraps prove with Devel::Cover
+        my $cover_db = "$dbio_root/cover_db";
+        @cmd = ('cover', "-test", "-outputdir", $cover_db, "--");
+        push @cmd, '-l';
+        if (@$prove_args) {
+            push @cmd, @$prove_args;
+        } else {
+            push @cmd, 't/';
+        }
+
+        print "Running with coverage: @cmd\n\n";
+        system(@cmd);
+        my $test_exit = $? >> 8;
+
+        # Generate coverage report
+        print "\nGenerating coverage report...\n";
+        system('cover', '-report', 'text', $cover_db);
+        print "\nFull HTML report: $cover_db/coverage.html\n";
+
+        return $test_exit;
+    }
+
+    @cmd = ('prove', '-l');
+    if (@$prove_args) {
+        push @cmd, @$prove_args;
+    } else {
+        push @cmd, 't/';
+    }
+
+    print "Running: @cmd\n\n";
+    system(@cmd);
+
+    return $? >> 8;
+}
+
+# ============================================================================
+# CLUSTER MODE
+# ============================================================================
+
+sub run_cluster {
+    my ($k8s, $prove_args, $cover) = @_;
+
+    # Step 3: Build and load the test image
+    print "Building Docker image $image...\n";
+    system('docker', 'build', '-t', $image, $dbio_root) == 0
+        or die "Docker build failed\n";
+
+    # Try to load into local cluster (kind or minikube)
+    if (system('kind', 'get', 'clusters', '>/dev/null', '2>&1') == 0) {
+        print "Loading image into kind...\n";
+        system('kind', 'load', 'docker-image', $image);
+    } elsif (system('minikube', 'status', '>/dev/null', '2>&1') == 0) {
+        print "Loading image into minikube...\n";
+        system('minikube', 'image', 'load', $image);
+    }
+
+    # Step 4: Deploy test Job
+    my @args;
+    if ($cover) {
+        # In cluster mode, run cover -test inside the container
+        @args = ('cover', '-test', '--', '-l');
+        push @args, @$prove_args ? @$prove_args : 't/';
+    } else {
+        @args = @$prove_args ? ('-l', @$prove_args) : ('-l', 't/');
+    }
+
+    $k8s->deploy_test_job(
+        image      => $image,
+        prove_args => \@args,
+        ($cover ? (command => ['perl']) : ()),
+    );
+
+    # Step 5: Wait for completion
+    my $job_exit = $k8s->wait_for_job;
+
+    # Step 6: Fetch and print logs
+    my $logs = $k8s->fetch_job_logs;
+    for my $entry (@$logs) {
+        print "=== Pod: $entry->{pod} ===\n";
+        print $entry->{log};
+        print "\n";
+    }
+
+    return $job_exit;
+}

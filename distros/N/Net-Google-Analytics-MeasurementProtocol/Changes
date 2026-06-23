@@ -1,5 +1,8 @@
 Revision history for Net-Google-Analytics-MeasurementProtocol
 
+4.02 2026-06-22
+    - updates to comply with GA4
+
 0.5 2016-04-01
     - ensure ua_object is not sent in POST to Google Analytics (Olaf Alders)
     - code improvements (Andy Jack)

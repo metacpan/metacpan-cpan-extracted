@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.043000
+    version 2.044000
 
 SYNOPSIS
 
@@ -68,7 +68,7 @@ METHODS
  author
 
         my $author = $mcpan->author('XSAWYERX');
-        my $author = $mcpan->author($search_spec);
+        my $author_resultset = $mcpan->author($search_spec);
 
     Finds an author by either its PAUSE ID or by a search spec defined by a
     hash reference. Since it is common to many other searches, it is
@@ -94,7 +94,7 @@ METHODS
  distribution
 
         my $dist = $mcpan->distribution('MetaCPAN-Client');
-        my $dist = $mcpan->distribution($search_spec);
+        my $dist_resultset = $mcpan->distribution($search_spec);
 
     Finds a distribution by either its distribution name or by a search
     spec defined by a hash reference. Since it is common to many other
@@ -111,7 +111,7 @@ METHODS
 
  favorite
 
-        my $favorite = $mcpan->favorite({ distribution => 'Moose' });
+        my $favorite_resultset = $mcpan->favorite({ distribution => 'Moose' });
 
     Returns a MetaCPAN::Client::ResultSet object containing
     MetaCPAN::Client::Favorite results.
@@ -119,7 +119,7 @@ METHODS
  release
 
         my $release = $mcpan->release('MetaCPAN-Client');
-        my $release = $mcpan->release($search_spec);
+        my $release_resultset = $mcpan->release($search_spec);
 
     Finds a release by either its distribution name or by a search spec
     defined by a hash reference. Since it is common to many other searches,
@@ -139,7 +139,7 @@ METHODS
  module
 
         my $module = $mcpan->module('MetaCPAN::Client');
-        my $module = $mcpan->module($search_spec);
+        my $module_resultset = $mcpan->module($search_spec);
 
     Finds a module by either its module name or by a search spec defined by
     a hash reference. Since it is common to many other searches, it is
@@ -164,7 +164,7 @@ METHODS
 
  reverse_dependencies
 
-        my $deps = $mcpan->reverse_dependencies('Search::Elasticsearch');
+        my $deps_resultset = $mcpan->reverse_dependencies('Search::Elasticsearch');
 
     all MetaCPAN::Client::Release objects of releases that are directly
     dependent on a given module, returned as MetaCPAN::Client::ResultSet.
@@ -191,8 +191,8 @@ METHODS
 
  recent
 
-        my $recent = $mcpan->recent(10);
-        my $recent = $mcpan->recent('today');
+        my $recent_resultset = $mcpan->recent(10);
+        my $recent_resultset = $mcpan->recent('today');
 
     return the latest N releases, or all releases from today.
 
@@ -252,20 +252,20 @@ METHODS
 
     See SEARCH PARAMS.
 
-       my $all_releases = $mcpan->all('releases', { fields => [...] })
+       my $all_releases_resultset = $mcpan->all('releases', { fields => [...] })
 
   _source
 
     See SEARCH PARAMS.
 
-       my $all_releases = $mcpan->all('releases', { _source => [...] })
+       my $all_releases_resultset = $mcpan->all('releases', { _source => [...] })
 
   es_filter
 
     Pass a raw Elasticsearch filter structure to reduce the number of
     elements returned by the query.
 
-        my $some_releases = $mcpan->all('releases', { es_filter => {...} })
+        my $some_releases_resultset = $mcpan->all('releases', { es_filter => {...} })
 
  BUILDARGS
 
@@ -303,7 +303,7 @@ SEARCH PARAMS
     things we can't to begin with (like non-leaf fields that hold a
     structure)
 
-        my $module = $mcpan->all('releases', { _source => "stat" });
+        my $module_resultset = $mcpan->all('releases', { _source => "stat" });
 
  scroller_time
 

@@ -209,7 +209,8 @@ static void sax_flush(bscanner* b) {
     const char* const pool = b->bytepool;
     const size_t n         = b->ev_len;
     ev_rec* const evs      = b->evbuf;
-    for (size_t i = 0; i < n; i++) {
+    size_t i;
+    for (i = 0; i < n; i++) {
         ev_rec* e = &evs[i];
         switch (e->type) {
         case EV_ENTER_BLOCK:
@@ -841,8 +842,9 @@ static const char* tbl_next_line(const char* p, const char* end, const char** le
  * by mds_inline_scan's fast path. Tables of single-word cells (the
  * common case in real-world reports) hit this on every cell. */
 MDS_ALWAYS_INLINE static int tbl_cell_is_plain(const char* s, size_t n) {
+    size_t i;
     if (n == 0) return 1;
-    for (size_t i = 0; i < n; i++) {
+    for (i = 0; i < n; i++) {
         unsigned char c = (unsigned char)s[i];
         if (c == '*' || c == '_' || c == '~' || c == '`'  ||
             c == '['  || c == ']' || c == '!' || c == '<'  ||
@@ -1360,7 +1362,8 @@ static const char* const HTML6_TAGS[] = {
 };
 
 static int is_html6_tag(const char* s, size_t n) {
-    for (int i = 0; HTML6_TAGS[i]; i++) {
+    int i;
+    for (i = 0; HTML6_TAGS[i]; i++) {
         size_t tl = strlen(HTML6_TAGS[i]);
         if (tl == n && ascii_ieq(s, HTML6_TAGS[i], n)) return 1;
     }
@@ -1848,11 +1851,12 @@ MDS_HOT void mds_block_scan(mds_ctx* ctx) {
                 size_t need;
                 char* dst;
                 int col;
+                const char* s;
                 need = (size_t)(ws_end - p) * 4 + (size_t)(le - ws_end) + 8;
                 buf_grow(&b.line_scratch, &b.line_scratch_cap, need);
                 dst = b.line_scratch;
                 col = 0;
-                for (const char* s = p; s < ws_end; s++) {
+                for (s = p; s < ws_end; s++) {
                     if (*s == '\t') {
                         int adv = 4 - (col & 3);
                         while (adv-- > 0) { *dst++ = ' '; col++; }
@@ -1898,9 +1902,10 @@ MDS_HOT void mds_block_scan(mds_ctx* ctx) {
                  * avoid an empty <section><ol></ol></section>. */
             } else {
                 mds_block_detail d;
+                size_t k;
                 memset(&d, 0, sizeof d);
                 cb.enter_block(ud, MDS_BLK_FOOTNOTES_SECTION, &d);
-                for (size_t k = 0; k < emit_n; k++) {
+                for (k = 0; k < emit_n; k++) {
                     const mds_footnote* fn;
                     mds_block_detail fd;
                     mds_render_html_used_footnote(ud, k, &lbl, &llen);
@@ -1961,6 +1966,7 @@ MDS_HOT static void scan_line(bscanner* b, const char* line, const char* line_en
     int blank = is_blank(p, line_end);
     int matched;
     int i;
+    size_t r;
     int lazy;
     int level;
     const char* bs;
@@ -2116,7 +2122,7 @@ regular:
              * handling (paragraph finalise + quote close). */
             if (matched < b->depth) {
                 int has_unmatched_quote = 0;
-                for (int i = matched; i < b->depth; i++) {
+                for (i = matched; i < b->depth; i++) {
                     if (b->stack[i].kind == CT_QUOTE) { has_unmatched_quote = 1; break; }
                 }
                 if (has_unmatched_quote) {
@@ -2144,17 +2150,17 @@ regular:
         {
             int deepest_li = -1;
             int has_quote_above_li = 0;
-            for (int i = 0; i < matched; i++) {
+            for (i = 0; i < matched; i++) {
                 if (b->stack[i].kind == CT_LIST_ITEM) deepest_li = i;
             }
             if (deepest_li >= 0) {
-                for (int i = deepest_li + 1; i < matched; i++) {
+                for (i = deepest_li + 1; i < matched; i++) {
                     if (b->stack[i].kind == CT_QUOTE) { has_quote_above_li = 1; break; }
                 }
             }
             if (!has_quote_above_li) b->blank_pending = 1;
         }
-        for (int i = 0; i < b->depth; i++) {
+        for (i = 0; i < b->depth; i++) {
             if (b->stack[i].kind == CT_LIST_ITEM && b->stack[i].is_empty)
                 b->stack[i].blank_after_empty = 1;
         }
@@ -2163,7 +2169,7 @@ regular:
          * match. (Lists handle blank lines via had_blank_inside; quotes don't
          * have a same notion.) */
         if (matched < b->depth) {
-            for (int i = matched; i < b->depth; i++) {
+            for (i = matched; i < b->depth; i++) {
                 if (b->stack[i].kind == CT_QUOTE) {
                     close_containers_to(b, matched);
                     break;
@@ -2229,7 +2235,7 @@ regular:
      * level while inner stays tight). */
     if (b->blank_pending) {
         int deepest = -1;
-        for (int i = 0; i < b->depth; i++)
+        for (i = 0; i < b->depth; i++)
             if (b->stack[i].kind == CT_LIST) deepest = i;
         if (deepest >= 0) b->stack[deepest].pending_blank = 1;
         b->blank_pending = 0;
@@ -2492,7 +2498,7 @@ regular:
             /* CommonMark: backslash-escape ASCII punctuation in info string. */
             b->fence_info = (char*)mds_arena_alloc(&b->ctx->arena, iln + 1);
             w = 0;
-            for (size_t r = 0; r < iln; r++) {
+            for (r = 0; r < iln; r++) {
                 unsigned char ch = (unsigned char)ifs[r];
                 if (ch == '\\' && r + 1 < iln) {
                     unsigned char nx = (unsigned char)ifs[r+1];

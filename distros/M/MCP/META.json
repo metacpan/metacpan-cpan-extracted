@@ -36,7 +36,7 @@
          "requires" : {
             "CryptX" : "0.087",
             "IPC::Run" : "20231003.0",
-            "JSON::Validator" : "5.15",
+            "JSON::Schema::Tiny" : "0.031",
             "Mojolicious" : "9.41",
             "perl" : "5.020"
          }
@@ -61,6 +61,6 @@
          "web" : "https://web.libera.chat/#mojo"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

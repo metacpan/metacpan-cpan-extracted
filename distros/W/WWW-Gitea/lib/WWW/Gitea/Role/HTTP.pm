@@ -6,6 +6,7 @@ use Moo::Role;
 use Carp qw(croak);
 use JSON::MaybeXS qw(decode_json encode_json);
 use HTTP::Request;
+use HTTP::Request::Common ();
 use LWP::UserAgent;
 use MIME::Base64 qw(encode_base64);
 use URI;
@@ -46,7 +47,22 @@ sub request {
     my $uri = URI->new($self->api_url . $path);
     $uri->query_form($args{query}) if $args{query};
 
-    my $req = HTTP::Request->new($method => $uri);
+    my $req;
+    if (my $up = $args{upload}) {
+        my $field = $up->{field} || 'attachment';
+        my $value = defined $up->{file}
+            ? [ $up->{file}, $up->{filename} ]
+            : [ undef, $up->{filename}, Content => ($up->{content} // '') ];
+        $req = HTTP::Request::Common::POST(
+            "$uri",
+            Content_Type => 'form-data',
+            Content      => [ $field => $value ],
+        );
+        $req->method($method);
+    }
+    else {
+        $req = HTTP::Request->new($method => $uri);
+    }
     $self->_apply_auth($req);
     $req->header(Accept => 'application/json');
     for my $k (keys %{ $args{headers} || {} }) {
@@ -108,7 +124,7 @@ WWW::Gitea::Role::HTTP - HTTP + token/basic auth role for the Gitea REST API
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -147,6 +163,20 @@ Low-level request method used by the API controllers. Accepts C<body>,
 C<query>, C<headers> and C<content_type> named arguments. Returns the decoded
 JSON response (or C<1> for an empty C<2xx> such as C<204 No Content>); croaks
 with the Gitea error message on a non-2xx response.
+
+For C<multipart/form-data> uploads (release assets, issue/comment attachments)
+pass an C<upload> HashRef instead of C<body>:
+
+    $self->request('POST', '/repos/getty/foo/releases/5/assets',
+        query  => { name => 'logo.png' },
+        upload => { field => 'attachment', file => '/path/to/logo.png' },
+    );
+
+C<upload> keys: C<field> (form field name, defaults to C<attachment>); either
+C<file> (path on disk, with optional C<filename> for the part name) or
+C<content> (raw bytes, with C<filename> for the part name). The request is
+built with L<HTTP::Request::Common>; any C<query> parameters are still applied
+to the URI, so a query-param such as C<name> works alongside the upload body.
 
 =head2 request_status
 

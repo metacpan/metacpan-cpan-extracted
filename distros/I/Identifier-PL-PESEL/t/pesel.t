@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 2;
+use Test::More 'tests' => 3;
 use Test::Exception;
 
 use FindBin;
@@ -37,4 +37,15 @@ subtest 'validate' => sub {
     ok !$p->validate( 0 ), 'incorrect pesel number';
 
     dies_ok { $p->validate( undef ) } 'incorrect pesel number';
+};
+
+subtest 'gender' => sub {
+    plan 'tests' => 3;
+
+    my $p = Identifier::PL::PESEL->new();
+
+    ok !$p->validate( '02070803627' ), 'incorrect pesel number';
+
+    is $p->gender( '90031512355' ), 'male';
+    is $p->gender( '02070803628' ), 'female';
 };

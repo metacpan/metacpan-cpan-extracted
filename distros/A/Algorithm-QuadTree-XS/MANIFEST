@@ -9,7 +9,6 @@ README.md
 XS.xs
 dist.ini
 lib/Algorithm/QuadTree/XS.pm
-lib/Algorithm/QuadTree/XS/NoBackRefs.pm
 ppport.h
 qtbase.c
 qtbase.h
@@ -18,11 +17,6 @@ t/02-zones.t
 t/03-delete.t
 t/04-circles.t
 t/06-references.t
-t/author-leaks-nobackrefs.t
 t/author-leaks.t
 t/author-pod-syntax.t
 t/lib/QuadTreeUtils.pm
-t/nobackrefs/01-use.t
-t/nobackrefs/02-zones.t
-t/nobackrefs/04-circles.t
-t/nobackrefs/06-references.t

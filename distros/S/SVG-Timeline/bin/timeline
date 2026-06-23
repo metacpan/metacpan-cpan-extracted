@@ -17,15 +17,16 @@ SVG document to C<STDOUT>.
 
 =head2 Input Data
 
-The program reads input data from a tab-separated file. Each line in the file
-represents a single event in the timeline - which will be represented by a
-coloured rectangle in the diagram.
+The program reads input data from a file where each line is whitespace-separated
+(spaces or tabs). Each line in the file represents a single event in the
+timeline - which will be represented by a coloured rectangle in the diagram.
 
-Each line in  the file requires three columns of data: a text string (to be
-used as the label for the event), a start year and an end year. There can
-also be an optional fourth column which is a colour for the background of
-the rectangle representing the event. This colour can be a colour name (e.g.
-C<red>) or an RGB string as recognised by SVG (e.g. C<rgb(255,0,0)>).
+Each line requires three pieces of data: a text string (to be used as the label
+for the event), a start year and an end year. The start and end years can be in
+C<YYYY>, C<YYYY-MM>, or C<YYYY-MM-DD> format. There can also be an optional
+fourth value which is a colour for the background of the rectangle representing
+the event. This colour can be a colour name (e.g. C<red>) or an RGB string as
+recognised by SVG (e.g. C<rgb(255,0,0)>).
 
 An example input file might be:
 
@@ -83,8 +84,17 @@ my $timeline = SVG::Timeline->new(%opts);
 
 while (<>) {
   chomp;
+  s/^\s+|\s+$//g;
+  next unless length;
+
   my %rec;
-  @rec{qw[text start end colour]} = split /\t/;
+  if (/^(.+?)\s+(\d{4}(?:-\d\d(?:-\d\d)?)?)\s+(\d{4}(?:-\d\d(?:-\d\d)?)?)\s*(\S+)?\s*$/) {
+    @rec{qw[text start end colour]} = ($1, $2, $3, $4);
+  } else {
+    warn "Skipping unrecognised line: $_\n";
+    next;
+  }
+
   $timeline->add_event(\%rec);
 }
 

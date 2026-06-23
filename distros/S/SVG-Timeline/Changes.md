@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.2.0] - 2026-06-22
+
+### Fixed
+
+- Stop labels overflowing to the right
+
+### Added
+
+- Continuous integration
+
 ## [0.1.3] - 2022-11-01
 
 ### Fixed

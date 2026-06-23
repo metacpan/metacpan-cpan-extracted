@@ -5,8 +5,8 @@ for all [DBIO](https://metacpan.org/pod/DBIO) distributions.
 
 ## Scope
 
-- `Dist::Zilla::PluginBundle::DBIO` — the `[@DBIO]` plugin bundle
-- `Pod::Weaver::PluginBundle::DBIO` — the `@DBIO` [Pod::Weaver](https://metacpan.org/pod/Pod::Weaver) config
+- `Dist::Zilla::PluginBundle::DBIO` - the `[@DBIO]` plugin bundle
+- `Pod::Weaver::PluginBundle::DBIO` - the `@DBIO` [Pod::Weaver](https://metacpan.org/pod/Pod::Weaver) config
 
 ## Usage
 
@@ -56,8 +56,8 @@ heritage = 1
   replaces `{{$NEXT}}` with version + date on release
 - **POD**: [PodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::PodWeaver) with
   `=attr` and `=method` collectors, auto-generated NAME, VERSION, AUTHORS, COPYRIGHT
-- **Copyright**: `heritage = 0` (default) — DBIO Authors only;
-  `heritage = 1` — adds DBIx::Class Authors attribution
+- **Copyright**: `heritage = 0` (default) - DBIO Authors only;
+  `heritage = 1` - adds DBIx::Class Authors attribution
 - **GitHub**: Metadata and issue tracking via
   [GithubMeta](https://metacpan.org/pod/Dist::Zilla::Plugin::GithubMeta)
 - **Build**: [MakeMaker](https://metacpan.org/pod/Dist::Zilla::Plugin::MakeMaker) for

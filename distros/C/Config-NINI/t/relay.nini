@@ -1,0 +1,127 @@
+###############################################################
+# relay.nini - example payment-relay daemon configuration
+# exercises most NINI features in a single file
+###############################################################
+
+# root scalars, a presence flag, an explicit empty
+service     relay
+version     3.2.1
+
+# valueless key is presence flag and will have value of "1"
+daemonize
+pidfile     /run/relay/relay.pid
+
+# '#' is not special when is not line leading (i.e. comment)
+banner      relay #4 - primary
+
+# explicit empty, NOT a presence flag
+maintenance ""
+
+
+# abstract template (removed from the result), used via "&name"
+*endpoint_defaults
+  timeout_ms 5000
+  retries    3
+  keepalive
+  tls_ciphers[:] ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256
+
+
+*endpoint_defaults log
+  level    info
+  facility local0
+
+
+# logging (defined here, extended again lower down)
+=log
+  dir     /var/log/relay
+  rotate  daily
+
+  # inline comment: two weeks
+  keep    14
+  formats[] json text syslog
+
+# listeners: an auto-index list of records
+=listener *
+  # inherit template keys + nested 'log'
+  & *endpoint_defaults
+
+  bind  0.0.0.0:8583
+  proto iso8583
+
+
+=listener *
+  &&& *endpoint_defaults
+  &&& log
+  bind      127.0.0.1:9090
+  proto     http
+
+  # local override of inherited default
+  timeout_ms 2000
+
+=hsm
+
+  zzz xxx
+
+# HSM pool (auto-index records)
+=hsm pool *
+  host  hsm-1.lan:1500
+  slot  0
+  label Primary HSM
+
+  & hsm pool
+
+=hsm pool *
+  host  hsm-2.lan:1500
+  slot  0
+  label Backup HSM
+
+  & hsm
+
+# routing table keyed by path segments ('/' is a name char)
+=route /iso/auth
+  upstream hsm
+
+  # mti is array with "," as values separator
+  mti[,]   0100, 0110
+
+  # ':' is ordinary in a value
+  pan_mask 6:4
+
+=route /iso/reversal
+  upstream hsm
+
+  # same mti array but when separator is not defined it will be whitespace
+  mti[]   0400  0410
+
+=route /admin/health
+  upstream none
+
+  # presence flag
+  public
+
+
+# plugins: whitespace list keeps ':' inside each element
+=plugins
+  load[] Relay:Filter  Relay:Audit  Relay:Metrics
+
+  namespace[:] Relay:Filter:PCI
+  searchpath[;] /opt/relay/lib; /usr/local/lib; /usr/lib
+
+
+# clear flag: wipe a subtree before redefining (for layering)
+=features experimental !!
+  enabled false
+
+
+# pull in TLS material from another file
+@include relay.tls.nini
+foobargasted none
+
+# re-enter an existing section to MERGE more keys
+=log
+  compress
+  max_size_mb 100
+
+# return to root, then one more root scalar
+=
+  status_file /run/relay/status

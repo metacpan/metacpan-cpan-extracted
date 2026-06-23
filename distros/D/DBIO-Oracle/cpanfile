@@ -1,0 +1,9 @@
+requires 'perl', '5.020';
+requires 'DBIO', '0.900000';
+requires 'Math::Base36', '0.07';
+requires 'DateTime::Format::Oracle';
+
+on test => sub {
+  requires 'Test::More', '0.98';
+  requires 'Data::Dumper::Concise';
+};

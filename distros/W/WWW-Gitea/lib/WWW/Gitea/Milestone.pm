@@ -82,7 +82,7 @@ WWW::Gitea::Milestone - Gitea milestone entity
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

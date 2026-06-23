@@ -1,0 +1,297 @@
+# PODNAME: DBIO::Manual::Migration
+# ABSTRACT: Step-by-step guide for migrating an existing DBIx::Class codebase to DBIO
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual::Migration - Step-by-step guide for migrating an existing DBIx::Class codebase to DBIO
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 OVERVIEW
+
+DBIO is a clean break from L<DBIx::Class>. There is no runtime
+compatibility shim. Migration is a mechanical, reviewable, code-level
+transformation: rename packages, swap a small number of APIs, drop a
+few removed features.
+
+This guide walks through that transformation step by step. Each step
+is independent and testable. After all steps, your application talks
+to DBIO and the door to DBIx::Class is closed.
+
+The full DBICTest schema set from L<DBIx::Class> 0.082844 has been
+imported under L<MigrationsTest|/F<t/lib/MigrationsTest/>> as a
+reference fixture. The conversion below is what was actually applied
+to it; the post-migration shape is the permanent DBIO test schema.
+
+For the rationale and full inventory of what changed, see
+L<DBIO::Manual::Heritage>. This document is the I<how>; Heritage is
+the I<what> and I<why>.
+
+=head1 STEP 1 - RENAME THE NAMESPACE
+
+Replace every occurrence of C<DBIx::Class> with C<DBIO> across your
+codebase. This is a pure mechanical transform:
+
+  DBIx::Class           -> DBIO
+  DBIx::Class::Core     -> DBIO::Core
+  DBIx::Class::Row      -> DBIO::Row
+  DBIx::Class::Schema   -> DBIO::Schema
+  DBIx::Class::ResultSet -> DBIO::ResultSet
+  DBIx::Class::ResultSource::Table -> DBIO::ResultSource::Table
+  DBIx::Class::ResultSource::View  -> DBIO::ResultSource::View
+  DBIx::Class::ResultClass::HashRefInflator -> DBIO::ResultClass::HashRefInflator
+  DBIx::Class::Storage::DBI -> DBIO::Storage::DBI
+
+A typical sweep:
+
+  find lib t -name '*.pm' -o -name '*.pl' -o -name '*.t' \
+    | xargs sed -i 's/DBIx::Class/DBIO/g'
+
+This handles 95 % of a vanilla codebase. After the sweep, fix up the
+two namespaces whose names changed shape, not just prefix:
+
+  DBIO::_Util  -> DBIO::Util       (was DBIx::Class::_Util)
+  DBIO::_ENV_  -> drop (was DBIx::Class::_ENV_, machinery removed)
+
+The remaining steps cover the cases where a like-for-like rename is
+wrong because the API itself has changed.
+
+=head1 STEP 2 - DROP CDBICompat AND OTHER REMOVED COMPONENTS
+
+The following components are gone with no replacement:
+
+=over 4
+
+=item * L<DBIx::Class::CDBICompat> - Class::DBI bridge. Port to native
+DBIO Result classes.
+
+=item * L<DBIx::Class::Schema::Versioned> - replaced by
+L<DBIO::Migration> (different DDL strategy; see L<DBIO::Manual::Heritage>).
+
+=item * L<DBIx::Class::SQLMaker::ClassicExtensions> and the
+L<SQL::Abstract::Classic> escape hatch - DBIO uses canonical
+L<SQL::Abstract> only.
+
+=back
+
+Remove these from C<load_components()> calls and any C<connect_info>
+options that referenced them.
+
+=head1 STEP 3 - REPLACE INTEGRATED COMPONENTS
+
+A handful of widely-used CPAN components have been folded into core
+DBIO. Their independent CPAN versions still install but no longer do
+anything useful inside DBIO. Switch to the integrated module:
+
+  DBIx::Class::TimeStamp        -> DBIO::Timestamp
+  DBIx::Class::UUIDColumns      -> DBIO::UUIDColumns
+  DBIx::Class::Helpers          -> integrated into DBIO::Row
+  DBIx::Class::IntrospectableM2M -> DBIO::ManyToMany (always on)
+  DBIx::Class::PassphraseColumn -> DBIO::PassphraseColumn
+
+In C<load_components> these names are unchanged after step 1 except
+for case (DBIO uses C<Timestamp>, not C<TimeStamp>):
+
+  __PACKAGE__->load_components(qw/Timestamp UUIDColumns/);
+
+=head1 STEP 4 - SWITCH CLASSDATA APIS TO COLUMN FLAGS
+
+Several components used class-level configuration calls. DBIO routes
+the same information through column-info flags on C<add_columns>.
+This makes the per-column intent visible at the column declaration
+and removes one layer of side-effect-at-load-time.
+
+=head2 Ordered
+
+  # before
+  __PACKAGE__->position_column('position');
+  __PACKAGE__->grouping_column('cd');
+  __PACKAGE__->null_position_value(undef);
+
+  __PACKAGE__->add_columns(
+    position => { data_type => 'integer' },
+    cd       => { data_type => 'integer' },
+  );
+
+  # after
+  __PACKAGE__->add_columns(
+    position => { data_type => 'integer', position => 1 },
+    cd       => { data_type => 'integer', grouping => 1 },
+  );
+  # null_position_value goes on the position column:
+  #   position => { ..., position => 1, null_position_value => undef }
+
+The class-level methods C<position_column>, C<grouping_column> and
+C<null_position_value> still exist but are now read-only introspection
+helpers; setters are gone.
+
+=head2 Timestamp
+
+  # before
+  __PACKAGE__->add_columns(
+    created => { data_type => 'datetime' },
+    updated => { data_type => 'datetime' },
+  );
+  # configuration was implicit via the component name; columns named
+  # created/updated were auto-detected.
+
+  # after - explicit per-column flags
+  __PACKAGE__->add_columns(
+    created => { data_type => 'datetime', set_on_create => 1 },
+    updated => { data_type => 'datetime', set_on_create => 1, set_on_update => 1 },
+  );
+
+  # or the helper:
+  __PACKAGE__->cols_updated_created;
+
+=head2 UUIDColumns
+
+  # before
+  __PACKAGE__->uuid_columns('artist_id');
+
+  # after
+  __PACKAGE__->add_columns(
+    artist_id => { data_type => 'varchar', size => 36, uuid_on_create => 1 },
+  );
+
+=head2 ChangeLog
+
+  # before
+  __PACKAGE__->changelog_exclude_columns(qw/ password_hash /);
+
+  # after
+  __PACKAGE__->add_columns(
+    password_hash => { data_type => 'varchar', size => 255, changelog => 0 },
+  );
+
+=head1 STEP 5 - REPLACE LIMIT DIALECT MACHINERY
+
+DBIx::Class drove LIMIT/OFFSET emulation through a string dispatch
+(C<sql_limit_dialect>) and an C<emulate_limit()> hook. DBIO replaces
+both with a single overridable method on the SQLMaker subclass:
+
+  package MyApp::SQLMaker;
+  use base 'DBIO::SQLMaker';
+
+  sub apply_limit {
+    my ($self, $sql, $bind, $limit, $offset) = @_;
+    # produce dialect-specific LIMIT clause
+    return ($sql, $bind);
+  }
+
+If you had C<sql_limit_dialect = 'GenericSubQ'> or similar, port the
+behaviour into C<apply_limit>. The default in core DBIO is the
+ANSI-standard C<LIMIT ? OFFSET ?>; every active driver provides its
+own override.
+
+=head1 STEP 6 - REPLACE SQL::Abstract::Classic CALLS
+
+If you reached into C<SQL::Abstract::Classic> directly (rare),
+replace with L<SQL::Abstract> 1.99+. The query DSL is compatible.
+Differences are in internal extension points only.
+
+=head1 STEP 7 - UPDATE TEST INFRASTRUCTURE
+
+Test environment variables and helper namespaces were renamed:
+
+  DBICTEST_*           -> DBIO_TEST_*
+  DBICTest::*          -> DBIO::Test::*
+
+Driver-specific test result classes belong in the driver's C<lib/>
+namespace, not in C<t/lib/>. Load them via the hashref form of
+L<DBIO::Schema/load_classes>:
+
+  DBIO::Test::Schema->load_classes({
+    'DBIO::PostgreSQL::Test' => ['SequenceTest'],
+  });
+
+Shared schemas for cross-distribution features go under
+C<DBIO::Test::Schema::*>. Never redefine the same schema class inline
+in multiple driver tests.
+
+=head1 STEP 8 - SCHEMA DEPLOYMENT
+
+DBIO drivers ship native introspect/diff/deploy. SQL::Translator is
+optional and only used as a fallback for drivers that have not yet
+been ported (db2, firebird, informix, mssql, oracle, sybase). For
+PostgreSQL, MySQL and SQLite you get the native path automatically:
+
+  $schema->deploy;     # routed via dbio_deploy_class on the storage
+
+If your application explicitly invoked C<deploymen_statements> or
+parsed SQL::Translator output, review whether you actually need that
+plumbing. The native deploy classes - L<DBIO::PostgreSQL::Deploy>,
+L<DBIO::MySQL::Deploy>, L<DBIO::SQLite::Deploy> - expose
+C<install>, C<diff>, C<apply> and C<upgrade> directly.
+
+=head1 STEP 9 - PORT CUSTOM COMPONENTS
+
+If you wrote your own component using the column-info flag pattern
+(intercepting C<add_columns>, stashing private flags, processing at
+lifecycle time), it should run unchanged after step 1. If you wrote
+a component using class-level setters (C<mk_classdata>), consider
+porting it to the column-info flag pattern: see the four core
+components - L<DBIO::Timestamp>, L<DBIO::Ordered>, L<DBIO::ChangeLog>,
+L<DBIO::UUIDColumns> - for the reference idiom.
+
+=head1 STEP 10 - RUN THE TESTS
+
+After each step, run the full test suite:
+
+  dzil test
+
+If a step exposes failures that a single targeted edit can fix, do
+the edit and continue. If the step lands you on a real semantic
+change (e.g. an C<emulate_limit> override that needs new logic),
+freeze it as a separate commit so the migration history reads
+cleanly.
+
+=head1 REFERENCE FIXTURE
+
+The file tree under F<t/lib/MigrationsTest/> is a verbatim import of
+L<DBIx::Class>'s F<t/lib/DBICTest/> with the namespace rewritten
+C<DBICTest> -> C<MigrationsTest>. The C<DBIx::Class::*> references
+inside it are I<intentionally> left in place at import time; the
+commits that follow apply each step above to that fixture, in order,
+with one commit per step. Walking the git log is therefore a working
+demo of the migration.
+
+The final state of F<t/lib/MigrationsTest/> is the permanent DBIO
+test fixture. The original DBICTest sources are I<not> retained
+anywhere in the tree.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<DBIO::Manual::Heritage> - what changed and why
+
+=item L<DBIO::Manual::Component> - writing components against DBIO
+
+=item L<DBIO::Timestamp>, L<DBIO::Ordered>, L<DBIO::ChangeLog>,
+L<DBIO::UUIDColumns> - reference column-info-flag components
+
+=back
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -6,6 +6,7 @@ requires 'JSON::MaybeXS';
 requires 'LWP::UserAgent';
 requires 'LWP::Protocol::https';
 requires 'HTTP::Request';
+requires 'HTTP::Request::Common';
 requires 'URI';
 requires 'MIME::Base64';
 requires 'Log::Any';

@@ -6,9 +6,9 @@ no warnings qw(experimental::signatures);
 use Carp ();
 use JSON ();
 
-our $VERSION = 4.01;
 
 package Net::Google::Analytics::MeasurementProtocol {
+  our $VERSION = 4.02;
 
   sub new ($class, %args) {
     return bless {

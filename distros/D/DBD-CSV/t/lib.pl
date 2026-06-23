@@ -116,8 +116,7 @@ END { DbCleanup (); }
 
     my $testtable = "testaa";
 
-    sub FindNewTable
-    {
+    sub FindNewTable {
 	my $dbh = shift;
 
 	my @tables = defined $listTablesHook ? $listTablesHook->($dbh)

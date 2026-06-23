@@ -50,20 +50,24 @@ struct Shape {
 
 typedef enum ShapeType ShapeType;
 
+Shape* create_shape();
+void destroy_shape(Shape *s);
+
 DynArr* create_array();
 void destroy_array(DynArr* arr);
 void push_array(DynArr *arr, void *ptr);
-void push_array_SV(DynArr *arr, SV *ptr);
+
 QuadTreeNode* create_nodes(int count, QuadTreeNode *parent);
 void destroy_node(QuadTreeNode *node);
-void clear_has_objects (QuadTreeNode *node);
 QuadTreeRootNode* create_root();
-QuadTreeRootNode* create_root_nobackref();
-void store_backref(QuadTreeRootNode *root, QuadTreeNode* node, SV *value);
+
+void adopt_object (QuadTreeRootNode *root, SV *value, Shape *s);
+void disown_object (QuadTreeRootNode *root, SV *value);
+
 void node_add_level(QuadTreeNode* node, double xmin, double ymin, double xmax, double ymax, int depth);
 void find_nodes(QuadTreeNode *node, HV *ret, Shape *param);
-bool fill_nodes(QuadTreeRootNode *root, QuadTreeNode *node, SV *value, Shape *param);
-bool fill_nodes_nobackref(QuadTreeNode *node, SV *value, Shape *param);
+bool fill_nodes(QuadTreeNode *node, SV *value, Shape *param);
+void delete_nodes(QuadTreeNode *node, SV *value, Shape *param);
 void clear_tree(QuadTreeRootNode *root);
 
 /* XS helpers */

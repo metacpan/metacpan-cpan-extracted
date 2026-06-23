@@ -3,9 +3,9 @@ abstract: Comma-Separated Values manipulation routines
 author:
   - H.Merijn Brand <hmbrand@cpan.org>
 build_requires:
-  Config: 0
+  Config: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: Author, CPAN::Meta::Converter version 2.150013
 license: perl
@@ -16,19 +16,19 @@ name: Text-CSV_XS
 provides:
   Text::CSV_XS:
     file: CSV_XS.pm
-    version: '1.62'
+    version: '1.64'
 recommends:
-  Encode: '3.22'
+  Encode: '3.24'
 requires:
-  IO::Handle: 0
-  Test::More: 0
-  Tie::Scalar: 0
-  XSLoader: 0
-  perl: '5.006001'
+  IO::Handle: '0'
+  Test::More: '0'
+  Tie::Scalar: '0'
+  XSLoader: '0'
+  perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#csv
   bugtracker: https://github.com/Tux/Text-CSV_XS/issues
   homepage: https://metacpan.org/pod/Text::CSV_XS
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Text-CSV_XS
-version: '1.62'
+version: '1.64'

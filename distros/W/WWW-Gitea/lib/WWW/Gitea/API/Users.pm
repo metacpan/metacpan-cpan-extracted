@@ -64,7 +64,7 @@ WWW::Gitea::API::Users - Gitea users API (lookup and search)
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Algorithm::QuadTree::XS;
-$Algorithm::QuadTree::XS::VERSION = '0.09';
+$Algorithm::QuadTree::XS::VERSION = '0.10';
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -14,32 +14,6 @@ our @EXPORT = qw(
 );
 
 use constant UNIQUE_RESULTS => 1;
-
-# NOTE: this implementation lives here for XS to load properly, but a separate
-# file including this module is present to allow regular perl module loading to
-# find it by name
-package Algorithm::QuadTree::XS::NoBackRefs;
-$Algorithm::QuadTree::XS::NoBackRefs::VERSION = '0.09';
-use strict;
-use warnings;
-use Exporter qw(import);
-use Carp qw(croak);
-
-our @EXPORT = qw(
-	_AQT_init
-	_AQT_deinit
-	_AQT_addObject
-	_AQT_findObjects
-	_AQT_delete
-	_AQT_clear
-);
-
-use constant UNIQUE_RESULTS => 1;
-
-sub _AQT_delete
-{
-	croak 'delete is not supported with ' . __PACKAGE__;
-}
 
 require XSLoader;
 XSLoader::load('Algorithm::QuadTree::XS', $Algorithm::QuadTree::XS::VERSION);
@@ -65,24 +39,17 @@ This implementation is compatible with C<Algorithm::QuadTree::PP>.
 
 =head1 BENCHMARK
 
-	# backend: Algorithm::QuadTree::XS::NoBackRefs
-
-	     clear: 1.460114e-05 +- 9.1e-10 wallclock secs (0.00623%) @ (68487.8 +-    4.3)/s (n=201)
-	  find_100: 2.96563e-05 +- 8.4e-09 wallclock secs (0.0283%) @ (33719.6 +-    9.6)/s (n=203)
-	insert_100: 1.22024e-04 +- 3.6e-08 wallclock secs (0.0295%) @ (8195.1 +-   2.4)/s (n=216)
-
 	# backend: Algorithm::QuadTree::XS
 
-	     clear: 5.5851e-05 +- 6.8e-08 wallclock secs (0.122%) @ (17905 +-    22)/s (n=206)
-	  find_100: 2.79711e-05 +- 4.0e-09 wallclock secs (0.0143%) @ (35751.2 +-    5.2)/s (n=202)
-	insert_100: 1.7825e-04 +- 1.2e-07 wallclock secs (0.0673%) @ (5610.2 +-   3.7)/s (n=228)
+	     clear: 1.64694e-05 +- 1.7e-09 wallclock secs (0.0103%) @ (60718.8 +-    6.1)/s (n=204)
+	  find_100: 2.70163e-05 +- 4.8e-09 wallclock secs (0.0178%) @ (37014.7 +-    6.6)/s (n=203)
+	insert_100: 1.37381e-04 +- 3.5e-08 wallclock secs (0.0255%) @ ( 7279 +-   1.8)/s (n=215)
 
 	# backend: Algorithm::QuadTree::PP
 
-	     clear: 1.43388e-03 +- 2.4e-07 wallclock secs (0.0167%) @ (697.41 +-  0.12)/s (n=200)
-	  find_100: 2.57478e-04 +- 5.6e-08 wallclock secs (0.0217%) @ (3883.82 +-   0.85)/s (n=201)
-	insert_100: 2.29717e-03 +- 2.0e-07 wallclock secs (0.00871%) @ (435.318 +-  0.038)/s (n=211)
-
+	     clear: 1.24342e-03 +- 2.7e-07 wallclock secs (0.0217%) @ (804.23 +-  0.18)/s (n=205)
+	  find_100: 2.45547e-04 +- 2.7e-08 wallclock secs (0.0110%) @ (4072.54 +-   0.45)/s (n=208)
+	insert_100: 2.13336e-03 +- 3.6e-07 wallclock secs (0.0169%) @ (468.744 +-  0.079)/s (n=206)
 
 Generated using C<tools/benchmark.pl> available in the GitHub repository. Tree
 depth was 6.
@@ -112,8 +79,6 @@ placed in a way so that none of them overlap.
 =head1 SEE ALSO
 
 L<Algorithm::QuadTree>
-
-L<Algorithm::QuadTree::XS::NoBackRefs>
 
 =head1 AUTHOR
 

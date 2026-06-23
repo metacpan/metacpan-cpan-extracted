@@ -1189,8 +1189,10 @@ PPCODE:
         SPAGAIN;
         nitems += nret;
         if (nitems > alloc) {
+	  while (nitems > alloc) {
             alloc <<= 2;
-            Renew(buf, alloc, SV*);
+	  }
+          Renew(buf, alloc, SV*);
         }
         for (j = nret-1; j >= 0; j--) {
             /* POPs would return elements in reverse order */

@@ -42,11 +42,11 @@ sub _wrap {
 }
 
 sub list {
-    my ($self, $owner, $repo) = @_;
+    my ($self, $owner, $repo, %query) = @_;
     croak 'owner required' unless defined $owner;
     croak 'repo required'  unless defined $repo;
     my $data = $self->call_operation('labels.list',
-        path => { owner => $owner, repo => $repo });
+        path => { owner => $owner, repo => $repo }, query => \%query);
     return [ map { $self->_wrap($_, $owner, $repo) } @{ $data || [] } ];
 }
 
@@ -110,7 +110,7 @@ WWW::Gitea::API::Labels - Gitea repository labels API
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -136,8 +136,10 @@ Pre-computed operation table (C<operationId> → C<{method, path}>).
 =head2 list
 
     my $labels = $gitea->labels->list('getty', 'p5-www-gitea');
+    my $page2  = $gitea->labels->list('getty', 'p5-www-gitea', page => 2, limit => 50);
 
-Lists the labels of a repository. Returns an ArrayRef of L<WWW::Gitea::Label>.
+Lists the labels of a repository. Accepts the Gitea pagination query parameters
+(C<page>, C<limit>). Returns an ArrayRef of L<WWW::Gitea::Label>.
 
 =head2 create
 

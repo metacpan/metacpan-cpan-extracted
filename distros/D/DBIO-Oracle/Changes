@@ -1,0 +1,40 @@
+Revision history for DBIO-Oracle
+
+0.900000  2026-06-23
+    First release. Oracle database driver for DBIO.
+
+    * Storage
+        - Oracle storage auto-detected for dbi:Oracle: DSNs, with the -ora
+          shortcut, load_components('Oracle'), and DBIO::Base subclassing
+        - Sequence-based auto-increment (auto_nextval / SELECT seq.nextval)
+        - LOB binding and chunking for CLOB/NCLOB/BLOB
+        - Savepoints, deferrable FK constraint handling, and NLS session
+          setup on connect
+        - Pre-9.0 fallback to WHERE-clause joins when ANSI joins are
+          unavailable
+
+    * SQLMaker
+        - ROWNUM-based limit/offset via the _RowNum dialect (apply_limit)
+        - RETURNING ... INTO ? insert-returning syntax
+        - CONNECT BY / START WITH / ORDER SIBLINGS BY / PRIOR hierarchical
+          query support
+        - Automatic identifier shortening to Oracle's 30-character limit
+          across SELECT/FROM and WHERE/HAVING paths and relation aliases
+
+    * Deploy
+        - Desired-state deployment via test-deploy-and-compare
+        - install_ddl creates a fresh schema; upgrade diffs live vs. desired
+
+    * Introspect
+        - Native introspection of tables, columns, keys, indexes, and
+          foreign keys via USER_*/ALL_* views
+
+    * Diff
+        - Native diff of two introspected models at table, column, and
+          index level
+
+    * DDL
+        - Native Oracle DDL generation from DBIO Result classes
+        - Dedupe sources sharing a physical table, skip subquery and view
+          sources, dereference literal table names, and emit CREATE VIEW
+          for non-virtual views

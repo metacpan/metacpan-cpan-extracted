@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-demo-mysql
+  labels:
+    app: dbio-demo-mysql
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: dbio-demo-mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbio-demo-mysql
+  labels:
+    app: dbio-demo-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dbio-demo-mysql
+  template:
+    metadata:
+      labels:
+        app: dbio-demo-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.4
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              value: dbio_demo
+            - name: MYSQL_USER
+              value: dbio
+            - name: MYSQL_PASSWORD
+              value: dbio
+            - name: MYSQL_ROOT_PASSWORD
+              value: dbio-root
+          readinessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "127.0.0.1", "-u", "dbio", "-pdbio"]
+            initialDelaySeconds: 10
+            periodSeconds: 5

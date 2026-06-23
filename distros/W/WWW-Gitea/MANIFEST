@@ -32,6 +32,7 @@ lib/WWW/Gitea/API/PullRequests.pm
 lib/WWW/Gitea/API/Releases.pm
 lib/WWW/Gitea/API/Repos.pm
 lib/WWW/Gitea/API/Users.pm
+lib/WWW/Gitea/Attachment.pm
 lib/WWW/Gitea/Comment.pm
 lib/WWW/Gitea/Issue.pm
 lib/WWW/Gitea/Label.pm
@@ -43,8 +44,10 @@ lib/WWW/Gitea/Repo.pm
 lib/WWW/Gitea/Role/HTTP.pm
 lib/WWW/Gitea/Role/OpenAPI.pm
 lib/WWW/Gitea/User.pm
+t/attachments.t
 t/author-pod-syntax.t
 t/integration.t
+t/list_query.t
 t/load.t
 t/openapi.t
 t/release-changes_has_content.t

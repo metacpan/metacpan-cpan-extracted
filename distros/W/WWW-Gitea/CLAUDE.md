@@ -42,20 +42,22 @@ project-specific consumer doc is `perl-www-gitea`.
 
 ```
 lib/WWW/Gitea.pm                     # Main client — url/token/basic auth, api_url, controllers
-lib/WWW/Gitea/Role/HTTP.pm           # token/basic auth + JSON request + request_status
+lib/WWW/Gitea/Role/HTTP.pm           # token/basic auth + JSON request + request_status + multipart upload
 lib/WWW/Gitea/Role/OpenAPI.pm        # operationId dispatch over pre-computed tables
 lib/WWW/Gitea/API/Misc.pm            # version, current_user
 lib/WWW/Gitea/API/Users.pm           # get, search
 lib/WWW/Gitea/API/Repos.pm           # get/create/edit/delete/search/fork/list
-lib/WWW/Gitea/API/Issues.pm          # list/create/get/edit/search + comments
+lib/WWW/Gitea/API/Issues.pm          # list/create/get/edit/search + comments + issue/comment attachments (list/create/get/edit/delete)
 lib/WWW/Gitea/API/PullRequests.pm    # list/create/get/edit/merge/is_merged
 lib/WWW/Gitea/API/Labels.pm          # list/create/get/edit/delete
 lib/WWW/Gitea/API/Milestones.pm      # list/create/get/edit/delete
-lib/WWW/Gitea/API/Releases.pm        # list/create/get/get_by_tag/edit/delete
+lib/WWW/Gitea/API/Releases.pm        # list/create/get/get_by_tag/edit/delete + assets (list/create/get/edit/delete)
 lib/WWW/Gitea/API/Orgs.pm            # get/create/edit/delete/repos/list
-lib/WWW/Gitea/{User,Repo,Issue,PullRequest,Label,Milestone,Release,Org,Comment}.pm  # entities
+lib/WWW/Gitea/Attachment.pm          # attachment/asset entity
+lib/WWW/Gitea/{User,Repo,Issue,PullRequest,Label,Milestone,Release,Org,Comment}.pm  # entities (Release/Issue carry asset/attachment convenience methods)
 t/load.t                             # module load
 t/openapi.t                          # operation tables, path substitution, auth, entity parsing
+t/attachments.t                      # network-free multipart upload coverage (fake UA)
 ```
 
 ## Design notes

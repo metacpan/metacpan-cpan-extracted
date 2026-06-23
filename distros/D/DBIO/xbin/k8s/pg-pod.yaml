@@ -1,0 +1,54 @@
+# Reference manifest for manual debugging.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/pg-pod.yaml
+#   kubectl wait --for=condition=Ready pod/pg --timeout=60s
+#   kubectl port-forward svc/pg-svc 5432:5432 &
+#   DBIOTEST_PG_DSN='dbi:Pg:dbname=dbio_test;host=127.0.0.1;port=5432' \
+#     DBIOTEST_PG_USER=dbio DBIOTEST_PG_PASS=dbio \
+#     prove -l t/
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pg
+  labels:
+    app: pg
+    role: dbio-test-db
+spec:
+  containers:
+    - name: pg
+      image: postgres:17
+      ports:
+        - containerPort: 5432
+      env:
+        - name: POSTGRES_DB
+          value: dbio_test
+        - name: POSTGRES_USER
+          value: dbio
+        - name: POSTGRES_PASSWORD
+          value: dbio
+      readinessProbe:
+        exec:
+          command:
+            - pg_isready
+            - -U
+            - dbio
+            - -d
+            - dbio_test
+        initialDelaySeconds: 5
+        periodSeconds: 3
+        timeoutSeconds: 2
+        failureThreshold: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-svc
+spec:
+  selector:
+    app: pg
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP

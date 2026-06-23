@@ -1,9 +1,10 @@
 package App::Netdisco::Backend::Job;
 
-use Dancer qw/:moose :syntax !error/;
+use Dancer qw/:moose :syntax !error !params/;
 use aliased 'App::Netdisco::Worker::Status';
 
 use Moo;
+use Try::Tiny;
 use Term::ANSIColor qw(:constants :constants256);
 use namespace::clean;
 
@@ -226,5 +227,28 @@ priority of the job and is used by L<MCE> when managing its job queue.
 =cut
 
 sub extra { (shift)->subaction }
+
+=head2 params
+
+Parses the C<subaction> field as JSON and returns a hashref of parameters.
+Returns an empty hashref if subaction is empty or not a dictionary.
+
+This is used by the discover job to override configuration, particularly
+SNMP timers which are sensitive for new devices. It returns an empty hashref
+when C<subaction> is used for direct data provided for ARP/MAC addresses.
+
+If C<subaction> is a plain string, it is promoted to being the C<device_auth_tag_hint>
+key's value in the returned hashref.
+
+=cut
+
+sub params {
+  my $job = shift;
+  return {} unless $job->subaction;
+  return try {
+    my $r = from_json($job->subaction);
+    ref $r eq 'HASH' ? $r : {}
+  } catch { {device_auth_tag_hint => $job->subaction} };
+}
 
 true;

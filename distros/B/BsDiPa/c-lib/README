@@ -3,24 +3,24 @@ s-bsdipa, a mutation of BSDiff
 
 Colin Percival's BSDiff, imported from FreeBSD and transformed into
 a library; please see header comment of s-bsdipa-lib.h for more:
-create or apply binary difference patch.  In general:
+create or apply a difference patch.  In general:
 
-- One includes s-bsdipa-lib.h and uses the all-in-memory s_bsdipa_diff()
+- One includes s-bsdipa-lib.h, and uses the all-in-memory s_bsdipa_diff()
   and s_bsdipa_patch() functions to create and apply patches.
-  Ie, (for example mmap(2)ed) memory in, (heap) memory out.
+  That is to say, (for example mmap(2)ed) memory in, (heap) memory out.
 
-- Necessary compression / storage preparation can (could) be achieved
+- Compression is necessary; storage preparation can (could) be achieved
   easily by including s-bsdipa-io.h after defining s_BSDIPA_IO as
   desired, followed by using the according s_bsdipa_io_write_*() and
-  _read_*() functions; These still do not perform direct I/O, but call
+  _read_*() functions.  These still do not perform direct I/O, but call
   a supplied hook with fully prepared buffers or store in (heap) memory,
   respectively.  Multiple _IO methods are provided.
 
 - In general the lib/ directory of the source repository is self-
   contained, and may be copied for inclusion in other projects.
 
-  If the s_BSDIPA_SMALL approach is taken, lib/libdivsufsort/ and
-  lib/divsufsort.h may also be removed.
+  If the s_BSDIPA_SMALL approach is taken the directory
+  lib/libdivsufsort may also be removed.
 
 - Please see the introductional header comments of s-bsdipa-lib.h and
   s-bsdipa-io.h for more.
@@ -31,8 +31,8 @@ create or apply binary difference patch.  In general:
   It times execution and tracks memory usage on stderr.
 
 - The directory perl contains the self-contained BsDiPa CPAN module.
-  (Perl ships with ZLIB, liblzma/XZ and libz2/BZ2 support is
-  compile-time detected.)
+  (Perl ships with ZLIB, libz2/BZ2, liblzma/XZ, and libzstd/ZSTD
+  support is compile-time detected.)
 
 Licenses (full text included in s-bsdipa-lib.h):
   libdivsufsort(/LICENSE): MIT
@@ -42,200 +42,207 @@ Licenses (full text included in s-bsdipa-lib.h):
 Repository:
   browse: https?://git.sdaoden.eu/browse/s-bsdipa.git
   clone:  https?://git.sdaoden.eu/scm/s-bsdipa.git
-
-  alternatively: https://github.com/sdaoden/s-bsdipa
+  (Alternatively: https://github.com/sdaoden/s-bsdipa)
+  We are Coverity.com project 31371 / s-bsdipa.
 
 Contact: steffen at sdaoden dot eu.
 
-1. s-bsdipa example
+1. Numbers, Numbers
 2. Releases
 
-1. s-bsdipa example
+1. Numbers, Numbers
 -------------------
 
-Tested via
+Examples 1 and 2 for a s-bsdipa executable built like
 
-  $ CFLAGS='-O3 -DNDEBUG' \
+  CFLAGS='-O2 ' make s_BSDIPA_CFLAGS='$(SUFX)' \
+    s_BSDIPA_32=y s_BSDIPA_TEXT=y all
+
+Example 3 built and tested like
+
+  CFLAGS='-O3 -DNDEBUG' \
     make s_BSDIPA_32=y s_BSDIPA_CFLAGS='$(SUFX)' clean all
-  $ mv s-bsdipa/s-bsdipa s-bsdipa32
-  $ CFLAGS='-O3 -DNDEBUG' \
+  mv s-bsdipa/s-bsdipa /tmp/s-bsdipa32
+  CFLAGS='-O3 -DNDEBUG' \
     make s_BSDIPA_CFLAGS='$(SUFX)' clean all
-  $ mv s-bsdipa/s-bsdipa s-bsdipa64
+  mv s-bsdipa/s-bsdipa /tmp/s-bsdipa64
+  make distclean
 
-  $ for c in -J -j -Z -z; do
+  for c in -J -j -Z -z; do
       for b in 32 64; do
         echo $b/$c
-        ./s-bsdipa$b $c -9 diff .2 .1 .P$b$c
-        ./s-bsdipa$b $c -f7 diff .2 .1 .P$b$c
-        ./s-bsdipa$b $c -f5 diff .2 .1 .P$b$c
-        ./s-bsdipa$b patch .1 .P$b$c .R$b$c
+        ./s-bsdipa$b $c -f7 diff .1 .2 .P$b$c
+        ./s-bsdipa$b -f patch .2 .P$b$c .R$b$c
       done
     done
 
-Text (manuals of S-nail, v14.9.25 vs v14.10.0-alpha):
+Example 1: manuals of s-nail v14.9.25 vs v14.10.0-alpha, roff (mdoc)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  $ file .1 .2
-  .1: troff or preprocessor input, ASCII text
-  .2: troff or preprocessor input, ASCII text
+  -rw-r----- 1 steffen steffen 428420 May 18 20:00 .B1
+  -rw-r----- 1 steffen steffen 390770 May 18 20:00 .B2
 
-  $ ll .1 .2
-  -rw-r----- 1 steffen steffen 428420 May  6 23:59 .1
-  -rw-r----- 1 steffen steffen 390770 May  7 00:00 .2
+  diff -e .B1 .B2 | wc -c
+  241233
+  diff -u .B1 .B2 | wc -c
+  593019
+
+BSDiff:
+
+  # 67368 result bytes | 121 allocs: all=9956597 peek=8130345 curr=485317
+  # Code 0:210 secs, BZ2 I/O 0:022 secs
+  # data: ctrl=54816 (4568 entries) diff=304307 extra=124113
+
+  # 65216 result bytes | 131 allocs: all=389444036 peek=387617784 curr=485317
+  # Code 0:209 secs, XZ I/O 0:138 secs
+  # data: ctrl=54816 (4568 entries) diff=304307 extra=124113
+
+  # 74830 result bytes | 122 allocs: all=2706657 peek=2254673 curr=485317
+  # Code 0:213 secs, ZLIB I/O 0:122 secs
+  # data: ctrl=54816 (4568 entries) diff=304307 extra=124113
+
+  # 69444 result bytes | 119 allocs: all=96286768 peek=94460516 curr=485317
+  # Code 0:210 secs, ZSTD I/O 0:145 secs
+  # data: ctrl=54816 (4568 entries) diff=304307 extra=124113
+
+Textual:
+
+  # 81943 result bytes | 182 allocs: all=8765557 peek=8129837 curr=484809
+  # Code 0:012 secs, BZ2 I/O 0:126 secs
+  # data: ctrl=54456 (4538 entries) diff=202309 extra=226111
+
+  # 82364 result bytes | 192 allocs: all=388252996 peek=387617276 curr=484809
+  # Code 0:011 secs, XZ I/O 0:254 secs
+  # data: ctrl=54456 (4538 entries) diff=202309 extra=226111
+
+  # 97355 result bytes | 183 allocs: all=1515617 peek=1120529 curr=484809
+  # Code 0:011 secs, ZLIB I/O 0:179 secs
+  # data: ctrl=54456 (4538 entries) diff=202309 extra=226111
+
+  # 86767 result bytes | 180 allocs: all=95095728 peek=94460008 curr=484809
+  # Code 0:012 secs, ZSTD I/O 0:230 secs
+  # data: ctrl=54456 (4538 entries) diff=202309 extra=226111
+
+Without header (-H), textual diff, ZLIB:
+
+  file .BP
+  .BP: zlib compressed data
+  base64 < .BP | wc -c
+  131516
+
+Example 2: two emails, as sent out to, and received reencoded back from a ML:
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  -rw-r----- 1 steffen steffen 4621 May 18 20:00 .S1
+  -rw-r----- 1 steffen steffen 5309 May 18 20:00 .S2
+
+  diff -e .S1 .S2 | wc -c
+  2326
+  diff -u .S1 .S2 | wc -c
+  4979
+
+BSDiff:
+
+  # 950 result bytes | 9 allocs: all=7582046 peek=7539566 curr=5130
+  # Code 0:003 secs, BZ2 I/O 0:001 secs
+  # data: ctrl=216 (18 entries) diff=3554 extra=1067
+
+  # 884 result bytes | 19 allocs: all=387069485 peek=387027005 curr=5130
+  # Code 0:003 secs, XZ I/O 0:127 secs
+  # data: ctrl=216 (18 entries) diff=3554 extra=1067
+
+  # 857 result bytes | 10 allocs: all=332106 peek=289626 curr=5130
+  # Code 0:002 secs, ZLIB I/O 0:000 secs
+  # data: ctrl=216 (18 entries) diff=3554 extra=1067
+
+  # 875 result bytes | 7 allocs: all=93912217 peek=93869737 curr=5130
+  # Code 0:003 secs, ZSTD I/O 0:144 secs
+  # data: ctrl=216 (18 entries) diff=3554 extra=1067
+
+Textual:
+
+  # 1260 result bytes | 9 allocs: all=7569958 peek=7539566 curr=5130
+  # Code 0:000 secs, BZ2 I/O 0:002 secs
+  # data: ctrl=108 (9 entries) diff=3043 extra=1578
+
+  # 1144 result bytes | 19 allocs: all=387057397 peek=387027005 curr=5130
+  # Code 0:000 secs, XZ I/O 0:130 secs
+  # data: ctrl=108 (9 entries) diff=3043 extra=1578
+
+  # 1089 result bytes | 10 allocs: all=320018 peek=289626 curr=5130
+  # Code 0:000 secs, ZLIB I/O 0:000 secs
+  # data: ctrl=108 (9 entries) diff=3043 extra=1578
+
+  # 1116 result bytes | 7 allocs: all=93900129 peek=93869737 curr=5130
+  # Code 0:000 secs, ZSTD I/O 0:147 secs
+  # data: ctrl=108 (9 entries) diff=3043 extra=1578
+
+Without header (-H), textual diff, ZLIB:
+
+  file .SP
+  .SP: zlib compressed data
+  base64 < .SP | wc -c
+  1472
+
+Example 3: binary btrfs-progs#6.19.1 vs #7.0-1 (btrfs; Linux x86-64):
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  -rwxr-x--- 1 steffen steffen 1243312 May 20 19:49 .1*
+  -rwxr-x--- 1 steffen steffen 1251504 May 20 19:49 .2*
+
+Ending up with
+
+  # data: ctrl=11904 (496 entries) diff=1217413 extra=25899
 
   32/-J
-  # 57072 result bytes | 114 allocs: all=708315454 peek=706338602
-  # Code 0:071 secs, XZ I/O 0:082 secs
-  # 57072 result bytes | 114 allocs: all=196610366 peek=194633514
-  # Code 0:070 secs, XZ I/O 0:068 secs
-  # 56848 result bytes | 114 allocs: all=100141374 peek=98164522
-  # Code 0:077 secs, XZ I/O 0:060 secs
-  # 390770 result bytes | 11 allocs: all=9252521 peek=8861638
-  # Code 0:000 secs, XZ I/O 0:003 secs
+  # 71324 result bytes | 32 allocs: all=201586036 peek=196316848
+  # Code 0:151 secs, XZ I/O 0:272 secs
+  # 1243312 result bytes | 11 allocs: all=19305425 peek=18062000
+  # Code 0:002 secs, XZ I/O 0:004 secs
   64/-J
-  # 57120 result bytes | 114 allocs: all=710339046 peek=706385342
-  # Code 0:073 secs, XZ I/O 0:105 secs
-  # 57120 result bytes | 114 allocs: all=198633958 peek=194680254
-  # Code 0:071 secs, XZ I/O 0:092 secs
-  # 56964 result bytes | 114 allocs: all=102164966 peek=98211262
-  # Code 0:079 secs, XZ I/O 0:086 secs
-  # 390770 result bytes | 11 allocs: all=9299261 peek=8908378
-  # Code 0:000 secs, XZ I/O 0:003 secs
+  # 71508 result bytes | 32 allocs: all=206861620 peek=196323244
+  # Code 0:154 secs, XZ I/O 0:275 secs
+  # 1243312 result bytes | 11 allocs: all=19311377 peek=18067952
+  # Code 0:002 secs, XZ I/O 0:004 secs
+
   32/-j
-  # 58761 result bytes | 104 allocs: all=10060911 peek=8084059
-  # Code 0:070 secs, BZ2 I/O 0:013 secs
-  # 58761 result bytes | 104 allocs: all=8460911 peek=6484059
-  # Code 0:069 secs, BZ2 I/O 0:013 secs
-  # 58761 result bytes | 104 allocs: all=6860911 peek=4884059
-  # Code 0:069 secs, BZ2 I/O 0:013 secs
-  # 390770 result bytes | 4 allocs: all=2892425 peek=2501654
-  # Code 0:000 secs, BZ2 I/O 0:006 secs
+  # 77363 result bytes | 22 allocs: all=13436581 peek=8167393
+  # Code 0:147 secs, BZ2 I/O 0:026 secs
+  # 1243312 result bytes | 4 allocs: all=5356721 peek=4113408
+  # Code 0:003 secs, BZ2 I/O 0:010 secs
   64/-j
-  # 58180 result bytes | 104 allocs: all=12084503 peek=8130799
-  # Code 0:079 secs, BZ2 I/O 0:013 secs
-  # 58180 result bytes | 104 allocs: all=10484503 peek=6530799
-  # Code 0:078 secs, BZ2 I/O 0:013 secs
-  # 58180 result bytes | 104 allocs: all=8884503 peek=4930799
-  # Code 0:071 secs, BZ2 I/O 0:014 secs
-  # 390770 result bytes | 4 allocs: all=2939165 peek=2548394
-  # Code 0:000 secs, BZ2 I/O 0:008 secs
+  # 76847 result bytes | 22 allocs: all=18712165 peek=11781689
+  # Code 0:152 secs, BZ2 I/O 0:026 secs
+  # 1243312 result bytes | 4 allocs: all=5362673 peek=4119360
+  # Code 0:003 secs, BZ2 I/O 0:011 secs
+
   32/-Z
-  # 60156 result bytes | 102 allocs: all=876613546 peek=874636694
-  # Code 0:069 secs, ZSTD I/O 0:561 secs
-  # 61350 result bytes | 102 allocs: all=41220652 peek=39243800
-  # Code 0:070 secs, ZSTD I/O 0:035 secs
-  # 62119 result bytes | 102 allocs: all=49460012 peek=47483160
-  # Code 0:070 secs, ZSTD I/O 0:025 secs
-  # 390770 result bytes | 4 allocs: all=5511857 peek=5121086
-  # Code 0:000 secs, ZSTD I/O 0:000 secs
+  # 79990 result bytes | 20 allocs: all=46196322 peek=40927134
+  # Code 0:146 secs, ZSTD I/O 0:106 secs
+  # 1243312 result bytes | 4 allocs: all=7176153 peek=5932840
+  # Code 0:002 secs, ZSTD I/O 0:001 secs
   64/-Z
-  # 61178 result bytes | 102 allocs: all=878637138 peek=874683434
-  # Code 0:072 secs, ZSTD I/O 0:581 secs
-  # 62558 result bytes | 102 allocs: all=43244244 peek=39290540
-  # Code 0:071 secs, ZSTD I/O 0:047 secs
-  # 64264 result bytes | 102 allocs: all=51483604 peek=47529900
-  # Code 0:072 secs, ZSTD I/O 0:028 secs
-  # 390770 result bytes | 4 allocs: all=5558597 peek=5167826
-  # Code 0:000 secs, ZSTD I/O 0:000 secs
+  # 80168 result bytes | 20 allocs: all=51471906 peek=40933530
+  # Code 0:155 secs, ZSTD I/O 0:105 secs
+  # 1243312 result bytes | 4 allocs: all=7182105 peek=5938792
+  # Code 0:004 secs, ZSTD I/O 0:001 secs
+
   32/-z
-  # 64391 result bytes | 105 allocs: all=2810971 peek=2367623
-  # Code 0:071 secs, ZLIB I/O 0:064 secs
-  # 65835 result bytes | 105 allocs: all=2810971 peek=2367623
-  # Code 0:069 secs, ZLIB I/O 0:016 secs
-  # 67632 result bytes | 105 allocs: all=2810971 peek=2367623
-  # Code 0:069 secs, ZLIB I/O 0:008 secs
-  # 390770 result bytes | 4 allocs: all=868209 peek=828281
-  # Code 0:000 secs, ZLIB I/O 0:001 secs
+  # 85292 result bytes | 23 allocs: all=7786641 peek=6512501
+  # Code 0:146 secs, ZLIB I/O 0:029 secs
+  # 1243312 result bytes | 4 allocs: all=2532505 peek=2492577
+  # Code 0:002 secs, ZLIB I/O 0:002 secs
   64/-z
-  # 66421 result bytes | 105 allocs: all=4834563 peek=4344475
-  # Code 0:073 secs, ZLIB I/O 0:119 secs
-  # 68606 result bytes | 105 allocs: all=4834563 peek=4344475
-  # Code 0:073 secs, ZLIB I/O 0:016 secs
-  # 70442 result bytes | 105 allocs: all=4834563 peek=4344475
-  # Code 0:072 secs, ZLIB I/O 0:008 secs
-  # 390770 result bytes | 4 allocs: all=914949 peek=875021
-  # Code 0:000 secs, ZLIB I/O 0:001 secs
-
-Binary (lynx v2-9-2u vs v2-9-2x, Linux x86-64):
-
-  $ ll .1 .2
-  -rwxr-x--- 1 steffen steffen 1678512 May  7 00:19 .1*
-  -rwxr-x--- 1 steffen steffen 1682544 May  7 00:20 .2*
-
-  32/-J
-  # 355988 result bytes | 84 allocs: all=715464804 peek=708487584
-  # Code 0:695 secs, XZ I/O 0:510 secs
-  # 355988 result bytes | 84 allocs: all=203759716 peek=196782496
-  # Code 0:604 secs, XZ I/O 0:450 secs
-  # 359448 result bytes | 84 allocs: all=107290724 peek=100313504
-  # Code 0:606 secs, XZ I/O 0:356 secs
-  # 1682544 result bytes | 11 allocs: all=11821069 peek=10138412
-  # Code 0:002 secs, XZ I/O 0:017 secs
-  64/-J
-  # 355880 result bytes | 84 allocs: all=722474004 peek=708519564
-  # Code 0:636 secs, XZ I/O 0:478 secs
-  # 355880 result bytes | 84 allocs: all=210768916 peek=196814476
-  # Code 0:636 secs, XZ I/O 0:463 secs
-  # 359476 result bytes | 84 allocs: all=114299924 peek=100345484
-  # Code 0:636 secs, XZ I/O 0:371 secs
-  # 1682544 result bytes | 11 allocs: all=11852809 peek=10170152
-  # Code 0:002 secs, XZ I/O 0:017 secs
-  32/-j
-  # 410229 result bytes | 74 allocs: all=17210261 peek=10233041
-  # Code 0:602 secs, BZ2 I/O 0:091 secs
-  # 408275 result bytes | 74 allocs: all=15610261 peek=8659765
-  # Code 0:607 secs, BZ2 I/O 0:091 secs
-  # 397830 result bytes | 74 allocs: all=14010261 peek=8659765
-  # Code 0:598 secs, BZ2 I/O 0:089 secs
-  # 1682544 result bytes | 4 allocs: all=5460973 peek=3778428
-  # Code 0:002 secs, BZ2 I/O 0:040 secs
-  64/-j
-  # 408806 result bytes | 74 allocs: all=24219461 peek=15636985
-  # Code 0:641 secs, BZ2 I/O 0:091 secs
-  # 406774 result bytes | 74 allocs: all=22619461 peek=15636985
-  # Code 0:635 secs, BZ2 I/O 0:091 secs
-  # 396466 result bytes | 74 allocs: all=21019461 peek=15636985
-  # Code 0:637 secs, BZ2 I/O 0:089 secs
-  # 1682544 result bytes | 4 allocs: all=5492713 peek=3810168
-  # Code 0:002 secs, BZ2 I/O 0:040 secs
-  32/-Z
-  # 379014 result bytes | 72 allocs: all=883762896 peek=876785676
-  # Code 0:605 secs, ZSTD I/O 1:003 secs
-  # 399581 result bytes | 72 allocs: all=48370002 peek=41392782
-  # Code 0:599 secs, ZSTD I/O 0:206 secs
-  # 411942 result bytes | 72 allocs: all=56609362 peek=49632142
-  # Code 0:606 secs, ZSTD I/O 0:070 secs
-  # 1682544 result bytes | 4 allocs: all=8080405 peek=6397860
-  # Code 0:002 secs, ZSTD I/O 0:002 secs
-  64/-Z
-  # 379017 result bytes | 72 allocs: all=890772096 peek=876817656
-  # Code 0:635 secs, ZSTD I/O 1:016 secs
-  # 402134 result bytes | 72 allocs: all=55379202 peek=41424762
-  # Code 0:642 secs, ZSTD I/O 0:214 secs
-  # 413229 result bytes | 72 allocs: all=63618562 peek=49664122
-  # Code 0:637 secs, ZSTD I/O 0:072 secs
-  # 1682544 result bytes | 4 allocs: all=8112145 peek=6429600
-  # Code 0:002 secs, ZSTD I/O 0:003 secs
-  32/-z
-  # 413044 result bytes | 75 allocs: all=9960321 peek=8659765
-  # Code 0:604 secs, ZLIB I/O 0:464 secs
-  # 420678 result bytes | 75 allocs: all=9960321 peek=8659765
-  # Code 0:600 secs, ZLIB I/O 0:086 secs
-  # 432110 result bytes | 75 allocs: all=9960321 peek=8659765
-  # Code 0:605 secs, ZLIB I/O 0:042 secs
-  # 1682544 result bytes | 4 allocs: all=3436757 peek=3396829
-  # Code 0:002 secs, ZLIB I/O 0:006 secs
-  64/-z
-  # 414385 result bytes | 75 allocs: all=16969521 peek=15636985
-  # Code 0:636 secs, ZLIB I/O 0:512 secs
-  # 422267 result bytes | 75 allocs: all=16969521 peek=15636985
-  # Code 0:641 secs, ZLIB I/O 0:086 secs
-  # 433588 result bytes | 75 allocs: all=16969521 peek=15636985
-  # Code 0:644 secs, ZLIB I/O 0:042 secs
-  # 1682544 result bytes | 4 allocs: all=3468497 peek=3428569
-  # Code 0:002 secs, ZLIB I/O 0:006 secs
+  # 85643 result bytes | 23 allocs: all=13062225 peek=11781689
+  # Code 0:153 secs, ZLIB I/O 0:029 secs
+  # 1243312 result bytes | 4 allocs: all=2538457 peek=2498529
+  # Code 0:002 secs, ZLIB I/O 0:002 secs
 
 2. Releases
 -----------
+
+v0.10.0, 2026-06-22:
+  - Add optional (s_BSDIPA_TEXT) simple texual line-based mode.
 
 v0.9.1, 2026-05-09:
   + perl/, s-bsdipa/: detect availability of I/O layers via compilation

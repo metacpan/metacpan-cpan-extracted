@@ -95,6 +95,41 @@ sub add_comment {
 }
 
 
+sub attachments {
+    my ($self, %query) = @_;
+    return $self->_client->issues->attachments(
+        $self->_owner, $self->_repo, $self->number, %query);
+}
+
+
+sub create_attachment {
+    my ($self, %args) = @_;
+    return $self->_client->issues->create_attachment(
+        $self->_owner, $self->_repo, $self->number, %args);
+}
+
+
+sub get_attachment {
+    my ($self, $attachment_id) = @_;
+    return $self->_client->issues->get_attachment(
+        $self->_owner, $self->_repo, $self->number, $attachment_id);
+}
+
+
+sub edit_attachment {
+    my ($self, $attachment_id, %args) = @_;
+    return $self->_client->issues->edit_attachment(
+        $self->_owner, $self->_repo, $self->number, $attachment_id, %args);
+}
+
+
+sub delete_attachment {
+    my ($self, $attachment_id) = @_;
+    return $self->_client->issues->delete_attachment(
+        $self->_owner, $self->_repo, $self->number, $attachment_id);
+}
+
+
 
 1;
 
@@ -110,7 +145,7 @@ WWW::Gitea::Issue - Gitea issue entity
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -227,6 +262,41 @@ Reopens the issue (shortcut for C<< $issue->edit(state => 'open') >>).
 
 Adds a comment to the issue. Returns the new L<WWW::Gitea::Comment>.
 
+=head2 attachments
+
+    my $attachments = $issue->attachments;
+
+Lists the issue's attachments. Returns an ArrayRef of
+L<WWW::Gitea::Attachment>.
+
+=head2 create_attachment
+
+    my $a = $issue->create_attachment(file => '/path/to/log.txt');
+
+Uploads an attachment to the issue (see
+L<WWW::Gitea::API::Issues/create_attachment>). Returns a
+L<WWW::Gitea::Attachment>.
+
+=head2 get_attachment
+
+    my $a = $issue->get_attachment(12);
+
+Fetches one of the issue's attachments by attachment id. Returns a
+L<WWW::Gitea::Attachment>.
+
+=head2 edit_attachment
+
+    $issue->edit_attachment(12, name => 'renamed.txt');
+
+Edits one of the issue's attachments. Returns the updated
+L<WWW::Gitea::Attachment>.
+
+=head2 delete_attachment
+
+    $issue->delete_attachment(12);
+
+Deletes one of the issue's attachments by attachment id.
+
 =head1 SEE ALSO
 
 =over 4
@@ -236,6 +306,8 @@ Adds a comment to the issue. Returns the new L<WWW::Gitea::Comment>.
 =item * L<WWW::Gitea::API::Issues>
 
 =item * L<WWW::Gitea::Comment>
+
+=item * L<WWW::Gitea::Attachment>
 
 =back
 

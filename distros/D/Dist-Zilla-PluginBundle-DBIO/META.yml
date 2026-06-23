@@ -1,11 +1,16 @@
 ---
 abstract: 'Dist::Zilla plugin bundle for DBIO distributions'
 author:
-  - 'DBIO & DBIx::Class Authors'
+  - 'DBIO Authors'
 build_requires:
+  Dist::Zilla::Tester: '0'
+  PPI: '0'
+  Pod::Elemental: '0'
+  Software::License::Perl_5: '0'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -14,39 +19,46 @@ meta-spec:
   version: '1.4'
 name: Dist-Zilla-PluginBundle-DBIO
 provides:
-  Dist::Zilla::Plugin::DBIO::SetCopyrightHolder:
-    file: lib/Dist/Zilla/PluginBundle/DBIO.pm
-    version: '0.900001'
+  Dist::Zilla::Plugin::DBIO::CodebergMeta:
+    file: lib/Dist/Zilla/Plugin/DBIO/CodebergMeta.pm
+    version: '0.900002'
+  Dist::Zilla::Plugin::DBIO::GatherSkills:
+    file: lib/Dist/Zilla/Plugin/DBIO/GatherSkills.pm
+    version: '0.900002'
+  Dist::Zilla::Plugin::DBIO::SetMeta:
+    file: lib/Dist/Zilla/Plugin/DBIO/SetMeta.pm
+    version: '0.900002'
   Dist::Zilla::PluginBundle::DBIO:
     file: lib/Dist/Zilla/PluginBundle/DBIO.pm
-    version: '0.900001'
+    version: '0.900002'
   Pod::Weaver::PluginBundle::DBIO:
     file: lib/Pod/Weaver/PluginBundle/DBIO.pm
-    version: '0.900001'
+    version: '0.900002'
   Pod::Weaver::PluginBundle::DBIO::Heritage:
     file: lib/Pod/Weaver/PluginBundle/DBIO/Heritage.pm
-    version: '0.900001'
+    version: '0.900002'
 requires:
   Dist::Zilla: '6.000'
   Dist::Zilla::Plugin::Bootstrap::lib: '0'
   Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch: '0'
-  Dist::Zilla::Plugin::GithubMeta: '0'
   Dist::Zilla::Plugin::MakeMaker::Awesome: '0'
   Dist::Zilla::Plugin::MetaProvides::Package: '0'
   Dist::Zilla::Plugin::PodWeaver: '0'
   Dist::Zilla::Plugin::Prereqs::FromCPANfile: '0'
+  Dist::Zilla::Plugin::ShareDir: '0'
   Dist::Zilla::Plugin::VersionFromMainModule: '0'
   Dist::Zilla::PluginBundle::Git: '0'
   Dist::Zilla::PluginBundle::Git::VersionManager: '0'
   Moose: '0'
+  Path::Tiny: '0'
   Pod::Weaver: '0'
   Pod::Weaver::Section::GenerateSection: '0'
   perl: '5.020'
 resources:
-  bugtracker: https://github.com/p5-dbio/dbio-dzil/issues
-  homepage: https://github.com/p5-dbio/dbio-dzil
-  repository: https://github.com/p5-dbio/dbio-dzil.git
-version: '0.900001'
+  bugtracker: https://codeberg.org/dbio/dbio-dzil/issues
+  homepage: https://codeberg.org/dbio/dbio-dzil
+  repository: https://codeberg.org/dbio/dbio-dzil.git
+version: '0.900002'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -63,14 +75,15 @@ x_Dist_Zilla:
       name: Bootstrap::lib
       version: '1.001002'
     -
-      class: Dist::Zilla::Plugin::DBIO::SetCopyrightHolder
-      name: '@DBIO/DBIO::SetCopyrightHolder'
+      class: Dist::Zilla::Plugin::DBIO::SetMeta
+      name: '@DBIO/DBIO::SetMeta'
       version: ~
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .proverc
             - CLAUDE.md
             - MANIFEST
             - META.json
@@ -88,6 +101,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@DBIO/PruneCruft'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::DBIO::GatherSkills
+      name: '@DBIO/DBIO::GatherSkills'
+      version: ~
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@DBIO/ShareDir'
       version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaJSON
@@ -125,6 +146,112 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: '@DBIO/Prereqs::FromCPANfile'
       version: '0.08'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@DBIO/@Git::VersionManager/pluginbundle version'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::RewriteVersion::Transitional
+      config:
+        Dist::Zilla::Plugin::RewriteVersion:
+          add_tarball_name: 0
+          finders:
+            - ':MainModule'
+          global: 0
+          skip_version_provider: 0
+        Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
+      name: '@DBIO/@Git::VersionManager/RewriteVersion::Transitional'
+      version: '0.009'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Update
+      name: '@DBIO/@Git::VersionManager/MetaProvides::Update'
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromRelease
+      config:
+        Dist::Zilla::Plugin::CopyFilesFromRelease:
+          filename:
+            - Changes
+          match: []
+      name: '@DBIO/@Git::VersionManager/CopyFilesFromRelease'
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%V%n%n%c
+          signoff: 0
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@DBIO/@Git::VersionManager/release snapshot'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: v0.900002
+          tag_format: v%V
+          tag_message: v%V
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@DBIO/@Git::VersionManager/Git::Tag'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+      config:
+        Dist::Zilla::Plugin::BumpVersionAfterRelease:
+          finders:
+            - ':MainModule'
+          global: 0
+          munge_makefile_pl: 1
+        Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
+      name: '@DBIO/@Git::VersionManager/BumpVersionAfterRelease::Transitional'
+      version: '0.009'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@DBIO/@Git::VersionManager/NextRelease'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: 'increment $VERSION after %v release'
+          signoff: 0
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Build.PL
+            - Changes
+            - Makefile.PL
+          allow_dirty_match:
+            - (?^:^lib/.*\.pm$)
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@DBIO/@Git::VersionManager/post-release commit'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -225,9 +352,9 @@ x_Dist_Zilla:
       name: '@DBIO/Manifest'
       version: '6.037'
     -
-      class: Dist::Zilla::Plugin::GithubMeta
-      name: '@DBIO/GithubMeta'
-      version: '0.58'
+      class: Dist::Zilla::Plugin::DBIO::CodebergMeta
+      name: '@DBIO/DBIO::CodebergMeta'
+      version: ~
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -253,114 +380,6 @@ x_Dist_Zilla:
           repo_root: .
       name: '@DBIO/Git::CheckFor::CorrectBranch'
       version: '0.014'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: recommends
-      name: '@DBIO/@Git::VersionManager/pluginbundle version'
-      version: '6.037'
-    -
-      class: Dist::Zilla::Plugin::RewriteVersion::Transitional
-      config:
-        Dist::Zilla::Plugin::RewriteVersion:
-          add_tarball_name: 0
-          finders:
-            - ':ExecFiles'
-            - ':InstallModules'
-          global: 1
-          skip_version_provider: 0
-        Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
-      name: '@DBIO/@Git::VersionManager/RewriteVersion::Transitional'
-      version: '0.009'
-    -
-      class: Dist::Zilla::Plugin::MetaProvides::Update
-      name: '@DBIO/@Git::VersionManager/MetaProvides::Update'
-      version: '0.007'
-    -
-      class: Dist::Zilla::Plugin::CopyFilesFromRelease
-      config:
-        Dist::Zilla::Plugin::CopyFilesFromRelease:
-          filename:
-            - Changes
-          match: []
-      name: '@DBIO/@Git::VersionManager/CopyFilesFromRelease'
-      version: '0.007'
-    -
-      class: Dist::Zilla::Plugin::Git::Commit
-      config:
-        Dist::Zilla::Plugin::Git::Commit:
-          add_files_in: []
-          commit_msg: v%V%n%n%c
-          signoff: 0
-        Dist::Zilla::Role::Git::DirtyFiles:
-          allow_dirty:
-            - Changes
-          allow_dirty_match: []
-          changelog: Changes
-        Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
-          repo_root: .
-        Dist::Zilla::Role::Git::StringFormatter:
-          time_zone: local
-      name: '@DBIO/@Git::VersionManager/release snapshot'
-      version: '2.052'
-    -
-      class: Dist::Zilla::Plugin::Git::Tag
-      config:
-        Dist::Zilla::Plugin::Git::Tag:
-          branch: ~
-          changelog: Changes
-          signed: 0
-          tag: v0.900001
-          tag_format: v%V
-          tag_message: v%V
-        Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
-          repo_root: .
-        Dist::Zilla::Role::Git::StringFormatter:
-          time_zone: local
-      name: '@DBIO/@Git::VersionManager/Git::Tag'
-      version: '2.052'
-    -
-      class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
-      config:
-        Dist::Zilla::Plugin::BumpVersionAfterRelease:
-          finders:
-            - ':ExecFiles'
-            - ':InstallModules'
-          global: 0
-          munge_makefile_pl: 1
-        Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
-      name: '@DBIO/@Git::VersionManager/BumpVersionAfterRelease::Transitional'
-      version: '0.009'
-    -
-      class: Dist::Zilla::Plugin::NextRelease
-      name: '@DBIO/@Git::VersionManager/NextRelease'
-      version: '6.037'
-    -
-      class: Dist::Zilla::Plugin::Git::Commit
-      config:
-        Dist::Zilla::Plugin::Git::Commit:
-          add_files_in: []
-          commit_msg: 'increment $VERSION after %v release'
-          signoff: 0
-        Dist::Zilla::Role::Git::DirtyFiles:
-          allow_dirty:
-            - Build.PL
-            - Changes
-            - Makefile.PL
-          allow_dirty_match:
-            - (?^:^lib/.*\.pm$)
-          changelog: Changes
-        Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
-          repo_root: .
-        Dist::Zilla::Role::Git::StringFormatter:
-          time_zone: local
-      name: '@DBIO/@Git::VersionManager/post-release commit'
-      version: '2.052'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@DBIO/ConfirmRelease'

@@ -1,0 +1,248 @@
+#!/usr/bin/env perl
+# ABSTRACT: Interactive demonstration of DBIO capabilities
+# dbio-demo — interactive demonstration of DBIO capabilities
+#
+# Usage:
+#   dbio-demo                              # SQLite in-memory (default)
+#   dbio-demo dbi:SQLite:demo.db           # SQLite file
+#   dbio-demo dbi:Pg:dbname=test user pass # PostgreSQL
+#   dbio-demo dbi:mysql:dbname=test u p    # MySQL
+
+use strict;
+use warnings;
+use 5.020;
+
+# ---------------------------------------------------------------------------
+# Inline schema — Artist -> CD -> Track
+# ---------------------------------------------------------------------------
+
+package Demo::Schema::Result::Artist {
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('demo_artist');
+  __PACKAGE__->add_columns(
+    id   => { data_type => 'integer', is_auto_increment => 1 },
+    name => { data_type => 'varchar', size => 128 },
+  );
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->add_unique_constraint([qw( name )]);
+  __PACKAGE__->has_many(cds => 'Demo::Schema::Result::CD', 'artist_id');
+}
+
+package Demo::Schema::Result::CD {
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('demo_cd');
+  __PACKAGE__->add_columns(
+    id        => { data_type => 'integer', is_auto_increment => 1 },
+    artist_id => { data_type => 'integer' },
+    title     => { data_type => 'varchar', size => 256 },
+    year      => { data_type => 'integer', is_nullable => 1 },
+  );
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->belongs_to(artist => 'Demo::Schema::Result::Artist', 'artist_id');
+  __PACKAGE__->has_many(tracks => 'Demo::Schema::Result::Track', 'cd_id');
+}
+
+package Demo::Schema::Result::Track {
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('demo_track');
+  __PACKAGE__->add_columns(
+    id       => { data_type => 'integer', is_auto_increment => 1 },
+    cd_id    => { data_type => 'integer' },
+    title    => { data_type => 'varchar', size => 256 },
+    position => { data_type => 'integer', is_nullable => 1 },
+  );
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->belongs_to(cd => 'Demo::Schema::Result::CD', 'cd_id');
+}
+
+package Demo::Schema {
+  use base 'DBIO::Schema';
+  __PACKAGE__->register_class(Artist => 'Demo::Schema::Result::Artist');
+  __PACKAGE__->register_class(CD     => 'Demo::Schema::Result::CD');
+  __PACKAGE__->register_class(Track  => 'Demo::Schema::Result::Track');
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+package main;
+
+my $dsn  = shift // 'dbi:SQLite:dbname=:memory:';
+my $user = shift;
+my $pass = shift;
+
+sub banner { say "\n", "=" x 60, "\n  $_[0]\n", "=" x 60 }
+sub step   { say "\n--- $_[0] ---" }
+sub show   { printf "  %-14s %s\n", @_ }
+
+banner("DBIO Demo");
+show("DSN:", $dsn);
+show("Driver:", $dsn =~ /^dbi:(\w+)/i ? $1 : '?');
+
+# -- Connect ----------------------------------------------------------------
+
+step("Connecting");
+my $schema = Demo::Schema->connect($dsn, $user, $pass, {
+  AutoCommit => 1,
+  RaiseError => 1,
+});
+say "  Connected to $dsn";
+show("Storage:", ref $schema->storage);
+
+# -- Deploy -----------------------------------------------------------------
+
+step("Deploying schema (3 tables)");
+$schema->deploy({ add_drop_table => 1 });
+say "  Tables created: demo_artist, demo_cd, demo_track";
+
+# -- Insert -----------------------------------------------------------------
+
+step("Inserting data");
+
+my @artists = (
+  { name => 'David Bowie',      cds => [
+    { title => 'Hunky Dory',         year => 1971, tracks => [
+      { title => 'Changes',             position => 1 },
+      { title => 'Oh! You Pretty Things', position => 2 },
+      { title => 'Life on Mars?',       position => 4 },
+    ]},
+    { title => 'Ziggy Stardust',     year => 1972, tracks => [
+      { title => 'Five Years',          position => 1 },
+      { title => 'Starman',             position => 8 },
+      { title => 'Ziggy Stardust',      position => 10 },
+      { title => 'Suffragette City',    position => 11 },
+    ]},
+  ]},
+  { name => 'Kraftwerk',        cds => [
+    { title => 'Autobahn',           year => 1974, tracks => [
+      { title => 'Autobahn',            position => 1 },
+      { title => 'Kometenmelodie 1',    position => 2 },
+      { title => 'Kometenmelodie 2',    position => 3 },
+      { title => 'Mitternacht',         position => 4 },
+      { title => 'Morgenspaziergang',   position => 5 },
+    ]},
+    { title => 'Die Mensch-Maschine', year => 1978, tracks => [
+      { title => 'Die Roboter',         position => 1 },
+      { title => 'Spacelab',            position => 2 },
+      { title => 'Das Model',           position => 4 },
+      { title => 'Neonlicht',           position => 5 },
+    ]},
+  ]},
+  { name => 'Nina Simone',      cds => [
+    { title => 'I Put a Spell on You', year => 1965, tracks => [
+      { title => 'Feeling Good',        position => 2 },
+      { title => 'I Put a Spell on You', position => 10 },
+    ]},
+  ]},
+);
+
+for my $data (@artists) {
+  my $cds = delete $data->{cds};
+  my $artist = $schema->resultset('Artist')->create($data);
+
+  for my $cd_data (@$cds) {
+    my $tracks = delete $cd_data->{tracks};
+    my $cd = $artist->create_related('cds', $cd_data);
+    $cd->create_related('tracks', $_) for @$tracks;
+  }
+
+  printf "  + %-16s  %d CDs, %d tracks\n",
+    $artist->name,
+    $artist->cds->count,
+    $artist->cds->search_related('tracks')->count;
+}
+
+# -- Counts -----------------------------------------------------------------
+
+step("Counts");
+show("Artists:", $schema->resultset('Artist')->count);
+show("CDs:",     $schema->resultset('CD')->count);
+show("Tracks:",  $schema->resultset('Track')->count);
+
+# -- Queries ----------------------------------------------------------------
+
+step("Query: all tracks by Kraftwerk (join through CD)");
+my $rs = $schema->resultset('Track')->search(
+  { 'artist.name' => 'Kraftwerk' },
+  { join => { cd => 'artist' }, order_by => ['cd.year', 'me.position'] },
+);
+while (my $t = $rs->next) {
+  printf "  %d. %-24s  (%s, %d)\n",
+    $t->position, $t->title, $t->cd->title, $t->cd->year;
+}
+
+step("Query: CDs from the 70s (ordered by year)");
+$rs = $schema->resultset('CD')->search(
+  { year => { '>=' => 1970, '<' => 1980 } },
+  { order_by => 'year', prefetch => 'artist' },
+);
+while (my $cd = $rs->next) {
+  printf "  %d  %-26s  by %s\n", $cd->year, $cd->title, $cd->artist->name;
+}
+
+step("Query: artists with more than 3 tracks");
+$rs = $schema->resultset('Artist')->search(undef, {
+  join     => { cds => 'tracks' },
+  group_by => ['me.id', 'me.name'],
+  having   => \[ 'COUNT(tracks.id) > ?', 3 ],
+});
+while (my $a = $rs->next) {
+  printf "  %-16s  %d tracks\n", $a->name,
+    $a->cds->search_related('tracks')->count;
+}
+
+# -- Update -----------------------------------------------------------------
+
+step("Update: rename 'Die Mensch-Maschine' to 'The Man-Machine'");
+my $cd = $schema->resultset('CD')->find({ title => 'Die Mensch-Maschine' });
+$cd->update({ title => 'The Man-Machine' });
+show("New title:", $cd->title);
+
+# -- Delete -----------------------------------------------------------------
+
+step("Delete: remove Nina Simone and cascade");
+my $nina = $schema->resultset('Artist')->find({ name => 'Nina Simone' });
+# manual cascade: delete tracks, then CDs, then artist
+for my $nina_cd ($nina->cds->all) {
+  $nina_cd->tracks->delete;
+  $nina_cd->delete;
+}
+$nina->delete;
+show("Artists now:", $schema->resultset('Artist')->count);
+show("CDs now:",     $schema->resultset('CD')->count);
+show("Tracks now:",  $schema->resultset('Track')->count);
+
+# -- Transaction ------------------------------------------------------------
+
+step("Transaction: add + rollback");
+eval {
+  $schema->txn_do(sub {
+    $schema->resultset('Artist')->create({ name => 'Ghost Artist' });
+    show("Inside txn:", $schema->resultset('Artist')->count . " artists");
+    die "intentional rollback\n";
+  });
+};
+show("After rollback:", $schema->resultset('Artist')->count . " artists");
+
+# -- ResultSet chaining -----------------------------------------------------
+
+step("ResultSet chaining demo");
+my $bowie_70s_tracks = $schema->resultset('Track')
+  ->search({ 'artist.name' => 'David Bowie' }, { join => { cd => 'artist' } })
+  ->search({ 'cd.year' => { '<' => 1975 } })
+  ->search(undef, { order_by => [{ -asc => 'cd.year' }, { -asc => 'me.position' }] });
+
+say "  David Bowie tracks from before 1975:";
+while (my $t = $bowie_70s_tracks->next) {
+  printf "    %s - %s (%d) #%d\n",
+    $t->cd->title, $t->title, $t->cd->year, $t->position;
+}
+
+# -- Done -------------------------------------------------------------------
+
+banner("Done");
+say "  Everything works. DBIO is ready.\n";

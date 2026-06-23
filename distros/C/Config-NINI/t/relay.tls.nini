@@ -1,0 +1,18 @@
+
+
+flabbergasted yeah
+
+# relay.tls.nini - included by relay.nini
+=tls
+
+  cert /etc/relay/tls/relay.crt
+  key  /etc/relay/tls/relay.key
+  ca   /etc/relay/tls/ca-bundle.crt
+  protocols[] TLSv1.2 TLSv1.3
+  verify_peer
+
+# @include relay.nini
+
+=tls test
+#&&tls
+

@@ -1,0 +1,36 @@
+Revision history for DBIO-Sybase
+
+0.900000  2026-06-23
+    First release. Sybase/ASE database driver for DBIO, extracted from
+    DBIO core as a separate distribution.
+
+    * Storage
+        - DBIO::Sybase::Storage dispatcher with driver registration and
+          rebless into the appropriate server-specific subclass
+        - DBIO::Sybase::Storage::ASE for Sybase ASE, composing identity
+          retrieval, bulk insert, LOB (TEXT/IMAGE) writer, and transaction
+          and savepoint management as ISA mixins under C3
+        - DBIO::Sybase::Storage::FreeTDS connection layer: AutoCommit via
+          SET CHAINED and text size via SET TEXTSIZE
+        - DateTime support for DATETIME and SMALLDATETIME columns
+
+    * Schema component and shortcut
+        - DBIO::Sybase schema component pinning the Sybase storage type
+        - use DBIO Schema => -syb shortcut (DBIO::Shortcut::syb)
+
+    * Deploy
+        - DBIO::Sybase::Deploy orchestrates desired-state deployment via
+          test-deploy-and-compare (install fresh, upgrade by diffing live
+          vs desired)
+
+    * Introspect
+        - Native introspection via sysobjects/syscolumns for tables and
+          views, columns, indexes, and foreign keys
+
+    * Diff
+        - Native model diff for tables, columns, and indexes
+
+    * DDL
+        - Native Sybase ASE DDL generation, deduping sources that share a
+          physical table, skipping subquery and view sources, dereferencing
+          literal table names, and emitting CREATE VIEW for non-virtual views

@@ -4,13 +4,13 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "RPi-ADC-ADS",
    "no_index" : {
@@ -45,6 +45,6 @@
          "web" : "https://github.com/stevieb9/rpi-adc-ads"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -19,9 +19,9 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Algorithm::QuadTree" => "0.3"
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.10",
   "test" => {
-    "TESTS" => "t/*.t t/nobackrefs/*.t"
+    "TESTS" => "t/*.t"
   }
 );
 

@@ -1,0 +1,496 @@
+# PODNAME: DBIO::Manual::Intro
+# ABSTRACT: Introduction to DBIO
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual::Intro - Introduction to DBIO
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 INTRODUCTION
+
+If you want a more native Perl interface to relational data than raw C<DBI>,
+this is the right place to start. This manual explains the mental model behind
+DBIO before diving into the larger API surface.
+
+=head1 THE DBIO WAY
+
+Here are a few simple tips that will help you get your bearings with
+DBIO.
+
+=head2 Tables become Result classes
+
+DBIO needs to know what your tables look like. You describe them by defining
+result classes. A result class declares one table, its columns, and its
+relationships to other tables.
+
+The important simplification is:
+
+  A Result class == Table
+
+(most of the time, but just bear with my simplification)
+
+=head2 It's all about the ResultSet
+
+Once the result sources exist, DBIO uses them to build query objects and turn
+database rows into Perl objects.
+
+Let's say we defined a ResultSource for an "album" table with three columns:
+"albumid", "artist", and "title".  Any time we want to query this table, we'll
+be creating a L<DBIO::ResultSet> from its ResultSource.  For example, the
+results of:
+
+  SELECT albumid, artist, title FROM album;
+
+Would be retrieved by creating a ResultSet object from the album table's
+ResultSource, likely by using the "search" method.
+
+DBIO does not stop at simple table queries. For example:
+
+  SELECT title FROM album GROUP BY title;
+
+You could easily achieve it.
+
+The important point is:
+
+  Any time you would reach for a SQL query in DBI, you are
+  creating a DBIO::ResultSet.
+
+=head2 Search is like "prepare"
+
+DBIO stays lazy for as long as it can. If you return a ResultSet, the query
+will not run until you call a method that needs rows or aggregates, such as
+C<next> or C<first>.
+
+The important thing to understand:
+
+  Setting up a ResultSet does not execute the query; retrieving
+  the data does.
+
+=head2 Search results are returned as Rows
+
+Rows of the search from the database are blessed into
+L<Result|DBIO::Manual::ResultClass> objects.
+
+=head1 SETTING UP DBIO
+
+Let's look at how you can set and use your first native L<DBIO> tree.
+
+First this manual shows the manual setup path. If you want DBIO to discover an
+existing schema automatically, jump ahead to
+L</Using DBIO::Generate>.
+
+=head2 Setting it up manually
+
+First, you should create your base schema class, which inherits from
+L<DBIO::Schema>:
+
+  package My::Schema;
+  use base qw/DBIO::Schema/;
+
+In this class you load your result_source ("table", "model") classes, which we
+will define later, using the load_namespaces() method:
+
+  # load My::Schema::Result::* and their resultset classes
+  __PACKAGE__->load_namespaces();
+
+By default this loads all the Result (Row) classes in the
+My::Schema::Result:: namespace, and also any resultset classes in the
+My::Schema::ResultSet:: namespace (if missing, the resultsets are
+defaulted to be DBIO::ResultSet objects). You can change the
+result and resultset namespaces by using options to the
+L<DBIO::Schema/load_namespaces> call.
+
+It is also possible to do the same things manually by calling
+C<load_classes> for the Row classes and defining in those classes any
+required resultset classes.
+
+Next, create each of the classes you want to load as specified above:
+
+  package My::Schema::Result::Album;
+  use base qw/DBIO::Core/;
+
+Load any additional components you may need with the load_components() method,
+and provide component configuration if required. For example, if you want
+automatic row ordering:
+
+  __PACKAGE__->load_components(qw/ Ordered /);
+  __PACKAGE__->position_column('rank');
+
+Ordered will refer to a field called 'position' unless otherwise directed.  Here you are defining
+the ordering field to be named 'rank'.  (NOTE: Insert errors may occur if you use the Ordered
+component, but have not defined a position column or have a 'position' field in your row.)
+
+Set the table for your class:
+
+  __PACKAGE__->table('album');
+
+Add columns to your class:
+
+  __PACKAGE__->add_columns(qw/ albumid artist title rank /);
+
+Each column can also be set up with its own accessor, data_type and other pieces
+of information that it may be useful to have -- just pass C<add_columns> a hash:
+
+  __PACKAGE__->add_columns(albumid =>
+                            { accessor  => 'album',
+                              data_type => 'integer',
+                              size      => 16,
+                              is_nullable => 0,
+                              is_auto_increment => 1,
+                            },
+                          artist =>
+                            { data_type => 'integer',
+                              size      => 16,
+                              is_nullable => 0,
+                            },
+                          title  =>
+                            { data_type => 'varchar',
+                              size      => 256,
+                              is_nullable => 0,
+                            },
+                          rank =>
+                            { data_type => 'integer',
+                              size      => 16,
+                              is_nullable => 0,
+                              default_value => 0,
+                            }
+                         );
+
+DBIO doesn't directly use most of this data yet, but various related
+modules such as L<HTML::FormHandler::Model::DBIC> make use of it.
+Also it allows you to create your database tables from your Schema,
+instead of the other way around.
+See L<DBIO::Schema/deploy> for details.
+
+See L<DBIO::ResultSource> for more details of the possible column
+attributes.
+
+Accessors are created for each column automatically, so My::Schema::Result::Album will
+have albumid() (or album(), when using the accessor), artist() and title()
+methods.
+
+Define a primary key for your class:
+
+  __PACKAGE__->set_primary_key('albumid');
+
+If you have a multi-column primary key, just pass a list instead:
+
+  __PACKAGE__->set_primary_key( qw/ albumid artistid / );
+
+Define this class' relationships with other classes using either C<belongs_to>
+to describe a column which contains an ID of another Table, or C<has_many> to
+make a predefined accessor for fetching objects that contain this Table's
+foreign key:
+
+  # in My::Schema::Result::Artist
+  __PACKAGE__->has_many('albums', 'My::Schema::Result::Album', 'artist');
+
+See L<DBIO::Relationship> for more information about the various types of
+available relationships and how you can design your own.
+
+=head2 Using DBIO::Generate
+
+L<DBIO::Generate> is part of the L<DBIO> distribution. It inspects your
+database, and automatically creates classes for all the tables in your
+schema.
+
+The simplest way to use it is via the L<dbiogen> script. For example:
+
+    $ dbiogen -o dump_directory=./lib \
+        -o components='["InflateColumn::DateTime"]' \
+        MyApp::Schema dbi:mysql:mydb user pass
+
+If you have a mixed-case database, use the C<preserve_case> option, e.g.:
+
+    $ dbiogen -o dump_directory=./lib -o preserve_case=1 \
+        -o components='["InflateColumn::DateTime"]' \
+        MyApp::Schema dbi:mysql:mydb user pass
+
+If you are using L<Catalyst>, then you can use the helper that comes with
+L<Catalyst::Model::DBIC::Schema>:
+
+    $ script/myapp_create.pl model MyModel DBIC::Schema MyApp::Schema \
+        create=static moniker_map='{ foo => "FOO" }' dbi:SQLite:./myapp.db \
+        on_connect_do='PRAGMA foreign_keys=ON' quote_char='"'
+
+See L<Catalyst::Helper::Model::DBIC::Schema> for more information on this
+helper.
+
+See the L<DBIO::Generate> documentation for more information on the many
+generation options.
+
+=head2 Connecting
+
+To connect to your Schema, you need to provide the connection details or a
+database handle.
+
+=head3 Via connection details
+
+The arguments are the same as for L<DBI/connect>:
+
+  my $schema = My::Schema->connect('dbi:SQLite:/home/me/myapp/my.db');
+
+You can create as many different schema instances as you need. So if you have a
+second database you want to access:
+
+  my $other_schema = My::Schema->connect( $dsn, $user, $password, $attrs );
+
+Note that L<DBIO::Schema> does not cache connections for you. If you use
+multiple connections, you need to do this manually.
+
+To execute some SQL statements on every connect you can add them as an option in
+a special fifth argument to connect:
+
+  my $another_schema = My::Schema->connect(
+      $dsn,
+      $user,
+      $password,
+      $attrs,
+      { on_connect_do => \@on_connect_sql_statments }
+  );
+
+See L<DBIO::Storage::DBI/connect_info> for more information about
+this and other special C<connect>-time options.
+
+=head3 Via a database handle
+
+The supplied coderef is expected to return a single connected database handle
+(e.g. a L<DBI> C<$dbh>)
+
+  my $schema = My::Schema->connect (
+    sub { Some::DBH::Factory->connect },
+    \%extra_attrs,
+  );
+
+=head2 Basic usage
+
+Once you've defined the basic classes, either manually or using
+L<DBIO::Generate>, you can start interacting with your database.
+
+To access your database using your $schema object, you can fetch a
+L<DBIO::Manual::Glossary/"ResultSet"> representing each of your tables by
+calling the C<resultset> method.
+
+The simplest way to get a record is by primary key:
+
+  my $album = $schema->resultset('Album')->find(14);
+
+This will run a C<SELECT> with C<albumid = 14> in the C<WHERE> clause, and
+return an instance of C<My::Schema::Result::Album> that represents this row.  Once you
+have that row, you can access and update columns:
+
+  $album->title('Physical Graffiti');
+  my $title = $album->title; # $title holds 'Physical Graffiti'
+
+If you prefer, you can use the C<set_column> and C<get_column> accessors
+instead:
+
+  $album->set_column('title', 'Presence');
+  $title = $album->get_column('title');
+
+Just like with L<Class::DBI>, you call C<update> to save your changes to the
+database (by executing the actual C<UPDATE> statement):
+
+  $album->update;
+
+If needed, you can throw away your local changes:
+
+  $album->discard_changes if $album->is_changed;
+
+As you can see, C<is_changed> allows you to check if there are local changes to
+your object.
+
+=head2 Adding and removing rows
+
+To create a new record in the database, you can use the C<create> method.  It
+returns an instance of C<My::Schema::Result::Album> that can be used to access the data
+in the new record:
+
+  my $new_album = $schema->resultset('Album')->create({
+    title  => 'Wish You Were Here',
+    artist => 'Pink Floyd'
+  });
+
+Now you can add data to the new record:
+
+  $new_album->label('Capitol');
+  $new_album->year('1975');
+  $new_album->update;
+
+Likewise, you can remove it from the database:
+
+  $new_album->delete;
+
+You can also remove records without retrieving them first, by calling delete
+directly on a ResultSet object.
+
+  # Delete all of Falco's albums
+  $schema->resultset('Album')->search({ artist => 'Falco' })->delete;
+
+=head2 Finding your objects
+
+L<DBIO> provides a few different ways to retrieve data from your
+database.  Here's one example:
+
+  # Find all of Santana's albums
+  my $rs = $schema->resultset('Album')->search({ artist => 'Santana' });
+
+In scalar context, as above, C<search> returns a L<DBIO::ResultSet>
+object.  It can be used to peek at the first album returned by the database:
+
+  my $album = $rs->first;
+  print $album->title;
+
+You can loop over the albums and update each one:
+
+  while (my $album = $rs->next) {
+    print $album->artist . ' - ' . $album->title;
+    $album->year(2001);
+    $album->update;
+  }
+
+Or, you can update them all at once:
+
+  $rs->update({ year => 2001 });
+
+In list context, the C<search> method returns all of the matching rows:
+
+  # Fetch immediately all of Carlos Santana's albums
+  my @albums = $schema->resultset('Album')->search(
+    { artist => 'Carlos Santana' }
+  );
+  foreach my $album (@albums) {
+    print $album->artist . ' - ' . $album->title;
+  }
+
+We also provide a handy shortcut for doing a C<LIKE> search:
+
+  # Find albums whose artist starts with 'Jimi'
+  my $rs = $schema->resultset('Album')->search_like({ artist => 'Jimi%' });
+
+Or you can provide your own C<WHERE> clause:
+
+  # Find Peter Frampton albums from the year 1986
+  my $where = 'artist = ? AND year = ?';
+  my @bind  = ( 'Peter Frampton', 1986 );
+  my $rs    = $schema->resultset('Album')->search_literal( $where, @bind );
+
+The preferred way to generate complex queries is to provide a
+L<SQL::Abstract>-compatible construct to C<search>:
+
+  my $rs = $schema->resultset('Album')->search({
+    artist  => { '!=', 'Janis Joplin' },
+    year    => { '<' => 1980 },
+    albumid => { '-in' => [ 1, 14, 15, 65, 43 ] }
+  });
+
+This results in something like the following C<WHERE> clause:
+
+  WHERE artist != 'Janis Joplin'
+    AND year < 1980
+    AND albumid IN (1, 14, 15, 65, 43)
+
+For more examples of complex queries, see L<DBIO::Manual::Cookbook>.
+
+The search can also be modified by passing another hash with
+attributes:
+
+  my @albums = My::Schema->resultset('Album')->search(
+    { artist => 'Bob Marley' },
+    { rows => 2, order_by => { -desc => 'year' } }
+  );
+
+C<@albums> then holds the two most recent Bob Marley albums.
+
+For more information on what you can do with a L<DBIO::ResultSet>, see
+L<DBIO::ResultSet/METHODS>.
+
+For a complete overview of the available attributes, see
+L<DBIO::ResultSet/ATTRIBUTES>.
+
+=head1 NOTES
+
+=head2 The Significance and Importance of Primary Keys
+
+The concept of a L<primary key|DBIO::ResultSource/set_primary_key> in
+DBIO warrants special discussion. The formal definition (which somewhat
+resembles that of a classic RDBMS) is I<a unique constraint that is least
+likely to change after initial row creation>. However this is where the
+similarity ends. Any time you call a CRUD operation on a row (e.g.
+L<delete|DBIO::Row/delete>,
+L<update|DBIO::Row/update>,
+L<discard_changes|DBIO::Row/discard_changes>,
+etc.) DBIO will use the values of the
+L<primary key|DBIO::ResultSource/set_primary_key> columns to populate
+the C<WHERE> clause necessary to accomplish the operation. This is why it is
+important to declare a L<primary key|DBIO::ResultSource/set_primary_key>
+on all your result sources B<even if the underlying RDBMS does not have one>.
+In a pinch one can always declare each row identifiable by all its columns:
+
+ __PACKAGE__->set_primary_key(__PACKAGE__->columns);
+
+Note that DBIO is smart enough to store a copy of the PK values before
+any row-object changes take place, so even if you change the values of PK
+columns the C<WHERE> clause will remain correct.
+
+If you elect not to declare a C<primary key>, DBIO will behave correctly
+by throwing exceptions on any row operation that relies on unique identifiable
+rows. If you inherited datasets with multiple identical rows in them, you can
+still operate with such sets provided you only utilize
+L<DBIO::ResultSet> CRUD methods:
+L<search|DBIO::ResultSet/search>,
+L<update|DBIO::ResultSet/update>,
+L<delete|DBIO::ResultSet/delete>
+
+For example, the following would not work (assuming C<People> does not have
+a declared PK):
+
+ my $result = $schema->resultset('People')
+                   ->search({ last_name => 'Dantes' })
+                    ->next;
+ $result->update({ children => 2 }); # <-- exception thrown because $result isn't
+                                  # necessarily unique
+
+So instead the following should be done:
+
+ $schema->resultset('People')
+         ->search({ last_name => 'Dantes' })
+          ->update({ children => 2 }); # <-- update's ALL Dantes to have children of 2
+
+=head2 Problems on RHEL5/CentOS5
+
+There used to be an issue with the system perl on Red Hat Enterprise
+Linux 5, some versions of Fedora and derived systems. Further
+information on this can be found in L<DBIO::Manual::Troubleshooting>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<DBIO::Manual::Cookbook>
+
+=back
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

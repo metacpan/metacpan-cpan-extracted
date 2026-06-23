@@ -1,0 +1,43 @@
+# Test runner image for dbio-db2 integration tests.
+#
+# Bakes the slow, stable parts: the IBM Data Server Driver (clidriver) and
+# DBD::DB2 built against it. Source code (dbio core + dbio-db2) is mounted at
+# run time, so editing tests never triggers a rebuild.
+#
+# Build:  docker build -f maint/docker/Dockerfile.test -t dbio-db2-test .
+# Used by: maint/docker/docker-compose.yml (service "test")
+
+FROM perl:5.40
+
+# clidriver needs libxml2 + a few runtime libs; build needs a compiler (perl
+# image already has gcc/make via the build-essential base, but be explicit).
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+      ca-certificates curl libxml2 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# IBM Data Server Driver (CLI). Public, license-free runtime client. This is
+# all DBD::DB2 needs to build and connect over TCP/IP (no full DB2 install).
+ENV IBM_DB_HOME=/opt/ibm/clidriver
+ENV DB2_HOME=/opt/ibm/clidriver
+ENV LD_LIBRARY_PATH=/opt/ibm/clidriver/lib
+RUN mkdir -p /opt/ibm \
+    && curl -fsSL -o /tmp/clidriver.tar.gz \
+       https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/linuxx64_odbc_cli.tar.gz \
+    && tar -xzf /tmp/clidriver.tar.gz -C /opt/ibm \
+    && rm /tmp/clidriver.tar.gz
+
+# DBD::DB2 builds against DB2_HOME (clidriver provides include/ + lib/).
+# Its Makefile.PL uses DBI/DBD.pm at configure time but does NOT declare DBI as
+# a configure prereq, so DBI must be installed first or configure dies with
+# "Can't locate DBI/DBD.pm".
+RUN cpanm --notest DBI \
+    && cpanm --notest DBD::DB2
+
+# Common test deps that rarely change. Per-repo cpanfile deps are installed at
+# container start (entrypoint) against the mounted source.
+RUN cpanm --notest Test::More Test::Exception Try::Tiny
+
+WORKDIR /src/dbio-db2
+COPY maint/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

@@ -49,4 +49,27 @@ my $mod = 'RPi::RTC::DS3231';
     }
 }
 
+{ # raw-register BCD guard, 12-hour mode (simple; exhaustive loop in rpi-wiringpi)
+  #
+  # As with month, the 12-hour round-trip self-masks the raw-vs-BCD bug. Read
+  # the actual stored byte for the worst-case value and assert valid BCD. FAILS
+  # on the old raw setHour (hour 12 -> 0x0C) and PASSES on the BCD setHour (hour
+  # 12 -> 0x12). Reg 0x02 = hour BCD bits 0-4 (mask 0x1F) + AM/PM bit 5 (0x20)
+  # + 12/24 bit 6 (0x40).
+    my $o = $mod->new;
+    $o->clock_hours(12);
+
+    $o->hour(12);
+    is $o->_get_register(0x02) & 0x1F, RPi::RTC::DS3231::dec2bcd(12),
+        '12-hour hour 12 stored as valid BCD 0x12 in reg 0x02 (not raw 0x0C)';
+
+    # The 12/24-select (0x40) and AM/PM (0x20) bits must survive an hour() write
+    $o->clock_hours(12);
+    $o->am_pm('PM');
+    $o->hour(11);
+    my $reg = $o->_get_register(0x02);
+    ok $reg & 0x40, '12/24-hour select bit preserved across hour() write';
+    ok $reg & 0x20, 'AM/PM bit preserved across hour() write';
+}
+
 done_testing();

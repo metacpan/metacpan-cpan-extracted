@@ -1,0 +1,221 @@
+# PODNAME: DBIO::Manual::QuickStart
+# ABSTRACT: Up and running with DBIO in 10 minutes
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual::QuickStart - Up and running with DBIO in 10 minutes
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 DESCRIPTION
+
+This document shows the minimum amount of code to make you a productive DBIO
+user. It assumes you are familiar with the basics of database
+programming (what database tables, rows and columns are) and the basics of
+Perl object-oriented programming (calling methods on an object instance).
+It also helps if you already know a little SQL and how to connect to a
+database through DBI.
+
+Follow along with the example database shipped in F<examples/Schema>. The same
+example schema appears throughout the rest of the documentation.
+
+=head2 Preparation
+
+First, install DBIO like any other CPAN distribution.
+See L<https://metacpan.org/pod/DBIO> and L<perlmodinstall>.
+
+Then open the distribution in your shell and change to the subdirectory
+mentioned earlier, the next command will download and unpack it:
+
+    $ perl -mCPAN -e'CPAN::Shell->look("DBIO")'
+    DBIO$ cd examples/Schema
+
+Inspect the database:
+
+    DBIO/examples/Schema$ sqlite3 db/example.db .dump
+
+You can also use a GUI database browser such as
+L<DBeaver|https://dbeaver.io> or L<DB Browser for SQLite|https://sqlitebrowser.org>.
+
+Have a look at the schema class files in the subdirectory F<MyApp>. The
+C<MyApp::Schema> class is the entry point for loading the other classes and
+interacting with the database through DBIO and the C<Result> classes correspond
+to the tables in the database. L<DBIO::Manual::Example> shows how to
+write all that Perl code. That is almost never necessary, though. Instead use
+L<dbiogen> (powered by L<DBIO::Generate>) to
+automatically create schema classes files from an existing database. The
+chapter L</"Resetting the database"> below shows an example invocation.
+
+=head2 Connecting to the database
+
+A L<schema|DBIO::Manual::Glossary/Schema> object represents the database.
+
+    use MyApp::Schema qw();
+    my $schema = MyApp::Schema->connect('dbi:SQLite:db/example.db');
+
+The first four arguments are the same as for L<DBI/connect>.
+
+=head2 Working with data
+
+Almost all actions go through a
+L<resultset|DBIO::Manual::Glossary/ResultSet> object.
+
+=head3 Adding data
+
+Using intermediate result objects:
+
+    my $artist_ma = $schema->resultset('Artist')->create({
+        name => 'Massive Attack',
+    });
+    my $cd_mezz = $artist_ma->create_related(cds => {
+        title => 'Mezzanine',
+    });
+    for ('Angel', 'Teardrop') {
+        $cd_mezz->create_related(tracks => {
+            title => $_
+        });
+    }
+
+Using relation accessors:
+
+    $schema->resultset('Artist')->create({
+        name => 'Metallica',
+        cds => [
+            {
+                title => q{Kill 'Em All},
+                tracks => [
+                    { title => 'Jump in the Fire' },
+                    { title => 'Whiplash' },
+                ],
+            },
+            {
+                title => 'ReLoad',
+                tracks => [
+                    { title => 'The Memory Remains' },
+                    { title => 'The Unforgiven II' },
+                    { title => 'Fuel' },
+                ],
+            },
+        ],
+    });
+
+Columns that are not named are filled with default values. The value C<undef>
+acts as a C<NULL> in the database.
+
+See the chapter L</"Introspecting the schema classes"> below to find out where
+the non-obvious source name strings such as C<Artist> and accessors such as
+C<cds> and C<tracks> come from.
+
+Set the environment variable C<DBI_TRACE='1|SQL'> to see the generated queries.
+
+=head3 Retrieving data
+
+Set up a condition.
+
+    my $artists_starting_with_m = $schema->resultset('Artist')->search(
+        {
+            name => { like => 'M%' }
+        }
+    );
+
+Iterate over result objects of class C<MyApp::Schema::Result::Artist>.
+L<Result|DBIO::Manual::Glossary/Result> objects represent a row and
+automatically get accessors for their column names.
+
+    for my $artist ($artists_starting_with_m->all) {
+        say $artist->name;
+    }
+
+=head3 Changing data
+
+Change the release year of all CDs titled I<ReLoad>.
+
+    $schema->resultset('Cd')->search(
+        {
+            title => 'ReLoad',
+        }
+    )->update_all(
+        {
+            year => 1997,
+        }
+    );
+
+=head3 Removing data
+
+Removes all tracks titled I<Fuel> regardless of which CD the belong to.
+
+    $schema->resultset('Track')->search(
+        {
+            title => 'Fuel',
+        }
+    )->delete_all;
+
+=head2 Introspecting the schema classes
+
+This is useful when you want to learn the generated names in a REPL or during
+exploratory programming.
+
+From the root to the details:
+
+    $schema->sources;                       # returns qw(Cd Track Artist)
+    $schema->source('Cd')->columns;         # returns qw(cdid artist title year)
+    $schema->source('Cd')->relationships;   # returns qw(artist tracks)
+
+From a detail to the root:
+
+    $some_result->result_source;            # returns appropriate source
+    $some_resultset->result_source;
+    $some_resultsource->schema;             # returns appropriate schema
+
+=head2 Resetting the database
+
+    # delete database file
+    DBIO/examples/Schema$ rm -f db/example.db
+
+    # create database and set up tables from definition
+    DBIO/examples/Schema$ sqlite3 db/example.db < db/example.sql
+
+    # fill them with data
+    DBIO/examples/Schema$ perl ./insertdb.pl
+
+    # delete the schema classes files
+    DBIO/examples/Schema$ rm -rf MyApp
+
+    # recreate schema classes files from database file
+    DBIO/examples/Schema$ dbiogen \
+        -o dump_directory=. MyApp::Schema dbi:SQLite:db/example.db
+
+=head2 Where to go next
+
+If you want to exercise what you learned with a more complicated schema,
+load L<Northwind|https://github.com/dalers/mywind> into your
+database.
+
+If you want to transfer your existing SQL knowledge, read
+L<DBIO::Manual::SQLHackers>.
+
+Continue with L<DBIO::Manual::Intro> and
+L<DBIO/"WHERE TO START READING">.
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

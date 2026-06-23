@@ -1,0 +1,52 @@
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
+
+use Test::More 0.88;
+use Test::EOL;
+
+my @files = (
+    'lib/Test/Load/Helper.pm',
+    't/custom-path.t',
+    't/explicit-into.t',
+    't/fixtures/custom-path/foo/bar/test-helper.pl',
+    't/fixtures/custom-path/test-case.pl',
+    't/fixtures/custom-path/test-helper.pl',
+    't/fixtures/explicit-into/test-case.pl',
+    't/fixtures/explicit-into/test-helper.pl',
+    't/fixtures/hierarchical/contracts/test-case.pl',
+    't/fixtures/hierarchical/contracts/test-helper.pl',
+    't/fixtures/hierarchical/test-helper.pl',
+    't/fixtures/hierarchy-gaps/a/b/c/test-case.pl',
+    't/fixtures/hierarchy-gaps/test-helper.pl',
+    't/fixtures/idempotent/test-case.pl',
+    't/fixtures/idempotent/test-helper.pl',
+    't/fixtures/indirection-dedup/test-case.pl',
+    't/fixtures/indirection-dedup/test-helper-a.pl',
+    't/fixtures/indirection-dedup/test-helper-b.pl',
+    't/fixtures/indirection-dedup/test-helper.pl',
+    't/fixtures/multi-namespace/test-case.pl',
+    't/fixtures/multi-namespace/test-helper.pl',
+    't/fixtures/no-helper/test-case.pl',
+    't/fixtures/parent-traversal/subdir/test-case.pl',
+    't/fixtures/parent-traversal/test-helper.pl',
+    't/fixtures/root-boundary/test-case.pl',
+    't/fixtures/same-dir/test-case.pl',
+    't/fixtures/same-dir/test-helper.pl',
+    't/hierarchical.t',
+    't/hierarchy-gaps.t',
+    't/idempotent.t',
+    't/indirection-dedup.t',
+    't/multi-namespace.t',
+    't/no-helper.t',
+    't/parent-traversal.t',
+    't/root-boundary-negative.t',
+    't/root-boundary-positive.t',
+    't/same-dir.t',
+    't/test-helper-die.pl',
+    't/test-helper.pl'
+);
+
+eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;
+done_testing;

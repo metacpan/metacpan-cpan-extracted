@@ -1,0 +1,85 @@
+# PODNAME: DBIO::Manual
+# ABSTRACT: Index of the Manual
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual - Index of the Manual
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 DESCRIPTION
+
+This is the L<DBIO> users manual. DBIO is a SQL->OOP mapper.
+This means that it can represent your SQL tables as perl classes, and give
+you convenient accessors and methods for retrieving and updating information
+from your SQL database.
+
+=head1 SECTIONS
+
+=head2 L<DBIO::Manual::FAQ>
+
+Short answers and doc pointers to questions.
+
+=head2 L<DBIO::Manual::Glossary>
+
+Explanations of terms used in this documentation.
+
+=head2 L<DBIO::Manual::Intro>
+
+Beginner guide to using DBIO.
+
+=head2 L<DBIO::Manual::Example>
+
+An example of slightly more complex usage.
+
+=head2 L<DBIO::Manual::Joining>
+
+How to translate known SQL JOINs into DBIO-ish.
+
+=head2 L<DBIO::Manual::Cookbook>
+
+Convenient recipes for DBIO usage.
+
+=head2 L<DBIO::Manual::Reading>
+
+How to read (and write) the reference documentation.
+
+=head2 L<DBIO::Manual::DocMap>
+
+Lists of modules by task to help you find the correct document.
+
+=head2 L<DBIO::Manual::Troubleshooting>
+
+Got trouble? Let us shoot it for you.
+
+=head2 L<DBIO::Manual::Migration>
+
+Step-by-step guide for migrating an existing L<DBIx::Class> codebase to DBIO.
+
+=head2 L<DBIO::Manual::Component>
+
+Existing components, and documentation and example on how to
+develop new ones.
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

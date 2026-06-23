@@ -13,6 +13,7 @@ use Try::Tiny;
 use Module::Load ();
 use NetAddr::IP::Lite ':lower';
 use List::Util qw/pairkeys pairfirst/;
+use Scalar::Util 'blessed';
 
 use base 'Dancer::Object::Singleton';
 
@@ -220,7 +221,8 @@ sub _snmp_connect_generic {
             ($useclass ? 0 : 1) );
       # if successful, restore the default/user timeouts and return
       if ($info) {
-          my $class = ($useclass ? $classes[0] : $info->device_type);
+          my $class = ($useclass ? $classes[0] : $info->device_type) // $classes[0];
+          Module::Load::load $class;
           return $class->new(
             %snmp_args, Version => $ver,
             ($info->offline ? (Cache => $info->cache) : ()),
@@ -246,7 +248,8 @@ sub _snmp_connect_generic {
 
           # if successful, restore the default/user timeouts and return
           if ($info) {
-              my $class = ($useclass ? $classes[0] : $info->device_type);
+              my $class = ($useclass ? $classes[0] : $info->device_type) // $classes[0];
+              Module::Load::load $class;
               return $class->new(
                 %snmp_args, Version => $ver,
                 ($info->offline ? (Cache => $info->cache) : ()),
@@ -258,8 +261,8 @@ sub _snmp_connect_generic {
 
   # then revert to conservative settings and repeat with all versions
 
-  # unless user wants just the fast connections for bulk discovery
-  # or we are on the first discovery attempt of a new device
+  # unless user wants just the fast connections for bulk discovery
+  # or we are on the first discovery attempt of a new device
   return if setting('snmp_try_slow_connect') == false;
 
   CLASS: foreach my $class (@classes) {
@@ -299,10 +302,11 @@ sub _try_connect {
 
   try {
       $snmp_args->{Offline} || debug
-        sprintf '[%s:%s] try_connect with v: %s, t: %s, r: %s, class: %s, comm: %s',
+        sprintf '[%s:%s] try_connect with v: %s, t: %s, r: %s, class: %s%s, comm: %s',
           $snmp_args->{DestHost}, $snmp_args->{RemotePort},
           $snmp_args->{Version}, ($snmp_args->{Timeout} / 1000000), $snmp_args->{Retries},
-          $class, $debug_comm;
+          $class,
+          ($comm->{tag} ? ', tag: '. $comm->{tag} : ''), $debug_comm;
       Module::Load::load $class;
 
       $info = $class->new(%$snmp_args, %comm_args) or return;
@@ -310,8 +314,8 @@ sub _try_connect {
                                : _try_write($info, $device, $comm));
 
       # first time a device is discovered, re-instantiate into specific class
-      if ($reclass and $info and $info->device_type ne $class) {
-          $class = $info->device_type;
+      if ($reclass and $info and ($info->device_type // '') ne $class) {
+          $class = $info->device_type // $class;
           $info->offline || debug
             sprintf '[%s:%s] try_connect with v: %s, new class: %s, comm: %s',
               $snmp_args->{DestHost}, $snmp_args->{RemotePort},
@@ -330,9 +334,16 @@ sub _try_connect {
       }
   }
   catch {
-      debug sprintf 'caught error in try_connect: %s', $_;
+      my $ex = $_;
+      my $err = !defined $ex ? '(undef)'
+                       : !ref $ex ? do { (my $e = "$ex") =~ s/ at \S+ line \d+.*//s; $e }
+                       : (blessed $ex && $ex->can('message')) ? $ex->message
+                       : (ref $ex eq 'HASH') ? ($ex->{message} || $ex->{error} || join('; ', map { "$_: $ex->{$_}" } sort keys %$ex) || '(empty hashref - MCE worker killed or timed out)')
+                       : "$ex";
+      $err = ref($ex) || '(empty)' unless length $err;
+      debug sprintf 'caught error in try_connect: %s', $err;
       undef $info;
-      die "exception in SNMP - could be job timeout or crash\n";
+      die "exception in SNMP - could be job timeout or crash: $err\n";
       # use DDP; debug p $_;
   };
 

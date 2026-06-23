@@ -37,7 +37,7 @@
             "JSON" : "0",
             "Module::CPANfile" : "0",
             "Module::CoreList" : "5.20181020",
-            "Module::Extract::VERSION" : "0",
+            "Module::Extract::VERSION" : "1.121",
             "PerlIO::gzip" : "0",
             "perl" : "5.020"
          }
@@ -63,6 +63,6 @@
          "web" : "https://github.com/briandfoy/cpan-audit"
       }
    },
-   "version" : "20260308.002",
+   "version" : "20260622.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

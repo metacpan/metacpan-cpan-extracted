@@ -1,0 +1,27 @@
+Revision history for DBIO-MySQL-Async
+
+0.900000  2026-06-23
+    First release. Future-based async MySQL/MariaDB storage for DBIO via EV::MariaDB.
+
+    * Storage
+        - DBIO::MySQL::Async::Storage on DBIO::Storage::Async, speaking the
+          MariaDB C client directly through EV::MariaDB (no DBI / DBD::mysql)
+        - Async select/insert/update/delete returning Future objects
+        - Sync fallback (->all, ->first, ...) via blocking ->get on the Future
+
+    * Transactions
+        - txn_do_async driving the BEGIN/COMMIT/ROLLBACK chain
+        - TransactionContext pinning one pooled connection for the txn duration
+
+    * Pipelining
+        - Pipeline mode batching queries into a single network round-trip,
+          up to 64 in-flight
+
+    * Connection pool
+        - Connection pool with transaction pinning, built on
+          DBIO::Storage::PoolBase
+
+    * AccessBroker
+        - Accept AccessBroker objects via Schema->connect($broker)
+        - Refresh async conninfo through the broker for newly created
+          pooled connections

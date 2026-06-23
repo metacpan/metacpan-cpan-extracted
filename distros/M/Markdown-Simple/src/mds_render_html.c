@@ -266,6 +266,7 @@ size_t mds_expand_entity_at(const char* s, size_t i, size_t n,
     size_t blen;
     size_t name_start;
     const mds_entity* e;
+    mds_entity ent_scratch;
 
     if (i >= n || s[i] != '&') return 0;
     q = i + 1;
@@ -312,7 +313,7 @@ size_t mds_expand_entity_at(const char* s, size_t i, size_t n,
     name_start = q;
     while (q < n && isalnum((unsigned char)s[q])) q++;
     if (q == name_start || q >= n || s[q] != ';') return 0;
-    e = mds_entity_lookup(s + name_start, q - name_start);
+    e = mds_entity_lookup(s + name_start, q - name_start, &ent_scratch);
     if (!e) return 0;
     if (e->ulen > 8) return 0;
     memcpy(out, e->utf8, e->ulen);

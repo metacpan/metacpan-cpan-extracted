@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Spec;
 
 BEGIN { use_ok ("DBI"); }
 do "./t/lib.pl";
@@ -85,11 +86,32 @@ ok ($dbh = Connect ($dsn),			"connect");
 # Check, whether the csv_tables->{$tbl}{file} attribute works
 like (my $def4 = TableDefinition ($tbl4, @tbl_def),
 	qr{^create table $tbl4}i,		"table definition");
-ok ($dbh->{csv_tables}{$tbl4}{file} = DbFile ($tbl4), "set table/file");
+{   my $dbf4 = DbFile ($tbl4);
+    my $dbd4 = DbDir ();
+
+    $dbh->{f_dir_search} = [ $dbd4 ];
+    ok ($dbh->{csv_tables}{$tbl4}{file} = $dbf4, "set table/file");
+    }
 ok ($dbh->do ($def4),				"create table");
 ok (-f DbFile ($tbl4),				"does exists");
 
 ok ($dbh->do ("drop table $tbl4"),		"drop table");
+
+if ($DBI::VERSION ge "1.648") {
+    ok (my $tbl5 = FindNewTable ($dbh),			"find new test table");
+    my $dir5 = File::Spec->catdir (DbDir (), "not-in-scope");
+    mkdir $dir5;
+    ok (my $dbf5 = File::Spec->catdir ($dir5, $tbl5),	"in bad location");
+    ok (!-f $dbf5,					"does not exist");
+    ok ($dbh->{csv_tables}{$tbl5}{file} = $dbf5,	"set to illegal location");
+    {   my @d;
+	local $SIG{__DIE__}  = sub { push @d => @_ };
+	local $dbh->{PrintError} = 0;
+	eval { $dbh->do ("create table $tbl5 (x char)"); };
+	like ("@d", qr{is unsafe and not allowed},	"unsafe caught");
+	};
+    rmdir $dir5;
+    }
 
 ok ($dbh->disconnect,				"disconnect");
 undef $dbh;

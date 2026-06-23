@@ -6,9 +6,10 @@ use warnings;
 use Digest::SHA qw(sha256_hex hmac_sha256 hmac_sha256_hex);
 use MIME::Base64 qw(encode_base64);
 use POSIX qw(strftime);
-use URI::Escape qw(uri_escape_utf8);
+use URI::Escape qw(uri_escape_utf8 uri_unescape);
+use Data::Dumper;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 my @SERVICE_URL_PATTERNS = (
   qr/(s3)[.]amazonaws[.]com\z/xsm,
@@ -65,15 +66,16 @@ sub sign {
 ########################################################################
   my ( $self, %args ) = @_;
 
-  my $method  = uc( $args{method} // 'GET' );
-  my $url     = $args{url} or die "url is required\n";
-  my $headers = $args{headers} // {};
-  my $payload = $args{payload} // q{};
+  my $method            = uc( $args{method} // 'GET' );
+  my $url               = $args{url} or die "url is required\n";
+  my $headers           = $args{headers}           // {};
+  my $payload           = $args{payload}           // q{};
+  my $add_sha256_header = $args{add_sha256_header} // 1;
 
   # parse url into components
   my ( $scheme, $host, $path, $query ) = $url =~ m{\A(https?)://([^/?#]+)([^?#]*)(?:[?]([^#]*))?\z}xsm;
 
-  $path  //= '/';
+  $path = $path || '/';
   $query //= q{};
 
   # timestamps
@@ -87,9 +89,9 @@ sub sign {
   # canonical headers - must include host and x-amz-date at minimum
   my %sign_headers = (
     %{$headers},
-    'host'                 => $host,
-    'x-amz-date'           => $datetime,
-    'x-amz-content-sha256' => $payload_hash,
+    'host'       => $host,
+    'x-amz-date' => $datetime,
+    $add_sha256_header ? ( 'x-amz-content-sha256' => $payload_hash ) : (),
   );
 
   $sign_headers{'x-amz-security-token'} = $self->{session_token}
@@ -104,7 +106,7 @@ sub sign {
   my $canon_query = q{};
   if ($query) {
     my @pairs = map {
-      join '=', map { uri_escape_utf8($_) } split /=/xsm, $_, 2
+      join '=', map { uri_escape_utf8( uri_unescape($_) ) } split /=/xsm, $_, 2
       }
       sort { $a cmp $b }
       split /&/xsm, $query;

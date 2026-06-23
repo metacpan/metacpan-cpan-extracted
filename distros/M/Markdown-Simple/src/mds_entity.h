@@ -62,25 +62,27 @@ static const mds_entity MDS_ENTITIES[] = {
 
 #include "mds_entities_full.h"
 
-/* Portable thread-local storage qualifier. Falls back to plain static
- * if the compiler offers nothing — single-threaded callers are unaffected;
- * multi-threaded callers building under such a compiler must serialise
- * mds_entity_lookup themselves. */
-#if defined(__cplusplus) && __cplusplus >= 201103L
-#  define MDS_TLS thread_local
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)
-#  define MDS_TLS _Thread_local
-#elif defined(__GNUC__) || defined(__clang__) || defined(__SUNPRO_C) || defined(__IBMC__)
-#  define MDS_TLS __thread
-#elif defined(_MSC_VER)
-#  define MDS_TLS __declspec(thread)
-#else
-#  define MDS_TLS /* no TLS available; falls back to plain static */
-#endif
-
-static inline const mds_entity* mds_entity_lookup(const char* name, size_t n) {
+/* Look up a named entity (without leading '&' / trailing ';').
+ *
+ * On a hit in the high-frequency MDS_ENTITIES table, returns a pointer
+ * to the static entry directly (scratch untouched).
+ *
+ * On a hit in the full HTML5 table, copies the row into *scratch (which
+ * must be supplied by the caller — typically a stack local) and returns
+ * scratch.
+ *
+ * Returns NULL on a miss.
+ *
+ * NB: this used to cache the slow-path hit in a thread-local static so
+ * the signature could be a plain (name, n). That emitted a PT_TLS
+ * program header into the .so which OpenBSD's ld.so refuses to dlopen
+ * ("unsupported TLS program header"). Passing scratch from the caller
+ * eliminates the TLS dependency entirely and is also strictly more
+ * thread-safe: the buffer lives in the caller's stack frame, so there
+ * is no shared state to race on at all. */
+static inline const mds_entity*
+mds_entity_lookup(const char* name, size_t n, mds_entity* scratch) {
     const mds_entity_full* f;
-    static MDS_TLS mds_entity scratch;
     size_t i;
     /* Fast path: small high-frequency table (linear scan). */
     for (i = 0; i < MDS_ENTITY_COUNT; i++) {
@@ -88,15 +90,16 @@ static inline const mds_entity* mds_entity_lookup(const char* name, size_t n) {
             memcmp(MDS_ENTITIES[i].name, name, n) == 0)
             return &MDS_ENTITIES[i];
     }
-    /* Slow path: full HTML5 table (binary search). Return value reuses the
-     * mds_entity layout so callers don't have to care which table hit. */
+    /* Slow path: full HTML5 table (binary search). Materialise into the
+     * caller-supplied scratch so callers don't have to care which table
+     * hit. */
     f = mds_entity_full_lookup(name, n);
     if (!f) return NULL;
-    scratch.name = f->name;
-    scratch.nlen = f->nlen;
-    scratch.utf8 = f->utf8;
-    scratch.ulen = f->ulen;
-    return &scratch;
+    scratch->name = f->name;
+    scratch->nlen = f->nlen;
+    scratch->utf8 = f->utf8;
+    scratch->ulen = f->ulen;
+    return scratch;
 }
 
 #endif

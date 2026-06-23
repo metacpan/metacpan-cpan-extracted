@@ -8,7 +8,7 @@ use POSIX       qw(ceil);
 use JSON::PP    ();
 use File::Slurp qw(read_file write_file);
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 use constant EULER  => 0.5772156649015329;
 use constant TWO_PI => 6.283185307179586;

@@ -3,7 +3,7 @@ package RPi::ADC::ADS;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 require XSLoader;
 XSLoader::load('RPi::ADC::ADS', $VERSION);
@@ -42,7 +42,7 @@ my %mux = (
 
     # differential
     4 => 0x0,    # 00000000, 0
-    5 => 0x1000, # 00100000, 4096
+    5 => 0x1000, # 00010000, 4096
     6 => 0x2000, # 00100000, 8192
     7 => 0x3000, # 00110000, 12288
 );
@@ -169,7 +169,11 @@ sub new {
     $self->queue($args{queue});
     $self->polarity($args{polarity});
     $self->mode($args{mode});
-    $self->gain($args{mode});
+    $self->gain($args{gain});
+
+    # default number of conversions to average per read (1 = single read)
+
+    $self->samples($args{samples});
 
     return $self;
 }
@@ -309,8 +313,22 @@ sub _resolution {
 
 # device methods
 
+sub samples {
+    my ($self, $samples) = @_;
+
+    if (defined $samples){
+        if ($samples !~ /^\d+$/ || $samples < 1){
+            die "samples() requires a positive integer\n";
+        }
+        $self->{samples} = $samples;
+    }
+
+    $self->{samples} = 1 if ! defined $self->{samples};
+
+    return $self->{samples};
+}
 sub volts {
-    my ($self, $channel) = @_;
+    my ($self, $channel, $samples) = @_;
 
     if (defined $channel){
         $self->channel($channel);
@@ -320,8 +338,9 @@ sub volts {
     my $dev = $self->device;
     my @write_buf = $self->register;
 
-    my $v =  voltage_c(
-        $addr, $dev, $write_buf[0], $write_buf[1], $self->_resolution
+    my $v = voltage_c(
+        $addr, $dev, $write_buf[0], $write_buf[1], $self->_resolution,
+        $self->_samples($samples),
     );
 
     if ($self->channel > 3 && $v < 0){
@@ -331,7 +350,7 @@ sub volts {
     return $v;
 }
 sub raw {
-    my ($self, $channel) = @_;
+    my ($self, $channel, $samples) = @_;
 
     if (defined $channel){
         $self->channel($channel);
@@ -341,7 +360,10 @@ sub raw {
     my $dev = $self->device;
     my @write_buf = $self->register;
 
-    my $r = raw_c($addr, $dev, $write_buf[0], $write_buf[1], $self->_resolution);
+    my $r = raw_c(
+        $addr, $dev, $write_buf[0], $write_buf[1], $self->_resolution,
+        $self->_samples($samples),
+    );
 
     if ($self->channel > 3 && $r < 0){
         return 0;
@@ -351,7 +373,7 @@ sub raw {
 
 }
 sub percent {
-    my ($self, $channel) = @_;
+    my ($self, $channel, $samples) = @_;
 
     if (defined $channel){
         $self->channel($channel);
@@ -362,16 +384,30 @@ sub percent {
     my @write_buf = $self->register;
 
     my $percent = percent_c(
-        $addr, $dev, $write_buf[0], $write_buf[1], $self->_resolution
+        $addr, $dev, $write_buf[0], $write_buf[1], $self->_resolution,
+        $self->_samples($samples),
     );
 
     $percent = 100 if $percent > 100;
-    
+
     if ($self->channel > 3 && $percent < 0){
         return 0;
     }
 
     return sprintf("%.2f", $percent);
+}
+
+sub _samples {
+    my ($self, $samples) = @_;
+
+    # Per-call override if given, otherwise the object default; validate either.
+    $samples = $self->samples if ! defined $samples;
+
+    if ($samples !~ /^\d+$/ || $samples < 1){
+        die "samples must be a positive integer\n";
+    }
+
+    return $samples;
 }
 
 sub _vim {}
@@ -499,6 +535,11 @@ Optional. See L</COMPARATOR POLARITY> for parameter values and details.
 
 Optional. See L</COMPARATOR QUEUE> for parameter values and details.
 
+    samples => $int
+
+Optional. The default number of conversions to average per read. Defaults to
+C<1>. See L</samples> for details.
+
 =head2 addr
 
 Sets/gets the ADC memory address. After object instantiation, this method
@@ -597,7 +638,27 @@ Parameters:
 
     $int
 
-Optional: See L</COMPARATOR QUEUE> for the parameter values and details.  
+Optional: See L</COMPARATOR QUEUE> for the parameter values and details.
+
+=head2 samples
+
+Sets/gets the default number of conversions the data-retrieval methods
+(L</volts>, L</percent>, L</raw>) average per call. Defaults to C<1> (a single
+conversion, the historical behaviour).
+
+Averaging is useful when the input is noisy or carries ripple - for example an
+RC-filtered PWM signal used as feedback, where a single conversion taken
+asynchronously to the PWM period can read far from the true level. The mean of
+N conversions recovers the true value. Averaging is done inside the XS over a
+single i2c bus session, so it is much cheaper than calling a read N times.
+
+Parameters:
+
+    $int
+
+Optional: a positive integer. The number of conversions to average per read.
+Larger values give a steadier reading at the cost of proportionally more time
+per read.
 
 =head1 OPERATIONAL METHODS
 
@@ -645,6 +706,12 @@ Optional: See L</INPUT CHANNELS> for parameter values and details. Specifies the
 ADC input channel to read from. Setting this parameter allows you to read all
 four channels without changing the default set in the object.
 
+    $samples
+
+Optional: a positive integer. The number of conversions to average for this
+read, overriding the object default for this call only. If omitted, the value
+set via L</samples> (default C<1>) is used. See L</samples> for when to average.
+
 Return: A floating point number between C<0> and the maximum voltage output by
 the Pi's GPIO pins.
 
@@ -652,13 +719,13 @@ the Pi's GPIO pins.
 
 Retrieves the ADC channel's input value by percentage of maximum input.
 
-Parameters: See C<$channel> in L</volts>.
+Parameters: See C<$channel> and C<$samples> in L</volts>.
 
 =head2 raw
 
 Retrieves the raw value of the ADC channel's input value.
 
-Parameters: See C<$channel> in L</volts>.
+Parameters: See C<$channel> and C<$samples> in L</volts>.
 
 =head1 C FUNCTIONS
 
@@ -672,15 +739,19 @@ Fetches the raw data from the channel specified.
 Implemented as:
 
     int
-    fetch (addr, dev, wbuf1, wbuf2, res)
+    fetch (addr, dev, wbuf1, wbuf2, res, samples)
         int addr
         char * dev
         char * wbuf1
         char * wbuf2
         int res
+        int samples
 
 C<wbuf1> is the most significant byte (bits 15-8) for the configuration
 register, C<wbuf2> being the least significant byte (bits 7-0).
+
+C<samples> is the number of conversions to average (minimum C<1>); the i2c
+device is opened once for the whole batch and the mean conversion is returned.
 
 =head2 voltage_c
 
@@ -689,12 +760,13 @@ Fetches the ADC input and returns it as the actual voltage.
 Implemented as:
 
     float
-    voltage_c (addr, dev, wbuf1, wbuf2, res)
+    voltage_c (addr, dev, wbuf1, wbuf2, res, samples)
         int addr
         char * dev
         char * wbuf1
         char * wbuf2
         int res
+        int samples
 
 See L</fetch> for details on the C<wbuf> arguments.
 
@@ -705,12 +777,13 @@ Fetches the ADC input and returns it in its raw form.
 Implemented as:
 
     int
-    raw_c (addr, dev, wbuf1, wbuf2, res)
+    raw_c (addr, dev, wbuf1, wbuf2, res, samples)
         int addr
         char * dev
         char * wbuf1
         char * wbuf2
         int res
+        int samples
 
 See L</fetch> for details on the C<wbuf> arguments.
 
@@ -722,12 +795,13 @@ maximum input values.
 Implemented as:
 
     float
-    percent_c (addr, dev, wbuf1, wbuf2, res)
+    percent_c (addr, dev, wbuf1, wbuf2, res, samples)
         int addr
         char * dev
         char * wbuf1
         char * wbuf2
         int res
+        int samples
 
 See L</fetch> for details on the C<wbuf> arguments.
 
@@ -802,7 +876,7 @@ Represents the programmable gain amplifier. This software uses C<1> or
     0       000     +/-6.144V
     1       001     +/-4.096V (default)
     2       010     +/-2.048V
-    3       011     +/-2.024V
+    3       011     +/-1.024V
     4       100     +/-0.512V
     5       101     +/-0.256V
     6       110     +/-0.256V

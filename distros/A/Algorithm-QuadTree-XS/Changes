@@ -1,5 +1,9 @@
 Revision history for Perl extension Algorithm::QuadTree::XS.
 
+0.10 Mon Jun 22 2026
+	- Improve the method of handling backreferences in XS backend
+	- remove XS::NoBackRefs, since the difference in performance is too small to justify its existence
+
 0.09 Mon Jun 22 2026
 	- minor code quality enhancements
 

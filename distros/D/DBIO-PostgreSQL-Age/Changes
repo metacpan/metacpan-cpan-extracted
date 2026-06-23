@@ -1,0 +1,36 @@
+Revision history for DBIO-PostgreSQL-Age
+
+0.900000  2026-06-23
+    First release. Apache AGE graph database support layered on DBIO::PostgreSQL.
+
+    * Schema component
+        - DBIO::PostgreSQL::Age, loaded via load_components('PostgreSQL::Age'),
+          sets storage_type to DBIO::PostgreSQL::Age::Storage
+
+    * Storage
+        - DBIO::PostgreSQL::Age::Storage extends DBIO::PostgreSQL::Storage and
+          registers for the Pg driver
+        - connect_call_load_age connection callback: LOAD 'age' and set
+          search_path to include ag_catalog on each connection
+
+    * Graph lifecycle
+        - create_graph($name) creates a named graph
+        - drop_graph($name, $cascade) drops a graph, optionally cascading to
+          all vertices and edges
+
+    * Cypher queries
+        - cypher($graph, $query, \@columns, \%params) executes openCypher and
+          returns arrayrefs of hashrefs; result columns are declared as agtype
+        - graph name validated as a plain identifier and inlined as a SQL
+          literal, since Apache AGE requires the first cypher() argument to be
+          a name constant rather than a placeholder
+        - optional params hashref JSON-encoded and passed as AGE's third
+          cypher() argument for parameterized queries
+        - SQL/bind generation split into a pure _cypher_sql_bind helper for
+          offline unit testing
+
+    * Tests
+        - t/00-load.t module load, t/20-cypher.t offline cypher SQL/bind
+          coverage, t/10-age-live.t live graph create/drop and CREATE/MATCH
+          queries (skips without a configured AGE-enabled PostgreSQL)
+

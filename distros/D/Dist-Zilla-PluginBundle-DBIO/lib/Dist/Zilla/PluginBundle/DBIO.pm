@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::DBIO;
 # ABSTRACT: Dist::Zilla plugin bundle for DBIO distributions
-our $VERSION = '0.900001';
+our $VERSION = '0.900002';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -33,17 +33,35 @@ has copyright_holder => (
   default => sub { $_[0]->payload->{copyright_holder} },
 );
 
+
+has share_skill => (
+  is      => 'ro',
+  isa     => 'ArrayRef[Str]',
+  lazy    => 1,
+  # Normalise to an arrayref. A direct [@DBIO] section aggregates repeated
+  # keys via mvp_multivalue_args, but when the bundle is wrapped in [@Filter]
+  # (the async drivers) the reader uses @Filter's multivalue list instead, so
+  # a lone share_skill arrives as a plain scalar — accept both.
+  default => sub {
+    my $v = $_[0]->payload->{share_skill};
+    return [] unless defined $v;
+    return ref $v eq 'ARRAY' ? $v : [$v];
+  },
+);
+
+sub mvp_multivalue_args { qw(share_skill) }
+
 sub configure {
   my ($self) = @_;
 
-  # Set copyright_holder via an inner BeforeBuild plugin — bundles have no $self->zilla
-  my $holder = $self->copyright_holder
-    // ( $self->heritage ? 'DBIO & DBIx::Class Authors' : 'DBIO Authors' );
-  $self->add_plugins([ 'DBIO::SetCopyrightHolder' => { holder => $holder } ]);
+  # Set author and copyright_holder via an inner BeforeBuild plugin — bundles have no $self->zilla
+  my $author = $self->heritage ? 'DBIO & DBIx::Class Authors' : 'DBIO Authors';
+  my $holder = $self->copyright_holder // $author;
+  $self->add_plugins([ 'DBIO::SetMeta' => { author => $author, holder => $holder } ]);
 
   # LICENSE is always committed in the repo and gathered from git.
   my @exclude_filenames = qw(
-    META.yml META.json MANIFEST README CLAUDE.md
+    META.yml META.json MANIFEST README CLAUDE.md .proverc
   );
 
   my @exclude_match;
@@ -65,6 +83,12 @@ sub configure {
 
   $self->add_plugins('PruneCruft');
 
+  # Ship this dist's own agent skills as a sharedir (see DBIO::Skills).
+  # Authored under .claude/skills/, copied into share/skills/ at build time.
+  $self->add_plugins([ 'DBIO::GatherSkills' =>
+    @{ $self->share_skill } ? { skill => $self->share_skill } : {} ]);
+  $self->add_plugins('ShareDir');
+
   # Metadata
   $self->add_plugins(qw(
     MetaJSON
@@ -74,9 +98,19 @@ sub configure {
     Prereqs::FromCPANfile
   ));
 
-  # Version — core uses VersionFromMainModule, drivers use git tags
+  # Version — core uses VersionFromMainModule, drivers use @Git::VersionManager
   if ($self->core) {
     $self->add_plugins('VersionFromMainModule');
+  } else {
+    $self->add_bundle('@Git::VersionManager' => {
+      'RewriteVersion::Transitional.global' => 0,
+      'RewriteVersion::Transitional.finder' => [':MainModule'],
+      'BumpVersionAfterRelease.finder'      => [':MainModule'],
+      'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
+      'Git::NextVersion.first_version' => '0.900000',
+      'Git::Tag.tag_format' => 'v%V',
+      'NextRelease.format' => '%-9v %{yyyy-MM-dd}d',
+    });
   }
 
   # POD — heritage uses @DBIO::Heritage which adds DBIx::Class attribution
@@ -92,7 +126,7 @@ sub configure {
   # Build — core uses MakeMaker::Awesome
   if ($self->core) {
     $self->add_plugins([ 'MakeMaker::Awesome' => { eumm_version => '6.78' } ]);
-    $self->add_plugins([ 'ExecDir' => { dir => 'script' } ]);
+    $self->add_plugins([ 'ExecDir' => { dir => 'bin' } ]);
   } else {
     $self->add_plugins('MakeMaker');
   }
@@ -103,10 +137,10 @@ sub configure {
     Manifest
   ));
 
-  # GitHub — drivers get auto-detected GithubMeta, core adds MetaResources manually
-  unless ($self->core) {
-    $self->add_plugins([ 'GithubMeta' => { issues => 1 } ]);
-  }
+  # Repository metadata — derived offline from the git remote
+  # (Codeberg/Forgejo or GitHub), no API token. Replaces [GithubMeta] and the
+  # external Dist::Zilla::Plugin::Codeberg::Meta.
+  $self->add_plugins([ 'DBIO::CodebergMeta' => { issues => 1 } ]);
 
   # Git checks
   $self->add_plugins([ 'Git::Check' => {
@@ -130,14 +164,6 @@ sub configure {
       'Git::Push',
     );
   } else {
-    $self->add_bundle('@Git::VersionManager' => {
-      'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
-      'RewriteVersion::Transitional.global' => 1,
-      'Git::NextVersion.first_version' => '0.900000',
-      'Git::Tag.tag_format' => 'v%V',
-      'NextRelease.format' => '%-9v %{yyyy-MM-dd}d',
-    });
-
     $self->add_plugins(
       'ConfirmRelease',
       'UploadToCPAN',
@@ -148,22 +174,6 @@ sub configure {
 
 __PACKAGE__->meta->make_immutable;
 
-no Moose;
-
-package Dist::Zilla::Plugin::DBIO::SetCopyrightHolder;
-use Moose;
-with 'Dist::Zilla::Role::Plugin', 'Dist::Zilla::Role::BeforeBuild';
-
-has holder => (is => 'ro', isa => 'Str', required => 1);
-
-sub before_build {
-  my ($self) = @_;
-  my $zilla = $self->zilla;
-  my ($attr) = grep { $_->name eq '_copyright_holder' } $zilla->meta->get_all_attributes;
-  $attr->set_value($zilla, $self->holder);
-}
-
-__PACKAGE__->meta->make_immutable;
 no Moose;
 
 __END__
@@ -178,35 +188,28 @@ Dist::Zilla::PluginBundle::DBIO - Dist::Zilla plugin bundle for DBIO distributio
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 
-  # New DBIO distribution — LICENSE committed in repo
-  name = DBIO-PostgreSQL-Async
-  author = DBIO Authors
-  license = Perl_5
+  # Standard DBIO driver distribution
+  name = DBIO-MyDriver
 
   [@DBIO]
 
-  # Distribution derived from DBIx::Class code — LICENSE committed in repo
+  # Distribution containing code derived from DBIx::Class
   name = DBIO-PostgreSQL
-  author = DBIO & DBIx::Class Authors
-  license = Perl_5
 
   [@DBIO]
   heritage = 1
 
-  # DBIO core — copyright from 2005, explicit copyright_holder override
-  name = DBIO
-  author = DBIx::Class & DBIO Contributors (see AUTHORS file)
-  license = Perl_5
+  # DBIO core distribution
+  name           = DBIO
   copyright_year = 2005
 
   [@DBIO]
-  core = 1
+  core     = 1
   heritage = 1
-  copyright_holder = DBIO Contributors
 
 =head1 DESCRIPTION
 
@@ -226,7 +229,7 @@ Every distribution using C<[@DBIO]> gets:
 
 =item * L<Dist::Zilla::Plugin::ExtraTests> — moves F<xt/> tests into F<t/> for release
 
-=item * L<Dist::Zilla::Plugin::GithubMeta> — auto-detects GitHub repository URL and issues link
+=item * L<Dist::Zilla::Plugin::DBIO::CodebergMeta> — repository, bugtracker and homepage META resources, derived offline from the git remote (Codeberg/Forgejo or GitHub)
 
 =item * L<Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch> — enforces release from C<main>
 
@@ -237,14 +240,15 @@ the distribution as-is. No license file is generated during the build.
 Heritage distributions use the original DBIx::Class license with DBIO
 attribution. Non-heritage distributions use a standard Perl_5 license.
 
-=head2 Driver distributions (default)
+=head2 Versioning
 
-Version is taken from git tags via L<Dist::Zilla::PluginBundle::Git::VersionManager>.
-For brand-new distributions without any tags yet, the first version will be
-C<0.900000>. The release workflow uses
-C<@Git::VersionManager> (which includes NextRelease), followed by
-L<Dist::Zilla::Plugin::ConfirmRelease>, L<Dist::Zilla::Plugin::UploadToCPAN>,
-and L<Dist::Zilla::Plugin::Git::Push>.
+Version is read from the main module's C<$VERSION> via
+L<Dist::Zilla::Plugin::VersionFromMainModule> (core) or via
+L<Dist::Zilla::PluginBundle::Git::VersionManager> (drivers).
+Only the main module carries C<$VERSION> — sub-modules are not versioned.
+
+L<RewriteVersion::Transitional> is configured with C<global = 0> and
+C<finder = [:MainModule]> so only the main module is patched on version bump.
 
 =head2 Heritage distributions (C<heritage = 1>)
 
@@ -258,18 +262,10 @@ defaults to C<DBIO & DBIx::Class Authors>.
 Uses L<Dist::Zilla::Plugin::VersionFromMainModule> (version from C<$VERSION>
 in the main module) and L<Dist::Zilla::Plugin::MakeMaker::Awesome> instead
 of the standard MakeMaker. Also enables L<Dist::Zilla::Plugin::ExecDir> for
-F<script/>. The release workflow uses NextRelease + Git::Commit/Tag/Push
+F<bin/>. The release workflow uses NextRelease + Git::Commit/Tag/Push
 directly rather than C<@Git::VersionManager>.
 
 =head1 ATTRIBUTES
-
-=head2 core
-
-Set to 1 for the DBIO core distribution. Switches to
-L<Dist::Zilla::Plugin::VersionFromMainModule> for versioning,
-L<Dist::Zilla::Plugin::MakeMaker::Awesome> for building, enables
-L<Dist::Zilla::Plugin::ExecDir> for F<script/>, and uses a simplified
-git release workflow without C<@Git::VersionManager>.
 
 =head2 heritage
 
@@ -286,9 +282,16 @@ Override the copyright holder string. If not set, defaults to
 C<DBIO & DBIx::Class Authors> for heritage distributions and
 C<DBIO Authors> for all others.
 
+=head2 share_skill
+
+Names of the agent skills this distribution owns (is the source of truth for).
+They are shipped as a sharedir (C<share/skills/>) and exposed at runtime via
+L<DBIO::Skills>. Repeatable; if omitted, the set is derived from the dist name.
+See L<Dist::Zilla::Plugin::DBIO::GatherSkills>.
+
 =head1 AUTHOR
 
-DBIO & DBIx::Class Authors
+DBIO Authors
 
 =head1 COPYRIGHT AND LICENSE
 

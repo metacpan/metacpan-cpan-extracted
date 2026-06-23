@@ -1,0 +1,67 @@
+# IBM DB2 pod for dbio-db2 integration tests.
+#
+# Mirrors the dbio-postgresql-async/maint/k8s/pg-pod.yaml convention: a single
+# DB pod + Service, reached via port-forward. Unlike Postgres/MySQL you still
+# need DBD::DB2 locally (built against the IBM clidriver) to run prove against
+# it -- see maint/docker/ for a fully containerised alternative that needs no
+# local DB2 client.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/db2-pod.yaml
+#   # First boot does one-time instance setup -- give it a few minutes:
+#   kubectl wait --for=condition=Ready pod/dbio-db2 --timeout=600s
+#   kubectl port-forward svc/dbio-db2-svc 50000:50000 &
+#
+#   DBIO_TEST_DB2_DSN='dbi:DB2:DATABASE=testdb;HOSTNAME=127.0.0.1;PORT=50000;PROTOCOL=TCPIP;' \
+#   DBIO_TEST_DB2_USER=db2inst1 \
+#   DBIO_TEST_DB2_PASS=dbio \
+#     prove -l -I../dbio/lib t/10-db2.t
+#
+#   kubectl delete -f maint/k8s/db2-pod.yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-db2
+  labels:
+    app: dbio-db2
+    role: dbio-test-db
+spec:
+  containers:
+    - name: db2
+      image: icr.io/db2_community/db2:latest
+      securityContext:
+        privileged: true        # DB2 community image requires it for instance setup
+      ports:
+        - containerPort: 50000
+      env:
+        - name: LICENSE
+          value: accept
+        - name: DB2INST1_PASSWORD
+          value: dbio
+        - name: DBNAME
+          value: testdb
+        - name: PERSISTENT_HOME
+          value: "false"
+      readinessProbe:
+        # The port opens well before the instance accepts connections; this
+        # only signals "process up". `kubectl wait` plus a connect retry in
+        # the test harness covers actual readiness.
+        tcpSocket:
+          port: 50000
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        timeoutSeconds: 3
+        failureThreshold: 60
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-db2-svc
+spec:
+  selector:
+    app: dbio-db2
+  ports:
+    - port: 50000
+      targetPort: 50000
+      protocol: TCP

@@ -1,0 +1,168 @@
+#!/usr/bin/env perl
+# ABSTRACT: Dump a database schema to DBIO Result classes
+# PODNAME: dbiogen
+
+
+use strict;
+use warnings;
+use Getopt::Long;
+use JSON::MaybeXS ();
+use DBI ();
+use DBIO::Generate ();
+use DBIO::Introspect::DBI ();
+
+my %opts;
+GetOptions(\%opts, 'o=s@', 'style=s');
+
+my %gen_opts;
+for my $o (@{ $opts{o} || [] }) {
+  my ($key, $val) = split /=/, $o, 2;
+  $val //= 1;  # bare -o flag
+  # Try to decode JSON values (for arrayrefs, hashrefs)
+  if ($val =~ /^\s*[\[\{]/) {
+    $val = JSON::MaybeXS->new->decode($val);
+  }
+  # Booleans and numbers
+  elsif ($val =~ /^\d+$/) {
+    $val = $val + 0;
+  }
+  $gen_opts{$key} = $val;
+}
+
+my ($schema_class, @connect_info) = @ARGV;
+
+die "Usage: dbiogen [--style=cake|candy|vanilla|moose] [-o key=value ...] <schema_class> <dsn> [user] [pass]\n"
+  unless $schema_class && @connect_info;
+
+$gen_opts{dump_directory} ||= './lib';
+$gen_opts{schema_class}   ||= $schema_class;
+
+if (my $style = $opts{style}) {
+  die "Unknown style '$style' -- use cake, candy, vanilla, or moose\n"
+    unless $style =~ /^(?:cake|candy|vanilla|moose)$/;
+  $gen_opts{style} = $style;
+}
+
+# Connect to the database
+my $dbh = DBI->connect(@connect_info)
+  or die "Could not connect to database: " . DBI->errstr . "\n";
+
+# Create DBI introspector
+my $introspect = DBIO::Introspect::DBI->new(dbh => $dbh);
+
+# Create and run the generator
+my $gen = DBIO::Generate->new(%gen_opts);
+
+$gen->dump($introspect);
+
+$dbh->disconnect if $dbh;
+
+print "Done.\n" unless $gen_opts{quiet};
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dbiogen - Dump a database schema to DBIO Result classes
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 SYNOPSIS
+
+    dbiogen <schema_class> <dsn> <user> <password> [options]
+
+    # Classic style (default)
+    dbiogen My::Schema dbi:Pg:dbname=foo myuser mypassword
+
+    # Cake style (most concise)
+    dbiogen --style=cake My::Schema dbi:Pg:dbname=foo myuser mypassword
+
+    # Candy style
+    dbiogen --style=candy My::Schema dbi:Pg:dbname=foo myuser mypassword
+
+    # With extra options
+    dbiogen --style=cake \
+             -o dump_directory=./lib \
+             -o debug=1 \
+             My::Schema \
+             dbi:Pg:dbname=foo \
+             myuser mypassword
+
+=head1 DESCRIPTION
+
+C<dbiogen> connects to a database, introspects the schema, and generates
+DBIO Result class files using L<DBIO::Generate>.
+
+=head2 Styles
+
+=over 4
+
+=item B<vanilla> (default)
+
+Traditional C<use base 'DBIO::Core'> with C<__PACKAGE__->add_columns(...)>
+method calls.
+
+=item B<cake>
+
+Uses C<use DBIO::Cake> with DDL-like DSL: C<col name =E<gt> varchar(100);>
+
+=item B<candy>
+
+Uses C<use DBIO::Candy> with C<has_column name =E<gt> 'varchar' =E<gt> { size =E<gt> 100 };>
+
+=item B<moose>
+
+Uses C<use Moose> with C<extends> instead of C<use base>.
+
+=back
+
+Options are given as C<-o key=value> pairs. Any option valid for
+L<DBIO::Generate> can be passed this way.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--style=STYLE>
+
+Generated code style. One of C<vanilla> (default), C<cake>, C<candy>, or
+C<moose>. See L</DESCRIPTION> above for a description of each style.
+
+=item B<-o key=value>
+
+Pass an option directly to L<DBIO::Generate>. May be given multiple
+times. Values that look like JSON objects or arrays are decoded automatically.
+Numeric values are coerced to numbers. Examples:
+
+    -o dump_directory=./lib
+    -o debug=1
+    -o components=["DBIO::InflateColumn::DateTime"]
+
+Any option accepted by L<DBIO::Generate> may be set this way.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBIO::Generate>, L<DBIO::Introspect::Base>, L<dbioadmin>
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

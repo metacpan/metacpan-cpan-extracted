@@ -1,5 +1,7 @@
 Revision history for BibTeX::Parser
 
+1.94    2026-06-22 New caching mode for BibTeX::Parser
+
 1.93    2025-08-31 BibTeX::Parser: match @string identifiers
         case-insensitively, as BibTeX does.
 

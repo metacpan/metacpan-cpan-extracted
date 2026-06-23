@@ -85,6 +85,10 @@ static SV *a_core_diff(int what, SV *before_sv, SV *after_sv, SV *patch_sv, SV *
 		SV *io_cookie);
 static enum s_bsdipa_state a_core_diff__write(void *user_cookie, uint8_t const *dat, s_bsdipa_off_t len,
 		s_bsdipa_off_t is_last);
+#ifdef s_BSDIPA_TEXT
+/* Must be proof against "algorithmic complexity attacks" by default! */
+static uint32_t a_core_diff__hash(void *user_cookie, uint8_t const *dat, size_t len);
+#endif
 
 static SV *a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv, SV *max_allowed_restored_len,
 		SV *io_cookie);
@@ -123,9 +127,19 @@ a_core_diff(int what, SV *before_sv, SV *after_sv, SV *patch_sv, SV *magic_windo
 	if(/*!SvOK(after_sv) ||*/ !SvPOK(after_sv))
 		goto jleave;
 
-	if(magic_window == NULL || !SvOK(magic_window))
-		d.dc_magic_window = 0;
-	else if(!SvIOK(magic_window))
+	d.dc_mem.mc_alloc = &a_alloc;
+	d.dc_mem.mc_free = &a_free;
+	d.dc_before_len = SvCUR(before_sv);
+	d.dc_before_dat = SvPVbyte_nolen(before_sv);
+	d.dc_after_len = SvCUR(after_sv);
+	d.dc_after_dat = SvPVbyte_nolen(after_sv);
+	d.dc_magic_window = 0;
+#ifdef s_BSDIPA_TEXT
+	d.dc_text_mode = 0;
+#endif
+
+	if(magic_window == NULL || !SvOK(magic_window)){
+	}else if(!SvIOK(magic_window))
 		goto jleave;
 	else{
 		IV i;
@@ -133,7 +147,15 @@ a_core_diff(int what, SV *before_sv, SV *after_sv, SV *patch_sv, SV *magic_windo
 		i = SvIV(magic_window);
 		if(i > 4096) /* <> docu! */
 			goto jleave;
-		d.dc_magic_window = (int32_t)i;
+		if(i >= 0)
+			d.dc_magic_window = (int32_t)i;
+#ifdef s_BSDIPA_TEXT
+		else{
+			d.dc_text_mode = 1;
+			d.dc_hash = &a_core_diff__hash;
+			/*d.dc_hash_cookie =*/
+		}
+#endif
 	}
 
 	if(is_equal_data == NULL || !SvOK(is_equal_data))
@@ -152,13 +174,6 @@ a_core_diff(int what, SV *before_sv, SV *after_sv, SV *patch_sv, SV *magic_windo
 		}
 	}else
 		iocp = INT2PTR(struct s_bsdipa_io_cookie*,SvIV(io_cookie));
-
-	d.dc_mem.mc_alloc = &a_alloc;
-	d.dc_mem.mc_free = &a_free;
-	d.dc_before_len = SvCUR(before_sv);
-	d.dc_before_dat = SvPVbyte_nolen(before_sv);
-	d.dc_after_len = SvCUR(after_sv);
-	d.dc_after_dat = SvPVbyte_nolen(after_sv);
 
 	s = s_bsdipa_diff(&d);
 	if(s != s_BSDIPA_OK)
@@ -248,6 +263,23 @@ jok:
 jleave:
 	return rv;
 }
+
+#ifdef s_BSDIPA_TEXT
+static uint32_t
+a_core_diff__hash(void *user_cookie, uint8_t const *dat, size_t len){
+	U32 h;
+	STRLEN l;
+	U8 const *p;
+	(void)user_cookie;
+
+	p = (U8 const*)dat;
+	l = (STRLEN)len;
+	h = 0;
+	PERL_HASH(h, p, l);
+
+	return h;
+}
+#endif
 
 static SV *
 a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv, SV *max_allowed_restored_len, SV *io_cookie){

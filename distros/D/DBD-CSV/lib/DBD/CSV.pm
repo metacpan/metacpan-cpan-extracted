@@ -29,7 +29,7 @@ use strict;
 
 our @ISA         = qw( DBD::File );
 
-our $VERSION     = "0.62";
+our $VERSION     = "0.63";
 our $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 our $err      = 0;	# holds error code   for DBI::err
@@ -1252,7 +1252,7 @@ L<Creating and dropping tables> above.
 The module is using flock () internally. However, this function is not
 available on some platforms. Use of flock () is disabled on MacOS and
 Windows 95: There's no locking at all (perhaps not so important on
-these operating systems, as they are for single users anyways).
+these operating systems, as they are for single users anyway).
 
 =back
 
@@ -1338,7 +1338,7 @@ Previous maintainer was Jeff Zucker
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2025 by H.Merijn Brand
+Copyright (C) 2009-2026 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
 Copyright (C) 1998-2004 by Jochen Wiedmann
 

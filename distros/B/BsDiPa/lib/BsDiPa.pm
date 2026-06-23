@@ -77,12 +77,15 @@ a library; please see header comment of lib/s-bsdipa-lib.h for more:
 create or apply binary difference patch.
 The perl package only uses C<s_BSDIPA_32> mode (31-bit size limits),
 and always uses the (integrated) libdivsufsort optimization.
+It always enables the special C<s_BSDIPA_TEXT> text data processing mode
+(available by specifying a negative C<$magic_window> when creating
+differential data).
 
 =head1 INTERFACE
 
 =over
 
-=item C<VERSION> (string, eg, '0.9.1')
+=item C<VERSION> (string, eg, '0.10.0')
 
 A version string.
 
@@ -150,13 +153,21 @@ from the memory backing C<$before_sv>
 to the memory backing C<$after_sv>,
 and place the result in the (de-)reference(d) C<$patch_sv>.
 On error C<undef> is stored if at least C<$patch_sv> is accessible.
-The optional C<$magic_window> specifies lookaround bytes,
-if <=0 the built-in default is used (16 at the time of this writing);
-the already unreasonable value 4096 is the maximum supported.
 The optional reference C<$is_equal_data> will be set to 1
 if C<$before_sv> and C<$after_sv> represent identical data,
 to 0 otherwise; it is only defined on success.
 See below for C<$io_cookie>.
+
+For the optional C<$magic_window> 0 and positive values specify
+BSDiff algorithm lookaround bytes.
+0 explicitly choses the built-in default (16 as of this writing);
+The already unreasonable value 4096 is the supported maximum.
+Negative values choose a special textual data differential mode
+(not BSDiff!) which inspects entire input lines
+(no newline convention normalization is applied).
+This mode uses the perl built-in C<PERL_HASH()> hash algorithm,
+and should therefore be safe against "algorithmic complexity attacks";
+This however implies that the result is B<not> reproducible.
 
 =item C<core_diff_bz2($before_sv, $after_sv, $patch_sv, $magic_window=0, $is_equal_data=0, $io_cookie=0)>
 

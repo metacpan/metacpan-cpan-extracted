@@ -1,0 +1,11 @@
+requires 'perl', '5.020';
+
+requires 'DBIO', '0.900000';
+requires 'DBIO::PostgreSQL', '0.900000';
+requires 'EV::Pg', '>= 0.02, < 0.03';
+requires 'Future', '0.49';
+
+on test => sub {
+  requires 'Test::More', '0.98';
+  requires 'Test::Exception';
+};

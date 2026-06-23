@@ -14,6 +14,7 @@ use 5.014;
 
 use Moose;
 use Moose::Util::TypeConstraints;
+use DateTime;
 use DateTime::Format::Strptime;
 
 coerce __PACKAGE__,
@@ -46,7 +47,7 @@ coerce 'SVG::Timeline::DateStr',
 
 coerce 'SVG::Timeline::Num',
   from 'SVG::Timeline::DateStr',
-  via  \&str2num;
+  via  \&_str2num;
 
 has index => (
   is => 'ro',
@@ -60,7 +61,7 @@ has text => (
   required => 1,
 );
 
-sub str2num {
+sub _str2num {
   my ($datestr) = @_;
 
   my $date = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d' )
@@ -91,6 +92,34 @@ has colour => (
 
 =head1 METHODS
 
+=head2 start_year
+
+Return the year that the event started.
+
+=cut
+
+sub start_year {
+  my $self = shift;
+
+  return int $self->start;
+}
+
+=head2 end_year
+
+Return the year that the event ended.
+
+=cut
+
+sub end_year {
+  my $self = shift;
+
+  if ($self->end) {
+    return int $self->end;
+  } else {
+    return DateTime->now->year;
+  }
+}
+
 =head2 draw_on($tl)
 
 Draw the event inside the given timeline object.
@@ -106,20 +135,38 @@ sub draw_on {
         + ($tl->bar_height * $tl->bar_spacing
            * ($self->index - 1));
 
+  my $width = ($self->end - $self->start) * $tl->units_per_year;
+
   $tl->rect(
     x              => $x,
     y              => $y,
-    width          => ($self->end - $self->start) * $tl->units_per_year,
+    width          => $width,
     height         => $tl->bar_height,
     fill           => $self->colour // $tl->default_colour,
     stroke         => $tl->bar_outline_colour,
     'stroke-width' => 1
   );
 
+  my $font_size   = $tl->bar_height * 0.8;
+  my $padding     = $tl->bar_height * 0.2;
+  my $text_x      = $x + $padding;
+  my $text_anchor = 'start';
+
+  # Estimate text width: approximate average character width is 0.6 × font-size
+  my $approx_text_width = length($self->text) * $font_size * 0.6;
+  my $right_edge        = $x + $width;
+  my $image_right_edge  = $tl->max_year * $tl->units_per_year;
+
+  if ($text_x + $approx_text_width > $image_right_edge) {
+    $text_x      = ($right_edge < $image_right_edge ? $right_edge : $image_right_edge) - $padding;
+    $text_anchor = 'end';
+  }
+
   $tl->text(
-    x => ($x + $tl->bar_height * 0.2),
-    y => $y + $tl->bar_height * 0.8,
-    'font-size' => $tl->bar_height * 0.8,
+    x             => $text_x,
+    y             => $y + $font_size,
+    'font-size'   => $font_size,
+    'text-anchor' => $text_anchor,
   )->cdata($self->text);
 }
 

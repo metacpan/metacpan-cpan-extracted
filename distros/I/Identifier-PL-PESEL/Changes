@@ -1,5 +1,8 @@
 Revision history for Identifier-PL-PESEL
 
+0.4     2026-06-22 19:15:00 CET
+        Add gender method
+
 0.3     2026-06-21 20:44:00 CET
         Meta infos changed
 

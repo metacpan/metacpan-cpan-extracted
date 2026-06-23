@@ -1,0 +1,30 @@
+Revision history for DBIO-MSSQL
+
+0.900000  2026-06-23
+    First release. Microsoft SQL Server driver for DBIO.
+
+    * Storage
+        - SCOPE_IDENTITY() identity retrieval, MONEY column casting,
+          ordered-subselect safety, SAVE TRANSACTION savepoints, deferred
+          FK checks via sp_msforeachtable, and NEWID() GUID/random support
+        - DBD::ODBC and DBD::MSSQL connection paths
+        - DBD::Sybase/FreeTDS path with placeholder detection (NoBindVars
+          rebless) and statement-cache workarounds
+
+    * SQL generation
+        - MSSQL SQLMaker with LIMIT/OFFSET via ROW_NUMBER() OVER() (with a
+          (SELECT(1)) default order) and the TOP dialect for older servers
+        - [ ] identifier quoting and SQLServer SQL::Translator type
+
+    * Schema management
+        - Native DDL generation, including CREATE VIEW for non-virtual
+          views from view_definition
+        - Native introspection via INFORMATION_SCHEMA and the sys.* catalog
+        - Native diff of tables, columns, indexes, and foreign keys
+        - test-deploy-and-compare install and upgrade via Deploy
+
+    * Integration
+        - DBIO::MSSQL schema component and the `use DBIO -ms` shortcut
+        - Result component for MSSQL-specific indexes
+        - base->native type Adapter
+        - datetime parsing for the MSSQL and Sybase paths

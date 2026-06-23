@@ -1,0 +1,153 @@
+# PODNAME: DBIO::Manual::Component
+# ABSTRACT: Developing DBIO Components
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual::Component - Developing DBIO Components
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 WHAT IS A COMPONENT
+
+A component is a module that can be added to your DBIO classes to provide
+extra functionality. A good example is L<DBIO::InflateColumn>, which
+automatically inflates and deflates column values to and from Perl objects.
+
+DBIO distinguishes between B<core infrastructure> -- the classes every
+result class transitively inherits from, whether you ask for them or not --
+and B<optional components> that you opt into via C<load_components>.
+
+=head1 USING
+
+Optional components are loaded with C<load_components()> on your result
+class:
+
+  package My::Schema::Result::Thing;
+  use base qw( DBIO::Core );
+  __PACKAGE__->load_components(qw/InflateColumn::DateTime Timestamp/);
+
+You usually omit the C<DBIO::> prefix; C<load_components> looks under
+C<DBIO::> by default. To load a component outside that namespace, prefix
+the name with C<+>:
+
+  __PACKAGE__->load_components(qw/ +My::Component /);
+
+The order in which components are loaded matters -- it determines the
+order they appear in the C3 inheritance chain. If a component overrides
+a method also overridden by another component, the one loaded first wins.
+When in doubt, read the docs of the components you are using.
+
+=head1 CREATING COMPONENTS
+
+A component is a class inheriting from L<DBIO::Base>:
+
+  package DBIO::MyComp;
+  use base qw(DBIO::Base);
+  # Add methods, accessors, load other components, etc.
+  1;
+
+When loaded, the component is injected into the result class' inheritance
+chain via L<Class::C3>. A component can provide new methods, override
+methods provided by other components, or hook into lifecycle methods on
+L<DBIO::Row>:
+
+  sub insert {
+    my $self = shift;
+    # Do stuff with $self before insert.
+    return $self->next::method(@_);
+  }
+
+  sub delete {
+    my $self = shift;
+    # Do stuff with $self before delete.
+    return $self->next::method(@_);
+  }
+
+Components loaded earlier sit closer to the front of the C<@ISA> chain.
+If you override C<insert()> but L<DBIO::Row> appears in the chain before
+your component, your override is shadowed. To inspect the actual
+resolution order:
+
+  print join ', ', mro::get_linear_isa('YourClass::Name');
+
+=head1 CORE INFRASTRUCTURE
+
+These classes are the substrate for every result class. They are loaded
+implicitly by L<DBIO::Core> and you do not list them in
+C<load_components>.
+
+L<DBIO::Core> -- The standard component bundle that user-facing result
+classes inherit from. Loads the rest of the core infrastructure.
+
+L<DBIO::Row> -- Per-row state, accessors, C<insert>/C<update>/C<delete>,
+the lifecycle hook surface every other component cooperates with.
+
+L<DBIO::PK> -- Primary key handling.
+
+L<DBIO::ResultSourceProxy> -- Provides C<__PACKAGE__-E<gt>table(...)>
+and proxies result-source methods onto the result class.
+
+L<DBIO::Relationship> -- Inter-table relationships
+(C<belongs_to>, C<has_many>, C<might_have>, C<many_to_many>).
+
+L<DBIO::InflateColumn> -- Per-column inflate/deflate hook used by both
+core and optional components.
+
+=head1 BUILT-IN OPTIONAL COMPONENTS
+
+These ship in the DBIO core distribution and are loaded explicitly via
+C<load_components>.
+
+L<DBIO::InflateColumn::DateTime> -- Inflate date/time columns to
+L<DateTime> objects.
+
+L<DBIO::InflateColumn::Serializer> -- Serialise complex Perl structures
+into a single column (JSON, Storable, YAML).
+
+L<DBIO::FilterColumn> -- Bidirectional filter callbacks between in-memory
+and storage representations.
+
+L<DBIO::Timestamp> -- C<set_on_create> / C<set_on_update> column flags
+for automatic timestamp maintenance.
+
+L<DBIO::EncodedColumn> -- One-way encode columns such as passwords.
+
+L<DBIO::UUIDColumns> -- C<uuid_on_create> column flag for automatic
+UUID generation on insert.
+
+L<DBIO::Ordered> -- C<position> / C<grouping> column flags to maintain
+a position column over an ordered list of rows.
+
+L<DBIO::HashAccessor> -- Generate get/set/exists/delete/push helpers for
+serialised hash columns.
+
+L<DBIO::ChangeLog> -- Record per-column change history into companion
+ChangeLog tables. Per-column C<< changelog => 0 >> flag to exclude
+sensitive fields.
+
+=head1 SEE ALSO
+
+L<DBIO::Manual::Cookbook>
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

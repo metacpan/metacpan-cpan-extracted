@@ -1,0 +1,664 @@
+# PODNAME: DBIO::Manual::Features
+# ABSTRACT: Feature overview with links to the relevant DBIO documentation
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual::Features - Feature overview with links to the relevant DBIO documentation
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 PROJECT
+
+=head2 Broad Contributor Base
+
+DBIO has accumulated contributions across core, drivers, tests, and
+documentation. See L<DBIO/AUTHORS> and F<AUTHORS> for the current list.
+
+=head2 Active Development
+
+Development activity changes over time, but DBIO continues to evolve across
+core and driver distributions. For recent releases and changelog history, see
+L<https://metacpan.org/changes/distribution/DBIO>.
+
+=head2 Practical Feedback Loop
+
+=over 1
+
+=item Users and maintainers regularly turn driver-specific gaps into concrete fixes
+
+=item Documentation improvements, failing tests, and focused bug reports are all useful contributions
+
+=back
+
+=head1 General ORM
+
+These are familiar ORM features, but they are still good reasons to use DBIO
+instead of hand-writing every query.
+
+=head2 Cross DB
+
+Most schema and query code should remain portable across drivers with little or
+no backend-specific tweaking.
+
+=head2 Basic CRUD
+
+=over 1
+
+=item C - Create
+
+=item R - Retrieve
+
+=item U - Update
+
+=item D - Delete
+
+=back
+
+=head2 SQL: Create
+
+ my $sth = $dbh->prepare('
+    INSERT INTO books
+    (title, author_id)
+    values (?,?)
+ ');
+
+ $sth->execute( 'A book title', $author_id );
+
+=head2 DBIO: Create
+
+ my $book = $book_rs->create({
+    title     => 'A book title',
+    author_id => $author_id,
+ });
+
+See L<DBIO::ResultSet/create>
+
+=over 1
+
+=item No need to pair placeholders and values
+
+=item Automatically gets autoincremented id for you
+
+=item Transparently uses INSERT ... RETURNING for databases that support it
+
+=back
+
+=head2 SQL: Read
+
+ my $sth = $dbh->prepare('
+    SELECT title,
+    authors.name as author_name
+    FROM books, authors
+    WHERE books.author = authors.id
+ ');
+
+ while ( my $book = $sth->fetchrow_hashref ) {
+   say "Author of $book->{title} is $book->{author_name}";
+ }
+
+=head2 DBIO: Read
+
+ my $book = $book_rs->find($book_id);
+
+or
+
+ my $book = $book_rs->search({ title => 'A book title' }, { rows => 1 })->next;
+
+or
+
+ my @books = $book_rs->search({ author => $author_id })->all;
+
+or
+
+ while( my $book = $books_rs->next ) {
+   printf "Author of %s is %s\n", $book->title, $book->author->name;
+ }
+
+See L<DBIO::ResultSet/find>, L<DBIO::ResultSet/search>, L<DBIO::ResultSet/next>, and L<DBIO::ResultSet/all>
+
+DBIO intentionally supports several convenient query shapes here.
+
+=head2 SQL: Update
+
+ my $update = $dbh->prepare('
+    UPDATE books
+    SET title = ?
+    WHERE id = ?
+ ');
+
+ $update->execute( 'New title', $book_id );
+
+=head2 DBIO: Update
+
+ $book->update({ title => 'New title' });
+
+See L<DBIO::Row/update>
+
+Will not update unless value changes
+
+=head2 SQL: Delete
+
+ my $delete = $dbh->prepare('DELETE FROM books WHERE id = ?');
+
+ $delete->execute($book_id);
+
+=head2 DBIO: Delete
+
+ $book->delete
+
+See L<DBIO::Row/delete>
+
+=head2 SQL: Search
+
+ my $sth = $dbh->prepare('
+   SELECT title,
+   authors.name as author_name
+   FROM books
+   WHERE books.name LIKE "%monte cristo%" AND
+   books.topic = "jailbreak"
+ ');
+
+=head2 DBIO: Search
+
+ my $book = $book_rs->search({
+    'me.name'  => { -like => '%monte cristo%' },
+    'me.topic' => 'jailbreak',
+ })->next;
+
+=over 1
+
+=item See L<SQL::Abstract>, L<DBIO::ResultSet/next>, and L<DBIO::ResultSet/search>
+
+=item Introspectable at the Perl level
+
+=item Easier to compose than raw SQL in Perl code
+
+=back
+
+=head2 Object-Level Overrides
+
+=over 1
+
+=item Override new if you want to do validation
+
+=item Override delete if you want to disable deletion
+
+=item Domain logic can live next to the result classes it belongs to
+
+=back
+
+=head2 Convenience Methods
+
+=over 1
+
+=item L<DBIO::ResultSet/find_or_create>
+
+=item L<DBIO::ResultSet/update_or_create>
+
+=back
+
+=head2 Non-column methods
+
+Need a method to build a user's gravatar URL? Add a C<gravatar_url> method to
+the result class.
+
+=head2 RELATIONSHIPS
+
+=over 1
+
+=item L<DBIO::Relationship/belongs_to>
+
+=item L<DBIO::Relationship/has_many>
+
+=item L<DBIO::Relationship/might_have>
+
+=item L<DBIO::Relationship/has_one>
+
+=item L<DBIO::Relationship/many_to_many>
+
+=item SET AND FORGET
+
+=back
+
+=head1 DBIO Specific Features
+
+These features are especially DBIO-shaped, even when similar ideas exist in
+other ORMs.
+
+=head2 ->deploy
+
+Create a database from your DBIO schema.
+
+ my $schema = Frew::Schema->connect( $dsn, $user, $pass );
+
+ $schema->deploy
+
+See L<DBIO::Schema/deploy>.
+
+=head2 Generate
+
+Create DBIO schema classes by introspecting an existing database.
+
+ dbiogen -o dump_directory=./lib MyApp::Schema $dsn $user $pass
+
+See L<dbiogen> and L<DBIO::Generate>.
+
+=head2 Populate
+
+Made for inserting lots of rows very quickly into database
+
+ $schema->populate([ Users =>
+    [qw( username password )],
+    [qw( frew     >=4char$ )],
+    [qw(      ...          )],
+    [qw(      ...          )],
+ );
+
+See L<DBIO::Schema/populate>
+
+See L<DBIO::Schema/populate> for details on bulk loading data.
+
+=head2 Multicreate
+
+Create an object and its related objects all at once
+
+ $schema->resultset('Author')->create({
+    name => 'Stephen King',
+    books => [{ title => 'The Dark Tower' }],
+    address => {
+       street => '123 Turtle Back Lane',
+       state  => { abbreviation => 'ME' },
+       city   => { name => 'Lowell'     },
+    },
+ });
+
+See L<DBIO::ResultSet/create>
+
+=over 1
+
+=item books is a has_many
+
+=item address is a belongs_to which in turn belongs to state and city each
+
+=item for this to work right state and city must mark abbreviation and name as unique
+
+=back
+
+=head2 Extensible
+
+DBIO helped pioneer fast MI in Perl 5 with Class::C3, so it is made to
+allow extensions to nearly every part of it.
+
+=head2 Extensibility example: Row helpers (integrated into DBIO::Row)
+
+The following helpers from F<DBIx::Class::Helpers> are integrated
+natively into L<DBIO::Row> and require no C<load_components> call:
+
+=over 1
+
+=item L<DBIO::Row/TO_JSON> — serializable hashref, excludes text/blob columns
+
+=item L<DBIO::Row/serializable_columns> — list of serializable columns
+
+=item L<DBIO::Row/self_rs> — ResultSet for a single row
+
+=item L<DBIO::Row/get_storage_value> — original DB value before in-memory changes
+
+=item L<DBIO::Row/before_column_change> — fire callback before a column is updated
+
+=item L<DBIO::Row/after_column_change> — fire callback after a column is updated
+
+=item L<DBIO::Row/around_column_change> — wrap update with a column-aware around hook
+
+=item L<DBIO::Row/proxy_resultset_method> — expose ResultSet C<with_> methods as row accessors
+
+=back
+
+=head2 Extensibility example: DBIO::TimeStamp
+
+=over 1
+
+=item See L<DBIO::TimeStamp>
+
+=item Cross DB
+
+=item set_on_create
+
+=item set_on_update
+
+=back
+
+=head2 Result vs ResultSet
+
+=over 1
+
+=item Result == Row
+
+=item ResultSet == Query Plan
+
+=over 1
+
+=item Internal Join Optimizer for all DB's (!!!)
+
+=back
+
+=item (less important but...)
+
+=item ResultSource == Queryable collection of rows (Table, View, etc)
+
+=item Storage == Database
+
+=item Schema == associates a set of ResultSources with a Storage
+
+=back
+
+=head2 ResultSet methods
+
+ package MyApp::Schema::ResultSet::Book;
+
+ use strict;
+ use warnings;
+
+ use base 'DBIO::ResultSet';
+
+ sub good {
+    my $self = shift;
+    $self->search({
+       $self->current_source_alias . '.rating' => { '>=' => 4 }
+    })
+ };
+
+ sub cheap {
+    my $self = shift;
+    $self->search({
+       $self->current_source_alias . '.price' => { '<=' => 5}
+    })
+ };
+
+ # ...
+
+ 1;
+
+See L<DBIO::Manual::Cookbook/Predefined searches>
+
+=over 1
+
+=item All searches should be ResultSet methods
+
+=item Name has obvious meaning
+
+=item L<DBIO::ResultSet/current_source_alias> helps things to work no matter what
+
+=back
+
+=head2 ResultSet method in Action
+
+ $schema->resultset('Book')->good
+
+=head2 ResultSet Chaining
+
+ $schema->resultset('Book')
+    ->good
+    ->cheap
+    ->recent
+
+=head2 search_related
+
+ my $score = $schema->resultset('User')
+    ->search({'me.userid' => 'frew'})
+    ->related_resultset('access')
+    ->related_resultset('mgmt')
+    ->related_resultset('orders')
+    ->telephone
+    ->search_related( shops => {
+       'shops.datecompleted' => {
+          -between => ['2009-10-01','2009-10-08']
+       }
+    })->completed
+    ->related_resultset('rpt_score')
+    ->search(undef, { rows => 1})
+    ->get_column('raw_scores')
+    ->next;
+
+The SQL that this produces (with placeholders filled in for clarity's sake)
+on our system (Microsoft SQL) is:
+
+ SELECT raw_scores
+   FROM (
+     SELECT raw_scores, ROW_NUMBER() OVER (
+         ORDER BY (
+             SELECT (1)
+           )
+       ) AS rno__row__index
+       FROM (
+         SELECT rpt_score.raw_scores
+           FROM users me
+           JOIN access access
+             ON access.userid = me.userid
+           JOIN mgmt mgmt
+             ON mgmt.mgmtid = access.mgmtid
+           JOIN [order] orders
+             ON orders.mgmtid = mgmt.mgmtid
+           JOIN shop shops
+             ON shops.orderno = orders.orderno
+           JOIN rpt_scores rpt_score
+             ON rpt_score.shopno = shops.shopno
+         WHERE (
+           datecompleted IS NOT NULL AND
+           (
+             (shops.datecompleted BETWEEN '2009-10-01' AND '2009-10-08')  AND
+             (type = '1' AND me.userid = 'frew')
+           )
+         )
+       ) rpt_score
+   ) rpt_score
+ WHERE rno__row__index BETWEEN 1 AND 1
+
+See: L<DBIO::ResultSet/related_resultset>,
+L<DBIO::ResultSet/search_related>, and
+L<DBIO::ResultSet/get_column>.
+
+=head2 bonus rel methods
+
+ my $book = $author->create_related(
+    books => {
+       title => 'Another Discworld book',
+    }
+ );
+
+ my $book2 = $pratchett->add_to_books({
+    title => 'MOAR Discworld book',
+ });
+
+See L<DBIO::Relationship::Base/create_related> and L<DBIO::Relationship::Base/add_to_$rel>
+
+Note that it automatically fills in foreign key for you
+
+=head2 Excellent Transaction Support
+
+ $schema->txn_do(sub {
+    ...
+ });
+
+ $schema->txn_begin; # <-- low level
+ # ...
+ $schema->txn_commit;
+
+See L<DBIO::Schema/txn_do>, L<DBIO::Schema/txn_begin>,
+and L<DBIO::Schema/txn_commit>.
+
+=head2 InflateColumn
+
+ package Frew::Schema::Result::Book;
+
+ use strict;
+ use warnings;
+
+ use base 'DBIO::Core';
+
+ use DateTime::Format::MySQL;
+
+ # Result code here
+
+ __PACKAGE__->load_components('InflateColumn');
+
+ __PACKAGE__->inflate_column(
+    date_published => {
+       inflate => sub { DateTime::Format::MySQL->parse_date( shift ) },
+       deflate => sub { shift->ymd },
+    },
+ );
+
+See L<DBIO::InflateColumn>, L<DBIO::InflateColumn/inflate_column>, and
+L<DBIO::InflateColumn::DateTime>.
+
+=head2 InflateColumn: deflation
+
+ $book->date_published(DateTime->now);
+ $book->update;
+
+=head2 InflateColumn: inflation
+
+ say $book->date_published->month_abbr; # Nov
+
+=head2 FilterColumn
+
+ package Frew::Schema::Result::Book;
+
+ use strict;
+ use warnings;
+
+ use base 'DBIO::Core';
+
+ # Result code here
+
+ __PACKAGE__->load_components('FilterColumn');
+
+ __PACKAGE__->filter_column(
+    length => {
+       to_storage   => 'to_metric',
+       from_storage => 'to_imperial',
+    },
+ );
+
+ sub to_metric   { $_[1] * .305 }
+ sub to_imperial { $_[1] * 3.28 }
+
+See L<DBIO::FilterColumn> and L<DBIO::FilterColumn/filter_column>
+
+=head2 ResultSetColumn
+
+ my $rsc = $schema->resultset('Book')->get_column('price');
+ $rsc->first;
+ $rsc->all;
+ $rsc->min;
+ $rsc->max;
+ $rsc->sum;
+
+See L<DBIO::ResultSetColumn>
+
+=head2 Aggregates
+
+ my @res = $rs->search(undef, {
+    select   => [
+       'price',
+       'genre',
+       { max => price },
+       { avg => price },
+    ],
+    as       => [
+       qw(price genre max_price avg_price)
+    ],
+    group_by => [qw(price genre)],
+ });
+ for (@res) {
+    say $_->price . ' ' . $_->genre;
+    say $_->get_column('max_price');
+    say $_->get_column('avg_price');
+ }
+
+See L<DBIO::ResultSet/select>, L<DBIO::ResultSet/as>, and
+L<DBIO::ResultSet/group_by>
+
+=over 1
+
+=item Careful, get_column can basically mean B<three> things
+
+=item private in which case you should use an accessor
+
+=item public for what there is no accessor for
+
+=item public for get resultset column (prev example)
+
+=back
+
+=head2 HRI
+
+ $rs->search(undef, {
+   result_class => 'DBIO::ResultClass::HashRefInflator',
+ });
+
+See L<DBIO::ResultSet/result_class> and L<DBIO::ResultClass::HashRefInflator>.
+
+=over 1
+
+=item Easy on memory
+
+=item Mega fast
+
+=item Great for quick debugging
+
+=item Great for performance tuning (we went from 2m to < 3s)
+
+=back
+
+=head2 Subquery Support
+
+ my $inner_query = $schema->resultset('Artist')
+    ->search({
+     name => [ 'Billy Joel', 'Brittany Spears' ],
+ })->get_column('id')->as_query;
+
+ my $rs = $schema->resultset('CD')->search({
+     artist_id => { -in => $inner_query },
+ });
+
+See L<DBIO::Manual::Cookbook/Subqueries>
+
+=head2 Bare SQL w/ Placeholders
+
+ $rs->update({
+    # !!! SQL INJECTION VECTOR
+    price => \"price + $inc", # DON'T DO THIS
+ });
+
+Better:
+
+ $rs->update({
+    price => \['price + ?', [inc => $inc]],
+ });
+
+See L<SQL::Abstract/Literal SQL with placeholders and bind values (subqueries)>
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

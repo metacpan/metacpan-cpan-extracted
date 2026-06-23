@@ -20,6 +20,7 @@ t/11-split_braced.t
 t/02-parse_string.t
 t/04-entry.t
 t/03-parse_entry.t
+t/16-cache.t
 t/bibs/mathscinet.txt
 t/bibs/10-funnyname.bib
 t/bibs/english.bib

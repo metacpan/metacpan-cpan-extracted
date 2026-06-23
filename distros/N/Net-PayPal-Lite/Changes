@@ -1,0 +1,8 @@
+Revision history for Net-PayPal-Lite
+
+0.02	2026-06-22
+	- documentation fixes
+
+0.01	2026-06-22
+	- do not store keys, nor use CBC out of the box.
+	- fork of SHERZODR's excellent Net::PayPal code under new namespace to avoid conflicts.

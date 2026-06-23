@@ -60,6 +60,41 @@ sub delete {
 }
 
 
+sub assets {
+    my ($self, %query) = @_;
+    return $self->_client->releases->assets(
+        $self->owner, $self->repo, $self->id, %query);
+}
+
+
+sub create_asset {
+    my ($self, %args) = @_;
+    return $self->_client->releases->create_asset(
+        $self->owner, $self->repo, $self->id, %args);
+}
+
+
+sub get_asset {
+    my ($self, $attachment_id) = @_;
+    return $self->_client->releases->get_asset(
+        $self->owner, $self->repo, $self->id, $attachment_id);
+}
+
+
+sub edit_asset {
+    my ($self, $attachment_id, %args) = @_;
+    return $self->_client->releases->edit_asset(
+        $self->owner, $self->repo, $self->id, $attachment_id, %args);
+}
+
+
+sub delete_asset {
+    my ($self, $attachment_id) = @_;
+    return $self->_client->releases->delete_asset(
+        $self->owner, $self->repo, $self->id, $attachment_id);
+}
+
+
 
 1;
 
@@ -75,7 +110,7 @@ WWW::Gitea::Release - Gitea release entity
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -170,6 +205,40 @@ Edits the release and updates L</data> in place.
 
 Deletes the release.
 
+=head2 assets
+
+    my $assets = $rel->assets;
+
+Lists the release's assets. Returns an ArrayRef of L<WWW::Gitea::Attachment>.
+
+=head2 create_asset
+
+    my $asset = $rel->create_asset(file => '/path/to/dist.tar.gz');
+
+Uploads an asset to the release (see
+L<WWW::Gitea::API::Releases/create_asset>). Returns a
+L<WWW::Gitea::Attachment>.
+
+=head2 get_asset
+
+    my $asset = $rel->get_asset(12);
+
+Fetches one of the release's assets by attachment id. Returns a
+L<WWW::Gitea::Attachment>.
+
+=head2 edit_asset
+
+    $rel->edit_asset(12, name => 'renamed.tar.gz');
+
+Edits one of the release's assets. Returns the updated
+L<WWW::Gitea::Attachment>.
+
+=head2 delete_asset
+
+    $rel->delete_asset(12);
+
+Deletes one of the release's assets by attachment id.
+
 =head1 SEE ALSO
 
 =over 4
@@ -177,6 +246,8 @@ Deletes the release.
 =item * L<WWW::Gitea>
 
 =item * L<WWW::Gitea::API::Releases>
+
+=item * L<WWW::Gitea::Attachment>
 
 =back
 

@@ -1,0 +1,41 @@
+Revision history for DBIO-DuckDB
+
+0.900000  2026-06-23
+    First release. DuckDB driver for DBIO built on the pure-FFI DBD::DuckDB.
+
+    * Storage
+        - DBIO::DuckDB schema component; autodetects dbi:DuckDB: DSNs and
+          forces +DBIO::DuckDB::Storage
+        - DBIO::DuckDB::Storage on DBIO::Storage::DBI: double-quoted
+          identifiers, INSERT ... RETURNING, savepoints
+        - `-du` shortcut (use DBIO Schema => -du) via DBIO::Shortcut::du
+
+    * SQLMaker
+        - DBIO::DuckDB::SQLMaker: PostgreSQL-flavored dialect, disables
+          SELECT ... FOR UPDATE
+
+    * DDL / Deploy
+        - DBIO::DuckDB::DDL generates DuckDB DDL from Result classes via a
+          single-source emitter (DBIO::DuckDB::DDL::Emit)
+        - emits CREATE VIEW for non-virtual views (from view_definition),
+          after all tables
+        - DBIO::DuckDB::Deploy installs and upgrades schemas via native
+          test-deploy-and-compare
+
+    * Introspect / Diff
+        - DBIO::DuckDB::Introspect reads information_schema and duckdb_*
+          views (tables, columns, indexes, foreign keys)
+        - DBIO::DuckDB::Diff compares two introspected models (tables,
+          columns, indexes)
+
+    * DuckDB specials
+        - Arrow-fetch and Appender escape hatches for columnar / bulk paths
+        - read_csv / read_parquet / read_json table-function helpers
+        - extension install, checkpoint, version helpers
+        - Quack client-server RPC (libduckdb >= 1.5): quack_serve,
+          quack_attach, quack_detach, plus on-connect attach hook
+
+    * Tests
+        - TAP suite: 00-load, 08-shortcut, 10-smoke, 20-introspect,
+          21-introspect-contract, 30-deploy, 35-ddl-emit, 40-diff,
+          50-arrow, 60-quack

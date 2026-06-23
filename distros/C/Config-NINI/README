@@ -1,0 +1,19 @@
+Config::NINI
+==============
+
+Config::NINI is compact configuration files parser.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2026 Vladi Belperchinov-Shabanski <cade@noxrun.com>

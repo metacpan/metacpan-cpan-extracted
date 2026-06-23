@@ -103,7 +103,7 @@ WWW::Gitea::API::Orgs - Gitea organizations API
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

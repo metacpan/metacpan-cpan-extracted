@@ -57,7 +57,7 @@ sub have_zstd{
 }
 
 version_and_contact 'c-lib/configh.sh';
-system 'cd c-lib; ./configh.sh s_BSDIPA_32=y';
+system 'cd c-lib; ./configh.sh s_BSDIPA_32=y s_BSDIPA_TEXT=y';
 have_bz2;
 have_xz;
 have_zstd;

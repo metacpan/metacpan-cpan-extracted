@@ -1,0 +1,71 @@
+# PODNAME: DBIO::Manual::ResultClass
+# ABSTRACT: Representing a single result (row) from a DB query
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual::ResultClass - Representing a single result (row) from a DB query
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 SYNOPSIS
+
+  package My::Schema::Result::Track;
+
+  use parent 'DBIO::Core';
+
+  __PACKAGE__->table('tracks');
+
+  __PACKAGE__->add_columns({
+    id => {
+      data_type => 'int',
+      is_auto_increment => 1,
+    },
+    cd_id => {
+      data_type => 'int',
+    },
+    title => {
+      data_type => 'varchar',
+      size => 50,
+    },
+    rank => {
+      data_type => 'int',
+      is_nullable => 1,
+    },
+  });
+
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->add_unique_constraint(u_title => ['cd_id', 'title']);
+
+=head1 DESCRIPTION
+
+In DBIO, query results normally arrive as instances of a specific
+C<Result Class> determined by the main query source. A result class is both the
+runtime API for rows and the place where DBIO learns the schema metadata for a
+table or view.
+
+Because a result class plays both roles, its available methods come from
+several cooperating modules. This document serves as a high-level map for
+declaring result classes and for finding the deeper API documentation.
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

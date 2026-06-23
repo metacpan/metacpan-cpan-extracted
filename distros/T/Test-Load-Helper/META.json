@@ -1,0 +1,74 @@
+{
+   "abstract" : "automatically load test helpers by walking the directory tree",
+   "author" : [
+      "Branislav Zahradn\u00edk <barney@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Load-Helper",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Path::Tiny" : "0.018",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0.018",
+            "Test::EOL" : "0",
+            "Test::YAFT" : "0",
+            "constant" : "0",
+            "require::relative" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Load::Helper" : {
+         "file" : "lib/Test/Load/Helper.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/happy-barney/perl-Test-Load-Helper/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/happy-barney/perl-Test-Load-Helper.git",
+         "web" : "https://github.com/happy-barney/perl-Test-Load-Helper"
+      }
+   },
+   "version" : "1.0.0",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

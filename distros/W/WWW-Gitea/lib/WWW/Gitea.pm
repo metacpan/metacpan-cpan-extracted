@@ -15,7 +15,7 @@ use WWW::Gitea::API::Releases;
 use WWW::Gitea::API::Orgs;
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 
 has url => (
@@ -137,7 +137,7 @@ WWW::Gitea - Perl client for the Gitea REST API
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

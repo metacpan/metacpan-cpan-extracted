@@ -37,8 +37,9 @@ sub call_operation {
     return $self->client->request(
         $op->{method},
         $path,
-        (defined $args{body}  ? (body  => $args{body})  : ()),
-        (defined $args{query} ? (query => $args{query}) : ()),
+        (defined $args{body}   ? (body   => $args{body})   : ()),
+        (defined $args{query}  ? (query  => $args{query})  : ()),
+        (defined $args{upload} ? (upload => $args{upload}) : ()),
         (defined $op->{content_type}
             ? (content_type => $op->{content_type}) : ()),
     );
@@ -60,7 +61,7 @@ WWW::Gitea::Role::OpenAPI - operationId-based dispatch against a cached operatio
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

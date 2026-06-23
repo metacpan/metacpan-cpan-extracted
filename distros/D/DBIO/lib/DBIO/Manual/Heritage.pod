@@ -1,0 +1,669 @@
+# PODNAME: DBIO::Manual::Heritage
+# ABSTRACT: Everything that changed from DBIx::Class to DBIO
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual::Heritage - Everything that changed from DBIx::Class to DBIO
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 OVERVIEW
+
+DBIO is a fork of L<DBIx::Class>. It retains the relational-mapping model
+and most of the API surface, but replaces, extends, and integrates a
+significant number of components. This document is the definitive reference
+for everyone migrating from DBIx::Class, or anyone who needs to understand
+what DBIO is relative to its ancestor.
+
+=head2 Naming
+
+B<DBIO> stands for I<DBI Objects>. The namespace C<DBIO::> replaces
+C<DBIx::Class::> throughout. Every module, every test, every tool has been
+renamed accordingly.
+
+DBIO is a clean break - there is no runtime C<DBIx::Class> compatibility
+shim. Existing code is migrated by mechanical rename (C<DBIx::Class::*>
+to C<DBIO::*>) plus the targeted API updates listed in
+L<DBIO::Manual::Migration>.
+
+=head1 FUNDAMENTAL ARCHITECTURE CHANGES
+
+=head2 DBIO::Base - the new meta-infrastructure base
+
+DBIx::Class distributed its meta-level machinery across several internal
+packages. DBIO consolidates it into L<DBIO::Base>, which every internal
+class uses as its root:
+
+=over 4
+
+=item C<use mro 'c3'> - MRO forced to C3 for the entire inheritance tree
+
+=item L<DBIO::Componentised> - the C<load_components()> machinery
+
+=item L<Class::Accessor::Grouped> - C<mk_group_accessors()>
+
+=item Perl subroutine attributes via C<MODIFY_CODE_ATTRIBUTES>
+
+=item C<_skip_namespace_frames> for clean stack traces
+
+=back
+
+B<Do not use C<DBIO::Base> directly in application code.> It is the
+machinery that everything else stands on. For your Result classes use
+L<DBIO::Core>; for ResultSet classes use L<DBIO::ResultSet>; for schema
+classes use L<DBIO::Schema>.
+
+=head2 SQL::Abstract replaces SQL::Abstract::Classic
+
+DBIx::Class depended on L<SQL::Abstract::Classic>, an older fork.
+DBIO uses the canonical L<SQL::Abstract> (>= 1.99) instead. The query API
+is compatible; the internal extensions required small adjustments in the
+SQLMaker layer.
+
+=head2 apply_limit replaces limit_dialect
+
+DBIx::Class used a C<sql_limit_dialect> string and an C<emulate_limit()>
+dispatch table inside the storage layer. DBIO removes both. Each driver's
+SQLMaker subclass provides an C<apply_limit($sql, $rows, $offset)> method
+instead. The default implementation emits C<LIMIT ? OFFSET ?>.
+
+If you had custom C<emulate_limit()> overrides, override C<apply_limit>
+on your SQLMaker subclass.
+
+=head2 Driver distributions split out of core
+
+All database-specific storage classes have been removed from the DBIO core
+distribution and moved into dedicated CPAN distributions:
+
+  DBIO-PostgreSQL    DBIO::PostgreSQL    (most advanced: pg_catalog introspect,
+                                          enums, schemas, RLS, indexes)
+  DBIO-MySQL         DBIO::MySQL
+  DBIO-SQLite        DBIO::SQLite
+  DBIO-DuckDB        DBIO::DuckDB        (embedded analytical; UUID, Arrow,
+                                          Appender, quack RPC)
+  DBIO-DB2           DBIO::DB2
+  DBIO-Firebird      DBIO::Firebird
+  DBIO-Informix      DBIO::Informix
+  DBIO-MSSQL         DBIO::MSSQL
+  DBIO-Oracle        DBIO::Oracle
+  DBIO-Sybase        DBIO::Sybase
+
+Install only the driver you need. Every driver ships its own native
+introspection, diff, and deploy modules (the test-and-compare strategy) and
+does not require L<SQL::Translator>.
+
+Two drivers also have non-blocking async variants whose queries return
+C<Future> objects, and there is a GraphQL projection layer:
+
+  DBIO-PostgreSQL-Async   DBIO::PostgreSQL::Async   (libpq via EV::Pg)
+  DBIO-MySQL-Async        DBIO::MySQL::Async        (MariaDB via EV::MariaDB)
+  DBIO-GraphQL            DBIO::GraphQL             (Result classes -> GraphQL)
+
+=head2 Replicated storage is now in core
+
+C<DBIx::Class::Replicated> was an external distribution. L<DBIO::Replicated>
+ships in the core distribution. Load it as a Schema component; it forces
+C<+DBIO::Replicated::Storage> and coordinates a master backend plus optional
+replicants:
+
+  package MyApp::Schema;
+  use base 'DBIO::Schema';
+  __PACKAGE__->load_components('DBIO::Replicated');
+
+  my $schema = MyApp::Schema->connect($dsn, $user, $pass, {
+      balancer_type => 'DBIO::Replicated::Balancer::First',
+  });
+  $schema->storage->connect_replicants([ $replica_dsn, $user, $pass ]);
+
+Writes, transactions and deploy go through the master; reads are delegated to
+the balancer (default C<DBIO::Replicated::Balancer::First>). The internals
+live in L<DBIO::Replicated::Pool>, L<DBIO::Replicated::Backend>, and
+L<DBIO::Replicated::Balancer>.
+
+=head2 SQL::Translator is optional
+
+Every driver ships its own native Deploy, Introspect, and Diff modules.
+C<DBIO::Schema-E<gt>deploy()> checks the active storage class for a
+C<dbio_deploy_class()> method; if present it routes to the native class,
+which deploys by introspecting both the live database and the desired schema
+and diffing the two models (test-and-compare). If a storage declares no
+native class, C<deploy()> does not silently translate the schema for you: it
+falls through to C<deployment_statements()>, which reads a pre-existing DDL
+file and throws if none is present. Core's deploy path never calls
+L<SQL::Translator>, so SQL::Translator is an optional dependency rather than a
+required one.
+
+=head1 RESULT CLASS STYLES
+
+DBIx::Class had one way to write a Result class: the explicit
+C<__PACKAGE__-E<gt>method()> style. DBIO keeps that (called I<Vanilla>)
+and adds two sugar layers.
+
+=head2 Vanilla (classic, unchanged API)
+
+  package MyApp::Schema::Result::Artist;
+  use base 'DBIO::Core';
+  __PACKAGE__->table('artist');
+  __PACKAGE__->add_columns(
+      artistid => { data_type => 'integer', is_auto_increment => 1 },
+      name     => { data_type => 'varchar', size => 100 },
+  );
+  __PACKAGE__->set_primary_key('artistid');
+  __PACKAGE__->has_many(cds => 'MyApp::Schema::Result::CD', 'artistid');
+  1;
+
+See L<DBIO::Core> and L<DBIO::Manual::ResultClass>.
+
+=head2 Candy (import-sugar, method renaming)
+
+L<DBIO::Candy> removes the C<__PACKAGE__-E<gt>> boilerplate and exports
+short aliases. It also infers the table name from the package name.
+
+  package MyApp::Schema::Result::Artist;
+  use DBIO::Candy;
+  column artistid => { data_type => 'integer', is_auto_increment => 1 };
+  column name     => { data_type => 'varchar', size => 100 };
+  primary_key 'artistid';
+  has_many cds => 'MyApp::Schema::Result::CD', 'artistid';
+  1;
+
+Key aliases exported by Candy:
+
+  column             -> add_columns
+  primary_key        -> set_primary_key
+  unique_constraint  -> add_unique_constraint
+  relationship       -> add_relationship
+
+Candy is derived from C<DBIx::Class::Candy>, which has been integrated into
+the core distribution.
+
+=head2 Cake (DDL-like DSL - most concise)
+
+L<DBIO::Cake> reads like schema DDL. Type functions (C<integer>, C<varchar>,
+C<serial>, C<uuid>, C<json>, C<jsonb>, C<text>, C<boolean>, ...) replace the
+verbose column-info hashref.
+
+  package MyApp::Schema::Result::Artist;
+  use DBIO::Cake;
+  col artistid => serial, auto_inc;
+  col name     => varchar(100);
+  primary_key 'artistid';
+  has_many cds => 'MyApp::Schema::Result::CD', 'artistid';
+  1;
+
+Cake modifiers:
+
+  null        auto_inc     fk($target)
+  default     unsigned     on_create    on_update
+
+Driver shortcuts activate driver-specific column types and components in one
+import flag:
+
+  use DBIO::Cake -Pg;       # PostgreSQL defaults (uuid, jsonb, ...)
+  use DBIO::Cake -MySQL;
+  use DBIO::Cake -SQLite;
+
+Other import flags:
+
+  -inflate_datetime    load InflateColumn::DateTime automatically
+  -inflate_json        inflate json columns to hashrefs
+  -inflate_jsonb       inflate jsonb columns (PostgreSQL)
+  -retrieve_defaults   fetch server-side defaults after insert
+
+The type registry on the active Storage class (C<cake_defaults()>,
+C<type_info($name)>) drives driver-aware column type resolution.
+
+=head1 INTEGRATED COMPONENTS
+
+The following features were previously separate CPAN distributions or
+required C<load_components>. In DBIO they are part of core and need no
+explicit loading unless noted.
+
+=head2 DBIO::Timestamp (was DBIx::Class::TimeStamp)
+
+Automatic C<created_at> / C<updated_at> timestamps. Configure per column:
+
+  col created_at => timestamp, on_create;
+  col updated_at => timestamp, on_update;
+
+Or use the helpers available in all three styles:
+
+  col_created 'created_at';        # set on insert
+  col_updated 'updated_at';        # set on insert and update
+  cols_updated_created();          # both with default names
+
+Available via L<DBIO::Timestamp>. No C<load_components> needed in Cake or
+Candy; Vanilla code can still load it explicitly.
+
+=head2 Row helpers (was DBIx::Class::Helpers)
+
+The following helpers from C<DBIx::Class::Helpers> are integrated directly
+into L<DBIO::Row> and require no C<load_components> call:
+
+=over 4
+
+=item L<DBIO::Row/TO_JSON> - serializable hashref, excludes blob/text columns
+
+=item L<DBIO::Row/serializable_columns> - list of serializable column names
+
+=item L<DBIO::Row/self_rs> - a ResultSet scoped to this row
+
+=item L<DBIO::Row/get_storage_value> - original DB value before in-memory changes
+
+=item L<DBIO::Row/before_column_change> - fire a callback before a column is modified
+
+=item L<DBIO::Row/after_column_change> - fire a callback after a column is modified
+
+=item L<DBIO::Row/around_column_change> - wrap a column update with an around-style hook
+
+=item L<DBIO::Row/proxy_resultset_method> - expose a ResultSet C<with_*> method as a row accessor
+
+=back
+
+These come from C<DBIx::Class::Helper::Row::StorageValues>,
+C<DBIx::Class::Helper::Row::OnColumnChange>, and
+C<DBIx::Class::Helper::ResultSet::ProxyResultSetMethod>.
+
+=head2 IntrospectableM2M (was DBIx::Class::IntrospectableM2M)
+
+Many-to-many introspection is integrated into
+L<DBIO::Relationship::ManyToMany>. The C<_m2m_metadata> structure is
+populated automatically when you declare a C<many_to_many> relationship. No
+C<load_components> needed.
+
+Accessible fields: C<accessor>, C<relation>, C<foreign_relation>,
+C<rs_method>, C<add_method>, C<set_method>, C<remove_method>.
+
+=head2 DBIO::UUIDColumns (was DBIx::Class::UUIDColumns)
+
+Auto-generate UUID values on insert. Mark columns with:
+
+  uuid_columns('id');            # Vanilla/Candy
+  col id => uuid, auto_inc;      # Cake (uses uuid_columns internally)
+
+The UUID class defaults to the first available among C<Data::UUID>,
+C<UUID>, C<UUID::Random>. Override with C<uuid_class()>.
+
+See L<DBIO::UUIDColumns>.
+
+=head2 DBIO::EncodedColumn
+
+One-way encoding of column values (passwords, tokens). Mark a column:
+
+  __PACKAGE__->add_columns(
+      password => {
+          data_type       => 'varchar',
+          size            => 100,
+          encode_column   => 1,
+          encode_class    => 'Digest',
+          encode_args     => { algorithm => 'SHA-256', format => 'hex' },
+          encode_check_method => 'check_password',
+      },
+  );
+
+The column is encoded transparently on write. The C<check_password>
+(or whatever name you give C<encode_check_method>) method is generated
+automatically on the Result class.
+
+Storage format: C<dbio$E<lt>algoE<gt>$E<lt>salt_b64E<gt>$E<lt>digest_b64E<gt>>.
+
+See L<DBIO::EncodedColumn>.
+
+=head2 DBIO::HashAccessor
+
+Accessor generation for serialized hash columns (JSON, YAML, MessagePack):
+
+  __PACKAGE__->add_hash_accessor('metadata', 'metadata_col');
+
+Generates: C<metadata()>, C<metadata_hash()>, C<metadata_hash_delete()>,
+C<metadata_push()>, C<metadata_shift()>.
+
+See L<DBIO::HashAccessor>.
+
+=head2 InflateColumn::Serializer (JSON, YAML, MessagePack)
+
+Serialize complex Perl structures to a text/blob column. Available via
+C<load_components('InflateColumn::Serializer')>. Serializer options:
+C<JSON>, C<YAML>, C<Sereal>, C<MsgPack>.
+
+=head2 PopulateMore (was DBIx::Class::PopulateMore)
+
+Enhanced C<populate()> that supports cross-source references, fixture
+data from files, and batch inserts. Integrated into L<DBIO::Schema>.
+The invocation syntax is unchanged:
+
+  $schema->populate([ Users => ... ]);
+
+=head1 NEW CONCEPTS
+
+These features did not exist in DBIx::Class in any form.
+
+=head2 DBIO::ChangeLog - audit trail per Result class
+
+Automatic row-level change tracking. Add to a Result class:
+
+  __PACKAGE__->load_components('ChangeLog');
+
+DBIO creates a companion table C<E<lt>tableE<gt>_changelog> automatically.
+By default every column change is recorded (INSERT, UPDATE, DELETE).
+Exclude sensitive columns:
+
+  __PACKAGE__->changelog_exclude_columns(qw/ password_hash session_token /);
+
+Changes are stored as JSON. Methods:
+
+  $row->changelog_entries();          # ResultSet of log rows
+  $schema->changelog_serialize_changes($hashref);
+  $schema->changelog_deserialize_changes($json_str);
+
+PostgreSQL storage can use native C<jsonb> for the changes column.
+The version table was renamed from C<dbix_class_schema_versions> to
+C<dbio_schema_versions>.
+
+See L<DBIO::ChangeLog> and L<DBIO::Schema::ChangeLog>.
+
+=head2 DBIO::AccessBroker - credential source interface
+
+A storage-agnostic interface for credential lifecycle management. A broker
+is a B<CredentialSource>: it supplies the connect info for one backend
+identity. It does not route and does not own a host list - read/write
+routing and the master/replicant topology belong to L<DBIO::Replicated>.
+Pass a broker to C<connect()> in place of a DSN; the storage detects it
+and attaches it:
+
+  my $schema = MyApp::Schema->connect(
+      DBIO::AccessBroker::Static->new(
+          dsn      => $dsn,
+          username => $user,
+          password => $pass,
+      )
+  );
+
+The storage calls C<connect_info_for_storage($storage)> on the broker
+before each connection. One credential can serve many servers via a
+C<< $broker->for_host($host) >> view.
+
+Built-in broker classes:
+
+=over 4
+
+=item L<DBIO::AccessBroker::Static> - single DSN, drop-in replacement
+
+=item L<DBIO::AccessBroker::Vault> - rotating credentials with TTL
+
+=item L<DBIO::AccessBroker::HostBound> - one credential identity pinned to one host
+
+=back
+
+Build a custom broker by subclassing L<DBIO::AccessBroker> and implementing
+C<connect_info_for_storage>, C<needs_refresh>, and C<refresh>.
+
+=head2 DBIO::Moo and DBIO::Moose - OO framework bridges
+
+Use Moo or Moose attributes alongside DBIO column accessors in the same
+Result, ResultSet, or Schema class.
+
+  package MyApp::Schema::Result::Artist;
+  use DBIO::Moo;
+  use DBIO::Cake;
+
+  col artistid => serial, auto_inc;
+  col name     => varchar(100);
+  primary_key 'artistid';
+
+  has display_name => (is => 'lazy');
+  sub _build_display_name { 'Artist: ' . $_[0]->name }
+
+  1;
+
+L<DBIO::Moo> and L<DBIO::Moose> wire the framework constructor
+(C<FOREIGNBUILDARGS> for Moo, C<BUILDARGS> for Moose) into DBIO's C<new()>
+so that DBIO column data is routed correctly and Moo/Moose attributes are
+filtered from DBIO's column constructor.
+
+Combinations with Cake and Candy are fully supported. Use
+L<DBIO::Cake> with C<use DBIO::Moo> in the same file.
+
+See L<DBIO::Moo> and L<DBIO::Moose>.
+
+=head2 Async storage interface
+
+L<DBIO::Storage::Async> defines a storage-agnostic async interface
+(Phase 1 + 2). Queries return C<Future> objects. Two concrete
+implementations bypass DBI entirely:
+
+=over 4
+
+=item C<DBIO::PostgreSQL::Async> (C<DBIO-PostgreSQL-Async>) - C<libpq> via
+C<EV::Pg>; adds LISTEN/NOTIFY, COPY IN/OUT, and request pipelining.
+
+=item C<DBIO::MySQL::Async> (C<DBIO-MySQL-Async>) - the MariaDB client via
+C<EV::MariaDB>; adds pipelining and connection-pool transaction pinning.
+
+=back
+
+The core async interface is in C<DBIO::Storage::Async>. Application code
+that targets multiple backends should program against that interface.
+
+=head2 Type registry on Storage
+
+Each driver's Storage class exposes:
+
+  $schema->storage->cake_defaults()        # hashref of driver-preferred options
+  $schema->storage->type_info($type_name)  # { components => [...], cake_options => {...} }
+
+The Cake DSL reads this registry when resolving column types so that, for
+example, C<col data =E<gt> jsonb> on a PostgreSQL storage automatically
+activates C<InflateColumn::JSONB>.
+
+=head2 DBIO::Storage::DateTimeFormat - shared driver datetime base
+
+DBIx::Class drivers each hand-rolled a private C<DateTime::Format::*> wrapper
+package inside their storage class, typically C<require>-ing
+L<DateTime::Format::Strptime> at runtime. DBIO replaces these with a shared
+base, L<DBIO::Storage::DateTimeFormat>. A driver's datetime format class
+declares its strptime patterns as class data and may name a preferred CPAN
+C<DateTime::Format::*> class:
+
+  package DBIO::DriverName::DateTime::Format;
+  use base 'DBIO::Storage::DateTimeFormat';
+  __PACKAGE__->preferred_format_class('DateTime::Format::DriverName'); # optional
+  __PACKAGE__->datetime_parse_pattern('%Y-%m-%d %H:%M:%S');
+  __PACKAGE__->datetime_format_pattern('%Y-%m-%d %H:%M:%S');
+
+When the preferred class is installed it handles parsing and formatting;
+otherwise the declared patterns are used via L<DateTime::Format::Strptime>
+(a hard dependency of core, so drivers declare nothing extra). The pattern
+fallback round-trips identically to the preferred class.
+
+=head1 UTILITY CHANGES
+
+=head2 DBIO::Util replaces DBIx::Class::_ENV_
+
+The internal C<DBIx::Class::_ENV_> pseudo-package has been removed. All runtime
+constants and utility functions are now in L<DBIO::Util>:
+
+  use DBIO::Util qw( is_windows help_url scope_guard ... );
+
+Exported functions include:
+
+  is_windows   is_dev_release   old_mro   has_ithreads
+  dbiotest     peepeeness       shuffle_unordered_resultsets
+  help_url     iv_size          os_name
+
+  sigwarn_silencer   modver_gt_or_eq   fail_on_internal_wantarray
+  refdesc  refcount  hrefaddr  scope_guard
+  quote_sub  qsub  perlstring  serialize  dump_value
+  UNRESOLVABLE_CONDITION
+
+  dir_path   file_path   parent_dir   slurp_file   write_file
+  mkpath     rmtree      split_name   class_path
+
+  firstidx  uniq  apply  array_eq
+  is_plain_value   is_literal_value
+
+C<Path::Class> is no longer a dependency; use the C<DBIO::Util> path helpers
+instead.
+
+=head2 DBIOx namespace
+
+The C<DBIOx::> namespace is reserved for official DBIO extensions that are
+not part of the core distribution - analogous to C<DBIx::> but scoped to the
+DBIO ecosystem.
+
+=head1 REMOVED FEATURES
+
+=head2 Class::DBI compatibility (CDBICompat)
+
+The C<DBIx::Class::CDBICompat> layer and the legacy C<DB.pm> shim have been
+removed entirely. There is no replacement. If you depend on C<Class::DBI>
+compatibility, stay on DBIx::Class or port your code.
+
+=head2 Hide-from-PAUSE package trick
+
+Internal packages no longer use the C<package # hide from PAUSE\nFoo::Bar;>
+trick. L<Meta::NoIndex> in the distribution's C<META.yml> handles PAUSE
+exclusion instead.
+
+=head2 Removed external dependencies
+
+=over 4
+
+=item C<SQL::Abstract::Classic> - replaced by C<SQL::Abstract>
+
+=item C<Path::Class> - replaced by helpers in L<DBIO::Util>
+
+=item C<Sub::Name> - no longer used
+
+=item C<SQL::Abstract::Util> - merged into L<SQL::Abstract> core
+
+=back
+
+=head1 TESTING INFRASTRUCTURE
+
+=head2 DBIO::Test - database-free unit testing
+
+Core tests B<must not> use a real database. L<DBIO::Test> provides a mock
+storage back-end:
+
+  use DBIO::Test;
+  my $schema = DBIO::Test->init_schema();    # fake storage, no DBI
+
+  my $storage = $schema->storage;
+  $storage->mock(qr/SELECT .* FROM artist/, [
+      { artistid => 1, name => 'Tori Amos' },
+  ]);
+
+Driver-specific tests (real SQL, real DBI) belong in the driver distributions.
+
+=head2 Shared test schemas
+
+Test schemas shared across the core and driver distributions live in
+C<DBIO::Test::Schema::*> under C<dbio/lib/>:
+
+  DBIO::Test::Schema::Vanilla
+  DBIO::Test::Schema::Candy
+  DBIO::Test::Schema::Cake
+  DBIO::Test::Schema::Moo
+  DBIO::Test::Schema::Moose
+
+Load driver-specific result classes with the hashref form:
+
+  DBIO::Test::Schema->load_classes({
+      'DBIO::PostgreSQL::Test' => ['SequenceTest'],
+  });
+
+Never redefine a shared schema class inline inside a driver test.
+
+=head2 Environment variables renamed
+
+All test environment variables were renamed from C<DBICTEST_*> to
+C<DBIO_TEST_*>:
+
+  DBIO_TEST_PG_DSN         PostgreSQL DSN
+  DBIO_TEST_MYSQL_DSN      MySQL/MariaDB DSN
+  DBIO_TEST_SQLITE_DSN     SQLite DSN (rarely needed, usually in-memory)
+
+=head1 MIGRATION QUICK-REFERENCE
+
+  DBIx::Class concept               DBIO equivalent
+  ---------------------------------------------------------------------
+  DBIx::Class::*                    DBIO::*
+  use base 'DBIx::Class::Core'      use base 'DBIO::Core'  (Vanilla)
+                                    use DBIO::Candy;       (Candy)
+                                    use DBIO::Cake;        (Cake)
+  sql_limit_dialect / emulate_limit apply_limit on SQLMaker subclass
+  SQL::Abstract::Classic            SQL::Abstract (>= 1.99)
+  DBIx::Class::TimeStamp            DBIO::Timestamp (integrated)
+  DBIx::Class::Helpers              DBIO::Row helpers (integrated)
+  DBIx::Class::IntrospectableM2M    ManyToMany (integrated)
+  DBIx::Class::UUIDColumns          DBIO::UUIDColumns (integrated)
+  DBIx::Class::Replicated           DBIO::Replicated (in core)
+  DBIx::Class::CDBICompat           removed (no replacement)
+  DBICTest::*                       DBIO::Test::*
+  DBICTEST_* env vars               DBIO_TEST_* env vars
+  dbix_class_schema_versions        dbio_schema_versions
+  SQL::Translator (DDL/deploy)      native Deploy per driver (optional)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<DBIO::Manual> - documentation overview
+
+=item L<DBIO::Manual::DocMap> - full documentation map
+
+=item L<DBIO::Manual::Migration> - step-by-step DBIx::Class to DBIO conversion
+
+=item L<DBIO::Base> - meta-infrastructure base class
+
+=item L<DBIO::Candy> - import-sugar layer
+
+=item L<DBIO::Cake> - DDL-like DSL layer
+
+=item L<DBIO::Timestamp> - automatic timestamp columns
+
+=item L<DBIO::UUIDColumns> - automatic UUID columns
+
+=item L<DBIO::EncodedColumn> - one-way column encoding
+
+=item L<DBIO::ChangeLog> - row-level audit trail
+
+=item L<DBIO::AccessBroker> - connection routing interface
+
+=item L<DBIO::Moo> - Moo attribute bridge
+
+=item L<DBIO::Moose> - Moose attribute bridge
+
+=item L<DBIO::Replicated> - replicated storage
+
+=item L<DBIO::Test> - database-free test infrastructure
+
+=item L<DBIO::Util> - utility functions
+
+=item L<DBIO::Storage::DateTimeFormat> - shared driver datetime base
+
+=back
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

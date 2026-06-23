@@ -1,5 +1,5 @@
 package Algorithm::QuadTree::PP;
-$Algorithm::QuadTree::PP::VERSION = '0.7';
+$Algorithm::QuadTree::PP::VERSION = '0.8';
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -177,10 +177,13 @@ sub _AQT_addObject
 {
 	my ($self, $object, @coords) = @_;
 
-	for my $node (@{_loopOnNodes($self, 0, @coords)}) {
+	my $nodes = _loopOnNodes($self, 0, @coords);
+	for my $node (@$nodes) {
 		push @{$node->{OBJECTS}}, $object;
-		push @{$self->{BACKREF}{$object}}, $node;
 	}
+
+	$self->{BACKREF}{$object} = \@coords
+		unless @$nodes == 0;
 }
 
 sub _AQT_findObjects
@@ -204,8 +207,9 @@ sub _AQT_delete
 	my ($self, $object) = @_;
 
 	return unless exists $self->{BACKREF}{$object};
+	my @coords = @{$self->{BACKREF}{$object}};
 
-	for my $node (@{$self->{BACKREF}{$object}}) {
+	for my $node (@{_loopOnNodes($self, 1, @coords)}) {
 		@{$node->{OBJECTS}} = grep {$_ ne $object} @{$node->{OBJECTS}};
 		_clearHasObjects($node) if !@{$node->{OBJECTS}};
 	}
@@ -229,7 +233,7 @@ sub _AQT_clear
 		}
 	}
 
-	$self->{BACKREF} = {};
+	%{$self->{BACKREF}} = ();
 }
 
 1;

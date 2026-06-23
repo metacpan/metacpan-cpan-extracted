@@ -263,7 +263,7 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 		if((j = ctrl[0]) < 0 || j >= s_BSDIPA_OFF_MAX)
 			goto jleave;
 
-		/* A data-less control (but the first) is "malicious" */
+		/* A data-less control (but the first) is "malicious" (see s-bsdiff.c) */
 		if(any_tick && k == 0 && j == 0)
 			goto jleave;
 
@@ -283,7 +283,7 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 				pcp->pc_restored_dat[respos++] = *--pcp->pc_diff_dat + pcp->pc_after_dat[aftpos++];
 		}
 
-		/* Extra dat */
+		/* Extra data */
 		j = ctrl[1];
 		if(j != 0){
 			if(pcp->pc_header.h_extra_len < j)

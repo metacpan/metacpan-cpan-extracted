@@ -98,6 +98,11 @@
 /* Backwards compatibility - alias for XOP_COMPAT_HAS_XOP */
 #define OBJECT_HAS_XOP XOP_COMPAT_HAS_XOP
 
+/* G_LIST - introduced in 5.18, aliased to G_ARRAY for older perls */
+#ifndef G_LIST
+#  define G_LIST G_ARRAY
+#endif
+
 /* Op sibling macros - introduced in 5.22 */
 #ifndef OpHAS_SIBLING
 #  define OpHAS_SIBLING(o)      ((o)->op_sibling != NULL)

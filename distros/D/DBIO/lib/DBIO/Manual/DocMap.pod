@@ -1,0 +1,157 @@
+# PODNAME: DBIO::Manual::DocMap
+# ABSTRACT: Guide to the DBIO documentation set
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual::DocMap - Guide to the DBIO documentation set
+
+=head1 VERSION
+
+version 0.900000
+
+=head1 Manuals
+
+=over 4
+
+=item L<DBIO::Manual> - User's Manual overview.
+
+=item L<DBIO::Manual::QuickStart> - Up and running with DBIO in 10 minutes.
+
+=item L<DBIO::Manual::Heritage> - Everything that changed from DBIx::Class to DBIO.
+
+=item L<DBIO::Manual::Migration> - Step-by-step migration of an existing DBIx::Class codebase.
+
+=item L<DBIO::Manual::Intro> - More detailed introduction to setting up and using DBIO.
+
+=item L<DBIO::Manual::SQLHackers> - How to use DBIO if you know SQL (external, available on CPAN)
+
+=item L<DBIO::Manual::Joining> - Joining tables with DBIO.
+
+=item L<DBIO::Manual::Features> - Feature overview with links into the API and manuals.
+
+=item L<DBIO::Manual::Glossary> - What do all those terms mean?
+
+=item L<DBIO::Manual::Cookbook> - Various short recipes on how to do things.
+
+=item L<DBIO::Manual::FAQ> - Frequently Asked Questions.
+
+=item L<DBIO::Manual::Troubleshooting> - What to do if things go wrong (diagnostics of known error messages).
+
+=back
+
+=head1 Driver distributions
+
+Database-specific storage implementations are split into dedicated
+distributions. Install the driver distribution that matches your backend:
+
+=over 4
+
+=item L<DBIO::PostgreSQL> (distribution: C<DBIO-PostgreSQL>)
+
+=item L<DBIO::MySQL> (distribution: C<DBIO-MySQL>)
+
+=item L<DBIO::SQLite> (distribution: C<DBIO-SQLite>)
+
+=back
+
+Additional driver distributions exist for other databases as the wider DBIO
+ecosystem continues to split out of the old monolithic layout.
+
+=head1 Core capabilities
+
+Some important capabilities live in the core distribution rather than in a
+database-specific driver:
+
+=over 4
+
+=item L<DBIO::Replicated> - Replicated storage support in DBIO core.
+
+=item L<DBIO::Test> - Shared test harness for DBIO and driver distributions.
+
+=back
+
+=head1 Some essential reference documentation
+
+The first two list items are the most important.
+
+=over 4
+
+=item L<DBIO::ResultSet/search> - Selecting and manipulating sets.
+
+The DSL (mini-language) for query composition is only partially explained there,
+see L<SQL::Abstract/WHERE CLAUSES> for the complete details.
+
+=item L<C<$schema>::Result::C<$resultclass>|DBIO::Manual::ResultClass>
+- Classes representing a single result (row) from a DB query.
+
+Such classes normally subclass L<DBIO::Core>, the methods inherited
+from L<DBIO::Row|DBIO::Row/METHODS> and
+L<DBIO::Relationship::Base|DBIO::Relationship::Base/METHODS>
+are used most often.
+
+=item L<DBIO::ResultSetColumn> - Perform operations on a single column of a ResultSet.
+
+=item L<DBIO::ResultSource> - Source/Table definition functions.
+
+=item L<DBIO::Schema> - Overall sources, and connection container.
+
+=item L<DBIO::Relationship> - Simple relationship declarations.
+
+=item L<DBIO::Relationship::Base> - Relationship declaration details.
+
+=item L<DBIO::InflateColumn> - Making objects out of your column values.
+
+=back
+
+=head1 Command-line tools
+
+=over 4
+
+=item L<dbioadmin> - Schema administration: deploy, upgrade, create DDL diffs,
+and run select/insert/update/delete against a live schema. Thin CLI frontend
+for L<DBIO::Admin>.
+
+=item L<dbiogen> - Connect to a database, introspect the schema, and generate
+DBIO Result class files. Supports Vanilla, Candy, and Cake output styles.
+Uses L<DBIO::Generate>.
+
+=back
+
+=head1 Examples and benchmarks
+
+The F<examples/> directory in the distribution contains runnable code:
+
+=over 4
+
+=item F<examples/Schema/> - Artist/CD/Track schema in Vanilla, Candy, and Cake
+style with F<insertdb.pl> and F<testdb.pl>. Pass the schema name as an
+argument: C<perl testdb.pl SchemaCandy>
+
+=item F<examples/Benchmarks/benchmark_datafetch.pl> - Row fetch performance
+using L<DBIO::ResultClass::HashRefInflator>.
+
+=item F<examples/Benchmarks/benchmark_hashrefinflator.pl> - HashRefInflator
+implementation comparison.
+
+=back
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

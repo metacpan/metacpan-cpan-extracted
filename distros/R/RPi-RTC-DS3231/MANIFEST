@@ -1,3 +1,4 @@
+.claude/settings.local.json
 bit.c
 bit.h
 Changes
@@ -9,6 +10,7 @@ MANIFEST.SKIP
 README
 rtc.h
 t/00-load.t
+t/01-bcd-encoding.t
 t/05-sec.t
 t/10-min.t
 t/15-hour.t

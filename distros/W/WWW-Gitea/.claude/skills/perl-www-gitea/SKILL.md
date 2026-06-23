@@ -42,11 +42,11 @@ Everything hangs off the client. Controllers are lazy and cached:
 | `$gitea->misc`       | `API::Misc`                      | `version`, `current_user`               |
 | `$gitea->users`      | `API::Users`                     | get, search                             |
 | `$gitea->repos`      | `API::Repos`                     | get/create/edit/delete/search/fork/list |
-| `$gitea->issues`     | `API::Issues`                    | list/create/get/edit/search + comments  |
+| `$gitea->issues`     | `API::Issues`                    | list/create/get/edit/search + comments + (issue & comment) attachments |
 | `$gitea->pulls`      | `API::PullRequests`              | list/create/get/edit/merge/is_merged    |
 | `$gitea->labels`     | `API::Labels`                    | list/create/get/edit/delete             |
 | `$gitea->milestones` | `API::Milestones`                | list/create/get/edit/delete             |
-| `$gitea->releases`   | `API::Releases`                  | list/create/get/get_by_tag/edit/delete  |
+| `$gitea->releases`   | `API::Releases`                  | list/create/get/get_by_tag/edit/delete + assets |
 | `$gitea->orgs`       | `API::Orgs`                      | get/create/edit/delete/repos/list       |
 
 `owner`/`repo`/`index`/`id` are passed as positional arguments; the request body / query
@@ -121,6 +121,38 @@ my $byTag = $gitea->releases->get_by_tag('getty', 'repo', 'v1.0.0');
 Labels, milestones and releases are addressed by numeric **`id`** (not name) — except a
 release also has `get_by_tag`.
 
+### Attachments / assets
+
+Gitea attaches files to three things — releases (called *assets*), issues, and comments. All
+three expose the same five operations and return `WWW::Gitea::Attachment`. Create uses
+`multipart/form-data`: pass **either** `file => $path` **or** `content => $bytes`; `name` sets
+the display name (sent as the `name` query param), `filename` the multipart part name.
+
+```perl
+# release assets — by release id
+my $asset = $gitea->releases->create_asset('getty', 'repo', $rel_id,
+    file => '/path/dist.tar.gz', name => 'dist.tar.gz');
+my $list  = $gitea->releases->assets('getty', 'repo', $rel_id);
+$gitea->releases->edit_asset('getty', 'repo', $rel_id, $asset->id, name => 'renamed');
+$gitea->releases->delete_asset('getty', 'repo', $rel_id, $asset->id);
+
+# issue attachments — by issue index
+$gitea->issues->create_attachment('getty', 'repo', 7, content => $bytes, name => 'log.txt');
+$gitea->issues->attachments('getty', 'repo', 7);
+
+# comment attachments — by comment id
+$gitea->issues->create_comment_attachment('getty', 'repo', 99, file => '/path/x.png');
+$gitea->issues->comment_attachments('getty', 'repo', 99);
+#   also: get_comment_attachment / edit_comment_attachment / delete_comment_attachment
+
+$asset->name; $asset->size; $asset->browser_download_url; $asset->uuid;
+```
+
+Entities delegate too: `$rel->assets`, `$rel->create_asset(...)`, `$rel->delete_asset($id)`;
+`$issue->attachments`, `$issue->create_attachment(...)`, `$issue->delete_attachment($id)`.
+Comment attachments have no entity shortcut (the `Comment` entity carries no owner/repo) — use
+the `$gitea->issues->*_comment_attachment` controller methods.
+
 ### Organizations
 
 ```perl
@@ -132,8 +164,8 @@ my $mine  = $gitea->orgs->list;                    # orgs the authed user belong
 ## Entity objects
 
 Every call returns a small entity (`WWW::Gitea::Repo`, `::Issue`, `::PullRequest`, `::Label`,
-`::Milestone`, `::Release`, `::Org`, `::User`, `::Comment`). They expose the commonly needed
-fields as accessors and keep the full decoded JSON on `->data`:
+`::Milestone`, `::Release`, `::Org`, `::User`, `::Comment`, `::Attachment`). They expose the
+commonly needed fields as accessors and keep the full decoded JSON on `->data`:
 
 ```perl
 $issue->data->{pull_request};            # reach anything not exposed as an accessor

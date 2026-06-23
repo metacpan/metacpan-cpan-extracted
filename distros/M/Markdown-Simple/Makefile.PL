@@ -41,6 +41,39 @@ sub _probe_compile {
     return $ok ? 1 : 0;
 }
 
+# LTO probe: compile a trivial .c with $cflags (which includes -flto) and
+# then link it as a shared object using $Config{lddlflags} *without* the
+# extra cflags. This mirrors exactly what MakeMaker does: OPTIMIZE goes
+# to the compile step, lddlflags goes to the link step. Old clang (≤ 3.6)
+# emits LLVM bitcode into the .o under -flto, which the system BFD ld
+# then refuses with "file not recognized: File format not recognized".
+# A check_lib-style probe (compile+link with same flags) would miss this
+# entirely because the link step would also get -flto and clang would
+# drive the LTO link path.
+sub _probe_lto_link {
+    my ($cflags) = @_;
+    my ($fh, $cfile) = File::Temp::tempfile(SUFFIX => '.c', UNLINK => 1);
+    print $fh "int mds_lto_probe(void) { return 0; }\n";
+    close $fh;
+    my $ofile  = "${cfile}.o";
+    my $sofile = "${cfile}." . ($Config{dlext} || 'so');
+    my $cc     = $Config{cc} || 'cc';
+    my $ccfl   = $Config{ccflags}  || '';
+    my $lddl   = $Config{lddlflags} || '-shared';
+    my $redir  = ($^O eq 'MSWin32') ? '>NUL 2>&1' : '>/dev/null 2>&1';
+    my $rc_c   = system("$cc $ccfl $cflags -c $cfile -o $ofile $redir");
+    my $ok     = 0;
+    if ($rc_c == 0 && -s $ofile) {
+        my $rc_l = system("$cc $lddl $ofile -o $sofile $redir");
+        $ok = ($rc_l == 0 && -s $sofile);
+    }
+    unlink $ofile  if -e $ofile;
+    unlink $sofile if -e $sofile;
+    print "probe: LTO (compile -flto, link plain) ... ",
+          ($ok ? "yes\n" : "no\n");
+    return $ok ? 1 : 0;
+}
+
 my @SIMD_DEFINES;
 my $arch = "$Config{archname} $Config{myarchname} $Config{archname64}";
 
@@ -117,7 +150,16 @@ elsif ($ENV{MDS_DEBUG}) {
 }
 else {
     my $base = '-O3';
-    my $lto_ok = _probe('LTO', "$base -flto", undef, 'return 0;');
+    # LTO probe — must mimic the *actual* MakeMaker two-step pipeline:
+    # compile with -flto via OPTIMIZE, then link with $Config{lddlflags}
+    # which does NOT carry -flto. Old clang (≤ 3.6) plus default system
+    # ld is the failure mode: clang emits LLVM bitcode into the .o, then
+    # BFD ld chokes with "file not recognized: File format not recognized".
+    # check_lib() would miss this because it compiles+links with the same
+    # flags, so the link sees -flto and clang drives the LTO link path.
+    # We have to split the steps to catch the asymmetry. See CPAN Testers
+    # c90d6af4 / ccf4b794 / 56908ee0 (FreeBSD 10 + clang 3.4).
+    my $lto_ok = _probe_lto_link("$base -flto");
     $OPTIMIZE_FLAGS = $lto_ok ? "$base -flto" : $base;
 }
 print "OPTIMIZE: $OPTIMIZE_FLAGS\n";

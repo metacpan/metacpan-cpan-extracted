@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::ResultSet;
 # ABSTRACT: A Result Set
-$MetaCPAN::Client::ResultSet::VERSION = '2.043000';
+$MetaCPAN::Client::ResultSet::VERSION = '2.044000';
 use Moo;
 use Carp;
 
@@ -31,8 +31,19 @@ has scroller => (
 
 # in case we're returning from a fetch
 has items => (
-    is  => 'ro',
-    isa => ArrayRef,
+    is      => 'ro',
+    isa     => ArrayRef,
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return [] unless $self->has_scroller;
+
+        my @items;
+        while ( defined( my $result = $self->scroller->next ) ) {
+            push @items, $result;
+        }
+        return \@items;
+    },
 );
 
 has total => (
@@ -109,7 +120,7 @@ MetaCPAN::Client::ResultSet - A Result Set
 
 =head1 VERSION
 
-version 2.043000
+version 2.044000
 
 =head1 DESCRIPTION
 

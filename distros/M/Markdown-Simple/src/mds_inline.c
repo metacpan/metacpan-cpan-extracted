@@ -418,6 +418,7 @@ static size_t try_entity(scn* z, size_t pos) {
     size_t q;
     size_t name_start;
     const mds_entity* e;
+    mds_entity ent_scratch;
     if (pos + 1 >= n) return 0;
     q = pos + 1;
     if (s[q] == '#') {
@@ -467,7 +468,7 @@ static size_t try_entity(scn* z, size_t pos) {
     name_start = q;
     while (q < n && isalnum((unsigned char)s[q])) q++;
     if (q == name_start || q >= n || s[q] != ';') return 0;
-    e = mds_entity_lookup(s + name_start, q - name_start);
+    e = mds_entity_lookup(s + name_start, q - name_start, &ent_scratch);
     if (!e) return 0;
     q++;
     append_text_dup(z, e->utf8, e->ulen);
@@ -768,8 +769,9 @@ static int parse_link_title(const char* s, size_t* pp, size_t n,
 /* ---------------- find matching open bracket ---------------- */
 
 static inode* find_open_bracket(scn* z, int* is_image) {
+    inode* x;
     *is_image = 0;
-    for (inode* x = z->tail; x; x = x->prev) {
+    for (x = z->tail; x; x = x->prev) {
         if (x->type == N_OPEN_BRACKET || x->type == N_OPEN_BANG) {
             *is_image = (x->type == N_OPEN_BANG);
             return x;  /* return topmost — caller checks ->active */
@@ -780,7 +782,8 @@ static inode* find_open_bracket(scn* z, int* is_image) {
 
 /* Disable any '[' opener nodes appearing before x (for nested-link rule). */
 static void deactivate_brackets(scn* z, inode* x) {
-    for (inode* p = x->prev; p; p = p->prev) {
+    inode* p;
+    for (p = x->prev; p; p = p->prev) {
         if (p->type == N_OPEN_BRACKET) p->active = 0;
     }
     (void)z;
@@ -829,6 +832,7 @@ static void process_emphasis(scn* z, inode* stack_bottom) {
     inode* new_close;
     inode* prev_link;
     inode* start;
+    inode* p;
     for (a = 0; a < 3; a++)
         for (b = 0; b < 3; b++)
             for (c = 0; c < 2; c++)
@@ -989,7 +993,7 @@ static void process_emphasis(scn* z, inode* stack_bottom) {
     }
     /* clear remaining DELIMs to TEXT */
     start = stack_bottom ? stack_bottom->next : z->head;
-    for (inode* p = start; p; p = p->next) {
+    for (p = start; p; p = p->next) {
         if (p->type == N_DELIM) {
             p->type = N_TEXT;
         }
@@ -1609,7 +1613,8 @@ static void emit_node(scn* z, inode* x) {
 }
 
 static void emit_children(scn* z, inode* head) {
-    for (inode* p = head; p; p = p->next) emit_node(z, p);
+    inode* p;
+    for (p = head; p; p = p->next) emit_node(z, p);
 }
 
 /* ---------------- public entry ---------------- */

@@ -1,6 +1,6 @@
 package Pod::Weaver::PluginBundle::DBIO;
 # ABSTRACT: Pod::Weaver configuration for DBIO distributions
-our $VERSION = '0.900001';
+our $VERSION = $Dist::Zilla::PluginBundle::DBIO::VERSION;
 use strict;
 use warnings;
 
@@ -71,7 +71,7 @@ Pod::Weaver::PluginBundle::DBIO - Pod::Weaver configuration for DBIO distributio
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 
@@ -116,7 +116,7 @@ With C<heritage = 1> (code derived from DBIx::Class):
 
 =head1 AUTHOR
 
-DBIO & DBIx::Class Authors
+DBIO Authors
 
 =head1 COPYRIGHT AND LICENSE
 

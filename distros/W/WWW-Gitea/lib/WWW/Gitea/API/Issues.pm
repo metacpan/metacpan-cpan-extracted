@@ -6,6 +6,7 @@ use Moo;
 use Carp qw(croak);
 use WWW::Gitea::Issue;
 use WWW::Gitea::Comment;
+use WWW::Gitea::Attachment;
 use namespace::clean;
 
 
@@ -27,6 +28,16 @@ has openapi_operations => (
             'issues.search'         => { method => 'GET',   path => '/repos/issues/search' },
             'issues.list_comments'  => { method => 'GET',   path => '/repos/{owner}/{repo}/issues/{index}/comments' },
             'issues.create_comment' => { method => 'POST',  path => '/repos/{owner}/{repo}/issues/{index}/comments' },
+            'issues.list_attachments'          => { method => 'GET',    path => '/repos/{owner}/{repo}/issues/{index}/assets' },
+            'issues.create_attachment'         => { method => 'POST',   path => '/repos/{owner}/{repo}/issues/{index}/assets' },
+            'issues.get_attachment'            => { method => 'GET',    path => '/repos/{owner}/{repo}/issues/{index}/assets/{attachment_id}' },
+            'issues.edit_attachment'           => { method => 'PATCH',  path => '/repos/{owner}/{repo}/issues/{index}/assets/{attachment_id}' },
+            'issues.delete_attachment'         => { method => 'DELETE', path => '/repos/{owner}/{repo}/issues/{index}/assets/{attachment_id}' },
+            'issues.list_comment_attachments'  => { method => 'GET',    path => '/repos/{owner}/{repo}/issues/comments/{id}/assets' },
+            'issues.create_comment_attachment' => { method => 'POST',   path => '/repos/{owner}/{repo}/issues/comments/{id}/assets' },
+            'issues.get_comment_attachment'    => { method => 'GET',    path => '/repos/{owner}/{repo}/issues/comments/{id}/assets/{attachment_id}' },
+            'issues.edit_comment_attachment'   => { method => 'PATCH',  path => '/repos/{owner}/{repo}/issues/comments/{id}/assets/{attachment_id}' },
+            'issues.delete_comment_attachment' => { method => 'DELETE', path => '/repos/{owner}/{repo}/issues/comments/{id}/assets/{attachment_id}' },
         };
     },
 );
@@ -96,12 +107,12 @@ sub search {
 
 
 sub comments {
-    my ($self, $owner, $repo, $index) = @_;
+    my ($self, $owner, $repo, $index, %query) = @_;
     croak 'owner required' unless defined $owner;
     croak 'repo required'  unless defined $repo;
     croak 'index required' unless defined $index;
     my $data = $self->call_operation('issues.list_comments',
-        path => { owner => $owner, repo => $repo, index => $index });
+        path => { owner => $owner, repo => $repo, index => $index }, query => \%query);
     return [ map {
         WWW::Gitea::Comment->new(client => $self->client, data => $_)
     } @{ $data || [] } ];
@@ -121,6 +132,158 @@ sub create_comment {
 }
 
 
+sub _wrap_attachment {
+    my ($self, $data) = @_;
+    return WWW::Gitea::Attachment->new(client => $self->client, data => $data);
+}
+
+sub _build_upload {
+    my ($self, %args) = @_;
+    croak 'file or content required'
+        unless defined $args{file} || defined $args{content};
+    return defined $args{file}
+        ? { field => 'attachment', file => $args{file},
+            (defined $args{filename} ? (filename => $args{filename}) : ()) }
+        : { field => 'attachment', content => $args{content},
+            filename => ($args{filename} // $args{name} // 'attachment') };
+}
+
+# --- issue attachments ----------------------------------------------------
+
+sub attachments {
+    my ($self, $owner, $repo, $index, %query) = @_;
+    croak 'owner required' unless defined $owner;
+    croak 'repo required'  unless defined $repo;
+    croak 'index required' unless defined $index;
+    my $data = $self->call_operation('issues.list_attachments',
+        path => { owner => $owner, repo => $repo, index => $index },
+        query => \%query);
+    return [ map { $self->_wrap_attachment($_) } @{ $data || [] } ];
+}
+
+
+sub create_attachment {
+    my ($self, $owner, $repo, $index, %args) = @_;
+    croak 'owner required' unless defined $owner;
+    croak 'repo required'  unless defined $repo;
+    croak 'index required' unless defined $index;
+    my $upload = $self->_build_upload(%args);
+    my %query = defined $args{name} ? (name => $args{name}) : ();
+    my $data = $self->call_operation('issues.create_attachment',
+        path => { owner => $owner, repo => $repo, index => $index },
+        (%query ? (query => \%query) : ()),
+        upload => $upload);
+    return $self->_wrap_attachment($data);
+}
+
+
+sub get_attachment {
+    my ($self, $owner, $repo, $index, $attachment_id) = @_;
+    croak 'owner required'         unless defined $owner;
+    croak 'repo required'          unless defined $repo;
+    croak 'index required'         unless defined $index;
+    croak 'attachment_id required' unless defined $attachment_id;
+    my $data = $self->call_operation('issues.get_attachment',
+        path => { owner => $owner, repo => $repo, index => $index,
+            attachment_id => $attachment_id });
+    return $self->_wrap_attachment($data);
+}
+
+
+sub edit_attachment {
+    my ($self, $owner, $repo, $index, $attachment_id, %args) = @_;
+    croak 'owner required'         unless defined $owner;
+    croak 'repo required'          unless defined $repo;
+    croak 'index required'         unless defined $index;
+    croak 'attachment_id required' unless defined $attachment_id;
+    my $data = $self->call_operation('issues.edit_attachment',
+        path => { owner => $owner, repo => $repo, index => $index,
+            attachment_id => $attachment_id },
+        body => \%args);
+    return $self->_wrap_attachment($data);
+}
+
+
+sub delete_attachment {
+    my ($self, $owner, $repo, $index, $attachment_id) = @_;
+    croak 'owner required'         unless defined $owner;
+    croak 'repo required'          unless defined $repo;
+    croak 'index required'         unless defined $index;
+    croak 'attachment_id required' unless defined $attachment_id;
+    return $self->call_operation('issues.delete_attachment',
+        path => { owner => $owner, repo => $repo, index => $index,
+            attachment_id => $attachment_id });
+}
+
+
+# --- comment attachments --------------------------------------------------
+
+sub comment_attachments {
+    my ($self, $owner, $repo, $comment_id, %query) = @_;
+    croak 'owner required'      unless defined $owner;
+    croak 'repo required'       unless defined $repo;
+    croak 'comment_id required' unless defined $comment_id;
+    my $data = $self->call_operation('issues.list_comment_attachments',
+        path => { owner => $owner, repo => $repo, id => $comment_id },
+        query => \%query);
+    return [ map { $self->_wrap_attachment($_) } @{ $data || [] } ];
+}
+
+
+sub create_comment_attachment {
+    my ($self, $owner, $repo, $comment_id, %args) = @_;
+    croak 'owner required'      unless defined $owner;
+    croak 'repo required'       unless defined $repo;
+    croak 'comment_id required' unless defined $comment_id;
+    my $upload = $self->_build_upload(%args);
+    my %query = defined $args{name} ? (name => $args{name}) : ();
+    my $data = $self->call_operation('issues.create_comment_attachment',
+        path => { owner => $owner, repo => $repo, id => $comment_id },
+        (%query ? (query => \%query) : ()),
+        upload => $upload);
+    return $self->_wrap_attachment($data);
+}
+
+
+sub get_comment_attachment {
+    my ($self, $owner, $repo, $comment_id, $attachment_id) = @_;
+    croak 'owner required'         unless defined $owner;
+    croak 'repo required'          unless defined $repo;
+    croak 'comment_id required'    unless defined $comment_id;
+    croak 'attachment_id required' unless defined $attachment_id;
+    my $data = $self->call_operation('issues.get_comment_attachment',
+        path => { owner => $owner, repo => $repo, id => $comment_id,
+            attachment_id => $attachment_id });
+    return $self->_wrap_attachment($data);
+}
+
+
+sub edit_comment_attachment {
+    my ($self, $owner, $repo, $comment_id, $attachment_id, %args) = @_;
+    croak 'owner required'         unless defined $owner;
+    croak 'repo required'          unless defined $repo;
+    croak 'comment_id required'    unless defined $comment_id;
+    croak 'attachment_id required' unless defined $attachment_id;
+    my $data = $self->call_operation('issues.edit_comment_attachment',
+        path => { owner => $owner, repo => $repo, id => $comment_id,
+            attachment_id => $attachment_id },
+        body => \%args);
+    return $self->_wrap_attachment($data);
+}
+
+
+sub delete_comment_attachment {
+    my ($self, $owner, $repo, $comment_id, $attachment_id) = @_;
+    croak 'owner required'         unless defined $owner;
+    croak 'repo required'          unless defined $repo;
+    croak 'comment_id required'    unless defined $comment_id;
+    croak 'attachment_id required' unless defined $attachment_id;
+    return $self->call_operation('issues.delete_comment_attachment',
+        path => { owner => $owner, repo => $repo, id => $comment_id,
+            attachment_id => $attachment_id });
+}
+
+
 
 1;
 
@@ -136,7 +299,7 @@ WWW::Gitea::API::Issues - Gitea issues API (issues and issue comments)
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -211,8 +374,10 @@ C<limit>). Returns an ArrayRef of L<WWW::Gitea::Issue>.
 =head2 comments
 
     my $comments = $gitea->issues->comments('getty', 'p5-www-gitea', 7);
+    my $page2    = $gitea->issues->comments('getty', 'p5-www-gitea', 7, page => 2, limit => 50);
 
-Lists the comments on an issue. Returns an ArrayRef of L<WWW::Gitea::Comment>.
+Lists the comments on an issue. Accepts the Gitea query parameters (C<page>,
+C<limit>, C<since>, C<before>). Returns an ArrayRef of L<WWW::Gitea::Comment>.
 
 =head2 create_comment
 
@@ -220,6 +385,89 @@ Lists the comments on an issue. Returns an ArrayRef of L<WWW::Gitea::Comment>.
         'getty', 'p5-www-gitea', 7, 'thanks!');
 
 Adds a comment to an issue. Returns the new L<WWW::Gitea::Comment>.
+
+=head2 attachments
+
+    my $attachments = $gitea->issues->attachments('getty', 'p5-www-gitea', 7);
+
+Lists the attachments on an issue. Accepts the Gitea query parameters
+(C<page>, C<limit>). Returns an ArrayRef of L<WWW::Gitea::Attachment>.
+
+=head2 create_attachment
+
+    my $a = $gitea->issues->create_attachment('getty', 'p5-www-gitea', 7,
+        file => '/path/to/log.txt', name => 'log.txt');
+
+    my $a = $gitea->issues->create_attachment('getty', 'p5-www-gitea', 7,
+        content => $bytes, name => 'log.txt');
+
+Uploads an attachment to an issue via C<multipart/form-data>. Pass B<either>
+C<file> (a path on disk) B<or> C<content> (raw bytes); C<name> sets the display
+name (C<name> query parameter), C<filename> the multipart part filename.
+Returns a L<WWW::Gitea::Attachment>.
+
+=head2 get_attachment
+
+    my $a = $gitea->issues->get_attachment('getty', 'p5-www-gitea', 7, 12);
+
+Fetches a single issue attachment by its numeric attachment id. Returns a
+L<WWW::Gitea::Attachment>.
+
+=head2 edit_attachment
+
+    $gitea->issues->edit_attachment('getty', 'p5-www-gitea', 7, 12,
+        name => 'renamed.txt');
+
+Edits an issue attachment (only C<name> is editable). Arguments are passed
+through as the JSON body. Returns the updated L<WWW::Gitea::Attachment>.
+
+=head2 delete_attachment
+
+    $gitea->issues->delete_attachment('getty', 'p5-www-gitea', 7, 12);
+
+Deletes an issue attachment by its numeric attachment id. Returns a true value
+on success.
+
+=head2 comment_attachments
+
+    my $attachments =
+        $gitea->issues->comment_attachments('getty', 'p5-www-gitea', 99);
+
+Lists the attachments on a comment (addressed by comment id). Accepts the Gitea
+query parameters (C<page>, C<limit>). Returns an ArrayRef of
+L<WWW::Gitea::Attachment>.
+
+=head2 create_comment_attachment
+
+    my $a = $gitea->issues->create_comment_attachment('getty', 'p5-www-gitea',
+        99, file => '/path/to/log.txt', name => 'log.txt');
+
+Uploads an attachment to a comment via C<multipart/form-data>. Same C<file> /
+C<content> / C<name> / C<filename> arguments as L</create_attachment>. Returns
+a L<WWW::Gitea::Attachment>.
+
+=head2 get_comment_attachment
+
+    my $a = $gitea->issues->get_comment_attachment('getty', 'p5-www-gitea',
+        99, 12);
+
+Fetches a single comment attachment by its numeric attachment id. Returns a
+L<WWW::Gitea::Attachment>.
+
+=head2 edit_comment_attachment
+
+    $gitea->issues->edit_comment_attachment('getty', 'p5-www-gitea', 99, 12,
+        name => 'renamed.txt');
+
+Edits a comment attachment (only C<name> is editable). Arguments are passed
+through as the JSON body. Returns the updated L<WWW::Gitea::Attachment>.
+
+=head2 delete_comment_attachment
+
+    $gitea->issues->delete_comment_attachment('getty', 'p5-www-gitea', 99, 12);
+
+Deletes a comment attachment by its numeric attachment id. Returns a true value
+on success.
 
 =head1 SEE ALSO
 
@@ -230,6 +478,8 @@ Adds a comment to an issue. Returns the new L<WWW::Gitea::Comment>.
 =item * L<WWW::Gitea::Issue>
 
 =item * L<WWW::Gitea::Comment>
+
+=item * L<WWW::Gitea::Attachment>
 
 =item * L<WWW::Gitea::API::PullRequests>
 

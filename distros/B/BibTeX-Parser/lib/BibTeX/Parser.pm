@@ -1,6 +1,6 @@
 package BibTeX::Parser;
 {
-    $BibTeX::Parser::VERSION = '1.93';
+    $BibTeX::Parser::VERSION = '1.94';
 }
 # ABSTRACT: A pure perl BibTeX parser
 use warnings;
@@ -32,11 +32,53 @@ sub new {
             oct => "October",
             nov => "November",
             dec => "December",
-
+	    "j-tugboat" => "TUGboat", # missing definition is irritating
         },
         line   => -1,
         buffer => "",
+	entries => {}
     }, $class;
+}
+
+sub read {
+    my $self = shift;
+    if (!exists $self->{opts}->{errorlevel}) {
+	$self->{opts}->{errorlevel} = 'warn';
+    }
+    while (my $entry=$self->next) {
+	if ($entry->parse_ok) {
+	    $self->{entries}->{$entry->key()} = $entry;
+	} else {
+	    if ($self->{opts}->{errorlevel} eq 'warn') {
+		warn "BibTeX Parser: Skipping entry in line $."
+	    } elsif ($self->{opts}->{errorlevel} eq 'error') {
+		exit("BibTeX Parser: Error in line $.")
+	    }
+	}
+    }
+}
+
+sub n {
+    my $self = shift;
+    return(scalar keys %{$self->{entries}});
+}
+
+sub entrykeys {
+    my $self = shift;
+    my @result = keys %{$self->{entries}};
+    return(\@result);
+}
+
+sub has {
+    my $self = shift;
+    my $key = shift;
+    return(exists($self->{entries}->{$key}));
+}
+
+sub entry {
+    my $self = shift;
+    my $key = shift;
+    return($self->{entries}->{$key});
 }
 
 sub _slurp_close_bracket;
@@ -98,8 +140,14 @@ sub _parse_next {
                     my $key   = lc($1);
                     my $value = _parse_string( $self->{strings},
                                        exists $self->{opts}->{"no-warn-ack"} );
-                    if ( defined $self->{strings}->{$key} ) {
-                        warn("Redefining string $key!");
+                    # If redefining to the same value, don't worry.
+                    # If redefining j-tugboat (predefined above), don't worry,
+                    #   people use \TUB vs. "TUGboat" arbitrarily.
+                    my $old_value = $self->{strings}->{$key};
+                    if ($key ne "j-tugboat"
+                        && defined $old_value && $old_value ne $value) {
+                        warn("Redefining string $key ",
+                             "(oldvalue=$old_value, newvalue=$value");
                     }
                     $self->{strings}->{$key} = $value;
                     /\G[\s\n]*\}/cg;
@@ -186,6 +234,8 @@ sub _slurp_close_bracket {
 # too irritating to have to define them (they are never used), and also
 # too irritating to have to see the many warnings on every run.
 # 
+# Similarly for j-TUGboat, which we predefine in the new() fn above.
+#
 sub _parse_string {
     my ($strings_ref, $no_warn_ack) = @_;
     $no_warn_ack ||= 0;
@@ -196,8 +246,10 @@ sub _parse_string {
         if (/\G(\d+)/cg) {
             $value .= $1;
         } elsif (/\G($re_name)/cgo) {
+            my $key = lc($1);
             if (! defined $strings_ref->{lc($1)}) {
-                warn("Using undefined string $1 (", lc($1), ")")
+                #debug_hash("looking up $key for $1", $strings_ref);
+                warn("Using undefined string $1 (", lc($1), ") in: $_")
                   unless $no_warn_ack && $1 =~ /^ack-/;
             }
             $value .= $strings_ref->{$1} || "";
@@ -282,6 +334,51 @@ sub _split_braced_string {
     return @tokens;
 }
 
+
+#
+sub debug_hash {
+  my ($label) = shift;
+  my (%hash) = (ref $_[0] && $_[0] =~ /.*HASH.*/) ? %{$_[0]} : @_;
+
+  my $str = "$label: {";
+  my @items = ();
+  for my $key (sort keys %hash) {
+    my $val = $hash{$key};
+    $key =~ s/\n/\\n/g;
+    $val =~ s/\n/\\n/g;
+    push (@items, "$key:$val");
+  }
+  $str .= join (",", @items);
+  $str .= "}";
+
+  warn ($str);
+}
+
+#
+sub debug_list {
+  my ($label) = shift;
+  my (@list) = (ref $_[0] && $_[0] =~ /.*ARRAY.*/) ? @{$_[0]} : @_;
+
+  my $str = "$label [" . join (",", @list) . "]";
+  warn $str;
+}
+
+
+# Return string representation of call stack for debugging.
+# 
+sub backtrace {
+  my $ret = "";
+
+  my ($line, $subr);
+  my $stackframe = 1;  # skip ourselves
+  while ((undef,undef,$line,$subr) = caller ($stackframe)) {
+    $ret .= " -> $subr.$line";
+    $stackframe++;
+  }
+
+  return $ret;
+}
+
 
 1;    # End of BibTeX::Parser
 
@@ -304,9 +401,9 @@ Parses BibTeX files.
     my $fh = IO::File->new("filename");
 
     # Create parser object ...
-    my $parser = BibTeX::Parser->new($fh);
+    my $parser = BibTeX::Parser->new($fh, $opts);
     
-    # ... and iterate over entries
+    # ... and either iterate over entries
     while (my $entry = $parser->next ) {
 	    if ($entry->parse_ok) {
 		    my $type    = $entry->type;
@@ -327,7 +424,26 @@ Parses BibTeX files.
 	    }
     }
 
+   # ... or read all entries at once
+   $parser->read();
+   my $num_entries = $parser->n();
+   my $entrykeys = $parser->entrykeys();
+   foreach my $key (@{$entrykeys}) {
+      my $entry = $parser->entry($key);
+      ...
+   }
+   if ($parser->has{'thekey') {
+     $theentry = $parser->entry('thekey');
+   }
 
+=head1 DESCRIPTION
+
+  There are two interfaces for BiBTeX::Parser: the serial one and
+  the caching one.  The serial interface can be used for very large
+  files.  It reads entries one by one, and outputs them using $parser->next()
+  function.  In other cases you might be better off with the caching
+  interface.  It reads all the entries at once, and can output the
+  list of keys or the entry with the given key.
 
 =head1 FUNCTIONS
 
@@ -339,9 +455,50 @@ Parameters:
 
 	* fh: A filehandle
 
+        * opts: a refernce to the hash of options.  Among other
+          options is 'errorlevel', used in the caching interface when
+          processing a non-parseable entry.  Can be 'warn' (the
+          default), 'erorr', or 'ignore'.  Note that in serial
+          interface the error processing is the responsibility of the
+          user.
+
 =head2 next
 
-Returns the next parsed entry or undef.
+Returns the next parsed entry or undef.  Cannot be combined with
+the L<read> interface described below.
+
+=head2 read
+
+Read all the entries from the filehandle in the internal cache.  
+
+
+
+
+=head2 n
+
+Returns the number of entries after L<read> function has been called
+
+=head2 entrykeys
+
+Returns the array of keys after L<read> function has been called
+
+=head2 entry
+
+Returns an entry with the given key after L<read> function has been called
+
+Parameters:
+
+    * key: the key
+
+=head2 has
+
+Returns true if the cached file has the given entry
+
+Parameters:
+
+    * key: the key
+
+
 
 
 =head1 NOTES
@@ -366,7 +523,7 @@ L<BibTeX::Parser::Author>
 
 =head1 VERSION
 
-version 1.93
+version 1.94
 
 =head1 AUTHOR
 
@@ -376,7 +533,7 @@ Karl Berry <karl@freefriends.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2025 Gerhard Gossen, Boris Veytsman, Karl Berry
+Copyright 2013-2026 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

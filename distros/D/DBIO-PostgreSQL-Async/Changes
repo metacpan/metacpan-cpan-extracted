@@ -1,0 +1,31 @@
+Revision history for DBIO-PostgreSQL-Async
+
+0.900000  2026-06-23
+    First release. Future-based async PostgreSQL storage for DBIO, speaking
+    libpq's async protocol via EV::Pg with no DBI in the path.
+
+    * Storage
+        - DBIO::PostgreSQL::Async::Storage built on DBIO::Storage::Async
+        - Non-blocking select/insert/update/delete returning Future objects
+        - Prepared statement caching
+        - Sync fallback (->all, ->first, etc. via blocking ->get on the Future)
+
+    * Transactions
+        - txn_do_async with BEGIN/COMMIT/ROLLBACK chaining
+        - Transaction context with connection pinning
+
+    * Pipelining
+        - Pipeline mode batching multiple queries in a single round-trip
+
+    * LISTEN/NOTIFY
+        - Real-time event streaming via ->listen and ->notify
+
+    * COPY
+        - COPY IN for bulk data loading
+
+    * Connection pool
+        - Async connection pool with transaction pinning
+
+    * AccessBroker
+        - Accept AccessBroker objects via Schema->connect($broker)
+        - Refresh async conninfo through the broker for new pooled connections

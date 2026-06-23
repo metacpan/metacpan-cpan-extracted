@@ -1,0 +1,163 @@
+#!/usr/bin/env perl
+# dbio-demo-async -- demonstrate DBIO with async PostgreSQL via EV::Pg
+#
+# Usage:
+#   dbio-demo-async dbi:Pg:dbname=test user pass
+
+use strict;
+use warnings;
+use 5.020;
+
+# ---------------------------------------------------------------------------
+# Inline schema -- Artist -> CD -> Track (same as dbio-demo)
+# ---------------------------------------------------------------------------
+
+package Demo::Schema::Result::Artist {
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('demo_artist');
+  __PACKAGE__->add_columns(
+    id   => { data_type => 'integer', is_auto_increment => 1 },
+    name => { data_type => 'varchar', size => 128 },
+  );
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->add_unique_constraint([qw( name )]);
+  __PACKAGE__->has_many(cds => 'Demo::Schema::Result::CD', 'artist_id');
+}
+
+package Demo::Schema::Result::CD {
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('demo_cd');
+  __PACKAGE__->add_columns(
+    id        => { data_type => 'integer', is_auto_increment => 1 },
+    artist_id => { data_type => 'integer' },
+    title     => { data_type => 'varchar', size => 256 },
+    year      => { data_type => 'integer', is_nullable => 1 },
+  );
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->belongs_to(artist => 'Demo::Schema::Result::Artist', 'artist_id');
+  __PACKAGE__->has_many(tracks => 'Demo::Schema::Result::Track', 'cd_id');
+}
+
+package Demo::Schema::Result::Track {
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('demo_track');
+  __PACKAGE__->add_columns(
+    id       => { data_type => 'integer', is_auto_increment => 1 },
+    cd_id    => { data_type => 'integer' },
+    title    => { data_type => 'varchar', size => 256 },
+    position => { data_type => 'integer', is_nullable => 1 },
+  );
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->belongs_to(cd => 'Demo::Schema::Result::CD', 'cd_id');
+}
+
+package Demo::Schema {
+  use base 'DBIO::Schema';
+  __PACKAGE__->load_components('PostgreSQL');
+  __PACKAGE__->register_class(Artist => 'Demo::Schema::Result::Artist');
+  __PACKAGE__->register_class(CD     => 'Demo::Schema::Result::CD');
+  __PACKAGE__->register_class(Track  => 'Demo::Schema::Result::Track');
+}
+
+# ---------------------------------------------------------------------------
+# Main -- async version
+# ---------------------------------------------------------------------------
+
+package main;
+
+my $dsn  = shift or die "Usage: dbio-demo-async DSN [USER] [PASS]\n";
+my $user = shift;
+my $pass = shift;
+
+sub banner { say "\n", "=" x 60, "\n  $_[0]\n", "=" x 60 }
+sub step   { say "\n--- $_[0] ---" }
+sub show   { printf "  %-14s %s\n", @_ }
+
+banner("DBIO Async Demo (PostgreSQL)");
+show("DSN:", $dsn);
+
+eval { require DBIO::PostgreSQL::Async }
+  or die "DBIO::PostgreSQL::Async not available -- install DBIO-PostgreSQL-Async\n";
+
+# -- Connect ----------------------------------------------------------------
+
+step("Connecting (async)");
+my $schema = Demo::Schema->connect($dsn, $user, $pass, {
+  AutoCommit => 1,
+  RaiseError => 1,
+  storage_type => 'DBIO::PostgreSQL::Async::Storage',
+});
+say "  Connected to $dsn";
+show("Storage:", ref $schema->storage);
+
+# -- Deploy -----------------------------------------------------------------
+
+step("Deploying schema (3 tables)");
+$schema->deploy({ add_drop_table => 1 });
+say "  Tables created: demo_artist, demo_cd, demo_track";
+
+# -- Insert -----------------------------------------------------------------
+
+step("Inserting data");
+
+my @artists = (
+  { name => 'David Bowie',      cds => [
+    { title => 'Hunky Dory',         year => 1971, tracks => [
+      { title => 'Changes',             position => 1 },
+      { title => 'Life on Mars?',       position => 4 },
+    ]},
+    { title => 'Ziggy Stardust',     year => 1972, tracks => [
+      { title => 'Starman',             position => 8 },
+      { title => 'Ziggy Stardust',      position => 10 },
+    ]},
+  ]},
+  { name => 'Kraftwerk',        cds => [
+    { title => 'Autobahn',           year => 1974, tracks => [
+      { title => 'Autobahn',            position => 1 },
+      { title => 'Morgenspaziergang',   position => 5 },
+    ]},
+  ]},
+);
+
+for my $data (@artists) {
+  my $cds = delete $data->{cds};
+  my $artist = $schema->resultset('Artist')->create($data);
+
+  for my $cd_data (@$cds) {
+    my $tracks = delete $cd_data->{tracks};
+    my $cd = $artist->create_related('cds', $cd_data);
+    $cd->create_related('tracks', $_) for @$tracks;
+  }
+
+  printf "  + %-16s  %d CDs, %d tracks\n",
+    $artist->name,
+    $artist->cds->count,
+    $artist->cds->search_related('tracks')->count;
+}
+
+# -- Counts -----------------------------------------------------------------
+
+step("Counts");
+show("Artists:", $schema->resultset('Artist')->count);
+show("CDs:",     $schema->resultset('CD')->count);
+show("Tracks:",  $schema->resultset('Track')->count);
+
+# -- Query ------------------------------------------------------------------
+
+step("Query: all tracks by Kraftwerk");
+my $rs = $schema->resultset('Track')->search(
+  { 'artist.name' => 'Kraftwerk' },
+  { join => { cd => 'artist' }, order_by => ['cd.year', 'me.position'] },
+);
+while (my $t = $rs->next) {
+  printf "  %d. %-24s  (%s, %d)\n",
+    $t->position, $t->title, $t->cd->title, $t->cd->year;
+}
+
+# -- Done -------------------------------------------------------------------
+
+banner("Done");
+say "  Async PostgreSQL demo complete.\n";

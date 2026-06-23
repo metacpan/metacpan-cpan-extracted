@@ -1,5 +1,28 @@
 Revision history for WWW-Gitea
 
+0.003     2026-06-22 18:34:06Z
+    - Add attachment / asset support: WWW::Gitea::API::Releases gains
+      assets/create_asset/get_asset/edit_asset/delete_asset, and
+      WWW::Gitea::API::Issues gains the matching issue attachment and comment
+      attachment methods (list/create/get/edit/delete for each).
+    - WWW::Gitea::Role::HTTP: request() now supports multipart/form-data
+      uploads via a new 'upload' argument (file on disk or raw bytes), used by
+      the asset/attachment create endpoints. Adds an HTTP::Request::Common
+      dependency.
+    - New entity WWW::Gitea::Attachment wrapping the Gitea attachment JSON.
+    - WWW::Gitea::Release and WWW::Gitea::Issue gain convenience methods
+      delegating to the new asset/attachment controllers.
+    - Add t/attachments.t (network-free multipart upload coverage) and extend
+      t/openapi.t for the new operations and the Attachment entity.
+
+0.002     2026-06-22 11:53:25Z
+    - WWW::Gitea::API::Labels: list() now accepts pagination query parameters
+      (page, limit), consistent with issues->list(). Previously labels could
+      not be paged, so only the server's default page was ever returned.
+    - WWW::Gitea::API::Issues: comments() now accepts query parameters
+      (page, limit, since, before) for the same reason.
+    - Add t/list_query.t covering query forwarding for the list endpoints.
+
 0.001     2026-06-19 15:10:02Z
     - Initial release
     - WWW::Gitea: Moo client for the Gitea REST API (api/v1) with token or

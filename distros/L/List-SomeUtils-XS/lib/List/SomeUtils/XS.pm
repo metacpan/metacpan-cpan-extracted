@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -82,7 +82,7 @@ List::SomeUtils::XS - XS implementation for List::SomeUtils
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 DESCRIPTION
 
@@ -90,13 +90,12 @@ There are no user-facing parts here. See L<List::SomeUtils> for API details.
 
 You shouldn't have to install this module directly. When you install
 L<List::SomeUtils>, it checks whether your system has a compiler. If it does,
-then it adds a dependency on this module so that it gets installed and you
-have the faster XS implementation.
+then it adds a dependency on this module so that it gets installed and you have
+the faster XS implementation.
 
 This distribution requires L<List::SomeUtils> but to avoid a circular
-dependency, that dependency is explicitly left out from the this
-distribution's metadata. However, without LSU already installed this module
-cannot function.
+dependency, that dependency is explicitly left out from the this distribution's
+metadata. However, without LSU already installed this module cannot function.
 
 =head1 SEE ALSO
 
@@ -113,8 +112,6 @@ Copyright 2013 - 2015 by Jens Rehsack
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/List-SomeUtils-XS/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -135,7 +132,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://houseabsolute.com/foss-donations/>.
 
 =head1 AUTHOR
 
@@ -143,7 +140,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2026 by Dave Rolsky.
 
 This is free software, licensed under:
 

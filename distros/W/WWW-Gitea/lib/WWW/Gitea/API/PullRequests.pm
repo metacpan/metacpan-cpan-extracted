@@ -128,7 +128,7 @@ WWW::Gitea::API::PullRequests - Gitea pull requests API
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
