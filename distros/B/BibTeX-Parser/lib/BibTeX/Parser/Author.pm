@@ -1,6 +1,6 @@
 package BibTeX::Parser::Author;
 {
-  $BibTeX::Parser::Author::VERSION = '1.94';
+  $BibTeX::Parser::Author::VERSION = '1.95';
 }
 
 use warnings;
@@ -427,7 +427,7 @@ the following token is not: C<{von}>
 
 =head1 VERSION
 
-version 1.94
+version 1.95
 
 =head1 AUTHOR
 

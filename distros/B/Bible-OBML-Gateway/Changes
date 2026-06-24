@@ -1,5 +1,8 @@
 Revision history for Bible::OBML::Gateway
 
+2.12      2026-06-23 18:42:42-07:00 America/Los_Angeles
+        - Change author email address (sadly)
+
 2.11      2025-06-13 10:22:25-07:00 America/Los_Angeles
         - Add security policy as per CPANSec recommendation
 

@@ -23,16 +23,11 @@ sub new {
 
 
 sub groups {
-    my ( $sf, $plugin, $db, $select_plugins ) = @_;
+    my ( $sf, $plugin, $select_plugins ) = @_;
     my $groups;
     if ( $select_plugins ) {
         $groups = [
             { name => 'group_select_plugins', text => "- Plugins" },
-        ];
-    }
-    elsif ( $db ) {
-        $groups = [
-            { name => 'group_connect', text => "- Connect data" }, ##
         ];
     }
     elsif ( $plugin ) {
@@ -123,6 +118,7 @@ sub sub_groups {
             { name => '_show_hidden_files', text => "- Hidden files",      section => 'insert' },
             { name => 'history_dirs',       text => "- Directory history", section => 'insert' },
             { name => '_data_source_type',  text => "- Source type",       section => 'insert' },
+            { name => 'max_cols_plain',     text => "- Max cols plain",    section => 'insert' },
         ],
         group_export => [
             { name => 'export_dir',         text => "- Destination folder", section => 'export'  },
@@ -555,6 +551,11 @@ sub group_import {
         ];
         $sf->__settings_menu_wrap( $info, $lo, $section, $sub_menu, $prompt );
     }
+    elsif ( $sub_group eq 'max_cols_plain' ) {
+        my $digits = 2;
+        my $prompt = 'Create table, source plain.' . "\n" . 'Maximum columns:';
+        $sf->__choose_a_number_wrap( $info, $lo, $section, $sub_group, $prompt, $digits, 1 );
+    }
     elsif ( $sub_group eq '_parse_file' ) {
         my $prompt = 'How to parse input files';
         my $sub_menu = [
@@ -789,7 +790,8 @@ sub __choose_a_subset_wrap {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $current = $lo->{$section}{$opt};
     $info .= "\n" if length $info;
-    $info .= 'Cur: ' . join( ', ', @$current );
+    $info .= 'Cur: ';
+    $info .= join( ', ', @$current ) if defined $current;
     my $name = 'New: ';
     # Choose_a_list
     my $list = $tu->choose_a_subset(
@@ -810,7 +812,8 @@ sub __choose_a_number_wrap {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $current = $lo->{$section}{$opt};
     my $w = $digits + int( ( $digits - 1 ) / 3 ) * length $sf->{i}{info_thsd_sep};
-    $info .= "\n" . 'Cur: ' . sprintf( "%*s", $w, insert_sep( $current, $sf->{i}{info_thsd_sep} ) );
+    $info .= "\n" . 'Cur: ';
+    $info .= sprintf( "%*s", $w, insert_sep( $current, $sf->{i}{info_thsd_sep} ) ) if defined $current;
     my $name = 'New: ';
     # Choose_a_number
     my $choice = $tu->choose_a_number( $digits,
@@ -826,11 +829,11 @@ sub __choose_a_number_wrap {
 sub __choose_a_directory_wrap {
     my ( $sf, $info, $lo, $section, $opt, $prompt ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-    #my $current = $lo->{$section}{$opt};
+    my $current = $lo->{$section}{$opt};
     # Choose_a_directory
     my $choice = $tu->choose_a_directory(
         { show_hidden => 1, info => $info, prompt => $prompt, clear_screen => 1, decoded => 1,
-          confirm => $sf->{i}{confirm}, back => $sf->{i}{back} } ##
+          confirm => $sf->{i}{confirm}, back => $sf->{i}{back}, init_dir => $current }
     );
     return if ! defined $choice;
     $lo->{$section}{$opt} = $choice;

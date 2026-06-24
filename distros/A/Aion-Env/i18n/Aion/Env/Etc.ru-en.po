@@ -1,0 +1,56 @@
+msgid "Aion::Env::Etc - создаёт константу связанную с ключом из конфигурационных файлов"
+msgstr "Aion::Env::Etc - creates a constant associated with a key from configuration files"
+
+msgid "Файл etc/include.yml:"
+msgstr "etc/include.yml file:"
+
+msgid "Файл etc/test.yml:"
+msgstr "File etc/test.yml:"
+
+msgid "Парсит конфигурационный файл. Путь к нему задан энвиронмент-переменной `AION_ENV_ETC_PATH`."
+msgstr "Parses the configuration file. The path to it is specified by the environment variable `AION_ENV_ETC_PATH`."
+
+msgid "В нём может быть ключ `includes` c включением других конфигурационных файлов, а у тех – других.\n"
+"Для простоты `includes` срабатывают от текущего каталога, который должен соответствовать корню проекта (таково соглашение)."
+msgstr "It may contain the `includes` key with the inclusion of other configuration files, and those with other ones.\n"
+"For simplicity, `includes` are triggered from the current directory, which should correspond to the project root (this is the convention)."
+
+msgid "Ключи вида `when@ID` будут перекрывать своими ключами ключи конфигурационного файла, если `ID` из них соответствует `APP_ENV`."
+msgstr "Keys of the form `when@ID` will overlap with their keys the keys of the configuration file if the `ID` of them matches `APP_ENV`."
+
+msgid "Хеши в ключах, при совпадении ключей в разных файлах, объединяются рекурсивно. Однако если в одном из ключей не хеш, то будет выброшено исключение."
+msgstr "Hashes in keys, if the keys match in different files, are combined recursively. However, if one of the keys does not have a hash, an exception will be thrown."
+
+msgid "Создаёт константу в пакете из которого был вызван."
+msgstr "Creates a constant in the package from which it was called."
+
+msgid "Допустимые опции:"
+msgstr "Valid options:"
+
+msgid ""
+"* `isa` – подпрограмма-тестер или объект `Aion::Type` для проверки типа.\n"
+"* `default` – значение по умолчанию.\n"
+"* `key` – ключ из конфигурационных файлов. По умолчанию к нему преобразуется имя константы (переводится в нижний регистр и подчёрки заменяются на точки)."
+msgstr ""
+"* `isa` – tester routine or `Aion::Type` object for type checking.\n"
+"* `default` – default value.\n"
+"* `key` – key from configuration files. By default, the name of the constant is converted to it (translated to lower case and underscores are replaced with dots)."
+
+msgid "Считывает и парсит конфигурационный файл в формате `yaml`. `${ID}` заменяются на значения из `%ENV`, а если там нет, то из файла `.env`. Парсит файлы в `include` рекурсивно."
+msgstr "Reads and parses a configuration file in `yaml` format. `${ID}` are replaced with values from `%ENV`, and if not there, then from the `.env` file. Parses files in `include` recursively."
+
+msgid "Обединяет два хеша рекурсивно. Если в совпадающих ключах не хеши, то выбрасывает ошибку с `$file` и `$path`, где `$file` – подключающийся файл, а `$path` – путь из ключей через точку."
+msgstr "Concatenates two hashes recursively. If the matching keys do not have hashes, then it throws an error with `$file` and `$path`, where `$file` is the connecting file, and `$path` is the path from the keys through the dot."
+
+msgid "Добавляет бэкслеши. Используется для эскейпинга энвиронментов."
+msgstr "Adds backslashes. Used for escaping environments."
+
+msgid "Получить значение по ключу из хеша."
+msgstr "Get the value by key from the hash."
+
+msgid "⚖ **Perl5**"
+msgstr "⚖ **Perl5**"
+
+msgid "The Aion::Env::Etc module is copyright © 2026 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Env::Etc module is copyright © 2026 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

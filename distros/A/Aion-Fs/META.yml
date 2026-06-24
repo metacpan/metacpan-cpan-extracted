@@ -19,7 +19,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +38,7 @@ no_index:
 provides:
   Aion::Fs:
     file: lib/Aion/Fs.pm
-    version: v0.2.3
+    version: v0.2.4
   Aion::Fs::Cat:
     file: lib/Aion/Fs/Cat.pm
   Aion::Fs::Find:
@@ -46,13 +46,13 @@ provides:
   Aion::Fs::Lay:
     file: lib/Aion/Fs/Lay.pm
 requires:
+  Aion::Env: '0'
   Exporter: '0'
   List::Util: '0'
   Scalar::Util: '0'
   Symbol: '0'
   Time::HiRes: '0'
   common::sense: '0'
-  config: '0'
   constant: '0'
   overload: '0'
   perl: v5.22.0
@@ -60,7 +60,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion-fs/issues
   homepage: https://github.com/darviarush/perl-aion-fs
   repository: https://github.com/darviarush/perl-aion-fs.git
-version: 0.2.3
+version: 0.2.4
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

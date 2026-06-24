@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.016;
 
-our $VERSION = '2.442';
+our $VERSION = '2.443';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -274,7 +274,6 @@ sub run {
                 user_dbs => $user_dbs,
                 sys_dbs => $sys_dbs,
             };
-            $op_rw->read_config_file( $driver, $plugin, $db );
 
             # DB-HANDLE
 
@@ -552,7 +551,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.442
+Version 2.443
 
 =head1 DESCRIPTION
 

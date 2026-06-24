@@ -1,7 +1,7 @@
 ---
 abstract: 'Cascading merged application configuration extension for exact'
 author:
-  - 'Gryphon Shafer <gryphon@cpan.org>'
+  - 'Gryphon Shafer <gryphon@goldenguru.com>'
 build_requires:
   File::Spec: '0'
   IO::Handle: '0'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/exact-conf/issues
   homepage: https://github.com/gryphonshafer/exact-conf
   repository: https://github.com/gryphonshafer/exact-conf.git
-version: '1.10'
+version: '1.11'
 x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

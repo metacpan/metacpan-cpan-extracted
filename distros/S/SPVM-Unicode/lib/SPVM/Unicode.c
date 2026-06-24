@@ -3,7 +3,7 @@
 
 #include "spvm_native.h"
 
-#include "SPVM__Unicode__utf8proc.h"
+#include "utf8proc.h"
 
 const char* FILE_NAME = "Unicode.c";
 
@@ -25,8 +25,8 @@ int32_t SPVM__Unicode__uchar(SPVM_ENV* env, SPVM_VALUE* stack) {
     return 0;
   }
   
-  SPVM__Unicode__utf8proc_int32_t dst;
-  int32_t uchar_len = (int32_t)SPVM__Unicode__utf8proc_iterate((const SPVM__Unicode__utf8proc_uint8_t*)(str + *offset_ref), str_len, &dst);
+  utf8proc_int32_t dst;
+  int32_t uchar_len = (int32_t)utf8proc_iterate((const utf8proc_uint8_t*)(str + *offset_ref), str_len, &dst);
   
   int32_t uchar;
   if (uchar_len > 0) {
@@ -36,7 +36,7 @@ int32_t SPVM__Unicode__uchar(SPVM_ENV* env, SPVM_VALUE* stack) {
   else if (uchar_len == 0) {
     uchar = -1;
   }
-  else if (uchar_len == SPVM_UTF8PROC_ERROR_INVALIDUTF8) {
+  else if (uchar_len == UTF8PROC_ERROR_INVALIDUTF8) {
     uchar = -2;
   }
   
@@ -50,7 +50,7 @@ int32_t SPVM__Unicode__uchar_to_utf8(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t uchar = stack[0].ival;
   
   char tmp_utf8_bytes[4];
-  int32_t utf8_len = (int32_t)SPVM__Unicode__utf8proc_encode_char((SPVM__Unicode__utf8proc_int32_t)uchar, (SPVM__Unicode__utf8proc_uint8_t*)tmp_utf8_bytes);
+  int32_t utf8_len = (int32_t)utf8proc_encode_char((utf8proc_int32_t)uchar, (utf8proc_uint8_t*)tmp_utf8_bytes);
   
   if (utf8_len == 0) {
     stack[0].oval = NULL;

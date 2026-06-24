@@ -12,6 +12,7 @@ t/03-queries.t
 t/04-mutations.t
 t/05-composite-pk.t
 t/06-pagination-filter.t
+t/07-order-by-validation.t
 t/lib/My/Schema.pm
 t/lib/My/Schema/Result/Author.pm
 t/lib/My/Schema/Result/Book.pm

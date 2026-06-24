@@ -35,8 +35,8 @@ local ($::_g0 = do {UNI_TEST;}, $::_e0 = do {30}); ::ok defined($::_g0) == defin
 local ($::_g0 = do {BB_TEST;}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'BB_TEST; # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 local ($::_g0 = do {eval 'use Aion::Env NN_TEST => ()'; $@;}, $::_e0 = 'NN_TEST is\'nt defined!'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, 'eval \'use Aion::Env NN_TEST => ()\'; $@; # ^-> NN_TEST is\'nt defined!' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {eval 'use Aion::Env NN_TEST => (nouname => 1)'; $@;}, $::_e0 = 'Unknown keyword: nouname'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, 'eval \'use Aion::Env NN_TEST => (nouname => 1)\'; $@; # ^-> Unknown keyword: nouname' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {eval 'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)'; $@;}, $::_e0 = 'Unknown keywords: nouname1, nouname2'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, 'eval \'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)\'; $@; # ^-> Unknown keywords: nouname1, nouname2' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {eval 'use Aion::Env NN_TEST => (nouname => 1)'; $@;}, $::_e0 = 'Unknown aspect: nouname'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, 'eval \'use Aion::Env NN_TEST => (nouname => 1)\'; $@; # ^-> Unknown aspect: nouname' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {eval 'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)'; $@;}, $::_e0 = 'Unknown aspects: nouname1, nouname2'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, 'eval \'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)\'; $@; # ^-> Unknown aspects: nouname1, nouname2' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPTION

@@ -1,5 +1,5 @@
 package Algorithm::QuadTree::XS;
-$Algorithm::QuadTree::XS::VERSION = '0.10';
+$Algorithm::QuadTree::XS::VERSION = '0.12';
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -40,39 +40,43 @@ This implementation is compatible with C<Algorithm::QuadTree::PP>.
 =head1 BENCHMARK
 
 	# backend: Algorithm::QuadTree::XS
-
-	     clear: 1.64694e-05 +- 1.7e-09 wallclock secs (0.0103%) @ (60718.8 +-    6.1)/s (n=204)
-	  find_100: 2.70163e-05 +- 4.8e-09 wallclock secs (0.0178%) @ (37014.7 +-    6.6)/s (n=203)
-	insert_100: 1.37381e-04 +- 3.5e-08 wallclock secs (0.0255%) @ ( 7279 +-   1.8)/s (n=215)
+	        find_100: 5.2622e-05 +- 1.7e-08 wallclock secs (0.0323%) @ (19003.4 +-    6.2)/s (n=208)
+	  find_100_check: 5.7178e-05 +- 2.3e-08 wallclock secs (0.0402%) @ (17489.1 +-    6.9)/s (n=200)
+	  insert_100_big: 2.57407e-04 +- 7.8e-08 wallclock secs (0.0303%) @ (3884.9 +-   1.2)/s (n=208)
+	insert_100_small: 1.50146e-04 +- 3.1e-08 wallclock secs (0.0206%) @ (6660.2 +-   1.4)/s (n=208)
 
 	# backend: Algorithm::QuadTree::PP
 
-	     clear: 1.24342e-03 +- 2.7e-07 wallclock secs (0.0217%) @ (804.23 +-  0.18)/s (n=205)
-	  find_100: 2.45547e-04 +- 2.7e-08 wallclock secs (0.0110%) @ (4072.54 +-   0.45)/s (n=208)
-	insert_100: 2.13336e-03 +- 3.6e-07 wallclock secs (0.0169%) @ (468.744 +-  0.079)/s (n=206)
+	        find_100: 5.9995e-04 +- 1.4e-07 wallclock secs (0.0233%) @ (1666.8 +-   0.39)/s (n=205)
+	  find_100_check: 6.7605e-04 +- 1.1e-07 wallclock secs (0.0163%) @ (1479.18 +-   0.23)/s (n=204)
+	  insert_100_big: 1.36311e-02 +- 3.3e-06 wallclock secs (0.0242%) @ (73.361 +- 0.018)/s (n=206)
+	insert_100_small: 4.3928e-03 +- 1.2e-06 wallclock secs (0.0273%) @ (227.647 +-  0.063)/s (n=209)
 
 Generated using C<tools/benchmark.pl> available in the GitHub repository. Tree
 depth was 6.
 
 =over
 
-=item * benchmark C<clear>
-
-Inserts into a tree a giant object which spans the entire area, then clear the
-tree. This forces clearing procedure to go into each leaf and clear it, which
-is worst-case scenario.
-
 =item * benchmark C<find_100>
 
-A predeclared tree exists with 10 elements inserted in the middle of the area.
-Tree is queried 10 times, 5 times with rectangular coordinates and 5 times with
-circular coordinates. All 10 items are returned each time, resulting in 100
-items returned total.
+A predeclared tree exists with big 10 elements inserted in the middle of the
+area.  Tree is queried 10 times, 5 times with rectangular coordinates and 5
+times with circular coordinates. All 10 items are returned each time, resulting
+in 100 items returned total. The queried area is as large as the objects in the tree.
 
-=item * benchmark C<insert_100>
+=item * benchmark C<find_100_check>
+
+Same as above, but C<CHECK> flag is enabled to check the shapes overlaping.
+
+=item * benchmark C<insert_100_small>
 
 Clears a tree and inserts 50 circles and 50 rectangles to it. Those objects are
 placed in a way so that none of them overlap.
+
+=item * benchmark C<insert_100_big>
+
+Same as above, but the objects inserted are 5 times larger. Due to their size,
+they overlap.
 
 =back
 

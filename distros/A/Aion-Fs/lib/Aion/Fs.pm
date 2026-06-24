@@ -2,7 +2,7 @@ package Aion::Fs;
 
 use common::sense;
 
-our $VERSION = "0.2.3";
+our $VERSION = "0.2.4";
 
 use Exporter qw/import/;
 use Scalar::Util   qw//;
@@ -448,13 +448,13 @@ sub transpath ($$;$) {
 
 # как mkdir -p
 use constant FILE_EXISTS => 17;
-use config   DIR_DEFAULT_PERMISSION => 0755;
+use Aion::Env AION_FS_DIR_DEFAULT_PERMISSION => (isa => sub {/^0[0-7]{3}$/}, default => '0755');
 sub mkpath (;$) {
 	my ($path) = @_ == 0? $_: @_;
 	
 	my $permission;
 	($path, $permission) = @$path if ref $path;
-	$permission = DIR_DEFAULT_PERMISSION unless Scalar::Util::looks_like_number $permission;
+	$permission = $permission // (AION_FS_DIR_DEFAULT_PERMISSION =~ /^0/? oct AION_FS_DIR_DEFAULT_PERMISSION: AION_FS_DIR_DEFAULT_PERMISSION);
 	
 	local $!;
 	
@@ -696,10 +696,10 @@ sub wildcard(;$) {
 }
 
 # Открывает файл на указанной строке в редакторе
-use config EDITOR => "vscodium %p:%l";
+use Aion::Env AION_FS_EDITOR => (default => "vscodium %p:%l");
 sub goto_editor($$) {
 	my ($path, $line) = @_;
-	my $p = EDITOR;
+	my $p = AION_FS_EDITOR;
 	$p =~ s!%p!$path!;
 	$p =~ s!%l!$line!;
 	my $status = system $p;
@@ -769,7 +769,7 @@ Aion::Fs - utilities for the file system: reading, writing, searching, replacing
 
 =head1 VERSION
 
-0.2.3
+0.2.4
 
 =head1 SYNOPSIS
 
@@ -1397,7 +1397,8 @@ Splits a file path into its components or assembles it from its components.
 	
 	    path '.$.Directory.Directory.' # --> $path
 	
-	    path {volume => "ADFS::HardDisk.", file => "File"} # => ADFS::HardDisk.$.File
+	    path {volume => "ADFS::HardDisk.", file => "File"} # \> ADFS::HardDisk.File
+	    path {volume => "ADFS::HardDisk.", folder => '$', file => "File"} # \> ADFS::HardDisk.$.File
 	    path {folder => "x"}  # => x.
 	    path {dir    => "x."} # => x.
 	}
@@ -1619,17 +1620,11 @@ Used in filters of the C<find> function.
 
 =head2 goto_editor ($path, $line)
 
-Opens the file in the editor from .config at the specified line. Defaults to C<vscodium %p:%l>.
+Opens a file in the editor from C<AION_FS_EDITOR> at the specified line. Defaults to C<vscodium %p:%l>.
 
-.config.pm file:
+.env file:
 
-	package config;
-	
-	config_module 'Aion::Fs' => {
-	    EDITOR => 'echo %p:%l > ed.txt',
-	};
-	
-	1;
+	AION_FS_EDITOR = echo %p:%l > ed.txt
 
 
 

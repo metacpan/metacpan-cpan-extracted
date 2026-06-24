@@ -12,7 +12,7 @@ jobs:
   perl:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Perl version
         run: perl -V
       - name: Perl config
@@ -32,8 +32,7 @@ jobs:
       - name: cpanm installs dependent modules
         run: perl cpanm -v -n -L ~/mylib --installdeps . --configure-args="--meta"
       - name: Show MYMETA.json
-        run: perl -0777 -p -e 1 MYMETA.json
-      - name: Show MYMETA.json
         run: cat MYMETA.json
       - run: perl Makefile.PL
-      - run: gmake disttest
+      - run: gmake
+      - run: gmake test

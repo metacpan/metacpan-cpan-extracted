@@ -50,6 +50,7 @@
       },
       "runtime" : {
          "requires" : {
+            "YAML::Syck" : "0",
             "common::sense" : "0",
             "constant" : "0",
             "perl" : "v5.22.0"
@@ -76,7 +77,10 @@
    "provides" : {
       "Aion::Env" : {
          "file" : "lib/Aion/Env.pm",
-         "version" : "0.1"
+         "version" : "0.2"
+      },
+      "Aion::Env::Etc" : {
+         "file" : "lib/Aion/Env/Etc.pm"
       }
    },
    "release_status" : "stable",
@@ -91,7 +95,7 @@
          "web" : "https://github.com/darviarush/perl-aion-env"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>"

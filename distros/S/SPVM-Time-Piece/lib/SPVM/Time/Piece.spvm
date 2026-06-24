@@ -2,7 +2,7 @@
 # MIT License
 
 class Time::Piece {
-  version "0.010";
+  version "0.011";
   
   use Sys;
   use Time::Seconds;

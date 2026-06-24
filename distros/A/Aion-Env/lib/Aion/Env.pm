@@ -2,7 +2,7 @@ package Aion::Env;
 
 use common::sense;
 
-our $VERSION = "0.1";
+our $VERSION = "0.2";
 
 use constant {};
 
@@ -13,7 +13,7 @@ sub import {
     my $isa = delete $kw{isa};
     my $is_default = exists $kw{default};
     my $default = delete $kw{default};
-    die sprintf "Unknown keyword%s: %s",
+    die sprintf "Unknown aspect%s: %s",
     	scalar keys %kw == 1? '': 's',
      	join ", ", sort keys %kw if keys %kw;
       
@@ -23,10 +23,10 @@ sub import {
     my $val = $ENV{$name} // $env{$name} // $default;
 
     if($isa) {
-    	if(UNIVERSAL::can($isa, "validate")) { $isa->validate($val, $name) }
-     	else {
+   		if(UNIVERSAL::isa($isa, "Aion::Type")) { $isa->validate($val, $name) }
+    	else {
 	    	local $_ = $val;
-	    	die "$name type is'nt isa!" unless $isa->();
+	    	die UNIVERSAL::can($isa, "get_message")? $isa->get_message($val): "$name type is'nt isa!" unless $isa->();
 		}
     }
     
@@ -82,7 +82,7 @@ Aion::Env - creates a constant associated with the value from .env
 
 =head1 VERSION
 
-0.1
+0.2
 
 =head1 SYNOPSIS
 
@@ -112,8 +112,8 @@ Aion::Env - creates a constant associated with the value from .env
 	BB_TEST; # -> 1
 	
 	eval 'use Aion::Env NN_TEST => ()'; $@; # ^-> NN_TEST is'nt defined!
-	eval 'use Aion::Env NN_TEST => (nouname => 1)'; $@; # ^-> Unknown keyword: nouname
-	eval 'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)'; $@; # ^-> Unknown keywords: nouname1, nouname2
+	eval 'use Aion::Env NN_TEST => (nouname => 1)'; $@; # ^-> Unknown aspect: nouname
+	eval 'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)'; $@; # ^-> Unknown aspects: nouname1, nouname2
 
 =head1 DESCRIPTION
 

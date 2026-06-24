@@ -4,7 +4,7 @@ use exact::cli;
 
 # PODNAME: linda
 # ABSTRACT: Plausibly helpful (and probably drunk) wrapper around morbo
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 use MojoX::Linda;
 
@@ -49,11 +49,11 @@ linda - Plausibly helpful (and probably drunk) wrapper around morbo
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,20 @@
 Revision history for Perl extension Algorithm::QuadTree.
 
+1.0 Wed Jun 24, 2026
+	[Breaking changes]
+		- hotfix: remove -check constructor option (introduced in 0.9), add ->get and ->getApprox method
+		- ->getEnclosedObjects behavior from 0.8 was restored (does not check results)
+		- ->get always returns checked results, ->getApprox always returns unchecked results (same as ->getEnclosedObjects)
+		- this makes the interface more consistent, as constructor only takes tree structure arguments
+
+0.9 Wed Jun 24, 2026
+	[New features]
+		- new option -check, which forces additional geometry checks on fetched shapes
+
+	[Other changes]
+		- improve performance and memory usage for objects which are big enough to span multiple nodes
+		- slightly worsen performance for inserting small objects due to tradeoff above
+
 0.8 Mon Jun 22, 2026
 	[Other changes]
 		- slightly increase pure perl clearing and insertion performance

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v0.0.2');
+our $VERSION   = qv('v0.0.3');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ DBIx::Class::Schema::GraphQL - Auto-generate a GraphQL schema from a DBIx::Class
 
 =head1 VERSION
 
-Version v0.0.2
+Version v0.0.3
 
 =cut
 
@@ -577,10 +577,14 @@ sub _apply_pagination {
     # Ordering
     my $order_by = $args->{orderBy};
     if ($order_by && $order_by->{field}) {
-        my $dir = lc($order_by->{direction} // 'ASC');
-        $rs = $rs->search(undef, {
-            order_by => { "-$dir" => $order_by->{field} }
-        });
+        my $field = $order_by->{field};
+        if ( $source->has_column($field) ) {
+            my $dir = lc($order_by->{direction} // 'ASC');
+            $rs = $rs->search(undef, { order_by => { "-$dir" => $field } });
+        }
+        else {
+            die "Invalid field '$field' provided for orderBy.\n";
+        }
     }
     else {
         # Default: stable order by PK

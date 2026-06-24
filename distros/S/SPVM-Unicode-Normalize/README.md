@@ -1,3 +1,10 @@
 # SPVM::Unicode::Normalize
 
-<a href="https://metacpan.org/pod/SPVM::Unicode::Normalize">SPVM::Unicode::Normalize</a>
+## Document
+
+<a href="https://metacpan.org/pod/SPVM::Unicode::Normalize">SPVM::Unicode::Normalize - CPAN</a>
+
+## See Also
+
+<a href="https://github.com/yuki-kimoto/SPVM">SPVM - Github</a>
+

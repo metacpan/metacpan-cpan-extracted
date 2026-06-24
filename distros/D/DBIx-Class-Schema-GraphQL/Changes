@@ -1,5 +1,16 @@
 Revision history for DBIx::Class::Schema::GraphQL
 
+v0.0.3  2026-06-23
+        [Security Fix]
+        - Fix SQL injection vulnerability in the plural allXs query fields.
+          The orderBy.field argument was previously passed directly into the
+          DBIx::Class order_by attribute without validation. It is now strictly
+          validated against the schema source's known column names via
+          ->has_column(). (CWE-89)
+        - Added integration tests to verify orderBy.field column validation.
+        - Thanks to the CPANSec Team for discovering and responsibly
+          disclosing this vulnerability.
+
 v0.0.2  2026-06-08
         [New Features]
         - Added patchX mutations for every source alongside the existing

@@ -33,5 +33,6 @@ on 'test' => sub {
 	requires 'open';
 };
 
+requires 'YAML::Syck';
 requires 'common::sense';
 requires 'constant';

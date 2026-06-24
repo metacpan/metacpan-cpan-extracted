@@ -11,12 +11,8 @@ script/convert.pl
 lib/LaTeX/ToUnicode/Tables.pm
 lib/LaTeX/ToUnicode.pm
 Makefile.PL
-head.ltx
 Makefile.TDS
 weaver.ini
 dist.ini
-latex-tounicode.pdf
-ltx2unitxt.1
-ltx2unitxt.pdf
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

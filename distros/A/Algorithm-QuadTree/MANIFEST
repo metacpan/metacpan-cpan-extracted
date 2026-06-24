@@ -17,5 +17,6 @@ t/04-circles.t
 t/05-window.t
 t/06-references.t
 t/07-bad-use.t
+t/08-geometry.t
 t/author-pod-syntax.t
 t/lib/QuadTreeUtils.pm

@@ -13,7 +13,7 @@ use Mojo::UserAgent;
 use Mojo::URL;
 use Mojo::Util 'html_unescape';
 
-our $VERSION = '2.11'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 has translation => 'NIV';
 has reference   => sub { Bible::Reference->new( bible => 'Protestant' ) };
@@ -376,7 +376,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 2.11
+version 2.12
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML-Gateway/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML-Gateway/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway)
@@ -571,7 +571,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/B/Bible-OBML-Gateway.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

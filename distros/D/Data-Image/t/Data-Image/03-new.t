@@ -2,10 +2,12 @@ use strict;
 use warnings;
 
 use Data::Image;
+use Data::Metadata;
+use Data::Metadata::KeyValue;
 use DateTime;
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 
 # Test.
@@ -23,6 +25,14 @@ $obj = Data::Image->new(
 	),
 	'height' => 2730,
 	'id' => 7,
+	'metadata' => Data::Metadata->new(
+		'key_values' => [
+			Data::Metadata::KeyValue->new(
+				'key' => 'photographed_in',
+				'value' => 'atelier',
+			),
+		],
+	),
 	'size' => 1040304,
 	'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
 	'width' => 4096,
@@ -55,8 +65,18 @@ eval {
 		'id' => 'bad',
 	);
 };
-is($EVAL_ERROR, "Parameter 'id' must be a natural number.\n",
-	"Parameter 'id' must be a natural number (bad).");
+is($EVAL_ERROR, "Parameter 'id' must be a positive natural number.\n",
+	"Parameter 'id' must be a positive natural number (bad).");
+clean();
+
+# Test.
+eval {
+	Data::Image->new(
+		'metadata' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'metadata' must be a 'Data::Metadata' object.\n",
+	"Parameter 'metadata' must be a 'Data::Metadata' object (bad).");
 clean();
 
 # Test.

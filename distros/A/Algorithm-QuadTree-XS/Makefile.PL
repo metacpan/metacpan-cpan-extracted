@@ -17,9 +17,9 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Algorithm::QuadTree::XS",
   "PREREQ_PM" => {
-    "Algorithm::QuadTree" => "0.3"
+    "Algorithm::QuadTree" => "1.0"
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
-  "Algorithm::QuadTree" => "0.3"
+  "Algorithm::QuadTree" => "1.0"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

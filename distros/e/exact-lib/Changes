@@ -1,5 +1,8 @@
 Revision history for exact::lib
 
+1.06      2026-06-23 19:01:31-07:00 America/Los_Angeles
+        - Change author email address (sadly)
+
 1.05      2025-06-13 10:29:25-07:00 America/Los_Angeles
         - Add security policy as per CPANSec recommendation
 

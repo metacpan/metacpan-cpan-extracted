@@ -6,9 +6,14 @@ README.md
 cpanfile
 doc/badges/total.svg
 i18n/Aion/Env.ru-en.po
+i18n/Aion/Env/Etc.ru-en.po
 lib/Aion/Env.md
 lib/Aion/Env.pm
+lib/Aion/Env/Etc.md
+lib/Aion/Env/Etc.pm
 minil.toml
 t/aion/env.t
+t/aion/env/etc.pm
+t/aion/env/etc.t
 META.yml
 MANIFEST

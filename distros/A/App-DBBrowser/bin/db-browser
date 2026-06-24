@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.442';
+our $VERSION = '2.443';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,25 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.442
-
-=head1 BACKWARD INCOMPATIBLE CHANGES
-
-=over
-
-=item
-
-Table names and column names are now unquoted by default (see L</Identifiers>).
-
-=item
-
-Saved subqueries are saved now at plugin level instead at driver level.
-
-=item
-
-How plugin and database configuration data is saved has changed.
-
-=back
+Version 2.443
 
 =head1 SYNOPSIS
 
@@ -416,7 +398,7 @@ If the option I<Source Type> is set to I<menu>, selecting I<Create Table> opens 
 of the data source. If I<Source Type> is set to I<plain> or I<file>, the set data source type is automatically used
 without displaying a menu. For more information, see L</Data Input>.
 
-You will be prompted:
+You will be asked:
 
 =over
 
@@ -426,9 +408,8 @@ for the table name
 
 =item
 
-if the first data row should be used as a header
-
-Selecting the prompt line of this menu allows you to set the 'create table' options.
+if the first data row should be used as a header (Selecting the prompt line of this menu allows you to set the
+L</Create-Table> options)
 
 =item
 
@@ -492,7 +473,10 @@ Delete records. The affected records are shown before the user confirms the dele
 
 =item plain
 
-Insert the data cell by cell.
+I<Create Table>: First, enter the column names (any empty fields will be ignored; see also L</Max Cols Plain>). Then,
+insert the data cell by cell.
+
+I<Insert>: Insert the data cell by cell.
 
 =item file
 
@@ -724,9 +708,6 @@ Display this documentation.
 The I<Options> menu is accessed with C<db-browser -h>.
 
 =head2 Connect data
-
-By selecting the prompt line of the plugin settings menu (Configure plugin-name), you can set the connect data at
-database level.
 
 =over
 
@@ -1455,6 +1436,10 @@ Set the data source type to C<plain>, C<file>, or C<menu> for C<Insert Into> and
 
 If set to C<menu>, a menu is offered where the user can choose the type of the data source. If set to C<plain> or
 C<file>, the respective setting is used directly without any menu.
+
+=head3 Max Cols Plain
+
+I<Create Table>, source type I<plain>: set the maximum number of columns.
 
 =head2 Export Data
 

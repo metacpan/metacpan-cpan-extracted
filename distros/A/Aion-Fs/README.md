@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-aion-fs/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-fs/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion-fs?logo=perl)](https://github.com/darviarush/perl-aion-fs/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Fs.svg)](https://metacpan.org/release/Aion-Fs) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-fs/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Fs+0.2.3)
+[![Actions Status](https://github.com/darviarush/perl-aion-fs/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-fs/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion-fs?logo=perl)](https://github.com/darviarush/perl-aion-fs/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Fs.svg)](https://metacpan.org/release/Aion-Fs) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-fs/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Fs+0.2.4)
 # NAME
 
 Aion::Fs - утилиты для файловой системы: чтение, запись, поиск, замена файлов и т.д.
 
 # VERSION
 
-0.2.3
+0.2.4
 
 # SYNOPSIS
 
@@ -262,7 +262,7 @@ cat  # => ¡bc
 
 * Если `$path` не указан, использует `$_`.
 * Если `$path` является ссылкой на массив, тогда используется путь в качестве первого элемента и права в качестве второго элемента.
-* Права по умолчанию – `0755`.
+* Права по умолчанию берутся из `AION_FS_DIR_DEFAULT_PERMISSION` указанной в `%ENV` или `.env`. Если и там и там нет, тогда – `0755`.
 * Возвращает `$path`.
 
 ```perl
@@ -527,7 +527,8 @@ sta(".")->{atime} # ~> ^\d+(\.\d+)?$
 
     path '.$.Directory.Directory.' # --> $path
 
-    path {volume => "ADFS::HardDisk.", file => "File"} # => ADFS::HardDisk.$.File
+    path {volume => "ADFS::HardDisk.", file => "File"} # \> ADFS::HardDisk.File
+    path {volume => "ADFS::HardDisk.", folder => '$', file => "File"} # \> ADFS::HardDisk.$.File
     path {folder => "x"}  # => x.
     path {dir    => "x."} # => x.
 }
@@ -722,17 +723,11 @@ wildcard "?_??_**"  # \> (?^usn:^._[^/]_[^/]*?$)
 
 ## goto_editor ($path, $line)
 
-Открывает файл в редакторе из .config на указанной строке. По умолчанию использует `vscodium %p:%l`.
+Открывает файл в редакторе из энвиронмента `AION_FS_EDITOR` на указанной строке. По умолчанию использует `vscodium %p:%l`.
 
-Файл .config.pm:
-```perl
-package config;
-
-config_module 'Aion::Fs' => {
-    EDITOR => 'echo %p:%l > ed.txt',
-};
-
-1;
+Файл .env:
+```text
+AION_FS_EDITOR = echo %p:%l > ed.txt
 ```
 
 ```perl

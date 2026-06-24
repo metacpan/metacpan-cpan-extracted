@@ -1,7 +1,7 @@
 package Cron::Toolkit;
 
 # VERSION
-$VERSION = 1.01;
+$VERSION = 1.02;
 
 use strict;
 use warnings;
@@ -955,20 +955,21 @@ sub next {
    $epoch_seconds //= time;
 
    my $clamped = max( $epoch_seconds, $self->{begin_epoch} );
-
    return if $clamped > $self->{end_epoch};
 
-   my $tm = Time::Moment->from_epoch($clamped)->with_offset_same_instant( $self->{utc_offset} );
+   my $tm = Time::Moment->from_epoch($clamped)
+                        ->with_offset_same_instant( $self->{utc_offset} );
    $tm = $tm->plus_seconds(1);
 
-   # shortcut for HMS
+   # HMS shortcut / odometer carry
    NODE: foreach my $i ( 0 .. 2 ) {
       my $node    = $self->{nodes}[$i];
       my $curval  = $self->_field_value( $tm, $node->field_type );
       my $lowval  = $node->lowest($tm);
       my $highval = $node->highest($tm);
 
-      if ($curval >= $highval) {
+      # Changed condition + explicit handling for exact highval
+      if ($curval > $highval || ($curval == $highval && !$node->match($curval, $tm))) {
          $tm = $self->_set_date( $tm, $node->field_type, $lowval );
          $tm = $self->_plus_one( $tm, $self->{nodes}[ $i + 1 ]->field_type );
          next NODE;
@@ -982,34 +983,19 @@ sub next {
          }
       }
 
-      # flip odometer if no match
+      # flip if no match found in this field
       $tm = $self->_set_date( $tm, $node->field_type, $lowval );
       $tm = $self->_plus_one( $tm, $self->{nodes}[ $i + 1 ]->field_type );
    }
-
-   # set year
-   my $year_node   = $self->{nodes}[6];
-   my $year_lowval = $year_node->lowest($tm); 
-   my $tm_year_low = $self->_set_date( $tm, $year_node->field_type, $year_lowval );
-   $tm_year_low = $self->_minus_one( $tm_year_low, $year_node->field_type );
-
-   $tm = $tm_year_low if $tm->is_before($tm_year_low);
-
-   my $max_tm = Time::Moment->new(
-      year   => 2099,
-      month  => 12,
-      day    => 31,
-      hour   => 23,
-      minute => 59,
-      second => 59,
-   );
-
-   my $max_iter = $tm->delta_days($max_tm);
 
    # the brute force approach for DMY is correct here because:
    # 1) the design is simple and easy to understand and debug
    # 2) solves all tricky end-of-month and leap year calculations
    # 3) 365 iterations per one-year time window is good enough
+
+   my $max_tm = Time::Moment->new( year => 2099, month => 12, day => 31,
+                                   hour => 23, minute => 59, second => 59 );
+   my $max_iter = $tm->delta_days($max_tm) || 1;
 
    for my $day ( 1 .. $max_iter ) {
       return $tm->epoch if $self->_is_match($tm);
@@ -1023,20 +1009,21 @@ sub previous {
    $epoch_seconds //= time;
 
    my $clamped = min( $epoch_seconds, $self->{end_epoch} );
-
    return if $clamped < $self->{begin_epoch};
 
-   my $tm = Time::Moment->from_epoch($clamped)->with_offset_same_instant( $self->{utc_offset} );
+   my $tm = Time::Moment->from_epoch($clamped)
+                        ->with_offset_same_instant( $self->{utc_offset} );
    $tm = $tm->minus_seconds(1);
 
+   # HMS shortcut / odometer carry (backward)
    NODE: foreach my $i ( 0 .. 2 ) {
-      my $node = $self->{nodes}[$i];
-
+      my $node    = $self->{nodes}[$i];
+      my $curval  = $self->_field_value( $tm, $node->field_type );
       my $lowval  = $node->lowest($tm);
       my $highval = $node->highest($tm);
-      my $curval  = $self->_field_value( $tm, $node->field_type );
 
-      if ($curval <= $lowval) {
+      # Changed condition + explicit handling for exact lowval
+      if ($curval < $lowval || ($curval == $lowval && !$node->match($curval, $tm))) {
          $tm = $self->_set_date( $tm, $node->field_type, $highval );
          $tm = $self->_minus_one( $tm, $self->{nodes}[ $i + 1 ]->field_type );
          next NODE;
@@ -1050,29 +1037,15 @@ sub previous {
          }
       }
 
-      # flip odometer if no match
+      # flip if no match found in this field
       $tm = $self->_set_date( $tm, $node->field_type, $highval );
       $tm = $self->_minus_one( $tm, $self->{nodes}[ $i + 1 ]->field_type );
    }
 
-   # set year
-   my $year_node    = $self->{nodes}[6];
-   my $year_highval = $year_node->highest($tm);
-   my $tm_year_high = $self->_set_date( $tm, $year_node->field_type, $year_highval );
-   $tm_year_high    = $self->_plus_one( $tm_year_high, $year_node->field_type );
-   $tm = $tm_year_high if $tm->is_after($tm_year_high);
-
-   # calculate maximum iterations
-   my $min_tm = Time::Moment->new(
-      year   => 1970,
-      month  => 1,
-      day    => 1,
-      hour   => 0,
-      minute => 0,
-      second => 0,
-   );
-
-   my $min_iter = $min_tm->delta_days($tm);
+   # Brute force for DOM/DOW/year (no year adjustment block)
+   my $min_tm = Time::Moment->new( year => 1970, month => 1, day => 1,
+                                   hour => 0, minute => 0, second => 0 );
+   my $min_iter = $min_tm->delta_days($tm) || 1;
 
    for my $day ( 0 .. $min_iter ) {
       return $tm->epoch if $self->_is_match($tm);

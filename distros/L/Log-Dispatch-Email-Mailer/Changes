@@ -1,5 +1,8 @@
 Revision history for Log::Dispatch::Email::Mailer
 
+1.16      2026-06-23 18:56:51-07:00 America/Los_Angeles
+        - Change author email address (sadly)
+
 1.15      2026-04-07 10:18:20-07:00 America/Los_Angeles
         - Bump minimum Perl version to 16 due to MIME::Types now requiring it
 

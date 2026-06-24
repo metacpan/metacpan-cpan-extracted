@@ -33,7 +33,7 @@ use Role::Tiny::With;
 with 'CPAN::Maker::Role::ModuleUtils';
 with 'CPAN::Maker::Role::FileUtils';
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.2';
 
 __PACKAGE__->use_log4perl( level => 'info' );
 
@@ -881,26 +881,28 @@ sub parse_project {
 ########################################################################
   my ( $self, $project, %args ) = @_;
 
-  if ($project) {
-    if ( $project->{author} ) {
-      $args{a} = $project->{author}->{name};
+  return %args
+    if !$project;
 
-      if ( $project->{author}->{mailto} ) {
-        $args{a} .= ' <' . $project->{author}->{mailto} . '>';
-      }
+  if ( $project->{author} ) {
+    my $name = $project->{author}->{name} // 'anonymouse';
+    $args{a} = $name;
 
-      $args{a} = sprintf q{'%s'}, $args{a};
+    if ( my $mailto = $project->{author}->{mailto} ) {
+      $args{a} .= ' <' . $mailto . '>';
     }
 
-    # -d
-    if ( $project->{description} ) {
-      $args{d} = sprintf q{'%s'}, $project->{description};
-    }
+    $args{a} = sprintf q{'%s'}, $args{a};
+  }
 
-    # -g
-    if ( $project->{git} ) {
-      $args{g} = $project->{git};
-    }
+  # -d
+  if ( my $description = $project->{description} ) {
+    $args{d} = sprintf q{'%s'}, $description;
+  }
+
+  # -g
+  if ( my $git = $project->{git} ) {
+    $args{g} = $git;
   }
 
   return %args;
@@ -911,9 +913,11 @@ sub parse_pm_module {
 ########################################################################
   my ( $self, $pm_module, %args ) = @_;
 
-  if ($pm_module) {
-    $args{m} = $pm_module;
-  }
+  return %args
+    if !$pm_module;
+
+  $args{m} = $pm_module;
+
   return %args;
 }
 
@@ -1105,8 +1109,8 @@ sub _generate_man_links {
 
       $content .= <<"POSTAMBLE";
 install ::
-\t\$(NOECHO) ln -sf \$(INSTALLMAN3DIR)/$module.3pm \$(INSTALLMAN3DIR)/$alias.3pm
-\t\$(NOECHO) echo \$(INSTALLMAN3DIR)/$alias.3pm >> \$(DESTINSTALLSITEARCH)/auto/\$(FULLEXT)/.packlist
+\t-\$(NOECHO) ln -sf \$(DESTINSTALLMAN3DIR)/$module.3pm \$(DESTINSTALLMAN3DIR)/$alias.3pm; \
+\t\$(NOECHO) echo \$(DESTINSTALLMAN3DIR)/$alias.3pm >> \$(DESTINSTALLSITEARCH)/auto/\$(FULLEXT)/.packlist
 POSTAMBLE
     }
   }
@@ -1463,7 +1467,7 @@ output or problems with the final distribution.
 
 =head1 VERSION
 
-This documentation refers to version 1.9.1
+This documentation refers to version 1.9.2
 
 =head1 USING THE BASH SCRIPT
 
@@ -1660,7 +1664,7 @@ main module being packaged.
 
 Example:
 
-  version: 1.9.1
+  version: 1.9.2
   project:
     git: https://github.com/rlauer6/perl-Amazon-Credentials
     description: "AWS credentials discoverer"

@@ -11,7 +11,7 @@ use Sub::Util 'set_subname';
 use Syntax::Keyword::Defer;
 use Syntax::Keyword::Try;
 
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 use feature      ();
 use utf8         ();
@@ -291,7 +291,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =for markdown [![test](https://github.com/gryphonshafer/exact/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact)
@@ -672,7 +672,7 @@ Alexander Ponomarev (shootnix)
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

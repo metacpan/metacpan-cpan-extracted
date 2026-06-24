@@ -126,6 +126,7 @@ sub defaults {
             empty_to_null_file       => 1,
             data_source_create_table => 2,
             data_source_insert       => 2,
+            max_cols_plain           => 25,
             show_hidden_files        => 0,
             file_filter              => '',
         },

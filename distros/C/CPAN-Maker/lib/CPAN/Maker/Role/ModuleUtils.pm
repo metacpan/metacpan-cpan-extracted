@@ -5,7 +5,7 @@ use ExtUtils::MM;
 
 use Role::Tiny;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.2';
 
 ########################################################################
 sub make_path_from_module {

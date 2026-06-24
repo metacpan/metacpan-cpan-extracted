@@ -1,5 +1,5 @@
 /*
- Copyright (c) 1997-2023  Michael Peppler
+ Copyright (c) 1997-2026  Michael Peppler
 
  You may distribute under the terms of either the GNU General Public
  License or the Artistic License, as specified in the Perl README file.
@@ -118,6 +118,7 @@ static CS_COMMAND *syb_alloc_cmd _((imp_dbh_t *, CS_CONNECTION*, int mode));
 static void dealloc_dynamic _((imp_sth_t *));
 static int map_syb_types _((int));
 static int map_sql_types _((int));
+static int init_dbh _((imp_dbh_t * ));
 static CS_CONNECTION *syb_db_connect _((struct imp_dbh_st *));
 static int syb_db_use _((imp_dbh_t *, CS_CONNECTION *));
 static int syb_st_describe_proc _((SV *sth, imp_sth_t *, char *));
@@ -1114,6 +1115,7 @@ int syb_db_login(SV *dbh, imp_dbh_t *imp_dbh, char *dsn, char *uid, char *pwd, S
   dTHX;
   int retval;
 
+  imp_dbh->locale = (CS_LOCALE*) NULL;
   imp_dbh->server[0] = 0;
   imp_dbh->charset[0] = 0;
   imp_dbh->packetSize[0] = 0;
@@ -1207,7 +1209,10 @@ int syb_db_login(SV *dbh, imp_dbh_t *imp_dbh, char *dsn, char *uid, char *pwd, S
   MUTEX_LOCK(context_alloc_mutex);
 #endif
 
-  if ((imp_dbh->connection = syb_db_connect(imp_dbh)) == NULL) {
+  retval = init_dbh(imp_dbh);
+
+  /* only try to connect if init_dbh() is successful! */
+  if (retval && (imp_dbh->connection = syb_db_connect(imp_dbh)) == NULL) {
     retval = 0;
   } else {
     retval = 1;
@@ -1233,10 +1238,9 @@ int syb_db_login(SV *dbh, imp_dbh_t *imp_dbh, char *dsn, char *uid, char *pwd, S
   return 1;
 }
 
-static CS_CONNECTION *syb_db_connect(imp_dbh_t *imp_dbh) {
+static int init_dbh(imp_dbh_t * imp_dbh) {
   dTHR;
   CS_RETCODE retcode;
-  CS_CONNECTION *connection = NULL;
   char ofile[255];
   int len;
 
@@ -1270,7 +1274,7 @@ static CS_CONNECTION *syb_db_connect(imp_dbh_t *imp_dbh) {
     if (retcode == CS_SUCCEED) {
       if ((retcode = ct_config(context, CS_SET, CS_IFILE, imp_dbh->ifile, CS_NULLTERM, NULL)) != CS_SUCCEED) {
         warn("ct_config(CS_SET, CS_IFILE, %s) failed", imp_dbh->ifile);
-        return NULL;
+        return 0;
       }
     }
   }
@@ -1371,295 +1375,281 @@ static CS_CONNECTION *syb_db_connect(imp_dbh_t *imp_dbh) {
     }
 #endif
 
-    if ((retcode = ct_con_alloc(context, &connection)) != CS_SUCCEED) {
-      warn("ct_con_alloc failed");
-      return 0;
+  return 1;
+}
+
+static CS_CONNECTION *syb_db_connect(imp_dbh_t *imp_dbh) {
+  dTHR;
+  CS_RETCODE retcode;
+  CS_CONNECTION *connection = NULL;
+  char ofile[255];
+  int len;
+
+  if ((retcode = ct_con_alloc(context, &connection)) != CS_SUCCEED) {
+    warn("ct_con_alloc failed");
+    return NULL;
+  }
+
+  if (imp_dbh->locale) {
+    if (ct_con_props(connection, CS_SET, CS_LOC_PROP,
+          (CS_VOID*)imp_dbh->locale, CS_UNUSED, (CS_INT*)NULL)
+      != CS_SUCCEED) {
+
+      warn("ct_con_props(CS_LOC_PROP) failed");
+      return NULL;
     }
+  }
 
-    if (imp_dbh->locale) {
-      if (ct_con_props(connection, CS_SET, CS_LOC_PROP,
-              (CS_VOID*)imp_dbh->locale, CS_UNUSED, (CS_INT*)NULL)
-          != CS_SUCCEED) {
-
-        warn("ct_con_props(CS_LOC_PROP) failed");
-        return 0;
-      }
-    }
-
-    if ((retcode = ct_con_props(connection, CS_SET, CS_USERDATA, &imp_dbh,
+  if ((retcode = ct_con_props(connection, CS_SET, CS_USERDATA, &imp_dbh,
                 CS_SIZEOF(imp_dbh), NULL)) != CS_SUCCEED) {
-      warn("ct_con_props(CS_USERDATA) failed");
-      return 0;
-    }
-    if (imp_dbh->tdsLevel[0] != 0) {
-      CS_INT value = 0;
-      if (strEQ(imp_dbh->tdsLevel, "CS_TDS_40")) {
-        value = CS_TDS_40;
-      } else if (strEQ(imp_dbh->tdsLevel, "CS_TDS_42")) {
-        value = CS_TDS_42;
-      } else if (strEQ(imp_dbh->tdsLevel, "CS_TDS_46")) {
-        value = CS_TDS_46;
-      } else if (strEQ(imp_dbh->tdsLevel, "CS_TDS_495")) {
-        value = CS_TDS_495;
-      } else if (strEQ(imp_dbh->tdsLevel, "CS_TDS_50")) {
-        value = CS_TDS_50;
-      }
-
-      if (value) {
-        if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
-          PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> ct_con_props(CS_TDS_VERSION,%s)\n", 
-            imp_dbh->tdsLevel);
-        }
-
-        if (ct_con_props(connection, CS_SET, CS_TDS_VERSION,
-                (CS_VOID*)&value, CS_UNUSED, (CS_INT*)NULL) != CS_SUCCEED) {
-          warn("ct_con_props(CS_TDS_VERSION, %s) failed", imp_dbh->tdsLevel);
-        }
-      } else {
-        warn("Unkown tdsLevel value %s found", imp_dbh->tdsLevel);
-      }
+    warn("ct_con_props(CS_USERDATA) failed");
+    return NULL;
+  }
+  if (imp_dbh->tdsLevel[0] != 0) {
+    CS_INT value = 0;
+    if (strEQ(imp_dbh->tdsLevel, "CS_TDS_40")) {
+      value = CS_TDS_40;
+    } else if (strEQ(imp_dbh->tdsLevel, "CS_TDS_42")) {
+      value = CS_TDS_42;
+    } else if (strEQ(imp_dbh->tdsLevel, "CS_TDS_46")) {
+      value = CS_TDS_46;
+    } else if (strEQ(imp_dbh->tdsLevel, "CS_TDS_495")) {
+      value = CS_TDS_495;
+    } else if (strEQ(imp_dbh->tdsLevel, "CS_TDS_50")) {
+      value = CS_TDS_50;
     }
 
-    if (imp_dbh->packetSize[0] != 0) {
-      int i = atoi(imp_dbh->packetSize);
+    if (value) {
       if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
-        PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> ct_con_props(CS_PACKETSIZE,%d)\n", i);
+        PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> ct_con_props(CS_TDS_VERSION,%s)\n", 
+          imp_dbh->tdsLevel);
       }
-      if (ct_con_props(connection, CS_SET, CS_PACKETSIZE, (CS_VOID*)&i,
-              CS_UNUSED, (CS_INT*)NULL) != CS_SUCCEED) {
-        warn("ct_con_props(CS_PACKETSIZE, %d) failed", i);
-        return 0;
-      }
-    }
 
-#if defined(CS_SEC_NETWORKAUTH)
-    if(imp_dbh->kerberosPrincipal[0] == 0) {
-#endif
-      if (retcode == CS_SUCCEED && *imp_dbh->uid) {
-        if ((retcode = ct_con_props(connection, CS_SET, CS_USERNAME,
-                    imp_dbh->uid, CS_NULLTERM, NULL)) != CS_SUCCEED) {
-          warn("ct_con_props(CS_USERNAME) failed");
-          return 0;
-        }
+      if (ct_con_props(connection, CS_SET, CS_TDS_VERSION,
+              (CS_VOID*)&value, CS_UNUSED, (CS_INT*)NULL) != CS_SUCCEED) {
+        warn("ct_con_props(CS_TDS_VERSION, %s) failed", imp_dbh->tdsLevel);
       }
-      if (retcode == CS_SUCCEED && *imp_dbh->pwd) {
-        if ((retcode = ct_con_props(connection, CS_SET, CS_PASSWORD,
-                    imp_dbh->pwd, CS_NULLTERM, NULL)) != CS_SUCCEED) {
-          warn("ct_con_props(CS_PASSWORD) failed");
-          return 0;
-        }
-      }
-#if defined(CS_SEC_NETWORKAUTH)
     } else {
-      /*
-       ** If we're using Kerberos, set the appropriate connection properties
-       ** (which requires the Sybase Kerberos principal name).
-       */
-      CS_INT i = CS_TRUE;
-      if(DBIc_DBISTATE(imp_dbh)->debug >= 3) {
-      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> ct_con_props(CS_SERVERPRINCIPAL,%s)\n",
-          imp_dbh->kerberosPrincipal);
-      }
-      if ((retcode = ct_con_props(connection, CS_SET, CS_SEC_NETWORKAUTH,
-                  (CS_VOID *) &i, CS_UNUSED, NULL)) != CS_SUCCEED) {
-        warn("ct_con_props(CS_SEC_NETWORKAUTH) failed");
-        return 0;
-      }
+      warn("Unkown tdsLevel value %s found", imp_dbh->tdsLevel);
+    }
+  }
 
-      if ((retcode = ct_con_props(connection, CS_SET, CS_SEC_SERVERPRINCIPAL,
-                  imp_dbh->kerberosPrincipal, CS_NULLTERM, NULL)) != CS_SUCCEED) {
-        warn("ct_con_props(CS_SEC_SERVERPRINCIPAL) failed");
-        return 0;
+  if (imp_dbh->packetSize[0] != 0) {
+    int i = atoi(imp_dbh->packetSize);
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> ct_con_props(CS_PACKETSIZE,%d)\n", i);
+    }
+    if (ct_con_props(connection, CS_SET, CS_PACKETSIZE, (CS_VOID*)&i,
+              CS_UNUSED, (CS_INT*)NULL) != CS_SUCCEED) {
+      warn("ct_con_props(CS_PACKETSIZE, %d) failed", i);
+      return NULL;
+    }
+  }
+
+#if defined(CS_SEC_NETWORKAUTH)
+  if(imp_dbh->kerberosPrincipal[0] == 0) {
+#endif
+    if (retcode == CS_SUCCEED && *imp_dbh->uid) {
+      if ((retcode = ct_con_props(connection, CS_SET, CS_USERNAME,
+                  imp_dbh->uid, CS_NULLTERM, NULL)) != CS_SUCCEED) {
+        warn("ct_con_props(CS_USERNAME) failed");
+        return NULL;
       }
     }
-#endif
-    if (retcode == CS_SUCCEED) {
-      if ((retcode = ct_con_props(connection, CS_SET, CS_APPNAME,
-                  *imp_dbh->scriptName ? imp_dbh->scriptName : scriptName,
-                  CS_NULLTERM, NULL)) != CS_SUCCEED) {
-        warn("ct_con_props(CS_APPNAME, %s) failed", imp_dbh->scriptName);
-        return 0;
+    if (retcode == CS_SUCCEED && *imp_dbh->pwd) {
+      if ((retcode = ct_con_props(connection, CS_SET, CS_PASSWORD,
+                  imp_dbh->pwd, CS_NULLTERM, NULL)) != CS_SUCCEED) {
+        warn("ct_con_props(CS_PASSWORD) failed");
+        return NULL;
       }
-      if ((retcode = ct_con_props(connection, CS_SET, CS_HOSTNAME,
+    }
+#if defined(CS_SEC_NETWORKAUTH)
+  } else {
+    /*
+     ** If we're using Kerberos, set the appropriate connection properties
+     ** (which requires the Sybase Kerberos principal name).
+     */
+    CS_INT i = CS_TRUE;
+    if(DBIc_DBISTATE(imp_dbh)->debug >= 3) {
+    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> ct_con_props(CS_SERVERPRINCIPAL,%s)\n",
+      imp_dbh->kerberosPrincipal);
+    }
+    if ((retcode = ct_con_props(connection, CS_SET, CS_SEC_NETWORKAUTH,
+                (CS_VOID *) &i, CS_UNUSED, NULL)) != CS_SUCCEED) {
+      warn("ct_con_props(CS_SEC_NETWORKAUTH) failed");
+      return NULL;
+    }
+
+    if ((retcode = ct_con_props(connection, CS_SET, CS_SEC_SERVERPRINCIPAL,
+                imp_dbh->kerberosPrincipal, CS_NULLTERM, NULL)) != CS_SUCCEED) {
+      warn("ct_con_props(CS_SEC_SERVERPRINCIPAL) failed");
+      return NULL;
+    }
+  }
+#endif
+  if (retcode == CS_SUCCEED) {
+    if ((retcode = ct_con_props(connection, CS_SET, CS_APPNAME,
+                *imp_dbh->scriptName ? imp_dbh->scriptName : scriptName,
+                CS_NULLTERM, NULL)) != CS_SUCCEED) {
+      warn("ct_con_props(CS_APPNAME, %s) failed", imp_dbh->scriptName);
+      return NULL;
+    }
+    if ((retcode = ct_con_props(connection, CS_SET, CS_HOSTNAME,
                   *imp_dbh->hostname ? imp_dbh->hostname : hostname, CS_NULLTERM,
                   NULL)) != CS_SUCCEED) {
-        warn("ct_con_props(CS_HOSTNAME, %s) failed", imp_dbh->hostname);
-        return 0;
-      }
+      warn("ct_con_props(CS_HOSTNAME, %s) failed", imp_dbh->hostname);
+      return NULL;
     }
-    if (retcode == CS_SUCCEED) {
-      if (imp_dbh->encryptPassword[0] != 0) {
-        int level = atoi(imp_dbh->encryptPassword);
-        if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
-          PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> encryptPassword = %d\n",level);
+  }
+  if (retcode == CS_SUCCEED) {
+    if (imp_dbh->encryptPassword[0] != 0) {
+      int level = atoi(imp_dbh->encryptPassword);
+      if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
+        PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> encryptPassword = %d\n",level);
+      }
+      int i = CS_TRUE;
+      /* CS_SEC_ENCRYPTION must be true to enable the additional properties below */
+      if (level != 0) {
+        if ((retcode = ct_con_props(connection, CS_SET, CS_SEC_ENCRYPTION,
+                    (CS_VOID*)&i, CS_UNUSED, (CS_INT*)NULL)) != CS_SUCCEED) {
+          warn("ct_con_props(CS_SEC_ENCRYPTION, true) failed");
+          return NULL;
         }
-        int i = CS_TRUE;
-        /* CS_SEC_ENCRYPTION must be true to enable the additional properties below */
-        if (level != 0) {
-          if ((retcode = ct_con_props(connection, CS_SET, CS_SEC_ENCRYPTION,
-                      (CS_VOID*)&i, CS_UNUSED, (CS_INT*)NULL)) != CS_SUCCEED) {
-            warn("ct_con_props(CS_SEC_ENCRYPTION, true) failed");
-            return 0;
-          }
-        }
+      }
 #if defined(CS_SEC_EXTENDED_ENCRYPTION)
 /* Set the level to > 1 to enable asymetric password encryption. This also disables 
 non-encrypted retries */
-        if (level > 1) {
-          CS_INT extendedEncryption = CS_TRUE;
-          CS_INT nonEncryptionRetry = CS_FALSE;
-          if ((retcode = ct_con_props(connection, CS_SET,
-                    CS_SEC_EXTENDED_ENCRYPTION, 
-                    &extendedEncryption, CS_UNUSED, (CS_INT*)NULL)) != CS_SUCCEED) {
-            warn("ct_con_props(CS_SEC_EXTENDED_ENCRYPTION, true) failed");
-            return 0;
-          }
-          if ((retcode = ct_con_props(connection, CS_SET,
-                    CS_SEC_NON_ENCRYPTION_RETRY,
-                    &nonEncryptionRetry, CS_UNUSED, (CS_INT*)NULL)) != CS_SUCCEED) {
-            warn("ct_con_props(CS_SEC_NON_ENCRYPTION_RETRY, false) failed");
-            return 0;
-          }
+      if (level > 1) {
+        CS_INT extendedEncryption = CS_TRUE;
+        CS_INT nonEncryptionRetry = CS_FALSE;
+        if ((retcode = ct_con_props(connection, CS_SET,
+                  CS_SEC_EXTENDED_ENCRYPTION, 
+                  &extendedEncryption, CS_UNUSED, (CS_INT*)NULL)) != CS_SUCCEED) {
+          warn("ct_con_props(CS_SEC_EXTENDED_ENCRYPTION, true) failed");
+          return 0;
         }
-#endif
-      }
-    }
-#if defined(CS_PROP_SSL_CA)
-    if(retcode == CS_SUCCEED) {
-      if(imp_dbh->sslCAFile[0] != 0) {
-        if((retcode = ct_con_props(connection, CS_SET, CS_PROP_SSL_CA,
-                    imp_dbh->sslCAFile,
-                    CS_NULLTERM, (CS_INT*)NULL)) != CS_SUCCEED) {
-          warn("ct_con_props(CS_PROP_SSL_CA, %s) failed", imp_dbh->sslCAFile);
+        if ((retcode = ct_con_props(connection, CS_SET,
+                  CS_SEC_NON_ENCRYPTION_RETRY,
+                  &nonEncryptionRetry, CS_UNUSED, (CS_INT*)NULL)) != CS_SUCCEED) {
+          warn("ct_con_props(CS_SEC_NON_ENCRYPTION_RETRY, false) failed");
           return 0;
         }
       }
+#endif
     }
+  }
+#if defined(CS_PROP_SSL_CA)
+  if(retcode == CS_SUCCEED) {
+    if(imp_dbh->sslCAFile[0] != 0) {
+      if((retcode = ct_con_props(connection, CS_SET, CS_PROP_SSL_CA,
+                    imp_dbh->sslCAFile,
+                    CS_NULLTERM, (CS_INT*)NULL)) != CS_SUCCEED) {
+        warn("ct_con_props(CS_PROP_SSL_CA, %s) failed", imp_dbh->sslCAFile);
+        return 0;
+      }
+    }
+  }
 #endif
 
-    if (retcode == CS_SUCCEED && imp_dbh->host[0] && imp_dbh->port[0]) {
+  if (retcode == CS_SUCCEED && imp_dbh->host[0] && imp_dbh->port[0]) {
 #if defined(CS_SERVERADDR)
-      char buff[255];
-      sprintf(buff, "%.64s %.20s", imp_dbh->host, imp_dbh->port);
-      if((retcode = ct_con_props(connection, CS_SET, CS_SERVERADDR,
+    char buff[255];
+    sprintf(buff, "%.64s %.20s", imp_dbh->host, imp_dbh->port);
+    if((retcode = ct_con_props(connection, CS_SET, CS_SERVERADDR,
                   (CS_VOID*)buff,
                   CS_NULLTERM, (CS_INT*)NULL)) != CS_SUCCEED) {
-        warn("ct_con_props(CS_SERVERADDR) failed");
-        return 0;
-      }
+      warn("ct_con_props(CS_SERVERADDR) failed");
+      return NULL;
+    }
 #else
-      croak("This version of OpenClient doesn't support CS_SERVERADDR");
+    croak("This version of OpenClient doesn't support CS_SERVERADDR");
 #endif
-    }
+  }
 
-    if (retcode == CS_SUCCEED && imp_dbh->blkLogin[0] != 0) {
-      CS_INT flag = CS_TRUE;
-      if ((retcode = ct_con_props(connection, CS_SET, CS_BULK_LOGIN,
-                  (CS_VOID*)&flag, CS_UNUSED, (CS_INT*)NULL)) != CS_SUCCEED) {
-        warn("ct_con_props(CS_BULK_LOGIN) failed");
-        return 0;
-      }
+  if (retcode == CS_SUCCEED && imp_dbh->blkLogin[0] != 0) {
+    CS_INT flag = CS_TRUE;
+    if ((retcode = ct_con_props(connection, CS_SET, CS_BULK_LOGIN,
+                (CS_VOID*)&flag, CS_UNUSED, (CS_INT*)NULL)) != CS_SUCCEED) {
+      warn("ct_con_props(CS_BULK_LOGIN) failed");
+      return NULL;
     }
+  }
 
-    if (retcode == CS_SUCCEED) {
-      len = *imp_dbh->server == 0 ? 0 : CS_NULLTERM;
+  if (retcode == CS_SUCCEED) {
+    len = *imp_dbh->server == 0 ? 0 : CS_NULLTERM;
       
-      // Try to connect - if this fails we do some cleanup...
-      if ((retcode = ct_connect(connection, imp_dbh->server, len)) != CS_SUCCEED) {
-        if (glocale != NULL) {
-          cs_loc_drop(context, glocale);
-        }
-        ct_con_drop(connection);
-        return 0;
-      }
+    // Try to connect - if this fails we do some cleanup...
+    if ((retcode = ct_connect(connection, imp_dbh->server, len)) != CS_SUCCEED) {
+      ct_con_drop(connection);
+      return NULL;
     }
-    if (imp_dbh->ifile[0]) {
-      if ((retcode = ct_config(context, CS_SET, CS_IFILE, ofile, CS_NULLTERM,
-                  NULL)) != CS_SUCCEED) {
-        warn("ct_config(CS_SET, CS_IFILE, %s) failed", ofile);
-      }
+  }
+  if (imp_dbh->ifile[0]) {
+    if ((retcode = ct_config(context, CS_SET, CS_IFILE, ofile, CS_NULLTERM,
+                NULL)) != CS_SUCCEED) {
+      warn("ct_config(CS_SET, CS_IFILE, %s) failed", ofile);
     }
+  }
 
-    if (imp_dbh->database[0] || imp_dbh->curr_db[0]) {
-      int ret = syb_db_use(imp_dbh, connection);
-      if (imp_dbh->failedDbUseFatal && ret < 0) {
-        /* cleanup, and return NULL */
-        ct_close(connection, CS_FORCE_CLOSE);
-        if (glocale != NULL) {
-          cs_loc_drop(context, glocale);
-        }
-        ct_con_drop(connection);
+  if (imp_dbh->database[0] || imp_dbh->curr_db[0]) {
+    int ret = syb_db_use(imp_dbh, connection);
+    if (imp_dbh->failedDbUseFatal && ret < 0) {
+      /* cleanup, and return NULL */
+      ct_close(connection, CS_FORCE_CLOSE);
+      ct_con_drop(connection);
 
-        return 0;
-      }
+      return NULL;
     }
+  }
 
-    if (imp_dbh->chainedSupported) {
-      CS_BOOL value = CS_FALSE;
+  if (imp_dbh->chainedSupported) {
+    CS_BOOL value = CS_FALSE;
 
-      /* Default to ct_option supported... */
-      imp_dbh->optSupported = 1;
+    /* Default to ct_option supported... */
+    imp_dbh->optSupported = 1;
 
-      if (DBIc_DBISTATE(imp_dbh)->debug >= 3) { 
-        PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> checking for chained transactions\n");
-      }
-      retcode = ct_options(connection, CS_SET, CS_OPT_CHAINXACTS, &value,
-          CS_UNUSED, NULL);
-      if (retcode == CS_FAIL) {
-        imp_dbh->doRealTran = 1;
-        imp_dbh->chainedSupported = 0;
-      }
-#if 0
-      /* This appears not to work - and hides the assignement to
-       optSupported done in the server callback */
-
-      /* No SRV_OPTION handler on the server... */
-      if (imp_dbh->lasterr == 17001) { 
-        imp_dbh->optSupported = 0;
-      } else {
-        imp_dbh->optSupported = 1;
-      }
-#endif
-      if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
-        PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> ct_option is %ssupported\n", 
-          imp_dbh->optSupported == 1 ?"":"not ");
-      }
-      if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
-        PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> chained transactions are %s supported\n", 
-          retcode == CS_FAIL ? "not" : "");
-      }
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 3) { 
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> checking for chained transactions\n");
     }
-
-#if 0
-    if(!imp_dbh->optSupported) {
+    retcode = ct_options(connection, CS_SET, CS_OPT_CHAINXACTS, &value,
+        CS_UNUSED, NULL);
+    if (retcode == CS_FAIL) {
+      imp_dbh->doRealTran = 1;
       imp_dbh->chainedSupported = 0;
-      imp_dbh->doRealTran = 1; /* XXX ??? */
     }
-#endif
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> ct_option is %ssupported\n", 
+        imp_dbh->optSupported == 1 ?"":"not ");
+    }
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    syb_db_login() -> chained transactions are %s supported\n", 
+        retcode == CS_FAIL ? "not" : "");
+    }
+  }
 
-    if (imp_dbh->connection) {
-      /* we're setting a sub-connection, so make sure that any attributes
-       such as syb_quoted_identifier and syb_rowcount are set here too */
+  if (imp_dbh->connection) {
+    /* we're setting a sub-connection, so make sure that any attributes
+     such as syb_quoted_identifier and syb_rowcount are set here too */
 
-      if (imp_dbh->quotedIdentifier && imp_dbh->optSupported) {
-        CS_INT value = 1;
-        retcode = ct_options(connection, CS_SET, CS_OPT_QUOTED_IDENT,
-            &value, CS_UNUSED, NULL);
-        if (retcode != CS_SUCCEED) {
-          warn("Setting of CS_OPT_QUOTED_IDENT failed.");
-        }
+    if (imp_dbh->quotedIdentifier && imp_dbh->optSupported) {
+      CS_INT value = 1;
+      retcode = ct_options(connection, CS_SET, CS_OPT_QUOTED_IDENT,
+          &value, CS_UNUSED, NULL);
+      if (retcode != CS_SUCCEED) {
+        warn("Setting of CS_OPT_QUOTED_IDENT failed.");
       }
+    }
 #if defined(CS_OPT_ROWCOUNT)
-      if(imp_dbh->rowcount && imp_dbh->optSupported) {
-        CS_INT value = imp_dbh->rowcount;
-        retcode = ct_options(connection, CS_SET, CS_OPT_ROWCOUNT,
-            &value, CS_UNUSED, NULL);
-        if(retcode != CS_SUCCEED) {
-          warn("Setting of CS_OPT_ROWCOUNT failed.");
-        }
+    if(imp_dbh->rowcount && imp_dbh->optSupported) {
+      CS_INT value = imp_dbh->rowcount;
+      retcode = ct_options(connection, CS_SET, CS_OPT_ROWCOUNT,
+          &value, CS_UNUSED, NULL);
+      if(retcode != CS_SUCCEED) {
+        warn("Setting of CS_OPT_ROWCOUNT failed.");
       }
-#endif
     }
+#endif
+  }
 
     return connection;
   }
@@ -1668,7 +1658,7 @@ static int syb_db_use(imp_dbh_t *imp_dbh, CS_CONNECTION *connection) {
   CS_COMMAND *cmd = syb_alloc_cmd(imp_dbh, connection, 1);
   CS_RETCODE ret;
   CS_INT restype;
-  char statement[255];
+  char statement[270];
   int retval = 0;
   char *db;
 

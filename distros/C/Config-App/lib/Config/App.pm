@@ -14,7 +14,7 @@ use POSIX ();
 use URI ();
 use YAML::XS ();
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -450,7 +450,7 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =for markdown [![test](https://github.com/gryphonshafer/Config-App/workflows/test/badge.svg)](https://github.com/gryphonshafer/Config-App/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Config-App/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Config-App)
@@ -847,7 +847,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/G/Config-App.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

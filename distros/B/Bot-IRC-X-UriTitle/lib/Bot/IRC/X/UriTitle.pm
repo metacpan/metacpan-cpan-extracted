@@ -9,7 +9,7 @@ use LWP::Protocol::https;
 use Text::Unidecode 'unidecode';
 use URI::Title 'title';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -44,7 +44,7 @@ Bot::IRC::X::UriTitle - Bot::IRC plugin to parse and print URI titles
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-UriTitle/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-UriTitle/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-UriTitle/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-UriTitle)
@@ -102,7 +102,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/T/Bot-IRC-X-UriTitle.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

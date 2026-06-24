@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion-Env
 
+0.2 2026-06-23T13:16:47Z
+
+    - added parser config files: Aion::Env::Etc
+
 0.1 2026-06-17T16:38:31Z
 
     - original version

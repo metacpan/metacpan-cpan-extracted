@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl pseudo pragma to enable strict, warnings, features, mro, filehandle methods",
-  "AUTHOR" => "Gryphon Shafer <gryphon\@cpan.org>",
+  "AUTHOR" => "Gryphon Shafer <gryphon\@goldenguru.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.31",
+  "VERSION" => "1.32",
   "test" => {
     "TESTS" => "t/*.t"
   }

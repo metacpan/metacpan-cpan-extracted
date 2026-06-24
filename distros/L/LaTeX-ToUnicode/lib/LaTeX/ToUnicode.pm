@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package LaTeX::ToUnicode;
 BEGIN {
-  $LaTeX::ToUnicode::VERSION = '1.94';
+  $LaTeX::ToUnicode::VERSION = '1.95';
 }
 #ABSTRACT: Convert LaTeX commands to Unicode (simplistically)
 

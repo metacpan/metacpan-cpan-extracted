@@ -1,5 +1,9 @@
 Revision history for Perl extension Config::NINI
 
+0.12  2026.06.23
+
+      1. added pod manual into the pm
+
 0.11  2026.06.22
 
       1. begin, specs, examples and perl implementation

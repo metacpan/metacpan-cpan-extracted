@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.443   2026-06-23
+    - ODBC (mysql,MariaDB): bugfix in get_schemas.
+    - Refactoring tables_info.
+    - Removed database-level configuration of connection data.
+    - Update error message export file name.
+    - Update import plain mode.
+
 2.442   2026-05-22
     - Term::TablePrint minimum version 0.182.
 

@@ -1,6 +1,6 @@
 # Security Policy for the MojoX-Log-Dispatch-Simple distribution.
 
-Report security issues by email to Gryphon Shafer <gryphon@cpan.org>.
+Report security issues by email to Gryphon Shafer <gryphon@goldenguru.com>.
 
 This is the Security Policy for MojoX-Log-Dispatch-Simple.
 
@@ -11,7 +11,7 @@ https://security.metacpan.org/docs/guides/security-policy-for-authors.html
 # How to Report a Security Vulnerability
 
 Security vulnerabilities can be reported to the current MojoX-Log-Dispatch-Simple
-maintainers by email to Gryphon Shafer <gryphon@cpan.org>.
+maintainers by email to Gryphon Shafer <gryphon@goldenguru.com>.
 
 Please include as many details as possible, including code samples
 or test cases, so that we can reproduce the issue.  Check that your

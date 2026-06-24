@@ -418,11 +418,11 @@ msgstr ""
 "* [String::Wildcard::Bash](https://metacpan.org/pod/String::Wildcard::Bash).\n"
 "* [Text::Glob](https://metacpan.org/pod/Text::Glob) – `glob_to_regex(\"*.{pm,pl}\")`."
 
-msgid "Открывает файл в редакторе из .config на указанной строке. По умолчанию использует `vscodium %p:%l`."
-msgstr "Opens the file in the editor from .config at the specified line. Defaults to `vscodium %p:%l`."
+msgid "Открывает файл в редакторе из `AION_FS_EDITOR` на указанной строке. По умолчанию использует `vscodium %p:%l`."
+msgstr "Opens a file in the editor from `AION_FS_EDITOR` at the specified line. Defaults to `vscodium %p:%l`."
 
-msgid "Файл .config.pm:"
-msgstr ".config.pm file:"
+msgid "Файл .env:"
+msgstr ".env file:"
 
 msgid "Переводит пакет в путь ФС. Без параметра использует `$_`."
 msgstr "Transfers the packet to the FS path. Without a parameter, uses `$_`."

@@ -27,17 +27,17 @@ ok( $obj->qr_code =~ m|
     %26issuer%3DUndefined
 |x, 'qr_code from clear state' );
 
-ok( $obj->qr_code( 'bv5o3disbutz4tl3', 'gryphon@cpan.org', 'Gryphon Shafer' ) =~ m|
+ok( $obj->qr_code( 'bv5o3disbutz4tl3', 'user@example.com', 'Example User' ) =~ m|
     https://quickchart.io/chart
     \?
     chs=200x200&cht=qr&chl=
-    otpauth%3A%2F%2Ftotp%2FGryphon%2520Shafer%3Agryphon%2540cpan.org%3Fsecret%3D
+    otpauth%3A%2F%2Ftotp%2FExample%2520User%3Auser%2540example.com%3Fsecret%3D
     bv5o3disbutz4tl3
-    %26issuer%3DGryphon%2520Shafer
+    %26issuer%3DExample%2520User
 |x, 'qr_code from specific state' );
 
-ok( $obj->qr_code( 'bv5o3disbutz4tl3', 'gryphon@cpan.org', 'Gryphon Shafer', 1 ) =~ m|
-    otpauth://totp/Gryphon%20Shafer:gryphon%40cpan.org\?secret=bv5o3disbutz4tl3&issuer=Gryphon%20Shafer
+ok( $obj->qr_code( 'bv5o3disbutz4tl3', 'user@example.com', 'Example User', 1 ) =~ m|
+    otpauth://totp/Example%20User:user%40example.com\?secret=bv5o3disbutz4tl3&issuer=Example%20User
 |x, 'qr_code otpauth from specific state' );
 
 is( $obj->code( undef, 1438643789 ), '007176', 'code()' );

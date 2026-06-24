@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.17'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 use DBI 1.40;
 use parent 'DBI';
@@ -735,7 +735,7 @@ DBIx::Query - Simplified abstracted chained DBI subclass
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =for markdown [![test](https://github.com/gryphonshafer/DBIx-Query/workflows/test/badge.svg)](https://github.com/gryphonshafer/DBIx-Query/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/DBIx-Query/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/DBIx-Query)
@@ -1394,7 +1394,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/D/DBIx-Query.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

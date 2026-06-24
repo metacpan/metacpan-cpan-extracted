@@ -2,9 +2,10 @@
 # MIT License
 
 class Unicode : precompile {
-  version "0.056";
+  version "0.057";
   
   use IntList;
+  use Resource::Utf8proc;
   
   native static method uchar : int ($string : string, $offset_ref : int*);
   native static method uchar_to_utf8 : string ($uchar : int);

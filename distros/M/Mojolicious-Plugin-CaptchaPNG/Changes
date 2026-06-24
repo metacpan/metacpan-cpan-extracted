@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::CaptchaPNG
 
+1.09      2026-06-23 18:57:57-07:00 America/Los_Angeles
+        - Change author email address (sadly)
+
 1.08      2025-06-17 09:49:13-07:00 America/Los_Angeles
         - Encourage captcha value encryption as per CPANSec recommendation
 

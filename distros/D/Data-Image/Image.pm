@@ -5,9 +5,10 @@ use warnings;
 
 use Mo qw(build is);
 use Mo::utils 0.28 qw(check_code check_isa check_length check_number check_number_id check_required);
+use Mo::utils::Number qw(check_positive_natural);
 use Mo::utils::URI qw(check_location);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has author => (
 	is => 'ro',
@@ -26,6 +27,10 @@ has height => (
 );
 
 has id => (
+	is => 'ro',
+);
+
+has metadata => (
 	is => 'ro',
 );
 
@@ -61,7 +66,10 @@ sub BUILD {
 	check_number($self, 'height');
 
 	# Check id.
-	check_number_id($self, 'id');
+	check_positive_natural($self, 'id');
+
+	# Check metadata.
+	check_isa($self, 'metadata', 'Data::Metadata');
 
 	# Check size.
 	check_number($self, 'size');
@@ -101,6 +109,7 @@ Data::Image - Data object for image.
  my $dt_created = $obj->dt_created;
  my $height = $obj->height;
  my $id = $obj->id;
+ my $metadata = $obj->metadata;
  my $size = $obj->size;
  my $url = $obj->url;
  my $url_cb = $obj->url_cb;
@@ -153,6 +162,16 @@ Default value is undef.
 Image id.
 
 It's optional.
+
+Default value is undef.
+
+=item * C<metadata>
+
+Metadata object.
+
+It's optional.
+
+Possible value is L<Data::Metadata> instance.
 
 Default value is undef.
 
@@ -232,6 +251,14 @@ Get image id.
 
 Returns number.
 
+=head2 C<metadata>
+
+ my $metadata = $obj->metadata;
+
+Get matadata object.
+
+Returns L<Data::Metadata> instance.
+
 =head2 C<size>
 
  my $size = $obj->size;
@@ -277,8 +304,6 @@ Returns number.
                          Reference: %s
                  Parameter 'height' must a number.
                          Value: %s
-                 Parameter 'id' must be a natural number.
-                         Value: %s
                  Parameter 'size' must a number.
                          Value: %s
                  Parameter 'url' has length greater than '255'.
@@ -288,9 +313,15 @@ Returns number.
                  Parameter 'width' must a number.
                          Value: %s
 
+         From Mo::utils::Number::check_positive_natural():
+                 Parameter 'id' must be a positive natural number.
+                         Value: %s
+
          From Mo::utils::URI:
                  Parameter 'url' doesn't contain valid location.
                          Value: %s
+
+=head1 EXAMPLES
 
 =head1 EXAMPLE
 
@@ -338,6 +369,7 @@ Returns number.
 
 L<Mo>,
 L<Mo::utils>,
+L<Mo::utils::Number>,
 L<Mo::utils::URI>.
 
 =head1 SEE ALSO
@@ -362,12 +394,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2025 Michal Josef Špaček
+© 2022-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -1,5 +1,8 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+8.002 - [IN PROGRES] Fix crash with arithmetic overloads which don't work with
+        ordinary numbers (e.g. Date::Time objects).
+        Small doc tweaks.
 8.001 - Simplify diaagnostic for dvis interpolation error
         Maybe handle recursion from tie handlers.
         Fix undefined warning if :debug import tag was used.

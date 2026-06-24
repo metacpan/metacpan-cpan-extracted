@@ -8,7 +8,7 @@ use DBI;
 use DBD::SQLite;
 use JSON::XS;
 
-our $VERSION = '1.48'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -148,7 +148,7 @@ Bot::IRC::Store::SQLite - Bot::IRC persistent data storage with SQLite
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 
@@ -208,7 +208,7 @@ L<Bot::IRC>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

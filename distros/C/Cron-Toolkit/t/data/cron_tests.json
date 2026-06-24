@@ -563,7 +563,6 @@
       "next_epoch" : 1761566400,
       "prev_epoch" : 1759147200,
       "type" : "quartz",
-      "tz" : "Europe/London",
       "utc_offset" : 0.0
    },
    {
@@ -755,8 +754,8 @@
       "desc" : "midnight on the 1st Monday, on the last Sunday of every month",
       "expr" : "0 0 0 ? * 1#1,L *",
       "invalid" : 0,
-      "next_epoch" : 1761436800,
-      "prev_epoch" : 1759708800,
+      "next_epoch" : 1761433200,
+      "prev_epoch" : 1759705200,
       "type" : "quartz",
       "tz" : "Europe/London",
       "utc_offset" : 0.0
@@ -1243,6 +1242,18 @@
       "type" : "quartz",
       "tz" : "America/Los_Angeles",
       "utc_offset" : -480.0
+   },
+   {
+      "as_quartz_string" : "*/15 * * * * ? *",
+      "as_string" : "*/15 * * * * ? *",
+      "base_epoch" : 1782100725,
+      "category" : "general",
+      "desc" : "every 15 seconds of every minute",
+      "expr" : "*/15 * * * * * *",
+      "invalid" : 0,
+      "next_epoch" : 1782100740,
+      "prev_epoch" : 1782100710,
+      "type" : "quartz"
    },
    {
       "category" : "parsing",

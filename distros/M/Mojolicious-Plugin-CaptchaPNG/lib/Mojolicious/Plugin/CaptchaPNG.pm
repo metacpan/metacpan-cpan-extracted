@@ -10,7 +10,7 @@ use GD::Image;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Exception;
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 my $settings = {
     method      => 'any',
@@ -171,7 +171,7 @@ Mojolicious::Plugin::CaptchaPNG - PNG captcha generation and validation Mojolici
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for markdown [![test](https://github.com/gryphonshafer/Mojo-Plugin-CaptchaPNG/workflows/test/badge.svg)](https://github.com/gryphonshafer/Mojo-Plugin-CaptchaPNG/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CaptchaPNG/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CaptchaPNG)
@@ -448,7 +448,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/M/Mojo-Plugin-CaptchaPNG.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

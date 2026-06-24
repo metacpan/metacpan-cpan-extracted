@@ -17,9 +17,14 @@ lib/Plerd/Util.pm
 minil.toml
 t/atomic_publish.t
 t/basic.t
+t/crlf.t
 t/daemon.t
+t/emoji_title.t
 t/incremental.t
+t/index_symlink.t
 t/init.t
+t/missing_tags_template.t
+t/post_sort.t
 t/source_model/1999-01-01-backdated.md
 t/source_model/1999-01-02-unicode.md
 t/source_model/TODAY-dated-today.md

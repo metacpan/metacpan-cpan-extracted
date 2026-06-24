@@ -7,7 +7,7 @@ use Import::Into;
 use feature    ();
 use Role::Tiny ();
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 my ($perl_version) = $^V =~ /^v5\.(\d+)/;
 
@@ -58,7 +58,7 @@ exact::role - Simple role interface extension for exact
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 
@@ -229,7 +229,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/D/exact-class.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

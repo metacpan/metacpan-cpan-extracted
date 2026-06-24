@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Wanted - ~/lib/Wanted.pm
-## Version v0.1.1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.1.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/05/16
-## Modified 2026/06/08
+## Modified 2026/06/14
 ## All rights reserved
 ## 
 ## 
@@ -19,7 +19,7 @@ require DynaLoader;
 our @ISA = qw( Exporter DynaLoader );
 our @EXPORT = qw( want rreturn lnoreturn );
 our @EXPORT_OK = qw( context howmany wantref );
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 our $DEBUG;
 
 bootstrap Wanted $VERSION;
@@ -228,7 +228,7 @@ sub lnoreturn () : lvalue
 sub _wantone
 {
     my( $uplevel, $arg ) = @_;
-    
+
     my $wantref = wantref( $uplevel + 1 );
     if( $arg =~ /^\d+$/ )
     {
@@ -389,7 +389,7 @@ Also works in threads, where the context is set at thread creation.
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 
@@ -471,7 +471,7 @@ Either the caller is directly assigning to the result of the sub call:
 or the caller is making a reference to the result, which might be assigned to later:
 
     my $ref = \(foo());   # Could now have: $$ref = 99;
-  
+
     # Note that this example imposes LIST context on the sub call.
     # So we are taking a reference to the first element to be
     # returned _in list context_.
@@ -533,7 +533,7 @@ This makes it very easy to write lvalue subroutines which do clever things:
         }
         return
     }
- 
+
     print "foo -> ", backstr("foo"), "\n";        # foo -> oof
     backstr(my $robin) = "nibor";
     print "\$robin is now $robin\n";              # $robin is now robin
@@ -552,7 +552,7 @@ Sometimes in scalar context the caller is expecting a reference of some sort to 
     print foo()->[23];   # ARRAY reference expected
     print ${foo()};      # SCALAR reference expected
     print foo()->bar();  # OBJECT reference expected
-    
+
     my $format = *{foo()}{FORMAT} # GLOB reference expected
 
 You can check this using conditionals like C<if (want('CODE'))>.
@@ -594,7 +594,7 @@ Sometimes the caller is only interested in the truth or falsity of a function's 
     }
 
     print (foo() ? "ok\n" : "not ok\n");
-    
+
 In the following example, all subroutine calls are in BOOL context:
 
     my $x = ( (foo() && !bar()) xor (baz() || quux()) );
@@ -603,7 +603,7 @@ Boolean context, like the reference contexts above, is considered to be a subcon
 
 =head1 FUNCTIONS
 
-=head2 want(SPECIFIERS)
+=head2 want
 
 This is the primary interface to this module, and should suffice for most purposes. You pass it a list of context specifiers, and the return value is true whenever all of the specifiers hold.
 
@@ -639,13 +639,13 @@ Use this function instead of C<return> from inside an lvalue subroutine when you
 
 If you use L</rreturn> or L</lnoreturn>, then you have to put a bare C<return;> at the very end of your lvalue subroutine, in order to stop the Perl compiler from complaining. Think of it as akin to the C<1;> that you have to put at the end of a module. (Note: this is no longer true in Perl 5.16.)
 
-=head2 howmany()
+=head2 howmany
 
 Returns the I<expectation count>, i.e. the number of items expected. If the expectation count is undefined, that indicates that an unlimited number of items might be used (e.g. the return value is being assigned to an array). In void context the expectation count is zero, and in scalar context it is one.
 
 The same as C<want('COUNT')>.
 
-=head2 wantref()
+=head2 wantref
 
 Returns the type of reference which the caller is expecting, or the empty string if the caller is not expecting a reference immediately.
 
@@ -1075,6 +1075,18 @@ For example:
 In this case, C<want('CODE')> should return false because the caller does not expect a code reference, but it returns true due to limitations in context detection.
 
 B<Recommendation:> Be cautious when using C<want('CODE')> in scalar context with prototyped subroutines. If necessary, explicitly check the context using C<want('SCALAR')> or avoid prototypes in such cases.
+
+=head2 Known platform issues
+
+=over 4
+
+=item * Solaris + Perl 5.10.0 threaded
+
+A segmentation fault occurs during global destruction when using threads.
+
+This only affects this extremely old combination and does not impact normal operation. The test C<t/09.threads.t> is skipped on this platform.
+
+=back
 
 =head1 CREDITS
 

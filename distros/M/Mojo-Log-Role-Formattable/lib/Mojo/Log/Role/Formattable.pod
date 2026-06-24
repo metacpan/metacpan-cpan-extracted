@@ -1,0 +1,45 @@
+=pod
+
+=head1 NAME
+
+Mojo::Log::Role::Formattable - Add logging methods with an "f" suffix to Mojo::Log
+
+=head1 SYNOPSIS
+
+  use Mojo::Log ();
+  my $log = Mojo::Log->new->with_roles( '+Formattable' );
+
+  $log->errorf( 'an error occurred: %s', $@ );
+
+=head1 DESCRIPTION
+
+This role adds "f" suffixed logging methods to the consuming class
+L<Mojo::Log>. Each method renders log messages like L<sprintf|perlfunc/"sprintf
+FORMAT, LIST">.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<Mojo::Log::Role::Format>
+
+=item *
+
+L<The Mojolicious Blog: More About Roles|https://mojolicious.io/blog/2017/12/13/day-13-more-about-roles/>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=cut

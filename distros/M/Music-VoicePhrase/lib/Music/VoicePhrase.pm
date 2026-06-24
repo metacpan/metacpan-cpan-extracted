@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct a measured phrase of notes
 
-our $VERSION = '0.0106';
+our $VERSION = '0.0107';
 
 use v5.36;
 use Moo;
@@ -57,12 +57,12 @@ has intervals => (
     default => sub { [-3, -2, -1, 1, 2, 3] },
 );
 
-has _voice => (
+has voice => (
     is      => 'lazy',
-    builder => '_build__voice',
+    builder => '_build_voice',
 );
 
-sub _build__voice ($self) {
+sub _build_voice ($self) {
     my $voice = Music::VoiceGen->new(
         pitches   => $self->pitches,
         intervals => $self->intervals,
@@ -181,7 +181,7 @@ sub build_motifs ($self) {
 
 
 sub build_voices ($self) {
-    my @voices = map { $self->_voice->rand } $self->motifs->@*;
+    my @voices = map { $self->voice->rand } $self->motifs->@*;
     return \@voices;
 }
 
@@ -205,7 +205,7 @@ Music::VoicePhrase - Construct a measured phrase of notes
 
 =head1 VERSION
 
-version 0.0106
+version 0.0107
 
 =head1 SYNOPSIS
 
@@ -213,10 +213,10 @@ version 0.0106
 
   my $mvp = Music::VoicePhrase->new;
 
-  my $motifs = $mvp->motifs;
+  my $motifs = $mvp->motifs; # using defaults
   my $voices = $mvp->voices;
 
-  $mvp->motif_num(6);
+  $mvp->motif_num(6); # get fresh
   $motifs = $mvp->build_motifs;
   $voices = $mvp->build_voices;
 

@@ -2,7 +2,7 @@
 use v5.14;
 use warnings;
 
-package Test::Load::Helper v1.0.0 {
+package Test::Load::Helper v1.0.1 {
 
 	use Carp qw (croak);
 	use Path::Tiny qw ();
@@ -245,7 +245,7 @@ traversal continues to the filesystem root.
 
 =head1 AUTHOR
 
-Branislav Zahradník <barney@cpan.org>
+Branislav Zahradník <barney.cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

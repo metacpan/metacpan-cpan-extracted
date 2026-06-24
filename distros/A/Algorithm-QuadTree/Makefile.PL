@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Scalar::Util" => 0
   },
-  "VERSION" => "0.8",
+  "VERSION" => "1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -4,7 +4,7 @@ package exact::conf;
 use 5.014;
 use exact;
 
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 sub import {
     my ( $self, $params, $caller ) = @_;
@@ -41,7 +41,7 @@ exact::conf - Cascading merged application configuration extension for exact
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-conf/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-conf/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-conf/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-conf)
@@ -124,7 +124,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/D/exact-conf.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

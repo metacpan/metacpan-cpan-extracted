@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 0.2.2
+# 0.2.3
 # 
 # # SYNOPSIS
 # 
@@ -527,7 +527,8 @@ local ($::_g0 = do {path $path->{path}}, $::_e0 = do {$path}); ::is_deeply $::_g
 
 local ($::_g0 = do {path '.$.Directory.Directory.'}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path \'.$.Directory.Directory.\' # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-local ($::_g0 = do {path {volume => "ADFS::HardDisk.", file => "File"}}, $::_e0 = "ADFS::HardDisk.$.File"); ::ok $::_g0 eq $::_e0, '    path {volume => "ADFS::HardDisk.", file => "File"} # => ADFS::HardDisk.$.File' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {volume => "ADFS::HardDisk.", file => "File"}}, $::_e0 = 'ADFS::HardDisk.File'); ::ok $::_g0 eq $::_e0, '    path {volume => "ADFS::HardDisk.", file => "File"} # \> ADFS::HardDisk.File' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {volume => "ADFS::HardDisk.", folder => '$', file => "File"}}, $::_e0 = 'ADFS::HardDisk.$.File'); ::ok $::_g0 eq $::_e0, '    path {volume => "ADFS::HardDisk.", folder => \'$\', file => "File"} # \> ADFS::HardDisk.$.File' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {path {folder => "x"}}, $::_e0 = "x."); ::ok $::_g0 eq $::_e0, '    path {folder => "x"}  # => x.' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {path {dir    => "x."}}, $::_e0 = "x."); ::ok $::_g0 eq $::_e0, '    path {dir    => "x."} # => x.' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
@@ -722,17 +723,11 @@ local ($::_g0 = do {wildcard "?_??_**"}, $::_e0 = '(?^usn:^._[^/]_[^/]*?$)'); ::
 # 
 # ## goto_editor ($path, $line)
 # 
-# Открывает файл в редакторе из .config на указанной строке. По умолчанию использует `vscodium %p:%l`.
+# Открывает файл в редакторе из `AION_FS_EDITOR` на указанной строке. По умолчанию использует `vscodium %p:%l`.
 # 
-# Файл .config.pm:
-#@> .config.pm
-#>> package config;
-#>> 
-#>> config_module 'Aion::Fs' => {
-#>>     EDITOR => 'echo %p:%l > ed.txt',
-#>> };
-#>> 
-#>> 1;
+# Файл .env:
+#@> .env
+#>> AION_FS_EDITOR = echo %p:%l > ed.txt
 #@< EOF
 # 
 ::done_testing; }; subtest 'goto_editor ($path, $line)' => sub { 

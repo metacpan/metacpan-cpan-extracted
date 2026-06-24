@@ -10,7 +10,7 @@ use LWP::Protocol::https;
 use Date::Parse 'str2time';
 use WWW::Shorten qw( TinyURL makeashorterlink );
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -149,7 +149,7 @@ Bot::IRC::X::Feeds - Bot::IRC plugin to watch and notify on changes in RSS feeds
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-Feeds/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-Feeds/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Feeds/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Feeds)
@@ -255,7 +255,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/T/Bot-IRC-X-Feeds.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

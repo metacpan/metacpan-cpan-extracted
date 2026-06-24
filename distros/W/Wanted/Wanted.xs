@@ -1,12 +1,12 @@
 /*
  *----------------------------------------------------------------------------
  * Wanted - ~/Wanted.xs
- * Version v0.1.0
+ * Version v0.1.2
  * Copyright(c) 2025 DEGUEST Pte. Ltd.
  * Original author: Robin Houston
  * Modified by: Jacques Deguest <jack@deguest.jp>
  * Created 2025/05/16
- * Modified 2025/05/24
+ * Modified 2025/06/14
  * All rights reserved
  * 
  * This program is free software; you can redistribute  it  and/or  modify  it
@@ -311,7 +311,7 @@ upcontext_plus(pTHX_ I32 count, bool end_of_block)
         }
     }
 
-    debugger_trouble = (cx->blk_oldcop->op_type == OP_DBSTATE);
+    debugger_trouble = (cx->blk_oldcop && cx->blk_oldcop->op_type == OP_DBSTATE);
 
     for (i = cxix-1; i>=0 ; i--)
     {
@@ -439,6 +439,7 @@ lastop(oplist* l)
             && ret->op_type != OP_SCOPE
             && ret->op_type != OP_LEAVE)
         {
+            free(l);
             return ret;
         }
     }
@@ -539,6 +540,12 @@ find_ancestors_from(OP* start, OP* next, oplist* l)
             else
                 l->length = ll;
         }
+    }
+    /* Not found. Free the list only if it was allocated in this outermost frame;
+       recursive frames borrow the caller's list and must not free it. */
+    if (outer_call)
+    {
+        free(l);
     }
     /* Do not free l here; let the caller handle it */
     return (oplist*)0;
@@ -832,11 +839,12 @@ copy_rvals(I32 uplevel, I32 skip)
     I32 i;
     AV* a;
 
+    if (!cx) return Nullav;
+
     oldmarksp = cx->blk_oldmarksp;
     mark_from = PL_markstack[oldmarksp-1];
     mark_to   = PL_markstack[oldmarksp];
 
-    if (!cx) return Nullav;
     a = newAV();
     for(i=mark_from+1; i<=mark_to; ++i)
         if (skip-- <= 0) av_push(a, newSVsv(PL_stack_base[i]));
@@ -867,8 +875,9 @@ copy_rval(I32 uplevel)
     I32 oldmarksp;
     AV* a;
 
-    oldmarksp = cx->blk_oldmarksp;
     if (!cx) return Nullav;
+
+    oldmarksp = cx->blk_oldmarksp;
     a = newAV();
     av_push(a, newSVsv(PL_stack_base[PL_markstack[oldmarksp+1]]));
 
@@ -949,12 +958,22 @@ I32 uplevel;
         PERL_CONTEXT* cx;
     CODE:
         cx = upcontext(aTHX_ uplevel);
-        if (!cx) RETVAL = 0;
-        
-        if (CvLVALUE(cx->blk_sub.cv))
-            RETVAL = CxLVAL(cx);
-        else
+        if (!cx)
+        {
             RETVAL = 0;
+        }
+        else if (!cx->blk_sub.cv)
+        {
+            RETVAL = 0;
+        }
+        else if (CvLVALUE(cx->blk_sub.cv))
+        {
+            RETVAL = CxLVAL(cx);
+        }
+        else
+        {
+            RETVAL = 0;
+        }
     OUTPUT:
         RETVAL
 
@@ -995,7 +1014,7 @@ I32 uplevel;
         }
         else
         {
-            if (o->op_type == OP_ENTERSUB && (first = cUNOPo->op_first)
+            if (o->op_type == OP_ENTERSUB && (first = cUNOPx(o)->op_first)
                   && (second = OpSIBLING(first)) && OpSIBLING(second) != Nullop)
                 retval = "method_call";
             else

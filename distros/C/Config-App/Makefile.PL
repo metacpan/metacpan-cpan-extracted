@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Cascading merged application configuration",
-  "AUTHOR" => "Gryphon Shafer <gryphon\@cpan.org>",
+  "AUTHOR" => "Gryphon Shafer <gryphon\@goldenguru.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warn" => 0
   },
-  "VERSION" => "1.20",
+  "VERSION" => "1.21",
   "test" => {
     "TESTS" => "t/*.t"
   }

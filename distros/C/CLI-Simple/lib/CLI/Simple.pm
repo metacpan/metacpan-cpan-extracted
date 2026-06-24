@@ -24,7 +24,7 @@ use Log::Log4perl qw();
 use Pod::Usage;
 use Scalar::Util qw(reftype);
 
-our $VERSION              = '2.0.3';
+our $VERSION              = '2.0.4';
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
 our $GETOPT_ERROR_MESSAGE;
@@ -504,7 +504,9 @@ sub usage {
 ########################################################################
   my ($self) = @_;
 
-  my $input = $ENV{MODULINO_WRAPPER} eq 'cli-simple' ? $INC{'CLI/Simple/Shell.pm'} : $self->get__program;
+  my $wrapper = $ENV{MODULINO_WRAPPER} // q{};
+
+  my $input = $wrapper eq 'cli-simple' ? $INC{'CLI/Simple/Shell.pm'} : $self->get__program;
 
   pod2usage(
     -noperldoc => 1,
@@ -840,7 +842,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.0.3.
+This documentation refers to version 2.0.4.
 
 =head1 FEATURES
 

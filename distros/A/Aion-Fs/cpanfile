@@ -33,12 +33,12 @@ on 'test' => sub {
 	requires 'open';
 };
 
+requires 'Aion::Env';
 requires 'Exporter';
 requires 'List::Util';
 requires 'Scalar::Util';
 requires 'Symbol';
 requires 'Time::HiRes';
 requires 'common::sense';
-requires 'config';
 requires 'constant';
 requires 'overload';

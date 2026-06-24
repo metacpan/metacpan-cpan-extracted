@@ -10,6 +10,7 @@ SYNOPSIS
      my $dt_created = $obj->dt_created;
      my $height = $obj->height;
      my $id = $obj->id;
+     my $metadata = $obj->metadata;
      my $size = $obj->size;
      my $url = $obj->url;
      my $url_cb = $obj->url_cb;
@@ -58,6 +59,16 @@ METHODS
             Image id.
 
             It's optional.
+
+            Default value is undef.
+
+    *       "metadata"
+
+            Metadata object.
+
+            It's optional.
+
+            Possible value is Data::Metadata instance.
 
             Default value is undef.
 
@@ -130,6 +141,13 @@ METHODS
 
     Returns number.
 
+  "metadata"
+     my $metadata = $obj->metadata;
+
+    Get matadata object.
+
+    Returns Data::Metadata instance.
+
   "size"
      my $size = $obj->size;
 
@@ -170,8 +188,6 @@ ERRORS
                              Reference: %s
                      Parameter 'height' must a number.
                              Value: %s
-                     Parameter 'id' must be a natural number.
-                             Value: %s
                      Parameter 'size' must a number.
                              Value: %s
                      Parameter 'url' has length greater than '255'.
@@ -181,10 +197,15 @@ ERRORS
                      Parameter 'width' must a number.
                              Value: %s
 
+             From Mo::utils::Number::check_positive_natural():
+                     Parameter 'id' must be a positive natural number.
+                             Value: %s
+
              From Mo::utils::URI:
                      Parameter 'url' doesn't contain valid location.
                              Value: %s
 
+EXAMPLES
 EXAMPLE
      use strict;
      use warnings;
@@ -225,7 +246,7 @@ EXAMPLE
      # Date and time the photo was created: 2022-01-01T00:00:00
 
 DEPENDENCIES
-    Mo, Mo::utils, Mo::utils::URI.
+    Mo, Mo::utils, Mo::utils::Number, Mo::utils::URI.
 
 SEE ALSO
     Data::Commons::Image
@@ -240,10 +261,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022-2025 Michal Josef Špaček
+    © 2022-2026 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

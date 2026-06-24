@@ -23,19 +23,19 @@ no_index:
 provides:
   CPAN::Maker:
     file: lib/CPAN/Maker.pm
-    version: v1.9.1
+    version: v1.9.2
   CPAN::Maker::Constants:
     file: lib/CPAN/Maker/Constants.pm
-    version: v1.9.1
+    version: v1.9.2
   CPAN::Maker::Role::FileUtils:
     file: lib/CPAN/Maker/Role/FileUtils.pm
-    version: v1.9.1
+    version: v1.9.2
   CPAN::Maker::Role::ModuleUtils:
     file: lib/CPAN/Maker/Role/ModuleUtils.pm
-    version: v1.9.1
+    version: v1.9.2
   CPAN::Maker::Utils:
     file: lib/CPAN/Maker/Utils.pm
-    version: v1.9.1
+    version: v1.9.2
 recommends:
   JSON::Validator: '0'
 requires:
@@ -56,5 +56,5 @@ resources:
   bugtracker: https://github.com/rlauer6/CPAN-Maker/issues
   homepage: https://github.com/rlauer6/CPAN-Maker
   repository: https://github.com/rlauer6/CPAN-Maker
-version: v1.9.1
+version: v1.9.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

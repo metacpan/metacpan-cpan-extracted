@@ -1,7 +1,7 @@
 ---
 abstract: 'Yet Another IRC Bot'
 author:
-  - 'Gryphon Shafer <gryphon@cpan.org>'
+  - 'Gryphon Shafer <gryphon@goldenguru.com>'
 build_requires:
   File::Spec: '0'
   IO::Handle: '0'
@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.016'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/Bot-IRC/issues
   homepage: https://github.com/gryphonshafer/Bot-IRC
   repository: https://github.com/gryphonshafer/Bot-IRC.git
-version: '1.48'
-x_generated_by_perl: v5.38.5
+version: '1.49'
+x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

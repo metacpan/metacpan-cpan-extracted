@@ -1,5 +1,5 @@
 package Algorithm::QuadTree;
-$Algorithm::QuadTree::VERSION = '0.8';
+$Algorithm::QuadTree::VERSION = '1.0';
 use strict;
 use warnings;
 use Carp;
@@ -49,14 +49,19 @@ sub new
 
 	my $obj = bless {}, $class;
 
+	for my $arg (keys %args) {
+		if ($arg =~ s{^-}{}) {
+			$obj->{uc $arg} = $args{"-$arg"};
+		}
+	}
+
 	for my $arg (qw/xmin ymin xmax ymax depth/) {
-		unless (exists $args{"-$arg"}) {
+		unless (exists $obj->{uc $arg}) {
 			carp "- must specify $arg";
 			return undef;
 		}
-
-		$obj->{uc $arg} = $args{"-$arg"};
 	}
+
 
 	$obj->{ORIGIN} = [0, 0];
 	$obj->{SCALE} = 1;
@@ -130,6 +135,22 @@ sub clear
 	return;
 }
 
+sub get
+{
+	my ($self, @coords) = @_;
+
+	@coords = $self->_adjustCoords(@coords)
+		unless $self->{SCALE} == 1;
+
+	$self->{CHECK} = 1;
+	if (BACKEND_UNIQUE_RESULTS) {
+		return _AQT_findObjects($self, @coords);
+	}
+	else {
+		return _uniq(_AQT_findObjects($self, @coords));
+	}
+}
+
 sub getEnclosedObjects
 {
 	my ($self, @coords) = @_;
@@ -137,17 +158,18 @@ sub getEnclosedObjects
 	@coords = $self->_adjustCoords(@coords)
 		unless $self->{SCALE} == 1;
 
+	$self->{CHECK} = 0;
 	if (BACKEND_UNIQUE_RESULTS) {
 		return _AQT_findObjects($self, @coords);
 	}
 	else {
 		return _uniq(_AQT_findObjects($self, @coords));
 	}
+}
 
-	# PS. I don't check explicitly if those objects
-	# are enclosed in the given area. They are just
-	# part of the segments that are enclosed in the
-	# given area. TBD.
+sub getApprox
+{
+	goto \&getEnclosedObjects;
 }
 
 sub setWindow
@@ -281,6 +303,10 @@ each of those nodes, we recursively check I<their> children nodes, and so on
 until we reach the leaves of the tree. Finally, we find all the objects that are
 assigned to those leaf nodes and check them for overlap with the initial area.
 
+In case an object is so big that it fully contains given node's area, it can be
+inserted into a higher node before it reaches the leaf, saving space and
+redundant descending into the tree's hierarchy.
+
 =head1 CLASS METHODS
 
 The following methods are public:
@@ -347,7 +373,7 @@ treated as a number, hinting you about the problem.
 
 This method returns an B<array reference> of all the objects that are assigned
 to the nodes that overlap the given rectangular area. The objects will be
-returned in the exact form they were passed to C<< ->add >>.
+returned in the exact form they were passed to C<< ->add >> (the first argument).
 
 =item I<$qt>-E<gt>B<getEnclosedObjects>(x, y, radius)
 
@@ -359,6 +385,20 @@ potential empty / undef values in your coordinates, as long as the number of
 arguments is right. It will never treat C<< ->getEnclosedObjects(1, 2, 3, undef) >>
 as a call to the circular version, and instead produce warnings about
 undef being treated as a number, hinting you about the problem.
+
+=item I<$qt>-E<gt>B<getApprox>(x0, y0, x1, y1)
+
+=item I<$qt>-E<gt>B<getApprox>(x, y, radius)
+
+These are aliases for both forms of C<getEnclosedObjects>.
+
+=item I<$qt>-E<gt>B<get>(x0, y0, x1, y1)
+
+=item I<$qt>-E<gt>B<get>(x, y, radius)
+
+These work like C<getEnclosedObjects>, but they perform an additional check on
+returned objects, so that the objects are guaranteed to be geometrically
+overlapping with the search area.
 
 =item I<$qt>-E<gt>B<delete>(object)
 

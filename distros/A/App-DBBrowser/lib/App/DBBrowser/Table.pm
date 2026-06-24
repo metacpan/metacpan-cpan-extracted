@@ -279,46 +279,46 @@ sub __get_filename_fs {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $file_name;
+    my $tmp_file_name;
     if ( $sf->{o}{export}{default_filename} ) {
-        $file_name = $sf->{d}{table_key};
+        $tmp_file_name = $sf->{d}{table_key};
     }
     my $count = 0;
 
     FILE_NAME: while ( 1 ) {
         if ( ++$count > 2 ) {
-            $file_name = '';
+            $tmp_file_name = '';
         }
         my $info = $ax->get_sql_info( $sql );
         # Readline
-        $file_name = $tr->readline(
+        $tmp_file_name = $tr->readline(
             'File name: ',
-            { info => $info, default => $file_name, hide_cursor => 2, history => [] }
+            { info => $info, default => $tmp_file_name, hide_cursor => 2, history => [] }
         );
         $ax->print_sql_info( $info );
-        if ( ! length $file_name ) {
+        if ( ! length $tmp_file_name ) {
             return;
         }
 
         FULL_FILE_NAME: while ( 1 ) {
-            my $file_name_plus = $file_name;
-            if ( $sf->{o}{export}{add_extension} && $file_name !~ /\.csv\z/i ) {
-                $file_name_plus .= '.csv';
+            my $file_name = $tmp_file_name;
+            if ( $sf->{o}{export}{add_extension} && $tmp_file_name !~ /\.csv\z/i ) {
+                $file_name .= '.csv';
             }
             my $export_dir = $sf->{o}{export}{export_dir};
             my $dir_fs = realpath( encode( 'locale_fs', $export_dir ) ) or die "$export_dir: $!";
-            my $file_fs = catfile $dir_fs, encode( 'locale_fs', $file_name_plus );
+            my $file_fs = catfile $dir_fs, encode( 'locale_fs', $file_name );
             my ( $new_name, $overwrite ) = ( '- New name', '- Overwrite' );
             my $chosen;
             if ( -e $file_fs ) {
                 my $menu;
                 my $prompt;
                 if ( -d $file_fs ) {
-                    $prompt = 'A directory with name "' . $file_name_plus . '" already exists.';
+                    $prompt = 'A directory \'' . decode( 'locale_fs', $file_fs ) . '\' already exists:';
                     $menu = [ undef, $new_name ];
                 }
                 else {
-                    $prompt =  'A file with name "' . $file_name_plus . '" already exists.';
+                    $prompt =  'A file \'' . decode( 'locale_fs', $file_fs ) . '\' already exists:';
                     $menu = [ undef, $new_name, $overwrite ];
                 }
                 # Choose
@@ -367,6 +367,7 @@ sub __get_filename_fs {
         }
     }
 }
+
 
 
 1;

@@ -50,7 +50,6 @@ sub from_col_by_col {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $back =  $sf->{i}{back};
     my $confirm = $sf->{i}{confirm};
     my $stmt_type = $sf->{d}{stmt_types}[0];
@@ -59,62 +58,59 @@ sub from_col_by_col {
         my $aoa = [];
         my $col_names;
         if ( $stmt_type eq 'Create_Table' ) {
-            my $col_count;
+            my $col_count = $sf->{o}{insert}{max_cols_plain} || 25; ##
+            my $width = length $col_count;
             my $info = 'CREATE TABLE';
-
-            COL_COUNT: while ( 1 ) {
-                # Choose a number
-                $col_count = $tu->choose_a_number( 2,
-                    { info => $info, cs_label => 'Number of columns: ', small_first => 1, confirm => $confirm,
-                    default_number => $col_count, back => $back, prompt => '' }
-                );
-                if ( ! $col_count ) {
-                    return;
-                }
-                my $fields = [ map { [ $_, '' ] } 1 .. $col_count ];
-                # Fill_form
-                my $form = $tf->fill_form(
-                    $fields,
-                    { info => $info, prompt => 'Column names:', confirm => $confirm, back => $back . '   ' }
-                );
-                if ( ! $form ) {
-                    next COL_COUNT;
-                }
-                $col_names = [ map { $_->[1] } @$form ]; # not quoted
-                unshift @$aoa, $col_names;
-                last COL_COUNT;
+            my $fields = [ map { [ sprintf( "%*d", $width, $_ ), '' ] } 1 .. $col_count ];
+            # Fill_form
+            my $form = $tf->fill_form(
+                $fields,
+                { info => $info, prompt => 'Column names:', confirm => $confirm, back => $back . '   ' }
+            );
+            if ( ! $form ) {
+                return;
             }
+            $col_names = [ map { $_->[1] } grep { length $_->[1] } @$form ]; # not quoted
+            unshift @$aoa, $col_names;
         }
         else {
             $col_names = $sql->{insert_col_names};
         }
         my $default;
+        my $count;
 
         WHAT_NEXT: while ( 1 ) {
             my $add = 'Add Data';
             my @pre = ( undef, $sf->{i}{ok} );
             my $menu = [ @pre, $add ];
             my $info = $sf->__get_read_info( $aoa );
-            # Choose
-            my $choice = $tc->choose(
-                $menu,
-                { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $choice ) {
-                if ( $stmt_type eq 'Create_Table' && @$aoa == 1 ) {
-                    next COL_BY_COL;
-                }
-                elsif ( $stmt_type eq 'Insert' && @$aoa == 0 ) {
-                    return;
-                }
-                else {
-                    $default = 0;
-                    $#$aoa--;
-                    next WHAT_NEXT;
+            my $choice;
+            if ( $stmt_type eq 'Insert' && ! $count ) {
+                $choice = $add;
+            }
+            else {
+                # Choose
+                $choice = $tc->choose(
+                    $menu,
+                    { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
+                );
+                $ax->print_sql_info( $info );
+                if ( ! defined $choice ) {
+                    if ( $stmt_type eq 'Create_Table' && @$aoa == 1 ) {
+                        next COL_BY_COL;
+                    }
+                    elsif ( $stmt_type eq 'Insert' && @$aoa == 0 ) {
+                        return;
+                    }
+                    else {
+                        $default = 0;
+                        $#$aoa--;
+                        next WHAT_NEXT;
+                    }
                 }
             }
-            elsif ( $choice eq $sf->{i}{ok} ) {
+            $count++;
+            if ( $choice eq $sf->{i}{ok} ) {
                 if ( ! @$aoa ) {
                     if ( $stmt_type eq 'Create_Table' ) {
                         next COL_BY_COL;
@@ -138,7 +134,7 @@ sub from_col_by_col {
                 );
                 $ax->print_sql_info( $info );
                 if ( ! defined $data ) {
-                    if ( ! @$aoa ) {
+                    if ( ! @$aoa && $stmt_type eq 'Create_Table' ) {
                         next COL_BY_COL;
                     }
                     $default = 0;

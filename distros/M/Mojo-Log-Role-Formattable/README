@@ -1,0 +1,36 @@
+NAME
+
+Mojo::Log::Role::Formattable - Add logging methods with an "f" suffix to Mojo::Log
+
+INSTALLATION
+
+To install this module, use your preferred CPAN client. If this is "cpanm" then
+run the command
+
+  cpanm Mojo::Log::Role::Formattable
+
+DOCUMENTATION
+
+After the installation, you can find further documentation using the command
+
+  perldoc Mojo::Log::Role::Formattable
+
+DEVELOPMENT
+
+After the download of the source code, you have to install the module
+dependencies first. The dependencies are described in a "cpanfile".
+
+It follows the "configure" step that creates a "Makefile"
+
+  perl Makefile.PL
+
+You may explicitly trigger the "build" step, calling
+
+  make
+
+before executing all test scripts
+
+  make test # in lexicographic order
+  prove t   # in random order
+
+The "RELEASE_TESTING" flag enables the release testing context.

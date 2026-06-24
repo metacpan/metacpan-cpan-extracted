@@ -5,7 +5,7 @@ Aion::Env - создаёт константу связанную со значе
 
 # VERSION
 
-0.1
+0.2
 
 # SYNOPSIS
 
@@ -35,8 +35,8 @@ UNI_TEST; # -> 30
 BB_TEST; # -> 1
 
 eval 'use Aion::Env NN_TEST => ()'; $@; # ^-> NN_TEST is'nt defined!
-eval 'use Aion::Env NN_TEST => (nouname => 1)'; $@; # ^-> Unknown keyword: nouname
-eval 'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)'; $@; # ^-> Unknown keywords: nouname1, nouname2
+eval 'use Aion::Env NN_TEST => (nouname => 1)'; $@; # ^-> Unknown aspect: nouname
+eval 'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)'; $@; # ^-> Unknown aspects: nouname1, nouname2
 ```
 
 # DESCRIPTION

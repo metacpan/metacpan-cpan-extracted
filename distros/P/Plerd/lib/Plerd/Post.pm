@@ -11,6 +11,8 @@ use HTML::SocialMeta;
 use Try::Tiny;
 use JSON;
 use Path::Class::File;
+use Digest::MD5 qw( md5_hex );
+use Encode qw( encode_utf8 );
 
 use Plerd::SmartyPants;
 use Web::Mention;
@@ -194,15 +196,22 @@ sub _build_published_filename {
         $filename =~ s/\..*$/.html/;
     }
     else {
-        $filename = $self->title;
         my $stripper = HTML::Strip->new( emit_spaces => 0 );
-        $filename = $stripper->parse( $filename );
-        $filename =~ s/\s+/-/g;
-        $filename =~ s/--+/-/g;
-        $filename =~ s/[^\w\-]+//g;
-        $filename = lc $filename;
-        $filename = $self->date->ymd( q{-} ) . q{-} . $filename;
-        $filename .= '.html';
+        my $slug = $stripper->parse( $self->title );
+        $slug =~ s/\s+/-/g;
+        $slug =~ s/--+/-/g;
+        $slug =~ s/[^\w\-]+//g;
+        $slug = lc $slug;
+
+        # A title made entirely of characters that can't appear in a filename
+        # (e.g. emoji) slugs down to nothing, which would make every such post
+        # on a given day collide on "YYYY-MM-DD-.html". Fall back to a short
+        # hash of the title, so distinct titles get distinct, stable filenames.
+        unless ( length $slug ) {
+            $slug = substr( md5_hex( encode_utf8( $self->title ) ), 0, 10 );
+        }
+
+        $filename = $self->date->ymd( q{-} ) . q{-} . $slug . '.html';
     }
 
     return $filename;
@@ -398,6 +407,15 @@ sub _build_social_meta_tags {
 
 }
 
+# Normalize CRLF ("Windows") and bare-CR ("classic Mac") newlines to LF, so
+# source files publish cleanly and get rewritten with consistent line endings
+# regardless of the editor that produced them.
+sub _normalize_newlines {
+    my ( $text ) = @_;
+    $text =~ s/\r\n?/\n/g;
+    return $text;
+}
+
 # This next internal method does a bunch of stuff.
 # It's called via Moose-trigger when the object's source_file attribute is set.
 # * Read and store the file's data (body) and metadata
@@ -413,6 +431,7 @@ sub _process_source_file {
     my %attributes;
     my @ordered_attribute_names = qw( title time published_filename guid tags);
     while ( my $line = <$fh> ) {
+        $line = _normalize_newlines( $line );
         chomp $line;
         last unless $line =~ /\S/;
         my ($key, $value) = $line =~ /^\s*(\w+?)\s*:\s*(.*?)\s*$/;
@@ -428,8 +447,8 @@ sub _process_source_file {
     $self->attributes( \%attributes );
 
     my $body;
-    while ( <$fh> ) {
-        $body .= $_;
+    while ( my $line = <$fh> ) {
+        $body .= _normalize_newlines( $line );
     }
 
     close $fh;

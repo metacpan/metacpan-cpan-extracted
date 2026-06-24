@@ -1,3 +1,14 @@
+Release 1.27
+    Remove incorrect cs_loc_drop() calls in syb_db_connect(). The glocale 
+    variable is global and allocated/initialized in syb_init(), and
+    should therefore remain available for the life of the process.
+    Extract locale and context initialization into a new init_dbh() function
+    so that secondary connections (for statement handles created while
+    another statement is active) will not unnecessarily reinitialize
+    these settings.
+    Many thanks to R. S. for pointing out this flaw and providing
+    ideas for the fix.
+
 Release 1.26
     Fix missing conditional statements for "new" datatypes introduced with
     ASE 15.x

@@ -1,6 +1,6 @@
 package Plerd;
 
-our $VERSION = '1.901';
+our $VERSION = '1.902';
 
 use Moose;
 use MooseX::Types::URI qw(Uri);
@@ -497,6 +497,17 @@ sub neighbor_basename {
 sub publish_tag_indexes {
     my $self = shift;
 
+    # tags.tt is the one non-critical template: if it's missing, publish the
+    # rest of the blog anyway rather than dying. Warn only if the blog actually
+    # uses tags and therefore loses content by skipping their pages.
+    unless ( -e $self->tags_template_file ) {
+        if ( $self->has_tags ) {
+            carp "This blog uses tags, but its template directory has no "
+                 . "tags.tt file. Skipping publication of tag pages.\n";
+        }
+        return;
+    }
+
     my $tag_map = $self->tags_map;
 
     # Commentary: Ideally we'd just pass a sorted array of tag objects
@@ -562,7 +573,7 @@ sub publish_recent_page {
         $self->publication_directory, "index.html.$$.tmp"
     );
     $temp_link->remove if -e $temp_link || -l $temp_link;
-    if ( symlink $self->recent_file, $temp_link ) {
+    if ( symlink $self->recent_file->basename, $temp_link ) {
         rename "$temp_link", "$index_file"
             or warn "Couldn't move the index.html symlink into place: $!\n";
     }
@@ -829,11 +840,19 @@ sub _build_recent_posts {
 sub _build_posts {
     my $self = shift;
 
-    my @posts = sort { $b->date <=> $a->date }
-                map { Plerd::Post->new( plerd => $self, source_file => $_ ) }
-                sort { $a->basename cmp $b->basename }
-                grep { /\.markdown$|\.md$/ }
-                $self->source_directory->children
+    # Newest publication date first, ties broken by source basename, using the
+    # same comparator as _ordered_basenames so a full publish and an incremental
+    # publish agree on order. The inner sort guarantees order regardless of
+    # readdir order, and the grep keeps both .md and .markdown sources.
+    my @posts =
+        sort {
+            $b->date <=> $a->date
+            || $a->source_file->basename cmp $b->source_file->basename
+        }
+        map { Plerd::Post->new( plerd => $self, source_file => $_ ) }
+        sort { $a->basename cmp $b->basename }
+        grep { /\.markdown$|\.md$/ }
+        $self->source_directory->children
     ;
 
     return \@posts;

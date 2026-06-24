@@ -6,7 +6,7 @@ use exact;
 
 use Lingua::ManagementSpeak;
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -41,7 +41,7 @@ Bot::IRC::X::ManagementSpeak - Bot::IRC plugin for rendering management-speak
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-ManagementSpeak/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-ManagementSpeak/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-ManagementSpeak/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-ManagementSpeak)
@@ -101,7 +101,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/T/Bot-IRC-X-ManagementSpeak.htm
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

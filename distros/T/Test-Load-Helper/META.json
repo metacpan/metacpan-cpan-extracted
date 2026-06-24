@@ -1,7 +1,7 @@
 {
    "abstract" : "automatically load test helpers by walking the directory tree",
    "author" : [
-      "Branislav Zahradn\u00edk <barney@cpan.org>"
+      "Branislav Zahradn\u00edk <barney.cpan@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -52,7 +52,7 @@
    "provides" : {
       "Test::Load::Helper" : {
          "file" : "lib/Test/Load/Helper.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/happy-barney/perl-Test-Load-Helper"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-2.0"

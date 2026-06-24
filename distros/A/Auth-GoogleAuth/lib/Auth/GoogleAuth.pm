@@ -13,7 +13,7 @@ use Crypt::PRNG 'rand';
 use Digest::HMAC_SHA1 'hmac_sha1_hex';
 use URI::Escape 'uri_escape';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 my @accessors = qw( secret secret32 issuer key_id );
 __PACKAGE__->mk_accessors(@accessors);
@@ -140,7 +140,7 @@ Auth::GoogleAuth - Google Authenticator TBOT Abstraction
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =for markdown [![test](https://github.com/gryphonshafer/Auth-GoogleAuth/workflows/test/badge.svg)](https://github.com/gryphonshafer/Auth-GoogleAuth/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth)
@@ -153,8 +153,8 @@ version 1.09
 
     $auth = Auth::GoogleAuth->new({
         secret => 'some secret string thing',
-        issuer => 'Gryphon Shafer',
-        key_id => 'gryphon@cpan.org',
+        issuer => 'Example User',
+        key_id => 'user@example.com',
     });
 
     $auth->secret();   # get/set
@@ -167,18 +167,18 @@ version 1.09
     my $otpauth_0 = $auth->otpauth;
     my $otpauth_1 = $auth->otpauth(
         'bv5o3disbutz4tl3', # secret32
-        'gryphon@cpan.org', # key_id
-        'Gryphon Shafer',   # issuer
+        'user@example.com', # key_id
+        'Example User',   # issuer
     );
 
     my $url_0 = $auth->qr_code;
     my $url_1 = $auth->qr_code(
         'bv5o3disbutz4tl3', # secret32
-        'gryphon@cpan.org', # key_id
-        'Gryphon Shafer',   # issuer
+        'user@example.com', # key_id
+        'Example User',   # issuer
     );
     my $url_2 = $auth->qr_code(
-        'bv5o3disbutz4tl3', 'gryphon@cpan.org', 'Gryphon Shafer', 1,
+        'bv5o3disbutz4tl3', 'user@example.com', 'Example User', 1,
     );
 
     my $code_0 = $auth->code;
@@ -218,8 +218,8 @@ This is a simple instantiator to which you can pass optional default values.
 
     $auth = Auth::GoogleAuth->new({
         secret => 'some secret string thing',
-        issuer => 'Gryphon Shafer',
-        key_id => 'gryphon@cpan.org',
+        issuer => 'Example User',
+        key_id => 'user@example.com',
     });
 
 The object returned will support the following attribute get/set methods:
@@ -264,8 +264,8 @@ This method returns a generated otpauth key URI.
     my $otpauth_0 = $auth->otpauth;
     my $otpauth_1 = $auth->otpauth(
         'bv5o3disbutz4tl3', # secret32
-        'gryphon@cpan.org', # key_id
-        'Gryphon Shafer',   # issuer
+        'user@example.com', # key_id
+        'Example User',     # issuer
     );
 
 =head2 qr_code
@@ -276,15 +276,15 @@ on the data either in the object or provided to this method.
     my $url_0 = $auth->qr_code;
     my $url_1 = $auth->qr_code(
         'bv5o3disbutz4tl3', # secret32
-        'gryphon@cpan.org', # key_id
-        'Gryphon Shafer',   # issuer
+        'user@example.com', # key_id
+        'Example User',     # issuer
     );
 
 You can optionally add a final true value, and if you do, the method will
 return the generated otpauth key URI rather than the Quick Chart API URL.
 
     my $url_2 = $auth->qr_code(
-        'bv5o3disbutz4tl3', 'gryphon@cpan.org', 'Gryphon Shafer', 1,
+        'bv5o3disbutz4tl3', 'user@example.com', 'Example User', 1,
     );
 
 =head2 code
@@ -406,7 +406,7 @@ L<Quick Chart QR Codes|https://quickchart.io/documentation/qr-codes>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

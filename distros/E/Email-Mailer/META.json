@@ -1,10 +1,10 @@
 {
    "abstract" : "Multi-purpose emailer for HTML, auto-text, attachments, and templates",
    "author" : [
-      "Gryphon Shafer <gryphon@cpan.org>"
+      "Gryphon Shafer <gryphon@goldenguru.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -75,8 +75,8 @@
          "web" : "https://github.com/gryphonshafer/Email-Mailer"
       }
    },
-   "version" : "1.23",
-   "x_generated_by_perl" : "v5.38.5",
+   "version" : "1.24",
+   "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-2.0"
 }

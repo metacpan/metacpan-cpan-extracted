@@ -1,0 +1,109 @@
+NAME
+    Data::Metadata - Data object for metadata.
+
+SYNOPSIS
+     use Data::Metadata;
+
+     my $obj = Data::Metadata->new(%params);
+     my $id = $obj->id;
+     my $key_values_ar = $obj->key_values;
+
+DESCRIPTION
+    This class represents metadata as an optional identifier and a required
+    list of Data::Metadata::KeyValue instances.
+
+METHODS
+  "new"
+     my $obj = Data::Metadata->new(%params);
+
+    Constructor.
+
+    *       "id"
+
+            Object id. The number is positive natural number.
+
+            It's optional.
+
+    *       "key_value"
+
+            Reference to array with Data::Metadata::KeyValue instances.
+
+            It's required.
+
+    Returns instance of object.
+
+  "id"
+     my $id = $obj->id;
+
+    Returns number or undef.
+
+  "key_values"
+     my $key_values_ar = $obj->key_values;
+
+    Returns reference to array with Data::Metadata::KeyValue instances.
+
+ERRORS
+     new():
+             From Mo::utils::Array::check_array_required():
+                     Parameter 'key_values' is required.
+                     Parameter 'key_values' with array must have at least one item.
+             From Mo::utils::Array::check_array_object():
+                     Parameter 'key_values' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'key_values' must contain 'Data::Metadata::KeyValue' objects.
+                             Value: %s
+                             Reference: %s
+             From Mo::utils::Number::check_positive_natural():
+                     Parameter 'id' must be a positive decimal number.
+                             Value: %s
+
+EXAMPLES
+  EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Metadata;
+     use Data::Metadata::KeyValue;
+
+     my $obj = Data::Metadata->new(
+             'id' => 7,
+             'key_values' => [
+                     Data::Metadata::KeyValue->new(
+                             'id' => 1,
+                             'key' => 'text',
+                             'value' => 'This is text',
+                     ),
+             ],
+     );
+
+     print $obj->id."\n";
+     print scalar @{$obj->key_values}."\n";
+
+     # Output:
+     # 7
+     # 1
+
+DEPENDENCIES
+    Mo Mo::utils::Array, Mo::utils::Number.
+
+SEE ALSO
+    Data::Metadata::KeyValue
+        Class for one metadata key/value pair.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Metadata>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025-2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

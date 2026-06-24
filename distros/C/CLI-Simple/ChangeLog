@@ -1,7 +1,17 @@
+Tue Jun 23 15:49:39 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.4]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.4.md: new
+	* VERSION: bump
+	* README.md: updated
+	* lib/CLI/Simple.pm.in
+	(usage): avoid uninitialized warning
+
 Tue Jun  9 14:44:42 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.3]:
-	* release-notes.mod: updated
+	* release-notes.md: updated
 	* release-notes/release-notes-2.0.3.md: new
 	* VERSION: bump
 	* README.md: updated

@@ -15,10 +15,10 @@ my %module_build_args = (
   },
   "dist_abstract" => "automatically load test helpers by walking the directory tree",
   "dist_author" => [
-    "Branislav Zahradn\x{ed}k <barney\@cpan.org>"
+    "Branislav Zahradn\x{ed}k <barney.cpan\@gmail.com>"
   ],
   "dist_name" => "Test-Load-Helper",
-  "dist_version" => "1.0.0",
+  "dist_version" => "1.0.1",
   "license" => "artistic_2",
   "module_name" => "Test::Load::Helper",
   "recursive_test_files" => 1,

@@ -1,3 +1,19 @@
+Tue Jun 23 14:51:07 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.9.2]:
+	* ChangeLog: modified
+	* VERION: bump
+	* release-notes.md: new
+	* release-notes/release-notes-1.9.2.md: new
+	* lib/CPAN/Maker.pm.in
+	(_generate_man_links)
+	- DESTINSTALLMAN3DIR, not INSTALLMAN3DIR
+	- ignore errors (-)
+	(parse_project)
+	- avoid uninitialized warnings
+	- refactored a bit
+	(parse_pm_module): refactored
+
 Tue May  5 13:29:52 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.9.1]:

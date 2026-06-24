@@ -1,3 +1,11 @@
+0.06 2026-06-23T14:05:53+02:00
+ - Change API: Rewrite check for id to
+   Mo::utils::Number::check_positive_natural(). There is change in error
+   message.
+ - Add 'metadata' parameter.
+ - Rewrite doc to use of =head1 EXAMPLES.
+ - Update copyright years.
+
 0.05 2025-03-03T00:38:40+01:00
  - Add 'id' parameter to constructor test.
  - Add test for bad id.

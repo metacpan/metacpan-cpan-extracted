@@ -5,7 +5,7 @@ use 5.014;
 use exact;
 use Util::CommandLine 1.04 ();
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 sub import {
     my ( $self, $params, $caller ) = @_;
@@ -44,7 +44,7 @@ exact::cli - Command-line interface helper utilities extension for exact
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-cli/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-cli/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-cli/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-cli)
@@ -137,7 +137,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/D/exact-cli.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

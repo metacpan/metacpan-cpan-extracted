@@ -1,6 +1,6 @@
 package LaTeX::ToUnicode::Tables;
 BEGIN {
-  $LaTeX::ToUnicode::Tables::VERSION = '1.94';
+  $LaTeX::ToUnicode::Tables::VERSION = '1.95';
 }
 use strict;
 use warnings;

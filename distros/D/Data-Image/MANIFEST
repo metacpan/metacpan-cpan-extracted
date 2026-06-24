@@ -27,9 +27,10 @@ t/Data-Image/05-comment.t
 t/Data-Image/06-dt_created.t
 t/Data-Image/07-height.t
 t/Data-Image/08-id.t
-t/Data-Image/09-size.t
-t/Data-Image/10-url.t
-t/Data-Image/11-url_cb.t
-t/Data-Image/12-width.t
+t/Data-Image/09-metadata.t
+t/Data-Image/10-size.t
+t/Data-Image/11-url.t
+t/Data-Image/12-url_cb.t
+t/Data-Image/13-width.t
 xt/Data-Image/01-pod_coverage.t
 xt/Data-Image/02-pod.t

@@ -38,8 +38,11 @@ no_index:
 provides:
   Aion::Env:
     file: lib/Aion/Env.pm
-    version: '0.1'
+    version: '0.2'
+  Aion::Env::Etc:
+    file: lib/Aion/Env/Etc.pm
 requires:
+  YAML::Syck: '0'
   common::sense: '0'
   constant: '0'
   perl: v5.22.0
@@ -47,7 +50,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion-env/issues
   homepage: https://github.com/darviarush/perl-aion-env
   repository: https://github.com/darviarush/perl-aion-env.git
-version: '0.1'
+version: '0.2'
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

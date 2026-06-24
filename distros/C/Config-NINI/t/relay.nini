@@ -125,3 +125,26 @@ foobargasted none
 # return to root, then one more root scalar
 =
   status_file /run/relay/status
+
+
+
+
+  = A
+      asd 999
+      & A
+
+  = B
+      qwe 333
+      & A
+
+  = A
+      & B
+
+  * aaa *
+  * aaa *
+  * aaa *
+
+  = bbb * * *
+  = bbb * * *
+  = bbb * * *
+  &&&jjj

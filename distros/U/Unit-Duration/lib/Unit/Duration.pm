@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 my $duration_element_re = qr/(?<expr>[-+*\/\d]+)\s*(?<unit>[A-z]+)\s*/;
 
@@ -333,7 +333,7 @@ Unit::Duration - Work-time unit duration conversion and canonicalization
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![test](https://github.com/gryphonshafer/Unit-Duration/workflows/test/badge.svg)](https://github.com/gryphonshafer/Unit-Duration/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Unit-Duration/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Unit-Duration)
@@ -666,7 +666,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/U/Unit-Duration.html>
 
 =head1 AUTHOR
 
-Gryphon Shafer <gryphon@cpan.org>
+Gryphon Shafer <gryphon@goldenguru.com>
 
 =head1 COPYRIGHT AND LICENSE
 

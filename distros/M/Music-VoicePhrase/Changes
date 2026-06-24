@@ -1,5 +1,9 @@
 Revision history for Music-VoicePhrase
 
+0.0107 2026-06-23 11:18:21
+    - Improve documentatiion.
+    - Make voice public.
+_
 0.0106 2026-06-22 15:21:03
     - Fix the mixed-up Changes formatting.
     - Add handy attributes to operate in real-time.

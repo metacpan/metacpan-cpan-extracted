@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.016;
 
-our $VERSION = '2.442';
+our $VERSION = '2.443';
 
 use Encode       qw( decode );
 #use bytes;      # required
@@ -113,7 +113,13 @@ sub get_schemas {
             # MySQL 8.0 Reference Manual / MySQL Glossary / Schema:
             # In MySQL, physically, a schema is synonymous with a database.
             # You can substitute the keyword SCHEMA instead of DATABASE in MySQL SQL syntax,
-            $user_schemas = [ $db ];
+            if ( $driver eq 'ODBC' ) {
+                # ODBC: $db is the data source name
+                $user_schemas = [ $dbh->get_info( $GetInfoType{SQL_DATABASE_NAME} ) ];
+            }
+            else {
+                $user_schemas = [ $db ];
+            }
         }
         elsif ( $dbms eq 'Firebird' ) {
             $user_schemas = [];
@@ -244,25 +250,24 @@ sub tables_info {
     }
     my $info_tables = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
     my $dbms = $sf->{Plugin}{i}{dbms};
-    my $db_odbc;
-    if ( $driver eq 'ODBC' && $dbms eq 'MariaDB' ) {
-        # `table_info` returns everything.
-        $db_odbc = $dbh->get_info( $GetInfoType{SQL_DATABASE_NAME} );
-        # ODBC: $db is the data source name and not the database name
+    my $schema_key;
+    # Set $schema_key if `table_info` returns everything.
+    if ( $driver =~ /^(?:Informix|Sybase)\z/ ) {
+        $schema_key = $table_schem;
+    }
+    elsif ( $driver eq 'ODBC' && $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
+        # table_cat returns the schema
+        $schema_key = $table_cat;
     }
     my ( @user_table_keys, @sys_table_keys );
     my $tables_info = {};
 
     for my $info_table ( @$info_tables ) {
-        if ( $driver =~ /^(?:Informix|Sybase)\z/ ) {
-            if ( defined $schema && $schema ne $info_table->{$table_schem} ) {
-                # `table_info` returns everything.
-                next;
-            }
-            $info_table->{$table_type} =~ s/\s+\z// if $driver eq 'Informix';
-        }
-        if ( length $db_odbc && $db_odbc ne $info_table->{$table_cat} ) {
+        if ( $schema_key && defined $schema && $schema ne $info_table->{$schema_key} ) {
             next;
+        }
+        if ( $driver eq 'Informix' ) {
+            $info_table->{$table_type} =~ s/\s+\z//;
         }
         if ( $dbms eq 'SQLite') {
             if ( $info_table->{$table_type} =~ /^(?:INDEX|TRIGGER)\z/ ) {
@@ -331,7 +336,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.442
+Version 2.443
 
 =head1 DESCRIPTION
 

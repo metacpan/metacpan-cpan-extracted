@@ -4,7 +4,7 @@
       "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.28",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "gpl_3"
    ],
@@ -50,13 +50,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Aion::Env" : "0",
             "Exporter" : "0",
             "List::Util" : "0",
             "Scalar::Util" : "0",
             "Symbol" : "0",
             "Time::HiRes" : "0",
             "common::sense" : "0",
-            "config" : "0",
             "constant" : "0",
             "overload" : "0",
             "perl" : "v5.22.0"
@@ -83,7 +83,7 @@
    "provides" : {
       "Aion::Fs" : {
          "file" : "lib/Aion/Fs.pm",
-         "version" : "v0.2.3"
+         "version" : "v0.2.4"
       },
       "Aion::Fs::Cat" : {
          "file" : "lib/Aion/Fs/Cat.pm"
@@ -107,7 +107,7 @@
          "web" : "https://github.com/darviarush/perl-aion-fs"
       }
    },
-   "version" : "0.2.3",
+   "version" : "0.2.4",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

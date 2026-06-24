@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-aion-env/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-env/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion-env?logo=perl)](https://github.com/darviarush/perl-aion-env/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Env.svg)](https://metacpan.org/release/Aion-Env) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-env/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Env+0.1)
+[![Actions Status](https://github.com/darviarush/perl-aion-env/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-env/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion-env?logo=perl)](https://github.com/darviarush/perl-aion-env/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Env.svg)](https://metacpan.org/release/Aion-Env) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-env/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Env+0.2)
 # NAME
 
 Aion::Env - создаёт константу связанную со значением из .env
 
 # VERSION
 
-0.1
+0.2
 
 # SYNOPSIS
 
@@ -35,8 +35,8 @@ UNI_TEST; # -> 30
 BB_TEST; # -> 1
 
 eval 'use Aion::Env NN_TEST => ()'; $@; # ^-> NN_TEST is'nt defined!
-eval 'use Aion::Env NN_TEST => (nouname => 1)'; $@; # ^-> Unknown keyword: nouname
-eval 'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)'; $@; # ^-> Unknown keywords: nouname1, nouname2
+eval 'use Aion::Env NN_TEST => (nouname => 1)'; $@; # ^-> Unknown aspect: nouname
+eval 'use Aion::Env NN_TEST => (nouname1 => 1, nouname2 => 2)'; $@; # ^-> Unknown aspects: nouname1, nouname2
 ```
 
 # DESCRIPTION
