@@ -62,4 +62,24 @@ Revision history for Perl extension Net::Whois::IP.
 1.20 2026-06-18 - jseymour
     - Promoted 1.19_01 to 1.20
     - Added release tarball to repo
+1.20_01 2026-06-21 - jseymour
+    - Corrected 1.20 tarball Changes entry in repo
+    - Corrected POD formatting for proper HTML rendering of code examples
+      (This resolves CPAN RT issue #110962)
+    - Corrected test output validation in t/test1.t and t/testx.t
+    - Added skips to test.pl, t/test1.t, and t/testx.t to skip for automated
+      smoke testers that may have port 43 blocked
+      (These two should resolve CPAN RT issue #160043)
+    - Fixed parsing of IPv6 NetRange records and other WHOIS fields containing
+      embedded colons
+      (This resolves CPAN RT issue #88989)
+    - Removed build artifacts from repo tracking
+    - Created .gitignore and added build artifacts to it
+1.20_02 2026-06-22 - jseymour
+    - Improved automated-test skip logic to detect actual port 43
+      unavailability before skipping live WHOIS tests
+    - Removed obsolete CVS/SVN keyword expansion tag from IP.pm
+1.21 2026-06-24 - jseymour
+    - Promoted 1.20_02 to 1.21
+    - Added 1.21 release tarball to repo
 

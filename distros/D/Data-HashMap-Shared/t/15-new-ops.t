@@ -203,4 +203,46 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     like($@, qr/path_prefix/, '  ...with a path_prefix diagnostic');
 }
 
+# incr/incr_by croak when a NEW key cannot be inserted (map at capacity) -- the
+# one op class that dies rather than returning false. Existing keys still work.
+{
+    my $path = tmpfile();
+    my $m = Data::HashMap::Shared::II->new($path, 2);   # tiny, no LRU
+    my $n = 0;
+    $n++ while $n < 10_000 && $m->put($n, $n);          # fill to capacity
+    ok($n > 0 && $n < 10_000, "map filled to capacity at $n entries");
+    is($m->incr(0), 1, 'incr on an existing key works at capacity (no insert needed)');
+    ok(!eval { $m->incr(999_999); 1 }, 'incr on a new key croaks when the map is full');
+    like($@, qr/increment failed/, '  ...with the documented message');
+    ok(!eval { $m->incr_by(888_888, 5); 1 }, 'incr_by on a new key croaks when full');
+    like($@, qr/incr_by failed/, '  ...with the documented message');
+    unlink $path;
+}
+
+# get_with_ttl on an EXPIRED key returns empty list (like a missing key) --
+# distinct from a never-existed key
+{
+    my $path = tmpfile();
+    my $m = Data::HashMap::Shared::II->new($path, 100, 0, 1);   # ttl = 1s
+    $m->put(1, 100);
+    my @live = $m->get_with_ttl(1);
+    is($live[0], 100, 'get_with_ttl: value present before expiry');
+    sleep 2;                                                    # key 1 expires
+    my @expired = $m->get_with_ttl(1);
+    is_deeply(\@expired, [], 'get_with_ttl on an expired key returns empty list');
+    unlink $path;
+}
+
+# set_multi on a non-LRU map that fills mid-batch returns the partial success count
+{
+    my $path = tmpfile();
+    my $m = Data::HashMap::Shared::II->new($path, 2);           # ~3 usable slots
+    my @pairs = map { ($_ => $_ * 10) } 1 .. 20;               # far over capacity
+    my $count = $m->set_multi(@pairs);
+    cmp_ok($count, '>', 0,  'set_multi: some pairs stored before the map fills');
+    cmp_ok($count, '<', 20, 'set_multi: returns the partial count when the map fills mid-batch');
+    is($m->size, $count, '  ...and the count matches the live size');
+    unlink $path;
+}
+
 done_testing;

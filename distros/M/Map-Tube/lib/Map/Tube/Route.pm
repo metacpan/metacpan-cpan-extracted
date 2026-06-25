@@ -1,7 +1,11 @@
 package Map::Tube::Route;
 
-$Map::Tube::Route::VERSION   = '4.10';
-$Map::Tube::Route::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v5.0.1');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +13,7 @@ Map::Tube::Route - Class to represent the route in the map.
 
 =head1 VERSION
 
-Version 4.10
+Version v5.0.1
 
 =cut
 
@@ -67,34 +71,65 @@ Returns an object of type L<Map::Tube::Route> as preferred route.
 sub preferred {
     my ($self) = @_;
 
-    my $index = 0;
-    my $nodes = [];
-    my $lines = [];
-    my $nodes_object = {};
     my $lines_object = {};
     foreach my $node (@{$self->nodes}) {
-        push @$nodes, { name => $node->name };
-        $nodes_object->{$node->name} = $node;
-
         foreach my $line (@{$node->{line}}) {
-            push @{$lines->[$index]}, $line->id;
             $lines_object->{$line->id} = $line;
         }
-
-        $index++;
     }
 
-    my $data   = filter($lines);
-    my $_nodes = [];
-    foreach my $i (0..$#$nodes) {
-        my $_node = {
-            id   => $nodes_object->{$nodes->[$i]->{name}}->id,
-            name => $nodes->[$i]->{name},
-            link => $nodes_object->{$nodes->[$i]->{name}}->link,
-        };
+    my @all_nodes = @{$self->nodes};
+    my $n         = scalar @all_nodes;
 
-        foreach (@{$data->[$i]}) {
-            push @{$_node->{line}}, $lines_object->{$_};
+    # Forward pass: compute the active line set at each position.
+    # Starts with all lines at the first node; at each hop, keep only
+    # the lines that continue from the previous active set. If none
+    # continue, it is a line change and we reset to all lines at that node.
+    my @active;
+    {
+        my %cur = map { $_->id => 1 } @{$all_nodes[0]->{line}};
+        $active[0] = { %cur };
+        for my $i (1 .. $n - 1) {
+            my %here = map { $_->id => 1 } @{$all_nodes[$i]->{line}};
+            my %cont = map { $_ => 1 } grep { $cur{$_} } keys %here;
+            %cur = %cont ? %cont : %here;
+            $active[$i] = { %cur };
+        }
+    }
+
+    # Backward pass: walk back from the end, intersecting each node's
+    # active set with the segment lines accumulated so far.
+    # At a change point, the junction node shows lines from BOTH segments.
+    my @display;
+    $display[$n - 1] = [ sort keys %{$active[$n - 1]} ];
+    my $seg_lines = { %{$active[$n - 1]} };
+
+    for my $i (reverse 0 .. $n - 2) {
+        my %isect = map { $_ => 1 } grep { $seg_lines->{$_} } keys %{$active[$i]};
+
+        if (%isect) {
+            $seg_lines   = \%isect;
+            $display[$i] = [ sort keys %isect ];
+        }
+        else {
+            # Change point: show both arriving and departing lines here.
+            $display[$i] = [ sort keys %{ { %{$active[$i]}, %$seg_lines } } ];
+            $seg_lines   = $active[$i];
+        }
+    }
+
+    # Rebuild nodes with the narrowed line lists.
+    my $_nodes = [];
+    for my $i (0 .. $n - 1) {
+        my $node  = $all_nodes[$i];
+        my $_node = {
+            id   => $node->id,
+            name => $node->name,
+            link => $node->link,
+        };
+        for my $id (@{$display[$i]}) {
+            push @{$_node->{line}}, $lines_object->{$id}
+                if exists $lines_object->{$id};
         }
 
         push @$_nodes, Map::Tube::Node->new($_node);

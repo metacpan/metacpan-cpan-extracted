@@ -56,7 +56,8 @@
             "XML::Twig" : "3.48",
             "namespace::autoclean" : "0.28",
             "overload" : "0",
-            "perl" : "5.014"
+            "perl" : "5.014",
+            "version" : "0.77"
          }
       },
       "test" : {
@@ -77,53 +78,56 @@
    "provides" : {
       "Map::Tube" : {
          "file" : "lib/Map/Tube.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       },
       "Map::Tube::Cookbook" : {
          "file" : "lib/Map/Tube/Cookbook.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       },
       "Map::Tube::Line" : {
          "file" : "lib/Map/Tube/Line.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       },
       "Map::Tube::Node" : {
          "file" : "lib/Map/Tube/Node.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       },
       "Map::Tube::Pluggable" : {
          "file" : "lib/Map/Tube/Pluggable.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       },
       "Map::Tube::Route" : {
          "file" : "lib/Map/Tube/Route.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       },
       "Map::Tube::Table" : {
          "file" : "lib/Map/Tube/Table.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       },
       "Map::Tube::Types" : {
          "file" : "lib/Map/Tube/Types.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       },
       "Map::Tube::Utils" : {
          "file" : "lib/Map/Tube/Utils.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       },
       "Test::Map::Tube" : {
          "file" : "lib/Test/Map/Tube.pm",
-         "version" : "4.10"
+         "version" : "v5.0.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/Map-Tube/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/manwar/Map-Tube.git",
          "web" : "https://github.com/manwar/Map-Tube"
       }
    },
-   "version" : "4.10",
+   "version" : "v5.0.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

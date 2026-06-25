@@ -75,7 +75,7 @@
          "web" : "https://github.com/pjcj/Perl-Critic-PJCJ"
       }
    },
-   "version" : "v0.2.6",
+   "version" : "v0.2.7",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"
@@ -267,7 +267,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.53.0",
+                  "git_version" : "2.54.0",
                   "repo_root" : "."
                }
             },
@@ -296,7 +296,7 @@
                   "changelog" : "Changes.md"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.53.0",
+                  "git_version" : "2.54.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -313,12 +313,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.2.6",
+                  "tag" : "v0.2.7",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.53.0",
+                  "git_version" : "2.54.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -338,7 +338,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.53.0",
+                  "git_version" : "2.54.0",
                   "repo_root" : "."
                }
             },

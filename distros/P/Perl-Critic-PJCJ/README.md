@@ -105,6 +105,12 @@ code density.
 You can configure `perltidy` to keep lines within the specified limit. Only
 when it is unable to do that will you need to manually make changes.
 
+Line lengths are measured in characters. Source is decoded as UTF-8 before
+measuring, so each multi-byte UTF-8 character counts as one. Single-byte
+encodings such as ASCII and Latin-1 are also measured correctly. Source in
+other multi-byte encodings (for example Shift-JIS) is not decoded and is
+measured by its octet length instead.
+
 #### Configuration
 
 - **max_line_length** - Maximum allowed line length in characters (default: 80)

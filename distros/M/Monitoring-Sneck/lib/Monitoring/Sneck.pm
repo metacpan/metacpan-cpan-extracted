@@ -16,11 +16,11 @@ Monitoring::Sneck - a boopable LibreNMS JSON style SNMP extend for remotely runn
 
 =head1 VERSION
 
-Version 1.4.0
+Version 1.4.1
 
 =cut
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.4.1';
 
 =head1 SYNOPSIS
 
@@ -239,6 +239,10 @@ sub new {
 	};
 	bless $self;
 
+	if ( defined( $args{config} ) ) {
+		$self->{config} = $args{config};
+	}
+
 	my $config_raw;
 	eval { $config_raw = read_file( $self->{config} ); };
 	if ($@) {
@@ -375,7 +379,7 @@ sub run {
 	# set the time it ran
 	$self->{to_return}{data}{time} = time;
 	#make sure it is a int
-	$self->{to_return}{data}{time}=~s/\..*$//;
+	$self->{to_return}{data}{time} =~ s/\..*$//;
 
 	my @vars   = keys( %{ $self->{vars} } );
 	my @checks = sort( keys( %{ $self->{checks} } ) );

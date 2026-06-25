@@ -1,5 +1,11 @@
 Revision history for Lilith
 
+3.0.0	2026-06-25/01:00
+		 - use DBIx::Class::Migration
+		 - use dbic-migration for migration DB schema versioning and updating
+		 - really needs PostgreSQL for jsonb
+		 - a few more real basic tests
+
 2.0.0	2026-03-20/23:00
 		 - use DBIx::Class::Schema
 		 - rework search stuff to use that and update some of the opts for src_bin/lilith

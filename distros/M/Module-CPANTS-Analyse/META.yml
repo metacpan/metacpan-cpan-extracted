@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
 keywords:
   - CPANTS
   - kwalitee
@@ -47,5 +47,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-CPANTS-Analyse
   homepage: https://cpants.cpanauthors.org
   repository: https://github.com/cpants/Module-CPANTS-Analyse
-version: '1.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

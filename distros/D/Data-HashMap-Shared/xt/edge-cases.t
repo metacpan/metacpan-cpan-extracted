@@ -1169,6 +1169,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is($v3, 30, 'sharded: set_multi values correct');
     my $sz = shm_ii_size $map;
     is($sz, 5, 'sharded: set_multi size');
+    # remove_multi on a sharded map (per-shard dispatch; 99 is absent)
+    my $rm = $map->remove_multi(1, 3, 99);
+    is($rm, 2, 'sharded: remove_multi returns count of existing keys removed');
+    ok(!(shm_ii_exists $map, 1) && !(shm_ii_exists $map, 3), 'sharded: remove_multi removed the keys');
+    is(shm_ii_size $map, 3, 'sharded: size after remove_multi');
     unlink "$path.$_" for 0..3;
 }
 

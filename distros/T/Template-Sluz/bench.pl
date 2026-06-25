@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use 5.016;
 
-use lib qw(lib);
 use Template::Sluz;
 use Time::HiRes;
 use Getopt::Long qw(GetOptions);

@@ -4,8 +4,9 @@ use Test::More;
 
 plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
 
-# Each eg/*.pl script should at least parse cleanly. We don't run them
-# (they may start daemons, sleep, etc); just `perl -c`.
+# Every eg/*.pl script should at least parse cleanly (`perl -c`); the fast,
+# self-contained ones (unique /tmp paths, no sleep) are also actually run and
+# checked for a clean exit -- catching runtime breakage that `perl -c` misses.
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 my $root = dirname(dirname(abs_path(__FILE__)));
@@ -25,6 +26,16 @@ for my $s (@scripts) {
     }
     is $rc, 0, "$rel parses cleanly"
         or diag "parse error:\n$out";
+}
+
+# Actually run the fast, self-contained examples (each uses a $$-unique /tmp
+# path and terminates quickly) and assert a clean exit.
+for my $name (qw(leaderboard memoize sharded_counter feature_flags)) {
+    my $script = "$root/eg/$name.pl";
+    unless (-f $script) { fail("eg/$name.pl exists"); next; }
+    my $out = qx($^X -I$root/blib/lib -I$root/blib/arch $script 2>&1);
+    is $?, 0, "eg/$name.pl runs cleanly (exit 0)"
+        or diag "runtime error:\n$out";
 }
 
 done_testing;

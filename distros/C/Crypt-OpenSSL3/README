@@ -27,17 +27,17 @@ DESCRIPTION
 
 RECENT CHANGES
 
-    Changes for version 0.008 (2026-06-20)
+    Changes for version 0.009 (2026-06-25)
 
-      * Add Crypt::OpenSSL3::X509::Store::Context
+      * [BREAKING] Remove ASN1 value classes
 
-      * Add SCT support
+      * Remove X509::Stack
 
-      * Add subject_alt_names and issuer_alt_names to X509
+      * Add Timestamp Protocol responder
 
-      * Increment ParseXS dependency to deal with INTERFACE issues
+      * Add various missing version guards
 
-      * Add to_time_t to ASN1::Time
+      * Fix class argument in read_der_{public,private}_key
 
     See the Changes file for more details.
 
@@ -47,7 +47,7 @@ REQUIREMENTS
 
       * XSLoader
 
-      * perl version 5.010 or later
+      * perl version 5.014 or later
 
       * strict
 

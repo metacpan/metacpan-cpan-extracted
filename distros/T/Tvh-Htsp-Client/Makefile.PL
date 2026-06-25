@@ -1,4 +1,4 @@
-use 5.012;
+use 5.028;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'List::Util' => '0',
-        'IO::Socket' => '0',
+        'namespace::autoclean' => '0',
+        'IO::Socket' => '1.45',
         'LooksLike'  => '0',
+        'List::Util' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Tvh-Htsp-Client-*' },

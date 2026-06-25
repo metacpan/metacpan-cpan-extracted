@@ -1,0 +1,217 @@
+=encoding utf-8
+
+=head1 NAME
+
+Data::HashMap::Shared::Cookbook - Practical recipes for shared-memory maps
+
+=head1 DESCRIPTION
+
+Copy-paste patterns for common cross-process tasks with
+L<Data::HashMap::Shared>: counters, caches, rate limiting, liveness, work
+queues, and atomic state. Each recipe is a complete, self-contained sketch;
+runnable versions of several live under C<eg/> in the distribution.
+
+Pick a variant by key/value type (see L</CHOOSING A VARIANT>) and replace the
+C<shm_xx_*> keyword prefix accordingly (C<shm_ii_>, C<shm_ss_>, C<shm_si_>, ...).
+
+=head1 RECIPES
+
+=head2 Shared request/error counters
+
+Pre-forked workers tallying into one map. C<incr>/C<incr_by> are atomic under a
+read lock, so no update is lost.
+
+    use Data::HashMap::Shared::SI;   # string metric name -> int64 count
+    my $stats = Data::HashMap::Shared::SI->new('/run/myapp/stats.shm', 1000);
+
+    # in each worker, per request:
+    shm_si_incr    $stats, 'requests';
+    shm_si_incr_by $stats, 'bytes_out', $n;
+    shm_si_incr    $stats, 'errors' if $failed;
+
+    # anytime, from any process:
+    my %snapshot = %{ $stats->to_hash };
+
+For write-heavy counters spread the load with C<new_sharded> (see
+F<eg/sharded_counter.pl>).
+
+=head2 High-water marks and leaderboards
+
+C<max>/C<min> store C<max($current, $desired)> / C<min(...)> atomically under a
+single lock, so concurrent updates never clobber each other or lose a higher
+score. A missing key is inserted as the given value.
+
+    use Data::HashMap::Shared::SI;   # player -> high score
+    my $board = Data::HashMap::Shared::SI->new('/run/game/board.shm', 10_000);
+
+    shm_si_max $board, $player, $score;   # keeps only the best, race-free
+    shm_si_min $board, 'min_latency_us', $sample;
+
+    my $scores = $board->to_hash;
+    my @top = (sort { $scores->{$b} <=> $scores->{$a} } keys %$scores)[0 .. 9];
+
+Full example: F<eg/leaderboard.pl>.
+
+=head2 Cache-aside memoization (compute once)
+
+C<get_or_set> stores a key's value once; racing callers all receive the same
+stored value, so an expensive computation is shared across the fleet.
+
+    use Data::HashMap::Shared::IS;   # int id -> string result
+    my $cache = Data::HashMap::Shared::IS->new('/run/myapp/memo.shm', 100_000);
+
+    sub lookup {
+        my $id = shift;
+        my $hit = shm_is_get $cache, $id;
+        return $hit if defined $hit;                 # fast path
+        return shm_is_get_or_set $cache, $id, compute($id);   # first writer wins
+    }
+
+Full example: F<eg/memoize.pl>.
+
+=head2 LRU cache with bounded memory
+
+Pass C<$max_size> to cap live entries; the least-recently-used entry is evicted
+on insert (clock/second-chance; reads stay lock-free).
+
+    use Data::HashMap::Shared::SS;
+    # max_entries=1_000_000 table, evict once 100_000 entries are live:
+    my $cache = Data::HashMap::Shared::SS->new('/run/myapp/cache.shm', 1_000_000, 100_000);
+
+    shm_ss_put $cache, $key, $value;          # auto-evicts LRU when full
+    my $v = shm_ss_get $cache, $key;          # also refreshes recency (clock bit)
+    my $evicted = $cache->stats->{evictions};
+
+For large values on a small table, size the string arena explicitly so a few
+big entries do not starve it: C<< ->new($path, $max_entries, 0, 0, 0, $arena_cap) >>.
+
+=head2 Per-key TTL and dedup / idempotency
+
+A default TTL expires entries lazily on access; C<add> inserts only if absent.
+Together they make a "process each id once within a window" guard.
+
+    use Data::HashMap::Shared::IS;   # event id -> marker, 300s TTL
+    my $seen = Data::HashMap::Shared::IS->new('/run/myapp/seen.shm', 1_000_000, 0, 300);
+
+    if ($seen->add($event_id, '1')) {   # true only the first time (then TTL'd)
+        handle($event_id);
+    } # else: already processed recently, skip
+
+C<put_ttl>/C<set_ttl> set a per-key TTL; C<persist> makes a key permanent;
+C<ttl_remaining> reports seconds left. TTL is measured on a monotonic clock.
+
+=head2 Worker heartbeat / liveness registry
+
+Each worker refreshes a TTL'd heartbeat; a dead worker stops refreshing and its
+entry expires, so a supervisor sees only live workers.
+
+    use Data::HashMap::Shared::IS;   # pid -> status, 2s TTL
+    my $reg = Data::HashMap::Shared::IS->new('/run/myapp/live.shm', 4096, 0, 2);
+
+    # worker loop:
+    shm_is_put $reg, $$, 'ok';        # every second; resets the TTL
+
+    # supervisor:
+    $reg->flush_expired;              # drop stale heartbeats
+    my @live = $reg->keys;
+
+Full example: F<eg/heartbeat.pl>.
+
+=head2 Token-bucket rate limiting
+
+A counter per subject with a TTL window; the first hit creates it (TTL applies),
+subsequent hits increment, and the key expires to reset the window.
+
+    use Data::HashMap::Shared::SI;   # subject -> hits, 60s window
+    my $rl = Data::HashMap::Shared::SI->new('/run/myapp/rl.shm', 100_000, 0, 60);
+
+    sub allow {
+        my $who = shift;
+        my $n = shm_si_incr $rl, $who;   # auto-creates at 1 with the default TTL
+        return $n <= 100;                # cap per window
+    }
+
+Full example: F<eg/rate_limiter.pl>.
+
+=head2 Atomic state machine (compare-and-swap)
+
+C<cas> swaps only if the current value matches, so processes can drive a shared
+state machine without a lock.
+
+    use Data::HashMap::Shared::SI;   # job -> state code (0=idle 1=running 2=done)
+    my $jobs = Data::HashMap::Shared::SI->new('/run/myapp/jobs.shm', 100_000);
+
+    # claim a job: idle(0) -> running(1), exactly one winner
+    if (shm_si_cas $jobs, $job, 0, 1) {
+        run($job);
+        shm_si_cas $jobs, $job, 1, 2;    # running -> done
+    }
+
+C<cas_take> atomically removes a key only if it matches (handy for one-shot
+claims); see also the work-queue pattern in F<eg/work_queue.pl>.
+
+=head1 CHOOSING A VARIANT
+
+Variants are C<< <key><value> >> where C<I16>/C<I32>/C<I> are signed 16/32/64-bit
+integers and C<S> is a byte string. Integer variants store values inline (no
+arena, fastest); string sides use the shared arena.
+
+    II    int64  -> int64     counters, ids-to-ids
+    I16   int16  -> int16     compact enums / small counters
+    I32   int32  -> int32
+    IS    int64  -> string    id -> blob/json (memoization)
+    I16S  int16  -> string
+    I32S  int32  -> string
+    SI    string -> int64     named counters, scores, rate limits
+    SI16  string -> int16
+    SI32  string -> int32
+    SS    string -> string    config, sessions, generic caches
+
+Use the narrowest integer width that fits your range (values wrap at the
+variant's width; see L<Data::HashMap::Shared/"Integer Range and Wrapping">).
+The C<incr>/C<decr>/C<incr_by>/C<max>/C<min> counter ops exist only on
+integer-value variants.
+
+=head1 SIZING
+
+C<< ->new($path, $max_entries, $max_size, $ttl, $lru_skip, $arena_cap) >>
+
+=over
+
+=item * B<$max_entries> — table capacity (it grows/shrinks elastically up to
+this). Round up for your peak live-key count.
+
+=item * B<$max_size> — LRU cap (0 = no eviction). Set to bound memory; entries
+beyond it evict least-recently-used.
+
+=item * B<$ttl> — default per-entry TTL in seconds (0 = none). Set for caches /
+windows; combine with C<$max_size> for a bounded TTL cache.
+
+=item * B<$lru_skip> — LRU promotion-skip percentage (0-99, default 0). Leave at
+0; raise only if profiling shows write-lock contention from LRU promotions on a
+Zipfian workload. See L<Data::HashMap::Shared/Constructor>.
+
+=item * B<$arena_cap> — string-storage bytes (0 = C<max(max_entries*128, 4096)>).
+Set explicitly when a few large string keys/values would otherwise exhaust the
+default; integer-only variants ignore it.
+
+=item * B<shards> (C<new_sharded($prefix, $shards, ...)>) — independent maps with
+independent locks for write-heavy workloads; per-key ops route automatically,
+and the sizing args above are B<per shard>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Data::HashMap::Shared> for the full API; the F<eg/> directory for runnable
+versions of these recipes.
+
+=head1 AUTHOR
+
+vividsnow
+
+=head1 LICENSE
+
+Same terms as Perl itself.
+
+=cut

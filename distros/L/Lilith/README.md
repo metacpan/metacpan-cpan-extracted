@@ -75,13 +75,26 @@ eve="/var/log/sagan/alert.json"
 Now we just need to setup the tables.
 
 ```
-lilith -a create_tables
+dbic-migration --schema_class Lilith::Schema -P $password -U $user --dsn $dsn install
 ```
 
 If using snmpd.
 
 ```
 extend lilith /usr/local/bin/lilith -a extend
+```
+
+### Upgrading
+
+```
+dbic-migration --schema_class Lilith::Schema -P $password -U $user --dsn $dsn upgrade
+```
+
+If from a old unversioned one like below.
+
+```
+dbic-migration --schema_class Lilith::Schema -P $password -U $user --dsn $dsn --to_version 1 upgrade
+dbic-migration --schema_class Lilith::Schema -P $password -U $user --dsn $dsn upgrade
 ```
 
 ### Config File
@@ -112,8 +125,6 @@ available for that.
 lilith [B<-c> <config>] B<-a> run
 
 lilith [B<-c> <config>] B<-a> class_map
-
-lilith [B<-c> <config>] B<-a> create_tables
 
 lilith [B<-c> <config>] B<-a> dump_self
 
@@ -167,10 +178,6 @@ Start processing the EVE logs and daemonize.
 #### class_map
 
 Print a table of class mapping from long name to the short name used for display in the search results.
-
-#### create_tables
-
-Create the tables in the DB.
 
 #### dump_self
 

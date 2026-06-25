@@ -2,7 +2,7 @@
 #
 # Author: Gisbert W. Selke, TapirSoft Selke & Selke GbR.
 #
-# Copyright (C) 2025 Gisbert W. Selke. All rights reserved.
+# Copyright (C) 2025--2026 Gisbert W. Selke. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,7 +15,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = version->declare('v0.1.2');
+our $VERSION = version->declare('v0.1.3');
 
 =encoding utf8
 

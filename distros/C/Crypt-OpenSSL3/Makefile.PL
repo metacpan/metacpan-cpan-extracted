@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.014;
 use ExtUtils::MakeMaker 7.12;
 
 use Crypt::OpenSSL::Guess;
@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Crypt-OpenSSL3",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Crypt::OpenSSL3",
   "PREREQ_PM" => {
     "XSLoader" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "version" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,5 +1,18 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+# 1.97 2026-06-24, update recommended
+
+- Fix [#63](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/63): `get_hex()` did not NUL-terminate its output; zero-length
+  OCTET STRING or BIT STRING attributes left the buffer entirely uninitialised, causing undefined behaviour on any downstream
+  `strlen()` or pointer access. Fixed by writing `'\0'` after the loop and increasing the `Renew` allocation from `length*4` to
+  `length*4+1` at both call sites. Merged via PR [#65](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/65).
+
+- Fix: `CertBag.certValue` encoding — certificate DER bytes are now correctly wrapped in an OCTET STRING as required by RFC 7292.
+
+- Test: add regression test `t/pkcs12-info-zero-length-attributes.t` covering zero-length OCTET STRING and BIT STRING bag attributes.
+
+- Build: add `Convert::ASN1` as a `develop` dependency (used by the fixture generation script `scripts/generate-zero-length-attr-fixture.pl`).
+
 # 1.96 2026-06-19, security release, update recommended
 
 - Security: fix [CVE-2026-9265](https://www.cve.org/CVERecord?id=CVE-2026-9265) — heap out-of-bounds read in `print_attribute`

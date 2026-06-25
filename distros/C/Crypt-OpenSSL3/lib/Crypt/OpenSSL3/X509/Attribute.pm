@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::Attribute;
-$Crypt::OpenSSL3::X509::Attribute::VERSION = '0.008';
+$Crypt::OpenSSL3::X509::Attribute::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ Crypt::OpenSSL3::X509::Attribute - An X509 attribute
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 METHODS
 

@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::BIO::Address;
-$Crypt::OpenSSL3::BIO::Address::VERSION = '0.008';
+$Crypt::OpenSSL3::BIO::Address::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::BIO::Address - A network address for BIO objects
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 METHODS
 

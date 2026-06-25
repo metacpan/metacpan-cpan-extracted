@@ -8,7 +8,7 @@ use base qw(Exporter);
 
 use Convert::ASN1;
 
-use version; our $VERSION = version->declare('2.1.1');
+use version; our $VERSION = version->declare('2.1.2');
 
 our @EXPORT_OK = qw(
   FORMAT_UNDEF FORMAT_ASN1 FORMAT_TEXT FORMAT_PEM
@@ -19,11 +19,7 @@ sub Crypt::OpenSSL::X509::has_extension_oid {
   my $x509 = shift;
   my $oid  = shift;
 
-  if (not $Crypt::OpenSSL::X509::exts_by_oid) {
-      $Crypt::OpenSSL::X509::exts_by_oid = $x509->extensions_by_oid;
-  }
-
-  return $$Crypt::OpenSSL::X509::exts_by_oid{$oid} ? 1 : 0;
+  return ${$x509->extensions_by_oid}{$oid} ? 1 : 0;
 }
 
 sub Crypt::OpenSSL::X509::Extension::is_critical {
@@ -649,6 +645,8 @@ In alphabetical order.
 =item * Jonas Brømsø @jonasbn
 
 =item * Louise Doran
+
+=item * Maxime Besson @maxbes
 
 =item * Michael McClimon @mmcclimon
 

@@ -1,6 +1,6 @@
 NAME
-    Data::HashMap::Shared - Type-specialized shared-memory hash maps for
-    multiprocess access
+    Data::HashMap::Shared - Multiprocess shared-memory hash maps with LRU
+    eviction and per-key TTL
 
 SYNOPSIS
         use Data::HashMap::Shared::II;
@@ -44,7 +44,9 @@ SYNOPSIS
 DESCRIPTION
     Data::HashMap::Shared provides type-specialized hash maps stored in
     file-backed shared memory (mmap(MAP_SHARED)), enabling efficient
-    multiprocess data sharing on Linux.
+    multiprocess data sharing on Linux. With opt-in LRU eviction and per-key
+    TTL it doubles as a fast cross-process cache; lookups take a lock-free
+    seqlock fast path.
 
     Linux-only. Requires 64-bit Perl.
 
@@ -61,8 +63,10 @@ DESCRIPTION
 
     *   Keyword API via XS::Parse::Keyword for maximum speed
 
-    *   Opt-in LRU eviction and per-key TTL (lock-free reads via clock
-        eviction)
+    *   Opt-in LRU eviction — clock/second-chance algorithm; reads stay
+        lock-free
+
+    *   Opt-in per-key TTL expiry — lazy removal on access; monotonic clock
 
     *   Stale lock recovery for both writers and readers (dead PIDs detected
         and drained automatically)
@@ -96,6 +100,7 @@ DESCRIPTION
         my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size);
         my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl);
         my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl, $lru_skip);
+        my $map = Data::HashMap::Shared::SS->new($path, $max_entries, 0, 0, 0, $arena_cap); # explicit arena bytes
         my $map = Data::HashMap::Shared::II->new_memfd($name, $max_entries, ...); # memfd-backed
         my $map = Data::HashMap::Shared::II->new_from_fd($fd);            # reopen memfd
         my $fd  = $map->memfd;                                            # -1 if not memfd
@@ -109,11 +114,11 @@ DESCRIPTION
     duped+open). "new_from_fd" reopens such a descriptor. Both require a
     64-bit Perl on Linux (memfd_create(2)).
 
-    $max_entries, $max_size, $ttl, and $lru_skip are used only when creating
-    a new file; when opening an existing one, all parameters are read from
-    the stored header and the constructor arguments are ignored. Multiple
-    processes can open the same file simultaneously. Dies if the file exists
-    but was created by a different variant or is corrupt.
+    $max_entries, $max_size, $ttl, $lru_skip, and $arena_cap are used only
+    when creating a new file; when opening an existing one, all parameters
+    are read from the stored header and the constructor arguments are
+    ignored. Multiple processes can open the same file simultaneously. Dies
+    if the file exists but was created by a different variant or is corrupt.
 
     Optional $max_size enables LRU eviction: when the map reaches $max_size
     entries, the least-recently-used entry is evicted on insert. Set to 0
@@ -137,6 +142,15 @@ DESCRIPTION
     write-lock churn for Zipfian (power-law) patterns where a few hot keys
     dominate. The LRU tail (eviction victim) is never skipped, preserving
     eviction correctness. Set to 0 for strict LRU ordering.
+
+    Optional $arena_cap (bytes) sizes the string-storage arena explicitly,
+    decoupling it from $max_entries. By default the arena holds roughly 128
+    bytes per entry (4096 minimum), so a map with a few large strings — keys
+    or values — can exhaust it while the table is nearly empty; pass an
+    $arena_cap sized for your strings instead. Clamped to "[4096,
+    0xFFFFFFFF]" (arena offsets are 32-bit). Integer-only variants
+    ("II"/"I16"/"I32") have no arena and ignore it. For sharded maps it is
+    the per-shard cap, like $max_entries.
 
     Zero-cost when disabled: with both "$max_size=0" and "$ttl=0", the fast
     lock-free read path is used. The only overhead is a branch (predicted
@@ -174,6 +188,11 @@ DESCRIPTION
     dispatch. Writes to different shards proceed in parallel with
     independent locks. "new_sharded" requires a filesystem $path_prefix;
     anonymous ("undef"-path) sharded maps are not supported.
+
+    The batch ops ("set_multi", "get_multi", "remove_multi") dispatch each
+    key to its shard independently rather than holding one lock for the
+    whole call, so on a sharded map a batch is not atomic across shards (the
+    "single lock" note in the API below applies to non-sharded maps).
 
     All operations work transparently on sharded maps: "put", "get",
     "remove", "exists", "add", "update", "swap", "take", "incr", "max",
@@ -283,7 +302,7 @@ DESCRIPTION
         my $ok = shm_xx_persist $map, $key;       # remove TTL, make key permanent; false on non-TTL maps
         my $ok = shm_xx_set_ttl $map, $key, $sec; # change TTL without changing value (0 = permanent); false on non-TTL maps
         my $n  = shm_xx_flush_expired $map;       # proactively expire all stale entries, returns count
-        my ($n, $done) = shm_xx_flush_expired_partial $map, $limit;  # gradual: scan $limit slots
+        my ($n, $done) = shm_xx_flush_expired_partial $map, $limit;  # gradual: scan $limit slots ($limit per shard on sharded maps; $done true once every shard completes a cycle)
 
     Atomic remove-and-return:
 
@@ -304,7 +323,7 @@ DESCRIPTION
         my $cur = shm_xx_cursor $map;             # create cursor
         while (my ($k, $v) = shm_xx_cursor_next $cur) { ... }
         shm_xx_cursor_reset $cur;                 # restart from beginning
-        shm_xx_cursor_seek $cur, $key;            # position at specific key (best-effort across resize)
+        my $ok = shm_xx_cursor_seek $cur, $key;   # position at key (best-effort across resize); true if found, false if missing/expired
         # cursor auto-destroyed when out of scope
 
     "shm_xx_each" is also safe to use with "remove" during iteration.

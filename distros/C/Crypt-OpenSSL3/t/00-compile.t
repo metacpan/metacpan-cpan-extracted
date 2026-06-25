@@ -5,18 +5,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 60 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 54 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Crypt/OpenSSL3.pm',
     'Crypt/OpenSSL3/ASN1.pm',
-    'Crypt/OpenSSL3/ASN1/Enumerated.pm',
-    'Crypt/OpenSSL3/ASN1/Integer.pm',
     'Crypt/OpenSSL3/ASN1/Object.pm',
-    'Crypt/OpenSSL3/ASN1/String.pm',
-    'Crypt/OpenSSL3/ASN1/Time.pm',
-    'Crypt/OpenSSL3/ASN1/Time/Generalized.pm',
-    'Crypt/OpenSSL3/ASN1/Time/UTC.pm',
     'Crypt/OpenSSL3/BIO.pm',
     'Crypt/OpenSSL3/BIO/Address.pm',
     'Crypt/OpenSSL3/BIO/PollDescriptor.pm',
@@ -48,6 +42,7 @@ my @module_files = (
     'Crypt/OpenSSL3/Timestamp/Accuracy.pm',
     'Crypt/OpenSSL3/Timestamp/Imprint.pm',
     'Crypt/OpenSSL3/Timestamp/Request.pm',
+    'Crypt/OpenSSL3/Timestamp/Responder.pm',
     'Crypt/OpenSSL3/Timestamp/Response.pm',
     'Crypt/OpenSSL3/Timestamp/StatusInfo.pm',
     'Crypt/OpenSSL3/Timestamp/TokenInfo.pm',
@@ -60,11 +55,10 @@ my @module_files = (
     'Crypt/OpenSSL3/X509/Name.pm',
     'Crypt/OpenSSL3/X509/Name/Entry.pm',
     'Crypt/OpenSSL3/X509/Request.pm',
-    'Crypt/OpenSSL3/X509/Stack.pm',
     'Crypt/OpenSSL3/X509/Store.pm',
     'Crypt/OpenSSL3/X509/Store/Context.pm',
     'Crypt/OpenSSL3/X509/Transparency/Evaluator.pm',
-    'Crypt/OpenSSL3/X509/Transparency/LogStore.pm',
+    'Crypt/OpenSSL3/X509/Transparency/Log/Store.pm',
     'Crypt/OpenSSL3/X509/Transparency/Timestamp.pm',
     'Crypt/OpenSSL3/X509/VerifyParam.pm',
     'Crypt/OpenSSL3/X509/VerifyResult.pm'

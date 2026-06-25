@@ -17,5 +17,5 @@ my @routes = <DATA>;
 ok_map_routes( $map, \@routes );
 
 __DATA__
-Route 1|Yonghegong Lama Temple|Beijing Zoo|Yonghegong Lama Temple, Andingmen, Gulou Dajie, Jishuitan, Ping'anli, Xinjiekou, Xizhimen, Beijing Zoo
+Route 1|Yonghegong Lama Temple|Beijing Zoo|Yonghegong Lama Temple, Andingmen, Gulou Dajie, Jishuitan, Ping'anli, Chegongzhuang, Xizhimen, Beijing Zoo
 Route 2|yonghegong lama temple|JINTAI XIZHAO|Yonghegong Lama Temple, Dongzhimen, Dongsi Shitiao, Chaoyangmen, Dongdaqiao, Hujialou, Jintai Xizhao

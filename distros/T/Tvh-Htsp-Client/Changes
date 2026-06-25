@@ -1,19 +1,29 @@
 Revision history for Tvh-Htsp-Client
 
+0.06    23 June 2026
+        - changed another German code comment to English
+        - added three more error checks
+        - added five more test cases
+        - improved degug output for better readability
+        - changed Error messages to itentify package plus method
+        - return messages of type 4 'Binary blob' converted to hex string
+        - debug output serialised messages converted to hex string
+        - method 'getChanNamId' now also takes channel Number as parameter
+
 0.05    10 June 2026
-        bumped minimum Perl version to 5.28 due to 'Tests are failing with perls < 5.28.0'
+        - bumped minimum Perl version to 5.28 due to 'Tests are failing with perls < 5.28.0'
 
 0.04    10 June 2026
-        no functional changes
-        changed German code comments to English
-        amended documentation
-        added __PACKAGE__ to Error messages to itentify their origin
+        - no functional changes
+        - changed German code comments to English
+        - amended documentation
+        - added __PACKAGE__ to Error messages to itentify their origin
 
 0.03    18 July 2025
-        added 'htsmsg_deserialise' method
+        - added 'htsmsg_deserialise' method
 
 0.02    12 July 2025
-        added 'getChanUuidId' method
+        - added 'getChanUuidId' method
 
 0.01    11 July 2025
-        Version 0.01 - initial release
+        - Version 0.01 - initial release

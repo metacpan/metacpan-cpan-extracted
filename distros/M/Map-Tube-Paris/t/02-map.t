@@ -18,5 +18,5 @@ my @routes = <DATA>;
 ok_map_routes( $map, \@routes );
 
 __DATA__
-Route 1|Rambuteau|Miromesnil|Rambuteau, Hôtel de Ville, Châtelet, Auber, Haussmann - Saint-Lazare, Saint-Lazare, Miromesnil
-Route 2|PASSY|invalides|Passy, Bir-Hakeim, Champ de Mars - Tour Eiffel, Pont de l'Alma, Invalides
+Route 1|Rambuteau|Miromesnil|Rambuteau, Hôtel de Ville, Châtelet, Pyramides, Madeleine, Saint-Lazare, Miromesnil
+Route 2|PASSY|invalides|Passy, Trocadéro, Alma - Marceau, Pont de l'Alma, Invalides

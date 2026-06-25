@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::Transparency::Evaluator;
-$Crypt::OpenSSL3::X509::Transparency::Evaluator::VERSION = '0.008';
+$Crypt::OpenSSL3::X509::Transparency::Evaluator::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Crypt::OpenSSL3;
 
 1;
 
-# ABSTRACT: An X509 certificate
+# ABSTRACT: An X509 transparency evaluation context
 
 __END__
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Crypt::OpenSSL3::X509::Transparency::Evaluator - An X509 certificate
+Crypt::OpenSSL3::X509::Transparency::Evaluator - An X509 transparency evaluation context
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 METHODS
 

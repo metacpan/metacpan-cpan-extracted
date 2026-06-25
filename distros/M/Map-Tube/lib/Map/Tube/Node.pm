@@ -1,7 +1,11 @@
 package Map::Tube::Node;
 
-$Map::Tube::Node::VERSION   = '4.10';
-$Map::Tube::Node::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v5.0.1');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +13,7 @@ Map::Tube::Node - Class to represent the station in the map.
 
 =head1 VERSION
 
-Version 4.10
+Version v5.0.1
 
 =cut
 

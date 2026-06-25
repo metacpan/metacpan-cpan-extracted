@@ -15,7 +15,7 @@
  *   SHM_VAL_INT_TYPE                    — integer value
  *
  * Optional:
- *   SHM_HAS_COUNTERS  — generate incr/decr/incr_by and integer cas (integer values only)
+ *   SHM_HAS_COUNTERS  — generate incr/decr/incr_by, max/min, and integer cas (integer values only)
  */
 
 /* ================================================================
@@ -1027,17 +1027,29 @@ typedef struct {
     uint64_t end_off;  /* end of LRU/TTL region — caller verifies file is at least this large */
 } ShmLayout;
 
+/* Clamp a requested arena capacity to the usable range: a 4096-byte floor so
+ * the arena is always functional, and a UINT32_MAX ceiling because arena
+ * offsets are uint32. */
+static inline uint64_t shm_clamp_arena_cap(uint64_t want) {
+    if (want < 4096) return 4096;
+    if (want > UINT32_MAX) return UINT32_MAX;
+    return want;
+}
+
 /* Compute region offsets after the header.
  *   max_tcap, node_size: table dimensions
  *   has_lru, has_ttl, has_arena: which optional regions are present
- *   max_entries: only used when has_arena (arena_cap = max(max_entries*128, 4096))
+ *   max_entries, arena_cap_override: only used when has_arena. arena_cap is
+ *     arena_cap_override (bytes) when nonzero, else the ~128 B/entry default
+ *     max(max_entries*128, 4096); both clamped via shm_clamp_arena_cap.
  * On create, the caller maps `lo->total_size` bytes; on reopen, the caller
  * verifies the file is at least `lo->end_off` bytes (reader_slots_off and
  * total_size are taken from the stored header). */
 static inline void shm_compute_layout(ShmLayout *lo, uint32_t max_tcap,
                                        uint32_t node_size, int has_lru,
                                        int has_ttl, int has_arena,
-                                       uint32_t max_entries) {
+                                       uint32_t max_entries,
+                                       uint64_t arena_cap_override) {
     lo->nodes_off  = sizeof(ShmHeader);
     lo->states_off = lo->nodes_off + (uint64_t)max_tcap * node_size;
     uint64_t off = lo->states_off + max_tcap;
@@ -1060,8 +1072,9 @@ static inline void shm_compute_layout(ShmLayout *lo, uint32_t max_tcap,
     lo->arena_off = lo->arena_cap = 0;
     if (has_arena) {
         lo->arena_off = (off + 7) & ~(uint64_t)7;
-        lo->arena_cap = (uint64_t)max_entries * 128;
-        if (lo->arena_cap < 4096) lo->arena_cap = 4096;
+        uint64_t want = arena_cap_override ? arena_cap_override
+                                           : (uint64_t)max_entries * 128;
+        lo->arena_cap = shm_clamp_arena_cap(want);
         lo->total_size = lo->arena_off + lo->arena_cap;
     } else {
         lo->total_size = off;
@@ -1167,7 +1180,7 @@ static inline int shm_validate_layout_regions(ShmLayout *lo, const ShmHeader *hd
     int has_lru = (hdr->max_size > 0);
     int has_ttl = (hdr->default_ttl > 0);
     shm_compute_layout(lo, hdr->max_table_cap, hdr->node_size,
-                       has_lru, has_ttl, has_arena, 0);
+                       has_lru, has_ttl, has_arena, 0, 0);
     if (lo->end_off > mapped_size) {
         if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN,
                              "%s: file too small for LRU/TTL arrays", prefix);
@@ -1241,7 +1254,7 @@ static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
                                   uint32_t node_size, uint32_t variant_id,
                                   int has_arena, uint32_t max_size,
                                   uint32_t default_ttl, uint32_t lru_skip,
-                                  char *errbuf) {
+                                  uint64_t arena_cap_override, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     uint32_t max_tcap = shm_max_tcap_from_entries(max_entries);
 
@@ -1249,7 +1262,7 @@ static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
     int has_ttl = (default_ttl > 0);
 
     ShmLayout lo;
-    shm_compute_layout(&lo, max_tcap, node_size, has_lru, has_ttl, has_arena, max_entries);
+    shm_compute_layout(&lo, max_tcap, node_size, has_lru, has_ttl, has_arena, max_entries, arena_cap_override);
 
     #define SHM_ERR(fmt, ...) do { if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, fmt, ##__VA_ARGS__); } while(0)
 
@@ -1330,7 +1343,7 @@ static ShmHandle *shm_create_memfd(const char *name, uint32_t max_entries,
                                     uint32_t node_size, uint32_t variant_id,
                                     int has_arena, uint32_t max_size,
                                     uint32_t default_ttl, uint32_t lru_skip,
-                                    char *errbuf) {
+                                    uint64_t arena_cap_override, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
 
     uint32_t max_tcap = shm_max_tcap_from_entries(max_entries);
@@ -1338,7 +1351,7 @@ static ShmHandle *shm_create_memfd(const char *name, uint32_t max_entries,
     int has_ttl = (default_ttl > 0);
 
     ShmLayout lo;
-    shm_compute_layout(&lo, max_tcap, node_size, has_lru, has_ttl, has_arena, max_entries);
+    shm_compute_layout(&lo, max_tcap, node_size, has_lru, has_ttl, has_arena, max_entries, arena_cap_override);
 
     int fd = memfd_create(name ? name : "hashmap", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) {
@@ -1468,7 +1481,8 @@ static ShmHandle *shm_create_sharded(const char *path_prefix, uint32_t num_shard
                                       uint32_t max_entries, uint32_t node_size,
                                       uint32_t variant_id, int has_arena,
                                       uint32_t max_size, uint32_t default_ttl,
-                                      uint32_t lru_skip, char *errbuf) {
+                                      uint32_t lru_skip, uint64_t arena_cap_override,
+                                      char *errbuf) {
     if (!path_prefix) {
         if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "new_sharded requires a path_prefix");
         return NULL;
@@ -1508,7 +1522,7 @@ static ShmHandle *shm_create_sharded(const char *path_prefix, uint32_t num_shard
         }
         h->shard_handles[i] = shm_create_map(shard_path, max_entries, node_size,
                                                variant_id, has_arena, max_size,
-                                               default_ttl, lru_skip, errbuf);
+                                               default_ttl, lru_skip, arena_cap_override, errbuf);
         if (!h->shard_handles[i]) {
             /* Clean up already-created shards */
             for (uint32_t j = 0; j < i; j++)
@@ -1652,31 +1666,34 @@ typedef struct {
 
 static ShmHandle *SHM_FN(create)(const char *path, uint32_t max_entries,
                                   uint32_t max_size, uint32_t default_ttl,
-                                  uint32_t lru_skip, char *errbuf) {
+                                  uint32_t lru_skip, uint64_t arena_cap_override,
+                                  char *errbuf) {
     return shm_create_map(path, max_entries,
                            (uint32_t)sizeof(SHM_NODE_TYPE),
                            SHM_VARIANT_ID, SHM_HAS_ARENA,
-                           max_size, default_ttl, lru_skip, errbuf);
+                           max_size, default_ttl, lru_skip, arena_cap_override, errbuf);
 }
 
 static ShmHandle *SHM_FN(create_sharded)(const char *path_prefix,
                                           uint32_t num_shards,
                                           uint32_t max_entries,
                                           uint32_t max_size, uint32_t default_ttl,
-                                          uint32_t lru_skip, char *errbuf) {
+                                          uint32_t lru_skip, uint64_t arena_cap_override,
+                                          char *errbuf) {
     return shm_create_sharded(path_prefix, num_shards, max_entries,
                                (uint32_t)sizeof(SHM_NODE_TYPE),
                                SHM_VARIANT_ID, SHM_HAS_ARENA,
-                               max_size, default_ttl, lru_skip, errbuf);
+                               max_size, default_ttl, lru_skip, arena_cap_override, errbuf);
 }
 
 static ShmHandle *SHM_FN(create_memfd)(const char *name, uint32_t max_entries,
                                         uint32_t max_size, uint32_t default_ttl,
-                                        uint32_t lru_skip, char *errbuf) {
+                                        uint32_t lru_skip, uint64_t arena_cap_override,
+                                        char *errbuf) {
     return shm_create_memfd(name, max_entries,
                              (uint32_t)sizeof(SHM_NODE_TYPE),
                              SHM_VARIANT_ID, SHM_HAS_ARENA,
-                             max_size, default_ttl, lru_skip, errbuf);
+                             max_size, default_ttl, lru_skip, arena_cap_override, errbuf);
 }
 
 static ShmHandle *SHM_FN(open_fd)(int fd, char *errbuf) {
@@ -3567,7 +3584,7 @@ static uint32_t SHM_FN(drain)(ShmHandle *h, uint32_t limit,
     return SHM_FN(drain_inner)(h, limit, out, buf, buf_cap, &buf_used);
 }
 
-/* ---- Counter operations and integer-value cas ---- */
+/* ---- Counter operations, atomic max/min, and integer-value cas ---- */
 
 #ifdef SHM_HAS_COUNTERS
 

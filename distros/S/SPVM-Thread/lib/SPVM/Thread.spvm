@@ -2,7 +2,7 @@
 # MIT License
 
 class Thread {
-  version "0.008";
+  version "0.009";
   
   use Callback;
   use Thread::ID;

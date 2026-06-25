@@ -4,13 +4,11 @@ package Tvh::Htsp::Client;
 use strict;
 use warnings;
 use v5.28;
-use feature 'say';
-use feature 'state';
 use namespace::autoclean;
 use IO::Socket qw(AF_INET SOCK_STREAM);
 use LooksLike;
 use List::Util qw(min max);
-our $VERSION     = '0.05';    # set the version for version checking
+our $VERSION     = '0.06';    # set the version for version checking
 sub new {
   my ($class, $args) = @_;
   my $self = {
@@ -30,7 +28,7 @@ sub new {
       proto => 'tcp',
       PeerHost => "$self->{host}",
       PeerPort => $self->{port},
-    ) || die "Can't open socket: $IO::Socket::errstr";
+    ) || die "Error ".(caller(0))[3].": can't open socket: $IO::Socket::errstr";
     # my $peer_addr = $self->{client}->connected();
     # if ($peer_addr) { say "Connected to $peer_addr"; }
   }
@@ -62,29 +60,34 @@ sub getChanUuidId {
   return $chan_uuid_id;
 }
 sub getChanNamId {
-  # Get channel name and ID
+  # Get 'channelName' and channelId'
   my $self = shift;
   my $channel = shift;
   my ($chan_name, $chan_id);
-  if (LooksLike::integer($channel)) {
+  if (LooksLike::integer($channel) and $channel > 100_000_000) {
+    # $channel > 100_000_000 must be a 'channelId'
     $chan_id = $channel;
     # get channel name
     my $reply = $self->htsp_send_recv({'method' => 'getChannel', 'channelId' => $channel});
     if ($reply->{'channelName'} and $reply->{'channelId'} eq "$channel") {
       $chan_name = $reply->{'channelName'};
     }
-    else {die "Error ".__PACKAGE__.": channelId '$channel' not found -- ".join(', ', map {"'$_ => $reply->{$_}'"} (sort keys $reply->%*))}
+    else {die "Error ".(caller(0))[3].": channelId '$channel' not found -- ".join(', ', map {"'$_ => $reply->{$_}'"} (sort keys $reply->%*))}
   }
   else {
-    # Enable async to find channel ID from channel name
+    # Enable async to find 'channelId' from 'channelName' or 'channelNumber'
     $self->htsp_send({'method' => 'enableAsyncMetadata'});
     # Process messages
     my $chan_nam_id = {};
+    my $chan_num_id = {};
+    my $chan_num_nam = {};
     while (1) {
       my $reply = $self->htsp_recv();
       if ($reply->{'method'}) {
         if ($reply->{'method'} eq 'channelAdd') {
           $chan_nam_id->{$reply->{'channelName'}} = $reply->{'channelId'};
+          $chan_num_id->{$reply->{'channelNumber'}} = $reply->{'channelId'};
+          $chan_num_nam->{$reply->{'channelNumber'}} = $reply->{'channelName'};
         }
         elsif ($reply->{'method'} eq 'initialSyncCompleted') {
           last;
@@ -92,14 +95,24 @@ sub getChanNamId {
       }
     }
     if ($chan_nam_id->{$channel}) {
-      # found channel name
+      # found 'channelName'
       $chan_name = $channel;
       $chan_id = $chan_nam_id->{$channel};
     }
+    elsif ($chan_num_id->{$channel}) {
+      # found 'channelNumber'
+      $chan_name = $chan_num_nam->{$channel};
+      $chan_id = $chan_num_id->{$channel};
+    }
+    elsif (LooksLike::integer($channel)) {
+      # 'channelNumber' not found
+      my $chan_num_sorted = join(', ', map {"'$_ $chan_num_nam->{$_}'"} (sort {$a <=> $b} keys $chan_num_nam->%*));
+      die ("Error ".(caller(0))[3].": channelNumber '$channel' not found in [ $chan_num_sorted ]");
+    }
     else {
-      # channel name not found
-      my $chan_nam_sorted = join(', ', map {"'$_'"} (sort keys $chan_nam_id->%*));
-      die ("Error ".__PACKAGE__.": channel name '$channel' not found in $chan_nam_sorted");
+      # 'channelName' not found
+      my $chan_nam_sorted = join(', ', map {"'$_ $chan_num_nam->{$_}'"} (sort {$a <=> $b} keys $chan_num_nam->%*));
+      die ("Error ".(caller(0))[3].": channelName '$channel' not found in [ $chan_nam_sorted ]");
     }
   }
   return ($chan_name, $chan_id);
@@ -114,12 +127,14 @@ sub htsp_send {
   # send HTSP message
   my $self = shift;
   my $msg = shift;
+  state $i = 0;
+  $i++;
   $self->{msg} = $msg;
   my $htspmsg = $self->htsmsg_serialise($msg);    # serialise
-  say STDERR $htspmsg if $self->{debug_info};
-  say "Sending '$msg->{'method'}'" if $self->{debug_info};
+  say STDERR join(' ',(unpack("H*",$htspmsg) =~ /../g)) if $self->{debug_info};    # convert serialised message to H = hex string (high nybble first)
+  say "$i sending '$msg->{'method'}' -- ".(caller(0))[3] if $self->{debug_info};
   my $size = $self->{client}->send($htspmsg);
-  say "Sent data of length $size" if $self->{debug_info};
+  say "  sent data of length $size" if $self->{debug_info};
   $self->htsmsg_deserialise(\$htspmsg) if $self->{debug_info};    # deserialise
   return $size;
 }
@@ -129,44 +144,43 @@ sub htsp_recv {
   my ($buffer, $length) = ('', 0);
   state $rest = '';
   state $i = 0;
+  $i++;
   $buffer = $rest;    # take over the 'rest' = remaining buffer from the previous call
   $length = unpack("N",substr($buffer,0,4,'')) if ($buffer);    # Total length of message = 4 byte integer "network" big-endian byte-order
   while (not $buffer) {
-    # Anfang der Nachricht sowie deren Länge ermitteln
-    $self->{client}->recv($buffer, 4096) // die "Error from socket: $IO::Socket::errstr";    # get bytes from HTSP server
-    die "Error ".__PACKAGE__.": received '$buffer' of length ".length($buffer) unless $buffer;
-    say "Received data of length ".length($buffer) if $self->{debug_info};
-    say STDERR $buffer if $self->{debug_info};
+    # Determine beginning and length of the message
+    $self->{client}->recv($buffer, 4096) // die "Error ".(caller(0))[3].": from socket: $IO::Socket::errstr";    # get bytes from HTSP server
+    die "Error ".(caller(0))[3].": received '$buffer' of length ".length($buffer) unless $buffer;
+    say "$i received data of length ".length($buffer)." -- ".(caller(0))[3] if $self->{debug_info};
+    say STDERR join(' ',(unpack("H*",$buffer) =~ /../g)) if $self->{debug_info};    # convert serialised message to H = hex string (high nybble first)
     while ($length == 0 and $buffer) {
       # enableAsyncMetadata first transmits a Null-Byte, we need to get rid of this
       $length = unpack("N",substr($buffer,0,4,''));    # Total length of message = 4 byte integer "network" big-endian byte-order
-      say "$i length -- $length" if $self->{debug_info};
+      say "  message length $length" if $self->{debug_info};
     }
     return({ response => 0 }) if ($length == 0 and not $buffer and $self->{msg}->{method} ne "enableAsyncMetadata");
   }
-  if ($length > 10000000 and $self->{debug_info}) {
+  if ($length > 10_000_000 and $self->{debug_info}) {
     # a likely incorrect excessive length, because the bytes are not being interpreted correctly
-    say STDERR $buffer;
-    die ("Error ".__PACKAGE__.": message length '$length' > 10000000, not realistic");
+    say STDERR join(' ',(unpack("H*",$buffer) =~ /../g));    # convert serialised message to H = hex string (high nybble first)
+    die ("Error ".(caller(0))[3].": message length '$length' > 10_000_000, not realistic");
   }
   while ($length > length($buffer)) {
     # the message length requires more bytes
-    say '$length > length($buffer)' if $self->{debug_info};
-    $self->{client}->recv(my $buffer0, min($length-length($buffer),4096)) // die "Error from socket: $IO::Socket::errstr";    # get bytes from HTSP server
-    die "Error ".__PACKAGE__.": received  '$buffer0' of length ".length($buffer0) unless $buffer0;
-    say "Received data of length ".length($buffer0) if $self->{debug_info};
-    say STDERR $buffer0 if $self->{debug_info};
+    say "  message length $length > ".length($buffer)." length(\$buffer)" if $self->{debug_info};
+    $self->{client}->recv(my $buffer0, min($length-length($buffer),4096)) // die "Error ".(caller(0))[3].": from socket: $IO::Socket::errstr";    # get bytes from HTSP server
+    die "Error ".(caller(0))[3].": received '$buffer0' of length ".length($buffer0) unless $buffer0;
+    say "  received data of length ".length($buffer0) if $self->{debug_info};
+    say STDERR join(' ',(unpack("H*",$buffer0) =~ /../g)) if $self->{debug_info};    # convert serialised message to H = hex string (high nybble first)
     $buffer .= $buffer0;    # append the received bytes to the response '$buffer'
   }
   if ($length <= length($buffer)) {
-    # the response contains additional bytes of the next following message
-    say '$length <= length($buffer)' if $self->{debug_info};
+    # the response contains additional bytes of the subsequent message
+    say "  message length $length <= ".length($buffer)." length(\$buffer)" if $self->{debug_info};
     $rest = $buffer;    # transfer response to '$rest'
-    $buffer = substr($rest,0,$length,'');    # shorten response '$buffer' to the required message '$length', keep the remainder in '$rest' for the next following call to 'htsp_recv'
+    $buffer = substr($rest,0,$length,'');    # shorten response '$buffer' to the required message '$length', keep the remainder in '$rest' for the subsequent call to 'htsp_recv'
   }
-  say "$i resp -- ".length($buffer) if $self->{debug_info};
-  # exit if $i == 15;
-  $i++;
+  say "$i buffer length -- ".length($buffer)." -- ".(caller(0))[3] if $self->{debug_info};
   my $htspmsg = pack("N",$length).$buffer;    # prepend the previously removed 4 bytes with the message length
   return $self->htsmsg_deserialise(\$htspmsg);    # deserialise the message an return it
 }
@@ -174,7 +188,9 @@ sub htsmsg_serialise {
   # serialise a HTSP message
   my $self = shift;
   my $msg = shift;
-  my $sub_message = shift // 0;
+  state $sub_message = 0;
+  state $i=0;
+  say ++$i." -- ".(caller(0))[3] if $self->{debug_info} and not $sub_message;
   my $htspmsg = '';
   my ($ishash, @keys, @vals);
   if (ref $msg eq "HASH") {
@@ -183,22 +199,25 @@ sub htsmsg_serialise {
     @vals = values $msg->%*;
   }
   elsif (ref $msg eq "ARRAY") {
+    die ("Error ".(caller(0))[3].": root message must be of type 'Map' = a 'HASH' reference, not '".ref($msg)."'") unless $sub_message;
     $ishash = 0;
     @keys = keys $msg->@*;
     @vals = values $msg->@*;
   }
   else {
-    die ("Error ".__PACKAGE__.": message must be a reference of type of 'HASH' or 'ARRAY', not '".ref($msg)."'");
+    die ("Error ".(caller(0))[3].": message must be a 'HASH' or 'ARRAY' reference, not '".ref($msg)."'");
   }
   for my $key (@keys) {
     my $val = shift @vals;
-    # say " $key, $val";
+    say '  'x($sub_message+1)."$key => $val" if $self->{debug_info};
     if (ref $val eq "HASH") {
       # Map = 1 = Sub message of type map
       my $type = pack("C",1);    # 1 byte integer
       my $namelength = $ishash ? pack("C",length($key)) : chr(0);    # 1 byte integer
       my $name = $ishash ? $key : '';   # string
-      my $data = $self->htsmsg_serialise($val,1);
+      $sub_message++;
+      my $data = $self->htsmsg_serialise($val);
+      $sub_message--;
       my $datalength = pack("N",length($data));    # 4 byte integer "network" big-endian byte-order
       $htspmsg .= $type.$namelength.$datalength.$name.$data;
     }
@@ -207,16 +226,21 @@ sub htsmsg_serialise {
       my $type = pack("C",5);    # 1 byte integer
       my $namelength = $ishash ? pack("C",length($key)) : chr(0);    # 1 byte integer
       my $name = $ishash ? $key : '';   # string
-      my $data = $self->htsmsg_serialise($val,1);
+      $sub_message++;
+      my $data = $self->htsmsg_serialise($val);
+      $sub_message--;
       my $datalength = pack("N",length($data));    # 4 byte integer "network" big-endian byte-order
       $htspmsg .= $type.$namelength.$datalength.$name.$data;
+    }
+    elsif (ref $val ne "") {
+      die ("Error ".(caller(0))[3].": field value cannot be a reference of type '".ref($val)."'");
     }
     elsif (LooksLike::integer($val)) {
       # S64 = 2 = Signed 64bit integer
       my $type = pack("C",2);    # 1 byte integer
       my $namelength = $ishash ? pack("C",length($key)) : chr(0);    # 1 byte integer
       my $name = $ishash ? $key : '';   # string
-      my $data = pack("q<",$val);    #  64 bit = 8 byte signed integer little-endian byte-order -> q = signed quad (64-bit) value
+      my $data = pack("q<",$val);    # 64 bit = 8 byte signed integer little-endian byte-order -> q = signed quad (64-bit) value
       # Integers are encoded using a very simple variable length encoding. All leading bytes that are 0 is discarded.
       $data =~ s/\0{1,7}$//;    # remove Null-Byte from the end, keep a first one
       my $datalength = pack("N",length($data));    # 4 byte integer "network" big-endian byte-order
@@ -227,7 +251,7 @@ sub htsmsg_serialise {
       my $type = pack("C",6);    # 1 byte integer
       my $namelength = $ishash ? pack("C",length($key)) : chr(0);    # 1 byte integer
       my $name = $ishash ? $key : '';   # string
-      my $data = pack("d",$val);    #  d = A double-precision float in native format
+      my $data = pack("d",$val);    # d = A double-precision float in native format
       my $datalength = pack("N",length($data));    # 4 byte integer "network" big-endian byte-order
       $htspmsg .= $type.$namelength.$datalength.$name.$data;
     }
@@ -241,6 +265,8 @@ sub htsmsg_serialise {
       $htspmsg .= $type.$namelength.$datalength.$name.$data;
     }
   }
+  # say '  'x($sub_message+1)."sub_message = ".$sub_message if $self->{debug_info};
+                                   # in case of root message prepend message length
   return $sub_message ? $htspmsg : pack("N",length($htspmsg)).$htspmsg;
 }
 sub htsmsg_deserialise {
@@ -249,13 +275,13 @@ sub htsmsg_deserialise {
   my $self = shift;
   my $htsmsg = shift;    # reference to the message to be deserialised
   state $i=0;
-  my $bd={};
-  $i++;
+  my $bd={};    # root message must be of type 'Map' = a 'HASH' reference
   # Root body
   # Length of Root body = 4 byte integer = Total length of message (not including this length field itself)
   my $length = $self->htsmsg_message_length($htsmsg);    # Total length of message
-  say "$i -- $length" if $self->{debug_info};
-  my $body = substr($$htsmsg,0,$length,'');    # Body = HTSMSG-Field * N = Fields in the root body
+  say ++$i." -- $length -- ".(caller(0))[3] if $self->{debug_info};
+  my $body = substr($$htsmsg,0,$length,'');    # keep additional length in '$htsmsg' for any subsequent messages
+  # Body = HTSMSG-Field * N = Fields in the root body
   while (length $body) {
     $self->htsmsg_field_deserialise (\$body, $bd);
   }
@@ -267,7 +293,7 @@ sub htsmsg_field_deserialise {
   my $self = shift;
   my $htsmsg = shift;
   my $bd = shift;
-  state $level="  ";
+  state $indent=1;
   # process HTSMSG-Field
   # Type = 1 byte integer = Type of field by ID
   my $type = unpack("C",substr($$htsmsg,0,1,''));
@@ -281,7 +307,7 @@ sub htsmsg_field_deserialise {
   my $data = substr($$htsmsg,0,$datalength,'');
   if ($type == 1) {
     # Map = 1 = Sub message of type map
-    say "$level$type $namelength $datalength '$name'" if $self->{debug_info};
+    say '  'x$indent."$type $namelength $datalength '$name'" if $self->{debug_info};
     my $ref;
     if (ref $bd eq "HASH") {
       $bd->{"$name"} = {} unless $bd->{"$name"};
@@ -292,9 +318,9 @@ sub htsmsg_field_deserialise {
       $ref = $bd->@[-1];
     }
     while (length $data) {
-      $level.="  ";
+      $indent++;
       $self->htsmsg_field_deserialise (\$data, $ref) ;
-      substr($level,-2,2,'');
+      $indent--;
     }
   }
   elsif ($type == 2) {
@@ -308,7 +334,7 @@ sub htsmsg_field_deserialise {
     elsif (ref $bd eq "ARRAY") {
       push($bd->@*, $data);
     }
-    say "$level$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
+    say '  'x$indent."$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
   }
   elsif ($type == 3) {
     # Str = 3 = UTF-8 encoded string
@@ -319,21 +345,22 @@ sub htsmsg_field_deserialise {
     elsif (ref $bd eq "ARRAY") {
       push($bd->@*, $data);
     }
-    say "$level$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
+    say '  'x$indent."$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
   }
   elsif ($type == 4) {
     # Bin = 4 = Binary blob
+    $data = unpack("H*",$data);    # convert binary blob to H = hex string (high nybble first)
     if (ref $bd eq "HASH") {
       $bd->{"$name"} = $data;
     }
     elsif (ref $bd eq "ARRAY") {
       push($bd->@*, $data);
     }
-    say "$level$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
+    say '  'x$indent."$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
   }
   elsif ($type == 5) {
     # List = 5 = Sub message of type list
-    say "$level$type $namelength $datalength '$name'" if $self->{debug_info};
+    say '  'x$indent."$type $namelength $datalength '$name'" if $self->{debug_info};
     my $ref;
     if (ref $bd eq "HASH") {
       $bd->{"$name"} = [] unless $bd->{"$name"};
@@ -344,9 +371,9 @@ sub htsmsg_field_deserialise {
       $ref = $bd->@[-1];
     }
     while (length $data) {
-      $level.="  ";
+      $indent++;
       $self->htsmsg_field_deserialise(\$data, $ref);
-      substr($level,-2,2,'');
+      $indent--;
     }
   }
   elsif ($type == 7) {
@@ -358,18 +385,18 @@ sub htsmsg_field_deserialise {
     elsif (ref $bd eq "ARRAY") {
       push($bd->@*, $data);
     }
-    say "$level$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
+    say '  'x$indent."$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
   }
   elsif ($type == 8) {
     # UUID = 8 = 64 bit UUID in binary format
-    $data = unpack("H*",$data);    #  16 byte = 128 bit binary number -> H = hex string (high nybble first)
+    $data = unpack("H*",$data);    # 16 byte = 128 bit binary number -> H = hex string (high nybble first)
     if (ref $bd eq "HASH") {
       $bd->{"$name"} = $data;
     }
     elsif (ref $bd eq "ARRAY") {
       push($bd->@*, $data);
     }
-    say "$level$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
+    say '  'x$indent."$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
   }
   elsif ($type == 6) {
     # Dbl = 6 = Double precision floating point
@@ -380,27 +407,30 @@ sub htsmsg_field_deserialise {
     elsif (ref $bd eq "ARRAY") {
       push($bd->@*, $data);
     }
-    say "$level$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
+    say '  'x$indent."$type $namelength $datalength '$name' '$data'" if $self->{debug_info};
+  }
+  else {
+    die ("Error ".(caller(0))[3].": encountered unknown field type ID '$type', must be one of 1..8");
   }
 }
 sub htsmsg_message_length {
   # determine message or data length of a htsp message to be deserialised
   my $self = shift;
-  my $bytes = shift;
+  my $htsmsg = shift;
   my $template = $self->{template};
   # for database version 3 -> a variable-length integer discarding leading zero bytes
   # -> template = "w" a BER compressed integer, Bit eight (the high bit) is set on each byte except the last
   # -- or --
   # for HTSP protocol and database version 2 -> 4 byte integer "network" big-endian byte-order
   # -> template = "N"
-  my $length = unpack("$template", $$bytes);
-  substr($$bytes,0,length(pack("$template", $length)),'');    # remove number of bytes consumed
+  my $length = unpack("$template", $$htsmsg);
+  substr($$htsmsg,0,length(pack("$template", $length)),'');    # remove number of bytes consumed
   return $length;
   # instead of template "w" we can do like this
   # my ($bits, $seven_bit_chunks) = (1,'');    # initalise
   # while ($bits) {
     # the continuation bit = most significant bit, MSB is set to 1, indicating that more bytes follow
-    # $bits = unpack("B8", substr($$bytes,0,1,''));    # get next byte as a string of 8 bits
+    # $bits = unpack("B8", substr($$htsmsg,0,1,''));    # get next byte as a string of 8 bits
     # $seven_bit_chunks .= substr($bits,1,7,'');    # add next 7-bit chunk
   # }
   # return oct('0b'.$seven_bit_chunks);    # convert bits to value
@@ -421,7 +451,7 @@ Refer to L<HTSP|https://docs.tvheadend.org/documentation/development/htsp>
 
 =head1 Version
 
-Version 0.05
+Version 0.06
 
 =head1 Synopsis
 
@@ -429,13 +459,14 @@ Version 0.05
  use JSON::XS;
  use Tvh::Htsp::Client;
 
+ # Establish client connection to HTSP server
  my $htsp = Tvh::Htsp::Client->new( { host => $host, port => $port, debug_info => $debug_info } );
  #   Be sure to use HTSP 'port', defaults to '9982'
  #   'host' defaults to 'localhost'
  #   'debug_info' defaults to 0
  #    setting it to 1 will output all details of client to server communication, which is normally not required
  # Setup
- my $msg = { method => 'hello', htspversion => 43, clientname => $creator, clientversion => "v$Tvh::Htsp::Client::VERSION" };
+ my $msg = { method => 'hello', htspversion => 43, clientname => 'Tvh::Htsp::Client', clientversion => "v$Tvh::Htsp::Client::VERSION" };
  my $reply = $htsp->htsp_send_recv($msg);
  # Tvheadend HTSP API or JSON API via HTTP Proxy using HTSP 'api' method
  $msg = { method => 'api', path => 'channel/grid', args => { start => 0, limit => 99999, sort => 'number', dir => 'desc' } };
@@ -493,7 +524,7 @@ C<($chan_name, $chan_id) = $htsp-E<gt>getChanNamId($channel);>
 
 Get channel name and ID
 
-Valid parameter: channel name or channel ID
+Valid parameter: channel Name or channel ID or channel Number
 
 =head2 htsp_send_recv
 
@@ -544,5 +575,7 @@ This software is Copyright (c) 2026 by Ulrich Buck.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.
 
 =cut

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Line change test">
+  <lines>
+    <line id="P" name="Line P" color="#C04828"/>
+    <line id="Q" name="Line Q" color="#3B8BD4"/>
+  </lines>
+  <stations>
+    <station id="S1" name="S1" line="P"   link="S2"       />
+    <station id="S2" name="S2" line="P,Q" link="S1,S3,X1" />
+    <station id="S3" name="S3" line="P"   link="S2,S4"    />
+    <station id="X1" name="X1" line="Q"   link="S2,S4"    />
+    <station id="S4" name="S4" line="P,Q" link="S3,X1"    />
+  </stations>
+</tube>

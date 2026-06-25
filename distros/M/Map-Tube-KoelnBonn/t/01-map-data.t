@@ -23,3 +23,4 @@ if ( Test::Map::Tube->can('ok_links_bidirectional') ) {
   ok_map( Map::Tube::KoelnBonn->new( ) );
 }
 
+done_testing;

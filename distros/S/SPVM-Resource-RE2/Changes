@@ -1,3 +1,9 @@
+0.047 2025-06-25
+  [Support Improvement]
+    * Support MSVC.
+  [Changes]
+    * Add -DNOMINMAX flag to compiler command.
+  
 0.046 2025-04-27
   [Changes]
     * Minimalize source files.

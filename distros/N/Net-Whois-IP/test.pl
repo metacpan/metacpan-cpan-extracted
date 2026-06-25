@@ -6,7 +6,30 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..1\n"; }
+BEGIN {
+    use IO::Socket::INET;
+
+    sub port_43_unavailable {
+	my $sock = IO::Socket::INET->new(
+	    PeerHost => 'whois.arin.net',
+	    PeerPort => 43,
+	    Proto    => 'tcp',
+	    Timeout  => 5,
+	);
+
+	return !defined $sock;
+    }
+
+    $| = 1;
+
+    if ( $ENV{AUTOMATED_TESTING} && port_43_unavailable() ) {
+	print "1..0 # SKIP Cannot reach whois.arin.net:43; live WHOIS tests require port 43 connectivity\n";
+	exit 0;
+    }
+
+    print "1..1\n";
+}
+
 END {print "not ok 1\n" unless $loaded;}
 use Net::Whois::IP;
 $loaded = 1;

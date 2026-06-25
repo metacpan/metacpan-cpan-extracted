@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::VerifyParam;
-$Crypt::OpenSSL3::X509::VerifyParam::VERSION = '0.008';
+$Crypt::OpenSSL3::X509::VerifyParam::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::X509::VerifyParam - X509 Verification parameters
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 METHODS
 
@@ -72,6 +72,8 @@ version 0.008
 =head2 set_ip
 
 =head2 set_ip_asc
+
+=head2 set_policies
 
 =head2 set_purpose
 

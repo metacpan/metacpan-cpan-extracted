@@ -1,10 +1,13 @@
 package Map::Tube::London::Line::Overground;
 
-$Map::Tube::London::Line::Central::VERSION   = '1.42';
-$Map::Tube::London::Line::Central::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v2.0.1');
+our $AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
-use strict; use warnings;
 
 =head1 NAME
 
@@ -12,7 +15,7 @@ Map::Tube::London::Line::Overground - London Tube Map: London Overground Line.
 
 =head1 VERSION
 
-Version 1.42
+Version v2.0.1
 
 =encoding utf8
 

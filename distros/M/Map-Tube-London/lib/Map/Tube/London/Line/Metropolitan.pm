@@ -1,10 +1,13 @@
 package Map::Tube::London::Line::Metropolitan;
 
-$Map::Tube::London::Line::Metropolitan::VERSION   = '1.42';
-$Map::Tube::London::Line::Metropolitan::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v2.0.1');
+our $AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
-use strict; use warnings;
 
 =head1 NAME
 
@@ -12,7 +15,7 @@ Map::Tube::London::Line::Metropolitan - London Tube Map: Metropolitan Line.
 
 =head1 VERSION
 
-Version 1.42
+Version v2.0.1
 
 =head1 DESCRIPTION
 
@@ -25,9 +28,9 @@ London Tube Map: Metropolitan Line.
     | Liverpool Street         | Aldgate, Moorgate                               |
     | Moorgate                 | Liverpool Street, Barbican                      |
     | Barbican                 | Moorgate, Farringdon                            |
-    | Farringdon               | Barbican, King's Cross St Pancras              |
+    | Farringdon               | Barbican, King's Cross St Pancras               |
     | King's Cross St Pancras  | Farringdon, Euston Square                       |
-    | Euston Square            | King's Cross St Pancras, Great Portland Street |
+    | Euston Square            | King's Cross St Pancras, Great Portland Street  |
     | Great Portland Street    | Euston Square, Baker Street                     |
     | Baker Street             | Great Portland Street, Finchley Road            |
     | Finchley Road            | Baker Street, Wembley Park                      |

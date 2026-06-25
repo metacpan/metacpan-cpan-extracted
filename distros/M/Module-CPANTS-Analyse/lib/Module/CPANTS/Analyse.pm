@@ -11,7 +11,7 @@ use Archive::Any::Lite;
 use Carp;
 use Parse::Distname;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 $VERSION =~ s/_//; ## no critic
 
 __PACKAGE__->mk_accessors(qw(dist opts tarball distdir d mck));
@@ -69,8 +69,24 @@ sub unpack {
 
     copy($me->dist, $me->testfile);
 
+    my @warnings;
+    my @link_errors;
     my @pax_headers;
     eval {
+        local $Archive::Zip::ErrorHandler = sub { die @_ };
+        local $SIG{__WARN__} = sub {
+            if ($_[0] =~ /^Making (?:hard|symbolic) link from '([^']+)'/) {
+                push @link_errors, $1;
+                return;
+            }
+            if ($_[0] =~ /^Invalid header/) {
+                push @warnings, $_[0];
+                return;
+            }
+            die @_;
+        };
+
+        local $Archive::Tar::CHMOD = 1;
         my $archive = Archive::Any::Lite->new($me->testfile);
         $archive->extract($me->testdir, {tar_filter_cb => sub {
             my $entry = shift;
@@ -81,13 +97,6 @@ sub unpack {
             return 1;
         }});
     };
-    if (@pax_headers) {
-        $me->d->{no_pax_headers} = 0;
-        $me->d->{error}{no_pax_headers} = join ',', @pax_headers;
-    } else {
-        $me->d->{no_pax_headers} = 1;
-    }
-
     if (my $error = $@) {
         $me->d->{extractable} = 0;
         $me->d->{error}{extractable} = $error;
@@ -100,7 +109,25 @@ sub unpack {
         return $error;
     }
 
-    $me->d->{extractable} = 1;
+    if (@link_errors or @warnings) {
+        # broken but some of the files may probably be extracted
+        $me->d->{extractable} = 0;
+        my %errors;
+        $errors{link_errors}            = \@link_errors if @link_errors;
+        $errors{warnings}               = \@warnings    if @warnings;
+        $me->d->{error}{extractable}    = \%errors      if %errors;
+        $me->d->{kwalitee}{extractable} = 0;
+    } else {
+        $me->d->{extractable} = 1;
+    }
+
+    if (@pax_headers) {
+        $me->d->{no_pax_headers} = 0;
+        $me->d->{error}{no_pax_headers} = join ',', @pax_headers;
+    } else {
+        $me->d->{no_pax_headers} = 1;
+    }
+
     unlink($me->testfile);
 
     opendir(my $fh_testdir, $me->testdir) or die "Cannot open ".$me->testdir.": $!";

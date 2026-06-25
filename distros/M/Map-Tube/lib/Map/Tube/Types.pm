@@ -1,7 +1,11 @@
 package Map::Tube::Types;
 
-$Map::Tube::Types::VERSION   = '4.10';
-$Map::Tube::Types::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v5.0.1');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,12 +13,11 @@ Map::Tube::Types - Attribute type definition for Map::Tube.
 
 =head1 VERSION
 
-Version 4.10
+Version v5.0.1
 
 =cut
 
 use v5.14;
-use strict; use warnings;
 
 use Type::Library -base, -declare => qw(Color Node NodeMap Nodes Line LineMap Lines Route Routes Table Tables);
 use Types::Standard qw(Str InstanceOf ArrayRef Map);

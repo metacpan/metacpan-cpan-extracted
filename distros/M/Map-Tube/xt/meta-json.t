@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use 5.006;
 use strict; use warnings;
@@ -22,4 +22,4 @@ if ($meta->{provides}) {
     }
 }
 
-done_testing();
+done_testing;

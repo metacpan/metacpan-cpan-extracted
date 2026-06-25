@@ -261,6 +261,24 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
+# sharded: per-shard cursors; $done is true only once ALL shards complete a cycle
+{
+    my $prefix = tmpfile();
+    my $map = Data::HashMap::Shared::II->new_sharded($prefix, 4, 1000, 0, 1);  # ttl=1s
+    $map->put($_, $_) for 1 .. 40;
+    sleep 2;   # let every entry expire
+    my ($total, $done, $calls) = (0, 0, 0);
+    while (!$done) {
+        my ($n, $d) = $map->flush_expired_partial(8);   # 8 slots per shard per call
+        $total += $n; $done = $d;
+        last if ++$calls > 5000;                        # safety net
+    }
+    ok($done, 'sharded flush_expired_partial: done once all shards complete a cycle');
+    is($total, 40, 'sharded flush_expired_partial: all expired entries flushed across shards');
+    is($map->size, 0, 'sharded: map empty after gradual flush');
+    unlink glob "$prefix*";
+}
+
 # === mmap_size ===
 
 {

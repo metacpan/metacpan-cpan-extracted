@@ -52,7 +52,7 @@
          "web" : "https://github.com/dsully/perl-crypt-openssl-x509"
       }
    },
-   "version" : "2.1.1",
+   "version" : "2.1.2",
    "x_contributors" : [
       "TIMLEGGE <timlegge@cpan.org>",
       "SKAJI <skaji@cpan.org>"

@@ -84,6 +84,12 @@ DISTRIBUTIONS
       Time::HiRes 0
       XSLoader 0
       perl 5.008
+  Convert-ASN1-0.34
+    pathname: T/TI/TIMLEGGE/Convert-ASN1-0.34.tar.gz
+    provides:
+      Convert::ASN1 0.34
+    requirements:
+      ExtUtils::MakeMaker 0
   Crypt-OpenSSL-Guess-0.15
     pathname: A/AK/AKIYM/Crypt-OpenSSL-Guess-0.15.tar.gz
     provides:

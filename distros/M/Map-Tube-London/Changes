@@ -1,5 +1,10 @@
 Revision history for Map::Tube::London
 
+v2.0.1  2026-06-24
+        - Updated dependency on Map::Tube v5.0.1.
+        - Updated unit test to respect the change in algorithm in Map::Tube.
+        - Switched to dotted-decimal versioning (v-strings).
+
 1.42  2025-04-17
       - Updated dependency on Map::Tube v4.07.
       - Updated unit test to ignore the STREET link for now.

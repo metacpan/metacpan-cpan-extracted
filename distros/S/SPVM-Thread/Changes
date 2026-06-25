@@ -1,3 +1,10 @@
+0.009 2026-06-25
+  [Requirement Changes]
+    * Require SPVM 0.990191.
+  [Test Improvement]
+    * Add CIs for MSVC.
+  [Support Improvement]
+    * Support MSVC.
 0.008 2025-04-07
   [Internal Changes]
     * Clean up config by removing redundant link flags and boilerplate as the SPVM core now handles them.

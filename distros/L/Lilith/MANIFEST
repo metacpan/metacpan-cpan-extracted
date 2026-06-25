@@ -1,17 +1,27 @@
 Changes
 lib/Lilith.pm
+lib/Lilith/Schema.pm
 lib/Lilith/Schema/Result/CapeAlert.pm
 lib/Lilith/Schema/Result/SaganAlert.pm
 lib/Lilith/Schema/Result/SuricataAlert.pm
-lib/Lilith/Schema.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
+share/migrations/PostgreSQL/deploy/1/001-auto.sql
 t/00-load.t
+t/lilith-class-methods.t
+t/lilith-new.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 src_bin/lilith
 init/freebsd
+share/migrations/PostgreSQL/deploy/1/001-auto.sql
+share/migrations/PostgreSQL/deploy/2/001-auto.sql
+share/migrations/PostgreSQL/downgrade/1-0/001-auto.sql
+share/migrations/PostgreSQL/upgrade/0-1/001-auto.sql
+share/migrations/PostgreSQL/upgrade/1-2/001-auto.sql
+share/fixtures/1/conf/.exists
+share/fixtures/2/conf/.exists
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

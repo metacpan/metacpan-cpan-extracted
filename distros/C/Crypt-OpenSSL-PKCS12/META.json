@@ -27,6 +27,7 @@
       },
       "develop" : {
          "requires" : {
+            "Convert::ASN1" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
             "Test::Kwalitee" : "1.21",
             "Test::Pod" : "1.41"
@@ -55,7 +56,7 @@
          "web" : "https://github.com/dsully/perl-crypt-openssl-pkcs12"
       }
    },
-   "version" : "1.96",
+   "version" : "1.97",
    "x_contributors" : [
       "@mmuehlenhoff",
       "@sectokia",

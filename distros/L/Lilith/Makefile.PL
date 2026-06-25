@@ -2,6 +2,8 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use File::ShareDir::Install;
+install_share 'share';
 
 my %WriteMakefileArgs = (
 	NAME               => 'Lilith',
@@ -13,7 +15,8 @@ my %WriteMakefileArgs = (
 	INST_SCRIPT        => 'bin',
 	EXE_FILES          => ['src_bin/lilith'],
 	CONFIGURE_REQUIRES => {
-		'ExtUtils::MakeMaker' => '0',
+		'ExtUtils::MakeMaker'     => '0',
+		'File::ShareDir::Install' => '0',
 	},
 	TEST_REQUIRES => {
 		'Test::More' => '0',
@@ -21,7 +24,9 @@ my %WriteMakefileArgs = (
 	PREREQ_PM => {
 		'DBI'                    => '1.643',
 		'DBIx::Class'            => '0',
+		'DBIx::Class::Migration' => '0',
 		'DBD::Pg'                => '0',
+		'File::ShareDir'         => '0',
 		'Data::Dumper'           => '0',
 		'Digest::SHA'            => '0',
 		'File::Slurp'            => '0',
@@ -70,3 +75,6 @@ delete $WriteMakefileArgs{LICENSE}
 	unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+package MY;
+use File::ShareDir::Install qw(postamble);

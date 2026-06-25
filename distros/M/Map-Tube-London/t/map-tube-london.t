@@ -16,16 +16,16 @@ my @routes = <DATA>;
 ok_map_routes($map, \@routes);
 
 __DATA__
-Route 1|Wembley Central|Bond Street|Wembley Central,Stonebridge Park,Harlesden,Willesden Junction,Shepherd's Bush,Holland Park,Notting Hill Gate,Bayswater,Paddington,Bond Street
+Route 1|Wembley Central|Bond Street|Wembley Central,Stonebridge Park,Harlesden,Willesden Junction,Kensal Green,Queens Park,Kilburn Park,Maida Vale,Warwick Avenue,Paddington,Bond Street
 Route 2|Bond Street|Euston|Bond Street,Oxford Circus,Warren Street,Euston
 Route 3|White City|Victoria|White City,Shepherd's Bush,Kensington (Olympia),Earl's Court,Gloucester Road,South Kensington,Sloane Square,Victoria
-Route 4|Temple|Farringdon|Temple,Embankment,Waterloo,Bank,Liverpool Street,Farringdon
+Route 4|Temple|Farringdon|Temple,Embankment,Charing Cross,Leicester Square,Tottenham Court Road,Farringdon
 Route 5|Turnham Green|Whitechapel|Turnham Green,Acton Town,Ealing Common,Ealing Broadway,Acton Main Line,Paddington,Bond Street,Tottenham Court Road,Farringdon,Liverpool Street,Whitechapel
 Route 6|Goldhawk Road|Wembley Central|Goldhawk Road,Shepherd's Bush Market,Wood Lane,White City,Shepherd's Bush,Willesden Junction,Harlesden,Stonebridge Park,Wembley Central
-Route 7|Wembley Central|Marylebone|Wembley Central,North Wembley,South Kenton,Kenton,Northwick Park,Preston Road,Wembley Park,Finchley Road,Baker Street,Marylebone
+Route 7|Wembley Central|Marylebone|Wembley Central,Stonebridge Park,Harlesden,Willesden Junction,Kensal Green,Queens Park,Kilburn Park,Maida Vale,Warwick Avenue,Paddington,Edgware Road,Marylebone
 Route 8|Baker Street|Neasden|Baker Street,Finchley Road,Wembley Park,Neasden
 Route 9|Baker Street|Preston Road|Baker Street,Finchley Road,Wembley Park,Preston Road
-Route 10|Oval|Euston|Oval,Kennington,Waterloo,Westminster,Green Park,Oxford Circus,Warren Street,Euston
+Route 10|Oval|Euston|Oval,Kennington,Waterloo,Bank,Moorgate,Old Street,Angel,King's Cross St Pancras,Euston
 Route 11|South Ealing|Alperton|South Ealing,Acton Town,Ealing Common,North Ealing,Park Royal,Alperton
 Route 12|Bank|Westminster|Bank,Waterloo,Westminster
 Route 13|Hoxton|Gospel Oak|Hoxton,Haggerston,Dalston Junction,Canonbury,Highbury & Islington,Caledonian Road & Barnsbury,Camden Road,Kentish Town West,Gospel Oak

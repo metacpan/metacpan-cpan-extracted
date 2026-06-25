@@ -1,21 +1,31 @@
 AGENTS.md
+bench.pl
 Changes
+example.pl
 lib/Template/Sluz.pm
 LICENSE
 Makefile.PL
 MANIFEST
 README.md
+release-notes.md
 t/01-main.t
+t/02-escape.t
+t/03-if.t
+t/04-foreach.t
+t/05-literal.t
+t/06-comment.t
+t/07-get_blocks.t
+t/08-include.t
+t/09-autoescape.t
+t/10-delimiters.t
+t/test_setup.pl
 t/tpls/child.stpl
 t/tpls/extra.stpl
+t/tpls/nested_inc.stpl
 t/tpls/parent.stpl
+t/tpls/var_scope.stpl
 tpls/child.stpl
 tpls/extra.stpl
 tpls/parent.stpl
-example.pl
-bench.pl
-release-notes.md
-t/tpls/var_scope.stpl
-t/tpls/nested_inc.stpl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

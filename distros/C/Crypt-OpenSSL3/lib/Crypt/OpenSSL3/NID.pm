@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::NID;
-$Crypt::OpenSSL3::NID::VERSION = '0.008';
+$Crypt::OpenSSL3::NID::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ Crypt::OpenSSL3::NID - OpenSSL NIDs
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 METHODS
 

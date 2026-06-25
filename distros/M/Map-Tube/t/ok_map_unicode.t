@@ -10,12 +10,19 @@ package main;
 
 use v5.14;
 use utf8;
-use open ':std', ':encoding(UTF-8)';
 use Test::More;
+
+binmode(STDOUT, ':encoding(UTF-8)');
+binmode(STDERR, ':encoding(UTF-8)');
+binmode(STDIN,  ':encoding(UTF-8)');
+
 my $map = UnicodeMap->new;
 
 is($map->get_shortest_route('À', 'Ù'), 'À (Èà), Ï (Èà, Àé), Ù (Àé)', 'Route showing station and line names with unicode character');
-is($map->get_line_by_name('Èà'), 'Èà', 'Line name with unicode characters');
+my $ret = $map->get_line_by_name('Èà');
+is($ret->id, 'L1', 'Get line by name, name with unicode characters');
+$ret = $map->get_line_by_id('L1');
+is($ret, 'Èà', 'Get line by id, name with unicode characters');
 is(join(" -> ", @{$map->get_stations('Èà')}), 'Ï (Èà, Àé) -> À (Èà) -> È (Èà)', 'Line station list');
 
 done_testing;

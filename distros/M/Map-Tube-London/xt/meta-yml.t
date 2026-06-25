@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict; use warnings;
 use Map::Tube::London;
@@ -18,4 +18,4 @@ if($meta->{provides}) {
     }
 }
 
-done_testing();
+done_testing;

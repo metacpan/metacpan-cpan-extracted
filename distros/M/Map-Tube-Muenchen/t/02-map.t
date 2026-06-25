@@ -11,6 +11,7 @@ eval 'use Test::Map::Tube tests => 3';
 plan skip_all => 'Test::Map::Tube required for this test' if $@;
 
 my $map = new_ok( 'Map::Tube::Muenchen' );
+$map->line_change_penalty(0) if $map->can('line_change_penalty');
 
 ok_map_functions($map);
 

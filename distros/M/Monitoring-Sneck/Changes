@@ -1,5 +1,8 @@
 Revision history for Monitoring-Sneck
 
+1.4.1   2026-06-25/01:15
+        - add some more tests
+
 1.4.0   2026-06-13/00:00
         - add missing depend on Proc::PID::File
 

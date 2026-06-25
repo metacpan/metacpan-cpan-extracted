@@ -1,9 +1,5 @@
 package Net::Whois::IP;
 
-########################################
-#$Id: IP.pm,v 1.21 2007-03-07 16:49:36 ben Exp $
-########################################
-
 =head1 NAME
 
 Net::Whois::IP - Perl extension for looking up the whois information for
@@ -19,7 +15,7 @@ ip addresses
 		      $optional_registry,
 		      $optional_multiple_flag,
 		      $optional_raw_flag,
-		      $option_array_of_search_options);
+		      $optional_array_of_search_options);
 
 In scalar context (single response hash returned):
 
@@ -34,7 +30,7 @@ In list context (response hash and response chain returned):
 							undef,
 							"true");
 
-    N.B.: See NOTES, below.
+N.B.: See NOTES, below.
 
 The array_of_responses is a reference to an array containing references
 to hashes for each level of query performed.  For example, many records
@@ -55,7 +51,7 @@ If $optional_raw_flag is not undef, the response will be a reference to
 an array containing the raw responses from the registrar instead of a
 reference to a hash. In raw mode, no parsed response chain is returned.
 
-If $option_array_of_search_options is not undef, the first two entries
+If $optional_array_of_search_options is not undef, the first two entries
 will be used to replace TechPhone and OrgTechPhone in the search method.
 This is fairly dangerous and can cause the module not to work at all if
 set incorrectly.
@@ -71,20 +67,35 @@ $optional_multiple_flag set to a value:
 
     my $response = whoisip_query($ip, undef, "true");
     foreach ( sort keys %$response ) {
-	print "$_ is\n"; foreach ( @{ $response->{ $_ } } ) { print " $_\n"; }
+	print "$_ is\n";
+	foreach ( @{ $response->{ $_ } } ) { print " $_\n"; }
     }
 
 $optional_raw_flag set to a value:
 
-my $response = whoisip_query( $ip, undef, undef, "true");
-foreach (@{$response}) { print $_; }
+    my $response = whoisip_query( $ip, undef, undef, "true");
+    foreach (@{$response}) { print $_; }
 
 $optional_array_of_search_options set but not $optional_multiple_flag or
 $optional_raw_flag:
 
-my $search_options = ["NetName","OrgName"];
-my $response = whoisip_query($ip, undef, undef, undef, $search_options);
-foreach (sort keys(%{$response}) ) { print "$_ $response->{$_} \n"; }
+    my $search_options = ["NetName","OrgName"];
+    my $response = whoisip_query($ip, undef, undef, undef, $search_options);
+    foreach (sort keys(%{$response}) ) { print "$_ $response->{$_} \n"; }
+
+=head1 TESTING
+
+Some tests perform live WHOIS queries and therefore require
+outbound TCP connectivity to WHOIS servers on port 43.
+
+When running under automated smoke-testing environments
+(C<AUTOMATED_TESTING>), live-query tests are skipped only if
+port 43 connectivity is unavailable. This allows automated
+test systems with working WHOIS access to exercise the live
+query functionality while avoiding false failures on systems
+that restrict outbound WHOIS traffic.
+
+Local development and manual testing are unaffected.
 
 =head1 NOTES
 
@@ -135,7 +146,7 @@ use feature 'state';
 	     whoisip_query
 	     set_debug
 	    );
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 my %whois_servers = (
 	   'RIPE' => 'whois.ripe.net',
@@ -360,14 +371,16 @@ sub _do_query {
     _do_debug("multiple flag = |" . ($multiple_flag // '') . "|");
 
     foreach my $line (@response) {
-	if($line =~ /^(.+):\s+(.+)$/) {
-	  if( ($multiple_flag) && ($multiple_flag ne '') ) {
-	    # Multiple_flag is set, so get all responses for a given record item
-	    push @{ $hash_response{$1} }, $2;
-	  }else{
-	    # Multiple_flag is not set, so only the last entry for any given record item
-	    $hash_response{$1} = $2;
-	   }
+	if ( $line =~ /^([^:]+):\s*(.*)$/ ) {
+	    my ($key, $val) = ($1, $2);
+
+	    if ( $multiple_flag && $multiple_flag ne '' ) {
+		# Multiple_flag is set, so get all responses for a given record item
+		push @{ $hash_response{$key} }, $val;
+	    } else {
+		# Multiple_flag is not set, so only the last entry for any given record item
+		$hash_response{$key} = $val;
+	    }
 	}
     }
 

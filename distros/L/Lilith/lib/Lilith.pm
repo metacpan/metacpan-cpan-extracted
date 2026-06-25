@@ -17,11 +17,11 @@ Lilith - Work with Suricata/Sagan EVE logs and PostgreSQL.
 
 =head1 VERSION
 
-Version 2.0.0
+Version 3.0.0
 
 =cut
 
-our $VERSION = '2.0.0';
+our $VERSION = '3.0.0';
 
 =head1 SYNOPSIS
 
@@ -540,115 +540,6 @@ sub run {
 
 	POE::Kernel->run;
 } ## end sub run
-
-=head2 create_tables
-
-Just creates the required tables in the DB.
-
-     $lilith->create_tables;
-
-=cut
-
-sub create_tables {
-	my ( $self, %opts ) = @_;
-
-	my $dbh = DBI->connect_cached( $self->{dsn}, $self->{user}, $self->{pass} );
-
-	my $sth
-		= $dbh->prepare( 'create table suricata_alerts ('
-			. 'id bigserial NOT NULL, '
-			. 'instance varchar(255) NOT NULL,'
-			. 'host varchar(255) NOT NULL,'
-			. 'timestamp TIMESTAMP WITH TIME ZONE NOT NULL, '
-			. 'event_id varchar(64) NOT NULL, '
-			. 'flow_id bigint, '
-			. 'in_iface varchar(255), '
-			. 'src_ip inet, '
-			. 'src_port integer, '
-			. 'dest_ip inet, '
-			. 'dest_port integer, '
-			. 'proto varchar(32), '
-			. 'app_proto varchar(255), '
-			. 'flow_pkts_toserver integer, '
-			. 'flow_bytes_toserver integer, '
-			. 'flow_pkts_toclient integer, '
-			. 'flow_bytes_toclient integer, '
-			. 'flow_start TIMESTAMP WITH TIME ZONE, '
-			. 'classification varchar(1024), '
-			. 'signature varchar(2048),'
-			. 'gid int, '
-			. 'sid bigint, '
-			. 'rev bigint, '
-			. 'PRIMARY KEY(id) );' );
-	$sth->execute();
-
-	$sth
-		= $dbh->prepare( 'create table suricata_alerts_raw ('
-			. 'event_id varchar(64) NOT NULL, '
-			. 'raw json NOT NULL, '
-			. 'PRIMARY KEY(event_id) );' );
-	$sth->execute();
-
-	$sth
-		= $dbh->prepare( 'create table sagan_alerts ('
-			. 'id bigserial NOT NULL, '
-			. 'instance varchar(255)  NOT NULL, '
-			. 'instance_host varchar(255)  NOT NULL, '
-			. 'timestamp TIMESTAMP WITH TIME ZONE, '
-			. 'event_id varchar(64) NOT NULL, '
-			. 'flow_id bigint, '
-			. 'in_iface varchar(255), '
-			. 'src_ip inet, '
-			. 'src_port integer, '
-			. 'dest_ip inet, '
-			. 'dest_port integer, '
-			. 'proto varchar(32), '
-			. 'facility varchar(255), '
-			. 'host varchar(255), '
-			. 'level varchar(255), '
-			. 'priority varchar(255), '
-			. 'program varchar(255), '
-			. 'xff inet, '
-			. 'stream bigint, '
-			. 'classification varchar(1024), '
-			. 'signature varchar(2048),'
-			. 'gid int, '
-			. 'sid bigint, '
-			. 'rev bigint, '
-			. 'raw json NOT NULL, '
-			. 'PRIMARY KEY(id) );' );
-	$sth->execute();
-
-	$sth
-		= $dbh->prepare( 'create table cape_alerts ('
-			. 'id bigserial NOT NULL, '
-			. 'instance varchar(255)  NOT NULL, '
-			. 'target varchar(255)  NOT NULL, '
-			. 'instance_host varchar(255)  NOT NULL, '
-			. 'task bigserial NOT NULL, '
-			. 'start TIMESTAMP WITH TIME ZONE, '
-			. 'stop TIMESTAMP WITH TIME ZONE, '
-			. 'malscore bigint NOT NULL, '
-			. 'subbed_from_ip inet, '
-			. 'subbed_from_host varchar(255), '
-			. 'pkg varchar(255), '
-			. 'md5 varchar(255), '
-			. 'sha1 varchar(255), '
-			. 'sha256 varchar(255), '
-			. 'slug varchar(255), '
-			. 'url varchar(255), '
-			. 'url_hostname varchar(255), '
-			. 'proto varchar(255), '
-			. 'src_ip inet, '
-			. 'src_port integer, '
-			. 'dest_ip inet, '
-			. 'dest_port integer, '
-			. 'size integer, '
-			. 'raw jsonb NOT NULL, '
-			. 'PRIMARY KEY(id) );' );
-	$sth->execute();
-
-} ## end sub create_tables
 
 =head2 extend
 

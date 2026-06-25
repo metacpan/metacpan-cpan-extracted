@@ -10,18 +10,29 @@ package main;
 
 use v5.14;
 use strict;
-use warnings;
-use Test::More tests => 10;
+use warnings FATAL => 'all';
+use utf8;
+use Test::More tests => 18;
 use Test::Exception;
 
 my $map = MetacharsMap->new;
 
 my $s1 = $map->get_node_by_id('1-01')->name; # no parentheses
+is($s1, 'Anaheim');
 my $s2 = $map->get_node_by_id('1-02')->name; # with parentheses
+is($s2, 'Hochheim (Main)');
+is($s2, 'Hochheim (Main)');
 my $s3 = $map->get_node_by_id('1-03')->name; # with parentheses
+is($s3, 'Flussheim (Main)');
 my $s4 = $map->get_node_by_id('2-01')->name; # no parentheses
+is($s4, 'Santa Anaheim');
 my $s5 = $map->get_node_by_id('2-02')->name; # with parentheses
+is($s5, 'Tiefheim (Main)');
 my $s6 = $map->get_node_by_id('2-03')->name; # with parentheses, non-ASCII Unicode
+is($s6, 'Flörsheim (Main)');
+
+my $i4 = $map->get_node_by_name('Santa Anaheim')->id; # no parentheses
+is($i4, '2-01');
 
 # diag( join( ':', $s1, $s2, $s3, $s4, $s5, $s6 ) );
 

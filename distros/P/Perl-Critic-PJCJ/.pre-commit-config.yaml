@@ -95,5 +95,5 @@ repos:
         name: Check for duplicated code
         description: Ensure we don't have large sections of duplicated code
         language: node
-        entry: jscpd --gitignore
+        entry: jscpd
         pass_filenames: true

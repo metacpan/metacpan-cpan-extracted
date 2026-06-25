@@ -2,7 +2,7 @@
 
 use v5.14;
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 use lib 't/';
 use File::Spec;
 use Sample;

@@ -1,0 +1,1 @@
+DROP TABLE dbix_class_deploymenthandler_versions;

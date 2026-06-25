@@ -1,5 +1,8 @@
 Revision history for Module-CPANTS-Analyse
 
+1.03 2026-06-24
+  - Applied a test patch by pghmcfc++ (GH#51) for newer Archive::Tar
+
 1.02 2023-09-10
   - Treat use v5.36 as use_warnings
   - Skip some of the manifest test if symlink is not available

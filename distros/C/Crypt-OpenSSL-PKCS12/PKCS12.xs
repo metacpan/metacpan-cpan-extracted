@@ -636,6 +636,7 @@ void get_hex(char *out, unsigned char *buf, int len)
     else
       out += sprintf(out, "%02X ", buf[i]);
   }
+  *out = '\0';
 }
 
 void hex_prin(BIO *out, unsigned char *buf, int len)
@@ -689,7 +690,7 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
     if(*attribute != NULL) {
       if (length < 0 || length > INT_MAX / 4)
         croak("OCTET STRING attribute length out of range (got %d)", length);
-      Renew(*attribute, (size_t)length * 4, char);
+      Renew(*attribute, (size_t)length * 4 + 1, char);
       get_hex(*attribute, av->value.octet_string->data, length);
     } else {
       hex_prin(out, av->value.octet_string->data, length);
@@ -702,7 +703,7 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
     if(*attribute != NULL) {
       if (length < 0 || length > INT_MAX / 4)
         croak("BIT STRING attribute length out of range (got %d)", length);
-      Renew(*attribute, (size_t)length * 4, char);
+      Renew(*attribute, (size_t)length * 4 + 1, char);
       get_hex(*attribute, av->value.bit_string->data, length);
     } else {
       hex_prin(out, av->value.bit_string->data, length);

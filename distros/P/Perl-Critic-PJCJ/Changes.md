@@ -1,5 +1,13 @@
 # Revision history for Perl::Critic::PJCJ
 
+## v0.2.7 - 2026-06-25
+
+- Count ProhibitLongLines line length in characters, not octets
+  - Lines with multi-byte UTF-8 characters are no longer wrongly flagged as
+    too long
+  - Single-byte source (ASCII, Latin-1) is unaffected; other multi-byte
+    encodings are not decoded and still count by octets
+
 ## v0.2.6 - 2026-04-11
 
 - Suggest single quotes for qq/q strings containing only double quotes

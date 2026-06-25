@@ -1,5 +1,15 @@
 Revision history for Map::Tube
 
+v5.0.1  2026-04-01
+        This release is only possible because of help from @GWS.
+        - The routing algorithm is line-change-aware now:
+          when two candidate routes have the same number of stops, the one
+          requiring fewer line changes is preferred. Each line change
+          incurs a small fractional penalty (0.5) on top of the normal
+          per-hop cost of 1, so hop count always dominates but unnecessary
+          changes are avoided.
+        - Switched to dotted-decimal versioning (v-strings).
+
 4.10  2025-05-13T12:40:00+00:00
       This release prepared by @GWS.
       - Removed is_tainted() and untaint_path() from Map::Utils

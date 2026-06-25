@@ -26,6 +26,7 @@ examples/advanced_operations/add_performance_max_campaign.pl
 examples/advanced_operations/add_responsive_search_ad_full.pl
 examples/advanced_operations/add_smart_campaign.pl
 examples/advanced_operations/create_and_attach_shared_keyword_set.pl
+examples/advanced_operations/fetch_and_approve_pending_multi_party_auth_reviews.pl
 examples/advanced_operations/find_and_remove_criteria_from_shared_set.pl
 examples/advanced_operations/get_ad_group_bid_modifiers.pl
 examples/advanced_operations/use_cross_account_bidding_strategy.pl
@@ -772,6 +773,9 @@ lib/Google/Ads/GoogleAds/V21/Enums/MinuteOfHourEnum.pm
 lib/Google/Ads/GoogleAds/V21/Enums/MobileAppVendorEnum.pm
 lib/Google/Ads/GoogleAds/V21/Enums/MobileDeviceTypeEnum.pm
 lib/Google/Ads/GoogleAds/V21/Enums/MonthOfYearEnum.pm
+lib/Google/Ads/GoogleAds/V21/Enums/MultiPartyAuthOperationTypeEnum.pm
+lib/Google/Ads/GoogleAds/V21/Enums/MultiPartyAuthReviewStatusEnum.pm
+lib/Google/Ads/GoogleAds/V21/Enums/MultiPartyAuthReviewTargetResourceEnum.pm
 lib/Google/Ads/GoogleAds/V21/Enums/NegativeGeoTargetTypeEnum.pm
 lib/Google/Ads/GoogleAds/V21/Enums/NonSkippableMaxDurationEnum.pm
 lib/Google/Ads/GoogleAds/V21/Enums/NonSkippableMinDurationEnum.pm
@@ -1046,6 +1050,8 @@ lib/Google/Ads/GoogleAds/V21/Resources/CustomerSearchTermInsight.pm
 lib/Google/Ads/GoogleAds/V21/Resources/CustomerSkAdNetworkConversionValueSchema.pm
 lib/Google/Ads/GoogleAds/V21/Resources/CustomerUserAccess.pm
 lib/Google/Ads/GoogleAds/V21/Resources/CustomerUserAccessInvitation.pm
+lib/Google/Ads/GoogleAds/V21/Resources/CustomerUserAccessInvitationReview.pm
+lib/Google/Ads/GoogleAds/V21/Resources/CustomerUserAccessReview.pm
 lib/Google/Ads/GoogleAds/V21/Resources/CustomInterest.pm
 lib/Google/Ads/GoogleAds/V21/Resources/CustomInterestMember.pm
 lib/Google/Ads/GoogleAds/V21/Resources/CustomizerAttribute.pm
@@ -1156,6 +1162,7 @@ lib/Google/Ads/GoogleAds/V21/Resources/MigrateDynamicSearchAdsCampaignToPerforma
 lib/Google/Ads/GoogleAds/V21/Resources/MobileAppCategoryConstant.pm
 lib/Google/Ads/GoogleAds/V21/Resources/MobileDeviceConstant.pm
 lib/Google/Ads/GoogleAds/V21/Resources/MoveUnusedBudgetRecommendation.pm
+lib/Google/Ads/GoogleAds/V21/Resources/MultiPartyAuthReview.pm
 lib/Google/Ads/GoogleAds/V21/Resources/NetworkSettings.pm
 lib/Google/Ads/GoogleAds/V21/Resources/NonSkippableInStreamRestrictions.pm
 lib/Google/Ads/GoogleAds/V21/Resources/Note.pm
@@ -1821,6 +1828,12 @@ lib/Google/Ads/GoogleAds/V21/Services/LocalServicesLeadService/ProvideLeadFeedba
 lib/Google/Ads/GoogleAds/V21/Services/LocalServicesLeadService/ProvideLeadFeedbackResponse.pm
 lib/Google/Ads/GoogleAds/V21/Services/LocalServicesLeadService/SurveyDissatisfied.pm
 lib/Google/Ads/GoogleAds/V21/Services/LocalServicesLeadService/SurveySatisfied.pm
+lib/Google/Ads/GoogleAds/V21/Services/MultiPartyAuthReviewService.pm
+lib/Google/Ads/GoogleAds/V21/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewOperation.pm
+lib/Google/Ads/GoogleAds/V21/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewRequest.pm
+lib/Google/Ads/GoogleAds/V21/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResponse.pm
+lib/Google/Ads/GoogleAds/V21/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResult.pm
+lib/Google/Ads/GoogleAds/V21/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResultOrError.pm
 lib/Google/Ads/GoogleAds/V21/Services/OfflineUserDataJobService.pm
 lib/Google/Ads/GoogleAds/V21/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsRequest.pm
 lib/Google/Ads/GoogleAds/V21/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsResponse.pm
@@ -2299,6 +2312,8 @@ lib/Google/Ads/GoogleAds/V22/Common/StoreSalesMetadata.pm
 lib/Google/Ads/GoogleAds/V22/Common/StoreSalesThirdPartyMetadata.pm
 lib/Google/Ads/GoogleAds/V22/Common/StructuredSnippetAsset.pm
 lib/Google/Ads/GoogleAds/V22/Common/StructuredSnippetFeedItem.pm
+lib/Google/Ads/GoogleAds/V22/Common/SyntheticContentAttestation.pm
+lib/Google/Ads/GoogleAds/V22/Common/SyntheticContentInfo.pm
 lib/Google/Ads/GoogleAds/V22/Common/TagSnippet.pm
 lib/Google/Ads/GoogleAds/V22/Common/TargetCpa.pm
 lib/Google/Ads/GoogleAds/V22/Common/TargetCpaSimulationPoint.pm
@@ -2646,6 +2661,9 @@ lib/Google/Ads/GoogleAds/V22/Enums/MinuteOfHourEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/MobileAppVendorEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/MobileDeviceTypeEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/MonthOfYearEnum.pm
+lib/Google/Ads/GoogleAds/V22/Enums/MultiPartyAuthOperationTypeEnum.pm
+lib/Google/Ads/GoogleAds/V22/Enums/MultiPartyAuthReviewStatusEnum.pm
+lib/Google/Ads/GoogleAds/V22/Enums/MultiPartyAuthReviewTargetResourceEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/NegativeGeoTargetTypeEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/NonSkippableMaxDurationEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/NonSkippableMinDurationEnum.pm
@@ -2726,6 +2744,8 @@ lib/Google/Ads/GoogleAds/V22/Enums/SmartCampaignStatusEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/SpendingLimitTypeEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/StructuredSnippetPlaceholderFieldEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/SummaryRowSettingEnum.pm
+lib/Google/Ads/GoogleAds/V22/Enums/SyntheticContentAttestationStatusEnum.pm
+lib/Google/Ads/GoogleAds/V22/Enums/SyntheticContentSourceEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/SystemManagedResourceSourceEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/TargetCpaOptInRecommendationGoalEnum.pm
 lib/Google/Ads/GoogleAds/V22/Enums/TargetFrequencyTimeUnitEnum.pm
@@ -2923,6 +2943,8 @@ lib/Google/Ads/GoogleAds/V22/Resources/CustomerSearchTermInsight.pm
 lib/Google/Ads/GoogleAds/V22/Resources/CustomerSkAdNetworkConversionValueSchema.pm
 lib/Google/Ads/GoogleAds/V22/Resources/CustomerUserAccess.pm
 lib/Google/Ads/GoogleAds/V22/Resources/CustomerUserAccessInvitation.pm
+lib/Google/Ads/GoogleAds/V22/Resources/CustomerUserAccessInvitationReview.pm
+lib/Google/Ads/GoogleAds/V22/Resources/CustomerUserAccessReview.pm
 lib/Google/Ads/GoogleAds/V22/Resources/CustomInterest.pm
 lib/Google/Ads/GoogleAds/V22/Resources/CustomInterestMember.pm
 lib/Google/Ads/GoogleAds/V22/Resources/CustomizerAttribute.pm
@@ -3034,6 +3056,7 @@ lib/Google/Ads/GoogleAds/V22/Resources/MigrateDynamicSearchAdsCampaignToPerforma
 lib/Google/Ads/GoogleAds/V22/Resources/MobileAppCategoryConstant.pm
 lib/Google/Ads/GoogleAds/V22/Resources/MobileDeviceConstant.pm
 lib/Google/Ads/GoogleAds/V22/Resources/MoveUnusedBudgetRecommendation.pm
+lib/Google/Ads/GoogleAds/V22/Resources/MultiPartyAuthReview.pm
 lib/Google/Ads/GoogleAds/V22/Resources/NetworkSettings.pm
 lib/Google/Ads/GoogleAds/V22/Resources/NonSkippableInStreamRestrictions.pm
 lib/Google/Ads/GoogleAds/V22/Resources/Note.pm
@@ -3722,6 +3745,12 @@ lib/Google/Ads/GoogleAds/V22/Services/LocalServicesLeadService/ProvideLeadFeedba
 lib/Google/Ads/GoogleAds/V22/Services/LocalServicesLeadService/ProvideLeadFeedbackResponse.pm
 lib/Google/Ads/GoogleAds/V22/Services/LocalServicesLeadService/SurveyDissatisfied.pm
 lib/Google/Ads/GoogleAds/V22/Services/LocalServicesLeadService/SurveySatisfied.pm
+lib/Google/Ads/GoogleAds/V22/Services/MultiPartyAuthReviewService.pm
+lib/Google/Ads/GoogleAds/V22/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewOperation.pm
+lib/Google/Ads/GoogleAds/V22/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewRequest.pm
+lib/Google/Ads/GoogleAds/V22/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResponse.pm
+lib/Google/Ads/GoogleAds/V22/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResult.pm
+lib/Google/Ads/GoogleAds/V22/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResultOrError.pm
 lib/Google/Ads/GoogleAds/V22/Services/OfflineUserDataJobService.pm
 lib/Google/Ads/GoogleAds/V22/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsRequest.pm
 lib/Google/Ads/GoogleAds/V22/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsResponse.pm
@@ -4204,6 +4233,8 @@ lib/Google/Ads/GoogleAds/V23/Common/StoreSalesMetadata.pm
 lib/Google/Ads/GoogleAds/V23/Common/StoreSalesThirdPartyMetadata.pm
 lib/Google/Ads/GoogleAds/V23/Common/StructuredSnippetAsset.pm
 lib/Google/Ads/GoogleAds/V23/Common/StructuredSnippetFeedItem.pm
+lib/Google/Ads/GoogleAds/V23/Common/SyntheticContentAttestation.pm
+lib/Google/Ads/GoogleAds/V23/Common/SyntheticContentInfo.pm
 lib/Google/Ads/GoogleAds/V23/Common/TagSnippet.pm
 lib/Google/Ads/GoogleAds/V23/Common/TargetCpa.pm
 lib/Google/Ads/GoogleAds/V23/Common/TargetCpaSimulationPoint.pm
@@ -4562,6 +4593,9 @@ lib/Google/Ads/GoogleAds/V23/Enums/MinuteOfHourEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/MobileAppVendorEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/MobileDeviceTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/MonthOfYearEnum.pm
+lib/Google/Ads/GoogleAds/V23/Enums/MultiPartyAuthOperationTypeEnum.pm
+lib/Google/Ads/GoogleAds/V23/Enums/MultiPartyAuthReviewStatusEnum.pm
+lib/Google/Ads/GoogleAds/V23/Enums/MultiPartyAuthReviewTargetResourceEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/NegativeGeoTargetTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/NonSkippableMaxDurationEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/NonSkippableMinDurationEnum.pm
@@ -4646,6 +4680,8 @@ lib/Google/Ads/GoogleAds/V23/Enums/SmartCampaignStatusEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/SpendingLimitTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/StructuredSnippetPlaceholderFieldEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/SummaryRowSettingEnum.pm
+lib/Google/Ads/GoogleAds/V23/Enums/SyntheticContentAttestationStatusEnum.pm
+lib/Google/Ads/GoogleAds/V23/Enums/SyntheticContentSourceEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/SystemManagedResourceSourceEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/TargetCpaOptInRecommendationGoalEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/TargetFrequencyTimeUnitEnum.pm
@@ -4857,6 +4893,8 @@ lib/Google/Ads/GoogleAds/V23/Resources/CustomerSearchTermInsight.pm
 lib/Google/Ads/GoogleAds/V23/Resources/CustomerSkAdNetworkConversionValueSchema.pm
 lib/Google/Ads/GoogleAds/V23/Resources/CustomerUserAccess.pm
 lib/Google/Ads/GoogleAds/V23/Resources/CustomerUserAccessInvitation.pm
+lib/Google/Ads/GoogleAds/V23/Resources/CustomerUserAccessInvitationReview.pm
+lib/Google/Ads/GoogleAds/V23/Resources/CustomerUserAccessReview.pm
 lib/Google/Ads/GoogleAds/V23/Resources/CustomInterest.pm
 lib/Google/Ads/GoogleAds/V23/Resources/CustomInterestMember.pm
 lib/Google/Ads/GoogleAds/V23/Resources/CustomizerAttribute.pm
@@ -4970,6 +5008,7 @@ lib/Google/Ads/GoogleAds/V23/Resources/MigrateDynamicSearchAdsCampaignToPerforma
 lib/Google/Ads/GoogleAds/V23/Resources/MobileAppCategoryConstant.pm
 lib/Google/Ads/GoogleAds/V23/Resources/MobileDeviceConstant.pm
 lib/Google/Ads/GoogleAds/V23/Resources/MoveUnusedBudgetRecommendation.pm
+lib/Google/Ads/GoogleAds/V23/Resources/MultiPartyAuthReview.pm
 lib/Google/Ads/GoogleAds/V23/Resources/NetworkSettings.pm
 lib/Google/Ads/GoogleAds/V23/Resources/NonSkippableInStreamRestrictions.pm
 lib/Google/Ads/GoogleAds/V23/Resources/Note.pm
@@ -5705,6 +5744,12 @@ lib/Google/Ads/GoogleAds/V23/Services/LocalServicesLeadService/ProvideLeadFeedba
 lib/Google/Ads/GoogleAds/V23/Services/LocalServicesLeadService/ProvideLeadFeedbackResponse.pm
 lib/Google/Ads/GoogleAds/V23/Services/LocalServicesLeadService/SurveyDissatisfied.pm
 lib/Google/Ads/GoogleAds/V23/Services/LocalServicesLeadService/SurveySatisfied.pm
+lib/Google/Ads/GoogleAds/V23/Services/MultiPartyAuthReviewService.pm
+lib/Google/Ads/GoogleAds/V23/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewOperation.pm
+lib/Google/Ads/GoogleAds/V23/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewRequest.pm
+lib/Google/Ads/GoogleAds/V23/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResponse.pm
+lib/Google/Ads/GoogleAds/V23/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResult.pm
+lib/Google/Ads/GoogleAds/V23/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResultOrError.pm
 lib/Google/Ads/GoogleAds/V23/Services/OfflineUserDataJobService.pm
 lib/Google/Ads/GoogleAds/V23/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsRequest.pm
 lib/Google/Ads/GoogleAds/V23/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsResponse.pm
@@ -6107,6 +6152,7 @@ lib/Google/Ads/GoogleAds/V24/Common/ListingScopeInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/LocalAdInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/LocalServiceIdInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/LocalServicesDocumentReadOnly.pm
+lib/Google/Ads/GoogleAds/V24/Common/LocalServicesPhoneNumber.pm
 lib/Google/Ads/GoogleAds/V24/Common/LocationAsset.pm
 lib/Google/Ads/GoogleAds/V24/Common/LocationAttributeMetadata.pm
 lib/Google/Ads/GoogleAds/V24/Common/LocationFeedItem.pm
@@ -6206,6 +6252,8 @@ lib/Google/Ads/GoogleAds/V24/Common/StoreSalesMetadata.pm
 lib/Google/Ads/GoogleAds/V24/Common/StoreSalesThirdPartyMetadata.pm
 lib/Google/Ads/GoogleAds/V24/Common/StructuredSnippetAsset.pm
 lib/Google/Ads/GoogleAds/V24/Common/StructuredSnippetFeedItem.pm
+lib/Google/Ads/GoogleAds/V24/Common/SyntheticContentAttestation.pm
+lib/Google/Ads/GoogleAds/V24/Common/SyntheticContentInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/TagSnippet.pm
 lib/Google/Ads/GoogleAds/V24/Common/TargetCpa.pm
 lib/Google/Ads/GoogleAds/V24/Common/TargetCpaSimulationPoint.pm
@@ -6395,6 +6443,7 @@ lib/Google/Ads/GoogleAds/V24/Enums/ChangeStatusResourceTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/ClickTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/CombinedAudienceStatusEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/ConsentStatusEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/ContentCreatorInsightsSupplementalDataEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/ContentLabelTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/ConversionActionCategoryEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/ConversionActionCountingTypeEnum.pm
@@ -6478,6 +6527,7 @@ lib/Google/Ads/GoogleAds/V24/Enums/GenderTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/GeoTargetConstantStatusEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/GeoTargetingRestrictionEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/GeoTargetingTypeEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/GlsPhoneNumberTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/GoalConfigLevelEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/GoalOptimizationEligibilityEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/GoalTypeEnum.pm
@@ -6567,6 +6617,9 @@ lib/Google/Ads/GoogleAds/V24/Enums/MobileAppVendorEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/MobileDevicePlatformEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/MobileDeviceTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/MonthOfYearEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/MultiPartyAuthOperationTypeEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/MultiPartyAuthReviewStatusEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/MultiPartyAuthReviewTargetResourceEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/NegativeGeoTargetTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/NonSkippableMaxDurationEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/NonSkippableMinDurationEnum.pm
@@ -6655,6 +6708,8 @@ lib/Google/Ads/GoogleAds/V24/Enums/SmartCampaignStatusEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/SpendingLimitTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/StructuredSnippetPlaceholderFieldEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/SummaryRowSettingEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/SyntheticContentAttestationStatusEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/SyntheticContentSourceEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/SystemManagedResourceSourceEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/TargetCpaOptInRecommendationGoalEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/TargetFrequencyTimeUnitEnum.pm
@@ -6873,6 +6928,8 @@ lib/Google/Ads/GoogleAds/V24/Resources/CustomerSearchTermInsight.pm
 lib/Google/Ads/GoogleAds/V24/Resources/CustomerSkAdNetworkConversionValueSchema.pm
 lib/Google/Ads/GoogleAds/V24/Resources/CustomerUserAccess.pm
 lib/Google/Ads/GoogleAds/V24/Resources/CustomerUserAccessInvitation.pm
+lib/Google/Ads/GoogleAds/V24/Resources/CustomerUserAccessInvitationReview.pm
+lib/Google/Ads/GoogleAds/V24/Resources/CustomerUserAccessReview.pm
 lib/Google/Ads/GoogleAds/V24/Resources/CustomInterest.pm
 lib/Google/Ads/GoogleAds/V24/Resources/CustomInterestMember.pm
 lib/Google/Ads/GoogleAds/V24/Resources/CustomizerAttribute.pm
@@ -6916,6 +6973,7 @@ lib/Google/Ads/GoogleAds/V24/Resources/GoogleAdsField.pm
 lib/Google/Ads/GoogleAds/V24/Resources/GoogleAdsIdentifier.pm
 lib/Google/Ads/GoogleAds/V24/Resources/GoogleAdsLinkIdentifier.pm
 lib/Google/Ads/GoogleAds/V24/Resources/GoogleAnalytics4Settings.pm
+lib/Google/Ads/GoogleAds/V24/Resources/GoogleLocalServicesInfo.pm
 lib/Google/Ads/GoogleAds/V24/Resources/GranularInsuranceStatus.pm
 lib/Google/Ads/GoogleAds/V24/Resources/GranularLicenseStatus.pm
 lib/Google/Ads/GoogleAds/V24/Resources/GroupContentSuitabilityPlacementView.pm
@@ -6955,10 +7013,12 @@ lib/Google/Ads/GoogleAds/V24/Resources/LifeEvent.pm
 lib/Google/Ads/GoogleAds/V24/Resources/ListingGroupFilterDimension.pm
 lib/Google/Ads/GoogleAds/V24/Resources/ListingGroupFilterDimensionPath.pm
 lib/Google/Ads/GoogleAds/V24/Resources/LocalCampaignSetting.pm
+lib/Google/Ads/GoogleAds/V24/Resources/LocalServicesCallout.pm
 lib/Google/Ads/GoogleAds/V24/Resources/LocalServicesCampaignSettings.pm
 lib/Google/Ads/GoogleAds/V24/Resources/LocalServicesEmployee.pm
 lib/Google/Ads/GoogleAds/V24/Resources/LocalServicesLead.pm
 lib/Google/Ads/GoogleAds/V24/Resources/LocalServicesLeadConversation.pm
+lib/Google/Ads/GoogleAds/V24/Resources/LocalServicesPmaxCampaignSettings.pm
 lib/Google/Ads/GoogleAds/V24/Resources/LocalServicesSettings.pm
 lib/Google/Ads/GoogleAds/V24/Resources/LocalServicesVerificationArtifact.pm
 lib/Google/Ads/GoogleAds/V24/Resources/LocationInterestView.pm
@@ -6987,6 +7047,7 @@ lib/Google/Ads/GoogleAds/V24/Resources/MigrateDynamicSearchAdsCampaignToPerforma
 lib/Google/Ads/GoogleAds/V24/Resources/MobileAppCategoryConstant.pm
 lib/Google/Ads/GoogleAds/V24/Resources/MobileDeviceConstant.pm
 lib/Google/Ads/GoogleAds/V24/Resources/MoveUnusedBudgetRecommendation.pm
+lib/Google/Ads/GoogleAds/V24/Resources/MultiPartyAuthReview.pm
 lib/Google/Ads/GoogleAds/V24/Resources/NetworkSettings.pm
 lib/Google/Ads/GoogleAds/V24/Resources/NonSkippableInStreamRestrictions.pm
 lib/Google/Ads/GoogleAds/V24/Resources/Note.pm
@@ -7124,6 +7185,7 @@ lib/Google/Ads/GoogleAds/V24/Resources/VideoEnhancement.pm
 lib/Google/Ads/GoogleAds/V24/Resources/Webpage.pm
 lib/Google/Ads/GoogleAds/V24/Resources/WebpageCondition.pm
 lib/Google/Ads/GoogleAds/V24/Resources/WebpageView.pm
+lib/Google/Ads/GoogleAds/V24/Resources/YoutubeLinkMetadata.pm
 lib/Google/Ads/GoogleAds/V24/Resources/YoutubeVideoIdentifier.pm
 lib/Google/Ads/GoogleAds/V24/Resources/YouTubeVideoUpload.pm
 lib/Google/Ads/GoogleAds/V24/Services/AccountBudgetProposalService.pm
@@ -7276,10 +7338,12 @@ lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/GenerateTargetingS
 lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/InsightsAudience.pm
 lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/InsightsAudienceDefinition.pm
 lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/InsightsAudienceDescription.pm
+lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/KnowledgeGraphEntitySearchOptions.pm
 lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/ListAudienceInsightsAttributesRequest.pm
 lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/ListAudienceInsightsAttributesResponse.pm
 lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/ListInsightsEligibleDatesRequest.pm
 lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/ListInsightsEligibleDatesResponse.pm
+lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/SearchFilter.pm
 lib/Google/Ads/GoogleAds/V24/Services/AudienceInsightsService/TargetingSuggestionMetrics.pm
 lib/Google/Ads/GoogleAds/V24/Services/AudienceService.pm
 lib/Google/Ads/GoogleAds/V24/Services/AudienceService/AudienceOperation.pm
@@ -7722,6 +7786,12 @@ lib/Google/Ads/GoogleAds/V24/Services/LocalServicesLeadService/ProvideLeadFeedba
 lib/Google/Ads/GoogleAds/V24/Services/LocalServicesLeadService/ProvideLeadFeedbackResponse.pm
 lib/Google/Ads/GoogleAds/V24/Services/LocalServicesLeadService/SurveyDissatisfied.pm
 lib/Google/Ads/GoogleAds/V24/Services/LocalServicesLeadService/SurveySatisfied.pm
+lib/Google/Ads/GoogleAds/V24/Services/MultiPartyAuthReviewService.pm
+lib/Google/Ads/GoogleAds/V24/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewOperation.pm
+lib/Google/Ads/GoogleAds/V24/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewRequest.pm
+lib/Google/Ads/GoogleAds/V24/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResponse.pm
+lib/Google/Ads/GoogleAds/V24/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResult.pm
+lib/Google/Ads/GoogleAds/V24/Services/MultiPartyAuthReviewService/ResolveMultiPartyAuthReviewResultOrError.pm
 lib/Google/Ads/GoogleAds/V24/Services/OfflineUserDataJobService.pm
 lib/Google/Ads/GoogleAds/V24/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsRequest.pm
 lib/Google/Ads/GoogleAds/V24/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsResponse.pm

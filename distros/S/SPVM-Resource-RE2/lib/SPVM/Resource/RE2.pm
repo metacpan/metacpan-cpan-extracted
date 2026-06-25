@@ -1,6 +1,6 @@
 package SPVM::Resource::RE2;
 
-our $VERSION = "0.046";
+our $VERSION = "0.047";
 
 1;
 
@@ -182,6 +182,10 @@ C++17
 =item * -Wno-unused-parameter
 
 =item * -Wno-missing-field-initializers
+
+=item * -DNOMINMAX
+
+For MSVC.
 
 =back
 

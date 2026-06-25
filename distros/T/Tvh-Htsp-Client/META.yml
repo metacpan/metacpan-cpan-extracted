@@ -19,9 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  IO::Socket: '0'
+  IO::Socket: '1.45'
   List::Util: '0'
   LooksLike: '0'
+  namespace::autoclean: '0'
   perl: '5.028'
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

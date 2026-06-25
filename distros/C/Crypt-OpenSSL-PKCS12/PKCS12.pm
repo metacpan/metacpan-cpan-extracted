@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.96';
+our $VERSION = '1.97';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);

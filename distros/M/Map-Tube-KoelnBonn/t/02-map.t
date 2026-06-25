@@ -17,6 +17,7 @@ ok_map_functions($map);
 my @routes = <DATA>;
 ok_map_routes($map, \@routes);
 
+done_testing;
 __DATA__
-Route 1|Neumarkt|Trimbornstr.|Neumarkt, Appellhofplatz / Breite Str., Dom / Hbf, Köln Hbf, Köln Messe / Deutz, Trimbornstr.
+Route 1|Neumarkt|Trimbornstr.|Neumarkt, Heumarkt, Deutzer Freiheit, Bf Deutz / Messe, Köln Messe / Deutz, Trimbornstr.
 Route 2|wurzerstr.|RAMERSDORF|Wurzerstr., Hochkreuz / Deutsches Museum Bonn, Max-Löbner-Str. / Friesdorf, Olof-Palme-Allee, Robert-Schuman-Platz, Rheinaue, Ramersdorf

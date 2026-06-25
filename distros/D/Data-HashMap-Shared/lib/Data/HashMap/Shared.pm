@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -14,7 +14,7 @@ __END__
 
 =head1 NAME
 
-Data::HashMap::Shared - Type-specialized shared-memory hash maps for multiprocess access
+Data::HashMap::Shared - Multiprocess shared-memory hash maps with LRU eviction and per-key TTL
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,9 @@ Data::HashMap::Shared - Type-specialized shared-memory hash maps for multiproces
 
 Data::HashMap::Shared provides type-specialized hash maps stored in
 file-backed shared memory (C<mmap(MAP_SHARED)>), enabling efficient
-multiprocess data sharing on Linux.
+multiprocess data sharing on Linux. With opt-in B<LRU eviction> and
+B<per-key TTL> it doubles as a fast cross-process B<cache>; lookups take a
+lock-free seqlock fast path.
 
 B<Linux-only>. Requires 64-bit Perl.
 
@@ -80,7 +82,9 @@ B<Linux-only>. Requires 64-bit Perl.
 
 =item * Keyword API via XS::Parse::Keyword for maximum speed
 
-=item * Opt-in LRU eviction and per-key TTL (lock-free reads via clock eviction)
+=item * Opt-in B<LRU eviction> — clock/second-chance algorithm; reads stay lock-free
+
+=item * Opt-in B<per-key TTL> expiry — lazy removal on access; monotonic clock
 
 =item * Stale lock recovery for both writers and readers (dead PIDs detected and drained automatically)
 
@@ -131,6 +135,7 @@ C<get(4464)> address the same entry. C<incr>/C<decr> wrap the same way
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size);
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl);
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl, $lru_skip);
+    my $map = Data::HashMap::Shared::SS->new($path, $max_entries, 0, 0, 0, $arena_cap); # explicit arena bytes
     my $map = Data::HashMap::Shared::II->new_memfd($name, $max_entries, ...); # memfd-backed
     my $map = Data::HashMap::Shared::II->new_from_fd($fd);            # reopen memfd
     my $fd  = $map->memfd;                                            # -1 if not memfd
@@ -144,9 +149,10 @@ can be passed to another process (via C<SCM_RIGHTS>, C<fork>+C<exec>, or
 duped+open). C<new_from_fd> reopens such a descriptor. Both require a
 64-bit Perl on Linux (C<memfd_create(2)>).
 
-C<$max_entries>, C<$max_size>, C<$ttl>, and C<$lru_skip> are used only when
-creating a new file; when opening an existing one, all parameters are read
-from the stored header and the constructor arguments are ignored.
+C<$max_entries>, C<$max_size>, C<$ttl>, C<$lru_skip>, and C<$arena_cap> are
+used only when creating a new file; when opening an existing one, all
+parameters are read from the stored header and the constructor arguments are
+ignored.
 Multiple processes can open the same file simultaneously.
 Dies if the file exists but was created by a different variant or is corrupt.
 
@@ -171,6 +177,14 @@ eviction consumes. Skipping promotions cuts write-lock churn for Zipfian
 (power-law) patterns where a few hot keys dominate. The LRU tail (eviction
 victim) is never skipped, preserving eviction correctness. Set to 0 for strict
 LRU ordering.
+
+Optional C<$arena_cap> (bytes) sizes the string-storage arena explicitly,
+decoupling it from C<$max_entries>. By default the arena holds roughly 128
+bytes per entry (4096 minimum), so a map with a few large strings — keys or
+values — can exhaust it while the table is nearly empty; pass an C<$arena_cap>
+sized for your strings instead. Clamped to C<[4096, 0xFFFFFFFF]> (arena offsets are
+32-bit). Integer-only variants (C<II>/C<I16>/C<I32>) have no arena and ignore
+it. For sharded maps it is the per-shard cap, like C<$max_entries>.
 
 B<Zero-cost when disabled>: with both C<$max_size=0> and C<$ttl=0>, the fast
 lock-free read path is used. The only overhead is a branch (predicted away).
@@ -217,6 +231,11 @@ route to the correct shard via hash dispatch. Writes to different shards
 proceed in parallel with independent locks. C<new_sharded> requires a
 filesystem C<$path_prefix>; anonymous (C<undef>-path) sharded maps are not
 supported.
+
+The batch ops (C<set_multi>, C<get_multi>, C<remove_multi>) dispatch each key
+to its shard independently rather than holding one lock for the whole call, so
+on a sharded map a batch is B<not> atomic across shards (the "single lock"
+note in the API below applies to non-sharded maps).
 
 All operations work transparently on sharded maps: C<put>, C<get>, C<remove>,
 C<exists>, C<add>, C<update>, C<swap>, C<take>, C<incr>, C<max>, C<min>, C<cas>, C<cas_take>,
@@ -324,7 +343,7 @@ LRU/TTL operations (C<put_ttl>, C<add_ttl>, and C<update_ttl> require a TTL-enab
     my $ok = shm_xx_persist $map, $key;       # remove TTL, make key permanent; false on non-TTL maps
     my $ok = shm_xx_set_ttl $map, $key, $sec; # change TTL without changing value (0 = permanent); false on non-TTL maps
     my $n  = shm_xx_flush_expired $map;       # proactively expire all stale entries, returns count
-    my ($n, $done) = shm_xx_flush_expired_partial $map, $limit;  # gradual: scan $limit slots
+    my ($n, $done) = shm_xx_flush_expired_partial $map, $limit;  # gradual: scan $limit slots ($limit per shard on sharded maps; $done true once every shard completes a cycle)
 
 Atomic remove-and-return:
 
@@ -344,7 +363,7 @@ Cursors (independent iterators, allow nesting and removal during iteration):
     my $cur = shm_xx_cursor $map;             # create cursor
     while (my ($k, $v) = shm_xx_cursor_next $cur) { ... }
     shm_xx_cursor_reset $cur;                 # restart from beginning
-    shm_xx_cursor_seek $cur, $key;            # position at specific key (best-effort across resize)
+    my $ok = shm_xx_cursor_seek $cur, $key;   # position at key (best-effort across resize); true if found, false if missing/expired
     # cursor auto-destroyed when out of scope
 
 C<shm_xx_each> is also safe to use with C<remove> during iteration.

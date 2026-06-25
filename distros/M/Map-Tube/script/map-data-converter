@@ -1,8 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 #
-# Author: Mohammad S Anwar (mohammad.anwar@yahoo.com)
-# Distribution: Map::Tube v3.68.
+# Author: Mohammad Sajid Anwar (mohammad.anwar@yahoo.com)
+# Distribution: Map::Tube v5.0.1
 
 package MapDataConverter;
 

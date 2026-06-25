@@ -24,7 +24,7 @@ use autouse 'Carp' => qw(croak);
 
 use constant SLUZ_INLINE => 'INLINE_TEMPLATE';
 
-our $VERSION = 'v0.9.2';
+our $VERSION = 'v0.9.4';
 
 ################################################################################
 # Built-in Sluz functions that can be used in templates
@@ -58,37 +58,55 @@ sub join {
 
 sub new {
     my $class = shift;
+    my %args  = @_;
     my $self  = {
-        version       => $VERSION,
-        tpl_file      => undef,
-        inc_tpl_file  => undef,
-        debug         => 0,
-        tpl_vars      => {},
-        parent_tpl    => undef,
-        var_prefix    => 'sluz_pfx',
-        perl_file     => undef,
-        perl_file_dir => undef,
-        fetch_called  => 0,
-        char_pos      => -1,
-        _sub_cache    => {},
+        version             => $VERSION,
+        tpl_file            => undef,
+        inc_tpl_file        => undef,
+        debug               => $args{debug}       // 0,
+        auto_escape         => $args{auto_escape} // 0,
+        tpl_vars            => {},
+        parent_tpl          => undef,
+        var_prefix          => 'sluz_pfx',
+        perl_file           => undef,
+        perl_file_dir       => undef,
+        fetch_called        => 0,
+        char_pos            => -1,
+        open_delim          => '{',
+        close_delim         => '}',
+        _sub_cache          => {},
+        __S                 => {}, # Cached prefixed var hash used by _peval
+        _convert_cache      => {}, # Cached _convert_vars results (avoids re-running regex on repeated expressions)
+        _blocks_cache       => {}, # Cached _get_blocks results (avoids re-tokenizing if payloads in loops)
+        _if_rules_cache     => {}, # Cached parsed {if} rules (avoids re-parsing same if block in loops)
+        _verified_sub_cache => {}, # Cached subs that succeeded once — skip eval/SIG overhead
     };
 
     bless $self, $class;
+    $self->_precompute_tags();
     return $self;
 }
 
 sub assign {
     my $self = shift;
 
+    my $pfx = $self->{var_prefix};
+
     # Accept either a hashref: assign($hash_ref)
     if (@_ == 1 && ref $_[0] eq 'HASH') {
         my $h = shift;
         @{$self->{tpl_vars}}{keys %$h} = values %$h;
+        for my $k (keys %$h) {
+            $self->{__S}{"${pfx}_$k"} = $h->{$k};
+        }
 
     # Or a key-value list: assign(name => 'Scott', age => 42)
     } elsif (@_ % 2 == 0) {
         my %h = @_;
         @{$self->{tpl_vars}}{keys %h} = values %h;
+        for my $k (keys %h) {
+            $self->{__S}{"${pfx}_$k"} = $h{$k};
+        }
     } else {
         $self->_error_out("Invalid assign. Must be a key/value or hash", 18956);
 	}
@@ -157,6 +175,38 @@ sub parent_tpl {
     return $self->{parent_tpl};
 }
 
+sub set_delimiters {
+    my $self  = shift;
+    my $open  = shift;
+    my $close = shift;
+
+    if (!defined $open || !defined $close) {
+        $self->_error_out("set_delimiters requires both open and close delimiter arguments", 51234);
+    }
+
+    if (length($open) != 1 || length($close) != 1) {
+        $self->_error_out("Delimiters must be single characters", 51235);
+    }
+
+    if ($open eq $close) {
+        $self->_error_out("Open and close delimiters must be different characters", 51236);
+    }
+
+    $self->{open_delim}  = $open;
+    $self->{close_delim} = $close;
+
+    $self->_precompute_tags();
+
+    # Clear all caches since results are delimiter-dependent
+    $self->{_blocks_cache}       = {};
+    $self->{_if_rules_cache}     = {};
+    $self->{_convert_cache}      = {};
+    $self->{_sub_cache}          = {};
+    $self->{_verified_sub_cache} = {};
+
+    return;
+}
+
 # Dive down an array or hashref using our dotted syntax
 sub array_dive {
     my $self     = shift;
@@ -187,6 +237,39 @@ sub array_dive {
         }
     }
     return $arr;
+}
+
+# HTML-escape a string for safe output. Encodes & < > " ' to entities.
+# Usable as a modifier: {$var|escape} or as a callable: {escape($var)}
+sub escape {
+    my $str = shift // '';
+
+    if (ref $str eq 'ARRAY') { return 'ARRAY' }
+    if (ref $str eq 'HASH')  { return 'HASH' }
+
+    $str =~ s/&/&amp;/g;
+    $str =~ s/</&lt;/g;
+    $str =~ s/>/&gt;/g;
+    $str =~ s/"/&quot;/g;
+    $str =~ s/'/&#x27;/g;
+
+    return $str;
+}
+
+# Bypass auto-escaping when auto_escape is on: {$var|noescape}
+sub noescape {
+    return shift;
+}
+
+# Apply auto-escaping if enabled, otherwise return value unchanged.
+# Ref types (ARRAY/HASH) pass through unescaped.
+sub _esc {
+    my ($self, $val) = @_;
+
+    if (!$self->{auto_escape}) { return $val }
+    if (ref $val)              { return $val }
+
+    return escape($val);
 }
 
 sub ltrim_one {
@@ -238,7 +321,9 @@ sub find_ending_tag {
 sub get_tokens {
     my $self = shift;
     my $str  = shift // '';
-    my @tokens = split /({[^}]+})/, $str;
+    my $o = quotemeta($self->{open_delim});
+    my $c = quotemeta($self->{close_delim});
+    my @tokens = split /($o[^$c]+$c)/, $str;
     @tokens = grep { defined && length } @tokens;
     return @tokens;
 }
@@ -246,10 +331,13 @@ sub get_tokens {
 sub is_if_token {
     my $self = shift;
     my $str  = shift // '';
-    if ($str eq '{else}') { return 1 }
-    if ($str eq '{/if}') { return 1 }
-    if ($str =~ /^\{(?:if|elseif)\s+(.+?)\}$/) {
-        return $1;
+    if ($str eq $self->{_tag_else})   { return 1 }
+    if ($str eq $self->{_tag_if_close}) { return 1 }
+    if (index($str, $self->{_tag_if}) == 0 || index($str, $self->{_tag_elseif}) == 0) {
+        my $inner = substr($str, length($self->{open_delim}));
+        $inner =~ s/^\S+\s+//;  # strip 'if ' or 'elseif '
+        $inner =~ s/\Q$self->{close_delim}\E$//;
+        return $inner;
     }
     return '';
 }
@@ -257,6 +345,60 @@ sub is_if_token {
 # -------------------------------------------------------------------
 # Private methods
 # -------------------------------------------------------------------
+
+sub _precompute_tags {
+    my $self = shift;
+    my $o    = $self->{open_delim};
+    my $c    = $self->{close_delim};
+
+    # Tag strings
+    $self->{_tag_if}              = "${o}if ";
+    $self->{_tag_if_close}        = "${o}/if${c}";
+    $self->{_tag_else}            = "${o}else${c}";
+    $self->{_tag_elseif}          = "${o}elseif ";
+    $self->{_tag_foreach}         = "${o}foreach ";
+    $self->{_tag_foreach_close}   = "${o}/foreach${c}";
+    $self->{_tag_include}         = "${o}include ";
+    $self->{_tag_literal}         = "${o}literal${c}";
+    $self->{_tag_literal_close}   = "${o}/literal${c}";
+    $self->{_tag_comment_open}    = "${o}*";
+    $self->{_tag_comment_close}   = "*${c}";
+
+    # Precomputed tag lengths (avoids repeated length() calls in hot loops)
+    $self->{_tag_if_len}            = length($self->{_tag_if});
+    $self->{_tag_if_close_len}      = length($self->{_tag_if_close});
+    $self->{_tag_foreach_len}       = length($self->{_tag_foreach});
+    $self->{_tag_include_len}       = length($self->{_tag_include});
+    $self->{_tag_literal_len}       = length($self->{_tag_literal});
+    $self->{_tag_literal_close_len} = length($self->{_tag_literal_close});
+
+    # Precomputed quotemeta values (avoids per-call quotemeta in _get_blocks)
+    $self->{_od_qr} = quotemeta($o);
+    $self->{_cd_qr} = quotemeta($c);
+
+    # Precompiled space-guard regex (avoids per-open-delimiter regex compile)
+    my $od_qr = $self->{_od_qr};
+    my $cd_qr = $self->{_cd_qr};
+    $self->{_space_guard_re} = qr/\s[$od_qr$cd_qr]\s/;
+
+    # Precompiled variable regex: {$var} or {$var.dot.path}
+    $self->{_re_var_simple} = qr/^\Q$o\E\$(\w[\w.]*)\Q$c\E$/;
+    $self->{_re_var_full}   = qr/^\Q$o\E\$([\w|.'";\t :,!@#%^&*?_\/\\\-]+)\Q$c\E$/;
+
+    # Precompiled foreach regex
+    $self->{_re_foreach} = qr/^\Q$o\Eforeach (\$\w[\w.]*) as \$(\w+)(?: => \$(\w+))?\Q$c\E(.+)\Q$o\E\/foreach\Q$c\E$/s;
+
+    # Precompiled literal regex
+    $self->{_re_literal} = qr/^\Q$o\Eliteral\Q$c\E(.+)\Q$o\E\/literal\Q$c\E$/s;
+
+    # Precompiled expression catch-all regex
+    $self->{_re_expr} = qr/^\Q$o\E(.+)\Q$c\E$/s;
+
+    # Precompiled simple if regex (no else/elseif)
+    $self->{_re_if_simple} = qr/\Q$o\Eif (.+?)\Q$c\E(.+)\Q$o\E\/if\Q$c\E/s;
+
+    return;
+}
 
 sub _get_perl_file {
     my $self = shift;
@@ -331,23 +473,35 @@ sub _get_inline_content {
 sub _get_blocks {
     my $self = shift;
     my $str  = shift // '';
-    my $slen = length $str;
-    my $start = 0;
+
+    # Check blocks cache — avoids re-tokenizing the same payload string
+    # (e.g. an {if} payload re-parsed on every iteration of a {foreach} loop)
+    if (exists $self->{_blocks_cache}{$str}) {
+        return @{$self->{_blocks_cache}{$str}};
+    }
+
+    my $od          = $self->{open_delim};
+    my $cd          = $self->{close_delim};
+    my $tag_if      = $self->{_tag_if};
+    my $tag_foreach = $self->{_tag_foreach};
+    my $tag_literal = $self->{_tag_literal};
+    my $slen        = length $str;
+    my $start       = 0;
     my $i;
     my @blocks;
 
-    my $z = index($str, '{');
+    my $z = index($str, $od);
     if ($z < 0) { $z = $slen }
 
     for ($i = $z; $i < $slen; $i++) {
         my $char      = substr($str, $i, 1);
-        my $is_open   = $char eq '{';
-        my $is_closed = $char eq '}';
+        my $is_open   = $char eq $od;
+        my $is_closed = $char eq $cd;
 
         if (!$is_open && !$is_closed) {
-            my $next_open  = index($str, '{', $i);
+            my $next_open  = index($str, $od, $i);
             if ($next_open < 0) { $next_open = $slen }
-            my $next_close = index($str, '}', $i);
+            my $next_close = index($str, $cd, $i);
             if ($next_close < 0) { $next_close = $slen }
             if ($next_open < $next_close) {
                 $i = $next_open - 1;
@@ -374,7 +528,7 @@ sub _get_blocks {
                 $next_c = ' ';
             }
             my $chk = $prev_c . $char . $next_c;
-            if ($chk =~ /\s[\{\}]\s/) { $is_open = 0 }
+            if ($chk =~ $self->{_space_guard_re}) { $is_open = 0 }
             if ($next_c eq '*') { $is_comment = 1 }
         }
 
@@ -385,14 +539,18 @@ sub _get_blocks {
             my $len   = $i - $start + 1;
             my $block = substr($str, $start, $len);
 
-            if ($block =~ /^\{(if|foreach|literal)\b/) {
-                my $open_tag  = $1;
-                my $close_tag = "{/$open_tag}";
+            my $matched_block;
+            if    (index($block, $tag_if) == 0)        { $matched_block = 'if'      }
+            elsif (index($block, $tag_foreach) == 0)   { $matched_block = 'foreach' }
+            elsif (index($block, $tag_literal) == 0)   { $matched_block = 'literal' }
+
+            if ($matched_block) {
+                my $close_tag = "${od}/${matched_block}${cd}";
                 for (my $j = $i + 1; $j < length $str; $j++) {
-                    if (substr($str, $j, 1) eq '}') {
+                    if (substr($str, $j, 1) eq $cd) {
                         my $tmp = substr($str, $start, $j - $start + 1);
-                        my $oc  = () = $tmp =~ /\{\Q$open_tag\E/g;
-                        my $cc  = () = $tmp =~ m@\{\/\Q$open_tag\E\}@g;
+                        my $oc  = () = $tmp =~ /\Q${od}${matched_block}\E/g;
+                        my $cc  = () = $tmp =~ /\Q${close_tag}\E/g;
                         if ($oc == $cc) {
                             $block = $tmp;
                             last;
@@ -407,12 +565,12 @@ sub _get_blocks {
         }
 
         if ($is_comment) {
-            my $end = $self->find_ending_tag(substr($str, $start), '{*', '*}');
+            my $end = $self->find_ending_tag(substr($str, $start), $self->{_tag_comment_open}, $self->{_tag_comment_close});
             if (!defined $end) {
                 my ($line, $col, $file) = $self->_get_char_location($i, $self->{tpl_file});
-                $self->_error_out("Missing closing <code>*}</code> for comment in <code>$file</code> on line #$line", 48724);
+                $self->_error_out("Missing closing <code>$self->{_tag_comment_close}</code> for comment in <code>$file</code> on line #$line", 48724);
             }
-            $start += $end + 2;
+            $start += $end + length($self->{_tag_comment_close});
             $i = $start;
         }
     }
@@ -428,12 +586,13 @@ sub _get_blocks {
     # (no trailing \n), the newline is structural content, not
     # whitespace noise.
     my $prev_is_if = 0;
+    my $tag_foreach_close = $self->{_tag_foreach_close};
     for my $i (0 .. $#blocks) {
         my $bstr     = $blocks[$i][0] // '';
-        my $cur_is_if = ($bstr =~ /^\{if\b/ || $bstr =~ /^\{for/);
+        my $cur_is_if = (index($bstr, $tag_if) == 0 || index($bstr, $tag_foreach) == 0);
         if ($prev_is_if) {
             my $should_strip = 1;
-            if ($blocks[$i-1][0] =~ /^\{foreach .+?\}(.*)\{\/foreach\}$/s) {
+            if ($blocks[$i-1][0] =~ /^\Q$tag_foreach\E.+?\}(.*)\Q$tag_foreach_close\E$/s) {
                 $should_strip = (substr($1, -1) eq "\n") ? 1 : 0;
             }
             if ($should_strip) {
@@ -443,23 +602,82 @@ sub _get_blocks {
         $prev_is_if = $cur_is_if;
     }
 
+    $self->{_blocks_cache}{$str} = \@blocks;
     return @blocks;
 }
 
 sub _process_blocks {
     my $self   = shift;
     my $blocks = shift;
-    my $html   = '';
+    my $out    = shift;  # Optional: ref to append output to (avoids temp string + concat)
 
+    my $od = $self->{open_delim};
+    my $cd = $self->{close_delim};
+    my $var_tag = "${od}\$";
+    my $var_re  = $self->{_re_var_simple};
+
+    if ($out) {
+        for my $x (@$blocks) {
+            my $block = $x->[0];
+            next unless length $block;
+            my $first = substr($block, 0, 1);
+            if ($first ne $od) {
+                $$out .= $block;
+                next;
+            }
+            # Fast path: {$var} or {$var.dot} with no modifier — inline
+            # variable resolution, skip _process_block AND _variable_block
+            if (substr($block, 0, 2) eq $var_tag && index($block, '|') < 0
+                && $block =~ $var_re) {
+                my $var = $1;
+                my $val;
+                if (index($var, '.') < 0) {
+                    $val = $self->{tpl_vars}{$var};
+                } else {
+                    $val = $self->array_dive($var, $self->{tpl_vars});
+                }
+                if (ref $val eq 'ARRAY')  { $$out .= 'ARRAY' }
+                elsif (ref $val eq 'HASH') { $$out .= 'HASH' }
+                elsif (defined $val)       { $$out .= $self->_esc($val) }
+                next;
+            }
+            $$out .= $self->_process_block($block, $x->[1]);
+        }
+        return;
+    }
+
+    my $html = '';
     for my $x (@$blocks) {
         my $block = $x->[0];
-        if (!length $block) { next }
-        if (substr($block, 0, 1) eq '{') {
-            my $char_pos = $x->[1];
-            $html .= $self->_process_block($block, $char_pos);
-        } else {
+        next unless length $block;
+        my $first = substr($block, 0, 1);
+        if ($first ne $od) {
             $html .= $block;
+            next;
         }
+        # Fast path: {$var} or {$var.dot} with no modifier
+        if (substr($block, 0, 2) eq $var_tag && index($block, '|') < 0
+            && $block =~ $var_re) {
+            my $var = $1;
+            my $val;
+            if (index($var, '.') < 0) {
+                $val = $self->{tpl_vars}{$var};
+            } else {
+                $val = $self->array_dive($var, $self->{tpl_vars});
+            }
+            if (ref $val eq 'ARRAY')  { $html .= 'ARRAY' }
+            elsif (ref $val eq 'HASH') { $html .= 'HASH' }
+            elsif (defined $val)       { $html .= $self->_esc($val) }
+            next;
+        }
+        # If block fast path — skip _process_block dispatch
+        if (substr($block, 0, $self->{_tag_if_len}) eq $self->{_tag_if}
+            && substr($block, -$self->{_tag_if_close_len}) eq $self->{_tag_if_close}) {
+            $self->{char_pos} = $x->[1];
+            $html .= $self->_if_block($block);
+            next;
+        }
+        $html .= $self->_process_block($block, $x->[1]);
     }
 
     return $html;
@@ -472,38 +690,42 @@ sub _process_block {
 
     $self->{char_pos} = $char_pos;
 
+    my $od = $self->{open_delim};
+    my $cd = $self->{close_delim};
+
     # 1. Variable block {$foo} or {$foo|modifier}
-    if (substr($str, 0, 2) eq '{$' && $str =~ /^\{\$([\w|.'";\t :,!@#%^&*?_\/\\\-]+)\}$/) {
+    if (substr($str, 0, 2) eq "${od}\$" && $str =~ $self->{_re_var_full}) {
         return $self->_variable_block($1);
     }
 
     # 2. If block {if ...}{/if}
-    if (substr($str, 0, 4) eq '{if ' && substr($str, -5) eq '{/if}') {
+    if (substr($str, 0, $self->{_tag_if_len}) eq $self->{_tag_if}
+        && substr($str, -$self->{_tag_if_close_len}) eq $self->{_tag_if_close}) {
         return $self->_if_block($str);
     }
 
     # 3. Foreach block {foreach ...}{/foreach}
-    if (substr($str, 0, 9) eq '{foreach ' && $str =~ /^\{foreach (\$\w[\w.]*) as \$(\w+)(?: => \$(\w+))?\}(.+)\{\/foreach\}$/s) {
+    if (substr($str, 0, $self->{_tag_foreach_len}) eq $self->{_tag_foreach} && $str =~ $self->{_re_foreach}) {
         return $self->_foreach_block($1, $2, $3, $4);
     }
 
     # 4. Include block {include ...}
-    if (substr($str, 0, 9) eq '{include ') {
+    if (substr($str, 0, $self->{_tag_include_len}) eq $self->{_tag_include}) {
         return $self->_include_block($str);
     }
 
     # 5. Literal block {literal}...{/literal}
-    if (substr($str, 0, 9) eq '{literal}' && $str =~ /^\{literal\}(.+)\{\/literal\}$/s) {
+    if (substr($str, 0, $self->{_tag_literal_len}) eq $self->{_tag_literal} && $str =~ $self->{_re_literal}) {
         return $1;
     }
 
     # 6. Expression / function block
-    if ($str =~ /^\{(.+)}$/s) {
+    if ($str =~ $self->{_re_expr}) {
         return $self->_expression_block($str, $1);
     }
 
     # 7. Unclosed tag
-    if (substr($str, -1) ne '}') {
+    if (substr($str, -1) ne $cd) {
         my ($line, $col, $file) = $self->_get_char_location($self->{char_pos}, $self->{tpl_file});
         $self->_error_out("Unclosed tag <code>$str</code> in <code>$file</code> on line #$line", 45821);
     }
@@ -519,6 +741,22 @@ sub _process_block {
 sub _variable_block {
     my $self = shift;
     my $str  = shift;
+
+    # Fast path: no pipe means no modifier, just resolve the variable.
+    # Avoids running the pipe-split regex on every plain variable block.
+    if (index($str, '|') < 0) {
+        my $ret;
+        # Inline simple key lookup (no dots) — skips array_dive method call
+        if (index($str, '.') < 0) {
+            $ret = $self->{tpl_vars}{$str};
+        } else {
+            $ret = $self->array_dive($str, $self->{tpl_vars});
+        }
+        if (ref $ret eq 'ARRAY') { return 'ARRAY' }
+        if (ref $ret eq 'HASH')  { return 'HASH' }
+        if (defined $ret) { return $self->_esc($ret) }
+        return '';
+    }
 
     if ($str =~ /(.+?)\|(.*)/) {
         my $key = $1;
@@ -542,12 +780,17 @@ sub _variable_block {
             }
             my $pre = $self->array_dive($key, $self->{tpl_vars}) // '';
 
+            my $seen_escape   = 0;
+			my $seen_noescape = 0;
+
             # Split on | not inside double or single quotes (supports chained
             # modifiers like {$x|uc|substr:0,3})
             my $pipe_re = qr/\|(?![^"]*"(?:(?:[^"]*"){2})*[^"]*$)(?![^']*'(?:(?:[^']*'){2})*[^']*$)/;
             for my $m_part (split $pipe_re, $mod) {
                 my @x    = split /:/, $m_part, 2;
                 my $func = $x[0] // '';
+                if ($func eq 'escape')   { $seen_escape   = 1 }
+                if ($func eq 'noescape') { $seen_noescape = 1 }
                 my $param_str = $x[1] // '';
                 my @params = ($pre);
 
@@ -587,6 +830,9 @@ sub _variable_block {
                 }
             }
 
+            if ($self->{auto_escape} && !$seen_noescape && !$seen_escape) {
+                return $self->_esc($pre);
+            }
             return $pre;
         }
     }
@@ -594,7 +840,7 @@ sub _variable_block {
     my $ret = $self->array_dive($str, $self->{tpl_vars});
     if (ref $ret eq 'ARRAY') { return 'ARRAY' }
     if (ref $ret eq 'HASH')  { return 'HASH' }
-    if (defined $ret) { return $ret }
+    if (defined $ret) { return $self->_esc($ret) }
     return '';
 }
 
@@ -602,27 +848,42 @@ sub _if_block {
     my $self = shift;
     my $str  = shift;
 
-    my $is_simple = index($str, '{else', 7) < 0;
     my @rules;
-
-    if ($is_simple) {
-        $str =~ /\{if (.+?)}(.+)\{\/if\}/s;
-        my $cond    = $1 // '';
-        my $payload = $2 // '';
-        $payload = $self->ltrim_one($payload, "\n");
-        @rules = ([$cond, $payload]);
+    if (exists $self->{_if_rules_cache}{$str}) {
+        @rules = @{$self->{_if_rules_cache}{$str}};
     } else {
-        my @toks = $self->get_tokens($str);
-        @rules   = $self->_if_rules_from_tokens(\@toks);
+        my $od = $self->{open_delim};
+        my $cd = $self->{close_delim};
+        my $isimple_start = length($od) + 1;
+        my $else_check = $od . 'else';
+        my $is_simple = index($str, $else_check, $isimple_start) < 0;
+
+        if ($is_simple) {
+            $str =~ $self->{_re_if_simple};
+            my $cond    = $1 // '';
+            my $payload = $2 // '';
+            $payload = $self->ltrim_one($payload, "\n");
+            @rules = ([$cond, $payload]);
+        } else {
+            my @toks = $self->get_tokens($str);
+            @rules   = $self->_if_rules_from_tokens(\@toks);
+        }
+
+        $self->{_if_rules_cache}{$str} = \@rules;
     }
 
     my $ret = '';
     for my $rule (@rules) {
-        my $test    = $self->_convert_vars($rule->[0]);
+        my $raw = $rule->[0];
+        # Inline _convert_vars for cached expressions — saves method call per iteration
+        my $test = (index($raw, '$') < 0) ? $raw :
+                   ($self->{_convert_cache}{$raw} // $self->_convert_vars($raw));
         my $payload = $rule->[1];
         my ($res) = $self->_peval($test);
         if ($res) {
-            my @in_blocks = $self->_get_blocks($payload);
+            # Inline _get_blocks for cached payloads
+            my $cached = $self->{_blocks_cache}{$payload};
+            my @in_blocks = $cached ? @$cached : $self->_get_blocks($payload);
             $ret .= $self->_process_blocks(\@in_blocks);
             last;
         }
@@ -639,8 +900,31 @@ sub _foreach_block {
     my $payload  = shift;
 
     my $conv_src = $self->_convert_vars($src_expr);
-    $payload = $self->ltrim_one($payload, "\n");
-    my @blocks = $self->_get_blocks($payload);
+    $payload     = $self->ltrim_one($payload, "\n");
+    my @blocks   = $self->_get_blocks($payload);
+
+    # Pre-classify blocks for fast dispatch in the loop (cached in block arrays)
+    # type: -1=empty, 0=text, 1=simple_var, 2=if_block, 99=other
+    my $od = $self->{open_delim};
+    my $cd = $self->{close_delim};
+    for my $b (@blocks) {
+        next if defined $b->[2];
+        my $bs = $b->[0];
+        if (!length $bs) {
+            $b->[2] = -1;
+        } elsif (substr($bs, 0, 1) ne $od) {
+            $b->[2] = 0;
+        } elsif (substr($bs, 0, 2) eq "${od}\$" && index($bs, '|') < 0
+                 && $bs =~ $self->{_re_var_simple}) {
+            $b->[2] = 1;
+            $b->[3] = $1;
+        } elsif (substr($bs, 0, $self->{_tag_if_len}) eq $self->{_tag_if}
+                 && substr($bs, -$self->{_tag_if_close_len}) eq $self->{_tag_if_close}) {
+            $b->[2] = 2;
+        } else {
+            $b->[2] = 99;
+        }
+    }
 
     my ($src) = $self->_peval($conv_src);
 
@@ -650,7 +934,15 @@ sub _foreach_block {
         $src = [$src];
     }
 
-    my %save = %{$self->{tpl_vars}};
+    my $pfx      = $self->{var_prefix};
+
+    # Precompute __S keys for the loop variables
+    my $okey_ks   = "${pfx}_$okey";
+    my $oval_ks   = defined $oval ? "${pfx}_$oval" : undef;
+    my $first_ks  = "${pfx}__FOREACH_FIRST";
+    my $last_ks   = "${pfx}__FOREACH_LAST";
+    my $index_ks  = "${pfx}__FOREACH_INDEX";
+
     my $ret  = '';
     my $idx  = 0;
 
@@ -658,25 +950,75 @@ sub _foreach_block {
     my $need_last  = index($payload, '__FOREACH_LAST')  >= 0;
     my $need_index = index($payload, '__FOREACH_INDEX') >= 0;
 
+    # Save only the keys we'll modify — O(k) where k <= 5, vs O(n) for
+    # copying the entire tpl_vars/__S hashes. Big win for nested foreach.
+    my @tpl_keys = ($okey);
+    my @ks_keys  = ($okey_ks);
+    if (defined $oval) {
+        push @tpl_keys, $oval;
+        push @ks_keys,  $oval_ks;
+    }
+    push @tpl_keys, '__FOREACH_FIRST' if $need_first;
+    push @ks_keys,  $first_ks         if $need_first;
+    push @tpl_keys, '__FOREACH_LAST'  if $need_last;
+    push @ks_keys,  $last_ks          if $need_last;
+    push @tpl_keys, '__FOREACH_INDEX' if $need_index;
+    push @ks_keys,  $index_ks         if $need_index;
+
+    my @tpl_exists = map { exists $self->{tpl_vars}{$_} } @tpl_keys;
+    my @tpl_vals   = map { $self->{tpl_vars}{$_} } @tpl_keys;
+    my @ks_exists  = map { exists $self->{__S}{$_} } @ks_keys;
+    my @ks_vals    = map { $self->{__S}{$_} } @ks_keys;
+
     if (ref $src eq 'ARRAY') {
         my $last = $#$src;
         for my $i (0 .. $last) {
             if ($need_first) {
                 $self->{tpl_vars}{__FOREACH_FIRST} = ($idx == 0) ? 1 : 0;
+                $self->{__S}{$first_ks} = ($idx == 0) ? 1 : 0;
             }
             if ($need_last) {
                 $self->{tpl_vars}{__FOREACH_LAST} = ($idx == $last) ? 1 : 0;
+                $self->{__S}{$last_ks} = ($idx == $last) ? 1 : 0;
             }
             if ($need_index) {
                 $self->{tpl_vars}{__FOREACH_INDEX} = $idx;
+                $self->{__S}{$index_ks} = $idx;
             }
             if (defined $oval) {
                 $self->{tpl_vars}{$okey} = $i;
                 $self->{tpl_vars}{$oval} = $src->[$i];
+                $self->{__S}{$okey_ks} = $i;
+                $self->{__S}{$oval_ks} = $src->[$i];
             } else {
                 $self->{tpl_vars}{$okey} = $src->[$i];
+                $self->{__S}{$okey_ks} = $src->[$i];
             }
-            $ret .= $self->_process_blocks(\@blocks);
+            # Inline block processing with pre-classified types — no substr/regex per iteration
+            for my $b (@blocks) {
+                my $type = $b->[2];
+                if ($type == 0) {
+                    $ret .= $b->[0];
+                } elsif ($type == 1) {
+                    my $var = $b->[3];
+                    my $val;
+                    if (index($var, '.') < 0) {
+                        $val = $self->{tpl_vars}{$var};
+                    } else {
+                        $val = $self->array_dive($var, $self->{tpl_vars});
+                    }
+                    if (ref $val eq 'ARRAY')  { $ret .= 'ARRAY' }
+                    elsif (ref $val eq 'HASH') { $ret .= 'HASH' }
+                    elsif (defined $val)       { $ret .= $self->_esc($val) }
+                } elsif ($type == 2) {
+                    $self->{char_pos} = $b->[1];
+                    $ret .= $self->_if_block($b->[0]);
+                } elsif ($type == -1) {
+                    next;
+                } else {
+                    $ret .= $self->_process_block($b->[0], $b->[1]);
+                }
+            }
             $idx++;
         }
     } elsif (ref $src eq 'HASH') {
@@ -686,25 +1028,68 @@ sub _foreach_block {
             my $k = $keys[$i];
             if ($need_first) {
                 $self->{tpl_vars}{__FOREACH_FIRST} = ($idx == 0) ? 1 : 0;
+                $self->{__S}{$first_ks} = ($idx == 0) ? 1 : 0;
             }
             if ($need_last) {
                 $self->{tpl_vars}{__FOREACH_LAST} = ($idx == $last) ? 1 : 0;
+                $self->{__S}{$last_ks} = ($idx == $last) ? 1 : 0;
             }
             if ($need_index) {
                 $self->{tpl_vars}{__FOREACH_INDEX} = $idx;
+                $self->{__S}{$index_ks} = $idx;
             }
             if (defined $oval) {
                 $self->{tpl_vars}{$okey} = $k;
                 $self->{tpl_vars}{$oval} = $src->{$k};
+                $self->{__S}{$okey_ks} = $k;
+                $self->{__S}{$oval_ks} = $src->{$k};
             } else {
                 $self->{tpl_vars}{$okey} = $src->{$k};
+                $self->{__S}{$okey_ks} = $src->{$k};
             }
-            $ret .= $self->_process_blocks(\@blocks);
+            # Inline block processing with pre-classified types — no substr/regex per iteration
+            for my $b (@blocks) {
+                my $type = $b->[2];
+                if ($type == 0) {
+                    $ret .= $b->[0];
+                } elsif ($type == 1) {
+                    my $var = $b->[3];
+                    my $val;
+                    if (index($var, '.') < 0) {
+                        $val = $self->{tpl_vars}{$var};
+                    } else {
+                        $val = $self->array_dive($var, $self->{tpl_vars});
+                    }
+                    if (ref $val eq 'ARRAY')  { $ret .= 'ARRAY' }
+                    elsif (ref $val eq 'HASH') { $ret .= 'HASH' }
+                    elsif (defined $val)       { $ret .= $self->_esc($val) }
+                } elsif ($type == 2) {
+                    $self->{char_pos} = $b->[1];
+                    $ret .= $self->_if_block($b->[0]);
+                } elsif ($type == -1) {
+                    next;
+                } else {
+                    $ret .= $self->_process_block($b->[0], $b->[1]);
+                }
+            }
             $idx++;
         }
     }
 
-    $self->{tpl_vars} = \%save;
+    # Restore only the keys we modified
+    for my $i (0 .. $#tpl_keys) {
+        if ($tpl_exists[$i]) {
+            $self->{tpl_vars}{$tpl_keys[$i]} = $tpl_vals[$i];
+        } else {
+            delete $self->{tpl_vars}{$tpl_keys[$i]};
+        }
+        if ($ks_exists[$i]) {
+            $self->{__S}{$ks_keys[$i]} = $ks_vals[$i];
+        } else {
+            delete $self->{__S}{$ks_keys[$i]};
+        }
+    }
+
     return $ret;
 }
 
@@ -789,12 +1174,23 @@ sub _convert_vars {
     my $str  = shift // '';
     if (index($str, '$') < 0) { return $str }
 
+    # Check conversion cache — avoids re-running regex substitutions on
+    # the same expression (e.g. an {if} condition inside a {foreach} loop)
+    if (exists $self->{_convert_cache}{$str}) {
+        return $self->{_convert_cache}{$str};
+    }
+
+    my $orig = $str;
+
     # Step 1: $var.key -> $__S->{sluz_pfx_var}->{key}
     $str =~ s/(\$\w[\w\.]*)/ $self->_dot_to_bracket_cb($1) /ge;
 
     # Step 2: $__S->{...}["key"] -> $__S->{...}->{key} (PHP bracket syntax)
-    $str =~ s/(\$__S(?:->\{[^}]+\})+)\[(["'])([^\]]+?)\2\]/$1 . '->{' . $3 . '}'/ge;
+    if (index($str, '[') >= 0) {
+        $str =~ s/(\$__S(?:->\{[^}]+\})+)\[(["'])([^\]]+?)\2\]/$1 . '->{' . $3 . '}'/ge;
+    }
 
+    $self->{_convert_cache}{$orig} = $str;
     return $str;
 }
 
@@ -857,23 +1253,32 @@ sub _peval {
     my $self = shift;
     my $str  = shift // '';
 
-    $str =~ s/===/==/g;
+    if (index($str, '===') >= 0) {
+        $str =~ s/===/==/g;
+    }
 
     my $opt = $self->_micro_optimize($str);
     if (defined $opt) { return ($opt, 0) }
 
-    my $__S = {};
-    while (my ($k, $v) = each %{$self->{tpl_vars}}) {
-        $__S->{"$self->{var_prefix}_$k"} = $v;
+    # Use the persistent $__S hash (maintained by assign/foreach) instead
+    # of rebuilding it from tpl_vars on every call
+    my $__S = $self->{__S};
+
+    # Check verified sub cache — subs that have succeeded at least once.
+    # Skip eval/local $SIG overhead (the biggest per-call cost in loops).
+    # no warnings in the compiled sub suppresses uninitialized-value warnings.
+    my $vsub = $self->{_verified_sub_cache}{$str};
+    if ($vsub) {
+        return ($vsub->($__S), 0);
     }
 
     # Check compiled sub cache — avoids re-parsing the same expression
     my $sub = $self->{_sub_cache}{$str};
     if (!defined $sub) {
         # Compile in main:: first (where user functions live), then Template::Sluz
-        $sub = eval "package main; sub { my \$__S = \$_[0]; return ($str); }";
+        $sub = eval "package main; no warnings; sub { my \$__S = \$_[0]; return ($str); }";
         if ($@) {
-            $sub = eval "sub { my \$__S = \$_[0]; return ($str); }";
+            $sub = eval "no warnings; sub { my \$__S = \$_[0]; return ($str); }";
         }
         # Cache the result (even undef) so we don't recompile failures
         $self->{_sub_cache}{$str} = $sub;
@@ -883,16 +1288,21 @@ sub _peval {
     if ($sub) {
         local $SIG{__WARN__} = sub {};
         $ret = eval { $sub->($__S) };
-        unless ($@) { return ($ret, 0) }
+        unless ($@) {
+            # Promote to verified cache — skip eval/SIG on future calls
+            $self->{_verified_sub_cache}{$str} = $sub;
+            delete $self->{_sub_cache}{$str};
+            return ($ret, 0);
+        }
         # Cached sub failed (e.g. function not in main::) — evict and fall through
         delete $self->{_sub_cache}{$str};
     }
 
     {
         local $SIG{__WARN__} = sub {};
-        $ret = eval "return ($str);";
+        $ret = eval "no warnings; return ($str);";
         if ($@) {
-            $ret = eval "package main; return ($str);";
+            $ret = eval "package main; no warnings; return ($str);";
         }
     }
 
@@ -968,15 +1378,19 @@ sub _if_rules_from_tokens {
     my $nested = 0;
     my @tmp;
 
+    my $tif_tag = $self->{_tag_if};
+    my $tifc_tag = $self->{_tag_if_close};
+    my $tif_prefix = $self->{open_delim} . 'if';
+
     for my $i (0 .. $num - 1) {
         my $item = $toks->[$i];
-        if ($item =~ /^\{if/) { $nested++ }
-        if ($item eq '{/if}') { $nested-- }
+        if (index($item, $tif_prefix) == 0) { $nested++ }
+        if ($item eq $tifc_tag) { $nested-- }
 
         my $yes = 0;
         if ($nested == 1) {
             $yes = $self->is_if_token($item) || 0;
-            $yes = 0 if $item eq '{/if}';
+            $yes = 0 if $item eq $tifc_tag;
         }
         $tmp[$i] = $yes;
     }
@@ -1005,7 +1419,7 @@ sub _if_rules_from_tokens {
     }
 
     if (@conds != @payloads) {
-        $self->_error_out("Error parsing {if} conditions in '$str'", 95320);
+        $self->_error_out("Error parsing if conditions in '$str'", 95320);
     }
 
     my @ret;
@@ -1055,6 +1469,15 @@ Output:
 
 Create a new Template::Sluz instance.
 
+    my $sluz = Template::Sluz->new();
+
+Options (all are optional):
+
+    my $sluz = Template::Sluz->new(
+        auto_escape => 1,   # auto HTML-escape all variable output
+        debug       => 1,   # enable debug mode (currently unused)
+    );
+
 =item B<assign>
 
 Assign template variables.
@@ -1077,6 +1500,20 @@ Process a template string directly without a file.
 
     $s->parse_string('Hello {$name}');
 
+=item B<set_delimiters>
+
+Change the template delimiters from the default C<{> and C<}> to a custom
+open and close character.  Both arguments are required and must be exactly
+one character each.  The two characters must be different.
+
+    $s->set_delimiters('<', '>');
+    print $s->parse_string('Hello <$name>');
+
+This is useful when template content contains curly braces (e.g., inline
+CSS, JavaScript, or JSON) that would otherwise conflict with the default
+template syntax.  All subsequent calls to C<fetch>, C<parse_string>, etc.
+will use the new delimiters.
+
 =back
 
 =head1 TEMPLATE SYNTAX
@@ -1092,6 +1529,7 @@ Process a template string directly without a file.
     {$name|uc}
     {$name|substr:0,3}
     {$name|lc|ucfirst}
+    {$name|escape}
 
 =head2 Default values
 
@@ -1126,6 +1564,30 @@ Process a template string directly without a file.
 
     {* This is a comment *}
 
+=head2 Alternate Delimiters
+
+By default the template engine uses C<{> and C<}> as delimiters.  You can
+change them to any single open and close character using C<set_delimiters>:
+
+    $s->set_delimiters('<', '>');
+
+    print $s->parse_string('Hello <$name>');
+
+All template syntax works the same way with alternate delimiters:
+
+    <if $age > 18>
+        Adult
+    <else>
+        Not adult
+    </if>
+
+    {foreach $items as $item}
+        <$item>
+    {/foreach}
+
+This is useful when your template content contains curly braces that would
+conflict with the default delimiters.
+
 =head1 FUNCTIONS AS MODIFIERS
 
 Any Perl built-in or user-defined function can be used as a template
@@ -1139,6 +1601,62 @@ When a function is called as a modifier the template variable is passed first
 and then it is followed by the params.
 
 Example: C<{$text|substr:0,10}> would map to the call C<substr($text, 0, 10)>
+
+=head1 SECURITY
+
+Template variables hold untrusted data (form input, database rows, URL
+parameters) by default.  The C<{$var}> construct emits the value verbatim,
+so a template that renders user data without escaping is vulnerable to
+cross-site scripting (XSS).
+
+=head2 Escape modifier
+
+Use the C<|escape> modifier on any variable that may contain
+user-supplied data:
+
+    {$comment|escape}
+
+The C<escape> modifier encodes C<&>, C<E<lt>>, C<E<gt>>, C<">, and C<'>
+to their HTML entity equivalents.  It can be chained with other modifiers:
+
+    {$comment|trim|escape}
+    {$name|uc|escape}
+
+=head2 Auto-escape mode
+
+Enable automatic HTML escaping for all variable output by setting the
+C<auto_escape> option on construction:
+
+    my $sluz = Template::Sluz->new(auto_escape => 1);
+
+When enabled, every C<{$var}> expression is automatically HTML-escaped.
+Use C<|noescape> to emit raw HTML for a specific variable:
+
+    {$trusted_html|noescape}
+
+Explicit C<|escape> takes priority and prevents double-escaping.
+Auto-escape is off by default for backward compatibility.
+
+=head2 Built-in escape functions
+
+=over 4
+
+=item B<escape>
+
+HTML-escape a string for safe output in an HTML context.  Encodes:
+
+    &  => &amp;
+    <  => &lt;
+    >  => &gt;
+    "  => &quot;
+    '  => &#x27;
+
+=item B<noescape>
+
+Identity passthrough. Bypasses auto-escaping when C<auto_escape> is
+enabled. Does nothing otherwise.
+
+=back
 
 =head1 AUTHOR
 

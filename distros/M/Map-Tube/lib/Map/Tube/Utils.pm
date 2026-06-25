@@ -1,7 +1,11 @@
 package Map::Tube::Utils;
 
-$Map::Tube::Utils::VERSION   = '4.10';
-$Map::Tube::Utils::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v5.0.1');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,14 +13,12 @@ Map::Tube::Utils - Helper package for Map::Tube.
 
 =head1 VERSION
 
-Version 4.10
+Version v5.0.1
 
 =cut
 
 use utf8;
 use v5.14;
-use strict;
-use warnings;
 
 use Try::Tiny;
 use JSON::MaybeXS;
@@ -26,7 +28,7 @@ use Unicode::Normalize 'NFC';
 
 use parent 'Exporter';
 our $COLOR_NAMES = _color_names();
-our @EXPORT_OK	 = qw/trim filter to_perl is_same common_lines get_method_map is_valid_color/;
+our @EXPORT_OK   = qw/trim filter to_perl is_same common_lines get_method_map is_valid_color/;
 
 =head1 DESCRIPTION
 

@@ -28,4 +28,5 @@ on test => sub {
   requires 'Cwd' => 0;
   requires 'Test::More' => '0.88';
   requires 'Test::FailWarnings' => 0;
+  suggests 'Test::File' => '1.993';
 };

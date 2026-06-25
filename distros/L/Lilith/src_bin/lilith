@@ -10,8 +10,6 @@ lilith [B<-c> <config>] B<-a> run
 
 lilith [B<-c> <config>] B<-a> class_map
 
-lilith [B<-c> <config>] B<-a> create_tables
-
 lilith [B<-c> <config>] B<-a> dump_self
 
 lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--id> <row_id> [B<--raw>]
@@ -28,7 +26,7 @@ lilith [B<-c> <config>] B<-a> search [B<--output> <return>] [B<-t> <table>]
 [B<-m> <minutes>] [B<--order> <clm>] [B<--limit> <int>] [B<--offset> <int>]
 [B<--orderdir> <dir>] [B<--si> <src_ip>] [B<--di> <<dst_ip>] [B<--ip> <ip>]
 [B<--sp> <<src_port>] [B<--dp> <<dst_port>] [B<--port> <<port>] [B<--host> <host>]
-[B<--ih> <host>] [B<-i> <instance>] [B<-c> <class>] [B<-s> <sig>] [B<--if> <if>]
+[B<--ih> <host>] [B<-i> <instance>] [B<-c> <class>] [B<-s> <sig>] [B<--if> <if>]subaction
 [B<--ap> <proto>] [B<--gid> <gid>] [B<--sid> <sid>] [B<--rev> <rev>]
 [B<--subip> <subip>] [B<--subhost> <subhost>] [B<--slug> <slug>] [B<--pkg> <pkg>]
 [B<--malscore> <malscore>] [B<--size> <size>] [B<--target> <target>]
@@ -68,9 +66,6 @@ Start processing the EVE logs and daemonize.
 
 Print a table of class mapping from long name to the short name used for display in the search results.
 
-=head2 create_tables
-
-Create the tables in the DB.
 
 =head2 dump_self
 
@@ -635,14 +630,14 @@ GetOptions(
 	'pcap=s'      => \$pcap,
 	'virani=s'    => \$virani,
 	'buffer=s'    => \$buffer,
-	'subip=s',    => \$subip,
-	'subhost=s',  => \$subhost,
-	'slug=s'      => \$slug,
-	'pkg=s'       => \$pkg,
-	'malscore=s'  => \@malscore,
-	'size=s'      => \@size,
-	'target=s'    => \$target,
-	'task=s'      => \@task,
+	'subip=s',         => \$subip,
+	'subhost=s',       => \$subhost,
+	'slug=s'           => \$slug,
+	'pkg=s'            => \$pkg,
+	'malscore=s'       => \@malscore,
+	'size=s'           => \@size,
+	'target=s'         => \$target,
+	'task=s'           => \@task,
 );
 
 # print version or help if requested
@@ -741,12 +736,6 @@ my $lilith = Lilith->new(
 	sagan_class_ignore    => $toml->{sagan_class_ignore},
 	sagan_sid_ignore      => $toml->{sagan_sid_ignore},
 );
-
-# create the tables if requested
-if ( $action eq 'create_tables' ) {
-	$lilith->create_tables();
-	exit;
-}
 
 # dump self if asked
 if ( $action eq 'dump_self' ) {

@@ -10,7 +10,7 @@ package main;
 
 use v5.14;
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 use Test::Map::Tube tests => 1;
 
 my $routes =

@@ -1,5 +1,13 @@
 Revision history for Template::Sluz
 
+0.9.4    2026-06-24
+    - New escape modifier for HTML-encoding unsafe characters
+    - New auto-escape mode (auto_escape => 1) with |noescape bypass
+    - Alternate delimiter support via set_delimiters('<', '>')
+    - Performance: ~60%+ speedup via caching and inlining
+    - Test suite reorganized into per-feature files
+    - Documentation for set_delimiters added
+
 0.9.1    2025-01-01
     - Initial release
     - Port of PHP sluz templating engine (Smarty-like syntax)

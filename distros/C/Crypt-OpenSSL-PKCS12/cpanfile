@@ -21,6 +21,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Convert::ASN1" => "0";
   requires "Test::CPAN::Meta::JSON" => "0.16";
   requires "Test::Kwalitee" => "1.21";
   requires "Test::Pod" => "1.41";

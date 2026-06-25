@@ -22,6 +22,7 @@ certs/thawte.pem
 certs/turk.pem
 certs/vsign1.pem
 dist.ini
+docs/TODO.md
 maint/Makefile_header.PL
 ppport.h
 scripts/test.sh

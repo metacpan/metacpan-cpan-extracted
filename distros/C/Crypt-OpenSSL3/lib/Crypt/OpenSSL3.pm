@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3;
-$Crypt::OpenSSL3::VERSION = '0.008';
+$Crypt::OpenSSL3::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Crypt::OpenSSL3 - A modern OpenSSL wrapper
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 

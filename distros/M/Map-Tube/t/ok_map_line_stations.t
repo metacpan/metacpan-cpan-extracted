@@ -2,7 +2,7 @@
 
 use v5.14;
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 use Test::More;
 
 my $min_ver = '0.87';

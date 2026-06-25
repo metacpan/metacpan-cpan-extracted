@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::Timestamp::Accuracy;
-$Crypt::OpenSSL3::Timestamp::Accuracy::VERSION = '0.008';
+$Crypt::OpenSSL3::Timestamp::Accuracy::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::Timestamp::Accuracy - A Timestamp Protocol accuracy
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 METHODS
 

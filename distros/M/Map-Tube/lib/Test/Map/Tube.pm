@@ -1,7 +1,11 @@
 package Test::Map::Tube;
 
-$Test::Map::Tube::VERSION    = '4.10';
-$Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v5.0.1');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +13,7 @@ Test::Map::Tube - Module for testing Map::Tube data and features.
 
 =head1 VERSION
 
-Version 4.10
+Version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -96,7 +100,6 @@ run almost all the individual tests in one go. Details are provided below.
 
 # ###### All further documentation at the end of this file ######
 
-use strict; use warnings;
 use 5.012;
 use Test::More;
 use Data::Compare;

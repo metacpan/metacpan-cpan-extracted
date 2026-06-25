@@ -18,5 +18,5 @@ my @routes = <DATA>;
 ok_map_routes( $map, \@routes );
 
 __DATA__
-Route 1|Börsenplatz|Bopser|Börsenplatz, Hauptbahnhof, Schlossplatz, Charlottenplatz, Olgaeck, Dobelstr., Bopser
+Route 1|Börsenplatz|Bopser|Börsenplatz, Hauptbahnhof, Staatsgalerie, Charlottenplatz, Olgaeck, Dobelstr., Bopser
 Route 2|BIHLPLATZ|peregrinastr.|Bihlplatz, Erwin-Schoettle-Platz, Marienplatz, Liststr., Pfaffenweg, Wielandshöhe, Haigst, Nägelestr., Zahnradbahnhof, Degerloch, Degerloch Albstr., Peregrinastr.

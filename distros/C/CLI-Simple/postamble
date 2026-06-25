@@ -1,3 +1,3 @@
 install ::
-	-1001 1001NOECHO) ln -sf $(INSTALLMAN3DIR)/CLI::Simple::Shell.3pm $(INSTALLMAN3DIR)/cli-simple.3pm; 
-	$(NOECHO) echo $(INSTALLMAN3DIR)/cli-simple.3pm >> $(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist
+	-$(NOECHO) ln -sf $(DESTINSTALLMAN3DIR)/CLI::Simple::Shell.3pm $(DESTINSTALLMAN3DIR)/cli-simple.3pm; 
+	$(NOECHO) echo $(DESTINSTALLMAN3DIR)/cli-simple.3pm >> $(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist

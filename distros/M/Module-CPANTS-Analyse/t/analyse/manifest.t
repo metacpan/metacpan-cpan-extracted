@@ -57,7 +57,7 @@ test_distribution {
 MANIFEST
 EOF
 
-  eval { symlink "$dir/MANIFEST", "$dir/MANIFEST.lnk" };
+  eval { symlink "MANIFEST", "$dir/MANIFEST.lnk" };
   if ($@) {
     diag "symlink is not supported";
     return;
@@ -73,7 +73,7 @@ test_distribution {
 MANIFEST
 EOF
 
-  eval { symlink "$dir/MANIFEST", "$dir/MANIFEST.lnk" };
+  eval { symlink "MANIFEST", "$dir/MANIFEST.lnk" };
   if ($@) {
     diag "symlink is not supported";
     return;

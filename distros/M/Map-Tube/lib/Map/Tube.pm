@@ -1,7 +1,11 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '4.10';
-$Map::Tube::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v5.0.1');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +13,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 4.10
+Version v5.0.1
 
 =cut
 
@@ -52,59 +56,67 @@ use Map::Tube::Types qw(Routes Tables Lines NodeMap LineMap Color);
 
 use Moo::Role;
 use Role::Tiny qw();
+use Types::Common::Numeric qw(PositiveOrZeroNum);
 use namespace::autoclean;
 
 =encoding utf8
 
 =head1 DESCRIPTION
 
-The core module defined as Role (Moo) to process  the map data.  It provides the
-interface to find the shortest route in terms of stoppage between two nodes.Also
+The core module defined as a Role (Moo) to process  the map data.  It provides the
+interface to find the shortest route in terms of stoppage between two nodes. Also
 you can get all possible routes between two given nodes.
+
+The routing algorithm is line-change-aware: when two candidate routes have the
+same number of stops, the one requiring fewer line changes is preferred. Each
+line change incurs a small fractional penalty (0.5) on top of the normal per-hop
+cost of 1, so hop count always dominates but unnecessary changes are avoided.
 
 If you are keen to know the internals of L<Map::Tube> then please follow the note
 documented in L<Map::Tube::Cookbook>.
 
 =head1 MAP LEADER BOARD
 
-    +----------------------+----------+------------------------------------------+
-    | Author               | PAUSE ID | Map Count (City)                         |
-    +----------------------+----------+------------------------------------------+
-    | Michal Josef Spacek  | SKIM     | 22 (Bucharest, Budapest, Dnipropetrovsk, |
-    |                      |          | Kazan, Kharkiv, Kiev, KualaLumpur,       |
-    |                      |          | Malaga, Minsk, Moscow, Nanjing,          |
-    |                      |          | NizhnyNovgorod, Novosibirsk, Prague,     |
-    |                      |          | SaintPetersburg, Samara, Singapore,      |
-    |                      |          | Sofia, Tbilisi, Vienna, Warsaw,          |
-    |                      |          | Yekaterinburg                            |
-    |                      |          |                                          |
-    | Gisbert W Selke      | GWS      | 16 (Beijing, Brussels, Chicago, Glasgow, |
-    |                      |          | Hamburg, KoelnBonn, Lyon, Muenchen,      |
-    |                      |          | Napoli, Oslo, Paris, Rhein/Ruhr,         |
-    |                      |          | San Francisco, Stockholm, Stuttgart,     |
-    |                      |          | Toulouse)                                |
-    |                      |          |                                          |
-    | Mohammad Sajid Anwar | MANWAR   | 8 (Barcelona, Delhi, Kolkatta, Leipzig,  |
-    |                      |          | London, Madrid, NYC, Tokyo)              |
-    |                      |          |                                          |
-    | Renee Baecker        | RENEEB   | 1 (Frankfurt)                            |
-    |                      |          |                                          |
-    | Stefan Limbacher     | STELIM   | 1 (Nuremberg)                            |
-    |                      |          |                                          |
-    | Slaven Rezic         | SREZIC   | 1 (Berlin)                               |
-    |                      |          |                                          |
-    | Errietta Kostala     | ERRIETTA | 1 (Athens)                               |
-    |                      |          |                                          |
-    | Marco Fontani        | MFONTANI | 1 (Milan)                                |
-    |                      |          |                                          |
-    | Soren Lund           | SLU      | 1 (Copenhagen)                           |
-    |                      |          |                                          |
-    | FUNG Cheok Yin       | CYFUNG   | 1 (Hong Kong)                            |
-    |                      |          |                                          |
-    | Vitali Peil          | VPEIL    | 1 (Bielefeld)                            |
-    |                      |          |                                          |
-    | Giuseppe Di Terlizzi | GDT      | 1 (Rome)                                 |
-    +----------------------+----------+------------------------------------------+
+    +----------------------+-----------+------------------------------------------+
+    | Author               | PAUSE ID  | Map Count (City)                         |
+    +----------------------+-----------+------------------------------------------+
+    | Michal Josef Spacek  | SKIM      | 22 (Bucharest, Budapest, Dnipropetrovsk, |
+    |                      |           | Kazan, Kharkiv, Kiev, KualaLumpur,       |
+    |                      |           | Malaga, Minsk, Moscow, Nanjing,          |
+    |                      |           | NizhnyNovgorod, Novosibirsk, Prague,     |
+    |                      |           | SaintPetersburg, Samara, Singapore,      |
+    |                      |           | Sofia, Tbilisi, Vienna, Warsaw,          |
+    |                      |           | Yekaterinburg)                           |
+    |                      |           |                                          |
+    | Gisbert W Selke      | GWS       | 16 (Beijing, Brussels, Chicago, Glasgow, |
+    |                      |           | Hamburg, KoelnBonn, Lyon, Muenchen,      |
+    |                      |           | Napoli, Oslo, Paris, RheinRuhr,          |
+    |                      |           | San Francisco, Stockholm, Stuttgart,     |
+    |                      |           | Toulouse)                                |
+    |                      |           |                                          |
+    | Mohammad Sajid Anwar | MANWAR    | 8 (Barcelona, Delhi, Kolkatta, Leipzig,  |
+    |                      |           | London, Madrid, NYC, Tokyo)              |
+    |                      |           |                                          |
+    | FUNG Cheok Yin       | CYFUNG    | 1 (Hong Kong)                            |
+    |                      |           |                                          |
+    | Peter Harrison       | EARLYBEAN | 1 (Sydney)                               |
+    |                      |           |                                          |
+    | Errietta Kostala     | ERRIETTA  | 1 (Athens)                               |
+    |                      |           |                                          |
+    | Giuseppe Di Terlizzi | GDT       | 1 (Rome)                                 |
+    |                      |           |                                          |
+    | Marco Fontani        | MFONTANI  | 1 (Milan)                                |
+    |                      |           |                                          |
+    | Renee Baecker        | RENEEB    | 1 (Frankfurt)                            |
+    |                      |           |                                          |
+    | Soren Lund           | SLU       | 1 (Copenhagen)                           |
+    |                      |           |                                          |
+    | Slaven Rezic         | SREZIC    | 1 (Berlin)                               |
+    |                      |           |                                          |
+    | Stefan Limbacher     | STELIM    | 1 (Nuremberg)                            |
+    |                      |           |                                          |
+    | Vitali Peil          | VPEIL     | 1 (Bielefeld)                            |
+    +----------------------+-----------+------------------------------------------+
 
 =cut
 
@@ -116,6 +128,7 @@ has tables  => (is => 'rw', isa => Tables );
 has routes  => (is => 'rw', isa => Routes );
 has _lines  => (is => 'rw', isa => LineMap);
 has bgcolor => (is => 'rw', isa => Color  );
+has line_change_penalty => (is => 'rw', isa => PositiveOrZeroNum, default => 0.5 );
 
 our $AUTOLOAD;
 our $PLUGINS = {
@@ -170,7 +183,7 @@ You should expect the result like below:
 
     Baker Street (Circle, Hammersmith & City, Bakerloo, Metropolitan, Jubilee), Great Portland Street (Circle, Hammersmith & City, Metropolitan), Euston Square (Circle, Hammersmith & City, Metropolitan)
 
-=head2 Special Usage
+Alternatively,
 
     use strict; use warnings;
     use Map::Tube::London;
@@ -186,8 +199,8 @@ You should now expect the result like below:
 
 =head2 get_shortest_routes($from, $to)
 
-It expects C<$from> and C<$to> station name, required param. It returns an object
-of type L<Map::Tube::Route>. On error it throws exception of type L<Map::Tube::Exception>.
+This requires C<$from> and C<$to> station names parameters. It returns an object
+of type L<Map::Tube::Route>. On error it throws an exception of type L<Map::Tube::Exception>.
 
 =cut
 
@@ -273,16 +286,16 @@ sub get_shortest_route {
 
 =head2 get_all_routes($from, $to) *** EXPERIMENTAL ***
 
-It expects C<$from> and C<$to> station name, required param. It  returns ref to a
-list of objects of type L<Map::Tube::Route>. On error it throws exception of type
+This requires C<$from> and C<$to> station names as parameters. It  returns a ref to a
+list of objects of type L<Map::Tube::Route>. On error it throws an exception of type
 L<Map::Tube::Exception>.
 
-Be carefull when using against a large map. You  may encounter warning similar to
-as shown below when run against London map.
+Be careful when using this against a large map. You  may encounter a warning similar to
+this one when running against London map:
 
-Deep recursion on subroutine "Map::Tube::_get_all_routes"
+    Deep recursion on subroutine "Map::Tube::_get_all_routes"
 
-However for comparatively smaller map, like below,it is happy to give all routes.
+However, for comparatively smaller maps, like below, it is happy to give all routes.
 
       A(1)  ----  B(2)
      /              \
@@ -303,11 +316,11 @@ sub get_all_routes {
 
 =head2 name()
 
-Returns map name.
+Returns the map name.
 
 =head2 get_node_by_id($node_id)
 
-Returns an object of type L<Map::Tube::Node> for given C<$node_id>.
+Returns an object of type L<Map::Tube::Node> for a given C<$node_id>.
 
 =cut
 
@@ -349,7 +362,7 @@ sub get_node_by_id {
 
 =head2 get_node_by_name($node_name)
 
-Returns an object of type L<Map::Tube::Node> for given C<$node_name>.
+Returns an object of type L<Map::Tube::Node> for a given C<$node_name>.
 
 =cut
 
@@ -431,7 +444,8 @@ sub get_line_by_name {
 
 =head2 get_lines()
 
-Returns ref to a list of objects of type L<Map::Tube::Line>.
+Returns a ref to a list of objects of type L<Map::Tube::Line>, containing
+all lines in the map (but excluding "other links").
 
 =cut
 
@@ -450,8 +464,8 @@ sub get_lines {
 
 =head2 get_stations($line_name)
 
-Returns ref to a list of objects of type L<Map::Tube::Node> for the C<$line_name>.
-If C<$line_name> is missing, it would return all stations in the map.
+Returns a ref to a list of objects of type L<Map::Tube::Node> for the line called C<$line_name>.
+If C<$line_name> is missing, it will return all stations in the map.
 
 =cut
 
@@ -494,7 +508,7 @@ sub get_stations {
 
 =head2 get_next_stations($station_name)
 
-Returns ref to a list of next stations from the given C<$station_name> as objects
+Returns a ref to the list of next stations from the given C<$station_name> as objects
 of type L<Map::Tube::Node>.
 
 =cut
@@ -528,7 +542,8 @@ sub get_next_stations {
 
 =head2 get_linked_stations($station_name)
 
-Returns ref to a list of linked stations from the given C<$station_name>.
+Returns a ref to the list of the names of the linked stations from the given
+C<$station_name> as strings.
 
 =cut
 
@@ -546,10 +561,21 @@ sub get_linked_stations {
 
 =head2 bgcolor($color)
 
-Set the background color for the map. It is optional. Please set it before making
-call to method L<Map::Tube::Plugin::Graph/"as_image($line_name)">. If not set, it
-will try to guess and may not be as good as you would expect.The C<$color> can be
-a simply color name or hash code.
+Set the background color for the map.  Returns the new value.  If called
+without a value, returns the unchanged previous value.  Setting this is
+optional.  Please set it before making a call to method
+L<Map::Tube::Plugin::Graph/"as_image($line_name)">.  If not set, it will
+try to guess and may not be as good as you would expect.The C<$color>
+can be a simply a color name or hash code (C<#RRGGBB>).
+
+=head2 line_change_penalty($penalty)
+
+When calculating shortest routes, each change from one line to another incurs
+a penalty which is added to the number of hops on the route. The default penalty
+is 0.5. This method can be used to query the current value or to set it to a new
+value, which must be at least 0. (Values of 1 or higher probably do not make much
+sense, since the number of hops should be the dominating factor.) If you just care
+about the nnumber of hops but not for changes, set it to 0.
 
 =cut
 
@@ -620,9 +646,9 @@ sub get_map_data {
 
 =head2 L<Map::Tube::Plugin::Graph>
 
-The L<Map::Tube::Plugin::Graph> plugin adds the support to generate the entire map
-or map for a particular line as base64 encoded string (png image).
-As of C<Map::Tube> v3.54 or above, you can now set the background color explicitly.
+The L<Map::Tube::Plugin::Graph> plugin adds support to generate the entire map
+or a map for a particular line as a base64 encoded string of a PNG image.
+For C<Map::Tube> v3.54 or above, you can set the background color explicitly.
 
     use strict; use warnings;
     use MIME::Base64;
@@ -653,7 +679,7 @@ Please refer to the L<documentation|Map::Tube::Plugin::Graph> for more details.
 
 =head2 L<Map::Tube::Plugin::Formatter>
 
-The L<Map::Tube::Plugin::Formatter> plugin adds the  support to format the object
+The L<Map::Tube::Plugin::Formatter> plugin adds support to format objects
 supported by the plugin.
 
     use strict; use warnings;
@@ -683,7 +709,7 @@ Please refer to the L<documentation|Map::Tube::Plugin::Formatter> for more info.
 
 =head2 L<Map::Tube::Plugin::FuzzyFind>
 
-Gisbert W. Selke, built the add-on for L<Map::Tube> to find stations and lines by
+Gisbert W. Selke built the add-on for L<Map::Tube> to find stations and lines by
 name, possibly partly or inexactly specified. The module is a Moo role which gets
 plugged into the Map::Tube::* family automatically once it is installed.
 
@@ -760,8 +786,8 @@ represent the sample map:
 
 The package L<Test::Map::Tube> can easily be used to validate raw map data. Anyone
 building a new map using L<Map::Tube> is advised to have a unit test as a part of
-their distribution.Just like in L<Map::Tube::London> package,there is a unit test
-something like below:
+their distribution. Just like in L<Map::Tube::London> package, there is a unit test
+somewhat like below:
 
     use strict; use warnings;
     use Test::More;
@@ -803,49 +829,78 @@ by L<Map::Tube>:
 sub _get_shortest_route {
     my ($self, $from) = @_;
 
-    my $nodes = [];
-    my $index = 0;
-    my $seen  = {};
+    # Each line change adds this fractional penalty on top of the normal hop
+    # cost of 1. Must be < 1 so hop count always dominates, but large enough
+    # to distinguish zero-change routes from one-change routes.
 
     $self->_init_table;
-    $self->_set_length($from, $index);
+    $self->_set_length($from, 0);
     $self->_set_path($from, $from);
 
     my $all_nodes = $self->{nodes};
-    while (defined($from)) {
-        my $length = $self->_get_length($from);
-        my $f_node = $all_nodes->{$from};
-        $self->_set_active_links($f_node);
 
-        if (defined $f_node) {
-            my $links = [ split /\,/, $f_node->{link} ];
-            while (scalar(@$links) > 0) {
-                my ($success, $link) = $self->_get_next_link($from, $seen, $links);
-                # was: $success or ($links = [ grep(!/\b\Q$link\E\b/, @$links) ]) and next;
-                # was: next unless defined($link);  -> if this ever happens, we'll be stuck in an infinite loop
-                if (!$success) {
-                    # If we didn't find any existing node at all, we're done:
-                    last unless defined $link;
-                    # Else: we found some node but it doesn't fit our needs; so remove it from
-                    # the candidates and try the next one:
-                    $links = [ grep(!/\b\Q$link\E\b/, @$links) ];
-                    next;
+    # Seed the start node with all of its own lines as the active lines.
+    if (defined $all_nodes->{$from}) {
+        my @ids = map { $_->{id} } @{$all_nodes->{$from}->{line}};
+        $self->_set_current_lines($from, \@ids);
+    }
+
+    # BFS queue. We still use a plain FIFO queue (not a priority queue) so
+    # that the traversal order, and therefore tie-breaking, matches the
+    # original BFS as closely as possible. The only change is that the cost
+    # stored per node is penalty-weighted (fractional), so a same-hop path
+    # with zero line changes beats one with a change.
+    #
+    # "queued" replaces the old $seen: a node is added to the queue at most
+    # once per cost improvement. Unlike the original $seen, a node can be
+    # re-queued if a cheaper (penalty-aware) path is later discovered.
+    my $queued = {};
+    my @queue  = ($from);
+    $queued->{$from} = 1;
+
+    while (@queue) {
+        my $u      = shift @queue;
+        my $u_cost = $self->_get_length($u);
+        my $u_node = $all_nodes->{$u};
+        next unless defined $u_node;
+
+        $self->_set_active_links($u_node);
+
+        my %active_set = map { $_ => 1 } @{$self->_get_current_lines($u)};
+
+        foreach my $v (split /\,/, $u_node->{link}) {
+            next if ($v eq $u);
+
+            my $v_node = $all_nodes->{$v};
+            next unless defined $v_node;
+
+            my @v_line_ids = map { $_->{id} } @{$v_node->{line}};
+            my @continuing = grep { $active_set{$_} } @v_line_ids;
+
+            my $penalty  = (@continuing == 0) ? $self->line_change_penalty : 0;
+            my $new_cost = $u_cost + 1 + $penalty;
+
+            # Update if unvisited or cheaper.  "Unvisited" is path==undef
+            # (avoids the 0-cost ambiguity of the start node).
+            my $old_cost = $self->_get_length($v);
+            my $visited  = defined $self->{tables}->{$v}->{path};
+
+            if (!$visited || $new_cost < $old_cost) {
+                $self->_set_length($v, $new_cost);
+                $self->_set_path($v, $u);
+                my @next = @continuing ? @continuing : $self->_capture_common_lines($u_node, $v_node);
+                $self->_set_current_lines($v, \@next);
+
+                # Re-queue only if not already waiting in the queue.
+                unless ($queued->{$v}) {
+                    push @queue, $v;
+                    $queued->{$v} = 1;
                 }
-
-                if (($self->_get_length($link) == 0) || ($length > ($index + 1))) {
-                    $self->_set_length($link, $length + 1);
-                    $self->_set_path($link, $from);
-                    push @$nodes, $link;
-                }
-
-                $seen->{$link} = 1;
-                $links = [ grep(!/\b\Q$link\E\b/, @$links) ];
             }
         }
 
-        $index = $length + 1;
-        $from  = shift @$nodes;
-        $nodes = [ grep(!/\b\Q$from\E\b/, @$nodes) ] if defined $from;
+        # Allow re-queuing this node in future if a cheaper path is found.
+        delete $queued->{$u};
     }
 }
 
@@ -1070,8 +1125,9 @@ sub _init_table {
     my ($self) = @_;
 
     foreach my $id (keys %{$self->{tables}}) {
-        $self->{tables}->{$id}->{path}   = undef;
-        $self->{tables}->{$id}->{length} = 0;
+        $self->{tables}->{$id}->{path}          = undef;
+        $self->{tables}->{$id}->{length}        = 0;
+        $self->{tables}->{$id}->{current_lines} = undef;
     }
 
     $self->{_active_links} = undef;
@@ -1268,6 +1324,22 @@ sub _set_length {
 
     return unless (defined $id && defined $value);
     $self->{tables}->{$id}->{length} = $value;
+}
+
+# Track the set of line IDs that were active when we arrived at a node.
+# This lets _get_shortest_route penalise line changes.
+sub _get_current_lines {
+    my ($self, $id) = @_;
+
+    return [] unless (defined $id && defined $self->{tables}->{$id});
+    return $self->{tables}->{$id}->{current_lines} // [];
+}
+
+sub _set_current_lines {
+    my ($self, $id, $lines_ref) = @_;
+
+    return unless (defined $id && defined $lines_ref);
+    $self->{tables}->{$id}->{current_lines} = $lines_ref;
 }
 
 sub _get_table {

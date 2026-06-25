@@ -2,19 +2,19 @@ MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SI32
 PROTOTYPES: DISABLE
 
 SV*
-new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
+new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0)
     CODE:
-        char errbuf[SHM_ERR_BUFLEN]; const char* path = SvOK(path_sv) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_si32_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
+        char errbuf[SHM_ERR_BUFLEN]; const char* path = SvOK(path_sv) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_si32_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, errbuf);
         if (!map) croak("Data::HashMap::Shared::SI32: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
 
 SV*
-new_sharded(char* class, SV* path_prefix_sv, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
+new_sharded(char* class, SV* path_prefix_sv, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0)
     CODE:
         const char* path_prefix = SvOK(path_prefix_sv) ? SvPV_nolen(path_prefix_sv) : NULL;
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_si32_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
+        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_si32_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, errbuf);
         if (!map) croak("Data::HashMap::Shared::SI32: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
@@ -22,11 +22,11 @@ new_sharded(char* class, SV* path_prefix_sv, UV num_shards, UV max_entries, UV l
 
 
 SV*
-new_memfd(char* class, SV* name_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
+new_memfd(char* class, SV* name_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN];
         const char* name = SvOK(name_sv) ? SvPV_nolen(name_sv) : NULL;
-        ShmHandle* map = shm_si32_create_memfd(name, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
+        ShmHandle* map = shm_si32_create_memfd(name, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, errbuf);
         if (!map) croak("Data::HashMap::Shared::SI32: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:

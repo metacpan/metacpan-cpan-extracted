@@ -14,13 +14,7 @@ examples/rsa.pl
 lib/Crypt/OpenSSL3.pm
 lib/Crypt/OpenSSL3.xs
 lib/Crypt/OpenSSL3/ASN1.pm
-lib/Crypt/OpenSSL3/ASN1/Enumerated.pm
-lib/Crypt/OpenSSL3/ASN1/Integer.pm
 lib/Crypt/OpenSSL3/ASN1/Object.pm
-lib/Crypt/OpenSSL3/ASN1/String.pm
-lib/Crypt/OpenSSL3/ASN1/Time.pm
-lib/Crypt/OpenSSL3/ASN1/Time/Generalized.pm
-lib/Crypt/OpenSSL3/ASN1/Time/UTC.pm
 lib/Crypt/OpenSSL3/BIO.pm
 lib/Crypt/OpenSSL3/BIO/Address.pm
 lib/Crypt/OpenSSL3/BIO/PollDescriptor.pm
@@ -52,6 +46,7 @@ lib/Crypt/OpenSSL3/Signature.pm
 lib/Crypt/OpenSSL3/Timestamp/Accuracy.pm
 lib/Crypt/OpenSSL3/Timestamp/Imprint.pm
 lib/Crypt/OpenSSL3/Timestamp/Request.pm
+lib/Crypt/OpenSSL3/Timestamp/Responder.pm
 lib/Crypt/OpenSSL3/Timestamp/Response.pm
 lib/Crypt/OpenSSL3/Timestamp/StatusInfo.pm
 lib/Crypt/OpenSSL3/Timestamp/TokenInfo.pm
@@ -64,11 +59,10 @@ lib/Crypt/OpenSSL3/X509/GeneralName.pm
 lib/Crypt/OpenSSL3/X509/Name.pm
 lib/Crypt/OpenSSL3/X509/Name/Entry.pm
 lib/Crypt/OpenSSL3/X509/Request.pm
-lib/Crypt/OpenSSL3/X509/Stack.pm
 lib/Crypt/OpenSSL3/X509/Store.pm
 lib/Crypt/OpenSSL3/X509/Store/Context.pm
 lib/Crypt/OpenSSL3/X509/Transparency/Evaluator.pm
-lib/Crypt/OpenSSL3/X509/Transparency/LogStore.pm
+lib/Crypt/OpenSSL3/X509/Transparency/Log/Store.pm
 lib/Crypt/OpenSSL3/X509/Transparency/Timestamp.pm
 lib/Crypt/OpenSSL3/X509/VerifyParam.pm
 lib/Crypt/OpenSSL3/X509/VerifyResult.pm

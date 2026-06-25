@@ -1,5 +1,9 @@
 Revision history for Perl extension Map::Tube::Muenchen.
 
+0.1.3 2026-06-11
+  - Removed code signatures (cpansign is deprecated), replaced with Sigstore/cosign.
+  - Prepared for use with Map::Tube v5.0.1.
+
 0.1.2 2025-04-30
   - Require Map::Tube 4.09.
   - Require Perl 5.14 (in accordance with Map::Tube 4.09).
