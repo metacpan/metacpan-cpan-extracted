@@ -10,6 +10,7 @@ use Readonly;
 # Fuzzing loop parameters
 # --------------------------------------------------
 Readonly my $DEFAULT_ITERATIONS   => 100;
+Readonly my $DEFAULT_TIMEOUT_SECS => 5;     # per-call alarm() timeout; 0 disables
 Readonly my $CORPUS_MUTATE_RATIO  => 0.70;  # 70% mutate, 30% explore
 Readonly my $RANDOM_KEEP_RATIO    => 0.20;  # keep 20% random when no coverage
 Readonly my $EDGE_CASE_RATIO      => 0.40;  # 40% chance to use declared edge case
@@ -17,6 +18,7 @@ Readonly my $INT_BOUNDARY_RATIO   => 0.30;  # 30% chance to use boundary int
 Readonly my $STR_BOUNDARY_RATIO   => 0.30;  # 30% chance to use boundary length
 Readonly my $SEED_CORPUS_SIZE     => 5;     # initial random inputs to seed corpus
 Readonly my $DEFAULT_MAX_STR_LEN  => 64;
+Readonly my $MATCHES_REGEX_TIMEOUT_SECS => 1; # ReDoS guard for schema 'matches' patterns
 Readonly my $DEFAULT_MAX_ARRAY    => 4;     # max elements in random array (0..N)
 Readonly my $INT32_MAX            => 2**31 - 1;
 Readonly my $INT32_MIN            => -(2**31);
@@ -36,7 +38,7 @@ Readonly my $TYPE_STRING  => 'string';
 # --------------------------------------------------
 Readonly my @JSON_MODULES => qw(JSON::MaybeXS JSON);
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 NAME
 
@@ -44,7 +46,7 @@ App::Test::Generator::CoverageGuidedFuzzer - AFL-style coverage-guided fuzzing f
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 SYNOPSIS
 
@@ -121,6 +123,12 @@ Random seed for reproducible runs. Optional - defaults to C<time()>.
 An optional pre-built object to use as the invocant when calling the
 target sub as a method.
 
+=item * C<timeout>
+
+Seconds to allow each C<target_sub> call before it is aborted via
+C<alarm()> and recorded as a bug. Optional - defaults to 5. Set to 0
+to disable the timeout (e.g. for target subs that legitimately block).
+
 =back
 
 =head3 Returns
@@ -137,6 +145,7 @@ A blessed hashref. Croaks if C<schema> or C<target_sub> is missing.
         iterations => { type => SCALAR,  optional => 1 },
         seed       => { type => SCALAR,  optional => 1 },
         instance   => { type => OBJECT,  optional => 1 },
+        timeout    => { type => SCALAR,  optional => 1 },
     }
 
 =head4 output
@@ -160,6 +169,7 @@ sub new {
 		instance   => $args{instance},
 		iterations => $args{iterations} // $DEFAULT_ITERATIONS,
 		seed       => $args{seed}       // time(),
+		timeout    => $args{timeout}    // $DEFAULT_TIMEOUT_SECS,
 		corpus     => [],   # [{input => ..., coverage => {...}}]
 		covered    => {},   # "file:line:branch" => 1
 		bugs       => [],   # [{input => ..., error => ...}]
@@ -202,6 +212,14 @@ None beyond C<$self>.
 
 A hashref with keys C<total_iterations>, C<interesting_inputs>,
 C<corpus_size>, C<branches_covered>, C<bugs_found>, and C<bugs>.
+
+=head3 Notes
+
+A C<target_sub> call that dies is only recorded in C<bugs> when the
+input that triggered it is valid per C<schema>. A die triggered by an
+input the schema itself marks invalid (e.g. out of the declared
+C<min>/C<max> range) is expected behaviour, not a bug, and is silently
+discarded.
 
 =head3 API specification
 
@@ -487,8 +505,14 @@ sub _run_one {
 		eval {
 			local $SIG{__WARN__} = sub { push @warnings, @_ };
 			local $SIG{__DIE__};
+			# A hanging target_sub call would otherwise hang the
+			# whole fuzzing run — alarm() bounds it and surfaces
+			# the timeout as a recorded bug instead.
+			local $SIG{ALRM} = sub { die "target_sub timed out after $self->{timeout}s\n" };
+			alarm($self->{timeout}) if $self->{timeout};
 			$result = $self->{target_sub}->(@call_args);
 		};
+		alarm(0) if $self->{timeout};
 		$error = $@ if $@;
 
 		# Treat unexpected warnings matching known bad patterns as soft bugs
@@ -534,14 +558,18 @@ sub _run_one {
 # Notes:      Snapshot comparison is imprecise for
 #             concurrent use but correct for single-
 #             threaded fuzzing. Instance is passed
-#             as invocant when set.
+#             as invocant when set. Devel::Cover state
+#             only grows, so this iteration's "before"
+#             is exactly the previous iteration's
+#             "after" -- cached in $self to avoid two
+#             full Devel::Cover walks per iteration.
 # --------------------------------------------------
 sub _run_with_cover {
 	my ($self, $input, $result_ref, $error_ref) = @_;
 
 	Devel::Cover::start() if Devel::Cover->can('start');
 
-	my %before = $self->_snapshot_cover();
+	my %before = %{ $self->{_last_cover_snapshot} || {} };
 
 	# Include instance as invocant for method calls
 	my @call_args = defined($self->{instance})
@@ -550,11 +578,17 @@ sub _run_with_cover {
 
 	eval {
 		local $SIG{__DIE__};
+		# See _run_one() — bound the call so a hanging target_sub
+		# cannot hang the whole fuzzing run.
+		local $SIG{ALRM} = sub { die "target_sub timed out after $self->{timeout}s\n" };
+		alarm($self->{timeout}) if $self->{timeout};
 		$$result_ref = $self->{target_sub}->(@call_args);
 	};
+	alarm(0) if $self->{timeout};
 	$$error_ref = $@ if $@;
 
 	my %after = $self->_snapshot_cover();
+	$self->{_last_cover_snapshot} = { %after };
 	Devel::Cover::stop() if Devel::Cover->can('stop');
 
 	# Return only branches newly hit in this call
@@ -941,7 +975,21 @@ sub _validate_value {
 		return 0 if defined($spec->{max}) && $len > $spec->{max};
 		if(defined($spec->{matches})) {
 			(my $pat = $spec->{matches}) =~ s{^/(.+)/$}{$1};
-			return 0 unless $value =~ /$pat/;
+
+			# ReDoS guard: a schema-supplied pattern matched against
+			# fuzzer-generated (attacker-shaped) input could exhibit
+			# catastrophic backtracking. Bound the match with alarm()
+			# the same way target_sub calls are bounded elsewhere in
+			# this module, and treat a timeout as a non-match.
+			my $matched = eval {
+				local $SIG{ALRM} = sub { die "matches regex timed out\n" };
+				alarm($MATCHES_REGEX_TIMEOUT_SECS);
+				my $m = $value =~ /$pat/;
+				alarm(0);
+				$m;
+			};
+			alarm(0);
+			return 0 unless $matched;
 		}
 	}
 	elsif($type eq $TYPE_BOOLEAN) {

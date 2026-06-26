@@ -2,7 +2,7 @@ package Zuzu::Module::Eval;
 
 use utf8;
 
-our $VERSION = '0.006000';
+our $VERSION = '0.007000';
 
 use Zuzu::Error;
 use Zuzu::Util::NativeHelpers qw( native_function zuzu_bool );

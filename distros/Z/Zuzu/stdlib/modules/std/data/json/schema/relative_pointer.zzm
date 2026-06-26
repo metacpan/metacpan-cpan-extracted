@@ -7,14 +7,14 @@ std/data/json/schema/relative_pointer - Relative JSON Pointer parser.
 =head1 SYNOPSIS
 
   from std/data/json/schema/relative_pointer import RelativeJSONPointer;
-
+  
   let doc := {
     people: [
       { name: "Ada" },
       { name: "Grace" },
     ],
   };
-
+  
   let pointer := new RelativeJSONPointer( path: "1/name" );
   say( pointer.first( doc, "/people/0/age", "(missing)" ) );
 

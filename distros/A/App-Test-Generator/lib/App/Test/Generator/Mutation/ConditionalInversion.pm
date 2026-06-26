@@ -7,11 +7,11 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 METHODS
 
@@ -107,6 +107,12 @@ Multiple conditionals on the same source line are each mutated
 independently. Mutant IDs include both line and column number to ensure
 uniqueness.
 
+Each mutant's optional C<context> field is always set to
+C<conditional> (every mutant produced by this strategy targets an
+C<if>/C<unless> keyword); its C<line_content> field holds the raw
+source text of the mutated line. Both are consumed by
+L<App::Test::Generator::Mutator>'s fast-mode dedup.
+
 =head3 API specification
 
 =head4 input
@@ -163,12 +169,14 @@ sub mutate {
 
 		my $mutant = eval {
 			App::Test::Generator::Mutant->new(
-				id          => "COND_INV_${line}_${col}",
-				group       => "COND_INV:$line",
-				description => "Invert condition $type to $flipped",
-				line        => $line,
-				type        => 'boolean',
-				original    => $cond->content(),
+				id           => "COND_INV_${line}_${col}",
+				group        => "COND_INV:$line",
+				description  => "Invert condition $type to $flipped",
+				line         => $line,
+				type         => 'boolean',
+				original     => $cond->content(),
+				context      => 'conditional',
+				line_content => $self->_line_content($doc, $line),
 
 				# Closure captures line, col and flipped so it targets
 				# exactly the right statement in the document copy

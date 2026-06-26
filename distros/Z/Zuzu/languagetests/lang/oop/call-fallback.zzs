@@ -1,0 +1,137 @@
+from test/more import *;
+
+class DynamicReceiver {
+	method __call__ ( String name, Array args, PairList opts ) {
+		return {
+			name: name,
+			args: args,
+			opts: opts,
+		};
+	}
+
+	method real () {
+		return "real";
+	}
+}
+
+class ParentWithMethod {
+	method inherited () {
+		return "inherited";
+	}
+}
+
+class ChildWithCall extends ParentWithMethod {
+	method __call__ ( String name, Array args, PairList opts ) {
+		return "called:" _ name;
+	}
+}
+
+trait TraitMethod {
+	method supplied () {
+		return "trait";
+	}
+}
+
+class TraitReceiver with TraitMethod {
+	method __call__ ( String name, Array args, PairList opts ) {
+		return "called:" _ name;
+	}
+}
+
+class InheritedCallBase {
+	method __call__ ( String name, Array args, PairList opts ) {
+		return name _ ":" _ args.length() _ ":" _ opts.length();
+	}
+}
+
+class InheritedCallChild extends InheritedCallBase;
+
+class NoCallReceiver;
+
+class ThrowingCall {
+	method __call__ ( String name, Array args, PairList opts ) {
+		die "dynamic failure";
+	}
+}
+
+class BadCallSignature {
+	method __call__ ( String name ) {
+		return name;
+	}
+}
+
+let dyn := new DynamicReceiver();
+let no_args := dyn.alpha();
+is( no_args{name}, "alpha", "__call__ receives missing method name" );
+is( no_args{args}.length(), 0, "__call__ receives empty positional Array" );
+is( no_args{opts}.length(), 0, "__call__ receives empty named PairList" );
+
+let pos := dyn.beta( 10, 20 );
+is( pos{name}, "beta", "__call__ handles positional missing call" );
+is( pos{args}[0], 10, "first positional argument preserved" );
+is( pos{args}[1], 20, "second positional argument preserved" );
+
+let named := dyn.gamma( mode: "fast", mode: "safe", count: 2 );
+is( named{opts}.length(), 3, "named arguments preserve PairList length" );
+is( named{opts}{mode}, "fast", "PairList first-value get behaviour remains" );
+is( named{opts}{count}, 2, "named argument value preserved" );
+
+let mixed := dyn.delta( "x", "y", flag: true );
+is( mixed{args}.length(), 2, "mixed call preserves positional count" );
+is( mixed{opts}{flag}, true, "mixed call preserves named argument" );
+
+is( dyn.real(), "real", "direct real method beats __call__" );
+
+let inherited_method := new ChildWithCall();
+is(
+	inherited_method.inherited(),
+	"inherited",
+	"inherited method beats __call__",
+);
+is(
+	inherited_method.unknown(),
+	"called:unknown",
+	"missing inherited receiver uses __call__",
+);
+
+let trait_receiver := new TraitReceiver();
+is(
+	trait_receiver.supplied(),
+	"trait",
+	"trait-supplied method beats __call__",
+);
+is(
+	trait_receiver.other(),
+	"called:other",
+	"missing trait receiver uses __call__",
+);
+
+let inherited_call := new InheritedCallChild();
+is(
+	inherited_call.anything( 1, 2, colour: "blue" ),
+	"anything:2:1",
+	"inherited __call__ handles missing method",
+);
+
+ok(
+	exception( function () {
+		new NoCallReceiver().missing();
+	} ) instanceof Exception,
+	"missing method without __call__ keeps existing exception",
+);
+
+ok(
+	exception( function () {
+		new ThrowingCall().missing();
+	} ) instanceof Exception,
+	"exception thrown by __call__ propagates",
+);
+
+ok(
+	exception( function () {
+		new BadCallSignature().missing( 1, 2 );
+	} ) instanceof Exception,
+	"bad __call__ signature throws normal binding exception",
+);
+
+done_testing();

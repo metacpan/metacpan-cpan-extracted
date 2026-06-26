@@ -15,11 +15,11 @@ Readonly my $WEIGHT_RETURNS_PROPERTY => 20;
 Readonly my $WEIGHT_RETURNS_SELF     => 15;
 Readonly my $WEIGHT_RETURNS_CONSTANT => 10;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 DESCRIPTION
 
@@ -81,8 +81,12 @@ constant literal value.
 
 =item * C<$method>
 
-An L<App::Test::Generator::Model::Method> object. Evidence is added
-to this object in place via C<add_evidence>.
+Normally an L<App::Test::Generator::Model::Method> object; evidence is
+added to it in place via C<add_evidence>. A plain hashref with a
+C<source> or C<body> key is also accepted defensively (as SchemaExtractor
+callers may pass one), but in that case no evidence is recorded — only
+a Model::Method object exposing both C<source()> and C<add_evidence()>
+actually accumulates evidence.
 
 =back
 
@@ -129,9 +133,12 @@ sub analyze {
 	# --------------------------------------------------
 	# Detect: return $self->{property}
 	# Negative lookahead ensures this does not also match
-	# plain return $self (handled separately below)
+	# plain return $self (handled separately below).
+	# Matched with /g so a method with several differing
+	# property-returning branches contributes evidence for
+	# each one found, not just the first in the source.
 	# --------------------------------------------------
-	if($source =~ /return\s+\$self->\{(\w+)\}/) {
+	while($source =~ /return\s+\$self->\{(\w+)\}/g) {
 		$add->(
 			category => 'return',
 			signal   => 'returns_property',
@@ -142,10 +149,13 @@ sub analyze {
 
 	# --------------------------------------------------
 	# Detect: return $self
-	# Use negative lookahead to avoid matching
-	# return $self->{...} which is a property return
+	# \b after \$self prevents matching variable names that
+	# merely start with "self" (e.g. $self_backup, $selfish);
+	# the negative lookahead then excludes return $self->{...}
+	# which is a property return handled above. Matched with
+	# /g for the same multi-occurrence reason as above.
 	# --------------------------------------------------
-	if($source =~ /return\s+\$self(?!->)/) {
+	while($source =~ /return\s+\$self\b(?!->)/g) {
 		$add->(
 			category => 'return',
 			signal   => 'returns_self',
@@ -157,8 +167,10 @@ sub analyze {
 	# Detect: return of a constant literal — quoted string,
 	# numeric literal, or undef. All indicate the method
 	# returns a fixed value rather than a computed state.
+	# Matched with /g for the same multi-occurrence reason
+	# as the patterns above.
 	# --------------------------------------------------
-	if($source =~ /return\s+(?:['"\d]|undef\b)/) {
+	while($source =~ /return\s+(?:['"\d]|undef\b)/g) {
 		$add->(
 			category => 'return',
 			signal   => 'returns_constant',

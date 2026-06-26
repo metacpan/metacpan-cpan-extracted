@@ -8,7 +8,7 @@ std/data/kdl/json - JSON-in-KDL structure conversion.
 
   from std/data/kdl import KDL;
   from std/data/kdl/json import kdl_to_json, json_to_kdl;
-
+  
   let kdl_doc := ( new KDL() ).decode( """- foo=1 bar=#true""" );
   let data := kdl_to_json(kdl_doc);
   let roundtrip := json_to_kdl(data);

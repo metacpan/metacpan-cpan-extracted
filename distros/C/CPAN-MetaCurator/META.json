@@ -43,6 +43,7 @@
             "File::Slurper" : "0.014",
             "File::Spec" : "3.9",
             "Getopt::Long" : "2.57",
+            "HTML::Entities" : "3.85",
             "HTML::Escape" : "1.11",
             "HTML::TreeBuilder" : "5.07",
             "Imager" : "1.029",
@@ -58,6 +59,7 @@
             "Syntax::Keyword::Match" : "0.15",
             "Text::Balanced" : "2.07",
             "Text::CSV::Encoded" : "0.25",
+            "Tree::DAG_Node" : "1.35",
             "Types::Standard" : "2.006",
             "boolean" : "0.46",
             "feature" : "1.89",
@@ -92,6 +94,6 @@
          "web" : "https://github.com/ronsavage/CPAN-MetaCurator"
       }
    },
-   "version" : "1.23",
+   "version" : "1.24",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

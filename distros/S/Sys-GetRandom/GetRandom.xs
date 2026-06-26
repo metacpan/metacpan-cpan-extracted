@@ -3,9 +3,15 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <sys/random.h>
-#include <sys/types.h>
 #include <errno.h>
+#include <sys/types.h>
+#ifdef __OpenBSD__
+    #include <unistd.h>
+    #define GRND_NONBLOCK 1u
+    #define GRND_RANDOM 2u
+#else
+    #include <sys/random.h>
+#endif
 
 #define MY_PKG "Sys::GetRandom"
 
@@ -32,6 +38,12 @@ sgr_getrandom(buffer, length, flags = 0, offset = 0)
     PREINIT:
         char *p;
     CODE:
+#ifdef __OpenBSD__
+        if (flags & ~(GRND_NONBLOCK | GRND_RANDOM)) {
+            errno = EINVAL;
+            XSRETURN_UNDEF;
+        }
+#endif
         if (length >= SSIZE_MAX || length >= (STRLEN)-1 - offset) {
             errno = EFAULT;
             XSRETURN_UNDEF;
@@ -48,7 +60,15 @@ sgr_getrandom(buffer, length, flags = 0, offset = 0)
             (void)curlen;
         }
         p = offset + SvGROW(buffer, offset + length + 1u);
+#ifdef __OpenBSD__
+        {
+            int r = getentropy(p, length);
+            assert(r == -1 || r == 0);
+            RETVAL = r == -1 ? r : length;
+        }
+#else
         RETVAL = getrandom(p, length, flags);
+#endif
         if (RETVAL == -1) {
             XSRETURN_UNDEF;
         }

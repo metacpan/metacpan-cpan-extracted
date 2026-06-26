@@ -61,5 +61,5 @@ resources:
   bugtracker: https://github.com/zuzuscript/zuzu-perl/issues
   homepage: https://zuzulang.org/
   repository: https://github.com/zuzuscript/zuzu-perl
-version: '0.006000'
+version: '0.007000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

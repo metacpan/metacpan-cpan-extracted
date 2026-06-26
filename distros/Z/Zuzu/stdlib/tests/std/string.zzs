@@ -54,6 +54,35 @@ ok(
 	"quotemeta prevents metacharacters from matching as regexp syntax",
 );
 is( sprint( "%s = %d", "count", 7 ), "count = 7", "sprint formats strings", );
+is( repeat( 3, "foo" ), "foofoofoo", "repeat repeats String values" );
+is( repeat( 0, "foo" ), "", "repeat zero times returns empty String" );
+is(
+	repeat( 4, "bar", "|" ),
+	"bar|bar|bar|bar",
+	"repeat inserts String separators",
+);
+is( repeat( 2.9, "ha" ), "haha", "repeat floors non-integer counts" );
+like(
+	exception( function() { repeat( -1, "nope" ); } ),
+	/negative/,
+	"repeat rejects negative counts",
+);
+let binary_repeated := repeat( 2, 'baz', ':' );
+is( typeof binary_repeated, "BinaryString", "repeat preserves BinaryString type" );
+is( to_string( binary_repeated ), "baz:baz", "repeat inserts BinaryString separators" );
+let binary_empty := repeat( 0, 'baz' );
+is( typeof binary_empty, "BinaryString", "repeat zero times preserves BinaryString type" );
+is( to_string( binary_empty ), "", "repeat zero times returns empty BinaryString" );
+like(
+	exception( function() { repeat( 2, "foo", '|' ); } ),
+	/cannot mix String and BinaryString/,
+	"repeat rejects mixed String value and BinaryString separator",
+);
+like(
+	exception( function() { repeat( 2, 'foo', "|" ); } ),
+	/cannot mix String and BinaryString/,
+	"repeat rejects mixed BinaryString value and String separator",
+);
 let pieces := split( "alpha,beta,gamma","," );
 is( pieces.length(), 3, "split wrapper" );
 is( pieces.get( 1, "" ), "beta", "split yields expected part" );

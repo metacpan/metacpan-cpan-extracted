@@ -7,15 +7,15 @@ perl - Evaluate Perl code from ZuzuScript.
 =head1 SYNOPSIS
 
   from perl import Perl, PerlResult;
-
+  
   let r := Perl.eval("[ 7, 8, 9 ]");
   assert( r instanceof PerlResult );
-
+  
   let j := r.toJSON();
-
+  
   let r2 := r.eval(" $_->[1] ");
   assert( r2 instanceof PerlResult );
-
+  
   let n;
   n := r2.value() if r2.isSafe();
 

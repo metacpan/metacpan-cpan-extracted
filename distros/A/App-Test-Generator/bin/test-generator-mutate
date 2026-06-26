@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Carp qw(croak);
 use Config;
 use Cwd qw(abs_path);
 use File::Find qw(find);
@@ -478,8 +479,17 @@ if($opt{file}) {
 	push @files, $opt{file};
 } elsif($opt{changed_only}) {
 	# Only mutate files changed since the base commit
+	croak("Invalid base_sha: $opt{base_sha}")
+		if defined($opt{base_sha}) && $opt{base_sha} !~ /^[0-9A-Za-z._\/-]+\z/;
 	my $base = $opt{base_sha} ? "$opt{base_sha}^" : 'HEAD~1';
-	my $diff = `git diff --name-only $base HEAD 2>/dev/null`;
+	my $diff = '';
+	{
+		open(my $git_fh, '-|', 'git', 'diff', '--name-only', $base, 'HEAD')
+			or croak("Could not run git diff: $!");
+		local $/;
+		$diff = <$git_fh> // '';
+		close($git_fh);
+	}
 	my @changed = grep {
 		# Must be a lib .pm file, must exist, and must not match any exclusion
 		my $f = $_;
@@ -505,26 +515,33 @@ if($opt{file}) {
 	);
 }
 
-# Pass absolute target file paths to the LCSAJ runtime debugger
-# via environment variable so it knows which files to instrument
-if(@files) {
-	$ENV{LCSAJ_TARGETS} = join(':', map { abs_path($_) } @files);
-} else {
-	# No files to mutate -- preserve existing LCSAJ hit data
-	delete $ENV{LCSAJ_TARGETS};
-}
-
 # -------------------------
 # Verify baseline tests
 # -------------------------
 
 print "Running baseline tests...\n" if $opt{verbose};
 
+# Run with whatever LCSAJ_TARGETS (if any) is already in the parent
+# environment, not the mutation-scoped value set below -- this baseline
+# pass verifies the unmodified suite, and t/LCSAJ-Runtime.t exercises
+# DB::DB() directly against its own file, which is never one of @files,
+# so scoping LCSAJ_TARGETS to @files here makes that test spuriously fail.
+#
 # Use list form of system() to avoid shell interpolation of $opt{tests},
 # which could be a security risk if the path contains special characters
 if(system('prove', '-Mblib', '-l', $opt{tests}) != 0) {
 	print STDERR "Baseline tests failed.\n";
 	exit 2;
+}
+
+# Pass absolute target file paths to the LCSAJ runtime debugger
+# via environment variable so it knows which files to instrument
+# during the mutation runs below.
+if(@files) {
+	$ENV{LCSAJ_TARGETS} = join(':', map { abs_path($_) } @files);
+} else {
+	# No files to mutate -- preserve existing LCSAJ hit data
+	delete $ENV{LCSAJ_TARGETS};
 }
 
 # -------------------------

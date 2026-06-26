@@ -7,7 +7,7 @@ std/data/ini - INI encoding and decoding for ZuzuScript.
 =head1 SYNOPSIS
 
   from std/data/ini import INI;
-
+  
   let codec := new INI( pretty: true, canonical: true );
   let text := codec.encode({
     app: {

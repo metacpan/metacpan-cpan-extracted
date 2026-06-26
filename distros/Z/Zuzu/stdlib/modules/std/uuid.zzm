@@ -7,7 +7,7 @@ std/uuid - Pure ZuzuScript UUID v1 generator.
 =head1 SYNOPSIS
 
   from std/uuid import create_uuid, create_uuid_binary;
-
+  
   let text := create_uuid();
   let raw := create_uuid_binary();
 

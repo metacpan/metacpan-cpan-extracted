@@ -7,7 +7,7 @@ std/gui/dialogue - Dialogue helpers.
 =head1 SYNOPSIS
 
   from std/gui/dialogue import *;
-
+  
   alert("Saved");
   let ok := confirm("Continue?");
   let name := prompt("Name:", value: "Ada");

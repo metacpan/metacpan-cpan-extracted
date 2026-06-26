@@ -7,14 +7,14 @@ std/net/url - URL parsing, escaping, and templates.
 =head1 SYNOPSIS
 
   from std/net/url import *;
-
+  
   let parsed := parse(
     "https://api.example.com/v1?q=tea%20time"
   );
-
+  
   let encoded := escape("tea time");
   let text := unescape(encoded);
-
+  
   let url := fill_template(
     "https://api.example.com/{version}/items/{id}{?q}",
     { version: "v1", id: 7, q: "tea time" }

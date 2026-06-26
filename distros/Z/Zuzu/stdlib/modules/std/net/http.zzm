@@ -7,18 +7,18 @@ std/net/http - HTTP/web client foundation.
 =head1 SYNOPSIS
 
   from std/net/http import CookieJar, UserAgent;
-
+  
   let jar := new CookieJar();
   let ua  := new UserAgent(
     cookie_jar: jar,
     agent: "my-app/1.0"
   );
-
+  
   let req := ua
     .build_request("GET", "https://example.com/items")
     .query({ page: "1" })
     .auth_bearer("TOKEN");
-
+  
   let res := ua.send(req);
   let data := res.expect_success().json();
 

@@ -71,3 +71,5 @@ App-.*
 typescript
 mutation*
 schemas/*\.yml
+CLAUDE.md
+\.claude

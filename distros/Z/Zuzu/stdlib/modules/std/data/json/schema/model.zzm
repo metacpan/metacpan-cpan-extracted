@@ -10,11 +10,11 @@ std/data/json/schema/model - JSON value projection helpers.
     jschema_is_object,
     jschema_object_get,
     jschema_type_name;
-
+  
   if ( jschema_is_object(value) ) {
     say( jschema_object_get( value, "title", "(untitled)" ) );
   }
-
+  
   say( jschema_type_name(value) );
 
 =head1 IMPLEMENTATION SUPPORT

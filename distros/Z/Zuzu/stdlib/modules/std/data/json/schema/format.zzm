@@ -7,10 +7,10 @@ std/data/json/schema/format - JSON Schema format validators.
 =head1 SYNOPSIS
 
   from std/data/json/schema/format import FormatRegistry;
-
+  
   let formats := new FormatRegistry();
   formats.register( "slug", fn value -> value ~ /^[a-z0-9-]+$/ );
-
+  
   say( formats.check( "slug", "release-2026" ) );
 
 =head1 IMPLEMENTATION SUPPORT

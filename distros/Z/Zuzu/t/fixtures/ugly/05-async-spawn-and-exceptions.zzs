@@ -1,0 +1,28 @@
+from std/task import all,resolved,sleep,yield;from test/more import *;
+
+async function delayed_double(Number n)→Number{await{sleep(0.01);};return n*2;}
+
+async function guarded_sum(Array values){
+let total:=0;for(let value in values){await{yield();};if(value<0){
+		throw new Exception(message:"negative");} total+=value;}
+return total;
+}
+
+async function main(){
+let pair:=await{all([delayed_double(3),resolved(5),]);};
+	let spawned:=spawn{let local:=await{delayed_double(pair[1]);};local+pair[0];};
+let observed:=await{spawned;};
+
+let failed:=false;try{await{guarded_sum([1,-1,2]);};}catch(Exception e){
+		failed:=e{message}eq"negative";}
+
+let async_lambdas:=[
+	async fn n->await{resolved(n+1);},async fn n->await{delayed_double(n);},];
+let lambda_values:=[await{async_lambdas[0](10);},await{async_lambdas[1](10);},];
+
+is(pair,[6,5],"await all returned both values");is(observed,16,"spawned task used awaited result");
+	ok(failed,"try/catch observed async exception");is(await{guarded_sum([1,2,3]);},6,"async for loop summed values");
+is(lambda_values,[11,20],"array of async lambdas ran");
+}
+
+await{main();};done_testing();

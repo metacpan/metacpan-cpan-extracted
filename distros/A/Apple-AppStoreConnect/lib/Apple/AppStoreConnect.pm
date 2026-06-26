@@ -14,11 +14,11 @@ Apple::AppStoreConnect - Apple App Store Connect API client
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -37,6 +37,15 @@ our $VERSION = '0.12';
     $res = $asc->get_apps();                                          # List of apps
     $res = $asc->get_apps(id => $app_id);                             # App details
     $res = $asc->get_apps(id => $app_id, path => 'customerReviews');  # App reviews
+
+    # List App Store versions, optionally with localizations
+    $res = $asc->get_app_store_versions(id => $app_id, platform => 'IOS');
+    $res = $asc->get_app_store_versions(id => $app_id, localizations => 1);
+    $res = $asc->get_app_store_versions(id => $app_id, localizations => 'en-US');
+
+    # Latest beta feedback for alerting
+    $res = $asc->get_beta_feedback_screenshot_submissions(id => $app_id, platform => 'IOS');
+    $res = $asc->get_beta_feedback_crash_submissions(id => $app_id, crash_log => 1);
 
 
 =head1 DESCRIPTION
@@ -178,9 +187,10 @@ specified in the constructor).
 =head2 C<get_apps>
 
     my $res = $asc->get_apps(
-        id     => $app_id?,
-        path   => $path?,
-        params => \%query_params?
+        id       => $app_id?,
+        path     => $path?,
+        platform => $platform?,
+        params   => \%query_params?
     );
 
 Without arguments it is similar to C<get(url=E<gt>"apps">, fetching the list of apps,
@@ -201,8 +211,133 @@ as values (unless the specific resource does not follow that pattern).
 See API documentation for C<path> support (e.g. C<builds>, C<appAvailability>,
 C<appPriceSchedule>, C<customerReviews> etc.).
 
+=item * C<platform> : Optional shortcut for C<filter[platform]>, for example
+C<IOS>, C<MAC_OS>, C<TV_OS>, or C<VISION_OS>.
+
 =item * C<params> : Any other query params that you need to pass
 (see L<API documentation|https://developer.apple.com/documentation/appstoreconnectapi>).
+
+=back
+
+=head2 C<get_app_store_versions>
+
+    my $res = $asc->get_app_store_versions(
+        id                  => $app_id,
+        platform            => $platform?,
+        localizations       => $localizations?,
+        localization_fields => $localization_fields?,
+        params              => \%query_params?
+    );
+
+    my $versions = $asc->get_app_store_versions(
+        id                  => $app_id,
+        platform            => 'IOS',
+        localization_fields => 'locale,whatsNew',
+        params              => {
+            'fields[appStoreVersions]' => 'platform,versionString,appVersionState'
+        }
+    );
+
+Returns an arrayref of App Store versions for the app, automatically fetching
+all pages. Each entry is a hash of the resource attributes, with C<id> and
+C<type> added.
+
+When C<localizations> is requested, one additional API call is made per
+version to fetch its localizations.
+
+=over 4
+
+=item * C<id> : The app ID.
+
+=item * C<platform> : Optional shortcut for C<filter[platform]>, for example
+C<IOS>, C<MAC_OS>, C<TV_OS>, or C<VISION_OS>.
+
+=item * C<localizations> : If true, each version entry will include a
+C<localizations> arrayref. Passing C<1> fetches all localizations. Passing a
+locale string, for example C<en-US>, fetches only that locale.
+
+=item * C<localization_fields> : Optional fields to return for each
+C<appStoreVersionLocalizations> resource, for example C<locale,whatsNew>. If
+specified, C<localizations> defaults to C<1>.
+
+=item * C<params> : Any other query params to pass to the
+C<apps/$app_id/appStoreVersions> request.
+
+=back
+
+=head2 C<get_beta_feedback_screenshot_submissions>
+
+    my $res = $asc->get_beta_feedback_screenshot_submissions(
+        id       => $app_id,
+        platform => $platform?,
+        limit    => $limit?,
+        sort     => $sort?,
+        params   => \%query_params?
+    );
+
+Returns an arrayref of beta feedback screenshot submissions for the app. By
+default, results are sorted newest first using C<-createdDate>, with C<limit>
+set to C<50>. Only up to C<limit> results are returned; pagination is not
+performed.
+
+=over 4
+
+=item * C<id> : The app ID.
+
+=item * C<platform> : Optional shortcut for C<filter[appPlatform]>, for example
+C<IOS>, C<MAC_OS>, C<TV_OS>, or C<VISION_OS>.
+
+=item * C<limit> : Optional maximum number of results to return. Default C<50>.
+
+=item * C<sort> : Optional sort order. Default C<-createdDate>.
+
+=item * C<params> : Any other query params to pass to the
+C<apps/$app_id/betaFeedbackScreenshotSubmissions> request, for example
+C<fields[betaFeedbackScreenshotSubmissions]> or C<include>.
+
+=back
+
+=head2 C<get_beta_feedback_crash_submissions>
+
+    my $res = $asc->get_beta_feedback_crash_submissions(
+        id               => $app_id,
+        platform         => $platform?,
+        limit            => $limit?,
+        sort             => $sort?,
+        crash_log        => $crash_log?,
+        crash_log_fields => $crash_log_fields?,
+        params           => \%query_params?
+    );
+
+Returns an arrayref of beta feedback crash submissions for the app. By default,
+results are sorted newest first using C<-createdDate>, with C<limit> set to
+C<50>. Only up to C<limit> results are returned; pagination is not performed.
+If C<crash_log> is true, each returned crash submission includes a C<crashLog>
+hashref with the linked crash log; one additional API call is made per
+submission to fetch it.
+
+=over 4
+
+=item * C<id> : The app ID.
+
+=item * C<platform> : Optional shortcut for C<filter[appPlatform]>, for example
+C<IOS>, C<MAC_OS>, C<TV_OS>, or C<VISION_OS>.
+
+=item * C<limit> : Optional maximum number of results to return. Default C<50>.
+
+=item * C<sort> : Optional sort order. Default C<-createdDate>.
+
+=item * C<crash_log> : If true, fetch C<betaFeedbackCrashSubmissions/$id/crashLog>
+for each crash submission and attach it as C<crashLog>.
+
+=item * C<crash_log_fields> : Optional fields to return for each C<betaCrashLogs>
+resource, for example C<logText>.
+
+=item * C<params> : Any other query params to pass to the
+C<apps/$app_id/betaFeedbackCrashSubmissions> request, for example
+C<fields[betaFeedbackCrashSubmissions]> or C<include>. Passing
+C<fields[betaCrashLogs]> here is also supported; it is applied to the crash log
+request.
 
 =back
 
@@ -271,12 +406,90 @@ sub get_response {
 sub get_apps {
     my $self = shift;
     my %args = @_;
+    my %params = $args{params} ? %{$args{params}} : ();
+    $params{'filter[platform]'} = $args{platform} if $args{platform};
+    $args{params} = \%params if %params;
+
     $args{url} = $self->{base_url} . 'apps';
     $args{url} .= "/$args{id}" if $args{id};
     $args{url} .= "/$args{path}" if $args{path};
     my $res = $self->get(%args);
 
     return _process_data($res);
+}
+
+sub get_app_store_versions {
+    my $self = shift;
+    my %args = @_;
+
+    croak("id required") unless $args{id};
+
+    my %params = $args{params} ? %{$args{params}} : ();
+    $params{'filter[platform]'} = $args{platform} if $args{platform};
+    $params{limit} ||= 200;
+    my $localizations = $args{localizations};
+    $localizations ||= 1 if $args{localization_fields};
+
+    my $versions = _flatten_resources($self->_get_all_pages(
+        url    => "apps/$args{id}/appStoreVersions",
+        params => \%params,
+    ));
+
+    if ($localizations) {
+        foreach my $version (@$versions) {
+            my %localization_params = (limit => 200);
+            $localization_params{'filter[locale]'} = $localizations
+                unless $localizations eq '1';
+            $localization_params{'fields[appStoreVersionLocalizations]'} = $args{localization_fields}
+                if $args{localization_fields};
+
+            $version->{localizations} = _flatten_resources($self->_get_all_pages(
+                url    => "appStoreVersions/$version->{id}/appStoreVersionLocalizations",
+                params => \%localization_params,
+            ));
+        }
+    }
+
+    return $versions;
+}
+
+sub get_beta_feedback_screenshot_submissions {
+    my $self = shift;
+    return $self->_get_beta_feedback_submissions(
+        resource => 'betaFeedbackScreenshotSubmissions',
+        @_,
+    );
+}
+
+sub get_beta_feedback_crash_submissions {
+    my $self = shift;
+    my %args = @_;
+
+    my %params = $args{params} ? %{$args{params}} : ();
+    my $crash_log_fields = $args{crash_log_fields};
+    $crash_log_fields ||= delete $params{'fields[betaCrashLogs]'};
+    $args{params} = \%params;
+
+    my $crashes = $self->_get_beta_feedback_submissions(
+        resource => 'betaFeedbackCrashSubmissions',
+        %args,
+    );
+
+    if ($args{crash_log}) {
+        foreach my $crash (@$crashes) {
+            my %params;
+            $params{'fields[betaCrashLogs]'} = $crash_log_fields
+                if $crash_log_fields;
+
+            my $res = $self->get(
+                url    => "betaFeedbackCrashSubmissions/$crash->{id}/crashLog",
+                params => \%params,
+            );
+            $crash->{crashLog} = _flatten_resource($res->{data});
+        }
+    }
+
+    return $crashes;
 }
 
 sub jwt {
@@ -347,6 +560,71 @@ sub _build_url {
     return $url;
 }
 
+sub _get_beta_feedback_submissions {
+    my $self = shift;
+    my %args = @_;
+
+    croak("id required") unless $args{id};
+    croak("resource required") unless $args{resource};
+
+    my %params = $args{params} ? %{$args{params}} : ();
+    $params{'filter[appPlatform]'} = $args{platform} if $args{platform};
+    $params{limit} ||= $args{limit} || 50;
+    $params{sort} ||= $args{sort} || '-createdDate';
+
+    my $res = $self->get(
+        url    => "apps/$args{id}/$args{resource}",
+        params => \%params,
+    );
+
+    return _flatten_resources($res->{data});
+}
+
+sub _get_all_pages {
+    my $self = shift;
+    my %args = @_;
+
+    my @data;
+    while ($args{url}) {
+        my $res = $self->get(%args);
+        push @data, @{$res->{data}}
+            if ref($res) && ref($res->{data}) && ref($res->{data}) eq 'ARRAY';
+
+        my $next = ref($res) && ref($res->{links}) eq 'HASH'
+            ? $res->{links}->{next}
+            : undef;
+        last unless $next;
+
+        %args = (url => $next);
+    }
+
+    return \@data;
+}
+
+sub _flatten_resources {
+    my $data = shift;
+
+    return $data unless ref($data) && ref($data) eq 'ARRAY';
+
+    return [
+        map {
+            my $item = $_;
+            my $res = ref($item->{attributes}) eq 'HASH'
+                ? {%{$item->{attributes}}}
+                : {};
+            $res->{id} = $item->{id} if $item->{id};
+            $res->{type} = $item->{type} if $item->{type};
+            $res;
+        } @$data
+    ];
+}
+
+sub _flatten_resource {
+    my $data = shift;
+    my $res = _flatten_resources([$data]);
+    return $res->[0];
+}
+
 sub _process_data {
     my $hash = shift;
     if (ref($hash) && ref($hash->{data}) && ref($hash->{data}) eq 'ARRAY') {
@@ -393,7 +671,7 @@ tax documents, new terms etc).
 
 =head1 AUTHOR
 
-Dimitrios Kechagias, C<< <dkechag at cpan.org> >>
+Dimitrios Kechagias, L<https://metacpan.org/author/DKECHAG>
 
 =head1 BUGS
 

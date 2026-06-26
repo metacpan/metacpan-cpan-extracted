@@ -39,6 +39,9 @@ subtest 'Wrong input' => sub {
     ok(lives {$asc = Apple::AppStoreConnect->new(%opt)}, "Does not die");
 
     like(dies { $asc->get() }, qr/url required/, "Missing url");
+    like(dies { $asc->get_app_store_versions() }, qr/id required/, "Missing app ID");
+    like(dies { $asc->get_beta_feedback_screenshot_submissions() }, qr/id required/, "Missing app ID");
+    like(dies { $asc->get_beta_feedback_crash_submissions() }, qr/id required/, "Missing app ID");
 };
 
 my $mock = Test2::Mock->new(

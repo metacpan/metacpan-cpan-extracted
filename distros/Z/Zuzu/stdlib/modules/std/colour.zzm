@@ -7,7 +7,7 @@ std/colour - Colour parsing helpers.
 =head1 SYNOPSIS
 
   from std/colour import parse_colour;
-
+  
   say( parse_colour("red") );  # #ff0000
   say( parse_colour("#abc") ); # #aabbcc
 

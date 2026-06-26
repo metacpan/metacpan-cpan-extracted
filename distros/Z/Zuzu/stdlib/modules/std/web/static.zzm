@@ -8,7 +8,7 @@ std/web/static - Static file controller for std/web routes.
 
   from std/web import Routes;
   from std/io import Path;
-
+  
   let routes := new Routes();
   routes.get("/img/*path").to(
     controller: "std/web/static#StaticHandler",

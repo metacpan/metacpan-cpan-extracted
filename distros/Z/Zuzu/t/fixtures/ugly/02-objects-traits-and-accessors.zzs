@@ -1,0 +1,42 @@
+from test/more import *;
+
+trait Labelled{
+method label;
+	method label(){return self.get_name() _ "#" _ self.get_id();}
+}
+trait Audited{ method audit(){
+return "audit:" _ self.label();
+}}
+
+class Record with Labelled{
+let String name with get,set,clear,has:="untitled"; let Number id with get,set:=0;
+	let parent with get,set,clear,has but weak;
+method summary; static method make;
+	method summary()→String{return self.label() _ ":" _ (self.has_parent()?"child":"root");}
+	static method make(String name,Number id){return new self(name:name,id:id);}
+}
+
+class Event extends Record with Audited;class AliasEvent extends Record but Audited;
+
+let root:=Record.make("root",1); let event:=new Event(name:"launch",id:2);
+   let alias:=new AliasEvent(name:"mirror",id:3);
+let single:=new Record with Audited(name:"local",id:4);
+
+event.set_parent(root);let weak_seen:=event.get_parent().summary(); root:=null;
+let changed:=new Record();changed.set_name("renamed").set_id(9); changed.clear_name();
+	changed.set_name("restored");
+
+let checks:=[
+function(value){return value does Labelled;},fn value->value instanceof Record,
+	->^^ can "summary",
+];
+let flags:=[];flags.push( ^^(event) ) for checks;
+
+is(event.summary(),"launch#2:root","class method and trait method compose");
+is(alias.audit(),"audit:mirror#3","abbreviated class with but trait works");
+ is(single.audit(),"audit:local#4","per-object trait composition works");is(weak_seen,"root#1:root","weak field was readable while referent lived");
+is(event.get_parent(),null,"weak field cleared after referent was dropped");is(changed.get_name(),"restored","generated accessors set and clear fields");
+ok(flags[0]and flags[1]and flags[2],"array of anonymous functions inspected object");
+ok(Event.make("factory",5)instanceof Event,"static self dispatch constructed subclass");
+like(exception(function(){event.set_id("bad");}),/TypeException/,"typed accessor rejected a bad value",);
+done_testing();

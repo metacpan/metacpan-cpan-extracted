@@ -1,0 +1,3 @@
+Currently build with:
+
+: % PERL5OPT="-MText^CCSV_XS -MFile::ShareDir" dzil build

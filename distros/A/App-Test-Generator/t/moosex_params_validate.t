@@ -3,8 +3,16 @@ use strict;
 use warnings;
 
 # use Test::DescribeMe qw(extended);
+#
+# No Test::Needs gate: this fixture's "use MooseX::Params::Validate" and
+# bareword type names (Str, ArrayRef[Str], Bool) appear only inside a
+# heredoc representing a target module's source. _extract_moosex_params_
+# schema() parses it with PPI and Safe->reval()'s the schema hash literal
+# without "use strict", so the type barewords stringify harmlessly; neither
+# module is ever actually loaded. Gating on them previously caused this
+# entire file -- and its real extraction coverage -- to be silently
+# skipped on any machine without Moose installed.
 use Test::Most;
-use Test::Needs ('MooseX::Params::Validate', 'MooseX::Types::Moose');
 use File::Temp qw(tempdir);
 use File::Spec;
 

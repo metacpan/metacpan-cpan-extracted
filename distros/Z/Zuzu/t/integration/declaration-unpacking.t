@@ -113,8 +113,8 @@ SRC
 
 like dies {
 	eval_src('let { a } := 42;');
-}, qr/Declaration unpacking expects Dict or PairList, got Number/,
-	'non-Dict and non-PairList sources fail clearly';
+}, qr/Declaration unpacking expects Dict, PairList, or Array, got Number/,
+	'non-Dict, non-PairList, and non-Array sources fail clearly';
 
 like dies {
 	eval_src('let { Number n } := { n: "nope" };');

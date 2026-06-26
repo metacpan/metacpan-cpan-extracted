@@ -7,26 +7,26 @@ std/getopt - Parse command line arguments.
 =head1 SYNOPSIS
 
   from std/getopt import Getopt;
-
+  
   function __main__ (argv) {
     let parsed := Getopt.parse(
       argv,
       [ "help|h", "verbose|v", "count|c=i", "name|n=s" ]
     );
-
+  
     if ( not parsed{ok} ) {
       say( parsed{error} );
       return 2;
     }
-
+  
     let opts := parsed{options};
     let rest := parsed{argv};
-
+  
     if ( opts{help} ) {
       say( "usage: tool [--count N] [--name STR] args..." );
       return 0;
     }
-
+  
     say( "remaining args = " + rest.length() );
     return 0;
   }

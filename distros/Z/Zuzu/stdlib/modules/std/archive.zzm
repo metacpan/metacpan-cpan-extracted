@@ -8,17 +8,17 @@ std/archive - Small archive and compression helpers.
 
   from std/archive import Archive;
   from std/io import Path;
-
+  
   let archive := {
     entries: [
       { path: "hello.txt", data: to_binary( "Hello\n" ) },
       { path: "nested/world.txt", data: to_binary( "World\n" ) },
     ],
   };
-
+  
   let bytes := Archive.encode( archive, "tar.gz" );
   let roundtrip := Archive.decode(bytes);
-
+  
   let path := Path.tempdir().child("hello.zip");
   Archive.dump( path, archive );
   let loaded := Archive.load(path);

@@ -16,11 +16,11 @@ Readonly my $MODE_SHARED_FIXTURE => 'shared_fixture';
 Readonly my $FIXTURE_SHARED       => 'shared';
 Readonly my $FIXTURE_NEW_PER_TEST => 'new_per_test';
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 DESCRIPTION
 
@@ -87,8 +87,9 @@ reserved for future fixture customisation based on schema metadata.
 
 =item * C<$isolation>
 
-A hashref mapping method names to isolation mode strings as produced
-by L<App::Test::Generator::Planner::Isolation>.
+A hashref mapping method names to isolation plan hashrefs, each with
+a C<fixture> key, as produced by
+L<App::Test::Generator::Planner::Isolation>.
 
 =back
 
@@ -136,7 +137,7 @@ sub plan {
 	# fresh object constructed per test case.
 	# --------------------------------------------------
 	for my $method (keys %{$isolation}) {
-		my $mode = $isolation->{$method} eq $MODE_SHARED_FIXTURE
+		my $mode = ($isolation->{$method}{fixture} // '') eq $MODE_SHARED_FIXTURE
 			? $FIXTURE_SHARED
 			: $FIXTURE_NEW_PER_TEST;
 

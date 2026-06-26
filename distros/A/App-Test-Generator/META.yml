@@ -17,10 +17,12 @@ build_requires:
   Symbol: '0'
   Test::DescribeMe: '0'
   Test::LectroTest: '0'
+  Test::Memory::Cycle: '0'
   Test::Mockingbird: '0.1'
   Test::Most: '0'
   Test::Needs: '0'
   Test::Returns: '0.03'
+  Test::Without::Module: '0'
   Unicode::GCString: '0'
   Unicode::Normalize: '0'
 configure_requires:
@@ -70,5 +72,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.39'
+version: '0.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

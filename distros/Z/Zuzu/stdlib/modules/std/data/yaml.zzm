@@ -7,7 +7,7 @@ std/data/yaml - YAML encoding and decoding for ZuzuScript.
 =head1 SYNOPSIS
 
   from std/data/yaml import YAML;
-
+  
   let codec := new YAML( pretty: true, canonical: true );
   let text := codec.encode({ answer: 42, ok: true });
   let data := codec.decode(text);

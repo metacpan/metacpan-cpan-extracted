@@ -1,5 +1,10 @@
 Revision history for Apple-AppStoreConnect
 
+0.13    2026-06-25
+        - Added 'platform' shortcut to "get_apps" method.
+        - Added "get_app_store_versions" method (optionally with localizations).
+        - Added beta feedback screenshot and crash convenience methods.
+
 0.12    2024-07-12
         'jwt_payload' option.
 

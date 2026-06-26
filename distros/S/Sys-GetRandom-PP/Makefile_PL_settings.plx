@@ -17,6 +17,7 @@ return {
     PREREQ_PM => {
         'Carp'     => 0,
         'Config'   => 0,
+        'Errno'    => 0,
         'Exporter' => '5.57',
         'constant' => '1.03',
         'strict'   => 0,

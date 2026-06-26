@@ -11,7 +11,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/mauke/Sys-GetRandom/issues
   repository: https://codeberg.org/mauke/Sys-GetRandom.git
-version: '0.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -7,7 +7,7 @@ std/data/toml - TOML encoding and decoding for ZuzuScript.
 =head1 SYNOPSIS
 
   from std/data/toml import TOML;
-
+  
   let codec := new TOML( pretty: true, canonical: true );
   let text := codec.encode({ answer: 42, name: "Zuzu" });
   let data := codec.decode(text);

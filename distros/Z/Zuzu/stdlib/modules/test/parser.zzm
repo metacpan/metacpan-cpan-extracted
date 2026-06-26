@@ -7,16 +7,16 @@ test/parser - Parse TAP output and summarize test counts.
 =head1 SYNOPSIS
 
   from test/parser import parse;
-
+  
   let tap := "ok 1 - alpha\nnot ok 2 - beta\n1..2\n";
   let summary := parse( tap );
-
+  
   # Top-level counts
   say( summary{top_level}{passed} );
-
+  
   # All assertions, including nested subtests
   say( summary{assertions}{failed} );
-
+  
   # Top-level plan, if present
   say( summary{planned} );
 

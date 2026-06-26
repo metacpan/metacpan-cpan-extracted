@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 package CLI::Simple::Modulino;
 
 use strict;
@@ -12,7 +10,7 @@ use FindBin qw($RealBin);
 
 use parent qw(CLI::Simple);
 
-caller or __PACKAGE__->main;
+caller or exit __PACKAGE__->main;
 
 ########################################################################
 sub cmd_create_modulino {
@@ -41,11 +39,10 @@ sub cmd_create_modulino {
 
   # remove pod
   $script =~ s/\A(.*)^=pod.*\z/$1/xsm;
-  print {*STDERR} $script;
 
   # customize
   $script =~ s/[@]MODULINO_WRAPPER[@]/$alias/xsm;
-  $script =~ s/[@]MODULE_NAME[@]/$module_name/xsm;
+  $script =~ s/[@]PERL_MODULE_NAME[@]/$module_name/xsm;
 
   my $modulino = sprintf '%s/%s', $installbindir, $alias;
 
@@ -95,7 +92,7 @@ __DATA__
 # modulino invocation
 
 MODULINO_WRAPPER=@MODULINO_WRAPPER@
-MODULE_NAME=CLI::Simple
+MODULE_NAME=@PERL_MODULE_NAME@
 MODULE_PATH=$(MODULE_PATH="${MODULE_NAME//:://}.pm" perl -M$MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};')
 
 MODULINO_WRAPPER=$MODULINO_WRAPPER perl $MODULE_PATH "$@"
@@ -108,16 +105,14 @@ CLI::Simple::Modulino - Create CLI wrapper around a modulino
 
 =head1 SYNOPSIS
 
- # create $RealBin/cli-simple
- create-modulino -m CLI::Simple
+ # create $RealBin/my-app
+ create-modulino -m My::App
 
- # create /usr/local/bin/cli-simple
- create-modulino -i /usr/local/bin -m CLI::Simple
+ # create /usr/local/bin/my-app
+ create-modulino -i /usr/local/bin -m My::App
 
- # create /usr/local/bin simple
- create-modulino -a simple -i /usr/local/bin -m CLI::Simple
-
-=head1 USAGE
+ # create /usr/local/bin app
+ create-modulino -a app -i /usr/local/bin -m My::App
 
 =head2 Options
 
@@ -135,7 +130,7 @@ Example:
 Creates a so called wrapper for a so-called "modulino". Modulinos are
 Perl modules that use the pattern:
 
- caller or __PACKAGE__->main
+ caller or exit __PACKAGE__->main
 
 ...to flexibly use a Perl module as a script.
 
@@ -148,4 +143,3 @@ Rob Lauer - <rlauer@treasurersbriefcase.com>
 =head1 SEE ALSO 
 
 L<CLI::Simple>
-

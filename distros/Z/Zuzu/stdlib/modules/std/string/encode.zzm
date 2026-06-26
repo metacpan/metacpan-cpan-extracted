@@ -7,7 +7,7 @@ std/string/encode - Character-encoding conversions between Strings and BinaryStr
 =head1 SYNOPSIS
 
   from std/string/encode import *;
-
+  
   let bytes := encode( "héllo", ENCODING_UTF16 );
   let text := decode( bytes, "UTF-16" );
 

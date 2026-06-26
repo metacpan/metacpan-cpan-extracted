@@ -4,7 +4,7 @@ HTTP::Date - HTTP::Date - date conversion routines
 
 # VERSION
 
-version 6.06
+version 6.07
 
 # SYNOPSIS
 
@@ -96,6 +96,12 @@ time2str() and str2time(), are exported by default.
 
     The parser ignores leading and trailing whitespace.  It also allow the
     seconds to be missing and the month to be numerical in most formats.
+
+    Numeric-only dates use day/month/year ordering (the ISO and common
+    European convention), not the US month/day/year ordering.  So
+    "3/4/2014" is parsed as 4 March 2014, and a US-style date such as
+    "3/13/2014" returns undef because 13 is not a valid month.  To parse
+    US-style dates, swap the first two fields before calling parse\_date().
 
     If the year is missing, then we assume that the date is the first
     matching date _before_ current month.  If the year is given with only

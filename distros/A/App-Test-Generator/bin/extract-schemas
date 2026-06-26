@@ -134,15 +134,15 @@ my $fuzz_iters = 100;
 my $corpus_dir;   # default set after output_dir is known
 
 GetOptions(
-    'output-dir|o=s'  => \$extractor_opts{output_dir},
-    'strict-pod|s=s'  => \$extractor_opts{strict_pod},
-    'verbose|v'       => \$extractor_opts{verbose},
-    'fuzz|f'          => \$fuzz,
-    'fuzz-all'        => \$fuzz_all,
-    'fuzz-iters=i'    => \$fuzz_iters,
-    'corpus-dir|c=s'  => \$corpus_dir,
-    'help|h'          => \$cli_opts{help},
-    'man|m'           => \$cli_opts{man},
+	'output-dir|o=s'  => \$extractor_opts{output_dir},
+	'strict-pod|s=s'  => \$extractor_opts{strict_pod},
+	'verbose|v'       => \$extractor_opts{verbose},
+	'fuzz|f'          => \$fuzz,
+	'fuzz-all'        => \$fuzz_all,
+	'fuzz-iters=i'    => \$fuzz_iters,
+	'corpus-dir|c=s'  => \$corpus_dir,
+	'help|h'          => \$cli_opts{help},
+	'man|m'           => \$cli_opts{man},
 ) or pod2usage(2);
 
 pod2usage(-exitval => 0, -verbose => 1) if $cli_opts{help};
@@ -181,8 +181,8 @@ my $schemas = $extractor->extract_all();
 my %fuzz_results;   # method_name => report hashref
 
 if ($fuzz) {
-    require App::Test::Generator::CoverageGuidedFuzzer;
-    make_path($corpus_dir) unless -d $corpus_dir;
+	require App::Test::Generator::CoverageGuidedFuzzer;
+	make_path($corpus_dir) unless -d $corpus_dir;
 
     # Load the target module once so all methods are callable
     my $package = _load_target_module($input_file, $schemas);
@@ -348,13 +348,25 @@ sub _load_target_module {
 
     die 'Could not determine package name from extracted schemas' unless $package;
 
+    # Reject anything that is not a syntactically valid Perl package name
+    # before it is used to build a require path — guards against this
+    # becoming a code-injection vector if $package is ever sourced from
+    # something less constrained than a PPI-parsed 'package' statement.
+    die "Invalid package name: $package"
+        unless $package =~ /^[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
+
     # Add the module's containing lib dir to @INC
     # Walks up from the file looking for a 'lib' directory
     my $abs = File::Spec->rel2abs($input_file);
-    my @dirs = File::Spec->splitdir( (File::Spec->splitpath($abs))[1] );
+    my ($volume, $directory) = File::Spec->splitpath($abs);
+    my @dirs = File::Spec->splitdir($directory);
 
     while (@dirs) {
-        my $candidate = File::Spec->catdir(@dirs, 'lib');
+        # catpath() (not catdir()) keeps $volume attached, so this still
+        # resolves on Windows when the temp dir and the checkout live on
+        # different drive letters (a bare catdir() result is interpreted
+        # as relative to the *current* drive, not $volume's).
+        my $candidate = File::Spec->catpath($volume, File::Spec->catdir(@dirs, 'lib'), '');
         if (-d $candidate) {
             lib->import($candidate);
             last;
@@ -362,7 +374,10 @@ sub _load_target_module {
         pop @dirs;
     }
 
-    eval "require $package"
+    # require() the module by file path rather than via string eval, so
+    # $package is never compiled as Perl source.
+    (my $module_file = $package) =~ s{::}{/}g;
+    eval { require "$module_file.pm" }
         or die "Could not load $package for fuzzing: $@";
 
     return $package;

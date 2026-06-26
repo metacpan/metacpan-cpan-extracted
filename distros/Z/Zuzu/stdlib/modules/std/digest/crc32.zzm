@@ -7,9 +7,9 @@ std/digest/crc32 - CRC32 digests for BinaryString values.
 =head1 SYNOPSIS
 
   from std/digest/crc32 import *;
-
+  
   let payload := to_binary( "hello" );
-
+  
   let raw := crc32(payload);
   let hex := crc32_hex(payload);
   let b64 := crc32_b64(payload);

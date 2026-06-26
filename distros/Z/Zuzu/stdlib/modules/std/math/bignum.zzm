@@ -7,11 +7,11 @@ std/math/bignum - Arbitrary precision BigNum class.
 =head1 SYNOPSIS
 
   from std/math/bignum import BigNum;
-
+  
   let n := BigNum.from_dec("12345");
   let m := BigNum.from_hex("0xABCDEF");
   let p := BigNum.from_dec("-12345.6789");
-
+  
   say m.badd(n).to_dec;
   say p.babs.to_dec;
 

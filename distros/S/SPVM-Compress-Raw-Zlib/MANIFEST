@@ -1,14 +1,15 @@
 .gitattributes
-.github/workflows/linux-ubuntu-latest-perl-v5.20.3.yml
+.github/workflows/linux-ubuntu-latest-asan.yml
+.github/workflows/linux-ubuntu-latest-perls.yml
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
+.github/workflows/windows-latest-msvc-debug.yml
+.github/workflows/windows-latest-msvc.yml
 .github/workflows/windows-latest.yml
 .gitignore
 Changes
 helper/constants.pl
 helper/constants.txt
-lib/SPVM/Compress/Raw/Zlib.c
-lib/SPVM/Compress/Raw/Zlib.config
 lib/SPVM/Compress/Raw/Zlib.pm
 lib/SPVM/Compress/Raw/Zlib.spvm
 lib/SPVM/Compress/Raw/Zlib/Base.c
@@ -27,8 +28,6 @@ lib/SPVM/Compress/Raw/Zlib/Inflate.c
 lib/SPVM/Compress/Raw/Zlib/Inflate.config
 lib/SPVM/Compress/Raw/Zlib/Inflate.pm
 lib/SPVM/Compress/Raw/Zlib/Inflate.spvm
-lib/SPVM/Compress/Raw/Zlib/Z_stream.c
-lib/SPVM/Compress/Raw/Zlib/Z_stream.config
 lib/SPVM/Compress/Raw/Zlib/Z_stream.pm
 lib/SPVM/Compress/Raw/Zlib/Z_stream.spvm
 LICENSE

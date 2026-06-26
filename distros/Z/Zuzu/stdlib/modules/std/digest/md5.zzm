@@ -7,9 +7,9 @@ std/digest/md5 - MD5 digests for BinaryString values.
 =head1 SYNOPSIS
 
   from std/digest/md5 import *;
-
+  
   let payload := to_binary( "hello" );
-
+  
   let raw := md5(payload);
   let hex := md5_hex(payload);
   let b64 := md5_b64(payload);

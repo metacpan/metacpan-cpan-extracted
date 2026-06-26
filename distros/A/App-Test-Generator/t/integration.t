@@ -2,7 +2,12 @@
 
 use strict;
 use warnings;
+use Readonly;
 use Test::Most;
+use Test::Mockingbird;
+use Test::Needs;
+use Test::Returns;
+use Test::Without::Module;
 use Capture::Tiny qw(capture);
 use File::Path    qw(make_path);
 use File::Temp    qw(tempdir tempfile);
@@ -18,11 +23,24 @@ BEGIN {
 	use_ok('App::Test::Generator');
 	use_ok('App::Test::Generator::SchemaExtractor');
 	use_ok('App::Test::Generator::Planner');
+	use_ok('App::Test::Generator::Planner::Mock');
+	use_ok('App::Test::Generator::Planner::Isolation');
+	use_ok('App::Test::Generator::Planner::Fixture');
+	use_ok('App::Test::Generator::Planner::Grouping');
+	use_ok('App::Test::Generator::TestStrategy');
+	use_ok('App::Test::Generator::Exporter::YAML');
 	use_ok('App::Test::Generator::Emitter::Perl');
 	use_ok('App::Test::Generator::Mutator');
 	use_ok('App::Test::Generator::LCSAJ');
 	use_ok('App::Test::Generator::CoverageGuidedFuzzer');
 }
+
+# --------------------------------------------------
+# Shared magic numbers, named per skill style rules
+# --------------------------------------------------
+Readonly my $FUZZ_SMALL_ITER  => 5;
+Readonly my $FUZZ_SEED_A      => 11;
+Readonly my $FUZZ_SEED_B      => 22;
 
 # --------------------------------------------------
 # Shared sample Perl module source used across tests
@@ -816,6 +834,355 @@ subtest 'test-generator-index: _is_class_method detects class vs instance method
 	is($detect->($class_src,    'generate'), 1, 'generate($class) -> class method');
 	is($detect->($instance_src, 'run'),      0, 'run($self) -> instance method');
 	is($detect->([],            'foo'),      0, 'empty source -> 0');
+};
+
+# ==================================================================
+# PIPELINE 11: Planner::build_plan() — five-subsystem composition
+#
+# build_plan() is documented to fan a schema out through TestStrategy,
+# Planner::Isolation, Planner::Fixture, Planner::Mock, and
+# Planner::Grouping and recombine their results. CLAUDE.md records the
+# responsibility split between these subsystems as a hard architectural
+# rule (TestStrategy never reads _analysis; Mock/Isolation do) — this
+# pipeline locks that contract in as an end-to-end assertion instead of
+# leaving it as a comment-only invariant.
+# ==================================================================
+
+subtest 'Planner::build_plan: side-effect/dependency metadata flows only to Mock/Isolation/Fixture/Grouping' => sub {
+	my $schemas = {
+		# A pure getter: TestStrategy alone should classify this from
+		# accessor/output metadata. No side effects, so Mock/Isolation
+		# must leave it with the "safe to reuse" defaults.
+		precision => {
+			input    => {},
+			output   => { type => 'integer' },
+			accessor => { type => 'getter', property => 'precision' },
+			_analysis => {
+				side_effects => { purity_level => 'pure' },
+				dependencies => {},
+			},
+		},
+		# An impure method that both shells out and touches the
+		# filesystem: Mock must request both mocks, Isolation must
+		# pick the fully-isolated fixture mode, and Grouping must
+		# bucket it under "impure".
+		sync_to_disk => {
+			input    => {},
+			output   => { type => 'void' },
+			_analysis => {
+				side_effects => {
+					purity_level   => 'impure',
+					calls_external => 1,
+					performs_io    => 1,
+				},
+				dependencies => {
+					filesystem => { path => '/tmp' },
+				},
+			},
+		},
+	};
+
+	my $planner = App::Test::Generator::Planner->new(
+		schemas => $schemas,
+		package => 'Sample::Disk',
+	);
+	my $plan = $planner->build_plan();
+
+	is(ref($plan), 'HASH', 'build_plan returns hashref');
+	is_deeply(
+		[ sort keys %{$plan} ],
+		[ qw(fixture groups isolation mock strategy) ],
+		'build_plan combines exactly the five documented subsystems',
+	);
+
+	# TestStrategy: driven only by accessor/output type, never _analysis.
+	ok($plan->{strategy}{precision}{getter_test}, 'pure getter -> getter_test flag from TestStrategy');
+	ok(!exists $plan->{strategy}{sync_to_disk}{getter_test}, 'non-accessor method has no getter_test flag');
+
+	# Planner::Mock: side_effects.calls_external + performs_io -> both mocks requested.
+	ok(!exists $plan->{mock}{precision}, 'pure method has no mock strategy (omitted, not falsy)');
+	is_deeply(
+		[ sort @{ $plan->{mock}{sync_to_disk} } ],
+		[ qw(capture_io mock_system) ],
+		'impure method needing both mocks gets an arrayref of both strategies',
+	);
+
+	# Planner::Isolation: purity_level drives fixture mode.
+	is($plan->{isolation}{precision}{fixture}, 'shared_fixture', 'pure method -> shared fixture');
+	is($plan->{isolation}{sync_to_disk}{fixture}, 'isolated_block', 'impure method -> isolated_block fixture');
+	ok($plan->{isolation}{sync_to_disk}{filesystem}, 'filesystem dependency passed through to isolation plan');
+
+	# Planner::Fixture: takes its cue from the isolation plan it is given.
+	# This is the real cross-module contract between Isolation and
+	# Fixture — Isolation::plan() returns a per-method hashref with a
+	# 'fixture' key, and Fixture::plan() must read that key, not treat
+	# the whole per-method value as a bare mode string.
+	is($plan->{fixture}{precision}{mode},     'shared',       'pure method -> shared fixture mode');
+	is($plan->{fixture}{sync_to_disk}{mode},  'new_per_test', 'impure method -> new_per_test fixture mode');
+
+	# Planner::Grouping: purity_level sorts methods into pure/mutating/impure.
+	ok((grep { $_ eq 'precision' } @{ $plan->{groups}{pure} }),
+		'pure method appears in the pure group');
+	ok((grep { $_ eq 'sync_to_disk' } @{ $plan->{groups}{impure} }),
+		'impure method appears in the impure group');
+
+	# Test::Returns: build_plan's output must satisfy its own documented
+	# API specification output schema (a hashref of hashrefs).
+	returns_ok($plan, { type => 'hashref' }, 'build_plan output satisfies its documented output schema');
+};
+
+subtest 'Planner::build_plan: delegates to each subsystem exactly once, with the schema it documents' => sub {
+	# Spy rather than mock — CLAUDE.md prefers verifying real
+	# collaboration over replacing it, since build_plan's value is the
+	# composition itself, not any one subsystem's internal logic.
+	my $spy_strategy  = Test::Mockingbird::spy('App::Test::Generator::TestStrategy',      'generate_plan');
+	my $spy_isolation = Test::Mockingbird::spy('App::Test::Generator::Planner::Isolation', 'plan');
+	my $spy_fixture   = Test::Mockingbird::spy('App::Test::Generator::Planner::Fixture',   'plan');
+	my $spy_mock      = Test::Mockingbird::spy('App::Test::Generator::Planner::Mock',      'plan');
+	my $spy_grouping  = Test::Mockingbird::spy('App::Test::Generator::Planner::Grouping',  'plan');
+
+	my $schemas = {
+		noop => { input => {}, output => {}, _analysis => {} },
+	};
+	my $planner = App::Test::Generator::Planner->new(schemas => $schemas, package => 'Sample::Noop');
+	$planner->build_plan();
+
+	is(scalar $spy_strategy->(),  1, 'TestStrategy::generate_plan called exactly once');
+	is(scalar $spy_isolation->(), 1, 'Planner::Isolation::plan called exactly once');
+	is(scalar $spy_fixture->(),   1, 'Planner::Fixture::plan called exactly once');
+	is(scalar $spy_mock->(),      1, 'Planner::Mock::plan called exactly once');
+	is(scalar $spy_grouping->(),  1, 'Planner::Grouping::plan called exactly once');
+
+	my ($mock_call)  = $spy_mock->();
+	my ($group_call) = $spy_grouping->();
+	is($mock_call->[2],  $schemas, 'Mock::plan is handed the same schema hashref build_plan was given');
+	is($group_call->[2], $schemas, 'Grouping::plan is handed the same schema hashref build_plan was given');
+
+	Test::Mockingbird::restore_all();
+};
+
+# ==================================================================
+# PIPELINE 12: SchemaExtractor -> Exporter::YAML -> disk -> Generator
+#
+# Exercises the full round trip through Exporter::YAML, which neither
+# of the existing "write" pipelines (PIPELINE 1 and PIPELINE 8) goes
+# through — those rely on SchemaExtractor's own _write_schema.
+# ==================================================================
+
+subtest 'SchemaExtractor -> Exporter::YAML -> disk -> Generator round trip' => sub {
+	my ($pm, $tmpdir) = _make_sample_module();
+	my $extractor = App::Test::Generator::SchemaExtractor->new(input_file => $pm);
+	my $schemas   = $extractor->extract_all(no_write => 1);
+	ok(scalar keys %{$schemas} > 0, 'schemas extracted for export');
+
+	my $exporter   = bless {}, 'App::Test::Generator::Exporter::YAML';
+	my $yaml_file  = File::Spec->catfile($tmpdir, 'exported_plan.yml');
+	lives_ok(sub { $exporter->export($schemas, $yaml_file) }, 'export() lives');
+	ok(-f $yaml_file, 'exported YAML file written to disk');
+
+	my $reloaded = LoadFile($yaml_file);
+	is(ref($reloaded), 'HASH', 'reloaded YAML deserialises to a hashref');
+	is_deeply(
+		[ sort keys %{$reloaded} ], [ sort keys %{$schemas} ],
+		'reloaded schema has the same method keys as the original',
+	);
+
+	# Feed the reloaded (disk round-tripped) schema for one method
+	# straight into Generator, proving the export format is consumable
+	# by the rest of the pipeline, not just human-readable.
+	my ($method) = sort keys %{$reloaded};
+	my $outfile  = File::Spec->catfile($tmpdir, "$method.reloaded.t");
+	capture(sub { App::Test::Generator->generate(schema => $reloaded->{$method}, output_file => $outfile) });
+	ok(-f $outfile, "generate() from reloaded YAML wrote a test file for $method");
+};
+
+# ==================================================================
+# PIPELINE 13: Concurrency — independent instances do not interfere
+#
+# Each class below is instantiated twice with deliberately divergent
+# inputs, and the two instances are driven in an interleaved order, to
+# confirm that no state leaks between independent objects of the same
+# class (e.g. via shared package-level state instead of $self).
+# ==================================================================
+
+subtest 'Concurrency: independent Mutator instances on different modules do not interfere' => sub {
+	my ($pm_a, $tmpdir_a) = _make_sample_module();
+
+	my $tmpdir_b = tempdir(CLEANUP => 1);
+	my $lib_b    = File::Spec->catdir($tmpdir_b, 'lib', 'Sample');
+	make_path($lib_b);
+	my $pm_b = File::Spec->catfile($lib_b, 'Branchy.pm');
+	open my $fh_b, '>', $pm_b or die $!;
+	print $fh_b <<'END_PM';
+package Sample::Branchy;
+use strict;
+use warnings;
+sub classify {
+	my ($self, $n) = @_;
+	if($n > 0) { return 'positive'; }
+	if($n < 0) { return 'negative'; }
+	return 'zero';
+}
+1;
+END_PM
+	close $fh_b;
+
+	require Cwd;
+	my $orig = Cwd::cwd();
+
+	chdir $tmpdir_a or die $!;
+	my $mutator_a = App::Test::Generator::Mutator->new(
+		file => File::Spec->catfile('lib', 'Sample', 'Calculator.pm'), lib_dir => 'lib',
+	);
+	my @mutants_a_pass1 = eval { $mutator_a->generate_mutants() };
+	chdir $orig;
+
+	chdir $tmpdir_b or die $!;
+	my $mutator_b = App::Test::Generator::Mutator->new(
+		file => File::Spec->catfile('lib', 'Sample', 'Branchy.pm'), lib_dir => 'lib',
+	);
+	my @mutants_b = eval { $mutator_b->generate_mutants() };
+	chdir $orig;
+
+	# Re-run mutator_a after mutator_b has been constructed and used,
+	# to confirm mutator_a's own results are unaffected by mutator_b.
+	chdir $tmpdir_a or die $!;
+	my @mutants_a_pass2 = eval { $mutator_a->generate_mutants() };
+	chdir $orig;
+
+	ok(scalar @mutants_a_pass1 > 0, 'mutator_a produced mutants');
+	ok(scalar @mutants_b > 0,       'mutator_b produced mutants');
+	is(scalar @mutants_a_pass1, scalar @mutants_a_pass2,
+		'mutator_a is deterministic and unaffected by mutator_b running in between');
+
+	for my $m (@mutants_a_pass1) {
+		unlike($m->line_content // '', qr/classify|positive|negative/,
+			"mutator_a mutant does not reference mutator_b's source");
+	}
+	for my $m (@mutants_b) {
+		unlike($m->line_content // '', qr/precision|Calculator/,
+			"mutator_b mutant does not reference mutator_a's source");
+	}
+};
+
+subtest 'Concurrency: independent CoverageGuidedFuzzer instances do not share corpus or bug state' => sub {
+	my $calls_a = 0;
+	my $target_a = sub { $calls_a++; die "A trigger\n" if ($_[0] // '') eq 'A_BUG'; return 1; };
+
+	my $calls_b = 0;
+	my $target_b = sub { $calls_b++; die "B trigger\n" if ($_[0] // '') eq 'B_BUG'; return 1; };
+
+	my $f_a = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema => { input => { type => 'string', min => 1, max => 10 } },
+		target_sub => $target_a, iterations => $FUZZ_SMALL_ITER, seed => $FUZZ_SEED_A,
+	);
+	my $f_b = App::Test::Generator::CoverageGuidedFuzzer->new(
+		schema => { input => { type => 'string', min => 1, max => 10 } },
+		target_sub => $target_b, iterations => $FUZZ_SMALL_ITER, seed => $FUZZ_SEED_B,
+	);
+
+	if($ENV{EXTENDED_TESTING}) {
+		# Interleave: run A, then B, then A again, so any shared
+		# package-level state would show up as cross-contamination.
+		# total_iterations accumulates per-instance across run() calls
+		# (stats live in $self, initialised once in new()), so fuzzer
+		# A's second run is expected to report 2x iterations — what
+		# matters for this test is that fuzzer B's run in between adds
+		# nothing to fuzzer A's count.
+		my $r_a1 = $f_a->run();
+		my $r_b  = $f_b->run();
+		my $r_a2 = $f_a->run();
+
+		is($r_a1->{total_iterations}, $FUZZ_SMALL_ITER,     'fuzzer A first run completed its own iteration count');
+		is($r_b->{total_iterations},  $FUZZ_SMALL_ITER,     'fuzzer B run completed its own iteration count');
+		is($r_a2->{total_iterations}, $FUZZ_SMALL_ITER * 2, 'fuzzer A accumulates only its own iterations, unaffected by fuzzer B running between');
+		ok($calls_a > 0, 'target_a was actually called by fuzzer A');
+		ok($calls_b > 0, 'target_b was actually called by fuzzer B');
+
+		for my $bug (@{ $f_a->bugs() }) {
+			unlike($bug->{error} // '', qr/B trigger/, 'fuzzer A bug list never contains fuzzer B errors');
+		}
+		for my $bug (@{ $f_b->bugs() }) {
+			unlike($bug->{error} // '', qr/A trigger/, 'fuzzer B bug list never contains fuzzer A errors');
+		}
+	} else {
+		ok(1, 'EXTENDED_TESTING not set — skipping fuzzer run, construction only');
+	}
+};
+
+# ==================================================================
+# PIPELINE 14: Optional dependency fallback — BSD::Resource missing
+#
+# CLAUDE.md documents BSD::Resource as loaded via a runtime require
+# inside SchemaExtractor's _compile_signature_isolated (not a
+# Makefile.PL PREREQ_PM, Unix-only, best-effort rlimit). This pipeline
+# proves the documented fallback: extraction must succeed identically
+# whether or not the module is installed.
+# ==================================================================
+
+subtest 'SchemaExtractor: signature_for extraction degrades gracefully without BSD::Resource' => sub {
+	# The fixture module below is only ever compiled by the isolated
+	# perl -T subprocess spawned from _compile_signature_isolated()
+	# (PIPELINE 14 sets allow_signature_exec => 1), so the dependency
+	# on Type::Params/Types::Common is real, not just text inside this
+	# process. Test::Without::Module cannot simulate "missing" for it
+	# (its @INC hook does not propagate to the spawned subprocess), so
+	# unlike BSD::Resource below, this is a hard skip, not a fallback
+	# under test.
+	test_needs('Type::Params', 'Types::Common');
+
+	my $module_src = <<'END_MODULE';
+package TestModule::SignatureFor;
+use Types::Standard qw(Num);
+use Type::Params qw(-sigs);
+
+signature_for add_numbers => (
+	method     => 1,
+	positional => [ Num, Num ],
+	returns    => Num,
+);
+
+sub add_numbers ( $self, $first, $second ) {
+	return $first + $second;
+}
+1;
+END_MODULE
+
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $module_file = File::Spec->catfile($tmpdir, 'SignatureFor.pm');
+	open my $fh, '>', $module_file or die $!;
+	print $fh $module_src;
+	close $fh;
+
+	my $extract_with = sub {
+		my $extractor = App::Test::Generator::SchemaExtractor->new(
+			input_file           => $module_file,
+			output_dir           => tempdir(CLEANUP => 1),
+			allow_signature_exec => 1,
+		);
+		return $extractor->extract_all(no_write => 1);
+	};
+
+	# Baseline: BSD::Resource genuinely available in this environment.
+	my $schema_with = $extract_with->();
+	ok($schema_with->{add_numbers}, 'add_numbers extracted with BSD::Resource present');
+
+	# Force "not installed": forbid the module via @INC and make sure
+	# any prior load in this process is forgotten first.
+	delete $INC{'BSD/Resource.pm'};
+	Test::Without::Module->import('BSD::Resource');
+
+	my $schema_without = eval { $extract_with->() };
+	my $err = $@;
+
+	Test::Without::Module->unimport('BSD::Resource');
+
+	is($err, '', 'extract_all() does not croak when BSD::Resource is unavailable');
+	ok($schema_without->{add_numbers}, 'add_numbers still extracted without BSD::Resource');
+	is_deeply(
+		$schema_without->{add_numbers}{input}, $schema_with->{add_numbers}{input},
+		'extracted parameter types are identical with or without BSD::Resource (best-effort rlimit only)',
+	);
 };
 
 done_testing();

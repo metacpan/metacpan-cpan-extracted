@@ -11,7 +11,9 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
-    't/date.t'
+    't/date.t',
+    't/numeric-date-order.t',
+    't/unicode-digits.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

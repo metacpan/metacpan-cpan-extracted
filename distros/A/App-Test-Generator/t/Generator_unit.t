@@ -51,6 +51,42 @@ subtest 'generate() croaks when called with no arguments' => sub {
 	);
 };
 
+subtest 'generate() croaks on a function name that is not a valid identifier' => sub {
+	my $schema = _schema_file(function => "foo'); system('touch /tmp/pwned'); #");
+	throws_ok(
+		sub {
+			capture(sub { App::Test::Generator->generate($schema) });
+		},
+		qr/not a valid Perl identifier/,
+		'malformed function name croaks rather than being spliced into generated code',
+	);
+};
+
+subtest 'generate() croaks on a module name that is not a valid package name' => sub {
+	my $schema = _schema_file(module => "Evil'); system('touch /tmp/pwned'); #");
+	throws_ok(
+		sub {
+			capture(sub { App::Test::Generator->generate($schema) });
+		},
+		qr/not a valid Perl identifier/,
+		'malformed module name croaks rather than being spliced into generated code',
+	);
+};
+
+subtest 'generate() croaks on a transform name that is not a valid identifier' => sub {
+	my $schema = _schema_file(
+		extra => "config:\n  properties:\n    enable: true\n" .
+			"transforms:\n  \"evil'}; system('touch /tmp/pwned'); {\":\n    input:\n      x: { type: string }\n",
+	);
+	throws_ok(
+		sub {
+			capture(sub { App::Test::Generator->generate($schema) });
+		},
+		qr/not a valid Perl identifier/,
+		'malformed transform name croaks rather than being spliced into generated code as a variable name',
+	);
+};
+
 subtest 'generate() legacy API returns without croaking' => sub {
 	my $schema = _schema_file();
 	my ($out, $err) = capture(sub {

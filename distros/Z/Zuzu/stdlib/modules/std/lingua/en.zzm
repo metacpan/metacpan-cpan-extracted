@@ -7,13 +7,13 @@ std/lingua/en - English text helpers for ZuzuScript.
 =head1 SYNOPSIS
 
   from std/lingua/en import *;
-
+  
   say( english_list(["tea", "cake", "jam"]) );
   # tea, cake, and jam
-
+  
   say( english_number(251) );
   # two hundred and fifty-one
-
+  
   say( english_ordinal(42) );
   # forty-second
 

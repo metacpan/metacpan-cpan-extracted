@@ -4,7 +4,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 # VERSION
 
-Version 0.39
+Version 0.40
 
 # SYNOPSIS
 
@@ -23,7 +23,7 @@ From the command line:
 
     # Attempt to create a formal definition from a routine package, then run tests against that formal definition
     # This is the holy grail of automatic test generation, just by looking at the source code
-    extract-schemas bin/extract-schemas lib/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yaml
+    extract-schemas lib/App/Test/Generator/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yml
 
 From Perl:
 
@@ -756,10 +756,10 @@ This example takes you through testing the online\_render method of [HTML::Genea
         name: Fuzz testing with perl ${{ matrix.perl }} on ${{ matrix.os }}
 
         steps:
-          - uses: actions/checkout@v5
+          - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
           - name: Set up Perl
-            uses: shogo82148/actions-setup-perl@v1
+            uses: shogo82148/actions-setup-perl@a198315ec4e9244f206879ea7b63078003aec8a6 # v1.41.1
             with:
               perl-version: ${{ matrix.perl }}
 
@@ -1231,7 +1231,7 @@ Takes a schema file and produces a test file (or STDOUT).
         input_file  => { type => 'string', optional => 1 },
         output_file => { type => 'string', optional => 1 },
         schema      => { type => 'hashref', optional => 1 },
-        quiet       => { type => 'boolean', optional => 1 },
+        quiet       => { type => 'boolean', optional => 1 },    # accepted but not yet implemented; has no effect
     }
 
 #### Output
@@ -1293,8 +1293,9 @@ input specification passed to [Params::Validate::Strict](https://metacpan.org/po
 - `$href`
 
     A hashref whose values are themselves hashrefs containing field
-    specifications. Keys whose values are not hashrefs are skipped with
-    a warning.
+    specifications. A scalar value that is a recognised type string (see
+    `_valid_type`) is expanded to `{ type => $value }`. Any other
+    non-hashref value is skipped with a warning.
 
 ### Returns
 
@@ -1323,11 +1324,11 @@ Other sub-keys are rendered via `perl_quote`.
 
 #### input
 
-    { href => { type => HASHREF, optional => 1 } }
+    { href => { type => 'hashref', optional => 1 } }
 
 #### output
 
-    { type => SCALAR }
+    { type => 'string' }
 
 ## render\_args\_hash
 
@@ -1350,10 +1351,6 @@ in a generated test file.
 A comma-separated string of `key =` value> pairs sorted by key.
 Returns an empty string if `$href` is undef, empty, or not a hashref.
 
-### Side effects
-
-None.
-
 ### Notes
 
 Keys and values are both rendered via `perl_quote`. In particular,
@@ -1365,11 +1362,11 @@ the generated test.
 
 #### input
 
-    { href => { type => HASHREF, optional => 1 } }
+    { href => { type => 'hashref', optional => 1 } }
 
 #### output
 
-    { type => SCALAR }
+    { type => 'string' }
 
 ## render\_arrayref\_map
 
@@ -1392,10 +1389,6 @@ qualifying key, sorted alphabetically. Returns the string `'()'` if
 `$href` is undef, empty, or not a hashref — this produces an empty
 hash assignment in the generated test rather than a syntax error.
 
-### Side effects
-
-None.
-
 ### Notes
 
 Array element values are rendered via `perl_quote` which handles
@@ -1407,11 +1400,11 @@ mixed-value hashes and only want the arrayref entries rendered.
 
 #### input
 
-    { href => { type => HASHREF, optional => 1 } }
+    { href => { type => 'hashref', optional => 1 } }
 
 #### output
 
-    { type => SCALAR }
+    { type => 'string' }
 
 ## perl\_quote
 
@@ -1423,9 +1416,11 @@ when evaluated in a generated test file.
 - `$v`
 
     Any Perl value. May be undef, a scalar, an arrayref, a Regexp, or a blessed
-    object. All types are handled — undef becomes `'undef'`, numbers are
-    unquoted, strings are single-quoted, arrayrefs recurse, Regexps become
-    `qr{...}`, and anything else falls through to `render_fallback`.
+    object. All types are handled — undef becomes `'undef'`, the strings
+    `'true'`/`'false'` become the Perl boolean constants `!!1`/`!!0`,
+    numbers are unquoted, other strings are single-quoted, arrayrefs recurse,
+    Regexps become `qr{...}`, and anything else (including hashrefs and
+    blessed objects) falls through to `render_fallback`.
 
 ### API specification
 
@@ -1443,7 +1438,7 @@ when evaluated in a generated test file.
 
 # SEE ALSO
 
-- [Test Coverage Report](https://nigelhorne.github.io/App-Test-Generator/coverage/)
+- [Test Dashboard](https://nigelhorne.github.io/App-Test-Generator/coverage/)
 - [App::Test::Generator::Template](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ATemplate) - Template of the file of tests created by `App::Test::Generator`
 - [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) - Create schemas from Perl programs
 - [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict): Schema Definition

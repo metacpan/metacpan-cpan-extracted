@@ -2,7 +2,7 @@ package XML::PugiXML;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('XML::PugiXML', $VERSION);
@@ -152,6 +152,14 @@ Write BOM (byte order mark).
 
 Indent each attribute on its own line (adds to other format flags).
 
+=item FORMAT_NO_EMPTY_ELEMENT_TAGS()
+
+Write empty elements in long form (C<< <e></e> >>) instead of the self-closing
+C<< <e/> >> form. As of pugixml 1.16, an element whose only child is an empty
+PCDATA node (for example after C<< $node->set_text('') >>) is printed
+self-closing by default; add this flag to restore the previous C<< <e></e> >>
+output.
+
 =back
 
 =head3 Node Type Constants
@@ -222,6 +230,19 @@ Parse DOCTYPE.
 Full parsing: PARSE_DEFAULT plus PIs, comments, the XML declaration and DOCTYPE
 nodes. (Whitespace-only PCDATA is still not preserved -- add PARSE_WS_PCDATA for
 that.)
+
+=back
+
+=head3 Library Constants
+
+=over 4
+
+=item PUGIXML_VERSION()
+
+The pugixml library version the binding was compiled against, as pugixml's
+integer C<PUGIXML_VERSION> macro (for example 1160 for 1.16, 180 for 1.8).
+C<ensure_child> and C<ensure_attr> use the native pugixml implementation when
+this is 1160 or greater, and emulate it below that.
 
 =back
 
@@ -320,6 +341,12 @@ Set attribute value (creates if doesn't exist). Returns the attribute.
 
 Add attribute at end or beginning.
 
+=item ensure_attr($name)
+
+Get the attribute of this name, creating it if absent. Returns the attribute.
+Unlike C<append_attr> it never duplicates an existing attribute. (Uses the
+native pugixml 1.16 C<ensure_attribute>; emulated on older libraries.)
+
 =item remove_attr($name)
 
 Remove an attribute by name. Returns true on success.
@@ -333,6 +360,13 @@ Remove an attribute by name. Returns true on success.
 =item append_child($name), prepend_child($name)
 
 Add child element at end or beginning.
+
+=item ensure_child($name)
+
+Get the first child of this name (as C<child> does), appending a new element
+with that name if none exists. Returns the child; unlike C<append_child> it
+never duplicates an existing one. (Native pugixml 1.16 C<ensure_child>;
+emulated on older libraries.)
 
 =item insert_child_before($name, $ref_node), insert_child_after($name, $ref_node)
 

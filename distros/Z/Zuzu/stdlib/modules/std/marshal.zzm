@@ -7,15 +7,15 @@ std/marshal - Serialize and deserialize ZuzuScript values.
 =head1 SYNOPSIS
 
   from std/marshal import dump, load, safe_to_dump;
-
+  
   let original := {
       name: "Ada",
       tags: [ "compiler", "runtime" ],
   };
-
+  
   let blob := dump(original);
   let copy := load(blob);
-
+  
   if ( safe_to_dump(original) ) {
       // Store blob, send it to another trusted worker, etc.
   }

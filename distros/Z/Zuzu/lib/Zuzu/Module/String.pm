@@ -2,7 +2,7 @@ package Zuzu::Module::String;
 
 use utf8;
 
-our $VERSION = '0.006000';
+our $VERSION = '0.007000';
 
 our %REGEXP_CACHE;
 our %SPLIT_LITERAL_CACHE;
@@ -144,6 +144,42 @@ sub _quotemeta {
 	$value =~ s{([\\/\^\$\.\|\?\*\+\(\)\[\]\{\}"'])}{\\$1}g;
 
 	return $value;
+}
+
+sub _repeat {
+	my ( $count, $text, $separator ) = @_;
+
+	my $repetitions = _num( $count, 0 );
+	die Zuzu::Error->new_runtime(
+		message => 'repeat() count cannot be negative',
+		file => '<std/string>',
+		line => 0,
+	) if $repetitions < 0;
+	$repetitions = int($repetitions);
+
+	my $text_is_binary = blessed($text)
+		&& $text->isa('Zuzu::Value::BinaryString');
+	my $separator_is_binary = defined $separator
+		&& blessed($separator)
+		&& $separator->isa('Zuzu::Value::BinaryString');
+
+	die Zuzu::Error->new_runtime(
+		message => 'TypeException: repeat() cannot mix String and BinaryString values',
+		file => '<std/string>',
+		line => 0,
+	) if defined $separator && $text_is_binary != $separator_is_binary;
+
+	if ($text_is_binary) {
+		my $bytes = $text->bytes // '';
+		my $sep = defined $separator ? $separator->bytes // '' : '';
+		return Zuzu::Value::BinaryString->new(
+			bytes => join $sep, (($bytes) x $repetitions),
+		);
+	}
+
+	my $value = _str( $text, '', 'repeat()' );
+	my $sep = defined $separator ? _str( $separator, '', 'repeat()' ) : '';
+	return join $sep, (($value) x $repetitions);
 }
 
 sub _split_text {
@@ -478,6 +514,23 @@ sub IMPORT {
 		},
 	);
 
+	my $repeat_fn = native_function(
+		name => 'repeat',
+		native => sub {
+			my ( @args ) = @_;
+			die Zuzu::Error->new_runtime(
+				message => 'repeat() expects two or three arguments',
+				file => '<std/string>',
+				line => 0,
+			) if scalar @args < 2 or scalar @args > 3;
+			return _repeat(
+				$args[0],
+				$args[1],
+				scalar @args >= 3 ? $args[2] : undef,
+			);
+		},
+	);
+
 	my $split_fn = native_function(
 		name => 'split',
 		native => sub {
@@ -609,6 +662,7 @@ sub IMPORT {
 		pattern_to_regexp => $pattern_to_regexp_fn,
 		quotemeta => $quotemeta_fn,
 		sprint => $sprint_fn,
+		repeat => $repeat_fn,
 		split => $split_fn,
 		join => $join_fn,
 		trim => $trim_fn,

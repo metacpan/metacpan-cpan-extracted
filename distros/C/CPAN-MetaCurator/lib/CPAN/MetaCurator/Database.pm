@@ -125,7 +125,7 @@ has time_option =>
 	required	=> 0,
 );
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 # -----------------------------------------------
 
@@ -145,7 +145,7 @@ sub build_pad
 
 	for (@{$self -> table_names}) {$$pad{$_} = $self -> read_table($_) };
 
-	# Constants.
+	# Constants. Eg: encoding.
 
 	$$pad{$$_{name} } = $$_{value} for (@{$$pad{constants} });
 

@@ -7,7 +7,7 @@ std/clib - Dynamic C library loading and scalar FFI calls.
 =head1 SYNOPSIS
 
   from std/clib import CLib;
-
+  
   let lib := CLib.open("stdlib/test-fixtures/example_clib/libgreet.so");
   let greet := lib.func(
     "greet",
@@ -18,7 +18,7 @@ std/clib - Dynamic C library loading and scalar FFI calls.
       free: "greet_free"
     }
   );
-
+  
   say to_string(greet.call());
 
 =head1 IMPLEMENTATION SUPPORT

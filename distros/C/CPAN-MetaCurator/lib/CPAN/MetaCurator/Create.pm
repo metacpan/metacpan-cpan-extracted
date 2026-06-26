@@ -5,7 +5,7 @@ use feature 'say';
 use parent 'CPAN::MetaCurator::Database';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 # -----------------------------------------------
 

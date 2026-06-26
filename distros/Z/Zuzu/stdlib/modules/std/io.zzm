@@ -7,10 +7,10 @@ std/io - Filesystem paths and standard stream helpers.
 =head1 SYNOPSIS
 
   from std/io import Path, STDIN, STDOUT, STDERR;
-
+  
   let p := new Path("notes.txt");
   p.spew_utf8("hello\n");
-
+  
   p.each_line( line => {
     STDOUT.print(line);
   } );

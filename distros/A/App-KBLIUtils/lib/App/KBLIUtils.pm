@@ -7,30 +7,163 @@ use warnings;
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-14'; # DATE
+our $DATE = '2026-06-26'; # DATE
 our $DIST = 'App-KBLIUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
 my $res;
 
 $res = gen_read_table_func(
-    name => 'list_kbli_categories',
-    summary => 'List KBLI categories',
-    table_data => do { require TableData::Business::ID::KBLI::2020::Category; TableData::Business::ID::KBLI::2020::Category->new },
-);
-die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
-
-$res = gen_read_table_func(
-    name => 'list_kbli_codes',
-    summary => 'List KBLI codes',
+    name => 'list_kbli_2020_codes',
+    summary => 'List KBLI 2020 codes',
     table_data => do { require TableData::Business::ID::KBLI::2020::Code; TableData::Business::ID::KBLI::2020::Code->new },
 );
 die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
 
+
+$res = gen_read_table_func(
+    name => 'list_kbli_2025_codes',
+    summary => 'List KBLI 2025 codes',
+    table_data => do { require TableData::Business::ID::KBLI::2025::Code; TableData::Business::ID::KBLI::2025::Code->new },
+);
+die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
+
+$SPEC{compare_kbli_2020_2025_codes} = {
+    v => 1.1,
+    summary => 'Compare codes in KBLI 2020 vs 2025',
+    args => {
+        codes => {
+            schema => ['array*', of=>'str*', min_len=>1],
+            req => 1,
+            pos => 0,
+            slurpy => 1,
+        },
+    },
+};
+sub compare_kbli_2020_2025_codes {
+    my %args = @_;
+    my $codes = $args{codes}; $codes && @$codes or return [400, "Please specify one or more codes"];
+
+    my $td_2020 = do { require TableData::Business::ID::KBLI::2020::Code; TableData::Business::ID::KBLI::2020::Code->new };
+    my $td_2025 = do { require TableData::Business::ID::KBLI::2025::Code; TableData::Business::ID::KBLI::2025::Code->new };
+
+    my $res = [200, "OK", [], {"table.fields"=>[qw/code status title_2020 title_2025 description_2020 description_2025/]}];
+
+    my %rows_in_2020;
+    my %rows_in_2025;
+    $td_2020->each_item(sub { my ($row, $table, $index) = @_; if (grep { $_ == $row->[0] } @$codes) { $rows_in_2020{$row->[0]} = $row }; 1 });
+    $td_2025->each_item(sub { my ($row, $table, $index) = @_; if (grep { $_ == $row->[0] } @$codes) { $rows_in_2025{$row->[0]} = $row }; 1 });
+
+    #use DD; dd \%rows_in_2020; dd \%rows_in_2025;
+
+    for my $code (@$codes) {
+        my $row = {code => $code};
+        if    (!$rows_in_2020{$code} && !$rows_in_2025{$code}) { $row->{status} = "UNKNOWN" }
+        elsif ( $rows_in_2020{$code} &&  $rows_in_2025{$code}) { $row->{status} = "both exists" }
+        elsif (!$rows_in_2020{$code} &&  $rows_in_2025{$code}) { $row->{status} = "NEW IN 2025" }
+        elsif ( $rows_in_2020{$code} && !$rows_in_2025{$code}) { $row->{status} = "DELETED IN 2025" }
+
+        if ($rows_in_2020{$code}) { $row->{title_2020} = $rows_in_2020{$code}[1]; $row->{description_2020} = $rows_in_2020{$code}[2] }
+        if ($rows_in_2025{$code}) { $row->{title_2025} = $rows_in_2025{$code}[1]; $row->{description_2025} = $rows_in_2025{$code}[2] }
+
+        push @{$res->[2]}, $row;
+    }
+
+    $res;
+}
+
+$SPEC{get_kbli_2020_title} = {
+    v => 1.1,
+    summary => 'Get title for a KBLI 2020 code',
+    args => {
+        code => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub get_kbli_2020_title {
+    my %args = @_;
+    my $code = $args{code}; $code or return [400, "Please specify one or more codes"];
+
+    my $td = do { require TableData::Business::ID::KBLI::2020::Code; TableData::Business::ID::KBLI::2020::Code->new };
+
+    my $title;
+    $td->each_item(sub { my ($row, $table, $index) = @_; if ($code == $row->[0]) { $title = $row->[1]; 0 } else { 1 } });
+    if ($title) { [200, "OK", $title] } else { [404, "Code not found"] }
+}
+
+$SPEC{get_kbli_2020_description} = {
+    v => 1.1,
+    summary => 'Get description for a KBLI 2020 code',
+    args => {
+        code => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub get_kbli_2020_description {
+    my %args = @_;
+    my $code = $args{code}; $code or return [400, "Please specify one or more codes"];
+
+    my $td = do { require TableData::Business::ID::KBLI::2020::Code; TableData::Business::ID::KBLI::2020::Code->new };
+
+    my $description;
+    $td->each_item(sub { my ($row, $table, $index) = @_; if ($code == $row->[0]) { $description = $row->[2]; 0 } else { 1 } });
+    if ($description) { [200, "OK", $description] } else { [404, "Code not found"] }
+}
+
+$SPEC{get_kbli_2025_title} = {
+    v => 1.1,
+    summary => 'Get title for a KBLI 2025 code',
+    args => {
+        code => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub get_kbli_2025_title {
+    my %args = @_;
+    my $code = $args{code}; $code or return [400, "Please specify one or more codes"];
+
+    my $td = do { require TableData::Business::ID::KBLI::2025::Code; TableData::Business::ID::KBLI::2025::Code->new };
+
+    my $title;
+    $td->each_item(sub { my ($row, $table, $index) = @_; if ($code == $row->[0]) { $title = $row->[1]; 0 } else { 1 } });
+    if ($title) { [200, "OK", $title] } else { [404, "Code not found"] }
+}
+
+$SPEC{get_kbli_2025_description} = {
+    v => 1.1,
+    summary => 'Get description for a KBLI 2025 code',
+    args => {
+        code => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub get_kbli_2025_description {
+    my %args = @_;
+    my $code = $args{code}; $code or return [400, "Please specify one or more codes"];
+
+    my $td = do { require TableData::Business::ID::KBLI::2025::Code; TableData::Business::ID::KBLI::2025::Code->new };
+
+    my $description;
+    $td->each_item(sub { my ($row, $table, $index) = @_; if ($code == $row->[0]) { $description = $row->[2]; 0 } else { 1 } });
+    if ($description) { [200, "OK", $description] } else { [404, "Code not found"] }
+}
+
 1;
-# ABSTRACT: Utilities related to KBLI (ode Baku Lapangan Usaha, a.k.a. Standard Code of Business Field)
+# ABSTRACT: Utilities related to Indonesian KBLI ("Klasifikasi Baku Lapangan Usaha Indonesia" a.k.a. the Indonesian ISIC "International Standard Industrial Classification of All Economic Activities")
 
 __END__
 
@@ -40,11 +173,11 @@ __END__
 
 =head1 NAME
 
-App::KBLIUtils - Utilities related to KBLI (ode Baku Lapangan Usaha, a.k.a. Standard Code of Business Field)
+App::KBLIUtils - Utilities related to Indonesian KBLI ("Klasifikasi Baku Lapangan Usaha Indonesia" a.k.a. the Indonesian ISIC "International Standard Industrial Classification of All Economic Activities")
 
 =head1 VERSION
 
-This document describes version 0.002 of App::KBLIUtils (from Perl distribution App-KBLIUtils), released on 2023-02-14.
+This document describes version 0.003 of App::KBLIUtils (from Perl distribution App-KBLIUtils), released on 2026-06-26.
 
 =head1 DESCRIPTION
 
@@ -52,22 +185,204 @@ This distributions provides the following command-line utilities:
 
 =over
 
-=item * L<list-kbli-categories>
+=item 1. L<compare-kbli-2020-2025-codes>
 
-=item * L<list-kbli-codes>
+=item 2. L<get-kbli-2020-description>
+
+=item 3. L<get-kbli-2020-title>
+
+=item 4. L<get-kbli-2025-description>
+
+=item 5. L<get-kbli-2025-title>
+
+=item 6. L<list-kbli-2020-codes>
+
+=item 7. L<list-kbli-2025-codes>
 
 =back
+
+Keywords: KBLI, Klasifikasi Baku Lapangan Usaha Indonesia, ISIC, International Standard Industrial Classification of All Economic Activities
 
 =head1 FUNCTIONS
 
 
-=head2 list_kbli_categories
+=head2 compare_kbli_2020_2025_codes
 
 Usage:
 
- list_kbli_categories(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ compare_kbli_2020_2025_codes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-List KBLI categories.
+Compare codes in KBLI 2020 vs 2025.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<codes>* => I<array[str]>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 get_kbli_2020_description
+
+Usage:
+
+ get_kbli_2020_description(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Get description for a KBLI 2020 code.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<code>* => I<str>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 get_kbli_2020_title
+
+Usage:
+
+ get_kbli_2020_title(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Get title for a KBLI 2020 code.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<code>* => I<str>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 get_kbli_2025_description
+
+Usage:
+
+ get_kbli_2025_description(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Get description for a KBLI 2025 code.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<code>* => I<str>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 get_kbli_2025_title
+
+Usage:
+
+ get_kbli_2025_title(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Get title for a KBLI 2025 code.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<code>* => I<str>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 list_kbli_2020_codes
+
+Usage:
+
+ list_kbli_2020_codes(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+List KBLI 2020 codes.
 
 REPLACE ME
 
@@ -179,50 +494,6 @@ Select fields to return.
 
 Select fields to return.
 
-=item * B<name> => I<str>
-
-Only return records where the 'name' field equals specified value.
-
-=item * B<name.contains> => I<str>
-
-Only return records where the 'name' field contains specified text.
-
-=item * B<name.in> => I<array[str]>
-
-Only return records where the 'name' field is in the specified values.
-
-=item * B<name.is> => I<str>
-
-Only return records where the 'name' field equals specified value.
-
-=item * B<name.isnt> => I<str>
-
-Only return records where the 'name' field does not equal specified value.
-
-=item * B<name.max> => I<str>
-
-Only return records where the 'name' field is less than or equal to specified value.
-
-=item * B<name.min> => I<str>
-
-Only return records where the 'name' field is greater than or equal to specified value.
-
-=item * B<name.not_contains> => I<str>
-
-Only return records where the 'name' field does not contain specified text.
-
-=item * B<name.not_in> => I<array[str]>
-
-Only return records where the 'name' field is not in the specified values.
-
-=item * B<name.xmax> => I<str>
-
-Only return records where the 'name' field is less than specified value.
-
-=item * B<name.xmin> => I<str>
-
-Only return records where the 'name' field is greater than specified value.
-
 =item * B<queries> => I<array[str]>
 
 Search.
@@ -259,6 +530,50 @@ Order records according to certain field(s).
 A list of field names separated by comma. Each field can be prefixed with '-' to
 specify descending order instead of the default ascending.
 
+=item * B<title> => I<str>
+
+Only return records where the 'title' field equals specified value.
+
+=item * B<title.contains> => I<str>
+
+Only return records where the 'title' field contains specified text.
+
+=item * B<title.in> => I<array[str]>
+
+Only return records where the 'title' field is in the specified values.
+
+=item * B<title.is> => I<str>
+
+Only return records where the 'title' field equals specified value.
+
+=item * B<title.isnt> => I<str>
+
+Only return records where the 'title' field does not equal specified value.
+
+=item * B<title.max> => I<str>
+
+Only return records where the 'title' field is less than or equal to specified value.
+
+=item * B<title.min> => I<str>
+
+Only return records where the 'title' field is greater than or equal to specified value.
+
+=item * B<title.not_contains> => I<str>
+
+Only return records where the 'title' field does not contain specified text.
+
+=item * B<title.not_in> => I<array[str]>
+
+Only return records where the 'title' field is not in the specified values.
+
+=item * B<title.xmax> => I<str>
+
+Only return records where the 'title' field is less than specified value.
+
+=item * B<title.xmin> => I<str>
+
+Only return records where the 'title' field is greater than specified value.
+
 =item * B<with_field_names> => I<bool>
 
 Return field names in each record (as hashE<sol>associative array).
@@ -283,13 +598,13 @@ Return value:  (any)
 
 
 
-=head2 list_kbli_codes
+=head2 list_kbli_2025_codes
 
 Usage:
 
- list_kbli_codes(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ list_kbli_2025_codes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-List KBLI codes.
+List KBLI 2025 codes.
 
 REPLACE ME
 
@@ -521,6 +836,12 @@ website's UI is an abomination).
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@gmail.com>
+
 =head1 CONTRIBUTING
 
 
@@ -541,7 +862,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

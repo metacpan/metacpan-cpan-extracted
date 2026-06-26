@@ -2,7 +2,7 @@ package Zuzu::Marshal::CBOR;
 
 use utf8;
 
-our $VERSION = '0.006000';
+our $VERSION = '0.007000';
 
 use Exporter qw( import );
 use B qw( SVf_IOK SVf_NOK SVf_POK svref_2object );

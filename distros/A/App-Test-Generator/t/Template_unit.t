@@ -61,4 +61,38 @@ subtest 'get_data_section() content for test.tt contains expected Perl boilerpla
 	like(${ $result }, qr/use warnings/, 'template contains "use warnings"');
 };
 
+# ==================================================================
+# _dedup_cases (embedded in the test.tt template, copied verbatim
+# into every generated .t file — extract its source and eval it in
+# isolation to exercise the dedup logic directly).
+#
+# Regression: a `return \@rc;` inside the `eval { }` block returns
+# from the eval, not from _dedup_cases — the deduped result must be
+# captured from the eval's value, or the sub always falls through to
+# returning the original, undeduplicated $cases.
+# ==================================================================
+
+subtest '_dedup_cases removes duplicate cases' => sub {
+	my $template = ${ App::Test::Generator::Template->get_data_section('test.tt') };
+
+	my ($sub_src) = $template =~ /(sub _dedup_cases\b.*?\n\}\n)/s;
+	ok($sub_src, 'extracted _dedup_cases source from test.tt template');
+
+	package Template::TestSandbox;
+	use JSON::PP qw(encode_json);
+	eval $sub_src; ## no critic
+	die "failed to eval _dedup_cases: $@" if $@;
+	package main;
+
+	my @cases = (
+		{ a => 1, b => 2 },
+		{ a => 1, b => 2 },
+		{ a => 3, b => 4 },
+	);
+
+	my $deduped = Template::TestSandbox::_dedup_cases(\@cases);
+
+	is(scalar(@{$deduped}), 2, 'duplicate case was removed');
+};
+
 done_testing();

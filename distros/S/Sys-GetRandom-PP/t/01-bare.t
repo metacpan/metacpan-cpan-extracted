@@ -5,6 +5,10 @@ use Test2::V0;
 
 use Sys::GetRandom::PP qw(getrandom random_bytes GRND_NONBLOCK GRND_RANDOM);
 
+getrandom ${\my $tmp}, 1
+    or die "getrandom(): $!";
+pass "getrandom() does not fail outright";
+
 {
     my $buf = [];
     is getrandom($buf, 1, GRND_RANDOM), 1, "getrandom() < 256 returns full result with GRND_RANDOM";

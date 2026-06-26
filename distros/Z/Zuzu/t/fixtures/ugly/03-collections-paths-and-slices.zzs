@@ -1,0 +1,36 @@
+from std/path/simple import SimplePath;from test/more import *;
+
+class Owner{let String label with get;}
+function owner(String label){return new Owner(label:label);}
+
+let data:={users:[
+	{name:"Ada",roles:<<"admin","editor">>},
+{name:"Bea",roles:<<"reader">>},],
+ counts:<<<"red","red","blue">>>,meta:{{source:"generated",source:"fixture",ok:true}},};
+
+let{users,meta:PairList metadata}:=data;let first_name:=data@"/users/#0/name";
+let all_names:=data@@"/users/*/name"; let has_admin:=data@?"/users/#0/roles/*";
+
+{       SimplePath.use();first_name:=data@"users[0].name"; }
+
+let text:="a😀cdef";let middle:=text[1:2];text[1]:="B";
+let bytes:=to_binary("abcdef");bytes[2:2]:=to_binary("XY");
+
+let dict_keys:=[];dict_keys.push(^^.key)for data.enumerate();
+
+let owner_source:={saved:owner("short-lived")};let{saved:weak_owner but weak}:=owner_source;
+let before_drop:=weak_owner.get_label();owner_source:=null;
+
+let collection_score:=0; collection_score+=1 if"admin"∈data{users}[0]{roles};
+collection_score+=2 unless"writer" in data{users}[1]{roles};
+collection_score+=([1,2]⋃[2,3]).length(); collection_score+=(<<1,2>> intersection<<2,3>>).length();
+	collection_score+=(<<<1,2,2>>>\<<<2>>>).length();
+
+is(first_name,"Ada","path operator found first name");is(all_names,["Ada","Bea"],"path operator selected all names");
+ok(has_admin,"path existence operator returned true"); is(users[1]{name},"Bea","destructured array supports indexes");
+is(metadata.get_all("source"),["generated","fixture"],"pairlist kept duplicates");
+is(dict_keys.sort(fn(a,b)->a cmp b),["counts","meta","users"],"dict enumerate worked",);
+is(middle,"😀c","string slice used character offsets");is(text,"aBcdef","string index assignment worked");
+is(to_string(bytes),"abXYef","binary string slice assignment worked"); is(before_drop,"short-lived","weak destructuring read live object");
+is(weak_owner,null,"weak destructuring cleared after source drop");is(collection_score,8,"sets, bags, arrays, unicode operators combined");
+done_testing();

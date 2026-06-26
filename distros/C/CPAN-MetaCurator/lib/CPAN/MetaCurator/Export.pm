@@ -18,6 +18,8 @@ use Moo;
 
 use Syntax::Keyword::Match;
 
+use Tree::DAG_Node;
+
 use Types::Standard qw/Str/;
 
 has test_topics_path =>
@@ -28,9 +30,10 @@ has test_topics_path =>
 	required	=> 0,
 );
 
+our $leaf_id;
 our %seen;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 # -----------------------------------------------
 
@@ -44,18 +47,17 @@ sub export_tree
 	my($pad)					= $self -> build_pad;
 	my($header, $body, $footer)	= $self -> build_html($pad); # Returns templates.
 	my(@list)					= '<ul>';
-	my($root)					= shift @{$$pad{topics} }; # I.e.: {parent_id => 1, text => 'Root', title => 'MetaCurator'}.
-	my($id)						= $$pad{topic_html_ids}{$$root{title} };
+	my($origin)					= shift @{$$pad{topics} }; # I.e.: {parent_id => 1, text => 'Root', title => 'MetaCurator'}.
+	my($not_used)				= $$pad{topic_html_ids}{$$origin{title} };
+	$leaf_id					= 0;
+	my($root)					= Tree::DAG_Node -> new({name => $$origin{title}, attributes => {id => $leaf_id} });
 
 	$self -> logger -> info($self -> visual_break);
-	$self -> logger -> info("Topic: id: $id. title: $$root{title}");
+	$self -> logger -> info("Topic: id: $leaf_id. title: $$origin{title}");
 
-	push @list, qq|<li data-jstree='{"opened": true}' id = '$id'><a href = '#'>$$root{title}</a>|;
+	push @list, qq|<li data-jstree='{"opened": true}' id = '$leaf_id'><a href = '#'>$$origin{title}</a>|;
 	push @list, '<ul>';
 
-	my(@divs);
-	my($item);
-	my($leaf_id, $lines_ref);
 	my(%wanted);
 
 	# Read data/testing.topics.txt for topic names to process. This just limits the output.
@@ -67,8 +69,7 @@ sub export_tree
 		$wanted{$_}			= true for (@$test_topics);
 	}
 
-	# If the file is empty, activate all topics.
-	# Fix me. Add file name & purpose to POD.
+	# If the file is absent or empty, activate all topics.
 
 	my(@keys) = keys %wanted;
 
@@ -77,27 +78,49 @@ sub export_tree
 		$wanted{$$_{title} } = true for (@{$$pad{topics} });
 	}
 
+	my($daughter);
+	my($item, $items_ref);
+	my($see_also_ref);
+
 	for my $topic (@{$$pad{topics} })
 	{
 		next if (! $wanted{$$topic{title} });
 
 		$self -> logger -> info("Topic: id: $$topic{id}. html_id: $$pad{topic_html_ids}{$$topic{title}}. title: $$topic{title}");
 
-		$leaf_id	= $$pad{topic_html_ids}{$$topic{title} };
-		$lines_ref	= $self -> parse_topic($leaf_id, $pad, $topic);
+		$daughter = Tree::DAG_Node -> new({name => $$topic{title}, attributes => {id => ++$leaf_id} });
+
+		$root -> add_daughter($daughter);
+
+		($items_ref, $see_also_ref) = $self -> parse_topic($daughter, $pad, $topic);
+
+		$self -> logger -> info("parse_topic() returned: $#$items_ref, $#$see_also_ref");
+
+		++$leaf_id;
 
 		push @list, qq|\t<li data-jstree='{"opened": false}' id = '$leaf_id'>$$topic{title}|;
 		push @list, '<ul>';
 
-		for (@$lines_ref)
+		for $item (@$items_ref)
 		{
+			++$leaf_id;
 			$$pad{count}{leaf}++;
 
-			push @list, $$_{html} ? "<li>$$_{html}</li>" : "<li id = '$$_{id}'>$$_{text}</li>";
+			if ($$item{text} eq 'See also')
+			{
+				push @list, qq|\t<li data-jstree='{"opened": false}' id = '$leaf_id'>See also|;
+				push @list, "\t<ul>";
+				push @list, qq|\t\t<li>$$_{text}</li>| for (@$see_also_ref);
+				push @list, "\t</ul>";
+				push @list, "\t</li>";
+			}
+			else
+			{
+				push @list, $$item{html} ? "<li>$$item{html}</li>" : "<li id = '$$item{id}'>$$item{text}</li>";
+			}
 		}
 
-		push @list, '</ul>';
-		push @list, '</li>';
+		push @list, '</ul>', '</li>';
 
 		$self -> logger -> info($self -> visual_break);
 	}
@@ -115,17 +138,12 @@ sub export_tree
 	$self -> write_file($header, $body, $footer, $pad);
 	$self -> logger -> info("$_ count: $$pad{count}{$_}") for (sort keys %{$$pad{count} });
 
-=pod
-	# Modules.
-	# There is a db table called modules so we need another name for the hash
-	# where the keys are the names of the modules and the values are db ids.
-
-	$$pad{module_names}				= {};
-	$$pad{module_names}{$$_{name} }	= $$_{id} for (@{$$pad{modules} });
-	my($module_count)				= $#{$$pad{module_names} } + 1;
-
-	$self -> logger -> info("Records in the module table: $module_count");
-=cut
+	# This works. It's very plain.
+	#say $root -> name;
+	#say map{"\t" . $_ -> name . "\n"} $root -> daughters;
+	#
+	# This works. It's nicer.
+	#say map("$_\n", @{$root->tree2string});
 
 	return 0;
 
@@ -185,30 +203,25 @@ sub gather_statistics
 
 sub parse_topic
 {
-	my($self, $leaf_id, $pad, $topic)	= @_;
-	my(@lines)							= split(/\n/, $$topic{text});
-	@lines								= grep{length} map{s/^\s+//; s/:\s*$//; $_} @lines;
-	my($line_id)						= $leaf_id;
-	my($index)							= -1;
+	my($self, $daughter, $pad, $topic) = @_;
+	my(@lines)	= split(/\n/, $$topic{text});
+	@lines		= grep{length} map{s/^\s+//; s/:\s*$//; $_} @lines;
+	my($index)	= -1;
 
 	$self -> logger -> debug("Topic: $$topic{title}. Line count: $#lines");
 
-	my(%button);
+	my(@components);
 	my($description);
 	my(@extras);
 	my($href);
-	my(%inside, $item, @items);
+	my(%inside, $is_topic, $item, @items);
 	my($line, $line_count);
-	my($module);
+	my($module, $module_leaf);
 	my(%node_type);
 	my(@pre_pre);
-	my(@see_also);
+	my($see_also_root, $see_also_1, @see_also);
 	my($token);
 
-	$button{extras}		= '';
-	$button{faq}		= '';
-	$button{pre_pre}	= "<span>&nbsp;&nbsp;</span><button id='toggle-btn'>TBA: [pre.../pre]</button>";
-	$button{see_also}	= "<button id='toggle-btn'>TBA: [See also]</button>";
 	$inside{pre_pre}	= false;
 	$inside{see_also}	= false;
 
@@ -216,7 +229,7 @@ sub parse_topic
 	{
 		$index++;
 
-		$item	= {href => '', id => ++$line_id, text => ''};
+		$item	= {href => '', id => ++$leaf_id, text => ''};
 		$line	= $lines[$index];
 		$token	= ($line =~ /^o (.+)/) ? $1 : '';
 
@@ -234,15 +247,17 @@ sub parse_topic
 		if ($token eq 'See also')
 		{
 			$inside{see_also}	= true;
-			$$item{html}		= $button{see_also};
-			$$item{text}		= '';
+			$$item{text}		= 'See also';
 
 			push @items, $item;
+
+			$see_also_root = Tree::DAG_Node -> new({name => 'See also', attributes => {id => ++$leaf_id} });
+
+			$daughter -> add_daughter($see_also_root);
 		}
 		elsif ($token)
 		{
 			$description		= '';
-			$href				= '';
 			$inside{see_also}	= false;
 			$line_count			= 0;
 			$module				= $token;
@@ -262,11 +277,7 @@ sub parse_topic
 		{
 			# Fix me. What happens if there are 2 sets of <pre>...</pre> within 1 topic?
 
-			$inside{pre_pre}	= true;
-#			$$item{html}		= $button{pre_pre};
-#			$$item{text}		= '';
-#
-#			push @items, $item;
+			$inside{pre_pre} = true;
 		}
 		elsif ($line =~ m|</pre>|)
 		{
@@ -287,7 +298,33 @@ sub parse_topic
 
 			if ($inside{see_also})
 			{
-				push@see_also, $token;
+				# Sample from topic AbCeDarian:
+				# It means in abcd order, i.e. alphabetical, so I can put it first in the list of topics :-)
+				# Sample from topic AiEngines:
+				# [[Acronyms]]
+
+				$$item{text}	= $token;
+				@components		= split(' - ', $token); # [0] may be text or Topic.
+				$components[0]	= $token if ($#components < 0);
+
+				# Must allow for topics AssemblerX86 & UTF8.
+
+				if ($components[0] =~ m/^\[\[([A-Za-z]+\d?\d?)\]\]/)
+				{
+					$components[0]	= $1;
+					$$item{text}	= $1;
+				}
+
+				$components[0]	= '' if ($components[0] !~ m/^[A-Za-z]+\d{0,2}$/);
+				$is_topic		= $$pad{topic_names}{$components[0]}; # Defined => it's a topic.
+				$$item{text}	= "[Topic] $$item{text}" if ($is_topic && ($$item{text} !~ m/^http/) );
+				$$item{text}	= $token if ($token =~ /^http/);
+
+				push@see_also, $item;
+
+				$see_also_1	= Tree::DAG_Node -> new({name => $$item{text}, attributes => {id => ++$leaf_id} });
+
+				$see_also_root -> add_daughter($see_also_1);
 			}
 			elsif ($line_count == 1)
 			{
@@ -296,10 +333,14 @@ sub parse_topic
 			elsif ($line_count == 2)
 			{
 				$href			= $token;
-				$$item{html}	= "<span><a href = '" . escape_html($href) . "' target = '_blank'>$module - $description</a></span><span>.</span>";
+				$$item{html}	= "<a href = '" . escape_html($href) . "' target = '_blank'>$module - $description</a>";
 				$$item{text}	= '';
 
 				push @items, $item;
+
+				$module_leaf = Tree::DAG_Node -> new({name => $module, attributes => {id => ++$leaf_id} });
+
+				$daughter -> add_daughter($module_leaf);
 			}
 			else
 			{
@@ -308,7 +349,7 @@ sub parse_topic
 		}
 	}
 
-	return [@items];
+	return ([@items], [@see_also]);
 
 } # End of parse_topic.
 
@@ -317,14 +358,16 @@ sub parse_topic
 sub write_file
 {
 	my($self, $header, $body, $footer, $pad) = @_;
-	my($encoding)		= lc $$pad{encoding};
-	my($output_path)	= File::Spec -> catfile($self -> home_path, $self -> output_path);
+	my($output_path) = File::Spec -> catfile($self -> home_path, $self -> output_path);
 
-	open(my $fh, ">$encoding", $output_path);
+	# $$pad{encoding} has a : prefix, & the value is from the constants table, which is from
+	# /home/ron/perl.modules/CPAN-MetaCurator/data/cpan.metacurator.constants.csv.
+
+	open(my $fh, ">$$pad{encoding}", $output_path);
 	print $fh $header, $body, $footer;
 	close $fh;
 
-	$self -> logger -> info("Created $output_path. Encoding: $encoding");
+	$self -> logger -> info("Created $output_path. Encoding: $$pad{encoding}");
 
 } # End of write_file.
 
@@ -341,6 +384,20 @@ The file Changes was converted into Changelog.ini by L<Module::Metadata::Changes
 =head1 Version Numbers
 
 Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
+
+=head1 Test data
+
+There is a mechanism to restrict processing to a tiny number of topics.
+
+To this end there is an option called test_topics_path, which takes a file name.
+If this file is present it is read, & each line in it is assumed to be a topic name.
+
+Topics listed are wanted, & so the program skips processing any other topics.
+
+There is a special case. If the file is present but empty, or absent, all topics are deemed
+to appear in the file & hence are processed.
+
+Default: /tmp/test.topics.txt.
 
 =head1 Support
 

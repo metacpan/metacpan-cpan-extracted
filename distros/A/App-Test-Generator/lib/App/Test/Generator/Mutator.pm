@@ -28,7 +28,7 @@ Readonly my $LEVEL_FAST => 'fast';
 Readonly my $DEFAULT_LIB_DIR => 'lib';
 Readonly my $DEFAULT_MUTATION_LEVEL => $LEVEL_FULL;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ App::Test::Generator::Mutator - Generate and apply mutation tests
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 DESCRIPTION
 
@@ -209,8 +209,11 @@ sub generate_mutants {
 	my @mutants;
 
 	# Run each registered mutation strategy against the document,
-	# excluding any candidates on skip-annotated lines
+	# excluding any candidates on skip-annotated lines. applies_to()
+	# is a cheap pre-filter -- skip the mutate() walk entirely for
+	# strategies that have nothing to match in this document.
 	for my $mutation (@{$self->{mutations}}) {
+		next unless $mutation->applies_to($doc);
 		push @mutants, grep { !$skip_lines{$_->line} } $mutation->mutate($doc);
 	}
 
@@ -357,7 +360,7 @@ sub apply_mutant {
 	# Parse the workspace copy and apply the mutation transform
 	my $doc = PPI::Document->new($target) or croak "Failed to parse $target";
 
-	$mutant->{transform}->($doc);
+	$mutant->transform->($doc);
 
 	$doc->save($target);
 }
@@ -437,9 +440,9 @@ sub _dedup_mutants {
 	for my $m (@{$mutants}) {
 		# Build a stable key from metadata — not from the coderef
 		my $key = join '|',
-			$m->{line}        // '',
-			$m->{original}    // '',
-			$m->{description} // '';
+			$m->line        // '',
+			$m->original    // '',
+			$m->description // '';
 
 		next if $seen{$key}++;
 		next if _is_redundant_mutation($m);
@@ -457,7 +460,7 @@ sub _dedup_mutants {
 #     redundant and should be skipped in fast
 #     mutation mode.
 #
-# Entry:      $m - a Mutant hashref.
+# Entry:      $m - a Mutant object.
 #
 # Exit:       Returns 1 if redundant, 0 otherwise.
 #
@@ -471,7 +474,7 @@ sub _dedup_mutants {
 sub _is_redundant_mutation {
 	my ($m) = @_;
 
-	my $orig = $m->{original} // '';
+	my $orig = $m->original // '';
 
 	# Arithmetic no-ops add nothing to mutation coverage
 	return 1 if $orig =~ /\+\s*0$/;
@@ -479,7 +482,7 @@ sub _is_redundant_mutation {
 
 	# Double negation inside conditionals forces boolean context
 	# in Perl and is not a meaningful mutation
-	if($m->{context} && $m->{context} eq 'conditional') {
+	if($m->context && $m->context eq 'conditional') {
 		return 1 if $orig =~ /^\!\!/;
 	}
 
@@ -487,7 +490,7 @@ sub _is_redundant_mutation {
 	return 1 if $orig =~ /^\s*(?:1|0)\s*$/;
 
 	# Mutations inside comments are unreachable code
-	return 1 if $m->{line_content} && $m->{line_content} =~ /^\s*#/;
+	return 1 if $m->line_content && $m->line_content =~ /^\s*#/;
 
 	return 0;
 }

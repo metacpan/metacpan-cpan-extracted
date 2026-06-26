@@ -7,19 +7,19 @@ std/net/smtp - low-level mail delivery.
 =head1 SYNOPSIS
 
   from std/net/smtp import Mailer, MailResult;
-
+  
   let headers := new PairList();
   headers.add( "From", "sender@example.test" );
   headers.add( "To", "recipient@example.test" );
   headers.add( "Subject", "Example" );
   headers.add( "Message-ID", "<example-1@example.test>" );
-
+  
   let mailer := new Mailer(
     transport: "smtp",
     host: "127.0.0.1",
     port: 2525
   );
-
+  
   let result := mailer.send(
     "sender@example.test",
     [ "recipient@example.test" ],

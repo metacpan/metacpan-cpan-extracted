@@ -1,6 +1,6 @@
 package CPAN::MetaCurator;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 #-------------------------------------------------
 
@@ -38,8 +38,13 @@ Note: My web host and I use case-sensitive file systems.
 =head2 Rebuild Perl Wiki Tree
 
 =over
-=item Run: INCLUDE_PACKAGES=1 - if you have /tmp/cpan.metapackager.sqlite available & to 0 (default) otherwise
+=item 'Run' here means run from the bash command line
+=item Run: cp ~/backup/02packages.details.txt /tmp
+=item Next, set INCLUDE_PACKAGES thus:
+=item If you have /tmp/cpan.metapackager.sqlite available use INCLUDE_PACKAGES=1 or 0 (default) otherwise
+=item Run: INCLUDE_PACKAGES=1
 =item Run: echo $INCLUDE_PACKAGES
+=item Run: export INCLUDE_PACKAGES
 =item Run: scripts/build.db.sh - to import tiddlers.json file into database data/cpan.metacurator.sqlite
 =item Run: scripts/export.tree.sh - to export CPAN::MetaCurator database to html/cpan.metacurator.tree.html
 =item Run: git push
@@ -49,7 +54,7 @@ Note: My web host and I use case-sensitive file systems.
 
 =over
 =item cd ~/perl.modules/Local-Website
-=item Edit Local::Website::Util::PatchIndex's sub parser() if necessary
+=item Edit Local::Website's data/patches.csv
 =item Run: scripts/parse.index.sh - to patch ~/savage.net.au/index.html
 =item Run: bu5.sh savage.net.au
 =item Run: bu5.sh perl.modules

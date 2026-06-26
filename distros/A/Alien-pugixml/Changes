@@ -1,5 +1,9 @@
 Revision history for Alien-pugixml
 
+0.03  2026-06-25
+    - Source build updated to pugixml 1.16
+    - Require pugixml >= 1.8 for system detection
+
 0.02  2026-03-04
     - Add CI for Linux, macOS, FreeBSD
     - Fix repository metadata

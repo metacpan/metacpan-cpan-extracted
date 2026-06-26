@@ -1,3 +1,6 @@
+0.09  2026-06-25
+    - Add support for OpenBSD using getentropy(2).
+
 0.08  2026-05-29
     - Implement getrandom's 4th parameter ("offset"), mimicking Sys::GetRandom
       more closely.

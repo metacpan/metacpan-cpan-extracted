@@ -7,13 +7,13 @@ std/log - Structured logging helpers for scripts.
 =head1 SYNOPSIS
 
   from std/log import Log;
-
+  
   Log.configure( {
     level: "info",
     timestamps: 1,
     stderr_for_errors: 1,
   } );
-
+  
   Log.info( "started" );
   Log.warn( "missing value for ", "foo" );
 

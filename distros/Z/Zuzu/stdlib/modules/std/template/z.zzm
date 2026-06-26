@@ -7,12 +7,12 @@ std/template/z - Pure ZuzuScript template engine.
 =head1 SYNOPSIS
 
   from std/template/z import ZTemplate;
-
+  
   let inline := new ZTemplate(
     string: "Hello {{ user/name }}!",
   );
   say( inline.process( { user: { name: "Ada" } } ) );
-
+  
   let file_tmpl := new ZTemplate(
     file: "templates/page.zt",
     escape: "html",

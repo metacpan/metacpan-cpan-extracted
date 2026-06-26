@@ -7,7 +7,7 @@ std/math - Mathematical constants and functions.
 =head1 SYNOPSIS
 
   from std/math import Math, π;
-
+  
   let r := 3;
   let a := π * Math.pow(r, 2);
   let s := Math.sin(Math.deg2rad(90));

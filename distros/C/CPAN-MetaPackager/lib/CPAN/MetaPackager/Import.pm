@@ -23,7 +23,7 @@ has packages_path =>
 	required	=> 0,
 );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 # -----------------------------------------------
 

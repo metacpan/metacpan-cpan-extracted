@@ -1,11 +1,11 @@
-package Test::App::Generator::Sample::Module;
+package App::Test::Generator::Sample::Module;
 
 use strict;
 use warnings;
 use Carp    qw(croak);
 use Readonly;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 # --------------------------------------------------
 # Validation constants — centralised so that changes
@@ -22,17 +22,17 @@ Readonly my $PASS_THRESHOLD => 60.0;
 
 =head1 NAME
 
-Test::App::Generator::Sample::Module - Example module for schema extraction testing
+App::Test::Generator::Sample::Module - Example module for schema extraction testing
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 SYNOPSIS
 
-    use Test::App::Generator::Sample::Module;
+    use App::Test::Generator::Sample::Module;
 
-    my $obj = Test::App::Generator::Sample::Module->new();
+    my $obj = App::Test::Generator::Sample::Module->new();
     my $result = $obj->validate_email('user@example.com');
 
 =head1 DESCRIPTION
@@ -46,7 +46,7 @@ so that the extractor's heuristics can be tested against known inputs.
 
 Constructor. Returns a new instance.
 
-    my $obj = Test::App::Generator::Sample::Module->new();
+    my $obj = App::Test::Generator::Sample::Module->new();
 
 =head3 Returns
 
@@ -60,7 +60,7 @@ A blessed hashref.
 
 =head4 output
 
-    { type => OBJECT, isa => 'Test::App::Generator::Sample::Module' }
+    { type => OBJECT, isa => 'App::Test::Generator::Sample::Module' }
 
 =cut
 
@@ -96,7 +96,7 @@ String (C<$MIN_EMAIL_LEN>-C<$MAX_EMAIL_LEN> chars). Required.
 =head4 input
 
     {
-        self  => { type => OBJECT, isa => 'Test::App::Generator::Sample::Module' },
+        self  => { type => OBJECT, isa => 'App::Test::Generator::Sample::Module' },
         email => { type => SCALAR, min => 5, max => 254 },
     }
 
@@ -146,7 +146,7 @@ Age in years as an integer.
 =head4 input
 
     {
-        self       => { type => OBJECT, isa => 'Test::App::Generator::Sample::Module' },
+        self       => { type => OBJECT, isa => 'App::Test::Generator::Sample::Module' },
         birth_year => { type => SCALAR, min => 1900 },
     }
 
@@ -198,7 +198,7 @@ Count of non-empty name strings as an integer.
 =head4 input
 
     {
-        self  => { type => OBJECT,   isa => 'Test::App::Generator::Sample::Module' },
+        self  => { type => OBJECT,   isa => 'App::Test::Generator::Sample::Module' },
         names => { type => ARRAYREF },
     }
 
@@ -249,7 +249,7 @@ Hashref of configuration options. Required.
 =head4 input
 
     {
-        self   => { type => OBJECT,  isa => 'Test::App::Generator::Sample::Module' },
+        self   => { type => OBJECT,  isa => 'App::Test::Generator::Sample::Module' },
         config => { type => HASHREF },
     }
 
@@ -301,7 +301,7 @@ Greeting string of the form C<"$greeting, $name!">.
 =head4 input
 
     {
-        self     => { type => OBJECT, isa => 'Test::App::Generator::Sample::Module' },
+        self     => { type => OBJECT, isa => 'App::Test::Generator::Sample::Module' },
         name     => { type => SCALAR, min => 1, max => 50 },
         greeting => { type => SCALAR, optional => 1 },
     }
@@ -351,7 +351,7 @@ Boolean scalar.
 =head4 input
 
     {
-        self    => { type => OBJECT, isa => 'Test::App::Generator::Sample::Module' },
+        self    => { type => OBJECT, isa => 'App::Test::Generator::Sample::Module' },
         enabled => { type => SCALAR },
     }
 
@@ -395,7 +395,7 @@ C<'Fail'> otherwise. Croaks on invalid input.
 =head4 input
 
     {
-        self  => { type => OBJECT, isa => 'Test::App::Generator::Sample::Module' },
+        self  => { type => OBJECT, isa => 'App::Test::Generator::Sample::Module' },
         score => { type => SCALAR, min => 0.0, max => 100.0 },
     }
 

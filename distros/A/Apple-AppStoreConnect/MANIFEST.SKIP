@@ -8,6 +8,7 @@ _build/
 cover_db/
 blib/
 .git/
+.gitignore
 .github
 inc/
 .lwpcookies

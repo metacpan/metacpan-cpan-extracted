@@ -7,14 +7,14 @@ std/path/jsonpointer - RFC 6901 JSON Pointer selectors.
 =head1 SYNOPSIS
 
   from std/path/jsonpointer import JSONPointer;
-
+  
   let data := {
     users: [
       { name: "Ada" },
       { name: "Bob" },
     ],
   };
-
+  
   let pointer := new JSONPointer( path: "/users/0/name" );
   say( pointer.first(data) );
 

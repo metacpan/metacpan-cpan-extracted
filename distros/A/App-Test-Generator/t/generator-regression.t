@@ -96,4 +96,30 @@ lives_ok {
 	);
 } 'hashref schema generates LectroTest code';
 
+#--------------------------------------------------------------------------
+# 8. 'matches' patterns containing an unescaped '/' must not break out of
+#    the generated qr// delimiter and inject code into the generated test
+#--------------------------------------------------------------------------
+{
+	my $breakout = q{a/; system('touch /tmp/pwned'); qr/b};
+
+	my $code;
+	lives_ok {
+		$code = App::Test::Generator::_schema_to_lectrotest_generator(
+			'name',
+			{ type => 'string', matches => $breakout }
+		);
+	} 'matches pattern containing / does not croak';
+
+	unlike(
+		$code, qr/\);\s*system\(/,
+		'matches pattern is not spliced as a bare statement-breaking system() call'
+	);
+
+	like(
+		$code, qr/qr\{/,
+		'matches pattern is re-embedded via the safe qr{} form'
+	);
+}
+
 done_testing();

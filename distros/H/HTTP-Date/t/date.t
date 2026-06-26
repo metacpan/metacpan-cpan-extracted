@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 141;
+use Test::More tests => 156;
 use HTTP::Date;
 
 # test str2time for supported dates.  Test cases with 2 digit year
@@ -53,7 +53,10 @@ my (@tests) = (
     '  03   Feb   1994  0:00  ',
 
     # Tests a commonly used (faulty?) date format of php cms systems
-    'Thu, 03 Feb 1994 00:00:00 +0000 GMT'
+    'Thu, 03 Feb 1994 00:00:00 +0000 GMT',
+
+    # Test with Time::Zone
+    '03 Feb 1994 02:00:00 CEST',
 );
 
 my $time = 760233600;    # assume broken POSIX counting of seconds
@@ -114,6 +117,14 @@ for (
     '1980-01-01 25:00:00',
     '1980-01-01 00:61:00',
     '1980-01-01 00:00:61',
+
+    # Negative time
+    '1880-01-01',
+    'Thu, 01 Jan 1880 00:00:00 GMT',
+    '01/Jan/1880:00:00:00 0000',
+
+    # Bad timezone string
+    '01 Jan 1994 02:00:00 BAD',
 ) {
     my $bad = 0;
     eval {
@@ -186,6 +197,17 @@ use HTTP::Date qw(parse_date);
 
 my @d = parse_date("Jan 1 2001");
 is_deeply( \@d, [2001, 1, 1, 0, 0, 0, undef] );
+
+# A malformed timezone with a doubled colon must be rejected, not silently
+# captured as the timezone. RT #101378 / GH #7.
+is_deeply( [ parse_date("1996-02-29 12:00:00 -01::00") ],
+    [], 'malformed timezone -01::00 is rejected' );
+
+# Well-formed timezone variants must still parse, returning the timezone intact.
+for my $tz ('-01:00', '-0100', '-01') {
+    my @d = parse_date("1996-02-29 12:00:00 $tz");
+    is( $d[6], $tz, "timezone $tz still accepted" );
+}
 
 # This test will break around year 2070
 is( parse_date("03-Feb-20"), "2020-02-03 00:00:00" );

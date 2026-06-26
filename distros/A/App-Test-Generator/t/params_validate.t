@@ -3,8 +3,12 @@ use strict;
 use warnings;
 
 # use Test::DescribeMe qw(extended);
+#
+# No Test::Needs gate: this fixture's "use Params::Validate" appears only
+# inside a heredoc representing a target module's source, parsed as plain
+# text by PPI and Safe->reval(). Params::Validate is never actually loaded
+# by this test.
 use Test::Most;
-use Test::Needs 'Params::Validate';
 use File::Temp qw(tempdir);
 use File::Spec;
 

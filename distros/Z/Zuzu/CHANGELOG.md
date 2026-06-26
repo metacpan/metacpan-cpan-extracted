@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project roughly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 but using Perlish version numbers like `x.yyyzzz` instead of `x.y.z`.
 
+## 0.007000 - 2026-06-25
+
+*stdlib tag 20260625, languagetests tag 20260625.*
+
+### Added
+
+- Added the `#value` cardinality prefix operator, which calls a concrete
+  `count()` method when available and otherwise follows `length` semantics.
+- Declaration destructuring now accepts Array sources and binds entries by
+  position while preserving defaults, type checks, and weak storage.
+- User-defined classes can now define `__call__(String name, Array args,
+  PairList opts)` as a fallback for missing method calls, after ordinary
+  direct, inherited, and trait-supplied method lookup.
+- Added `std/string.repeat` for repeating `String` or `BinaryString` values
+  with optional same-type separators.
+- Switch case and default bodies now have access to the active switch value
+  via `^^`, including when execution falls through cases.
+
+### Fixed
+
+- `switch` no longer executes the `default` block after a matched case unless
+  fall-through was requested with `continue`.
+- Updated the vendored `languagetests` pointer for `switch` coverage to include
+  `^^` visibility in unmatched `default` branches.
+
 ## 0.006000 - 2026-06-19
 
 ### Fixed

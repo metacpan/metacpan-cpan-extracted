@@ -416,4 +416,33 @@ END_MODULE
     done_testing();
 };
 
+# Regression: signature splitting must respect nested brackets in a
+# default value -- a default like { a => 1, b => 2 } contains commas
+# that must not be mistaken for parameter separators
+subtest 'Signature splitting respects commas nested in a default value' => sub {
+    my $module = <<'END_MODULE';
+package Test::NestedDefault;
+use strict;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+sub configure($self, $opts = { a => 1, b => 2 }, $name = 'x') {
+    return $opts;
+}
+
+END_MODULE
+
+    my $extractor = create_extractor($module);
+    my $schemas = $extractor->extract_all();
+
+    my $configure = $schemas->{configure};
+
+    ok(exists $configure->{input}{opts}, 'opts param extracted');
+    ok(exists $configure->{input}{name}, 'name param extracted, not swallowed by nested comma');
+    is($configure->{input}{name}{_default}, 'x', 'name default correctly parsed after nested-bracket default');
+
+    done_testing();
+};
+
 done_testing();

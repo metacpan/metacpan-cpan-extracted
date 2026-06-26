@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 use Test::Most;
+use Test::Mockingbird;
+use Test::Returns;
+use Readonly;
 use Capture::Tiny qw(capture);
 use File::Path    qw(make_path);
 use File::Spec;
@@ -12,6 +15,12 @@ use File::Temp    qw(tempdir tempfile);
 # App::Test::Generator and its sub-modules.
 # These tests deliberately probe broken, empty, huge, and
 # adversarial inputs to ensure the system fails gracefully.
+
+# Sentinel weight used to prove a forged evidence entry (one that
+# bypassed add_evidence()'s category/signal validation) is still
+# counted by resolve_confidence() -- chosen to be unambiguously
+# above the 'high' confidence threshold on its own.
+Readonly my $FORGED_EVIDENCE_WEIGHT => 9999;
 
 BEGIN {
 	use_ok('App::Test::Generator');
@@ -26,6 +35,11 @@ BEGIN {
 	use_ok('App::Test::Generator::Mutation::ReturnUndef');
 	use_ok('App::Test::Generator::Mutation::ConditionalInversion');
 	use_ok('App::Test::Generator::Mutation::NumericBoundary');
+	use_ok('App::Test::Generator::Model::Method');
+	use_ok('App::Test::Generator::Planner::Isolation');
+	use_ok('App::Test::Generator::TestStrategy');
+	use_ok('App::Test::Generator::Analyzer::SideEffect');
+	use_ok('App::Test::Generator::Exporter::YAML');
 }
 
 # ==================================================================
@@ -971,6 +985,242 @@ subtest 'render_hash: skips undef sub-values gracefully' => sub {
 	ok(defined $result,        'undef sub-value handled');
 	unlike($result, qr/min/,   'undef min key omitted');
 	like($result,   qr/max/,   'defined max key present');
+};
+
+# ==================================================================
+# Planner::Isolation -- asymmetric argument validation
+#
+# plan() croaks if $strategy is not a hashref, but never validates
+# $schema at all. Every access to $schema below is a chained rvalue
+# dereference ($schema->{$method}{_analysis}...), which Perl resolves
+# to undef without autovivifying or dying even when $schema itself is
+# undef. This is real, intentional asymmetry (CLAUDE.md documents it),
+# not an oversight -- the hostile case to prove is that a caller who
+# forgets to pass $schema still gets a safe, maximally-defensive plan
+# rather than a crash.
+# ==================================================================
+subtest 'Planner::Isolation::plan: undef schema degrades gracefully to the safest fixture' => sub {
+	my $planner = App::Test::Generator::Planner::Isolation->new();
+
+	my $isolation;
+	lives_ok {
+		$isolation = $planner->plan(undef, { risky_method => 1 });
+	} 'plan() does not die when $schema is undef';
+
+	is_deeply(
+		$isolation,
+		{ risky_method => { fixture => 'isolated_block' } },
+		'undef schema degrades to the most defensive (isolated_block) fixture, not a crash',
+	);
+};
+
+# ==================================================================
+# Model::Method -- aliasing/state abuse via evidence_ref()
+#
+# POD documents evidence_ref() as returning "the live internal
+# arrayref, not a copy". Treated as a hostile capability: a caller can
+# splice a forged entry directly into that arrayref, completely
+# bypassing add_evidence()'s category/signal whitelist validation, and
+# have it silently summed by resolve_confidence() anyway, since that
+# method trusts every entry's weight regardless of provenance.
+# ==================================================================
+subtest 'Model::Method::evidence_ref: external mutation bypasses add_evidence() validation entirely' => sub {
+	my $m = App::Test::Generator::Model::Method->new(name => 'm', source => 'sub m {}');
+	my $ref = $m->evidence_ref;
+
+	push @{$ref}, {
+		category => 'not_a_real_category',
+		signal   => 'not_a_real_signal',
+		weight   => $FORGED_EVIDENCE_WEIGHT,
+	};
+
+	is(scalar($m->evidence), 1,
+		'forged entry is visible through evidence() despite never passing through add_evidence()');
+
+	my $conf = $m->resolve_confidence;
+	is($conf->{score}, $FORGED_EVIDENCE_WEIGHT,
+		'forged weight is summed into resolve_confidence() with no provenance check');
+	is($conf->{level}, 'high',
+		'a single forged entry is enough on its own to reach "high" confidence');
+};
+
+# ==================================================================
+# Model::Method -- list vs scalar context confusion
+#
+# evidence() is documented to behave differently depending on calling
+# context: list context yields every evidence hashref, scalar context
+# yields only the count (via Perl's own "array in scalar context is
+# its length" rule, not a special case in the sub body). Exercise both
+# conventions side by side on the same populated object.
+# ==================================================================
+subtest 'Model::Method::evidence: list and scalar context return genuinely different things' => sub {
+	my $m = App::Test::Generator::Model::Method->new(name => 'm', source => 'sub m {}');
+	$m->add_evidence(category => 'return', signal => 'returns_constant', weight => 10);
+	$m->add_evidence(category => 'return', signal => 'returns_self',     weight => 15);
+
+	my @list_ctx   = $m->evidence;
+	my $scalar_ctx = $m->evidence;
+
+	is(scalar(@list_ctx), 2, 'list context returns both evidence hashrefs');
+	is($scalar_ctx,        2, 'scalar context returns the entry count, not the last entry');
+	is(ref($list_ctx[0]), 'HASH', 'each list-context element is still a real evidence hashref');
+};
+
+# ==================================================================
+# Model::Method -- unlocalized $_ mutation
+#
+# resolve_confidence() sums weights via the postfix form
+# "$total += $_->{weight} for @{ $self->{evidence} };". Postfix
+# for/foreach always aliases and restores $_ around the loop body, but
+# that safety property is easy to break if the loop is ever rewritten
+# -- assert it explicitly rather than trusting it silently continues
+# to hold under future refactors.
+# ==================================================================
+subtest 'Model::Method::resolve_confidence: does not leak $_ into the caller' => sub {
+	local $_ = 'sentinel-before-call';
+
+	my $m = App::Test::Generator::Model::Method->new(name => 'm', source => 'sub m {}');
+	$m->add_evidence(category => 'return', signal => 'returns_constant', weight => 10);
+	$m->resolve_confidence;
+
+	is($_, 'sentinel-before-call',
+		'$_ is unchanged by resolve_confidence(), confirming the postfix for-loop restores it');
+};
+
+# ==================================================================
+# Analyzer::SideEffect / Analyzer::Complexity -- unexpected reference
+# types in place of the documented source-string body
+#
+# $method->{body} is documented as a plain source string. Passing an
+# arrayref instead must not crash: the regex match operator stringifies
+# its operand (e.g. to "ARRAY(0x...)"), which trivially fails to match
+# any side-effect or branch-keyword pattern, so the safe and correct
+# outcome is graceful "no signal detected" rather than a die.
+# ==================================================================
+subtest 'Analyzer::SideEffect::analyze: arrayref body stringifies harmlessly instead of crashing' => sub {
+	my $se = App::Test::Generator::Analyzer::SideEffect->new();
+
+	my $report;
+	lives_ok {
+		$report = $se->analyze({ body => [ 'system("rm -rf /")' ] });
+	} 'analyze() lives when body is an arrayref instead of a string';
+
+	is($report->{purity_level}, 'pure',
+		'a stringified arrayref reference does not coincidentally match any side-effect pattern');
+};
+
+# ==================================================================
+# Analyzer::SideEffect -- typeglob in place of the method hashref
+#
+# $method is documented as "a hashref". A typeglob reference is exactly
+# the kind of unexpected-reference-type input the skill calls for.
+# Perl's own type system rejects dereferencing it as a hash with a
+# clear, immediate die rather than silently misbehaving or corrupting
+# state -- confirm that boundary explicitly.
+# ==================================================================
+subtest 'Analyzer::SideEffect::analyze: typeglob in place of $method dies predictably, not silently' => sub {
+	my $se = App::Test::Generator::Analyzer::SideEffect->new();
+
+	throws_ok {
+		$se->analyze(\*STDOUT);
+	} qr/Not a HASH reference/,
+		'a typeglob ref in place of $method dies with a clear type error';
+};
+
+# ==================================================================
+# Exporter::YAML -- circular-reference plan hashref
+#
+# Empirically verified against YAML::XS directly (libyaml supports
+# anchors/aliases for cyclic structures) before writing this test: a
+# self-referential plan hashref does NOT hang or crash DumpFile. This
+# is therefore a lives_ok confirmation of safe, already-correct
+# behaviour -- a hang here would be a real denial-of-service risk
+# given that plan hashrefs are partly schema-derived, so it is worth
+# locking in permanently rather than assuming it stays true.
+# ==================================================================
+subtest 'Exporter::YAML::export: self-referential plan hashref does not hang or crash' => sub {
+	my $exporter = bless {}, 'App::Test::Generator::Exporter::YAML';
+	my %plan;
+	$plan{self} = \%plan;	# circular reference
+
+	my $dir  = tempdir(CLEANUP => 1);
+	my $file = File::Spec->catfile($dir, 'circular.yml');
+
+	lives_ok {
+		$exporter->export(\%plan, $file);
+	} 'export() does not crash or hang on a circular-reference plan';
+
+	ok(-s $file, 'a non-empty YAML file was written for the circular structure');
+};
+
+# ==================================================================
+# TestStrategy::generate_plan -- malformed per-method schema entries
+#
+# generate_plan() has no schema-shape validation of its own, unlike
+# every Planner::* submodule (which all croak on a non-hashref $schema
+# argument). Probe both ends of that gap: an undef per-method entry is
+# safe (a chained rvalue dereference degrades to defaults), while a
+# non-hashref entry such as a plain string is unsafe (dereferencing a
+# string as a hashref dies under "strict refs"). Both behaviours were
+# verified directly against the running code before being asserted
+# here.
+# ==================================================================
+subtest 'TestStrategy::generate_plan: undef per-method entry degrades to the basic_test fallback' => sub {
+	my $strategy = App::Test::Generator::TestStrategy->new(
+		schema => { mystery_method => undef },
+	);
+
+	my $plan;
+	lives_ok {
+		$plan = $strategy->generate_plan;
+	} 'generate_plan() lives when a per-method schema entry is undef';
+
+	is_deeply(
+		$plan->{mystery_method},
+		{ basic_test => 1 },
+		'an undef per-method entry degrades to the basic_test-only fallback plan',
+	);
+};
+
+subtest 'TestStrategy::generate_plan: non-hashref per-method entry dies with a clear type error' => sub {
+	my $strategy = App::Test::Generator::TestStrategy->new(
+		schema => { broken_method => 'not a hashref' },
+	);
+
+	throws_ok {
+		$strategy->generate_plan;
+	} qr/HASH ref/,
+		'a non-hashref per-method schema entry dies clearly rather than silently misbehaving';
+};
+
+# ==================================================================
+# Generator::generate() -- end-to-end injection attempt via a
+# schema-derived function name
+#
+# _assert_identifier() itself is already unit-tested directly
+# elsewhere (t/function.t). This instead exercises the *full*
+# generate() pipeline end to end: a function name shaped like a Perl
+# statement-injection payload (semicolon-separated, containing a
+# system() call) must be rejected before it ever reaches the point of
+# being spliced unescaped into generated test source, and critically,
+# before any output file is created on disk.
+# ==================================================================
+subtest 'Generator::generate(): statement-injection-shaped function name is rejected before any file is written' => sub {
+	my $dir     = tempdir(CLEANUP => 1);
+	my $outfile = File::Spec->catfile($dir, 'out.t');
+
+	my $schema = {
+		function => 'evil; system("touch /tmp/pwned"); 1',
+		input    => { number => { type => 'number', position => 0 } },
+		output   => { type => 'number' },
+	};
+
+	throws_ok {
+		App::Test::Generator->generate(schema => $schema, output_file => $outfile);
+	} qr/not a valid Perl identifier/,
+		'a statement-injection-shaped function name is rejected';
+
+	ok(!-e $outfile, 'no output file was written once the malicious identifier was rejected');
 };
 
 done_testing();

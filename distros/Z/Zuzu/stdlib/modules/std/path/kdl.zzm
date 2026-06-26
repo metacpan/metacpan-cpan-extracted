@@ -8,7 +8,7 @@ std/path/kdl - KDL Query Language selectors for KDL documents.
 
   from std/data/kdl import KDL;
   from std/path/kdl import KDLQuery;
-
+  
   let doc := ( new KDL() ).decode( """
   package {
     name foo
@@ -17,7 +17,7 @@ std/path/kdl - KDL Query Language selectors for KDL documents.
     }
   }
   """ );
-
+  
   let names := doc @@ new KDLQuery( path: "package >> name" );
 
 =head1 IMPLEMENTATION SUPPORT

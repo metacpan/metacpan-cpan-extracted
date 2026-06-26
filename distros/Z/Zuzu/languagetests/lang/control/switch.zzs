@@ -1,11 +1,11 @@
 from test/more import *;
-let eq_match := "";
+let eq_match := false;
 
-switch ( "bar": eq ) {
-	case "foo": eq_match := "foo";
-	case "bar", "baz": eq_match := "bar";
+switch ( 1 ) {
+	case 0: eq_match := false;
+	case 1: eq_match := ^^ == 1;
 	continue;
-	default: eq_match := eq_match _ "-default";
+	default: eq_match := eq_match and ^^ == 1;
 }
 
 let pattern := "";
@@ -21,7 +21,14 @@ switch (2) {
 	case 1: number_case := 10;
 	case 2: number_case := 20;
 }
-is( eq_match, "bar-default", "switch :eq comparator and continue work" );
+
+let default_case := 0;
+switch (3) {
+	case 1: default_case := 10;
+	default: default_case := ^^;
+}
+is( eq_match, true, "switch continue and ^^ work" );
 is( pattern, "xy", "switch :~ comparator supports regexp cases" );
 is( number_case, 20, "switch supports numeric case matching" );
+is( default_case, 3, "switch default case sees discriminant via ^^" );
 done_testing();

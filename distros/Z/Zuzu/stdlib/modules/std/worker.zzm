@@ -7,7 +7,7 @@ std/worker - isolated workers for shared-nothing parallel work.
 =head1 SYNOPSIS
 
   from std/worker import Worker;
-
+  
   async function __main__ () {
     let task := Worker.spawn(
       function ( x ) {
@@ -15,7 +15,7 @@ std/worker - isolated workers for shared-nothing parallel work.
       },
       [ 21 ],
     );
-
+  
     say await {
       task;
     };
@@ -174,7 +174,7 @@ For example:
     },
     [],
   );
-
+  
   await {
     handle.send(21);
   };

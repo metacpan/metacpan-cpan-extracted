@@ -13,7 +13,9 @@ use FindBin qw($Bin);
 use IPC::Run3;
 use IPC::System::Simple qw(system);
 use Test::Most;
-use Test::Needs 'Data::Text', 'HTML::Genealogy::Map', 'Class::Simple';
+# HTML::Genealogy::Map was needed by t/conf/html_genealogy_map.{conf,yml},
+# both since deleted; no remaining t/conf/* fixture targets that module.
+use Test::Needs 'Data::Text', 'Class::Simple';
 
 my $dirname = "$Bin/conf";
 

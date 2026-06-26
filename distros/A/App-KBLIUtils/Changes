@@ -1,3 +1,12 @@
+0.003   2026-06-26  Released-By: PERLANCAR; Urgency: medium
+
+        - [removed] Remove CLIs: list-kbli-categories, list-kbli-codes (will use
+          specific KBLI version in CLI names).
+
+        - Add CLIs: get-kbli-{2020,2025}-{title,description},
+          compare-kbli-2020-2025-code, list-kbli-{2020,2025}-codes
+
+
 0.002   2023-02-14  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.
@@ -5,6 +14,6 @@
         - [doc] Fix Abstract, mention a couple of URLs.
 
 
-0.001   2023-02-14  Released-By: PERLANCAR
+0.001   2023-02-12  Released-By: PERLANCAR
 
         - First release.

@@ -7,17 +7,17 @@ std/data/xml - XML parsing and DOM manipulation for ZuzuScript.
 =head1 SYNOPSIS
 
   from std/data/xml import XML;
-
+  
   let doc := XML.parse(
     "<root><item id='a'>first</item></root>"
   );
-
+  
   let root := doc.documentElement();
   let item := root.firstChild();
-
+  
   item.setAttribute("status", "active");
   root.appendChild( doc.createComment("done") );
-
+  
   let text := doc.toXML(true);
 
 =head1 IMPLEMENTATION SUPPORT

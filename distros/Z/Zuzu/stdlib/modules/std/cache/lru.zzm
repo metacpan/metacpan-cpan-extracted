@@ -7,14 +7,14 @@ std/cache/lru - Pure ZuzuScript in-memory LRU cache.
 =head1 SYNOPSIS
 
   from std/cache/lru import Cache;
-
+  
   let cache := new Cache( capacity: 20 );
-
+  
   let item := cache.get( "item-key", function ( item_key ) {
     # Called only on cache miss.
     return calculate_some_expensive_value( item_key );
   } );
-
+  
   cache.empty();
 
 =head1 IMPLEMENTATION SUPPORT

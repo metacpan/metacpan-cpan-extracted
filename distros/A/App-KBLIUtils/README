@@ -1,25 +1,179 @@
 NAME
-    App::KBLIUtils - Utilities related to KBLI (ode Baku Lapangan Usaha,
-    a.k.a. Standard Code of Business Field)
+    App::KBLIUtils - Utilities related to Indonesian KBLI ("Klasifikasi Baku
+    Lapangan Usaha Indonesia" a.k.a. the Indonesian ISIC "International
+    Standard Industrial Classification of All Economic Activities")
 
 VERSION
-    This document describes version 0.002 of App::KBLIUtils (from Perl
-    distribution App-KBLIUtils), released on 2023-02-14.
+    This document describes version 0.003 of App::KBLIUtils (from Perl
+    distribution App-KBLIUtils), released on 2026-06-26.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
-    *   list-kbli-categories
+    1. compare-kbli-2020-2025-codes
+    2. get-kbli-2020-description
+    3. get-kbli-2020-title
+    4. get-kbli-2025-description
+    5. get-kbli-2025-title
+    6. list-kbli-2020-codes
+    7. list-kbli-2025-codes
 
-    *   list-kbli-codes
+    Keywords: KBLI, Klasifikasi Baku Lapangan Usaha Indonesia, ISIC,
+    International Standard Industrial Classification of All Economic
+    Activities
 
 FUNCTIONS
-  list_kbli_categories
+  compare_kbli_2020_2025_codes
     Usage:
 
-     list_kbli_categories(%args) -> [$status_code, $reason, $payload, \%result_meta]
+     compare_kbli_2020_2025_codes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    List KBLI categories.
+    Compare codes in KBLI 2020 vs 2025.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   codes* => *array[str]*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  get_kbli_2020_description
+    Usage:
+
+     get_kbli_2020_description(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get description for a KBLI 2020 code.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code* => *str*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  get_kbli_2020_title
+    Usage:
+
+     get_kbli_2020_title(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get title for a KBLI 2020 code.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code* => *str*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  get_kbli_2025_description
+    Usage:
+
+     get_kbli_2025_description(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get description for a KBLI 2025 code.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code* => *str*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  get_kbli_2025_title
+    Usage:
+
+     get_kbli_2025_title(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get title for a KBLI 2025 code.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code* => *str*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  list_kbli_2020_codes
+    Usage:
+
+     list_kbli_2020_codes(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List KBLI 2020 codes.
 
     REPLACE ME
 
@@ -148,58 +302,6 @@ FUNCTIONS
 
         Select fields to return.
 
-    *   name => *str*
-
-        Only return records where the 'name' field equals specified value.
-
-    *   name.contains => *str*
-
-        Only return records where the 'name' field contains specified text.
-
-    *   name.in => *array[str]*
-
-        Only return records where the 'name' field is in the specified
-        values.
-
-    *   name.is => *str*
-
-        Only return records where the 'name' field equals specified value.
-
-    *   name.isnt => *str*
-
-        Only return records where the 'name' field does not equal specified
-        value.
-
-    *   name.max => *str*
-
-        Only return records where the 'name' field is less than or equal to
-        specified value.
-
-    *   name.min => *str*
-
-        Only return records where the 'name' field is greater than or equal
-        to specified value.
-
-    *   name.not_contains => *str*
-
-        Only return records where the 'name' field does not contain
-        specified text.
-
-    *   name.not_in => *array[str]*
-
-        Only return records where the 'name' field is not in the specified
-        values.
-
-    *   name.xmax => *str*
-
-        Only return records where the 'name' field is less than specified
-        value.
-
-    *   name.xmin => *str*
-
-        Only return records where the 'name' field is greater than specified
-        value.
-
     *   queries => *array[str]*
 
         Search.
@@ -240,6 +342,58 @@ FUNCTIONS
         with '-' to specify descending order instead of the default
         ascending.
 
+    *   title => *str*
+
+        Only return records where the 'title' field equals specified value.
+
+    *   title.contains => *str*
+
+        Only return records where the 'title' field contains specified text.
+
+    *   title.in => *array[str]*
+
+        Only return records where the 'title' field is in the specified
+        values.
+
+    *   title.is => *str*
+
+        Only return records where the 'title' field equals specified value.
+
+    *   title.isnt => *str*
+
+        Only return records where the 'title' field does not equal specified
+        value.
+
+    *   title.max => *str*
+
+        Only return records where the 'title' field is less than or equal to
+        specified value.
+
+    *   title.min => *str*
+
+        Only return records where the 'title' field is greater than or equal
+        to specified value.
+
+    *   title.not_contains => *str*
+
+        Only return records where the 'title' field does not contain
+        specified text.
+
+    *   title.not_in => *array[str]*
+
+        Only return records where the 'title' field is not in the specified
+        values.
+
+    *   title.xmax => *str*
+
+        Only return records where the 'title' field is less than specified
+        value.
+
+    *   title.xmin => *str*
+
+        Only return records where the 'title' field is greater than
+        specified value.
+
     *   with_field_names => *bool*
 
         Return field names in each record (as hash/associative array).
@@ -262,12 +416,12 @@ FUNCTIONS
 
     Return value: (any)
 
-  list_kbli_codes
+  list_kbli_2025_codes
     Usage:
 
-     list_kbli_codes(%args) -> [$status_code, $reason, $payload, \%result_meta]
+     list_kbli_2025_codes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    List KBLI codes.
+    List KBLI 2025 codes.
 
     REPLACE ME
 
@@ -526,6 +680,9 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    perlancar <perlancar@gmail.com>
+
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
     requests on GitHub.
@@ -543,7 +700,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

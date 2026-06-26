@@ -88,13 +88,14 @@ subtest 'plan() omits pure methods with no side effects' => sub {
 };
 
 # ---------------------------------------------------------------
-# 7. plan() — calls_external takes precedence over performs_io
+# 7. plan() — calls_external and performs_io together get both
+#    mock strategies, not just one silently dropped.
 # ---------------------------------------------------------------
-subtest 'plan() gives mock_system precedence over capture_io' => sub {
+subtest 'plan() assigns both mock strategies when both side effects present' => sub {
 	my $p    = App::Test::Generator::Planner::Mock->new();
 	my $plan = $p->plan(_schema(calls_external => 1, performs_io => 1));
-	is($plan->{test_method}, 'mock_system',
-		'mock_system takes precedence when both side effects present');
+	is_deeply($plan->{test_method}, ['mock_system', 'capture_io'],
+		'both mock_system and capture_io applied when both side effects present');
 };
 
 # ---------------------------------------------------------------

@@ -19,7 +19,8 @@ return {
         'warnings' => 0,
     },
     DEVELOP_REQUIRES => {
-        'Test::Pod' => 1.22,
+        'Pod::Markdown::Githubert' => 0,
+        'Test::Pod'                => 1.22,
     },
 
     depend => {

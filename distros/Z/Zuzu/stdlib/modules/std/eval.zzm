@@ -7,7 +7,7 @@ std/eval - Evaluate Zuzu code in a nested caller scope.
 =head1 SYNOPSIS
 
   from std/eval import eval;
-
+  
   let x := 2;
   let y := eval("x + 40;");
 

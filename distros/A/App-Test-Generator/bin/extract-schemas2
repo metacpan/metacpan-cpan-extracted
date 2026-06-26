@@ -192,7 +192,7 @@ if ($opts{emit_tests}) {
 
 print "Planning tests...\n" if $opts{verbose};
 
-my $planner = App::Test::Generator::Planner->new(schemas => $schemas);
+my $planner = App::Test::Generator::Planner->new(schemas => $schemas, package => $package_name);
 
 my $plans = $planner->plan_all();
 

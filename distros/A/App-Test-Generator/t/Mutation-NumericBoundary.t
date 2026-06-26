@@ -192,13 +192,39 @@ CODE
 subtest 'mutate: readline operator is skipped' => sub {
 	my $m = _mutation();
 
-	# Readline <$fh> -- the < must not produce mutants
+	# Readline <$fh> -- PPI tokenises this as a single
+	# PPI::Token::QuoteLike::Readline, so no bare < Operator
+	# token exists for it to begin with -- no mutants either way
 	my @mutants = $m->mutate(_doc('sub foo { my $line = <$fh>; }'));
 	is(scalar @mutants, 0, 'readline <$fh> produces no mutants');
 
 	# Regular < comparison still works
 	@mutants = $m->mutate(_doc('sub foo { if($x < 10) { 1; } }'));
 	is(scalar @mutants, 3, 'regular < comparison still produces mutants');
+};
+
+# ==================================================================
+# mutate -- unspaced comparison is not mistaken for a readline
+# --------------------------------------------------
+# Regression test for a bug where $next_sib->isa('PPI::Token::Symbol')
+# was (incorrectly) used to detect readlines: PPI already tokenises
+# <$fh> as a single Readline token (see test above), so that guard
+# never actually fired for a real readline -- its only observable
+# effect was to silently skip mutating a genuine numeric comparison
+# whenever the right-hand operand was an unspaced bare scalar, e.g.
+# "$a<$b". The guard has been removed; this asserts the fix.
+# ==================================================================
+subtest 'mutate: unspaced scalar comparison is mutated (regression)' => sub {
+	my $m = _mutation();
+
+	my @mutants = $m->mutate(_doc('sub foo { my $r = ($a<$b) ? 1 : 0; }'));
+	is(scalar @mutants, 3, 'unspaced $a<$b still produces 3 mutants');
+
+	@mutants = $m->mutate(_doc('sub foo { return 1 if $x>$y; }'));
+	is(scalar @mutants, 3, 'unspaced $x>$y still produces 3 mutants');
+
+	@mutants = $m->mutate(_doc('sub foo { return 1 if $x==$y; }'));
+	is(scalar @mutants, 1, 'unspaced $x==$y still produces 1 mutant');
 };
 
 # ==================================================================
@@ -398,6 +424,75 @@ subtest 'applies_to() returns 0 for readline < operator' => sub {
 	# <$fh> is a readline, not a comparison — should be ignored
 	my $doc = PPI::Document->new(\'sub foo { my $line = <$fh>; }');
 	is($m->applies_to($doc), 0, 'readline < not treated as comparison operator');
+};
+
+subtest 'applies_to() returns 1 for unspaced scalar comparison (regression)' => sub {
+	require PPI;
+	my $m   = App::Test::Generator::Mutation::NumericBoundary->new();
+	my $doc = PPI::Document->new(\'sub foo { my $r = $a<$b; }');
+	is($m->applies_to($doc), 1, 'unspaced $a<$b is treated as a comparison operator');
+};
+
+# ==================================================================
+# mutate -- transform skips operators that do not match this
+# mutant's captured line/column/content
+# --------------------------------------------------
+# Each mutant's transform closure re-finds all operators in the
+# document copy it is given and must only mutate the one operator
+# whose line, column, and original text all match what was captured
+# at mutate() time -- every other operator must be left untouched.
+# This exercises the three "next unless" mismatch guards inside the
+# transform closure.
+# ==================================================================
+subtest 'mutate: transform leaves non-matching operators untouched' => sub {
+	my $m   = _mutation();
+	my $src = <<'CODE';
+sub check {
+	return 1 if $a > 0;
+	return 2 if $b == 0;
+}
+CODE
+	my $doc     = _doc($src);
+	my @mutants = $m->mutate($doc);
+
+	# Find the mutant targeting the == operator (flips to !=)
+	my ($eq_mutant) = grep { $_->original eq '==' } @mutants;
+	ok(defined $eq_mutant, 'found mutant for == operator');
+
+	my $copy = _doc($src);
+	$eq_mutant->transform->($copy);
+	my $transformed = $copy->serialize;
+
+	# The == must have been flipped, but the unrelated > must survive
+	like($transformed, qr/\$b\s*!=\s*0/, '== operator was flipped to !=');
+	like($transformed, qr/\$a\s*>\s*0/, 'unrelated > operator left untouched');
+};
+
+# ==================================================================
+# mutate -- transform skips a same-line operator at the wrong column
+# --------------------------------------------------
+# Two operators sharing a single source line both pass the
+# "line_number == $line" guard inside the transform closure, so this
+# exercises the next "column_number == $col" guard specifically --
+# the line-number-only test above can't reach it, since differing
+# operators there are already rejected by line number.
+# ==================================================================
+subtest 'mutate: transform skips same-line operator at wrong column' => sub {
+	my $m   = _mutation();
+	my $src = 'sub foo { if($a > 0 && $b == 0) { 1; } }';
+
+	my $doc     = _doc($src);
+	my @mutants = $m->mutate($doc);
+
+	my ($eq_mutant) = grep { $_->original eq '==' } @mutants;
+	ok(defined $eq_mutant, 'found mutant for == operator on the shared line');
+
+	my $copy = _doc($src);
+	$eq_mutant->transform->($copy);
+	my $transformed = $copy->serialize;
+
+	like($transformed, qr/\$b\s*!=\s*0/, '== at the correct column was flipped');
+	like($transformed, qr/\$a\s*>\s*0/, '> at a different column on the same line was left untouched');
 };
 
 done_testing();

@@ -8,7 +8,7 @@ std/data/xml/escape - XML entity escaping helpers.
 
   from std/data/xml/escape import
     escape_xml, unescape_xml;
-
+  
   let escaped := escape_xml(
     "<tea attr=\"hot\">& 'biscuits'</tea>"
   );

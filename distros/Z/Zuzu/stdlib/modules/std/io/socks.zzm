@@ -7,11 +7,11 @@ std/io/socks - socket programming helpers for Zuzu.
 =head1 SYNOPSIS
 
   from std/io/socks import *;
-
+  
   let srv := listen_tcp( "127.0.0.1", 0 );
   let cli := connect_tcp( "127.0.0.1", srv.port() );
   let peer := srv.accept();
-
+  
   cli.say( "hello" );
   let line := peer.next_line();
 

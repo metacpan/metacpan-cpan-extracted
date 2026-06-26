@@ -19,7 +19,7 @@ std/secure - Secure runtime services and capability inspection.
       PublicKey,
       SealedBox,
       TlsIdentity;
-
+  
   let caps := Secure.capabilities();
   Secure.require( "random", "bytes" );
 

@@ -250,6 +250,40 @@ END_BODY
 	done_testing();
 };
 
+# Test 6b: External object dependency detection — single-occurrence
+# regression. Pattern 2 first checks `if ($method_body =~ /\$(\w+)->\w+\(/g)`
+# then loops `while ($method_body =~ /\$(\w+)->\w+\(/g)` over the *same*
+# string. Without resetting pos() between them, the if's own /g match
+# advances pos past the first (and here, only) occurrence, so the while
+# loop finds nothing and uses_objects is never populated.
+subtest 'External Object Dependency Detection - single object variable' => sub {
+	my $module = <<'END_MODULE';
+package Test::SingleDependency;
+sub method_with_one_dependency {
+	my $self = shift;
+	my $thing = Some::External::Thing->new();
+	return $thing->process();
+}
+END_MODULE
+
+	my $extractor = create_extractor($module);
+
+	my $method_body = <<'END_BODY';
+	my $self = shift;
+	my $thing = Some::External::Thing->new();
+	return $thing->process();
+END_BODY
+
+	my $deps = $extractor->_detect_external_object_dependency($method_body);
+
+	ok($deps, 'External dependencies detected');
+	ok($deps->{uses_objects}, 'Detects use of the single object variable');
+	is($deps->{uses_objects}[0], 'Some::External::Thing', 'Correct class inferred for the object variable')
+		if $deps->{uses_objects};
+
+	done_testing();
+};
+
 # Test 7: Integrated _needs_object_instantiation
 subtest 'Integrated Object Instantiation Detection' => sub {
 	my $module = <<'END_MODULE';

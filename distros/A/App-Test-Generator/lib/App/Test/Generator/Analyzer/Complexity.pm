@@ -38,11 +38,11 @@ Readonly my @EXCEPTION_TOKENS => qw(
 	die croak confess try catch eval
 );
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 DESCRIPTION
 
@@ -99,8 +99,10 @@ Analyse the source of a method and return a complexity report hashref.
 
 =item * C<$method>
 
-An L<App::Test::Generator::Model::Method> object. The method source is
-read via C<source()>.
+A hashref describing the method, as built internally by
+L<App::Test::Generator::SchemaExtractor>. The method source is read
+from its C<body> key (a plain string of Perl source); this is I<not>
+an L<App::Test::Generator::Model::Method> object.
 
 =back
 
@@ -140,7 +142,7 @@ purposes.
 
     {
         self   => { type => OBJECT, isa => 'App::Test::Generator::Analyzer::Complexity' },
-        method => { type => OBJECT, isa => 'App::Test::Generator::Model::Method' },
+        method => { type => HASHREF, keys => { body => { type => SCALAR, optional => 1 } } },
     }
 
 =head4 output
@@ -166,6 +168,12 @@ sub analyze {
 	# not a Model::Method object — access the body key directly
 	my $body = $method->{body} // '';
 
+	# Branch/logic/exception keywords and the ?/&&/|| operators are
+	# only real decision points as actual code; the same characters
+	# inside a string literal (e.g. "Are you sure?") or a comment
+	# must not inflate the cyclomatic score
+	my $code_only = _strip_strings_and_comments($body);
+
 	my %result = (
 		cyclomatic_score => $CYCLOMATIC_BASE,
 		branching_points => 0,
@@ -179,20 +187,20 @@ sub analyze {
 	# new decision point that increases cyclomatic complexity
 	# --------------------------------------------------
 	for my $token (@BRANCH_TOKENS) {
-		my $count = () = $body =~ /\b$token\b/g;
+		my $count = () = $code_only =~ /\b$token\b/g;
 		$result{branching_points} += $count;
 		$result{cyclomatic_score} += $count;
 	}
 
 	# Logical operators also introduce implicit branches
-	my $logic_count = () = $body =~ /&&|\|\||\?/g;
+	my $logic_count = () = $code_only =~ /&&|\|\||\?/g;
 	$result{cyclomatic_score} += $logic_count;
 
 	# --------------------------------------------------
 	# Early returns — each return beyond the first adds
 	# an additional exit path through the method
 	# --------------------------------------------------
-	my $return_count = () = $body =~ /\breturn\b/g;
+	my $return_count = () = $code_only =~ /\breturn\b/g;
 	$result{early_returns}    = $return_count > 1 ? $return_count - 1 : 0;
 	$result{cyclomatic_score} += $result{early_returns};
 
@@ -201,7 +209,7 @@ sub analyze {
 	# a path that must be tested separately
 	# --------------------------------------------------
 	for my $token (@EXCEPTION_TOKENS) {
-		my $count = () = $body =~ /\b$token\b/g;
+		my $count = () = $code_only =~ /\b$token\b/g;
 		$result{exception_paths} += $count;
 		$result{cyclomatic_score} += $count;
 	}
@@ -234,6 +242,29 @@ sub analyze {
 		                            $LEVEL_HIGH;
 
 	return \%result;
+}
+
+# --------------------------------------------------
+# Purpose: blank out the contents of '...' and "..." string
+#          literals and # line comments so that the keyword
+#          and operator counts above only see real code, not
+#          words/punctuation that merely appear inside a
+#          message or comment.
+# Entry:   a raw source body string.
+# Exit:    the same string with string-literal contents and
+#          comment text removed.
+# Side effects: none. Best-effort only — does not handle q//,
+#          qq//, heredocs, or quote-like operators with custom
+#          delimiters.
+# --------------------------------------------------
+sub _strip_strings_and_comments {
+	my ($body) = @_;
+
+	$body =~ s/"(?:[^"\\]|\\.)*"//g;
+	$body =~ s/'(?:[^'\\]|\\.)*'//g;
+	$body =~ s/#.*$//mg;
+
+	return $body;
 }
 
 1;

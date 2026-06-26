@@ -7,7 +7,7 @@ std/dump - Structured value dumper for ZuzuScript.
 =head1 SYNOPSIS
 
   from std/dump import Dumper;
-
+  
   let text := Dumper.dump(
     { nums: [ 1, 2, 3 ] },
     { pretty: true, sort_keys: true }

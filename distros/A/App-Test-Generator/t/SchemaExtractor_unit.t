@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::Most;
+use Test::Mockingbird;
 use File::Temp qw(tempdir);
 use File::Spec;
 
@@ -466,6 +467,48 @@ subtest 'generate_pod_validation_report() has no side effects' => sub {
 	$e->generate_pod_validation_report($schemas);
 	my $keys_after = join ',', sort keys %{$schemas};
 	is($keys_after, $keys_before, 'schemas hashref unchanged after report');
+};
+
+# ==================================================================
+# Regression: numeric boundary value hints must not be double-counted.
+#
+# _analyze_method used two separate %seen guards for the same loop —
+# one keyed on the raw (possibly undef) value, one keyed on a
+# normalised '__undef__' placeholder — so an undef boundary value
+# could be pushed twice. _numeric_boundary_values() never actually
+# returns undef today, but the dedup logic must still be correct if
+# that ever changes (and a single dedup pass is also simpler).
+# ==================================================================
+
+subtest '_analyze_method() does not double-count numeric boundary hints' => sub {
+	Test::Mockingbird::mock(
+		'App::Test::Generator::SchemaExtractor',
+		'_numeric_boundary_values',
+		sub { return [ -1, 0, undef, 1 ] },
+	);
+
+	my $src = <<'END_PM';
+package TestModule;
+
+sub add_one {
+	my ($self, $n) = @_;
+	return $n + 1;
+}
+
+1;
+END_PM
+
+	my ($pm) = _make_pm($src);
+	my $e = App::Test::Generator::SchemaExtractor->new(input_file => $pm);
+	my $schemas = $e->extract_all(no_write => 1);
+
+	my $boundary_values = $schemas->{add_one}{_yamltest_hints}{boundary_values};
+	ok($boundary_values, 'boundary_values hint present');
+
+	my $undef_count = grep { !defined $_ } @{$boundary_values};
+	is($undef_count, 1, 'undef boundary value appears exactly once, not twice');
+
+	Test::Mockingbird::unmock('App::Test::Generator::SchemaExtractor', '_numeric_boundary_values');
 };
 
 done_testing();

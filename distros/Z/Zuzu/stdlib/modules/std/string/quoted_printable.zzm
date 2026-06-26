@@ -7,12 +7,12 @@ std/string/quoted_printable - Quoted-printable encoders and decoders.
 =head1 SYNOPSIS
 
   from std/string/quoted_printable import encode, decode;
-
+  
   let raw := to_binary( "Hello, world!\r\n" );
-
+  
   let text := encode(raw);
   let bytes := decode(text);
-
+  
   let binary_text := encode(raw, binary: true);
   let short_lines := encode(raw, line_length: 40, newline: "\n");
 

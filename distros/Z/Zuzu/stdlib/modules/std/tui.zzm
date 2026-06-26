@@ -7,7 +7,7 @@ std/tui - Terminal UI helpers.
 =head1 SYNOPSIS
 
   from std/tui import supports_ansi, colour_text, readline, write_line;
-
+  
   write_line( "Warning", "yellow" );
   let path := readline( "File: ", "", filename_completions );
 

@@ -7,7 +7,7 @@ std/defer - Run a callback when a guard object is demolished.
 =head1 SYNOPSIS
 
   from std/defer import Guard;
-
+  
   let guard := new Guard( callback: fn () { cleanup(); } );
   guard.disable();
 

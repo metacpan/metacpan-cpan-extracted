@@ -1,5 +1,15 @@
 /* C++ headers before Perl to avoid macro conflicts (do_open/do_close vs <locale>) */
 #include <pugixml.hpp>
+
+/* Hard floor: the binding references format_no_empty_element_tags, added in
+   pugixml 1.8 (PUGIXML_VERSION 180). Fail the build with a clear message rather
+   than a cryptic C++ error if compiled against an older header (e.g. a system
+   lib whose pkg-config over-reported its version). ensure_child / ensure_attr
+   transparently emulate the 1.16 API below 1160. */
+#if PUGIXML_VERSION < 180
+#  error "XML::PugiXML requires pugixml >= 1.8 (format_no_empty_element_tags)"
+#endif
+
 #include <sstream>
 #include <string>
 #include <cerrno>
@@ -356,12 +366,14 @@ BOOT:
     HV* stash = gv_stashpv("XML::PugiXML", GV_ADD);
 #define PUGI_CONST(name, val) \
     newCONSTSUB(stash, name, newSVuv((UV)(val)))
+    PUGI_CONST("PUGIXML_VERSION",         PUGIXML_VERSION);
     PUGI_CONST("FORMAT_DEFAULT",          format_default);
     PUGI_CONST("FORMAT_INDENT",           format_indent);
     PUGI_CONST("FORMAT_NO_DECLARATION",   format_no_declaration);
     PUGI_CONST("FORMAT_RAW",              format_raw);
     PUGI_CONST("FORMAT_WRITE_BOM",        format_write_bom);
     PUGI_CONST("FORMAT_INDENT_ATTRIBUTES", format_indent_attributes);
+    PUGI_CONST("FORMAT_NO_EMPTY_ELEMENT_TAGS", format_no_empty_element_tags);
     PUGI_CONST("PARSE_DEFAULT",           parse_default);
     PUGI_CONST("PARSE_MINIMAL",           parse_minimal);
     PUGI_CONST("PARSE_PI",                parse_pi);
@@ -545,6 +557,25 @@ CODE:
 {
     CHECK_NODE_ALIVE(self);
     xml_node child = self->node.prepend_child(name);
+    RETVAL = wrap_node(aTHX_ child, self->doc_sv);
+}
+OUTPUT:
+    RETVAL
+
+SV*
+ensure_child(XML::PugiXML::Node self, nul_safe_pv name)
+CODE:
+{
+    CHECK_NODE_ALIVE(self);
+    /* get-or-create the first child element of this name. pugixml 1.16 added a
+       native ensure_child; emulate it on older libraries (child-or-append) so
+       the binding still builds against a system pugixml < 1.16. */
+#if PUGIXML_VERSION >= 1160
+    xml_node child = self->node.ensure_child(name);
+#else
+    xml_node child = self->node.child(name);
+    if (!child) child = self->node.append_child(name);
+#endif
     RETVAL = wrap_node(aTHX_ child, self->doc_sv);
 }
 OUTPUT:
@@ -740,6 +771,25 @@ CODE:
 {
     CHECK_NODE_ALIVE(self);
     xml_attribute attr = self->node.prepend_attribute(name);
+    RETVAL = wrap_attr(aTHX_ attr, self->node, self->doc_sv);
+}
+OUTPUT:
+    RETVAL
+
+SV*
+ensure_attr(XML::PugiXML::Node self, nul_safe_pv name)
+CODE:
+{
+    CHECK_NODE_ALIVE(self);
+    /* get-or-create the attribute of this name. pugixml 1.16 added a native
+       ensure_attribute; emulate it on older libraries (find-or-append) so the
+       binding still builds against a system pugixml < 1.16. */
+#if PUGIXML_VERSION >= 1160
+    xml_attribute attr = self->node.ensure_attribute(name);
+#else
+    xml_attribute attr = self->node.attribute(name);
+    if (!attr) attr = self->node.append_attribute(name);
+#endif
     RETVAL = wrap_attr(aTHX_ attr, self->node, self->doc_sv);
 }
 OUTPUT:

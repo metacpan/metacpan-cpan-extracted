@@ -7,7 +7,7 @@ std/string - String utilities for ZuzuScript modules.
 =head1 SYNOPSIS
 
   from std/string import *;
-
+  
   let s := "abcdef";
   say( substr( s, 1, 3 ) );     # bcd
   say( index( s, "cd" ) );      # 2
@@ -18,6 +18,7 @@ std/string - String utilities for ZuzuScript modules.
   say( search( s, rx ) );       # CD (if present)
   say( trim("  hello  ") );     # hello
   say( title("hello_world") );  # Hello World
+  say( repeat(4, "bar", "|") ); # bar|bar|bar|bar
 
 =head1 IMPLEMENTATION SUPPORT
 
@@ -113,6 +114,17 @@ text, for example C<< /^${quotemeta(label)}:/i >>.
 Parameters: C<format> is a format string and C<args> are replacement
 values. Returns: C<String>. Formats text.
 
+=item * C<repeat(Number count, String|BinaryString text,
+String|BinaryString separator?)>
+
+Parameters: C<count> is the number of repetitions, C<text> is the value
+to repeat, and C<separator> is optional text to place between repeated
+values. Returns: C<String> or C<BinaryString>. Repeats C<text>
+C<floor(count)> times, inserting C<separator> between copies when given.
+C<count> must not be negative. C<text> and C<separator> may both be
+character strings or both be byte strings; mixing C<String> and
+C<BinaryString> throws an exception.
+
 =item * C<split(String text, String separator_or_regexp, Number limit?)>
 
 Parameters: C<text> is source text, C<separator_or_regexp> is the split
@@ -161,6 +173,161 @@ Parameters: C<text> is source text. Returns: C<String>. Converts text to
 camelCase.
 
 =back
+
+=head1 FORMAT STRINGS (SPRINT)
+
+C<sprint> uses C<printf>-style format strings. Ordinary text is copied
+to the result. A conversion starts with C<%>, consumes one positional
+argument, and inserts the formatted value. C<%%> inserts a literal
+percent sign and does not consume an argument.
+
+The portable conversion codes are:
+
+=over
+
+=item * C<%s>
+
+Formats the value as text.
+
+=item * C<%d> and C<%i>
+
+Formats the value as a signed decimal integer. Fractional C<Number>
+values are truncated toward zero before formatting.
+
+=item * C<%u>
+
+Formats the value as an unsigned decimal integer. Use non-negative
+numbers for portable results.
+
+=item * C<%x> and C<%X>
+
+Formats the value as hexadecimal, using lowercase or uppercase letters.
+
+=item * C<%o>
+
+Formats the value as octal.
+
+=item * C<%f>
+
+Formats the value as fixed-point decimal. Without an explicit precision,
+the Perl and Rust runtimes use the usual C<printf> default of six digits
+after the decimal point.
+
+=item * C<%e> and C<%E>
+
+Formats the value in exponential notation, using lowercase or uppercase
+C<e>.
+
+=item * C<%g> and C<%G>
+
+Formats the value using the shorter of fixed-point or exponential
+notation, using lowercase or uppercase exponent markers when exponential
+notation is chosen.
+
+=item * C<%c>
+
+Formats a number as a Unicode codepoint.
+
+=back
+
+Conversions may include flags, a minimum width, and a precision before
+the conversion code:
+
+  %[flags][width][.precision]code
+
+The portable flags are:
+
+=over
+
+=item * C<->
+
+Left-aligns the formatted value within the field width.
+
+=item * C<0>
+
+Pads numeric fields with zeroes instead of spaces.
+
+=item * C<+>
+
+Always prints a sign for signed numeric conversions.
+
+=item * C<space>
+
+Prefixes positive signed numeric values with a space.
+
+=item * C<#>
+
+Uses an alternate form where the conversion defines one, such as C<0x>
+for C<%#x>, C<0X> for C<%#X>, or a leading C<0> for C<%#o>.
+
+=back
+
+C<width> is a decimal minimum field width. Values shorter than the width
+are padded on the left by default, or on the right when C<-> is used.
+C<precision> is written as C<.N>. For C<%s>, it limits the number of
+characters copied. For C<%f>, C<%e>, and C<%E>, it controls the number
+of digits after the decimal point. For C<%g> and C<%G>, it controls the
+number of significant digits.
+
+Arguments are converted according to the placeholder:
+
+=over
+
+=item * C<String>
+
+C<%s> inserts the text. Numeric placeholders should only be used with
+numeric text when the value is intentionally being coerced.
+
+=item * C<BinaryString>
+
+C<%s> treats byte strings as text. ASCII bytes are portable; for
+arbitrary binary data, encode it first, for example as Base64 or hex,
+instead of formatting raw bytes directly.
+
+=item * C<Number>
+
+Numeric placeholders use the numeric value. C<%d> and C<%i> truncate
+fractions toward zero. C<%c> treats the number as a Unicode codepoint.
+
+=item * C<Null>
+
+C<%s> formats C<null> as the empty string. Numeric placeholders treat
+C<null> as zero.
+
+=item * Other values
+
+C<%s> uses the value's normal string rendering. Numeric placeholders are
+intended for values with numeric semantics; using other values is not
+portable.
+
+=back
+
+Field width is formatter width, not necessarily terminal display width.
+Avoid relying on exact padding for non-ASCII text, combining characters,
+or emoji.
+
+=head2 Examples
+
+  say sprint( "%s = %d", "count", 7 );
+  // count = 7
+
+  say sprint( "|%8s|%-8s|", "cat", "cat" );
+  // |     cat|cat     |
+
+  say sprint( "%04x %#x %#o", 10, 255, 64 );
+  // 000a 0xff 0100
+
+  say sprint( "%+.2f", 3.5 );
+  // +3.50
+
+  say sprint( "%.3s", "abcdef" );
+  // abc
+
+  say sprint( "%c", 9731 );
+  // ☃
+
+  say sprint( "[%s][%d]", null, null );
+  // [][0]
 
 =head1 PORTABILITY
 

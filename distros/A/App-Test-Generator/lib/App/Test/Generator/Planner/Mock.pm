@@ -9,17 +9,17 @@ use Readonly;
 # Mock strategy labels written to the plan output.
 # mock_system is used when a method calls external
 # commands; capture_io when it performs IO operations.
-# Note: if a method does both, mock_system takes
-# precedence — see note in plan() below.
+# A method needing both gets an arrayref of both labels
+# — see note in plan() below.
 # --------------------------------------------------
 Readonly my $MOCK_SYSTEM     => 'mock_system';
 Readonly my $MOCK_CAPTURE_IO => 'capture_io';
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 DESCRIPTION
 
@@ -87,14 +87,14 @@ L<App::Test::Generator::Analyzer::SideEffect>.
 
 =head3 Returns
 
-A hashref mapping method names to mock strategy strings. Only methods
-that require mocking appear in the output — pure methods are omitted.
+A hashref mapping method names to a mock strategy. Only methods that
+require mocking appear in the output — pure methods are omitted.
 
 Currently supported strategy values are C<mock_system> and
-C<capture_io>. If a method both calls external commands and performs
-IO, C<mock_system> takes precedence. This is a known limitation and
-may be revised in a future version to support multiple strategies per
-method.
+C<capture_io>. A method needing only one of these gets that value as
+a plain scalar string. A method that both calls external commands and
+performs IO needs both mocks applied, so it gets an arrayref
+C<[mock_system, capture_io]> instead of a single string.
 
 =head3 API specification
 
@@ -110,7 +110,7 @@ method.
     {
         type => HASHREF,
         keys => {
-            '*' => { type => SCALAR },
+            '*' => { type => 'scalar | arrayref' },
         },
     }
 
@@ -131,12 +131,12 @@ sub plan {
 
 		# --------------------------------------------------
 		# Assign mock strategy based on detected side effects.
-		# mock_system takes precedence over capture_io when
-		# both are present — this is a known limitation.
-		# TODO: consider supporting multiple strategies per
-		# method as an arrayref in a future version.
+		# A method needing both gets an arrayref of both labels
+		# rather than silently dropping one of them.
 		# --------------------------------------------------
-		if($effects->{calls_external}) {
+		if($effects->{calls_external} && $effects->{performs_io}) {
+			$mock_plan{$method} = [$MOCK_SYSTEM, $MOCK_CAPTURE_IO];
+		} elsif($effects->{calls_external}) {
 			$mock_plan{$method} = $MOCK_SYSTEM;
 		} elsif($effects->{performs_io}) {
 			$mock_plan{$method} = $MOCK_CAPTURE_IO;

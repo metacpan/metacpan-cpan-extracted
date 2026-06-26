@@ -7,7 +7,7 @@ std/net/dns - DNS lookup helpers.
 =head1 SYNOPSIS
 
   from std/net/dns import lookup, addresses, reverse;
-
+  
   let ips := addresses("example.com");
   let mx  := lookup("example.com", "MX");
   let ptr := reverse("127.0.0.1");

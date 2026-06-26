@@ -760,6 +760,17 @@ subtest '_detect_list_context() detects list return with multiple values' => sub
 	is($output{type}, 'array', 'array type from list return');
 };
 
+subtest '_detect_list_context() ignores commas nested inside brackets' => sub {
+	my $e = _extractor();
+	my %output;
+	# Only one top-level comma (between the hashref and $c) -- the
+	# comma inside { x => 1, y => 2 } must not be counted, or this
+	# would be (wrongly) treated as a 3-value list return
+	$e->_detect_list_context(\%output, 'sub foo { return ({ x => 1, y => 2 }, $c); }');
+	is($output{type}, 'array', 'array type from list return');
+	is($output{_list_return}, 2, 'nested comma not counted toward list size');
+};
+
 # ==================================================================
 # _validate_output
 # ==================================================================
@@ -2588,6 +2599,35 @@ subtest '_analyze_relationships() deduplicates relationships' => sub {
 	my @mutex = grep { $_->{type} eq 'mutually_exclusive' } @{$result};
 	# After dedup there should be at most one entry for the same pair
 	ok(scalar @mutex <= 1, 'duplicate relationships deduplicated');
+};
+
+# ------------------------------------------------------------------
+# Regression: parameter names were extracted with a hardcoded
+# my (...) = @_ regex, so shift-style and modern-signature methods
+# never reached @param_names and _analyze_relationships always
+# returned an empty arrayref for them regardless of what the body
+# actually did with its parameters.
+# ------------------------------------------------------------------
+subtest '_analyze_relationships() detects mutually exclusive params in shift-style method' => sub {
+	my $e = _extractor();
+	my $method = {
+		name => 'connect',
+		body => 'sub connect { my $self = shift; my $file = shift; my $host = shift; die if $file && $host; }',
+	};
+	my $result = $e->_analyze_relationships($method);
+	my @mutex = grep { $_->{type} eq 'mutually_exclusive' } @{$result};
+	ok(scalar @mutex > 0, 'mutually_exclusive relationship detected for shift-style params');
+};
+
+subtest '_analyze_relationships() detects mutually exclusive params in modern-signature method' => sub {
+	my $e = _extractor();
+	my $method = {
+		name => 'connect',
+		body => 'sub connect($self, $file, $host) { die if $file && $host; }',
+	};
+	my $result = $e->_analyze_relationships($method);
+	my @mutex = grep { $_->{type} eq 'mutually_exclusive' } @{$result};
+	ok(scalar @mutex > 0, 'mutually_exclusive relationship detected for modern-signature params');
 };
 
 # ==================================================================

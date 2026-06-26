@@ -277,6 +277,78 @@ CODE
 };
 
 # ==================================================================
+# analyze -- returns_self is NOT triggered by variable names
+# that merely start with "self" (overly broad \$self(?!->))
+# --------------------------------------------------
+# Regression: \$self(?!->) without a word boundary matched the
+# "$self" prefix of any longer variable name, e.g. $self_backup,
+# so "return $self_backup;" was wrongly classified as returns_self.
+# ==================================================================
+subtest 'analyze: returns_self not triggered by $self-prefixed variable names' => sub {
+	my $ev = _evidence_after('sub foo { my $self_backup = 1; return $self_backup; }');
+	my @self_ev = grep { $_->{signal} eq 'returns_self' } @{$ev};
+	is(scalar @self_ev, 0, 'returns_self not triggered by $self_backup');
+
+	$ev = _evidence_after('sub foo { my $selfish = 1; return $selfish; }');
+	@self_ev = grep { $_->{signal} eq 'returns_self' } @{$ev};
+	is(scalar @self_ev, 0, 'returns_self not triggered by $selfish');
+
+	done_testing();
+};
+
+# ==================================================================
+# analyze -- each occurrence of a signal contributes its own
+# evidence entry (single-pass /g fix)
+# --------------------------------------------------
+# Regression: matching without /g only ever produced one evidence
+# entry per signal regardless of how many qualifying return
+# statements appeared in the source, understating the evidence
+# for methods with multiple matching return paths.
+# ==================================================================
+subtest 'analyze: each matching return statement contributes its own evidence' => sub {
+	# Two distinct properties returned from different branches
+	my $source = <<'CODE';
+sub get {
+	my ($self, $which) = @_;
+	return $self->{x} if $which eq 'x';
+	return $self->{y};
+}
+CODE
+	my $ev = _evidence_after($source);
+	my @prop = grep { $_->{signal} eq 'returns_property' } @{$ev};
+	is(scalar @prop, 2, 'two returns_property entries for two distinct property returns');
+	my %values = map { $_->{value} => 1 } @prop;
+	ok($values{x}, 'x property captured');
+	ok($values{y}, 'y property captured');
+
+	# Two plain "return $self;" statements in different branches
+	$source = <<'CODE';
+sub chain {
+	my ($self, $flag) = @_;
+	return $self if $flag;
+	return $self;
+}
+CODE
+	$ev = _evidence_after($source);
+	my @self_ev = grep { $_->{signal} eq 'returns_self' } @{$ev};
+	is(scalar @self_ev, 2, 'two returns_self entries for two plain return $self statements');
+
+	# Two constant returns in different branches
+	$source = <<'CODE';
+sub status {
+	my ($self) = @_;
+	return 0 unless $self->{ok};
+	return 1;
+}
+CODE
+	$ev = _evidence_after($source);
+	my @const = grep { $_->{signal} eq 'returns_constant' } @{$ev};
+	is(scalar @const, 2, 'two returns_constant entries for two constant return statements');
+
+	done_testing();
+};
+
+# ==================================================================
 # analyze -- add_evidence is called with correct named args
 # --------------------------------------------------
 # Uses a spy to verify the exact call signature rather than

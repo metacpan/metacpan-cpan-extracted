@@ -20,13 +20,15 @@ Readonly my $OUT_DIR => 'cover_html/lcsaj_hits';
 
 Devel::App::Test::Generator::LCSAJ::Runtime - Debugger backend for LCSAJ coverage
 
+=encoding UTF-8
+
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 SYNOPSIS
 
@@ -62,8 +64,11 @@ non-internal file is recorded.
 =cut
 
 # --------------------------------------------------
-# %HITS   - { normalised_path => { line_number => hit_count } }
-# %TARGET - set of normalised paths to record (empty means record everything)
+# %HITS       - { normalised_path => { line_number => hit_count } }
+# %TARGET     - set of normalised paths to record (empty means record everything)
+# %NORM_CACHE - { raw_file => normalised_path }, memoises abs_path()
+#               since DB::DB sees the same $file on every consecutive
+#               statement within a source file
 #
 # These must be package globals (our) rather than lexicals because DB::DB
 # is called by the Perl debugger infrastructure and needs to access them
@@ -71,6 +76,7 @@ non-internal file is recorded.
 # --------------------------------------------------
 our %HITS;
 our %TARGET;
+our %NORM_CACHE;
 
 # --------------------------------------------------
 # Populate %TARGET from LCSAJ_TARGETS at compile time.
@@ -152,15 +158,76 @@ sub _normalize {
 #             be as fast as possible.
 #             Internal files and out-of-target files
 #             are skipped immediately.
+#             abs_path() resolution is memoised in
+#             %NORM_CACHE per raw $file, since the same
+#             file is seen on every consecutive statement.
 # --------------------------------------------------
+=head2 DB::DB
+
+Perl debugger hook, automatically invoked by the interpreter before every
+statement while this module is active as a C<-d:> debugger backend.
+Records a per-(file, line) hit count used later for LCSAJ coverage
+analysis.
+
+=head3 Arguments
+
+None. Perl calls this sub directly; the current execution location is
+obtained internally via C<caller(0)>.
+
+=head3 Returns
+
+Nothing meaningful — this is a void debugger callback.
+
+=head3 Side effects
+
+Increments C<%HITS{$norm}{$line}> for the normalised path and line number
+of the statement about to execute. Resolves each distinct raw filename
+via C<Cwd::abs_path> once, memoising the result in C<%NORM_CACHE>.
+
+=head3 Usage example
+
+Not called directly — activated via the Perl debugger flag:
+
+    PERL5OPT='-d:App::Test::Generator::LCSAJ::Runtime -Mblib' prove -l t
+
+=head3 API specification
+
+=head4 input
+
+    { }
+
+=head4 output
+
+    { type => UNDEF }
+
+=head3 Formal specification
+
+Let H be the hits relation (file x line) → ℕ, T be the target-file set,
+and I be the internal-file predicate (true only for this module's own
+source path).
+
+  ┌ DB_DB ──────────────────────────────────────────
+  │ ΔH
+  │ file? : FilePath
+  │ line? : ℕ
+  ├─────────────────────────────────────────────────
+  │ norm == normalize(file?)
+  │ ¬I(norm) ∧ (T = ∅ ∨ norm ∈ T)
+  │   ⟹ H′(norm, line?) = H(norm, line?) + 1
+  │ I(norm) ∨ (T ≠ ∅ ∧ norm ∉ T)
+  │   ⟹ H′ = H
+  └─────────────────────────────────────────────────
+
+=cut
+
 sub DB::DB {
 	my (undef, $file, $line) = caller(0);
 
 	return unless defined $file && defined $line;
 
-	# Resolve symlinks and relative components to a stable absolute path
-	my $abs  = abs_path($file) // $file;
-	my $norm = _normalize($abs);
+	# Resolve symlinks and relative components to a stable absolute path,
+	# cached per raw $file to avoid a stat() on every statement
+	my $norm = $NORM_CACHE{$file} //= _normalize(abs_path($file) // $file);
 
 	# Never record hits inside this module itself — suffix match is used
 	# so it works regardless of CWD or install prefix
@@ -202,6 +269,10 @@ sub _write_results {
 
 	make_path($OUT_DIR) unless -d $OUT_DIR;
 
+	# autodie is disabled for this open -- under "use autodie qw(open)"
+	# open() never returns false on failure, it throws its own exception
+	# instead, which would silently make the "or croak" below dead code
+	no autodie qw(open);
 	open my $fh, '>', $out_file or croak "Cannot write $out_file: $!";
 
 	print $fh encode_json(\%HITS);

@@ -1,0 +1,4 @@
+use strict;
+use warnings;
+
+requires 'HTML::Escape', '1.11';

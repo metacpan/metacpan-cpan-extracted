@@ -10,7 +10,7 @@ std/internals - Runtime internals helpers for advanced modules.
     ref_id, to_String, to_Number, to_Boolean, to_Regexp,
     to_Regexp_with_flags,
     make_instance, setprop, getprop, load_module;
-
+  
   let obj_class := class_name(some_object);
   let obj_class_value := classof(some_object);
   let slots := object_slots(some_object);
@@ -119,15 +119,15 @@ lexically scoped runtime special property via outward lexical lookup.
 
   from std/internals import setprop, getprop;
   from std/path/z import ZPath;
-
+  
   setprop( "paths", ZPath );
   say( getprop( "paths" ) );   // Class object
-
+  
   do {
     setprop( "paths", null );
     say( getprop( "paths" ) ); // null (shadowed in this block)
   };
-
+  
   say( getprop( "paths" ) );   // ZPath (outer lexical value)
 
 =head1 COPYRIGHT AND LICENCE

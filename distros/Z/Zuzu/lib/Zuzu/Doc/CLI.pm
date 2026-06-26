@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.006000';
+our $VERSION = '0.007000';
 
 use File::Spec;
 use Getopt::Long qw(

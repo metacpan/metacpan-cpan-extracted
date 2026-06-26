@@ -7,11 +7,11 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =cut
 
@@ -70,8 +70,6 @@ sub applies_to {
 	my $ops = $doc->find('PPI::Token::Operator') || [];
 	for my $op (@{$ops}) {
 		next unless exists $FLIP{$op->content()};
-		my $next_sib = $op->next_sibling();
-		next if $next_sib && $next_sib->isa('PPI::Token::Symbol');
 		my $parent = $op->parent();
 		next unless $parent->isa('PPI::Statement')
 			|| $parent->isa('PPI::Structure::Condition')
@@ -137,6 +135,13 @@ The following operators and their flips are supported:
 Mutant IDs include line number, column number, and the flip target to
 ensure uniqueness even when multiple operators share a source line.
 
+Each mutant's optional C<context> field is set to C<conditional> if
+the operator sits inside (or is itself the keyword of) an
+C<if>/C<unless>/C<while>/C<until> compound statement, or C<expression>
+otherwise; its C<line_content> field holds the raw source text of the
+mutated line. Both are consumed by
+L<App::Test::Generator::Mutator>'s fast-mode dedup.
+
 =head3 API specification
 
 =head4 input
@@ -174,11 +179,6 @@ sub mutate {
 	for my $op (@{$ops}) {
 		my $original = $op->content();
 
-		# Skip readline operators — < immediately followed by
-		# a symbol token is <$fh> not a numeric comparison
-		my $next_sib = $op->next_sibling();
-		next if $next_sib && $next_sib->isa('PPI::Token::Symbol');
-
 		# Only process comparison operators that have defined flips
 		next unless exists $FLIP{$original};
 
@@ -194,6 +194,14 @@ sub mutate {
 		my $line = $op->location->[0];
 		my $col  = $op->location->[1];
 
+		# PPI always wraps a condition's content in a
+		# PPI::Statement::Expression, so the operator's immediate
+		# parent is never literally PPI::Structure::Condition --
+		# use the shared ancestor-walking helper instead, as
+		# BooleanNegation and ReturnUndef do, to correctly detect
+		# operators inside if/unless/while/until conditions
+		my $context = $self->_in_conditional($op) ? 'conditional' : 'expression';
+
 		# Generate one mutant per flip of this operator
 		for my $change (@{ $FLIP{$original} }) {
 			# Build a unique id from location and the specific flip
@@ -202,12 +210,14 @@ sub mutate {
 
 			my $mutant = eval {
 				App::Test::Generator::Mutant->new(
-					id          => $id,
-					group       => "NUM_BOUNDARY:$line",
-					description => "Numeric boundary flip $original to $change",
-					original    => $original,
-					line        => $line,
-					type        => 'comparison',
+					id           => $id,
+					group        => "NUM_BOUNDARY:$line",
+					description  => "Numeric boundary flip $original to $change",
+					original     => $original,
+					line         => $line,
+					type         => 'comparison',
+					context      => $context,
+					line_content => $self->_line_content($doc, $line),
 
 					# The transform closure captures line, col, original
 					# and change so it targets precisely the right operator
@@ -220,15 +230,6 @@ sub mutate {
 							next unless $op->line_number   == $line;
 							next unless $op->column_number == $col;
 							next unless $op->content       eq $original;
-
-							# Safety check — do not mutate if this looks like
-							# a readline operator (<$fh>) rather than a numeric
-							# comparison. A readline < is immediately followed
-							# by a symbol token starting with $
-							my $next_sib = $op->next_sibling;
-							if($next_sib && $next_sib->isa('PPI::Token::Symbol')) {
-								last;
-							}
 
 							$op->set_content($change);
 							last;

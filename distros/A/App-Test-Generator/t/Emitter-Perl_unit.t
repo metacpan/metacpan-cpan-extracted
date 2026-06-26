@@ -75,6 +75,20 @@ subtest 'new() croaks when package is missing' => sub {
 	);
 };
 
+subtest 'new() croaks when package is not a valid Perl package name' => sub {
+	throws_ok(
+		sub {
+			App::Test::Generator::Emitter::Perl->new(
+				schema  => {},
+				plans   => {},
+				package => "Evil'); system('touch /tmp/pwned'); #",
+			)
+		},
+		qr/not a valid Perl package name/,
+		'malformed package name croaks rather than being spliced into generated code',
+	);
+};
+
 subtest 'new() stores all three arguments' => sub {
 	my $schema  = { foo => { output => {} } };
 	my $plans   = { foo => { basic_test => 1 } };
@@ -157,6 +171,19 @@ subtest 'emit() handles multiple methods in sorted order' => sub {
 	my $pos_gamma = index($result, 'gamma');
 	ok($pos_alpha < $pos_beta,  'alpha appears before beta');
 	ok($pos_beta  < $pos_gamma, 'beta appears before gamma');
+};
+
+subtest 'emit() croaks when a method name is not a valid Perl identifier' => sub {
+	my $e = App::Test::Generator::Emitter::Perl->new(
+		schema  => { "foo'); system('touch /tmp/pwned'); #" => {} },
+		plans   => { "foo'); system('touch /tmp/pwned'); #" => { basic_test => 1 } },
+		package => 'Test::Package',
+	);
+	throws_ok(
+		sub { $e->emit() },
+		qr/not a valid Perl identifier/,
+		'malformed method name croaks rather than being spliced into generated code',
+	);
 };
 
 subtest 'emit() with no methods still produces valid header and footer' => sub {

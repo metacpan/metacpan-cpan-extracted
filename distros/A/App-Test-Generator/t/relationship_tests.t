@@ -333,6 +333,31 @@ like($yaml_content, qr/content/, 'YAML contains second parameter');
 # Test comments include relationship info
 like($yaml_content, qr/Parameter relationships detected:/, 'YAML comments mention relationships');
 
+# Regression: _detect_dependencies()'s second condition used the literal
+# text '$param1'/'$param2' instead of interpolating the loop variables, so
+# it could never match real code and always returned no relationships for
+# this pattern (masked in the schema-level tests above because
+# _detect_conditional_requirements independently detects the same "X
+# requires Y" wording). Call it directly to pin down its own behaviour.
+subtest '_detect_dependencies() detects "if $x && !$y" directly' => sub {
+	my $code = q{
+		sub dependency {
+			my ($self, $port, $host) = @_;
+			croak "Port requires host" if $port && !$host;
+			return "$host:$port";
+		}
+	};
+
+	my $rels = $extractor->_detect_dependencies($code, ['port', 'host']);
+
+	ok(@{$rels} >= 1, '_detect_dependencies() found at least one relationship');
+
+	my ($rel) = grep { $_->{type} eq 'dependency' } @{$rels};
+	ok($rel, 'found a dependency-type relationship');
+	is($rel->{param}, 'port', 'correct dependent parameter');
+	is($rel->{requires}, 'host', 'correct required parameter');
+};
+
 done_testing();
 
 __END__

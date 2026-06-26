@@ -2,7 +2,7 @@ package Zuzu::Runtime;
 
 use utf8;
 
-our $VERSION = '0.006000';
+our $VERSION = '0.007000';
 our $DEBUG_LEVEL = 0;
 
 use Digest::MD5 qw( md5_hex );
@@ -1260,27 +1260,35 @@ sub eval_let_unpack {
 	my $source = $node->init->evaluate($self);
 	my $dict = $self->_unwrap_builtin_collection( $source, 'Dict' );
 	my $pairlist = $self->_unwrap_builtin_collection( $source, 'PairList' );
-	if ( !$dict and !$pairlist ) {
+	my $array = $self->_unwrap_builtin_collection( $source, 'Array' );
+	if ( !$dict and !$pairlist and !$array ) {
 		my $type = $self->_type_name($source);
 		die Zuzu::Error->new_runtime(
-			message => "Declaration unpacking expects Dict or PairList, got $type",
+			message => "Declaration unpacking expects Dict, PairList, or Array, got $type",
 			file => $node->file,
 			line => $node->line,
 		);
 	}
 
 	my @resolved;
+	my $index = 0;
 	for my $binding ( @{ $node->bindings // [] } ) {
-		my $key = $binding->{key_expr}->evaluate($self);
-		$key = defined($key) ? "$key" : '';
 		my ( $present, $value );
-		if ($dict) {
-			$present = exists $dict->map->{$key} ? 1 : 0;
-			$value = slot_value( \$dict->map->{$key} ) if $present;
+		if ($array) {
+			$present = $index < @{ $array->items } ? 1 : 0;
+			$value = slot_value( \$array->items->[$index] ) if $present;
 		}
 		else {
-			$present = $pairlist->contains_key($key) ? 1 : 0;
-			$value = $pairlist->get($key) if $present;
+			my $key = $binding->{key_expr}->evaluate($self);
+			$key = defined($key) ? "$key" : '';
+			if ($dict) {
+				$present = exists $dict->map->{$key} ? 1 : 0;
+				$value = slot_value( \$dict->map->{$key} ) if $present;
+			}
+			else {
+				$present = $pairlist->contains_key($key) ? 1 : 0;
+				$value = $pairlist->get($key) if $present;
+			}
 		}
 
 		if ( !$present and $binding->{has_default} ) {
@@ -1300,6 +1308,7 @@ sub eval_let_unpack {
 		) if !$binding->{_skip_type_check};
 
 		push @resolved, [ $binding, $value ];
+		$index++;
 	}
 
 	for my $item ( @resolved ) {
@@ -2176,106 +2185,120 @@ sub eval_switch {
 	my ( $self, $node ) = @_;
 
 	my $value = $node->value_expr->evaluate($self);
+	my $env = Zuzu::Env->_new_fast( $self->{_stack}[-1] );
+	$self->_push_env($env);
+	$env->declare( '^^', $value, 1, 'Any' );
+
 	my $matched = 0;
 	my $fell_through = 0;
 	my $result;
 	my $cases = $node->cases // [];
 	my $dispatch = $self->_switch_dispatch_table( $node, $cases, $value );
-	if ( $dispatch and exists $dispatch->{case_index} ) {
-		my $start_index = $dispatch->{case_index};
-		for my $case ( @{$cases}[ $start_index .. $#$cases ] ) {
-			$fell_through = 0;
+	my $ok = eval {
+		SWITCH_EVAL: {
+			if ( $dispatch and exists $dispatch->{case_index} ) {
+				my $start_index = $dispatch->{case_index};
+				$matched = 1;
+				for my $case ( @{$cases}[ $start_index .. $#$cases ] ) {
+					$fell_through = 0;
 
-			eval {
-				$result = $case->{body}->evaluate($self);
-				1;
-			} or do {
-				my $e = $@;
-				if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
-					$fell_through = 1;
-					next;
+					eval {
+						$result = $case->{body}->evaluate($self);
+						1;
+					} or do {
+						my $e = $@;
+						if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
+							$fell_through = 1;
+							next;
+						}
+						die $e;
+					};
+
+					last if !$fell_through;
 				}
-				die $e;
-			};
+				if ( ( !$matched || $fell_through ) and defined $node->default_block ) {
+					eval {
+						$result = $node->default_block->evaluate($self);
+						1;
+					} or do {
+						my $e = $@;
+						if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
+							last SWITCH_EVAL;
+						}
+						die $e;
+					};
+				}
+				last SWITCH_EVAL;
+			}
+			if ( $dispatch and $dispatch->{eligible} and defined $node->default_block ) {
+				eval {
+					$result = $node->default_block->evaluate($self);
+					1;
+				} or do {
+					my $e = $@;
+					if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
+						last SWITCH_EVAL;
+					}
+					die $e;
+				};
+				last SWITCH_EVAL;
+			}
 
-			return $result if !$fell_through;
+			CASE:
+			for my $case ( @$cases ) {
+				if ( !$matched ) {
+					for my $case_value ( @{ $case->{values} // [] } ) {
+						my $operator = $node->comparator;
+						my $candidate_expr = $case_value;
+						if ( ref($case_value) eq 'HASH' ) {
+							$operator = $case_value->{operator} // $operator;
+							$candidate_expr = $case_value->{value};
+						}
+						my $candidate = $candidate_expr->evaluate($self);
+						if ( $self->_switch_matches( $operator, $value, $candidate, $node->file, $node->line ) ) {
+							$matched = 1;
+							last;
+						}
+					}
+				}
+
+				next if !$matched;
+				$fell_through = 0;
+
+				eval {
+					$result = $case->{body}->evaluate($self);
+					1;
+				} or do {
+					my $e = $@;
+					if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
+						$fell_through = 1;
+						next CASE;
+					}
+					die $e;
+				};
+
+				last CASE;
+			}
+
+			if ( ( !$matched or $fell_through ) and defined $node->default_block ) {
+				eval {
+					$result = $node->default_block->evaluate($self);
+					1;
+				} or do {
+					my $e = $@;
+					if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
+						last SWITCH_EVAL;
+					}
+					die $e;
+				};
+			}
 		}
-		if ( defined $node->default_block ) {
-			eval {
-				$result = $node->default_block->evaluate($self);
-				1;
-			} or do {
-				my $e = $@;
-				if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
-					return $result;
-				}
-				die $e;
-			};
-		}
-		return $result;
-	}
-	if ( $dispatch and $dispatch->{eligible} and defined $node->default_block ) {
-		eval {
-			$result = $node->default_block->evaluate($self);
-			1;
-		} or do {
-			my $e = $@;
-			if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
-				return $result;
-			}
-			die $e;
-		};
-		return $result;
-	}
 
-	CASE:
-	for my $case ( @$cases ) {
-		if ( !$matched ) {
-			for my $case_value ( @{ $case->{values} // [] } ) {
-				my $operator = $node->comparator;
-				my $candidate_expr = $case_value;
-				if ( ref($case_value) eq 'HASH' ) {
-					$operator = $case_value->{operator} // $operator;
-					$candidate_expr = $case_value->{value};
-				}
-				my $candidate = $candidate_expr->evaluate($self);
-				if ( $self->_switch_matches( $operator, $value, $candidate, $node->file, $node->line ) ) {
-					$matched = 1;
-					last;
-				}
-			}
-		}
-
-		next if !$matched;
-		$fell_through = 0;
-
-		eval {
-			$result = $case->{body}->evaluate($self);
-			1;
-		} or do {
-			my $e = $@;
-			if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
-				$fell_through = 1;
-				next CASE;
-			}
-			die $e;
-		};
-
-		last CASE;
-	}
-
-	if ( ( !$matched or $fell_through ) and defined $node->default_block ) {
-		eval {
-			$result = $node->default_block->evaluate($self);
-			1;
-		} or do {
-			my $e = $@;
-			if ( ref($e) and $e->{_control} and $e->{_control} eq 'continue' ) {
-				return $result;
-			}
-			die $e;
-		};
-	}
+		1;
+	};
+	my $err = $@;
+	$self->_pop_env;
+	die $err if !$ok;
 
 	return $result;
 }
@@ -3412,8 +3435,44 @@ sub eval_unary {
 		}
 		return length( $self->_to_OperatorString( $v, $node->file, $node->line ) );
 	}
+	if ( $op eq '#' ) {
+		return $self->_cardinality_value( $v, $node->file, $node->line );
+	}
 	return $self->_type_name($v) if $op eq 'typeof';
 	die Zuzu::Error->new_runtime(message => "Unsupported unary op '$op'", file => $node->file, line => $node->line);
+}
+
+sub _cardinality_value {
+	my ( $self, $value, $file, $line ) = @_;
+
+	if ( blessed($value) ) {
+		if (
+			$value->isa('Zuzu::Value::Array')
+			or $value->isa('Zuzu::Value::Dict')
+			or $value->isa('Zuzu::Value::PairList')
+			or $value->isa('Zuzu::Value::Set')
+			or $value->isa('Zuzu::Value::Bag')
+		) {
+			return $value->count;
+		}
+		if ( $value->isa('Zuzu::Value::Object') ) {
+			my $method = $self->_lookup_method( $value->class, 'count', 0 );
+			return $self->_call_method(
+				$method,
+				$value,
+				[],
+				$EMPTY_HASH,
+				$EMPTY_ARRAY,
+				$file,
+				$line,
+			) if $method;
+		}
+		if ( $value->isa('Zuzu::Value::BinaryString') ) {
+			return $value->byte_length;
+		}
+	}
+
+	return length( $self->_to_OperatorString( $value, $file, $line ) );
 }
 
 sub _make_lvalue_ref_closure {
@@ -4777,6 +4836,17 @@ sub eval_member_call {
 			die Zuzu::Error->new_runtime(message => "Named arguments are not supported for Bag methods", file => $node->file, line => $node->line)
 				if _named_pairs_count( $named_pairs );
 			return $self->_bag_method($bag_like, $node->method, $positional, $node->file, $node->line);
+		}
+		if ( my $fallback = $self->_call_missing_method_fallback(
+			$obj,
+			$node->method,
+			$positional,
+			$named_pairs,
+			$node->file,
+			$node->line,
+			$node->{_arg_static_types},
+		) ) {
+			return $fallback->[0];
 		}
 		die Zuzu::Error->new_runtime(message => "Unknown method '".$node->method."'", file => $node->file, line => $node->line);
 	}
@@ -6477,6 +6547,31 @@ sub _named_pairs_count {
 	return 0 if !defined $named_pairs;
 
 	return scalar @{ $named_pairs };
+}
+
+sub _call_missing_method_fallback {
+	my ( $self, $obj, $method_name, $positional, $named_pairs, $file, $line, $arg_static_types ) = @_;
+
+	my $fallback = $self->_lookup_method( $obj->class, '__call__', 0 )
+		or return undef;
+
+	my $args_array = Zuzu::Value::Array->new(
+		items => [ @{ $positional // $EMPTY_ARRAY } ],
+	);
+	my $opts_pairlist = Zuzu::Value::PairList->new(
+		list => [ map { [ $_->[0], $_->[1] ] } @{ $named_pairs // $EMPTY_ARRAY } ],
+	);
+
+	return [ $self->_call_method(
+		$fallback,
+		$obj,
+		[ $method_name, $args_array, $opts_pairlist ],
+		$EMPTY_HASH,
+		$EMPTY_ARRAY,
+		$file,
+		$line,
+		$arg_static_types,
+	) ];
 }
 
 sub _call_method {

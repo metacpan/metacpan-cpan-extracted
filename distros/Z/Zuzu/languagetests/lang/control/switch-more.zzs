@@ -28,6 +28,14 @@ switch ( "foo": eq ) {
 		block_form := block_form + 10;
 	}
 }
+
+let switched := 0;
+switch ( 1 ) {
+	case 1: switched := ^^;
+	default: switched := 99;
+}
+
+is( switched, 1, "switch binds ^^ to the switched-on value" );
 is( block_form, 1, "switch accepts explicit blocks in case bodies" );
 let pattern := "";
 

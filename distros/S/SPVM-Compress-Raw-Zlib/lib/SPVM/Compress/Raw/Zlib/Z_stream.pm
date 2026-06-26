@@ -8,60 +8,15 @@ package SPVM::Compress::Raw::Zlib::Z_stream;
 
 =head1 Name
 
-SPVM::Compress::Raw::Zlib::Z_stream - Short Description
+SPVM::Compress::Raw::Zlib::Z_stream - Zlib Stream
 
 =head1 Description
 
-Compress::Raw::Zlib::Z_stream class in L<SPVM> has methods to do someting.
+Compress::Raw::Zlib::Z_stream class in L<SPVM> represents a Zlib stream.
 
 =head1 Usage
 
   use Compress::Raw::Zlib::Z_stream;
-
-=head1 Details
-
-
-
-=head1 Super Class
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-=head1 Well Known Child Classes
-
-
-
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 

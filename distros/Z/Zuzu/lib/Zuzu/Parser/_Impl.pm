@@ -2,7 +2,7 @@ package Zuzu::Parser::_Impl;
 
 use utf8;
 
-our $VERSION = '0.006000';
+our $VERSION = '0.007000';
 
 use Zuzu::AST::Block;
 use Zuzu::AST::Expr::Array;
@@ -2239,6 +2239,7 @@ sub parse_prefix {
 			or $t->value eq '!'
 			or $t->value eq '¬'
 			or $t->value eq '~'
+			or $t->value eq '#'
 			or $t->value eq '√'
 			or $t->value eq '\\'
 		)

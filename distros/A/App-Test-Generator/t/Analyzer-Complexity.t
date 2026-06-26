@@ -476,6 +476,40 @@ subtest 'analyze: branching keywords are whole-word matched' => sub {
 };
 
 # ==================================================================
+# analyze -- ? and other operators inside strings/comments
+# must NOT inflate the cyclomatic score
+# --------------------------------------------------
+# Regression: the logical-operator count previously matched
+# &&/||/? against the raw source body, so a literal "?" inside a
+# string message (e.g. a prompt like "Are you sure?") or a
+# keyword inside a comment was miscounted as a real decision point.
+# ==================================================================
+subtest 'analyze: ?/keywords inside strings or comments do not inflate score' => sub {
+	# A bare string containing "?" but no real ternary operator
+	my $report = _analyze_body('sub confirm { return "Are you sure?"; }');
+	is($report->{cyclomatic_score}, $CYCLOMATIC_BASE,
+		'"?" inside a string literal does not add to cyclomatic_score');
+
+	# "if"/"die" appear only inside a comment, not as real code
+	$report = _analyze_body(
+		"sub get { # die if this fails, but it never does\n\treturn 1;\n}"
+	);
+	is($report->{branching_points}, 0, '"if" inside a comment does not count as a branching point');
+	is($report->{exception_paths},  0, '"die" inside a comment does not count as an exception path');
+
+	# A real ternary alongside a string containing "?" -- both must
+	# be counted correctly: the real ternary detected, the string
+	# content ignored
+	$report = _analyze_body(
+		q{sub ask { my $x = $a ? "Are you sure?" : "No way?"; return $x; }}
+	);
+	is($report->{cyclomatic_score}, $CYCLOMATIC_BASE + 1,
+		'real ternary is still counted once despite "?" inside the surrounding strings');
+
+	done_testing();
+};
+
+# ==================================================================
 # analyze -- exception keywords are whole-word matched
 # ==================================================================
 subtest 'analyze: exception keywords are whole-word matched' => sub {

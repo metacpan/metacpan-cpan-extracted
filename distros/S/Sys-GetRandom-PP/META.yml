@@ -25,6 +25,7 @@ no_index:
 requires:
   Carp: '0'
   Config: '0'
+  Errno: '0'
   Exporter: '5.57'
   constant: '1.03'
   strict: '0'
@@ -32,5 +33,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/mauke/Sys-GetRandom-PP/issues
   repository: https://codeberg.org/mauke/Sys-GetRandom-PP.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

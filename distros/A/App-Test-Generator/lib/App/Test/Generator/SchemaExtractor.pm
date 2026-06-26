@@ -65,11 +65,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 SYNOPSIS
 
@@ -1239,6 +1239,7 @@ Construct a new SchemaExtractor for a given Perl source file.
         max_parameters       => 50,                 # Default: 20
         confidence_threshold => 0.7,               # Default: 0.5
         strict_pod           => 0|1|2,              # Default: 0 (off)
+        allow_signature_exec => 1,                  # Default: 0 (off)
     );
 
 =head3 Arguments
@@ -1262,8 +1263,10 @@ Print progress messages to stdout during analysis. Optional, default 0.
 =item * C<include_private>
 
 Include methods whose names begin with C<_> in the analysis. Optional,
-default 0. Methods named C<_new>, C<_init>, and C<_build> are always
-included regardless of this setting.
+default 0. Methods whose name begins with C<_new>, C<_init>, or
+C<_build> are always included regardless of this setting (a prefix
+match, so e.g. C<_build_attribute> and C<_init_logger> qualify too,
+matching common Moose builder/initializer naming conventions).
 
 =item * C<max_parameters>
 
@@ -1280,6 +1283,20 @@ C<_low_confidence =E<gt> 1>. Optional, default 0.5.
 Controls POD/code agreement validation. C<0> disables validation,
 C<1> emits warnings, C<2> croaks on first disagreement. Also accepts
 the strings C<off>, C<warn>, and C<fatal>. Optional, default 0.
+
+=item * C<allow_signature_exec>
+
+Opt-in flag allowing extraction of parameter types from a
+L<Type::Params> C<signature_for()> declaration. This requires actually
+running the C<signature_for> expression (sliced from the target
+module's own source) in a forked C<perl -T> process, since
+L<Type::Params> types are runtime objects that cannot be introspected
+statically. Every other extraction path in this module is static
+(L<PPI>-only) analysis that never executes any of the target module's
+code; this is the one exception. Optional, default 0 (the
+C<signature_for> path is silently skipped, with a warning under
+C<verbose>, when off). Only enable this for modules whose code you
+already trust enough to execute.
 
 =back
 
@@ -1304,6 +1321,7 @@ Reads and parses the input file using L<PPI> at construction time.
         max_parameters       => { type => SCALAR,  optional => 1 },
         confidence_threshold => { type => SCALAR,  optional => 1 },
         strict_pod           => { type => SCALAR,  optional => 1 },
+        allow_signature_exec => { type => SCALAR,  optional => 1 },
     }
 
 =head4 output
@@ -1333,6 +1351,7 @@ sub new {
 		confidence_threshold => $params->{confidence_threshold} // $DEFAULT_CONFIDENCE_THRESH,
 		max_parameters       => $params->{max_parameters}       // $DEFAULT_MAX_PARAMETERS,	# safety limit
 		strict_pod => _validate_strictness_level($params->{strict_pod}),	# Enable strict POD checking
+		allow_signature_exec => $params->{allow_signature_exec} // 0,	# opt-in: execute Type::Params signature_for() exprs from the target module
 	};
 
 	# Validate input file exists
@@ -1638,20 +1657,15 @@ sub _extract_class_methods {
 		my $class_name = $1;
 		my $start_pos = pos($content);
 
-		# Find the matching closing brace (simple brace counting)
-		my $depth = 1;
-		my $class_end = $start_pos;
+		# Find the matching closing brace. $start_pos is just after the
+		# opening '{' consumed by the regex above, so back up one
+		# character to hand the brace itself to extract_bracketed.
+		require Text::Balanced;
+		my $extracted = Text::Balanced::extract_bracketed(substr($content, $start_pos - 1), '{}');
 
-		while ($depth > 0 && $class_end < length($content)) {
-			my $char = substr($content, $class_end, 1);
-			$depth++ if $char eq '{';
-			$depth-- if $char eq '}';
-			$class_end++;
-		}
+		next unless defined $extracted;	# unbalanced braces, skip class
 
-		next if $depth != 0;	# unbalanced braces, skip class
-
-		my $class_body = substr($content, $start_pos, $class_end - $start_pos - 1);
+		my $class_body = substr($extracted, 1, length($extracted) - 2);
 
 		$self->_log("  Found class $class_name");
 
@@ -1985,9 +1999,6 @@ $schema->{output} = $self->_analyze_output(
 			@{ $schema->{_yamltest_hints}{boundary_values} };
 
 		foreach my $v (@{ $self->_numeric_boundary_values }) {
-			push @{ $schema->{_yamltest_hints}{boundary_values} }, $v
-			unless $seen{$v}++;
-
 			my $key = defined $v ? $v : '__undef__';
 			push @{ $schema->{_yamltest_hints}{boundary_values} }, $v unless $seen{$key}++;
 		}
@@ -2764,25 +2775,32 @@ sub _parse_pv_call {
 	$string =~ s/^\s*\(\s*//;
 	$string =~ s/\s*\)\s*$//;
 
-	# Find the first comma at brace-depth 0
-	my $depth = 0;
-	my $comma_pos;
+	# Find the first comma at brace-depth 0, jumping over each balanced
+	# {...} block in one step via extract_bracketed rather than
+	# counting depth character by character
+	require Text::Balanced;
+	my $rest = $string;
+	my $comma_pos = 0;
+	my $found_comma = 0;
 
-	for my $i (0 .. length($string) - 1) {
-		my $char = substr($string, $i, 1);
-
-		if ($char eq '{') {
-			$depth++;
-		} elsif ($char eq '}') {
-			$depth--;
-			return if $depth < 0;	# Broken source code
-		} elsif ($char eq ',' && $depth == 0) {
-			$comma_pos = $i;
+	while (length $rest) {
+		if (substr($rest, 0, 1) eq '{') {
+			# extract_bracketed advances $rest past the extracted block
+			# in place, so $rest must not be re-truncated afterwards
+			my $extracted = Text::Balanced::extract_bracketed($rest, '{}');
+			return unless defined $extracted;	# Broken source code
+			$comma_pos += length $extracted;
+			next;
+		}
+		if (substr($rest, 0, 1) eq ',') {
+			$found_comma = 1;
 			last;
 		}
+		$comma_pos++;
+		$rest = substr($rest, 1);
 	}
 
-	return unless defined $comma_pos;
+	return unless $found_comma;
 
 	my $first_arg = substr($string, 0, $comma_pos);
 	my $hash_str = substr($string, $comma_pos + 1);
@@ -3090,9 +3108,37 @@ sub _extract_signature_expression {
 #
 # Purpose:    Compile and evaluate a Type::Params
 #             signature expression in an isolated
-#             environment to extract parameter
-#             metadata without polluting the
-#             current process.
+#             process to extract parameter metadata
+#             without polluting the current process.
+#
+#             Only runs when the caller passed
+#             allow_signature_exec => 1 to new().
+#             Extracting parameter types from a
+#             Type::Params signature_for() declaration
+#             requires actually building the type
+#             objects at runtime -- there is no purely
+#             static way to do it -- so this is real
+#             execution of an excerpt of the target
+#             module's own source. Every other code
+#             path in this module is static (PPI-only)
+#             analysis that never runs the target's
+#             code, so this one feature must be opted
+#             into explicitly rather than triggered
+#             implicitly by extract_all().
+#
+#             A Safe compartment was previously tried
+#             first as a "fast path" before falling
+#             back to this subprocess unconditionally.
+#             It was removed: Type::Params and
+#             Types::Common pull in XS modules (e.g.
+#             B.pm via Type::Params), and Safe cannot
+#             host XS/dynamic loading at all, so the
+#             compartment never succeeded for any real
+#             signature_for() declaration -- it was
+#             dead code that gave a false impression of
+#             sandboxing while every real call fell
+#             through to the unconditional subprocess
+#             below.
 #
 # Entry:      $function        - function name string.
 #             $signature_expr  - Type::Params
@@ -3102,6 +3148,8 @@ sub _extract_signature_expression {
 # Exit:       Returns a decoded JSON hashref
 #             containing parameters and returns
 #             metadata on success.
+#             Returns undef without running anything if
+#             allow_signature_exec was not enabled.
 #             Croaks on unsafe expressions, timeout,
 #             or compile errors.
 #
@@ -3115,10 +3163,23 @@ sub _extract_signature_expression {
 sub _compile_signature_isolated {
 	my ($self, $function, $signature_expr) = @_;
 
+	unless ($self->{allow_signature_exec}) {
+		carp "Skipping Type::Params signature_for($function) extraction: ",
+			'allow_signature_exec => 1 was not passed to new() ',
+			'(this would execute code from the target module)'
+			if $self->{verbose};
+		return;
+	}
+
 	# Remove comments
 	$signature_expr =~ s/#.*$//mg;
 
-	# Reject obviously dangerous constructs
+	# Reject obviously dangerous constructs. This is defense in depth
+	# only, not a real security boundary -- it is a denylist of literal
+	# tokens and cannot catch e.g. a symbolic-ref call built by string
+	# concatenation. The actual control here is the allow_signature_exec
+	# opt-in above: this code must never run against a module the caller
+	# has not already decided to trust enough to execute.
 	if ($signature_expr =~ /\b(?:system|exec|open|fork|require|do|eval|qx)\b/) {
 		die 'Unsafe signature expression';
 	}
@@ -3187,12 +3248,6 @@ PERL
 	# Substitute function name and signature expression
 	$payload =~ s/FUNCTION_NAME/$function/g;
 	$payload =~ s/SIGNATURE_EXPR/$signature_expr/;
-
-	my $compartment = Safe->new();
-	$compartment->permit_only(qw(:base_core :base_mem :base_orig :load));
-	if(my $sig = $compartment->reval($payload)) {
-		return $sig;
-	}
 
 	# Run in an isolated Perl process
 	my ($wtr, $rdr, $err) = (undef, undef, gensym);
@@ -4378,13 +4433,20 @@ sub _detect_list_context {
 	# Avoid false positives from function calls
 	if ($code =~ /return\s*\(\s*([^)]+)\s*\)\s*;/) {
 		my $content = $1;
-		# Count commas outside of nested structures
+
+		# Count commas outside of nested structures, jumping over each
+		# balanced bracketed block in one step via extract_bracketed
+		require Text::Balanced;
 		my $comma_count = 0;
-		my $depth = 0;
-		for my $char (split //, $content) {
-			$depth++ if $char eq '(' || $char eq '[' || $char eq '{';
-			$depth-- if $char eq ')' || $char eq ']' || $char eq '}';
-			$comma_count++ if $char eq ',' && $depth == 0;
+		my $rest = $content;
+		while (length $rest) {
+			if (substr($rest, 0, 1) =~ /[(\[{]/) {
+				my $extracted = Text::Balanced::extract_bracketed($rest, '(){}[]');
+				last unless defined $extracted;	# Unbalanced brackets
+				next;
+			}
+			$comma_count++ if substr($rest, 0, 1) eq ',';
+			$rest = substr($rest, 1);
 		}
 
 		if ($comma_count > 0 && $content !~ /\b(?:bless|new)\b/) {
@@ -4686,12 +4748,17 @@ sub _infer_type_from_expression {
 
 	# Check for multiple comma-separated values (indicates array/list)
 	if ($expr =~ /,/) {
+		require Text::Balanced;
 		my $comma_count = 0;
-		my $depth = 0;
-		for my $char (split //, $expr) {
-			$depth++ if $char =~ /[\(\[\{]/;
-			$depth-- if $char =~ /[\)\]\}]/;
-			$comma_count++ if $char eq ',' && $depth == 0;
+		my $rest = $expr;
+		while (length $rest) {
+			if (substr($rest, 0, 1) =~ /[(\[{]/) {
+				my $extracted = Text::Balanced::extract_bracketed($rest, '(){}[]');
+				last unless defined $extracted;	# Unbalanced brackets
+				next;
+			}
+			$comma_count++ if substr($rest, 0, 1) eq ',';
+			$rest = substr($rest, 1);
 		}
 
 		if ($comma_count > 0) {
@@ -5125,9 +5192,20 @@ sub _analyze_parameter_type {
 	# Heuristic numeric inference (low confidence)
 	# ------------------------------------------------------------
 	if (!$p->{type}) {
+		# An explicit looks_like_number($param) check is a direct
+		# numeric-type assertion by the author, stronger evidence than
+		# incidental arithmetic adjacency (e.g. $param is only ever
+		# used inside a defined-or default before the arithmetic, so
+		# the arithmetic-operator check below never sees $param itself
+		# next to an operator).
+		if ($code =~ /\blooks_like_number\s*\(\s*\$$param\s*\)/) {
+			$p->{type} = 'number';
+			$p->{_type_confidence} = 'heuristic';
+			$self->_log("  CODE: $param inferred as number (looks_like_number check)");
+		}
 		# Numeric operators: + - * / % **
 		# Use \/(?!\/) to exclude // (defined-or) from matching as division.
-		if (
+		elsif (
 			$code =~ /\$$param\s*(?:[\+\-\*\%]|\/(?!\/))/ ||
 			$code =~ /(?:[\+\-\*\%]|\/(?!\/))\s*\$$param/ ||
 			$code =~ /\bint\s*\(\s*\$$param\s*\)/ ||
@@ -5800,24 +5878,30 @@ sub _parse_modern_signature {
 
 	$self->_log("  DEBUG: Parsing signature: [$sig]");
 
-	# Split signature by commas, but respect nested structures
+	# Split signature by commas, but respect nested structures (e.g. a
+	# default value containing a hashref/arrayref literal)
+	require Text::Balanced;
 	my @parts;
 	my $current = '';
-	my $depth = 0;
+	my $rest = $sig;
 
-	for my $char (split //, $sig) {
-		if ($char eq '(' || $char eq '[' || $char eq '{') {
-			$depth++;
-			$current .= $char;
-		} elsif ($char eq ')' || $char eq ']' || $char eq '}') {
-			$depth--;
-			$current .= $char;
-		} elsif ($char eq ',' && $depth == 0) {
+	while (length $rest) {
+		if (substr($rest, 0, 1) =~ /[(\[{]/) {
+			# extract_bracketed advances $rest past the extracted block
+			# in place, so $rest must not be re-truncated afterwards
+			my $extracted = Text::Balanced::extract_bracketed($rest, '(){}[]');
+			last unless defined $extracted;	# Unbalanced brackets
+			$current .= $extracted;
+			next;
+		}
+		if (substr($rest, 0, 1) eq ',') {
 			push @parts, $current;
 			$current = '';
-		} else {
-			$current .= $char;
+			$rest = substr($rest, 1);
+			next;
 		}
+		$current .= substr($rest, 0, 1);
+		$rest = substr($rest, 1);
 	}
 	push @parts, $current if $current =~ /\S/;
 
@@ -7268,10 +7352,13 @@ sub _set_defaults {
 # Side effects: Logs detections to stdout when
 #               verbose is set.
 #
-# Notes:      Parameter names are extracted from
-#             the my (...) = @_ pattern only —
-#             shift-style parameters are not
-#             currently analysed for relationships.
+# Notes:      Parameter names are extracted via
+#             _extract_parameters_from_signature, so
+#             every style it supports -- my (...) =
+#             @_, shift-style (my $x = shift), direct-
+#             index ($_[N]), and modern signatures --
+#             is analysed for relationships, not just
+#             the my (...) = @_ list-assignment form.
 # --------------------------------------------------
 sub _analyze_relationships {
 	my ($self, $method) = @_;
@@ -7279,12 +7366,12 @@ sub _analyze_relationships {
 	my $code = $method->{body};
 	my @relationships;
 
-	# Extract all parameter names from the method
-	my @param_names;
-	if ($code =~ /my\s*\(\s*\$\w+\s*,\s*(.+?)\)\s*=\s*\@_/s) {
-		my $params = $1;
-		@param_names = $params =~ /\$(\w+)/g;
-	}
+	# Extract all parameter names from the method, using the same
+	# multi-style detection used for schema population so shift-style
+	# and modern-signature methods get relationship analysis too
+	my %params;
+	$self->_extract_parameters_from_signature(\%params, $code);
+	my @param_names = sort { $params{$a}{position} <=> $params{$b}{position} } keys %params;
 
 	return [] unless @param_names;
 
@@ -7630,7 +7717,7 @@ sub _detect_dependencies {
 			# Pattern 1: Error message mentions "X requires Y" AND code checks $x && !$y
 			# Split into two checks to be more flexible
 			if (($code =~ /(?:die|croak|confess)\s+['"]\w*$param1[^'"]*requires[^'"]*$param2/i) &&
-			    ($code =~ /if\s+\$param1\s+&&\s+!\$param2/)) {
+			    ($code =~ /if\s+\$$param1\s+&&\s+!\$$param2/)) {
 
 				push @relationships, {
 					type => 'dependency',
@@ -8819,8 +8906,12 @@ sub _detect_external_object_dependency {
 	}
 
 	# Pattern 2: Calls methods on objects from other classes
-	if ($method_body =~ /\$(\w+)->\w+\(/g) {
+	if ($method_body =~ /\$(\w+)->\w+\(/) {
 		my %object_vars;
+		# Reset pos for global match — the if check above used a
+		# non-/g match so it cannot have advanced pos, but the while
+		# loop's own /g matches still need to start from the beginning.
+		pos($method_body) = 0;
 		while ($method_body =~ /\$(\w+)->\w+\(/g) {
 			$object_vars{$1}++;
 		}
@@ -9661,8 +9752,9 @@ it is useful for creating a template which you can modify to create a working sc
 
 =head1 TODO
 
-Extend C<=head4 Input> parsing to cover union types (e.g. C<scalar | scalarref>)
-and the C<enum>/C<memberof> constraint synonym.
+Extend C<=head4 Input> parsing to cover the C<enum>/C<memberof> constraint
+synonym (union types, e.g. C<scalar | scalarref>, are already handled by
+C<_map_formal_input_type>).
 
 =head1 SEE ALSO
 

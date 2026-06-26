@@ -2,7 +2,7 @@ package CPAN::MetaPackager;
 
 use 5.36.0;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 #-------------------------------------------------
 
@@ -25,9 +25,11 @@ CPAN::MetaPackager - Manage the cpan.metapackager.sqlite database
 =back
 
 =over
+=item 'Run' here means run from the bash command line
 =item cd /tmp
 =item Run: wget https://www.cpan.org/modules/02packages.details.txt.gz
 =item Run: gunzip 02packages.details.txt.gz
+=item Run: cp 02packages.details.txt ~/backup
 =item Run: tar xvf CPAN-MetaPackager-1.00.tgz
 =item cd CPAN-MetaPackager
 =item The next command will take 104 minutes for 264,956 records on my Levono M70Q 'Tiny' desktop

@@ -29,7 +29,7 @@ do { my $x = {
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12',
+                                      'Test::Spelling' => '0.17',
                                       'Test::Vars' => '0.014',
                                       'Test::Version' => '1',
                                       'warnings' => '0'
@@ -54,7 +54,6 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'perl' => '5.006002',
                                    'warnings' => '0'
                                  }
                  }

@@ -25,10 +25,10 @@ WriteMakefile(
 
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
-        'Alien::pugixml'      => 0,
+        'Alien::pugixml'      => '0.03',
     },
     BUILD_REQUIRES => {
-        'Alien::pugixml' => 0,
+        'Alien::pugixml' => '0.03',
     },
     PREREQ_PM => {},
     TEST_REQUIRES => {

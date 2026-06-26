@@ -1,11 +1,12 @@
 bin/cli-simple
-bin/create-modulino.pl
+bin/create-modulino
 ChangeLog
 lib/CLI/Simple.pm
 lib/CLI/Simple/Constants.pm
 lib/CLI/Simple/DumpSpec.pm
 lib/CLI/Simple/Helpers.pm
 lib/CLI/Simple/Migrate.pm
+lib/CLI/Simple/Modulino.pm
 lib/CLI/Simple/Scaffold.pm
 lib/CLI/Simple/Shell.pm
 lib/CLI/Simple/Utils.pm

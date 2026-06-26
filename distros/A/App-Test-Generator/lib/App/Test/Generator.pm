@@ -37,7 +37,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use constant {
 	DEFAULT_ITERATIONS => 30,
@@ -156,7 +156,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 SYNOPSIS
 
@@ -182,7 +182,7 @@ From the command line:
 
   # Attempt to create a formal definition from a routine package, then run tests against that formal definition
   # This is the holy grail of automatic test generation, just by looking at the source code
-  extract-schemas bin/extract-schemas lib/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yaml
+  extract-schemas lib/App/Test/Generator/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yml
 
 From Perl:
 
@@ -1007,10 +1007,10 @@ This example takes you through testing the online_render method of L<HTML::Genea
       name: Fuzz testing with perl ${{ matrix.perl }} on ${{ matrix.os }}
 
       steps:
-        - uses: actions/checkout@v5
+        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
         - name: Set up Perl
-          uses: shogo82148/actions-setup-perl@v1
+          uses: shogo82148/actions-setup-perl@a198315ec4e9244f206879ea7b63078003aec8a6 # v1.41.1
           with:
             perl-version: ${{ matrix.perl }}
 
@@ -1556,7 +1556,7 @@ Takes a schema file and produces a test file (or STDOUT).
         input_file  => { type => 'string', optional => 1 },
         output_file => { type => 'string', optional => 1 },
         schema      => { type => 'hashref', optional => 1 },
-        quiet       => { type => 'boolean', optional => 1 },
+        quiet       => { type => 'boolean', optional => 1 },	# accepted but not yet implemented; has no effect
     }
 
 =head4 Output
@@ -1659,8 +1659,17 @@ sub generate
 		_validate_module($module, $schema_file);
 	}
 
+	# $module/$function are spliced unescaped into generated test
+	# source below (use_ok, new_ok, ->$function, $module::$function)
+	# — reject anything that isn't identifier-shaped before that happens.
+	_assert_identifier($module, 'module', package => 1) if defined($module) && length($module);
+
 	# sensible defaults
 	$function ||= 'run';
+	# package => 1: fully-qualified sub names (e.g. DB::DB, a debugger
+	# hook installed into the DB:: package regardless of its source
+	# package) are legitimate function names, not just bare identifiers
+	_assert_identifier($function, 'function', package => 1);
 	$iterations ||= DEFAULT_ITERATIONS;		 # default fuzz runs if not specified
 	$seed = undef if defined $seed && $seed eq '';	# treat empty as undef
 
@@ -2029,9 +2038,12 @@ sub generate
 			if(ref($inputs) eq 'ARRAY') {
 				$input_str = join(', ', map { perl_quote($_) } @{$inputs});
 			} elsif(ref($inputs) eq 'HASH') {
-				$input_str = Dumper($inputs);
-				$input_str =~ s/\$VAR1 =//;
-				$input_str =~ s/;//;
+				$input_str = render_fallback($inputs);
+
+				# YAML can't express Perl's undef, so a corpus value of
+				# the sentinel string 'undef' means "this param is
+				# undef" -- convert the quoted sentinel back to the
+				# bareword so the generated test passes real undef
 				$input_str =~ s/=> 'undef'/=> undef/gms;
 			} else {
 				$input_str = $inputs;
@@ -2148,6 +2160,10 @@ sub generate
 	$tt->process($template, $vars, \$test) or croak($tt->error());
 
 	if ($test_file) {
+		# autodie is disabled for this open -- under "use autodie qw(:all)"
+		# open() never returns false on failure, it throws its own exception
+		# instead, which would silently make the "or croak" dead code.
+		no autodie qw(open);
 		open my $fh, '>:encoding(UTF-8)', $test_file or croak "Cannot open $test_file: $!";
 		print $fh "$test\n";
 		close $fh;
@@ -2173,7 +2189,6 @@ sub generate
 #
 # Entry:      $name - the string to check.
 # Exit:       Returns 1 if builtin, 0 otherwise.
-# Side effects: None.
 # --------------------------------------------------
 sub _is_perl_builtin {
 	my $name = $_[0];
@@ -2297,8 +2312,6 @@ sub _load_schema {
 #             Croaks if the section exists but is not
 #             a hashref (and not the string 'undef').
 #
-# Side effects: None.
-#
 # Notes:      The string 'undef' is treated as an
 #             absent section — callers that set a
 #             section to 'undef' in YAML get the same
@@ -2410,7 +2423,6 @@ sub _validate_config {
 #             $schema->{input} must be a hashref.
 #
 # Exit:       Returns nothing. Croaks on invalid type.
-# Side effects: None.
 # --------------------------------------------------
 sub _validate_input_params {
 	my $schema = $_[0];
@@ -2452,7 +2464,6 @@ sub _validate_input_params {
 #
 # Exit:       Returns nothing. Croaks on invalid or
 #             duplicate positions. Carps on gaps.
-# Side effects: None.
 # --------------------------------------------------
 sub _validate_input_positions {
 	my $schema = $_[0];
@@ -2514,7 +2525,6 @@ sub _validate_input_positions {
 # Exit:       Returns nothing. Croaks on conflicting
 #             or malformed enum/memberof. Carps on
 #             unknown semantic types.
-# Side effects: None.
 # --------------------------------------------------
 sub _validate_input_semantics {
 	my $schema = $_[0];
@@ -2565,7 +2575,6 @@ sub _validate_input_semantics {
 #
 # Exit:       Returns nothing. Croaks on invalid property
 #             definitions. Carps on unknown builtins.
-# Side effects: None.
 # --------------------------------------------------
 sub _validate_transform_properties {
 	my $schema = $_[0];
@@ -2669,8 +2678,6 @@ sub _normalize_config {
 # Exit:       Returns 1 if the type is known,
 #             0 if the type is unknown or undef.
 #
-# Side effects: None.
-#
 # Notes:      The lookup hash is declared with
 #             'state' so it is built only once per
 #             process rather than on every call —
@@ -2697,6 +2704,48 @@ sub _valid_type {
 	);
 
 	return($VALID{$type} // 0);
+}
+
+# --------------------------------------------------
+# _assert_identifier
+#
+# Purpose:    Validate that a string is shaped like a
+#             plain Perl identifier (or, with
+#             package => 1, a "::"-separated package
+#             name) before it is spliced into generated
+#             test source as a bareword, package name,
+#             method name, or variable name rather than
+#             a quoted string literal. Schema-derived
+#             names (module, function, transform names)
+#             are spliced unescaped at the call sites
+#             that use this guard, so an unvalidated
+#             name could otherwise break out of the
+#             generated source and inject arbitrary
+#             Perl into a file that L<prove> will run.
+#
+# Entry:      $name - the string to validate.
+#             $what - short label for the value, used
+#                     only in the croak message.
+#             %opts - package => 1 allows "::"
+#                     separators in $name.
+#
+# Exit:       Returns $name unchanged on success.
+#             Croaks if $name is not identifier-shaped.
+# --------------------------------------------------
+sub _assert_identifier {
+	my ($name, $what, %opts) = @_;
+
+	croak(__PACKAGE__, ": $what is missing or empty")
+		unless defined($name) && length($name);
+
+	my $re = $opts{package}
+		? qr/^[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/
+		: qr/^[A-Za-z_]\w*\z/;
+
+	croak(__PACKAGE__, ": $what '$name' is not a valid Perl identifier")
+		unless $name =~ $re;
+
+	return $name;
 }
 
 # --------------------------------------------------
@@ -2881,8 +2930,9 @@ input specification passed to L<Params::Validate::Strict>.
 =item * C<$href>
 
 A hashref whose values are themselves hashrefs containing field
-specifications. Keys whose values are not hashrefs are skipped with
-a warning.
+specifications. A scalar value that is a recognised type string (see
+C<_valid_type>) is expanded to C<{ type =E<gt> $value }>. Any other
+non-hashref value is skipped with a warning.
 
 =back
 
@@ -2913,11 +2963,11 @@ Other sub-keys are rendered via C<perl_quote>.
 
 =head4 input
 
-    { href => { type => HASHREF, optional => 1 } }
+    { href => { type => 'hashref', optional => 1 } }
 
 =head4 output
 
-    { type => SCALAR }
+    { type => 'string' }
 
 =cut
 
@@ -3016,10 +3066,6 @@ or Regexp objects — all are handled by C<perl_quote>.
 A comma-separated string of C<key => value> pairs sorted by key.
 Returns an empty string if C<$href> is undef, empty, or not a hashref.
 
-=head3 Side effects
-
-None.
-
 =head3 Notes
 
 Keys and values are both rendered via C<perl_quote>. In particular,
@@ -3031,11 +3077,11 @@ the generated test.
 
 =head4 input
 
-    { href => { type => HASHREF, optional => 1 } }
+    { href => { type => 'hashref', optional => 1 } }
 
 =head4 output
 
-    { type => SCALAR }
+    { type => 'string' }
 
 =cut
 
@@ -3079,10 +3125,6 @@ qualifying key, sorted alphabetically. Returns the string C<'()'> if
 C<$href> is undef, empty, or not a hashref — this produces an empty
 hash assignment in the generated test rather than a syntax error.
 
-=head3 Side effects
-
-None.
-
 =head3 Notes
 
 Array element values are rendered via C<perl_quote> which handles
@@ -3094,11 +3136,11 @@ mixed-value hashes and only want the arrayref entries rendered.
 
 =head4 input
 
-    { href => { type => HASHREF, optional => 1 } }
+    { href => { type => 'hashref', optional => 1 } }
 
 =head4 output
 
-    { type => SCALAR }
+    { type => 'string' }
 
 =cut
 
@@ -3143,8 +3185,6 @@ sub render_arrayref_map {
 # Exit:       Returns 1 if any field has a defined
 #             'position' key, 0 otherwise.
 #
-# Side effects: None.
-#
 # Notes:      Returns 0 immediately for undef or non-hash
 #             input rather than throwing — callers use the
 #             return value as a boolean and do not expect
@@ -3182,8 +3222,6 @@ sub _has_positions {
 # Exit:       Returns a Perl source-code fragment that
 #             evaluates to the original string value,
 #             or the string 'undef' if $s is undef.
-#
-# Side effects: None.
 #
 # Notes:      index() returns -1 when not found and
 #             any value >= 0 when found, including 0
@@ -3239,8 +3277,6 @@ sub q_wrap {
 # Entry:      $s - the string to escape.
 # Exit:       Returns the escaped string, or an
 #             empty string if $s is undef.
-#
-# Side effects: None.
 #
 # Notes:      NUL byte replacement produces the
 #             two-character sequence \0 which is
@@ -3298,9 +3334,11 @@ when evaluated in a generated test file.
 =item * C<$v>
 
 Any Perl value. May be undef, a scalar, an arrayref, a Regexp, or a blessed
-object. All types are handled — undef becomes C<'undef'>, numbers are
-unquoted, strings are single-quoted, arrayrefs recurse, Regexps become
-C<qr{...}>, and anything else falls through to C<render_fallback>.
+object. All types are handled — undef becomes C<'undef'>, the strings
+C<'true'>/C<'false'> become the Perl boolean constants C<!!1>/C<!!0>,
+numbers are unquoted, other strings are single-quoted, arrayrefs recurse,
+Regexps become C<qr{...}>, and anything else (including hashrefs and
+blessed objects) falls through to C<render_fallback>.
 
 =back
 
@@ -3398,8 +3436,6 @@ sub _perl_quote {
 #             produce any testable properties.
 #             Never returns undef.
 #
-# Side effects: None. Does not modify any argument.
-#
 # Notes:      Transforms whose input is the string
 #             'undef' or whose input spec is not a
 #             hashref are silently skipped — they
@@ -3417,6 +3453,12 @@ sub _generate_transform_properties {
 	my @properties;
 
 	for my $transform_name (sort keys %{$transforms}) {
+		# $transform_name is spliced by _render_properties as a Perl
+		# *variable name* (my $$transform_name = Property {...}), not
+		# just inside a string literal — reject anything that isn't
+		# identifier-shaped before it reaches that point.
+		_assert_identifier($transform_name, 'transform name');
+
 		my $transform   = $transforms->{$transform_name};
 
 		my $input_spec  = $transform->{input};
@@ -3479,6 +3521,12 @@ sub _generate_transform_properties {
 			# Skip non-hashref field specs — scalar types
 			# like 'string' have no generator sub-structure
 			next unless ref($spec) eq 'HASH';
+
+			# $field is spliced unescaped into the generated
+			# LectroTest generator spec by
+			# _schema_to_lectrotest_generator() — reject anything
+			# that isn't identifier-shaped first.
+			_assert_identifier($field, 'input field name');
 
 			my $gen = _schema_to_lectrotest_generator($field, $spec);
 			if(defined($gen) && length($gen)) {
@@ -3567,8 +3615,6 @@ sub _generate_transform_properties {
 # Exit:       Returns a hashref keyed by semantic
 #             type name. Each value is a hashref
 #             with 'code' and 'description' keys.
-#
-# Side effects: None.
 #
 # Notes:      The returned hashref is built fresh
 #             on every call — callers that need it
@@ -3828,8 +3874,6 @@ sub _get_semantic_generators {
 #             name. Each value is a hashref with
 #             'description', 'code_template', and
 #             'applicable_to' keys.
-#
-# Side effects: None.
 #
 # Notes:      'applicable_to' lists the types for
 #             which each property is meaningful. It
@@ -4137,12 +4181,27 @@ sub _schema_to_lectrotest_generator {
 		if(defined($spec->{'matches'})) {
 			my $pattern = $spec->{'matches'};
 
+			# Compile the pattern safely rather than splicing the raw
+			# string into qr/$pattern/ — the raw form lets a pattern
+			# containing an unescaped '/' break out of the qr//
+			# delimiter and inject arbitrary Perl into the generated
+			# test. regexp_pattern() decomposes the already-compiled
+			# Regexp object back into pattern text that is guaranteed
+			# to be a self-contained regex body, safe to re-embed.
+			my $compiled = ref($pattern) eq 'Regexp' ? $pattern : eval { qr/$pattern/ };
+			if($@ || !defined($compiled)) {
+				carp "Invalid matches pattern '$pattern' for field '$field_name': $@";
+				return "$field_name <- String(length => [$min_len, $max_len])";
+			}
+			my ($pat, $mods) = regexp_pattern($compiled);
+			my $safe_re = "qr{$pat}" . ($mods // '');
+
 			if(defined($spec->{'max'})) {
-				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/, length => $spec->{'max'} }) }";
+				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => $safe_re, length => $spec->{'max'} }) }";
 			} elsif(defined($spec->{'min'})) {
-				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/, length => $spec->{'min'} }) }";
+				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => $safe_re, length => $spec->{'min'} }) }";
 			} else {
-				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/ }) }";
+				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => $safe_re }) }";
 			}
 		}
 
@@ -4201,8 +4260,6 @@ sub _schema_to_lectrotest_generator {
 # Exit:       Returns 1 if the output type is one of
 #             'number', 'integer', or 'float'.
 #             Returns 0 otherwise.
-#
-# Side effects: None.
 # --------------------------------------------------
 sub _is_numeric_transform {
 	my ($input_spec, $output_spec) = @_;
@@ -4231,8 +4288,6 @@ sub _is_numeric_transform {
 #
 # Exit:       Returns 1 if the output type is 'string'.
 #             Returns 0 otherwise.
-#
-# Side effects: None.
 # --------------------------------------------------
 sub _is_string_transform {
 	my ($input_spec, $output_spec) = @_;
@@ -4261,8 +4316,6 @@ sub _is_string_transform {
 # Exit:       Returns 1 if the dominant input and
 #             output types are identical strings.
 #             Returns 0 otherwise.
-#
-# Side effects: None.
 #
 # Notes:      Uses _get_dominant_type for both sides.
 #             For multi-field input specs, dominant
@@ -4303,8 +4356,6 @@ sub _same_type {
 # Exit:       Returns a type string. Returns
 #             $DEFAULT_FIELD_TYPE ('string') if no
 #             type can be determined.
-#
-# Side effects: None.
 # --------------------------------------------------
 sub _get_dominant_type {
 	my $spec = $_[0];
@@ -4349,8 +4400,6 @@ sub _get_dominant_type {
 # Exit:       Returns a string of Perl source code.
 #             Returns an empty string if $properties
 #             is undef, not an arrayref, or empty.
-#
-# Side effects: None.
 #
 # Notes:      The generated code uses 4-space
 #             indentation deliberately — this is the
@@ -4426,8 +4475,6 @@ sub _render_properties {
 #             Returns an empty list if no properties
 #             can be detected or if $input_spec is
 #             undef or the string 'undef'.
-#
-# Side effects: None.
 #
 # Notes:      The 'positive' heuristic checks the
 #             transform name case-insensitively against
@@ -4515,10 +4562,22 @@ sub _detect_transform_properties {
 
 		if(defined($output_spec->{'matches'})) {
 			my $pattern = $output_spec->{'matches'};
-			push @properties, {
-				name => 'pattern_match',
-				code => "\$result =~ qr/$pattern/",
-			};
+
+			# See the matching comment in _schema_to_lectrotest_generator —
+			# compile first and re-embed via regexp_pattern() rather than
+			# splicing the raw string into qr/$pattern/, which would let
+			# an unescaped '/' break out of the delimiter.
+			my $compiled = ref($pattern) eq 'Regexp' ? $pattern : eval { qr/$pattern/ };
+			if($@ || !defined($compiled)) {
+				carp "Invalid matches pattern '$pattern' for transform '$transform_name': $@";
+			} else {
+				my ($pat, $mods) = regexp_pattern($compiled);
+				my $safe_re = "qr{$pat}" . ($mods // '');
+				push @properties, {
+					name => 'pattern_match',
+					code => "\$result =~ $safe_re",
+				};
+			}
 		}
 	}
 
@@ -4695,7 +4754,7 @@ C<seed> and C<iterations> really should be within C<config>.
 
 =over 4
 
-=item * L<Test Coverage Report|https://nigelhorne.github.io/App-Test-Generator/coverage/>
+=item * L<Test Dashboard|https://nigelhorne.github.io/App-Test-Generator/coverage/>
 
 =item * L<App::Test::Generator::Template> - Template of the file of tests created by C<App::Test::Generator>
 

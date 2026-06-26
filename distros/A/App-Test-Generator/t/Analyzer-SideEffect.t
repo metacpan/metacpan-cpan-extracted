@@ -425,6 +425,44 @@ subtest 'analyze: tolerates missing body key' => sub {
 };
 
 # ==================================================================
+# analyze -- IO/exec keywords inside string literals or comments
+# must NOT trigger false positives
+# --------------------------------------------------
+# Regression: IO_PATTERN/EXEC_PATTERN previously matched against
+# the raw source body, so a bare keyword appearing inside a string
+# message or a comment (not an actual call) was misclassified as
+# a real side effect.
+# ==================================================================
+subtest 'analyze: IO/exec keywords inside strings or comments are not false positives' => sub {
+	# "system" appears only inside a string message, not as a call
+	my $report = _analyze_body('sub check { return "system check failed"; }');
+	is($report->{calls_external}, 0,
+		'"system" inside a string literal does not trigger calls_external');
+
+	# "print"/"warn" appear only inside a comment
+	$report = _analyze_body(
+		"sub get { # warn the caller before we print\n\treturn \$self->{name};\n}"
+	);
+	is($report->{performs_io}, 0,
+		'print/warn inside a comment do not trigger performs_io');
+
+	# "open"/"exec" appear only inside a single-quoted string
+	$report = _analyze_body(q{sub describe { return 'open the door and exec the plan'; }});
+	is($report->{performs_io},    0, '"open" inside single-quoted string does not trigger performs_io');
+	is($report->{calls_external}, 0, '"exec" inside single-quoted string does not trigger calls_external');
+
+	# A real call alongside a string/comment containing other keywords
+	# must still be detected -- stripping must not blind the analyser
+	$report = _analyze_body(
+		qq{sub run { print "about to call system\\n"; system("ls"); }}
+	);
+	is($report->{performs_io},    1, 'real print call is still detected alongside a string mentioning system');
+	is($report->{calls_external}, 1, 'real system call is still detected alongside a string mentioning system');
+
+	done_testing();
+};
+
+# ==================================================================
 # analyze -- purity_level string values match constants
 # ==================================================================
 subtest 'purity_level constants have correct values' => sub {

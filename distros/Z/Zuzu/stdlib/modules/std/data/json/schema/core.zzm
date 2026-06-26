@@ -7,10 +7,10 @@ std/data/json/schema/core - JSON Schema resources and reference registry.
 =head1 SYNOPSIS
 
   from std/data/json/schema/core import SchemaRegistry;
-
+  
   let registry := new SchemaRegistry();
   registry.register( address_schema, "https://example.test/address" );
-
+  
   let subschema := registry.resolve(
     "https://example.test/address#/properties/postcode",
   );

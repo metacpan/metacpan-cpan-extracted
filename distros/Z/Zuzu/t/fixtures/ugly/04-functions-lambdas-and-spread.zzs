@@ -1,0 +1,28 @@
+from test/more import *;
+
+function fold_label;function surround(String value,String left:="[",String right:="]")→String{
+return left _ value _ right;
+}
+
+function fold_label(first...PairList options,Array rest){
+ let text:=first;for(let item in rest){text:=surround(text _ ":" _ item,options.get("left","<"),">");}
+	return text;
+}
+function call_twice(callable,value){return callable(callable(value));}
+
+let builders:=[function(x){return x+1;},fn Number x->x*2,→^^-3,];
+
+let nested:=call_twice(function(value){return(value|>builders[0](^^)|>builders[1](^^)▷builders[2](^^));},4,);
+
+let variadic:=fold_label("seed",...["a","b"],...{{left:"(",left:"{"}},"c",);
+let literal_args:=["body","<<",">>"];let surrounded:=surround(...literal_args);
+let lambda:=fn(Number a,Number b)->do{let scale:=2;(a+b)*scale;};
+	let typed_labeler:=fn(String prefix,Number n)->`${prefix}:${n}`;
+let composed:=5▷builders[0](^^)▷builders[1](^^);let reversed:=builders[2](^^)<|10;
+
+is(nested,13,"deep anonymous callback and chain operators worked");is(variadic,"(((seed:a>:b>:c>","spreads mixed positional and pairlist args");
+is(surrounded,"<<body>>","array spread expanded positional args"); is(lambda(3,4),14,"complex lambda do block returned value");
+is(typed_labeler("n",7),"n:7","typed shorthand lambda interpolated");is(composed,12,"ASCII rightwards chain composed functions");
+is(reversed,7,"ASCII leftwards chain composed function");is(fold_label("solo"),"solo","function predeclaration completed later");
+like(exception(function(){typed_labeler("bad","x");}),/TypeException/,"typed lambda rejected bad argument",);
+done_testing();

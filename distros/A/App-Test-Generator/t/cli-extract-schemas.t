@@ -118,4 +118,76 @@ sub run_cmd {
 	like($err . $out, qr/strict-pod/i, 'error mentions strict-pod');
 }
 
+# --------------------------------------------------------------------
+# --fuzz loads the target module via require-by-path, not string eval
+# (regression test for the eval "require $package" code-injection fix
+# in _load_target_module)
+# --------------------------------------------------------------------
+
+{
+	my $libdir = File::Spec->catdir($tmpdir, 'lib');
+	mkdir $libdir unless -d $libdir;
+	my $fuzz_module = File::Spec->catfile($libdir, 'TestFuzzModule.pm');
+
+	open my $fh2, '>', $fuzz_module or die $!;
+	print $fh2 <<'END_PM';
+package TestFuzzModule;
+
+=head2 add
+
+=head3 Input
+
+[ {type=>'integer'}, {type=>'integer'} ]
+
+=cut
+
+sub add {
+	my ($a, $b) = @_;
+	return $a + $b;
+}
+
+1;
+END_PM
+	close $fh2;
+
+	my ($exit, $out, $err) = run_cmd(
+		$script,
+		'--fuzz',
+		'--fuzz-iters', 5,
+		'--output-dir', File::Spec->catdir($tmpdir, 'fuzz-schemas'),
+		'--corpus-dir', File::Spec->catdir($tmpdir, 'fuzz-corpus'),
+		$fuzz_module
+	);
+
+	is($exit, 0, '--fuzz exits cleanly when loading a well-formed module');
+	like($out, qr/Fuzzing complete/, '--fuzz actually ran against the loaded module')
+		or diag("stdout: $out\nstderr: $err");
+}
+
+# --------------------------------------------------------------------
+# Package-name validation guard (unit-level): mirrors the regex added
+# to _load_target_module in bin/extract-schemas to reject anything
+# that isn't a syntactically valid Perl package name before it is used
+# to build a require path.
+# --------------------------------------------------------------------
+
+{
+	my $valid_re = qr/^[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
+
+	for my $good (qw(Foo Foo::Bar Foo::Bar::Baz _Private App::Test::Generator)) {
+		like($good, $valid_re, "valid package name '$good' is accepted");
+	}
+
+	for my $bad (
+		"Foo; system('id')",
+		'Foo`id`',
+		'Foo/../../etc/passwd',
+		'Foo $(id)',
+		"Foo\nsystem('id')",
+		'',
+	) {
+		unlike($bad, $valid_re, "malicious-looking value '$bad' is rejected");
+	}
+}
+
 done_testing();

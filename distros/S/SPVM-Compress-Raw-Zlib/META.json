@@ -27,19 +27,15 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.990143",
-            "SPVM::Resource::Zlib" : "1.004"
+            "SPVM" : "0.990191"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.990143",
-            "SPVM::Regex" : "0.248",
-            "SPVM::Resource::Zlib" : "1.004"
+            "SPVM" : "0.990191",
+            "SPVM::Regex" : "0.261",
+            "SPVM::Resource::Zlib" : "1.009"
          }
-      },
-      "test" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -50,6 +46,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Compress-Raw-Zlib"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

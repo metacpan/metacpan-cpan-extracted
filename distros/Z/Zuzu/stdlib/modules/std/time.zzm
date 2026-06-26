@@ -7,12 +7,12 @@ std/time - Time objects, formatting, and parsing.
 =head1 SYNOPSIS
 
   from std/time import Time, TimeZone, Duration, TimeFormat, TimeParser;
-
+  
   let london := TimeZone.named("Europe/London");
   let now := new Time(timezone: london);
   let tomorrow := now.add_days(1);
   let next_hour := now.add(Duration.hours(1));
-
+  
   let parsed := Time.parse("2026-03-20T12:00:00", timezone: london);
   say TimeFormat.rfc3339().format(parsed);
 

@@ -1,0 +1,96 @@
+from std/eval import eval;
+from test/more import *;
+
+class Owner {
+	let label with get;
+}
+
+function make_owner ( String label ) {
+	return new Owner( label: label );
+}
+
+let exact_source := [ "alpha", "beta" ];
+let { first, second } := exact_source;
+is( first, "alpha", "Array destructuring binds first value by position" );
+is( second, "beta", "Array destructuring binds second value by position" );
+
+let alias_source := [ "host.example", 443 ];
+let {
+	ignored_host_key: host_name,
+	ignored_port_key: port_number,
+} := alias_source;
+is( host_name, "host.example", "Array alias binding uses first position" );
+is( port_number, 443, "Array alias binding uses second position" );
+
+let default_calls := 0;
+function defaulted ( value ) {
+	default_calls += 1;
+	return value;
+}
+
+let default_source := [ "present" ];
+let {
+	present,
+	missing := defaulted("fallback"),
+} := default_source;
+is( present, "present", "present Array value binds before default" );
+is( missing, "fallback", "missing Array position uses default" );
+is( default_calls, 1, "Array defaults are lazy and missing-only" );
+
+let short_source := [];
+let { absent } := short_source;
+is( absent, null, "missing Array position without default binds null" );
+
+let extra_source := [ 1, 2, 3, 4 ];
+let { one, two } := extra_source;
+is( one, 1, "extra Array source first value binds" );
+is( two, 2, "extra Array source second value binds" );
+
+let typed_source := [ "label", 12 ];
+let { String typed_label, count: Number typed_count } := typed_source;
+is( typed_label, "label", "typed Array destructuring checks String binding" );
+is( typed_count, 12, "typed Array destructuring checks Number alias binding" );
+
+const { const_value } := [ "fixed" ];
+is( const_value, "fixed", "const Array destructuring binds value" );
+ok(
+	exception( function () {
+		eval( "const { locked } := [ \"x\" ]; locked := \"y\";" );
+	} ) instanceof Exception,
+	"const Array destructuring result remains immutable",
+);
+
+function weak_saved_after_scope () {
+	let source := [ make_owner("temporary") ];
+	let { saved but weak } := source;
+	is(
+		saved.get_label(),
+		"temporary",
+		"Array destructuring but weak reads live referent",
+	);
+	source := null;
+	return saved;
+}
+is(
+	weak_saved_after_scope(),
+	null,
+	"Array destructuring but weak reads null after source drop",
+);
+
+let dict_source := { host: "localhost", port: 8080 };
+let { host, port } := dict_source;
+is( host, "localhost", "existing Dict destructuring still binds by key" );
+is( port, 8080, "existing Dict destructuring still binds second key" );
+
+let pair_source := {{ item: "first", item: "second" }};
+let { item } := pair_source;
+is( item, "first", "existing PairList destructuring keeps first-value behaviour" );
+
+ok(
+	exception( function () {
+		eval( "let { a, b: a } := [ 1, 2 ];" );
+	} ) instanceof Exception,
+	"duplicate local names still throw for Array destructuring",
+);
+
+done_testing();

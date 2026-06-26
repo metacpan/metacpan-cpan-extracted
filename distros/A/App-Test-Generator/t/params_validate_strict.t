@@ -3,8 +3,11 @@ use strict;
 use warnings;
 
 # use Test::DescribeMe qw(extended);
+#
+# No Test::Needs gate: Params::Validate::Strict is a hard PREREQ_PM of
+# App::Test::Generator itself (see Makefile.PL), not an optional test
+# dependency -- use_ok() below already fails loudly if it is missing.
 use Test::Most;
-use Test::Needs 'Params::Validate::Strict';
 use File::Temp qw(tempdir);
 use File::Spec;
 

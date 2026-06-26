@@ -7,7 +7,7 @@ std/math/range - Format integer lists as compact display ranges.
 =head1 SYNOPSIS
 
   from std/math/range import abbreviate;
-
+  
   let values := [ 3, 4, 9, 10, 11, 12, 15 ];
   let compact := abbreviate( values );
   # [ "3", "4", "9-12", "15" ]

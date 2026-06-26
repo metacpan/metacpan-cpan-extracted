@@ -26,6 +26,7 @@ sub _fuzzer {
 		iterations => $args{iterations} // 5,
 		seed       => $args{seed}       // 42,
 		exists $args{instance} ? (instance => $args{instance}) : (),
+		exists $args{timeout}  ? (timeout  => $args{timeout})  : (),
 	);
 }
 
@@ -118,6 +119,51 @@ subtest 'new() each call returns a distinct object' => sub {
 	my $f1 = _fuzzer();
 	my $f2 = _fuzzer();
 	isnt($f1, $f2, 'distinct objects returned');
+};
+
+subtest 'new() defaults timeout to 5 seconds' => sub {
+	my $f = _fuzzer();
+	is($f->{timeout}, 5, 'timeout defaults to 5');
+};
+
+subtest 'new() stores supplied timeout' => sub {
+	my $f = _fuzzer(timeout => 1);
+	is($f->{timeout}, 1, 'timeout stored correctly');
+};
+
+# ==================================================================
+# Regression: a hanging target_sub must not hang the whole fuzzing
+# run. Both the Devel::Cover and non-cover call sites in _run_one /
+# _run_with_cover now wrap the target_sub call in an alarm()-bounded
+# eval, recording the timeout as a bug rather than blocking forever.
+# ==================================================================
+
+subtest 'run() aborts a hanging target_sub via timeout and records a bug' => sub {
+	my $f = _fuzzer(
+		timeout    => 1,
+		iterations => 1,
+		target_sub => sub { sleep 30; return 1 },
+	);
+
+	my $start = time();
+	my $r;
+	lives_ok(sub { $r = $f->run() }, 'run() returns rather than hanging');
+	my $elapsed = time() - $start;
+
+	ok($elapsed < 25, "run() returned promptly (elapsed=${elapsed}s), not after the full sleep")
+		or diag("run() took ${elapsed}s — timeout did not abort the hanging call");
+
+	ok(scalar(@{$f->bugs()}) >= 1, 'hanging call recorded as a bug');
+	like($f->bugs()->[0]{error}, qr/timed out/, 'bug error mentions the timeout');
+};
+
+subtest 'run() with timeout disabled (0) does not wrap target_sub in alarm' => sub {
+	my $f = _fuzzer(
+		timeout    => 0,
+		iterations => 3,
+		target_sub => sub { 1 },
+	);
+	lives_ok(sub { $f->run() }, 'run() lives with timeout disabled');
 };
 
 # ==================================================================

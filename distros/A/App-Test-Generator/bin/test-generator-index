@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
+use Carp qw(croak);
 use Cwd qw(abs_path);
 use File::Basename qw(dirname basename);
 use File::Glob ':glob';
@@ -4464,8 +4465,12 @@ sub _mutant_file_report {
 	my @lines = <$in>;
 	close $in;
 
-	my $filename = $file;
-	$filename =~ s{[\\/]}{_}g;
+	# $file values come from mutation.json, keyed by paths discovered
+	# under lib/; reject any '..' segment before it can be used to
+	# build an output path, since the directory-preserving join below
+	# would otherwise let such a segment escape $dir.
+	croak("Refusing to report on suspicious file path: $file")
+		if grep { $_ eq File::Spec->updir } File::Spec->splitdir($file);
 
 	# Preserve directory structure inside report
 	my $relative_path = File::Spec->catfile($dir, $file . '.html');
@@ -4473,6 +4478,11 @@ sub _mutant_file_report {
 	my $out_dir = dirname($relative_path);
 
 	make_path($out_dir) unless -d $out_dir;
+
+	my $resolved_dir = abs_path($dir) // $dir;
+	my $resolved_out = abs_path($out_dir) // $out_dir;
+	croak("Refusing to write report outside $dir: $relative_path")
+		unless index($resolved_out, $resolved_dir) == 0;
 
 	open my $out, '>', $relative_path or die "$relative_path: $!";
 

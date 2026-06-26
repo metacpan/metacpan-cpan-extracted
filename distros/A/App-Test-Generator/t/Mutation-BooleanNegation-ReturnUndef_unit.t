@@ -21,20 +21,6 @@ sub _doc {
 	return PPI::Document->new(\$_[0]);
 }
 
-# --------------------------------------------------
-# Helper: find first return/break statement in doc
-# --------------------------------------------------
-sub _first_return {
-	my ($doc) = @_;
-	my $nodes = $doc->find(sub {
-		my $node = $_[1];
-		return 0 unless $node->isa('PPI::Statement::Break');
-		my $first = $node->schild(0) or return 0;
-		return $first->content eq 'return';
-	}) || [];
-	return $nodes->[0];
-}
-
 # ==================================================================
 # BooleanNegation — new()
 # ==================================================================
@@ -55,51 +41,33 @@ subtest 'BooleanNegation::new() each call returns distinct object' => sub {
 # BooleanNegation — applies_to()
 #
 # POD spec:
-#   Returns true for PPI::Statement::Return (Break) nodes
-#   that are specifically return statements.
-#   Returns false otherwise.
+#   Document-level pre-filter (see Mutation::Base): returns true if
+#   the whole document contains at least one qualifying return
+#   statement, false otherwise.
 # ==================================================================
 
-subtest 'BooleanNegation::applies_to() returns 1 for return statement' => sub {
+subtest 'BooleanNegation::applies_to() returns 1 for doc containing a return statement' => sub {
 	my $m   = App::Test::Generator::Mutation::BooleanNegation->new();
 	my $doc = _doc('sub foo { return $x; }');
-	my $ret = _first_return($doc);
-	SKIP: {
-		skip 'no return statement found by PPI', 1 unless $ret;
-		is($m->applies_to($ret), 1, 'return statement -> applies_to returns 1');
-	}
+	is($m->applies_to($doc), 1, 'doc with return stmt -> applies_to returns 1');
 };
 
-subtest 'BooleanNegation::applies_to() returns 0 for plain expression' => sub {
+subtest 'BooleanNegation::applies_to() returns 0 for doc with no return statements' => sub {
 	my $m   = App::Test::Generator::Mutation::BooleanNegation->new();
 	my $doc = _doc('sub foo { my $x = 1; }');
-	my $stmt = $doc->find_first('PPI::Statement');
-	ok($stmt, 'found a statement');
-	is($m->applies_to($stmt), 0, 'plain statement -> applies_to returns 0');
+	is($m->applies_to($doc), 0, 'no return stmts -> applies_to returns 0');
 };
 
-subtest 'BooleanNegation::applies_to() returns 0 for if compound statement' => sub {
+subtest 'BooleanNegation::applies_to() returns 1 for return nested inside if' => sub {
 	my $m   = App::Test::Generator::Mutation::BooleanNegation->new();
 	my $doc = _doc('sub foo { if($x) { return 1; } }');
-	my $if  = $doc->find_first('PPI::Statement::Compound');
-	ok($if, 'found compound statement');
-	is($m->applies_to($if), 0, 'if statement -> applies_to returns 0');
+	is($m->applies_to($doc), 1, 'return nested in if -> applies_to returns 1');
 };
 
-subtest 'BooleanNegation::applies_to() returns 0 for last statement' => sub {
+subtest 'BooleanNegation::applies_to() returns 0 for doc with only last/next/redo' => sub {
 	my $m   = App::Test::Generator::Mutation::BooleanNegation->new();
 	my $doc = _doc('sub foo { for my $i (1..10) { last; } }');
-	my $nodes = $doc->find(sub {
-		$_[1]->isa('PPI::Statement::Break') &&
-		do {
-			my $f = $_[1]->schild(0);
-			$f && $f->content eq 'last';
-		}
-	}) || [];
-	SKIP: {
-		skip 'no last statement found', 1 unless @{$nodes};
-		ok(!$m->applies_to($nodes->[0]), 'last statement -> applies_to false');
-	}
+	is($m->applies_to($doc), 0, 'only last stmt -> applies_to returns 0');
 };
 
 # ==================================================================
@@ -207,13 +175,12 @@ subtest 'BooleanNegation::mutate() does not modify the original document' => sub
 	is($doc->serialize, $before, 'original document unchanged after mutate()');
 };
 
-subtest 'BooleanNegation::mutate() returns exactly 0 not undef for non-Break node' => sub {
+subtest 'BooleanNegation::applies_to() returns exactly 0 not undef when nothing qualifies' => sub {
 	require PPI;
-	my $m    = App::Test::Generator::Mutation::BooleanNegation->new();
-	my $doc  = PPI::Document->new(\'sub foo { my $x = 1; }');
-	my $stmt = $doc->find_first('PPI::Statement::Variable');
-	my $result = $m->applies_to($stmt);
-	is($result, 0, 'non-Break node returns exactly 0 not undef');
+	my $m   = App::Test::Generator::Mutation::BooleanNegation->new();
+	my $doc = PPI::Document->new(\'sub foo { my $x = 1; }');
+	my $result = $m->applies_to($doc);
+	is($result, 0, 'no qualifying return stmt returns exactly 0 not undef');
 };
 
 # ==================================================================
@@ -236,34 +203,27 @@ subtest 'ReturnUndef::new() each call returns distinct object' => sub {
 # ReturnUndef — applies_to()
 #
 # POD spec:
-#   Returns true for return statements (PPI::Statement::Break).
-#   Returns false otherwise.
+#   Document-level pre-filter (see Mutation::Base): returns true if
+#   the whole document contains at least one qualifying return
+#   statement, false otherwise.
 # ==================================================================
 
-subtest 'ReturnUndef::applies_to() returns 1 for return statement' => sub {
+subtest 'ReturnUndef::applies_to() returns 1 for doc containing a return statement' => sub {
 	my $m   = App::Test::Generator::Mutation::ReturnUndef->new();
 	my $doc = _doc('sub foo { return $x; }');
-	my $ret = _first_return($doc);
-	SKIP: {
-		skip 'no return statement found', 1 unless $ret;
-		is($m->applies_to($ret), 1, 'return statement -> applies_to returns 1');
-	}
+	is($m->applies_to($doc), 1, 'doc with return stmt -> applies_to returns 1');
 };
 
-subtest 'ReturnUndef::applies_to() returns 0 for plain expression' => sub {
+subtest 'ReturnUndef::applies_to() returns 0 for doc with no return statements' => sub {
 	my $m   = App::Test::Generator::Mutation::ReturnUndef->new();
 	my $doc = _doc('sub foo { my $x = 1; }');
-	my $stmt = $doc->find_first('PPI::Statement');
-	ok($stmt, 'found a statement');
-	is($m->applies_to($stmt), 0, 'plain statement -> applies_to returns 0');
+	is($m->applies_to($doc), 0, 'no return stmts -> applies_to returns 0');
 };
 
-subtest 'ReturnUndef::applies_to() returns 0 for if statement' => sub {
+subtest 'ReturnUndef::applies_to() returns 1 for return nested inside if' => sub {
 	my $m   = App::Test::Generator::Mutation::ReturnUndef->new();
 	my $doc = _doc('sub foo { if($x) { return 1; } }');
-	my $if  = $doc->find_first('PPI::Statement::Compound');
-	ok($if, 'found compound statement');
-	is($m->applies_to($if), 0, 'if statement -> applies_to returns 0');
+	is($m->applies_to($doc), 1, 'return nested in if -> applies_to returns 1');
 };
 
 # ==================================================================

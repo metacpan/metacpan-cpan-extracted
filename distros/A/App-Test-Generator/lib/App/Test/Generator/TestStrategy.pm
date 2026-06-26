@@ -39,17 +39,20 @@ Readonly my $TEST_BOUNDARY        => 'boundary_tests';
 Readonly my $TEST_CHAINING        => 'chaining_test';
 Readonly my $TEST_BASIC           => 'basic_test';
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 DESCRIPTION
 
 Generates a test strategy plan for all methods in a schema, determining
 which test types should be produced for each method based on its
-accessor classification, output type, side effects, and other metadata.
+accessor classification, output type, and other metadata. Side-effect
+and dependency-driven planning (mocking, isolation) is handled
+separately by L<App::Test::Generator::Planner::Mock> and
+L<App::Test::Generator::Planner::Isolation>.
 
 =head2 new
 
@@ -155,13 +158,6 @@ sub generate_plan {
 	for my $method (keys %{ $self->{schema} }) {
 		my $schema = $self->{schema}{$method};
 
-		# Extract analysis metadata from the schema — note that
-		# $schema is already the per-method hashref so we access
-		# _analysis directly, not via the method name key again
-		my $analysis = $schema->{_analysis}          || {};
-		my $effects  = $analysis->{side_effects}     || {};
-		my $deps     = $analysis->{dependencies}     || {};
-
 		# Generate and store the plan for this method
 		$self->{plans}{$method} = $self->_plan_for_method($schema);
 	}
@@ -221,9 +217,15 @@ sub _plan_for_method {
 		} elsif($acc_type eq $ACCESSOR_GETSET) {
 			# For getset accessors, check the input parameter
 			# type to determine if object injection or boolean
-			# set tests are more appropriate
-			my ($param) = grep { !/^_/ } keys %{ $schema->{input} || {} };
-			my $param_type = ($param && $schema->{input}{$param}{type}) // '';
+			# set tests are more appropriate. Sort by position (keys
+			# %hash has no defined order) so the choice is deterministic
+			# if more than one candidate is present.
+			my $input = $schema->{input} || {};
+			my ($param) = sort {
+				($input->{$a}{position} // 9999) <=> ($input->{$b}{position} // 9999)
+				|| $a cmp $b
+			} grep { !/^_/ } keys %{ $input };
+			my $param_type = ($param && $input->{$param}{type}) // '';
 
 			if($param_type eq $TYPE_OBJECT) {
 				$plan{$TEST_OBJECT_INJECT} = 1;

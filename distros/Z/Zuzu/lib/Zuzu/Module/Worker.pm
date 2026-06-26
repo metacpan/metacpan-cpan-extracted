@@ -2,7 +2,7 @@ package Zuzu::Module::Worker;
 
 use utf8;
 
-our $VERSION = '0.006000';
+our $VERSION = '0.007000';
 
 use POSIX ();
 use IO::Select;

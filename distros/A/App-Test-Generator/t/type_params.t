@@ -44,6 +44,7 @@ TODO: {
 			input_file => $module_file,
 			output_dir => tempdir(CLEANUP => 1),
 			verbose	=> 0,
+			allow_signature_exec => 1,	# this test deliberately exercises signature_for() execution
 		);
 	}
 

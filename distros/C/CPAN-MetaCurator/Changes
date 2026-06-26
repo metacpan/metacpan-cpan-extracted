@@ -1,5 +1,9 @@
 Revision history for perl module CPAN::MetaCurator
 
+1.24  2026-06-17
+	- Add Tree::DAG_Node to Export.pm. Slowly move outputting to building a tree & then outputting.
+	- Clean up instructions in MetaCurator.pm
+
 1.23  2026-06-15
 	- Rebuild the db.
 	- Rewrite the instructions in MetaCurator.pm

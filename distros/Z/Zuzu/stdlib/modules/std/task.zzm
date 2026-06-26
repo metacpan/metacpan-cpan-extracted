@@ -7,7 +7,7 @@ std/task - task helpers for async ZuzuScript code.
 =head1 SYNOPSIS
 
   from std/task import all, race, sleep, yield, timeout, Channel, CancellationSource;
-
+  
   async function __main__ () {
     let a := spawn { await { sleep(0.1); }; "a"; };
     let b := spawn { await { sleep(0.1); }; "b"; };

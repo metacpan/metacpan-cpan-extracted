@@ -7,7 +7,7 @@ use autodie qw(:all);
 use Carp qw(croak);
 use JSON::MaybeXS;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ App::Test::Generator::LCSAJ::Coverage - Merge LCSAJ path data with runtime hits
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 DESCRIPTION
 
@@ -118,7 +118,12 @@ sub merge {
 		$path->{covered} = $covered;
 	}
 
-	# Write the annotated paths to the output file
+	# Write the annotated paths to the output file. autodie is disabled
+	# for this open so the custom error message below is actually
+	# reachable -- under "use autodie qw(:all)" open() never returns
+	# false on failure, it throws its own exception instead, which
+	# would silently make the "or croak" dead code.
+	no autodie qw(open);
 	open my $fh, '>', $out_file or croak "Cannot write coverage output to $out_file: $!";
 	print $fh encode_json($paths);
 	close $fh;
@@ -148,6 +153,10 @@ sub merge {
 sub _slurp {
 	my $file = $_[0];
 
+	# autodie is disabled for this open for the same reason as in
+	# merge() above -- it would otherwise make the custom "Cannot
+	# read" message unreachable dead code.
+	no autodie qw(open);
 	open my $fh, '<', $file or croak "Cannot read $file: $!";
 
 	# Localise $/ to undef to slurp entire file in one read

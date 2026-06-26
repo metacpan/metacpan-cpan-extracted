@@ -268,7 +268,7 @@ children. KDL properties are exposed as ZPath attributes.
 
   from std/data/kdl import KDL;
   from std/path/z import ZPath;
-
+  
   let doc := ( new KDL() ).decode( """
   (pkg)package "zuzu" (email)"dev@example.test" version="0.1.0" {
     foo "first"
@@ -277,20 +277,20 @@ children. KDL properties are exposed as ZPath attributes.
     foo "third"
   }
   """ );
-
+  
   // The package node's first child is its first argument.
   say( ( new ZPath( path: "/package/#0" ) ).first(doc) );       // zuzu
-
+  
   // Properties are attributes.
   say( ( new ZPath( path: "/package/@version" ) ).first(doc) ); // 0.1.0
-
+  
   // Child nodes can be selected by name and zero-based occurrence.
   say( ( new ZPath( path: "/package/foo#2/#0" ) ).first(doc) ); // third
-
+  
   // tag() exposes type annotations on nodes and values.
   say( ( new ZPath( path: "tag(/package)" ) ).first(doc) );     // pkg
   say( ( new ZPath( path: "tag(/package/#1)" ) ).first(doc) );  // email
-
+  
   // local-name() exposes the node name, like it does for XML elements.
   say( ( new ZPath( path: "local-name(/package)" ) ).first(doc) );
   say( ( new ZPath( path: "/package/foo#2/local-name()" ) ).first(doc) );

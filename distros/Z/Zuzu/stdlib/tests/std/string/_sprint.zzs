@@ -1,0 +1,241 @@
+from std/string import sprint;
+from test/more import *;
+
+function chars ( String ch, Number n ) {
+	let out := "";
+	let remaining := n;
+	while ( remaining > 0 ) {
+		out _= ch;
+		remaining--;
+	}
+	return out;
+}
+
+function right ( text, Number width ) {
+	let rendered := "" _ text;
+	let needed := width - length rendered;
+	return chars( " ", needed ) _ rendered;
+}
+
+function left ( text, Number width ) {
+	let rendered := "" _ text;
+	let needed := width - length rendered;
+	return rendered _ chars( " ", needed );
+}
+
+function check ( String format, expected, String name, ... args ) {
+	is( sprint( format, ...args ), expected, name );
+}
+
+check( "plain text", "plain text", "literal format without args" );
+check( "100%% complete", "100% complete",
+	"Perl/Rust target: literal percent in text" );
+check( "%s-%s-%s", "alpha-beta-gamma", "multiple %s placeholders",
+	"alpha", "beta", "gamma" );
+check( "%d/%d/%d", "1/2/3", "multiple %d placeholders", 1, 2, 3 );
+check( "%s:%d:%.1f:%c", "id:7:2.5:A", "mixed common placeholders",
+	"id", 7, 2.5, 65 );
+
+let string_cases := [
+	[ "plain String", "alpha", "alpha" ],
+	[ "empty String", "", "" ],
+	[ "BinaryString", 'bytes', "bytes" ],
+	[ "integer as string", 42, "42" ],
+	[ "float as string", 3.5, "3.5" ],
+	[ "null as string", null, "" ],
+];
+
+check( "%s", "a☃z", "%s accepts Unicode String", "a☃z" );
+check( "<%s>", "<a☃z>", "%s interpolates Unicode String", "a☃z" );
+
+for ( let c in string_cases ) {
+	let label := c[0];
+	let value := c[1];
+	let rendered := c[2];
+	check( "%s", rendered, `%s accepts ${label}`, value );
+	check( "<%s>", `<${rendered}>`, `%s interpolates ${label}`, value );
+	check( "%2s", right( rendered, 2 ), `%2s formats ${label}`, value );
+	check( "%5s", right( rendered, 5 ), `%5s formats ${label}`, value );
+	check( "%8s", right( rendered, 8 ), `%8s formats ${label}`, value );
+	check( "[%8s]", `[${
+		right( rendered, 8 )
+	}]`, `%8s can be embedded for ${label}`, value );
+	check( "%s|%5s", `${rendered}|${
+		right( rendered, 5 )
+	}`, `%s and %5s consume two ${label} args`, value, value );
+}
+
+let integer_cases := [
+	[ "zero", 0, "0" ],
+	[ "positive integer", 7, "7" ],
+	[ "negative integer", -7, "-7" ],
+	[ "large integer", 12345, "12345" ],
+	[ "floating integer conversion", 3.9, "3" ],
+	[ "negative floating integer conversion", -3.9, "-3" ],
+	[ "null integer conversion", null, "0" ],
+];
+
+for ( let c in integer_cases ) {
+	let label := c[0];
+	let value := c[1];
+	let rendered := c[2];
+	check( "%d", rendered, `%d formats ${label}`, value );
+	check( "<%d>", `<${rendered}>`, `%d interpolates ${label}`, value );
+	check( "%2d", right( rendered, 2 ), `%2d formats ${label}`, value );
+	check( "%4d", right( rendered, 4 ), `%4d formats ${label}`, value );
+	check( "%6d", right( rendered, 6 ), `%6d formats ${label}`, value );
+	check( "%d|%4d", `${rendered}|${
+		right( rendered, 4 )
+	}`, `%d and %4d consume two ${label} args`, value, value );
+}
+
+let float_cases := [
+	[ "zero", 0, "0.00", "0.000", "0" ],
+	[ "positive integer", 7, "7.00", "7.000", "7" ],
+	[ "negative integer", -7, "-7.00", "-7.000", "-7" ],
+	[ "positive float", 3.5, "3.50", "3.500", "4" ],
+	[ "negative float", -3.5, "-3.50", "-3.500", "-4" ],
+	[ "rounding float", 2.345, "2.35", "2.345", "2" ],
+	[ "null float", null, "0.00", "0.000", "0" ],
+];
+
+for ( let c in float_cases ) {
+	let label := c[0];
+	let value := c[1];
+	let two := c[2];
+	let three := c[3];
+	let zero := c[4];
+	check( "%.2f", two, `%.2f formats ${label}`, value );
+	check( "%.3f", three, `%.3f formats ${label}`, value );
+	check( "%.0f", zero, `%.0f formats ${label}`, value );
+	check( "%6.2f", right( two, 6 ), `%6.2f formats ${label}`, value );
+	check( "%8.3f", right( three, 8 ), `%8.3f formats ${label}`, value );
+	check( "[%8.3f]", `[${
+		right( three, 8 )
+	}]`, `%8.3f can be embedded for ${label}`, value );
+	check( "%.2f|%8.3f", `${two}|${
+		right( three, 8 )
+	}`, `%f formats consume two ${label} args`, value, value );
+}
+
+let char_cases := [
+	[ "ASCII A", 65, "A" ],
+	[ "ASCII zero", 48, "0" ],
+	[ "space", 32, " " ],
+];
+
+check( "%c", "☃", "%c formats Unicode snowman", 9731 );
+check( "<%c>", "<☃>", "%c interpolates Unicode snowman", 9731 );
+
+for ( let c in char_cases ) {
+	let label := c[0];
+	let value := c[1];
+	let rendered := c[2];
+	check( "%c", rendered, `%c formats ${label}`, value );
+	check( "<%c>", `<${rendered}>`, `%c interpolates ${label}`, value );
+	check( "%2c", right( rendered, 2 ), `%2c formats ${label}`, value );
+	check( "%4c", right( rendered, 4 ), `%4c formats ${label}`, value );
+	check( "%c|%4c", `${rendered}|${
+		right( rendered, 4 )
+	}`, `%c and %4c consume two ${label} args`, value, value );
+}
+
+for ( let text in [ "a", "ab", "abc", "abcd", "abcde" ] ) {
+	check( "%5s", right( text, 5 ), `%5s width sweep for ${text}`, text );
+	check( "%6s", right( text, 6 ), `%6s width sweep for ${text}`, text );
+	check( "%7s", right( text, 7 ), `%7s width sweep for ${text}`, text );
+	check( "%s:%5s:%7s", `${text}:${
+		right( text, 5 )
+	}:${
+		right( text, 7 )
+	}`, `%s repeated width sweep for ${text}`, text, text, text );
+}
+
+for ( let number in [ 0, 1, 12, 123, -1, -12, -123 ] ) {
+	let rendered := "" _ number;
+	check( "%3d", right( rendered, 3 ), `%3d width sweep for ${number}`, number );
+	check( "%5d", right( rendered, 5 ), `%5d width sweep for ${number}`, number );
+	check( "%7d", right( rendered, 7 ), `%7d width sweep for ${number}`, number );
+	check( "%d/%5d/%7d", `${rendered}/${
+		right( rendered, 5 )
+	}/${
+		right( rendered, 7 )
+	}`, `%d repeated width sweep for ${number}`, number, number, number );
+}
+
+let precision_sweep := [
+	[ 0, "0.0", "0.00", "0.000" ],
+	[ 1.5, "1.5", "1.50", "1.500" ],
+	[ 12.5, "12.5", "12.50", "12.500" ],
+	[ -1.5, "-1.5", "-1.50", "-1.500" ],
+	[ -12.5, "-12.5", "-12.50", "-12.500" ],
+];
+
+for ( let c in precision_sweep ) {
+	let number := c[0];
+	let p1 := c[1];
+	let p2 := c[2];
+	let p3 := c[3];
+	check( "%.1f", p1, `%.1f precision sweep for ${number}`, number );
+	check( "%.2f", p2, `%.2f precision sweep for ${number}`, number );
+	check( "%.3f", p3, `%.3f precision sweep for ${number}`, number );
+	check( "%7.2f", right( p2, 7 ), `%7.2f precision sweep for ${number}`, number );
+	check( "%.1f/%7.2f/%.3f", `${p1}/${
+		right( p2, 7 )
+	}/${p3}`, `%f repeated precision sweep for ${number}`,
+		number, number, number );
+}
+
+let target_cases := [
+	[ "left align String", "%-8s", "cat", "cat     " ],
+	[ "left align BinaryString", "%-8s", 'cat', "cat     " ],
+	[ "left align integer", "%-5d", 42, "42   " ],
+	[ "left align negative integer", "%-5d", -7, "-7   " ],
+	[ "left align float", "%-8.2f", 3.5, "3.50    " ],
+	[ "left align char", "%-3c", 65, "A  " ],
+	[ "zero pad integer", "%05d", 42, "00042" ],
+	[ "zero pad negative integer", "%05d", -7, "-0007" ],
+	[ "zero pad hex", "%04x", 10, "000a" ],
+	[ "zero pad float", "%08.2f", 3.5, "00003.50" ],
+	[ "plus flag integer", "%+d", 42, "+42" ],
+	[ "plus flag negative integer", "%+d", -7, "-7" ],
+	[ "space flag integer", "% d", 42, " 42" ],
+	[ "space flag negative integer", "% d", -7, "-7" ],
+	[ "plus flag float", "%+.2f", 3.5, "+3.50" ],
+	[ "space flag float", "% .2f", 3.5, " 3.50" ],
+	[ "String precision", "%.3s", "abcdef", "abc" ],
+	[ "String width and precision", "%5.3s", "abcdef", "  abc" ],
+	[ "String left width and precision", "%-5.3s", "abcdef", "abc  " ],
+	[ "BinaryString precision", "%.3s", 'abcdef', "abc" ],
+	[ "default float precision", "%f", 3.5, "3.500000" ],
+	[ "literal percent", "%%", null, "%" ],
+	[ "hex lower", "%x", 255, "ff" ],
+	[ "hex upper", "%X", 255, "FF" ],
+	[ "octal", "%o", 64, "100" ],
+	[ "alternate hex lower", "%#x", 255, "0xff" ],
+	[ "alternate hex upper", "%#X", 255, "0XFF" ],
+	[ "alternate octal", "%#o", 64, "0100" ],
+	[ "exponential", "%.2e", 12.5, "1.25e+01" ],
+	[ "general", "%.3g", 12.5, "12.5" ],
+	[ "Unicode char byte width", "%2c", 9731, "☃" ],
+	[ "Unicode char wider byte width", "%4c", 9731, " ☃" ],
+];
+
+for ( let c in target_cases ) {
+	if ( c[2] ≡ null and c[1] ≡ "%%" ) {
+		check( c[1], c[3], `Perl/Rust target: ${c[0]}` );
+	}
+	else {
+		check( c[1], c[3], `Perl/Rust target: ${c[0]}`, c[2] );
+	}
+}
+
+check( "rate %% %d", "rate % 7", "Perl/Rust target: percent with value", 7 );
+check( "%-6s|%05d|%+.2f", "ab    |00042|+3.50",
+	"Perl/Rust target: combined flags", "ab", 42, 3.5 );
+check( "%#x/%#X/%#o", "0xff/0XFF/0100",
+	"Perl/Rust target: combined alternate forms", 255, 255, 64 );
+check( "%5.3s|%-5.3s|%04x", "  abc|abc  |000a",
+	"Perl/Rust target: combined precision and hex", "abcdef", "abcdef", 10 );
+
+done_testing();

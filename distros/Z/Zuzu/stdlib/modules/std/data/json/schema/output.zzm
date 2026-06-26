@@ -10,9 +10,9 @@ std/data/json/schema/output - JSON Schema validation output objects.
     RequiredPropertyError,
     TypeMismatchError,
     validate;
-
+  
   let result := validate( schema, instance );
-
+  
   if ( not result.valid() ) {
     for ( let error in result.errors() ) {
       say( error.keywordLocation() _ " " _ error.error() );

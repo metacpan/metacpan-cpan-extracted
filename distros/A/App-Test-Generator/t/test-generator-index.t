@@ -3,6 +3,11 @@
 use strict;
 use warnings;
 use Test::Most;
+use Cwd qw(abs_path);
+use File::Basename qw(dirname);
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
 
 # Tests for private functions in bin/test-generator-index.
 # The script cannot be require'd directly because it has top-level
@@ -91,6 +96,29 @@ sub perldelta_url {
 	my ($v) = @_;
 	my ($maj, $min) = "$v" =~ /^v?(\d+)\.(\d+)/;
 	return "https://perldoc.perl.org/perl${maj}${min}0delta";
+}
+
+# _resolve_report_path — mirrors the path-traversal guard added to
+# _mutant_file_report() in bin/test-generator-index: rejects any '..'
+# segment in $file, then confirms the directory-preserving join of
+# $dir and $file resolves to somewhere under $dir before returning it.
+sub _resolve_report_path {
+	my ($dir, $file) = @_;
+
+	die "Refusing to report on suspicious file path: $file\n"
+		if grep { $_ eq File::Spec->updir } File::Spec->splitdir($file);
+
+	my $relative_path = File::Spec->catfile($dir, $file . '.html');
+	my $out_dir = dirname($relative_path);
+
+	make_path($out_dir) unless -d $out_dir;
+
+	my $resolved_dir = abs_path($dir) // $dir;
+	my $resolved_out = abs_path($out_dir) // $out_dir;
+	die "Refusing to write report outside $dir: $relative_path\n"
+		unless index($resolved_out, $resolved_dir) == 0;
+
+	return $relative_path;
 }
 
 # ==================================================================
@@ -359,6 +387,46 @@ subtest 'perldelta_url() different versions produce different URLs' => sub {
 	my $u1 = perldelta_url('5.034000');
 	my $u2 = perldelta_url('5.036000');
 	isnt($u1, $u2, 'different versions produce different URLs');
+};
+
+# ==================================================================
+# _resolve_report_path (path-traversal guard regression tests)
+# ==================================================================
+
+subtest '_resolve_report_path() accepts a normal lib/ path, preserving structure' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	my $path = _resolve_report_path($dir, 'lib/Foo/Bar.pm');
+	is($path, File::Spec->catfile($dir, 'lib/Foo/Bar.pm.html'), 'directory structure preserved under $dir');
+	ok(-d dirname($path), 'intermediate directories created');
+};
+
+subtest '_resolve_report_path() rejects a file containing a ".." segment' => sub {
+	my $container = tempdir(CLEANUP => 1);
+	my $dir = File::Spec->catdir($container, 'reportdir');
+	mkdir $dir or die $!;
+
+	throws_ok(
+		sub { _resolve_report_path($dir, '../../etc/cron.d/evil') },
+		qr/Refusing to report on suspicious file path/,
+		'.. segment is rejected before any path is built'
+	);
+
+	# Nothing besides the pre-existing reportdir/ should have been
+	# created in $container — confirms the guard fires before any
+	# make_path/open touches the filesystem.
+	opendir(my $dh, $container) or die $!;
+	my @entries = grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+	closedir $dh;
+	is_deeply(\@entries, ['reportdir'], 'no sibling directory created outside $dir');
+};
+
+subtest '_resolve_report_path() rejects a ".." segment buried mid-path' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	throws_ok(
+		sub { _resolve_report_path($dir, 'lib/../../escaped') },
+		qr/Refusing to report on suspicious file path/,
+		'.. anywhere in the path is rejected, not just a leading one'
+	);
 };
 
 done_testing();

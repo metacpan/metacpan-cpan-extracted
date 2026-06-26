@@ -7,10 +7,10 @@ std/digest/sha - SHA digests for BinaryString values.
 =head1 SYNOPSIS
 
   from std/digest/sha import *;
-
+  
   let payload := to_binary( "hello" );
   let key := to_binary( "shared-secret" );
-
+  
   let hex256 := sha256_hex(payload);
   let raw512 := sha512(payload);
   let auth := hmac_sha256_hex(payload, key);

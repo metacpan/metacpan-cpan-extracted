@@ -45,6 +45,7 @@
          "requires" : {
             "Carp" : "0",
             "Config" : "0",
+            "Errno" : "0",
             "Exporter" : "5.57",
             "constant" : "1.03",
             "strict" : "0",
@@ -68,6 +69,6 @@
          "web" : "https://codeberg.org/mauke/Sys-GetRandom-PP"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

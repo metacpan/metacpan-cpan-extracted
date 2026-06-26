@@ -4,7 +4,7 @@ Apple::AppStoreConnect - Apple App Store Connect API client
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
@@ -23,6 +23,15 @@ Version 0.12
     $res = $asc->get_apps();                                          # List of apps
     $res = $asc->get_apps(id => $app_id);                             # App details
     $res = $asc->get_apps(id => $app_id, path => 'customerReviews');  # App reviews
+
+    # List App Store versions, optionally with localizations
+    $res = $asc->get_app_store_versions(id => $app_id, platform => 'IOS');
+    $res = $asc->get_app_store_versions(id => $app_id, localizations => 1);
+    $res = $asc->get_app_store_versions(id => $app_id, localizations => 'en-US');
+
+    # Latest beta feedback for alerting
+    $res = $asc->get_beta_feedback_screenshot_submissions(id => $app_id, platform => 'IOS');
+    $res = $asc->get_beta_feedback_crash_submissions(id => $app_id, crash_log => 1);
 
 # DESCRIPTION
 
@@ -139,9 +148,10 @@ specified in the constructor).
 ## `get_apps`
 
     my $res = $asc->get_apps(
-        id     => $app_id?,
-        path   => $path?,
-        params => \%query_params?
+        id       => $app_id?,
+        path     => $path?,
+        platform => $platform?,
+        params   => \%query_params?
     );
 
 Without arguments it is similar to `get(url=>"apps"`, fetching the list of apps,
@@ -158,8 +168,106 @@ where a hash with the ids of this resource as keys are returned and the attribut
 as values (unless the specific resource does not follow that pattern).
 See API documentation for `path` support (e.g. `builds`, `appAvailability`,
 `appPriceSchedule`, `customerReviews` etc.).
+- `platform` : Optional shortcut for `filter[platform]`, for example
+`IOS`, `MAC_OS`, `TV_OS`, or `VISION_OS`.
 - `params` : Any other query params that you need to pass
 (see [API documentation](https://developer.apple.com/documentation/appstoreconnectapi)).
+
+## `get_app_store_versions`
+
+    my $res = $asc->get_app_store_versions(
+        id                  => $app_id,
+        platform            => $platform?,
+        localizations       => $localizations?,
+        localization_fields => $localization_fields?,
+        params              => \%query_params?
+    );
+
+    my $versions = $asc->get_app_store_versions(
+        id                  => $app_id,
+        platform            => 'IOS',
+        localization_fields => 'locale,whatsNew',
+        params              => {
+            'fields[appStoreVersions]' => 'platform,versionString,appVersionState'
+        }
+    );
+
+Returns an arrayref of App Store versions for the app, automatically fetching
+all pages. Each entry is a hash of the resource attributes, with `id` and
+`type` added.
+
+When `localizations` is requested, one additional API call is made per
+version to fetch its localizations.
+
+- `id` : The app ID.
+- `platform` : Optional shortcut for `filter[platform]`, for example
+`IOS`, `MAC_OS`, `TV_OS`, or `VISION_OS`.
+- `localizations` : If true, each version entry will include a
+`localizations` arrayref. Passing `1` fetches all localizations. Passing a
+locale string, for example `en-US`, fetches only that locale.
+- `localization_fields` : Optional fields to return for each
+`appStoreVersionLocalizations` resource, for example `locale,whatsNew`. If
+specified, `localizations` defaults to `1`.
+- `params` : Any other query params to pass to the
+`apps/$app_id/appStoreVersions` request.
+
+## `get_beta_feedback_screenshot_submissions`
+
+    my $res = $asc->get_beta_feedback_screenshot_submissions(
+        id       => $app_id,
+        platform => $platform?,
+        limit    => $limit?,
+        sort     => $sort?,
+        params   => \%query_params?
+    );
+
+Returns an arrayref of beta feedback screenshot submissions for the app. By
+default, results are sorted newest first using `-createdDate`, with `limit`
+set to `50`. Only up to `limit` results are returned; pagination is not
+performed.
+
+- `id` : The app ID.
+- `platform` : Optional shortcut for `filter[appPlatform]`, for example
+`IOS`, `MAC_OS`, `TV_OS`, or `VISION_OS`.
+- `limit` : Optional maximum number of results to return. Default `50`.
+- `sort` : Optional sort order. Default `-createdDate`.
+- `params` : Any other query params to pass to the
+`apps/$app_id/betaFeedbackScreenshotSubmissions` request, for example
+`fields[betaFeedbackScreenshotSubmissions]` or `include`.
+
+## `get_beta_feedback_crash_submissions`
+
+    my $res = $asc->get_beta_feedback_crash_submissions(
+        id               => $app_id,
+        platform         => $platform?,
+        limit            => $limit?,
+        sort             => $sort?,
+        crash_log        => $crash_log?,
+        crash_log_fields => $crash_log_fields?,
+        params           => \%query_params?
+    );
+
+Returns an arrayref of beta feedback crash submissions for the app. By default,
+results are sorted newest first using `-createdDate`, with `limit` set to
+`50`. Only up to `limit` results are returned; pagination is not performed.
+If `crash_log` is true, each returned crash submission includes a `crashLog`
+hashref with the linked crash log; one additional API call is made per
+submission to fetch it.
+
+- `id` : The app ID.
+- `platform` : Optional shortcut for `filter[appPlatform]`, for example
+`IOS`, `MAC_OS`, `TV_OS`, or `VISION_OS`.
+- `limit` : Optional maximum number of results to return. Default `50`.
+- `sort` : Optional sort order. Default `-createdDate`.
+- `crash_log` : If true, fetch `betaFeedbackCrashSubmissions/$id/crashLog`
+for each crash submission and attach it as `crashLog`.
+- `crash_log_fields` : Optional fields to return for each `betaCrashLogs`
+resource, for example `logText`.
+- `params` : Any other query params to pass to the
+`apps/$app_id/betaFeedbackCrashSubmissions` request, for example
+`fields[betaFeedbackCrashSubmissions]` or `include`. Passing
+`fields[betaCrashLogs]` here is also supported; it is applied to the crash log
+request.
 
 # NOTES
 
@@ -192,7 +300,7 @@ tax documents, new terms etc).
 
 # AUTHOR
 
-Dimitrios Kechagias, `<dkechag at cpan.org>`
+Dimitrios Kechagias, [https://metacpan.org/author/DKECHAG](https://metacpan.org/author/DKECHAG)
 
 # BUGS
 

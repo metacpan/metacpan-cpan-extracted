@@ -1,5 +1,10 @@
 Revision history for XML-PugiXML
 
+0.07  2026-06-25
+    - Add ensure_child / ensure_attr (get-or-create)
+    - Expose FORMAT_NO_EMPTY_ELEMENT_TAGS and PUGIXML_VERSION constants
+    - Support system pugixml >= 1.8 (Alien::pugixml 0.03)
+
 0.06  2026-06-01
     - Catch C++ exceptions at the XS boundary
     - Reject cross-doc node args and embedded NULs

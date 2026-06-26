@@ -2,7 +2,7 @@
 
 cd $HOME/perl.modules/CPAN-MetaCurator/
 
-zap.log.sh
+scripts/zap.log.sh
 time scripts/export.tree.pl -log_level debug -include_packages $INCLUDE_PACKAGES
 
 declare -x SOURCE=html/cpan.metacurator.tree.html

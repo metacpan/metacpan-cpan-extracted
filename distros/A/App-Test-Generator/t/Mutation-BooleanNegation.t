@@ -45,49 +45,22 @@ subtest 'new and inheritance' => sub {
 subtest 'applies_to' => sub {
 	my $m = _mutation();
 
-	# PPI >= 1.270 classifies return statements as PPI::Statement::Break
-	# rather than PPI::Statement::Return -- use a custom predicate to find them
+	# applies_to() is a document-level pre-filter (see Mutation::Base
+	# POD) used by Mutator::generate_mutants to skip the mutate() walk
+	# entirely when a document has nothing to mutate -- it takes the
+	# whole PPI::Document, not an individual node.
 	my $doc = _doc('sub foo { return $x; }');
+	ok($m->applies_to($doc), 'applies_to returns true for doc containing a return stmt');
 
-	my $breaks = $doc->find(sub {
-		my $node = $_[1];
-		# Match Break nodes that are specifically return statements
-		return 0 unless $node->isa('PPI::Statement::Break');
-		my $first = $node->schild(0) or return 0;
-		return $first->content eq 'return';
-	}) || [];
+	# A document with no return statements at all
+	my $doc_no_return = _doc('sub foo { my $x = 1; }');
+	ok(!$m->applies_to($doc_no_return), 'applies_to returns false for doc with no return stmts');
 
-	ok($breaks && @{$breaks}, 'found return statement in doc');
-
-	if($breaks && @{$breaks}) {
-		ok($m->applies_to($breaks->[0]),
-			'applies_to returns true for return Break node');
-	} else {
-		fail('applies_to returns true for return Break node -- no node found');
-	}
-
-	# Other node types are rejected
-	my $words = $doc->find('PPI::Token::Word');
-	ok($words && @{$words}, 'found word tokens in doc');
-	ok(!$m->applies_to($words->[0]),
-		'applies_to returns false for non-Return node');
-
-	# last/next/redo are PPI::Statement::Break but not return -- must be rejected
-	my $doc2   = _doc('sub foo { while(1) { last; } }');
-	my $lasts  = $doc2->find(sub {
-		my $node = $_[1];
-		return 0 unless $node->isa('PPI::Statement::Break');
-		my $first = $node->schild(0) or return 0;
-		return $first->content eq 'last';
-	}) || [];
-
-	if($lasts && @{$lasts}) {
-		ok(!$m->applies_to($lasts->[0]),
-			'applies_to returns false for last (non-return Break node)');
-	} else {
-		# last may not parse as Break in all PPI versions -- skip gracefully
-		pass('applies_to last test skipped -- no last node found');
-	}
+	# last/next/redo are PPI::Statement::Break but not return -- a
+	# document containing only those must not qualify
+	my $doc_last = _doc('sub foo { while(1) { last; } }');
+	ok(!$m->applies_to($doc_last),
+		'applies_to returns false for doc with only last/next/redo');
 
 	done_testing();
 };
@@ -379,6 +352,42 @@ subtest 'mutate: postfix conditional returns produce no mutant' => sub {
 	# return until condition
 	@mutants = $m->mutate(_doc('sub foo { return until $x; }'));
 	is(scalar @mutants, 0, 'return until produces no mutant');
+
+	done_testing();
+};
+
+# ==================================================================
+# mutate -- chained/dereferencing return expressions are negated
+# in full, not just their leading token
+# --------------------------------------------------
+# Regression: $ret->schild(1) only ever captured the first token of
+# a multi-token return expression (e.g. just $self out of
+# $self->{value}), so the transform wrapped only that leading token
+# in !(...) and left the rest of the chain dangling outside the
+# parens, producing the broken mutant 'return !($self)->{value};'
+# (dies at runtime: "Can't use string ... as a HASH ref").
+# ==================================================================
+subtest 'mutate: chained return expression is negated as a whole' => sub {
+	my $m = _mutation();
+
+	my $src     = 'sub foo { return $self->{value}; }';
+	my @mutants = $m->mutate(_doc($src));
+	is(scalar @mutants, 1, 'one mutant for chained property return');
+
+	my $copy = _doc($src);
+	$mutants[0]->transform->($copy);
+	is($copy->serialize, 'sub foo { return !($self->{value}); }',
+		'whole $self->{value} expression wrapped in !(...), not just $self');
+
+	# Same chain, but with a postfix conditional appended
+	$src     = 'sub foo { return $self->{value} if $x; }';
+	@mutants = $m->mutate(_doc($src));
+	is(scalar @mutants, 1, 'one mutant for chained property return with postfix conditional');
+
+	$copy = _doc($src);
+	$mutants[0]->transform->($copy);
+	is($copy->serialize, 'sub foo { return !($self->{value}) if $x; }',
+		'whole $self->{value} expression wrapped in !(...), postfix conditional preserved');
 
 	done_testing();
 };

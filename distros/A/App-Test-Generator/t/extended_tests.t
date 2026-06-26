@@ -18,6 +18,7 @@ use Scalar::Util  qw(looks_like_number);
 
 BEGIN {
 	use_ok('App::Test::Generator');
+	use_ok('App::Test::Generator::Mutant');
 	use_ok('App::Test::Generator::Mutator');
 	use_ok('App::Test::Generator::Mutation::BooleanNegation');
 	use_ok('App::Test::Generator::Mutation::ReturnUndef');
@@ -41,9 +42,23 @@ BEGIN {
 	*_is_redundant_mutation = \&App::Test::Generator::Mutator::_is_redundant_mutation;
 }
 
+my $next_id = 0;
+sub _make_mutant {
+	my %args = @_;
+	return App::Test::Generator::Mutant->new(
+		id          => $args{id}          // 'TEST_' . ++$next_id,
+		line        => $args{line}        // 1,
+		original    => $args{original}    // 'x',
+		description => $args{description} // 'test',
+		context     => $args{context}     // '',
+		line_content => $args{line_content} // '',
+		transform   => $args{transform}   // sub {},
+	);
+}
+
 subtest '_dedup_mutants: single unique mutant returns exactly 1' => sub {
 	my $mutants = [
-		{ line => 5, original => '>', description => 'flip', transform => sub {} }
+		_make_mutant(line => 5, original => '>', description => 'flip')
 	];
 	my $result = _dedup_mutants($mutants);
 	is(scalar @{$result}, 1, 'single unique mutant: count is exactly 1');
@@ -51,8 +66,8 @@ subtest '_dedup_mutants: single unique mutant returns exactly 1' => sub {
 
 subtest '_dedup_mutants: two identical mutants return exactly 1' => sub {
 	my $mutants = [
-		{ line => 5, original => '>', description => 'flip', transform => sub {} },
-		{ line => 5, original => '>', description => 'flip', transform => sub {} },
+		_make_mutant(line => 5, original => '>', description => 'flip'),
+		_make_mutant(line => 5, original => '>', description => 'flip'),
 	];
 	my $result = _dedup_mutants($mutants);
 	is(scalar @{$result}, 1,
@@ -61,9 +76,9 @@ subtest '_dedup_mutants: two identical mutants return exactly 1' => sub {
 
 subtest '_dedup_mutants: three identical mutants return exactly 1' => sub {
 	my $mutants = [
-		{ line => 5, original => '>', description => 'flip', transform => sub {} },
-		{ line => 5, original => '>', description => 'flip', transform => sub {} },
-		{ line => 5, original => '>', description => 'flip', transform => sub {} },
+		_make_mutant(line => 5, original => '>', description => 'flip'),
+		_make_mutant(line => 5, original => '>', description => 'flip'),
+		_make_mutant(line => 5, original => '>', description => 'flip'),
 	];
 	my $result = _dedup_mutants($mutants);
 	is(scalar @{$result}, 1, 'three identical mutants -> exactly 1');
@@ -71,8 +86,8 @@ subtest '_dedup_mutants: three identical mutants return exactly 1' => sub {
 
 subtest '_dedup_mutants: two different mutants return exactly 2' => sub {
 	my $mutants = [
-		{ line => 5,  original => '>', description => 'A', transform => sub {} },
-		{ line => 10, original => '<', description => 'B', transform => sub {} },
+		_make_mutant(line => 5,  original => '>', description => 'A'),
+		_make_mutant(line => 10, original => '<', description => 'B'),
 	];
 	my $result = _dedup_mutants($mutants);
 	is(scalar @{$result}, 2, 'two distinct mutants -> exactly 2');
@@ -80,18 +95,18 @@ subtest '_dedup_mutants: two different mutants return exactly 2' => sub {
 
 subtest '_dedup_mutants: +0 no-op removed, valid mutant kept' => sub {
 	my $mutants = [
-		{ line => 5,  original => '$x + 0', description => 'noop',  transform => sub {} },
-		{ line => 10, original => '$x > 0', description => 'valid', transform => sub {} },
+		_make_mutant(line => 5,  original => '$x + 0', description => 'noop'),
+		_make_mutant(line => 10, original => '$x > 0', description => 'valid'),
 	];
 	my $result = _dedup_mutants($mutants);
 	is(scalar @{$result}, 1, '+0 removed, valid kept: count is exactly 1');
-	is($result->[0]{description}, 'valid', 'correct mutant retained');
+	is($result->[0]->description, 'valid', 'correct mutant retained');
 };
 
 subtest '_dedup_mutants: -0 no-op removed, valid mutant kept' => sub {
 	my $mutants = [
-		{ line => 5,  original => '$x - 0', description => 'noop',  transform => sub {} },
-		{ line => 10, original => '$x > 0', description => 'valid', transform => sub {} },
+		_make_mutant(line => 5,  original => '$x - 0', description => 'noop'),
+		_make_mutant(line => 10, original => '$x > 0', description => 'valid'),
 	];
 	my $result = _dedup_mutants($mutants);
 	is(scalar @{$result}, 1, '-0 removed, valid kept: count is exactly 1');
@@ -99,8 +114,8 @@ subtest '_dedup_mutants: -0 no-op removed, valid mutant kept' => sub {
 
 subtest '_dedup_mutants: standalone 1 removed, valid mutant kept' => sub {
 	my $mutants = [
-		{ line => 5,  original => '1',      description => 'literal', transform => sub {} },
-		{ line => 10, original => '$x > 0', description => 'valid',   transform => sub {} },
+		_make_mutant(line => 5,  original => '1',      description => 'literal'),
+		_make_mutant(line => 10, original => '$x > 0', description => 'valid'),
 	];
 	my $result = _dedup_mutants($mutants);
 	is(scalar @{$result}, 1, 'literal 1 removed, valid kept');
@@ -108,24 +123,22 @@ subtest '_dedup_mutants: standalone 1 removed, valid mutant kept' => sub {
 
 subtest '_dedup_mutants: comment line mutant removed, valid kept' => sub {
 	my $mutants = [
-		{
+		_make_mutant(
 			line         => 5,
 			original     => '$x > 0',
 			description  => 'commented',
 			line_content => '# if ($x > 0)',
-			transform    => sub {}
-		},
-		{
+		),
+		_make_mutant(
 			line         => 10,
 			original     => '$x > 0',
 			description  => 'real',
 			line_content => "\tif(\$x > 0) {",
-			transform    => sub {}
-		},
+		),
 	];
 	my $result = _dedup_mutants($mutants);
 	is(scalar @{$result}, 1, 'comment-line mutant removed, real kept');
-	is($result->[0]{description}, 'real', 'real mutant retained not commented');
+	is($result->[0]->description, 'real', 'real mutant retained not commented');
 };
 
 subtest '_dedup_mutants: empty input returns empty arrayref' => sub {
@@ -136,10 +149,10 @@ subtest '_dedup_mutants: empty input returns empty arrayref' => sub {
 
 subtest '_dedup_mutants: all redundant mutants -> empty result' => sub {
 	my $mutants = [
-		{ line => 1, original => '$x + 0', description => 'noop1', transform => sub {} },
-		{ line => 2, original => '$x - 0', description => 'noop2', transform => sub {} },
-		{ line => 3, original => '1',      description => 'bool',  transform => sub {} },
-		{ line => 4, original => '0',      description => 'bool2', transform => sub {} },
+		_make_mutant(line => 1, original => '$x + 0', description => 'noop1'),
+		_make_mutant(line => 2, original => '$x - 0', description => 'noop2'),
+		_make_mutant(line => 3, original => '1',      description => 'bool'),
+		_make_mutant(line => 4, original => '0',      description => 'bool2'),
 	];
 	my $result = _dedup_mutants($mutants);
 	is(scalar @{$result}, 0, 'all redundant mutants -> empty result');
@@ -151,48 +164,48 @@ subtest '_dedup_mutants: all redundant mutants -> empty result' => sub {
 # ==================================================================
 
 subtest '_is_redundant_mutation: returns exactly 1 for +0' => sub {
-	is(_is_redundant_mutation({ original => '$x + 0' }), 1,
+	is(_is_redundant_mutation(_make_mutant(original => '$x + 0')), 1,
 		'+0 returns exactly 1 not undef');
 };
 
 subtest '_is_redundant_mutation: returns exactly 1 for -0' => sub {
-	is(_is_redundant_mutation({ original => '$y - 0' }), 1,
+	is(_is_redundant_mutation(_make_mutant(original => '$y - 0')), 1,
 		'-0 returns exactly 1 not undef');
 };
 
 subtest '_is_redundant_mutation: returns exactly 0 for normal op' => sub {
-	is(_is_redundant_mutation({ original => '$x > 0' }), 0,
+	is(_is_redundant_mutation(_make_mutant(original => '$x > 0')), 0,
 		'normal op returns exactly 0 not undef');
 };
 
 subtest '_is_redundant_mutation: !! in conditional returns exactly 1' => sub {
-	is(_is_redundant_mutation({
+	is(_is_redundant_mutation(_make_mutant(
 		original => '!!$flag',
 		context  => 'conditional',
-	}), 1, 'double negation in conditional returns exactly 1');
+	)), 1, 'double negation in conditional returns exactly 1');
 };
 
 subtest '_is_redundant_mutation: !! outside conditional returns exactly 0' => sub {
-	is(_is_redundant_mutation({
+	is(_is_redundant_mutation(_make_mutant(
 		original => '!!$flag',
-	}), 0, 'double negation outside conditional returns exactly 0');
+	)), 0, 'double negation outside conditional returns exactly 0');
 };
 
 subtest '_is_redundant_mutation: standalone 0 returns exactly 1' => sub {
-	is(_is_redundant_mutation({ original => '0' }), 1,
+	is(_is_redundant_mutation(_make_mutant(original => '0')), 1,
 		'standalone 0 returns exactly 1');
 };
 
 subtest '_is_redundant_mutation: padded 1 returns exactly 1' => sub {
-	is(_is_redundant_mutation({ original => '  1  ' }), 1,
+	is(_is_redundant_mutation(_make_mutant(original => '  1  ')), 1,
 		'padded standalone 1 returns exactly 1');
 };
 
 subtest '_is_redundant_mutation: comment line returns exactly 1' => sub {
-	is(_is_redundant_mutation({
+	is(_is_redundant_mutation(_make_mutant(
 		original     => '$x',
 		line_content => '# $x > 0',
-	}), 1, 'comment line returns exactly 1');
+	)), 1, 'comment line returns exactly 1');
 };
 
 # ==================================================================

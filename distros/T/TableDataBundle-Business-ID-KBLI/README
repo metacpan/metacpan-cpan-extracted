@@ -4,9 +4,9 @@ NAME
     Business Field)
 
 VERSION
-    This document describes version 20230214.0.0 of
+    This document describes version 20260626.0.0 of
     TableDataBundle::Business::ID::KBLI (from Perl distribution
-    TableDataBundle-Business-ID-KBLI), released on 2023-02-14.
+    TableDataBundle-Business-ID-KBLI), released on 2026-06-26.
 
 DESCRIPTION
     This distribution contains the following TableData:: modules:
@@ -14,6 +14,8 @@ DESCRIPTION
     *   TableData::Business::ID::KBLI::2020::Category
 
     *   TableData::Business::ID::KBLI::2020::Code
+
+    *   TableData::Business::ID::KBLI::2025::Code
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -30,6 +32,9 @@ SEE ALSO
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
@@ -48,8 +53,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

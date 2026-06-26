@@ -9,8 +9,9 @@ build_requires:
 configure_requires:
   Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Build::CMake: '0.99'
+  Alien::Build::Plugin::PkgConfig::Negotiate: '1.53'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +27,7 @@ requires:
   perl: '5.010'
 resources:
   repository: https://github.com/vividsnow/perl5-alien-pugixml.git
-version: '0.02'
+version: '0.03'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

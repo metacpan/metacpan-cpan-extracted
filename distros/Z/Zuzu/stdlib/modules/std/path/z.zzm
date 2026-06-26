@@ -8,14 +8,14 @@ std/path/z - Pure Zuzu implementation of ZPath selectors.
 
   from std/path/z import ZPath;
   from std/time import Time;
-
+  
   let data := {
     users: [
       { name: "Ada", age: 32, updated: new Time() },
       { name: "Bob", age: 27 },
     ],
   };
-
+  
   let names := query( data, "/users/*/name" );
   let zp := new ZPath( path: "/users/#0/name" );
   say( zp.first( data, "n/a" ) );
@@ -116,7 +116,7 @@ The path operators C<@>, C<@@>, and C<@?> can be set to use this module
 in a lexical scope.
 
   from std/path/z import ZPath;
-
+  
   function find_usernames (data) {
     ZPath.use();
     return data @@ "/users/*/name";

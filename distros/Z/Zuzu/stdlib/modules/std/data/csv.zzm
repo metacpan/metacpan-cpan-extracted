@@ -8,19 +8,19 @@ std/data/csv - CSV/TSV and delimited text data handling.
 
   from std/data/csv import CSV;
   from std/io import Path;
-
+  
   let csv := new CSV(
     headers: true,
     sep_char: ",",
   );
-
+  
   let rows := csv.load( Path.tempfile() );
-
+  
   let reader := csv.open( new Path("people.csv") );
   for ( let row in reader ) {
     say( row{name} );
   }
-
+  
   let writer := csv.open_writer( new Path("people-out.csv") );
   writer.write_header( [ "name", "age" ] );
   writer.write_row( { name: "Ada", age: 32 } );

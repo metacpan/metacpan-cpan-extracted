@@ -49,13 +49,15 @@ t/30-basics.t
 t/40-more.t
 t/abs.t
 t/advanced_types.t
-t/app.t
 t/Analyzer-Complexity.t
 t/Analyzer-Return.t
 t/Analyzer-ReturnMeta.t
 t/Analyzer-SideEffect.t
+t/app.t
 t/cli-extract-schemas.t
+t/cli-extract-schemas2.t
 t/cli-fuzz-harness-generator.t
+t/cli-test-generator-mutate.t
 t/conf-corpus.t
 t/conf-fuzz.t
 t/conf/abs.yml
@@ -75,6 +77,7 @@ t/eof.t
 t/eol.t
 t/error_constraints.t
 t/errors.t
+t/Exporter-YAML.t
 t/extended_tests.t
 t/function.t
 t/fuzz.t
@@ -86,6 +89,7 @@ t/getset_accessor.t
 t/instantiation.t
 t/integration.t
 t/LCSAJ-Coverage.t
+t/LCSAJ-Runtime.t
 t/LCSAJ.t
 t/LCSAJ_unit.t
 t/Model-Method.t
@@ -125,6 +129,7 @@ t/return.t
 t/schema_input.t
 t/SchemaExtractor.t
 t/SchemaExtractor_function.t
+t/SchemaExtractor_signature_exec.t
 t/SchemaExtractor_unit.t
 t/strict_pod.t
 t/Template.t

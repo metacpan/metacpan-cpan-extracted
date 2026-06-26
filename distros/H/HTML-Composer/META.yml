@@ -1,0 +1,26 @@
+---
+abstract: 'Compose validated HTML from Perl data structures'
+author:
+  - 'Rawley Fowler <rawleyfowler@proton.me>'
+build_requires:
+  Test::More: '1.302222'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Composer
+requires:
+  HTML::Escape: '1.11'
+  Sereal::Encoder: '5.006'
+resources:
+  repository: https://codeberg.org/rawleyfowler/perl-HTML-Composer.git
+version: '0.002'
+x_contributors:
+  - 'rawley <rawleyfowler@gmail.com>'
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

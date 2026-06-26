@@ -1,5 +1,18 @@
 Change history for HTTP-Date
 
+6.07      2026-06-25 15:12:09Z
+
+    - Add test with Time::Zone (GH#25) (Michal Josef Špaček)
+    - Add test with bad Time::Zone string (GH#26) (Michal Josef Špaček)
+    - Add tests with negative time (GH#26) (Michal Josef Špaček)
+    - Replace all instances of \d with [0-9] in regular expressions to
+      reject non-ASCII Unicode digits, with a regression test (GH#27)
+      (Robert Rothenberg)
+    - Reject malformed ISO 8601 timezones with a doubled colon (GH#31)
+      (Olaf Alders)
+    - Document day/month/year ordering for numeric dates (GH#32) (Olaf
+      Alders)
+
 6.06      2023-07-06 22:29:55Z
     - Use copyright year rather than range (GH#18) (Olaf Alders)
     - Replace "Test" with "Test::More" (GH#20) (James Raspass)

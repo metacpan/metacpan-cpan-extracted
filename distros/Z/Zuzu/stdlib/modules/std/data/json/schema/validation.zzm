@@ -7,16 +7,16 @@ std/data/json/schema/validation - JSON Schema 2020-12 evaluator.
 =head1 SYNOPSIS
 
   from std/data/json/schema/validation import JSONSchema, validate, valid;
-
+  
   let schema := new JSONSchema(
     schema: {
       type: "array",
       items: { type: "integer" },
     },
   );
-
+  
   say( schema.is_valid([ 1, 2, 3 ]) );
-
+  
   let result := validate( { minimum: 10 }, 4 );
   say( result.errors()[0].error() );
 

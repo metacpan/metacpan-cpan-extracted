@@ -11,7 +11,7 @@ use App::Test::Generator::Planner::Fixture;
 use App::Test::Generator::Planner::Mock;
 use App::Test::Generator::Planner::Grouping;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 # Accessor type strings used in plan_all() strategy mapping
 Readonly my $ACCESSOR_GET      => 'get';
@@ -23,7 +23,7 @@ Readonly my $OUTPUT_BOOLEAN => 'boolean';
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head2 new
 
@@ -46,7 +46,23 @@ Construct a new Planner instance.
 
 =head3 Returns
 
-A blessed hashref.
+A blessed hashref. Croaks if C<schemas> or C<package> is missing.
+
+=head3 API specification
+
+=head4 input
+
+    {
+        schemas => { type => HASHREF },
+        package => { type => SCALAR  },
+    }
+
+=head4 output
+
+    {
+        type => OBJECT,
+        isa  => 'App::Test::Generator::Planner',
+    }
 
 =cut
 
@@ -79,6 +95,18 @@ A hashref mapping method name to a plan hashref. Each plan hashref
 contains boolean flags such as C<getter_test>, C<getset_test>,
 C<object_injection_test>, and C<boolean_test> indicating which test
 types should be emitted for that method.
+
+=head3 API specification
+
+=head4 input
+
+    {
+        self => { type => OBJECT, isa => 'App::Test::Generator::Planner' },
+    }
+
+=head4 output
+
+    { type => HASHREF }
 
 =cut
 
@@ -115,22 +143,50 @@ sub plan_all {
 	return \%method_plan;
 }
 
-# --------------------------------------------------
-# build_plan
-#
-# Build a comprehensive test plan using
-#     all available planning subsystems:
-#     strategy, isolation, fixture, mock,
-#     and grouping.
-#
-# Entry:      None beyond $self.
-# Exit:       Returns a hashref with keys: strategy,
-#             isolation, fixture, mock, groups.
-#
-# Notes:      TODO: This method does not appear to be
-#             called anywhere. Consider removing it or
-#             integrating it into plan_all().
-# --------------------------------------------------
+=head2 build_plan
+
+Build a comprehensive test plan by running the schema through all
+available planning subsystems in sequence: strategy generation,
+isolation, fixture, mock, and grouping.
+
+    my $plan = $planner->build_plan();
+
+=head3 Arguments
+
+None beyond C<$self>.
+
+=head3 Returns
+
+A hashref with five keys: C<strategy> (from
+L<App::Test::Generator::TestStrategy/generate_plan>), C<isolation>
+(from L<App::Test::Generator::Planner::Isolation/plan>, given the
+strategy as context), C<fixture> (from
+L<App::Test::Generator::Planner::Fixture/plan>, given the isolation
+plan as context), C<mock> (from
+L<App::Test::Generator::Planner::Mock/plan>), and C<groups> (from
+L<App::Test::Generator::Planner::Grouping/plan>).
+
+=head3 Notes
+
+Unlike C<plan_all>, which is the planner actually used by the test
+generation pipeline, C<build_plan> is not currently called anywhere
+else in this distribution. It is kept as a public entry point for
+the richer combined plan it produces.
+
+=head3 API specification
+
+=head4 input
+
+    {
+        self => { type => OBJECT, isa => 'App::Test::Generator::Planner' },
+    }
+
+=head4 output
+
+    { type => HASHREF }
+
+=cut
+
 sub build_plan {
 	my $self = $_[0];
 

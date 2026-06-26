@@ -7,15 +7,15 @@ javascript - Evaluate JavaScript from ZuzuScript.
 =head1 SYNOPSIS
 
   from javascript import JS, JSResult;
-
+  
   let r := JS.eval("[ 7, 8, 9 ]");
   assert( r instanceof JSResult );
-
+  
   let j := r.toJSON();
-
+  
   let r2 := r.eval(" this[1] ");
   assert( r2 instanceof JSResult );
-
+  
   let n;
   n := r2.value() if r2.isSafe();
 

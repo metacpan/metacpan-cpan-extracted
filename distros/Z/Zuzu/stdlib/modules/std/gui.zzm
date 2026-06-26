@@ -7,7 +7,7 @@ std/gui - User-facing GUI constructor helpers.
 =head1 SYNOPSIS
 
   from std/gui import *;
-
+  
   let w := Window(
   	title: "Demo",
   	VBox(

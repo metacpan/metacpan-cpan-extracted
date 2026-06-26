@@ -1,9 +1,13 @@
 use Test2::V0;
 
 use Encode qw( decode );
+use File::Basename qw( dirname );
 use File::Spec;
-use File::Temp qw( tempdir );
+use File::Temp qw( tempdir tempfile );
+use IPC::Open3 qw( open3 );
+use Symbol qw( gensym );
 
+use Zuzu::Parser;
 use Zuzu::Tidy;
 
 my $messy = <<'SRC';
@@ -245,8 +249,8 @@ like(
 );
 like(
 	$spacing_tidy,
-	qr/\nlet cfg := \{ pretty: false, sort_keys: false, color: false, quiet: false \};\n/,
-	'removes trailing comma for single-line dict or bag literals',
+	qr/\nlet cfg := \{\n\tpretty: false,\n\tsort_keys: false,\n\tcolor: false,\n\tquiet: false,\n\};\n/,
+	'forces multi-line dict literal when source has a trailing comma',
 );
 like $spacing_tidy, qr/\nlet range_arr := \[ 1 \.\.\. 3 \];\n/,
 	'keeps array ranges formatted as ranges';
@@ -254,24 +258,64 @@ like $spacing_tidy, qr/\nlet range_set := << 1 \.\.\. 3 >>;\n/,
 	'keeps set ranges formatted as ranges';
 like $spacing_tidy, qr/\nlet range_bag := <<< 1 \.\.\. 3 >>>;\n/,
 	'keeps bag ranges formatted as ranges';
-like $spacing_tidy, qr/\nlet arr := \[ 1, 2, 3 \];\n/, 'removes trailing comma for single-line arrays';
+like $spacing_tidy, qr/\nlet arr := \[\n\t1,\n\t2,\n\t3,\n\];\n/,
+	'forces multi-line array when source has a trailing comma';
 like(
 	$spacing_tidy,
 	qr/\nlet arr_force := \[\n\ta{40},\n\tb{40},\n\tc{40},\n\td{40},\n\];\n/,
 	'formats split arrays one item per line with trailing comma',
 );
-like $spacing_tidy, qr/\nlet set_single := << 1, 2, 3 >>;\n/, 'removes trailing comma for single-line sets';
+like $spacing_tidy, qr/\nlet set_single := <<\n\t1,\n\t2,\n\t3,\n>>;\n/,
+	'forces multi-line set when source has a trailing comma';
 like(
 	$spacing_tidy,
 	qr/\nlet set_force := <<\n\ta{40},\n\tb{40},\n\tc{40},\n\td{40},\n>>;\n/,
 	'formats split sets one item per line with trailing comma',
 );
-like $spacing_tidy, qr/\nlet bag_single := <<< 1, 2, 3 >>>;\n/, 'removes trailing comma for single-line bags';
+like $spacing_tidy, qr/\nlet bag_single := <<<\n\t1,\n\t2,\n\t3,\n>>>;\n/,
+	'forces multi-line bag when source has a trailing comma';
 like(
 	$spacing_tidy,
 	qr/\nlet bag_force := <<<\n\ta{40},\n\tb{40},\n\tc{40},\n\td{40},\n>>>;?\n/,
 	'formats split bags one item per line with trailing comma',
 );
+
+my $trailing_comma_src = <<'SRC';
+function declares(a,b,){return a}
+let single_arg:=foo(1,)
+let single_arr:=[1,]
+let no_trailing:=foo(1,2,3)
+let nested_force:=[[1,2,],[3,4,],]
+let call_args:=foo(1,2,3,)
+let shifted:=a<<b
+let mixed:=[a<<b,c]
+SRC
+my $trailing_comma_tidy = Zuzu::Tidy->tidy( $trailing_comma_src, filename => 'trailing-comma.zzs' );
+
+like $trailing_comma_tidy,
+	qr/\Afunction declares \(\n\ta,\n\tb,\n\) \{/,
+	'forces multi-line declaration parameter list when source has a trailing comma';
+like $trailing_comma_tidy,
+	qr/\nlet single_arg := foo\(\n\t1,\n\);\n/,
+	'forces multi-line call args for a single-item trailing-comma argument list';
+like $trailing_comma_tidy,
+	qr/\nlet single_arr := \[\n\t1,\n\];\n/,
+	'forces multi-line array for a single-item trailing-comma array literal';
+like $trailing_comma_tidy,
+	qr/\nlet no_trailing := foo\( 1, 2, 3 \);\n/,
+	'a sequence without a trailing comma is unaffected and stays single-line';
+like $trailing_comma_tidy,
+	qr/\nlet nested_force := \[\n\t\[\n\t\t1,\n\t\t2,\n\t\],\n\t\[\n\t\t3,\n\t\t4,\n\t\],\n\];\n/,
+	'nested forced sequences each split and indent independently';
+like $trailing_comma_tidy,
+	qr/\nlet call_args := foo\(\n\t1,\n\t2,\n\t3,\n\);\n/,
+	'forces multi-line call argument list when source has a trailing comma';
+like $trailing_comma_tidy,
+	qr/\nlet shifted := a << b;\n/,
+	'<< used as a genuine binary shift operator is spaced normally and not split';
+like $trailing_comma_tidy,
+	qr/\nlet mixed := \[ a << b, c \];\n/,
+	'a binary shift expression as a non-trailing-comma array item does not confuse bracket matching';
 
 my $unpack_tidy = Zuzu::Tidy->tidy(
 	q{let {host,"for":for_id,Number port:=1234,`user-${suffix}`:String user_id,(key): value but weak}:=opts},
@@ -328,8 +372,8 @@ like $current_syntax_tidy, qr/\nlet ceiled := ⌈value \+ 0\.2⌉;\n/,
 	'formats ceil bracket inner expression';
 like $current_syntax_tidy, qr/\nlet bits := a & b \| c \^ d;\n/,
 	'formats bitwise operator spacing';
-like $current_syntax_tidy, qr/\nlet set_single := « 1, 2, 3 »;\n/,
-	'removes trailing comma for single-line guillemet sets';
+like $current_syntax_tidy, qr/\nlet set_single := «\n\t1,\n\t2,\n\t3,\n»;\n/,
+	'forces multi-line guillemet set when source has a trailing comma';
 like $current_syntax_tidy, qr/\nlet diff := left \\ right;\n/,
 	'formats set-difference operator spacing';
 like $current_syntax_tidy, qr/\nasync function worker \(value\) \{/,
@@ -410,6 +454,28 @@ is $canonical_exit, 0, 'zuzu-tidy.pl --canonical-operators exits successfully';
 is $canonical_output, "let n := 2 × 3;\n",
 	'zuzu-tidy.pl --canonical-operators prints canonical operators';
 
+my $stdin_err = gensym;
+my $stdin_pid = open3(
+	my $stdin_in,
+	my $stdin_out,
+	$stdin_err,
+	$^X,
+	$bin,
+	'--stdin',
+);
+binmode $stdin_in, ':encoding(UTF-8)';
+binmode $stdin_out, ':encoding(UTF-8)';
+print {$stdin_in} "let stdin_value:=4\n";
+close $stdin_in;
+my $stdin_output = do { local $/; <$stdin_out> };
+my $stdin_error = do { local $/; <$stdin_err> };
+waitpid $stdin_pid, 0;
+my $stdin_exit = $? >> 8;
+is $stdin_exit, 0, 'zuzu-tidy.pl --stdin exits successfully';
+is $stdin_error, '', 'zuzu-tidy.pl --stdin does not print errors';
+is $stdin_output, "let stdin_value := 4;\n",
+	'zuzu-tidy.pl --stdin prints tidied output';
+
 my $in_place_cmd = "$^X $bin --in-place $script";
 my $in_place_output = qx{$in_place_cmd};
 my $in_place_exit = $? >> 8;
@@ -421,5 +487,262 @@ open my $rfh, '<:encoding(UTF-8)', $script
 my $rewritten = do { local $/; <$rfh> };
 close $rfh;
 is $rewritten, "let n := 1;\n", '--in-place writes tidied content';
+
+## ------------------------------------------------------------------
+## Syntax-stress regression harness (examples/syntax-stress-test).
+##
+## Fixtures under t/fixtures/ugly/ are verbatim copies of
+## examples/syntax-stress-test/uglified/*.zzs. They are intentionally
+## ugly and must not be cleaned up: they exist to exercise Zuzu::Tidy
+## against real-world messy input.
+## ------------------------------------------------------------------
+
+my $zuzu_bin  = File::Spec->catfile( $repo_root, 'bin', 'zuzu.pl' );
+my @stdlib_includes = (
+	'-I', File::Spec->catdir( $repo_root, 'stdlib', 'modules' ),
+	'-I', File::Spec->catdir( $repo_root, 'stdlib', 'test-modules' ),
+);
+
+sub _slurp {
+	my ( $path ) = @_;
+	open my $fh, '<:encoding(UTF-8)', $path or die "Could not read $path: $!";
+	local $/;
+	my $content = <$fh>;
+	close $fh;
+	return $content;
+}
+
+sub _run_under_zuzu_perl {
+	my ( $script_path ) = @_;
+	my @cmd = ( $^X, $zuzu_bin, @stdlib_includes, $script_path );
+	my ( $stdout, $stderr ) = ( '', '' );
+	my $err = gensym;
+	my $pid = open3( my $in, my $out, $err, @cmd );
+	close $in;
+	$stdout = do { local $/; <$out> };
+	$stderr = do { local $/; <$err> };
+	waitpid $pid, 0;
+	my $exit = $? >> 8;
+	return { exit => $exit, stdout => $stdout, stderr => $stderr, cmd => join( ' ', @cmd ) };
+}
+
+sub _tap_passed {
+	my ( $result ) = @_;
+	return 0 if $result->{exit} != 0;
+	return 0 if $result->{stdout} =~ /^\s*not ok\b/m;
+	return 1;
+}
+
+my @stress_fixtures = qw(
+	01-control-and-literals.zzs
+	02-objects-traits-and-accessors.zzs
+	03-collections-paths-and-slices.zzs
+	04-functions-lambdas-and-spread.zzs
+	05-async-spawn-and-exceptions.zzs
+);
+
+my $fixtures_dir = File::Spec->catdir( $repo_root, 't', 'fixtures', 'ugly' );
+my $manually_tidied_dir = File::Spec->catdir(
+	$repo_root, '..', 'examples', 'syntax-stress-test', 'manually-tidied'
+);
+
+for my $name ( @stress_fixtures ) {
+	my $ugly_path = File::Spec->catfile( $fixtures_dir, $name );
+	my $ugly_src = _slurp($ugly_path);
+	my $tidied = Zuzu::Tidy->tidy( $ugly_src, filename => $name );
+
+	my $parser = Zuzu::Parser->new;
+	my $parse_ok = eval {
+		$parser->parse( $tidied, $name );
+		1;
+	};
+	my $parse_error = $@;
+	ok $parse_ok, "$name: auto-tidied ugly fixture parses with Zuzu::Parser"
+		or diag "Parse error for $name:\n$parse_error\n---- tidied output ----\n$tidied";
+
+	my $tmpdir = tempdir( CLEANUP => 1 );
+	my $tidied_path = File::Spec->catfile( $tmpdir, $name );
+	open my $fh, '>:encoding(UTF-8)', $tidied_path
+		or die "Could not write $tidied_path: $!";
+	print {$fh} $tidied;
+	close $fh;
+
+	my $result = _run_under_zuzu_perl($tidied_path);
+
+	# Same pre-existing, unrelated std/path/z/node.zzm runtime bug noted
+	# below for the manually-tidied fixture: it also reproduces on the
+	# never-tidied original source, so it isn't something Zuzu::Tidy
+	# introduced or can fix.
+	if ( $name eq '03-collections-paths-and-slices.zzs' ) {
+		todo 'pre-existing std/path/z/node.zzm runtime bug, unrelated to Zuzu::Tidy' => sub {
+			ok _tap_passed($result), "$name: auto-tidied ugly fixture runs under zuzu-perl";
+		};
+		next;
+	}
+
+	ok _tap_passed($result), "$name: auto-tidied ugly fixture runs under zuzu-perl"
+		or diag "Command: $result->{cmd}\nExit: $result->{exit}\nSTDOUT:\n$result->{stdout}\nSTDERR:\n$result->{stderr}";
+}
+
+for my $name ( @stress_fixtures ) {
+	my $manual_path = File::Spec->catfile( $manually_tidied_dir, $name );
+	next if ! -f $manual_path;
+	my $manual_src = _slurp($manual_path);
+
+	my $parser = Zuzu::Parser->new;
+	my $parse_ok = eval {
+		$parser->parse( $manual_src, $name );
+		1;
+	};
+	ok $parse_ok, "$name: manually-tidied fixture parses with Zuzu::Parser"
+		or diag "Parse error for $name:\n$@";
+
+	my $result = _run_under_zuzu_perl($manual_path);
+
+	# Known pre-existing bug in std/path/z/node.zzm's Node.children(),
+	# unrelated to Zuzu::Tidy: indexing failure under zuzu-perl even for
+	# the original, never-tidied source. Out of scope for this plan
+	# (Assumptions: changes are scoped to Zuzu::Tidy unless lexer/parser
+	# defects are found). Tracked here so a real fix shows up as a new
+	# failure instead of silently staying broken.
+	if ( $name eq '03-collections-paths-and-slices.zzs' ) {
+		todo 'pre-existing std/path/z/node.zzm runtime bug, unrelated to Zuzu::Tidy' => sub {
+			ok _tap_passed($result), "$name: manually-tidied fixture runs under zuzu-perl";
+		};
+		next;
+	}
+
+	ok _tap_passed($result), "$name: manually-tidied fixture runs under zuzu-perl"
+		or diag "Command: $result->{cmd}\nExit: $result->{exit}\nSTDOUT:\n$result->{stdout}\nSTDERR:\n$result->{stderr}";
+}
+
+## ------------------------------------------------------------------
+## Focused assertions for the known bad shapes from
+## examples/syntax-stress-test/tidy-improvements.md. These currently
+## fail (Phase 1 of that plan) and should turn green as the formatter
+## is fixed in subsequent phases.
+## ------------------------------------------------------------------
+
+my $pairlist_spread_src = <<'SRC';
+let merged := combine(...{{ left: "(", left: "{" }});
+SRC
+my $pairlist_spread_tidy = Zuzu::Tidy->tidy(
+	$pairlist_spread_src,
+	filename => 'pairlist-spread.zzs',
+);
+like $pairlist_spread_tidy, qr/\.\.\.\{\{.*?\}\}/s,
+	'pairlist spread keeps doubled {{ ... }} delimiters intact';
+unlike $pairlist_spread_tidy, qr/\.\.\.\{\n/,
+	'pairlist spread is not split into a nested { { ... } } block';
+
+my $class_brace_tidy = Zuzu::Tidy->tidy(
+	"class Record with Labelled{let String name:=\"x\"}\n",
+	filename => 'class-brace.zzs',
+);
+unlike $class_brace_tidy, qr/\{[ \t]*let\b/,
+	'class opening brace is followed by a newline, not an inline field declaration';
+
+my $function_brace_tidy = Zuzu::Tidy->tidy(
+	"function classify(Number n)->String{if(n>0){return \"pos\"}return \"non-pos\"}\n",
+	filename => 'function-brace.zzs',
+);
+unlike $function_brace_tidy, qr/\{[ \t]*if[ \t]*\(/,
+	'function opening brace is followed by a newline, not an inline if statement';
+
+my $method_brace_tidy = Zuzu::Tidy->tidy(
+	"class Demo{method summary()->String{return \"ok\"}}\n",
+	filename => 'method-brace.zzs',
+);
+unlike $method_brace_tidy, qr/\{[ \t]*return\b/,
+	'method opening brace is followed by a newline, not an inline return';
+
+my $async_brace_tidy = Zuzu::Tidy->tidy(
+	"async function delayed_double(Number n)->Number{await{sleep(0.01)}return n*2}\n",
+	filename => 'async-brace.zzs',
+);
+unlike $async_brace_tidy, qr/\{[ \t]*await[ \t]*\{/,
+	'async function opening brace is followed by a newline, not an inline await block';
+
+my $static_method_tidy = Zuzu::Tidy->tidy(
+	"class Builder{method summary()->String{return \"a\"}static method make()->Builder{return new Builder()}}\n",
+	filename => 'static-method.zzs',
+);
+unlike $static_method_tidy, qr/\}[ \t]*static[ \t]+method\b/,
+	'closing a method body does not collapse onto the same line as the next static method declaration';
+
+my $try_catch_src = <<'SRC';
+try{
+step1()
+step2()
+step3()
+step4()
+step5()
+}catch(Exception e){handle(e)}
+SRC
+my $try_catch_tidy = Zuzu::Tidy->tidy( $try_catch_src, filename => 'try-catch.zzs' );
+unlike $try_catch_tidy, qr/\}\n\n\s*catch\b/,
+	'try/catch stay adjacent with no blank line between the closing } and catch';
+
+my $for_else_src = <<'SRC';
+for(let item in items){
+step1(item)
+step2(item)
+step3(item)
+step4(item)
+step5(item)
+}else{say "nothing"}
+SRC
+my $for_else_tidy = Zuzu::Tidy->tidy( $for_else_src, filename => 'for-else.zzs' );
+unlike $for_else_tidy, qr/\}\n\n\s*else\b/,
+	'for/else stay adjacent with no blank line between the closing } and else';
+
+my $multiline_call_tidy = Zuzu::Tidy->tidy(
+	"call_twice(function(value){step_one(value)step_two(value)}, 4);\n",
+	filename => 'multiline-call.zzs',
+);
+unlike $multiline_call_tidy, qr/^\s*,\s*\d/m,
+	'a trailing call argument after a callback is not stranded alone on its own line';
+
+my $index_call_tidy = Zuzu::Tidy->tidy(
+	"let lambda_values:=[await{async_lambdas[0](10);},await{async_lambdas[1](10);},];\n",
+	filename => 'index-call.zzs',
+);
+unlike $index_call_tidy, qr/\[\s*0\s*,?\s*\n/,
+	'a simple index expression is never split across a line break';
+
+## ------------------------------------------------------------------
+## Phase 5 whitespace rules: switch comparator spacing, access chains,
+## slices, and concatenation around punctuation literals.
+## ------------------------------------------------------------------
+
+my $switch_comparator_tidy = Zuzu::Tidy->tidy(
+	"switch(n mod 4: =){case 0:say \"a\" default:say \"b\"}\n",
+	filename => 'switch-comparator.zzs',
+);
+like $switch_comparator_tidy, qr/switch \( n mod 4 : = \) \{/,
+	'switch comparator marker keeps readable spacing around :';
+
+my $access_chain_tidy = Zuzu::Tidy->tidy(
+	"let x:=data{users}[0]{roles};\n",
+	filename => 'access-chain.zzs',
+);
+like $access_chain_tidy, qr/\Alet x := data\{users\}\[0\]\{roles\};\n/,
+	'chained dict/index access stays tight with no inserted spaces';
+
+my $slice_tidy = Zuzu::Tidy->tidy(
+	"let m:=text[1:2];\nlet n:=bytes[2:2];\nlet p:=arr[:2];\nlet q:=arr[1:];\n",
+	filename => 'slice.zzs',
+);
+like $slice_tidy, qr/\Alet m := text\[1:2\];\n/, 'keeps a simple slice compact';
+like $slice_tidy, qr/\nlet n := bytes\[2:2\];\n/, 'keeps a binary-string slice compact';
+like $slice_tidy, qr/\nlet p := arr\[:2\];\n/, 'keeps a slice with an omitted start compact';
+like $slice_tidy, qr/\nlet q := arr\[1:\];\n/, 'keeps a slice with an omitted end compact';
+
+my $concat_punct_tidy = Zuzu::Tidy->tidy(
+	qq{let r := text _":" _ item;\n},
+	filename => 'concat-punct.zzs',
+);
+like $concat_punct_tidy, qr/\Alet r := text _ ":" _ item;\n/,
+	'spaces the concatenation operator consistently around a punctuation string literal';
 
 done_testing;

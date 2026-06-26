@@ -1,0 +1,84 @@
+from test/more import *;
+
+=encoding utf8
+
+=head1 NAME
+
+control-and-literals - harmless syntax stress for basic forms
+
+=cut
+
+let numbers := [ 42, 0x2A, 0o52, 0b101010, 6.02E3 ];
+let escaped := "line\nquote\"slash\\tab\tunicode\u2603";
+let raw := """raw\nkeeps\tescapes""";
+let who := "formatter";
+let templated := `hello ${who}`;
+let triple_template := ```total ${numbers[0] + numbers[1]}```;
+let payload := 'ABC\n\x44';
+let matcher := /hello\s+\w+/;
+
+/* Nested control flow and switch comparators. */
+function classify(Number n)->String {
+	if ( n < 0 ) {return "negative";
+	}
+	else if ( n = 0 ) {return "zero";
+}
+
+let label := "";
+switch ( n mod 4: = ) {
+	case 0: label := "quarter";
+	case 1: label := "one";
+	case 2: label := "two";
+	default: label := "other";
+}
+return label;}
+
+let total := 0;
+for ( let n in numbers ) {
+if ( n > 100 ) { total += 100; }
+else { total += n; }
+}else {
+total := -1;
+}
+
+let empty_else := false;
+for ( let item in [] ) { empty_else := false; }
+else { empty_else := true; }
+
+let countdown:=3;
+while(countdown>0){countdown--;next if countdown=1;last if countdown=0;}
+
+let protected := try {
+	throw new Exception( message: "caught" );
+		"missed";
+}
+catch ( Exception e ) {
+e{message}
+};
+
+let did_do := do {
+	let inner := ⌊3.8⌋ + ⌈4.2⌉;
+	inner * 2;
+};
+
+let postfix := 0;
+postfix += 2 if true;
+postfix += 100 unless true;
+postfix += ^^ for [ 1, 2, 3 ];
+
+is( classify(-1), "negative", "if branch classifies negatives" );
+is( classify(0), "zero", "else-if branch classifies zero" );
+is( classify(8), "quarter", "switch branch classifies multiples" );
+ok( empty_else, "for/else ran on an empty array" );
+is( countdown, 0, "while loop used postfix next/last guards" );
+is( protected, "caught", "try/catch expression returned catch value" );
+is( did_do, 16, "do expression and floor/ceil brackets evaluated" );
+is( postfix, 8, "postfix if/unless/for contributed expected total" );
+ok( "hello formatter" ~ matcher, "regexp literal matches text" );
+is( typeof payload, "BinaryString", "single-quoted literal is binary" );
+is( templated, "hello formatter", "template string interpolated" );
+is( triple_template, "total 84", "triple template interpolated" );
+is( raw[0:3], "raw", "raw multiline string parsed" );
+ok( length escaped > 10, "escaped string parsed" );
+ok( total > 200, "mixed numeric literals accumulated" );
+done_testing();

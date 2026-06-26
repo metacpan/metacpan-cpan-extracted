@@ -26,21 +26,6 @@ sub _mutation {
 	return new_ok('App::Test::Generator::Mutation::ReturnUndef');
 }
 
-# --------------------------------------------------
-# Helper: find return statements using the PPI >= 1.270
-# predicate (PPI::Statement::Break with first token 'return')
-# --------------------------------------------------
-sub _find_returns {
-	my ($doc) = @_;
-	return $doc->find(sub {
-		my $node = $_[1];
-		# PPI >= 1.270 classifies return as PPI::Statement::Break
-		return 0 unless $node->isa('PPI::Statement::Break');
-		my $first = $node->schild(0) or return 0;
-		return $first->content eq 'return';
-	}) || [];
-}
-
 # ==================================================================
 # new and inheritance
 # ==================================================================
@@ -58,40 +43,23 @@ subtest 'new and inheritance' => sub {
 # ==================================================================
 subtest 'applies_to' => sub {
 	my $m  = _mutation();
+
+	# applies_to() is a document-level pre-filter (see Mutation::Base
+	# POD) used by Mutator::generate_mutants to skip the mutate() walk
+	# entirely when a document has nothing to mutate -- it takes the
+	# whole PPI::Document, not an individual node.
 	my $doc = _doc('sub foo { return $x; }');
+	ok($m->applies_to($doc), 'applies_to returns true for doc containing a return stmt');
 
-	# PPI::Statement::Break return nodes are accepted
-	my $returns = _find_returns($doc);
-	ok($returns && @{$returns}, 'found return statement in doc');
+	# A document with no return statements at all
+	my $doc_no_return = _doc('sub foo { my $x = 1; }');
+	ok(!$m->applies_to($doc_no_return), 'applies_to returns false for doc with no return stmts');
 
-	if($returns && @{$returns}) {
-		ok($m->applies_to($returns->[0]),
-			'applies_to returns true for return Break node');
-	} else {
-		fail('applies_to returns true for return Break node -- no node found');
-	}
-
-	# Other node types are rejected
-	my $words = $doc->find('PPI::Token::Word');
-	ok($words && @{$words}, 'found word tokens in doc');
-	ok(!$m->applies_to($words->[0]),
-		'applies_to returns false for non-Return node');
-
-	# last/next/redo are PPI::Statement::Break but not return
-	my $doc2  = _doc('sub foo { while(1) { last; } }');
-	my $lasts = $doc2->find(sub {
-		my $node = $_[1];
-		return 0 unless $node->isa('PPI::Statement::Break');
-		my $first = $node->schild(0) or return 0;
-		return $first->content eq 'last';
-	}) || [];
-
-	if($lasts && @{$lasts}) {
-		ok(!$m->applies_to($lasts->[0]),
-			'applies_to returns false for last (non-return Break node)');
-	} else {
-		pass('applies_to last test skipped -- no last node found');
-	}
+	# last/next/redo are PPI::Statement::Break but not return -- a
+	# document containing only those must not qualify
+	my $doc_last = _doc('sub foo { while(1) { last; } }');
+	ok(!$m->applies_to($doc_last),
+		'applies_to returns false for doc with only last/next/redo');
 
 	done_testing();
 };
@@ -361,13 +329,48 @@ subtest 'mutate: postfix conditional returns produce no mutant' => sub {
 	done_testing();
 };
 
-subtest 'ReturnUndef::mutate() returns exactly 0 not undef for non-Break node' => sub {
+# ==================================================================
+# mutate -- chained/dereferencing return expressions are replaced
+# in full, not just their leading token
+# --------------------------------------------------
+# Regression: $ret->schild(1) only ever captured the first token of
+# a multi-token return expression (e.g. just $self out of
+# $self->{value}), so the transform replaced only that leading token
+# and left the rest of the chain dangling, producing the broken
+# mutant 'return undef->{value};' (dies at runtime: "Can't use
+# string ... as a HASH ref").
+# ==================================================================
+subtest 'mutate: chained return expression is replaced as a whole' => sub {
+	my $m = _mutation();
+
+	my $src     = 'sub foo { return $self->{value}; }';
+	my @mutants = $m->mutate(_doc($src));
+	is(scalar @mutants, 1, 'one mutant for chained property return');
+
+	my $copy = _doc($src);
+	$mutants[0]->transform->($copy);
+	is($copy->serialize, 'sub foo { return undef; }',
+		'whole $self->{value} expression replaced with undef, not just $self');
+
+	# Same chain, but with a postfix conditional appended
+	$src     = 'sub foo { return $self->{value} if $x; }';
+	@mutants = $m->mutate(_doc($src));
+	is(scalar @mutants, 1, 'one mutant for chained property return with postfix conditional');
+
+	$copy = _doc($src);
+	$mutants[0]->transform->($copy);
+	is($copy->serialize, 'sub foo { return undef if $x; }',
+		'whole $self->{value} expression replaced with undef, postfix conditional preserved');
+
+	done_testing();
+};
+
+subtest 'ReturnUndef::applies_to() returns exactly 0 not undef when nothing qualifies' => sub {
 	require PPI;
-	my $m    = App::Test::Generator::Mutation::ReturnUndef->new();
-	my $doc  = PPI::Document->new(\'sub foo { my $x = 1; }');
-	my $stmt = $doc->find_first('PPI::Statement::Variable');
-	my $result = $m->applies_to($stmt);
-	is($result, 0, 'non-Break node returns exactly 0 not undef');
+	my $m   = App::Test::Generator::Mutation::ReturnUndef->new();
+	my $doc = PPI::Document->new(\'sub foo { my $x = 1; }');
+	my $result = $m->applies_to($doc);
+	is($result, 0, 'no qualifying return stmt returns exactly 0 not undef');
 };
 
 done_testing();

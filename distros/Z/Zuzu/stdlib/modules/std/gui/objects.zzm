@@ -7,7 +7,7 @@ std/gui/objects - Runtime-supported GUI object classes.
 =head1 SYNOPSIS
 
   from std/gui/objects import Window, VBox, Button;
-
+  
   let w := new Window( title: "Demo" );
   let b := new Button( text: "OK", id: "submit" );
   w.set_content( new VBox( children: [ b ] ) );

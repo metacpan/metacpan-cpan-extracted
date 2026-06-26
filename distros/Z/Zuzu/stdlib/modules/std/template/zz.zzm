@@ -7,7 +7,7 @@ std/template/zz - ZZPath-backed template engine.
 =head1 SYNOPSIS
 
   from std/template/zz import ZZTemplate;
-
+  
   let tmpl := new ZZTemplate(
     string: "Hello {{ name ?: \"friend\" }}!",
   );

@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::Most;
+use Test::Mockingbird;
 use File::Temp qw(tempdir);
 use File::Spec;
 
@@ -161,6 +162,84 @@ subtest 'generate_mutants() does not croak for bare module with no targets' => s
 	my $m = App::Test::Generator::Mutator->new(file => $pm, lib_dir => $lib);
 	lives_ok(sub { $m->generate_mutants() },
 		'no croak for module with no mutation targets');
+};
+
+# ==================================================================
+# Regression: generate_mutants() never called applies_to() on any
+# registered strategy before calling mutate() -- the pre-filter
+# documented in Mutation::Base's POD was dead code. mutate() must
+# now be skipped entirely for a strategy whose applies_to() says the
+# document has nothing to mutate.
+# ==================================================================
+subtest 'generate_mutants() skips mutate() when applies_to() returns false' => sub {
+	my ($pm, $lib) = _make_pm(
+		"package TestModule;\nsub foo { if(\$x > 0) { return 1; } return 0; }\n1;\n"
+	);
+	my $m = App::Test::Generator::Mutator->new(file => $pm, lib_dir => $lib);
+
+	my $mutate_called = 0;
+	Test::Mockingbird::mock(
+		'App::Test::Generator::Mutation::NumericBoundary',
+		'applies_to',
+		sub { return 0 },
+	);
+	Test::Mockingbird::mock(
+		'App::Test::Generator::Mutation::NumericBoundary',
+		'mutate',
+		sub { $mutate_called++; return () },
+	);
+
+	$m->generate_mutants();
+	is($mutate_called, 0, 'mutate() never called when applies_to() returns false');
+
+	Test::Mockingbird::unmock('App::Test::Generator::Mutation::NumericBoundary', 'applies_to');
+	Test::Mockingbird::unmock('App::Test::Generator::Mutation::NumericBoundary', 'mutate');
+};
+
+subtest 'generate_mutants() still calls mutate() when applies_to() returns true' => sub {
+	my ($pm, $lib) = _make_pm(
+		"package TestModule;\nsub foo { if(\$x > 0) { return 1; } return 0; }\n1;\n"
+	);
+	my $m = App::Test::Generator::Mutator->new(file => $pm, lib_dir => $lib);
+
+	my $mutate_called = 0;
+	Test::Mockingbird::mock(
+		'App::Test::Generator::Mutation::NumericBoundary',
+		'mutate',
+		sub { $mutate_called++; return () },
+	);
+
+	$m->generate_mutants();
+	ok($mutate_called > 0, 'mutate() called when applies_to() returns true');
+
+	Test::Mockingbird::unmock('App::Test::Generator::Mutation::NumericBoundary', 'mutate');
+};
+
+# ==================================================================
+# Regression: none of the four concrete Mutation::* strategies ever
+# populated the context/line_content fields that
+# Mutator::_is_redundant_mutation's fast-mode dedup checks depend on,
+# so those checks were dead code for real, production-generated
+# mutants. Each strategy must now set both fields.
+# ==================================================================
+subtest 'generate_mutants() populates context and line_content on real mutants' => sub {
+	my ($pm, $lib) = _make_pm(
+		"package TestModule;\nsub foo {\n\tif(\$x > 0) {\n\t\treturn 1;\n\t}\n\treturn 0;\n}\n1;\n"
+	);
+	my $m = App::Test::Generator::Mutator->new(file => $pm, lib_dir => $lib);
+	my @mutants = $m->generate_mutants();
+
+	ok(scalar(@mutants) > 0, 'mutants were generated for the fixture');
+
+	for my $mutant (@mutants) {
+		ok(defined $mutant->context, $mutant->id . ': context is defined');
+		ok(defined $mutant->line_content, $mutant->id . ': line_content is defined');
+		like($mutant->line_content, qr/\S/, $mutant->id . ': line_content is non-blank');
+	}
+
+	my @conditional = grep { $_->context eq 'conditional' } @mutants;
+	ok(scalar(@conditional) > 0,
+		'at least one mutant is correctly classified as context => conditional');
 };
 
 # ==================================================================

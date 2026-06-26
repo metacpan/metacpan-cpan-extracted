@@ -7,7 +7,7 @@ std/data/toon - Pure-Zuzu TOON codec.
 =head1 SYNOPSIS
 
   from std/data/toon import TOON;
-
+  
   let codec := new TOON( indent: 2 );
   let text := codec.encode({ answer: 42 });
   let data := codec.decode(text);

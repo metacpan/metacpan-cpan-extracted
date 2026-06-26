@@ -7,21 +7,21 @@ std/proc - Process execution, environment, and signals.
 =head1 SYNOPSIS
 
   from std/proc import Proc, Env, sleep;
-
+  
   let pid := Proc.pid();
   let home := Env.get("HOME", "");
-
+  
   let res := Proc.run(
     "perl",
     [ "-e", "print qq<ok\\n>;" ]
   );
-
+  
   let seen := 0;
   Proc.onsignal( "USR1", function () {
     seen++;
   } );
   Proc.kill( "USR1", Proc.pid() );
-
+  
   sleep(0.1);
 
 =head1 IMPLEMENTATION SUPPORT

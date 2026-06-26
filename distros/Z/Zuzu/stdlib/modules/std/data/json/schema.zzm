@@ -12,7 +12,7 @@ std/data/json/schema - JSON Schema 2020-12 validation.
     TypeMismatchError,
     validate,
     valid;
-
+  
   let person_schema := {
     type: "object",
     required: [ "name" ],
@@ -21,9 +21,9 @@ std/data/json/schema - JSON Schema 2020-12 validation.
       age:  { type: "integer", minimum: 0 },
     },
   };
-
+  
   say( valid( person_schema, { name: "Ada", age: 37 } ) );
-
+  
   let result := validate( person_schema, { age: -1 } );
   for ( let error in result.errors() ) {
     if ( error instanceof RequiredPropertyError ) {

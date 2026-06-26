@@ -1,5 +1,333 @@
 Revision history for App-Test-Generator
 
+0.40	Thu Jun 25 20:28:59 EDT 2026
+	[Bug fixes]
+	- Fix bin/generate-test-dashboard passing --changed_only to
+	  test-generator-mutate without a --base_sha, causing the diff to
+	  cover only HEAD~1. With dashboard.yml's concurrency cancel-in-progress
+	  policy, coalesced CI runs left stale survivor entries for any file not
+	  touched in the final commit of a batch; those entries were never
+	  refreshed by subsequent runs. Now computes BASE_SHA by skipping the
+	  workflow's own bookkeeping commits (same logic as mutate.yml), so the
+	  diff always covers everything since mutation.json was last meaningfully
+	  regenerated.
+	- Fix bin/test-generator-mutate setting $ENV{LCSAJ_TARGETS} to the
+	  mutation-scoped file list before running the baseline system('prove')
+	  check. This caused t/LCSAJ-Runtime.t (which calls DB::DB() directly
+	  against its own file) to fail spuriously whenever --file or
+	  --changed_only selected a subset of lib files, aborting the entire
+	  mutation run before any mutants were tested. LCSAJ_TARGETS is now
+	  assigned after baseline verification, scoped only to the mutation runs.
+	- Fix t/LCSAJ-Runtime.t's hit-recording subtest assuming %TARGET is
+	  empty. During mutation testing LCSAJ_TARGETS is intentionally scoped
+	  to the file under mutation (never a test file), so %TARGET is
+	  non-empty and the subtest's direct DB::DB() call was filtered out,
+	  making the 'hit recorded' assertion fail for every per-mutant prove
+	  run. This produced a fake 100% kill rate that invalidated all mutation
+	  results. Fixed by using local %TARGET = () within that subtest.
+	- Fix t/function.t's BEGIN-time LCSAJ_TARGETS subtest spawning its
+	  child perl process via qx{}/backticks with a shell-quoted -e
+	  argument (single quotes). qx{} always goes through a shell, and
+	  cmd.exe on Windows does not treat single quotes as a quoting
+	  character, so the child process failed to parse its own -e
+	  script ("Can't find string terminator"). Switched to list-form
+	  system() under Capture::Tiny::capture_merged(), which passes the
+	  -e argument directly with no shell involved on any platform.
+	- Fix LCSAJ::_save_lcsaj() building an output directory path by
+	  joining $dir with $file's full path when $file has no 'lib/'
+	  segment to strip (e.g. a File::Temp tempfile). On Windows this
+	  embedded a second drive letter mid-path and made
+	  File::Path::make_path fail with "Invalid argument"; on other
+	  platforms it silently created a deeply nested mirror of $file's
+	  absolute path under $dir. Now falls back to the basename when
+	  the stripped path is still absolute.
+	- Removed Test::Needs gates that never reflect a genuine dependency:
+	  t/params_validate.t, t/moosex_params_validate.t (Params::Validate
+	  and MooseX::Params::Validate/MooseX::Types::Moose appear only in
+	  heredoc fixture text parsed by PPI/Safe::reval, never truly loaded),
+	  t/params_validate_strict.t (already a hard PREREQ_PM), and the
+	  HTML::Genealogy::Map gate in t/fuzz.t (leftover from deleted
+	  t/conf/html_genealogy_map.{conf,yml} fixtures). The
+	  MooseX::Params::Validate fix restores real extraction coverage
+	  that was previously silently skipped on any machine without Moose
+	  installed.
+	- Added a Test::Needs gate for Type::Params/Types::Common to the
+	  signature_for subtest in t/integration.t: that fixture is compiled
+	  by a genuinely spawned perl -T subprocess, which
+	  Test::Without::Module cannot fake "missing" for, so the dependency
+	  must be a hard skip rather than left to croak.
+	- Fix Planner::Fixture::plan() comparing $isolation->{$method}
+	  directly against the 'shared_fixture' string. Planner::Isolation::
+	  plan() actually returns a per-method hashref with a 'fixture' key
+	  (plus optional env/filesystem/time/network keys), not a bare mode
+	  string, so the comparison always stringified a hash reference and
+	  was always false. In practice this meant every method planned by
+	  Planner::build_plan() silently got 'new_per_test' fixture mode,
+	  even purity-'pure' methods that should have gotten a shared
+	  fixture. Each module's own unit tests passed because they fed
+	  Fixture::plan() a fabricated flat-string isolation map that never
+	  matched Isolation::plan()'s real output shape; only composing the
+	  two through build_plan() in a new end-to-end test caught the
+	  mismatch. Fixed to read $isolation->{$method}{fixture}; updated
+	  Fixture.pm's POD and t/Planner-Fixture.t, t/Planner-submodules_unit.t,
+	  and t/function.t's fixtures to the real per-method hashref shape.
+	- Fix mutation.json incorrectly added to .gitignore while the file is
+	  tracked by git; removed the .gitignore entry and untracked the file
+	  with git rm --cached so it is no longer committed.
+	- Fix mutate.yml (deployed to dependent repos) still using floating
+	  shogo82148/actions-setup-perl@v1 after dashboard.yml was pinned;
+	  both deployed workflow files now pin to the same version.
+	- Fix POD-embedded CI workflow template referencing stale action
+	  versions (actions/checkout@v5, actions-setup-perl@v1) after
+	  dashboard.yml was updated; template now matches dashboard.yml.
+	- Fix README.md SEE ALSO link label still saying "Test Coverage Report"
+	  after the POD was updated to "Test Dashboard".
+	- Fix dashboard.yml "Publish test dashboard" step running unguarded on
+	  pull_request events, publishing PR-derived coverage output to the
+	  public gh-pages site; now skipped on pull_request like the other
+	  commit steps.
+	- Fix dashboard.yml "Save updated mutation results" guard
+	  (if: github.event_name == 'workflow_run') discarding the freshly
+	  regenerated mutation.json on plain push runs; generate-test-dashboard
+	  regenerates mutation.json on every run regardless of trigger, so the
+	  guard now matches its siblings (if: github.event_name !=
+	  'pull_request').
+	- Fix dashboard.yml silently skipping the coverage snapshot when
+	  cover_html/cover.json is missing, masking real dashboard-generation
+	  failures; the step now emits an ::error:: annotation, dumps
+	  cover_db/cover_html/coverage for diagnosis, and fails the job.
+	- Fix mutate.yml "Find last code commit" silently falling back to
+	  HEAD~1 when no base commit could be parsed from git log, narrowing
+	  the mutation diff without any visible indication; now emits an
+	  ::warning:: annotation when BASE is empty.
+	- Fix dashboard.yml and mutate.yml commit steps calling a shared
+	  .github/scripts/commit-if-changed.sh helper; dependent repos only
+	  receive the two workflow YAML files when copying them in (see
+	  "now portable to any CPAN module" below), so the script was missing
+	  on every consumer and CI failed with "No such file or directory".
+	  Commit/push logic is now inlined directly in each step.
+	- Fix extract-schemas _load_target_module() loading the target module
+	  via eval "require $package" (string eval); the package name is now
+	  validated against Perl's package-name grammar and the module is
+	  loaded by converting it to a file path and calling require on that,
+	  so it is never compiled as arbitrary Perl source.
+	- Fix test-generator-mutate --changed_only interpolating --base_sha
+	  into a backtick-executed git diff command; --base_sha is now
+	  validated against a restrictive character class and git diff is
+	  invoked via list-form open() instead of the shell.
+	- Fix test-generator-index _mutant_file_report() computing a
+	  slash-sanitised $filename that was never used, leaving the report
+	  path built from the raw, unsanitised $file; it now rejects any '..'
+	  path segment in $file and verifies the resolved output path stays
+	  under the report directory before writing.
+	- Fix extract-schemas _load_target_module() losing the drive letter
+	  when reconstructing the lib-dir candidate with File::Spec->catdir(),
+	  so the @INC-walking loop never found a 'lib' directory on Windows
+	  when the input file and the cwd were on different drives; now uses
+	  catpath() to keep the volume attached.
+	- Fix SchemaExtractor _infer_type_from_expression() and
+	  _parse_modern_signature() using hand-rolled brace/bracket depth
+	  counters to split comma-separated lists, which mishandled nested
+	  brackets (e.g. a signature default value containing a hashref
+	  literal could be split on the comma inside the hashref); both now
+	  use Text::Balanced::extract_bracketed() to skip over nested
+	  structures correctly.
+	- Fix Mutator.pm's _dedup_mutants(), _is_redundant_mutation(), and
+	  apply_mutant() reaching into Mutant objects via direct hash access
+	  (e.g. $m->{line}), bypassing the class's own accessor methods; all
+	  six call sites now use the Mutant accessors ($m->line, $m->original,
+	  $m->transform, etc).
+	- Fix Devel::App::Test::Generator::LCSAJ::Runtime's DB::DB debugger
+	  hook calling abs_path() (a filesystem stat) on every single
+	  statement executed under the debugger; resolved paths are now
+	  memoised per raw $file in %NORM_CACHE.
+	- Fix lib/App/Test/Generator/Sample/Module.pm declaring
+	  package Test::App::Generator::Sample::Module (reversed word order)
+	  instead of App::Test::Generator::Sample::Module, so the package
+	  name did not match its location under
+	  lib/App/Test/Generator/Sample/; renamed throughout the file.
+	- Fix Generator.pm SYNOPSIS extract-schemas example passing two
+	  positional arguments (bin/extract-schemas lib/Sample/Module.pm)
+	  instead of one, referencing a nonexistent lib/Sample/Module.pm path,
+	  and naming the generated schema file schemas/greet.yaml when
+	  extract-schemas actually writes schemas/greet.yml; corrected all
+	  three.
+	- Fix lib/App/Test/Generator/Exporter/YAML.pm having no package
+	  statement (so it loaded into main::), no input validation before
+	  YAML::XS::DumpFile(), and no test coverage; added the package
+	  statement, Params::Validate::Strict validation of plan/file
+	  (rejecting non-hashref plans and missing/empty file paths), and
+	  t/Exporter-YAML.t.
+	- Fix generate()'s _assert_identifier() check on the function name
+	  rejecting fully-qualified sub names such as DB::DB, breaking
+	  t/app.t's self-test sweep against
+	  Devel::App::Test::Generator::LCSAJ::Runtime.pm (DB::DB is a Perl
+	  debugger hook, always installed into the DB:: package regardless
+	  of its source package); the function-name check now allows "::"
+	  separators, same as the existing module-name check.
+	- Fix SchemaExtractor's heuristic numeric-type inference missing
+	  parameters that are only ever validated via an explicit
+	  looks_like_number($param) call rather than direct arithmetic
+	  adjacency (e.g. a parameter used as looks_like_number($b) in a
+	  guard clause and only later folded into arithmetic via
+	  $a + ($b // 0), where $b never sits next to an operator itself);
+	  such parameters fell back to type 'string', so fuzz-generated
+	  non-numeric inputs caused generated tests to fail against code
+	  that legitimately dies on non-numeric input. An explicit
+	  looks_like_number($param) call in the source is now treated as a
+	  direct numeric-type assertion, checked before the existing
+	  arithmetic-operator and comparison heuristics.
+	- Fix _compile_signature_isolated()'s "fast path" Safe compartment,
+	  tried before falling back to the subprocess unconditionally;
+	  Type::Params/Types::Common pull in XS modules and Safe cannot host
+	  XS/dynamic loading, so the compartment never succeeded for any real
+	  signature_for() declaration and was dead code giving a false
+	  impression of sandboxing. Removed; the subprocess path (gated on
+	  allow_signature_exec => 1) is now the only path.
+	- Fix Generator.pm splicing module/function/transform/field names
+	  unescaped into generated test source; added _assert_identifier()
+	  and applied it before every such splice point so a name that is
+	  not identifier-shaped now croaks instead of producing a test file
+	  with injected code.
+	- Fix extract-schemas2 calling Planner->new without the required
+	  package argument, crashing on every invocation; package is now
+	  passed through from the extracted schema.
+	- Fix Template.pm _dedup_cases() always being a no-op: a return
+	  inside the eval{} block returned from the eval, not from
+	  _dedup_cases, so the deduplicated result was discarded and the
+	  unduplicated $cases was always returned to the caller.
+	- Fix SchemaExtractor _detect_dependencies() relationship detection
+	  losing pos() state on a shared $code string across nested global
+	  matches; affected loops now operate on independent copies/resets.
+	- Fix SchemaExtractor numeric boundary-value hints double-counting
+	  values already present from a previous hint pass; boundary values
+	  are now added through a seen-value set, so re-running hint
+	  generation on the same schema no longer duplicates values.
+	- Fix SchemaExtractor _detect_external_object_dependency() not
+	  resetting pos($method_body) before its global match, so a prior
+	  match elsewhere on the same string could cause this detector to
+	  start scanning mid-string and miss leading dependencies; pos() is
+	  now explicitly reset to 0 first.
+	- Fix CoverageGuidedFuzzer calling target_sub with no time bound, so
+	  a target that hangs (e.g. on an unexpected infinite-loop input)
+	  hung the whole fuzz run; calls are now wrapped in alarm()-based
+	  timeout (default 5s, configurable via timeout => N, 0 disables).
+	- Fix LCSAJ.pm's CFG builder connecting every branch point only to a
+	  newly-created true-block successor, leaving the false-arm block
+	  disconnected from the frontier and silently dropped as an empty
+	  leaf with no lines or edges; both true and false successors are
+	  now wired into the frontier so subsequent statements are recorded
+	  against both arms.
+	- Fix Mutator generate_mutants() never calling each mutation
+	  strategy's applies_to() pre-filter before mutate(), and never
+	  populating the context/line_content fields on the Mutant objects
+	  it constructs; both are now wired through.
+	- Fix Analyzer::SideEffect.pm and Analyzer::Complexity.pm counting
+	  IO/exec keywords, branch/logic/exception keywords, and the
+	  literal ? character when they merely appeared inside a string
+	  literal or comment (e.g. "Are you sure?" or a # comment containing
+	  "die"); source is now stripped of string and comment content
+	  before these keyword/operator counts are taken.
+	- Fix Analyzer::Return.pm's \$self(?!->) returns_self pattern
+	  matching the \$self prefix of any longer variable name (e.g.
+	  \$self_backup, \$selfish); added a \b word boundary. Also fixed
+	  all three return-pattern matches running as a single non-/g match,
+	  so a method with several qualifying return statements only ever
+	  contributed one evidence entry instead of one per occurrence.
+	- Fix Mutation::BooleanNegation and Mutation::ReturnUndef mutating
+	  only the first PPI token of a multi-token return expression (e.g.
+	  $self->{value}), since $ret->schild(1) captures just the leading
+	  Symbol token of a chained/dereferencing expression; this produced
+	  broken mutants like 'return !($self)->{value};' and
+	  'return undef->{value};' that die at runtime rather than testing
+	  the intended boolean/undef substitution. Both now resolve the
+	  full expression span (up to a trailing postfix conditional/loop
+	  modifier or the statement terminator) and wrap/replace it as a
+	  whole.
+	- Fix SchemaExtractor _analyze_relationships() extracting parameter
+	  names with a hardcoded my (...) = @_ regex only, so shift-style
+	  (my $x = shift) and modern-signature (sub foo($self, $x)) methods
+	  never had their parameter relationships (mutually-exclusive,
+	  required-group, dependency, etc.) analysed; parameter extraction
+	  now reuses _extract_parameters_from_signature(), which already
+	  supports all four parameter-declaration styles.
+	- Fix Analyzer::ReturnMeta.pm's stability bonus for boolean returns
+	  being undocumented in POD: since stability_score starts at 100 and
+	  is clamped to [0, 100], the bonus is a no-op unless an earlier
+	  penalty already reduced the score, which POD readers had no way of
+	  knowing. Documented the no-op-in-the-common-case behaviour.
+	- Fix Planner::Mock.pm plan() silently dropping the capture_io mock
+	  for any method that is both calls_external and performs_io, since
+	  the if/elsif gave mock_system precedence; such a method now gets
+	  an arrayref of both mock strategies instead of losing one.
+	- Fix CoverageGuidedFuzzer.pm _run_with_cover() walking the full
+	  Devel::Cover state twice per fuzz iteration (once for "before",
+	  once for "after"); coverage state only grows, so this iteration's
+	  "before" is now the cached "after" snapshot from the previous
+	  iteration, halving the per-iteration Devel::Cover walk count.
+	- Fix CoverageGuidedFuzzer.pm _validate_value() matching a schema-
+	  supplied 'matches' regex against fuzzer-generated input with no
+	  bound on catastrophic backtracking; the match is now wrapped in
+	  the same alarm()-based timeout already used to bound target_sub
+	  calls, and a timeout is treated as a non-match.
+	- Fix SchemaExtractor.pm's TODO POD section claiming union-type
+	  parsing (e.g. scalar | scalarref) in =head4 Input specs was
+	  unimplemented; _map_formal_input_type already handles it. Narrowed
+	  the TODO to the part that is genuinely still unimplemented (the
+	  enum/memberof constraint synonym).
+	- Fix TestStrategy.pm's getset-accessor branch picking an arbitrary,
+	  hash-order-dependent input parameter when more than one candidate
+	  was present; candidates are now sorted by their schema position
+	  field first, making the choice deterministic.
+	- Fix LCSAJ::Coverage.pm's custom "Cannot read $file: $!" / "Cannot
+	  write coverage output to $out_file: $!" croak messages being
+	  unreachable dead code under "use autodie qw(:all)" (autodie's
+	  open() never returns false, so "open(...) or croak(...)" never
+	  fires); autodie is now disabled locally for these two open calls
+	  so the documented custom messages are actually produced on failure.
+
+	[Enhancements]
+	- Add cross-module end-to-end subtests to t/integration.t:
+	  Planner::build_plan()'s full five-subsystem composition (verifying
+	  the documented TestStrategy/Mock/Isolation/Fixture/Grouping
+	  responsibility split with real side-effect/dependency metadata,
+	  and that build_plan() calls each subsystem exactly once via
+	  Test::Mockingbird::spy); a SchemaExtractor -> Exporter::YAML ->
+	  disk -> Generator round trip; independent-instance concurrency
+	  checks for Mutator and CoverageGuidedFuzzer (interleaved calls on
+	  separate instances must not leak state); and a Test::Without::
+	  Module-based fallback check proving SchemaExtractor's
+	  signature_for() extraction is unaffected by BSD::Resource being
+	  unavailable. Test::Returns' returns_ok() is used to validate
+	  build_plan()'s output against its documented API specification.
+	- Pin shogo82148/actions-setup-perl to immutable commit SHA
+	  (a198315 / v1.41.1) in dashboard.yml, mutate.yml, and the
+	  POD-embedded CI template; actions/checkout similarly pinned to
+	  df4cb1c (v6) in the POD template.
+	- dashboard.yml and mutate.yml commit/push steps now do a
+	  git pull --rebase before pushing, reducing non-fast-forward
+	  rejections when mutate.yml's commit and dashboard.yml's
+	  workflow_run-triggered commit land close together.
+	- Add destructive/hostile subtests to t/edge_cases.t, scoped to
+	  angles not already covered by t/function.t or t/Model-Method*.t:
+	  Planner::Isolation::plan() with an undef $schema (only $strategy is
+	  hashref-validated; $schema degrades safely to the isolated_block
+	  fixture); Model::Method::evidence_ref() external-mutation/aliasing
+	  abuse (a forged entry bypassing add_evidence()'s category/signal
+	  validation is still summed by resolve_confidence()); evidence()'s
+	  documented list-vs-scalar context difference; an unlocalized-$_
+	  confirmation for resolve_confidence()'s postfix for loop;
+	  Analyzer::SideEffect::analyze() with an arrayref method body
+	  (stringifies harmlessly) and a typeglob in place of $method (dies
+	  with Perl's native "Not a HASH reference"); Exporter::YAML::export()
+	  with a circular-reference plan hashref (YAML::XS handles it via
+	  anchors/aliases, confirmed not to hang); TestStrategy::generate_plan()
+	  with an undef vs. non-hashref per-method schema entry (the former
+	  degrades to basic_test, the latter dies under strict refs); and an
+	  end-to-end Generator::generate() injection test confirming a
+	  statement-injection-shaped function name is rejected by
+	  _assert_identifier() before any output file is written.
+
 0.39	Sun May 24 17:43:17 EDT 2026
 
 	[Bug fixes]
@@ -78,6 +406,89 @@ Revision history for App-Test-Generator
 	  _extract_defaults_from_code so that inner closure parameters
 	  (my ($x, $y) = @_ inside a sub ref) are not mistaken for the outer
 	  method's parameters.
+
+	[Bug fixes]
+	- Fix Mutation::NumericBoundary's conditional-context detection
+	  (used for Mutator's fast-mode dedup) always evaluating false: PPI
+	  wraps a condition's content in PPI::Statement::Expression, so an
+	  operator's immediate parent is never literally
+	  PPI::Structure::Condition. Operators inside if/unless/while/until
+	  conditions were always tagged 'expression'. Now uses the same
+	  ancestor-walking _in_conditional() helper already shared by
+	  BooleanNegation and ReturnUndef.
+	- Fix Analyzer::SideEffect.pm's mutates_self and mutates_globals
+	  detection ($self->{field} = ... assignment and %ENV/%SIG/@ARGV
+	  mutation) matching against the raw method body instead of the
+	  comment/string-stripped $code_only, so a field-assignment-like
+	  fragment inside a string literal or comment could be mistaken for
+	  an actual mutation. Both checks now match against $code_only, same
+	  as the keyword/operator counts already fixed in a prior release.
+	- Fix Emitter::Perl.pm's _emit_method_tests() having no dispatch
+	  branch for the boundary_tests plan flag: TestStrategy.pm sets
+	  $plan{boundary_tests} when a method's schema carries non-empty
+	  _yamltest_hints, but the corresponding $TEST_BOUNDARY constant was
+	  defined and never read, so methods planned for boundary testing
+	  silently got zero generated test code for it. Added the dispatch
+	  line plus a new _emit_boundary_test() that emits one smoke-test
+	  block per boundary_values/invalid_inputs hint value.
+	- Fix TestStrategy.pm's generate_plan() extracting side_effects and
+	  dependencies from each method's schema _analysis but never using
+	  them, while the module's own DESCRIPTION claimed the plan was
+	  based on them; verified empirically that schema side-effect data
+	  has zero effect on the generated plan. Removed the dead
+	  extraction and corrected DESCRIPTION to attribute side-effect- and
+	  dependency-driven planning to Planner::Mock and Planner::Isolation,
+	  where it actually happens.
+	- Fix SchemaExtractor.pm's include_private POD describing the
+	  always-included _new/_init/_build method-name override as an
+	  exact-name match; _find_methods actually does a prefix match
+	  (/^_(new|init|build)/), so e.g. _build_attribute and _init_logger
+	  are also force-included, matching common Moose builder/
+	  initializer naming conventions. Confirmed via git log -L that the
+	  prefix behaviour is original and deliberate; POD corrected to
+	  match.
+	- Fix Generator.pm's render_hash() POD describing $href's values as
+	  always hashrefs; a scalar value that is a recognised type string
+	  is silently expanded to { type => $value } before being skipped-
+	  with-a-warning, which the POD did not mention.
+	- Fix Generator.pm's _perl_quote() POD omitting that the strings
+	  'true'/'false' are special-cased to the Perl boolean constants
+	  !!1/!!0 rather than being single-quoted like other strings.
+	- Fix Analyzer::Complexity.pm and Analyzer::Return.pm POD describing
+	  their $method argument as an App::Test::Generator::Model::Method
+	  object; SchemaExtractor's actual callers pass a plain hashref with
+	  a body/source key, not a Model::Method instance. POD corrected to
+	  describe the real calling convention.
+	- Fix README.md's extract-schemas usage example passing two
+	  positional arguments and referencing a nonexistent
+	  lib/Sample/Module.pm with a .yaml extension; corrected to the real
+	  invocation (extract-schemas lib/App/Test/Generator/Sample/Module.pm
+	  && fuzz-harness-generator -r schemas/greet.yml) and updated its
+	  GitHub Actions example to the same pinned action SHAs already used
+	  in dashboard.yml/mutate.yml.
+
+	[Enhancements]
+	- Add comprehensive black-box subtests to t/unit.t validating the
+	  public, POD-documented API of every .pm file under lib/ (all 27
+	  modules), written strictly against each module's documented
+	  Arguments/Returns contract rather than incidental implementation
+	  behaviour. Where a module's existing dedicated test file
+	  (e.g. t/Planner-Isolation.t, t/TestStrategy.t,
+	  t/Template_unit.t) already exercised its public API exhaustively
+	  in equivalent black-box style, no duplicate coverage was added to
+	  t/unit.t.
+	- Add missing public-API POD (Purpose, Arguments, Returns, API
+	  specification) to every previously undocumented public method in
+	  Model::Method.pm, which had none beyond a VERSION section; to
+	  Template.pm's get_data_section(); and to Planner.pm's build_plan(),
+	  which previously carried only an internal TODO-style comment
+	  despite being a public method.
+	- Add Notes sections to Mutation::BooleanNegation, ::ConditionalInversion,
+	  ::NumericBoundary, and ::ReturnUndef documenting the context and
+	  line_content fields each mutant carries for Mutator's fast-mode
+	  dedup, and to CoverageGuidedFuzzer.pm documenting that a
+	  target_sub die is only recorded as a bug when the triggering input
+	  is schema-valid.
 
 0.38	Mon May 18 21:19:40 EDT 2026
 

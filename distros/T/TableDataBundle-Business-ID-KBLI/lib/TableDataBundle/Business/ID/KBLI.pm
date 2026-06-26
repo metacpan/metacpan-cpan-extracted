@@ -3,9 +3,9 @@
 package TableDataBundle::Business::ID::KBLI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-14'; # DATE
+our $DATE = '2026-06-26'; # DATE
 our $DIST = 'TableDataBundle-Business-ID-KBLI'; # DIST
-our $VERSION = '20230214.0.0'; # VERSION
+our $VERSION = '20260626.0.0'; # VERSION
 
 1;
 # ABSTRACT: Collection of TableData:: modules related to KBLI (Kode Baku Lapangan Usaha, a.k.a. Standard Code of Business Field)
@@ -22,7 +22,7 @@ TableDataBundle::Business::ID::KBLI - Collection of TableData:: modules related 
 
 =head1 VERSION
 
-This document describes version 20230214.0.0 of TableDataBundle::Business::ID::KBLI (from Perl distribution TableDataBundle-Business-ID-KBLI), released on 2023-02-14.
+This document describes version 20260626.0.0 of TableDataBundle::Business::ID::KBLI (from Perl distribution TableDataBundle-Business-ID-KBLI), released on 2026-06-26.
 
 =head1 DESCRIPTION
 
@@ -33,6 +33,8 @@ This distribution contains the following L<TableData>:: modules:
 =item * L<TableData::Business::ID::KBLI::2020::Category>
 
 =item * L<TableData::Business::ID::KBLI::2020::Code>
+
+=item * L<TableData::Business::ID::KBLI::2025::Code>
 
 =back
 
@@ -54,6 +56,12 @@ L<https://oss.go.id/informasi/kbli-kode>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 =head1 CONTRIBUTING
 
 
@@ -74,7 +82,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

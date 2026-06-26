@@ -246,8 +246,12 @@ sub beta {
 1;
 END_PM
 	my ($paths, $decoded) = _generate_for_source($src);
-	# alpha contributes at least one path, beta at least two
-	ok(scalar(@{$decoded}) >= 3, 'paths from both subs present')
+	# alpha has no branch (no jump = no LCSAJ, see test 13) and
+	# contributes nothing. beta's if-branch has no trailing
+	# statement that differs between its true/false arms — both
+	# arms jump to the same "return 0;" line, so the true-edge and
+	# false-edge path records are identical and dedupe to one.
+	ok(scalar(@{$decoded}) >= 1, 'paths from beta present')
 		or diag('Got ' . scalar(@{$decoded}) . ' path(s)');
 	my @null_bounds = grep { !defined $_->{start} || !defined $_->{end} } @{$decoded};
 	is(scalar(@null_bounds), 0, 'no null-bounds paths across multiple subs');
@@ -316,10 +320,12 @@ sub one_branch {
 1;
 END_PM
 	my ($paths, $decoded) = _generate_for_source($src);
-	# One if-branch produces exactly 3 outgoing edges from the
-	# branch block — one for each successor
-	# The sub has a trailing statement after the if, so the CFG has three blocks: the pre-branch block, the true block, and the post-branch block.
-	is(scalar(@{$decoded}), 3, 'single-branch sub produces exactly 3 paths');
+	# The pre-branch block has two outgoing edges (true and false
+	# successors). Both successors carry the same trailing
+	# "return $y;" line (the model has no else-body to distinguish
+	# them), so their target line is identical and the two raw path
+	# records dedupe to one.
+	is(scalar(@{$decoded}), 1, 'single-branch sub with no else produces exactly 1 deduped path');
 };
 
 # ---------------------------------------------------------------
@@ -511,6 +517,30 @@ subtest '_build_cfg() creates true and false successor blocks for if branch' => 
 	# The block before the if should have at least two outgoing edges
 	my @branching = grep { scalar @{$_->{edges}} >= 2 } @{$blocks};
 	ok(scalar @branching >= 1, 'at least one block has two or more outgoing edges');
+};
+
+# Regression: the false-branch successor block previously never had
+# any statement lines (or further edges) added to it — only the
+# true-branch successor continued to accumulate subsequent
+# statements — so it was always skipped by _cfg_to_lcsaj() and the
+# false arm of every branch was unmodeled. Both successors must now
+# carry the lines of statements that follow the branch.
+subtest '_build_cfg() populates lines on both the true and false successor blocks' => sub {
+	require PPI;
+	my $src = "sub foo { my \$x = shift; if(\$x > 0) { return 1; } return 0; }";
+	my $doc = PPI::Document->new(\$src);
+	my $sub = $doc->find_first('PPI::Statement::Sub');
+	my $blocks = _build_cfg($sub);
+
+	# The pre-branch block has edges to exactly two successors
+	my ($pre_branch) = grep { scalar @{$_->{edges}} == 2 } @{$blocks};
+	ok($pre_branch, 'found the block with two outgoing edges (the branch point)');
+
+	my %by_id = map { $_->{id} => $_ } @{$blocks};
+	my ($true_block, $false_block) = @by_id{ @{ $pre_branch->{edges} } };
+
+	ok(scalar(@{ $true_block->{lines} })  > 0, 'true successor has populated lines')  if $true_block;
+	ok(scalar(@{ $false_block->{lines} }) > 0, 'false successor has populated lines') if $false_block;
 };
 
 subtest '_build_cfg() connects sequential blocks with fallthrough edges' => sub {

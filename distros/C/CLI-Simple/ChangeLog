@@ -1,3 +1,17 @@
+Thu Jun 25 05:02:45 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.6]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.6.md: new
+	* README.md: modified
+	* bin/create-modulino.pl.in
+	- moved to CLI/Simple/Modulino.pl.in
+	- exit with error code
+	(cmd_create_modulino)
+	- @MODULE_NAME@ => @PERL_MODULE_NAME@ to avoid conflict with @MODULE_NAME@
+	* .gitignore: + bin/create-modulino
+	* buildspec.yml: +CLI::Simple::Modulino
+
 Wed Jun 24 07:53:30 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.5]:

@@ -33,11 +33,11 @@ use constant EXEC_PATTERN => qr/\b(?:system|exec)\b|qx\(|`/;
 # --------------------------------------------------
 use constant GLOBAL_PATTERN => qr/\$(?:GLOBAL|ENV|SIG|ARGV|_|!|0)\b|\$\/|%ENV\b|%SIG\b|\@ARGV\b/;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 DESCRIPTION
 
@@ -161,6 +161,12 @@ sub analyze {
 	# Method argument is a raw hashref from SchemaExtractor
 	my $body = $method->{body} // '';
 
+	# IO/exec keywords are only real side effects as bare identifiers;
+	# the same words inside string literals or comments (e.g. a log
+	# message "system check failed" or a comment "# warn the caller")
+	# must not trigger a false positive
+	my $code_only = _strip_strings_and_comments($body);
+
 	my %result = (
 		mutates_self    => 0,
 		mutates_globals => 0,
@@ -171,10 +177,13 @@ sub analyze {
 
 	# --------------------------------------------------
 	# Detect assignment to $self->{field} — any such
-	# assignment means the method mutates its own state
+	# assignment means the method mutates its own state.
+	# Matched against $code_only so a field-assignment-like
+	# fragment appearing inside a string literal or comment
+	# is not mistaken for an actual mutation.
 	# --------------------------------------------------
 	my %seen_fields;
-	while($body =~ /\$self->\{(\w+)\}\s*=/g) {
+	while($code_only =~ /\$self->\{(\w+)\}\s*=/g) {
 		$result{mutates_self} = 1;
 
 		# Deduplicate field names in case the same field
@@ -185,26 +194,31 @@ sub analyze {
 
 	# --------------------------------------------------
 	# Detect mutation of global variables — %ENV, %SIG,
-	# @ARGV and common Perl special variables.
+	# @ARGV and common Perl special variables. Matched
+	# against $code_only for the same reason as above.
 	# NOTE: does not catch all possible globals.
 	# --------------------------------------------------
-	if($body =~ GLOBAL_PATTERN) {
+	if($code_only =~ GLOBAL_PATTERN) {
 		$result{mutates_globals} = 1;
 	}
 
 	# --------------------------------------------------
 	# Detect IO operations — print, say, warn, open etc.
 	# Higher-level logging abstractions are not detected.
+	# Matched against $code_only so a keyword appearing
+	# inside a string literal or comment is not mistaken
+	# for an actual IO call.
 	# --------------------------------------------------
-	if($body =~ IO_PATTERN) {
+	if($code_only =~ IO_PATTERN) {
 		$result{performs_io} = 1;
 	}
 
 	# --------------------------------------------------
 	# Detect external command execution via system(),
-	# exec(), qx() or backtick operators
+	# exec(), qx() or backtick operators. Matched against
+	# $code_only for the same reason as IO_PATTERN above.
 	# --------------------------------------------------
-	if($body =~ EXEC_PATTERN) {
+	if($code_only =~ EXEC_PATTERN) {
 		$result{calls_external} = 1;
 	}
 
@@ -224,6 +238,28 @@ sub analyze {
 		                                           $PURITY_IMPURE;
 
 	return \%result;
+}
+
+# --------------------------------------------------
+# Purpose: blank out the contents of '...' and "..." string
+#          literals and # line comments so that keyword regexes
+#          (IO_PATTERN, EXEC_PATTERN) only match real code, not
+#          words that merely appear inside a message or comment.
+# Entry:   a raw source body string.
+# Exit:    the same string with string-literal contents and
+#          comment text replaced by blanks, same overall layout.
+# Side effects: none. Best-effort only — does not handle q//,
+#          qq//, heredocs, or quote-like operators with custom
+#          delimiters.
+# --------------------------------------------------
+sub _strip_strings_and_comments {
+	my ($body) = @_;
+
+	$body =~ s/"(?:[^"\\]|\\.)*"//g;
+	$body =~ s/'(?:[^'\\]|\\.)*'//g;
+	$body =~ s/#.*$//mg;
+
+	return $body;
 }
 
 1;

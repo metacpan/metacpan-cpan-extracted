@@ -7,9 +7,9 @@ std/result - A simple Result object for explicit success and failure values.
 =head1 SYNOPSIS
 
   from std/result import Result;
-
+  
   let r := Result.ok(42);
-
+  
   if ( r.is_ok() ) {
     say r.unwrap();
   }

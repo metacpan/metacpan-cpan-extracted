@@ -1,10 +1,18 @@
 use alienfile;
 
-plugin 'PkgConfig' => 'pugixml';
+# Use a system pugixml when one is installed and recent enough; otherwise build
+# from source. 1.8 is the floor XML::PugiXML needs (it references the output
+# flag format_no_empty_element_tags, added in pugixml 1.8). Older or missing
+# system libraries fall through to the source build below, which installs the
+# current release.
+plugin 'PkgConfig' => (
+    pkg_name        => 'pugixml',
+    atleast_version => '1.8',
+);
 
 share {
     plugin 'Download' => (
-        url     => 'https://github.com/zeux/pugixml/releases/download/v1.15/pugixml-1.15.tar.gz',
+        url     => 'https://github.com/zeux/pugixml/releases/download/v1.16/pugixml-1.16.tar.gz',
         version => qr/pugixml-([0-9.]+)\.tar\.gz$/,
     );
 

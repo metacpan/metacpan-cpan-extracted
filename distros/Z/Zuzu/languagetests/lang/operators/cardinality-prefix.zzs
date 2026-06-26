@@ -1,0 +1,75 @@
+from test/more import *;
+
+class CountedBox {
+	let items;
+
+	method count () {
+		return items.length();
+	}
+}
+
+class ParentCounter {
+	method count () {
+		return 88;
+	}
+}
+
+class ChildCounter extends ParentCounter;
+
+class StringLikeOnly {
+	method to_String () {
+		return "stringlike";
+	}
+}
+
+class DynamicCountOnly {
+	method __call__ ( String name, Array args, PairList opts ) {
+		if ( name eq "count" ) {
+			return 999;
+		}
+		return "dynamic";
+	}
+
+	method to_String () {
+		return "fallback";
+	}
+}
+
+let arr := [ 1, 2, 3 ];
+is( #arr, 3, "#Array returns item count" );
+
+let dict := { alpha: 1, beta: 2 };
+is( #dict, 2, "#Dict returns pair count" );
+
+let pairs := {{ alpha: 1, alpha: 2, beta: 3 }};
+is( #pairs, 3, "#PairList preserves duplicate pair count" );
+
+let set := << 1, 1, 2 >>;
+is( #set, 2, "#Set returns unique item count" );
+
+let bag := <<< 1, 1, 2 >>>;
+is( #bag, 3, "#Bag returns stored item count" );
+
+is( #"plain", 5, "#String returns character length" );
+is( #"a☃b", 3, "#String counts Unicode characters" );
+is( #'a☃b', 5, "#BinaryString returns byte length" );
+is( #42, 2, "#Number falls back to length coercion" );
+is( #null, 0, "#null follows existing length behaviour" );
+
+let counted := new CountedBox( items: [ "a", "b", "c", "d" ] );
+is( #counted, 4, "#Object with concrete count calls count" );
+
+let inherited := new ChildCounter();
+is( #inherited, 88, "#Object with inherited count calls inherited method" );
+
+let stringlike := new StringLikeOnly();
+is( #stringlike, 10, "#Object without count falls back to String length" );
+
+let dynamic := new DynamicCountOnly();
+is(
+	#dynamic,
+	8,
+	"#Object with only __call__ count falls back to length, not __call__",
+);
+
+done_testing();

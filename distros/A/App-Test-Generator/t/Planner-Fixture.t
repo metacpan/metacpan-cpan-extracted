@@ -69,18 +69,21 @@ subtest 'plan() returns empty hashref for empty isolation' => sub {
 # ==================================================================
 subtest 'plan() assigns "shared" mode for shared_fixture isolation' => sub {
 	my $f = App::Test::Generator::Planner::Fixture->new();
-	my $result = $f->plan({}, { get_name => 'shared_fixture' });
+	my $result = $f->plan({}, { get_name => { fixture => 'shared_fixture' } });
 	ok(exists $result->{get_name}, 'method key present in result');
 	is($result->{get_name}{mode}, 'shared', 'shared_fixture -> shared mode');
 };
 
 # ==================================================================
 # plan — all other isolation modes
+#
+# Isolation::plan() returns a hashref per method with a 'fixture' key
+# (not a bare string), so plan() must read $isolation->{$method}{fixture}.
 # ==================================================================
 subtest 'plan() assigns "new_per_test" for non-shared_fixture isolation' => sub {
 	my $f = App::Test::Generator::Planner::Fixture->new();
-	for my $mode (qw(isolated none process_isolated)) {
-		my $result = $f->plan({}, { my_method => $mode });
+	for my $mode (qw(isolated_block fresh_object process_isolated)) {
+		my $result = $f->plan({}, { my_method => { fixture => $mode } });
 		is($result->{my_method}{mode}, 'new_per_test',
 			"'$mode' isolation -> new_per_test mode");
 	}
@@ -88,8 +91,14 @@ subtest 'plan() assigns "new_per_test" for non-shared_fixture isolation' => sub 
 
 subtest 'plan() assigns "new_per_test" for empty string isolation' => sub {
 	my $f      = App::Test::Generator::Planner::Fixture->new();
-	my $result = $f->plan({}, { foo => '' });
+	my $result = $f->plan({}, { foo => { fixture => '' } });
 	is($result->{foo}{mode}, 'new_per_test', 'empty string -> new_per_test');
+};
+
+subtest 'plan() assigns "new_per_test" when fixture key is absent' => sub {
+	my $f      = App::Test::Generator::Planner::Fixture->new();
+	my $result = $f->plan({}, { foo => {} });
+	is($result->{foo}{mode}, 'new_per_test', 'missing fixture key -> new_per_test');
 };
 
 # ==================================================================
@@ -98,9 +107,9 @@ subtest 'plan() assigns "new_per_test" for empty string isolation' => sub {
 subtest 'plan() handles multiple methods independently' => sub {
 	my $f = App::Test::Generator::Planner::Fixture->new();
 	my $result = $f->plan({}, {
-		shared_method   => 'shared_fixture',
-		isolated_method => 'isolated',
-		plain_method    => 'none',
+		shared_method   => { fixture => 'shared_fixture' },
+		isolated_method => { fixture => 'isolated_block' },
+		plain_method    => { fixture => 'fresh_object' },
 	});
 	is(scalar keys %{$result}, 3, 'all three methods present');
 	is($result->{shared_method}{mode},   'shared',       'shared_method -> shared');
@@ -113,7 +122,7 @@ subtest 'plan() handles multiple methods independently' => sub {
 # ==================================================================
 subtest 'plan() schema argument is accepted and does not affect output' => sub {
 	my $f = App::Test::Generator::Planner::Fixture->new();
-	my $isolation = { foo => 'shared_fixture' };
+	my $isolation = { foo => { fixture => 'shared_fixture' } };
 	my $result_no_schema   = $f->plan(undef, $isolation);
 	my $result_with_schema = $f->plan({ module => 'Foo', input => {} }, $isolation);
 	is_deeply($result_no_schema, $result_with_schema,

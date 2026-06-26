@@ -14,6 +14,21 @@ use Apple::AppStoreConnect;
 
 use File::Temp qw/tempfile/;
 
+{
+    package TestUA;
+
+    sub new {
+        my $class = shift;
+        return bless {responses => [@_], calls => []}, $class;
+    }
+
+    sub get {
+        my $self = shift;
+        push @{$self->{calls}}, [@_];
+        return HTTP::Response->new(200, 'SUCCESS', undef, shift @{$self->{responses}});
+    }
+}
+
 my %params = (
     issuer => "XXXXXXXXXX",
     key_id => "QX0X0X00XX",
@@ -175,6 +190,20 @@ subtest 'get_apps' => sub {
         },
         'get_apps call correct with id and path'
     );
+
+    $out = $asc->get_apps(platform=>'IOS');
+    is($out, $ref2, 'Received response');
+    is(
+        $mock->call_tracking->[7]->{args},
+        array {
+            item object {prop blessed => 'LWP::UserAgent'; etc};
+            item "${base}apps?filter[platform]=IOS";
+            item 'Authorization';
+            item match(qr/^Bearer ey[^.]+\.ey[^.]+\.[^.]+/);
+            end
+        },
+        'get_apps call correct with platform'
+    );
 };
 
 subtest 'Optional parameters' => sub {
@@ -196,7 +225,7 @@ subtest 'Optional parameters' => sub {
     my $out = $asc->get(url => 'apps', raw => 1);
     is($out, $json, 'Received JSON response');
     is(
-        $mock->call_tracking->[7]->{args},
+        $mock->call_tracking->[8]->{args},
         array {
             item $ua;
             item "${base}apps";
@@ -205,6 +234,245 @@ subtest 'Optional parameters' => sub {
             end
         },
         'get call correct'
+    );
+};
+
+subtest 'get_app_store_versions' => sub {
+    my $ua = TestUA->new(
+        '{"data":[{"type":"appStoreVersions","id":"v1","attributes":{"versionString":"1.0","platform":"IOS"}}],"links":{"next":"'.$base.'apps/1/appStoreVersions?cursor=abc"}}',
+        '{"data":[{"type":"appStoreVersions","id":"v2","attributes":{"versionString":"1.1","platform":"IOS"}}]}',
+        '{"data":[{"type":"appStoreVersionLocalizations","id":"l1","attributes":{"locale":"en-US","whatsNew":"One"}},{"type":"appStoreVersionLocalizations","id":"l2","attributes":{"locale":"fr-FR","whatsNew":"Un"}}]}',
+        '{"data":[]}'
+    );
+    my $asc3 = Apple::AppStoreConnect->new(%params, key => $key, ua => $ua);
+
+    my $out = $asc3->get_app_store_versions(
+        id            => 1,
+        platform      => 'IOS',
+        localizations => 1,
+    );
+
+    is(
+        $out,
+        [
+            {
+                id            => 'v1',
+                type          => 'appStoreVersions',
+                versionString => '1.0',
+                platform      => 'IOS',
+                localizations => [
+                    {
+                        id       => 'l1',
+                        type     => 'appStoreVersionLocalizations',
+                        locale   => 'en-US',
+                        whatsNew => 'One',
+                    },
+                    {
+                        id       => 'l2',
+                        type     => 'appStoreVersionLocalizations',
+                        locale   => 'fr-FR',
+                        whatsNew => 'Un',
+                    },
+                ],
+            },
+            {
+                id            => 'v2',
+                type          => 'appStoreVersions',
+                versionString => '1.1',
+                platform      => 'IOS',
+                localizations => [],
+            },
+        ],
+        'Versions and localizations returned'
+    );
+
+    like(
+        $ua->{calls}->[0]->[0],
+        qr#^\Q${base}apps/1/appStoreVersions\E\?(limit=200&filter\[platform\]=IOS|filter\[platform\]=IOS&limit=200)$#,
+        'Version request uses platform filter and limit'
+    );
+    is(
+        $ua->{calls}->[1]->[0],
+        "${base}apps/1/appStoreVersions?cursor=abc",
+        'Version request follows next link'
+    );
+    is(
+        $ua->{calls}->[2]->[0],
+        "${base}appStoreVersions/v1/appStoreVersionLocalizations?limit=200",
+        'Localizations request fetches all locales'
+    );
+    is(
+        $ua->{calls}->[3]->[0],
+        "${base}appStoreVersions/v2/appStoreVersionLocalizations?limit=200",
+        'Localizations request is made for each version'
+    );
+};
+
+subtest 'get_app_store_versions with locale' => sub {
+    my $ua = TestUA->new(
+        '{"data":[{"type":"appStoreVersions","id":"v1","attributes":{"versionString":"1.0"}}]}',
+        '{"data":[{"type":"appStoreVersionLocalizations","id":"l1","attributes":{"locale":"en-US","whatsNew":"One"}}]}'
+    );
+    my $asc3 = Apple::AppStoreConnect->new(%params, key => $key, ua => $ua);
+
+    my $out = $asc3->get_app_store_versions(id => 1, localizations => 'en-US');
+
+    is(
+        $out->[0]->{localizations},
+        [
+            {
+                id       => 'l1',
+                type     => 'appStoreVersionLocalizations',
+                locale   => 'en-US',
+                whatsNew => 'One',
+            },
+        ],
+        'Only requested locale returned'
+    );
+    like(
+        $ua->{calls}->[1]->[0],
+        qr#^\Q${base}appStoreVersions/v1/appStoreVersionLocalizations\E\?(limit=200&filter\[locale\]=en-US|filter\[locale\]=en-US&limit=200)$#,
+        'Locale filter passed to localizations request'
+    );
+};
+
+subtest 'get_app_store_versions localization fields' => sub {
+    my $ua = TestUA->new(
+        '{"data":[{"type":"appStoreVersions","id":"v1","attributes":{"versionString":"1.0"}}]}',
+        '{"data":[{"type":"appStoreVersionLocalizations","id":"l1","attributes":{"locale":"en-US","whatsNew":"One"}}]}'
+    );
+    my $asc3 = Apple::AppStoreConnect->new(%params, key => $key, ua => $ua);
+
+    my $out = $asc3->get_app_store_versions(
+        id                  => 1,
+        localization_fields => 'locale,whatsNew',
+    );
+
+    is(
+        $out->[0]->{localizations},
+        [
+            {
+                id       => 'l1',
+                type     => 'appStoreVersionLocalizations',
+                locale   => 'en-US',
+                whatsNew => 'One',
+            },
+        ],
+        'Localization fields imply localizations'
+    );
+    like(
+        $ua->{calls}->[1]->[0],
+        qr#^\Q${base}appStoreVersions/v1/appStoreVersionLocalizations\E\?(limit=200&fields\[appStoreVersionLocalizations\]=locale,whatsNew|fields\[appStoreVersionLocalizations\]=locale,whatsNew&limit=200)$#,
+        'Localization fields passed to localizations request'
+    );
+};
+
+subtest 'get_beta_feedback_screenshot_submissions' => sub {
+    my $ua = TestUA->new(
+        '{"data":[{"type":"betaFeedbackScreenshotSubmissions","id":"s1","attributes":{"createdDate":"2026-06-24T10:00:00Z","comment":"Looks wrong","appPlatform":"IOS","screenshots":[{"url":"https://example.com/shot.png","width":1170,"height":2532}]}}]}'
+    );
+    my $asc3 = Apple::AppStoreConnect->new(%params, key => $key, ua => $ua);
+
+    my $out = $asc3->get_beta_feedback_screenshot_submissions(
+        id       => 1,
+        platform => 'IOS',
+        params   => {
+            'fields[betaFeedbackScreenshotSubmissions]' => 'createdDate,comment,appPlatform,screenshots',
+        },
+    );
+
+    is(
+        $out,
+        [
+            {
+                id          => 's1',
+                type        => 'betaFeedbackScreenshotSubmissions',
+                createdDate => '2026-06-24T10:00:00Z',
+                comment     => 'Looks wrong',
+                appPlatform => 'IOS',
+                screenshots => [
+                    {
+                        url    => 'https://example.com/shot.png',
+                        width  => 1170,
+                        height => 2532,
+                    },
+                ],
+            },
+        ],
+        'Screenshot feedback returned'
+    );
+
+    my $url = $ua->{calls}->[0]->[0];
+    like($url, qr#^\Q${base}apps/1/betaFeedbackScreenshotSubmissions\E\?#, 'Screenshot request URL');
+    like($url, qr/(?:^|[?&])filter\[appPlatform\]=IOS(?:&|$)/, 'Screenshot request uses app platform filter');
+    like($url, qr/(?:^|[?&])limit=50(?:&|$)/, 'Screenshot request defaults limit');
+    like($url, qr/(?:^|[?&])sort=-createdDate(?:&|$)/, 'Screenshot request defaults newest first');
+    like(
+        $url,
+        qr/(?:^|[?&])fields\[betaFeedbackScreenshotSubmissions\]=createdDate,comment,appPlatform,screenshots(?:&|$)/,
+        'Screenshot request passes fields'
+    );
+};
+
+subtest 'get_beta_feedback_crash_submissions' => sub {
+    my $ua = TestUA->new(
+        '{"data":[{"type":"betaFeedbackCrashSubmissions","id":"c1","attributes":{"createdDate":"2026-06-24T11:00:00Z","comment":"Crashed","deviceModel":"iPhone16,2"}}]}',
+        '{"data":{"type":"betaCrashLogs","id":"cl1","attributes":{"logText":"stack trace"}}}'
+    );
+    my $asc3 = Apple::AppStoreConnect->new(%params, key => $key, ua => $ua);
+
+    my %request_params = (
+        'fields[betaFeedbackCrashSubmissions]' => 'createdDate,comment,deviceModel',
+        'fields[betaCrashLogs]'                => 'logText',
+    );
+    my $out = $asc3->get_beta_feedback_crash_submissions(
+        id        => 1,
+        limit     => 25,
+        crash_log => 1,
+        params    => \%request_params,
+    );
+
+    is(
+        $out,
+        [
+            {
+                id          => 'c1',
+                type        => 'betaFeedbackCrashSubmissions',
+                createdDate => '2026-06-24T11:00:00Z',
+                comment     => 'Crashed',
+                deviceModel => 'iPhone16,2',
+                crashLog    => {
+                    id      => 'cl1',
+                    type    => 'betaCrashLogs',
+                    logText => 'stack trace',
+                },
+            },
+        ],
+        'Crash feedback with crash log returned'
+    );
+
+    my $list_url = $ua->{calls}->[0]->[0];
+    like($list_url, qr#^\Q${base}apps/1/betaFeedbackCrashSubmissions\E\?#, 'Crash request URL');
+    like($list_url, qr/(?:^|[?&])limit=25(?:&|$)/, 'Crash request uses limit');
+    like($list_url, qr/(?:^|[?&])sort=-createdDate(?:&|$)/, 'Crash request defaults newest first');
+    like(
+        $list_url,
+        qr/(?:^|[?&])fields\[betaFeedbackCrashSubmissions\]=createdDate,comment,deviceModel(?:&|$)/,
+        'Crash request passes fields'
+    );
+    unlike($list_url, qr/fields\[betaCrashLogs\]/, 'Crash log fields not passed to list endpoint');
+    is(
+        $ua->{calls}->[1]->[0],
+        "${base}betaFeedbackCrashSubmissions/c1/crashLog?fields[betaCrashLogs]=logText",
+        'Crash log request passes crash log fields'
+    );
+    is(
+        \%request_params,
+        {
+            'fields[betaFeedbackCrashSubmissions]' => 'createdDate,comment,deviceModel',
+            'fields[betaCrashLogs]'                => 'logText',
+        },
+        'Caller params are not modified'
     );
 };
 

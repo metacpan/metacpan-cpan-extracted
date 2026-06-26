@@ -8,7 +8,7 @@ std/db - DBI-powered SQL database access.
 
   from std/db import DB;
   from std/io import Path;
-
+  
   let dbh := DB.temp({
     auto_commit: false,
     isolation_level: "immediate"
@@ -18,12 +18,12 @@ std/db - DBI-powered SQL database access.
     "create table users (id integer, name text)"
   ).execute();
   dbh.commit();
-
+  
   let insert := dbh.prepare(
     "insert into users (id, name) values (?, ?)"
   );
   insert.execute(1, "Ari");
-
+  
   let query := dbh.prepare(
     "select id, name from users order by id"
   );
@@ -33,7 +33,7 @@ std/db - DBI-powered SQL database access.
   }
   let cols := query.column_names();
   let types := query.column_types();
-
+  
   let file_db := DB.open( new Path("app.sqlite") );
 
 =head1 IMPLEMENTATION SUPPORT

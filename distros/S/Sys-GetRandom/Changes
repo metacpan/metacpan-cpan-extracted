@@ -1,6 +1,10 @@
-0.02 2025-03-13
+0.03  2026-06-25
+    - list platforms known to work
+    - add support for OpenBSD using getentropy(2)
+
+0.02  2025-03-13
     - move repository and bugtracker to codeberg
     - add "SEE ALSO" section to documentation
 
-0.01 2023-02-10
+0.01  2023-02-10
     - initial release

@@ -108,6 +108,20 @@ echo "${LCSAJ_TARGETS:0:500}"
 # --- Step 6: Run mutation analysis ---
 echo "Running mutation analysis..."
 mkdir -p mutation_html/lib cover_html
+
+# --changed_only defaults to diffing HEAD~1, which only sees the single most
+# recent commit. Consecutive runs of this workflow can be coalesced by its
+# concurrency group, so the previous run's commit may be several commits
+# back -- diffing only HEAD~1 then misses files edited in those skipped
+# commits, and their stale survivor entries get carried forward forever by
+# the --changed_only merge. Walk back to the last commit that isn't one of
+# this workflow's own bookkeeping commits, same as mutate.yml does, so the
+# diff covers everything since mutation.json was last meaningfully refreshed.
+BASE_SHA=$(git log --oneline | grep -v "^.\{8\} \(Add generated mutant\|Add coverage snapshot\|Update mutation results\)" | head -1 | awk '{print $1}')
+if [ -z "$BASE_SHA" ]; then
+	echo "::warning::Could not determine a base commit from git log; test-generator-mutate will fall back to HEAD~1"
+fi
+
 test-generator-mutate \
 	-v \
 	--lib lib \
@@ -117,6 +131,7 @@ test-generator-mutate \
 	--cover_json cover_html/cover.json \
 	--lcsaj_root cover_html/mutation_html/lib \
 	--changed_only \
+	${BASE_SHA:+--base_sha "$BASE_SHA"} \
 	--lcsaj_hits cover_html/lcsaj_hits.json < /dev/null
 	# --min-score 85
 

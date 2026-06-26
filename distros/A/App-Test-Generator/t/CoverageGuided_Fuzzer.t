@@ -662,4 +662,53 @@ subtest 'run() detects bugs from target_sub die on valid input' => sub {
 	is(scalar @{$f->bugs()}, $report->{bugs_found}, 'bugs array matches bugs_found count');
 };
 
+# ==================================================================
+# _validate_value — 'matches' ReDoS guard (white-box)
+# ==================================================================
+subtest '_validate_value accepts a string matching a benign pattern' => sub {
+	my $f = _fuzzer();
+	ok($f->_validate_value('abc123', { type => 'string', matches => '/^[a-z]+\d+$/' }),
+		'benign pattern matches valid input');
+};
+
+subtest '_validate_value rejects a string not matching a benign pattern' => sub {
+	my $f = _fuzzer();
+	ok(!$f->_validate_value('???', { type => 'string', matches => '/^[a-z]+\d+$/' }),
+		'benign pattern rejects non-matching input');
+};
+
+subtest '_validate_value returns within the alarm bound on a catastrophic pattern' => sub {
+	my $f = _fuzzer();
+	# Classic catastrophic-backtracking pattern: (a+)+ against a string
+	# with no trailing match char forces exponential backtracking.
+	my $evil_pattern = '/^(a+)+$/';
+	my $evil_input   = ('a' x 40) . '!';
+
+	my $start = time();
+	my $result;
+	lives_ok(
+		sub { $result = $f->_validate_value($evil_input, { type => 'string', matches => $evil_pattern }) },
+		'_validate_value does not hang or die on a catastrophic-backtracking pattern',
+	);
+	my $elapsed = time() - $start;
+	ok($elapsed < 5, "returned well within the timeout bound (took ${elapsed}s)");
+	ok(!$result, 'timed-out match is treated as a non-match (rejected)');
+};
+
+# ==================================================================
+# _snapshot_cover / _run_with_cover — single-walk-per-iteration caching
+# (white-box; only meaningful when Devel::Cover is unavailable, where
+# _snapshot_cover short-circuits to an empty hash, but the caching
+# logic itself is exercised regardless)
+# ==================================================================
+subtest '_run_with_cover caches the "after" snapshot for reuse as next "before"' => sub {
+	my $f = _fuzzer(target_sub => sub { 1 });
+	ok(!exists $f->{_last_cover_snapshot}, 'no cached snapshot before first call');
+
+	my ($result, $error);
+	$f->_run_with_cover('x', \$result, \$error);
+	ok(exists $f->{_last_cover_snapshot}, 'snapshot cached after _run_with_cover call');
+	is(ref($f->{_last_cover_snapshot}), 'HASH', 'cached snapshot is a hashref');
+};
+
 done_testing();

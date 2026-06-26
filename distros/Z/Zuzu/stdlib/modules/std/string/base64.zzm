@@ -7,12 +7,12 @@ std/string/base64 - Base64 encoders and decoders.
 =head1 SYNOPSIS
 
   from std/string/base64 import *;
-
+  
   let raw := to_binary( "Hello, world!" );
-
+  
   let b64 := encode(raw);
   let text := decode(b64);
-
+  
   let safe := encode_urlsafe(raw);
   let original := decode_urlsafe(safe);
 
