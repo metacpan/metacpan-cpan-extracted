@@ -63,3 +63,4 @@
 
 ^\.travis\.yml$
 ^Map-Tube-Napoli-.*.tar.gz$
+^Map-Tube-Napoli-.*.tar.gz.sigstore.json$

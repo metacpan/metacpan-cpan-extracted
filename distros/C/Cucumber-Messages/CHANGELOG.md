@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [33.0.4] - 2026-06-27
+### Fixed
+- [JavaScript] Update static version file at release time ([#459](https://github.com/cucumber/messages/pull/459))
+
 ## [33.0.3] - 2026-06-20
 ### Added
 - [Ruby] Added `#type` classification (Returning hashified response), for all messages (Including envelopes) ([#447](https://github.com/cucumber/messages/pull/447))
@@ -696,7 +700,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v33.0.3...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v33.0.4...HEAD
+[33.0.4]: https://github.com/cucumber/messages/compare/v33.0.3...v33.0.4
 [33.0.3]: https://github.com/cucumber/messages/compare/v33.0.2...v33.0.3
 [33.0.2]: https://github.com/cucumber/messages/compare/v33.0.1...v33.0.2
 [33.0.1]: https://github.com/cucumber/messages/compare/v33.0.0...v33.0.1

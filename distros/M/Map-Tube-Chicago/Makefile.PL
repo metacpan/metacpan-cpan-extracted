@@ -28,7 +28,7 @@ WriteMakefile(
                           'Moo'              => 0,
                           'namespace::clean' => 0,
                           'File::Share'      => 0,
-                          'Map::Tube'        => 'v5.0.1',
+                          'Map::Tube'        => v5.0.1,
                         },
   dist               => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
   clean              => { FILES    => $mod_distname . '-*', },
@@ -37,12 +37,19 @@ WriteMakefile(
                           dynamic_config => 0,
                           prereqs        => {
                                               test => {
-                                                    recommends => {
-                                                                    'Test::Map::Tube' => 0,
-                                                                    'Test::Kwalitee'  => 0,
-                                                                    'XML::Twig'       => 0,
-                                                                    'Graph'           => 0,
-                                                                  },
+                                                        recommends => {
+                                                                        'Test::CheckManifest'    => 0.9,
+                                                                        'Test::CPAN::Changes'    => 0,
+                                                                        'Test::CPAN::Meta::JSON' => 0,
+                                                                        'Test::CPAN::Meta'       => 0,
+                                                                        'Test::Kwalitee'         => 0,
+                                                                        'Test::Map::Tube'        => 0,
+                                                                        'Test::Pod'              => 1.22,
+                                                                        'Test::Pod::Coverage'    => 1.0,
+                                                                        'Test::Version'          => 0,
+                                                                        'XML::Twig'              => 0,
+                                                                        'Graph'                  => 0,
+                                                                      },
                                                       },
                                             },
                           provides       => {
@@ -51,19 +58,29 @@ WriteMakefile(
                                                              version => $mod_version,
                                                            },
                                             },
-                          resources   => {
-                          bugtracker => { mailto => 'bug-' . $mod_distname . '@rt.cpan.org', },
-                                         },
+                          resources      => {
+                                              repository => {
+                                                              type => 'git',
+                                                              url  => 'https://github.com/gwselke/' . $mod_distname . '.git',
+                                                              web  => 'https://github.com/gwselke/' . $mod_distname,
+                                                            },
+                                              bugtracker => {
+                                                               web => 'https://github.com/gwselke/' . $mod_distname . '/issues'
+                                                             },
+                                            },
                         },
 );
 
 package MY;
-use File::ShareDir::Install 'postamble';
+use File::ShareDir::Install;
 
 sub postamble {
-    return <<"MAKEFILE";
+  my $self = shift;
+  my @ret  = File::ShareDir::Install::postamble($self);
+  push @ret, <<"MAKEFILE";
 sigstore-sign:
 \t\@echo "Signing distribution with Sigstore..."
 \tcosign sign-blob \$(DISTVNAME).tar.gz --bundle \$(DISTVNAME).tar.gz.sigstore.json
 MAKEFILE
+  return join( "\n", @ret );
 }

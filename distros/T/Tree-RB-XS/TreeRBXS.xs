@@ -1059,7 +1059,8 @@ static void TreeRBXS_item_advance_all_iters(struct TreeRBXS_item* item, int flag
 static void TreeRBXS_item_detach_tree(struct TreeRBXS_item* item, struct TreeRBXS *tree) {
 	//warn("TreeRBXS_item_detach_tree");
 	//warn("detach tree %p %p key %d", item, tree, (int) item->keyunion.ikey);
-	if (rbtree_node_is_in_tree(&item->rbnode)) {
+	bool in_tree= rbtree_node_is_in_tree(&item->rbnode);
+	if (in_tree) {
 		if (tree->prev_inserted_item == item) {
 			tree->prev_inserted_item= NULL;
 			tree->prev_inserted_trend= 0;
@@ -1077,6 +1078,8 @@ static void TreeRBXS_item_detach_tree(struct TreeRBXS_item* item, struct TreeRBX
 	   Else the tree was the only owner, and the node needs freed */
 	if (!item->owner)
 		TreeRBXS_item_free(item);
+	else if (in_tree)
+		SvREFCNT_dec(item->owner);
 }
 
 /* Callback when clearing the entire tree.
@@ -1084,7 +1087,7 @@ static void TreeRBXS_item_detach_tree(struct TreeRBXS_item* item, struct TreeRBX
  */
 static void TreeRBXS_item_clear(struct TreeRBXS_item* item, struct TreeRBXS *tree) {
 	struct TreeRBXS_iter *iter= item->iter, *next;
-	// Detach all iterators from this node.
+	/* Detach all iterators from this node */
 	while (iter) {
 		next= iter->next_iter;
 		iter->item= NULL;
@@ -1094,11 +1097,12 @@ static void TreeRBXS_item_clear(struct TreeRBXS_item* item, struct TreeRBXS *tre
 	item->iter= NULL;
 	item->recent.next= NULL;
 	item->recent.prev= NULL;
-	if (rbtree_node_is_in_tree(&item->rbnode))
-		memset(&item->rbnode, 0, sizeof(item->rbnode));
+	memset(&item->rbnode, 0, sizeof(item->rbnode));
 	// If the item is still referenced by the perl Node object, don't delete it.
 	if (!item->owner)
 		TreeRBXS_item_free(item);
+	else
+		SvREFCNT_dec(item->owner);
 }
 
 static void TreeRBXS_iter_free(struct TreeRBXS_iter *iter) {
@@ -1714,14 +1718,14 @@ static SV* TreeRBXS_wrap_item(struct TreeRBXS_item *item) {
 		return newRV_inc(item->owner);
 	// else create a node object
 	item->owner= newSV(0);
-	obj= newRV_noinc(item->owner);
-	sv_bless(obj, gv_stashpv("Tree::RB::XS::Node", GV_ADD));
 	magic= sv_magicext(item->owner, NULL, PERL_MAGIC_ext, &TreeRBXS_item_magic_vt, (const char*) item, 0);
 #ifdef USE_ITHREADS
 	magic->mg_flags |= MGf_DUP;
 #else
 	(void)magic; // suppress warning
 #endif
+	obj= newRV_inc(item->owner);
+	sv_bless(obj, gv_stashpv("Tree::RB::XS::Node", GV_ADD));
 	return obj;
 }
 
@@ -3649,6 +3653,7 @@ STORABLE_thaw(item_sv, cloning, idx, refs)
 			item->key_type= KEY_TYPE_ANY;
 			item->keyunion.svkey= SvREFCNT_inc(svec[0]);
 			item->value= SvREFCNT_inc(svec[1]);
+			item->owner= SvRV(item_sv);
 		} else {
 			tree= TreeRBXS_get_magic_tree(refs, OR_DIE);
 			if (!(node= rbtree_node_child_at_index(TreeRBXS_get_root(tree), idx)))
@@ -3659,8 +3664,11 @@ STORABLE_thaw(item_sv, cloning, idx, refs)
 					croak("BUG: Storable deserialized tree node multiple times");
 				return;
 			}
+			else {
+				item->owner= SvRV(item_sv);
+				SvREFCNT_inc(item->owner);
+			}
 		}
-		item->owner= SvRV(item_sv);
 		magic= sv_magicext(item->owner, NULL, PERL_MAGIC_ext, &TreeRBXS_item_magic_vt, (const char*) item, 0);
 		#ifdef USE_ITHREADS
 		magic->mg_flags |= MGf_DUP;

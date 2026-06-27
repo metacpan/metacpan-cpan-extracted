@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Runner - PAGI Demo</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <h1>Job Runner</h1>
+            <div class="header-stats">
+                <div class="stat">
+                    <span class="stat-label">Pending</span>
+                    <span class="stat-value" id="stat-pending">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Running</span>
+                    <span class="stat-value" id="stat-running">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Completed</span>
+                    <span class="stat-value" id="stat-completed">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Failed</span>
+                    <span class="stat-value" id="stat-failed">0</span>
+                </div>
+            </div>
+            <div class="connection-status" id="connection-status">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Left Panel: Job Types & Form -->
+            <section class="panel panel-left">
+                <div class="panel-section">
+                    <h2>Create Job</h2>
+                    <div class="job-types" id="job-types">
+                        <!-- Job type buttons populated by JS -->
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <form id="job-form" class="job-form">
+                        <div id="job-params">
+                            <!-- Dynamic form fields populated by JS -->
+                            <p class="placeholder-text">Select a job type above</p>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="submit-btn" disabled>
+                            Create Job
+                        </button>
+                    </form>
+                </div>
+
+                <div class="panel-section">
+                    <h2>Worker Status</h2>
+                    <div class="worker-info">
+                        <div class="worker-stat">
+                            <span>Active:</span>
+                            <span id="worker-active">0</span> / <span id="worker-capacity">3</span>
+                        </div>
+                        <div class="worker-stat">
+                            <span>Processed:</span>
+                            <span id="worker-processed">0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Panel: Job Queue -->
+            <section class="panel panel-center">
+                <div class="panel-header">
+                    <h2>Job Queue</h2>
+                    <button class="btn btn-small" id="clear-completed-btn">
+                        Clear Completed
+                    </button>
+                </div>
+                <div class="job-list" id="job-list">
+                    <!-- Job cards populated by JS -->
+                    <p class="placeholder-text">No jobs in queue</p>
+                </div>
+            </section>
+
+            <!-- Right Panel: Job Details -->
+            <section class="panel panel-right">
+                <h2>Job Details</h2>
+                <div class="job-details" id="job-details">
+                    <p class="placeholder-text">Select a job to view details</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

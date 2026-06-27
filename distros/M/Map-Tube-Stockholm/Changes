@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::Stockholm
 
+0.1.4 2026-06-26
+  - Removed code signatures (cpansign is deprecated), replaced with Sigstore/cosign.
+  - Improvements to Makefile.PL
+  - Switched to Github as code repository and issue handler.
+
 0.1.3 2025-04-30
   - Require Map::Tube 4.09.
   - Require Perl 5.14 (in accordance with Map::Tube 4.09).

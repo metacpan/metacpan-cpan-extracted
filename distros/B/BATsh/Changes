@@ -1,5 +1,212 @@
 Revision history for BATsh
 
+0.06  2026-06-27 JST (Japan Standard Time)
+
+    - SH indexed and associative arrays (BATsh::SH). The single most useful
+      missing piece of bash-script compatibility is now implemented:
+
+        arr=(a b c)            indexed array literal
+        arr+=(d e)             append at the next index
+        arr[i]=v, arr[i]+=v    element assignment / string append
+        declare -a arr         declare an (empty) indexed array
+        declare -A map         declare an associative array
+        typeset -a / -A        accepted as an alias of declare
+        map[key]=value         associative element assignment
+        map=([k1]=v1 [k2]=v2)  associative (or sparse indexed) literal
+        ${arr[i]}, ${map[key]} element access; $arr is short for ${arr[0]}
+        ${arr[-1]}             negative index counts back from the last element
+        ${arr[@]}, ${arr[*]}   all element values
+        ${#arr[@]}             number of set elements
+        ${#arr[i]}             length of one element's value
+        ${!arr[@]}             list of indices (indexed) or keys (associative)
+        unset arr, unset arr[i] remove whole array / single element
+
+      Indexed subscripts are evaluated arithmetically (so ${arr[$i]} and
+      ${arr[i+1]} work) and indexed arrays may be sparse; associative
+      subscripts are literal strings. Array names are case-insensitive, like
+      scalar variables, and a name is either a scalar or an array, never both.
+      Element order for ${arr[@]} is ascending numeric index for indexed
+      arrays and sorted key order for associative arrays -- bash leaves the
+      associative order unspecified, so a deterministic order is used for
+      portable output. In a for list, "${arr[@]}" and "${!arr[@]}" word-split
+      to one item per element or key, so elements containing spaces survive.
+      Array operations are detected on the raw line before expansion so the
+      "(a b c)" literal and the "[sub]" subscripts are never mangled by
+      variable or command substitution. All Perl 5.005_03 compatible (no
+      prototypes; storage via plain package-level hashes).
+
+    - SH for-loop word list: the list of a "for VAR in LIST" header is now
+      variable- and command-substitution-expanded (previously the words were
+      taken literally), with quote-aware word splitting and filename globbing.
+      This fixes "for x in $LIST" and enables "for x in "${arr[@]}"".
+
+    - SH echo: quote removal is now structural (per word) rather than only
+      stripping one pair of surrounding quotes, so e.g.
+      echo "${arr[@]}" tail no longer prints the literal double quotes.
+
+    - t/0010-sh-arrays.t: new regression suite (26 checks) covering indexed
+      and associative arrays, append, sparse arrays, negative indexing,
+      arithmetic and variable subscripts, ${#arr[@]} / ${#arr[i]} / ${!arr[@]},
+      unset of whole arrays and single elements, declare/typeset -a/-A,
+      inline associative initialisers, and for-loop iteration over both
+      "${arr[@]}" and "${!arr[@]}".
+
+    - lib/BATsh.pm, lib/BATsh/SH.pm: POD updated to document array support and
+      to move arrays out of the "not implemented" list.
+
+    - CMD CALL :label argument passing and subroutine call frame
+      (BATsh.pm, BATsh::CMD). CALL :label arg1 arg2 ... now installs the
+      subroutine's own positional parameters -- %0 is the :label token,
+      %1..%9 are the call arguments, and %* is their join -- and the caller's
+      %0..%9 / %* frame is saved on entry and restored on return, so a
+      subroutine no longer clobbers the caller's parameters and a shorter call
+      no longer inherits the caller's stale arguments. Arguments are
+      %-expanded before the call and split with double-quote awareness, so
+      CALL :sub "a b" %FILE% passes "a b" as a single argument. The two CALL
+      code paths (the BATsh-level directive interceptor and BATsh::CMD's
+      _cmd_call) now both delegate to BATsh->call_sub, which performs the
+      save/install/restore, so they behave identically. The same arguments
+      are mirrored to BATSH_ARG1.. so an SH-mode subroutine body sees them as
+      $1..$9 / $@. Previously CALL set BATSH_ARG* but not %1..%9 (so %1 and
+      %~dp1 inside the subroutine saw the caller's arguments), set neither %0
+      nor %* for the callee, and never restored the caller's frame.
+
+    - CMD %~N path modifiers on CALL arguments: because %1..%9 are now
+      populated by CALL, the tilde modifiers %~f1 %~d1 %~p1 %~n1 %~x1 (and
+      combinations such as %~dp1, %~nx1) operate on a subroutine's passed
+      path arguments, not just on %0.
+
+    - CMD SHIFT / SHIFT /N is now an actual dispatched builtin (BATsh::CMD).
+      It was documented but unimplemented, so SHIFT inside a subroutine fell
+      through to an external command ("Can't exec SHIFT"). SHIFT now moves
+      %2 into %1, %3 into %2, ..., clears %9, rebuilds %*, and keeps the
+      BATSH_ARG* mirror in step; SHIFT /N begins the shift at %N.
+
+    - t/0011-cmd-call-args.t: new regression suite (14 checks) for CALL
+      argument passing (%1..%9, %*, %0 = label), caller-frame save/restore,
+      quoted and %-expanded arguments, %~nx1 / %~n1 / %~x1 / %~dp1 on passed
+      arguments, SHIFT and SHIFT /N, nested CALL frames, SH-mode subroutine
+      bodies seeing $1..$9, and non-inheritance of unused parameters.
+
+    - lib/BATsh.pm, lib/BATsh/CMD.pm: POD documents the CALL argument frame,
+      %~N modifiers on passed arguments, and SHIFT / SHIFT /N.
+
+    - CMD subroutine-internal GOTO labels (BATsh.pm). A subroutine body may
+      now contain its own :labels as GOTO targets -- loops, forward skips,
+      or an early GOTO :EOF return -- so idioms such as a SHIFT loop that
+      sums a variable-length argument list work inside a CALL'd subroutine.
+      _extract_subroutines() previously used only a "label ... RET" heuristic
+      that mis-split such a subroutine: an internal label appearing before
+      the RET demoted the real entry label, so CALL :SUB reported "undefined
+      subroutine" and only the last internal label was registered. The
+      extractor now (a) treats any label named by a "CALL :LABEL" anywhere in
+      the script as a subroutine entry point (unioned with the existing RET
+      heuristic for backward compatibility), and (b) opens a subroutine only
+      at the top level: once inside a body, every :label is an internal label
+      that travels with the body and only RET/RETURN closes it. Internal
+      labels are resolved by the CMD interpreter when the body runs.
+
+    - CALL is no longer intercepted in _exec_cmd_section; it is handled by the
+      CMD interpreter's _cmd_call (which already delegates to call_sub /
+      source_file). The old interception flushed and split the CMD batch at
+      each CALL, so a GOTO whose loop body contained a CALL landed in a
+      different exec_block than its label and failed with "label not found".
+      Keeping CALL inside the batch lets each CMD section -- and each
+      subroutine body -- run as one block with a complete label index, so
+      GOTO across a CALL now resolves (in main code and in subroutines
+      alike). The now-unused BATsh::_split_call_args helper was removed.
+
+    - t/0012-cmd-sub-labels.t: new regression suite (7 checks) for internal
+      GOTO loops with SHIFT, subroutine reuse, internal forward GOTO skips,
+      coexistence of top-level GOTO labels with internal-label subroutines,
+      multiple subroutines each with their own internal labels, early
+      GOTO :EOF return from a subroutine, and nested CALL where both the
+      caller and callee subroutines use internal labels.
+
+    - eg/09_cmd_subroutines.batsh: the SHIFT demonstration now uses the
+      idiomatic internal GOTO loop (:SUMARGS_LOOP / :SUMARGS_DONE) to sum a
+      variable-length argument list.
+
+    - SH case..esac pattern branching (BATsh::SH). _parse_case() and
+      _match_pattern() were rewritten to parse clauses structurally rather
+      than line by line, adding:
+        * the bash fall-through terminators ;& (run the next clause's body
+          unconditionally) and ;;& (keep testing the remaining patterns),
+          alongside the normal ;;;
+        * character-class patterns [abc], ranges [a-z], and negation
+          [!abc] / [^abc], in addition to the existing * and ? globs;
+        * quoted and backslash-escaped patterns that match literally (e.g.
+          "*") matches a literal asterisk);
+        * a fully-inline construct on one physical line
+          (case $x in a) echo a ;; *) echo b ;; esac);
+        * an optional leading "(" before the pattern list ((pattern)).
+      Multiple |-separated patterns and the default *) clause already worked
+      and remain supported; clause and pattern splitting is now quote- and
+      [class]-aware so a | or ) inside quotes or a [...] class is not a
+      delimiter.  The closing esac is recognised only at a clause boundary,
+      so the word "esac" appearing inside a body no longer ends the construct
+      prematurely.  break / continue / return / exit inside a clause body
+      stop the case and propagate as before.  All Perl 5.005_03 compatible
+      (hand-rolled scanners; no regex features beyond \A \z and character
+      classes).
+
+    - t/0013-sh-case.t: new regression suite (17 checks) for |-patterns, the
+      *) default, glob and [class] patterns including negation and ranges,
+      quoted/literal patterns, ;& and ;;& fall-through, fully-inline and
+      multi-line forms, leading-paren clauses, empty bodies, first-match
+      semantics, and esac-inside-a-body.
+
+    - SH trap / signal handling (BATsh::SH, BATsh.pm): a minimal trap built-in
+      bridged to Perl's %SIG.
+
+        trap 'commands' SIGSPEC...   register a handler
+        trap - SIGSPEC...            reset to the default action
+        trap '' SIGSPEC...           ignore the signal
+        trap        / trap -p        list the current traps
+
+      A SIGSPEC is a signal name with or without a leading SIG (INT, SIGINT),
+      a number (2), or the EXIT pseudo-signal (also 0).  Real signals are
+      bridged to %SIG: trap 'cmd' INT installs a %SIG{INT} handler that runs
+      cmd, trap '' INT sets IGNORE, and trap - INT restores DEFAULT.  The EXIT
+      trap runs internally when the script finishes or when exit is called
+      (exactly once), wired in via BATsh.pm's run / run_string / run_lines and
+      BATsh::SH::fire_exit_trap(), plus _cmd_exit().  The handler command is
+      captured on the raw line (a new interceptor in _exec_line, before
+      expansion) and expanded only when it fires, so trap 'rm -f $tmp' EXIT
+      removes the file named by $tmp as it stood at exit.  EXIT/ERR/DEBUG/
+      RETURN are treated as pseudo-signals and never touch %SIG (only EXIT
+      runs a handler today); %SIG assignment is eval-guarded so signal names
+      unsupported by the host (common on Windows) degrade quietly.  trap was
+      previously listed as unimplemented.  Assigning a handler for a signal
+      the platform lacks (e.g. HUP/USR1/USR2 on Windows) no longer prints a
+      "No such signal" warning: _sh_set_os_sig() filters just that warning
+      while the best-effort assignment still succeeds.
+
+    - t/0014-sh-trap.t: new regression suite (14 checks) for the EXIT trap on
+      normal end, on exit, with deferred expansion, cancellation, and
+      single-fire; %SIG handler install / IGNORE / DEFAULT / clearing;
+      handler execution and real signal delivery (kill); trap listing;
+      multiple signals per command; SIG-prefix and numeric normalization.
+
+    - eg/12_cmd_vs_sh.batsh: new teaching example that writes the same nine
+      tasks twice -- once in cmd.exe (CMD) style and once in bash/sh (SH)
+      style -- as a side-by-side parallel-translation reference for students:
+      printing, variables, arithmetic, an if/else string test, a counted
+      loop, a list loop, a subroutine/function, a multi-way branch (CMD
+      IF-chain vs SH case), and the shared variable bridge between the two
+      modes.  A quick CMD-vs-SH syntax table heads the file; output lines are
+      labelled CMD:/SH: so the two notations line up.
+
+    - doc/ cheat sheets (all 21 languages): added three new sections covering
+      the 0.06 SH features -- "15. SH Arrays", "16. SH case Statements", and
+      "17. SH trap and Signals" -- with the same language-independent code
+      examples in every file and consecutive section numbering preserved
+      (t/9080 still passes).  Inline comments and prose are fully localized
+      for EN and JA, and additionally for ZH, KO, FR, ID, VI and TR; the
+      remaining 12 languages (BM BN HI KM MN MY NE SI TL TW UR UZ) carry the
+      translated section headings with the comment text left in English as a
+      draft pending native-speaker review.
+
 0.05  2026-06-14 JST (Japan Standard Time)
 
     - SH single-line loops: "for VAR in LIST; do BODY; done" and

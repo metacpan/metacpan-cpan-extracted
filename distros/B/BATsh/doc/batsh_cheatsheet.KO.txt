@@ -227,4 +227,52 @@ BATsh는 cmd.exe와 bash/sh 구문을 같은 스크립트에서 실행하는 이
   cmd1 || cmd2    cmd1 이 실패할 때만 cmd2 실행
   cmd1 ; cmd2     무조건 cmd2 실행
 
+15. SH 배열
+-----------
+  arr=(a b c)            # 인덱스 배열 리터럴
+  arr+=(d e)             # 요소 추가
+  arr[5]=x               # 인덱스로 대입
+  declare -a list        # 인덱스 배열 선언
+  declare -A map         # 연관 배열 선언
+  map[key]=value         # 연관 배열 대입
+  map=([k1]=v1 [k2]=v2)  # 연관 배열 리터럴
+
+  ${arr[0]}    0번 요소  ($arr 는 ${arr[0]} 와 동일)
+  ${arr[-1]}   마지막 요소
+  ${arr[@]}    모든 요소(단어 분리)
+  ${arr[*]}    모든 요소(한 단어)
+  ${#arr[@]}   요소 개수
+  ${#arr[2]}   2번 요소의 길이
+  ${!arr[@]}   인덱스(또는 키) 목록
+  unset arr[1] # 요소 하나 삭제
+  unset arr    # 배열 전체 삭제
+
+16. SH case 문
+--------------
+  case $x in
+      a|b|c)      echo "a, b 또는 c" ;;    # |  -- 여러 패턴
+      [0-9])      echo "숫자 한 자"    ;;    # [..]  문자 클래스
+      [!aeiou])   echo "자음"        ;;    # [!..] 부정 클래스
+      data*)      echo "접두사"       ;;    # *  와  ?  글로빙
+      "*")        echo "별표"        ;;    # 따옴표=리터럴 일치
+      *)          echo "기본값"       ;;    # *)  기본 절
+  esac
+
+  절 종료자(각 본문 뒤):
+    ;;    여기서 종료(일반적인 경우)
+    ;&    다음 절 본문까지 이어서 실행
+    ;;&   남은 패턴을 계속 검사
+
+17. SH trap 및 시그널
+---------------------
+  trap 'echo bye' EXIT       # 스크립트 종료 시(또는 exit 시) 실행
+  trap 'rm -f $tmp' EXIT     # 핸들러는 실행될 때 전개됨
+  trap 'echo got INT' INT    # %SIG 를 통해 실제 시그널 연결
+  trap '' INT                # 시그널 무시
+  trap - INT                 # 기본 동작으로 복원
+  trap                       # 현재 trap 목록(또는: trap -p)
+
+  SIGSPEC: 이름(INT 또는 SIGINT), 번호(2), 또는 EXIT(= 0).
+  EXIT 는 종료 시 한 번 실행; 실제 이름은 Perl %SIG 핸들러를 설치.
+
 참고: https://metacpan.org/dist/BATsh

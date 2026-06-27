@@ -1,10 +1,11 @@
 package Thunderhorse::Context;
-$Thunderhorse::Context::VERSION = '0.105';
+$Thunderhorse::Context::VERSION = '0.106';
 use v5.40;
 use Mooish::Base -standard;
 
 use Devel::StrictMode;
 
+use Future::AsyncAwait;
 use Thunderhorse::Request;
 use Thunderhorse::Response;
 use Thunderhorse::WebSocket;
@@ -30,9 +31,15 @@ has field 'req' => (
 	default => sub ($self) { Thunderhorse::Request->new(context => $self) },
 );
 
+has field 'connection' => (
+	(STRICT ? (isa => HasMethods ['response_started']) : ()),
+	lazy => sub ($self) { $self->scope->{'pagi.connection'} },
+);
+
 has field 'res' => (
 	(STRICT ? (isa => InstanceOf ['Thunderhorse::Response']) : ()),
-	default => sub ($self) { Thunderhorse::Response->new(context => $self) },
+	lazy => sub ($self) { Thunderhorse::Response->new(context => $self) },
+	clearer => -hidden,
 );
 
 # NOTE: websocket must be lazy, because it will die if scope is not websocket
@@ -105,9 +112,39 @@ sub consume ($self)
 sub is_consumed ($self)
 {
 	return $self->_consumed
-		|| $self->res->is_sent
+		|| $self->connection->response_started
+		|| $self->res->is_ready
 		|| ($self->has_ws && $self->ws->is_closed)
 		|| ($self->has_sse && $self->sse->is_closed);
+}
+
+sub empty_res ($self)
+{
+	$self->_clear_res;
+	return $self->res;
+}
+
+async sub send_res ($self)
+{
+	# NOTE: we check a general pagi constraint, but raise a thunderhorse exception -
+	# should it just die()?
+	Gears::X::Thunderhorse->raise('response was already sent')
+		if $self->connection->response_started;
+
+	await $self->res->respond($self->sender);
+
+	return;
+}
+
+async sub try_send_res ($self)
+{
+	return
+		if $self->connection->response_started;
+
+	await $self->res->respond($self->sender)
+		if $self->res->is_ready;
+
+	return;
 }
 
 __END__
@@ -124,7 +161,7 @@ Thunderhorse::Context - Request handling context
 		my $stashed_value = $ctx->stash->get('key');
 		my $session_value = $ctx->session->get('key');
 
-		await $ctx->res->text("Hello World");
+		$ctx->res->text("Hello World");
 	}
 
 =head1 DESCRIPTION
@@ -202,6 +239,13 @@ used, or other middleware that will populate C<pagi.session> scope key.
 L<PAGI::Session> will throw an exception if C<pagi.session> is not present in
 scope.
 
+=head3 connection
+
+Connection object for this context, taken from PAGI scope. Connection objects
+are inserted into the scope by the server, and there is no clear subclass they
+will inherit from. They follow a duck-typed interface though, and can be
+trusted to have at least C<response_started> method.
+
 =head2 Methods
 
 =head3 new
@@ -251,6 +295,31 @@ context object for chaining.
 Returns true if the context has been consumed either explicitly via
 L</consume>, or implicitly by sending a response, closing a WebSocket
 connection, or closing an SSE stream.
+
+=head3 empty_res
+
+	$new_res = $ctx->empty_res()
+
+Discards the current response attached to the context, then builds and returns
+a fresh one. Useful if you want to completely discard response data.
+
+=head3 send_res
+
+	await $ctx->send_res()
+
+Tries to send the response back to the client. Dies if the response has already
+been sent. Force-sends the response even if it has an empty body.
+
+=head3 try_send_res
+
+	$ctx->try_send_res()
+
+Similar as L</send_res>, but does nothing if the response has already been
+sent. Also skips sending the response if it is not ready yet, according to
+L<Thunderhorse::Response/is_ready>.
+
+Note that you don't have to use this method explicitly. Thunderhorse will
+automatically use it after the route handler returns.
 
 =head1 SEE ALSO
 

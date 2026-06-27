@@ -1,0 +1,45 @@
+# Revision history for PAGI-Tools
+
+0.002000 - 2026-06-26
+  - Split out of the PAGI distribution into its own distribution (git history
+    preserved).
+  - New PAGI::Tools module anchors the distribution.
+  - The application runner ships in PAGI-Server as PAGI::Server::Runner.
+  - B<BREAKING>: PAGI::Response is now a value — factories build detached
+    responses, body methods return $self, respond($send) sends, to_app makes any
+    response mountable; Endpoint HTTP handlers RETURN a response value
+    (await $res->json(...) no longer sends).
+  - B<BREAKING>: PAGI::Request->configure/->config removed; path_param strict and
+    multipart limits are now per-call options.
+  - PAGI::Headers: ordered, case-insensitive, multi-value header container
+    (rejects undef values; to_hash); Response and Request route headers through it.
+  - is_sent now reads response_started off the pagi.connection object, not a scope
+    scalar, so it survives middleware's scope copy. Adds PAGI::Test::ConnectionState.
+  - PAGI::Response->has_body_source: predicate for whether a body source was
+    registered.
+  - PAGI::Response: charset follows the body — text/html/send gain
+    "; charset=utf-8", json() stays bare application/json.
+  - PAGI::Utils::to_app coerces coderefs, component objects, and class names; every
+    composition point accepts anything it accepts.
+  - builder's enable() accepts configured middleware instances.
+  - PAGI::App::Router: coderef route middleware can transform the channel.
+  - PAGI::Endpoint::Router route middleware are value-flow (await $next->() returns
+    the handler's response); App::Router dispatch returns the matched route's value.
+  - PAGI::Context: $ctx->text/html/json/redirect shorthands,
+    assert_http/websocket/sse guards, on_default catch-all, raw_send accessor.
+  - Backpressure/lifecycle helpers: on_complete, buffered_amount/high_water_mark/
+    low_water_mark, on_high_water/on_drain/is_writable, WebSocket->deny().
+  - PAGI::Request->multipart_stream: pull-based streaming multipart parsing with
+    app-controlled sinks; mutually exclusive with the buffered body methods.
+  - PAGI::App::Redirect and ::NotFound build a PAGI::Response value (modules kept
+    for the dynamic case).
+  - PAGI::Lifespan coerces its app arg via to_app, and reports shutdown-handler
+    failures instead of swallowing them.
+  - Spec: URLMap sets root_path; WrapCGI builds SCRIPT_NAME from root_path.
+  - Canonical scope-adding middleware route through the modify_scope helper.
+  - Documented the PAGI::Response subclassing seam for framework authors.
+  - Docs: recipes are now PAGI::Tools::Cookbook; Tutorial/Cookbook examples
+    corrected against the current API; chat-showcase example uses PAGI::App::Router
+    + PAGI::Lifespan.
+  - For changes prior to 0.002000, see the Changes file of the PAGI distribution
+    (versions up to 0.001023).

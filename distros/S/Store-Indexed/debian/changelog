@@ -1,0 +1,5 @@
+libstore-indexed-perl (0.0.1.noble) noble; urgency=low
+
+  * Initial release.
+
+ -- Milan Chrobok <mc@radiopiloten.de>  Wed, 20 Jun 2026 13:00:00 +0100

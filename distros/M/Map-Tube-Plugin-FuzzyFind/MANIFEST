@@ -31,5 +31,6 @@ t/53-version.t
 t/60-pod.t
 t/61-pod-coverage.t
 t/62-changes.t
+t/63-kwalitee.t
 t/Sample.pm
 t/sample.xml

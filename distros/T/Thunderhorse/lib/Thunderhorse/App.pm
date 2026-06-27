@@ -1,5 +1,5 @@
 package Thunderhorse::App;
-$Thunderhorse::App::VERSION = '0.105';
+$Thunderhorse::App::VERSION = '0.106';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -208,6 +208,7 @@ async sub pagi ($self, $scope, $receive, $send)
 	# the context
 	if (!$ctx->is_consumed) {
 		await $self->render_error(undef, $ctx, 404);
+		await $ctx->send_res;
 	}
 
 	return;
@@ -240,15 +241,12 @@ sub run ($self)
 async sub render_error ($self, $controller, $ctx, $code, $message = undef)
 {
 	$message = defined $message && !$self->is_production ? $message : status_message($code);
-	await $ctx->res->status($code)->text($message);
+	$ctx->empty_res->status($code)->text($message);
 }
 
 async sub render_response ($self, $controller, $ctx, $result)
 {
-	await $ctx->res
-		->status_try(200)
-		->content_type_try('text/html')
-		->send($result);
+	$ctx->res->status_try(200)->html($result);
 }
 
 #########################

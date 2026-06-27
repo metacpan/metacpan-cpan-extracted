@@ -2,23 +2,11 @@ use strict;
 use warnings;
 use Test2::V0;
 
-# Core modules that must always load
-my @core_modules = qw(
-    PAGI::Server
-    PAGI::Server::Connection
-    PAGI::Server::Protocol::HTTP1
-    PAGI::App::WrapPSGI
-    PAGI::Request::Negotiate
-    PAGI::Request::Upload
-);
-
-# Test core modules
-for my $module (@core_modules) {
-    my $file = $module;
-    $file =~ s{::}{/}g;
-    $file .= '.pm';
-    my $loaded = eval { require $file; 1 };
-    ok($loaded, "load $module") or diag $@;
-}
+# The PAGI distribution is the specification: PAGI.pm plus the
+# PAGI::Spec::* POD documents. PAGI.pm is the only loadable module (the
+# spec documents are pure POD, checked in t/pod-syntax.t), so this load
+# test covers the one shippable module.
+require PAGI;
+ok(PAGI->VERSION, 'PAGI loads and reports a version');
 
 done_testing;

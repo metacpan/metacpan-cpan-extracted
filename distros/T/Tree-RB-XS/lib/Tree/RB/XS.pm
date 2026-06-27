@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.20';
+$Tree::RB::XS::VERSION = '0.21';
 # VERSION
 # ABSTRACT: Red/Black Tree and LRU Cache implemented in C
 
@@ -1213,7 +1213,7 @@ fast and minimal.  Tree::RB::XS can do the same a bit faster with:
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 AUTHOR
 
@@ -1221,7 +1221,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

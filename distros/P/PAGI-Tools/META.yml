@@ -1,0 +1,44 @@
+---
+abstract: 'Application toolkit for the PAGI specification'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Future::IO: '0.23'
+  IO::Async: '0.802'
+  Test2::V0: '0.000159'
+  Time::HiRes: '1.9764'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PAGI-Tools
+no_index:
+  directory:
+    - examples
+recommends:
+  Compress::Raw::Zlib: '0'
+  Cpanel::JSON::XS: '4.19'
+  Crypt::URandom: '0.36'
+  Future::IO: '0.23'
+requires:
+  Cookie::Baker: '0.11'
+  Future: '0.50'
+  Future::AsyncAwait: '0.66'
+  HTTP::Date: '6.06'
+  HTTP::MultiPartParser: '0.02'
+  Hash::MultiValue: '0.16'
+  IO::Compress::Gzip: '0'
+  JSON::MaybeXS: '1.004003'
+  perl: '5.018'
+resources:
+  bugtracker: https://github.com/jjn1056/PAGI-Tools/issues
+  homepage: https://github.com/jjn1056/PAGI-Tools
+  repository: https://github.com/jjn1056/PAGI-Tools.git
+version: '0.002000'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0

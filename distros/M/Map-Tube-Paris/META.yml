@@ -22,13 +22,15 @@ no_index:
 provides:
   Map::Tube::Paris:
     file: lib/Map/Tube/Paris.pm
-    version: v0.2.1
+    version: v0.2.2
 requires:
   File::Share: '0'
   Map::Tube: v5.0.1
   Moo: '0'
   namespace::clean: '0'
   perl: '5.014'
-resources: {}
-version: v0.2.1
+resources:
+  bugtracker: https://github.com/gwselke/Map-Tube-Paris/issues
+  repository: https://github.com/gwselke/Map-Tube-Paris.git
+version: v0.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

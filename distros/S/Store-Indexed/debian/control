@@ -1,0 +1,12 @@
+Source: libstore-indexed-perl
+Section: perl
+Priority: optional
+Maintainer: Milan Chrobok <mc@radiopiloten.de>
+Build-Depends: debhelper-compat (= 12), perl, libicu-dev
+Standards-Version: 4.5.0
+
+Package: libstore-indexed-perl
+Architecture: any
+Depends: ${perl:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Description: This module provides an XS implementation to store and retrieve
+ keys and values from an index.

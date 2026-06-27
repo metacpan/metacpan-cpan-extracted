@@ -1,0 +1,52 @@
+#!/bin/sh
+# BATsh example 10: SH case..esac pattern branching (BATsh::SH, v0.06)
+# Run: perl lib/BATsh.pm eg/10_sh_case.batsh
+
+# multiple patterns with | and a default *) clause
+echo "fruit classification:"
+for fruit in apple pear quince banana; do
+    case $fruit in
+        apple)        echo "  $fruit: pome (apple)" ;;
+        pear|quince)  echo "  $fruit: pome fruit" ;;
+        *)            echo "  $fruit: something else" ;;
+    esac
+done
+
+# glob and character-class patterns
+echo "character classes:"
+for ch in 7 a Z _; do
+    case $ch in
+        [0-9])  echo "  $ch is a digit" ;;
+        [a-z])  echo "  $ch is lowercase" ;;
+        [A-Z])  echo "  $ch is uppercase" ;;
+        *)      echo "  $ch is punctuation" ;;
+    esac
+done
+
+# negated class and glob
+echo "vowel check:"
+for word in apple grape kiwi; do
+    case $word in
+        [aeiou]*)  echo "  $word starts with a vowel" ;;
+        *)         echo "  $word starts with a consonant" ;;
+    esac
+done
+
+# ;& fall-through and ;;& continue-testing
+echo "fall-through (;&):"
+case red in
+    red)    echo "  red" ;&
+    orange) echo "  ...and orange (fell through)" ;;
+    *)      echo "  other" ;;
+esac
+
+echo "continue-testing (;;&):"
+case ab in
+    a*) echo "  matched the a-prefix pattern" ;;&
+    *b) echo "  also matched the b-suffix pattern" ;;
+    *)  echo "  other" ;;
+esac
+
+# fully inline form
+echo "inline:"
+case build in start) echo "  starting" ;; build) echo "  building" ;; *) echo "  idle" ;; esac

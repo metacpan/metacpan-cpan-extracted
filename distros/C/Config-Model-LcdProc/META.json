@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -21,8 +21,8 @@
       },
       "configure" : {
          "requires" : {
-            "Config::Model" : "2.141",
-            "Config::Model::Itself" : "2.022",
+            "Config::Model" : "2.163",
+            "Config::Model::Itself" : "2.031",
             "Getopt::Long" : "0",
             "Module::Build" : "0.34",
             "Path::Tiny" : "0"
@@ -53,9 +53,9 @@
          "web" : "http://github.com/dod38fr/config-model-lcdproc"
       }
    },
-   "version" : "2.055",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "version" : "2.056",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
    "x_spdx_expression" : "LGPL-2.1"
 }
 

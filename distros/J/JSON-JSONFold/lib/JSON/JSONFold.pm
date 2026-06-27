@@ -1,4 +1,4 @@
-package JSON::JSONFold;
+package JSON::JSONFold ;
 
 use strict;
 use warnings;
@@ -7,14 +7,14 @@ use JSON::PP ();
 
 use Exporter 'import';
 
-our $VERSION = '0.1.7';
+our $VERSION = '0.2.0';
 our @EXPORT = qw(
     format_json write_json fold_text
     encode_json to_json) ;
 
 our @EXPORT_OK = qw(
-    jsonfold_config
-    create_formatter
+	jsonfold_config
+	create_writer
 ) ;
 # Object Orient Interface
 
@@ -50,8 +50,6 @@ sub format {
     my $text = $json->encode($data) ;
 
     $stream->write($text);
-    $stream->finish;
-    $stream->flush;
 
     close $out or die "close output: $!" ;
     $output .= "\n" unless $output =~ /\n\z/;
@@ -69,8 +67,6 @@ sub fold {
     my $stream = _stream($out, $config, 0) ;
 
     $stream->write($text);
-    $stream->finish;
-    $stream->flush;
 
     close $out or die "close output: $!" ;
     $output .= "\n" unless $output =~ /\n\z/;
@@ -134,7 +130,7 @@ sub fold_text {
     return $fmt->fold($text) ;
 }
 
-sub create_formatter {
+sub create_writer {
     my($fh, $width, $config, %overrides) = @_ ;
     my $do_close = delete $overrides{close_fp} ;
     return _stream($fh, _config($config, $width, %overrides), $do_close) ;
@@ -143,9 +139,9 @@ sub create_formatter {
 # Helper for Function/OO interface methods
 
 sub _config {
-    my ($preset, $width, %overrides) = @_ ;
-    $overrides{width} = $width if $width ;
-    return JSON::JSONFold::Config::config($preset, %overrides) ;
+	my ($preset, $width, %overrides) = @_ ;
+	$overrides{width} = $width if defined $width ;
+	return JSON::JSONFold::Config::config($preset, %overrides) ;
 }
 
 sub _stream {
@@ -245,47 +241,53 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-use constant MAX_ARRAY_ITEMS => 1000;
-use constant MAX_OBJ_ITEMS   => 1000;
-use constant MAX_NESTING     => 10;
-use constant DEFAULT_WIDTH   => 100;
+use constant DEFAULT_WIDTH   => 100 ;
+use constant MAX_ARRAY_ITEMS => 1000 ;
+use constant MAX_OBJ_ITEMS   => 1000 ;
+use constant MAX_NESTING     => 10 ;
+use constant MAX_GRID_LINES  => 1000 ;
+use constant MAX_WIDTH       => 255 ;
 
-our $SEQ;
+our $SEQ = 0 ;
 use constant {
-    C_OFF               => $SEQ++,
-    C_WIDTH             => $SEQ++,
+	C_OFF               => $SEQ++,
+	C_WIDTH             => $SEQ++,
 
-    C_PACK_ARRAY_ITEMS  => $SEQ++,
-    C_PACK_OBJ_ITEMS    => $SEQ++,
-    C_PACK_NESTING      => $SEQ++,
+	C_PACK_ARRAY_ITEMS  => $SEQ++,
+	C_PACK_OBJ_ITEMS    => $SEQ++,
+	C_PACK_NESTING      => $SEQ++,
 
-    C_FOLD_ARRAY_ITEMS  => $SEQ++,
-    C_FOLD_OBJ_ITEMS    => $SEQ++,
-    C_FOLD_NESTING      => $SEQ++,
+	C_FOLD_ARRAY_ITEMS  => $SEQ++,
+	C_FOLD_OBJ_ITEMS    => $SEQ++,
+	C_FOLD_NESTING      => $SEQ++,
 
-    C_JOIN_ARRAY_ITEMS  => $SEQ++,
-    C_JOIN_OBJ_ITEMS    => $SEQ++,
-    C_JOIN_NESTING      => $SEQ++,
-    C_UNUSED_LAST       => $SEQ++,
-};
+	C_GRID_ARRAY_ITEMS  => $SEQ++,
+	C_GRID_OBJ_ITEMS    => $SEQ++,
+	C_GRID_MIN_LINES    => $SEQ++,
+	C_GRID_MAX_LINES    => $SEQ++,
+	C_GRID_ARRAY_MIN    => $SEQ++,
+	C_GRID_OBJ_MIN      => $SEQ++,
 
-our %PRESETS ;        # values defined later
+	C_JOIN_ARRAY_ITEMS  => $SEQ++,
+	C_JOIN_OBJ_ITEMS    => $SEQ++,
+	C_JOIN_NESTING      => $SEQ++,
+	C_UNUSED_LAST       => $SEQ++,
+} ;
 
 BEGIN {
 
     our @EXPORT = qw(
         C_OFF
         C_WIDTH
-        C_PACK_ARRAY_ITEMS
-        C_PACK_OBJ_ITEMS
-        C_PACK_NESTING
-        C_FOLD_ARRAY_ITEMS
-        C_FOLD_OBJ_ITEMS
-        C_FOLD_NESTING
-        C_JOIN_ARRAY_ITEMS
-        C_JOIN_OBJ_ITEMS
-        C_JOIN_NESTING
-    );
+		C_PACK_ARRAY_ITEMS C_PACK_OBJ_ITEMS C_PACK_NESTING
+
+		C_FOLD_ARRAY_ITEMS C_FOLD_OBJ_ITEMS	C_FOLD_NESTING
+
+		C_GRID_ARRAY_ITEMS C_GRID_OBJ_ITEMS C_GRID_MIN_LINES
+		C_GRID_MAX_LINES C_GRID_ARRAY_MIN C_GRID_OBJ_MIN
+
+		C_JOIN_ARRAY_ITEMS C_JOIN_OBJ_ITEMS C_JOIN_NESTING
+	) ;
 }
 
 our @FIELDS = (
@@ -297,12 +299,20 @@ our @FIELDS = (
     [ 'fold_array_items', C_FOLD_ARRAY_ITEMS ],
     [ 'fold_obj_items',   C_FOLD_OBJ_ITEMS ],
     [ 'fold_nesting',     C_FOLD_NESTING ],
+	[ grid_array_items => C_GRID_ARRAY_ITEMS ],
+	[ grid_obj_items   => C_GRID_OBJ_ITEMS ],
+	[ grid_min_lines   => C_GRID_MIN_LINES ],
+	[ grid_max_lines   => C_GRID_MAX_LINES ],
+	[ grid_array_min   => C_GRID_ARRAY_MIN ],
+	[ grid_obj_min     => C_GRID_OBJ_MIN ],
     [ 'join_array_items', C_JOIN_ARRAY_ITEMS ],
     [ 'join_obj_items',   C_JOIN_OBJ_ITEMS ],
     [ 'join_nesting',     C_JOIN_NESTING ],
-);
+) ;
 
 our %NAME_TO_INDEX = map { @$_ } @FIELDS ;
+our %PRESETS ;
+our ($NONE, $DEFAULT) ;
 
 sub as_hash {
     my ($self) = @_ ;
@@ -324,160 +334,212 @@ sub _make {
     $d[C_FOLD_OBJ_ITEMS]   = $arg{fold_obj_items};
     $d[C_FOLD_NESTING]     = $arg{fold_nesting};
 
+	$d[C_GRID_ARRAY_ITEMS] = $arg{grid_array_items} ;
+	$d[C_GRID_OBJ_ITEMS]   = $arg{grid_obj_items} ;
+	$d[C_GRID_MIN_LINES]   = $arg{grid_min_lines} ;
+	$d[C_GRID_MAX_LINES]   = $arg{grid_max_lines} ;
+	$d[C_GRID_ARRAY_MIN]   = $arg{grid_array_min} ;
+	$d[C_GRID_OBJ_MIN]     = $arg{grid_obj_min} ;
+
     $d[C_JOIN_ARRAY_ITEMS] = $arg{join_array_items};
     $d[C_JOIN_OBJ_ITEMS]   = $arg{join_obj_items};
     $d[C_JOIN_NESTING]     = $arg{join_nesting};
     return bless \@d, $class;
 }
 
-our $NONE = __PACKAGE__->_make(
-    width            => DEFAULT_WIDTH,
-
-    pack_array_items => 0,
-    pack_obj_items   => 0,
-    pack_nesting     => 0,
-
-    fold_array_items => 0,
-    fold_obj_items   => 0,
-    fold_nesting     => 0,
-
-    join_array_items => 0,
-    join_obj_items   => 0,
-    join_nesting     => 0,
-);
-
-our $DEFAULT = __PACKAGE__->_make(
-    width            => DEFAULT_WIDTH,
-
-    pack_array_items => 8,
-    pack_obj_items   => 4,
-    pack_nesting     => 1,
-
-    fold_array_items => 8,
-    fold_obj_items   => 4,
-    fold_nesting     => 1,
-
-    join_array_items => 8,
-    join_obj_items   => 4,
-    join_nesting     => 1,
-);
-
 sub _replace {
-    my ($base, $validate) = (shift, shift) ;
-    return $base unless @_;
-    my $overrides = @_ == 1 && ref($_[0]) ? $_[0] : { @_ };
-    return $base unless %$overrides;
+	my ($base, $validate) = (shift, shift) ;
+	return $base unless @_ ;
+	my $overrides = @_ == 1 && ref($_[0]) ? $_[0] : { @_ } ;
+	return $base unless %$overrides ;
 
-    # Make  acopy of the original object.
-    my @d = @$base;
-    for my $key (keys %$overrides) {
-        unless ( exists $NAME_TO_INDEX{$key} ) {
-            die "unknown JSON::JSONFold config key: $key\n" if $validate ;
-            next ;
-        } ;
-        $d[$NAME_TO_INDEX{$key}] = $overrides->{$key};
-    }
-    return bless \@d, ref($base) || __PACKAGE__;
+	my @d = @$base ;
+	for my $key (keys %$overrides) {
+		unless (exists $NAME_TO_INDEX{$key}) {
+			die "unknown JSON::JSONFold config key: $key\n" if $validate ;
+			next ;
+		}
+		$d[$NAME_TO_INDEX{$key}] = $overrides->{$key} ;
+	}
+	return bless \@d, ref($base) || __PACKAGE__ ;
 }
 
-    # Resolve named config into actual config object.
 sub _resolve_config {
-    my ($config) = @_;
+	my ($config) = @_ ;
+	return $config if ref($config) ;
 
-    return $config if ref($config) ;
-
-    my $name = $config // '';
-    $config = $PRESETS{$name} ;
-    die "unknown JSON::JSONFold preset: $name\n"
-        unless defined $config ;
-
-    return $config ;
+	my $name = $config // '' ;
+	die "unknown JSON::JSONFold preset: $name\n"
+		unless exists $PRESETS{$name} ;
+	return $PRESETS{$name} ;
 }
-
 
 sub config {
-    my ($preset, %overrides)  = @_;
-    return _replace(_resolve_config($preset), 0, \%overrides);
+	my ($preset, %overrides) = @_ ;
+	return _replace(_resolve_config($preset), 0, \%overrides) ;
 }
 
 sub new {
-    my ($class, $config, @args) = @_;
-    return config($config, @args);
+	my ($class, $config, @args) = @_ ;
+	return config($config, @args) ;
 }
 
-    # Create preset - force validation.
 sub _new_preset {
-    my $base = shift ;
-    return _replace($base, 1, @_) ;
+	my $base = shift ;
+	return _replace($base, 1, @_) ;
 }
 
-%PRESETS = (
-    off     => __PACKAGE__->_make(off => 1),
-    ''      => $DEFAULT,
-    default => $DEFAULT,
-    none    => $NONE,
-    low     => _new_preset($DEFAULT, fold_nesting => 0, join_nesting => 0),
-    med     => _new_preset($DEFAULT, join_nesting => 0),
-    high    => _new_preset($DEFAULT,
-        pack_array_items => 16, pack_obj_items => 8, pack_nesting => 4,
-        fold_array_items => 16, fold_obj_items => 8, fold_nesting => 4,
-        join_array_items => 16, join_obj_items => 8, join_nesting => 2,
-    ),
-    max     => _new_preset($NONE,
-        width => 255,
-        pack_array_items => MAX_ARRAY_ITEMS, pack_obj_items => MAX_OBJ_ITEMS,
-        pack_nesting => MAX_NESTING,
-        fold_array_items => MAX_ARRAY_ITEMS, fold_obj_items => MAX_OBJ_ITEMS,
-        fold_nesting => MAX_NESTING,
-        join_array_items => MAX_ARRAY_ITEMS, join_obj_items => MAX_OBJ_ITEMS,
-        join_nesting => MAX_NESTING,
-    ),
-    pack    => _new_preset($NONE,
-        pack_array_items => MAX_ARRAY_ITEMS, pack_obj_items => MAX_OBJ_ITEMS,
-        pack_nesting => MAX_NESTING,
-    ),
-    fold    => _new_preset($NONE,
-        fold_array_items => MAX_ARRAY_ITEMS, fold_obj_items => MAX_OBJ_ITEMS,
-        fold_nesting => MAX_NESTING,
-    ),
-    join    => _new_preset($NONE,
-        fold_array_items => MAX_ARRAY_ITEMS, fold_obj_items => MAX_OBJ_ITEMS,
-        fold_nesting => MAX_NESTING,
-        join_array_items => MAX_ARRAY_ITEMS, join_obj_items => MAX_OBJ_ITEMS,
-        join_nesting => MAX_NESTING,
-    ),
-);
+sub _class_init {
+	my $class = shift ;
 
+	$DEFAULT = $class->_make(
+		width => DEFAULT_WIDTH,
+
+		pack_array_items => 10,
+		pack_obj_items   => 5,
+		pack_nesting     => 1,
+
+		fold_array_items => 10,
+		fold_obj_items   => 5,
+		fold_nesting     => 2,
+
+		grid_array_items => MAX_ARRAY_ITEMS,
+		grid_obj_items   => MAX_OBJ_ITEMS,
+		grid_min_lines   => 3,
+		grid_max_lines   => 100,
+		grid_array_min   => 3,
+		grid_obj_min     => 3,
+
+		join_array_items => 8,
+		join_obj_items   => 4,
+		join_nesting     => 1,
+	) ;
+
+	$NONE = $class->_make(
+		width => DEFAULT_WIDTH,
+
+		pack_array_items => 0,
+		pack_obj_items   => 0,
+		pack_nesting     => 0,
+
+		fold_array_items => 0,
+		fold_obj_items   => 0,
+		fold_nesting     => 0,
+
+		grid_array_items => 0,
+		grid_obj_items   => 0,
+		grid_min_lines   => 0,
+		grid_max_lines   => 0,
+		grid_array_min   => 0,
+		grid_obj_min     => 0,
+
+		join_array_items => 0,
+		join_obj_items   => 0,
+		join_nesting     => 0,
+	) ;
+
+	my %pack_max = (
+		pack_array_items => MAX_ARRAY_ITEMS,
+		pack_obj_items   => MAX_OBJ_ITEMS,
+		pack_nesting     => MAX_NESTING,
+	) ;
+	my %fold_max = (
+		fold_array_items => MAX_ARRAY_ITEMS,
+		fold_obj_items   => MAX_OBJ_ITEMS,
+		fold_nesting     => MAX_NESTING,
+	) ;
+	my %join_max = (
+		join_array_items => MAX_ARRAY_ITEMS,
+		join_obj_items   => MAX_OBJ_ITEMS,
+		join_nesting     => MAX_NESTING,
+	) ;
+	my %grid_max = (
+		grid_array_items => MAX_ARRAY_ITEMS,
+		grid_obj_items   => MAX_OBJ_ITEMS,
+		grid_min_lines   => 3,
+		grid_max_lines   => MAX_GRID_LINES,
+	) ;
+
+	%PRESETS = (
+		off     => $class->_make(off => 1),
+		''      => $DEFAULT,
+		default => $DEFAULT,
+		none    => $NONE,
+
+		low     => _new_preset($DEFAULT,
+			fold_nesting   => 0,
+			join_nesting   => 0,
+			grid_max_lines => 0,
+		),
+		med     => _new_preset($DEFAULT,
+			join_nesting   => 0,
+			grid_max_lines => 0,
+		),
+		classic => _new_preset($DEFAULT,
+			grid_max_lines => 0,
+		),
+		high    => _new_preset($DEFAULT,
+			pack_array_items => 20, pack_obj_items => 10, pack_nesting => 4,
+			fold_array_items => 20, fold_obj_items => 10, fold_nesting => 4,
+			grid_array_min   => 4,  grid_obj_min   => 4,
+			join_array_items => 16, join_obj_items => 8,  join_nesting => 2,
+		),
+		max     => _new_preset($DEFAULT,
+			width => MAX_WIDTH,
+			%pack_max, %fold_max, %join_max, %grid_max,
+			grid_array_min => 4,
+			grid_obj_min   => 4,
+		),
+		pack    => _new_preset($NONE, %pack_max),
+		fold    => _new_preset($NONE, %fold_max),
+		grid    => _new_preset($NONE, %pack_max, %fold_max, %grid_max),
+		join    => _new_preset($NONE,
+			%fold_max,
+			join_array_items => MAX_ARRAY_ITEMS,
+			join_obj_items   => MAX_OBJ_ITEMS,
+			join_nesting     => MAX_NESTING,
+		),
+	) ;
+}
+
+__PACKAGE__->_class_init ;
 
 # -------------------------------------------------------------------------
 # Internal package: one physical pretty-printed line
 # -------------------------------------------------------------------------
 
-package JSON::JSONFold::Line;
-use strict;
-use warnings;
+package JSON::JSONFold::Line ;
+
+use strict ;
+use warnings ;
 use Exporter 'import' ;
 
 use constant KIND_NONE => $JSON::JSONFold::Kind::KIND_NONE ;
+use constant KIND_DICT => $JSON::JSONFold::Kind::KIND_DICT ;
+use constant KIND_LIST => $JSON::JSONFold::Kind::KIND_LIST ;
 
-our $SEQ ;
+our $SEQ = 0 ;
 use constant {
-    L_INDENT => $SEQ++,
-    L_TEXT => $SEQ++,
-    L_PARENT_KIND => $SEQ++,
-    L_ITEMS => $SEQ++,
-    L_LEAFS => $SEQ++,
-    L_CHILD_NESTING => $SEQ++,
-    L_OPENER => $SEQ++,
-    L_CLOSER => $SEQ++,
-    L_CAN_JOIN => $SEQ++,
-    L_CAN_PACK => $SEQ++,
+	L_INDENT         => $SEQ++,
+	L_PARTS          => $SEQ++,
+	L_PARTS_LENGTH   => $SEQ++,
+	L_KIND           => $SEQ++,
+	L_ITEMS          => $SEQ++,
+	L_LEAFS          => $SEQ++,
+	L_CHILD_NESTING  => $SEQ++,
+	L_OPENER         => $SEQ++,
+	L_CLOSER         => $SEQ++,
+	L_CAN_JOIN       => $SEQ++,
+	L_CAN_PACK       => $SEQ++,
+	L_CAN_GRID       => $SEQ++,
 } ;
 
 BEGIN {
-    our @EXPORT = qw( L_INDENT
-        L_TEXT
-        L_PARENT_KIND
+	our @EXPORT = qw(
+		L_INDENT
+		L_PARTS
+		L_PARTS_LENGTH
+		L_KIND 
         L_ITEMS
         L_LEAFS
         L_CHILD_NESTING
@@ -485,65 +547,70 @@ BEGIN {
         L_CLOSER
         L_CAN_JOIN
         L_CAN_PACK
-        ) ;
+        L_CAN_GRID
+	) ;
+}
+
+my $KEY_RE = qr/^\s*(?:(?:"[^"\\]*")|(?:'[^'\\]*')|(?:[A-Za-z_\$][A-Za-z0-9_\$]*)|)\s*:/ ;
+
+sub _calc_parts_length {
+	my ($parts) = @_ ;
+	return 0 unless @$parts ;
+	my $n = -1 ;
+	$n += 1 + length($_) for @$parts ;
+	return $n ;
 }
 
 sub parse {
-    my ($class, $s, $parent_kind) = @_;
-    $parent_kind //= KIND_NONE;
+	my ($class, $s) = @_ ;
 
     my ($spaces) = $s =~ /^(\s*)/;
     my $body = substr($s, length($spaces));
     $body =~ s/\s+\z//;
 
-    my $last = substr($body, -1, 1);
-
-    my $opener = $OPENING_KIND{$last} // KIND_NONE ;
-    my $closer = $CLOSING_KIND{$body} // KIND_NONE;
-
-    my $is_body = $parent_kind && !$opener && !$closer ? 1 : 0;
+	my $last = length($body) ? substr($body, -1, 1) : '' ;
+	my $opener = $JSON::JSONFold::Kind::OPENING_KIND{$last} // KIND_NONE ;
+	my $closer = $JSON::JSONFold::Kind::CLOSING_KIND{$body} // KIND_NONE ;
+    my $is_body = !$opener && !$closer ? 1 : 0;
 
     my @d ;
     $#d = $SEQ ;
     $d[L_INDENT]      = length($spaces);
-    $d[L_TEXT]        = $body;
-    $d[L_PARENT_KIND] = $parent_kind;
-    $d[L_ITEMS]       = 1;
-    $d[L_LEAFS]       = 1;
+ 
+	$d[L_PARTS]         = [ $body ] ;
+	$d[L_PARTS_LENGTH]  = length($body) ;
+	$d[L_KIND]          = KIND_NONE ;
+	$d[L_ITEMS]         = $is_body ? 1 : 0 ;
+	$d[L_LEAFS]         = $is_body ? 1 : 0 ;
     $d[L_CHILD_NESTING] = -1;
     $d[L_OPENER]      = $opener;
     $d[L_CLOSER]      = $closer;
     $d[L_CAN_JOIN]    = $is_body;
     $d[L_CAN_PACK]    = $is_body;
+	$d[L_CAN_GRID]      = 0 ;
 
     return bless \@d, $class ;
 }
 
-sub fold {
-    my ($class, $lines, $leafs, $child_nesting) = @_;
-    my $first_line = $lines->[0] ;
-    my @d ;
-    $#d = $SEQ ;
-    $d[L_INDENT]        = $first_line->[L_INDENT] ;
-    $d[L_TEXT]          = join(' ', map { $_->[L_TEXT] } @$lines) ;
-    $d[L_PARENT_KIND]   = $first_line->[L_PARENT_KIND] ;
-    $d[L_ITEMS]         = 1;
-    $d[L_LEAFS]         = $leafs;
-    $d[L_CHILD_NESTING] = $child_nesting;
-    $d[L_OPENER]        = KIND_NONE;
-    $d[L_CLOSER]        = KIND_NONE;
-    $d[L_CAN_PACK]      = 0;
-    $d[L_CAN_JOIN]      = 1,
-
-    return bless \@d, $class ;
+sub raw   {
+    return (' ' x $_[0][L_INDENT]) . join(' ', @{ $_[0][L_PARTS] }) . "\n"
 }
 
-sub raw   { return (' ' x $_[0][L_INDENT]) . $_[0][L_TEXT] . "\n" }
-sub width { return $_[0][L_INDENT] + length($_[0][L_TEXT]) }
+sub width {
+    return $_[0][L_INDENT] + $_[0][L_PARTS_LENGTH]
+}
 
-sub join_line {
+sub can_merge {
+	my ($self, $other, $item_limit, $width_limit) = @_ ;
+	return $self->[L_INDENT] == $other->[L_INDENT]
+		&& $self->[L_ITEMS] + $other->[L_ITEMS] <= $item_limit
+		&& $self->[L_INDENT] + $self->[L_PARTS_LENGTH] + 1 + $other->[L_PARTS_LENGTH] <= $width_limit ;
+}
+
+sub merge_line {
     my ($self, $other) = @_;
-    $self->[L_TEXT] .= ' ' . $other->[L_TEXT];
+	push @{ $self->[L_PARTS] }, @{ $other->[L_PARTS] } ;
+	$self->[L_PARTS_LENGTH] += 1 + $other->[L_PARTS_LENGTH] if @{ $other->[L_PARTS] } ;
     $self->[L_ITEMS] += $other->[L_ITEMS];
     $self->[L_LEAFS] += $other->[L_LEAFS];
     if ($other->[L_CHILD_NESTING] > $self->[L_CHILD_NESTING]) {
@@ -551,6 +618,51 @@ sub join_line {
         $self->[L_CAN_PACK] = 0;
     }
     return $self;
+}
+
+sub set_parts {
+	my ($self, $parts) = @_ ;
+	$self->[L_PARTS] = $parts ;
+	$self->[L_PARTS_LENGTH] = _calc_parts_length($parts) ;
+	return $self ;
+}
+
+sub dict_signature {
+	my ($self) = @_ ;
+	my @parts = @{ $self->[L_PARTS] } ;
+	return undef if @parts < 3 ;
+
+	my @signature ;
+	for my $part (@parts[1 .. $#parts - 1]) {
+		return undef unless $part =~ /($KEY_RE)/ ;
+		push @signature, $1 ;
+	}
+	return join("\x1e", @signature) ;
+}
+
+sub _format_parts {
+	my ($parts, $widths) = @_ ;
+	my $last = $#$widths ;
+	my @out ;
+	for my $i (0 .. $#$parts) {
+		my $part = $parts->[$i] ;
+		my $w = $widths->[$i] ;
+		if ($part =~ /^[\-0-9]/) {
+			push @out, sprintf("%*s", $w, $part) ;
+		}
+		elsif ($i < $last) {
+			push @out, sprintf("%-*s", $w, $part) ;
+		}
+		else {
+			push @out, $part ;
+		}
+	}
+	return \@out ;
+}
+
+sub apply_grid {
+	my ($self, $widths) = @_ ;
+	return $self->set_parts(_format_parts($self->[L_PARTS], $widths)) ;
 }
 
 # -------------------------------------------------------------------------
@@ -568,71 +680,141 @@ BEGIN {
     JSON::JSONFold::Line->import() ;
 }
 
-our $SEQ ;
+our $SEQ = 0 ;
 use constant {
-    F_UNUSED_FIRST  => $SEQ++,
-    F_KIND          => $SEQ++,
+	F_KIND           => $SEQ++,
+	F_INDENT         => $SEQ++,
     F_DEPTH         => $SEQ++,
     F_LINES         => $SEQ++,
-    F_PACK_LIMIT    => $SEQ++,
+	F_PARTS_LENGTH   => $SEQ++,
+	F_PACK_LIMIT     => $SEQ++,
     F_FOLD_LIMIT    => $SEQ++,
     F_JOIN_LIMIT    => $SEQ++,
+	F_GRID_LIMIT     => $SEQ++,
+	F_GRID_MIN_ITEMS => $SEQ++,
     F_CONTENT_LINES => $SEQ++,
     F_ITEMS         => $SEQ++,
     F_LEAFS         => $SEQ++,
     F_FOLD_OK       => $SEQ++,
+	F_GRID_OK        => $SEQ++,
     F_CHILD_NESTING => $SEQ++,
-    F_UNUSED_LAST   => $SEQ++,
 } ;
 
 BEGIN {
-    our @EXPORT = qw(
-        F_UNUSED_FIRST
-        F_KIND
-        F_DEPTH
-        F_LINES
-        F_PACK_LIMIT
-        F_FOLD_LIMIT
-        F_JOIN_LIMIT
-        F_CONTENT_LINES
-        F_ITEMS
-        F_LEAFS
-        F_FOLD_OK
-        F_CHILD_NESTING
-        F_UNUSED_LAST
-    ) ;
+	our @EXPORT = qw(
+		F_KIND F_INDENT F_DEPTH F_LINES F_PARTS_LENGTH
+		F_PACK_LIMIT F_FOLD_LIMIT F_JOIN_LIMIT F_GRID_LIMIT F_GRID_MIN_ITEMS
+		F_CONTENT_LINES F_ITEMS F_LEAFS F_FOLD_OK F_GRID_OK F_CHILD_NESTING
+	) ;
 }
 
 sub new {
     my ($class, %arg) = @_;
     my @d ;
     $#d = $SEQ ;
-    $d[F_KIND]          = $arg{kind};
+	$d[F_KIND]           = $arg{kind} // 0 ;
+	$d[F_INDENT]         = $arg{indent} // 0 ;
     $d[F_DEPTH]         = $arg{depth} // 0;
-    $d[F_LINES]         = $arg{lines} || [];
+    $d[F_LINES]         = $arg{lines} // [];
+	$d[F_PARTS_LENGTH]   = 0 ;
     $d[F_PACK_LIMIT]    = $arg{pack_limit} // 0;
     $d[F_FOLD_LIMIT]    = $arg{fold_limit} // 0;
     $d[F_JOIN_LIMIT]    = $arg{join_limit} // 0;
+	$d[F_GRID_LIMIT]     = $arg{grid_limit} // 0 ;
+	$d[F_GRID_MIN_ITEMS] = $arg{grid_min_items} // 0 ;
     $d[F_CONTENT_LINES] = 0;
     $d[F_ITEMS]         = 0;
     $d[F_LEAFS]         = 0;
     $d[F_FOLD_OK]       = 1;
+	$d[F_GRID_OK]        = 0 ;
     $d[F_CHILD_NESTING] = -1;
     return bless \@d, $class;
 }
 
-# Update Frame information based on added line
-sub update_add {
+sub is_empty  { return @{ $_[0][F_LINES] } == 0 }
+sub last_line { return $_[0][F_LINES][-1] }
+
+sub update_stats {
     my ($self, $line) = @_ ;
     $self->[F_ITEMS] += $line->[L_ITEMS];
     $self->[F_LEAFS] += $line->[L_LEAFS];
+	$self->[F_PARTS_LENGTH] += $line->[L_PARTS_LENGTH] + ($self->[F_PARTS_LENGTH] ? 1 : 0) ;
     if ($line->[L_CHILD_NESTING] >= $self->[F_CHILD_NESTING]) {
         $self->[F_CHILD_NESTING] = $line->[L_CHILD_NESTING] + 1;
     }
+	return ;
 }
 
-sub is_empty { return @{ $_[0][F_LINES] } == 0 }
-sub last_line { return $_[0][F_LINES][-1] }
+sub add_line {
+	my ($self, $line) = @_ ;
+	push @{ $self->[F_LINES] }, $line ;
+	if (!$line->[L_OPENER] && !$line->[L_CLOSER]) {
+		$self->[F_CONTENT_LINES]++ ;
+	}
+	$self->update_stats($line) ;
+	return ;
+}
+
+sub check_fold_limits {
+	my ($self, $cfg) = @_ ;
+	return 0 if $self->[F_PARTS_LENGTH] > $cfg->[JSON::JSONFold::Config::C_WIDTH] ;
+	return 0 if $self->[F_ITEMS] > $self->[F_FOLD_LIMIT] ;
+	return 0 if $self->[F_CHILD_NESTING] >= $cfg->[JSON::JSONFold::Config::C_FOLD_NESTING] ;
+	return 1 ;
+}
+
+sub fold_lines {
+	my ($self, $cfg) = @_ ;
+	my @parts = map { @{ $_->[L_PARTS] } } @{ $self->[F_LINES] } ;
+
+	my @d ;
+	$#d = $JSON::JSONFold::Line::SEQ ;
+	$d[L_INDENT]        = $self->[F_INDENT] ;
+	$d[L_PARTS]         = \@parts ;
+	$d[L_PARTS_LENGTH]  = $self->[F_PARTS_LENGTH] ;
+	$d[L_KIND]          = $self->[F_KIND] ;
+	$d[L_ITEMS]         = 1 ;
+	$d[L_LEAFS]         = $self->[F_LEAFS] ;
+	$d[L_CHILD_NESTING] = $self->[F_CHILD_NESTING] ;
+	$d[L_OPENER]        = JSON::JSONFold::Kind::KIND_NONE ;
+	$d[L_CLOSER]        = JSON::JSONFold::Kind::KIND_NONE ;
+	$d[L_CAN_PACK]      = 0 ;
+	$d[L_CAN_JOIN]      = $self->[F_CHILD_NESTING] < $cfg->[JSON::JSONFold::Config::C_JOIN_NESTING] ? 1 : 0 ;
+	$d[L_CAN_GRID]      = ($cfg->[JSON::JSONFold::Config::C_GRID_MAX_LINES] > 0
+						   && $self->[F_ITEMS] <= $self->[F_GRID_LIMIT]) ? 1 : 0 ;
+
+	@{ $self->[F_LINES] } = (bless \@d, 'JSON::JSONFold::Line') ;
+	return ;
+}
+
+sub join_lines {
+	my ($self, $cfg) = @_ ;
+	my $lines = $self->[F_LINES] ;
+	my $n = @$lines ;
+	return if $n < 2 ;
+
+	my $prev = $lines->[0] ;
+	my $write_pos = 1 ;
+
+	for (my $read_pos = 1; $read_pos < $n; $read_pos++) {
+		my $line = $lines->[$read_pos] ;
+		if ($prev->[L_CAN_JOIN]
+			&& $line->[L_CAN_JOIN]
+			&& $prev->can_merge($line, $self->[F_JOIN_LIMIT], $cfg->[JSON::JSONFold::Config::C_WIDTH])) {
+			$prev->merge_line($line) ;
+			$prev->[L_CAN_PACK] = 0 ;
+		}
+		else {
+			$lines->[$write_pos] = $line if $read_pos != $write_pos ;
+			$prev = $line ;
+			$write_pos++ ;
+		}
+	}
+
+	splice(@$lines, $write_pos) if $write_pos < @$lines ;
+	$self->[F_CONTENT_LINES] -= ($n - $write_pos) ;
+	return ;
+}
 
 # -------------------------------------------------------------------------
 # Internal package: counters
@@ -673,7 +855,7 @@ BEGIN {
     JSON::JSONFold::Config->import() ;
 }
 
-our $SEQ ;
+our $SEQ = 0 ;
 use constant {
     W_UNUSED_FIRST => $SEQ++,
     W_FH           => $SEQ++,
@@ -684,19 +866,6 @@ use constant {
     W_DO_CLOSE      => $SEQ++,
     W_UNUSED_LAST  => $SEQ++,
 } ;
-
-BEGIN {
-    our @EXPORT = qw(
-        W_UNUSED_FIRST
-        W_FH
-        W_CFG
-        W_PENDING
-        W_STACK
-        W_STATS
-        W_DO_CLOSE
-        W_UNUSED_LAST
-    ) ;
-}
 
 sub new {
     my ($class, $fh, $config, $do_close) = @_;
@@ -737,7 +906,7 @@ sub write {
         $self->[W_STATS]{lines_in}++;
         my $line_text = $self->[W_PENDING] . substr($s, 0, $nl);
         $self->[W_PENDING] = substr($s, $nl + 1);
-        $self->_feed(JSON::JSONFold::Line->parse($line_text, $self->_parent_kind));
+        $self->_feed(JSON::JSONFold::Line->parse($line_text));
         return $len;
     }
 
@@ -746,7 +915,7 @@ sub write {
     $lines[0] = $self->[W_PENDING] . $lines[0] ;
     $self->[W_PENDING] = pop @lines ;
     for my $part ( @lines ) {
-        $self->_feed(JSON::JSONFold::Line->parse($part, $self->_parent_kind));
+        $self->_feed(JSON::JSONFold::Line->parse($part));
 
     }    
     $self->[W_STATS]{lines_in} += @lines;
@@ -784,33 +953,44 @@ sub _feed {
     my ($self, $line) = @_;
     # Opener
     if ($line->[L_OPENER]) {
-        push @{ $self->[W_STACK] }, JSON::JSONFold::Frame->new(
+		my $frame = JSON::JSONFold::Frame->new(
             kind       => $line->[L_OPENER],
+			indent         => $line->[L_INDENT],
             depth      => scalar(@{ $self->[W_STACK] }),
-            lines      => [ $line ],
             pack_limit => $self->_pack_limit($line->[L_OPENER]),
             fold_limit => $self->_fold_limit($line->[L_OPENER]),
             join_limit => $self->_join_limit($line->[L_OPENER]),
-        );
-        return;
-    }
+			grid_limit     => $self->_grid_limit($line->[L_OPENER]),
+			grid_min_items => $self->_grid_min_items($line->[L_OPENER]),
+		) ;
+		$frame->add_line($line) ;
+		push @{ $self->[W_STACK] }, $frame ;
 
-    # Closer
-    if ($line->[L_CLOSER]) {
-        $self->_close_frame($line, $line->[L_CLOSER]);
-        return;
-    }
+		$self->_mark_no_fold if $line->width > $self->[W_CFG][C_WIDTH] ;
+		return ;
+	}
 
-    # Regular Line
-    if (@{ $self->[W_STACK] }) {
-        my $frame = $self->[W_STACK][-1];
-        $line->[L_CAN_PACK] = 0 if $line->[L_ITEMS] >= $frame->[F_PACK_LIMIT];
-        $line->[L_CAN_JOIN] = 0 if $line->[L_ITEMS] >= $frame->[F_JOIN_LIMIT];
-        $self->_add_to_frame($frame, $line);
-    } else {
-        $self->_write_line($line);
-    }
-    return ;
+	unless (@{ $self->[W_STACK] }) {
+		$self->_write_line($line) ;
+		return ;
+	}
+
+	my $frame = $self->[W_STACK][-1] ;
+
+	if ($line->[L_CLOSER]) {
+		if ($frame->[F_KIND] != $line->[L_CLOSER]) {
+			$frame->[F_FOLD_OK] = 0 ;
+			$frame->[F_GRID_OK] = 0 ;
+		}
+		$frame->add_line($line) ;
+		$self->_close_frame ;
+		return ;
+	}
+
+	$line->[L_CAN_PACK] = 0 if $line->[L_ITEMS] >= $frame->[F_PACK_LIMIT] ;
+	$line->[L_CAN_JOIN] = 0 if $line->[L_ITEMS] >= $frame->[F_JOIN_LIMIT] ;
+	$self->_add_to_frame($frame, $line) ;
+	return ;
 }
 
 sub _emit_lines {
@@ -828,135 +1008,175 @@ sub _emit_lines {
     return
 }
 
-
-
 sub _add_to_frame {
     my ($self, $frame, $line) = @_;
 
-    if (!$frame->is_empty) {
-        return if $line->[L_CAN_PACK] && $self->_try_pack($frame, $line);
-        return if $line->[L_CAN_JOIN] && $self->_try_join($frame, $line);
-
+	if (!$frame->is_empty) {
+		unless ($frame->[F_GRID_OK]) {
+			my $prev = $frame->last_line ;
+			return if $line->[L_CAN_PACK] && $prev->[L_CAN_PACK] && $self->_try_pack($frame, $prev, $line) ;
+			return if $line->[L_CAN_JOIN] && $prev->[L_CAN_JOIN] && $self->_try_join($frame, $prev, $line) ;
+		}
         # If frame is empty, may be it's in "streaming" mode, which
         # mean that lines that can not be packed/joined can be sent
         # directly to the output:
-    } elsif (!$frame->[F_FOLD_OK] && !$line->[L_CAN_PACK] && !$line->[L_CAN_JOIN]) {
+    } elsif (
+        !$frame->[F_FOLD_OK] && !$line->[L_CAN_PACK] && !$line->[L_CAN_JOIN]
+        ) {
         $self->_write_line($line);
         return;
     }
 
-    push @{ $frame->[F_LINES] }, $line;
+	$frame->add_line($line) ;
 
     if ( $frame->[F_FOLD_OK] && $line->width > $self->[W_CFG][C_WIDTH] ) {
         $self->_mark_no_fold ;
     }
 
-    unless ($line->[L_CLOSER]) {
-        $frame->[F_CONTENT_LINES]++;
-        $frame->update_add($line) ;
-        if ( $frame->[F_FOLD_OK] ) {
-            $self->_mark_no_fold unless $self->_check_fold_limits($frame) 
-        }
-    }
+	unless ($line->[L_CLOSER]) {
+		if ($frame->[F_FOLD_OK] && !$frame->check_fold_limits($self->[W_CFG])) {
+			$self->_mark_no_fold ;
+		}
 
-    $self->_stream_frame($frame) unless $frame->[F_FOLD_OK];
-    return
-}
+		if ($frame->[F_GRID_OK] && !$line->[L_CAN_GRID]) {
+			$self->_mark_no_grid ;
+			$frame->join_lines($self->[W_CFG]) ;
+		}
+	}
 
-sub _can_merge {
-    my ($self, $prev, $line, $limit) = @_;
-    return $prev->[L_INDENT] == $line->[L_INDENT]
-        && $prev->[L_ITEMS] + $line->[L_ITEMS] <= $limit
-        && $prev->[L_INDENT] + length($prev->[L_TEXT]) + 1 + length($line->[L_TEXT]) <= $self->[W_CFG][C_WIDTH];
+	$self->_stream_frame($frame) unless $frame->[F_FOLD_OK] || $frame->[F_GRID_OK] ;
+	return ;
 }
 
 sub _merge_into_frame {
     my ($self, $frame, $prev, $line) = @_;
-    $prev->join_line($line);
-    $frame->update_add($line) ;
+	$prev->merge_line($line) ;
 
-    $prev->[L_CAN_PACK] = 0 if $prev->[L_ITEMS] >= $frame->[F_PACK_LIMIT];
-    $prev->[L_CAN_JOIN] = 0 if $prev->[L_ITEMS] >= $frame->[F_JOIN_LIMIT];
-    if ( $frame->[F_FOLD_OK] ) {
-        unless ( $self->_check_fold_limits($frame)) {
+	$prev->[L_CAN_PACK] = 0
+		if $prev->[L_ITEMS] >= $frame->[F_PACK_LIMIT]
+		|| $prev->[L_CHILD_NESTING] >= $self->[W_CFG][C_PACK_NESTING] ;
+
+	$prev->[L_CAN_JOIN] = 0
+		if $prev->[L_ITEMS] >= $frame->[F_JOIN_LIMIT]
+		|| $prev->[L_CHILD_NESTING] >= $self->[W_CFG][C_JOIN_NESTING] ;
+
+	$frame->update_stats($line) ;
+
+	if ($frame->[F_FOLD_OK] && !$frame->check_fold_limits($self->[W_CFG])) {
             $self->_mark_no_fold ;
             $self->_stream_frame($frame) ;
-        }
     }
 }
 
 sub _try_pack {
-    my ($self, $frame, $line) = @_;
-
-    return 0 if $frame->[F_PACK_LIMIT] <= 1 || !$line->[L_CAN_PACK] ||
-        $frame->is_empty;
-
-    my $prev = $frame->last_line;
-    return 0 unless $prev->[L_CAN_PACK]
-        && $prev->[L_CHILD_NESTING] < $self->[W_CFG][C_PACK_NESTING]
-        && $self->_can_merge($prev, $line, $frame->[F_PACK_LIMIT]);
+	my ($self, $frame, $prev, $line) = @_ ;
+	return 0 if $frame->[F_PACK_LIMIT] <= 1 ;
+	return 0 unless $prev->can_merge($line, $frame->[F_PACK_LIMIT], $self->[W_CFG][C_WIDTH]) ;
     $self->_merge_into_frame($frame, $prev, $line);
-    # Disable join, or pack limits reached
     $prev->[L_CAN_JOIN] = 0 unless $prev->[L_CAN_PACK] ;
     return 1;
 }
 
+sub _try_grid {
+	my ($self, $frame) = @_ ;
+	return 0 if $frame->[F_KIND] != JSON::JSONFold::Kind::KIND_LIST ;
+
+	my $line_count = @{ $frame->[F_LINES] } - 2 ;
+	return 0 if $line_count < 2
+		|| $line_count < $self->[W_CFG][C_GRID_MIN_LINES]
+		|| $line_count > $self->[W_CFG][C_GRID_MAX_LINES] ;
+
+	my @lines = @{ $frame->[F_LINES] }[1 .. @{ $frame->[F_LINES] } - 2] ;
+	return 0 unless @lines ;
+
+	my $first = $lines[0] ;
+	my $part_count = @{ $first->[L_PARTS] } ;
+	return 0 if $part_count < 4 || ($part_count - 2) < $frame->[F_GRID_MIN_ITEMS] ;
+
+	for my $line (@lines) {
+		return 0 if @{ $line->[L_PARTS] } != $part_count ;
+	}
+
+	if ($first->[L_KIND] == JSON::JSONFold::Kind::KIND_DICT) {
+		my $sig = $first->dict_signature ;
+		return 0 unless defined $sig ;
+		for my $line (@lines) {
+			my $line_sig = $line->dict_signature ;
+			return 0 unless defined $line_sig && $line_sig eq $sig ;
+		}
+	}
+
+	my @widths ;
+	for my $i (0 .. $part_count - 1) {
+		my $max = 0 ;
+		for my $line (@lines) {
+			my $len = length($line->[L_PARTS][$i]) ;
+			$max = $len if $len > $max ;
+		}
+		push @widths, $max ;
+	}
+
+	my $grided_length = -1 ;
+	$grided_length += 1 + $_ for @widths ;
+	return 0 if $frame->[F_LINES][0][L_INDENT] + $grided_length > $self->[W_CFG][C_WIDTH] ;
+
+	for my $line (@lines) {
+		$line->apply_grid(\@widths) ;
+		$line->[L_CAN_PACK] = 0 ;
+		$line->[L_CAN_JOIN] = 0 ;
+		$line->[L_CAN_GRID] = 0 ;
+	}
+	return 1 ;
+}
+
 sub _try_join {
-    my ($self, $frame, $line) = @_;
-
-    return 0 if $frame->[F_JOIN_LIMIT] <= 1 ||
-        !$line->[L_CAN_JOIN] || $line->[L_CHILD_NESTING] >= $self->[W_CFG][C_JOIN_NESTING] ||
-        $frame->is_empty;
-
-    my $prev = $frame->last_line;
-    return 0 unless $prev->[L_CAN_JOIN]
-        && $prev->[L_CHILD_NESTING] < $self->[W_CFG][C_JOIN_NESTING]
-        && $self->_can_merge($prev, $line, $frame->[F_JOIN_LIMIT]);
+    my ($self, $frame, $prev, $line) = @_;
+	return 0 if $frame->[F_JOIN_LIMIT] <= 1 ;
+	return 0 unless $prev->can_merge($line, $frame->[F_JOIN_LIMIT], $self->[W_CFG][C_WIDTH]) ;
     $self->_merge_into_frame($frame, $prev, $line);
     return 1;
 }
 
-sub _check_fold_limits {
-    my ($self, $frame) = @_;
 
-    return if $frame->[F_CONTENT_LINES] > 1 ;
-    return if $frame->[F_ITEMS] > $frame->[F_FOLD_LIMIT] ;
-    return if $frame->[F_CHILD_NESTING] >= $self->[W_CFG][C_FOLD_NESTING] ;
-    return 1 ;
-}
 
 sub _close_frame {
-    my ($self, $closer, $closing_kind) = @_;
-    unless (@{ $self->[W_STACK] }) {
-        $self->_write_line($closer);
-        return;
-    }
+	my ($self) = @_ ;
 
-    # Frame is removed/destroyed
     my $frame = pop @{ $self->[W_STACK] };
-    my $lines = $frame->[F_LINES] ;
-    push @$lines, $closer ;
-#   MAYBE: $frame->[F_FOLD_OK] = 0 if $frame->[F_KIND] != $closing_kind;
 
-    if ( my $folded = $self->_try_fold($frame)) {
-        $lines = [ $folded ] ;
-    }
-    $self->_emit_lines($lines);
+	if ($frame->[F_GRID_OK]) {
+		if ($self->_try_grid($frame)) {
+			$self->_mark_no_grid ;
+		}
+		else {
+			$self->_mark_no_grid ;
+			$frame->join_lines($self->[W_CFG]) ;
+			$frame->[F_FOLD_OK] = $frame->check_fold_limits($self->[W_CFG]) ;
+		}
+	}
+
+	if ($frame->[F_FOLD_OK]) {
+		if ($self->_try_fold($frame)) {
+			if (@{ $self->[W_STACK] } && $frame->[F_LINES][0][L_CAN_GRID]) {
+				my $parent = $self->[W_STACK][-1] ;
+				$parent->[F_GRID_OK] = 1 if $parent->[F_CONTENT_LINES] == 0 ;
+			}
+		}
+	}
+
+	$self->_emit_lines($frame->[F_LINES]) ;
+	return ;
 }
 
 sub _try_fold {
-    my ($self, $frame) = @_;
-    return undef if !$frame->[F_FOLD_OK] || $frame->[F_CONTENT_LINES] != 1 || @{ $frame->[F_LINES] } != 3;
+	my ($self, $frame) = @_ ;
+	return 0 if !$frame->[F_FOLD_OK]
+		|| $frame->[F_CONTENT_LINES] != 1
+		|| @{ $frame->[F_LINES] } != 3
+		|| $frame->[F_INDENT] + $frame->[F_PARTS_LENGTH] > $self->[W_CFG][C_WIDTH] ;
 
-    my $folded_len = -1;
-    $folded_len += 1 + length($_->[L_TEXT]) for @{ $frame->[F_LINES] };
-    return undef if $frame->[F_LINES][0][L_INDENT] + $folded_len > $self->[W_CFG][C_WIDTH];
-
-    return JSON::JSONFold::Line->fold(
-        $frame->[F_LINES],
-        $frame->[F_LEAFS],
-        $frame->[F_CHILD_NESTING],
-    );
+	$frame->fold_lines($self->[W_CFG]) ;
+	return 1 ;
 }
 
 sub _stream_frame {
@@ -980,8 +1200,15 @@ sub _mark_no_fold {
     $_->[F_FOLD_OK] = 0 for @{ $self->[W_STACK] };
 }
 
+sub _mark_no_grid {
+	my ($self) = @_ ;
+	$_->[F_GRID_OK] = 0 for @{ $self->[W_STACK] } ;
+	return ;
+}
+
 sub _write_line {
     my ($self, $line) = @_ ;
+    $self->[W_STATS]{lines_out} ++ ;
     return $self->_write_str($line->raw) ;
 }
 
@@ -990,16 +1217,9 @@ sub _write_str {
 
     $self->[W_FH]->print($s) ;
     $self->[W_STATS]{bytes_out} += length($s);
-    $self->[W_STATS]{lines_out} += _count_newlines($s);
     return length($s);
 }
 
-sub _parent_kind {
-    my ($self) = @_ ;
-    my $stack = $self->[W_STACK] ;
-    return unless @$stack ;
-    return @$stack ? $stack->[-1][F_KIND] : JSON::JSONFold::Kind::KIND_NONE ;
-}
 
 sub _choose_limit {
     my ($kind, $list, $dict) = @_;
@@ -1007,22 +1227,28 @@ sub _choose_limit {
          : $kind == JSON::JSONFold::Kind::KIND_DICT() ? $dict
          : 0;
 }
+
 sub _pack_limit { _choose_limit($_[1], $_[0][W_CFG][C_PACK_ARRAY_ITEMS], $_[0][W_CFG][C_PACK_OBJ_ITEMS]) }
 sub _fold_limit { _choose_limit($_[1], $_[0][W_CFG][C_FOLD_ARRAY_ITEMS], $_[0][W_CFG][C_FOLD_OBJ_ITEMS]) }
 sub _join_limit { _choose_limit($_[1], $_[0][W_CFG][C_JOIN_ARRAY_ITEMS], $_[0][W_CFG][C_JOIN_OBJ_ITEMS]) }
+sub _grid_limit { _choose_limit($_[1], $_[0][W_CFG][C_GRID_ARRAY_ITEMS], $_[0][W_CFG][C_GRID_OBJ_ITEMS]) }
+sub _grid_min_items { _choose_limit($_[1], $_[0][W_CFG][C_GRID_ARRAY_MIN], $_[0][W_CFG][C_GRID_OBJ_MIN]) }
 sub _count_newlines { return ($_[0] =~ tr/\n//) }
+
+# -------------------------------------------------------------------------
+# CLI
+# -------------------------------------------------------------------------
 
 package JSON::JSONFold::CLI ;
 
+use strict ;
+use warnings ;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
     demo_data
     run
 ) ;
-
-use strict;
-use warnings;
 
 sub setup {
     require Carp ;
@@ -1078,11 +1304,9 @@ sub parse_options {
         'compact=s'  => \$opt{compact},
         'indent=i'   => \$opt{indent},
         'sort-keys!' => \$opt{sort_keys},
+    );
 
-        'width=i'            => \$opt{width},
-    ) or die "Try --help\n";
-
-    return \%opt;
+	return \%opt ;
 }
 
 sub usage {
@@ -1091,7 +1315,7 @@ sub usage {
 Usage: json-jsonfold [options] < input.json
 
   --demo
-  --compact=default|none|low|med|high|max|pack|fold|join|off
+  --compact=default|classic|none|low|med|high|max|grid|pack|fold|join|off
   --width=N
   --indent=N
   --sort-keys
@@ -1192,7 +1416,7 @@ JSON::JSONFold - compact, readable JSON formatting
 
     # Streaming interface
 
-    my $formatter = create_formatter(\*STDOUT, 100, 'default');
+    my $formatter = create_writer(\*STDOUT, 100, 'default');
 
     $formatter->write($text);
     $formatter->finish;
@@ -1240,7 +1464,7 @@ The following functions are exported by default:
 The following functions are exported on request:
 
     jsonfold_config
-    create_formatter
+    create_writer
 
 
 =head1 FUNCTIONAL INTERFACE
@@ -1340,9 +1564,9 @@ Alias for C<format>, provided for compatibility with JSON-style APIs.
 
 =head1 STREAMING INTERFACE
 
-=head2 create_formatter
+=head2 create_writer
 
-    my $formatter = create_formatter($fh, $width, $config, %overrides);
+    my $formatter = create_writer($fh, $width, $config, %overrides);
 
 Creates a streaming formatter around an existing filehandle.
 
@@ -1354,7 +1578,7 @@ The returned object accepts pretty-printed JSON text incrementally and writes
 folded JSON to C<$fh>. This allows JSONFold to be used as a streaming
 post-processor without buffering the entire document in memory.
 
-    my $formatter = create_formatter(\*STDOUT, 100, 'default');
+    my $formatter = create_writer(\*STDOUT, 100, 'default');
 
     $formatter->write("{\n");
     $formatter->write(qq(  "name": "Alice"\n));
@@ -1372,7 +1596,7 @@ The returned object is a L<JSON::JSONFold::Writer> and supports:
     stats()
 
 Normally, users should prefer C<format_json>, C<write_json>, or the object
-interface. C<create_formatter> is intended for advanced use cases and
+interface. C<create_writer> is intended for advanced use cases and
 integration with existing serializers and streaming APIs.
 
 =head1 JSON-COMPATIBLE FUNCTIONS

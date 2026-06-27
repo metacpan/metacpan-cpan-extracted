@@ -16,7 +16,7 @@ package FacadeApp::Controller::Test::Facade {
 	async sub send_something_later ($self)
 	{
 		await $self->app->loop->delay_future(after => 0.5);
-		await $self->res->text('Something');
+		$self->res->text('Something');
 	}
 }
 
@@ -41,6 +41,38 @@ package FacadeApp::Controller::Test {
 			'/good' => {
 				to => async sub ($self, $ctx) {
 					await $ctx->send_something_later;
+					return;
+				}
+			}
+		);
+
+		# ditto, but return a promise instead of awaiting
+		$router->add(
+			'/good2' => {
+				to => sub ($self, $ctx) {
+					return $ctx->send_something_later;
+				}
+			}
+		);
+
+		# this is also good, because calling send_res explicitly should not
+		# hurt TH as a whole.
+		$router->add(
+			'/good_send' => {
+				to => async sub ($self, $ctx) {
+					await $ctx->send_something_later;
+					await $ctx->send_res;
+				}
+			}
+		);
+
+		# ditto, but less confidently
+		$router->add(
+			'/good_send2' => {
+				to => async sub ($self, $ctx) {
+					$ctx->consume;
+					await $ctx->send_something_later;
+					await $ctx->try_send_res;
 					return;
 				}
 			}
@@ -86,6 +118,27 @@ my $app = FacadeApp->new;
 
 subtest 'should render /good' => sub {
 	http $app, GET '/good';
+	http_status_is 200;
+	http_header_is 'Content-Type', 'text/plain; charset=utf-8';
+	http_text_is 'Something';
+};
+
+subtest 'should render /good2' => sub {
+	http $app, GET '/good2';
+	http_status_is 200;
+	http_header_is 'Content-Type', 'text/plain; charset=utf-8';
+	http_text_is 'Something';
+};
+
+subtest 'should render /good_send' => sub {
+	http $app, GET '/good_send';
+	http_status_is 200;
+	http_header_is 'Content-Type', 'text/plain; charset=utf-8';
+	http_text_is 'Something';
+};
+
+subtest 'should render /good_send2' => sub {
+	http $app, GET '/good_send2';
 	http_status_is 200;
 	http_header_is 'Content-Type', 'text/plain; charset=utf-8';
 	http_text_is 'Something';

@@ -54,20 +54,20 @@ package HooksApp {
 	{
 		$self->set_render_error_called($self->render_error_called + 1);
 		$message //= "app error: $code";
-		await $ctx->res->status($code)->text($message);
+		$ctx->res->status($code)->text($message);
 	}
 
 	async sub render_response ($self, $controller, $ctx, $result)
 	{
 		$self->set_render_response_called($self->render_response_called + 1);
-		await $ctx->res->text($result);
+		$ctx->res->text($result);
 	}
 
 	async sub on_error ($self, $controller, $ctx, $error)
 	{
 		$self->set_on_error_called($self->on_error_called + 1);
 		die $error unless $error isa 'Gears::X::HTTP';
-		await +($controller // $self->controller)->render_error($ctx, $error->code, "app caught: " . $error->code);
+		await + ($controller // $self->controller)->render_error($ctx, $error->code, "app caught: " . $error->code);
 	}
 
 	async sub on_startup ($self, $state)
@@ -140,21 +140,21 @@ package HooksApp::Controller::CustomHooks {
 	async sub render_response ($self, $ctx, $result)
 	{
 		$self->set_render_response_called($self->render_response_called + 1);
-		await $ctx->res->text($result);
+		$ctx->res->text($result);
 	}
 
 	async sub render_error ($self, $ctx, $code, $message = undef)
 	{
 		$self->set_render_error_called($self->render_error_called + 1);
 		$message //= "custom error: $code";
-		await $ctx->res->status($code)->text($message);
+		$ctx->res->status($code)->text($message);
 	}
 
 	async sub on_error ($self, $ctx, $error)
 	{
 		$self->set_on_error_called($self->on_error_called + 1);
 		die $error unless $error isa 'Gears::X::HTTP';
-		await $self->render_error($ctx, $error->code, "custom caught: " . $error->code);
+		$self->render_error($ctx, $error->code, "custom caught: " . $error->code);
 	}
 }
 

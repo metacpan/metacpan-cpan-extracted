@@ -1,0 +1,84 @@
+# Revision history for PAGI-Server
+
+0.002001 - 2026-06-26
+
+  Bug Fixes
+  - t/lifespan-post-startup-failure.t now skips when the optional
+    Future::IO::Impl::IOAsync backend is unavailable, instead of dying at
+    compile time. The test use'd Future::IO unconditionally while Future::IO
+    is only a `recommends`, so 0.002000 failed to install on a clean smoker
+    without it. Now guarded the same way as t/05-sse.t.
+
+0.002000 - 2026-06-26
+
+  Distribution
+  - PAGI::Server and bin/pagi-server split out of the PAGI distribution
+    into their own distribution. Git history preserved from the original
+    repository (https://github.com/jjn1056/pagi).
+  - The application runner now ships here as PAGI::Server::Runner (relocated
+    from PAGI-Tools). pagi-server stays server-agnostic and threads its
+    PAGI::Server-specific options through to the configured server class.
+
+  PAGI 0.3 spec conformance
+  - feat: declare PAGI 0.3 conformance — scopes emit version and
+    spec_version 0.3.
+  - feat(ws/h2): WebSocket Denial Response — an application may send an HTTP
+    response instead of accepting the handshake, over both HTTP/1.1 and HTTP/2.
+  - feat(h2): HTTP/2 responses now carry a server-supplied Date header.
+  - fix(server): populate the WebSocket disconnect reason/code on the
+    disconnect event; renamed the queue_overflow close path.
+  - feat(server): fire on_complete on clean HTTP request completion, distinct
+    from the abnormal-disconnect Future; the lifespan scope state is a
+    documented HashRef.
+  - fix(server): drop non-spec scope keys — pagi.features from all scopes, and
+    pagi.connection from HTTP/2 WebSocket/SSE scopes.
+
+  Backpressure / flow control
+  - feat: pagi.transport flow-control handle on HTTP, WebSocket and SSE scopes
+    (HTTP/1.1, plus HTTP/2 streaming responses and SSE-over-HTTP/2), exposing
+    buffered_amount and edge-triggered on_high_water / on_drain watermark
+    callbacks.
+  - fix(h2): bound streaming backpressure on the per-stream send queue rather
+    than the shared TCP buffer, and break a transport_state reference cycle at
+    stream teardown.
+  - feat(cli): expose --write-high-watermark and --write-low-watermark on
+    pagi-server, threading the write backpressure watermarks through to the
+    server constructor (previously settable only via the constructor API).
+
+  Lifespan
+  - feat(lifespan): lifespan_mode (auto|on|off) and a matching --lifespan CLI
+    flag.
+  - feat(lifespan): bound startup with lifespan_startup_timeout (default 30s).
+  - fix(lifespan): treat a clean lifespan decline as unsupported rather than an
+    error, and log the exception text when a startup raise is treated as
+    unsupported.
+  - fix(lifespan): surface post-startup lifespan-app failures. A long-lived
+    lifespan or background task that died after startup completed was caught by
+    a bare eval and silently discarded — no log, server kept running. Such
+    failures are now logged at error level; the pre-startup "lifespan not
+    supported" auto-detection is unchanged.
+
+  Security / robustness
+  - feat(h2): h2_rst_rate_limit — explicit, tunable HTTP/2 Rapid Reset
+    (CVE-2023-44487) defense; corrected the max_concurrent_streams POD claim.
+  - fix(tls): negotiate TLS 1.3 and compute cipher_suite; drop non-spec TLS
+    extension keys.
+  - fix(http): return 500 when an application returns without starting a
+    response.
+  - fix(worker): the master exits non-zero when every worker fails lifespan
+    startup, instead of holding the listening socket with nothing serving
+    (no zombie master).
+
+  Performance
+  - perf: coalesce response writes, add ASCII fast paths, and debounce the
+    idle timer.
+
+  Maintenance
+  - chore: remove the dead on_error option.
+  - docs: documentation-accuracy pass — corrected POD/README claims that
+    contradicted the code (Server.pm options, Compliance.pod CL+TE handling,
+    the HTTP1 protocol surface, and example outputs) and documented
+    previously-undocumented options.
+
+  - For changes prior to 0.002000, see the Changes file of the PAGI
+    distribution (versions up to 0.001023).

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -52,8 +52,8 @@ my $build = $class->new(
     'Module::Build' => '0.34'
   },
   'configure_requires' => {
-    'Config::Model' => '2.141',
-    'Config::Model::Itself' => '2.022',
+    'Config::Model' => '2.163',
+    'Config::Model::Itself' => '2.031',
     'Getopt::Long' => '0',
     'Module::Build' => '0.34',
     'Path::Tiny' => '0'

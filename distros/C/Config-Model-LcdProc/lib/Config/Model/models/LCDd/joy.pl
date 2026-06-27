@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,14 +9,20 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'Device' => 'Select the input device to use ',
+      'Map_Axis1neg' => 'set the axis map',
+      'Map_Button1' => 'set the button map'
+    },
     'element' => [
       'Device',
       {
-        'description' => 'Select the input device to use ',
         'type' => 'leaf',
         'upstream_default' => '/dev/js0',
         'value_type' => 'uniline'
@@ -24,7 +30,6 @@ return [
       'Map_Axis1neg',
       {
         'default' => 'Left',
-        'description' => 'set the axis map',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -49,7 +54,6 @@ return [
       'Map_Button1',
       {
         'default' => 'Enter',
-        'description' => 'set the button map',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -64,4 +68,3 @@ return [
   }
 ]
 ;
-

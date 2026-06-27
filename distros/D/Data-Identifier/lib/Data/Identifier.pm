@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.30;
+our $VERSION = v0.31;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
@@ -345,12 +345,16 @@ sub new {
                 $type = 'uri';
                 $id = $id->to_string;
             } elsif ($id->isa('Data::URIID::Result')) {
-                $opts{displayname} //= sub { return $from->attribute('displayname', default => undef) };
+                $opts{displayname}   //= sub { return $from->attribute('displayname',   default => undef) };
+                $opts{description}   //= sub { return $from->attribute('description',   default => undef) };
+                $opts{displaycolour} //= sub { return $from->attribute('displaycolour', default => undef) };
+                $opts{icontext}      //= sub { return $from->attribute('icon_text',     default => undef) };
                 $type = $id->id_type;
                 $id   = $id->id;
             } elsif ($id->isa('Data::URIID::Base') || $id->isa('Data::URIID::Colour') || $id->isa('Data::URIID::Service')) {
                 #$opts{displayname} //= $id->name if $id->isa('Data::URIID::Service');
                 $opts{displayname} //= $id->displayname(default => undef, no_defaults => 1);
+                $opts{displaycolour} //= $id if $id->isa('Data::URIID::Colour');
                 $type = 'ise';
                 $id   = $id->ise;
             } elsif ($id->isa('Data::TagDB::Tag')) {
@@ -434,6 +438,11 @@ sub new {
         } elsif ($uri =~ m#^urn:oid:([0-2](?:\.(?:0|[1-9][0-9]*))+)\z#) {
             $id = $1;
             $type = $well_known{oid};
+        } elsif ($uri =~ m#^urn:isbn:([0-9Xx-]+)\z# && scalar(eval {require Business::ISBN; 1})) {
+            $id   = Business::ISBN->new($1)->as_isbn13->as_string([]);
+            $type = $well_known{gtin};
+            $self->{id_cache} //= {};
+            $self->{id_cache}{WK_URI()} //= $uri;
         } elsif ($uri =~ m#^https?://www\.wikidata\.org/entity/([QPL][1-9][0-9]*)\z#) {
             $id = $1;
             $type = $well_known{wd};
@@ -478,7 +487,7 @@ sub new {
     $self->{type} = $type;
     $self->{id} = $id;
 
-    foreach my $key (qw(validate namespace generator request generate displayname)) {
+    foreach my $key (qw(validate namespace generator request generate displayname displaycolour icontext description)) {
         next unless defined $opts{$key};
         $self->{$key} //= $opts{$key};
     }
@@ -844,6 +853,15 @@ sub null_to_undef {
 }
 
 
+sub is_null {
+    my ($self, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    return !defined Data::Identifier::null_to_undef($self);
+}
+
+
 #@returns __PACKAGE__
 sub namespace {
     my ($self, %opts) = @_;
@@ -938,9 +956,42 @@ sub displayname {
 }
 
 
-sub displaycolour { my ($self, %opts) = @_; return $opts{default}; }
-sub icontext { my ($self, %opts) = @_; return $opts{default}; }
-sub description { my ($self, %opts) = @_; return $opts{default}; }
+sub displaycolour {
+    my ($self, %opts) = @_;
+
+    if (defined(my $value = $self->{displaycolour})) {
+        $value = $self->$value() if ref($value) eq 'CODE';
+
+        # recheck and return as any of the above conversions could result in $displayname becoming invalid.
+        return $value if defined($value) && length($value);
+    }
+
+    return $opts{default};
+}
+sub icontext {
+    my ($self, %opts) = @_;
+
+    if (defined(my $value = $self->{icontext})) {
+        $value = $self->$value() if ref $value;
+
+        # recheck and return as any of the above conversions could result in $displayname becoming invalid.
+        return $value if defined($value) && length($value);
+    }
+
+    return $opts{default};
+}
+sub description {
+    my ($self, %opts) = @_;
+
+    if (defined(my $value = $self->{description})) {
+        $value = $self->$value() if ref $value;
+
+        # recheck and return as any of the above conversions could result in $displayname becoming invalid.
+        return $value if defined($value) && length($value);
+    }
+
+    return $opts{default};
+}
 
 
 sub tagname {
@@ -1051,7 +1102,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.30
+version v0.31
 
 =head1 SYNOPSIS
 
@@ -1546,6 +1597,19 @@ Otherwise returns the identifier itself.
 If C<$identifier> is not an instance of this package is parsed as with C<from> in L</new>.
 In this case it's undefined if the orginal value or an instance of this package is returned.
 
+=head2 is_null
+
+    my $bool = $identifier->is_null; # $identifier must be non-undef
+    # or:
+    my $bool = Data::Identifier::is_null($identifier); # $identifier can be undef
+
+(experimental since v0.31)
+
+Returns a Perl boolean indicating if the identifier represents a null value.
+C<undef> is understood as a legal null value.
+
+The same rules as per L</null_to_undef> apply.
+
 =head2 namespace
 
     my Data::Identifier $namespace = $identifier->namespace( [ %opts ] );
@@ -1671,7 +1735,7 @@ It is undefined (since v0.29) if this includes names known by L</tagname>.
 These functions return C<undef>. They are for compatibility with L<Data::TagDB::Tag>.
 
 B<Note:>
-Future versions of those methods will C<die> if no value is found (most likely) unless C<default> is given.
+Starting with version C<v0.33> of this module those methods will C<die> if no value is found (most likely) unless C<default> is given.
 
 B<Note:>
 Future versions may return some actual data.
@@ -1691,6 +1755,10 @@ This option is accepted but ignored.
 This is for compatibility with L</displayname> and implementations of other packages.
 
 =back
+
+B<See also:>
+L<Data::Displaycolour>,
+L<Data::IconText>.
 
 =head2 tagname
 

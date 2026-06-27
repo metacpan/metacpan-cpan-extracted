@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,10 +9,22 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'PauseKey' => 'keypad settings
+Keyname      Function
+             Normal context              Menu context
+-------      --------------              ------------
+PauseKey     Pause/Continue              Enter/select
+BackKey      Back(Go to previous screen) Up/Left
+ForwardKey   Forward(Go to next screen)  Down/Right
+MainMenuKey  Open main menu              Exit/Cancel'
+    },
     'element' => [
       'BackKey',
       {
@@ -41,14 +53,6 @@ return [
       'PauseKey',
       {
         'default' => 'LeftKey',
-        'description' => 'keypad settings
-Keyname      Function
-             Normal context              Menu context
--------      --------------              ------------
-PauseKey     Pause/Continue              Enter/select
-BackKey      Back(Go to previous screen) Up/Left
-ForwardKey   Forward(Go to next screen)  Down/Right
-MainMenuKey  Open main menu              Exit/Cancel',
         'type' => 'leaf',
         'value_type' => 'uniline'
       }
@@ -57,4 +61,3 @@ MainMenuKey  Open main menu              Exit/Cancel',
   }
 ]
 ;
-

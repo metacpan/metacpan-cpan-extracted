@@ -22,6 +22,11 @@ t/0006-new-features.t
 t/0007-extcmd-env.t
 t/0008-nested-subst.t
 t/0009-new-vars.t
+t/0010-sh-arrays.t
+t/0011-cmd-call-args.t
+t/0012-cmd-sub-labels.t
+t/0013-sh-case.t
+t/0014-sh-trap.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t
@@ -39,6 +44,10 @@ eg/04_sh_features.batsh
 eg/05_cmd_comprehensive.batsh
 eg/06_sh_comprehensive.batsh
 eg/07_mixed_comprehensive.batsh
+eg/08_sh_arrays.batsh
+eg/09_cmd_subroutines.batsh
+eg/10_sh_case.batsh
+eg/11_sh_trap.batsh
 doc/batsh_cheatsheet.BM.txt
 doc/batsh_cheatsheet.BN.txt
 doc/batsh_cheatsheet.EN.txt

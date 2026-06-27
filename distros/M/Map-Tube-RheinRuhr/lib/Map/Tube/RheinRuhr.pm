@@ -14,7 +14,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.2.4');
+our $VERSION = version->declare('v0.2.5');
 
 =encoding utf8
 
@@ -44,7 +44,7 @@ with 'Map::Tube';
 =head1 DESCRIPTION
 
 This module allows to find the shortest route between any two given tube
-stations in the Rhein/Ruhr area of Germany, including Düsseldorf and the Ruhrgebiet.
+stations in the Rhein/Ruhr area of Germany, including Duesseldorf and the Ruhrgebiet.
 All interesting methods are provided by the role L<Map::Tube>.
 
 =head1 METHODS
@@ -72,7 +72,7 @@ the constructor will die.
 =head1 BUGS
 
 Please report any bugs or feature requests through the web interface at
-https://github.com/gwselke/Map-Tube-RheinRuhr/issues. I will be
+L<https://github.com/gwselke/Map-Tube-RheinRuhr/issues>. I will be
 notified and then you'll automatically be notified of progress on your
 bug when (and if) I make changes.
 

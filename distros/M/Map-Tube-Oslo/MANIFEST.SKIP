@@ -63,3 +63,4 @@
 
 ^\.travis\.yml$
 ^Map-Tube-Oslo-.*.tar.gz$
+^Map-Tube-Oslo-.*.tar.gz.signature.json$

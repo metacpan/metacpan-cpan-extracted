@@ -1,0 +1,28 @@
+#!/bin/sh
+# BATsh example 11: SH trap / signal handling (BATsh::SH, v0.06)
+# Run: perl lib/BATsh.pm eg/11_sh_trap.batsh
+
+# An EXIT trap runs when the script ends -- handy for cleanup.  The handler
+# is expanded when it fires, so it sees the final value of $work.
+trap 'echo "cleanup: would remove $work"' EXIT
+
+work=/tmp/batsh_demo_data
+echo "doing some work with $work"
+
+# Register a handler for a real signal.  trap bridges to Perl's %SIG, so a
+# delivered INT (Ctrl-C) would run this instead of terminating the script.
+trap 'echo "(would handle interrupt here)"' INT
+echo "INT handler installed"
+
+# Inspect the currently-registered traps.
+echo "current traps:"
+trap
+
+# Ignoring and then restoring a signal.
+trap '' INT
+echo "INT now ignored"
+trap - INT
+echo "INT restored to default"
+
+echo "main work finished"
+# The EXIT trap fires automatically here, after the last line.

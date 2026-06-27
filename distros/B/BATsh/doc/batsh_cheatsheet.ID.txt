@@ -229,4 +229,52 @@ bagian dijalankan apa adanya oleh shell yang sesuai.
   cmd1 || cmd2    jalankan cmd2 hanya jika cmd1 gagal
   cmd1 ; cmd2     jalankan cmd2 tanpa syarat
 
+15. Array SH
+------------
+  arr=(a b c)            # literal array berindeks
+  arr+=(d e)             # tambahkan elemen
+  arr[5]=x               # tetapkan berdasarkan indeks
+  declare -a list        # deklarasikan array berindeks
+  declare -A map         # deklarasikan array asosiatif
+  map[key]=value         # penetapan asosiatif
+  map=([k1]=v1 [k2]=v2)  # literal asosiatif
+
+  ${arr[0]}    elemen 0  ($arr sama dengan ${arr[0]})
+  ${arr[-1]}   elemen terakhir
+  ${arr[@]}    semua elemen (pisah-kata)
+  ${arr[*]}    semua elemen (satu kata)
+  ${#arr[@]}   jumlah elemen
+  ${#arr[2]}   panjang elemen 2
+  ${!arr[@]}   daftar indeks (atau kunci)
+  unset arr[1] # hapus satu elemen
+  unset arr    # hapus seluruh array
+
+16. Pernyataan case SH
+----------------------
+  case $x in
+      a|b|c)      echo "a, b atau c" ;;    # |  -- beberapa pola
+      [0-9])      echo "satu digit"  ;;    # [..]  kelas karakter
+      [!aeiou])   echo "konsonan"    ;;    # [!..] kelas negasi
+      data*)      echo "awalan"      ;;    # *  dan  ?  glob
+      "*")        echo "bintang"     ;;    # dikutip = cocok harfiah
+      *)          echo "bawaan"      ;;    # *)  klausa bawaan
+  esac
+
+  Terminator klausa (setelah tiap badan):
+    ;;    berhenti di sini (kasus normal)
+    ;&    lanjut menjalankan badan klausa berikutnya
+    ;;&   terus menguji pola yang tersisa
+
+17. trap dan Sinyal SH
+----------------------
+  trap 'echo bye' EXIT       # jalan saat skrip berakhir (atau saat exit)
+  trap 'rm -f $tmp' EXIT     # handler diekspansi saat dipicu
+  trap 'echo got INT' INT    # jembatani sinyal nyata lewat %SIG
+  trap '' INT                # abaikan sinyal
+  trap - INT                 # pulihkan aksi bawaan
+  trap                       # daftar trap saat ini (juga: trap -p)
+
+  SIGSPEC: nama (INT atau SIGINT), nomor (2), atau EXIT (= 0).
+  EXIT jalan sekali di akhir; nama nyata memasang handler %SIG Perl.
+
 Lihat juga: https://metacpan.org/dist/BATsh

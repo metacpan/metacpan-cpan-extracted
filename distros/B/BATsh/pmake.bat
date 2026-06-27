@@ -24,7 +24,7 @@ package pmake;
 # Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$PMAKE_BAT_VERSION = '0.37';
+$PMAKE_BAT_VERSION = '0.39';
 $PMAKE_BAT_VERSION = $PMAKE_BAT_VERSION;
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
@@ -1525,6 +1525,12 @@ sub _sc_slurp_lines {
     return @lines;
 }
 
+sub _sc_has_non_usascii {
+    my ($path) = @_;
+    my $raw = _sc_slurp($path);
+    return ($raw =~ /[^\x00-\x7f]/) ? 1 : 0;
+}
+
 # Mask here-document bodies, blanking each body line while keeping the
 # introducer and terminator lines so that line numbers are preserved.
 #
@@ -1929,8 +1935,14 @@ sub _dist_check_sources {
     # them. The t/9xxx tests and t/lib/*.pm are themselves US-ASCII and
     # 5.005_03-clean and are checked. (Without this scope every fixture
     # false-fails C1, and lib/mb.pm false-fails P/K -- 212 spurious FAILs.)
+    # A distribution module is exempted from the house-style scans only when
+    # it actually carries non-US-ASCII bytes: that marks a multibyte
+    # transpiler core (e.g. lib/mb.pm, lib/mb8.pm) whose bytes are
+    # transformation DATA, not code. Ordinary US-ASCII modules (e.g.
+    # lib/BATsh.pm) are always checked. Exemption is decided by CONTENT, not
+    # by MANIFEST position, so the test stays correct for every ina dist.
     @targets = grep {
-        !m{^lib/mb\.pm$}i
+        !( m{\.pm$}i && _sc_has_non_usascii($_) )
         && !( m{^t/.*\.t$}i && $_ !~ m{^t/9\d{3}}i )
     } @targets;
 

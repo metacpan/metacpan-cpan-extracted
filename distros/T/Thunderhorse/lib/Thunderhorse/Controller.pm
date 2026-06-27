@@ -1,5 +1,5 @@
 package Thunderhorse::Controller;
-$Thunderhorse::Controller::VERSION = '0.105';
+$Thunderhorse::Controller::VERSION = '0.106';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -117,7 +117,7 @@ Thunderhorse::Controller - Base controller class for Thunderhorse
 
 	async sub show ($self, $ctx, $id)
 	{
-		await $ctx->res->text("User ID: $id");
+		$ctx->res->text("User ID: $id");
 	}
 
 =head1 DESCRIPTION

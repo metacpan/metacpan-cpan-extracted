@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,14 +9,23 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'ClearGraphic' => 'Clear graphic memory on start-up. ',
+      'Port' => 'port to use legal: 0x200-0x400 ',
+      'Size' => 'set display size in pixels ',
+      'bidirectional' => 'Use LPT port in bi-directional mode. This should work on most LPT port and
+is required for proper timing! ',
+      'delayBus' => 'Insert additional delays into reads / writes. '
+    },
     'element' => [
       'ClearGraphic',
       {
-        'description' => 'Clear graphic memory on start-up. ',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'boolean',
@@ -27,22 +36,18 @@ return [
       },
       'Port',
       {
-        'description' => 'port to use legal: 0x200-0x400 ',
         'type' => 'leaf',
         'upstream_default' => '0x378',
         'value_type' => 'uniline'
       },
       'Size',
       {
-        'description' => 'set display size in pixels ',
         'type' => 'leaf',
         'upstream_default' => '128x64',
         'value_type' => 'uniline'
       },
       'bidirectional',
       {
-        'description' => 'Use LPT port in bi-directional mode. This should work on most LPT port and
-is required for proper timing! ',
         'type' => 'leaf',
         'upstream_default' => 'yes',
         'value_type' => 'boolean',
@@ -53,7 +58,6 @@ is required for proper timing! ',
       },
       'delayBus',
       {
-        'description' => 'Insert additional delays into reads / writes. ',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'boolean',
@@ -67,4 +71,3 @@ is required for proper timing! ',
   }
 ]
 ;
-

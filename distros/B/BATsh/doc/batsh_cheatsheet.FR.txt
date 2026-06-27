@@ -230,4 +230,52 @@ exécutée telle quelle par le shell approprié.
   cmd1 || cmd2    exécute cmd2 seulement si cmd1 échoue
   cmd1 ; cmd2     exécute cmd2 sans condition
 
+15. Tableaux SH
+---------------
+  arr=(a b c)            # littéral de tableau indexé
+  arr+=(d e)             # ajouter des éléments
+  arr[5]=x               # affecter par index
+  declare -a list        # déclarer un tableau indexé
+  declare -A map         # déclarer un tableau associatif
+  map[key]=value         # affectation associative
+  map=([k1]=v1 [k2]=v2)  # littéral associatif
+
+  ${arr[0]}    élément 0  ($arr équivaut à ${arr[0]})
+  ${arr[-1]}   dernier élément
+  ${arr[@]}    tous les éléments (découpés en mots)
+  ${arr[*]}    tous les éléments (un seul mot)
+  ${#arr[@]}   nombre d'éléments
+  ${#arr[2]}   longueur de l'élément 2
+  ${!arr[@]}   liste des indices (ou clés)
+  unset arr[1] # supprimer un élément
+  unset arr    # supprimer tout le tableau
+
+16. Instructions case SH
+------------------------
+  case $x in
+      a|b|c)      echo "a, b ou c"  ;;    # |  -- plusieurs motifs
+      [0-9])      echo "un chiffre" ;;    # [..]  classe de caractères
+      [!aeiou])   echo "consonne"   ;;    # [!..] classe négative
+      data*)      echo "préfixe"    ;;    # *  et  ?  jokers
+      "*")        echo "une étoile" ;;    # entre guillemets = littéral
+      *)          echo "défaut"     ;;    # *)  clause par défaut
+  esac
+
+  Terminateurs de clause (après chaque corps) :
+    ;;    s'arrêter ici (cas normal)
+    ;&    enchaîner sur le corps de la clause suivante
+    ;;&   continuer à tester les motifs restants
+
+17. trap et signaux SH
+----------------------
+  trap 'echo bye' EXIT       # exécuté à la fin du script (ou sur exit)
+  trap 'rm -f $tmp' EXIT     # le gestionnaire est développé au déclenchement
+  trap 'echo got INT' INT    # relier un vrai signal via %SIG
+  trap '' INT                # ignorer le signal
+  trap - INT                 # rétablir l'action par défaut
+  trap                       # lister les trap actuels (aussi : trap -p)
+
+  SIGSPEC : un nom (INT ou SIGINT), un numéro (2) ou EXIT (= 0).
+  EXIT s'exécute une fois à la fin ; les vrais noms installent des gestionnaires %SIG Perl.
+
 Voir aussi : https://metacpan.org/dist/BATsh

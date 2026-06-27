@@ -1,0 +1,179 @@
+=encoding UTF-8
+
+=head1 NAME
+
+PAGI::Spec::Extensions - The PAGI server extension mechanism
+
+=head1 Extensions
+
+B<Version>: 0.3 (Draft)
+
+The PAGI specification provides for server-specific extensions to be used
+outside of the core PAGI specification. This document records the extension
+mechanism and shared extensions so servers and applications can interoperate
+without private agreements.
+
+Each extension is advertised by the server and may add keys to the connection
+scope and define new event types. The L<TLS extension|PAGI::Spec::Tls> is a
+fully specified example with its own document.
+
+=head2 Declaring Extensions
+
+=over
+
+=item -
+
+Servers advertise extensions in C<< scope->{extensions} >>. Each key must be a
+lower-case identifier (e.g., C<fullflush>, C<tls>).
+
+=item -
+
+Extension values are hashrefs whose contents are defined by the extension
+author. Use permitted data types from the core spec.
+
+=item -
+
+Applications must check for the presence of an extension before sending any
+extension-specific events.
+
+=back
+
+When contributing a new extension, document it with:
+
+=over
+
+=item 1.
+
+B<Name & Purpose> -- what problem it solves.
+
+=item 2.
+
+B<Scope Additions> -- keys added to C<< scope->{extensions}{$name} >> or other
+metadata.
+
+=item 3.
+
+B<Events> -- new C<type> values that may flow through C<$receive>/C<$send>.
+
+=item 4.
+
+B<Compatibility> -- how clients should behave if the server omits the
+extension.
+
+=back
+
+=head2 Example: C<fullflush>
+
+Some HTTP servers expose a C<fullflush> capability that immediately flushes
+buffered bytes to the client (useful for server-sent events or debugging).
+
+=over
+
+=item -
+
+B<Scope>: servers set C<< scope->{extensions}{fullflush} = {} >> to indicate
+support.
+
+=item -
+
+B<Event>: applications may send C<< { type => 'http.fullflush' } >> to force a
+flush. Servers that do not advertise the extension must reject the event with
+an error.
+
+=back
+
+Additional extensions (tracing hooks, background task controls, etc.) should
+follow the same pattern.
+
+=head2 Defined extensions
+
+The PAGI specification defines these extensions. A server advertises the ones it
+supports in C<< scope->{extensions} >>; an application checks for a key's
+presence before relying on it.
+
+=over
+
+=item -
+
+C<fullflush> -- force-flush buffered output to the client (described above).
+
+=item -
+
+C<tls> -- metadata about a TLS connection (PEM certificates, negotiated version,
+cipher suite). See L<PAGI::Spec::Tls>.
+
+=item -
+
+C<websocket.http.response> -- reject a WebSocket handshake with a custom HTTP
+response (status, headers, body) instead of a bare C<403 Forbidden>. See
+L<PAGI::Spec::Www/"WebSocket Denial Response (extension)">.
+
+=back
+
+(The C<pagi.connection> and C<pagi.transport> introspection handles are
+C<pagi.*> scope keys rather than C<extensions> entries; see L<PAGI::Spec::Www>.)
+
+=head2 Defining your own events
+
+The mechanism above is how a B<server> advertises a capability. A framework or
+application can also introduce its own events, at two different cost levels:
+
+=over
+
+=item -
+
+B<New event types within a scope> (like C<http.fullflush>), or B<new scope
+types> entirely (a protocol beyond C<http>/C<websocket>/C<sse>), require a
+B<cooperating server> -- the server has to produce or accept those events. Use a
+namespaced C<type> (for example C<myproto.message>) and document it as an
+extension so other servers and applications can interoperate.
+
+=item -
+
+B<Your own asynchronous events> -- a timer firing, a background job finishing, a
+message arriving on an external queue -- require B<no server cooperation and no
+protocol changes>. You model them as L<Future>s and compose them with the
+protocol's events using ordinary Future combinators. This is what makes PAGI's
+model loop-agnostic: a handler can wait on its own event sources alongside
+C<$receive>, and the same code runs under any conforming server.
+
+    use Future;
+
+    # Whichever resolves first wins (the loser is cancelled): the next client
+    # message, or our own event -- a job-completion Future from elsewhere in
+    # the program.
+    my $next = await Future->wait_any( $receive->(), $job_done );
+
+=back
+
+See L<PAGI::Building> for using this to build event-driven layers on PAGI.
+
+=head2 Version History
+
+=over
+
+=item -
+
+0.3 (Draft): Added the "Defined extensions" registry (C<tls>, C<websocket.http.response>) and the C<pagi.connection>/C<pagi.transport> clarification note.
+
+=item -
+
+0.2 (Draft): Initial extensions-mechanism documentation.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item -
+
+L<PAGI::Spec> -- the base specification
+
+=item -
+
+L<PAGI::Spec::Tls> -- the TLS extension, a fully specified example
+
+=back
+
+=cut

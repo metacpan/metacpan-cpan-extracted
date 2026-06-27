@@ -3,7 +3,8 @@ use strict;
 use warnings;
 
 use Test::More;
-use Data::Dumper::Compact qw(ddc);
+use List::Util qw(any);
+# use Data::Dumper::Compact qw(ddc);
 
 use_ok 'Music::VoicePhrase';
 
@@ -24,6 +25,18 @@ subtest defaults => sub {
     is scalar $obj->motifs->@*, 4, 'motifs';
     is scalar $obj->voices->@*, 4, 'voices';
     is $obj->verbose, 0, 'verbose';
+};
+
+subtest pitches => sub {
+    my $obj = new_ok 'Music::VoicePhrase' => [
+        pitches   => [qw(60 64 67)],
+        motif_num => 20,
+    ];
+    my $same = 0;
+    for my $voice ($obj->voices->@*) {
+        $same = any { $voice == $_ } $obj->pitches->@*;
+    }
+    ok $same, 'pitches';
 };
 
 done_testing();

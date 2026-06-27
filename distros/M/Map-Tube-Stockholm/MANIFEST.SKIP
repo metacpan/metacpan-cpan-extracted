@@ -63,3 +63,4 @@
 
 ^\.travis\.yml$
 ^Map-Tube-Stockholm-.*.tar.gz$
+^Map-Tube-Stockholm-.*.tar.gz.sigstore.json$

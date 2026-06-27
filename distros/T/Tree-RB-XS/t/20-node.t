@@ -2,6 +2,7 @@
 use FindBin;
 use lib "$FindBin::RealBin/lib";
 use Test2WithExplain;
+use Scalar::Util 'weaken';
 use Tree::RB::XS qw( KEY_TYPE_INT KEY_TYPE_FLOAT KEY_TYPE_USTR KEY_TYPE_BSTR KEY_TYPE_ANY
    CMP_PERL CMP_STR CMP_FOLDCASE );
 use Time::HiRes 'time';
@@ -173,6 +174,16 @@ subtest node_ownership => sub {
 	}, 'node attributes');
 	undef $test1;
 	is( \@canary::dead, ['test2','test1'], 'free node frees value' );
+};
+
+subtest weak_node_reference => sub {
+	my $tree= Tree::RB::XS->new(kv => [ a => 1, b => 2 ]);
+	my $node= $tree->get_node('a');
+	weaken($node);
+	is( $node, D, 'tree keeps inflated node alive after external reference is weakened' );
+	is( $tree->get_node('a'), $node, 'tree returns same node object' );
+	$tree->delete('a');
+	is( $node, undef, 'node is released when removed from tree' );
 };
 
 subtest set_key => sub {

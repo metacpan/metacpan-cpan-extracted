@@ -1,3 +1,8 @@
+Version 0.21 - 2026-06-27
+  - Tree now holds strong reference to Node-wrapper objects, so once they are
+    created (still lazily on demand) they remain until that node is deleted.
+    This makes it possible to make weak references to Node objects.
+
 Version 0.20 - 2025-12-17
   - Fixed bug where 'put' with allow_duplicates did not always replace all other
     nodes with identical keys

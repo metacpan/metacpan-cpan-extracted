@@ -18,7 +18,7 @@ use Carp;
 use Data::Identifier;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.30;
+our $VERSION = v0.31;
 
 use constant {
     BOOL_TRUE  => Data::Identifier->new(uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5')->register,
@@ -215,6 +215,7 @@ sub new {
 }
 
 
+#@returns Data::Identifier
 sub from_bool {
     my ($self, $bool, @opts) = _normalise_args(@_);
 
@@ -320,6 +321,7 @@ sub pack {
 }
 
 
+#@returns Data::Identifier
 sub unpack {
     my ($self, $template, $data, @opts) = _normalise_args(@_);
     my $pack_template;
@@ -391,6 +393,7 @@ sub unpack {
 }
 
 
+#@returns Data::Identifier
 sub parse_sirtx {
     my ($self, $data, @opts) = _normalise_args(@_);
 
@@ -609,6 +612,7 @@ sub render_unit_request {
 }
 
 
+#@returns Data::Identifier
 sub register_namespace {
     my ($self, $identifier, %opts) = _register_base(@_);
 
@@ -620,11 +624,18 @@ sub register_namespace {
 }
 
 
+#@returns Data::Identifier
 sub register_generator {
     my ($self, $identifier, %opts) = _register_base(@_);
+    my %pass;
 
-    delete $opts{$_} foreach qw(namespace style type);
+    $pass{$_} = delete $opts{$_} foreach qw(namespace style type);
     delete $opts{$_} foreach qw(native_case source_role up_relation for_type copy_tagnames native_ise_template);
+
+    $pass{namespace} = $self->register_namespace($pass{namespace}) if defined $pass{namespace};
+    $pass{type}      = $self->register_type($pass{type}) if defined $pass{type};
+
+    Data::Identifier::Generate->_register_generator($identifier, %pass);
 
     croak 'Stray options passed' if scalar keys %opts;
 
@@ -632,6 +643,7 @@ sub register_generator {
 }
 
 
+#@returns Data::Identifier
 sub register_type {
     my ($self, $identifier, %opts) = _register_base(@_);
     my $uuid = $identifier->uuid; # ensure we map to an UUID
@@ -655,6 +667,39 @@ sub register_type {
     croak 'Stray options passed' if scalar keys %opts;
 
     return $identifier->register;
+}
+
+
+#@returns Data::Identifier
+sub regenerate {
+    my ($self, $identifier, %opts) = _normalise_args(@_);
+
+    $identifier = Data::Identifier->new(from => $identifier);
+
+    if (defined(my $generator = delete $opts{generator})) {
+        # TODO compare with what is in $identifier already and die on mismatch.
+        $identifier->{generator} //= Data::Identifier->new(from => $generator);
+    }
+
+    if (defined(my $request = delete $opts{request})) {
+        # TODO compare with what is in $identifier already and die on mismatch.
+        croak 'Invalid request' unless length($request);
+        $identifier->{request} //= $request;
+    }
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    if (defined(my $generator = $identifier->{generator}) && defined(my $request = $identifier->{request})) {
+        my $n = eval { Data::Identifier::Generate->generic(generator => $generator, request => $request) };
+
+        if (defined $n) {
+            foreach my $key (qw(displayname displaycolour description icontext)) {
+                $identifier->{$key} //= $n->{$key} // next;
+            }
+        }
+    }
+
+    return $identifier;
 }
 
 # ---- Private helpers ----
@@ -701,6 +746,7 @@ sub _load_well_known {
     };
 }
 
+#@returns Data::Identifier
 sub _update_tag {
     my ($identifier, $sid, $sni, $tagname) = @_;
     my $id_cache = $identifier->{id_cache} //= {};
@@ -753,7 +799,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.30
+version v0.31
 
 =head1 SYNOPSIS
 
@@ -963,10 +1009,15 @@ For example:
 Registers a generator the same way L</register_namespace> registers an namespace.
 All aspects of L</register_namespace> apply as well but for the fact that this method is used to register generators and the list of specific options.
 
-Currently the following options as known from L<Data::Identifier::Generate/generic> are accepted but ignored:
+Currently the following options as known from L<Data::Identifier::Generate/generic> are accepted:
 C<namespace>,
 C<style>,
 C<type>.
+
+If a namespace is passed it is registered as per L</register_namespace> with no options.
+It is still valid to call L</register_namespace> for it manually to (re)register it with options.
+
+Equally, if type is passed it is registered as per L</register_type> in the same way.
 
 Also the following keys not yet supported by L<Data::Identifier::Generate/generic> are accepted but ignored:
 C<native_case>,
@@ -1004,6 +1055,38 @@ This method calls L</register_namespace> on the given namespace to ensure the na
 
 The value that represents a null for the given identifier.
 It will be aliased to the null identifier.
+
+=back
+
+=head2 regenerate
+
+    my Data::Identifier $identifier = $util->regenerate($id, %opts);
+
+(experimental since v0.31)
+
+This method tries to run the generator for an identifier already in existance in the same way
+L<Data::Identifier::Generate> does for requests.
+
+C<$id> should be an instance of L<Data::Identifier>. Otherwise it is parsed as per C<from> in L<Data::Identifier/new>.
+
+B<Note:>
+This method will C<die> if there is a problem (such as an identifier mismatch, validation error, etc.).
+It will however not report any error if not enough data is available for regeneration or the specific regeneration
+is not supported. It however may update the identifier as much as possible.
+
+The following options are supported. All values default to what is already known (e.g. by been given to L<Data::Identifier/new>).
+
+=over
+
+=item C<generator>
+
+The same as C<generator> in L<Data::Identifier/new>.
+
+The generator should be registered using L</register_generator>.
+
+=item C<request>
+
+The same as C<request> in L<Data::Identifier/new>.
 
 =back
 

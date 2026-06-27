@@ -15,7 +15,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.81.3');
+our $VERSION = version->declare('v0.81.4');
 
 =head1 NAME
 
@@ -555,44 +555,22 @@ Thanks to Mohammad S Anwar, author of L<Map::Tube>, for that module, for great f
 discussions, advice, debugging help, and willingness to refactor his code.
 Thanks to Slaven Rezic for extensive testing and valuable suggestions.
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-map-tube-plugin-fuzzyfind at rt.cpan.org>,  or
-through the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube-Plugin-FuzzyFind>.
-I will  be notified and then you'll automatically be notified of progress on your
-bug as I make changes.
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Map::Tube::Plugin::FuzzyFind
 
-You can also look for information at:
+=head1 BUGS
 
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-Plugin-FuzzyFind>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Map-Tube-Plugin-FuzzyFind>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Map-Tube-Plugin-FuzzyFind>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Map-Tube-Plugin-FuzzyFind/>
-
-=back
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/gwselke/Map-Tube-Plugin-FuzzyFind/issues>. I will be
+notified and then you'll automatically be notified of progress on your
+bug when (and if) I make changes.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015, 2025 Gisbert W. Selke, Tapirsoft Selke & Selke GbR
+Copyright (C) 2015, 2025, 2026 Gisbert W. Selke, Tapirsoft Selke & Selke GbR
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

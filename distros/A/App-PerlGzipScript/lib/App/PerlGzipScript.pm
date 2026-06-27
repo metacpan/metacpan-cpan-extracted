@@ -1,5 +1,5 @@
-package App::PerlGzipScript v0.0.2;
-use v5.40;
+package App::PerlGzipScript v0.0.3;
+use v5.42;
 __END__
 
 =encoding utf-8
@@ -28,6 +28,13 @@ the size of cpm script is reduced from 731KB to 189KB.
   $ ls -alh cpm*
   -rw-r--r-- 1 skaji staff 731K Sep 30 06:48 cpm
   -rw-r--r-- 1 skaji staff 189K Sep 30 06:48 cpm-gzip
+
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/perl-gzip-script/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

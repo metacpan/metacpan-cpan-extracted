@@ -18,11 +18,15 @@ package BATsh::CMD;
 #  10. IF EXIST handles quoted paths with spaces
 #  11. Pipeline (|): _split_compound detects |, _exec_pipe chains via tmpfile
 #  12. SET /P VAR=Prompt: reads one line from STDIN
-#  13. SHIFT / SHIFT /N: shifts %1..%9 and %* positional parameters
+#  13. SHIFT / SHIFT /N: shifts %1..%9 and rebuilds %* (dispatched builtin)
 #  14. Batch-parameter tilde modifiers via Env::expand_cmd():
-#      %~0 %~f1 %~d0 %~p0 %~n1 %~x1 %~dp0 %~nx1 (f d p n x combinable)
+#      %~0 %~f1 %~d0 %~p0 %~n1 %~x1 %~dp0 %~nx1 (f d p n x combinable),
+#      and on CALL :label arguments once they populate %1..%9
 #  15. & && || compound commands (_exec_compound)
 #  16. %0..%9 and %* positional parameter expansion in expand_cmd()
+#  17. CALL :label arg1 arg2: installs the subroutine's own %0..%9 / %*
+#      (quote-aware, %-expanded) via BATsh->call_sub, which saves and
+#      restores the caller's positional-parameter frame
 #
 ######################################################################
 
@@ -36,7 +40,7 @@ use File::Copy ();
 use File::Path ();
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 require BATsh::Env;
@@ -598,6 +602,7 @@ sub _dispatch {
         return 0;
     }
     if ($CMD eq 'CALL')    { return _cmd_call($class, $rest, $opts_ref) }
+    if ($CMD eq 'SHIFT')   { return _cmd_shift($rest) }
     if ($CMD eq 'SETLOCAL') {
         $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
         BATsh::Env::setlocal($rest);
@@ -1247,13 +1252,12 @@ sub _cmd_call {
 
     if ($rest =~ /\A:([A-Za-z_][A-Za-z0-9_]*)(.*)/i) {
         my ($lbl, $argstr) = (uc($1), $2);
-        $argstr =~ s/\A\s+//;
-        my @args = split /\s+/, $argstr;
-        for my $n (1 .. 9) {
-            BATsh::Env->set("%$n", defined($args[$n-1]) ? $args[$n-1] : '');
-        }
+        # $rest reaches here already %-expanded by _expand_line, so split the
+        # argument string with double-quote awareness and let call_sub install
+        # the %0..%9 / %* frame (and restore the caller's on return).
+        my @args = _split_call_args($argstr);
         if (defined $opts_ref->{'_batsh'}) {
-            $opts_ref->{'_batsh'}->call_sub($lbl);
+            $opts_ref->{'_batsh'}->call_sub($lbl, @args);
         }
         return 0;
     }
@@ -1270,6 +1274,76 @@ sub _cmd_call {
     # Re-expand the already-expanded string (second pass)
     my $reexpanded = BATsh::Env->expand_cmd($rest);
     return _cmd_external($reexpanded, '');
+}
+
+# ----------------------------------------------------------------
+# _split_call_args: split a CALL argument string into words, honouring
+# double quotes (cmd.exe uses double quotes only).  Surrounding quotes
+# are removed.
+# ----------------------------------------------------------------
+sub _split_call_args {
+    my ($s) = @_;
+    $s = '' unless defined $s;
+    $s =~ s/\A\s+//; $s =~ s/\s+\z//;
+    return () if $s eq '';
+    my @out;
+    my $cur  = '';
+    my $have = 0;
+    my $in_q = 0;
+    for my $c (split //, $s) {
+        if ($c eq '"') { $in_q = !$in_q; $have = 1; next }
+        if ($c =~ /\s/ && !$in_q) {
+            if ($have) { push @out, $cur; $cur = ''; $have = 0 }
+            next;
+        }
+        $cur .= $c; $have = 1;
+    }
+    push @out, $cur if $have;
+    return @out;
+}
+
+# ----------------------------------------------------------------
+# SHIFT [/N] -- shift positional parameters %1..%9 left, rebuild %*
+#
+# Plain SHIFT moves %2 into %1, %3 into %2, ... %9 into %8, and clears
+# %9.  SHIFT /N begins the shift at %N (parameters %1..%(N-1) are left
+# unchanged), matching cmd.exe.  %0 is left untouched (BATsh's documented
+# contract shifts %1..%9 and %*; this also keeps a CALL'd label's name
+# stable).  The SH-side BATSH_ARG* mirror is updated so an SH subroutine
+# body sees the same shift via $1..$9.
+# ----------------------------------------------------------------
+sub _cmd_shift {
+    my ($rest) = @_;
+    $rest = '' unless defined $rest;
+    my $start = 1;
+    if ($rest =~ /\/(\d)/) { $start = int($1) }
+    $start = 1 if $start < 1;
+    $start = 9 if $start > 9;
+
+    for (my $n = $start; $n < 9; $n++) {
+        my $next = BATsh::Env->get('%' . ($n + 1));
+        BATsh::Env->set('%' . $n, defined($next) ? $next : '');
+    }
+    BATsh::Env->set('%9', '');
+
+    # Rebuild %* from the contiguous run of non-empty positional params.
+    my @remaining;
+    for my $n (1 .. 9) {
+        my $v = BATsh::Env->get("%$n");
+        last unless defined $v && $v ne '';
+        push @remaining, $v;
+    }
+    BATsh::Env->set('%*', join(' ', @remaining));
+
+    # Keep the SH-side mirror consistent with the shifted %1..%9.
+    for my $n (1 .. 9) {
+        my $v = BATsh::Env->get("%$n");
+        $BATsh::Env::STORE{"BATSH_ARG$n"} = defined $v ? $v : '';
+    }
+    $BATsh::Env::STORE{'BATSH_ARGC'} = scalar @remaining;
+
+    $ERRORLEVEL = 0;
+    return 0;
 }
 
 # ----------------------------------------------------------------
@@ -1518,6 +1592,30 @@ a value updated inside the same block, enable delayed expansion:
       ECHO %X%    &:: old  -- immediate, parse-time
   )
   ENDLOCAL
+
+=head2 Subroutines and Positional Parameters
+
+C<CALL :label arg1 arg2 ...> runs the lines of a C<:label> ... C<RET>
+subroutine as a call frame.  The subroutine sees its own C<%0> (the
+C<:label> token), C<%1>..C<%9> (the call arguments) and C<%*> (their
+join); the caller's C<%0>..C<%9> / C<%*> are saved on entry and restored
+on return, so a subroutine cannot clobber the caller's parameters.
+Arguments are C<%>-expanded before the call and split with double-quote
+awareness, so C<CALL :sub "a b" %FILE%> passes C<a b> as one argument.
+The tilde modifiers below therefore operate on passed arguments too, e.g.
+C<%~nx1> or C<%~dp1> inside the subroutine act on its C<%1>.
+
+C<SHIFT> moves C<%2> into C<%1>, C<%3> into C<%2>, ..., clears C<%9> and
+rebuilds C<%*>.  C<SHIFT /N> begins the shift at C<%N>, leaving
+C<%1>..C<%(N-1)> unchanged.
+
+A subroutine body may contain its own C<:labels> as GOTO targets (loops,
+forward skips, or an early C<GOTO :EOF> to return).  These internal labels
+belong to the subroutine and are resolved while it runs; only the matching
+C<RET> / C<RETURN> ends the subroutine.  Top-level C<:labels> remain
+ordinary GOTO targets in the main script.  A C<GOTO> whose loop body
+contains a C<CALL> resolves correctly because each CMD section (and each
+subroutine body) runs as a single block with a complete label index.
 
 =head2 Escape Character
 

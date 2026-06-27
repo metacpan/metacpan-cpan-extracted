@@ -31,7 +31,7 @@ use constant {
 };
 
 
-our $VERSION = v0.30;
+our $VERSION = v0.31;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -81,20 +81,53 @@ my %_gte_simple_profiles = (
     },
 );
 
+my %_generators = (
+    WK_UNSIGNED_INTEGER_GENERATOR()     => {
+        style       => 'integer-based',
+        namespace   => Data::Identifier->NS_INT(),
+    },
+    WK_SIGNED_INTEGER_GENERATOR()       => {
+        style       => 'integer-based',
+        namespace   => Data::Identifier->NS_INT(),
+    },
+    WK_UNICODE_CHARACTER_GENERATOR()    => {},
+    WK_RGB_COLOUR_GENERATOR()           => {
+        style       => 'colour',
+        namespace   => '88d3944f-a13b-4e35-89eb-e3c1fbe53e76',
+    },
+    WK_DATE_GENERATOR()                 => {
+        namespace   => Data::Identifier->NS_DATE(),
+        icontext    => "\N{TEAR-OFF CALENDAR}",
+    },
+    #WK_LANGUAGE_GENERATOR()             => {},
+    WK_MULTIPLICITY_GENERATOR()         => {
+        namespace   => NS_GTE,
+    },
+    WK_MINIMUM_MULTIPLICITY_GENERATOR() => {
+        namespace   => NS_GTE,
+    },
+);
+
 
 #@returns Data::Identifier
 sub integer {
     my ($pkg, $request, %opts) = @_;
     $opts{request}      = $request;
-    $opts{style}        = 'integer-based';
-    $opts{namespace}    = Data::Identifier->NS_INT();
     $opts{displayname}//= $request;
     $opts{generator}    = $request >= 0 ? WK_UNSIGNED_INTEGER_GENERATOR : WK_SIGNED_INTEGER_GENERATOR;
+
+    # We currently don't set one for $request == 0
+    if ($request > 0) {
+        $opts{icontext}   //= "\N{DOUBLE-STRUCK CAPITAL N}";
+    } elsif ($request < 0) {
+        $opts{icontext}   //= "\N{DOUBLE-STRUCK CAPITAL Z}";
+    }
 
     return $pkg->generic(%opts);
 }
 
 
+#@returns Data::Identifier
 sub unicode_character {
     my ($pkg, $type, $request, %opts) = @_;
     my $unicode_cp;
@@ -143,9 +176,8 @@ sub unicode_character {
 sub colour {
     my ($pkg, $colour, %opts) = @_;
     $opts{request}      = $colour;
-    $opts{style}        = 'colour';
-    $opts{namespace}    = '88d3944f-a13b-4e35-89eb-e3c1fbe53e76';
     $opts{generator}    = WK_RGB_COLOUR_GENERATOR;
+
     return $pkg->generic(%opts);
 }
 
@@ -208,7 +240,6 @@ sub date {
     $opts{request}      = $request;
     $opts{input}      //= $request; # force raw value!
     $opts{style}        = undef;
-    $opts{namespace}    = Data::Identifier->NS_DATE();
     $opts{displayname}//= $request;
     $opts{generator}    = WK_DATE_GENERATOR;
 
@@ -216,6 +247,7 @@ sub date {
 }
 
 
+#@returns Data::Identifier
 sub language {
     my ($pkg, $req, %opts) = @_;
     my $name;
@@ -246,6 +278,7 @@ sub language {
 }
 
 
+#@returns Data::Identifier
 sub multiplicity {
     my ($pkg, $subtype, $request, %opts) = @_;
     my $prefix = $_multiplicity_prefix{$subtype} // croak 'Invalid subtype: '.$subtype;
@@ -258,7 +291,6 @@ sub multiplicity {
 
     $opts{request}      = $request;
     $opts{input}        = $prefix.'.'.$request;
-    $opts{namespace}    = NS_GTE;
     $opts{displayname}//= $_multiplicity_names{$request};
     $opts{displayname}//= $request;
     $opts{generator}    = $_multiplicity_generators{$subtype};
@@ -275,6 +307,7 @@ sub multiplicity {
 }
 
 
+#@returns Data::Identifier
 sub gte_simple {
     my ($pkg, $profile, $request, %opts) = @_;
     my %order;
@@ -328,6 +361,7 @@ sub gte_simple {
 }
 
 
+#@returns Data::Identifier
 sub unit {
     my ($pkg, $request, %opts) = @_;
 
@@ -340,8 +374,15 @@ sub unit {
 #@returns Data::Identifier
 sub generic {
     my ($pkg, %opts) = @_;
+    my $generator = $opts{generator};
 
-    if (defined(my $type)) {
+    if (defined($generator)) {
+        $generator = Data::Identifier->new(from => $generator) unless ref($generator);
+
+        %opts = (%{$_generators{$generator->ise}//{}}, %opts);
+    }
+
+    if (defined(my $type = $opts{type})) {
         $opts{namespace} //= $type->namespace;
     }
 
@@ -400,6 +441,10 @@ sub generic {
             if (defined $request) {
                 my $req = lc($request);
 
+                if (exists &Data::URIID::Colour::new) {
+                    eval { $opts{displaycolour} //= Data::URIID::Colour->new(rgb => $request) };
+                }
+
                 $req = sprintf('#%s%s%s', $1 x 6, $2 x 6, $3 x 6) if $req =~ /^#([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/;
 
                 if ($req =~ /^#[a-f0-9]{36}$/) {
@@ -419,13 +464,26 @@ sub generic {
         my $ns = ref($opts{namespace}) ? $opts{namespace}->uuid(no_defaults => 1) : $opts{namespace};
         my $uuid = $pkg->_uuid_v5($ns, $opts{input});
         my $tag = Data::Identifier->new(uuid => $uuid, displayname => $opts{displayname});
-        $tag->{$_} //= $opts{$_} foreach qw(generator request);
-        $tag->{generator} = Data::Identifier->new(from => $tag->{generator}) if defined($tag->{generator}) && !ref($tag->{generator});
+        foreach my $key (qw(request displaycolour description icontext)) {
+            $tag->{$key} //= $opts{$key} if defined $opts{$key};
+        }
+        $tag->{generator} //= $generator;
         return $tag;
     }
 }
 
 # ---- Private helpers ----
+
+sub _register_generator {
+    my ($pkg, $generator, %opts) = @_;
+    my $g = $_generators{$generator->ise} //= {};
+
+    foreach my $key (keys %opts) {
+        my $v = $opts{$key} // next;
+
+        $g->{$key} //= $v;
+    }
+}
 
 sub _available_module {
     my (@modules) = @_;
@@ -522,7 +580,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.30
+version v0.31
 
 =head1 SYNOPSIS
 
@@ -636,6 +694,9 @@ This is the same as defined by L<Data::Identifier/new>.
 Defaults to the data from the request.
 
 =back
+
+B<Note:>
+When L<Data::URIID::Colour> is loaded, it is used to generate a displaycolour value.
 
 =head2 date
 
@@ -760,7 +821,7 @@ Defaults to a name from a build in list or C<$number> if no entry is found.
 
     my Data::Identifier $identifier = Data::Identifier::Generate->gte_simple($profile => $request, %opts);
 
-(since v0.13)
+(experimental since v0.13)
 
 Generates an identifier using simple GTE rules.
 This method must not be called in list context.

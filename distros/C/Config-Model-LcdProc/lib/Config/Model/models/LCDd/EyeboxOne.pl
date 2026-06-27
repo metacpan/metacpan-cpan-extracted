@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,29 +9,41 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'Backlight' => 'Switch on the backlight? ',
+      'Cursor' => 'Switch on the cursor? ',
+      'Device' => 'Select the output device to use 
+Device=/dev/cua01',
+      'LeftKey' => 'Enter Key is a \\r character, so it\'s hardcoded in the driver',
+      'Size' => 'Set the display size ',
+      'Speed' => 'Set the communication speed ',
+      'keypad_test_mode' => 'You can find out which key of your display sends which
+character by setting keypad_test_mode to yes and running
+LCDd. LCDd will output all characters it receives.
+Afterwards you can modify the settings above and set
+keypad_set_mode to no again.'
+    },
     'element' => [
       'Backlight',
       {
-        'description' => 'Switch on the backlight? ',
         'type' => 'leaf',
         'upstream_default' => 'yes',
         'value_type' => 'uniline'
       },
       'Cursor',
       {
-        'description' => 'Switch on the cursor? ',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'uniline'
       },
       'Device',
       {
-        'description' => 'Select the output device to use 
-Device=/dev/cua01',
         'type' => 'leaf',
         'upstream_default' => '/dev/ttyS1',
         'value_type' => 'uniline'
@@ -51,7 +63,6 @@ Device=/dev/cua01',
       'LeftKey',
       {
         'default' => 'D',
-        'description' => 'Enter Key is a \\r character, so it\'s hardcoded in the driver',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -63,7 +74,6 @@ Device=/dev/cua01',
       },
       'Size',
       {
-        'description' => 'Set the display size ',
         'type' => 'leaf',
         'upstream_default' => '20x4',
         'value_type' => 'uniline'
@@ -76,7 +86,6 @@ Device=/dev/cua01',
           '9600',
           '19200'
         ],
-        'description' => 'Set the communication speed ',
         'type' => 'leaf',
         'upstream_default' => '19200',
         'value_type' => 'enum'
@@ -90,11 +99,6 @@ Device=/dev/cua01',
       'keypad_test_mode',
       {
         'default' => 'no',
-        'description' => 'You can find out which key of your display sends which
-character by setting keypad_test_mode to yes and running
-LCDd. LCDd will output all characters it receives.
-Afterwards you can modify the settings above and set
-keypad_set_mode to no again.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       }
@@ -103,4 +107,3 @@ keypad_set_mode to no again.',
   }
 ]
 ;
-

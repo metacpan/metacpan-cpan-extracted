@@ -44,6 +44,8 @@ package EdgeApp {
 		$r->add('/only_post' => {to => 'print_method', action => 'http.post'});
 
 		$r->add('/future' => {to => 'return_future'});
+
+		$r->add('/bad_consume' => {to => 'bad_consume'});
 	}
 
 	sub stash_and_return ($self, $ctx, $msg)
@@ -67,6 +69,12 @@ package EdgeApp {
 	sub return_future ($self, $ctx)
 	{
 		return $ctx->res->text('return text without await');
+	}
+
+	sub bad_consume ($self, $ctx)
+	{
+		# this consumes the context without sending anything
+		$ctx->consume;
 	}
 };
 
@@ -128,6 +136,15 @@ subtest 'returning future from handler should work' => sub {
 	http_status_is 200;
 	http_header_is 'content-type', 'text/plain; charset=utf-8';
 	http_text_is 'return text without await';
+};
+
+subtest 'should throw an exception when the context is consumed without sending anything' => sub {
+	my $ex = dies {
+		http $app, GET '/bad_consume';
+		fail "call succeeded with error " . http->status;
+	};
+
+	like $ex, qr{App returned without sending response}, 'exception ok';
 };
 
 done_testing;

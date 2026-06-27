@@ -1,5 +1,9 @@
 Revision history for Perl extension Map::Tube::Beijing.
 
+0.12.8 2026-06-26
+  - Switched to Github as code repository and issue handler.
+  - Improvements to Makefile.PL
+
 0.12.7 2026-06-12
   - Removed code signatures (cpansign is deprecated), replaced with Sigstore/cosign.
   - Prepared for use with Map::Tube v5.0.1.

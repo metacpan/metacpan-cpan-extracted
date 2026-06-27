@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,21 +9,25 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'Device' => 'device to use ',
+      'Size' => 'display size '
+    },
     'element' => [
       'Device',
       {
-        'description' => 'device to use ',
         'type' => 'leaf',
         'upstream_default' => '/dev/ttyS1',
         'value_type' => 'uniline'
       },
       'Size',
       {
-        'description' => 'display size ',
         'type' => 'leaf',
         'upstream_default' => '16x2',
         'value_type' => 'uniline'
@@ -33,4 +37,3 @@ return [
   }
 ]
 ;
-

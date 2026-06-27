@@ -1,0 +1,83 @@
+{
+   "abstract" : "Application toolkit for the PAGI specification",
+   "author" : [
+      "John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PAGI-Tools",
+   "no_index" : {
+      "directory" : [
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "6.030",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::PkgVersion" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Compress::Raw::Zlib" : "0",
+            "Cpanel::JSON::XS" : "4.19",
+            "Crypt::URandom" : "0.36",
+            "Future::IO" : "0.23"
+         },
+         "requires" : {
+            "Cookie::Baker" : "0.11",
+            "Future" : "0.50",
+            "Future::AsyncAwait" : "0.66",
+            "HTTP::Date" : "6.06",
+            "HTTP::MultiPartParser" : "0.02",
+            "Hash::MultiValue" : "0.16",
+            "IO::Compress::Gzip" : "0",
+            "JSON::MaybeXS" : "1.004003",
+            "perl" : "5.018"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Future::IO" : "0.23",
+            "IO::Async" : "0.802",
+            "Test2::V0" : "0.000159",
+            "Time::HiRes" : "1.9764"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/PAGI-Tools/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/PAGI-Tools",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/PAGI-Tools.git",
+         "web" : "https://github.com/jjn1056/PAGI-Tools"
+      }
+   },
+   "version" : "0.002000",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

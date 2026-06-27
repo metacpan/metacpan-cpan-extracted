@@ -3,7 +3,7 @@
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More tests => 37;
+use Test::More tests => 41;
 
 use_ok('Data::Identifier::Util');
 use_ok('Data::Identifier');
@@ -48,6 +48,17 @@ my %sirtx = (
 
 foreach my $value (sort keys %sirtx) {
     ok($util->parse_sirtx($value)->eq($sirtx{$value}), 'parse_sirtx "'.$value.'"');
+}
+
+{
+    my $identifier = Data::Identifier->new(wd => 'Q44054');
+    isa_ok($identifier, 'Data::Identifier');
+    is($identifier->displayname(default => undef, no_defaults => 1), undef, 'No displayname');
+    $util->regenerate($identifier, generator => '710412ba-dafd-4eca-91eb-4501e717af8f', request => 'Q44054 Franz Marc');
+    is($identifier->displayname(default => undef, no_defaults => 1), undef, 'Still no displayname');
+    $util->register_generator('710412ba-dafd-4eca-91eb-4501e717af8f', namespace => '9e10aca7-4a99-43ac-9368-6cbfa43636df', style => 'id-based');
+    $util->regenerate($identifier);
+    is($identifier->displayname(default => undef, no_defaults => 1), 'Franz Marc', 'Now with displayname');
 }
 
 exit 0;

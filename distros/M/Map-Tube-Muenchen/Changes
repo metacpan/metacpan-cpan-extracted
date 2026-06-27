@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::Muenchen.
 
+0.1.4 2026-06-26
+  - Fixed Makefile.PL issue preventing data file from being installed.
+  - Improvements to Makefile.PL
+  - Switched to Github as code repository and issue handler.
+
 0.1.3 2026-06-11
   - Removed code signatures (cpansign is deprecated), replaced with Sigstore/cosign.
   - Prepared for use with Map::Tube v5.0.1.

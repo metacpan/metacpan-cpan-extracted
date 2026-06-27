@@ -3,6 +3,8 @@ lib/Map/Tube/Stockholm.pm
 Makefile.PL
 MANIFEST                                 This list of files
 MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
 README
 share/stockholm-map.xml
 t/00-load.t
@@ -14,11 +16,7 @@ t/10-manifest.t
 t/11-meta-json.t
 t/12-meta-yml.t
 t/13-version.t
-t/14-signature.t
 t/20-pod.t
 t/21-pod-coverage.t
 t/22-changes.t
 t/23-kwalitee.t
-SIGNATURE
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

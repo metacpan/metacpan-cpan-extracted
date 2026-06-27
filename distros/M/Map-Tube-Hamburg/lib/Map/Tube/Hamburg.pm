@@ -14,7 +14,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.1.3');
+our $VERSION = version->declare('v0.1.4');
 
 =encoding utf8
 
@@ -69,6 +69,13 @@ construction.
 
 If something goes wrong, maybe because the map information file was corrupted,
 the constructor will die.
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/gwselke/Map-Tube-Hamburg/issues>. I will be
+notified and then you'll automatically be notified of progress on your
+bug when (and if) I make changes.
 
 =head1 AUTHOR
 

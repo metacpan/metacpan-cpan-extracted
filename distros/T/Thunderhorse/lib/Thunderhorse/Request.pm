@@ -1,5 +1,5 @@
 package Thunderhorse::Request;
-$Thunderhorse::Request::VERSION = '0.105';
+$Thunderhorse::Request::VERSION = '0.106';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -89,11 +89,10 @@ constructor arguments.
 
 =head3 update
 
-	$req->update()
+	$req->update($scope, $receive, $send)
 
-Updates the internal PAGI scope and receiver from the context's PAGI tuple.
-Called automatically when the context's PAGI tuple changes via
-setter of L<Thunderhorse::Context/pagi>.
+Updates the internal PAGI scope and receiver. Called automatically when the
+context's PAGI tuple changes via setter of L<Thunderhorse::Context/pagi>.
 
 =head1 SEE ALSO
 

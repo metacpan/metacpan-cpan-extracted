@@ -1,5 +1,5 @@
 package Gears::X::Thunderhorse;
-$Gears::X::Thunderhorse::VERSION = '0.105';
+$Gears::X::Thunderhorse::VERSION = '0.106';
 use v5.40;
 use Mooish::Base;
 

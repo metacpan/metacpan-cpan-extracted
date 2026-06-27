@@ -26,15 +26,15 @@ my %WriteMakefileArgs = (
     "strictures" => 2
   },
   "TEST_REQUIRES" => {
-    "Data::Dumper::Compact" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "List::Util" => 0,
     "Test::More" => "0.88",
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0107",
+  "VERSION" => "0.0108",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,10 +43,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Data::Dumper::Compact" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => 0,
   "Moo" => 2,
   "Music::Duration::Partition" => 0,
   "Music::Scales" => 0,

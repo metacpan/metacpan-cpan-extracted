@@ -62,4 +62,4 @@
 
 ^\.travis\.yml$
 ^Map-Tube-Beijing-.*.tar.gz$
-
+^Map-Tube-Beijing-.*.tar.gz.sigstore.json$

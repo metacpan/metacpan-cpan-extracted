@@ -1,0 +1,50 @@
+#!/bin/sh
+# BATsh example 08: SH indexed and associative arrays (BATsh::SH, v0.06)
+# Run: perl lib/BATsh.pm eg/08_sh_arrays.batsh
+
+# --- indexed array ---
+echo "indexed array:"
+fruit=(apple banana cherry)
+echo "  all     : ${fruit[@]}"
+echo "  count   : ${#fruit[@]}"
+echo "  first   : ${fruit[0]}"
+echo "  last    : ${fruit[-1]}"
+echo "  short   : $fruit"
+
+# element assignment and append
+fruit[1]=blueberry
+fruit+=(date elderberry)
+echo "  updated : ${fruit[@]}"
+echo "  indices : ${!fruit[@]}"
+
+# iterate, preserving elements that contain spaces
+echo "iterate indexed:"
+items=("first item" "second item" "third item")
+for it in "${items[@]}"; do
+    echo "  - $it"
+done
+
+# --- associative array ---
+echo "associative array:"
+declare -A capital
+capital[Japan]=Tokyo
+capital[France]=Paris
+capital=([Japan]=Tokyo [France]=Paris [Italy]=Rome)
+echo "  Japan   : ${capital[Japan]}"
+echo "  count   : ${#capital[@]}"
+echo "  keys    : ${!capital[@]}"
+
+echo "iterate associative:"
+for country in "${!capital[@]}"; do
+    echo "  $country => ${capital[$country]}"
+done
+
+# inline initialiser and element length
+declare -A score=([alice]=90 [bob]=85)
+echo "score alice : ${score[alice]} (len ${#score[alice]})"
+
+# remove one element, then the whole array
+unset capital[Italy]
+echo "after unset Italy, count: ${#capital[@]}"
+unset capital
+echo "after unset all,   count: ${#capital[@]}"

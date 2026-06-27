@@ -22,13 +22,15 @@ no_index:
 provides:
   Map::Tube::Chicago:
     file: lib/Map/Tube/Chicago.pm
-    version: v0.2.2
+    version: v0.2.3
 requires:
   File::Share: '0'
   Map::Tube: v5.0.1
   Moo: '0'
   namespace::clean: '0'
   perl: '5.014'
-resources: {}
-version: v0.2.2
+resources:
+  bugtracker: https://github.com/gwselke/Map-Tube-Chicago/issues
+  repository: https://github.com/gwselke/Map-Tube-Chicago.git
+version: v0.2.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

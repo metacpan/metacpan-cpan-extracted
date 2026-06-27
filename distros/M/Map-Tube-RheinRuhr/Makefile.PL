@@ -23,7 +23,7 @@ WriteMakefile(
                           'ExtUtils::MakeMaker'     => 6.64,
                           'File::ShareDir::Install' => 0,
                         },
-  TEST_REQUIRES      => { 'Test::More'  => 0.82, },
+  TEST_REQUIRES      => { 'Test::More' => 0.82, },
   PREREQ_PM          => {
                           'Moo'              => 0,
                           'namespace::clean' => 0,
@@ -65,19 +65,22 @@ WriteMakefile(
                                                               web  => 'https://github.com/gwselke/' . $mod_distname,
                                                             },
                                               bugtracker => {
-                                                               web    => 'https://github.com/gwselke/' . $mod_distname . '/issues'
+                                                               web => 'https://github.com/gwselke/' . $mod_distname . '/issues'
                                                              },
-                                         },
+                                            },
                         },
 );
 
 package MY;
-use File::ShareDir::Install 'postamble';
+use File::ShareDir::Install;
 
 sub postamble {
-    return <<"MAKEFILE";
+  my $self = shift;
+  my @ret  = File::ShareDir::Install::postamble($self);
+  push @ret, <<"MAKEFILE";
 sigstore-sign:
 \t\@echo "Signing distribution with Sigstore..."
 \tcosign sign-blob \$(DISTVNAME).tar.gz --bundle \$(DISTVNAME).tar.gz.sigstore.json
 MAKEFILE
+  return join( "\n", @ret );
 }

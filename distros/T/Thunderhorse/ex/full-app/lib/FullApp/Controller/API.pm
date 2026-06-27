@@ -27,7 +27,7 @@ sub flatten_locations ($self, $level)
 	return @out;
 }
 
-async sub list_locations ($self, $ctx)
+sub list_locations ($self, $ctx)
 {
 	my @locations = map {
 		+{
@@ -39,6 +39,6 @@ async sub list_locations ($self, $ctx)
 		}
 	} $self->flatten_locations($self->router);
 
-	await $ctx->res->json(\@locations);
+	$ctx->res->json(\@locations);
 }
 

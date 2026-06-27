@@ -16,9 +16,10 @@ package BATsh::SH;
 #   for VAR in list; do ... done
 #   while condition; do ... done
 #   until condition; do ... done
-#   case $var in pattern) ... ;; esac
+#   case $var in pat|pat) ... ;; *) ... ;; esac  (|, globs, [classes], ;& ;;&)
 #   test / [ ... ]  (file, string, integer comparisons)
 #   cd, pwd, exit, true, false, :
+#   trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]  (EXIT + %SIG bridge)
 #   read VAR  (reads one line from STDIN)
 #   shift [N]  (shift positional parameters left)
 #   local VAR=value  (function-scoped variable)
@@ -38,6 +39,16 @@ package BATsh::SH;
 #   ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,}  (case conversion)
 #   ${VAR:N:L}, ${VAR:N}  (substring)
 #   ${#VAR}  (string length)
+#   arr=(a b c), arr+=(d e)  (indexed array assignment / append)
+#   arr[i]=v, arr[i]+=v      (indexed element assignment / append)
+#   declare -a arr, declare -A map, typeset ... (array declaration)
+#   map=([k1]=v1 [k2]=v2), map[k]=v  (associative array assignment)
+#   ${arr[i]}, ${map[key]}   (element access; $arr == ${arr[0]})
+#   ${arr[@]}, ${arr[*]}     (all elements)
+#   ${#arr[@]}, ${#map[@]}   (element count)
+#   ${#arr[i]}               (length of one element)
+#   ${!arr[@]}, ${!map[@]}   (indices / keys)
+#   unset arr, unset arr[i]  (whole array / single element)
 #   source / . file
 #
 ######################################################################
@@ -51,7 +62,7 @@ use File::Spec ();
 use Carp qw(croak);
 use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 # Bareword filehandle globs for SH pipeline (Perl 5.005_03 compatible)
@@ -88,6 +99,24 @@ $_PIPE_DEPTH = 0;
 
 # SH function registry -- must be package-level for access from _expand and _exec_line
 use vars qw(%_SH_FUNCTIONS);
+
+# SH array storage (v0.06).  Indexed and associative arrays.
+#   %_SH_ARRAY      : NAME (uppercased) => hashref { subscript => value }
+#   %_SH_ARRAY_TYPE : NAME (uppercased) => 'indexed' | 'assoc'
+# Array names are case-insensitive (stored uppercase) to match the scalar
+# store.  Indexed arrays may be sparse; subscripts are integer strings.
+# Associative arrays use arbitrary string subscripts.  Element order for
+# ${arr[@]} is ascending numeric index (indexed) or ascending key sort
+# (assoc) -- the latter is chosen for deterministic output across Perl
+# versions, since bash leaves associative-array order unspecified.
+use vars qw(%_SH_ARRAY %_SH_ARRAY_TYPE);
+
+# SH trap registry (v0.06).  Maps a normalized signal name (e.g. INT, TERM,
+# EXIT) to the raw command string to run when that signal/event fires.  An
+# empty string means "ignore"; absence means "default".  Real signals are
+# bridged to Perl's %SIG (see _sh_set_os_sig); the EXIT pseudo-signal is run
+# internally when the script exits (see fire_exit_trap / _cmd_exit).
+use vars qw(%_SH_TRAP);
 # ----------------------------------------------------------------
 my $LAST_STATUS = 0;   # $?
 my @FUNCTION_STACK = ();   # for 'local' variable scoping
@@ -263,6 +292,25 @@ sub _exec_line {
         return _exec_sh_pipe($class, \@pipe_segs, $opts_ref);
     }
 
+    # Array / associative-array operations (v0.06).  Detected on the RAW line
+    # (before _expand) so that the "(a b c)" literal and the "[sub]" subscripts
+    # are not mangled by variable / command-substitution expansion.
+    {
+        my @h = _sh_try_array_op($class, $line, $opts_ref);
+        return $h[1] if @h;
+    }
+
+    # trap (v0.06).  Detected on the RAW line so that the handler command is
+    # captured literally and (re-)expanded only when the trap fires, matching
+    # shell semantics for e.g. trap 'rm $tmp' EXIT.
+    {
+        my $probe = $line;
+        $probe =~ s/\A\s+//;
+        if ($probe =~ /\Atrap(\s.*|)\z/is && $probe !~ /\Atrap\s*=/) {
+            return _cmd_trap($class, $1, $opts_ref);
+        }
+    }
+
     # POSIX assignment prefix on the RAW line: `VAR=value command args`.
     # Detected before expansion so that a value containing $(...) or quoted
     # spaces is not mistaken for a trailing command.  Pure assignments (no
@@ -381,6 +429,42 @@ sub _expand {
     # backtick command substitution: `cmd`
     $str =~ s/`([^`]*)`/_cmd_subst($class, $1)/ge;
 
+    # ---- Array expansions (v0.06) ----------------------------------
+    # These MUST precede the scalar ${#VAR} / ${VAR} rules below so that a
+    # subscripted reference is never mis-parsed as a plain variable.
+
+    # ${#NAME[@]} / ${#NAME[*]} -- number of set elements
+    $str =~ s/\$\{#([A-Za-z_][A-Za-z0-9_]*)\[[\@*]\]\}/
+        _arr_count($1)
+    /ge;
+
+    # ${#NAME[SUB]} -- length of one element
+    $str =~ s/\$\{#([A-Za-z_][A-Za-z0-9_]*)\[([^\]]*)\]\}/
+        do {
+            my $v = _arr_get_element($1, _arr_expand_sub($class, $2));
+            defined $v ? length($v) : 0
+        }
+    /ge;
+
+    # ${!NAME[@]} / ${!NAME[*]} -- list of indices / keys
+    $str =~ s/\$\{!([A-Za-z_][A-Za-z0-9_]*)\[[\@*]\]\}/
+        join(' ', _arr_ordered_keys($1))
+    /ge;
+
+    # ${NAME[@]} / ${NAME[*]} -- all elements (space-joined word-split model)
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\[[\@*]\]\}/
+        join(' ', _arr_values($1))
+    /ge;
+
+    # ${NAME[SUB]} -- single element
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\[([^\]]*)\]\}/
+        do {
+            my $v = _arr_get_element($1, _arr_expand_sub($class, $2));
+            defined $v ? $v : ''
+        }
+    /ge;
+    # ----------------------------------------------------------------
+
     # ${#VAR} -- length of value
     $str =~ s/\$\{#([A-Za-z_][A-Za-z0-9_]*)\}/
         do { my $v = BATsh::Env->get($1); defined $v ? length($v) : 0 }
@@ -471,9 +555,17 @@ sub _expand {
         do { my $v = BATsh::Env->get($1); (defined $v && $v ne '') ? $2 : '' }
     /ge;
 
-    # ${VAR} -- plain expansion
+    # ${VAR} -- plain expansion (array name yields element 0)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/
-        do { my $v = BATsh::Env->get($1); defined $v ? $v : '' }
+        do {
+            my $n = $1;
+            if (_arr_exists($n)) {
+                my $v = _arr_get_element($n, 0); defined $v ? $v : ''
+            }
+            else {
+                my $v = BATsh::Env->get($n); defined $v ? $v : ''
+            }
+        }
     /ge;
 
     # $? last status
@@ -516,9 +608,17 @@ sub _expand {
         }
     /ge;
 
-    # $VAR
+    # $VAR (array name yields element 0)
     $str =~ s/\$([A-Za-z_][A-Za-z0-9_]*)/
-        do { my $v = BATsh::Env->get($1); defined $v ? $v : '' }
+        do {
+            my $n = $1;
+            if (_arr_exists($n)) {
+                my $v = _arr_get_element($n, 0); defined $v ? $v : ''
+            }
+            else {
+                my $v = BATsh::Env->get($n); defined $v ? $v : ''
+            }
+        }
     /ge;
 
     # Restore the escaped specials as literal characters (reverse order of
@@ -709,7 +809,28 @@ sub _cmd_unset {
     my ($rest) = @_;
     for my $var (split /\s+/, $rest) {
         $var =~ s/\A\s+//; $var =~ s/\s+\z//;
-        BATsh::Env->unset($var) if $var ne '';
+        next if $var eq '';
+        # unset NAME[SUB] -- remove a single array element
+        if ($var =~ /\A([A-Za-z_][A-Za-z0-9_]*)\[([^\]]*)\]\z/) {
+            my ($name, $sub) = ($1, $2);
+            my $k = _arr_name($name);
+            if (exists $_SH_ARRAY{$k}) {
+                if ((defined $_SH_ARRAY_TYPE{$k} && $_SH_ARRAY_TYPE{$k} eq 'assoc')) {
+                    delete $_SH_ARRAY{$k}{$sub};
+                }
+                else {
+                    delete $_SH_ARRAY{$k}{ _arr_index($sub) };
+                }
+            }
+            next;
+        }
+        # unset NAME -- remove a whole array (and any scalar of the same name)
+        my $k = _arr_name($var);
+        if (exists $_SH_ARRAY{$k}) {
+            delete $_SH_ARRAY{$k};
+            delete $_SH_ARRAY_TYPE{$k};
+        }
+        BATsh::Env->unset($var);
     }
     $LAST_STATUS = 0;
     return 0;
@@ -732,9 +853,10 @@ sub _cmd_echo {
         $rest =~ s/\\r/\r/g;
         $rest =~ s/\\\\/\\/g;
     }
-    # Strip surrounding quotes
-    $rest =~ s/\A"(.*)"\z/$1/s;
-    $rest =~ s/\A'(.*)'\z/$1/s;
+    # Remove shell quoting structurally so that quotes anywhere in the
+    # argument list are dropped (e.g. echo "${arr[@]}" tail), not only when
+    # the whole string is wrapped in one pair of quotes.
+    $rest = _arr_dequote($rest);
     if ($no_newline) { print $rest }
     else             { print "$rest\n" }
     $LAST_STATUS = 0;
@@ -794,9 +916,161 @@ sub _cmd_exit {
     my ($rest) = @_;
     $rest =~ s/\A\s+//;
     my $code = ($rest =~ /\A(\d+)/) ? int($1) : 0;
+    # Run the EXIT trap (once) before exiting, while no exit is yet pending so
+    # the trap body executes.  Delete it first to avoid re-entry / double-fire.
+    if (exists $_SH_TRAP{'EXIT'}) {
+        my $cmd = delete $_SH_TRAP{'EXIT'};
+        if (defined $cmd && $cmd ne '') {
+            eval { _run_lines('BATsh::SH', [$cmd], {}) };
+        }
+    }
     $_EXIT_CODE = $code;
     $LAST_STATUS = $code;
     return $code;
+}
+
+# ----------------------------------------------------------------
+# trap -- signal / event handling (v0.06)
+#
+# Supported forms:
+#   trap 'commands' SIGSPEC...   register a handler
+#   trap - SIGSPEC...            reset to the default action
+#   trap '' SIGSPEC...           ignore the signal
+#   trap            / trap -p    list the current traps
+#
+# SIGSPEC may be a name (with or without a leading SIG), a number, or the
+# EXIT pseudo-signal (also spelled 0).  Real OS signals are bridged to
+# Perl's %SIG; EXIT is run internally when the script ends or on `exit`.
+# The handler command is stored unexpanded and (re-)expanded when it fires.
+# ----------------------------------------------------------------
+sub _cmd_trap {
+    my ($class, $rest, $opts_ref) = @_;
+    my ($mode, $cmd, $sigs) = _sh_parse_trap($rest);
+
+    if ($mode eq 'list') {
+        my @names = @{$sigs} ? @{$sigs} : sort keys %_SH_TRAP;
+        for my $n (@names) {
+            my $sig = _sh_normalize_sig($n);
+            next unless exists $_SH_TRAP{$sig};
+            print "trap -- '" . $_SH_TRAP{$sig} . "' $sig\n";
+        }
+        $LAST_STATUS = 0;
+        return 0;
+    }
+
+    for my $spec (@{$sigs}) {
+        my $sig = _sh_normalize_sig($spec);
+        next if $sig eq '';
+        if ($mode eq 'reset') {
+            delete $_SH_TRAP{$sig};
+            _sh_set_os_sig($sig, 'DEFAULT');
+        }
+        elsif ($mode eq 'ignore') {
+            $_SH_TRAP{$sig} = '';
+            _sh_set_os_sig($sig, 'IGNORE');
+        }
+        else {   # set
+            $_SH_TRAP{$sig} = $cmd;
+            _sh_set_os_sig($sig, 'HANDLER');
+        }
+    }
+    $LAST_STATUS = 0;
+    return 0;
+}
+
+# Parse the (raw) argument string of a trap command.
+# Returns ($mode, $cmd, \@sigs) where $mode is 'list', 'reset', 'ignore'
+# or 'set'.  For 'set', $cmd is the (still unexpanded) handler command.
+sub _sh_parse_trap {
+    my ($s) = @_;
+    $s = '' unless defined $s;
+    $s =~ s/\A\s+//; $s =~ s/\s+\z//;
+    return ('list', undef, []) if $s eq '';
+
+    if ($s =~ /\A-p\b\s*(.*)\z/s) {
+        my @sigs = grep { length } split /\s+/, $1;
+        return ('list', undef, \@sigs);
+    }
+
+    my ($action, $quoted, $rest);
+    if ($s =~ /\A'([^']*)'\s*(.*)\z/s) {
+        ($action, $quoted, $rest) = ($1, 1, $2);
+    }
+    elsif ($s =~ /\A"((?:[^"\\]|\\.)*)"\s*(.*)\z/s) {
+        ($action, $quoted, $rest) = ($1, 1, $2);
+    }
+    else {
+        ($action, $rest) = split /\s+/, $s, 2;
+        $quoted = 0;
+        $rest   = '' unless defined $rest;
+    }
+    my @sigs = grep { length } split /\s+/, $rest;
+
+    return ('reset',  undef, \@sigs) if !$quoted && $action eq '-';
+    return ('ignore', '',    \@sigs) if $quoted  && $action eq '';
+    return ('set',    $action, \@sigs);
+}
+
+# Normalize a signal spec to a bare name: strip a leading SIG, uppercase,
+# and map the common signal numbers to names.
+sub _sh_normalize_sig {
+    my ($s) = @_;
+    return '' unless defined $s;
+    $s =~ s/\A\s+//; $s =~ s/\s+\z//;
+    return '' if $s eq '';
+    $s = uc($s);
+    $s =~ s/\ASIG//;
+    if ($s =~ /\A\d+\z/) {
+        my %num = (0 => 'EXIT', 1 => 'HUP', 2 => 'INT', 3 => 'QUIT',
+                   6 => 'ABRT', 9 => 'KILL', 13 => 'PIPE', 14 => 'ALRM',
+                   15 => 'TERM');
+        $s = exists $num{$s + 0} ? $num{$s + 0} : $s;
+    }
+    return $s;
+}
+
+# Bridge a trap to Perl's %SIG.  Pseudo-signals (EXIT/ERR/DEBUG/RETURN) are
+# handled internally and never touch %SIG.  Assignment is eval-guarded so an
+# unsupported signal name (e.g. on Windows) degrades quietly.
+sub _sh_set_os_sig {
+    my ($sig, $what) = @_;
+    return if $sig eq 'EXIT' || $sig eq 'ERR'
+           || $sig eq 'DEBUG' || $sig eq 'RETURN';
+    # Some signals (e.g. HUP/USR1/USR2) do not exist on every platform --
+    # notably Windows -- where assigning to %SIG for them emits a harmless
+    # "No such signal" warning.  Suppress just that warning so a portable
+    # script trapping such a signal stays quiet; all other warnings pass
+    # through, and the assignment itself still succeeds (best effort).
+    local $SIG{__WARN__} = sub {
+        my $w = defined $_[0] ? $_[0] : '';
+        warn $w unless $w =~ /No such signal/;
+    };
+    eval {
+        if    ($what eq 'DEFAULT') { $SIG{$sig} = 'DEFAULT' }
+        elsif ($what eq 'IGNORE')  { $SIG{$sig} = 'IGNORE' }
+        else                       { $SIG{$sig} = sub { _sh_run_trap($sig) } }
+    };
+    return;
+}
+
+# Run the handler command registered for $sig (no-op if unset or 'ignore').
+sub _sh_run_trap {
+    my ($sig) = @_;
+    my $cmd = $_SH_TRAP{$sig};
+    return unless defined $cmd && $cmd ne '';
+    eval { _run_lines('BATsh::SH', [$cmd], {}) };
+}
+
+# Run the EXIT trap (if any) exactly once, then clear it.  Called by the
+# top-level run paths in BATsh.pm when the whole script has finished.
+sub fire_exit_trap {
+    my ($class) = @_;
+    return unless exists $_SH_TRAP{'EXIT'};
+    my $cmd = delete $_SH_TRAP{'EXIT'};
+    return if !defined $cmd || $cmd eq '';
+    $_EXIT_CODE = undef;   # let the trap body run to completion
+    eval { _run_lines('BATsh::SH', [$cmd], {}) };
+    return;
 }
 
 # ----------------------------------------------------------------
@@ -1185,17 +1459,11 @@ sub _parse_for {
         }
     }
 
-    # Expand list items; apply filename globbing to unquoted words
-    my @items_raw = split /\s+/, $list_str;
-    my @items;
-    for my $w (@items_raw) {
-        if ($w =~ /[*?\[]/) {
-            push @items, _glob_expand($w);
-        }
-        else {
-            push @items, $w;
-        }
-    }
+    # Expand list items.  _expand_word_list resolves variables and command
+    # substitutions, applies filename globbing to unquoted glob words, and
+    # expands a whole-word ${arr[@]} / ${arr[*]} reference (quoted or not) to
+    # one item per array element.
+    my @items = _expand_word_list($class, $list_str);
     my $status = 0;
     for my $val (@items) {
         BATsh::Env->set($var, $val);
@@ -1342,76 +1610,265 @@ sub _parse_case {
     my $case_line = $lines[$i]; $i++;
     $case_line =~ s/\r?\n\z//; $case_line =~ s/\A\s+//;
 
-    # case WORD in
-    my $word = '';
-    if ($case_line =~ /\Acase\s+(.*?)\s+in\s*\z/i) {
-        $word = _expand(undef, $1);
+    # Header: case WORD in [inline clauses...]
+    # The clauses (and even esac) may follow inline on the same physical line
+    # -- e.g. "case $x in a) echo a ;; *) echo other ;; esac" -- or on the
+    # following lines.  $inline_rest captures anything after "in".
+    my $word        = '';
+    my $inline_rest = '';
+    if ($case_line =~ /\Acase\s+(.*?)\s+in\b\s*(.*)\z/is) {
+        $word        = _arr_dequote(_expand($class, $1));
+        $inline_rest = $2;
+    }
+    else {
+        return (0, $i);   # malformed header: nothing to do
     }
 
-    # Read patterns and bodies until esac
+    # Accumulate the clause region (everything between "in" and "esac"),
+    # stopping as soon as the closing esac is seen.  esac is only recognised
+    # at a clause boundary (start of region, after a ;;/;&/;;& terminator, or
+    # at the start of a line), so the word "esac" appearing inside a body
+    # (e.g. echo esac) does not end the construct prematurely.
+    my $region = '';
+    my $found  = 0;
+    {
+        my $pos = _case_top_esac_pos($inline_rest);
+        if ($pos >= 0) { $region = substr($inline_rest, 0, $pos); $found = 1 }
+        else           { $region = $inline_rest }
+    }
+    while (!$found && $i <= $#lines) {
+        my $l = $lines[$i]; $i++;
+        $l =~ s/\r?\n\z//;
+        my $pos = _case_top_esac_pos($l);
+        if ($pos >= 0) {
+            $region .= "\n" . substr($l, 0, $pos);
+            $found = 1;
+            last;
+        }
+        $region .= "\n" . $l;
+    }
+
+    # Split the region into clauses, then evaluate with fall-through support:
+    #   ;;   normal: stop after the first matching clause
+    #   ;&   fall through: run the NEXT clause's body unconditionally
+    #   ;;&  continue: keep testing the remaining clauses against the word
+    my @clauses = _case_split_clauses($region);
+
     my $status = 0;
-    my $matched = 0;
+    my $stop   = 0;   # a ;; was reached after a match -- stop entirely
+    my $fall   = 0;   # previous clause ended in ;& -- run this body no matter what
+    for my $cl (@clauses) {
+        last if $stop;
+        my ($ctext, $term) = @{$cl};
+        next unless $ctext =~ /\S/;
 
-    while ($i <= $#lines) {
-        my $pl = $lines[$i]; $i++;
-        $pl =~ s/\r?\n\z//; $pl =~ s/\A\s+//;
-        next if $pl =~ /\A\s*\z/;
-        my $lc_f = lc( ($pl =~ /\A(\S+)/) ? $1 : '' );
-        last if $lc_f eq 'esac';
-        next if $pl =~ /\A\s*;;\s*\z/;  # stray ;; between patterns
+        my ($pattern_str, $body_text) = _case_parse_clause($ctext);
+        next unless defined $pattern_str;   # not a pattern) clause -- skip
 
-        # Case 1: pattern) body ;; -- all on one line
-        if ($pl =~ /\A(.*?)\)\s*(.+?)\s*;;\s*\z/) {
-            my ($pattern_str, $inline_body) = ($1, $2);
-            if (!$matched) {
-                for my $pat (split /\|/, $pattern_str) {
-                    $pat =~ s/\A\s+//; $pat =~ s/\s+\z//;
-                    if (_match_pattern($word, $pat)) {
-                        $status = _run_lines($class, [$inline_body], $opts_ref);
-                        $matched = 1;
-                        last;
-                    }
-                }
+        my $run = 0;
+        if ($fall) {
+            $run  = 1;
+            $fall = 0;
+        }
+        else {
+            for my $pat (_case_split_patterns($pattern_str)) {
+                $pat =~ s/\A\s+//; $pat =~ s/\s+\z//;
+                next if $pat eq '';
+                if (_match_pattern($word, $pat)) { $run = 1; last }
             }
-            next;
         }
 
-        # Case 2: pattern) -- pattern only, body on next lines until ;;
-        if ($pl =~ /\A(.*?)\)\s*\z/) {
-            my $pattern_str = $1;
-            my @body = ();
-            while ($i <= $#lines) {
-                my $bl = $lines[$i]; $i++;
-                $bl =~ s/\r?\n\z//;
-                last if $bl =~ /\A\s*;;\s*\z/;
-                if ($bl =~ /\A(.+?)\s*;;\s*\z/) { push @body, $1; last }
-                push @body, $bl;
-            }
-            if (!$matched) {
-                for my $pat (split /\|/, $pattern_str) {
-                    $pat =~ s/\A\s+//; $pat =~ s/\s+\z//;
-                    if (_match_pattern($word, $pat)) {
-                        $status = _run_lines($class, \@body, $opts_ref);
-                        $matched = 1;
-                        last;
-                    }
-                }
-            }
+        if ($run) {
+            my @body = split /\n/, $body_text;
+            $status = _run_lines($class, \@body, $opts_ref);
+            last if $_BREAK || $_CONTINUE || $_RETURN || defined $_EXIT_CODE;
+            if    ($term eq ';;')  { $stop = 1 }
+            elsif ($term eq ';&')  { $fall = 1 }   # next body unconditionally
+            # ';;&' : neither stop nor fall -- keep testing later clauses
         }
     }
 
     return ($status, $i);
 }
 
-# Shell glob pattern matching
+# Locate a clause-boundary "esac" at the top level of $s (outside quotes).
+# Returns its character offset, or -1.  An esac is only at a clause boundary
+# when the preceding non-blank character is a ';', '&', or newline, or it is
+# at the very start -- so "echo esac" inside a body does not match.
+sub _case_top_esac_pos {
+    my ($s) = @_;
+    return -1 unless defined $s && $s ne '';
+    my @c = split //, $s;
+    my $n = scalar @c;
+    my $i = 0; my $sq = 0; my $dq = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($sq) { $sq = 0 if $ch eq "'"; $i++; next }
+        if ($ch eq "'" && !$dq) { $sq = 1; $i++; next }
+        if ($ch eq '"') { $dq = !$dq; $i++; next }
+        if (!$dq && lc(substr($s, $i, 4)) eq 'esac') {
+            my $after = ($i + 4 < $n) ? substr($s, $i + 4, 1) : '';
+            my $aok = ($i + 4 >= $n || $after =~ /\s/) ? 1 : 0;
+            my $j = $i - 1;
+            $j-- while $j >= 0 && ($c[$j] eq ' ' || $c[$j] eq "\t");
+            my $bok = ($j < 0 || $c[$j] eq ';' || $c[$j] eq '&'
+                       || $c[$j] eq "\n") ? 1 : 0;
+            return $i if $aok && $bok;
+        }
+        $i++;
+    }
+    return -1;
+}
+
+# Split a case region into clauses on the terminators ;;& / ;; / ;& at the
+# top level (outside quotes).  Returns a list of [clause_text, terminator].
+sub _case_split_clauses {
+    my ($s) = @_;
+    my @out;
+    my $cur = '';
+    my @c   = split //, $s;
+    my $n   = scalar @c;
+    my $i = 0; my $sq = 0; my $dq = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($sq) { $cur .= $ch; $sq = 0 if $ch eq "'"; $i++; next }
+        if ($ch eq "'" && !$dq) { $sq = 1; $cur .= $ch; $i++; next }
+        if ($ch eq '"') { $dq = !$dq; $cur .= $ch; $i++; next }
+        if (!$sq && !$dq) {
+            if (substr($s, $i, 3) eq ';;&') {
+                push @out, [$cur, ';;&']; $cur = ''; $i += 3; next;
+            }
+            if (substr($s, $i, 2) eq ';;') {
+                push @out, [$cur, ';;'];  $cur = ''; $i += 2; next;
+            }
+            if (substr($s, $i, 2) eq ';&') {
+                push @out, [$cur, ';&'];  $cur = ''; $i += 2; next;
+            }
+        }
+        $cur .= $ch; $i++;
+    }
+    push @out, [$cur, ';;'] if $cur =~ /\S/;
+    return @out;
+}
+
+# Parse a clause "pat1|pat2) body" into ($patterns, $body).  A leading "("
+# is accepted (bash form).  The "(" closing the pattern list is the first
+# top-level ")" outside quotes and outside a [...] class.  Returns
+# (undef, undef) when no pattern ")" is present.
+sub _case_parse_clause {
+    my ($s) = @_;
+    $s =~ s/\A[\s\n]+//;
+    $s =~ s/\A\(//;   # optional leading (
+    my @c = split //, $s;
+    my $n = scalar @c;
+    my $i = 0; my $sq = 0; my $dq = 0; my $cls = 0;
+    my $found = -1;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($sq) { $sq = 0 if $ch eq "'"; $i++; next }
+        if ($ch eq "'" && !$dq) { $sq = 1; $i++; next }
+        if ($ch eq '"') { $dq = !$dq; $i++; next }
+        if (!$sq && !$dq) {
+            if    ($ch eq '[') { $cls = 1 }
+            elsif ($ch eq ']') { $cls = 0 }
+            elsif ($ch eq ')' && !$cls) { $found = $i; last }
+        }
+        $i++;
+    }
+    return (undef, undef) if $found < 0;
+    my $patterns = substr($s, 0, $found);
+    my $body     = ($found + 1 <= length($s)) ? substr($s, $found + 1) : '';
+    return ($patterns, $body);
+}
+
+# Split a pattern list on top-level "|" (outside quotes and [...] classes).
+sub _case_split_patterns {
+    my ($s) = @_;
+    my @out;
+    my $cur = '';
+    my @c   = split //, $s;
+    my $n   = scalar @c;
+    my $i = 0; my $sq = 0; my $dq = 0; my $cls = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($sq) { $cur .= $ch; $sq = 0 if $ch eq "'"; $i++; next }
+        if ($ch eq "'" && !$dq) { $sq = 1; $cur .= $ch; $i++; next }
+        if ($ch eq '"') { $dq = !$dq; $cur .= $ch; $i++; next }
+        if (!$sq && !$dq) {
+            if    ($ch eq '[') { $cls = 1 }
+            elsif ($ch eq ']') { $cls = 0 }
+            elsif ($ch eq '|' && !$cls) { push @out, $cur; $cur = ''; $i++; next }
+        }
+        $cur .= $ch; $i++;
+    }
+    push @out, $cur;
+    return @out;
+}
+
+# Match a shell-glob case pattern against a word.  Supports * ? and
+# character classes [abc] [a-z] [!abc]/[^abc], plus quoting and backslash
+# escapes (a quoted or escaped metacharacter is matched literally).
 sub _match_pattern {
     my ($word, $pat) = @_;
-    return 1 if $pat eq '*';
-    # Convert shell glob to regex
-    my $re = quotemeta($pat);
-    $re =~ s/\\\*/.*/g;
-    $re =~ s/\\\?/./g;
+    $word = '' unless defined $word;
+    my $re = _case_glob_to_re($pat);
     return ($word =~ /\A$re\z/) ? 1 : 0;
+}
+
+sub _case_glob_to_re {
+    my ($pat) = @_;
+    $pat = '' unless defined $pat;
+    my $re = '';
+    my @c = split //, $pat;
+    my $n = scalar @c;
+    my $i = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($ch eq "'") {                       # literal single-quoted run
+            $i++;
+            while ($i < $n && $c[$i] ne "'") { $re .= quotemeta($c[$i]); $i++ }
+            $i++; next;
+        }
+        if ($ch eq '"') {                       # literal double-quoted run
+            $i++;
+            while ($i < $n && $c[$i] ne '"') {
+                if ($c[$i] eq '\\' && $i + 1 < $n) {
+                    $i++; $re .= quotemeta($c[$i]); $i++; next;
+                }
+                $re .= quotemeta($c[$i]); $i++;
+            }
+            $i++; next;
+        }
+        if ($ch eq '\\') {                      # escaped literal
+            $i++; $re .= quotemeta($c[$i]) if $i < $n; $i++; next;
+        }
+        if ($ch eq '*') { $re .= '.*'; $i++; next }
+        if ($ch eq '?') { $re .= '.';  $i++; next }
+        if ($ch eq '[') {                       # character class
+            my $j   = $i + 1;
+            my $neg = 0;
+            if ($j < $n && ($c[$j] eq '!' || $c[$j] eq '^')) { $neg = 1; $j++ }
+            my $body = '';
+            if ($j < $n && $c[$j] eq ']') { $body .= '\\]'; $j++ }  # leading ] literal
+            while ($j < $n && $c[$j] ne ']') {
+                my $cc = $c[$j];
+                if ($cc eq '\\' && $j + 1 < $n) {
+                    $body .= '\\' . $c[$j + 1]; $j += 2; next;
+                }
+                if ($cc eq '\\' || $cc eq '^' || $cc eq ']') { $body .= '\\' . $cc }
+                else                                         { $body .= $cc }
+                $j++;
+            }
+            if ($j < $n && $c[$j] eq ']') {
+                $re .= '[' . ($neg ? '^' : '') . $body . ']';
+                $i = $j + 1; next;
+            }
+            $re .= '\\['; $i++; next;            # unterminated [ : literal
+        }
+        $re .= quotemeta($ch);
+        $i++;
+    }
+    return $re;
 }
 
 # ----------------------------------------------------------------
@@ -2639,6 +3096,389 @@ END { for my $f (@_BG_TMPFILES) { unlink $f if defined $f } }
 
 
 # ----------------------------------------------------------------
+# Array / associative-array support (v0.06)
+# ----------------------------------------------------------------
+# Array names are case-insensitive, matching the scalar store: the key
+# stored in %_SH_ARRAY is always the uppercased name.
+sub _arr_name { return uc($_[0]) }
+
+sub _arr_exists {
+    my ($name) = @_;
+    return exists $_SH_ARRAY{ _arr_name($name) } ? 1 : 0;
+}
+
+sub _arr_is_assoc {
+    my ($name) = @_;
+    my $k = _arr_name($name);
+    return (exists $_SH_ARRAY_TYPE{$k} && $_SH_ARRAY_TYPE{$k} eq 'assoc') ? 1 : 0;
+}
+
+# Evaluate an indexed-array subscript as an integer.  Plain integers are
+# taken verbatim; anything else is run through the arithmetic evaluator so
+# that subscripts such as "1+1" or a bare variable name work like bash.
+sub _arr_index {
+    my ($s) = @_;
+    $s = '' unless defined $s;
+    $s =~ s/\A\s+//; $s =~ s/\s+\z//;
+    return 0 if $s eq '';
+    return int($s) if $s =~ /\A-?\d+\z/;
+    my $v = _eval_arith($s);
+    return ($v =~ /\A-?\d+\z/) ? int($v) : 0;
+}
+
+# Resolve $VAR / ${VAR} inside a subscript (no command substitution, no
+# arithmetic -- those are applied later for indexed subscripts).
+sub _arr_expand_sub {
+    my ($class, $s) = @_;
+    return '' unless defined $s;
+    $s =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/
+        do { my $v = BATsh::Env->get($1); defined $v ? $v : '' }
+    /ge;
+    $s =~ s/\$([A-Za-z_][A-Za-z0-9_]*)/
+        do { my $v = BATsh::Env->get($1); defined $v ? $v : '' }
+    /ge;
+    return $s;
+}
+
+# Element keys in display order: ascending numeric (indexed) or sorted
+# string (assoc).
+sub _arr_ordered_keys {
+    my ($name) = @_;
+    my $k = _arr_name($name);
+    return () unless exists $_SH_ARRAY{$k};
+    my $h = $_SH_ARRAY{$k};
+    if ((defined $_SH_ARRAY_TYPE{$k} && $_SH_ARRAY_TYPE{$k} eq 'assoc')) {
+        return sort keys %{$h};
+    }
+    return sort { $a <=> $b } keys %{$h};
+}
+
+sub _arr_values {
+    my ($name) = @_;
+    my $k = _arr_name($name);
+    return () unless exists $_SH_ARRAY{$k};
+    my $h = $_SH_ARRAY{$k};
+    return map { $h->{$_} } _arr_ordered_keys($name);
+}
+
+sub _arr_count {
+    my ($name) = @_;
+    my $k = _arr_name($name);
+    return 0 unless exists $_SH_ARRAY{$k};
+    return scalar keys %{$_SH_ARRAY{$k}};
+}
+
+# Fetch a single element.  $sub is already $VAR-expanded by the caller.
+# Returns undef when the element is unset.
+sub _arr_get_element {
+    my ($name, $sub) = @_;
+    my $k = _arr_name($name);
+    return undef unless exists $_SH_ARRAY{$k};
+    my $h = $_SH_ARRAY{$k};
+    if ((defined $_SH_ARRAY_TYPE{$k} && $_SH_ARRAY_TYPE{$k} eq 'assoc')) {
+        return exists $h->{$sub} ? $h->{$sub} : undef;
+    }
+    my $idx = _arr_index($sub);
+    if ($idx < 0) {
+        # Negative subscript: count back over the ordered set of set indices.
+        my @keys = _arr_ordered_keys($name);
+        return undef unless @keys;
+        my $kk = $keys[$idx];
+        return defined $kk ? $h->{$kk} : undef;
+    }
+    return exists $h->{$idx} ? $h->{$idx} : undef;
+}
+
+# Remove shell quoting from a value: drop unescaped quote characters while
+# honouring single- vs double-quote regions.  Handles whole-token quotes
+# ("a b") and partial quotes (foo"a b"bar) alike.
+sub _arr_dequote {
+    my ($v) = @_;
+    return '' unless defined $v;
+    my $out   = '';
+    my $in_sq = 0;
+    my $in_dq = 0;
+    for my $c (split //, $v) {
+        if ($in_sq) { if ($c eq "'") { $in_sq = 0 } else { $out .= $c } next }
+        if ($c eq "'" && !$in_dq) { $in_sq = 1; next }
+        if ($c eq '"' && !$in_sq) { $in_dq = !$in_dq; next }
+        $out .= $c;
+    }
+    return $out;
+}
+
+# Split a string on unquoted whitespace, KEEPING the quote characters in
+# each returned token (so the caller can tell whether a token was quoted).
+sub _arr_split_words {
+    my ($s) = @_;
+    $s = '' unless defined $s;
+    my @words;
+    my $cur   = '';
+    my $have  = 0;
+    my $in_sq = 0;
+    my $in_dq = 0;
+    my @chars = split //, $s;
+    my $n     = scalar @chars;
+    my $i     = 0;
+    while ($i < $n) {
+        my $c = $chars[$i];
+        if ($in_sq) { $cur .= $c; $in_sq = 0 if $c eq "'"; $have = 1; $i++; next }
+        if ($c eq "'" && !$in_dq) { $in_sq = 1; $cur .= $c; $have = 1; $i++; next }
+        if ($c eq '"' && !$in_sq) { $in_dq = !$in_dq; $cur .= $c; $have = 1; $i++; next }
+        if (!$in_sq && !$in_dq && $c =~ /\s/) {
+            if ($have) { push @words, $cur; $cur = ''; $have = 0 }
+            $i++; next;
+        }
+        $cur .= $c; $have = 1; $i++;
+    }
+    push @words, $cur if $have;
+    return @words;
+}
+
+# Parse the body of a (...) array literal into a list of [subscript, value]
+# pairs.  $subscript is undef for positional elements and a string for
+# explicit [sub]=value elements.
+sub _arr_parse_elements {
+    my ($class, $body) = @_;
+    my @raw = _arr_split_words($body);
+    my @out;
+    for my $tok (@raw) {
+        my ($sub, $vpart);
+        if ($tok =~ /\A\[(.*?)\]=(.*)\z/s) {
+            ($sub, $vpart) = ($1, $2);
+        }
+        else {
+            ($sub, $vpart) = (undef, $tok);
+        }
+        my $raw_has_quote = ($vpart =~ /['"]/) ? 1 : 0;
+        my $exp = _expand($class, $vpart);
+        if (defined $sub) {
+            $sub = _arr_dequote(_expand($class, $sub));
+            push @out, [$sub, _arr_dequote($exp)];
+        }
+        elsif (!$raw_has_quote && $exp =~ /\s/) {
+            # Unquoted expansion is subject to word splitting.
+            for my $w (split /\s+/, $exp) {
+                next if $w eq '';
+                push @out, [undef, $w];
+            }
+        }
+        else {
+            push @out, [undef, _arr_dequote($exp)];
+        }
+    }
+    return @out;
+}
+
+# arr=( ... )  /  arr+=( ... )   whole-array assignment or append.
+sub _arr_assign_literal {
+    my ($class, $name, $body, $append) = @_;
+    my $k     = _arr_name($name);
+    my $assoc = _arr_is_assoc($name);   # honour a prior 'declare -A'
+
+    if (!$append) {
+        $_SH_ARRAY{$k}      = {};
+        $_SH_ARRAY_TYPE{$k} = $assoc ? 'assoc' : 'indexed';
+    }
+    else {
+        $_SH_ARRAY{$k}      = {} unless exists $_SH_ARRAY{$k};
+        $_SH_ARRAY_TYPE{$k} = ($assoc ? 'assoc' : 'indexed')
+            unless exists $_SH_ARRAY_TYPE{$k};
+    }
+    BATsh::Env->unset($name);   # a name is array OR scalar, not both
+
+    my $is_assoc = ($_SH_ARRAY_TYPE{$k} eq 'assoc');
+    my @elems    = _arr_parse_elements($class, $body);
+
+    if ($is_assoc) {
+        for my $e (@elems) {
+            my ($sub, $val) = @{$e};
+            $sub = '' unless defined $sub;
+            $_SH_ARRAY{$k}{$sub} = $val;
+        }
+    }
+    else {
+        my $next = 0;
+        for my $ix (keys %{$_SH_ARRAY{$k}}) {
+            $next = $ix + 1 if $ix =~ /\A-?\d+\z/ && $ix + 1 > $next;
+        }
+        for my $e (@elems) {
+            my ($sub, $val) = @{$e};
+            if (defined $sub && $sub ne '') {
+                my $ix = _arr_index($sub);
+                $_SH_ARRAY{$k}{$ix} = $val;
+                $next = $ix + 1;
+            }
+            else {
+                $_SH_ARRAY{$k}{$next} = $val;
+                $next++;
+            }
+        }
+    }
+    $LAST_STATUS = 0;
+    return 0;
+}
+
+# arr[sub]=value  /  arr[sub]+=value   single-element assignment or append.
+sub _arr_assign_element {
+    my ($class, $name, $sub, $rawval, $append) = @_;
+    my $val = _expand($class, $rawval);
+    $val =~ s/\A"(.*)"\z/$1/s;
+    $val =~ s/\A'(.*)'\z/$1/s;
+    my $k = _arr_name($name);
+    $sub = _arr_expand_sub($class, $sub);
+    if (!exists $_SH_ARRAY{$k}) {
+        $_SH_ARRAY{$k}      = {};
+        $_SH_ARRAY_TYPE{$k} = 'indexed';
+    }
+    BATsh::Env->unset($name);
+    my $key = (defined $_SH_ARRAY_TYPE{$k} && $_SH_ARRAY_TYPE{$k} eq 'assoc')
+        ? $sub : _arr_index($sub);
+    if ($append) {
+        my $old = exists $_SH_ARRAY{$k}{$key} ? $_SH_ARRAY{$k}{$key} : '';
+        $_SH_ARRAY{$k}{$key} = $old . $val;
+    }
+    else {
+        $_SH_ARRAY{$k}{$key} = $val;
+    }
+    $LAST_STATUS = 0;
+    return 0;
+}
+
+# declare / typeset [-aA] NAME[=(...)] ...   array (and scalar) declaration.
+sub _cmd_declare {
+    my ($class, $rest) = @_;
+    $rest = '' unless defined $rest;
+    $rest =~ s/\A\s+//;
+
+    my $type;   # 'assoc' | 'indexed' | undef
+    while ($rest =~ s/\A(-[A-Za-z]+)\s+//) {
+        my $flag = $1;
+        if    ($flag =~ /A/) { $type = 'assoc' }
+        elsif ($flag =~ /a/) { $type = 'indexed' unless defined $type }
+    }
+
+    while ($rest ne '') {
+        $rest =~ s/\A\s+//;
+        last if $rest eq '';
+        if ($rest =~ /\A([A-Za-z_][A-Za-z0-9_]*)\+?=\((.*)\)\s*(.*)\z/s) {
+            my ($name, $body, $tail) = ($1, $2, $3);
+            my $k = _arr_name($name);
+            $_SH_ARRAY_TYPE{$k} = $type if defined $type;
+            _arr_assign_literal($class, $name, $body, 0);
+            $rest = $tail;
+        }
+        elsif ($rest =~ /\A([A-Za-z_][A-Za-z0-9_]*)=(\S*)\s*(.*)\z/s) {
+            my ($name, $val, $tail) = ($1, $2, $3);
+            if (defined $type) {
+                # Typed array declared with a scalar initialiser: seed [0].
+                my $k = _arr_name($name);
+                $_SH_ARRAY_TYPE{$k} = $type;
+                _arr_assign_element($class, $name, '0', $val, 0);
+            }
+            else {
+                $val = _expand($class, $val);
+                $val =~ s/\A"(.*)"\z/$1/s;
+                $val =~ s/\A'(.*)'\z/$1/s;
+                BATsh::Env->set($name, $val);
+            }
+            $rest = $tail;
+        }
+        elsif ($rest =~ /\A([A-Za-z_][A-Za-z0-9_]*)\s*(.*)\z/s) {
+            my ($name, $tail) = ($1, $2);
+            my $k = _arr_name($name);
+            $_SH_ARRAY{$k}      = {} unless exists $_SH_ARRAY{$k};
+            $_SH_ARRAY_TYPE{$k} = (defined $type ? $type : 'indexed');
+            $rest = $tail;
+        }
+        else {
+            last;
+        }
+    }
+    $LAST_STATUS = 0;
+    return 0;
+}
+
+# _sh_try_array_op: detect and perform an array operation on the RAW line.
+# Returns (1, $status) when it handled the line, or () otherwise.
+sub _sh_try_array_op {
+    my ($class, $line, $opts_ref) = @_;
+    my $s = $line;
+    $s =~ s/\A\s+//; $s =~ s/\s+\z//;
+    $s =~ s/\s*;\s*\z//;   # tolerate one trailing ';'
+
+    # declare / typeset / local with array semantics
+    if ($s =~ /\A(declare|typeset|local)\b\s*(.*)\z/is) {
+        my ($kw, $args) = ($1, $2);
+        my $is_local      = (lc($kw) eq 'local');
+        my $has_arr_flag  = ($args =~ /\A-[A-Za-z]*[aA]/) ? 1 : 0;
+        my $has_arr_init  = ($args =~ /=\(/) ? 1 : 0;
+        if (!$is_local || $has_arr_flag || $has_arr_init) {
+            return (1, _cmd_declare($class, $args));
+        }
+        return ();   # plain 'local x=1' -> handled by _cmd_local
+    }
+
+    # NAME=( ... )  or  NAME+=( ... )  -- whole-line array literal
+    if ($s =~ /\A([A-Za-z_][A-Za-z0-9_]*)(\+?)=\((.*)\)\z/s) {
+        my ($name, $plus, $body) = ($1, $2, $3);
+        return (1, _arr_assign_literal($class, $name, $body,
+                                       ($plus eq '+') ? 1 : 0));
+    }
+
+    # NAME[SUB]=VALUE  or  NAME[SUB]+=VALUE  -- single-element assignment
+    if ($s =~ /\A([A-Za-z_][A-Za-z0-9_]*)\[([^\]]*)\](\+?)=(.*)\z/s) {
+        my ($name, $sub, $plus, $val) = ($1, $2, $3, $4);
+        return (1, _arr_assign_element($class, $name, $sub, $val,
+                                       ($plus eq '+') ? 1 : 0));
+    }
+
+    return ();
+}
+
+# _expand_word_list: turn a for-loop list string into a list of items.
+# Resolves variables / command substitution, applies filename globbing to
+# unquoted glob words, and expands a whole-word ${arr[@]} / ${arr[*]}
+# reference (quoted or not) to one item per array element.
+sub _expand_word_list {
+    my ($class, $list_str) = @_;
+    my @raw = _arr_split_words($list_str);
+    my @items;
+    for my $tok (@raw) {
+        # Whole-word ${arr[@]} / ${arr[*]} -> one item per element value.
+        if ($tok =~ /\A"?\$\{([A-Za-z_][A-Za-z0-9_]*)\[[\@*]\]\}"?\z/
+            && _arr_exists($1)) {
+            push @items, _arr_values($1);
+            next;
+        }
+        # Whole-word ${!arr[@]} / ${!arr[*]} -> one item per index / key.
+        if ($tok =~ /\A"?\$\{!([A-Za-z_][A-Za-z0-9_]*)\[[\@*]\]\}"?\z/
+            && _arr_exists($1)) {
+            push @items, _arr_ordered_keys($1);
+            next;
+        }
+        my $raw_has_quote = ($tok =~ /['"]/) ? 1 : 0;
+        my $exp = _arr_dequote(_expand($class, $tok));
+        if (!$raw_has_quote) {
+            if ($exp =~ /[*?\[]/) {
+                push @items, _glob_expand($exp);
+            }
+            elsif ($exp =~ /\s/) {
+                push @items, grep { $_ ne '' } split /\s+/, $exp;
+            }
+            elsif ($exp ne '') {
+                push @items, $exp;
+            }
+            # an empty unquoted word expands to nothing
+        }
+        else {
+            push @items, $exp;
+        }
+    }
+    return @items;
+}
+
+# ----------------------------------------------------------------
 # Accessors
 # ----------------------------------------------------------------
 sub last_status     { return $LAST_STATUS }
@@ -2721,9 +3561,12 @@ No external sh or bash is required.
   until condition; do ... done
   (for/while/until accept the loop body either on following lines or fully
    inline on one line, e.g. "for i in 1 2 3; do echo $i; done")
-  case $var in pattern) ... ;; esac
+  case $var in pat) ... ;; pat1|pat2) ... ;; *) ... ;; esac
+  (case: |-separated patterns, * ? [abc] [a-z] [!abc] globs, quoted/literal
+   patterns, and the bash ;& / ;;& fall-through terminators)
   test / [ ... ]  (file tests, string, integer comparisons)
   cd, pwd, exit, true, false, :, read, shift, local, set
+  trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]
   $(( arithmetic )) -- supports $1..$9 positional params
   $( command substitution ), `backtick substitution`
   $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0, $!
@@ -2734,6 +3577,16 @@ No external sh or bash is required.
   ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,}  -- case conversion
   ${VAR:offset:length}, ${VAR:offset}  -- substring
   ${#VAR}  -- string length
+  arr=(a b c), arr+=(d e)  -- indexed array assignment / append
+  arr[i]=v, arr[i]+=v      -- indexed element assignment / append
+  declare -a arr, declare -A map, typeset ...  -- array declaration
+  map=([k1]=v1 [k2]=v2), map[k]=v  -- associative array assignment
+  ${arr[i]}, ${map[key]}, $arr (== ${arr[0]})  -- element access
+  ${arr[@]}, ${arr[*]}     -- all elements
+  ${#arr[@]}, ${#map[@]}   -- element count
+  ${#arr[i]}               -- length of one element
+  ${!arr[@]}, ${!map[@]}   -- indices / keys
+  unset arr, unset arr[i]  -- whole array / single element
   source / . file
   name() { ... }, function name { ... }  -- function definition
   cmd1 | cmd2 [| cmd3 ...]  (pipeline via temporary file)
@@ -2780,6 +3633,105 @@ The following parameter expansion forms are supported:
 
 Patterns use shell glob syntax: C<*> matches any string, C<?>
 matches any single character, C<[abc]> matches a character class.
+
+=head2 Arrays and Associative Arrays
+
+Indexed arrays are created by a parenthesised list, by an explicit element
+assignment, or by C<declare -a>:
+
+  arr=(alpha beta gamma)    # arr[0]=alpha arr[1]=beta arr[2]=gamma
+  arr[3]=delta              # element assignment
+  arr+=(epsilon)            # append at the next index
+  arr[0]+=X                 # append to one element's string value
+  declare -a empty          # declare an empty indexed array
+
+Associative arrays must be declared with C<declare -A> (or C<typeset -A>)
+before use, then keyed by arbitrary strings:
+
+  declare -A color
+  color[red]=FF0000
+  color=([green]=00FF00 [blue]=0000FF)   # whole-array (re)assignment
+
+Element and bulk access mirror bash:
+
+  ${arr[2]}        one element (indexed subscript is evaluated arithmetically)
+  ${color[red]}    one element (associative subscript is a literal string)
+  $arr             shorthand for ${arr[0]}
+  ${arr[-1]}       negative index counts back from the last set element
+  ${arr[@]}        all element values
+  ${arr[*]}        all element values (same as [@] here)
+  ${#arr[@]}       number of set elements
+  ${#arr[2]}       length of one element's value
+  ${!arr[@]}       list of indices (indexed) or keys (associative)
+
+C<unset arr> removes the whole array; C<unset arr[i]> removes one element.
+
+Element values that contain spaces survive a quoted whole-array reference:
+in a C<for> list C<"${arr[@]}"> and C<"${!arr[@]}"> expand to one item per
+element or key.  Elsewhere C<${arr[@]}> joins elements with a single space,
+consistent with the word-splitting model used throughout BATsh::SH.  Array
+names are case-insensitive (like scalar variables); a name is either a
+scalar or an array, never both.  Element order for C<${arr[@]}> is ascending
+numeric index for indexed arrays and sorted key order for associative arrays
+(bash leaves associative order unspecified, so a deterministic order is used
+for portable output).
+
+=head2 Case Statements
+
+C<case WORD in ... esac> selects a clause by matching C<WORD> against shell
+glob patterns:
+
+  case $fruit in
+      apple)         echo "an apple" ;;
+      pear|quince)   echo "pome fruit" ;;     # | separates alternatives
+      a*)            echo "starts with a" ;;  # * ? globbing
+      [0-9])         echo "a digit" ;;        # character classes
+      [!aeiou]*)     echo "not a vowel" ;;    # [!...] negated class
+      *)             echo "something else" ;; # default catch-all
+  esac
+
+Each clause is C<pattern) commands TERMINATOR>.  Patterns are separated by
+C<|>; a clause matches if any of its patterns matches the word.  Pattern
+syntax is shell glob: C<*> (any string), C<?> (any character), C<[abc]>,
+ranges C<[a-z]>, and negation C<[!abc]> or C<[^abc]>.  Quoted or
+backslash-escaped metacharacters match literally (e.g. C<"*")> matches a
+literal asterisk).  C<*)> is the conventional default clause.
+
+Three clause terminators are supported, matching bash:
+
+  ;;    stop after this clause (the normal case)
+  ;&    fall through: run the NEXT clause's body unconditionally
+  ;;&   continue: keep testing the remaining patterns against the word
+
+The construct may be written across lines or fully inline on one line
+(C<case $x in a) echo a ;; *) echo b ;; esac>).  A leading C<(> before the
+pattern list (C<(pattern)>) is accepted.
+
+=head2 Traps and Signals
+
+C<trap> registers a handler to run on a signal or on the C<EXIT> pseudo-signal:
+
+  trap 'COMMANDS' SIGSPEC...   run COMMANDS when each SIGSPEC fires
+  trap - SIGSPEC...            reset to the default action
+  trap '' SIGSPEC...           ignore the signal
+  trap            (or trap -p) list the current traps
+
+A C<SIGSPEC> is a signal name with or without a leading C<SIG> (C<INT>,
+C<SIGINT>), a signal number (C<2>), or the C<EXIT> pseudo-signal (also
+spelled C<0>).  Real signals are bridged to Perl's C<%SIG>: C<trap 'cmd' INT>
+installs a C<%SIG{INT}> handler that runs C<cmd>, C<trap '' INT> sets it to
+C<IGNORE>, and C<trap - INT> restores C<DEFAULT>.  The C<EXIT> trap is run
+internally when the script finishes or when C<exit> is called.
+
+The handler command is stored unexpanded and expanded when it fires, so
+
+  tmp=$(mktemp); trap 'rm -f $tmp' EXIT
+
+removes the file named by C<$tmp> as it stood at exit.  Handlers run at the
+next safe point after a signal is delivered.  C<EXIT> / C<ERR> / C<DEBUG> /
+C<RETURN> are treated as pseudo-signals and never touch C<%SIG>; of these,
+only C<EXIT> currently runs a handler.  Signal names unsupported by the host
+(common on Windows) are accepted but degrade quietly.
 
 =head2 Function Definitions
 

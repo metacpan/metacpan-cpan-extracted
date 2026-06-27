@@ -62,7 +62,7 @@
    "provides" : {
       "Map::Tube::RheinRuhr" : {
          "file" : "lib/Map/Tube/RheinRuhr.pm",
-         "version" : "v0.2.4"
+         "version" : "v0.2.5"
       }
    },
    "release_status" : "stable",
@@ -76,6 +76,6 @@
          "web" : "https://github.com/gwselke/Map-Tube-RheinRuhr"
       }
    },
-   "version" : "v0.2.4",
+   "version" : "v0.2.5",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

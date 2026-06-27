@@ -1,0 +1,45 @@
+@ECHO OFF
+:: BATsh example 09: CMD subroutines -- CALL :label arguments, %~N path
+:: modifiers on passed arguments, and SHIFT (v0.06)
+:: Run: perl lib/BATsh.pm eg/09_cmd_subroutines.batsh
+
+ECHO -- argument passing --
+CALL :GREET World
+CALL :GREET "BATsh user"
+
+ECHO -- path modifiers on a passed argument --
+CALL :SPLITPATH C:\projects\batsh\report.txt
+
+ECHO -- caller frame is preserved across CALL --
+SET TASK=build
+CALL :GREET %TASK%
+ECHO back in main: TASK=%TASK%
+
+ECHO -- SHIFT plus an internal GOTO loop sums any number of arguments --
+CALL :SUMARGS 10 20 30 40
+
+GOTO :EOF
+
+:GREET
+ECHO   hello, %1 (from %0)
+RET
+
+:SPLITPATH
+ECHO   full : %~f1
+ECHO   drive: %~d1
+ECHO   dir  : %~p1
+ECHO   name : %~n1
+ECHO   ext  : %~x1
+ECHO   nx   : %~nx1
+RET
+
+:SUMARGS
+SET /A TOTAL=0
+:SUMARGS_LOOP
+IF "%1"=="" GOTO :SUMARGS_DONE
+SET /A TOTAL=%TOTAL% + %1
+SHIFT
+GOTO :SUMARGS_LOOP
+:SUMARGS_DONE
+ECHO   total = %TOTAL%
+RET

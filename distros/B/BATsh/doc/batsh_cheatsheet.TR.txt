@@ -229,4 +229,52 @@ gibi çalıştırılır.
   cmd1 || cmd2    cmd2'yi yalnızca cmd1 başarısızsa çalıştır
   cmd1 ; cmd2     cmd2'yi koşulsuz çalıştır
 
+15. SH Diziler
+--------------
+  arr=(a b c)            # indeksli dizi sabiti
+  arr+=(d e)             # öğe ekle
+  arr[5]=x               # indekse göre ata
+  declare -a list        # indeksli dizi tanımla
+  declare -A map         # ilişkisel dizi tanımla
+  map[key]=value         # ilişkisel atama
+  map=([k1]=v1 [k2]=v2)  # ilişkisel sabit
+
+  ${arr[0]}    0. öğe  ($arr, ${arr[0]} ile aynı)
+  ${arr[-1]}   son öğe
+  ${arr[@]}    tüm öğeler (sözcüklere ayrılır)
+  ${arr[*]}    tüm öğeler (tek sözcük)
+  ${#arr[@]}   öğe sayısı
+  ${#arr[2]}   2. öğenin uzunluğu
+  ${!arr[@]}   indeks (veya anahtar) listesi
+  unset arr[1] # bir öğeyi sil
+  unset arr    # tüm diziyi sil
+
+16. SH case Deyimleri
+---------------------
+  case $x in
+      a|b|c)      echo "a, b veya c" ;;    # |  -- birden çok desen
+      [0-9])      echo "bir rakam"   ;;    # [..]  karakter sınıfı
+      [!aeiou])   echo "ünsüz"       ;;    # [!..] olumsuz sınıf
+      data*)      echo "önek"        ;;    # *  ve  ?  joker
+      "*")        echo "yıldız"      ;;    # tırnaklı = birebir eşleşme
+      *)          echo "varsayılan"  ;;    # *)  varsayılan dal
+  esac
+
+  Dal sonlandırıcıları (her gövdeden sonra):
+    ;;    burada dur (normal durum)
+    ;&    sonraki dal gövdesini de çalıştır
+    ;;&   kalan desenleri sınamayı sürdür
+
+17. SH trap ve Sinyaller
+------------------------
+  trap 'echo bye' EXIT       # betik bitince (veya exit'te) çalışır
+  trap 'rm -f $tmp' EXIT     # işleyici tetiklenince açılır
+  trap 'echo got INT' INT    # gerçek sinyali %SIG ile köprüle
+  trap '' INT                # sinyali yok say
+  trap - INT                 # varsayılan eylemi geri yükle
+  trap                       # geçerli trap'leri listele (ayrıca: trap -p)
+
+  SIGSPEC: ad (INT veya SIGINT), numara (2) ya da EXIT (= 0).
+  EXIT sonda bir kez çalışır; gerçek adlar Perl %SIG işleyicileri kurar.
+
 Ayrıca bakınız: https://metacpan.org/dist/BATsh

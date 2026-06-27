@@ -966,8 +966,16 @@ C<SSL_force_fingerprint>.
 
 =item SSL_force_fingerprint
 
-This option should be set to true if a failed fingerprint validation should
-override an otherwise successful certificate validation.
+Set this to true to enforce strict certificate pinning: the connection will be
+rejected unless the peer certificate matches one of the fingerprints given in
+C<SSL_fingerprint>, even if the certificate chain would otherwise be trusted.
+
+Without this option, C<SSL_fingerprint> acts as an alternative trust anchor —
+a matching fingerprint can unlock an otherwise-rejected certificate (e.g.
+self-signed or from an unknown CA), but a non-matching fingerprint does not
+block a certificate that passes normal chain validation. With this option, the
+fingerprint check is the sole trust decision: any certificate not in the
+fingerprint list is rejected regardless of CA trust.
 
 =item SSL_cert_file | SSL_cert | SSL_key_file | SSL_key
 
@@ -1293,13 +1301,17 @@ This is the default if SSL_verify_mode is VERIFY_NONE.
 
 =item SSL_OCSP_TRY_STAPLE
 
-Try OCSP stapling, but don't complain if it gets no stapled response back.
+Try OCSP stapling, but don't fail if no usable stapled response is received.
+Both a missing staple and a broken or unverifiable staple are treated the same:
+the connection continues without OCSP revocation information from the staple.
 This is the default if SSL_verify_mode is VERIFY_PEER (the default).
 
 =item SSL_OCSP_MUST_STAPLE
 
-Consider it a hard error, if the server does not send a stapled OCSP response
-back. Most servers currently send no stapled OCSP response back.
+Require a valid stapled OCSP response; fail the connection if none is received.
+A broken or unverifiable staple is treated the same as a missing one — both
+cause the connection to fail with "did not receive the required stapled OCSP
+response". Most servers currently send no stapled OCSP response back.
 
 =item SSL_OCSP_FAIL_HARD
 
@@ -1740,8 +1752,9 @@ Net::SSLeay.
 =item B<peer_certificate($field;[$refresh])>
 
 If a peer certificate exists, this function can retrieve values from it.
-If no field is given the internal representation of certificate from Net::SSLeay
-is returned.
+If no field is given the internal representation of certificate (X509 handle)
+from Net::SSLeay is returned, with reference owned internally (i.e. should not
+be freed).
 If refresh is true it will not used a cached version, but check again in case
 the certificate of the connection has changed due to renegotiation.
 
@@ -1776,15 +1789,20 @@ See Net::SSLeay::X509_get_subjectAltNames.
 
 This is similar to C<peer_certificate> but will return the sites own
 certificate. The same arguments for B<$field> can be used.
-If no B<$field> is given the certificate handle from the underlying OpenSSL will
-be returned. This handle will only be valid as long as the SSL connection exists
-and if used afterwards it might result in strange crashes of the application.
+If no B<$field> is given the X509 handle from the underlying OpenSSL will
+be returned. This handle is owned internally and will only be valid as long as
+the SSL connection exists. If used afterwards it might result in strange crashes
+of the application.
 
 =item B<peer_certificates>
 
-This returns all the certificates send by the peer, e.g. first the peers own
-certificate and then the rest of the chain. You might use B<CERT_asHash> from
-L<IO::Socket::SSL::Utils> to inspect each of the certificates.
+This returns all the certificates send by the peer as X509 handles, e.g. first
+the peers own certificate and then the rest of the chain. You might use
+B<CERT_asHash> from L<IO::Socket::SSL::Utils> to inspect each of the
+certificates.
+
+Like with B<sock_certificate> and B<peer_certificates> the handles are owned
+internally and will only be valid as long as the SSL connection exists.
 
 This function depends on a version of Net::SSLeay >= 1.58 .
 

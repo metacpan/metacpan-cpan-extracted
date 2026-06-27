@@ -1,5 +1,23 @@
 Revision history for Thunderhorse
 
+0.106 - 2026-06-27
+	[Public interface changes]
+	- Added connection attribute to Context
+	- Added empty_res, send_res, try_send_res methods to Context
+	- Added is_ready method to Response
+
+	[Breaking changes]
+	- Response is now a value (via PAGI::Tools change)
+		- awaiting response's calls which used to send data like "text", "html" etc. is now wrong - remove "await" calls
+	- Thunderhorse dependencies no longer ensure pagi-server will be installed (via PAGI distribution split)
+		- pagi-server is now a part of a separate PAGI::Server module, which is not a direct dependency for Thunderhorse
+
+	[Fixes]
+	- Router behavior was improved (via Gears 0.104 change)
+		- previously, declaring bridges as empty routes was hard, and required an empty route ('' instead of '/')
+		- Gears::Router added pattern_separator, which is set to '/' by default, and affects how paths are joined
+		- this makes sure bridges will not cause repeated '/' in routes if they are declared as '/'
+
 0.105 - 2026-05-25
 	[Changes]
 	- Context's stash is now created lazily

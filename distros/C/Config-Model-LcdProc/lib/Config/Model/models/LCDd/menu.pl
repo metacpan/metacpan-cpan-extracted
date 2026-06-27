@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,10 +9,20 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'MenuKey' => 'You can configure what keys the menu should use. Note that the MenuKey
+will be reserved exclusively, the others work in shared mode.
+Up to six keys are supported. The MenuKey (to enter and exit the menu), the
+EnterKey (to select values) and at least one movement keys are required.
+These are the default key assignments:',
+      'PermissiveGoto' => 'If true the server allows transitions between different client\'s menus'
+    },
     'element' => [
       'DownKey',
       {
@@ -35,11 +45,6 @@ return [
       'MenuKey',
       {
         'default' => 'Escape',
-        'description' => 'You can configure what keys the menu should use. Note that the MenuKey
-will be reserved exclusively, the others work in shared mode.
-Up to six keys are supported. The MenuKey (to enter and exit the menu), the
-EnterKey (to select values) and at least one movement keys are required.
-These are the default key assignments:',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -49,7 +54,6 @@ These are the default key assignments:',
           'true',
           'false'
         ],
-        'description' => 'If true the server allows transitions between different client\'s menus',
         'type' => 'leaf',
         'upstream_default' => 'false',
         'value_type' => 'enum'
@@ -71,4 +75,3 @@ These are the default key assignments:',
   }
 ]
 ;
-

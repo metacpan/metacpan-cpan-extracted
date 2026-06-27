@@ -7,64 +7,41 @@ use 5.018;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "PAGI Specification, Utilities and Reference Server",
+  "ABSTRACT" => "The PAGI specification - Perl Asynchronous Gateway Interface",
   "AUTHOR" => "John Napiorkowski <jjnapiork\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "PAGI",
-  "EXE_FILES" => [
-    "bin/pagi-server"
-  ],
   "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.018",
   "NAME" => "PAGI",
   "PREREQ_PM" => {
-    "Cookie::Baker" => "0.11",
-    "Future" => "0.50",
-    "Future::AsyncAwait" => "0.66",
-    "HTTP::MultiPartParser" => "0.02",
-    "HTTP::Parser::XS" => "0.17",
-    "Hash::MultiValue" => "0.16",
-    "IO::Async" => "0.802",
-    "IO::Socket::IP" => "0.43",
-    "JSON::MaybeXS" => "1.004003",
-    "Protocol::WebSocket" => "0.26",
-    "URI::Escape" => "5.09"
+    "PAGI::Server" => "0.002000",
+    "PAGI::Tools" => "0.002000"
   },
   "TEST_REQUIRES" => {
-    "Net::Async::HTTP" => "0.49",
-    "Net::Async::WebSocket::Client" => "0.14",
+    "Future::AsyncAwait" => "0.38",
+    "Future::IO" => "0.08",
+    "IO::Async" => "0.78",
     "Test2::V0" => "0.000159",
-    "Test::Future::IO::Impl" => "0.14",
-    "Time::HiRes" => "1.9764",
-    "URI" => "1.60"
+    "Test::Pod" => "1.41"
   },
-  "VERSION" => "0.001023",
+  "VERSION" => "0.002000",
   "test" => {
-    "TESTS" => "t/*.t t/app/*.t t/context/*.t t/endpoint/*.t t/http2/*.t t/lifespan/*.t t/middleware/*.t t/middleware/session/*.t t/request/*.t t/server/*.t t/sse/*.t t/test-client/*.t t/utf8/*.t t/utils/*.t t/websocket/*.t"
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
-  "Cookie::Baker" => "0.11",
-  "Future" => "0.50",
-  "Future::AsyncAwait" => "0.66",
-  "HTTP::MultiPartParser" => "0.02",
-  "HTTP::Parser::XS" => "0.17",
-  "Hash::MultiValue" => "0.16",
-  "IO::Async" => "0.802",
-  "IO::Socket::IP" => "0.43",
-  "JSON::MaybeXS" => "1.004003",
-  "Net::Async::HTTP" => "0.49",
-  "Net::Async::WebSocket::Client" => "0.14",
-  "Protocol::WebSocket" => "0.26",
+  "Future::AsyncAwait" => "0.38",
+  "Future::IO" => "0.08",
+  "IO::Async" => "0.78",
+  "PAGI::Server" => "0.002000",
+  "PAGI::Tools" => "0.002000",
   "Test2::V0" => "0.000159",
-  "Test::Future::IO::Impl" => "0.14",
-  "Time::HiRes" => "1.9764",
-  "URI" => "1.60",
-  "URI::Escape" => "5.09"
+  "Test::Pod" => "1.41"
 );
 
 

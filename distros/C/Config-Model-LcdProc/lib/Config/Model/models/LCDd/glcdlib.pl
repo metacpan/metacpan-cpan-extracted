@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,43 +9,64 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'Backlight' => 'Backlight if applicable',
+      'Brightness' => 'Brightness (in %) if applicable',
+      'CharEncoding' => 'character encoding to use',
+      'Contrast' => 'Contrast (in %) if applicable',
+      'Driver' => 'which graphical display supported by graphlcd-base to use 
+(see /etc/graphlcd.conf for possible drivers)',
+      'FontFile' => 'path to font file to use',
+      'Invert' => 'invert light/dark pixels',
+      'MinFontFaceSize' => 'minimum size in pixels in which fonts should be rendered',
+      'ShowBigBorder' => 'border within the usable text area,
+for setting up TextResolution and
+MinFontFaceSize (if using FT2);
+border around the unused area',
+      'ShowDebugFrame' => 'turns on/off 1 pixel thick debugging',
+      'ShowThinBorder' => 'border around the unused area',
+      'TextResolution' => 'text resolution in fixed width characters 
+(if it won\'t fit according to available physical pixel resolution
+and the minimum available font face size in pixels, then
+\'DebugBorder\' will automatically be turned on)',
+      'UpsideDown' => 'flip image upside down',
+      'UseFT2' => 'no=use graphlcd bitmap fonts (they have only one size / font file)
+yes=use fonts supported by FreeType2 (needs Freetype2 support in
+libglcdprocdriver and its dependants)'
+    },
     'element' => [
       'Backlight',
       {
         'default' => 'no',
-        'description' => 'Backlight if applicable',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'Brightness',
       {
         'default' => '50',
-        'description' => 'Brightness (in %) if applicable',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'CharEncoding',
       {
         'default' => 'iso8859-2',
-        'description' => 'character encoding to use',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'Contrast',
       {
         'default' => '50',
-        'description' => 'Contrast (in %) if applicable',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'Driver',
       {
-        'description' => 'which graphical display supported by graphlcd-base to use 
-(see /etc/graphlcd.conf for possible drivers)',
         'type' => 'leaf',
         'upstream_default' => 'image',
         'value_type' => 'uniline'
@@ -53,21 +74,18 @@ return [
       'FontFile',
       {
         'default' => '/usr/share/fonts/corefonts/courbd.ttf',
-        'description' => 'path to font file to use',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'Invert',
       {
         'default' => 'no',
-        'description' => 'invert light/dark pixels',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'MinFontFaceSize',
       {
         'default' => '7x12',
-        'description' => 'minimum size in pixels in which fonts should be rendered',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -86,33 +104,19 @@ return [
       'ShowBigBorder',
       {
         'default' => 'no',
-        'description' => 'border within the usable text area,
-for setting up TextResolution and
-MinFontFaceSize (if using FT2);
-border around the unused area',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'ShowDebugFrame',
-      {
-        'default' => 'no',
-        'description' => 'turns on/off 1 pixel thick debugging',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
+      '*ShowBigBorder',
       'ShowThinBorder',
       {
         'default' => 'yes',
-        'description' => 'border around the unused area',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'TextResolution',
       {
-        'description' => 'text resolution in fixed width characters 
-(if it won\'t fit according to available physical pixel resolution
-and the minimum available font face size in pixels, then
-\'DebugBorder\' will automatically be turned on)',
         'type' => 'leaf',
         'upstream_default' => '16x4',
         'value_type' => 'uniline'
@@ -120,16 +124,12 @@ and the minimum available font face size in pixels, then
       'UpsideDown',
       {
         'default' => 'no',
-        'description' => 'flip image upside down',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'UseFT2',
       {
         'default' => 'yes',
-        'description' => 'no=use graphlcd bitmap fonts (they have only one size / font file)
-yes=use fonts supported by FreeType2 (needs Freetype2 support in
-libglcdprocdriver and its dependants)',
         'type' => 'leaf',
         'value_type' => 'uniline'
       }
@@ -138,4 +138,3 @@ libglcdprocdriver and its dependants)',
   }
 ]
 ;
-

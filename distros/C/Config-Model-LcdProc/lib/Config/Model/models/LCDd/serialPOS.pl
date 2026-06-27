@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,21 +9,27 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'Device' => 'Device to use in serial mode ',
+      'Size' => 'Specifies the size of the display in characters. ',
+      'Speed' => 'communication baud rate with the display ',
+      'Type' => 'Set the communication protocol to use with the POS display.'
+    },
     'element' => [
       'Device',
       {
-        'description' => 'Device to use in serial mode ',
         'type' => 'leaf',
         'upstream_default' => '/dev/lcd',
         'value_type' => 'uniline'
       },
       'Size',
       {
-        'description' => 'Specifies the size of the display in characters. ',
         'type' => 'leaf',
         'upstream_default' => '16x2',
         'value_type' => 'uniline'
@@ -36,7 +42,6 @@ return [
           '19200',
           '115200'
         ],
-        'description' => 'communication baud rate with the display ',
         'type' => 'leaf',
         'upstream_default' => '9600',
         'value_type' => 'enum'
@@ -51,7 +56,6 @@ return [
           'LogicControls',
           'Ultimate'
         ],
-        'description' => 'Set the communication protocol to use with the POS display.',
         'type' => 'leaf',
         'upstream_default' => 'AEDEX',
         'value_type' => 'enum'
@@ -61,4 +65,3 @@ return [
   }
 ]
 ;
-

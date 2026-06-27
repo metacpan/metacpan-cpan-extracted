@@ -1,51 +1,56 @@
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-PAGI::Spec::Lifespan - PAGI Specification Documentation
-
-=head1 NOTICE
-
-This documentation is auto-generated from the PAGI specification
-markdown files. For the authoritative source, see:
-
-L<https://github.com/jjn1056/PAGI/tree/main/docs/specs>
+PAGI::Spec::Lifespan - The PAGI Lifespan protocol for startup and shutdown events
 
 =head1 Lifespan Protocol
 
-B<Version>: 0.2 (Draft)
+B<Version>: 0.3 (Draft)
 
-The Lifespan B<PAGI> sub-specification outlines how to communicate lifespan events such as startup and shutdown within PAGI.
+The Lifespan B<PAGI> sub-specification outlines how to communicate
+lifespan events such as startup and shutdown within PAGI.
 
-The lifespan messages allow for an application to initialise and shutdown in the context of a running event loop. An example of this would be creating a connection pool and subsequently closing the connection pool to release the connections.
+The lifespan messages allow for an application to initialise and
+shutdown in the context of a running event loop. An example of this
+would be creating a connection pool and subsequently closing the
+connection pool to release the connections.
 
 =head2 Execution Model
 
-Lifespan events B<must be sent by every PAGI server instance or worker> that manages an application event loop. This ensures that application-level resources are initialized and cleaned up in the context in which they run.
+Lifespan events B<must be sent by every PAGI server instance or worker>
+that manages an application event loop. This ensures that application-level
+resources are initialized and cleaned up in the context in which they run.
 
-=over 4
+=over
 
-=item *
+=item -
 
-In B<multi-process deployments>, each worker process must independently send C<lifespan.startup> on init and C<lifespan.shutdown> on exit.
+In B<multi-process deployments>, each worker process must independently
+send C<lifespan.startup> on init and C<lifespan.shutdown> on exit.
 
-=item *
+=item -
 
 In B<in-process async mode>, the main event loop will send the events.
 
 =back
 
-This matches the ASGI model and ensures that applications have the opportunity to manage state correctly in async-safe scopes.
+This matches the ASGI model and ensures that applications have the opportunity
+to manage state correctly in async-safe scopes.
 
-Lifespans and requests B<must occur on the same event loop>. This guarantees that async-local state (such as DB pools or background tasks) is not shared unsafely across threads or processes.
+Lifespans and requests B<must occur on the same event loop>. This guarantees
+that async-local state (such as DB pools or background tasks) is not shared
+unsafely across threads or processes.
 
-A possible implementation of this protocol in B<modern Perl> using L<Future::AsyncAwait> could look like this:
+A possible implementation of this protocol in B<modern Perl> using C<Future::AsyncAwait>
+could look like this:
 
     use strict;
     use warnings;
     use Future::AsyncAwait;
 
-    async sub app ($scope, $receive, $send) {
+    async sub app {
+        my ($scope, $receive, $send) = @_;
         # Only handle 'lifespan' protocol
         if ($scope->{type} eq 'lifespan') {
 
@@ -82,60 +87,117 @@ The lifespan scope exists for the duration of the event loop.
 
 The scope information passed in C<scope> contains basic metadata:
 
-=over 4
+=over
 
-=item *
+=item -
 
 C<type> (String) - C<"lifespan">.
 
-=item *
+=item -
 
-C<pagi["version"]> (String) - The version of the PAGI core spec that governs the worker.
+The C<version> key of the C<pagi> hashref (accessed as C<< $scope->{pagi}{version} >>) (String) - The version of the PAGI core spec that governs the worker.
 
-=item *
+=item -
 
-C<pagi["spec_version"]> (String) - The version of this lifespan sub-specification. Optional; if missing it defaults to C<"0.2">.
+The C<spec_version> key of the C<pagi> hashref (accessed as C<< $scope->{pagi}{spec_version} >>) (String) - The version of this lifespan sub-specification. Optional; if missing, assume it matches C<version>.
 
-=item *
+=item -
 
-C<pagi["is_worker"]> (Int, optional) - C<1> if running as a worker in a multi-process deployment, C<0> or absent for single-process mode. Applications can use this to avoid duplicate initialization (e.g., only print startup messages from worker 1).
+The C<is_worker> key of the C<pagi> hashref (accessed as C<< $scope->{pagi}{is_worker} >>) (Int, optional) - C<1> when running as a worker in a multi-process deployment; C<0> in single-process mode. May be absent on servers that do not distinguish workers. Applications can use this to avoid duplicate initialization (e.g., only print startup messages from worker 1).
 
-=item *
+=item -
 
-C<pagi["worker_num"]> (Int, optional) - Worker identifier (1, 2, 3, ...) in multi-process mode. Absent or C<undef> for single-process mode. Combined with C<is_worker>, applications can identify which worker they are running in.
+The C<worker_num> key of the C<pagi> hashref (accessed as C<< $scope->{pagi}{worker_num} >>) (Int, optional) - Worker identifier (1, 2, 3, ...) in multi-process mode. Absent or C<undef> for single-process mode. Combined with C<is_worker>, applications can identify which worker they are running in.
 
-=item *
+=item -
 
-C<state> (HashRef, optional) - A namespace where the application can persist values to be copied into subsequent request scopes. Servers omit this key if the feature is unsupported.
+C<state> (HashRef, optional) - A namespace where the application can persist values to be copied (as a shallow copy; see L</Lifespan State>) into subsequent request scopes. Servers omit this key if the feature is unsupported.
 
 =back
 
-If an exception is raised when calling the application coderef with a C<lifespan.startup> message (or when a C<lifespan> scope is created), the server must cease sending further lifespan events for that worker. The server should log the error and may either exit or continue starting without lifespan support, depending on operator configuration. Applications that wish to prevent startup entirely should explicitly send C<lifespan.startup.failed> with a message.
+If the application B<declines> the lifespan protocol -- either by raising an
+exception when called with the C<lifespan> scope, or by returning without ever
+sending C<lifespan.startup.complete> or C<lifespan.startup.failed> -- the server
+B<must> treat lifespan as unsupported: it B<must> continue startup, B<must not>
+send further lifespan events for that worker, and B<should> log this at an
+informational level. A raised exception and a clean return are resolved
+identically, and the server B<must not> block startup indefinitely waiting for a
+lifespan signal.
+
+To prevent startup entirely, an application B<must> send
+C<lifespan.startup.failed> with a message; on receiving it the server B<must>
+abort startup (it B<must not> begin accepting connections) and B<should> log the
+message. This is the B<only> application signal that prevents the server from
+starting -- a clean return B<must not>.
+
+If the application raises an exception B<after> it has sent
+C<lifespan.startup.complete> -- for example, a long-lived background task started
+during lifespan crashes -- the server B<should> log the error at error level and
+B<may> continue running in a degraded state. It is not required to shut down.
 
 =head2 Lifespan State
 
-Applications often want to persist data from the lifespan cycle to request/response handling. For example, a database connection can be established in the lifespan cycle and persisted to the request/response cycle.
+Applications often want to persist data from the lifespan cycle to request/response handling.
+For example, a database connection can be established in the lifespan cycle and persisted to
+the request/response cycle.
 
-The C<scope["state"]> namespace provides a place to store these sorts of things. The server will ensure that a I<shallow copy> of the namespace is passed into each subsequent request/response call into the application. Since the server manages the application lifespan and often the event loop as well this ensures that the application is always accessing the database connection (or other stored object) that corresponds to the right event loop and lifecycle, without using context variables, global mutable state or having to worry about references to stale/closed connections.
+The C<scope["state"]> namespace provides a place to store these sorts of things.
+The server will ensure that a I<shallow copy> of the namespace is passed into each subsequent
+request/response call into the application.
+Since the server manages the application lifespan and often the event loop as well this
+ensures that the application is always accessing the database connection (or other stored object)
+that corresponds to the right event loop and lifecycle, without using context variables,
+global mutable state or having to worry about references to stale/closed connections.
 
-PAGI servers that implement this feature will provide C<state> as part of the C<lifespan> scope:
+PAGI servers that implement this feature will provide
+C<state> as part of the C<lifespan> scope:
 
-    "scope": {
+    my $scope = {
         ...
-        "state": {},
-    }
+        state => {},
+    };
 
-The namespace is controlled completely by the PAGI application; the server will not interact with it other than to copy it. Nonetheless, applications should be cooperative by properly naming their keys such that they will not collide with other frameworks or middleware.
+The namespace is controlled completely by the PAGI application; the server will not
+interact with it other than to copy it.
+Nonetheless, applications should be cooperative by properly naming their keys such that they
+will not collide with other frameworks or middleware.
+
+Because the copy is I<shallow>, take care how you share B<mutable> data:
+
+=over
+
+=item *
+
+The B<values> in C<state> (object references -- a database pool, a queue, a
+pub/sub hub) are shared. Every request scope sees the same object, so mutating
+it through that reference (calling a method, C<push>-ing onto an arrayref) is
+visible everywhere.
+
+=item *
+
+The B<top-level keys> are private to each copy. Assigning a top-level key in one
+scope -- C<< $scope->{state}{count}++ >> in a request, or
+C<< $state->{queue} = [] >> in the lifespan once requests are running -- changes
+only that scope's copy. Other scopes keep their own and silently desync.
+
+=back
+
+So to share mutable data, store a container or object B<once> at startup and
+mutate it B<through its reference>; never B<replace> a top-level C<state> key and
+expect other scopes to see it. This mirrors the database-connection example
+above: you store the pool once and use it everywhere -- you never reassign it
+per request.
 
 =head2 Startup - C<receive> event
 
-Sent to the application when the server is ready to startup and receive connections, but before it has started to do so.
+Sent to the application when the server is ready to startup and receive connections,
+but before it has started to do so.
 
 B<Keys>:
 
-=over 4
+=over
 
-=item *
+=item -
 
 C<type> (String) - C<"lifespan.startup">.
 
@@ -143,13 +205,14 @@ C<type> (String) - C<"lifespan.startup">.
 
 =head2 Startup Complete - C<send> event
 
-Sent by the application when it has completed its startup. A server must wait for this message before it starts processing connections.
+Sent by the application when it has completed its startup. A server
+must wait for this message before it starts processing connections.
 
 B<Keys>:
 
-=over 4
+=over
 
-=item *
+=item -
 
 C<type> (String) - C<"lifespan.startup.complete">.
 
@@ -157,17 +220,18 @@ C<type> (String) - C<"lifespan.startup.complete">.
 
 =head2 Startup Failed - C<send> event
 
-Sent by the application when it has failed to complete its startup. If a server sees this it should log/print the message provided and then exit.
+Sent by the application when it has failed to complete its startup. If a server
+sees this it should log/print the message provided and then exit.
 
 B<Keys>:
 
-=over 4
+=over
 
-=item *
+=item -
 
 C<type> (String) - C<"lifespan.startup.failed">.
 
-=item *
+=item -
 
 C<message> (String) - Optional; if missing defaults to C<"">.
 
@@ -175,27 +239,29 @@ C<message> (String) - Optional; if missing defaults to C<"">.
 
 =head2 Shutdown - C<receive> event
 
-Sent to the application when the server has stopped accepting connections and closed all active connections.
+Sent to the application when the server has stopped accepting connections and closed
+all active connections.
 
 B<Keys>:
 
-=over 4
+=over
 
-=item *
+=item -
 
-C<type> (String) -  C<"lifespan.shutdown">.
+C<type> (String) - C<"lifespan.shutdown">.
 
 =back
 
 =head2 Shutdown Complete - C<send> event
 
-Sent by the application when it has completed its cleanup. A server must wait for this message before terminating.
+Sent by the application when it has completed its cleanup. A server
+must wait for this message before terminating.
 
 B<Keys>:
 
-=over 4
+=over
 
-=item *
+=item -
 
 C<type> (String) - C<"lifespan.shutdown.complete">.
 
@@ -203,17 +269,18 @@ C<type> (String) - C<"lifespan.shutdown.complete">.
 
 =head2 Shutdown Failed - C<send> event
 
-Sent by the application when it has failed to complete its cleanup. If a server sees this it should log/print the message provided and then terminate.
+Sent by the application when it has failed to complete its cleanup. If a server
+sees this it should log/print the message provided and then terminate.
 
 B<Keys>:
 
-=over 4
+=over
 
-=item *
+=item -
 
 C<type> (String) - C<"lifespan.shutdown.failed">.
 
-=item *
+=item -
 
 C<message> (String) - Optional; if missing defaults to C<"">.
 
@@ -221,13 +288,17 @@ C<message> (String) - Optional; if missing defaults to C<"">.
 
 =head2 Version History
 
-=over 4
+=over
 
-=item *
+=item -
 
-0.2 (Draft): Added isI<worker and worker>num fields for multi-worker support
+0.3 (Draft): No changes from 0.2
 
-=item *
+=item -
+
+0.2 (Draft): Added is_worker and worker_num fields for multi-worker support
+
+=item -
 
 0.1 (Draft): Initial lifespan specification
 
@@ -236,4 +307,3 @@ C<message> (String) - Optional; if missing defaults to C<"">.
 =head2 Copyright
 
 This document has been placed in the public domain.
-

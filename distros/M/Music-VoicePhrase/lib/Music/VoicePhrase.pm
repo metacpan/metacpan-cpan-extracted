@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct a measured phrase of notes
 
-our $VERSION = '0.0107';
+our $VERSION = '0.0108';
 
 use v5.36;
 use Moo;
@@ -162,6 +162,13 @@ has onsets => (
 );
 
 
+has channel => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not an integer" unless $_[0] =~ /^\d+$/ },
+    default => sub { 0 },
+);
+
+
 has verbose => (
     is      => 'ro',
     isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
@@ -169,9 +176,9 @@ has verbose => (
 );
 
 
-sub BUILD ($self, $args) {
-    # $self->_build_motifs;
-}
+# sub BUILD ($self, $args) {
+#     $self->_build_motifs;
+# }
 
 
 sub build_motifs ($self) {
@@ -205,7 +212,7 @@ Music::VoicePhrase - Construct a measured phrase of notes
 
 =head1 VERSION
 
-version 0.0107
+version 0.0108
 
 =head1 SYNOPSIS
 
@@ -259,9 +266,10 @@ Default: C<0>
 
   $pitches = $mvp->pitches;
 
-Scale name known to the L<Music::Scales> module.
+The allowed pitches in MIDI number format.
 
-Default: 2 consecutive octaves given the B<base> note, B<scale> name, and starting B<octave>.
+Default: 2 consecutive octaves given the B<base> note, B<scale> name,
+and starting B<octave>.
 
 =head2 intervals
 
@@ -358,6 +366,14 @@ Default: C<{}>
 
 Computed attribute for the note onsets used in real-time processing.
 
+=head2 channel
+
+  $channel = $mvp->channel;
+
+The MIDI channel of the part.
+
+Default: C<0>
+
 =head2 verbose
 
   $verbose = $mvp->verbose;
@@ -404,7 +420,7 @@ L<Music::Scales>
 
 L<Music::VoiceGen>
 
-L<https://github.com/ology/Music/blob/master/tones-together.pl>
+L<https://github.com/ology/Music/blob/master/tones-parts.pl>
 
 =head1 AUTHOR
 

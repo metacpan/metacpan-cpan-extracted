@@ -82,3 +82,4 @@
 
 ^\.travis\.yml$
 ^Map-Tube-KoelnBonn-.*.tar.gz$
+^Map-Tube-KoelnBonn-.*.tar.gz.sigstore.json$

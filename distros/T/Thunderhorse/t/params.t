@@ -54,7 +54,7 @@ package ParamsApp {
 				to => sub ($self, $ctx) {
 					my $headers = $ctx->req->headers;
 					my @response;
-					foreach my $key (sort keys $headers->%*) {
+					foreach my $key (sort $headers->names) {
 						push @response, "${key}: " . join ', ', $headers->get_all($key);
 					}
 

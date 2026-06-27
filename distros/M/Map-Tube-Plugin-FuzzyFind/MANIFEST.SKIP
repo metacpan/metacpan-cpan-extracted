@@ -62,3 +62,4 @@
 
 ^\.travis\.yml$
 ^Map-Tube-Plugin-FuzzyFind-.*.tar.gz$
+^Map-Tube-Plugin-FuzzyFind-.*.tar.gz.signature.json$

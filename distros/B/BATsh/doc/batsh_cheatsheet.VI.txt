@@ -227,4 +227,52 @@ văn bởi shell phù hợp.
   cmd1 || cmd2    chạy cmd2 chỉ khi cmd1 thất bại
   cmd1 ; cmd2     chạy cmd2 vô điều kiện
 
+15. Mảng SH
+------------
+  arr=(a b c)            # literal mảng theo chỉ số
+  arr+=(d e)             # thêm phần tử
+  arr[5]=x               # gán theo chỉ số
+  declare -a list        # khai báo mảng theo chỉ số
+  declare -A map         # khai báo mảng kết hợp
+  map[key]=value         # gán mảng kết hợp
+  map=([k1]=v1 [k2]=v2)  # literal mảng kết hợp
+
+  ${arr[0]}    phần tử 0  ($arr giống ${arr[0]})
+  ${arr[-1]}   phần tử cuối
+  ${arr[@]}    tất cả phần tử (tách từ)
+  ${arr[*]}    tất cả phần tử (một từ)
+  ${#arr[@]}   số phần tử
+  ${#arr[2]}   độ dài phần tử 2
+  ${!arr[@]}   danh sách chỉ số (hoặc khóa)
+  unset arr[1] # xóa một phần tử
+  unset arr    # xóa toàn bộ mảng
+
+16. Câu lệnh case SH
+----------------------
+  case $x in
+      a|b|c)      echo "a, b hoặc c" ;;    # |  -- nhiều mẫu
+      [0-9])      echo "một chữ số"  ;;    # [..]  lớp ký tự
+      [!aeiou])   echo "phụ âm"      ;;    # [!..] lớp phủ định
+      data*)      echo "tiền tố"     ;;    # *  và  ?  glob
+      "*")        echo "dấu sao"     ;;    # có nháy = khớp đúng chữ
+      *)          echo "mặc định"    ;;    # *)  mệnh đề mặc định
+  esac
+
+  Dấu kết thúc mệnh đề (sau mỗi thân):
+    ;;    dừng tại đây (trường hợp thường)
+    ;&    chạy tiếp thân mệnh đề kế tiếp
+    ;;&   tiếp tục kiểm tra các mẫu còn lại
+
+17. trap và Tín hiệu SH
+--------------------------
+  trap 'echo bye' EXIT       # chạy khi script kết thúc (hoặc khi exit)
+  trap 'rm -f $tmp' EXIT     # trình xử lý được khai triển khi kích hoạt
+  trap 'echo got INT' INT    # bắc cầu tín hiệu thật qua %SIG
+  trap '' INT                # bỏ qua tín hiệu
+  trap - INT                 # khôi phục hành vi mặc định
+  trap                       # liệt kê trap hiện tại (hoặc: trap -p)
+
+  SIGSPEC: tên (INT hoặc SIGINT), số (2), hoặc EXIT (= 0).
+  EXIT chạy một lần ở cuối; tên thật cài trình xử lý %SIG của Perl.
+
 Xem thêm: https://metacpan.org/dist/BATsh

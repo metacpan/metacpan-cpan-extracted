@@ -21,7 +21,7 @@ L<Thunderhorse::App/render_error>:
 			$html = $controller->template('error/error', {title => status_message($code)});
 		}
 
-		await $ctx->res->status($code)->html($html);
+		$ctx->res->status($code)->html($html);
 	}
 
 For example for error 404, code above will try to render C<error/404.tt>

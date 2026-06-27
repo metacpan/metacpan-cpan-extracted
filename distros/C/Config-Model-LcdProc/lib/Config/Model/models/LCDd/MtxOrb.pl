@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,14 +9,39 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'Brightness' => 'Set the initial brightness ',
+      'Contrast' => 'Set the initial contrast 
+NOTE: The driver will ignore this if the display
+      is a vfd or vkd as they don\'t have this feature',
+      'Device' => 'Select the output device to use ',
+      'KeyMap_A' => 'The following table translates from MtxOrb key letters to logical key names.
+By default no keys are mapped, meaning the keypad is not used at all.',
+      'OffBrightness' => 'Set the initial off-brightness 
+This value is used when the display is normally
+switched off in case LCDd is inactive',
+      'Size' => 'Set the display size ',
+      'Speed' => 'Set the communication speed ',
+      'Type' => 'Set the display type ',
+      'hasAdjustableBacklight' => 'Some old displays do not have an adjustable backlight but only can
+switch the backlight on/off. If you experience randomly appearing block
+characters, try setting this to false. ',
+      'keypad_test_mode' => 'See the [menu] section for an explanation of the key mappings
+You can find out which key of your display sends which
+character by setting keypad_test_mode to yes and running
+LCDd. LCDd will output all characters it receives.
+Afterwards you can modify the settings above and set
+keypad_set_mode to no again.'
+    },
     'element' => [
       'Brightness',
       {
-        'description' => 'Set the initial brightness ',
         'max' => '1000',
         'min' => '0',
         'type' => 'leaf',
@@ -25,24 +50,18 @@ return [
       },
       'Contrast',
       {
-        'description' => 'Set the initial contrast 
-NOTE: The driver will ignore this if the display
-      is a vfd or vkd as they don\'t have this feature',
         'type' => 'leaf',
         'upstream_default' => '480',
         'value_type' => 'uniline'
       },
       'Device',
       {
-        'description' => 'Select the output device to use ',
         'type' => 'leaf',
         'upstream_default' => '/dev/lcd',
         'value_type' => 'uniline'
       },
       'KeyMap_A',
       {
-        'description' => 'The following table translates from MtxOrb key letters to logical key names.
-By default no keys are mapped, meaning the keypad is not used at all.',
         'type' => 'leaf',
         'upstream_default' => 'Left',
         'value_type' => 'uniline'
@@ -79,9 +98,6 @@ By default no keys are mapped, meaning the keypad is not used at all.',
       },
       'OffBrightness',
       {
-        'description' => 'Set the initial off-brightness 
-This value is used when the display is normally
-switched off in case LCDd is inactive',
         'max' => '1000',
         'min' => '0',
         'type' => 'leaf',
@@ -90,7 +106,6 @@ switched off in case LCDd is inactive',
       },
       'Size',
       {
-        'description' => 'Set the display size ',
         'type' => 'leaf',
         'upstream_default' => '20x4',
         'value_type' => 'uniline'
@@ -103,7 +118,6 @@ switched off in case LCDd is inactive',
           '9600',
           '19200'
         ],
-        'description' => 'Set the communication speed ',
         'type' => 'leaf',
         'upstream_default' => '19200',
         'value_type' => 'enum'
@@ -116,16 +130,12 @@ switched off in case LCDd is inactive',
           'vfd',
           'vkd'
         ],
-        'description' => 'Set the display type ',
         'type' => 'leaf',
         'upstream_default' => 'lcd',
         'value_type' => 'enum'
       },
       'hasAdjustableBacklight',
       {
-        'description' => 'Some old displays do not have an adjustable backlight but only can
-switch the backlight on/off. If you experience randomly appearing block
-characters, try setting this to false. ',
         'type' => 'leaf',
         'upstream_default' => 'yes',
         'value_type' => 'boolean',
@@ -137,12 +147,6 @@ characters, try setting this to false. ',
       'keypad_test_mode',
       {
         'default' => 'no',
-        'description' => 'See the [menu] section for an explanation of the key mappings
-You can find out which key of your display sends which
-character by setting keypad_test_mode to yes and running
-LCDd. LCDd will output all characters it receives.
-Afterwards you can modify the settings above and set
-keypad_set_mode to no again.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       }
@@ -151,4 +155,3 @@ keypad_set_mode to no again.',
   }
 ]
 ;
-

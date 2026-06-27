@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,14 +9,32 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'Backlight' => 'Set the backlight state ',
+      'Contrast' => 'Select the displays contrast ',
+      'Device' => 'Select the output device to use ',
+      'DiscMode' => 'Set the disc mode 
+0 => spin the "slim" disc - two disc segments,
+1 => their complement spinning;',
+      'OnExit' => 'Set the exit behavior 
+0 means leave shutdown message,
+1 means show the big clock,
+2 means blank device',
+      'Protocol' => 'Specify which iMon protocol should be used
+
+Choose 0 for 15c2:ffdc device,
+Choose 1 for 15c2:0038 device',
+      'Size' => 'Specify the size of the display in pixels '
+    },
     'element' => [
       'Backlight',
       {
-        'description' => 'Set the backlight state ',
         'type' => 'leaf',
         'upstream_default' => 'on',
         'value_type' => 'boolean',
@@ -27,7 +45,6 @@ return [
       },
       'Contrast',
       {
-        'description' => 'Select the displays contrast ',
         'max' => '1000',
         'min' => '0',
         'type' => 'leaf',
@@ -36,7 +53,6 @@ return [
       },
       'Device',
       {
-        'description' => 'Select the output device to use ',
         'type' => 'leaf',
         'upstream_default' => '/dev/lcd0',
         'value_type' => 'uniline'
@@ -47,19 +63,12 @@ return [
           '0',
           '1'
         ],
-        'description' => 'Set the disc mode 
-0 => spin the "slim" disc - two disc segments,
-1 => their complement spinning;',
         'type' => 'leaf',
         'upstream_default' => '0',
         'value_type' => 'enum'
       },
       'OnExit',
       {
-        'description' => 'Set the exit behavior 
-0 means leave shutdown message,
-1 means show the big clock,
-2 means blank device',
         'max' => '2',
         'min' => '0',
         'type' => 'leaf',
@@ -72,17 +81,12 @@ return [
           '0',
           '1'
         ],
-        'description' => 'Specify which iMon protocol should be used
-
-Choose 0 for 15c2:ffdc device,
-Choose 1 for 15c2:0038 device',
         'type' => 'leaf',
         'upstream_default' => '0',
         'value_type' => 'enum'
       },
       'Size',
       {
-        'description' => 'Specify the size of the display in pixels ',
         'type' => 'leaf',
         'upstream_default' => '96x16',
         'value_type' => 'uniline'
@@ -92,4 +96,3 @@ Choose 1 for 15c2:0038 device',
   }
 ]
 ;
-

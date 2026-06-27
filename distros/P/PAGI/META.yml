@@ -1,14 +1,13 @@
 ---
-abstract: 'PAGI Specification, Utilities and Reference Server'
+abstract: 'The PAGI specification - Perl Asynchronous Gateway Interface'
 author:
   - 'John Napiorkowski <jjnapiork@cpan.org>'
 build_requires:
-  Net::Async::HTTP: '0.49'
-  Net::Async::WebSocket::Client: '0.14'
+  Future::AsyncAwait: '0.38'
+  Future::IO: '0.08'
+  IO::Async: '0.78'
   Test2::V0: '0.000159'
-  Test::Future::IO::Impl: '0.14'
-  Time::HiRes: '1.9764'
-  URI: '1.60'
+  Test::Pod: '1.41'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -21,31 +20,15 @@ name: PAGI
 no_index:
   directory:
     - examples
-recommends:
-  Cpanel::JSON::XS: '4.19'
-  Crypt::URandom: '0.36'
-  Future::IO: '0.23'
-  IO::Async::SSL: '0.25'
-  IO::Socket::SSL: '2.074'
-  Net::HTTP2::nghttp2: '0.007'
 requires:
-  Cookie::Baker: '0.11'
-  Future: '0.50'
-  Future::AsyncAwait: '0.66'
-  HTTP::MultiPartParser: '0.02'
-  HTTP::Parser::XS: '0.17'
-  Hash::MultiValue: '0.16'
-  IO::Async: '0.802'
-  IO::Socket::IP: '0.43'
-  JSON::MaybeXS: '1.004003'
-  Protocol::WebSocket: '0.26'
-  URI::Escape: '5.09'
+  PAGI::Server: '0.002000'
+  PAGI::Tools: '0.002000'
   perl: '5.018'
 resources:
   bugtracker: https://github.com/jjn1056/pagi/issues
   homepage: https://github.com/jjn1056/pagi
-  repository: https://github.com/jjn1056/pagi
-version: '0.001023'
+  repository: https://github.com/jjn1056/pagi.git
+version: '0.002000'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

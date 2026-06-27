@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,14 +9,28 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
     'class_description' => 'generated from LCDd.conf',
+    'description' => {
+      'Brightness' => 'Set the initial brightness ',
+      'Contrast' => 'Set the initial contrast ',
+      'Device' => 'Select the output device to use ',
+      'NewFirmware' => 'Set the firmware version (New means >= 2.0) ',
+      'OffBrightness' => 'Set the initial off-brightness 
+This value is used when the display is normally
+switched off in case LCDd is inactive',
+      'Reboot' => 'Reinitialize the LCD\'s BIOS 
+normally you shouldn\'t need this',
+      'Size' => 'Select the LCD size ',
+      'Speed' => 'Set the communication speed '
+    },
     'element' => [
       'Brightness',
       {
-        'description' => 'Set the initial brightness ',
         'max' => '1000',
         'min' => '0',
         'type' => 'leaf',
@@ -25,7 +39,6 @@ return [
       },
       'Contrast',
       {
-        'description' => 'Set the initial contrast ',
         'max' => '1000',
         'min' => '0',
         'type' => 'leaf',
@@ -34,14 +47,12 @@ return [
       },
       'Device',
       {
-        'description' => 'Select the output device to use ',
         'type' => 'leaf',
         'upstream_default' => '/dev/lcd',
         'value_type' => 'uniline'
       },
       'NewFirmware',
       {
-        'description' => 'Set the firmware version (New means >= 2.0) ',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'boolean',
@@ -52,9 +63,6 @@ return [
       },
       'OffBrightness',
       {
-        'description' => 'Set the initial off-brightness 
-This value is used when the display is normally
-switched off in case LCDd is inactive',
         'max' => '1000',
         'min' => '0',
         'type' => 'leaf',
@@ -63,8 +71,6 @@ switched off in case LCDd is inactive',
       },
       'Reboot',
       {
-        'description' => 'Reinitialize the LCD\'s BIOS 
-normally you shouldn\'t need this',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'boolean',
@@ -75,7 +81,6 @@ normally you shouldn\'t need this',
       },
       'Size',
       {
-        'description' => 'Select the LCD size ',
         'type' => 'leaf',
         'upstream_default' => '20x4',
         'value_type' => 'uniline'
@@ -89,7 +94,6 @@ normally you shouldn\'t need this',
           '19200',
           '115200'
         ],
-        'description' => 'Set the communication speed ',
         'type' => 'leaf',
         'upstream_default' => '9600',
         'value_type' => 'enum'
@@ -99,4 +103,3 @@ normally you shouldn\'t need this',
   }
 ]
 ;
-

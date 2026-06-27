@@ -23,7 +23,7 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use File::Spec ();
 BEGIN { eval { require Cwd } }

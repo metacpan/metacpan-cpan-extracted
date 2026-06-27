@@ -1,5 +1,5 @@
 package Thunderhorse;
-$Thunderhorse::VERSION = '0.105';
+$Thunderhorse::VERSION = '0.106';
 ##################################
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #
@@ -110,6 +110,15 @@ sub build_handler ($controller, $destination)
 			}
 		}
 
+		# NOTE: this method will not send the response if we already sent or if
+		# the response is not ready. It does not check whether the context is
+		# consumed altogether, so a manually consumed context with a non-ready
+		# response will not send anything, likely rendering some kind of error
+		# page (but not 404). Currently, a PAGI error is raised, informing
+		# about app returning without sending respnose.
+		# NOTE: this needs to be here, since we want to use $send from this context
+		await $ctx->try_send_res;
+
 		# if this is a bridge and bridge did not render, it means we are
 		# free to go deeper. Avoid first match, as it was handled already
 		# above
@@ -213,6 +222,10 @@ the very last operation in the file.
 Scripts must be called using C<pagi-server> (or other PAGI-specific software).
 Running the script using C<perl> does nothing, as the application cannot run
 itself - it will be built, but it will not set up a webserver.
+
+C<pagi-server> can be obtained separately from L<PAGI::Server> module.
+Thunderhorse does not automatically include PAGI::Server as its dependency,
+since it is not coupled with any specific PAGI server implementation.
 
 =back
 
@@ -388,29 +401,29 @@ Return value of the destination sub is by default sent to the requestor as
 C<text/html> with status code C<200>. This is a common and handy shortcut, but
 it is equally easy to do something else. Take the following destination example:
 
-	async sub send_custom ($self, $ctx)
+	async sub build_custom ($self, $ctx)
 	{
-		await $ctx->res->text('Plaintext response');
+		$ctx->res->text('Plaintext response');
 		return 'this will not get rendered';
 	}
 
-This takes response (L<Thunderhorse::Response>) from context, and sends
-plaintext manually. This action I<consumes> the context, marking it as
-finished. In this case, return value of the destination is ignored. Note that
-the await call on C<< ->text >> method is mandatory.
+This takes response (L<Thunderhorse::Response>) from context, and sets
+plaintext body manually. This action I<consumes> the context, marking it as
+finished. In this case, return value of the destination is ignored.
+
 
 Another example:
 
-	sub send_custom2 ($self, $ctx)
+	sub set_custom2 ($self, $ctx)
 	{
-		$ctx->res->status(400)->content_type('text/plain');
-		return 'this is rendered as plaintext and status 400';
+		$ctx->res->content_type('text/plain');
+		return 'this is rendered as plaintext';
 	}
 
 This time, the return value of the destination is not ignored, since only
 setting response metadata does not cause the context to be consumed. Status and
 I<Content-Type> header will not be overridden, so the response will be sent as
-plaintext. In this case, there is no need to await anything.
+plaintext.
 
 While not very common, a destination can be unimplemented when C<to> is
 skipped. Unimplemented locations will be "stepped over" during request
@@ -523,10 +536,10 @@ bridge is created when you call C<add> on the result of another C<add>:
 
 When C</admin/users> is requested, both C<check_admin> and C<list_users> will
 be called in sequence. The bridge destination receives the same arguments as
-regular destinations. If the bridge consumes the context (by sending a
-response), further matching stops. Otherwise, the next matching location is
-called. For this reason, bridge destinations should return C<undef> explicitly
-to avoid consuming the context by accident:
+regular destinations. If the bridge consumes the context, further matching
+stops. Otherwise, the next matching location is called. For this reason, bridge
+destinations should return C<undef> explicitly to avoid consuming the context
+by accident:
 
 	sub check_admin ($self, $ctx)
 	{
@@ -539,17 +552,7 @@ to avoid consuming the context by accident:
 
 Bridges only match for paths when a full level is matched, for example the
 above admin bridge will match for C</admin> and C</admin/test>, but not for
-C</admins>. For this reason, all locations under the bridge should start their
-patterns with C</>. The sole exception to this is creating a location under a
-bridge with an empty pattern, which will match the exact same pattern as the
-bridge, but still be under the bridge in the hierarchy:
-
-	# ran after $admin_bridge, but only on the same pattern
-	$admin_bridge->add(
-		'' => {
-			to => 'admin_homepage',
-		},
-	);
+C</admins>.
 
 =head3 Actions
 
@@ -654,7 +657,7 @@ would expect.
 One unique feature of Thunderhorse is that it does not stop searching for
 matches once it finds a match. Instead, it gathers a list of matching locations
 and then proceeds to execute them in order. It stops once one of the handlers
-consumes the context, which is usually done by sending a response. If no
+consumes the context, which is usually done by setting a response body. If no
 handlers consumed the context, a I<404 Not Found> error page is rendered.
 
 This allows for superb flexibility, but has a couple of interesting side
@@ -774,6 +777,30 @@ locations, they can match on their own even if none of their children are
 matching. If we let C<important_auth> run before C<login_page>, for example by
 setting its order to C<-2>, it will effectively become a bridge for
 C<login_page>.
+
+Currently, the context can be consumed by:
+
+=over
+
+=item * Setting the response body in L<Thunderhorse::Context/res>
+
+=item * Setting the response status to one of the statuses which does not require a body
+
+=item * Closing a websocket connection in L<Thunderhorse::Context/ws>
+
+=item * Closing a sse connection in L<Thunderhorse::Context/sse>
+
+=item * Manually sending any response via PAGI, triggering C<response_started> in C<pagi.connection> scope key
+
+=item * Manually consuming the context via L<Thunderhorse::Context/consume> call
+
+=back
+
+This system should be pretty bulletproof, however once you use the last option
+and call L<Thunderhorse::Context/consume>, all safety measures are off - it's
+now your responsibility to make sure the route handler will render something
+eventually. If it doesn't, you will get a low-level PAGI exception and an error
+page completely bypassing any Thunderhorse error rendering. Use with caution.
 
 =head2 Controllers
 
@@ -1025,11 +1052,25 @@ are loaded in order:
 
 =back
 
-Where C<$ext> is any extension handled by available config readers (C<.pl> for
-Perl scripts by default), and C<$env> is the current environment (production,
-development, or test). The environment can be set via the C<PAGI_ENV>
-environment variable or the C<env> constructor parameter. C<pagi-server -E
-production> also sets C<PAGI_ENV>.
+Where C<$ext> is any extension handled by available config readers, and C<$env>
+is the current environment (production, development, or test). The environment
+can be set via the C<PAGI_ENV> environment variable or the C<env> constructor
+parameter. C<pagi-server -E production> also sets C<PAGI_ENV>.
+
+By default, configuration is gathered from perl files with C<.pl> extension.
+These files should yield a hash reference with configuration keys. To use an
+alternative type of configuration files, L<Gears::App/config> should be
+provided as a constructor argument, or declared in the application class. Perl
+files allow additional symbols to be declared in them (as subroutines), and by
+default C<app> symbol is declared, allowing you to easily provide complex data
+in your configuration:
+
+	# conf/config.pl
+	{
+		# a custom configuration key, calling custom method from your
+		# application class
+		system_info => app->get_system_info,
+	}
 
 Configuration files are merged together, with environment-specific settings
 overriding base settings. Example structure:
@@ -1282,7 +1323,7 @@ This hook's method B<cannot be declared on a controller level>.
 The C<on_error> hook is called when an exception occurs during request
 processing.
 
-This hook should consume the context by sending a response. The default handler
+This hook should consume the context by setting a response. The default handler
 calls L</render_error> method a text page with an error message.
 
 =head3 Overriding system methods
@@ -1307,7 +1348,7 @@ following things:
 
 =item * tries to set C<Content-Type> header to C<text/html> (if it was not set already)
 
-=item * awaits sending C<$result> to the client using L<PAGI::Response/send> method (as text)
+=item * sets C<$result> as the response body
 
 =back
 
@@ -1319,11 +1360,12 @@ references and render them as JSON/YAML.
 	async sub render_error($self, $ctx, $code, $message = undef) { ... }
 	async sub render_error($self, $controller, $ctx, $code, $message = undef) { ... }
 
-This method's default implementation sends a plain text response with code
+This method's default implementation builds a plain text response with code
 C<500>. The default implementation checks C<is_production> method of the
 application to avoid rendering the original error message which may contain
 sensitive information. It also acknowledges the existence of L<Gears::X::HTTP>,
-which may change the error code to something else.
+which may change the error code to something else. Original response is
+discarded and a new one is built.
 
 =head2 Performance tuning
 
@@ -1351,13 +1393,13 @@ use them automatically if available. The list includes:
 
 =over
 
-=item * L<MooX::TypeTiny>
-
 =item * L<Class::XSAccessor>
 
-=item * L<MooX::XSConstructor>
-
 =item * L<Type::Tiny::XS>
+
+=item * L<Future::XS>
+
+=item * All of modules listed in L<Mooish::Base/Moo>
 
 =back
 

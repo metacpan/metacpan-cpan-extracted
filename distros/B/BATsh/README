@@ -2,7 +2,7 @@ NAME
     BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 VERSION
-    Version 0.05
+    Version 0.06
 
 SYNOPSIS
       use BATsh;
@@ -158,7 +158,11 @@ SH MODE
       for VAR in list; do ... done
       while condition; do ... done
       until condition; do ... done
-      case $var in pattern) ... ;; esac
+      case $var in pat1|pat2) ... ;; *) ... ;; esac
+        (case: |-patterns, * ? [abc] [a-z] [!abc] globs, quoted/literal
+         patterns, and the bash ;& / ;;& fall-through terminators)
+      trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]
+        (EXIT pseudo-signal plus a pure-Perl %SIG bridge for real signals)
       test / [ ... ]  (file, string, and integer comparisons)
       cd, pwd, exit, true, false, :, read, shift [N], local VAR=value
       $(( arithmetic )) -- +, -, *, /, %, and $1..$9 inside
@@ -177,6 +181,12 @@ SH MODE
       ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,}  -- case conversion
       ${VAR:N:L}, ${VAR:N}  -- substring
       ${#VAR}  -- string length
+      arr=(a b c), arr+=(d e), arr[i]=v  -- indexed arrays
+      declare -a arr, declare -A map, typeset ...  -- array declaration
+      map=([k]=v ...), map[k]=v  -- associative arrays
+      ${arr[i]}, ${map[key]}, $arr (== ${arr[0]})  -- element access
+      ${arr[@]}, ${arr[*]}, ${#arr[@]}, ${#arr[i]}, ${!arr[@]}
+      unset arr, unset arr[i]
       source / . file
 
 INSTALLATION
@@ -218,9 +228,6 @@ BUGS AND LIMITATIONS
 
     The built-in SH interpreter does not support:
 
-    *   Arrays, indexed and associative ("arr[i]", "${arr[@]}",
-        "declare -A").
-
     *   Filename (pathname) globbing such as "echo *.txt" or "for f in
         *.pl". The "*", "?" and "[abc]" metacharacters are honoured in
         "case" patterns and in "${VAR%pat}" / "${VAR#pat}" expansion only,
@@ -235,8 +242,7 @@ BUGS AND LIMITATIONS
         ">(cmd)").
 
     *   The shell options "set -e", "set -u", "set -x", and the builtins
-        "trap", "getopts", "select", "alias", "declare"/"typeset", "eval"
-        and "exec".
+        "getopts", "select", "alias", "eval" and "exec".
 
     Common to both modes: a parenthesised group "( ... )" does not run in a
     separate sub-shell; it shares the one variable store, so there is no
@@ -303,6 +309,11 @@ EXAMPLES
       eg/05_cmd_comprehensive.batsh Comprehensive CMD-mode tour
       eg/06_sh_comprehensive.batsh  Comprehensive SH-mode tour
       eg/07_mixed_comprehensive.batsh  Mixed CMD/SH comprehensive tour
+      eg/08_sh_arrays.batsh         SH indexed and associative arrays
+      eg/09_cmd_subroutines.batsh   CMD subroutines: CALL args, %~N, SHIFT
+      eg/10_sh_case.batsh           SH case..esac pattern branching
+      eg/11_sh_trap.batsh           SH trap / signal handling
+      eg/12_cmd_vs_sh.batsh         cmd and sh side by side (for students)
 
     Run a .batsh example with:
 

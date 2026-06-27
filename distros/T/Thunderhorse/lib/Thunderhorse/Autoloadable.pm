@@ -1,5 +1,5 @@
 package Thunderhorse::Autoloadable;
-$Thunderhorse::Autoloadable::VERSION = '0.105';
+$Thunderhorse::Autoloadable::VERSION = '0.106';
 use v5.40;
 use Mooish::Base -standard, -role;
 

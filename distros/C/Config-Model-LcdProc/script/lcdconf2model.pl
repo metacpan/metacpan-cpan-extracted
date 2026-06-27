@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2023 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023, 2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -38,12 +38,15 @@ use warnings;
 #    user documentation
 # 5/ Write the resulting LCDd model
 
-use Config::Model 2.141;
-use Config::Model::Itself 2.022;    # to create the model
+use Config::Model 2.163;
+use Config::Model::Itself 2.031;    # to create the model
 
-use 5.010;
+use v5.20;
 use Path::Tiny;
 use Getopt::Long;
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 my $verbose = 0;
 my $show_model = 0;
@@ -118,7 +121,7 @@ my $model = Config::Model->new();
 # - the child class that contains data from a elements of the INI
 #   classes (named Dummy::Class)
 
-# For techinical reason, the lower class (Dummy::Class) must be
+# For technical reason, the lower class (Dummy::Class) must be
 # created first.
 
 # The class is used to store any parameter found in an INI class
@@ -217,9 +220,7 @@ my %dispatch;
 # This subs is passed: the INI class name, the INI parameter name
 # the comment attached to the parameter, the INI value, and an optional
 # value type
-$dispatch{_default_} = sub {
-    my ( $ini_class, $ini_param, $info_r, $ini_v, $value_type ) = @_;
-
+$dispatch{_default_} = sub ($ini_class, $ini_param, $info_r, $ini_v, $value_type ='') {
     # prepare a string to create the ini_class model
     my $load = qq!class:"$ini_class" element:$ini_param type=leaf !;
     $value_type ||= 'uniline';
@@ -260,8 +261,7 @@ $dispatch{_default_} = sub {
 
 # Now let's take care of the special cases. This one deals with "Driver"
 # parameter found in INI [server] class
-$dispatch{"LCDd::server"}{Driver} = sub {
-    my ( $class, $elt, $info_r, $ini_v ) = @_;
+$dispatch{"LCDd::server"}{Driver} = sub ($class, $elt, $info_r, $ini_v) {
     my $load = qq!class:"$class" element:$elt type=check_list !;
     my @drivers = split /\W+/, $$info_r;
     while ( @drivers and ( shift @drivers ) !~ /supported/ ) { }
@@ -272,8 +272,8 @@ $dispatch{"LCDd::server"}{Driver} = sub {
 };
 
 # Ensure that DriverPath ends with a slash by adding a match clause
-$dispatch{"LCDd::server"}{DriverPath} = sub {
-    return $dispatch{_default_}->( @_ ) . q! match="/$"! ;
+$dispatch{"LCDd::server"}{DriverPath} = sub ($class, $elt, $info_r, $ini_v) {
+    return $dispatch{_default_}->($class, $elt, $info_r, $ini_v) . q! match="/$"! ; #"
 };
 
 # like default but ensure that the parameter is integer
@@ -281,9 +281,8 @@ $dispatch{"LCDd::server"}{WaitTime}
     = $dispatch{"LCDd::server"}{ReportLevel}
     = $dispatch{"LCDd::picolcd"}{LircFlushThreshold}
     = $dispatch{"LCDd::server"}{Port}
-    = sub {
-        my ( $class, $elt, $info_r, $ini_v ) = @_;
-        return $dispatch{_default_}->( @_, 'integer' );
+    = sub ($class, $elt, $info_r, $ini_v) {
+        return $dispatch{_default_}->($class, $elt, $info_r, $ini_v, 'integer');
     };
 
 # special dispatch case
@@ -293,8 +292,7 @@ my %override ;
 $override{"LCDd::server"}{GoodBye}
     = $override{"LCDd::server"}{Hello}
     = $override{"LCDd::linux_input"}{key}
-    = sub {
-        my ( $class, $elt ) = @_;
+    = sub ($class, $elt) {
         my $ret = qq( class:"$class" element:$elt type=list ) ;
         $ret .= 'cargo type=leaf value_type=uniline';
         return $ret ;
@@ -368,8 +366,10 @@ foreach my $ini_class (@ini_classes) {
             level=hidden
             warp
               follow:selected="- server Driver"
-              rules:"\$selected.is_set('$ini_class')"
-                level=normal
+              rules:0
+                when="\$selected.is_set('$ini_class')"
+                apply
+                  level=normal
         !;
     }
     $meta_root->load($driver_class_spec);
@@ -399,9 +399,7 @@ $tmp->remove_tree;
 say "Done";
 
 # this function extracts info specified between square brackets and returns a model snippet
-sub info_to_model {
-    my ($info,$value_type, $info_r) = @_ ;
-
+sub info_to_model ($info,$value_type, $info_r) {
     $info =~ s/\s+//g;
     my @model ;
 

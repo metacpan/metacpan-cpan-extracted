@@ -1,5 +1,8 @@
 Revision history for GnuPG-Interface
 
+1.07 - 2026-06-26
+ - Make _version work under mod_perl
+
 1.06 - 2026-03-26
  - Make tests pass for GnuPG 2.5.18
 

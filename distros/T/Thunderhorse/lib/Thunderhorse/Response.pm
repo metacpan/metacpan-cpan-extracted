@@ -1,5 +1,5 @@
 package Thunderhorse::Response;
-$Thunderhorse::Response::VERSION = '0.105';
+$Thunderhorse::Response::VERSION = '0.106';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -13,13 +13,30 @@ sub FOREIGNBUILDARGS ($class, %args)
 	Gears::X::Thunderhorse->raise('no context for response')
 		unless $args{context};
 
-	return $args{context}->pagi->@[0, 2];
+	return ($args{context}->pagi->[0]);
 }
 
 sub update ($self, $scope, $receive, $send)
 {
 	$self->{scope} = $scope;
-	$self->{send} = $send;
+}
+
+sub _allows_empty_body ($self, $status)
+{
+	# HTTP protocol hardcodes - these statuses can have empty bodies
+	return $status < 200
+		|| $status == 204
+		|| ($status >= 300 && $status < 400);
+}
+
+sub is_ready ($self)
+{
+	return true if $self->has_body_source;
+
+	return $self->_allows_empty_body($self->status)
+		if $self->has_status;
+
+	return false;
 }
 
 __END__
@@ -32,16 +49,16 @@ Thunderhorse::Response - Response wrapper for Thunderhorse
 
 	async sub show ($self, $ctx, $id)
 	{
-		await $ctx->res->text("Hello World");
-		await $ctx->res->json({data => 'value'});
-		await $ctx->res->redirect('/login');
+		$ctx->res->text("Hello World");
+		$ctx->res->json({data => 'value'});
+		$ctx->res->redirect('/login');
 	}
 
 =head1 DESCRIPTION
 
 Thunderhorse::Response is a thin wrapper around L<PAGI::Response> that
 integrates with L<Thunderhorse::Context>. It provides a fluent interface for
-building and sending HTTP responses, including JSON, HTML, redirects, and file
+building HTTP responses, including JSON, HTML, redirects, and file
 downloads.
 
 This class extends L<PAGI::Response> and mixes in C<Thunderhorse::Message> to
@@ -71,11 +88,21 @@ constructor arguments.
 
 =head3 update
 
-	$res->update()
+	$res->update($scope, $receive, $send)
 
-Updates the internal PAGI scope and sender from the context's PAGI tuple.
-Called automatically when the context's PAGI tuple changes via
-setter of L<Thunderhorse::Context/pagi>.
+Updates the internal PAGI scope. Called automatically when the context's PAGI
+tuple changes via setter of L<Thunderhorse::Context/pagi>.
+
+=head3 is_ready
+
+	$bool = $res->is_ready()
+
+Returns whether this response is ready as far as Thunderhorse is concerned.
+Responses which are ready will cause the context to become consumed after the
+route handler returns.
+
+Response is ready if it has a body, or if it has a status which does not
+require body like C<204 No Content> or C<3XX>.
 
 =head1 SEE ALSO
 

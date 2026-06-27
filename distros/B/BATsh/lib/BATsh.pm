@@ -22,7 +22,7 @@ use File::Spec ();
 BEGIN { eval { require Cwd } }
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 require BATsh::Env;
@@ -88,6 +88,7 @@ sub run {
     my @script_args = defined($args{args}) ? @{$args{args}} : ();
     _set_batch_args($file, @script_args);
     _process_lines(@lines);
+    BATsh::SH::fire_exit_trap("BATsh::SH") if defined &BATsh::SH::fire_exit_trap;
     return 1;
 }
 
@@ -97,6 +98,7 @@ sub run_string {
     my @lines = map { "$_\n" } split(/\n/, $source, -1);
     _ensure_env_init();
     _process_lines(@lines);
+    BATsh::SH::fire_exit_trap("BATsh::SH") if defined &BATsh::SH::fire_exit_trap;
     return 1;
 }
 
@@ -104,6 +106,7 @@ sub run_lines {
     my ($class_or_self, @lines) = @_;
     _ensure_env_init();
     _process_lines(@lines);
+    BATsh::SH::fire_exit_trap("BATsh::SH") if defined &BATsh::SH::fire_exit_trap;
     return 1;
 }
 
@@ -284,9 +287,36 @@ sub _extract_subroutines {
     my (@lines) = @_;
     my @out = (); my $in_sub = ''; my @sub_body = ();
 
-    # Two-pass: first identify which :LABEL lines have a matching RET/RETURN.
-    # Only those are BATsh subroutines; pure GOTO labels stay in the stream.
+    # Determine which :LABEL lines are subroutine ENTRY points (to be lifted
+    # out of the main stream and stored in %_SUBROUTINES) versus ordinary
+    # GOTO labels (which stay in the stream for the CMD interpreter).
+    #
+    # Two independent signals are unioned:
+    #
+    #   (a) CALL targets: any label named by a "CALL :LABEL" anywhere in the
+    #       script is an entry point.  This is the decisive signal -- a label
+    #       you CALL is a subroutine -- and it lets a subroutine contain its
+    #       own internal GOTO labels without being mis-split.
+    #
+    #   (b) The RET heuristic: a label whose block ends in RET/RETURN before
+    #       the next label.  Kept for backward compatibility so a subroutine
+    #       invoked only indirectly is still recognised.
+    #
+    # A label is opened as a subroutine ONLY at the top level (not while
+    # already inside a subroutine body); once inside a body, every :LABEL is
+    # an internal label that travels with the body so that GOTO within the
+    # subroutine resolves, and only RET/RETURN closes the body.
     my %is_sub_label = ();
+
+    # (a) CALL targets (matched anywhere on the line, e.g. "IF .. CALL :X").
+    for my $line (@lines) {
+        (my $s = $line) =~ s/\r?\n\z//;
+        while ($s =~ /\bCALL\s+:([A-Za-z_][A-Za-z0-9_]*)/ig) {
+            $is_sub_label{uc($1)} = 1;
+        }
+    }
+
+    # (b) RET heuristic.
     {
         my $cur = '';
         for my $line (@lines) {
@@ -311,18 +341,21 @@ sub _extract_subroutines {
         $s =~ s/\A\s+//;
         if ($s =~ /\A:([A-Za-z_][A-Za-z0-9_]*)\s*\z/) {
             my $lbl = uc($1);
-            if ($is_sub_label{$lbl}) {
-                # This is a BATsh subroutine definition
-                $_SUBROUTINES{$in_sub} = [@sub_body] if $in_sub ne '';
-                $in_sub = $lbl; @sub_body = ();
-                next;   # remove label line from stream
-            }
-            else {
-                # This is a GOTO label: keep in stream for CMD interpreter
-                push @out, $line if $in_sub eq '';
-                push @sub_body, $line if $in_sub ne '';
+            if ($in_sub ne '') {
+                # Inside a subroutine: this is an internal label of the body
+                # (a GOTO target), not a new subroutine.  Keep it with the
+                # body so the CMD interpreter can resolve GOTO :internal.
+                push @sub_body, $line;
                 next;
             }
+            if ($is_sub_label{$lbl}) {
+                # Top-level subroutine entry: lift it out of the main stream.
+                $in_sub = $lbl; @sub_body = ();
+                next;   # remove the entry-label line from the stream
+            }
+            # Top-level GOTO label: keep in stream for the CMD interpreter.
+            push @out, $line;
+            next;
         }
         if ($in_sub ne '') {
             if ($s =~ /\A(?:RET|RETURN)\s*\z/i) {
@@ -348,11 +381,54 @@ sub call_sub {
     $label = uc($label); $label =~ s/^://;
     croak "BATsh->call_sub: undefined subroutine :$label"
         unless exists $_SUBROUTINES{$label};
-    $BATsh::Env::STORE{'BATSH_ARGC'} = scalar @args;
-    for my $i (1 .. scalar @args) {
-        $BATsh::Env::STORE{"BATSH_ARG$i"} = $args[$i-1];
+
+    # --- Save the caller's positional-parameter frame -----------------
+    # CALL :label is a true subroutine call: the callee gets its own
+    # %0..%9 / %* (and the SH-side BATSH_ARG* mirror), and the caller's
+    # parameters are restored on return.  An undef snapshot means the key
+    # was absent and must be removed again on restore.
+    my @frame_keys = ('%0','%1','%2','%3','%4','%5','%6','%7','%8','%9','%*',
+                      'BATSH_ARGC',
+                      'BATSH_ARG1','BATSH_ARG2','BATSH_ARG3','BATSH_ARG4',
+                      'BATSH_ARG5','BATSH_ARG6','BATSH_ARG7','BATSH_ARG8',
+                      'BATSH_ARG9');
+    my %saved;
+    for my $k (@frame_keys) {
+        $saved{$k} = exists $BATsh::Env::STORE{$k} ? $BATsh::Env::STORE{$k}
+                                                   : undef;
     }
-    _process_lines(@{$_SUBROUTINES{$label}});
+
+    # --- Install the subroutine's own arguments -----------------------
+    # %0 is the label token (":LABEL"), matching cmd.exe, so that %~..0
+    # modifiers and %0 inside the subroutine refer to the label, not the
+    # outer script.  %1..%9 are the call arguments; %* is their join.
+    BATsh::Env->set('%0', ":$label");
+    for my $n (1 .. 9) {
+        BATsh::Env->set("%$n", defined($args[$n-1]) ? $args[$n-1] : '');
+    }
+    BATsh::Env->set('%*', join(' ', @args));
+
+    # SH-side mirror so a subroutine body written in SH mode still sees
+    # $1..$9 / $@.  Keys beyond the supplied argument count are removed so
+    # a shorter call does not inherit the caller's stale BATSH_ARG* values.
+    $BATsh::Env::STORE{'BATSH_ARGC'} = scalar @args;
+    for my $n (1 .. 9) {
+        if ($n <= scalar @args) {
+            $BATsh::Env::STORE{"BATSH_ARG$n"} = $args[$n-1];
+        }
+        else {
+            delete $BATsh::Env::STORE{"BATSH_ARG$n"};
+        }
+    }
+
+    # --- Run the body, then always restore the caller frame -----------
+    my $ok  = eval { _process_lines(@{$_SUBROUTINES{$label}}); 1 };
+    my $err = $@;
+    for my $k (@frame_keys) {
+        if (defined $saved{$k}) { $BATsh::Env::STORE{$k} = $saved{$k} }
+        else                    { delete $BATsh::Env::STORE{$k} }
+    }
+    die $err unless $ok;
     return 1;
 }
 
@@ -395,22 +471,12 @@ sub _exec_cmd_section {
             push @batch, $line;
             next;
         }
-        if ($s =~ /\ACALL\s+:([A-Za-z_][A-Za-z0-9_]*)(.*)/i) {
-            my ($lbl, $rest) = (uc($1), $2);
-            _flush_cmd(\@batch) if @batch; @batch = ();
-            $rest =~ s/\A\s+//;
-            my @args = split /\s+/, $rest;
-            eval { call_sub('', $lbl, @args) };
-            warn $@ if $@;
-            next;
-        }
-        if ($s =~ /\ACALL\s+(\S+\.batsh)(.*)/i) {
-            my $bfile = $1;
-            _flush_cmd(\@batch) if @batch; @batch = ();
-            eval { source_file('', $bfile) };
-            warn $@ if $@;
-            next;
-        }
+        # NOTE: CALL :label and CALL file.batsh are intentionally NOT
+        # intercepted here.  They are handled by the CMD interpreter's
+        # _cmd_call (which delegates to call_sub / source_file).  Letting
+        # CALL stay inside the batch keeps the whole CMD section in one
+        # exec_block, so a GOTO whose loop body contains a CALL still finds
+        # its label, and a subroutine body may use its own internal labels.
         push @batch, $line;
     }
     _flush_cmd(\@batch) if @batch;
@@ -632,7 +698,7 @@ BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -755,8 +821,21 @@ a value updated inside a block, use delayed expansion:
 =head2 Batch Parameters
 
 C<%0> is the script path (absolute); C<%1>..C<%9> are positional arguments;
-C<%*> is all arguments joined by space.  C<SHIFT> / C<SHIFT /N> shifts the
-positional parameters.  C<CALL :label> saves and restores caller's arguments.
+C<%*> is all arguments joined by space.
+
+C<CALL :label arg1 arg2 ...> invokes a subroutine as a true call frame: the
+subroutine receives its own C<%0> (the C<:label> token), C<%1>..C<%9> (the
+call arguments) and C<%*> (their join), and the caller's parameters are
+saved before the call and restored on return.  Arguments are C<%>-expanded
+before the call and split with double-quote awareness, so
+C<CALL :sub "a b" %FILE%> passes C<a b> as one argument and the expanded
+value of C<%FILE%> as the next.  Nested calls each get an independent frame.
+The same arguments are also visible as C<$1>..C<$9> / C<$@> when the
+subroutine body is written in SH mode.
+
+C<SHIFT> moves C<%2> into C<%1>, C<%3> into C<%2>, and so on, clears C<%9>,
+and rebuilds C<%*>; C<SHIFT /N> begins the shift at C<%N> (C<%1>..C<%(N-1)>
+are left unchanged).
 
 Batch-parameter tilde modifiers expand C<%0>..C<%9> components:
 
@@ -795,9 +874,11 @@ SH sections are executed by BATsh::SH, which implements:
   for VAR in list; do ... done
   while condition; do ... done
   until condition; do ... done
-  case $var in pattern) ... ;; esac
+  case $var in pat1|pat2) ... ;; *) ... ;; esac
+    (|-patterns, * ? [abc] [a-z] [!abc] globs, ;& and ;;& fall-through)
   test / [ ... ]  (file, string, and integer comparisons)
   cd, pwd, exit, true, false, :, read, shift [N], local VAR=value
+  trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]  (EXIT + %SIG)
   $(( arithmetic )) -- +, -, *, /, %, and $1..$9 inside
   $( command ) and `command`  (command substitution, nested)
   cmd1 | cmd2 [| cmd3 ...]  (pipeline via temporary file)
@@ -812,6 +893,12 @@ SH sections are executed by BATsh::SH, which implements:
   ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,}  -- case conversion
   ${VAR:N:L}, ${VAR:N}  -- substring
   ${#VAR}  -- string length
+  arr=(a b c), arr+=(d e), arr[i]=v, arr[i]+=v  -- indexed arrays
+  declare -a arr, declare -A map, typeset ...   -- array declaration
+  map=([k]=v ...), map[k]=v                     -- associative arrays
+  ${arr[i]}, ${map[key]}, $arr (== ${arr[0]})   -- element access
+  ${arr[@]}, ${arr[*]}, ${#arr[@]}, ${#arr[i]}, ${!arr[@]}
+  unset arr, unset arr[i]
   source / . file
 
 =head1 REQUIREMENTS
@@ -845,12 +932,17 @@ Dynamic pseudo-variables C<%DATE%> (YYYY-MM-DD), C<%TIME%> (HH:MM:SS.cc),
 C<%CD%> (current directory), C<%RANDOM%> (0-32767), C<%ERRORLEVEL%>, and
 C<%CMDCMDLINE%> are B<now supported> as of version 0.05.
 
+Indexed and associative arrays -- C<arr=(a b c)>, C<arr+=(...)>,
+C<arr[i]=v>, C<declare -A map>, C<map=([k]=v ...)>, C<${arr[i]}>,
+C<${arr[@]}>, C<${#arr[@]}>, C<${!arr[@]}>, and C<unset arr[i]> -- are
+B<now supported> as of version 0.06 (see L<BATsh::SH>).  Element ordering
+for C<${arr[@]}> is ascending numeric index for indexed arrays and sorted
+key order for associative arrays (bash leaves the latter unspecified);
+C<"${arr[@]}"> word-splits to one item per element in C<for> lists.
+
 The built-in SH interpreter does not implement:
 
 =over
-
-=item * Arrays, indexed and associative: C<arr[i]>, C<${arr[@]}>,
-C<declare -A>.
 
 =item * Tilde expansion C<~/path> and C<~user> (only C<cd> with no
 argument uses C<$HOME>).
@@ -861,10 +953,16 @@ argument uses C<$HOME>).
 (C<E<lt>(cmd)>, C<E<gt>(cmd)>).
 
 =item * The shell options C<set -e>, C<set -u>, C<set -x>, and the
-builtins C<trap>, C<getopts>, C<select>, C<alias>, C<declare>/C<typeset>,
-C<eval> and C<exec>.
+builtins C<getopts>, C<select>, C<alias>, C<eval> and C<exec>.
 
 =back
+
+C<trap> B<is> supported in SH mode: C<trap 'cmd' SIGSPEC...> registers a
+handler, C<trap - SIGSPEC> resets to default, C<trap '' SIGSPEC> ignores,
+and C<trap> / C<trap -p> lists.  Real signals are bridged to Perl's C<%SIG>;
+the C<EXIT> pseudo-signal (also C<0>) runs when the script ends or on
+C<exit>.  The handler is expanded when it fires.  See L<BATsh::SH/"Traps and
+Signals">.
 
 Common to both modes: a parenthesised group C<( ... )> does not run in a
 separate sub-shell; it shares the one variable store, so there is no
