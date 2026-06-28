@@ -23,8 +23,8 @@ sub new {
 
     Wx::Event::EVT_PAINT( $self, sub {
         my( $self, $event ) = @_;
-
         return unless ref $self->{'settings'};
+
         $self->{'x_pos'} = $self->GetPosition->x;
         $self->{'y_pos'} = $self->GetPosition->y;
 
@@ -34,9 +34,8 @@ sub new {
                                        $self->paint( Wx::PaintDC->new( $self ), $self->{'size'}{'x'}, $self->{'size'}{'y'} ), 0, 0);
         } else {
             Wx::PaintDC->new( $self )->Blit (0, 0, $self->{'size'}{'x'},
-                                                   $self->{'size'}{'y'} + $self->{'menu_size'},
-                                                   $self->{'dc'},
-                                                   $self->{'x_pos'} , $self->{'y_pos'} + $self->{'menu_size'} );
+                                                   $self->{'size'}{'y'}-1,
+                                                   $self->{'dc'},  5, $self->{'menu_size'} + 6);
         }
         1;
     });

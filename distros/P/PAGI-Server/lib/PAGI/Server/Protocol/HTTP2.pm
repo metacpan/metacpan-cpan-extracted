@@ -2,7 +2,7 @@ package PAGI::Server::Protocol::HTTP2;
 use strict;
 use warnings;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.002002';
 
 =encoding utf8
 
@@ -154,7 +154,7 @@ use strict;
 use warnings;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.002001';
+our $VERSION = '0.002002';
 
 sub new {
     my ($class, %args) = @_;

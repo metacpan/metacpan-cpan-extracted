@@ -62,5 +62,35 @@ my $dir = cwd;
   is( cwd, $dir, 'Returned to whence it started' );
 }
 
+# --skip-tests-for, but instead of testing from ::main, test just the sub that
+# decides if the tests should be skipped or not
+{
+  my $target = {
+    meta     => CPAN::Meta->new({ version => '1.0', name => 'FooBar'}),
+    src_name => 'FooBar-1.0',
+    modules  => {
+      'Foo::Bar' => { inital_version => undef },
+      'Foo::Baz' => { inital_version => undef },
+    },
+  };
+  my $cache = { opts => { 'skip-tests-for' => { 'Foo::Bar' => 1 } } };
+
+  App::MechaCPAN::Install::_test_prereq( $target, $cache );
+  is( $target->{skip_tests}, 1, 'skip-tests-for skips when a provided module name matches' );
+
+  delete $target->{skip_tests};
+  $cache->{opts}->{'skip-tests-for'} = { $target->{src_name} => 1 };
+
+  App::MechaCPAN::Install::_test_prereq( $target, $cache );
+  is( $target->{skip_tests}, 1, 'skip-tests-for skips when a package name is provided' );
+
+  my $skip_key = $target->{modules}->{'Foo::Bar'};
+  $cache->{opts}->{'skip-tests-for'} = { $skip_key => 1 };
+  delete $target->{skip_tests};
+
+  App::MechaCPAN::Install::_test_prereq( $target, $cache );
+  is( $target->{skip_tests}, '', 'skip-tests-for does not skip when a provided module value matches' );
+}
+
 chdir $pwd;
 done_testing;

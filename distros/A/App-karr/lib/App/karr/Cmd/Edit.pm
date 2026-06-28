@@ -1,7 +1,7 @@
 # ABSTRACT: Modify an existing task
 
 package App::karr::Cmd::Edit;
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -172,7 +172,7 @@ App::karr::Cmd::Edit - Modify an existing task
 
 =head1 VERSION
 
-version 0.302
+version 0.303
 
 =head1 SYNOPSIS
 

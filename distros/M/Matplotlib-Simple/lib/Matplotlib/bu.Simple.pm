@@ -6,7 +6,7 @@ use autodie ':all';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.28;
+our $VERSION = 0.29;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use Term::ANSIColor;
@@ -36,7 +36,7 @@ my @ax_methods = (
  'set_anchor', 'set_aspect', 'set_autoscale_on', 'set_autoscalex_on', 'set_autoscaley_on',
  'set_axes_locator', 'set_axis_off',    'set_axis_on',   'set_axisbelow',
  'set_box_aspect',   'set_fc',          'set_forward_navigation_events',
- 'set_frame_on',     'set_mouseover( ', 'set_navigate', 'set_navigate_mode',
+ 'set_frame_on',     'set_navigate', 'set_navigate_mode',
  'set_position',     'set_prop_cycle',  'set_rasterization_zorder',
  'set_subplotspec',  'set_title',       'set_xbound', 'set_xlabel',
  'set_xlim',    # ax.set_xlim(left, right), or ax.set_xlim(right = 180)
@@ -86,7 +86,7 @@ my @plt_methods = (
 	'AbstractContextManager', 'Annotation', 'Arrow', 'Artist', 'AutoLocator',
 	'AxLine', 'Axes', 'BackendFilter',          'Button', 'Circle', 'Colorizer',
 	'ColorizingArtist', 'Colormap',     'Enum', 'ExitStack', 'Figure',
-	'FigureBase',   'FigureCanvasBase', 'FigureManagerBase', ' FixedFormatter',
+	'FigureBase',   'FigureCanvasBase', 'FigureManagerBase', 'FixedFormatter',
 	'FixedLocator', 'FormatStrFormatter', 'Formatter',       'FuncFormatter',
 	'GridSpec',     'IndexLocator',       'Line2D', 'LinearLocator', 'Locator',
 	'LogFormatter', 'LogFormatterExponent', 'LogFormatterMathtext',
@@ -262,6 +262,7 @@ my %opt = (
 	 'keys', # specify the order, otherwise alphabetical #'log', # if set to > 1, the y-axis will be logarithmic # 's', # float or array-like, shape (n, ), optional. The marker size in points**2 (typographic points are 1/72 in.).
 	  'logscale', # "x" and/or "y" as an aray
 	 'shared.colorbar', # array of 0-based indices for sharing a colorbar
+	 'show.legend',
 	 'set.options'    # color = 'red', marker = 'v', etc.
 	],
 	violin_helper => [
@@ -354,7 +355,7 @@ sub plot_args {    # this is a helper function to other matplotlib subroutines
 			}
 			if ( $ref eq '' ) {
 				if ($method eq 'show') {
-					say {$args->{fh}} "$obj[$i].$method()" . '#line' . __LINE__;
+					next; # plt.show() is emitted by plt() after plt.savefig()
 				} else {
 					say {$args->{fh}} "$obj[$i].$method($args->{args}{$method}) #line" . __LINE__;
 				}
@@ -462,7 +463,7 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 	  $options .= ', log = True';
 	}    # args that can be either arrays or strings below; STRINGS:
 	foreach my $c ( grep { defined $plot->{$_} } ( 'color', 'edgecolor' ) ) {
-		next if ( ( $c eq 'color' ) && ( $plot_type eq 'grouped' ) );
+		next if ( ( $c eq 'color' ) && ( $plot_type eq 'grouped' ) && ( ref $plot->{$c} ne '' ) );
 		my $ref = ref $plot->{$c};
 		if ( $ref eq '' ) {    # single color
 			$options .= ", $c = '$plot->{$c}'";
@@ -535,7 +536,7 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 		my $barwidth = $plot->{width} // 0.8;
 		$plot->{stacked} = $plot->{stacked} // 0;
 		if ( $plot->{stacked} == 0 ) {
-			$barwidth /= ( (scalar keys %ref_counts) + 3 );
+			$barwidth /= ( scalar @val + 1 ); # @val holds one array per bar series
 		}
 		my @xticks   = 0 .. scalar @{ $val[0] } - 1;
 		my @mean_pos = map { 0 } 0 .. scalar @{ $val[0] } - 1;    # initialize
@@ -550,12 +551,13 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 			}
 			my $set_options = '';
 			foreach
-			  my $f ( grep { defined $plot->{$_}[$i] } ( 'color', 'label' ) )
+			  my $f ( grep { ( ref $plot->{$_} eq 'ARRAY' ) && defined $plot->{$_}[$i] } ( 'color', 'label' ) )
 			{
 				 $set_options .= ", $f = '$plot->{$f}[$i]'";
 			}
 			if ( $plot->{stacked} > 0 ) {
-				$set_options .= ', bottom = [' . join( ',', @bottom ) . ']';
+				my $stack_kwarg = $plot->{'plot.type'} eq 'barh' ? 'left' : 'bottom';
+				$set_options .= ", $stack_kwarg = [" . join( ',', @bottom ) . ']';
 			}
 			say { $args->{fh} } "ax$ax.$plot->{'plot.type'}($x, ["
 			 . join( ',', @{$arr} )
@@ -734,7 +736,7 @@ sub colored_table_helper {
 	if (defined $plot->{'row.labels'}) {
 		@rows = @{ $plot->{'row.labels'} };
 	} else {
-		@rows = sort keys %data;
+		@rows = @cols; # the matrix "d" is built with one row per entry of @cols
 	}
 	my ($min, $max) = ('inf', '-inf');
 	say {$args->{fh}} 'd = []';
@@ -742,7 +744,6 @@ sub colored_table_helper {
 	foreach my $k1 (@cols) {
 		foreach my $k2 (grep {!defined $data{$k1}{$_}} @cols) {
 			$data{$k1}{$k2} = 'np.nan';#$plot->{default_undefined};
-			$data{$k2}{$k1} = 'np.nan';#$plot->{default_undefined};
 		}
 		foreach my $k2 (grep {looks_like_number($data{$k1}{$_})} @cols) {
 			$min = min($min, $data{$k1}{$k2});
@@ -750,16 +751,18 @@ sub colored_table_helper {
 		}
 		say {$args->{fh}} 'd.append([' . join (',', @{ $data{$k1} }{@cols}) . '])';
 	}
-	$min = $args->{cb_min} // $min;
-	$max = $args->{cb_max} // $max;
+	$min = $plot->{cb_min} // $min;
+	$max = $plot->{cb_max} // $max;
 	$plot->{cmap} = $plot->{cmap} // 'gist_rainbow';
 	$plot->{cb_logscale} = $plot->{cb_logscale} // 0;
 	my $ax = $args->{ax} // '';
 	say {$args->{fh}} 'from matplotlib import colors' if $plot->{cb_logscale} > 0;
 	$plot->{'undef.color'} = $plot->{'undef.color'} // 'gray';
-	say {$args->{fh}} 'plt.cm.gist_rainbow.set_bad("' . $plot->{'undef.color'} . '")';
+	say {$args->{fh}} 'import matplotlib';
+	say {$args->{fh}} "table_cmap = matplotlib.colormaps['$plot->{cmap}'].copy()";
+	say {$args->{fh}} 'table_cmap.set_bad("' . $plot->{'undef.color'} . '")';
 	say {$args->{fh}} "norm = plt.Normalize($min, $max)";
-	say {$args->{fh}} 'datacolors = plt.cm.gist_rainbow(norm(d))';
+	say {$args->{fh}} 'datacolors = table_cmap(norm(d))';
 	my @options;
 	my %translate = (cb_min => 'vmin', cb_max => 'vmax');
 	foreach my $opt (grep {defined $plot->{$_}} 'cb_min', 'cb_max'){
@@ -773,9 +776,9 @@ sub colored_table_helper {
 		$opt = ", $opt";
 	}
 	if ($plot->{cb_logscale}) {
-		say {$args->{fh}} "img = ax$ax.imshow(d, cmap='$plot->{cmap}', norm=colors.LogNorm($opt))";
+		say {$args->{fh}} 'img = ax' . $ax . '.imshow(d, cmap=table_cmap, norm=colors.LogNorm(' . join (',', @options) . '))';
 	} else {
-		say {$args->{fh}} "img = ax$ax.imshow(d, cmap='$plot->{cmap}' $opt)";
+		say {$args->{fh}} "img = ax$ax.imshow(d, cmap=table_cmap $opt)";
 	}
 	$plot->{'colorbar.on'} = $plot->{'colorbar.on'} // 1;
 	if (defined $plot->{cblabel}) {
@@ -903,7 +906,7 @@ sub hexbin_helper {
 	my $ax = $args->{ax} // '';
 	say { $args->{fh} } "im$ax = ax$ax.hexbin(x, y $options)\n";
 	my $opts = '';
-	foreach my $o (grep {defined $plot->{$_}} ('cblabel', 'cblocation', 'cborientation')) { #str
+	foreach my $o (grep {defined $plot->{$_}} ('cblocation', 'cborientation')) { #str; cblabel is handled separately below
 		my $mpl_opt = $o;
 		$mpl_opt =~ s/^cb//;
 		$opts .= ", $mpl_opt = '$plot->{$o}'";
@@ -981,7 +984,7 @@ sub hist_helper {
 				$options .= ", $arg = $plot->{$arg}";
 			}
 		} elsif ( $ref eq 'ARRAY' ) {
-			$options .= ", $arg = [" . join( ',', @{ $plot->{$arg} } ) . '"]';
+			$options .= ", $arg = [" . join( ',', @{ $plot->{$arg} } ) . ']';
 		} else {
 			p $plot;
 			die "$ref for $arg isn't acceptable";
@@ -1082,9 +1085,6 @@ sub hist2d_helper {
 		 . " points.";
 	  die 'The length of both keys must be equal.';
 	}
-	if ($plot->{xlabel}) {
-		
-	}
 	$plot->{xlabel} = $plot->{xlabel} // $keys[0];
 	$plot->{ylabel} = $plot->{ylabel} // $keys[1];
 	$plot->{cmap}   = $plot->{cmap}   // 'gist_rainbow';
@@ -1170,7 +1170,7 @@ sub hist2d_helper {
 	say {$args->{fh}} "print(f'plot $ax hist2d density range = [{min_hist2d_box}, {max_hist2d_box}]')";
 	return 0 if $plot->{'show.colorbar'} == 0;
 	my $opts = '';
-	foreach my $o (grep {defined $plot->{$_}} ('cblabel', 'cblocation', 'cborientation')) { #str
+	foreach my $o (grep {defined $plot->{$_}} ('cblocation', 'cborientation')) { #str; cblabel is handled separately below
 		my $mpl_opt = $o;
 		$mpl_opt =~ s/^cb//;
 		$opts .= ", $mpl_opt = '$plot->{$o}'";
@@ -1513,8 +1513,8 @@ sub plot_helper {
 	}
 	if (defined $plot->{twinx}) {
 		if (ref $plot->{twinx} eq '') {
-			die "twinx must be an hash index, not \"$plot->{twinx}\"" unless $plot->{twinx} =~ m/^\d+$/;
-			@twinx = $plot->{twinx};
+			die "twinx \"$plot->{twinx}\" is not a key in data" unless defined $plot->{data}{ $plot->{twinx} };
+			@twinx = ($plot->{twinx});
 		} elsif (ref $plot->{twinx} eq 'HASH') {
 			@bad_opt = sort grep {!defined $plot->{data}{$_}} keys %{ $plot->{twinx} };
 			if (scalar @bad_opt > 0) {
@@ -1573,7 +1573,7 @@ sub plot_helper {
 		{
 			$options = ", $plot->{'set.options'}";
 		}
-		if ( defined $plot->{'set.options'}{$set} ) {
+		if ( ( ref $plot->{'set.options'} eq 'HASH' ) && ( defined $plot->{'set.options'}{$set} ) ) {
 			$options = ", $plot->{'set.options'}{$set}";
 		}
 		my $label = '';
@@ -1672,7 +1672,7 @@ sub scatter_helper {
 			$color_key = pop @keys;
 		}
 		foreach my $i (0,1) {
-			my @undef_i = grep {not defined $plot->{data}{$keys[0]}[$_]} 0..scalar @{ $plot->{data}{ $keys[0] } } - 1;
+			my @undef_i = grep {not defined $plot->{data}{$keys[$i]}[$_]} 0..scalar @{ $plot->{data}{ $keys[$i] } } - 1;
 			if (scalar @undef_i > 0) {
 				p @undef_i;
 				die "the above indices for $current_sub group $i are undefined.";
@@ -1698,10 +1698,10 @@ sub scatter_helper {
 			}
 			say { $args->{fh} } 'z = [' . join( ',', @{ $plot->{data}{$color_key} } ) . ']';
 			say { $args->{fh} }
-			  "im = ax$ax.scatter(x, y, c = z, cmap = 'gist_rainbow' $options)";
+			  "im = ax$ax.scatter(x, y, c = z, cmap = '$plot->{cmap}' $options)";
 			say { $args->{fh} } "fig.colorbar(im, label = '$color_key' $cb_opts)";
 		} else {
-			say { $args->{fh} } "ax$ax.scatter(x, y, $options)";
+			say { $args->{fh} } "ax$ax.scatter(x, y $options)";
 		}
 		$plot->{xlabel} = $plot->{xlabel} // $keys[0];
 		$plot->{ylabel} = $plot->{ylabel} // $keys[1];
@@ -1803,7 +1803,6 @@ sub violin_helper {
 	if ( $plot->{orientation} !~ m/^(?:horizontal|vertical)$/ ) {
 		die "$current_sub needs either \"horizontal\" or \"vertical\", not \"$plot->{orientation}\"";
 	}
-	$args->{whiskers} = $args->{whiskers} // 1;    # by default, make whiskers
 	if (ref $plot->{data} eq 'ARRAY') {
 		my $tmp = delete $plot->{data};
 		$plot->{data}{''} = $tmp;
@@ -1816,7 +1815,7 @@ sub violin_helper {
 	}
 	my $ax = $args->{ax} // '';
 	$plot->{medians}  = $plot->{medians}  // 1; # by default, show median values
-	$plot->{whiskers} = $plot->{whiskers} // 1;
+	$plot->{whiskers} = $plot->{whiskers} // 1;    # by default, make whiskers
 	$plot->{edgecolor} = $plot->{edgecolor} // 'black';
 	my $options = '';    # these args go to the plt.hist call
 	say { $args->{fh} } 'd = []';
@@ -1976,7 +1975,7 @@ sub wide_helper {
 			say { $args->{fh} } 'ys = np.array(ys)';
 			say { $args->{fh} } 'mean_ys = ys.mean(axis=0)';
 			say { $args->{fh} } 'std = ys.std(axis=0)';
-			say { $args->{fh} } 'ys_upper = np.minimum(mean_ys + std, 1)';
+			say { $args->{fh} } 'ys_upper = mean_ys + std';
 			say { $args->{fh} } 'ys_lower = mean_ys - std';
 			if ( $plot->{'show.legend'} > 0 ) {
 				say { $args->{fh} } "ax$ax.plot(base_y, mean_ys, '$color', label = '$group')";
@@ -2007,7 +2006,7 @@ sub wide_helper {
 		say { $args->{fh} } 'ys = np.array(ys)';
 		say { $args->{fh} } 'mean_ys = ys.mean(axis=0)';
 		say { $args->{fh} } 'std = ys.std(axis=0)';
-		say { $args->{fh} } 'ys_upper = np.minimum(mean_ys + std, 1)';
+		say { $args->{fh} } 'ys_upper = mean_ys + std';
 		say { $args->{fh} } 'ys_lower = mean_ys - std';
 		say { $args->{fh} } "ax$ax.plot(base_y, mean_ys, '$color')";
 		say { $args->{fh} }
@@ -2020,7 +2019,10 @@ sub wide_helper {
 sub print_type {
 	my $str = shift;
 	my $type = 'no quotes';
-	if ($str =~ m/^\w+\h*=\h*["']/) {
+	if (looks_like_number($str)) { # numbers (e.g. 0.8) must not be quoted
+		return 'no quotes';
+	}
+	if ($str =~ m/\w+\h*=\h*["'\(]/) {
 		return 'no quotes';
 	}
    if ($str =~ m/^\w+$/) {
@@ -2049,7 +2051,7 @@ sub plt {
 		p $args;
 		die 'either "show" or "output.file" must be defined';
 	}
-	my @reqd_args = ('output.file'); # e.g. "my_image.svg"
+	my @reqd_args = $args->{show} ? () : ('output.file'); # e.g. "my_image.svg"; optional if "show" is set
 	my $single_example = 'plt({
 	\'output.file\' => \'/tmp/gospel.word.counts.svg\',
 	\'plot.type\'       => \'bar\',
@@ -2189,9 +2191,6 @@ sub plt {
 	foreach my $y (@y) {
 		push @py, '(' . join( ',', @{$y} ) . ')';
 	}
-	if ($args->{arr}) {
-		
-	}
 	if ((defined $args->{'shared.colorbar'}) && ($single_plot == 1)) {
 		warn 'There is only 1 plot/subplot, shared colorbars make no sense... deleting';
 		delete $args->{'shared.colorbar'};
@@ -2264,8 +2263,10 @@ sub plt {
 	);
 	if ($single_plot == 1) {
 		foreach my $graph (@{ $args->{add} }) {
-			my $type = $graph->{'plot.type'} // $args->{'plot.type'};
-			die 'plot.type not defined' unless defined $graph->{'plot.type'};
+			$graph->{'plot.type'} = $graph->{'plot.type'} // $args->{'plot.type'};
+			my $type = $graph->{'plot.type'};
+			die 'plot.type not defined for "add" graph' unless defined $type;
+			die "\"$type\" isn't a known plot.type" unless defined $dispatch{$type};
 			$dispatch{$type}->({
 				fh   => $fh,
 				ax   => 0,
@@ -2278,7 +2279,6 @@ sub plt {
 			p $args;
 			die "$type isn't defined";
 		}
-		die 'plot.type not defined' unless defined $dispatch{$type};
 		$dispatch{$type}->({
 			fh   => $fh,
 			ax   => 0,
@@ -2321,7 +2321,11 @@ sub plt {
 			}
 		}
 		foreach my $graph (@{ $plot->{add} }) {
-			$dispatch{$graph->{'plot.type'}}->({
+			$graph->{'plot.type'} = $graph->{'plot.type'} // $plot->{'plot.type'};
+			my $type = $graph->{'plot.type'};
+			die "plot.type not defined for \"add\" graph at ax = $ax" unless defined $type;
+			die "\"$type\" isn't a known plot.type at ax = $ax" unless defined $dispatch{$type};
+			$dispatch{$type}->({
 				fh   => $fh,
 				ax   => $ax,
 				plot => $graph
@@ -2366,12 +2370,10 @@ sub plt {
 		my $ref = ref $args->{$plt_method};
 		if ( $ref eq '' ) {
 			my $type = print_type($args->{$plt_method});
-			if ($type eq 'single quotes') {
-				if ($plt_method eq 'show') {
-					say $fh "plt.$plt_method()#" . __LINE__;
-				} else {
-					say $fh "plt.$plt_method('$args->{$plt_method}')#" . __LINE__;
-				}
+			if ($plt_method eq 'show') {
+				next; # plt.show() is emitted after plt.savefig() below
+			} elsif ($type eq 'single quotes') {
+				say $fh "plt.$plt_method('$args->{$plt_method}')#" . __LINE__;
 			} elsif ($type eq 'no quotes') {
 				say $fh "plt.$plt_method($args->{$plt_method})#" . __LINE__;
 			}
@@ -2413,14 +2415,17 @@ sub plt {
 	if (defined $args->{scaley}) {
 		say $fh "fig.set_figheight(plt.rcParams['figure.figsize'][1] * $args->{scaley}) #" . __LINE__;
 	}
-	write_data({
-		data => $args->{'output.file'},
-		fh   => $fh,
-		name => 'output_file'
-	});
-	say $fh "plt.savefig(output_file, bbox_inches = 'tight', metadata={'Creator': 'made/written by "
-	. getcwd()
-	. "/$RealScript called using \"$current_sub\" in " . __FILE__ . " version $VERSION'})";
+	if (defined $args->{'output.file'}) {
+		write_data({
+			data => $args->{'output.file'},
+			fh   => $fh,
+			name => 'output_file'
+		});
+		say $fh "plt.savefig(output_file, bbox_inches = 'tight', metadata={'Creator': 'made/written by "
+		. getcwd()
+		. "/$RealScript called using \"$current_sub\" in " . __FILE__ . " version $VERSION'})";
+	}
+	say $fh 'plt.show()' if $args->{show}; # after savefig, so the file is written even if the window is never closed
 	$args->{execute} = $args->{execute} // 1;
 	say $fh 'plt.close()' if $args->{execute} == 0;
 	if ( $args->{execute} ) {
@@ -2433,15 +2438,15 @@ sub plt {
 			die 'python3 ' . $fh->filename . ' failed';
 		}
 		say 'wrote '		
-		 . colored( ['cyan on_bright_yellow'], "$args->{'output.file'}" );
+		 . colored( ['cyan on_bright_yellow'], "$args->{'output.file'}" ) if defined $args->{'output.file'};
 	} else {    # not running yet
 		say 'will write '
-		 . colored( ['cyan on_bright_yellow'], "$args->{'output.file'}" );
+		 . colored( ['cyan on_bright_yellow'], "$args->{'output.file'}" ) if defined $args->{'output.file'};
 	}
 	return $fh->filename;
 }
 # Generate wrappers dynamically
-my @wrappers = qw(bar barh boxplot colored_table hexbin hist hist2d imshow pie plot scatter violin  wide);
+my @wrappers = qw(bar barh boxplot colored_table hexbin hist hist2d imshow pie plot scatter violin violinplot wide);
 
 foreach my $sub_name (@wrappers) {
 	no strict 'refs'; # Gemini helped
@@ -4575,6 +4580,70 @@ colorbar options now work better in C<scatter>.
 Better warning when color key isn't defined for C<scatter>
 
 When giving two hash of hashes for a barplot, if one second key is defined in one subplot, but not the other, that subkey is initialized to 0.
+
+=head3 Cross-platform support
+
+The module now should run on Windows in addition to Linux and macOS.
+
+The generated Python script is written to the system temporary directory (via C<< File::Spec-E<gt>tmpdir() >>) instead of a hard-coded C</tmp>, which does not exist on Windows.
+
+The Python interpreter is now discovered automatically by probing, in order, C<python3>, C<python>, and the Windows C<py> launcher, accepting the first that reports Python 3. This fixes Windows, where the interpreter is typically named C<python> (not C<python3>), and correctly rejects the Microsoft Store C<python3> stub and any Python 2. Set the C<MPLS_PYTHON> (or C<PYTHON>) environment variable to override the interpreter with a specific name or full path.
+
+The Python script is now executed with the list form of C<system> rather than a single shell string, so script paths containing spaces (common on Windows, e.g. C<C:\Users\First Last\AppData\Local\Temp>) no longer break execution.
+
+The C<Creator> metadata embedded in the output file is now passed through C<write_data> (base64), so Windows paths containing backslashes no longer produce invalid escape sequences (e.g. C<\U> in C<C:\Users>) in the generated Python string literal.
+
+On Windows, C<Win32::Console::ANSI> is loaded if available (it is optional, not a hard dependency) so colored status messages render on legacy consoles.
+
+=head3 Crashes / generated-code fixes
+
+C<violinplot> is now a callable wrapper; it was exported and dispatched but never defined, so calling it died with "Undefined subroutine".
+
+C<hist> with an array of C<bins> no longer emits a stray double-quote (e.g. C<[0,2,4"]>) that caused a Python C<SyntaxError>.
+
+C<hexbin> and C<hist2d> no longer pass C<cblabel> twice (once inside the option string and again as C<< label =E<gt> ... >>), which previously caused a duplicate-keyword C<SyntaxError>.
+
+C<scatter> with a scalar C<set.options> no longer emits a doubled comma (C<scatter(x, y, , ...)>), which was a C<SyntaxError>.
+
+Stacked C<barh> now uses the C<left> keyword for stacking instead of C<bottom>, which collided with C<barh>'s own C<bottom> (y-position) parameter and raised "got multiple values for keyword argument 'bottom'".
+
+C<colored_table> with C<cb_logscale> together with C<cb_min>/C<cb_max> no longer emits C<LogNorm(, vmin=...)> with a leading comma (a C<SyntaxError>).
+
+C<plot> with a hash of data and a scalar C<set.options> no longer crashes by dereferencing a string as a hash under C<strict refs>.
+
+C<plot> with a hash of data now accepts a scalar C<twinx> naming a data key (e.g. C<< twinx =E<gt> 'pressure' >>); previously the value was wrongly required to be a digit string, making key-named C<twinx> impossible.
+
+Grouped bar plots with a single scalar C<color> (e.g. C<< color =E<gt> 'green' >>) no longer crash trying to dereference the string as an array; the color is applied to all series.
+
+=head3 Incorrect-output fixes
+
+C<colored_table> no longer clobbers asymmetric data: filling undefined cells with C<np.nan> previously also overwrote the mirror cell, destroying defined values (if C<< A-E<gt>B >> was defined but C<< B-E<gt>A >> was not, both became C<NaN>).
+
+C<colored_table> now honors C<cb_min> and C<cb_max>; they were read from the wrong hash (C<$args> instead of the plot options) and so were silently ignored.
+
+C<colored_table> now honors the C<cmap> option; the color map and C<set_bad> color were hard-coded to C<gist_rainbow> regardless of the C<cmap> given. The colormap is copied before calling C<set_bad>, as registered colormaps are immutable in current matplotlib.
+
+C<colored_table> default row labels now mirror the column labels, matching the matrix that is actually built; with asymmetric data the old default could produce a row-label count mismatch ("'rowLabels' must be of length N").
+
+C<scatter> (single set, three keys) now honors the C<cmap> option instead of always using C<gist_rainbow>.
+
+C<scatter> now validates undefined values in I<both> coordinate keys; the undefined-data check previously inspected only the first key.
+
+Grouped, non-stacked bar widths are now divided by the number of bar series (plus one), not by a constant; the old divisor came from a hash that always held exactly one key, so groups with more than a few series overlapped their neighbors.
+
+The C<wide> plot no longer clamps the upper standard-deviation band at C<1>; that clamp assumed data in the range C<[0, 1]> and clipped ordinary data (the documented example reaches roughly C<1.9>).
+
+Numeric arguments to C<plt> methods (e.g. C<< margins =E<gt> 0.2 >>) are no longer quoted into strings; C<print_type> now recognizes numbers.
+
+C<plt.show()> is now emitted after C<plt.savefig()> (and only once), so using C<show> no longer writes the file only after the interactive window is closed; C<output.file> is no longer required when C<show> is requested.
+
+The C<add> overlay's C<plot.type> now correctly falls back to the parent plot's type when omitted, in both single- and multi-plot calls; the fallback was previously unreachable dead code, and an undefined type could be dispatched on.
+
+=head3 Cleanups
+
+Removed corrupted entries from the method whitelists (C<'set_mouseover( '> and a leading-space C<' FixedFormatter'>) that made those options unusable.
+
+Removed a stray default applied to the wrong hash in C<violin>, two empty dead C<if> blocks, and a duplicated C<die>.
 
 =head2 0.27
 

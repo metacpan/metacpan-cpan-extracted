@@ -1,11 +1,3 @@
-=begin html
-
-<a href="https://travis-ci.org/dod38fr/cme-perl">
-   <img src="https://travis-ci.org/dod38fr/cme-perl.svg?branch=master">
-</a>
-
-=end html
-
 =head1 cme - Check or edit configuration data
 
 L<cme> provides a command to check or edit configuration data with

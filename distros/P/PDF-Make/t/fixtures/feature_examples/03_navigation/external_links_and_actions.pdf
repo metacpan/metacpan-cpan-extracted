@@ -1,0 +1,216 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+4 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+5 0 obj
+<</Type /Annot/Subtype /Link/Rect [20 180 260 208]/A <</S /URI/URI (https://metacpan.org/pod/PDF::Make::Builder)>>/Border [0 0 0]>>
+endobj
+6 0 obj
+<</Type /Annot/Subtype /Link/Rect [20 220 260 248]/Border [0 0 0]/A <</Type /Action/S /Named/N /NextPage>>>>
+endobj
+7 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+8 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+9 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+10 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+11 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+12 0 obj
+<</Type /Annot/Subtype /Link/Rect [20 120 260 148]/Border [0 0 0]/A <</Type /Action/S /Named/N /FirstPage>>>>
+endobj
+13 0 obj
+<</Type /Annot/Subtype /Link/Rect [20 160 260 188]/Border [0 0 0]/A <</Type /Action/S /Named/N /PrevPage>>>>
+endobj
+14 0 obj
+<</Type /Annot/Subtype /Link/Rect [20 200 260 228]/Border [0 0 0]/A <</Type /Action/S /Named/N /LastPage>>>>
+endobj
+15 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+16 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+17 0 obj
+<</Length 618>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 722 Tm
+(External Links and) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 652 Tm
+(Actions) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 618 Tm
+(Blue box: external URL. Green box: NextPage action.) Tj
+ET
+q
+0.145098039215686 0.388235294117647 0.92156862745098 rg
+20 180 240 28 re
+f
+Q
+BT
+1 1 1 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 64.1935 189 Tm
+(Open PDF::Make::Builder docs) Tj
+ET
+q
+0.019607843137254 0.588235294117647 0.411764705882352 rg
+20 220 240 28 re
+f
+Q
+BT
+1 1 1 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 114.320500000000009 229 Tm
+(Next Page) Tj
+ET
+
+endstream
+endobj
+18 0 obj
+<</Length 727>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 772 Tm
+(Action Targets) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 738 Tm
+(Use the boxes below for FirstPage, PrevPage, and LastPage actions.) Tj
+ET
+q
+0.486274509803921 0.227450980392156 0.929411764705882 rg
+20 120 240 28 re
+f
+Q
+BT
+1 1 1 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 114.936499999999995 129 Tm
+(First Page) Tj
+ET
+q
+0.862745098039215 0.149019607843137 0.149019607843137 rg
+20 160 240 28 re
+f
+Q
+BT
+1 1 1 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 104.233499999999992 169 Tm
+(Previous Page) Tj
+ET
+q
+0.917647058823529 0.345098039215686 0.047058823529411 rg
+20 200 240 28 re
+f
+Q
+BT
+1 1 1 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 115.233499999999992 209 Tm
+(Last Page) Tj
+ET
+
+endstream
+endobj
+19 0 obj
+<</Length 172>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 772 Tm
+(Final Page) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 738 Tm
+(LastPage action should jump here.) Tj
+ET
+
+endstream
+endobj
+20 0 obj
+<</Type /Pages/Kids [21 0 R 22 0 R 23 0 R]/Count 3>>
+endobj
+21 0 obj
+<</Type /Page/Parent 20 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F_Helvetica_normal 4 0 R>>>>/Contents 17 0 R/Annots [5 0 R 6 0 R]>>
+endobj
+22 0 obj
+<</Type /Page/Parent 20 0 R/MediaBox [0 0 595 842]/Resources <</Font <</F_Helvetica_normal 11 0 R>>>>/Contents 18 0 R/Annots [12 0 R 13 0 R 14 0 R]>>
+endobj
+23 0 obj
+<</Type /Page/Parent 20 0 R/MediaBox [0 0 595 842]/Resources <</Font <</F_Helvetica_normal 16 0 R>>>>/Contents 19 0 R>>
+endobj
+24 0 obj
+<</Type /Catalog/Pages 20 0 R>>
+endobj
+25 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260421201236Z)/ModDate (D:20260421201236Z)>>
+endobj
+xref
+0 26
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000151 00000 n 
+0000000219 00000 n 
+0000000287 00000 n 
+0000000434 00000 n 
+0000000558 00000 n 
+0000000626 00000 n 
+0000000694 00000 n 
+0000000762 00000 n 
+0000000831 00000 n 
+0000000900 00000 n 
+0000001026 00000 n 
+0000001151 00000 n 
+0000001276 00000 n 
+0000001345 00000 n 
+0000001414 00000 n 
+0000002082 00000 n 
+0000002859 00000 n 
+0000003081 00000 n 
+0000003150 00000 n 
+0000003306 00000 n 
+0000003472 00000 n 
+0000003608 00000 n 
+0000003656 00000 n 
+trailer
+<</Size 26/Root 24 0 R/Info 25 0 R/ID[<E2B304B5A248F26DC16915AA9981F74E><E2B304B5A248F26DC16915AA9981F74E>]>>
+startxref
+3763
+%%EOF

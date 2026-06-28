@@ -35,6 +35,8 @@ max_statements = 3
 [ClassHierarchies::ProhibitExplicitISA]
 [ClassHierarchies::ProhibitOneArgBless]
 [CodeLayout::ProhibitFatCommaNewline]
+[CodeLayout::RequireTrailingCommaAtNewline]
+except_function_calls = 1
 [CodeLayout::ProhibitHardTabs]
 allow_leading_tabs = 0
 [CodeLayout::ProhibitIfIfSameLine]
@@ -43,8 +45,6 @@ allow_leading_tabs = 0
 [CodeLayout::RequireASCII]
 [CodeLayout::RequireConsistentNewlines]
 [CodeLayout::RequireFinalSemicolon]
-[CodeLayout::RequireTrailingCommaAtNewline]
-except_function_calls = 1
 [Community::AmpersandSubCalls]
 [Community::BarewordFilehandles]
 [Community::ConditionalImplicitReturn]
@@ -76,6 +76,9 @@ max_nests = 7
 [ControlStructures::ProhibitUnreachableCode]
 [ControlStructures::ProhibitUntilBlocks]
 [ControlStructures::ProhibitYadaOperator]
+[Documentation::ProhibitDuplicateHeadings]
+[Documentation::ProhibitDuplicateSeeAlso]
+[Documentation::RequireFinalCut]
 [ErrorHandling::RequireCarping]
 [ErrorHandling::RequireCheckingReturnValueOfEval]
 [InputOutput::ProhibitBacktickOperators]
@@ -103,7 +106,7 @@ version = 5.024
 [Modules::ProhibitConditionalUseStatements]
 [Modules::ProhibitExcessMainComplexity]
 [ProhibitImplicitImport]
-ignored_modules = namespace::clean v5.24
+ignored_modules = namespace::clean
 [Modules::ProhibitModuleShebang]
 [Modules::ProhibitMultiplePackages]
 [Modules::ProhibitPOSIXimport]
@@ -111,7 +114,6 @@ ignored_modules = namespace::clean v5.24
 [Modules::RequireBarewordIncludes]
 [Modules::RequireEndWithOne]
 [Modules::RequireExplicitInclusion]
-ignore_modules = /Crypt::OpenSSL::CA::/
 [Modules::RequireFilenameMatchesPackage]
 [NamingConventions::Capitalization]
 [NamingConventions::ProhibitAmbiguousNames]

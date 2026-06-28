@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Firewall::Filter;
-$WebService::OPNsense::Firewall::Filter::VERSION = '0.001';
+$WebService::OPNsense::Firewall::Filter::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
@@ -18,17 +18,23 @@ with 'WebService::OPNsense::Firewall::Role::NAT';
 
 sub download_rules {
     my ($self) = @_;
-    return $self->client->get( $self->_path('downloadRules') );
+    my $uri = $self->_path('downloadRules');
+
+    return $self->client->get($uri);
 }
 
 sub upload_rules {
     my ( $self, $rules_data ) = @_;
-    return $self->client->post( $self->_path('uploadRules'), $rules_data );
+    my $uri = $self->_path('uploadRules');
+
+    return $self->client->post( $uri, $rules_data );
 }
 
 sub get_interface_list {
     my ($self) = @_;
-    return $self->client->get( $self->_path('getInterfaceList') );
+    my $uri = $self->_path('getInterfaceList');
+
+    return $self->client->get($uri);
 }
 
 1;
@@ -45,9 +51,11 @@ WebService::OPNsense::Firewall::Filter - Firewall filter rule controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
+
+    use WebService::OPNsense::Constants qw( $ACTION_PASS $PROTO_TCP $OPN_ENABLED );
 
     my $filter = $opn->firewall_filter;
 
@@ -60,11 +68,12 @@ version 0.001
     # Add a new rule
     my $result = $filter->add_rule({
         rule => {
-            description => 'Allow HTTP',
-            action      => 'pass',
-            protocol    => 'TCP',
-            source_net  => 'any',
+            action          => $ACTION_PASS,
+            description     => 'Allow HTTP',
             destination_port => '80',
+            enabled         => $OPN_ENABLED,
+            protocol        => $PROTO_TCP,
+            source_net      => 'any',
         },
     });
 
@@ -72,13 +81,132 @@ version 0.001
 
 Manages firewall filter rules.
 
-=head1 NAME
-
-WebService::OPNsense::Firewall::Filter - Firewall filter rule controller
-
 =head1 CONSTANTS
 
-SNAT mode constants are available from L<WebService::OPNsense::Constants>:
+The following constants are available from
+L<WebService::OPNsense::Constants>.
+
+=head2 Actions
+
+Use when setting the C<action> field in a rule.
+
+=over
+
+=item C<$ACTION_BLOCK>
+
+=item C<$ACTION_PASS>
+
+=item C<$ACTION_REJECT>
+
+=back
+
+=head2 Address families
+
+Use when setting the C<address_family> field.
+
+=over
+
+=item C<$AF_INET>
+
+=item C<$AF_INET6>
+
+=item C<$AF_INET46>
+
+=back
+
+=head2 Directions
+
+Use when setting the C<direction> field.
+
+=over
+
+=item C<$DIRECTION_ANY>
+
+=item C<$DIRECTION_IN>
+
+=item C<$DIRECTION_OUT>
+
+=back
+
+=head2 Gateway
+
+Use when setting the C<gateway> field.
+
+=over
+
+=item C<$GATEWAY_DEFAULT>
+
+=back
+
+=head2 Interface names
+
+Use when setting the C<interface> field.
+
+=over
+
+=item C<$INTERFACE_WAN>
+
+=item C<$INTERFACE_LAN>
+
+=item C<$INTERFACE_DMZ>
+
+=item C<$INTERFACE_GUEST>
+
+=item C<$INTERFACE_LOOPBACK>
+
+=item C<$INTERFACE_OPT1> through C<$INTERFACE_OPT9>
+
+=back
+
+=head2 Protocols
+
+Use when setting the C<protocol> field.
+
+=over
+
+=item C<$PROTO_ANY>
+
+=item C<$PROTO_ESP>
+
+=item C<$PROTO_GRE>
+
+=item C<$PROTO_ICMP>
+
+=item C<$PROTO_OSPF>
+
+=item C<$PROTO_PIM>
+
+=item C<$PROTO_SCTP>
+
+=item C<$PROTO_TCP>
+
+=item C<$PROTO_TCP_UDP>
+
+=item C<$PROTO_UDP>
+
+=item C<$PROTO_VRRP>
+
+=back
+
+=head2 Rule sequence positions
+
+Use when setting the C<sequence> field.
+
+=over
+
+=item C<$SEQ_EARLY>
+
+=item C<$SEQ_FIRST>
+
+=item C<$SEQ_FLOATING>
+
+=item C<$SEQ_LAST>
+
+=back
+
+=head2 SNAT modes
+
+Use when setting the C<snat_mode> field.
 
 =over
 
@@ -92,7 +220,47 @@ SNAT mode constants are available from L<WebService::OPNsense::Constants>:
 
 =back
 
-Use them when setting the SNAT mode via the C<snat_mode> field.
+=head2 State types
+
+Use when setting the C<state_type> field.
+
+=over
+
+=item C<$STATETYPE_KEEP>
+
+=item C<$STATETYPE_MODULATE>
+
+=item C<$STATETYPE_NONE>
+
+=item C<$STATETYPE_SLOPPY>
+
+=item C<$STATETYPE_SYNPROXY>
+
+=back
+
+=head2 TCP flags
+
+Use when setting the C<tcp_flags_*> fields.
+
+=over
+
+=item C<$TCP_FLAG_ACK>
+
+=item C<$TCP_FLAG_CWR>
+
+=item C<$TCP_FLAG_ECE>
+
+=item C<$TCP_FLAG_FIN>
+
+=item C<$TCP_FLAG_PSH>
+
+=item C<$TCP_FLAG_RST>
+
+=item C<$TCP_FLAG_SYN>
+
+=item C<$TCP_FLAG_URG>
+
+=back
 
 =head1 METHODS
 
@@ -112,14 +280,14 @@ Returns a single rule by UUID.
 
     my $result = $filter->add_rule($rule_data);
 
-Creates a new firewall rule.  C<$rule_data> should be a hashref matching the
+Creates firewall rule.  C<$rule_data> should be a hashref matching the
 OPNsense API format (e.g. C<< { rule => { ... } } >>).
 
 =head2 set_rule
 
     my $result = $filter->set_rule($uuid, $rule_data);
 
-Updates an existing rule.
+Updates rule.
 
 =head2 del_rule
 
@@ -200,9 +368,33 @@ Returns selectable network options for rule creation.
 
 Returns selectable port options for rule creation.
 
-=for Pod::Coverage _api_path _path client search_rule get_rule add_rule set_rule del_rule
-toggle_rule toggle_rule_log move_rule_before apply savepoint cancel_rollback revert
-set_settings get list_categories list_network_select_options list_port_select_options
+=head2 revert
+
+    my $result = $filter->revert( $revision );
+
+Reverts to a previous configuration revision.
+
+=head2 get
+
+    my $config = $filter->get;
+
+Returns the full firewall configuration.
+
+=head2 set_settings
+
+    my $result = $filter->set_settings( $settings );
+
+Updates the firewall configuration.
+
+=head2 client
+
+    my $http_client = $ctrl->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Firewall::Role::NAT>
 
 =head1 AUTHOR
 

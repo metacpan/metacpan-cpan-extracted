@@ -17,7 +17,6 @@ use Test2::V0 qw(!bag !bool !warnings !subtest), -no_pragmas => 1;  # prefer Tes
 use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings', ':report_warnings';
 sub subtest { Test2::V0::subtest(@_); bail_if_not_passing() if $ENV{AUTHOR_TESTING}; }
 use if $ENV{AUTHOR_TESTING} || -d '.git', 'Test2::Plugin::SubtestFilter';
-use Safe::Isa;
 use List::Util 'pairs';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
@@ -29,7 +28,7 @@ use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use JSON::Schema::Modern::Document::OpenAPI;
 use JSON::Schema::Modern::Utilities 0.628 qw(true false);
 use OpenAPI::Modern;
-use OpenAPI::Modern::Utilities;
+use OpenAPI::Modern::Utilities qw(:constants elem);
 use YAML::PP 0.005;
 
 use constant OAS_VOCABULARIES => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
@@ -66,11 +65,11 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
     if length $body_content and $body_content =~ /[^\x00-\xff]/;
 
   my $req;
-  if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst' or $TYPE eq 'dancer2') {
+  if (elem($TYPE, [qw(lwp plack catalyst dancer2)])) {
     test_needs('HTTP::Request', 'URI');
 
     my $uri = URI->new($uri_string);
-    my $host = $uri->$_call_if_can('host');
+    my $host = $uri->can('host') && $uri->host;
     $req = HTTP::Request->new($method => $uri, [], $body_content);
     $req->headers->push_header(@$_) foreach pairs @$headers, $host ? (Host => $host) : ();
     $req->headers->header('Content-Length' => length($body_content))
@@ -78,7 +77,7 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
         and not defined $req->headers->header('Transfer-Encoding');
     $req->protocol('HTTP/1.1'); # required, but not added by HTTP::Request constructor
 
-    if ($TYPE eq 'plack' or $TYPE eq 'catalyst' or $TYPE eq 'dancer2') {
+    if (elem($TYPE, [qw(plack catalyst dancer2)])) {
       test_needs('Plack::Request', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
       die 'HTTP::Headers::Fast::XS is buggy and should not be used' if eval { HTTP::Headers::Fast::XS->VERSION };
 
@@ -185,7 +184,7 @@ sub uri ($uri_string, @path_parts) {
   die '$TYPE is not set at ', join(' line ', (caller)[1,2]), ".\n" if not defined $TYPE;
 
   my $uri;
-  if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst') {
+  if (elem($TYPE, [qw(lwp plack catalyst)])) {
     test_needs('URI');
     $uri = URI->new($uri_string);
     $uri->path_segments(@path_parts) if @path_parts;
@@ -212,7 +211,7 @@ sub query_params ($request, $pairs) {
   elsif ($TYPE eq 'mojo') {
     $request->url->query->pairs($pairs);
   }
-  elsif ($TYPE eq 'plack' or $TYPE eq 'catalyst' or $TYPE eq 'dancer2') {
+  elsif (elem($TYPE, [qw(plack catalyst dancer2)])) {
     # this is the encoded query string portion of the URI
     $request->env->{QUERY_STRING} = Mojo::Parameters->new->pairs($pairs)->to_string;
     $request->env->{REQUEST_URI} .= '?' . $request->env->{QUERY_STRING};
@@ -234,7 +233,7 @@ sub remove_header ($message, $header_name) {
   elsif ($TYPE eq 'mojo') {
     $message->headers->remove($header_name);
   }
-  elsif ($TYPE eq 'plack' or $TYPE eq 'catalyst' or $TYPE eq 'dancer2') {
+  elsif (elem($TYPE, [qw(plack catalyst dancer2)])) {
     $message->headers->remove_header($header_name);
     delete $message->env->{uc $header_name =~ s/-/_/r} if $message->can('env');
   }

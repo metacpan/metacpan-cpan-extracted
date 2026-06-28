@@ -1,0 +1,77 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Length 235>>
+stream
+BT
+/F1 24 Tf
+1 0 0 1 72 700 Tm
+(PDF with Attachments) Tj
+ET
+BT
+/F1 12 Tf
+1 0 0 1 72 660 Tm
+(This PDF has 2 embedded files.) Tj
+ET
+BT
+/F1 10 Tf
+0.4 0.4 0.4 rg
+1 0 0 1 72 630 Tm
+(Open the attachments panel in Acrobat to see them.) Tj
+ET
+
+endstream
+endobj
+3 0 obj
+<</Type /Pages/Kids [4 0 R]/Count 1>>
+endobj
+4 0 obj
+<</Type /Page/Parent 3 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F1 1 0 R>>>>/Contents 2 0 R>>
+endobj
+5 0 obj
+<</Type /Catalog/Pages 3 0 R/Names <</EmbeddedFiles <</Names [(readme.txt) 7 0 R (config.json) 9 0 R]>>>>>>
+endobj
+6 0 obj
+<</Type /EmbeddedFile/Subtype /text#232Fplain/Params <</Size 53>>/Length 53>>
+stream
+Hello from PDF::Make!
+This is an embedded text file.
+
+endstream
+endobj
+7 0 obj
+<</Type /Filespec/F (readme.txt)/UF (readme.txt)/Desc (Sample readme)/EF <</F 6 0 R/UF 6 0 R>>/AFRelationship /Data>>
+endobj
+8 0 obj
+<</Type /EmbeddedFile/Subtype /application#232Fjson/Params <</Size 38>>/Length 38>>
+stream
+{"version":"1.0","author":"PDF::Make"}
+endstream
+endobj
+9 0 obj
+<</Type /Filespec/F (config.json)/UF (config.json)/EF <</F 8 0 R/UF 8 0 R>>/AFRelationship /Data>>
+endobj
+10 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260419144307Z)/ModDate (D:20260419144307Z)>>
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000367 00000 n 
+0000000420 00000 n 
+0000000536 00000 n 
+0000000659 00000 n 
+0000000823 00000 n 
+0000000956 00000 n 
+0000001111 00000 n 
+0000001225 00000 n 
+trailer
+<</Size 11/Root 5 0 R/Info 10 0 R/ID[<E5202A21CF66B084066B192CD82DABA3><E5202A21CF66B084066B192CD82DABA3>]>>
+startxref
+1332
+%%EOF

@@ -376,6 +376,11 @@ C<content> are required. C<tags> defaults to C<[]>, C<created_at> defaults
 to C<time()>, and C<id> is automatically computed from the canonical
 serialization. If C<id> is passed explicitly, it is preserved as-is.
 
+Text fields such as C<content> and tag elements are expected to be Perl
+character strings. The canonical serializer encodes those strings to UTF-8
+bytes for hashing and signing. Passing already UTF-8-encoded bytes as text
+will treat those bytes as characters and produce a different event ID.
+
 For events parsed from the wire, use L</from_wire> instead, which requires
 all seven NIP-01 fields and does not apply any defaults.
 
@@ -406,6 +411,10 @@ wire (e.g. from JSON-decoded protocol messages). All seven NIP-01 event
 fields are required: C<id>, C<pubkey>, C<created_at>, C<kind>, C<tags>,
 C<content>, C<sig>. No defaults are applied. Croaks if any field is
 missing, undefined, or fails format validation.
+
+String values in the hashref are expected to already be decoded Perl
+character strings, as produced by L<Net::Nostr::Message/parse> from
+UTF-8 wire bytes.
 
 This is the entry point used by L<Net::Nostr::Message/parse> for EVENT
 and AUTH messages. Use L</new> for local event construction where
@@ -478,7 +487,8 @@ croaks if the value is defined but not valid 128-char lowercase hex.
 
 Returns the canonical JSON serialization used for ID computation:
 C<[0, pubkey, created_at, kind, tags, content]>. The output is UTF-8
-encoded with no extra whitespace.
+encoded bytes with no extra whitespace. Non-control Unicode characters are
+included as UTF-8 bytes rather than escaped as C<\u> sequences.
 
 =head2 to_hash
 

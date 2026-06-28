@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Diagnostics;
-$WebService::OPNsense::Diagnostics::VERSION = '0.001';
+$WebService::OPNsense::Diagnostics::VERSION = '0.002';
 use Moo;
 use WebService::OPNsense::Normalize qw( optional_segment );
 use namespace::clean;
@@ -168,7 +168,7 @@ WebService::OPNsense::Diagnostics - Diagnostics API controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -181,10 +181,6 @@ version 0.001
 =head1 DESCRIPTION
 
 Network and system diagnostics.
-
-=head1 NAME
-
-WebService::OPNsense::Diagnostics - Diagnostics API controller
 
 =head1 METHODS
 
@@ -343,7 +339,7 @@ Returns disk usage information.
 
     my $time = $diag->system_time;
 
-Returns the current system time.
+Returns system time.
 
 =head2 portprobe
 
@@ -358,7 +354,15 @@ C<host> and C<port> fields.
 
 Returns current traffic statistics per interface.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $diag->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense>
 
 =head1 AUTHOR
 

@@ -1,3 +1,10 @@
+1.003001   2026-06-27
+
+  - Clarify UTF-8 byte/string boundaries for event serialization and message parsing
+  - Reject decoded wide-character JSON strings in Net::Nostr::Message->parse
+  - Add byte-level NIP-01 coverage for non-ASCII event content and tags
+  - Run nested NIP conformance tests under make test
+
 1.003000   2026-04-15
 
   - Expose TLS client options in Net::Nostr::Client for secure relay connections

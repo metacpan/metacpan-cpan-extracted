@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::HASync;
-$WebService::OPNsense::HASync::VERSION = '0.001';
+$WebService::OPNsense::HASync::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
@@ -76,7 +76,7 @@ WebService::OPNsense::HASync - High availability sync controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -88,17 +88,13 @@ version 0.001
 
 High availability synchronization.
 
-=head1 NAME
-
-WebService::OPNsense::HASync - High availability sync controller
-
 =head1 METHODS
 
 =head2 get
 
     my $settings = $ha->get;
 
-Returns the current HA sync settings.
+Returns HA sync settings.
 
 =head2 set_settings
 
@@ -154,7 +150,15 @@ Restarts HA sync.
 
 Restarts all HA sync services.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $ha->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense>
 
 =head1 AUTHOR
 

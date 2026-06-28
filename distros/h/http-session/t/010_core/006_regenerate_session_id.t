@@ -32,7 +32,7 @@ sub {
     is $session->session_id, 'FOOBAR';
     $session->regenerate_session_id();
     $session->set('hoge', 'fuga');
-    like $session->session_id, qr/^[a-z0-9]{32}$/;
+    like $session->session_id, qr/^[A-Za-z0-9_-]{32}$/;
     my $newsessid = $session->session_id;
     undef $session;
 
@@ -56,14 +56,14 @@ sub {
     is $session->session_id, 'FOOBAR';
     $session->regenerate_session_id(1);
     $session->set('hoge', 'fuga');
-    like $session->session_id, qr/^[a-z0-9]{32}$/;
+    like $session->session_id, qr/^[A-Za-z0-9_-]{32}$/;
     my $newsessid = $session->session_id;
     undef $session;
 
     $session = gen_session('FOOBAR');
     is $session->get('foo'), undef;
     is $session->get('hoge'), undef, 'do not pass to old session';
-    like $session->session_id, qr/^[a-z0-9]{32}$/;
+    like $session->session_id, qr/^[A-Za-z0-9_-]{32}$/;
     undef $session;
 
     $session = gen_session($newsessid);

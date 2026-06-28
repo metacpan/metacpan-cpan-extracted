@@ -1,5 +1,12 @@
 Revision history for MIDI-Util
 
+0.1307 2026-06-27 11:33:47
+    - Remove the embarrassing "use lib" line in eg/dump.
+
+0.1306 2026-06-27 11:19:54
+    - Improve documentation.
+    - Add the scale_names() function, because Music::Scales doesn't do that.
+
 0.1305 2026-04-27 07:32:03
     - Fix typo in docs.
     - Only substitute MIDI s/f for #/b if a flag is given as the first argument to the midi_format() function.

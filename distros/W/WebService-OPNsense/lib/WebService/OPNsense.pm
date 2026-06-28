@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense;
-$WebService::OPNsense::VERSION = '0.001';
+$WebService::OPNsense::VERSION = '0.002';
 use Carp    qw( croak );
 use English qw( -no_match_vars );
 use Moo;
@@ -135,8 +135,7 @@ has 'diagnostics' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Diagnostics;
-        return WebService::OPNsense::Diagnostics->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Diagnostics');
     },
 );
 
@@ -145,8 +144,7 @@ has 'firewall' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Firewall;
-        return WebService::OPNsense::Firewall->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Firewall');
     },
 );
 
@@ -155,8 +153,7 @@ has 'firewall_alias' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Firewall::Alias;
-        return WebService::OPNsense::Firewall::Alias->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Firewall::Alias');
     },
 );
 
@@ -165,8 +162,7 @@ has 'firewall_category' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Firewall::Category;
-        return WebService::OPNsense::Firewall::Category->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Firewall::Category');
     },
 );
 
@@ -175,8 +171,7 @@ has 'firewall_filter' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Firewall::Filter;
-        return WebService::OPNsense::Firewall::Filter->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Firewall::Filter');
     },
 );
 
@@ -185,8 +180,7 @@ has 'firewall_d_nat' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Firewall::DNat;
-        return WebService::OPNsense::Firewall::DNat->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Firewall::DNat');
     },
 );
 
@@ -195,8 +189,7 @@ has 'firewall_npt' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Firewall::Npt;
-        return WebService::OPNsense::Firewall::Npt->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Firewall::Npt');
     },
 );
 
@@ -205,8 +198,7 @@ has 'firewall_one_to_one' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Firewall::OneToOne;
-        return WebService::OPNsense::Firewall::OneToOne->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Firewall::OneToOne');
     },
 );
 
@@ -215,8 +207,7 @@ has 'firewall_source_nat' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Firewall::SourceNat;
-        return WebService::OPNsense::Firewall::SourceNat->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Firewall::SourceNat');
     },
 );
 
@@ -225,8 +216,7 @@ has 'interfaces' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Interfaces;
-        return WebService::OPNsense::Interfaces->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Interfaces');
     },
 );
 
@@ -235,8 +225,7 @@ has 'routes' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Routes;
-        return WebService::OPNsense::Routes->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Routes');
     },
 );
 
@@ -245,8 +234,7 @@ has 'system' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::System;
-        return WebService::OPNsense::System->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::System');
     },
 );
 
@@ -255,8 +243,7 @@ has 'backup' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Backup;
-        return WebService::OPNsense::Backup->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Backup');
     },
 );
 
@@ -265,8 +252,7 @@ has 'captive_portal_settings' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::CaptivePortal::Settings;
-        return WebService::OPNsense::CaptivePortal::Settings->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::CaptivePortal::Settings');
     },
 );
 
@@ -275,8 +261,7 @@ has 'captive_portal_session' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::CaptivePortal::Session;
-        return WebService::OPNsense::CaptivePortal::Session->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::CaptivePortal::Session');
     },
 );
 
@@ -285,8 +270,7 @@ has 'captive_portal_access' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::CaptivePortal::Access;
-        return WebService::OPNsense::CaptivePortal::Access->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::CaptivePortal::Access');
     },
 );
 
@@ -295,8 +279,7 @@ has 'captive_portal_voucher' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::CaptivePortal::Voucher;
-        return WebService::OPNsense::CaptivePortal::Voucher->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::CaptivePortal::Voucher');
     },
 );
 
@@ -305,8 +288,7 @@ has 'captive_portal_service' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::CaptivePortal::Service;
-        return WebService::OPNsense::CaptivePortal::Service->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::CaptivePortal::Service');
     },
 );
 
@@ -315,8 +297,7 @@ has 'cron_settings' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Cron::Settings;
-        return WebService::OPNsense::Cron::Settings->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Cron::Settings');
     },
 );
 
@@ -325,8 +306,7 @@ has 'cron_service' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Cron::Service;
-        return WebService::OPNsense::Cron::Service->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Cron::Service');
     },
 );
 
@@ -335,8 +315,7 @@ has 'dnsmasq_settings' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Dnsmasq::Settings;
-        return WebService::OPNsense::Dnsmasq::Settings->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Dnsmasq::Settings');
     },
 );
 
@@ -345,8 +324,7 @@ has 'dnsmasq_leases' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Dnsmasq::Leases;
-        return WebService::OPNsense::Dnsmasq::Leases->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Dnsmasq::Leases');
     },
 );
 
@@ -355,8 +333,7 @@ has 'dnsmasq_service' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Dnsmasq::Service;
-        return WebService::OPNsense::Dnsmasq::Service->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Dnsmasq::Service');
     },
 );
 
@@ -365,8 +342,7 @@ has 'hasync' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::HASync;
-        return WebService::OPNsense::HASync->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::HASync');
     },
 );
 
@@ -375,8 +351,7 @@ has 'ids_settings' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IDS::Settings;
-        return WebService::OPNsense::IDS::Settings->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IDS::Settings');
     },
 );
 
@@ -385,8 +360,7 @@ has 'ids_service' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IDS::Service;
-        return WebService::OPNsense::IDS::Service->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IDS::Service');
     },
 );
 
@@ -395,8 +369,7 @@ has 'ipsec_connections' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Connections;
-        return WebService::OPNsense::IPsec::Connections->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Connections');
     },
 );
 
@@ -405,8 +378,7 @@ has 'ipsec_key_pairs' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::KeyPairs;
-        return WebService::OPNsense::IPsec::KeyPairs->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::KeyPairs');
     },
 );
 
@@ -415,8 +387,7 @@ has 'ipsec_leases' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Leases;
-        return WebService::OPNsense::IPsec::Leases->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Leases');
     },
 );
 
@@ -425,8 +396,7 @@ has 'ipsec_manual_spd' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::ManualSpd;
-        return WebService::OPNsense::IPsec::ManualSpd->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::ManualSpd');
     },
 );
 
@@ -435,8 +405,7 @@ has 'ipsec_pools' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Pools;
-        return WebService::OPNsense::IPsec::Pools->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Pools');
     },
 );
 
@@ -445,8 +414,7 @@ has 'ipsec_pre_shared_keys' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::PreSharedKeys;
-        return WebService::OPNsense::IPsec::PreSharedKeys->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::PreSharedKeys');
     },
 );
 
@@ -455,8 +423,7 @@ has 'ipsec_sad' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Sad;
-        return WebService::OPNsense::IPsec::Sad->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Sad');
     },
 );
 
@@ -465,8 +432,7 @@ has 'ipsec_service' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Service;
-        return WebService::OPNsense::IPsec::Service->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Service');
     },
 );
 
@@ -475,8 +441,7 @@ has 'ipsec_sessions' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Sessions;
-        return WebService::OPNsense::IPsec::Sessions->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Sessions');
     },
 );
 
@@ -485,8 +450,7 @@ has 'ipsec_settings' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Settings;
-        return WebService::OPNsense::IPsec::Settings->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Settings');
     },
 );
 
@@ -495,8 +459,7 @@ has 'ipsec_spd' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Spd;
-        return WebService::OPNsense::IPsec::Spd->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Spd');
     },
 );
 
@@ -505,8 +468,7 @@ has 'ipsec_tunnel' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Tunnel;
-        return WebService::OPNsense::IPsec::Tunnel->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Tunnel');
     },
 );
 
@@ -515,8 +477,7 @@ has 'ipsec_vti' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::IPsec::Vti;
-        return WebService::OPNsense::IPsec::Vti->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::IPsec::Vti');
     },
 );
 
@@ -525,8 +486,7 @@ has 'kea_dhcpv4' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Kea::Dhcpv4;
-        return WebService::OPNsense::Kea::Dhcpv4->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Kea::Dhcpv4');
     },
 );
 
@@ -535,8 +495,7 @@ has 'kea_dhcpv6' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Kea::Dhcpv6;
-        return WebService::OPNsense::Kea::Dhcpv6->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Kea::Dhcpv6');
     },
 );
 
@@ -545,8 +504,7 @@ has 'kea_leases' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Kea::Leases;
-        return WebService::OPNsense::Kea::Leases->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Kea::Leases');
     },
 );
 
@@ -555,8 +513,7 @@ has 'kea_ddns' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Kea::Ddns;
-        return WebService::OPNsense::Kea::Ddns->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Kea::Ddns');
     },
 );
 
@@ -565,8 +522,7 @@ has 'kea_ctrl_agent' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Kea::CtrlAgent;
-        return WebService::OPNsense::Kea::CtrlAgent->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Kea::CtrlAgent');
     },
 );
 
@@ -575,8 +531,7 @@ has 'kea_service' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Kea::Service;
-        return WebService::OPNsense::Kea::Service->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Kea::Service');
     },
 );
 
@@ -585,8 +540,7 @@ has 'openvpn_instances' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::OpenVPN::Instances;
-        return WebService::OPNsense::OpenVPN::Instances->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::OpenVPN::Instances');
     },
 );
 
@@ -595,8 +549,7 @@ has 'openvpn_client_overwrites' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::OpenVPN::ClientOverwrites;
-        return WebService::OPNsense::OpenVPN::ClientOverwrites->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::OpenVPN::ClientOverwrites');
     },
 );
 
@@ -605,8 +558,7 @@ has 'openvpn_service' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::OpenVPN::Service;
-        return WebService::OPNsense::OpenVPN::Service->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::OpenVPN::Service');
     },
 );
 
@@ -615,8 +567,7 @@ has 'openvpn_export' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::OpenVPN::Export;
-        return WebService::OPNsense::OpenVPN::Export->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::OpenVPN::Export');
     },
 );
 
@@ -625,8 +576,7 @@ has 'trafficshaper_settings' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::TrafficShaper::Settings;
-        return WebService::OPNsense::TrafficShaper::Settings->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::TrafficShaper::Settings');
     },
 );
 
@@ -635,8 +585,7 @@ has 'trafficshaper_service' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::TrafficShaper::Service;
-        return WebService::OPNsense::TrafficShaper::Service->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::TrafficShaper::Service');
     },
 );
 
@@ -645,8 +594,7 @@ has 'unbound_settings' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Unbound::Settings;
-        return WebService::OPNsense::Unbound::Settings->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Unbound::Settings');
     },
 );
 
@@ -655,8 +603,7 @@ has 'unbound_overview' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Unbound::Overview;
-        return WebService::OPNsense::Unbound::Overview->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Unbound::Overview');
     },
 );
 
@@ -665,8 +612,7 @@ has 'unbound_diagnostics' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Unbound::Diagnostics;
-        return WebService::OPNsense::Unbound::Diagnostics->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Unbound::Diagnostics');
     },
 );
 
@@ -675,10 +621,16 @@ has 'unbound_service' => (
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        require WebService::OPNsense::Unbound::Service;
-        return WebService::OPNsense::Unbound::Service->new( client => $self );
+        return $self->_build_opn_object('WebService::OPNsense::Unbound::Service');
     },
 );
+
+sub _build_opn_object {
+    my ( $self, $module ) = @_;
+    ( my $file = "$module.pm" ) =~ s{::}{/}g;
+    require $file;
+    return $module->new( client => $self );
+}
 
 1;
 
@@ -694,7 +646,7 @@ WebService::OPNsense - Perl client library for the OPNsense REST API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =for :stopwords OPNsense API OPNsense
 

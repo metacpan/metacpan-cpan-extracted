@@ -14,8 +14,8 @@ use PAGI::Server;
 # server+Tools integration test; skip when Tools is not installed (the server's
 # own request handling is covered Tools-free in t/10-http-compliance.t etc.).
 BEGIN {
-    eval { require PAGI::Request; 1 }
-        or plan(skip_all => 'PAGI-Tools (PAGI::Request) not installed');
+    eval { require PAGI::Request; my $v = PAGI::Request->VERSION; !defined($v) || $v >= 0.002000 }
+        or plan(skip_all => 'PAGI-Tools (PAGI::Request >= 0.002000) not installed');
 }
 
 # Skip if not running integration tests

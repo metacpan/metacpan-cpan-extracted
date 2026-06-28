@@ -1,5 +1,5 @@
 ---
-abstract: 'MIDI Utilities'
+abstract: 'MIDI and music utilities'
 author:
   - 'Gene Boggs <gene.boggs@gmail.com>'
 build_requires:
@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Util
   repository: https://github.com/ology/MIDI-Util.git
-version: '0.1305'
+version: '0.1307'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw/Class::Accessor::Fast/;
 use 5.00800;
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 use Carp ();
 use Scalar::Util ();
 use Module::Runtime ();
@@ -26,7 +26,10 @@ sub new {
     $args{is_changed} ||= 0;
     $args{is_fresh}   ||= 0;
     $args{sid_length} ||= 32;
-    $args{id}         ||= 'HTTP::Session::ID::SHA1';
+    if ( $args{sid_length} !~ /\A[1-9][0-9]*\z/ ) {
+        Carp::croak "sid_length must be a positive integer";
+    }
+    $args{id}         ||= 'HTTP::Session::ID::Urandom';
     my $self = bless {%args}, $class;
     $self->_load_session();
     Carp::croak "[BUG] we have bug" unless $self->{request};
@@ -174,7 +177,7 @@ __END__
 
 =head1 NAME
 
-HTTP::Session - simple session
+HTTP::Session - (DEPRECATED) simple session
 
 =head1 SYNOPSIS
 
@@ -194,6 +197,8 @@ HTTP::Session - simple session
 
 =head1 DESCRIPTION
 
+B<This module is deprecated.> Use L<Plack::Middleware::Session> instead.
+
 Yet another session manager.
 
 easy to integrate with L<PSGI> =)
@@ -212,6 +217,20 @@ C<state> is instance of HTTP::Session::State::*.
 
 C<request> is duck typed object.C<request> object should have C<header>, C<address>, C<param>.
 You can use PSGI's $env instead.
+
+C<id> selects the session-ID generator class (default:
+L<HTTP::Session::ID::Urandom>, which draws from L<Crypt::URandom>). The
+C<HTTP::Session::ID::MD5> and C<HTTP::Session::ID::SHA1> backends are also
+supported; as of CVE-2026-3256 they hash cryptographically secure random bytes
+(from L<Crypt::URandom>) instead of their former predictable time/PID/C<rand()>
+input, while keeping their hexadecimal output. Each backend has its own
+session-ID alphabet: C<Urandom> uses URL-safe Base64 (C<[A-Za-z0-9_-]>), while
+C<MD5> and C<SHA1> use lowercase hexadecimal (C<[0-9a-f]>).
+
+C<sid_length> defaults to 32, which yields at least 128 bits of entropy with any
+backend (192 bits with C<Urandom>). Lowering it is supported, but reduces the
+entropy of the session ID proportionally; values around 22 or below drop under
+the 128-bit level generally recommended for session identifiers.
 
 =item $session->html_filter($html)
 

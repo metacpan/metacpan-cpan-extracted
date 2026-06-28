@@ -1,0 +1,238 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+4 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+5 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+6 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Courier>>
+endobj
+7 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+8 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+9 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+10 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+11 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+12 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+13 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+14 0 obj
+<</Length 2980>>
+stream
+BT
+0.2 0.4 0.6 rg
+/F_Helvetica_normal 28 Tf
+1 0 0 1 20 744 Tm
+(PDF::Make::Builder Demo) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 724 Tm
+(This document was generated using the high-level Builder API. Builder wraps the low-level PDF::Make Canvas) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 713 Tm
+(operators with automatic word-wrapping, font management, and coordinate translation. All add_ methods return $self) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 702 Tm
+(for chaining.) Tj
+ET
+BT
+0.20392156862745 0.596078431372549 0.858823529411764 rg
+/F_Helvetica_normal 18 Tf
+1 0 0 1 20 679 Tm
+(Typography) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 12 Tf
+1 0 0 1 20 658 Tm
+(The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 12 Tf
+1 0 0 1 20 647 Tm
+(daft zebras jump.) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Times_normal 12 Tf
+1 0 0 1 20 631 Tm
+(The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs.) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Courier_normal 10 Tf
+1 0 0 1 20 617 Tm
+(The quick brown fox jumps over the lazy dog.) Tj
+ET
+BT
+0.20392156862745 0.596078431372549 0.858823529411764 rg
+/F_Helvetica_normal 18 Tf
+1 0 0 1 20 593 Tm
+(Shapes) Tj
+ET
+q
+0.20392156862745 0.596078431372549 0.858823529411764 rg
+20 534 120 50 re
+f
+Q
+q
+0.180392156862745 0.8 0.44313725490196 rg
+20 479 120 50 re
+f
+Q
+q
+0.905882352941176 0.298039215686274 0.235294117647058 rg
+20 424 120 50 re
+f
+Q
+BT
+0.20392156862745 0.596078431372549 0.858823529411764 rg
+/F_Helvetica_normal 18 Tf
+1 0 0 1 20 401 Tm
+(Lines) Tj
+ET
+q
+1 w
+0.2 0.2 0.2 RG
+20 392 m
+592 392 l
+S
+Q
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 379 Tm
+(Solid line) Tj
+ET
+q
+1 w
+0.20392156862745 0.596078431372549 0.858823529411764 RG
+[6 3] 0 d
+20 374 m
+592 374 l
+S
+Q
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 361 Tm
+(Dashed line) Tj
+ET
+q
+1 w
+0.180392156862745 0.8 0.44313725490196 RG
+1 J
+[0 4] 0 d
+20 356 m
+592 356 l
+S
+Q
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 343 Tm
+(Dotted line) Tj
+ET
+BT
+0.20392156862745 0.596078431372549 0.858823529411764 rg
+/F_Helvetica_normal 18 Tf
+1 0 0 1 20 320 Tm
+(Long Text with Word Wrap) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 300 Tm
+(Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 289 Tm
+(aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 278 Tm
+(Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint) Tj
+ET
+BT
+0.2 0.2 0.2 rg
+/F_Helvetica_normal 11 Tf
+1 0 0 1 20 267 Tm
+(occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.) Tj
+ET
+
+endstream
+endobj
+15 0 obj
+<</Type /Pages/Kids [16 0 R]/Count 1>>
+endobj
+16 0 obj
+<</Type /Page/Parent 15 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F_Helvetica_normal 13 0 R/F_Times_normal 5 0 R/F_Courier_normal 6 0 R>>>>/Contents 14 0 R>>
+endobj
+17 0 obj
+<</Type /Catalog/Pages 15 0 R>>
+endobj
+18 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260627131006Z)/ModDate (D:20260627131006Z)>>
+endobj
+xref
+0 19
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000151 00000 n 
+0000000219 00000 n 
+0000000287 00000 n 
+0000000353 00000 n 
+0000000417 00000 n 
+0000000485 00000 n 
+0000000553 00000 n 
+0000000621 00000 n 
+0000000690 00000 n 
+0000000759 00000 n 
+0000000828 00000 n 
+0000000897 00000 n 
+0000003928 00000 n 
+0000003983 00000 n 
+0000004163 00000 n 
+0000004211 00000 n 
+trailer
+<</Size 19/Root 17 0 R/Info 18 0 R/ID[<42BFD7E50B5536C42175E8DA028E3BA5><42BFD7E50B5536C42175E8DA028E3BA5>]>>
+startxref
+4318
+%%EOF

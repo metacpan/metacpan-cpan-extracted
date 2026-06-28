@@ -5,7 +5,7 @@ use warnings;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 our $Debug   = 0;
-our $VERSION = '1.35';
+our $VERSION = '1.36';
 
 use File::Slurper 'read_lines';
 
@@ -3249,7 +3249,7 @@ an arrayref as a stack:
 		callback =>
 		sub
 		{
-			my(@node, $options) = @_;
+			my($node, $options) = @_;
 
 			# Process $node, using $options...
 

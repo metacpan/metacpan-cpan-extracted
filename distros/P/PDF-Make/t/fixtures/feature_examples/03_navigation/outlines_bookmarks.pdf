@@ -1,0 +1,143 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+4 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+5 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+6 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+7 0 obj
+<</Length 191>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 722 Tm
+(Chapter 1) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 688 Tm
+(Open the bookmarks panel to inspect the outline tree.) Tj
+ET
+
+endstream
+endobj
+8 0 obj
+<</Length 197>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 772 Tm
+(Chapter 2) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 738 Tm
+(Chapter 2 contains two nested sections in the outline tree.) Tj
+ET
+
+endstream
+endobj
+9 0 obj
+<</Length 190>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 772 Tm
+(Appendix) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 738 Tm
+(Appendix demonstrates another top-level outline item.) Tj
+ET
+
+endstream
+endobj
+10 0 obj
+<</Type /Pages/Kids [11 0 R 12 0 R 13 0 R]/Count 3>>
+endobj
+11 0 obj
+<</Type /Page/Parent 10 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F_Helvetica_normal 2 0 R>>>>/Contents 7 0 R>>
+endobj
+12 0 obj
+<</Type /Page/Parent 10 0 R/MediaBox [0 0 595 842]/Resources <</Font <</F_Helvetica_normal 4 0 R>>>>/Contents 8 0 R>>
+endobj
+13 0 obj
+<</Type /Page/Parent 10 0 R/MediaBox [0 0 595 842]/Resources <</Font <</F_Helvetica_normal 6 0 R>>>>/Contents 9 0 R>>
+endobj
+14 0 obj
+<</Type /Outlines/First 15 0 R/Last 15 0 R/Count 6>>
+endobj
+15 0 obj
+<</Title (Document)/Parent 14 0 R/Dest [11 0 R /Fit]/First 16 0 R/Last 20 0 R/Count 5>>
+endobj
+16 0 obj
+<</Title (Chapter 1)/Parent 15 0 R/Dest [11 0 R /Fit]/Next 17 0 R>>
+endobj
+17 0 obj
+<</Title (Chapter 2)/Parent 15 0 R/Dest [12 0 R /Fit]/First 18 0 R/Last 19 0 R/Count 2/Prev 16 0 R/Next 20 0 R>>
+endobj
+18 0 obj
+<</Title (Section 2.1)/Parent 17 0 R/Dest [12 0 R /Fit]/Next 19 0 R>>
+endobj
+19 0 obj
+<</Title (Section 2.2)/Parent 17 0 R/Dest [12 0 R /Fit]/Prev 18 0 R>>
+endobj
+20 0 obj
+<</Title (Appendix)/Parent 15 0 R/Dest [13 0 R /Fit]/Prev 17 0 R>>
+endobj
+21 0 obj
+<</Type /Catalog/Pages 10 0 R/Outlines 14 0 R>>
+endobj
+22 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260421183820Z)/ModDate (D:20260421183820Z)>>
+endobj
+xref
+0 23
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000151 00000 n 
+0000000219 00000 n 
+0000000287 00000 n 
+0000000355 00000 n 
+0000000423 00000 n 
+0000000663 00000 n 
+0000000909 00000 n 
+0000001148 00000 n 
+0000001217 00000 n 
+0000001351 00000 n 
+0000001485 00000 n 
+0000001619 00000 n 
+0000001688 00000 n 
+0000001792 00000 n 
+0000001876 00000 n 
+0000002005 00000 n 
+0000002091 00000 n 
+0000002177 00000 n 
+0000002260 00000 n 
+0000002324 00000 n 
+trailer
+<</Size 23/Root 21 0 R/Info 22 0 R/ID[<5F26825564C526EBFC47B4344970368E><5F26825564C526EBFC47B4344970368E>]>>
+startxref
+2431
+%%EOF

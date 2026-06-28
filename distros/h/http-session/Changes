@@ -1,5 +1,21 @@
 Revision history for Perl module HTTP::Session
 
+0.54 2026-06-27T22:35:07Z
+
+   - This distribution is now deprecated (x_deprecated). Use
+     Plack::Middleware::Session instead. This module will no longer be
+     maintained or receive further updates.
+   - HTTP::Session::ID::Urandom now draws from Crypt::URandom instead of
+     reading /dev/urandom directly, for portability and speed, and is now the
+     default session-ID backend.
+   - Fix predictable session-ID generation in HTTP::Session::ID::MD5 and
+     HTTP::Session::ID::SHA1 (CVE-2026-3256): they now hash cryptographically
+     secure random bytes from Crypt::URandom instead of a time/PID/rand()-based
+     value. Their hexadecimal output format is unchanged.
+   - HTTP::Session::Store::CHI now filters session ids the same way
+     HTTP::Session::Store::Memcached does, rejecting control characters
+     and overly long ids before passing them to the backend.
+
 0.53 2024-03-07T05:47:13Z
 
    - version up to fix PUUSE indexing problem.

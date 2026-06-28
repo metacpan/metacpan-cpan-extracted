@@ -17,7 +17,7 @@ WriteMakefile(
 	VERSION_FROM	=> 'lib/Email/Abuse/Investigator.pm',
 	ABSTRACT_FROM	=> 'lib/Email/Abuse/Investigator.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-		? ('LICENSE'=> 'GPL')
+		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
@@ -31,10 +31,10 @@ WriteMakefile(
 		'IO::Socket::INET' => 0,
 		'MIME::QuotedPrint' => 0,
 		'MIME::Base64' => 0,
-		'IPC::System::Simple' => 0,
 		'Object::Configure' => 0,
 		'Params::Get' => 0,
 		'Params::Validate::Strict' => 0.34,
+		'Readonly' => 0,
 		'Sub::Private' => '0.05',
 		'Sub::Protected' => '0.02',
 		'Readonly::Values::Months' => 0,
@@ -46,6 +46,7 @@ WriteMakefile(
 		# 'HTML::LinkExtor' => 0
 	}, TEST_REQUIRES => {
 		'FindBin' => 0,
+		'IPC::System::Simple' => 0,
 		'MIME::Base64' => 0,
 		'MIME::QuotedPrint' => 0,
 		'POSIX' => 0,

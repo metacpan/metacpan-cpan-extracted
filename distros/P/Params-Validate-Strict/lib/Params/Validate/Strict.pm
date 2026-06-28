@@ -2,6 +2,7 @@ package Params::Validate::Strict;
 
 # FIXME: {max} doesn't play ball with non-ascii strings
 # TODO: better use of the description parameter in error messages
+# FIXME: ensure paramaters such as min => 1 length constraint applies to all values. In this case, undef should not pass through without a croak.
 
 use strict;
 use warnings;
@@ -24,11 +25,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 =head1 SYNOPSIS
 

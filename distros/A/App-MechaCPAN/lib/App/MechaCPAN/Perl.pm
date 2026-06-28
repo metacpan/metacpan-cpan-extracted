@@ -115,6 +115,16 @@ sub go
       if $success;
   }
 
+  # Ask inflate_archive to SHA confirm the file if its a CPAN url
+  if ( $src_tz =~ m/^ \Q$App::MechaCPAN::Perl::source_mirror\E /xms )
+  {
+    my $chksum_txt = '';
+    fetch_file( "$src_tz.sha256.txt" => \$chksum_txt );
+
+    my ($chksum) = $chksum_txt =~ m{\A([0-9a-fA-F]{64})\Z}xms;
+    $src_tz = { src => $src_tz, sha256 => $chksum };
+  }
+
   my $src_dir = inflate_archive($src_tz);
 
   my @src_dirs = File::Spec->splitdir("$src_dir");
@@ -417,6 +427,16 @@ sub build_reusable
   my $verstr = "perl $version";
   info $verstr, "Fetching $verstr";
 
+  # Ask inflate_archive to SHA confirm the file if its a CPAN url
+  if ( $src_tz =~ m/^ \Q$App::MechaCPAN::Perl::source_mirror\E /xms )
+  {
+    my $chksum_txt = '';
+    fetch_file( "$src_tz.sha256.txt" => \$chksum_txt );
+
+    my ($chksum) = $chksum_txt =~ m{\A([0-9a-fA-F]{64})\Z}xms;
+    $src_tz = { src => $src_tz, sha256 => $chksum };
+  }
+
   my $src_dir = inflate_archive($src_tz);
 
   my @src_dirs = File::Spec->splitdir("$src_dir");
@@ -501,7 +521,15 @@ sub build_reusable
   my $orig_dir = &get_project_dir;
   my $output   = "$slugline.tar.$compress";
   chdir $perl_dir;
-  run("tar cf - v$version/ | $compress > $orig_dir/$output");
+
+  # Instead of relying on a shell to pipe contents from tar to $compress, both
+  # gnutar and bsdtar accept the use-compress-program option
+  run(
+    'tar',
+    '--use-compress-program', $compress,
+    '-cf',                    "$orig_dir/$output",
+    "v$version/"
+  );
 
   success $verstr, "Created $verstr: $output";
 

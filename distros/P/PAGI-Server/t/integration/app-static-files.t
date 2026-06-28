@@ -16,8 +16,8 @@ use PAGI::Server;
 # PAGI::App::File / ::Directory are in the sibling PAGI-Tools distribution. Skip
 # when not installed.
 BEGIN {
-    eval { require PAGI::App::File; require PAGI::App::Directory; 1 }
-        or plan(skip_all => 'PAGI-Tools (PAGI::App::File/Directory) not installed');
+    eval { require PAGI::App::File; require PAGI::App::Directory; my $v = PAGI::App::File->VERSION; !defined($v) || $v >= 0.002000 }
+        or plan(skip_all => 'PAGI-Tools (PAGI::App::File/Directory >= 0.002000) not installed');
 }
 
 my $loop = IO::Async::Loop->new;

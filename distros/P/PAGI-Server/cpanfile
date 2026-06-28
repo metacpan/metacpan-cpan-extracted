@@ -44,9 +44,10 @@ on 'test' => sub {
     # t/integration/ (including t/integration/runner-server.t) and parts of
     # t/http2/ exercise toolkit modules (PAGI::Test::Client, PAGI::App::*,
     # middleware) that live in PAGI-Tools. PAGI-Server has NO runtime dependency
-    # on PAGI-Tools — the runner (PAGI::Server::Runner) ships in this dist.
-    # Until the PAGI-Tools distribution is on CPAN, supply toolkit modules at
-    # test time from a sibling checkout:
+    # on PAGI-Tools — the runner (PAGI::Server::Runner) ships in this dist. These
+    # tests therefore depend on no toolkit module here; each guards itself and
+    # skips unless PAGI-Tools 0.002000+ (the detached PAGI::Response value API)
+    # is installed. Install it from CPAN, or run against a sibling checkout:
     #   PERL5LIB=/path/to/PAGI-Tools/lib:$PERL5LIB prove -lr t/
 };
 

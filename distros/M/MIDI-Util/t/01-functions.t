@@ -15,6 +15,7 @@ use_ok 'MIDI::Util', qw(
     timidity_conf
     get_microseconds
     score2events
+    scale_names
 );
 
 my $score;
@@ -119,6 +120,13 @@ subtest get_microseconds => sub {
 subtest score2events => sub {
     my $got = score2events($score);
     is_deeply $got->[3], [ 'note_on', 0, 9, 42, 64 ], 'score2events';
+};
+
+subtest scale_names => sub {
+    my $got = scale_names();
+    is ref($got), 'ARRAY', 'scale_names';
+    is @$got, 46, 'scale_names';
+    is $got->[0], 'ionian', 'scale_names';
 };
 
 done_testing();

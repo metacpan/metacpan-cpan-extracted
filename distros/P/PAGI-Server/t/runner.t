@@ -172,8 +172,8 @@ APP
 # Test 10: Load app from module (requires PAGI-Tools for PAGI::App::Directory)
 subtest 'load app from module' => sub {
     SKIP: {
-        skip 'PAGI::App::Directory not available (install PAGI-Tools)', 4
-            unless eval { require PAGI::App::Directory; 1 };
+        skip 'PAGI::App::Directory not available (install PAGI-Tools >= 0.002000)', 4
+            unless eval { require PAGI::App::Directory; my $v = PAGI::App::Directory->VERSION; !defined($v) || $v >= 0.002000 };
 
         my $runner = PAGI::Server::Runner->new;
         $runner->{argv} = ['PAGI::App::Directory', 'root=.'];
@@ -217,8 +217,8 @@ MOD
 # Test 11: Default app (requires PAGI-Tools for PAGI::App::Directory)
 subtest 'default app loads Directory' => sub {
     SKIP: {
-        skip 'PAGI::App::Directory not available (install PAGI-Tools)', 3
-            unless eval { require PAGI::App::Directory; 1 };
+        skip 'PAGI::App::Directory not available (install PAGI-Tools >= 0.002000)', 3
+            unless eval { require PAGI::App::Directory; my $v = PAGI::App::Directory->VERSION; !defined($v) || $v >= 0.002000 };
 
         my $runner = PAGI::Server::Runner->new;
         my $app = $runner->load_app;
@@ -472,8 +472,8 @@ subtest '-M module loading' => sub {
 
     # Actually loading the -M module + running the -e code needs the app present.
     SKIP: {
-        skip 'PAGI::App::File not available (install PAGI-Tools)', 1
-            unless eval { require PAGI::App::File; 1 };
+        skip 'PAGI::App::File not available (install PAGI-Tools >= 0.002000)', 1
+            unless eval { require PAGI::App::File; my $v = PAGI::App::File->VERSION; !defined($v) || $v >= 0.002000 };
         my $app = $runner->load_app;
         ok(ref $app eq 'CODE', '-M/-e returns coderef');
     }

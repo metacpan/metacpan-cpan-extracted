@@ -32,6 +32,9 @@ WriteMakefile(
         'Clone'      => 0,
         'IO::Socket::SSL'     => 0,
     },
+    test => {
+        TESTS => 't/*.t t/*/*.t',
+    },
     META_MERGE => {
         resources   => {
             repository  => 'https://github.com/NicholasBHubbard/Net-Nostr',

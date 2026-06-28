@@ -1,6 +1,6 @@
 # NAME
 
-HTTP::Session - simple session
+HTTP::Session - (DEPRECATED) simple session
 
 # SYNOPSIS
 
@@ -20,6 +20,8 @@ HTTP::Session - simple session
 
 # DESCRIPTION
 
+**This module is deprecated.** Use [Plack::Middleware::Session](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ASession) instead.
+
 Yet another session manager.
 
 easy to integrate with [PSGI](https://metacpan.org/pod/PSGI) =)
@@ -36,6 +38,20 @@ easy to integrate with [PSGI](https://metacpan.org/pod/PSGI) =)
 
     `request` is duck typed object.`request` object should have `header`, `address`, `param`.
     You can use PSGI's $env instead.
+
+    `id` selects the session-ID generator class (default:
+    [HTTP::Session::ID::Urandom](https://metacpan.org/pod/HTTP%3A%3ASession%3A%3AID%3A%3AUrandom), which draws from [Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom)). The
+    `HTTP::Session::ID::MD5` and `HTTP::Session::ID::SHA1` backends are also
+    supported; as of CVE-2026-3256 they hash cryptographically secure random bytes
+    (from [Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom)) instead of their former predictable time/PID/`rand()`
+    input, while keeping their hexadecimal output. Each backend has its own
+    session-ID alphabet: `Urandom` uses URL-safe Base64 (`[A-Za-z0-9_-]`), while
+    `MD5` and `SHA1` use lowercase hexadecimal (`[0-9a-f]`).
+
+    `sid_length` defaults to 32, which yields at least 128 bits of entropy with any
+    backend (192 bits with `Urandom`). Lowering it is supported, but reduces the
+    entropy of the session ID proportionally; values around 22 or below drop under
+    the 128-bit level generally recommended for session identifiers.
 
 - $session->html\_filter($html)
 

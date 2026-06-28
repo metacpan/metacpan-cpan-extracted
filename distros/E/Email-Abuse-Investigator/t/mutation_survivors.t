@@ -26,7 +26,9 @@ use POSIX		qw( strftime );
 
 use FindBin qw( $Bin );
 use lib "$Bin/../lib", "$Bin/..";
-use_ok('Email::Abuse::Investigator');
+BEGIN {
+	use_ok('Email::Abuse::Investigator');
+}
 
 # ---------------------------------------------------------------------------
 # Stub infrastructure
@@ -47,6 +49,7 @@ sub null_net {
 	*Email::Abuse::Investigator::_domain_whois = sub { undef };
 	*Email::Abuse::Investigator::_raw_whois	= sub { undef };
 	*Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	*Email::Abuse::Investigator::_parallel_resolve_hosts = sub {};
 }
 sub restore_net {
 	no warnings 'redefine';

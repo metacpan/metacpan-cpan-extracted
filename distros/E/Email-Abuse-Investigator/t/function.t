@@ -31,6 +31,14 @@ use FindBin qw( $Bin );
 use lib "$Bin/../lib", "$Bin/..";
 use_ok('Email::Abuse::Investigator');
 
+# Suppress the AnyEvent::DNS parallel resolver for the entire file.
+# Individual subtests stub the seven seam methods via local(), but
+# _parallel_resolve_hosts is :Private and bypasses those stubs, firing
+# real DNS when AnyEvent::DNS is installed and multiple URL hostnames appear.
+no warnings 'redefine';
+*Email::Abuse::Investigator::_parallel_resolve_hosts = sub {};
+use warnings 'redefine';
+
 # ---------------------------------------------------------------------------
 # Utility: build a minimal raw RFC-2822 email string
 # ---------------------------------------------------------------------------

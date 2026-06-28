@@ -4,45 +4,58 @@
 use strictures 2;
 
 package WebService::OPNsense::OpenVPN::Service;
-$WebService::OPNsense::OpenVPN::Service::VERSION = '0.001';
+$WebService::OPNsense::OpenVPN::Service::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
 has client => ( is => 'ro', required => 1 );
 
+sub _api_path {
+    return '/api/openvpn/service';
+}
+
+with 'WebService::OPNsense::Role::APIPath';
+
 sub search_sessions {
     my ( $self, %params ) = @_;
-    return $self->client->get( '/api/openvpn/service/searchSessions', \%params );
+    my $uri = $self->_path('searchSessions');
+    return $self->client->get( $uri, \%params );
 }
 
 sub search_routes {
     my ( $self, %params ) = @_;
-    return $self->client->get( '/api/openvpn/service/searchRoutes', \%params );
+    my $uri = $self->_path('searchRoutes');
+    return $self->client->get( $uri, \%params );
 }
 
 sub kill_session {
     my ( $self, $session_data ) = @_;
-    return $self->client->post( '/api/openvpn/service/killSession', $session_data );
+    my $uri = $self->_path('killSession');
+    return $self->client->post( $uri, $session_data );
 }
 
 sub reconfigure {
     my ($self) = @_;
-    return $self->client->post('/api/openvpn/service/reconfigure');
+    my $uri = $self->_path('reconfigure');
+    return $self->client->post($uri);
 }
 
 sub start_service {
     my ($self) = @_;
-    return $self->client->post('/api/openvpn/service/start');
+    my $uri = $self->_path('start');
+    return $self->client->post($uri);
 }
 
 sub stop_service {
     my ($self) = @_;
-    return $self->client->post('/api/openvpn/service/stop');
+    my $uri = $self->_path('stop');
+    return $self->client->post($uri);
 }
 
 sub restart_service {
     my ($self) = @_;
-    return $self->client->post('/api/openvpn/service/restart');
+    my $uri = $self->_path('restart');
+    return $self->client->post($uri);
 }
 
 1;
@@ -59,7 +72,7 @@ WebService::OPNsense::OpenVPN::Service - OpenVPN service controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -76,10 +89,6 @@ version 0.001
 
 Manages the OpenVPN service and queries active sessions
 and routes.
-
-=head1 NAME
-
-WebService::OPNsense::OpenVPN::Service - OpenVPN service controller
 
 =head1 METHODS
 
@@ -125,7 +134,15 @@ Stops the OpenVPN service.
 
 Restarts the OpenVPN service.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $service->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::APIPath>
 
 =head1 AUTHOR
 

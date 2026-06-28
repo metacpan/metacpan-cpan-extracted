@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::TrafficShaper::Settings;
-$WebService::OPNsense::TrafficShaper::Settings::VERSION = '0.001';
+$WebService::OPNsense::TrafficShaper::Settings::VERSION = '0.002';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -19,135 +19,179 @@ with 'WebService::OPNsense::Role::Settings';
 
 sub search_pipes {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchPipe'), \%params );
+    my $uri = $self->_path('searchPipe');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_pipe {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getPipe/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getPipe/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_pipe {
     my ( $self, $pipe_data ) = @_;
-    return $self->client->post( $self->_path('addPipe'), $pipe_data );
+    my $uri = $self->_path('addPipe');
+
+    return $self->client->post( $uri, $pipe_data );
 }
 
 sub set_pipe {
     my ( $self, $uuid, $pipe_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setPipe/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setPipe/{uuid}', uuid => $uuid ), $pipe_data,
+        $uri, $pipe_data,
     );
 }
 
 sub del_pipe {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delPipe/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delPipe/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_pipe {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'togglePipe/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'togglePipe/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
 sub download_pipes {
     my ($self) = @_;
-    return $self->client->get( $self->_path('downloadPipes') );
+    my $uri = $self->_path('downloadPipes');
+
+    return $self->client->get($uri);
 }
 
 sub upload_pipes {
     my ( $self, $pipes_data ) = @_;
-    return $self->client->post( $self->_path('uploadPipes'), $pipes_data );
+    my $uri = $self->_path('uploadPipes');
+
+    return $self->client->post( $uri, $pipes_data );
 }
 
 sub search_queues {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchQueue'), \%params );
+    my $uri = $self->_path('searchQueue');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_queue {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getQueue/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getQueue/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_queue {
     my ( $self, $queue_data ) = @_;
-    return $self->client->post( $self->_path('addQueue'), $queue_data );
+    my $uri = $self->_path('addQueue');
+
+    return $self->client->post( $uri, $queue_data );
 }
 
 sub set_queue {
     my ( $self, $uuid, $queue_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setQueue/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setQueue/{uuid}', uuid => $uuid ), $queue_data,
+        $uri, $queue_data,
     );
 }
 
 sub del_queue {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delQueue/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delQueue/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_queue {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleQueue/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleQueue/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
 sub download_queues {
     my ($self) = @_;
-    return $self->client->get( $self->_path('downloadQueues') );
+    my $uri = $self->_path('downloadQueues');
+
+    return $self->client->get($uri);
 }
 
 sub upload_queues {
     my ( $self, $queues_data ) = @_;
-    return $self->client->post( $self->_path('uploadQueues'), $queues_data );
+    my $uri = $self->_path('uploadQueues');
+
+    return $self->client->post( $uri, $queues_data );
 }
 
 sub search_rules {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchRule'), \%params );
+    my $uri = $self->_path('searchRule');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_rule {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getRule/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getRule/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_rule {
     my ( $self, $rule_data ) = @_;
-    return $self->client->post( $self->_path('addRule'), $rule_data );
+    my $uri = $self->_path('addRule');
+
+    return $self->client->post( $uri, $rule_data );
 }
 
 sub set_rule {
     my ( $self, $uuid, $rule_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setRule/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setRule/{uuid}', uuid => $uuid ), $rule_data,
+        $uri, $rule_data,
     );
 }
 
 sub del_rule {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delRule/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delRule/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_rule {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleRule/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleRule/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
@@ -165,29 +209,25 @@ WebService::OPNsense::TrafficShaper::Settings - Traffic shaper settings controll
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
     my $ts_settings = $opn->trafficshaper_settings;
 
-    my $settings = $ts_settings->get;
+    my $settings = $ts_settings->get_settings;
 
 =head1 DESCRIPTION
 
 Traffic shaper pipes, queues, and rules.
 
-=head1 NAME
-
-WebService::OPNsense::TrafficShaper::Settings - Traffic shaper settings controller
-
 =head1 METHODS
 
-=head2 get
+=head2 get_settings
 
-    my $settings = $ts_settings->get;
+    my $settings = $ts_settings->get_settings;
 
-Returns the current traffic shaper settings.
+Returns traffic shaper settings.
 
 =head2 set_settings
 
@@ -211,13 +251,13 @@ Returns a single pipe by UUID.
 
     my $result = $ts_settings->add_pipe($pipe_data);
 
-Creates a new pipe.
+Creates pipe.
 
 =head2 set_pipe
 
     my $result = $ts_settings->set_pipe($uuid, $pipe_data);
 
-Updates an existing pipe.
+Updates pipe.
 
 =head2 del_pipe
 
@@ -259,13 +299,13 @@ Returns a single queue by UUID.
 
     my $result = $ts_settings->add_queue($queue_data);
 
-Creates a new queue.
+Creates queue.
 
 =head2 set_queue
 
     my $result = $ts_settings->set_queue($uuid, $queue_data);
 
-Updates an existing queue.
+Updates queue.
 
 =head2 del_queue
 
@@ -307,13 +347,13 @@ Returns a single traffic shaper rule by UUID.
 
     my $result = $ts_settings->add_rule($rule_data);
 
-Creates a new traffic shaper rule.
+Creates traffic shaper rule.
 
 =head2 set_rule
 
     my $result = $ts_settings->set_rule($uuid, $rule_data);
 
-Updates an existing traffic shaper rule.
+Updates traffic shaper rule.
 
 =head2 del_rule
 
@@ -327,7 +367,15 @@ Deletes a traffic shaper rule by UUID.
 
 Enables or disables a traffic shaper rule.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $ts_settings->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Settings>
 
 =head1 AUTHOR
 

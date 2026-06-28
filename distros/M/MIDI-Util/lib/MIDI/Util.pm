@@ -1,9 +1,9 @@
 package MIDI::Util;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: MIDI Utilities
+# ABSTRACT: MIDI and music utilities
 
-our $VERSION = '0.1305';
+our $VERSION = '0.1307';
 
 use strict;
 use warnings;
@@ -29,6 +29,7 @@ our @EXPORT = qw(
     play_fluidsynth
     get_microseconds
     score2events
+    scale_names
 );
 
 use constant TICKS => 96;
@@ -311,6 +312,49 @@ sub score2events {
     return MIDI::Score::score_r_to_events_r($score->{Score});
 }
 
+
+sub scale_names {
+    return [qw(
+        ionian major
+        hypolydian
+        dorian
+        hypomyxolydian
+        phrygian
+        hypoaeolian
+        lydian
+        hypolocrian
+        mixolydian
+        hypoionian
+        aeolian minor m
+        hypodorian
+        locrian
+        hypophrygian
+        harmonicminor hm
+        melodicminor mm
+        blues
+        pentatonic pmaj
+        chromatic
+        diminished
+        wholetone
+        augmented
+        hungarianminor
+        3semitone
+        4semitone
+        neapolitanminor nmin
+        neapolitanmajor nmaj
+        todi
+        marva
+        persian
+        oriental
+        romanian
+        pelog
+        iwato
+        hirajoshi
+        egyptian
+        pminor pentatonicminor
+    )];
+}
+
 1;
 
 __END__
@@ -321,11 +365,11 @@ __END__
 
 =head1 NAME
 
-MIDI::Util - MIDI Utilities
+MIDI::Util - MIDI and music utilities
 
 =head1 VERSION
 
-version 0.1305
+version 0.1307
 
 =head1 SYNOPSIS
 
@@ -343,6 +387,7 @@ version 0.1305
     play_fluidsynth
     get_microseconds
     score2events
+    scale_names
   );
 
   my $dump = midi_dump('length'); # volume, etc.
@@ -375,9 +420,11 @@ version 0.1305
 
   my $events = score2events($score);
 
+  my $name = scale_names();
+
 =head1 DESCRIPTION
 
-C<MIDI::Util> comprises handy MIDI utilities.
+C<MIDI::Util> comprises handy MIDI and music utilities.
 
 Nothing is exported by default.
 
@@ -451,9 +498,9 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 =head2 reverse_dump
 
   $by_value = reverse_dump($name);
-  $by_value = reverse_dump($name, $precision); # for name = length
+  $by_value = reverse_dump($name, $precision);
 
-Return the reversed hashref from the B<midi_dump> routine hashes section.
+Return the reversed hashref of B<midi_dump()>.
 
 =head2 midi_format
 
@@ -535,6 +582,12 @@ ticks.
   score2events($score_obj);
 
 Return the B<score> as array reference of events.
+
+=head2 scale_names
+
+  $name = scale_names();
+
+Return the scale names as known to the L<Music::Scales> module.
 
 =head1 SEE ALSO
 

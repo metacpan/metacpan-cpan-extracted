@@ -169,6 +169,7 @@ subtest '/paths correctness' => sub {
         '/h/#/i' => {},           # invalid
         '/j/{foo?bar}' => {},     # valid, but weird
         '/k/{foo#bar}' => {},     # valid, but weird
+        '/{foo}%2f{bar}' => {},   # valid
       },
     },
   );
@@ -729,6 +730,7 @@ servers:
     variables:
       foo#bar:
         default: foo
+  - url: http://example.com/y/foo%2fbar   # valid
 YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(

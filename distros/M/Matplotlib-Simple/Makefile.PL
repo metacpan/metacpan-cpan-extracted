@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "Data::Printer" => 0,
     "Devel::Confess" => 0,
     "Devel::Size" => 0,
-    "Digest::SHA" => 0,
     "File::Path" => 0,
     "IPC::System::Simple" => 0,
     "JSON::MaybeXS" => 0,
@@ -31,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.28",
+  "VERSION" => "0.29",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +42,6 @@ my %FallbackPrereqs = (
   "Data::Printer" => 0,
   "Devel::Confess" => 0,
   "Devel::Size" => 0,
-  "Digest::SHA" => 0,
   "File::Path" => 0,
   "IPC::System::Simple" => 0,
   "JSON::MaybeXS" => 0,

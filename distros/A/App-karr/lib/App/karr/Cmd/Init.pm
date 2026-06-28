@@ -1,7 +1,7 @@
 # ABSTRACT: Initialize a new karr board
 
 package App::karr::Cmd::Init;
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -104,7 +104,7 @@ App::karr::Cmd::Init - Initialize a new karr board
 
 =head1 VERSION
 
-version 0.302
+version 0.303
 
 =head1 SYNOPSIS
 

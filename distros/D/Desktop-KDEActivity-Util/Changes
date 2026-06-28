@@ -1,0 +1,8 @@
+0.002   2026-03-29  Released-By: PERLANCAR; Urgency: high
+
+        - Remove old vestigial code.
+
+
+0.001   2026-03-29  Released-By: PERLANCAR
+
+        - First release, refactored from App-KDEActivityUtils.

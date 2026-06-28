@@ -144,6 +144,29 @@ subtest 'unicode content serializes as UTF-8' => sub {
     is($decoded->[5], "\x{1F600}", 'unicode emoji round-trips through serialization');
 };
 
+subtest 'unicode content and tags serialize as exact UTF-8 bytes' => sub {
+    my $emoji = "\x{1F600}";
+    my $event = Net::Nostr::Event->new(
+        pubkey => 'a' x 64, kind => 1,
+        content => "hello $emoji",
+        created_at => 1000,
+        tags => [['t', "nostr-$emoji"]],
+    );
+
+    my $expected_serialization = '[0,"' . ('a' x 64) . '",1000,1,[["t","nostr-' . $emoji . '"]],"hello ' . $emoji . '"]';
+    utf8::encode($expected_serialization);
+
+    my $json = $event->json_serialize;
+    is($json, $expected_serialization, 'serialization uses exact UTF-8 bytes');
+    is(unpack('H*', $json),
+        '5b302c2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c313030302c312c5b5b2274222c226e6f7374722df09f9880225d5d2c2268656c6c6f20f09f9880225d',
+        'serialized byte sequence is pinned');
+    unlike($json, qr/\\u/i, 'non-control Unicode is not escaped as \\u');
+    is($event->id, '79af3bfbf6c390409199bfe2405e9597494336996b6e9ac5594f3a6a0b0996cc',
+        'event id is pinned for non-ASCII content and tags');
+    is($event->id, sha256_hex($expected_serialization), 'event id hashes the pinned UTF-8 bytes');
+};
+
 ###############################################################################
 # Tags
 ###############################################################################

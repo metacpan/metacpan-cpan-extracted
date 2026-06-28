@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::System;
-$WebService::OPNsense::System::VERSION = '0.001';
+$WebService::OPNsense::System::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
@@ -74,7 +74,7 @@ WebService::OPNsense::System - System API controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -87,10 +87,6 @@ version 0.001
 =head1 DESCRIPTION
 
 System status, firmware information, and system operations.
-
-=head1 NAME
-
-WebService::OPNsense::System - System API controller
 
 =head1 METHODS
 
@@ -154,7 +150,15 @@ Halts (shuts down) the system immediately.
 
 Returns the navigation menu structure.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $sys->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense>
 
 =head1 AUTHOR
 

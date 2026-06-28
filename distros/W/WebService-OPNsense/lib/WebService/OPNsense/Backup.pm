@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Backup;
-$WebService::OPNsense::Backup::VERSION = '0.001';
+$WebService::OPNsense::Backup::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
@@ -18,7 +18,9 @@ with 'WebService::OPNsense::Role::APIPath';
 
 sub backups {
     my ( $self, $host ) = @_;
-    return $self->client->get( $self->_path( 'backups/{host}', host => $host ) );
+    my $uri = $self->_path( 'backups/{host}', host => $host );
+
+    return $self->client->get($uri);
 }
 
 sub download {
@@ -29,24 +31,33 @@ sub download {
 
 sub diff {
     my ( $self, $host, $backup1, $backup2 ) = @_;
+    my $uri =
+        $self->_path( 'diff/{host}/{backup1}/{backup2}', host => $host, backup1 => $backup1, backup2 => $backup2 );
+
     return $self->client->get(
-        $self->_path( 'diff/{host}/{backup1}/{backup2}', host => $host, backup1 => $backup1, backup2 => $backup2 ),
+        $uri,
     );
 }
 
 sub providers {
     my ($self) = @_;
-    return $self->client->get( $self->_path('providers') );
+    my $uri = $self->_path('providers');
+
+    return $self->client->get($uri);
 }
 
 sub delete_backup {
     my ( $self, $backup ) = @_;
-    return $self->client->post( $self->_path( 'deleteBackup/{backup}', backup => $backup ) );
+    my $uri = $self->_path( 'deleteBackup/{backup}', backup => $backup );
+
+    return $self->client->post($uri);
 }
 
 sub revert_backup {
     my ( $self, $backup ) = @_;
-    return $self->client->post( $self->_path( 'revertBackup/{backup}', backup => $backup ) );
+    my $uri = $self->_path( 'revertBackup/{backup}', backup => $backup );
+
+    return $self->client->post($uri);
 }
 
 1;
@@ -63,7 +74,7 @@ WebService::OPNsense::Backup - Backup controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -74,10 +85,6 @@ version 0.001
 =head1 DESCRIPTION
 
 Manages configuration backups.
-
-=head1 NAME
-
-WebService::OPNsense::Backup - Backup controller
 
 =head1 METHODS
 
@@ -118,7 +125,15 @@ Deletes a backup.
 
 Reverts to a backup.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $backup->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::APIPath>
 
 =head1 AUTHOR
 

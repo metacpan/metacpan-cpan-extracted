@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.84  2026-06-27
+	- mapping update
+	- CI modernization
+
 0.83  2026-04-26
 	- bugfix: handle multiple CPAN distributions work again
 

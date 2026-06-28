@@ -37,9 +37,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Dumper" : "2.189",
             "ExtUtils::MakeMaker" : "7.7",
             "File::Slurper" : "0.014",
-            "open" : "0",
+            "Getopt::Long" : "2.57",
+            "perl" : "5.020004",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -67,6 +69,6 @@
          "web" : "https://github.com/ronsavage/Tree-DAG_Node"
       }
    },
-   "version" : "1.35",
+   "version" : "1.36",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

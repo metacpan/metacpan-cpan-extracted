@@ -1,0 +1,47 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Title (Encrypted Test Document)/Author (Test Suite)/Producer (PDF-Make/0.01)/CreationDate (D:20260421083818Z)/ModDate (D:20260421083818Z)>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+<</Length 116>>
+stream
+BT
+/F1 24 Tf
+72 700 Td
+(Encrypted Content) Tj
+ET
+BT
+/F1 12 Tf
+72 660 Td
+(This PDF is encrypted with AES-256.) Tj
+ET
+
+endstream
+endobj
+4 0 obj
+<</Type /Pages/Kids [5 0 R]/Count 1>>
+endobj
+5 0 obj
+<</Type /Page/Parent 4 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F1 2 0 R>>>>/Contents 3 0 R>>
+endobj
+6 0 obj
+<</Type /Catalog/Pages 4 0 R>>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000015 00000 n 
+0000000173 00000 n 
+0000000241 00000 n 
+0000000406 00000 n 
+0000000459 00000 n 
+0000000575 00000 n 
+trailer
+<</Size 7/Root 6 0 R/Info 1 0 R/ID[<1505674DD17195CC364F5658DA3890EB><1505674DD17195CC364F5658DA3890EB>]>>
+startxref
+621
+%%EOF

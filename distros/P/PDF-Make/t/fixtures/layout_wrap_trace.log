@@ -1,0 +1,30 @@
+wrap line=[] line_w=0.000 rem=254.000 next=[Main] add=23.837 cand_w=23.837 cw=254.000 slack=13.000 => KEEP
+wrap line=[Main] line_w=23.837 rem=230.163 next=[Content] add=41.580 cand_w=65.417 cw=254.000 slack=13.000 => KEEP
+wrap line=[Main Content] line_w=65.417 rem=188.583 next=[Area] add=26.290 cand_w=91.707 cw=254.000 slack=13.000 => KEEP
+wrap line=[] line_w=0.000 rem=254.000 next=[The] add=15.507 cand_w=15.507 cw=254.000 slack=13.000 => KEEP
+wrap line=[The] line_w=15.507 rem=238.493 next=[center] add=27.513 cand_w=43.020 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center] line_w=43.020 rem=210.980 next=[column] add=31.509 cand_w=74.529 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column] line_w=74.529 rem=179.471 next=[has] add=17.010 cand_w=91.539 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has] line_w=91.539 rem=162.461 next=[weight] add=28.512 cand_w=120.051 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight] line_w=120.051 rem=133.949 next=[2,] add=10.008 cand_w=130.059 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight 2,] line_w=130.059 rem=123.941 next=[so] add=12.006 cand_w=142.065 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight 2, so] line_w=142.065 rem=111.935 next=[it] add=7.002 cand_w=149.067 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight 2, so it] line_w=149.067 rem=104.933 next=[takes] add=24.012 cand_w=173.079 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight 2, so it takes] line_w=173.079 rem=80.921 next=[twice] add=23.004 cand_w=196.083 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight 2, so it takes twice] line_w=196.083 rem=57.917 next=[the] add=15.012 cand_w=211.095 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight 2, so it takes twice the] line_w=211.095 rem=42.905 next=[width] add=23.508 cand_w=234.603 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight 2, so it takes twice the width] line_w=234.603 rem=19.397 next=[of] add=10.008 cand_w=244.611 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight 2, so it takes twice the width of] line_w=244.611 rem=9.389 next=[each] add=22.014 cand_w=266.625 cw=254.000 slack=13.000 => KEEP
+wrap line=[The center column has weight 2, so it takes twice the width of each] line_w=266.625 rem=-12.625 next=[sidebar.] add=34.515 cand_w=301.140 cw=254.000 slack=13.000 => BREAK
+wrap line=[sidebar.] line_w=32.013 rem=221.987 next=[Use] add=18.504 cand_w=50.517 cw=254.000 slack=13.000 => KEEP
+wrap line=[sidebar. Use] line_w=50.517 rem=203.483 next=[this] add=16.506 cand_w=67.023 cw=254.000 slack=13.000 => KEEP
+wrap line=[sidebar. Use this] line_w=67.023 rem=186.977 next=[for] add=13.005 cand_w=80.028 cw=254.000 slack=13.000 => KEEP
+wrap line=[sidebar. Use this for] line_w=80.028 rem=173.972 next=[article-style] add=48.006 cand_w=128.034 cw=254.000 slack=13.000 => KEEP
+wrap line=[sidebar. Use this for article-style] line_w=128.034 rem=125.966 next=[layouts] add=31.014 cand_w=159.048 cw=254.000 slack=13.000 => KEEP
+wrap line=[sidebar. Use this for article-style layouts] line_w=159.048 rem=94.952 next=[where] add=27.009 cand_w=186.057 cw=254.000 slack=13.000 => KEEP
+wrap line=[sidebar. Use this for article-style layouts where] line_w=186.057 rem=67.943 next=[the] add=15.012 cand_w=201.069 cw=254.000 slack=13.000 => KEEP
+wrap line=[sidebar. Use this for article-style layouts where the] line_w=201.069 rem=52.931 next=[main] add=22.005 cand_w=223.074 cw=254.000 slack=13.000 => KEEP
+wrap line=[sidebar. Use this for article-style layouts where the main] line_w=223.074 rem=30.926 next=[content] add=32.022 cand_w=255.096 cw=254.000 slack=13.000 => KEEP
+wrap line=[sidebar. Use this for article-style layouts where the main content] line_w=255.096 rem=-1.096 next=[needs] add=27.018 cand_w=282.114 cw=254.000 slack=13.000 => BREAK
+wrap line=[needs] line_w=24.516 rem=229.484 next=[more] add=23.004 cand_w=47.520 cw=254.000 slack=13.000 => KEEP
+wrap line=[needs more] line_w=47.520 rem=206.480 next=[room.] add=25.506 cand_w=73.026 cw=254.000 slack=13.000 => KEEP

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::KeyPairs;
-$WebService::OPNsense::IPsec::KeyPairs::VERSION = '0.001';
+$WebService::OPNsense::IPsec::KeyPairs::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
@@ -15,16 +15,7 @@ sub _api_path {
 }
 
 with 'WebService::OPNsense::Role::ItemCrud';
-
-sub get {
-    my ($self) = @_;
-    return $self->client->get( $self->_path('get') );
-}
-
-sub set_settings {
-    my ( $self, $settings_data ) = @_;
-    return $self->client->post( $self->_path('set'), $settings_data );
-}
+with 'WebService::OPNsense::Role::Settings';
 
 sub gen_key_pair {
     my ( $self, $type, $size ) = @_;
@@ -46,7 +37,7 @@ WebService::OPNsense::IPsec::KeyPairs - IPsec key pair controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -59,23 +50,7 @@ version 0.001
 
 Manages IPsec key pairs.
 
-=head1 NAME
-
-WebService::OPNsense::IPsec::KeyPairs - IPsec key pair controller
-
 =head1 METHODS
-
-=head2 get
-
-    my $config = $kp->get;
-
-Returns the key pair configuration.
-
-=head2 set_settings
-
-    my $result = $kp->set_settings($settings_data);
-
-Sets the key pair configuration.
 
 =head2 gen_key_pair
 
@@ -84,7 +59,67 @@ Sets the key pair configuration.
 Generates a new key pair.  Optionally specify C<$type> (e.g. C<'RSA'>) and
 C<$size> (e.g. C<2048>).
 
-=for Pod::Coverage _api_path _path client search_item get_item add_item set_item del_item
+=head1 PROVIDED METHODS
+
+The following methods are inherited from consumed roles.
+
+=head2 search_item
+
+    my $results = $ctrl->search_item( %params );
+
+Searches for key pairs.
+
+=head2 get_item
+
+    my $item = $ctrl->get_item( $uuid );
+
+Returns a single key pair by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 add_item
+
+    my $result = $ctrl->add_item( $item_data );
+
+Creates a key pair.
+
+=head2 set_item
+
+    my $result = $ctrl->set_item( $uuid, $item_data );
+
+Updates a key pair.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 del_item
+
+    my $result = $ctrl->del_item( $uuid );
+
+Deletes a key pair by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 toggle_item
+
+    my $result = $ctrl->toggle_item( $uuid, $enabled );
+
+Enables or disables a key pair.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 get_settings
+
+    my $config = $ctrl->get_settings;
+
+Returns key pair settings.
+
+=head2 set_settings
+
+    my $result = $ctrl->set_settings( $settings_data );
+
+Updates key pair settings.
+
+=head2 client
+
+    my $http_client = $ctrl->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::ItemCrud>
 
 =head1 AUTHOR
 

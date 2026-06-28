@@ -4,9 +4,8 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::Vti;
-$WebService::OPNsense::IPsec::Vti::VERSION = '0.001';
+$WebService::OPNsense::IPsec::Vti::VERSION = '0.002';
 use Moo;
-use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
 
 has client => ( is => 'ro', required => 1 );
@@ -16,12 +15,6 @@ sub _api_path {
 }
 
 with 'WebService::OPNsense::Role::Crud';
-
-sub set_vti {
-    my ( $self, $uuid, $vti_data ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'set/{uuid}', uuid => $uuid ), $vti_data );
-}
 
 1;
 
@@ -37,7 +30,7 @@ WebService::OPNsense::IPsec::Vti - IPsec VTI (Virtual Tunnel Interface) controll
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -50,19 +43,55 @@ version 0.001
 
 IPsec Virtual Tunnel Interfaces.
 
-=head1 NAME
+=head1 PROVIDED METHODS
 
-WebService::OPNsense::IPsec::Vti - IPsec VTI (Virtual Tunnel Interface) controller
+The following methods are inherited from consumed roles.
 
-=head1 METHODS
+=head2 search
 
-=head2 set_vti
+    my $results = $ctrl->search( %params );
 
-    my $result = $vti->set_vti($uuid, $vti_data);
+Searches for VTI entries.
 
-Updates an existing VTI entry.
+=head2 get
 
-=for Pod::Coverage _api_path _path client search get add del toggle
+    my $vti = $ctrl->get( $uuid );
+
+Returns a single VTI entry by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 set
+
+    my $result = $ctrl->set( $uuid, $vti_data );
+
+Updates VTI entry by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 add
+
+    my $result = $ctrl->add( $vti_data );
+
+Creates VTI entry.
+
+=head2 del
+
+    my $result = $ctrl->del( $uuid );
+
+Deletes a VTI entry by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 toggle
+
+    my $result = $ctrl->toggle( $uuid, $enabled );
+
+Enables or disables a VTI entry.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 client
+
+    my $http_client = $ctrl->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Crud>
 
 =head1 AUTHOR
 

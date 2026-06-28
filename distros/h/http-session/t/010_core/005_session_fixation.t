@@ -33,6 +33,6 @@ sub {
         request => CGI->new({ sid => 'baz' }),
     );
     ok $session->session_id() ne 'baz', 'no session fixation';
-    like $session->session_id(), qr/^[a-z0-9]{32}$/, 'regen session id';
+    like $session->session_id(), qr/^[A-Za-z0-9_-]{32}$/, 'regen session id';
 }->();
 

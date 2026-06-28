@@ -12,7 +12,7 @@
 
    GitHub will *ALWAYS* have the latest version and CPAN is not guaranteed to have the latest.
 
-   You will get best results if you use a font with all of the UTF-8 characters.  See the **Fonts** section below.
+   You will get best results if you use a font with all of the UTF-8 characters.  See the [**Fonts**](#fonts) section below.
 
 ![Divider](pics/pink.jpg?raw=true "Divider")
 

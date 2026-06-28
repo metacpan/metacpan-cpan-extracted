@@ -1,0 +1,202 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+4 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+5 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+6 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+7 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+8 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+9 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+10 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+11 0 obj
+<</Length 319>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 722 Tm
+(Chapter 1: Introduction) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 688 Tm
+(This is the first page of a multi-page document.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 674 Tm
+(Each page can contain different content and formatting.) Tj
+ET
+
+endstream
+endobj
+12 0 obj
+<</Length 396>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 772 Tm
+(Chapter 2: Content) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 738 Tm
+(This is the second page.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 724 Tm
+(Notice how we can add new pages with add_page\(\).) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 710 Tm
+(Each page starts fresh with default formatting.) Tj
+ET
+
+endstream
+endobj
+13 0 obj
+<</Length 544>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 772 Tm
+(Chapter 3: More Pages) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 738 Tm
+(This is the third page.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 40 Tf
+1 0 0 1 20 693 Tm
+(Section 3.1) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 671 Tm
+(We can use heading levels to structure content.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 40 Tf
+1 0 0 1 20 626 Tm
+(Section 3.2) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 604 Tm
+(Pages automatically flow to maintain layout.) Tj
+ET
+
+endstream
+endobj
+14 0 obj
+<</Length 310>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 772 Tm
+(Chapter 4: Conclusion) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 738 Tm
+(This is the final page.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 724 Tm
+(Multi-page documents are useful for reports, manuals, and long documents.) Tj
+ET
+
+endstream
+endobj
+15 0 obj
+<</Type /Pages/Kids [16 0 R 17 0 R 18 0 R 19 0 R]/Count 4>>
+endobj
+16 0 obj
+<</Type /Page/Parent 15 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F_Helvetica_normal 2 0 R>>>>/Contents 11 0 R>>
+endobj
+17 0 obj
+<</Type /Page/Parent 15 0 R/MediaBox [0 0 595 842]/Resources <</Font <</F_Helvetica_normal 4 0 R>>>>/Contents 12 0 R>>
+endobj
+18 0 obj
+<</Type /Page/Parent 15 0 R/MediaBox [0 0 595 842]/Resources <</Font <</F_Helvetica_normal 8 0 R>>>>/Contents 13 0 R>>
+endobj
+19 0 obj
+<</Type /Page/Parent 15 0 R/MediaBox [0 0 595 842]/Resources <</Font <</F_Helvetica_normal 10 0 R>>>>/Contents 14 0 R>>
+endobj
+20 0 obj
+<</Type /Catalog/Pages 15 0 R>>
+endobj
+21 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260421183820Z)/ModDate (D:20260421183820Z)>>
+endobj
+xref
+0 22
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000151 00000 n 
+0000000219 00000 n 
+0000000287 00000 n 
+0000000355 00000 n 
+0000000423 00000 n 
+0000000491 00000 n 
+0000000559 00000 n 
+0000000627 00000 n 
+0000000696 00000 n 
+0000001065 00000 n 
+0000001511 00000 n 
+0000002105 00000 n 
+0000002465 00000 n 
+0000002541 00000 n 
+0000002676 00000 n 
+0000002811 00000 n 
+0000002946 00000 n 
+0000003082 00000 n 
+0000003130 00000 n 
+trailer
+<</Size 22/Root 20 0 R/Info 21 0 R/ID[<F22BD2D249B31129D1E1E2C740EC160A><F22BD2D249B31129D1E1E2C740EC160A>]>>
+startxref
+3237
+%%EOF

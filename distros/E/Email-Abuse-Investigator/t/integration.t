@@ -30,12 +30,14 @@ use warnings;
 use Test::More;
 use MIME::Base64	  qw( encode_base64 );
 use MIME::QuotedPrint qw( encode_qp );
-use POSIX			 qw( strftime );
+use POSIX	 qw( strftime );
 
 use FindBin qw( $Bin );
 use lib "$Bin/../lib", "$Bin/..";
 
-use_ok('Email::Abuse::Investigator');
+BEGIN {
+	use_ok('Email::Abuse::Investigator');
+}
 
 # ---------------------------------------------------------------------------
 # Network stub infrastructure
@@ -111,6 +113,10 @@ sub install_stubs {
 	*Email::Abuse::Investigator::_follow_redirect_chain = ref($ov{follow_redirect}) eq 'CODE'
 		? $ov{follow_redirect}
 		: sub { undef };
+
+	# Suppress the AnyEvent::DNS parallel resolver so no real DNS queries
+	# are fired when multiple URL hostnames appear in an email body.
+	*Email::Abuse::Investigator::_parallel_resolve_hosts = sub {};
 }
 
 # ---------------------------------------------------------------------------

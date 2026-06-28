@@ -12,7 +12,7 @@ sub {
         store => HTTP::Session::Store::Null->new,
         request => CGI->new(),
     );
-    like $session->_generate_session_id, qr/^[a-z0-9]{32}$/;
+    like $session->_generate_session_id, qr/^[A-Za-z0-9_-]{32}$/;
 }->();
 
 sub {
@@ -22,7 +22,7 @@ sub {
         request    => CGI->new(),
         sid_length => 10,
     );
-    like $session->_generate_session_id, qr/^[a-z0-9]{10}$/;
+    like $session->_generate_session_id, qr/^[A-Za-z0-9_-]{10}$/;
 }->();
 
 sub {
@@ -33,5 +33,5 @@ sub {
         request    => CGI->new(),
         sid_length => 10,
     );
-    like $session->_generate_session_id, qr/^[a-z0-9]{10}$/;
+    like $session->_generate_session_id, qr/^[A-Za-z0-9_-]{10}$/;
 }->();

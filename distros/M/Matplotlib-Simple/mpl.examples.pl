@@ -1478,7 +1478,7 @@ for (my $pad = 0.01; $pad <= 0.09; $pad += 0.03) {
 		title       => "pad = $pad"
 	};
 }
-plt({
+plt(
 	execute       => 0,
 	fh            => $fh,
 	'output.file' => 'output.images/hist2d.pads.png',
@@ -1486,13 +1486,13 @@ plt({
 	ncols         => 2,
 	nrows         => 2,
 	scale         => 2
-});
+);
 
 my @t;
 for (my $t = 0.01; $t <= 10; $t += 0.01) {
 	push @t, $t;
 }
-plt({
+plt(
 	execute       => 0,
 	fh            => $fh,
 	data          => [
@@ -1519,8 +1519,8 @@ plt({
 			ylabel      => '"exp", color="red"',
 		}
 	},
-});
-plt({
+);
+plt(
 	execute       => 0,
 	fh            => $fh,
 	data          => {
@@ -1547,7 +1547,7 @@ plt({
 			ylabel      => '"exp", color="red"',
 		}
 	},
-});
+);
 plt({
 	fh                => $fh,
 	execute           => 0,
@@ -1663,7 +1663,7 @@ plt({
 	'output.file' => '/tmp/hist2d.logscale.svg',
 	'plot.type'   => 'hist2d',
 });
-scatter({
+scatter(
 	add           => [
 	{
 		'plot.type' => 'plot',
@@ -1684,7 +1684,7 @@ scatter({
 		B => [1..9]
 	},
 	logscale => ['x', 'y']
-});
+);
 hist({
 	execute       => 0,
 	fh            => $fh,
@@ -1753,7 +1753,31 @@ plt({
 	color_key   => 'MSE',
 	'output.file' => '/tmp/scatter.multiset.colorkey.svg'
 });
-
+plt(
+	p => [
+		{
+			'plot.type' => 'bar',
+			data        => {
+				A => 1, B => 2, C => 3
+			}
+		},
+		{
+			'plot.type' => 'plot',
+			data        => {
+				A => [
+					[0,1,2],
+					[0,1,2]
+				]
+			},
+			'set.options' => {
+				A => 'color = "black"'
+			}
+		}
+	],
+	execute       => 0,
+	fh            => $fh,
+	'output.file' => '/tmp/p.arg.svg'
+);
 plt({
 	fh                => $fh,
 	execute           => 1,

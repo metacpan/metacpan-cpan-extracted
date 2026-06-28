@@ -4,11 +4,20 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::Sad;
-$WebService::OPNsense::IPsec::Sad::VERSION = '0.001';
+$WebService::OPNsense::IPsec::Sad::VERSION = '0.002';
+use Carp qw( croak );
 use Moo;
-use namespace::clean;
+use namespace::clean;    # must be last
 
 has client => ( is => 'ro', required => 1 );
+
+sub _require_id {
+    my ( $self, $id ) = @_;
+    if ( !defined($id) || !length($id) ) {
+        croak 'SAD entry ID is required';
+    }
+    return $id;
+}
 
 sub search {
     my ( $self, %params ) = @_;
@@ -17,6 +26,7 @@ sub search {
 
 sub delete_entry {
     my ( $self, $id ) = @_;
+    $self->_require_id($id);
     return $self->client->post("/api/ipsec/sad/delete/$id");
 }
 
@@ -34,23 +44,19 @@ WebService::OPNsense::IPsec::Sad - IPsec Security Association Database (SAD) con
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
     my $sad = $opn->ipsec_sad;
 
     my $entries = $sad->search;
-    $sad->delete($id);
+    $sad->delete_entry($id);
 
 =head1 DESCRIPTION
 
 Queries and manages the IPsec Security Association
 Database (SAD).
-
-=head1 NAME
-
-WebService::OPNsense::IPsec::Sad - IPsec Security Association Database (SAD) controller
 
 =head1 METHODS
 
@@ -66,7 +72,15 @@ Searches for SAD entries.
 
 Deletes a SAD entry by ID.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $sad->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense>
 
 =head1 AUTHOR
 

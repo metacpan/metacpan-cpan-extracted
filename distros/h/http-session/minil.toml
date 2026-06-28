@@ -1,1 +1,4 @@
 module_maker="ModuleBuildTiny"
+
+[Metadata]
+x_deprecated = 1

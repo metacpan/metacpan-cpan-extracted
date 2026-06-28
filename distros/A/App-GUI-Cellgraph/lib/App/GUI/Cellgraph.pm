@@ -7,7 +7,7 @@ use warnings;
 use Wx;
 use utf8;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 use base qw/Wx::App/;
 use App::GUI::Cellgraph::Frame;
@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-App::GUI::Cellgraph - draw pattern by cellular automata
+App::GUI::Cellgraph - draw pattern with cellular automata
 
 =head1 SYNOPSIS
 

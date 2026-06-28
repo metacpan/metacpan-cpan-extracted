@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Dnsmasq::Settings;
-$WebService::OPNsense::Dnsmasq::Settings::VERSION = '0.001';
+$WebService::OPNsense::Dnsmasq::Settings::VERSION = '0.002';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -19,180 +19,244 @@ with 'WebService::OPNsense::Role::Settings';
 
 sub search_host {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchHost'), \%params );
+    my $uri = $self->_path('searchHost');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_host {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getHost/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getHost/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_host {
     my ( $self, $host_data ) = @_;
-    return $self->client->post( $self->_path('addHost'), $host_data );
+    my $uri = $self->_path('addHost');
+
+    return $self->client->post( $uri, $host_data );
 }
 
 sub set_host {
     my ( $self, $uuid, $host_data ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setHost/{uuid}', uuid => $uuid ), $host_data );
+    my $uri = $self->_path( 'setHost/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $host_data );
 }
 
 sub del_host {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delHost/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delHost/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub search_domain {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchDomain'), \%params );
+    my $uri = $self->_path('searchDomain');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_domain {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getDomain/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getDomain/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_domain {
     my ( $self, $domain_data ) = @_;
-    return $self->client->post( $self->_path('addDomain'), $domain_data );
+    my $uri = $self->_path('addDomain');
+
+    return $self->client->post( $uri, $domain_data );
 }
 
 sub set_domain {
     my ( $self, $uuid, $domain_data ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setDomain/{uuid}', uuid => $uuid ), $domain_data );
+    my $uri = $self->_path( 'setDomain/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $domain_data );
 }
 
 sub del_domain {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delDomain/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delDomain/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub search_option {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchOption'), \%params );
+    my $uri = $self->_path('searchOption');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_option {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getOption/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getOption/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_option {
     my ( $self, $option_data ) = @_;
-    return $self->client->post( $self->_path('addOption'), $option_data );
+    my $uri = $self->_path('addOption');
+
+    return $self->client->post( $uri, $option_data );
 }
 
 sub set_option {
     my ( $self, $uuid, $option_data ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setOption/{uuid}', uuid => $uuid ), $option_data );
+    my $uri = $self->_path( 'setOption/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $option_data );
 }
 
 sub del_option {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delOption/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delOption/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub search_range {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchRange'), \%params );
+    my $uri = $self->_path('searchRange');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_range {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getRange/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getRange/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_range {
     my ( $self, $range_data ) = @_;
-    return $self->client->post( $self->_path('addRange'), $range_data );
+    my $uri = $self->_path('addRange');
+
+    return $self->client->post( $uri, $range_data );
 }
 
 sub set_range {
     my ( $self, $uuid, $range_data ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setRange/{uuid}', uuid => $uuid ), $range_data );
+    my $uri = $self->_path( 'setRange/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $range_data );
 }
 
 sub del_range {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delRange/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delRange/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub search_tag {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchTag'), \%params );
+    my $uri = $self->_path('searchTag');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_tag {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getTag/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getTag/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_tag {
     my ( $self, $tag_data ) = @_;
-    return $self->client->post( $self->_path('addTag'), $tag_data );
+    my $uri = $self->_path('addTag');
+
+    return $self->client->post( $uri, $tag_data );
 }
 
 sub set_tag {
     my ( $self, $uuid, $tag_data ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setTag/{uuid}', uuid => $uuid ), $tag_data );
+    my $uri = $self->_path( 'setTag/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $tag_data );
 }
 
 sub del_tag {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delTag/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delTag/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub search_boot {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchBoot'), \%params );
+    my $uri = $self->_path('searchBoot');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_boot {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getBoot/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getBoot/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_boot {
     my ( $self, $boot_data ) = @_;
-    return $self->client->post( $self->_path('addBoot'), $boot_data );
+    my $uri = $self->_path('addBoot');
+
+    return $self->client->post( $uri, $boot_data );
 }
 
 sub set_boot {
     my ( $self, $uuid, $boot_data ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setBoot/{uuid}', uuid => $uuid ), $boot_data );
+    my $uri = $self->_path( 'setBoot/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $boot_data );
 }
 
 sub del_boot {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delBoot/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delBoot/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub download_hosts {
     my ($self) = @_;
-    return $self->client->get( $self->_path('downloadHosts') );
+    my $uri = $self->_path('downloadHosts');
+
+    return $self->client->get($uri);
 }
 
 sub upload_hosts {
     my ( $self, $hosts_data ) = @_;
-    return $self->client->post( $self->_path('uploadHosts'), $hosts_data );
+    my $uri = $self->_path('uploadHosts');
+
+    return $self->client->post( $uri, $hosts_data );
 }
 
 1;
@@ -209,7 +273,7 @@ WebService::OPNsense::Dnsmasq::Settings - Dnsmasq settings controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -219,7 +283,7 @@ version 0.001
     my $config = $settings->get;
 
     # Update settings
-    $settings->set({ dnsmasq => { enabled => 1 } });
+    $settings->set_settings({ dnsmasq => { enabled => 1 } });
 
     # Search hosts
     my $hosts = $settings->search_host(current => 1, rowCount => 50);
@@ -238,17 +302,13 @@ version 0.001
 Dnsmasq settings, including host overrides, domain overrides, DHCP options,
 ranges, tags, and boot settings.
 
-=head1 NAME
-
-WebService::OPNsense::Dnsmasq::Settings - Dnsmasq settings controller
-
 =head1 METHODS
 
-=head2 get
+=head2 get_settings
 
-    my $config = $settings->get;
+    my $config = $settings->get_settings;
 
-Returns the current Dnsmasq configuration.
+Returns Dnsmasq configuration.
 
 =head2 set_settings
 
@@ -272,13 +332,13 @@ Returns a single host override by UUID.
 
     my $result = $settings->add_host($host_data);
 
-Creates a new host override.
+Creates host override.
 
 =head2 set_host
 
     my $result = $settings->set_host($uuid, $host_data);
 
-Updates an existing host override.
+Updates host override.
 
 =head2 del_host
 
@@ -302,13 +362,13 @@ Returns a single domain override by UUID.
 
     my $result = $settings->add_domain($domain_data);
 
-Creates a new domain override.
+Creates domain override.
 
 =head2 set_domain
 
     my $result = $settings->set_domain($uuid, $domain_data);
 
-Updates an existing domain override.
+Updates domain override.
 
 =head2 del_domain
 
@@ -332,13 +392,13 @@ Returns a single DHCP option by UUID.
 
     my $result = $settings->add_option($option_data);
 
-Creates a new DHCP option.
+Creates DHCP option.
 
 =head2 set_option
 
     my $result = $settings->set_option($uuid, $option_data);
 
-Updates an existing DHCP option.
+Updates DHCP option.
 
 =head2 del_option
 
@@ -362,13 +422,13 @@ Returns a single DHCP range by UUID.
 
     my $result = $settings->add_range($range_data);
 
-Creates a new DHCP range.
+Creates DHCP range.
 
 =head2 set_range
 
     my $result = $settings->set_range($uuid, $range_data);
 
-Updates an existing DHCP range.
+Updates DHCP range.
 
 =head2 del_range
 
@@ -392,13 +452,13 @@ Returns a single tag by UUID.
 
     my $result = $settings->add_tag($tag_data);
 
-Creates a new tag.
+Creates tag.
 
 =head2 set_tag
 
     my $result = $settings->set_tag($uuid, $tag_data);
 
-Updates an existing tag.
+Updates tag.
 
 =head2 del_tag
 
@@ -422,13 +482,13 @@ Returns a single boot setting by UUID.
 
     my $result = $settings->add_boot($boot_data);
 
-Creates a new boot setting.
+Creates boot setting.
 
 =head2 set_boot
 
     my $result = $settings->set_boot($uuid, $boot_data);
 
-Updates an existing boot setting.
+Updates boot setting.
 
 =head2 del_boot
 
@@ -448,7 +508,15 @@ Downloads host overrides as a data structure.
 
 Uploads host overrides from a data structure.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $settings->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Settings>
 
 =head1 AUTHOR
 

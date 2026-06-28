@@ -403,6 +403,8 @@ my %PARSERS = (
 
 sub parse {
     my ($class, $raw) = @_;
+    croak "message JSON must be UTF-8 encoded bytes, not decoded characters\n"
+        if defined $raw && !ref($raw) && $raw =~ /[^\x00-\xFF]/;
     my $arr = eval { $JSON->decode($raw) };
     croak "invalid JSON: $@\n" if $@;
     croak "message must be a JSON array\n" unless ref($arr) eq 'ARRAY';
@@ -509,18 +511,23 @@ arguments, type mismatches, unknown type, or unknown arguments.
     my $json = $msg->serialize;
 
 Returns the JSON-encoded message string per the NIP-01 wire format.
+The returned string is UTF-8 encoded bytes suitable for WebSocket I/O.
 
     my $msg = Net::Nostr::Message->new(type => 'CLOSE', subscription_id => 'x');
     say $msg->serialize;  # '["CLOSE","x"]'
 
 =head2 parse
 
-    my $msg = Net::Nostr::Message->parse($json_string);
+    my $msg = Net::Nostr::Message->parse($json_bytes);
 
-Class method. Parses a JSON message string and returns a new
-Net::Nostr::Message object. Croaks on invalid JSON, unknown message
-types, or malformed messages. Validates structural format of each
-message type (element count, field types). String fields
+Class method. Parses a UTF-8 encoded JSON message byte string and returns
+a new Net::Nostr::Message object. Decoded Perl strings containing
+characters outside the byte range are rejected; pass the UTF-8 wire bytes
+received from the relay/client.
+
+Croaks on invalid JSON, unknown message types, or malformed messages.
+Validates structural format of each message type (element count, field
+types). String fields
 (subscription_id, message, challenge) are rejected if they are JSON
 objects or arrays. C<event_id> in OK messages must be 64-character
 lowercase hex. For EVENT and AUTH messages, the contained event is

@@ -15,9 +15,9 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Getopt::Long::Descriptive;
 use Mojo::File 'path';
-use Safe::Isa;
 use Feature::Compat::Try;
 use List::Util 'max';
+use builtin::compat 'blessed';
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
 use OpenAPI::Modern::Utilities ':constants';
@@ -70,7 +70,7 @@ sub process ($encoded_document, $openapi = 0, $document_filename = undef) {
       $js->add_document($document) if $opt->dump_identifiers;
     }
     catch ($e) {
-      say $e->$_isa('JSON::Schema::Modern::Result') ? $e->dump : $e;
+      say blessed($e) && $e->isa('JSON::Schema::Modern::Result') ? $e->dump : $e;
       exit 2;
     }
 
@@ -156,7 +156,10 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.138
+version 0.139
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 

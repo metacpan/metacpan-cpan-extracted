@@ -1,7 +1,7 @@
 # ABSTRACT: Ref-backed board storage for karr
 
 package App::karr::BoardStore;
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 use Moo;
 use File::Temp qw( tempdir );
 use Path::Tiny qw( path );
@@ -265,7 +265,7 @@ App::karr::BoardStore - Ref-backed board storage for karr
 
 =head1 VERSION
 
-version 0.302
+version 0.303
 
 =head1 SYNOPSIS
 

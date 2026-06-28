@@ -19,7 +19,7 @@ my $deplib  = 'Try/Tiny';
 my $options = {
   source => {
     $lib        => "$pwd/test_dists/$lib/$lib-1.0.tar.gz",
-    'Try::Tiny' => 'E/ET/ETHER/Try-Tiny-0.24.tar.gz',
+    'Try::Tiny' => 'E/ET/ETHER/Try-Tiny-0.32.tar.gz',
   },
 };
 
@@ -43,7 +43,7 @@ diag("Try::Tiny => $INC{'Try/Tiny.pm'}");
 }
 
 diag("Try::Tiny => $INC{'Try/Tiny.pm'}");
-is( $Try::Tiny::VERSION, '0.24', "The correct version was installed" );
+is( $Try::Tiny::VERSION, '0.32', "The correct version was installed" );
 
 chdir $pwd;
 done_testing;

@@ -1,5 +1,13 @@
 Revision history for App-MechaCPAN
 
+0.31  2026-06-27 10:42:12 EDT
+  - Switch to using only tar for inflating archives, removing shell pipes
+  - Clean up the logic around the cpanfile parsing, mainly around conflicts
+  - Start doing SHA256 checks on perl and module installations
+  - Add support for CHECKSUM checks on modules with the --verify option
+  - Update the versoin of Try::Tiny in tests for new perl versions (GH#25)
+  - Other small bugfixes
+
 0.30  2023-08-22 22:29:58 EDT
   - Document the new prebuilt binary feature
   - Make the binary download feature not the default for the time being

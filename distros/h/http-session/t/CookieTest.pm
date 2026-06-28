@@ -58,7 +58,7 @@ sub test {
             state   => HTTP::Session::State::Cookie->new(),
             request => $cgi->new
         );
-        like $session->session_id(), qr/^[a-z0-9]{32}$/, 'cookie not found';
+        like $session->session_id(), qr/^[A-Za-z0-9_-]{32}$/, 'cookie not found';
     }->();
 
     sub {
@@ -202,7 +202,7 @@ sub test {
             state   => HTTP::Session::State::Cookie->new(),
             request => TestRequest->new
         );
-        like $session->session_id(), qr/^[a-z0-9]{32}$/, 'cookie not found';
+        like $session->session_id(), qr/^[A-Za-z0-9_-]{32}$/, 'cookie not found';
     }->();
 }
 

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Kea::CtrlAgent;
-$WebService::OPNsense::Kea::CtrlAgent::VERSION = '0.001';
+$WebService::OPNsense::Kea::CtrlAgent::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
@@ -30,7 +30,7 @@ WebService::OPNsense::Kea::CtrlAgent - Kea control agent controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -38,21 +38,17 @@ version 0.001
 
     my $config = $ctrl_agent->get;
 
-    $ctrl_agent->set({ ... });
+    $ctrl_agent->set_settings({ ... });
 
 =head1 DESCRIPTION
 
 Kea control agent configuration.
 
-=head1 NAME
-
-WebService::OPNsense::Kea::CtrlAgent - Kea control agent controller
-
 =head1 METHODS
 
-=head2 get
+=head2 get_settings
 
-    my $config = $ctrl_agent->get;
+    my $config = $ctrl_agent->get_settings;
 
 Returns the full Kea control agent configuration.
 
@@ -62,7 +58,15 @@ Returns the full Kea control agent configuration.
 
 Updates the Kea control agent configuration.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $ctrl_agent->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Settings>
 
 =head1 AUTHOR
 

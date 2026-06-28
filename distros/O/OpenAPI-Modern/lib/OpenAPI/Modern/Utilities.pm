@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.138';
+our $VERSION = '0.139';
 
 use 5.020;
 use strictures 2;
@@ -253,7 +253,7 @@ sub elem ($items, $set) {
 
   any {
     my $x = $_;
-    any { $x eq $_ } @$items
+    any { defined $x ? (defined $_ && $x eq $_) : (!defined $_) } @$items
   }
   @$set;
 }
@@ -280,7 +280,10 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.138
+version 0.139
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 

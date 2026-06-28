@@ -19,13 +19,14 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "WebService-OPNsense",
-  "dist_version" => "0.001",
+  "dist_version" => "0.002",
   "license" => "mit",
   "module_name" => "WebService::OPNsense",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
     "Const::Fast" => 0,
+    "Exporter::Shiny" => 0,
     "Exporter::Tiny" => 0,
     "JSON::MaybeXS" => 0,
     "Moo" => 0,
@@ -43,8 +44,12 @@ my %module_build_args = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Net::CIDR::Lite" => 0,
+    "Net::Netmask" => 0,
+    "NetAddr::IP" => 0,
     "Test2::V1" => "1.302217",
-    "Test::More" => 0
+    "Test::LWP::UserAgent" => 0,
+    "Test::More" => 0,
+    "constant" => 0
   }
 );
 
@@ -55,8 +60,12 @@ my %fallback_build_requires = (
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Net::CIDR::Lite" => 0,
+  "Net::Netmask" => 0,
+  "NetAddr::IP" => 0,
   "Test2::V1" => "1.302217",
-  "Test::More" => 0
+  "Test::LWP::UserAgent" => 0,
+  "Test::More" => 0,
+  "constant" => 0
 );
 
 

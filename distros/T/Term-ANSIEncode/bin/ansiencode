@@ -286,7 +286,8 @@ sub dump_chars {
             }
         }
     }
-	return($temp);
+    $temp .= "\n";
+    return($temp);
 }
 
 sub raw_tokens {

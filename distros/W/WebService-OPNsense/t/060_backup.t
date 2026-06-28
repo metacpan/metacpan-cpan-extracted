@@ -1,15 +1,21 @@
 #!perl
-use v5.24;
 use strictures 2;
 
-use Test2::V1               qw( is ok done_testing );
-use Test2::Tools::Exception qw( dies );
+use Test2::V1               qw( is ok subtest done_testing );
+use Test2::Tools::Exception ();
 
-use HTTP::Response;
-use Test::LWP::UserAgent;
+use HTTP::Response       ();
+use Ref::Util            qw( is_plain_hashref );
+use Test::LWP::UserAgent ();
+
+use constant {
+    HTTP_OK                  => 200,
+    HTTP_NOT_FOUND           => 404,
+    HTTP_INTERNAL_SERVER_ERR => 500,
+};
 
 BEGIN { $WebService::OPNsense::VERSION = '0.001' }
-use WebService::OPNsense;
+use WebService::OPNsense ();
 
 # Helper: build an OPNsense object with a mock handler
 sub _build_opn {
@@ -24,154 +30,313 @@ sub _build_opn {
     );
 }
 
-# providers (GET, 200, decoded data)
-{
+subtest 'providers' => sub {
+    subtest 'GET 200 decoded data' => sub {
+        my $captured;
+        my $opn = _build_opn(
+            sub {
+                my ($req) = @_;
+                $captured = $req->uri->as_string;
+                HTTP::Response->new(
+                    HTTP_OK, 'OK',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"rows":[{"name":"file","enabled":"1"},{"name":"ftp","enabled":"0"}]}',
+                );
+            }
+        );
+        my $providers = $opn->backup->providers;
+        is(
+            $captured,
+            'https://opnsense.example.com/api/core/backup/providers',
+            'URL path'
+        );
+        ok( is_plain_hashref($providers), 'returns hashref' );
+        is( $providers->{rows}[0]{name},    'file', 'first row name' );
+        is( $providers->{rows}[0]{enabled}, '1',    'first row enabled' );
+        is( $providers->{rows}[1]{name},    'ftp',  'second row name' );
+    };
+
+    subtest 'GET 200 empty content returns undef' => sub {
+        my $opn = _build_opn(
+            sub {
+                HTTP::Response->new(
+                    HTTP_OK, 'OK',
+                    [ 'Content-Type' => 'application/json' ],
+                    q{},
+                );
+            }
+        );
+        ok(
+            !defined $opn->backup->providers,
+            'empty content returns undef'
+        );
+    };
+};
+
+subtest 'backups with host' => sub {
     my $captured;
     my $opn = _build_opn(
         sub {
             my ($req) = @_;
             $captured = $req->uri->as_string;
             HTTP::Response->new(
-                200, 'OK',
-                [ 'Content-Type' => 'application/json' ],
-                '{"rows":[{"name":"file","enabled":"1"},{"name":"ftp","enabled":"0"}]}',
-            );
-        }
-    );
-    my $data = $opn->backup->providers;
-    is(
-        $captured,
-        'https://opnsense.example.com/api/core/backup/providers',
-        'providers URL path'
-    );
-    is( ref $data,                 'HASH', 'providers returns hashref' );
-    is( $data->{rows}[0]{name},    'file', 'providers first row name' );
-    is( $data->{rows}[0]{enabled}, '1',    'providers first row enabled' );
-    is( $data->{rows}[1]{name},    'ftp',  'providers second row name' );
-}
-
-# providers (GET, 200, empty content)
-{
-    my $opn = _build_opn(
-        sub {
-            HTTP::Response->new(
-                200, 'OK',
-                [ 'Content-Type' => 'application/json' ],
-                '',
-            );
-        }
-    );
-    ok(
-        !defined $opn->backup->providers,
-        'providers empty content returns undef'
-    );
-}
-
-# backups with host (GET, 200)
-{
-    my $captured;
-    my $opn = _build_opn(
-        sub {
-            my ($req) = @_;
-            $captured = $req->uri->as_string;
-            HTTP::Response->new(
-                200, 'OK',
+                HTTP_OK, 'OK',
                 [ 'Content-Type' => 'application/json' ],
                 '{"rows":[{"id":"20200601","description":"nightly"}]}',
             );
         }
     );
-    my $data = $opn->backup->backups('myfirewall');
+    my $backups = $opn->backup->backups('myfirewall');
     is(
         $captured,
         'https://opnsense.example.com/api/core/backup/backups/myfirewall',
-        'backups URL path with host'
+        'URL path with host'
     );
-    is( ref $data,            'HASH',     'backups returns hashref' );
-    is( $data->{rows}[0]{id}, '20200601', 'backups row id' );
-}
+    ok( is_plain_hashref($backups), 'returns hashref' );
+    is( $backups->{rows}[0]{id}, '20200601', 'row id' );
+};
 
-# backups 404 (GET, suppressed)
-{
+subtest 'backups 404 returns undef' => sub {
     my $opn = _build_opn(
         sub {
-            HTTP::Response->new( 404, 'Not Found' );
+            HTTP::Response->new( HTTP_NOT_FOUND, 'Not Found' );
         }
     );
     ok(
         !defined $opn->backup->backups('missing'),
-        'backups 404 returns undef'
+        '404 returns undef'
     );
-}
+};
 
-# delete_backup (POST, 200, decoded data)
-{
-    my ( $captured, $method );
-    my $opn = _build_opn(
-        sub {
-            my ($req) = @_;
-            $captured = $req->uri->as_string;
-            $method   = $req->method;
-            HTTP::Response->new(
-                200, 'OK',
-                [ 'Content-Type' => 'application/json' ],
-                '{"result":"deleted"}',
-            );
-        }
-    );
-    my $data = $opn->backup->delete_backup('bak-20200601');
-    is( $method, 'POST', 'delete_backup uses POST' );
-    is(
-        $captured,
-        'https://opnsense.example.com/api/core/backup/deleteBackup/bak-20200601',
-        'delete_backup URL path'
-    );
-    is( $data->{result}, 'deleted', 'delete_backup result' );
-}
+subtest 'delete_backup' => sub {
+    subtest 'POST 200 success' => sub {
+        my ( $captured, $method );
+        my $opn = _build_opn(
+            sub {
+                my ($req) = @_;
+                $captured = $req->uri->as_string;
+                $method   = $req->method;
+                HTTP::Response->new(
+                    HTTP_OK, 'OK',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"result":"deleted"}',
+                );
+            }
+        );
+        my $result = $opn->backup->delete_backup('bak-20200601');
+        is( $method, 'POST', 'uses POST' );
+        is(
+            $captured,
+            'https://opnsense.example.com/api/core/backup/deleteBackup/bak-20200601',
+            'URL path'
+        );
+        is( $result->{result}, 'deleted', 'result' );
+    };
 
-# delete_backup error (POST, 500, Exception)
-{
-    my $opn = _build_opn(
-        sub {
-            HTTP::Response->new(
-                500, 'Internal Server Error',
-                [ 'Content-Type' => 'application/json' ],
-                '{"error":"delete failed"}',
-            );
-        }
-    );
-    my $e = eval { $opn->backup->delete_backup('bad-bak'); undef } || $@;
-    ok(
-        $e->isa('WebService::OPNsense::Exception'),
-        'delete_backup 500 throws Exception'
-    );
-    is( $e->http_status, 500,             'exception http_status' );
-    is( $e->message,     'delete failed', 'exception message' );
-}
+    subtest 'POST 500 throws Exception' => sub {
+        my $opn = _build_opn(
+            sub {
+                HTTP::Response->new(
+                    HTTP_INTERNAL_SERVER_ERR, 'Internal Server Error',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"error":"delete failed"}',
+                );
+            }
+        );
+        my $e = eval { $opn->backup->delete_backup('bad-bak'); undef } || $@;
+        ok(
+            $e->isa('WebService::OPNsense::Exception'),
+            '500 throws Exception'
+        );
+        is( $e->http_status, HTTP_INTERNAL_SERVER_ERR, 'http_status' );
+        is( $e->message,     'delete failed',          'message' );
+    };
+};
 
-# revert_backup (POST, 200, decoded data)
-{
-    my ( $captured, $method );
-    my $opn = _build_opn(
-        sub {
-            my ($req) = @_;
-            $captured = $req->uri->as_string;
-            $method   = $req->method;
-            HTTP::Response->new(
-                200, 'OK',
-                [ 'Content-Type' => 'application/json' ],
-                '{"result":"reverted"}',
-            );
-        }
-    );
-    my $data = $opn->backup->revert_backup('bak-20200601');
-    is( $method, 'POST', 'revert_backup uses POST' );
-    is(
-        $captured,
-        'https://opnsense.example.com/api/core/backup/revertBackup/bak-20200601',
-        'revert_backup URL path'
-    );
-    is( $data->{result}, 'reverted', 'revert_backup result' );
-}
+subtest 'revert_backup' => sub {
+    subtest 'POST 200 success' => sub {
+        my ( $captured, $method );
+        my $opn = _build_opn(
+            sub {
+                my ($req) = @_;
+                $captured = $req->uri->as_string;
+                $method   = $req->method;
+                HTTP::Response->new(
+                    HTTP_OK, 'OK',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"result":"reverted"}',
+                );
+            }
+        );
+        my $result = $opn->backup->revert_backup('bak-20200601');
+        is( $method, 'POST', 'uses POST' );
+        is(
+            $captured,
+            'https://opnsense.example.com/api/core/backup/revertBackup/bak-20200601',
+            'URL path'
+        );
+        is( $result->{result}, 'reverted', 'result' );
+    };
+
+    subtest 'POST 500 throws Exception' => sub {
+        my $opn = _build_opn(
+            sub {
+                HTTP::Response->new(
+                    HTTP_INTERNAL_SERVER_ERR, 'Internal Server Error',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"error":"revert failed"}',
+                );
+            }
+        );
+        my $e = eval { $opn->backup->revert_backup('bad-bak'); undef } || $@;
+        ok(
+            $e->isa('WebService::OPNsense::Exception'),
+            '500 throws Exception'
+        );
+        is( $e->http_status, HTTP_INTERNAL_SERVER_ERR, 'http_status' );
+        is( $e->message,     'revert failed',          'message' );
+    };
+};
+
+subtest 'download' => sub {
+    subtest 'GET 200 with specific backup revision' => sub {
+        my ( $captured, $method );
+        my $opn = _build_opn(
+            sub {
+                my ($req) = @_;
+                $captured = $req->uri->as_string;
+                $method   = $req->method;
+                HTTP::Response->new(
+                    HTTP_OK, 'OK',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"configuration":"<opnsense></opnsense>"}',
+                );
+            }
+        );
+        my $config = $opn->backup->download( 'myfirewall', 'bak-20200601' );
+        is( $method, 'GET', 'uses GET' );
+        is(
+            $captured,
+            'https://opnsense.example.com/api/core/backup/download/myfirewall/bak-20200601',
+            'URL path with backup revision'
+        );
+        is( $config->{configuration}, '<opnsense></opnsense>', 'returned data' );
+    };
+
+    subtest 'GET 200 without backup revision (optional segment omitted)' => sub {
+        my ( $captured, $method );
+        my $opn = _build_opn(
+            sub {
+                my ($req) = @_;
+                $captured = $req->uri->as_string;
+                $method   = $req->method;
+                HTTP::Response->new(
+                    HTTP_OK, 'OK',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"configuration":"<opnsense></opnsense>"}',
+                );
+            }
+        );
+        my $config = $opn->backup->download('myfirewall');
+        is( $method, 'GET', 'uses GET' );
+        is(
+            $captured,
+            'https://opnsense.example.com/api/core/backup/download/myfirewall',
+            'URL path without backup revision'
+        );
+        is( $config->{configuration}, '<opnsense></opnsense>', 'returned data' );
+    };
+
+    subtest 'GET 404 returns undef' => sub {
+        my $opn = _build_opn(
+            sub {
+                HTTP::Response->new( HTTP_NOT_FOUND, 'Not Found' );
+            }
+        );
+        ok(
+            !defined $opn->backup->download('myfirewall'),
+            '404 returns undef'
+        );
+    };
+
+    subtest 'GET 500 throws Exception' => sub {
+        my $opn = _build_opn(
+            sub {
+                HTTP::Response->new(
+                    HTTP_INTERNAL_SERVER_ERR, 'Internal Server Error',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"error":"download failed"}',
+                );
+            }
+        );
+        my $e = eval { $opn->backup->download('myfirewall'); undef } || $@;
+        ok(
+            $e->isa('WebService::OPNsense::Exception'),
+            '500 throws Exception'
+        );
+        is( $e->http_status, HTTP_INTERNAL_SERVER_ERR, 'http_status' );
+        is( $e->message,     'download failed',        'message' );
+    };
+};
+
+subtest 'diff' => sub {
+    subtest 'GET 200 success' => sub {
+        my ( $captured, $method );
+        my $opn = _build_opn(
+            sub {
+                my ($req) = @_;
+                $captured = $req->uri->as_string;
+                $method   = $req->method;
+                HTTP::Response->new(
+                    HTTP_OK, 'OK',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"diff":"old vs new"}',
+                );
+            }
+        );
+        my $diff = $opn->backup->diff( 'myfirewall', 'bak-v1', 'bak-v2' );
+        is( $method, 'GET', 'uses GET' );
+        is(
+            $captured,
+            'https://opnsense.example.com/api/core/backup/diff/myfirewall/bak-v1/bak-v2',
+            'URL path'
+        );
+        ok( defined $diff->{diff}, 'diff data returned' );
+    };
+
+    subtest 'GET 404 returns undef' => sub {
+        my $opn = _build_opn(
+            sub {
+                HTTP::Response->new( HTTP_NOT_FOUND, 'Not Found' );
+            }
+        );
+        ok(
+            !defined $opn->backup->diff( 'myfirewall', 'bak-v1', 'bak-v2' ),
+            '404 returns undef'
+        );
+    };
+
+    subtest 'GET 500 throws Exception' => sub {
+        my $opn = _build_opn(
+            sub {
+                HTTP::Response->new(
+                    HTTP_INTERNAL_SERVER_ERR, 'Internal Server Error',
+                    [ 'Content-Type' => 'application/json' ],
+                    '{"error":"diff failed"}',
+                );
+            }
+        );
+        my $e = eval {
+            $opn->backup->diff( 'myfirewall', 'bak-v1', 'bak-v2' );
+            undef;
+        } || $@;
+        ok(
+            $e->isa('WebService::OPNsense::Exception'),
+            '500 throws Exception'
+        );
+        is( $e->http_status, HTTP_INTERNAL_SERVER_ERR, 'http_status' );
+        is( $e->message,     'diff failed',            'message' );
+    };
+};
 
 done_testing;

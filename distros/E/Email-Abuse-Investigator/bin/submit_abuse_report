@@ -413,7 +413,8 @@ sub _send_report {
         inv      => $a{inv},
     );
 
-    # Debug: if SUBMIT_ABUSE_DUMP_MIME is set, write the raw MIME to a file
+    # Developer aid: set SUBMIT_ABUSE_DUMP_MIME=path to write the raw MIME
+    # message to a file for inspection (e.g. SUBMIT_ABUSE_DUMP_MIME=/tmp/out.eml).
     if (my $dump = $ENV{SUBMIT_ABUSE_DUMP_MIME}) {
         if (open my $fh, '>', $dump) {
             print $fh $mail;

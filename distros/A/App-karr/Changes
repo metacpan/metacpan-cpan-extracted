@@ -1,3 +1,13 @@
+0.303     2026-06-28 02:07:23Z
+
+    - Docker: build Alien::FFI against the system libffi (apt libffi-dev) instead
+      of fetching a libffi tarball from a GitHub release page, which broke the
+      image build intermittently in CI (Alien::Build itself warns the
+      release-page download negotiator "will typically not work"). The runtime
+      image now ships libffi8 for the dynamically linked FFI::Platypus. The
+      vendored libgit2 (share) build is unchanged, so the runtime stays
+      self-contained.
+
 0.302     2026-06-21 23:04:42Z
 
     - `karr board` now renders a compact, Markdown-flavoured plaintext board

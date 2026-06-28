@@ -1,16 +1,16 @@
 {
-   "abstract" : "draw pattern by cellular automata",
+   "abstract" : "draw pattern with cellular automata",
    "author" : [
       "Herbert Breunung <lichtkind@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "App-GUI-Cellgraph",
    "no_index" : {
@@ -51,7 +51,7 @@
    "provides" : {
       "App::GUI::Cellgraph" : {
          "file" : "lib/App/GUI/Cellgraph.pm",
-         "version" : "0.82"
+         "version" : "0.83"
       }
    },
    "release_status" : "stable",
@@ -62,9 +62,9 @@
          "web" : "https://github.com/lichtkind/App-GUI-Cellgraph"
       }
    },
-   "version" : "0.82",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.83",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

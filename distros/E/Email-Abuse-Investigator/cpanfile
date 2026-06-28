@@ -3,12 +3,12 @@
 requires 'perl', '5.010';
 
 requires 'IO::Socket::INET';
-requires 'IPC::System::Simple';
 requires 'MIME::Base64';
 requires 'MIME::QuotedPrint';
 requires 'Object::Configure';
 requires 'Params::Get';
 requires 'Params::Validate::Strict', '0.34';
+requires 'Readonly';
 requires 'Readonly::Values::Months';
 requires 'Socket';
 requires 'Sub::Private', '0.05';
@@ -22,6 +22,7 @@ on 'configure' => sub {
 
 on 'test' => sub {
 	requires 'FindBin';
+	requires 'IPC::System::Simple';
 	requires 'MIME::Base64';
 	requires 'MIME::QuotedPrint';
 	requires 'POSIX';

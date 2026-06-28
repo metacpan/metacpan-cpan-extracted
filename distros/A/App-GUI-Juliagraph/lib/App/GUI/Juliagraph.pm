@@ -7,7 +7,7 @@ use warnings;
 use Wx;
 use utf8;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 use base qw/Wx::App/;
 use App::GUI::Juliagraph::Frame;
@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-App::GUI::Juliagraph - drawing Mandelbrot-, Julia fractals and more
+App::GUI::Juliagraph - draw Mandelbrot-, Julia fractals and more
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,7 @@ an interesting image
 =item 4.
 
 push "Draw" (below drawing board) or Ctrl+D or I<Draw> in I<Image> menu,
-or middle click of the drawing board, to produce full resolution image
+or middle click over the drawing board, to produce full resolution image
 
 =item 5.
 

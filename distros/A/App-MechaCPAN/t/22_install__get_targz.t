@@ -51,7 +51,13 @@ SKIP:
     my $tgz = eval { App::MechaCPAN::Install::_get_targz($target) };
     diag("Error: '$@'")
       if $@;
-    ok( -s "$tgz", "Got '$src'" );
+
+    if ( ref $tgz eq 'HASH' )
+    {
+      $tgz = $tgz->{src};
+    }
+
+    isnt( -s "$tgz", undef, "Got '$src'" );
   }
 }
 

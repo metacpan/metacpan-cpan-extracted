@@ -1,4 +1,4 @@
-package Term::ANSIEncode 2.04;
+package Term::ANSIEncode 2.05;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -59,7 +59,7 @@ BEGIN {
     our @EXPORT_OK = qw(ansi_colors);
 } ## end BEGIN
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 # Package-level caches so large tables are built only once per process.
 our $GLOBAL_ANSI_META = _global_ansi_meta();

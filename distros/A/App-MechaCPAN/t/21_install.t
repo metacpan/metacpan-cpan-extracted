@@ -11,7 +11,7 @@ my $pwd = cwd;
 foreach my $dist ( sort glob("$FindBin::Bin/../test_dists/*/*.tar.gz") )
 {
   next
-    if $dist =~ m/Fail/xms;
+    if $dist =~ m{Fail|ShadyTars}xms;
 
   chdir $pwd;
   my $tmpdir = tempdir( TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX", CLEANUP => 1 );

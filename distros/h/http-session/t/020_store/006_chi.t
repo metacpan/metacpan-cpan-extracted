@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use lib qw(../../ .);
 use Test::Requires 'CHI';
-use Test::More tests => 4*2;
+use Test::More tests => (4 + 12) * 2;
 use t::Exception;
 use HTTP::Session;
 use CGI;
@@ -32,5 +32,30 @@ sub run_tests {
     is $store->select('foo'), undef;
     $store->insert('foo' => {boo => 'fy'});
     is $store->select('foo')->{'boo'}, 'fy', 'complex';
+
+    my $bad_key = "x" x 1024 . rand();
+    injection(sub { $store->select($bad_key); });
+    injection(sub { $store->insert($bad_key, {foo => 'bar'}); });
+    injection(sub { $store->update($bad_key, {foo => 'bar'}); });
+
+    $bad_key = "x\r\nstats\r\n" . rand();
+    injection(sub { $store->select($bad_key); });
+    injection(sub { $store->insert($bad_key, {foo => 'bar'}); });
+    injection(sub { $store->update($bad_key, {foo => 'bar'}); });
+
+    $bad_key = "m e m c a c h e d" . rand();
+    injection(sub { $store->select($bad_key); });
+    injection(sub { $store->insert($bad_key, {foo => 'bar'}); });
+    injection(sub { $store->update($bad_key, {foo => 'bar'}); });
+
+    $bad_key = qq!\x{3042}!x100;
+    injection(sub { $store->select($bad_key); });
+    injection(sub { $store->insert($bad_key, {foo => 'bar'}); });
+    injection(sub { $store->update($bad_key, {foo => 'bar'}); });
 }
 
+sub injection {
+    my $code = shift;
+    eval { $code->() };
+    like $@, qr/injection/;
+}

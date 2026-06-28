@@ -1,0 +1,375 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+4 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+5 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+6 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+7 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+8 0 obj
+<</Length 1428>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 722 Tm
+(Interactive Form Fields) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 40 Tf
+1 0 0 1 20 657 Tm
+(Text Input) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 635 Tm
+(Name:) Tj
+ET
+q
+1 1 1 rg
+20 602 200 24 re
+f
+0.75 w
+0.666666666666666 0.666666666666666 0.666666666666666 RG
+20.25 602.25 199.5 23.5 re
+S
+Q
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 585 Tm
+(Email:) Tj
+ET
+q
+1 1 1 rg
+20 552 200 24 re
+f
+0.75 w
+0.666666666666666 0.666666666666666 0.666666666666666 RG
+20.25 552.25 199.5 23.5 re
+S
+Q
+BT
+0 0 0 rg
+/F_Helvetica_normal 40 Tf
+1 0 0 1 20 504 Tm
+(Checkboxes) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 482 Tm
+(I agree to the terms:) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 442 Tm
+(Subscribe to newsletter:) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 40 Tf
+1 0 0 1 20 371 Tm
+(Dropdown \(Combo\)) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 349 Tm
+(Country:) Tj
+ET
+q
+1 1 1 rg
+20 316 200 24 re
+f
+0.75 w
+0.666666666666666 0.666666666666666 0.666666666666666 RG
+20.25 316.25 199.5 23.5 re
+S
+Q
+BT
+0 0 0 rg
+/F_Helvetica_normal 40 Tf
+1 0 0 1 20 268 Tm
+(List Box) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 246 Tm
+(Interests:) Tj
+ET
+q
+1 1 1 rg
+20 157 200 80 re
+f
+0.75 w
+0.666666666666666 0.666666666666666 0.666666666666666 RG
+20.25 157.25 199.5 79.5 re
+S
+Q
+BT
+0 0 0 rg
+/F_Helvetica_normal 40 Tf
+1 0 0 1 20 109 Tm
+(Push Button) Tj
+ET
+
+endstream
+endobj
+9 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+10 0 obj
+<</BBox [0 0 200 24]/Type /XObject/Subtype /Form/Resources <</Font <</Helv 9 0 R>>>>/Length 84>>
+stream
+q
+1 1 1 rg
+0 0 200.00 24.00 re f
+BT
+/Helv 10 Tf 0 g
+2.00 8.00 Td
+(Jane Doe) Tj
+ET
+Q
+
+endstream
+endobj
+11 0 obj
+<</FT /Tx/T (full_name)/V (Jane Doe)/DA (/Helv 10 Tf 0 g)/Type /Annot/Subtype /Widget/Rect [20 602 220 626]/Border [0 0 1]/MK <</BC [0 0 0]/BG [1 1 1]>>/F 4/AP <</N 10 0 R>>>>
+endobj
+12 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+13 0 obj
+<</BBox [0 0 200 24]/Type /XObject/Subtype /Form/Resources <</Font <</Helv 12 0 R>>>>/Length 35>>
+stream
+q
+1 1 1 rg
+0 0 200.00 24.00 re f
+Q
+
+endstream
+endobj
+14 0 obj
+<</FT /Tx/T (email)/DA (/Helv 10 Tf 0 g)/Type /Annot/Subtype /Widget/Rect [20 552 220 576]/Border [0 0 1]/MK <</BC [0 0 0]/BG [1 1 1]>>/F 4/AP <</N 13 0 R>>>>
+endobj
+15 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+16 0 obj
+<</BBox [0 0 14 14]/Type /XObject/Subtype /Form/Resources <</Font <</Helv 15 0 R>>>>/Length 70>>
+stream
+q
+1 1 1 rg
+0 0 14.00 14.00 re f
+0 0 0 RG
+0.5 w
+1 1 12.00 12.00 re s
+Q
+
+endstream
+endobj
+17 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+18 0 obj
+<</BBox [0 0 14 14]/Type /XObject/Subtype /Form/Resources <</Font <</Helv 17 0 R>>>>/Length 114>>
+stream
+q
+1 1 1 rg
+0 0 14.00 14.00 re f
+0 0 0 RG
+0.5 w
+1 1 12.00 12.00 re s
+1 w
+3.40 7.00 m
+5.80 4.00 l
+11.20 10.60 l
+S
+Q
+
+endstream
+endobj
+19 0 obj
+<</FT /Btn/T (agree)/DA (/Helv 10 Tf 0 g)/Type /Annot/Subtype /Widget/Rect [20 459 34 473]/Border [0 0 1]/F 4/AP <</N <</Off 16 0 R/Yes 18 0 R>>>>/AS /Off>>
+endobj
+20 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+21 0 obj
+<</BBox [0 0 14 14]/Type /XObject/Subtype /Form/Resources <</Font <</Helv 20 0 R>>>>/Length 70>>
+stream
+q
+1 1 1 rg
+0 0 14.00 14.00 re f
+0 0 0 RG
+0.5 w
+1 1 12.00 12.00 re s
+Q
+
+endstream
+endobj
+22 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+23 0 obj
+<</BBox [0 0 14 14]/Type /XObject/Subtype /Form/Resources <</Font <</Helv 22 0 R>>>>/Length 114>>
+stream
+q
+1 1 1 rg
+0 0 14.00 14.00 re f
+0 0 0 RG
+0.5 w
+1 1 12.00 12.00 re s
+1 w
+3.40 7.00 m
+5.80 4.00 l
+11.20 10.60 l
+S
+Q
+
+endstream
+endobj
+24 0 obj
+<</FT /Btn/T (subscribe)/DA (/Helv 10 Tf 0 g)/Type /Annot/Subtype /Widget/Rect [20 419 34 433]/Border [0 0 1]/F 4/AP <</N <</Off 21 0 R/Yes 23 0 R>>>>/AS /Off>>
+endobj
+25 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+26 0 obj
+<</BBox [0 0 200 24]/Type /XObject/Subtype /Form/Resources <</Font <</Helv 25 0 R>>>>/Length 35>>
+stream
+q
+1 1 1 rg
+0 0 200.00 24.00 re f
+Q
+
+endstream
+endobj
+27 0 obj
+<</FT /Ch/T (country)/Ff 131072/DA (/Helv 10 Tf 0 g)/Opt [[(United States) (United States)] [(United Kingdom) (United Kingdom)] [(Canada) (Canada)] [(Australia) (Australia)]]/Type /Annot/Subtype /Widget/Rect [20 316 220 340]/Border [0 0 1]/MK <</BC [0 0 0]/BG [1 1 1]>>/F 4/AP <</N 26 0 R>>>>
+endobj
+28 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+29 0 obj
+<</BBox [0 0 200 80]/Type /XObject/Subtype /Form/Resources <</Font <</Helv 28 0 R>>>>/Length 35>>
+stream
+q
+1 1 1 rg
+0 0 200.00 80.00 re f
+Q
+
+endstream
+endobj
+30 0 obj
+<</FT /Ch/T (interests)/DA (/Helv 10 Tf 0 g)/Opt [[(Programming) (prog)] [(Design) (design)] [(Writing) (write)] [(Music) (music)]]/Type /Annot/Subtype /Widget/Rect [20 157 220 237]/Border [0 0 1]/MK <</BC [0 0 0]/BG [1 1 1]>>/F 4/AP <</N 29 0 R>>>>
+endobj
+31 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+32 0 obj
+<</BBox [0 0 130 28]/Type /XObject/Subtype /Form/Resources <</Font <</Helv 31 0 R>>>>/Length 185>>
+stream
+q
+0.8 0.8 0.8 rg
+0 0 130.00 28.00 re f
+1 1 1 RG 1 w
+0 0 m 130.00 0 l 130.00 28.00 l S
+0.4 0.4 0.4 RG
+0 0 m 0 28.00 l 130.00 28.00 l S
+BT
+/Helv 10 Tf 0 g
+50.00 10.00 Td (Submit) Tj
+ET
+Q
+
+endstream
+endobj
+33 0 obj
+<</FT /Btn/T (submit_btn)/V (Submit)/Ff 65536/DA (/Helv 10 Tf 0 g)/Type /Annot/Subtype /Widget/Rect [20 64 150 92]/Border [0 0 1]/F 4/AP <</N 32 0 R>>>>
+endobj
+34 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
+endobj
+35 0 obj
+<</Fields [11 0 R 14 0 R 19 0 R 24 0 R 27 0 R 30 0 R 33 0 R]/DA (/Helv 12 Tf 0 g)/NeedAppearances true/DR <</Font <</Helv 34 0 R>>>>>>
+endobj
+36 0 obj
+<</Type /Pages/Kids [37 0 R]/Count 1>>
+endobj
+37 0 obj
+<</Type /Page/Parent 36 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F_Helvetica_normal 7 0 R>>>>/Contents 8 0 R/Annots [11 0 R 14 0 R 19 0 R 24 0 R 27 0 R 30 0 R 33 0 R]>>
+endobj
+38 0 obj
+<</Type /Catalog/Pages 36 0 R/AcroForm 35 0 R>>
+endobj
+39 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260627174336Z)/ModDate (D:20260627174336Z)>>
+endobj
+xref
+0 40
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000151 00000 n 
+0000000219 00000 n 
+0000000287 00000 n 
+0000000355 00000 n 
+0000000423 00000 n 
+0000000491 00000 n 
+0000001969 00000 n 
+0000002035 00000 n 
+0000002250 00000 n 
+0000002442 00000 n 
+0000002509 00000 n 
+0000002676 00000 n 
+0000002851 00000 n 
+0000002918 00000 n 
+0000003119 00000 n 
+0000003186 00000 n 
+0000003432 00000 n 
+0000003605 00000 n 
+0000003672 00000 n 
+0000003873 00000 n 
+0000003940 00000 n 
+0000004186 00000 n 
+0000004363 00000 n 
+0000004430 00000 n 
+0000004597 00000 n 
+0000004906 00000 n 
+0000004973 00000 n 
+0000005140 00000 n 
+0000005406 00000 n 
+0000005473 00000 n 
+0000005791 00000 n 
+0000005960 00000 n 
+0000006027 00000 n 
+0000006178 00000 n 
+0000006233 00000 n 
+0000006425 00000 n 
+0000006489 00000 n 
+trailer
+<</Size 40/Root 38 0 R/Info 39 0 R/ID[<8DA10B4282A8BD45AEEBFA4C8B6FB864><8DA10B4282A8BD45AEEBFA4C8B6FB864>]>>
+startxref
+6596
+%%EOF

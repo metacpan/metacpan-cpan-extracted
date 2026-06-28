@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Unbound::Service;
-$WebService::OPNsense::Unbound::Service::VERSION = '0.001';
+$WebService::OPNsense::Unbound::Service::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
@@ -18,12 +18,16 @@ with 'WebService::OPNsense::Role::Service';
 
 sub reconfigure_general {
     my ($self) = @_;
-    return $self->client->post( $self->_path('reconfigureGeneral') );
+    my $uri = $self->_path('reconfigureGeneral');
+
+    return $self->client->post($uri);
 }
 
 sub dnsbl {
     my ($self) = @_;
-    return $self->client->post( $self->_path('dnsbl') );
+    my $uri = $self->_path('dnsbl');
+
+    return $self->client->post($uri);
 }
 
 1;
@@ -40,7 +44,7 @@ WebService::OPNsense::Unbound::Service - Unbound service controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -52,17 +56,13 @@ version 0.001
 
 Unbound DNS service control.
 
-=head1 NAME
-
-WebService::OPNsense::Unbound::Service - Unbound service controller
-
 =head1 METHODS
 
 =head2 status
 
     my $status = $unbound_service->status;
 
-Returns the current Unbound service status.
+Returns Unbound service status.
 
 =head2 start
 
@@ -100,7 +100,15 @@ Reconfigures general Unbound settings.
 
 Updates the DNSBL configuration.
 
-=for Pod::Coverage _api_path _path client status start stop restart reconfigure
+=head2 client
+
+    my $http_client = $unbound_service->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Service>
 
 =head1 AUTHOR
 

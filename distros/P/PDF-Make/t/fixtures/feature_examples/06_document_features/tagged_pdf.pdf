@@ -1,0 +1,177 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+4 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+5 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+6 0 obj
+<</Length 1355>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 722 Tm
+(Accessible PDF) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 652 Tm
+(Document) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 618 Tm
+(This PDF uses structural tags for accessibility. Screen readers can navigate using the heading hierarchy.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 40 Tf
+1 0 0 1 20 573 Tm
+(Introduction) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 551 Tm
+(Tagged PDFs include a logical structure tree that maps visual content to semantic elements like headings, paragraphs, lists, and figures.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 40 Tf
+1 0 0 1 20 506 Tm
+(Benefits) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 484 Tm
+(1. Screen reader navigation via heading structure) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 470 Tm
+(2. Content reflow for different screen sizes) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 456 Tm
+(3. Copy/paste preserves reading order) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 442 Tm
+(4. Compliance with PDF/UA accessibility standard) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 30 Tf
+1 0 0 1 20 407 Tm
+(Implementation) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 387 Tm
+(Call enable_tagging\(\) before adding content. Headings \(H1-H6\) and text \(P\) are tagged automatically.) Tj
+ET
+
+endstream
+endobj
+7 0 obj
+<</Type /Pages/Kids [8 0 R]/Count 1>>
+endobj
+8 0 obj
+<</Type /Page/Parent 7 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F_Helvetica_normal 5 0 R>>>>/Contents 6 0 R>>
+endobj
+9 0 obj
+<</Type /Catalog/Pages 7 0 R/StructTreeRoot 22 0 R/MarkInfo <</Marked true>>>>
+endobj
+10 0 obj
+<</Type /StructElem/S /Document/K [11 0 R 12 0 R 13 0 R 14 0 R 15 0 R 16 0 R 17 0 R 18 0 R 19 0 R 20 0 R 21 0 R]/P 22 0 R>>
+endobj
+11 0 obj
+<</Type /StructElem/S /H1/P 10 0 R>>
+endobj
+12 0 obj
+<</Type /StructElem/S /P/P 10 0 R>>
+endobj
+13 0 obj
+<</Type /StructElem/S /H2/P 10 0 R>>
+endobj
+14 0 obj
+<</Type /StructElem/S /P/P 10 0 R>>
+endobj
+15 0 obj
+<</Type /StructElem/S /H2/P 10 0 R>>
+endobj
+16 0 obj
+<</Type /StructElem/S /P/P 10 0 R>>
+endobj
+17 0 obj
+<</Type /StructElem/S /P/P 10 0 R>>
+endobj
+18 0 obj
+<</Type /StructElem/S /P/P 10 0 R>>
+endobj
+19 0 obj
+<</Type /StructElem/S /P/P 10 0 R>>
+endobj
+20 0 obj
+<</Type /StructElem/S /H3/P 10 0 R>>
+endobj
+21 0 obj
+<</Type /StructElem/S /P/P 10 0 R>>
+endobj
+22 0 obj
+<</Type /StructTreeRoot/K 10 0 R>>
+endobj
+23 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260424130832Z)/ModDate (D:20260424130832Z)>>
+endobj
+xref
+0 24
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000151 00000 n 
+0000000219 00000 n 
+0000000287 00000 n 
+0000000355 00000 n 
+0000001760 00000 n 
+0000001813 00000 n 
+0000001945 00000 n 
+0000002039 00000 n 
+0000002179 00000 n 
+0000002232 00000 n 
+0000002284 00000 n 
+0000002337 00000 n 
+0000002389 00000 n 
+0000002442 00000 n 
+0000002494 00000 n 
+0000002546 00000 n 
+0000002598 00000 n 
+0000002650 00000 n 
+0000002703 00000 n 
+0000002755 00000 n 
+0000002806 00000 n 
+trailer
+<</Size 24/Root 9 0 R/Info 23 0 R/ID[<A5E44B5BC8477191C62E3B66D10E6CB0><A5E44B5BC8477191C62E3B66D10E6CB0>]>>
+startxref
+2913
+%%EOF

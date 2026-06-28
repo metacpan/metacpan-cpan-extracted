@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Role::APIPath;
-$WebService::OPNsense::Role::APIPath::VERSION = '0.001';
+$WebService::OPNsense::Role::APIPath::VERSION = '0.002';
 use Moo::Role;
 use namespace::clean;
 
@@ -33,9 +33,64 @@ WebService::OPNsense::Role::APIPath - Role providing _path helper for URI::Templ
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
-=for Pod::Coverage _api_path _path client
+=head1 DESCRIPTION
+
+Provides a shared C<_path> helper for L<URI::Template>-based URL construction.
+Consuming classes must provide a C<_api_path> method and consume the
+L<WebService::Client> role.
+
+This role is consumed by L<WebService::OPNsense::Role::Crud>,
+L<WebService::OPNsense::Role::ItemCrud>,
+L<WebService::OPNsense::Role::Service>,
+L<WebService::OPNsense::Role::Settings>,
+L<WebService::OPNsense::Firewall::Role::NAT>,
+L<WebService::OPNsense::Backup>,
+L<WebService::OPNsense::IPsec::Tunnel>,
+L<WebService::OPNsense::OpenVPN::Export>, and
+L<WebService::OPNsense::Routes>.
+
+=head1 REQUIRED METHODS
+
+=head2 client
+
+    my $http_client = $ctrl->client;
+
+Provided by the consuming class via L<WebService::Client>.
+
+=head2 _api_path
+
+    my $api_path = $ctrl->_api_path;
+
+Returns the base API path string for the controller (e.g. C</api/firewall/filter>).
+
+=head1 PROVIDED METHODS
+
+=head2 _path
+
+    my $uri = $ctrl->_path( $endpoint, %vars );
+
+Constructs a URI by combining C<_api_path> with C<$endpoint> and expanding
+any template variables via L<URI::Template>.
+
+    # /api/firewall/filter/searchRule
+    my $uri = $self->_path('searchRule');
+
+    # /api/firewall/filter/getRule/123
+    my $uri = $self->_path('getRule/:id', id => 123);
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Crud>,
+L<WebService::OPNsense::Role::ItemCrud>,
+L<WebService::OPNsense::Role::Service>,
+L<WebService::OPNsense::Role::Settings>,
+L<WebService::OPNsense::Firewall::Role::NAT>,
+L<WebService::OPNsense::Backup>,
+L<WebService::OPNsense::IPsec::Tunnel>,
+L<WebService::OPNsense::OpenVPN::Export>,
+L<WebService::OPNsense::Routes>
 
 =head1 AUTHOR
 

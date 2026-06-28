@@ -4,9 +4,8 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::ManualSpd;
-$WebService::OPNsense::IPsec::ManualSpd::VERSION = '0.001';
+$WebService::OPNsense::IPsec::ManualSpd::VERSION = '0.002';
 use Moo;
-use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
 
 has client => ( is => 'ro', required => 1 );
@@ -16,12 +15,6 @@ sub _api_path {
 }
 
 with 'WebService::OPNsense::Role::Crud';
-
-sub set_manual_spd {
-    my ( $self, $uuid, $spd_data ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'set/{uuid}', uuid => $uuid ), $spd_data );
-}
 
 1;
 
@@ -37,7 +30,7 @@ WebService::OPNsense::IPsec::ManualSpd - IPsec manual SPD (Security Policy Datab
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -50,19 +43,55 @@ version 0.001
 
 Manages manual IPsec Security Policy Database entries.
 
-=head1 NAME
+=head1 PROVIDED METHODS
 
-WebService::OPNsense::IPsec::ManualSpd - IPsec manual SPD controller
+The following methods are inherited from consumed roles.
 
-=head1 METHODS
+=head2 search
 
-=head2 set_manual_spd
+    my $results = $ctrl->search( %params );
 
-    my $result = $mspd->set_manual_spd($uuid, $spd_data);
+Searches for manual SPD entries.
 
-Updates an existing manual SPD entry.
+=head2 get
 
-=for Pod::Coverage _api_path _path client search get add del toggle
+    my $spd = $ctrl->get( $uuid );
+
+Returns a single manual SPD entry by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 set
+
+    my $result = $ctrl->set( $uuid, $spd_data );
+
+Updates manual SPD entry by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 add
+
+    my $result = $ctrl->add( $spd_data );
+
+Creates manual SPD entry.
+
+=head2 del
+
+    my $result = $ctrl->del( $uuid );
+
+Deletes a manual SPD entry by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 toggle
+
+    my $result = $ctrl->toggle( $uuid, $enabled );
+
+Enables or disables a manual SPD entry.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 client
+
+    my $http_client = $ctrl->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Crud>
 
 =head1 AUTHOR
 

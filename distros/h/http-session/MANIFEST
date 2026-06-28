@@ -52,7 +52,7 @@ t/040_regression/regenerate.t
 t/040_regression/validation.t
 t/050_id/01_sha1.t
 t/050_id/02_md5.t
-t/050_id/03_md5_combined.t
+t/050_id/03_combined.t
 t/050_id/04_urandom.t
 t/060_psgi/001_res.t
 t/060_psgi/002_req.t

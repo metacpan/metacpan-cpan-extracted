@@ -1,4 +1,24 @@
 Revision history for WebService-OPNsense
 
+0.002    2026-06-27
+    - Add missing dependencies (Exporter::Shiny, Test::LWP::UserAgent).
+    - Fix KeaItemCrud undef guard for unknown types.
+    - Fix Sessions/Sad/Spd SYNOPSIS wrong method names.
+    - Fix NAT.pm mutating operations using GET -> POST.
+    - Add input validation for NAT toggle_rule_log, Sessions/Sad/Spd _require_id.
+    - URL-encode Kea::Leases IPs, guard undef in OPNsense uri_escape.
+    - Fix Object.pm doc mismatch, CaptivePortal/Settings.pm typo.
+    - Fix pod-coverage: =head2 client in Ddns/CtrlAgent/IPsec::Settings.
+    - Document Exception.pm overload/extends.
+    - Convert hardcoded API paths to _path/_api_path where clean.
+    - Add set method to Role::Crud for IPsec/Pools/Vti/ManualSpd.
+    - Alphabetical order Firewall.pm attributes.
+    - Extract _do_* helpers in IPsec/Connections (24 methods -> one-liners).
+    - Extract _build_opn_object in OPNsense.pm (55 builders -> one-liners).
+    - Rename Role::Settings get -> get_settings.
+    - Add test coverage for Backup download/diff/revert, GET 500, optional_segment.
+    - Fix perlcriticrc dead ignore_modules, 000_basic.t indentation.
+    - Add SEE ALSO to 43 modules missing it.
+
 0.001    2026-06-21
     - Initial release (alpha).

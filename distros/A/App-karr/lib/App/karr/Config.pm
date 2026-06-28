@@ -1,7 +1,7 @@
 # ABSTRACT: Board configuration management
 
 package App::karr::Config;
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 use Moo;
 use YAML::XS qw( LoadFile DumpFile );
 use Path::Tiny;
@@ -164,7 +164,7 @@ App::karr::Config - Board configuration management
 
 =head1 VERSION
 
-version 0.302
+version 0.303
 
 =head1 SYNOPSIS
 

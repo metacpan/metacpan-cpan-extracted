@@ -1,5 +1,15 @@
 Revision history for Perl module Tree::DAG_Node.
 
+1.36  2025-06-28T11:53:00
+	- Fix typo in the 2nd FAQ: "How to process every node in tree?". The POD contained
+		"my(@node, $options) = @_;" whereas it should read "my($node, $options) = @_;".
+		Thanx to Torsten Seemann for the report.
+	- Add new version of LICENSE to the distro.
+	- Add new files LICENSE-Artistic-2.0 & LICENSE-GPL-3 to the distro.
+	- Add Data::Dumper, Getopt::Long, perl to Makefile.PL.
+	- Remove open from Makefile.PL.
+	- Modernize MANIFEST.SKIP.
+
 1.35  2025-05-12T17:00:00
 	- Change sub hashref2string() line 726 so it does not generate an error or warning when
 		the node or node name is '' (empty string), undef or 0 (zero).
@@ -8,7 +18,7 @@ Revision history for Perl module Tree::DAG_Node.
 		to have been done as per the last dot point under v 1.34 below, but was not done properly.
 	- This last point also affects the related module Data::RenderAsTree, which ships with a
 		range of test programs and sample scripts which futher exercise these features.
-		The point of these latter samples is so you can use them without having to fiddle about
+		The point of these 9 plain scripts is so you can use them without having to fiddle about
 		removing the test code in the corresponding test scripts.
 
 1.34  2025-04-23T17:01:00

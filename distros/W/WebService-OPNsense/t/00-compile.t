@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 66 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 67 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'WebService/OPNsense.pm',
@@ -64,6 +64,7 @@ my @module_files = (
     'WebService/OPNsense/Role/APIPath.pm',
     'WebService/OPNsense/Role/Crud.pm',
     'WebService/OPNsense/Role/ItemCrud.pm',
+    'WebService/OPNsense/Role/KeaItemCrud.pm',
     'WebService/OPNsense/Role/Service.pm',
     'WebService/OPNsense/Role/Settings.pm',
     'WebService/OPNsense/Routes.pm',

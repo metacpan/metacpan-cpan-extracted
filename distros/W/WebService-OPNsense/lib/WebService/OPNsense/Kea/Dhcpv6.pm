@@ -4,9 +4,8 @@
 use strictures 2;
 
 package WebService::OPNsense::Kea::Dhcpv6;
-$WebService::OPNsense::Kea::Dhcpv6::VERSION = '0.001';
+$WebService::OPNsense::Kea::Dhcpv6::VERSION = '0.002';
 use Moo;
-use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
 
 has client => ( is => 'ro', required => 1 );
@@ -16,145 +15,31 @@ sub _api_path {
 }
 
 with 'WebService::OPNsense::Role::Settings';
-
-sub add_option {
-    my ( $self, $option_data ) = @_;
-    return $self->client->post( $self->_path('addOption'), $option_data );
-}
+with 'WebService::OPNsense::Role::KeaItemCrud';
 
 sub add_pd_pool {
     my ( $self, $pd_pool_data ) = @_;
-    return $self->client->post( $self->_path('addPdPool'), $pd_pool_data );
-}
-
-sub add_peer {
-    my ( $self, $peer_data ) = @_;
-    return $self->client->post( $self->_path('addPeer'), $peer_data );
-}
-
-sub add_reservation {
-    my ( $self, $reservation_data ) = @_;
-    return $self->client->post( $self->_path('addReservation'), $reservation_data );
-}
-
-sub add_subnet {
-    my ( $self, $subnet_data ) = @_;
-    return $self->client->post( $self->_path('addSubnet'), $subnet_data );
-}
-
-sub del_option {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delOption/{uuid}', uuid => $uuid ) );
+    return $self->_kea_add_item( 'pd_pool', $pd_pool_data );
 }
 
 sub del_pd_pool {
     my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delPdPool/{uuid}', uuid => $uuid ) );
-}
-
-sub del_peer {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delPeer/{uuid}', uuid => $uuid ) );
-}
-
-sub del_reservation {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delReservation/{uuid}', uuid => $uuid ) );
-}
-
-sub del_subnet {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delSubnet/{uuid}', uuid => $uuid ) );
-}
-
-sub get_option {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getOption/{uuid}', uuid => $uuid ) );
+    return $self->_kea_del_item( 'pd_pool', $uuid );
 }
 
 sub get_pd_pool {
     my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getPdPool/{uuid}', uuid => $uuid ) );
-}
-
-sub get_peer {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getPeer/{uuid}', uuid => $uuid ) );
-}
-
-sub get_reservation {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getReservation/{uuid}', uuid => $uuid ) );
-}
-
-sub get_subnet {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getSubnet/{uuid}', uuid => $uuid ) );
-}
-
-sub search_option {
-    my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchOption'), \%params );
+    return $self->_kea_get_item( 'pd_pool', $uuid );
 }
 
 sub search_pd_pool {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchPdPool'), \%params );
-}
-
-sub search_peer {
-    my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchPeer'), \%params );
-}
-
-sub search_reservation {
-    my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchReservation'), \%params );
-}
-
-sub search_subnet {
-    my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchSubnet'), \%params );
-}
-
-sub set_option {
-    my ( $self, $uuid, $option_data ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setOption/{uuid}', uuid => $uuid ), $option_data );
+    return $self->_kea_search_item( 'pd_pool', %params );
 }
 
 sub set_pd_pool {
     my ( $self, $uuid, $pd_pool_data ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setPdPool/{uuid}', uuid => $uuid ), $pd_pool_data );
-}
-
-sub set_peer {
-    my ( $self, $uuid, $peer_data ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setPeer/{uuid}', uuid => $uuid ), $peer_data );
-}
-
-sub set_reservation {
-    my ( $self, $uuid, $reservation_data ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setReservation/{uuid}', uuid => $uuid ), $reservation_data );
-}
-
-sub set_subnet {
-    my ( $self, $uuid, $subnet_data ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setSubnet/{uuid}', uuid => $uuid ), $subnet_data );
+    return $self->_kea_set_item( 'pd_pool', $uuid, $pd_pool_data );
 }
 
 1;
@@ -171,7 +56,7 @@ WebService::OPNsense::Kea::Dhcpv6 - Kea DHCPv6 controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -179,7 +64,7 @@ version 0.001
 
     my $config = $dhcpv6->get;
 
-    $dhcpv6->set({ ... });
+    $dhcpv6->set_settings({ ... });
 
     my $subnets = $dhcpv6->search_subnet(current => 1, rowCount => 50);
 
@@ -187,97 +72,24 @@ version 0.001
 
 Manages Kea DHCPv6 configuration.
 
-=head1 NAME
-
-WebService::OPNsense::Kea::Dhcpv6 - Kea DHCPv6 controller
-
 =head1 METHODS
 
-=head2 add_option
+Provides all methods from L<WebService::OPNsense::Role::KeaItemCrud> for
+managing option, peer, reservation, and subnet items:
 
-    my $result = $dhcpv6->add_option($option_data);
+    add_option  del_option  get_option  search_option  set_option
+    add_peer    del_peer    get_peer    search_peer     set_peer
+    add_reservation  del_reservation  get_reservation
+    search_reservation  set_reservation
+    add_subnet  del_subnet  get_subnet  search_subnet   set_subnet
 
-=head2 add_pd_pool
+Provides methods from L<WebService::OPNsense::Role::Settings>:
 
-    my $result = $dhcpv6->add_pd_pool($pd_pool_data);
+=head2 get_settings
 
-=head2 add_peer
-
-    my $result = $dhcpv6->add_peer($peer_data);
-
-=head2 add_reservation
-
-    my $result = $dhcpv6->add_reservation($reservation_data);
-
-=head2 add_subnet
-
-    my $result = $dhcpv6->add_subnet($subnet_data);
-
-=head2 del_option
-
-    my $result = $dhcpv6->del_option($uuid);
-
-=head2 del_pd_pool
-
-    my $result = $dhcpv6->del_pd_pool($uuid);
-
-=head2 del_peer
-
-    my $result = $dhcpv6->del_peer($uuid);
-
-=head2 del_reservation
-
-    my $result = $dhcpv6->del_reservation($uuid);
-
-=head2 del_subnet
-
-    my $result = $dhcpv6->del_subnet($uuid);
-
-=head2 get
-
-    my $config = $dhcpv6->get;
+    my $config = $dhcpv6->get_settings;
 
 Returns the full Kea DHCPv6 configuration.
-
-=head2 get_option
-
-    my $option = $dhcpv6->get_option($uuid);
-
-=head2 get_pd_pool
-
-    my $pd_pool = $dhcpv6->get_pd_pool($uuid);
-
-=head2 get_peer
-
-    my $peer = $dhcpv6->get_peer($uuid);
-
-=head2 get_reservation
-
-    my $reservation = $dhcpv6->get_reservation($uuid);
-
-=head2 get_subnet
-
-    my $subnet = $dhcpv6->get_subnet($uuid);
-
-=head2 search_option
-
-    my $results = $dhcpv6->search_option(%params);
-
-=head2 search_pd_pool
-
-    my $results = $dhcpv6->search_pd_pool(%params);
-
-=head2 search_peer
-
-    my $results = $dhcpv6->search_peer(%params);
-
-=head2 search_reservation
-
-    my $results = $dhcpv6->search_reservation(%params);
-
-=head2 search_subnet
-
-    my $results = $dhcpv6->search_subnet(%params);
 
 =head2 set_settings
 
@@ -285,27 +97,35 @@ Returns the full Kea DHCPv6 configuration.
 
 Updates the Kea DHCPv6 configuration.
 
-=head2 set_option
+=head2 add_pd_pool
 
-    my $result = $dhcpv6->set_option($uuid, $option_data);
+    my $result = $dhcpv6->add_pd_pool($pd_pool_data);
+
+=head2 del_pd_pool
+
+    my $result = $dhcpv6->del_pd_pool($uuid);
+
+=head2 get_pd_pool
+
+    my $pd_pool = $dhcpv6->get_pd_pool($uuid);
+
+=head2 search_pd_pool
+
+    my $results = $dhcpv6->search_pd_pool(%params);
 
 =head2 set_pd_pool
 
     my $result = $dhcpv6->set_pd_pool($uuid, $pd_pool_data);
 
-=head2 set_peer
+=head2 client
 
-    my $result = $dhcpv6->set_peer($uuid, $peer_data);
+    my $http_client = $dhcpv6->client;
 
-=head2 set_reservation
+Returns the underlying HTTP client object used for API requests.
 
-    my $result = $dhcpv6->set_reservation($uuid, $reservation_data);
+=head1 SEE ALSO
 
-=head2 set_subnet
-
-    my $result = $dhcpv6->set_subnet($uuid, $subnet_data);
-
-=for Pod::Coverage client
+L<WebService::OPNsense::Role::Settings>
 
 =head1 AUTHOR
 

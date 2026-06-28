@@ -27,11 +27,11 @@ hosted URLs, and suspicious domains
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -745,8 +745,7 @@ sub parse_email {
 	$text = $$text if ref($text) eq 'SCALAR';
 
 	# Any other reference type is a programming error
-	Carp::croak(__PACKAGE__ . ': parse_email() requires a string or scalar reference')
-		if ref($text);
+	Carp::croak(__PACKAGE__ . ': parse_email() requires a string or scalar reference') if ref($text);
 
 	# Sanitise: strip control characters that could affect terminal output.
 	# Keep \t (tabs in headers), \n (line endings), \r (CRLF mail format).
@@ -1417,6 +1416,8 @@ sub _risk_check_origin :Private {
 	my $orig = $self->originating_ip();
 	return unless $orig;
 
+	return if(!defined($orig->{ip}));
+
 	# Residential / broadband rDNS patterns suggest a compromised host
 	if ($orig->{rdns} && $orig->{rdns} =~ /
 		\d+[-_.]\d+[-_.]\d+[-_.]\d+   # dotted-quad in rDNS
@@ -1638,6 +1639,7 @@ sub _risk_check_urls_and_domains :Private {
 
 	for my $u ($self->embedded_urls()) {
 		# Skip trusted infrastructure -- these are not spam indicators
+		next unless($u->{host});
 		my $bare = lc $u->{host};
 		next unless defined($bare);
 		$bare =~ s/^www\.//;
@@ -1686,6 +1688,7 @@ sub _risk_check_urls_and_domains :Private {
 
 		# Lookalike domain check (brand name in a non-brand domain)
 		for my $brand (@LOOKALIKE_BRANDS) {
+			next if(!defined($d->{domain}));
 			if ($d->{domain} =~ /\Q$brand\E/i &&
 			    $d->{domain} !~ /^\Q$brand\E\.(?:com|co\.uk|net|org)$/) {
 				$flag->('HIGH', 'lookalike_domain',
@@ -2479,8 +2482,7 @@ sub report {
 
 	# Originating host section
 	push @out, '[ ORIGINATING HOST ]';
-	my $orig = $self->originating_ip();
-	if ($orig) {
+	if(my $orig = $self->originating_ip()) {
 		push @out, '  IP           : ' . _sanitise_output($orig->{ip});
 		push @out, '  Reverse DNS  : ' . _sanitise_output($orig->{rdns})    if $orig->{rdns};
 		push @out, '  Country      : ' . _sanitise_output($orig->{country}) if $orig->{country};
@@ -3248,7 +3250,6 @@ sub _follow_redirect_chain :Protected {
 			}
 			$final   = $loc;
 			$current = $loc;
-
 		} elsif ($res->is_success()) {
 			# 2xx: inspect body for client-side redirect patterns
 			my $body = $res->decoded_content() // '';
@@ -3268,7 +3269,6 @@ sub _follow_redirect_chain :Protected {
 			last unless defined $dest;
 			$final   = $dest;
 			$current = $dest;
-
 		} else {
 			last;
 		}
@@ -3301,16 +3301,23 @@ sub _follow_redirect_chain :Protected {
 
 sub _parallel_resolve_hosts :Private {
 	my ($self, $hostnames_ref, $cache_ref) = @_;
-	return unless $HAS_ANYEVENT_DNS;
+	# Guard both conditions together: an empty hash must never reach condvar
+	# creation because $cv->recv would block forever with $pending == 0.
+	return unless $HAS_ANYEVENT_DNS && %$hostnames_ref;
 
 	# Build an AnyEvent condvar to wait for all lookups to complete
 	my $cv      = AnyEvent->condvar;
 	my $pending = scalar keys %$hostnames_ref;
 
+	# AnyEvent::DNS::resolve is a method, not a standalone function.
+	# Use the global resolver singleton; passing a bare string as the
+	# first arg would make Perl treat the hostname as the invocant.
+	my $resolver = AnyEvent::DNS::resolver();
+
 	for my $host (keys %$hostnames_ref) {
-		# Fire an async A (and AAAA) query for each hostname
-		AnyEvent::DNS::resolve(
-			$host, 'A',
+		# Fire an async A query for each hostname
+		$resolver->resolve(
+			$host, 'a',
 			sub {
 				my @answers = @_;
 				if (@answers) {
@@ -3585,8 +3592,7 @@ sub _analyse_domain :Private {
 		);
 
 		# --- MX record -> mail hosting ---
-		my $mxq = $res->search($domain, 'MX');
-		if ($mxq) {
+		if(my $mxq = $res->search($domain, 'MX')) {
 			my ($best) = sort { $a->preference <=> $b->preference }
 			             grep { $_->type eq 'MX' } $mxq->answer;
 			if ($best) {
@@ -3603,12 +3609,10 @@ sub _analyse_domain :Private {
 		}
 
 		# --- NS record -> DNS hosting ---
-		my $nsq = $res->search($domain, 'NS');
-		if ($nsq) {
+		if(my $nsq = $res->search($domain, 'NS')) {
 			# Sort alphabetically so DNS round-robin ordering never changes which
-		# nameserver we record -- both runs of the same domain always agree.
-		my ($first) = sort { $a->nsdname cmp $b->nsdname }
-		              grep { $_->type eq 'NS' } $nsq->answer;
+			# nameserver we record -- both runs of the same domain always agree.
+			my ($first) = sort { $a->nsdname cmp $b->nsdname } grep { $_->type eq 'NS' } $nsq->answer;
 			if ($first) {
 				(my $ns_host = lc $first->nsdname) =~ s/\.$//;
 				$info{ns_host} = $ns_host;
@@ -3624,8 +3628,7 @@ sub _analyse_domain :Private {
 	}
 
 	# --- Domain WHOIS -> registrar + dates ---
-	my $domain_whois = $self->_domain_whois($domain);
-	if ($domain_whois) {
+	if(my $domain_whois = $self->_domain_whois($domain)) {
 		# Truncate raw WHOIS for storage but parse structured fields from full text
 		$info{whois_raw} = substr($domain_whois, 0, $WHOIS_RAW_MAX);
 
@@ -4308,8 +4311,21 @@ None -- returns C<undef> on a missing header, never throws.
 =cut
 
 sub header_value {
-	my ($self, $name) = @_;
-	return $self->_header_value($name);
+	my $self = shift;
+
+	my $params = Params::Validate::Strict::validate_strict({
+		args => Params::Get::get_params('name', \@_) || {},
+		schema => {
+			name => {
+				'type'     => 'string',
+				'optional' => 0,
+			}
+		}
+	});
+
+	return if((!defined($params)) || !defined($params->{name}));
+	return if ref($params->{name});
+	return $self->_header_value($params->{name});
 }
 
 #

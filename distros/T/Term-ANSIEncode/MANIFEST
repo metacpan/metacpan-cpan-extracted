@@ -54,5 +54,6 @@ MANIFEST
 README.md
 t/00-tests.t
 LICENSE
+LICENSE.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

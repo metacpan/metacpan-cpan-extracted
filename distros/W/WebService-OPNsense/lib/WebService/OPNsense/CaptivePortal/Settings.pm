@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::CaptivePortal::Settings;
-$WebService::OPNsense::CaptivePortal::Settings::VERSION = '0.001';
+$WebService::OPNsense::CaptivePortal::Settings::VERSION = '0.002';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -19,37 +19,49 @@ with 'WebService::OPNsense::Role::Settings';
 
 sub search_zones {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchZone'), \%params );
+    my $uri = $self->_path('searchZone');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_zone {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getZone/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getZone/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_zone {
     my ( $self, $zone_data ) = @_;
-    return $self->client->post( $self->_path('addZone'), $zone_data );
+    my $uri = $self->_path('addZone');
+
+    return $self->client->post( $uri, $zone_data );
 }
 
 sub set_zone {
     my ( $self, $uuid, $zone_data ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setZone/{uuid}', uuid => $uuid ), $zone_data );
+    my $uri = $self->_path( 'setZone/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $zone_data );
 }
 
 sub del_zone {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delZone/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delZone/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_zone {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleZone/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleZone/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
@@ -67,29 +79,25 @@ WebService::OPNsense::CaptivePortal::Settings - Captive portal settings controll
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-    my $cp_settings = $opn->captiveportal_settings;
+    my $cp_settings = $opn->captive_portal_settings;
 
-    my $settings = $cp_settings->get;
+    my $settings = $cp_settings->get_settings;
 
 =head1 DESCRIPTION
 
 Manages captive portal settings and zones.
 
-=head1 NAME
-
-WebService::OPNsense::CaptivePortal::Settings - Captive portal settings controller
-
 =head1 METHODS
 
-=head2 get
+=head2 get_settings
 
-    my $settings = $cp_settings->get;
+    my $settings = $cp_settings->get_settings;
 
-Returns the current captive portal settings.
+Returns captive portal settings.
 
 =head2 set_settings
 
@@ -113,13 +121,13 @@ Returns a single zone by UUID.
 
     my $result = $cp_settings->add_zone($zone_data);
 
-Creates a new captive portal zone.
+Creates captive portal zone.
 
 =head2 set_zone
 
     my $result = $cp_settings->set_zone($uuid, $zone_data);
 
-Updates an existing zone.
+Updates zone.
 
 =head2 del_zone
 
@@ -133,7 +141,15 @@ Deletes a zone by UUID.
 
 Enables or disables a zone.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $cp_settings->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Settings>
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IDS::Service;
-$WebService::OPNsense::IDS::Service::VERSION = '0.001';
+$WebService::OPNsense::IDS::Service::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
@@ -18,32 +18,44 @@ with 'WebService::OPNsense::Role::Service';
 
 sub reload_rules {
     my ($self) = @_;
-    return $self->client->post( $self->_path('reloadRules') );
+    my $uri = $self->_path('reloadRules');
+
+    return $self->client->post($uri);
 }
 
 sub update_rules {
     my ( $self, $wait ) = @_;
-    return $self->client->post( $self->_path( 'updateRules{/wait}', wait => $wait ) );
+    my $uri = $self->_path( 'updateRules{/wait}', wait => $wait );
+
+    return $self->client->post($uri);
 }
 
 sub query_alerts {
     my ( $self, %params ) = @_;
-    return $self->client->post( $self->_path('queryAlerts'), \%params );
+    my $uri = $self->_path('queryAlerts');
+
+    return $self->client->post( $uri, \%params );
 }
 
 sub get_alert_logs {
     my ($self) = @_;
-    return $self->client->get( $self->_path('getAlertLogs') );
+    my $uri = $self->_path('getAlertLogs');
+
+    return $self->client->get($uri);
 }
 
 sub get_alert_info {
     my ( $self, $alert_id ) = @_;
-    return $self->client->get( $self->_path( 'getAlertInfo/{alert_id}', alert_id => $alert_id ) );
+    my $uri = $self->_path( 'getAlertInfo/{alert_id}', alert_id => $alert_id );
+
+    return $self->client->get($uri);
 }
 
 sub drop_alert_log {
     my ($self) = @_;
-    return $self->client->post( $self->_path('dropAlertLog') );
+    my $uri = $self->_path('dropAlertLog');
+
+    return $self->client->post($uri);
 }
 
 1;
@@ -60,7 +72,7 @@ WebService::OPNsense::IDS::Service - IDS service controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -73,17 +85,13 @@ version 0.001
 Controls the IDS/IPS service, alerts, and rule
 updates.
 
-=head1 NAME
-
-WebService::OPNsense::IDS::Service - IDS service controller
-
 =head1 METHODS
 
 =head2 status
 
     my $status = $ids_service->status;
 
-Returns the current IDS service status.
+Returns IDS service status.
 
 =head2 start
 
@@ -146,7 +154,15 @@ Returns information about a specific alert.
 
 Drops (clears) the alert log.
 
-=for Pod::Coverage _api_path _path client status start stop restart reconfigure
+=head2 client
+
+    my $http_client = $ids_service->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Service>
 
 =head1 AUTHOR
 

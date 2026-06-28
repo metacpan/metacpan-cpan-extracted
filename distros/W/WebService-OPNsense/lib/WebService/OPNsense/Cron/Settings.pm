@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Cron::Settings;
-$WebService::OPNsense::Cron::Settings::VERSION = '0.001';
+$WebService::OPNsense::Cron::Settings::VERSION = '0.002';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -19,37 +19,49 @@ with 'WebService::OPNsense::Role::Settings';
 
 sub search_jobs {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchJob'), \%params );
+    my $uri = $self->_path('searchJob');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_job {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getJob/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getJob/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_job {
     my ( $self, $job_data ) = @_;
-    return $self->client->post( $self->_path('addJob'), $job_data );
+    my $uri = $self->_path('addJob');
+
+    return $self->client->post( $uri, $job_data );
 }
 
 sub set_job {
     my ( $self, $uuid, $job_data ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'setJob/{uuid}', uuid => $uuid ), $job_data );
+    my $uri = $self->_path( 'setJob/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $job_data );
 }
 
 sub del_job {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delJob/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delJob/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_job {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleJob/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleJob/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
@@ -67,7 +79,7 @@ WebService::OPNsense::Cron::Settings - Cron settings controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -79,17 +91,13 @@ version 0.001
 
 Manages cron jobs.
 
-=head1 NAME
-
-WebService::OPNsense::Cron::Settings - Cron settings controller
-
 =head1 METHODS
 
-=head2 get
+=head2 get_settings
 
-    my $settings = $cron_settings->get;
+    my $settings = $cron_settings->get_settings;
 
-Returns the current cron settings.
+Returns cron settings.
 
 =head2 set_settings
 
@@ -113,13 +121,13 @@ Returns a single cron job by UUID.
 
     my $result = $cron_settings->add_job($job_data);
 
-Creates a new cron job.
+Creates cron job.
 
 =head2 set_job
 
     my $result = $cron_settings->set_job($uuid, $job_data);
 
-Updates an existing cron job.
+Updates cron job.
 
 =head2 del_job
 
@@ -133,7 +141,15 @@ Deletes a cron job by UUID.
 
 Enables or disables a cron job.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $cron_settings->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Settings>
 
 =head1 AUTHOR
 

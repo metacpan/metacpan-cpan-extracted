@@ -1,7 +1,8 @@
 package App::MechaCPAN;
 
 use v5.14;
-use strict;
+use warnings;
+
 use Cwd qw/cwd/;
 use Carp;
 use Config;
@@ -28,15 +29,16 @@ BEGIN
     logmsg info success error
     dest_dir get_project_dir
     fetch_file inflate_archive
+    file_digest_chk get_cpan_checksums
     humane_tmpname humane_tmpfile humane_tmpdir
     parse_cpanfile
-    run restart_script
+    run run_qvf restart_script
     rel_start_to_abs
     /;
   our %EXPORT_TAGS = ( go => [@EXPORT_OK] );
 }
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 require App::MechaCPAN::Perl;
 require App::MechaCPAN::Install;
@@ -45,9 +47,13 @@ require App::MechaCPAN::Deploy;
 my $loaded_at_compile;
 my $restarted_key        = 'APP_MECHACPAN_RESTARTED';
 my $is_restarted_process = delete $ENV{$restarted_key};
-INIT
+
 {
-  $loaded_at_compile = 1;
+  no warnings 'void';
+  INIT
+  {
+    $loaded_at_compile = 1;
+  }
 }
 
 $loaded_at_compile //= 0;
@@ -59,6 +65,7 @@ our @args = (
   'no-log!',
   'directory|d=s',
   'build-reusable-perl!',
+  'verify!',
 );
 
 # Timeout when there's no output in seconds
@@ -68,6 +75,12 @@ our $QUIET;      # Do not print any progress to STDERR
 our $LOGFH;      # File handle to send the logs to
 our $LOG_ON = 1; # Default if to log or not
 our $PROJ_DIR;   # The directory given with -d or pwd if not provided
+our $CHKSIGS;    # Check signatures on/off/best attempt (undef)
+
+# In certain blocks, you may see `no warnings 'uninitialized'`. Several subs
+# end up doing a lot of work with comparisions that don't distinguish between
+# undef and the empty string, so these warnings create more noise than useful
+# feedback, and the code to silence them are not meaningfully better
 
 sub main
 {
@@ -75,6 +88,8 @@ sub main
 
   if ( $0 =~ m/zhuli/ )
   {
+    no warnings 'uninitialized';
+
     if ( $argv[0] =~ m/^do the thing/i )
     {
       success( "zhuli$$", 'Running deployment' )
@@ -136,6 +151,7 @@ sub main
   local $LOGFH;
   local $VERBOSE = $options->{verbose} // $VERBOSE;
   local $QUIET   = $options->{quiet}   // $QUIET;
+  local $CHKSIGS = $options->{verify}  // $CHKSIGS;
 
   my $cmd;
 
@@ -150,7 +166,8 @@ sub main
     }
   }
 
-  my $cmd    = $cmd // ucfirst lc shift @argv;
+  $cmd = $cmd // ucfirst lc shift @argv;
+
   my $pkg    = join( '::', __PACKAGE__, $cmd );
   my $action = eval { $pkg->can('go') };
   my $munge  = eval { $pkg->can('munge_args') };
@@ -328,9 +345,13 @@ sub git_extract_re
 
 sub parse_cpanfile
 {
-  my $file = shift;
+  my $file       = shift;
+  my @incl_types = @_;
 
   state $sandbox_num = 1;
+  state @phases;
+  @phases = qw/configure build test author/
+    if !@phases;
 
   my $result = { runtime => {} };
 
@@ -360,7 +381,7 @@ sub parse_cpanfile
     };
   }
 
-  foreach my $phase (qw/configure build test author/)
+  foreach my $phase (@phases)
   {
     $methods->{ $phase . '_requires' } = sub
     {
@@ -402,6 +423,25 @@ sub parse_cpanfile
 
   delete $result->{current};
 
+  if (@incl_types)
+  {
+    my %incl = ( map { $_ => 1 } @incl_types );
+
+    foreach my $phase ( values %$result )
+    {
+      next
+        if ref $phase ne 'HASH';
+
+      foreach my $type ( keys %$phase )
+      {
+        if ( !$incl{$type} )
+        {
+          delete $phase->{$type};
+        }
+      }
+    }
+  }
+
   return $result;
 }
 
@@ -421,7 +461,7 @@ sub humane_qr
 
 sub humane_tmpname
 {
-  my $descr = shift;
+  my $descr = shift // '';
 
   my @localtime = localtime;
   my $now       = sprintf(
@@ -553,6 +593,8 @@ sub _show_line
   my $color = shift;
   my $line  = shift;
 
+  no warnings 'uninitialized';
+
   # If the color starts with red, it's an error and we should not touch it,
   # otherwise, we should clean up the line
   state $ERR_COLOR = Term::ANSIColor::color('RED');
@@ -570,6 +612,12 @@ sub _show_line
     # Scroll Up 1 line
     print STDERR "\n";
     $idx = -1;
+  }
+
+  # When key is _, that means we're undoing the last line
+  if ( $key eq '_' )
+  {
+    $idx = 0;
   }
 
   if ( !defined $idx )
@@ -611,10 +659,19 @@ sub status
   my $color = shift;
   my $line  = shift;
 
+  no warnings 'uninitialized';
+
   if ( !defined $line )
   {
     $line  = $color;
     $color = 'RESET';
+  }
+
+  # The _ key means undo the last line, but only status can do that, so treat
+  # it the same as undef
+  if ( $key eq '_' )
+  {
+    undef $key;
   }
 
   logmsg($line);
@@ -634,10 +691,14 @@ sub status
 
   _show_line( $key, $color . $BOLD, $line );
 
-  @last_key = ( $key, $color, $line );
+  @last_key = ( $key // '_', $color, $line );
 }
-END  { print STDERR "\n" unless $QUIET; }
-INIT { print STDERR "\n" unless $QUIET; }
+
+{
+  no warnings 'void';
+  END  { print STDERR "\n" unless $QUIET; }
+  INIT { print STDERR "\n" unless $QUIET; }
+}
 
 sub _get_project_dir
 {
@@ -712,8 +773,19 @@ sub fetch_file
   local $@;
 
   my $ff = File::Fetch->new( uri => $url );
-  $ff->scheme('http')
-    if $ff->scheme eq 'https';
+
+  if ( $File::Fetch::VERSION < 0.50 )
+  {
+    # File::Fetch < 0.50 (versions bundled with perl before 5.26) does not
+    # have an entry for https, so we have to convince it to use the http list
+    # by telling it that the scheme is http. This does *NOT* change what
+    # scheme the file is actually fetched with, only what client list will
+    # be used/attempted. So https URIs are still fetched over https. In modern
+    # versions of File::Fetch there is an https list, and that list does
+    # enforce https verification
+    $ff->scheme('http')
+      if $ff->scheme eq 'https';
+  }
 
   if ( ref $to eq 'SCALAR' )
   {
@@ -784,6 +856,493 @@ sub fetch_file
   return $result;
 }
 
+sub file_digest_chk
+{
+  my ( $path, $expected ) = @_;
+
+  require Digest::SHA;
+  my $actual = Digest::SHA->new('sha256')->addfile( "$path", 'b' )->hexdigest;
+
+  $expected = uc $expected;
+  $actual   = uc $actual;
+
+  die "Expected and Actual Digest differs: $actual ne $expected"
+    if $expected ne $actual;
+
+  return;
+}
+
+sub _verify_checksums_body
+{
+  my $chksum_body = shift;
+
+  # CHECKSUMS has a very regular pattern. If it doesn't match, we must refuse
+  # loudly since it appears to be tampered with.
+
+  my @result;
+  my @content = split /\r?\n/, $chksum_body;
+
+  while ( @content && $content[0] eq '' )
+  {
+    shift @content;
+  }
+
+  while ( @content && $content[-1] eq '' )
+  {
+    pop @content;
+  }
+
+  # Check the file header and the PGP header
+  {
+    my $header     = shift @content;
+    my $pgp_header = shift @content;
+
+    # First line must be that the PGP is also valid perl
+    push @result, $header;
+    croak "CHECKSUMS file failed validation: header-line mismatch"
+      if $header ne q{0&&<<''; # this PGP-signed message is also valid perl};
+
+    # Second line MUST be the PGP signed message start
+    push @result, $pgp_header;
+    croak "CHECKSUMS file failed validation: PGP header mismatch"
+      if $pgp_header ne q{-----BEGIN PGP SIGNED MESSAGE-----};
+  }
+
+  # We're now safely in the PGP signed message. Grab all the PGP headers
+  while ( defined( my $pgp_line = shift @content ) )
+  {
+    push @result, $pgp_line;
+    last
+      if $pgp_line eq '';
+  }
+
+  # Now read the perl hash header start, which is any number of comments
+  # followed by a hash definition
+  while ( defined( my $perl_intro = shift @content ) )
+  {
+    push @result, $perl_intro;
+    last
+      if $perl_intro eq '$cksum = {';    # } This confuses vim and annoys me
+
+    next
+      if $perl_intro =~ m/^[#]/xms;
+
+    my $linenum = scalar @result;
+    croak "CHECKSUMS file failed validation: Unexpected perl code $linenum";
+  }
+
+  my ($indent) = $content[0] =~ m/^(\s+)/;
+
+  croak "CHECKSUMS file failed validation: missing indentation"
+    if !defined $indent;
+
+  # Definition lines can only be `'Key' => {` or `'Key' => 'Value'`
+  while ( defined( my $perl_line = shift @content ) )
+  {
+    push @result, $perl_line;
+    last
+      if $perl_line =~ m/^};$/xms;
+
+    next
+      if $perl_line =~ m/^ \Q$indent\E '[^' ]+' \s+ => \s+ {$/xms;
+
+    next
+      if $perl_line
+      =~ m/^ \Q$indent\E \s+ '[\w-]+' \s+ => \s+ ('[^' ]+' | \d+) ,? $/xms;
+
+    next
+      if $perl_line =~ m/^ \Q$indent\E},?/xms;
+
+    my $linenum = scalar @result;
+    croak "CHECKSUMS file failed validation: Unexpected perl code $linenum";
+  }
+
+  {
+    my $perl_footer = shift @content;
+
+    if ( $perl_footer ne '__END__' )
+    {
+      my $linenum = scalar @result;
+      croak "CHECKSUMS file failed validation: Unexpected footer $linenum";
+    }
+    push @result, $perl_footer;
+  }
+
+  # We now have no content that perl will read, which means all we should have is the PGP signature
+  {
+    my $pgp_header = shift @content;
+    push @result, $pgp_header;
+
+    if ( $pgp_header ne '-----BEGIN PGP SIGNATURE-----' )
+    {
+      my $linenum = scalar @result;
+      croak
+        "CHECKSUMS file failed validation: Unexpected PGP header $linenum";
+    }
+
+    # Ignore all of the PGP armor headers. They must be well-formed as much as
+    # they can be (includes a colon followed by a space as a separator)
+    while ( defined( my $pgp_line = shift @content ) )
+    {
+      push @result, $pgp_line;
+
+      last
+        if $pgp_line eq '';
+
+      next
+        if $pgp_line =~ m{: };
+
+      my $linenum = scalar @result;
+      croak "CHECKSUMS file failed validation: Unexpected pgp armor header line $linenum";
+    }
+
+    while ( defined( my $pgp_line = shift @content ) )
+    {
+      push @result, $pgp_line;
+
+      last
+        if $pgp_line eq '-----END PGP SIGNATURE-----';
+
+      next
+        if $pgp_line =~ m{^[A-Za-z0-9+/=]*$}x;
+
+      my $linenum = scalar @result;
+      croak "CHECKSUMS file failed validation: Unexpected pgp line $linenum";
+    }
+  }
+
+  croak "CHECKSUMS file failed validation: missing PGP signature end"
+    if $result[-1] ne '-----END PGP SIGNATURE-----';
+
+  croak "CHECKSUMS file failed validation: Unexpected data after end"
+    if @content;
+
+  return join( "\n", @result );
+}
+
+my $cpan_fingerprint = '2E66 557A B97C 19C7 91AF  8E20 328D A867 450F 89EC';
+my $keyserve         = 'https://www.cpan.org/modules/04pause.html';
+my $search           = '';
+
+sub _cpan_key_chk
+{
+  my $keyring = shift;    # Expects the binary public key data
+
+  require Digest::SHA;
+
+  # Parse the packet header (RFC 9580) and make sure its a Public Key
+  # (type 6). We also require it to be the new packet format
+  my $body_len;
+  my $type;
+  my ( $header_octet, $remaining ) = unpack 'Ca*', $keyring;
+
+  die "not an OpenPGP packet"
+    if !( $header_octet & 0x80 );
+
+  if ( !( $header_octet & 0x40 ) )
+  {
+    $type = ( $header_octet >> 2 ) & 0x0F;
+    my $len_type = $header_octet & 0x03;
+
+    ( $body_len, $remaining )
+      = $len_type == 0 ? unpack( 'Ca*', $remaining )
+      : $len_type == 1 ? unpack( 'na*', $remaining )
+      : $len_type == 2 ? unpack( 'Na*', $remaining )
+      :   die "indeterminate-length packet in primary key position";
+  }
+
+  if ( $header_octet & 0x40 )
+  {
+    $type = $header_octet & 0x3F;
+
+    my ($enc_len) = unpack 'C', $remaining;
+
+    if ( $enc_len < 192 )
+    {
+      ( $body_len, $remaining ) = unpack 'Ca*', $remaining;
+    }
+    elsif ( $enc_len < 224 )
+    {
+      my $extra;
+      ( $enc_len, $extra, $remaining ) = unpack 'CCa*', $remaining;
+      $body_len = ( ( $enc_len - 192 ) << 8 ) + $extra + 192;
+    }
+    elsif ( $enc_len == 255 )
+    {
+      ( $enc_len, $body_len, $remaining ) = unpack 'CNa*', $remaining;
+    }
+    else { die "partial-length packet in primary key position" }
+  }
+
+  die "first packet is type $type, not a public key (type 6)"
+    unless $type == 6;
+
+  my $body = substr( $remaining, 0, $body_len );
+  die "truncated key packet"
+    if length($body) != $body_len;
+
+  my $version = unpack 'C', $body;
+  die "not a v4 key (got version $version)"
+    if $version != 4;
+
+  # v4 fingerprint = SHA-1( 0x99 || 2-byte BE length || packet body )
+  my $to_hash  = "\x99" . pack( 'n', $body_len ) . $body;
+  my $actual   = uc( Digest::SHA::sha1_hex($to_hash) );
+  my $expected = $cpan_fingerprint;
+  $expected =~ s/\s//g;
+
+  die
+    "Downloaded CPAN Public key does not match expected fingerprint ( $actual ne $expected )"
+    if $actual ne $expected;
+
+  return;
+}
+
+sub cpan_keyring
+{
+  state $keyring_path;
+  state $cache_path;
+
+  if ( !defined $cache_path )
+  {
+    my $dest_dir  = &dest_dir;
+    my $cache_dir = File::Spec->catdir( "$dest_dir", 'cache' );
+    mkdir $cache_dir
+      unless -d $cache_dir;
+
+    $cache_path = File::Spec->catfile( "$cache_dir", 'cpan_keyring.pgp' );
+  }
+
+  if ( !defined $keyring_path && -e $cache_path )
+  {
+    my $mtime = ( stat $cache_path )[9];
+    if ( defined $mtime && time - $mtime < 24 * 60 * 60 )
+    {
+      open my $keyring_fh, '<', $cache_path;
+      my $keyring = do { local $/; <$keyring_fh> };
+
+      # Verify that this is the CPAN key by checking the primary key.
+      local $@;
+      eval { _cpan_key_chk($keyring) };
+      my $error = $@;
+
+      if ($error)
+      {
+        logmsg "Existing CPAN Public Key on disk could not be used: $error";
+        unlink $cache_path;
+      }
+      else
+      {
+        $keyring_path = $cache_path;
+      }
+    }
+  }
+
+  if ( !defined $keyring_path )
+  {
+    # Always download the freshest, even if we leave it in local/
+    my $keyring = '';
+    fetch_file( "$keyserve$search", \$keyring );
+
+    # Strip the armor around the base64 string
+    $keyring =~ s/\r//xmsg;
+    $keyring =~ s{
+      \A
+      .*?                                        # Everything before the armor
+      (?: \Q$cpan_fingerprint\E [^\n]* \n )      # require fingerprint on prior line
+      \Q-----BEGIN PGP PUBLIC KEY BLOCK-----\E\n
+      (?: [^\n]+ \n)* \n                         # The headers
+      (
+        (?: [A-Za-z0-9+/]* =* \n )*              # The base64 content
+      )
+      (?: =[A-Za-z0-9+\/]{4}\s*\n )?             # The optional checksum
+      \Q-----END PGP PUBLIC KEY BLOCK-----\E
+      .*                                         # Everything after the armor
+      \Z
+    }{$1}xms;
+
+    require MIME::Base64;
+
+    $keyring = MIME::Base64::decode_base64($keyring);
+
+    # Verify that this is the CPAN key by checking the primary key.
+    _cpan_key_chk($keyring);
+
+    open my $keyring_fh, '>', $cache_path;
+    print $keyring_fh $keyring;
+
+    $keyring_path = $cache_path;
+  }
+
+  return $keyring_path;
+}
+
+#gpgv, sqv, gpg, sq, and rnp
+my @verifier = (
+  sub
+  {
+    return
+      if !eval { run(qw/gpgv --version/); 1 };
+
+    return sub
+    {
+      my ( $file, $keyring ) = @_;
+      run_qvf( "gpgv", "--keyring", "$keyring", "$file" );
+    };
+  },
+  sub
+  {
+    my $out = eval { run(qw/sqv --version/) };
+    return
+      if !defined $out;
+    my ($major) = $out =~ m/(\d+)\.\d+(?:\.\d+)?/;
+    return
+      if !defined $major || $major < 1;
+
+    return sub
+    {
+      my ( $file, $keyring ) = @_;
+      run_qvf( "sqv", "--keyring", "$keyring", "$file" );
+    };
+  },
+  sub
+  {
+    return
+      if !eval { run(qw/gpg --version/); 1 };
+
+    return sub
+    {
+      my ( $file, $keyring ) = @_;
+      run_qvf( "gpg", "--no-default-keyring", "--keyring", "$keyring",
+        "--verify", "$file" );
+    };
+  },
+  sub
+  {
+    my $out = eval { run(qw/sq --version/) };
+    return
+      if !defined $out;
+    my ($major) = $out =~ m/(\d+)\.\d+(?:\.\d+)?/;
+    return
+      if !defined $major || $major < 1;
+
+    return sub
+    {
+      my ( $file, $keyring ) = @_;
+      run_qvf( "sq", "verify", "--signer-file", "$keyring", "$file" );
+    };
+  },
+  sub
+  {
+    return
+      if !eval { run(qw/rnp --version/); 1 };
+
+    return sub
+    {
+      my ( $file, $keyring ) = @_;
+      run_qvf( "rnp", "--keyfile", "$keyring", "--verify", "$file" );
+    };
+  },
+);
+
+sub _resolve_verifier
+{
+  state $verify_fn;
+
+  if ( !defined $verify_fn )
+  {
+    foreach my $verify (@verifier)
+    {
+      my $fn = $verify->();
+      if ( defined $fn )
+      {
+        $verify_fn = $fn;
+        last;
+      }
+    }
+  }
+
+  return $verify_fn;
+}
+
+sub get_cpan_checksums
+{
+  my $url = shift;
+  my $key = shift;
+
+  # If verify is off, don't check any part of the CHECKSUMS
+  return
+    if defined $CHKSIGS && !$CHKSIGS;
+
+  die "CHECKSUMS URL must be HTTPS, not '$url'"
+    unless $url =~ m{\Ahttps://}xmsi;
+
+  die "CHECKSUMS URL must end with CHECKSUMS, not '$url'"
+    unless $url =~ m{CHECKSUMS\z}xmsi;
+
+  # Even if verification is optional, not downloading the CHECKSUMS is fatal
+  my $checksums = '';
+  fetch_file( $url, \$checksums );
+  $checksums = App::MechaCPAN::_verify_checksums_body($checksums);
+
+  # If $CHKSIGS is true, we must verify that CHECKSUMS has a valid signature
+  # If $CHKSIGS is undef, we will verify that CHECKSUMS has a valid signature
+  #   if possible, but won't throw errors if can't.
+  # In both cases, the CHECKSUMS is used to validate the checksums of the
+  #   downloaded file
+  # If $CHKSIGS is otherwise false, we already did an early return above
+  my $verify_fn = _resolve_verifier();
+
+  if ( !defined $verify_fn )
+  {
+    die "Could not find verification program and verification was required"
+      if $CHKSIGS;
+    logmsg "CHECKSUMS signature not checked: PGP verifier not found";
+  }
+  else
+  {
+    my $keyring  = cpan_keyring();
+    my $chk_file = humane_tmpfile('CHECKSUMS');
+
+    $chk_file->print($checksums);
+    $chk_file->flush;
+    $verify_fn->( "$chk_file", $keyring );
+    logmsg "VALID: $url";
+  }
+
+  my $result = do
+  {
+    require Safe;
+    my $safe = Safe->new("App::MechaCPAN::reval");
+
+    local $@;
+    my $chksum = $safe->reval($checksums);
+    die "Failed to parse CHECKSUMS: $@"
+      if $@;
+
+    die "Failed to get HASH from CHECKSUMS"
+      if ref $chksum ne 'HASH';
+
+    $chksum;
+  };
+
+  # If a module name is passed ($key), then we check if it is listed in the
+  # CHECKSUMS file. If it is missing, it depends on $CHKSIGS. If it is true
+  # (strict verify), an error will be produced. If it is undef (best-effort)
+  # then a log entry will be added, and nothing will be returned, whcih will
+  # match the no-verify path above.
+  if ( defined $key && !exists $result->{$key} )
+  {
+    die "Could not find module '$key' in CHECKSUMS"
+      if $CHKSIGS;
+
+    logmsg "Could not find '$key' in CHECKSUMS, not attempting to verify";
+    return;
+  }
+
+  return $result;
+}
+
 my @inflate = (
 
   # System tar
@@ -793,7 +1352,7 @@ my @inflate = (
 
     my $humane_qr = humane_qr;
     return
-      unless $src =~ m{ [.]tar[.] (?: gz | bz2 | xz ) $humane_qr? $}xms;
+      unless $src =~ m{ [.]tar[.] (?: xz | gz | bz2|bzip2 ) $humane_qr? $}xms;
 
     state $tar;
     if ( !defined $tar )
@@ -810,9 +1369,13 @@ my @inflate = (
       : $src =~ m/(bz2|bzip2) $humane_qr? $/xms ? 'bzip2'
       :                                           'xz';
 
-    run("$unzip -dc $src | tar xf -");
+    # Instead of relying on a shell to pipe contents from unzip to tar, both
+    # gnutar and bsdtar accept the use-compress-program option. bsdtar needs
+    # the -d option so it will decompress, while gnutar automatically adds it
+    # but it is harmless to add.
+    run( 'tar', '--use-compress-program', "$unzip -d", '-xf', $src );
     return 1;
-    },
+  },
 
   # Archive::Tar
   sub
@@ -830,15 +1393,92 @@ my @inflate = (
   },
 );
 
+sub _path_escapes_dir
+{
+  my $path = shift;
+
+  return 0
+    if !defined $path;
+  return 0
+    if !length $path;
+
+  return 1
+    if File::Spec->file_name_is_absolute($path);
+
+  for my $part ( File::Spec->splitdir($path) )
+  {
+    return 1
+      if $part eq '..';
+  }
+
+  return 0;
+}
+
+# Inspect a tar archive's header entries (no extraction). Returns a
+# human-readable reason if any entry would escape the destination dir
+# (absolute paths, '..' traversal in names, or symlink/hardlink targets
+# pointing outside). Returns undef if the archive is safe.
+sub _validate_archive_is_safe
+{
+  my $src = shift;
+
+  require Archive::Tar;
+
+  # Create a tar iterator. The magic 1 tells it to decompress
+  my $iter = Archive::Tar->iter( "$src", 1 );
+
+  return "could not read archive: $src"
+    if !defined $iter;
+
+  while ( my $entry = $iter->() )
+  {
+    my $name = $entry->full_path;
+
+    return "unsafe entry name: '$name'"
+      if _path_escapes_dir($name);
+
+    if ( $entry->is_symlink || $entry->is_hardlink )
+    {
+      my $linkname = $entry->linkname;
+
+      return "unsafe link target: '$name' -> '$linkname'"
+        if _path_escapes_dir($linkname);
+    }
+  }
+
+  return;
+}
+
 sub inflate_archive
 {
   my $src = shift;
   my $dir = shift;
 
+  my $sha256;
+
+  if ( ref $src eq 'HASH' )
+  {
+    $sha256 = delete $src->{sha256};
+
+    # Technically the error is wrong, it can have an optional sha256 key,
+    # but it gets people here to see that the error is that there is a
+    # narrow requirement for the hashref version of inflate_archive
+    die "Hashref for inflate_archive must be only the 'src' key"
+      if scalar( keys %$src ) != 1 || !exists $src->{src};
+
+    $src = $src->{src};
+  }
+
   # $src can be a file path or a URL.
   if ( !-e "$src" )
   {
     $src = fetch_file($src);
+  }
+
+  if ($sha256)
+  {
+    file_digest_chk( $src, $sha256 );
+    logmsg "Digest passed: $src";
   }
 
   if ( !defined $dir )
@@ -849,6 +1489,11 @@ sub inflate_archive
 
   die "Could not find destination directory: $dir"
     if !-d $dir;
+
+  if ( my $reason = _validate_archive_is_safe($src) )
+  {
+    croak "Refusing to extract unsafe archive $src: $reason\n";
+  }
 
   my $orig = cwd;
 
@@ -917,6 +1562,46 @@ sub _genio
   $read_hdl->autoflush(1);
 
   return ( $read_hdl, $write_hdl );
+}
+
+# Run a command and suppress the entire output unless there was an error
+sub run_qvf
+{
+  my @args = @_;
+  if ( $VERBOSE )
+  {
+    return run(@args);
+  }
+
+  my $qvf = '';
+  open my $fh, '>', \$qvf;
+
+  local $@;
+
+  my $result;
+  eval {
+    local $LOGFH   = $fh;
+    defined wantarray ? $result = run(@args) : run(@args);
+  };
+
+  if ( $@ )
+  {
+    if ( $LOGFH )
+    {
+      print $LOGFH $qvf;
+    }
+    die $@;
+  }
+
+  return
+    if !defined wantarray;
+
+  if (wantarray)
+  {
+    return split( /\r?\n/, $result );
+  }
+
+  return $result;
 }
 
 sub run
@@ -993,6 +1678,8 @@ sub run
           next;
         }
 
+        # All output goes to STDERR so it can be captured
+        # in verbose mode
         print STDERR $line if $print_output;
 
         if ( $fh eq $output )
@@ -1025,10 +1712,10 @@ sub run
     }
   };
 
-  my $error = $@;
+  my $eval_error = $@;
   alarm 0;
 
-  if ( $error eq $alrm_code )
+  if ( $eval_error eq $alrm_code )
   {
     info "Idle timeout (${TIMEOUT}s) exceeded, killing";
     kill "KILL", $pid;
@@ -1043,12 +1730,12 @@ sub run
     my $core = $? & 128     ? 'Core Dumped'               : '';
 
     # There could be a lot of output, ignore all but the very end
-    @out_tail[-1] = "...SKIPPED\n"
+    $out_tail[-1] = "...SKIPPED\n"
       if scalar @out_tail > $max_lines;
     my $out_tail = join( '', reverse @out_tail );
     chomp $out_tail;
 
-    @err_tail[-1] = "...SKIPPED\n"
+    $err_tail[-1] = "...SKIPPED\n"
       if scalar @err_tail > $max_lines;
     my $err_tail = join( '', reverse @err_tail );
     chomp $err_tail;
@@ -1220,9 +1907,10 @@ sub restart_script
       archlibexp privlibexp
       otherlibdirsexp
       /;
-    my %site_inc = map { $_ => 1 } @Config{@paths}, '.';
 
-    foreach my $lib ( split ':', $ENV{PERL5LIB} )
+    my %site_inc = map { defined $_ ? ( $_ => 1 ) : () } @Config{@paths}, '.';
+
+    foreach my $lib ( split ':', $ENV{PERL5LIB} // '')
     {
       $site_inc{$lib} = 1;
       $site_inc{"$lib/$Config{archname}"} = 1;
@@ -1243,6 +1931,7 @@ sub restart_script
 
     # Make sure anything from PERL5LIB and local::lib are removed since it's
     # most likely the wrong version as well.
+    $ENV{PERL_LOCAL_LIB_ROOT} //= '';
     @inc_add = grep { $_ !~ m/^$ENV{PERL_LOCAL_LIB_ROOT}/xms } @inc_add;
     undef @ENV{qw/PERL_LOCAL_LIB_ROOT PERL5LIB/};
 
@@ -1375,6 +2064,34 @@ Using quiet means that the normal information descriptions are hidden. Note that
 =head2 --no-log
 
 A log is normally outputted into the C<local/logs> directory. This option will prevent a log from being created.
+
+=head2 --verify
+
+When C<--verify> is given, a verification of the CPAN C<CHECKSUMS> file during module install is required. Note that packages from L<BackPAN|https://backpan.perl.org/> will not verify when C<--verify> is given. This process includes three steps after downloading the C<CHECKSUMS> file from CPAN for the module.
+
+=over
+
+=item 1. Confirm the shape of CHECKSUMS
+
+C<CHECKSUMS> files contain all the files and the file checksums for a CPAN author's uploads. This file is compared against a rigid definition to ensure that it does not appear to be doing anything malicious.
+
+=item 2. Confirm the signature of CHECKSUMS
+
+Once the C<CHECKSUMS> structure has been examined, the embedded signature is verified. The C<CHECKSUMS> file is signed using the PAUSE Batch Signing Key (C<2E66 557A B97C 19C7 91AF  8E20 328D A867 450F 89EC>, accessible at L<https://www.cpan.org/modules/04pause.html>). This signature is checked with an external PGP signature verification program. See below for a list of usable external verification programs.
+
+=item 3. Compare the sha256 of the downloaded module to CHECKSUMS
+
+Once the CHECKSUMS file has been checked, the size, CPAN author path, and the C<sha256> value of the downloaded module archive are compared against the values from the CHECKSUMS file. These values must match.
+
+=back
+
+You can also disable C<CHECKSUMS> verification completely with C<--no-verify>. That will prevent all of these steps from running at all.
+
+When neither option is provided then the signature checking step is attempted, but will not produce an error if the external verification program could not be found, or the file is from backpan and has no corrisponding C<CHECKSUMS> entry. An error is still raised if any other parts of the process finds a problem.
+
+If L<MetaCPAN|https://metacpan.org> was used to find a module, the search will include the SHA256 of the package, which will be checked against the downloaded archive. This check cannot be disabled currently.
+
+The verification programs that can be used are: L<gpgv|https://www.gnupg.org/>, L<sqv|https://sequoia-pgp.org/>, L<gpg|https://www.gnupg.org/>, L<sq|https://sequoia-pgp.org/>, and L<rnp|https://www.rnpgp.org/>.
 
 =head2 --directory=<path>
 

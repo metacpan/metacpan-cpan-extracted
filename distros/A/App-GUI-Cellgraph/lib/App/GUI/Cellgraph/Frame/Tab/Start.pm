@@ -244,7 +244,7 @@ sub update_cell_colors {
     for my $i (0 .. $#colors) {
         return unless ref $colors[$i] eq 'Graphics::Toolkit::Color';
         if (exists $self->{'state_colors'}[$i]) {
-            my @rgb = $colors[$i]->rgb;
+            my @rgb = $colors[$i]->values();
             $do_recolor += !( $rgb[$_] == $self->{'state_colors'}[$i][$_]) for 0 .. 2;
         } else { $do_recolor++ }
     }

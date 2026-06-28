@@ -68,6 +68,7 @@ sub stub_net {
 	*Email::Abuse::Investigator::_domain_whois = sub { $ov{domain_whois} // undef };
 	*Email::Abuse::Investigator::_raw_whois	= sub { undef };
 	*Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	*Email::Abuse::Investigator::_parallel_resolve_hosts = sub {};
 }
 
 my %_ORIG;

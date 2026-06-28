@@ -5,11 +5,12 @@
 !/.claude/
 .claude/*
 !.claude/settings.json
-!.claude/settings.local.json
 !.claude/agents/
 !.claude/agents/**
 !.claude/skills/
 !.claude/skills/**
+!.claude/rules/
+!.claude/rules/**
 !.claude/hooks/
 !.claude/hooks/**
 

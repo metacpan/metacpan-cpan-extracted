@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Unbound::Settings;
-$WebService::OPNsense::Unbound::Settings::VERSION = '0.001';
+$WebService::OPNsense::Unbound::Settings::VERSION = '0.002';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -19,218 +19,282 @@ with 'WebService::OPNsense::Role::Settings';
 
 sub search_host_override {
     my ( $self, %params ) = @_;
+    my $uri = $self->_path('searchHostOverride');
+
     return $self->client->get(
-        $self->_path('searchHostOverride'), \%params,
+        $uri, \%params,
     );
 }
 
 sub get_host_override {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'getHostOverride/{uuid}', uuid => $uuid );
+
     return $self->client->get(
-        $self->_path( 'getHostOverride/{uuid}', uuid => $uuid ),
+        $uri,
     );
 }
 
 sub add_host_override {
     my ( $self, $host_data ) = @_;
+    my $uri = $self->_path('addHostOverride');
+
     return $self->client->post(
-        $self->_path('addHostOverride'), $host_data,
+        $uri, $host_data,
     );
 }
 
 sub set_host_override {
     my ( $self, $uuid, $host_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setHostOverride/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setHostOverride/{uuid}', uuid => $uuid ), $host_data,
+        $uri, $host_data,
     );
 }
 
 sub del_host_override {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'delHostOverride/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'delHostOverride/{uuid}', uuid => $uuid ),
+        $uri,
     );
 }
 
 sub toggle_host_override {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleHostOverride/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleHostOverride/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
 sub search_host_alias {
     my ( $self, %params ) = @_;
+    my $uri = $self->_path('searchHostAlias');
+
     return $self->client->get(
-        $self->_path('searchHostAlias'), \%params,
+        $uri, \%params,
     );
 }
 
 sub get_host_alias {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'getHostAlias/{uuid}', uuid => $uuid );
+
     return $self->client->get(
-        $self->_path( 'getHostAlias/{uuid}', uuid => $uuid ),
+        $uri,
     );
 }
 
 sub add_host_alias {
     my ( $self, $alias_data ) = @_;
+    my $uri = $self->_path('addHostAlias');
+
     return $self->client->post(
-        $self->_path('addHostAlias'), $alias_data,
+        $uri, $alias_data,
     );
 }
 
 sub set_host_alias {
     my ( $self, $uuid, $alias_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setHostAlias/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setHostAlias/{uuid}', uuid => $uuid ), $alias_data,
+        $uri, $alias_data,
     );
 }
 
 sub del_host_alias {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'delHostAlias/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'delHostAlias/{uuid}', uuid => $uuid ),
+        $uri,
     );
 }
 
 sub toggle_host_alias {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleHostAlias/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleHostAlias/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
 sub search_forward {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchForward'), \%params );
+    my $uri = $self->_path('searchForward');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_forward {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getForward/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getForward/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_forward {
     my ( $self, $forward_data ) = @_;
-    return $self->client->post( $self->_path('addForward'), $forward_data );
+    my $uri = $self->_path('addForward');
+
+    return $self->client->post( $uri, $forward_data );
 }
 
 sub set_forward {
     my ( $self, $uuid, $forward_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setForward/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setForward/{uuid}', uuid => $uuid ), $forward_data,
+        $uri, $forward_data,
     );
 }
 
 sub del_forward {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delForward/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delForward/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_forward {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleForward/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleForward/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
 sub search_acl {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchACL'), \%params );
+    my $uri = $self->_path('searchACL');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_acl {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getACL/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getACL/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_acl {
     my ( $self, $acl_data ) = @_;
-    return $self->client->post( $self->_path('addACL'), $acl_data );
+    my $uri = $self->_path('addACL');
+
+    return $self->client->post( $uri, $acl_data );
 }
 
 sub set_acl {
     my ( $self, $uuid, $acl_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setACL/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setACL/{uuid}', uuid => $uuid ), $acl_data,
+        $uri, $acl_data,
     );
 }
 
 sub del_acl {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delACL/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delACL/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_acl {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleACL/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleACL/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
 sub search_dnsbl {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchDnsbl'), \%params );
+    my $uri = $self->_path('searchDnsbl');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_dnsbl {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getDnsbl/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getDnsbl/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_dnsbl {
     my ( $self, $dnsbl_data ) = @_;
-    return $self->client->post( $self->_path('addDnsbl'), $dnsbl_data );
+    my $uri = $self->_path('addDnsbl');
+
+    return $self->client->post( $uri, $dnsbl_data );
 }
 
 sub set_dnsbl {
     my ( $self, $uuid, $dnsbl_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setDnsbl/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setDnsbl/{uuid}', uuid => $uuid ), $dnsbl_data,
+        $uri, $dnsbl_data,
     );
 }
 
 sub del_dnsbl {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delDnsbl/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delDnsbl/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_dnsbl {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleDnsbl/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleDnsbl/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
 sub update_blocklist {
     my ($self) = @_;
-    return $self->client->post( $self->_path('updateBlocklist') );
+    my $uri = $self->_path('updateBlocklist');
+
+    return $self->client->post($uri);
 }
 
 sub get_nameservers {
     my ($self) = @_;
-    return $self->client->get( $self->_path('getNameservers') );
+    my $uri = $self->_path('getNameservers');
+
+    return $self->client->get($uri);
 }
 
 1;
@@ -247,7 +311,7 @@ WebService::OPNsense::Unbound::Settings - Unbound settings controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -260,17 +324,13 @@ version 0.001
 Manages Unbound DNS settings including host overrides,
 aliases, forwards, ACLs, and DNSBL.
 
-=head1 NAME
-
-WebService::OPNsense::Unbound::Settings - Unbound settings controller
-
 =head1 METHODS
 
-=head2 get
+=head2 get_settings
 
-    my $settings = $unbound_settings->get;
+    my $settings = $unbound_settings->get_settings;
 
-Returns the current Unbound settings.
+Returns Unbound settings.
 
 =head2 set_settings
 
@@ -294,13 +354,13 @@ Returns a single host override by UUID.
 
     my $result = $unbound_settings->add_host_override($data);
 
-Creates a new host override.
+Creates host override.
 
 =head2 set_host_override
 
     my $result = $unbound_settings->set_host_override($uuid, $data);
 
-Updates an existing host override.
+Updates host override.
 
 =head2 del_host_override
 
@@ -330,13 +390,13 @@ Returns a single host alias by UUID.
 
     my $result = $unbound_settings->add_host_alias($data);
 
-Creates a new host alias.
+Creates host alias.
 
 =head2 set_host_alias
 
     my $result = $unbound_settings->set_host_alias($uuid, $data);
 
-Updates an existing host alias.
+Updates host alias.
 
 =head2 del_host_alias
 
@@ -366,13 +426,13 @@ Returns a single forward entry by UUID.
 
     my $result = $unbound_settings->add_forward($data);
 
-Creates a new forward entry.
+Creates forward entry.
 
 =head2 set_forward
 
     my $result = $unbound_settings->set_forward($uuid, $data);
 
-Updates an existing forward entry.
+Updates forward entry.
 
 =head2 del_forward
 
@@ -402,13 +462,13 @@ Returns a single ACL entry by UUID.
 
     my $result = $unbound_settings->add_acl($data);
 
-Creates a new ACL entry.
+Creates ACL entry.
 
 =head2 set_acl
 
     my $result = $unbound_settings->set_acl($uuid, $data);
 
-Updates an existing ACL entry.
+Updates ACL entry.
 
 =head2 del_acl
 
@@ -438,13 +498,13 @@ Returns a single DNSBL entry by UUID.
 
     my $result = $unbound_settings->add_dnsbl($data);
 
-Creates a new DNSBL entry.
+Creates DNSBL entry.
 
 =head2 set_dnsbl
 
     my $result = $unbound_settings->set_dnsbl($uuid, $data);
 
-Updates an existing DNSBL entry.
+Updates DNSBL entry.
 
 =head2 del_dnsbl
 
@@ -470,7 +530,15 @@ Updates the DNSBL blocklist.
 
 Returns the configured nameservers.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $unbound_settings->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Settings>
 
 =head1 AUTHOR
 

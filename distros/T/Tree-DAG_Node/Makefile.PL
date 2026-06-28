@@ -29,9 +29,11 @@ my(%params) =
 	PL_FILES	=> {},
 	PREREQ_PM	=>
 	{
+		'Data::Dumper'			=> 2.189,
 		'ExtUtils::MakeMaker'	=> 7.70,
 		'File::Slurper'			=> 0.014,
-		'open'					=> 0,
+		'Getopt::Long'			=> 2.57,
+		'perl'					=> 5.020004,
 		'strict'				=> 0,
 		'utf8'					=> 0,
 		'warnings'				=> 0,

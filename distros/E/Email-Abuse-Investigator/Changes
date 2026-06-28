@@ -1,5 +1,44 @@
 Revision history for Email-Abuse-Investigator
 
+0.12	Sat Jun 27 13:17:32 EDT 2026
+	[Bug Fixes]
+	- Fix some uninitialized variables
+
+	- _parallel_resolve_hosts: fixed an empty-input deadlock when AnyEvent::DNS
+	  is installed.  With an empty %$hostnames_ref, $pending was 0, no callbacks
+	  were ever scheduled, and $cv->recv blocked forever.
+	  Fix: return early via (return unless $HAS_ANYEVENT_DNS && %$hostnames_ref).
+	  Fixes https://github.com/nigelhorne/Email-Abuse-Investigator/issues/2
+
+	- _parallel_resolve_hosts: fixed a fatal crash on emails with 2+ URL
+	  hostnames when AnyEvent::DNS is installed.
+	  AnyEvent::DNS::resolve($host,'A',$cb) was called as a bare package
+	  function; AnyEvent::DNS::resolve is a method on resolver objects, so $host
+	  was treated as the invocant ($self) and Perl died with:
+	    Can't locate object method "wait_for_slot" via package "<hostname>"
+	  This crashed every test that called embedded_urls() with 2+ URL hosts.
+	  Fix: use AnyEvent::DNS::resolver->resolve($host,'a',$cb).
+	  Fixes https://github.com/nigelhorne/Email-Abuse-Investigator/issues/2
+
+	[Enhancements]
+	- Stricter type checking for header_value
+
+	[Tests]
+	- All six test helpers (null_net/stub_net/install_stubs in t/integration.t,
+	  t/unit.t, t/edge_cases.t, t/extended_tests.t, t/mutation_survivors.t, and
+	  a file-level stub in t/function.t) now stub _parallel_resolve_hosts to a
+	  no-op.  Previously, installing AnyEvent::DNS caused these helpers to fire
+	  real async DNS queries for every test email containing 2+ URL hostnames,
+	  exposing both the API bug above and the missing stubs.
+
+	- t/github_2.t: new regression test file for GitHub issue #2 (5 subtests).
+	  WITH AnyEvent::DNS: verifies the empty-hash guard returns immediately,
+	  proves the correct OO API ($resolver->resolve) does not crash via a fake
+	  NXDOMAIN resolver, and confirms the host cache is populated from A records.
+	  WITHOUT AnyEvent::DNS (via Test::Without::Module + module reload): confirms
+	  embedded_urls() falls back to the sequential _resolve_host loop and that
+	  _parallel_resolve_hosts is a pure no-op leaving the cache empty.
+
 0.11	Sun Jun 14 20:02:44 EDT 2026
 
   [Enhancements]

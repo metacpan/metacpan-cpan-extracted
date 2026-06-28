@@ -157,6 +157,36 @@ subtest 'parse() relay EVENT message' => sub {
     is($msg->event->sig, $EVENT->sig, 'event sig preserved');
 };
 
+subtest 'parse() accepts UTF-8 wire bytes with non-ASCII event text' => sub {
+    my $emoji = "\x{1F600}";
+    my $event = Net::Nostr::Event->new(
+        pubkey => 'a' x 64,
+        kind => 1,
+        created_at => 1000,
+        tags => [['t', "nostr-$emoji"]],
+        content => "hello $emoji",
+        sig => 'b' x 128,
+    );
+    my $raw = JSON->new->utf8->encode(['EVENT', 'sub1', $event->to_hash]);
+
+    my $msg = Net::Nostr::Message->parse($raw);
+    is($msg->type, 'EVENT', 'type is EVENT');
+    is($msg->event->content, "hello $emoji", 'content decoded to Perl characters');
+    is($msg->event->tags->[0][1], "nostr-$emoji", 'tag text decoded to Perl characters');
+    is($msg->event->id, $event->id, 'event id preserved');
+};
+
+subtest 'parse() rejects decoded wide-character JSON strings' => sub {
+    my $emoji = "\x{1F600}";
+    my $decoded_json = JSON->new->encode(['NOTICE', "hello $emoji"]);
+
+    like(
+        dies { Net::Nostr::Message->parse($decoded_json) },
+        qr/UTF-8 encoded bytes/,
+        'decoded JSON string is rejected with the wire-byte contract'
+    );
+};
+
 subtest 'parse() OK message (accepted)' => sub {
     my $raw = JSON->new->utf8->encode(['OK', 'aa' x 32, JSON::true, '']);
     my $msg = Net::Nostr::Message->parse($raw);

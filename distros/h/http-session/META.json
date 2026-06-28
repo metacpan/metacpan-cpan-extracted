@@ -1,10 +1,10 @@
 {
-   "abstract" : "simple session",
+   "abstract" : "(DEPRECATED) simple session",
    "author" : [
       "Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,8 @@
             "CGI" : "4.45",
             "CGI::Simple::Cookie" : "1.22",
             "Class::Accessor::Fast" : "0.31",
-            "Digest::SHA1" : "2.11",
+            "Crypt::URandom" : "0.36",
+            "Digest::SHA" : "5.45",
             "Exporter" : "5.63",
             "HTTP::Response" : "5.818",
             "MIME::Base64" : "0",
@@ -68,7 +69,7 @@
    "provides" : {
       "HTTP::Session" : {
          "file" : "lib/HTTP/Session.pm",
-         "version" : "0.53"
+         "version" : "0.54"
       },
       "HTTP::Session::Expired" : {
          "file" : "lib/HTTP/Session/Expired.pm"
@@ -137,18 +138,20 @@
          "web" : "https://github.com/tokuhirom/http-session"
       }
    },
-   "version" : "0.53",
+   "version" : "0.54",
    "x_contributors" : [
       "Atsushi Kato <ktat.is@gmail.com>",
       "Atsushi Kato <ktat@cpan.org>",
       "MATSUU Takuto <matsuu@gmail.com>",
       "Neil Bowers <neil@bowers.com>",
+      "Olaf Alders <olaf@wundersolutions.com>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>",
       "kazuho <kazuho@d0d07461-0603-4401-acd4-de1884942a52>",
       "tohae <tohaechan@gmail.com>",
       "tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>",
       "yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

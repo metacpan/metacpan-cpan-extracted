@@ -1,0 +1,103 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+<</Length 601>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 722 Tm
+(PDF Attachments) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 688 Tm
+(This document has embedded file attachments.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 674 Tm
+(Check your PDF viewer's attachment panel to see them.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 660 Tm
+(Attached files:) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 646 Tm
+(1. sample_data.csv - CSV data with three rows) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 632 Tm
+(2. config.json - JSON configuration metadata) Tj
+ET
+
+endstream
+endobj
+4 0 obj
+<</Type /Pages/Kids [5 0 R]/Count 1>>
+endobj
+5 0 obj
+<</Type /Page/Parent 4 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F_Helvetica_normal 2 0 R>>>>/Contents 3 0 R>>
+endobj
+6 0 obj
+<</Type /Catalog/Pages 4 0 R/Names <</EmbeddedFiles <</Names [(sample_data.csv) 8 0 R (config.json) 10 0 R]>>>>>>
+endobj
+7 0 obj
+<</Type /EmbeddedFile/Subtype /text#232Fcsv/Params <</Size 38>>/Length 38>>
+stream
+Name,Score
+Alice,95
+Bob,87
+Charlie,92
+
+endstream
+endobj
+8 0 obj
+<</Type /Filespec/F (sample_data.csv)/UF (sample_data.csv)/Desc (Sample CSV data)/EF <</F 7 0 R/UF 7 0 R>>/AFRelationship /Data>>
+endobj
+9 0 obj
+<</Type /EmbeddedFile/Subtype /application#232Fjson/Params <</Size 58>>/Length 58>>
+stream
+{"version": "1.0", "format": "pdf", "engine": "PDF::Make"}
+endstream
+endobj
+10 0 obj
+<</Type /Filespec/F (config.json)/UF (config.json)/Desc (Configuration metadata)/EF <</F 9 0 R/UF 9 0 R>>/AFRelationship /Data>>
+endobj
+11 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260422090230Z)/ModDate (D:20260422090230Z)>>
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000151 00000 n 
+0000000801 00000 n 
+0000000854 00000 n 
+0000000986 00000 n 
+0000001115 00000 n 
+0000001262 00000 n 
+0000001407 00000 n 
+0000001582 00000 n 
+0000001727 00000 n 
+trailer
+<</Size 12/Root 6 0 R/Info 11 0 R/ID[<893E3CB73FC5D717AA882BC2488CD236><893E3CB73FC5D717AA882BC2488CD236>]>>
+startxref
+1834
+%%EOF

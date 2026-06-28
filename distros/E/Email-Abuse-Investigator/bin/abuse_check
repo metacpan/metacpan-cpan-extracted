@@ -14,7 +14,7 @@ use autodie qw(:all);
 
 use utf8;
 use open qw(:std :encoding(UTF-8));
-use lib '.';					# find Mail/Message/Abuse.pm nearby
+use lib '.';					# find Email/Abuse/Investigator.pm nearby
 use Email::Abuse::Investigator;
 
 # ---- Read the raw email ------------------------------------------------

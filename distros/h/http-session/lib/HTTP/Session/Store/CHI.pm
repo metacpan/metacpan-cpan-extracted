@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use base qw/Class::Accessor::Fast/;
 use CHI;
+use Encode qw( encode_utf8 is_utf8 );
 
 __PACKAGE__->mk_ro_accessors(qw/chi expires/);
 
@@ -20,24 +21,33 @@ sub new {
     bless {%args}, $class;
 }
 
+sub _filter_sid($) {
+    my $session_id = shift;
+    $session_id = encode_utf8($session_id) if is_utf8($session_id);
+    if ($session_id =~ /[\x00-\x20\x7f-\xff]/ || length($session_id) > 250) {
+        die "detected memcached injection: $session_id";
+    }
+    return $session_id;
+}
+
 sub select {
     my ( $self, $session_id ) = @_;
-    my $data = $self->chi->get($session_id);
+    my $data = $self->chi->get(_filter_sid $session_id);
 }
 
 sub insert {
     my ($self, $session_id, $data) = @_;
-    $self->chi->set( $session_id, $data, $self->expires );
+    $self->chi->set( _filter_sid($session_id), $data, $self->expires );
 }
 
 sub update {
     my ($self, $session_id, $data) = @_;
-    $self->chi->set( $session_id, $data, $self->expires );
+    $self->chi->set( _filter_sid($session_id), $data, $self->expires );
 }
 
 sub delete {
     my ($self, $session_id) = @_;
-    $self->chi->remove( $session_id );
+    $self->chi->remove( _filter_sid($session_id) );
 }
 
 sub cleanup { Carp::croak "This storage doesn't support cleanup" }

@@ -4,36 +4,40 @@
 use strictures 2;
 
 package WebService::OPNsense::CaptivePortal::Access;
-$WebService::OPNsense::CaptivePortal::Access::VERSION = '0.001';
+$WebService::OPNsense::CaptivePortal::Access::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
 has client => ( is => 'ro', required => 1 );
 
+sub _api_path {
+    return '/api/captiveportal/access';
+}
+
+with 'WebService::OPNsense::Role::APIPath';
+
 sub api {
     my ($self) = @_;
-    return $self->client->get('/api/captiveportal/access/api');
+    my $uri = $self->_path('api');
+    return $self->client->get($uri);
 }
 
 sub status {
     my ( $self, $zoneid ) = @_;
-    my $path = '/api/captiveportal/access/status';
-    $path .= "/$zoneid" if defined $zoneid;
-    return $self->client->get($path);
+    my $uri = $self->_path( 'status{/zoneid}', zoneid => $zoneid );
+    return $self->client->get($uri);
 }
 
 sub logon {
     my ( $self, $zoneid ) = @_;
-    my $path = '/api/captiveportal/access/logon';
-    $path .= "/$zoneid" if defined $zoneid;
-    return $self->client->post($path);
+    my $uri = $self->_path( 'logon{/zoneid}', zoneid => $zoneid );
+    return $self->client->post($uri);
 }
 
 sub logoff {
     my ( $self, $zoneid ) = @_;
-    my $path = '/api/captiveportal/access/logoff';
-    $path .= "/$zoneid" if defined $zoneid;
-    return $self->client->post($path);
+    my $uri = $self->_path( 'logoff{/zoneid}', zoneid => $zoneid );
+    return $self->client->post($uri);
 }
 
 1;
@@ -50,7 +54,7 @@ WebService::OPNsense::CaptivePortal::Access - Captive portal access controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -61,10 +65,6 @@ version 0.001
 =head1 DESCRIPTION
 
 Manages captive portal access control.
-
-=head1 NAME
-
-WebService::OPNsense::CaptivePortal::Access - Captive portal access controller
 
 =head1 METHODS
 
@@ -95,7 +95,15 @@ Logs on a captive portal session.  Optionally specify a zone ID.
 
 Logs off a captive portal session.  Optionally specify a zone ID.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $cp_access->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::APIPath>
 
 =head1 AUTHOR
 

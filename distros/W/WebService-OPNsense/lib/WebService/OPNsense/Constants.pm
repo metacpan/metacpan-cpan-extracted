@@ -1,11 +1,12 @@
 #!/bin/false
-# ABSTRACT: Cross-cutting constants for the OPNsense REST API
+# ABSTRACT: Named constants for the OPNsense REST API -- safer and more maintainable than hardcoded strings
 # PODNAME: WebService::OPNsense::Constants
 use strictures 2;
 
 package WebService::OPNsense::Constants;
-$WebService::OPNsense::Constants::VERSION = '0.001';
-use Const::Fast::Exporter qw( const );
+$WebService::OPNsense::Constants::VERSION = '0.002';
+use Const::Fast qw( const );
+use parent      qw( Exporter::Tiny );
 
 # Actions
 const our $ACTION_BLOCK  => 'block';
@@ -39,8 +40,8 @@ const our $DIRECTION_IN  => 'in';
 const our $DIRECTION_OUT => 'out';
 
 # Enabled / Disabled state
-const our $DISABLED => 0;
-const our $ENABLED  => 1;
+const our $OPN_DISABLED => 0;
+const our $OPN_ENABLED  => 1;
 
 # Gateway
 const our $GATEWAY_DEFAULT => 'default';
@@ -136,6 +137,106 @@ const our $TLS_VERSION_1_1 => '1.1';
 const our $TLS_VERSION_1_2 => '1.2';
 const our $TLS_VERSION_1_3 => '1.3';
 
+our @EXPORT_OK = qw(
+    $ACTION_BLOCK
+    $ACTION_PASS
+    $ACTION_REJECT
+    $AF_INET
+    $AF_INET6
+    $AF_INET46
+    $ALIAS_ASN
+    $ALIAS_AUTHGROUP
+    $ALIAS_DYNIPV6HOST
+    $ALIAS_EXTERNAL
+    $ALIAS_GEOIP
+    $ALIAS_HOST
+    $ALIAS_INTERNAL
+    $ALIAS_MAC
+    $ALIAS_NETWORK
+    $ALIAS_NETWORK_GROUP
+    $ALIAS_PORT
+    $ALIAS_URL
+    $ALIAS_URL_JSON
+    $ALIAS_URL_TABLE
+    $DIRECTION_ANY
+    $DIRECTION_IN
+    $DIRECTION_OUT
+    $OPN_DISABLED
+    $OPN_ENABLED
+    $GATEWAY_DEFAULT
+    $INTERFACE_DMZ
+    $INTERFACE_GUEST
+    $INTERFACE_LAN
+    $INTERFACE_LOOPBACK
+    $INTERFACE_OPT1
+    $INTERFACE_OPT2
+    $INTERFACE_OPT3
+    $INTERFACE_OPT4
+    $INTERFACE_OPT5
+    $INTERFACE_OPT6
+    $INTERFACE_OPT7
+    $INTERFACE_OPT8
+    $INTERFACE_OPT9
+    $INTERFACE_WAN
+    $INTERFACE_WAN2
+    $INTERFACE_WAN_DHCP
+    $INTERFACE_WAN_PPPOE
+    $IF_GROUP_DMZ
+    $IF_GROUP_GUEST
+    $IF_GROUP_LAN
+    $IF_GROUP_OPT1
+    $IF_GROUP_OPT2
+    $IF_GROUP_OPT3
+    $IF_GROUP_OPT4
+    $IF_GROUP_OPT5
+    $IF_GROUP_OPT6
+    $IF_GROUP_OPT7
+    $IF_GROUP_OPT8
+    $IF_GROUP_OPT9
+    $IF_GROUP_WAN
+    $LOG_LEVEL_NONE
+    $LOG_LEVEL_NORMAL
+    $LOG_LEVEL_HIGH
+    $ONETOONE_BINAT
+    $ONETOONE_NAT
+    $PROTO_ANY
+    $PROTO_ESP
+    $PROTO_GRE
+    $PROTO_ICMP
+    $PROTO_OSPF
+    $PROTO_PIM
+    $PROTO_SCTP
+    $PROTO_TCP
+    $PROTO_TCP_UDP
+    $PROTO_UDP
+    $PROTO_VRRP
+    $SEQ_EARLY
+    $SEQ_FIRST
+    $SEQ_FLOATING
+    $SEQ_LAST
+    $SNAT_ADVANCED
+    $SNAT_AUTOMATIC
+    $SNAT_DISABLED
+    $SNAT_HYBRID
+    $STATETYPE_KEEP
+    $STATETYPE_MODULATE
+    $STATETYPE_NONE
+    $STATETYPE_SLOPPY
+    $STATETYPE_SYNPROXY
+    $TCP_FLAG_ACK
+    $TCP_FLAG_CWR
+    $TCP_FLAG_ECE
+    $TCP_FLAG_FIN
+    $TCP_FLAG_PSH
+    $TCP_FLAG_RST
+    $TCP_FLAG_SYN
+    $TCP_FLAG_URG
+    $TLS_VERSION_1_0
+    $TLS_VERSION_1_1
+    $TLS_VERSION_1_2
+    $TLS_VERSION_1_3
+);
+
 1;
 
 __END__
@@ -146,20 +247,32 @@ __END__
 
 =head1 NAME
 
-WebService::OPNsense::Constants - Cross-cutting constants for the OPNsense REST API
+WebService::OPNsense::Constants - Named constants for the OPNsense REST API -- safer and more maintainable than hardcoded strings
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-    use WebService::OPNsense::Constants;
+    # Import only the constants you need
+    use WebService::OPNsense::Constants qw( $ACTION_PASS $PROTO_TCP $INTERFACE_WAN );
+    print $ACTION_PASS;         # 'pass'
+    print $PROTO_TCP;           # 'TCP'
+    print $INTERFACE_WAN;       # 'wan'
 
-    # All constants are exported by default
-    print $ACTION_PASS;
-    print $PROTO_TCP;
-    print $INTERFACE_WAN;
+    # Selective import -- only listed names enter your namespace
+    use WebService::OPNsense::Constants qw( $ACTION_PASS $PROTO_TCP );
+    print $ACTION_PASS;         # imported
+    print $PROTO_TCP;           # imported
+
+    # Empty import list -- nothing imported, use fully-qualified names
+    use WebService::OPNsense::Constants ();
+    print $WebService::OPNsense::Constants::ACTION_PASS;
+    print $WebService::OPNsense::Constants::PROTO_TCP;
+
+    # Unknown import names die at compile time
+    # use WebService::OPNsense::Constants qw( $NONEXISTENT );  # dies
 
 =head1 DESCRIPTION
 
@@ -167,12 +280,11 @@ Provides shared constant values used across the OPNsense API.  Constants
 cover actions, protocols, interfaces, directions, state types, and other
 enum-like values that appear in multiple API controllers.
 
-Constants are exported automatically on C<use>.  No explicit import list
-is needed.
-
-=head1 NAME
-
-WebService::OPNsense::Constants - Cross-cutting constants for the OPNsense REST API
+Nothing is exported by default.  List the names you need in the C<use>
+statement (e.g. C<use WebService::OPNsense::Constants qw($ACTION_PASS
+$PROTO_TCP)>).  Unknown names croak at compile time.  Use
+C<use WebService::OPNsense::Constants ()> to import nothing and reference
+constants by their fully-qualified name.
 
 =head1 CONSTANTS
 
@@ -250,9 +362,9 @@ WebService::OPNsense::Constants - Cross-cutting constants for the OPNsense REST 
 
 =over
 
-=item C<$ENABLED>
+=item C<$OPN_ENABLED>
 
-=item C<$DISABLED>
+=item C<$OPN_DISABLED>
 
 =back
 

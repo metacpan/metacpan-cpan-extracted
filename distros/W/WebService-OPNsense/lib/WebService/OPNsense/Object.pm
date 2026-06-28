@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Object;
-$WebService::OPNsense::Object::VERSION = '0.001';
+$WebService::OPNsense::Object::VERSION = '0.002';
 use Moo;
 use Ref::Util qw( is_plain_hashref );
 use namespace::clean;
@@ -52,7 +52,7 @@ WebService::OPNsense::Object - Base result-object class for OPNsense API respons
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -67,14 +67,18 @@ version 0.001
 =head1 DESCRIPTION
 
 Provides a simple hash-based result object for deserialized API responses.
-Nested hashrefs are recursively converted to L<WebService::OPNsense::Object>
-instances.
-
-=head1 NAME
-
-WebService::OPNsense::Object - Base result-object class for OPNsense API responses
+Top-level nested hashrefs are converted to
+L<WebService::OPNsense::Object> instances.
 
 =head1 METHODS
+
+=head2 BUILD
+
+    my $obj = WebService::OPNsense::Object->new(%args);
+
+L<Moo> lifecycle hook.  Top-level nested hashrefs in the constructor
+arguments are recursively converted to L<WebService::OPNsense::Object>
+instances.
 
 =head2 get
 
@@ -86,7 +90,9 @@ Retrieves a value by key.
 
 Returns a plain hashref suitable for JSON serialization.
 
-=for Pod::Coverage BUILD
+=head1 SEE ALSO
+
+L<WebService::OPNsense>
 
 =head1 AUTHOR
 

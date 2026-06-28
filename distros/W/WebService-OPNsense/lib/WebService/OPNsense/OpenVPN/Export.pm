@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::OpenVPN::Export;
-$WebService::OPNsense::OpenVPN::Export::VERSION = '0.001';
+$WebService::OPNsense::OpenVPN::Export::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
@@ -18,34 +18,46 @@ with 'WebService::OPNsense::Role::APIPath';
 
 sub providers {
     my ($self) = @_;
-    return $self->client->get( $self->_path('providers') );
+    my $uri = $self->_path('providers');
+
+    return $self->client->get($uri);
 }
 
 sub templates {
     my ($self) = @_;
-    return $self->client->get( $self->_path('templates') );
+    my $uri = $self->_path('templates');
+
+    return $self->client->get($uri);
 }
 
 sub accounts {
     my ( $self, $vpnid ) = @_;
+    my $uri = $self->_path( 'accounts{/vpnid}', vpnid => $vpnid );
+
     return $self->client->get(
-        $self->_path( 'accounts{/vpnid}', vpnid => $vpnid ),
+        $uri,
     );
 }
 
 sub validate_presets {
     my ( $self, $presets_data ) = @_;
-    return $self->client->post( $self->_path('validatePresets'), $presets_data );
+    my $uri = $self->_path('validatePresets');
+
+    return $self->client->post( $uri, $presets_data );
 }
 
 sub store_presets {
     my ( $self, $presets_data ) = @_;
-    return $self->client->post( $self->_path('storePresets'), $presets_data );
+    my $uri = $self->_path('storePresets');
+
+    return $self->client->post( $uri, $presets_data );
 }
 
 sub download {
     my ( $self, $download_data ) = @_;
-    return $self->client->post( $self->_path('download'), $download_data );
+    my $uri = $self->_path('download');
+
+    return $self->client->post( $uri, $download_data );
 }
 
 1;
@@ -62,7 +74,7 @@ WebService::OPNsense::OpenVPN::Export - OpenVPN export controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -76,10 +88,6 @@ version 0.001
 
 Exports OpenVPN client configurations and manages
 export presets.
-
-=head1 NAME
-
-WebService::OPNsense::OpenVPN::Export - OpenVPN export controller
 
 =head1 METHODS
 
@@ -120,7 +128,15 @@ Stores export presets for later use.
 
 Downloads an OpenVPN client configuration package.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $export->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::APIPath>
 
 =head1 AUTHOR
 

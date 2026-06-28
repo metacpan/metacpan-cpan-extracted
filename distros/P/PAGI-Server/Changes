@@ -1,5 +1,21 @@
 # Revision history for PAGI-Server
 
+0.002002 - 2026-06-27
+
+  Bug Fixes
+  - The PAGI-Tools-dependent integration tests now require PAGI::Response (and
+    the other toolkit modules they exercise) at version 0.002000 or newer, the
+    release that introduced the detached PAGI::Response value API
+    (new($scope) + respond($send)). A pre-split PAGI install (<= 0.001023) still
+    provides those module names, so the guards previously let the tests run
+    against the old `new($scope, $send)` constructor and
+    t/integration/response-integration.t died with "send is required" on a
+    smoker that had the old distribution installed. The guards now skip on an
+    older version while still running against an unversioned in-tree checkout.
+
+  Documentation
+  - cpanfile: PAGI-Tools is now on CPAN; note updated accordingly.
+
 0.002001 - 2026-06-26
 
   Bug Fixes

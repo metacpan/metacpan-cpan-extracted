@@ -1,5 +1,12 @@
 Revision history for Params-Validate-Strict
 
+0.35	Sat Jun 27 21:28:03 EDT 2026
+
+  [Tests]
+  - function.t: the "1e309 overflows to Inf" subtest now skips on
+    -Duselongdouble builds where 1e309 is a finite value, not Inf.
+    Fixes GitHub#3
+
 0.34	Sat Jun 13 15:55:13 EDT 2026
 
   [Enhancements]

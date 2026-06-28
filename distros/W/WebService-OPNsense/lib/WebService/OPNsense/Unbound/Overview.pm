@@ -4,45 +4,55 @@
 use strictures 2;
 
 package WebService::OPNsense::Unbound::Overview;
-$WebService::OPNsense::Unbound::Overview::VERSION = '0.001';
+$WebService::OPNsense::Unbound::Overview::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
 has client => ( is => 'ro', required => 1 );
 
+sub _api_path {
+    return '/api/unbound/overview';
+}
+
+with 'WebService::OPNsense::Role::APIPath';
+
 sub is_enabled {
     my ($self) = @_;
-    return $self->client->get('/api/unbound/overview/isEnabled');
+    my $uri = $self->_path('isEnabled');
+    return $self->client->get($uri);
 }
 
 sub is_block_list_enabled {
     my ($self) = @_;
-    return $self->client->get('/api/unbound/overview/isBlockListEnabled');
+    my $uri = $self->_path('isBlockListEnabled');
+    return $self->client->get($uri);
 }
 
 sub get_policies {
     my ($self) = @_;
-    return $self->client->get('/api/unbound/overview/getPolicies');
+    my $uri = $self->_path('getPolicies');
+    return $self->client->get($uri);
 }
 
 sub totals {
     my ( $self, $maximum ) = @_;
-    my $path = '/api/unbound/overview/totals';
-    $path .= "/$maximum" if defined $maximum;
-    return $self->client->get($path);
+    my $uri = $self->_path( 'totals{/maximum}', maximum => $maximum );
+    return $self->client->get($uri);
 }
 
 sub search_queries {
     my ( $self, %params ) = @_;
-    return $self->client->get( '/api/unbound/overview/searchQueries', \%params );
+    my $uri = $self->_path('searchQueries');
+    return $self->client->get( $uri, \%params );
 }
 
 sub rolling {
     my ( $self, $timeperiod, $clients ) = @_;
-    my $path = '/api/unbound/overview/rolling';
-    $path .= "/$timeperiod" if defined $timeperiod;
-    $path .= "/$clients"    if defined $clients;
-    return $self->client->get($path);
+    my $uri = $self->_path(
+        'rolling{/timeperiod}{/clients}', timeperiod => $timeperiod,
+        clients => $clients,
+    );
+    return $self->client->get($uri);
 }
 
 1;
@@ -59,7 +69,7 @@ WebService::OPNsense::Unbound::Overview - Unbound overview controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -70,10 +80,6 @@ version 0.001
 =head1 DESCRIPTION
 
 Unbound overview and statistics.
-
-=head1 NAME
-
-WebService::OPNsense::Unbound::Overview - Unbound overview controller
 
 =head1 METHODS
 
@@ -114,7 +120,15 @@ Searches DNS query logs.
 
 Returns rolling statistics for a given time period and client count.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $unbound_overview->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::APIPath>
 
 =head1 AUTHOR
 

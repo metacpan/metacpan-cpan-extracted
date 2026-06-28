@@ -85,9 +85,9 @@
          "web" : "http://github.com/dod38fr/cme-perl"
       }
    },
-   "version" : "1.048",
+   "version" : "1.049",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.41",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
    "x_spdx_expression" : "LGPL-2.1"
 }
 

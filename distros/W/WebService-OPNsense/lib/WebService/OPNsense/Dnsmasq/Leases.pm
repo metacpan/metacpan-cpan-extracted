@@ -4,15 +4,22 @@
 use strictures 2;
 
 package WebService::OPNsense::Dnsmasq::Leases;
-$WebService::OPNsense::Dnsmasq::Leases::VERSION = '0.001';
+$WebService::OPNsense::Dnsmasq::Leases::VERSION = '0.002';
 use Moo;
 use namespace::clean;
 
 has client => ( is => 'ro', required => 1 );
 
+sub _api_path {
+    return '/api/dnsmasq/leases';
+}
+
+with 'WebService::OPNsense::Role::APIPath';
+
 sub search {
     my ( $self, %params ) = @_;
-    return $self->client->get( '/api/dnsmasq/leases/search', \%params );
+    my $uri = $self->_path('search');
+    return $self->client->get( $uri, \%params );
 }
 
 1;
@@ -29,7 +36,7 @@ WebService::OPNsense::Dnsmasq::Leases - Dnsmasq leases controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -41,10 +48,6 @@ version 0.001
 
 Queries Dnsmasq DHCP leases.
 
-=head1 NAME
-
-WebService::OPNsense::Dnsmasq::Leases - Dnsmasq leases controller
-
 =head1 METHODS
 
 =head2 search
@@ -53,7 +56,15 @@ WebService::OPNsense::Dnsmasq::Leases - Dnsmasq leases controller
 
 Searches for DHCP leases.  Parameters: C<current>, C<rowCount>, C<searchPhrase>.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $leases->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::APIPath>
 
 =head1 AUTHOR
 

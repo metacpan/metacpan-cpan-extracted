@@ -17,7 +17,7 @@ use lib 't/lib';
 use Helper;
 use Test2::Warnings qw(:no_end_test warnings had_no_warnings);
 use JSON::Schema::Modern::Utilities qw(jsonp get_type add_media_type delete_media_type);
-use OpenAPI::Modern::Utilities 'uri_encode';
+use OpenAPI::Modern::Utilities qw(uri_encode elem);
 
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
@@ -2343,7 +2343,7 @@ YAML
 
   {
     my $todo = todo 'mojo will strip the content body when parsing a stringified request that lacks Content-Length'
-      if $::TYPE eq 'lwp' or $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
+      if elem($::TYPE, [qw(lwp plack catalyst dancer2)]);
 
     # this works without a charset because all characters fit into a single byte, essentially
     # acting like latin1.
@@ -2374,7 +2374,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/content',
+          instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content)))->to_string,
           error => 'incorrect Content-Type "text/bloop"',
@@ -2413,7 +2413,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/content',
+          instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content blOOp/HTml)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content blOOp/HTml)))->to_string,
           error => 'EXCEPTION: unsupported media type "blOOp/HTML": add support with JSON::Schema::Modern::Utilities::add_media_type(...)',
@@ -2495,7 +2495,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/content',
+          instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain)))->to_string,
           error => re(qr/^could not decode content as text\/plain; charset=UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
@@ -2526,7 +2526,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/content',
+          instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain)))->to_string,
           error => re(qr{^could not decode content as text/plain; charset=UTF-8: UTF-8 "\\xE9" does not map to Unicode}),
@@ -2544,7 +2544,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/content',
+          instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json; charset=UTF-8: malformed UTF-8 character in JSON string/),
@@ -2562,7 +2562,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/content',
+          instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json; charset=UTF-8: /),
@@ -2643,27 +2643,61 @@ paths:
       requestBody:
         required: true
         content:
-          '*/*':
+          '*/*':        # anything that can be deserialized to an object is valid (json, yaml...)
             schema:
-              minLength: 10
+              type: object
 YAML
 
-  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'unsupported/unsupported' ], '!!!');
+  $result = $openapi->validate_request(request('POST', 'http://example.com/foo',
+    [ 'Content-Type' => 'application/json' ], '{"a":1}'));
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/body/content',
-          keywordLocation => jsonp(qw(/paths /foo post requestBody content */* schema minLength)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content */* schema minLength)))->to_string,
-          error => 'length is less than 10',
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        request => {
+          body => {
+            content => { a => 1 },
+          },
         },
-      ],
-    },
+      },
+    ],
+    'application/json can be deserialized, and matches the */* media-type entry',
+  );
+
+  $result = $openapi->validate_request(request('POST', 'http://example.com/foo',
+    [ 'Content-Type' => 'unknown/type' ], '!!!'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => false,
+        errors => [
+          {
+            instanceLocation => '/request/body/content',
+            keywordLocation => jsonp(qw(/paths /foo post requestBody content */* schema type)),
+            absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content */* schema type)))->to_string,
+            error => 'got string, not object',
+          },
+        ],
+      },
+      {
+        request => {
+          body => {
+            content => '!!!',
+          },
+        },
+      },
+    ],
     'unknown content type can still be evaluated if */* is an acceptable media-type',
   );
+
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'a/b' ], '0');
   is_equal(
@@ -2673,9 +2707,9 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body/content',
-          keywordLocation => jsonp(qw(/paths /foo post requestBody content */* schema minLength)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content */* schema minLength)))->to_string,
-          error => 'length is less than 10',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content */* schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content */* schema type)))->to_string,
+          error => 'got string, not object',
         },
       ],
     },
@@ -2703,7 +2737,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/content',
+          instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json: malformed JSON string/),
@@ -3356,7 +3390,7 @@ YAML
 
   {
   my $todo = todo 'HTTP::Message::to_psgi fetches all headers as a single concatenated string'
-    if $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
+    if elem($::TYPE, [qw(plack catalyst dancer2)]);
   $request = request('GET', 'http://example.com/foo', [
       MultipleValuesAsString => '  one ',
       MultipleValuesAsString => ' two  ',
@@ -3378,7 +3412,7 @@ YAML
 
   {
   my $todo = todo 'HTTP::Message::to_psgi fetches all headers as a single concatenated string'
-    if $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
+    if elem($::TYPE, [qw(plack catalyst dancer2)]);
   $request = request('GET', 'http://example.com/foo', [
     MultipleValuesAsArray => '  one',
     MultipleValuesAsArray => ' one ',
@@ -3404,7 +3438,7 @@ YAML
 
   {
   my $todo = todo 'HTTP::Message::to_psgi fetches all headers as a single concatenated string'
-    if $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
+    if elem($::TYPE, [qw(plack catalyst dancer2)]);
   $request = request('GET', 'http://example.com/foo', [
       MultipleValuesAsObjectExplodeFalse => ' R, 100 ',
       MultipleValuesAsObjectExplodeFalse => ' B, 150,  G , 200 ',
@@ -3532,6 +3566,58 @@ YAML
       ],
     },
     'can correctly use a $ref to "0" when parsing parameter schemas for type hints',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    post:
+      parameters:
+      - name: X-Test1
+        in: header
+        required: true
+        schema:
+          const: '1'
+      - name: X-Test2
+        in: header
+        required: true
+        content:
+          text/plain:
+            schema:
+              const: '1'
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              const: '1'
+YAML
+
+  my $result = $openapi->validate_request(request('POST', 'http://example.com/foo',
+      [ 'Content-Type' => 'text/plain', 'X-Test1' => 1, 'X-Test2' => 1 ], 1));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        request => {
+          header => {
+            'X-Test1' => '1',
+            'X-Test2' => '1',
+          },
+          body => {
+            content => '1',
+          },
+        },
+      },
+    ],
+    'numeric header value is treated as a string, whether style-encoded or media-type-encoded',
   );
 };
 
@@ -3696,7 +3782,7 @@ YAML
 
 SKIP: {
   # "Bad Content-Length: maybe client disconnect? (1 bytes remaining)"
-  skip 'plack dies on this input', 3 if $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
+  skip 'plack dies on this input', 3 if elem($::TYPE, [qw(plack catalyst dancer2)]);
   is_equal(
     $openapi->validate_request(request($_, 'http://example.com/foo', [ 'Content-Length' => 1 ]))->TO_JSON,
     {
@@ -4954,7 +5040,7 @@ YAML
   );
 };
 
-subtest 'itemSchema' => sub {
+subtest $::TYPE.': itemSchema' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));

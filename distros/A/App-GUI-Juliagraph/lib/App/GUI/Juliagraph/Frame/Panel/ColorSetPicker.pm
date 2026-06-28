@@ -126,7 +126,7 @@ sub update_display {
     my $set_length = @{ $self->{'sets'}{$set_name} };
     $self->{'set_content'} = [ map { color( $self->{'sets'}{$set_name}[ $_ ] ) }  0 .. $set_length - 1 ];
     $self->{'set_content'}[$_] = color( $default_color ) for $set_length .. $self->{'max_display_count'}-1;
-    $self->{'display'}[$_]->set_color( $self->{'set_content'}[ $_ ]->rgb_hash ) for 0 .. $self->{'max_display_count'}-1;
+    $self->{'display'}[$_]->set_color( $self->{'set_content'}[ $_ ]->values(as => 'hash') ) for 0 .. $self->{'max_display_count'}-1;
 }
 
 

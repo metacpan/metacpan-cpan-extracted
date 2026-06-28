@@ -4,9 +4,8 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::Pools;
-$WebService::OPNsense::IPsec::Pools::VERSION = '0.001';
+$WebService::OPNsense::IPsec::Pools::VERSION = '0.002';
 use Moo;
-use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
 
 has client => ( is => 'ro', required => 1 );
@@ -16,12 +15,6 @@ sub _api_path {
 }
 
 with 'WebService::OPNsense::Role::Crud';
-
-sub set_pool {
-    my ( $self, $uuid, $pool_data ) = @_;
-    validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'set/{uuid}', uuid => $uuid ), $pool_data );
-}
 
 1;
 
@@ -37,7 +30,7 @@ WebService::OPNsense::IPsec::Pools - IPsec pool controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -50,19 +43,55 @@ version 0.001
 
 Manages IPsec pools.
 
-=head1 NAME
+=head1 PROVIDED METHODS
 
-WebService::OPNsense::IPsec::Pools - IPsec pool controller
+The following methods are inherited from consumed roles.
 
-=head1 METHODS
+=head2 search
 
-=head2 set_pool
+    my $results = $ctrl->search( %params );
 
-    my $result = $pools->set_pool($uuid, $pool_data);
+Searches for pools.
 
-Updates an existing pool.
+=head2 get
 
-=for Pod::Coverage _api_path _path client search get add del toggle
+    my $pool = $ctrl->get( $uuid );
+
+Returns a single pool by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 set
+
+    my $result = $ctrl->set( $uuid, $pool_data );
+
+Updates a pool by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 add
+
+    my $result = $ctrl->add( $pool_data );
+
+Creates pool.
+
+=head2 del
+
+    my $result = $ctrl->del( $uuid );
+
+Deletes a pool by UUID.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 toggle
+
+    my $result = $ctrl->toggle( $uuid, $enabled );
+
+Enables or disables a pool.  Throws if C<$uuid> is not a valid UUID.
+
+=head2 client
+
+    my $http_client = $ctrl->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Crud>
 
 =head1 AUTHOR
 

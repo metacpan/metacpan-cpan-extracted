@@ -44,7 +44,7 @@ sub set_colors {
     my ( $self, @color ) = @_;
     return unless @color > 1;
     for (@color) { return unless ref $_ eq 'Graphics::Toolkit::Color' }
-    $self->{'color'} = [ map {[$_->rgb]} @color ];
+    $self->{'color'} = [ map {[$_->values()]} @color ];
 }
 
 sub reset {

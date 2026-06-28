@@ -1,0 +1,78 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+[/CalRGB <</WhitePoint [0.9505 1 1.088999999999999]/Gamma [2.2 2.2 2.2]/Matrix [0.412399999999999 0.2126 0.0193 0.357599999999999 0.715199999999999 0.119199999999999 0.180499999999999 0.072199999999999 0.9505]>>]
+endobj
+4 0 obj
+<</Length 572>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 36 706 Tm
+(Color Space Example) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 36 672 Tm
+(The document switches to sRGB before drawing color samples.) Tj
+ET
+q
+0.937254901960784 0.266666666666666 0.266666666666666 rg
+36 643 240 24 re
+f
+Q
+q
+0.133333333333333 0.772549019607843 0.368627450980392 rg
+36 614 240 24 re
+f
+Q
+q
+0.231372549019607 0.509803921568627 0.964705882352941 rg
+36 585 240 24 re
+f
+Q
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 36 571 Tm
+(Red, green, and blue samples are rendered under sRGB context.) Tj
+ET
+
+endstream
+endobj
+5 0 obj
+<</Type /Pages/Kids [6 0 R]/Count 1>>
+endobj
+6 0 obj
+<</Type /Page/Parent 5 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F_Helvetica_normal 2 0 R>>>>/Contents 4 0 R>>
+endobj
+7 0 obj
+<</Type /Catalog/Pages 5 0 R>>
+endobj
+8 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260421183820Z)/ModDate (D:20260421183820Z)>>
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000151 00000 n 
+0000000379 00000 n 
+0000001000 00000 n 
+0000001053 00000 n 
+0000001185 00000 n 
+0000001231 00000 n 
+trailer
+<</Size 9/Root 7 0 R/Info 8 0 R/ID[<08658AA94AC2DF526B4358CA6517D0AF><08658AA94AC2DF526B4358CA6517D0AF>]>>
+startxref
+1337
+%%EOF

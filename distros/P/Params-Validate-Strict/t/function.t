@@ -598,12 +598,16 @@ subtest 'validate_strict: type integer — Inf rejected' => sub {
 };
 
 subtest 'validate_strict: type integer — overflowing scientific notation (Inf) rejected' => sub {
-	# 1e309 overflows to Inf in IEEE 754 double; must be rejected, not accepted as Inf.
-	_vs_throws(
-		{ schema => { n => { type => 'integer' } }, input => { n => '1e309' } },
-		qr/must be an integer/,
-		'"1e309" (overflows to Inf) rejected as integer'
-	);
+	SKIP: {
+		my $probe = "1e309" + 0;
+		skip '"1e309" is a finite long double on this platform — overflow test does not apply', 1
+			if ($probe - $probe) == 0;
+		_vs_throws(
+			{ schema => { n => { type => 'integer' } }, input => { n => '1e309' } },
+			qr/must be an integer/,
+			'"1e309" (overflows to Inf) rejected as integer'
+		);
+	}
 };
 
 # ══════════════════════════════════════════════════════════════════════════════

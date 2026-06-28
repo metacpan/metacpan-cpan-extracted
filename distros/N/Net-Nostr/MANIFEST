@@ -119,6 +119,7 @@ t/54-LiveActivity.t
 t/55-Wiki.t
 t/56-DVM.t
 t/57-Thread.t
+t/58-Makefile.t
 t/data/nip44.vectors.json
 t/lib/TestFixtures.pm
 t/nip/01.t

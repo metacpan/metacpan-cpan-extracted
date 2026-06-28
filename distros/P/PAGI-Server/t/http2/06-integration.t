@@ -30,8 +30,8 @@ use Net::HTTP2::nghttp2::Session;
 # PAGI::Test::Client lives in the sibling PAGI-Tools distribution. Skip when it
 # is not installed (the raw HTTP/2 paths are covered Tools-free in t/http2/*).
 BEGIN {
-    eval { require PAGI::Test::Client; 1 }
-        or plan(skip_all => 'PAGI-Tools (PAGI::Test::Client) not installed');
+    eval { require PAGI::Test::Client; my $v = PAGI::Test::Client->VERSION; !defined($v) || $v >= 0.002000 }
+        or plan(skip_all => 'PAGI-Tools (PAGI::Test::Client >= 0.002000) not installed');
 }
 
 my $loop = IO::Async::Loop->new;

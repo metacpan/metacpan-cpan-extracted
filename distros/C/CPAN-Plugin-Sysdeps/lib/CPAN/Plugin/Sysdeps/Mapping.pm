@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 # shortcuts
 #  os and distros
@@ -766,7 +766,7 @@ sub mapping {
        [package => [qw(libmcrypt-devel libtool-ltdl-devel)]]],
      ],
 
-     [cpanmod => ['Crypt::OpenSSL::DSA', 'Crypt::OpenSSL::PKCS12', 'Crypt::OpenSSL::Random', 'Crypt::OpenSSL::RSA', 'Crypt::OpenSSL::X509', 'IO::Socket::SSL'],
+     [cpanmod => ['Crypt::OpenSSL::DSA', 'Crypt::OpenSSL::PKCS12', 'Crypt::OpenSSL::Random', 'Crypt::OpenSSL::RSA', 'Crypt::OpenSSL::X509', 'IO::Socket::SSL', 'Crypt::OpenSSL3'],
       # freebsd has all libssl in the base system
       [like_debian,
        [package => ['libssl-dev', 'zlib1g-dev']]],
@@ -1956,7 +1956,7 @@ sub mapping {
 	[package => [qw(libfreetype6-dev libgif-dev libpng12-dev libjpeg-dev), 'libtiff5-dev | libtiff4-dev']]],
        [linuxdistrocodename => [qw(jessie xenial)],
 	[package => [qw(libfreetype6-dev libgif-dev libpng12-dev libjpeg-dev libtiff5-dev)]]],
-       [package => [qw(libfreetype6-dev libgif-dev libpng-dev libjpeg-dev libtiff5-dev)]],
+       [package => ['libfreetype-dev | libfreetype6-dev', qw(libgif-dev libpng-dev libjpeg-dev libtiff5-dev)]],
       ],
       [like_fedora,
        [package => [qw(freetype-devel giflib-devel libpng-devel libjpeg-turbo-devel libtiff-devel)]]],
@@ -1983,17 +1983,23 @@ sub mapping {
       [os_freebsd,
        [osvers => {'>=', 4, '<', 10},
 	[package => []]],
-       [package => 'libheif']], # but does not seem to work with freebsd 10, only with 11 and later
+       [package => ['libheif', 'pkgconf']]], # but does not seem to work with freebsd 10, only with 11 and later; pkg-config is required to find location of libheif library
       [like_debian,
        [before_ubuntu_bionic,
 	[package => []]],
-       [package => 'libheif-dev']],
+       [before_ubuntu_jammy,
+	[package => 'libheif-dev']],
+       [package => [qw(libheif-dev libx265-dev)]]], # module requires a HEVC encoder which is provided by libx265
       [like_fedora,
        [linuxdistro => 'centos', # not available for 7
 	package => []],
-       [linuxdistro => 'fedora', linuxdistroversion => {'>=', 37}, # however, configure fails: "doesn't have a HEVC encoder"
+       [linuxdistro => 'fedora', linuxdistroversion => {'>=', 37}, # however, configure fails: "doesn't have a HEVC encoder"; an x265 library does not seem to be available
 	[package => 'libheif-devel']],
       ],
+      [like_alpine,
+       [package => [qw(libheif-dev)]]],
+      [os_darwin,
+       [package => [qw(libheif)]]],
      ],
 
      [cpanmod => 'Imager::File::JPEG',
@@ -2915,7 +2921,7 @@ sub mapping {
      [cpanmod => 'OpenGL::FTGL',
       [like_debian,
        # but does not work, lookup into wrong freetype directory
-       [package => ['libftgl-dev', 'libfreetype6-dev']]]],
+       [package => ['libftgl-dev', 'libfreetype-dev | libfreetype6-dev']]]],
 
      [cpanmod => 'OpenGL::GLFW',
       [os_freebsd,
@@ -3541,7 +3547,7 @@ sub mapping {
        [osvers => {'<', freebsd_new_jpeg_osvers}, [package => [qw(freetype2 libXft libX11 png), freebsd_old_jpeg]]],
        [package => [qw(freetype2 libXft libX11 png), freebsd_new_jpeg]]],
       [like_debian,
-       [package => [qw(libx11-dev libfreetype6-dev libxft-dev libpng-dev libz-dev libjpeg-dev)]]],
+       [package => ['libx11-dev', 'libfreetype-dev | libfreetype6-dev', qw(libxft-dev libpng-dev libz-dev libjpeg-dev)]]],
       [like_fedora,
        [package => [qw(libX11-devel libXft-devel libpng-devel zlib-devel libjpeg-devel)]]],
      ],

@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "MIDI Utilities",
+  "ABSTRACT" => "MIDI and music utilities",
   "AUTHOR" => "Gene Boggs <gene.boggs\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1305",
+  "VERSION" => "0.1307",
   "test" => {
     "TESTS" => "t/*.t"
   }

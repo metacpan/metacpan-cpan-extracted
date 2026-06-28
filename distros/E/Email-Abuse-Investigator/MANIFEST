@@ -23,6 +23,7 @@ t/integration.t
 t/kwalitee.t
 t/locales.t
 t/manifest.t
+t/github_2.t
 t/mutant_killers.t
 t/mutation_survivors.t
 t/pod-coverage.t

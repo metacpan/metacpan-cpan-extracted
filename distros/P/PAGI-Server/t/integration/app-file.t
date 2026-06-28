@@ -16,8 +16,8 @@ use PAGI::Server;
 # PAGI::App::File is in the sibling PAGI-Tools distribution. Skip when it is not
 # installed (file-serving over the server is also covered by t/42-file-response.t).
 BEGIN {
-    eval { require PAGI::App::File; 1 }
-        or plan(skip_all => 'PAGI-Tools (PAGI::App::File) not installed');
+    eval { require PAGI::App::File; my $v = PAGI::App::File->VERSION; !defined($v) || $v >= 0.002000 }
+        or plan(skip_all => 'PAGI-Tools (PAGI::App::File >= 0.002000) not installed');
 }
 
 # =============================================================================

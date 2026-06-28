@@ -1,7 +1,8 @@
 use strict;
 use FindBin;
-use File::Copy;
 use Test::More;
+use File::Temp qw/tempdir tempfile/;
+use File::Spec;
 use Cwd qw/cwd/;
 
 require q[./t/helper.pm];
@@ -32,5 +33,51 @@ is_deeply(
   $cpanfile_info, $output,
   "parse_snapshot produces the expected requirements"
 );
+
+subtest 'bad snapshot' => sub
+{
+  chdir $pwd;
+
+  my $tmpdir = tempdir(
+    TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX",
+    CLEANUP => 1,
+  );
+
+  chdir $tmpdir;
+  my $dir = cwd;
+
+  my ( $fh, $cpanfile ) = tempfile( "cpanfile.XXXXXXXX", DIR => $tmpdir );
+
+  $fh->say("not a carton snapshot\nrest of content\n");
+
+  local $@;
+  my $result = eval { App::MechaCPAN::Deploy::parse_snapshot($cpanfile) };
+  my $err = $@;
+
+  is($result, undef, 'parse_snapshot produces error with a bad snapshot');
+  like($err, qr/carton\s+snapshot/xms, 'Error is about carton snapshot');
+};
+
+subtest 'empty snapshot' => sub
+{
+  chdir $pwd;
+
+  my $tmpdir = tempdir(
+    TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX",
+    CLEANUP => 1,
+  );
+
+  chdir $tmpdir;
+  my $dir = cwd;
+
+  my ( $fh, $cpanfile ) = tempfile( "cpanfile.XXXXXXXX", DIR => $tmpdir );
+
+  local $@;
+  my $result = eval { App::MechaCPAN::Deploy::parse_snapshot($cpanfile) };
+  my $err = $@;
+
+  is($result, undef, 'parse_snapshot produces error with a bad snapshot');
+  like($err, qr/carton\s+snapshot/xms, 'Error is about carton snapshot');
+};
 
 done_testing;

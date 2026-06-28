@@ -1,5 +1,5 @@
 NAME
-    App::GUI::Cellgraph - draw pattern by cellular automata
+    App::GUI::Cellgraph - draw pattern with cellular automata
 
 SYNOPSIS
     1.  read this POD page

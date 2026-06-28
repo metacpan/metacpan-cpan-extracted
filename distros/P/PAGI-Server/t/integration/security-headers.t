@@ -12,8 +12,8 @@ plan skip_all => "Server integration tests not supported on Windows" if $^O eq '
 # PAGI::Middleware::Builder and the security-headers middleware live in the
 # sibling PAGI-Tools distribution. Skip when Tools is not installed.
 BEGIN {
-    eval { require PAGI::Middleware::Builder; 1 }
-        or plan(skip_all => 'PAGI-Tools (PAGI::Middleware::Builder) not installed');
+    eval { require PAGI::Middleware::Builder; my $v = PAGI::Middleware::Builder->VERSION; !defined($v) || $v >= 0.002000 }
+        or plan(skip_all => 'PAGI-Tools (PAGI::Middleware::Builder >= 0.002000) not installed');
 }
 
 # Import the builder DSL (builder/enable). Reached only when the BEGIN skip

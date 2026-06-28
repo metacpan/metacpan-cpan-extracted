@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IDS::Settings;
-$WebService::OPNsense::IDS::Settings::VERSION = '0.001';
+$WebService::OPNsense::IDS::Settings::VERSION = '0.002';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -19,172 +19,230 @@ with 'WebService::OPNsense::Role::Settings';
 
 sub list_rulesets {
     my ($self) = @_;
-    return $self->client->get( $self->_path('listRulesets') );
+    my $uri = $self->_path('listRulesets');
+
+    return $self->client->get($uri);
 }
 
 sub get_ruleset {
     my ( $self, $id ) = @_;
-    return $self->client->get( $self->_path( 'getRuleset/{id}', id => $id ) );
+    my $uri = $self->_path( 'getRuleset/{id}', id => $id );
+
+    return $self->client->get($uri);
 }
 
 sub set_ruleset {
     my ( $self, $filename ) = @_;
-    return $self->client->post( $self->_path( 'setRuleset/{filename}', filename => $filename ) );
+    my $uri = $self->_path( 'setRuleset/{filename}', filename => $filename );
+
+    return $self->client->post($uri);
 }
 
 sub get_ruleset_properties {
     my ($self) = @_;
-    return $self->client->get( $self->_path('getRulesetProperties') );
+    my $uri = $self->_path('getRulesetProperties');
+
+    return $self->client->get($uri);
 }
 
 sub set_ruleset_properties {
     my ( $self, $properties_data ) = @_;
+    my $uri = $self->_path('setRulesetProperties');
+
     return $self->client->post(
-        $self->_path('setRulesetProperties'), $properties_data,
+        $uri, $properties_data,
     );
 }
 
 sub toggle_ruleset {
     my ( $self, $filenames ) = @_;
-    return $self->client->post( $self->_path( 'toggleRuleset/{filenames}', filenames => $filenames ) );
+    my $uri = $self->_path( 'toggleRuleset/{filenames}', filenames => $filenames );
+
+    return $self->client->post($uri);
 }
 
 sub list_rule_metadata {
     my ($self) = @_;
-    return $self->client->get( $self->_path('listRuleMetadata') );
+    my $uri = $self->_path('listRuleMetadata');
+
+    return $self->client->get($uri);
 }
 
 sub get_rule_info {
     my ( $self, $sid ) = @_;
-    return $self->client->get( $self->_path( 'getRuleInfo/{sid}', sid => $sid ) );
+    my $uri = $self->_path( 'getRuleInfo/{sid}', sid => $sid );
+
+    return $self->client->get($uri);
 }
 
 sub toggle_rule {
     my ( $self, $sids, $enabled ) = @_;
-    return $self->client->post( $self->_path( 'toggleRule/{sids}/{enabled}', sids => $sids, enabled => $enabled ) );
+    my $uri = $self->_path( 'toggleRule/{sids}/{enabled}', sids => $sids, enabled => $enabled );
+
+    return $self->client->post($uri);
 }
 
 sub set_rule {
     my ( $self, $sid ) = @_;
-    return $self->client->post( $self->_path( 'setRule/{sid}', sid => $sid ) );
+    my $uri = $self->_path( 'setRule/{sid}', sid => $sid );
+
+    return $self->client->post($uri);
 }
 
 sub search_installed_rules {
     my ( $self, %params ) = @_;
-    return $self->client->post( $self->_path('searchInstalledRules'), \%params );
+    my $uri = $self->_path('searchInstalledRules');
+
+    return $self->client->post( $uri, \%params );
 }
 
 sub search_policy {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchPolicy'), \%params );
+    my $uri = $self->_path('searchPolicy');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_policy {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getPolicy/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getPolicy/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_policy {
     my ( $self, $policy_data ) = @_;
-    return $self->client->post( $self->_path('addPolicy'), $policy_data );
+    my $uri = $self->_path('addPolicy');
+
+    return $self->client->post( $uri, $policy_data );
 }
 
 sub set_policy {
     my ( $self, $uuid, $policy_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setPolicy/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setPolicy/{uuid}', uuid => $uuid ), $policy_data,
+        $uri, $policy_data,
     );
 }
 
 sub del_policy {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delPolicy/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delPolicy/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_policy {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'togglePolicy/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'togglePolicy/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
 sub search_policy_rule {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchPolicyRule'), \%params );
+    my $uri = $self->_path('searchPolicyRule');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_policy_rule {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getPolicyRule/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getPolicyRule/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_policy_rule {
     my ( $self, $rule_data ) = @_;
-    return $self->client->post( $self->_path('addPolicyRule'), $rule_data );
+    my $uri = $self->_path('addPolicyRule');
+
+    return $self->client->post( $uri, $rule_data );
 }
 
 sub set_policy_rule {
     my ( $self, $uuid, $rule_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setPolicyRule/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setPolicyRule/{uuid}', uuid => $uuid ), $rule_data,
+        $uri, $rule_data,
     );
 }
 
 sub del_policy_rule {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delPolicyRule/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delPolicyRule/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_policy_rule {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'togglePolicyRule/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'togglePolicyRule/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
 sub search_user_rule {
     my ( $self, %params ) = @_;
-    return $self->client->get( $self->_path('searchUserRule'), \%params );
+    my $uri = $self->_path('searchUserRule');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub get_user_rule {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->get( $self->_path( 'getUserRule/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'getUserRule/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
 }
 
 sub add_user_rule {
     my ( $self, $rule_data ) = @_;
-    return $self->client->post( $self->_path('addUserRule'), $rule_data );
+    my $uri = $self->_path('addUserRule');
+
+    return $self->client->post( $uri, $rule_data );
 }
 
 sub set_user_rule {
     my ( $self, $uuid, $rule_data ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'setUserRule/{uuid}', uuid => $uuid );
+
     return $self->client->post(
-        $self->_path( 'setUserRule/{uuid}', uuid => $uuid ), $rule_data,
+        $uri, $rule_data,
     );
 }
 
 sub del_user_rule {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    return $self->client->post( $self->_path( 'delUserRule/{uuid}', uuid => $uuid ) );
+    my $uri = $self->_path( 'delUserRule/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
 }
 
 sub toggle_user_rule {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleUserRule/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
     return $self->client->post(
-        $self->_path( 'toggleUserRule/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled ),
+        $uri,
     );
 }
 
@@ -202,7 +260,7 @@ WebService::OPNsense::IDS::Settings - IDS settings controller
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -215,17 +273,13 @@ version 0.001
 Manages IDS/IPS settings, rulesets, policies, and user
 rules.
 
-=head1 NAME
-
-WebService::OPNsense::IDS::Settings - IDS settings controller
-
 =head1 METHODS
 
-=head2 get
+=head2 get_settings
 
-    my $settings = $ids_settings->get;
+    my $settings = $ids_settings->get_settings;
 
-Returns the current IDS settings.
+Returns IDS settings.
 
 =head2 set_settings
 
@@ -315,13 +369,13 @@ Returns a single policy by UUID.
 
     my $result = $ids_settings->add_policy($policy_data);
 
-Creates a new policy.
+Creates policy.
 
 =head2 set_policy
 
     my $result = $ids_settings->set_policy($uuid, $policy_data);
 
-Updates an existing policy.
+Updates policy.
 
 =head2 del_policy
 
@@ -351,13 +405,13 @@ Returns a single policy rule by UUID.
 
     my $result = $ids_settings->add_policy_rule($rule_data);
 
-Creates a new policy rule.
+Creates policy rule.
 
 =head2 set_policy_rule
 
     my $result = $ids_settings->set_policy_rule($uuid, $rule_data);
 
-Updates an existing policy rule.
+Updates policy rule.
 
 =head2 del_policy_rule
 
@@ -387,13 +441,13 @@ Returns a single user rule by UUID.
 
     my $result = $ids_settings->add_user_rule($rule_data);
 
-Creates a new user rule.
+Creates user rule.
 
 =head2 set_user_rule
 
     my $result = $ids_settings->set_user_rule($uuid, $rule_data);
 
-Updates an existing user rule.
+Updates user rule.
 
 =head2 del_user_rule
 
@@ -407,7 +461,15 @@ Deletes a user rule by UUID.
 
 Enables or disables a user rule.
 
-=for Pod::Coverage client
+=head2 client
+
+    my $http_client = $ids_settings->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head1 SEE ALSO
+
+L<WebService::OPNsense::Role::Settings>
 
 =head1 AUTHOR
 

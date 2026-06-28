@@ -306,7 +306,7 @@
 
         Added more tokens to the tokens option
 
-		Fixed the man page errors
+        Fixed the man page errors
 
 1.76    Jan 14, 2026
 
@@ -319,7 +319,7 @@
 1.78    Jan 14, 2026
 
         Further hardening of ANSI capablity detection with bnetter Windows
-		compatibility.
+        compatibility.
 
 1.79    Jan 14, 2026
 
@@ -364,7 +364,7 @@
 1.89    Fed 17, 2026
 
         Example ANS files added to the "examples" directory.  Some will
-		require a wide terminal.
+        require a wide terminal.
 
         New tokens added
 
@@ -396,29 +396,29 @@
 1.96    Mar 23, 2026
 
         MetaCPAN has this weird behavior using the bin/ansi-encode file for
-		the documentation.  Weird I made some changes to help minimize this
-		weirdness.
+        the documentation.  Weird I made some changes to help minimize this
+        weirdness.
 
 1.96    Mar 25, 2026
 
         Renamed the executable to "ansiencode" to get around the MetaCPAN
-		weirdness.
+        weirdness.
 
 1.98    Mar 25, 2026
 
         Boy did I go on an adventure delving into the mysteries of
-		ExtUtils::MakeMaker.  GitHub A.I. and I struggled to add a symlink
-		ability to the "make install" feature, as I renamed the executable
-		from "ansi-encode" (a stupid MetaCPAN problem) to "ansiencode".
-		I wanted legacy compatibility so older calls wouldn't die so
-		the "make install" would create a symlink (in Unix-like systems)
-		to the old "ansi-encode".  So both "ansiencode" and "ansi-encode"
-		still works.  To quote Adrian from "Adrian's Digital Basement",
-		"It freaking works!" after nearly 45 minutes of back and forth wi
-		A.I. help.
+        ExtUtils::MakeMaker.  GitHub A.I. and I struggled to add a symlink
+        ability to the "make install" feature, as I renamed the executable
+        from "ansi-encode" (a stupid MetaCPAN problem) to "ansiencode".
+        I wanted legacy compatibility so older calls wouldn't die so
+        the "make install" would create a symlink (in Unix-like systems)
+        to the old "ansi-encode".  So both "ansiencode" and "ansi-encode"
+        still works.  To quote Adrian from "Adrian's Digital Basement",
+        "It freaking works!" after nearly 45 minutes of back and forth wi
+        A.I. help.
 
         As you can tell I am not a frequent user of "make", so this was a
-		nightmare.
+        nightmare.
 
 1.99    Mar 25, 2026
 
@@ -431,8 +431,8 @@
 2.01    May 17, 2026
 
         Ugh, I accidentally included some test code.
-		Since CPAN has no inline editing ability, I had to increment the
-		version.
+        Since CPAN has no inline editing ability, I had to increment the
+        version.
 
 2.02    May 18, 2026
 
@@ -441,15 +441,19 @@
 2.03    May 26, 2026
 
         Refactored the code.  Discovered a bizarre bug that only happens
-		with the "ansiencode" script, but not the module itself.
+        with the "ansiencode" script, but not the module itself.
 
         The bug?  The token "BLOCK" and "ENDBLOCK" are not processed from the
-		"ansiencode" script, but works just fine from using the
-		"Term::ANSIEncode" script.  I don't get it and A.I. doesn't get it.
-		It doesn't make any sense.  So I shrug my shoulders and accept it.
+        "ansiencode" script, but works just fine from using the
+        "Term::ANSIEncode" script.  I don't get it and A.I. doesn't get it.
+        It doesn't make any sense.  So I shrug my shoulders and accept it.
 
 2.04    May 27, 2026
 
         Macros added.
-		Documentation improved.
-		Additional testing on build.
+        Documentation improved.
+        Additional testing on build.
+
+2.05    Jun 27, 2026
+
+        Fixed formatting error for dump

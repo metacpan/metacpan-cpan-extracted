@@ -1,3 +1,8 @@
+0.73   2026-06-27  lichtkind
+-------
+    * = minor bug fix release = 1 fix
+    ! update old API call of GTC1
+
 0.72   2025-09-03  lichtkind
 -------
     * = minor fix release = 2 fixes
@@ -21,8 +26,8 @@
     * * complete reworked color mapping tab
     * * reworked constriants tab
     * + add subgradient for smooth color gradients
-    * + smother changing of max iteraation and max (bailout) value
-    * + assigning pixel coordinates to any monomialfactor
+    * + smoother changing of max iteration and max (bailout) value
+    * + assigning pixel coordinates to any monomial factor
     * + assigning pixel coordinates to more than one destination
     * + copied over color tab from hormonograph
     * + monomials have 3 more options (log + sign + coordinates factor)
@@ -30,7 +35,7 @@
 0.5    2023-11-27  lichtkind
 -------
     * = major feature release
-    * * reworked constriants tab
+    * * reworked constraints tab
         added options to use constant or coordinate values
     * * polynomial tab for more complex equations with more monomials
     * ' minor corrections in POD

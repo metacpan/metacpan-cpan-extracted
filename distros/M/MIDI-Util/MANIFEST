@@ -7,7 +7,7 @@ Makefile.PL
 README
 README.md
 dist.ini
-eg/dump
+eg/dump.pl
 lib/MIDI/Util.pm
 t/00-compile.t
 t/01-functions.t

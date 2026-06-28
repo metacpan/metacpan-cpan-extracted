@@ -23,6 +23,8 @@ our @args = (
   'only-sources!',
   'update!',
   'stop-on-error!',
+  'skip-recommends!',
+  'skip-suggests!',
 );
 
 our $dest_lib;
@@ -184,20 +186,22 @@ TARGET:
       }
     }
 
-    $target->{state}++
-      if $target->{state} ne $COMPLETE;
-
-    if ( $target->{state} eq scalar @states )
+    if ( $target->{state} ne $COMPLETE )
     {
-      _complete($target);
-      $target->{was_installed} = 1;
-      success( $target->{key}, $line );
+      $target->{state}++;
+
+      if ( $target->{state} == scalar @states )
+      {
+        _complete($target);
+        $target->{was_installed} = 1;
+        success( $target->{key}, $line );
+      }
     }
   }
 
   chdir $orig_dir;
 
-  my %attempted = map  { $_->{name} => $_ } values %{ $cache->{targets} };
+  my %attempted = map  { $_->{key} => $_ } values %{ $cache->{targets} };
   my @failed    = grep { $_->{state} eq $FAILED } values %attempted;
   my @installed = grep { $_->{was_installed} } values %attempted;
 
@@ -334,12 +338,12 @@ sub _prereq
   return @deps, $target;
 }
 
+# Determine if the target should be tested. If so, pull in the test-prereq
 sub _test_prereq
 {
   my $target = shift;
   my $cache  = shift;
 
-  my $meta = $target->{meta};
   my $opts = $cache->{opts};
 
   my $skip_tests = $opts->{'skip-tests'};
@@ -350,7 +354,8 @@ sub _test_prereq
 
     if ( !$skip_tests && defined $target->{modules} )
     {
-      foreach my $module ( %{ $target->{modules} } )
+      # Check if any of the modules in the package are in the list to skip
+      foreach my $module ( keys %{ $target->{modules} } )
       {
         if ( $skips->{$module} )
         {
@@ -610,9 +615,15 @@ sub _targets_from_cpanfile
     = $cpanfile =~ m{^(.[/\\])?cpanfile$}
     ? 'cpanfile'
     : "cpanfile $cpanfile";
-  info "Reading $iname";
+  info '_cpanfile', "Reading $iname";
 
-  my $prereq = parse_cpanfile($cpanfile);
+  my @types = (
+    'requires',
+    $cache->{opts}->{'skip-recommends'} ? () : 'recommends',
+    $cache->{opts}->{'skip-suggests'}   ? () : 'suggests',
+  );
+
+  my $prereq = parse_cpanfile( $cpanfile, @types );
   my @phases = qw/configure build test runtime/;
 
   my @acc = map {%$_} map { values %{ $prereq->{$_} } } @phases;
@@ -624,6 +635,8 @@ sub _targets_from_cpanfile
     $target->{update} = $update // 1;
     push @reqs, $target;
   }
+
+  success '_cpanfile', "Reading $iname";
 
   return @reqs;
 }
@@ -719,6 +732,15 @@ sub _target_prereqs_were_installed
   my $target = shift;
   my $cache  = shift;
 
+  return $target->{prereqs_was_installed}
+    if $target->{prereqs_was_installed};
+
+  state $cycle_key = '_cycle_target_prereqs_were_installed';
+  return 0
+    if $target->{$cycle_key};
+
+  local $target->{$cycle_key} = 1;
+
   foreach my $prereq ( _target_prereqs( $target, $cache ) )
   {
     _target_prereqs_were_installed( $prereq, $cache );
@@ -735,7 +757,7 @@ sub _target_prereqs_were_installed
 sub _search_metacpan
 {
   my $src        = shift;
-  my $constraint = shift;
+  my $constraint = shift // '';
 
   state %seen;
 
@@ -744,7 +766,7 @@ sub _search_metacpan
 
   # TODO mirrors
   my $dnld = 'https://fastapi.metacpan.org/download_url/' . _escape($src);
-  if ( defined $constraint )
+  if ( $constraint )
   {
     $dnld .= '?version=' . _escape($constraint);
   }
@@ -804,13 +826,14 @@ sub _get_targz
   }
 
   # PAUSE
+  my $cpan_url = 'https://cpan.metacpan.org/authors/id';
   if ( $src =~ $pause_re )
   {
     my $author  = $1;
     my $package = $2;
     $url = join(
       '/',
-      'https://cpan.metacpan.org/authors/id',
+      $cpan_url,
       substr( $author, 0, 1 ),
       substr( $author, 0, 2 ),
       $author,
@@ -829,6 +852,7 @@ sub _get_targz
 
     $target->{is_cpan} = 1;
     $target->{version} = version->parse( $json_data->{version} );
+    $target->{sha256}  = $json_data->{checksum_sha256};
   }
 
   if ( defined $url )
@@ -837,12 +861,55 @@ sub _get_targz
     if ( $url =~ $full_pause_re )
     {
       my $package = $3;
-      $target->{pathname} = "$1/$2/$3";
+      $target->{pathname}  = "$1/$2/$3";
+      $target->{cpan_path} = "$1/$2";
+      $target->{filename}  = $package;
+
+      # If CHKSIGS is enabled, we always want to check CHECKSUMS. If we have
+      # a sha256 from metacpan, CHECKSUMS will take precedence
+      if ( !$target->{sha256} || $App::MechaCPAN::CHKSIGS )
+      {
+        my $chk_url = $url;
+        $chk_url =~ s/$package$/CHECKSUMS/;
+        $target->{checksums_url} = $chk_url;
+      }
+
       $package =~ s/ (.*) [.] ( tar[.](gz|z|bz2) | zip | tgz) $/$1/xmsi;
       $target->{distvname} = $package;
     }
 
-    return fetch_file($url);
+    my $src_tgz = fetch_file($url);
+
+    if ( my $checksums_url = $target->{checksums_url} )
+    {
+      my $filename  = $target->{filename};
+      my $checksums = get_cpan_checksums( $checksums_url, $filename );
+
+      if ( defined $checksums )
+      {
+        my $cpan_path = $target->{cpan_path};
+        my $entry     = $checksums->{$filename};
+
+        croak "No CHECKSUMS entry for $filename"
+          if !defined $entry;
+        croak "Mismatch 'cpan_path': $entry->{cpan_path} ne $cpan_path"
+          if $entry->{cpan_path} ne $cpan_path;
+        croak "Mismatch 'size': $entry->{size} != -s $src_tgz"
+          if $entry->{size} != -s $src_tgz;
+
+        $target->{sha256} = $entry->{sha256};
+      }
+    }
+
+    if ( $target->{sha256} )
+    {
+      $src_tgz = {
+        src    => $src_tgz,
+        sha256 => $target->{sha256},
+      };
+    }
+
+    return $src_tgz;
   }
 
   croak "Cannot find $src\n";
@@ -1036,6 +1103,7 @@ sub _complete
     my $module = $target->{module};
     my $ver    = $target->{installed_version};
 
+    no warnings 'uninitialized';
     $target->{was_installed} = 1
       if $ver eq _get_core_ver($module);
   }

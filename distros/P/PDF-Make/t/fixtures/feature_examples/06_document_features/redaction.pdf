@@ -1,0 +1,127 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+2 0 obj
+<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+endobj
+3 0 obj
+<</Length 1028>>
+stream
+BT
+0 0 0 rg
+/F_Helvetica_normal 50 Tf
+1 0 0 1 20 722 Tm
+(Document Redaction) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 688 Tm
+(This document demonstrates PDF redaction capabilities.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 674 Tm
+(Sensitive information below has been marked for redaction.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 660 Tm
+(Employee: John Smith) Tj
+ET
+
+
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 618 Tm
+(Department: Engineering) Tj
+ET
+q
+0 0 0 rg
+18 641 80 13 re
+f
+Q
+q
+
+Q
+q
+0 0 0 rg
+18 627 77 13 re
+f
+Q
+q
+
+Q
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 604 Tm
+(Two redaction annotations have been placed on this page.) Tj
+ET
+BT
+0 0 0 rg
+/F_Helvetica_normal 9 Tf
+1 0 0 1 20 590 Tm
+(A conforming viewer will show them as redaction marks.) Tj
+ET
+q
+0 0 0 rg
+18 641 80 13 re
+f
+Q
+q
+BT
+1 1 1 rg
+/F_Helvetica_normal 10 Tf
+1 0 0 1 30.5 643.5 Tm
+(REDACTED) Tj
+ET
+Q
+q
+0 0 0 rg
+18 627 77 13 re
+f
+Q
+q
+BT
+1 1 1 rg
+/F_Helvetica_normal 10 Tf
+1 0 0 1 29 629.5 Tm
+(REDACTED) Tj
+ET
+Q
+
+endstream
+endobj
+4 0 obj
+<</Type /Pages/Kids [5 0 R]/Count 1>>
+endobj
+5 0 obj
+<</Type /Page/Parent 4 0 R/MediaBox [0 0 612 792]/Resources <</Font <</F_Helvetica_normal 2 0 R>>>>/Contents 3 0 R>>
+endobj
+6 0 obj
+<</Type /Catalog/Pages 4 0 R>>
+endobj
+7 0 obj
+<</Producer (PDF-Make/0.01)/CreationDate (D:20260422202821Z)/ModDate (D:20260422202821Z)>>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000151 00000 n 
+0000001229 00000 n 
+0000001282 00000 n 
+0000001414 00000 n 
+0000001460 00000 n 
+trailer
+<</Size 8/Root 6 0 R/Info 7 0 R/ID[<C5920C66FE1FC8EFE6DCFB7007E7C20E><C5920C66FE1FC8EFE6DCFB7007E7C20E>]>>
+startxref
+1566
+%%EOF

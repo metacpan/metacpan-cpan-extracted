@@ -16,6 +16,7 @@ t/70-more.t
 t/alternative.t
 t/array.t
 t/comment-spelling.t
+t/conf/validate_strict.yml
 t/cross_validation.t
 t/custom_types.t
 t/custom_validation.t
@@ -41,6 +42,7 @@ t/pod.t
 t/positional.t
 t/prereq.t
 t/strict.t
+t/string.t
 t/t_union_type.t
 t/transform.t
 t/unit.t

@@ -21,9 +21,11 @@ no_index:
     - t
     - inc
 requires:
+  Data::Dumper: '2.189'
   ExtUtils::MakeMaker: '7.7'
   File::Slurper: '0.014'
-  open: '0'
+  Getopt::Long: '2.57'
+  perl: '5.020004'
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -31,5 +33,5 @@ resources:
   bugtracker: https://github.com/ronsavage/Tree-DAG_Node/issues
   license: http://opensource.org/licenses/Artistic-2.0
   repository: https://github.com/ronsavage/Tree-DAG_Node.git
-version: '1.35'
+version: '1.36'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

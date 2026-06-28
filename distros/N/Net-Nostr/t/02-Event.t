@@ -5,6 +5,8 @@ use strictures 2;
 use Test2::V0 -no_srand => 1;
 # use Test2::Plugin::BailOnFail; # bail out of testing on the first failure
 use Clone 'clone';
+use Digest::SHA qw(sha256_hex);
+use JSON ();
 
 use lib 't/lib';
 use TestFixtures qw(%FIATJAF_EVENT);
@@ -45,6 +47,30 @@ subtest 'json_serialize()' => sub {
     my $json = $event->json_serialize;
     my $decoded = JSON::decode_json($json);
     is($decoded->[4], [['p', 'abc123'], ['e', 'def456']], 'tags serialize as array of arrays');
+};
+
+subtest 'json_serialize() emits exact UTF-8 bytes for non-ASCII text' => sub {
+    my $emoji = "\x{1F600}";
+    my $event = Net::Nostr::Event->new(
+        pubkey => 'a' x 64,
+        kind => 1,
+        created_at => 1000,
+        tags => [['t', "nostr-$emoji"]],
+        content => "hello $emoji",
+    );
+
+    my $expected_json = '[0,"' . ('a' x 64) . '",1000,1,[["t","nostr-' . $emoji . '"]],"hello ' . $emoji . '"]';
+    utf8::encode($expected_json);
+
+    my $json = $event->json_serialize;
+    is($json, $expected_json, 'non-ASCII content and tags serialize as UTF-8 bytes');
+    is(unpack('H*', $json),
+        '5b302c2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c313030302c312c5b5b2274222c226e6f7374722df09f9880225d5d2c2268656c6c6f20f09f9880225d',
+        'serialized byte sequence is pinned');
+    unlike($json, qr/\\u/i, 'non-control Unicode is not escaped as \\u');
+    is($event->id, '79af3bfbf6c390409199bfe2405e9597494336996b6e9ac5594f3a6a0b0996cc',
+        'event id is pinned for non-ASCII content and tags');
+    is($event->id, sha256_hex($expected_json), 'event id hashes the pinned UTF-8 bytes');
 };
 
 ###############################################################################

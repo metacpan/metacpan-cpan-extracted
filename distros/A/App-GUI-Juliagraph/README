@@ -1,5 +1,5 @@
 NAME
-    App::GUI::Juliagraph - drawing Mandelbrot-, Julia fractals and more
+    App::GUI::Juliagraph - draw Mandelbrot-, Julia fractals and more
 
 SYNOPSIS
     1.  read this POD
@@ -10,7 +10,7 @@ SYNOPSIS
         interesting image
 
     4.  push "Draw" (below drawing board) or Ctrl+D or *Draw* in *Image*
-        menu, or middle click of the drawing board, to produce full
+        menu, or middle click over the drawing board, to produce full
         resolution image
 
     5.  choose "Save" in Image menu (or Ctrl+S) to store image in a PNG /

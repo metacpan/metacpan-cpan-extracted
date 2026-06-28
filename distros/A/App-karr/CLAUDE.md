@@ -10,6 +10,25 @@ A Perl reimplementation of [kanban-md](https://github.com/antopolskiy/kanban-md)
 
 This is a Dist::Zilla distribution using `[@Author::GETTY]`.
 
+## House rules, agents & coordination
+
+Engineering discipline, the delegation lane, board coordination, and the release policy live in
+`.claude/rules/karr-rules.md` — auto-loaded by Claude Code at launch. Don't restate them here.
+
+**Delegate behavior-relevant code instead of editing it yourself** (the rule and rationale are in
+the rules file). Agents in this repo (skills force-loaded via `briefing.skills`):
+
+| Task | Agent |
+|---|---|
+| Implement / refactor / debug behavior-relevant code | `karr-worker` (default) |
+| Write/extend tests under `t/` | `karr-test-writer` |
+| Pre-release audit (Changes, cpanfile, dist.ini, version) | `karr-release-checker` |
+| POD (`=attr`/`=method`, `# ABSTRACT`) | `karr-pod-writer` |
+
+**Dogfood:** karr tracks its own work on its own board (`refs/karr/*`). Use `karr list --compact`
+/ `karr board` for open work and file bugs found here as tickets. Full surface: skill
+`kanban-issues-karr-cli`.
+
 ## Reference: kanban-md
 
 The Go implementation at `../kanban-md/` is the feature reference. Key docs:
@@ -85,6 +104,8 @@ dzil build                     # Build distribution
 
 ## What still needs building (v1 roadmap)
 
+Live status is on the karr board (`refs/karr/*`); this is the at-a-glance summary.
+
 1. **metrics command** — throughput, lead/cycle time, flow efficiency
 2. **dependency checking** — block tasks with unsatisfied deps from being picked
 3. **Self-healing IDs** — detect and repair duplicate IDs, filename/ID mismatches
@@ -97,8 +118,13 @@ dzil build                     # Build distribution
 - For user-visible changes, add an unreleased entry under `{{$NEXT}}` in `Changes`
 - POD follows `[@Author::GETTY]` conventions (inline `=attr`, `=method`, no manual NAME/VERSION/AUTHOR sections)
 - `# ABSTRACT:` comment required on every .pm file
+- Release policy (`dzil release` only with explicit go-ahead) is in `.claude/rules/karr-rules.md`
 
 ## Repository metadata
 
-- Agent and skill material lives under `.claude/`
-- Keep this file focused on the repository
+Agent/skill/rule material lives under `.claude/`:
+- `rules/karr-rules.md` — house rules, auto-loaded (discipline, delegation, coordination, release)
+- `agents/karr-*.md` — the project agent fleet (briefing-aware; skills force-loaded at spawn)
+- `skills/` — `kanban-issues-karr-cli` + shared Getty Perl skills (hardlinked via manage-skills; don't rename)
+
+Keep this file focused on the repository; behavioral rules belong in `rules/`, not here.

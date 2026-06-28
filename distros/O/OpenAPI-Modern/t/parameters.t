@@ -16,6 +16,7 @@ use lib 't/lib';
 use Helper;
 use JSON::Schema::Modern::Utilities qw(is_bool get_type is_type jsonp_set);
 use OpenAPI::Modern::Utilities qw(coerce_primitive uri_encode);
+use Feature::Compat::Try;
 
 my $openapi = OpenAPI::Modern->new(
   openapi_uri => 'http://localhost:1234/api',
@@ -1089,6 +1090,20 @@ subtest 'query parameters' => sub {
       ],
     },
     {
+      name => 'bad $ref in schema',
+      param_obj => { name => 'q', schema => { '$ref' => 'https://example.com/does_not_exist' } },
+      queries => 'a=b&c=d',
+      exception => 1,
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/q',
+          keywordLocation => $keyword_path.'/schema/$ref',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/schema/$ref',
+          error => 'EXCEPTION: unable to find resource "https://example.com/does_not_exist"',
+        },
+      ],
+    },
+    {
       name => 'empty string, allowEmptyValue=true',
       param_obj => { name => 'q', allowEmptyValue => true },
       queries => 'q=&a=b&c=d',
@@ -1935,7 +1950,26 @@ subtest 'query parameters' => sub {
 
       my $state = _init_test('/request/uri/query', +{ $param_obj->%{qw(schema content)} });
 
-      my $valid = $openapi->_validate_parameter($state, $param_obj, params => Mojo::URL->new('https://example.com/blah?'.$test->{queries})->query);
+      my ($valid, $exception);
+      try {
+        $valid = $openapi->_validate_parameter($state, $param_obj, params => Mojo::URL->new('https://example.com/blah?'.$test->{queries})->query);
+      }
+      catch ($e) {
+        $exception = $e;
+      }
+
+      if (defined $exception) {
+        is($exception, undef, 'did not throw an exception') if not $test->{exception};
+
+        is_equal(
+          [ $exception->TO_JSON ],
+          $test->{errors}//[],
+          ($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred',
+        );
+
+        return;
+      }
+
       die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
         $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
 
@@ -2608,7 +2642,26 @@ subtest 'cookie parameters' => sub {
       my $headers = Mojo::Headers->new;
       $headers->add('Cookie', $test->{cookie}) if defined $test->{cookie};
 
-      my $valid = $openapi->_validate_parameter($state, $param_obj, headers => $headers);
+      my ($valid, $exception);
+      try {
+        $valid = $openapi->_validate_parameter($state, $param_obj, headers => $headers);
+      }
+      catch ($e) {
+        $exception = $e;
+      }
+
+      if (defined $exception) {
+        is($exception, undef, 'did not throw an exception') if not $test->{exception};
+
+        is_equal(
+          [ $exception->TO_JSON ],
+          $test->{errors}//[],
+          ($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred',
+        );
+
+        return;
+      }
+
       die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
         $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
 

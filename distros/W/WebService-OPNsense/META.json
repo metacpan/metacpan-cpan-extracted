@@ -42,6 +42,7 @@
             "Test::NoBreakpoints" : "0.15",
             "Test::NoTabs" : "0",
             "Test::PAUSE::Permissions" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
@@ -52,6 +53,7 @@
          "requires" : {
             "Carp" : "0",
             "Const::Fast" : "0",
+            "Exporter::Shiny" : "0",
             "Exporter::Tiny" : "0",
             "JSON::MaybeXS" : "0",
             "Moo" : "0",
@@ -71,275 +73,283 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Net::CIDR::Lite" : "0",
+            "Net::Netmask" : "0",
+            "NetAddr::IP" : "0",
             "Test2::V1" : "1.302217",
-            "Test::More" : "0"
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0",
+            "constant" : "0"
          }
       }
    },
    "provides" : {
       "WebService::OPNsense" : {
          "file" : "lib/WebService/OPNsense.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Backup" : {
          "file" : "lib/WebService/OPNsense/Backup.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::CaptivePortal::Access" : {
          "file" : "lib/WebService/OPNsense/CaptivePortal/Access.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::CaptivePortal::Service" : {
          "file" : "lib/WebService/OPNsense/CaptivePortal/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::CaptivePortal::Session" : {
          "file" : "lib/WebService/OPNsense/CaptivePortal/Session.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::CaptivePortal::Settings" : {
          "file" : "lib/WebService/OPNsense/CaptivePortal/Settings.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::CaptivePortal::Voucher" : {
          "file" : "lib/WebService/OPNsense/CaptivePortal/Voucher.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Constants" : {
          "file" : "lib/WebService/OPNsense/Constants.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Cron::Service" : {
          "file" : "lib/WebService/OPNsense/Cron/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Cron::Settings" : {
          "file" : "lib/WebService/OPNsense/Cron/Settings.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Diagnostics" : {
          "file" : "lib/WebService/OPNsense/Diagnostics.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Dnsmasq::Leases" : {
          "file" : "lib/WebService/OPNsense/Dnsmasq/Leases.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Dnsmasq::Service" : {
          "file" : "lib/WebService/OPNsense/Dnsmasq/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Dnsmasq::Settings" : {
          "file" : "lib/WebService/OPNsense/Dnsmasq/Settings.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Exception" : {
          "file" : "lib/WebService/OPNsense/Exception.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Firewall" : {
          "file" : "lib/WebService/OPNsense/Firewall.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Firewall::Alias" : {
          "file" : "lib/WebService/OPNsense/Firewall/Alias.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Firewall::Category" : {
          "file" : "lib/WebService/OPNsense/Firewall/Category.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Firewall::DNat" : {
          "file" : "lib/WebService/OPNsense/Firewall/DNat.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Firewall::Filter" : {
          "file" : "lib/WebService/OPNsense/Firewall/Filter.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Firewall::Npt" : {
          "file" : "lib/WebService/OPNsense/Firewall/Npt.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Firewall::OneToOne" : {
          "file" : "lib/WebService/OPNsense/Firewall/OneToOne.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Firewall::Role::NAT" : {
          "file" : "lib/WebService/OPNsense/Firewall/Role/NAT.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Firewall::SourceNat" : {
          "file" : "lib/WebService/OPNsense/Firewall/SourceNat.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::HASync" : {
          "file" : "lib/WebService/OPNsense/HASync.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IDS::Service" : {
          "file" : "lib/WebService/OPNsense/IDS/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IDS::Settings" : {
          "file" : "lib/WebService/OPNsense/IDS/Settings.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Connections" : {
          "file" : "lib/WebService/OPNsense/IPsec/Connections.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::KeyPairs" : {
          "file" : "lib/WebService/OPNsense/IPsec/KeyPairs.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Leases" : {
          "file" : "lib/WebService/OPNsense/IPsec/Leases.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::ManualSpd" : {
          "file" : "lib/WebService/OPNsense/IPsec/ManualSpd.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Pools" : {
          "file" : "lib/WebService/OPNsense/IPsec/Pools.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::PreSharedKeys" : {
          "file" : "lib/WebService/OPNsense/IPsec/PreSharedKeys.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Sad" : {
          "file" : "lib/WebService/OPNsense/IPsec/Sad.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Service" : {
          "file" : "lib/WebService/OPNsense/IPsec/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Sessions" : {
          "file" : "lib/WebService/OPNsense/IPsec/Sessions.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Settings" : {
          "file" : "lib/WebService/OPNsense/IPsec/Settings.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Spd" : {
          "file" : "lib/WebService/OPNsense/IPsec/Spd.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Tunnel" : {
          "file" : "lib/WebService/OPNsense/IPsec/Tunnel.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::IPsec::Vti" : {
          "file" : "lib/WebService/OPNsense/IPsec/Vti.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Interfaces" : {
          "file" : "lib/WebService/OPNsense/Interfaces.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Kea::CtrlAgent" : {
          "file" : "lib/WebService/OPNsense/Kea/CtrlAgent.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Kea::Ddns" : {
          "file" : "lib/WebService/OPNsense/Kea/Ddns.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Kea::Dhcpv4" : {
          "file" : "lib/WebService/OPNsense/Kea/Dhcpv4.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Kea::Dhcpv6" : {
          "file" : "lib/WebService/OPNsense/Kea/Dhcpv6.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Kea::Leases" : {
          "file" : "lib/WebService/OPNsense/Kea/Leases.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Kea::Service" : {
          "file" : "lib/WebService/OPNsense/Kea/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Normalize" : {
          "file" : "lib/WebService/OPNsense/Normalize.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Object" : {
          "file" : "lib/WebService/OPNsense/Object.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::OpenVPN::ClientOverwrites" : {
          "file" : "lib/WebService/OPNsense/OpenVPN/ClientOverwrites.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::OpenVPN::Export" : {
          "file" : "lib/WebService/OPNsense/OpenVPN/Export.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::OpenVPN::Instances" : {
          "file" : "lib/WebService/OPNsense/OpenVPN/Instances.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::OpenVPN::Service" : {
          "file" : "lib/WebService/OPNsense/OpenVPN/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Role::APIPath" : {
          "file" : "lib/WebService/OPNsense/Role/APIPath.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Role::Crud" : {
          "file" : "lib/WebService/OPNsense/Role/Crud.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Role::ItemCrud" : {
          "file" : "lib/WebService/OPNsense/Role/ItemCrud.pm",
-         "version" : "0.001"
+         "version" : "0.002"
+      },
+      "WebService::OPNsense::Role::KeaItemCrud" : {
+         "file" : "lib/WebService/OPNsense/Role/KeaItemCrud.pm",
+         "version" : "0.002"
       },
       "WebService::OPNsense::Role::Service" : {
          "file" : "lib/WebService/OPNsense/Role/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Role::Settings" : {
          "file" : "lib/WebService/OPNsense/Role/Settings.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Routes" : {
          "file" : "lib/WebService/OPNsense/Routes.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::System" : {
          "file" : "lib/WebService/OPNsense/System.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::TrafficShaper::Service" : {
          "file" : "lib/WebService/OPNsense/TrafficShaper/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::TrafficShaper::Settings" : {
          "file" : "lib/WebService/OPNsense/TrafficShaper/Settings.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Unbound::Diagnostics" : {
          "file" : "lib/WebService/OPNsense/Unbound/Diagnostics.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Unbound::Overview" : {
          "file" : "lib/WebService/OPNsense/Unbound/Overview.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Unbound::Service" : {
          "file" : "lib/WebService/OPNsense/Unbound/Service.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::OPNsense::Unbound::Settings" : {
          "file" : "lib/WebService/OPNsense/Unbound/Settings.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -354,7 +364,7 @@
          "web" : "https://github.com/djzort/perl-WebService-OPNsense"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_author_pledge" : {
       "version" : 1
    },
