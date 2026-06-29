@@ -253,7 +253,7 @@ subtest '_get_inheritance_chain() - class with parent' => sub {
 	done_testing();
 };
 
-subtest '_walk_isa() - processes class hierarchy' => sub {
+subtest '_get_inheritance_chain() - processes class hierarchy' => sub {
 	{
 		package Test::Base;
 		sub new { bless {}, shift }
@@ -264,41 +264,30 @@ subtest '_walk_isa() - processes class hierarchy' => sub {
 		sub new { bless {}, shift }
 	}
 
-	my @chain;
-	my %seen;
-
-	Object::Configure::_walk_isa('Test::Derived', \@chain, \%seen);
+	my @chain = Object::Configure::_get_inheritance_chain('Test::Derived');
 
 	ok(scalar(@chain) > 0, 'Chain populated');
-	ok($seen{'Test::Derived'}, 'Derived class marked as seen');
-	ok($seen{'Test::Base'}, 'Base class marked as seen');
-	ok($seen{'UNIVERSAL'}, 'UNIVERSAL marked as seen');
+	ok((grep { $_ eq 'Test::Derived' } @chain), 'Derived class in chain');
+	ok((grep { $_ eq 'Test::Base'    } @chain), 'Base class in chain');
+	ok((grep { $_ eq 'UNIVERSAL'     } @chain), 'UNIVERSAL in chain');
 
 	done_testing();
 };
 
-subtest '_walk_isa() - adds UNIVERSAL for classes with no parents' => sub {
-	my @chain;
-	my %seen;
+subtest '_get_inheritance_chain() - adds UNIVERSAL for classes with no parents' => sub {
+	my @chain = Object::Configure::_get_inheritance_chain('Test::Orphan');
 
-	Object::Configure::_walk_isa('Test::Orphan', \@chain, \%seen);
-
-	ok(grep({ $_ eq 'UNIVERSAL' } @chain), 'UNIVERSAL added for orphan class');
-	ok(grep({ $_ eq 'Test::Orphan' } @chain), 'Class itself added');
+	ok((grep { $_ eq 'UNIVERSAL'    } @chain), 'UNIVERSAL added for orphan class');
+	ok((grep { $_ eq 'Test::Orphan' } @chain), 'Class itself in chain');
 
 	done_testing();
 };
 
-subtest '_walk_isa() - does not add UNIVERSAL twice' => sub {
-	my @chain;
-	my %seen;
-
-	# Call twice to ensure deduplication
-	Object::Configure::_walk_isa('Test::Solo', \@chain, \%seen);
-	Object::Configure::_walk_isa('Test::Solo', \@chain, \%seen);
+subtest '_get_inheritance_chain() - UNIVERSAL appears exactly once' => sub {
+	my @chain = Object::Configure::_get_inheritance_chain('Test::Solo');
 
 	my $universal_count = grep { $_ eq 'UNIVERSAL' } @chain;
-	is($universal_count, 1, 'UNIVERSAL only added once');
+	is($universal_count, 1, 'UNIVERSAL appears exactly once');
 
 	done_testing();
 };

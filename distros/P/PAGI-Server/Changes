@@ -1,5 +1,38 @@
 # Revision history for PAGI-Server
 
+0.002004 - 2026-06-28
+
+  Bug Fixes
+  - The HTTP/2 tests (t/http2/*.t) skipped only when Net::HTTP2::nghttp2 was
+    older than 0.007, but the server treats HTTP/2 as usable only at
+    nghttp2 >= 0.008 (PAGI::Server::Protocol::HTTP2::MIN_NGHTTP2_VERSION) and
+    when the C library reports itself available. On a smoker with nghttp2 0.007
+    the guards passed, the tests ran, and every HTTP/2 session died "nghttp2 not
+    installed". The tests now gate on PAGI::Server::Protocol::HTTP2->available,
+    the same predicate the server uses, so they skip exactly when the server
+    would decline HTTP/2.
+  - t/runner.t and t/integration/runner-server.t guarded PAGI::App::File and
+    PAGI::App::Directory with the `!defined($v) || $v >= 0.002000` undef-loophole
+    that 0.002003 removed elsewhere; a pre-split PAGI install would slip through.
+    They now gate on PAGI::Tools, consistent with the other toolkit-dependent
+    tests.
+
+0.002003 - 2026-06-28
+
+  Bug Fixes
+  - The PAGI-Tools-dependent integration test guards added in 0.002002 did not
+    actually skip on a pre-split PAGI install, so a smoker with the old
+    distribution still ran t/integration/response-integration.t against the old
+    `new($scope, $send)` constructor and died "send is required". The 0.002002
+    guards keyed off each body module's own $VERSION with an
+    `!defined($v) || $v >= 0.002000` test; the undef branch (meant to allow an
+    unversioned in-tree checkout) also admitted the pre-split modules, which are
+    likewise unversioned. The guards now gate on PAGI::Tools, a module that
+    exists only in the split-era distribution, so a pre-split install has no
+    PAGI::Tools and the test skips. PAGI::Tools hardcodes its $VERSION (the body
+    modules get theirs injected only at build), so the VERSION(0.002000) check
+    is reliable for both installed releases and an in-tree checkout.
+
 0.002002 - 2026-06-27
 
   Bug Fixes

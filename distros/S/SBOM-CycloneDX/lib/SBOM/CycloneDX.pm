@@ -30,7 +30,7 @@ use constant JSON_SCHEMA_1_5 => 'http://cyclonedx.org/schema/bom-1.5.schema.json
 use constant JSON_SCHEMA_1_6 => 'http://cyclonedx.org/schema/bom-1.6.schema.json';
 use constant JSON_SCHEMA_1_7 => 'http://cyclonedx.org/schema/bom-1.7.schema.json';
 
-our $VERSION = 1.08;
+our $VERSION = 1.09;
 
 our %JSON_SCHEMA = (
     '1.2' => JSON_SCHEMA_1_2,
@@ -256,7 +256,6 @@ sub TO_JSON {
 
 }
 
-
 1;
 
 __END__
@@ -271,6 +270,7 @@ SBOM::CycloneDX - CycloneDX Perl Library
 
     use SBOM::CycloneDX;
     use SBOM::CycloneDX::Enum qw(COMPONENT_TYPE);
+    use SBOM::CycloneDX::Util qw(cyclonedx_tool);
 
     my $bom = SBOM::CycloneDX->new;
 
@@ -563,12 +563,6 @@ This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 
 =item * L<SBOM::CycloneDX::Issue>
 
-=over
-
-=item * L<SBOM::CycloneDX::Issue::Source>
-
-=back
-
 =item * L<SBOM::CycloneDX::License>
 
 =over
@@ -652,8 +646,6 @@ This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 =item * L<SBOM::CycloneDX::Vulnerability::Rating>
 
 =item * L<SBOM::CycloneDX::Vulnerability::Reference>
-
-=item * L<SBOM::CycloneDX::Vulnerability::Source>
 
 =back
 

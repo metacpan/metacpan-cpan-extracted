@@ -407,6 +407,12 @@ window.addEventListener("load", (e)=>{
 		        return Promise.resolve();
         })
         .then(()=>{
+          return chunkLoader.app();
+        })
+        .then(()=>{
+          return chunkLoader.css();
+        })
+        .then(()=>{
                 //console.log("About to call resolver");
                 chunkLoader.resolver();
                 //Load the app here

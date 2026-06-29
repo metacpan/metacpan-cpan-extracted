@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000025';
 
 use DBD::SQLite 1.0;
 
@@ -187,6 +187,12 @@ my %TABLE_TYPES = (
     'view'  => 'DBIx::QuickORM::Schema::View',
 );
 
+# Permanent and temporary schema catalogs, in shadowing-priority order for the
+# DDL lookup (a temp object shadows a permanent one of the same name, but
+# _table_ddl historically prefers the permanent DDL, so permanent is listed
+# first and wins the //= in _fetch_all_ddl).
+my @MASTERS = ('sqlite_master', 'sqlite_temp_master');
+
 =pod
 
 =head1 PUBLIC METHODS
@@ -211,35 +217,58 @@ sub build_tables_from_db {
         "SELECT name, type, 1 FROM sqlite_temp_master WHERE type IN ('table', 'view')",
     );
 
-    my %tables;
-
+    my @table_list;
     for my $q (@queries) {
         my $sth = $dbh->prepare($q);
         $sth->execute();
-
         while (my ($tname, $type, $temp) = $sth->fetchrow_array) {
-            next if $tname =~ m/^sqlite_/;
-            next if $params{autofill}->skip(table => $tname);
-
-            my $table = {name => $tname, db_name => $tname, is_temp => $temp};
-            my $class = $TABLE_TYPES{lc($type)} // 'DBIx::QuickORM::Schema::Table';
-            $params{autofill}->hook(pre_table => {table => $table, class => \$class});
-
-            $table->{columns} = $self->build_columns_from_db($tname, %params);
-            $params{autofill}->hook(columns => {columns => $table->{columns}, table => $table});
-
-            $table->{indexes} = $self->build_indexes_from_db($tname, %params);
-            $params{autofill}->hook(indexes => {indexes => $table->{indexes}, table => $table});
-
-            @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params);
-
-            $params{autofill}->hook(post_table => {table => $table, class => \$class});
-
-            # Hooks may rename the table; key by the final name.
-            my $final_name = $table->{name};
-            $tables{$final_name} = $class->new($table);
-            $params{autofill}->hook(table => {table => $tables{$final_name}});
+            push @table_list => [$tname, $type, $temp];
         }
+    }
+
+    # Sweep column, index, foreign-key, and DDL metadata for every table in one
+    # query each (per catalog) instead of a query-per-table. The pragma_* table
+    # functions are joined laterally against sqlite_master / sqlite_temp_master
+    # so a single statement iterates all tables. The per-table builders below
+    # consume these pre-fetched rows; primary key and rowid-alias detection are
+    # derived from the pre-fetched xinfo rather than extra queries.
+    my $all_xinfo   = $self->_fetch_all_xinfo;
+    my $all_indexes = $self->_fetch_all_index_info;
+    my $all_fks     = $self->_fetch_all_fks;
+    my $all_ddl     = $self->_fetch_all_ddl;
+
+    my %tables;
+    for my $row (@table_list) {
+        my ($tname, $type, $temp) = @$row;
+        next if $tname =~ m/^sqlite_/;
+        next if $params{autofill}->skip(table => $tname);
+
+        # Key pre-fetched metadata by (is_temp, name): a temporary object shadows
+        # a permanent one of the same name, and the unqualified pragma calls in
+        # the sweeps resolve to the temp object, so both catalog sweeps would
+        # otherwise pile rows for a shadowed name under one key and double them.
+        my $xinfo        = $all_xinfo->{$temp}{$tname} // [];
+        my @pk           = $self->_pk_from_xinfo($xinfo);
+        my $identity_col = $self->_rowid_alias_from($xinfo, $all_ddl->{$tname});
+
+        my $table = {name => $tname, db_name => $tname, is_temp => $temp};
+        my $class = $TABLE_TYPES{lc($type)} // 'DBIx::QuickORM::Schema::Table';
+        $params{autofill}->hook(pre_table => {table => $table, class => \$class});
+
+        $table->{columns} = $self->build_columns_from_db($tname, %params, column_rows => $xinfo, identity_col => $identity_col);
+        $params{autofill}->hook(columns => {columns => $table->{columns}, table => $table});
+
+        $table->{indexes} = $self->build_indexes_from_db($tname, %params, index_rows => ($all_indexes->{$temp}{$tname} // []), pk_fallback => \@pk);
+        $params{autofill}->hook(indexes => {indexes => $table->{indexes}, table => $table});
+
+        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params, index_rows => ($all_indexes->{$temp}{$tname} // []), fk_rows => ($all_fks->{$temp}{$tname} // []), pk_fallback => \@pk);
+
+        $params{autofill}->hook(post_table => {table => $table, class => \$class});
+
+        # Hooks may rename the table; key by the final name.
+        my $final_name = $table->{name};
+        $tables{$final_name} = $class->new($table);
+        $params{autofill}->hook(table => {table => $tables{$final_name}});
     }
 
     return \%tables;
@@ -257,27 +286,16 @@ sub build_table_keys_from_db {
     my $self = shift;
     my ($table, %params) = @_;
 
-    my $dbh = $self->{+DBH};
-
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT il.name     AS grp,
-               il.origin   AS type,
-               il.`unique` AS uniq,
-               ii.name     AS column
-         FROM pragma_index_list(?)       AS il,
-              pragma_index_info(il.name) AS ii
-     ORDER BY seq, il.name, seqno, cid
-    EOT
-
-    $sth->execute($table);
+    my $index_rows = $params{index_rows} // $self->_query_index_info($table);
+    my $fk_rows    = $params{fk_rows}    // $self->_query_fks($table);
 
     my ($pk, %unique, @links);
 
     my %index;
-    while (my $row = $sth->fetchrow_hashref()) {
-        my $idx = $index{$row->{grp}} //= {};
-        $idx->{type}   = $row->{type};
-        $idx->{unique} = $row->{uniq};
+    for my $row (@$index_rows) {
+        my $idx = $index{$row->{name}} //= {};
+        $idx->{type}   = $row->{origin};
+        $idx->{unique} = $row->{unique};
         push @{$idx->{cols} //= []} => $row->{column};
     }
 
@@ -291,7 +309,7 @@ sub build_table_keys_from_db {
     }
 
     unless ($pk && @$pk) {
-        my @found = $self->_primary_key($table);
+        my @found = $params{pk_fallback} ? @{$params{pk_fallback}} : $self->_primary_key($table);
 
         if (@found) {
             $pk = \@found;
@@ -303,9 +321,7 @@ sub build_table_keys_from_db {
     }
 
     %index = ();
-    $sth = $dbh->prepare("SELECT `id`, `table`, `from`, `to` FROM pragma_foreign_key_list(?) order by id, seq");
-    $sth->execute($table);
-    while (my $row = $sth->fetchrow_hashref()) {
+    for my $row (@$fk_rows) {
         my $idx = $index{$row->{id}} //= {};
 
         push @{$idx->{columns} //= []} => $row->{from};
@@ -362,23 +378,21 @@ sub build_columns_from_db {
     my ($table, %params) = @_;
 
     croak "A table name is required" unless $table;
-    my $dbh = $self->{+DBH};
 
     # pragma_table_xinfo (SQLite 3.31.0+, 2020-01-22) lists every column
     # including hidden virtual-table columns and GENERATED columns; the
     # older pragma_table_info silently omits them. The `hidden` flag
     # distinguishes them: 0 ordinary, 1 hidden virtual-table column,
     # 2 virtual generated column, 3 stored generated column.
-    my $sth = $dbh->prepare("SELECT * FROM pragma_table_xinfo(?)");
-    $sth->execute($table);
+    my $rows = $params{column_rows} // $self->_query_xinfo($table);
 
     # A rowid-alias column auto-assigns on insert (with or without
     # AUTOINCREMENT, which only changes rowid allocation policy), matching the
     # identity semantics of the other engines.
-    my $identity_col = $self->_rowid_alias_column($table);
+    my $identity_col = exists $params{identity_col} ? $params{identity_col} : $self->_rowid_alias_column($table);
 
-    my (%columns, @links);
-    while (my $res = $sth->fetchrow_hashref) {
+    my %columns;
+    for my $res (@$rows) {
         my $hidden = $res->{hidden} // 0;
         next if $hidden == 1;    # hidden virtual-table columns are not part of the ORM schema
 
@@ -425,30 +439,223 @@ sub build_indexes_from_db {
     my $self = shift;
     my ($table, %params) = @_;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT il.`name`   AS name,
-               il.`unique` AS u,
-               ii.`name`   AS column
-          FROM pragma_index_list(?)       AS il,
-               pragma_index_info(il.name) AS ii
-      ORDER BY il.name, ii.seqno
-    EOT
-
-    $sth->execute($table);
+    my $rows = $params{index_rows} // $self->_query_index_info($table);
 
     my %out;
-    while (my ($name, $u, $col) = $sth->fetchrow_array) {
-        my $idx = $out{$name} //= {name => $name, columns => [], unique => $u ? 1 : 0};
-        push @{$idx->{columns}} => $col;
+    for my $row (@$rows) {
+        my $idx = $out{$row->{name}} //= {name => $row->{name}, columns => [], unique => $row->{unique} ? 1 : 0};
+        push @{$idx->{columns}} => $row->{column};
     }
 
-    if (my @pk = $self->_primary_key($table)) {
+    my @pk = $params{pk_fallback} ? @{$params{pk_fallback}} : $self->_primary_key($table);
+    if (@pk) {
         $out{"${table}:pk"} = {name => "${table}:pk", unique => 1, columns => \@pk};
     }
 
     return [map { $params{autofill}->hook(index => {index => $out{$_}, table_name => $table}); $out{$_} } sort keys %out];
+}
+
+=pod
+
+=head1 PRIVATE METHODS (schema introspection)
+
+=over 4
+
+=item $by_table = $dialect->_fetch_all_xinfo
+
+=item $by_table = $dialect->_fetch_all_index_info
+
+=item $by_table = $dialect->_fetch_all_fks
+
+=item $by_table = $dialect->_fetch_all_ddl
+
+Sweep column (C<pragma_table_xinfo>), index (C<pragma_index_list> +
+C<pragma_index_info>), foreign-key (C<pragma_foreign_key_list>), and stored-DDL
+metadata for every table in a single statement per catalog. The pragma table
+functions are joined laterally against C<sqlite_master> / C<sqlite_temp_master>
+so one statement iterates all tables. C<_fetch_all_xinfo>,
+C<_fetch_all_index_info>, and C<_fetch_all_fks> return a hashref keyed by
+temp-flag (0 permanent, 1 temporary) then table name, so a temporary object
+never merges with a permanent one of the same name; C<_fetch_all_ddl> is keyed
+by table name (permanent DDL wins, matching C<_table_ddl>).
+
+=item @cols = $dialect->_pk_from_xinfo($xinfo_rows)
+
+The primary-key column names (ordered by key position) derived from pre-fetched
+C<pragma_table_xinfo> rows, without an extra query.
+
+=item $col_or_undef = $dialect->_rowid_alias_from($xinfo_rows, $ddl)
+
+The rowid-alias column derived from pre-fetched xinfo rows and stored DDL,
+without an extra query. See C<_rowid_alias_column> for the alias rule.
+
+=item $rows = $dialect->_query_xinfo($table)
+
+=item $rows = $dialect->_query_index_info($table)
+
+=item $rows = $dialect->_query_fks($table)
+
+Single-table fallbacks used when the per-table builders are called without
+pre-fetched rows.
+
+=back
+
+=cut
+
+sub _fetch_all_xinfo {
+    my $self = shift;
+
+    my $dbh = $self->{+DBH};
+
+    my %by_table;
+    for my $is_temp (0 .. $#MASTERS) {
+        my $master = $MASTERS[$is_temp];
+        my $sth = $dbh->prepare(<<"        EOT");
+            SELECT m.name AS qorm_tbl, x.*
+              FROM $master m
+              JOIN pragma_table_xinfo(m.name) x
+             WHERE m.type IN ('table', 'view')
+          ORDER BY m.name, x.cid
+        EOT
+        $sth->execute();
+        while (my $row = $sth->fetchrow_hashref) {
+            my $tname = delete $row->{qorm_tbl};
+            push @{$by_table{$is_temp}{$tname} //= []} => $row;
+        }
+    }
+
+    return \%by_table;
+}
+
+sub _query_xinfo {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare("SELECT * FROM pragma_table_xinfo(?)");
+    $sth->execute($table);
+
+    return $sth->fetchall_arrayref({});
+}
+
+sub _fetch_all_index_info {
+    my $self = shift;
+
+    my $dbh = $self->{+DBH};
+
+    my %by_table;
+    for my $is_temp (0 .. $#MASTERS) {
+        my $master = $MASTERS[$is_temp];
+        my $sth = $dbh->prepare(<<"        EOT");
+            SELECT m.name, il.name, il.`unique`, il.origin, ii.name
+              FROM $master m
+              JOIN pragma_index_list(m.name)  AS il
+              JOIN pragma_index_info(il.name) AS ii
+             WHERE m.type IN ('table', 'view')
+          ORDER BY m.name, il.name, ii.seqno
+        EOT
+        $sth->execute();
+        while (my ($tbl, $name, $uniq, $origin, $col) = $sth->fetchrow_array) {
+            push @{$by_table{$is_temp}{$tbl} //= []} => {name => $name, unique => $uniq, origin => $origin, column => $col};
+        }
+    }
+
+    return \%by_table;
+}
+
+sub _query_index_info {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT il.name, il.`unique`, il.origin, ii.name
+          FROM pragma_index_list(?)       AS il,
+               pragma_index_info(il.name) AS ii
+      ORDER BY il.name, ii.seqno
+    EOT
+    $sth->execute($table);
+
+    my @rows;
+    while (my ($name, $uniq, $origin, $col) = $sth->fetchrow_array) {
+        push @rows => {name => $name, unique => $uniq, origin => $origin, column => $col};
+    }
+
+    return \@rows;
+}
+
+sub _fetch_all_fks {
+    my $self = shift;
+
+    my $dbh = $self->{+DBH};
+
+    my %by_table;
+    for my $is_temp (0 .. $#MASTERS) {
+        my $master = $MASTERS[$is_temp];
+        my $sth = $dbh->prepare(<<"        EOT");
+            SELECT m.name, fk.id, fk.`table`, fk.`from`, fk.`to`
+              FROM $master m
+              JOIN pragma_foreign_key_list(m.name) AS fk
+             WHERE m.type IN ('table', 'view')
+          ORDER BY m.name, fk.id, fk.seq
+        EOT
+        $sth->execute();
+        while (my ($tbl, $id, $ftable, $ffrom, $fto) = $sth->fetchrow_array) {
+            push @{$by_table{$is_temp}{$tbl} //= []} => {id => $id, table => $ftable, from => $ffrom, to => $fto};
+        }
+    }
+
+    return \%by_table;
+}
+
+sub _query_fks {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare("SELECT `id`, `table`, `from`, `to` FROM pragma_foreign_key_list(?) order by id, seq");
+    $sth->execute($table);
+
+    return $sth->fetchall_arrayref({});
+}
+
+sub _fetch_all_ddl {
+    my $self = shift;
+
+    my $dbh = $self->{+DBH};
+
+    my %by_table;
+    for my $master (@MASTERS) {
+        my $sth = $dbh->prepare("SELECT name, sql FROM $master WHERE type = 'table'");
+        $sth->execute();
+        while (my ($name, $sql) = $sth->fetchrow_array) {
+            $by_table{$name} //= $sql;
+        }
+    }
+
+    return \%by_table;
+}
+
+sub _pk_from_xinfo {
+    my $self = shift;
+    my ($rows) = @_;
+
+    my @pk = grep { ($_->{pk} // 0) > 0 && (!defined $_->{hidden} || $_->{hidden} < 2) } @$rows;
+
+    return map { $_->{name} } sort { $a->{pk} <=> $b->{pk} } @pk;
+}
+
+sub _rowid_alias_from {
+    my $self = shift;
+    my ($rows, $ddl) = @_;
+
+    my @pk = grep { ($_->{pk} // 0) > 0 && (!defined $_->{hidden} || $_->{hidden} < 2) } @$rows;
+
+    return undef unless @pk == 1;
+    return undef unless uc($pk[0]->{type} // '') eq 'INTEGER';
+    return undef if defined($ddl) && $self->_strip_sql_noise($ddl) =~ m/\bWITHOUT\s+ROWID\b/i;
+
+    return $pk[0]->{name};
 }
 
 =pod

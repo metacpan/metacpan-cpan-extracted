@@ -70,6 +70,7 @@ App-.*
 .test-script-*
 typescript
 mutation*
+^xt/mutant_\d
 schemas/*\.yml
 CLAUDE.md
 \.claude

@@ -68,7 +68,7 @@ typedef struct pdfmake_path_seg {
  * Path - collection of segments forming subpaths
  */
 
-typedef struct pdfmake_path {
+struct pdfmake_path {
     pdfmake_path_seg_t *segs;
     size_t seg_count;
     size_t seg_cap;
@@ -80,7 +80,11 @@ typedef struct pdfmake_path {
     /* Start of current subpath (for close) */
     pdfmake_point_t subpath_start;
     int has_subpath;
-} pdfmake_path_t;
+};
+#ifndef PDFMAKE_PATH_T_DEFINED
+#define PDFMAKE_PATH_T_DEFINED
+typedef struct pdfmake_path pdfmake_path_t;
+#endif
 
 /*
  * Line cap styles (PDF spec 8.4.3.3)

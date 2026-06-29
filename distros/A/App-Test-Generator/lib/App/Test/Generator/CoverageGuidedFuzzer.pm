@@ -38,7 +38,7 @@ Readonly my $TYPE_STRING  => 'string';
 # --------------------------------------------------
 Readonly my @JSON_MODULES => qw(JSON::MaybeXS JSON);
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 NAME
 
@@ -46,7 +46,7 @@ App::Test::Generator::CoverageGuidedFuzzer - AFL-style coverage-guided fuzzing f
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =head1 SYNOPSIS
 

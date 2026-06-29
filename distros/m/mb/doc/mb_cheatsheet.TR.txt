@@ -45,3 +45,20 @@
   printf "length=%d\n", mb::length($s);    # character count
   printf "sub=%s\n",    mb::substr($s,0,5); # "Hello"
   printf "pos=%d\n",    mb::index($s,"World"); # 6
+
+[ 9. Çalışma zamanı kod noktası düzenli ifadesi (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." bir kod noktasıyla eşleşir
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie biçimine eşdeğer
+
+[ 10. Düzgün baytları doğrula (mb::valid) ]
+  mb::valid($octets)            # düzgünse 1, değilse 0
+                                # katı, isteğe bağlı; kodlamaya göre değişir
+
+[ 11. Kod noktasina göre böl (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # kod noktası sınırlarında böler
+
+[ 12. Çalıştırmanın üç yolu (filter / modulino / runtime) ]
+  use mb;                       # yol 1: kaynak filtresi (perl 5.8+)
+  perl mb.pm script.pl          # yol 2: modulino
+  use mb qw(*mb utf8);          # yol 3: çalışma zamanı arayüzü

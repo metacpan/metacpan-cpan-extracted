@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use parent qw(Digest::base);
 
 use Carp;
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 
 # Private constructor:
@@ -61,14 +61,14 @@ Data::URIID::Digest - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 
     use Data::URIID::Digest;
 
-    my $extractor = Data::URIID->new;
-    my $result = $extractor->lookup( $URI );
+    my Data::URIID $extractor = Data::URIID->new;
+    my Data::URIID::Result $result = $extractor->lookup( $URI );
     my $digest = $result->digest('sha-3-512', as => 'Digest');
 
 This is an internal module. It is used to emulate an object created by L<Digest>.

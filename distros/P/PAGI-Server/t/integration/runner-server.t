@@ -88,7 +88,7 @@ subtest 'integration: server responds to requests' => sub {
 # ---------------------------------------------------------------------------
 subtest 'integration: module-based app serves files' => sub {
     skip_all 'PAGI::App::File not available (install PAGI-Tools >= 0.002000)'
-        unless eval { require PAGI::App::File; my $v = PAGI::App::File->VERSION; !defined($v) || $v >= 0.002000 };
+        unless eval { require PAGI::Tools; PAGI::Tools->VERSION(0.002000); require PAGI::App::File; 1 };
     my $loop = IO::Async::Loop->new;
 
     # Create a temp directory with a file
@@ -130,7 +130,7 @@ subtest 'integration: module-based app serves files' => sub {
 # ---------------------------------------------------------------------------
 subtest 'SSL options validation' => sub {
     skip_all 'PAGI::App::Directory not available (install PAGI-Tools >= 0.002000)'
-        unless eval { require PAGI::App::Directory; my $v = PAGI::App::Directory->VERSION; !defined($v) || $v >= 0.002000 };
+        unless eval { require PAGI::Tools; PAGI::Tools->VERSION(0.002000); require PAGI::App::Directory; 1 };
     my $runner = PAGI::Server::Runner->new(
         quiet          => 1,
         server_options => {
@@ -155,7 +155,7 @@ subtest 'SSL options validation' => sub {
 # ---------------------------------------------------------------------------
 subtest 'load_server with socket option omits host/port (PAGI::Server introspection)' => sub {
     skip_all 'PAGI::App::Directory not available (install PAGI-Tools >= 0.002000)'
-        unless eval { require PAGI::App::Directory; my $v = PAGI::App::Directory->VERSION; !defined($v) || $v >= 0.002000 };
+        unless eval { require PAGI::Tools; PAGI::Tools->VERSION(0.002000); require PAGI::App::Directory; 1 };
     my $socket_path = File::Temp::tmpnam() . '.sock';
     my $runner = PAGI::Server::Runner->new(
         quiet          => 1,
@@ -177,7 +177,7 @@ subtest 'load_server with socket option omits host/port (PAGI::Server introspect
 # ---------------------------------------------------------------------------
 subtest 'load_server with listen option omits host/port (PAGI::Server introspection)' => sub {
     skip_all 'PAGI::App::Directory not available (install PAGI-Tools >= 0.002000)'
-        unless eval { require PAGI::App::Directory; my $v = PAGI::App::Directory->VERSION; !defined($v) || $v >= 0.002000 };
+        unless eval { require PAGI::Tools; PAGI::Tools->VERSION(0.002000); require PAGI::App::Directory; 1 };
     my $socket_path = File::Temp::tmpnam() . '.sock';
     my $runner = PAGI::Server::Runner->new(
         quiet          => 1,

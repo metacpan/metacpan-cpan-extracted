@@ -1,3 +1,21 @@
+Sun Jun 28 16:06:55 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.1.0]:
+	* .gitignore: +buildspec.yml.current
+	* release-notes.md: new
+	* release-notes-1.1.0.md: new
+	* README.md: generate
+	* VERSION: bump
+	* lib/Data/NestedKey.pm.in: modified
+	* t/01-subscript.t: new
+	(_parse_path): new
+	(_walk): new
+	(set): support index syntax
+	(get): likewise
+	(delete): likewise
+	(exists_key): likewise
+	* release-notes.mk: new
+
 Sun Mar 15 10:56:36 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.0.8]:

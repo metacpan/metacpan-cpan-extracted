@@ -1,3 +1,9 @@
+0.06 2026-06-28
+    * Add comments.minimized column
+    * Add issue.issue_field_values column (even though that's an array...)
+    * Add issue.pinned_comment column
+    * Add issue.pin column
+
 0.05 2025-08-22
     * Skip empty rows if Github shows these
     * Add "sub_issues_summary" column

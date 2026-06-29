@@ -38,11 +38,23 @@ BEGIN
   our %EXPORT_TAGS = ( go => [@EXPORT_OK] );
 }
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
-require App::MechaCPAN::Perl;
-require App::MechaCPAN::Install;
-require App::MechaCPAN::Deploy;
+my @commands = qw/
+  perl
+  install
+  deploy
+  /;
+
+foreach my $cmd ( @commands )
+{
+  my $pkg = __PACKAGE__ . "::" . ucfirst($cmd);
+  local $@;
+  my ($file, $line) = ( __FILE__, __LINE__+1);
+  eval qq{#line $line "$file"\nrequire $pkg};
+  die $@
+    if $@;
+}
 
 my $loaded_at_compile;
 my $restarted_key        = 'APP_MECHACPAN_RESTARTED';
@@ -66,6 +78,7 @@ our @args = (
   'directory|d=s',
   'build-reusable-perl!',
   'verify!',
+  'help|h!',
 );
 
 # Timeout when there's no output in seconds
@@ -114,11 +127,50 @@ sub main
   );
   @args = keys %{ { map { $_ => 1 } @args } };
 
+  if ( !@argv )
+  {
+    my $prog = ( File::Spec->splitpath($0) )[2] || 'mechacpan';
+
+    my @options = map {
+      my ($names) = m/^([^=:!+]+)/;
+      join( ', ', map { length > 1 ? "--$_" : "-$_" } split /\|/, $names );
+    } @App::MechaCPAN::args;
+
+    my $orig_fh = select STDERR;
+
+    say "Usage: $prog [options] <command> [<args>]";
+    say "";
+    say "Commands:";
+    say "  $_"
+      foreach @commands;
+    say "";
+    say "Global Options:";
+    say "  $_"
+      foreach @options;
+    say "";
+    say "Run '$prog --help' for full documentation.";
+
+    select $orig_fh;
+    return -1;
+  }
+
   my $options = {};
   my $getopt_ret
     = Getopt::Long::GetOptionsFromArray( \@argv, $options, @args );
   return -1
     if !$getopt_ret;
+
+  if ( $options->{help} )
+  {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(
+      -input   => $INC{ _inc_pkg(__PACKAGE__) },
+      -verbose => 2,
+      -exitval => 'NOEXIT',
+      -output  => \*STDOUT,
+    );
+    return 0;
+  }
 
   my $merge_options = sub
   {
@@ -1973,6 +2025,10 @@ App::MechaCPAN - Mechanize the installation of CPAN things.
   # If cpanfile.snapshot exists, it will be consulted exclusivly
   user@host:~$ mechacpan deploy
   user@host:~$ zhuli do the thing
+  
+  # Download mechacpan for use or for a one-off command
+  user@host:~$ curl -L https://get.mechacpan.us -o mechacpan
+  user@host:~$ curl -L https://get.mechacpan.us | perl - deploy
 
 =head1 DESCRIPTION
 

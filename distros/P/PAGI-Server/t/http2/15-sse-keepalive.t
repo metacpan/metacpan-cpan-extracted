@@ -11,8 +11,9 @@ use Time::HiRes ();
 
 plan skip_all => "Server integration tests not supported on Windows" if $^O eq 'MSWin32';
 BEGIN {
-    eval { require Net::HTTP2::nghttp2; Net::HTTP2::nghttp2->VERSION(0.007); 1 }
-        or plan(skip_all => 'Net::HTTP2::nghttp2 0.007+ not installed (optional)');
+    require PAGI::Server::Protocol::HTTP2;
+    PAGI::Server::Protocol::HTTP2->available
+        or plan(skip_all => 'HTTP/2 not available (Net::HTTP2::nghttp2 0.008+ required)');
 }
 
 # ============================================================

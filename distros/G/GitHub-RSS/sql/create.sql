@@ -1,7 +1,7 @@
 create table "issue" (
     "number" decimal(16,0)
   , "id" decimal(16,0) not null primary key
-   ,"user" varchar(16384)
+  , "user" varchar(16384)
   , "user_id" decimal(16,0)
   , "user_login" varchar(255)
   , "user_gravatar_id" varchar(255)
@@ -37,19 +37,23 @@ create table "issue" (
   , "sub_issues_summary" varchar(1024)
   , "type" varchar(1024)
   , "issue_dependencies_summary" varchar(1024)
+  , "pinned_comment" varchar(1024)
+  , "issue_field_values" varchar(1024) -- actually an array, but ...
 );
 
 create table "comment" (
     "id" decimal(16,0) not null primary key
-   ,"author_association" varchar(255)
-   ,"body" varchar(16384)
-   ,"created_at" datetime not null
-   ,"html_url" varchar(1024)
-   ,"issue_url" varchar(1024)
-   ,"node_id" varchar(255)
-   ,"updated_at" datetime
-   ,"url" varchar(1024)
-   ,"user" varchar(16384)
+   , "author_association" varchar(255)
+   , "body" varchar(16384)
+   , "created_at" datetime not null
+   , "html_url" varchar(1024)
+   , "issue_url" varchar(1024)
+   , "minimized" varchar(10)
+   , "node_id" varchar(255)
+   , "updated_at" datetime
+   , "url" varchar(1024)
+   , "user" varchar(16384)
    , "reactions" varchar(1024)
    , "performed_via_github_app" varchar(1024)
+   , "pin" varchar(1024)
 );

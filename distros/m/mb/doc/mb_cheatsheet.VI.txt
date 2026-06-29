@@ -45,3 +45,20 @@
   printf "length=%d\n", mb::length($s);    # character count
   printf "sub=%s\n",    mb::substr($s,0,5); # "Hello"
   printf "pos=%d\n",    mb::index($s,"World"); # 6
+
+[ 9. Biểu thức chính quy điểm mã lúc chạy (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." khớp một điểm mã
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tương đương dạng tie
+
+[ 10. Kiểm tra byte hợp lệ (mb::valid) ]
+  mb::valid($octets)            # hợp lệ trả 1, không thì 0
+                                # nghiêm ngặt, tùy chọn; thay đổi theo mã hóa
+
+[ 11. Tách theo điểm mã (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # tách tại ranh giới điểm mã
+
+[ 12. Ba cách chạy (filter / modulino / runtime) ]
+  use mb;                       # đường 1: bộ lọc nguồn (perl 5.8+)
+  perl mb.pm script.pl          # đường 2: modulino
+  use mb qw(*mb utf8);          # đường 3: giao diện lúc chạy

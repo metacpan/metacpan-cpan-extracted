@@ -28,7 +28,7 @@ Readonly my $LEVEL_FAST => 'fast';
 Readonly my $DEFAULT_LIB_DIR => 'lib';
 Readonly my $DEFAULT_MUTATION_LEVEL => $LEVEL_FULL;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ App::Test::Generator::Mutator - Generate and apply mutation tests
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =head1 DESCRIPTION
 

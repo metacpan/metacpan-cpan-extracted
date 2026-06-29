@@ -8,6 +8,9 @@ use File::Temp qw/tempdir/;
 
 require q[./t/helper.pm];
 
+# Don't bother with CHECKSUMS verification
+local $App::MechaCPAN::CHKSIGS = 0;
+
 my $pwd = cwd;
 
 my $tmpdir = tempdir( TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX", CLEANUP => 1 );

@@ -224,7 +224,7 @@ has y_step =>
 	required => 0,
 );
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 # ------------------------------------------------
 
@@ -1720,13 +1720,14 @@ L<Tree::Cladogram> was written by Ron Savage I<E<lt>ron@savage.net.auE<gt>> in 2
 
 My homepage: L<http://savage.net.au/>
 
-=head1 Copyright
+=head1 COPYRIGHT, LICENSE, AND DISCLAIMER
 
-Australian copyright (c) 2015, Ron Savage.
+Copyright 2015 by Ron Savage.
 
-	All Programs of mine are 'OSI Certified Open Source Software';
-	you can redistribute them and/or modify them under the terms of
-	The Perl License, a copy of which is available at:
-	http://dev.perl.org/licenses/
+See the accompanying LICENSE file.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
 
 =cut

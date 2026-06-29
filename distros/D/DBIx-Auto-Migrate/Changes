@@ -14,3 +14,8 @@
 	- Test for cases where no real db tests can be run.
 0.8 Thu Jan  1 10:25:02 PM CET 2026
 	- Fixing indentation typo in docs.
+0.9 Sun Jun 28 05:02:45 PM CEST 2026
+    - Calling dsn in $self to allow dinamic object builders.
+1.001 Sun Jun 28 05:13:38 PM CEST 2026
+    - Searching migrations also in $self to allow more dynamism
+    - [BREAKING CHANGE] The default extra is ok for postgres but not for other DBs so if provided it should actually override all the options for DBI to ease life to developers

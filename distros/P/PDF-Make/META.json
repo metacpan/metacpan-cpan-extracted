@@ -34,17 +34,18 @@
       "runtime" : {
          "requires" : {
             "Object::Proto" : "0.16",
-            "perl" : "5.020000"
+            "perl" : "5.010001"
          }
       },
       "test" : {
          "requires" : {
+            "Test2::Bundle::Numerical" : "0.03",
             "Test::LeakTrace" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

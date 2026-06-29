@@ -658,7 +658,7 @@ Node* CssPruneNodes(Node *head) {
  * ****************************************************************************
  */
 char* CssMinify(const char* string) {
-    char* results;
+    char* results = NULL;
     CssDoc doc;
 
     /* initialize our CSS document object */
@@ -672,12 +672,12 @@ char* CssMinify(const char* string) {
 
     /* PASS 1: tokenize CSS into a list of nodes */
     Node* head = CssTokenizeString(&doc, string);
-    if (!head) return NULL;
+    if (!head) goto cleanup;
     /* PASS 2: collapse nodes */
     CssCollapseNodes(head);
     /* PASS 3: prune nodes */
     head = CssPruneNodes(head);
-    if (!head) return NULL;
+    if (!head) goto cleanup;
     /* PASS 4: re-assemble CSS into single string */
     {
         Node* curr;
@@ -697,6 +697,7 @@ char* CssMinify(const char* string) {
         *ptr = 0;
     }
     /* free memory used by the NodeSets */
+    cleanup:
     {
         NodeSet* curr = doc.head_set;
         while (curr) {

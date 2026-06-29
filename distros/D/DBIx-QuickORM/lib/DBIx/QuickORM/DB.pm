@@ -2,7 +2,7 @@ package DBIx::QuickORM::DB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000025';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -145,6 +145,19 @@ sub init {
 
     croak "Cannot provide both a socket and a host" if $self->{+SOCKET} && $self->{+HOST};
 }
+
+=pod
+
+=item $bool = $db->cas_count_reliable
+
+True if a connection to this database reports the affected-row count that
+compare-and-set needs (rows matched, not rows changed). The MySQL and MariaDB
+drivers enable that by default; this is false only when the found-rows client
+flag was explicitly turned off in the connect attributes.
+
+=cut
+
+sub cas_count_reliable { $_[0]->{+DIALECT}->cas_count_reliable($_[0]->attributes) }
 
 =pod
 

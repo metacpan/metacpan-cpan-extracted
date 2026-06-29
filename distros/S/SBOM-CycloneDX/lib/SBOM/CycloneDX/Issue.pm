@@ -19,8 +19,11 @@ has type        => (is => 'rw', isa => Enum [qw(defect enhancement security)], r
 has id          => (is => 'rw', isa => Str);
 has name        => (is => 'rw', isa => Str);
 has description => (is => 'rw', isa => Str);
-has source      => (is => 'rw', isa => InstanceOf ['SBOM::CycloneDX::Source']);
-has references  => (is => 'rw', isa => ArrayLike [Str], default => sub { SBOM::CycloneDX::List->new });
+
+has source =>
+    (is => 'rw', isa => InstanceOf ['SBOM::CycloneDX::Source'] | InstanceOf ['SBOM::CycloneDX::Issue::Source']);
+
+has references => (is => 'rw', isa => ArrayLike [Str], default => sub { SBOM::CycloneDX::List->new });
 
 sub TO_JSON {
 

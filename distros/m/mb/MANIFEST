@@ -23,6 +23,14 @@ t/1001_num_base2.t
 t/1002_num_base8.t
 t/1003_num_base10.t
 t/1004_num_base16.t
+t/1007_runtime_qr.t
+t/1010_filter.t
+t/1011_modulino.t
+t/1012_valid.t
+t/1013_valid_encodings.t
+t/1014_split.t
+t/1015_import_args.t
+t/1016_source_encoding.t
 t/2001_basic_transpile.t
 t/2002_basic_2quote.t
 t/2003_basic_3quote_s.t

@@ -1,5 +1,11 @@
 Revision history for Perl extension Tree::Cladogram.
 
+1.05  2026-06-29
+	- Replace the body of the LICENSE file with what is recommended at
+		https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+	- Patch the source code POD to refer to this LICENSE file.
+	- Modernize the files MANIFEST.SKIP & README.
+
 1.04  2021-02-02T10:49:00
 	- Add t/00.*.
 	- Reformat Makefile.PL.

@@ -33,3 +33,20 @@
   mb::set_script_encoding('utf8');
   my $s = "ہیلو دنیا";
   printf "لمبائی=%d\n", mb::length($s);
+
+[ 9. رن ٹائم کوڈ پوائنٹ ریگولر ایکسپریشن (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." ایک کوڈ پوائنٹ سے میل کھاتا ہے
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie شکل کے مساوی
+
+[ 10. درست بائٹس کی جانچ (mb::valid) ]
+  mb::valid($octets)            # درست ہو تو 1، ورنہ 0
+                                # سخت، اختیاری؛ انکوڈنگ پر منحصر
+
+[ 11. کوڈ پوائنٹ کے مطابق تقسیم (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # کوڈ پوائنٹ کی حد پر تقسیم
+
+[ 12. چلانے کے تین طریقے (filter / modulino / runtime) ]
+  use mb;                       # راستہ 1: سورس فلٹر (perl 5.8+)
+  perl mb.pm script.pl          # راستہ 2: modulino
+  use mb qw(*mb utf8);          # راستہ 3: رن ٹائم انٹرفیس

@@ -44,3 +44,20 @@
   printf "文字数=%d\n", mb::length($s);     # 7
   printf "部分文字列=%s\n", mb::substr($s,0,5); # "こんにちは"
   printf "位置=%d\n", mb::index($s,"世界");  # 5
+
+[ 9. 実行時コードポイント正規表現 (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." が1コードポイントに一致
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie 形式と等価
+
+[ 10. 整形式バイトの検証 (mb::valid) ]
+  mb::valid($octets)            # 整形式なら1、不正なら0
+                                # 厳格・オプトイン。エンコーディング依存
+
+[ 11. コードポイント単位の分割 (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # コードポイント境界で分割
+
+[ 12. 実行する3つの方法 (filter / modulino / runtime) ]
+  use mb;                       # 経路1: ソースフィルタ (perl 5.8+)
+  perl mb.pm script.pl          # 経路2: modulino
+  use mb qw(*mb utf8);          # 経路3: ランタイムインターフェース

@@ -27,7 +27,10 @@ extern "C" {
 #define PDFMAKE_FONT_T_DEFINED
 typedef struct pdfmake_font pdfmake_font_t;
 #endif
+#ifndef PDFMAKE_PATH_T_DEFINED
+#define PDFMAKE_PATH_T_DEFINED
 typedef struct pdfmake_path pdfmake_path_t;
+#endif
 #ifndef PDFMAKE_RENDER_CTX_T_DEFINED
 #define PDFMAKE_RENDER_CTX_T_DEFINED
 typedef struct pdfmake_render_ctx pdfmake_render_ctx_t;

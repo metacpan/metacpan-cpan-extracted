@@ -1,5 +1,23 @@
 Revision history for App-Test-Generator
 
+0.41	Sun Jun 28 08:01:43 EDT 2026
+	[Bug fixes]
+	- Fix bin/test-generator-mutate's per-mutant prove invocation: switch
+	  from a workspace-copy + PERL5LIB strategy to in-place mutation of
+	  the project's own lib/ file (with save/restore) plus prove -l. The
+	  previous approach injected the mutated workspace via PERL5LIB, but
+	  test files that use 'use lib "$Bin/../lib"' (a common CPAN idiom)
+	  call unshift @INC at compile time, which prepends the project's
+	  actual lib/ before the PERL5LIB workspace path. Every test then
+	  loaded the original code instead of the mutant, making all 403
+	  mutants survive and producing a 0% kill rate. In-place mutation
+	  writes the mutant directly to lib/, so every @INC strategy
+	  (PERL5LIB, -l, 'use lib "$Bin/../lib"') sees the mutated code.
+	  prove -l is used so tests that rely on -Ilib rather than 'use lib'
+	  also find the module. The workspace is retained as a staging area
+	  for the compile check; the original file is restored after every
+	  prove run regardless of outcome.
+
 0.40	Thu Jun 25 20:28:59 EDT 2026
 	[Bug fixes]
 	- Fix bin/generate-test-dashboard passing --changed_only to

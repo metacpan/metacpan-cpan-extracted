@@ -5,26 +5,56 @@ use strict;
 use warnings;
 use Exporter qw/import/;
 
-our $VERSION   = "0.14";
-our @EXPORT    = qw/InJoyoKanji InJouyouKanji InJinmeiyoKanji InJinmeiyouKanji/;
+our $VERSION = "0.15";
+our @EXPORT = qw/
+    IsJoyoKanji IsJouyouKanji IsJinmeiyoKanji IsJinmeiyouKanji
+    InJoyoKanji InJouyouKanji InJinmeiyoKanji InJinmeiyouKanji
+/;
 our @EXPORT_OK = qw/
+    IsJoyoKanji20101130      IsJouyouKanji20101130
+    IsJinmeiyoKanji20101130  IsJinmeiyouKanji20101130
+    IsJinmeiyoKanji20150107  IsJinmeiyouKanji20150107
+    IsJinmeiyoKanji20170925  IsJinmeiyouKanji20170925
+    IsJinmeiyoKanji20260626  IsJinmeiyouKanji20260626
+
     InJoyoKanji20101130      InJouyouKanji20101130
     InJinmeiyoKanji20101130  InJinmeiyouKanji20101130
     InJinmeiyoKanji20150107  InJinmeiyouKanji20150107
     InJinmeiyoKanji20170925  InJinmeiyouKanji20170925
+    InJinmeiyoKanji20260626  InJinmeiyouKanji20260626
 /;
 
-*InJoyoKanji           = \&InJoyoKanji20101130;
-*InJouyouKanji         = \&InJoyoKanji;
-*InJouyouKanji20101130 = \&InJoyoKanji20101130;
+# MMEMO: IsXXXのプロパティを推奨。InXXXは将来的に公式ブロック名と衝突するリスクがある
 
-*InJinmeiyoKanji          = \&InJinmeiyoKanji20170925;
-*InJinmeiyouKanji         = \&InJinmeiyoKanji;
-*InJinmeiyouKanji20101130 = \&InJinmeiyoKanji20101130;
-*InJinmeiyouKanji20150107 = \&InJinmeiyoKanji20150107;
-*InJinmeiyouKanji20170925 = \&InJinmeiyoKanji20170925;
+*IsJoyoKanji           = \&IsJoyoKanji20101130;
+*IsJouyouKanji         = \&IsJoyoKanji;
+*IsJouyouKanji20101130 = \&IsJoyoKanji20101130;
 
-sub InJoyoKanji20101130
+*InJoyoKanji           = \&IsJoyoKanji20101130;
+*InJouyouKanji         = \&IsJoyoKanji;
+*InJoyoKanji20101130   = \&IsJoyoKanji20101130;
+*InJouyouKanji20101130 = \&IsJoyoKanji20101130;
+
+*IsJinmeiyoKanji          = \&IsJinmeiyoKanji20260626;
+*IsJinmeiyouKanji         = \&IsJinmeiyoKanji;
+*IsJinmeiyouKanji20101130 = \&IsJinmeiyoKanji20101130;
+*IsJinmeiyouKanji20150107 = \&IsJinmeiyoKanji20150107;
+*IsJinmeiyouKanji20170925 = \&IsJinmeiyoKanji20170925;
+*IsJinmeiyouKanji20260626 = \&IsJinmeiyoKanji20260626;
+
+*InJinmeiyoKanji          = \&IsJinmeiyoKanji20260626;
+*InJinmeiyouKanji         = \&IsJinmeiyoKanji;
+*InJinmeiyoKanji20101130  = \&IsJinmeiyoKanji20101130;
+*InJinmeiyouKanji20101130 = \&IsJinmeiyoKanji20101130;
+*InJinmeiyoKanji20150107  = \&IsJinmeiyoKanji20150107;
+*InJinmeiyouKanji20150107 = \&IsJinmeiyoKanji20150107;
+*InJinmeiyoKanji20170925  = \&IsJinmeiyoKanji20170925;
+*InJinmeiyouKanji20170925 = \&IsJinmeiyoKanji20170925;
+*InJinmeiyoKanji20260626  = \&IsJinmeiyoKanji20260626;
+*InJinmeiyouKanji20260626 = \&IsJinmeiyoKanji20260626;
+
+
+sub IsJoyoKanji20101130
 {
     return <<"END";
 4E00
@@ -2007,23 +2037,31 @@ sub InJoyoKanji20101130
 END
 }
 
-sub InJinmeiyoKanji20170925
+sub IsJinmeiyoKanji20260626
 {
     return <<"END";
-+Lingua::JA::KanjiTable::InJinmeiyoKanji20150107
++Lingua::JA::KanjiTable::IsJinmeiyoKanji20170925
+52D2
+END
+}
+
+sub IsJinmeiyoKanji20170925
+{
+    return <<"END";
++Lingua::JA::KanjiTable::IsJinmeiyoKanji20150107
 6E3E
 END
 }
 
-sub InJinmeiyoKanji20150107
+sub IsJinmeiyoKanji20150107
 {
     return <<"END";
-+Lingua::JA::KanjiTable::InJinmeiyoKanji20101130
++Lingua::JA::KanjiTable::IsJinmeiyoKanji20101130
 5DEB
 END
 }
 
-sub InJinmeiyoKanji20101130
+sub IsJinmeiyoKanji20101130
 {
     return <<"END";
 4E11
@@ -2876,37 +2914,38 @@ Lingua::JA::KanjiTable - User-Defined Character Properties for Joyo Kanji and Ji
   use Lingua::JA::KanjiTable;
   use utf8;
 
-  '亜'   =~ /^\p{InJoyoKanji}$/   ? 1 : 0; # => 1
-  '亞'   =~ /^\p{InJoyoKanji}$/   ? 1 : 0; # => 0
-  '匁'   =~ /^\p{InJoyoKanji}$/   ? 1 : 0; # => 0
-  '叱'   =~ /^\p{InJouyouKanji}$/ ? 1 : 0; # => 0
-  '𠮟'   =~ /^\p{InJouyouKanji}$/ ? 1 : 0; # => 1
-  '恍惚' =~ /^\p{InJoyoKanji}+$/  ? 1 : 0; # => 0
-  '固唾' =~ /^\p{Lingua::JA::KanjiTable::InJoyoKanji20101130}+$/ ? 1 : 0; # => 1
+  '亜'   =~ /^\p{IsJoyoKanji}$/   ? 1 : 0; # => 1
+  '亞'   =~ /^\p{IsJoyoKanji}$/   ? 1 : 0; # => 0
+  '匁'   =~ /^\p{IsJoyoKanji}$/   ? 1 : 0; # => 0
+  '叱'   =~ /^\p{IsJouyouKanji}$/ ? 1 : 0; # => 0
+  '𠮟'   =~ /^\p{IsJouyouKanji}$/ ? 1 : 0; # => 1
+  '恍惚' =~ /^\p{IsJoyoKanji}+$/  ? 1 : 0; # => 0
+  '固唾' =~ /^\p{Lingua::JA::KanjiTable::IsJoyoKanji20101130}+$/ ? 1 : 0; # => 1
 
-  '亞' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 1
-  '匁' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 1
-  '柊' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 1
-  '苺' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 1
-  '姦' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 0
-  '渾' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 1
+  '亞' =~ /^\p{IsJinmeiyoKanji}$/ ? 1 : 0; # => 1
+  '匁' =~ /^\p{IsJinmeiyoKanji}$/ ? 1 : 0; # => 1
+  '柊' =~ /^\p{IsJinmeiyoKanji}$/ ? 1 : 0; # => 1
+  '苺' =~ /^\p{IsJinmeiyoKanji}$/ ? 1 : 0; # => 1
+  '姦' =~ /^\p{IsJinmeiyoKanji}$/ ? 1 : 0; # => 0
+  '渾' =~ /^\p{IsJinmeiyoKanji}$/ ? 1 : 0; # => 1
+  '勒' =~ /^\p{IsJinmeiyoKanji}$/ ? 1 : 0; # => 1
 
 =for test_synopsis_expectation_no_test
 
   #Jinmei(名) check:
-  '太郎喜左衛門将時能' =~ /^\p{InJinmei}+$/ ? 1 : 0; # => 1
-  '愛子エンジェル'     =~ /^\p{InJinmei}+$/ ? 1 : 0; # => 1
-  'み〜こ'             =~ /^\p{InJinmei}+$/ ? 1 : 0; # => 0
-  'ニャー'             =~ /^\p{InJinmei}+$/ ? 1 : 0; # => 1
-  '奈々'               =~ /^\p{InJinmei}+$/ ? 1 : 0; # => 1
-  '〆子'               =~ /^\p{InJinmei}+$/ ? 1 : 0; # => 0
-  '巫女みこナース'     =~ /^\p{InJinmei}+$/ ? 1 : 0; # => 1
+  '太郎喜左衛門将時能' =~ /^\p{IsJinmei}+$/ ? 1 : 0; # => 1
+  '愛子エンジェル'     =~ /^\p{IsJinmei}+$/ ? 1 : 0; # => 1
+  'み〜こ'             =~ /^\p{IsJinmei}+$/ ? 1 : 0; # => 0
+  'ニャー'             =~ /^\p{IsJinmei}+$/ ? 1 : 0; # => 1
+  '奈々'               =~ /^\p{IsJinmei}+$/ ? 1 : 0; # => 1
+  '〆子'               =~ /^\p{IsJinmei}+$/ ? 1 : 0; # => 0
+  '巫女みこナース'     =~ /^\p{IsJinmei}+$/ ? 1 : 0; # => 1
 
-  sub InJinmei
+  sub IsJinmei
   {
       return <<"END";
-  +Lingua::JA::KanjiTable::InJoyoKanji
-  +Lingua::JA::KanjiTable::InJinmeiyoKanji
+  +Lingua::JA::KanjiTable::IsJoyoKanji
+  +Lingua::JA::KanjiTable::IsJinmeiyoKanji
   3005
   3041\t3096
   309D
@@ -2926,33 +2965,67 @@ By default Lingua::JA::KanjiTable exports the following user-defined character p
 
 =over 4
 
-=item InJoyoKanji - The latest Jouyou Kanji table（平成22年11月30日内閣告示第2号）
+=item IsJoyoKanji - The latest Jouyou Kanji table（平成22年11月30日内閣告示第2号）
+
+=item IsJouyouKanji - ditto
+
+=item InJoyoKanji - ditto
 
 =item InJouyouKanji - ditto
 
-=item InJinmeiyoKanji - The latest Jinmeiyou Kanji table（2017年9月25日版）
+=item IsJinmeiyoKanji - The latest Jinmeiyou Kanji table（2026年6月26日版）
+
+=item IsJinmeiyouKanji - ditto
+
+=item InJinmeiyoKanji - ditto
 
 =item InJinmeiyouKanji - ditto
 
 =back
 
-The following properties are not exported by default:
+To avoid potential naming conflicts with 'In', it is recommended to use properties prefixed with 'Is'.
+
+The following properties are exportable (not exported by default):
 
 =over 4
 
-=item InJoyoKanji20101130 - 常用漢字表（平成22年11月30日内閣告示第2号）
+=item IsJoyoKanji20101130 - 常用漢字表（平成22年11月30日内閣告示第2号）
+
+=item IsJouyouKanji20101130 - ditto
+
+=item InJoyoKanji20101130 - ditto
 
 =item InJouyouKanji20101130 - ditto
 
-=item InJinmeiyoKanji20170925 - 人名用漢字表（2017年9月25日版）
+=item IsJinmeiyoKanji20260626 - 人名用漢字表（2026年6月26日版）
+
+=item IsJinmeiyouKanji20260626 - ditto
+
+=item InJinmeiyoKanji20260626 - ditto
+
+=item InJinmeiyouKanji20260626 - ditto
+
+=item IsJinmeiyoKanji20170925 - 人名用漢字表（2017年9月25日版）
+
+=item IsJinmeiyouKanji20170925 - ditto
+
+=item InJinmeiyoKanji20170925 - ditto
 
 =item InJinmeiyouKanji20170925 - ditto
 
-=item InJinmeiyoKanji20150107 - 人名用漢字表（2015年1月7日版）
+=item IsJinmeiyoKanji20150107 - 人名用漢字表（2015年1月7日版）
+
+=item IsJinmeiyouKanji20150107 - ditto
+
+=item InJinmeiyoKanji20150107 - ditto
 
 =item InJinmeiyouKanji20150107 - ditto
 
-=item InJinmeiyoKanji20101130 - 人名用漢字表（2010年11月30日版）
+=item IsJinmeiyoKanji20101130 - 人名用漢字表（2010年11月30日版）
+
+=item IsJinmeiyouKanji20101130 - ditto
+
+=item InJinmeiyoKanji20101130 - ditto
 
 =item InJinmeiyouKanji20101130 - ditto
 
@@ -2984,3 +3057,4 @@ it under the same terms as Perl itself.
 pawa E<lt>pawa@pawafuru.comE<gt>
 
 =cut
+

@@ -10,8 +10,9 @@ use Socket qw(AF_UNIX SOCK_STREAM);
 
 plan skip_all => "Server integration tests not supported on Windows" if $^O eq 'MSWin32';
 BEGIN {
-    eval { require Net::HTTP2::nghttp2; Net::HTTP2::nghttp2->VERSION(0.007); 1 }
-        or plan(skip_all => 'Net::HTTP2::nghttp2 0.007+ not installed (optional)');
+    require PAGI::Server::Protocol::HTTP2;
+    PAGI::Server::Protocol::HTTP2->available
+        or plan(skip_all => 'HTTP/2 not available (Net::HTTP2::nghttp2 0.008+ required)');
 }
 
 # ============================================================
@@ -30,8 +31,8 @@ use Net::HTTP2::nghttp2::Session;
 # PAGI::Test::Client lives in the sibling PAGI-Tools distribution. Skip when it
 # is not installed (the raw HTTP/2 paths are covered Tools-free in t/http2/*).
 BEGIN {
-    eval { require PAGI::Test::Client; my $v = PAGI::Test::Client->VERSION; !defined($v) || $v >= 0.002000 }
-        or plan(skip_all => 'PAGI-Tools (PAGI::Test::Client >= 0.002000) not installed');
+    eval { require PAGI::Tools; PAGI::Tools->VERSION(0.002000); require PAGI::Test::Client; 1 }
+        or plan(skip_all => 'PAGI-Tools 0.002000+ (PAGI::Test::Client) not installed');
 }
 
 my $loop = IO::Async::Loop->new;

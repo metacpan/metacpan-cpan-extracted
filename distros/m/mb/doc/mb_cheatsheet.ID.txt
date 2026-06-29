@@ -44,3 +44,20 @@
   printf "length=%d\n", mb::length($s);    # character count
   printf "sub=%s\n",    mb::substr($s,0,5); # "Hello"
   printf "pos=%d\n",    mb::index($s,"World"); # 6
+
+[ 9. Regex titik kode saat runtime (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." cocok dengan satu titik kode
+  $str =~ m{\G$mb{qr/(.)/}gc}   # setara bentuk tie
+
+[ 10. Validasi byte yang benar (mb::valid) ]
+  mb::valid($octets)            # 1 jika benar, 0 jika tidak
+                                # ketat, opsional; bergantung pada enkoding
+
+[ 11. Pisah per codepoint (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # pisah pada batas codepoint
+
+[ 12. Tiga cara menjalankan (filter / modulino / runtime) ]
+  use mb;                       # jalur 1: filter sumber (perl 5.8+)
+  perl mb.pm script.pl          # jalur 2: modulino
+  use mb qw(*mb utf8);          # jalur 3: antarmuka runtime

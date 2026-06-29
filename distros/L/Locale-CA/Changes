@@ -1,5 +1,18 @@
 Revision history for Locale-CA
 
+0.10	Sun Jun 28 19:20:41 EDT 2026
+	Non-en/fr system locales now fall back to English instead of croaking
+	Explicit lang parameter is now case-insensitive ('FR' and 'EN' accepted)
+	Function-call style new() with a non-class first arg now works correctly
+	Passing lang => '' no longer silently falls back to environment detection
+	Missing __DATA__ section now croaks instead of returning an empty object
+	split on data lines now uses a limit of 2 to preserve colons in values
+	Parsed province data is cached per language for the process lifetime
+	Fixed UNIVERSAL::isa() function-call deprecation; use eval { $proto->isa() } instead
+	IPC::Run3, IPC::System::Simple, Test::Exception, Test::Which added to TEST_REQUIRES
+	MANIFEST.SKIP now suppresses .circleci/ from the distribution tarball
+	Removed stale "hash not strict" BUGS entry; per-object shallow copies make mutation intentional
+
 0.09	Fri Apr 10 20:48:26 EDT 2026
 	Added fuzz testing
 	Use I18N::LangTags::Detect

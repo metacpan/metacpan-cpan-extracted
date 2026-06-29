@@ -20,7 +20,7 @@ package Clownfish::CFC::Perl::Build::Charmonic;
 
 use base qw( Module::Build );
 
-our $VERSION = '0.006003';
+our $VERSION = '0.006004';
 $VERSION = eval $VERSION;
 
 use Carp;

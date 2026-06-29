@@ -8,6 +8,10 @@ use Test::More;
 
 use SBOM::CycloneDX;
 
+unless ($ENV{JSON_SCHEMA_TESTING}) {
+    plan(skip_all => "Skip JSON Schema tests");
+}
+
 my @SPEC_VERSIONS = qw[1.2 1.3 1.4 1.5 1.6 1.7];
 
 for my $spec_version (@SPEC_VERSIONS) {

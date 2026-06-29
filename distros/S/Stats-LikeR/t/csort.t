@@ -163,8 +163,8 @@ BEGIN {
 # Error handling
 #
 {
-	eval { csort("notaref", 'x') };
-	like $@, qr/array-ref \(AoH\) or hash-ref \(HoA\)/, 'rejects non-ref data';
+	eval { csort('notaref', 'x') };
+	like $@, qr/array-ref \(AoH\) or hash-ref \(HoA, HoH\)/, 'rejects non-ref data';
 
 	eval { csort([ { x => 1 } ], undef) };
 	like $@, qr/column name or a comparator/, 'rejects undef $by';

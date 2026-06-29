@@ -15,14 +15,17 @@ plan skip_all => "Server integration tests not supported on Windows" if $^O eq '
 # PAGI::Response is in the sibling PAGI-Tools distribution. This test uses the
 # detached value-object API (new($scope) + respond($send)), which first shipped
 # in PAGI-Tools 0.002000; older releases require $send in new() and would die
-# with "send is required". Skip unless a new-enough PAGI::Response is installed.
-# An in-tree checkout (run via PERL5LIB=.../PAGI-Tools/lib) has the detached API
-# but no injected $VERSION, so treat an undef version as new enough; only a
-# defined, older version skips. The server's response wire-format is covered
-# Tools-free elsewhere (t/10-http-compliance.t, t/42-file-response.t).
+# with "send is required". Gate on PAGI::Tools rather than PAGI::Response's own
+# version: PAGI::Tools exists only in the split-era distribution, so a pre-split
+# PAGI install carrying an old PAGI::Response has no PAGI::Tools and skips. Body
+# modules like PAGI::Response are versionless in an in-tree checkout ($VERSION is
+# injected only at build), but PAGI::Tools hardcodes its $VERSION, so the
+# VERSION(0.002000) gate is reliable in both installed and checkout layouts. The
+# server's response wire-format is covered Tools-free elsewhere
+# (t/10-http-compliance.t, t/42-file-response.t).
 BEGIN {
-    eval { require PAGI::Response; my $v = PAGI::Response->VERSION; !defined($v) || $v >= 0.002000 }
-        or plan(skip_all => 'PAGI-Tools (PAGI::Response >= 0.002000) not installed');
+    eval { require PAGI::Tools; PAGI::Tools->VERSION(0.002000); require PAGI::Response; 1 }
+        or plan(skip_all => 'PAGI-Tools 0.002000+ (PAGI::Response) not installed');
 }
 
 my $loop = IO::Async::Loop->new;

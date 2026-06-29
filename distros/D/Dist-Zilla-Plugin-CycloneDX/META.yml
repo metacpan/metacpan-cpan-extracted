@@ -1,0 +1,61 @@
+---
+abstract: 'CycloneDX files in dzil generated dists'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.020'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.020'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-CycloneDX
+provides:
+  Dist::Zilla::Plugin::CycloneDX:
+    file: lib/Dist/Zilla/Plugin/CycloneDX.pm
+    version: '0.001'
+  Dist::Zilla::Role::CycloneDXSource:
+    file: lib/Dist/Zilla/Role/CycloneDXSource.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  MooseX::Types::Moose: '0'
+  SBOM::CycloneDX: '1.08'
+  SBOM::CycloneDX::Component: '0'
+  SBOM::CycloneDX::ExternalReference: '0'
+  SBOM::CycloneDX::License: '0'
+  SBOM::CycloneDX::Metadata: '0'
+  SBOM::CycloneDX::Metadata::Lifecycle: '0'
+  SBOM::CycloneDX::OrganizationalContact: '0'
+  SBOM::CycloneDX::Tools: '0'
+  SBOM::CycloneDX::Util: '0'
+  Time::Piece: '0'
+  URI::PackageURL: '0'
+  autovivification: '0'
+  experimental: '0'
+  namespace::autoclean: '0'
+  perl: '5.020'
+resources:
+  IRC:
+    url: irc://irc.perl.org/#distzilla
+  bugtracker: https://github.com/Leont/dist-zilla-plugin-cyclonedx/issues
+  repository: git://github.com/Leont/dist-zilla-plugin-cyclonedx.git
+version: '0.001'
+x_generated_by_perl: v5.42.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

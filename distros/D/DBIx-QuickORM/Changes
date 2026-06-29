@@ -1,4 +1,51 @@
+0.000025  2026-06-28 10:59:16-07:00 America/Los_Angeles
+
+    Internal / cleanup:
+    - Backfill the missing changelog entries for the 0.000023 and 0.000024 releases.
+
+0.000024  2026-06-28 09:48:16-07:00 America/Los_Angeles
+
+    Features:
+    - Add compare-and-set via cas() on handles and rows: a guarded single-row update that reports a lost race instead of throwing (GitHub #29).
+
+    Documentation:
+    - Document compare-and-set and batch schema introspection in the Manual.
+
+    Internal / cleanup:
+    - Refactor schema introspection to run in a fixed number of queries per database across all dialects.
+
 0.000023  2026-06-13 22:20:26-07:00 America/Los_Angeles
+
+    Features:
+    - Add OFFSET and DISTINCT support to handles.
+    - Support link-less CROSS joins with validated join arguments.
+    - Add a primary_key override option to the DSL builder.
+    - Add the async contract to the base Dialect class.
+
+    Documentation:
+    - Record the connection/transaction and row/schema/handle audit changes as ARCHITECTURE.md addenda.
+
+    Internal / cleanup:
+    - Audit and harden the connection, transaction, handle, dialect, and row-state subsystems.
+    - Harden the forked-query pipe protocol, process ownership, and parent row cache.
+    - Fast-destroy ephemeral test databases to quiet teardown under prove -j.
+
+    Fixes:
+    - Fix savepoint frame merges leapfrogging rolled-back transactions.
+    - Make a refused transaction finalize recoverable and croak on double-finalize.
+    - Fix count() on handles with omit, joins, or distinct.
+    - Treat LIMIT 0 as a real limit instead of dropping it.
+    - Allow order_by/limit on a handle without a WHERE clause.
+    - Quote primary-key identifiers in upserts and quote join field aliases.
+    - Scope PostgreSQL introspection to the search_path and fix identifier quoting.
+    - Fix SQLite recording plain indexes as unique constraints.
+    - Mark SQLite rowid-alias columns as identity and fix AUTOINCREMENT false positives.
+    - Croak on conflicting primary keys in Table::merge unless overridden.
+    - Croak when saving desynced rows or vivifying an already-loaded row.
+    - Restore find-or-create with a data-loss warning.
+    - Emit database= in MySQL-family DSNs.
+    - Fix the row cache key escaping, undef primary-key handling, and dead-entry cleanup.
+    - Harden Connection reconnect and rebuild the dialect on reconnect.
 
 0.000022  2026-05-28 13:26:49-07:00 America/Los_Angeles
 

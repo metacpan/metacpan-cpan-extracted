@@ -3,7 +3,6 @@ abstract: 'Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Dashboard for 
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
-  Cwd: '0'
   Data::Random: '0'
   Data::Random::String: '0'
   Data::Random::String::Matches: '0.02'
@@ -11,7 +10,6 @@ build_requires:
   Encode: '0'
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
-  IPC::Run3: '0'
   IPC::System::Simple: '0'
   JSON::PP: '0'
   Symbol: '0'
@@ -29,7 +27,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
-license: open_source
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -41,16 +39,19 @@ no_index:
 requires:
   Carp: '0'
   Config::Abstraction: '0.36'
+  Cwd: '0'
   Data::Dumper: '0'
   Data::Section::Simple: '0'
   File::Copy: '0'
   File::Copy::Recursive: '0'
   File::Path: '0'
+  File::Slurp: '0'
   File::Spec: '0'
   File::Temp: '0'
   Getopt::Long: '0'
   HTML::Entities: '0'
   IPC::Open3: '0'
+  IPC::Run3: '0'
   JSON::MaybeXS: '0'
   Module::Load::Conditional: '0'
   PPI: '0'
@@ -58,19 +59,20 @@ requires:
   Params::Validate::Strict: '0.3'
   Pod::Simple: '0'
   Pod::Usage: '0'
+  Readonly: '0'
   Readonly::Values::Boolean: '0'
   Return::Set: '0.03'
   Safe: '0'
-  Symbol: '0'
   Template: '0'
+  URI: '0'
   UUID::Tiny: '0'
+  WWW::RT::CPAN: '0'
   YAML::XS: '0'
   autodie: '0'
   perl: '5.036'
-  re: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.40'
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,5 +1,11 @@
 Revision history for Perl extension Crypt::PasswdMD5.
 
+1.44  2026-06-29
+	- Replace the file LICENSE-GPL-3 with the file LICENSE
+		containing what is recommended at
+		https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+	- Patch the source code reference to refer to this LICENSE file.
+
 1.43  2026-05-23T08:14:00
 	- Accept pull request from Paul Howarth to replace use of the cryptographically
 		weak rand() function with the much stronger Crypt::URandom::urandom().

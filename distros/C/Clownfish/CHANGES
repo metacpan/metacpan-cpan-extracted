@@ -1,5 +1,12 @@
 Revision history for Apache Clownfish
 
+0.6.4  2026-06-28
+
+  Bugfixes:
+
+    * Fix clang compiler warnings with non-strict prototypes, which prevented
+      installing Clownfish on MacOS. This is a Perl release only.
+
 0.6.3  2018-02-20
 
   Bugfixes:

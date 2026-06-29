@@ -38,3 +38,20 @@
   printf "문자수=%d\n",   mb::length($s);
   printf "부분=%s\n",     mb::substr($s,0,3);
   printf "위치=%d\n",     mb::index($s,"하세요");
+
+[ 9. 런타임 코드포인트 정규식 (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "."가 한 코드포인트와 일치
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie 형식과 동등
+
+[ 10. 올바른 바이트 검증 (mb::valid) ]
+  mb::valid($octets)            # 올바르면 1, 아니면 0
+                                # 엄격, 선택적; 인코딩에 따라 다름
+
+[ 11. 코드포인트 단위 분할 (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # 코드포인트 경계로 분할
+
+[ 12. 실행하는 세 가지 방법 (filter / modulino / runtime) ]
+  use mb;                       # 경로1: 소스 필터 (perl 5.8+)
+  perl mb.pm script.pl          # 경로2: modulino
+  use mb qw(*mb utf8);          # 경로3: 런타임 인터페이스

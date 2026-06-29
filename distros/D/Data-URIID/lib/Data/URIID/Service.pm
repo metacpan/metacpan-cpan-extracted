@@ -22,7 +22,7 @@ use Data::Identifier::Generate v0.25;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 use parent 'Data::URIID::Base';
 
@@ -713,6 +713,22 @@ sub _own_well_known {
         }
     }
 
+    my %earths = (
+        uuid                                   => '3c2c155f-a4a0-49f3-bdaf-7f61d25c6b8c', # sid 60
+        wd                                     => 'Q2',
+        fc                                     => 'Q176134',
+        '893a7d5c-124c-4ad6-9a56-0ea8be50b536' => '1135962553',
+        'e9c13254-831f-474c-8881-31012ca45a72' => 'scot/1917',
+        '685c7871-2965-4f0a-ac63-d6bacd1e575e' => '6270149919445006650001',
+        '435f6b8c-cae4-4dcf-816a-1225fc35108f' => 'earth_(planet)',
+        '3ff707af-1f72-4e1f-a81b-7871fb6079e1' => 'concept4083',
+        '02e34fcc-cf5e-445a-ba54-bf6df8ae036a' => '6295630',
+    );
+    foreach my $id_type (keys %earths) {
+        my $id = Data::Identifier->new($id_type => $earths{$id_type})->register;
+        $id->userdata('Data::URIID', is_earth => 1);
+    }
+
     return $res = \%own_well_known;
 }
 
@@ -1047,7 +1063,7 @@ sub _offline_lookup__Data__Identifier {
             $attr{description} //= {'*' => $description};
         }
 
-        foreach my $type (qw(uuid oid uri sid)) {
+        foreach my $type (qw(uuid oid uri sid tagname)) {
             my $func = $id->can($type);
 
             if (defined(my $value = $id->$func(default => undef))) {
@@ -1318,7 +1334,7 @@ sub _online_lookup__osm__handle {
     my %attr;
     my %res = (id => \%ids, attributes => \%attr);
 
-    $attr{space_object} = {'*' => URI->new('http://www.wikidata.org/entity/Q2')}; # If it's on OSM it's on earth.
+    $attr{space_object} = {'*' => $self->extractor->earth->as('URI')}; # If it's on OSM it's on earth.
     $attr{latitude} = {'*' => $element->{lat} + 0} if defined $element->{lat};
     $attr{longitude} = {'*' => $element->{lon} + 0} if defined $element->{lon};
     $attr{altitude} = {'*' => $tags->{ele} + 0} if defined $tags->{ele};
@@ -1580,7 +1596,7 @@ sub _online_lookup__denkxweb_hessen {
         kdname => 'displayname',
     );
 
-    $attr{space_object} = {'*' => URI->new('http://www.wikidata.org/entity/Q2')}; # If it's on denkxweb.denkmalpflege-hessen.de it's on earth.
+    $attr{space_object} = {'*' => $self->extractor->earth->as('URI')}; # If it's on denkxweb.denkmalpflege-hessen.de it's on earth.
 
     foreach my $html_id (keys %attr_map) {
         foreach my $node (map {$_->content_list} $html->findnodes('/html/body//div[@id="'.$html_id.'"]')) {
@@ -1618,15 +1634,15 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 
     use Data::URIID;
 
-    my $extractor = Data::URIID->new;
-    my $result = $extractor->lookup( $URI );
-    my $service = $result->attribute('service');
+    my Data::URIID $extractor = Data::URIID->new;
+    my Data::URIID::Result $result = $extractor->lookup( $URI );
+    my Data::URIID::Service $service = $result->attribute('service');
 
     my $name = $service->name;
     my $ise = $service->ise;

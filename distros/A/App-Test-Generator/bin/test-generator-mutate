@@ -597,22 +597,31 @@ for my $file (@files) {
 
 		$mutator->apply_mutant($mutant);
 
-		# Point PERL5LIB at the workspace so prove picks up the
-		# mutated module rather than the original in blib/ or lib/
-		local $ENV{PERL5LIB} = File::Spec->catfile($workspace, $opt{lib})
-			. ($ENV{PERL5LIB} ? $Config{path_sep} . $ENV{PERL5LIB} : '');
+		my $workspace_file = File::Spec->catfile($workspace, $file);
 
-		my $compile = system($^X, '-c', File::Spec->catfile($workspace, $file));
+		my $compile = system($^X, '-c', $workspace_file);
 		next if $compile != 0;
 
-		# Clear PERL5OPT to prevent -Ilib or other flags from
-		# overriding the workspace PERL5LIB — if PERL5OPT contains
-		# -Ilib, prove will load modules from the project's own lib/
-		# instead of the mutated workspace, causing all mutants to
-		# survive regardless of the mutation applied
+		# Apply mutation in-place so test files that use 'use lib "$Bin/../lib"'
+		# (a common CPAN idiom) load the mutated code.  Those files do
+		# 'unshift @INC' at compile time, which prepends the project's own lib/
+		# BEFORE any PERL5LIB-injected workspace path, making the workspace
+		# approach invisible to them and causing all mutants to survive.
+		# In-place mutation writes to the actual project file, so every @INC
+		# strategy (PERL5LIB, -I, 'use lib', and blib) sees the mutant.
+		my $orig_content = do { open(my $fh, '<', $file) or croak "Cannot read $file: $!"; local $/; <$fh> };
+		my $mut_content  = do { open(my $fh, '<', $workspace_file) or croak "Cannot read $workspace_file: $!"; local $/; <$fh> };
+
+		{ open(my $fh, '>', $file) or croak "Cannot write $file: $!"; print $fh $mut_content; }
+
+		# Clear PERL5OPT so no stray -Ilib or -M flags interfere with prove.
 		local $ENV{PERL5OPT} = '';
 
-		my $survived = (system('prove', $opt{tests}) == 0);
+		# -l adds the project's lib/ to @INC for tests that don't use 'use lib'.
+		my $survived = (system('prove', '-l', $opt{tests}) == 0);
+
+		# Always restore the original, even if prove crashes.
+		{ open(my $fh, '>', $file) or croak "Cannot restore $file: $!"; print $fh $orig_content; }
 
 		if($survived) {
 			# Representative survived — mark the entire group as survived

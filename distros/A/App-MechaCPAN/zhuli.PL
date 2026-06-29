@@ -31,6 +31,8 @@ find(
   $prefix
 );
 
+my $help_pod;
+
 foreach my $file (sort @files)
 {
   my $parser = Pod::Simple->new;
@@ -58,10 +60,28 @@ foreach my $file (sort @files)
         unless $in_end;
     }
   );
+
   $ouFH->say(qq{# line 1 "$file"});
-  $parser->parse_file("$prefix/$file");
+
+  open my $inFH, '<', "$prefix/$file";
+  my @lines = <$inFH>;
+  $parser->parse_lines(@lines);
+
+  next
+    unless $file eq 'App/MechaCPAN.pm';
+
+  foreach my $line (@lines)
+  {
+    if ( $line =~ m/__END__$/xms ... !defined $line )
+    {
+      $help_pod .= $line;
+    }
+  }
 }
 
 open my $mc_fh, "<", "$FindBin::Bin/script/mechacpan";
 $ouFH->say("package main;");
-$ouFH->say(do { local $/; <$mc_fh> });
+$ouFH->say( do { local $/; <$mc_fh> } );
+
+# Add the POD of App:MechaCPAN back to the end to let --help work
+$ouFH->say($help_pod);

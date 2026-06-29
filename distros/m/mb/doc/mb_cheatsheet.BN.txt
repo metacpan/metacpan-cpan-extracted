@@ -33,3 +33,20 @@
   mb::set_script_encoding('utf8');
   my $s = "হ্যালো";
   printf "দৈর্ঘ্য=%d\n", mb::length($s);
+
+[ 9. রানটাইম কোডপয়েন্ট রেগুলার এক্সপ্রেশন (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." একটি কোডপয়েন্টের সাথে মেলে
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie রূপের সমতুল্য
+
+[ 10. সঠিক বাইট যাচাই (mb::valid) ]
+  mb::valid($octets)            # সঠিক হলে 1, নাহলে 0
+                                # কঠোর, ঐচ্ছিক; এনকোডিং অনুসারে পরিবর্তিত
+
+[ 11. কোডপয়ন্ট অনুযায়ী বিভাজন (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # কোডপয়ন্ট সীমানায় বিভাজন
+
+[ 12. চালানোর তিনটি উপায় (filter / modulino / runtime) ]
+  use mb;                       # পথ 1: সোর্স ফিল্টার (perl 5.8+)
+  perl mb.pm script.pl          # পথ 2: modulino
+  use mb qw(*mb utf8);          # পথ 3: রানটাইম ইন্টারফেস

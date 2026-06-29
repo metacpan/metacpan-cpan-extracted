@@ -1,0 +1,42 @@
+NAME
+
+    constant::string - Perl pragma to declare constants whose values are
+    their own names
+
+VERSION
+
+    version 2026.26
+
+SYNOPSIS
+
+        use constant::string qw( FOO BAR BAZ );
+    
+        print FOO;  # Outputs: FOO
+        print BAR;  # Outputs: BAR
+
+DESCRIPTION
+
+    This pragma allows you to declare compile-time constants without having
+    to explicitly repeat their names as string values. Passing a list of
+    strings to use constant::string creates constant subroutines in the
+    caller's namespace where each constant returns its own name.
+
+    It behaves exactly like the core constant pragma under the hood,
+    meaning these are fully optimized, inlined compile-time constants—not
+    regular subroutine calls.
+
+SEE ALSO
+
+      * constant - The core Perl pragma utilized under the hood.
+
+AUTHOR
+
+    James Wright <jameswright6@acm.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2026 by James Wright.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

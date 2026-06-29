@@ -1,0 +1,125 @@
+{
+   "$schema": "http://cyclonedx.org/schema/bom-1.7.schema.json",
+   "bomFormat": "CycloneDX",
+   "metadata": {
+      "authors": [
+         {
+            "email": "fawaka@gmail.com",
+            "name": "Leon Timmermans"
+         }
+      ],
+      "component": {
+         "bom-ref": "Dist-Zilla-Plugin-CycloneDX@0.001",
+         "description": "CycloneDX files in dzil generated dists",
+         "externalReferences": [
+            {
+               "type": "chat",
+               "url": "irc://irc.perl.org/#distzilla"
+            },
+            {
+               "type": "documentation",
+               "url": "https://metacpan.org/pod/Dist::Zilla::Plugin::CycloneDX"
+            },
+            {
+               "type": "issue-tracker",
+               "url": "https://github.com/Leont/dist-zilla-plugin-cyclonedx/issues"
+            },
+            {
+               "type": "vcs",
+               "url": "https://github.com/Leont/dist-zilla-plugin-cyclonedx"
+            }
+         ],
+         "group": "CPAN",
+         "name": "Dist-Zilla-Plugin-CycloneDX",
+         "purl": "pkg:cpan/Dist-Zilla-Plugin-CycloneDX@0.001",
+         "type": "library",
+         "version": "0.001"
+      },
+      "licenses": [
+         {
+            "expression": "Artistic-1.0-Perl OR GPL-1.0-or-later"
+         }
+      ],
+      "lifecycles": [
+         {
+            "phase": "pre-build"
+         }
+      ],
+      "timestamp": "2026-06-28T21:44:38Z",
+      "tools": {
+         "components": [
+            {
+               "externalReferences": [
+                  {
+                     "type": "chat",
+                     "url": "irc://irc.perl.org/#distzilla"
+                  },
+                  {
+                     "type": "documentation",
+                     "url": "https://metacpan.org/pod/Dist::Zilla::Plugin::CycloneDX"
+                  },
+                  {
+                     "type": "issue-tracker",
+                     "url": "https://github.com/Leont/dist-zilla-plugin-cyclonedx/issues"
+                  },
+                  {
+                     "type": "vcs",
+                     "url": "https://github.com/Leont/dist-zilla-plugin-cyclonedx"
+                  }
+               ],
+               "group": "CPAN",
+               "name": "Dist-Zilla-Plugin-CycloneDX",
+               "type": "library"
+            },
+            {
+               "bom-ref": "SBOM-CycloneDX@1.09",
+               "description": "Perl distribution for CycloneDX",
+               "externalReferences": [
+                  {
+                     "type": "website",
+                     "url": "https://metacpan.org/pod/SBOM::CycloneDX"
+                  },
+                  {
+                     "type": "documentation",
+                     "url": "https://metacpan.org/dist/SBOM-CycloneDX"
+                  },
+                  {
+                     "type": "vcs",
+                     "url": "https://github.com/giterlizzi/perl-SBOM-CycloneDX"
+                  },
+                  {
+                     "type": "issue-tracker",
+                     "url": "https://github.com/giterlizzi/perl-SBOM-CycloneDX/issues"
+                  },
+                  {
+                     "type": "license",
+                     "url": "https://github.com/giterlizzi/perl-SBOM-CycloneDX/blob/main/LICENSE"
+                  },
+                  {
+                     "type": "release-notes",
+                     "url": "https://github.com/giterlizzi/perl-SBOM-CycloneDX/blob/main/Changes"
+                  },
+                  {
+                     "type": "distribution",
+                     "url": "https://metacpan.org/dist/SBOM-CycloneDX"
+                  }
+               ],
+               "group": "CPAN",
+               "licenses": [
+                  {
+                     "license": {
+                        "id": "Artistic-2.0"
+                     }
+                  }
+               ],
+               "name": "SBOM-CycloneDX",
+               "type": "library",
+               "version": "1.09"
+            }
+         ]
+      }
+   },
+   "serialNumber": "urn:uuid:a489e437-c1e7-4f3e-847c-6fb7ce1a0ee5",
+   "specVersion": "1.7",
+   "version": 1
+}

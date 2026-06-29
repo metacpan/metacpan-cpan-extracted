@@ -14,10 +14,11 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use lib 't/lib';
 use Helper;
+use Clone 'clone';
 
 use Test::Needs 'Mojolicious::Plugin::OpenAPI::Modern';
 
-my $schema = dclone($::schema);
+my $schema = clone($::schema);
 $schema->{info}{title} = 'Test API using config from the plugin';
 
 $::app->config({

@@ -1,7 +1,7 @@
 {
    "abstract" : "two letter codes for province identification in Canada and vice versa",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
@@ -38,10 +38,14 @@
       },
       "test" : {
          "requires" : {
+            "IPC::Run3" : "0",
+            "IPC::System::Simple" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Exception" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::NoWarnings" : "0"
+            "Test::NoWarnings" : "0",
+            "Test::Which" : "0"
          }
       }
    },
@@ -58,6 +62,6 @@
          "web" : "https://github.com/nigelhorne/Locale-CA-Info"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

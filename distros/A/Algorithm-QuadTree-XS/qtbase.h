@@ -9,7 +9,6 @@
 
 typedef struct QuadTreeNode QuadTreeNode;
 typedef struct QuadTreeRootNode QuadTreeRootNode;
-typedef struct DynArr DynArr;
 typedef enum ShapeType ShapeType;
 typedef struct Shape Shape;
 
@@ -29,8 +28,7 @@ struct Shape {
 
 struct QuadTreeNode {
 	QuadTreeNode *children;
-	QuadTreeNode *parent;
-	DynArr *values;
+	AV *values;
 	Shape *dimensions;
 	bool has_objects;
 };
@@ -38,28 +36,14 @@ struct QuadTreeNode {
 struct QuadTreeRootNode {
 	QuadTreeNode *node;
 	HV *backref;
-	DynArr *objects;
 };
-
-struct DynArr {
-	void **ptr;
-	unsigned int count;
-	unsigned int max_size;
-};
-
-
-typedef enum ShapeType ShapeType;
 
 Shape* create_shape();
 void prepare_rectangle(Shape *s, double x, double y, double x2, double y2);
 void prepare_circle(Shape *s, double x0, double y0, double radius);
 void destroy_shape(Shape *s);
 
-DynArr* create_array();
-void destroy_array(DynArr* arr);
-void push_array(DynArr *arr, void *ptr);
-
-QuadTreeNode* create_nodes(int count, QuadTreeNode *parent);
+QuadTreeNode* create_nodes(int count);
 void destroy_node(QuadTreeNode *node);
 QuadTreeRootNode* create_root();
 

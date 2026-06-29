@@ -9,9 +9,9 @@ use Exporter qw(import);
 use IPC::System::Options 'system', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-29'; # DATE
+our $DATE = '2026-05-18'; # DATE
 our $DIST = 'Desktop-KDEActivity-Util'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(
                        get_current_kde_activity
@@ -46,6 +46,38 @@ sub _list_kde_activities {
         };
     }
 
+  FILTER_HAS_WINDOWS: {
+        last unless defined $args{has_windows};
+        require Desktop::XWindowManager::Util;
+        my $res = Desktop::XWindowManager::Util::list_xwm_windows();
+        return [500, "Can't list windows: $res->[0] - $res->[1]"]
+            unless $res->[0] == 200;
+        my %act_num_windows;
+        for my $row (@rows) { $act_num_windows{ $row->{guid} } = 0 }
+        for my $wid (@{$res->[2]}) {
+            my $res_gwkact = Desktop::XWindowManager::Util::get_xwm_window_kde_activity(
+                id => $wid);
+            unless ($res_gwkact->[0] == 200) {
+                log_warn "Can't get KDE activity for window id %s: %d - %s", $wid, $res_gwkact->[0], $res_gwkact->[1];
+                last FILTER_HAS_WINDOWS;
+            }
+            my $guids = $res_gwkact->[2];
+            my @guids = $guids ? (split /,/, $guids) : ();
+            for my $guid (@guids) { $act_num_windows{ $guid }++ }
+        }
+
+        my @filtered_rows;
+        for my $row (@rows) {
+            $row->{num_windows} = $act_num_windows{ $row->{guid} };
+            if ($args{has_windows}) {
+                push @filtered_rows, $row if $row->{num_windows};
+            } else {
+                push @filtered_rows, $row unless $row->{num_windows};
+            }
+        }
+        @rows = @filtered_rows;
+    } # FILTER_HAS_WINDOWS
+
     unless ($args{detail}) {
         @rows = map { $_->{name} } @rows;
     }
@@ -60,6 +92,14 @@ $SPEC{list_kde_activities} = {
         detail => {
             schema => 'bool*',
             cmdline_aliases => {l=>{}},
+        },
+        has_windows => {
+            schema => 'bool*',
+            cmdline_aliases => {
+                w=>{is_flag=>1, summary=>'Shortcut for --has-windows', code=>sub { $_[0]{has_windows} = 1 }},
+                W=>{is_flag=>1, summary=>'Shortcut for --no-has-windows (--hasnt-windows)', code=>sub { $_[0]{has_windows} = 0 }},
+            },
+            tags => ['category:filtering'],
         },
     },
     deps => {
@@ -178,7 +218,7 @@ Desktop::KDEActivity::Util - Utilities related to KDE Activities
 
 =head1 VERSION
 
-This document describes version 0.002 of Desktop::KDEActivity::Util (from Perl distribution Desktop-KDEActivity-Util), released on 2026-03-29.
+This document describes version 0.003 of Desktop::KDEActivity::Util (from Perl distribution Desktop-KDEActivity-Util), released on 2026-05-18.
 
 =head1 SYNOPSIS
 
@@ -247,6 +287,10 @@ Arguments ('*' denotes required arguments):
 
 (No description)
 
+=item * B<has_windows> => I<bool>
+
+(No description)
+
 
 =back
 
@@ -312,6 +356,12 @@ Source repository is at L<https://github.com/perlancar/perl-Desktop-KDEActivity-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@gmail.com>
 
 =head1 CONTRIBUTING
 

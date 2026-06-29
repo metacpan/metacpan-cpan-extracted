@@ -13,7 +13,6 @@ lib/Tree/Cladogram/Imager.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.SKIP
 README
 scripts/Debian.font.list.pl
 scripts/image.magick.pl

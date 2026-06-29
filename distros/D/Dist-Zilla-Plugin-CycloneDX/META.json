@@ -1,0 +1,98 @@
+{
+   "abstract" : "CycloneDX files in dzil generated dists",
+   "author" : [
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-CycloneDX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "5.020"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "MooseX::Types::Moose" : "0",
+            "SBOM::CycloneDX" : "1.08",
+            "SBOM::CycloneDX::Component" : "0",
+            "SBOM::CycloneDX::ExternalReference" : "0",
+            "SBOM::CycloneDX::License" : "0",
+            "SBOM::CycloneDX::Metadata" : "0",
+            "SBOM::CycloneDX::Metadata::Lifecycle" : "0",
+            "SBOM::CycloneDX::OrganizationalContact" : "0",
+            "SBOM::CycloneDX::Tools" : "0",
+            "SBOM::CycloneDX::Util" : "0",
+            "Time::Piece" : "0",
+            "URI::PackageURL" : "0",
+            "autovivification" : "0",
+            "experimental" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.020",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::CycloneDX" : {
+         "file" : "lib/Dist/Zilla/Plugin/CycloneDX.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Role::CycloneDXSource" : {
+         "file" : "lib/Dist/Zilla/Role/CycloneDXSource.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Leont/dist-zilla-plugin-cyclonedx/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/dist-zilla-plugin-cyclonedx.git",
+         "web" : "https://github.com/Leont/dist-zilla-plugin-cyclonedx"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.perl.org/#distzilla"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

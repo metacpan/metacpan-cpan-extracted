@@ -1,3 +1,16 @@
+v0.22  2026-06-29Z
+    - Improved documentation
+    - Replaced own ISBN logic with Business::ISBN
+    - Corrected check for as Digest to include Digest::base
+    - Extract tagname from Data::Identifier
+    - Improved result attribute casting
+    - Added attribute is_on_earth
+    - Allow setting identifier used for earth
+    - Added support for geo:-URIs
+    - Improved support for ni://-URIs
+    - Updated dependency on Data::Identifier
+    - Updated templates for https://sirtx.keep-cool.org/
+
 v0.21  2026-06-16Z
     - Added support for Denkxweb (Landesamt für Denkmalpflege Hessen)
     - Updated database of well known IDs

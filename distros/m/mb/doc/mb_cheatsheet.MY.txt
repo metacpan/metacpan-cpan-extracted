@@ -33,3 +33,20 @@
   mb::set_script_encoding('utf8');
   my $s = "မင်္ဂလာပါ";
   printf "အရှည်=%d\n", mb::length($s);
+
+[ 9. runtime ကုဒ်ပွိုင့် ပုံမှန်အသုံးအနှုန်း (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." သည် ကုဒ်ပွိုင့်တစ်ခုနှင့် ကိုက်ညီသည်
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie ပုံစံနှင့် ညီမျှသည်
+
+[ 10. မှန်ကန်သော bytes ကို စစ်ဆေးခြင်း (mb::valid) ]
+  mb::valid($octets)            # မှန်လျှင် 1၊ မဟုတ်လျှင် 0
+                                # တင်းကျပ်၊ ရွေးချယ်နိုင်၊ encoding ပေါ်မူတည်
+
+[ 11. ကုဒ်ပွိုင့်အလိုက် ပိုင်းခြားခြင်း (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # ကုဒ်ပွိုင့် နယ်နိမိတ်တွင် ပိုင်းခြား
+
+[ 12. လည်ပတ်ရန် နည်းလမ်းသုံးသွယ် (filter / modulino / runtime) ]
+  use mb;                       # လမ်းကြောင်း 1: source filter (perl 5.8+)
+  perl mb.pm script.pl          # လမ်းကြောင်း 2: modulino
+  use mb qw(*mb utf8);          # လမ်းကြောင်း 3: runtime interface

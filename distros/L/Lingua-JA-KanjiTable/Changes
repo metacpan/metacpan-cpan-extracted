@@ -1,5 +1,11 @@
 Revision history for Perl extension Lingua-JA-KanjiTable
 
+0.15 2026-06-28T16:40:01Z
+
+    - Added "勒" (U+52D2) to Jinmeiyo Kanji
+    - Added `InJinmeiyoKanji20260626`
+    - Add Is... properties to match the existing In... properties (recommended to use properties prefixed with 'Is')
+
 0.14 2017-10-02T14:50:57Z
 
     - Added "渾" to Jinmeiyo Kanji

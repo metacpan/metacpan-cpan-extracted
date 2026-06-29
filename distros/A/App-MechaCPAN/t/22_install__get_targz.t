@@ -13,6 +13,9 @@ if ( !&App::MechaCPAN::can_https )
 my $has_git = &App::MechaCPAN::has_git;
 local $ENV{GIT_SSL_NO_VERIFY}='true';
 
+# Don't bother with CHECKSUMS verification
+local $App::MechaCPAN::CHKSIGS = 0;
+
 # Notes:
 #  * we don't test with git or ssh since those require some kind of login
 #  * File::Remove is included to make sure that it's not confused with file://

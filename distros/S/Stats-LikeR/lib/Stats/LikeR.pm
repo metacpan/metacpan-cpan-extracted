@@ -4,54 +4,365 @@ require 5.010;
 use strict;
 use feature 'say';
 package Stats::LikeR;
-our $VERSION = 0.16;
+our $VERSION = 0.18;
 require XSLoader;
-use Devel::Confess 'color';
 use warnings FATAL => 'all';
 use autodie ':default';
 use Exporter 'import';
 use Scalar::Util 'looks_like_number';
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(add_data aoh2hoa aov cfilter chisq_test col col2col cor cor_test cov csort dnorm filter fisher_test glm group_by hoh2hoa hist kruskal_test ks_test ljoin lm matrix max mean median min mode oneway_test p_adjust power_t_test prcomp quantile rbinom read_table rnorm runif sample scale sd seq shapiro_test sum summary t_test transpose value_counts var var_test view wilcox_test write_table);
+our @EXPORT_OK = qw(add_data aoh2hoa aoh2hoh aov assign cfilter chisq_test col col2col cor cor_test cov csort dnorm dropna filter fisher_test glm group_by hoa2aoh hoh2hoa hist intersection kruskal_test ks_test ljoin lm matrix max mean median min mode oneway_test p_adjust power_t_test predict prcomp quantile rbinom read_table rnorm runif sample scale sd seq shapiro_test sum summary t_test transpose uniq vals value_counts var var_test view wilcox_test write_table);
 our @EXPORT = @EXPORT_OK;
 
-require XSLoader;
-# ---- filter DSL: col() builds a predicate via overloading (pure Perl) -------
-# Exported: filter (XS) and col.  Place col()/Col/Pred near the top of the .pm;
-# they need no XS.  filter() is the XSUB.
-sub col { Stats::LikeR::Col->new($_[0]) }
-{
-	package Stats::LikeR::Col;
-	sub new { bless { name => $_[1] }, ref($_[0]) || $_[0] }
-	# build a comparison leaf; if operands were swapped (4 > col('x')), flip the op
-	sub _c {
-		my ($self, $val, $swapped, $op, $flip) = @_;
-		Stats::LikeR::Pred->_leaf($self->{name}, $swapped ? $flip : $op, $val);
+sub aoh2hoh {
+	my ($aoh, $key) = @_;
+	die 'aoh2hoh: first argument must be an arrayref of hashrefs'
+	  unless ref($aoh) eq 'ARRAY';
+	die 'aoh2hoh: a row key must be defined' unless defined $key;
+	my %out;
+	my $i = 0;
+	for my $row (@$aoh) {
+		die "index $i is not a hash" unless ref($row) eq 'HASH';
+		die "index $i has no key \"$key\"" unless defined $row->{$key};
+		my $rk = $row->{$key};
+		die "aoh2hoh: duplicate key '$rk' has >= 2 occurrences"
+			if exists $out{$rk};
+		$out{$rk} = { %$row }; # shallow copy of the row
+		$i++;
 	}
-	use overload
-		'>'  => sub { $_[0]->_c($_[1],$_[2],'>','<')  },
-		'<'  => sub { $_[0]->_c($_[1],$_[2],'<','>')  },
-		'>=' => sub { $_[0]->_c($_[1],$_[2],'>=','<=') },
-		'<=' => sub { $_[0]->_c($_[1],$_[2],'<=','>=') },
-		'==' => sub { $_[0]->_c($_[1],$_[2],'==','==') },
-		'!=' => sub { $_[0]->_c($_[1],$_[2],'!=','!=') },
-		'lt' => sub { $_[0]->_c($_[1],$_[2],'lt','gt') },
-		'gt' => sub { $_[0]->_c($_[1],$_[2],'gt','lt') },
-		'le' => sub { $_[0]->_c($_[1],$_[2],'le','ge') },
-		'ge' => sub { $_[0]->_c($_[1],$_[2],'ge','le') },
-		'eq' => sub { $_[0]->_c($_[1],$_[2],'eq','eq') },
-		'ne' => sub { $_[0]->_c($_[1],$_[2],'ne','ne') },
-		fallback => 1;
+	return \%out;
 }
+# assign($df, name => \&code, name2 => \&code2, ...)
+#
+# Add (or overwrite) columns derived from existing ones, dplyr-mutate style.
+# Each coderef is called once per row with the row as $_ (a hashref) and also
+# as $_[0]; $_[1] is the 0-based row index. For HoH inputs, $_[2] is the row key.
+# It returns the new cell value.
+#
+# Works on all three data-frame shapes:
+#   AoH  [ {weight=>70, height=>1.8}, ... ]        (arrayref of row hashrefs)
+#   HoA  { weight=>[70,...], height=>[1.8,...] }   (hashref of column arrayrefs)
+#   HoH  { r1 => {weight=>70}, r2 => {...} }       (hashref of row hashrefs)
+#
+# Pairs are applied in order, so a later column may use an earlier new one.
+# Modifies $df in place (lowest RAM/CPU) and returns it for chaining.
+# To keep the original intact, hand it a copy: assign(clone($df), ...).
+#
+sub assign {
+	my $df = shift;
+	die 'assign: first argument must be a data frame (AoH arrayref or HoA/HoH hashref)'
+	  unless ref $df;
+	die 'assign: expected an even list of (name => coderef) pairs' if @_ % 2;
+	my $current_sub = (split(/::/,(caller(0))[3]))[-1];
+	my $r = ref $df;
+	if ($r eq 'ARRAY') { # ----- AoH: add a key to each row hash -----
+	  while (@_) {
+		   my ($name, $code) = (shift, shift);
+		   die "assign: value for '$name' must be a CODE ref"
+		       unless ref $code eq 'CODE';
+		   my $i = 0;
+		   for my $row (@$df) {
+		       die "assign: row $i is not a hashref" unless ref $row eq 'HASH';
+		       local $_ = $row;
+		       $row->{$name} = $code->($row, $i);
+		       $i++;
+		   }
+	  }
+	  return $df;
+	}
+
+	if ($r eq 'HASH') {
+		# Determine if it's HoA or HoH
+		my $is_hoh = 0;
+		for my $v (values %$df) {
+			my $ref = ref $v;
+			if ($ref eq 'HASH') {
+				$is_hoh = 1; last;
+			} elsif ($ref eq 'ARRAY') {
+				$is_hoh = 0; last;
+			} else {
+				die "$current_sub: \$v is a \"$ref\" which is neither a HASH nor an ARRAY";
+			}
+		}
+		if ($is_hoh) { # ----- HoH: add a key to each inner hash -----
+			while (@_) {
+				 my ($name, $code) = (shift, shift);
+				 die "assign: value for '$name' must be a CODE ref"
+				     unless ref $code eq 'CODE';
+				 my $i = 0;
+				 for my $row_key (sort keys %$df) {
+				     my $row = $df->{$row_key};
+				     die "assign: row '$row_key' is not a hashref" unless ref $row eq 'HASH';
+				     local $_ = $row;
+				     $row->{$name} = $code->($row, $i, $row_key);
+				     $i++;
+				 }
+			}
+			return $df;
+		} else { # ----- HoA: append a new column array -----
+			# row count = longest existing column
+			my $n = 0;
+			for my $v (values %$df) {
+				 $n = @$v if ref $v eq 'ARRAY' && @$v > $n;
+			}
+			while (@_) {
+				 my ($name, $code) = (shift, shift);
+				 die "assign: value for '$name' must be a CODE ref"
+				     unless ref $code eq 'CODE';
+				 # snapshot the current columns once (cheap: refs, not data)
+				 my @keys = keys %$df;
+				 my @col  = map { my $c = $df->{$_}; ref $c eq 'ARRAY' ? $c : undef } @keys;
+				 my @new;
+				 $#new = $n - 1 if $n;        # preallocate the result column
+				 my %view;
+				 for (my $i = 0; $i < $n; $i++) {
+				     $view{ $keys[$_] } = defined $col[$_] ? $col[$_][$i] : $df->{ $keys[$_] }
+				         for 0 .. $#keys;
+				     local $_ = \%view;
+				     $new[$i] = $code->(\%view, $i);
+				 }
+				 $df->{$name} = \@new;        # visible to later pairs (re-snapshot above)
+			}
+			return $df;
+		}
+	}
+	die 'assign: data frame must be an arrayref (AoH) or hashref (HoA/HoH)';
+}
+
+# ---- filter DSL: col() builds a predicate via overloading (pure Perl) -------
+# col('name') returns an overloaded object; comparing it (col('age') >= 18) or
+# combining comparisons with & | ! builds a predicate that carries its per-row
+# test in a {code} closure. filter() (XS) unwraps that closure, so col() and a
+# plain coderef share one evaluation path -- no XS evaluator, no Carp.
+#
+# Rules: numeric ops > < >= <= == != compare as numbers; string ops gt lt ge le
+# eq ne compare as strings; & | ! combine; operands may be in either order; a
+# missing/undef cell (and, for numeric ops, a non-numeric cell) never matches.
+sub col { Stats::LikeR::col::_new(@_) }
 {
-	package Stats::LikeR::Pred;
-	sub _leaf { bless { op => $_[2], col => $_[1], val => $_[3] }, 'Stats::LikeR::Pred' }
-	sub _node { bless { op => $_[0], l => $_[1], r => $_[2] }, 'Stats::LikeR::Pred' }
+	package Stats::LikeR::col;
+	use warnings;
+	use Scalar::Util qw(blessed looks_like_number);
 	use overload
-		'&' => sub { Stats::LikeR::Pred::_node('and', $_[0], $_[1]) },
-		'|' => sub { Stats::LikeR::Pred::_node('or',  $_[0], $_[1]) },
-		'!' => sub { Stats::LikeR::Pred::_node('not', $_[0], undef) },
-		fallback => 1;
+		'>'	 => sub { _num($_[0], '>',	$_[1], $_[2]) },
+		'<'	 => sub { _num($_[0], '<',	$_[1], $_[2]) },
+		'>=' => sub { _num($_[0], '>=', $_[1], $_[2]) },
+		'<=' => sub { _num($_[0], '<=', $_[1], $_[2]) },
+		'==' => sub { _num($_[0], '==', $_[1], $_[2]) },
+		'!=' => sub { _num($_[0], '!=', $_[1], $_[2]) },
+		'gt' => sub { _str($_[0], 'gt', $_[1], $_[2]) },
+		'lt' => sub { _str($_[0], 'lt', $_[1], $_[2]) },
+		'ge' => sub { _str($_[0], 'ge', $_[1], $_[2]) },
+		'le' => sub { _str($_[0], 'le', $_[1], $_[2]) },
+		'eq' => sub { _str($_[0], 'eq', $_[1], $_[2]) },
+		'ne' => sub { _str($_[0], 'ne', $_[1], $_[2]) },
+		'&'	 => sub { _logic($_[0], '&', $_[1]) },
+		'|'	 => sub { _logic($_[0], '|', $_[1]) },
+		'!'	 => sub { _not($_[0]) },
+		'""'   => sub { 'Stats::LikeR::col predicate' },
+		'bool' => sub { 1 },
+		fallback => 0;
+
+	sub _new {
+		my ($name) = @_;
+		die "col(): expects a single column name\n" if !defined($name) || ref $name;
+		return bless { name => $name }, __PACKAGE__;
+	}
+
+	my %NUM = (
+		'>'	 => sub { $_[0] >  $_[1] }, '<'	 => sub { $_[0] <  $_[1] },
+		'>=' => sub { $_[0] >= $_[1] }, '<=' => sub { $_[0] <= $_[1] },
+		'==' => sub { $_[0] == $_[1] }, '!=' => sub { $_[0] != $_[1] },
+	);
+	my %STR = (
+		'gt' => sub { $_[0] gt $_[1] }, 'lt' => sub { $_[0] lt $_[1] },
+		'ge' => sub { $_[0] ge $_[1] }, 'le' => sub { $_[0] le $_[1] },
+		'eq' => sub { $_[0] eq $_[1] }, 'ne' => sub { $_[0] ne $_[1] },
+	);
+
+	# numeric comparison: undef OR non-numeric cells never match
+	sub _num {
+		my ($self, $op, $other, $swap) = @_;
+		my $name = $self->{name};
+		die "col(): the '$op' comparison must start from a bare column, e.g. col('x') $op ...\n"
+			unless defined $name;
+		my $f = $NUM{$op};
+		my $code = $swap
+			? sub { my $c = $_[0]{$name}; (defined($c) && looks_like_number($c)) ? ($f->($other, $c) ? 1 : 0) : 0 }
+			: sub { my $c = $_[0]{$name}; (defined($c) && looks_like_number($c)) ? ($f->($c, $other) ? 1 : 0) : 0 };
+		return bless { code => $code }, __PACKAGE__;
+	}
+
+	# string comparison: undef cells never match
+	sub _str {
+		my ($self, $op, $other, $swap) = @_;
+		my $name = $self->{name};
+		die "col(): the '$op' comparison must start from a bare column, e.g. col('x') $op ...\n"
+			unless defined $name;
+		my $f = $STR{$op};
+		my $code = $swap
+			? sub { my $c = $_[0]{$name}; defined($c) ? ($f->($other, $c) ? 1 : 0) : 0 }
+			: sub { my $c = $_[0]{$name}; defined($c) ? ($f->($c, $other) ? 1 : 0) : 0 };
+		return bless { code => $code }, __PACKAGE__;
+	}
+
+	sub _logic {
+		my ($self, $op, $other) = @_;
+		my $lc = $self->{code};
+		die "col(): the left operand of '$op' is not a comparison (build it like (col('x') > 0))\n"
+			unless ref $lc eq 'CODE';
+		my $rc = (blessed($other) && $other->isa(__PACKAGE__)) ? $other->{code} : undef;
+		die "col(): the right operand of '$op' must be a col() comparison too\n"
+			unless ref $rc eq 'CODE';
+		my $code = $op eq '&'
+			? sub { ($lc->($_[0]) && $rc->($_[0])) ? 1 : 0 }
+			: sub { ($lc->($_[0]) || $rc->($_[0])) ? 1 : 0 };
+		return bless { code => $code }, __PACKAGE__;
+	}
+
+	sub _not {
+		my ($self) = @_;
+		my $c = $self->{code};
+		die "col(): the operand of '!' is not a comparison (build it like !(col('x') > 0))\n"
+			unless ref $c eq 'CODE';
+		return bless { code => sub { $c->($_[0]) ? 0 : 1 } }, __PACKAGE__;
+	}
+}
+
+#
+# dropna($df, cols => \@cols, how => 'any'|'all')	# NA mode
+# dropna($df, rows => \@rows)						 # literal deletion
+#
+# $df may be:
+#	AoH	 [ { A=>.., B=>.. }, ... ]			rows are 0-based indices
+#	HoA	 { A=>[..], B=>[..] }				rows are 0-based indices
+#	HoH	 { r1=>{ A=>.. }, r2=>{ .. } }		rows are the outer keys
+#
+# cols mode (NA): inspect the named columns and drop the rows that are undef
+#	in them. how => 'any' (default) drops a row when any named column is undef;
+#	how => 'all' drops it only when every named column is undef. Columns that
+#	are not named are untouched but stay aligned (their cell at a dropped index
+#	goes too). A missing key counts as undef.
+#
+# rows mode: delete exactly the listed rows (indices for AoH/HoA, keys for HoH);
+#	no NA check. Indices/keys that aren't present are ignored.
+#
+# Returns a NEW top-level data frame; the original is never modified. For HoA
+# the column arrays are rebuilt (cell values copied); for AoH/HoH the surviving
+# row references are reused, not deep-copied (dropna never mutates a row).
+#
+sub dropna {
+	my $df = shift;
+	die "dropna: first argument must be a data frame (HoA/HoH hashref or AoH arrayref)\n"
+		unless ref $df;
+	die "dropna: arguments after the data frame must be name => value pairs\n"
+		if @_ % 2;
+	my %arg = @_;
+
+	my %known = ( cols => 1, rows => 1, how => 1 );
+	my @bad = sort grep { !$known{$_} } keys %arg;
+	die "dropna: unknown argument(s): @bad\n" if @bad;
+
+	my $have_cols = exists $arg{cols};
+	my $have_rows = exists $arg{rows};
+	die "dropna: pass exactly one of 'cols' or 'rows'\n"
+		unless $have_cols xor $have_rows;
+
+	my $sel = $have_cols ? $arg{cols} : $arg{rows};
+	die "dropna: '" . ($have_cols ? 'cols' : 'rows') . "' must be an arrayref\n"
+		unless ref $sel eq 'ARRAY';
+
+	my $how = defined $arg{how} ? lc $arg{how} : 'any';
+	die "dropna: 'how' must be 'any' or 'all'\n"
+		unless $how eq 'any' or $how eq 'all';
+
+	my $r = ref $df;
+
+	#----- AoH -----
+	if ($r eq 'ARRAY') {
+		if ($have_rows) {						# literal index deletion
+			my %drop = map { $_ => 1 } @$sel;
+			return [ map { $df->[$_] } grep { !$drop{$_} } 0 .. $#$df ];
+		}
+		my @cols = @$sel;
+		return [ @$df ] unless @cols;			# nothing to check -> keep all
+		return [] unless @$df;				# empty frame -> empty result
+		my %seen;
+		for my $row (@$df) {
+			next unless ref $row eq 'HASH';
+			$seen{$_} = 1 for keys %$row;
+		}
+		for my $c (@cols) {
+			die "dropna: column '$c' not found\n" unless $seen{$c};
+		}
+		my @keep;
+		for my $i (0 .. $#$df) {
+			my $row = $df->[$i];
+			my $nundef = (ref $row eq 'HASH')
+				? (grep { !defined $row->{$_} } @cols)
+				: @cols;						# malformed row counts as all-NA
+			my $drop = $how eq 'any' ? $nundef > 0 : $nundef == @cols;
+			push @keep, $i unless $drop;
+		}
+		return [ map { $df->[$_] } @keep ];
+	}
+
+	#----- HoA vs HoH -----
+	if ($r eq 'HASH') {
+		my ($saw_arr, $saw_hash) = (0, 0);
+		for my $v (values %$df) {
+			next unless ref $v;
+			$saw_arr++	if ref $v eq 'ARRAY';
+			$saw_hash++ if ref $v eq 'HASH';
+		}
+		die "dropna: hashref mixes array and hash values (ambiguous HoA/HoH)\n"
+			if $saw_arr and $saw_hash;
+
+		#----- HoH -----
+		if ($saw_hash) {
+			if ($have_rows) {					# delete row keys
+				my %drop = map { $_ => 1 } @$sel;
+				return { map { $_ => $df->{$_} } grep { !$drop{$_} } keys %$df };
+			}
+			my @cols = @$sel;
+			return { %$df } unless @cols;
+			my %out;
+			for my $rk (keys %$df) {
+				my $row = $df->{$rk};
+				my $nundef = (ref $row eq 'HASH')
+					? (grep { !defined $row->{$_} } @cols)
+					: @cols;
+				my $drop = $how eq 'any' ? $nundef > 0 : $nundef == @cols;
+				$out{$rk} = $row unless $drop;
+			}
+			return \%out;
+		}
+
+		#----- HoA (also the empty-hash fallthrough) -----
+		my $n = 0;
+		for my $v (values %$df) {
+			$n = @$v if ref $v eq 'ARRAY' and @$v > $n;
+		}
+		if ($have_rows) {						# delete indices
+			my %drop = map { $_ => 1 } @$sel;
+			my @keep = grep { !$drop{$_} } 0 .. $n - 1;
+			return { map { $_ => [ @{ $df->{$_} }[@keep] ] } keys %$df };
+		}
+		my @cols = @$sel;
+		return { map { $_ => [ @{ $df->{$_} } ] } keys %$df } unless @cols;
+		for my $c (@cols) {
+			die "dropna: column '$c' not found\n" unless exists $df->{$c};
+		}
+		my @keep;
+		for my $i (0 .. $n - 1) {
+			my $nundef = grep { !defined $df->{$_}[$i] } @cols;
+			my $drop = $how eq 'any' ? $nundef > 0 : $nundef == @cols;
+			push @keep, $i unless $drop;
+		}
+		return { map { $_ => [ @{ $df->{$_} }[@keep] ] } keys %$df };
+	}
+
+	die "dropna: data frame must be an arrayref (AoH) or hashref (HoA/HoH)\n";
 }
 sub summary {
 	my ($data, %args);
@@ -77,7 +388,7 @@ sub summary {
 	$args{nrows} //= delete($args{nrow}) // 10;
 	my $ref_type = ref $data;
 	if (($ref_type ne 'ARRAY') && ($ref_type ne 'HASH')) {
-		die "$current_sub' data must either be a hash or an array, not \"$ref_type\"";
+		die "$current_sub: data must either be a hash or an array, not \"$ref_type\"";
 	}
 	my $single_arr = 0;
 	if (($ref_type eq 'ARRAY') && (ref $data->[0] eq '')) {
@@ -172,6 +483,7 @@ sub read_table {
 
 	my %allowed_args = map { $_ => 1 } (
 		'comment', 'output.type', 'filter', 'row.names', 'sep',
+		'auto.row.names',
 	);
 	my @undef_args = sort grep { !$allowed_args{$_} } keys %args;
 	if (@undef_args) {
@@ -184,6 +496,17 @@ sub read_table {
 	die "read_table: output.type \"$otype\" isn't allowed (aoh, hoa, hoh)\n"
 		unless $otype =~ m/^(?:aoh|hoa|hoh)$/;
 
+	# R's write.table(col.names=TRUE) default omits the header label for the
+	# row-names column, so a header comes out one field short of every data
+	# row. With 'auto.row.names' set, mirror read.table's rule: when (and only
+	# when) the header is exactly one field short, treat the first data field
+	# as an (otherwise unlabelled) row-names column. Any truthy value enables
+	# it; a non-1 string is used as the synthesized column name.
+	my $want_auto_rn = $args{'auto.row.names'} ? 1 : 0;
+	my $auto_rn_name =
+		($want_auto_rn && "$args{'auto.row.names'}" ne '1')
+			? $args{'auto.row.names'} : 'row_name';
+
 	my $filter = $args{filter};
 	if (defined $filter && ref($filter) eq 'CODE') {
 		$filter = { 0 => $filter };
@@ -193,54 +516,83 @@ sub read_table {
 
 	my (@data, %data, @header, @uniq_header,
 	    %mapped_filters, @sorted_filter_flds, %seen_rownames);
-	my $data_row = 0;
+	my $data_row    = 0;
+	my $header_seen = 0;
+	my $header_done = 0;
+
+	# Everything that depends on the (possibly augmented) @header lives here so
+	# it can run either right after the header line (strict mode) or deferred
+	# to the first data row (auto.row.names mode, once the width is known).
+	my $finalize_header = sub {
+		if (@header && $header[0] eq '') {
+			$header[0] = 'row_name';
+		}
+		my %seen_h;
+		# FIX: hoa output with duplicate column names used to push the same
+		# cell once PER OCCURRENCE, silently corrupting the column lengths.
+		# Iterate unique names (order preserved) instead.
+		@uniq_header = grep { !$seen_h{$_}++ } @header;
+		my @dup_cols = grep { $seen_h{$_} > 1 } @uniq_header;
+		warn "read_table: duplicate column name(s) in $file: @dup_cols (later values win)\n"
+			if @dup_cols;
+		if ($otype eq 'hoh' && !defined $args{'row.names'}) {
+			$args{'row.names'} = $header[0];
+		}
+		if (defined $args{'row.names'}
+				&& !grep { $_ eq $args{'row.names'} } @header) {
+			die "\"$args{'row.names'}\" isn't in the header of $file\n";
+		}
+		if ($filter) {
+			%mapped_filters = ();
+			for my $k (keys %$filter) {
+				if ($k =~ /^\d+$/) {
+					# FIX: a numeric key past the last column used to be
+					# accepted and then silently extended every row via the
+					# $_ write-back
+					die "read_table: numeric filter key $k exceeds the "
+					  . scalar(@header) . " columns of $file\n"
+						if $k > @header;
+					$mapped_filters{$k} = $filter->{$k};
+				} else {
+					my ($idx) = grep { $header[$_] eq $k } 0 .. $#header;
+					die "Filter column '$k' not found in header\n"
+						unless defined $idx;
+					$mapped_filters{ $idx + 1 } = $filter->{$k};
+				}
+			}
+			@sorted_filter_flds = sort { $a <=> $b } keys %mapped_filters;
+		}
+	};
+
 	_parse_csv_file($file, $args{sep} // '', $args{comment} // '', sub {
 		my ($line_ref) = @_;
-		if (!@header) {
-			# --- HEADER PROCESSING (copy made only here; runs once) ---
+
+		if (!$header_seen) {
+			# --- HEADER CAPTURE (copy made only here; runs once) ---
 			my @line = @$line_ref;
 			$line[0] =~ s/^\Q$args{comment}\E//
 				if @line && defined $line[0] && length( $args{comment} // '' );
-			@header = @line;
-			if (@header && $header[0] eq '') {
-				$header[0] = 'row_name';
-			}
-			my %seen_h;
-			# FIX: hoa output with duplicate column names used to push the
-			# same cell once PER OCCURRENCE, silently corrupting the column
-			# lengths. Iterate unique names (order preserved) instead.
-			@uniq_header = grep { !$seen_h{$_}++ } @header;
-			my @dup_cols = grep { $seen_h{$_} > 1 } @uniq_header;
-			warn "read_table: duplicate column name(s) in $file: @dup_cols (later values win)\n"
-				if @dup_cols;
-			if ($otype eq 'hoh' && !defined $args{'row.names'}) {
-				$args{'row.names'} = $header[0];
-			}
-			if (defined $args{'row.names'}
-					&& !grep { $_ eq $args{'row.names'} } @header) {
-				die "\"$args{'row.names'}\" isn't in the header of $file\n";
-			}
-			if ($filter) {
-				for my $k (keys %$filter) {
-					if ($k =~ /^\d+$/) {
-						# FIX: a numeric key past the last column used to be
-						# accepted and then silently extended every row via
-						# the $_ write-back
-						die "read_table: numeric filter key $k exceeds the "
-						  . scalar(@header) . " columns of $file\n"
-							if $k > @header;
-						$mapped_filters{$k} = $filter->{$k};
-					} else {
-						my ($idx) = grep { $header[$_] eq $k } 0 .. $#header;
-						die "Filter column '$k' not found in header\n"
-							unless defined $idx;
-						$mapped_filters{ $idx + 1 } = $filter->{$k};
-					}
-				}
-				@sorted_filter_flds = sort { $a <=> $b } keys %mapped_filters;
+			@header      = @line;
+			$header_seen = 1;
+			unless ($want_auto_rn) {	# strict: finalize immediately
+				$finalize_header->();
+				$header_done = 1;
 			}
 			return;
 		}
+
+		if (!$header_done) {
+			# First data row in auto.row.names mode: now the data width is
+			# known, so decide whether the file carries an unlabelled leading
+			# row-names column (header exactly one field short).
+			if (@$line_ref == @header + 1) {
+				unshift @header, $auto_rn_name;
+			}
+			$finalize_header->();
+			$header_done = 1;
+			# fall through and process THIS line as data
+		}
+
 		# --- DATA PROCESSING (operate on $line_ref directly; no row copy) ---
 		$data_row++;
 		if (@$line_ref != @header) {
@@ -294,91 +646,75 @@ sub read_table {
 			}
 		}
 	});
+	# header-only files in auto mode never hit a data row: still validate
+	$finalize_header->() if $header_seen && !$header_done;
+
 	if ($otype eq 'aoh') {
 		return \@data;
 	} else { # hoa or hoh
 		return \%data;
 	}
 }
-# ---------------------------------------------------------------------------
-# view(): an R-style `head` for the structures read_table() returns.
+# view($data, %opts) -- pretty-print an AoH / HoA / HoH / flat-hash table.
 #
-# Handles all three output.type values:
-#   aoh  -> ARRAY of HASH refs
-#   hoa  -> HASH of ARRAY refs
-#   hoh  -> HASH of HASH refs
+# Changes in this version:
+#   * Column widths, truncation, and padding are measured in DISPLAY COLUMNS,
+#     not bytes: UTF-8 cells (e.g. "Jorgensen" with an o-slash) no longer push
+#     later columns out of alignment, and East-Asian wide chars count as 2.
+#     Cell text is decoded for measurement and re-encoded to UTF-8 for output,
+#     so the printed bytes are unchanged -- only the spacing is corrected.
+#   * Data::Printer-style ANSI colouring. New options:
+#         color  => 'auto' (default) | 1 | 0
+#                   'auto' = colour only when writing to a terminal
+#         colors => { number => '#87afff', string => 'bright_yellow', ... }
+#                   per-type overrides; values may be a #rrggbb truecolour hex,
+#                   a named ANSI colour, or a raw SGR string ("38;5;110").
+#     Colour types used: number, string, undef, hash (column headers / named
+#     row labels), array (numeric row labels), caller_info (the "# AoH: ..."
+#     lines). Only the value text is wrapped in escapes; padding stays plain
+#     so alignment is identical with or without colour.
 #
-# Pure Perl; the only dependency is Scalar::Util (core). There is nothing for
-# XS to speed up here: view only touches the first n rows, and the total-row
-# count is O(1) for every structure (scalar @$aoh, array length, scalar keys).
-# Keeping it pure Perl also keeps install portable (no compiler needed).
-#
-# Usage:
-#   view($data);                      # first 6 rows, like head()
-#   view($data, n => 20);             # first 20 rows
-#   view($data, cols => [...]);       # pin explicit column order
-#   view($data, na => '.', max_width => 30, gap => 1, ellipsis => '~');
-#   view($data, 'row.names' => 'id'); # use column 'id' as the row label
-#   view($data, to => \*STDERR);      # print elsewhere
-#   my $s = view($data, return_only => 1);  # capture string, suppress print
-#
-# Column order: read_table stores rows as hashes, so the original CSV column
-# order is gone. view sorts columns by name for a stable layout and treats a
-# column literally named 'row_name' (read_table's label for a leading blank
-# header) as the row label. Pass cols => [...] to override the order.
-# ---------------------------------------------------------------------------
-
 sub view {
 	my $data = shift;
 	my %args = @_;
-
 	# --- reject unknown arguments (mirrors read_table/write_table) ---
 	my %allowed = map { $_ => 1 } qw(
 		n rows na max_width ellipsis gap cols columns
-		to return_only row.names row_names
+		to return_only row.names row_names color colors
 	);
 	my @bad = sort grep { !$allowed{$_} } keys %args;
 	die "view: unknown argument(s): @bad\n" if @bad;
-
 	# --- n / rows (synonyms); reject conflicting or non-integer values ---
 	die "view: pass either 'n' or 'rows', not both\n"
 		if exists $args{n} && exists $args{rows};
 	my $n = exists $args{rows} ? $args{rows}
-		  : exists $args{n}    ? $args{n}
-		  :                       6;
+		  : exists $args{n}	   ? $args{n}
+		  :						  6;
 	die "view: 'n'/'rows' must be a non-negative integer\n"
 		unless defined $n && $n =~ /^\d+$/;
-
-	my $na    = exists $args{na}        ? $args{na}        : 'NA';
+	my $na	  = exists $args{na}		? $args{na}		   : 'undef';
 	my $maxw  = exists $args{max_width} ? $args{max_width} : 80;
-	my $ell   = exists $args{ellipsis}  ? $args{ellipsis}  : '...';
-	my $gap   = exists $args{gap}       ? (' ' x $args{gap}) : '  ';
+	my $ell	  = exists $args{ellipsis}	? $args{ellipsis}  : '...';
+	my $gap	  = exists $args{gap}		? (' ' x $args{gap}) : '  ';
 	my $ucols = $args{cols} || $args{columns};
-	my $fh    = $args{to};
+	my $fh	  = $args{to};
 	my $quiet = $args{return_only};
-
 	# 'row.names' takes precedence over the row_names alias (both accepted)
 	my $label_col = exists $args{'row.names'} ? $args{'row.names'}
-		          : exists $args{row_names}   ? $args{row_names}
-		          : undef;
-
+				  : exists $args{row_names}	  ? $args{row_names}
+				  : undef;
 	my $rt = ref $data;
 	die "view: expected an ARRAY (AoH) or HASH (HoA/HoH) reference, got "
 	  . ($rt || 'a non-reference') . "\n"
 	  unless $rt eq 'ARRAY' or $rt eq 'HASH';
-
 	my ($kind, @cols, @labels, @raw, $total, $lab_header);
 	if ($rt eq 'ARRAY') { # ---- AoH ----
 		$kind  = 'AoH';
 		$total = scalar @$data;
 		my $show = $n < $total ? $n : $total;
-
 		if ($ucols) {
 			@cols = @$ucols;
 		} else {
-			# BUG FIX: scan at least one row when data exists, so the header
-			# still lists columns even when showing 0 rows (n => 0). PERF:
-			# collect unique keys once, then sort once -- not sort-per-row.
 			my $scan = $show > 0 ? $show : ($total > 0 ? 1 : 0);
 			my %seen;
 			for my $i (0 .. $scan - 1) {
@@ -406,14 +742,9 @@ sub view {
 		my $sample;
 		for my $k (@keys) { $sample = $data->{$k}; last if defined $sample; }
 		my $vt = ref $sample;
-
-		if (!@keys) {                                       # ---- empty ----
-			# BUG FIX: an empty hash used to die ("neither ARRAY nor HASH");
-			# treat it as an empty table, mirroring an empty AoH.
-			$kind = 'Hash';
-			$total = 0;
-			$lab_header = '';
-		} elsif ($vt eq 'ARRAY') {                          # ---- HoA ----
+		if (!@keys) {
+			$kind = 'Hash'; $total = 0; $lab_header = '';
+		} elsif ($vt eq 'ARRAY') {							# ---- HoA ----
 			$kind = 'HoA';
 			my @allcols = $ucols ? @$ucols : sort @keys;
 			$total = 0;
@@ -435,16 +766,14 @@ sub view {
 					ref $data->{$_} eq 'ARRAY' ? $data->{$_}[$i] : undef
 				} @cols ];
 			}
-		} elsif ($vt eq 'HASH') {                           # ---- HoH ----
+		} elsif ($vt eq 'HASH') {							# ---- HoH ----
 			$kind = 'HoH';
 			$total = scalar @keys;
 			my @rk = sort @keys;
 			my $show = $n < $total ? $n : $total;
 			my @shown = $show > 0 ? @rk[0 .. $show - 1] : ();
-			if ($ucols) {
-				@cols = @$ucols;
-			} else {
-				# PERF: gather unique inner keys, sort once.
+			if ($ucols) { @cols = @$ucols; }
+			else {
 				my %seen;
 				for my $rkk (@shown) {
 					next unless ref $data->{$rkk} eq 'HASH';
@@ -453,33 +782,19 @@ sub view {
 				@cols = sort keys %seen;
 			}
 			@cols = grep { $_ ne $label_col } @cols if defined $label_col;
-			# BUG FIX: honour the row_names alias here too (was 'row.names'
-			# only, so row_names => 'x' showed a 'row_name' header).
 			$lab_header = defined $label_col ? $label_col : 'row_name';
 			for my $rkk (@shown) {
 				push @labels, $rkk;
 				my $inner = ref $data->{$rkk} eq 'HASH' ? $data->{$rkk} : {};
 				push @raw, [ map { $inner->{$_} } @cols ];
 			}
-		} else {                                            # ---- flat hash ----
-			# BUG/FEATURE: a hash whose values are plain scalars
-			# ({ a => 1, b => 2, ... }) used to die ("neither ARRAY nor
-			# HASH"). Render it like write_table's flat hash: one row, keys
-			# as columns, a numeric '1' row label.
-			$kind = 'Hash';
-			$total = 1;
+		} else {											# ---- flat hash ----
+			$kind = 'Hash'; $total = 1;
 			my $show = $n < $total ? $n : $total;
-			if ($ucols) {
-				@cols = @$ucols;
-			} else {
-				@cols = sort @keys;
-			}
+			if ($ucols) { @cols = @$ucols; } else { @cols = sort @keys; }
 			my $lc = defined $label_col ? $label_col
 				   : (grep { $_ eq 'row_name' } @cols) ? 'row_name' : undef;
-			if (defined $lc) {
-				@cols = grep { $_ ne $lc } @cols;
-				$lab_header = $lc;
-			}
+			if (defined $lc) { @cols = grep { $_ ne $lc } @cols; $lab_header = $lc; }
 			$lab_header = '' unless defined $lab_header;
 			for my $i (0 .. $show - 1) {
 				push @labels, defined $lc ? $data->{$lc} : ($i + 1);
@@ -488,7 +803,95 @@ sub view {
 		}
 	}
 
-	# numeric detection per column (drives right/left alignment)
+	# ---- display helpers (UTF-8 / wide-char aware) ----
+	my $RESET = "\e[0m";
+	my $decode = sub {
+		my $s = shift;
+		return ($s, 0) if utf8::is_utf8($s);
+		my $d = $s;
+		return ($d, 1) if utf8::decode($d);	   # valid UTF-8 byte string -> chars
+		return ($s, 0);						   # not UTF-8: leave bytes untouched
+	};
+	my $wide = sub {
+		my $o = shift;
+		return 1 if ($o >= 0x1100 && $o <= 0x115F)
+				 || ($o >= 0x2E80 && $o <= 0xA4CF)
+				 || ($o >= 0xAC00 && $o <= 0xD7A3)
+				 || ($o >= 0xF900 && $o <= 0xFAFF)
+				 || ($o >= 0xFE30 && $o <= 0xFE4F)
+				 || ($o >= 0xFF00 && $o <= 0xFF60)
+				 || ($o >= 0xFFE0 && $o <= 0xFFE6)
+				 || ($o >= 0x1F300 && $o <= 0x1FAFF);
+		return 0;
+	};
+	my $cwidth = sub {							# width of an already-decoded string
+		my $s = shift; my $w = 0;
+		for my $ch (split //, $s) { my $o = ord $ch; next if $o == 0; $w += $wide->($o) ? 2 : 1; }
+		return $w;
+	};
+	my $dwidth = sub { my ($c) = $decode->(shift); return $cwidth->($c); };
+	my $ell_w  = $dwidth->($ell);
+	# stringify + sanitize + char-aware truncate; returns (output_bytes, width)
+	my $prep = sub {
+		my $v = shift;
+		my $s = defined $v ? "$v" : $na;
+		$s =~ s/\t/\\t/g; $s =~ s/\r/\\r/g; $s =~ s/\n/\\n/g;
+		my ($c, $dec) = $decode->($s);
+		if ($maxw && $cwidth->($c) > $maxw) {
+			my $budget = $maxw - $ell_w; $budget = 0 if $budget < 0;
+			my $keep = ''; my $w = 0;
+			for my $ch (split //, $c) {
+				my $cw = $wide->(ord $ch) ? 2 : 1;
+				last if $w + $cw > $budget;
+				$keep .= $ch; $w += $cw;
+			}
+			$c = $keep . $ell;
+			$dec ||= utf8::is_utf8($ell);
+		}
+		my $w = $cwidth->($c);
+		my $bytes = $c; utf8::encode($bytes) if $dec;
+		return ($bytes, $w);
+	};
+
+	# ---- colour configuration (Data::Printer-style) ----
+	my %default_colors = (
+		array		=> 'bright_white',	number => 'bright_blue',
+		string		=> 'bright_yellow', class  => 'bright_green',
+		undef		=> 'bright_red',	hash   => 'magenta',
+		caller_info => 'bright_cyan',	separator => 'white',
+	);
+	my %color = (%default_colors, %{ $args{colors} || {} });
+	my %fg = (
+		black=>30, red=>31, green=>32, yellow=>33, blue=>34, magenta=>35, cyan=>36, white=>37,
+		bright_black=>90, bright_red=>91, bright_green=>92, bright_yellow=>93,
+		bright_blue=>94, bright_magenta=>95, bright_cyan=>96, bright_white=>97,
+	);
+	my $sgr = sub {
+		my $spec = $color{ $_[0] };
+		return '' unless defined $spec && length $spec;
+		if ($spec =~ /^#?([0-9a-fA-F]{6})\z/) {
+			my ($r, $g, $b) = map { hex } unpack 'a2a2a2', $1;
+			return "\e[38;2;$r;$g;${b}m";
+		}
+		return "\e[$fg{$spec}m" if exists $fg{$spec};
+		return "\e[$spec" . 'm'	 if $spec =~ /^\d[\d;]*\z/;
+		return '';
+	};
+	my $want_color;
+	if (!defined $args{color} || (!ref $args{color} && $args{color} eq 'auto')) {
+		my $target = defined $fh ? $fh : \*STDOUT;
+		$want_color = (!$quiet && -t $target) ? 1 : 0;
+	} else {
+		$want_color = $args{color} ? 1 : 0;
+	}
+	my $paint = sub {
+		my ($text, $type) = @_;
+		return $text unless $want_color;
+		my $c = $sgr->($type);
+		return length $c ? $c . $text . $RESET : $text;
+	};
+
+	# ---- column types (alignment) ----
 	my @numeric = (1) x scalar @cols;
 	for my $r (@raw) {
 		for my $j (0 .. $#cols) {
@@ -498,68 +901,65 @@ sub view {
 		}
 	}
 	my $lab_numeric = @labels ? 1 : 0;
-	for my $l (@labels) {
-		$lab_numeric = 0, last unless defined $l && looks_like_number($l);
-	}
-
-	# stringify + sanitize + truncate cells (column names left intact)
-	my $ell_len = length $ell;
-	my $clean = sub {
+	for my $l (@labels) { $lab_numeric = 0, last unless defined $l && looks_like_number($l); }
+	my $val_type = sub {
 		my $v = shift;
-		return $na unless defined $v;
-		$v = "$v";
-		$v =~ s/\t/\\t/g; $v =~ s/\r/\\r/g; $v =~ s/\n/\\n/g;
-		if ($maxw && length($v) > $maxw) {
-			my $keep = $maxw - $ell_len;
-			$keep = 0 if $keep < 0;
-			$v = substr($v, 0, $keep) . $ell;
-		}
-		return $v;
+		return 'undef'	unless defined $v;
+		return 'number' if looks_like_number($v);
+		return 'string';
 	};
-	my @lab_s  = map { $clean->($_) } @labels;
-	my @rows_s = map { [ map { $clean->($_) } @$_ ] } @raw;
-	my @head_s = @cols;
 
-	# column widths
-	my $lab_w = length $lab_header;
-	for my $s (@lab_s) { my $l = length $s; $lab_w = $l if $l > $lab_w; }
-	my @w = map { length $_ } @head_s;
-	for my $r (@rows_s) {
-		for my $j (0 .. $#cols) {
-			my $l = length $r->[$j];
-			$w[$j] = $l if $l > $w[$j];
-		}
+	# ---- prepare every cell once: [bytes, width, colour-type] ----
+	my @lab_cell = map { [ $prep->($_), (!defined $_ ? 'undef' : $lab_numeric ? 'array' : 'hash') ] } @labels;
+	my @row_cell;
+	for my $r (@raw) {
+		push @row_cell, [ map { [ $prep->($r->[$_]), $val_type->($r->[$_]) ] } 0 .. $#cols ];
+	}
+	my @head_cell = map { [ $prep->($_) ] } @cols;
+	my ($lh_b, $lh_w) = $prep->($lab_header);
+
+	# ---- column widths (display columns) ----
+	my $lab_w = $lh_w;
+	for my $c (@lab_cell) { $lab_w = $c->[1] if $c->[1] > $lab_w; }
+	my @w;
+	for my $j (0 .. $#cols) {
+		my $width = $head_cell[$j][1];
+		for my $r (@row_cell) { $width = $r->[$j][1] if $r->[$j][1] > $width; }
+		$w[$j] = $width;
 	}
 
-	my $pad = sub {
-		my ($s, $width, $right) = @_;
-		my $g = $width - length $s; $g = 0 if $g < 0;
-		return $right ? (' ' x $g) . $s : $s . (' ' x $g);
+	# ---- pad: spaces are never coloured; only the value text is ----
+	my $field = sub {
+		my ($bytes, $bw, $width, $right, $type) = @_;
+		my $gapn = $width - $bw; $gapn = 0 if $gapn < 0;
+		my $sp = ' ' x $gapn;
+		my $painted = $paint->($bytes, $type);
+		return $right ? $sp . $painted : $painted . $sp;
 	};
 
 	my @out;
-	my $shown = scalar @rows_s;
-	push @out, sprintf("# %s: %d row%s x %d col%s  (showing %d)",
-		$kind, $total, ($total == 1 ? '' : 's'),
-		scalar(@cols), (@cols == 1 ? '' : 's'), $shown);
-
-	my @hcells = ( $pad->($lab_header, $lab_w, 0) );
-	push @hcells, $pad->($head_s[$_], $w[$_], $numeric[$_]) for 0 .. $#cols;
+	my $shown = scalar @row_cell;
+	push @out, $paint->(
+		sprintf("# %s: %d row%s x %d col%s	(showing %d)",
+			$kind, $total, ($total == 1 ? '' : 's'),
+			scalar(@cols), (@cols == 1 ? '' : 's'), $shown),
+		'caller_info');
+	my @hcells = ( $field->($lh_b, $lh_w, $lab_w, 0, 'hash') );
+	push @hcells, $field->($head_cell[$_][0], $head_cell[$_][1], $w[$_], $numeric[$_], 'hash') for 0 .. $#cols;
 	push @out, join($gap, @hcells);
-
-	for my $ri (0 .. $#rows_s) {
-		my @cells = ( $pad->($lab_s[$ri], $lab_w, $lab_numeric) );
-		push @cells, $pad->($rows_s[$ri][$_], $w[$_], $numeric[$_]) for 0 .. $#cols;
+	for my $ri (0 .. $#row_cell) {
+		my @cells = ( $field->($lab_cell[$ri][0], $lab_cell[$ri][1], $lab_w, $lab_numeric, $lab_cell[$ri][2]) );
+		push @cells, $field->($row_cell[$ri][$_][0], $row_cell[$ri][$_][1], $w[$_], $numeric[$_], $row_cell[$ri][$_][2]) for 0 .. $#cols;
 		push @out, join($gap, @cells);
 	}
-	push @out, sprintf("# ... %d more row%s", $total - $shown,
-		($total - $shown == 1 ? '' : 's')) if $shown < $total;
+	push @out, $paint->(
+		sprintf("# ... %d more row%s", $total - $shown, ($total - $shown == 1 ? '' : 's')),
+		'caller_info') if $shown < $total;
 
 	my $str = join("\n", @out) . "\n";
 	unless ($quiet) { defined $fh ? print {$fh} $str : print $str; }
 	return $str;
 }
-
 1;
 =encoding utf8
 
@@ -727,6 +1127,140 @@ A row that is B<not> a hash ref is skipped rather than fatal: it contributes C<u
 
 The output column order follows hash iteration order and is therefore not guaranteed — sort the keys if you need a stable layout. Round-tripping through C<hoa2aoh> (or the reverse) reconstructs the data but not necessarily the original key/row ordering, and rows originally absent a key will gain it as an explicit C<undef>.
 
+=head2 C<aoh2hoh>
+
+Index an B<A>rray-B<o>f-B<H>ashes into a B<H>ash-B<o>f-B<H>ashes, keyed by the value of one column.
+
+ my $hoh = aoh2hoh($aoh, $key);
+
+Where C<aoh2hoa> I<transposes> rows into columns, C<aoh2hoh> I<indexes> rows by a chosen field, turning a sequential list into a lookup table. The chosen field is treated as a B<primary key>: it must be unique across the rows, and a repeat is fatal.
+
+=head3 Signature
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>Argument</th>
+  <th>Type</th>
+  <th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>$aoh</code></td>
+  <td>arrayref</td>
+  <td>The rows: an arrayref of hashrefs.</td>
+</tr>
+<tr>
+  <td><code>$key</code></td>
+  <td>scalar</td>
+  <td>The column name whose value indexes each row.</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+Returns a hashref. Each top-level key is a row's C<< $row-E<gt>{$key} >> value; each value is a shallow copy of that row.
+
+ my $rows = [
+     { id => 'p1', kd => 12.4, chain => 'A' },
+     { id => 'p2', kd =>  3.1, chain => 'B' },
+ ];
+ 
+ my $by_id = aoh2hoh($rows, 'id');
+ # {
+ #   p1 => { id => 'p1', kd => 12.4, chain => 'A' },
+ #   p2 => { id => 'p2', kd =>  3.1, chain => 'B' },
+ # }
+ 
+ $by_id->{p2}{kd};   # 3.1 -- O(1) lookup instead of a linear scan
+
+=head3 Semantics
+
+These choices are the parts most worth keeping in mind, because the AoH->HoH mapping is ambiguous where a transpose is not.
+
+B<Duplicate keys are fatal.> If two rows share the same key value, the call dies rather than silently dropping a row:
+
+ aoh2hoh([ { id => 'a', x => 1 }, { id => 'a', x => 9 } ], 'id');
+ # dies: aoh2hoh: duplicate key 'a' has >= 2 occurrences
+
+This makes the chosen column an enforced primary key: the result is only returned if every row maps to a distinct bucket. If your data legitimately has repeats and you want to I<keep> them, you want a hash-of-arrays-of-rows instead -- a different return shape. If you want last-wins or first-wins collapse, dedup the input before calling.
+
+B<The key column is retained> inside each inner hash (the copy is of the whole row). Drop it deliberately if you don't want the redundancy.
+
+B<Shallow copy.> Inner hashes are fresh, so adding or removing keys on the output never touches the input. But a I<value> that is itself a reference is shared, exactly like C<< $out{$rk}{$_} = $row-E<gt>{$_} >>:
+
+ my $shared = [ 1, 2, 3 ];
+ my $out = aoh2hoh([ { id => 'a', data => $shared } ], 'id');
+ push @{ $out->{a}{data} }, 4;   # $shared now has 4 elements too
+
+A row that is not a hashref, or that lacks a defined value at C<$key>, is fatal.
+
+B<Numeric vs string keys collide.> Hash keys are strings, so C<1> and C<"1"> map to the same bucket and therefore trip the duplicate-key die. Normalize the key column first if a row could carry both forms.
+
+=head3 Use cases
+
+B<Join / enrichment lookups.> Build an index once, then attach fields from one dataset onto another by shared id without an O(n*m) nested loop -- and the duplicate-key die guarantees the join side really is keyed uniquely:
+
+ my $meta = aoh2hoh($pdb_metadata, 'pdb_id');
+ for my $hit (@$results) {
+     $hit->{resolution} = $meta->{ $hit->{pdb_id} }{resolution};
+ }
+
+B<Primary-key validation.> Because a repeat is fatal, the call doubles as an assertion that a column is unique -- a cheap way to catch a malformed table (duplicate accession, duplicate peptide id) at load time rather than downstream.
+
+B<Random-access reshaping of tabular data.> After parsing a CSV/TSV into an array of row-hashes, re-index by a primary key so downstream code can fetch a row by name rather than scanning. Pairs naturally with the CSV-parsing side of the toolkit.
+
+B<Set membership and difference.> C<< exists $hoh-E<gt>{$k} >> gives a cheap presence test, useful for asking which ids in one table are missing from another.
+
+=head3 Relationship to C<aoh2hoa>
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>Function</th>
+  <th>Output shape</th>
+  <th>Indexed by</th>
+  <th>Typical question it answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>aoh2hoa</code></td>
+  <td>hash of arrayrefs</td>
+  <td>column name</td>
+  <td>"give me every value in column X"</td>
+</tr>
+<tr>
+  <td><code>aoh2hoh</code></td>
+  <td>hash of hashrefs</td>
+  <td>a row's key val</td>
+  <td>"give me the whole row whose id is Y"</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+Reach for C<aoh2hoa> when you want columns (vectors to feed a statistic or a plot); reach for C<aoh2hoh> when you want addressable rows keyed by a unique field.
+
+=head3 Implementation note
+
+The operation is a single pass over the rows with one hash insert per row -- the same asymptotics in pure Perl as in XS, and Perl's hash operations are already C underneath. There is no meaningful speed or memory advantage to an XS implementation here, so pure Perl is preferred unless it must live in the same C<.xs> for packaging parity. The duplicate check is a single C<exists> per row and does not change that. (An XS version would C<croak> on the duplicate before allocating the second copy, so there is no extra cleanup to manage.)
+
 =head2 aov
 
 Warning: assumes normal distribution
@@ -875,6 +1409,73 @@ is the equivalent of:
  summary(anova_model)
 
 in R
+
+=head2 assign
+
+Add new columns to a data frame, computed from the columns already there.
+
+=head3 Usage
+
+ assign($df, new_name => sub { ... }, another => sub { ... }, ...);
+
+=over
+
+=item * B<< C<$df> >> — your data frame, in either shape:
+
+=over
+
+=item * B<AoH> — arrayref of row hashrefs: C<< [ {weight=E<gt>70, height=E<gt>1.75}, ... ] >>
+
+=item * B<HoA> — hashref of column arrayrefs: C<< { weight=E<gt>[70,...], height=E<gt>[1.75,...] } >>
+
+=back
+
+=item * B<< C<< new_name =E<gt> sub { ... } >> >> — one or more pairs. Each sub computes one cell of the new column and is called once per row:
+
+=over
+
+=item * C<$_> is the current row as a hashref, so you read other columns with C<< $_-E<gt>{colname} >>.
+
+=item * C<$_[1]> is the row's index (0-based), if you need it.
+
+=item * whatever the sub returns becomes the cell value.
+
+=back
+
+=back
+
+It changes C<$df> in place and also returns it (handy for chaining).
+
+=head3 Example
+
+ my $df = [
+     { weight => 70, height => 1.75 },
+     { weight => 90, height => 1.80 },
+ ];
+ assign($df, bmi => sub { $_->{weight} / $_->{height} ** 2 });
+ 
+ # $df is now:
+ # [ { weight=>70, height=>1.75, bmi=>22.86 },
+ #   { weight=>90, height=>1.80, bmi=>27.78 } ]
+
+=head3 Good to know
+
+=over
+
+=item * B<Pairs run in order>, so a later column can use one you just made:
+
+assign($df,
+  bmi   => sub { $I<< ->{weight} / $ >>->{height} ** 2 },
+  class => sub { $_->{bmi} > 25 ? 'high' : 'ok' },   # uses bmi
+);
+
+=item * B<Same recipe, both shapes.> The exact same C<< sub { $_-E<gt>{weight} / ... } >> works whether C<$df> is AoH or HoA; you always read the row through C<$_>.
+
+=item * B<It modifies your data frame.> If you need to keep the original, pass a copy: C<assign(clone($df), ...)>.
+
+=item * Reusing a column name B<overwrites> that column.
+
+=back
 
 =head2 cfilter
 
@@ -1467,6 +2068,7 @@ Sort a table by a column or by a custom comparator. Works on both common Perl ta
 =over
 
 =item * B<< C<$data> >> — your table, in either shape:
+
 =over
 
 =item * B<AoH> — arrayref of hashrefs (a list of rows): C<< [ {id=E<gt>1, v=E<gt>10}, {id=E<gt>2, v=E<gt>20} ] >>
@@ -1476,6 +2078,7 @@ Sort a table by a column or by a custom comparator. Works on both common Perl ta
 =back
 
 =item * B<< C<$by> >> — I<how> to sort:
+
 =over
 
 =item * a B<column name> (string), or
@@ -1543,11 +2146,82 @@ but default mean, standard deviation, and log can be passed as parameters:
 
  $x = dnorm(0, mean => 0, sd => 2, 'log' => 0);
 
+=head2 dropna
+
+Drop missing data from a data frame, loosely modeled on pandas' C<dropna>. Works
+on all three shapes: AoH C<< [ {A=E<gt>..}, .. ] >>, HoA C<< { A=E<gt>[..], .. } >>, and
+HoH C<< { r1=E<gt>{A=E<gt>..}, .. } >>.
+
+=head3 Usage
+
+ # NA mode: drop rows that are undef in the named columns
+ dropna($df, cols => ['A', 'B']);
+ dropna($df, cols => ['A', 'B'], how => 'all');
+ # deletion mode: remove specific rows outright
+ dropna($df, rows => [2, 5]);          # indices for AoH/HoA, keys for HoH
+
+You pass B<exactly one> of C<cols> or C<rows>.
+
+=head3 C<cols> — drop rows with missing values
+
+Inspect only the named columns and drop the rows where they're undef. Columns
+you don't name are never inspected, but they stay aligned (their cell at a
+dropped row goes too). A missing key counts as undef.
+
+C<how> controls the threshold:
+
+=over
+
+=item * B<< C<'any'> >> (default) — drop a row if I<any> named column is undef there.
+
+=item * B<< C<'all'> >> — drop a row only if I<every> named column is undef there.
+
+my $df = { A => [1, 2, undef], B => [1, 2, 3], C => [undef, 2, 4] };
+dropna($df, cols => ['A', 'B']);
+
+
+=back
+
+=head1 { A => [1, 2], B => [1, 2], C => [undef, 2] }
+
+
+Index 2 is dropped because C<A> is undef there. C<C> is not consulted, so its own
+undef at index 0 doesn't trigger a drop — but index 2 is still removed from C<C>
+so every column stays the same length.
+
+=head3 C<rows> — delete specific rows
+
+Remove exactly the rows you list — no missing-value logic. Rows are 0-based
+indices for AoH and HoA, or the outer keys for HoH. Anything not present is
+ignored.
+
+ dropna({ A => [10, 20, 30] }, rows => [1]);   # { A => [10, 30] }
+
+=head3 Good to know
+
+=over
+
+=item * B<Returns a new data frame; the original is never modified.> For HoA the
+column arrays are rebuilt (cell values copied); for AoH and HoH the surviving
+row references are reused, not deep-copied (dropna never mutates a row). Clone
+the result if you need full independence.
+
+=item * B<It dies> on: a non-ref data frame; passing both or neither of C<cols>/C<rows>;
+a non-arrayref selector; a C<cols> name absent from a non-empty HoA or AoH; an
+invalid C<how>; an unknown argument; or a hashref that mixes array and hash
+values (ambiguous HoA vs HoH).
+
+=item * An empty AoH or HoA returns empty rather than erroring.
+
+=item * HoH results come back in hash order, since HoH rows are unordered.
+
+=back
+
 =head2 filter
 
 Return a new data frame containing only the rows of C<$df> that match a predicate. The original C<$df> is never modified.
 
- my $df2 = filter($df, col('column.name') > 4);
+ my $adults = filter($df, col('age') >= 18);
 
 C<filter> accepts a predicate in one of two forms:
 
@@ -1579,12 +2253,18 @@ Both C<filter> and C<col> are exported by default.
 <tr>
   <td>1</td>
   <td><code>$df</code></td>
-  <td>The data frame to filter. Either an <b>array of hashes</b> (AoH — e.g. the default output of <code>read_table</code>) or a <b>hash of arrays</b> (HoA).</td>
+  <td>The data frame: an <b>array of hashes</b> (AoH, the default <code>read_table</code> output), a <b>hash of arrays</b> (HoA), or a <b>hash of hashes</b> (HoH, e.g. <code>read_table</code> with <code>'output.type' => 'hoh'</code>).</td>
 </tr>
 <tr>
   <td>2</td>
   <td>predicate</td>
-  <td>Either a <code>col()</code> comparison object or a <code>CODE</code> reference.</td>
+  <td>A <code>col()</code> comparison object <b>or</b> a <code>CODE</code> reference.</td>
+</tr>
+<tr>
+  <td>3 +</td>
+  <td>`'output.type' => 'aoh'\</td>
+  <td>'hoa'`</td>
+  <td><i>Optional.</i> The shape of the returned frame. Omit it to keep the input's own shape. <code>'out'</code> and <code>'output_type'</code> are accepted aliases, and a bare <code>filter($df, $pred, 'aoh')</code> also works.</td>
 </tr>
 </tbody>
 </table>
@@ -1593,17 +2273,13 @@ Both C<filter> and C<col> are exported by default.
 
 
 
-The return value is a B<new> data frame of the B<same shape> as the input (AoH in → AoH out, HoA in → HoA out). For an HoA, every column is filtered in parallel by row index, so all returned columns stay the same length and aligned.
-
 =head3 The C<col()> form
 
-C<col('name')> is a deferred reference to a column. It carries no data — only the column name — so it can be compared with a literal (or another value) to build a predicate that C<filter> evaluates once per row.
+C<col('name')> is a deferred reference to a column. It carries no data — only the column name — so it can be compared with a literal to build a predicate that C<filter> evaluates once per row.
 
  filter($df, col('age') >= 18);  # keep rows where age >= 18
  filter($df, col('sex') eq 'f'); # keep rows where sex is 'f'
  filter($df, 18 <= col('age'));  # operands may be in either order
-
-=head3 Comparison operators
 
 
 
@@ -1621,12 +2297,12 @@ C<col('name')> is a deferred reference to a column. It carries no data — only 
 <tr>
   <td>Numeric</td>
   <td><code>></code> <code><</code> <code>>=</code> <code><=</code> <code>==</code> <code>!=</code></td>
-  <td>numeric (the cell and the value are compared as numbers)</td>
+  <td>numeric (cell and value compared as numbers)</td>
 </tr>
 <tr>
   <td>String</td>
   <td><code>gt</code> <code>lt</code> <code>ge</code> <code>le</code> <code>eq</code> <code>ne</code></td>
-  <td>string (the cell and the value are compared as strings)</td>
+  <td>string (cell and value compared as strings)</td>
 </tr>
 </tbody>
 </table>
@@ -1634,10 +2310,6 @@ C<col('name')> is a deferred reference to a column. It carries no data — only 
 =end html
 
 
-
-C<col('x')> may appear on either side of the operator; C<< 4 E<lt> col('x') >> is automatically rewritten to the equivalent C<< col('x') E<gt> 4 >>.
-
-=head3 Combining predicates: C<&>, C<|>, C<!>
 
 Predicates compose with bitwise C<&> (and), C<|> (or), and C<!> (not):
 
@@ -1647,30 +2319,48 @@ Predicates compose with bitwise C<&> (and), C<|> (or), and C<!> (not):
 
 Comparison operators bind more tightly than C<&> and C<|>, so C<< (col('a') E<gt> 4) & (col('b') E<lt> 2) >> is parsed correctly, but the parentheses are recommended for readability.
 
+ > Note: C<< col('age') E<gt> 32 >> works because C<col('age')> is an object whose C<< E<gt> >> is overloaded. A B<bare string> cannot do this — C<< 'age' E<gt> 32 >> is computed by Perl to a plain boolean (the string numifies to 0) before C<filter> is ever called, so the column name is lost. Always wrap the column in C<col(...)>.
+
 =head3 The code-reference form
 
 For logic the operators can't express, pass a C<sub>. It is called once per row; the B<row is a hash reference>, available both as C<$_> and as the first argument C<$_[0]>. Return a true value to keep the row.
 
  filter($df, sub { $_->{x} > 4 && $_->{grp} eq 'a' });
  filter($df, sub { $_->{name} =~ /^A/ });
+ filter($df, sub { $_->{age} % 2 == 0 });            # things col() has no operator for
  filter($df, sub { $_[0]{score} > $_[0]{threshold} });
 
-For an HoA, each row is assembled into a temporary hash reference (C<< { column =E<gt> value, ... } >>) before the sub is called, so the same C<< $_-E<gt>{column} >> syntax works regardless of the input shape.
+For a HoA, each row is assembled into a temporary C<< { column =E<gt> value, ... } >> hash before the sub (or the C<col()> test) is called, so the same C<< $_-E<gt>{column} >> syntax works regardless of the input shape.
+
+=head3 Choosing the output shape
+
+By default C<filter> returns a frame of the B<same shape> as the input (AoH → AoH, HoA → HoA, HoH → HoH). Pass C<output.type> to convert while filtering:
+
+ my $aoh = read_table('patients.csv');                          # array of hashes
+ my $hoa = filter($aoh, col('Age') >= 18, 'output.type' => 'hoa');
+ # $hoa->{Age}, $hoa->{Sex}, ... are all the same length and row-aligned
+
+The two selectable output types are C<'aoh'> and C<'hoa'>. C<'hoh'> is B<not> selectable, because producing a hash of hashes would require choosing which column becomes the row key; an HoH input keeps its keys only when the output shape is left at the default (HoH → HoH).
 
 =head3 Examples
 
  use Stats::LikeR;
  my $df = read_table('patients.csv');                 # array of hashes
- # numeric threshold
- my $adults = filter($df, col('Age') >= 18);
- # combine conditions
- my $target = filter($df, (col('Age') >= 18) & (col('Sex') eq 'f'));
- # arbitrary logic with a coderef
- my $flagged = filter($df, sub { $_->{ALT} > 40 || $_->{AST} > 40 });
- # hash-of-arrays input -> hash-of-arrays output, columns filtered in parallel
+ 
+ my $adults = filter($df, col('Age') >= 18);          # numeric threshold
+ my $target = filter($df, (col('Age') >= 18) & (col('Sex') eq 'f'));   # combine
+ my $flagged = filter($df, sub { $_->{ALT} > 40 || $_->{AST} > 40 });  # coderef
+ 
+ # hash of arrays in -> hash of arrays out (columns filtered in parallel)
  my $hoa = read_table('patients.csv', 'output.type' => 'hoa');
  my $sub = filter($hoa, col('Age') > 32);
- # $sub->{Age}, $sub->{Sex}, ... are all the same length and row-aligned
+ 
+ # hash of hashes in -> the same row keys, fewer of them
+ my $hoh = read_table('patients.csv', 'output.type' => 'hoh');
+ my $keep = filter($hoh, col('Age') > 32);
+ 
+ # convert shape while filtering
+ my $as_hoa = filter($df, col('Age') > 32, 'output.type' => 'hoa');
 
 =head3 Behavior and notes
 
@@ -1678,15 +2368,15 @@ For an HoA, each row is assembled into a temporary hash reference (C<< { column 
 
 =item * B<The input is never modified.> C<filter> builds and returns a new frame; C<$df> is left untouched.
 
-=item * B<< A missing or C<undef> cell never matches >> a C<col()> comparison. For example C<< col('x') E<gt> 0 >> silently drops any row that has no C<x> value or whose C<x> is C<undef>.
+=item * B<< A missing or C<undef> cell never matches a C<col()> comparison. >> C<< col('x') E<gt> 0 >> silently drops any row whose C<x> is absent or C<undef>; for numeric operators a non-numeric cell is likewise dropped. With a coderef, C<undef> is whatever your sub makes of it.
 
-=item * B<AoH rows are shared, not deep-copied>, into the returned frame: the returned array references the I<same> row hashes as the input (fast, low-memory). Mutating a row in the result would therefore also change it in the original. HoA values are copied into fresh arrays.
+=item * B<Rows are shared, not deep-copied, wherever possible.> When an AoH or HoH row is kept (output left as AoH/HoH, or converted to C<aoh>), the returned frame references the I<same> inner row hashes as the input. Mutating such a row in the result would also change it in the original. HoA inputs and any C<hoa> output build fresh arrays and fresh cell values.
 
-=item * B<Keep-all / keep-none> are well defined: a predicate true for every row returns a copy-shaped frame with all rows; a predicate true for none returns an empty frame (C<[]> for AoH, a hash of empty arrays for HoA).
+=item * B<Keep-all / keep-none are well defined.> A predicate true for every row returns the whole frame in the chosen shape; true for none returns an empty frame: C<[]> for C<aoh>, a hash of empty (but present) columns for C<hoa>, and C<{}> for C<hoh>.
 
-=item * B<Supported shapes are AoH and HoA.> Passing a non-reference, an array element that is not a hash reference, or an HoA column that is not an array reference raises a descriptive error.
+=item * B<Supported shapes are AoH, HoA, and HoH.> A non-reference, an AoH element that is not a hash reference, a HoA column that is not an array reference, or a HoH row that is not a hash reference all raise a descriptive error; a bare C<col('x')> with no comparison is also an error. An empty hash C<{}> is treated as an empty frame.
 
-=item * B<Perl 5.10 compatible.> The C<col()>/operator layer is pure Perl (operator overloading); the per-row evaluation is done in XS.
+=item * B<Perl 5.10 compatible.> The C<col()>/operator layer is pure Perl (operator overloading building a per-row closure); filtering and any reshaping run in XS.
 
 =back
 
@@ -1978,6 +2668,60 @@ Data can be further broken down with filter/subs like in C<read_table>:
 
 where each filter filters on the columns, e.g. second hash keys.
 
+=head2 hoa2aoh
+
+Turn a hash-of-arrays into an array-of-hashes.
+
+=head3 Usage
+
+ my $aoh = hoa2aoh($hoa);
+
+=over
+
+=item * B<< C<$hoa> >> — a hashref whose values are arrayrefs, one per column:
+
+{ id => [1, 2, 3], name => ['a', 'b', 'c'] }
+
+=item * B<returns> — an arrayref of row hashrefs:
+
+[
+    { id => 1, name => 'a' },
+    { id => 2, name => 'b' },
+    { id => 3, name => 'c' }
+]
+
+=back
+
+It builds a brand-new structure and copies every cell, so the result is
+completely independent of the input — changing one never affects the other.
+
+=head3 Example
+
+ my $hoa = { mpg => [21, 22.8, 18.1], cyl => [6, 4, 6] };
+ my $aoh = hoa2aoh($hoa);
+ $aoh->[1]{mpg};        # 22.8
+ $hoa->{mpg}[1];        # still 22.8 — unaffected by edits to $aoh
+
+=head3 Good to know
+
+=over
+
+=item * B<Row count> is the length of the longest column. If columns have different
+lengths, the short ones are padded with C<undef> in the missing rows.
+
+=item * B<< C<undef> cells >> are kept as C<undef>.
+
+=item * An B<empty hash>, or one whose columns are all empty, gives back C<[]>.
+
+=item * It B<dies> if the argument isn't a hashref, or if any column value isn't an
+arrayref (the message names the offending column).
+
+=back
+
+=head3 See also
+
+C<hoa2aoh> is the reverse of C<aoh2hoa>
+
 =head2 hoh2hoa
 
 Convert a B<hash of hashes> (row-major: outer key = row, inner key = column)
@@ -2100,6 +2844,46 @@ Computes the histogram of the given data values, operating in single $O(N)$ pass
  my $res = hist([1, 2, 2, 3, 3, 3, 4, 4, 5], breaks => 4);
 
 If C<breaks> is not explicitly provided, it defaults to calculating the number of bins using Sturges' formula.
+
+=head2 intersection
+
+Returns the set intersection (∩) of a list of array references: the values
+that appear in B<every> array ref given.
+
+ use Stats::LikeR;
+ 
+ my @i = intersection([1, 2, 3], [2, 3, 4]);          # (2, 3)
+ my @t = intersection([1, 2, 3, 4], [2, 3, 4], [3, 4]); # (3, 4)
+ my $n = intersection([1, 2, 3], [2, 3, 4]);          # 2
+
+Every argument must be an array reference — each one is treated as a set.
+Unlike C<mean> and C<uniq>, bare scalars are not accepted; passing a non-reference
+(or a non-array reference) croaks.
+
+The result is B<deduplicated> and ordered by first appearance in the I<first>
+array ref. Duplicate values within any single ref are counted once, so
+C<intersection([1, 2, 2, 3], [2, 3, 3, 4])> is C<(2, 3)>, not C<(2, 2, 3)>.
+
+Values are compared by stringification — the same C<eq> semantics used by
+C<uniq>. C<1>, C<1.0>, and C<"1"> are treated as equal, while C<"3"> and C<"3.0">
+are distinct. The UTF-8 flag is part of the comparison key, so a UTF-8 string
+and a byte-identical non-UTF-8 string are kept separate.
+
+In list context C<intersection> returns the shared values; in scalar context it
+returns the cardinality (the number of shared values).
+
+With a single array ref, the result is simply that ref's unique values. If any
+ref is empty, the intersection is empty.
+
+C<intersection> croaks on degenerate or ill-formed input, reporting the
+offending position:
+
+ intersection();              # croaks: intersection needs >= 1 array ref
+ intersection([1, 2], 3);     # croaks: argument 1 is not an array ref
+ intersection([1, undef, 3]); # croaks: undefined value at array ref index 1 (argument 0)
+
+This matches the undef-handling of C<mean> and C<uniq> and the rest of the
+numeric reducers in Stats::LikeR.
 
 =head2 kruskal_test
 
@@ -2799,6 +3583,80 @@ which returns
  my $hoa = { B => [4, 2, 6], A => [2, 4, 6] };
  my $pca = prcomp($hoa);
 
+=head2 predict
+
+R-style prediction for the fitted objects returned by C<lm> and C<glm>. It rebuilds
+each row's linear predictor from the model's coefficients and (for C<glm>) applies
+the inverse link.
+
+=head3 Usage
+
+ my $fit  = lm(formula => 'mpg ~ wt + hp', data => $train);
+ my $yhat = predict($fit, $newdata);              # predictions on new rows
+ my $resp = predict($logit_fit, $newdata);        # glm: response scale (default)
+ my $eta  = predict($logit_fit, $newdata, type => 'link');   # linear predictor
+ my $fitted = predict($fit);                      # no newdata -> stored fitted.values
+
+=over
+
+=item * B<< C<$model> >> — a fitted C<lm>/C<glm> hashref. C<predict> reads its C<coefficients>
+(and, for C<glm>, its C<family>).
+
+=item * B<< C<$newdata> >> — a HoA, AoH, or HoH of new observations. Omit it (or pass
+C<undef>) to get the model's own C<fitted.values> back.
+
+=item * B<< C<type> >> — C<'response'> (default) returns predictions on the response scale
+(the inverse link applied — logistic for binomial); C<'link'> returns the linear
+predictor. For C<lm> and gaussian C<glm> the link is the identity, so the two are
+the same.
+
+=back
+
+=head3 What it returns
+
+A hashref keyed by row name → prediction, exactly like C<lm>/C<glm> key
+C<fitted.values>: a C<row.names> column (or HoH key) if present, otherwise 1-based
+integer labels.
+
+ my $m = lm(formula => 'y ~ x + I(x^2)', data => $train);
+ my $p = predict($m, { x => [1, 2, 3] });
+ # { 1 => ..., 2 => ..., 3 => ... }
+
+=head3 How it works
+
+For each new row the prediction is
+
+ eta = Intercept + Σ  coef[term] · term(row)
+
+where each C<term> is evaluated with the same engine used to fit the model, so
+interactions (C<x:z> → product) and transforms (C<I(x^2)> → power) behave
+identically to fitting. Coefficients that the fit marked aliased (stored as NaN)
+contribute nothing, just as they were excluded from the fitted values. For C<glm>
+with C<< family =E<gt> 'binomial' >> and C<< type =E<gt> 'response' >>, C<eta> is passed through the
+logistic function C<1 / (1 + exp(-eta))>; otherwise C<eta> is returned as is.
+
+A consequence worth noting: predicting on the I<training> data reproduces the
+model's C<fitted.values> for any model built from continuous terms, interactions,
+or C<I()> transforms.
+
+=head3 Good to know
+
+=over
+
+=item * A prediction comes back as B<NaN> when a required term can't be evaluated in
+the new data (a missing column, or a value that makes the term undefined).
+
+=item * B<Factors are a limitation.> The fitted object stores only the dummy term
+I<names> (e.g. C<genderM>), not the underlying factor levels, so C<predict>
+cannot re-expand a raw categorical column in new data. Either pass pre-expanded
+0/1 dummy columns whose names match the coefficient names, or extend C<lm>/C<glm>
+to retain the factor levels.
+
+=item * B<It dies> on: a model that isn't a hashref or has no C<coefficients>; an
+invalid C<type>; or C<newdata> that isn't a HoA/HoH hashref or AoH arrayref.
+
+=back
+
 =head2 quantile
 
 Calculates sample quantiles using R's continuous Type 7 interpolation. 
@@ -3034,6 +3892,7 @@ An option C<nrows> or its synonym C<nrow> specifies the maximum number of rows t
 and then C<summary(\@arr)>, or C<summary(@arr)>
 
  ---------------------------------------------------------------------------
+ 
  Index  # values      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
  ---------------------------------------------------------------------------
       0       22   0.04312     0.286    0.4975    0.5121    0.7296    0.9633 
@@ -3242,6 +4101,123 @@ An empty outer hash or an outer hash whose inner hashes are all empty both retur
 
 Dies if any inner element is not a hash reference
 
+=head2 uniq
+
+Returns the distinct values of its arguments, in first-seen order.
+
+ use Stats::LikeR;
+ 
+ my @u = uniq(1, 2, 2, 3, 1);         # (1, 2, 3)
+ my @s = uniq(qw/a b a c/);           # ('a', 'b', 'c')
+ my @f = uniq(1, [2, 2, 3], [3, 4]);  # (1, 2, 3, 4)
+ my $n = uniq(1, 2, 2, 3, 1);         # 3
+
+C<uniq> accepts a flat list of scalars, array references, or any mix of the
+two. Array references are expanded B<one level> — their elements are treated
+as additional arguments, but nested array references are not recursed into and
+are compared as opaque values.
+
+Values are compared by stringification, the same C<eq> semantics used by
+C<List::Util::uniq>: C<1>, C<1.0>, and C<"1"> all collapse to a single result, and
+the first value seen is the one returned (as a fresh copy, never an alias to
+the input). Order of first appearance is preserved.
+
+In list context C<uniq> returns the distinct values. In scalar context it
+returns the I<count> of distinct values, matching C<List::Util::uniq>.
+
+The UTF-8 flag is part of the comparison key, so a UTF-8 string and a
+byte-identical non-UTF-8 string are kept distinct — they are different strings.
+Strings that are logically equal and consistently encoded collapse as expected.
+
+Unlike C<List::Util::uniq>, which passes a single C<undef> through, C<uniq>
+B<croaks> on any undefined value, reporting the offending argument index (and
+the array-ref index, when the undef came from inside a reference):
+
+ uniq(1, undef, 3);     # croaks: undefined value at argument index 1
+ uniq([1, undef, 3]);   # croaks: undefined value at array ref index 1 (argument 0)
+
+This matches the undef-handling of C<mean> and the other functions in Stats::LikeR.
+
+=head2 vals
+
+Extract a single column from a data frame as a flat array reference, similar to pandas' C<to_list>
+
+ my $ages = vals($df, 'age');
+
+C<vals> accepts all three data-frame shapes and always returns a new arrayref of that column's values:
+
+=over
+
+=item * B<AoH> (array of hashes) -- one value per row, in row order.
+
+=item * B<HoA> (hash of arrays) -- the named column array, copied.
+
+=item * B<HoH> (hash of hashes) -- one value per row, in B<ascending key order> (a HoH has no inherent row order, so keys are sorted as strings).
+
+=back
+
+=head3 Arguments
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>Position</th>
+  <th>Name</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1</td>
+  <td><code>$df</code></td>
+  <td>An AoH (arrayref), or a HoA/HoH (hashref). The shape is auto-detected by peeking the first hash value: a hashref value means HoH, otherwise HoA.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>$col</code></td>
+  <td>The column name (must be defined).</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+=head3 Behavior and notes
+
+=over
+
+=item * B<The result is a copy.> Every value is duplicated, so mutating the returned array never touches C<$df>, and C<undef> slots are ordinary writable scalars.
+
+=item * B<< A missing cell is C<undef>. >> For AoH and HoH, a row that lacks the column (or isn't a hashref) yields C<undef> for that row.
+
+=item * B<An absent column is strict only for HoA.> Because a HoA column I<is> the structure, asking for a column the hash doesn't have dies. For AoH/HoH the column is per-row, so an entirely-absent column simply yields all-C<undef> (it is not an error). This asymmetry is deliberate; pass the column name carefully for AoH/HoH, since a typo returns C<undef>s rather than dying.
+
+=item * B<< Empty frames return C<[]> >> -- an empty AoH or an empty hash both give a clean empty arrayref.
+
+=item * UTF-8 column names and HoH keys are handled correctly (lookups use the key SV; HoH keys sort by Perl string order).
+
+=back
+
+=head3 Examples
+
+ my $aoh = read_table('patients.csv');                 # array of hashes
+ my $age = vals($aoh, 'Age');                           # [ 34, 51, ... ]
+ 
+ my $hoa = read_table('patients.csv', 'output.type' => 'hoa');
+ my $sex = vals($hoa, 'Sex');                           # copy of the Sex column
+ 
+ my $hoh = read_table('patients.csv', 'output.type' => 'hoh');
+ my $age2 = vals($hoh, 'Age');                          # values in sorted row-key order
+ 
+ # feed straight into the numeric routines
+ my $m = mean( vals($aoh, 'Age') );
+
 =head2 value_counts
 
 Count the values in a given data set, return a hash reference showing how many times each particular value is present.
@@ -3264,6 +4240,24 @@ returns C<< { a =E<gt> 1, b =E<gt> 2} >>
 
 like an array reference above, returns C<< { a =E<gt> 1, b =E<gt> 2} >>
 
+=head3 Array of hashes
+
+ my @records = (
+     { name => 'Alice', dept => 'Sales' },
+     { name => 'Bob',   dept => 'Eng'   },
+     { name => 'Carol', dept => 'Sales' },
+ );
+ my $vc = value_counts(\@records, 'dept');
+
+with a key, the value at that key is counted in each hash, so the above returns C<< { Sales =E<gt> 2, Eng =E<gt> 1 } >>. A record that lacks the key is skipped. Passing an array of hashes without a key, or with an element that is not a hash reference, is a fatal error.
+
+=head3 Array of arrays
+
+ my @rows = (['a', 1], ['b', 1], ['a', 2]);
+ my $vc = value_counts(\@rows, 0);
+
+when the elements are array references, the key is treated as a numeric column index, so the above returns C<< { a =E<gt> 2, b =E<gt> 1 } >>. A non-numeric index against array-reference elements is a fatal error.
+
 =head3 Hash
 
  my $value_counts = value_counts( { A => 'a', B => 'a', C => 'b' } );
@@ -3275,7 +4269,6 @@ returns C<< { a =E<gt> 2, b =E<gt> 1} >>
  my $value_counts = value_counts({ 'a' => ['j', 't', 't'], 'b' => ['j', 't', 'v']});
 
 without a key (like above), the occurences of C<j>, C<t>, and C<v> are counted.
-
 With a key, like C<a> for above, only values within that hash key are counted:
 
  my $vc = value_counts({ 'a' => ['j', 't', 't'], 'b' => ['j', 't', 'v']}, 'a');
@@ -3296,6 +4289,8 @@ With a key, like C<a> for above, only values within that hash key are counted:
  }, 'a');
 
 the column, or second hash key, that you wish to count, is specified at the command line
+
+The two new subsections (Array of hashes, Array of arrays) are the only additions; everything else is unchanged. They're placed after the array-container forms to keep array inputs grouped, mirroring how Hash of array / Hash of hash sit together. If you'd rather I drop this into a C<.md> file or fold it into POD (C<=head3> headers, C<< CE<lt>E<gt> >> for the inline code) for the actual module docs, say the word.
 
 =head2 var
 
@@ -3685,6 +4680,267 @@ Args can also be accepted:
  write_table( 'data' => \%flat, 'file' => $f );
 
 =head1 changes
+
+=head2 0.18
+
+C<restrict> keyword added to numerous places within C<intersection> to decrease CPU time
+
+fix to dist.ini for dependencies
+
+fixed POD rendering
+
+=head2 0.17
+
+addition of C<assign>, which adds new columns based on calculations from other columns
+
+addition of C<hoa2aoh>, transforming hash of arrays to array of hashes
+
+addition of C<predict>, using results from C<aov>, C<glm>, and C<lm>
+
+addition of C<aoh2hoh> transforming array of hash into hash of hashes, C<intersection>, C<uniq>, and C<vals>
+
+=head3 C<aov>
+
+=head4 Bug fixes
+
+=over
+
+=item * B<< C<size_t> underflow on empty arrays. >> Three loops were bounded by C<av_len(...)>
+compared against an unsigned counter; C<av_len> returns C<-1> for an empty array,
+which turned C<< k E<lt>= len >> into a C<SIZE_MAX> loop. The C<stack()> value loop, the C<.>
+column-expansion loop, and the C<group_stats> column loop now use a signed
+C<SSize_t> bound.
+
+=item * B<HoH row count.> Row count for hash-of-hashes input was taken from the return
+value of C<hv_iterinit>; it now uses C<HvUSEDKEYS(hv)> with a separate
+C<hv_iterinit>, matching C<predict>.
+
+=item * B<Buffer overflow in interaction parsing.> C<strcpy(right, colon + 1)> into a
+fixed C<char right[256]> is now C<snprintf(right, sizeof(right), ...)>.
+
+=back
+
+=head4 Performance / memory
+
+=over
+
+=item * B<< Removed the per-row C<row_x> scratch allocation. >> Design rows are built
+directly into C<X_mat[valid_n]>; C<valid_n> simply does not advance on a rejected
+row. Interaction columns read their operands from the same in-progress row, so
+the logic is unchanged.
+
+=item * B<< C<row_names> is no longer dead. >> Surviving row names are transferred (pointer
+move, no copy) into C<surv_names> to key C<fitted.values>; rejected rows are freed
+in place.
+
+=item * B<< Dropped a C<restrict> UB. >> C<orig_data_sv> aliases C<data_sv>; the C<restrict>
+qualifier was removed.
+
+=back
+
+=head4 New, C<predict>-compatible output keys
+
+=over
+
+=item * B<< C<coefficients> >> — OLS estimates recovered by back-substitution on the R factor
+left in C<X_mat> against Q'y in C<Y> (no re-derivation). Keys are the expanded term
+names (C<Intercept>, continuous names, C<base.level> dummies, and C<a:b> interaction
+products). Aliased columns are reported as C<NaN>, which C<predict> drops.
+
+=item * B<< C<fitted.values> >> — C<Xb> over the non-aliased columns, keyed by surviving row
+name. Computed from a snapshot of the design (C<Dsav>) taken before the QR
+overwrites C<X_mat>. Costs one transient copy of the design matrix; negligible for
+typical ANOVA where the column count is small.
+
+=item * B<< C<xlevels> >> — sorted level list per factor, index 0 = reference, aligned with
+the contrast coding used to build the dummies.
+
+=item * B<< C<family> >> — C<"gaussian">.
+
+=back
+
+=head4 Cleanup-path correctness
+
+=over
+
+=item * C<xlevels_hv>, C<Dsav>, and C<surv_names> are freed on both the "0 degrees of
+freedom" croak and the normal exit. The interaction-main-effects croak in
+PHASE 3 also frees C<xlevels_hv>.
+
+=back
+
+=head4 Known limitations (unchanged)
+
+=over
+
+=item * The intercept-stripping string surgery (C<-1>, C<+0>, C<+1>, ...) operates on the
+whole RHS and can still mangle C<I(x-1)>-style transforms; treat C<I()> with
+arithmetic constants carefully.
+
+=item * Top-level keys C<coefficients> / C<fitted.values> / C<xlevels> / C<family> /
+C<group_stats> share the return hash with the ANOVA rows; a predictor literally
+named one of those would collide.
+
+=back
+
+=head3 C<predict>
+
+=head4 New: factor-bearing interaction terms
+
+Previously, interaction coefficients such as C<GroupB:Sexmale> or C<GroupB:x> fell
+through to the continuous C<evaluate_term> path and died on a nonexistent column.
+They are now handled directly:
+
+=over
+
+=item * B<< C<dummy_hv> >> stores each dummy's factor base index (an C<IV>) instead of
+C<&PL_sv_yes>, so a dummy name maps back to its C<(base, level)> in O(1)
+(C<level == name + strlen(base)>). C<hv_exists> lookups are unaffected.
+
+=item * During coefficient caching, any C<:> term with at least one factor-dummy component
+is routed to a separate list (C<icopy> / C<ibeta>); pure-continuous interactions
+(e.g. C<x:z>) stay on the existing C<evaluate_term> path, so prior behavior is
+preserved.
+
+=item * Each routed term is parsed once into flat component arrays. Factor components
+store a base index and level pointer; continuous components store the term string
+and get the same up-front column-existence validation as main terms.
+
+=item * Per row, each factor's raw level is read once into C<raw_lv[]> and reused by both
+main effects and interactions (no duplicate C<get_data_string_alloc>). An
+interaction's value is the product of its components: a factor component
+contributes C<1.0> iff the row's level matches the dummy's level (reference levels
+give C<0>), continuous components go through C<evaluate_term>.
+
+=back
+
+This covers factor×factor, factor×continuous, continuous×continuous, and n-way
+combinations.
+
+=head4 Other
+
+=over
+
+=item * HoH row count uses C<HvUSEDKEYS> (already present).
+
+=item * The unseen-factor-level croak now frees every level string already read for the
+current row, not just the current one.
+
+=back
+
+=head3 Tests
+
+=over
+
+=item * B<< C<aov.t> >> — one-way ANOVA against hand-computed values (Df / Sum Sq / Mean Sq /
+F / decomposition); identical results across HoA / HoH / AoH / stacked input;
+simple regression; C<.> expansion; intercept removal (C<-1>); two-way with
+interaction (Type I SS on a balanced design); NaN listwise deletion; all croak
+paths; leak checks.
+
+=item * B<< C<predict.t> >> — C<predict(training) == fitted.values> round-trips for one-way,
+regression, factor×factor, factor×continuous, and continuous×continuous models;
+explicit predicted values; agreement across HoA / AoH / HoH / flat newdata;
+no-newdata path; binomial C<link> vs C<response>; gaussian identity link; all croak
+paths; leak checks.
+
+=back
+
+Leak tests use C<no_leaks_ok> guarded by C<unless $INC{'Devel/Cover.pm'}> and skipped
+when C<Test::LeakTrace> is absent.
+
+=head4 Assumptions worth confirming
+
+=over
+
+=item * The NaN-deletion test relies on C<evaluate_term> returning C<NaN> for a non-finite
+response value (an C<Inf - Inf> NaN is fed in deterministically).
+
+=item * The continuous×continuous round-trip relies on C<evaluate_term("x:z")> yielding
+C<x * z> — the same assumption the pre-existing C<predict> continuous-interaction
+path already made. If that path was untested, this round-trip now exercises it.
+
+=back
+
+=head3 C<view>
+
+now returns colored output; fixed bug with incorrect widths; undefined values show as C<undef> rather than C<NA>, as in Data::Printer
+
+=head3 C<csort>
+
+now accepts Hash of Hashes; addition of C<restrict> which should decrease calculation time
+
+=head3 filter
+
+=over
+
+=item * B<Added hash-of-hashes (HoH) input.> In addition to AoH and HoA, C<filter> now accepts an HoH (C<< { key =E<gt> { col =E<gt> val, ... }, ... } >>); each inner hash is one row, and matching keys are preserved by default (HoH -> HoH).
+
+=item * B<< Added C<output.type>. >> C<< filter($df, $pred, 'output.type' =E<gt> 'aoh'|'hoa') >> selects the returned shape (aliases C<out> / C<output_type>; a bare positional type also works). When omitted, the input shape is preserved. C<hoh> is not a selectable output, since it would require choosing a key column.
+
+=item * B<< C<col()> reworked, not removed. >> Both predicate forms are kept: C<< col('age') E<gt>= 18 >> still works and is the concise/composable option, while a coderef covers everything else. Internally C<col()> is now B<pure Perl> — an overloaded class that builds a per-row closure — and C<filter> unwraps that closure so C<col()> and a coderef share one evaluation path. The previous standalone XS predicate evaluator (C<filt_eval>/C<filt_ctx>) is gone; delete it if your tree still has it. One consequence: a C<col()> comparison now costs the same per row as the equivalent coderef (a Perl call), rather than being evaluated in C.
+
+=item * B<Unchanged guarantees:> the input frame is never modified; C<undef> (and, for numeric ops, non-numeric) cells never match a C<col()> comparison; AoH/HoH rows are shared rather than copied where possible; keep-all/keep-none shapes are well defined per output type; Perl 5.10 compatibility is retained. A latent C<SvTRUE(POPs)> double-evaluation in the per-row call helper (which crashed on perls where C<SvTRUE> is a multi-eval macro) was fixed along the way.
+
+=back
+
+=head3 read_table
+
+Added an opt-in C<auto.row.names> argument so C<read_table> can read the file R
+produces by default from C<write.table(x, sep="\t")>.
+
+=head4 The problem
+
+R's C<write.table> defaults to C<row.names=TRUE, col.names=TRUE>, which writes the
+row-names column in every data row but emits B<no header label for it>. So a
+frame with N columns comes out as N header fields over N+1 data fields — e.g.
+C<mtcars> gives 11 headers but 12-field rows. By default C<read_table> (correctly)
+rejects that as ragged:
+
+ Alignment error on mtcars.tsv data row 1 (12 fields vs 11 headers).
+
+=head4 The change
+
+C<auto.row.names> turns on R's own C<read.table> rule: B<when, and only when, the
+header is exactly one field short of the data rows, treat the first field of
+each row as an (unlabelled) row-names column.>
+
+ # default: the leading column is named 'row_name'
+ my $df = read_table('mtcars.tsv', 'auto.row.names' => 1);
+ 
+ # or give it a name
+ my $df = read_table('mtcars.tsv', 'auto.row.names' => 'model');
+
+The synthesized column behaves like any other first column: it appears in C<aoh>
+and C<hoa> output, and for C<hoh> it becomes the default key (so rows are keyed by
+the model name). This also lines up with the existing handling of R's
+C<col.names=NA> output (a blank leading header), which still produces a
+C<row_name> column with no flag needed.
+
+=head4 What did not change
+
+The strict alignment check is still the default. Without C<auto.row.names> the
+lopsided file still croaks, and even with it, a row that is off by anything
+other than exactly one field still croaks — so the corruption guard only relaxes
+for the one case R itself treats specially.
+
+Tested in C<t/read_table.2.t> (16 assertions, Perl 5.10.1 and 5.38): aoh / hoa /
+hoh output, custom column name, the already-aligned file (flag is a no-op), the
+C<col.names=NA> path, and the strict / ragged croak paths.
+
+=head4 additional bugfix
+
+ # This is a comment
+ id,name,val
+ 1,Alice,10.5
+ 2,Bob,
+ 3,Charlie,15.2
+
+would not be read correctly using C<read_table>, but now is read correctly
+
+=head3 value_counts
+
+now accepts array of hashes
 
 =head2 0.16
 

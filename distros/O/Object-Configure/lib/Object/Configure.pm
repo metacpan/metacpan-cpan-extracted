@@ -7,18 +7,32 @@ use Carp;
 use Config::Abstraction 0.38;
 use File::Spec;
 use Log::Abstraction 0.26;
+use mro;
 use Params::Get 0.13;
+use Readonly;
 use Return::Set;
 use Scalar::Util qw(blessed weaken);
 use Time::HiRes qw(time);
 use File::stat;
+use POSIX qw(WNOHANG);
 
-# Global registry to track configured objects for hot reload
-our %_object_registry = ();
-our %_config_watchers = ();
+# Avoid magic literals scattered across hot paths and signal handlers.
+# Centralising here makes global search-replace safe and self-documents intent.
+Readonly my $OS_WINDOWS   => 'MSWin32';
+Readonly my $LOGGER_NULL  => 'NULL';
+Readonly my $SIG_DEFAULT  => 'DEFAULT';
+Readonly my $SIG_IGNORE   => 'IGNORE';
+Readonly my $POLL_SLEEP   => 0.1;   # seconds between waitpid polls in disable_hot_reload
+Readonly my $KILL_TIMEOUT => 5;     # seconds before SIGKILL escalation after SIGTERM
+
+# Global registry — intentionally package-level so that the END block and
+# signal handlers installed in one call site share state with all others.
+# This is a deliberate singleton design; see LIMITATIONS for the trade-offs.
+our %_object_registry   = ();
+our %_config_watchers   = ();
 our %_config_file_stats = ();
 
-# Keep track of the original USR1 handler for chaining
+# Saved before we install our SIGUSR1 handler so we can chain and restore it.
 our $_original_usr1_handler;
 
 =head1 NAME
@@ -27,11 +41,11 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.21
+0.23
 
 =cut
 
-our $VERSION = 0.21;
+our $VERSION = 0.23;
 
 =head1 SYNOPSIS
 
@@ -372,91 +386,86 @@ Now you can set up a configuration file and environment variables to configure y
         }
     }
 
-=head3 Formal Specification
+=head3 MESSAGES
 
-    configure: Class × Params → ConfigHash
+=over 4
 
-    Given:
-    - C: set of all class names
-    - P: set of all parameter hashes
-    - F: set of all file paths
-    - H: set of all configuration hashes
+=item * C<configure: what class do you want to configure?> -- class argument was undef or empty string. Pass the calling package name as the first argument.
 
-    State:
-    - ConfigFiles: F → H (maps file paths to configuration content)
-    - EnvVars: String → String (environment variables)
-    - InheritanceChain: C → seq C (ordered sequence of ancestor classes)
+=item * C<CLASS: FILE: OS-error> -- the config_file is not readable and no config_dirs were supplied. Check file permissions or supply config_dirs.
 
-    Pre-condition:
-    ∀ class ∈ C, params ∈ P •
-        class ≠ ∅ ∧
-        (params.config_file ≠ ∅ ⇒
-            (∃ dir ∈ params.config_dirs • readable(dir/params.config_file)) ∨
-            readable(params.config_file))
+=item * C<Warning: Can't load configuration from FILE: DETAIL> -- Config::Abstraction rejected the file. Check YAML/JSON/conf syntax.
 
-    Post-condition:
-    ∀ result ∈ H •
-        result = params ⊕
-                 (⊕ f ∈ InheritanceConfigFiles(class) • ConfigFiles(f)) ⊕
-                 (⊕ v ∈ RelevantEnvVars(class) • v) ∧
-        result.logger ∈ Log::Abstraction ∧
-        (∀ k ∈ dom params •
-            (params(k) ∈ CodeRef ∨ blessed(params(k))) ⇒ result(k) = params(k))
+=back
 
-    where ⊕ denotes hash merge with right-precedence
+=head3 PSEUDOCODE
+
+    configure(class, params):
+        croak if class is empty
+        stash coderefs/objects from params (Config::Abstraction cannot hold them)
+        if params.logger is arrayref: move to $array_logger
+        build inheritance chain via mro::get_linear_isa (base -> child, UNIVERSAL first)
+        if config_file given:
+            croak if not readable and no config_dirs
+            for each ancestor class (child -> base order): find & collect matching config file
+            add primary config file last (highest priority)
+            sort collected files base -> child
+            deep-merge each file's section into params
+        else if environment variables exist:
+            merge env vars for each ancestor then for the class itself
+        determine carp_on_warn / croak_on_error
+        build logger via _build_logger(spec, carp_on_warn)
+        store _config_file and _config_files for hot reload
+        restore stashed coderefs/objects
+        return params
 
 =cut
 
 sub configure {
-	my $class = $_[0];
-	my $params = $_[1] || {};	# Contains the defaults, the run time config will overwrite them
-	my $array;
+	my $class  = $_[0];
+	my $params = $_[1] || {};	# caller's defaults; config file values override them
+	my $array_logger;		# stash for an arrayref logger spec (Config::Abstraction rejects refs)
 
-	croak(__PACKAGE__, ': configure: what class do you want to configure?') if(!defined($class) || $class eq '');
-
-	# Stash coderefs and blessed objects EXCEPT logger (which needs special handling)
+	croak(__PACKAGE__, ': configure: what class do you want to configure?')
+		if !defined($class) || $class eq '';
 
 	# Config::Abstraction treats unknown scalar values as config file paths and will
-	# attempt to read them, which corrupts coderefs and object references.
-	# We must remove these from $params before calling configure(), then restore them
-	# afterward. The logger parameter has its own special handling below, so we skip it here.
-	# This automatic stashing means users don't need to implement the stash-delete-restore
-	# pattern in their own constructors.
+	# attempt to read them, corrupting coderefs and object references.
+	# Stash them here and restore after merging so callers never need this pattern.
 	my %stashed_values;
 	foreach my $key (keys %$params) {
-		next if $key eq 'logger';	# logger has its own special handling below
+		next if $key eq 'logger';	# logger has its own path through _build_logger
 		my $value = $params->{$key};
 		if(ref($value) eq 'CODE' || blessed($value)) {
 			$stashed_values{$key} = delete $params->{$key};
 		}
 	}
 
-	if(exists($params->{'logger'}) && (ref($params->{'logger'}) eq 'ARRAY')) {
-		$array = delete $params->{'logger'};
+	if(exists($params->{'logger'}) && ref($params->{'logger'}) eq 'ARRAY') {
+		$array_logger = delete $params->{'logger'};
 	}
 
 	my $original_class = $class;
 	$class =~ s/::/__/g;
 
-	# Store config file path for hot reload
 	my $config_file = $params->{'config_file'};
 	my $config_dirs = $params->{'config_dirs'};
 
-	# Get inheritance chain for finding ancestor config files
+	# _get_inheritance_chain returns [UNIVERSAL, ..., Base, Child] (base-first).
+	# Reversing it below gives child-first for the discovery loop; the sort
+	# that follows re-establishes base-first order for actual loading.
 	my @inheritance_chain = _get_inheritance_chain($original_class);
 
-	# Build list of config files to load (ancestor to child order)
 	my @config_files_to_load = ();
-	my %tracked_files = ();
+	my %tracked_files        = ();
 
-	if ($config_file) {
-		# Check if primary config file is readable (unless config_dirs provided)
-		if ((!$config_dirs) && (!-r $config_file)) {
+	if($config_file) {
+		# Fail early so the error message carries the OS errno string while $!
+		# is still fresh from the -r test, giving a locale-correct message.
+		if(!$config_dirs && !-r $config_file) {
 			croak("$class: ", $config_file, ": $!");
 		}
 
-		# Find config files for each class in the hierarchy
-		# Important: iterate in reverse order (base -> parent -> child)
 		foreach my $ancestor_class (reverse @inheritance_chain) {
 			my $ancestor_config_file = _find_class_config_file(
 				$ancestor_class,
@@ -464,121 +473,92 @@ sub configure {
 				$config_dirs
 			);
 
-			# Skip if this is the primary config file - it will be added at the end
-			if ($ancestor_config_file && $ancestor_config_file eq $config_file) {
-				next;
-			}
+			# Primary file is added separately at the end (highest priority)
+			next if $ancestor_config_file && $ancestor_config_file eq $config_file;
 
-			# Only add if we found a file and haven't already added it
-			if ($ancestor_config_file && -r $ancestor_config_file && !$tracked_files{$ancestor_config_file}) {
-				push @config_files_to_load, {
-					file => $ancestor_config_file,
-					class => $ancestor_class
-				};
+			if($ancestor_config_file && -r $ancestor_config_file && !$tracked_files{$ancestor_config_file}) {
+				push @config_files_to_load, { file => $ancestor_config_file, class => $ancestor_class };
 				$tracked_files{$ancestor_config_file} = 1;
-
-				# Track for hot reload
-				if (-f $ancestor_config_file) {
-					$_config_file_stats{$ancestor_config_file} = stat($ancestor_config_file);
-				}
+				$_config_file_stats{$ancestor_config_file} = stat($ancestor_config_file)
+					if -f $ancestor_config_file;
 			}
 		}
 
-		# Ensure the primary config file is included LAST (highest priority)
-		# This handles the case where the primary file doesn't match the class name pattern
-		if ($config_file && !$tracked_files{$config_file} && -r $config_file) {
-			push @config_files_to_load, {
-				file => $config_file,
-				class => $original_class
-			};
+		if($config_file && !$tracked_files{$config_file} && -r $config_file) {
+			push @config_files_to_load, { file => $config_file, class => $original_class };
 			$tracked_files{$config_file} = 1;
-
-			if (-f $config_file) {
-				$_config_file_stats{$config_file} = stat($config_file);
-			}
+			$_config_file_stats{$config_file} = stat($config_file)
+				if -f $config_file;
 		}
 
 		if(!scalar(@config_files_to_load)) {
-			# Can't find an inheritence tree
-			foreach my $dir(@{$config_dirs}) {
+			foreach my $dir (@{$config_dirs}) {
 				my $candidate = File::Spec->catfile($dir, $config_file);
 				if(-r $candidate) {
-					push @config_files_to_load, {
-						file => $candidate,
-						class => $original_class
-					};
-					last;  # CRITICAL: Stop at first readable file
+					push @config_files_to_load, { file => $candidate, class => $original_class };
+					last;	# stop at first readable hit; later dirs are lower priority
 				}
 			}
 		}
 	}
 
-	# Load and merge configurations from all files
-	if (@config_files_to_load) {
-		# Sort by class hierarchy to ensure correct order (base -> parent -> child)
-		# This must happen AFTER all files are collected
-		if (@config_files_to_load) {
-			my %class_order;
-			for my $i (0..$#inheritance_chain) {
-				$class_order{$inheritance_chain[$i]} = $i;
-			}
-			@config_files_to_load = sort {
-				($class_order{$a->{class}} // 999) <=> ($class_order{$b->{class}} // 999)
-			} @config_files_to_load;
+	if(@config_files_to_load) {
+		# Sort so that base-class files are loaded before child files.
+		# %class_order is keyed on the chain (UNIVERSAL=0, ..., Child=N).
+		my %class_order;
+		for my $i (0 .. $#inheritance_chain) {
+			$class_order{ $inheritance_chain[$i] } = $i;
 		}
+		@config_files_to_load = sort {
+			($class_order{ $a->{class} } // 999) <=> ($class_order{ $b->{class} } // 999)
+		} @config_files_to_load;
 
-		# Start with the passed-in defaults
 		my $merged_params = { %$params };
 
 		foreach my $config_info (@config_files_to_load) {
-			my $cfg_file = $config_info->{file};
-			my $cfg_class = $config_info->{class};
+			my $cfg_file    = $config_info->{file};
+			my $cfg_class   = $config_info->{class};
 			my $section_name = $cfg_class;
 			$section_name =~ s/::/__/g;
 
-			# When loading individual config files for inheritance,
-			# don't pass config_dirs - just load the specific file
+			# Load only the specific file; do not re-pass config_dirs to avoid
+			# re-scanning directories and picking up the wrong file for this class.
 			my $config = Config::Abstraction->new(
 				config_file => $cfg_file,
-				env_prefix => "${section_name}__"
+				env_prefix  => "${section_name}__"
 			);
 
-			if ($config) {
-				# Get this config file's values for the section
+			if($config) {
 				my $this_config = $config->merge_defaults(
 					defaults => {},
-					section => $section_name,
-					merge => 1,
-					deep => 1
+					section  => $section_name,
+					merge    => 1,
+					deep     => 1
 				);
-
-				# Deep merge: later configs override earlier ones
 				$merged_params = _deep_merge($merged_params, $this_config);
-			} elsif ($@) {
+			} elsif($@) {
 				carp("Warning: Can't load configuration from $cfg_file: $@");
 			}
 		}
 
 		$params = $merged_params;
-	} elsif (my $config = Config::Abstraction->new(env_prefix => "${class}__")) {
-		# Handle environment variables with inheritance
+	} elsif(my $config = Config::Abstraction->new(env_prefix => "${class}__")) {
+		# No config file: honour environment variables across the full ancestor chain.
 		my $merged_config = {};
 
-		# Merge ancestor configurations from environment
-		foreach my $ancestor_class (reverse @inheritance_chain) {
+		# Iterate base-first so that each more-specific class overrides the more
+		# general one: UNIVERSAL → GrandParent → Parent → Child.
+		foreach my $ancestor_class (@inheritance_chain) {
 			my $section_name = $ancestor_class;
 			$section_name =~ s/::/__/g;
 
-			my $ancestor_env_config = Config::Abstraction->new(
-				env_prefix => "${section_name}__"
-			);
-
-			if ($ancestor_env_config) {
+			my $ancestor_env_config = Config::Abstraction->new(env_prefix => "${section_name}__");
+			if($ancestor_env_config) {
 				my $ancestor_config = $ancestor_env_config->merge_defaults(
 					defaults => {},
-					section => $section_name,
-					merge => 1,
-					deep => 1
+					section  => $section_name,
+					merge    => 1,
+					deep     => 1
 				);
 				$merged_config = _deep_merge($merged_config, $ancestor_config);
 			}
@@ -586,199 +566,41 @@ sub configure {
 
 		$params = $config->merge_defaults(
 			defaults => $params,
-			section => $class,
-			merge => 1,
-			deep => 1
+			section  => $class,
+			merge    => 1,
+			deep     => 1
 		);
 
-		# Apply inherited config
 		$params = _deep_merge($merged_config, $params);
 
-		# Track this config file for hot reload
-		if ($params->{config_path} && -f $params->{config_path}) {
-			$_config_file_stats{$params->{config_path}} = stat($params->{config_path});
+		if($params->{config_path} && -f $params->{config_path}) {
+			$_config_file_stats{ $params->{config_path} } = stat($params->{config_path});
 		}
 	}
 
 	my $croak_on_error = exists($params->{'croak_on_error'}) ? $params->{'croak_on_error'} : 1;
-	my $carp_on_warn = exists($params->{'carp_on_warn'}) ? $params->{'carp_on_warn'} : 0;
+	my $carp_on_warn   = exists($params->{'carp_on_warn'})   ? $params->{'carp_on_warn'}   : 0;
 
-	# Load the default logger
-	if (my $logger = $params->{'logger'}) {
-		if(!ref($logger) && $logger eq 'NULL') {
-			# Explicitly keep NULL - do not create a logger
-			# The logger param stays as the string 'NULL'
-		} elsif(ref($logger) eq 'HASH') {
-			if(exists $logger->{'syslog'}) {
-				$params->{'logger'} = Log::Abstraction->new({
-					carp_on_warn => $carp_on_warn,
-					syslog => $logger->{'syslog'},
-					%{$logger}
-				});
-			} else {
-				$params->{'logger'} = Log::Abstraction->new({
-					carp_on_warn => $carp_on_warn,
-					%{$logger}
-				});
-			}
-		} elsif(!blessed($logger) || !$logger->isa('Log::Abstraction')) {
-			$params->{'logger'} = Log::Abstraction->new({
-				carp_on_warn => $carp_on_warn,
-				logger => $logger
-			});
-		}
-	} elsif ($array) {
-		$params->{'logger'} = Log::Abstraction->new(
-			array => $array,
-			carp_on_warn => $carp_on_warn
-		);
-		undef $array;
-	} else {
-		$params->{'logger'} = Log::Abstraction->new(carp_on_warn => $carp_on_warn);
+	# User-supplied logger always wins over config-file logger.
+	# $array_logger is defined when the caller passed an arrayref; it was deleted from
+	# $params before config merging so the merge couldn't overwrite it.  Config-file logger
+	# (a hashref from YAML) is only used when the caller gave no explicit logger at all.
+	my $logger_spec = defined($array_logger) ? $array_logger : $params->{'logger'};
+	$params->{'logger'} = _build_logger($logger_spec, $carp_on_warn);
+
+	if(!exists($params->{_config_file})) {
+		$params->{_config_file} = $config_file if defined $config_file;
+	}
+	if(!exists($params->{_config_files})) {
+		$params->{_config_files} = [ map { $_->{file} } @config_files_to_load ]
+			if @config_files_to_load;
 	}
 
-	if(exists($params->{'logger'}) && ref($params->{'logger'})) {
-		if ($array && !$params->{'logger'}->{'array'}) {
-			$params->{'logger'}->{'array'} = $array;
-		}
-
-		if ($array && !$params->{'logger'}->{'array'}) {
-			$params->{'logger'}->{'array'} = $array;
-		}
-	}
-
-	# Store config file path in params for hot reload
-	# Preserve user-provided internal keys
-	if (!exists($params->{_config_file})) {
-		$params->{_config_file} = $config_file if defined($config_file);
-	}
-	if (!exists($params->{_config_files})) {
-		$params->{_config_files} = [map { $_->{file} } @config_files_to_load] if @config_files_to_load;
-	}
-
-	# Restore stashed coderefs and objects via hash slice
-	@{$params}{keys %stashed_values} = values %stashed_values if %stashed_values;
+	# Re-attach stashed coderefs/objects via hash slice
+	@{$params}{ keys %stashed_values } = values %stashed_values if %stashed_values;
 
 	return Return::Set::set_return($params, { 'type' => 'hashref' });
 }
-
-# Find the appropriate config file for a given class
-# Looks for class-specific config files based on naming conventions
-sub _find_class_config_file {
-	my ($class, $base_config_file, $config_dirs) = @_;
-
-	# Convert class name to file-friendly format
-	my $class_file = lc($class);
-	$class_file =~ s/::/-/g;
-
-	# Extract directory and extension from base config file using File::Spec
-	# so that path separators are handled correctly on all platforms
-	my ($base_vol, $base_dir_part, $base_name_ext) = File::Spec->splitpath($base_config_file);
-	my (undef, $base_ext) = $base_name_ext =~ /^(.*?)(\.[^.]+)?$/;
-	$base_ext //= '';	# $2 is undef when there is no extension
-	my $base_dir = File::Spec->catpath($base_vol, $base_dir_part, '');
-
-	# Try base directory patterns first
-	my @base_patterns = (
-		File::Spec->catfile($base_dir, "${class_file}${base_ext}"),
-		File::Spec->catfile($base_dir, "${class_file}.conf"),
-		File::Spec->catfile($base_dir, "${class_file}.yml"),
-		File::Spec->catfile($base_dir, "${class_file}.yaml"),
-		File::Spec->catfile($base_dir, "${class_file}.json"),
-	);
-
-	foreach my $pattern (@base_patterns) {
-		if (-r $pattern && -f $pattern) {
-			return $pattern;
-		}
-	}
-
-	# Then try config_dirs in order - fully check each dir before moving to next
-	if ($config_dirs && ref($config_dirs) eq 'ARRAY') {
-		foreach my $dir (@$config_dirs) {
-			# Remove trailing slash if present
-			$dir =~ s{/$}{};
-			my @dir_patterns = (
-				"${dir}/${class_file}${base_ext}",
-				"${dir}/${class_file}.conf",
-				"${dir}/${class_file}.yml",
-				"${dir}/${class_file}.yaml",
-				"${dir}/${class_file}.json",
-			);
-			foreach my $pattern (@dir_patterns) {
-				if (-r $pattern && -f $pattern) {
-					return $pattern;
-				}
-			}
-		}
-	}
-
-	return undef;
-}
-
-# Helper function to get the inheritance chain for a class
-sub _get_inheritance_chain {
-	my ($class) = @_;
-	my @chain = ();
-	my %seen = ();
-
-	_walk_isa($class, \@chain, \%seen);
-
-	return @chain;
-}
-
-# Recursive function to walk the @ISA hierarchy
-sub _walk_isa {
-	my ($class, $chain, $seen) = @_;
-
-	return if $seen->{$class}++;
-
-	# Get the @ISA array for this class
-	no strict 'refs';
-	my @isa = @{"${class}::ISA"};
-	use strict 'refs';
-
-	# Recursively process parent classes first
-	foreach my $parent (@isa) {
-		# Skip common base classes that won't have configs
-		# next if $parent eq 'Exporter';
-		# next if $parent eq 'DynaLoader';
-		# next if $parent eq 'UNIVERSAL';
-
-		_walk_isa($parent, $chain, $seen);
-	}
-
-	# If this class has no parents and isn't UNIVERSAL itself,
-	# explicitly add UNIVERSAL as a parent
-	if (!@isa && $class ne 'UNIVERSAL') {
-		_walk_isa('UNIVERSAL', $chain, $seen);
-	}
-
-	# Add current class to chain (after parents)
-	push @$chain, $class;
-}
-
-# Deep merge two hash references
-# Second hash takes precedence over first
-sub _deep_merge {
-	my ($base, $overlay) = @_;
-
-	return $overlay unless ref($base) eq 'HASH';
-	return $overlay unless ref($overlay) eq 'HASH';
-
-	my $result = { %$base };
-
-	foreach my $key (keys %$overlay) {
-		if (ref($overlay->{$key}) eq 'HASH' && ref($result->{$key}) eq 'HASH') {
-			$result->{$key} = _deep_merge($result->{$key}, $overlay->{$key});
-		} else {
-			$result->{$key} = $overlay->{$key};
-		}
-	}
-
-	return $result;
-}
-
 
 =head2 instantiate($class,...)
 
@@ -858,29 +680,6 @@ This is a "quick and dirty" way to add configuration support to classes you don'
     type => 'object',
     description => 'Instance of the specified class'
 
-=head3 Formal Specification
-
-    instantiate: Params → Object
-
-    Given:
-    - P: set of all parameter hashes
-    - C: set of all class names
-    - O: set of all objects
-
-    Pre-condition:
-    ∀ params ∈ P •
-        params.class ∈ C ∧
-        params.class.can('new')
-
-    Post-condition:
-    ∀ result ∈ O •
-        ∃ config ∈ H •
-            config = configure(params.class, params) ∧
-            result = params.class.new(config) ∧
-            blessed(result) = params.class ∧
-            (config._config_file ≠ ∅ ⇒
-                result ∈ _object_registry(params.class))
-
 =cut
 
 sub instantiate
@@ -892,10 +691,7 @@ sub instantiate
 
 	my $obj = $class->new($params);
 
-	# Register object for hot reload if config file is used
-	if ($params->{_config_file}) {
-		register_object($class, $obj);
-	}
+	register_object($class, $obj) if $params->{_config_file};
 
 	return $obj;
 }
@@ -999,38 +795,7 @@ Objects must be registered via C<register_object> to receive configuration updat
     description => 'PID of background watcher process',
     condition => 'value > 0'
 
-=head3 Formal Specification
-
-    enable_hot_reload: Interval × Callback → PID
-
-    Given:
-    - I: set of positive integers (intervals in seconds)
-    - CB: set of code references
-    - PID: set of process identifiers
-
-    State:
-    - _config_watchers: {pid: PID, callback: CB}
-    - _config_file_stats: F → Stat
-
-    Pre-condition:
-    ∀ interval ∈ I, callback ∈ CB ∪ {∅} •
-        interval ≥ 1 ∧
-        _config_watchers = ∅ ∧
-        OS ≠ 'MSWin32'
-
-    Post-condition:
-    ∀ result ∈ PID •
-        result > 0 ∧
-        _config_watchers.pid = result ∧
-        _config_watchers.callback = callback ∧
-        (∀ t ∈ Time •
-            (t mod interval = 0) ⇒
-                (∃ f ∈ dom _config_file_stats •
-                    mtime(f) > _config_file_stats(f).mtime ⇒
-                        send_signal(SIGUSR1, parent_process)))
-
 =cut
-
 
 sub enable_hot_reload {
 	my %params = @_;
@@ -1038,17 +803,14 @@ sub enable_hot_reload {
 	my $interval = $params{interval} || 10;
 	my $callback = $params{callback};
 
-	# Don't start multiple watchers
-	return if %_config_watchers;
+	return if %_config_watchers;	# already watching; avoid double-fork
 
-	# Fork a background process to watch config files
-	if (my $pid = fork()) {
-		# Parent process - store the watcher PID
-		$_config_watchers{pid} = $pid;
+	if(my $pid = fork()) {
+		$_config_watchers{pid}      = $pid;
 		$_config_watchers{callback} = $callback;
 		return $pid;
-	} elsif (defined $pid) {
-		# Child process - run the file watcher
+	} elsif(defined $pid) {
+		# Child: run forever, signal parent on change
 		_run_config_watcher($interval, $callback);
 		exit 0;
 	} else {
@@ -1112,46 +874,28 @@ The function blocks until the watcher process has fully terminated.
 
     type => 'void'
 
-=head3 Formal Specification
-
-    disable_hot_reload: () → ()
-
-    State:
-    - _config_watchers: {pid: PID, callback: CB}
-
-    Pre-condition:
-    true
-
-    Post-condition:
-    _config_watchers = ∅ ∧
-    (∀ p ∈ PID •
-        p = _config_watchers.pid@pre ⇒
-            ¬alive(p))
-
 =cut
 
 sub disable_hot_reload {
 	## MUTANT_SKIP_BEGIN
-	if (my $pid = $_config_watchers{pid}) {
-		# Guard against non-numeric PIDs (e.g. from mutation testing)
+	if(my $pid = $_config_watchers{pid}) {
 		if($pid =~ /\A[0-9]+\z/ && $pid > 0) {
 			kill('TERM', $pid);
 
-			# Wait up to 5 seconds for the child to exit; if it doesn't respond
-			# to SIGTERM, escalate to SIGKILL to avoid hanging indefinitely
-			my $deadline = time() + 5;
+			# Poll up to KILL_TIMEOUT seconds; escalate to SIGKILL if SIGTERM is ignored.
+			# SIGKILL cannot be caught or deferred so the subsequent waitpid is always safe.
+			my $deadline = time() + $KILL_TIMEOUT;
 			my $kid;
 			do {
-				$kid = waitpid($pid, POSIX::WNOHANG());
+				$kid = waitpid($pid, WNOHANG);
 				if($kid == 0 && time() < $deadline) {
-					select undef, undef, undef, 0.1;	# sleep 100ms between polls
+					select undef, undef, undef, $POLL_SLEEP;
 				}
 			} while($kid == 0 && time() < $deadline);
 
-			# Escalate if still alive after timeout
 			if($kid == 0) {
 				kill('KILL', $pid);
-				waitpid($pid, 0);	# SIGKILL is not deferrable; this wait is safe
+				waitpid($pid, 0);
 			}
 		}
 		%_config_watchers = ();
@@ -1224,30 +968,6 @@ Private properties (those starting with C<_>) are not updated during reload.
     description => 'Number of objects successfully reloaded',
     condition => 'value >= 0'
 
-=head3 Formal Specification
-
-    reload_config: () → ℕ
-
-    State:
-    - _object_registry: C → seq ObjectRef
-    - ConfigFiles: F → H
-
-    Pre-condition:
-    true
-
-    Post-condition:
-    ∀ result ∈ ℕ •
-        result = |{obj ∈ flatten(ran _object_registry) |
-                   obj ≠ ∅ ∧
-                   obj._config_file ∈ dom ConfigFiles}| ∧
-        (∀ obj ∈ flatten(ran _object_registry) •
-            obj ≠ ∅ ∧ obj._config_file ∈ dom ConfigFiles ⇒
-                (∀ k ∈ dom ConfigFiles(obj._config_file) •
-                    k ∉ PrivateKeys ⇒
-                        obj(k)@post = ConfigFiles(obj._config_file)(k)))
-
-    where PrivateKeys = {k | k starts with '_'}
-
 =cut
 
 sub reload_config {
@@ -1256,158 +976,24 @@ sub reload_config {
 	foreach my $class_key (keys %_object_registry) {
 		my $objects = $_object_registry{$class_key};
 
-		# Clean up dead object references
-		@$objects = grep { defined $_ } @$objects;
+		@$objects = grep { defined $_ } @$objects;	# prune garbage-collected weak refs
 
 		foreach my $obj_ref (@$objects) {
-			if (my $obj = $$obj_ref) {
+			if(my $obj = $$obj_ref) {
 				eval {
 					_reload_object_config($obj);
 					$reloaded_count++;
 				};
-				if ($@) {
-					warn "Failed to reload config for object: $@";
+				if($@) {
+					carp("Failed to reload config for object: $@");
 				}
 			}
 		}
 
-		# Remove empty entries
 		delete $_object_registry{$class_key} unless @$objects;
 	}
 
 	return $reloaded_count;
-}
-
-# Internal function to run the config file watcher
-sub _run_config_watcher {
-	my ($interval, $callback) = @_;
-
-	# Set up signal handlers for clean shutdown
-	local $SIG{TERM} = sub { exit 0 };
-	local $SIG{INT} = sub { exit 0 };
-
-	while (1) {
-		sleep($interval);
-
-		my $changes_detected = 0;
-
-		# Check each monitored config file
-		foreach my $config_file (keys %_config_file_stats) {
-			if (-f $config_file) {
-				my $current_stat = stat($config_file);
-				my $stored_stat = $_config_file_stats{$config_file};
-
-				# Compare modification times
-				if ((!$stored_stat) || ($current_stat->mtime > $stored_stat->mtime)) {
-					$_config_file_stats{$config_file} = $current_stat;
-					$changes_detected = 1;
-				}
-			} else {
-				# File was deleted
-				delete $_config_file_stats{$config_file};
-				$changes_detected = 1;
-			}
-		}
-
-		if($changes_detected) {
-			if($^O ne 'MSWin32') {
-				# Reload configurations in the main process
-				# Use a signal or shared memory mechanism
-				if(my $parent_pid = getppid()) {
-					kill('USR1', $parent_pid);
-				}
-			}
-		}
-	}
-}
-
-# Internal function to reload a single object's configuration
-sub _reload_object_config {
-	my $obj = $_[0];
-
-	return unless blessed($obj);
-
-	my $class = ref($obj);
-	my $original_class = $class;
-	$class =~ s/::/__/g;
-
-	# Get the original config file path(s) if they exist
-	# Use the full path from _config_files if available, otherwise try _config_file
-	my $config_file;
-	if ($obj->{_config_files} && ref($obj->{_config_files}) eq 'ARRAY' && @{$obj->{_config_files}}) {
-		# Use the last (most specific) config file
-		$config_file = $obj->{_config_files}[-1];
-	} else {
-		$config_file = $obj->{_config_file} || $obj->{config_file};
-	}
-
-	return unless $config_file && -f $config_file;
-
-	# Reload the configuration
-	my $config = Config::Abstraction->new(
-		config_file => $config_file,
-		env_prefix => "${class}__"
-	);
-
-	if ($config) {
-		# Use merge_defaults with empty defaults to get just the config values
-		my $new_params = $config->merge_defaults(
-			defaults => {},
-			section => $class,
-			merge => 1,
-			deep => 1
-		);
-
-		# Update object properties, preserving non-config data
-		foreach my $key (keys %$new_params) {
-			next if $key =~ /^_/;	# Skip private properties
-
-			if($key =~ /^logger/ && $new_params->{$key} ne 'NULL') {
-				# Handle logger reconfiguration specially
-				_reconfigure_logger($obj, $key, $new_params->{$key});
-			} else {
-				$obj->{$key} = $new_params->{$key};
-			}
-		}
-
-		# Call object's reload hook if it exists
-		if ($obj->can('_on_config_reload')) {
-			$obj->_on_config_reload($new_params);
-		}
-
-		# Log the reload if logger exists
-		if ($obj->{logger} && $obj->{logger}->can('info')) {
-			$obj->{logger}->info("Configuration reloaded for $original_class");
-		}
-	}
-
-	return;
-}
-
-# Internal function to reconfigure the logger
-sub _reconfigure_logger
-{
-	my ($obj, $key, $logger_config) = @_;
-
-	if (ref($logger_config) eq 'HASH') {
-		# Create new logger with new config
-		my $carp_on_warn = $obj->{carp_on_warn} || 0;
-
-		if ($logger_config->{syslog}) {
-			$obj->{$key} = Log::Abstraction->new({
-				carp_on_warn => $carp_on_warn,
-				syslog => $logger_config->{syslog},
-				%$logger_config
-			});
-		} else {
-			$obj->{$key} = Log::Abstraction->new({
-				carp_on_warn => $carp_on_warn,
-				%$logger_config
-			});
-		}
-	} else {
-		$obj->{$key} = $logger_config;
-	}
 }
 
 =head2 register_object($class, $obj)
@@ -1496,79 +1082,44 @@ On Windows, the signal handler is not installed (SIGUSR1 does not exist).
 
     type => 'void'
 
-=head3 Formal Specification
-
-    register_object: C × O → ()
-
-    Given:
-    - C: set of class names
-    - O: set of blessed objects
-    - OR: C → seq WeakRef(O) (object registry)
-
-    State:
-    - _object_registry: OR
-    - _original_usr1_handler: SignalHandler ∪ {∅}
-    - $SIG{USR1}: SignalHandler
-
-    Pre-condition:
-    ∀ class ∈ C, obj ∈ O •
-        class ≠ ∅ ∧
-        obj ≠ ∅ ∧
-        blessed(obj) ≠ ∅
-
-    Post-condition:
-    ∀ class ∈ C, obj ∈ O •
-        ∃ ref ∈ _object_registry(class) •
-            weak(ref) = obj ∧
-        (_original_usr1_handler = ∅@pre ⇒
-            (_original_usr1_handler@post = $SIG{USR1}@pre ∧
-             $SIG{USR1}@post = reload_config_handler))
-
 =cut
 
 sub register_object
 {
 	my ($class, $obj) = @_;
 
-	croak(__PACKAGE__, '::register_object: Usage ($class, $obj)') unless(defined($class) && defined($obj));
+	croak(__PACKAGE__, '::register_object: Usage ($class, $obj)')
+		unless defined($class) && defined($obj);
 
-	# Use weak references to avoid memory leaks
 	my $obj_ref = \$obj;
 	weaken($$obj_ref);
+	push @{ $_object_registry{$class} }, $obj_ref;
 
-	push @{$_object_registry{$class}}, $obj_ref;
+	# Install SIGUSR1 handler exactly once.  We save the previous handler so
+	# we can chain to it (another module may have installed one) and restore it
+	# on shutdown.  On Windows SIGUSR1 does not exist so we skip the signal work
+	# but still save $_original_usr1_handler so restore_signal_handlers is safe.
+	if(!defined $_original_usr1_handler) {
+		$_original_usr1_handler = $SIG{USR1} || $SIG_DEFAULT;
 
-	# Set up signal handler for hot reload (only once)
-	if (!defined $_original_usr1_handler) {
-		# Store the existing handler (could be DEFAULT, IGNORE, or a code ref)
-		$_original_usr1_handler = $SIG{USR1} || 'DEFAULT';
-
-		return if($^O eq 'MSWin32');	# There is no SIGUSR1 on Windows
+		return if $^O eq $OS_WINDOWS;
 
 		$SIG{USR1} = sub {
-			# Handle our hot reload first
 			reload_config();
-			if ($_config_watchers{callback}) {
-				$_config_watchers{callback}->();
-			}
+			$_config_watchers{callback}->() if $_config_watchers{callback};
 
-			# Chain to the original handler if it exists and is callable
-			if (ref($_original_usr1_handler) eq 'CODE') {
+			if(ref($_original_usr1_handler) eq 'CODE') {
 				$_original_usr1_handler->();
-			} elsif ($_original_usr1_handler eq 'DEFAULT') {
-				# Let the default handler run (which typically does nothing for USR1)
-				# We don't need to explicitly call it
-			} elsif ($_original_usr1_handler eq 'IGNORE') {
-				# Do nothing - the signal was being ignored
-			}
-			# Note: If it was some other string, it was probably a custom handler name
-			# but we can't easily call those, so we'll just warn
-			elsif ($_original_usr1_handler ne 'DEFAULT' && $_original_usr1_handler ne 'IGNORE') {
-				warn "Object::Configure: Cannot chain to non-code USR1 handler: $_original_usr1_handler";
+			} elsif($_original_usr1_handler eq $SIG_DEFAULT
+			     || $_original_usr1_handler eq $SIG_IGNORE) {
+				# DEFAULT for USR1 is typically a no-op; IGNORE means discard
+			} else {
+				carp("Object::Configure: Cannot chain to non-code USR1 handler: $_original_usr1_handler");
 			}
 		};
 	}
-	return;	# ensure the functions return nothing (void/empty list)
+
+	return;
 }
 
 =head2 restore_signal_handlers
@@ -1624,31 +1175,16 @@ On Windows, this function has no effect (SIGUSR1 does not exist).
 
     type => 'void'
 
-=head3 Formal Specification
-
-    restore_signal_handlers: () → ()
-
-    State:
-    - _original_usr1_handler: SignalHandler ∪ {∅}
-    - $SIG{USR1}: SignalHandler
-
-    Pre-condition:
-    true
-
-    Post-condition:
-    $SIG{USR1}@post = _original_usr1_handler@pre ∧
-    _original_usr1_handler@post = ∅
-
 =cut
 
 sub restore_signal_handlers
 {
-	if (defined $_original_usr1_handler) {
-		$SIG{USR1} = $_original_usr1_handler if($^O ne 'MSWin32');	# There is no SIGUSR1 on Windows
+	if(defined $_original_usr1_handler) {
+		$SIG{USR1} = $_original_usr1_handler unless $^O eq $OS_WINDOWS;
 		$_original_usr1_handler = undef;
 	}
 
-	return;	# ensure the functions return nothing (void/empty list)
+	return;
 }
 
 =head2 get_signal_handler_info
@@ -1688,10 +1224,6 @@ Boolean indicating whether Object::Configure's hot reload handler is active.
 The PID of the background watcher process, or undef if not running.
 
 =back
-
-=head3 Side Effects
-
-None.
 
 =head3 Notes
 
@@ -1741,44 +1273,270 @@ This is primarily a debugging aid and is not needed for normal operation.
         }
     }
 
-=head3 Formal Specification
-
-    get_signal_handler_info: () → InfoHash
-
-    Given:
-    - IH: set of all info hashes
-
-    State:
-    - _original_usr1_handler: SignalHandler ∪ {∅}
-    - $SIG{USR1}: SignalHandler ∪ {∅}
-    - _config_watchers: {pid: PID, callback: CB}
-
-    Pre-condition:
-    true
-
-    Post-condition:
-    ∀ result ∈ IH •
-        result.original_usr1 = _original_usr1_handler ∧
-        result.current_usr1 = $SIG{USR1} ∧
-        result.hot_reload_active = (_original_usr1_handler ≠ ∅) ∧
-        result.watcher_pid = _config_watchers.pid
-
 =cut
 
 sub get_signal_handler_info {
 	return {
-		original_usr1 => $_original_usr1_handler,
-		current_usr1 => $SIG{USR1},
+		original_usr1    => $_original_usr1_handler,
+		current_usr1     => $SIG{USR1},
 		hot_reload_active => defined $_original_usr1_handler,
-		watcher_pid => $_config_watchers{pid},
+		watcher_pid      => $_config_watchers{pid},
 	};
 }
 
-# Cleanup on module destruction
+# ----------------------------------------------------------------------------
+# Private helpers
+# All routines below are implementation details; callers must not rely on them.
+# ----------------------------------------------------------------------------
+
+# Purpose:   Consolidate all logger-creation paths into one place.
+#            Called from configure() and _reconfigure_logger() to eliminate
+#            the duplication that existed between the two.
+# Entry:     $spec may be: undef (want default), the string 'NULL' (no logging),
+#            an ARRAY ref (log-capture array), a HASH ref (options for Log::Abstraction),
+#            a pre-built Log::Abstraction instance (pass through), or any other
+#            scalar (treated as a logger name / file path).
+#            $carp_on_warn is a boolean controlling Carp::carp integration.
+# Exit:      Returns a Log::Abstraction instance, or the string 'NULL'.
+# Side:      May allocate a new Log::Abstraction object.
+sub _build_logger {
+	my ($spec, $carp_on_warn) = @_;
+	$carp_on_warn //= 0;
+
+	return Log::Abstraction->new(carp_on_warn => $carp_on_warn)
+		unless defined $spec;
+
+	return $LOGGER_NULL
+		if !ref($spec) && $spec eq $LOGGER_NULL;
+
+	return $spec
+		if blessed($spec) && $spec->isa('Log::Abstraction');
+
+	if(ref($spec) eq 'ARRAY') {
+		return Log::Abstraction->new(array => $spec, carp_on_warn => $carp_on_warn);
+	}
+
+	if(ref($spec) eq 'HASH') {
+		return Log::Abstraction->new({ carp_on_warn => $carp_on_warn, %$spec });
+	}
+
+	# Scalar: a logger name, file path, or other string identifier passed to L::A
+	return Log::Abstraction->new({ carp_on_warn => $carp_on_warn, logger => $spec });
+}
+
+# Purpose:   Build the ancestor chain needed for config-file discovery and env merging.
+#            Uses the class's own MRO (DFS or C3) via mro::get_linear_isa, which is
+#            more correct than a hardcoded DFS walk and handles diamond inheritance.
+#            UNIVERSAL is added explicitly because mro::get_linear_isa does not include
+#            it unless it appears in @ISA, yet Object::Configure supports universal.yml.
+# Entry:     $class is a fully-qualified class name that has already been loaded.
+# Exit:      Returns a list in base-first order: (UNIVERSAL, ..., GrandParent, Parent, Class).
+sub _get_inheritance_chain {
+	my ($class) = @_;
+
+	my @mro = @{ mro::get_linear_isa($class) };
+
+	# mro::get_linear_isa returns child-first; reverse to get base-first.
+	# UNIVERSAL is implicit in Perl's type system but not always in the MRO list,
+	# so append it when absent to ensure universal.yml is picked up.
+	push @mro, 'UNIVERSAL' unless grep { $_ eq 'UNIVERSAL' } @mro;
+
+	return reverse @mro;
+}
+
+# Purpose:   Find a config file for a specific ancestor class using the same
+#            naming convention as the primary config file (directory + extension).
+# Entry:     $class is a fully-qualified class name.
+#            $base_config_file is the primary config file path (provides dir and ext).
+#            $config_dirs is an optional arrayref of additional search directories.
+# Exit:      Returns a readable file path, or undef if nothing found.
+sub _find_class_config_file {
+	my ($class, $base_config_file, $config_dirs) = @_;
+
+	my $class_file = lc($class);
+	$class_file =~ s/::/-/g;
+
+	my ($base_vol, $base_dir_part, $base_name_ext) = File::Spec->splitpath($base_config_file);
+	my (undef, $base_ext) = $base_name_ext =~ /^(.*?)(\.[^.]+)?$/;
+	$base_ext //= '';
+	my $base_dir = File::Spec->catpath($base_vol, $base_dir_part, '');
+
+	my @base_patterns = (
+		File::Spec->catfile($base_dir, "${class_file}${base_ext}"),
+		File::Spec->catfile($base_dir, "${class_file}.conf"),
+		File::Spec->catfile($base_dir, "${class_file}.yml"),
+		File::Spec->catfile($base_dir, "${class_file}.yaml"),
+		File::Spec->catfile($base_dir, "${class_file}.json"),
+	);
+
+	foreach my $pattern (@base_patterns) {
+		return $pattern if -r $pattern && -f $pattern;
+	}
+
+	if($config_dirs && ref($config_dirs) eq 'ARRAY') {
+		foreach my $dir (@$config_dirs) {
+			$dir =~ s{/$}{};
+			foreach my $pattern (
+				"${dir}/${class_file}${base_ext}",
+				"${dir}/${class_file}.conf",
+				"${dir}/${class_file}.yml",
+				"${dir}/${class_file}.yaml",
+				"${dir}/${class_file}.json",
+			) {
+				return $pattern if -r $pattern && -f $pattern;
+			}
+		}
+	}
+
+	return undef;
+}
+
+# Purpose:   Run as the forked watcher child.  Polls %_config_file_stats and
+#            sends SIGUSR1 to the parent when any file changes.
+# Entry:     $interval >= 1 (seconds). $callback is unused in the child (it runs
+#            in the parent's SIGUSR1 handler).
+# Exit:      Never returns; terminates via SIGTERM/SIGINT handlers.
+# Side:      Modifies %_config_file_stats entries in the child's address space only.
+sub _run_config_watcher {
+	my ($interval, $callback) = @_;
+
+	local $SIG{TERM} = sub { exit 0 };
+	local $SIG{INT}  = sub { exit 0 };
+
+	while(1) {
+		sleep($interval);
+
+		my $changes_detected = 0;
+
+		foreach my $config_file (keys %_config_file_stats) {
+			if(-f $config_file) {
+				my $current_stat = stat($config_file);
+				my $stored_stat  = $_config_file_stats{$config_file};
+
+				if(!$stored_stat || $current_stat->mtime > $stored_stat->mtime) {
+					$_config_file_stats{$config_file} = $current_stat;
+					$changes_detected = 1;
+				}
+			} else {
+				delete $_config_file_stats{$config_file};
+				$changes_detected = 1;
+			}
+		}
+
+		if($changes_detected && $^O ne $OS_WINDOWS) {
+			if(my $parent_pid = getppid()) {
+				kill('USR1', $parent_pid);
+			}
+		}
+	}
+}
+
+# Purpose:   Reload a single object's configuration from disk and update its fields.
+#            Private properties (prefix '_') are intentionally skipped to avoid
+#            clobbering internal bookkeeping set at construction time.
+# Entry:     $obj must be a blessed reference with a {_config_file} or {_config_files} key.
+# Exit:      Returns nothing; updates $obj in-place.
+# Side:      Reads from disk. Calls $obj->_on_config_reload if the method exists.
+sub _reload_object_config {
+	my $obj = $_[0];
+
+	return unless blessed($obj);
+
+	my $class          = ref($obj);
+	my $original_class = $class;
+	$class =~ s/::/__/g;
+
+	# Prefer the most-specific (last) file from the full list; fall back to scalar key
+	my $config_file;
+	if($obj->{_config_files} && ref($obj->{_config_files}) eq 'ARRAY' && @{ $obj->{_config_files} }) {
+		$config_file = $obj->{_config_files}[-1];
+	} else {
+		$config_file = $obj->{_config_file} || $obj->{config_file};
+	}
+
+	return unless $config_file && -f $config_file;
+
+	my $config = Config::Abstraction->new(
+		config_file => $config_file,
+		env_prefix  => "${class}__"
+	);
+
+	if($config) {
+		my $new_params = $config->merge_defaults(
+			defaults => {},
+			section  => $class,
+			merge    => 1,
+			deep     => 1
+		);
+
+		foreach my $key (keys %$new_params) {
+			next if $key =~ /^_/;
+
+			if($key eq 'logger') {
+				# Only the exact 'logger' key triggers logger reconstruction.
+				# Keys like 'logger.file' are flat config values, not logger specs.
+				my $val = $new_params->{$key};
+				if(ref($val) || (defined($val) && $val ne $LOGGER_NULL)) {
+					_reconfigure_logger($obj, $key, $val);
+				} else {
+					$obj->{$key} = $val;
+				}
+			} else {
+				$obj->{$key} = $new_params->{$key};
+			}
+		}
+
+		$obj->_on_config_reload($new_params) if $obj->can('_on_config_reload');
+
+		$obj->{logger}->info("Configuration reloaded for $original_class")
+			if $obj->{logger} && $obj->{logger}->can('info');
+	}
+
+	return;
+}
+
+# Purpose:   Replace the logger on an already-constructed object with one
+#            built from a new config value (typically a YAML hashref).
+#            Delegates to _build_logger so logger-creation logic lives in one place.
+# Entry:     $obj is a blessed hashref. $key is the hash key to update (usually 'logger').
+#            $logger_config is the new spec from the config file.
+# Exit:      Returns nothing; updates $obj->{$key} in-place.
+# Side:      May allocate a new Log::Abstraction instance.
+sub _reconfigure_logger
+{
+	my ($obj, $key, $logger_config) = @_;
+	my $carp_on_warn = $obj->{carp_on_warn} || 0;
+	$obj->{$key} = _build_logger($logger_config, $carp_on_warn);
+	return;
+}
+
+# Purpose:   Right-precedence deep merge of two hash references.
+#            Scalar/arrayref values in $overlay replace those in $base entirely;
+#            nested hashrefs are merged recursively.
+# Entry:     Both args should be hashrefs (or undef/non-ref, handled gracefully).
+# Exit:      Returns a new hashref; neither input is modified.
+sub _deep_merge {
+	my ($base, $overlay) = @_;
+
+	return $overlay unless ref($base)    eq 'HASH';
+	return $overlay unless ref($overlay) eq 'HASH';
+
+	my $result = { %$base };
+
+	foreach my $key (keys %$overlay) {
+		if(ref($overlay->{$key}) eq 'HASH' && ref($result->{$key}) eq 'HASH') {
+			$result->{$key} = _deep_merge($result->{$key}, $overlay->{$key});
+		} else {
+			$result->{$key} = $overlay->{$key};
+		}
+	}
+
+	return $result;
+}
+
+# Clean up the watcher child and restore signal state on interpreter exit.
 END {
 	disable_hot_reload();
-
-	# Restore original USR1 handler if we modified it
 	restore_signal_handlers();
 }
 
@@ -1793,6 +1551,242 @@ END {
 =item * L<Test Dashboard|https://nigelhorne.github.io/Object-Configure/coverage/>
 
 =back
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * B<Global singleton state.> C<%_object_registry>, C<%_config_watchers>, and
+C<%_config_file_stats> are package globals.  Two independent subsystems in the same
+process share one hot-reload registry and one SIGUSR1 handler.  There is no
+instance-level isolation.  A proper fix would wrap state in an object and allow
+multiple independent C<Object::Configure> instances, but that would break the
+existing constructor-call API (C<configure($class, \%params)>).
+
+=item * B<Hot reload is Unix-only.> SIGUSR1 does not exist on Windows.
+All signal-related paths are guarded with C<$^O ne 'MSWin32'>, so the module
+loads on Windows but silently skips hot-reload registration.
+
+=item * B<configure() is a God function.> At ~120 lines it handles arg validation,
+config-file discovery, MRO walking, multi-file merging, env-var merging, logger
+creation, and hot-reload bookkeeping.  Future versions should decompose this into
+smaller, independently testable units.
+
+=item * B<_deep_merge reimplements CPAN.> L<Hash::Merge::Simple> or L<Hash::Merge>
+provide tested, feature-complete deep merge.  The internal C<_deep_merge> is 15
+lines and correct for the current use, but does not handle arrayrefs (they are
+replaced wholesale, not merged).  If array-merge semantics are ever needed, switch
+to a CPAN module.
+
+=item * B<No encapsulation enforcement.> Private helpers (C<_build_logger>,
+C<_get_inheritance_chain>, etc.) are accessible to any caller.  L<Sub::Private>
+(enforce mode) would make accidental external use a compile-time error.  It is not
+added here to avoid a smoker dependency on a less-common module.
+
+=item * B<configure() signature is positional, instantiate() is named.>  The two
+public constructors have inconsistent calling conventions.  Normalising them to named
+args would require a deprecation cycle.
+
+=item * B<mro::get_linear_isa and UNIVERSAL.>  Perl's C<mro::get_linear_isa> does
+not include C<UNIVERSAL> in its output unless C<UNIVERSAL> appears explicitly in
+C<@ISA>.  This module appends C<UNIVERSAL> manually so that C<universal.yml> is
+always discovered.  If a future Perl version changes this behaviour the guard
+(C<grep { $_ eq 'UNIVERSAL' }>) remains correct.
+
+=back
+
+=head1 Formal Specification
+
+=head2 configure
+
+    configure: Class x Params -> ConfigHash
+
+    Given:
+    - C: set of all class names
+    - P: set of all parameter hashes
+    - F: set of all file paths
+    - H: set of all configuration hashes
+
+    State:
+    - ConfigFiles: F -> H (maps file paths to configuration content)
+    - EnvVars: String -> String (environment variables)
+    - InheritanceChain: C -> seq C (ordered sequence of ancestor classes)
+
+    Pre-condition:
+    forall class in C, params in P:
+        class != empty
+        (params.config_file != empty =>
+            (exists dir in params.config_dirs: readable(dir/params.config_file))
+            OR readable(params.config_file))
+
+    Post-condition:
+    forall result in H:
+        result = params
+                 (+) (merge f in InheritanceConfigFiles(class): ConfigFiles(f))
+                 (+) (merge v in RelevantEnvVars(class): v)
+        result.logger in Log::Abstraction
+        (forall k in dom params:
+            (params(k) in CodeRef OR blessed(params(k))) => result(k) = params(k))
+
+    where (+) denotes hash merge with right-precedence
+
+=head2 instantiate
+
+    instantiate: Params -> Object
+
+    Given:
+    - P: set of all parameter hashes
+    - C: set of all class names
+    - O: set of all objects
+
+    Pre-condition:
+    forall params in P:
+        params.class in C
+        params.class.can('new')
+
+    Post-condition:
+    forall result in O:
+        exists config in H:
+            config = configure(params.class, params)
+            result = params.class.new(config)
+            blessed(result) = params.class
+            (config._config_file != empty =>
+                result in _object_registry(params.class))
+
+=head2 enable_hot_reload
+
+    enable_hot_reload: Interval x Callback -> PID
+
+    Given:
+    - I: set of positive integers (intervals in seconds)
+    - CB: set of code references
+    - PID: set of process identifiers
+
+    State:
+    - _config_watchers: {pid: PID, callback: CB}
+    - _config_file_stats: F -> Stat
+
+    Pre-condition:
+    forall interval in I, callback in CB union {empty}:
+        interval >= 1
+        _config_watchers = empty
+        OS != 'MSWin32'
+
+    Post-condition:
+    forall result in PID:
+        result > 0
+        _config_watchers.pid = result
+        _config_watchers.callback = callback
+        (forall t in Time:
+            (t mod interval = 0) =>
+                (exists f in dom _config_file_stats:
+                    mtime(f) > _config_file_stats(f).mtime =>
+                        send_signal(SIGUSR1, parent_process)))
+
+=head2 disable_hot_reload
+
+    disable_hot_reload: () -> ()
+
+    State:
+    - _config_watchers: {pid: PID, callback: CB}
+
+    Pre-condition:
+    true
+
+    Post-condition:
+    _config_watchers = empty
+    (forall p in PID:
+        p = _config_watchers.pid@pre =>
+            NOT alive(p))
+
+=head2 reload_config
+
+    reload_config: () -> N
+
+    State:
+    - _object_registry: C -> seq ObjectRef
+    - ConfigFiles: F -> H
+
+    Pre-condition:
+    true
+
+    Post-condition:
+    forall result in N:
+        result = |{obj in flatten(ran _object_registry) |
+                   obj != empty
+                   obj._config_file in dom ConfigFiles}|
+        (forall obj in flatten(ran _object_registry):
+            obj != empty AND obj._config_file in dom ConfigFiles =>
+                (forall k in dom ConfigFiles(obj._config_file):
+                    k NOT in PrivateKeys =>
+                        obj(k)@post = ConfigFiles(obj._config_file)(k)))
+
+    where PrivateKeys = {k | k starts with '_'}
+
+=head2 register_object
+
+    register_object: C x O -> ()
+
+    Given:
+    - C: set of class names
+    - O: set of blessed objects
+    - OR: C -> seq WeakRef(O) (object registry)
+
+    State:
+    - _object_registry: OR
+    - _original_usr1_handler: SignalHandler union {empty}
+    - $SIG{USR1}: SignalHandler
+
+    Pre-condition:
+    forall class in C, obj in O:
+        class != empty
+        obj != empty
+        blessed(obj) != empty
+
+    Post-condition:
+    forall class in C, obj in O:
+        exists ref in _object_registry(class):
+            weak(ref) = obj
+        (_original_usr1_handler = empty@pre =>
+            (_original_usr1_handler@post = $SIG{USR1}@pre
+             $SIG{USR1}@post = reload_config_handler))
+
+=head2 restore_signal_handlers
+
+    restore_signal_handlers: () -> ()
+
+    State:
+    - _original_usr1_handler: SignalHandler union {empty}
+    - $SIG{USR1}: SignalHandler
+
+    Pre-condition:
+    true
+
+    Post-condition:
+    $SIG{USR1}@post = _original_usr1_handler@pre
+    _original_usr1_handler@post = empty
+
+=head2 get_sigal_handler_info
+
+    get_signal_handler_info: () -> InfoHash
+
+    Given:
+    - IH: set of all info hashes
+
+    State:
+    - _original_usr1_handler: SignalHandler union {empty}
+    - $SIG{USR1}: SignalHandler union {empty}
+    - _config_watchers: {pid: PID, callback: CB}
+
+    Pre-condition:
+    true
+
+    Post-condition:
+    forall result in IH:
+        result.original_usr1 = _original_usr1_handler
+        result.current_usr1 = $SIG{USR1}
+        result.hot_reload_active = (_original_usr1_handler != empty)
+        result.watcher_pid = _config_watchers.pid
 
 =head1 SUPPORT
 

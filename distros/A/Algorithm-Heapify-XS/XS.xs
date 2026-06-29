@@ -16,6 +16,88 @@
                           : Perl_do_ncmp(aTHX_ (a)[(child)], a[(parent)])) > 0) )\
       ? !(is_min & 1) : (is_min & 1) )
 
+#define FORCE_SCALAR(fakeop)                    \
+STMT_START {                                    \
+        SAVEOP();                               \
+        Copy(PL_op, &fakeop, 1, OP);            \
+        fakeop.op_flags = OPf_WANT_SCALAR;      \
+        PL_op = &fakeop;                        \
+} STMT_END
+
+
+#ifndef Perl_do_ncmp
+/* compare left and right SVs. Returns:
+ * -1: <
+ *  0: ==
+ *  1: >
+ *  2: left or right was a NaN
+ */
+I32
+Perl_do_ncmp(pTHX_ SV* const left, SV * const right)
+{
+    PERL_ARGS_ASSERT_DO_NCMP;
+#ifdef PERL_PRESERVE_IVUV
+    /* Fortunately it seems NaN isn't IOK */
+    if (SvIV_please_nomg(right) && SvIV_please_nomg(left)) {
+            if (!SvIsUV(left)) {
+                const IV leftiv = SvIVX(left);
+                if (!SvIsUV(right)) {
+                    /* ## IV <=> IV ## */
+                    const IV rightiv = SvIVX(right);
+                    return (leftiv > rightiv) - (leftiv < rightiv);
+                }
+                /* ## IV <=> UV ## */
+                if (leftiv < 0)
+                    /* As (b) is a UV, it's >=0, so it must be < */
+                    return -1;
+                {
+                    const UV rightuv = SvUVX(right);
+                    return ((UV)leftiv > rightuv) - ((UV)leftiv < rightuv);
+                }
+            }
+
+            if (SvIsUV(right)) {
+                /* ## UV <=> UV ## */
+                const UV leftuv = SvUVX(left);
+                const UV rightuv = SvUVX(right);
+                return (leftuv > rightuv) - (leftuv < rightuv);
+            }
+            /* ## UV <=> IV ## */
+            {
+                const IV rightiv = SvIVX(right);
+                if (rightiv < 0)
+                    /* As (a) is a UV, it's >=0, so it cannot be < */
+                    return 1;
+                {
+                    const UV leftuv = SvUVX(left);
+                    return (leftuv > (UV)rightiv) - (leftuv < (UV)rightiv);
+                }
+            }
+            NOT_REACHED; /* NOTREACHED */
+    }
+#endif
+    {
+      NV const lnv = SvNV_nomg(left);
+      NV const rnv = SvNV_nomg(right);
+
+#if defined(NAN_COMPARE_BROKEN) && defined(Perl_isnan)
+      if (Perl_isnan(lnv) || Perl_isnan(rnv)) {
+          return 2;
+       }
+      return (lnv > rnv) - (lnv < rnv);
+#else
+      if (lnv < rnv)
+        return -1;
+      if (lnv > rnv)
+        return 1;
+      if (lnv == rnv)
+        return 0;
+      return 2;
+#endif
+    }
+}
+#endif
+
 
 I32 sift_up(pTHX_ SV **a, ssize_t start, ssize_t end, I32 is_min) {
      /*start represents the limit of how far up the heap to sift.
@@ -125,13 +207,6 @@ void heapify_with_sift_down(pTHX_ SV **a, ssize_t count, I32 is_min) {
     /* after sifting down the root all nodes/elements are in heap order */
 }
 
-#define FORCE_SCALAR(fakeop)                    \
-STMT_START {                                    \
-        SAVEOP();                               \
-        Copy(PL_op, &fakeop, 1, OP);            \
-        fakeop.op_flags = OPf_WANT_SCALAR;      \
-        PL_op = &fakeop;                        \
-} STMT_END
 
 MODULE = Algorithm::Heapify::XS		PACKAGE = Algorithm::Heapify::XS		
 
@@ -263,4 +338,3 @@ PPCODE:
     } else {
         XSRETURN(0);
     }
-

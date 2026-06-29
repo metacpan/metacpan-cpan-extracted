@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.011-2-g593a6ff
+package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.012-6-gdef27f7
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test::Mojo role providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use 5.020;  # for fc, unicode_strings features
 use strictures 2;
@@ -171,7 +171,10 @@ Test::Mojo::Role::OpenAPI::Modern - Test::Mojo role providing access to an OpenA
 
 =head1 VERSION
 
-version 0.012
+version 0.013
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 
@@ -411,6 +414,11 @@ There is also an irc channel available for users of this distribution, at
 L<C<#mojo> on C<irc.libera.chat>|irc://irc.libera.chat/#mojo>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI
+Slack server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

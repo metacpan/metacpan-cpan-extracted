@@ -3,20 +3,13 @@ abstract: 'Test::Mojo role providing access to an OpenAPI document and parser'
 author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
-  File::Spec: '0'
-  Module::Metadata: '0'
-  Mojo::URL: '0'
+  Clone: '0'
   Mojolicious: '9.0'
-  Scalar::Util: '0'
-  Storable: '0'
   Test::Deep: '0'
-  Test::Mojo: '0'
   Test::More: '0.96'
   Test::Needs: '0'
   YAML::PP: '0.005'
   experimental: '0'
-  lib: '0'
-  open: '0'
   perl: '5.020'
   stable: '0.031'
 configure_requires:
@@ -41,38 +34,33 @@ meta-spec:
 name: Test-Mojo-Role-OpenAPI-Modern
 no_index:
   directory:
+    - inc
     - t
     - xt
 provides:
   Test::Mojo::Role::OpenAPI::Modern:
     file: lib/Test/Mojo/Role/OpenAPI/Modern.pm
-    version: '0.012'
+    version: '0.013'
 recommends:
   Mojolicious::Plugin::OpenAPI::Modern: '0.007'
 requires:
   JSON::Schema::Modern: '0.638'
-  List::Util: '0'
-  Mojo::Base: '0'
   Mojolicious: '9.0'
-  OpenAPI::Modern: '0.133'
+  OpenAPI::Modern: '0.139'
   Role::Tiny: '2.000001'
-  feature: '0'
   if: '0'
   namespace::clean: '0'
   perl: '5.020'
-  strict: '0'
   strictures: '2'
-  utf8: '0'
-  warnings: '0'
 resources:
   IRC: irc://irc.libera.chat/#mojo
   bugtracker: https://github.com/karenetheridge/Test-Mojo-Role-OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/Test-Mojo-Role-OpenAPI-Modern
   repository: https://github.com/karenetheridge/Test-Mojo-Role-OpenAPI-Modern.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
-    version: '5.043010'
+    version: '5.044000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -154,7 +142,7 @@ x_Dist_Zilla:
           repo_root: .
           version: '0.009'
       name: '@Author::ETHER/generate CONTRIBUTING'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::InstallGuide
       config:
@@ -299,12 +287,18 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodWeaver
       config:
         Dist::Zilla::Plugin::PodWeaver:
-          config_plugins:
-            - '@Author::ETHER'
           finder:
             - ':InstallModules'
             - ':PerlExecFiles'
           plugins:
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: SUPPORT
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: VERSION
+              version: '4.020'
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@Author::ETHER/EnsurePod5'
@@ -405,6 +399,14 @@ x_Dist_Zilla:
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/footer'
               version: '4.020'
+            -
+              class: inc::AppendSection
+              name: AppendSupport
+              version: ~
+            -
+              class: inc::AppendSection
+              name: AppendVersion
+              version: ~
       name: '@Author::ETHER/PodWeaver'
       version: '4.010'
     -
@@ -562,7 +564,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20260420'
+          Module::CoreList: '5.20260722'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -726,7 +728,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.012
+          tag: v0.013
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -859,6 +861,29 @@ x_Dist_Zilla:
       name: DevelopRequires
       version: '6.037'
     -
+      class: Dist::Zilla::Plugin::RemovePrereqs
+      config:
+        Dist::Zilla::Plugin::RemovePrereqs:
+          modules_to_remove:
+            - Encode
+            - File::Spec
+            - IO::Handle
+            - IPC::Open3
+            - List::Util
+            - Module::Metadata
+            - Mojo::Base
+            - Mojo::URL
+            - Scalar::Util
+            - Test::Mojo
+            - feature
+            - lib
+            - open
+            - strict
+            - utf8
+            - warnings
+      name: RemovePrereqs
+      version: '6.037'
+    -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
       version: '6.037'
@@ -912,7 +937,7 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.037'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.43.10
+x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

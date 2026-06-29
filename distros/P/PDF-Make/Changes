@@ -1,4 +1,28 @@
 Revision history for PDF::Make
 
+0.04  2026-06-28
+      - t/73-watermarks.t: switched to Test2::Bundle::Numerical 
+      - Guarded pdfmake_path_t typedef in pdfmake_text.h /
+        pdfmake_render.h with PDFMAKE_PATH_T_DEFINED 
+
+0.03  2026-06-28
+      - typemap: rewrote all 28 INPUT/OUTPUT blocks to avoid an interpolation
+        bug in ExtUtils::ParseXS 3.45+ that silently dropped
+        ${$ALIAS?...:...} expressions, leaving `self` uninitialised and
+        causing SEGVs in 83 of 90 test files on the CPAN Testers grid
+        (perl 5.36 x86_64-linux).
+      - Lowered the supported Perl floor from 5.20 to 5.10.1.
+        MIN_PERL_VERSION 
+      - Added pre-5.22 compatibility shims for the op-tree sibling API
+        (OpSIBLING, OpHAS_SIBLING, OpMORESIB_set, OpLASTSIB_set) 
+      - Added a pre-5.16 fallback for gv_fetchmeth_pvn that delegates to
+        gv_fetchmeth, 
+      - t/73-watermarks.t: switched to Test2::Bundle::Numerical so
+        opacity/colour comparisons pass on perls built with
+        -Duselongdouble / -Dusequadmath.
+
+0.02  2026-06-28
+      Second release — see git log for the feature set introduced.
+
 0.01  2026-06-28
       First version, released on an unsuspecting world.

@@ -1,6 +1,6 @@
 # JPack application (web client)
 package Data::JPack::App;
-our $VERSION="v0.1.1";
+our $VERSION="v0.1.2";
 
 use v5.36;
 
@@ -149,4 +149,44 @@ sub localize_table {
   $t->table=$prev_table;
 }
 
-1;
+
+# ==========
+# Application (routes to middleware)
+use Object::Pad;
+class Data::JPack::App;
+
+field $_dynamic;    
+
+BUILD{
+ 
+  #$_dynamic="site";
+
+}
+
+sub app {
+  # Only load middleware if needed.
+  require uSAC::HTTP::Middleware::Static;
+  sub {
+
+    my $parent=shift;
+    my %options;
+
+    my $_dynamic="site";
+    # Add routes for jpack applciations
+    $parent->add([qw[GET HEAD]], "app"
+      => uSAC::HTTP::Middleware::Static::uhm_static_root(
+        prefix=>"/",
+        roots=> [$_dynamic],
+      ));
+
+    # For external libs...
+    $parent->add([qw[GET HEAD]], "lib"
+      => uSAC::HTTP::Middleware::Static::uhm_static_root(
+        prefix=>"/",
+        roots=> [$_dynamic],
+      ));
+
+  }
+}
+
+\&app;

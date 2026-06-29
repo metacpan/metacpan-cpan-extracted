@@ -24,19 +24,19 @@ my $builder = Clownfish::Build->new(
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <dev at lucy dot apache dot org>',
-    dist_version       => '0.6.3',
+    dist_version       => '0.6.4',
     dist_abstract      => 'Apache Clownfish Runtime',
     requires           => { 'perl' => '5.8.3', },
     configure_requires => {
         'Module::Build'               => 0.280801,
-        'Clownfish::CFC::Perl::Build' => 0.006003,
+        'Clownfish::CFC::Perl::Build' => 0.006004,
     },
     build_requires => {
         'Module::Build'      => 0.280801,
         'ExtUtils::CBuilder' => 0.21,
         'ExtUtils::ParseXS'  => 3.00,
         'Devel::PPPort'      => 3.14,
-        'Clownfish::CFC'     => 0.006003,
+        'Clownfish::CFC'     => 0.006004,
     },
     no_index => {
         directory => [qw( buildlib )],

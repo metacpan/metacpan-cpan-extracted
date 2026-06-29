@@ -98,4 +98,44 @@ static void xop_compat_register_custom_op(pTHX_ Perl_ppaddr_t ppfunc, XOP *xop) 
 #  endif
 #endif
 
+/* ============================================
+   OP sibling API compatibility (5.22+)
+   OpSIBLING/OpHAS_SIBLING/OpMORESIB_set/OpLASTSIB_set were added in 5.22.
+   Before that, op->op_sibling was a simple OP* pointer with NULL meaning
+   "last in chain", so we map the new macros onto direct field access.
+   ============================================ */
+
+#if !PERL_VERSION_GE(5,22,0)
+#  ifndef OpSIBLING
+#    define OpSIBLING(o)         ((o)->op_sibling)
+#  endif
+#  ifndef OpHAS_SIBLING
+#    define OpHAS_SIBLING(o)     (cBOOL((o)->op_sibling))
+#  endif
+#  ifndef OpMORESIB_set
+#    define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
+#  endif
+#  ifndef OpLASTSIB_set
+/* On 5.22+ the second arg is the parent op stored via op_sibparent;
+ * on older perls there is no parent pointer, so we just clear op_sibling
+ * to mark end-of-chain and discard the parent argument. */
+#    define OpLASTSIB_set(o, parent) ((void)(parent), (o)->op_sibling = NULL)
+#  endif
+#endif
+
+/* ============================================
+   Method lookup compatibility (5.16+)
+   gv_fetchmeth_pvn was added in 5.15.4 / 5.16; before that, the only
+   public helper is gv_fetchmeth which already takes (stash, name, len, level)
+   and doesn't accept a `flags` arg. We drop the flags arg, which only
+   carried a GV_SUPER hint that we never use here.
+   ============================================ */
+
+#if !PERL_VERSION_GE(5,16,0)
+#  ifndef gv_fetchmeth_pvn
+#    define gv_fetchmeth_pvn(stash, name, namelen, level, flags) \
+        gv_fetchmeth((stash), (name), (namelen), (level))
+#  endif
+#endif
+
 #endif /* XOP_COMPAT_H */

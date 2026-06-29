@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::DuckDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000025';
 
 use DBD::DuckDB;
 use DBI ();
@@ -250,22 +250,43 @@ sub build_tables_from_db {
          WHERE table_schema = current_schema()
     EOT
     $sth->execute();
+    my @table_list = @{$sth->fetchall_arrayref};
+
+    # Sweep all constraints, columns, indexes, and table DDL for the current
+    # schema in one query each, grouped by table, rather than a query-per-table.
+    # The constraint sweep is shared by the key and index builders. Primary-key
+    # membership (needed for identity detection) comes from the constraints,
+    # since duckdb_columns() does not expose it.
+    my $all_constraints = $self->_fetch_all_constraints;
+
+    my %pk_by_table;
+    for my $tname (keys %$all_constraints) {
+        for my $con (@{$all_constraints->{$tname}}) {
+            next unless $con->{constraint_type} eq 'PRIMARY KEY';
+            $pk_by_table{$tname}{$_} = 1 for @{$con->{constraint_column_names} // []};
+        }
+    }
+
+    my $all_columns   = $self->_fetch_all_columns(\%pk_by_table);
+    my $all_indexes   = $self->_fetch_all_indexes;
+    my $all_generated = $self->_fetch_all_generated;
 
     my %tables;
-    while (my ($tname, $type) = $sth->fetchrow_array) {
+    for my $row (@table_list) {
+        my ($tname, $type) = @$row;
         next if $params{autofill}->skip(table => $tname);
 
         my $table = {name => $tname, db_name => $tname, is_temp => ($type eq 'LOCAL TEMPORARY' ? 1 : 0)};
         my $class = $TABLE_TYPES{$type} // 'DBIx::QuickORM::Schema::Table';
         $params{autofill}->hook(pre_table => {table => $table, class => \$class});
 
-        $table->{columns} = $self->build_columns_from_db($tname, %params);
+        $table->{columns} = $self->build_columns_from_db($tname, %params, column_rows => ($all_columns->{$tname} // []), generated => ($all_generated->{$tname} // {}));
         $params{autofill}->hook(columns => {columns => $table->{columns}, table => $table});
 
-        $table->{indexes} = $self->build_indexes_from_db($tname, %params);
+        $table->{indexes} = $self->build_indexes_from_db($tname, %params, constraint_rows => ($all_constraints->{$tname} // []), index_rows => ($all_indexes->{$tname} // []));
         $params{autofill}->hook(indexes => {indexes => $table->{indexes}, table => $table});
 
-        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params);
+        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params, constraint_rows => ($all_constraints->{$tname} // []));
 
         $params{autofill}->hook(post_table => {table => $table, class => \$class});
 
@@ -291,20 +312,10 @@ sub build_table_keys_from_db {
     my $self = shift;
     my ($table, %params) = @_;
 
-    my $dbh = $self->{+DBH};
-
-    my $sth = $dbh->prepare(<<'    EOT');
-        SELECT constraint_type,
-               constraint_column_names,
-               referenced_table,
-               referenced_column_names
-          FROM duckdb_constraints()
-         WHERE table_name = ?
-    EOT
-    $sth->execute($table);
+    my $rows = $params{constraint_rows} // $self->_query_constraints($table);
 
     my ($pk, %unique, @links);
-    while (my $row = $sth->fetchrow_hashref) {
+    for my $row (@$rows) {
         my $type = $row->{constraint_type};
         my $cols = $row->{constraint_column_names} // [];
 
@@ -344,15 +355,12 @@ sub build_columns_from_db {
     my ($table, %params) = @_;
 
     croak "A table name is required" unless $table;
-    my $dbh = $self->{+DBH};
 
-    my $sth = $dbh->prepare("SELECT * FROM pragma_table_info(?)");
-    $sth->execute($table);
-
-    my %generated = $self->_generated_columns($table);
+    my $rows = $params{column_rows} // $self->_query_columns($table);
+    my $generated = $params{generated} // {$self->_generated_columns($table)};
 
     my %columns;
-    while (my $res = $sth->fetchrow_hashref) {
+    for my $res (@$rows) {
         next if $params{autofill}->skip(column => ($table, $res->{name}));
 
         my $col = {};
@@ -367,7 +375,7 @@ sub build_columns_from_db {
         $col->{identity} = 1
             if $res->{pk} && defined($res->{dflt_value}) && $res->{dflt_value} =~ /nextval/i;
 
-        $col->{generated} = 1 if $generated{lc $res->{name}};
+        $col->{generated} = 1 if $generated->{lc $res->{name}};
 
         my $type = $res->{type};
         $type =~ s/\(.*$//;
@@ -399,6 +407,14 @@ sub _generated_columns {
         undef, $table,
     );
 
+    return $self->_parse_generated($ddl);
+}
+
+# Extract the names of GENERATED ALWAYS AS columns from a table's stored DDL.
+sub _parse_generated {
+    my $self = shift;
+    my ($ddl) = @_;
+
     return unless defined $ddl && length $ddl;
 
     my %out;
@@ -412,6 +428,173 @@ sub _generated_columns {
     }
 
     return %out;
+}
+
+=pod
+
+=item $by_table = $dialect->_fetch_all_constraints
+
+=item $by_table = $dialect->_fetch_all_columns(\%pk_by_table)
+
+=item $by_table = $dialect->_fetch_all_indexes
+
+=item $by_table = $dialect->_fetch_all_generated
+
+Sweep all constraint, column, secondary-index, and generated-column metadata
+for the current schema in one query each, returning a hashref of table name to
+that table's data. C<_fetch_all_columns> maps C<duckdb_columns()> rows into the
+C<pragma_table_info> shape the column builder expects, filling the C<pk> flag
+from the supplied primary-key membership. C<_fetch_all_generated> returns, per
+table, the hashref of generated column names produced by C<_parse_generated>.
+
+=item $rows = $dialect->_query_constraints($table)
+
+=item $rows = $dialect->_query_columns($table)
+
+=item $rows = $dialect->_query_indexes($table)
+
+Single-table fallbacks used when the per-table builders are called without
+pre-fetched rows.
+
+=cut
+
+sub _fetch_all_constraints {
+    my $self = shift;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<'    EOT');
+        SELECT table_name,
+               constraint_type,
+               constraint_column_names,
+               referenced_table,
+               referenced_column_names
+          FROM duckdb_constraints()
+         WHERE schema_name = current_schema()
+    EOT
+    $sth->execute();
+
+    my %by_table;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @{$by_table{$row->{table_name}} //= []} => $row;
+    }
+
+    return \%by_table;
+}
+
+sub _query_constraints {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<'    EOT');
+        SELECT constraint_type,
+               constraint_column_names,
+               referenced_table,
+               referenced_column_names
+          FROM duckdb_constraints()
+         WHERE table_name = ?
+    EOT
+    $sth->execute($table);
+
+    return $sth->fetchall_arrayref({});
+}
+
+sub _fetch_all_columns {
+    my $self = shift;
+    my ($pk_by_table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<'    EOT');
+        SELECT table_name,
+               column_name,
+               column_index,
+               data_type,
+               is_nullable,
+               column_default
+          FROM duckdb_columns()
+         WHERE schema_name = current_schema()
+      ORDER BY table_name, column_index
+    EOT
+    $sth->execute();
+
+    my %by_table;
+    while (my $row = $sth->fetchrow_hashref) {
+        my $tname = $row->{table_name};
+        push @{$by_table{$tname} //= []} => {
+            cid        => $row->{column_index} - 1,
+            name       => $row->{column_name},
+            type       => $row->{data_type},
+            notnull    => $row->{is_nullable} ? 0 : 1,
+            pk         => ($pk_by_table->{$tname}{$row->{column_name}} ? 1 : 0),
+            dflt_value => $row->{column_default},
+        };
+    }
+
+    return \%by_table;
+}
+
+sub _query_columns {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare("SELECT * FROM pragma_table_info(?)");
+    $sth->execute($table);
+
+    return $sth->fetchall_arrayref({});
+}
+
+sub _fetch_all_indexes {
+    my $self = shift;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<'    EOT');
+        SELECT table_name, index_name, is_unique, expressions
+          FROM duckdb_indexes()
+         WHERE schema_name = current_schema()
+    EOT
+    $sth->execute();
+
+    my %by_table;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @{$by_table{$row->{table_name}} //= []} => $row;
+    }
+
+    return \%by_table;
+}
+
+sub _query_indexes {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<'    EOT');
+        SELECT index_name, is_unique, expressions
+          FROM duckdb_indexes()
+         WHERE table_name = ?
+    EOT
+    $sth->execute($table);
+
+    return $sth->fetchall_arrayref({});
+}
+
+sub _fetch_all_generated {
+    my $self = shift;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<'    EOT');
+        SELECT table_name, sql
+          FROM duckdb_tables()
+         WHERE schema_name = current_schema()
+    EOT
+    $sth->execute();
+
+    my %by_table;
+    while (my ($tname, $ddl) = $sth->fetchrow_array) {
+        $by_table{$tname} = {$self->_parse_generated($ddl)};
+    }
+
+    return \%by_table;
 }
 
 =pod
@@ -431,19 +614,14 @@ sub build_indexes_from_db {
     my $self = shift;
     my ($table, %params) = @_;
 
-    my $dbh = $self->{+DBH};
+    my $constraints = $params{constraint_rows} // $self->_query_constraints($table);
+    my $indexes     = $params{index_rows}      // $self->_query_indexes($table);
 
     my %out;
 
     # Primary key and unique constraints.
-    my $sth = $dbh->prepare(<<'    EOT');
-        SELECT constraint_type, constraint_column_names
-          FROM duckdb_constraints()
-         WHERE table_name = ?
-           AND constraint_type IN ('PRIMARY KEY', 'UNIQUE')
-    EOT
-    $sth->execute($table);
-    while (my $row = $sth->fetchrow_hashref) {
+    for my $row (@$constraints) {
+        next unless $row->{constraint_type} eq 'PRIMARY KEY' || $row->{constraint_type} eq 'UNIQUE';
         my $cols = $row->{constraint_column_names} // [];
         my $is_pk = $row->{constraint_type} eq 'PRIMARY KEY';
         my $name = $is_pk ? "${table}:pk" : "${table}:uniq:" . column_key(@$cols);
@@ -452,13 +630,7 @@ sub build_indexes_from_db {
 
     # Named secondary indexes. 'expressions' is an arrayref of the indexed
     # column names.
-    $sth = $dbh->prepare(<<'    EOT');
-        SELECT index_name, is_unique, expressions
-          FROM duckdb_indexes()
-         WHERE table_name = ?
-    EOT
-    $sth->execute($table);
-    while (my $row = $sth->fetchrow_hashref) {
+    for my $row (@$indexes) {
         my $name = $row->{index_name} // next;
         next if exists $out{$name};
 

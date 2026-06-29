@@ -29,7 +29,7 @@ my(%params) =
 	PL_FILES	=> {},
 	PREREQ_PM	=>
 	{
-		'Data::Dumper'			=> 2.189,
+		'Data::Dumper'			=> 0,
 		'ExtUtils::MakeMaker'	=> 7.70,
 		'File::Slurper'			=> 0.014,
 		'Getopt::Long'			=> 2.57,

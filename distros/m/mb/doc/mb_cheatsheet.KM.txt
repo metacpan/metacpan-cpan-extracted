@@ -33,3 +33,20 @@
   mb::set_script_encoding('utf8');
   my $s = "សួស្ដី";
   printf "ប្រវែង=%d\n", mb::length($s);
+
+[ 9. កន្សោមនិយ័តកម្ម code point ពេលដំណើរការ (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." ផ្គូផ្គងនឹង code point មួយ
+  $str =~ m{\G$mb{qr/(.)/}gc}   # ស្មើនឹងទម្រង់ tie
+
+[ 10. ផ្ទៀងផ្ទាត់ bytes ត្រឹមត្រូវ (mb::valid) ]
+  mb::valid($octets)            # ត្រឹមត្រូវ 1 បើមិនត្រឹមត្រូវ 0
+                                # តឹងរ៉ឹង ស្រេចចិត្ត អាស្រ័យលើ encoding
+
+[ 11. បំបែកតាម code point (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # បំបែកនៅព្រំដែន code point
+
+[ 12. មធ្យោបាយបីដើម្បីដំណើរការ (filter / modulino / runtime) ]
+  use mb;                       # ផ្លូវ 1: source filter (perl 5.8+)
+  perl mb.pm script.pl          # ផ្លូវ 2: modulino
+  use mb qw(*mb utf8);          # ផ្លូវ 3: runtime interface

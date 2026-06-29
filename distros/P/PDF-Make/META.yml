@@ -4,6 +4,7 @@ author:
   - 'LNATION <email@lnation.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test2::Bundle::Numerical: '0.03'
   Test::LeakTrace: '0'
   Test::More: '0'
 configure_requires:
@@ -22,6 +23,6 @@ no_index:
     - inc
 requires:
   Object::Proto: '0.16'
-  perl: '5.020000'
-version: '0.02'
+  perl: '5.010001'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

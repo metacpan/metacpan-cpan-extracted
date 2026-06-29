@@ -6,6 +6,9 @@ use Cwd qw/cwd/;
 
 require q[./t/helper.pm];
 
+# Don't bother with CHECKSUMS verification
+local $App::MechaCPAN::CHKSIGS = 0;
+
 my $pwd = cwd;
 foreach my $dist ( sort glob("$FindBin::Bin/../test_dists/Deploy*/") )
 {

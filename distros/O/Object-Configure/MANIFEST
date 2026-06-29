@@ -21,6 +21,7 @@ t/function.t
 t/inheritance.t
 t/instantiate.t
 t/integration.t
+t/locales.t
 t/manifest.t
 t/mutant_killer.t
 t/pod-cm.t

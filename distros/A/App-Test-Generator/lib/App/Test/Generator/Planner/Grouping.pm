@@ -20,11 +20,11 @@ Readonly my $GROUP_PURE     => 'pure';
 Readonly my $GROUP_MUTATING => 'mutating';
 Readonly my $GROUP_IMPURE   => 'impure';
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =head1 DESCRIPTION
 

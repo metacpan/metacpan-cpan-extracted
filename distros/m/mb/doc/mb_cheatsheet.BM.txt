@@ -44,3 +44,20 @@
   printf "length=%d\n", mb::length($s);    # character count
   printf "sub=%s\n",    mb::substr($s,0,5); # "Hello"
   printf "pos=%d\n",    mb::index($s,"World"); # 6
+
+[ 9. Regex titik kod masa larian (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." sepadan dengan satu titik kod
+  $str =~ m{\G$mb{qr/(.)/}gc}   # setara bentuk tie
+
+[ 10. Sahkan bait yang sah (mb::valid) ]
+  mb::valid($octets)            # 1 jika sah, 0 jika tidak
+                                # ketat, pilihan; berubah ikut pengekodan
+
+[ 11. Pisah ikut codepoint (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # pisah pada sempadan codepoint
+
+[ 12. Tiga cara menjalankan (filter / modulino / runtime) ]
+  use mb;                       # laluan 1: penapis sumber (perl 5.8+)
+  perl mb.pm script.pl          # laluan 2: modulino
+  use mb qw(*mb utf8);          # laluan 3: antara muka masa larian

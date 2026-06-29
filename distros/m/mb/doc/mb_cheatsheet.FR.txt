@@ -38,3 +38,20 @@
   printf "longueur=%d\n", mb::length($s);
   printf "sous=%s\n",     mb::substr($s,0,7);
   printf "pos=%d\n",      mb::index($s,"monde");
+
+[ 9. Expression régulière de point de code à l'exécution (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # « . » correspond à un point de code
+  $str =~ m{\G$mb{qr/(.)/}gc}   # équivalent à la forme tie
+
+[ 10. Valider des octets bien formés (mb::valid) ]
+  mb::valid($octets)            # 1 si bien formé, 0 sinon
+                                # strict, optionnel ; varie selon l'encodage
+
+[ 11. Découpage par point de code (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # découpe aux frontières de point de code
+
+[ 12. Trois façons d'exécuter (filter / modulino / runtime) ]
+  use mb;                       # voie 1 : filtre de source (perl 5.8+)
+  perl mb.pm script.pl          # voie 2 : modulino
+  use mb qw(*mb utf8);          # voie 3 : interface d'exécution

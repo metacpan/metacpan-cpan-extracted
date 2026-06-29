@@ -1,5 +1,10 @@
 Revision history for App-MechaCPAN
 
+0.32  2026-06-28 12:32:51 EDT
+  - Skip CHECKSUMS checks during unrelated tests
+  - Improve usage and help messaging
+  - Add packed-mechacpan instructions to Synopsis
+
 0.31  2026-06-27 10:42:12 EDT
   - Switch to using only tar for inflating archives, removing shell pipes
   - Clean up the logic around the cpanfile parsing, mainly around conflicts

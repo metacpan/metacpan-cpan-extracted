@@ -34,7 +34,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 use parent 'Data::URIID::Base';
 
@@ -72,6 +72,16 @@ my %attributes = (
     best_service => {},
     (map {$_ => {source_type => 'number'}} qw(altitude latitude longitude)),
     space_object => {},
+    is_on_earth => {
+        source_type => 'bool',
+        cb => sub {
+            my ($self) = @_;
+            my $space_object = $self->attribute('space_object', default => undef, as => 'Data::Identifier');
+
+            return undef unless defined $space_object;
+            return $space_object->userdata('Data::URIID', 'is_earth') || 0;
+        },
+    },
 
     sex_or_gender => {},
 
@@ -321,7 +331,7 @@ my %url_templates = (
         ['danbooru2chanjp-post-identifier' => 'https://danbooru.2chan.jp/image_data.php?start=%s&limit=1', undef, [qw(metadata)]],
     ],
     'sirtxkeepcoolorg' => [
-        ['sirtx-numerical-identifier' => 'https://sirtx.keep-cool.org/lists.html#sni:%s', undef, [qw(info)]],
+        ['sirtx-numerical-identifier' => 'https://sirtx.keep-cool.org/sni.html#sni:%s', undef, [qw(info)]],
     ],
     'denkxweb-hessen' => [
         ['denkxweb-hessen-identifier' => 'https://denkxweb.denkmalpflege-hessen.de/%u/', undef, [qw(info)]],
@@ -360,40 +370,15 @@ my %url_parser = (
             id => \1,
         },
         {
-            path => qr/^isbn:([0-9]{9}[0-9Xx])$/,
+            path => qr/^isbn:([0-9-]{9,}[0-9Xx])\z/,
             type => 'gtin',
             id => sub {
                 my ($self, $uri, $rule, $res) = @_;
                 my $isbn = $res->[0];
 
-                {
-                    my @digits = split(//, $isbn);
-                    my $check = pop(@digits);
-                    my $sum = 0;
+                require Business::ISBN;
 
-                    for (my $i = 0; length(my $c = shift @digits); $i++) {
-                        $sum += (ord($c) - ord('0')) * (10 - $i);
-                    }
-
-                    if ($check eq 'X' || $check eq 'x') {
-                        $check = 11;
-                    }
-
-                    die 'Bad check' unless $check == (11 - ($sum % 11));
-                }
-
-                {
-                    $isbn =~ s/^([0-9]{9}).$/978$1/;
-
-                    my @digits = split(//, $isbn);
-                    my $sum = 0;
-
-                    for (my $i = 0; length(my $c = shift @digits); $i++) {
-                        $sum += (ord($c) - ord('0')) * ($i & 1 ? 3 : 1);
-                    }
-
-                    return sprintf('%u%u', $isbn, 10 - ($sum % 10));
-                }
+                return Business::ISBN->new($isbn)->as_isbn13->as_string([]);
             },
         },
     ],
@@ -839,7 +824,7 @@ my %url_parser = (
             # urn:uuid:039e0bb7-5dd3-40ee-a98c-596ff6cce405
             # https://sirtx.keep-cool.org/lists.html#sni:10
             host => 'sirtx.keep-cool.org',
-            path => qr#^/lists\.html$#,
+            path => qr#^/(?:sni|lists)\.html$#,
             source => 'sirtxkeepcoolorg',
             type => 'sirtx-numerical-identifier',
             action => 'info',
@@ -943,6 +928,7 @@ my %ni_hashes = (
     'sha3-384'  => [64, 'sha-3-384'],
     'sha3-512'  => [86, 'sha-3-512'],
 );
+my %reverse_ni_hashes = map {$ni_hashes{$_}[1] => $_} keys %ni_hashes;
 
 
 # Private method.
@@ -1133,7 +1119,7 @@ sub _lookup__ni {
             if (length($hash) == $def->[0]) {
                 $hash = unpack('H*', MIME::Base64::decode_base64url($hash));
 
-                $self->_set;
+                $self->_set('scheme-ni', undef, undef, undef, 'fetch');
                 $self->{primary}{digest} //= {};
                 $self->{primary}{digest}{$def->[1]} = $hash;
 
@@ -1144,6 +1130,22 @@ sub _lookup__ni {
                 }
             }
         }
+    }
+}
+
+sub _lookup__geo {
+    my ($self) = @_;
+    my URI $uri = $self->{uri};
+    my $path = $uri->path;
+
+    if ($path =~ m#^([0-9]+(?:\.[0-9]+)?),([0-9]+(?:\.[0-9]+)?)(?:,([0-9]+(?:\.[0-9]+)?))?(?:;crs=wgs84)?\z#) {
+        my ($latitude, $longitude, $altitude) = ($1 + 0, $2 + 0, $3);
+
+        $self->_set('scheme-geo');
+        $self->{primary}{latitude}     = $latitude;
+        $self->{primary}{longitude}    = $longitude;
+        $self->{primary}{altitude}     = $altitude + 0 if defined $altitude;
+        $self->{primary}{space_object} = $self->extractor->earth->as('URI');
     }
 }
 
@@ -1337,6 +1339,10 @@ sub _cast {
             return $value;
         } elsif ($as eq 'ise' && $source_type eq 'media_subtype') {
             return $self->_media_subtype_to_uuid($value);
+        } elsif ($as eq 'string' && $source_type eq 'bool') {
+            return $value ? 'true' : 'false';
+        } elsif ($as eq 'string' && $source_type eq 'uint') {
+            return $value . '';
         } elsif ($as eq 'string' && eval {$value->isa('URI')}) {
             return $value->as_string;
         } elsif ($as eq __PACKAGE__ && eval {$value->isa('URI')}) {
@@ -1355,6 +1361,27 @@ sub _cast {
 
         if ($as eq __PACKAGE__ && defined(my $ise = eval{$self->attribute($key, %opts, as => 'ise')})) {
             return $self->_as_lookup([ise => $ise], %opts);
+        }
+    }
+
+    {
+        # Try via Data::Identifier
+        my $id;
+
+        if ($source_type eq 'media_subtype') {
+            $id = Data::Identifier->new(uuid => $self->_media_subtype_to_uuid($value));
+        } elsif ($source_type eq 'uint') {
+            $id = Data::Identifier::Generate->integer($value);
+        } elsif ($source_type eq 'bool') {
+            $id = Data::Identifier->new(uuid => ($value ? 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5' : '6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1'));
+        } elsif ($source_type eq 'ise') {
+            $id = Data::Identifier->new(ise => $value);
+        } elsif (ref $value) {
+            $id = eval { Data::Identifier->new(from => $value) };
+        }
+
+        if (defined($id) && defined(my $res = eval {$id->as($as)})) {
+            return $res;
         }
     }
 
@@ -1498,7 +1525,7 @@ sub digest {
             }
 
             return sprintf('v0 %s bytes 0-/* %s', $key, $value);
-        } elsif ($as eq 'Digest') {
+        } elsif ($as eq 'Digest' || $as eq 'Digest::base') {
             return Data::URIID::Digest->_new($value);
         }
 
@@ -1703,6 +1730,34 @@ sub url {
         }
     }
 
+    # Try ni:
+    if ($service eq 'scheme-ni' && defined($opts{action}) && $opts{action} eq 'fetch') {
+        foreach my $digest (qw(sha-3-256 sha-3-512 sha-3-384 sha-3-224 sha-2-256 sha-2-512 sha-2-384)) {
+            if (defined(my $value = $self->digest($digest, default => undef, as => 'binary'))) {
+                my $uri = URI->new(sprintf('ni:///%s;%s', $reverse_ni_hashes{$digest} // next, MIME::Base64::encode_base64url($value)));
+
+                if (defined(my $media_subtype = $self->attribute('media_subtype', default => undef, as => 'media_subtype'))) {
+                    $uri->query_param(ct => $media_subtype);
+                }
+
+                return $uri;
+            }
+        }
+    }
+
+    # Try geo:
+    if ($service eq 'scheme-geo' && defined($opts{action}) && $opts{action} eq 'info') {
+        if ($self->attribute('is_on_earth', default => undef) && defined(my $latitude = $self->attribute('latitude', default => undef)) && defined(my $longitude = $self->attribute('longitude', default => undef))){
+            my $str = sprintf('geo:%s,%s', $latitude, $longitude);
+
+            if (defined(my $altitude = $self->attribute('altitude', default => undef))) {
+                $str .= ','.$altitude;
+            }
+
+            return URI->new($str);
+        }
+    }
+
     if (defined($self->{url_overrides}) && defined($self->{url_overrides}{$service})) {
         if (defined(my $action = $opts{action})) {
             if (defined(my $url = $self->{url_overrides}{$service}{$action})) {
@@ -1879,14 +1934,14 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 
     use Data::URIID;
 
-    my $extractor = Data::URIID->new;
-    my $result = $extractor->lookup( $URI );
+    my Data::URIID $extractor = Data::URIID->new;
+    my Data::URIID::Result $result = $extractor->lookup( $URI );
 
 This module provides access to results from a lookup.
 
@@ -1987,6 +2042,12 @@ A name that can be used to display the subject to the user.
 
 An icon for the item.
 
+=item C<is_on_earth>
+
+A boolean indicating whether the object is located on earth.
+This is specifically useful on results that also provide C<latitude> and C<longitude>.
+It provides an easy way as checking L</space_object> to be equal to earth is a non-trivial problem as different services might return different identifiers for earth.
+
 =item C<icon_text>
 
 A one character alternative to the icon.
@@ -2030,6 +2091,7 @@ The sex or gender of the object. This is useful when addressing people.
 =item C<space_object>
 
 The object in space (astronomical body) this item is on.
+See also L</is_on_earth>.
 
 =item C<thumbnail>
 
@@ -2119,12 +2181,12 @@ On any error this method will C<die>.
 
 =head2 url
 
-    my $url = $result->url;
+    my iURI $url = $result->url;
     # or:
-    my $url = $result->url( $service );
-    my $url = $result->url( service => $service ); # the same
+    my URI $url = $result->url( $service );
+    my URI $url = $result->url( service => $service ); # the same
     # or:
-    my $url = $result->url( %options );
+    my URI $url = $result->url( %options );
 
 Returns a URL for the resource on a given service.
 If no service is given the value returned by C<$result-E<gt>attribute('service')> is used.

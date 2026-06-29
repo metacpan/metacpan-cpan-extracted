@@ -1,5 +1,53 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.23	Sun Jun 28 09:55:21 EDT 2026
+	[ Refactoring ]
+	- Replaced hand-rolled _walk_isa / _get_inheritance_chain with mro::get_linear_isa
+	  (handles diamond inheritance correctly; UNIVERSAL appended manually when absent).
+	  _walk_isa is removed; callers that called it directly will get "Undefined subroutine".
+	- Extracted _build_logger() private helper consolidating logger creation from
+	  configure() and _reconfigure_logger(), eliminating the duplication.
+	- Added Readonly constants for all magic strings: $OS_WINDOWS, $LOGGER_NULL,
+	  $SIG_DEFAULT, $SIG_IGNORE, $POLL_SLEEP, $KILL_TIMEOUT.
+	- Removed duplicate dead-code block in configure() (second identical
+	  "if ($array && !$params->{'logger'}->{'array'})" check).
+	- Replaced POSIX::WNOHANG() fully-qualified call with imported WNOHANG.
+	- Added =head1 LIMITATIONS POD section documenting known design trade-offs.
+	- Readonly promoted from TEST_REQUIRES to PREREQ_PM (now used in lib/).
+
+	[ Bug Fixes ]
+	- Fixed configure() to give user-supplied arrayref logger priority over
+	  config-file logger (previously the config file could silently override
+	  an explicitly passed logger => \@arr).
+	- Fixed env-var ancestor merge order in configure() no-config-file path:
+	  was iterating child-first (base-class env vars overrode child-class),
+	  now iterates base-first so child correctly overrides base.
+	- Fixed _reload_object_config() logger-key match from /^logger/ to eq 'logger':
+	  keys like 'logger.file' are flat config values, not logger specs, and must
+	  not be processed through _reconfigure_logger().
+	- Fixed warn → carp in reload_config() for package-correct stack traces.
+
+	[ CI ]
+	- Bumped App::Test::Generator to 0.41 in both dashboard.yml and mutate.yml.
+	- Added --exclude lib/Devel --exclude lib/App/Test/Generator/Sample to the
+	  non-ATG-repo generate-test-dashboard call in dashboard.yml (parity with
+	  mutate.yml).
+	- Fixed empty-BASE guard in mutate.yml (no-op diff when all commits are bot).
+	- Added conditional $BASE_SHA_FLAG in mutate.yml (avoids passing empty --base_sha).
+	- Removed || true from all git pull --rebase lines in both workflow files.
+	- Fixed coverage snapshot to use pre-captured SNAPSHOT_SHA / SNAPSHOT_TIMESTAMP
+	  instead of recomputing git rev-parse after bot commits moved HEAD.
+
+	[ Tests ]
+	- Added t/locales.t: verifies configure() error strings are locale-consistent
+	  under en_US.UTF-8, de_DE.UTF-8, ja_JP.UTF-8 using local $! = ENOENT pattern.
+	- Updated t/function.t: replaced _walk_isa() subtests with _get_inheritance_chain()
+	  equivalents to match refactored internals.
+
+0.22
+	[ Bug Fixes ]
+	- Fixed https://github.com/nigelhorne/Object-Configure/issues/4
+
 0.21	Thu May 21 07:55:13 EDT 2026
 
 	[Bug Fixes]

@@ -116,6 +116,58 @@ Larry Wall-san's Way
 
   Welcome to world of Larry Wall-san's Way!!
 
+THREE WAYS TO RUN
+
+  A script reaches multibyte codepoint semantics in one of three ways.
+  They are additive; pick the one that fits.
+
+    -----------------------------------------------------------------------
+    way            how to invoke         transpiles            perl
+    -----------------------------------------------------------------------
+    1 filter       use mb;               the whole file        5.8 and later
+    2 modulino     perl mb.pm script.pl  the whole script      5.005_03+
+    3 runtime      use mb qw(*mb utf8);  only where you call   5.005_03+
+                                         mb::qr / mb::valid /
+                                         mb::split / $mb{...}
+    -----------------------------------------------------------------------
+
+  Use the filter for a fresh script on a modern perl with plain-looking
+  source.  Use the modulino when you must support perl 5.005_03 / 5.6 (no
+  source filter there), run a single file as "perl mb.pm script.pl", or need
+  <DATA> (a __DATA__/__END__ script is run through a child interpreter).  Use
+  the runtime interface to keep ordinary octet Perl and add codepoint behaviour
+  only at the few spots that need it.
+
+STRICT VS LENIENT
+
+  After mb::set_script_encoding('utf8') (or 'sjis', 'eucjp', ...), mb defines
+  one "character" STRICTLY as: a well-formed multi-byte sequence of that
+  encoding, OR a single US-ASCII byte. A stray octet is not a character.
+
+    mb::set_script_encoding('utf8');
+    mb::length("A\x85B");    # 1  (0x85 is a stray byte; the walk halts)
+
+    mb::set_script_encoding('sjis');
+    mb::length("A\x85B");    # 2  (under sjis 0x85 is a legal lead byte)
+
+  So "strict" means strict with respect to the current encoding. The codepoint
+  character classes are strict too: "\S" matches a well-formed sequence or a
+  US-ASCII byte, so a lone stray octet matches neither "\s" nor "\S".
+  mb::valid() is the explicit predicate built on this same strict unit (1 if
+  the whole string is well-formed, 0 otherwise).
+
+  The one deliberate lenient exception, and only on the filter/modulino paths,
+  is the dot ".": a transpiled "." also matches any single octet so it never
+  gets stuck on binary data. The runtime interface (mb::qr) keeps even "."
+  strict.
+
+  "Lenient" otherwise just means the octet view: plain "length"/"substr" count
+  bytes, and a script that calls mb::set_script_encoding() itself is passed
+  through the filter unchanged so it keeps managing octets on its own. Choose
+  the codepoint (strict) model for text work and to detect malformed input;
+  choose the octet (lenient) model for binary-safe I/O and byte-exact
+  pass-through; or use mb::valid() as the gate where octets become trusted text.
+
 INSTALLATION
 
   perl mb.pm install

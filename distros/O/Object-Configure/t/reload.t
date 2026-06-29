@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use Errno qw(ENOENT);
-use POSIX qw(strerror);	# Import the strerror function
 use Test::Most;
 use File::Temp qw(tempfile tempdir);
 use File::Spec;
@@ -296,7 +295,12 @@ subtest 'Error handling' => sub {
 	# Test with non-existent config file
 	my $bad_config = File::Spec->catfile($temp_dir, 'nonexistent.conf');
 
-	my $mess = strerror(ENOENT);
+	# Use Perl's own $! to get the ENOENT string — this is locale-consistent
+	# with whatever Perl embeds in the thrown exception, unlike POSIX::strerror
+	# which uses the C library's LC_MESSAGES locale and can diverge on systems
+	# where the two locale stacks are configured differently.
+	local $! = ENOENT;
+	my $mess = "$!";
 	throws_ok {
 		TestClass->new(config_file => $bad_config);
 	} qr/\Q$mess\E/, 'Dies with non-existent config file';

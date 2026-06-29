@@ -33,3 +33,20 @@
   mb::set_script_encoding('utf8');
   my $s = "Сайн байна уу";
   printf "урт=%d\n", mb::length($s);
+
+[ 9. Ажиллах үеийн код цэгийн тогтмол илэрхийлэл (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." нэг код цэгтэй тохирно
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie хэлбэртэй тэнцүү
+
+[ 10. Зөв байтуудыг шалгах (mb::valid) ]
+  mb::valid($octets)            # зөв бол 1, эс бөгөөс 0
+                                # хатуу, сонголтоор; кодчлолоос хамаарна
+
+[ 11. Код цэгээр хуваах (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # код цэгийн хязгаараар хуваана
+
+[ 12. Ажиллуулах гурван арга (filter / modulino / runtime) ]
+  use mb;                       # зам 1: эх кодын шүүлтүүр (perl 5.8+)
+  perl mb.pm script.pl          # зам 2: modulino
+  use mb qw(*mb utf8);          # зам 3: ажиллах үеийн интерфейс

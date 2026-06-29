@@ -13,6 +13,10 @@ use List::Util            qw(first);
 
 use SBOM::CycloneDX::Schema;
 
+unless ($ENV{JSON_SCHEMA_TESTING}) {
+    plan(skip_all => "Skip JSON Schema tests");
+}
+
 my @SKIP = qw[
     valid-attestation-1.6.json
     valid-attestation-1.7.json

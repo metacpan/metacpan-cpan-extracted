@@ -34,3 +34,20 @@
   my $s = "नमस्ते दुनिया";
   printf "लंबाई=%d\n", mb::length($s);
   printf "भाग=%s\n",   mb::substr($s,0,5);
+
+[ 9. रनटाइम कोडपॉइंट रेगुलर एक्सप्रेशन (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." एक कोडपॉइंट से मेल खाता है
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie रूप के समतुल्य
+
+[ 10. सही बाइट्स की जाँच (mb::valid) ]
+  mb::valid($octets)            # सही होने पर 1, अन्यथा 0
+                                # सख्त, वैकल्पिक; एन्कोडिंग पर निर्भर
+
+[ 11. कोडपॉइंट के अनुसार विभाजन (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # कोडपॉइंट सीमा पर विभाजन
+
+[ 12. चलाने के तीन तरीके (filter / modulino / runtime) ]
+  use mb;                       # पथ 1: सोर्स फ़िल्टर (perl 5.8+)
+  perl mb.pm script.pl          # पथ 2: modulino
+  use mb qw(*mb utf8);          # पथ 3: रनटाइम इंटरफ़ेस

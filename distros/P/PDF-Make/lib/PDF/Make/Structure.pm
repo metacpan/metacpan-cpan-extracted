@@ -3,7 +3,7 @@ package PDF::Make::Structure;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use PDF::Make ();
 

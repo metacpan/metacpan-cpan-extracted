@@ -24,14 +24,12 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Devel::Confess" => 0,
     "Scalar::Util" => "1.22",
-    "autodie" => 0
-  },
-  "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::LeakTrace" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "autodie" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t"
   }

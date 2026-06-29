@@ -1,6 +1,6 @@
 package DBIx::Auto::Migrate;
 
-our $VERSION = "0.8";
+our $VERSION = "1.001";
 
 use v5.16.3;
 use strict;
@@ -30,24 +30,35 @@ sub _migrations_finish {
     _check_defined_sub( $caller, 'dsn' );
     _check_defined_sub( $caller, 'user' );
     _check_defined_sub( $caller, 'pass' );
-    my $extra;
-    if ( defined( my $extra_sub = $caller->can('extra') ) ) {
-        $extra = $extra_sub->();
-    }
-    $extra //= {};
-    my ( $dsn, $user, $pass ) = ( $caller->dsn, $caller->user, $caller->pass );
 
-    if ( 'HASH' ne ref $extra ) {
-        die "${caller}::extra should return a hashref or undef";
-    }
     {
         no strict 'refs';
         no warnings 'redefine';
         *{"${caller}::connect"} = sub {
-            _connect_wrapper( $caller, 'connect', $dsn, $user, $pass, $extra );
+            my $self = shift;
+            my $extra;
+            if ( defined( my $extra_sub = $self->can('extra') ) ) {
+                $extra = $extra_sub->();
+            }
+            $extra //= {};
+            if ( 'HASH' ne ref $extra ) {
+                die "${caller}::extra should return a hashref or undef";
+            }
+            my ( $dsn, $user, $pass ) = ( $self->dsn, $self->user, $self->pass );
+            _connect_wrapper( $self, $caller, 'connect', $dsn, $user, $pass, $extra );
         };
         *{"${caller}::connect_cached"} = sub {
-            _connect_wrapper( $caller, 'connect_cached', $dsn, $user, $pass,
+            my $self = shift;
+            my $extra;
+            if ( defined( my $extra_sub = $self->can('extra') ) ) {
+                $extra = $extra_sub->();
+            }
+            $extra //= {};
+            if ( 'HASH' ne ref $extra ) {
+                die "${caller}::extra should return a hashref or undef";
+            }
+            my ( $dsn, $user, $pass ) = ( $self->dsn, $self->user, $self->pass );
+            _connect_wrapper( $self, $caller, 'connect_cached', $dsn, $user, $pass,
                 $extra );
         };
 
@@ -55,29 +66,34 @@ sub _migrations_finish {
 }
 
 sub _connect_wrapper {
-    my ( $caller, $sub, $dsn, $user, $pass, $extra ) = @_;
+    my ( $self, $caller, $sub, $dsn, $user, $pass, $extra ) = @_;
     my $dbh = DBI->can($sub)->(
         'DBI', $dsn, $user, $pass,
         {
-            RaiseError => 1,
-            Callbacks  => {
-                connected => sub {
-                    eval {shift->do('set timezone = UTC')};
-                    return;
-                }
-            },
-            %$extra,
+            (
+                defined $extra
+                ?  (%$extra) 
+                : (
+                    RaiseError => 1,
+                    Callbacks  => {
+                        connected => sub {
+                            eval {shift->do('set timezone = UTC')};
+                            return;
+                        }
+                    }
+                )
+            )
         },
     );
-    _migrate( $caller, $dbh );
+    _migrate( $self, $caller, $dbh );
     return $dbh;
 }
 
 sub _migrate {
-    my ( $caller, $dbh ) = @_;
+    my ( $self, $caller, $dbh ) = @_;
     local $dbh->{RaiseError} = 0;
     local $dbh->{PrintError} = 0;
-    my @migrations = $caller->can('migrations')->();
+    my @migrations = $self->can('migrations')->();
     if ( _get_current_migration($dbh) > @migrations ) {
         warn "Something happened there, wrong migration number.";
     }

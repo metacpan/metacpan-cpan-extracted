@@ -23,15 +23,11 @@
          "requires" : {
             "Devel::Confess" : "0",
             "Scalar::Util" : "1.22",
-            "autodie" : "0",
-            "perl" : "5.010"
-         }
-      },
-      "test" : {
-         "requires" : {
             "Test::Exception" : "0",
             "Test::LeakTrace" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "autodie" : "0",
+            "perl" : "5.010"
          }
       }
    },
@@ -47,9 +43,9 @@
          "web" : "https://github.com/hhg7/stats"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_generated_by_perl" : "v5.42.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

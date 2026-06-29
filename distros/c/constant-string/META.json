@@ -1,0 +1,68 @@
+{
+   "abstract" : "Perl pragma to declare constants whose values are their own names",
+   "author" : [
+      "James Wright <jameswright6@acm.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.051",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "constant-string",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.044"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.051"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "constant" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "overload" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "constant::string" : {
+         "file" : "lib/constant/string.pm",
+         "version" : "2026.267"
+      },
+      "constant::string::uc" : {
+         "file" : "lib/constant/string/uc.pm",
+         "version" : "2026.267"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tehmoth/constant-string/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tehmoth/constant-string.git",
+         "web" : "https://github.com/tehmoth/constant-string"
+      }
+   },
+   "version" : "2026.267",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

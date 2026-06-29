@@ -33,3 +33,20 @@
   mb::set_script_encoding('utf8');
   my $s = "ආයුබෝවන්";
   printf "දිග=%d\n", mb::length($s);
+
+[ 9. ධාවන කාල කේතාංක නිත්‍ය ප්‍රකාශනය (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." කේතාංකයකට ගැළපේ
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie ආකෘතියට සමානයි
+
+[ 10. වලංගු බයිට් පරීක්ෂාව (mb::valid) ]
+  mb::valid($octets)            # වලංගු නම් 1, නැතිනම් 0
+                                # දැඩි, විකල්ප; කේතනය අනුව වෙනස් වේ
+
+[ 11. කේතාංක මායිම් වල බෙදීම (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # කේතාංක මායිම් වල බෙදයි
+
+[ 12. ධාවනය කිරීමට ක්‍රම තුනක් (filter / modulino / runtime) ]
+  use mb;                       # මාර්ගය 1: මූල පෙරහන (perl 5.8+)
+  perl mb.pm script.pl          # මාර්ගය 2: modulino
+  use mb qw(*mb utf8);          # මාර්ගය 3: ධාවන අතුරුමුහුණත

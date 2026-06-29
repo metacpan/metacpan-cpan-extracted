@@ -1,5 +1,15 @@
 Revision history for Perl extension JavaScript::Minifier::XS.
 
+0.16      2026-06-28 14:10:28-07:00 America/Vancouver
+    - Fixes CVE-2026-56017, which caused Perl to SEGFAULT when calling
+      minify().  Thanks to CPANSec for raising the issue, and providing a
+      prototype fix.
+    - Fixes CVE-2026-56018, caused by a memory leak in minify() where each
+      tokenized Node's "contents" buffer were not properly freed, resulting in a
+      memory leak on every call.
+    - Updated author tests for "does the JS still compile?", to use "node"
+      instead of "jsl".
+
 0.15      2021-10-15 20:21:23-07:00 America/Vancouver
     - GH#8 - preserve newlines when collapsing whitespace; if a block of
       whitespace contains a newline, then when collapsing we collapse to a

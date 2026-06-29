@@ -44,3 +44,20 @@
   printf "length=%d\n", mb::length($s);    # character count
   printf "sub=%s\n",    mb::substr($s,0,5); # "Hello"
   printf "pos=%d\n",    mb::index($s,"World"); # 6
+
+[ 9. Runtime na regex ng code point (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." tumutugma sa isang code point
+  $str =~ m{\G$mb{qr/(.)/}gc}   # katumbas ng tie na anyo
+
+[ 10. I-validate ang tamang bytes (mb::valid) ]
+  mb::valid($octets)            # 1 kung tama, 0 kung hindi
+                                # mahigpit, opsyonal; nag-iiba ayon sa encoding
+
+[ 11. Hatiin ayon sa codepoint (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # hatiin sa hangganan ng codepoint
+
+[ 12. Tatlong paraan ng pagpapatakbo (filter / modulino / runtime) ]
+  use mb;                       # daan 1: source filter (perl 5.8+)
+  perl mb.pm script.pl          # daan 2: modulino
+  use mb qw(*mb utf8);          # daan 3: runtime interface

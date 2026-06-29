@@ -63,10 +63,11 @@ my $qt = Algorithm::QuadTree->new(
 );
 
 Test::MemoryGrowth::no_growth {
-	init_zones $qt;
+	init_zones $qt, 2;
 
 	my $clearer = loop_zones {
-		$qt->delete(object_name(@_));
+		$qt->delete(object_name(@_, 1));
+		$qt->delete(object_name(@_, 2));
 	};
 
 	$clearer->();

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000025';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -95,6 +95,26 @@ sub async_prepare_args     { my ($self, %params) = @_; $self->dbi_driver eq 'DBD
 sub async_ready            { my ($self, %params) = @_; $self->dbi_driver eq 'DBD::mysql' ? $params{sth}->mysql_async_ready() : $params{sth}->mariadb_async_ready() }
 sub async_result           { my ($self, %params) = @_; $self->dbi_driver eq 'DBD::mysql' ? $params{sth}->mysql_async_result() : $params{sth}->mariadb_async_result() }
 sub async_cancel           { my $self = shift; croak "Dialect '" . $self->dialect_name . "' does not support canceling async queries" }
+
+=pod
+
+=item $bool = $dialect->cas_count_reliable(\%attrs)
+
+The MySQL and MariaDB drivers enable the found-rows client flag by default, so
+the affected-row count reflects rows matched. This returns false only when that
+flag (C<mysql_client_found_rows> / C<mariadb_found_rows>) was explicitly turned
+off in the connect attributes.
+
+=cut
+
+sub cas_count_reliable {
+    my $self = shift;
+    my ($attrs) = @_;
+    for my $key (qw/mysql_client_found_rows mariadb_found_rows/) {
+        return 0 if exists $attrs->{$key} && !$attrs->{$key};
+    }
+    return 1;
+}
 
 =pod
 
@@ -404,23 +424,32 @@ sub build_tables_from_db {
 
     my $sth = $dbh->prepare('SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = ?');
     $sth->execute($self->{+DB_NAME});
+    my @table_list = @{$sth->fetchall_arrayref};
+
+    # Sweep all columns, indexes, and constraints for the database in one query
+    # each, grouped by table, rather than a query-per-table. The per-table
+    # builders below consume these pre-fetched rows.
+    my $all_columns = $self->_fetch_all_columns;
+    my $all_indexes = $self->_fetch_all_indexes;
+    my $all_keys    = $self->_fetch_all_keys;
 
     my %tables;
 
-    while (my ($tname, $type) = $sth->fetchrow_array) {
+    for my $row (@table_list) {
+        my ($tname, $type) = @$row;
         next if $params{autofill}->skip(table => $tname);
 
         my $table = {name => $tname, db_name => $tname, is_temp => $TEMP_TYPES{$type} // 0};
         my $class = $TABLE_TYPES{$type} // 'DBIx::QuickORM::Schema::Table';
         $params{autofill}->hook(pre_table => {table => $table, class => \$class});
 
-        $table->{columns} = $self->build_columns_from_db($tname, %params);
+        $table->{columns} = $self->build_columns_from_db($tname, %params, column_rows => $all_columns->{$tname} // []);
         $params{autofill}->hook(columns => {columns => $table->{columns}, table => $table});
 
-        $table->{indexes} = $self->build_indexes_from_db($tname, %params);
+        $table->{indexes} = $self->build_indexes_from_db($tname, %params, index_rows => $all_indexes->{$tname} // []);
         $params{autofill}->hook(indexes => {indexes => $table->{indexes}, table => $table});
 
-        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params);
+        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params, key_rows => $all_keys->{$tname} // []);
 
         $params{autofill}->hook(post_table => {table => $table, class => \$class});
 
@@ -437,31 +466,12 @@ sub build_table_keys_from_db {
     my $self = shift;
     my ($table, %params) = @_;
 
-    my $dbh = $self->{+DBH};
-
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT tco.constraint_name          AS con,
-               tco.constraint_type          AS type,
-               kcu.column_name              AS col,
-               kcu.referenced_table_name    AS ftab,
-               kcu.referenced_column_name   AS fcol
-          FROM information_schema.table_constraints tco
-          JOIN information_schema.key_column_usage  kcu
-            ON tco.constraint_schema = kcu.constraint_schema
-           AND tco.constraint_name   = kcu.constraint_name
-           AND tco.table_name        = kcu.table_name
-         WHERE tco.table_schema NOT IN ('sys','information_schema', 'mysql', 'performance_schema')
-           AND tco.table_name        = ?
-           AND tco.table_schema      = ?
-      ORDER BY tco.table_schema, tco.table_name, tco.constraint_name, kcu.ordinal_position
-    EOT
-
-    $sth->execute($table, $self->{+DB_NAME});
+    my $rows = $params{key_rows} // $self->_query_keys($table);
 
     my ($pk, %unique, @links);
 
     my %keys;
-    while (my $row = $sth->fetchrow_hashref) {
+    for my $row (@$rows) {
         my $item = $keys{$row->{con}} //= {type => lc($row->{type})};
 
         push @{$item->{columns} //= []} => $row->{col};
@@ -497,19 +507,11 @@ sub build_columns_from_db {
     my ($table, %params) = @_;
 
     croak "A table name is required" unless $table;
-    my $dbh = $self->{+DBH};
 
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT *
-          FROM information_schema.columns
-         WHERE table_name    = ?
-           AND table_schema  = ?
-    EOT
+    my $rows = $params{column_rows} // $self->_query_columns($table);
 
-    $sth->execute($table, $self->{+DB_NAME});
-
-    my (%columns, @links);
-    while (my $res = $sth->fetchrow_hashref) {
+    my %columns;
+    for my $res (@$rows) {
         next if $params{autofill}->skip(column => ($table, $res->{COLUMN_NAME}));
 
         my $col = {};
@@ -606,8 +608,113 @@ sub build_indexes_from_db {
     my $self = shift;
     my ($table, %params) = @_;
 
-    my $dbh = $self->dbh;
+    my $rows = $params{index_rows} // $self->_query_indexes($table);
 
+    my %out;
+    for my $r (@$rows) {
+        my ($name, $col, $nu, $type) = @$r;
+        my $idx = $out{$name} //= {name => $name, unique => $nu ? 0 : 1, type => $type, columns => []};
+        push @{$idx->{columns}} => $col;
+    }
+
+    return [map { $params{autofill}->hook(index => {index => $out{$_}, table_name => $table}); $out{$_} } sort keys %out];
+}
+
+=pod
+
+=head1 PRIVATE METHODS (schema introspection)
+
+=over 4
+
+=item $by_table = $dialect->_fetch_all_columns
+
+=item $by_table = $dialect->_fetch_all_indexes
+
+=item $by_table = $dialect->_fetch_all_keys
+
+Sweep all column, index, and constraint metadata for the connected database in
+a single query each, returning a hashref of table name to the rows for that
+table (in the same shape the matching single-table C<_query_*> helper returns).
+
+=item $rows = $dialect->_query_columns($table)
+
+=item $rows = $dialect->_query_indexes($table)
+
+=item $rows = $dialect->_query_keys($table)
+
+Single-table fallbacks used when the per-table builders are called without
+pre-fetched rows. Each issues one query scoped to C<$table>.
+
+=back
+
+=cut
+
+sub _fetch_all_columns {
+    my $self = shift;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT *
+          FROM information_schema.columns
+         WHERE table_schema = ?
+      ORDER BY table_name, ordinal_position
+    EOT
+    $sth->execute($self->{+DB_NAME});
+
+    my %by_table;
+    while (my $res = $sth->fetchrow_hashref) {
+        my $tname = $res->{TABLE_NAME} // $res->{table_name};
+        push @{$by_table{$tname} //= []} => $res;
+    }
+
+    return \%by_table;
+}
+
+sub _query_columns {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT *
+          FROM information_schema.columns
+         WHERE table_name    = ?
+           AND table_schema  = ?
+    EOT
+    $sth->execute($table, $self->{+DB_NAME});
+
+    return $sth->fetchall_arrayref({});
+}
+
+sub _fetch_all_indexes {
+    my $self = shift;
+
+    my $dbh = $self->dbh;
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT table_name,
+               index_name,
+               column_name,
+               non_unique,
+               index_type
+          FROM INFORMATION_SCHEMA.STATISTICS
+         WHERE table_schema = ?
+      ORDER BY table_name, index_name, seq_in_index
+    EOT
+    $sth->execute($self->{+DB_NAME});
+
+    my %by_table;
+    while (my ($tname, $name, $col, $nu, $type) = $sth->fetchrow_array) {
+        push @{$by_table{$tname} //= []} => [$name, $col, $nu, $type];
+    }
+
+    return \%by_table;
+}
+
+sub _query_indexes {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->dbh;
     my $sth = $dbh->prepare(<<"    EOT");
         SELECT index_name,
                column_name,
@@ -618,16 +725,65 @@ sub build_indexes_from_db {
            AND table_schema = ?
       ORDER BY index_name, seq_in_index
     EOT
-
     $sth->execute($table, $self->{+DB_NAME});
 
-    my %out;
-    while (my ($name, $col, $nu, $type) = $sth->fetchrow_array) {
-        my $idx = $out{$name} //= {name => $name, unique => $nu ? 0 : 1, type => $type, columns => []};
-        push @{$idx->{columns}} => $col;
+    return $sth->fetchall_arrayref;
+}
+
+sub _fetch_all_keys {
+    my $self = shift;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT tco.table_name             AS tab,
+               tco.constraint_name        AS con,
+               tco.constraint_type        AS type,
+               kcu.column_name            AS col,
+               kcu.referenced_table_name  AS ftab,
+               kcu.referenced_column_name AS fcol
+          FROM information_schema.table_constraints tco
+          JOIN information_schema.key_column_usage  kcu
+            ON tco.constraint_schema = kcu.constraint_schema
+           AND tco.constraint_name   = kcu.constraint_name
+           AND tco.table_name        = kcu.table_name
+         WHERE tco.table_schema NOT IN ('sys','information_schema', 'mysql', 'performance_schema')
+           AND tco.table_schema = ?
+      ORDER BY tco.table_name, tco.constraint_name, kcu.ordinal_position
+    EOT
+    $sth->execute($self->{+DB_NAME});
+
+    my %by_table;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @{$by_table{$row->{tab}} //= []} => $row;
     }
 
-    return [map { $params{autofill}->hook(index => {index => $out{$_}, table_name => $table}); $out{$_} } sort keys %out];
+    return \%by_table;
+}
+
+sub _query_keys {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT tco.constraint_name          AS con,
+               tco.constraint_type          AS type,
+               kcu.column_name              AS col,
+               kcu.referenced_table_name    AS ftab,
+               kcu.referenced_column_name   AS fcol
+          FROM information_schema.table_constraints tco
+          JOIN information_schema.key_column_usage  kcu
+            ON tco.constraint_schema = kcu.constraint_schema
+           AND tco.constraint_name   = kcu.constraint_name
+           AND tco.table_name        = kcu.table_name
+         WHERE tco.table_schema NOT IN ('sys','information_schema', 'mysql', 'performance_schema')
+           AND tco.table_name        = ?
+           AND tco.table_schema      = ?
+      ORDER BY tco.table_schema, tco.table_name, tco.constraint_name, kcu.ordinal_position
+    EOT
+    $sth->execute($table, $self->{+DB_NAME});
+
+    return $sth->fetchall_arrayref({});
 }
 
 ###############################################################################

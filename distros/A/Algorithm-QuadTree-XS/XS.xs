@@ -38,7 +38,6 @@ _AQT_deinit(self)
 		clear_tree(root);
 		destroy_node(root->node);
 		free(root->node);
-		destroy_array(root->objects);
 		SvREFCNT_dec((SV*) root->backref);
 
 		free(root);

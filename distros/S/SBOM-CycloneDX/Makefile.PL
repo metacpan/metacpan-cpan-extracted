@@ -33,7 +33,7 @@ WriteMakefile(
                 web  => 'https://github.com/giterlizzi/perl-SBOM-CycloneDX'
             },
         },
-        x_purl => 'pkg:cpan/GDT/SBOM-CycloneDX'
+        x_purl => 'pkg:cpan/SBOM-CycloneDX'
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
     clean => {FILES    => 'SBOM-CycloneDX-*'},

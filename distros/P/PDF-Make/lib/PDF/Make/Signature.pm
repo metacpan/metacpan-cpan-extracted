@@ -2,7 +2,7 @@ package PDF::Make::Signature;
 
 use strict;
 use warnings;
-use 5.020;
+use 5.010001;
 use PDF::Make ();  # XS supplies _verify, _count, _sign_doc and the SigningIdentity / Certificate accessors
 
 =head1 NAME
@@ -73,7 +73,7 @@ Features:
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use Carp qw(croak);
 use Scalar::Util qw(blessed);

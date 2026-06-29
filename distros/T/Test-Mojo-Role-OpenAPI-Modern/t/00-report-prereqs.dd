@@ -11,10 +11,6 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
-                                      'Encode' => '0',
-                                      'File::Spec' => '0',
-                                      'IO::Handle' => '0',
-                                      'IPC::Open3' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta' => '0',
@@ -38,19 +34,13 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'JSON::Schema::Modern' => '0.638',
-                                      'List::Util' => '0',
-                                      'Mojo::Base' => '0',
                                       'Mojolicious' => '9.0',
-                                      'OpenAPI::Modern' => '0.133',
+                                      'OpenAPI::Modern' => '0.139',
                                       'Role::Tiny' => '2.000001',
-                                      'feature' => '0',
                                       'if' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => '5.020',
-                                      'strict' => '0',
-                                      'strictures' => '2',
-                                      'utf8' => '0',
-                                      'warnings' => '0'
+                                      'strictures' => '2'
                                     }
                     },
        'test' => {
@@ -58,20 +48,13 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'File::Spec' => '0',
-                                   'Module::Metadata' => '0',
-                                   'Mojo::URL' => '0',
+                                   'Clone' => '0',
                                    'Mojolicious' => '9.0',
-                                   'Scalar::Util' => '0',
-                                   'Storable' => '0',
                                    'Test::Deep' => '0',
-                                   'Test::Mojo' => '0',
                                    'Test::More' => '0.96',
                                    'Test::Needs' => '0',
                                    'YAML::PP' => '0.005',
                                    'experimental' => '0',
-                                   'lib' => '0',
-                                   'open' => '0',
                                    'perl' => '5.020',
                                    'stable' => '0.031'
                                  }
@@ -127,6 +110,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::PromptIfStale' => '0',
                                            'Dist::Zilla::Plugin::Readme' => '0',
                                            'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.142180',
+                                           'Dist::Zilla::Plugin::RemovePrereqs' => '0',
                                            'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.006',
                                            'Dist::Zilla::Plugin::Run::AfterBuild' => '0.041',
                                            'Dist::Zilla::Plugin::Run::AfterRelease' => '0.038',

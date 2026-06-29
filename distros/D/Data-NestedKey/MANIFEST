@@ -2,9 +2,11 @@ ChangeLog
 lib/Data/NestedKey.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 share/README.md
 t/01-append.t
 t/01-as_string.t
 t/01-basic.t
+t/01-subscript.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

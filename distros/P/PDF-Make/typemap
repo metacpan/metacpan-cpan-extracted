@@ -31,374 +31,346 @@ int32_t	T_IV
 INPUT
 
 T_PTROBJ_WRITER
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Writer")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Writer\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Writer");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Writer\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_DOC
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Document")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Document\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Document");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Document\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_PAGE
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Page")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Page\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Page");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Page\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_CANVAS
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Canvas")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Canvas\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Canvas");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Canvas\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_PARSER
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Parser")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Parser\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Parser");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Parser\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_ARENA
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Arena")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Arena\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Arena");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Arena\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_OBJ
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Obj")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Obj\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Obj");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Obj\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_READER
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Reader")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Reader\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Reader");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Reader\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_READER_PAGE
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Reader::Page")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Reader::Page\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Reader::Page");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Reader::Page\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_IMAGE
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Image")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Image\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Image");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Image\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_FONT
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Font")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Font\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Font");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Font\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_REF
 	IV tmp = SvIV((SV*)SvRV($arg));
 	$var = INT2PTR($type, tmp);
 
 T_PTROBJ_ACTION
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Action")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Action\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Action");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Action\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_CRYPT
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Crypt")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Crypt\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Crypt");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Crypt\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_FORM
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::FormPtr")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::FormPtr\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::FormPtr");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::FormPtr\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_FIELD
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::FieldPtr")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::FieldPtr\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::FieldPtr");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::FieldPtr\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_LAYER
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Layer")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Layer\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Layer");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Layer\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_ATTACH
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Attachment")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Attachment\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Attachment");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Attachment\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_COLORSPACE
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Color")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Color\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Color");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Color\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_WATERMARK
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Watermark")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Watermark\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Watermark");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Watermark\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_STAMP
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Stamp")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Stamp\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Stamp");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Stamp\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_SIGIDENT
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::SigningIdentity")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::SigningIdentity\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::SigningIdentity");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::SigningIdentity\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_X509CERT
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::CertificateXS")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::CertificateXS\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::CertificateXS");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::CertificateXS\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_LINEAR
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::LinearContext")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::LinearContext\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::LinearContext");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::LinearContext\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_STREAMREADER
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::StreamReaderXS")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::StreamReaderXS\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::StreamReaderXS");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::StreamReaderXS\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_RENDERCTX
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Render")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Render\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Render");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Render\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_DECODEDIMAGE
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::DecodedImage")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::DecodedImage\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::DecodedImage");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::DecodedImage\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_IMPORTCTX
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Import")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Import\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Import");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Import\",
+		\"$pname\", \"$var\");
 
 T_PTROBJ_RENDER
-	if (sv_isobject($arg) && sv_derived_from($arg, "PDF::Make::Render")) {
+	if (sv_isobject($arg) && sv_derived_from($arg, \"PDF::Make::Render\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ "%s: %s is not of type %s",
-		${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq["$pname"]},
-		"$var", "PDF::Make::Render");
+	    Perl_croak(aTHX_ \"%s: %s is not of type PDF::Make::Render\",
+		\"$pname\", \"$var\");
 
 OUTPUT
 
 T_PTROBJ_WRITER
-	sv_setref_pv($arg, "PDF::Make::Writer", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Writer\", (void*)$var);
 
 T_PTROBJ_DOC
-	sv_setref_pv($arg, "PDF::Make::Document", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Document\", (void*)$var);
 
 T_PTROBJ_PAGE
-	sv_setref_pv($arg, "PDF::Make::Page", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Page\", (void*)$var);
 
 T_PTROBJ_CANVAS
-	sv_setref_pv($arg, "PDF::Make::Canvas", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Canvas\", (void*)$var);
 
 T_PTROBJ_PARSER
-	sv_setref_pv($arg, "PDF::Make::Parser", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Parser\", (void*)$var);
 
 T_PTROBJ_ARENA
-	sv_setref_pv($arg, "PDF::Make::Arena", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Arena\", (void*)$var);
 
 T_PTROBJ_OBJ
-	sv_setref_pv($arg, "PDF::Make::Obj", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Obj\", (void*)$var);
 
 T_PTROBJ_READER
-	sv_setref_pv($arg, "PDF::Make::Reader", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Reader\", (void*)$var);
 
 T_PTROBJ_READER_PAGE
-	sv_setref_pv($arg, "PDF::Make::Reader::Page", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Reader::Page\", (void*)$var);
 
 T_PTROBJ_IMAGE
-	sv_setref_pv($arg, "PDF::Make::Image", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Image\", (void*)$var);
 
 T_PTROBJ_FONT
-	sv_setref_pv($arg, "PDF::Make::Font", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Font\", (void*)$var);
 
 T_PTROBJ_REF
-	sv_setref_pv($arg, "PDF::Make::Obj", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Obj\", (void*)$var);
 
 T_PTROBJ_ACTION
-	sv_setref_pv($arg, "PDF::Make::Action", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Action\", (void*)$var);
 
 T_PTROBJ_CRYPT
-	sv_setref_pv($arg, "PDF::Make::Crypt", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Crypt\", (void*)$var);
 
 T_PTROBJ_FORM
-	sv_setref_pv($arg, "PDF::Make::FormPtr", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::FormPtr\", (void*)$var);
 
 T_PTROBJ_FIELD
-	sv_setref_pv($arg, "PDF::Make::FieldPtr", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::FieldPtr\", (void*)$var);
 
 T_PTROBJ_LAYER
-	sv_setref_pv($arg, "PDF::Make::Layer", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Layer\", (void*)$var);
 
 T_PTROBJ_ATTACH
-	sv_setref_pv($arg, "PDF::Make::Attachment", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Attachment\", (void*)$var);
 
 T_PTROBJ_COLORSPACE
-	sv_setref_pv($arg, "PDF::Make::Color", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Color\", (void*)$var);
 
 T_PTROBJ_WATERMARK
-	sv_setref_pv($arg, "PDF::Make::Watermark", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Watermark\", (void*)$var);
 
 T_PTROBJ_STAMP
-	sv_setref_pv($arg, "PDF::Make::Stamp", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Stamp\", (void*)$var);
 
 T_PTROBJ_SIGIDENT
-	sv_setref_pv($arg, "PDF::Make::SigningIdentity", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::SigningIdentity\", (void*)$var);
 
 T_PTROBJ_X509CERT
-	sv_setref_pv($arg, "PDF::Make::CertificateXS", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::CertificateXS\", (void*)$var);
 
 T_PTROBJ_LINEAR
-	sv_setref_pv($arg, "PDF::Make::LinearContext", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::LinearContext\", (void*)$var);
 
 T_PTROBJ_STREAMREADER
-	sv_setref_pv($arg, "PDF::Make::StreamReaderXS", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::StreamReaderXS\", (void*)$var);
 
 T_PTROBJ_RENDERCTX
-	sv_setref_pv($arg, "PDF::Make::Render", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Render\", (void*)$var);
 
 T_PTROBJ_DECODEDIMAGE
-	sv_setref_pv($arg, "PDF::Make::DecodedImage", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::DecodedImage\", (void*)$var);
 
 T_PTROBJ_IMPORTCTX
-	sv_setref_pv($arg, "PDF::Make::Import", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Import\", (void*)$var);
 
 T_PTROBJ_RENDER
-	sv_setref_pv($arg, "PDF::Make::Render", (void*)$var);
+	sv_setref_pv($arg, \"PDF::Make::Render\", (void*)$var);

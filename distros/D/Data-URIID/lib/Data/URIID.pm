@@ -21,7 +21,7 @@ use Data::URIID::Service;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 my %names = (
     service => {
@@ -72,6 +72,10 @@ my %names = (
         'danbooru2chanjp'   => 'dac7a0ba-9090-4db7-bb94-373fabf98103', # danbooru.2chan.jp
         'sirtxkeepcoolorg'  => '0d7be696-accc-4d52-9cea-9c2362a57d62', # sirtx.keep-cool.org
         'denkxweb-hessen'   => '05bbc5d4-b77f-48bb-b458-97ddc16ab48f', # denkxweb.denkmalpflege-hessen.de
+
+        # schemes using namespace 0883381d-1d01-4aa2-bd15-e8bb7ac7673d
+        'scheme-ni'         => '0293c674-7576-572e-ab19-81d8e1ce0300',
+        'scheme-geo'        => '711fdb97-4a86-5e05-aaf0-f817bbd32b4e',
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -208,6 +212,8 @@ sub new {
             $self->service($service_name)->online(1);
         }
     }
+
+    $self->earth($self->{earth}) if defined $self->{earth};
 
     return $self;
 }
@@ -351,6 +357,22 @@ sub language_tags {
     return @{$self->{language_tags}};
 }
 
+
+sub earth {
+    my ($self, $n, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    if (defined $n) {
+        my $id = $self->{earth} = Data::Identifier->new(from => $n);
+        $id->userdata('Data::URIID', is_earth => 1);
+        $id->register;
+        return $id;
+    }
+
+    return $self->{earth} //= Data::Identifier->new(wd => 'Q2');
+}
+
 # Private method:
 sub _get_language_tags {
     my ($self, %opts) = @_;
@@ -426,6 +448,7 @@ sub is_ise {
 }
 
 
+#@returns Data::URIID::Service
 sub service {
     my ($self, $service) = @_;
     my $cache = $self->{service_cache} //= {};
@@ -517,15 +540,15 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 
     use Data::URIID;
 
-    my $extractor = Data::URIID->new;
+    my Data::URIID $extractor = Data::URIID->new;
 
-    my $result = $extractor->lookup( $uri );
+    my Data::URIID::Result $result = $extractor->lookup( $uri );
 
     my $id = $result->id( $type );
     my $displayname = $result->attribute('displayname');
@@ -558,9 +581,9 @@ This package inherits from L<Data::Identifier::Interface::Known>.
 
 =head2 new
 
-    my $extractor = Data::URIID->new;
+    my Data::URIID $extractor = Data::URIID->new;
     # or:
-    my $extractor = Data::URIID->new( option => value, ... );
+    my Data::URIID $extractor = Data::URIID->new( option => value, ... );
 
 Returns a new object that can be used for lookups.
 The following options are defined:
@@ -580,6 +603,10 @@ Boolean indicating whether online operation is allowed by default.
 
 Default false.
 See also L<"default_online">.
+
+=item C<earth>
+
+Identifier of Earth. See L</earth> for details.
 
 =item C<language_tags>
 
@@ -639,9 +666,9 @@ Useragent to use (L<LWP::UserAgent>).
 
 =head2 lookup
 
-    my $result = $extractor->lookup( $uri );
+    my Data::URIID::Result $result = $extractor->lookup( $uri );
     # or:
-    my $result = $extractor->lookup( $type, $uri );
+    my Data::URIID::Result $result = $extractor->lookup( $type, $uri );
 
 Tries to look up the URI and returns the result.
 Takes an L<URI> object (preferred) or a plain string as argument.
@@ -688,6 +715,28 @@ See also L<"online">.
 Gets or sets the list of acceptable language tags.
 
 See also L<"new">.
+
+=head2 earth
+
+    my Data::Identifier $earth = $extractor->earth;
+    # or:
+    $extractor->earth($earth);
+
+(experimental since v0.22)
+
+Gets or sets the default identifier used for earth.
+This can be used to select used vocabulary.
+However different services still might return different identifiers for earth.
+It is therefore an error to compare the C<space_object> attribute of L<Data::URIID::Result> with this value.
+Use the attribute L<Data::URIID::Result/is_on_earth> which provides a boolean value.
+
+If a new value is set the value must be a valid L<Data::Identifier> that resolves to an URI
+(see L<Data::Identifier/uri>, this requirement might be dropped in later versions).
+If the value is not be a valid L<Data::Identifier>, it is parsed as per C<from> of L<Data::Identifier/new>.
+
+The identifier will also be registered as per L<Data::Identifier/register>.
+
+The value must be set before any calls to L</lookup> to take effect for them.
 
 =head1 UTILITY METHODS
 
@@ -736,7 +785,7 @@ Returns whether or not a string is a valid ISE.
 
 =head2 service
 
-    my $service = $extractor->service( $service );
+    my Data::URIID::Service $service = $extractor->service( $service );
 
 This method will return a L<Data::URIID::Service> for the given name or ISE if successful or C<die> otherwise.
 

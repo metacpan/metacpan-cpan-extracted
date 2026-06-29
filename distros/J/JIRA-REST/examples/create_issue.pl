@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.016;
+use 5.034;
 use utf8;
 use warnings;
 use FindBin;
@@ -74,7 +74,7 @@ See the L<JIRACLI> documentation.
 
 =head1 COPYRIGHT
 
-Copyright 2016-2022 CPQD.
+Copyright 2016-2026 CPQD.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use PDF::Make;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 1;
 

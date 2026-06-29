@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000025';
 
 use Carp qw/croak/;
 use DBIx::QuickORM::Util qw/column_key/;
@@ -236,6 +236,13 @@ sub build_tables_from_db {
         $found{$tname} = {type => $type, schema => $tschema};
     }
 
+    # Sweep all columns, constraints, and indexes for the search-path schemas in
+    # one query each, keyed by schema then table. The per-table builders below
+    # consume these pre-fetched rows for the schema that won name resolution.
+    my $all_columns = $self->_fetch_all_columns($schemas);
+    my $all_indexes = $self->_fetch_all_indexes($schemas);
+    my $all_keys    = $self->_fetch_all_keys($schemas);
+
     my %tables;
 
     for my $tname (sort keys %found) {
@@ -249,13 +256,13 @@ sub build_tables_from_db {
 
         $params{autofill}->hook(pre_table => {table => $table, class => \$class});
 
-        $table->{columns} = $self->build_columns_from_db($tname, %params, table_schema => $tschema);
+        $table->{columns} = $self->build_columns_from_db($tname, %params, table_schema => $tschema, column_rows => ($all_columns->{$tschema}{$tname} // []));
         $params{autofill}->hook(columns => {columns => $table->{columns}, table => $table});
 
-        $table->{indexes} = $self->build_indexes_from_db($tname, %params, table_schema => $tschema);
+        $table->{indexes} = $self->build_indexes_from_db($tname, %params, table_schema => $tschema, index_rows => ($all_indexes->{$tschema}{$tname} // []));
         $params{autofill}->hook(indexes => {indexes => $table->{indexes}, table => $table});
 
-        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params, table_schema => $tschema);
+        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params, table_schema => $tschema, key_rows => ($all_keys->{$tschema}{$tname} // []));
 
         $params{autofill}->hook(post_table => {table => $table, class => \$class});
 
@@ -282,26 +289,15 @@ sub build_table_keys_from_db {
     my $self = shift;
     my ($table, %params) = @_;
 
-    my $dbh = $self->{+DBH};
-    my $tschema = $params{table_schema} // $self->_table_schema($table);
-
-    # Join on oids rather than casting conrelid through regclass (whose text
-    # form is search_path- and quoting-sensitive) or using regnamespace
-    # (PostgreSQL 9.5+); this works back to 9.3.
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT pg_get_constraintdef(con.oid)
-          FROM pg_constraint con
-          JOIN pg_class      rel ON rel.oid = con.conrelid
-          JOIN pg_namespace  nsp ON nsp.oid = rel.relnamespace
-         WHERE rel.relname  = ?
-           AND nsp.nspname  = ?
-    EOT
-
-    $sth->execute($table, $tschema);
+    my $specs = $params{key_rows};
+    unless ($specs) {
+        my $tschema = $params{table_schema} // $self->_table_schema($table);
+        $specs = $self->_query_keys($table, $tschema);
+    }
 
     my ($pk, %unique, @links);
 
-    while (my ($spec) = $sth->fetchrow_array) {
+    for my $spec (@$specs) {
         if (my ($type, $columns) = $spec =~ m/^(UNIQUE|PRIMARY KEY) \(([^\)]+)\)/gi) {
             my @columns = $self->_split_identifiers($columns);
 
@@ -344,21 +340,15 @@ sub build_columns_from_db {
     my ($table, %params) = @_;
 
     croak "A table name is required" unless $table;
-    my $dbh = $self->{+DBH};
-    my $tschema = $params{table_schema} // $self->_table_schema($table);
 
-    my $sth = $dbh->prepare(<<"    EOT");
-        SELECT *
-          FROM information_schema.columns
-         WHERE table_catalog = ?
-           AND table_name    = ?
-           AND table_schema  = ?
-    EOT
+    my $rows = $params{column_rows};
+    unless ($rows) {
+        my $tschema = $params{table_schema} // $self->_table_schema($table);
+        $rows = $self->_query_columns($table, $tschema);
+    }
 
-    $sth->execute($self->{+DB_NAME}, $table, $tschema);
-
-    my (%columns, @links);
-    while (my $res = $sth->fetchrow_hashref) {
+    my %columns;
+    for my $res (@$rows) {
         next if $params{autofill}->skip(column => ($table, $res->{column_name}));
 
         my $col = {};
@@ -443,8 +433,202 @@ sub build_indexes_from_db {
     my $self = shift;
     my ($table, %params) = @_;
 
+    my $rows = $params{index_rows};
+    unless ($rows) {
+        my $tschema = $params{table_schema} // $self->_table_schema($table);
+        $rows = $self->_query_indexes($table, $tschema);
+    }
+
+    my (%seen, @out);
+    for my $row (@$rows) {
+        my $idx = $seen{$row->{name}};
+        unless ($idx) {
+            $idx = $seen{$row->{name}} = {name => $row->{name}, type => $row->{type}, columns => [], unique => $row->{is_unique} ? 1 : 0, definition => $row->{def}};
+            push @out => $idx;
+        }
+        push @{$idx->{columns}} => $row->{column_name} if defined $row->{column_name};
+    }
+
+    for my $idx (@out) {
+        my $def = delete $idx->{definition};
+        $params{autofill}->hook(index => {index => $idx, table_name => $table, definition => $def});
+    }
+
+    return \@out;
+}
+
+=pod
+
+=head1 PRIVATE METHODS (schema introspection)
+
+=over 4
+
+=item $by_schema = $dialect->_fetch_all_columns($schemas)
+
+=item $by_schema = $dialect->_fetch_all_keys($schemas)
+
+=item $by_schema = $dialect->_fetch_all_indexes($schemas)
+
+Sweep all column, constraint, and index metadata for the given search-path
+schemas in one query each, returning a hashref of schema name to table name to
+the rows for that table (in the same shape the matching single-table
+C<_query_*> helper returns).
+
+=item $rows = $dialect->_query_columns($table, $tschema)
+
+=item $specs = $dialect->_query_keys($table, $tschema)
+
+=item $rows = $dialect->_query_indexes($table, $tschema)
+
+Single-table fallbacks used when the per-table builders are called without
+pre-fetched rows. Each issues one query scoped to C<$table> in C<$tschema>.
+
+=back
+
+=cut
+
+sub _fetch_all_columns {
+    my $self = shift;
+    my ($schemas) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $in = join(', ' => ('?') x @$schemas);
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT *
+          FROM information_schema.columns
+         WHERE table_catalog = ?
+           AND table_schema IN ($in)
+    EOT
+    $sth->execute($self->{+DB_NAME}, @$schemas);
+
+    my %by_schema;
+    while (my $res = $sth->fetchrow_hashref) {
+        push @{$by_schema{$res->{table_schema}}{$res->{table_name}} //= []} => $res;
+    }
+
+    return \%by_schema;
+}
+
+sub _query_columns {
+    my $self = shift;
+    my ($table, $tschema) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT *
+          FROM information_schema.columns
+         WHERE table_catalog = ?
+           AND table_name    = ?
+           AND table_schema  = ?
+    EOT
+    $sth->execute($self->{+DB_NAME}, $table, $tschema);
+
+    return $sth->fetchall_arrayref({});
+}
+
+sub _fetch_all_keys {
+    my $self = shift;
+    my ($schemas) = @_;
+
+    my $dbh = $self->{+DBH};
+    my $in = join(', ' => ('?') x @$schemas);
+
+    # Join on oids rather than casting conrelid through regclass (whose text
+    # form is search_path- and quoting-sensitive) or using regnamespace
+    # (PostgreSQL 9.5+); this works back to 9.3.
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT nsp.nspname,
+               rel.relname,
+               pg_get_constraintdef(con.oid)
+          FROM pg_constraint con
+          JOIN pg_class      rel ON rel.oid = con.conrelid
+          JOIN pg_namespace  nsp ON nsp.oid = rel.relnamespace
+         WHERE nsp.nspname IN ($in)
+      ORDER BY nsp.nspname, rel.relname, con.conname, con.oid
+    EOT
+    $sth->execute(@$schemas);
+
+    my %by_schema;
+    while (my ($schema, $tname, $spec) = $sth->fetchrow_array) {
+        push @{$by_schema{$schema}{$tname} //= []} => $spec;
+    }
+
+    return \%by_schema;
+}
+
+sub _query_keys {
+    my $self = shift;
+    my ($table, $tschema) = @_;
+
+    my $dbh = $self->{+DBH};
+
+    # Join on oids rather than casting conrelid through regclass (whose text
+    # form is search_path- and quoting-sensitive) or using regnamespace
+    # (PostgreSQL 9.5+); this works back to 9.3.
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT pg_get_constraintdef(con.oid)
+          FROM pg_constraint con
+          JOIN pg_class      rel ON rel.oid = con.conrelid
+          JOIN pg_namespace  nsp ON nsp.oid = rel.relnamespace
+         WHERE rel.relname  = ?
+           AND nsp.nspname  = ?
+      ORDER BY con.conname, con.oid
+    EOT
+    $sth->execute($table, $tschema);
+
+    my @specs;
+    while (my ($spec) = $sth->fetchrow_array) {
+        push @specs => $spec;
+    }
+
+    return \@specs;
+}
+
+sub _fetch_all_indexes {
+    my $self = shift;
+    my ($schemas) = @_;
+
     my $dbh = $self->dbh;
-    my $tschema = $params{table_schema} // $self->_table_schema($table);
+    my $in = join(', ' => ('?') x @$schemas);
+
+    # Read the catalogs instead of regex-parsing pg_indexes.indexdef, which
+    # breaks on quoted mixed-case index names. The generate_series join with
+    # indkey subscripting preserves column order and works back to PostgreSQL
+    # 9.3 (no unnest WITH ORDINALITY, no array_position). Expression entries
+    # have indkey 0, match no pg_attribute row, and are skipped.
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT n.nspname  AS table_schema,
+               tc.relname AS table_name,
+               ic.relname AS name,
+               am.amname  AS type,
+               CASE WHEN i.indisunique THEN 1 ELSE 0 END AS is_unique,
+               a.attname  AS column_name,
+               pg_get_indexdef(i.indexrelid) AS def
+          FROM pg_index i
+          JOIN pg_class      ic ON ic.oid = i.indexrelid
+          JOIN pg_class      tc ON tc.oid = i.indrelid
+          JOIN pg_namespace  n  ON n.oid  = tc.relnamespace
+          JOIN pg_am         am ON am.oid = ic.relam
+          JOIN generate_series(0, 31) s(i) ON s.i < i.indnatts
+          LEFT JOIN pg_attribute a ON a.attrelid = tc.oid AND a.attnum = i.indkey[s.i]
+         WHERE n.nspname IN ($in)
+      ORDER BY n.nspname, tc.relname, ic.relname, s.i
+    EOT
+    $sth->execute(@$schemas);
+
+    my %by_schema;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @{$by_schema{$row->{table_schema}}{$row->{table_name}} //= []} => $row;
+    }
+
+    return \%by_schema;
+}
+
+sub _query_indexes {
+    my $self = shift;
+    my ($table, $tschema) = @_;
+
+    my $dbh = $self->dbh;
 
     # Read the catalogs instead of regex-parsing pg_indexes.indexdef, which
     # breaks on quoted mixed-case index names. The generate_series join with
@@ -468,25 +652,9 @@ sub build_indexes_from_db {
            AND n.nspname  = ?
       ORDER BY ic.relname, s.i
     EOT
-
     $sth->execute($table, $tschema);
 
-    my (%seen, @out);
-    while (my $row = $sth->fetchrow_hashref) {
-        my $idx = $seen{$row->{name}};
-        unless ($idx) {
-            $idx = $seen{$row->{name}} = {name => $row->{name}, type => $row->{type}, columns => [], unique => $row->{is_unique} ? 1 : 0, definition => $row->{def}};
-            push @out => $idx;
-        }
-        push @{$idx->{columns}} => $row->{column_name} if defined $row->{column_name};
-    }
-
-    for my $idx (@out) {
-        my $def = delete $idx->{definition};
-        $params{autofill}->hook(index => {index => $idx, table_name => $table, definition => $def});
-    }
-
-    return \@out;
+    return $sth->fetchall_arrayref({});
 }
 
 =pod

@@ -24,7 +24,7 @@ for my $spec_version (qw[1.3 1.4 1.5 1.6 1.7]) {
         eval { $bom->components->push(SBOM::CycloneDX::Component->new(name => 'acme-library', version => '1.0.0')) };
 
         isnt $@, '';
-        diag $@;
+        note $@;
         is_bom $bom;
         is $bom->spec_version, $spec_version;
 

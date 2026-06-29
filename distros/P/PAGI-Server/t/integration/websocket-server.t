@@ -14,8 +14,8 @@ use PAGI::Server;
 # server+Tools integration test; skip when Tools is not installed (the raw
 # WebSocket protocol is covered Tools-free in t/04-websocket.t and others).
 BEGIN {
-    eval { require PAGI::WebSocket; my $v = PAGI::WebSocket->VERSION; !defined($v) || $v >= 0.002000 }
-        or plan(skip_all => 'PAGI-Tools (PAGI::WebSocket >= 0.002000) not installed');
+    eval { require PAGI::Tools; PAGI::Tools->VERSION(0.002000); require PAGI::WebSocket; 1 }
+        or plan(skip_all => 'PAGI-Tools 0.002000+ (PAGI::WebSocket) not installed');
 }
 
 my $loop = IO::Async::Loop->new;

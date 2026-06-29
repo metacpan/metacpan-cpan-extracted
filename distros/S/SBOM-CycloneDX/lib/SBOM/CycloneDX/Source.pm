@@ -39,7 +39,18 @@ SBOM::CycloneDX::Source - Source of the issue/vulnerability where it is document
 =head1 SYNOPSIS
 
     $issue->source(
-        SBOM::CycloneDX::Source->new( name => 'NVD', url => 'https://nvd.nist.gov/vuln/detail/CVE-2019-9997' )
+        SBOM::CycloneDX::Source->new(
+            name => 'NVD',
+            url => 'https://nvd.nist.gov/vuln/detail/CVE-2019-9997'
+        )
+    );
+
+    $vulnerability = SBOM::CycloneDX::Vulnerability->new(
+        id     => 'SNYK-JAVA-COMFASTERXMLJACKSONCORE-32111',
+        source => SBOM::CycloneDX::Vulnerability::Source->new(
+            name => 'Snyk',
+            url  => 'https://snyk.io/vuln/SNYK-JAVA-COMFASTERXMLJACKSONCORE-32111'
+        )
     );
 
 

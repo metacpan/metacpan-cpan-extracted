@@ -6,12 +6,12 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   File::Temp: '0'
+  Test::More: '1.001002'
   Test::Pod: '1.51'
-  Test::Simple: '1.302052'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,8 +22,10 @@ no_index:
     - t
     - inc
 requires:
+  ExtUtils::MakeMaker: '7.7'
   File::Slurper: '0.008'
   Getopt::Long: '0'
+  Image::Magick: v6.9.3
   Imager: '1.004'
   Imager::Fill: '1.012'
   Moo: '2.000002'
@@ -31,11 +33,12 @@ requires:
   Tree::DAG_Node: '1.27'
   Types::Standard: '1'
   parent: '0'
+  perl: '5.020004'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/ronsavage/Tree-Cladogram/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/Tree-Cladogram.git
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

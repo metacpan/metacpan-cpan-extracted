@@ -15,7 +15,7 @@
 
 package Clownfish::Test;
 use Clownfish;
-our $VERSION = '0.006003';
+our $VERSION = '0.006004';
 $VERSION = eval $VERSION;
 
 sub dl_load_flags { 1 }
@@ -23,7 +23,7 @@ sub dl_load_flags { 1 }
 BEGIN {
     require DynaLoader;
     our @ISA = qw( DynaLoader );
-    bootstrap Clownfish::Test '0.6.3';
+    bootstrap Clownfish::Test '0.6.4';
 }
 
 sub run_tests {

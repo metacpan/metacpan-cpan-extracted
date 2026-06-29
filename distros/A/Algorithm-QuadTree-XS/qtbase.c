@@ -2,9 +2,6 @@
 #include <math.h>
 
 #define CHILDREN_PER_NODE 4
-#define MAX_SIZE_INITIAL 4
-#define MAX_SIZE_GROWTH 2
-#define MAX_SIZE_CLEAR 32
 
 Shape* create_shape()
 {
@@ -41,84 +38,18 @@ void destroy_shape(Shape *s)
 	free(s);
 }
 
-DynArr* create_array()
-{
-	DynArr *arr = malloc(sizeof *arr);
-	arr->count = 0;
-	arr->max_size = 0;
-
-	return arr;
-}
-
-void destroy_array(DynArr* arr)
-{
-	if (arr->max_size > 0) {
-		free(arr->ptr);
-	}
-
-	free(arr);
-}
-
-void clear_array(DynArr *arr)
-{
-	arr->count = 0;
-
-	if (arr->max_size >= MAX_SIZE_CLEAR) {
-		arr->max_size = 0;
-		free(arr->ptr);
-	}
-}
-
-void push_array(DynArr *arr, void *ptr)
-{
-	if (arr->count == arr->max_size) {
-		if (arr->max_size == 0) {
-			arr->max_size = MAX_SIZE_INITIAL;
-			arr->ptr = malloc(arr->max_size * sizeof *arr->ptr);
-		}
-		else {
-			arr->max_size *= MAX_SIZE_GROWTH;
-
-			void *enlarged = realloc(arr->ptr, arr->max_size * sizeof *arr->ptr);
-			assert(enlarged != NULL);
-
-			arr->ptr = enlarged;
-		}
-	}
-
-	arr->ptr[arr->count] = ptr;
-	arr->count += 1;
-}
-
 void adopt_object (QuadTreeRootNode *root, SV *value, Shape *s)
 {
-	push_array(root->objects, value);
-	SvREFCNT_inc(value);
 	hv_store_ent(root->backref, value, newSViv((uintptr_t) s), 0);
 }
 
 void disown_object (QuadTreeRootNode *root, SV *value)
 {
-	int i;
-	DynArr* new_list = create_array();
-	for(i = 0; i < root->objects->count; ++i) {
-		SV *fetched = (SV*) root->objects->ptr[i];
-		if (!sv_eq(fetched, value)) {
-			push_array(new_list, fetched);
-		}
-		else {
-			SvREFCNT_dec(fetched);
-		}
-	}
-
-	destroy_array(root->objects);
-	root->objects = new_list;
-
 	/* NOTE: no shape destruction here, since "adopt_object" does not create it */
 	hv_delete_ent(root->backref, value, 0, 0);
 }
 
-QuadTreeNode* create_nodes(int count, QuadTreeNode *parent)
+QuadTreeNode* create_nodes(int count)
 {
 	QuadTreeNode *node = malloc(count * sizeof *node);
 
@@ -126,7 +57,6 @@ QuadTreeNode* create_nodes(int count, QuadTreeNode *parent)
 	for (i = 0; i < count; ++i) {
 		node[i].values = NULL;
 		node[i].children = NULL;
-		node[i].parent = parent;
 		node[i].has_objects = false;
 	}
 
@@ -136,7 +66,7 @@ QuadTreeNode* create_nodes(int count, QuadTreeNode *parent)
 /* NOTE: does not actually free the node, but frees its children nodes */
 void destroy_node(QuadTreeNode *node)
 {
-	destroy_array(node->values);
+	SvREFCNT_dec((SV*) node->values);
 	destroy_shape(node->dimensions);
 
 	if (node->children != NULL) {
@@ -152,9 +82,8 @@ void destroy_node(QuadTreeNode *node)
 QuadTreeRootNode* create_root()
 {
 	QuadTreeRootNode *root = malloc(sizeof *root);
-	root->node = create_nodes(1, NULL);
+	root->node = create_nodes(1);
 	root->backref = newHV();
-	root->objects = create_array();
 
 	return root;
 }
@@ -165,10 +94,10 @@ void node_add_level(QuadTreeNode* node, double xmin, double ymin, double xmax, d
 
 	node->dimensions = create_shape();
 	prepare_rectangle(node->dimensions, xmin, ymin, xmax, ymax);
-	node->values = create_array();
+	node->values = newAV();
 
 	if (!last) {
-		node->children = create_nodes(CHILDREN_PER_NODE, node);
+		node->children = create_nodes(CHILDREN_PER_NODE);
 		double xmid = xmin + (xmax - xmin) / 2;
 		double ymid = ymin + (ymax - ymin) / 2;
 
@@ -242,10 +171,12 @@ void find_nodes(QuadTreeNode *node, HV *ret, Shape *param, bool fully_contained)
 	if (!(fully_contained || shapes_overlap(param, node->dimensions))) return;
 
 	int i;
-	for (i = 0; i < node->values->count; ++i) {
-		SV *fetched = (SV*) node->values->ptr[i];
-		SvREFCNT_inc(fetched);
-		hv_store_ent(ret, fetched, fetched, 0);
+	for (i = 0; i < av_count(node->values); ++i) {
+		SV **fetched = av_fetch(node->values, i, 0);
+		if (fetched != NULL) {
+			SvREFCNT_inc(*fetched);
+			hv_store_ent(ret, *fetched, *fetched, 0);
+		}
 	}
 
 	if (node->children != NULL) {
@@ -258,13 +189,13 @@ void find_nodes(QuadTreeNode *node, HV *ret, Shape *param, bool fully_contained)
 bool fill_nodes (QuadTreeNode *node, SV *value, Shape *param)
 {
 	if (shape_contained(node->dimensions, param)) {
-		push_array(node->values, value);
+		av_push(node->values, SvREFCNT_inc(value));
 	}
 	else {
 		if (!shapes_overlap(param, node->dimensions)) return false;
 
 		if (node->children == NULL) {
-			push_array(node->values, value);
+			av_push(node->values, SvREFCNT_inc(value));
 		}
 		else {
 			int i;
@@ -289,19 +220,20 @@ void delete_nodes(QuadTreeNode *node, SV *value, Shape *param, bool fully_contai
 
 	int i;
 
-	if (node->values->count > 0) {
-		DynArr* new_list = create_array();
 
-		for (i = 0; i < node->values->count; ++i) {
-			SV *fetched = (SV*) node->values->ptr[i];
-			if (!sv_eq(fetched, value)) {
-				push_array(new_list, fetched);
+	if (av_count(node->values) > 0) {
+		AV* new_list = newAV();
+
+		for (i = 0; i < av_count(node->values); ++i) {
+			SV **fetched = av_fetch(node->values, i, 0);
+			if (fetched != NULL && !sv_eq(*fetched, value)) {
+				av_push(new_list, SvREFCNT_inc(*fetched));
 			}
 		}
 
-		destroy_array(node->values);
+		SvREFCNT_dec((SV*) node->values);
 		node->values = new_list;
-		node->has_objects = new_list->count > 0;
+		node->has_objects = av_count(new_list) > 0;
 	}
 
 	if (node->children != NULL) {
@@ -316,7 +248,7 @@ void clear_node(QuadTreeNode *node)
 {
 	if (!node->has_objects) return;
 	node->has_objects = false;
-	clear_array(node->values);
+	av_clear(node->values);
 
 	if (node->children != NULL) {
 		int i;
@@ -340,12 +272,7 @@ void clear_tree(QuadTreeRootNode *root)
 		destroy_shape((Shape*) SvIV(value));
 	}
 
-	for (i = 0; i < root->objects->count; ++i) {
-		SvREFCNT_dec((SV*) root->objects->ptr[i]);
-	}
-
 	hv_clear(root->backref);
-	clear_array(root->objects);
 }
 
 void filter_geometry(HV* results, HV* shapes, Shape *s)

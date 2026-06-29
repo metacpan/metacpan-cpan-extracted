@@ -1,4 +1,4 @@
-package GitHub::RSS;
+package GitHub::RSS 0.06;
 use strict;
 use 5.010;
 use Moo 2;
@@ -13,8 +13,6 @@ use DBI;
 use JSON;
 
 use Data::Dumper;
-
-our $VERSION = '0.05';
 
 =head1 NAME
 

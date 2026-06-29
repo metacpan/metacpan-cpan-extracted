@@ -1,5 +1,273 @@
 Revision history for this software.
 
+0.64  2026-06-29 JST (Japan Standard Time)
+  - doc lib/mb.pm + README (step 8 doc sub-step): expand the usage documentation
+    of the three ways to run (filter / modulino / runtime).  The POD "=head1
+    Runtime multibyte interface ..." section now opens with a path comparison
+    table (how to invoke, what gets codepoint semantics, supported perl
+    versions) and rules of thumb for choosing a path, and gains a detailed
+    "=head2 strict vs lenient" subsection: mb's character unit is STRICT (a
+    well-formed multi-byte sequence of the current encoding OR a US-ASCII byte
+    [\x00-\x7F]); the codepoint walk (mb::length / mb::substr / mb::index) halts
+    at the first stray octet; what is "stray" is encoding-dependent (the same
+    "A\x85B" is length 1 under utf8 but length 2 under sjis); codepoint
+    character classes (\S etc.) are strict; the single deliberate lenient
+    exception is the transpiled dot "." on the filter / modulino paths
+    ("(?>$over_ascii|.)"), while the runtime interface (mb::qr) keeps even "."
+    strict; mb::valid() is the explicit strict predicate; and a "how to choose"
+    guide contrasts the codepoint (strict) and octet (lenient) models.  README
+    gains matching "THREE WAYS TO RUN" and "STRICT VS LENIENT" sections.  POD/
+    README only; lib/mb.pm code is unchanged (diff is POD-only), $VERSION stays
+    0.64, Pod::Checker still 0/0, and the full direct-run tally is unchanged at
+    ok 465,965 / not ok 0 (zero regression).
+  - doc lib/mb.pm (step 8): add a new "=head1 Runtime multibyte interface
+    (mb::qr / mb::valid / mb::split) and the three transpile paths" POD section
+    (POD-only, US-ASCII, Pod::Checker clean: 0 errors / 0 warnings).  It
+    documents (1) the three ways a script reaches codepoint semantics -- the
+    path-1 opportunistic source filter ("use mb;" on perl 5.8+), the modulino
+    ("perl mb.pm script.pl", in-process eval or *.oo child), and the path-3
+    runtime interface ("use mb qw(*mb utf8);") -- and (2) the three runtime
+    subroutines ported in steps 1/5: mb::qr() (the functional form of
+    $mb{qr/.../}, returning a codepoint regex STRING not a qr// object, which
+    matters on perl 5.005_03), mb::valid() (the strict, opt-in well-formedness
+    predicate that uses the STRICT unit, not the lenient everyday $x, and whose
+    verdict varies by script encoding: utf8 strict / rfc2279 permissive / wtf8
+    surrogate-tolerant), and mb::split() (the UTF8::R2-compatible runtime
+    split).  No code change to lib/mb.pm (diff is POD-only); $VERSION stays 0.64.
+  - doc (step 8): extend all 21 doc/mb_cheatsheet.*.txt with four new sections,
+    "Runtime codepoint regex (mb::qr)", "Validate well-formed bytes (mb::valid)",
+    "Split on codepoint boundaries (mb::split)" and "Three ways to run (filter /
+    modulino / runtime)", localized in each language and numbered consecutively
+    after the existing sections so t/9080-cheatsheets.t (S2 consecutive
+    numbering) still passes.  The mb::split section completes the cheatsheet
+    coverage of all three runtime subroutines (mb::qr / mb::valid / mb::split)
+    required by step 8, matching the POD section above.
+  - test (step 8): test-asset integration.  The curated mb-native runtime tests
+    added in steps 1-7 -- t/1007_runtime_qr.t, t/1010_filter.t,
+    t/1011_modulino.t, t/1012_valid.t, t/1013_valid_encodings.t, t/1014_split.t,
+    t/1015_import_args.t, t/1016_source_encoding.t -- are confirmed as the
+    integrated, deduplicated runtime test set, numbered to mb's existing 1xxx
+    convention.  A blanket inheritance of UTF8::R2's ur2_* qr suite was
+    EVALUATED and DECLINED: it is not additive.  ur2_* encodes mb8's
+    octet-lenient \S/\H/\V semantics (a lone \x85 / \xA0 matches \S), whereas
+    mb's documented codepoint \S matches only "a well-formed multi-byte
+    sequence OR a US-ASCII byte [\x00-\x7F]", so a lone stray octet matches
+    neither and a direct port produces 6 not-ok per qr file (e.g. assertions
+    317/318/327/328/337/338 in ur2_1020_qr1).  This is mb-0.63's long-standing
+    behaviour, not a port regression, so per the zero-regression rule the bulk
+    inheritance is withdrawn; selective inheritance of non-diverging ur2_* cases
+    remains possible as a future per-file-vetted additive sub-step.
+  - QA (step 8): final release-candidate QA.  Full direct-run tally is
+    ok 465,965 / not ok 0 (unchanged from step 7; zero regression).  All meta
+    tests green: 9001-load=32, 9010-encoding=54, 9020-perl5compat=160,
+    9025-perl542compat=11, 9030-distribution=620, 9040-style=31, 9050-pod=6
+    (Pod::Checker still 0/0 after the new POD), 9060-readme=10,
+    9080-cheatsheets=63 (after the new cheatsheet sections).  Verified on perl
+    5.38.2 only; old-perl real-machine confirmation (5.005_03 / 5.6 / 5.8) and
+    perl 5.41+ source::encoding firing remain on the maintainer's pre-release
+    checklist.
+  - verify lib/mb.pm (step 7): re-confirm the Perl 5.41+ "no source::encoding;"
+    injection.  All five script-level transpile paths route their mb::parse()
+    output through mb::_insert_source_encoding_unimport(): the path-1 source
+    filter, the modulino *.oo writer, the modulino in-process eval, and the two
+    require-time prefix *.oo writers.  The runtime mb::eval() (a string eval)
+    intentionally does NOT inject, exactly as in the mb8-0.01 source it was
+    ported from.  The injection regex is byte-for-byte identical to mb8-0.01,
+    so the port is exact.  No code change was needed (verification only);
+    "use v5.41", "use v5.42", "use 5.041", "use 5.042" and higher all receive
+    "; no source::encoding;" on the SAME physical line (before any trailing
+    comment, no line-number shift), while "use v5.40" / "use 5.040" and earlier,
+    and "require VERSION", are correctly left alone.
+  - test (step 7): add t/1016_source_encoding.t (34 assertions) locking in the
+    injection behaviour by inspecting the transpiled text directly, so it needs
+    no Perl 5.41+ interpreter and runs on every perl from 5.005_03 up (no source
+    filter, no version-specific feature; pure US-ASCII body).  It checks the
+    accepted version notations, the below-threshold non-matches, same-line
+    placement / line-number preservation, trailing-comment handling, CRLF and CR
+    line endings, multiple version statements, and the require/no non-matches.
+    MANIFEST gains the new test file.  All prior assertions still pass unchanged;
+    total is 465,965 (zero regressions, +38 = +34 new test assertions +4 added
+    MANIFEST-integrity checks in 9030-distribution).  Verified on perl 5.38.2
+    only; real execution under perl 5.41+ is deferred to the maintainer.
+  - feature lib/mb.pm (step 6): clarify the import() / main() argument errors.
+    The argument acceptance is unchanged -- import() still accepts the runtime
+    tokens *mb and %mb plus every encoding name (big5 / big5hkscs / eucjp /
+    gb18030 / gbk / rfc2279 / sjis / uhc / utf8 / wtf8), and the modulino
+    main() -e still accepts every encoding name (NOT narrowed to the UTF-8
+    family like mb8).  Only the three die messages for an unsupported argument
+    were made explicit: import() now dies with "import argument '...' not
+    supported (use one of: *mb, %mb, big5, big5hkscs, eucjp, gb18030, gbk,
+    rfc2279, sjis, uhc, utf8, wtf8)." and both main() -e branches now die with
+    "script_encoding '...' not supported (use one of: big5, big5hkscs, eucjp,
+    gb18030, gbk, rfc2279, sjis, uhc, utf8, wtf8)." (the runtime tokens *mb /
+    %mb are import-only and are not advertised by the modulino).  This is a
+    message-text-only change; the die-firing condition is identical, so no
+    existing behaviour changes (additive only).
+  - test (step 6): add t/1015_import_args.t (46 assertions: unsupported import
+    argument dies with an explicit listing message naming *mb / %mb and the
+    encodings; both main() -e forms (-eXXX and -e XXX) die the same way and the
+    modulino listing omits *mb / %mb; every supported token *mb / %mb and all
+    ten encodings is still accepted by use mb '...').  The test loads mb with
+    require, exercises the rejection paths through eval (they die in the
+    argument scan before any side effect) and the acceptance paths in a child
+    perl, so it runs on every perl from 5.005_03 up.  MANIFEST gains the new
+    test file.  All prior assertions still pass unchanged; total is 465,927
+    (zero regressions, +50 = +46 new test assertions +4 added MANIFEST-integrity
+    checks in 9030-distribution).  Verified on perl 5.38.2 only.
+  - feature lib/mb.pm (step 5): port two runtime functions from mb8-0.01.
+    sub mb::valid(;$) (about 13 lines) is inserted right before
+    sub mb::require(); it is a non-destructive predicate that whole-matches
+    its argument (or $_) against the STRICT unit ($over_ascii or a US-ASCII
+    byte, NOT the lenient $x), returning 1 for well-formed input and 0 when
+    any stray octet is present.  The string is never modified.  sub
+    mb::split(;$$$) (about 40 lines) is inserted right before sub mb::_split();
+    it is the UTF8::R2-compatible runtime split for path-3 callers (the
+    transpiler still uses mb::_split, untouched).  When the first argument is
+    '' or an empty (?^...:) group it splits on $x codepoints; otherwise it
+    delegates to CORE::split via qr{@{[mb::qr($_[0])]}} (mb::qr returns a
+    string, so it is interpolated into a fresh qr{}).  The $] < 5.012
+    implicit-split-to-@_ deprecation warning under $^W is carried over as is.
+    Both subs depend only on pre-existing mb internals ($over_ascii, $x,
+    mb::qr); no existing behaviour is changed (additive only).
+  - test (step 5): add t/1012_valid.t (20 assertions: well-formed and
+    malformed octet cases, $_ default, non-destructiveness, strict-walk
+    relation), t/1013_valid_encodings.t (18 assertions: utf8 / rfc2279 / wtf8
+    well-formedness differences and set/get round trip), and t/1014_split.t
+    (80 assertions: argument counts 0..3, positive/negative/exceeding LIMIT,
+    scalar and list context, ASCII and full-width multibyte).  Tests load mb
+    with require and set the encoding explicitly, so they exercise the runtime
+    functions without the source filter and run on every perl from 5.005_03
+    up.  MANIFEST gains the three new test files.  All 465,747 prior
+    assertions still pass unchanged; total is 465,877 (zero regressions,
+    +130 = +118 new test assertions +12 added MANIFEST-integrity checks in
+    9030-distribution).  Verified on perl 5.38.2 only; the 5.005_03 /
+    5.6 / 5.8 confirmation of mb::split's $] < 5.012 path remains for ina to
+    run on a real old perl.
+  - audit lib/mb.pm (step 4): perl 5.005_03 read-only-value audit of every
+    destructive s/// and tr/// in the code region.  Result: no new code change
+    is required.  No destructive s///|tr/// is applied to $_[n], to a string
+    literal, or to a bare read-only $_; every such target is a fresh writable
+    lexical (copy-first idioms (my $c = $src) =~ s///, my($c) = @_, and
+    my $c = $_[n]).  The one runtime sub that may receive a qr// argument and
+    substitutes on it, _r2_qr(), already copies first via my $source = "$_[0]"
+    (mitigation A, added in an earlier 0.64 step).  The tr/x// occurrences are
+    count-only (no /d, empty replacement) and never modify their operand.
+  - decision lib/mb.pm (step 4): mitigation B (re-expressing the file-scoped
+    transpile-path $x as a plain string instead of a qr// object) is NOT
+    applied; the file-scoped $x stays qr/(?>$over_ascii|[\x00-\x7F])/ and stays
+    STRICT.  Reason, measured empirically: a qr// object interpolates into a
+    larger pattern as a modifier-isolated subpattern ((?^...:...)), and the
+    transpile path depends on that isolation where $x sits inside /x and escape
+    contexts; the bare-string form drops the wrapper and regressed the
+    qr-as-q / s-as-q escape transpilation (406 assertions failed on perl 5.38 in
+    t/2023_basic_escape_qr_as_q.t and t/2025_basic_escape_s_as_q.t), so the
+    change was reverted.  The file-scoped $x is never the target of a
+    destructive s///, only ever interpolated into search patterns, so it has no
+    read-only hazard to fix.  A short comment recording this was added at the $x
+    definition; this is the only edit to lib/mb.pm in step 4 and is comment-only
+    (behaviour unchanged).
+  - test (step 4): all 465,747 assertions from the previous 0.64 step still
+    pass unchanged on perl 5.38.2 (zero regressions); no test was added or
+    removed.  The read-only failures this audit targets only reproduce on perl
+    5.005_03 / 5.6, which is not available in this environment, so the
+    5.005_03-specific behaviour remains to be confirmed on a real old perl.
+  - feature lib/mb.pm: port the runtime UTF-8 codepoint regex engine from
+    mb8-0.01.  sub _r2_qr() (about 188 lines) and sub mb::qr() (3 lines)
+    are inserted right after sub list_all_by_hyphen_utf8_like() (same
+    package mb context).  _r2_qr() builds a multibyte-aware regular
+    expression string from the body of a qr/.../ token at run time and is
+    the engine behind the UTF8::R2-compatible $mb{qr/.../} interface.
+    Dependencies ($over_ascii, the $bare_* classes, mb::chr, and
+    list_all_by_hyphen_utf8_like) are all pre-existing in mb and unchanged;
+    list_all_by_hyphen_utf8_like is byte-identical between mb and mb8.
+  - robustness lib/mb.pm: _r2_qr() now builds a *local* strict STRING form of
+    the one-codepoint matcher, my $x = "(?>$over_ascii|[\x00-\x7F])", and uses
+    it throughout in place of the file-scoped qr// object $x.  The file-scoped
+    $x is a qr// object; on perl 5.005_03 a qr// object loses its body when
+    interpolated into another pattern ("$qr" -> "(?-xism:)"), so an embedded
+    $x silently degraded to a match-anything sub-pattern on old perl, causing
+    negative codepoint classes, hyphen-range boundaries, quantifier shortfall
+    and "." (without /s) to over-match.  A plain string interpolates losslessly
+    from 5.005_03 onward.  The local form is kept STRICT ([\x00-\x7F]); the
+    file-scoped qr// $x is left untouched for mb's transpile path.
+  - change lib/mb.pm: the %mb tie FETCH is changed from { $_[1] } (a no-op
+    pass-through) to { _r2_qr($_[1]) } so that $mb{qr/.../} now builds a
+    UTF-8 codepoint regex at run time.  This is additive: import() exports
+    an *untied* snapshot copy of %mb, so no existing code or test reaches
+    FETCH; the change therefore cannot alter existing behaviour.  $x is
+    deliberately kept strict (qr/(?>$over_ascii|[\x00-\x7F])/); leniency is
+    not introduced here.
+  - add t/1007_runtime_qr.t: 27 assertions exercising $mb{qr/.../} via a
+    direct tie my %mb, 'mb' (UTF-8 character classes, hyphen ranges,
+    negation, quantifiers, POSIX classes, alternation, mixed ASCII and
+    multibyte ranges, and the /i and /s modifiers).  This file is encoded
+    in UTF-8 by design (an explicit-UTF-8 test).
+  - test: 465,697 existing assertions all pass unchanged; total is now
+    465,724 (+27) with zero failures.
+  - feature lib/mb.pm: port "path 1", the opportunistic source code filter,
+    from mb8-0.01 into import(), made ADDITIVE for mb.  On perl 5.8 or later,
+    "use mb;" (or "use mb 'utf8';" etc.) installs a Filter::Util::Call source
+    filter that reads the whole remaining source in one pass and, for a genuine
+    path-1 script, runs it through mb::parse() followed by
+    mb::_insert_source_encoding_unimport() -- so such a script needs only
+    "use mb;" to be auto-transpiled and the modulino (perl mb.pm script.pl) is
+    no longer required on 5.8+.  CRUCIAL GUARD: if the buffered source itself
+    calls mb::set_script_encoding(), the script is treated as octet-oriented /
+    runtime-managed (mb's long-standing "use mb; then call mb::* on octet data"
+    convention) and is passed through UNCHANGED.  This is what makes the change
+    additive: every pre-existing "use mb;" caller -- which was never
+    source-filtered, because mb-0.63 had no filter, and which sets its own
+    encoding at run time -- behaves exactly as before, so the existing 465,697
+    assertions are all unchanged.  Filter::Util::Call has been a core module
+    since perl 5.8.0 and is require()d only at run time, so no new dependency is
+    declared; if it is somehow unavailable, "use mb;" silently loads as the
+    plain runtime import (no die, to preserve the legacy convention).
+  - feature lib/mb.pm: import() now also recognises the *mb / %mb tokens and,
+    when present, suppresses the source filter (runtime-interface request,
+    reserved for a later step).  Existing single-argument encoding invocations
+    are unchanged; no shipped code or test passes these tokens.
+  - change lib/mb.pm: on perl 5.005_03 / 5.6 the source filter is unavailable;
+    "use mb;" loads as the plain runtime import exactly as before (it does NOT
+    die), and source transpilation there is via the modulino as always.
+  - change lib/mb.pm: sub main() sets PERL_MB_OCTET=1 in the environment of the
+    child interpreter it spawns to run the transpiled *.oo script.  The child
+    loads -Mmb=ver,enc, so without this flag the new path-1 filter could
+    transpile the already transpiled *.oo a second time.  import() honours
+    PERL_MB_OCTET by skipping the filter, preventing double transpilation.
+  - add t/1010_filter.t: 5 assertions that drive "use mb 'utf8';" scripts (with
+    no mb::set_script_encoding call, i.e. genuine path-1) through a child perl
+    and confirm auto-transpilation (length, character-class match, substitution,
+    global capture count, negated class).  On perl < 5.8 the cases self-skip.
+    This file is encoded in UTF-8 by design (an explicit-UTF-8 test).
+  - feature lib/mb.pm: sub main() (the modulino) now splits the execution path
+    on whether the target script contains a __DATA__/__END__ section, mirroring
+    mb8-0.01.  A script with no __DATA__/__END__ is transpiled and run in
+    process by CORE::eval with no temporary file: the *.oo companion script,
+    the $script.lock directory, and the child interpreter are all skipped.  A
+    "package main;\n#line 1 \"$script\"\n" prefix is prepended so that run-time
+    error messages report the original script name and correct line numbers.
+    A script that does contain __DATA__/__END__ keeps the previous behaviour
+    (write *.oo only when stale, then run it through a child interpreter),
+    because an in-process string eval cannot provide a working <DATA> handle.
+    The source is now read once, up front, for the __DATA__/__END__ test; the
+    poor-make staleness check and MSWin32 @ARGV globbing are unchanged.
+  - change lib/mb.pm: the in-process branch also sets PERL_MB_OCTET=1 (local)
+    around the CORE::eval, so that a "use mb;" / "use mb 'utf8';" inside the
+    transpiled source does not re-install the path-1 source filter and
+    transpile a second time.
+  - change lib/mb.pm: when run as a modulino ($0 eq __FILE__), $INC{'mb.pm'} is
+    registered (if not already set) before main() is called.  This makes a
+    "use mb;" / "require mb" inside an in-process transpiled script resolve to
+    the already loaded modulino instead of reloading mb.pm, which would
+    otherwise emit many "Subroutine ... redefined" warnings.  This mirrors the
+    child-interpreter path, where -Mmb=ver,enc already populates $INC{'mb.pm'}.
+  - add t/1011_modulino.t: 6 assertions covering the modulino split -- a
+    no-__DATA__ script runs in process (codepoint length, character-class
+    match, and absence of any *.oo file), a __DATA__ script reads <DATA> via a
+    child interpreter (and a *.oo file IS created), and an in-process run-time
+    error reports the original line number.  This file is encoded in UTF-8 by
+    design (an explicit-UTF-8 test).
+
 0.63  2026-06-14 JST (Japan Standard Time)
   - fix t/lib/INA_CPAN_Check.pm: ok() now has prototype ($;$) so that a
     failing regex match passed inline (e.g. ok($text =~ /pat/, "label"))

@@ -18,11 +18,11 @@ Readonly my $FIXTURE_SHARED   => 'shared_fixture';
 Readonly my $FIXTURE_FRESH    => 'fresh_object';
 Readonly my $FIXTURE_ISOLATED => 'isolated_block';
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =head1 DESCRIPTION
 

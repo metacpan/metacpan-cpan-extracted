@@ -44,3 +44,20 @@
   printf "length=%d\n", mb::length($s);    # character count
   printf "sub=%s\n",    mb::substr($s,0,5); # "Hello"
   printf "pos=%d\n",    mb::index($s,"World"); # 6
+
+[ 9. Ish vaqti kod nuqtasi regex (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." bitta kod nuqtasiga mos keladi
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie shakliga teng
+
+[ 10. To'g'ri baytlarni tekshirish (mb::valid) ]
+  mb::valid($octets)            # to'g'ri bo'lsa 1, aks holda 0
+                                # qat'iy, ixtiyoriy; kodlashga bog'liq
+
+[ 11. Kod nuqtasi bo'yicha bo'lish (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # kod nuqtasi chegaralarida bo'ladi
+
+[ 12. Ishga tushirishning uch usuli (filter / modulino / runtime) ]
+  use mb;                       # yo'l 1: manba filtri (perl 5.8+)
+  perl mb.pm script.pl          # yo'l 2: modulino
+  use mb qw(*mb utf8);          # yo'l 3: ish vaqti interfeysi

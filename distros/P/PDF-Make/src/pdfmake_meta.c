@@ -305,7 +305,7 @@ pdfmake_trapped_t pdfmake_meta_get_trapped(pdfmake_doc_t *doc) {
 
 /* Producer string constant */
 #ifndef PDFMAKE_VERSION
-#define PDFMAKE_VERSION "0.02"
+#define PDFMAKE_VERSION "0.04"
 #endif
 
 void pdfmake_meta_auto_fill(pdfmake_doc_t *doc) {

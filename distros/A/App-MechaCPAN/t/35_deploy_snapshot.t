@@ -7,6 +7,9 @@ use File::Temp qw/tempdir/;
 
 require q[./t/helper.pm];
 
+# Don't bother with CHECKSUMS verification
+local $App::MechaCPAN::CHKSIGS = 0;
+
 my $pwd      = cwd;
 my $cpanfile = "$FindBin::Bin/../test_dists/DeploySnapshot/cpanfile";
 

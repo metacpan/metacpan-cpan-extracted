@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,7 +14,7 @@ use Carp;
 
 use Data::Identifier v0.25;
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 
 
@@ -120,7 +120,7 @@ Data::URIID::Base - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 

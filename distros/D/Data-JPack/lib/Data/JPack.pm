@@ -6,7 +6,7 @@ use feature ":all";
 use CSS::Minifier::XS;
 use JavaScript::Minifier::XS;
 
-our $VERSION="v0.3.0";
+our $VERSION="v0.3.2";
 
 use feature qw<say>;
 no warnings "experimental";

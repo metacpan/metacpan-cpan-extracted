@@ -1,4 +1,4 @@
-use 5.020000;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -62,14 +62,14 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/PDF/Make.pm',
     ABSTRACT_FROM    => 'lib/PDF/Make.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.020000',
+    MIN_PERL_VERSION => '5.010001',
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     OBJECT           => join(' ', @obj),
     C                => \@c_src,
     H                => \@h_files,
     XS               => { 'Make.xs' => 'Make.c' },
     INC              => '-Iinclude',
-    CCFLAGS          => "$Config{ccflags} -std=c11",
+    CCFLAGS          => "$Config{ccflags} -std=gnu99",
 
     FUNCLIST         => [_read_funclist()],
     DL_FUNCS         => { 'PDF::Make' => [] },
@@ -79,8 +79,9 @@ my %WriteMakefileArgs = (
         'ExtUtils::Depends'   => '0',
     },
     TEST_REQUIRES => {
-        'Test::More'      => '0',
-        'Test::LeakTrace' => '0',
+        'Test::More'                => '0',
+        'Test::LeakTrace'           => '0',
+        'Test2::Bundle::Numerical'  => '0.03',
     },
     PREREQ_PM => {
         'Object::Proto' => '0.16',

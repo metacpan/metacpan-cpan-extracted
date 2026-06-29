@@ -19,8 +19,8 @@ use Test::Deep;
 subtest 'request or response not valid' => sub {
   my $t = Test::Mojo
     ->with_roles('+OpenAPI::Modern')
-    ->new($::app)
-    ->openapi($::openapi)
+    ->new($::app)               # defined in t/lib/Helper.pm
+    ->openapi($::openapi)       # ""
     ->test_openapi_verbose(1);
 
   $t->post_ok('/foo/123', {'Content-Type' => 'application/furble'} => '!!!')
@@ -29,7 +29,7 @@ subtest 'request or response not valid' => sub {
     ->request_not_valid
     ->response_not_valid
     ->request_not_valid('Unsupported Media Type')
-    ->request_not_valid(q{'/request/body/content': incorrect Content-Type "application/furble"})
+    ->request_not_valid(q{'/request/body': incorrect Content-Type "application/furble"})
     ->response_not_valid(q{'/response/code': no response object found for code 400}, 'test2');
 
   cmp_deeply(

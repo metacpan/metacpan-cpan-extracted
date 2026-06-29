@@ -1,7 +1,7 @@
 package JIRA::REST;
 # ABSTRACT: Thin wrapper around Jira's REST API
-$JIRA::REST::VERSION = '0.024';
-use 5.016;
+$JIRA::REST::VERSION = '0.025';
+use 5.034;
 use utf8;
 use warnings;
 
@@ -29,19 +29,6 @@ sub new {
         $args{url}->path($path);
     }
 
-    unless ($args{anonymous} || $args{pat}) {
-        # If username and password are not set we try to lookup the credentials
-        if (! defined $args{username} || ! defined $args{password}) {
-            ($args{username}, $args{password}) =
-                _search_for_credentials($args{url}, $args{username});
-        }
-
-        foreach (qw/username password/) {
-            croak __PACKAGE__ . "::new: '$_' argument must be a non-empty string.\n"
-                if ! defined $args{$_} || ref $args{$_} || length $args{$_} == 0;
-        }
-    }
-
     my $rest = REST::Client->new($args{rest_client_config});
 
     # Set default base URL
@@ -49,17 +36,6 @@ sub new {
 
     # Follow redirects/authentication by default
     $rest->setFollow(1);
-
-    unless ($args{anonymous} || $args{session}) {
-        # Since Jira doesn't send an authentication challenge, we force the
-        # sending of the authentication header.
-        $rest->addHeader(
-            Authorization =>
-                $args{pat}
-                ? "Bearer $args{pat}"
-                : 'Basic ' . encode_base64("$args{username}:$args{password}", '')
-            );
-    }
 
     for my $ua ($rest->getUseragent) {
         # Configure UserAgent name
@@ -75,33 +51,75 @@ sub new {
         $ua->cookie_jar(HTTP::CookieJar::LWP->new());
     }
 
-    my $jira = bless {
+    my $self = bless {
         rest => $rest,
         json => JSON->new->utf8->allow_nonref,
         api  => $api,
     } => $class;
 
-    $jira->{_session} = $jira->POST('/rest/auth/1/session', undef, {
-        username => $args{username},
-        password => $args{password},
-    }) if $args{session};
+    if ($args{anonymous}) {
+        $self->{authentication} = 'anonymous';
+        # Do not authenticate
+    } elsif ($args{pat}) {
+        $self->{authentication} = 'personal access token';
+        $rest->addHeader(Authorization => "Bearer $args{pat}");
+    } elsif ($args{client_id}) {
+        $self->{authentication} = 'access token';
+        foreach (qw/client_secret scope/) {
+            croak __PACKAGE__ . "::new: '$_' argument must be defined when 'client_id' is defined.\n"
+                unless defined $args{$_};
+        }
 
-    return $jira;
+        my $access_token = _access_token($self, $args{client_id}, $args{client_secret}, $args{scope});
+
+        $rest->addHeader(Authorization => "Bearer $access_token");
+    } else {
+        $self->{authentication} = 'basic';
+        # If username and password are not both set we try to lookup the credentials
+        if (! defined $args{username} || ! defined $args{password}) {
+            ($args{username}, $args{password}) =
+                _search_for_credentials($args{url}, $args{username});
+        }
+
+        foreach (qw/username password/) {
+            croak __PACKAGE__ . "::new: '$_' argument must be a non-empty string.\n"
+                if ! defined $args{$_} || ref $args{$_} || length $args{$_} == 0;
+        }
+
+        $rest->addHeader(
+            Authorization =>
+            'Basic ' . encode_base64("$args{username}:$args{password}", '')
+        );
+
+    }
+
+    if ($args{session} && $self->{authentication} eq 'basic') {
+        $self->{session} = $self->POST(
+            '/rest/auth/1/session',
+            undef,
+            {
+                username => $args{username},
+                password => $args{password},
+            },
+        );
+    }
+
+    return $self;
 }
 
 sub _grok_args {
     my ($class, @args) = @_;
 
     # Valid option names in the order expected by the old-form constructor
-    my @opts = qw/url username password rest_client_config proxy ssl_verify_none anonymous pat session/;
+    my @opts = qw/url username password rest_client_config proxy ssl_verify_none anonymous pat session client_id client_secret scope/;
 
     my %args;
 
     if (@args == 1 && ref $args[0] && ref $args[0] eq 'HASH') {
         # The new-form constructor expects a single hash reference.
-        @args{@opts} = delete @{$args[0]}{@opts};
-        croak __PACKAGE__ . "::new: unknown arguments: '", join("', '", sort keys %{$args[0]}), "'.\n"
-            if keys %{$args[0]};
+        @args{@opts} = delete $args[0]->@{@opts};
+        croak __PACKAGE__ . "::new: unknown arguments: '", join("', '", sort keys $args[0]->%*), "'.\n"
+            if keys $args[0]->%*;
     } else {
         # The old-form constructor expects a list of positional parameters.
         @args{@opts} = @args;
@@ -116,41 +134,40 @@ sub _grok_args {
         croak __PACKAGE__ . "::new: 'url' argument must be a URI object.\n";
     }
 
-    if (!!$args{anonymous} + !!$args{pat} + !!$args{session} > 1) {
-        croak __PACKAGE__ . "::new: 'anonymous', 'pat', and 'session' are mutually exclusive options.\n"
-    }
-
     for ($args{rest_client_config}) {
         $_ //= {};
         croak __PACKAGE__ . "::new: 'rest_client_config' argument must be a hash reference.\n"
             unless defined && ref && ref eq 'HASH';
     }
 
-    # remove the REST::Client faux config 'proxy' if set and use it later.
-    # This is deprecated since v0.017
-    if (my $proxy = delete $args{rest_client_config}{proxy}) {
-        carp __PACKAGE__ . "::new: passing 'proxy' in the 'rest_client_config' hash is deprecated. Please, use the corresponding argument instead.\n";
-        $args{proxy} //= $proxy;
-    }
-
     return ($class, %args);
 }
 
-sub new_session {
-    my ($class, @args) = @_;
+sub _access_token {
+    my ($self, $client_id, $client_secret, $scope) = @_;
 
-    if (@args == 1 && ref $args[0] && ref $args[0] eq 'HASH') {
-        $args[0]{session} = 1;
-    } else {
-        $args[8] = 1;
-    }
+    my $path =
+        '/rest/oauth2/latest/token?' .
+        join(
+            '&',
+            'grant_type=client_credentials',
+            'client_id=' . uri_escape($client_id),
+            'client_secret=' . uri_escape($client_secret),
+            'scope=' . uri_escape($scope),
+        );
 
-    return $class->new(@args);
+    $self->{rest}->POST(
+        $path,
+        undef,
+        {'Content-Type' => 'application/x-www-form-urlencoded'},
+    );
+
+    return $self->_content()->{access_token};
 }
 
 sub DESTROY {
     my $self = shift;
-    $self->DELETE('/rest/auth/1/session') if exists $self->{_session};
+    $self->DELETE('/rest/auth/1/session') if exists $self->{session};
     return;
 }
 
@@ -358,7 +375,7 @@ sub next_issue {
         # This is the end of the search results
         $self->{iter} = undef;
         return;
-    } elsif ($iter->{offset} == $iter->{results}{startAt} + @{$iter->{results}{issues}}) {
+    } elsif ($iter->{offset} == $iter->{results}{startAt} + $iter->{results}{issues}->@*) {
         # Time to get the next bunch of issues
         $iter->{params}{startAt} = $iter->{offset};
         $iter->{results}         = $self->POST('/search', undef, $iter->{params});
@@ -380,7 +397,7 @@ sub attach_files {
     foreach my $file (@files) {
         my $response = $rest->getUseragent()->post(
             $rest->getHost . "/rest/api/latest/issue/$issueIdOrKey/attachments",
-            %{$rest->{_headers}},
+            $rest->{_headers}->%*,
             'X-Atlassian-Token' => 'nocheck',
             'Content-Type'      => 'form-data',
             'Content'           => [ file => [$file, encode_utf8( $file )] ],
@@ -407,7 +424,7 @@ JIRA::REST - Thin wrapper around Jira's REST API
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -457,7 +474,7 @@ version 0.024
         fields     => [ qw/summary status assignee/ ],
     });
 
-    foreach my $issue (@{$search->{issues}}) {
+    foreach my $issue ($search->{issues}->@*) {
         print "Found issue $issue->{key}\n";
     }
 
@@ -547,19 +564,63 @@ one does not specify an API prefix. This is useful if you mainly want to use
 a particular API or if you want to specify a particular version of an API
 during construction.
 
+=item * B<anonymous>
+
+The boolean B<anonymous> authentication argument tells the module if you want to
+connect to the specified Jira with no authentication. This allows you to get
+some information from open or public Jira servers. If enabled, no other
+authentication arguments below are used.
+
+=item * B<pat>
+
+The B<pat> authentication argument is a string representing a L<Personal Access
+Token|https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html>
+that can be used for authentication.  Personal Access Tokens are available since
+Jira 8.14. If enabled, no other authentication arguments below are used.
+
+=item * B<client_id>
+
+=item * B<client_secret>
+
+=item * B<scope>
+
+These authentication arguments are strings used to request an Access Token for a
+L<service
+account|https://confluence.atlassian.com/enterprise/service-accounts-overview-1627095923.html>>
+
+If B<client_id> is set, the other two arguments must also be set. Service
+Account Access Tokens are available since Jira 11.0.
+
+If enabled, no other authentication arguments below are used.
+
 =item * B<username>
 
 =item * B<password>
 
-The username and password of a Jira user to use for authentication.
+The B<username> and B<password> authentication arguments are strings
+representing the usual credentials of a user. They are used as the default
+authentication method if no other method above is defined. JIRA::REST uses Basic
+HTTP authentication in this case.
 
-If B<anonymous> is false and no B<pat> given, then, if either B<username> or
-B<password> isn't defined the module looks them up in either the C<.netrc> file
-or via L<Config::Identity> (which allows C<gpg> encrypted credentials).
+If either B<username> or B<password> isn't defined the module looks them up in
+either the C<.netrc> file or via L<Config::Identity> (which allows C<gpg>
+encrypted credentials).
 
 L<Config::Identity> will look for F<~/.jira-identity> or F<~/.jira>.
 You can change the filename stub from C<jira> to a custom stub with the
 C<JIRA_REST_IDENTITY> environment variable.
+
+=item * B<session>
+
+The boolean B<session> argument tells the module if you want it to acquire a
+session cookie by making a C<POST /rest/auth/1/session> call to login to
+Jira. This is particularly useful when interacting with Jira Data Center,
+because it can use the session cookie to maintain affinity with one of the
+redundant servers. Upon destruction, the object makes a C<DELETE
+/rest/auth/1/session> call to logout from Jira.
+
+This option is used only if the B<username> and B<password> arguments are also
+used.
 
 =item * B<rest_client_config>
 
@@ -567,12 +628,6 @@ A JIRA::REST object uses a L<REST::Client> object to make the REST
 invocations. This optional argument must be a hash reference that can be fed
 to the REST::Client constructor. Note that the C<url> argument
 overwrites any value associated with the C<host> key in this hash.
-
-As an extension, the hash reference also accepts one additional argument
-called B<proxy> that is an extension to the REST::Client configuration and
-will be removed from the hash before passing it on to the REST::Client
-constructor. However, this argument is deprecated since v0.017 and you
-should avoid it. Use the following argument instead.
 
 =item * B<proxy>
 
@@ -586,43 +641,7 @@ underlying L<REST::Client>'s user agent to 0, thus disabling them. This
 allows access to Jira servers that have self-signed certificates that don't
 pass L<LWP::UserAgent>'s verification methods.
 
-=item * B<anonymous>
-
-=item * B<pat>
-
-=item * B<session>
-
-These three arguments are mutually exclusive, i.e., you can use at most one of
-them. By default, they are all undefined.
-
-The boolean B<anonymous> argument tells the module if you want to connect to the
-specified Jira with no authentication. This allows you to get some information
-from open or public Jira servers. If enabled, the B<username> and B<password>
-arguments are disregarded.
-
-The B<pat> argument maps to a string which should be a personal access token
-that can be used for authentication instead of a username and a password.  This
-option is available since Jira version 8.14.  Please refer to
-L<https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html>
-for details. If enabled, the B<username> and B<password> arguments are
-disregarded.
-
-The booleal B<session> argument tells the module if you want it to acquire a
-session cookie by making a C<POST /rest/auth/1/session> call to login to
-Jira. This is particularly useful when interacting with Jira Data Center,
-because it can use the session cookie to maintain affinity with one of the
-redundant servers. Upon destruction, the object makes a C<DELETE
-/rest/auth/1/session> call to logout from Jira. If enabled, the B<username> and
-B<password> arguments are required.
-
 =back
-
-=head2 new_session OPTIONS
-
-This alternative constructor simply invokes the default constructor with the
-same options, adding to them the B<session> option. New code should use the
-default constructor with the B<session> option because this constructor may be
-deprecated in the future.
 
 =head1 REST METHODS
 
@@ -775,31 +794,25 @@ interface to attach files to issues.
 
 =head1 PERL AND JIRA COMPATIBILITY POLICY
 
-Currently L<JIRA::REST> requires Perl 5.16 and is tested on Jira Data Center
-8.13.
+Currently L<JIRA::REST> requires Perl 5.34 and is tested on Jira Data Center
+11.3.7.
 
 We try to be compatible with the Perl native packages of the oldest L<Ubuntu
-LTS|https://www.ubuntu.com/info/release-end-of-life> and
-L<CentOS|https://wiki.centos.org/About/Product> Linux distributions still
-getting maintainance updates.
+LTS|https://www.ubuntu.com/info/release-end-of-life> Linux distribution still
+getting maintenance updates.
 
-  +-------------+-----------------------+------+
-  | End of Life | Distro                | Perl |
-  +-------------+-----------------------+------+
-  |   2023-04   | Ubuntu 18.04 (bionic) | 5.26 |
-  |   2024-07   | CentOS 7              | 5.16 |
-  |   2025-04   | Ubuntu 20.04 (focal)  | 5.30 |
-  |   2027-04   | Ubuntu 22.04 (jammy)  | 5.34 |
-  |   2029-05   | CentOS 8              | 5.26 |
-  +-------------+-----------------------+------+
-
-As you can see, we're kept behind mostly by the slow pace of CentOS (actually,
-RHEL) releases.
+  +-------------+-------------------------+------+
+  | End of Life | Distro                  | Perl |
+  +-------------+-------------------------+------+
+  |   2027-04   | Ubuntu 22.04 (jammy)    | 5.34 |
+  |   2029-04   | Ubuntu 24.04 (noble)    | 5.38 |
+  |   2031-04   | Ubuntu 26.04 (resolute) | 5.40 |
+  +-------------+-------------------------+------+
 
 As for Jira, the policy is very lax. I (the author) only test L<JIRA::REST> on
-the Jira server installed in the company I work for, which is usually (but not
-always) at most one year older than the newest released version. I don't have
-yet an easy way to test it on different versions.
+the Jira Data Center installed in the company I work for, which is usually (but
+not always) at most one year older than the newest released version. I don't
+have yet an easy way to test it on different versions.
 
 =head1 SEE ALSO
 
@@ -832,7 +845,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2026 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

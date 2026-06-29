@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,7 +14,7 @@ use overload '""' => \&rgb;
 use Carp;
 use Scalar::Util qw(weaken blessed);
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 use parent qw(Data::URIID::Base Data::Identifier::Interface::Known);
 
@@ -129,13 +129,13 @@ Data::URIID::Colour - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 
     use Data::URIID::Colour;
 
-    my $colour = Data::URIID::Colour->new(rgb => '#FF0000');
+    my Data::URIID::Colour $colour = Data::URIID::Colour->new(rgb => '#FF0000');
 
 This module represents a single colour.
 
@@ -145,7 +145,7 @@ This package inherits from L<Data::URIID::Base>, and L<Data::Identifier::Interfa
 
 =head2 new
 
-    my $colour = Data::URIID::Colour->new( option => value, ... );
+    my Data::URIID::Colour $colour = Data::URIID::Colour->new( option => value, ... );
 
 Returns a new object for the given colour.
 The following options are defined:

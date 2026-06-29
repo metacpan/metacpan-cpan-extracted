@@ -446,13 +446,14 @@ Node* JsTokenizeString(JsDoc* doc, const char* string) {
                 char ch = 0;
 
                 /* find last non-whitespace, non-comment node */
-                while (nodeIsWHITESPACE(last) || nodeIsCOMMENT(last))
+                while (last && (nodeIsWHITESPACE(last) || nodeIsCOMMENT(last)))
                     last = last->prev;
 
-                ch = last->contents[last->length-1];
+                if (last && (last->length > 0))
+                    ch = last->contents[last->length-1];
 
                 /* see if we're "division" or "regexp" */
-                if (nodeIsIDENTIFIER(last) && nodeEquals(last, "return")) {
+                if (last && nodeIsIDENTIFIER(last) && nodeEquals(last, "return")) {
                     /* returning a regexp from a function */
                     _JsExtractLiteral(doc, node);
                 }
@@ -486,7 +487,7 @@ Node* JsTokenizeString(JsDoc* doc, const char* string) {
         /* some debugging info */
 #ifdef DEBUG
         {
-            int idx;
+            size_t idx;
             printf("----------------------------------------------------------------\n");
             printf("%s: [%s]\n", strNodeTypes[node->type], node->contents);
             printf("next: [");
@@ -701,7 +702,7 @@ Node* JsPruneNodes(Node *head) {
  * ****************************************************************************
  */
 char* JsMinify(const char* string) {
-    char* results;
+    char* results = NULL;
     JsDoc doc;
 
     /* initialize our JS document object */
@@ -715,12 +716,12 @@ char* JsMinify(const char* string) {
 
     /* PASS 1: tokenize JS into a list of nodes */
     Node* head = JsTokenizeString(&doc, string);
-    if (!head) return NULL;
+    if (!head) goto cleanup;
     /* PASS 2: collapse nodes */
     JsCollapseNodes(head);
     /* PASS 3: prune nodes */
     head = JsPruneNodes(head);
-    if (!head) return NULL;
+    if (!head) goto cleanup;
     /* PASS 4: re-assemble JS into single string */
     {
         Node* curr;
@@ -740,10 +741,16 @@ char* JsMinify(const char* string) {
         *ptr = 0;
     }
     /* free memory used by the NodeSets */
+    cleanup:
     {
         NodeSet* curr = doc.head_set;
         while (curr) {
             NodeSet* next = curr->next;
+            /* free each node's contents buffer before freeing the set */
+            size_t idx;
+            for (idx=0; idx < curr->next_node; idx++)
+                JsClearNodeContents( &curr->nodes[idx] );
+            /* free the set, now that it's empty */
             Safefree(curr);
             curr = next;
         }

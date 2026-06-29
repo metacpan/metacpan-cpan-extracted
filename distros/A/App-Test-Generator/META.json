@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -34,16 +34,19 @@
          "requires" : {
             "Carp" : "0",
             "Config::Abstraction" : "0.36",
+            "Cwd" : "0",
             "Data::Dumper" : "0",
             "Data::Section::Simple" : "0",
             "File::Copy" : "0",
             "File::Copy::Recursive" : "0",
             "File::Path" : "0",
+            "File::Slurp" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "Getopt::Long" : "0",
             "HTML::Entities" : "0",
             "IPC::Open3" : "0",
+            "IPC::Run3" : "0",
             "JSON::MaybeXS" : "0",
             "Module::Load::Conditional" : "0",
             "PPI" : "0",
@@ -51,28 +54,27 @@
             "Params::Validate::Strict" : "0.3",
             "Pod::Simple" : "0",
             "Pod::Usage" : "0",
+            "Readonly" : "0",
             "Readonly::Values::Boolean" : "0",
             "Return::Set" : "0.03",
             "Safe" : "0",
-            "Symbol" : "0",
             "Template" : "0",
+            "URI" : "0",
             "UUID::Tiny" : "0",
+            "WWW::RT::CPAN" : "0",
             "YAML::XS" : "0",
             "autodie" : "0",
-            "perl" : "5.036",
-            "re" : "0"
+            "perl" : "5.036"
          }
       },
       "test" : {
          "requires" : {
-            "Cwd" : "0",
             "Data::Random" : "0",
             "Data::Random::String" : "0",
             "Data::Random::String::Matches" : "0.02",
             "Data::Random::Structure" : "0",
             "Encode" : "0",
             "FindBin" : "0",
-            "IPC::Run3" : "0",
             "IPC::System::Simple" : "0",
             "JSON::PP" : "0",
             "Symbol" : "0",
@@ -104,6 +106,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

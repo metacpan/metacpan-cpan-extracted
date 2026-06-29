@@ -1,4 +1,16 @@
 Revision history for Perl extension Data::JPack.
+
+v0.3.2 2026-06-29
+  [fixes]
+    - Update dependency JavaScript::Minifier::XS to v0.16 to address memory
+      leaks
+
+v0.3.1 2026-05-27
+  [fixes]
+    - Base template now calls jack app and css files.
+    - Fix template path
+    - Add base application App
+
 v0.3.0 2026-04-21
   [features]
     - add css and javascript minification support

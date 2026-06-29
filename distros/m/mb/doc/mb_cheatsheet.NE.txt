@@ -33,3 +33,20 @@
   mb::set_script_encoding('utf8');
   my $s = "नमस्ते संसार";
   printf "लम्बाइ=%d\n", mb::length($s);
+
+[ 9. रनटाइम कोडपोइन्ट नियमित अभिव्यक्ति (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." ले एउटा कोडपोइन्ट मिलाउँछ
+  $str =~ m{\G$mb{qr/(.)/}gc}   # tie रूपसँग समान
+
+[ 10. सही बाइट जाँच (mb::valid) ]
+  mb::valid($octets)            # सही भए 1, अन्यथा 0
+                                # कडा, वैकल्पिक; encoding अनुसार फरक
+
+[ 11. कोडपोइन्ट अनुसार विभाजन (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # कोडपोइन्ट सिमामा विभाजन
+
+[ 12. चलाउने तीन तरिका (filter / modulino / runtime) ]
+  use mb;                       # बाटो 1: स्रोत फिल्टर (perl 5.8+)
+  perl mb.pm script.pl          # बाटो 2: modulino
+  use mb qw(*mb utf8);          # बाटो 3: रनटाइम इन्टरफेस

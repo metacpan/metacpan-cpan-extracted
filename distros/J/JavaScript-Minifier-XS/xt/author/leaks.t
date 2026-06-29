@@ -13,7 +13,7 @@ BEGIN {
 use Test::LeakTrace;
 
 ###############################################################################
-## What CSS docs do we want to try compressing?
+# What JS docs do we want to try compressing?
 my $curl = which('curl');
 my @libs = (
     'http://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.js',

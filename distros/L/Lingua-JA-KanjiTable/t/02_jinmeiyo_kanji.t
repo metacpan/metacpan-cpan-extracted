@@ -2,10 +2,17 @@ use strict;
 use warnings;
 use utf8;
 use Lingua::JA::KanjiTable qw/
+    IsJinmeiyoKanji          IsJinmeiyouKanji
+    IsJinmeiyoKanji20101130  IsJinmeiyouKanji20101130
+    IsJinmeiyoKanji20150107  IsJinmeiyouKanji20150107
+    IsJinmeiyoKanji20170925  IsJinmeiyouKanji20170925
+    IsJinmeiyoKanji20260626  IsJinmeiyouKanji20260626
+
     InJinmeiyoKanji          InJinmeiyouKanji
     InJinmeiyoKanji20101130  InJinmeiyouKanji20101130
     InJinmeiyoKanji20150107  InJinmeiyouKanji20150107
     InJinmeiyoKanji20170925  InJinmeiyouKanji20170925
+    InJinmeiyoKanji20260626  InJinmeiyouKanji20260626
 /;
 use Test::More;
 
@@ -19,18 +26,32 @@ is(length $_, 861, '861 kanji');
 
 for my $char ( split(//) )
 {
+    ok( $char =~ /^\p{IsJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
     ok( $char =~ /^\p{InJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
 }
 
-ok(/^\p{InJinmeiyouKanji}+$/,         'Jinmeiyou Kanji latest');
-ok(/^\p{InJinmeiyoKanji20101130}+$/,   'Jinmeiyo Kanji 2010-11-30');
-ok(/^\p{InJinmeiyouKanji20101130}+$/, 'Jinmeiyou Kanji 2010-11-30');
-ok(/^\p{InJinmeiyoKanji20150107}+$/,   'Jinmeiyo Kanji 2015-01-07');
-ok(/^\p{InJinmeiyouKanji20150107}+$/, 'Jinmeiyou Kanji 2015-01-07');
-ok(/^\p{InJinmeiyoKanji20170925}+$/,   'Jinmeiyo Kanji 2017-09-25');
-ok(/^\p{InJinmeiyouKanji20170925}+$/, 'Jinmeiyou Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyouKanji}+$/,         'Is Jinmeiyou Kanji latest');
+ok(/^\p{IsJinmeiyoKanji20101130}+$/,   'Is Jinmeiyo Kanji 2010-11-30');
+ok(/^\p{IsJinmeiyouKanji20101130}+$/, 'Is Jinmeiyou Kanji 2010-11-30');
+ok(/^\p{IsJinmeiyoKanji20150107}+$/,   'Is Jinmeiyo Kanji 2015-01-07');
+ok(/^\p{IsJinmeiyouKanji20150107}+$/, 'Is Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{IsJinmeiyoKanji20170925}+$/,   'Is Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyouKanji20170925}+$/, 'Is Jinmeiyou Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyoKanji20260626}+$/,   'Is Jinmeiyo Kanji 2026-06-26');
+ok(/^\p{IsJinmeiyouKanji20260626}+$/, 'Is Jinmeiyou Kanji 2026-06-26');
 
-ok('a' !~ /^\p{InJinmeiyouKanji}+$/, 'not Jinmeiyou Kanji');
+ok(/^\p{InJinmeiyouKanji}+$/,         'In Jinmeiyou Kanji latest');
+ok(/^\p{InJinmeiyoKanji20101130}+$/,   'In Jinmeiyo Kanji 2010-11-30');
+ok(/^\p{InJinmeiyouKanji20101130}+$/, 'In Jinmeiyou Kanji 2010-11-30');
+ok(/^\p{InJinmeiyoKanji20150107}+$/,   'In Jinmeiyo Kanji 2015-01-07');
+ok(/^\p{InJinmeiyouKanji20150107}+$/, 'In Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{InJinmeiyoKanji20170925}+$/,   'In Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{InJinmeiyouKanji20170925}+$/, 'In Jinmeiyou Kanji 2017-09-25');
+ok(/^\p{InJinmeiyoKanji20260626}+$/,   'In Jinmeiyo Kanji 2026-06-26');
+ok(/^\p{InJinmeiyouKanji20260626}+$/, 'In Jinmeiyou Kanji 2026-06-26');
+
+ok('a' !~ /^\p{IsJinmeiyouKanji}+$/, 'Is not Jinmeiyou Kanji');
+ok('a' !~ /^\p{InJinmeiyouKanji}+$/, 'In not Jinmeiyou Kanji');
 
 
 $_ .= '巫'; # Added on 01/07/2015
@@ -38,32 +59,86 @@ is(length $_, 862, '862 kanji');
 
 for my $char ( split(//) )
 {
+    ok( $char =~ /^\p{IsJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
     ok( $char =~ /^\p{InJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
 }
 
-ok(/^\p{InJinmeiyouKanji}+$/,            'Jinmeiyou Kanji latest');
-ok( ! /^\p{InJinmeiyoKanji20101130}+$/,  '"巫" is not in Jinmeiyo Kanji 2010-11-30');
-ok( ! /^\p{InJinmeiyouKanji20101130}+$/, '"巫" is not in Jinmeiyou Kanji 2010-11-30');
-ok(/^\p{InJinmeiyoKanji20150107}+$/,      'Jinmeiyo Kanji 2015-01-07');
-ok(/^\p{InJinmeiyouKanji20150107}+$/,    'Jinmeiyou Kanji 2015-01-07');
-ok(/^\p{InJinmeiyoKanji20170925}+$/,      'Jinmeiyo Kanji 2017-09-25');
-ok(/^\p{InJinmeiyouKanji20170925}+$/,    'Jinmeiyou Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyouKanji}+$/,            'Is Jinmeiyou Kanji latest');
+ok( ! /^\p{IsJinmeiyoKanji20101130}+$/,  'Is "巫" is not in Jinmeiyo Kanji 2010-11-30');
+ok( ! /^\p{IsJinmeiyouKanji20101130}+$/, 'Is "巫" is not in Jinmeiyou Kanji 2010-11-30');
+ok(/^\p{IsJinmeiyoKanji20150107}+$/,     'Is Jinmeiyo Kanji 2015-01-07');
+ok(/^\p{IsJinmeiyouKanji20150107}+$/,    'Is Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{IsJinmeiyoKanji20170925}+$/,     'Is Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyouKanji20170925}+$/,    'Is Jinmeiyou Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyoKanji20260626}+$/,     'Is Jinmeiyo Kanji 2026-06-26');
+ok(/^\p{IsJinmeiyouKanji20260626}+$/,    'Is Jinmeiyou Kanji 2026-06-26');
 
+ok(/^\p{InJinmeiyouKanji}+$/,            'In Jinmeiyou Kanji latest');
+ok( ! /^\p{InJinmeiyoKanji20101130}+$/,  'In "巫" is not in Jinmeiyo Kanji 2010-11-30');
+ok( ! /^\p{InJinmeiyouKanji20101130}+$/, 'In "巫" is not in Jinmeiyou Kanji 2010-11-30');
+ok(/^\p{InJinmeiyoKanji20150107}+$/,     'In Jinmeiyo Kanji 2015-01-07');
+ok(/^\p{InJinmeiyouKanji20150107}+$/,    'In Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{InJinmeiyoKanji20170925}+$/,     'In Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{InJinmeiyouKanji20170925}+$/,    'In Jinmeiyou Kanji 2017-09-25');
+ok(/^\p{InJinmeiyoKanji20260626}+$/,     'In Jinmeiyo Kanji 2026-06-26');
+ok(/^\p{InJinmeiyouKanji20260626}+$/,    'In Jinmeiyou Kanji 2026-06-26');
 
 $_ .= '渾'; # Added on 09/25/2017
 is(length $_, 863, '863 kanji');
 
 for my $char ( split(//) )
 {
+    ok( $char =~ /^\p{IsJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
     ok( $char =~ /^\p{InJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
 }
 
-ok(/^\p{InJinmeiyouKanji}+$/,            'Jinmeiyou Kanji latest');
-ok( ! /^\p{InJinmeiyoKanji20101130}+$/,  '"巫" is not in Jinmeiyo Kanji 2010-11-30');
-ok( ! /^\p{InJinmeiyouKanji20101130}+$/, '"巫" is not in Jinmeiyou Kanji 2010-11-30');
-ok( ! /^\p{InJinmeiyoKanji20150107}+$/,  '"渾" is not in Jinmeiyo Kanji 2015-01-07');
-ok( ! /^\p{InJinmeiyouKanji20150107}+$/, '"渾" is not in Jinmeiyou Kanji 2015-01-07');
-ok(/^\p{InJinmeiyoKanji20170925}+$/,      'Jinmeiyo Kanji 2017-09-25');
-ok(/^\p{InJinmeiyouKanji20170925}+$/,    'Jinmeiyou Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyouKanji}+$/,            'Is Jinmeiyou Kanji latest');
+ok( ! /^\p{IsJinmeiyoKanji20101130}+$/,  'Is "巫" is not in Jinmeiyo Kanji 2010-11-30');
+ok( ! /^\p{IsJinmeiyouKanji20101130}+$/, 'Is "巫" is not in Jinmeiyou Kanji 2010-11-30');
+ok( ! /^\p{IsJinmeiyoKanji20150107}+$/,  'Is "渾" is not in Jinmeiyo Kanji 2015-01-07');
+ok( ! /^\p{IsJinmeiyouKanji20150107}+$/, 'Is "渾" is not in Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{IsJinmeiyoKanji20170925}+$/,     'Is Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyouKanji20170925}+$/,    'Is Jinmeiyou Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyoKanji20260626}+$/,     'Is Jinmeiyo Kanji 2026-06-26');
+ok(/^\p{IsJinmeiyouKanji20260626}+$/,    'Is Jinmeiyou Kanji 2026-06-26');
+
+ok(/^\p{InJinmeiyouKanji}+$/,            'In Jinmeiyou Kanji latest');
+ok( ! /^\p{InJinmeiyoKanji20101130}+$/,  'In "巫" is not in Jinmeiyo Kanji 2010-11-30');
+ok( ! /^\p{InJinmeiyouKanji20101130}+$/, 'In "巫" is not in Jinmeiyou Kanji 2010-11-30');
+ok( ! /^\p{InJinmeiyoKanji20150107}+$/,  'In "渾" is not in Jinmeiyo Kanji 2015-01-07');
+ok( ! /^\p{InJinmeiyouKanji20150107}+$/, 'In "渾" is not in Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{InJinmeiyoKanji20170925}+$/,     'In Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{InJinmeiyouKanji20170925}+$/,    'In Jinmeiyou Kanji 2017-09-25');
+ok(/^\p{InJinmeiyoKanji20260626}+$/,     'In Jinmeiyo Kanji 2026-06-26');
+ok(/^\p{InJinmeiyouKanji20260626}+$/,    'In Jinmeiyou Kanji 2026-06-26');
+
+$_ .= '勒'; # Added on 06/28/2026
+is(length $_, 864, '864 kanji');
+
+for my $char ( split(//) )
+{
+    ok( $char =~ /^\p{IsJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
+    ok( $char =~ /^\p{InJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
+}
+
+ok(/^\p{IsJinmeiyouKanji}+$/,            'Is Jinmeiyou Kanji latest');
+ok( ! /^\p{IsJinmeiyoKanji20101130}+$/,  'Is "巫" is not in Jinmeiyo Kanji 2010-11-30');
+ok( ! /^\p{IsJinmeiyouKanji20101130}+$/, 'Is "巫" is not in Jinmeiyou Kanji 2010-11-30');
+ok( ! /^\p{IsJinmeiyoKanji20150107}+$/,  'Is "渾" is not in Jinmeiyo Kanji 2015-01-07');
+ok( ! /^\p{IsJinmeiyouKanji20150107}+$/, 'Is "渾" is not in Jinmeiyou Kanji 2015-01-07');
+ok( ! /^\p{IsJinmeiyoKanji20170925}+$/,  'Is "勒" is not in Jinmeiyo Kanji 2017-09-25');
+ok( ! /^\p{IsJinmeiyouKanji20170925}+$/, 'Is "勒" is not in Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{IsJinmeiyoKanji20260626}+$/,     'Is Jinmeiyo Kanji 2026-06-26');
+ok(/^\p{IsJinmeiyouKanji20260626}+$/,    'Is Jinmeiyou Kanji 2026-06-26');
+
+ok(/^\p{InJinmeiyouKanji}+$/,            'In Jinmeiyou Kanji latest');
+ok( ! /^\p{InJinmeiyoKanji20101130}+$/,  'In "巫" is not in Jinmeiyo Kanji 2010-11-30');
+ok( ! /^\p{InJinmeiyouKanji20101130}+$/, 'In "巫" is not in Jinmeiyou Kanji 2010-11-30');
+ok( ! /^\p{InJinmeiyoKanji20150107}+$/,  'In "渾" is not in Jinmeiyo Kanji 2015-01-07');
+ok( ! /^\p{InJinmeiyouKanji20150107}+$/, 'In "渾" is not in Jinmeiyou Kanji 2015-01-07');
+ok( ! /^\p{InJinmeiyoKanji20170925}+$/,  'In "勒" is not in Jinmeiyo Kanji 2017-09-25');
+ok( ! /^\p{InJinmeiyouKanji20170925}+$/, 'In "勒" is not in Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{InJinmeiyoKanji20260626}+$/,     'In Jinmeiyo Kanji 2026-06-26');
+ok(/^\p{InJinmeiyouKanji20260626}+$/,    'In Jinmeiyou Kanji 2026-06-26');
 
 done_testing;

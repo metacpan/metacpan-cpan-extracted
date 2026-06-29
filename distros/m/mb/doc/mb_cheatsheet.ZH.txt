@@ -44,3 +44,20 @@
   printf "字符数=%d\n", mb::length($s);     # 4
   printf "子串=%s\n",   mb::substr($s,0,2); # "你好"
   printf "位置=%d\n",   mb::index($s,"世界"); # 2
+
+[ 9. 运行时码点正则 (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." 匹配一个码点
+  $str =~ m{\G$mb{qr/(.)/}gc}   # 与 tie 形式等价
+
+[ 10. 验证规范字节 (mb::valid) ]
+  mb::valid($octets)            # 规范则为1，否则为0
+                                # 严格、可选；随编码而变
+
+[ 11. 按码位分割 (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # 按码位边界分割
+
+[ 12. 三种运行方式 (filter / modulino / runtime) ]
+  use mb;                       # 路径1：源码过滤器 (perl 5.8+)
+  perl mb.pm script.pl          # 路径2：modulino
+  use mb qw(*mb utf8);          # 路径3：运行时接口

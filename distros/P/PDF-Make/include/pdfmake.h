@@ -18,7 +18,7 @@ extern "C" {
 #include "pdfmake_arena.h"
 
 /* Compile-time version of the library. Matches $VERSION in lib/PDF/Make.pm. */
-#define PDFMAKE_VERSION "0.02"
+#define PDFMAKE_VERSION "0.04"
 
 /* Returns the library version string. Phase 01 smoke symbol. */
 const char *pdfmake_version(void);

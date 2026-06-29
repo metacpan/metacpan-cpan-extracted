@@ -1,5 +1,13 @@
 Revision history for Perl module Tree::DAG_Node.
 
+1.37  2025-06-29T08:00:00
+	- Replace the body of the LICENSE file with what is recommended at
+		https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+	- Patch the source code reference to refer to this LICENSE file.
+	- Remove the excess & confusing files LICENSE-Artistic-2.0 & LICENSE-GPL-3.
+	- Reset the required version of Data::Dumper back to 0.
+	- Thanx to Paul Howarth & David B. Evans for the reports.
+
 1.36  2025-06-28T11:53:00
 	- Fix typo in the 2nd FAQ: "How to process every node in tree?". The POD contained
 		"my(@node, $options) = @_;" whereas it should read "my($node, $options) = @_;".

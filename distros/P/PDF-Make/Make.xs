@@ -41,12 +41,16 @@
 /* -------------------------------------------------------------------------
  * Render API forward declarations
  * ------------------------------------------------------------------------- */
-typedef struct pdfmake_render_ctx {
+struct pdfmake_render_ctx {
     uint32_t *pixels;
     int width;
     int height;
     int stride;
-} pdfmake_render_ctx_t;
+};
+#ifndef PDFMAKE_RENDER_CTX_T_DEFINED
+#define PDFMAKE_RENDER_CTX_T_DEFINED
+typedef struct pdfmake_render_ctx pdfmake_render_ctx_t;
+#endif
 
 typedef pdfmake_render_ctx_t* PDF__Make__Render;
 

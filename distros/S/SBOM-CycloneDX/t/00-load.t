@@ -80,7 +80,6 @@ my @modules = qw[
     SBOM::CycloneDX::Hash
     SBOM::CycloneDX::IdentifiableAction
     SBOM::CycloneDX::Issue
-    SBOM::CycloneDX::Issue::Source
     SBOM::CycloneDX::License
     SBOM::CycloneDX::License::ExpressionDetail
     SBOM::CycloneDX::License::Licensee
@@ -104,6 +103,7 @@ my @modules = qw[
     SBOM::CycloneDX::ReleaseNotes
     SBOM::CycloneDX::Schema
     SBOM::CycloneDX::Service
+    SBOM::CycloneDX::Source
     SBOM::CycloneDX::Standard
     SBOM::CycloneDX::Standard::Level
     SBOM::CycloneDX::Standard::Requirement
@@ -119,7 +119,6 @@ my @modules = qw[
     SBOM::CycloneDX::Vulnerability::ProofOfConcept
     SBOM::CycloneDX::Vulnerability::Rating
     SBOM::CycloneDX::Vulnerability::Reference
-    SBOM::CycloneDX::Vulnerability::Source
 ];
 
 for my $module (@modules) {

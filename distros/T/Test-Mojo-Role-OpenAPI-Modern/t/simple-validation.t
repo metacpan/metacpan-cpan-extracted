@@ -16,6 +16,7 @@ use lib 't/lib';
 use Helper;
 use Test::Needs;
 use Scalar::Util 'refaddr';
+use Clone 'clone';
 
 subtest 'openapi object on the test itself' => sub {
   my $t = Test::Mojo
@@ -53,7 +54,7 @@ subtest 'openapi object on the test itself' => sub {
 subtest 'openapi object is constructed using provided configs' => sub {
   test_needs 'Mojolicious::Plugin::OpenAPI::Modern';
 
-  my $schema = dclone($::schema);
+  my $schema = clone($::schema);
   $schema->{info}{title} = 'Test API using overridden configs';
 
   my $t = Test::Mojo

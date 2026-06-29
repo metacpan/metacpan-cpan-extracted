@@ -1,5 +1,7 @@
 Revision history for Perl extension Algorithm::Heapify::XS.
 
+0.05  Tues May 19 2025
+        - gracefully handle missing ncmp()
 
 0.03  Mon Aug 27 2018
         - Fixups for threaded builds.

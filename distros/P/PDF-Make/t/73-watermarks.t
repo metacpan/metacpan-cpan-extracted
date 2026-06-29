@@ -2,7 +2,8 @@
 
 use strict;
 use warnings;
-use Test::More;
+use Test2::Bundle::Numerical qw(:all);
+use Test2::Tools::Class qw(can_ok);
 use File::Temp qw(tempfile tempdir);
 
 BEGIN {

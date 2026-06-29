@@ -18,6 +18,10 @@ SYNOPSIS
       # If cpanfile.snapshot exists, it will be consulted exclusivly
       user@host:~$ mechacpan deploy
       user@host:~$ zhuli do the thing
+      
+      # Download mechacpan for use or for a one-off command
+      user@host:~$ curl -L https://get.mechacpan.us -o mechacpan
+      user@host:~$ curl -L https://get.mechacpan.us | perl - deploy
 
 DESCRIPTION
 

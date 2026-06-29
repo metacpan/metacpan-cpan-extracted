@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 use parent 'Data::URIID::Base';
 
@@ -401,7 +401,7 @@ Data::URIID::Barcode - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 

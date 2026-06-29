@@ -11,6 +11,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01-compile.t',
+    't/CVE-2026-56017.t',
     't/minify.t'
 );
 

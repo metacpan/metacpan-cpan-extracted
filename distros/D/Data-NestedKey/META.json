@@ -52,7 +52,7 @@
    "provides" : {
       "Data::NestedKey" : {
          "file" : "lib/Data/NestedKey.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -68,6 +68,6 @@
          "web" : "http://github.com/rlauer6/data-nestedkey.git"
       }
    },
-   "version" : "v1.0.8",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

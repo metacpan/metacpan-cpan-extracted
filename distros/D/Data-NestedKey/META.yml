@@ -26,7 +26,7 @@ no_index:
 provides:
   Data::NestedKey:
     file: lib/Data/NestedKey.pm
-    version: v1.0.8
+    version: v1.1.0
 requires:
   JSON: '0'
   List::Util: '1.32'
@@ -36,5 +36,5 @@ resources:
   bugtracker: http://github.com/rlauer6/data-nestedkey/issues
   homepage: http://github.com/rlauer6/data-nestedkey.git
   repository: git://github.com/rlauer6/data-nestedkey.git
-version: v1.0.8
+version: v1.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

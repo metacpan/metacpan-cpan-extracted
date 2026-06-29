@@ -2,9 +2,9 @@ NAME
     Desktop::KDEActivity::Util - Utilities related to KDE Activities
 
 VERSION
-    This document describes version 0.002 of Desktop::KDEActivity::Util
+    This document describes version 0.003 of Desktop::KDEActivity::Util
     (from Perl distribution Desktop-KDEActivity-Util), released on
-    2026-03-29.
+    2026-05-18.
 
 SYNOPSIS
 DESCRIPTION
@@ -58,6 +58,10 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   detail => *bool*
+
+        (No description)
+
+    *   has_windows => *bool*
 
         (No description)
 
@@ -118,6 +122,9 @@ SOURCE
 SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

@@ -2,7 +2,7 @@
 
 # perl -Ilib examples/search.pl --jiraurl https://lharey.atlassian.net --jql "assignee = 'Lisa Hare'"
 
-use 5.016;
+use 5.034;
 use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -92,7 +92,7 @@ See the L<JIRACLI> documentation.
 
 =head1 COPYRIGHT
 
-Copyright 2016-2022 CPQD.
+Copyright 2016-2026 CPQD.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

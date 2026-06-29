@@ -1,7 +1,10 @@
 use strict;
 use warnings;
 use utf8;
-use Lingua::JA::KanjiTable qw/InJoyoKanji InJouyouKanji InJoyoKanji20101130 InJouyouKanji20101130/;
+use Lingua::JA::KanjiTable qw/
+    IsJoyoKanji IsJouyouKanji IsJoyoKanji20101130 IsJouyouKanji20101130
+    InJoyoKanji InJouyouKanji InJoyoKanji20101130 InJouyouKanji20101130
+/;
 use Test::More;
 
 binmode Test::More->builder->$_ => ':utf8'
@@ -13,13 +16,19 @@ is(length $_, 2136, '2136 kanji');
 
 for my $char ( split(//) )
 {
+    ok( $char =~ /^\p{IsJouyouKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
     ok( $char =~ /^\p{InJouyouKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
 }
 
-ok(/^\p{InJoyoKanji}+$/,             'Joyo Kanji latest');
-ok(/^\p{InJoyoKanji20101130}+$/,     'Joyo Kanji 2010-11-30');
-ok(/^\p{InJouyouKanji20101130}+$/, 'Jouyou Kanji 2010-11-30');
+ok(/^\p{IsJoyoKanji}+$/,           'Is Joyo Kanji latest');
+ok(/^\p{IsJoyoKanji20101130}+$/,   'Is Joyo Kanji 2010-11-30');
+ok(/^\p{IsJouyouKanji20101130}+$/, 'Is Jouyou Kanji 2010-11-30');
 
-ok('あ' !~ /^\p{InJoyoKanji}+$/, 'not Joyo Kanji');
+ok(/^\p{InJoyoKanji}+$/,           'In Joyo Kanji latest');
+ok(/^\p{InJoyoKanji20101130}+$/,   'In Joyo Kanji 2010-11-30');
+ok(/^\p{InJouyouKanji20101130}+$/, 'In Jouyou Kanji 2010-11-30');
+
+ok('あ' !~ /^\p{IsJoyoKanji}+$/, 'Is not Joyo Kanji');
+ok('あ' !~ /^\p{InJoyoKanji}+$/, 'In not Joyo Kanji');
 
 done_testing;

@@ -38,3 +38,20 @@
   printf "字元數=%d\n",  mb::length($s);
   printf "子字串=%s\n",  mb::substr($s,0,2);
   printf "位置=%d\n",    mb::index($s,"世界");
+
+[ 9. 執行時碼點正規表示式 (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." 比對一個碼點
+  $str =~ m{\G$mb{qr/(.)/}gc}   # 與 tie 形式等價
+
+[ 10. 驗證合規位元組 (mb::valid) ]
+  mb::valid($octets)            # 合規為1，否則為0
+                                # 嚴格、可選；隨編碼而變
+
+[ 11. 依碼位分割 (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # 依碼位邊界分割
+
+[ 12. 三種執行方式 (filter / modulino / runtime) ]
+  use mb;                       # 路徑1：原始碼過濾器 (perl 5.8+)
+  perl mb.pm script.pl          # 路徑2：modulino
+  use mb qw(*mb utf8);          # 路徑3：執行時介面

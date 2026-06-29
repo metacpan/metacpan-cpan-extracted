@@ -17,8 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Data::URIID",
   "PREREQ_PM" => {
+    "Business::ISBN" => "3.006",
     "Carp" => "1.35",
-    "Data::Identifier" => "0.25.0",
+    "Data::Identifier" => "0.31.0",
     "DateTime::Format::ISO8601" => "0.08",
     "Digest::base" => "1.16",
     "Encode" => "3.19",
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.21",
+  "VERSION" => "v0.22",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,8 +45,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Business::ISBN" => "3.006",
   "Carp" => "1.35",
-  "Data::Identifier" => "0.25.0",
+  "Data::Identifier" => "0.31.0",
   "DateTime::Format::ISO8601" => "0.08",
   "Digest::base" => "1.16",
   "Encode" => "3.19",

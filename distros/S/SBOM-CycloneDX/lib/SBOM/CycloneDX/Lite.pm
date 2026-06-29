@@ -46,26 +46,34 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 my $LATEST_SPEC_VERSION = (
     sort {
-        my ($am, $an) = split /\./, $a, 2;
-        my ($bm, $bn) = split /\./, $b, 2;
-        $am <=> $bm || $an <=> $bn
+        my ($am, $an, $ap) = split /\./, $a, 3;
+        my ($bm, $bn, $bp) = split /\./, $b, 3;
+        $ap //= 0;
+        $bp //= 0;
+        $am <=> $bm || $an <=> $bn || $ap <=> $bp
     } keys %SBOM::CycloneDX::JSON_SCHEMA
 )[-1];
 
-our $DEFAULT_SPEC_VERSION = $LATEST_SPEC_VERSION;
+my $DEFAULT_SPEC_VERSION = $LATEST_SPEC_VERSION;
+
+my %_caller_version = ();
 
 sub import {
 
-    my $class = shift;
+    my $class  = shift;
+    my $caller = caller;
 
     foreach (@_) {
-        if ($_ =~ /^\:v(1_\d)$/) {
-            $DEFAULT_SPEC_VERSION = $1;
-            $DEFAULT_SPEC_VERSION =~ tr/_/./;
+
+        if ($_ =~ /^\:v(1_\d+(?:_\d+)?)$/) {
+            my $v = $1 =~ tr/_/./r;
+            $_caller_version{$caller} = $v;
         }
+
         if ($_ eq ':latest') {
             $DEFAULT_SPEC_VERSION = $LATEST_SPEC_VERSION;
         }
+
     }
 
     local $Exporter::ExportLevel = 1;
@@ -73,7 +81,12 @@ sub import {
 
 }
 
-sub bom                { SBOM::CycloneDX->new(spec_version => $DEFAULT_SPEC_VERSION, @_) }
+sub bom {
+    my $caller  = caller;
+    my $version = $_caller_version{$caller} // $DEFAULT_SPEC_VERSION;
+    return SBOM::CycloneDX->new(spec_version => $version, @_);
+}
+
 sub component          { SBOM::CycloneDX::Component->new(@_) }
 sub contact            { SBOM::CycloneDX::OrganizationalContact->new(@_) }
 sub external_reference { SBOM::CycloneDX::ExternalReference->new(@_) }
@@ -107,6 +120,7 @@ SBOM::CycloneDX::Lite - Simple accessors and helpers for SBOM::CycloneDX
 =head1 SYNOPSIS
 
     use SBOM::CycloneDX::Lite qw(:v1_7 :all);
+    use SBOM::CycloneDX::Util qw(cyclonedx_tool);
 
     my $bom = bom;
 

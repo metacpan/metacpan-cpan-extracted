@@ -2,7 +2,7 @@ package DBIx::QuickORM::Manual::Querying;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000025';
 
 1;
 
@@ -126,6 +126,24 @@ combine the new condition with whatever the handle already had:
     # WHERE (surname = 'smith') OR (surname = 'jones')
     my $h3 = $h->or({surname => 'jones'});
 
+=head2 Raw values in a clause
+
+A value in a WHERE clause is normally deflated to its database form before it is
+bound, so you can pass an inflated value (a hashref for a JSON column, a
+C<DateTime> object, and so on) and it is matched correctly. When you already
+hold the database-form value -- for example one read straight from a row's
+stored data -- wrap it in L<DBIx::QuickORM::Raw> so it binds as-is instead of
+being deflated a second time:
+
+    use DBIx::QuickORM::Raw;
+
+    my $raw = DBIx::QuickORM::Raw->new($row->raw_stored_field('data'));
+    $con->handle('events')->where({data => {'-value' => $raw}})->all;
+
+This matters for types whose deflation is not idempotent (encoding a JSON string
+again would double-encode it), and it is the mechanism C<cas> uses for its
+field-name guards.
+
 =head2 ORDER BY and LIMIT
 
     my $h = $con->handle('people')
@@ -248,6 +266,39 @@ clause:
 
 Passing a row object instead writes that row's pending changes. C<update>
 cannot be combined with C<limit> or C<order_by>.
+
+=head2 Compare and set
+
+C<cas> updates a single row only while a set of guard values still match, so
+two writers cannot overwrite each other unnoticed. It runs one
+C<UPDATE ... SET ... WHERE primary_key AND guard> statement and returns a
+L<DBIx::QuickORM::CAS::Result> that is true only when a row was updated; a
+failed guard is a normal C<lost> result, not an exception.
+
+The simplest form is on a row: guard on the fields you read, then write only if
+they have not changed since.
+
+    my $row = $con->handle('counters')->by_id(1);
+
+    my $result = $row->cas([qw/value/], {value => $row->field('value') + 1});
+
+    if ($result) {
+        # won: nobody else changed value
+    }
+    else {
+        # lost: refetch and retry
+    }
+
+The changes should set a new value for at least one guard column, as the
+incrementing C<value> does above; C<cas> warns otherwise, because a guard that
+never changes lets two concurrent writers both win.
+
+The guard can be a list of field names (compared against the row's stored
+values), a single field name, or a where hashref. On a handle you supply
+whichever half the handle is missing: C<< $h->row($row)->cas(\@fields, \%changes) >>
+or C<< $h->where(\%guard)->cas($row, \%changes) >>. An async or aside handle
+returns the same result object unresolved; poll C<< $result->ready >> or just
+use it, and any other method blocks until the database answers.
 
 =head2 Delete
 

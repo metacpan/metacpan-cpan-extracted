@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.63';
+$VERSION = '0.64';
 $VERSION = $VERSION;
 
 # internal use
@@ -65,6 +65,14 @@ if ($^X =~ /jperl/i) {
 
 # this file is used as command on command line
 if ($0 eq __FILE__) {
+
+    # register this modulino in %INC so that a "use mb;" / "require mb" inside an
+    # in-process transpiled script (see sub main) is satisfied by the already
+    # loaded modulino instead of reloading mb.pm (which would emit a flood of
+    # "Subroutine ... redefined" warnings).  This mirrors the child-interpreter
+    # path, where -Mmb=ver,enc already populates $INC{'mb.pm'}.
+    $INC{'mb.pm'} = __FILE__ if not exists $INC{'mb.pm'};
+
     main();
 }
 
@@ -86,18 +94,27 @@ sub import {
         shift @_;
     }
 
+    # scan import arguments
+    my $want_runtime = 0; # *mb or %mb requested -> runtime interface, no filter
+    my $encoding     = undef;
+    for my $arg (@_) {
+        if (($arg eq '*mb') or ($arg eq '%mb')) {
+            $want_runtime = 1;
+        }
+        elsif ($arg =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | rfc2279 | sjis | uhc | utf8 | wtf8 ) \z/xms) {
+            $encoding = $arg;
+        }
+        else {
+            die "@{[__FILE__]} import argument '$arg' not supported (use one of: *mb, %mb, big5, big5hkscs, eucjp, gb18030, gbk, rfc2279, sjis, uhc, utf8, wtf8).\n";
+        }
+    }
+
     # set system encoding
     $system_encoding = detect_system_encoding();
 
     # set script encoding
-    if (defined $_[0]) {
-        my $encoding = $_[0];
-        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | rfc2279 | sjis | uhc | utf8 | wtf8 ) \z/xms) {
-            mb::set_script_encoding($encoding);
-        }
-        else {
-            die "@{[__FILE__]} script_encoding '$encoding' not supported.\n";
-        }
+    if (defined $encoding) {
+        mb::set_script_encoding($encoding);
     }
     else {
         mb::set_script_encoding($system_encoding);
@@ -120,6 +137,54 @@ sub import {
     my $old_package = mb::get_old_package();
     for my $subroutine (qw( chop chr do dosglob eval getc index index_byte length ord require reverse rindex rindex_byte substr tr )) {
         *{$old_package . $subroutine} = \&{"mb::$subroutine"};
+    }
+
+    # path 1: opportunistic source code filter
+    #
+    # Installed for "use mb;" style loading (no *mb/%mb token) and not when
+    # running an already transpiled *.oo script through -Mmb=ver,enc (the
+    # modulino sets PERL_MB_OCTET in that case, see sub main).
+    #
+    # ADDITIVE GUARD (zero regression): a script that calls
+    # mb::set_script_encoding() itself is, by construction, an octet-oriented
+    # / runtime-managed script (this is mb's long-standing "use mb; then call
+    # mb::* functions on octet data" convention, used throughout t/*.t).  Such
+    # a script must NOT have its own source transpiled, so the filter passes it
+    # through unchanged.  Only a genuine path-1 script -- one that does not
+    # manage the encoding at run time -- is auto-transpiled.  This keeps every
+    # pre-existing "use mb;" caller behaving exactly as before (it was never
+    # source-filtered, because no filter existed in mb-0.63) while still letting
+    # a plain "use mb;" / "use mb 'utf8';" script be transpiled with no modulino.
+    #
+    # Filter::Util::Call has been a core module since perl 5.8.0; it is only
+    # require()d at run time, so no extra dependency is declared.  On perl
+    # 5.005_03 / 5.6 the filter is unavailable and "use mb;" loads as a plain
+    # runtime import (the modulino remains the way to transpile there).
+    if ((not $want_runtime) and (not $ENV{'PERL_MB_OCTET'}) and ($] >= 5.008)) {
+        if (eval { require Filter::Util::Call; 1 }) {
+            my $done = 0;
+            Filter::Util::Call::filter_add(sub {
+                return 0 if $done;
+                my $buffer = '';
+                my $status = 0;
+                while (($status = Filter::Util::Call::filter_read()) > 0) {
+                    $buffer .= $_;
+                    $_ = '';
+                }
+                if ($status == 0) {
+                    # runtime-managed (octet-oriented) script: pass through as is
+                    if ($buffer =~ /\b mb::set_script_encoding \s* \(/xms) {
+                        $_ = $buffer;
+                    }
+                    else {
+                        $_ = mb::_insert_source_encoding_unimport(mb::parse($buffer));
+                    }
+                    $done = 1;
+                    return 1;
+                }
+                return $status;
+            });
+        }
     }
 }
 
@@ -161,7 +226,7 @@ END
             shift @ARGV;
         }
         else {
-            die "script_encoding '$encoding' not supported.\n";
+            die "script_encoding '$encoding' not supported (use one of: big5, big5hkscs, eucjp, gb18030, gbk, rfc2279, sjis, uhc, utf8, wtf8).\n";
         }
     }
     elsif ($ARGV[0] =~ /\A -e \z/xms) {
@@ -172,68 +237,24 @@ END
             shift @ARGV;
         }
         else {
-            die "script_encoding '$encoding' not supported.\n";
+            die "script_encoding '$encoding' not supported (use one of: big5, big5hkscs, eucjp, gb18030, gbk, rfc2279, sjis, uhc, utf8, wtf8).\n";
         }
     }
     else {
         mb::set_script_encoding($system_encoding);
     }
 
-    # poor "make"
-    (my $script_oo = $ARGV[0]) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
-    if (
-        (not -e $script_oo)                    or
-        (mtime($script_oo) <= mtime($ARGV[0])) or
-        (mtime($script_oo) <= mtime(__FILE__))
-    ) {
+    # remember the target script name and read its source once
+    my $script = $ARGV[0];
 
-        # read application script
-        my $fh = mb::_open_r($ARGV[0]) or die "$0(@{[__LINE__]}): can't open file: $ARGV[0]\n";
+    # read application script
+    my $rfh = mb::_open_r($script) or die "$0(@{[__LINE__]}): can't open file: $script\n";
 
-        # sysread(...) has hidden binmode($fh) that's not portable
-        # local $_; sysread($fh, $_, -s $ARGV[0]);
-        local $_ = CORE::do { local $/; no strict 'refs'; readline(*{$fh}) };
-        { no strict 'refs'; close($fh) }
-
-        # poor file locking
-        local $SIG{__DIE__} = sub { rmdir "$ARGV[0].lock"; };
-        if (mkdir "$ARGV[0].lock", 0755) {
-            my $fh = mb::_open_w($script_oo) or die "$0(@{[__LINE__]}): can't open file: $script_oo\n";
-            { no strict 'refs'; print {*{$fh}} mb::_insert_source_encoding_unimport(mb::parse()) }
-            { no strict 'refs'; close($fh) }
-            rmdir "$ARGV[0].lock";
-        }
-        else {
-            die "$0(@{[__LINE__]}): can't mkdir: $ARGV[0].lock\n";
-        }
-    }
-
-    # run octet-oriented script
-    my $module_path = '';
-    my $module_name = '';
-    my $quote = '';
-    if ($OSNAME =~ /MSWin32/) {
-        if ($0 =~ m{ ([^\/\\]+)\.pm \z}xmsi) {
-            ($module_path, $module_name) = ($`, $1);
-            $module_path ||= '.';
-            $module_path =~ s{ [\/\\] \z}{}xms;
-        }
-        else {
-            die "$0(@{[__LINE__]}): can't run as module.\n";
-        }
-        $quote = q{"};
-    }
-    else {
-        if ($0 =~ m{ ([^\/]+)\.pm \z}xmsi) {
-            ($module_path, $module_name) = ($`, $1);
-            $module_path ||= '.';
-            $module_path =~ s{ / \z}{}xms;
-        }
-        else {
-            die "$0(@{[__LINE__]}): can't run as module.\n";
-        }
-        $quote = q{'};
-    }
+    # sysread(...) has hidden binmode($fh) that's not portable
+    # local $_; sysread($fh, $_, -s $ARGV[0]);
+    local $_ = CORE::do { local $/; no strict 'refs'; readline(*{$rfh}) };
+    { no strict 'refs'; close($rfh) }
+    my $source = $_;
 
     # @ARGV wildcard globbing
     if ($OSNAME =~ /MSWin32/) {
@@ -268,10 +289,95 @@ END
         @ARGV = @argv;
     }
 
-    # run octet-oriented script
-    $| = 1;
-    system($^X, "-I$module_path", "-M$module_name=$mb::VERSION,$script_encoding", map { / / ? "$quote$_$quote" : $_ } $script_oo, @ARGV[1..$#ARGV]);
-    exit($? >> 8);
+    # Strategy for <DATA>:
+    #   - no __DATA__/__END__ : transpile and run in-process by CORE::eval
+    #                           (no temporary file is created)
+    #   - has __DATA__/__END__: a string eval cannot provide a working <DATA>
+    #                           handle, so write a *.oo script and run it as a
+    #                           real file through a child interpreter.
+    if ($source =~ /^__(?:END|DATA)__\b/m) {
+
+        # poor "make": (re)transpile to *.oo only when stale
+        (my $script_oo = $script) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
+        if (
+            (not -e $script_oo)                   or
+            (mtime($script_oo) <= mtime($script)) or
+            (mtime($script_oo) <= mtime(__FILE__))
+        ) {
+
+            # poor file locking
+            local $SIG{__DIE__} = sub { rmdir "$script.lock"; };
+            if (mkdir "$script.lock", 0755) {
+                my $wfh = mb::_open_w($script_oo) or die "$0(@{[__LINE__]}): can't open file: $script_oo\n";
+                { no strict 'refs'; print {*{$wfh}} mb::_insert_source_encoding_unimport(mb::parse($source)) }
+                { no strict 'refs'; close($wfh) }
+                rmdir "$script.lock";
+            }
+            else {
+                die "$0(@{[__LINE__]}): can't mkdir: $script.lock\n";
+            }
+        }
+
+        # locate this module for the child interpreter
+        my $module_path = '';
+        my $module_name = '';
+        my $quote = '';
+        if ($OSNAME =~ /MSWin32/) {
+            if ($0 =~ m{ ([^\/\\]+)\.pm \z}xmsi) {
+                ($module_path, $module_name) = ($`, $1);
+                $module_path ||= '.';
+                $module_path =~ s{ [\/\\] \z}{}xms;
+            }
+            else {
+                die "$0(@{[__LINE__]}): can't run as module.\n";
+            }
+            $quote = q{"};
+        }
+        else {
+            if ($0 =~ m{ ([^\/]+)\.pm \z}xmsi) {
+                ($module_path, $module_name) = ($`, $1);
+                $module_path ||= '.';
+                $module_path =~ s{ / \z}{}xms;
+            }
+            else {
+                die "$0(@{[__LINE__]}): can't run as module.\n";
+            }
+            $quote = q{'};
+        }
+
+        # run octet-oriented script
+        # PERL_MB_OCTET tells the child interpreter (which loads -Mmb=ver,enc) not
+        # to install the path-1 source filter on the already transpiled *.oo script.
+        $| = 1;
+        local $ENV{'PERL_MB_OCTET'} = 1;
+        system($^X, "-I$module_path", "-M$module_name=$mb::VERSION,$script_encoding", map { / / ? "$quote$_$quote" : $_ } $script_oo, @ARGV[1..$#ARGV]);
+        exit($? >> 8);
+    }
+    else {
+
+        # transpile and run in-process (no temporary file is created)
+        my $transpiled = mb::_insert_source_encoding_unimport(mb::parse($source));
+
+        # make the script see its own name and its own arguments
+        local $0    = $script;
+        local @ARGV = @ARGV[1..$#ARGV];
+
+        # escape the file name for the #line directive so error messages
+        # point back at the original script with correct line numbers
+        (my $filename = $script) =~ s/([\\"])/\\$1/g;
+        my $code = "package main;\n#line 1 \"$filename\"\n" . $transpiled;
+
+        # PERL_MB_OCTET keeps any "use mb ..." inside the transpiled source from
+        # re-installing the path-1 source filter (which would transpile twice).
+        $| = 1;
+        local $ENV{'PERL_MB_OCTET'} = 1;
+        CORE::eval $code;
+        if ($@) {
+            print STDERR $@;
+            exit 1;
+        }
+        exit 0;
+    }
 }
 
 #---------------------------------------------------------------------
@@ -574,6 +680,21 @@ sub mb::ord (;$) {
 }
 
 #---------------------------------------------------------------------
+# valid() tests well-formedness of a string for the current script encoding
+sub mb::valid (;$) {
+    local $_ = @_ ? $_[0] : $_;
+
+    # mb has no UTF-8 flag and no decode boundary, so the everyday operations
+    # are deliberately lenient (every octet is at least a one-byte character).
+    # mb::valid is the explicit, opt-in validity check for callers who do want
+    # to reject malformed input. It uses the STRICT unit -- $over_ascii (a
+    # well-formed multi-byte sequence) or a US-ASCII byte -- NOT the lenient
+    # $x, so any stray octet makes the whole string fail to match and the
+    # predicate returns false. The string itself is never modified.
+    return /\A (?: $over_ascii | [\x00-\x7F] )* \z/xms ? 1 : 0;
+}
+
+#---------------------------------------------------------------------
 # require for MBCS encoding
 sub mb::require (;$) {
     local $_ = @_ ? $_[0] : $_;
@@ -753,6 +874,20 @@ sub mb::set_script_encoding ($) {
     }->{$script_encoding} || '[\x80-\xFF]';
 
     # supports qr/./ in MBCS script
+    #
+    # NOTE (0.64 step 4 read-only audit): this transpile-path $x is kept as a
+    # qr// OBJECT on purpose. A qr// interpolates into another pattern as a
+    # modifier-isolated subpattern ((?^...:...) / (?-xism:...)); the transpile
+    # path relies on that isolation when $x is embedded inside /x and escape
+    # contexts. Re-expressing $x as a plain string (the form used by mb8 and
+    # by the local $x inside _r2_qr) drops that wrapper and regresses the
+    # qr-as-q / s-as-q escape transpilation (observed: 406 failures on perl
+    # 5.38). So the "mitigation B" stringification is NOT applied here; the
+    # file-scoped $x stays a qr// object and stays STRICT ([\x00-\x7F]).
+    # Read-only safety on perl 5.005_03 is not needed for this $x: it is only
+    # ever interpolated into search patterns, never the target of a
+    # destructive s///. The runtime engine that DOES need a writable copy
+    # (_r2_qr) already takes one via my $source = "$_[0]".
     $x = qr/(?>$over_ascii|[\x00-\x7F])/;
 
     # regexp of multi-byte anchoring
@@ -1464,6 +1599,49 @@ sub mb::_open_w ($) {
     my $fhn = "mb::FH::H$mb::_fh_seq";
     { no strict 'refs'; open($fhn, "> $_[0]") or return "" }
     return $fhn;
+}
+
+#---------------------------------------------------------------------
+# split() runtime function (UTF8::R2 compatible)
+#
+# This is the runtime entry point that a path-3 user calls directly as
+# mb::split(...). It mirrors UTF8::R2::split so that scripts ported from the
+# UTF8::R2 environment behave identically. The transpiler does NOT use this;
+# transpiled "split" is rewritten to mb::_split() below, which is a separate,
+# more elaborate implementation tuned for the filter/modulino paths.
+#
+# Note: mb::qr() returns a plain regular-expression STRING (not a qr// object,
+# which matters on perl 5.005_03; see _r2_qr), so the pattern is interpolated
+# into a fresh qr{...} before it is handed to CORE::split.
+sub mb::split (;$$$) {
+    if (defined($_[0]) and (($_[0] eq '') or ($_[0] =~ /\A \( \? \^? [-a-z]* : \) \z/x))) {
+        my @x = (defined($_[1]) ? $_[1] : $_) =~ /\G$x/g;
+        if (defined($_[2]) and ($_[2] > 0) and (scalar(@x) > $_[2])) {
+            @x = (@x[0..$_[2]-1-1], join('',  @x[$_[2]-1..$#x]));
+        }
+        if (wantarray) {
+            return @x;
+        }
+        else {
+            if ($] < 5.012) {
+                warn "Use of implicit split to \@_ is deprecated" if $^W;
+                @_ = @x; # unlike camel book and perldoc saying, can return only scalar(@_), cannot @_
+            }
+            return scalar @x;
+        }
+    }
+    elsif (@_ == 3) {
+        return CORE::split qr{@{[mb::qr($_[0])]}}, $_[1], $_[2];
+    }
+    elsif (@_ == 2) {
+        return CORE::split qr{@{[mb::qr($_[0])]}}, $_[1];
+    }
+    elsif (@_ == 1) {
+        return CORE::split qr{@{[mb::qr($_[0])]}};
+    }
+    else {
+        return CORE::split;
+    }
 }
 
 #---------------------------------------------------------------------
@@ -4551,6 +4729,225 @@ $a[3] < 0xBF ?  sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF] [
     # over range of codepoint
     confess sprintf(qq{@{[__FILE__]}: codepoint class [$_[0]-$_[1]] is not 1 to 4 octets (%d-%d)}, CORE::length($a), CORE::length($b));
 }
+#---------------------------------------------------------------------
+# qr// for UTF-8 codepoint string at runtime (used by $mb{qr/.../})
+# ported from UTF8::R2::qr; uses mb::chr and list_all_by_hyphen_utf8_like
+sub _r2_qr ($) {
+
+    # Local STRING form of the one-codepoint matcher, used throughout this
+    # subroutine in place of the file-scoped qr// object $x.
+    #
+    # The file-scoped $x is a qr// object ($x = qr/(?>$over_ascii|...)/). On
+    # perl 5.005_03 a qr// object loses its body when interpolated into
+    # another pattern ("$qr" becomes "(?-xism:)" with the contents dropped),
+    # so an embedded $x would silently degrade to a match-anything sub-pattern
+    # in BOTH the parsing regexes below and the generated output. That makes
+    # negative codepoint classes, hyphen-range boundaries, quantifier shortfall
+    # and "." (without /s) over-match on old perl. A plain string interpolates
+    # losslessly on every perl from 5.005_03 onward, so build one here.
+    #
+    # It is kept STRICT (ASCII tail is [\x00-\x7F], not [\x00-\xFF]): leniency
+    # is deliberately not introduced. $over_ascii is itself a plain string.
+    # The file-scoped qr// $x is left untouched for mb's transpile path.
+    my $x = "(?>$over_ascii|[\\x00-\\x7F])";
+
+    # Work on a stringified, writable copy of the argument. The caller passes
+    # either a qr// object (from $mb{qr/.../}) or a plain string. On perl
+    # 5.005_03 a destructive s/// applied directly to a qr// argument (or to a
+    # read-only literal) fails ("Modification of a read-only value") or yields
+    # an empty body, so copy "$_[0]" into a lexical first.
+    my $source = "$_[0]";
+
+    my $modifiers = '';
+    if (my($m) = $source =~ /\A \( \? \^? (.*?) : /x) {
+        $modifiers = $m;
+        $modifiers =~ s/-.*//;
+    }
+
+    my @after = ();
+    while ($source =~ s! \A (
+        (?> \[ (?: \[:[^:]+?:\] | \\x\{[0123456789ABCDEFabcdef]+\} | \\c[\x00-\xFF] | (?>\\$x) | $x )+? \] ) |
+                                  \\x\{[0123456789ABCDEFabcdef]+\} | \\c[\x00-\xFF] | (?>\\$x) | $x
+    ) !!x) {
+        my $before = $1;
+
+        # [^...] or [...]
+        if (my($negative, $class) = $before =~ /\A \[ (\^?) ((?>\\$x|$x)+?) \] \z/x) {
+            my @classmate = $class =~ /\G (?: \[:.+?:\] | \\x\{[0123456789ABCDEFabcdef]+\} | (?>\\$x) | $x ) /xg;
+            my @sbcs = ();
+            my @xbcs = ();
+
+            for (my $i=0; $i <= $#classmate; ) {
+                my $classmate = $classmate[$i];
+
+                # hyphen of [A-Z] or [^A-Z]
+                if (($i < $#classmate) and ($classmate[$i+1] eq '-')) {
+                    my $a = ($classmate[$i+0] =~ /\A \\x \{ ([0123456789ABCDEFabcdef]+) \} \z/x) ? mb::chr(hex $1) : $classmate[$i+0];
+                    my $b = ($classmate[$i+2] =~ /\A \\x \{ ([0123456789ABCDEFabcdef]+) \} \z/x) ? mb::chr(hex $1) : $classmate[$i+2];
+                    push @xbcs, list_all_by_hyphen_utf8_like($a, $b);
+                    $i += 3;
+                }
+
+                # any "one"
+                else {
+
+                    # \x{UTF8hex}
+                    if ($classmate =~ /\A \\x \{ ([0123456789ABCDEFabcdef]+) \} \z/x) {
+                        push @xbcs, mb::chr(hex $1);
+                    }
+
+                    # \any
+                    elsif ($classmate eq '\D'         ) { push @xbcs, "(?:(?![$bare_d])$x)"  }
+                    elsif ($classmate eq '\H'         ) { push @xbcs, "(?:(?![$bare_h])$x)"  }
+#                   elsif ($classmate eq '\N'         ) { push @xbcs, "(?:(?!\\n)$x)"        } # \N in a character class must be a named character: \N{...} in regex
+#                   elsif ($classmate eq '\R'         ) { push @xbcs, "(?>\\r\\n|[$bare_v])" } # Unrecognized escape \R in character class passed through in regex
+                    elsif ($classmate eq '\S'         ) { push @xbcs, "(?:(?![$bare_s])$x)"  }
+                    elsif ($classmate eq '\V'         ) { push @xbcs, "(?:(?![$bare_v])$x)"  }
+                    elsif ($classmate eq '\W'         ) { push @xbcs, "(?:(?![$bare_w])$x)"  }
+                    elsif ($classmate eq '\b'         ) { push @sbcs, $bare_backspace        }
+                    elsif ($classmate eq '\d'         ) { push @sbcs, $bare_d                }
+                    elsif ($classmate eq '\h'         ) { push @sbcs, $bare_h                }
+                    elsif ($classmate eq '\s'         ) { push @sbcs, $bare_s                }
+                    elsif ($classmate eq '\v'         ) { push @sbcs, $bare_v                }
+                    elsif ($classmate eq '\w'         ) { push @sbcs, $bare_w                }
+
+                    # [:POSIX:]
+                    elsif ($classmate eq '[:alnum:]'  ) { push @sbcs, '\x30-\x39\x41-\x5A\x61-\x7A';                  }
+                    elsif ($classmate eq '[:alpha:]'  ) { push @sbcs, '\x41-\x5A\x61-\x7A';                           }
+                    elsif ($classmate eq '[:ascii:]'  ) { push @sbcs, '\x00-\x7F';                                    }
+                    elsif ($classmate eq '[:blank:]'  ) { push @sbcs, '\x09\x20';                                     }
+                    elsif ($classmate eq '[:cntrl:]'  ) { push @sbcs, '\x00-\x1F\x7F';                                }
+                    elsif ($classmate eq '[:digit:]'  ) { push @sbcs, '\x30-\x39';                                    }
+                    elsif ($classmate eq '[:graph:]'  ) { push @sbcs, '\x21-\x7F';                                    }
+                    elsif ($classmate eq '[:lower:]'  ) { push @sbcs, '\x61-\x7A';                                    } # /i modifier requires 'a' to 'z' literally
+                    elsif ($classmate eq '[:print:]'  ) { push @sbcs, '\x20-\x7F';                                    }
+                    elsif ($classmate eq '[:punct:]'  ) { push @sbcs, '\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E'; }
+                    elsif ($classmate eq '[:space:]'  ) { push @sbcs, '\s\x0B';                                       } # "\s" and vertical tab ("\cK")
+                    elsif ($classmate eq '[:upper:]'  ) { push @sbcs, '\x41-\x5A';                                    } # /i modifier requires 'A' to 'Z' literally
+                    elsif ($classmate eq '[:word:]'   ) { push @sbcs, '\x30-\x39\x41-\x5A\x5F\x61-\x7A';              }
+                    elsif ($classmate eq '[:xdigit:]' ) { push @sbcs, '\x30-\x39\x41-\x46\x61-\x66';                  }
+
+                    # [:^POSIX:]
+                    elsif ($classmate eq '[:^alnum:]' ) { push @xbcs, "(?:(?![\\x30-\\x39\\x41-\\x5A\\x61-\\x7A])$x)";                      }
+                    elsif ($classmate eq '[:^alpha:]' ) { push @xbcs, "(?:(?![\\x41-\\x5A\\x61-\\x7A])$x)";                                 }
+                    elsif ($classmate eq '[:^ascii:]' ) { push @xbcs, "(?:(?![\\x00-\\x7F])$x)";                                            }
+                    elsif ($classmate eq '[:^blank:]' ) { push @xbcs, "(?:(?![\\x09\\x20])$x)";                                             }
+                    elsif ($classmate eq '[:^cntrl:]' ) { push @xbcs, "(?:(?![\\x00-\\x1F\\x7F])$x)";                                       }
+                    elsif ($classmate eq '[:^digit:]' ) { push @xbcs, "(?:(?![\\x30-\\x39])$x)";                                            }
+                    elsif ($classmate eq '[:^graph:]' ) { push @xbcs, "(?:(?![\\x21-\\x7F])$x)";                                            }
+                    elsif ($classmate eq '[:^lower:]' ) { push @xbcs, "(?:(?![\\x61-\\x7A])$x)";                                            } # /i modifier requires 'a' to 'z' literally
+                    elsif ($classmate eq '[:^print:]' ) { push @xbcs, "(?:(?![\\x20-\\x7F])$x)";                                            }
+                    elsif ($classmate eq '[:^punct:]' ) { push @xbcs, "(?:(?![\\x21-\\x2F\\x3A-\\x3F\\x40\\x5B-\\x5F\\x60\\x7B-\\x7E])$x)"; }
+                    elsif ($classmate eq '[:^space:]' ) { push @xbcs, "(?:(?![\\s\\x0B])$x)";                                               } # "\s" and vertical tab ("\cK")
+                    elsif ($classmate eq '[:^upper:]' ) { push @xbcs, "(?:(?![\\x41-\\x5A])$x)";                                            } # /i modifier requires 'A' to 'Z' literally
+                    elsif ($classmate eq '[:^word:]'  ) { push @xbcs, "(?:(?![\\x30-\\x39\\x41-\\x5A\\x5F\\x61-\\x7A])$x)";                 }
+                    elsif ($classmate eq '[:^xdigit:]') { push @xbcs, "(?:(?![\\x30-\\x39\\x41-\\x46\\x61-\\x66])$x)";                      }
+
+                    # other all
+                    elsif (CORE::length($classmate)==1) { push @sbcs, $classmate }
+                    else                                { push @xbcs, $classmate }
+                    $i += 1;
+                }
+            }
+
+            # [^...]
+            if ($negative eq q[^]) {
+                push @after,
+                    ( @sbcs and  @xbcs) ? '(?:(?!' . join('|', @xbcs, '['.join('', @sbcs).']') . ")$x)" :
+                    (!@sbcs and  @xbcs) ? '(?:(?!' . join('|', @xbcs                        ) . ")$x)" :
+                    ( @sbcs and !@xbcs) ? '(?:(?!' .                  '['.join('', @sbcs).']'  . ")$x)" :
+                    '';
+            }
+
+            # [...] on Perl 5.006
+            elsif ($] =~ /\A5\.006/) {
+                push @after,
+                    ( @sbcs and  @xbcs) ? '(?:'    . join('|', @xbcs, '['.join('', @sbcs).']') .    ')' :
+                    (!@sbcs and  @xbcs) ? '(?:'    . join('|', @xbcs                        ) .    ')' :
+                    ( @sbcs and !@xbcs) ?                             '['.join('', @sbcs).']'           :
+                    '';
+            }
+
+            # [...]
+            else {
+                push @after,
+                    ( @sbcs and  @xbcs) ? '(?:(?=' . join('|', @xbcs, '['.join('', @sbcs).']') . ")$x)" :
+                    (!@sbcs and  @xbcs) ? '(?:(?=' . join('|', @xbcs                        ) . ")$x)" :
+                    ( @sbcs and !@xbcs) ?                             '['.join('', @sbcs).']'           :
+                    '';
+            }
+        }
+
+        # \any or /./
+        elsif ($before eq '.' ) { push @after, ($modifiers =~ /s/) ? $x : "(?:(?!\\n)$x)"                    }
+        elsif ($before eq '\B') { push @after, "(?:(?<![$bare_w])(?![$bare_w])|(?<=[$bare_w])(?=[$bare_w]))" }
+        elsif ($before eq '\D') { push @after, "(?:(?![$bare_d])$x)"                                         }
+        elsif ($before eq '\H') { push @after, "(?:(?![$bare_h])$x)"                                         }
+        elsif ($before eq '\N') { push @after, "(?:(?!\\n)$x)"                                               }
+        elsif ($before eq '\R') { push @after, "(?>\\r\\n|[$bare_v])"                                        }
+        elsif ($before eq '\S') { push @after, "(?:(?![$bare_s])$x)"                                         }
+        elsif ($before eq '\V') { push @after, "(?:(?![$bare_v])$x)"                                         }
+        elsif ($before eq '\W') { push @after, "(?:(?![$bare_w])$x)"                                         }
+        elsif ($before eq '\b') { push @after, "(?:(?<![$bare_w])(?=[$bare_w])|(?<=[$bare_w])(?![$bare_w]))" }
+        elsif ($before eq '\d') { push @after, "[$bare_d]"                                                   }
+        elsif ($before eq '\h') { push @after, "[$bare_h]"                                                   }
+        elsif ($before eq '\s') { push @after, "[$bare_s]"                                                   }
+        elsif ($before eq '\v') { push @after, "[$bare_v]"                                                   }
+        elsif ($before eq '\w') { push @after, "[$bare_w]"                                                   }
+
+        # quantifiers ? + * {n} {n,} {n,m}
+        elsif ($before =~ /\A[?+*{]\z/) {
+            if    (0)                                             { }
+            elsif ($after[-1] =~ /\A \\c [\x00-\xFF]        \z/x) { } # \c) \c} \c] \cX
+            elsif ($after[-1] =~ /\A \\  [\x00-\xFF]        \z/x) { } # \) \} \] \" \0 \1 \D \E \F \G \H \K \L \N \Q \R \S \U \V \W \\ \a \d \e \f \h \l \n \r \s \t \u \v \w
+            elsif ($after[-1] =~ /\A     [\x00-\xFF]        \z/x) { } # (a) a{1} [a] a . \012 \x12 \o{12} \g{1}
+            elsif ($after[-1] =~ /       [\x00-\xFF] [)}\]] \z/x) { } # (any) any{1} [any]
+            else {                                                    # XBCS
+                $after[-1] = '(?:' . $after[-1] . ')';
+            }
+            push @after, $before;
+        }
+
+        # \x{UTF8hex}
+        elsif ($before =~ /\A \\x \{ ([0123456789ABCDEFabcdef]+) \} \z/x) {
+            push @after, mb::chr(hex $1);
+        }
+
+        # else
+        else {
+            push @after, $before;
+        }
+    }
+
+    my $after = join '', @after;
+
+    # Return a plain regular-expression STRING, not a qr// object.
+    #
+    # On perl 5.005_03 a qr// object, when interpolated into another pattern
+    # (for example  m<\G$mb{qr/.../}>g  or  s<$mb{qr/.../}><...>  or even a
+    # second  =~ //  after stringification) loses its body: "$qr" becomes
+    # "(?-xism:)" with the contents dropped, so the pattern then matches
+    # anything. A plain string interpolates losslessly on every perl from
+    # 5.005_03 onward. The (?modifiers:...) wrapper preserves the i/m/s/x
+    # flags that were present on the original qr/.../ token.
+    if ($modifiers ne '') {
+        return "(?$modifiers:$after)";
+    }
+    else {
+        return "(?:$after)";
+    }
+}
+
+#---------------------------------------------------------------------
+# mb::qr() - functional form of the runtime UTF-8 codepoint regex builder.
+# This is the same engine as $mb{qr/.../} (the tie FETCH), exposed as a
+# named subroutine for UTF8::R2 source compatibility:
+#     $_ =~ mb::qr(qr/.../)   is equivalent to   $_ =~ $mb{qr/.../}
+# It returns a plain regular-expression string (see _r2_qr above for why a
+# string and not a qr// object, which matters on perl 5.005_03).
+sub mb::qr ($) {
+    return _r2_qr($_[0]);
+}
 
 #---------------------------------------------------------------------
 # parse codepoint class
@@ -5364,7 +5761,7 @@ sub escape_to_hex {
 # $result = $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
 sub TIEHASH  { bless { }, $_[0] }
-sub FETCH    { $_[1] }
+sub FETCH    { _r2_qr($_[1]) }
 sub STORE    { }
 sub FIRSTKEY { }
 sub NEXTKEY  { }
@@ -8642,6 +9039,260 @@ have to write "UTF8::R2::split(qr/regexp/, $_, 3)" to do "split(/regexp/, $_, 3)
 =item *
 
 have to write "UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
+
+=back
+
+=head1 Runtime multibyte interface (mb::qr / mb::valid / mb::split) and the three transpile paths
+
+A script reaches multibyte codepoint semantics with mb.pm in one of three ways.
+They are additive: the long-standing octet-oriented convention ("use mb;" then
+call mb::* on octet data) is unchanged, and a script picks the path it wants.
+
+The three ways differ in WHO rewrites your code, WHEN, and HOW MUCH of it:
+
+  -------------------------------------------------------------------------
+  path           how to invoke         what gets codepoint    perl versions
+  -------------------------------------------------------------------------
+  1 filter       use mb;               the whole rest of the  5.8 and later
+                 (or use mb 'utf8';)   file, transpiled at
+                                       compile time
+  2 modulino     perl mb.pm script.pl  the whole script,      5.005_03 and
+                                       transpiled before it     later
+                                       runs
+  3 runtime      use mb qw(*mb utf8);  only where you call    5.005_03 and
+                                       mb::qr / mb::valid /     later
+                                       mb::split / $mb{...}
+  -------------------------------------------------------------------------
+
+Rules of thumb for choosing a path:
+
+=over 2
+
+=item *
+
+Use B<path 1 (filter)> for a fresh script on a modern perl (5.8+) when you
+want plain-looking source ("length", "substr", "m/./" all in codepoint
+semantics) and do not want a wrapper command.  This is the easiest path.
+
+=item *
+
+Use B<path 2 (modulino)> when you must also support perl 5.005_03 / 5.6 (where
+the source filter is unavailable), when you ship a single-file program run as
+"perl mb.pm script.pl", or when the script has a __DATA__/__END__ section that
+must be read through <DATA> (the modulino keeps the *.oo child interpreter for
+exactly that case).
+
+=item *
+
+Use B<path 3 (runtime)> when you want surgical control: keep the file as
+ordinary octet Perl and reach for codepoint behaviour only at the few spots
+that need it (one regex, one split, one validity check).  This is also the way
+to add mb behaviour to code you do not want to transpile wholesale, and it
+mirrors "use UTF8::R2 qw(*mb);".
+
+=back
+
+=head2 The three paths
+
+=over 2
+
+=item *
+
+Path 1, the opportunistic source filter (perl 5.8 or later).
+A plain "use mb;" (or "use mb 'utf8';" etc.) installs a source filter that
+transpiles the rest of the file to codepoint semantics, so no modulino is
+needed.  As an additive guard, a script that itself calls
+mb::set_script_encoding() is treated as octet-oriented and is passed through
+unchanged, exactly as before.  On perl 5.005_03 / 5.6 the filter is
+unavailable and "use mb;" loads as the plain runtime import (it does not die);
+transpilation there is via the modulino as always.
+
+=item *
+
+Path 2, the modulino ("perl mb.pm your_script.pl ...").
+A script with no __DATA__/__END__ section is transpiled and run in process by
+an internal eval with no temporary file; a script that does contain
+__DATA__/__END__ keeps the previous behaviour (write your_script.oo.pl when
+stale, then run it through a child interpreter, so <DATA> works).
+
+=item *
+
+Path 3, the runtime interface ("use mb qw(*mb utf8);").
+The *mb / %mb token requests the runtime interface and suppresses the path-1
+filter.  Your source stays ordinary Perl and you call the runtime subroutines
+below where you want codepoint behaviour.  This mirrors "use UTF8::R2 qw(*mb);".
+
+=back
+
+=head2 The runtime subroutines
+
+=over 2
+
+=item *
+
+mb::qr(qr/regexp/)
+
+Builds a multibyte codepoint regular expression at run time.  It is the
+functional form of $mb{qr/regexp/}: the two are equivalent.
+
+  use mb qw(*mb utf8);
+  if ($str =~ mb::qr(qr/./)) { ... }     # "." matches one codepoint
+  while ($str =~ m{\G$mb{qr/(.)/}gc}) { ... }
+
+mb::qr() returns a plain regular-expression B<string>, not a qr// object,
+on purpose: on perl 5.005_03 a qr// object loses its body when interpolated
+into another pattern, whereas a string interpolates losslessly from 5.005_03
+onward.
+
+=item *
+
+mb::valid()  or  mb::valid($octets)
+
+A non-destructive, opt-in predicate that returns 1 when the whole argument
+(or $_) is well-formed under the current script encoding and 0 otherwise.
+The string is never modified.  mb works directly on octet strings -- it has
+no UTF-8 flag and no separate decode step -- so it does not reject malformed
+input on its own; mb::valid is the explicit gate for callers who DO want to
+reject it.  It tests against the STRICT unit (a well-formed multi-byte
+sequence or a US-ASCII byte [\x00-\x7F]), the same strict unit the character
+walk and the codepoint character classes use, so its verdict agrees with how
+mb counts and matches characters (see "strict vs lenient" below).
+
+What counts as well-formed depends on the encoding:
+
+  mb::set_script_encoding('utf8');     # RFC 3629 strict: no surrogate,
+                                       # no overlong, nothing beyond U+10FFFF
+  mb::set_script_encoding('rfc2279');  # RFC 2279 permissive
+  mb::set_script_encoding('wtf8');     # like utf8 but a lone surrogate is allowed
+
+  mb::set_script_encoding('utf8');
+  mb::valid("\xE3\x81\x82");           # 1 (well-formed 3-byte)
+  mb::valid("\xED\xA0\x80");           # 0 (lone surrogate)
+
+=item *
+
+mb::split()  or  mb::split($pattern, $string, $limit)
+
+The UTF8::R2-compatible runtime split for path-3 callers.  It splits on
+codepoint boundaries, the codepoint-aware counterpart of CORE::split.  The
+transpiler's own internal split helper is separate and untouched.
+
+=back
+
+=head2 strict vs lenient: what mb means by a "character", and how to choose
+
+This is the single most important thing to understand about mb.
+
+=head3 mb's character model is STRICT
+
+When you select an encoding with mb::set_script_encoding('utf8') (or 'sjis',
+'eucjp', ...), mb defines one "character" (one codepoint unit) as:
+
+  a well-formed multi-byte sequence of that encoding,  OR
+  a single US-ASCII byte [\x00-\x7F]
+
+and nothing else.  A stray high octet that does not begin (or complete) a
+well-formed sequence is NOT a character.  Concretely, the codepoint walk used
+by mb::length / mb::substr / mb::index and friends advances one strict unit at
+a time and STOPS at the first octet it cannot account for:
+
+  mb::set_script_encoding('utf8');
+  mb::length("A\x85B");     # 1  -- "A" is one unit; 0x85 is a stray
+                            #       continuation byte, the walk halts there
+
+What counts as "stray" is encoding-dependent, because each encoding defines a
+different set of well-formed sequences:
+
+  mb::set_script_encoding('sjis');
+  mb::length("A\x85B");     # 2  -- under sjis 0x85 is a legal lead byte,
+                            #       so "\x85B" is one (DBCS) character
+
+So the very same octets are 1 character under utf8 and 2 characters under
+sjis.  "Strict" therefore means "strict with respect to the current encoding",
+not "the same for every encoding".
+
+The codepoint character classes that the transpiler and the runtime engine
+build are strict in the same way.  For example "\S" matches a well-formed
+multi-byte sequence or a US-ASCII byte [\x00-\x7F], so a lone stray octet such
+as "\x85" or "\xA0" matches neither "\s" nor "\S" as a codepoint:
+
+  $str =~ mb::qr(qr/\S/)    # no match against a lone 0x85
+
+mb::valid() is the explicit, non-destructive predicate built on this same
+strict unit: it returns 1 only when the WHOLE string is well-formed, 0 if any
+stray octet is present.
+
+=head3 the one deliberate lenient exception: the transpiled dot "."
+
+There is exactly one place where mb is intentionally lenient, and only on the
+filter / modulino transpile paths: the metacharacter "." (dot).  A transpiled
+"." is "(?>$over_ascii|.)", i.e. a well-formed multi-byte sequence OR any
+single octet.  The single-octet fallback is there so that "." never gets stuck
+on arbitrary binary or partially-formed octet data, matching the everyday Perl
+intuition that "." steps over one "thing".
+
+  # filter / modulino path
+  "\x85" =~ /./             # MATCHES (dot falls back to one octet)
+  "\x85" =~ /\S/            # does NOT match (classes stay strict)
+
+The runtime interface (path 3, mb::qr / $mb{...}) does NOT take this shortcut:
+there even "." is the strict unit, so a lone 0x85 matches nothing at all.  If
+you need uniformly strict matching including the dot, use the runtime
+interface; if you want "." to behave like plain Perl's octet dot, use the
+filter or modulino path.
+
+=head3 the lenient (octet) view, and octet-oriented scripts
+
+"Lenient" in the broad sense is simply the octet view of a string: every byte
+is just a byte, there is no validation and no decode.  That is how plain Perl
+operators behave, and mb keeps that available on purpose:
+
+=over 2
+
+=item *
+
+CORE::length / CORE::substr / a plain "length" or "substr" in a non-transpiled
+script count and slice BYTES (octets), not codepoints.
+
+=item *
+
+A script that calls mb::set_script_encoding() itself is treated as
+octet-oriented and is passed through the path-1 filter UNCHANGED (see "The
+three paths"), so it keeps managing octets and encoding on its own terms.
+
+=item *
+
+mb does not offer a switch that makes the codepoint walk itself lenient (treat
+every stray octet as a one-byte character).  That fully-lenient model was the
+UTF-8-only prototype's behaviour and is deliberately NOT adopted here; mb's
+codepoint unit stays strict.
+
+=back
+
+=head3 how to choose
+
+=over 2
+
+=item *
+
+Choose the B<codepoint (strict)> model -- the filter, the modulino, or the
+runtime subs -- when you process human text and care about correct character
+counts, character-aware substr / index / regex, and casing, and when you want
+malformed input to be detectable (character classes will not match it, and
+mb::valid() will report it).
+
+=item *
+
+Choose the B<octet (lenient)> model -- ordinary Perl operators, or an
+octet-oriented script that calls mb::set_script_encoding() and is passed
+through unchanged -- for binary-safe I/O, byte-exact pass-through, or when you
+manage the encoding boundary yourself.
+
+=item *
+
+Mix them deliberately: stay octet-oriented for I/O and use mb::valid() as an
+explicit gate at the point where octets become trusted text, then use the
+runtime subs (or transpiled regions) for the codepoint work.
 
 =back
 

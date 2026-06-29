@@ -1,5 +1,13 @@
 Change history for SBOM::CycloneDX
 
+1.09 2026-06-28
+    - DEPRECATED "SBOM::CycloneDX::Vulnerability::Source" and "SBOM::CycloneDX::Issue::Source"
+      (giterlizzi/perl-SBOM-CycloneDX#11)
+    - Updated SPDX license IDs (v1.1-3.28.0)
+    - FIX typo in Lyfecycle (@Leont / LEONT)
+    - Improved readability of test messages (@Leont / LEONT)
+    - All tests using JSON::Validator are optional (set JSON_SCHEMA_TESTING=1 to enable them)
+
 1.08 2026-05-12
     - Added "SBOM::CycloneDX::Composition" and "SBOM::CycloneDX::Source"
     - Added "SBOM::CycloneDX::Enum::AggregateType"

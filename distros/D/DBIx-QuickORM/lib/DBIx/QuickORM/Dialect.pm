@@ -6,7 +6,7 @@ use Carp qw/croak confess/;
 use Scalar::Util qw/blessed/;
 use DBI();
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000025';
 
 use DBIx::QuickORM::Util qw/load_class find_modules/;
 
@@ -92,6 +92,13 @@ True if the dialect supports a C<RETURNING> clause on the relevant statement.
 Returns the database-native type name if the dialect supports the given
 logical type, otherwise nothing.
 
+=item $bool = $dialect->cas_count_reliable(\%attrs)
+
+True if a connection built with the given attributes reports the affected-row
+count that compare-and-set needs (rows matched, not rows changed). The base is
+always true; the MySQL family returns false when the found-rows flag was turned
+off.
+
 =cut
 
 # {{{ Feature flags and simple accessors
@@ -105,6 +112,8 @@ sub supports_returning_insert { 0 }
 sub supports_returning_delete { 0 }
 
 sub supports_type { my $self = shift; return undef }
+
+sub cas_count_reliable { return 1 }
 
 sub datetime_formatter { my $self = shift; croak "No datetime formatter is defined for the '" . $self->dialect_name . "' dialect" }
 

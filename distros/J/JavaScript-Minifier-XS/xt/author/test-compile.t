@@ -17,11 +17,11 @@ use File::Which qw(which);
 use JavaScript::Minifier::XS qw(minify);
 
 ###############################################################################
-# Make sure we've got "curl" and "jsl" installed.
+# Make sure we've got "curl" and "node" installed.
 my $curl = which('curl');
-my $jsl  = which('jsl');
-unless ($curl && $jsl) {
-    plan skip_all => "Test requires 'curl' and 'jsl'";
+my $node = which('node');
+unless ($curl && $node) {
+    plan skip_all => "Test requires 'curl' and 'node'";
 }
 
 ###############################################################################
@@ -65,16 +65,13 @@ sub js_compile {
     my $js = shift;
     my ($out, $err);
 
-    run [$jsl, '-stdin'], \$js, \$out, \$err;
+    run [$node, '--check', '-'], \$js, \$out, \$err;
 
-    my $res = (split /^/, $out)[-1];
-    $res =~ s{(\d+\s+error.*?),.*}{$1};
-
-    unless ($res =~ /\d+\s+error/) {
-      fail "Unexpected output from jsl";
-      diag $res;
+    if ($err) {
+      fail "Unexpected output from Node";
+      diag $err;
     }
 
-    return $res;
+    return $err;
 }
 

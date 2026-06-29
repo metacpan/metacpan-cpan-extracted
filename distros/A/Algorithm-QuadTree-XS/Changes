@@ -1,6 +1,14 @@
 Revision history for Perl extension Algorithm::QuadTree::XS.
 
+0.14 Sun Jun 28 2026
+	- hotfix: avoid av_push_simple (not provided by ppport)
+
+0.13 Sun Jun 28 2026
+	- remove redundant code elements
+	- add missing changelog
+
 0.12 Wed Jun 24 2026
+	- adjust to work with Algorithm::QuadTree 1.0
 
 0.11 Wed Jun 24 2026
 	- improve performance and memory usage for objects which are big enough to span multiple nodes

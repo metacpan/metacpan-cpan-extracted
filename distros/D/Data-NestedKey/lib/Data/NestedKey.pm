@@ -15,7 +15,7 @@ use Scalar::Util qw(reftype);
 use Storable qw(nfreeze);
 use YAML::XS ();
 
-our $VERSION = '1.0.8';
+our $VERSION = '1.1.0';
 
 # Package variables for serialization options
 our $JSON_PRETTY = 1;  # Controls whether JSON output is pretty or compact
@@ -61,6 +61,79 @@ sub _is_array { return ref $_[0] && reftype( $_[0] ) eq 'ARRAY'; }
 sub _is_hash { return ref $_[0] && reftype( $_[0] ) eq 'HASH'; }
 ########################################################################
 
+# Parse a dot-separated path into a list of segment hashrefs.
+# Each segment has:
+#   key   => the hash key name
+#   index => array index (integer, possibly negative), or undef if none
+#
+# Examples:
+#   'foo.bar'             -> [{key=>'foo'},{key=>'bar'}]
+#   'repositories[0].uri' -> [{key=>'repositories',index=>0},{key=>'uri'}]
+#   'items[-1]'           -> [{key=>'items',index=>-1}]
+
+########################################################################
+sub _parse_path {
+########################################################################
+  my ($path) = @_;
+
+  my @segments;
+
+  for my $part ( split /[.]/, $path ) {
+    if ( $part =~ /\A (.+?) \[ (-?\d+) \] \z/xsm ) {
+      push @segments, { key => $1, index => $2 + 0 };
+    }
+    else {
+      push @segments, { key => $part, index => undef };
+    }
+  }
+
+  return @segments;
+}
+
+# Walk a parsed path down into $data, stopping one segment before the
+# end.  Returns ($node, $final_segment) where $node is the innermost
+# container the final segment lives in, or (undef, undef) if any
+# intermediate step is missing or of the wrong type.
+#
+# If $create is true, missing intermediate hash keys are auto-vivified
+# (mirrors the old behaviour in set()).  Array slots are never
+# auto-vivified here — callers that need that must handle it themselves.
+
+########################################################################
+sub _walk {
+########################################################################
+  my ( $data, $segments, $create ) = @_;
+
+  my $current = $data;
+
+  for my $seg ( @{$segments}[ 0 .. $#{$segments} - 1 ] ) {
+    my ( $key, $idx ) = @{$seg}{qw(key index)};
+
+    # Step into the hash key
+    if ( _is_hash($current) ) {
+      $current->{$key} //= {} if $create && !exists $current->{$key};
+
+      return ( undef, undef ) if !exists $current->{$key};
+
+      $current = $current->{$key};
+    }
+    else {
+      return ( undef, undef );
+    }
+
+    # If this segment also carries an array subscript, step into it
+    if ( defined $idx ) {
+      return ( undef, undef ) if !_is_array($current);
+
+      $current = $current->[$idx];
+
+      return ( undef, undef ) if !defined $current;
+    }
+  }
+
+  return ( $current, $segments->[-1] );
+}
+
 ########################################################################
 sub set {
 ########################################################################
@@ -71,7 +144,11 @@ sub set {
 
   for my $p ( pairs @kv_list ) {
     my ( $key_path, $value ) = @{$p};
-    my $action = $key_path =~ s/^([+-])// ? $1 : q{};
+    my $action = $key_path =~ s/\A([+-])//xsm ? $1 : q{};
+
+    # set() does not support array subscripts in paths; use plain dot-keys only.
+    croak "Array subscripts (e.g. key[0]) are not supported in set() paths: '$key_path'"
+      if $key_path =~ /\[/;
 
     my @keys    = split /[.]/, $key_path;
     my $current = $self->{data};
@@ -129,23 +206,38 @@ sub get {
   my @results;
 
   for my $key_path (@key_paths) {
-    my @keys    = split /[.]/, $key_path;
-    my $current = $self->{data};
+    my @segments = _parse_path($key_path);
+    my $current  = $self->{data};
+    my $ok       = 1;
 
-    for my $key (@keys) {
+    for my $seg (@segments) {
+      my ( $key, $idx ) = @{$seg}{qw(key index)};
+
       if ( _is_hash($current) && exists $current->{$key} ) {
         $current = $current->{$key};
       }
       else {
         $current = undef;
+        $ok      = 0;
         last;
+      }
+
+      if ( defined $idx ) {
+        if ( _is_array($current) ) {
+          $current = $current->[$idx];
+        }
+        else {
+          $current = undef;
+          $ok      = 0;
+          last;
+        }
       }
     }
 
-    push @results, $current;
+    push @results, $ok ? $current : undef;
   }
 
-  return wantarray ? @results : $results[0];  # Ensure it works in scalar and list context
+  return wantarray ? @results : $results[0];
 }
 
 ########################################################################
@@ -168,30 +260,61 @@ sub delete { ## no critic
   my ( $self, @key_paths ) = @_;
 
   for my $key_path (@key_paths) {
-    my @keys    = split /[.]/xsm, $key_path;
+    my @segments = _parse_path($key_path);
+    my @parents;  # Track parent containers for empty-hash cleanup
     my $current = $self->{data};
-    my @parents;  # Track parent references
+    my $abort   = 0;
 
-    for my $key ( @keys[ 0 .. $#keys - 1 ] ) {
+    for my $seg ( @segments[ 0 .. $#segments - 1 ] ) {
+      my ( $key, $idx ) = @{$seg}{qw(key index)};
+
       last if !_is_hash($current) || !exists $current->{$key};
 
-      push @parents, [ $current, $key ];  # Store parent reference
+      push @parents, [ $current, $key ];
       $current = $current->{$key};
+
+      if ( defined $idx ) {
+        if ( _is_array($current) ) {
+          $current = $current->[$idx];
+
+          if ( !defined $current ) {
+            $abort = 1;
+            last;
+          }
+          # Array slots are not tracked for empty-cleanup
+          @parents = ();
+        }
+        else {
+          $abort = 1;
+          last;
+        }
+      }
     }
 
-    my $final_key = $keys[-1];
+    next if $abort;
 
-    if ( exists $current->{$final_key} ) {
-      delete $current->{$final_key};
+    my $final = $segments[-1];
+    my ( $final_key, $final_idx ) = @{$final}{qw(key index)};
+
+    if ( defined $final_idx ) {
+      # Deleting a specific array slot: splice it out
+      if ( _is_hash($current)
+        && exists $current->{$final_key}
+        && _is_array( $current->{$final_key} ) ) {
+        splice @{ $current->{$final_key} }, $final_idx, 1;
+      }
+    }
+    else {
+      if ( _is_hash($current) && exists $current->{$final_key} ) {
+        delete $current->{$final_key};
+      }
     }
 
-    # Cleanup empty parent hashes
+    # Cleanup empty parent hashes (only meaningful when no array was traversed)
     while (@parents) {
       my ( $parent, $key ) = @{ pop @parents };
-
-      if ( _is_hash( $parent->{$key} ) && !%{ $parent->{$key} } ) {
-        delete $parent->{$key};
-      }
+      last if !_is_hash( $parent->{$key} ) || %{ $parent->{$key} };
+      delete $parent->{$key};
     }
   }
 
@@ -205,11 +328,13 @@ sub exists_key {
   my @results;
 
   for my $key_path (@key_paths) {
-    my @keys    = split /[.]/xsm, $key_path;
-    my $current = $self->{data};
-    my $exists  = 1;
+    my @segments = _parse_path($key_path);
+    my $current  = $self->{data};
+    my $exists   = 1;
 
-    for my $key (@keys) {
+    for my $seg (@segments) {
+      my ( $key, $idx ) = @{$seg}{qw(key index)};
+
       if ( _is_hash($current) && exists $current->{$key} ) {
         $current = $current->{$key};
       }
@@ -217,12 +342,22 @@ sub exists_key {
         $exists = 0;
         last;
       }
+
+      if ( defined $idx ) {
+        if ( _is_array($current) && defined $current->[$idx] ) {
+          $current = $current->[$idx];
+        }
+        else {
+          $exists = 0;
+          last;
+        }
+      }
     }
 
     push @results, $exists;
   }
 
-  return wantarray ? @results : $results[0];  # Ensures proper scalar context behavior
+  return wantarray ? @results : $results[0];
 }
 
 1;
@@ -245,39 +380,49 @@ Data::NestedKey - Object-oriented handling of deeply nested hash structures.
   );
 
   $nk->set('foo.bar.baz' => 99, 'foo.xyz' => [1, 2, 3]);
+
+  # Plain dot-path access
   my $baz = $nk->get('foo.bar.baz');
+
+  # Array subscript access
+  my $nk2 = Data::NestedKey->new($ecr_response);
+  my $uri  = $nk2->get('repositories[0].repositoryUri');
+
   $nk->delete('foo.bar.baz');
   print $nk->as_string();
 
 =head1 DESCRIPTION
 
-Data::NestedKey provides an object-oriented approach to managing deeply nested 
-hash structures using dot-separated keys. This allows structured data to be 
-manipulated in a clean and intuitive way without requiring manual traversal 
+Data::NestedKey provides an object-oriented approach to managing deeply nested
+hash structures using dot-separated keys. This allows structured data to be
+manipulated in a clean and intuitive way without requiring manual traversal
 of nested hashes.
 
-While traditional hash manipulation requires explicitly iterating through nested 
-structures, this module allows setting and retrieving values using simple text 
-strings. The ability to specify a path using a single, dot-separated key improves 
-readability, reduces boilerplate, and enhances efficiency when working with complex 
-data structures.
+Path strings use dots to separate hash keys. Array elements may be accessed
+by appending a zero-based subscript in square brackets to any hash key segment.
+Negative indices count from the end of the array (C<-1> is the last element).
 
-A key motivation for this module is configuration file manipulation. Many applications 
-use structured configuration files (e.g., JSON, YAML) where default settings exist, 
-but some values require customization. This module enables modifying specific 
-configuration elements using intuitive dot-separated keys, making updates more 
+  repositories[0].repositoryUri   # first element of the repositories array
+  items[-1].name                  # last element of the items array
+  a.b[2].c.d[-1]                  # deeply nested mix of hashes and arrays
+
+Array subscript notation is supported in C<get>, C<exists_key>, and C<delete>.
+C<set> continues to operate on plain dot-separated hash paths only.
+
+A key motivation for this module is configuration file and API response
+manipulation. Many applications use structured data (e.g., JSON, YAML) where
+values are nested several levels deep. This module enables reading and modifying
+specific elements using intuitive dot-separated keys, making access more
 straightforward.
 
 For example, given a JSON configuration file, a utility could allow:
 
    init-config foo.json session_files.dir /some/path
 
-Where the command takes the configuration file name followed by key-value pairs 
-representing the specific elements to update. This approach provides a simple 
-and effective way to adjust settings without needing to manually traverse the 
-configuration structure.
+Where the command takes the configuration file name followed by key-value pairs
+representing the specific elements to update.
 
-The class also supports serialization in multiple formats, controlled by 
+The class also supports serialization in multiple formats, controlled by
 package variables:
 
 =over 4
@@ -301,34 +446,36 @@ Specifies the serialization format. Supported formats:
 
 =head2 new([$hash_ref], @kv_list)
 
-Creates a new Data::NestedKey object. If no arguments are provided, initializes 
-with an empty structure. Optionally, an initial hash reference can be supplied. 
+Creates a new Data::NestedKey object. If no arguments are provided, initializes
+with an empty structure. Optionally, an initial hash reference can be supplied.
 Key-value pairs may also be provided for immediate population.
 
 Returns a C<Data::NestedKey> object.
 
 =head2 set(@kv_list)
 
-Inserts, updates, appends, or removes values in the nested structure using dot-separated keys.
+Inserts, updates, appends, or removes values in the nested structure using
+dot-separated keys. Array subscript notation (e.g. C<key[0]>) is B<not>
+supported in set paths; an exception will be thrown if one is used.
 
 =over 4
 
-=item * If a key already exists and holds a scalar, assigning a new value will **replace** it.
+=item * If a key already exists and holds a scalar, assigning a new value will B<replace> it.
 
-=item * If the `+` prefix is used (e.g., `+key`), the value will be **appended**:
+=item * If the C<+> prefix is used (e.g., C<+key>), the value will be B<appended>:
 
     $nk->set('foo.bar' => 1);
     $nk->set('+foo.bar' => 2);
     $nk->set('+foo.bar' => 3);
     # foo.bar now contains [1, 2, 3]
 
-=item * If the `+` prefix is used with a hash, it merges keys instead of replacing:
+=item * If the C<+> prefix is used with a hash, it merges keys instead of replacing:
 
     $nk->set('config' => { key1 => 'val1' });
     $nk->set('+config' => { key2 => 'val2' });
     # config now contains { key1 => 'val1', key2 => 'val2' }
 
-=item * If the `-` prefix is used (e.g., `-key`), the value is **removed**:
+=item * If the C<-> prefix is used (e.g., C<-key>), the value is B<removed>:
 
     $nk->set('-foo.bar' => 2);
     # If foo.bar is an array, it removes element '2'
@@ -341,19 +488,31 @@ Returns the object itself.
 
 =head2 get(@key_paths)
 
-Retrieves values from the nested structure based on dot-separated keys.
+Retrieves values from the nested structure based on dot-separated key paths.
+Array elements may be accessed with C<[n]> subscripts (zero-based; negative
+indices count from the end):
 
-Returns a list of values corresponding to the requested keys.
+  my $uri  = $nk->get('repositories[0].repositoryUri');
+  my $last = $nk->get('items[-1].name');
+
+Returns C<undef> for any path that does not exist or whose subscript is out
+of range.  In list context returns all requested values; in scalar context
+returns the first.
 
 =head2 delete(@key_paths)
 
-Removes the specified keys from the nested structure.
+Removes the specified keys from the nested structure. If the final segment
+carries an array subscript, the element is removed with C<splice> (the array
+shrinks; no undef hole is left). Empty parent hashes are pruned automatically
+when no array is traversed on the way down.
 
 Returns the object itself.
 
 =head2 exists_key(@key_paths)
 
-Checks whether the given keys exist in the nested structure.
+Checks whether the given keys exist in the nested structure. Array subscripts
+are honoured: a subscript pointing past the end of an array, or to an undef
+slot, is treated as non-existent.
 
 Returns a list of boolean values (1 for exists, 0 for does not exist).
 
@@ -361,9 +520,9 @@ Returns a list of boolean values (1 for exists, 0 for does not exist).
 
 Serializes the nested structure into a string using the specified format.
 
-You can also use the "" to interpolate the object into its serialized
-representation. Set the C<$Data::NestedKey::FORMAT> variable if you
-want to change the default format from JSON to another format.
+The C<""> operator is overloaded to call this method, so the object may be
+interpolated directly into strings.  Set C<$Data::NestedKey::FORMAT> to change
+the default format from JSON.
 
 Returns a string representation of the data.
 

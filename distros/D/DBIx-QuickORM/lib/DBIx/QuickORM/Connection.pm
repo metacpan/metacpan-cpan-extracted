@@ -2,7 +2,7 @@ package DBIx::QuickORM::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000025';
 
 use Carp qw/confess croak carp/;
 use Scalar::Util qw/blessed weaken/;
@@ -372,6 +372,11 @@ sub async_check {
 
 Shortcut for C<< $con->orm->db >>. Returns an L<DBIx::QuickORM::DB> object.
 
+=item $bool = $con->cas_count_reliable
+
+True if this connection reports the affected-row count that compare-and-set
+needs (rows matched, not rows changed). See L<DBIx::QuickORM::DB/cas_count_reliable>.
+
 =item $dbh = $con->aside_dbh
 
 Returns a completely new and independent C<$dbh> connected to the database.
@@ -379,6 +384,7 @@ Returns a completely new and independent C<$dbh> connected to the database.
 =cut
 
 sub db { $_[0]->{+ORM}->db }
+sub cas_count_reliable { $_[0]->db->cas_count_reliable }
 sub aside_dbh { $_[0]->{+ORM}->db->new_dbh }
 
 ########################

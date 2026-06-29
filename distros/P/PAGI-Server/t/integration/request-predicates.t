@@ -10,8 +10,8 @@ use lib 'lib';
 # Skip when it is not installed; the server-side behavior these exercise is
 # covered Tools-free elsewhere (t/10-http-compliance.t, t/03-request-body.t).
 BEGIN {
-    eval { require PAGI::Request; my $v = PAGI::Request->VERSION; !defined($v) || $v >= 0.002000 }
-        or plan(skip_all => 'PAGI-Tools (PAGI::Request >= 0.002000) not installed');
+    eval { require PAGI::Tools; PAGI::Tools->VERSION(0.002000); require PAGI::Request; 1 }
+        or plan(skip_all => 'PAGI-Tools 0.002000+ (PAGI::Request) not installed');
 }
 
 subtest 'is_json predicate' => sub {

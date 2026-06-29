@@ -44,3 +44,20 @@
   printf "length=%d\n", mb::length($s);    # character count
   printf "sub=%s\n",    mb::substr($s,0,5); # "Hello"
   printf "pos=%d\n",    mb::index($s,"World"); # 6
+
+[ 9. Runtime codepoint regex (mb::qr) ]
+  use mb qw(*mb utf8);
+  $str =~ mb::qr(qr/./)         # "." matches one codepoint
+  $str =~ m{\G$mb{qr/(.)/}gc}   # equivalent tied form
+
+[ 10. Validate well-formed bytes (mb::valid) ]
+  mb::valid($octets)            # 1 if well-formed, 0 otherwise
+                                # strict, opt-in; varies by encoding
+
+[ 11. Split on codepoint boundaries (mb::split) ]
+  @f = mb::split(qr/,/, $csv)   # split on codepoint boundaries
+
+[ 12. Three ways to run (filter / modulino / runtime) ]
+  use mb;                       # path 1: source filter (perl 5.8+)
+  perl mb.pm script.pl          # path 2: modulino
+  use mb qw(*mb utf8);          # path 3: runtime interface
