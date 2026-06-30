@@ -33,13 +33,13 @@ use Role::Tiny::With;
 with 'CPAN::Maker::Role::ModuleUtils';
 with 'CPAN::Maker::Role::FileUtils';
 
-our $VERSION = '1.9.2';
+our $VERSION = '1.9.3';
 
 __PACKAGE__->use_log4perl( level => 'info' );
 
 use parent qw(CLI::Simple);
 
-caller or __PACKAGE__->main();
+caller or exit __PACKAGE__->main();
 
 ########################################################################
 sub init {
@@ -1109,8 +1109,8 @@ sub _generate_man_links {
 
       $content .= <<"POSTAMBLE";
 install ::
-\t-\$(NOECHO) ln -sf \$(DESTINSTALLMAN3DIR)/$module.3pm \$(DESTINSTALLMAN3DIR)/$alias.3pm; \
-\t\$(NOECHO) echo \$(DESTINSTALLMAN3DIR)/$alias.3pm >> \$(DESTINSTALLSITEARCH)/auto/\$(FULLEXT)/.packlist
+\t-\$(NOECHO) ln -sf \$(INSTALLMAN3DIR)/$module.3pm \$(DESTINSTALLMAN3DIR)/$alias.3pm; \
+\t\$(NOECHO) echo \$(INSTALLMAN3DIR)/$alias.3pm >> \$(DESTINSTALLSITEARCH)/auto/\$(FULLEXT)/.packlist
 POSTAMBLE
     }
   }
@@ -1301,7 +1301,7 @@ sub main {
     default_option => $default_options,
   );
 
-  exit $cli->run();
+  return $cli->run();
 }
 
 1;
@@ -1467,7 +1467,7 @@ output or problems with the final distribution.
 
 =head1 VERSION
 
-This documentation refers to version 1.9.2
+This documentation refers to version 1.9.3
 
 =head1 USING THE BASH SCRIPT
 
@@ -1664,7 +1664,7 @@ main module being packaged.
 
 Example:
 
-  version: 1.9.2
+  version: 1.9.3
   project:
     git: https://github.com/rlauer6/perl-Amazon-Credentials
     description: "AWS credentials discoverer"

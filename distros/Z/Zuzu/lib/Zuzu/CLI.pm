@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.007000';
+our $VERSION = '0.007001';
 
 use Scalar::Util qw( blessed );
 use Getopt::Long qw(

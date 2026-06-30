@@ -185,6 +185,7 @@ src/LDNS.xs
 src/typemap
 t/axfr.t
 t/dnssec.t
+t/ede.t
 t/example.org
 t/idn.t
 t/load_zonefile.t

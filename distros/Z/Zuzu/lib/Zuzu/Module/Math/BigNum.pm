@@ -2,7 +2,7 @@ package Zuzu::Module::Math::BigNum;
 
 use utf8;
 
-our $VERSION = '0.007000';
+our $VERSION = '0.007001';
 
 use Math::BigFloat;
 use Math::BigInt;

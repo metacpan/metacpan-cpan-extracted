@@ -11,7 +11,7 @@ use List::Util qw(max min);
 use base 'CVSS::Base';
 use CVSS::Constants ();
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 $VERSION =~ tr/_//d;    ## no critic
 
 use constant DEBUG => $ENV{CVSS_DEBUG};
@@ -537,7 +537,7 @@ DISTANCE: foreach my $max_vector (@max_vectors) {
     $value = max(0.0, $value);
     $value = min(10.0, $value);
 
-    my $base_score = sprintf('%.1f', $value);
+    my $base_score = int($value * 10 + 0.5) / 10;
 
     DEBUG and say STDERR "-- BaseScore: $base_score ($value)";
 
@@ -656,8 +656,34 @@ __END__
 
 CVSS::v4 - Parse and calculate CVSS v4.0 scores
 
+=head1 SYNOPSIS
+
+    use CVSS::v4;
+    my $cvss = CVSS::v4->from_vector_string('CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:L/VI:H/VA:H/SC:N/SI:N/SA:N');
+
+    say $cvss->AV; # L
+    say $cvss->attackVector; # LOCAL
 
 =head1 DESCRIPTION
+
+The Common Vulnerability Scoring System (CVSS) is an open framework for 
+communicating the characteristics and severity of software vulnerabilities. 
+CVSS consists of four metric groups: Base, Threat, Environmental, and 
+Supplemental. The Base group represents the intrinsic qualities of a 
+vulnerability that are constant over time and across user environments, the 
+Threat group reflects the characteristics of a vulnerability that change over 
+time, and the Environmental group represents the characteristics of a 
+vulnerability that are unique to a user's environment. Base metric values are 
+combined with default values that assume the highest severity for Threat and 
+Environmental metrics to produce a score ranging from 0 to 10. To further 
+refine a resulting severity score, Threat and Environmental metrics can then be 
+amended based on applicable threat intelligence and environmental 
+considerations. Supplemental metrics do not modify the final score, and are 
+used as additional insight into the characteristics of a vulnerability. A CVSS 
+vector string consists of a compressed textual representation of the values 
+used to derive the score.
+
+L<https://www.first.org/cvss/v4.0/specification-document>
 
 =head2 METHODS
 
@@ -826,7 +852,7 @@ L<https://github.com/giterlizzi/perl-CVSS>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023-2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2023-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

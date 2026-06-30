@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -23,11 +23,14 @@ use File::FStore;
 use parent qw(File::FStore::Base Data::Identifier::Interface::Known);
 
 use constant {
-    WRITE_BITS  => S_IWUSR|S_IWGRP|S_IWOTH,
-    RE_ISE      => qr<^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[1-3](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)$>,
+    WRITE_BITS                  => S_IWUSR|S_IWGRP|S_IWOTH,
+    RE_ISE                      => qr<^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[1-3](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)$>,
+
+    MEDIA_SUBTYPE_GENERATOR     => Data::Identifier->new(uuid => 'a649d48d-35b0-4454-81af-c5fd2eb40373')->register,
+    MEDIA_SUBTYPE_NAMESPACE     => Data::Identifier->new(uuid => '50d7c533-2d9b-4208-b560-bcbbf75ce3f9')->register,
 };
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my @_xattr_hashes = qw(sha-1-160 sha-2-256 sha-3-512);
 
@@ -49,6 +52,15 @@ my %_exts = (
     'application/zip'           => 'zip',
     'text/plain'                => 'txt',
 );
+
+my @_media_subtypes = map {
+    Data::Identifier::Generate->generic(
+        generator   => MEDIA_SUBTYPE_GENERATOR,
+        namespace   => MEDIA_SUBTYPE_NAMESPACE,
+        style       => 'name-based',
+        request     => $_,
+    )->register
+} keys %_exts;
 
 my %_db_tags = (
     # well known tags:
@@ -146,55 +158,55 @@ sub update {
                 $digests = $data->{digests} //= {};
 
                 $properties->{size} //= $size;
-                croak 'Size missmatch' if $properties->{size} != $size;
+                croak 'Size mismatch' if $properties->{size} != $size;
                 $properties->{inode} //= $ino;
-                croak 'inode missmatch' if $properties->{inode} != $ino;
+                croak 'inode mismatch' if $properties->{inode} != $ino;
 
                 # Load some basic properties, first the final values, than the current ones.
                 foreach my $lifecycle (qw(final current)) {
                     if (defined(my $v = $inode->get('size', lifecycle => $lifecycle, default => undef))) {
                         $properties->{size} //= $v;
-                        croak 'Size missmatch' if $properties->{size} != $v;
+                        croak 'Size mismatch' if $properties->{size} != $v;
                     }
 
                     if (defined(my $v = $inode->get('mediatype', lifecycle => $lifecycle, default => undef, as => 'mediatype'))) {
                         $properties->{mediasubtype} //= $v;
-                        croak sprintf('Media subtype missmatch on (%s): "%s" vs. "%s"', $self->dbname, $properties->{mediasubtype}, $v) if $properties->{mediasubtype} ne $v;
+                        croak sprintf('Media subtype mismatch on (%s): "%s" vs. "%s"', $self->dbname, $properties->{mediasubtype}, $v) if $properties->{mediasubtype} ne $v;
                     }
 
-                    if (defined(my $v = $inode->get('inodeise', lifecycle => $lifecycle, default => undef, as => 'mediatype'))) {
+                    if (defined(my $v = $inode->get('inodeise', lifecycle => $lifecycle, default => undef, as => 'ise'))) {
                         $properties->{inodeise} //= $v;
-                        # XXX:  We ignore missmatches here. This can be for a number of reasons. Such as switches between different sources of the value.
+                        # XXX:  We ignore mismatches here. This can be for a number of reasons. Such as switches between different sources of the value.
                         # TODO: A better policy should be implemented later on.
                     }
 
                     if (defined(my $v = $inode->get('st_ino', lifecycle => $lifecycle, default => undef))) {
                         $properties->{inode} //= $v;
-                        croak 'inode missmatch' if $properties->{inode} != $v;
+                        croak 'inode mismatch' if $properties->{inode} != $v;
                     }
                 }
 
                 # First load all known final ones.
-                foreach my $digest (@{$self->_used_digests}) {
+                foreach my $digest (@{$self->_used_digests}, @{$self->_used_digests_ni}) {
                     if (defined(my $v = $inode->digest($digest, lifecycle => 'final', default => undef))) {
                         $digests->{$digest} //= $v;
-                        croak 'Digest missmatch for '.$digest if $digests->{$digest} ne $v;
+                        croak 'Digest mismatch for '.$digest if $digests->{$digest} ne $v;
                     }
                 }
 
                 # Then test against the current ones.
                 unless ($no_digests) {
-                    foreach my $digest (@{$self->_used_digests}) {
+                    foreach my $digest (@{$self->_used_digests}, @{$self->_used_digests_ni}) {
                         if (defined(my $v = $inode->digest($digest, default => undef))) {
                             $digests->{$digest} //= $v;
-                            croak 'Digest missmatch for '.$digest if $digests->{$digest} ne $v;
+                            croak 'Digest mismatch for '.$digest if $digests->{$digest} ne $v;
                         }
                     }
                 }
 
                 if (defined(my $contentise = eval {$self->_calculate_contentise($data)->uuid})) {
                     $properties->{contentise} //= $contentise;
-                    croak 'Content ISE missmatch' if $properties->{contentise} ne $contentise;
+                    croak 'Content ISE mismatch' if $properties->{contentise} ne $contentise;
                 }
 
                 $on_pre_set->($self) if defined $on_pre_set;
@@ -211,6 +223,25 @@ sub update {
                 foreach my $fn ($self->_linknames($digests, $link_style)) {
                     next if -l $fn;
                     symlink($filename, $fn) or croak $!;
+                }
+            }
+
+            {
+                my $used_digests_ni = $self->_used_digests_ni;
+
+                if (scalar(@{$used_digests_ni})) {
+                    require MIME::Base64;
+
+                    state $up = File::Spec->updir;
+                    my $dbname = $self->dbname;
+                    my $filename = File::Spec->catfile(( map {$up} 0..1), 'store', $dbname);
+
+                    foreach my $digest (@{$used_digests_ni}) {
+                        my $v = $digests->{$digest} // next; # TODO: Try to query it!
+                        my $fn = $store->_file(v2 => ni => ($File::FStore::_ni_hashes{$digest} // next) => MIME::Base64::encode_base64url(pack('H*', $v)));
+                        next if -l $fn;
+                        symlink($filename, $fn) or croak $!;
+                    }
                 }
             }
 
@@ -410,7 +441,7 @@ sub delete {
 
 sub sync_with_db {
     my ($self, %opts) = @_;
-    my $db = $opts{db} // $self->db;
+    my $db = $opts{db} // $self->store->so_get('db', default => undef, no_defaults => 1);
     my $fii_inode = $self->as('File::Information::Inode');
     $db->in_transaction(rw => sub {
             my $data = $self->get;
@@ -512,6 +543,7 @@ sub _known_provider {
         link_styles     => [[keys %File::FStore::_valid_link_styles], not_identifiers => 1],
         store_styles    => [[keys %File::FStore::_valid_store_styles], not_identifiers => 1],
         domains         => [[qw(properties digests)], not_identifiers => 1],
+        mediasubtypes   => [\@_media_subtypes,  rawtype => 'Data::Identifier'],
         other_tags      => [[values %_db_tags], rawtype => 'Data::Identifier'],
     };
     croak 'Unsupported options passed' if scalar(keys %opts);
@@ -530,9 +562,8 @@ sub _valid_digests {
 
 sub _new {
     my ($pkg, %opts) = @_;
-    my $self = bless \%opts, $pkg;
+    my $self = $pkg->SUPER::_new(%opts);
 
-    croak 'No store is given' unless defined $self->{store};
     croak 'No dbid is given' unless defined $self->{dbid};
 
     return $self;
@@ -568,6 +599,11 @@ sub _detach_fh {
 sub _used_digests {
     my ($self) = @_;
     return $self->{used_digests} //= $self->store->_used_digests;
+}
+
+sub _used_digests_ni {
+    my ($self) = @_;
+    return $self->{used_digests_ni} //= $self->store->_used_digests_ni;
 }
 
 sub _calculate_contentise {
@@ -635,7 +671,7 @@ sub _linknames {
     $digests //= $self->get('digests');
     $link_style //= $store->setting('link_style');
 
-    foreach my $digest (keys %{$digests}) {
+    foreach my $digest (@{$self->_used_digests}) {
         my $v = $digests->{$digest} // next;
 
         $v .= $ext if defined $ext;
@@ -693,7 +729,7 @@ File::FStore::File - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -834,7 +870,7 @@ The following domains are supported:
 
 =item C<properties>
 
-This domain contains flat properties of the file sich as it's size.
+This domain contains flat properties of the file such as it's size.
 
 See L</PROPERTIES>.
 
@@ -857,7 +893,7 @@ The key is the digest name in universal tag (utag) format (e.g. C<sha-3-224>).
 
 This sets a value on the file.
 The value is checked against already known values.
-If a value is set for a key that already holds a value this method C<die>s if the values missmatch.
+If a value is set for a key that already holds a value this method C<die>s if the values mismatch.
 
 This method takes a domain-key-value triplet, or a domain and a hashref with multiple values, or
 a single hashref with the domain(s) as keys and hashrefs with key-value pairs as values.
@@ -970,26 +1006,47 @@ The following classes are defined:
 
 =item C<domains>
 
+(since v0.05)
+
 The list of domains this module supports.
 
 =item C<properties>
+
+(since v0.05)
 
 The list of keys for the C<properties> domain this module knows.
 
 =item C<digests>
 
+(since v0.05)
+
 The list of keys for the C<domains> domain this module knows.
 Note that actual support of those digests depend on installed modules and is not reflected by this list.
 
+See L<File::Information/digest_info> for more information on any specific digest.
+
 =item C<link_styles>
+
+(since v0.05)
 
 The list of supported link styles. See L<File::FStore/new>.
 
 =item C<store_styles>
 
+(since v0.05)
+
 The list of supported store styles. See L<File::FStore/new>.
 
-=item C<other-tags>
+=item C<mediasubtypes>
+
+(since v0.07)
+
+A list of mediasubtypes known by this module.
+Files of mediasubtypes not within this list are still supported but the store might do more guessing with them.
+
+=item C<other_tags>
+
+(since v0.05)
 
 A list of other tags this module knows about.
 This list is hardly useful for most operations.
@@ -1014,7 +1071,7 @@ The inode number. The value is specific to the filesystem the file is on.
 The media subtype of the file.
 
 B<Warning:>
-This property is commonly very missunderstood.
+This property is commonly very misunderstood.
 It is best to not set this manually and let the store maintain the value.
 Setting this value is acceptable when importing data from another store or from a L<File::Information::Base> object.
 
@@ -1047,7 +1104,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

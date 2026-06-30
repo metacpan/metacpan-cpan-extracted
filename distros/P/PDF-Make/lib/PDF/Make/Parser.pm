@@ -3,7 +3,7 @@ package PDF::Make::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # Load the XS code from PDF::Make
 use PDF::Make ();

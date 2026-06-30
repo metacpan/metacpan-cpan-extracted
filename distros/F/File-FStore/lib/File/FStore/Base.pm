@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,9 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.06;
+use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects);
+
+our $VERSION = v0.07;
 
 
 sub contentise {
@@ -24,8 +26,8 @@ sub contentise {
     confess 'No contentise known for this file' unless defined $self->{contentise};
 
     return $self->{contentise}->as($as,
-        db => $self->db(default => undef),
-        extractor => $self->extractor(default => undef),
+        db        => $self->so_get('db', default => undef, no_defaults => 1),
+        extractor => $self->so_get('extractor', default => undef, no_defaults => 1),
     );
 }
 
@@ -50,14 +52,14 @@ sub store {
 }
 
 
-#@returns Data::TagDB
+#@deprecated
 sub db {
     my ($self, %opts) = @_;
     return $self->{db} //= $self->store->db(%opts);
 }
 
 
-#@returns Data::URIID
+#@deprecated
 sub extractor {
     my ($self, %opts) = @_;
     return $self->{extractor} //= $self->store->extractor(%opts);
@@ -67,6 +69,19 @@ sub extractor {
 sub fii {
     my ($self) = @_;
     return $self->{fii} //= $self->store->fii;
+}
+
+# ---- Private helpers ----
+
+sub _new {
+    my ($pkg, %opts) = @_;
+    my $self = bless \%opts, $pkg;
+
+    croak 'No store is given' unless defined $self->{store};
+
+    $self->so_attach(parent => $self->{store});
+
+    return $self;
 }
 
 1;
@@ -83,7 +98,7 @@ File::FStore::Base - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -92,6 +107,8 @@ version v0.06
     my File::FStore::Base $obj = ...;
 
 This package is the base package for other packages, containing common methods.
+
+This package inherits from L<Data::Identifier::Interface::Userdata>, and L<Data::Identifier::Interface::Subobjects>.
 
 =head1 METHODS
 
@@ -146,7 +163,11 @@ Returns the store this file belongs to.
     # or:
     my Data::TagDB $db = $file->db(default => $def);
 
-Proxy for L<File::FStore/db>.
+(since v0.04, deprecated since v0.07, will be removed in v0.10, may warn).
+
+This is deprecated. See L<Data::Identifier::Interface::Subobjects/so_get> for a replacement.
+
+Deprecated proxy for L<File::FStore/db>.
 
 =head2 extractor
 
@@ -154,13 +175,20 @@ Proxy for L<File::FStore/db>.
     # or:
     my Data::URIID $extractor = $file->extractor(default => $def);
 
-Proxy for L<File::FStore/extractor>.
+(since v0.04, deprecated since v0.07, will be removed in v0.10, may warn).
+
+This is deprecated. See L<Data::Identifier::Interface::Subobjects/so_get> for a replacement.
+
+Deprecated proxy for L<File::FStore/extractor>.
 
 =head2 fii
 
     my File::Information $fii = $file->fii;
 
+(since v0.01, experimental since v0.07)
+
 Proxy for L<File::FStore/fii>.
+See there for information on the status of this method.
 
 =head1 AUTHOR
 
@@ -168,7 +196,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

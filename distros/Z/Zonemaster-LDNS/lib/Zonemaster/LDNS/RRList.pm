@@ -82,8 +82,6 @@ Pops an RR off the list.
 
 Returns true or false depending on if the list is an RRset or not.
 
-Note that the underlying LDNS function appears to have a bug as the comparison of the owner name field is case sensitive. See https://github.com/NLnetLabs/ldns/pull/251.
-
 =item string()
 
 Returns a string with the list of RRs in presentation format.

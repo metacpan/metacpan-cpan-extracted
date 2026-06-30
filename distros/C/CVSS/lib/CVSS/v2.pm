@@ -11,7 +11,7 @@ use List::Util qw(min);
 use base 'CVSS::Base';
 use CVSS::Constants ();
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 $VERSION =~ tr/_//d;    ## no critic
 
 use constant DEBUG => $ENV{CVSS_DEBUG};
@@ -160,9 +160,21 @@ CVSS::v2 - Parse and calculate CVSS v2.0 scores
     say $cvss->AV; # N
     say $cvss->accessVector; # NETWORK
 
-
 =head1 DESCRIPTION
 
+The Common Vulnerability Scoring System (CVSS) provides an open framework for 
+communicating the characteristics and impacts of IT vulnerabilities. CVSS 
+consists of 3 groups: Base, Temporal and Environmental. Each group produces a 
+numeric score ranging from 0 to 10, and a Vector, a compressed textual 
+representation that reflects the values used to derive the score. The Base 
+group represents the intrinsic qualities of a vulnerability. The Temporal group 
+reflects the characteristics of a vulnerability that change over time. The 
+Environmental group represents the characteristics of a vulnerability that are 
+unique to any user's environment. CVSS enables IT managers, vulnerability 
+bulletin providers, security vendors, application vendors and researchers to 
+all benefit by adopting this common language of scoring IT vulnerabilities.
+
+L<https://www.first.org/cvss/v2/guide>
 
 =head2 METHODS
 
@@ -271,7 +283,7 @@ L<https://github.com/giterlizzi/perl-CVSS>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023-2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2023-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

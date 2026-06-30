@@ -18,7 +18,7 @@ To install this module, run the following commands.
 
 Using App::cpanminus:
 
-    cpanm URI::PackageURL
+    cpanm CVSS
 
 ## SUPPORT AND DOCUMENTATION
 

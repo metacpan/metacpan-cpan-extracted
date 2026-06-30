@@ -2,7 +2,7 @@ package DBIx::QuickORM::Schema::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000026';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -41,7 +41,7 @@ L<https://github.com/exodist/DBIx-QuickORM>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 
@@ -49,7 +49,7 @@ L<https://github.com/exodist/DBIx-QuickORM>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 

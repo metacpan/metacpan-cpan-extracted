@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use Template;
 use URI;
 
 my %_domain_keys = (
-    properties => [qw(size inode contentise mediasubtype media_type)],
+    properties => [qw(size inode contentise mediasubtype media_type inodeise)],
     digests => [
         qw(md-5-128 sha-1-160),
         (map {'sha-2-'.$_, 'sha-3-'.$_} 224, 256, 384, 512),

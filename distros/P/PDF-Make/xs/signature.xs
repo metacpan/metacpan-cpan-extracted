@@ -470,7 +470,7 @@ _sign_doc(doc, identity, hash_alg, reason, location, contact, name, signing_time
                     hv_iterinit(fh);
                     while ((val = hv_iternextsv(fh, &key, &keylen))) {
                         if (!SvOK(val)) continue;
-                        ap_names[i] = strndup(key, (size_t)keylen);
+                        ap_names[i] = pdfmake_xs_strndup(key, (size_t)keylen);
                         ap_bases[i] = strdup(SvPV_nolen(val));
                         i++;
                     }
@@ -498,7 +498,7 @@ _sign_doc(doc, identity, hash_alg, reason, location, contact, name, signing_time
                     hv_iterinit(xh);
                     while ((val = hv_iternextsv(xh, &key, &keylen))) {
                         if (!SvOK(val)) continue;
-                        ap_xo_names[i] = strndup(key, (size_t)keylen);
+                        ap_xo_names[i] = pdfmake_xs_strndup(key, (size_t)keylen);
                         ap_xo_nums[i]  = (uint32_t)SvUV(val);
                         i++;
                     }

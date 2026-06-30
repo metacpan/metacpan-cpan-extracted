@@ -62,10 +62,16 @@ sub round_trip {
     ok($eq, "large: content intact across fragments");
 }
 
-# (A standalone zero-length message is intentionally not tested: lws does not
-# deliver an empty frame as an on_message event, which is its own behaviour to
-# define, not this module's. The recv-side zero-length guard still matters for
-# empty *fragments* within a larger message.)
+# 3. A zero-length message IS a valid message and must be delivered as its own
+#    on_message event (the empty string). Reassembly keys delivery on "frame
+#    complete", not "bytes buffered > 0", so it must not drop an empty message.
+{
+    my ($fired, $got) = (0, undef);
+    round_trip(sub { $_[0]->send("") },
+               sub { $fired = 1; $got = $_[0] });
+    ok($fired, "empty: zero-length message delivered as an on_message event");
+    is($got, "", "empty: payload is the empty string");
+}
 
 done_testing;
 

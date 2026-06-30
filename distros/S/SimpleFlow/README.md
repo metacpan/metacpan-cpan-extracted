@@ -170,6 +170,24 @@ The test suite additionally uses `Test::More` and
 
 # Change log
 
+## 0.14 (2026-06-29) (Claude Opus 4.8 helped)
+
+### `task`
+- **New:** accepts a flat key/value list as well as a hash ref —
+  `task(cmd => ...)` and `task({ cmd => ... })` are now equivalent. A lone
+  non-hashref scalar or any odd-length argument list is fatal.
+- **Bug fix:** the default `die => 1` was ignored when checking for missing
+  `output.files`. The block tested the raw `$args->{'die'}` (undef when the
+  caller omitted it) instead of the resolved `$r{'die'}`, so a command that
+  failed to produce its declared outputs only warned instead of dying. Now
+  consistent with the exit-code check.
+- **Bug fix:** removed a stray `)` (and an extraneous leading space) from the
+  "command is" line written to the log file; it now matches the on-screen form.
+- **Bug fix:** `length $_ == 0` could throw a fatal uninitialized-value warning
+  (under `warnings FATAL => 'all'`) on an undef element of the `input.files`
+  array branch and the `output.files` empty-name check. Both now guard with
+  `(defined $_) && (length $_ == 0)`, matching the `input.files` scalar branch.
+
 ## 0.13 (2026-06-11)
 
 ### Fixed (Claude Opus 4.8 helped)

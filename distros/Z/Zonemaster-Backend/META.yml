@@ -3,10 +3,12 @@ abstract: 'A system for running Zonemaster tests asynchronously through an RPC-A
 author:
   - 'Michal Toma <toma@nic.fr>'
 build_requires:
+  Capture::Tiny: 0
   DBD::SQLite: 1.66
   ExtUtils::MakeMaker: 6.59
   Test::Differences: 0
   Test::Exception: 0
+  Test::Fatal: 0
   Test::NoWarnings: 0
   Time::Local: 1.26
 configure_requires:
@@ -54,11 +56,11 @@ requires:
   Router::Simple::Declare: 0
   Starman: 0
   Try::Tiny: 0.12
-  Zonemaster::Engine: 8.001
-  Zonemaster::LDNS: 5.000001
+  Zonemaster::Engine: 9
+  Zonemaster::LDNS: 5.001
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-backend/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-backend
-version: 12.0.0
+version: 12.1.0

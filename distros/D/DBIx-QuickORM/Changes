@@ -1,3 +1,14 @@
+0.000026  2026-06-29 17:41:35-07:00 America/Los_Angeles
+
+    Security:
+    - Quote all SQL identifiers so caller-supplied names (order_by, where keys, field/returning lists, upsert columns, and join aliases) can no longer break out into SQL injection (CVE-2026-13766).
+
+    INCOMPATIBLE CHANGES (from the CVE-2026-13766 fix):
+    - SQL identifiers are now quoted, changing two caller-facing behaviors:
+      - order_by/field bare strings must be column names, not raw SQL.
+      - A bare "name DESC" or "COUNT(*)" no longer works; use \'...' or {-desc => 'name'}.
+      - LiteralSource croaks on a non-identifier 'subquery' alias.
+
 0.000025  2026-06-28 10:59:16-07:00 America/Los_Angeles
 
     Internal / cleanup:

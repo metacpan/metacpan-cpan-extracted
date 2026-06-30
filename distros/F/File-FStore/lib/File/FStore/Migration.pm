@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -16,7 +16,7 @@ use File::Spec;
 
 use parent 'File::FStore::Base';
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 
 sub upgrade {
@@ -193,16 +193,6 @@ sub insert_tagpool {
     );
 }
 
-# ---- Private helpers ----
-sub _new {
-    my ($pkg, %opts) = @_;
-    my $self = bless \%opts, $pkg;
-
-    croak 'No store is given' unless defined $self->{store};
-
-    return $self;
-}
-
 1;
 
 __END__
@@ -217,7 +207,7 @@ File::FStore::Migration - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -373,7 +363,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

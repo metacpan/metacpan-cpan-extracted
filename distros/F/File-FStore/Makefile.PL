@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Carp" => "1.35",
     "DBD::SQLite" => "1.72",
     "DBI" => "1.643",
-    "Data::Identifier" => "0.11.0",
+    "Data::Identifier" => "0.31.0",
     "Digest::SHA3" => "1.05",
     "Fcntl" => "1.15",
     "File::Information" => "0.8.0",
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.06",
+  "VERSION" => "v0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %FallbackPrereqs = (
   "Carp" => "1.35",
   "DBD::SQLite" => "1.72",
   "DBI" => "1.643",
-  "Data::Identifier" => "0.11.0",
+  "Data::Identifier" => "0.31.0",
   "Digest::SHA3" => "1.05",
   "Fcntl" => "1.15",
   "File::Information" => "0.8.0",

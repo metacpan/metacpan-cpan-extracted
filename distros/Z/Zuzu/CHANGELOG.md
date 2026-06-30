@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project roughly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 but using Perlish version numbers like `x.yyyzzz` instead of `x.y.z`.
 
+## 0.007001 - 2026-06-29
+
+*stdlib tag 20260629, languagetests tag 20260625.*
+
+### Fixed
+
+- CI ztest runs now pass nested ZuzuScript subprocesses through the same Perl
+  interpreter as the test harness, avoiding failures when `bin/zuzu.pl`'s
+  shebang would otherwise find a different system Perl.
+
 ## 0.007000 - 2026-06-25
 
 *stdlib tag 20260625, languagetests tag 20260625.*

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Join;
 use strict;
 use warnings;
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000026';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -250,24 +250,33 @@ sub source_db_moniker {
         my $table = $comp->{table};
         my $type  = $comp->{type} // "";
 
+        # Quote the alias and ON-clause column references so a caller-supplied
+        # alias (or a reserved-word/mixed-case column) cannot break out into
+        # raw SQL. Each side of an "alias.column" pair is quoted separately so
+        # it becomes "alias"."column", not the wrong "alias.column".
+        my $qas = $self->_quote_identifier($as);
+
         if ($type =~ m/^CROSS$/i) {
             # CROSS JOIN takes no ON clause (PostgreSQL rejects one).
-            $out .= " CROSS JOIN " . $table->source_db_moniker . " AS $as";
+            $out .= " CROSS JOIN " . $table->source_db_moniker . " AS $qas";
         }
         elsif ($link) {
             my $lc = $link->local_columns;
             my $oc = $link->other_columns;
 
+            my $qfrom = $self->_quote_identifier($from);
             my @cols;
             for (my $i = 0; $i < @$lc; $i++) {
-                push @cols => "$as.$oc->[$i] = $from.$lc->[$i]";
+                push @cols => $qas . '.' . $self->_quote_identifier($oc->[$i])
+                            . ' = '
+                            . $qfrom . '.' . $self->_quote_identifier($lc->[$i]);
             }
 
             $out .= $type =~ m/join/i ? " $type " : " $type JOIN ";
-            $out .= $table->source_db_moniker . " AS $as ON (" . join(' AND ' => @cols) . ")";
+            $out .= $table->source_db_moniker . " AS $qas ON (" . join(' AND ' => @cols) . ")";
         }
         else {
-            $out = $table->source_db_moniker . " AS $as";
+            $out = $table->source_db_moniker . " AS $qas";
         }
     }
 
@@ -361,7 +370,14 @@ sub fields_to_fetch {
     for my $as (@{$self->{+ORDER}}) {
         my $c = $self->{+COMPONENTS}->{$as};
         my $t = $c->{table};
-        push @fields => map { my $db = $t->field_db_name($_); \("$as.$db AS " . $self->_quote_identifier("$as.$db")) } @{$t->fields_to_fetch};
+        # Quote the "alias"."column" reference (each part separately) so it
+        # matches the quoted alias the FROM clause defines; the AS label keeps
+        # its "alias.field" form since that is the result-set column key.
+        push @fields => map {
+            my $db  = $t->field_db_name($_);
+            my $ref = $self->_quote_identifier($as) . '.' . $self->_quote_identifier($db);
+            \("$ref AS " . $self->_quote_identifier("$as.$db"));
+        } @{$t->fields_to_fetch};
     }
 
     return \@fields;
@@ -600,7 +616,7 @@ L<https://github.com/exodist/DBIx-QuickORM>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 
@@ -608,7 +624,7 @@ L<https://github.com/exodist/DBIx-QuickORM>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 

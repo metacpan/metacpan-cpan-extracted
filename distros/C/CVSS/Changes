@@ -1,10 +1,14 @@
 Change history for CVSS
 
+1.15 2026-06-30
+    - Improved the calculation of the CVSS v4.0 base score
+    - Run "CVSS::v[234]->import()" in CVSS front-end class (@remay, giterlizzi/perl-CVSS#5)
+
 1.14 2025-07-05
-    - FIX "Possible precedence problem between ! and %s" in Perl 5.42
+    - FIX "Possible precedence problem between ! and %s" in Perl 5.42 (@remay, giterlizzi/perl-CVSS#5)
 
 1.13 2024-08-16
-    - Return undef in "to_vector_string" if any of "base" metrics is missing
+    - Return undef in "to_vector_string" if any of "base" metrics is missing (@eserte, giterlizzi/perl-CVSS#4)
 
 1.12 2024-08-07
     - Improved documentation

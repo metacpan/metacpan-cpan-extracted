@@ -5,7 +5,7 @@ from std/io import Path;
 from std/math import Math;
 from std/math/range import abbreviate;
 from std/proc import Proc, Env;
-from std/string import join, sprint, replace, substr, starts_with;
+from std/string import join, repeat, sprint, replace, substr, starts_with;
 from test/parser import parse;
 
 let String _RESET := "\x1b[0m";
@@ -159,6 +159,10 @@ function _parse_failed_tests ( Dict summary, verbose ) {
 	return abbreviate( failed_numbers );
 }
 
+function _verbose_indent ( Dict test_row ) {
+	return repeat( test_row.get( "depth", 0 ) + 1, "  " );
+}
+
 function _zuzu_command ( Dict opts ) {
 	if ( opts{zuzu} ≢ null and opts{zuzu} ≢ "" ) {
 		return "" _ opts{zuzu};
@@ -297,9 +301,13 @@ function __main__ ( argv ) {
 		totals{ass_todo} += summary{assertions}{todo};
 		totals{ass_skipped} += summary{assertions}{skipped};
 
+		let file_skipped := summary.get( "skip_all", false );
 		let file_ok := Proc.is_success( run )
-			and summary{top_level}{total} > 0
-			and summary{top_level}{failed} = 0;
+			and summary{top_level}{failed} = 0
+			and (
+				summary{top_level}{total} > 0
+				or file_skipped
+			);
 
 		if ( file_ok ) {
 			totals{files_passed}++;
@@ -309,7 +317,9 @@ function __main__ ( argv ) {
 			failures.set( file.to_String(), file_failed_tests );
 		}
 
-		let status_text := file_ok ? _paint( "PASS", _GREEN, colour_enabled )
+		let status_text := file_ok and file_skipped
+			? _paint( "SKIP", _YELLOW, colour_enabled )
+			: file_ok ? _paint( "PASS", _GREEN, colour_enabled )
 			: _paint( "FAIL", _RED, colour_enabled );
 		let counts_text := sprint(
 			`total:%3d  pass:%3d  fail:%3d  todo:%3d  skip:%3d`,
@@ -332,7 +342,9 @@ function __main__ ( argv ) {
 				let desc := test_row{description} ≡ ""
 					? `test ${test_row{number}}`
 					: test_row{description};
-				say( `  ${marker} [${test_row{bucket}}] ${desc}` );
+				say(
+					`${_verbose_indent( test_row )}${marker} [${test_row{bucket}}] ${desc}`
+				);
 			}
 		}
 	}

@@ -1915,6 +1915,7 @@ stdlib/tests/std/zuzuzoo/_verify.zzs
 stdlib/tests/std/zuzuzoo/_versions.zzs
 stdlib/tests/test/more.zzs
 stdlib/tests/test/parser.zzs
+stdlib/tests/test/zuzuprove.zzs
 t/00-compile.t
 t/01-zuzu-api.t
 t/02-marshal-cbor-adapter.t

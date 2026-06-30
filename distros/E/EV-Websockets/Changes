@@ -1,5 +1,9 @@
 Revision history for EV::Websockets
 
+0.09    2026-06-29
+        - Fixed permessage-deflate messages split across multiple on_message
+          callbacks; compressed frames are reassembled into one message
+
 0.08    2026-06-01
         - Fixed idle connections stalling the EV loop
         - Fixed crash when recycling TLS contexts

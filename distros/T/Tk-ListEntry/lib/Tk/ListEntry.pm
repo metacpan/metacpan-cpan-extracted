@@ -76,22 +76,23 @@ sub Populate {
 	$self->SUPER::Populate($args);
 
 	my $entry = $self->Entry->pack(-expand => 1, -fill => 'both');
-	my $list = $self->PopList(
+	my $list = $entry->PopList(
 		-nofocus => 1,
 		-confine => 1,
 		-selectcall => ['EntrySelect', $self],
 		-widget => $entry,
 	);
-	$list->bind('<Button-1>',[$self, 'ListClick', Ev('y')]);
 	$self->Advertise(Entry => $entry);
 	$self->Advertise(List => $list);
-	$list->Subwidget('List')->bind('<Button-1>', [$list, 'Select']);
+	my $l = $list->Subwidget('List');
+	$l->bind('<Enter>', [$self, 'grabOff']);
+	$l->bind('<Leave>', [$self, 'grabOn']);
 	$entry->bind('<Button-1>', [$list, 'popFlip']);
 	$entry->bind('<Down>', [$self, 'keyDown']);
 	$entry->bind('<End>', [$self, 'keyEnd']);
 	$entry->bind('<Home>', [$self, 'keyHome']);
 	$entry->bind('<Escape>', [$list, 'popDown']);
-	$entry->bind('<FocusOut>', [$list, 'popDown']);
+	$entry->bind('<FocusOut>', [$self, 'focusOut']);
 	$entry->bind('<KeyRelease>', [$self, 'filter']);
 	$entry->bind('<Return>', [$self, 'keyReturn']);
 	$entry->bind('<Up>', [$self, 'keyUp']);
@@ -108,6 +109,8 @@ sub Populate {
 		DEFAULT => [$entry],
 	);
 	$self->Delegates(
+		popDown	=> $list,
+		popUp => $list,
 		DEFAULT => $entry,
 	);
 }
@@ -135,6 +138,36 @@ sub filter {
 	my $e = $self->Subwidget('Entry');
 	$l->filter($e->get);
 }
+
+sub focusOut {
+	my $self = shift;
+	return if exists $self->{'inside'};
+	$self->popDown;
+}
+
+sub grabOff {
+	my $self = shift;
+	my $list = $self->Subwidget('List');
+	$list->parent->grabRelease;
+	$self->{'inside'} = 1;
+	if (ref $list->{'_BE_grabinfo'} eq 'CODE') {
+		$list->{'_BE_grabinfo'}->();
+		delete $list->{'_BE_grabinfo'};
+	}
+	$list->Subwidget('List')->focus
+}
+
+sub grabOn {
+	my $self = shift;
+	my $list = $self->Subwidget('List');
+	delete $self->{'inside'};
+	if ($list->ismapped) {
+		$list->{'_BE_grabinfo'} = $list->grabSave;
+		$list->parent->grabGlobal;
+	}
+	$self->Subwidget('Entry')->focus
+}
+
 
 sub keyDown {
 	my $self = shift;
@@ -197,22 +230,7 @@ sub keyUp {;
 	} 
 }
 
-#This method is a hack to make the ListEntry
-#also work with -motionselect disabled
-
-sub ListClick {
-	my ($self, $y) = @_;
-	my $list = $self->Subwidget('List')->Subwidget('List');
-	my $near = $list->nearest($y);
-	if ((defined $near) and (! $self->cget('-motionselect'))) {
-		$list->selectionSet($near);
-		my $call = $list->cget('-browsecmd');
-		$call->Call;
-	}
-}
-
 =item B<validate>
-
 
 Returns a true if the value of the entry is in the values list.
 

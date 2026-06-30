@@ -1498,6 +1498,112 @@ packet_type(obj)
     OUTPUT:
         RETVAL
 
+
+void
+packet__get_first_ede(obj)
+    Zonemaster::LDNS::Packet obj;
+    INIT:
+        ldns_edns_option_list *edns_opts;
+        ldns_edns_option *option;
+        size_t i;
+        size_t opts_count;
+        uint16_t ede_code = 0;
+        char *ede_text = NULL;
+        U8 gimme = GIMME_V;
+        SV *sv;
+
+    PPCODE:
+        if (gimme == G_VOID) {
+            XSRETURN_UNDEF;
+        }
+
+        edns_opts = ldns_pkt_edns_get_option_list(obj);
+        if (edns_opts == NULL) {
+            XSRETURN_UNDEF;
+        }
+
+        opts_count = ldns_edns_option_list_get_count(edns_opts);
+        for (i = 0; i < opts_count; i++) {
+            option = ldns_edns_option_list_get_option(edns_opts, i);
+            if (option != NULL &&
+                  ldns_edns_get_code(option) == LDNS_EDNS_EDE &&
+                  ldns_edns_ede_get_code(option, &ede_code) == LDNS_STATUS_OK) {
+                break;
+            }
+        }
+
+        if (i == opts_count) {
+            XSRETURN_UNDEF;
+        }
+
+        mXPUSHu(ede_code);
+
+        if (gimme == G_ARRAY &&
+              ldns_edns_ede_get_text(option, &ede_text) == LDNS_STATUS_OK &&
+              ede_text != NULL) {
+            sv = newSVpvn(ede_text, ldns_edns_get_size(option) - 2);
+            sv_utf8_decode(sv);
+            mXPUSHs(sv);
+            free(ede_text);
+        }
+
+void
+packet__set_first_ede(obj, ede, ...)
+    Zonemaster::LDNS::Packet obj;
+    U16 ede;
+    INIT:
+        ldns_edns_option_list *edns_opts;
+        ldns_edns_option *option;
+        ldns_edns_option *new_option;
+        size_t i;
+        size_t opts_count;
+        STRLEN len;
+        uint8_t *buf;
+        char *extra_text;
+
+    PPCODE:
+        edns_opts = ldns_pkt_edns_get_option_list(obj);
+        if (edns_opts == NULL) {
+            edns_opts = ldns_edns_option_list_new();
+            if (edns_opts == NULL) {
+                croak("Could not allocate EDNS option list");
+            }
+            ldns_pkt_set_edns_option_list(obj, edns_opts);
+        }
+
+        opts_count = ldns_edns_option_list_get_count(edns_opts);
+        for (i = 0; i < opts_count; i++) {
+            option = ldns_edns_option_list_get_option(edns_opts, i);
+            if (option != NULL && ldns_edns_get_code(option) == LDNS_EDNS_EDE) {
+                break;
+            }
+        }
+
+        if (items > 2 && SvOK(ST(2))) {
+            extra_text = SvPV(ST(2), len);
+            len += sizeof(uint16_t);
+            buf = malloc(len);
+            memcpy(buf + sizeof(uint16_t), extra_text, len - sizeof(uint16_t));
+        }
+        else {
+            len = sizeof(uint16_t);
+            buf = malloc(len);
+        }
+        *((uint16_t*)buf) = htons(ede);
+
+        new_option = ldns_edns_new(LDNS_EDNS_EDE, len, buf);
+
+        if (i < opts_count) {
+            option = ldns_edns_option_list_set_option(edns_opts, new_option, i);
+            if (option != NULL) {
+                ldns_edns_deep_free(option);
+            }
+        }
+        else {
+            ldns_edns_option_list_push(edns_opts, new_option);
+        }
+
+
 void
 packet_DESTROY(sv)
     SV *sv;

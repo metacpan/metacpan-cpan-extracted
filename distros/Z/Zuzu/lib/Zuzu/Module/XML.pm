@@ -2,7 +2,7 @@ package Zuzu::Module::XML;
 
 use utf8;
 
-our $VERSION = '0.007000';
+our $VERSION = '0.007001';
 
 use Scalar::Util qw( blessed );
 use Encode qw( decode encode FB_CROAK );

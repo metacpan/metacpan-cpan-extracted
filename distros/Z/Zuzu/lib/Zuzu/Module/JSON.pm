@@ -3,7 +3,7 @@ package Zuzu::Module::JSON;
 use strict;
 use utf8;
 
-our $VERSION = '0.007000';
+our $VERSION = '0.007001';
 
 use Scalar::Util qw( blessed );
 use Zuzu::Error;

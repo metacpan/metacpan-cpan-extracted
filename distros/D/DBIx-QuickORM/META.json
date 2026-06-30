@@ -1,7 +1,7 @@
 {
    "abstract" : "Composable ORM builder.",
    "author" : [
-      "Chad Granum <exodist@cpan.org>"
+      "Chad Granum <exodist7@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -97,7 +97,7 @@
          "url" : "https://github.com/exodist/DBIx-QuickORM/"
       }
    },
-   "version" : "0.000025",
+   "version" : "0.000026",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -24,7 +24,7 @@ if ($ENV{AUTOMATED_TESTING}) {
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Composable ORM builder.",
-  "AUTHOR" => "Chad Granum <exodist\@cpan.org>",
+  "AUTHOR" => "Chad Granum <exodist7\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000060",
     "ok" => 0
   },
-  "VERSION" => "0.000025",
+  "VERSION" => "0.000026",
   "test" => {
     "TESTS" => "t/*.t t/AI/*.t t/AI/handle/*.t t/handle/*.t"
   }

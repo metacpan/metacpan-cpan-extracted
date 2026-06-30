@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test2::Bundle::Numerical qw(:all);
+use Test2::Tools::Numerical qw(float_is_abs);
 use Test2::Tools::Class qw(can_ok);
 use File::Temp qw(tempfile tempdir);
 
@@ -26,7 +27,7 @@ can_ok('PDF::Make::Stamp', qw(text bates type format position margin_x margin_y 
     ok($wm, 'Text watermark created');
     is($wm->type, 'text', 'Type is text');
     is($wm->text_content, 'DRAFT', 'Text content correct');
-    is($wm->opacity, 0.3, 'Default opacity');
+    float_is_abs($wm->opacity, 0.3, 'Default opacity', 1e-12);
     is($wm->size, 72, 'Default size');
     is($wm->font, 'Helvetica-Bold', 'Default font');
 }
@@ -45,7 +46,18 @@ can_ok('PDF::Make::Stamp', qw(text bates type format position margin_x margin_y 
     ok($wm, 'Custom watermark created');
     is($wm->position, 1, 'Diagonal position (enum 1)');
     is($wm->opacity, 0.5, 'Custom opacity');
-    is_deeply($wm->color, [0.8, 0.2, 0.2], 'Custom color');
+    {
+        my $got = $wm->color;
+        is(ref $got, 'ARRAY', 'Custom color is an arrayref')
+            and is(scalar @$got, 3, 'Custom color has 3 components')
+            and do {
+                my @expected = (0.8, 0.2, 0.2);
+                for my $i (0 .. $#expected) {
+                    float_is_abs($got->[$i], $expected[$i],
+                                 "Custom color [$i]", 1e-12);
+                }
+            };
+    }
     is($wm->font, 'Times-Bold', 'Custom font');
     is($wm->size, 96, 'Custom size');
     is($wm->rotation, 45, 'Custom rotation');
@@ -67,7 +79,7 @@ can_ok('PDF::Make::Stamp', qw(text bates type format position margin_x margin_y 
     is($wm->width, 200, 'Image width');
     is($wm->height, 100, 'Image height');
     is($wm->position, 0, 'Center position (enum 0)');
-    is($wm->opacity, 0.2, 'Custom opacity');
+    float_is_abs($wm->opacity, 0.2, 'Custom opacity', 1e-12);
     is($wm->scale, 0.5, 'Custom scale');
 }
 

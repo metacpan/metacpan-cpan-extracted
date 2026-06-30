@@ -1,0 +1,78 @@
+{
+   "abstract" : "Interface to a map specified at runtime.",
+   "author" : [
+      "Gisbert W. Selke <gws@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Map-Tube-Generic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Map::Tube" : "4.09",
+            "Moo" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Map::Tube::Glasgow" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Kwalitee" : "0",
+            "Test::Map::Tube" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1",
+            "Test::Version" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0.82"
+         }
+      }
+   },
+   "provides" : {
+      "Map::Tube::Generic" : {
+         "file" : "lib/Map/Tube/Generic.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gwselke/Map-Tube-Generic/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gwselke/Map-Tube-Generic.git",
+         "web" : "https://github.com/gwselke/Map-Tube-Generic"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

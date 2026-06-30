@@ -2,7 +2,7 @@ package DBIx::QuickORM::SQLBuilder::SQLAbstract;
 use strict;
 use warnings;
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000026';
 
 use Carp qw/croak confess/;
 use Sub::Util qw/set_subname/;
@@ -106,7 +106,14 @@ BEGIN {
             if (blessed($source)) {
                 croak "'$source' does not implement the 'DBIx::QuickORM::Role::Source' role" unless $source->DOES('DBIx::QuickORM::Role::Source');
                 my $moniker = $source->source_db_moniker;
-                ($stmt, @bind) = $self->$meth($moniker, @args);
+                # Emit the FROM target verbatim. With quote_char set,
+                # SQL::Abstract would otherwise quote a plain-string moniker as
+                # a single identifier, corrupting literal-source subqueries
+                # ("( SELECT ... ) AS x") and join FROM fragments. A scalar ref
+                # is passed through as literal SQL; join monikers are already
+                # refs, so only wrap when one is not.
+                my $from = ref($moniker) ? $moniker : \$moniker;
+                ($stmt, @bind) = $self->$meth($from, @args);
             }
             else {
                 ($stmt, @bind) = $self->$meth($source, @args);
@@ -175,11 +182,17 @@ sub qorm_upsert {
     $returning = $1 if $statement =~ s/\s+(returning.*)$//is;
 
     my $pk_db = [ map { $source->field_db_name($_) } @$pk ];
-    my $conf = $params{dialect}->upsert_statement($pk_db);
+    my $dbh   = $params{dialect}->dbh;
+    my $conf  = $params{dialect}->upsert_statement($pk_db);
     my @inject;
     for my $field (sort keys %$changes) {
         my $db_field = $source->field_db_name($field);
-        push @inject => "$db_field = ?";
+        # Quote the identifier in the appended SET clause so a crafted or
+        # unknown column name cannot break out into raw SQL; this clause is
+        # built after SQL::Abstract runs, so its quote_char never reaches it.
+        # The bind spec keeps the raw db name because field_affinity/field_type
+        # look it up unquoted.
+        push @inject => $dbh->quote_identifier($db_field) . " = ?";
         push @$binds => {
             field => $db_field,
             value => $changes->{$field},
@@ -193,7 +206,7 @@ sub qorm_upsert {
     # assignment instead. The MySQL-family clause ('ON DUPLICATE KEY UPDATE')
     # needs VALUES() so MySQL still reports the row via last_insert_id.
     unless (@inject) {
-        my $col = $pk_db->[0];
+        my $col = $dbh->quote_identifier($pk_db->[0]);
         push @inject => $conf =~ m/ON DUPLICATE KEY UPDATE/i ? "$col = VALUES($col)" : "$col = $col";
     }
 
@@ -511,7 +524,7 @@ L<https://github.com/exodist/DBIx-QuickORM>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 
@@ -519,7 +532,7 @@ L<https://github.com/exodist/DBIx-QuickORM>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 

@@ -1,0 +1,132 @@
+from test/more import *;
+
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+if ( not __system__.get( "deny_js", true ) ) {
+	skip_all( "nested zuzu-js Proc.run does not pass child arguments" );
+}
+
+from std/io import Path;
+from std/proc import Env, Proc;
+
+function _zuzu_command () {
+	let configured := Env.get( "ZUZU", "" );
+	return configured if configured ne "";
+
+	let runtime := "" _ __system__.get( "runtime", "" );
+	return "zuzu-rust" if runtime eq "zuzu-rust";
+	return "zuzu.pl" if runtime eq "Zuzu::Runtime";
+	return "zuzu";
+}
+
+let module_root := new Path( "" _ __system__{inc}[0] );
+let stdlib_root := module_root.parent();
+let script := stdlib_root.child("scripts").child("zuzuprove");
+let zuzu := _zuzu_command();
+let temp := Path.tempdir();
+
+let pass_file := temp.child("pass.zzs");
+pass_file.spew_utf8("""
+from test/more import *;
+ok( true, "passes" );
+done_testing();
+""");
+
+let skip_file := temp.child("skip.zzs");
+skip_file.spew_utf8("""
+from test/more import *;
+skip_all( "planned skip" );
+""");
+
+let empty_file := temp.child("empty.zzs");
+empty_file.spew_utf8("");
+
+let nested_file := temp.child("nested.zzs");
+nested_file.spew_utf8("""
+from test/more import *;
+
+ok( true, "top" );
+subtest( "outer", function () {
+	ok( true, "inner" );
+	subtest( "nested", function () {
+		ok( true, "deep" );
+	} );
+} );
+done_testing();
+""");
+
+function _run_zuzuprove ( Array files, Array extra_args := [] ) {
+	let args := [
+		"-I" _ module_root.to_String(),
+		script.to_String(),
+		"--no-colour",
+		"--zuzu",
+		zuzu,
+		"-I" _ module_root.to_String(),
+	];
+	for ( let arg in extra_args ) {
+		args.push(arg);
+	}
+	for ( let file in files ) {
+		args.push(file.to_String());
+	}
+
+	return Proc.run(
+		zuzu,
+		args,
+		{
+			capture_stdout: true,
+			capture_stderr: true,
+			cwd: stdlib_root.to_String(),
+		},
+	);
+}
+
+let passing := _run_zuzuprove([ pass_file, skip_file ]);
+like(
+	passing{stdout},
+	/Result:\s+PASS/,
+	"zuzuprove accepts skip-all TAP as a successful file",
+);
+like(
+	passing{stdout},
+	/skip\s+total:\s*0\s+pass:\s*0\s+fail:\s*0\s+todo:\s*0\s+skip:\s*0\s+SKIP/,
+	"zuzuprove reports skip-all files as SKIP",
+);
+like(
+	passing{stdout},
+	/Files:\s+2 \(2 passed, 0 failed\)/,
+	"skip-all files count as passed files",
+);
+
+let failing := _run_zuzuprove([ empty_file ]);
+like(
+	failing{stdout},
+	/Result:\s+FAIL/,
+	"zuzuprove still rejects files with no TAP assertions or skip-all plan",
+);
+like(
+	failing{stdout},
+	/script failed before TAP assertions/,
+	"zuzuprove keeps the no-TAP failure diagnostic",
+);
+
+let nested := _run_zuzuprove([ nested_file ], [ "--verbose" ]);
+like(
+	nested{stdout},
+	/\n  . \[passed\] top\n/,
+	"zuzuprove verbose output keeps top-level assertions at base indent",
+);
+like(
+	nested{stdout},
+	/\n    . \[passed\] inner\n/,
+	"zuzuprove verbose output indents subtest assertions",
+);
+like(
+	nested{stdout},
+	/\n      . \[passed\] deep\n/,
+	"zuzuprove verbose output indents nested subtest assertions",
+);
+
+done_testing();

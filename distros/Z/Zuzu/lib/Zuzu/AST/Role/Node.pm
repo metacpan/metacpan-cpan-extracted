@@ -2,7 +2,7 @@ package Zuzu::AST::Role::Node;
 
 use utf8;
 
-our $VERSION = '0.007000';
+our $VERSION = '0.007001';
 
 use Moo::Role;
 

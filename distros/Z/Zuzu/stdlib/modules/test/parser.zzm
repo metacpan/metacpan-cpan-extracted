@@ -51,7 +51,8 @@ C<null> if no top-level plan is present.
 =item * Parsed test assertion rows.
 
 Each parsed assertion is appended to C<tests>, including whether it is
-at top level and its parsed number/description metadata.
+at top level, its subtest C<depth>, and its parsed number/description
+metadata.
 
 =back
 
@@ -100,6 +101,16 @@ function _strip_indent ( String line ) {
 	return rest;
 }
 
+function _indent_depth ( String line ) {
+	let depth := 0;
+	let rest := line;
+	while ( rest ~ /^    / ) {
+		depth++;
+		rest := substr( rest, 4 );
+	}
+	return depth;
+}
+
 function _bucket_for_assertion ( String line ) {
 	if ( line ~ /#\s*todo\b/i ) {
 		return "todo";
@@ -129,7 +140,12 @@ function _count_assertion ( Dict counts, String bucket ) {
 	}
 }
 
-function _parse_test_row ( String body, String bucket, Boolean is_top_level ) {
+function _parse_test_row (
+	String body,
+	String bucket,
+	Boolean is_top_level,
+	Number depth
+) {
 	let ok := body ~ /^ok\b/;
 	let rest := ok ? substr( body, 3 ): substr( body, 7 );
 	let number := null;
@@ -150,6 +166,7 @@ function _parse_test_row ( String body, String bucket, Boolean is_top_level ) {
 		description: description,
 		bucket: bucket,
 		top_level: is_top_level,
+		depth: depth,
 		raw: body,
 	};
 }
@@ -166,7 +183,8 @@ function parse_lines ( Array lines ) {
 			next;
 		}
 
-		let is_top_level := not ( line ~ /^    / );
+		let depth := _indent_depth( line );
+		let is_top_level := depth = 0;
 		let body := _strip_indent( line );
 
 		if ( body ~ /^\d+\.\.\d+\b/ ) {
@@ -186,7 +204,7 @@ function parse_lines ( Array lines ) {
 			if ( is_top_level ) {
 				_count_assertion( top_level, bucket );
 			}
-			tests.push( _parse_test_row( body, bucket, is_top_level ) );
+			tests.push( _parse_test_row( body, bucket, is_top_level, depth ) );
 		}
 	}
 

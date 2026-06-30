@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::ListEntry.
 
+0.06  Mon Jun 29 2026
+	- Use <Enter> and <Leave> events to relax the grabGlobal so the list is enabled to do it's work.
+	- Removed all hacks and workarounds to this effect.
+
 0.05  Mon Mar 17 2025
 	- Fixed bug created in last update (-nofocus was not set).
 

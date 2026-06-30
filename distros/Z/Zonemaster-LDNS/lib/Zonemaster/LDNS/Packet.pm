@@ -103,7 +103,28 @@ sub additional_rrlist {
     return Zonemaster::LDNS::RRList->new( \@records );
 }
 
+sub first_ede {
+    my ( $self, @args ) = @_;
+    if ( scalar @args > 0 ) {
+        my ( $ede, $text ) = @args;
+
+        # Encode string into UTF-8 byte sequence if not already done so
+        if ( defined $text and utf8::is_utf8( $text ) ) {
+            $text = Encode::encode( 'UTF-8', $text );
+            return $self->_set_first_ede( $ede, $text );
+        }
+        else {
+            return $self->_set_first_ede( @args );
+        }
+    }
+    else {
+        return $self->_get_first_ede();
+    }
+}
+
 1;
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -182,7 +203,7 @@ Gets and/or sets the EDNS0 UDP size.
 
 Gets and/or sets the EDNS0 Extended RCODE field.
 
-=item ends_z()
+=item edns_z()
 
 Gets and/or sets the EDNS0 Z bits.
 
@@ -309,5 +330,47 @@ Returns a Perl string holding the packet in wire format.
 =item type()
 
 Returns the ldns library's guess as to the content of the packet. One of the strings C<question>, C<referral>, C<answer>, C<nxdomain>, C<nodata> or C<unknown>.
+
+=item first_ede( [ $error_code, [ $extra_text ] ] )
+
+Gets (if called without any arguments) or sets (if called with one or two
+arguments) the first Extended DNS Error (EDE) in the packet.
+
+As a setter, always returns C<undef>.
+
+As a getter, the return value depends on the context.
+
+In scalar context, returns the value of the EDE INFO-CODE field, or C<undef>
+if the packet contains no EDE.
+
+In list context, returns:
+
+=over
+
+=item *
+
+an empty list if there is no EDE;
+
+=item *
+
+a list of one item, the EDE INFO-CODE, if there is an EDE without EXTRA-TEXT;
+
+=item *
+
+a list of two items, the EDE INFO-CODE and the EXTRA-TEXT, if there is an EDE with EXTRA-TEXT.
+
+=back
+
+This list can be unpacked into a pair of variables, like this:
+
+    my ( $code, $extra_text ) = $packet->first_ede();
+
+The EDE EXTRA-TEXT is specified in RFC 8914 to be UTF-8 encoded text. When
+retrieving the EXTRA-TEXT from a packet, UTF-8 valid text is returned as a
+Unicode character string, and UTF-8 invalid text, although forbidden, is
+returned as a (binary) byte string. Trailing NUL bytes are preserved both when
+setting the EXTRA-TEXT in a packet or when getting a packet’s EXTRA-TEXT.
+
+
 
 =back

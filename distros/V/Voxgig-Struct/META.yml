@@ -1,0 +1,23 @@
+---
+abstract: "Uniform JSON-shaped data structure manipulations Ã¢€” Perl port of @voxgig/struct"
+author:
+  - Voxgig
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Voxgig-Struct
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010'
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

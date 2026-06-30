@@ -3,6 +3,7 @@ use Test2::Require::AuthorTesting;
 
 use File::Find qw( find );
 use File::Spec;
+use File::Temp qw( tempdir );
 use IPC::Run qw( run );
 use TAP::Parser;
 
@@ -22,6 +23,13 @@ my @runtime_lib = (
 	File::Spec->catdir( $repo_root, 'stdlib', 'modules' ),
 );
 my $zuzu_bin = File::Spec->catfile( $repo_root, 'bin', 'zuzu.pl' );
+my $zuzu_runner_dir =
+	tempdir( 'zuzu-ztest-runner-XXXXXXXX', DIR => $repo_root, CLEANUP => 1 );
+my $zuzu_runner = _write_zuzu_runner(
+	File::Spec->catfile( $zuzu_runner_dir, 'zuzu-current-perl' ),
+	$^X,
+	$zuzu_bin,
+);
 my $fixture_dir = File::Spec->catdir( $repo_root, 'stdlib', 'test-fixtures' );
 
 my @zzs_files;
@@ -61,12 +69,16 @@ for my $ztest_path ( @zzs_files ) {
 		}
 		pass 'parsed ztest source';
 
-		my $run = _run_ztest_cli($ztest_path);
+		my $run = _run_ztest_cli( $ztest_path, $display_name );
 
 		if ( not $run->{ok} ) {
 			fail 'executed ztest script';
 			if ( defined $run->{error} and $run->{error} ne '' ) {
 				diag $run->{error};
+			}
+			if ( length $run->{stdout} ) {
+				diag "stdout from $display_name:";
+				diag $run->{stdout};
 			}
 			if ( length $run->{stderr} ) {
 				diag "stderr from $display_name:";
@@ -94,7 +106,7 @@ for my $ztest_path ( @zzs_files ) {
 }
 
 sub _run_ztest_cli {
-	my ( $ztest_path ) = @_;
+	my ( $ztest_path, $display_name ) = @_;
 
 	my @cmd = (
 		$^X,
@@ -105,8 +117,10 @@ sub _run_ztest_cli {
 	my $stdout = '';
 	my $stderr = '';
 	my $ran = eval {
-		local $ENV{ZUZU} = $zuzu_bin;
+		local $ENV{ZUZU} = $zuzu_runner;
 		local $ENV{FIXTURE_DIR} = $fixture_dir;
+		local $ENV{ZUZU_PROC_RUN_DIAG} =
+			$display_name eq 'stdlib/tests/test/zuzuprove.zzs' ? 1 : undef;
 		run( \@cmd, '<', \undef, '>', \$stdout, '2>', \$stderr );
 		1;
 	};
@@ -129,6 +143,30 @@ sub _run_ztest_cli {
 		error => $error,
 		status => $status,
 	};
+}
+
+sub _write_zuzu_runner {
+	my ( $path, $perl, $zuzu ) = @_;
+
+	open my $fh, '>:encoding(UTF-8)', $path
+		or die "Could not write $path: $!";
+	print {$fh} '#!' . $perl . "\n";
+	print {$fh} "use strict;\nuse warnings;\n";
+	print {$fh} 'exec { ' . _perl_literal($perl) . ' } '
+		. _perl_literal($perl) . ', '
+		. _perl_literal($zuzu) . ", \@ARGV;\n";
+	print {$fh} 'die "Could not exec ' . _perl_literal($zuzu) . ': $!";' . "\n";
+	close $fh or die "Could not close $path: $!";
+	chmod 0755, $path or die "Could not chmod $path: $!";
+
+	return $path;
+}
+
+sub _perl_literal {
+	my ( $value ) = @_;
+	$value =~ s/\\/\\\\/g;
+	$value =~ s/'/\\'/g;
+	return "'$value'";
 }
 
 sub _assert_valid_tap {

@@ -166,6 +166,24 @@ pdfmake_imgr_err_t pdfmake_decoded_image_resize(
     pdfmake_interp_mode_t mode,
     pdfmake_arena_t *arena);
 
+/* Portable strndup: POSIX 2008 / GNU only, not in C99/C11 and missing from
+ * Windows UCRT.  Returned buffer is malloc'd; free with plain free(). */
+static char *pdfmake_xs_strndup(const char *s, size_t n)
+{
+    char *p;
+    size_t i;
+
+    if (!s) return NULL;
+    /* Honour the n-byte cap even if s is shorter (don't read past the
+     * caller's buffer; mirrors POSIX strndup semantics). */
+    for (i = 0; i < n && s[i]; i++) ;
+    p = (char *)malloc(i + 1);
+    if (!p) return NULL;
+    memcpy(p, s, i);
+    p[i] = '\0';
+    return p;
+}
+
 /* Shared helper for render_page.xs */
 static void hv_to_render_opts(pTHX_ HV *hv, pdfmake_render_opts_t *opts)
 {

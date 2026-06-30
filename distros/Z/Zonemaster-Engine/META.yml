@@ -28,6 +28,7 @@ no_index:
     - share
     - t
 requires:
+  CBOR::XS: 0
   Class::Accessor: 0
   Clone: 0
   Email::Valid: 0
@@ -45,10 +46,10 @@ requires:
   Readonly: 0
   Text::CSV: 0
   YAML::XS: 0
-  Zonemaster::LDNS: 5.000002
+  Zonemaster::LDNS: 5.001
   perl: 5.16.0
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '8.001001'
+version: '9.000000'

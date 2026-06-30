@@ -1099,15 +1099,15 @@ The source code repository for DBIx::QuickORM can be found at
 
 # MAINTAINERS
 
-- Chad Granum <exodist@cpan.org>
+- Chad Granum <exodist7@gmail.com>
 
 # AUTHORS
 
-- Chad Granum <exodist@cpan.org>
+- Chad Granum <exodist7@gmail.com>
 
 # COPYRIGHT
 
-Copyright Chad Granum <exodist@cpan.org>.
+Copyright Chad Granum <exodist7@gmail.com>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

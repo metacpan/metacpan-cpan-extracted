@@ -55,8 +55,8 @@ subtest on_clause_sides => sub {
     my $join    = DBIx::QuickORM::Join->new(schema => $schema, primary_source => $users)->left_join($link);
     my $moniker = ${$join->source_db_moniker};
 
-    like($moniker, qr/\bON \(b\.user_id = a\.id\)/, "ON clause pairs the joined alias with the other columns");
-    unlike($moniker, qr/b\.id|a\.user_id/, "no swapped alias/column pairings appear");
+    like($moniker, qr/\bON \("b"\."user_id" = "a"\."id"\)/, "ON clause pairs the joined alias with the other columns");
+    unlike($moniker, qr/"b"\."id"|"a"\."user_id"/, "no swapped alias/column pairings appear");
 };
 
 subtest runtime_sqlite => sub {

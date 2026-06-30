@@ -44,9 +44,9 @@ my $join = DBIx::QuickORM::Join->new(schema => $schema, primary_source => $foo)-
 
 subtest fields_to_fetch => sub {
     my $fields = join(', ' => map { $$_ } @{$join->fields_to_fetch});
-    like($fields, qr/\ba\.foo_id AS "a\.foo_id"/, "foo PK fetched by database name under its alias");
-    like($fields, qr/\ba\.name AS "a\.name"/,     "foo name fetched by database name under its alias");
-    like($fields, qr/\bb\.bar_id\b/,              "bar PK fetched by database name under its alias");
+    like($fields, qr/"a"\."foo_id" AS "a\.foo_id"/, "foo PK fetched by database name under its alias");
+    like($fields, qr/"a"\."name" AS "a\.name"/,     "foo name fetched by database name under its alias");
+    like($fields, qr/"b"\."bar_id" AS "b\.bar_id"/, "bar PK fetched by database name under its alias");
     unlike($fields, qr/foo_pid|foo_name|bar_pid|bar_foo/, "no ORM names appear in the fetch list");
 };
 

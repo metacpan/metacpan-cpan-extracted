@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000026';
 
 use Carp qw/confess croak carp/;
 use Sub::Util qw/set_subname/;
@@ -1155,6 +1155,14 @@ row that uses a new connection.
 Can be used to get the fields of a handle, or to create a clone of the
 handle that uses the new fields.
 
+Each plain-string field is a database column and is quoted as an identifier. To
+select an expression or literal SQL (e.g. C<COUNT(*)>), pass it as a scalar
+reference (C<< \'COUNT(*)' >>) or a literal-with-binds arrayref.
+
+B<Changed in 0.000026:> plain-string fields are now quoted. Previously a bare
+string was emitted verbatim and could carry raw SQL (and SQL injection); it is
+now treated as one quoted column name.
+
 =item $omit = $h->omit()
 
 =item $new_h = $h->omit(\@omit)
@@ -1196,6 +1204,16 @@ Get the pending operation target, or create a clone with a new target set.
 
 Can be used to get the order_by of a handle, or to create a clone of the
 handle that uses the new order_by.
+
+Each plain-string entry is a database column (optionally C<alias.column>) and
+is quoted as an identifier. To order by an expression or with an explicit
+direction, use the hash form (C<< {-desc => 'name'} >>) or pass raw SQL as a
+scalar reference (C<< \'name DESC' >>).
+
+B<Changed in 0.000026:> plain-string entries are now quoted. Previously a bare
+string was emitted verbatim, so C<'name DESC'> or C<'COUNT(*)'> ran as raw SQL
+-- which also allowed SQL injection (CVE-2026-13766). Such a bare string is now
+treated as one (nonexistent) quoted column.
 
 =back
 
@@ -2883,11 +2901,14 @@ sub _count_expression {
 
     my $source = $self->{+SOURCE};
 
+    my $dbh = $self->{+CONNECTION}->dbh;
+
     my ($pk_source, $prefix);
     if ($source->isa('DBIx::QuickORM::Join')) {
         my $as = $source->order->[0];
         $pk_source = $source->components->{$as}->{table};
-        $prefix    = "$as.";
+        # Quote the alias so it matches the alias the join's FROM clause emits.
+        $prefix    = $dbh->quote_identifier($as) . ".";
     }
     elsif ($self->{+DISTINCT}) {
         $pk_source = $source;
@@ -2901,7 +2922,9 @@ sub _count_expression {
     croak "Cannot count distinct rows on a source without a primary key"        unless $pk && @$pk;
     croak "Cannot count distinct rows on a source with a compound primary key"  if @$pk > 1;
 
-    my $db = $pk_source->field_db_name($pk->[0]);
+    # Quote the column so a reserved-word or mixed-case primary key still
+    # produces valid SQL.
+    my $db = $dbh->quote_identifier($pk_source->field_db_name($pk->[0]));
     return "COUNT(DISTINCT $prefix$db)";
 }
 
@@ -2946,7 +2969,7 @@ L<https://github.com/exodist/DBIx-QuickORM>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 
@@ -2954,7 +2977,7 @@ L<https://github.com/exodist/DBIx-QuickORM>.
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
 
 =back
 

@@ -71,7 +71,7 @@ sub run {
         say <<"VERSION";
 $progname version $VERSION
 
-Copyright 2023-2024, Giuseppe Di Terlizzi <gdt\@cpan.org>
+Copyright 2023-2025, Giuseppe Di Terlizzi <gdt\@cpan.org>
 
 This program is part of the "CVSS" distribution and is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
@@ -200,7 +200,7 @@ L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2023-2024 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2023-2026 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -19,7 +19,7 @@ use File::FStore::File;
 
 use parent 'File::FStore::Base';
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 
 sub link_in {
@@ -61,7 +61,7 @@ sub set {
         foreach my $key (keys %{$ddata}) {
             my $v = $ddata->{$key} // next;
             $dd->{$key} //= $v;
-            croak 'Data missmatch domain '.$cdomain.' key '.$key if $dd->{$key} ne $v;
+            croak 'Data mismatch domain '.$cdomain.' key '.$key if $dd->{$key} ne $v;
         }
     }
 }
@@ -98,7 +98,7 @@ sub done {
         foreach my $digest (@{$self->_used_digests}) {
             if (defined(my $v = $inode->digest($digest, lifecycle => $lifecycle, default => undef))) {
                 $data{digests}{$digest} //= $v;
-                croak 'Digest missmatch for '.$digest if $data{digests}{$digest} ne $v;
+                croak 'Digest mismatch for '.$digest if $data{digests}{$digest} ne $v;
             }
         }
     }
@@ -181,9 +181,7 @@ sub DESTROY {
 
 sub _new {
     my ($pkg, %opts) = @_;
-    my $self = bless \%opts, $pkg;
-
-    croak 'No store is given' unless defined $self->{store};
+    my $self = $pkg->SUPER::_new(%opts);
 
     $self->store->_init_store_style;
     $self->reset;
@@ -253,7 +251,7 @@ File::FStore::Adder - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -326,7 +324,7 @@ This method works the same way as said method including safety checks.
     $adder->done;
 
 Marks the adder as done with all changes, but not yet inserted.
-This method C<die>s on error or on state missmatch.
+This method C<die>s on error or on state mismatch.
 
 B<Note:>
 You normally don't need to call this method manually.
@@ -366,7 +364,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

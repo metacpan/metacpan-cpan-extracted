@@ -1,0 +1,34 @@
+---
+abstract: 'Interface to a map specified at runtime.'
+author:
+  - 'Gisbert W. Selke <gws@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.82'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Map-Tube-Generic
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Map::Tube::Generic:
+    file: lib/Map/Tube/Generic.pm
+    version: v0.1.0
+requires:
+  Map::Tube: '4.09'
+  Moo: '0'
+  namespace::clean: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/gwselke/Map-Tube-Generic/issues
+  repository: https://github.com/gwselke/Map-Tube-Generic.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,0 +1,8 @@
+Makefile.PL
+README.md
+LICENSE
+lib/AI/Agent/Skills/SiteKit.pm
+t/sitekit.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

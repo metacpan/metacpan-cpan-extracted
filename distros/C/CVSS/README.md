@@ -2,6 +2,19 @@
 
 # CVSS - Perl extension for CVSS (Common Vulnerability Scoring System) 2.0/3.x/4.0
 
+This module calculates the CVSS (Common Vulnerability Scoring System) scores
+(basic, temporal, and environmental), convert the "vector string" and returns
+the `CVSS` object in JSON or XML.
+
+The Common Vulnerability Scoring System (CVSS) provides a way to capture the
+principal characteristics of a vulnerability and produce a numerical score
+reflecting its severity. The numerical score can then be translated into a
+qualitative representation (such as low, medium, high, and critical) to help
+organizations properly assess and prioritize their vulnerability management
+processes.
+
+https://www.first.org/cvss/
+
 ## Synopsis
 
 ```.pl
@@ -171,6 +184,12 @@ Using `App::cpanminus`:
     cpanm CVSS
 
 
+## Acknowledgements
+
+This module is listed in the [CVSS v4.0 FAQ](https://www.first.org/cvss/v4.0/faq#List-of-Calculator-Libraries)
+by FIRST.Org as a community CVSS calculator library.
+
+
 ## Documentation
 
 - `perldoc CVSS`
@@ -181,7 +200,8 @@ Using `App::cpanminus`:
 - [FIRST] CVSS v3.0 Specification (https://www.first.org/cvss/v3.0/specification-document)
 - [FIRST] CVSS v2.0 Complete Guide (https://www.first.org/cvss/v2/guide)
 
+
 ## Copyright
 
-- Copyright 2007-2024 © FIRST.org - Forum of Incident Response and Security Teams, Inc.
-- Copyright 2023-2024 © Giuseppe Di Terlizzi
+- Copyright 2007-2026 © FIRST.org - Forum of Incident Response and Security Teams, Inc.
+- Copyright 2023-2026 © Giuseppe Di Terlizzi (GDT)

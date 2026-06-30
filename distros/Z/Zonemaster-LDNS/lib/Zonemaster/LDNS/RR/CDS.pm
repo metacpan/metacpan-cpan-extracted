@@ -19,6 +19,4 @@ A subclass of L<Zonemaster::LDNS::RR::DS>, so it has all the methods of that cla
 
 No other specific methods implemented.
 
-Note that the inherited parent methods L<Zonemaster::LDNS::RR::DS/verify($other)> will always return false, as LDNS currently only supports the DS and DNSKEY RR types for this method.
-
 =cut

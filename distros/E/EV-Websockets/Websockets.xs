@@ -66,6 +66,8 @@ struct ev_ws_ctx_s {
     struct ev_loop* loop;
     struct lws_context* lws_ctx;
     ev_ws_conn_t* connections;
+    ev_ws_conn_t* flush_head; /* conns with a buffered, fully-received message
+                                 awaiting delivery once the service call drains */
     ev_ws_fd_t** fd_table;
     int fd_table_size;
     ev_timer timer;
@@ -97,11 +99,14 @@ struct ev_ws_conn_s {
     /* Response Headers (client: response headers; server: request headers) */
     HV* response_headers;
 
-    /* Receive buffer for fragmented messages */
+    /* Receive buffer for reassembling a message across callbacks */
     char* recv_buf;
     size_t recv_len;
     size_t recv_alloc;
     int recv_is_binary;
+    int recv_complete;       /* buffered message is fully received (final frame) */
+    ev_ws_conn_t* flush_next; /* link in ctx->flush_head while pending delivery */
+    int on_flush;            /* already queued on ctx->flush_head (dedup) */
     size_t max_message_size;
 
     /* Send queue */
@@ -264,6 +269,8 @@ static void schedule_timeout(ev_ws_ctx_t* ctx) {
     ev_timer_start(ctx->loop, &ctx->timer);
 }
 
+static void flush_recv_messages(ev_ws_ctx_t* ctx);
+
 static void do_lws_service(ev_ws_ctx_t* ctx) {
     if (ctx && ctx->magic == EV_WS_CTX_MAGIC && ctx->lws_ctx) {
         int alive = 1;
@@ -281,6 +288,8 @@ static void do_lws_service(ev_ws_ctx_t* ctx) {
            NULL) is invalid since lws 3.2 and never drains buflists. Per-fd I/O
            is driven by io_cb via lws_service_fd(&pollfd). */
         lws_service_tsi(ctx->lws_ctx, -1, 0);
+        if (alive)
+            flush_recv_messages(ctx); /* deliver messages reassembled above */
         if (alive) {
             ctx->alive_flag = prev_flag;
             schedule_timeout(ctx);
@@ -385,6 +394,34 @@ static void emit_message(ev_ws_conn_t* conn, const char* data, size_t len, int i
     XPUSHs(sv_2mortal(newSViv(is_binary)));
     XPUSHs(sv_2mortal(newSViv(is_final)));
     EMIT_END(conn, "message handler");
+}
+
+/* Deliver buffered, fully-received messages once an lws service call has
+   drained all currently-available input. The receive path reassembles a
+   message across callbacks (necessary because permessage-deflate inflates one
+   frame into several callbacks, each reporting lws_is_final_fragment() == 1)
+   and queues the connection here; we emit only complete messages. The ref taken
+   when queuing keeps each conn alive across its callback, so it is safe to
+   touch conn after emit_message returns. */
+static void flush_recv_messages(ev_ws_ctx_t* ctx) {
+    ev_ws_conn_t* conn = ctx->flush_head;
+    ctx->flush_head = NULL;
+    while (conn) {
+        ev_ws_conn_t* next = conn->flush_next;
+        conn->flush_next = NULL;
+        conn->on_flush = 0;
+        if (conn->magic == EV_WS_CONN_MAGIC && conn->recv_complete) {
+            /* recv_complete (not recv_len>0): a zero-length message is a valid
+               complete message and must still be delivered. */
+            emit_message(conn, conn->recv_buf ? conn->recv_buf : "", conn->recv_len, conn->recv_is_binary, 1);
+            if (conn->magic == EV_WS_CONN_MAGIC) {
+                conn->recv_len = 0;
+                conn->recv_complete = 0;
+            }
+        }
+        conn_unref(conn); /* release the flush-list ref */
+        conn = next;
+    }
 }
 
 static void emit_close(ev_ws_conn_t* conn, int code, const char* reason) {
@@ -576,6 +613,8 @@ static void io_cb(EV_P_ ev_io* w, int revents) {
         ctx->alive_flag = &alive;
         ctx_ref(ctx);
         lws_service_fd(ctx->lws_ctx, &pollfd);
+        if (alive)
+            flush_recv_messages(ctx); /* deliver messages reassembled above */
         if (alive) {
             ctx->alive_flag = prev_flag;
             schedule_timeout(ctx);
@@ -897,7 +936,19 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                 DEBUG_LOG("Received data (reason %d): len=%zu final=%d binary=%d", (int)reason, len, is_final, is_binary);
 
                 if (lws_is_first_fragment(wsi)) {
+                    /* A new message begins. If a completed message is still
+                       buffered, deliver it first: with permessage-deflate lws
+                       inflates one frame into several callbacks each flagged
+                       "final", so we must reassemble across callbacks rather
+                       than treat every final callback as a whole message. */
+                    if (conn->recv_complete) {
+                        conn_ref(conn);
+                        emit_message(conn, conn->recv_buf ? conn->recv_buf : "", conn->recv_len, conn->recv_is_binary, 1);
+                        if (conn->magic != EV_WS_CONN_MAGIC) { conn_unref(conn); break; }
+                        conn_unref(conn);
+                    }
                     conn->recv_len = 0;
+                    conn->recv_complete = 0;
                     conn->recv_is_binary = is_binary;
                 }
 
@@ -910,6 +961,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                         conn->recv_buf = NULL;
                         conn->recv_len = 0;
                         conn->recv_alloc = 0;
+                        conn->recv_complete = 0;
                     }
                     conn_unref(conn);
                     return -1;
@@ -927,13 +979,20 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                 if (len) /* guard: recv_buf may still be NULL for an empty frame */
                     memcpy(conn->recv_buf + conn->recv_len, in, len);
                 conn->recv_len += len;
+                conn->recv_complete = is_final;
 
-                if (is_final) {
+                /* Queue the connection so its completed message is delivered
+                   once the current lws service call drains all available input
+                   (see flush_recv_messages). is_final alone is unreliable under
+                   permessage-deflate, so we defer delivery: a fully-received
+                   message (recv_complete) is emitted either in the first-fragment
+                   branch above when the next message starts, or at flush time.
+                   The flush-list ref keeps conn alive until then. */
+                if (!conn->on_flush) {
                     conn_ref(conn);
-                    emit_message(conn, conn->recv_buf, conn->recv_len, conn->recv_is_binary, 1);
-                    if (conn->magic == EV_WS_CONN_MAGIC)
-                        conn->recv_len = 0;
-                    conn_unref(conn);
+                    conn->flush_next = conn->ctx->flush_head;
+                    conn->ctx->flush_head = conn;
+                    conn->on_flush = 1;
                 }
             }
             break;
@@ -1028,7 +1087,17 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                 conn->wsi = NULL;
                 unlink_conn(conn);
                 conn_ref(conn);
-                emit_close(conn, close_code, close_reason);
+                /* Deliver a fully-received-but-not-yet-flushed message before
+                   on_close, so on_message precedes on_close even when the data
+                   and the close arrive in the same lws service pass (delivery is
+                   otherwise deferred to flush_recv_messages, which runs after the
+                   service returns -- i.e. after this CLOSED callback). */
+                if (conn->recv_complete) {
+                    emit_message(conn, conn->recv_buf ? conn->recv_buf : "", conn->recv_len, conn->recv_is_binary, 1);
+                    if (conn->magic == EV_WS_CONN_MAGIC) { conn->recv_len = 0; conn->recv_complete = 0; }
+                }
+                if (conn->magic == EV_WS_CONN_MAGIC)
+                    emit_close(conn, close_code, close_reason);
                 conn_unref(conn);
                 conn_unref(conn); /* drop wsi ref */
             }
@@ -1220,6 +1289,17 @@ CODE:
     ev_timer_stop(self->loop, &self->timer);
 
     free_all_fd_watchers(self);
+
+    /* Release connections still queued for message delivery (no delivery during
+       teardown); each holds a flush-list ref. They remain in self->connections
+       and are torn down by the loop below. */
+    while (self->flush_head) {
+        conn = self->flush_head;
+        self->flush_head = conn->flush_next;
+        conn->on_flush = 0;
+        conn->flush_next = NULL;
+        conn_unref(conn); /* release the flush-list ref */
+    }
 
     /* Close all connections */
     for (conn = self->connections; conn != NULL; conn = next) {
@@ -1700,6 +1780,8 @@ CODE:
         ctx_ref(self);
         self->alive_flag = &alive;
         lws_service_tsi(self->lws_ctx, -1, 0);
+        if (alive)
+            flush_recv_messages(self); /* deliver any reassembled message */
         if (alive) {
             self->alive_flag = prev_flag;
             schedule_timeout(self);

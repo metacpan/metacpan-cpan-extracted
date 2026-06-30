@@ -1,3 +1,14 @@
+Mon Jun 29 08:27:34 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.9.3]:
+	* VERSION: bump
+	* lib/CPAN/Maker.pm.in
+	(main): return, don't exit here, exit using the modulino pattern
+	(_generate_man_links)
+	- fixed incorrect source
+	* release-notes.md: updated
+	* release-notes/release-notes-1.9.3.md: new
+
 Tue Jun 23 14:51:07 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.9.2]:

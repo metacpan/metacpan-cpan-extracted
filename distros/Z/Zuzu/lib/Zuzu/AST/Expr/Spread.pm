@@ -2,7 +2,7 @@ package Zuzu::AST::Expr::Spread;
 
 use utf8;
 
-our $VERSION = '0.007000';
+our $VERSION = '0.007001';
 
 use Moo;
 use Zuzu::Error;

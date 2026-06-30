@@ -7,7 +7,7 @@ use Log::Log4perl::Level;
 
 use parent qw(Exporter);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 use Readonly;
 

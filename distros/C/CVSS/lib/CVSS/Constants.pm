@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 $VERSION =~ tr/_//d;    ## no critic
 
 
@@ -22,7 +22,6 @@ use constant CVSS2_NOT_DEFINED_VALUE => 'ND';
 
 use constant CVSS2_VECTOR_STRING_REGEX =>
     qr{^((AV:[NAL]|AC:[LMH]|Au:[MSN]|[CIA]:[NPC]|E:(U|POC|F|H|ND)|RL:(OF|TF|W|U|ND)|RC:(UC|UR|C|ND)|CDP:(N|L|LM|MH|H|ND)|TD:(N|L|M|H|ND)|[CIA]R:(L|M|H|ND))/)*(AV:[NAL]|AC:[LMH]|Au:[MSN]|[CIA]:[NPC]|E:(U|POC|F|H|ND)|RL:(OF|TF|W|U|ND)|RC:(UC|UR|C|ND)|CDP:(N|L|LM|MH|H|ND)|TD:(N|L|M|H|ND)|[CIA]R:(L|M|H|ND))$};
-
 
 use constant CVSS2_METRIC_GROUPS =>
     {base => [qw(AV AC Au C I A)], temporal => [qw(E RL RC)], environmental => [qw(CDP TD CR IR AR)]};
@@ -149,7 +148,6 @@ use constant CVSS3_SCORE_SEVERITY => {
     HIGH     => {min => 7.0, max => 8.9},
     CRITICAL => {min => 9.0, max => 10.0}
 };
-
 
 use constant CVSS3_NOT_DEFINED_VALUE => 'X';
 
@@ -874,7 +872,7 @@ L<https://github.com/giterlizzi/perl-CVSS>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023-2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2023-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -10,13 +10,13 @@ use Exporter qw(import);
 
 use constant DEBUG => $ENV{CVSS_DEBUG};
 
-use CVSS::v2 ();
-use CVSS::v3 ();
-use CVSS::v4 ();
+use CVSS::v2;
+use CVSS::v3;
+use CVSS::v4;
 
 our @EXPORT = qw(encode_cvss decode_cvss cvss_to_xml);
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 $VERSION =~ tr/_//d;    ## no critic
 
 my $CVSS_CLASSES = {'2.0' => 'CVSS::v2', '3.0' => 'CVSS::v3', '3.1' => 'CVSS::v3', '4.0' => 'CVSS::v4'};
@@ -239,6 +239,15 @@ L<CVSS::Base>, L<CVSS::v2>, L<CVSS::v3>, L<CVSS::v4>
 =back
 
 
+=head1 ACKNOWLEDGEMENTS
+
+This module is listed in the CVSS v4.0 Frequently Asked Questions by FIRST.Org
+(Forum of Incident Response and Security Teams) as a community CVSS calculator
+library.
+
+L<https://www.first.org/cvss/v4.0/faq#List-of-Calculator-Libraries>
+
+
 =head1 SUPPORT
 
 =head2 Bugs / Feature Requests
@@ -268,7 +277,7 @@ L<https://github.com/giterlizzi/perl-CVSS>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023-2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2023-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

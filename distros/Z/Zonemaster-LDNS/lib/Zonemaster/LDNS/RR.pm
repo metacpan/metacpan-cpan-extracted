@@ -116,6 +116,8 @@ sub to_string {
 
 1;
 
+=encoding UTF-8
+
 =head1 NAME
 
 Zonemaster::LDNS::RR - common baseclass for all classes representing resource records.

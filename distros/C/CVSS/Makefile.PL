@@ -25,7 +25,7 @@ WriteMakefile(
                 web  => 'https://github.com/giterlizzi/perl-CVSS'
             },
         },
-        x_purl => 'pkg:cpan/GDT/CVSS'
+        x_purl => 'pkg:cpan/CVSS'
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
     clean => {FILES    => 'CVSS-*'},

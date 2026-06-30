@@ -13,7 +13,7 @@
     ( ( ( (child_is_magic) || (parent_is_magic) )                                               \
         ? (((tmpsv) = amagic_call((a)[(child)], (a)[(parent)], is_min & 2 ? sgt_amg : gt_amg, 0)) && SvTRUE((tmpsv)))  \
         : ( ((is_min & 2) ? Perl_sv_cmp(aTHX_ (a)[(child)], a[(parent)]) \
-                          : Perl_do_ncmp(aTHX_ (a)[(child)], a[(parent)])) > 0) )\
+                          : my_Perl_do_ncmp(aTHX_ (a)[(child)], a[(parent)])) > 0) )\
       ? !(is_min & 1) : (is_min & 1) )
 
 #define FORCE_SCALAR(fakeop)                    \
@@ -25,7 +25,9 @@ STMT_START {                                    \
 } STMT_END
 
 
-#ifndef Perl_do_ncmp
+#ifdef Perl_do_ncmp
+#define my_Perl_do_ncmp Perl_do_ncmp
+#else
 /* compare left and right SVs. Returns:
  * -1: <
  *  0: ==
@@ -33,7 +35,7 @@ STMT_START {                                    \
  *  2: left or right was a NaN
  */
 I32
-Perl_do_ncmp(pTHX_ SV* const left, SV * const right)
+my_Perl_do_ncmp(pTHX_ SV* const left, SV * const right)
 {
     PERL_ARGS_ASSERT_DO_NCMP;
 #ifdef PERL_PRESERVE_IVUV

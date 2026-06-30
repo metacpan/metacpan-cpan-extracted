@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2026 Philipp Schafft
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+# ABSTRACT: Example demonstrating store creation on the command line
+
+use strict;
+use warnings;
+
+use File::FStore;
+
+my ($path, @files) = @ARGV;
+
+die 'No valid path given' unless defined($path) && length($path);
+
+my File::FStore $store = File::FStore->new(path => $path);
+
+my File::FStore::Adder $adder = $store->new_adder;
+
+foreach my $file (@files) {
+    $adder->link_in($file);
+    $adder->insert;
+    $adder->reset;
+}
+
+$store->close;
+
+#ll

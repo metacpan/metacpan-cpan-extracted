@@ -37,6 +37,12 @@ is( parsed{assertions}{todo}, 3, "assertion todo count" );
 is( parsed{assertions}{skipped}, 2, "assertion skip count" );
 is( parsed{assertions}{total}, 11, "assertion total count" );
 
+is( parsed{tests}[0]{depth}, 0, "top-level assertions have depth zero" );
+is( parsed{tests}[4]{depth}, 1, "subtest assertions have depth one" );
+is( parsed{tests}[5]{depth}, 2, "nested subtest assertions have depth two" );
+is( parsed{tests}[6]{depth}, 2, "nested subtest depth is retained" );
+is( parsed{tests}[7]{depth}, 1, "subtest summary assertion returns to depth one" );
+
 is( parsed{planned}, 5, "captures top-level plan" );
 is( parsed{plan_directive}, "", "plan without directive has empty directive" );
 is( parsed{skip_all}, false, "normal plan is not skip-all" );

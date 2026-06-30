@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
     
 # licensed under Artistic License 2.0 (see LICENSE file)
     
@@ -20,9 +20,9 @@ use Scalar::Util qw(weaken);
 
 use File::FStore::File;
 
-use parent 'Data::Identifier::Interface::Known';
+use parent qw(Data::Identifier::Interface::Known Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects);
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 use constant {
     DEFAULT_LINK_STYLE  => '1-level',
@@ -44,6 +44,17 @@ our %_valid_link_styles = map {$_ => 1} qw(none 1-level 2-level);
 our %_valid_store_styles = map {$_ => 1} qw(1-level-contentise 2-level-contentise);
 
 my %_flat_settings = map {$_ => $_} qw(link_style store_style);
+
+our %_ni_hashes = (
+    'sha-2-256' => 'sha-256',
+    'sha-2-384' => 'sha-384',
+    'sha-2-512' => 'sha-512',
+    'sha-3-224' => 'sha3-224',
+    'sha-3-256' => 'sha3-256',
+    'sha-3-384' => 'sha3-384',
+    'sha-3-512' => 'sha3-512',
+);
+my %_ni_hashes_reverse = map {$_ni_hashes{$_} => $_} keys %_ni_hashes;
 
 
 sub create {
@@ -107,9 +118,11 @@ sub new {
     my $path = delete $opts{path} // croak 'No path given';
     my $weak = delete $opts{weak};
     my @used_digests;
+    my @used_digests_ni;
     my $self = bless {
         path => $path,
         used_digests => \@used_digests,
+        used_digests_ni => \@used_digests_ni,
         transaction_count => 0,
         link_style => DEFAULT_LINK_STYLE,
         store_style => DEFAULT_STORE_STYLE,
@@ -118,9 +131,7 @@ sub new {
     foreach my $key (keys %_types) {
         my $v = delete $opts{$key};
         next unless defined $v;
-        croak 'Invalid type for key: '.$key unless eval {$v->isa($_types{$key})};
-        $self->{$key} = $v;
-        weaken($self->{$key}) if $weak;
+        $self->so_attach($key => $v, weak => $weak);
     }
 
     if (defined(my $link_style = delete $opts{link_style})) {
@@ -137,13 +148,23 @@ sub new {
 
     croak 'Stray options passed' if scalar keys %opts;
 
-    opendir(my $dir, $self->_directory(v2 => 'by')) or croak $!;
-    while (defined(my $ent = readdir($dir))) {
-        next if $ent =~ /^\./;
-        croak 'Invalid store, unsupported/invalid digest used: '.$ent unless $_valid_digests{$ent};
-        push(@used_digests, $ent);
+    {
+        opendir(my $dir, $self->_directory(v2 => 'by')) or croak $!;
+        while (defined(my $ent = readdir($dir))) {
+            next if $ent =~ /^\./;
+            croak 'Invalid store, unsupported/invalid digest used: '.$ent unless $_valid_digests{$ent};
+            push(@used_digests, $ent);
+        }
+        closedir($dir);
     }
-    closedir($dir);
+
+    if (opendir(my $dir, $self->_directory(v2 => 'ni'))) {
+        while (defined(my $ent = readdir($dir))) {
+            next if $ent =~ /^\./;
+            push(@used_digests_ni, $_ni_hashes_reverse{$ent} // next);
+        }
+        closedir($dir);
+    }
 
     $self->{dbh} = DBI->connect('dbi:SQLite:dbname='.$self->_file(v2 => store => 'db.sqlite'), undef, undef, { RaiseError => 1, PrintError => undef });
 
@@ -359,6 +380,29 @@ sub scrub {
             }
             closedir($algodir);
         });
+
+    {
+        if (opendir(my $algodir, $self->_directory('v2' => 'ni'))) {
+            $self->in_transaction(ro => sub {
+                    while (defined(my $algoent = readdir($algodir))) {
+                        my $dirname;
+
+                        next if $algoent =~ /^\./;
+
+                        $dirname = $self->_directory(v2 => ni => $algoent);
+
+                        opendir(my $dir, $dirname) or next;
+                        while (defined(my $fn = readdir($dir))) {
+                            my $fullname = File::Spec->catfile($dirname, $fn);
+                            next if $fn =~ /^\./;
+                            unlink($fullname) unless -e $fullname;
+                        }
+                        closedir($dir);
+                    }
+                });
+            closedir($algodir);
+        }
+    }
 }
 
 
@@ -438,64 +482,78 @@ sub migration {
 }
 
 
+#@deprecated
 sub export {
     my ($self, @args) = @_;
     return $self->migration->export_data(@args);
 }
 
 
+#@deprecated
 sub import_data {
     my ($self, @args) = @_;
     return $self->migration->import_data(@args);
 }
 
 
-sub attach {
-    my ($self, %opts) = @_;
-    my $weak = delete $opts{weak};
+sub add_digest {
+    my ($self, $digests, @opts) = @_;
+    my $path = $self->{path};
+    my %used_digests = map {$_ => undef} @{$self->{used_digests}};
 
-    foreach my $key (keys %_types) {
-        my $v = delete $opts{$key};
-        next unless defined $v;
-        croak 'Invalid type for key: '.$key unless eval {$v->isa($_types{$key})};
-        $self->{$key} //= $v;
-        croak 'Missmatch for key: '.$key unless $self->{$key} == $v;
-        weaken($self->{$key}) if $weak;
+    croak 'Stray options passed' if scalar @opts;
+
+    $digests = [split(/\s*,\s*|\s+/, $digests)] unless ref $digests;
+
+    foreach my $d (@{$digests}) {
+        next if exists $used_digests{$d};
+
+        croak 'Invalid digest: '.$d unless defined $_valid_digests{$d};
+        mkdir(File::Spec->catdir($path, qw(v2 by), $d)) or croak $!;
+
+        $used_digests{$d} = undef;
     }
 
-    croak 'Stray options passed' if scalar keys %opts;
+    @{$self->{used_digests}} = keys %used_digests;
 }
 
 
-#@returns Data::TagDB
+#@deprecated
+sub attach {
+    my ($self, %opts) = @_;
+    $self->so_attach(%opts);
+}
+
+
+#@deprecated
 sub db {
     my ($self, %opts) = @_;
-    return $self->{db} if defined $self->{db};
-    return $opts{default} if exists $opts{default};
-    croak 'No database known';
+    return $self->so_get('db', %opts);
 }
 
 
-#@returns Data::URIID
+#@deprecated
 sub extractor {
     my ($self, %opts) = @_;
-    return $self->{extractor} if defined $self->{extractor};
-    return $opts{default} if exists $opts{default};
-    croak 'No extractor known';
+    return $self->so_get('extractor', %opts);
 }
 
 
 #@returns File::Information
 sub fii {
     my ($self) = @_;
-    return $self->{fii} if defined $self->{fii};
+    my $fii = $self->so_get('fii', default => undef, no_defaults => 1);
+    return $fii if defined $fii;
 
     require File::Information;
     File::Information->VERSION(v0.06);
-    return $self->{fii} = File::Information->new(
-        db        => $self->db(default => undef),
-        extractor => $self->extractor(default => undef),
+    $fii = File::Information->new(
+        db        => $self->so_get('db', default => undef, no_defaults => 1),
+        extractor => $self->so_get('extractor', default => undef, no_defaults => 1),
     );
+
+    $self->so_attach(fii => $fii);
+    return $fii;
 }
 
 # --- Overrides for Data::Identifier::Interface::Known ---
@@ -536,6 +594,11 @@ sub _directory {
 sub _used_digests {
     my ($self) = @_;
     return $self->{used_digests};
+}
+
+sub _used_digests_ni {
+    my ($self) = @_;
+    return $self->{used_digests_ni};
 }
 
 sub _init_link_style {
@@ -691,7 +754,7 @@ File::FStore - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -712,7 +775,7 @@ Other metadata is intentionally not supported.
 For storage of other metadata see L<Data::TagDB> and L</db>.
 For reading metadata and file analysis see L<File::Information> and L</fii>.
 
-This package inherits from L<Data::Identifier::Interface::Known>.
+This package inherits from L<Data::Identifier::Interface::Known>, and L<Data::Identifier::Interface::Userdata>.
 
 =head1 METHODS
 
@@ -730,7 +793,7 @@ Takes the same options as L</new> plus the following:
 
 List of digests to be used in the store. Each digest is given in the universal tag format (or utag)
 (e.g. C<sha-3-224>.
-The list can be passed as a arrayref or as a comma seperated list.
+The list can be passed as a arrayref or as a comma separated list.
 
 The list can contain digests that are not supported by the system this runs on.
 They may for example still be used with import/export functions.
@@ -778,7 +841,7 @@ The path to the store.
 
 (since v0.05)
 
-The style to use for storing files. One of: C<1-level-contentise>, or C<1-level-contentise>.
+The style to use for storing files. One of: C<1-level-contentise>, or C<2-level-contentise>.
 
 B<Note:>
 This does not affect already existing files.
@@ -1035,7 +1098,7 @@ Returns a new L<File::FStore::Migration> object for this store.
 
     $migration->export_data(...);
 
-(since v0.01, deprecated since v0.05).
+(since v0.01, deprecated since v0.05, will be removed in v0.10, may warn).
 
 Deprecated proxy for L<File::FStore::Migration/export_data>.
 
@@ -1045,17 +1108,39 @@ This proxy will be removed in version v0.10. Future versions of this proxy may C
 
     $store->import_data(...);
 
-(since v0.01, deprecated since v0.05).
+(since v0.01, deprecated since v0.05, will be removed in v0.10, may warn).
 
 Deprecated proxy for L<File::FStore::Migration/import_data>.
 
 This proxy will be removed in version v0.10. Future versions of this proxy may C<warn> about it's usage.
+
+=head2 add_digest
+
+    $store->add_digest($digest);
+
+(experimental since v0.07)
+
+Adds a digest to the store.
+
+Multiple digests can be given by setting C<$digest> to an arrayref or by providing a comma separated list.
+
+If a digest is already used by the store no change is made.
+
+In order to populate the new digest L</scan> should be called (after all new digests have been added).
+
+B<Note:>
+Newly added digests may or may not be visible to instances of L<File::FStore::File> or L<File::FStore::Adder> or any other instance of L<File::FStore>
+that were created before this function was called.
 
 =head2 attach
 
     $self->attach(key => $obj, ...);
     # or:
     $self->attach(key => $obj, ..., weak => 1);
+
+(since v0.04, deprecated since v0.07, will be removed in v0.10, may warn).
+
+This is deprecated. See L<Data::Identifier::Interface::Subobjects/so_attach> for a replacement.
 
 Attaches objects of the given type.
 Takes the same list of objects as L</new>.
@@ -1070,6 +1155,10 @@ If C<weak> is set to a true value the object reference becomes weak.
     # or:
     my Data::TagDB $db = $store->db(default => $def);
 
+(since v0.01, deprecated since v0.07, will be removed in v0.10, may warn).
+
+This is deprecated. See L<Data::Identifier::Interface::Subobjects/so_get> for a replacement.
+
 Returns the instance of L<Data::TagDB> if any was given via L</new>.
 
 If no value is known returns the value of the option C<default> (if passed) or C<die>s.
@@ -1080,6 +1169,10 @@ If no value is known returns the value of the option C<default> (if passed) or C
     # or:
     my Data::URIID $extractor = $store->extractor(default => $def);
 
+(since v0.01, deprecated since v0.07, will be removed in v0.10, may warn).
+
+This is deprecated. See L<Data::Identifier::Interface::Subobjects/so_get> for a replacement.
+
 Returns the instance of L<Data::URIID> if any was given via L</new>.
 
 If no value is known returns the value of the option C<default> (if passed) or C<die>s.
@@ -1088,10 +1181,17 @@ If no value is known returns the value of the option C<default> (if passed) or C
 
     my File::Information $fii = $store->fii;
 
+(since v0.01, experimental since v0.07)
+
 Returns the instance of L<File::Information> passed via L</new> or a internally created one if none were given.
 
 B<Note:>
 If the option C<default> is passed, it is ignored with no error.
+
+B<Note:>
+The semantics of this method are slightly differen than that of L<Data::Identifier::Interface::Subobjects/so_get>.
+This method therefore became experimental with version v0.07.
+Future versions starting with version v0.10 may change or remove this method.
 
 =head2 known
 
@@ -1109,7 +1209,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

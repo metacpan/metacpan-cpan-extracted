@@ -65,8 +65,8 @@ subtest lookup_keying => sub {
     like(dies { $join->from('folk') }, qr/Unable to resolve 'folk'/, "from() does not resolve the primary source's db name");
 
     my $moniker = ${$join->source_db_moniker};
-    like($moniker, qr/^folk AS a/,                  "the moniker still uses the primary table's db name");
-    like($moniker, qr/LEFT JOIN critters AS b/,     "the moniker still uses the joined table's db name");
+    like($moniker, qr/^folk AS "a"/,                "the moniker still uses the primary table's db name");
+    like($moniker, qr/LEFT JOIN critters AS "b"/,   "the moniker still uses the joined table's db name");
 };
 
 subtest chained_join_from_primary => sub {

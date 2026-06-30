@@ -7,7 +7,7 @@ use DDP {output => 'STDOUT', array_max => 10, show_memsize => 1};
 use Devel::Confess 'color';
 use Cwd 'getcwd';
 package SimpleFlow;
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 use Time::HiRes;
 use Term::ANSIColor;
 # Windows portability: the legacy Windows console (cmd.exe) prints raw ANSI
@@ -46,10 +46,17 @@ sub say2 { # say to both command line and log file
 }
 
 sub task {
-	my ($args) = @_;
 	my $current_sub = (split(/::/,(caller(0))[3]))[-1];
-	unless (ref $args eq 'HASH') {
-		die "args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
+	# Accept either a single hash ref -- task({ cmd => ... }) -- or a flat
+	# key/value list -- task(cmd => ...). A lone non-hashref scalar, or an
+	# odd-length list, can't be read either way and is fatal.
+	my $args;
+	if (@_ == 1 && ref $_[0] eq 'HASH') {
+		$args = $_[0];
+	} elsif (@_ % 2 == 0) {
+		$args = { @_ };
+	} else {
+		die "args to $current_sub must be a hash ref (e.g. $current_sub({ cmd => ... })) or a flat key/value list (e.g. $current_sub(cmd => ...)); got an odd-length list";
 	}
 	my @c = caller;
 	my @reqd_args = (
@@ -90,7 +97,7 @@ sub task {
 		if ($ref eq 'ARRAY') {
 			@missing_files = grep {not -f -r $_ } @{ $args->{'input.files'} };
 			%input_file_size = map { $_ => -s $_ } @{ $args->{'input.files'} };
-			@empty_filenames = grep {length $_ == 0} @{ $args->{'input.files'} };
+			@empty_filenames = grep {(defined $_) && (length $_ == 0)} @{ $args->{'input.files'} };
 		} elsif ($ref eq '') { # scalar
 			@missing_files = grep {not -f -r $_ } ($args->{'input.files'});
 			%input_file_size = map { $_ => -s $_ } ($args->{'input.files'} );
@@ -113,7 +120,7 @@ sub task {
 	}
 	my $msg = "\@ $c[1] line $c[2] The command is:\n" . colored(['blue on_bright_red'], $args->{cmd});
 	say $msg;
-	say {$args->{'log.fh'}} "\@ $c[1] line $c[2] The command is:\n $args->{cmd})" if defined $args->{'log.fh'};
+	say {$args->{'log.fh'}} "\@ $c[1] line $c[2] The command is:\n$args->{cmd}" if defined $args->{'log.fh'};
 	if (defined $args->{'output.files'}) { # avoid "uninitialized value" warning
 		my $ref = ref $args->{'output.files'};
 		if ($ref eq 'ARRAY') {
@@ -125,7 +132,7 @@ sub task {
 			die "$ref isn't allowed for \"output.files\"";
 		}
 	}
-	@empty_filenames = grep {length $_ == 0} @output_files; # 0-length filenames aren't allowed
+	@empty_filenames = grep {(defined $_) && (length $_ == 0)} @output_files; # 0-length filenames aren't allowed
 	if (scalar @empty_filenames > 0) {
 		p $args;
 		die '0-length filenames are not allowed (found in "output.files"';
@@ -217,7 +224,7 @@ sub task {
 		p(@missing_output_files, output => $args->{'log.fh'}, string_max => $string_max) if defined $args->{'log.fh'};
 		p %r, string_max => $string_max;
 		p(%r, output => $args->{'log.fh'}, string_max => $string_max) if defined $args->{'log.fh'};
-		if ($args->{'die'}) {
+		if ($r{'die'}) { # use the resolved value (defaults to 1), not the raw arg
 			die 'those above files should have been made but are missing';
 		} else {
 			say STDERR 'those above files should have been made but are missing';
@@ -539,6 +546,32 @@ The test suite additionally uses C<Test::More> and
 L<Test::Exception>.
 
 =head1 Change log
+
+=head2 0.14 (2026-06-29) (Claude Opus 4.8 helped)
+
+=head3 C<task>
+
+=over
+
+=item * B<New:> accepts a flat key/value list as well as a hash ref —
+C<< task(cmd =E<gt> ...) >> and C<< task({ cmd =E<gt> ... }) >> are now equivalent. A lone
+non-hashref scalar or any odd-length argument list is fatal.
+
+=item * B<Bug fix:> the default C<< die =E<gt> 1 >> was ignored when checking for missing
+C<output.files>. The block tested the raw C<< $args-E<gt>{'die'} >> (undef when the
+caller omitted it) instead of the resolved C<$r{'die'}>, so a command that
+failed to produce its declared outputs only warned instead of dying. Now
+consistent with the exit-code check.
+
+=item * B<Bug fix:> removed a stray C<)> (and an extraneous leading space) from the
+"command is" line written to the log file; it now matches the on-screen form.
+
+=item * B<Bug fix:> C<length $_ == 0> could throw a fatal uninitialized-value warning
+(under C<< warnings FATAL =E<gt> 'all' >>) on an undef element of the C<input.files>
+array branch and the C<output.files> empty-name check. Both now guard with
+C<(defined $_) && (length $_ == 0)>, matching the C<input.files> scalar branch.
+
+=back
 
 =head2 0.13 (2026-06-11)
 

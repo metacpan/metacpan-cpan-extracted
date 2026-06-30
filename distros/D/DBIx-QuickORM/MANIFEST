@@ -129,6 +129,7 @@ t/AI/row_manager_fixes.t
 t/AI/row_state.t
 t/AI/row_txn_frames.t
 t/AI/schema_compose.t
+t/AI/sqli_identifiers.t
 t/AI/table_pk_merge.t
 t/AI/transaction_audit.t
 t/AI/transaction_extra.t

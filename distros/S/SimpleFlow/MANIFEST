@@ -7,6 +7,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+dzil.sh
 lib/SimpleFlow.pm
 read.me.pod
 t/01.t

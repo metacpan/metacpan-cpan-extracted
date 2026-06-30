@@ -6,7 +6,6 @@ use warnings;
 use CLI::Simple::Constants qw(:booleans);
 use Cwd qw(abs_path);
 use English qw(-no_match_vars);
-use FindBin qw($RealBin);
 
 use parent qw(CLI::Simple);
 
@@ -27,10 +26,17 @@ sub cmd_create_modulino {
     $alias = lc $alias;
   }
 
-  my $installbindir = $self->get_installbindir // $RealBin;
+  my $installbindir = $self->get_installbindir;
+
+  if ( !$installbindir ) {
+    require Config;
+    ($installbindir) = Config::config_re(qr/installsitebin/xsm);
+    ($installbindir) = $installbindir =~ /=\'([^\']+)/xsm;
+  }
+
   $installbindir = abs_path($installbindir);
 
-  die "ERROR: no such directory or inaccessible\n"
+  die "ERROR: no such directory ($installbindir) or inaccessible\n"
     if !-d $installbindir;
 
   local $RS = undef;

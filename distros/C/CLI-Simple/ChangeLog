@@ -1,8 +1,20 @@
+Mon Jun 29 12:29:27 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.7]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.7.md: new
+	* VERSION: bump
+	* README.md: generated
+	* lib/CLI/Simple/Modulino.pm.in
+	(cmd_create_modulin)
+	- set default install path to installsitebin
+
 Thu Jun 25 05:02:45 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.6]:
 	* release-notes.md: updated
 	* release-notes/release-notes-2.0.6.md: new
+	* VERSION: bump
 	* README.md: modified
 	* bin/create-modulino.pl.in
 	- moved to CLI/Simple/Modulino.pl.in

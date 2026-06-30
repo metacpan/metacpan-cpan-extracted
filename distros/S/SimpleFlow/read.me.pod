@@ -296,6 +296,32 @@ L<Test::Exception>.
 
 =head1 Change log
 
+=head2 0.14 (2026-06-29) (Claude Opus 4.8 helped)
+
+=head3 C<task>
+
+=over
+
+=item * B<New:> accepts a flat key/value list as well as a hash ref —
+C<< task(cmd =E<gt> ...) >> and C<< task({ cmd =E<gt> ... }) >> are now equivalent. A lone
+non-hashref scalar or any odd-length argument list is fatal.
+
+=item * B<Bug fix:> the default C<< die =E<gt> 1 >> was ignored when checking for missing
+C<output.files>. The block tested the raw C<< $args-E<gt>{'die'} >> (undef when the
+caller omitted it) instead of the resolved C<$r{'die'}>, so a command that
+failed to produce its declared outputs only warned instead of dying. Now
+consistent with the exit-code check.
+
+=item * B<Bug fix:> removed a stray C<)> (and an extraneous leading space) from the
+"command is" line written to the log file; it now matches the on-screen form.
+
+=item * B<Bug fix:> C<length $_ == 0> could throw a fatal uninitialized-value warning
+(under C<< warnings FATAL =E<gt> 'all' >>) on an undef element of the C<input.files>
+array branch and the C<output.files> empty-name check. Both now guard with
+C<(defined $_) && (length $_ == 0)>, matching the C<input.files> scalar branch.
+
+=back
+
 =head2 0.13 (2026-06-11)
 
 =head3 Fixed (Claude Opus 4.8 helped)

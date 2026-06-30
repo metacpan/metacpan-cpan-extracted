@@ -10,6 +10,7 @@
   * [Installation from source](#installation-from-source)
   * [Post-installation sanity check](#post-installation-sanity-check)
   * [Testing](#testing)
+  * [CI artifact](#ci-artifact)
 * [Optional features](#optional-features)
   * [Ed25519]
   * [IDN]
@@ -120,6 +121,19 @@ not run). To run all tests, execute
 ```sh
 TEST_WITH_NETWORK=1 make test
 ```
+
+### CI artifact
+
+A tarball (`Zonemaster-LDNS-<version>.tar.gz`) is built and uploaded as a GitHub Actions artifact on every push and pull request. This artifact can be useful for release testing and PR review.
+
+To download it:
+
+1. Go to the [Actions tab](https://github.com/zonemaster/zonemaster-ldns/actions) of the repository.
+2. Select a workflow run (e.g. for a specific PR or branch).
+3. Scroll to the bottom of the run summary to the **Artifacts** section.
+4. Download the artifact named `Zonemaster-LDNS-<version>-<short_sha>`.
+
+The artifact name includes the module version and the first 7 characters of the commit SHA.
 
 ## Optional features
 

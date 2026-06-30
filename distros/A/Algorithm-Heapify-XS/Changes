@@ -1,7 +1,11 @@
 Revision history for Perl extension Algorithm::Heapify::XS.
 
+0.06  Mon Jun 29, 2026
+        - Better missing ncmp() solution that does not warn on Win32. Thanks to Sisyphus for the head up.
+
 0.05  Tues May 19 2025
-        - gracefully handle missing ncmp()
+        - gracefully handle missing ncmp() - Thanks to Book, Eric Herman, Slaven Rezic, Bartosz Jarzyna
+          for looking into this, sorry the patch too so long to come.
 
 0.03  Mon Aug 27 2018
         - Fixups for threaded builds.

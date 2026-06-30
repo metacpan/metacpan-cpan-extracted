@@ -2,7 +2,7 @@ package Zuzu::Module::Proc;
 
 use utf8;
 
-our $VERSION = '0.007000';
+our $VERSION = '0.007001';
 
 use File::Temp qw( tempfile );
 use IPC::Run qw( harness run timeout );
@@ -311,8 +311,39 @@ sub _run_command {
 		timed_out => $timed_out ? 1 : 0,
 	};
 	$result->{ok} = _result_ok($result);
+	_emit_run_diag( $result, $stdout, $stderr )
+		if $ENV{ZUZU_PROC_RUN_DIAG};
 
 	return $result;
+}
+
+sub _emit_run_diag {
+	my ( $result, $stdout, $stderr ) = @_;
+
+	return
+		if $result->{ok}
+		and defined $stdout
+		and $stdout ne '';
+
+	my $command = join ' ', map { defined $_ ? $_ : '<undef>' }
+		@{ $result->{command} // [] };
+	warn "[ZUZU_PROC_RUN_DIAG] command=$command\n";
+	warn "[ZUZU_PROC_RUN_DIAG] exit=$result->{exit_code} "
+		. "signal=$result->{signal} error="
+		. ( defined $result->{error} ? $result->{error} : '' ) . "\n";
+	warn "[ZUZU_PROC_RUN_DIAG] stdout="
+		. _diag_snippet( defined $stdout ? $stdout : '' ) . "\n";
+	warn "[ZUZU_PROC_RUN_DIAG] stderr="
+		. _diag_snippet( defined $stderr ? $stderr : '' ) . "\n";
+}
+
+sub _diag_snippet {
+	my ( $text ) = @_;
+
+	$text =~ s/\s+\z//;
+	$text = substr( $text, 0, 4000 ) . "\n...[truncated]"
+		if length($text) > 4000;
+	return $text eq '' ? '<empty>' : $text;
 }
 
 sub _run_pipeline_legacy {
