@@ -354,17 +354,41 @@ EOT
 
 subtest "ENV and CONFIG" => sub {
   my $src = <<'EOT';
-     [SEC]
+     [SEC1]
      the PATH=$(=ENV:PATH)
      the archlib=$(=CONFIG:archlib)
+
+     [SEC2]
+     the PATH=$([SEC1]=ENV:PATH)
+     the archlib=$([SEC1]=CONFIG:archlib)
+
+     [SEC3]
+     the PATH=$([SEC3]=ENV:PATH)
+     the archlib=$([SEC3]=CONFIG:archlib)
+
+     [SEC4]
+     the PATH=$([non existing sec]=ENV:PATH)
+     the archlib=$([non existing sec]=CONFIG:archlib)
 EOT
   my $obj = Config::INI::RefVars->new->parse_ini(src => $src);
   is_deeply($obj->variables,
             {
-             'SEC' => {
-                       'the PATH'    => $ENV{PATH},
-                       'the archlib' => $Config{archlib}
-                      }
+             'SEC1' => {
+                        'the PATH'    => $ENV{PATH},
+                        'the archlib' => $Config{archlib}
+                       },
+             'SEC2' => {
+                        'the PATH'    => $ENV{PATH},
+                        'the archlib' => $Config{archlib}
+                       },
+             'SEC3' => {
+                        'the PATH'    => $ENV{PATH},
+                        'the archlib' => $Config{archlib}
+                       },
+             'SEC4' => {
+                        'the PATH'    => '',
+                        'the archlib' => '',
+                       },
             },
             'variables()');
 };

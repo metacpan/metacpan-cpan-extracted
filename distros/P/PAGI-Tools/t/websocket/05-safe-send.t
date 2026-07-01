@@ -50,9 +50,9 @@ subtest 'try_send_text returns false on failure' => sub {
     my $result = $ws->try_send_text('Hello')->get;
 
     ok(!$result, 'returns false on failure');
-    ok($ws->is_closed, 'marks connection as closed');
-    is($ws->close_code, 1006, 'sets close code to 1006 (abnormal closure)');
-    is($ws->close_reason, 'Connection lost', 'sets close reason');
+    # A failed send is not a disconnect: connection state is left untouched.
+    ok(!$ws->is_closed, 'does not mark the connection closed');
+    is($ws->close_code, undef, 'no fabricated 1006 close code');
 };
 
 subtest 'try_send_text returns false when already closed' => sub {
@@ -83,7 +83,7 @@ subtest 'try_send_bytes returns false on failure' => sub {
     my $result = $ws->try_send_bytes("\x00")->get;
 
     ok(!$result, 'returns false on failure');
-    ok($ws->is_closed, 'marks connection as closed');
+    ok(!$ws->is_closed, 'does not mark the connection closed');
 };
 
 subtest 'try_send_bytes returns false when already closed' => sub {
@@ -114,7 +114,7 @@ subtest 'try_send_json returns false on failure' => sub {
     my $result = $ws->try_send_json({ msg => 'hi' })->get;
 
     ok(!$result, 'returns false on failure');
-    ok($ws->is_closed, 'marks connection as closed');
+    ok(!$ws->is_closed, 'does not mark the connection closed');
 };
 
 subtest 'try_send_json returns false when already closed' => sub {

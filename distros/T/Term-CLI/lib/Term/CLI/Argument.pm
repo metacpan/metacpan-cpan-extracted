@@ -4,7 +4,7 @@
 #
 #  Description:  Generic parent class for arguments in Term::CLI
 #
-#       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
+#       Author:  Steven Bakker (SBAKKER), <cpanman@monkey-mind.net>
 #      Created:  22/01/18
 #
 #   Copyright (c) 2018-2022 Steven Bakker
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument 0.061000;
+package Term::CLI::Argument 0.061001;
 
 use 5.014;
 use warnings;
@@ -93,7 +93,7 @@ Term::CLI::Argument - generic parent class for arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.061000
+version 0.061001
 
 =head1 SYNOPSIS
 
@@ -290,7 +290,7 @@ L<Term::CLI::Element>(3p).
 
 =head1 AUTHOR
 
-Steven Bakker E<lt>sbakker@cpan.orgE<gt>, 2018-2022.
+Steven Bakker E<lt>cpanman@monkey-mind.netE<gt>, 2018-2022.
 
 =head1 COPYRIGHT AND LICENSE
 

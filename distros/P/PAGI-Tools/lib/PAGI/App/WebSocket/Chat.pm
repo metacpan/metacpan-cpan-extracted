@@ -1,5 +1,5 @@
 package PAGI::App::WebSocket::Chat;
-$PAGI::App::WebSocket::Chat::VERSION = '0.002000';
+$PAGI::App::WebSocket::Chat::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;

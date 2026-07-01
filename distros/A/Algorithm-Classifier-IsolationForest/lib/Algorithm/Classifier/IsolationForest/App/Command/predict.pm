@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Algorithm::Classifier::IsolationForest ();
 use Algorithm::Classifier::IsolationForest::App -command;
+use Algorithm::Classifier::IsolationForest::App::Command::pack ();
 use File::Slurp qw(read_file write_file);
 use Scalar::Util qw(looks_like_number);
 
@@ -22,13 +23,23 @@ sub abstract { 'Processes the data using the score_predict_samples using the spe
 
 sub description { 'Processes the data using the score_predict_samples using the specified model.
 
+The input may be either a CSV (one row of features per line) or a
+.iforest-packed binary produced by `iforest pack` (auto-detected via
+its magic bytes; cuts the CSV parse + pack_input_xs cost on repeated
+runs against the same dataset).
+
+The input CSV may have any number of feature columns; every row must have the
+same column count and every value must be numeric.
+
 Output format is as below per line.
 
 $score,$predict
 
-If -d is specified it is as below.
+If -d is specified all input feature columns are prepended.  When the
+input is a .iforest-packed file the columns come from unpacking the
+stored doubles.
 
-$x,$y,$score,$predict
+$feat1,...,$featN,$score,$predict
 ' }
 
 sub validate {
@@ -64,44 +75,99 @@ sub validate {
 sub execute {
 	my ( $self, $opt, $args ) = @_;
 
-	my @data;
-	
-	my $line_int = 1;
-	foreach my $line (read_file($opt->{'i'})) {
-		chomp($line);
-
-	    my ($x, $y) = split(/\,/, $line);
-
-		if (!defined($x)){
-			die('Line '.$line_int.' of "'.$opt->{'i'}.'" lacks a value for x');
-		}elsif(!looks_like_number($x)){
-			die('Line '.$line_int.' of "'.$opt->{'i'}.'" value for x,"'.$x.'", does not appear to be a number');			
-		}elsif(!defined($y)){
-			die('Line '.$line_int.' of "'.$opt->{'i'}.'" lacks a value for y');
-		}elsif(!looks_like_number($y)){
-			die('Line '.$line_int.' of "'.$opt->{'i'}.'" value for y,"'.$y.'", does not appear to be a number');			
-		}
-
-		push @data, [ $x, $y ];
-		
-		$line_int++;
-	}
-
 	my $iforest = Algorithm::Classifier::IsolationForest->load($opt->{'m'});
 
-	my $results = $iforest->score_predict_samples(\@data, $opt->{'t'});
+	my @data;     # arrayref-of-arrayrefs OR re-derived on demand from $packed
+	my $score_input;    # what we hand to score_predict_samples
+
+	if ( Algorithm::Classifier::IsolationForest::App::Command::pack::is_packed_file( $opt->{'i'} ) ) {
+		my ( $n_pts, $n_feats, $bytes )
+			= Algorithm::Classifier::IsolationForest::App::Command::pack::read_packed_file( $opt->{'i'} );
+		die "packed input has $n_feats features but model expects "
+			. $iforest->{n_features} . "\n"
+			if $n_feats != $iforest->{n_features};
+
+		# Build a PackedData wrapper directly from the on-disk bytes --
+		# no CSV parse, no pack_input_xs.
+		$score_input = bless {
+			packed  => $bytes,
+			n_pts   => $n_pts,
+			n_feats => $n_feats,
+		}, 'Algorithm::Classifier::IsolationForest::PackedData';
+
+		# Only unpack to per-row arrayrefs when -d asks for it, since
+		# that work undoes the whole point of using a packed file.
+		if ( $opt->{'d'} ) {
+			my @doubles = unpack( 'd*', $bytes );
+			for my $i ( 0 .. $n_pts - 1 ) {
+				push @data,
+					[ @doubles[ $i * $n_feats .. ( $i + 1 ) * $n_feats - 1 ] ];
+			}
+		}
+	}
+	else {
+		# CSV path
+		my $expected_cols;
+		my $line_int = 1;
+		foreach my $line (read_file($opt->{'i'})) {
+			chomp($line);
+			next if $line =~ /^\s*$/;
+
+			my @fields = split(/,/, $line, -1);
+
+			if ( !defined($expected_cols) ) {
+				$expected_cols = scalar @fields;
+				die( 'Line ' . $line_int . ' of "' . $opt->{'i'} . '" has no columns' )
+					if $expected_cols < 1;
+			} elsif ( scalar @fields != $expected_cols ) {
+				die(    'Line '
+					  . $line_int . ' of "'
+					  . $opt->{'i'}
+					  . '" has '
+					  . scalar(@fields)
+					  . ' columns but expected '
+					  . $expected_cols );
+			}
+
+			my $col_int = 1;
+			for my $field (@fields) {
+				die(    'Line '
+					  . $line_int . ' of "'
+					  . $opt->{'i'}
+					  . '" value for column '
+					  . $col_int . ',"'
+					  . $field
+					  . '", does not appear to be a number' )
+					unless looks_like_number($field);
+				$col_int++;
+			}
+
+			push @data, \@fields;
+
+			$line_int++;
+		}
+		$score_input = \@data;
+	}
+
+	my $results = $iforest->score_predict_samples($score_input, $opt->{'t'});
 
 	my $results_string='';
 	
-	my $data_int = 0;
-	while(defined($data[$data_int])){
-		if ($opt->{'d'}){
-			$results_string = $results_string .$data[$data_int][0].','.$data[$data_int][1].','. $results->[$data_int][0].','.$results->[$data_int][1]."\n";
-		}else{
-			$results_string = $results_string . $results->[$data_int][0].','.$results->[$data_int][1]."\n";
+	# Drive the loop off $results rather than @data so the packed-input
+	# path (which only populates @data when -d is set) still produces
+	# one output row per scored point.
+	for my $i ( 0 .. $#$results ) {
+		if ( $opt->{'d'} ) {
+			$results_string .=
+				  join( ',', @{ $data[$i] } ) . ','
+				. $results->[$i][0] . ','
+				. $results->[$i][1] . "\n";
 		}
-
-		$data_int++;
+		else {
+			$results_string .=
+				  $results->[$i][0] . ','
+				. $results->[$i][1] . "\n";
+		}
 	}
 
 	if (!defined($opt->{'o'})){

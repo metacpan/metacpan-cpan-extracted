@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More 0.88;
-eval "use JSON::Any qw(Syck)";
+eval "require JSON::Any; JSON::Any->import('Syck')";
 plan skip_all => "JSON::Syck not installed: $@" if $@;
 
 ok( JSON::Any->new->objToJson( { foo => 1 } ) );

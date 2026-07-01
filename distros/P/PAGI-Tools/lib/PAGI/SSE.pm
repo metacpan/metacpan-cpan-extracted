@@ -1,5 +1,5 @@
 package PAGI::SSE;
-$PAGI::SSE::VERSION = '0.002000';
+$PAGI::SSE::VERSION = '0.002001';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -160,6 +160,15 @@ sub is_closed {
     return $self->{_state} eq 'closed';
 }
 
+# True while the stream is live (started and not yet closed/disconnected).
+# Mirrors PAGI::WebSocket->is_connected (state eq 'connected'): an SSE scope
+# carries no pagi.connection (spec: N/A for sse), so connection liveness is
+# derived from this object's own state machine, not the base Context method.
+sub is_connected {
+    my $self = shift;
+    return $self->{_state} eq 'started';
+}
+
 # Disconnect reason - why the connection closed
 # Common values: 'client_closed', 'write_error', 'send_timeout', 'idle_timeout'
 sub disconnect_reason {
@@ -221,6 +230,11 @@ sub _set_state {
 sub _set_closed {
     my ($self) = @_;
     $self->{_state} = 'closed';
+
+    # Wake a parked run() (which races this future against $receive) so a close
+    # from deep in a helper actually ends the stream.
+    $self->{_closed_future}->done
+        if $self->{_closed_future} && !$self->{_closed_future}->is_ready;
 }
 
 # Start the SSE stream
@@ -542,13 +556,23 @@ async sub _run_close_callbacks {
 }
 
 # Close the connection
-sub close {
-    my ($self) = @_;
+async sub close {
+    my ($self, %opts) = @_;
 
     return $self if $self->is_closed;
 
+    # Record the reason so on_close callbacks (and the server access log) see it.
+    $self->{_disconnect_reason} //= $opts{reason} // 'app_closed';
+
+    # Tell the server to end the stream now (sse.close). The reason is
+    # server-side only and is never written to the wire.
+    await $self->{send}->({
+        type => 'sse.close',
+        (defined $opts{reason} ? (reason => $opts{reason}) : ()),
+    });
+
     $self->_set_closed;
-    $self->_run_close_callbacks->get;
+    await $self->_run_close_callbacks;
 
     return $self;
 }
@@ -559,12 +583,19 @@ async sub run {
 
     await $self->start unless $self->is_started;
 
+    # Race incoming events against an explicit close() (which resolves this
+    # future via _set_closed), so run() returns when the stream is closed from
+    # anywhere -- not only when the client disconnects.
+    $self->{_closed_future} //= Future->new;
+
     while (!$self->is_closed) {
-        my $event = eval { await $self->{receive}->() };
+        my $event = eval { await Future->wait_any($self->{receive}->(), $self->{_closed_future}) };
         if (my $err = $@) {
             warn "PAGI::SSE receive error: $err";
             last;
         }
+
+        last if $self->is_closed;   # woken by close()
 
         my $type = $event->{type} // '';
 
@@ -762,7 +793,7 @@ boilerplate and provides:
 
 =item * Multiple send methods (send, send_json, send_event)
 
-=item * Connection state tracking (is_started, is_closed)
+=item * Connection state tracking (is_started, is_closed, is_connected)
 
 =item * Cleanup callback registration (on_close)
 
@@ -798,11 +829,16 @@ Creates a new SSE wrapper. Requires:
 
 Dies if scope type is not 'sse'.
 
-B<Singleton pattern:> The SSE object is cached in C<< $scope->{'pagi.sse'} >>.
-If you call C<new()> multiple times with the same scope, you get the same
-SSE object back. This ensures consistent state (is_started, is_closed,
-callbacks) across multiple code paths that may create SSE objects from
-the same scope.
+B<Cached per scope (while referenced):> The SSE object is cached in
+C<< $scope->{'pagi.sse'} >>, so calling C<new()> again with the same scope
+returns the B<same object> — preserving state (is_started, is_closed,
+callbacks) across code paths that build an SSE object from the same scope —
+B<as long as you hold a strong reference to it>. The cache is deliberately
+B<weak> (to avoid a C<< $scope >> <-> SSE reference cycle), so it is B<not> a
+guaranteed singleton: if every strong reference is dropped the object may be
+garbage-collected, and a later C<new()> will build a fresh one with reset
+state. In normal use a handler keeps C<$sse> alive for the life of the
+connection, so this does not arise.
 
 =head1 SCOPE ACCESSORS
 
@@ -909,9 +945,17 @@ Idempotent - only sends sse.start once.
 
 =head2 close
 
-    $sse->close;
+    await $sse->close;
+    await $sse->close(reason => 'job_complete');
 
-Marks connection as closed and runs on_close callbacks.
+Ends the SSE stream by sending an C<sse.close> event, then runs C<on_close>
+callbacks. The optional C<reason> is server-side metadata only (logging,
+metrics, tracing): it is passed to C<on_close> callbacks but is B<never> written
+to the wire -- SSE has no close frame, so to signal anything to the client send
+an ordinary C<send_event> before closing. Calling C<close> also wakes a parked
+L</run>, so you can end the stream from deep in a helper. Returns a Future and is
+asynchronous, so C<await> it -- this ensures the C<sse.close> send and any
+asynchronous C<on_close> callbacks complete before C<close> resolves.
 
 =head2 run
 
@@ -927,6 +971,22 @@ handler to keep the connection open.
     if ($sse->is_started) { ... }
     if ($sse->is_closed) { ... }
     my $state = $sse->connection_state;    # 'pending', 'started', 'closed'
+
+=head2 is_connected
+
+    if ($sse->is_connected) { ... }
+
+True while the stream is live: started and not yet closed or disconnected
+(equivalently, C<connection_state eq 'started'>). This is a synchronous,
+non-destructive check that does not consume the receive queue. Mirrors
+L<PAGI::WebSocket/is_connected>.
+
+Because an SSE scope carries no C<pagi.connection> (the spec marks it
+B<not applicable> for C<sse>), liveness is derived from this object's own
+state machine. Like its WebSocket counterpart, the value is only as fresh
+as the last observed I/O: a half-open connection is not detected until the
+next send fails or the server reports a disconnect, so treat it as
+"not falsely stale" rather than a live network probe.
 
 =head2 disconnect_reason
 

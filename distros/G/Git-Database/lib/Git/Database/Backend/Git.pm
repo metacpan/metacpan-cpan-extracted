@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git;
-$Git::Database::Backend::Git::VERSION = '0.012';
+$Git::Database::Backend::Git::VERSION = '0.013';
 use Git::Version::Compare qw( ge_git );
 use Sub::Quote;
 
@@ -215,7 +215,7 @@ Git::Database::Backend::Git - A Git::Database backend based on Git
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

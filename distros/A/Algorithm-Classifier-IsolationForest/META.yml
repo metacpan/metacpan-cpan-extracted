@@ -4,6 +4,9 @@ author:
   - 'Zane C. Bowers-Hadley <vvelox@vvelox.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  JSON::PP: '0'
+  List::Util: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -18,11 +21,23 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Inline: '0'
+  Inline::C: '0'
 requires:
   App::Cmd: '0'
+  Carp: '0'
+  Config: '0'
   File::Slurp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  JSON::PP: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Storable: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/LilithSec/Algorithm-Classifier-IsolationForest
-version: v0.1.0
+version: v0.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

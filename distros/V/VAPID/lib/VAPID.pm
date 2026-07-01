@@ -1,5 +1,5 @@
 package VAPID;
-use 5.006; use strict; use warnings; our $VERSION = '1.05';
+use 5.006; use strict; use warnings; our $VERSION = '1.06';
 use Crypt::JWT qw(encode_jwt); use Crypt::PK::ECC; use URI; use MIME::Base64 qw/encode_base64url decode_base64url/; 
 use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate); use Crypt::KeyDerivation qw(hkdf); use Crypt::PRNG qw(random_bytes); 
 use HTTP::Request; use LWP::UserAgent; use JSON qw(decode_json);
@@ -303,8 +303,8 @@ sub build_push_request {
 	$req->header(TTL => $ttl);
 	$req->header(Authorization => $vapid_headers->{Authorization});
 
-	if ($vapid_headers->{'Crypto-Key'}) {
-		my $crypto_key = $vapid_headers->{'Crypto-Key'};
+	if ($vapid_headers->{"Crypto-Key"}) {
+		my $crypto_key = $vapid_headers->{"Crypto-Key"};
 
 		if (defined $payload && length $payload) {
 			my $encrypted = encrypt_payload($payload, $subscription);
@@ -360,7 +360,7 @@ VAPID - Voluntary Application Server Identification
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =cut
 

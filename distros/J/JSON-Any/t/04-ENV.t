@@ -25,7 +25,8 @@ plan skip_all => 'Cpanel::JSON::XS nor JSON::XS are installed', 1
     ok( $json = JSON::Any->new(), 'got a JSON::Any object' );
 
     my $exception = exception { $json->encode("dahut") };
-    if (Cpanel::JSON::XS->VERSION >= '4.42') {
+    if (JSON::Any->handlerType eq 'Cpanel::JSON::XS' and Cpanel::JSON::XS->VERSION >= '4.42'
+        or JSON::Any->handlerType eq 'JSON::XS' and JSON::XS->VERSION >= '4.0') {
         is(
             $exception,
             undef,

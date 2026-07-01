@@ -116,6 +116,8 @@ subtest 'more blanks' => sub {
   my $obj = Config::INI::RefVars->new;
   my $src = <<'EOT';
 [some section]
+blank =
+blank +=
 blanks +=
 blanks +=
 blanks +=
@@ -124,7 +126,8 @@ blanks +=
 blanks +=
 EOT
   $obj->parse_ini(src => $src);
-  is_deeply($obj->variables, { 'some section' => {blanks => ' ' x 5} },
+  is_deeply($obj->variables, { 'some section' => {blank  => ' ',
+                                                  blanks => ' ' x 5} },
             'variables(), 5 blanks');
 };
 

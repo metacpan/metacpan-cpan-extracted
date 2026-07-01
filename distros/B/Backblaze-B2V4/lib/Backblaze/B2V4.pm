@@ -5,7 +5,7 @@ package Backblaze::B2V4;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use v5.38; # or higher
 use Cpanel::JSON::XS;
@@ -1123,7 +1123,7 @@ with the bucket name as an argument.
 Example:
 
 	my $results = $b2->b2_get_upload_info(
-		bucket_name => 'MyBucketName'
+	  bucket_name => 'MyBucketName'
 	);
 
 The %$results hash now has 'upload_url' and 'authorization_token'

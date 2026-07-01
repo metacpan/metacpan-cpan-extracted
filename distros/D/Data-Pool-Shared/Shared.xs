@@ -247,6 +247,15 @@ reset(self)
   CODE:
     pool_reset(h);
 
+void
+scan_from(self, slot)
+    SV *self
+    UV slot
+  PREINIT:
+    EXTRACT_POOL(self);
+  CODE:
+    pool_scan_from(h, (uint64_t)slot);
+
 SV *
 path(self)
     SV *self

@@ -1,3 +1,8 @@
+3.0509050200 - 2026-06-30
+
+  * update to net-snmp 5.9.5.2
+  * #7 stage install so Test::Alien can link against built libnetsnmp
+
 3.0509040004 - 2023-12-13
 
   * add alien_extra_site_config to pick up CFLAGS and LDFLAGS

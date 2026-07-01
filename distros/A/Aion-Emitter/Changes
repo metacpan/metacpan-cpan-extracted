@@ -1,5 +1,10 @@
 Revision history for Perl extension Aion-Emitter
 
+0.1.1 2026-06-30T14:03:40Z
+
+    - config replaced to Aion::Env::Etc
+    - pkg and sub replaced to act
+
 0.1.0 2026-03-10T13:27:07Z
 
     - fix: if not file with annotations, then not die

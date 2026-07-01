@@ -1,5 +1,5 @@
 package PAGI::WebSocket;
-$PAGI::WebSocket::VERSION = '0.002000';
+$PAGI::WebSocket::VERSION = '0.002001';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -420,7 +420,11 @@ async sub deny {
         more => 0,
     });
 
-    $self->_set_closed($status, '');
+    # An HTTP denial sends a response, not a WebSocket close frame — there is no
+    # RFC6455 close code, so mark closed without recording one (close_code stays
+    # undef). The bare-403 fallback above DID send a real close frame and keeps
+    # its 1008 via _set_closed.
+    $self->{_state} = 'closed';
     return $self;
 }
 
@@ -480,10 +484,10 @@ async sub try_send_text {
             text => $text,
         });
     };
-    if ($@) {
-        $self->_set_closed(1006, 'Connection lost');
-        return 0;
-    }
+    # A failed send is not a disconnect (a send after close is a silent no-op per
+    # spec), so return false per the try_* contract without fabricating a 1006
+    # close or mutating connection state.
+    return 0 if $@;
     return 1;
 }
 
@@ -497,10 +501,10 @@ async sub try_send_bytes {
             bytes => $bytes,
         });
     };
-    if ($@) {
-        $self->_set_closed(1006, 'Connection lost');
-        return 0;
-    }
+    # A failed send is not a disconnect (a send after close is a silent no-op per
+    # spec), so return false per the try_* contract without fabricating a 1006
+    # close or mutating connection state.
+    return 0 if $@;
     return 1;
 }
 
@@ -515,10 +519,10 @@ async sub try_send_json {
             text => $json,
         });
     };
-    if ($@) {
-        $self->_set_closed(1006, 'Connection lost');
-        return 0;
-    }
+    # A failed send is not a disconnect (a send after close is a silent no-op per
+    # spec), so return false per the try_* contract without fabricating a 1006
+    # close or mutating connection state.
+    return 0 if $@;
     return 1;
 }
 
@@ -564,7 +568,12 @@ async sub receive {
             return undef;
         }
 
-        # Skip connect events - they're handled by accept()
+        # websocket.connect is a handshake event, not application data, so it is
+        # filtered out of the message stream here. PAGI's handshake contract: the
+        # server sends websocket.connect and waits for the app's reply; the app
+        # replies by sending accept()/close(). The app does not need to consume
+        # the connect event itself — this filter makes a stray one a no-op rather
+        # than surfacing it as a message. See accept() for the contract.
         next if $event->{type} eq 'websocket.connect';
 
         return $event;
@@ -958,6 +967,17 @@ C<< $ws->query($name, raw => 1) >>.
 Accepts the WebSocket connection. Optionally specify a subprotocol
 to use and additional response headers.
 
+B<Handshake contract.> The server sends a C<websocket.connect> event and waits
+for the application's reply before completing the handshake; the reply is
+C<accept> (this method) or C<close>/C<deny>. The application does B<not> need to
+receive the C<websocket.connect> event itself — C<accept> sends the reply
+directly, and any C<websocket.connect> in the receive stream is filtered out by
+L</receive> rather than surfaced as a message. This matches ASGI, whose
+normative requirements bind only the server (the application is never required
+to consume C<connect> before accepting); the reference server, RFC 6455, and
+other frameworks (e.g. Mojolicious, which auto-upgrades) impose no such app-side
+ordering either.
+
 =head2 close
 
     await $ws->close;
@@ -1018,7 +1038,10 @@ See L<PAGI::Spec::Www/"WebSocket Denial Response">.
     my $code = $ws->close_code;        # 1000, 1001, etc.
     my $reason = $ws->close_reason;    # 'Normal closure'
 
-Available after connection closes. Defaults: code=1005, reason=''.
+Available after connection closes. A real close frame defaults to code=1005,
+reason=''. After an HTTP denial via C<deny> on a denial-response-capable server,
+C<close_code> is C<undef>: a denial sends an HTTP response, not a WebSocket
+close frame, so there is no RFC6455 close code.
 
 =head2 buffered_amount, high_water_mark, low_water_mark
 
@@ -1058,13 +1081,47 @@ Send a message. Dies if connection is closed.
 =head2 try_send_text, try_send_bytes, try_send_json
 
     my $sent = await $ws->try_send_json($data);
-    if (!$sent) {
-        # Client disconnected
-        cleanup_user($id);
-    }
 
-Returns true if sent, false if failed or closed. Does not throw.
-Useful for broadcasting to multiple clients.
+B<Best-effort send.> Attempts the send and B<never throws>, returning a boolean.
+Intended for broadcast-style loops -- "send to many, skip the failures" -- where
+one bad recipient must not abort the loop or corrupt shared connection state (a
+failed send leaves C<is_closed>/C<close_code> untouched).
+
+B<The boolean is a weak signal; do not treat it as a delivery receipt:>
+
+=over 4
+
+=item *
+
+A B<false> return means the send definitely did not happen -- the socket is
+already known-closed, or the underlying send raised. It tells you I<that> it
+failed, not I<why>.
+
+=item *
+
+A B<true> return does B<not> guarantee delivery. Per the spec, a send to a peer
+that has disconnected is a silent no-op, so if the client has vanished but the
+server has not yet surfaced the C<websocket.disconnect> event, the send no-ops
+and this still returns true. "Sent" means "the send call did not fail," not "the
+client received it."
+
+=back
+
+If you need more than best-effort, reach for the right tool instead of inspecting
+this return value:
+
+=over 4
+
+=item * B<Why did it fail?> Use C<send_text>/C<send_bytes>/C<send_json>, which
+throw the underlying error.
+
+=item * B<Is the peer still there?> Use C<is_connected> (or the
+C<send_*_if_connected> variants) and react to the C<websocket.disconnect> event.
+
+=item * B<Is the connection backpressured?> Use C<is_writable> /
+C<buffered_amount> and the watermark / C<on_drain> controls.
+
+=back
 
 =head2 send_text_if_connected, send_bytes_if_connected, send_json_if_connected
 

@@ -1,5 +1,26 @@
 Revision history for Algorithm-Classifier-IsolationForest
 
+0.2.1   2026-06-30/14:30
+        - derp... actually update MANIFEST so a bunch of files from last release
+          are actually included
+
+0.2.0   2026-06-30/14:15
+        - C acceleration via Inline::C for core fit and predict ops
+        - OpenMP support for parallel multi-threaded fitting and predict ops
+        - SIMD (AVX/SSE) acceleration where available
+        - Data packing support for compact model storage (new `pack` CLI command)
+        - Parallel fit capability
+        - New `score_predict_split` method
+        - New `accel` CLI command for querying available acceleration flags
+        - New `bench` CLI command for running built-in benchmarks
+        - New `info` CLI command with expanded model introspection
+        - Benchmarking scripts covering fit, predict, scoring, and accel modes
+        - Tests: accel flag detection, accel selection, undef column handling,
+          data packing, parallel fit, sklearn comparison (including undef),
+          and CLI
+        - minor tweaks to `csv2plot` for a bit nicer rendering
+        - minor POD fixes
+
 0.1.0   2026-06-23/03:15
         - add csv2plot helper command for graphing
 

@@ -1,5 +1,5 @@
 package PAGI::App::URLMap;
-$PAGI::App::URLMap::VERSION = '0.002000';
+$PAGI::App::URLMap::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;

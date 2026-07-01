@@ -7,6 +7,7 @@ use File::Spec          ();
 use File::Temp          ();
 use File::Basename      ();
 use Test::Requires::Git ();
+use Git::Version::Compare qw( ge_git );
 
 # Git::Database objects
 use Git::Database::Object::Blob;
@@ -17,6 +18,7 @@ use Git::Database::Object::Tag;
 use Git::Database::Backend::None;
 
 our @kinds = qw( blob tree commit tag );
+my ($git_version) = `git --version` =~ /\Agit version (.*)/;
 
 # all the following functions will end up in the caller's namespace
 
@@ -61,7 +63,8 @@ sub empty_repository {
     my $dir = File::Temp::tempdir( CLEANUP => 1 );
 
     Test::Requires::Git::test_requires_git '1.6.5';
-    `git init $dir`;
+    if   ( ge_git( $git_version, '2.28.0' ) ) { `git init -b master $dir`; }
+    else                                      { `git init $dir`; }
     die "`git init $dir` failed" if $?;
 
     return $dir;
@@ -77,6 +80,7 @@ my %builder_for = (
     'Git::Sub'        => sub { shift },
     'Git::Wrapper'    => sub { Git::Wrapper->new( shift ); },
     'Git::Raw::Repository' => sub { Git::Raw::Repository->open( shift ); },
+    'Git::Native::Repository' => sub { Git::Native->open(shift); },
 );
 my %min_version = (
     map ( { ( $_ => 0 ) } keys %builder_for ),
@@ -110,7 +114,7 @@ sub available_bundles {
 
 sub available_backends {
     return 'None',    # always available
-      grep $_->VERSION >= $min_version{$_},
+      grep $min_version{$_} ? $_->VERSION >= $min_version{$_} : 1,
       map eval { Module::Runtime::use_module($_) },
       grep !/^None$/,
       sort keys %builder_for;

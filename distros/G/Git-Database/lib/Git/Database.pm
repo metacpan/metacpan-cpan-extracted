@@ -1,5 +1,5 @@
 package Git::Database;
-$Git::Database::VERSION = '0.012';
+$Git::Database::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -22,6 +22,7 @@ use namespace::clean;
 my @STORES = (
 
     # complete backends, fastest first
+    'Git::Native::Repository',
     'Git::Raw::Repository',
     'Git',
     'Git::Repository',
@@ -43,7 +44,14 @@ my %MIN_VERSION = (
 my $STORES;
 
 sub available_stores {
-    $STORES ||= [ map eval { use_module( $_ => $MIN_VERSION{$_} || 0 ) }, @STORES ];
+    $STORES ||= [
+        map eval {
+            $MIN_VERSION{$_}
+              ? use_module( $_ => $MIN_VERSION{$_} )
+              : use_module($_);
+        },
+        @STORES
+    ];
     return @$STORES;
 }
 
@@ -62,6 +70,12 @@ my %STORE_FOR = (
             ( Repository  => _absdir($_[0]->{git_dir})   )x!! $_[0]->{git_dir},
         );
      },
+    'Git::Native::Repository' => sub {
+        require Git::Native;
+        return Git::Native->open(
+            $_[0]->{work_tree} || $_[0]->{git_dir} || '.'
+        );
+    },
     'Git::PurePerl' => sub {
         my %args;
         $args{directory} = _absdir("$_[0]->{work_tree}") if $_[0]->{work_tree};
@@ -108,7 +122,10 @@ sub new {
         if ( $backend = $args->{backend} ) {
             return use_module('Git::Database::Backend::None')->new
               if $backend eq 'None';
-            use_module $backend, $MIN_VERSION{$backend} || 0
+            if ( exists $MIN_VERSION{$backend} ) {
+                use_module $backend, $MIN_VERSION{$backend};
+            }
+            else { use_module $backend; }
         }
         else {
 
@@ -140,7 +157,7 @@ Git::Database - Provide access to the Git object database
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -278,6 +295,8 @@ always available.
 
 =head1 SEE ALSO
 
+=head2 Classes
+
 =over 4
 
 =item Objects
@@ -308,6 +327,20 @@ L<Git::Database::Backend::Git::Raw>.
 
 =back
 
+=head2 Blog posts
+
+=over 4
+
+=item *
+
+L<Introducing Git::Database|https://blogs.perl.org/users/book/2016/09/announcing-gitdatabase.html> (September 27, 2016)
+
+=item *
+
+L<Git::Database now supports seven different Git backends|https://blogs.perl.org/users/book/2017/03/gitdatabase-now-supports-seven-different-git-backends.html> (March 28, 2017)
+
+=back
+
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -334,7 +367,7 @@ Philippe Bruhat (BooK) <book@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright 2013-2019 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2026 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

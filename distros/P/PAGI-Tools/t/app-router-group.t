@@ -82,11 +82,14 @@ subtest 'callback group: basic prefix' => sub {
 subtest 'callback group: with middleware' => sub {
     my @calls;
     my $mw_log = [];
-    my $auth_mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @$mw_log, 'auth';
-        $scope->{authed} = 1;
-        await $next->();
+    my $auth_mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @$mw_log, 'auth';
+            $scope->{authed} = 1;
+            await $app->($scope, $receive, $send);
+        };
     };
 
     my $router = PAGI::App::Router->new;
@@ -107,15 +110,21 @@ subtest 'callback group: with middleware' => sub {
 
 subtest 'callback group: middleware stacking with route middleware' => sub {
     my $order = [];
-    my $group_mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @$order, 'group';
-        await $next->();
+    my $group_mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @$order, 'group';
+            await $app->($scope, $receive, $send);
+        };
     };
-    my $route_mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @$order, 'route';
-        await $next->();
+    my $route_mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @$order, 'route';
+            await $app->($scope, $receive, $send);
+        };
     };
 
     my $router = PAGI::App::Router->new;
@@ -135,16 +144,22 @@ subtest 'callback group: middleware stacking with route middleware' => sub {
 subtest 'callback group: nested groups' => sub {
     my @calls;
     my $org_mw_ran = 0;
-    my $org_mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        $org_mw_ran++;
-        await $next->();
+    my $org_mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            $org_mw_ran++;
+            await $app->($scope, $receive, $send);
+        };
     };
     my $team_mw_ran = 0;
-    my $team_mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        $team_mw_ran++;
-        await $next->();
+    my $team_mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            $team_mw_ran++;
+            await $app->($scope, $receive, $send);
+        };
     };
 
     my $router = PAGI::App::Router->new;
@@ -246,10 +261,13 @@ subtest 'router-object form: basic' => sub {
 
 subtest 'router-object form: with middleware' => sub {
     my $mw_ran = 0;
-    my $mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        $mw_ran++;
-        await $next->();
+    my $mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            $mw_ran++;
+            await $app->($scope, $receive, $send);
+        };
     };
 
     my $api = PAGI::App::Router->new;

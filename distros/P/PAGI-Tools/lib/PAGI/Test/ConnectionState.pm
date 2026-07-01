@@ -1,5 +1,5 @@
 package PAGI::Test::ConnectionState;
-$PAGI::Test::ConnectionState::VERSION = '0.002000';
+$PAGI::Test::ConnectionState::VERSION = '0.002001';
 use strict;
 use warnings;
 

@@ -1023,8 +1023,8 @@ Middleware position is the same idea with a different duck type:
 C<enable> accepts a middleware name (resolved under
 C<PAGI::Middleware::>, with C<^> to escape) or a configured instance
 with a C<wrap> method, and per-route middleware arrays in
-L<PAGI::App::Router> accept instances or
-C<($scope, $receive, $send, $next)> coderefs.
+L<PAGI::App::Router> accept instances or coderef factories of the
+form C<sub { my ($app) = @_; async sub { ... } }>.
 
 Passing middleware where an app belongs (or vice versa) croaks at
 composition time with a message pointing at the right position.

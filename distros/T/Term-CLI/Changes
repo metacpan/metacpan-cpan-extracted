@@ -1,3 +1,12 @@
+0.061001 -- 2025-05-16
+
+    - Replace cpan.org email address.
+
+    - Fix RPM spec file
+        Get rid of `perl(:MODULE_COMPAT_...)` dependency.
+
+    - Fix typo (Erorr -> Error).
+
 0.061000 -- 2025-05-16
 
     - Fix escape sequences during completion (fixes #29)

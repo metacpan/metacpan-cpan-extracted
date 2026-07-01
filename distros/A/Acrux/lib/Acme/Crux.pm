@@ -780,8 +780,10 @@ sub new {
     unless (defined($logfile) && length($logfile)) {
         $self->{logfile} = $logfile = File::Spec->catfile($logdir, sprintf("%s.log", $moniker));
     }
-    unless (File::Spec->file_name_is_absolute($logfile)) {
-        $self->{logfile} = $logfile = File::Spec->rel2abs($logfile);
+    if ($logfile !~ /^(?:[@=-]|\:?(?:stdout|stderr|syslog)\:?)$/) {
+        unless (File::Spec->file_name_is_absolute($logfile)) {
+            $self->{logfile} = $logfile = File::Spec->rel2abs($logfile);
+        }
     }
 
     # PID file

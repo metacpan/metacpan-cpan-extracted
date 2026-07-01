@@ -1,5 +1,5 @@
 package PAGI::Middleware::ContentLength;
-$PAGI::Middleware::ContentLength::VERSION = '0.002000';
+$PAGI::Middleware::ContentLength::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

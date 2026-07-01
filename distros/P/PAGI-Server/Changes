@@ -1,5 +1,28 @@
 # Revision history for PAGI-Server
 
+0.002005 - 2026-06-30
+
+  Features
+  - sse.http.response.* decline events (PAGI spec). Before sse.start, an
+    application may decline the stream and return a normal HTTP response
+    (404/401/403/204/redirect/...) by sending sse.http.response.start +
+    sse.http.response.body instead of sse.start. This finally makes an
+    unmatched SSE route return a real HTTP 404 rather than crashing the
+    connection, and gives EventSource the spec's 204 stop-reconnect path.
+    Implemented for both HTTP/1.1 and HTTP/2, reusing the normal HTTP
+    response machinery. First-send-wins: after sse.start a decline raises,
+    and after sse.http.response.start a stream event raises. EventValidator
+    accepts the decline events (status required integer; headers arrayref;
+    more integer).
+  - sse.close send-event (PAGI spec). Applications can now end an SSE stream
+    explicitly -- immediately and decoupled from returning -- instead of only by
+    returning. Implemented for both HTTP/1.1 (chunked terminator) and HTTP/2
+    (final END_STREAM frame). An optional `reason` is server-side metadata only
+    and is never written to the wire. After sse.close a repeat sse.close is a
+    no-op and any other send raises; a transport-gone close (client disconnect)
+    stays a silent no-op. Returning after the final sse.send remains valid and
+    terminates identically. EventValidator accepts sse.close.
+
 0.002004 - 2026-06-28
 
   Bug Fixes

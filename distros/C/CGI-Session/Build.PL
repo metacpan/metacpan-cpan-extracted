@@ -137,8 +137,8 @@ Module::Build -> new
 	requires =>
 	{
         'CGI'          => 3.26,
+		'Crypt::SysRandom' => 0.007,
 		'Data::Dumper' => 0,
-		'Digest::MD5'  => 0,
 		'Scalar::Util' => 0,
 	},
     no_index => {

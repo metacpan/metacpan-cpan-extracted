@@ -24,9 +24,11 @@ Pull requests are welcome! To contribute code:
 2. Write tests for any new feature or bug fix.
 3. Ensure all tests pass using `prove -l t/` or `make test`.
 4. Follow the existing code style, especially:
-   - No tabs please
-   - No trailing whitespace please
-   - 2 spaces indentation
+   - No tabs please.
+   - No trailing whitespace please.
+   - 2 spaces indentation.
+   - Do not add any built-in functions (Config::INI::RefVars::Builtins) whose
+     names contain an underscore.
 5. In your pull request, briefly explain your changes and their motivation.
 
 
@@ -34,10 +36,6 @@ Pull requests are welcome! To contribute code:
 
 This module uses MakeMaker for creating releases (`make dist`).
 An external script is used for the build process.
-To make it available, you must execute the following commands in your local Git repository:
-
-    git submodule init
-    git submodule update
 
 
 ## Licensing

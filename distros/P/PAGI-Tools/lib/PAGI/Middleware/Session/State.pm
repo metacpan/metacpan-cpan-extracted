@@ -1,5 +1,5 @@
 package PAGI::Middleware::Session::State;
-$PAGI::Middleware::Session::State::VERSION = '0.002000';
+$PAGI::Middleware::Session::State::VERSION = '0.002001';
 use strict;
 use warnings;
 

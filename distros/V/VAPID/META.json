@@ -4,7 +4,7 @@
       "LNATION <email@lnation.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.7702, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -52,7 +52,7 @@
    "provides" : {
       "VAPID" : {
          "file" : "lib/VAPID.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/VAPID"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_contributors" : [
       "Jan Kasprzak (YENYA) <kas@informatics.muni.cz>"
    ],

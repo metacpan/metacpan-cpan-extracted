@@ -43,7 +43,7 @@ See the C<LICENSE> file or L<https://opensource.org/license/artistic-2-0> for de
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 1;
 

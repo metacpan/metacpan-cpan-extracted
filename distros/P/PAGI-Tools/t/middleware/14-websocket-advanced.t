@@ -5,7 +5,6 @@ use Test2::V0;
 use Future::AsyncAwait;
 use IO::Async::Loop;
 
-use PAGI::Middleware::WebSocket::Compression;
 use PAGI::Middleware::WebSocket::RateLimit;
 
 my $loop = IO::Async::Loop->new;
@@ -14,88 +13,6 @@ sub run_async (&) {
     my ($code) = @_;
     $loop->await($code->());
 }
-
-# ===================
-# WebSocket::Compression Tests
-# ===================
-
-subtest 'WebSocket::Compression - adds compression config to scope' => sub {
-    my $compress = PAGI::Middleware::WebSocket::Compression->new(
-        level    => 6,
-        min_size => 128,
-    );
-
-    my $captured_scope;
-    my $app = async sub  {
-        my ($scope, $receive, $send) = @_;
-        $captured_scope = $scope;
-        await $send->({ type => 'websocket.accept' });
-    };
-
-    my $wrapped = $compress->wrap($app);
-    my $scope = {
-        type    => 'websocket',
-        headers => [['sec-websocket-extensions', 'permessage-deflate']],
-    };
-
-    run_async {
-        $wrapped->(
-            $scope,
-            async sub { { type => 'websocket.disconnect' } },
-            async sub { }
-        );
-    };
-
-    ok exists $captured_scope->{'pagi.websocket.compression'}, 'has compression config';
-    is $captured_scope->{'pagi.websocket.compression'}{level}, 6, 'level set';
-    is $captured_scope->{'pagi.websocket.compression'}{min_size}, 128, 'min_size set';
-};
-
-subtest 'WebSocket::Compression - passes through non-websocket' => sub {
-    my $compress = PAGI::Middleware::WebSocket::Compression->new();
-
-    my $captured_scope;
-    my $app = async sub  {
-        my ($scope, $receive, $send) = @_;
-        $captured_scope = $scope;
-        await $send->({ type => 'http.response.start', status => 200, headers => [] });
-        await $send->({ type => 'http.response.body', body => 'OK', more => 0 });
-    };
-
-    my $wrapped = $compress->wrap($app);
-    my $scope = { type => 'http', method => 'GET', path => '/' };
-
-    run_async { $wrapped->($scope, async sub { {} }, async sub { }) };
-
-    ok !exists $captured_scope->{'pagi.websocket.compression'}, 'no compression for HTTP';
-};
-
-subtest 'WebSocket::Compression - passes through without extension' => sub {
-    my $compress = PAGI::Middleware::WebSocket::Compression->new();
-
-    my $captured_scope;
-    my $app = async sub  {
-        my ($scope, $receive, $send) = @_;
-        $captured_scope = $scope;
-        await $send->({ type => 'websocket.accept' });
-    };
-
-    my $wrapped = $compress->wrap($app);
-    my $scope = {
-        type    => 'websocket',
-        headers => [],  # No permessage-deflate
-    };
-
-    run_async {
-        $wrapped->(
-            $scope,
-            async sub { { type => 'websocket.disconnect' } },
-            async sub { }
-        );
-    };
-
-    ok !exists $captured_scope->{'pagi.websocket.compression'}, 'no compression without extension';
-};
 
 # ===================
 # WebSocket::RateLimit Tests

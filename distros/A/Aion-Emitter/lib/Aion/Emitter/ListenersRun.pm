@@ -20,7 +20,7 @@ sub list {
 	my ($self) = @_;
 	
 	my @listeners = sort { $a->{evt} eq $b->{evt}? $a->{nice} <=> $b->{nice}: $a->{evt} cmp $b->{evt} }
-		pairmap { my $evt = $a; map { +{ %$_, evt => $evt, act => "$_->{pkg}#$_->{sub}", nice => 0+$_->{nice} } } @$b }
+		pairmap { my $evt = $a; map { +{ %$_, evt => $evt, act => $_->{act}, nice => 0+$_->{nice} } } @$b }
 		%{$self->emitter->event};
 	
 	@listeners = grep { /$self->{mask}/ } @listeners if $self->mask ne "";

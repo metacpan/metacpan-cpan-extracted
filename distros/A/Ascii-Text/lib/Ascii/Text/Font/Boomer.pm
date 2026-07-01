@@ -1,5 +1,7 @@
 package Ascii::Text::Font::Boomer;
 
+use strict;
+use warnings;
 use Rope;
 use Rope::Autoload;
 

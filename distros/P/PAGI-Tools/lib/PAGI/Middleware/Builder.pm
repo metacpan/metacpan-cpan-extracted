@@ -1,5 +1,5 @@
 package PAGI::Middleware::Builder;
-$PAGI::Middleware::Builder::VERSION = '0.002000';
+$PAGI::Middleware::Builder::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;

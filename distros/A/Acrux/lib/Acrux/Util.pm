@@ -285,6 +285,38 @@ If you don't supply one of these forms, we assume you are specifying the date yo
 
 Returns offset of time (in secs)
 
+=head2 parse_words
+
+    my $words = parse_words("foo,bar baz");
+    my $words = parse_words(@strings);
+    my $words = parse_words(\@strings);
+
+Parses one or more strings into a list of words.
+
+Input may be a single string, a list of strings or an array reference.
+Words are separated by whitespace, commas and semicolons.
+
+Double-quoted strings are preserved as a single word, allowing separators
+and whitespace to be embedded in a value.
+
+Empty tokens are discarded.
+
+Always returns an array reference.
+
+Examples:
+
+    parse_words("foo,bar baz"); # [qw(foo bar baz)]
+    parse_words(["foo; bar", "baz qux"]);
+        # [qw(foo bar baz qux)]
+    parse_words(q{foo "bar baz" qux});
+        # ['foo', 'bar baz', 'qux']
+    parse_words([
+        q{foo,bar},
+        q{"baz qux"},
+    ]); # ['foo', 'bar', 'baz qux']
+
+See also L</words> for simply parsing
+
 =head2 prompt
 
     my $value = prompt($message);
@@ -495,6 +527,8 @@ This function parse string by words and returns as an anonymous array.
 All words in the resultating array are unique and arranged
 in the order of the input string
 
+See also L</parse_words> for extended parsing
+
 =head1 HISTORY
 
 See C<Changes> file
@@ -531,6 +565,7 @@ use Fcntl qw/ O_WRONLY O_CREAT O_APPEND O_EXCL SEEK_END /;
 use Time::Local;
 use Data::Dumper qw//;
 use Storable qw/dclone/;
+use Text::ParseWords qw/quotewords/;
 
 use Acrux::Const qw/ IS_TTY DATE_FORMAT DATETIME_FORMAT /;
 
@@ -546,7 +581,7 @@ our @EXPORT_OK = (qw/
         randchars
         dformat strf trim truncstr indent words
         touch eqtime slurp spew spurt
-        parse_expire parse_time_offset
+        parse_expire parse_time_offset parse_words
         os_type is_os_type
         color load_class
         prompt
@@ -1078,6 +1113,25 @@ sub prompt {
     }
 
     return (!defined $ans || $ans eq '') ? $def : $ans;
+}
+
+sub parse_words {
+    return [] unless @_;
+    my $in = @_
+        ? @_ > 1
+            ? [@_]
+            : ref $_[0] eq 'ARRAY'
+                ? $_[0]
+                : [$_[0]]
+        : [];
+
+    my @w = ();
+
+    foreach my $it (@$in) {
+        push @w, grep { defined && length } quotewords(qr/\s+|[\,\;]+/, 0, $it);
+    }
+
+    return [@w];
 }
 
 1;

@@ -9,13 +9,19 @@ README.md
 t/00-load.t
 t/30-basics.t
 t/40-more.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
+t/function.t
 t/get_params.t
+t/integration.t
+t/locales.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-synopsis.t
 t/pod.t
+t/unit.t
 t/validate-strict.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

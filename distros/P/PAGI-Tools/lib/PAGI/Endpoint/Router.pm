@@ -1,5 +1,5 @@
 package PAGI::Endpoint::Router;
-$PAGI::Endpoint::Router::VERSION = '0.002000';
+$PAGI::Endpoint::Router::VERSION = '0.002001';
 use strict;
 use warnings;
 
@@ -45,26 +45,18 @@ sub to_app {
     # Let subclass define routes
     $instance->_build_routes($internal_router);
 
-    my $app = $internal_router->to_app;
+    my $app   = $internal_router->to_app;
     my $state = $instance->{_state};
-    my $context_class = $instance->context_class;
 
     return async sub {
         my ($scope, $receive, $send) = @_;
 
-        # Inject instance state into scope (allows $req->state to work)
+        # Inject instance state into scope (allows $ctx->state to work)
         $scope->{state} //= $state;
 
-        # HTTP routes return a response value that bubbles up through the
-        # value-flow method middleware; send it once here. Other dispatch
-        # outcomes (WS/SSE/mount/404/405) handle their own sending and yield
-        # a non-respond-able value.
-        my $res = await $app->($scope, $receive, $send);
-        if (Scalar::Util::blessed($res) && $res->can('respond')) {
-            require PAGI::Context;
-            my $ctx = $context_class->new($scope, $receive, $send);
-            await $ctx->respond($res);
-        }
+        # HTTP route apps respond at their own boundary (via _build_value_app).
+        # WS/SSE/mount/404/405 all handle their own sending.
+        await $app->($scope, $receive, $send);
     };
 }
 
@@ -78,11 +70,12 @@ sub _build_routes {
 
 # Internal route builder that wraps handlers
 package PAGI::Endpoint::Router::RouteBuilder;
-$PAGI::Endpoint::Router::RouteBuilder::VERSION = '0.002000';
+$PAGI::Endpoint::Router::RouteBuilder::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;
-use Scalar::Util qw(blessed);
+use Carp qw(croak);
+use PAGI::Utils qw(is_response);
 
 sub new {
     my ($class, $endpoint, $router) = @_;
@@ -106,15 +99,10 @@ sub _add_http_route {
 
     my ($middleware, $handler) = $self->_parse_route_args(@rest);
 
-    # Wrap middleware
-    my @wrapped_mw = map { $self->_wrap_middleware($_) } @$middleware;
+    my $app = $self->_build_value_app($middleware, $handler);
 
-    # Wrap handler
-    my $wrapped = $self->_wrap_http_handler($handler);
-
-    # Register with internal router using the appropriate HTTP method
     my $router_method = lc($method);
-    $self->{router}->$router_method($path, @wrapped_mw ? (\@wrapped_mw, $wrapped) : $wrapped);
+    $self->{router}->$router_method($path, $app);
 
     return $self;
 }
@@ -133,41 +121,53 @@ sub _parse_route_args {
     }
 }
 
-sub _wrap_http_handler {
-    my ($self, $handler) = @_;
+sub _build_value_app {
+    my ($self, $method_mw, $handler) = @_;
 
-    my $endpoint = $self->{endpoint};
-    my $context_class = $endpoint->context_class;
+    my $endpoint  = $self->{endpoint};
+    my $ctx_class = $endpoint->context_class;
 
-    # If handler is a string, it's a method name
-    if (!ref($handler)) {
-        my $method_name = $handler;
-        my $method = $endpoint->can($method_name)
-            or die "No such method: $method_name in " . ref($endpoint);
+    my @mw = map { $self->_resolve_value_mw($_) } @$method_mw;   # async sub($ctx,$next)->Response
+    my $handler_code = $self->_resolve_handler($handler);         # async sub($ctx)->Response
 
-        return async sub {
-            my ($scope, $receive, $send) = @_;
-
-            require PAGI::Context;
-
-            my $ctx = $context_class->new($scope, $receive, $send);
-            my $res = await $endpoint->$method($ctx);
-            die "handler did not return a response\n"
-                unless Scalar::Util::blessed($res) && $res->can('respond');
-            return $res;
-        };
-    }
-
-    # Already a coderef - wrap it
     return async sub {
         my ($scope, $receive, $send) = @_;
 
         require PAGI::Context;
+        my $ctx = $ctx_class->new($scope, $receive, $send);
 
-        my $ctx = $context_class->new($scope, $receive, $send);
+        my $next = async sub { await $handler_code->($ctx) };
+        for my $m (reverse @mw) {
+            my $inner = $next;
+            $next = async sub { await $m->($ctx, $inner) };
+        }
+
+        await $ctx->respond(await $next->());
+    };
+}
+
+sub _resolve_handler {
+    my ($self, $handler) = @_;
+
+    my $endpoint = $self->{endpoint};
+
+    if (!ref($handler)) {
+        my $method = $endpoint->can($handler)
+            or die "No such method: $handler in " . ref($endpoint);
+        return async sub {
+            my ($ctx) = @_;
+            my $res = await $endpoint->$method($ctx);
+            croak "handler did not return a response"
+                unless is_response($res);
+            return $res;
+        };
+    }
+
+    return async sub {
+        my ($ctx) = @_;
         my $res = await $handler->($ctx);
-        die "handler did not return a response\n"
-            unless Scalar::Util::blessed($res) && $res->can('respond');
+        croak "handler did not return a response"
+            unless is_response($res);
         return $res;
     };
 }
@@ -176,10 +176,14 @@ sub websocket {
     my ($self, $path, @rest) = @_;
 
     my ($middleware, $handler) = $self->_parse_route_args(@rest);
-    my @wrapped_mw = map { $self->_wrap_middleware($_) } @$middleware;
+
+    die "WebSocket routes do not support route-level middleware; "
+      . "apply event middleware at the mount or group level\n"
+        if @$middleware;
+
     my $wrapped = $self->_wrap_websocket_handler($handler);
 
-    $self->{router}->websocket($path, @wrapped_mw ? (\@wrapped_mw, $wrapped) : $wrapped);
+    $self->{router}->websocket($path, $wrapped);
 
     return $self;
 }
@@ -221,10 +225,14 @@ sub sse {
     my ($self, $path, @rest) = @_;
 
     my ($middleware, $handler) = $self->_parse_route_args(@rest);
-    my @wrapped_mw = map { $self->_wrap_middleware($_) } @$middleware;
+
+    die "SSE routes do not support route-level middleware; "
+      . "apply event middleware at the mount or group level\n"
+        if @$middleware;
+
     my $wrapped = $self->_wrap_sse_handler($handler);
 
-    $self->{router}->sse($path, @wrapped_mw ? (\@wrapped_mw, $wrapped) : $wrapped);
+    $self->{router}->sse($path, $wrapped);
 
     return $self;
 }
@@ -262,27 +270,20 @@ sub _wrap_sse_handler {
     };
 }
 
-sub _wrap_middleware {
+sub _resolve_value_mw {
     my ($self, $mw) = @_;
 
     my $endpoint = $self->{endpoint};
-    my $context_class = $endpoint->context_class;
 
     # String = endpoint method name → value-flow route middleware.
     if (!ref($mw)) {
         my $method = $endpoint->can($mw)
             or die "No such middleware method: $mw";
-
         return async sub {
-            my ($scope, $receive, $send, $next) = @_;
-
-            require PAGI::Context;
-
-            my $ctx = $context_class->new($scope, $receive, $send);
-
+            my ($ctx, $next) = @_;
             my $res = await $endpoint->$method($ctx, $next);
-            die "route middleware '$mw' did not return a response\n"
-                unless blessed($res) && $res->can('respond');
+            croak "route middleware '$mw' did not return a response"
+                unless is_response($res);
             return $res;
         };
     }
@@ -495,9 +496,9 @@ Route middleware are value-flow: C<$next-E<gt>()> returns the handler's
 L<PAGI::Response>, which the middleware may decorate (C<$res-E<gt>header(...)>),
 observe, or replace by returning a different response. A middleware must
 B<return> a response (its own, or the one from C<$next>); forgetting to return
-is a loud error. Standard event middleware (L<PAGI::Middleware> instances and
-C<($scope, $receive, $send, $next)> coderefs) are applied at the mount or group
-level, where they wrap the whole endpoint.
+is a loud error. Standard event middleware (L<PAGI::Middleware> instances and factory coderefs of
+the form C<sub { my ($app) = @_; async sub { my ($scope, $receive, $send) = @_; ... } }>)
+are applied at the mount or group level, where they wrap the whole endpoint.
 
     # Handler in subrouter - sees stash from parent middleware
     async sub get_profile {

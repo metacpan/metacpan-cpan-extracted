@@ -3,7 +3,7 @@ package PAGI::Server::EventValidator;
 use strict;
 use warnings;
 
-our $VERSION = '0.002004';
+our $VERSION = '0.002005';
 
 use Carp qw(croak);
 
@@ -204,7 +204,48 @@ sub validate_sse_send {
     elsif ($type eq 'sse.keepalive') {
         _validate_sse_keepalive($event);
     }
+    elsif ($type eq 'sse.close') {
+        _validate_sse_close($event);
+    }
+    elsif ($type eq 'sse.http.response.start') {
+        _validate_sse_decline_start($event);
+    }
+    elsif ($type eq 'sse.http.response.body') {
+        _validate_sse_decline_body($event);
+    }
     # http.fullflush has no required fields beyond type
+}
+
+sub _validate_sse_decline_start {
+    my ($event) = @_;
+
+    croak "sse.http.response.start requires 'status' field"
+        unless exists $event->{status} && defined $event->{status};
+    croak "sse.http.response.start 'status' must be an integer"
+        unless $event->{status} =~ /^\d+$/;
+    if (exists $event->{headers} && defined $event->{headers}) {
+        croak "sse.http.response.start 'headers' must be an array reference"
+            unless ref $event->{headers} eq 'ARRAY';
+    }
+}
+
+sub _validate_sse_decline_body {
+    my ($event) = @_;
+
+    if (exists $event->{more} && defined $event->{more}) {
+        croak "sse.http.response.body 'more' must be an integer"
+            unless $event->{more} =~ /^\d+$/;
+    }
+}
+
+sub _validate_sse_close {
+    my ($event) = @_;
+
+    # reason is optional and server-side only; if present it must be a string
+    if (exists $event->{reason} && defined $event->{reason}) {
+        croak "sse.close 'reason' must be a string"
+            if ref $event->{reason};
+    }
 }
 
 sub _validate_sse_start {

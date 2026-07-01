@@ -35,8 +35,8 @@ on 'test' => sub {
 };
 
 requires 'Aion', '1.6';
+requires 'Aion::Env', '0.2';
 requires 'Aion::Format', '0.1.1';
 requires 'Aion::Run', '0.0.3';
 requires 'List::Util';
 requires 'common::sense';
-requires 'config';

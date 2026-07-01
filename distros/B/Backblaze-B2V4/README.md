@@ -342,7 +342,7 @@ with the bucket name as an argument.
 Example:
 
         my $results = $b2->b2_get_upload_info(
-                bucket_name => 'MyBucketName'
+          bucket_name => 'MyBucketName'
         );
 
 The %$results hash now has 'upload\_url' and 'authorization\_token'

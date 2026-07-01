@@ -1,5 +1,7 @@
 package Ascii::Text::Font::Amongus;
 
+use strict;
+use warnings;
 use Rope;
 use Rope::Autoload;
 

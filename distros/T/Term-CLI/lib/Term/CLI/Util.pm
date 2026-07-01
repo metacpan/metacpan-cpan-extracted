@@ -4,7 +4,7 @@
 #
 #  Description:  Utility functions for Term::CLI
 #
-#       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
+#       Author:  Steven Bakker (SBAKKER), <cpanman@monkey-mind.net>
 #      Created:  21/01/2022
 #
 #   Copyright (c) 2022 Steven Bakker
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Util 0.061000;
+package Term::CLI::Util 0.061001;
 
 use 5.014;
 use warnings;
@@ -211,7 +211,7 @@ Term::CLI::Util - utility functions for Term::CLI(3p)
 
 =head1 VERSION
 
-version 0.061000
+version 0.061001
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Git::Database::Object::Tag;
-$Git::Database::Object::Tag::VERSION = '0.012';
+$Git::Database::Object::Tag::VERSION = '0.013';
 use Git::Database::Actor;
 use DateTime;
 use Encode qw( decode );
@@ -129,7 +129,7 @@ Git::Database::Object::Tag - A tag object in the Git database
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

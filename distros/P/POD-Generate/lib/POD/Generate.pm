@@ -1,5 +1,5 @@
 package POD::Generate;
-use 5.006; use strict; use warnings; our $VERSION = q|0.02|;
+use 5.006; use strict; use warnings; our $VERSION = q|0.03|;
 
 use overload 
 	q|${}| => sub { $_[0]->generate(q|string|) },
@@ -416,7 +416,7 @@ POD::Generate - programmatically generate plain old documentation
 
 =head1 VERSION
 
-v0.02
+v0.03
 
 =cut
 

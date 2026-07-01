@@ -1,41 +1,37 @@
 # NAME
 
-Params::Get - Get the parameters to a subroutine in any way you want
+Params::Get - Normalise subroutine arguments regardless of calling convention
 
 # VERSION
 
-Version 0.14
+Version 0.15
 
 # DESCRIPTION
 
-Exports a single function, `get_params`, which returns a given value.
+`Params::Get` exports a single function, `get_params`, which accepts a
+caller's argument list (or a reference to it) in any of the common Perl
+calling conventions and returns a unified hash-ref.  Library authors can
+write one normalisation call at the top of every public method rather than
+hand-rolling the same conditional chains in each one.
 
-When used hand-in-hand with [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) and [Return::Set](https://metacpan.org/pod/Return%3A%3ASet),
-you should be able to formally specify the input and output sets for a method.
+When combined with [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) and [Return::Set](https://metacpan.org/pod/Return%3A%3ASet) you can
+formally specify and enforce the input and output contracts of every method.
 
 # SYNOPSIS
 
-    use Params::Get;
+    use Params::Get qw(get_params);
     use Params::Validate::Strict;
 
-    sub where_am_i
-    {
+    sub where_am_i {
         my $params = Params::Validate::Strict::validate_strict({
-            args => Params::Get::get_params(undef, \@_),
+            args   => get_params(undef, \@_),
             schema => {
-                'latitude' => {
-                    type => 'number',
-                    min => -90,
-                    max => 90
-                }, 'longitude' => {
-                    type => 'number',
-                    min => -180,
-                    max => 180
-                }
-            }
+                latitude  => { type => 'number', min => -90,  max =>  90 },
+                longitude => { type => 'number', min => -180, max => 180 },
+            },
         });
-
-        print 'You are at ', $params->{'latitude'}, ', ', $params->{'longitude'}, "\n";
+        printf "You are at %s, %s\n",
+            $params->{latitude}, $params->{longitude};
     }
 
     where_am_i(latitude => 0.3, longitude => 124);
@@ -45,88 +41,150 @@ you should be able to formally specify the input and output sets for a method.
 
 ## get\_params
 
-Parse the arguments given to a function.
-Processes arguments passed to methods and ensures they are in a usable format,
-allowing the caller to call the function in any way that they want
-e.g. \`foo('bar')\`, \`foo(arg => 'bar')\`, \`foo({ arg => 'bar' })\` all mean the same
-when called with
+Parse the argument list passed to a subroutine and return a unified hash-ref
+regardless of the calling convention used.  Supported conventions:
 
-    get_params('arg', @_);
+- Single hash-ref: `foo({ a => 1 })`
+- Named key/value pairs: `foo(a => 1, b => 2)`
+- Single scalar with a default key: `foo('US')` given `get_params('country', @_)`
+- Array-ref shorthand: `foo(\@_)` inside the callee
+- Mandatory positional argument plus an options hash-ref:
+`Obj->new($val, { opt => 1 })`
+- Scalar-ref: `foo(\'text')` -- dereferenced automatically
+- Blessed object or CODE ref: mapped under `$default`
+- Array-ref of positional key names as `$default`:
+`get_params([qw(name age)], @_)`
 
-or
+### ARGUMENTS
 
-    get_params('arg', \@_);
+- `$default` (scalar string, arrayref of strings, or `undef`)
 
-Some people like this sort of model, which is also supported.
+    Controls how a single non-hash argument is interpreted:
 
-    use MyClass;
+    - **string** -- used as the key name when a lone scalar, ref, or object
+    is received.
+    - **arrayref of strings** -- positional key names; the _n_th argument
+    is mapped to the _n_th name.  Extra arguments are silently discarded;
+    missing arguments produce `undef` values.
+    - **undef** -- no default key; the caller must pass named pairs or a
+    single hash-ref.  An empty argument list returns `undef`.
 
-    my $str = 'hello world';
-    my $obj = MyClass->new($str, { type => 'string' });
+- `@args`
 
-    package MyClass;
+    The caller's argument list, passed either as a flat list (`@_`) or as a
+    reference to the array (`\@_`).  Both forms are accepted transparently.
 
-    use Params::Get;
+### RETURNS
 
-    sub new {
-        my $class = shift;
-        my $rc = Params::Get::get_params('value', \@_);
+A hash-ref on success, or `undef` when `$default` is `undef` and no
+arguments are provided.
 
-        return bless $rc, $class;
+### SIDE EFFECTS
+
+Croaks from the caller's frame on programming errors (wrong calling
+convention, non-ARRAY ref passed as `$default`).  Confesses with a full
+stack trace when `$default` is defined but zero arguments are received,
+because that almost always indicates a programming error.
+
+### API SPECIFICATION
+
+#### Input
+
+        {
+                default => {
+                        type => [ 'string', 'stringref' ],
+                        optional => 1,
+                        position => 0,
+                }, args => {
+                        type => [ 'array', 'arrayref' ],
+                        optional => 1,
+                        position => 1,
+                }
+        }
+
+#### output
+
+    {
+        type => 'hashref',
+        optional => 1,
     }
 
-## The `$default` Parameter
+### MESSAGES
 
-The first argument is the `$default` parameter controls how single-argument calls are interpreted and provides
-a default key name for parameter extraction in those cases.
+    Message                                             Meaning                                Resolution
+    --------------------------------------------------  -------------------------------------  ----------------------------------------------
+    ::get_params: $default must be a scalar or          A non-ARRAY ref was passed as          Pass a plain string, arrayref of strings,
+      arrayref                                          $default                               or undef
+    Usage: Pkg->method($key => $val)  [stack trace]    $default is defined but no args given  Ensure the caller always passes a value
+    Usage: Pkg->method()                               Odd-length or unrecognisable arg list  Correct the calling convention in the caller
 
-When no arguments are provided with a defined `$default`:
+### PSEUDOCODE
 
-    get_params('required'); # Throws usage error
+    1.  Fast-path: if the sole argument is a plain HASH ref, return it
+        immediately (fires before $default is inspected -- see LIMITATIONS).
 
-The function requires either arguments or an undefined `$default`.
+    2.  Shift $default.  Validate: must be undef, a plain scalar, or an
+        ARRAY ref.  Any other ref type croaks immediately.
 
-### Usage Examples
+    3.  If $default is an ARRAY ref, map remaining @_ positionally to those
+        key names and return.  A single plain HASH ref is still passed
+        through unchanged.
 
-- Simple scalar parameter:
+    4.  Detect the \@_ calling convention: if exactly one ARRAY ref argument
+        remains, check the two-element (key => scalar-val) shorthand and
+        return immediately when it matches.  Otherwise unwrap and use the
+        array contents as the effective @args.
 
-        sub set_country {
-            my $params = get_params('country', @_);
-            # Accepts: set_country('US')
-            # Returns: { country => 'US' }
-        }
+    5.  Dispatch on argument count:
+        0 -- confess (with stack trace) if $default is defined;
+             return undef otherwise.
+        1 -- if $default is defined, wrap the single arg under $default
+             (scalar, arrayref, scalarref->deref, coderef, blessed object).
+             Without $default: unwrap REF-of-REF, pass HASH ref through,
+             return empty ARRAY ref as-is.  Anything else: croak.
+        2 with HASH ref as arg[1]
+          -- Mandatory-positional + options-hashref pattern.
+        even N -- treat as flat key/value pairs.
+        odd N  -- croak.
 
-- Object constructor with options:
+# LIMITATIONS
 
-        sub new {
-            my $class = shift;
-            my $params = get_params('value', @_);
-            # Accepts: MyClass->new($object)
-            # Accepts: MyClass->new($object, { option => 'value' })
-            # Returns: { value => $object } or { value => $object, option => 'value' }
-        }
+- **Single empty arrayref cannot be distinguished from `\@_` of an empty list**
 
-- Hash parameter:
+    When the caller does `foo([])` and the callee uses `get_params('key', @_)`,
+    the `@_` list is `([])` -- one element, an arrayref.  The function
+    interprets the lone arrayref as a `\@_` passthrough, unwraps it to an empty
+    list, and then croaks because `$default` is defined but there are zero
+    arguments.  Workaround: pass the value as a named pair
+    (`key => []`) or ensure the callee always uses `\@_`.
 
-        sub configure {
-            my $params = get_params('config', @_);
-            # Accepts: configure({ db => 'mysql', host => 'localhost' })
-            # Returns: { config => { db => 'mysql', host => 'localhost' } }
-        }
+- **Single hash ref always bypasses `$default` key naming**
 
-- Without default (named parameters only):
+    `get_params('config', { a => 1 })` returns `{ a => 1 }`, not
+    `{ config => { a => 1 } }`.  The fast path fires before `$default`
+    is inspected.  To store a hash ref under a default key, pass it as a named
+    pair: `get_params('config', config => { a => 1 })`.
 
-        sub process {
-            my $params = get_params(undef, @_);
-            # Accepts: process(name => 'John', age => 30)
-            # Returns: { name => 'John', age => 30 }
-        }
+- **No mechanism to mark a `$default` argument as optional**
 
-### Caveats
+    When `$default` is a string and zero arguments are received, the function
+    always confesses.  There is no way to express _"accept zero args and return
+    undef gracefully"_.
 
-- When `$default` is defined and no arguments are provided, an error is thrown
-- There's no way to specify that a default parameter is optional
-- Single hash references always bypass the default parameter naming
+- **Duplicate keys in a flat list silently overwrite; last value wins**
+
+    `get_params(undef, foo => 1, foo => 2)` returns `{ foo => 2 }`
+    with no warning.  If an attacker controls part of the argument list, a
+    later duplicate key can silently override an earlier sanitised value.
+    Detect and reject duplicate keys in the validation layer (e.g.
+    [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict)) rather than relying on `get_params` to catch
+    them.
+
+- **Positional-names `$default` silently discards extra arguments**
+
+    `get_params([qw(a b)], 1, 2, 3)` returns `{ a => 1, b => 2 }`
+    and ignores `3`.  If strict arity is required, validate the returned hash
+    with [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
 
 # AUTHOR
 
@@ -134,7 +192,8 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
-Sometimes giving an array ref rather than array fails.
+Please report bugs or feature requests to `bug-params-get at rt.cpan.org`
+or through [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Params-Get](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Params-Get).
 
 # SEE ALSO
 
@@ -145,40 +204,47 @@ Sometimes giving an array ref rather than array fails.
 
 # SUPPORT
 
-This module is provided as-is without any warranty.
+- MetaCPAN: [https://metacpan.org/dist/Params-Get](https://metacpan.org/dist/Params-Get)
+- RT: [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Get](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Get)
+- CPAN Testers: [http://matrix.cpantesters.org/?dist=Params-Get](http://matrix.cpantesters.org/?dist=Params-Get)
+- CPAN Testers Dependencies: [http://deps.cpantesters.org/?module=Params::Get](http://deps.cpantesters.org/?module=Params::Get)
 
-Please report any bugs or feature requests to `bug-params-get at rt.cpan.org`,
-or through the web interface at
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Params-Get](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Params-Get).
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+## FORMAL SPECIFICATION
 
-You can find documentation for this module with the perldoc command.
+### get\_params
 
-    perldoc Params::Get
+    Let D = default key (Str | [Str*] | undef), A = argument tuple.
 
-You can also look for information at:
+    get_params : D x A* -> HashRef | Undef
 
-- MetaCPAN
+    -- Fast path (fires before D is inspected -- see LIMITATIONS)
+    get_params(D, h)            == h             when |A|=1, h:HashRef
 
-    [https://metacpan.org/dist/Params-Get](https://metacpan.org/dist/Params-Get)
+    -- Positional-names default
+    get_params([n1..nk], v*)    == {ni -> vi}    i in 1..k, vi = undef when missing
 
-- RT: CPAN's request tracker
+    -- Scalar default, single arg
+    get_params(d, s)            == {d -> s}      d:Str, s:Scalar
+    get_params(d, a)            == {d -> a}      d:Str, a:ArrayRef
+    get_params(d, \s)           == {d -> s}      d:Str (scalarref dereferenced)
+    get_params(d, c)            == {d -> c}      d:Str, c:CodeRef
+    get_params(d, o)            == {d -> o}      d:Str, o:BlessedObject
 
-    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Get](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Get)
+    -- Mandatory-positional + options-hashref
+    get_params(d, v, {k->w..})  == {d->v, k->w..}    non-empty opts
+    get_params(d, d, {k->w..})  == {d -> {k->w..}}   first arg IS the key name
 
-- CPAN Testers' Matrix
+    -- Named pairs
+    get_params(undef, k1,v1..)  == {ki -> vi}    when |A| is even
 
-    [http://matrix.cpantesters.org/?dist=Params-Get](http://matrix.cpantesters.org/?dist=Params-Get)
-
-- CPAN Testers Dependencies
-
-    [http://deps.cpantesters.org/?module=Params::Get](http://deps.cpantesters.org/?module=Params::Get)
+    -- Empty / error
+    get_params(undef)           == undef
+    get_params(d)               => confess       d:Str (missing required arg)
+    get_params(D, odd-list)     => croak
 
 # LICENCE AND COPYRIGHT
 
 Copyright 2025-2026 Nigel Horne.
 
-Usage is subject to the GPL2 licence terms.
-If you use it,
+Usage is subject to the GPL2 licence terms.  If you use this module,
 please let me know.

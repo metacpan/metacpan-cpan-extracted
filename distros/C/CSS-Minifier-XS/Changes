@@ -1,8 +1,13 @@
 Revision history for Perl extension CSS::Minifier::XS.
 
+0.15      2026-06-30 11:19:01-07:00 America/Vancouver
+    - Fix bug which resulted in zeroes being collapsed when they shouldn't,
+      affecting filenames with zeroes in them (e.g.  "url(status-0.png)").
+      Thanks to Stefan Berger for reporting GH#5.
+
 0.14      2026-06-28 16:30:59-07:00 America/Vancouver
     - Fixes a memory leak in minify(), when the entire document is minified
-      away.
+      away.  CVE-2026-13593
 
 0.13      2021-02-06 17:26:39-08:00 America/Vancouver
     - Internals; avoid allocating memory for each node as we tokenize the

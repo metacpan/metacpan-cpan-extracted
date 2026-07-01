@@ -7,6 +7,11 @@ on 'develop' => sub {
 	requires 'Minilla', 'v3.1.19';
 	requires 'Liveman', '1.0';
 	requires 'Software::License::GPL_3';
+	requires 'Test::CPAN::Meta';
+	requires 'Test::MinimumVersion::Fast';
+	requires 'Test::PAUSE::Permissions';
+	requires 'Test::Pod';
+	requires 'Test::Spellunker';
 	requires 'V';
 	requires 'Version::Next';
 };
@@ -27,13 +32,14 @@ on 'test' => sub {
 	requires 'open';
 };
 
-# Для DDP
+# For DDP
 recommends 'Devel::Size';
 
+requires 'Aion::Env', '0.2';
 requires 'DDP';
-requires 'Guard';
 requires 'Encode';
 requires 'Exporter';
+requires 'Guard';
 requires 'JSON::XS';
 requires 'List::Util';
 requires 'POSIX';
@@ -42,5 +48,4 @@ requires 'YAML::Syck';
 requires 'bigint';
 requires 'bytes';
 requires 'common::sense';
-requires 'config';
 requires 'constant';

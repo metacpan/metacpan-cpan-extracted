@@ -28,6 +28,7 @@ t/01-basic.t
 t/02-multiprocess.t
 t/03-memfd-eventfd.t
 t/04-edge-cases.t
+t/05-scan-from.t
 t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t

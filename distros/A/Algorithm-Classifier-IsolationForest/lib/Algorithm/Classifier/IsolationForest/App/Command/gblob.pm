@@ -20,6 +20,7 @@ sub opt_spec {
 			'Number of abnormal points to generate. If less than 1, none will be generated.',
 			{ 'default' => '20' }
 		],
+		[ 'd=i', 'Number of dimensions (features) per point.', { 'default' => '2' } ],
 	);
 } ## end sub opt_spec
 
@@ -30,9 +31,14 @@ sub description {
 
 The output format is as below...
 
-$X,$Y,$truth
+$feat1,...,$featN,$truth
 
-$truth is a 0/1 with 1 meaning it is a abnormal value
+$truth is a 0/1 with 1 meaning it is a abnormal value.
+
+Normal points are drawn from N(0,1) in each dimension. Anomalous points are
+placed on a hyperspherical shell at radius 5-8 from the origin.
+
+Use -D to control the number of dimensions (default: 2).
 ';
 } ## end sub description
 
@@ -52,6 +58,10 @@ sub validate {
 		$self->usage_error( '-n, "' . $opt->{'n'} . '", must be be 1 or greater' );
 	}
 
+	if ( $opt->{'d'} < 1 ) {
+		$self->usage_error( '-D, "' . $opt->{'d'} . '", must be 1 or greater' );
+	}
+
 	return 1;
 } ## end sub validate
 
@@ -65,18 +75,28 @@ sub gaussian {
 sub execute {
 	my ( $self, $opt, $args ) = @_;
 
+	my $dims = $opt->{'d'};
+	srand( $opt->{'s'} ) if defined $opt->{'s'};
+
 	my $data = '';
 
+	# Normal points: each feature is drawn from N(0,1)
 	for ( 1 .. $opt->{'n'} ) {
-		$data = $data . gaussian( 0, 1 ) . ',' . gaussian( 0, 1 ) . ",0\n";
+		my @feats = map { gaussian( 0, 1 ) } 1 .. $dims;
+		$data = $data . join( ',', @feats ) . ",0\n";
 	}
+
+	# Anomalous points: random direction in D-space scaled to radius 5-8.
+	# Direction is a normalised vector of D Gaussian draws.
 	if ( $opt->{'a'} >= 1 ) {
 		for ( 1 .. $opt->{'a'} ) {
-			my $angle  = rand() * 2 * PI;
 			my $radius = 5 + rand() * 3;
-			my $X      = $radius * cos($angle);
-			my $Y      = $radius * sin($angle);
-			$data = $data . $X . ',' . $Y . ",1\n";
+			my @raw    = map { gaussian( 0, 1 ) } 1 .. $dims;
+			my $norm   = 0;
+			$norm += $_ * $_ for @raw;
+			$norm = sqrt($norm) || 1;
+			my @feats = map { $_ / $norm * $radius } @raw;
+			$data = $data . join( ',', @feats ) . ",1\n";
 		}
 	}
 

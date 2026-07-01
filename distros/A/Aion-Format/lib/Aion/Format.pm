@@ -3,7 +3,7 @@ package Aion::Format;
 
 use common::sense;
 
-our $VERSION = "0.1.2";
+our $VERSION = "0.1.3";
 
 require POSIX;
 require Term::ANSIColor;
@@ -419,7 +419,7 @@ Aion::Format - a Perl extension for formatting numbers, coloring output, etc.
 
 =head1 VERSION
 
-0.1.2
+0.1.3
 
 =head1 SYNOPSIS
 
@@ -724,7 +724,7 @@ Transliterates Russian text.
 
 Trap for B<STDERR>.
 
-If there is an error in the block, C<STDOUT> is restored, but the output in the block is lost.
+If there is an error in the block, B<STDERR> is restored and the output in the block is lost.
 
 	trapperr { print STDERR "Stars: ✨" }  # => Stars: ✨
 
@@ -734,7 +734,7 @@ See also C<IO::Capture::Stderr>.
 
 Trap for B<STDOUT>.
 
-If there is an error in the block, C<STDOUT> is restored, but the output in the block is lost.
+If there is an error in the block, B<STDOUT> is restored and the output in the block is lost.
 
 	trappout { print "Stars: ✨" }  # => Stars: ✨
 	trappout { print "Stars: ✨"; die "error" }  # @=> error

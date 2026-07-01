@@ -3,19 +3,14 @@ package CGI::Session::ID::md5;
 # $Id$
 
 use strict;
-use Digest::MD5;
+use Crypt::SysRandom qw( random_bytes );
 use CGI::Session::ErrorHandler;
 
-$CGI::Session::ID::md5::VERSION = '4.43';
+$CGI::Session::ID::md5::VERSION = '4.49';
 @CGI::Session::ID::md5::ISA     = qw( CGI::Session::ErrorHandler );
 
 *generate = \&generate_id;
-sub generate_id {
-    my $md5 = Digest::MD5->new();
-    $md5->add($$ , time() , rand(time) );
-    return $md5->hexdigest();
-}
-
+sub generate_id { return unpack("H*", random_bytes(16)) }
 
 1;
 

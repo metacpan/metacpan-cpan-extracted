@@ -132,39 +132,45 @@ my $access_log = PAGI::Middleware::AccessLog->new(
 );
 
 # 2. Coderef middleware - request timing
-my $timing = async sub {
-    my ($scope, $receive, $send, $next) = @_;
-    my $start = time();
-    await $next->();
-    my $duration = (time() - $start) * 1000;
-    warn sprintf "[timing] %s %s %.2fms\n",
-        $scope->{method} // 'WS/SSE', $scope->{path}, $duration;
+my $timing = sub {
+    my ($app) = @_;
+    async sub {
+        my ($scope, $receive, $send) = @_;
+        my $start = time();
+        await $app->($scope, $receive, $send);
+        my $duration = (time() - $start) * 1000;
+        warn sprintf "[timing] %s %s %.2fms\n",
+            $scope->{method} // 'WS/SSE', $scope->{path}, $duration;
+    };
 };
 
 # 3. Coderef middleware - JSON content-type validation for POST
-my $require_json = async sub {
-    my ($scope, $receive, $send, $next) = @_;
+my $require_json = sub {
+    my ($app) = @_;
+    async sub {
+        my ($scope, $receive, $send) = @_;
 
-    # Only check POST requests
-    if (($scope->{method} // '') eq 'POST') {
-        my $content_type = '';
-        for my $h (@{$scope->{headers} // []}) {
-            if (lc($h->[0]) eq 'content-type') {
-                $content_type = $h->[1];
-                last;
+        # Only check POST requests
+        if (($scope->{method} // '') eq 'POST') {
+            my $content_type = '';
+            for my $h (@{$scope->{headers} // []}) {
+                if (lc($h->[0]) eq 'content-type') {
+                    $content_type = $h->[1];
+                    last;
+                }
+            }
+
+            unless ($content_type =~ m{application/json}i) {
+                my $res = PAGI::Response->new($scope);
+                await $res->status(415)->json({
+                    error => 'Content-Type must be application/json'
+                })->respond($send);
+                return;  # Short-circuit - don't call $app
             }
         }
 
-        unless ($content_type =~ m{application/json}i) {
-            my $res = PAGI::Response->new($scope);
-            await $res->status(415)->json({
-                error => 'Content-Type must be application/json'
-            })->respond($send);
-            return;  # Short-circuit - don't call $next
-        }
-    }
-
-    await $next->();
+        await $app->($scope, $receive, $send);
+    };
 };
 
 #---------------------------------------------------------

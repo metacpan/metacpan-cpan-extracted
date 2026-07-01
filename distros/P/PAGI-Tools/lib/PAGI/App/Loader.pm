@@ -1,5 +1,5 @@
 package PAGI::App::Loader;
-$PAGI::App::Loader::VERSION = '0.002000';
+$PAGI::App::Loader::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;

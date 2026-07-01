@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Source: https://metacpan.org/release/Term-CLI
-Upstream-Contact: Steven Bakker <sbakker@cpan.org>
+Upstream-Contact: Steven Bakker <cpanman@monkey-mind.net>
 Upstream-Name: Term-CLI
 DISCLAIMER: This copyright info was automatically extracted 
  from the perl module. It may not be accurate, so you better 
@@ -12,7 +12,7 @@ DISCLAIMER: This copyright info was automatically extracted
  with this file.
 
 Files: *
-Copyright: Steven Bakker <sbakker@cpan.org>
+Copyright: Steven Bakker <cpanman@monkey-mind.net>
 License: Artistic or GPL-1+
 
 Files: debian/*

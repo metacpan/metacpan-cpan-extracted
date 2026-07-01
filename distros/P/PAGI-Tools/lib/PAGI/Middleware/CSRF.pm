@@ -1,5 +1,5 @@
 package PAGI::Middleware::CSRF;
-$PAGI::Middleware::CSRF::VERSION = '0.002000';
+$PAGI::Middleware::CSRF::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

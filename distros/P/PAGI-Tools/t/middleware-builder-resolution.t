@@ -41,9 +41,9 @@ subtest 'middleware class resolution' => sub {
         'PAGI::Middleware::Auth::Bearer',
         'Auth::Bearer gets PAGI::Middleware:: prefix';
 
-    is $builder->_resolve_middleware('WebSocket::Compression'),
-        'PAGI::Middleware::WebSocket::Compression',
-        'WebSocket::Compression gets PAGI::Middleware:: prefix';
+    is $builder->_resolve_middleware('WebSocket::RateLimit'),
+        'PAGI::Middleware::WebSocket::RateLimit',
+        'WebSocket::RateLimit gets PAGI::Middleware:: prefix';
 
     is $builder->_resolve_middleware('SSE::Retry'),
         'PAGI::Middleware::SSE::Retry',
@@ -75,9 +75,9 @@ subtest 'loading real nested middleware' => sub {
     is $class1, 'PAGI::Middleware::Auth::Basic', 'Auth::Basic resolves correctly';
     ok $class1->can('wrap'), 'Auth::Basic class loaded and has wrap method';
 
-    my $class2 = $builder->_resolve_middleware('WebSocket::Compression');
-    is $class2, 'PAGI::Middleware::WebSocket::Compression', 'WebSocket::Compression resolves correctly';
-    ok $class2->can('wrap'), 'WebSocket::Compression class loaded and has wrap method';
+    my $class2 = $builder->_resolve_middleware('WebSocket::RateLimit');
+    is $class2, 'PAGI::Middleware::WebSocket::RateLimit', 'WebSocket::RateLimit resolves correctly';
+    ok $class2->can('wrap'), 'WebSocket::RateLimit class loaded and has wrap method';
 };
 
 # =============================================================================

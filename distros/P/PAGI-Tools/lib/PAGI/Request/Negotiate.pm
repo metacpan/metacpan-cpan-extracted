@@ -1,5 +1,5 @@
 package PAGI::Request::Negotiate;
-$PAGI::Request::Negotiate::VERSION = '0.002000';
+$PAGI::Request::Negotiate::VERSION = '0.002001';
 use strict;
 use warnings;
 
@@ -322,10 +322,14 @@ sub quality_for_type {
 
 =head2 Content Negotiation in a PAGI App
 
+    use PAGI::Request;
     use PAGI::Request::Negotiate;
 
     async sub app ($scope, $receive, $send) {
-        my $accept = $scope->{headers}{accept} // '*/*';
+        # Scope headers are an arrayref of [name, value] pairs, not a hash.
+        # Read them through PAGI::Request, not $scope->{headers}{...}.
+        my $req    = PAGI::Request->new($scope, $receive);
+        my $accept = $req->header('accept') // '*/*';
 
         my $format = PAGI::Request::Negotiate->best_match(
             ['json', 'html', 'xml'],

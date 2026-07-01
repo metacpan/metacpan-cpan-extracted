@@ -1,5 +1,5 @@
 package PAGI::App::NotFound;
-$PAGI::App::NotFound::VERSION = '0.002000';
+$PAGI::App::NotFound::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;

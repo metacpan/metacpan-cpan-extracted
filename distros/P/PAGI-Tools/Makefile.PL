@@ -24,7 +24,8 @@ my %WriteMakefileArgs = (
     "HTTP::MultiPartParser" => "0.02",
     "Hash::MultiValue" => "0.16",
     "IO::Compress::Gzip" => 0,
-    "JSON::MaybeXS" => "1.004003"
+    "JSON::MaybeXS" => "1.004003",
+    "Module::Load" => 0
   },
   "TEST_REQUIRES" => {
     "Future::IO" => "0.23",
@@ -32,9 +33,9 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000159",
     "Time::HiRes" => "1.9764"
   },
-  "VERSION" => "0.002000",
+  "VERSION" => "0.002001",
   "test" => {
-    "TESTS" => "t/*.t t/app/*.t t/context/*.t t/endpoint/*.t t/middleware/*.t t/middleware/session/*.t t/request/*.t t/sse/*.t t/test-client/*.t t/test/*.t t/utils/*.t t/websocket/*.t"
+    "TESTS" => "t/*.t t/app/*.t t/context/*.t t/endpoint/*.t t/integration/*.t t/middleware/*.t t/middleware/session/*.t t/request/*.t t/sse/*.t t/test-client/*.t t/test/*.t t/utils/*.t t/websocket/*.t"
   }
 );
 
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "IO::Async" => "0.802",
   "IO::Compress::Gzip" => 0,
   "JSON::MaybeXS" => "1.004003",
+  "Module::Load" => 0,
   "Test2::V0" => "0.000159",
   "Time::HiRes" => "1.9764"
 );

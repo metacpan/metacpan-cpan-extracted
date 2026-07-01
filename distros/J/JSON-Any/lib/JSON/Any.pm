@@ -1,9 +1,9 @@
-package JSON::Any; # git description: v1.40-5-g0826677
+package JSON::Any; # git description: v1.41-3-g2ae6655
 
 use warnings;
 use strict;
 
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 
 use Carp qw(croak carp);
 
@@ -645,7 +645,7 @@ JSON::Any - (DEPRECATED) Wrapper Class for the various JSON classes
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 

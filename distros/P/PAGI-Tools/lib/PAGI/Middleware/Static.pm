@@ -1,5 +1,5 @@
 package PAGI::Middleware::Static;
-$PAGI::Middleware::Static::VERSION = '0.002000';
+$PAGI::Middleware::Static::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

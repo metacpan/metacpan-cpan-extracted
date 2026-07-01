@@ -1,5 +1,5 @@
 package PAGI::Request;
-$PAGI::Request::VERSION = '0.002000';
+$PAGI::Request::VERSION = '0.002001';
 use strict;
 use warnings;
 use Hash::MultiValue;

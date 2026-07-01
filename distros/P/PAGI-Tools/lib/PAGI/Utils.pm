@@ -1,5 +1,5 @@
 package PAGI::Utils;
-$PAGI::Utils::VERSION = '0.002000';
+$PAGI::Utils::VERSION = '0.002001';
 use strict;
 use warnings;
 use Exporter 'import';
@@ -8,8 +8,16 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use PAGI::Lifespan;
 
-our @EXPORT_OK = qw(handle_lifespan to_app);
+our @EXPORT_OK = qw(handle_lifespan to_app is_response);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
+
+# True if $x is a PAGI response value: a blessed object that can respond($send).
+# The single source of truth for the "did the handler return a response?" check
+# (used by the endpoint and router dispatch paths).
+sub is_response {
+    my ($x) = @_;
+    return blessed($x) && $x->can('respond') ? 1 : 0;
+}
 
 async sub handle_lifespan {
     my ($scope, $receive, $send, %opts) = @_;
@@ -122,5 +130,17 @@ pass components and class names directly:
 
     mount '/static' => PAGI::App::File->new(root => $dir);
     mount '/api'    => 'MyApp::API';
+
+=cut
+
+=head2 is_response
+
+    croak "handler did not return a response" unless is_response($value);
+
+Returns 1 if C<$value> is a PAGI response value -- a blessed object with a
+C<respond> method -- and 0 otherwise. This is the single source of truth for the
+"did the handler return a response?" check used across the endpoint and router
+dispatch paths, so those checks stay consistent (same predicate, same C<croak>
+diagnostics) instead of each re-deriving C<< blessed($x) && $x->can('respond') >>.
 
 =cut

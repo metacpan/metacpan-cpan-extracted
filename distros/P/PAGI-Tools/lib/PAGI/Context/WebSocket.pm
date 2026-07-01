@@ -1,5 +1,5 @@
 package PAGI::Context::WebSocket;
-$PAGI::Context::WebSocket::VERSION = '0.002000';
+$PAGI::Context::WebSocket::VERSION = '0.002001';
 use strict;
 use warnings;
 

@@ -219,6 +219,52 @@ bool nodeStartsBANGIMPORTANT(Node* node) {
     return 0;
 }
 
+/* checks if this node contains a numeric value: an optional leading run of
+ * digits, followed by an optional single decimal point, which MUST be followed
+ * by a digit, and an optional trailing unit (letters and/or "%").
+ *
+ * NOTE: "node->contents" may not be NULL terminated (it is a pointer into a
+ * pre-existing string value), so iterate using "->contents" and "->length".
+ */
+bool nodeIsNumber(Node* node) {
+    const char* p   = node->contents;
+    const char* end = p + node->length;
+    bool sawDigit = 0;
+
+    /* leading run of digits */
+    while ((p < end) && charIsNumeric(*p)) {
+        sawDigit = 1;
+        p++;
+    }
+
+    /* decimal point, which MUST be followed by a digit */
+    if ((p < end) && (*p == '.')) {
+        p++;
+        /* no trailing digit? Then not a number */
+        if ((p >= end) || !charIsNumeric(*p))
+            return 0;
+        /* skip past all following digits */
+        while ((p < end) && charIsNumeric(*p))
+            p++;
+        sawDigit = 1;
+    }
+
+    /* must have seen at least one digit, otherwise it's not a number */
+    if (!sawDigit)
+        return 0;
+
+    /* optional trailing unit: letters and/or "%" only */
+    while (p < end) {
+        char ch = *p++;
+        if ( ((ch>='a')&&(ch<='z')) || ((ch>='A')&&(ch<='Z')) || (ch=='%') )
+            continue;
+        return 0;
+    }
+
+    /* looks sane; it's a number */
+    return 1;
+}
+
 /* ****************************************************************************
  * NODE MANIPULATION FUNCTIONS
  * ****************************************************************************
@@ -474,14 +520,24 @@ void CssCollapseNodes(Node* curr) {
                 break;
             case NODE_IDENTIFIER:
             {
-                /* if the node doesn't begin with a "zero", nothing to collapse */
-                const char* ptr = curr->contents;
-                if ( (*ptr != '0') && (*ptr != '.' )) {
-                    /* not "0" and not "point-something" */
+                const char* ptr;
+
+                /* if the node isn't numeric, there's no point trying to
+                 * collapse a Zero (as it won't have any).
+                 */
+                if (!nodeIsNumber(curr))
                     break;
-                }
-                if ( (*ptr == '.') && (*(ptr+1) != '0') ) {
-                    /* "point-something", but not "point-zero" */
+
+                /* numerics can be part of a NAME or PATH segment, instead of
+                 * being an actual numeric value (e.g. ".grid-001",
+                 * "--spacing-001", "url(cache/00/foo.png)").  Those need to be
+                 * preserved.
+                 */
+                if (curr->prev
+                    && (nodeIsCHAR(curr->prev, '-') || nodeIsCHAR(curr->prev, '/'))
+                    && curr->prev->prev
+                    && nodeIsIDENTIFIER(curr->prev->prev))
+                {
                     break;
                 }
 

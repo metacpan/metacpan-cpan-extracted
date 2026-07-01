@@ -183,26 +183,29 @@ Apply middleware to specific routes by passing an arrayref:
   my $router = PAGI::App::Router->new;
 
   # Define middleware
-  my $auth_mw = async sub {
-      my ($scope, $receive, $send, $next) = @_;
+  my $auth_mw = sub {
+      my ($app) = @_;
+      async sub {
+          my ($scope, $receive, $send) = @_;
 
-      # Check authorization
-      my $token = '';
-      for my $h (@{$scope->{headers}}) {
-          if (lc($h->[0]) eq 'authorization') {
-              $token = $h->[1];
-              last;
+          # Check authorization
+          my $token = '';
+          for my $h (@{$scope->{headers}}) {
+              if (lc($h->[0]) eq 'authorization') {
+                  $token = $h->[1];
+                  last;
+              }
           }
-      }
 
-      unless ($token eq 'Bearer secret123') {
-          my $res = PAGI::Response->new($scope);
-          await $res->status(401)->json({ error => 'Unauthorized' })->respond($send);
-          return;  # Don't call $next->()
-      }
+          unless ($token eq 'Bearer secret123') {
+              my $res = PAGI::Response->new($scope);
+              await $res->status(401)->json({ error => 'Unauthorized' })->respond($send);
+              return;  # Don't call $app->()
+          }
 
-      # Authorized - continue to handler
-      await $next->();
+          # Authorized - continue to handler
+          await $app->($scope, $receive, $send);
+      };
   };
 
   # Apply middleware to specific routes
@@ -213,10 +216,13 @@ Apply middleware to specific routes by passing an arrayref:
   });
 
   # Multiple middleware
-  my $log_mw = async sub {
-      my ($scope, $receive, $send, $next) = @_;
-      warn "Request: $scope->{method} $scope->{path}\n";
-      await $next->();
+  my $log_mw = sub {
+      my ($app) = @_;
+      async sub {
+          my ($scope, $receive, $send) = @_;
+          warn "Request: $scope->{method} $scope->{path}\n";
+          await $app->($scope, $receive, $send);
+      };
   };
 
   $router->post('/admin/users' => [$log_mw, $auth_mw] => async sub {
@@ -255,10 +261,13 @@ Use C<mount()> to attach sub-applications or routers at a prefix:
   $main_router->mount('/api' => $api_router);
 
   # Mount with middleware (applies to all sub-routes)
-  my $cors_mw = async sub {
-      my ($scope, $receive, $send, $next) = @_;
-      # Add CORS headers...
-      await $next->();
+  my $cors_mw = sub {
+      my ($app) = @_;
+      async sub {
+          my ($scope, $receive, $send) = @_;
+          # Add CORS headers...
+          await $app->($scope, $receive, $send);
+      };
   };
 
   $main_router->mount('/api' => [$cors_mw] => $api_router);
@@ -1035,6 +1044,118 @@ run in registration order, and may be C<async sub>s. The loop runs until the
 client disconnects, a handler calls C<< $ctx->stop >>, or C<receive> fails;
 C<run()> resolves with the reason and clears the handlers afterward so closures
 over C<$ctx> do not leak.
+
+=head2 Closing an SSE stream, and recording why
+
+Returning from an SSE handler ends the stream when your code does. Call
+C<< $sse->close >> to end it B<explicitly and immediately> -- from anywhere,
+including deep in a helper -- which also wakes a parked C<< $sse->run >>. An
+optional C<reason> is recorded server-side (logs, metrics, tracing) and passed
+to C<on_close>; it is B<never> sent to the client, since SSE has no close frame:
+
+  $router->sse('/quotes' => async sub {
+      my ($scope, $receive, $send) = @_;
+      my $sse = PAGI::SSE->new($scope, $receive, $send);
+
+      my $sub = subscribe_feed($sse->query_param('job'));
+
+      # One cleanup hook, however the stream ends (client gone, our close, ...).
+      $sse->on_close(async sub {
+          my ($sse, $reason) = @_;
+          await $sub->cancel;                  # async cleanup, awaited
+      });
+
+      while (defined(my $tick = await $sub->next)) {
+          await $sse->send_event(event => 'quote', data => $tick);
+          next unless $tick->{final};
+
+          # Tell the CLIENT with an in-band event it listens for, then close with
+          # a SERVER-SIDE reason for your logs.
+          await $sse->send_event(event => 'done', data => { ok => 1 });
+          return await $sse->close(reason => 'feed_complete');
+      }
+      await $sse->close(reason => 'feed_gone');
+  });
+
+The two "why" channels are deliberately separate: a normal C<sse.send> event is
+the only thing the browser can observe, while C<reason> is server-side metadata.
+Because the close is an event on C<$send>, middleware can observe it -- wrap
+C<$send> to fan close reasons out to metrics or tracing without touching the
+handler:
+
+  sub observe_sse_closes {
+      my ($app) = @_;
+      return async sub {
+          my ($scope, $receive, $send) = @_;
+          my $wrapped = async sub {
+              my ($event) = @_;
+              metric_inc('sse_close', $event->{reason} // 'unspecified')
+                  if ($event->{type} // '') eq 'sse.close';
+              return await $send->($event);    # forward unchanged
+          };
+          await $app->($scope, $receive, $wrapped);
+      };
+  }
+
+Apply it at the mount or group level (event middleware). See L<PAGI::SSE/close>
+for the method, L<PAGI::Spec::Www/"Close SSE - C<send> event"> for the protocol
+event, and L<PAGI::Cookbook/"Ending a stream: return vs C<sse.close>"> for the
+raw form.
+
+=head2 Declining an SSE request (404 / 401 / 204 stop-reconnect)
+
+An SSE request is an ordinary C<GET> with C<Accept: text/event-stream>. Before
+you start the stream you can B<decline> it and return a normal HTTP response
+instead -- no event stream. Send C<sse.http.response.start> followed by
+C<sse.http.response.body> on the raw C<$send> (the same one you passed to
+C<< PAGI::SSE->new >>), instead of calling C<< $sse->start >>:
+
+  $router->sse('/feed' => async sub {
+      my ($scope, $receive, $send) = @_;
+      my $sse = PAGI::SSE->new($scope, $receive, $send);
+
+      # Auth check before we commit to a stream.
+      unless (authorized($sse->query_param('token'))) {
+          await $send->({
+              type    => 'sse.http.response.start',
+              status  => 401,
+              headers => [['content-type', 'text/plain']],
+          });
+          await $send->({ type => 'sse.http.response.body', body => 'Unauthorized', more => 0 });
+          return;
+      }
+
+      await $sse->start;
+      # ... stream ...
+  });
+
+Three common reasons to decline:
+
+=over 4
+
+=item * B<404> -- no such SSE endpoint. C<PAGI::App::Router> already does this
+for an unmatched SSE route (see L</SSE Routes>); you rarely write it by hand.
+
+=item * B<401> / B<403> -- authentication or authorization failed; don't open a
+stream.
+
+=item * B<204> -- the spec's mechanism to B<stop> an C<EventSource> from
+reconnecting. A browser's C<EventSource> reconnects on any non-success or
+network drop; answering the request with C<204 No Content> tells it to stop for
+good.
+
+=back
+
+  # Tell EventSource to stop reconnecting: a bare 204.
+  await $send->({ type => 'sse.http.response.start', status => 204, headers => [] });
+  await $send->({ type => 'sse.http.response.body', body => '', more => 0 });
+
+First-send-wins picks the mode: once you have sent C<sse.start> a decline
+raises, and once you have sent C<sse.http.response.start> a stream event
+(C<sse.send>, C<sse.start>, ...) raises. Decide before you start.
+
+See L<PAGI::Spec::Www/"Decline SSE - C<send> event"> for the protocol events and
+the full state machine.
 
 =head1 BACKGROUND WORK
 

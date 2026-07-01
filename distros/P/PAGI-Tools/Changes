@@ -1,5 +1,61 @@
 # Revision history for PAGI-Tools
 
+0.002001 - 2026-06-30
+  - PAGI::Endpoint / PAGI::Endpoint::Router: route-level event middleware is now
+    spec-pure factory form, composed at build time. The vestigial call() and the
+    old 4-arg ($scope, $receive, $send, $next) middleware form are removed; the
+    endpoint owns the value-flow chain and responds at the framework boundary
+    (await $next->() returns the handler's response value). WS/SSE route-level
+    middleware now fail loudly (unsupported), and a value-flow non-response error
+    names the offending method.
+  - PAGI::SSE: close() now sends an explicit sse.close event (with an optional
+    server-side reason) and wakes a parked run(); close() is async so on_close
+    callbacks run to completion.
+  - PAGI::Endpoint::SSE: await keepalive() so the sse.keepalive event is actually
+    emitted on a fully-async server.
+  - PAGI::Utils::is_response: one predicate for "did the handler return a
+    response?", shared by the endpoint and router dispatch paths so the
+    diagnostics stay consistent.
+  - PAGI::SSE / PAGI::Context::SSE: add is_connected, derived from the SSE
+    wrapper's own state machine (true while started and not closed), mirroring
+    PAGI::WebSocket. Context::SSE::is_connected overrides the base method, which
+    reads pagi.connection (not applicable to sse) and therefore wrongly reported
+    a live stream as disconnected. Like the WebSocket counterpart it is "not
+    falsely stale" rather than a live network probe.
+  - PAGI::WebSocket->deny() no longer records the HTTP denial status as a
+    WebSocket close code; close_code is undef after an HTTP denial (a denial
+    sends a response, not a close frame). The bare-403 fallback still reports
+    1008.
+  - PAGI::WebSocket try_send_text/bytes/json no longer fabricate a 1006
+    "Connection lost" close (and no longer mark the socket closed) when a send
+    errors. A failed send returns false without mutating connection state; a
+    real disconnect is still detected via the websocket.disconnect event.
+  - Docs: PAGI::SSE scope caching described accurately (cached while
+    referenced via a weak ref, not a guaranteed singleton);
+    PAGI::Request::Negotiate content-negotiation example reads the Accept
+    header through PAGI::Request instead of the (fatal) $scope->{headers}{...};
+    try_send_* documented as best-effort with a send-method ladder; a cookbook
+    recipe on declining an SSE request (404 / 401 / 204 stop-reconnect);
+    examples and Endpoint POD migrated off the removed 4-arg middleware form.
+  - REMOVED PAGI::Middleware::WebSocket::Compression. permessage-deflate
+    (RFC 7692) is a WebSocket framing-layer feature -- a compressed message is
+    signalled by the RSV1 frame bit, which only the server's framing layer can
+    set. A middleware at the PAGI event layer can deflate the payload bytes but
+    cannot flag the frame, so the deflated bytes went out in a normal RSV1=0
+    frame (garbage on the wire). It also wrote a non-spec `extensions` key on
+    websocket.accept (the event allows only `subprotocol`/`headers`), which the
+    reference server ignores -- and that server explicitly does not implement
+    permessage-deflate (RSV bits forced to 0). If WebSocket compression is
+    wanted, it must be a server feature, not an application middleware.
+  - PAGI::App::Router: an unmatched SSE or WebSocket route now returns a real
+    404 instead of crashing the connection. The 404 is emitted with the event
+    family that matches the scope -- sse.http.response.* on SSE and
+    websocket.http.response.* on WebSocket, plain http.response.* on HTTP --
+    since those scopes reject a plain http.response.* before a stream or
+    handshake starts. A custom not_found app still takes over for every scope
+    type. Requires a server supporting the sse.http.response.* decline events
+    (PAGI-Server 0.002005+).
+
 0.002000 - 2026-06-26
   - Split out of the PAGI distribution into its own distribution (git history
     preserved).

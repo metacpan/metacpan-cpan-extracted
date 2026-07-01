@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,7 +37,7 @@ no_index:
 provides:
   Aion::Format:
     file: lib/Aion/Format.pm
-    version: v0.1.2
+    version: v0.1.3
   Aion::Format::Html:
     file: lib/Aion/Format/Html.pm
   Aion::Format::Json:
@@ -49,6 +49,7 @@ provides:
 recommends:
   Devel::Size: '0'
 requires:
+  Aion::Env: '0.2'
   DDP: '0'
   Encode: '0'
   Exporter: '0'
@@ -61,14 +62,13 @@ requires:
   bigint: '0'
   bytes: '0'
   common::sense: '0'
-  config: '0'
   constant: '0'
   perl: v5.22.0
 resources:
   bugtracker: https://github.com/darviarush/perl-aion-format/issues
   homepage: https://github.com/darviarush/perl-aion-format
   repository: https://github.com/darviarush/perl-aion-format.git
-version: 0.1.2
+version: 0.1.3
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

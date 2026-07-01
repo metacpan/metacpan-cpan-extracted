@@ -1,5 +1,5 @@
 package PAGI::Middleware;
-$PAGI::Middleware::VERSION = '0.002000';
+$PAGI::Middleware::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;
@@ -186,24 +186,6 @@ async sub buffer_request_body {
     return ($body, $event);
 }
 
-=head2 call
-
-    await $middleware->call($scope, $receive, $send, $app);
-
-Convenience method to invoke the middleware with an app.
-Equivalent to:
-
-    my $wrapped = $middleware->wrap($app);
-    await $wrapped->($scope, $receive, $send);
-
-=cut
-
-async sub call {
-    my ($self, $scope, $receive, $send, $app) = @_;
-
-    my $wrapped = $self->wrap($app);
-    await $wrapped->($scope, $receive, $send);
-}
 
 1;
 

@@ -1,5 +1,5 @@
 package PAGI::Middleware::WebSocket::RateLimit;
-$PAGI::Middleware::WebSocket::RateLimit::VERSION = '0.002000';
+$PAGI::Middleware::WebSocket::RateLimit::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

@@ -37,7 +37,10 @@ my %WriteMakefileArgs = (
         'feature'  => 0,
         'constant' => 0,
         'Carp'     => 0,
+        'Config' => 0,
+        'Cwd' => 0,
         'File::Spec::Functions' => 0,
+        'File::Basename' => 0,
         'Config' => 0,
     },
     META_MERGE => {
@@ -59,10 +62,11 @@ my %WriteMakefileArgs = (
                     },
     },
     TEST_REQUIRES => {
-        'strict' => 0,
-        'warnings' => 0,
         'constant' => 0,
+        'lib' => 0,
+        'File::Basename' => 0,
         'File::Spec::Functions' => 0,
+        'File::Temp' => 0,
         'Config' => 0,
         'ExtUtils::MakeMaker' => 0,
         'Test::Simple' => '0.98',
@@ -72,13 +76,13 @@ my %WriteMakefileArgs = (
         'Test::Warn' => '0.37',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp',
-               PREOP => 'perl tools/pm_filter_simple.pl $(DISTVNAME)'
+               PREOP => 'perl release-tools/pm_filter.pl $(DISTVNAME)'
     },
     clean => { FILES => 'Config-INI-RefVars-*' },
 );
 
 if ($ENV{AAHAZRED_PERL_DEVEL}) {
-  $WriteMakefileArgs{PM_FILTER} = 'perl tools/pm_filter_simple.pl';
+  $WriteMakefileArgs{PM_FILTER} = 'perl release-tools/pm_filter.pl';
 }
 
 # Compatibility with old versions of ExtUtils::MakeMaker

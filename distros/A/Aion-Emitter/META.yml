@@ -20,7 +20,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,22 +39,22 @@ no_index:
 provides:
   Aion::Emitter:
     file: lib/Aion/Emitter.pm
-    version: v0.1.0
+    version: v0.1.1
   Aion::Emitter::ListenersRun:
     file: lib/Aion/Emitter/ListenersRun.pm
 requires:
   Aion: '1.6'
+  Aion::Env: '0.2'
   Aion::Format: v0.1.1
   Aion::Run: v0.0.3
   List::Util: '0'
   common::sense: '0'
-  config: '0'
   perl: v5.22.0
 resources:
   bugtracker: https://github.com/darviarush/perl-aion-emitter/issues
   homepage: https://github.com/darviarush/perl-aion-emitter
   repository: https://github.com/darviarush/perl-aion-emitter.git
-version: 0.1.0
+version: 0.1.1
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

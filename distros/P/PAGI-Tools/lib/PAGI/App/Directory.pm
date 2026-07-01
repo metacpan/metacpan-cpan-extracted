@@ -1,5 +1,5 @@
 package PAGI::App::Directory;
-$PAGI::App::Directory::VERSION = '0.002000';
+$PAGI::App::Directory::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;

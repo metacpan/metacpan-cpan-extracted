@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Module::Runtime qw( require_module );
+use Module::Runtime qw( require_module use_module );
 use File::pushd qw( pushd );
 use File::Spec;
 
@@ -9,9 +9,6 @@ use Git::Database;
 
 use lib 't/lib';
 use TestUtil;
-
-plan skip_all => 'Git::Sub not available'
-  if !eval { require Git::Sub; };
 
 my %builder_for = (
     'string'         => sub { shift },
@@ -22,7 +19,10 @@ my %builder_for = (
     'Path::Tiny'     => sub { Path::Tiny->new(shift) },
 );
 
-my @backends = grep $_ ne 'None', available_backends();
+my @backends = grep eval {
+    use_module("Git::Database::Backend::$_")
+      ->does('Git::Database::Role::ObjectReader');
+}, available_backends();
 
 my @classes = ( 'string', grep eval { require_module($_) }, sort keys %builder_for );
 

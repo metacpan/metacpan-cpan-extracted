@@ -20,11 +20,20 @@ Acrux::Log - Acrux logger
     my $log = Acrux::Log->new(file => '/tmp/test.log');
        $log->error("My test error message to /tmp/test.log")
 
+    # Using STDOUT
+    my $log = Acrux::Log->new(file => 'stdout'); # or 'stdout:', ':stdout'
+    my $log = Acrux::Log->new(file => '-');
+
     # Using STDOUT (handle)
     my $log = Acrux::Log->new(
             handle => IO::Handle->new_from_fd(fileno(STDOUT), "w")
         );
-    $log->error("My test error message to STDOUT")
+
+    # Using STDERR (default since 0.10)
+    my $log = Acrux::Log->new(file => 'stderr'); # or 'stderr:', ':stderr'
+    my $log = Acrux::Log->new(file => '=');
+
+    # Using syslog
 
     # Customize minimum log level
     my $log = Acrux::Log->new(level => 'warn');
@@ -72,7 +81,7 @@ This class implements the following attributes
 
     autoclean => 1
 
-This attribute enables cleaning (closing handler or syslog) on DESTROY
+This attribute enables cleaning (closing file handler or syslog) on DESTROY
 
 =head2 color
 
@@ -97,8 +106,25 @@ See also L<Sys::Syslog/Facilities>
 =head2 file
 
     file => '/var/log/myapp.log'
+    file => 'stdout' # 'stdout:', ':stdout', '-'
+    file => 'stderr' # 'stderr:', ':stderr', '='
+    file => 'syslog'
 
 Log file path used by "handle"
+
+B<Compatibility note:>
+
+Prior to version 0.10, Acrux::Log implicitly used syslog when no logging
+destination was specified.
+Starting with version 0.10, the default destination is STDERR.
+
+To continue using syslog, configure it explicitly:
+
+    file => "syslog:"
+
+or
+
+    file => "@"
 
 =head2 format
 
@@ -329,11 +355,11 @@ my %MAGIC = (
     'debug'     => 7,
     'info'      => 6,
     'notice'    => 5,
-    'warn'      => 4,
-    'error'     => 3,
-    'fatal'     => 2, 'crit' => 2,
+    'warn'      => 4, 'warning' => 4,
+    'error'     => 3, 'err'     => 3,
+    'fatal'     => 2, 'crit'    => 2, 'critical' => 2,
     'alert'     => 1,
-    'emerg'     => 0,
+    'emerg'     => 0, 'emergency' => 0,
 );
 my %COLORS = (
     'trace'     => 'white',
@@ -386,21 +412,61 @@ sub new {
     # Set formatter
     $self->{format} ||= $self->{short} ? \&_short : $self->{color} ? \&_color : \&_default;
 
-    # Open sys log socket
+    # External logger object specified directly
     if ($args->{logger}) {
-        croak "Blessed reference expected in logger attribute" unless blessed($args->{logger});
         $self->{provider} = "external";
-    } elsif ($args->{handle}) {
+        unless (blessed($args->{logger})) {
+            printf STDERR "Blessed reference expected in \"logger\" attribute. Logging to STDERR instead.\n";
+            $self->{provider} = "handle";
+            $self->{handle} = IO::Handle->new_from_fd(fileno(STDERR), "w");
+        }
+    }
+
+    # Handler specified directly
+    elsif ($args->{handle}) {
         $self->{provider} = "handle";
         return $self;
-    } elsif ($args->{file}) {
+    }
+
+    # File rules
+    elsif ($args->{file}) { # File
         my $file = $args->{file};
-        $self->{handle} = IO::File->new($file, ">>");
-        croak qq/Can't open log file "$file": $!/ unless defined $self->{handle};
-        $self->{provider} = "file";
-    } else {
-        Sys::Syslog::openlog($args->{ident}, $args->{logopt}, $args->{facility});
-        $self->{provider} = "syslog";
+
+        # Open syslog socket
+        if ($file =~ /^\:?syslog\:?$/i or $file eq '@') {
+            Sys::Syslog::openlog($args->{ident}, $args->{logopt}, $args->{facility});
+            $self->{provider} = "syslog";
+        }
+
+        # Use STDOUT handle
+        elsif ($file =~ /^\:?stdout\:?$/i or $file eq '-') {
+            $self->{provider} = "handle";
+            $self->{handle} = IO::Handle->new_from_fd(fileno(STDOUT), "w");
+        }
+
+        # Use STDERR handle
+        elsif ($file =~ /^\:?stderr\:?$/i or $file eq '=') {
+            $self->{provider} = "handle";
+            $self->{handle} = IO::Handle->new_from_fd(fileno(STDERR), "w");
+        }
+
+        # Open log file handle
+        else {
+            $self->{provider} = "file";
+            $self->{handle} = IO::File->new($file, ">>");
+            unless (defined $self->{handle}) { # Error
+                printf STDERR "Can't open log file \"%s\" for writing (%s). Logging to STDERR instead.\n",
+                    $file, $!;
+                $self->{provider} = "handle";
+                $self->{handle} = IO::Handle->new_from_fd(fileno(STDERR), "w");
+            }
+        }
+    }
+
+    # Default: STDERR (since 0.10)
+    else {
+        $self->{provider} = "handle";
+        $self->{handle} = IO::Handle->new_from_fd(fileno(STDERR), "w");
     }
 
     return $self;

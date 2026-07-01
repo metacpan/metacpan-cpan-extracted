@@ -157,4 +157,45 @@ $obj = MyClass2->new();
 throws_ok(sub { $obj->method() }, qr/Usage/, 'no args dies');
 lives_ok(sub { $obj->method('bar' => []) }, 'can pass in an empty array');
 
+# Check the fix in release 0.14
+my $rc = get_params('foo', foo => { 'a' => 'b', 'c' => 'd' });
+cmp_deeply($rc, { 'foo' => { 'a' => 'b', 'c' => 'd' } });
+
+# --- Arrayref-of-names $default (v0.15 feature) ---
+
+# Basic positional mapping
+cmp_deeply(
+	get_params([qw(name age)], 'Alice', 30),
+	{ name => 'Alice', age => 30 },
+	'arrayref default: two positional args'
+);
+
+# Missing trailing arg produces undef for that key
+cmp_deeply(
+	get_params([qw(name age)], 'Bob'),
+	{ name => 'Bob', age => undef },
+	'arrayref default: missing arg -> undef'
+);
+
+# Extra args beyond the key list are silently discarded
+cmp_deeply(
+	get_params([qw(a b)], 1, 2, 3),
+	{ a => 1, b => 2 },
+	'arrayref default: extra arg discarded'
+);
+
+# Empty names arrayref
+cmp_deeply(
+	get_params([], 'ignored'),
+	{},
+	'arrayref default: empty names list'
+);
+
+# Single hashref passthrough is preserved even with arrayref default
+cmp_deeply(
+	get_params([qw(x y)], { foo => 'bar' }),
+	{ foo => 'bar' },
+	'arrayref default: single hashref still passes through'
+);
+
 done_testing();

@@ -1,5 +1,5 @@
 package PAGI::Request::Upload;
-$PAGI::Request::Upload::VERSION = '0.002000';
+$PAGI::Request::Upload::VERSION = '0.002001';
 use strict;
 use warnings;
 

@@ -1,5 +1,5 @@
 package PAGI::Request::BodyStream;
-$PAGI::Request::BodyStream::VERSION = '0.002000';
+$PAGI::Request::BodyStream::VERSION = '0.002001';
 use strict;
 use warnings;
 

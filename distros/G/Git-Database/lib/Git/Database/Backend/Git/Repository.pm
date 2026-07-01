@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::Repository;
-$Git::Database::Backend::Git::Repository::VERSION = '0.012';
+$Git::Database::Backend::Git::Repository::VERSION = '0.013';
 use IO::Select;
 use Sub::Quote;
 
@@ -214,7 +214,7 @@ Git::Database::Backend::Git::Repository - A Git::Database backend based on Git::
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

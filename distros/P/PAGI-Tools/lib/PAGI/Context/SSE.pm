@@ -1,5 +1,5 @@
 package PAGI::Context::SSE;
-$PAGI::Context::SSE::VERSION = '0.002000';
+$PAGI::Context::SSE::VERSION = '0.002001';
 use strict;
 use warnings;
 
@@ -41,6 +41,10 @@ sub every { shift->sse->every(@_) }
 
 sub is_started { shift->sse->is_started }
 sub is_closed  { shift->sse->is_closed }
+
+# is_connected overrides the base Context method (which reads pagi.connection,
+# N/A for sse) to use the SSE wrapper's own state — mirrors Context::WebSocket.
+sub is_connected { shift->sse->is_connected }
 
 # ── Protocol metadata ────────────────────────────────────────────────
 
@@ -186,9 +190,13 @@ Idempotent — only sends C<sse.start> once.
 
 =head2 close
 
-    $ctx->close;
+    await $ctx->close;
+    await $ctx->close(reason => 'job_complete');
 
-Marks connection as closed and runs on_close callbacks.
+Ends the SSE stream by sending an C<sse.close> event, then runs C<on_close>
+callbacks. The optional C<reason> is server-side metadata only -- passed to
+C<on_close> but B<never> written to the wire. Delegates to L<PAGI::SSE/close>;
+returns a Future and is asynchronous, so C<await> it.
 
 =head1 SEND METHODS
 
@@ -261,6 +269,16 @@ True after C<start()> or first send.
     if ($ctx->is_closed) { ... }
 
 True after close or disconnect.
+
+=head2 is_connected
+
+    if ($ctx->is_connected) { ... }
+
+True while the stream is live (started and not closed/disconnected).
+Overrides the base C<is_connected> — which reads C<pagi.connection>, not
+applicable to SSE — to use the SSE wrapper's own state, mirroring
+L<PAGI::Context::WebSocket>. See L<PAGI::SSE/is_connected> for the freshness
+caveat.
 
 =head2 last_event_id
 

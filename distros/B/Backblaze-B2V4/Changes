@@ -1,5 +1,9 @@
 Revision history for Perl extension Backblaze-B2V4
 
+0.03 2026-07-01T03:27:57Z
+
+     - Fix cpanfile typos, so that Marlin installs
+
 0.02 2026-06-10T03:14:08Z
 
     - Improve documentation / add current_status_is_ok()

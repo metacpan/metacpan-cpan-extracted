@@ -1,6 +1,7 @@
 Changes
 CONTRIBUTING.md
 lib/Config/INI/RefVars.pm
+lib/Config/INI/RefVars/Builtins.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -26,16 +27,36 @@ t/09-args.t
 t/10-arg_error.t
 t/11-ini_error.t
 t/12-global_mode.t
+t/13-function-calls.t
+t/14-function-call-errors.t
+t/15-function-call-commas.t
+t/16-more-function-calls.t
+t/17-substr-errors.t
+t/18-join-function.t
+t/19-functions-storage.t
+t/20-user-functions-basic.t
+t/21-user-functions-errors.t
+t/22-user-functions-scope.t
+t/23-user-functions-nested.t
+t/24-builtins-logic.t
+t/25-builtins-substitute.t
+t/26-builtins-match.t
+t/27-other.t
+t/28-additional-builtins.t
+t/29-line-continuation.t
 t/99-data/dummy.ini
 t/99-examples.t
+t/Builtins/01-basic.t
+t/Builtins/02-logic.t
+t/Builtins/03-substr-x.t
+t/Builtins/04-substitute.t
+t/Builtins/05-match.t
+t/Builtins/06-other.t
+t/Local/Test/RefVars.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-
 xt/boilerplate.t
 xt/pod-spell.t
-
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-
-

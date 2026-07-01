@@ -35,7 +35,7 @@ $EXPORT_TAGS{idx}= [ grep { /_idx\z/ } @EXPORT_OK ];
 
 our @EXPORT = qw();
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Algorithm::Heapify::XS', $VERSION);

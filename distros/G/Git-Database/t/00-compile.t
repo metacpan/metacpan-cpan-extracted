@@ -9,10 +9,13 @@ use Test::More;
 use lib 't/lib';
 use TestUtil;
 
+diag `git --version`;
+
 my %backends = map
-  +( join( '/', qw( Git Database Backend ), split /::/ ) . ".pm" => 1 ),
+  +( join( '/', qw( Git Database Backend ), split /::/ ) . ".pm" => $_ ),
   available_backends();
-  use Data::Dumper;print Dumper(\%backends);
+diag "Backends available";
+diag "- $_" for sort values %backends;
 
 my @module_files = (
     'Git/Database.pm',
@@ -73,9 +76,5 @@ for my $lib (@module_files)
     }
 }
 
-
-
 is(scalar(@warnings), 0, 'no warnings found')
     or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
-
-

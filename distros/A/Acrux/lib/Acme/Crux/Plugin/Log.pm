@@ -289,28 +289,28 @@ sub register {
       || ($has_config ? $app->config->get("/logprefix") : ''); # From config file
 
     # Correct provider rules
-    my $provider = $args->{provider}  # From plugin arguments first
+    my $provider = $args->{provider} # From plugin arguments first
       || $app->getopt("logprovider") # From command line options
       || $app->orig->{"logprovider"} # From App arguments
       || ($has_config ? $app->config->get("/logprovider") : '') || ''; # From config file
-    if ($provider eq 'syslog')    { $file = $handle = $logger = undef }
+    if    ($provider eq 'syslog') { $file = 'syslog'; $handle = $logger = undef }
     elsif ($provider eq 'file')   { $logger = $handle = undef }
     elsif ($provider eq 'handle') { $logger = undef }
 
     # Create instance
     my $log = Acrux::Log->new(
-        autoclean => $autoclean,
-        color => $colorize, # !!
-        facility => $facility,
-        file => $file,
-        format => $frmt, # !!
-        handle => $handle,
-        ident => $ident,
-        level => $level,
-        logger => $logger,
-        logopt => $logopt,
-        short => $short,
-        prefix => $prefix,
+        autoclean   => $autoclean,
+        color       => $colorize,
+        facility    => $facility,
+        file        => $file,
+        format      => $frmt,
+        handle      => $handle,
+        ident       => $ident,
+        level       => $level,
+        logger      => $logger,
+        logopt      => $logopt,
+        short       => $short,
+        prefix      => $prefix,
     );
 
     # Set log helper (method)

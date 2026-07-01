@@ -69,6 +69,9 @@ subtest "simple examples" => sub {
                                 '=:'         => $Dir_Sep,
                                 '=::'        => $Config{path_sep},
                                 '=VERSION'   => $VERSION,
+                                '=devnull'   => File::Spec::Functions::devnull(),
+                                '=rootdir'   => File::Spec::Functions::rootdir(),
+                                '=tmpdir'    => File::Spec::Functions::tmpdir(),
                                 '=TO_CP_SEC' => '__TOCOPY__',
                                 '=srcname'   => 'INI data'
                                }
@@ -119,27 +122,30 @@ subtest "simple examples" => sub {
     is_deeply($obj->variables,
               {
                'A' => {
-                       '=' => 'A',
+                       '='   => 'A',
                        'bar' => 'global: i am global',
                        'baz' => 'global: i am global',
                        'foo' => '123'
                       },
                'B' => {
-                       '=' => 'B',
-                       'bar' => 'not common: ',
-                       'baz' => 'not common: i am NOT global',
+                       '='      => 'B',
+                       'bar'    => 'not common: ',
+                       'baz'    => 'not common: i am NOT global',
                        'global' => 'i am global (but local)',
-                       'x' => 'INI data',
-                       'y' => 'INI data'
+                       'x'      => 'INI data',
+                       'y'      => 'INI data'
                       },
                '__TOCOPY__' => {
-                                '=' => '__TOCOPY__',
-                                '=:' => $Dir_Sep,
-                                '=::' => $Config{path_sep},
-                                '=VERSION' => $VERSION,
+                                '='          => '__TOCOPY__',
+                                '=:'         => $Dir_Sep,
+                                '=::'        => $Config{path_sep},
+                                '=devnull'   => File::Spec::Functions::devnull(),
+                                '=rootdir'   => File::Spec::Functions::rootdir(),
+                                '=tmpdir'    => File::Spec::Functions::tmpdir(),
+                                '=VERSION'   => $VERSION,
                                 '=TO_CP_SEC' => '__TOCOPY__',
-                                '=srcname' => 'INI data',
-                                'global' => 'i am global',
+                                '=srcname'   => 'INI data',
+                                'global'     => 'i am global',
                                 'not common' => 'i am NOT global'
                                }
               },
@@ -204,9 +210,9 @@ EOT
                            }
                  };
   subtest "global mode" => sub {
-    my $obj_gm = Config::INI::RefVars->new(global_mode => 1,
+    my $obj_gm = Config::INI::RefVars->new(global_mode    => 1,
                                            tocopy_section => 'GLOBAL',
-                                           tocopy_vars => {a => 'ORIG'}
+                                           tocopy_vars    => {a => 'ORIG'}
                                           );
     $obj_gm->parse_ini(src => $src);
     is_deeply($obj_gm->variables, $expected, "variables, global mode" );

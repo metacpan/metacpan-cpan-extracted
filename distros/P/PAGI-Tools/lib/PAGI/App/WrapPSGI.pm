@@ -1,5 +1,5 @@
 package PAGI::App::WrapPSGI;
-$PAGI::App::WrapPSGI::VERSION = '0.002000';
+$PAGI::App::WrapPSGI::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;

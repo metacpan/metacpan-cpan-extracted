@@ -2,7 +2,7 @@ package PAGI::Server::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '0.002004';
+our $VERSION = '0.002005';
 
 use Future;
 use Future::AsyncAwait;
@@ -1397,6 +1397,10 @@ sub _h2_create_sse_send {
             return ($chunk, 0);  # SSE streams never EOF via data_callback
         }
 
+        # Queue empty. If the application closed this stream (sse.close), emit a
+        # final empty DATA frame with END_STREAM to terminate it; otherwise defer.
+        return ('', 1) if $ss->{sse_closing};
+
         # Queue empty — defer (NGHTTP2_ERR_DEFERRED in the C layer)
         return undef;
     };
@@ -1404,15 +1408,30 @@ sub _h2_create_sse_send {
     return async sub {
         my ($event) = @_;
         return unless $weak_self;
-        return if $weak_self->{closed};
 
         my $ss = $weak_self->{h2_streams}{$stream_id};
         return unless $ss;
 
+        my $type = $event->{type} // '';
+
+        # After an application-initiated sse.close on THIS stream, a second
+        # sse.close is a no-op and any other send raises. Tracked per-stream
+        # ($ss), since HTTP/2 multiplexes many SSE streams over one connection.
+        if ($ss->{sse_close_sent}) {
+            return if $type eq 'sse.close';
+            die "cannot send '$type' after sse.close\n";
+        }
+
+        # After an sse.http.response.start (decline), only the decline body may
+        # follow; a stream event is a programming error (first-send-wins).
+        if ($ss->{sse_decline_started} && $type !~ /^sse\.http\.response\./) {
+            die "cannot send '$type' after sse.http.response.start\n";
+        }
+
+        return if $weak_self->{closed};
+
         # Reset SSE idle timer on send activity
         $weak_self->_reset_sse_idle_timer;
-
-        my $type = $event->{type} // '';
 
         # Dev-mode event validation (PAGI spec compliance)
         if ($weak_self->{validate_events}) {
@@ -1520,6 +1539,43 @@ sub _h2_create_sse_send {
             else {
                 $weak_self->_stop_sse_keepalive;
             }
+        }
+        elsif ($type eq 'sse.close') {
+            # End THIS HTTP/2 stream now: flush remaining queued events, then the
+            # data_callback emits a final END_STREAM frame. `reason` is
+            # server-side only and is never written to the wire.
+            $ss->{sse_close_sent} = 1;
+            $ss->{sse_closing}    = 1;
+            $weak_self->{sse_disconnect_reason} = $event->{reason}
+                if defined $event->{reason};
+            $weak_self->{h2_session}->resume_stream($stream_id);
+            $weak_self->_h2_write_pending;
+        }
+        elsif ($type eq 'sse.http.response.start') {
+            die "cannot decline with sse.http.response.start after sse.start\n"
+                if $ss->{response_started};
+            return if $ss->{sse_decline_started};   # idempotent
+            $ss->{sse_decline_started} = 1;
+            $ss->{sse_decline_status}  = $event->{status} // 200;
+            $ss->{sse_decline_headers} = [
+                map { [_validate_header_name($_->[0]), _validate_header_value($_->[1])] }
+                    @{$event->{headers} // []}
+            ];
+            $ss->{sse_decline_body} = '';
+        }
+        elsif ($type eq 'sse.http.response.body') {
+            return unless $ss->{sse_decline_started};
+            return if $ss->{response_started};
+            $ss->{sse_decline_body} .= $event->{body} // '';
+            return if $event->{more};   # more chunks coming — keep buffering
+
+            $ss->{response_started} = 1;
+            $weak_self->{h2_session}->submit_response($stream_id,
+                status  => $ss->{sse_decline_status},
+                headers => $ss->{sse_decline_headers},
+                body    => $ss->{sse_decline_body},
+            );
+            $weak_self->_h2_write_pending;
         }
         else {
             _unrecognized_event_type($type, 'sse');
@@ -3304,8 +3360,19 @@ async sub _handle_sse_request {
         warn "PAGI application error (SSE): $error\n";
     }
 
-    # Send chunked terminator if SSE was started (uses chunked encoding)
-    # Check both closed flag and that stream is still writable
+    # End the stream (no-op if an explicit sse.close already finished it).
+    $self->_finish_sse_stream('stream_complete');
+}
+
+# Idempotently end an SSE stream: write the chunked terminator (HTTP/1.1), write
+# the access log, and close the connection. Called both by the on-return path
+# above and by an explicit sse.close event, so it must run exactly once.
+sub _finish_sse_stream {
+    my ($self, $reason) = @_;
+    return if $self->{sse_finished};
+    $self->{sse_finished} = 1;
+
+    # Send chunked terminator if SSE was started and the stream is still writable
     if ($self->{sse_started} && !$self->{closed} &&
         $self->{stream} && $self->{stream}->write_handle) {
         $self->{stream}->write("0\r\n\r\n");
@@ -3315,7 +3382,7 @@ async sub _handle_sse_request {
     $self->_write_access_log;
 
     # Close connection after SSE stream ends
-    $self->_handle_disconnect_and_close('stream_complete');
+    $self->_handle_disconnect_and_close($reason);
 }
 
 sub _create_sse_scope {
@@ -3510,12 +3577,28 @@ sub _create_sse_send {
     return async sub  {
         my ($event) = @_;
         return Future->done unless $weak_self;
+
+        my $type = $event->{type} // '';
+
+        # After an application-initiated sse.close the stream is closed: a second
+        # sse.close is a no-op, but any other send is a programming error and
+        # raises (a failed Future the application's `await $send` will throw).
+        if ($weak_self->{sse_close_sent}) {
+            return Future->done if $type eq 'sse.close';
+            die "cannot send '$type' after sse.close\n";
+        }
+
+        # Transport already gone (client disconnect): sends are a silent no-op.
         return Future->done if $weak_self->{closed};
+
+        # After an sse.http.response.start (decline), only the decline body may
+        # follow; a stream event is a programming error (first-send-wins).
+        if ($weak_self->{sse_decline_started} && $type !~ /^sse\.http\.response\./) {
+            die "cannot send '$type' after sse.http.response.start\n";
+        }
 
         # Reset SSE idle timer on send activity
         $weak_self->_reset_sse_idle_timer;
-
-        my $type = $event->{type} // '';
 
         # Dev-mode event validation (PAGI spec compliance)
         if ($weak_self->{validate_events}) {
@@ -3604,6 +3687,51 @@ sub _create_sse_send {
             else {
                 $weak_self->_stop_sse_keepalive;
             }
+        }
+        elsif ($type eq 'sse.close') {
+            # Explicit application-initiated end of the SSE stream. End it now,
+            # decoupled from the application returning. `reason` is server-side
+            # metadata only and is never written to the wire. Idempotency for a
+            # repeat sse.close is handled by the sse_close_sent guard above.
+            $weak_self->{sse_close_sent} = 1;
+            $weak_self->{sse_disconnect_reason} = $event->{reason}
+                if defined $event->{reason};
+            $weak_self->_finish_sse_stream($event->{reason} // 'app_closed');
+        }
+        elsif ($type eq 'sse.http.response.start') {
+            # Decline the SSE stream and return a normal HTTP response. Valid only
+            # before sse.start; namespaced under sse. (mirrors websocket.http.response.*).
+            die "cannot decline with sse.http.response.start after sse.start\n"
+                if $weak_self->{sse_started};
+            return if $weak_self->{sse_decline_started};   # idempotent
+            $weak_self->{sse_decline_started} = 1;
+            $weak_self->{sse_decline_status}  = $event->{status} // 200;
+            $weak_self->{sse_decline_headers} = [
+                map { [_validate_header_name($_->[0]), _validate_header_value($_->[1])] }
+                    @{$event->{headers} // []}
+            ];
+            $weak_self->{sse_decline_body} = '';
+        }
+        elsif ($type eq 'sse.http.response.body') {
+            return unless $weak_self->{sse_decline_started};
+            return if $weak_self->{response_started};
+            $weak_self->{sse_decline_body} .= $event->{body} // '';
+            return if $event->{more};   # more chunks coming — keep buffering
+
+            my $status  = $weak_self->{sse_decline_status};
+            my $body    = $weak_self->{sse_decline_body};
+            my @headers = (
+                @{$weak_self->{sse_decline_headers}},
+                ['content-length', length $body],
+                ['date', $weak_self->{protocol}->format_date],
+            );
+            my $response = $weak_self->{protocol}->serialize_response_start($status, \@headers, 0);
+            $response .= $body;
+            $weak_self->{stream}->write($response);
+            $weak_self->{response_started} = 1;
+            $weak_self->{response_status}  = $status;   # access log
+            # Declined: close the connection (no event stream was started).
+            $weak_self->_handle_disconnect_and_close('client_closed');
         }
         elsif ($type eq 'http.fullflush') {
             # Fullflush extension - force immediate TCP buffer flush

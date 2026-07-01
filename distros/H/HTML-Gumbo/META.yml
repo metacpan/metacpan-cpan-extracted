@@ -18,11 +18,11 @@ name: HTML-Gumbo
 provides:
   HTML::Gumbo:
     file: lib/HTML/Gumbo.pm
-    version: '0.19'
+    version: '0.20'
 requires:
   XSLoader: '0'
 resources:
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/ruz/HTML-Gumbo
-version: '0.19'
+  repository: https://github.com/bestpractical/HTML-Gumbo
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@
 #
 #  Description:  Class for Term::CLI and Term::ReadLine glue
 #
-#       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
+#       Author:  Steven Bakker (SBAKKER), <cpanman@monkey-mind.net>
 #      Created:  23/Jan/2018
 #
 #   Copyright (c) 2018-2022 Steven Bakker
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::ReadLine 0.061000;
+package Term::CLI::ReadLine 0.061001;
 
 use 5.014;
 use warnings;
@@ -511,7 +511,7 @@ Term::CLI::ReadLine - Term::ReadLine compatibility layer for Term::CLI
 
 =head1 VERSION
 
-version 0.061000
+version 0.061001
 
 =head1 SYNOPSIS
 
@@ -891,7 +891,7 @@ L<Term::ReadLine::Perl>(3p).
 
 =head1 AUTHOR
 
-Steven Bakker E<lt>sbakker@cpan.orgE<gt>, 2018-2021.
+Steven Bakker E<lt>cpanman@monkey-mind.netE<gt>, 2018-2021.
 
 =head1 COPYRIGHT AND LICENSE
 

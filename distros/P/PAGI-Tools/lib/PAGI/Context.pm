@@ -1,5 +1,5 @@
 package PAGI::Context;
-$PAGI::Context::VERSION = '0.002000';
+$PAGI::Context::VERSION = '0.002001';
 use strict;
 use warnings;
 use Carp qw(croak);

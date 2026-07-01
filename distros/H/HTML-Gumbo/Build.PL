@@ -20,7 +20,7 @@ my $builder = Module::Build->new(
 
     meta_merge => {
         resources => {
-            repository => 'https://github.com/ruz/HTML-Gumbo'
+            repository => 'https://github.com/bestpractical/HTML-Gumbo'
         }
     },
 

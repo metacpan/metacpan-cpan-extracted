@@ -1,5 +1,8 @@
 package Ascii::Text::Font;
 
+use strict;
+use warnings;
+
 use Rope;
 
 function default_character => sub {

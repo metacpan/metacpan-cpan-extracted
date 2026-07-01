@@ -2,7 +2,7 @@ use strict;
 use Test::More 0.88;
 use Test::Without::Module qw(JSON::XS);
 
-eval "use JSON::Any qw(JSON)";
+eval "require JSON::Any; JSON::Any->import('JSON')";
 plan skip_all => "JSON.pm not installed: $@" if $@;
 
 diag("Testing JSON.pm backend");

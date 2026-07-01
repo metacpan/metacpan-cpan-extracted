@@ -1,5 +1,5 @@
 package PAGI::Middleware::HTTPSRedirect;
-$PAGI::Middleware::HTTPSRedirect::VERSION = '0.002000';
+$PAGI::Middleware::HTTPSRedirect::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

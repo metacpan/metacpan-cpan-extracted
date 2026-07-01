@@ -1,5 +1,8 @@
 Revision history for Music-VoicePhrase
 
+0.0109 2026-06-30 16:30:16
+    - Add the patch attribute.
+
 0.0108 2026-06-26 10:43:04
     - Improve documentation.
     - Add a channel attribute.

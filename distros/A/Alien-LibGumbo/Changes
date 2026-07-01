@@ -1,3 +1,10 @@
+0.06 2026-05-22
+
+  - Update to libgumbo 0.13.2
+  - Migrate to the new libgumbo repo on codeberg
+  - Add Best Practical as co-maintainer and document RT bug tracker
+  - Move module repo to https://github.com/bestpractical/alien-libgumbo
+
 0.05 2018-02-21
 
   - elementary documentation, thanks to the community

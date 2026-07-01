@@ -1,5 +1,5 @@
 package PAGI::Middleware::AccessLog;
-$PAGI::Middleware::AccessLog::VERSION = '0.002000';
+$PAGI::Middleware::AccessLog::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

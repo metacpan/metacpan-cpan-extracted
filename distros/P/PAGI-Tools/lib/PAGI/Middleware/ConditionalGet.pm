@@ -1,5 +1,5 @@
 package PAGI::Middleware::ConditionalGet;
-$PAGI::Middleware::ConditionalGet::VERSION = '0.002000';
+$PAGI::Middleware::ConditionalGet::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

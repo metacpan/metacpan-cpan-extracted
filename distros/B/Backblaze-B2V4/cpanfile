@@ -5,11 +5,11 @@ on 'test' => sub {
 	requires 'Digest::SHA', '6.02';
 	requires 'HTTP::Tiny', '>= 0.094';
 	requires 'IO::Socket::SSL', '>= 1.56';
-	requires 'Marlin', '0.023001';
-	requires 'MIME::Base64', '3.15';
+	requires 'Marlin', '>= 0.023001';
+	requires 'MIME::Base64', '>= 3.15';
 	requires 'Net::SSLeay', '>= 1.49';
 	requires 'Path::Tiny', '0.108';
 	requires 'URI::Escape', '3.31';
-    requires 'Test::More', '0.98';
+	requires 'Test::More', '0.98';
 };
 

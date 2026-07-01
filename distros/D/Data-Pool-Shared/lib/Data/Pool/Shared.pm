@@ -1,7 +1,7 @@
 package Data::Pool::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Data::Pool::Shared', $VERSION);
@@ -212,6 +212,20 @@ startup for crash recovery.
 Returns slot index on success, C<undef> on failure/timeout.
 
     $pool->free($idx);                  # release slot (returns true/false)
+
+=head3 Deterministic allocation order
+
+    $pool->scan_from(0);   # next alloc scans from slot 0 (reproducible low-to-high)
+
+By default each handle begins its bitmap scan at a C<getpid()>-derived word
+offset, spreading concurrent allocators across the bitmap to cut CAS contention --
+but that makes the allocated ids non-reproducible across runs. For a single
+allocator that wants deterministic, sequential ids, C<scan_from($slot)> pins the
+scan start to C<$slot>'s 64-slot word (pass C<0> for low-to-high order). It is
+B<per-handle> (does not affect other processes), takes effect on the next
+C<alloc>, and an out-of-range C<$slot> wraps. The bitmap is still the source of
+truth, so this only changes I<where> the scan starts, never correctness. All
+typed variants inherit it.
 
 =head2 Batch Operations
 

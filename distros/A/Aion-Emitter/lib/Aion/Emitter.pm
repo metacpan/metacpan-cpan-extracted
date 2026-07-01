@@ -3,33 +3,33 @@ package Aion::Emitter;
 
 use common::sense;
 
-our $VERSION = "0.1.0";
+our $VERSION = "0.1.1";
 
 use Aion::Pleroma;
 
 use Aion;
 
-use config {
-	INI => 'etc/annotation/listen.ann',
-	EVENT => {},
-};
+my $event_isa = HashRef[ArrayRef[Dict[act => StrMatch[qr/^[\w:]+#\w+$/a], line => Option[Nat], nice => Option[Num], remark => Option[Str]]]];
+
+use Aion::Env::Etc INI => (isa => Str, default => 'etc/annotation/listen.ann', key => 'aion.emitter.ini');
+use Aion::Env::Etc EVENT => (isa => $event_isa, default => {}, key => 'aion.emitter.event');
 
 # Путь к собранным из аннотаций методам
 has ini => (is => 'ro', isa => Str, default => INI);
 
 # Список слушателей
-has event => (is => 'ro', isa => HashRef[ArrayRef[Dict[pkg => Str, sub => Str, line => Nat, nice => Option[Num], remark => Option[Str]]]], default => sub {
+has event => (is => 'ro', isa => $event_isa, default => sub {
 	my ($self) = @_;
 	my %event = %{EVENT()};
 	
 	if(defined $self->ini and -e $self->ini) {
-		open my $f, "<:utf8", $self->ini or die "Not open ${\$self->ini}";
+		open my $f, "<:encoding(UTF-8)", $self->ini or die "Not open ${\$self->ini}";
 		while(<$f>) {
-			close($f), die "${\$self->ini}:$. corrupt!" unless /^([\w:]+)#(\w*),(\d+)=(?:(-?\d+(?:\.\d+)?)\s+)?([a-z][\w:]*(?:#[\w.:-]+)?)(?:\s+(.*?))??\s*$/i;
+			do { close $f; die "${\$self->ini}:$. corrupt!" } unless /^([\w:]+)#(\w*),(\d+)=(?:(-?\d+(?:\.\d+)?)\s+)?([a-z][\w:]*(?:#[\w.:-]+)?)(?:\s+(.*?))??\s*$/ia;
 			my ($pkg, $sub, $line, $nice, $evt, $remark) = ($1, $2, $3, $4, $5, $6);
+			$sub //= 'listen';
 			push @{$event{$evt}}, {
-				pkg => $pkg,
-				sub => $sub,
+				act => "$pkg#$sub",
 				line => $line,
 				$nice? (nice => $nice): (),
 				$remark ne ''? (remark => $remark): (),
@@ -39,11 +39,7 @@ has event => (is => 'ro', isa => HashRef[ArrayRef[Dict[pkg => Str, sub => Str, l
 	}
 
 	for my $listens (values %event) {
-		@$listens = sort {
-			$a->{nice} <=> $b->{nice}
-			or $a->{pkg} cmp $b->{pkg}
-			or $a->{sub} cmp $b->{sub}
-		} @$listens;
+		@$listens = sort { $a->{nice} <=> $b->{nice} or $a->{act} cmp $b->{act} } @$listens;
 	}
 	
 	\%event
@@ -60,7 +56,7 @@ sub emit {
 	return $self unless $listeners;
 	
 	for my $listener_bag (@$listeners) {
-		my ($pkg, $sub) = @$listener_bag{qw/pkg sub/};
+		my ($pkg, $sub) = split /#/, $listener_bag->{act}, 2;
 		my $listener = $self->pleroma->get($pkg) // $self->pleroma->autoware($pkg)->resolve($pkg);
 		$listener->$sub($event);
 	}
@@ -80,7 +76,7 @@ Aion::Emitter - event dispatcher
 
 =head1 VERSION
 
-0.1.0
+0.1.1
 
 =head1 SYNOPSIS
 

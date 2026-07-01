@@ -17,9 +17,12 @@ use File::Spec::Functions qw(catdir catfile rel2abs splitpath);
 
 my $Dir_Sep = catdir("", "");
 my $VERSION = $Config::INI::RefVars::VERSION;
-my %Global = ('=:'        => $Dir_Sep,
-              '=::'       => $Config{path_sep},
-              '=VERSION'  => $VERSION,
+my %Global = ('=:'         => $Dir_Sep,
+              '=::'        => $Config{path_sep},
+              '=VERSION'   => $VERSION,
+              '=devnull'   => File::Spec::Functions::devnull(),
+              '=rootdir'   => File::Spec::Functions::rootdir(),
+              '=tmpdir'    => File::Spec::Functions::tmpdir(),
               '=TO_CP_SEC' => '__TOCOPY__',
              );
 

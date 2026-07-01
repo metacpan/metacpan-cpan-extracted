@@ -4,7 +4,7 @@
 #
 #  Description:  Class for CLI parsing
 #
-#       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
+#       Author:  Steven Bakker (SBAKKER), <cpanman@monkey-mind.net>
 #      Created:  31/01/18
 #
 #   Copyright (c) 2018-2022 Steven Bakker
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI 0.061000;
+package Term::CLI 0.061001;
 
 use 5.014;
 use warnings;
@@ -343,7 +343,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.061000
+version 0.061001
 
 =head1 SYNOPSIS
 
@@ -801,7 +801,7 @@ Non-zero value indicates an error.
 
 =item C<error> =E<gt> I<Str>
 
-Erorr diagnostic.
+Error diagnostic.
 
 =back
 
@@ -878,7 +878,7 @@ L<Term::ReadLine::Gnu>(3p).
 
 =head1 AUTHOR
 
-Steven Bakker E<lt>sbakker@cpan.orgE<gt>, 2018.
+Steven Bakker E<lt>cpanman@monkey-mind.netE<gt>, 2018.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME              => 'Plack::App::DirectoryIndex',
   VERSION_FROM      => 'lib/Plack/App/DirectoryIndex.pm',
-  MIN_PERL_VERSION  => '5.38.0',
+  MIN_PERL_VERSION  => '5.26.0',
   PREREQ_PM         => {
     Plack                => 0,
     'WebServer::DirIndex' => '0.1.4',

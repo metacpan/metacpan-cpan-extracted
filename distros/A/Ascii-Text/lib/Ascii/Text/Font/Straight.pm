@@ -1,5 +1,7 @@
 package Ascii::Text::Font::Straight;
 
+use strict;
+use warnings;
 use Rope;
 use Rope::Autoload;
 

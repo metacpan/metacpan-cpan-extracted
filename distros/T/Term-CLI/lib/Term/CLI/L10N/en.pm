@@ -1,7 +1,7 @@
 #=============================================================================
 #
 #       Module:  Term::CLI::L10N::en
-#       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
+#       Author:  Steven Bakker (SBAKKER), <cpanman@monkey-mind.net>
 #      Created:  27/02/18
 #
 #   Copyright (c) 2018-2022 Steven Bakker; All rights reserved.
@@ -15,7 +15,7 @@
 #
 #=============================================================================
 
-package Term::CLI::L10N::en 0.061000;
+package Term::CLI::L10N::en 0.061001;
 
 use 5.014;
 use warnings;
@@ -37,7 +37,7 @@ Term::CLI::L10N::en - English localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.061000
+version 0.061001
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ L<Term::CLI::L10N>(3p).
 
 =head1 AUTHOR
 
-Steven Bakker E<lt>sbakker@cpan.orgE<gt>.
+Steven Bakker E<lt>cpanman@monkey-mind.netE<gt>.
 
 =head1 COPYRIGHT AND LICENSE
 

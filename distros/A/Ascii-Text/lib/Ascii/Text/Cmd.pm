@@ -1,5 +1,8 @@
 package Ascii::Text::Cmd;
 
+use strict;
+use warnings;
+
 use Rope::Cmd;
 use Types::Standard qw/Str Int Bool Enum/;
 use Ascii::Text;

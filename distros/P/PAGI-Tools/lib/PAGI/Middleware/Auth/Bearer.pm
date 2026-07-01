@@ -1,5 +1,5 @@
 package PAGI::Middleware::Auth::Bearer;
-$PAGI::Middleware::Auth::Bearer::VERSION = '0.002000';
+$PAGI::Middleware::Auth::Bearer::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

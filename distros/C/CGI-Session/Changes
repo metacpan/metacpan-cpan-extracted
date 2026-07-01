@@ -1,6 +1,11 @@
 CGI::Session Change Log
 =====================================================================
 
+4.49 - June 30th, 2026
+
+   * SECURITY: Strengthen cryptographic randomness of MD5 driver, CVE-2026-56016
+     (Robert Rothenberg, Mark Stosberg)
+
 4.48 - July 11th, 2011
     No code changes.
 

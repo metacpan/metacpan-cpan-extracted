@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More 0.88;
-eval "use JSON::Any qw(PP)";
+eval "require JSON::Any; JSON::Any->import('PP')";
 plan skip_all => "JSON::PP not installed: $@" if $@;
 
 diag("Testing JSON::PP backend");

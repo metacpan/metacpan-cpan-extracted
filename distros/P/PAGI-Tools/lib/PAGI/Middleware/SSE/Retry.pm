@@ -1,5 +1,5 @@
 package PAGI::Middleware::SSE::Retry;
-$PAGI::Middleware::SSE::Retry::VERSION = '0.002000';
+$PAGI::Middleware::SSE::Retry::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

@@ -35,7 +35,7 @@
    "provides" : {
       "HTML::Gumbo" : {
          "file" : "lib/HTML/Gumbo.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -44,9 +44,9 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/ruz/HTML-Gumbo"
+         "url" : "https://github.com/bestpractical/HTML-Gumbo"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

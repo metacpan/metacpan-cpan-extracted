@@ -1,5 +1,5 @@
 package PAGI::App::SSE::Pubsub;
-$PAGI::App::SSE::Pubsub::VERSION = '0.002000';
+$PAGI::App::SSE::Pubsub::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;

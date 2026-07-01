@@ -1,5 +1,10 @@
 Revision history for Data::Pool::Shared
 
+0.06  2026-06-30
+    - scan_from($slot): pin the per-handle allocation scan start for deterministic,
+      sequential id order (overrides the getpid()-derived spread default). Purely
+      additive; inherited by all typed variants.
+
 0.05  2026-06-01
     - alloc_n/free_n: free temp buffer via SAVEFREEPV (leak on OOM-croak)
 

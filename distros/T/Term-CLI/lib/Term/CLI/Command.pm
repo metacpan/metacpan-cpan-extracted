@@ -4,7 +4,7 @@
 #
 #  Description:  Class for (sub-)commands in Term::CLI
 #
-#       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
+#       Author:  Steven Bakker (SBAKKER), <cpanman@monkey-mind.net>
 #      Created:  30/01/18
 #
 #   Copyright (c) 2018-2022 Steven Bakker
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Command 0.061000;
+package Term::CLI::Command 0.061001;
 
 use 5.014;
 use warnings;
@@ -331,7 +331,7 @@ Term::CLI::Command - Class for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.061000
+version 0.061001
 
 =head1 SYNOPSIS
 
@@ -632,7 +632,7 @@ L<Getopt::Long|Getopt::Long>(3p).
 
 =head1 AUTHOR
 
-Steven Bakker E<lt>sbakker@cpan.orgE<gt>, 2018.
+Steven Bakker E<lt>cpanman@monkey-mind.netE<gt>, 2018.
 
 =head1 COPYRIGHT AND LICENSE
 

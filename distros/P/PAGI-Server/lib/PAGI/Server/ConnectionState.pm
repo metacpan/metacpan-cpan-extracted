@@ -3,7 +3,7 @@ package PAGI::Server::ConnectionState;
 use strict;
 use warnings;
 
-our $VERSION = '0.002004';
+our $VERSION = '0.002005';
 
 use Scalar::Util qw(weaken);
 

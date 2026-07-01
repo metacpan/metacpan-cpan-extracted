@@ -159,8 +159,8 @@ sub _parse_url ($) {
 }
 
 # 1 - set / in each page, if it not file (*.*), or 0 - unset
-use config DIR => 0;
-use config ONPAGE => "off://off";
+use Aion::Env::Etc DIR => (default => 0, key => 'aion.format.url.dir');
+use Aion::Env::Etc ONPAGE => (default => "off://off", key => 'aion.format.url.onpage');
 
 # Парсит и нормализует url
 sub parse_url($;$$) {

@@ -1,5 +1,41 @@
 # This file documents the revision history for Perl extension PAGI
 
+0.002001 - 2026-06-30
+  [Specification updates]
+  - Application/middleware return value is now specified as inert: the server
+    assigns the resolved value no meaning and acts only on the Future
+    (completion/errors) and on events plus connection facts. Frameworks may use
+    return values for their own composition but must convert them to events at
+    the gateway boundary; a value must not escape to the server as the result.
+  - Middleware section: clarified that middleware propagate the inner Future
+    (not a value) and observe/rewrite responses by wrapping $send/$receive;
+    removed a stranded comment from the example.
+  - Added the sse.close send-event: an explicit, application-initiated end to an
+    SSE stream (the SSE analog of http.response.body{more=>0}), ending it
+    immediately and decoupled from the application returning. Optional reason
+    field is server-side metadata only -- never transmitted to the client (SSE
+    has no close frame, unlike websocket.close). After sse.close, further
+    sse.send/sse.comment/sse.keepalive MUST raise; sse.close is idempotent.
+    Returning after the final sse.send remains a valid way to end a stream.
+  - Added sse.http.response.start / sse.http.response.body send-events: before
+    sse.start, an application MAY decline the stream and return a normal HTTP
+    response (404, 401, a 204 to stop EventSource reconnection, a redirect, ...).
+    Namespaced under sse. (mirroring the websocket.http.response denial events) so
+    an sse scope only carries sse.* events. First-send-wins: after sse.start these
+    are invalid; after sse.http.response.start the stream events are invalid (both
+    MUST raise). Unlike the WebSocket denial extension this is a core capability
+    (no event-stream fallback exists), so every conforming server MUST support it.
+
+  [Documentation]
+  - Cookbook: new SERVER-SENT EVENTS recipe "Ending a stream: return vs
+    sse.close" -- the two termination paths (identical on the wire), the
+    server-side-only reason, and observing close events by wrapping $send.
+  - Tutorial: new Part 2 section "2.8 Middleware: Wrapping an Application"
+    teaching the pure $app -> $app pattern (scope cloning, wrapping
+    $send/$receive, short-circuiting, error propagation, the inert return
+    value, and stacking). UTF-8 and async-pitfalls sections renumbered to
+    2.9 and 2.10.
+
 0.002000 - 2026-06-26
   [Distribution]
   - The PAGI distribution is now the specification: PAGI.pm plus the

@@ -136,6 +136,7 @@ t/http2/21-http-date-header.t
 t/http2/22-denial-response.t
 t/http2/23-rst-rate-limit.t
 t/http2/24-incomplete-response.t
+t/http2/25-sse-decline.t
 t/integration/app-file.t
 t/integration/app-static-files.t
 t/integration/connection-complete.t
@@ -151,6 +152,7 @@ t/integration/request-server.t
 t/integration/response-integration.t
 t/integration/runner-server.t
 t/integration/security-headers.t
+t/integration/sse-close-end-to-end.t
 t/integration/sse-format-helpers.t
 t/integration/sse-wire-format.t
 t/integration/transport-backpressure.t
@@ -171,6 +173,8 @@ t/server/01-async-file.t
 t/signal-graceful-restart.t
 t/signal-graceful-shutdown.t
 t/signal-worker-scaling.t
+t/sse-close.t
+t/sse-decline.t
 t/tls-optional.t
 t/utf8/01-raw-utf8.t
 t/websocket/30-denial-response.t

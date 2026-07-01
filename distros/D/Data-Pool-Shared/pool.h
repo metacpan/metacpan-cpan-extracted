@@ -183,6 +183,15 @@ static inline int64_t pool_try_alloc(PoolHandle *h) {
     return -1;
 }
 
+/* Pin the per-handle allocation scan to start at the given slot's word. Pass 0 for
+ * deterministic, sequential (low-to-high) allocation order, overriding the
+ * getpid()-derived spread start. The spread only reduces CAS contention when many
+ * processes allocate concurrently; a single allocator wants reproducible order, and
+ * the bitmap stays the source of truth either way. An out-of-range slot wraps. */
+static inline void pool_scan_from(PoolHandle *h, uint64_t slot) {
+    h->scan_hint = (uint32_t)((slot / 64) % h->bitmap_words);
+}
+
 /* Blocking alloc. timeout<0 = infinite, 0 = non-blocking, >0 = seconds. */
 static inline int64_t pool_alloc(PoolHandle *h, double timeout) {
     int64_t slot = pool_try_alloc(h);

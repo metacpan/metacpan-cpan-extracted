@@ -1,5 +1,5 @@
 {
-   "abstract" : "INI file reader that supports make-style variable references and multiple assignment operators.",
+   "abstract" : "INI file reader with variable references and function calls",
    "author" : [
       "Abdul al Hazred <451@gmx.eu>"
    ],
@@ -34,6 +34,8 @@
          "requires" : {
             "Carp" : "0",
             "Config" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
             "File::Spec::Functions" : "0",
             "constant" : "0",
             "feature" : "0",
@@ -46,22 +48,23 @@
          "requires" : {
             "Config" : "0",
             "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
             "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
             "TAP::Harness" : "3.26",
             "Test::Exception" : "0.36",
             "Test::More" : "0.98",
             "Test::Simple" : "0.98",
             "Test::Warn" : "0.37",
             "constant" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "lib" : "0"
          }
       }
    },
    "provides" : {
       "Config::INI::RefVars" : {
          "file" : "lib/Config/INI/RefVars.pm",
-         "version" : "0.24"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -72,7 +75,7 @@
          "web" : "https://github.com/AAHAZRED/perl-Config-INI-RefVars"
       }
    },
-   "version" : "0.24",
+   "version" : "1.02",
    "x_bugtracker" : {
       "web" : "https://github.com/AAHAZRED/perl-Config-INI-RefVars/issues"
    },

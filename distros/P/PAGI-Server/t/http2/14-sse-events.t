@@ -333,4 +333,56 @@ subtest 'SSE with custom status and headers' => sub {
     $loop->remove($server);
 };
 
+# ============================================================
+# sse.close ends the stream (END_STREAM); send-after-close raises
+# ============================================================
+subtest 'sse.close terminates the HTTP/2 stream; send-after-close raises' => sub {
+    my ($close_ok, $post_close_raised) = (0, 0);
+
+    my $app = async sub {
+        my ($scope, $receive, $send) = @_;
+        await $receive->();
+
+        await $send->({ type => 'sse.start', status => 200 });
+        await $send->({ type => 'sse.send', event => 'tick', data => '1' });
+
+        eval { await $send->({ type => 'sse.close', reason => 'h2_done' }); $close_ok = 1; 1 };
+
+        # After sse.close, any further send MUST raise.
+        eval { await $send->({ type => 'sse.send', event => 'late', data => 'LATE' }); 1 }
+            or $post_close_raised = 1;
+    };
+
+    my ($conn, $stream_io, $client_sock, $server) = create_h2c_connection(app => $app);
+
+    my $response_body = '';
+    my $stream_closed = 0;
+    my $client = create_client(
+        on_data_chunk_recv => sub { my ($sid, $data) = @_; $response_body .= $data; return 0 },
+        on_stream_close    => sub { $stream_closed = 1; return 0 },
+    );
+
+    h2c_handshake($client, $client_sock);
+
+    $client->submit_request(
+        method    => 'GET',
+        path      => '/events',
+        scheme    => 'http',
+        authority => 'localhost',
+        headers   => [['accept', 'text/event-stream']],
+    );
+    $client_sock->syswrite($client->mem_send);
+
+    exchange_frames($client, $client_sock, 20);
+
+    like($response_body, qr/data: 1\n/,   'tick event delivered before close');
+    ok($close_ok,          'sse.close accepted over HTTP/2 (did not raise)');
+    ok($post_close_raised, 'sse.send after sse.close raised');
+    unlike($response_body, qr/LATE/,      'post-close event not delivered');
+    ok($stream_closed,     'HTTP/2 stream closed (END_STREAM)');
+
+    $stream_io->close_now;
+    $loop->remove($server);
+};
+
 done_testing;

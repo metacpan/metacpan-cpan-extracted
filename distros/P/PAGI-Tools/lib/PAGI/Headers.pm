@@ -1,5 +1,5 @@
 package PAGI::Headers;
-$PAGI::Headers::VERSION = '0.002000';
+$PAGI::Headers::VERSION = '0.002001';
 use strict;
 use warnings;
 use Carp qw(croak);

@@ -124,7 +124,7 @@ WriteMakefile(
     PL_FILES     => {},
     PREREQ_PM    => {
         'CGI'               => 3.26,
-        'Digest::MD5'       => 0,
+		'Crypt::SysRandom'  => 0.007,
         'Data::Dumper'      => 0,
 #		'Test::Differences' => 0,
         'Test::More'        => 0,

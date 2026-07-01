@@ -1,5 +1,5 @@
 package PAGI::Middleware::CORS;
-$PAGI::Middleware::CORS::VERSION = '0.002000';
+$PAGI::Middleware::CORS::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

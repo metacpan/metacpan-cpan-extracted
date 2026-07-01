@@ -1,5 +1,5 @@
 package PAGI::Middleware::Healthcheck;
-$PAGI::Middleware::Healthcheck::VERSION = '0.002000';
+$PAGI::Middleware::Healthcheck::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

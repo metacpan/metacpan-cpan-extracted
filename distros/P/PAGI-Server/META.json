@@ -16,6 +16,9 @@
    "no_index" : {
       "directory" : [
          "examples"
+      ],
+      "package" : [
+         "PAGI::Server::Protocol::HTTP2::Session"
       ]
    },
    "prereqs" : {
@@ -74,7 +77,7 @@
          "web" : "https://github.com/jjn1056/pagi-server"
       }
    },
-   "version" : "0.002004",
+   "version" : "0.002005",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"

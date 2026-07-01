@@ -1,5 +1,19 @@
 Revision history for Perl extension Algorithm::Heapify::XS.
 
+0.08  Tue Jun 30 2026
+        - Expand the overload regression coverage to exercise heap push,
+          heap adjust, explicit numeric <=> overloads, and explicit string
+          cmp overloads across the supported perl range.
+
+0.07  Tue Jun 30 2026
+        - Fix overloaded numeric comparisons for large integer values.
+          Thanks to Tony Cook (tonycoz) for the report and analysis in
+          https://github.com/demerphq/Algorithm-Heapify-XS/issues/4
+        - Use modern numeric comparison helpers on new perls, with compatible
+          fallback logic for perl 5.18.4 through current.
+        - Add a regression test covering overloaded large-UV ordering.
+        - Define NOT_REACHED when older perls do not provide it.
+
 0.06  Mon Jun 29, 2026
         - Better missing ncmp() solution that does not warn on Win32. Thanks to Sisyphus for the head up.
 
@@ -16,4 +30,3 @@ Revision history for Perl extension Algorithm::Heapify::XS.
 0.01  Sun Aug 26 2018
 	- original version; created by h2xs 1.23 with options
 		-A -n Algorithm::Heapify::XS
-

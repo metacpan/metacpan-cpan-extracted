@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More 0.88;
 
-eval "use JSON::Any qw(DWIW)";
+eval "require JSON::Any; JSON::Any->import('DWIW')";
 plan skip_all => "JSON::DWIW not installed: $@" if $@;
 
 diag("Testing JSON::DWIW backend");

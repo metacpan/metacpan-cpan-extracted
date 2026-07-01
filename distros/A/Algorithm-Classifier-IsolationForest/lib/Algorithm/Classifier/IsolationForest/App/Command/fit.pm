@@ -33,7 +33,9 @@ sub abstract { 'Fits the model using the specified data and save it' }
 
 sub description { 'Fits the model using the specified data and save it
 
-The input format is expected to be CSV. It uses the first two columns for X/Y.
+The input format is expected to be CSV. All columns are used as features;
+each row becomes one sample. Every row must have the same number of columns
+and every value must be numeric.
 
 Switches to new args are like below...
 
@@ -86,25 +88,44 @@ sub execute {
 	}
 
 	my @data;
-	
+	my $expected_cols;
+
 	my $line_int = 1;
 	foreach my $line (read_file($opt->{'i'})) {
 		chomp($line);
+		next if $line =~ /^\s*$/;
 
-	    my ($x, $y) = split(/\,/, $line);
+		my @fields = split(/,/, $line, -1);
 
-		if (!defined($x)){
-			die('Line '.$line_int.' of "'.$opt->{'i'}.'" lacks a value for x');
-		}elsif(!looks_like_number($x)){
-			die('Line '.$line_int.' of "'.$opt->{'i'}.'" value for x,"'.$x.'", does not appear to be a number');			
-		}elsif(!defined($y)){
-			die('Line '.$line_int.' of "'.$opt->{'i'}.'" lacks a value for y');
-		}elsif(!looks_like_number($y)){
-			die('Line '.$line_int.' of "'.$opt->{'i'}.'" value for y,"'.$y.'", does not appear to be a number');			
+		if ( !defined($expected_cols) ) {
+			$expected_cols = scalar @fields;
+			die( 'Line ' . $line_int . ' of "' . $opt->{'i'} . '" has no columns' )
+				if $expected_cols < 1;
+		} elsif ( scalar @fields != $expected_cols ) {
+			die(    'Line '
+				  . $line_int . ' of "'
+				  . $opt->{'i'}
+				  . '" has '
+				  . scalar(@fields)
+				  . ' columns but expected '
+				  . $expected_cols );
 		}
 
-		push @data, [ $x, $y ];
-		
+		my $col_int = 1;
+		for my $field (@fields) {
+			die(    'Line '
+				  . $line_int . ' of "'
+				  . $opt->{'i'}
+				  . '" value for column '
+				  . $col_int . ',"'
+				  . $field
+				  . '", does not appear to be a number' )
+				unless looks_like_number($field);
+			$col_int++;
+		}
+
+		push @data, \@fields;
+
 		$line_int++;
 	}
 	

@@ -46,6 +46,8 @@ examples/endpoint-router-demo/lib/MyApp/Main.pm
 examples/endpoint-router-demo/public/index.html
 examples/full-demo/README.md
 examples/full-demo/app.pl
+examples/sse-close/README.md
+examples/sse-close/app.pl
 examples/sse-dashboard/README.md
 examples/sse-dashboard/app.pl
 examples/sse-dashboard/public/index.html
@@ -128,7 +130,6 @@ lib/PAGI/Middleware/Session/Store.pm
 lib/PAGI/Middleware/Session/Store/Memory.pm
 lib/PAGI/Middleware/Static.pm
 lib/PAGI/Middleware/TrustedHosts.pm
-lib/PAGI/Middleware/WebSocket/Compression.pm
 lib/PAGI/Middleware/WebSocket/RateLimit.pm
 lib/PAGI/Middleware/XSendfile.pm
 lib/PAGI/Request.pm
@@ -158,6 +159,7 @@ t/33-csrf-timing-safe.t
 t/34-directory-security.t
 t/35-gzip-concurrency.t
 t/app-router-group.t
+t/app-router-scope-decline.t
 t/app-router.t
 t/app-wrapcgi-env.t
 t/app/02-routing.t
@@ -177,6 +179,7 @@ t/context/07-router.t
 t/context/08-dispatcher.t
 t/context/09-websocket-delegation.t
 t/context/10-sse-delegation.t
+t/context/11-sse-connection-state.t
 t/context/assert-type.t
 t/context/http-sugar.t
 t/context/raw-send.t
@@ -195,6 +198,7 @@ t/endpoint/11-return-contract.t
 t/endpoint/12-route-middleware-value-flow.t
 t/headers.t
 t/integration-endpoint-router-demo.t
+t/integration/sse-decline-end-to-end.t
 t/lib/PAGITest/FakeServer.pm
 t/lib/TestApps/AutoLoaded.pm
 t/lib/TestApps/Component.pm
@@ -270,6 +274,9 @@ t/sse/07-last-event-id.t
 t/sse/08-keepalive.t
 t/sse/09-iteration.t
 t/sse/10-integration.t
+t/sse/11-async-close.t
+t/sse/12-close-event.t
+t/sse/cached-while-referenced.t
 t/stash.t
 t/static_test_files/app.js
 t/static_test_files/hello.txt
@@ -291,6 +298,7 @@ t/test/connection-state.t
 t/transport-helpers.t
 t/utils-lifespan.t
 t/utils-to-app.t
+t/utils/is-response.t
 t/utils/random.t
 t/websocket-heartbeat.t
 t/websocket-query-params.t
@@ -305,3 +313,5 @@ t/websocket/07-iteration.t
 t/websocket/08-cleanup.t
 t/websocket/11-stash-and-callbacks.t
 t/websocket/denial-response.t
+t/websocket/deny-close-code.t
+t/websocket/try-send-error.t

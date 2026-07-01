@@ -1,12 +1,12 @@
 {
-   "abstract" : "Get the parameters to a subroutine in any way you want",
+   "abstract" : "Normalise subroutine arguments regardless of calling convention",
    "author" : [
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,30 +27,46 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Devel::Confess" : "0",
-            "ExtUtils::MakeMaker" : "6.64",
-            "Scalar::Util" : "0"
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.010001"
          }
       },
       "test" : {
          "requires" : {
             "Error" : "0",
-            "Test::Compile" : "0",
+            "IPC::System::Simple" : "0",
+            "Params::Validate::Strict" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0.08",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::Warnings" : "0"
+            "Test::Returns" : "0",
+            "Test::Without::Module" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "0.14",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Params-Get@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Get",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Get"
+      },
+      "homepage" : "https://metacpan.org/pod/Params::Get",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nigelhorne/Params-Get.git",
+         "web" : "https://github.com/nigelhorne/Params-Get"
+      }
+   },
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

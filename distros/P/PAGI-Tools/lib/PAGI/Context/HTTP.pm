@@ -1,5 +1,5 @@
 package PAGI::Context::HTTP;
-$PAGI::Context::HTTP::VERSION = '0.002000';
+$PAGI::Context::HTTP::VERSION = '0.002001';
 use strict;
 use warnings;
 use Carp qw(croak);

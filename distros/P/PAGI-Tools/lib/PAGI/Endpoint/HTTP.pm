@@ -1,11 +1,12 @@
 package PAGI::Endpoint::HTTP;
-$PAGI::Endpoint::HTTP::VERSION = '0.002000';
+$PAGI::Endpoint::HTTP::VERSION = '0.002001';
 use strict;
 use warnings;
 
 use Future::AsyncAwait;
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
+use PAGI::Utils qw(is_response);
 
 # Factory class method - override in subclass for customization
 sub context_class { 'PAGI::Context' }
@@ -57,7 +58,7 @@ async sub dispatch {
     }
 
     croak ref($self) . "->$http_method did not return a response"
-        unless blessed($res) && $res->can('respond');
+        unless is_response($res);
     await $ctx->respond($res);
 }
 

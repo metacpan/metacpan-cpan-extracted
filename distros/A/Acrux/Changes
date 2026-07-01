@@ -1,5 +1,23 @@
 # Version/Revision history
 
+0.10 Tue 30 Jun 2026 12:36:09 MSK
+    * Changed default logging backend from syslog to STDERR.
+      Applications relying on implicit syslog logging should explicitly
+      configure file => "syslog:" (or file => "@") instead.
+    * Added explicit logging targets:
+        file => "stdout:"
+        file => "stderr:"
+        file => "syslog:"
+    * Short aliases are also supported:
+        "-"  => stdout
+        "="  => stderr
+        "@"  => syslog
+    * If a log file cannot be opened, logging automatically falls back to
+      STDERR instead of aborting initialization.
+
+0.09 Sat 27 Jun 2026 19:12:29 MSK
+    * Added Acrux::Util::parse_words function
+
 0.08 Tue 20 Jan 2026 19:29:10 MSK
     * Project relicensed from the Perl 5 dual license to the Artistic License 2.0
     * Added Acrux::Digest::Damm module with checkdigit/digest methods

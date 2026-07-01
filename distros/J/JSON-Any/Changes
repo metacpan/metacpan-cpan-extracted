@@ -1,5 +1,9 @@
 Revision history for JSON-Any
 
+1.42      2026-06-30 21:25:05Z
+    - fix test error with allow_non-ref and JSON::XS >= 4.0 when
+      Cpanel::JSON::XS is not installed (RT#127753)
+
 1.41      2026-06-18 03:44:01Z
     - fix test error with allow_non-ref and Cpanel::JSON::XS >= 4.42
       (RT#179192)

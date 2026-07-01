@@ -1,16 +1,17 @@
 {
    "abstract" : "gumbo parser library",
    "author" : [
-      "Ruslan Zakirov <Ruslan.Zakirov@gmail.com>"
+      "Ruslan Zakirov <Ruslan.Zakirov@gmail.com>",
+      "Best Practical Solutions, LLC <modules@bestpractical.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-LibGumbo",
    "prereqs" : {
@@ -34,7 +35,7 @@
    "provides" : {
       "Alien::LibGumbo" : {
          "file" : "lib/Alien/LibGumbo.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -43,9 +44,9 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/ruz/Alien-LibGumbo"
+         "url" : "https://github.com/bestpractical/alien-libgumbo"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

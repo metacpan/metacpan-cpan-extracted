@@ -20,7 +20,6 @@ no_index:
   directory:
     - examples
 recommends:
-  Compress::Raw::Zlib: '0'
   Cpanel::JSON::XS: '4.19'
   Crypt::URandom: '0.36'
   Future::IO: '0.23'
@@ -33,12 +32,13 @@ requires:
   Hash::MultiValue: '0.16'
   IO::Compress::Gzip: '0'
   JSON::MaybeXS: '1.004003'
+  Module::Load: '0'
   perl: '5.018'
 resources:
   bugtracker: https://github.com/jjn1056/PAGI-Tools/issues
   homepage: https://github.com/jjn1056/PAGI-Tools
   repository: https://github.com/jjn1056/PAGI-Tools.git
-version: '0.002000'
+version: '0.002001'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

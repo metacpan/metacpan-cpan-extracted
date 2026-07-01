@@ -563,10 +563,13 @@ subtest 'any() with params and constraints' => sub {
 
 subtest 'any() with middleware' => sub {
     my @calls;
-    my $mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        $scope->{mw_ran} = 1;
-        await $next->();
+    my $mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            $scope->{mw_ran} = 1;
+            await $app->($scope, $receive, $send);
+        };
     };
 
     my $router = PAGI::App::Router->new;
@@ -662,10 +665,13 @@ subtest 'mount string form (auto-require + to_app)' => sub {
 
 subtest 'mount string form with middleware' => sub {
     my $mw_called = 0;
-    my $mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        $mw_called = 1;
-        await $next->();
+    my $mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            $mw_called = 1;
+            await $app->($scope, $receive, $send);
+        };
     };
 
     my $router = PAGI::App::Router->new;

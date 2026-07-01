@@ -1,5 +1,5 @@
 package PAGI::Middleware::XSendfile;
-$PAGI::Middleware::XSendfile::VERSION = '0.002000';
+$PAGI::Middleware::XSendfile::VERSION = '0.002001';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

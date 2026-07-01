@@ -37,7 +37,6 @@
       },
       "runtime" : {
          "recommends" : {
-            "Compress::Raw::Zlib" : "0",
             "Cpanel::JSON::XS" : "4.19",
             "Crypt::URandom" : "0.36",
             "Future::IO" : "0.23"
@@ -51,6 +50,7 @@
             "Hash::MultiValue" : "0.16",
             "IO::Compress::Gzip" : "0",
             "JSON::MaybeXS" : "1.004003",
+            "Module::Load" : "0",
             "perl" : "5.018"
          }
       },
@@ -75,7 +75,7 @@
          "web" : "https://github.com/jjn1056/PAGI-Tools"
       }
    },
-   "version" : "0.002000",
+   "version" : "0.002001",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"

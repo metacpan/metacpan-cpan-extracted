@@ -9,7 +9,7 @@ Tk::ListEntry - BrowseEntry like widget without button
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.07';
 
 use Tk;
 require Tk::PopList;

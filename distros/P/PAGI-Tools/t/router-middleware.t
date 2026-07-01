@@ -68,11 +68,14 @@ subtest 'single coderef middleware' => sub {
     my $router = PAGI::App::Router->new;
     my @tracker;
 
-    my $mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'mw:before';
-        await $next->();
-        push @tracker, 'mw:after';
+    my $mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'mw:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'mw:after';
+        };
     };
 
     $router->get('/' => [$mw] => make_app('home', \@tracker));
@@ -88,25 +91,34 @@ subtest 'multiple middleware execution order' => sub {
     my $router = PAGI::App::Router->new;
     my @tracker;
 
-    my $mw1 = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'mw1:before';
-        await $next->();
-        push @tracker, 'mw1:after';
+    my $mw1 = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'mw1:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'mw1:after';
+        };
     };
 
-    my $mw2 = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'mw2:before';
-        await $next->();
-        push @tracker, 'mw2:after';
+    my $mw2 = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'mw2:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'mw2:after';
+        };
     };
 
-    my $mw3 = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'mw3:before';
-        await $next->();
-        push @tracker, 'mw3:after';
+    my $mw3 = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'mw3:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'mw3:after';
+        };
     };
 
     $router->get('/' => [$mw1, $mw2, $mw3] => make_app('home', \@tracker));
@@ -125,20 +137,24 @@ subtest 'middleware can short-circuit' => sub {
     my $router = PAGI::App::Router->new;
     my @tracker;
 
-    my $auth = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'auth:check';
-        # Don't call $next - short circuit
-        await $send->({
-            type    => 'http.response.start',
-            status  => 401,
-            headers => [['content-type', 'text/plain']],
-        });
-        await $send->({
-            type => 'http.response.body',
-            body => 'Unauthorized',
-            more => 0,
-        });
+    # Factory whose inner sub responds without ever calling $app.
+    my $auth = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'auth:check';
+            # Do not call $app — short-circuit.
+            await $send->({
+                type    => 'http.response.start',
+                status  => 401,
+                headers => [['content-type', 'text/plain']],
+            });
+            await $send->({
+                type => 'http.response.body',
+                body => 'Unauthorized',
+                more => 0,
+            });
+        };
     };
 
     $router->get('/' => [$auth] => make_app('home', \@tracker));
@@ -154,21 +170,14 @@ subtest 'middleware can modify scope' => sub {
     my $router = PAGI::App::Router->new;
     my $captured_scope;
 
-    my $add_user = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        # Create new scope with user info
-        my $new_scope = { %$scope, user => { id => 42, name => 'Test' } };
-        # Need to call app with new scope - but $next captures original
-        # This requires a different approach...
-        await $next->();
-    };
-
-    # For scope modification, middleware needs to call the next handler directly
-    # Let's test a simpler case - modifying via scope reference
-    my $modify_scope = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        $scope->{custom_data} = 'from_middleware';
-        await $next->();
+    # Factory that stamps custom_data onto the scope before calling $app.
+    my $modify_scope = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            $scope->{custom_data} = 'from_middleware';
+            await $app->($scope, $receive, $send);
+        };
     };
 
     my $app_handler = async sub {
@@ -194,7 +203,7 @@ subtest 'PAGI::Middleware instance' => sub {
     my $router = PAGI::App::Router->new;
     my @tracker;
 
-    # Create a simple middleware class
+    # Object middleware: wrap() is called once at build time and returns the handler.
     {
         package TestMiddleware;
         use Future::AsyncAwait;
@@ -204,19 +213,13 @@ subtest 'PAGI::Middleware instance' => sub {
             return bless { tracker => $args{tracker}, name => $args{name} }, $class;
         }
 
-        async sub call {
-            my ($self, $scope, $receive, $send, $app) = @_;
-            push @{$self->{tracker}}, "$self->{name}:before";
-            my $wrapped = $self->wrap($app);
-            await $wrapped->($scope, $receive, $send);
-            push @{$self->{tracker}}, "$self->{name}:after";
-        }
-
         sub wrap {
             my ($self, $app) = @_;
             return async sub {
                 my ($scope, $receive, $send) = @_;
+                push @{$self->{tracker}}, "$self->{name}:before";
                 await $app->($scope, $receive, $send);
+                push @{$self->{tracker}}, "$self->{name}:after";
             };
         }
     }
@@ -236,11 +239,14 @@ subtest 'mount with middleware' => sub {
     my $router = PAGI::App::Router->new;
     my @tracker;
 
-    my $mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'mount_mw:before';
-        await $next->();
-        push @tracker, 'mount_mw:after';
+    my $mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'mount_mw:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'mount_mw:after';
+        };
     };
 
     my $sub_router = PAGI::App::Router->new;
@@ -259,18 +265,24 @@ subtest 'stacked middleware - mount + route' => sub {
     my $router = PAGI::App::Router->new;
     my @tracker;
 
-    my $outer_mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'outer:before';
-        await $next->();
-        push @tracker, 'outer:after';
+    my $outer_mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'outer:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'outer:after';
+        };
     };
 
-    my $inner_mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'inner:before';
-        await $next->();
-        push @tracker, 'inner:after';
+    my $inner_mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'inner:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'inner:after';
+        };
     };
 
     my $sub_router = PAGI::App::Router->new;
@@ -292,11 +304,14 @@ subtest 'websocket route with middleware' => sub {
     my $router = PAGI::App::Router->new;
     my @tracker;
 
-    my $mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'ws_mw:before';
-        await $next->();
-        push @tracker, 'ws_mw:after';
+    my $mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'ws_mw:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'ws_mw:after';
+        };
     };
 
     my $ws_handler = async sub {
@@ -317,11 +332,14 @@ subtest 'sse route with middleware' => sub {
     my $router = PAGI::App::Router->new;
     my @tracker;
 
-    my $mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'sse_mw:before';
-        await $next->();
-        push @tracker, 'sse_mw:after';
+    my $mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'sse_mw:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'sse_mw:after';
+        };
     };
 
     my $sse_handler = async sub {
@@ -349,10 +367,10 @@ subtest 'invalid middleware - dies at registration' => sub {
     }, qr/Invalid middleware/, 'hashref middleware rejected';
 
     like dies {
-        # Object without call method
+        # Object without wrap method
         my $obj = bless {}, 'SomeClass';
         $router->get('/' => [$obj] => sub {});
-    }, qr/Invalid middleware/, 'object without call() rejected';
+    }, qr/Invalid middleware/, 'object without wrap() rejected';
 };
 
 subtest 'empty middleware array' => sub {
@@ -378,21 +396,27 @@ subtest 'mixed middleware types' => sub {
 
         sub new { bless { tracker => $_[1] }, $_[0] }
 
-        async sub call {
-            my ($self, $scope, $receive, $send, $app) = @_;
-            push @{$self->{tracker}}, 'instance:before';
-            await $app->($scope, $receive, $send);
-            push @{$self->{tracker}}, 'instance:after';
+        sub wrap {
+            my ($self, $app) = @_;
+            return async sub {
+                my ($scope, $receive, $send) = @_;
+                push @{$self->{tracker}}, 'instance:before';
+                await $app->($scope, $receive, $send);
+                push @{$self->{tracker}}, 'instance:after';
+            };
         }
     }
 
     my $instance_mw = MixedTestMiddleware->new(\@tracker);
 
-    my $coderef_mw = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'coderef:before';
-        await $next->();
-        push @tracker, 'coderef:after';
+    my $coderef_mw = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            push @tracker, 'coderef:before';
+            await $app->($scope, $receive, $send);
+            push @tracker, 'coderef:after';
+        };
     };
 
     $router->get('/' => [$instance_mw, $coderef_mw] => make_app('home', \@tracker));
@@ -411,14 +435,17 @@ subtest 'coderef middleware can wrap the receive channel' => sub {
     my $router = PAGI::App::Router->new;
 
     # Middleware injects a synthetic event ahead of the real receive.
-    my $inject = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        my $done = 0;
-        my $wrapped_receive = async sub {
-            return { type => 'tick' } unless $done++;
-            return await $receive->();
+    my $inject = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            my $done = 0;
+            my $wrapped_receive = async sub {
+                return { type => 'tick' } unless $done++;
+                return await $receive->();
+            };
+            await $app->($scope, $wrapped_receive, $send);
         };
-        await $next->($scope, $wrapped_receive, $send);
     };
 
     # App reports the first event type it sees on the channel.
@@ -439,15 +466,18 @@ subtest 'coderef middleware can wrap the send channel' => sub {
     my $router = PAGI::App::Router->new;
 
     # Middleware stamps a header onto the response start event.
-    my $stamp = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        my $wrapped_send = async sub {
-            my ($event) = @_;
-            $event = { %$event, headers => [ @{ $event->{headers} // [] }, ['x-powered-by', 'PAGI'] ] }
-                if $event->{type} eq 'http.response.start';
-            await $send->($event);
+    my $stamp = sub {
+        my ($app) = @_;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            my $wrapped_send = async sub {
+                my ($event) = @_;
+                $event = { %$event, headers => [ @{ $event->{headers} // [] }, ['x-powered-by', 'PAGI'] ] }
+                    if $event->{type} eq 'http.response.start';
+                await $send->($event);
+            };
+            await $app->($scope, $receive, $wrapped_send);
         };
-        await $next->($scope, $receive, $wrapped_send);
     };
 
     my $app_handler = async sub {
@@ -463,22 +493,37 @@ subtest 'coderef middleware can wrap the send channel' => sub {
     is $headers{'x-powered-by'}, 'PAGI', 'response carries the header added by the wrapped send';
 };
 
-subtest 'arg-less $next still continues with the inherited channel' => sub {
+subtest 'wrap is called once at build time, not per request' => sub {
     my $router = PAGI::App::Router->new;
-    my @tracker;
 
-    # The common form: observe, then continue with $next->() (no args).
-    my $observe = async sub {
-        my ($scope, $receive, $send, $next) = @_;
-        push @tracker, 'observe';
-        await $next->();
+    # $counter lives in factory scope; if wrap() ran per request it would reset each time.
+    my $counter_mw = sub {
+        my ($app) = @_;
+        my $counter = 0;
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            my $n = ++$counter;
+            my $wrapped_send = async sub {
+                my ($event) = @_;
+                $event = { %$event, headers => [ @{ $event->{headers} // [] }, ['x-call-count', "$n"] ] }
+                    if $event->{type} eq 'http.response.start';
+                await $send->($event);
+            };
+            await $app->($scope, $receive, $wrapped_send);
+        };
     };
 
-    $router->get('/' => [$observe] => make_app('home', \@tracker));
-    my $events = request($router->to_app, path => '/')->get;
+    $router->get('/' => [$counter_mw] => make_app('home'));
+    my $app = $router->to_app;
 
-    is \@tracker, ['observe', 'app:home'], 'arg-less continue is unchanged';
-    is $events->[0]{status}, 200, 'response flows through';
+    my $events1 = request($app, path => '/')->get;
+    my $events2 = request($app, path => '/')->get;
+
+    my %h1 = map { @$_ } @{ $events1->[0]{headers} };
+    my %h2 = map { @$_ } @{ $events2->[0]{headers} };
+
+    is $h1{'x-call-count'}, '1', 'first request: counter is 1';
+    is $h2{'x-call-count'}, '2', 'second request: counter is 2 (wrap called once at build time)';
 };
 
 done_testing;

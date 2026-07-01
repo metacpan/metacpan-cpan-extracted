@@ -4,7 +4,7 @@
       "Sherzod Ruzmetov <sherzodr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "session",
       "http"
@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CGI-Session",
    "no_index" : {
@@ -28,7 +28,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : 0
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -39,88 +39,10 @@
       "runtime" : {
          "requires" : {
             "CGI" : "3.26",
-            "Data::Dumper" : 0,
-            "Digest::MD5" : 0,
-            "Scalar::Util" : 0
+            "Crypt::SysRandom" : "0.007",
+            "Data::Dumper" : "0",
+            "Scalar::Util" : "0"
          }
-      }
-   },
-   "provides" : {
-      "CGI::Session" : {
-         "file" : "lib/CGI/Session.pm",
-         "version" : "4.48"
-      },
-      "CGI::Session::Driver" : {
-         "file" : "lib/CGI/Session/Driver.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::Driver::DBI" : {
-         "file" : "lib/CGI/Session/Driver/DBI.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::Driver::db_file" : {
-         "file" : "lib/CGI/Session/Driver/db_file.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::Driver::file" : {
-         "file" : "lib/CGI/Session/Driver/file.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::Driver::mysql" : {
-         "file" : "lib/CGI/Session/Driver/mysql.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::Driver::postgresql" : {
-         "file" : "lib/CGI/Session/Driver/postgresql.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::Driver::sqlite" : {
-         "file" : "lib/CGI/Session/Driver/sqlite.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::ErrorHandler" : {
-         "file" : "lib/CGI/Session/ErrorHandler.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::ID::incr" : {
-         "file" : "lib/CGI/Session/ID/incr.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::ID::md5" : {
-         "file" : "lib/CGI/Session/ID/md5.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::ID::static" : {
-         "file" : "lib/CGI/Session/ID/static.pm",
-         "version" : "4.44"
-      },
-      "CGI::Session::Serialize::default" : {
-         "file" : "lib/CGI/Session/Serialize/default.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::Serialize::freezethaw" : {
-         "file" : "lib/CGI/Session/Serialize/freezethaw.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::Serialize::storable" : {
-         "file" : "lib/CGI/Session/Serialize/storable.pm",
-         "version" : "4.43"
-      },
-      "CGI::Session::Test::Default" : {
-         "file" : "lib/CGI/Session/Test/Default.pm",
-         "version" : "4.47"
-      },
-      "CGI::Session::Test::SimpleObjectClass" : {
-         "file" : "lib/CGI/Session/Test/Default.pm",
-         "version" : 0
-      },
-      "CGI::Session::Tutorial" : {
-         "file" : "lib/CGI/Session/Tutorial.pm",
-         "version" : "4.43"
-      },
-      "OverloadedClass" : {
-         "file" : "lib/CGI/Session/Test/Default.pm",
-         "version" : 0
       }
    },
    "release_status" : "stable",
@@ -132,5 +54,6 @@
          "url" : "http://github.com/cromedome/cgi-session"
       }
    },
-   "version" : "4.48"
+   "version" : "4.49",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

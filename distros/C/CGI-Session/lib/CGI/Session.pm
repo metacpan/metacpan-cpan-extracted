@@ -4,7 +4,7 @@ use Carp;
 use CGI::Session::ErrorHandler;
 
 @CGI::Session::ISA      = qw( CGI::Session::ErrorHandler );
-$CGI::Session::VERSION  = '4.48';
+$CGI::Session::VERSION  = '4.49';
 $CGI::Session::NAME     = 'CGISESSID';
 $CGI::Session::IP_MATCH = 0;
 
@@ -1314,7 +1314,7 @@ The following ID generators are included in the standard distribution.
 
 =item *
 
-L<md5|CGI::Session::ID::md5> - generates 32 character long hexadecimal string. Requires L<Digest::MD5|Digest::MD5>.
+L<md5|CGI::Session::ID::md5> - generates 32 character long hexadecimal string. Requires L<Crypto::SysRandom|Crypto::SysRandom>.
 Full name: B<CGI::Session::ID::md5>.
 
 =item *

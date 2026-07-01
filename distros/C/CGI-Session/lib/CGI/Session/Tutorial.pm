@@ -336,7 +336,7 @@ Do not keep sessions open for very long. This will increase the possibility that
 
 =head2 SESSION IDs
 
-Session ids are not easily guessed (unless you're using L<incr ID generator|CGI::Session::ID::incr>)! Default configuration of CGI::Session uses L<Digest::MD5|CGI::Session::ID::md5> to generate random, 32 character long identifier. Although this string cannot be guessed as easily by others, if they find it out somehow, can they use this identifier against the other person?
+Session ids are not easily guessed (unless you're using L<incr ID generator|CGI::Session::ID::incr>)! Default configuration of CGI::Session uses L<CGI::Session::ID::md5|CGI::Session::ID::md5> to generate random, 32 character long identifier. Although this string cannot be guessed as easily by others, if they find it out somehow, can they use this identifier against the other person?
 
 Consider the scenario, where you just give someone either via email or an instant messaging a link to a Web site where you're currently logged in. The URL you give to that person contains a session id as part of a query string. If the site was initializing the session solely using query string parameter, after clicking on that link that person now appears to that site as you, and might have access to all of your private data instantly.
 

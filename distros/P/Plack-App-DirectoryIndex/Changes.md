@@ -5,7 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.4]
+
+### Fixed
+
+- Lower `MIN_PERL_VERSION` from 5.38.0 to 5.26.0. The module itself only needs
+  Perl 5.10, and its only non-core prerequisite (`WebServer::DirIndex`)
+  supports Perl 5.26+, so the 5.38 floor was unnecessarily excluding usable
+  Perl versions.
+
+### Changed
+
+- CI now tests across Perl 5.26 through 5.42 (previously only `latest`), so the
+  declared `MIN_PERL_VERSION` is actually exercised.
 
 ## [0.2.3] - 2026-03-16
 

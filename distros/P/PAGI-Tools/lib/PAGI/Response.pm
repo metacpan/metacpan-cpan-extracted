@@ -1,5 +1,5 @@
 package PAGI::Response;
-$PAGI::Response::VERSION = '0.002000';
+$PAGI::Response::VERSION = '0.002001';
 use strict;
 use warnings;
 
@@ -1549,6 +1549,6 @@ package PAGI::Response::Writer {
 
     sub bytes_written { $_[0]->{bytes_written} }
 }
-$PAGI::Response::Writer::VERSION = '0.002000';
+$PAGI::Response::Writer::VERSION = '0.002001';
 
 1;

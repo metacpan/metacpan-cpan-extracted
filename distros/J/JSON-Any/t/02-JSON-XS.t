@@ -4,7 +4,7 @@ use warnings;
 
 use Test::More 0.88;
 
-eval "use JSON::Any qw(XS)";
+eval "require JSON::Any; JSON::Any->import('XS')";
 plan skip_all => "JSON::XS not installed: $@" if $@;
 
 diag("Testing JSON::XS backend");

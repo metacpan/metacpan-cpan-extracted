@@ -1,5 +1,5 @@
 package PAGI::App::Router;
-$PAGI::App::Router::VERSION = '0.002000';
+$PAGI::App::Router::VERSION = '0.002001';
 use strict;
 use warnings;
 use Future::AsyncAwait;
@@ -552,16 +552,14 @@ sub _validate_middleware {
 
     for my $mw (@$middleware) {
         if (ref($mw) eq 'CODE') {
-            # Coderef is valid
             next;
         }
-        elsif (blessed($mw) && $mw->can('call')) {
-            # PAGI::Middleware instance with call() method
+        elsif (blessed($mw) && $mw->can('wrap')) {
             next;
         }
         else {
             my $type = ref($mw) || 'scalar';
-            croak "Invalid middleware: expected coderef or object with ->call method, got $type";
+            croak "Invalid middleware: expected coderef factory or object with ->wrap method, got $type";
         }
     }
 }
@@ -572,32 +570,9 @@ sub _build_middleware_chain {
     return $app unless $middlewares && @$middlewares;
 
     my $chain = $app;
-
     for my $mw (reverse @$middlewares) {
-        my $next = $chain;
-
-        if (ref($mw) eq 'CODE') {
-            # Coderef with $next signature. Forward a transformed channel when the
-            # middleware passes one to $next (so a coderef can wrap $receive/$send
-            # or replace $scope, like an object middleware); otherwise continue
-            # with the inherited triple, preserving the arg-less $next->() form.
-            $chain = async sub {
-                my ($scope, $receive, $send) = @_;
-                await $mw->($scope, $receive, $send, async sub {
-                    my ($s, $r, $sd) = @_ ? @_ : ($scope, $receive, $send);
-                    await $next->($s, $r, $sd);
-                });
-            };
-        }
-        else {
-            # PAGI::Middleware instance - use existing call()
-            $chain = async sub {
-                my ($scope, $receive, $send) = @_;
-                await $mw->call($scope, $receive, $send, $next);
-            };
-        }
+        $chain = ref($mw) eq 'CODE' ? $mw->($chain) : $mw->wrap($chain);
     }
-
     return $chain;
 }
 
@@ -637,6 +612,28 @@ sub to_app {
         return 0;  # No match
     };
 
+    # Emit an unmatched-route response using the event family that matches the
+    # scope. HTTP uses plain http.response.*; SSE and WebSocket scopes only
+    # accept their namespaced decline events (sse.http.response.* /
+    # websocket.http.response.*) before a stream/handshake starts — a plain
+    # http.response.* on those scopes raises on a conforming server. A custom
+    # not_found app, if configured, takes over for every scope type.
+    my $send_not_found = async sub {
+        my ($scope, $receive, $send) = @_;
+        if ($not_found) {
+            await $not_found->($scope, $receive, $send);
+            return;
+        }
+        my $type   = $scope->{type} // 'http';
+        my $prefix = $type eq 'http' ? 'http.response' : "$type.http.response";
+        await $send->({
+            type    => "$prefix.start",
+            status  => 404,
+            headers => [['content-type', 'text/plain']],
+        });
+        await $send->({ type => "$prefix.body", body => 'Not Found', more => 0 });
+    };
+
     return async sub {
         my ($scope, $receive, $send) = @_;
         my $type   = $scope->{type} // 'http';
@@ -672,16 +669,7 @@ sub to_app {
                 return;
             }
             # No mount matched either - 404
-            if ($not_found) {
-                await $not_found->($scope, $receive, $send);
-            } else {
-                await $send->({
-                    type => 'http.response.start',
-                    status => 404,
-                    headers => [['content-type', 'text/plain']],
-                });
-                await $send->({ type => 'http.response.body', body => 'Not Found', more => 0 });
-            }
+            await $send_not_found->($scope, $receive, $send);
             return;
         }
 
@@ -711,16 +699,7 @@ sub to_app {
                 return;
             }
             # No mount matched either - 404
-            if ($not_found) {
-                await $not_found->($scope, $receive, $send);
-            } else {
-                await $send->({
-                    type => 'http.response.start',
-                    status => 404,
-                    headers => [['content-type', 'text/plain']],
-                });
-                await $send->({ type => 'http.response.body', body => 'Not Found', more => 0 });
-            }
+            await $send_not_found->($scope, $receive, $send);
             return;
         }
 
@@ -787,16 +766,7 @@ sub to_app {
         }
 
         # No mount matched either - 404
-        if ($not_found) {
-            await $not_found->($scope, $receive, $send);
-        } else {
-            await $send->({
-                type => 'http.response.start',
-                status => 404,
-                headers => [['content-type', 'text/plain']],
-            });
-            await $send->({ type => 'http.response.body', body => 'Not Found', more => 0 });
-        }
+        await $send_not_found->($scope, $receive, $send);
     };
 }
 
@@ -811,11 +781,26 @@ interface. Routes requests based on scope type first, then path pattern.
 HTTP routes additionally match on method. Returns 404 for unmatched paths
 and 405 for unmatched HTTP methods. Lifespan events are automatically ignored.
 
+The 404 response is emitted with the event family that matches the scope:
+plain C<http.response.*> on an HTTP scope, and the namespaced decline events
+C<sse.http.response.*> / C<websocket.http.response.*> on SSE and WebSocket
+scopes. This matters because those scopes reject a plain C<http.response.*>
+before a stream or handshake begins, so an unmatched SSE or WebSocket route
+returns a real 404 instead of crashing the connection.
+
+The C<sse.http.response.*> decline events require a server that implements them
+(L<PAGI::Server> 0.002005 or later); the C<websocket.http.response.*> denial is
+the long-standing WebSocket denial-response extension.
+
 =head1 OPTIONS
 
 =over 4
 
-=item * C<not_found> - Custom app to handle unmatched routes (all scope types)
+=item * C<not_found> - Custom app to handle unmatched routes (all scope types).
+
+When set, it replaces the default 404 for every scope type and is responsible
+for emitting a scope-appropriate response itself (e.g. C<sse.http.response.*>
+on an SSE scope).
 
 =back
 
@@ -1016,35 +1001,42 @@ All route methods accept an optional middleware arrayref before the app:
 
 =item * B<PAGI::Middleware instance>
 
-Any object with a C<call($scope, $receive, $send, $app)> method:
+Any object with a C<wrap($app)> method. C<wrap> is called B<once at build time>
+(when C<to_app> is called) and must return an async handler coderef
+C<async sub ($scope, $receive, $send) { ... }>:
 
     use PAGI::Middleware::RateLimit;
 
     my $rate_limit = PAGI::Middleware::RateLimit->new(limit => 100);
     $router->get('/api/data' => [$rate_limit] => $handler);
 
-=item * B<Coderef with $next signature>
+=item * B<Coderef factory>
 
-    my $timing = async sub ($scope, $receive, $send, $next) {
-        my $start = time;
-        await $next->();  # Call next middleware or app
-        warn sprintf "Request took %.3fs", time - $start;
+A plain coderef that accepts C<$app> and returns an async handler. The factory
+is called B<once at build time>; the returned handler is called per request:
+
+    my $timing = sub ($app) {
+        async sub ($scope, $receive, $send) {
+            my $start = time;
+            await $app->($scope, $receive, $send);
+            warn sprintf "Request took %.3fs", time - $start;
+        };
     };
     $router->get('/api/data' => [$timing] => $handler);
 
-A coderef middleware may also transform the channel by passing a modified
-C<($scope, $receive, $send)> to C<$next> (at parity with object middleware) —
-for example wrapping C<$receive> to inject events or wrapping C<$send> to stamp
-response headers. Calling C<< $next->() >> with no arguments continues with the
-inherited channel:
+A factory may transform the channel by passing a modified
+C<($scope, $receive, $send)> to C<$app> — for example wrapping C<$receive> to
+inject events or wrapping C<$send> to stamp response headers:
 
-    my $stamp = async sub ($scope, $receive, $send, $next) {
-        my $wrapped_send = async sub ($event) {
-            $event = { %$event, headers => [ @{ $event->{headers} // [] }, ['x-powered-by', 'PAGI'] ] }
-                if $event->{type} eq 'http.response.start';
-            await $send->($event);
+    my $stamp = sub ($app) {
+        async sub ($scope, $receive, $send) {
+            my $wrapped_send = async sub ($event) {
+                $event = { %$event, headers => [ @{ $event->{headers} // [] }, ['x-powered-by', 'PAGI'] ] }
+                    if $event->{type} eq 'http.response.start';
+                await $send->($event);
+            };
+            await $app->($scope, $receive, $wrapped_send);
         };
-        await $next->($scope, $receive, $wrapped_send);
     };
 
 =back
@@ -1061,22 +1053,24 @@ Middleware executes in array order for requests, reverse order for responses
 
 =head2 Short-Circuiting
 
-Middleware can skip calling C<$next> to short-circuit the chain:
+Middleware can skip calling C<$app> to short-circuit the chain:
 
-    my $auth = async sub ($scope, $receive, $send, $next) {
-        unless ($scope->{user}) {
-            await $send->({
-                type    => 'http.response.start',
-                status  => 401,
-                headers => [['content-type', 'text/plain']],
-            });
-            await $send->({
-                type => 'http.response.body',
-                body => 'Unauthorized',
-            });
-            return;  # Don't call $next
-        }
-        await $next->();
+    my $auth = sub ($app) {
+        async sub ($scope, $receive, $send) {
+            unless ($scope->{user}) {
+                await $send->({
+                    type    => 'http.response.start',
+                    status  => 401,
+                    headers => [['content-type', 'text/plain']],
+                });
+                await $send->({
+                    type => 'http.response.body',
+                    body => 'Unauthorized',
+                });
+                return;  # Don't call $app
+            }
+            await $app->($scope, $receive, $send);
+        };
     };
 
 =head2 Stacking with Mount

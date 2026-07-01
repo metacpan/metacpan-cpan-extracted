@@ -4,7 +4,7 @@
       "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.28",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -51,11 +51,11 @@
       "runtime" : {
          "requires" : {
             "Aion" : "1.6",
+            "Aion::Env" : "0.2",
             "Aion::Format" : "v0.1.1",
             "Aion::Run" : "v0.0.3",
             "List::Util" : "0",
             "common::sense" : "0",
-            "config" : "0",
             "perl" : "v5.22.0"
          }
       },
@@ -81,7 +81,7 @@
    "provides" : {
       "Aion::Emitter" : {
          "file" : "lib/Aion/Emitter.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       },
       "Aion::Emitter::ListenersRun" : {
          "file" : "lib/Aion/Emitter/ListenersRun.pm"
@@ -99,7 +99,7 @@
          "web" : "https://github.com/darviarush/perl-aion-emitter"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.1",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>"

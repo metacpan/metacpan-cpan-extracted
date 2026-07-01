@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct a measured phrase of notes
 
-our $VERSION = '0.0108';
+our $VERSION = '0.0109';
 
 use v5.36;
 use Moo;
@@ -134,6 +134,13 @@ has voices => (
 );
 
 
+has patch => (
+    is      => 'ro',
+    isa     => sub { croak "$_[0] is not a valid patch" unless $_[0] =~ /^[0-9]$/ },
+    default => sub { 0 },
+);
+
+
 has queue => (
     is      => 'rw',
     isa     => sub { croak "$_[0] is not an array-ref" unless ref $_[0] eq 'ARRAY' },
@@ -212,7 +219,7 @@ Music::VoicePhrase - Construct a measured phrase of notes
 
 =head1 VERSION
 
-version 0.0108
+version 0.0109
 
 =head1 SYNOPSIS
 
@@ -336,6 +343,14 @@ The pitches given by L<Music::VoiceGen>.
 
 Default: C<4> voices
 
+=head2 patch
+
+  $patch = $mvp->patch;
+
+Patch / synth program integer from C<0> to C<127>.
+
+Default: C<0> (GM piano)
+
 =head2 queue
 
   $queue = $mvp->queue;
@@ -420,7 +435,7 @@ L<Music::Scales>
 
 L<Music::VoiceGen>
 
-L<https://github.com/ology/Music/blob/master/tones-parts.pl>
+L<https://github.com/ology/Music/blob/master/tones-variation.pl>
 
 =head1 AUTHOR
 

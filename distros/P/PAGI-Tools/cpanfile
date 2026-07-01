@@ -17,10 +17,13 @@ requires 'Hash::MultiValue', '0.16';
 requires 'Cookie::Baker', '0.11';
 requires 'HTTP::MultiPartParser', '0.02';
 
-# Response compression (PAGI::Middleware::GZip; WebSocket permessage-deflate).
-# Both ship with core Perl; declared so the dependency is explicit.
+# Response compression (PAGI::Middleware::GZip). Ships with core Perl; declared
+# so the dependency is explicit.
 requires 'IO::Compress::Gzip';
-recommends 'Compress::Raw::Zlib';
+
+# Nested-namespace middleware class resolution (PAGI::Endpoint::Router). Core
+# since 5.9.4; declared explicitly.
+requires 'Module::Load';
 
 # Date parsing for PAGI::Middleware::ConditionalGet
 requires 'HTTP::Date', '6.06';

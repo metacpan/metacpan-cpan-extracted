@@ -22,10 +22,11 @@ my %module_build_args = (
   },
   "dist_abstract" => "gumbo parser library",
   "dist_author" => [
-    "Ruslan Zakirov <Ruslan.Zakirov\@gmail.com>"
+    "Ruslan Zakirov <Ruslan.Zakirov\@gmail.com>",
+    "Best Practical Solutions, LLC <modules\@bestpractical.com>"
   ],
   "dist_name" => "Alien-LibGumbo",
-  "dist_version" => "0.05",
+  "dist_version" => "0.06",
   "license" => "perl",
   "module_name" => "Alien::LibGumbo",
   "recommends" => {},
@@ -40,7 +41,7 @@ my %module_build_args = (
   "test_requires" => {},
   meta_merge => {
     resources  => {
-      repository => "https://github.com/ruz/Alien-LibGumbo",
+      repository => "https://github.com/bestpractical/alien-libgumbo",
       # uncomment to use GitHub issue tracker instead of RT
       #bugtracker => "https://github.com/ruz/Alien-LibGumbo/issues",
     },

@@ -17,16 +17,41 @@ my %WriteMakefileArgs = (
 	},
 	TEST_REQUIRES => {
 		'Test::More' => '0',
+		'File::Temp' => '0',
+		'JSON::PP'   => '0',
+		'List::Util' => '0',
 	},
 	PREREQ_PM => {
-		'App::Cmd'    => '0',
-		'File::Slurp' => '0',
+		'App::Cmd'     => '0',
+		'Carp'         => '0',
+		'Config'       => '0',
+		'File::Slurp'  => '0',
+		'File::Spec'   => '0',
+		'File::Temp'   => '0',
+		'JSON::PP'     => '0',
+		'List::Util'   => '0',
+		'POSIX'        => '0',
+		'Scalar::Util' => '0',
+		'Storable'     => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Algorithm-Classifier-IsolationForest-*' },
 	META_MERGE => {
 		"meta-spec" => { version => 2 },
-		resources   => {
+		prereqs     => {
+			runtime => {
+				# Inline / Inline::C unlock the native scoring backend
+				# (and OpenMP parallel tree-walk if libgomp is available
+				# at build time).  The pure-Perl fallback works without
+				# them, just slower, so they are recommends rather than
+				# hard requires.
+				recommends => {
+					'Inline'    => '0',
+					'Inline::C' => '0',
+				},
+			},
+		},
+		resources => {
 			repository => {
 				type => 'git',
 				url  => 'git@github.com:LilithSec/Algorithm-Classifier-IsolationForest.git',

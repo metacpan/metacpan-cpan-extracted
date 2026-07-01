@@ -1,5 +1,5 @@
 package Git::Database::Role::Object;
-$Git::Database::Role::Object::VERSION = '0.012';
+$Git::Database::Role::Object::VERSION = '0.013';
 use Sub::Quote;
 
 use Moo::Role;
@@ -73,7 +73,7 @@ Git::Database::Role::Object - Role for objects from the Git object database
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

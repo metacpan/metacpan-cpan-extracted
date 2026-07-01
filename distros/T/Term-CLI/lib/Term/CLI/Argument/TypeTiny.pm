@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::TypeTiny 0.061000;
+package Term::CLI::Argument::TypeTiny 0.061001;
 
 use Types::Standard 1.000005 qw(
   Bool
@@ -64,7 +64,7 @@ Term::CLI::Argument::TypeTiny - class for Type::Tiny validated arguments in Term
 
 =head1 VERSION
 
-version 0.061000
+version 0.061001
 
 =head1 SYNOPSIS
 

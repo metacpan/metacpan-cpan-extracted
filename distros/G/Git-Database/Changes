@@ -1,5 +1,13 @@
 Revision history for Git-Database
 
+0.013 2026-07-01 BOOK
+    - initial bare implementation of the Git::Native backend
+      (it does nothing useful yet: patches welcome!)
+    - add links to published blog posts about Git::Database
+    - protect against backend stores that don't define a version
+      (like Git::Native::Repository)
+    - minor test improvements
+
 0.012 2019-04-26 BOOK
     - Adapted to the output of git-cat-file for git >= 2.21.0.rc0
       (RT #129103, reported by SREZIC)

@@ -1,5 +1,7 @@
 package Ascii::Text::Font::Block;
 
+use strict;
+use warnings;
 use Rope;
 use Rope::Autoload;
 
