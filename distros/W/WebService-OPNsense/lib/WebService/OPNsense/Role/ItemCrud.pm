@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Role::ItemCrud;
-$WebService::OPNsense::Role::ItemCrud::VERSION = '0.002';
+$WebService::OPNsense::Role::ItemCrud::VERSION = '0.003';
 use Moo::Role;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -73,7 +73,7 @@ WebService::OPNsense::Role::ItemCrud - Role for item CRUD methods
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

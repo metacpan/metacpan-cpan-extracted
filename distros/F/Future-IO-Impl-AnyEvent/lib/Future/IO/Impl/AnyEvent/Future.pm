@@ -8,7 +8,7 @@ use base 'Future';
 
 use AnyEvent;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub await {
   my ($self) = @_;

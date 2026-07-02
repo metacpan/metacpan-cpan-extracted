@@ -2,11 +2,12 @@ package DBIx::QuickORM::SQLBuilder::SQLAbstract;
 use strict;
 use warnings;
 
-our $VERSION = '0.000026';
+our $VERSION = '0.000027';
 
 use Carp qw/croak confess/;
 use Sub::Util qw/set_subname/;
 use Scalar::Util qw/blessed/;
+use DBIx::QuickORM::Util qw/literal_write_value/;
 use parent 'SQL::Abstract';
 
 use Role::Tiny::With qw/with/;
@@ -192,13 +193,27 @@ sub qorm_upsert {
         # built after SQL::Abstract runs, so its quote_char never reaches it.
         # The bind spec keeps the raw db name because field_affinity/field_type
         # look it up unquoted.
-        push @inject => $dbh->quote_identifier($db_field) . " = ?";
-        push @$binds => {
-            field => $db_field,
-            value => $changes->{$field},
-            type  => 'field',
-            param => $counter++,
-        };
+        my $col = $dbh->quote_identifier($db_field);
+        my $v   = $changes->{$field};
+
+        # Mirror the literal handling in _format_insert_and_update_data so the
+        # conflict-UPDATE half stays symmetric with the INSERT half: a scalar
+        # ref is emitted as SQL, [\'sql ?', @binds] is emitted with its binds,
+        # and everything else is bound as data.
+        unless (literal_write_value($v)) {
+            push @inject => "$col = ?";
+            push @$binds => {field => $db_field, value => $v, type => 'field', param => $counter++};
+            next;
+        }
+
+        if (ref($v) eq 'SCALAR') {
+            push @inject => "$col = $$v";
+            next;
+        }
+
+        my ($sql, @lits) = @$v;
+        push @inject => "$col = $$sql";
+        push @$binds => {field => $db_field, value => $_, type => 'field', param => $counter++} for @lits;
     }
     # When every field is part of the primary key there is nothing to update
     # on conflict, but the conflict clause still needs an assignment (and
@@ -332,8 +347,12 @@ sub qorm_or {
 
 =item $formatted = $builder->_format_insert_and_update_data(\%data)
 
-Wrap each value in a C<< { -value => ... } >> so C<SQL::Abstract> treats it as
-a literal bind value rather than interpreting it.
+Wrap each data value in a C<< { -value => ... } >> so C<SQL::Abstract> binds it
+rather than interpreting a hashref or arrayref value as an operator expression.
+Intentional SQL literals are the exception: a scalar ref (C<\'NOW()'>) is emitted
+verbatim, and an arrayref whose first element is a scalar ref (C<[\'col + ?', $n]>)
+becomes a literal-with-bind expression whose bind values keep the column's
+affinity.
 
 =back
 
@@ -343,9 +362,30 @@ sub _format_insert_and_update_data {
     my $self = shift;
     my ($data) = @_;
 
-    $data = { map { $_ => {'-value' => $data->{$_}} } keys %$data };
+    my %out;
+    for my $field (keys %$data) {
+        my $v = $data->{$field};
 
-    return $data;
+        unless (literal_write_value($v)) {
+            $out{$field} = {'-value' => $v};
+            next;
+        }
+
+        # A bare scalar ref is literal SQL; SQL::Abstract emits it verbatim.
+        if (ref($v) eq 'SCALAR') {
+            $out{$field} = $v;
+            next;
+        }
+
+        # [\'sql ?', @binds] -> SQL::Abstract's \[ $sql, [col => bind], ... ]
+        # literal-with-bind form. With bindtype 'columns' each bind must be a
+        # [column, value] pair, so tag every bind with this field so affinity
+        # and deflation still apply.
+        my ($sql, @binds) = @$v;
+        $out{$field} = \[ $$sql, map { [$field => $_] } @binds ];
+    }
+
+    return \%out;
 }
 
 =pod

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Dnsmasq::Settings;
-$WebService::OPNsense::Dnsmasq::Settings::VERSION = '0.002';
+$WebService::OPNsense::Dnsmasq::Settings::VERSION = '0.003';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -273,7 +273,7 @@ WebService::OPNsense::Dnsmasq::Settings - Dnsmasq settings controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

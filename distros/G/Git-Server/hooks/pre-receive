@@ -2,11 +2,14 @@
 
 use strict;
 use warnings;
+use FindBin qw($RealBin $Script);
 
-!$ENV{REMOTE_USER} && !$ENV{REMOTE_ADDR} && die "\npre-receive: git-server mis-configured.\n".($0=~m{^(.*)/hooks/}?`$1/git-verify`:"");
+!$ENV{REMOTE_USER} && !$ENV{REMOTE_ADDR} && die "\n$Script: git-server mis-configured.\n".`$RealBin/../git-verify`;
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
+my $config = `$RealBin/configs 2>/dev/null`;
+my $allowed = $config =~ /^acl.writers=(.*)$/m and $1 =~ /(^|,)\Q$ENV{REMOTE_USER}\E($|,)/;
 my $r = "\x01"; # enable bit 2^(fileno STDIN)
-die localtime().": [$who] git-server: NO pre-receive STDIN? Commandline Execution Worked!\n" if !select $r, undef, undef, 0.2;
+die localtime().": [$who] git-server: NO $Script STDIN? Commandline Execution Worked!\n" if !select $r, undef, undef, 0.2;
 $SIG{__DIE__} = sub {
     my $why = shift;
     $why =~ s/\s*$/\n/;
@@ -15,15 +18,16 @@ $SIG{__DIE__} = sub {
     exit 1;
 };
 while (my $push_info = <STDIN>) {
-    my ($old,$new,$ref) = $push_info =~ m{^(\w+) (\w+) ([\w/\-.@]+)} or die localtime().": [$who] git-server: Invalid pre-receive STDIN!\n";
-    die localtime().": [$who] git-server: Invalid pre-receive ref!\n" unless $ref;
+    my ($old,$new,$ref) = $push_info =~ m{^(\w+) (\w+) ([\w/\-.@]+)} or die localtime().": [$who] git-server: Invalid $Script STDIN!\n";
+    die localtime().": [$who] git-server: Invalid $Script ref!\n" unless $ref;
     my $branch = ($ref =~ m{^refs/(?:heads|tags)/(.+)} || $ref =~ m{.*/([^/]+)}) ? $1 : $ref;
     my $type = ($ref =~ m{^refs/tags/}) ? "tag" : "branch";
+    warn localtime().": [$who] git-server: You cannot push changes to $type $branch without [acl.writers] permissons.\n" and exit 5 if !$allowed;
     ipclog("REF:$branch");
     ipclog("  TYPE:$type");
     ipclog("  OLD:$old");
     ipclog("  NEW:$new");
-    my $conf = $0 =~ m{(.*)/} ? `$1/configs` : `git config --list`;
+    my $conf = $config;
     if ($conf =~ s/^acl.restrictemail=(.+)//m) {
         my $restrictemail = $1;
         my $sniffers = [];

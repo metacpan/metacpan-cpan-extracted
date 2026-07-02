@@ -64,16 +64,16 @@ subtest 'GET 200 returns decoded data' => sub {
     is( $result->{count},  TEST_COUNT, 'data count' );
 };
 
-subtest 'GET 404 returns undef' => sub {
+subtest 'GET 404 throws Exception' => sub {
     my $opn = _build_mock( HTTP_NOT_FOUND, '{"message":"not found"}' );
     my $req = HTTP::Request->new( GET => 'http://localhost/api/test' );
-    ok( !defined $opn->req($req), 'returns undef' );
+    ok( dies { $opn->req($req) }, 'GET 404 throws' );
 };
 
-subtest 'GET 410 returns undef' => sub {
+subtest 'GET 410 throws Exception' => sub {
     my $opn = _build_mock( HTTP_GONE, '{"message":"gone"}' );
     my $req = HTTP::Request->new( GET => 'http://localhost/api/test' );
-    ok( !defined $opn->req($req), 'returns undef' );
+    ok( dies { $opn->req($req) }, 'GET 410 throws' );
 };
 
 subtest 'POST 200 returns decoded data' => sub {

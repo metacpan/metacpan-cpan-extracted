@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use File::Spec::Functions qw(catdir catfile);
+use File::Spec::Functions qw(catdir catfile catpath);
 
 use Config::INI::RefVars::Builtins ();
 
@@ -12,6 +12,7 @@ my %Names = map {$_ => undef } qw(and
                                   basename
                                   catdir
                                   catfile
+                                  catpath
                                   concat
                                   dirname
                                   eq
@@ -40,6 +41,7 @@ ok(!%Names, "all names found") or diag("Missing: " . join(', ', keys(%Names)));
 
 is($Dispatch->{catdir}->('foo', 'bar'), catdir('foo', 'bar'), 'catdir');
 is($Dispatch->{catfile}->('foo', 'bar.txt'), catfile('foo', 'bar.txt'), 'catfile');
+is($Dispatch->{catpath}->(qw(C x y)), catpath(qw(C x y)));
 is($Dispatch->{ignore}->('a', 'b', 'c'), '', 'ignore');
 is($Dispatch->{concat}->('a', 'b', 'c'), 'abc', 'concat');
 is($Dispatch->{join}->(':', 'a', 'b', 'c'), 'a:b:c', 'join');

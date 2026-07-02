@@ -4,7 +4,7 @@
       "nautofon <nautofon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,8 +26,10 @@
          }
       },
       "configure" : {
+         "recommends" : {
+            "ExtUtils::CppGuess" : "0"
+         },
          "requires" : {
-            "ExtUtils::CppGuess" : "0",
             "ExtUtils::MakeMaker" : "7.12",
             "ExtUtils::MakeMaker::CPANfile" : "0.09",
             "Path::Tiny" : "0.062"
@@ -63,54 +65,51 @@
    "provides" : {
       "Archive::SCS" : {
          "file" : "lib/Archive/SCS.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::CityHash" : {
          "file" : "lib/Archive/SCS/CityHash.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::DirIndex" : {
          "file" : "lib/Archive/SCS/DirIndex.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::Directory" : {
          "file" : "lib/Archive/SCS/Directory.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::GameDir" : {
          "file" : "lib/Archive/SCS/GameDir.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::HashFS" : {
          "file" : "lib/Archive/SCS/HashFS.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::HashFS2" : {
          "file" : "lib/Archive/SCS/HashFS2.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::InMemory" : {
          "file" : "lib/Archive/SCS/InMemory.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::Mountable" : {
          "file" : "lib/Archive/SCS/Mountable.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::TObj" : {
          "file" : "lib/Archive/SCS/TObj.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Archive::SCS::Zip" : {
          "file" : "lib/Archive/SCS/Zip.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://forum.scssoft.com/viewtopic.php?t=330746"
-      },
       "homepage" : "https://forum.scssoft.com/viewtopic.php?t=330746",
       "repository" : {
          "type" : "git",
@@ -118,6 +117,9 @@
          "web" : "https://github.com/nautofon/Archive-SCS"
       }
    },
-   "version" : "1.09",
+   "version" : "1.10",
+   "x_contributors" : [
+      "Karen Etheridge <ether@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

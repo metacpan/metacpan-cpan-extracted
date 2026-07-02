@@ -1275,8 +1275,8 @@ static NV K2x(int n, NV d) {
 /* One comparator, used by every qsort below. Branch form avoids overflow that
  * a subtraction-based comparator would hit, and is correct for any NV width. */
 static int compare_NVs(const void *a, const void *b) {
-    NV x = *(const NV *)a, y = *(const NV *)b;
-    return (x > y) - (x < y);
+	NV x = *(const NV *)a, y = *(const NV *)b;
+	return (x > y) - (x < y);
 }
 /* Largest m*n for which we will run the exact DP even when exact=>1 is forced.
  * Time is O(m*n); memory is O(min(m,n)). Beyond this we warn and go asymptotic. */
@@ -2173,8 +2173,447 @@ static SV *cs_materialize(pTHX_ bool out_aoh, bool is_aoh, AV *restrict src_av,
 	}
 	return newRV_noinc((SV *)out);
 }
+
+#ifndef M_LN_SQRT_2PI
+#define M_LN_SQRT_2PI 0.918938533204672741780329736406  /* log(sqrt(2*pi)) */
+#endif
+#ifndef M_LN_2PI
+#define M_LN_2PI      1.837877066409345483560659472811  /* log(2*pi) */
+#endif
+#ifndef DBL_MIN
+#define DBL_MIN 2.2250738585072014e-308
+#endif
+
+/* Stirling's error  stirlerr(n) = log(n!) - log( sqrt(2*pi*n) * (n/e)^n )
+ * (Catherine Loader 2000; same table + series R uses) */
+static NV bt_stirlerr(NV n) {
+	static const NV S0 = 0.083333333333333333333;        /* 1/12   */
+	static const NV S1 = 0.00277777777777777777778;      /* 1/360  */
+	static const NV S2 = 0.00079365079365079365079365;   /* 1/1260 */
+	static const NV S3 = 0.000595238095238095238095238;  /* 1/1680 */
+	static const NV S4 = 0.0008417508417508417508417508; /* 1/1188 */
+	static const NV halves[31] = {
+		0.0,                            /* 0.0 (placeholder; unreachable here) */
+		0.1534264097200273452913848,    /* 0.5  */
+		0.0810614667953272582196702,    /* 1.0  */
+		0.0548141210519176538961390,    /* 1.5  */
+		0.0413406959554092940938221,    /* 2.0  */
+		0.03316287351993628748511048,   /* 2.5  */
+		0.02767792568499833914878929,   /* 3.0  */
+		0.02374616365629749597132920,   /* 3.5  */
+		0.02079067210376509311152277,   /* 4.0  */
+		0.01848845053267318523077934,   /* 4.5  */
+		0.01664469118982119216319487,   /* 5.0  */
+		0.01513497322191737887351255,   /* 5.5  */
+		0.01387612882307074799874573,   /* 6.0  */
+		0.01281046524292022692424986,   /* 6.5  */
+		0.01189670994589177009505572,   /* 7.0  */
+		0.01110455975820691732662991,   /* 7.5  */
+		0.010411265261972096497478567,  /* 8.0  */
+		0.009799416126158803298389475,  /* 8.5  */
+		0.009255462182712732917728637,  /* 9.0  */
+		0.008768700134139385462952823,  /* 9.5  */
+		0.008330563433362871256469318,  /* 10.0 */
+		0.007934114564314020547248100,  /* 10.5 */
+		0.007573675487951840794972024,  /* 11.0 */
+		0.007244554301320383179543912,  /* 11.5 */
+		0.006942840107209529865664152,  /* 12.0 */
+		0.006665247032707682442354394,  /* 12.5 */
+		0.006408994188004207068439631,  /* 13.0 */
+		0.006171712263039457647532867,  /* 13.5 */
+		0.005951370112758847735624416,  /* 14.0 */
+		0.005746216513010115682023589,  /* 14.5 */
+		0.005554733551962801371038690   /* 15.0 */
+	};
+	NV nn;
+	if (n <= 15.0) {
+		nn = n + n;
+		if (nn == floor(nn)) return halves[(int)nn];
+		return lgamma(n + 1.0) - (n + 0.5) * log(n) + n - M_LN_SQRT_2PI;
+	}
+	nn = n * n;
+	if (n > 500.0) return (S0 - S1 / nn) / n;
+	if (n >  80.0) return (S0 - (S1 - S2 / nn) / nn) / n;
+	if (n >  35.0) return (S0 - (S1 - (S2 - S3 / nn) / nn) / nn) / n;
+	return (S0 - (S1 - (S2 - (S3 - S4 / nn) / nn) / nn) / nn) / n;
+}
+
+/* Deviance term  bd0(x, np) = x*log(x/np) + np - x, summed as a Taylor series
+ * when x is close to np to avoid catastrophic cancellation. */
+static NV bt_bd0(NV x, NV np) {
+	if (np == 0.0) return 0.0;            /* unreachable: callers guarantee np > 0 */
+	if (fabs(x - np) < 0.1 * (x + np)) {
+		NV v = (x - np) / (x + np);
+		NV s = (x - np) * v;
+		if (fabs(s) < DBL_MIN) return s;
+		NV ej = 2.0 * x * v;
+		v *= v;
+		for (int j = 1; ; j++) {          /* |v| < 0.1, so this converges quickly */
+			ej *= v;
+			NV s1 = s + ej / (NV)(2 * j + 1);
+			if (s1 == s) return s1;
+			s = s1;
+		}
+	}
+	return x * log(x / np) + np - x;
+}
+
+/* Binomial PMF via R's dbinom_raw (q = 1 - p) */
+static NV bt_dbinom_raw(NV x, NV n, NV p, NV q) {
+	if (p == 0.0) return (x == 0.0) ? 1.0 : 0.0;
+	if (q == 0.0) return (x == n)   ? 1.0 : 0.0;
+	if (x == 0.0) {
+		if (n == 0.0) return 1.0;
+		NV lc = (p < 0.1) ? -bt_bd0(n, n * q) - n * p : n * log(q);
+		return exp(lc);
+	}
+	if (x == n) {
+		NV lc = (q < 0.1) ? -bt_bd0(n, n * p) - n * q : n * log(p);
+		return exp(lc);
+	}
+	if (x < 0.0 || x > n) return 0.0;
+	NV lc = bt_stirlerr(n) - bt_stirlerr(x) - bt_stirlerr(n - x)
+	      - bt_bd0(x, n * p) - bt_bd0(n - x, n * q);
+	NV lf = M_LN_2PI + log(x) + log1p(-x / n);   /* better than log(n-x)-log(n) for x<<n */
+	return exp(lc - 0.5 * lf);
+}
+
+static NV bt_dbinom(long x, long n, NV p) {
+	if (x < 0 || x > n) return 0.0;
+	return bt_dbinom_raw((NV)x, (NV)n, p, 1.0 - p);
+}
+
+/* Lower tail P(X <= k) = I_{1-p}(n-k, k+1); upper P(X > k) = I_p(k+1, n-k) */
+static NV bt_pbinom_lower(long k, long n, NV p) {
+	if (k < 0)  return 0.0;
+	if (k >= n) return 1.0;
+	return incbeta((NV)(n - k), (NV)(k + 1), 1.0 - p);
+}
+static NV bt_pbinom_upper(long k, long n, NV p) {
+	if (k < 0)  return 1.0;
+	if (k >= n) return 0.0;
+	return incbeta((NV)(k + 1), (NV)(n - k), p);
+}
+
+/* Inverse regularized incomplete beta (R's qbeta): incbeta is monotone in x,
+ * so safeguarded bisection converges to full double precision. */
+static NV bt_qbeta(NV alpha, NV a, NV b) {
+	if (alpha <= 0.0) return 0.0;
+	if (alpha >= 1.0) return 1.0;
+	NV lo = 0.0, hi = 1.0, mid = 0.5;
+	for (unsigned short int i = 0; i < 200; i++) {
+		mid = 0.5 * (lo + hi);
+		if (incbeta(a, b, mid) < alpha) lo = mid; else hi = mid;
+		if (hi - lo < 1e-15) break;
+	}
+	return 0.5 * (lo + hi);
+}
+
+/* Clopper-Pearson endpoints (R's p.L / p.U) */
+static NV bt_pL(NV alpha, long x, long n) {
+	if (x == 0) return 0.0;
+	return bt_qbeta(alpha, (NV)x, (NV)(n - x + 1));
+}
+static NV bt_pU(NV alpha, long x, long n) {
+	if (x == n) return 1.0;
+	return bt_qbeta(1.0 - alpha, (NV)(x + 1), (NV)(n - x));
+}
+
+/* Validate one count argument: a nonnegative integer */
+static long bt_check_count(pTHX_ SV *sv, const char *what) {
+	if (!sv || !SvOK(sv)) croak("binom_test: %s is undef", what);
+	if (!looks_like_number(sv)) croak("binom_test: %s is not a number", what);
+	NV v = SvNV(sv);
+	NV r = floor(v + 0.5);
+	if (v < 0 || fabs(v - r) > 1e-7)
+		croak("binom_test: %s must be a nonnegative integer", what);
+	return (long)r;
+}
+/* =====================================================================
+ * Studentized range distribution (Tukey's) -- ptukey() / qtukey().
+ *
+ * Faithful C port of R's src/nmath/{ptukey,qtukey}.c (Copenhaver &
+ * Holland 1988), the exact algorithm underlying R's TukeyHSD.  The only
+ * substitutions are approx_pnorm() for pnorm() (both are 0.5*erfc based,
+ * so identical to machine precision) and the libc lgamma() for
+ * lgammafn().  Internals are kept in plain double / long double exactly
+ * as upstream so results are bit-faithful regardless of Perl's NV width.
+ *
+ *   st_wprob(w, rr, cc)          integral of Hartley's range over (0,w)
+ *   st_ptukey(q, rr, cc, df)     lower-tail P(range < q)
+ *   st_qinv(p, c, v)             AS 70 initial estimate for the secant
+ *   st_qtukey(p, rr, cc, df)     inverse of st_ptukey via secant method
+ *
+ * rr = number of groups/ranges (1 for a single ANOVA factor),
+ * cc = number of means, df = residual degrees of freedom.
+ * ===================================================================== */
+static NV st_wprob(NV w, NV rr, NV cc)
+{
+#define TK_NLEG  12
+#define TK_IHALF 6
+	const double C1 = -30.0, C2 = -50.0, C3 = 60.0;
+	const double bb = 8.0, wlar = 3.0, wincr1 = 2.0, wincr2 = 3.0;
+	static const double xleg[TK_IHALF] = {
+		0.981560634246719250690549090149,
+		0.904117256370474856678465866119,
+		0.769902674194304687036893833213,
+		0.587317954286617447296702418941,
+		0.367831498998180193752691536644,
+		0.125233408511468915472441369464
+	};
+	static const double aleg[TK_IHALF] = {
+		0.047175336386511827194615961485,
+		0.106939325995318430960254718194,
+		0.160078328543346226334652529543,
+		0.203167426723065921749064455810,
+		0.233492536538354808760849898925,
+		0.249147045813402785000562436043
+	};
+	double a, ac, pr_w, b, binc, c, cc1,
+		pminus, pplus, qexpo, qsqz, rinsum, wi, wincr, xx;
+	long double blb, bub, einsum, elsum;
+	int j, jj;
+
+	qsqz = w * 0.5;
+	if (qsqz >= bb) return 1.0;
+
+	pr_w = 2.0 * approx_pnorm(qsqz) - 1.0;
+	if (pr_w >= exp(C2 / cc)) pr_w = pow(pr_w, cc);
+	else                      pr_w = 0.0;
+
+	if (w > wlar) wincr = wincr1;
+	else          wincr = wincr2;
+
+	blb = qsqz;
+	binc = (bb - qsqz) / wincr;
+	bub = blb + binc;
+	einsum = 0.0;
+	cc1 = cc - 1.0;
+
+	for (wi = 1; wi <= wincr; wi++) {
+		elsum = 0.0;
+		a = (double)(0.5 * (bub + blb));
+		b = (double)(0.5 * (bub - blb));
+		for (jj = 1; jj <= TK_NLEG; jj++) {
+			if (TK_IHALF < jj) { j = (TK_NLEG - jj) + 1; xx = xleg[j - 1]; }
+			else               { j = jj;                 xx = -xleg[j - 1]; }
+			c = b * xx;
+			ac = a + c;
+			qexpo = ac * ac;
+			if (qexpo > C3) break;
+			pplus  = 2.0 * approx_pnorm(ac);
+			pminus = 2.0 * approx_pnorm(ac - w);
+			rinsum = (pplus * 0.5) - (pminus * 0.5);
+			if (rinsum >= exp(C1 / cc1)) {
+				rinsum = (aleg[j - 1] * exp(-(0.5 * qexpo))) * pow(rinsum, cc1);
+				elsum += rinsum;
+			}
+		}
+		elsum *= (((2.0 * b) * cc) * M_1_SQRT_2PI);
+		einsum += elsum;
+		blb = bub;
+		bub += binc;
+	}
+	pr_w += (double) einsum;
+	if (pr_w <= exp(C1 / rr)) return 0.0;
+	pr_w = pow(pr_w, rr);
+	if (pr_w >= 1.0) return 1.0;
+	return pr_w;
+#undef TK_NLEG
+#undef TK_IHALF
+}
+
+static NV st_ptukey(NV q, NV rr, NV cc, NV df)
+{
+#define TK_NLEGQ  16
+#define TK_IHALFQ 8
+	const double eps1 = -30.0, eps2 = 1.0e-14;
+	const double dhaf = 100.0, dquar = 800.0, deigh = 5000.0, dlarg = 25000.0;
+	const double ulen1 = 1.0, ulen2 = 0.5, ulen3 = 0.25, ulen4 = 0.125;
+	static const double xlegq[TK_IHALFQ] = {
+		0.989400934991649932596154173450,
+		0.944575023073232576077988415535,
+		0.865631202387831743880467897712,
+		0.755404408355003033895101194847,
+		0.617876244402643748446671764049,
+		0.458016777657227386342419442984,
+		0.281603550779258913230460501460,
+		0.950125098376374401853193354250e-1
+	};
+	static const double alegq[TK_IHALFQ] = {
+		0.271524594117540948517805724560e-1,
+		0.622535239386478928628438369944e-1,
+		0.951585116824927848099251076022e-1,
+		0.124628971255533872052476282192,
+		0.149595988816576732081501730547,
+		0.169156519395002538189312079030,
+		0.182603415044923588866763667969,
+		0.189450610455068496285396723208
+	};
+	double ans, f2, f21, f2lf, ff4, otsum, qsqz, rotsum, t1, twa1, ulen, wprb;
+	int i, j, jj;
+
+	if (q <= 0.0) return 0.0;
+	if (df < 2.0 || rr < 1.0 || cc < 2.0) return NAN;
+	if (!isfinite(q)) return 1.0;
+	if (df > dlarg) return st_wprob(q, rr, cc);
+
+	f2 = df * 0.5;
+	f2lf = ((f2 * log(df)) - (df * M_LN2)) - lgamma(f2);
+	f21 = f2 - 1.0;
+	ff4 = df * 0.25;
+	if      (df <= dhaf)  ulen = ulen1;
+	else if (df <= dquar) ulen = ulen2;
+	else if (df <= deigh) ulen = ulen3;
+	else                  ulen = ulen4;
+	f2lf += log(ulen);
+	ans = 0.0;
+
+	for (i = 1; i <= 50; i++) {
+		otsum = 0.0;
+		twa1 = (2 * i - 1) * ulen;
+		for (jj = 1; jj <= TK_NLEGQ; jj++) {
+			if (TK_IHALFQ < jj) {
+				j = jj - TK_IHALFQ - 1;
+				t1 = (f2lf + (f21 * log(twa1 + (xlegq[j] * ulen))))
+					- (((xlegq[j] * ulen) + twa1) * ff4);
+			} else {
+				j = jj - 1;
+				t1 = (f2lf + (f21 * log(twa1 - (xlegq[j] * ulen))))
+					+ (((xlegq[j] * ulen) - twa1) * ff4);
+			}
+			if (t1 >= eps1) {
+				if (TK_IHALFQ < jj)
+					qsqz = q * sqrt(((xlegq[j] * ulen) + twa1) * 0.5);
+				else
+					qsqz = q * sqrt(((-(xlegq[j] * ulen)) + twa1) * 0.5);
+				wprb = st_wprob(qsqz, rr, cc);
+				rotsum = (wprb * alegq[j]) * exp(t1);
+				otsum += rotsum;
+			}
+		}
+		if (i * ulen >= 1.0 && otsum <= eps2) break;
+		ans += otsum;
+	}
+	if (ans > 1.0) ans = 1.0;
+	return ans;
+#undef TK_NLEGQ
+#undef TK_IHALFQ
+}
+
+static NV st_qinv(NV p, NV c, NV v)
+{
+	const double p0 = 0.322232421088,    q0 = 0.993484626060e-01;
+	const double p1 = -1.0,              q1 = 0.588581570495;
+	const double p2 = -0.342242088547,   q2 = 0.531103462366;
+	const double p3 = -0.204231210125,   q3 = 0.103537752850;
+	const double p4 = -0.453642210148e-04, q4 = 0.38560700634e-02;
+	const double c1 = 0.8832, c2 = 0.2368, c3 = 1.214, c4 = 1.208, c5 = 1.4142;
+	const double vmax = 120.0;
+	double ps, qq, t, yi;
+
+	ps = 0.5 - 0.5 * p;
+	yi = sqrt(log(1.0 / (ps * ps)));
+	t = yi + (((( yi * p4 + p3) * yi + p2) * yi + p1) * yi + p0)
+		/ (((( yi * q4 + q3) * yi + q2) * yi + q1) * yi + q0);
+	if (v < vmax) t += (t * t * t + t) / v / 4.0;
+	qq = c1 - c2 * t;
+	if (v < vmax) qq += -c3 / v + c4 * t / v;
+	return t * (qq * log(c - 1.0) + c5);
+}
+
+static NV st_qtukey(NV p, NV rr, NV cc, NV df)
+{
+	const double eps = 0.0001;
+	const int maxiter = 50;
+	double ans = 0.0, valx0, valx1, x0, x1, xabs;
+	int iter;
+
+	if (df < 2.0 || rr < 1.0 || cc < 2.0) return NAN;
+	if (p <= 0.0) return 0.0;
+	if (p >= 1.0) return INFINITY;
+
+	x0 = st_qinv(p, cc, df);
+	valx0 = st_ptukey(x0, rr, cc, df) - p;
+	if (valx0 > 0.0) x1 = fmax(0.0, x0 - 1.0);
+	else             x1 = x0 + 1.0;
+	valx1 = st_ptukey(x1, rr, cc, df) - p;
+
+	for (iter = 1; iter < maxiter; iter++) {
+		ans = x1 - ((valx1 * (x1 - x0)) / (valx1 - valx0));
+		valx0 = valx1;
+		x0 = x1;
+		if (ans < 0.0) { ans = 0.0; valx1 = -p; }
+		valx1 = st_ptukey(ans, rr, cc, df) - p;
+		x1 = ans;
+		xabs = fabs(x1 - x0);
+		if (xabs < eps) return ans;
+	}
+	return ans; /* did not converge in maxiter; best estimate */
+}
+
 // --- XS SECTION ---
 MODULE = Stats::LikeR  PACKAGE = Stats::LikeR
+
+NV ptukey(q, nmeans, df, ...)
+	NV q
+	NV nmeans
+	NV df
+CODE:
+{
+	/* ptukey(q, nmeans, df, nranges => 1, lower_tail => 1, log_p => 0)
+	 * Studentized range CDF, as in R's ptukey().  q may also be an
+	 * arrayref, in which case a mortal arrayref is returned (see OUTPUT
+	 * note below -- scalar form here, vector form handled by caller). */
+	NV nranges = 1.0;
+	bool lower_tail = TRUE, log_p = FALSE;
+	if ((items - 3) % 2 != 0)
+		croak("ptukey: expected q, nmeans, df followed by key => value pairs");
+	for (int i = 3; i < items; i += 2) {
+		const char *restrict key = SvPV_nolen(ST(i));
+		SV *restrict val = ST(i + 1);
+		if      (strEQ(key, "nranges"))    nranges    = SvNV(val);
+		else if (strEQ(key, "lower_tail")) lower_tail = SvTRUE(val) ? TRUE : FALSE;
+		else if (strEQ(key, "lower.tail")) lower_tail = SvTRUE(val) ? TRUE : FALSE;
+		else if (strEQ(key, "log_p"))      log_p      = SvTRUE(val) ? TRUE : FALSE;
+		else if (strEQ(key, "log.p"))      log_p      = SvTRUE(val) ? TRUE : FALSE;
+		else croak("ptukey: unknown argument '%s'", key);
+	}
+	NV pr = st_ptukey(q, nranges, nmeans, df);
+	if (!lower_tail) pr = 1.0 - pr;
+	RETVAL = log_p ? log(pr) : pr;
+}
+OUTPUT:
+	RETVAL
+
+NV qtukey(p, nmeans, df, ...)
+	NV p
+	NV nmeans
+	NV df
+CODE:
+{
+	/* qtukey(p, nmeans, df, nranges => 1, lower_tail => 1, log_p => 0)
+	 * Inverse studentized range CDF, as in R's qtukey(). */
+	NV nranges = 1.0;
+	bool lower_tail = TRUE, log_p = FALSE;
+	if ((items - 3) % 2 != 0)
+		croak("qtukey: expected p, nmeans, df followed by key => value pairs");
+	for (int i = 3; i < items; i += 2) {
+		const char *restrict key = SvPV_nolen(ST(i));
+		SV *restrict val = ST(i + 1);
+		if      (strEQ(key, "nranges"))    nranges    = SvNV(val);
+		else if (strEQ(key, "lower_tail")) lower_tail = SvTRUE(val) ? TRUE : FALSE;
+		else if (strEQ(key, "lower.tail")) lower_tail = SvTRUE(val) ? TRUE : FALSE;
+		else if (strEQ(key, "log_p"))      log_p      = SvTRUE(val) ? TRUE : FALSE;
+		else if (strEQ(key, "log.p"))      log_p      = SvTRUE(val) ? TRUE : FALSE;
+		else croak("qtukey: unknown argument '%s'", key);
+	}
+	if (log_p)       p = exp(p);
+	if (!lower_tail) p = 1.0 - p;
+	RETVAL = st_qtukey(p, nranges, nmeans, df);
+}
+OUTPUT:
+	RETVAL
 
 SV *aoh2hoa(data)
 	SV *data
@@ -2245,6 +2684,129 @@ SV *aoh2hoa(data)
 	}
 	OUTPUT:
 		RETVAL
+
+SV* binom_test(...)
+CODE:
+{
+	if (items < 1) croak("binom_test requires at least the number of successes");
+
+	long x = 0, n = 0;
+	bool have_n = 0;
+	unsigned int pos = 1; // index where named args begin
+
+	SV *restrict x_sv = ST(0);
+	if (SvROK(x_sv) && SvTYPE(SvRV(x_sv)) == SVt_PVAV) {
+		/* x = [successes, failures]; n is derived */
+		AV *restrict xa = (AV *)SvRV(x_sv);
+		if (av_len(xa) != 1)
+			croak("binom_test: x as an array ref must hold exactly 2 elements "
+			      "(successes, failures)");
+		long s = bt_check_count(aTHX_ *av_fetch(xa, 0, 0), "successes");
+		long f = bt_check_count(aTHX_ *av_fetch(xa, 1, 0), "failures");
+		x = s;
+		n = s + f;
+		have_n = 1;
+	} else {
+		/* x = successes (scalar); n must follow positionally */
+		x = bt_check_count(aTHX_ x_sv, "x");
+		if (items >= 2 && SvOK(ST(1)) && looks_like_number(ST(1))) {
+			n = bt_check_count(aTHX_ ST(1), "n");
+			have_n = 1;
+			pos = 2;
+		}
+	}
+	if (!have_n)
+		croak("binom_test: number of trials n is required when x is a scalar");
+
+	NV   p          = 0.5;
+	NV   conf_level = 0.95;
+	const char *restrict alternative = "two.sided";
+
+	for (unsigned int i = pos; i < items; i += 2) {
+		if (i + 1 >= items) croak("binom_test: odd number of named arguments");
+		const char *restrict key = SvPV_nolen(ST(i));
+		SV *restrict val = ST(i + 1);
+		if (strEQ(key, "p")) {
+			p = SvNV(val);
+			if (!(p >= 0.0 && p <= 1.0))
+				croak("binom_test: p must be between 0 and 1");
+		} else if (strEQ(key, "conf_level") || strEQ(key, "conf.level")) {
+			conf_level = SvNV(val);
+			if (!(conf_level > 0.0 && conf_level < 1.0))
+				croak("binom_test: conf_level must be between 0 and 1");
+		} else if (strEQ(key, "alternative")) {
+			alternative = SvPV_nolen(val);
+			if (strNE(alternative, "two.sided") && strNE(alternative, "less") &&
+			    strNE(alternative, "greater"))
+				croak("binom_test: alternative must be 'two.sided', 'less' or 'greater'");
+		} else {
+			croak("binom_test: unknown argument '%s'", key);
+		}
+	}
+	if (n < 1) croak("binom_test: n must be a positive integer >= x");
+	if (x > n) croak("binom_test: number of successes cannot exceed trials");
+	// ---- p-value (switch on alternative, as R does)
+	NV PVAL;
+	if (strEQ(alternative, "less")) {
+		PVAL = bt_pbinom_lower(x, n, p);              /* P(X <= x) */
+	} else if (strEQ(alternative, "greater")) {
+		PVAL = bt_pbinom_upper(x - 1, n, p);          /* P(X >= x) */
+	} else {                                          /* two.sided */
+		if (p == 0.0) {
+			PVAL = (x == 0) ? 1.0 : 0.0;
+		} else if (p == 1.0) {
+			PVAL = (x == n) ? 1.0 : 0.0;
+		} else {
+			const NV relErr = 1.0 + 1e-7;
+			NV d = bt_dbinom(x, n, p);
+			NV m = (NV)n * p;
+			if ((NV)x == m) {
+				PVAL = 1.0;
+			} else if ((NV)x < m) {
+				long y = 0;
+				for (long i = (long)ceil(m); i <= n; i++)
+					if (bt_dbinom(i, n, p) <= d * relErr) y++;
+				PVAL = bt_pbinom_lower(x, n, p) + bt_pbinom_upper(n - y, n, p);
+			} else {
+				long y = 0;
+				for (long i = 0; i <= (long)floor(m); i++)
+					if (bt_dbinom(i, n, p) <= d * relErr) y++;
+				PVAL = bt_pbinom_lower(y - 1, n, p) + bt_pbinom_upper(x - 1, n, p);
+			}
+		}
+	}
+	if (PVAL > 1.0) PVAL = 1.0;
+	// confidence interval (Clopper-Pearson)
+	NV ci_lo, ci_hi;
+	if (strEQ(alternative, "less")) {
+		ci_lo = 0.0;
+		ci_hi = bt_pU(1.0 - conf_level, x, n);
+	} else if (strEQ(alternative, "greater")) {
+		ci_lo = bt_pL(1.0 - conf_level, x, n);
+		ci_hi = 1.0;
+	} else {
+		NV a = (1.0 - conf_level) / 2.0;
+		ci_lo = bt_pL(a, x, n);
+		ci_hi = bt_pU(a, x, n);
+	}
+	// ---- htest-style result ----
+	HV *restrict ret = newHV();
+	hv_stores(ret, "method",      newSVpv("Exact binomial test", 0));
+	hv_stores(ret, "alternative", newSVpv(alternative, 0));
+	hv_stores(ret, "statistic",   newSViv(x));             /* number of successes    */
+	hv_stores(ret, "parameter",   newSViv(n));             /* number of trials       */
+	hv_stores(ret, "estimate",    newSVnv((NV)x / (NV)n)); /* probability of success */
+	hv_stores(ret, "null_value",  newSVnv(p));
+	hv_stores(ret, "p_value",     newSVnv(PVAL));
+	hv_stores(ret, "conf_level",  newSVnv(conf_level));
+	AV *restrict ci = newAV();
+	av_push(ci, newSVnv(ci_lo));
+	av_push(ci, newSVnv(ci_hi));
+	hv_stores(ret, "conf_int",    newRV_noinc((SV *)ci));
+	RETVAL = newRV_noinc((SV *)ret);
+}
+OUTPUT:
+  RETVAL
 
 void csort(data, by, output=&PL_sv_undef)
 	SV *data
@@ -7030,7 +7592,7 @@ NV var(...)
 			SV* restrict arg = ST(i);
 			if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
 				 AV* restrict av = (AV*)SvRV(arg);
-				 SSize_t len = av_len(av) + 1;
+				 size_t len = av_len(av) + 1;
 				 for (size_t j = 0; j < len; j++) {
 					  SV** restrict tv = av_fetch(av, j, 0);
 					  if (tv && SvOK(*tv)) {
@@ -7100,7 +7662,7 @@ SV* t_test(...)
 		if (!x_sv || !SvROK(x_sv) || SvTYPE(SvRV(x_sv)) != SVt_PVAV)
 			croak("t_test: 'x' is a required argument and must be an ARRAY reference");
 		AV*restrict x_av = (AV*)SvRV(x_sv);
-		SSize_t nx = av_len(x_av) + 1;
+		size_t nx = av_len(x_av) + 1;
 		if (nx < 2) croak("t_test: 'x' needs at least 2 elements");
 		AV*restrict y_av = NULL;
 		if (y_sv && SvROK(y_sv) && SvTYPE(SvRV(y_sv)) == SVt_PVAV)
@@ -7122,7 +7684,7 @@ SV* t_test(...)
 
 		if (paired || y_av) {
 			if (!y_av) croak("t_test: 'y' must be provided for paired or two-sample tests");
-			SSize_t ny = av_len(y_av) + 1;
+			size_t ny = av_len(y_av) + 1;
 			if (paired && ny != nx) croak("t_test: Paired arrays must be same length");
 			NV mean_y = 0.0, M2_y = 0.0, var_y;
 			for (size_t i = 0; i < ny; i++) {
@@ -7136,8 +7698,8 @@ SV* t_test(...)
 			if (paired) {
 				 NV mean_d = 0.0, M2_d = 0.0;
 				 for (size_t i = 0; i < nx; i++) {
-					  SV**restrict dx_ptr = av_fetch(x_av, i, 0);
-					  SV**restrict dy_ptr = av_fetch(y_av, i, 0);
+					 SV**restrict dx_ptr = av_fetch(x_av, i, 0);
+					 SV**restrict dy_ptr = av_fetch(y_av, i, 0);
 					 NV dx = (dx_ptr && SvOK(*dx_ptr)) ? SvNV(*dx_ptr) : 0.0;
 					 NV dy = (dy_ptr && SvOK(*dy_ptr)) ? SvNV(*dy_ptr) : 0.0;
 					 NV val = dx - dy;
@@ -7213,7 +7775,7 @@ void p_adjust(SV* p_sv, const char* method = "holm")
 			croak("p_adjust: first argument must be an ARRAY reference of p-values");
 		}
 		AV *restrict p_av = (AV*)SvRV(p_sv);
-		SSize_t n = av_len(p_av) + 1;
+		size_t n = av_len(p_av) + 1;
 		// Handle empty input
 		if (n == 0) {
 			XSRETURN_EMPTY;
@@ -7429,7 +7991,7 @@ void intersection(...)
 			AV* restrict av;
 			size_t len;
 			if (!(SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV))
-				croak("intersection: argument %" UVuf " is not an array ref", (UV)i);
+				croak("intersection: argument index %" UVuf " of %" UVuf " total (max index %" UVuf ") is not an array reference", (UV)i, (UV)nrefs, (UV)(nrefs - 1));
 			av = (AV*)SvRV(arg);
 			len = av_len(av) + 1;
 			loc = (HV*)sv_2mortal((SV*)newHV());   /* per-ref dedup */
@@ -7479,14 +8041,14 @@ void intersection(...)
 
 SV* cor(SV* x_sv, SV* y_sv = &PL_sv_undef, const char* method = "pearson")
 	INIT:
-	// --- validate method -------------------------------------------
+	// --- validate method
 	if (strcmp(method, "pearson")  != 0 &&
 		strcmp(method, "spearman") != 0 &&
 		strcmp(method, "kendall")  != 0)
 		  croak("cor: unknown method '%s' (use 'pearson', 'spearman', or 'kendall')",
 				method);
 
-	// --- validate x ------------------------------------------------
+	// --- validate x
 	if (!SvROK(x_sv) || SvTYPE(SvRV(x_sv)) != SVt_PVAV)
 		  croak("cor: x must be an ARRAY reference");
 
@@ -7494,7 +8056,7 @@ SV* cor(SV* x_sv, SV* y_sv = &PL_sv_undef, const char* method = "pearson")
 	size_t nx   = av_len(x_av) + 1;
 	if (nx == 0) croak("cor: x is empty");
 
-	// --- detect whether x is a flat vector or a matrix (AoA) -------
+	// --- detect whether x is a flat vector or a matrix (AoA)
 	bool x_is_matrix = 0;
 	{
 		SV**restrict fp = av_fetch(x_av, 0, 0);
@@ -7502,7 +8064,7 @@ SV* cor(SV* x_sv, SV* y_sv = &PL_sv_undef, const char* method = "pearson")
 			x_is_matrix = 1;
 	}
 
-	// --- detect y ----------------------------
+	// --- detect y
 	bool has_y = (SvOK(y_sv) && SvROK(y_sv) &&
 				   SvTYPE(SvRV(y_sv)) == SVt_PVAV);
 
@@ -7520,7 +8082,7 @@ SV* cor(SV* x_sv, SV* y_sv = &PL_sv_undef, const char* method = "pearson")
 	// Branch 1: both inputs are flat vectors  →  scalar result
 	if (!x_is_matrix && !y_is_matrix) {
 		if (!has_y) {
-			/* cor(vector) == 1 by definition */
+			// cor(vector) == 1 by definition
 			RETVAL = newSVnv(1.0);
 		} else {
 			if (nx != ny)
@@ -7667,7 +8229,7 @@ SV* cor(SV* x_sv, SV* y_sv = &PL_sv_undef, const char* method = "pearson")
 			av_extend(rows_out[i], ncols_y - 1);
 		}
 		if (symmetric) {
-		/* Upper triangle + diagonal, then mirror. r_cache[i][j] (j >= i) holds the computed value. */
+		// Upper triangle + diagonal, then mirror. r_cache[i][j] (j >= i) holds the computed value
 			NV **restrict r_cache;
 			Newx(r_cache, ncols_x, NV*);
 			for (size_t i = 0; i < ncols_x; i++)
@@ -10771,8 +11333,8 @@ CODE:
 	} else if (ref_type == SVt_PVAV) { // Array-of-Arrays
 		AV     *restrict in_av  = (AV *)SvRV(input_ref);
 		AV     *restrict out_av = newAV();
-		SSize_t nrows  = av_len(in_av) + 1;
-		SSize_t ncols  = 0;
+		size_t nrows  = av_len(in_av) + 1;
+		size_t ncols  = 0;
 		retval_sv = sv_2mortal(newRV_noinc((SV *)out_av));
 		if (nrows > 0) {// Pass 1: validate all rows; fix ncols from row 0
 			{
@@ -10801,7 +11363,7 @@ CODE:
 			// Pass 2: output[j][i] = input[i][j]
 			if (ncols > 0) {
 				av_extend(out_av, ncols - 1);
-				for (SSize_t j = 0; j < ncols; j++) {
+				for (size_t j = 0; j < ncols; j++) {
 					AV *restrict out_col_av = newAV();
 					SV *restrict col_ref    = newRV_noinc((SV *)out_col_av);
 					if (!av_store(out_av, j, col_ref)) {
@@ -10810,7 +11372,7 @@ CODE:
 								"failed to allocate output column %d", (int)j);
 					}
 					av_extend(out_col_av, nrows - 1);
-					for (SSize_t i = 0; i < nrows; i++) {
+					for (size_t i = 0; i < nrows; i++) {
 						SV **restrict elem = av_fetch(in_av, i, 0);
 						if (elem && *elem) {
 							SvGETMAGIC(*elem); 
@@ -10894,6 +11456,87 @@ SV *hoa2aoh(hoa)
 		FREETMPS;
 		LEAVE;
 		RETVAL = newRV_noinc((SV *)out);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *hoa2hoh(hoa, key)
+	SV *hoa
+	SV *key
+	PREINIT:
+		HV *restrict in;
+		HV *restrict out;
+		AV *restrict keycol;
+		HE *restrict he;
+		SV **restrict kv;	// per-column key SVs (mortal)
+		AV **restrict cv;	// per-column array bodies (borrowed)
+		size_t n, i;
+		size_t ncols, ci;
+	CODE:
+	{
+		if (!SvROK(hoa) || SvTYPE(SvRV(hoa)) != SVt_PVHV)
+			croak("hoa2hoh: first argument must be a hash-of-arrays (hashref)");
+		if (!SvOK(key))
+			croak("hoa2hoh: key column name is undefined");
+		in    = (HV *)SvRV(hoa);
+		ncols = (size_t)HvUSEDKEYS(in);
+		/* the key column must exist and be an arrayref */
+		{
+			HE *restrict khe  = hv_fetch_ent(in, key, 0, 0);
+			SV *restrict kval = khe ? HeVAL(khe) : NULL;
+			if (!khe || !kval || !SvROK(kval) || SvTYPE(SvRV(kval)) != SVt_PVAV)
+				croak("hoa2hoh: key column '%s' is not present as an arrayref",
+					SvPV_nolen(key));
+			keycol = (AV *)SvRV(kval);
+		}
+		/* SAVEFREEPV makes these scratch arrays croak-safe */
+		ENTER;
+		SAVETMPS;
+		Newx(kv, ncols ? ncols : 1, SV *);
+		SAVEFREEPV(kv);
+		Newx(cv, ncols ? ncols : 1, AV *);
+		SAVEFREEPV(cv);
+		/* one pass to collect columns and find the longest */
+		n  = 0;
+		ci = 0;
+		hv_iterinit(in);
+		while ((he = hv_iternext(in))) {
+			SV *restrict val = HeVAL(he);
+			size_t len;
+			if (!val || !SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVAV)
+				croak("hoa2hoh: column '%s' is not an arrayref",
+					SvPV_nolen(hv_iterkeysv(he)));
+			kv[ci] = hv_iterkeysv(he);	/* mortal; valid until our LEAVE */
+			cv[ci] = (AV *)SvRV(val);
+			len = (size_t)(av_len(cv[ci]) + 1);
+			if (len > n)
+				n = len;
+			ci++;
+		}
+		ncols = ci;
+		out = newHV();
+		sv_2mortal((SV *)out);	/* reclaimed on croak; +1'd below on success */
+		for (i = 0; i < n; i++) {
+			HV  *restrict row;
+			SV  *restrict rowname;
+			SV **restrict kp = av_fetch(keycol, i, 0);
+			if (!kp || !*kp || !SvOK(*kp))
+				croak("hoa2hoh: key column '%s' has an undefined value at row %zu",
+					SvPV_nolen(key), i);
+			rowname = *kp;
+			if (hv_exists_ent(out, rowname, 0))
+				croak("hoa2hoh: duplicate row name '%s'", SvPV_nolen(rowname));
+			row = newHV();
+			for (ci = 0; ci < ncols; ci++) {
+				SV **restrict cp   = av_fetch(cv[ci], i, 0);
+				SV	*restrict cell = (cp && *cp) ? newSVsv(*cp) : newSV(0);
+				(void)hv_store_ent(row, kv[ci], cell, 0);
+			}
+			(void)hv_store_ent(out, rowname, newRV_noinc((SV *)row), 0);
+		}
+		RETVAL = newRV_inc((SV *)out);
+		FREETMPS;
+		LEAVE;
 	}
 	OUTPUT:
 		RETVAL
@@ -11013,3 +11656,368 @@ PPCODE:
 	XSRETURN(1);
 }
 
+void
+_qcut_core(data_ref, probs_ref, drop_dups, want_codes)
+	SV *data_ref
+	SV *probs_ref
+	IV drop_dups
+	IV want_codes
+PREINIT:
+	AV  *data_av;
+	AV  *probs_av;
+	AV  *edge_av;
+	AV  *code_av = NULL;
+	SV **el;
+	IV   n, m, i, j, ne, w;
+	NV  *srt  = NULL;
+	NV  *edges = NULL;
+	NV   p, h, frac, v;
+	IV   lo, bin, lo2, hi2, mid, k;
+PPCODE:
+	if (!SvROK(data_ref) || SvTYPE(SvRV(data_ref)) != SVt_PVAV)
+		croak("_qcut_core: data must be an ARRAY reference");
+	if (!SvROK(probs_ref) || SvTYPE(SvRV(probs_ref)) != SVt_PVAV)
+		croak("_qcut_core: probs must be an ARRAY reference");
+
+	data_av  = (AV *) SvRV(data_ref);
+	probs_av = (AV *) SvRV(probs_ref);
+	n = av_len(data_av)  + 1;
+	m = av_len(probs_av) + 1;
+	if (n < 1)
+		croak("_qcut_core: need at least one data value");
+	if (m < 2)
+		croak("_qcut_core: need at least two probabilities (one bin)");
+
+	Newx(srt, n, NV);
+	for (i = 0; i < n; i++) {
+		el = av_fetch(data_av, i, 0);
+		srt[i] = (el && SvOK(*el)) ? SvNV(*el) : 0.0;
+	}
+	qsort(srt, (size_t) n, sizeof(NV), compare_NVs);
+
+	/* quantile cutpoints via linear interpolation (numpy/pandas default) */
+	Newx(edges, m, NV);
+	for (j = 0; j < m; j++) {
+		el = av_fetch(probs_av, j, 0);
+		p = el ? SvNV(*el) : 0.0;
+		if (p < 0.0) p = 0.0;
+		if (p > 1.0) p = 1.0;
+		h    = (NV)(n - 1) * p;
+		lo   = (IV) floor((double) h);
+		frac = h - (NV) lo;
+		if (lo + 1 < n)
+			edges[j] = srt[lo] + frac * (srt[lo + 1] - srt[lo]);
+		else
+			edges[j] = srt[lo];
+	}
+	/* guard fp drift: enforce non-decreasing edges */
+	for (j = 1; j < m; j++)
+		if (edges[j] < edges[j - 1])
+			edges[j] = edges[j - 1];
+
+	Safefree(srt);		/* no longer needed once cutpoints exist */
+
+	/* duplicate edges: raise (default) or drop */
+	w = 1;
+	for (j = 1; j < m; j++) {
+		if (edges[j] == edges[w - 1]) {
+			if (!drop_dups) {
+				Safefree(edges);
+				croak("_qcut_core: bin edges are not unique; pass duplicates => 'drop' (or use fewer bins)");
+			}
+		} else {
+			edges[w++] = edges[j];
+		}
+	}
+	ne = w;
+	if (ne < 2) {
+		Safefree(edges);
+		croak("_qcut_core: data has too few distinct values to form bins");
+	}
+
+	edge_av = newAV();
+	av_extend(edge_av, ne - 1);
+	for (j = 0; j < ne; j++)
+		av_push(edge_av, newSVnv(edges[j]));
+
+	/* assign each original value to a 0-based bin only if codes are wanted;
+	   lowest bin is inclusive on both ends */
+	if (want_codes) {
+		code_av = newAV();
+		av_extend(code_av, n - 1);
+		for (i = 0; i < n; i++) {
+			el = av_fetch(data_av, i, 0);
+			v  = (el && SvOK(*el)) ? SvNV(*el) : 0.0;
+			if (v <= edges[0]) {
+				bin = 0;
+			} else if (v >= edges[ne - 1]) {
+				bin = ne - 2;
+			} else {
+				lo2 = 1;
+				hi2 = ne - 1;
+				k   = ne - 1;
+				while (lo2 <= hi2) {
+					mid = lo2 + ((hi2 - lo2) >> 1);
+					if (edges[mid] >= v) {
+						k   = mid;
+						hi2 = mid - 1;
+					} else {
+						lo2 = mid + 1;
+					}
+				}
+				bin = k - 1;
+			}
+			av_push(code_av, newSViv(bin));
+		}
+	}
+
+	Safefree(edges);
+
+	EXTEND(SP, 2);
+	if (want_codes)
+		PUSHs(sv_2mortal(newRV_noinc((SV *) code_av)));
+	else
+		PUSHs(&PL_sv_undef);
+	PUSHs(sv_2mortal(newRV_noinc((SV *) edge_av)));
+
+
+void get_union(...)
+	PROTOTYPE: @
+	PREINIT:
+		HV*restrict seen;
+		AV*restrict order;
+		size_t nrefs, n, oi, olen;
+		int gimme;
+	PPCODE:
+		gimme = GIMME_V;
+		nrefs = items;
+		if (nrefs == 0)
+			croak("union needs >= 1 array ref");
+		seen  = (HV*)sv_2mortal((SV*)newHV());
+		order = (AV*)sv_2mortal((SV*)newAV()); /* buffer: pushing to the stack while still reading ST() would clobber the args */
+		n = 0;
+		for (size_t i = 0; i < nrefs; i++) {
+			SV*restrict arg = ST(i);
+			AV*restrict av;
+			size_t len;
+			if (!(SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV))
+				croak("union: argument index %" UVuf " of %" UVuf " total (max index %" UVuf ") is not an array reference", (UV)i, (UV)nrefs, (UV)(nrefs - 1));
+			av = (AV*)SvRV(arg);
+			len = (size_t)(av_len(av) + 1);
+			for (size_t j = 0; j < len; j++) {
+				SV**restrict tv = av_fetch(av, j, 0);
+				STRLEN klen;
+				const char*restrict key;
+				I32 hklen;
+				if (!(tv && SvOK(*tv)))
+					croak("union: undefined value at array ref index %" UVuf " (argument %" UVuf ")", (UV)j, (UV)i);
+				key = SvPV(*tv, klen);
+				hklen = SvUTF8(*tv) ? -(I32)klen : (I32)klen;
+				if (hv_exists(seen, key, hklen))
+					continue;
+				(void)hv_store(seen, key, hklen, &PL_sv_undef, 0);
+				n++;
+				if (gimme != G_SCALAR)
+					av_push(order, newSVsv(*tv));
+			}
+		}
+		if (gimme == G_SCALAR) {
+			XPUSHs(sv_2mortal(newSVuv(n)));
+		} else {
+			olen = (size_t)(av_len(order) + 1);
+			for (oi = 0; oi < olen; oi++) {
+				SV**restrict e = av_fetch(order, oi, 0);
+				if (e && *e)
+					XPUSHs(sv_2mortal(newSVsv(*e)));
+			}
+		}
+
+void get_unique(...)
+	PROTOTYPE: @
+	PREINIT:
+		HV*restrict count;
+		AV*restrict order;
+		size_t nrefs, n, oi, olen;
+		int gimme;
+	PPCODE:
+		gimme = GIMME_V;
+		nrefs = items;
+		if (nrefs == 0)
+			croak("get_unique needs >= 1 array ref");
+		count = (HV*)sv_2mortal((SV*)newHV());
+		order = (AV*)sv_2mortal((SV*)newAV());
+		for (size_t i = 0; i < nrefs; i++) {
+			SV*restrict arg = ST(i);
+			HV*restrict loc;
+			AV*restrict av;
+			size_t len;
+			if (!(SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV))
+				croak("get_unique: argument index %" UVuf " of %" UVuf " total (max index %" UVuf ") is not an array reference", (UV)i, (UV)nrefs, (UV)(nrefs - 1));
+			av = (AV*)SvRV(arg);
+			len = (size_t)(av_len(av) + 1);
+			loc = (HV*)sv_2mortal((SV*)newHV());   /* per-ref dedup */
+			for (size_t j = 0; j < len; j++) {
+				SV**restrict tv = av_fetch(av, j, 0);
+				STRLEN klen;
+				const char*restrict key;
+				I32 hklen;
+				SV**restrict cv;
+				if (!(tv && SvOK(*tv)))
+					croak("get_unique: undefined value at array ref index %" UVuf " (argument %" UVuf ")", (UV)j, (UV)i);
+				key = SvPV(*tv, klen);
+				hklen = SvUTF8(*tv) ? -(I32)klen : (I32)klen;
+				if (hv_exists(loc, key, hklen))
+					continue;
+				(void)hv_store(loc, key, hklen, &PL_sv_undef, 0);
+				cv = hv_fetch(count, key, hklen, 1);
+				if (cv && *cv) {
+					if (SvOK(*cv)) sv_setiv(*cv, SvIV(*cv) + 1);
+					else           sv_setiv(*cv, 1);
+				}
+				if (i == 0)
+					av_push(order, newSVsv(*tv));  /* candidates, in first ref's order */
+			}
+		}
+		n = 0;
+		olen = (size_t)(av_len(order) + 1);
+		for (oi = 0; oi < olen; oi++) {
+			SV**restrict e = av_fetch(order, oi, 0);
+			STRLEN klen;
+			const char*restrict key;
+			I32 hklen;
+			SV**restrict cv;
+			if (!(e && *e))
+				continue;
+			key = SvPV(*e, klen);
+			hklen = SvUTF8(*e) ? -(I32)klen : (I32)klen;
+			cv = hv_fetch(count, key, hklen, 0);
+			if (cv && *cv && SvIV(*cv) == 1) {
+				if (gimme != G_SCALAR)
+					XPUSHs(sv_2mortal(newSVsv(*e)));
+				n++;
+			}
+		}
+		if (gimme == G_SCALAR)
+			XPUSHs(sv_2mortal(newSVuv(n)));
+
+void Lonly(...)
+	PROTOTYPE: $$
+	PREINIT:
+		HV*restrict inOther;
+		HV*restrict seen;
+		AV*restrict keep;
+		AV*restrict other;
+		size_t nrefs, n, klen_a, olen;
+		int gimme;
+	PPCODE:
+		gimme = GIMME_V;
+		nrefs = items;
+		if (nrefs != 2)
+			croak("Lonly needs exactly 2 array refs (got %" UVuf ")", (UV)nrefs);
+		{
+			SV*restrict aL = ST(0);
+			SV*restrict aR = ST(1);
+			if (!(SvROK(aL) && SvTYPE(SvRV(aL)) == SVt_PVAV))
+				croak("Lonly: first (left) argument is not an array reference");
+			if (!(SvROK(aR) && SvTYPE(SvRV(aR)) == SVt_PVAV))
+				croak("Lonly: second (right) argument is not an array reference");
+			keep  = (AV*)SvRV(aL); // items we may return
+			other = (AV*)SvRV(aR); // items to subtract
+		}
+		inOther = (HV*)sv_2mortal((SV*)newHV());
+		seen    = (HV*)sv_2mortal((SV*)newHV());
+		olen = (size_t)(av_len(other) + 1);
+		for (size_t j = 0; j < olen; j++) {
+			SV**restrict tv = av_fetch(other, j, 0);
+			STRLEN klen;
+			const char*restrict key;
+			I32 hklen;
+			if (!(tv && SvOK(*tv)))
+				croak("Lonly: undefined value in right array ref at index %" UVuf, (UV)j);
+			key = SvPV(*tv, klen);
+			hklen = SvUTF8(*tv) ? -(I32)klen : (I32)klen;
+			(void)hv_store(inOther, key, hklen, &PL_sv_undef, 0);
+		}
+		n = 0;
+		klen_a = (size_t)(av_len(keep) + 1);
+		for (size_t j = 0; j < klen_a; j++) {
+			SV**restrict tv = av_fetch(keep, j, 0);
+			STRLEN klen;
+			const char*restrict key;
+			I32 hklen;
+			if (!(tv && SvOK(*tv)))
+				croak("Lonly: undefined value in left array ref at index %" UVuf, (UV)j);
+			key = SvPV(*tv, klen);
+			hklen = SvUTF8(*tv) ? -(I32)klen : (I32)klen;
+			if (hv_exists(inOther, key, hklen))
+				continue;                      /* present in R -> not left-only */
+			if (hv_exists(seen, key, hklen))
+				continue;                      /* dedup within L */
+			(void)hv_store(seen, key, hklen, &PL_sv_undef, 0);
+			n++;
+			if (gimme != G_SCALAR)
+				XPUSHs(sv_2mortal(newSVsv(*tv)));
+		}
+		if (gimme == G_SCALAR)
+			XPUSHs(sv_2mortal(newSVuv(n)));
+
+void Ronly(...)
+	PROTOTYPE: $$
+	PREINIT:
+		HV*restrict inOther;
+		HV*restrict seen;
+		AV*restrict keep;
+		AV*restrict other;
+		size_t nrefs, n, klen_a, olen;
+		int gimme;
+	PPCODE:
+		gimme = GIMME_V;
+		nrefs = items;
+		if (nrefs != 2)
+			croak("Ronly needs exactly 2 array refs (got %" UVuf ")", (UV)nrefs);
+		{
+			SV*restrict aL = ST(0);
+			SV*restrict aR = ST(1);
+			if (!(SvROK(aL) && SvTYPE(SvRV(aL)) == SVt_PVAV))
+				croak("Ronly: first (left) argument is not an array reference");
+			if (!(SvROK(aR) && SvTYPE(SvRV(aR)) == SVt_PVAV))
+				croak("Ronly: second (right) argument is not an array reference");
+			other = (AV*)SvRV(aL);  /* items to subtract    */
+			keep  = (AV*)SvRV(aR);  /* items we may return  */
+		}
+		inOther = (HV*)sv_2mortal((SV*)newHV());
+		seen    = (HV*)sv_2mortal((SV*)newHV());
+		olen = (size_t)(av_len(other) + 1);
+		for (size_t j = 0; j < olen; j++) {
+			SV**restrict tv = av_fetch(other, j, 0);
+			STRLEN klen;
+			const char*restrict key;
+			I32 hklen;
+			if (!(tv && SvOK(*tv)))
+				croak("Ronly: undefined value in left array ref at index %" UVuf, (UV)j);
+			key = SvPV(*tv, klen);
+			hklen = SvUTF8(*tv) ? -(I32)klen : (I32)klen;
+			(void)hv_store(inOther, key, hklen, &PL_sv_undef, 0);
+		}
+		n = 0;
+		klen_a = (size_t)(av_len(keep) + 1);
+		for (size_t j = 0; j < klen_a; j++) {
+			SV**restrict tv = av_fetch(keep, j, 0);
+			STRLEN klen;
+			const char*restrict key;
+			I32 hklen;
+			if (!(tv && SvOK(*tv)))
+				croak("Ronly: undefined value in right array ref at index %" UVuf, (UV)j);
+			key = SvPV(*tv, klen);
+			hklen = SvUTF8(*tv) ? -(I32)klen : (I32)klen;
+			if (hv_exists(inOther, key, hklen))
+				continue; // present in L -> not right-only
+			if (hv_exists(seen, key, hklen))
+				continue; // dedup within R
+			(void)hv_store(seen, key, hklen, &PL_sv_undef, 0);
+			n++;
+			if (gimme != G_SCALAR)
+				XPUSHs(sv_2mortal(newSVsv(*tv)));
+		}
+		if (gimme == G_SCALAR)
+			XPUSHs(sv_2mortal(newSVuv(n)));

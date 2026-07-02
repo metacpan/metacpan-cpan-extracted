@@ -1,0 +1,19 @@
+Changes
+dsu.h
+eg/components.pl
+eg/cross_process.pl
+lib/Data/DisjointSet/Shared.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+Shared.xs
+t/01-basic.t
+t/02-oracle.t
+xt/crash_recovery.t
+xt/eg_runs.t
+xt/fork_dsu.t
+xt/kwalitee.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Cron::Settings;
-$WebService::OPNsense::Cron::Settings::VERSION = '0.002';
+$WebService::OPNsense::Cron::Settings::VERSION = '0.003';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -17,32 +17,9 @@ sub _api_path {
 
 with 'WebService::OPNsense::Role::Settings';
 
-sub search_jobs {
-    my ( $self, %params ) = @_;
-    my $uri = $self->_path('searchJob');
-
-    return $self->client->get( $uri, \%params );
-}
-
-sub get_job {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'getJob/{uuid}', uuid => $uuid );
-
-    return $self->client->get($uri);
-}
-
 sub add_job {
     my ( $self, $job_data ) = @_;
-    my $uri = $self->_path('addJob');
-
-    return $self->client->post( $uri, $job_data );
-}
-
-sub set_job {
-    my ( $self, $uuid, $job_data ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'setJob/{uuid}', uuid => $uuid );
+    my $uri = $self->_path('add_job');
 
     return $self->client->post( $uri, $job_data );
 }
@@ -50,15 +27,38 @@ sub set_job {
 sub del_job {
     my ( $self, $uuid ) = @_;
     validate_uuid($uuid);
-    my $uri = $self->_path( 'delJob/{uuid}', uuid => $uuid );
+    my $uri = $self->_path( 'del_job/{uuid}', uuid => $uuid );
 
     return $self->client->post($uri);
+}
+
+sub get_job {
+    my ( $self, $uuid ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'get_job/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
+}
+
+sub search_jobs {
+    my ( $self, %params ) = @_;
+    my $uri = $self->_path('search_jobs');
+
+    return $self->client->get( $uri, \%params );
+}
+
+sub set_job {
+    my ( $self, $uuid, $job_data ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'set_job/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $job_data );
 }
 
 sub toggle_job {
     my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
-    my $uri = $self->_path( 'toggleJob/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+    my $uri = $self->_path( 'toggle_job/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
 
     return $self->client->post(
         $uri,
@@ -79,7 +79,7 @@ WebService::OPNsense::Cron::Settings - Cron settings controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -105,11 +105,17 @@ Returns cron settings.
 
 Updates cron settings.
 
-=head2 search_jobs
+=head2 add_job
 
-    my $jobs = $cron_settings->search_jobs(%params);
+    my $result = $cron_settings->add_job($job_data);
 
-Searches for cron jobs.
+Creates cron job.
+
+=head2 del_job
+
+    my $result = $cron_settings->del_job($uuid);
+
+Deletes a cron job by UUID.
 
 =head2 get_job
 
@@ -117,23 +123,17 @@ Searches for cron jobs.
 
 Returns a single cron job by UUID.
 
-=head2 add_job
+=head2 search_jobs
 
-    my $result = $cron_settings->add_job($job_data);
+    my $jobs = $cron_settings->search_jobs(%params);
 
-Creates cron job.
+Searches for cron jobs.
 
 =head2 set_job
 
     my $result = $cron_settings->set_job($uuid, $job_data);
 
 Updates cron job.
-
-=head2 del_job
-
-    my $result = $cron_settings->del_job($uuid);
-
-Deletes a cron job by UUID.
 
 =head2 toggle_job
 

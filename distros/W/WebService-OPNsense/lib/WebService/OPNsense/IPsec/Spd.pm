@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::Spd;
-$WebService::OPNsense::IPsec::Spd::VERSION = '0.002';
+$WebService::OPNsense::IPsec::Spd::VERSION = '0.003';
 use Carp qw( croak );
 use Moo;
 use namespace::clean;    # must be last
@@ -44,7 +44,7 @@ WebService::OPNsense::IPsec::Spd - IPsec Security Policy Database (SPD) controll
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

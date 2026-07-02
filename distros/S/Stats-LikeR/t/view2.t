@@ -1,11 +1,17 @@
 #!/usr/bin/env perl
 require 5.010;
 use warnings FATAL => 'all';
-use feature 'say';
-use Scalar::Util 'looks_like_number';
+use Stats::LikeR;
 use Test::Exception; # die_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
+
+# Column chunking depends on the terminal width (explicit 'width' arg, then
+# $ENV{COLUMNS}, then 80). Pin COLUMNS wide so the single-block layout tests
+# are deterministic regardless of the caller's terminal; the chunking tests
+# below pass an explicit 'width' that overrides it.
+$ENV{COLUMNS} = 1000;
+
 # Custom helper for floating-point comparisons
 sub is_approx {
 	my ($got, $expected, $test_name, $epsilon) = @_;
@@ -28,303 +34,19 @@ sub is_approx {
 	}
 }
 
-#---------------------------------------------------------------------------
-# view() is inlined below pending integration into Stats::LikeR.
-# After integrating, delete the inlined copy and add:  use Stats::LikeR;
-#---------------------------------------------------------------------------
-sub view {
-	my $data = shift;
-	my %args = @_;
-	# --- reject unknown arguments (mirrors read_table/write_table) ---
-	my %allowed = map { $_ => 1 } qw(
-		n rows na max_width ellipsis gap cols columns
-		to return_only row.names row_names color colors
-	);
-	my @bad = sort grep { !$allowed{$_} } keys %args;
-	die "view: unknown argument(s): @bad\n" if @bad;
-	# --- n / rows (synonyms); reject conflicting or non-integer values ---
-	die "view: pass either 'n' or 'rows', not both\n"
-		if exists $args{n} && exists $args{rows};
-	my $n = exists $args{rows} ? $args{rows}
-		  : exists $args{n}	   ? $args{n}
-		  :						  6;
-	die "view: 'n'/'rows' must be a non-negative integer\n"
-		unless defined $n && $n =~ /^\d+$/;
-	my $na	  = exists $args{na}		? $args{na}		   : 'undef';
-	my $maxw  = exists $args{max_width} ? $args{max_width} : 80;
-	my $ell	  = exists $args{ellipsis}	? $args{ellipsis}  : '...';
-	my $gap	  = exists $args{gap}		? (' ' x $args{gap}) : '  ';
-	my $ucols = $args{cols} || $args{columns};
-	my $fh	  = $args{to};
-	my $quiet = $args{return_only};
-	# 'row.names' takes precedence over the row_names alias (both accepted)
-	my $label_col = exists $args{'row.names'} ? $args{'row.names'}
-				  : exists $args{row_names}	  ? $args{row_names}
-				  : undef;
-	my $rt = ref $data;
-	die "view: expected an ARRAY (AoH) or HASH (HoA/HoH) reference, got "
-	  . ($rt || 'a non-reference') . "\n"
-	  unless $rt eq 'ARRAY' or $rt eq 'HASH';
-	my ($kind, @cols, @labels, @raw, $total, $lab_header);
-	if ($rt eq 'ARRAY') { # ---- AoH ----
-		$kind  = 'AoH';
-		$total = scalar @$data;
-		my $show = $n < $total ? $n : $total;
-		if ($ucols) {
-			@cols = @$ucols;
-		} else {
-			my $scan = $show > 0 ? $show : ($total > 0 ? 1 : 0);
-			my %seen;
-			for my $i (0 .. $scan - 1) {
-				my $row = $data->[$i];
-				next unless ref $row eq 'HASH';
-				$seen{$_} = 1 for keys %$row;
-			}
-			@cols = sort keys %seen;
-		}
-		my $lc = defined $label_col ? $label_col
-			   : (grep { $_ eq 'row_name' } @cols) ? 'row_name' : undef;
-		if (defined $lc) {
-			@cols = grep { $_ ne $lc } @cols;
-			$lab_header = $lc;
-		}
-		for my $i (0 .. $show - 1) {
-			my $row = $data->[$i];
-			$row = {} unless ref $row eq 'HASH';
-			push @labels, defined $lc ? $row->{$lc} : ($i + 1);
-			push @raw, [ map { $row->{$_} } @cols ];
-		}
-		$lab_header = '' unless defined $lab_header;
-	} elsif ($rt eq 'HASH') {
-		my @keys = keys %$data;
-		my $sample;
-		for my $k (@keys) { $sample = $data->{$k}; last if defined $sample; }
-		my $vt = ref $sample;
-		if (!@keys) {
-			$kind = 'Hash'; $total = 0; $lab_header = '';
-		} elsif ($vt eq 'ARRAY') {							# ---- HoA ----
-			$kind = 'HoA';
-			my @allcols = $ucols ? @$ucols : sort @keys;
-			$total = 0;
-			for my $k (@keys) {
-				next unless ref $data->{$k} eq 'ARRAY';
-				my $l = scalar @{ $data->{$k} };
-				$total = $l if $l > $total;
-			}
-			my $show = $n < $total ? $n : $total;
-			my $lc = defined $label_col ? $label_col
-				   : (grep { $_ eq 'row_name' } @allcols) ? 'row_name' : undef;
-			@cols = grep { !defined $lc || $_ ne $lc } @allcols;
-			$lab_header = defined $lc ? $lc : '';
-			for my $i (0 .. $show - 1) {
-				push @labels, defined $lc
-					? (ref $data->{$lc} eq 'ARRAY' ? $data->{$lc}[$i] : undef)
-					: ($i + 1);
-				push @raw, [ map {
-					ref $data->{$_} eq 'ARRAY' ? $data->{$_}[$i] : undef
-				} @cols ];
-			}
-		} elsif ($vt eq 'HASH') {							# ---- HoH ----
-			$kind = 'HoH';
-			$total = scalar @keys;
-			my @rk = sort @keys;
-			my $show = $n < $total ? $n : $total;
-			my @shown = $show > 0 ? @rk[0 .. $show - 1] : ();
-			if ($ucols) { @cols = @$ucols; }
-			else {
-				my %seen;
-				for my $rkk (@shown) {
-					next unless ref $data->{$rkk} eq 'HASH';
-					$seen{$_} = 1 for keys %{ $data->{$rkk} };
-				}
-				@cols = sort keys %seen;
-			}
-			@cols = grep { $_ ne $label_col } @cols if defined $label_col;
-			$lab_header = defined $label_col ? $label_col : 'row_name';
-			for my $rkk (@shown) {
-				push @labels, $rkk;
-				my $inner = ref $data->{$rkk} eq 'HASH' ? $data->{$rkk} : {};
-				push @raw, [ map { $inner->{$_} } @cols ];
-			}
-		} else {											# ---- flat hash ----
-			$kind = 'Hash'; $total = 1;
-			my $show = $n < $total ? $n : $total;
-			if ($ucols) { @cols = @$ucols; } else { @cols = sort @keys; }
-			my $lc = defined $label_col ? $label_col
-				   : (grep { $_ eq 'row_name' } @cols) ? 'row_name' : undef;
-			if (defined $lc) { @cols = grep { $_ ne $lc } @cols; $lab_header = $lc; }
-			$lab_header = '' unless defined $lab_header;
-			for my $i (0 .. $show - 1) {
-				push @labels, defined $lc ? $data->{$lc} : ($i + 1);
-				push @raw, [ map { $data->{$_} } @cols ];
-			}
-		}
-	}
-
-	# ---- display helpers (UTF-8 / wide-char aware) ----
-	my $RESET = "\e[0m";
-	my $decode = sub {
-		my $s = shift;
-		return ($s, 0) if utf8::is_utf8($s);
-		my $d = $s;
-		return ($d, 1) if utf8::decode($d);	   # valid UTF-8 byte string -> chars
-		return ($s, 0);						   # not UTF-8: leave bytes untouched
-	};
-	my $wide = sub {
-		my $o = shift;
-		return 1 if ($o >= 0x1100 && $o <= 0x115F)
-				 || ($o >= 0x2E80 && $o <= 0xA4CF)
-				 || ($o >= 0xAC00 && $o <= 0xD7A3)
-				 || ($o >= 0xF900 && $o <= 0xFAFF)
-				 || ($o >= 0xFE30 && $o <= 0xFE4F)
-				 || ($o >= 0xFF00 && $o <= 0xFF60)
-				 || ($o >= 0xFFE0 && $o <= 0xFFE6)
-				 || ($o >= 0x1F300 && $o <= 0x1FAFF);
-		return 0;
-	};
-	my $cwidth = sub {							# width of an already-decoded string
-		my $s = shift; my $w = 0;
-		for my $ch (split //, $s) { my $o = ord $ch; next if $o == 0; $w += $wide->($o) ? 2 : 1; }
-		return $w;
-	};
-	my $dwidth = sub { my ($c) = $decode->(shift); return $cwidth->($c); };
-	my $ell_w  = $dwidth->($ell);
-	# stringify + sanitize + char-aware truncate; returns (output_bytes, width)
-	my $prep = sub {
-		my $v = shift;
-		my $s = defined $v ? "$v" : $na;
-		$s =~ s/\t/\\t/g; $s =~ s/\r/\\r/g; $s =~ s/\n/\\n/g;
-		my ($c, $dec) = $decode->($s);
-		if ($maxw && $cwidth->($c) > $maxw) {
-			my $budget = $maxw - $ell_w; $budget = 0 if $budget < 0;
-			my $keep = ''; my $w = 0;
-			for my $ch (split //, $c) {
-				my $cw = $wide->(ord $ch) ? 2 : 1;
-				last if $w + $cw > $budget;
-				$keep .= $ch; $w += $cw;
-			}
-			$c = $keep . $ell;
-			$dec ||= utf8::is_utf8($ell);
-		}
-		my $w = $cwidth->($c);
-		my $bytes = $c; utf8::encode($bytes) if $dec;
-		return ($bytes, $w);
-	};
-
-	# ---- colour configuration (Data::Printer-style) ----
-	my %default_colors = (
-		array		=> 'bright_white',	number => 'bright_blue',
-		string		=> 'bright_yellow', class  => 'bright_green',
-		undef		=> 'bright_red',	hash   => 'magenta',
-		caller_info => 'bright_cyan',	separator => 'white',
-	);
-	my %color = (%default_colors, %{ $args{colors} || {} });
-	my %fg = (
-		black=>30, red=>31, green=>32, yellow=>33, blue=>34, magenta=>35, cyan=>36, white=>37,
-		bright_black=>90, bright_red=>91, bright_green=>92, bright_yellow=>93,
-		bright_blue=>94, bright_magenta=>95, bright_cyan=>96, bright_white=>97,
-	);
-	my $sgr = sub {
-		my $spec = $color{ $_[0] };
-		return '' unless defined $spec && length $spec;
-		if ($spec =~ /^#?([0-9a-fA-F]{6})\z/) {
-			my ($r, $g, $b) = map { hex } unpack 'a2a2a2', $1;
-			return "\e[38;2;$r;$g;${b}m";
-		}
-		return "\e[$fg{$spec}m" if exists $fg{$spec};
-		return "\e[$spec" . 'm'	 if $spec =~ /^\d[\d;]*\z/;
-		return '';
-	};
-	my $want_color;
-	if (!defined $args{color} || (!ref $args{color} && $args{color} eq 'auto')) {
-		my $target = defined $fh ? $fh : \*STDOUT;
-		$want_color = (!$quiet && -t $target) ? 1 : 0;
-	} else {
-		$want_color = $args{color} ? 1 : 0;
-	}
-	my $paint = sub {
-		my ($text, $type) = @_;
-		return $text unless $want_color;
-		my $c = $sgr->($type);
-		return length $c ? $c . $text . $RESET : $text;
-	};
-
-	# ---- column types (alignment) ----
-	my @numeric = (1) x scalar @cols;
-	for my $r (@raw) {
-		for my $j (0 .. $#cols) {
-			my $v = $r->[$j];
-			next unless defined $v;
-			$numeric[$j] = 0 unless looks_like_number($v);
-		}
-	}
-	my $lab_numeric = @labels ? 1 : 0;
-	for my $l (@labels) { $lab_numeric = 0, last unless defined $l && looks_like_number($l); }
-	my $val_type = sub {
-		my $v = shift;
-		return 'undef'	unless defined $v;
-		return 'number' if looks_like_number($v);
-		return 'string';
-	};
-
-	# ---- prepare every cell once: [bytes, width, colour-type] ----
-	my @lab_cell = map { [ $prep->($_), (!defined $_ ? 'undef' : $lab_numeric ? 'array' : 'hash') ] } @labels;
-	my @row_cell;
-	for my $r (@raw) {
-		push @row_cell, [ map { [ $prep->($r->[$_]), $val_type->($r->[$_]) ] } 0 .. $#cols ];
-	}
-	my @head_cell = map { [ $prep->($_) ] } @cols;
-	my ($lh_b, $lh_w) = $prep->($lab_header);
-
-	# ---- column widths (display columns) ----
-	my $lab_w = $lh_w;
-	for my $c (@lab_cell) { $lab_w = $c->[1] if $c->[1] > $lab_w; }
-	my @w;
-	for my $j (0 .. $#cols) {
-		my $width = $head_cell[$j][1];
-		for my $r (@row_cell) { $width = $r->[$j][1] if $r->[$j][1] > $width; }
-		$w[$j] = $width;
-	}
-
-	# ---- pad: spaces are never coloured; only the value text is ----
-	my $field = sub {
-		my ($bytes, $bw, $width, $right, $type) = @_;
-		my $gapn = $width - $bw; $gapn = 0 if $gapn < 0;
-		my $sp = ' ' x $gapn;
-		my $painted = $paint->($bytes, $type);
-		return $right ? $sp . $painted : $painted . $sp;
-	};
-
-	my @out;
-	my $shown = scalar @row_cell;
-	push @out, $paint->(
-		sprintf("# %s: %d row%s x %d col%s	(showing %d)",
-			$kind, $total, ($total == 1 ? '' : 's'),
-			scalar(@cols), (@cols == 1 ? '' : 's'), $shown),
-		'caller_info');
-	my @hcells = ( $field->($lh_b, $lh_w, $lab_w, 0, 'hash') );
-	push @hcells, $field->($head_cell[$_][0], $head_cell[$_][1], $w[$_], $numeric[$_], 'hash') for 0 .. $#cols;
-	push @out, join($gap, @hcells);
-	for my $ri (0 .. $#row_cell) {
-		my @cells = ( $field->($lab_cell[$ri][0], $lab_cell[$ri][1], $lab_w, $lab_numeric, $lab_cell[$ri][2]) );
-		push @cells, $field->($row_cell[$ri][$_][0], $row_cell[$ri][$_][1], $w[$_], $numeric[$_], $row_cell[$ri][$_][2]) for 0 .. $#cols;
-		push @out, join($gap, @cells);
-	}
-	push @out, $paint->(
-		sprintf("# ... %d more row%s", $total - $shown, ($total - $shown == 1 ? '' : 's')),
-		'caller_info') if $shown < $total;
-
-	my $str = join("\n", @out) . "\n";
-	unless ($quiet) { defined $fh ? print {$fh} $str : print $str; }
-	return $str;
-}
-
 #--------
 # helpers
 #--------
 sub _strip { my $s = shift; $s =~ s/\e\[[0-9;]*m//g; return $s; }
 sub _lines { return split /\n/, _strip($_[0]); }
 sub _dwidth { my $s = _strip(shift); utf8::decode($s); return length $s; }
+
+# A table wider than the terminal, reused by the chunking / leak tests below.
+# 8 data columns (each 2 wide) + a row_name label column (8 wide), gap = 2.
+my $wide = [
+	{ row_name => 'r1', c1=>11, c2=>12, c3=>13, c4=>14, c5=>15, c6=>16, c7=>17, c8=>18 },
+	{ row_name => 'r2', c1=>21, c2=>22, c3=>23, c4=>24, c5=>25, c6=>26, c7=>27, c8=>28 },
+];
 
 #--------
 # undefined values render as "undef" (Data::Printer style)
@@ -401,7 +123,7 @@ sub _dwidth { my $s = _strip(shift); utf8::decode($s); return length $s; }
 }
 
 #--------
-# every header and row shares one display width (alignment invariant)
+# every header and row shares one display width (single-block alignment invariant)
 #--------
 {
 	my $aoh = [ { a => 1, b => 'xx', c => 3 }, { a => 22, b => 'y', c => 444 } ];
@@ -521,6 +243,90 @@ sub _dwidth { my $s = _strip(shift); utf8::decode($s); return length $s; }
 }
 
 #--------
+# 'width' argument: accepted, and validated as a positive integer
+#--------
+{
+	lives_ok  { view($wide, width => 80,  return_only => 1, color => 0) } "a valid 'width' is accepted (not an unknown arg)";
+	throws_ok { view($wide, width => 0,	  return_only => 1) } qr/width.*positive integer/, 'width => 0 dies';
+	throws_ok { view($wide, width => -1,  return_only => 1) } qr/width.*positive integer/, 'a negative width dies';
+	throws_ok { view($wide, width => 'x', return_only => 1) } qr/width.*positive integer/, 'a non-numeric width dies';
+	throws_ok { view($wide, width => 2.5, return_only => 1) } qr/width.*positive integer/, 'a non-integer width dies';
+}
+
+#--------
+# R-style column chunking: a table wider than the terminal is split into
+# successive column blocks, each led by a repeated copy of the label column.
+#--------
+{
+	# wide enough -> a single block
+	my @one = _lines(view($wide, width => 1000, return_only => 1, color => 0));
+	is(scalar(grep { /^row_name/ } @one), 1, 'width=1000: a single column block');
+	like($one[0], qr/x 8 cols/, 'the banner reports the full column count');
+
+	# narrow -> several blocks
+	my @narrow = _lines(view($wide, width => 20, return_only => 1, color => 0));
+	my @hdr = grep { /^row_name/ } @narrow;
+	cmp_ok(scalar @hdr, '>', 1, 'a narrow width splits the columns into multiple blocks');
+	is(scalar(grep { /^r1\b/ } @narrow), scalar @hdr, 'the label column is repeated in every block');
+	is(scalar(grep { /^# AoH:/ } @narrow), 1, 'the banner is printed exactly once');
+	like($narrow[0], qr/x 8 cols/, 'the banner still counts every column, not just one block');
+
+	# every column appears once, in original order, across the blocks
+	my @order;
+	for my $h (@hdr) { my @t = split ' ', $h; shift @t; push @order, @t; }
+	is_deeply(\@order, [qw(c1 c2 c3 c4 c5 c6 c7 c8)],
+		'columns are distributed across blocks in their original order');
+
+	# no blank separator line between blocks (matches R)
+	is(scalar(grep { $_ eq '' } @narrow), 0, 'no blank line is inserted between blocks');
+
+	# within each block, the header and its rows share one display width
+	{
+		my @L = _lines(view($wide, width => 24, return_only => 1, color => 0));
+		my (@blocks, $cur);
+		for my $ln (@L) {
+			next if $ln =~ /^#/;						# skip banner / footer
+			if ($ln =~ /^row_name/) { $cur = []; push @blocks, $cur; }
+			push @$cur, $ln if $cur;
+		}
+		cmp_ok(scalar @blocks, '>', 1, 'the sample splits into multiple blocks at width 24');
+		my $aligned = 1;
+		for my $b (@blocks) { my %w; $w{ _dwidth($_) }++ for @$b; $aligned = 0 if keys %w != 1; }
+		ok($aligned, 'inside each block the header and its rows share one display width');
+	}
+
+	# the row-truncation footer is printed once, not once per block
+	my @foot = _lines(view($wide, n => 1, width => 20, return_only => 1, color => 0));
+	is(scalar(grep { /^# \.\.\. / } @foot), 1, 'the footer is printed once regardless of block count');
+
+	# a single column wider than the width still renders (overflow, no infinite loop)
+	my @big = _lines(view([ { row_name => 'r1', huge => ('X' x 30) } ], width => 10, return_only => 1, color => 0));
+	is(scalar(grep { /^row_name/ } @big), 1, 'an over-wide single column stays in one block');
+	like($big[1], qr/\bhuge\b/, 'the over-wide column header still shows');
+	like($big[2], qr/X{30}/,	'the over-wide value is rendered in full');
+}
+
+#--------
+# terminal-width source precedence: explicit 'width' > $ENV{COLUMNS} > 80
+#--------
+{
+	{
+		local $ENV{COLUMNS} = 18;
+		my @L = _lines(view($wide, return_only => 1, color => 0));
+		cmp_ok(scalar(grep { /^row_name/ } @L), '>', 1, 'COLUMNS drives chunking when no width is given');
+	}
+	{
+		local $ENV{COLUMNS} = 18;
+		my @L = _lines(view($wide, width => 1000, return_only => 1, color => 0));
+		is(scalar(grep { /^row_name/ } @L), 1, 'an explicit width overrides COLUMNS');
+	}
+	{
+		local $ENV{COLUMNS} = 'not-a-number';
+		lives_ok { view($wide, return_only => 1, color => 0) } 'an invalid COLUMNS is ignored rather than fatal';
+	}
+}
+
+#--------
 # colour: opt-in ANSI that never disturbs alignment
 #--------
 {
@@ -535,6 +341,18 @@ sub _dwidth { my $s = _strip(shift); utf8::decode($s); return length $s; }
 	like($col, qr/\e\[94m/,			   'numbers painted with the number colour');
 	like($col, qr/\e\[35m/,			   'headers painted with the hash colour');
 	like($col, qr/\e\[96m# AoH/,	   'the caller-info line is painted');
+}
+
+#--------
+# colour survives chunking: each block's header is still painted
+#--------
+{
+	my $col = view($wide, width => 20, return_only => 1, color => 1);
+	my @painted_hdr = grep { /\e\[35m/ && /row_name/ } split /\n/, $col;
+	cmp_ok(scalar @painted_hdr, '>', 1, 'every block header is coloured');
+	(my $stripped = $col) =~ s/\e\[[0-9;]*m//g;
+	is($stripped, scalar view($wide, width => 20, return_only => 1, color => 0),
+		'stripping ANSI from a chunked render reproduces the plain chunked layout');
 }
 
 #--------
@@ -567,5 +385,11 @@ no_leaks_ok {
 no_leaks_ok {
 	my $s = view({ id => [1, 2], name => ["J\xC3\xB8rgensen", 'Bo'] }, return_only => 1, color => 1);
 } 'view: no memory leaks on a coloured UTF-8 render' unless $INC{'Devel/Cover.pm'};
+
+# warm up the chunking path before the leak check (hoist the real call out)
+view($wide, width => 20, return_only => 1, color => 0);
+no_leaks_ok {
+	my $s = view($wide, width => 20, return_only => 1, color => 0);
+} 'view: no memory leaks on a chunked (multi-block) render' unless $INC{'Devel/Cover.pm'};
 
 done_testing;

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Role::KeaItemCrud;
-$WebService::OPNsense::Role::KeaItemCrud::VERSION = '0.002';
+$WebService::OPNsense::Role::KeaItemCrud::VERSION = '0.003';
 use Carp qw( croak );
 use Moo::Role;
 use WebService::OPNsense::Normalize qw( validate_uuid );
@@ -181,7 +181,7 @@ WebService::OPNsense::Role::KeaItemCrud - Shared CRUD methods for Kea DHCP item 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

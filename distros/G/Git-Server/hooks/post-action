@@ -99,10 +99,14 @@ if ($ENV{IPC}) {
     else {
         die localtime().": [$who] git-server: Unrecognized IPC transport: $info\n";
     }
-    my $config = `$Bin/configs 2>/dev/null`;
+}
 
+my $op = $ref->{operation} || $ENV{SSH_ORIGINAL_COMMAND} || "UNKNOWN OPERATION";
+
+my $config = `$Bin/configs 2>/dev/null`;
+if ($config) {
     # Check if pushed any branches
-    if (local $_ = $ref and "HASH" eq ref and ($_->{operation} || "") eq "push" and $_ = $_->{refs}) {
+    if (local $_ = $ref and "HASH" eq ref and $op eq "push" and $_ = $_->{refs}) {
         my $branches = [ eval { map { ($_->{type} || "") eq "branch" && $_->{ref} ? ( $_->{ref} ) : () } @$_ } ];
         system "$ENV{GIT_HOOKS_PATH}/push-notify", @$branches if @$branches;
     }
@@ -133,10 +137,16 @@ if ($ENV{IPC}) {
             url => $url,
             method => "post",
             transport => "json",
+            operation => "push",
             %$cfg,
             gitdir => $dir,
             payload => $ref,
         };
+        my $do_webhook = 0;
+        foreach my $inc (split /[\,\|]+/, $cfg->{operation}) {
+            ++$do_webhook and last if $inc =~ /^(\*|\Q$op\E)$/;
+        }
+        next unless $do_webhook;
         my $queuefile = "$queue/webhook-".(eval { require Time::HiRes; Time::HiRes::time() } or time())."-$$.queue";
         my $event = eval { require JSON; JSON->new->canonical->encode($cfg)."\n"; } || eval { require Data::Dumper; $Data::Dumper::Sortkeys=1; Data::Dumper::Dumper($cfg); } || "";
         # Queue event to ensure it still goes through in case of any temporary errors:
@@ -152,7 +162,6 @@ if ($ENV{IPC}) {
 }
 
 # Log git operation to log.logfile:
-my $op = $ref->{operation} || $ENV{SSH_ORIGINAL_COMMAND} || "UNKNOWN OPERATION";
 my $allowed = !$ENV{GIT_PRE_EXIT_STATUS};
 if (my $crashed = $ref->{error_code}) {
     # Operation didn't complete properly
@@ -179,7 +188,7 @@ if (my $crashed = $ref->{error_code}) {
         logger "$op not attempted : ACL pre-failure! [code=$ENV{GIT_PRE_EXIT_STATUS}]";
     }
 }
-else {
+elsif (grep { /^(\Q$op\E|\*)$/ } split /[\|,]+/, ($config =~ /^log\.operation=(.+)/m ? $1 : "push")) {
     # Operation completed successfully.
     my $pull_branch = ($ENV{XMODIFIERS}||="") =~ /\bpull_branch=(\S+)\n/ ? $1 : "";
     my $client = $ENV{XMODIFIERS} =~ /^client=.*(git-?\w*)/m ? $1 : "";

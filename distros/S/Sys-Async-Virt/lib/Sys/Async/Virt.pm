@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v12.4.0
+#                   and LibVirt version v12.5.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -19,7 +19,7 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt v0.6.4;
+class Sys::Async::Virt v0.6.5;
 
 
 use Carp qw(croak);
@@ -29,30 +29,30 @@ use Future::Selector;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v12.4.0;
+use Protocol::Sys::Virt::Remote::XDR v12.5.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::KeepAlive v12.4.0;
-use Protocol::Sys::Virt::Remote v12.4.0;
-use Protocol::Sys::Virt::Transport v12.4.0;
-use Protocol::Sys::Virt::URI v12.4.0; # imports parse_url
+use Protocol::Sys::Virt::KeepAlive v12.5.0;
+use Protocol::Sys::Virt::Remote v12.5.0;
+use Protocol::Sys::Virt::Transport v12.5.0;
+use Protocol::Sys::Virt::URI v12.5.0; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.6.4;
-use Sys::Async::Virt::Domain v0.6.4;
-use Sys::Async::Virt::DomainCheckpoint v0.6.4;
-use Sys::Async::Virt::DomainSnapshot v0.6.4;
-use Sys::Async::Virt::Network v0.6.4;
-use Sys::Async::Virt::NetworkPort v0.6.4;
-use Sys::Async::Virt::NwFilter v0.6.4;
-use Sys::Async::Virt::NwFilterBinding v0.6.4;
-use Sys::Async::Virt::Interface v0.6.4;
-use Sys::Async::Virt::StoragePool v0.6.4;
-use Sys::Async::Virt::StorageVol v0.6.4;
-use Sys::Async::Virt::NodeDevice v0.6.4;
-use Sys::Async::Virt::Secret v0.6.4;
+use Sys::Async::Virt::Connection::Factory v0.6.5;
+use Sys::Async::Virt::Domain v0.6.5;
+use Sys::Async::Virt::DomainCheckpoint v0.6.5;
+use Sys::Async::Virt::DomainSnapshot v0.6.5;
+use Sys::Async::Virt::Network v0.6.5;
+use Sys::Async::Virt::NetworkPort v0.6.5;
+use Sys::Async::Virt::NwFilter v0.6.5;
+use Sys::Async::Virt::NwFilterBinding v0.6.5;
+use Sys::Async::Virt::Interface v0.6.5;
+use Sys::Async::Virt::StoragePool v0.6.5;
+use Sys::Async::Virt::StorageVol v0.6.5;
+use Sys::Async::Virt::NodeDevice v0.6.5;
+use Sys::Async::Virt::Secret v0.6.5;
 
-use Sys::Async::Virt::Callback v0.6.4;
-use Sys::Async::Virt::Stream v0.6.4;
+use Sys::Async::Virt::Callback v0.6.5;
+use Sys::Async::Virt::Stream v0.6.5;
 
 use constant {
     CLOSE_REASON_ERROR                                   => 0,
@@ -70,6 +70,7 @@ use constant {
     TYPED_PARAM_FIELD_LENGTH                             => 80,
     GET_DOMAIN_CAPABILITIES_DISABLE_DEPRECATED_FEATURES  => (1 << 0),
     GET_DOMAIN_CAPABILITIES_EXPAND_CPU_FEATURES          => (1 << 1),
+    GET_DOMAIN_CAPABILITIES_SUPPORTED_CPU_FEATURES       => (1 << 2),
     DOMAIN_DEFINE_VALIDATE                               => (1 << 0),
     LIST_DOMAINS_ACTIVE                                  => 1 << 0,
     LIST_DOMAINS_INACTIVE                                => 1 << 1,
@@ -865,7 +866,8 @@ my @reply_translators = (
     \&_no_translation,
     sub { 453; my $client = shift; _translated_msg($client, { dom => \&_translate_remote_nonnull_domain }, @_) },
     sub { 454; my $client = shift; _translated_msg($client, { dom => \&_translate_remote_nonnull_domain }, @_) },
-    sub { 455; my $client = shift; _translated_msg($client, { dom => \&_translate_remote_nonnull_domain }, @_) }
+    sub { 455; my $client = shift; _translated_msg($client, { dom => \&_translate_remote_nonnull_domain }, @_) },
+    \&_no_translation
 );
 
 sub _map( $client, $unwrap, $argmap, $data) {
@@ -2509,9 +2511,9 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.6.4
+v0.6.5
 
-Based on LibVirt tag v12.4.0
+Based on LibVirt tag v12.5.0
 
 =head1 SYNOPSIS
 
@@ -2580,7 +2582,7 @@ value.
 
 =head2 RUNNING AGAINST OLDER SERVERS
 
-The reference LibVirt version of this module is v12.4.0. This means
+The reference LibVirt version of this module is v12.5.0. This means
 all API entry points have been implemented as they are declared in the
 protocol of that version (except for the ones listed in the section
 L</UNIMPLEMENTED ENTRYPOINTS>).  The consequence of a server being of a lower
@@ -2589,7 +2591,7 @@ supported by the server.
 
 =head2 RUNNING AGAINST NEWER SERVERS
 
-The module can run against any version of LibVirt newer than v12.4.0;
+The module can run against any version of LibVirt newer than v12.5.0;
 any new entry points in the API will not be available, but all existing APIs
 can be used as per the stability guarantees.
 
@@ -3666,6 +3668,8 @@ See documentation of L<virStorageVolLookupByPath|https://libvirt.org/html/libvir
 =item GET_DOMAIN_CAPABILITIES_DISABLE_DEPRECATED_FEATURES
 
 =item GET_DOMAIN_CAPABILITIES_EXPAND_CPU_FEATURES
+
+=item GET_DOMAIN_CAPABILITIES_SUPPORTED_CPU_FEATURES
 
 =item DOMAIN_DEFINE_VALIDATE
 

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::PreSharedKeys;
-$WebService::OPNsense::IPsec::PreSharedKeys::VERSION = '0.002';
+$WebService::OPNsense::IPsec::PreSharedKeys::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -31,7 +31,7 @@ WebService::OPNsense::IPsec::PreSharedKeys - IPsec pre-shared key controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

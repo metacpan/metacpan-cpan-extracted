@@ -49,7 +49,7 @@
      Math::Float32 object.
 
      See the SYNOPSIS section (above) for some elaboration,
-     If necessay, $val will be rounded (to nearest, ties to even)
+     If necessary, $val will be rounded (to nearest, ties to even)
      to fit into the single precision float type.
 
     flt_set($obj, $val);
@@ -71,9 +71,13 @@
 =head1 ARITHMETIC
 
  Arithmetic operations can be performed on a Math::Float32 object
- by either IVs, NVs, PVs or other Math::Float32 objects.
+ by either IVs, NVs, PVs, Math::Bfloat16 objects or other
+ Math::Float32 objects.
  The IV/NV/PV operands will first be converted to a single
- precision value (rounded to nearest, ties to even).
+ precision float value (rounded to nearest, ties to even).
+ Operations involving Math::Bfloat16 objects will be handled by
+ Math::Bfloat16's overloading subs & will return a Math::Bfoat16
+ object. (See the Math::Bfloat16 pod for further information.)
 
  All arithmetic is done via the overloading of the
  '+', '-', '*', '/', '%', '**'/, '+=', '-=', '*=', '/=', '%=',

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Role::Service;
-$WebService::OPNsense::Role::Service::VERSION = '0.002';
+$WebService::OPNsense::Role::Service::VERSION = '0.003';
 use Moo::Role;
 use namespace::clean;
 
@@ -59,7 +59,7 @@ WebService::OPNsense::Role::Service - Role for service control methods (status/s
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

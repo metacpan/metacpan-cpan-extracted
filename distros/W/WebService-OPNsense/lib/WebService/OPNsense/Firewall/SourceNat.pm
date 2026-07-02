@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Firewall::SourceNat;
-$WebService::OPNsense::Firewall::SourceNat::VERSION = '0.002';
+$WebService::OPNsense::Firewall::SourceNat::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -30,7 +30,7 @@ WebService::OPNsense::Firewall::SourceNat - Firewall outbound (source) NAT rule 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ version 0.002
     $src_nat->add_rule({
         rule => {
             description => 'NAT traffic from internal network',
-            source_net  => '192.168.1.0/24',
+            source_net  => '192.0.2.0/24',
             protocol    => $PROTO_ANY,
             snat_mode   => $SNAT_AUTOMATIC,
             enabled     => $OPN_ENABLED,

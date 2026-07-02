@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1,
-#        XDR::Gen version 1.1.2 and LibVirt version v12.4.0
+#        XDR::Gen version 1.1.2 and LibVirt version v12.5.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -9,7 +9,7 @@
 #
 ####################################################################
 
-package Protocol::Sys::Virt::Remote::XDR v12.4.0;
+package Protocol::Sys::Virt::Remote::XDR v12.5.1;
 
 use constant {
     VIR_TYPED_PARAM_INT     => 1,
@@ -171,6 +171,7 @@ use constant DOMAIN_GUEST_INFO_PARAMS_MAX => 2048; # 2048
 use constant NETWORK_PORT_PARAMETERS_MAX => 16; # 16
 use constant DOMAIN_AUTHORIZED_SSH_KEYS_MAX => 2048; # 2048
 use constant DOMAIN_MESSAGES_MAX => 2048; # 2048
+use constant DOMAIN_ANNOUNCE_INTERFACE_PARAMS_MAX => 16; # 16
 # @_: ($class, $value, $index, $input) = @_;
 sub deserialize_uuid {
     my $input_length = length $_[3];
@@ -34365,6 +34366,93 @@ sub serialize_domain_event_callback_channel_lifecycle_msg {
     substr( $_[3], $_[2] ) = pack("l>", $_[1]->{reason});
     $_[2] += 4;
 }
+# @_: ($class, $value, $index, $input) = @_;
+sub deserialize_domain_announce_interface_args {
+    my $input_length = length $_[3];
+    $_[1] = {};
+    # Deserializing field: 'dom'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Deserializing field: 'device'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_string( $_[1]->{device}, $_[2], $_[3] );
+
+    # Deserializing field: 'params'
+    # my ($class, $value, $index, $input) = @_;
+    do {
+        die "Input buffer too short"
+            if ($input_length - $_[2]) < 4;
+        my $len = unpack("L>", substr( $_[3], $_[2] ));
+        $_[2] += 4;
+
+        die "Array too long (max: 16): $len"
+            unless ($len <= 16);
+        $_[1]->{params} = [];
+        for my $i1 ( 0 .. ($len - 1) ) {
+            # my ($class, $value, $index, $input) = @_;
+            $_[0]->deserialize_typed_param( $_[1]->{params}->[$i1], $_[2], $_[3] );
+        }
+    };
+
+    # Deserializing field: 'flags'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{flags} = unpack("L>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'unsigned int': $_[1]->{flags}"
+        unless (0 <= $_[1]->{flags} and $_[1]->{flags} <= 4294967295);
+}
+# @_: ($class, $value, $index, $output) = @_;
+sub serialize_domain_announce_interface_args {
+    croak "Missing required input 'struct' value"
+        unless defined $_[1];
+
+    # Serializing field: 'dom'
+    croak "Missing required input value 'dom'"
+        unless exists $_[1]->{dom};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Serializing field: 'device'
+    croak "Missing required input value 'device'"
+        unless exists $_[1]->{device};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_string( $_[1]->{device}, $_[2], $_[3] );
+
+    # Serializing field: 'params'
+    croak "Missing required input value 'params'"
+        unless exists $_[1]->{params};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'array' value"
+        unless defined $_[1]->{params};
+    do {
+        my $len = scalar @{ $_[1]->{params} };
+        die "Array too long (max: 16): $len"
+            unless ($len <= 16);
+
+        substr( $_[3], $_[2] ) = pack("L>", $len);
+        $_[2] += 4;
+        for my $i1 ( 0 .. ($len - 1) ) {
+            # my ($class, $value, $index, $output) = @_;
+            $_[0]->serialize_typed_param( $_[1]->{params}->[$i1], $_[2], $_[3] );
+        }
+    };
+
+    # Serializing field: 'flags'
+    croak "Missing required input value 'flags'"
+        unless exists $_[1]->{flags};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'unsigned int' value"
+        unless defined $_[1]->{flags};
+    die "Out of bounds 'unsigned int': $_[1]->{flags}"
+        unless (0 <= $_[1]->{flags} and $_[1]->{flags} <= 4294967295);
+    die "Non-integer 'int' value given: $_[1]->{flags}"
+        unless int($_[1]->{flags}) == $_[1]->{flags};
+    substr( $_[3], $_[2] ) = pack("L>", $_[1]->{flags});
+    $_[2] += 4;
+}
 use constant PROGRAM => 536903814; # 0x20008086
 use constant PROTOCOL_VERSION => 1; # 1
 # Define elements from enum 'procedure'
@@ -34824,6 +34912,7 @@ use constant {
     PROC_DOMAIN_EVENT_NIC_MAC_CHANGE                  => 453,
     PROC_DOMAIN_EVENT_VCPU_REMOVED                    => 454,
     PROC_DOMAIN_EVENT_CALLBACK_CHANNEL_LIFECYCLE      => 455,
+    PROC_DOMAIN_ANNOUNCE_INTERFACE                    => 456,
 };
 # @_: ($class, $value, $index, $input) = @_;
 sub deserialize_procedure {
@@ -34833,7 +34922,7 @@ sub deserialize_procedure {
         if ($input_length - $_[2]) < 4;
     $_[1] = unpack("l>", substr( $_[3], $_[2] ) );
     die "Out of range enum value supplied: $_[1]"
-        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
+        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01'),
                    $_[1], 1);
     $_[2] += 4;
 }
@@ -34843,7 +34932,7 @@ sub serialize_procedure {
     croak "Missing required input 'enum' value"
         unless defined $_[1];
     die "Out of range enum value: $_[1]"
-        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
+        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01'),
                    $_[1], 1);
     substr( $_[3], $_[2] ) = pack("l>", $_[1]);
     $_[2] += 4;
@@ -34860,9 +34949,9 @@ Protocol::Sys::Virt::Remote::XDR - Constants and (de)serializers for remote serv
 
 =head1 VERSION
 
-v12.4.0
+v12.5.1
 
-Based on LibVirt tag v12.4.0
+Based on LibVirt tag v12.5.0
 
 =head1 SYNOPSYS
 
@@ -35036,6 +35125,8 @@ brevity.  These prefixes have been stripped:
 =item * DOMAIN_AUTHORIZED_SSH_KEYS_MAX
 
 =item * DOMAIN_MESSAGES_MAX
+
+=item * DOMAIN_ANNOUNCE_INTERFACE_PARAMS_MAX
 
 =item * DOMAIN_EVENT_GRAPHICS_IDENTITY_MAX
 
@@ -35974,6 +36065,8 @@ brevity.  These prefixes have been stripped:
 =item * PROC_DOMAIN_EVENT_VCPU_REMOVED
 
 =item * PROC_DOMAIN_EVENT_CALLBACK_CHANNEL_LIFECYCLE
+
+=item * PROC_DOMAIN_ANNOUNCE_INTERFACE
 
 =back
 
@@ -37427,6 +37520,8 @@ position C<$idx> into their corresponding Perl representation.
 =item * domain_event_nic_mac_change_msg
 
 =item * domain_event_callback_channel_lifecycle_msg
+
+=item * domain_announce_interface_args
 
 =item * procedure
 

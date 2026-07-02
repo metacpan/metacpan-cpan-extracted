@@ -1,0 +1,12 @@
+AI/LLM Policy:
+
+I will not police what tools you use to write code, including LLM.
+
+I expect all PR's to be:
+ * Reasonably sized
+ * Human reviewable
+ * Completely understood by the one submitting them
+ * Documentation must not be "uncanny valley"
+
+Clarification on docs: Documentation may be AI written, and may even be
+identifiably so, but it must not feel unnatural to read.

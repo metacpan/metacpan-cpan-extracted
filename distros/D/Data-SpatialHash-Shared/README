@@ -1,0 +1,424 @@
+NAME
+    Data::SpatialHash::Shared - Shared-memory spatial hash index for Linux
+
+SYNOPSIS
+        use Data::SpatialHash::Shared;
+
+        # 100k-entry map, auto-sized buckets, 1.0 world-unit cells
+        my $s = Data::SpatialHash::Shared->new(undef, 100_000, 0, 1.0);
+
+        my $h = $s->insert(10.5, 20.5, 42);      # 2D point id=42 -> handle
+        $s->move($h, 11.0, 21.0);                # entity moved
+        my @near = $s->query_radius(10, 20, 5);  # ids within radius 5
+        my @nn   = $s->query_knn(10, 20, 3);     # 3 nearest ids
+
+        my $p = $s->insert(1, 2, 3, 7);          # 3D point id=7
+        $s->each_in_radius(0, 0, 0, 10, sub { my ($id) = @_; });
+
+        $s->remove($h);
+        my $stats = $s->stats;                   # { count => ..., max_chain => ... }
+
+        # toroidal world + a one-call collision broad-phase (e.g. a game tick)
+        my $w = Data::SpatialHash::Shared->new(undef, 100_000, 0, 16, wrap => [2000, 2000]);
+        my $a = $w->insert(5, 5, 1);  $w->set_radius($a, 3);   # actor 1, interaction radius 3
+        $w->move_many([ [$a, 6, 6] ]);                          # bulk-reposition each tick
+        my $near = $w->query_radius_many([ [6, 6, 3] ]);        # batched neighbor queries, one lock
+        $w->each_colliding_pair(sub { my ($x, $y) = @_; });     # every colliding pair, seam-aware
+
+        # spherical world (planet): geo proximity + cube-sphere chunk/LOD ids
+        my $g = Data::SpatialHash::Shared->new(undef, 100_000, 0, 1000, sphere => 6_371_000);
+        my $e = $g->insert_geo(0.81, 0.21, 500, 1);             # lat/lon radians, 500 m altitude
+        my @hit = $g->query_geo_radius(0.81, 0.21, 500, 2000);  # within 2 km (true 3D distance)
+        my $chunk = $g->cube_cell_geo(0.81, 0.21, 12);          # level-12 cube-sphere cell id
+
+DESCRIPTION
+    Sparse spatial hash in shared memory: an unbounded Euclidean grid by
+    default, or a bounded seamless torus (see "Toroidal space"). Positions
+    and values are stored in a flat array of entries; a hash table of
+    buckets maps cell coordinates to entry chains. Coordinates are arbitrary
+    floats in 2D or 3D; for 2D use, simply omit the "z" argument (it
+    defaults to 0). For planets and other spherical worlds, geo helpers map
+    latitude/longitude/altitude to 3D and a cube-sphere cell scheme provides
+    chunk and level-of-detail ids (see "Spherical worlds").
+
+    Multiple processes can map the same hash and read and write it
+    concurrently; access is serialized by a write-preferring futex rwlock
+    that recovers automatically if a lock holder dies (see "CRASH SAFETY").
+
+    Linux-only. Requires 64-bit Perl.
+
+  Coordinate model
+    Space is divided into axis-aligned cells of size "cell_size". A point at
+    (x, y, z) lands in cell (floor(x/cell_size), floor(y/cell_size),
+    floor(z/cell_size)). Spatial queries walk all cells that overlap the
+    query region; smaller cells reduce false positives at the cost of more
+    bucket lookups.
+
+  2D vs 3D
+    All methods that accept coordinates accept either (x, y) or (x, y, z).
+    When z is omitted it is treated as 0. A handle created with a 2D insert
+    can be queried with either 2D or 3D calls.
+
+  Toroidal space
+    By default the grid is unbounded and Euclidean. Construct with "wrap =>
+    [$Wx, $Wy]" (2D) or "[$Wx, $Wy, $Wz]" (3D) to make space a seamless
+    torus: neighbour-cell expansion wraps around the grid edges and
+    "query_radius", "query_knn", "each_in_radius", "query_radius_many", and
+    the pair emitters all use the minimum-image (shortest wrapping) distance
+
+        dx = abs(ax - bx);  dx = $Wx - dx if dx > $Wx / 2;   # per axis
+
+    so an entry near 0 and one near $Wx are neighbours. Keep positions
+    within "[0, $W)" per axis for the metric to be meaningful. Each wrapped
+    extent must be a positive multiple of "cell_size" so the cells tile the
+    world exactly, otherwise the constructor croaks. "query_cell" resolves
+    its coordinate to a wrapped cell, but "query_aabb" uses the literal
+    (non-wrapping) box even in a wrapping world. The wrap configuration is
+    part of the mapped format and is restored on reopen; the "world"
+    accessor returns the extents.
+
+METHODS
+  Constructors
+        my $s = Data::SpatialHash::Shared->new($path, $max, $buckets, $cell);
+        my $s = Data::SpatialHash::Shared->new(undef, $max, $buckets, $cell);
+        my $s = Data::SpatialHash::Shared->new_memfd($name, $max, $buckets, $cell);
+        my $s = Data::SpatialHash::Shared->new_from_fd($fd);
+        my $s = Data::SpatialHash::Shared->new($path, $max, $buckets, $cell, wrap => [$Wx, $Wy]);
+
+    $path is the backing file path; "undef" creates an anonymous mapping.
+    $max is the maximum number of entries. $buckets is the bucket count (0 =
+    auto). $cell is the cell size (float).
+
+    Pass "wrap => [$Wx, $Wy]" (or "[$Wx, $Wy, $Wz]") to make the world a
+    seamless torus of those extents (see "Toroidal space"); omit it for an
+    unbounded Euclidean space.
+
+    When reopening an existing backing file or memfd, the stored header
+    wins: the caller's $max, $buckets, $cell, "wrap", and "sphere" arguments
+    are ignored and the file's original values are used.
+
+    "new_memfd" creates a Linux memfd (anonymous but transferable via
+    "memfd" file descriptor). "new_from_fd" reopens an existing memfd in
+    another process.
+
+  Mutators
+        my $h = $s->insert(x, y, value);        # 2D insert -- returns handle or undef
+        my $h = $s->insert(x, y, z, value);     # 3D insert
+        my $h = $s->insert(x, y, z, value, r);  # 3D insert with an interaction radius
+        $s->set_radius($h, $r);                 # set/replace an entry's radius
+        $s->move($h, x, y);                     # relocate entry (2D)
+        $s->move($h, x, y, z);                  # relocate entry (3D)
+        $s->remove($h);                         # free entry slot
+        $s->set_value($h, $v);                  # update stored value
+        $s->clear;                              # remove all entries
+        my @ids = $s->insert_many([ [x,y,value], [x,y,value,r], ... ]);  # bulk insert
+        my $n   = $s->move_many([ [handle,x,y], [handle,x,y,z], ... ]);  # bulk move
+
+    "insert" returns a handle (opaque integer) on success, or "undef" if
+    "max_entries" is exhausted. "move" and "remove" return true on success,
+    or false if the handle is invalid or already removed. "set_value"
+    instead croaks on an invalid or freed handle; it and "clear" return
+    nothing.
+
+    Each entry may carry an interaction radius (default 0; must be finite
+    and non-negative), used by "each_colliding_pair". Set it with the
+    5-argument "insert" or with "set_radius" (which croaks on an invalid or
+    freed handle); for a 2D entry with a radius, insert then call
+    "set_radius". "insert_many" and "move_many" apply a whole batch under a
+    single lock acquisition -- each row is an arrayref. "insert_many"
+    inserts 2D entries (rows "[x,y,value]" or "[x,y,value,radius]"; use
+    "insert" in a loop for 3D) and returns the list of handles, with "undef"
+    for any row that overflowed the pool, was malformed (not an arrayref of
+    length 3 or 4), or carried a negative or non-finite radius. "move_many"
+    takes "[handle,x,y]" or "[handle,x,y,z]" rows and returns the count
+    successfully moved; freed/invalid handles and malformed rows are
+    skipped.
+
+    Handles are entry slot indices starting at 0, and 0 is false in Perl.
+    The very first insert into a fresh hash returns handle 0. Always test
+    the result with "defined $h", never for truthiness:
+
+        my $h = $s->insert($x, $y, $v);
+        die "full" unless defined $h;   # correct: handle 0 is valid
+        # WRONG: "unless $h" would treat the first handle (0) as failure
+
+  Accessors
+        $s->has($h);              # true if handle is live
+        $s->value($h);            # stored value
+        $s->get_radius($h);       # stored interaction radius (0 if unset)
+        my ($x, $y, $z) = $s->position($h);   # current position
+
+    "has" is the safe predicate for a possibly-freed handle; "value",
+    "position", and "get_radius" croak on an invalid or freed handle.
+
+  Queries
+    Most query methods return a list of stored values (not handles) for
+    matching entries; "query_radius_many" instead returns an arrayref of
+    id-list arrayrefs (see "Batched radius queries"). For "query_knn",
+    results are in nearest-first order.
+
+        my @ids = $s->query_radius(x, y, r);         # 2D radius search
+        my @ids = $s->query_radius(x, y, z, r);      # 3D radius search
+        my @ids = $s->query_aabb(x0, y0, x1, y1);    # 2D axis-aligned box
+        my @ids = $s->query_aabb(x0, y0, z0, x1, y1, z1);  # 3D box
+        my @ids = $s->query_cell(x, y);              # single cell (2D)
+        my @ids = $s->query_cell(x, y, z);           # single cell (3D)
+        my @ids = $s->query_knn(x, y, k);            # k nearest (2D)
+        my @ids = $s->query_knn(x, y, z, k);         # k nearest (3D)
+        $s->each_in_radius(x, y, r, sub { my ($v) = @_; ... });    # 2D cb
+        $s->each_in_radius(x, y, z, r, sub { my ($v) = @_; ... }); # 3D cb
+        my $lists = $s->query_radius_many([ [x,y,r], [x,y,z,r] ]); # N radius queries, one lock
+
+    "query_radius" and "each_in_radius" require a finite, non-negative
+    radius, and "query_knn" requires "k" to be at least 1; out-of-range
+    values croak. The radius is inclusive (a point at exactly the radius
+    matches), unlike the strict "each_pair_within"; "query_geo_radius" is
+    inclusive too, as are "query_aabb"'s box edges.
+
+    "each_in_radius" snapshots the matching values under the read lock, then
+    invokes the callback once per value after the lock is released. Because
+    the lock is dropped before any callback runs, the callback may safely
+    call back into the same map (for example "has" or "move") without
+    deadlock.
+
+   Batched radius queries
+        my $lists = $s->query_radius_many([ [x, y, r], [x, y, z, r], ... ]);
+        # $lists->[i] is an arrayref of ids, == [ $s->query_radius(@{ $queries->[i] }) ]
+
+    "query_radius_many" runs a whole batch of radius queries under a single
+    read lock and returns an arrayref of id-list arrayrefs, one per query in
+    input order. Each row is "[x, y, r]" (2D) or "[x, y, z, r]" (3D); a
+    malformed row (not a 3- or 4-element arrayref, or a negative or
+    non-finite "r") yields an empty list for that slot, siblings unaffected
+    -- it cannot croak mid-batch while holding the lock, mirroring
+    "insert_many". A region-too-large or out-of-memory condition from any
+    query still croaks (after freeing the partial result). This is purely a
+    lock-amortization win for callers issuing many queries per critical
+    section (for example a per-tick collision broad-phase across many
+    actors): one "rdlock"/"rdunlock" pair for the batch instead of one per
+    query.
+
+   Collision pairs
+        $s->each_pair_within($max_r, sub { my ($va, $vb) = @_; ... });
+        $s->each_colliding_pair(sub { my ($va, $vb) = @_; ... });
+
+    "each_pair_within" invokes the callback once for every unordered pair of
+    entries whose centre distance is less than $max_r. "each_colliding_pair"
+    instead pairs entries whose centre distance is less than the sum of
+    their two radii (see "set_radius") -- a heterogeneous-radius collision
+    test computed in a single grid walk, so a small "cell_size" stays
+    correct even for large-radius entries. Both emit each pair exactly once,
+    are seam-aware in a toroidal world, and -- like "each_in_radius" --
+    snapshot under the read lock then run the callback with the lock
+    released (so it may mutate the map). The callback arguments are the
+    stored values of the pair. Distances are 3D when any entry has a
+    non-zero "z" (or the world wraps in "z"), otherwise 2D.
+    "each_pair_within" croaks on a negative or non-finite $max_r.
+
+   Region query cost
+    The cost of a region query scales with the number of grid cells covering
+    the query region, not with the number of matching points. For
+    "query_radius", "each_in_radius", and each "query_radius_many" sub-query
+    that is roughly (2 * radius / cell_size) ** dims cells (similarly for
+    "query_aabb", which scans the cells spanning the box). The scan runs
+    while holding a read lock. An over-large radius relative to "cell_size"
+    therefore scans many empty cells, wasting time and stalling concurrent
+    writers that are waiting for the lock. Size "cell_size" on the order of
+    your typical query radius so each query touches only a handful of cells.
+
+    As a safety net, any region query that would scan more than
+    approximately 67 million cells (2**26) -- a "query_radius",
+    "query_aabb", "each_in_radius", or a "query_radius_many" sub-query whose
+    region spans that many cells, a "query_knn" that must walk that many
+    cells across its expanding shells, or a "each_pair_within" /
+    "each_colliding_pair" whose per-entry neighbourhood spans that many
+    cells -- croaks with a message containing the word "cells" rather than
+    scanning unbounded. If your use case genuinely requires regions that
+    large, increase "cell_size" so the same physical region maps to fewer
+    cells.
+
+  Spherical worlds
+    For points on or above a sphere (planets, globes), construct with a body
+    radius and use the geo helpers; a separate cube-sphere scheme gives
+    stable hierarchical cell ids for chunking and level-of-detail. Curvature
+    needs no special handling: with "sphere" set, geo coordinates are
+    converted to and from Cartesian in C, so proximity is exact
+    straight-line distance -- correct for surface and air entities alike --
+    not a great-circle approximation.
+
+   Geo proximity
+        my $s = Data::SpatialHash::Shared->new(undef, $max, 0, $cell, sphere => $R);
+
+        my $h = $s->insert_geo($lat, $lon, $alt, $value);   # radians; alt above the surface
+        $s->move_geo($h, $lat, $lon, $alt);
+        my ($lat, $lon, $alt) = $s->position_geo($h);
+        my @vals = $s->query_geo_radius($lat, $lon, $alt, $dist);   # $dist in world units
+
+    "sphere" is the body radius -- distinct from a per-entry interaction
+    radius -- and must be finite and greater than zero; it is stored in the
+    map and restored on reopen. "sphere" and "wrap" are mutually exclusive
+    (a sphere is not a flat torus); passing both croaks. Latitude and
+    longitude are in radians ("lat" in -pi/2 .. pi/2, "lon" in -pi .. pi);
+    "alt" is height above the sphere of radius $R, so an entity lies at
+    distance "$R + $alt" from the centre. Each geo method converts to
+    Cartesian and delegates to the ordinary 3D engine, so $dist in
+    "query_geo_radius" is a true straight-line distance and must be finite
+    and non-negative. At a pole, longitude is undefined and "position_geo"
+    reports it as 0. Calling a geo method on a map created without "sphere"
+    croaks. "insert_geo" returns a handle or "undef" if the pool is
+    exhausted (test with "defined" -- handle 0 is valid but false);
+    "move_geo" returns true, or false for a freed/invalid handle;
+    "position_geo" croaks on a freed or invalid handle.
+
+   Cube-sphere cells
+    A direction (or lat/lon) maps to a hierarchical cell id on a
+    cube-sphere: six cube faces, each an equal-angle grid subdivided to a
+    chosen level (level 0 = the whole face, level "L" = "2**L" cells per
+    face edge, up to level 24). The ids are stateless integers independent
+    of any stored data -- useful as chunk keys for streaming and
+    level-of-detail.
+
+        my $cell = $s->cube_cell($x, $y, $z, $level);     # direction (need not be unit length)
+        my $cell = $s->cube_cell_geo($lat, $lon, $level);
+        my @adj  = $s->cube_neighbors($cell);             # 4 edge-adjacent cells, seam-aware
+        my $up   = $s->cube_parent($cell);                # coarser cell (undef at level 0)
+        my @kids = $s->cube_children($cell);              # 4 finer cells (empty at level 24)
+        my $lvl  = $s->cube_level($cell);
+        my ($x, $y, $z) = $s->cube_center($cell);         # cell centre as a unit vector
+        my ($lat, $lon) = $s->cube_center_geo($cell);
+
+    A cell id packs "(level, face, i, j)" into an unsigned integer, so cells
+    at different levels are different ids. "cube_neighbors" returns the four
+    edge-adjacent cells, correct across face seams; diagonal/corner
+    neighbours are not included. These methods read no map state (any handle
+    provides them), and a malformed cell id croaks; a zero or non-finite
+    direction yields an arbitrary but valid cell. The grid is near-uniform
+    (equal-angle), not equal-area.
+
+  Introspection
+        $s->count;        # live entry count
+        $s->max_entries;  # capacity
+        $s->num_buckets;  # bucket table size
+        $s->cell_size;    # cell size in world units
+        my @w = $s->world;  # wrap extents: (Wx,Wy) or (Wx,Wy,Wz); empty if not toroidal
+        my $R = $s->sphere; # body radius (sphere => $R), or 0 if not a sphere map
+        $s->stats;        # diagnostic hashref (see STATS)
+
+  Lifecycle
+        $s->path;              # backing file path, or undef for anon/memfd
+        $s->memfd;             # memfd fd (-1 for file-backed/anon)
+        $s->sync;              # msync mmap to backing store
+        $s->unlink;            # remove backing file
+        Class->unlink($path);  # class-method form
+
+    "sync" and "unlink" croak on OS failure.
+
+  Event Loop Integration
+        my $fd = $s->eventfd;         # lazy-create eventfd, returns fd
+        $s->eventfd_set($fd);         # attach an external eventfd
+        my $fd = $s->fileno;          # current eventfd fd, or -1
+        $s->notify;                   # write 1 to eventfd (signal update)
+        my $n = $s->eventfd_consume;  # read+reset eventfd counter
+
+    "eventfd_set" attaches an external eventfd, closing the
+    previously-attached fd (such as one created by "eventfd") unless it is
+    the same descriptor. "notify" returns false if no eventfd is attached,
+    true after writing the signal. "eventfd_consume" returns the counter as
+    an integer, or "undef" if no eventfd is attached or nothing is pending
+    (a spurious wakeup).
+
+TUNING
+    Choose "cell_size" close to your typical query radius. A value too small
+    means many cells are scanned per radius query; a value too large packs
+    many entries into each cell and increases false-positive tests.
+
+    Choose "num_buckets" to be a power of two slightly above the expected
+    peak live count; any value you pass is rounded up to the next power of
+    two. The default (0 = auto) picks a power of two near "max_entries",
+    which is a safe starting point. After loading real data, inspect
+    "stats->{load_factor}" (target below 0.7) and "stats->{max_chain}"
+    (target below 5).
+
+BENCHMARKS
+    Measured on Linux x86_64, Perl 5.40.2 (bench/single.pl). The first four
+    use 100k entries at "cell_size" 1.0; "each_colliding_pair" uses 4000
+    radius-bearing actors on a 2000x2000 torus; the geo/cube rows use a
+    planet ("sphere" set):
+
+        insert:                4.6M/s
+        query_radius:           61k/s
+        query_knn(10):         125k/s
+        move:                  2.2M/s
+        move_many:              22M/s    # ~10x move -- one lock acquisition per batch
+        each_colliding_pair:   770/s     # ~1.3 ms per full broad-phase pass
+        query_geo_radius:       12k/s    # planet proximity (lat/lon/alt -> 3D in C)
+        cube_cell:             5.5M/s    # cube-sphere cell id (level 14)
+
+STATS
+    stats() returns a hashref with keys:
+
+    "count" -- current number of live entries
+    "max_entries" -- allocated entry capacity
+    "num_buckets" -- size of the bucket table
+    "cell_size" -- cell size (float)
+    "free_slots" -- available entry slots (max_entries - count)
+    "occupied_buckets" -- number of buckets with at least one entry
+    "max_chain" -- longest collision chain across all buckets
+    "max_cell" -- most entries sharing a single grid cell
+    "load_factor" -- count / num_buckets (float)
+    "ops" -- total mutation operation counter
+    "mmap_size" -- size of the shared mapping in bytes
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+CRASH SAFETY
+    The write lock is a futex-based rwlock with PID-encoded ownership. If
+    the writer process dies while holding the lock, the next writer that
+    cannot acquire the lock checks whether the owner PID is still alive and,
+    if not, recovers the lock. Reader slots are similarly reclaimed when a
+    dead reader's slot is detected.
+
+    Limitation: PID reuse is not detected. If a new process acquires the
+    same PID as a dead lock holder before recovery runs, the stale lock may
+    not be released automatically. This edge case requires the kernel to
+    reassign PIDs faster than lock-recovery attempts, which is very unlikely
+    in practice but cannot be ruled out.
+
+SEE ALSO
+    Data::Graph::Shared - directed weighted graph
+
+    Data::Heap::Shared - priority queue (for Dijkstra, Prim, etc.)
+
+    Data::Pool::Shared - fixed-size object pool
+
+    Data::HashMap::Shared - concurrent hash table
+
+    Data::Buffer::Shared - typed shared array
+
+    Data::Queue::Shared - FIFO queue
+
+    Data::Stack::Shared - LIFO stack
+
+    Data::Deque::Shared - double-ended queue
+
+    Data::Log::Shared - append-only log
+
+    Data::Sync::Shared - synchronization primitives
+
+    Data::PubSub::Shared - publish-subscribe ring
+
+    Data::ReqRep::Shared - request-reply
+
+    Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
+
+    Data::RingBuffer::Shared - fixed-size overwriting ring buffer
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

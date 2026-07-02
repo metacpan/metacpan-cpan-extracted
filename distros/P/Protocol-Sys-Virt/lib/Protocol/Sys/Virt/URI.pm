@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1,
-#        XDR::Gen version 1.1.2 and LibVirt version v12.4.0
+#        XDR::Gen version 1.1.2 and LibVirt version v12.5.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -13,11 +13,12 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::URI v12.4.0;
+package Protocol::Sys::Virt::URI v12.5.1;
 
 use parent qw(Exporter);
 
 use Carp qw(croak);
+use List::Util qw(pairmap);
 use Log::Any qw($log);
 use URI::Encode qw(uri_encode uri_decode);
 
@@ -27,7 +28,21 @@ sub parse_url {
     my $url = shift;
     my ($base, $query) = split( /\?/, $url, 2 );
     $query //= '';
-    my %args = map {
+    my %args;
+    pairmap {
+        if ($a eq 'argv') {
+            if (exists $args{argv}) {
+                push $args{argv}->@*, $b;
+            }
+            else {
+                $args{argv} = [ $b ];
+            }
+        }
+        else {
+            $args{$a} = $b;
+        }
+    }
+    map {
         uri_decode($_)
     }
     map {
@@ -79,7 +94,7 @@ Protocol::Sys::Virt::URI - Helper routines for parsing LibVirt URIs
 
 =head1 VERSION
 
-v12.4.0
+v12.5.1
 
 =head1 SYNOPSIS
 
@@ -136,6 +151,9 @@ C<session>.
 
 Contains a hashref with the (URI-decoded) name/value pairs from
 the query string.
+
+I<Since v12.5.1>: The C<argv> parameters are returned in an array; even if there is
+only a single value.
 
 =item transport
 

@@ -1,0 +1,120 @@
+#!/usr/bin/env perl
+use Mojo::Base;
+use Test::Mojo;
+use Test::More;
+use Test::MockModule;
+use Mojolicious::Lite;
+
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+
+# client server routes
+get('/protected' => sub {
+      my $c = shift;
+      if (my $identity = $c->oidc->get_valid_identity()) {
+        $c->render(text => $identity->subject . ' is authenticated');
+      }
+      else {
+        $c->oidc->redirect_to_authorize();
+      }
+    });
+get('/error/:code' => sub {
+      my $c = shift;
+      $c->log->warn("OIDC error : " . $c->flash('error_message'));
+      $c->render(text   => 'Authentication Error',
+                 status => $c->stash('code'));
+    });
+
+# provider server routes
+get('/authorize' => sub {
+      my $c = shift;
+      my $redirect_uri  = $c->param('redirect_uri');
+      my $client_id     = $c->param('client_id');
+      my $state         = $c->param('state');
+      my $response_type = $c->param('response_type');
+      if ($response_type eq 'code' && $client_id eq 'my_id') {
+        $c->redirect_to("$redirect_uri?client_id=$client_id&state=$state&code=abc&iss=my_issuer");
+      }
+      else {
+        $c->redirect_to("$redirect_uri?error=error");
+      }
+    });
+post('/token' => sub {
+       my $c = shift;
+       my ($client_id, $client_secret) = split(':', $c->req->url->to_abs->userinfo);
+       my $grant_type = $c->param('grant_type');
+       my $code       = $c->param('code');
+       if ($grant_type eq 'authorization_code'
+           && $client_id eq 'my_id' && $client_secret eq 'my_secret'
+           && $code eq 'abc') {
+         $c->render(json => {id_token      => 'my_id_token',
+                             access_token  => 'my_access_token',
+                             refresh_token => 'my_refresh_token',
+                             scope         => 'openid profile email',
+                             token_type    => 'Bearer',
+                             expires_in    => 3599});
+       }
+       else {
+         $c->render(json => {error             => 'error',
+                             error_description => 'error_description'},
+                    status => 401);
+       }
+     });
+
+my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
+$mock_oidc_client->redefine('kid_keys' => sub { {} });
+
+my $mock_data_uuid = Test::MockModule->new('Data::UUID');
+$mock_data_uuid->redefine('create_str' => sub { 'fake_uuid' });
+
+plugin 'Local::Mojolicious::Plugin::OIDC' => {
+  authentication_error_path => '/error/401',
+  provider => {
+    my_provider => {
+      id                   => 'my_id',
+      issuer               => 'my_issuer',
+      secret               => 'my_secret',
+      authorize_url        => '/authorize',
+      token_url            => '/token',
+      userinfo_url         => '/userinfo',
+      end_session_url      => '/logout',
+      jwks_url             => '/jwks',
+      signin_redirect_path => '/oidc/login/callback',
+      scope                => 'openid profile email',
+    },
+  }
+};
+
+my $t = Test::Mojo->new(app);
+$t->ua->max_redirects(3);
+
+# invalid token format
+$t->get_ok('/protected')
+  ->status_is(401)
+  ->content_is('Authentication Error');
+
+my $mock_crypt_jwt = Test::MockModule->new('Crypt::JWT');
+$mock_crypt_jwt->redefine('decode_jwt' => sub {
+  my %params = @_;
+  my %claims = (
+    iss   => 'my_issuer',
+    iat   => time - 10,
+    exp   => time + 30,
+    aud   => 'my_id',
+    sub   => 'my_subject',
+    nonce => 'fake_uuid',
+  );
+  return (
+    $params{decode_header} ? { 'alg' => 'whatever' } : (),
+    \%claims,
+  );
+});
+
+$t->get_ok('/protected?a=b&c=d')
+  ->status_is(200)
+  ->content_is('my_subject is authenticated');
+
+like($t->tx->req->url, qr[/protected\?a=b&c=d$],
+     'keep initial url');
+
+done_testing;

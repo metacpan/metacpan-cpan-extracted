@@ -4,15 +4,15 @@
 use strictures 2;
 
 package WebService::OPNsense::System;
-$WebService::OPNsense::System::VERSION = '0.002';
+$WebService::OPNsense::System::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
 has client => ( is => 'ro', required => 1 );
 
-sub status {
-    my ($self) = @_;
-    return $self->client->get('/api/core/system/status');
+sub changelog {
+    my ( $self, $version ) = @_;
+    return $self->client->post("/api/core/firmware/changelog/$version");
 }
 
 sub firmware_info {
@@ -25,29 +25,9 @@ sub firmware_status {
     return $self->client->get('/api/core/firmware/status');
 }
 
-sub hostname {
+sub firmware_upgrade {
     my ($self) = @_;
-    return $self->client->get('/api/core/system/hostname');
-}
-
-sub version {
-    my ($self) = @_;
-    return $self->client->get('/api/core/system/version');
-}
-
-sub logging {
-    my ( $self, %params ) = @_;
-    return $self->client->get( '/api/core/system/logging', \%params );
-}
-
-sub changelog {
-    my ($self) = @_;
-    return $self->client->get('/api/core/firmware/changelog');
-}
-
-sub reboot {
-    my ($self) = @_;
-    return $self->client->post('/api/core/system/reboot');
+    return $self->client->post('/api/core/firmware/upgrade');
 }
 
 sub halt {
@@ -55,9 +35,14 @@ sub halt {
     return $self->client->post('/api/core/system/halt');
 }
 
-sub menu {
+sub reboot {
     my ($self) = @_;
-    return $self->client->get('/api/core/system/menu');
+    return $self->client->post('/api/core/system/reboot');
+}
+
+sub status {
+    my ($self) = @_;
+    return $self->client->get('/api/core/system/status');
 }
 
 1;
@@ -74,15 +59,15 @@ WebService::OPNsense::System - System API controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
     my $sys = $opn->system;
 
-    my $status = $sys->status;
-    my $info   = $sys->firmware_info;
-    my $version = $sys->version;
+    my $status  = $sys->status;
+    my $info    = $sys->firmware_info;
+    my $upgrade = $sys->firmware_upgrade;
 
 =head1 DESCRIPTION
 
@@ -90,11 +75,11 @@ System status, firmware information, and system operations.
 
 =head1 METHODS
 
-=head2 status
+=head2 changelog
 
-    my $status = $sys->status;
+    my $changelog = $sys->changelog($version);
 
-Returns system status information.
+Returns the firmware changelog for the given version.
 
 =head2 firmware_info
 
@@ -108,35 +93,11 @@ Returns firmware version and update information.
 
 Returns current firmware status (e.g. if updates are available).
 
-=head2 hostname
+=head2 firmware_upgrade
 
-    my $hostname = $sys->hostname;
+    my $result = $sys->firmware_upgrade;
 
-Returns the system hostname.
-
-=head2 version
-
-    my $version = $sys->version;
-
-Returns the OPNsense version string.
-
-=head2 logging
-
-    my $logs = $sys->logging(%params);
-
-Searches system logs.  Parameters: C<current>, C<rowCount>, C<searchPhrase>, C<facility>, C<severity>.
-
-=head2 changelog
-
-    my $changelog = $sys->changelog;
-
-Returns the firmware changelog.
-
-=head2 reboot
-
-    my $result = $sys->reboot;
-
-Reboots the system immediately.
+Starts a firmware upgrade process.  Returns the upgrade job result.
 
 =head2 halt
 
@@ -144,11 +105,17 @@ Reboots the system immediately.
 
 Halts (shuts down) the system immediately.
 
-=head2 menu
+=head2 reboot
 
-    my $menu = $sys->menu;
+    my $result = $sys->reboot;
 
-Returns the navigation menu structure.
+Reboots the system immediately.
+
+=head2 status
+
+    my $status = $sys->status;
+
+Returns system status information.
 
 =head2 client
 

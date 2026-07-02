@@ -102,15 +102,20 @@ use HTML::Escape qw(escape_html);
 use Sereal::Encoder;
 use HTML::Composer::Unsafe;
 
-my @allowed_head_tags = qw(
-  title meta link style script noscript base template
+my @tags_list = qw(
+  a abbr address area article aside audio b base bdi bdo blockquote body
+  br button canvas caption cite code col colgroup data datalist dd del
+  details dfn dialog div dl dt em embed fieldset figcaption figure
+  footer form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe
+  img input ins kbd label legend li link main map mark menu meta
+  meter nav noscript object ol optgroup option output p param picture
+  plaintext pre progress q rp rt ruby s samp script search section
+  select slot small source span strong style sub summary sup table
+  tbody td template textarea tfoot th thead time title tr track u
+  ul var video wbr
 );
 
-my @allowed_body_tags = qw();
-
-my @disallowed_body_tags = qw(
-  title meta base link
-);
+my %tags_map = map { $_ => 1 } @tags_list;
 
 =head2 new(%ARGS)
 
@@ -315,6 +320,10 @@ sub _render {
                 if ( $rsp && ( $rsp_array | $rsp_hash ) )
                 {   # It is a tag if it has a follow up attr HASH or, body ARRAY
                     push @a, '<', my $eo = escape_html($o);
+
+                    croak "Invalid tag: <$eo>, expected one of "
+                      . join( ', ', @tags_list )
+                      if !$tags_map{$eo};
 
                     if ( !grep { $_ eq $eo }
                         qw(br img input meta link hr col source) )

@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use FindBin qw($RealBin);
 
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 my $how = shift =~ /^([\w\-]+)$/ ? $1 : die localtime().": [$who] git-server: Proxy invocation malfunction.\n";
@@ -18,17 +19,7 @@ while ($ENV{XMODIFIERS} =~ s/\n\n/\n/g) {}
 $ENV{XMODIFIERS} =~ s/\n+$//;
 $ENV{USER} ||= [getpwuid $<]->[0];
 $ENV{HOME} ||= [getpwuid $<]->[7];
-while (my ($remote,$proxy) = each %proxy) {
-    # Ensure no cheater local repo urls.
-    # XXX: Should HTTP URLs be converted to SSH URLs on the fly to be "helpful" for known URLs, such as github.com?
-    next if $proxy =~ m{^(\w+://|[-.@\w]+:)}; # If it has a colon, it's probably a safe enough "remote" git URL
-    my $server = $ENV{SERVER_ADDR} or die "Auth required for proxy.url $proxy\n";
-    $proxy =~ s{^~(/?)}{$ENV{HOME}$1};
-    $proxy =~ s{^\Q$ENV{HOME}\E(/?)}{};
-    $proxy ||= "/";
-    $proxy = "$ENV{USER}\@$server:$proxy";
-    $proxy{$remote} = $proxy;
-}
+
 my $WHY_FAILED = {};
 sub remote_refs {
     my $remote = shift;
@@ -50,6 +41,20 @@ sub remote_refs {
     # Clean up refs list ignoring "HEAD" and ignore everything that isn't a regular branch or tag, such as /pull/ requests.
     @list = sort { my ($a_ref,$b_ref) = "$a$b" =~ /\s(refs.*)\n.*?\s(refs.*)/; $a_ref cmp $b_ref or $a cmp $b } grep { m{\srefs/(?:heads|tags)/(?!HEAD)} } @list;
     return join "", @list;
+}
+
+sub fixlocalpushremote {
+    my $r = $_[0] or return;
+    # If it has a colon, it's probably a safe enough "remote" git URL, not a cheater local directory.
+    if ($r eq "here" || $proxy{$r} && $proxy{$r} !~ m{^(\w+://|[-.@\w]+:)}) {
+        (my $packer = $RealBin) =~ s/hooks$/git-packer/ or die localtime().": [$who] git-server: Proxy local invocation malfunction.\n";
+        local $_ = "$ENV{HOME}/bin/git-receive-pack";
+        unlink,mkdir("$ENV{HOME}/bin"),symlink($packer,$_) if !-l or $packer ne readlink;
+        # Ensure push runs through git-packer shim to ensure all push hooks are honored.
+        $r .= " --receive-pack=$_" if -l && $packer eq readlink;
+        eval { $_[0] = $r } if !defined wantarray;
+    }
+    return $r;
 }
 
 my $refs = {};
@@ -154,6 +159,8 @@ if (1) {
     warn localtime().": [$who] git-server: Proxy Sync required: $partial_sync_ok\n";
 }
 
+delete $ENV{GIT_SERVER_VERSION}; # Must be cleared to trick packer into thinking that we aren't already running the hooks, so remote synced repos within local directories will still run through their git-hooks properly, too.
+
 my $tips = {};
 my $names = {};
 my $snapshot = "";
@@ -233,6 +240,7 @@ foreach my $n (sort keys %$diff) {
             next;
         }
         warn localtime().": [$who] git-server: DEBUG: READY: old[$older] new[$newer] target[$target]\n" if $ENV{DEBUG};
+        fixlocalpushremote $older;
         if ($t eq "tag") {
             # Move or create tag $n on $older to $target to match $newer
             system "(git tag -f $n $target && git push --force $older $n) 1>&2";
@@ -250,16 +258,16 @@ foreach my $n (sort keys %$diff) {
         if (!$r) {
             # Need to delete the tag or branch from ALL proxies and from local to ensure it doesn't come back during a future sync.
             system "git $t -d $n 1>&2";
-            $_ ne $pick and system "git push --delete $_ $n 1>&2" foreach @$remotes;
+            $_ ne $pick and system "git push --delete ".(fixlocalpushremote $_)." $n 1>&2" foreach @$remotes;
         }
         elsif ($t eq "tag") {
             # Move tag $n to $r
-            system "(git tag -f $n $r && git push --force here $n) 1>&2";
+            system "(git tag -f $n $r && git push --force ".(fixlocalpushremote "here")." $n) 1>&2";
         }
         elsif ($t eq "branch") {
             # Push remote proxy changes on branch $n to local
             0 == system "(git checkout $n || git checkout --track $pick/$n) 1>&2" or next;
-            system "(git pull --rebase $pick $n && git push here) 1>&2";
+            system "(git pull --rebase $pick $n && git push ".(fixlocalpushremote "here").") 1>&2";
         }
     }
     elsif ($how =~ /write/ and -s ".git/SYNCED") {
@@ -269,16 +277,16 @@ foreach my $n (sort keys %$diff) {
         if (!$l) {
             # Need to delete the remote tag or branch from ALL proxies to ensure it doesn't come back during a future sync.
             system "git $t -d $n 1>&2";
-            system "git push --delete $_ $n 1>&2" foreach sort keys %proxy;
+            system "git push --delete ".(fixlocalpushremote $_)." $n 1>&2" foreach sort keys %proxy;
         }
         elsif ($t eq "tag") {
             # Move tag $n to $l
-            system "(git tag -f $n $l && git push --force $pick $n) 1>&2";
+            system "(git tag -f $n $l && git push --force ".(fixlocalpushremote $pick)." $n) 1>&2";
         }
         elsif ($t eq "branch") {
             # Push local changes on branch $n to remote proxy
             0 == system "(git checkout $n || git checkout --track here/$n) 1>&2" or next;
-            system "(git pull --rebase here $n && git push $pick $n --force) 1>&2";
+            system "(git pull --rebase here $n && git push ".(fixlocalpushremote $pick)." $n --force) 1>&2";
         }
     }
     else {

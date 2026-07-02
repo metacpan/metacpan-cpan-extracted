@@ -1,0 +1,210 @@
+NAME
+    Data::DisjointSet::Shared - shared-memory union-find (disjoint-set) for
+    Linux
+
+SYNOPSIS
+        use Data::DisjointSet::Shared;
+
+        # a universe of 1000 elements (0 .. 999), anonymous shared mapping
+        my $d = Data::DisjointSet::Shared->new(undef, 1000);
+
+        $d->union(0, 1);          # merge the sets containing 0 and 1
+        $d->union(1, 2);          # 0, 1, 2 are now one set
+        $d->merge(3, 4);          # merge is an alias for union
+
+        $d->connected(0, 2);      # true  -- same set
+        $d->same(0, 3);           # false -- 'same' is an alias for connected
+        $d->find(2);              # canonical representative (root) of 2's set
+        $d->set_size(0);          # number of elements in 0's set (3)
+
+        $d->num_sets;             # how many disjoint sets remain
+        $d->capacity;             # the fixed element count (1000)
+
+        # union many pairs in a single lock acquisition (flat [a0,b0,a1,b1,...])
+        my $merged = $d->union_many([ 5,6, 6,7, 8,9 ]);   # returns how many merged
+
+        $d->reset;                # back to all singletons (num_sets == capacity)
+
+        # share across processes via a backing file
+        my $shared = Data::DisjointSet::Shared->new("/tmp/dsu.bin", 1000);
+
+DESCRIPTION
+    A union-find (disjoint-set) structure in shared memory. It maintains a
+    partition of a fixed universe of N integer elements (numbered "0 ..
+    N-1") into disjoint sets. The three core operations are:
+
+    *   union(a, b) -- merge the set containing "a" with the set containing
+        "b" into a single set.
+
+    *   find(x) -- return the *canonical representative* (the root) of the
+        set containing "x". Two elements are in the same set if and only if
+        they have the same root.
+
+    *   connected(a, b) -- test whether "a" and "b" are currently in the
+        same set.
+
+    The structure uses path compression (path halving on "find") together
+    with union by size (the larger-sized root always becomes the parent),
+    which gives near-constant amortized time per operation (the
+    inverse-Ackermann bound). Each element is one "parent" slot and one
+    "size" slot, both 32-bit, so the payload is "8 * N" bytes regardless of
+    how many unions are performed; the mapping also carries a fixed ~16 KB
+    cross-process reader table, so the "mmap_size" stat reports the true
+    total.
+
+    Because the "parent"/"size" arrays live in a shared mapping, several
+    processes share one structure: any process that opens the same backing
+    file, inherits the anonymous mapping across "fork", or reopens a passed
+    memfd, sees the others' unions and contributes its own. A
+    write-preferring futex rwlock with dead-process recovery guards every
+    mutation, so unions from many processes serialize cleanly and the final
+    partition is well defined.
+
+    IMPORTANT: "find", "connected" and "set_size" perform path compression
+    -- they mutate the structure to keep future queries fast -- and
+    therefore acquire the write lock. They are *not* read-only operations.
+    Only "num_sets" and "capacity" are cheap reads ("capacity" is lock-free;
+    it is immutable after construction).
+
+    There is no operation that unions one whole structure into another. A
+    disjoint-set is a partition of one fixed universe; combining it with a
+    separate structure is not meaningful. To combine elements, use "union"
+    or "union_many" within a single structure. Linux-only. Requires 64-bit
+    Perl.
+
+METHODS
+  Constructors
+        my $d = Data::DisjointSet::Shared->new($path, $n);
+        my $d = Data::DisjointSet::Shared->new(undef, $n);          # anonymous
+        my $d = Data::DisjointSet::Shared->new_memfd($name, $n);
+        my $d = Data::DisjointSet::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" or omitted for an anonymous mapping).
+    $n is the number of elements: the universe is "0 .. $n-1". It must be
+    ">= 1" and "<= 2**31"; "new" and "new_memfd" croak if $n is out of
+    range. A freshly created structure starts with every element in its own
+    singleton set, so "num_sets == $n" and "set_size($i) == 1" for every $i.
+
+    When reopening an existing file or memfd, the stored "n" wins and the
+    existing partition is preserved; the $n you pass to "new" on a reopen is
+    only used when the file is brand new. "new_memfd" creates a Linux memfd
+    (transferable via its "memfd" descriptor); "new_from_fd" reopens one in
+    another process.
+
+  Union and query
+        my $merged = $d->union($a, $b);      # merge; 1 if newly merged, 0 if already together
+        my $merged = $d->merge($a, $b);      # alias for union
+        my $root   = $d->find($x);           # canonical representative of $x's set
+        my $bool   = $d->connected($a, $b);  # true if $a and $b are in the same set
+        my $bool   = $d->same($a, $b);       # alias for connected
+        my $size   = $d->set_size($x);       # number of elements in $x's set
+
+    "union" merges the set containing $a with the set containing $b and
+    returns 1 if they were in different sets (a merge happened, and
+    "num_sets" decreased by one) or 0 if they were already in the same set
+    (nothing changed). "merge" is a short alias.
+
+    "find" returns the root of $x's set -- a stable representative that is
+    equal for all members of the same set. "connected" (aliased "same")
+    returns true when $a and $b share a root. "set_size" returns the number
+    of elements in $x's set.
+
+    All four of "find", "connected", "set_size" and "union" take the write
+    lock: "union" obviously mutates, and "find"/"connected"/"set_size"
+    mutate via path compression. Every index argument must be in "0 ..
+    capacity-1"; an out-of-range index croaks before any lock is taken (so a
+    caught croak never leaks a lock).
+
+  Bulk union
+        my $merged = $d->union_many(\@pairs);
+
+    "union_many" takes an array reference of even length holding a flat list
+    of pairs, "[a0, b0, a1, b1, ...]", and unions each consecutive "(a, b)"
+    pair under a single write lock. It returns the number of pairs that
+    actually caused a merge (i.e. the count of "union" calls that would have
+    returned 1).
+
+    The batch is atomic with respect to validation: every index is resolved
+    and range-checked before the lock is taken, so an odd-length array or
+    any out-of-range index croaks without performing "any" union and without
+    holding the lock. An empty array reference is a valid no-op that
+    performs zero unions.
+
+  Partition size
+        my $sets = $d->num_sets;             # current number of disjoint sets
+        my $sets = $d->sets;                 # alias for num_sets
+        my $n    = $d->capacity;             # the fixed element count (immutable)
+
+    "num_sets" (aliased "sets") is the current count of disjoint sets: it
+    starts equal to "capacity" and decreases by one on each successful
+    "union". "capacity" is the number of elements the structure was created
+    with and never changes. Both are read-only; "capacity" is lock-free.
+
+  Lifecycle
+        $d->reset;                           # back to all singletons
+        $d->clear;                           # alias for reset
+        $d->path; $d->memfd; $d->sync; $d->unlink;   # or Class->unlink($path)
+
+    "reset" (aliased "clear") returns every element to its own singleton
+    set, so "num_sets" becomes "capacity" again. "sync" flushes the mapping
+    to its backing store (a no-op for anonymous and memfd structures, which
+    have none); "unlink" removes the backing file (also callable as
+    "Class->unlink($path)"); "path" returns the backing path ("undef" for
+    anonymous, memfd, or fd-reopened structures) and "memfd" the backing
+    descriptor -- the memfd of a "new_memfd" structure or the dup'd fd of a
+    "new_from_fd" structure, and -1 for file-backed or anonymous structures.
+
+STATS
+    stats() returns a hashref describing the structure:
+
+    *   "capacity" -- the fixed number of elements ("0 .. capacity-1").
+
+    *   "sets" -- the current number of disjoint sets ("num_sets").
+
+    *   "ops" -- running count of operations that took the write lock
+        ("union", "union_many", "find", "connected", "set_size", "reset").
+
+    *   "mmap_size" -- bytes of the shared mapping.
+
+SHARING ACROSS PROCESSES
+    The structure lives in a shared mapping, shared the same three ways as
+    the rest of the family: a backing file (every process calls "new($path,
+    $n)" on the same path), an anonymous mapping inherited across "fork", or
+    a memfd whose descriptor is passed to an unrelated process (over a UNIX
+    socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened with
+    new_from_fd($fd). Because the mapping is shared, every process unions
+    into and queries the same partition. All mutation is serialized by the
+    write lock, so the final partition is independent of how the processes
+    interleave.
+
+        # parent and children share one disjoint-set with no coordination
+        my $d = Data::DisjointSet::Shared->new(undef, 100);   # before fork
+        unless (fork) { $d->union($_, $_ + 1) for 0 .. 49; exit }
+        wait;
+        print $d->num_sets, "\n";   # reflects the child's unions
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Because "union" updates a couple of words while
+    holding the lock, a crash leaves the partition consistent up to the last
+    completed "union". Limitation: PID reuse is not detected (very unlikely
+    in practice).
+
+SEE ALSO
+    Data::Histogram::Shared, Data::CountMinSketch::Shared,
+    Data::HyperLogLog::Shared, Data::BloomFilter::Shared,
+    Data::Intern::Shared, Data::SortedSet::Shared,
+    Data::SpatialHash::Shared, and the rest of the "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

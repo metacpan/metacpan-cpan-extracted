@@ -1,0 +1,59 @@
+{
+   "abstract" : "shared-memory sorted set (ZSET) for Linux",
+   "author" : [
+      "vividsnow"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-SortedSet-Shared",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::PPPort" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Intern::Shared" : "0.01",
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/perl5-data-sortedset-shared/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/perl5-data-sortedset-shared.git",
+         "web" : "https://github.com/vividsnow/perl5-data-sortedset-shared"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

@@ -104,6 +104,34 @@ authentication method.
 String of the private RSA key file when using the C<private_key_jwt> client
 authentication method.
 
+=head2 tls_client_cert_file
+
+Path to the PEM-encoded client certificate to use for mutual TLS (mTLS) client authentication.
+
+This option is used only when C<client_auth_method> is set to C<tls_client_auth>.
+
+The certificate must correspond to the private key configured with C<tls_client_key_file>.
+
+=head2 tls_client_key_file
+
+Path to the PEM-encoded private key associated with the client certificate specified
+by C<tls_client_cert_file>.
+
+This option is used only when C<client_auth_method> is set to C<tls_client_auth>.
+
+If the private key is encrypted, specify its passphrase using C<tls_client_key_passphrase>.
+
+=head2 tls_client_key_passphrase
+
+Passphrase used to decrypt the private key specified by C<tls_client_key_file>.
+
+This option is only required when the private key is encrypted.
+
+=head2 tls_ca_file
+
+Path to a PEM-encoded CA certificate bundle used to verify the TLS certificate
+presented by the OpenID Provider during mutual TLS authentication.
+
 =head2 provider."provider".audience
 
 Specifies the provider for whom the access token is intended.
@@ -434,10 +462,6 @@ is generated and sent in the POST body.
 The private key can be defined with the C<private_key> attribute of the L<OIDC::Client>
 object instance or with one of the following configuration entries :
 
-=item none
-
-The Client does not authenticate itself.
-
 =over
 
 =item private_jwk_file
@@ -449,6 +473,15 @@ The Client does not authenticate itself.
 =item private_key
 
 =back
+
+=item tls_client_auth
+
+Mutual TLS (mTLS) client authentication using an X.509 certificate during
+the TLS handshake itself.
+
+=item none
+
+The Client does not authenticate itself.
 
 =back
 

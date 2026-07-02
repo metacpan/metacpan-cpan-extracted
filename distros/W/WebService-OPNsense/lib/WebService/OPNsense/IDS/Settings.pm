@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IDS::Settings;
-$WebService::OPNsense::IDS::Settings::VERSION = '0.002';
+$WebService::OPNsense::IDS::Settings::VERSION = '0.003';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -260,7 +260,7 @@ WebService::OPNsense::IDS::Settings - IDS settings controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

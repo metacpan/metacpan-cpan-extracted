@@ -6,7 +6,7 @@ use namespace::autoclean;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 use Carp qw(croak);
-use List::MoreUtils qw(duplicates);
+use List::MoreUtils qw(duplicates uniq any);
 
 =encoding utf8
 
@@ -42,6 +42,10 @@ sub _check_configuration ($self) {
     private_jwk                        => { isa => 'HashRef', optional => 1 },
     private_key_file                   => { isa => 'Str', optional => 1 },
     private_key                        => { isa => 'Str', optional => 1 },
+    tls_client_key_file                => { isa => 'Str', optional => 1 },
+    tls_client_key_passphrase          => { isa => 'Str', optional => 1 },
+    tls_client_cert_file               => { isa => 'Str', optional => 1 },
+    tls_ca_file                        => { isa => 'Str', optional => 1 },
     audience                           => { isa => 'Str', optional => 1 },
     role_prefix                        => { isa => 'Str', optional => 1 },
     well_known_url                     => { isa => 'Str', optional => 1 },
@@ -84,6 +88,27 @@ sub _check_configuration ($self) {
     mocked_access_token                => { isa => 'HashRef', optional => 1 },
     mocked_userinfo                    => { isa => 'HashRef', optional => 1 },
   );
+}
+
+
+sub _check_client_auth_configuration ($self) {
+  my @auth_methods = uniq($self->token_endpoint_auth_method,
+                          $self->introspection_endpoint_auth_method);
+
+  if (any { $_ eq 'tls_client_auth' } @auth_methods) {
+    unless ($self->tls_client_cert_file && $self->tls_client_key_file) {
+      croak("OIDC: 'tls_client_cert_file' and 'tls_client_key_file' attributes "
+            . "are required when tls_client_auth method is used");
+    }
+  }
+
+  if (any { $_ eq 'private_key_jwt' } @auth_methods) {
+    $self->private_key;
+  }
+
+  # client_secret_* methods : we can't check the presence of the secret here because a Resource Server
+  # doesn't need any secret to verify an access token (without introspection).
+  # An exception is thrown when attempting to access the 'secret' attribute if it is missing.
 }
 
 

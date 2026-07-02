@@ -2,7 +2,7 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::HashFS 1.09
+class Archive::SCS::HashFS 1.10
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';
@@ -222,68 +222,64 @@ method entries () {
 sub create_file ($pathname, $scs) {
   $scs isa Archive::SCS or die;
 
-  # This subroutine is designed for internal testing. It may or may not
-  # produce files that are compatible with SCS. All entry contents are
-  # loaded into memory.
-
   my (@entries, %entries);
   push @entries, map { cityhash64 $_ } $scs->list_dirs, $scs->list_files;
   push @entries, map { cityhash64_hex $_ } $scs->list_orphans;
   push @entries, cityhash64 '' if eval { $scs->read_entry(''); 1 };
   @entries = sort @entries;
-  $entries{$_} = {
-    data => $scs->read_entry(cityhash64_as_hex $_),
-    flags => 0,
-  } for @entries;
 
-  # Serialize directory listings
-  do {
-    $entries{$_}->{flags} |= 0x1;
-    $entries{$_}->{data} = join "\n",
-      $entries{$_}->{data}->files,
-      map { "*$_" } $entries{$_}->{data}->dirs;
-  } for grep {
-    $entries{$_}->{data} isa Archive::SCS::DirIndex
-  } keys %entries;
+  my $start = 0x40;
+  my $offset = $start + @entries * 0x20;
+
+  my $fh = Path::Tiny->new($pathname)->openw_raw;
+  print $fh "\0" x $offset;
 
   my %opts2 = ( -CRC32 => 1, -WindowBits => 15, -Level => 9, -AppendOutput => 1 );
   my $zlib_d = Compress::Raw::Zlib::Deflate->new(%opts2) or die;
 
-  my $offset = 0;
   for my $hash (@entries) {
+    $entries{$hash}->{flags} = 0;
+    my $data = $scs->read_entry(cityhash64_as_hex $hash);
+
+    # Serialize directory listings
+    if ($data isa Archive::SCS::DirIndex) {
+      $entries{$hash}->{flags} = 0x1;
+      $data = join "\n", $data->files, map { "*$_" } $data->dirs;
+    }
 
     # Compress entry contents
-    $zlib_d->deflate( \($entries{$hash}->{data}), \(my $compressed = '') );
+    $zlib_d->deflate( \$data, \(my $compressed = '') );
     $zlib_d->flush( \$compressed );
     $entries{$hash}->{crc} = $zlib_d->crc32;
     $entries{$hash}->{size} = $zlib_d->total_in;
     $zlib_d->deflateReset;
     if (length $compressed < $entries{$hash}->{size}) {
-      $entries{$hash}->{data} = $compressed;
+      $data = $compressed;
       $entries{$hash}->{flags} |= 0x2;
     }
 
     $entries{$hash}->{offset} = $offset;
-    $offset += length $entries{$hash}->{data};
+    $entries{$hash}->{zsize} = length $data;
+    $offset += length $data;
+
+    print $fh $data;
   }
 
-  my $fh = Path::Tiny->new($pathname)->openw_raw;
+  seek $fh, 0, SEEK_SET or croak "$pathname: $!";
   print $fh pack 'A4 vv A4 VV',
-    $MAGIC, 1, 0, 'CITY', (scalar @entries), my $start = 0x40;
-  print $fh "\0" x ($start - 0x14);
+    $MAGIC, 1, 0, 'CITY', (scalar @entries), $start;
+  seek $fh, $start, SEEK_SET or croak "$pathname: $!";
 
-  $start += @entries * 0x20;
   for my $hash (@entries) {
     my $entry = $entries{$hash};
     print $fh pack '(QQLLLL)<',
       cityhash64_as_int $hash,
-      $start + $entry->{offset},
+      $entry->{offset},
       $entry->{flags},
       $entry->{crc},
       $entry->{size},
-      length $entry->{data};
+      $entry->{zsize};
   }
-  print $fh $_ for map { $entries{$_}->{data} } @entries;
 }
 
 1;
@@ -310,7 +306,7 @@ Represents an SCS archive file encoded in HashFS version 1
 (basically 1.49 and earlier).
 
 Hash values used with this module must be in the internal format
-(currently, an 8-byte scalar PV in network byte order).
+(currently, a 16-byte hex scalar in network byte order).
 
 =head1 METHODS
 
@@ -392,7 +388,7 @@ L<nautofon|https://github.com/nautofon>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2025 by nautofon.
+This software is copyright (c) 2026 by nautofon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

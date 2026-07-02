@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Dnsmasq::Leases;
-$WebService::OPNsense::Dnsmasq::Leases::VERSION = '0.002';
+$WebService::OPNsense::Dnsmasq::Leases::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -36,7 +36,7 @@ WebService::OPNsense::Dnsmasq::Leases - Dnsmasq leases controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

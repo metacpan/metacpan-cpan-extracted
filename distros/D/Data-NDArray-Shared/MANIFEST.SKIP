@@ -1,0 +1,16 @@
+^\.git/
+^\.github/
+^\.superpowers/
+\bblib/
+\bpm_to_blib$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^MANIFEST\.bak$
+(^|/)\.gitignore$
+^Shared\.c$
+\.o$
+\.bs$
+^ppport\.h$
+^[^/]+\.tar\.gz$
+~$

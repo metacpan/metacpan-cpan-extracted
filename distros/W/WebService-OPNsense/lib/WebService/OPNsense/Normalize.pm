@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Normalize;
-$WebService::OPNsense::Normalize::VERSION = '0.002';
+$WebService::OPNsense::Normalize::VERSION = '0.003';
 use Carp            qw( croak );
 use Exporter::Shiny qw( normalize_ip optional_segment validate_uuid );
 use Scalar::Util    qw( blessed );
@@ -60,7 +60,7 @@ WebService::OPNsense::Normalize - Normalization and validation utilities
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -23,8 +23,8 @@ my %options = (
     resources    => {
       repository   => {
         type         => 'git',
-        url          => 'https://github.com/sisyphus/math-flt.git',
-        web          => 'https://github.com/sisyphus/math-flt',
+        url          => 'https://github.com/sisyphus/math-float32.git',
+        web          => 'https://github.com/sisyphus/math-float32',
       },
     },
   },

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Object;
-$WebService::OPNsense::Object::VERSION = '0.002';
+$WebService::OPNsense::Object::VERSION = '0.003';
 use Moo;
 use Ref::Util qw( is_plain_hashref );
 use namespace::clean;
@@ -52,7 +52,7 @@ WebService::OPNsense::Object - Base result-object class for OPNsense API respons
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

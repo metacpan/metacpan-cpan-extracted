@@ -4,7 +4,7 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 4;
+use Test::More tests => 5;
 BEGIN { use_ok('Tk::DocumentTree') };
 use File::Spec;
 
@@ -12,11 +12,11 @@ use File::Spec;
 # applyGtkSettings;
 
 my @files = (
-	'Untitled',
 	't/Tk-DocumentTree.t',
 	'Makefile.PL',
 	'Changes',
 	'lib/Tk/DocumentTree.pm',
+	'Untitled',
 );
 
 createapp;
@@ -26,15 +26,6 @@ if (defined $app) {
 	$doctree = $app->DocumentTree(
 	)->pack(-expand => 1, -fill => 'both');
 
-	for (@files) {
-		my $name = $_;
-		if (-e $name) {
-			$name = File::Spec->rel2abs($_);
-			$doctree->entryAdd($name);
-		} else {
-			$doctree->entryAdd($name);
-		}
-	}
 	$app->Frame->pack;
 	$app->Button(
 		-text => 'Modified',
@@ -65,10 +56,28 @@ if (defined $app) {
 		-text => 'Select',
 		-command => ['entrySelect', $doctree, $sfile],
 	)->pack(-side => 'left');
+	$app->Button(
+		-text => 'Refresh',
+		-command => ['refresh', $doctree],
+	)->pack(-side => 'left');
 }
 
 @tests = (
-	[sub {  return defined $doctree }, '1', 'Can create']
+	[sub { return defined $doctree }, '1', 'Can create'],
+	[sub {
+		for (@files) {
+			my $name = $_;
+#			print "adding $name\n";
+			if (-e $name) {
+				$name = File::Spec->rel2abs($_);
+				$doctree->entryAdd($name);
+			} else {
+				$doctree->entryAdd($name);
+			}
+		}
+		return 1 
+	}, '1', 'Adding entries'],
+#	[sub { pause(300); $doctree->refresh; return 1 }, '1', 'refresh'],
 );
 
 starttesting;

@@ -5,7 +5,7 @@ use warnings;
 use vars qw($VERSION);
 use Convert::Color;
 
-$VERSION =  0.10;
+$VERSION =  0.11;
 
 sub new {
 	my ($class, $lb) = @_;
@@ -119,14 +119,7 @@ static char * select_draft_xpm[] = {
 	for (1 .. $width - 2) { $xpm = "$xpm."}
 	$xpm = "$xpm$end";
 	
-	my $pixmap = $lb->Pixmap(-data => $xpm);
-	my $c = $lb->Subwidget('Canvas');
-	my $image = $c->createImage($x1, $y1,
-		-image => $pixmap,
-		-anchor => 'nw',
-		-tags => ['sel'],
-	);
-	return $image
+	return $lb->Pixmap(-data => $xpm);
 }
 
 1;

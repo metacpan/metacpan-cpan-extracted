@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::CaptivePortal::Session;
-$WebService::OPNsense::CaptivePortal::Session::VERSION = '0.002';
+$WebService::OPNsense::CaptivePortal::Session::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -60,7 +60,7 @@ WebService::OPNsense::CaptivePortal::Session - Captive portal session controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

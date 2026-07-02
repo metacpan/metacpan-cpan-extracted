@@ -1,5 +1,9 @@
 Revision history for Config-INI-RefVars
 
+1.03    2026/07/01
+
+    - Added function 'catpath'.
+
 1.02    2026/07/01
 
     - Completed CONTRIBUTING.md.
@@ -18,7 +22,7 @@ Revision history for Config-INI-RefVars
     - Added more built-in function.
     - Added constructor argument 'builtins' for to register additional built-in functions.
     - Allow line continuation via \=, :\= etc.
-    - Allow inculde files via '=include FILE'.
+    - Allow include files via '=include FILE'.
     - Added variables '=rootdir' and '=tmpdir'.
 
 0.24    2026/05/09

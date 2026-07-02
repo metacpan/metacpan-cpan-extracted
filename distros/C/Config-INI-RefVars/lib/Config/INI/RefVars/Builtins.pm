@@ -5,17 +5,18 @@ use 5.010;
 use strict;
 use warnings;
 
-use File::Spec::Functions qw(catdir catfile);
+use File::Spec::Functions;# qw(catdir catfile);
 use File::Basename qw(dirname basename);
 
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 
 sub default_dispatch_table {
   return {
-          catdir   => \&catdir,
-          catfile  => \&catfile,
+          catdir   => \&File::Spec::Functions::catdir,
+          catfile  => \&File::Spec::Functions::catfile,
+          catpath  => \&_catpath,
           ignore   => \&_ignore,
           concat   => \&_concat,
           join     => \&_join,
@@ -32,6 +33,11 @@ sub default_dispatch_table {
           dirname  => \&dirname,
           basename => \&basename,
          };
+}
+
+sub _catpath {
+  die("catpath: expected 3 arguments\n") unless @_ == 3;
+  return File::Spec::Functions::catpath(@_);
 }
 
 
@@ -200,7 +206,7 @@ Config::INI::RefVars::Builtins - Built-in functions for Config::INI::RefVars
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -257,6 +263,13 @@ Equivalent to:
 
   File::Spec::Functions::catfile(...)
 
+=head2 catpath
+
+  $(=& catpath,arg1,arg2,arg3)
+
+Equivalent to:
+
+  File::Spec::Functions::catpath(...)
 
 =head2 ignore
 

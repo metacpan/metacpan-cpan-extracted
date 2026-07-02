@@ -1,0 +1,321 @@
+package DBIx::QuickORM::Util;
+use strict;
+use warnings;
+
+our $VERSION = '0.000027';
+
+use Data::Dumper;
+use Scalar::Util qw/blessed/;
+use Carp qw/croak confess/;
+
+use Module::Pluggable sub_name => '_find_mods';
+BEGIN {
+    *_find_paths = \&search_path;
+    no strict 'refs';
+    delete ${\%{__PACKAGE__ . "\::"}}{search_path};
+}
+
+use Importer Importer => 'import';
+
+our @EXPORT_OK = qw{
+    load_class
+    find_modules
+    merge_hash_of_objs
+    clone_hash_of_objs
+    column_key
+    debug
+    parse_conflate_args
+    mask
+    unmask
+    masked
+};
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Util - Internal utility functions for DBIx::QuickORM.
+
+=head1 DESCRIPTION
+
+A grab-bag of utility functions used internally by L<DBIx::QuickORM>.
+Nothing is exported by default; request the functions you need by name.
+
+=head1 SYNOPSIS
+
+    use DBIx::QuickORM::Util qw/load_class column_key/;
+
+    my $class = load_class('Some::Class') or die "Error: $@";
+    my $key   = column_key(@column_names);
+
+=cut
+
+sub column_key { return join ', ' => sort @_ }
+
+sub load_class {
+    my ($class, $prefix) = @_;
+
+    if ($prefix) {
+        $class = "${prefix}::${class}" unless $class =~ s/^\+// or $class =~ m/^$prefix\b/;
+    }
+
+    my $file = $class;
+    $file =~ s{::}{/}g;
+    $file .= ".pm";
+
+    eval { require $file; $class };
+}
+
+sub find_modules {
+    my (@prefixes) = @_;
+
+    __PACKAGE__->_find_paths(new => @prefixes);
+    return __PACKAGE__->_find_mods();
+}
+
+sub merge_hash_of_objs {
+    my ($hash_a, $hash_b, $merge_params) = @_;
+
+    $hash_a      //= {};
+    $hash_b      //= {};
+    $merge_params //= {};
+
+    my %out;
+    my %seen;
+
+    for my $name (keys %$hash_a, keys %$hash_b) {
+        next if $seen{$name}++;
+
+        my $a = $hash_a->{$name};
+        my $b = $hash_b->{$name};
+
+        if ($a && $b) {
+            my $r = ref($a);
+            my $bl = blessed($a);
+
+            if    ($bl)           { $out{$name} = $a->merge($b, %$merge_params) }
+            elsif ($r eq 'HASH')  { $out{$name} = {%$a, %$b} }
+            elsif ($r eq 'ARRAY') { $out{$name} = [@$b] }                           # Second array wins
+            else                  { $out{$name} = $b }                              # Second value wins
+
+            next;
+        }
+
+        my $v  = $a // $b;
+        my $r  = ref($v);
+        my $bl = blessed($v);
+        if    ($bl)           { $out{$name} = $v->clone(%$merge_params) }
+        elsif ($r eq 'ARRAY') { $out{$name} = [@$v] }
+        elsif ($r eq 'HASH')  { $out{$name} = clone_hash_of_objs($v, $merge_params) }
+        else                  { $out{$name} = $v }
+    }
+
+    return \%out;
+}
+
+sub clone_hash_of_objs {
+    my ($hash, $clone_params) = @_;
+
+    croak "Need a hashref, got '$hash'" unless ref($hash) eq 'HASH';
+
+    my %out;
+    my %seen;
+
+    for my $name (keys %$hash) {
+        my $val = $hash->{$name} or next;
+        if (blessed($val)) {
+            $out{$name} = $hash->{$name}->clone(%$clone_params);
+            next;
+        }
+
+        my $r = ref($val);
+        if ($r eq 'ARRAY') {
+            $out{$name} = [@$val];
+        }
+        elsif ($r eq 'HASH') {
+            $out{$name} = clone_hash_of_objs($val, $clone_params);
+        }
+    }
+
+    return \%out;
+}
+
+
+sub debug {
+    local $Data::Dumper::Sortkeys      = 1;
+    local $Data::Dumper::Terse         = 1;
+    local $Data::Dumper::Quotekeys     = 0;
+    local $Data::Dumper::Deepcopy      = 1;
+    local $Data::Dumper::Trailingcomma = 1;
+    my $out = Dumper(@_);
+    return $out if defined wantarray;
+    print $out;
+}
+
+sub masked { my ($it) = @_; blessed($it) && $it->isa('DBIx::QuickORM::Util::Mask') ? 1 : 0 }
+
+sub unmask { my ($it) = @_; masked($it) ? $it->qorm_unmask : $it }
+
+sub mask {
+    require DBIx::QuickORM::Util::Mask;
+    return DBIx::QuickORM::Util::Mask->new(@_);
+}
+
+sub parse_conflate_args {
+    my ($proto, %params);
+    $proto = shift if @_ % 2;
+
+    if (!blessed($_[0]) && eval { $_[0]->does('DBIx::QuickORM::Role::Type') ? 1 : 0 }) {
+        (@params{qw/class value/}) = (shift(@_), shift(@_));
+        %params = (%params, @_);
+    }
+    else {
+        %params = @_;
+    }
+
+    if ($proto) {
+        if (blessed($proto)) {
+            $params{value} //= $proto;
+        }
+        else {
+            my $ref = ref($proto);
+            my $is_class;
+            if ($ref) {
+                $is_class = 0;
+            }
+            else {
+                my $file = "$proto.pm";
+                $file =~ s{::}{/}g;
+                $is_class = $INC{$file} ? 1 : 0;
+            }
+
+            if ($is_class) {
+                $params{class} //= $proto;
+            }
+            else {
+                $params{value} //= $proto;
+            }
+        }
+    }
+
+    confess "'value' argument must be present unless called on an instance of a type class" unless exists $params{value};
+
+    $params{class} //= blessed($params{value}) // caller;
+
+    return \%params if $params{affinity};
+
+    my $source  = $params{source}  // return \%params;
+    my $dialect = $params{dialect} // return \%params;
+    my $field   = $params{field}   // return \%params;
+    $params{affinity} = $source->field_affinity($field, $dialect);
+
+    return \%params;
+}
+
+
+1;
+
+__END__
+
+=head1 EXPORTS
+
+=over 4
+
+=item $class_or_false = load_class($class)
+
+=item $class_or_false = load_class($class, $prefix)
+
+Loads the class, optionally prefixing it with C<$prefix> (a leading C<+>
+on C<$class> suppresses the prefix). On success it returns the class
+name. On failure it returns false and C<$@> is set to the error.
+
+=item $string = column_key(@column_names)
+
+Returns a stable key string for a set of column names by sorting them
+and joining with C<', '>. The same set of names always yields the same
+key regardless of input order.
+
+=item @modules = find_modules(@prefixes)
+
+Returns the list of installed modules found under the given namespace
+prefixes.
+
+=item $hashref = merge_hash_of_objs($hash_a, $hash_b, \%merge_params)
+
+Merges two hashes whose values may be objects, array refs, hash refs, or
+plain scalars. Blessed values are merged via their C<merge> method;
+otherwise the second hash's value wins. C<\%merge_params> is passed
+through to C<merge>/C<clone>. Returns a new hash ref.
+
+=item $hashref = clone_hash_of_objs($hash, \%clone_params)
+
+Returns a deep clone of a hash whose values may be objects, array refs,
+or nested hash refs. Blessed values are cloned via their C<clone>
+method, receiving C<\%clone_params>.
+
+=item $string = debug(@args)
+
+=item debug(@args)
+
+Dumps its arguments using L<Data::Dumper> with sorted, terse output. In
+non-void context it returns the dump string; in void context it prints
+the dump.
+
+=item $params = parse_conflate_args(@args)
+
+=item $params = parse_conflate_args($proto, @args)
+
+Normalizes the flexible argument forms accepted by the type-conflation
+interface into a single hash ref. Resolves C<class>, C<value>, and
+C<affinity> from the supplied prototype and key/value arguments. Croaks
+unless a C<value> can be determined.
+
+=item $mask = mask(string => $str, generator => sub { ... }, mask_class => $class)
+
+Build a L<DBIx::QuickORM::Util::Mask> - a lazily-built wrapper that hides a
+heavy object from dumps and stack traces. See that module for details.
+
+=item $bool = masked($thing)
+
+True if C<$thing> is a mask.
+
+=item $obj = unmask($thing)
+
+Returns the wrapped object (building it if needed) for a mask, or C<$thing>
+unchanged otherwise.
+
+=back
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist7@gmail.comE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

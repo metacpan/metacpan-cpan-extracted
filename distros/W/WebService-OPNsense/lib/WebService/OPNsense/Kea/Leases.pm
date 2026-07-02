@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Kea::Leases;
-$WebService::OPNsense::Kea::Leases::VERSION = '0.002';
+$WebService::OPNsense::Kea::Leases::VERSION = '0.003';
 use Moo;
 use URI::Escape qw( uri_escape_utf8 );
 use namespace::clean;    # must be last
@@ -40,7 +40,7 @@ WebService::OPNsense::Kea::Leases - Kea leases controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -62,5 +62,12 @@ is( { parse_url( 'qemu+ext:///system?command=/opt/run-some-command%20my-arg' ) }
       query => { command => '/opt/run-some-command my-arg' } },
     '' );
 
+is( { parse_url( 'qemu+ext:///system?command=/opt/run-some-command&argv=my-arg&argv=arg2' ) },
+    { base => 'qemu+ext:///system', proxy => 'qemu:///system',  name => 'qemu:///system',
+      hypervisor => 'qemu', transport => 'ext', type => 'system',
+      query => { command => '/opt/run-some-command', argv => [ 'my-arg', 'arg2' ] }
+    },
+    '' );
+
 
 done_testing;

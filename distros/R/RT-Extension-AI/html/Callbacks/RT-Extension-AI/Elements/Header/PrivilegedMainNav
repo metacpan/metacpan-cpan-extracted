@@ -1,0 +1,12 @@
+<%init>
+return unless RT->Config->Get('RT_AI_Provider');
+
+my $search = Menu()->child('search') or return;
+my $tickets = $search->child('tickets') or return;
+
+$tickets->child(
+    'natural-language',
+    title => loc('Natural Language (AI)'),
+    path  => '/Search/Edit.html',
+);
+</%init>

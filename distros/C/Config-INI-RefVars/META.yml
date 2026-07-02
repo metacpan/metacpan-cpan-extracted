@@ -31,7 +31,7 @@ no_index:
 provides:
   Config::INI::RefVars:
     file: lib/Config/INI/RefVars.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Carp: '0'
   Config: '0'
@@ -45,7 +45,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/AAHAZRED/perl-Config-INI-RefVars.git
-version: '1.02'
+version: '1.03'
 x_bugtracker:
   web: https://github.com/AAHAZRED/perl-Config-INI-RefVars/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

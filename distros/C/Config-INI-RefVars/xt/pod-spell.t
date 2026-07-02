@@ -18,6 +18,7 @@ VMS
 TOCOPY
 tocopy
 concat
+catpath
 dirname
 DHCP
 

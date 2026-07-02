@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::KeyPairs;
-$WebService::OPNsense::IPsec::KeyPairs::VERSION = '0.002';
+$WebService::OPNsense::IPsec::KeyPairs::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -37,7 +37,7 @@ WebService::OPNsense::IPsec::KeyPairs - IPsec key pair controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

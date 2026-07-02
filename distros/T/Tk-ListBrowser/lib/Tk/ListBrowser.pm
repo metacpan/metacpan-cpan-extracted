@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -609,6 +609,7 @@ sub Populate {
 		for ($plusbmp, $minusbmp) {
 			$_->configure(@bmpopt)
 		};
+		$self->filterShow if $self->cget('-filterforce');
 	});
 	return $self
 }
@@ -1383,13 +1384,17 @@ sub delete {
 	my ($self, $name) = @_;
 	my $index = $self->index($name);
 	if (defined $index) {
-		my $del = $self->pool->delete($name);
+		my $del = $self->get($name);
+		my $noshow = $del->noshow;
 		$del->clear;
 		my @columns = $self->columnList;
 		for (@columns) {
 			$self->itemRemove($name, $_);
 		}
-		$self->refreshCheck($del, $index) if $self->cget('-autorefresh');
+		$self->pool->delete($name);
+		if ($self->cget('-autorefresh')) {
+			$self->refreshPurge($index) unless $noshow
+		}
 		return
 	}
 	croak "Entry '$name' not found"
@@ -1479,6 +1484,15 @@ sub filterFlip {
 	}
 }
 
+sub filterEscape {
+	my $self = shift;
+	my $e = $self->Subwidget('FilterEntry');
+	$e->reset;
+#	$e->filter;
+	$self->filterFlip;
+	$self->filterRefresh;
+}
+
 sub filterHide {
 	my $self = shift;
 	return if $self->cget('-nofilter');
@@ -1542,7 +1556,7 @@ sub filterShow {
 		$flag = '';
 		$self->Advertise('FilterEntry', $e);
 		$e->bind('<Control-f>', [$self, 'filterFlip']);
-		$e->bind('<Escape>', [$self, 'filterFlip']);
+		$e->bind('<Escape>', [$self, 'filterEscape']);
 	}
 	$e->reset if $flag;
 
@@ -2909,9 +2923,10 @@ sub OnConfigure {
 	}
 
 	#need to refresh if arrange is column or row
-	my $arrange = $self->cget('-arrange');
-	my %a = (qw/column 1 row 1/);
-	$self->refresh if exists $a{$arrange};
+	$self->refreshPurge;
+#	my $arrange = $self->cget('-arrange');
+#	my %a = (qw/column 1 row 1/);
+#	$self->refreshPurge if exists $a{$arrange};
 
 }
 
@@ -3119,6 +3134,8 @@ before the refresh starts.
 sub refreshPurge {
 	my ($self, $index, $nosave) = @_;
 
+	return if $self->pool->size eq 0;
+
 	$index = 0 unless defined $index;
 	my $pos = $self->refreshPos;
 	return if ($index > $pos) and $self->refreshLoopActive;
@@ -3131,10 +3148,12 @@ sub refreshPurge {
 	}
 
 	#clear from index
-	for ($index .. $self->indexLast) {
+	my $last = $self->indexLast;
+	for ($index .. $last) {
 		my $entry = $self->getIndex($_);
 		$entry->clear;
 	}
+	return if $index > $last;
 
 	my $handler = $self->handler;
 	my $entry = $self->getIndex($index);

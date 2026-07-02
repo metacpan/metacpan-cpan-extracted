@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Role::Settings;
-$WebService::OPNsense::Role::Settings::VERSION = '0.002';
+$WebService::OPNsense::Role::Settings::VERSION = '0.003';
 use Moo::Role;
 use namespace::clean;
 
@@ -38,7 +38,7 @@ WebService::OPNsense::Role::Settings - Role for settings get/set methods
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

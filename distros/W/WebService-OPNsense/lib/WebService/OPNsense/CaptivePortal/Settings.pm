@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::CaptivePortal::Settings;
-$WebService::OPNsense::CaptivePortal::Settings::VERSION = '0.002';
+$WebService::OPNsense::CaptivePortal::Settings::VERSION = '0.003';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -17,32 +17,9 @@ sub _api_path {
 
 with 'WebService::OPNsense::Role::Settings';
 
-sub search_zones {
-    my ( $self, %params ) = @_;
-    my $uri = $self->_path('searchZone');
-
-    return $self->client->get( $uri, \%params );
-}
-
-sub get_zone {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'getZone/{uuid}', uuid => $uuid );
-
-    return $self->client->get($uri);
-}
-
 sub add_zone {
     my ( $self, $zone_data ) = @_;
     my $uri = $self->_path('addZone');
-
-    return $self->client->post( $uri, $zone_data );
-}
-
-sub set_zone {
-    my ( $self, $uuid, $zone_data ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'setZone/{uuid}', uuid => $uuid );
 
     return $self->client->post( $uri, $zone_data );
 }
@@ -53,6 +30,29 @@ sub del_zone {
     my $uri = $self->_path( 'delZone/{uuid}', uuid => $uuid );
 
     return $self->client->post($uri);
+}
+
+sub get_zone {
+    my ( $self, $uuid ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'getZone/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
+}
+
+sub search_zones {
+    my ( $self, %params ) = @_;
+    my $uri = $self->_path('search_zones');
+
+    return $self->client->get( $uri, \%params );
+}
+
+sub set_zone {
+    my ( $self, $uuid, $zone_data ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'setZone/{uuid}', uuid => $uuid );
+
+    return $self->client->post( $uri, $zone_data );
 }
 
 sub toggle_zone {
@@ -79,7 +79,7 @@ WebService::OPNsense::CaptivePortal::Settings - Captive portal settings controll
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -93,41 +93,17 @@ Manages captive portal settings and zones.
 
 =head1 METHODS
 
-=head2 get_settings
-
-    my $settings = $cp_settings->get_settings;
-
-Returns captive portal settings.
-
-=head2 set_settings
-
-    my $result = $cp_settings->set_settings($settings_data);
-
-Updates captive portal settings.
-
-=head2 search_zones
-
-    my $zones = $cp_settings->search_zones(%params);
-
-Searches for captive portal zones.
-
-=head2 get_zone
-
-    my $zone = $cp_settings->get_zone($uuid);
-
-Returns a single zone by UUID.
-
 =head2 add_zone
 
     my $result = $cp_settings->add_zone($zone_data);
 
 Creates captive portal zone.
 
-=head2 set_zone
+=head2 client
 
-    my $result = $cp_settings->set_zone($uuid, $zone_data);
+    my $http_client = $cp_settings->client;
 
-Updates zone.
+Returns the underlying HTTP client object used for API requests.
 
 =head2 del_zone
 
@@ -135,17 +111,41 @@ Updates zone.
 
 Deletes a zone by UUID.
 
+=head2 get_settings
+
+    my $settings = $cp_settings->get_settings;
+
+Returns captive portal settings.
+
+=head2 get_zone
+
+    my $zone = $cp_settings->get_zone($uuid);
+
+Returns a single zone by UUID.
+
+=head2 search_zones
+
+    my $zones = $cp_settings->search_zones(%params);
+
+Searches for captive portal zones.
+
+=head2 set_settings
+
+    my $result = $cp_settings->set_settings($settings_data);
+
+Updates captive portal settings.
+
+=head2 set_zone
+
+    my $result = $cp_settings->set_zone($uuid, $zone_data);
+
+Updates zone.
+
 =head2 toggle_zone
 
     my $result = $cp_settings->toggle_zone($uuid, $enabled);
 
 Enables or disables a zone.
-
-=head2 client
-
-    my $http_client = $cp_settings->client;
-
-Returns the underlying HTTP client object used for API requests.
 
 =head1 SEE ALSO
 

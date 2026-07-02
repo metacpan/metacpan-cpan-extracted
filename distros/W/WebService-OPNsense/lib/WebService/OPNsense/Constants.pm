@@ -1,10 +1,10 @@
 #!/bin/false
-# ABSTRACT: Named constants for the OPNsense REST API -- safer and more maintainable than hardcoded strings
+# ABSTRACT: Named constants for the OPNsense REST API
 # PODNAME: WebService::OPNsense::Constants
 use strictures 2;
 
 package WebService::OPNsense::Constants;
-$WebService::OPNsense::Constants::VERSION = '0.002';
+$WebService::OPNsense::Constants::VERSION = '0.003';
 use Const::Fast qw( const );
 use parent      qw( Exporter::Tiny );
 
@@ -247,11 +247,11 @@ __END__
 
 =head1 NAME
 
-WebService::OPNsense::Constants - Named constants for the OPNsense REST API -- safer and more maintainable than hardcoded strings
+WebService::OPNsense::Constants - Named constants for the OPNsense REST API
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

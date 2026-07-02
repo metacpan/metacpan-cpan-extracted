@@ -1,5 +1,11 @@
 Changes for OIDC-Client distribution
 
+1.07 2026-07-01
+  - No Data::UUID instance attribute to prevent glibc double free / segmentation fault
+  - Added support for the 'tls_client_auth' method
+  - The client authentification configuration is checked at startup
+  - Added integration tests
+
 1.06 2025-12-23
   - Added support for the 'after_touching_session' callback (needed for Dancer2)
   - Claim mapping configuration : added the ability to walk down the data tree of a claim using the dot character

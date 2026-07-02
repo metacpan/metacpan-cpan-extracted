@@ -1,5 +1,26 @@
 Imager release history.  Older releases can be found in Changes.old
 
+Imager 1.032 - 1 July 2026
+============
+
+ - JPEG: fix a memory leak from reading a JPEG image with more than
+   one IPTC/APP13 block
+   CVE-2026-13708
+
+ - SGI: fix a buffer read over flow when reading a crafted RLE SGI
+   file.
+   CVE-2026-13705
+
+ - getscanline() with type float in list context would leak the
+   returned SVs.  Introduced in 1.013.
+
+ - TIFF: sizeproc could potentiallly ignore a seek error when finding
+   the current position (but then should fail later trying to restore
+   it.)  Revealed by a signed comparison warning.
+
+ - GIF: fix use of uninitialized values when logging introduced by the
+   CVE-2026-8454 fix.
+
 Imager 1.031 - 15 May 2026
 ============
 

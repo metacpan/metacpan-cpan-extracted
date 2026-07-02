@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Firewall::DNat;
-$WebService::OPNsense::Firewall::DNat::VERSION = '0.002';
+$WebService::OPNsense::Firewall::DNat::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -30,7 +30,7 @@ WebService::OPNsense::Firewall::DNat - Firewall port forward (DNAT) rule control
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ version 0.002
             protocol         => $PROTO_TCP,
             destination_net  => '203.0.113.1',
             destination_port => '80',
-            target           => '192.168.1.10',
+            target           => '192.0.2.10',
             local_port       => '80',
             enabled          => $OPN_ENABLED,
         },

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct a measured phrase of notes
 
-our $VERSION = '0.0109';
+our $VERSION = '0.0110';
 
 use v5.36;
 use Moo;
@@ -136,7 +136,7 @@ has voices => (
 
 has patch => (
     is      => 'ro',
-    isa     => sub { croak "$_[0] is not a valid patch" unless $_[0] =~ /^[0-9]$/ },
+    isa     => sub { croak "$_[0] is not a valid patch" unless $_[0] =~ /^[0-9]+$/ },
     default => sub { 0 },
 );
 
@@ -219,7 +219,7 @@ Music::VoicePhrase - Construct a measured phrase of notes
 
 =head1 VERSION
 
-version 0.0109
+version 0.0110
 
 =head1 SYNOPSIS
 

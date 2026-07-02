@@ -10,7 +10,7 @@ use Cwd qw(abs_path);
 use File::Spec::Functions qw(catdir catfile file_name_is_absolute splitpath);
 use Config::INI::RefVars::Builtins;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use constant DFLT_TOCOPY_SECTION => "__TOCOPY__";
 use constant FLD_KEY_PREFIX      => __PACKAGE__ . ' __ ';
@@ -860,7 +860,7 @@ Config::INI::RefVars - INI file reader with variable references and function cal
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -1690,7 +1690,7 @@ results (see example below).
 
 B<NOTE:>
 In some special cases, variables have different values in standard mode than in global mode.
-
+Example:
 
    section=$(=)
    x=GLOBAL

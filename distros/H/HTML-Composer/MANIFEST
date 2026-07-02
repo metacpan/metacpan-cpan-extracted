@@ -8,6 +8,7 @@ README.md
 cpanfile
 dist.ini
 examples/plack.pl
+examples/table.pl
 lib/HTML/Composer.pm
 lib/HTML/Composer/Unsafe.pm
 t/basic.t

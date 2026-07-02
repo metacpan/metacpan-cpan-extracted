@@ -3,19 +3,17 @@ TODO
 
 Some features we need or want, plus some neat ideas that may not be too feasible to implement.
 
- - The pre-receive hook ought to default to BLOCK any changes if not running through git-server correctly.
-
  - If proxy fails with the default Forwarding Agent, try each public key individually to see if any of them work any better. (-i PUB -o IdentitiesOnly=yes? Cache winning reader PUBs? Brick over reader PUB with known writer PUBs?).
 
- - Investigate new feature like proxy.readonly to be used as Read-Only remote sync, instead of the normal proxy.url Two-Way syncr. This can help with setting up a load balancing cluster of git servers, particularly when used for large deployment systems, which only need read-only access anyways. This can also help when trying to sync with remote repo with read-only access is all that is available, such as a simple public HTTP sytle git URL. Writes directly to the remote proxy.readonly will be synced to the local repo, but not vice versa, so writes to the local repo will not attempt to be pushed to the proxy.readonly remote.
-
- - Right now, if proxy.url detects remote [there] changes, then the local [here] repo is updated accordingly, even if connected with acl.readers or acl.deploy rights, and no {operation} "push" webhook is fired off and the push-notification is not triggered. This is definitely bad because the git-deploy clients will not be notified right away, as expected, so they will need to wait upto --max-delay seconds. This may also pose a security problem as these updates can bypass hooks and triggers. And this should be BLOCKED if {remote_user} does not have acl.writers permissions. If {remote_user} does have acl.writers permissions, then an appropriate {operation} "push" webhook, (with {refs} including all commits updated), ought to be fired off, either instead of or in addition to the original "push" or "pull" {operation} that triggered this Proxy Sync. And the push-notification should be triggered. Then local [here] proxy sync changes can behave more like any normal "push" without any cheater bypassing. Maybe this can be implemented with hooks/pre-receive to verify REMOTE_USER has acl.writers. Will pre-receive be hooked properly for these imported changes pushed from the .workingdir? Or maybe hooks/proxy can snapshot the REMOTE_USER permissions prior to jumping into the .workingdir, then BLOCK local changes if REMOTE_USER doesn't have acl.writers permissions. Or maybe both hooks/pre-receive and hooks/proxy? I'm hoping to avoid having to double SSH back to ssh://$USER@$SERVER_ADDR/repo using the SSH_AUTH_SOCK with "skip_proxy" to avoid infinite recursion, but maybe that's another way to implement it to really ensure all the "push" hooks are caught appropriately.
+ - Investigate new feature like proxy.readonly to be used as Read-Only remote sync, instead of the normal proxy.url Two-Way syncr. This can help with setting up a load balancing cluster of git servers, particularly when used for large deployment systems, which only need read-only access anyways. This can also help when trying to sync with remote repo where read-only access is all that is available, such as a simple public HTTP sytle git URL. Writes directly to the remote proxy.readonly will be synced to the local repo, but not vice versa, so writes to the local repo will not attempt to be pushed to the proxy.readonly remote.
 
  - Many SSH Servers are now defaulting NOT to AcceptEnv. So in case there isn't sufficient support, the SSH Client will fail with SendEnv. So consider using another transport mechanism instead of relying so much on XMODIFIERS. (On git >= 2.18, the GIT_USER_AGENT variable is provided via Git Protocol V2 and should be more reliable than XMODIFIERS for git-client or git-deploy to use, but I'm not sure how much information could even fit in there.)
 
  - Instead of relying on SendEnv, git-verify should also use another mechanism to test the configuration. (Maybe another special commandline arg instead of relying on SendEnv?)
 
  - The {client_git_version} does not include the actual git client version during most read operations if SSHD on the Git Server Host does not have "AcceptEnv GIT_PROTOCOL" enabled.
+
+ - The {client_git_version} does not include the actual git client version when an empty "git push" is run without actually pushing any changes.
 
  - Add [log.verbosity] 0 or 1 or 2 feature to control level of messaging spewage to the git client.
 
@@ -59,7 +57,6 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - [webhook] features for callback:
    * Allow for WhiteList or BlackList filters to trigger webhook or ignore webhooks under certain conditions:
-     : When a certain operation is performed, i.e., clone|pull|push
      : When specified branches are involved
      : When certain REMOTE_USER is involved
      : When coming from a specific IP or Network CIDR

@@ -1,5 +1,20 @@
 -----
 
+12.5.1    2026-07-01
+   [Added]
+       * Support for the 'argv' URI query parameter for the 'ext' transport
+   [Fixed]
+       * Version number in CHANGES for 12.5.0 (was accidentally 12.0.5)
+
+12.5.0    2026-07-01
+   [Added]
+       * (De)serializers: deserialize_domain_announce_interface_args,
+         serialize_domain_announce_interface_args
+       * Constants PROC_DOMAIN_ANNOUNCE_INTERFACE,
+         DOMAIN_ANNOUNCE_INTERFACE_PARAMS_MAX
+   [Changed]
+       * Updated to libvirt tag v12.5.0
+
 12.4.0    2026-06-01
    [Added]
        * Domain events PROC_DOMAIN_EVENT_CALLBACK_CHANNEL_LIFECYCLE

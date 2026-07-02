@@ -146,7 +146,7 @@ skip_object = 1
 [Subroutines::ProhibitQualifiedSubDeclarations]
 [Subroutines::ProhibitReturnSort]
 [Subroutines::ProhibitUnusedPrivateSubroutines]
-allow = _api_path _path
+allow = _api_path _path _uri_authority
 [Subroutines::ProtectPrivateSubs]
 [Subroutines::RequireArgUnpacking]
 [Subroutines::RequireFinalReturn]

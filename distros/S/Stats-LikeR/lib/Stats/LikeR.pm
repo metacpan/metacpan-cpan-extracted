@@ -4,14 +4,14 @@ require 5.010;
 use strict;
 use feature 'say';
 package Stats::LikeR;
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 require XSLoader;
 use warnings FATAL => 'all';
 use autodie ':default';
 use Exporter 'import';
 use Scalar::Util 'looks_like_number';
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(add_data aoh2hoa aoh2hoh aov assign cfilter chisq_test col col2col cor cor_test cov csort dnorm dropna filter fisher_test glm group_by hoa2aoh hoh2hoa hist intersection kruskal_test ks_test ljoin lm matrix max mean median min mode oneway_test p_adjust power_t_test predict prcomp quantile rbinom read_table rnorm runif sample scale sd seq shapiro_test sum summary t_test transpose uniq vals value_counts var var_test view wilcox_test write_table);
+our @EXPORT_OK = qw(add_data aoh2hoa aoh2hoh aov assign binom_test cfilter chisq_test chunk col col2col cor cor_test cov csort dnorm dropna filter fisher_test get_union get_unique glm group_by hoa2aoh hoa2hoh hoh2hoa hist intersection kruskal_test ks_test Lonly ljoin lm matrix max mean median min mode oneway_test p_adjust power_t_test predict prcomp ptukey qcut qtukey quantile Ronly rbinom read_table rnorm runif sample scale sd seq shapiro_test sum summary t_test transpose TukeyHSD uniq vals value_counts var var_test view wilcox_test write_table);
 our @EXPORT = @EXPORT_OK;
 
 sub aoh2hoh {
@@ -127,6 +127,41 @@ sub assign {
 		}
 	}
 	die 'assign: data frame must be an arrayref (AoH) or hashref (HoA/HoH)';
+}
+
+sub chunk {
+	my ($aref, %opt) = @_;
+	die "chunk: first argument must be an ARRAY reference\n"
+		unless ref $aref eq 'ARRAY';
+
+	die "chunk: pass exactly one of size => N or parts => K\n"
+		if  (defined $opt{size} && defined $opt{parts})
+		||  (!defined $opt{size} && !defined $opt{parts});
+
+	my $n = scalar @$aref;
+	return () unless $n; # empty input -> no groups
+
+	my @groups;
+	if (defined $opt{size}) {
+		my $sz = $opt{size};
+		die "chunk: size must be a positive integer\n"
+			unless $sz =~ /\A[1-9][0-9]*\z/;
+		for (my $i = 0; $i < $n; $i += $sz) {
+			my $hi = $i + $sz - 1;
+			$hi = $n - 1 if $hi > $n - 1;
+			push @groups, [ @{$aref}[$i .. $hi] ];
+		}
+	} else {
+		my $k = $opt{parts};
+		die "chunk: parts must be a positive integer\n"
+			unless $k =~ /\A[1-9][0-9]*\z/;
+		for my $i (0 .. $k - 1) {
+			my $lo = int( $i       * $n / $k );
+			my $hi = int( ($i + 1) * $n / $k );
+			push @groups, [ @{$aref}[$lo .. $hi - 1] ];
+		}
+	}
+	return @groups;
 }
 
 # ---- filter DSL: col() builds a predicate via overloading (pure Perl) -------
@@ -364,6 +399,131 @@ sub dropna {
 
 	die "dropna: data frame must be an arrayref (AoH) or hashref (HoA/HoH)\n";
 }
+
+sub qcut {
+	my ($data, $q, %opt) = @_;
+
+	# help: qcut('h') / qcut('H'), or that string in the q slot
+	if ( (!ref $data && defined $data && $data =~ /\A[hH]\z/)
+	  || (!ref $q    && defined $q    && $q    =~ /\A[hH]\z/) ) {
+		my $h = <<'HELP';
+qcut - equal-frequency binning of a numeric column (analog of pandas qcut)
+
+  USAGE
+    my @edges            = qcut($data, $q);                 # default: edge list
+    my @edges            = qcut($data, $q, edges => 1);     # same, explicit
+    my $codes            = qcut($data, $q, codes => 1);     # bin codes (arrayref)
+    my ($codes, $edges)  = qcut($data, $q, codes => 1, edges => 1);
+    my $labels           = qcut($data, $q, labels => [...]);
+    qcut('h');  # or qcut('H')  -> print this help and die
+
+  ARGUMENTS
+    $data   arrayref of numbers; undef entries are missing (NA) and are
+            skipped for cutpoints, returned as undef in code output
+    $q      positive integer (number of equal-frequency bins) OR an arrayref
+            of probabilities in [0,1], e.g. [0, 0.5, 0.95, 1]
+
+  OPTIONS
+    edges => 1        include the edge vector (default unless codes requested)
+    codes => 1        include 0-based bin codes (one per element)
+    labels => [...]   map codes onto your labels; implies codes => 1
+    labels => 'interval'   label each element with its interval, e.g. "(3.25, 5.5]"
+    duplicates => 'drop'   merge non-unique cutpoints instead of dying ('raise')
+
+  RETURN
+    edges only (default) .... a flat list of edges  (call in list context)
+    codes only .............. an arrayref of codes/labels
+    both .................... ($codes_ref, $edges_ref)
+
+  NOTES
+    Cutpoints use linear interpolation between order statistics (numpy/pandas
+    default), so results match pandas.qcut. Bins are right-closed (a, b] with
+    the lowest bin closed on both ends [a, b].
+HELP
+		die $h;
+	}
+
+	die "qcut: first argument must be an ARRAY reference (try qcut('h'))\n"
+		unless ref $data eq 'ARRAY';
+
+	# probability vector: q+1 evenly spaced points, or an explicit list
+	my $probs;
+	if (ref $q eq 'ARRAY') {
+		$probs = [ sort { $a <=> $b } @$q ];
+	} else {
+		die "qcut: number of quantiles must be a positive integer\n"
+			unless defined $q && $q =~ /\A[1-9][0-9]*\z/;
+		$probs = [ map { $_ / $q } 0 .. $q ];
+	}
+
+	my $drop   = (($opt{duplicates} // 'raise') eq 'drop') ? 1 : 0;
+	my $labels = $opt{labels};
+
+	# codes are opt-in (labels imply them); edges are on unless codes asked for
+	my $want_codes = ($opt{codes} || defined $labels) ? 1 : 0;
+	my $want_edges = exists $opt{edges}
+		? ($opt{edges} ? 1 : 0)
+		: ($want_codes ? 0 : 1);
+	die "qcut: nothing to return (set edges => 1 or codes => 1)\n"
+		unless $want_edges || $want_codes;
+
+	# does the column contain any NA?
+	my $has_na = 0;
+	for my $x (@$data) { if (!defined $x) { $has_na = 1; last } }
+
+	my ($codes, $edges, @pos);
+	if ($want_codes && $has_na) {
+		# strip NA, remember positions, scatter codes back afterwards
+		my @vals;
+		for my $i (0 .. $#$data) {
+			next unless defined $data->[$i];
+			push @vals, $data->[$i] + 0;
+			push @pos,  $i;
+		}
+		die "qcut: no non-missing values\n" unless @vals;
+		($codes, $edges) = _qcut_core(\@vals, $probs, $drop, 1);
+	} elsif ($has_na) {
+		# edges only: drop NA so cutpoints ignore them, positions don't matter
+		my @vals = grep { defined } @$data;
+		die "qcut: no non-missing values\n" unless @vals;
+		($codes, $edges) = _qcut_core(\@vals, $probs, $drop, 0);
+	} else {
+		# no NA: hand the original arrayref straight to XS (no copy)
+		($codes, $edges) = _qcut_core($data, $probs, $drop, $want_codes);
+	}
+
+	# edges-only: return the flat list
+	return @$edges unless $want_codes;
+
+	# turn integer codes into requested labels, or keep the XS arrayref as-is
+	my $out;
+	if (defined $labels && ref $labels eq 'ARRAY') {
+		my $nbin = scalar(@$edges) - 1;
+		die "qcut: got $nbin bins but " . scalar(@$labels) . " labels\n"
+			unless @$labels == $nbin;
+		$out = [ map { $labels->[$_] } @$codes ];
+	} elsif (defined $labels && $labels eq 'interval') {
+		my @iv;
+		for my $b (0 .. $#$edges - 1) {
+			my $l = $edges->[$b];
+			my $r = $edges->[$b + 1];
+			$iv[$b] = $b == 0 ? "[$l, $r]" : "($l, $r]";
+		}
+		$out = [ map { $iv[$_] } @$codes ];
+	} else {
+		$out = $codes;			# reuse XS result; no copy
+	}
+
+	# scatter NA positions back in (codes path only)
+	if ($has_na) {
+		my @r = (undef) x scalar(@$data);
+		@r[@pos] = @$out;
+		$out = \@r;
+	}
+
+	return $want_edges ? ($out, $edges) : $out;
+}
+
 sub summary {
 	my ($data, %args);
 	my $current_sub = (split(/::/,(caller(0))[3]))[-1];
@@ -676,10 +836,13 @@ sub read_table {
 #
 sub view {
 	my $data = shift;
+	if (not defined $data) {
+		die 'view received undefined data';
+	}
 	my %args = @_;
 	# --- reject unknown arguments (mirrors read_table/write_table) ---
 	my %allowed = map { $_ => 1 } qw(
-		n rows na max_width ellipsis gap cols columns
+		n rows na max_width ellipsis gap cols columns width
 		to return_only row.names row_names color colors
 	);
 	my @bad = sort grep { !$allowed{$_} } keys %args;
@@ -699,6 +862,14 @@ sub view {
 	my $ucols = $args{cols} || $args{columns};
 	my $fh	  = $args{to};
 	my $quiet = $args{return_only};
+	# terminal width used to break wide tables into column chunks (R-style).
+	# precedence: explicit 'width' arg -> $ENV{COLUMNS} -> 80 (R's default).
+	my $tw = exists $args{width} ? $args{width}
+		   : (defined $ENV{COLUMNS} && $ENV{COLUMNS} =~ /^[1-9][0-9]*\z/)
+			 ? $ENV{COLUMNS}
+			 : 80;
+	die "view: 'width' must be a positive integer\n"
+		unless defined $tw && $tw =~ /^[1-9][0-9]*\z/;
 	# 'row.names' takes precedence over the row_names alias (both accepted)
 	my $label_col = exists $args{'row.names'} ? $args{'row.names'}
 				  : exists $args{row_names}	  ? $args{row_names}
@@ -937,6 +1108,30 @@ sub view {
 		return $right ? $sp . $painted : $painted . $sp;
 	};
 
+	# ---- break columns into chunks that fit within $tw (R-style) ----
+	# the label column (width $lab_w) is repeated at the front of every chunk.
+	# $gap is spaces only, so its display width is length($gap).
+	my $gap_w = length $gap;
+	my @chunks;
+	if (@cols) {
+		my $j = 0;
+		while ($j <= $#cols) {
+			my $used = $lab_w;
+			my @chunk;
+			while ($j <= $#cols) {
+				my $add = $gap_w + $w[$j];
+				# always keep at least one column per chunk, even if it overflows
+				last if @chunk && $used + $add > $tw;
+				push @chunk, $j;
+				$used += $add;
+				$j++;
+			}
+			push @chunks, \@chunk;
+		}
+	} else {
+		@chunks = ( [] );	# no data columns: just the label column
+	}
+
 	my @out;
 	my $shown = scalar @row_cell;
 	push @out, $paint->(
@@ -944,14 +1139,18 @@ sub view {
 			$kind, $total, ($total == 1 ? '' : 's'),
 			scalar(@cols), (@cols == 1 ? '' : 's'), $shown),
 		'caller_info');
-	my @hcells = ( $field->($lh_b, $lh_w, $lab_w, 0, 'hash') );
-	push @hcells, $field->($head_cell[$_][0], $head_cell[$_][1], $w[$_], $numeric[$_], 'hash') for 0 .. $#cols;
-	push @out, join($gap, @hcells);
-	for my $ri (0 .. $#row_cell) {
-		my @cells = ( $field->($lab_cell[$ri][0], $lab_cell[$ri][1], $lab_w, $lab_numeric, $lab_cell[$ri][2]) );
-		push @cells, $field->($row_cell[$ri][$_][0], $row_cell[$ri][$_][1], $w[$_], $numeric[$_], $row_cell[$ri][$_][2]) for 0 .. $#cols;
-		push @out, join($gap, @cells);
+
+	for my $chunk (@chunks) {
+		my @hcells = ( $field->($lh_b, $lh_w, $lab_w, 0, 'hash') );
+		push @hcells, $field->($head_cell[$_][0], $head_cell[$_][1], $w[$_], $numeric[$_], 'hash') for @$chunk;
+		push @out, join($gap, @hcells);
+		for my $ri (0 .. $#row_cell) {
+			my @cells = ( $field->($lab_cell[$ri][0], $lab_cell[$ri][1], $lab_w, $lab_numeric, $lab_cell[$ri][2]) );
+			push @cells, $field->($row_cell[$ri][$_][0], $row_cell[$ri][$_][1], $w[$_], $numeric[$_], $row_cell[$ri][$_][2]) for @$chunk;
+			push @out, join($gap, @cells);
+		}
 	}
+
 	push @out, $paint->(
 		sprintf("# ... %d more row%s", $total - $shown, ($total - $shown == 1 ? '' : 's')),
 		'caller_info') if $shown < $total;
@@ -959,6 +1158,223 @@ sub view {
 	my $str = join("\n", @out) . "\n";
 	unless ($quiet) { defined $fh ? print {$fh} $str : print $str; }
 	return $str;
+}
+
+# TukeyHSD($fit, %opts) -- Tukey Honest Significant Differences.
+#
+# Mirrors R's stats::TukeyHSD for the fitted objects produced by this
+# module's aov(), lm() and glm().  Base R only defines TukeyHSD.aov; this
+# extends the same all-pairwise studentized-range comparison to lm and glm
+# outputs as well.
+#
+# The fitted objects here do not retain the model frame, so unlike R the
+# response values and per-level replication counts are recomputed from the
+# data.  Therefore the caller supplies the data frame and the response name:
+#
+#   my $fit = aov({ weight => \@w, group => \@g }, 'weight ~ group');
+#   my $hsd = TukeyHSD($fit, data => $df, formula => 'weight ~ group');
+#   # or:    TukeyHSD($fit, data => $df, response => 'weight');
+#
+# Options:
+#   data        (required) the AoH / HoA / HoH used to fit the model
+#   response    response column name; or give formula => 'y ~ ...'
+#   formula     alternative to response: LHS is parsed for the response
+#   which       factor name or arrayref of names (default: all factors)
+#   conf.level  confidence level, default 0.95 (conf_level also accepted)
+#   ordered     if true, order each factor's levels by increasing mean
+#
+# Returns a hashref: one entry per factor mapping to an arrayref of
+# comparison hashes { comparison, diff, lwr, upr, 'p adj' } in R's
+# lower-triangle order, plus the attributes 'conf.level' and 'ordered'.
+#
+# Scope: main-effect factors (those present in $fit->{xlevels}); a grouping
+# variable must be categorical (string levels) to be treated as a factor,
+# exactly as R requires factor().  MSE is the residual mean square (for glm
+# this is deviance/df.residual: exact for the gaussian family, a Wald-type
+# scale otherwise).  Per-level means are observed marginal means, which
+# match R's model.tables means for one-way (and balanced) designs.
+sub TukeyHSD {
+	my ($fit, %opt) = @_;
+	die 'TukeyHSD: first argument must be a fitted-model hashref (from aov/lm/glm)'
+		unless ref($fit) eq 'HASH';
+
+	my $conf = exists $opt{'conf.level'} ? $opt{'conf.level'}
+	         : exists $opt{conf_level}   ? $opt{conf_level}
+	         : 0.95;
+	die 'TukeyHSD: conf.level must be between 0 and 1'
+		unless $conf > 0 && $conf < 1;
+	my $ordered = $opt{ordered} ? 1 : 0;
+
+	my $data = $opt{data}
+		or die "TukeyHSD: 'data' (the data frame used to fit the model) is required";
+
+	# --- residual mean square (MSE) and residual d.f., per model type ---
+	my ($mse, $df);
+	if (ref($fit->{Residuals}) eq 'HASH') {                 # aov
+		$df  = $fit->{Residuals}{Df};
+		$mse = $fit->{Residuals}{'Mean Sq'};
+	} elsif (exists($fit->{rss}) && exists($fit->{'df.residual'})) {         # lm
+		$df  = $fit->{'df.residual'};
+		$mse = ($df > 0) ? $fit->{rss} / $df : undef;
+	} elsif (exists($fit->{deviance}) && exists($fit->{'df.residual'})) {    # glm
+		$df  = $fit->{'df.residual'};
+		$mse = ($df > 0) ? $fit->{deviance} / $df : undef;
+	} else {
+		die 'TukeyHSD: could not find residual MSE/df in the fit (expected aov/lm/glm output)';
+	}
+	die 'TukeyHSD: residual degrees of freedom must be >= 2 (got '
+		. (defined($df) ? $df : 'undef') . ')'
+		unless defined($df) && $df >= 2;
+	die 'TukeyHSD: could not determine a positive residual mean square'
+		unless defined($mse) && $mse > 0;
+
+	# --- WIDE one-way layout ------------------------------------------------
+	# data = { level => [observations], ... } with no response/formula: each
+	# key is a group and its arrayref holds that group's values -- the same
+	# shape aov() auto-stacks when the formula is omitted. Simpler than R's
+	# long format: no stacked response column, no separate factor column.
+	if (   !defined($opt{response}) && !defined($opt{formula})
+		&& ref($data) eq 'HASH' && keys(%$data) >= 2
+		&& (!grep { ref($_) ne 'ARRAY' } values %$data)
+		&& (!grep { !grep { defined && looks_like_number($_) } @$_ } values %$data)) {
+		my $label = (defined $opt{which} && !ref $opt{which}) ? $opt{which} : 'group';
+		my (%sum, %cnt);
+		for my $lev (keys %$data) {
+			for my $yv (@{ $data->{$lev} }) {
+				next unless defined($yv) && looks_like_number($yv);
+				$sum{$lev} += $yv;
+				$cnt{$lev}++;
+			}
+		}
+		my @levels = grep { $cnt{$_} } sort keys %$data;  # R orders levels alphabetically
+		die 'TukeyHSD: need at least 2 non-empty groups' unless @levels >= 2;
+		my @means = map { $sum{$_} / $cnt{$_} } @levels;
+		my @n     = map { $cnt{$_} }            @levels;
+		return {
+			$label       => _tukey_compare(\@levels, \@means, \@n, $mse, $df, $conf, $ordered),
+			'conf.level' => $conf,
+			ordered      => $ordered,
+		};
+	}
+
+	# --- LONG layout (R-style): a response column + one or more factor columns
+	my $resp = $opt{response};
+	if (!defined($resp) && defined $opt{formula}) {
+		($resp) = $opt{formula} =~ /\A\s*([^~]+?)\s*~/;
+	}
+	die "TukeyHSD: need the response variable; pass response => 'name' or formula => 'y ~ ...'"
+		unless defined($resp) && length $resp;
+
+	# --- factors present in the model (idx 0 of each xlevels entry = reference) ---
+	my $xl = $fit->{xlevels};
+	die 'TukeyHSD: no factors in the fitted model (nothing to compare)'
+		unless ref($xl) eq 'HASH' && keys %$xl;
+
+	my @which = defined($opt{which})
+		? (ref($opt{which}) eq 'ARRAY' ? @{ $opt{which} } : ($opt{which}))
+		: (sort keys %$xl);
+
+	my @factors;
+	for my $f (@which) {
+		if (exists $xl->{$f}) { push @factors, $f }
+		else { warn "TukeyHSD: '$f' is not a factor in the model and will be dropped\n" }
+	}
+	die "TukeyHSD: 'which' specified no factors" unless @factors;
+
+	my $y = _tukey_col($data, $resp);
+
+	my %out;
+	for my $f (@factors) {
+		my $g = _tukey_col($data, $f);
+		die "TukeyHSD: response '$resp' and factor '$f' differ in length"
+			unless scalar(@$y) == scalar(@$g);
+
+		my (%sum, %cnt);
+		for my $i (0 .. $#$g) {
+			my $gv = $g->[$i];
+			my $yv = $y->[$i];
+			next unless defined($gv) && defined($yv) && looks_like_number($yv);
+			$sum{$gv} += $yv;
+			$cnt{$gv}++;
+		}
+
+		# canonical level order from xlevels, then any extra observed levels
+		my @levels = @{ $xl->{$f} };
+		my %seen = map { $_ => 1 } @levels;
+		push @levels, sort grep { !$seen{$_} } keys %cnt;
+		@levels = grep { $cnt{$_} } @levels;      # only levels that carry data
+
+		die "TukeyHSD: factor '$f' needs at least 2 non-empty levels"
+			unless scalar(@levels) >= 2;
+
+		my @means = map { $sum{$_} / $cnt{$_} } @levels;
+		my @n     = map { $cnt{$_} }            @levels;
+
+		$out{$f} = _tukey_compare(\@levels, \@means, \@n, $mse, $df, $conf, $ordered);
+	}
+
+	$out{'conf.level'} = $conf;      # attributes, R-style
+	$out{ordered}      = $ordered;
+	return \%out;
+}
+
+# _tukey_compare(\@levels, \@means, \@n, $mse, $df, $conf, $ordered)
+# Shared HSD math for one factor: builds the pairwise-comparison rows in R's
+# lower-triangle, column-major order. Used by both the wide and long paths.
+sub _tukey_compare {
+	my ($levels, $means, $n, $mse, $df, $conf, $ordered) = @_;
+	my @levels = @$levels;
+	my @means  = @$means;
+	my @n      = @$n;
+	if ($ordered) {
+		my @ord = sort { $means[$a] <=> $means[$b] } 0 .. $#means;
+		@levels = @levels[@ord];
+		@means  = @means[@ord];
+		@n      = @n[@ord];
+	}
+	my $k    = scalar @means;
+	my $crit = Stats::LikeR::qtukey($conf, $k, $df);    # nranges = 1
+	my @rows;
+	for my $j (0 .. $k - 1) {                            # column-major lower triangle
+		for my $i ($j + 1 .. $k - 1) {
+			my $diff  = $means[$i] - $means[$j];
+			my $se    = sqrt( ($mse / 2) * (1 / $n[$i] + 1 / $n[$j]) );
+			my $width = $crit * $se;
+			my $est   = ($se > 0)
+				? $diff / $se
+				: ($diff >= 0 ? 9**9**9 : -(9**9**9));
+			my $padj  = Stats::LikeR::ptukey(abs($est), $k, $df, 'lower.tail' => 0);
+			push @rows, {
+				comparison => "$levels[$i]-$levels[$j]",
+				diff       => $diff,
+				lwr        => $diff - $width,
+				upr        => $diff + $width,
+				'p adj'    => $padj,
+			};
+		}
+	}
+	return \@rows;
+}
+
+# _tukey_col($data, $col) -- pull one column's cells, in row order, from any
+# of the three data-frame shapes (AoH arrayref, HoA/HoH hashref).
+sub _tukey_col {
+	my ($data, $col) = @_;
+	die 'TukeyHSD: data must be a reference (AoH / HoA / HoH)' unless ref $data;
+	my $r = ref $data;
+	if ($r eq 'ARRAY') {                              # AoH
+		return [ map { $_->{$col} } @$data ];
+	} elsif ($r eq 'HASH') {
+		my ($first) = values %$data;
+		if (ref($first) eq 'ARRAY') {                 # HoA
+			die "TukeyHSD: column '$col' not found in data"
+				unless exists $data->{$col};
+			return [ @{ $data->{$col} } ];
+		} else {                                      # HoH (row-name keyed)
+			return [ map { $data->{$_}{$col} } sort keys %$data ];
+		}
+	}
+	die 'TukeyHSD: unsupported data shape';
 }
 1;
 =encoding utf8
@@ -1477,6 +1893,89 @@ assign($df,
 
 =back
 
+=head2 binom_test
+
+C<binom_test> answers one question: you ran a yes/no experiment C<n> times and
+got C<x> successes — is that consistent with some assumed success rate, or is it
+too far off to be chance? It is the exact binomial test, the same as R's
+C<binom.test>.
+
+=head3 A toddler and two cards
+
+Show a toddler two cards each round and ask them to point at the one with the
+star. If he/she is only guessing, he/she will be right half the time, so the
+"pure guessing" success rate is C<p = 0.5>.
+
+You play 10 rounds and the toddler gets 6 right. Real skill, or just luck?
+
+ use Stats::LikeR 'binom_test';
+ 
+ my $r = binom_test(6, 10, p => 0.5);   # 6 wins, 10 rounds, guessing rate 0.5
+ 
+ print $r->{p_value};                   # 0.7539
+
+The full result is a hashref:
+
+ {
+     statistic   => 6,            # times the toddler was right
+     parameter   => 10,           # rounds played
+     estimate    => 0.6,          # observed rate, 6/10
+     null_value  => 0.5,          # the "pure guessing" rate we test against
+     p_value     => 0.7539,
+     conf_int    => [0.262, 0.878],
+     conf_level  => 0.95,
+     alternative => 'two.sided',
+     method      => 'Exact binomial test',
+ }
+
+=head3 Reading the p-value
+
+The p-value is the chance of seeing a result B<at least this surprising> if the
+toddler were really just guessing.
+
+Here C<p = 0.75>. That is enormous: a pure guesser scores 6/10 (or something
+even further from 5) about three times out of four. So 6/10 is completely
+ordinary luck — no evidence of skill.
+
+The common cutoff is C<0.05>. Below it, you start to believe something real is
+going on. Above it, chance explains the result fine. C<0.75> is nowhere close,
+so we call this B<just chance>.
+
+=head3 What "legit" would look like
+
+Suppose the toddler had gone 9 for 10 instead:
+
+ my $r = binom_test(9, 10, p => 0.5);
+ 
+ print $r->{p_value};                   # 0.0215
+
+Now C<p = 0.02>, under C<0.05>. A pure guesser almost never does that well, so
+this B<is> good evidence the toddler can actually tell the cards apart.
+
+=head3 The confidence interval
+
+C<conf_int> is the plausible range for the toddler's true success rate. For
+6/10 it runs from about C<0.26> to C<0.88> — wide, and it comfortably includes
+C<0.5>. That overlap with the guessing rate is another way of seeing that luck
+cannot be ruled out. For 9/10 the interval would sit well above C<0.5>.
+
+=head3 Options
+
+=over
+
+=item * C<p> is the assumed success rate (default C<0.5>).
+
+=item * C<alternative> is C<'two.sided'> (default), C<'less'>, or C<'greater'>. Use
+C<'greater'> when you only care whether the toddler beats guessing, not
+whether they do worse.
+
+=item * C<conf_level> sets the interval width (default C<0.95>).
+
+=back
+
+You can also pass the counts as C<binom_test([6, 4])> — 6 right, 4 wrong — when
+you have wins and losses instead of wins and a total.
+
 =head2 cfilter
 
 Select B<columns> out of a table and return it in the same shape. A column is
@@ -1738,6 +2237,82 @@ Flat Hash References evaluate Goodness of Fit while preserving your categorical 
  };
  
  my $res = chisq_test($data);
+
+=head2 chunk
+
+Split an array into contiguous, roughly equal groups by I<position>. Unlike
+L<#qcut>, C<chunk> does not inspect values, sort, or compute cutpoints; it
+slices the array in the order given. Use it for batching work, paginating, or
+grouping non-numeric data such as strings.
+
+=head3 Signature
+
+ my @groups = chunk($data, size  => $n);   # fixed elements per group
+ my @groups = chunk($data, parts => $k);   # fixed number of groups
+
+=over
+
+=item * C<$data> — an array reference. Its contents are never examined or sorted;
+elements are grouped in input order.
+
+=back
+
+Pass exactly one of C<size> or C<parts>. Passing both, or neither, is a fatal
+error — the two readings of "equal groups" differ (see below), so the caller
+chooses which one is meant rather than relying on a default.
+
+=over
+
+=item * C<< size =E<gt> $n >> — each group holds C<$n> elements; the final group holds
+whatever remains.
+
+=item * C<< parts =E<gt> $k >> — the array is divided into C<$k> groups as equal as possible,
+with any remainder spread across the leading groups.
+
+=back
+
+=head3 Return value
+
+A list of array references, in input order — call it in list context:
+
+ my @groups = chunk($data, parts => 4);
+
+Passing more C<parts> than there are elements yields trailing empty groups
+(matching C<numpy.array_split>), so no elements are ever dropped. An empty input
+array returns an empty list.
+
+=head3 Examples
+
+C<size> fixes the elements per group; the last group is the remainder. Splitting
+the 26 letters into groups of five leaves one over:
+
+ my @groups = chunk(['a' .. 'z'], size => 5);
+ # 6 groups, sizes 5,5,5,5,5,1
+ # [a b c d e] [f g h i j] [k l m n o] [p q r s t] [u v w x y] [z]
+
+C<parts> fixes the number of groups; the remainder is absorbed by the leading
+groups instead:
+
+ my @groups = chunk(['a' .. 'z'], parts => 5);
+ # 5 groups, sizes 5,5,5,5,6
+ # [a b c d e] [f g h i j] [k l m n o] [p q r s t] [u v w x y z]
+
+When the split is even the two forms agree:
+
+ my @a = chunk([1 .. 10], size  => 2);
+ my @b = chunk([1 .. 10], parts => 5);
+ # identical: 5 groups of 2
+
+Order is preserved — C<chunk> never sorts. Sort the array yourself first if you
+want ordered groups:
+
+ my @groups = chunk([3, 1, 2], size => 2);
+ # ([3, 1], [2])
+
+More parts than elements gives empty trailing groups, losing nothing:
+
+ my @groups = chunk([1, 2, 3], parts => 5);
+ # 5 groups; flattening them back gives (1, 2, 3)
 
 =head2 C<col2col>
 
@@ -2421,6 +2996,41 @@ which returns a hash reference:
      }
  });
 
+=head2 get_union
+
+ my @all   = get_union(\@a, \@b, \@c); # every distinct value, any list
+ my $count = get_union(\@a, \@b, \@c); # how many distinct values
+
+Takes one or more array references and returns every value that appears in at
+least one of them. Duplicates collapse and the result keeps first-appearance
+order. In scalar context it returns the count. Values are compared by their
+string form (like Perl hash keys), so C<1>, C<"1"> and C<1.0> are one element,
+while a UTF-8 flagged string stays distinct from the same bytes without the
+flag. A non-array-ref argument or an C<undef> element is fatal. Mirrors
+C<List::Compare>'s C<get_union>.
+
+ my @a = (1, 2, 3, 3);
+ my @b = (3, 4);
+ my @u = get_union(\@a, \@b);            # (1, 2, 3, 4)
+
+=head2 get_unique
+
+ my @only_first = get_unique(\@a, \@b, \@c);
+ my $count      = get_unique(\@a, \@b, \@c);
+
+Takes one or more array references and returns the values that appear in the
+B<first> reference and in B<no other> reference; with a single reference it
+returns that list's distinct values. Duplicates collapse, the result keeps
+first-appearance order, and scalar context returns the count. Values are
+compared by string form (see C<get_union>). A non-array-ref argument or an
+C<undef> element is fatal. Mirrors C<List::Compare>'s C<get_unique>, which
+likewise defaults to the first list.
+
+ my @a = (1, 2, 3);
+ my @b = (3, 4, 5);
+ my @c = (5, 6);
+ my @u = get_unique(\@a, \@b, \@c);      # (1, 2)  -- 3 is also in @b
+
 =head2 glm
 
 takes a hash of an array as input
@@ -2722,6 +3332,27 @@ arrayref (the message names the offending column).
 
 C<hoa2aoh> is the reverse of C<aoh2hoa>
 
+=head2 hoa2hoh( \%hoa, $key )
+
+Converts a hash-of-arrays (column-major) into a hash-of-hashes keyed by the
+C<$key> column, i.e. C<< { $rowname =E<gt> { col =E<gt> value, ... } } >>. Analogous to
+C<hoa2aoh>, but rows are indexed by their C<$key> value instead of positionally.
+
+ my %hoa = (
+     id => [ qw(a b c) ],
+     x  => [ 1, 2, 3 ],
+     y  => [ 4, 5, 6 ],
+ );
+ my $hoh = hoa2hoh( \%hoa, 'id' );
+ # { a => { id => 'a', x => 1, y => 4 }, b => {...}, c => {...} }
+
+The C<$key> column is retained in each inner row. Columns are copied by value.
+Shorter columns are padded with C<undef>, matching C<hoa2aoh>.
+
+Dies if: the first argument is not a hashref of arrayrefs; C<$key> is undef or
+names a missing/non-array column; the C<$key> column holds an undefined value
+for any row; or two rows share the same C<$key> value.
+
 =head2 hoh2hoa
 
 Convert a B<hash of hashes> (row-major: outer key = row, inner key = column)
@@ -2856,7 +3487,7 @@ that appear in B<every> array ref given.
  my @t = intersection([1, 2, 3, 4], [2, 3, 4], [3, 4]); # (3, 4)
  my $n = intersection([1, 2, 3], [2, 3, 4]);          # 2
 
-Every argument must be an array reference — each one is treated as a set.
+Every argument must be an array reference: each one is treated as a set.
 Unlike C<mean> and C<uniq>, bare scalars are not accepted; passing a non-reference
 (or a non-array reference) croaks.
 
@@ -3007,8 +3638,9 @@ For example:
 
 =head2 ljoin
 
-Consider a hash: C<$h{$row}{$col}>, and another hash C<$i{$row}{$col}>.
-C<ljoin> will add information for C<$col> in C<%i> for each C<$row> to C<%h>, where C<$row> exists in both C<%h> and C<%i>
+Consider a hash: C<$h{$row}{$col}>, and another hash C<$i{$row}{$col2}>.
+C<ljoin> will add information for C<$col> in C<%i> for each C<$row> to C<%h>, where C<$row> exists in both C<%h> and C<%i>.
+Similar to C<cbind> in R.
 
 For example,
 
@@ -3054,6 +3686,22 @@ If your data contains missing numbers (C<NA> or C<undef>), C<lm> handles listwis
 the dot operator also works:
 
  $lm = lm(formula => 'y ~ .', data => $dot_data);
+
+=head2 Lonly
+
+ my @left_only = Lonly(\@left, \@right);
+ my $count     = Lonly(\@left, \@right);
+
+Takes B<exactly two> array references and returns the values in the left list
+that are absent from the right list. Duplicates collapse, the result keeps
+left-list order, and scalar context returns the count. Values are compared by
+string form (see C<get_union>). A non-array-ref argument, an C<undef> element,
+or anything other than two references is fatal. Mirrors C<List::Compare>'s
+C<get_Lonly>.
+
+ my @a = (1, 2, 3, 4);
+ my @b = (3, 4, 5);
+ my @l = Lonly(\@a, \@b);                # (1, 2)
 
 =head2 matrix
 
@@ -3657,6 +4305,132 @@ invalid C<type>; or C<newdata> that isn't a HoA/HoH hashref or AoH arrayref.
 
 =back
 
+=head2 qcut
+
+Equal-frequency binning of a numeric column, which is the analog of pandas C<qcut>.
+Where C<cut> would slice a value range into equal-I<width> intervals (and dump
+most of a skewed distribution into one bin), C<qcut> chooses cutpoints so each
+bin holds roughly the same I<number> of observations. This is the binning you
+usually want for ranked-list work: deciles, quartiles, top-5% tranches.
+
+Cutpoints are computed by linear interpolation between order statistics, the
+same method as numpy/pandas, so results match C<pandas.qcut> exactly. Bins are
+right-closed, C<(a, b]>, with the lowest bin closed on both ends, C<[a, b]>, so
+the minimum value is always included.
+
+=head3 Signature
+
+ qcut($data, $q, %options)
+
+=over
+
+=item * C<$data> — an array reference of numbers. C<undef> entries are treated as
+missing (NA): they are skipped when computing cutpoints and, when codes are
+requested, come back as C<undef> in their original positions.
+
+=item * C<$q> — either a positive integer (the number of equal-frequency bins) or an
+array reference of probabilities in C<[0, 1]> giving explicit cut
+boundaries, e.g. C<[0, 0.5, 0.95, 1]>.
+
+=back
+
+For a usage reminder at the prompt, call C<qcut('h')> (or C<qcut('H')>); it dies
+with a short help message.
+
+=head3 What it returns
+
+By default C<qcut> returns the B<edge vector as a flat list> — the cheap,
+common query — so call it in list context:
+
+ my @edges = qcut($data, 4);          # ($e0, $e1, $e2, $e3, $e4)
+
+The per-element bin assignment (the expensive part) is opt-in. Ask for it with
+C<< codes =E<gt> 1 >> and you get an array reference parallel to C<$data>:
+
+ my $codes = qcut($data, 4, codes => 1);
+
+Ask for both in a single pass and you get two references, C<($codes, $edges)>:
+
+ my ($codes, $edges) = qcut($data, 4, codes => 1, edges => 1);
+
+=head3 Options
+
+=over
+
+=item * C<< edges =E<gt> 1 >> — include the edge vector. On by default; turned off
+automatically when you request codes, so set it explicitly to get both.
+
+=item * C<< codes =E<gt> 1 >> — include the 0-based integer bin codes.
+
+=item * C<< labels =E<gt> [...] >> — map the bin codes onto your own labels (implies
+C<< codes =E<gt> 1 >>). The list length must equal the number of bins.
+
+=item * C<< labels =E<gt> 'interval' >> — label each element with its interval string,
+e.g. C<(3.25, 5.5]> (also implies codes).
+
+=item * C<< duplicates =E<gt> 'drop' >> — if tied data produces non-unique cutpoints, merge
+them into fewer bins instead of dying. The default, C<'raise'>, throws an
+error (as pandas does).
+
+=back
+
+=head3 Examples
+
+Quartile edges (the default). The cutpoints match pandas exactly:
+
+ my @edges = qcut([1 .. 10], 4);
+ # @edges = (1, 3.25, 5.5, 7.75, 10)
+
+Bin codes. They are 0-based; note the tie distribution matches pandas (inner
+bins take 2 here, outer bins 3):
+
+ my $codes = qcut([1 .. 10], 4, codes => 1);
+ # $codes = [0, 0, 0, 1, 1, 2, 2, 3, 3, 3]
+
+Edges and codes together, computed in one pass:
+
+ my ($codes, $edges) = qcut([1 .. 10], 4, codes => 1, edges => 1);
+
+Equal frequency on clean data — 100 values into 4 bins of 25:
+
+ my $codes = qcut([1 .. 100], 4, codes => 1);
+ # 25 elements in each of bins 0, 1, 2, 3
+
+An explicit probability vector, for an asymmetric top-5% tranche:
+
+ my @edges = qcut([1 .. 100], [0, 0.5, 0.95, 1]);
+ my $codes = qcut([1 .. 100], [0, 0.5, 0.95, 1], codes => 1);
+ # bin 0: lower half (50), bin 1: next 45%, bin 2: top 5%
+
+Named labels instead of integer codes (implies codes):
+
+ my $labels = qcut([1 .. 10], 4, labels => [qw/Q1 Q2 Q3 Q4/]);
+ # ['Q1','Q1','Q1','Q2','Q2','Q3','Q3','Q4','Q4','Q4']
+
+Interval-string labels:
+
+ my $iv = qcut([1 .. 10], 4, labels => 'interval');
+ # $iv->[0]  eq '[1, 3.25]'
+ # $iv->[-1] eq '(7.75, 10]'
+
+Missing values are ignored for cutpoints, and (when codes are requested) pass
+straight through:
+
+ my $codes = qcut([1, 2, undef, 4, 5, 6, 7, 8, 9, 10], 4, codes => 1);
+ # $codes->[2] is undef; the rest are binned as usual
+
+Tied data and C<duplicates>. Heavy ties can make adjacent cutpoints equal; the
+default raises, C<'drop'> merges:
+
+ my @tied = ((0) x 8, 1, 2, 3, 4);
+ qcut(\@tied, 4);                         # dies: bin edges are not unique
+ my @edges = qcut(\@tied, 4, duplicates => 'drop');
+ # fewer than 5 edges; the empty quantile bands are collapsed
+
+Get the usage summary and stop:
+
+ qcut('h');   # dies with the help text above
+
 =head2 quantile
 
 Calculates sample quantiles using R's continuous Type 7 interpolation. 
@@ -3664,6 +4438,23 @@ Calculates sample quantiles using R's continuous Type 7 interpolation.
  my $quantile = quantile('x' => [1..99], probs => [0.05, 0.1, 0.25]);
 
 If the C<probs> parameter is omitted, it behaves identically to R by defaulting to the 0, 25, 50, 75, and 100 percentiles (C<c(0, .25, .5, .75, 1)>). The returned hash keys match R's standardized naming convention (e.g., C<"25%">, C<"33.3%">).
+
+=head2 Ronly
+
+ my @right_only = Ronly(\@left, \@right);
+ my $count      = Ronly(\@left, \@right);
+
+Takes B<exactly two> array references and returns the values in the right list
+that are absent from the left list. Duplicates collapse, the result keeps
+right-list order, and scalar context returns the count. Values are compared by
+string form (see C<get_union>). A non-array-ref argument, an C<undef> element,
+or anything other than two references is fatal. Mirrors C<List::Compare>'s
+C<get_Ronly>, and is the reverse of C<Lonly>: C<Ronly(\@a, \@b)> equals
+C<Lonly(\@b, \@a)>.
+
+ my @a = (1, 2, 3, 4);
+ my @b = (3, 4, 5);
+ my @r = Ronly(\@a, \@b); # (5)
 
 =head2 rbinom
 
@@ -4679,7 +5470,17 @@ Args can also be accepted:
 
  write_table( 'data' => \%flat, 'file' => $f );
 
-=head1 changes
+=head1 Changes
+
+=head2 0.19
+
+numerous C<SSize_t var1 = av_len(var) + 1> are changed to C<size_t var1 = av_len(var) + 1> as C<size_t>; as the result cannot be negative, in order to expand numerical range
+
+Addition of C<hoa2hoh>, C<binom_test>, C<chunk>, C<get_union>, C<get_unique>, C<Lonly>, C<Ronly>, C<qcut>, and 3 tukey functions
+
+Better warnings when non-array references are given to C<intersection>
+
+C<view> now breaks columns into chunks for very wide data sets, more closely matching R's behavior
 
 =head2 0.18
 

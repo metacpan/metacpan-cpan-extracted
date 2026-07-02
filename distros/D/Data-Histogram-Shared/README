@@ -1,0 +1,240 @@
+NAME
+    Data::Histogram::Shared - shared-memory HdrHistogram for Linux
+
+SYNOPSIS
+        use Data::Histogram::Shared;
+
+        # track values in [1, 3_600_000_000] with 3 significant figures, anonymous
+        my $h = Data::Histogram::Shared->new(undef, 1, 3_600_000_000, 3);
+
+        $h->record(120);              # record the value 120 once
+        $h->record(2500, 4);          # record the value 2500 four times
+
+        $h->value_at_percentile(50);  # median (50th percentile)
+        $h->percentile(99);           # 99th percentile (alias)
+        $h->min; $h->max; $h->mean;   # min / max / arithmetic mean
+        $h->total_count;              # number of recorded values
+
+        # bulk record in a single lock acquisition
+        $h->record_many([ 100, 250, 250, 900, 1500 ]);
+
+        # merge another histogram of identical geometry (cellwise add)
+        my $other = Data::Histogram::Shared->new(undef, 1, 3_600_000_000, 3);
+        $other->record_many([ 50, 75, 80 ]);
+        $h->merge($other);
+
+        # share across processes via a backing file
+        my $shared = Data::Histogram::Shared->new("/tmp/latency.hdr", 1, 3_600_000_000, 3);
+
+DESCRIPTION
+    A High Dynamic Range histogram (HdrHistogram) in shared memory: a
+    compact, fixed-size structure that records integer values across a very
+    wide range and answers percentile, minimum, maximum and mean queries
+    within a fixed, configurable relative error. It is the standard tool for
+    latency and response- time measurement, where the values of interest
+    span many orders of magnitude (microseconds to seconds) yet a constant
+    number of significant figures must be preserved across the whole range.
+
+    You construct the histogram with the "lowest" and "highest" values it
+    must track and the number of "sig_figs" (significant figures) of
+    precision you require. Values are bucketed logarithmically -- one bucket
+    per power of two of magnitude -- and linearly within each bucket, so
+    that any two values that agree to "sig_figs" significant figures fall
+    into the same sub-bucket and are treated as equivalent. A percentile
+    query is therefore accurate to within "1 / 10**sig_figs" relative error:
+    with the default 3 significant figures, a reported percentile is within
+    0.1% of the true value. Memory is proportional to the dynamic range and
+    the precision, not to the number of values recorded: you can record
+    billions of samples into a few kilobytes of counters.
+
+    The histogram stores integer values only. To record floating-point
+    quantities, scale them to integers yourself before recording -- for
+    example, record a latency in microseconds (or nanoseconds) rather than
+    fractional seconds, and divide the reported percentiles back down.
+
+    Because the counts array lives in a shared mapping, several processes
+    share one histogram: any process that opens the same backing file,
+    inherits the anonymous mapping across "fork", or reopens a passed memfd,
+    sees the others' recordings and contributes its own. A write-preferring
+    futex rwlock with dead-process recovery guards mutation, so many
+    processes may "record" and query concurrently. Two histograms of
+    identical geometry (same "lowest", "highest" and "sig_figs") can be
+    combined with "merge" (cellwise add of their counts arrays), which
+    yields a histogram whose distribution is the union of the two input
+    streams. Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $h = Data::Histogram::Shared->new($path, $lowest, $highest, $sig_figs);
+        my $h = Data::Histogram::Shared->new(undef, 1, 3_600_000_000, 3);   # defaults
+        my $h = Data::Histogram::Shared->new_memfd($name, $lowest, $highest, $sig_figs);
+        my $h = Data::Histogram::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" or omitted for an anonymous mapping).
+    $lowest is the lowest value that can be distinguished from 0 and must be
+    ">= 1" (default 1). $highest is the highest value that can be tracked
+    and must be ">= 2 * $lowest" (default "3_600_000_000", i.e. one hour in
+    microseconds). $sig_figs is the number of significant figures of
+    precision and must be in the range 1..5 (default 3). "new" and
+    "new_memfd" croak if any argument is out of range.
+
+    $lowest additionally must satisfy "floor(log2($lowest)) + ceil(log2(2 *
+    10**$sig_figs)) - 1 <= 61" (a histogram-geometry limit); in practice
+    this only rejects a very large $lowest -- above roughly "2**51" at the
+    default "sig_figs = 3". Such a histogram croaks at construction.
+
+    From these the histogram derives its bucket geometry: a unit magnitude
+    of "floor(log2($lowest))", "2 * 10**sig_figs" sub-buckets per power of
+    two (rounded up to a power of two), and as many buckets as are needed to
+    cover $highest. When reopening an existing file or memfd, the stored
+    geometry wins and the caller's $lowest/$highest/$sig_figs arguments are
+    ignored. "new_memfd" creates a Linux memfd (transferable via its "memfd"
+    descriptor); "new_from_fd" reopens one in another process.
+
+  Recording values
+        my $count = $h->record($value);          # record once;  returns new total_count
+        my $count = $h->record($value, $n);      # record $n times; returns new total_count
+        my $added = $h->record_many(\@values);    # record each once; returns how many
+        $h->reset;                               # clear every count back to empty
+
+    "record" adds $n (default 1) occurrences of the integer $value to the
+    histogram and returns the new "total_count". $value must be in the range
+    "0 .. $highest": a negative value croaks, and a value above $highest
+    croaks ("value ... exceeds highest_trackable_value"). Values strictly
+    below $lowest are recorded but collapse into the lowest sub-bucket. $n
+    is an unsigned integer.
+
+    "record_many" takes an array reference and records each element once
+    under a single write lock, returning the number recorded. Every element
+    is range-checked before the lock is taken, so an out-of-range element
+    croaks without recording any of the batch (and without holding the
+    lock).
+
+    The precision contract: any two values that agree to "sig_figs"
+    significant figures are equivalent -- they fall into the same sub-bucket
+    and are indistinguishable once recorded. A value read back out of the
+    histogram (for example via a percentile query) is the highest value
+    equivalent to the bucket it landed in, so it is always ">= " the
+    recorded value and within "1 / 10**sig_figs" relative error of it.
+
+  Querying
+        my $v = $h->value_at_percentile($p);     # value at the $p-th percentile (0..100)
+        my $v = $h->percentile($p);              # alias for value_at_percentile
+        my $c = $h->count_at_value($value);      # count recorded in $value's bucket
+        my $lo = $h->min;                        # lowest recorded value (0 if empty)
+        my $hi = $h->max;                        # highest recorded value (0 if empty)
+        my $mu = $h->mean;                       # arithmetic mean (0 if empty)
+        my $n  = $h->total_count;                # number of recorded values
+        my $n  = $h->count;                      # alias for total_count
+
+    "value_at_percentile" returns the value below which $p percent of the
+    recorded values lie: the highest equivalent value of the bucket at that
+    percentile, so it never underestimates. $p is a percentile in the range
+    0..100 (not a 0..1 quantile). "percentile" is a short alias. An empty
+    histogram returns 0 for any percentile.
+
+    "count_at_value" returns the number of values recorded in the bucket
+    that $value falls into (so values equivalent to $value are counted
+    together). $value is range-checked like "record": a negative value, or a
+    value above $highest, croaks. "min" and "max" are the exact lowest and
+    highest values ever recorded (each 0 when nothing has been recorded).
+    "mean" is the arithmetic mean, computed from each bucket's
+    median-equivalent value. "total_count" (aliased "count") is the number
+    of recorded values -- the sum of all the per-bucket counts.
+
+  Merging
+        $h->merge($other);
+
+    Folds $other's counts array into $h by cellwise addition, so $h then
+    represents the combined distribution of both histograms; $h's
+    "total_count", "min" and "max" are updated to span both. Both histograms
+    must have identical geometry -- the same "lowest", "highest" and
+    "sig_figs" ("merge" croaks on a mismatch). $other is read under its own
+    lock into a private snapshot first, so merging is deadlock-free even if
+    two processes merge each other concurrently; $other is not modified.
+    Counts that would overflow a 64-bit cell saturate at the maximum value.
+
+  Introspection and lifecycle
+        $h->lowest; $h->highest; $h->sig_figs; $h->counts_len; $h->stats;
+        $h->path; $h->memfd; $h->sync; $h->unlink;   # or Class->unlink($path)
+
+    "lowest", "highest" and "sig_figs" return the configured geometry;
+    "counts_len" is the number of 64-bit counter cells. "sync" flushes the
+    mapping to its backing store (a no-op for anonymous and memfd
+    histograms, which have none); "unlink" removes the backing file (also
+    callable as "Class->unlink($path)"); "path" returns the backing path
+    ("undef" for anonymous, memfd, or fd-reopened histograms) and "memfd"
+    the backing descriptor -- the memfd of a "new_memfd" histogram or the
+    dup'd fd of a "new_from_fd" histogram, and -1 for file-backed or
+    anonymous histograms.
+
+STATS
+    stats() returns a hashref describing the histogram:
+
+    *   "lowest" -- the lowest trackable value.
+
+    *   "highest" -- the highest trackable value.
+
+    *   "sig_figs" -- the significant figures of precision.
+
+    *   "count" -- the number of recorded values ("total_count").
+
+    *   "min" -- the lowest recorded value (0 if empty).
+
+    *   "max" -- the highest recorded value (0 if empty).
+
+    *   "mean" -- the arithmetic mean of the recorded values (0.0 if empty).
+
+    *   "counts_len" -- the number of 64-bit counter cells.
+
+    *   "bucket_count" -- the number of logarithmic buckets.
+
+    *   "sub_bucket_count" -- the number of linear sub-buckets per bucket.
+
+    *   "ops" -- running count of mutating operations ("record",
+        "record_many", "merge", "reset").
+
+    *   "mmap_size" -- bytes of the shared mapping.
+
+SHARING ACROSS PROCESSES
+    The histogram lives in a shared mapping, shared the same three ways as
+    the rest of the family: a backing file (every process calls "new($path,
+    ...)" on the same path with matching geometry), an anonymous mapping
+    inherited across "fork", or a memfd whose descriptor is passed to an
+    unrelated process (over a UNIX socket via "SCM_RIGHTS", or via
+    "/proc/$pid/fd/$n") and reopened with new_from_fd($fd). Because the
+    mapping is shared, every process records into and queries the same
+    counts array, so the distribution reflects the combined stream all of
+    them have recorded.
+
+        # producer and consumer share one histogram with no coordination
+        my $h = Data::Histogram::Shared->new(undef, 1, 1_000_000, 3);   # before fork
+        unless (fork) { $h->record(500) for 1 .. 10; exit }
+        wait;
+        print $h->value_at_percentile(50), "\n";   # the child's recordings
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Each count increment is a single word store, so
+    a crash leaves the histogram consistent up to the last completed
+    "record". Limitation: PID reuse is not detected (very unlikely in
+    practice).
+
+SEE ALSO
+    Data::CountMinSketch::Shared, Data::HyperLogLog::Shared,
+    Data::BloomFilter::Shared, Data::Intern::Shared,
+    Data::SortedSet::Shared, Data::SpatialHash::Shared, and the rest of the
+    "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

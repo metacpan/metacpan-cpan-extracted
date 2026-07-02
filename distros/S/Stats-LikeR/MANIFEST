@@ -20,9 +20,11 @@ t/assign.HoH.t
 t/assign.t
 t/better.coverage.t
 t/better_coverage.t
+t/binom_test.t
 t/bodyfat.csv
 t/cfilter.t
 t/chisq_test.t
+t/chunk.t
 t/col2col.t
 t/csort.HoH.t
 t/csort.t
@@ -42,11 +44,14 @@ t/pm.coverage.t
 t/prcomp.t
 t/predict.t
 t/predict2.t
+t/qcut.t
 t/read_table.2.t
 t/read_table.comments.t
 t/read_table.t
+t/set_ops.t
 t/summary.t
 t/transpose.t
+t/tukey.t
 t/uniq.t
 t/vals.t
 t/vals2.t

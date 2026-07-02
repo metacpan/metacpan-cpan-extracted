@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Firewall::Role::NAT;
-$WebService::OPNsense::Firewall::Role::NAT::VERSION = '0.002';
+$WebService::OPNsense::Firewall::Role::NAT::VERSION = '0.003';
 use Carp qw( croak );
 use Moo::Role;
 use WebService::OPNsense::Normalize qw( validate_uuid );
@@ -158,7 +158,7 @@ WebService::OPNsense::Firewall::Role::NAT - Role for NAT controller shared rule 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

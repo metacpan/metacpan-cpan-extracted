@@ -31,5 +31,4 @@ When using OIDC-Client with an application, it is highly recommended to configur
 
 ## Limitations
 
-- no support for *tls_client_auth* client authentication method
 - no support for Implicit or Hybrid flows (applicable to front-end applications only and deprecated)

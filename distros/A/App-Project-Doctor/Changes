@@ -1,0 +1,22 @@
+Revision history for App-Project-Doctor
+
+0.02	Wed Jul  1 14:31:48 EDT 2026
+	[ Bug Fixes ]
+	- Added Test::DescribeMe to TEST_REQUIRES
+	- Check::Dependencies: POD blocks (e.g. SYNOPSIS "use L<Foo>") were scanned
+	  for use/require statements, producing false positives such as module 'L'
+	- Check::Dependencies: 'lib', 'Cwd', 'Encode', 'Fcntl', 'IO::File',
+	  'IO::Handle', and 'File::Copy' were missing from the %CORE exclusion list
+	- Check::Dependencies: modules provided by the distribution itself (under lib/)
+	  were incorrectly flagged as missing prerequisites
+	- Check::Dependencies: 'requires' lines indented inside cpanfile 'on' phase
+	  blocks were silently skipped due to anchored /^requires/ regex
+	- Check::CpanReadiness: only bare 'README' was accepted; README.md, README.pod,
+	  README.rst, and README.txt are now all treated as satisfying the requirement
+
+	[ Enhancements ]
+	- Added Test Dashboard
+	- Added runtime configuration via Object::Configure
+
+0.01	Wed Jul  1 12:45:37 EDT 2026
+        First draft

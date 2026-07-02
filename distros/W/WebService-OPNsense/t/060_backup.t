@@ -96,16 +96,15 @@ subtest 'backups with host' => sub {
     is( $backups->{rows}[0]{id}, '20200601', 'row id' );
 };
 
-subtest 'backups 404 returns undef' => sub {
+subtest 'backups 404 throws Exception' => sub {
     my $opn = _build_opn(
         sub {
             HTTP::Response->new( HTTP_NOT_FOUND, 'Not Found' );
         }
     );
-    ok(
-        !defined $opn->backup->backups('missing'),
-        '404 returns undef'
-    );
+    my $e = eval { $opn->backup->backups('missing'); undef } || $@;
+    ok( $e->isa('WebService::OPNsense::Exception'), '404 throws Exception' );
+    is( $e->http_status, HTTP_NOT_FOUND, 'http_status is 404' );
 };
 
 subtest 'delete_backup' => sub {
@@ -247,16 +246,15 @@ subtest 'download' => sub {
         is( $config->{configuration}, '<opnsense></opnsense>', 'returned data' );
     };
 
-    subtest 'GET 404 returns undef' => sub {
+    subtest 'GET 404 throws Exception' => sub {
         my $opn = _build_opn(
             sub {
                 HTTP::Response->new( HTTP_NOT_FOUND, 'Not Found' );
             }
         );
-        ok(
-            !defined $opn->backup->download('myfirewall'),
-            '404 returns undef'
-        );
+        my $e = eval { $opn->backup->download('myfirewall'); undef } || $@;
+        ok( $e->isa('WebService::OPNsense::Exception'), '404 throws Exception' );
+        is( $e->http_status, HTTP_NOT_FOUND, 'http_status is 404' );
     };
 
     subtest 'GET 500 throws Exception' => sub {
@@ -304,16 +302,15 @@ subtest 'diff' => sub {
         ok( defined $diff->{diff}, 'diff data returned' );
     };
 
-    subtest 'GET 404 returns undef' => sub {
+    subtest 'GET 404 throws Exception' => sub {
         my $opn = _build_opn(
             sub {
                 HTTP::Response->new( HTTP_NOT_FOUND, 'Not Found' );
             }
         );
-        ok(
-            !defined $opn->backup->diff( 'myfirewall', 'bak-v1', 'bak-v2' ),
-            '404 returns undef'
-        );
+        my $e = eval { $opn->backup->diff( 'myfirewall', 'bak-v1', 'bak-v2' ); undef } || $@;
+        ok( $e->isa('WebService::OPNsense::Exception'), '404 throws Exception' );
+        is( $e->http_status, HTTP_NOT_FOUND, 'http_status is 404' );
     };
 
     subtest 'GET 500 throws Exception' => sub {

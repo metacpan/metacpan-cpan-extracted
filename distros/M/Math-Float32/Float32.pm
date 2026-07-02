@@ -37,14 +37,14 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 Math::Float32->DynaLoader::bootstrap($VERSION);
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
 
 
-my @tagged = qw( flt_to_NV flt_to_MPFR
+my @tagged = qw( flt_to_NV
                  is_flt_nan is_flt_inf is_flt_zero flt_set_nan flt_set_inf flt_set_zero
                  flt_signbit
                  flt_set
@@ -110,6 +110,7 @@ sub oload_add {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_add($_[0], $coderef->($_[1]), 0);
    }
+   return Math::Bfloat16::oload_add($_[1], $_[0], $_[2]) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_add() function";
 }
 
@@ -122,6 +123,7 @@ sub oload_mul {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_mul($_[0], $coderef->($_[1]), 0);
    }
+   return Math::Bfloat16::oload_mul($_[1], $_[0], $_[2]) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_mul() function";
 }
 
@@ -134,6 +136,7 @@ sub oload_sub {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_sub($_[0], $coderef->($_[1]), $_[2]);
    }
+   return Math::Bfloat16::oload_sub($_[1], $_[0], 1) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_sub() function";
 }
 
@@ -146,6 +149,7 @@ sub oload_div {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_div($_[0], $coderef->($_[1]), $_[2]);
    }
+   return Math::Bfloat16::oload_div($_[1], $_[0], 1) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_div() function";
 }
 
@@ -158,6 +162,7 @@ sub oload_fmod {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_fmod($_[0], $coderef->($_[1]), $_[2]);
    }
+   return Math::Bfloat16::oload_fmod($_[1], $_[0], 1) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_fmod() function";
 }
 
@@ -170,6 +175,7 @@ sub oload_pow {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_pow($_[0], $coderef->($_[1]), $_[2]);
    }
+   return Math::Bfloat16::oload_pow($_[1], $_[0], 1) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_pow() function";
 }
 
@@ -186,6 +192,7 @@ sub oload_equiv {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_equiv($_[0], $coderef->($_[1]), 0);
    }
+   return Math::Bfloat16::oload_equiv($_[1], $_[0], 0) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_equiv() function";
 }
 
@@ -197,6 +204,7 @@ sub oload_not_equiv {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_not_equiv($_[0], $coderef->($_[1]), 0);
    }
+   return Math::Bfloat16::oload_not_equiv($_[1], $_[0], 0) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_not_equiv() function";
 }
 
@@ -208,6 +216,7 @@ sub oload_gt {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_gt($_[0], $coderef->($_[1]), $_[2]);
    }
+   return Math::Bfloat16::oload_lt($_[1], $_[0], 0) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_gt() function";
 }
 
@@ -219,6 +228,7 @@ sub oload_gte {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_gte($_[0], $coderef->($_[1]), $_[2]);
    }
+   return Math::Bfloat16::oload_lte($_[1], $_[0], 0) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_gte() function";
 }
 
@@ -230,6 +240,7 @@ sub oload_lt {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_lt($_[0], $coderef->($_[1]), $_[2]);
    }
+   return Math::Bfloat16::oload_gt($_[1], $_[0], 0) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_lt() function";
 }
 
@@ -241,6 +252,7 @@ sub oload_lte {
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_lte($_[0], $coderef->($_[1]), $_[2]);
    }
+   return Math::Bfloat16::oload_gte($_[1], $_[0], 0) if $itsa == 20;
    die "Unrecognized 2nd argument passed to oload_lte() function";
 }
 
@@ -251,6 +263,11 @@ sub oload_spaceship {
      return _oload_spaceship($_[0], $coderef->(bin2hex($_[1])), $_[2])
        if($itsa == 4 && $_[1] =~ /^(\s+)?[\-\+]?0b/i);
      return _oload_spaceship($_[0], $coderef->($_[1]), $_[2]);
+   }
+   if($itsa == 20) {
+     my $ret = Math::Bfloat16::oload_spaceship($_[1], $_[0], 0);
+     return undef if !defined($ret);
+     return $ret * -1;
    }
    die "Unrecognized 2nd argument passed to oload_spaceship() function";
 }
@@ -270,31 +287,6 @@ sub is_flt_zero {
 sub flt_signbit {
   return 1 if hex(substr(unpack_flt_hex($_[0]), 0, 1)) >= 8;
   return 0;
-}
-
-sub flt_nextabove {
-  if(is_flt_zero($_[0])) {
-    flt_set($_[0], $Math::Float32::flt_DENORM_MIN);
-  }
-  elsif($_[0] < $Math::Float32::flt_NORM_MIN && $_[0] >= -$Math::Float32::flt_NORM_MIN ) {
-    $_[0] += $Math::Float32::flt_DENORM_MIN;
-    flt_set_zero($_[0], -1) if is_flt_zero($_[0]);
-  }
-  else {
-    _flt_nextabove($_[0]);
-  }
-}
-
-sub flt_nextbelow {
-  if(is_flt_zero($_[0])) {
-    flt_set($_[0], -$Math::Float32::flt_DENORM_MIN);
-  }
-  elsif($_[0] <= $Math::Float32::flt_NORM_MIN && $_[0] > -$Math::Float32::flt_NORM_MIN ) {
-    $_[0] -= $Math::Float32::flt_DENORM_MIN;
-  }
-  else {
-    _flt_nextbelow($_[0]);
-  }
 }
 
 sub unpack_flt_hex {

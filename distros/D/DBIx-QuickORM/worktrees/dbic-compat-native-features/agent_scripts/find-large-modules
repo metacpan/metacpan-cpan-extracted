@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Walk lib/**.pm and report any file whose code (excluding POD)
+# exceeds the 1000-line threshold (see STYLE_GUIDE.md).
+#
+# Usage:
+#   perl scripts/find-large-modules                   # threshold = 1000
+#   perl scripts/find-large-modules --threshold 500   # custom threshold
+#   perl scripts/find-large-modules lib/Foo.pm        # specific files
+#
+# Exits 0 when no files exceed the threshold, 1 otherwise.
+
+use File::Find ();
+use Getopt::Long qw/GetOptions/;
+
+my $threshold = 1000;
+GetOptions('threshold=i' => \$threshold) or die "bad arguments\n";
+
+my @files = @ARGV;
+unless (@files) {
+    File::Find::find(
+        {
+            no_chdir => 1,
+            wanted   => sub { push @files, $_ if /\.pm\z/ && -f $_ },
+        },
+        'lib',
+    );
+}
+
+my $found = 0;
+for my $file (sort @files) {
+    open my $fh, '<', $file or do { warn "open $file: $!"; next };
+    my @lines = <$fh>;
+    close $fh;
+
+    my $code_count = 0;
+    my $in_pod = 0;
+    my $eof = 0;
+
+    for my $line (@lines) {
+        if ($line =~ /^__END__\s*$/ || $line =~ /^__DATA__\s*$/) {
+            $eof = 1;
+            last;
+        }
+
+        if ($line =~ /^=cut\b/) {
+            $in_pod = 0;
+            next;
+        }
+        if (!$in_pod && $line =~ /^=[A-Za-z]\w*/) {
+            $in_pod = 1;
+        }
+
+        next if $in_pod;
+        $code_count++;
+    }
+
+    if ($code_count > $threshold) {
+        printf("%s: %d lines of code (threshold %d)\n", $file, $code_count, $threshold);
+        $found++;
+    }
+}
+
+if ($found) {
+    print STDERR "\n$found module(s) exceed the $threshold-line threshold (STYLE_GUIDE.md).\n";
+    exit 1;
+}
+exit 0;

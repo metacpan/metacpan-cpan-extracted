@@ -1,5 +1,14 @@
 Revision history for RT-Extension-AI
 
+0.07
+ - Move functions to a dedicated section at the bottom of the POD. This is a
+   documentation-only change.
+ - Document natural language search
+ - Add a beta note to the natural language search
+ - Add notes about token usage, specifically input tokens
+ - Add a Search menu entry for natural language search
+ - Add Claude as a new AI provider option
+
 0.06 2026-05-27
  - Add AI queue setup assistant feature
  - Accept a natural language search query and generate TicketSQL

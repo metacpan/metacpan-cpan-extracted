@@ -2,7 +2,7 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::InMemory 1.09
+class Archive::SCS::InMemory 1.10
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';
@@ -153,7 +153,7 @@ way to create a new archive file from an L<Archive::SCS> object.
 =back
 
 Hash values used with this module must be in the internal format
-(currently, an 8-byte scalar PV in network byte order).
+(currently, a 16-byte hex scalar in network byte order).
 
 =head1 METHODS
 
@@ -210,7 +210,7 @@ L<nautofon|https://github.com/nautofon>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2025 by nautofon.
+This software is copyright (c) 2026 by nautofon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

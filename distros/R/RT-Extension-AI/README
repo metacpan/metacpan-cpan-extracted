@@ -1,18 +1,3 @@
-  GenerateTicketSummary
-    Generate a formatted summary of ticket conversations for AI processing.
-    This function extracts Create and Correspond transactions from a ticket
-    and formats them using XML-like tags similar to the context file format.
-
-  CleanTransactionContent
-    Clean up transaction content by removing RT email headers, signatures,
-    and excessive whitespace. Also escapes XML characters for safe inclusion
-    in XML output.
-
-  LoadContextFile
-    Load and return the contents of a context file for AI processing. This
-    function searches for relevant context files in the configured directory
-    and returns the content for inclusion in AI API requests.
-
 NAME
     RT-Extension-AI - Add various AI Features to Request Tracker
 
@@ -72,6 +57,7 @@ CONFIGURATION
                     suggest_response => 'Provide clear, practical advice or suggestions based on the given question or scenario.',
                     translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',
                     autocomplete_text => 'Predict the next three words based on the input text without explanations.',
+                    generate_ticketsql => 'You are an expert in Request Tracker (RT) search. Given a natural language description, generate a TicketSQL query to find tickets. If the request references desired columns in the output, also generate a Format string to display the results appropriately. Use the provided TicketSQL and Format grammar references to ensure correctness. Consider what columns would be most useful to display based on the user request.',
                  },
                  editor_features => [ 'adjust_tone', 'suggest_response', 'translate_content', 'autocomplete_text' ],
                  queue_creation_assistant => 1,  # Set to 0 to disable the AI queue creation assistant
@@ -106,6 +92,7 @@ CONFIGURATION
                     suggest_response => 'Provide clear, practical advice or suggestions based on the given question or scenario.',
                     translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',
                     autocomplete_text => 'Predict the next three words based on the input text without explanations.',
+                    generate_ticketsql => 'You are an expert in Request Tracker (RT) search. Given a natural language description, generate a TicketSQL query to find tickets. If the request references desired columns in the output, also generate a Format string to display the results appropriately. Use the provided TicketSQL and Format grammar references to ensure correctness. Consider what columns would be most useful to display based on the user request.',
                 },
                 editor_features => [ 'adjust_tone', 'suggest_response', 'translate_content', 'autocomplete_text' ],
                 queue_creation_assistant => 1,  # Set to 0 to disable the AI queue creation assistant
@@ -114,6 +101,47 @@ CONFIGURATION
                 suggest_response_context_prompt => "Context: The following are complete conversation histories from similar resolved support tickets. Use these examples to understand typical issue patterns, effective troubleshooting approaches, and professional response tone. Each <Ticket> contains chronological messages between users (customers/requesters) and support staff (privileged users). Apply these patterns to craft an appropriate response:",  # Text that introduces the context
               },
         );
+
+    Below shows a sample configuration with Claude (Anthropic):
+
+        Set( %RT_AI_Provider,
+              'Default' => {
+                name    => 'Claude',
+                api_key => 'YOUR_API_KEY',
+                timeout => 30,
+                url     => 'https://api.anthropic.com/v1/messages',
+                default_model => {
+                    name       => 'claude-opus-4-8',
+                    max_tokens => 1024,
+                    # temperature => 0.5,   # Omit for frontier models (Opus 4.7+),
+                                            # which reject temperature with a 400.
+                },
+                autocomplete_model => {
+                    name       => 'claude-haiku-4-5',
+                    max_tokens => 20,
+                },
+                prompts => {
+                    summarize_ticket => 'You are a helpdesk assistant. Summarize the ticket conversation precisely. Focus on key points, decisions made, and any follow-up actions required.',
+                    assess_sentiment => 'Classify the overall sentiment as Satisfied, Dissatisfied, or Neutral. Provide reasoning if possible.',
+                    adjust_tone => 'Paraphrase the text for clarity and professionalism. Ensure the tone is polite, concise, and customer-friendly.',
+                    suggest_response => 'Provide clear, practical advice or suggestions based on the given question or scenario.',
+                    translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',
+                    autocomplete_text => 'Predict the next three words based on the input text without explanations.',
+                    generate_ticketsql => 'You are an expert in Request Tracker (RT) search. Given a natural language description, generate a TicketSQL query to find tickets. If the request references desired columns in the output, also generate a Format string to display the results appropriately. Use the provided TicketSQL and Format grammar references to ensure correctness. Consider what columns would be most useful to display based on the user request.',
+                },
+                editor_features => [ 'adjust_tone', 'suggest_response', 'translate_content', 'autocomplete_text' ],
+                queue_creation_assistant => 1,  # Set to 0 to disable the AI queue creation assistant
+                use_context_files => 0,  # Set to 1 to enable context file usage for suggest_response
+                context_file_path => "$RT::EtcPath/ai/context",  # Directory containing context files
+                suggest_response_context_prompt => "Context: The following are complete conversation histories from similar resolved support tickets. Use these examples to understand typical issue patterns, effective troubleshooting approaches, and professional response tone. Each <Ticket> contains chronological messages between users (customers/requesters) and support staff (privileged users). Apply these patterns to craft an appropriate response:",  # Text that introduces the context
+              },
+        );
+
+    The Anthropic Messages API requires max_tokens, so always set it in
+    default_model (and autocomplete_model). temperature is sent only when
+    you set it explicitly, because the frontier models (Opus 4.7 and later)
+    reject it. To pin a specific API version, add an anthropic_version key
+    to the provider configuration; it defaults to 2023-06-01.
 
   Global and Queue-specific Configuration
     The block of configuration defined for the "Default" key, as shown
@@ -143,6 +171,8 @@ CONFIGURATION
         https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-f
         lash:generateContent
 
+    *   Claude (Anthropic), URL: https://api.anthropic.com/v1/messages
+
   Models
     Some API providers have different models that are optimized for
     different tasks. Currently most AI features use the general model. The
@@ -150,6 +180,40 @@ CONFIGURATION
     way to set a different model for that feature. ChatGPT, for example, has
     a turbo model that is optimized for speed and makes the autocomplete
     work much better.
+
+  Token Usage and Costs
+    AI providers bill based on the number of tokens they process, counting
+    both the input you send (your prompts, the ticket content, and any
+    reference material) and the output they return. Providers differ in
+    their default input token limits and in how they price input tokens, so
+    a feature that runs well and costs little with one provider may hit a
+    limit or cost more with another.
+
+    In our testing, Google Gemini accepted large inputs by default and at
+    low cost. Claude (Anthropic), by contrast, applies tiered rate limits,
+    and we had to move the account up to "Tier 1" to raise the default input
+    token limit enough for the heavier features to run. Your own provider
+    may behave differently and will be influenced by your usage of different
+    features.
+
+    Some features send much larger inputs than others. These tend to use the
+    most input tokens:
+
+    *   The natural language search sends the TicketSQL and Format grammar
+        references with every request, which makes each call large.
+
+    *   The Queue Creation Assistant carries the full chat history with each
+        turn, so the input grows as the conversation continues.
+
+    *   suggest_response, when context files are enabled, includes
+        conversation histories from similar tickets, which can add
+        substantial input.
+
+    Before enabling these features in full production, test them with your
+    provider and watch your token usage for both input and output. Confirm
+    that your account's limits and budget can absorb the volume you expect.
+    Refer to your AI provider's documentation for the details of their token
+    limits, pricing, and policies.
 
   Prompts
     You can define different prompts for different AI features. The keys in
@@ -259,6 +323,21 @@ FEATURES
     single click. See "Queue Creation Assistant" above for configuration
     details.
 
+  Natural Language Search (beta)
+    A natural language search form on the advanced search page (Search >
+    Tickets > Natural Language (AI), or directly at /Search/Edit.html).
+    Describe the tickets you want to find in plain language and the AI
+    provider generates the corresponding TicketSQL query and display columns
+    for you. Click "Generate Search" to create the search, then click
+    "Apply" to confirm it and return to the Query Builder. The form is shown
+    whenever an AI provider is configured.
+
+    This feature is currently in beta and has the following limitation: the
+    AI does not yet know the specific queue names, statuses, custom fields,
+    and other object names defined in your RT. If your question depends on
+    any of these, include the correct names in your request so the AI can
+    generate an accurate search.
+
 DEVELOPER
   CKEditor Plugin RtExtensionAi
     A new custom CKEditor plugin RtExtensionAi provides the AI integration
@@ -302,6 +381,22 @@ COPYRIGHT
     This is free software, licensed under:
 
       The GNU General Public License, Version 2, June 1991
+
+INTERNAL METHODS AND FUNCTIONS
+  GenerateTicketSummary
+    Generate a formatted summary of ticket conversations for AI processing.
+    This function extracts Create and Correspond transactions from a ticket
+    and formats them using XML-like tags similar to the context file format.
+
+  CleanTransactionContent
+    Clean up transaction content by removing RT email headers, signatures,
+    and excessive whitespace. Also escapes XML characters for safe inclusion
+    in XML output.
+
+  LoadContextFile
+    Load and return the contents of a context file for AI processing. This
+    function searches for relevant context files in the configured directory
+    and returns the content for inclusion in AI API requests.
 
   LoadQueueCreationPrompt
     Load the system prompt for the queue creation assistant from

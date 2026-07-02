@@ -2,7 +2,7 @@ package DBIx::QuickORM::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '0.000026';
+our $VERSION = '0.000027';
 
 use Carp qw/confess croak carp/;
 use Scalar::Util qw/blessed weaken/;
@@ -800,6 +800,20 @@ Get an L<DBIx::QuickORM::Handle> object that operates on this connection. Any
 argument accepted by the C<new()> or C<handle()> methods on
 L<DBIx::QuickORM::Handle> can be provided here as arguments.
 
+B<Passing an existing handle uses it as a subquery source.> A
+L<DBIx::QuickORM::Handle> is itself a source, so handing one to C<handle()>
+splices its query in as a derived table, C<< ( <inner query> ) AS <alias> >>:
+
+    my $recent = $con->handle('events')->where({ts => {'>' => $cutoff}});
+    $con->handle($recent)->where({kind => 'click'})->all;
+    # SELECT * FROM ( SELECT ... FROM events WHERE ts > ? ) AS subquery
+    #   WHERE kind = ?
+
+Use C<< $recent->subquery_alias('name') >> to control the derived-table alias
+(default C<subquery>). To refine an existing handle B<without> wrapping it in
+a subquery, call refining methods on the handle directly (e.g.
+C<< $recent->where(...) >>), which return a refined clone.
+
 B<Note:> unlike C<source()>, C<handle()> does not accept a scalar reference
 (literal SQL) directly; passing one throws. Build the source first and pass
 the object:
@@ -810,15 +824,15 @@ the object:
 
 sub handle {
     my $self = shift;
-    my ($in, @args) = @_;
+    my ($in) = @_;
 
     croak "handle() requires a source, a handle, or handle constructor arguments; got undef" unless defined $in;
 
-    if ((blessed($in) || !ref($in)) && ($in->isa('DBIx::QuickORM::Handle') || $in->DOES('DBIx::QuickORM::Role::Handle'))) {
-        return $in unless @args;
-        return $in->handle(@args);
-    }
-
+    # A handle passed here is consumed as a query source (a derived table),
+    # because Handle DOES Role::Source: the new handle wraps it as
+    # ( <inner query> ) AS <alias>. To refine an existing handle without
+    # wrapping it, call refining methods on the handle itself (e.g.
+    # $h->where(...)), which already return a refined clone.
     return $self->{+DEFAULT_HANDLE_CLASS}->handle(connection => $self, @_);
 }
 
@@ -911,9 +925,15 @@ or a hashref with the C<< field => val >> pairs.
 
 An arrayref of L<DBIx::QuickORM::Row> objects will be returned.
 
-This is a convenience method that boils down to this:
+For a table name or source object this is a convenience method that boils down
+to:
 
     $con->handle($source)->by_ids(@ids);
+
+B<Note:> when C<$source> is itself a L<DBIx::QuickORM::Handle>, it is used
+directly as the handle rather than wrapped as a subquery source the way
+C<< handle() >> would treat it. A primary-key lookup over a derived table is
+not meaningful, so the handle is reused as-is.
 
 =cut
 

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Role::APIPath;
-$WebService::OPNsense::Role::APIPath::VERSION = '0.002';
+$WebService::OPNsense::Role::APIPath::VERSION = '0.003';
 use Moo::Role;
 use namespace::clean;
 
@@ -33,7 +33,7 @@ WebService::OPNsense::Role::APIPath - Role providing _path helper for URI::Templ
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

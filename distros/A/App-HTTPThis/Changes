@@ -1,5 +1,13 @@
 # Changes for App-HTTPThis
 
+1.0.0
+     * Default to binding to 127.0.0.1 when no host is set in the CLI or config
+     * Add --all (alias --promiscuous) and config all=1 to restore the previous all-interfaces behaviour
+
+0.11.2
+     * Be honest about the default being to bind to all network interfaces
+     * Add back missing '=head1 NAME' section (went missing in de-dzillification)
+
 0.11.1
      * Bump required version of Plack::App::DirectoryIndex
 

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000026';
+our $VERSION = '0.000027';
 
 use Data::Dumper;
 use Scalar::Util qw/blessed/;
@@ -28,6 +28,7 @@ our @EXPORT_OK = qw{
     mask
     unmask
     masked
+    literal_write_value
 };
 
 =pod
@@ -53,6 +54,19 @@ Nothing is exported by default; request the functions you need by name.
 =cut
 
 sub column_key { return join ', ' => sort @_ }
+
+# True when a write value (an insert/update/cas/upsert column value) is an
+# intentional SQL literal rather than data to bind: a scalar ref of SQL
+# (\'NOW()') or an arrayref whose first element is a scalar ref of SQL plus its
+# bind values ([\'col + ?', $n]). Everything else (plain scalars, undef,
+# hashrefs, plain arrayrefs, blessed objects) is data.
+sub literal_write_value {
+    my ($val) = @_;
+    my $ref = ref($val) or return 0;
+    return 1 if $ref eq 'SCALAR';
+    return 1 if $ref eq 'ARRAY' && ref($val->[0]) eq 'SCALAR';
+    return 0;
+}
 
 sub load_class {
     my ($class, $prefix) = @_;

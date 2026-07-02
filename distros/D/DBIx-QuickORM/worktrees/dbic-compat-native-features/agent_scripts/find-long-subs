@@ -1,0 +1,93 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Walk lib/**.pm and report any sub whose body exceeds the line
+# threshold (see ARCHITECTURE.md §25). POD blocks and __END__
+# trailers are stripped before counting; the limit applies to
+# executable Perl only.
+#
+# Usage:
+#   perl author/find-long-subs                   # threshold = 75
+#   perl author/find-long-subs --threshold 100   # custom threshold
+#   perl author/find-long-subs lib/Foo.pm        # specific files
+#
+# Exits 0 when no subs exceed the threshold, 1 otherwise. Suitable
+# for CI as a tripwire on regressions.
+
+use File::Find ();
+use Getopt::Long qw/GetOptions/;
+
+my $threshold = 75;
+GetOptions('threshold=i' => \$threshold) or die "bad arguments\n";
+
+my @files = @ARGV;
+unless (@files) {
+    File::Find::find(
+        {
+            no_chdir => 1,
+            wanted   => sub { push @files, $_ if /\.pm\z/ && -f $_ },
+        },
+        'lib',
+    );
+}
+
+my $found = 0;
+for my $file (sort @files) {
+    open my $fh, '<', $file or do { warn "open $file: $!"; next };
+    my @lines = <$fh>;
+    close $fh;
+
+    # Strip POD blocks (=foo ... =cut).
+    my $in_pod = 0;
+    for my $i (0 .. $#lines) {
+        if ($lines[$i] =~ /^=cut\b/) { $in_pod = 0; $lines[$i] = ""; next }
+        if (!$in_pod && $lines[$i] =~ /^=[A-Za-z]\w*/) { $in_pod = 1 }
+        $lines[$i] = "" if $in_pod;
+    }
+    # Strip __END__ / __DATA__ trailers.
+    my $eof = 0;
+    for my $i (0 .. $#lines) {
+        $eof = 1 if $lines[$i] =~ /^__(?:END|DATA)__\s*$/;
+        $lines[$i] = "" if $eof;
+    }
+
+    my $i = 0;
+    while ($i < @lines) {
+        if ($lines[$i] =~ /^\s*sub\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:\(.*?\))?\s*\{/) {
+            my $name  = $1;
+            my $start = $i;
+            my $depth = 0;
+            my $j     = $i;
+            my $opened = 0;
+            while ($j < @lines) {
+                my $stripped = $lines[$j];
+                $stripped =~ s/#.*//;
+                $stripped =~ s/'(?:\\.|[^'\\])*'//g;
+                $stripped =~ s/"(?:\\.|[^"\\])*"//g;
+                my $o = () = $stripped =~ /\{/g;
+                my $c = () = $stripped =~ /\}/g;
+                $depth += $o - $c;
+                $opened ||= $o > 0;
+                if ($opened && $depth <= 0) {
+                    my $len = $j - $start + 1;
+                    if ($len > $threshold) {
+                        printf("%s:%d  %s  (%d lines)\n", $file, $start + 1, $name, $len);
+                        $found++;
+                    }
+                    $i = $j;
+                    last;
+                }
+                $j++;
+            }
+            $i++ if $j >= @lines;
+        }
+        $i++;
+    }
+}
+
+if ($found) {
+    print STDERR "\n$found sub(s) exceed the $threshold-line threshold (ARCHITECTURE.md \xc2\xa725).\n";
+    exit 1;
+}
+exit 0;

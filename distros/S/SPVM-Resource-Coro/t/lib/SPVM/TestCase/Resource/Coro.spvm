@@ -1,0 +1,4 @@
+class TestCase::Resource::Coro {
+  use Resource::Coro;
+  native static method test : int ();
+}

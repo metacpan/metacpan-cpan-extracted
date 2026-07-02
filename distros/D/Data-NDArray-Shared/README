@@ -1,0 +1,359 @@
+NAME
+    Data::NDArray::Shared - shared-memory typed N-dimensional numeric array
+    for Linux
+
+SYNOPSIS
+        use Data::NDArray::Shared;
+
+        # a 2x3 array of doubles in an anonymous shared mapping
+        # ($path = undef for an anonymous array)
+        my $a = Data::NDArray::Shared->new(undef, "f64", 2, 3);
+
+        $a->ndim;        # 2
+        $a->size;        # 6   (== 2 * 3, also ->numel)
+        $a->shape;       # (2, 3)
+        $a->strides;     # (3, 1)   row-major, in elements
+        $a->dtype;       # "f64"
+        $a->itemsize;    # 8
+
+        $a->set(0, 0, 1.5);          # element [0][0] = 1.5  (multi-index)
+        $a->get(0, 0);               # 1.5
+        $a->set_flat(5, 9);          # last element by flat index
+        $a->get_flat(5);             # 9
+
+        $a->fill(7);                 # every element = 7
+        $a->zero;                    # every element = 0
+
+        $a->sum;  $a->mean;  $a->min;  $a->max;   # whole-array reductions
+
+        $a->add_scalar(2);           # every element += 2   (in place)
+        $a->mul_scalar(3);           # every element *= 3   (in place)
+
+        $a->reshape(3, 2);           # same data, shape (3,2), strides (2,1)
+
+        # element-wise array arithmetic (same dtype + total size), in place
+        my $b = Data::NDArray::Shared->new(undef, "f64", 3, 2);
+        $a->add($b);                 # a[i] += b[i]
+        $a->subtract($b);            # a[i] -= b[i]
+        $a->multiply($b);            # a[i] *= b[i]
+
+        my $list = $a->to_list;      # arrayref of all elements, row-major
+
+        # integer dtypes: i64/i32/i16/i8/u64/u32/u16/u8
+        my $c = Data::NDArray::Shared->new(undef, "u8", 4);
+        $c->set_flat(0, 300);        # wraps to 44 (stored in the element width)
+
+        # share across processes via a backing file ($path = the file)
+        my $shared = Data::NDArray::Shared->new("/tmp/nd.bin", "f64", 100, 100);
+
+DESCRIPTION
+    A dense, row-major numeric tensor in shared memory, shared across
+    processes. The array has a fixed dtype (one of "f64", "f32", "i64",
+    "i32", "i16", "i8", "u64", "u32", "u16", "u8"), a fixed shape of 1 to 8
+    dimensions, and the matching row-major strides (in elements). The
+    elements live contiguously in a shared mapping, so several processes
+    share one array: any process that opens the same backing file, inherits
+    the anonymous mapping across "fork", or reopens a passed memfd, sees the
+    same data.
+
+    Supported operations:
+
+    *   Indexed access -- get(@idx) / "set(@idx, $val)" by a full
+        multi-index, and get_flat($e) / "set_flat($e, $val)" by a single
+        linear (row-major) index "0 .. size-1".
+
+    *   Bulk fills -- fill($val) sets every element; "zero" sets every
+        element to zero.
+
+    *   reshape(@newshape) -- change the shape without copying data; the
+        total element count must be unchanged. Strides are recomputed
+        row-major.
+
+    *   Reductions -- "sum", "mean" (both return a floating-point number
+        computed by double accumulation), "min" and "max" (return the actual
+        extreme element in the dtype-correct type).
+
+    *   In-place scalar arithmetic -- add_scalar($s) and mul_scalar($s)
+        apply "element OP $s" to every element.
+
+    *   In-place element-wise array arithmetic -- "add", "subtract" and
+        "multiply" combine the receiver with another "Data::NDArray::Shared"
+        of the same dtype and same total size, element by element.
+
+    Values are stored in the element type. For the integer dtypes, a value
+    that does not fit the element width wraps/truncates to that width per C
+    cast rules (storing 300 into a "u8" yields 44); the caller is
+    responsible for fitting values to the dtype. Float dtypes store the
+    nearest representable value ("f32" loses precision relative to a Perl
+    NV). All arithmetic on integer dtypes is performed in the element's
+    integer type (so it can overflow/wrap); float dtypes accumulate
+    reductions in "double".
+
+    A write-preferring futex rwlock with dead-process recovery guards every
+    mutation, so writes from many processes serialize cleanly. The immutable
+    header fields ("dtype", "ndim", "size", "itemsize", "shape", "strides")
+    are read without locking ("reshape" updates "shape"/"strides"/"ndim"
+    under the write lock). Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $a = Data::NDArray::Shared->new($path, $dtype, @shape);     # file-backed
+        my $a = Data::NDArray::Shared->new(undef, $dtype, @shape);     # anonymous
+        my $a = Data::NDArray::Shared->new_memfd($name, $dtype, @shape);
+        my $a = Data::NDArray::Shared->new_memfd(undef, $dtype, @shape);
+        my $a = Data::NDArray::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" for an anonymous mapping); $dtype is
+    the dtype name ("f64", "i32", ...); and @shape is the shape: "($path,
+    $dtype, @shape)". "new_memfd" takes the memfd label as its leading
+    argument instead of a path ("undef" for an unnamed memfd): "($name,
+    $dtype, @shape)".
+
+    @shape must have 1 to 8 dimensions, each ">= 1". The constructor croaks
+    on an unknown dtype, on no dimensions or a zero/negative dimension, on
+    more than 8 dimensions, or if the implied data buffer ("product(shape) *
+    itemsize") would overflow or exceed an internal 1 TiB cap ("shape too
+    large"). A freshly created array is zero-filled.
+
+    When reopening an existing file or memfd, the stored dtype, shape and
+    strides win and the existing data is preserved; the dtype/shape you pass
+    to "new" on a reopen are only used when the file is brand new.
+    "new_memfd" creates a Linux memfd (transferable via its "memfd"
+    descriptor); "new_from_fd" reopens one in another process.
+
+  Element access
+        my $v = $a->get(@idx);            # element at the full multi-index
+        $a->set(@idx, $val);              # write the element at the multi-index
+        my $v = $a->get_flat($e);         # element at flat (row-major) index $e
+        $a->set_flat($e, $val);           # write the element at flat index $e
+
+    "get"/"set" take exactly "ndim" indices; each index must be in "0 ..
+    shape[d]-1". The flat index for "get_flat"/"set_flat" must be in "0 ..
+    size-1". A wrong index count or an out-of-range index croaks before any
+    lock is taken (so a caught croak never leaks a lock). "get" and
+    "get_flat" return the dtype-correct scalar (a floating-point number for
+    float dtypes, a signed integer for the signed-int dtypes, an unsigned
+    integer for the unsigned-int dtypes). "set"/"set_flat" store the value
+    in the element type, wrapping integer values to the element width (see
+    "DESCRIPTION").
+
+    Indices must be non-negative integers in "0 .. shape-1"; a negative
+    index is treated as a large unsigned value and croaks out of range.
+
+  Bulk fills
+        $a->fill($val);                   # every element = $val  (returns $a)
+        $a->zero;                         # every element = 0     (returns $a)
+
+    "fill" writes the typed value of $val to every element (integers wrap to
+    the element width). "zero" sets the whole buffer to zero. Both return
+    the array for chaining.
+
+  reshape
+        $a->reshape(@newshape);           # returns $a
+
+    "reshape" changes the shape in place without moving any data: the flat,
+    row-major sequence of elements is unchanged; only "shape", "strides" and
+    "ndim" are updated (strides recomputed row-major). The product of
+    @newshape must equal the current "size", and the new rank must be 1 to
+    8; otherwise it croaks. Returns the array for chaining.
+
+  Reductions
+        my $s = $a->sum;                  # floating-point sum  (double accumulation)
+        my $m = $a->mean;                 # $s / size
+        my $lo = $a->min;                 # smallest element, dtype-correct
+        my $hi = $a->max;                 # largest  element, dtype-correct
+
+    "sum" and "mean" always return a floating-point number: every element is
+    read as a "double" and accumulated, so for the 64-bit integer dtypes a
+    very large sum may lose integer precision. "min" and "max" return the
+    actual extreme element value in its native dtype (so an "i64" min is
+    exact). The array always has at least one element, so these never
+    operate on an empty array.
+
+  Scalar arithmetic (in place)
+        $a->add_scalar($s);               # element += $s for every element
+        $a->mul_scalar($s);               # element *= $s for every element
+
+    Each applies the operation to every element in the element's own
+    arithmetic: float dtypes compute in floating point; integer dtypes
+    compute in the element's integer type (and therefore wrap on overflow).
+    Both return the array for chaining.
+
+  Element-wise array arithmetic (in place)
+        $a->add($b);                      # a[i] += b[i]
+        $a->subtract($b);                 # a[i] -= b[i]
+        $a->multiply($b);                 # a[i] *= b[i]
+
+    Each combines the receiver with another "Data::NDArray::Shared" element
+    by element, storing the result back into the receiver. The other array
+    must have the same dtype and the same total size (its shape need not
+    match, only the element count); a mismatch croaks before any lock is
+    taken. Self-application is allowed and meaningful: "$a->add($a)"
+    doubles, "$a->subtract($a)" zeroes, "$a->multiply($a)" squares. Each
+    returns the receiver for chaining.
+
+    Locking is deadlock-free across processes: the two arrays' locks are
+    acquired in a globally consistent order keyed on a per-array shared
+    identity, with the receiver taking the write lock and the other the read
+    lock. Two unrelated processes performing "X->add(Y)" and "Y->add(X)"
+    concurrently cannot deadlock.
+
+  Whole-array list
+        my $aref = $a->to_list;           # arrayref of all elements, row-major
+        my $aref = $a->flat;              # alias for to_list
+
+    "to_list" (aliased "flat") returns a new array reference holding every
+    element in flat row-major order, each as the dtype-correct scalar.
+
+  Accessors
+        $a->dtype;        # dtype name string, e.g. "f64"
+        $a->ndim;         # number of dimensions
+        $a->size;         # total element count   (also ->numel)
+        $a->itemsize;     # bytes per element
+        $a->shape;        # list of dimension sizes
+        $a->strides;      # list of row-major strides (in elements)
+
+    All read immutable (or reshape-updated) header fields. "size" (aliased
+    "numel") and "itemsize" never change; "shape"/"strides"/"ndim" change
+    only under "reshape".
+
+  Lifecycle
+        $a->path; $a->memfd; $a->sync; $a->unlink;   # or Class->unlink($path)
+
+    "sync" flushes the mapping to its backing store (a no-op for anonymous
+    and memfd arrays, which have none); "unlink" removes the backing file
+    (also callable as "Class->unlink($path)"); "path" returns the backing
+    path ("undef" for anonymous, memfd, or fd-reopened arrays); "memfd"
+    returns the backing descriptor -- the memfd of a "new_memfd" array or
+    the dup'd fd of a "new_from_fd" array, and -1 for file-backed or
+    anonymous arrays.
+
+STATS
+    stats() returns a hashref describing the array:
+
+    *   "dtype" -- the dtype name string.
+
+    *   "ndim" -- the number of dimensions.
+
+    *   "size" -- the total element count.
+
+    *   "itemsize" -- bytes per element.
+
+    *   "shape" -- an arrayref of the dimension sizes.
+
+    *   "ops" -- running count of operations that took the write lock (every
+        "set", "set_flat", "fill", "zero", "reshape", "add_scalar",
+        "mul_scalar", "add", "subtract", "multiply").
+
+    *   "mmap_size" -- bytes of the shared mapping.
+
+PDL INTEROP
+    If PDL is installed the array converts to and from PDL ndarrays. PDL is
+    an optional, load-on-demand dependency -- there is no build- or runtime
+    prereq; the four conversion methods ("to_pdl", "from_pdl",
+    "update_from_pdl", "as_pdl_alias") "croak" if PDL is missing, while
+    "buffer" and "update_from_bytes" have no PDL dependency. Each dtype maps
+    to a PDL type of the same byte width ("f64" to "double", "i32" to
+    "long", "u64" to "ulonglong", and so on), so the data moves with no
+    per-element conversion.
+
+    Axis order: this array is row-major (C-order) while PDL's dim(0) is the
+    fastest-varying axis, so the shape is reversed across the boundary -- an
+    "($r, $c)" array corresponds to PDL dims "($c, $r)", and
+    "$piddle->at($j, $i)" is "$array->get($i, $j)". The conversion methods
+    handle this for you.
+
+    *   "$piddle = $array->to_pdl"
+
+        A new piddle holding a copy of the data, of the mapped PDL type and
+        dims reverse($array->shape). Read under the lock, so it is a
+        consistent snapshot.
+
+    *   "$array = Data::NDArray::Shared->from_pdl($piddle, $path)"
+
+        A new shared array copied from $piddle (made physical and contiguous
+        first); the dtype and shape follow the piddle's type and "reverse"
+        of its dims. $path is the backing file ("undef" or omitted for an
+        anonymous mapping).
+
+    *   "$array->update_from_pdl($piddle)"
+
+        Copy $piddle into this array in place (write-locked). The piddle's
+        type must match the dtype and its dims must equal
+        reverse($array->shape), else it croaks. Returns the array.
+
+    *   "$piddle = $array->as_pdl_alias"
+
+        A piddle that aliases the shared mapping with no copy (a real
+        "PDL_DONTTOUCHDATA" ndarray over our memory): an in-place PDL
+        operation ("$p .= ...", "$p->inplace->...") writes straight through
+        to shared memory -- visible to every process that maps it -- and
+        reads see live data. The array is kept alive for as long as the
+        piddle.
+
+        This one method needs PDL at build time (it is compiled against
+        PDL's C API): if the module was installed without PDL present it
+        "croak"s, while the copy methods above keep working through a
+        runtime "require PDL". Reinstall with PDL installed to enable it.
+
+        Caveats. The alias bypasses the rwlock: you must coordinate access
+        yourself (no other process mutating concurrently), as with any
+        unlocked shared-memory view. Do not resize or retype the alias (a
+        reshape that grows it, a type conversion) -- it is a fixed window
+        onto the mapping; use "to_pdl"/"from_pdl" when you want an
+        independent, resizable copy.
+
+    *   "$bytes = $array->buffer"
+
+        The raw contiguous data region as a byte string (read-locked
+        snapshot), row-major C-order -- useful on its own for serialization
+        or IPC, and the basis for "to_pdl".
+        "$array->update_from_bytes($bytes)" is the inverse (write-locked;
+        the string must be exactly "size * itemsize" bytes).
+
+    See eg/pdl_interop.pl for a worked example, including a cross-process
+    PDL transform on one shared array.
+
+SHARING ACROSS PROCESSES
+    The array lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path,
+    $dtype, @shape)" on the same path), an anonymous mapping inherited
+    across "fork", or a memfd whose descriptor is passed to an unrelated
+    process (over a UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n")
+    and reopened with new_from_fd($fd). Because the mapping is shared, every
+    process reads and writes the same elements. All mutation is serialized
+    by the write lock, so a set of disjoint writers produces a well-defined
+    final array regardless of how they interleave.
+
+        # parent and children fill disjoint slices of one shared array
+        my $a = Data::NDArray::Shared->new(undef, "f64", 4000);   # before fork
+        unless (fork) { $a->set_flat($_, $_) for 0 .. 999; exit }
+        wait;
+        print $a->get_flat(500), "\n";   # reflects the child's writes
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Because each mutation updates the data buffer
+    (and, for "reshape", a few header words) while holding the lock, a crash
+    leaves the array consistent up to the last completed operation.
+    Limitation: PID reuse is not detected (very unlikely in practice).
+
+SEE ALSO
+    Data::Histogram::Shared, Data::RoaringBitmap::Shared,
+    Data::DisjointSet::Shared, Data::CountMinSketch::Shared,
+    Data::HyperLogLog::Shared, Data::BloomFilter::Shared,
+    Data::Intern::Shared, Data::SortedSet::Shared,
+    Data::SpatialHash::Shared, and the rest of the "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

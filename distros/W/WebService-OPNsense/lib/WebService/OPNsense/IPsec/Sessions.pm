@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::Sessions;
-$WebService::OPNsense::IPsec::Sessions::VERSION = '0.002';
+$WebService::OPNsense::IPsec::Sessions::VERSION = '0.003';
 use Carp qw( croak );
 use Moo;
 use namespace::clean;    # must be last
@@ -57,7 +57,7 @@ WebService::OPNsense::IPsec::Sessions - IPsec session controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

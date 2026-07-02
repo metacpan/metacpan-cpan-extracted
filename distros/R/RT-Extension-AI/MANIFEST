@@ -8,6 +8,7 @@ html/AI/AdjustToneForm
 html/AI/ModalContent
 html/AI/SuggestionForm
 html/AI/TranslateForm
+html/Callbacks/RT-Extension-AI/Elements/Header/PrivilegedMainNav
 html/Callbacks/RT-Extension-AI/Elements/JavascriptConfig/Data
 html/Callbacks/RT-Extension-AI/Elements/Tabs/Privileged
 html/Callbacks/RT-Extension-AI/Search/Edit.html/BeforeQuery
@@ -39,6 +40,7 @@ lib/RT/Action/AddTicketSentiment.pm
 lib/RT/Action/AddTicketSummary.pm
 lib/RT/Extension/AI.pm
 lib/RT/Extension/AI/Provider.pm
+lib/RT/Extension/AI/Provider/Claude.pm
 lib/RT/Extension/AI/Provider/Gemini.pm
 lib/RT/Extension/AI/Provider/OpenAI.pm
 Makefile.PL

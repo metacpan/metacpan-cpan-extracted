@@ -1,0 +1,33 @@
+Changes
+cpanfile
+lib/App/Project/Doctor.pm
+lib/App/Project/Doctor/Check/Base.pm
+lib/App/Project/Doctor/Check/CI.pm
+lib/App/Project/Doctor/Check/CpanReadiness.pm
+lib/App/Project/Doctor/Check/Dependencies.pm
+lib/App/Project/Doctor/Check/GitHubActions.pm
+lib/App/Project/Doctor/Check/License.pm
+lib/App/Project/Doctor/Check/Meta.pm
+lib/App/Project/Doctor/Check/Pod.pm
+lib/App/Project/Doctor/Check/Role.pm
+lib/App/Project/Doctor/Check/Security.pm
+lib/App/Project/Doctor/Check/Tests.pm
+lib/App/Project/Doctor/Context.pm
+lib/App/Project/Doctor/Finding.pm
+lib/App/Project/Doctor/Fixer.pm
+lib/App/Project/Doctor/Report.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+script/project-doctor
+t/edge_cases.t
+t/eof.t
+t/eol.t
+t/extended_tests.t
+t/function.t
+t/integration.t
+t/unit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

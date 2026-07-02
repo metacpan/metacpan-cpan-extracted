@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::ManualSpd;
-$WebService::OPNsense::IPsec::ManualSpd::VERSION = '0.002';
+$WebService::OPNsense::IPsec::ManualSpd::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -30,7 +30,7 @@ WebService::OPNsense::IPsec::ManualSpd - IPsec manual SPD (Security Policy Datab
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

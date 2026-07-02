@@ -1,0 +1,211 @@
+NAME
+    Data::SortedSet::Shared - shared-memory sorted set (ZSET) for Linux
+
+SYNOPSIS
+        use Data::SortedSet::Shared;
+
+        # up to 1M members, anonymous shared mapping
+        my $z = Data::SortedSet::Shared->new(undef, 1_000_000);
+
+        $z->add(42, 1500);              # member 42 with score 1500
+        $z->add(7,  1500);              # ties broken by member id
+        $z->incr(42, 50);               # 42 -> 1550 (returns the new score)
+
+        my @top   = $z->rev_range_by_rank(0, 9);    # top 10 members (highest score)
+        my $rank  = $z->rank(42);                    # 0-based rank (lowest score = 0)
+        my $score = $z->score(42);
+        my @near  = $z->range_by_score(1400, 1600);  # members scored in [1400, 1600]
+
+        my ($m, $s) = $z->pop_min;       # remove + return the lowest
+
+        $z->each(sub { my ($member, $score) = @_; ... });   # in score order
+
+DESCRIPTION
+    An ordered set in shared memory, in the spirit of a Redis sorted set:
+    each member is a 64-bit integer carrying a double score, and members are
+    kept in score order. It is backed by an order-statistics B+tree -- so
+    "rank", range, and "pop" are O(log n) and ranges scan sequentially
+    through doubly-linked leaves -- paired with a member-to-score hash
+    index, so "score" and "exists" are O(1).
+
+    The total order is (score, member): members with equal scores are
+    ordered by member id, which gives a well-defined rank and a
+    deterministic "pop_min"/"pop_max".
+
+    Multiple processes can map the same set and read and write it
+    concurrently; access is serialized by a write-preferring futex rwlock
+    that recovers automatically if a lock holder dies (see "CRASH SAFETY").
+
+    Members are 64-bit integers. For string-keyed sets, see "String-keyed
+    sets" and Data::SortedSet::Shared::Strings (bundled). Scores must not be
+    NaN. Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $z = Data::SortedSet::Shared->new($path, $max);
+        my $z = Data::SortedSet::Shared->new(undef, $max);        # anonymous
+        my $z = Data::SortedSet::Shared->new_memfd($name, $max);
+        my $z = Data::SortedSet::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" for an anonymous mapping); $max is
+    the maximum number of members. When reopening an existing file or memfd,
+    the stored header wins and the caller's $max is ignored. "new_memfd"
+    creates a Linux memfd (transferable via its "memfd" descriptor);
+    "new_from_fd" reopens one in another process.
+
+  String-keyed sets
+        my $z = Data::SortedSet::Shared->new_strings(max => 1_000_000);
+        $z->add("alice", 1500);
+        my @top = $z->rev_range_by_rank(0, 9);    # ("alice", ...)
+
+    "new_strings" returns a Data::SortedSet::Shared::Strings -- the same API
+    as this class but with string members. Keys are interned to dense ids
+    via Data::Intern::Shared (a prerequisite of this distribution), so the
+    set is still shared across processes by id. Ties among equal scores
+    break by interning id, not lexicographically. See
+    Data::SortedSet::Shared::Strings for the full options ("set"/"keys"
+    backing paths, "max_keys", "arena"), and the separate "wrap" constructor
+    that adopts two existing objects.
+
+  Mutators
+        $z->add($member, $score);     # 1 new, 0 existing (score updated), undef if full
+        $z->incr($member, $delta);    # add to the score (creating at $delta); returns new score
+        $z->remove($member);          # true if removed, false if absent
+        my $n = $z->add_many([ [$m1,$s1], [$m2,$s2], ... ]);   # bulk; returns count of new
+        $z->clear;
+
+    "add" inserts a new member or updates an existing member's score,
+    returning 1 or 0 respectively, or "undef" if the pool is full and the
+    member is new. $score may be any finite or infinite value but not NaN
+    (croaks). "incr" creates an absent member at $delta (like Redis ZINCRBY)
+    and croaks if the result would be NaN, or if the pool is full and the
+    member is new.
+
+    "add_many" applies a whole batch under a single lock; each row is an
+    "[member, score]" arrayref, malformed or NaN-scored rows are skipped,
+    and it stops at $max. It returns the number of members newly inserted,
+    which can be fewer than the number of new rows if the pool fills
+    mid-batch.
+
+  Lookup and count
+        $z->score($member);           # the score, or undef if absent
+        $z->exists($member);
+        $z->count;                    # number of members
+        $z->rank($member);            # 0-based rank (lowest score = 0), or undef
+        $z->rev_rank($member);        # rank from the top, or undef
+        $z->count_in_score($min, $max);   # members with score in [min, max] (inclusive)
+
+  Rank and range
+        $z->at_rank($r);              # member at rank $r (negative counts from the end), or undef
+        my @m = $z->range_by_rank($start, $stop);       # members in [start .. stop] by rank
+        my @m = $z->rev_range_by_rank(0, 9);            # top 10 (highest scores first)
+        my @m = $z->range_by_score($min, $max, %opts);  # members scored in [min, max], ascending
+        my @m = $z->rev_range_by_score($max, $min, %opts);
+
+    Rank indices are 0-based and may be negative (counting from the end,
+    like Perl slices); "range_by_*" bounds are inclusive. "range_by_score" /
+    "rev_range_by_score" accept "limit => $n" and "offset => $k" (a negative
+    "offset" is treated as 0). All range and rank methods return members;
+    pass "withscores => 1" for a flat "(member, score, ...)" list instead.
+
+  Pop and peek
+        my ($member, $score) = $z->pop_min;    # remove + return the lowest, or () if empty
+        my ($member, $score) = $z->pop_max;
+        my ($member, $score) = $z->peek_min;   # without removing
+        my ($member, $score) = $z->peek_max;
+
+  Iteration
+        $z->each(sub { my ($member, $score) = @_; ... });
+
+    "each" snapshots all members under the read lock, then invokes the
+    callback once per member in score order after the lock is released, so
+    the callback may safely call back into the set.
+
+  Introspection and lifecycle
+        $z->count; $z->max_entries; $z->stats;     # see STATS
+        $z->path; $z->memfd; $z->sync; $z->unlink;     # or Class->unlink($path)
+        $z->eventfd; $z->fileno; $z->notify; $z->eventfd_consume;
+
+    "sync" flushes the mapping to its backing store and "unlink" removes the
+    backing file (also callable as "Class->unlink($path)"). "path" returns
+    the backing file path ("undef" for an anonymous or memfd-backed set) and
+    "memfd" returns the descriptor of a "new_memfd" set (-1 otherwise). The
+    eventfd methods let another process wait for updates: "eventfd" lazily
+    creates an eventfd and returns its descriptor (croaks on failure;
+    calling it again returns the same fd), "fileno" returns the current
+    eventfd descriptor or -1, "notify" writes a wakeup (returning false if
+    no eventfd is attached), and "eventfd_consume" reads and resets the
+    counter, returning it as an integer or "undef" when nothing is pending.
+
+SHARING ACROSS PROCESSES
+    The set lives in a shared mapping, so several processes operate on the
+    same data with no serialization layer in between. There are three ways
+    to share it:
+
+    *   A backing file -- every process calls "new($path, $max)" on the same
+        path. The first to arrive creates and sizes the file (serialized by
+        an exclusive lock); the rest map it.
+
+    *   An anonymous mapping inherited across "fork" -- create with
+        "new(undef, $max)" before forking; the parent and its children then
+        share the one mapping.
+
+    *   A memfd -- create with "new_memfd($name, $max)" and hand its "memfd"
+        descriptor to an unrelated process (over a UNIX socket with
+        "SCM_RIGHTS", or while the creator is alive via "/proc/$pid/fd/$n"),
+        which reopens it with new_from_fd($fd).
+
+        # children populate a fork-shared set; the parent reads the result
+        my $z = Data::SortedSet::Shared->new(undef, 1_000_000);
+        for my $k (1 .. 4) {
+            unless (fork) {                                  # child
+                $z->add($k * 1_000_000 + $_, rand) for 1 .. 1000;
+                exit;
+            }
+        }
+        1 while wait != -1;                                  # reap children
+        print $z->count, "\n";                               # 4000
+
+    Every operation is serialized by the rwlock, so concurrent writers do
+    not corrupt the tree. A writer can wake readers blocked in other
+    processes through the eventfd interface: it calls "notify" after a
+    batch, and a reader selects on "fileno" then drains the count with
+    "eventfd_consume".
+
+COMPLEXITY
+    "score"/"exists"/"peek_*" are O(1); "add"/"remove"/"incr"/"rank"/
+    "at_rank"/"pop_*" and locating a range bound are O(log n); a range or
+    iteration of "k" members is O(log n + k), scanning sequentially through
+    the linked leaves.
+
+STATS
+    stats() returns a hashref with keys: "count", "max_entries", "height"
+    (B+tree height), "node_capacity", "nodes_used", "index_slots",
+    "index_load" (occupied fraction of the member index), "ops" (running
+    count of write-path calls, whether or not they changed the set), and
+    "mmap_size" (bytes).
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+CRASH SAFETY
+    The write lock is a futex-based rwlock with PID-encoded ownership; if a
+    writer dies while holding it, the next writer detects the dead owner and
+    recovers. Reader slots are reclaimed similarly. Limitation: PID reuse is
+    not detected, which is very unlikely in practice but cannot be ruled
+    out.
+
+SEE ALSO
+    Data::SortedSet::Shared::Strings (string-keyed variant, bundled with
+    this distribution), Data::Intern::Shared, Data::SpatialHash::Shared,
+    Data::HashMap::Shared, Data::Heap::Shared, Data::Graph::Shared, and the
+    rest of the "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

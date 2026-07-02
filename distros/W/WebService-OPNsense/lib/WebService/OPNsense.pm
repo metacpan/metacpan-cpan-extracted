@@ -4,9 +4,10 @@
 use strictures 2;
 
 package WebService::OPNsense;
-$WebService::OPNsense::VERSION = '0.002';
-use Carp    qw( croak );
-use English qw( -no_match_vars );
+$WebService::OPNsense::VERSION = '0.003';
+use Carp         qw( croak );
+use English      qw( -no_match_vars );
+use MIME::Base64 qw( encode_base64 );
 use Moo;
 use Ref::Util   qw( is_arrayref is_hashref );
 use URI::Escape qw( uri_escape_utf8 );
@@ -36,6 +37,11 @@ has '+mode' => (
     default => 'v2',
 );
 
+has '+content_type' => (
+    is      => 'ro',
+    default => $EMPTY_STR,
+);
+
 has username => (
     is       => 'ro',
     required => 1,
@@ -53,12 +59,12 @@ sub BUILD {
     $url =~ s{/+$}{};
     $self->{base_url} = $url;
 
-    my $auth = $self->_uri_authority($url);
-    $self->ua->credentials(
-        $auth,
+    my $token = encode_base64(
+        join( q{:}, $self->username, $self->password ),
         $EMPTY_STR,
-        $self->username,
-        $self->password,
+    );
+    $self->ua->default_header(
+        'Authorization' => 'Basic ' . $token,
     );
 
     $self->ua->default_header(
@@ -73,16 +79,11 @@ sub BUILD {
     return;
 }
 
-# Unwrap WebService::Client::Response objects, throw Exception on non-2xx,
-# and return undef for GET 404/410 (resource not found / gone).
+# Unwrap WebService::Client::Response objects and throw
+# WebService::OPNsense::Exception on non-2xx status codes.
 around req => sub {
     my ( $orig, $self, $req, %args ) = @_;
     my $res = $self->$orig( $req, %args );
-
-    if ( !$res->ok && $req->method eq 'GET' ) {
-        my $code = $res->code;
-        return if $code eq '404' || $code eq '410';
-    }
 
     if ( !$res->ok ) {
         require WebService::OPNsense::Exception;
@@ -646,7 +647,7 @@ WebService::OPNsense - Perl client library for the OPNsense REST API
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =for :stopwords OPNsense API OPNsense
 
@@ -918,6 +919,12 @@ Lazy accessor returning a L<WebService::OPNsense::Unbound::Diagnostics> instance
 
 Lazy accessor returning a L<WebService::OPNsense::Unbound::Service> instance.
 
+=head2 C<content_type>
+
+HTTP Content-Type header value.  Defaults to empty string to avoid sending
+C<application/json> on GET requests (which OPNsense rejects with 400
+"Invalid JSON syntax").
+
 =head2 C<interfaces>
 
 Lazy accessor returning a L<WebService::OPNsense::Interfaces> instance.
@@ -927,15 +934,16 @@ Lazy accessor returning a L<WebService::OPNsense::Interfaces> instance.
 =head2 BUILD
 
 L<Moo> lifecycle hook.  Validates and normalizes C<base_url>, configures
-HTTP Basic Auth credentials, and sets a descriptive C<User-Agent> string.
+preemptive HTTP Basic Auth credentials (via C<Authorization> header),
+and sets a descriptive C<User-Agent> string.
 
 =head2 req
 
     my $data = $opn->req($http_request, %args);
 
 C<around> modifier wrapping L<WebService::Client/req>.  Unwraps the
-response object, returns C<undef> for GET 404/410 responses, and throws a
-L<WebService::OPNsense::Exception> on other non-2xx status codes.
+response object and throws a L<WebService::OPNsense::Exception> on
+non-2xx status codes.
 
 =head2 get
 

@@ -1,244 +1,18 @@
+require 5.010;
 use strict;
 use warnings;
 use Test::More;
-use Scalar::Util qw(looks_like_number);
+use Test::Exception;
+use Stats::LikeR;
 
-# ---------------------------------------------------------------------------
-# view() is inlined here so this test is self-contained (no external files).
-# Keep it in sync with the copy shipped in the module.
-# ---------------------------------------------------------------------------
-sub view {
-	my $data = shift;
-	my %args = @_;
-
-	# --- reject unknown arguments (mirrors read_table/write_table) ---
-	my %allowed = map { $_ => 1 } qw(
-		n rows na max_width ellipsis gap cols columns
-		to return_only row.names row_names
-	);
-	my @bad = sort grep { !$allowed{$_} } keys %args;
-	die "view: unknown argument(s): @bad\n" if @bad;
-
-	# --- n / rows (synonyms); reject conflicting or non-integer values ---
-	die "view: pass either 'n' or 'rows', not both\n"
-		if exists $args{n} && exists $args{rows};
-	my $n = exists $args{rows} ? $args{rows}
-		  : exists $args{n}    ? $args{n}
-		  :                       6;
-	die "view: 'n'/'rows' must be a non-negative integer\n"
-		unless defined $n && $n =~ /^\d+$/;
-
-	my $na    = exists $args{na}        ? $args{na}        : 'NA';
-	my $maxw  = exists $args{max_width} ? $args{max_width} : 80;
-	my $ell   = exists $args{ellipsis}  ? $args{ellipsis}  : '...';
-	my $gap   = exists $args{gap}       ? (' ' x $args{gap}) : '  ';
-	my $ucols = $args{cols} || $args{columns};
-	my $fh    = $args{to};
-	my $quiet = $args{return_only};
-
-	# 'row.names' takes precedence over the row_names alias (both accepted)
-	my $label_col = exists $args{'row.names'} ? $args{'row.names'}
-		          : exists $args{row_names}   ? $args{row_names}
-		          : undef;
-
-	my $rt = ref $data;
-	die "view: expected an ARRAY (AoH) or HASH (HoA/HoH) reference, got "
-	  . ($rt || 'a non-reference') . "\n"
-	  unless $rt eq 'ARRAY' or $rt eq 'HASH';
-
-	my ($kind, @cols, @labels, @raw, $total, $lab_header);
-	if ($rt eq 'ARRAY') { # ---- AoH ----
-		$kind  = 'AoH';
-		$total = scalar @$data;
-		my $show = $n < $total ? $n : $total;
-
-		if ($ucols) {
-			@cols = @$ucols;
-		} else {
-			# BUG FIX: scan at least one row when data exists, so the header
-			# still lists columns even when showing 0 rows (n => 0). PERF:
-			# collect unique keys once, then sort once -- not sort-per-row.
-			my $scan = $show > 0 ? $show : ($total > 0 ? 1 : 0);
-			my %seen;
-			for my $i (0 .. $scan - 1) {
-				my $row = $data->[$i];
-				next unless ref $row eq 'HASH';
-				$seen{$_} = 1 for keys %$row;
-			}
-			@cols = sort keys %seen;
-		}
-		my $lc = defined $label_col ? $label_col
-			   : (grep { $_ eq 'row_name' } @cols) ? 'row_name' : undef;
-		if (defined $lc) {
-			@cols = grep { $_ ne $lc } @cols;
-			$lab_header = $lc;
-		}
-		for my $i (0 .. $show - 1) {
-			my $row = $data->[$i];
-			$row = {} unless ref $row eq 'HASH';
-			push @labels, defined $lc ? $row->{$lc} : ($i + 1);
-			push @raw, [ map { $row->{$_} } @cols ];
-		}
-		$lab_header = '' unless defined $lab_header;
-	} elsif ($rt eq 'HASH') {
-		my @keys = keys %$data;
-		my $sample;
-		for my $k (@keys) { $sample = $data->{$k}; last if defined $sample; }
-		my $vt = ref $sample;
-
-		if (!@keys) {                                       # ---- empty ----
-			# BUG FIX: an empty hash used to die ("neither ARRAY nor HASH");
-			# treat it as an empty table, mirroring an empty AoH.
-			$kind = 'Hash';
-			$total = 0;
-			$lab_header = '';
-		} elsif ($vt eq 'ARRAY') {                          # ---- HoA ----
-			$kind = 'HoA';
-			my @allcols = $ucols ? @$ucols : sort @keys;
-			$total = 0;
-			for my $k (@keys) {
-				next unless ref $data->{$k} eq 'ARRAY';
-				my $l = scalar @{ $data->{$k} };
-				$total = $l if $l > $total;
-			}
-			my $show = $n < $total ? $n : $total;
-			my $lc = defined $label_col ? $label_col
-				   : (grep { $_ eq 'row_name' } @allcols) ? 'row_name' : undef;
-			@cols = grep { !defined $lc || $_ ne $lc } @allcols;
-			$lab_header = defined $lc ? $lc : '';
-			for my $i (0 .. $show - 1) {
-				push @labels, defined $lc
-					? (ref $data->{$lc} eq 'ARRAY' ? $data->{$lc}[$i] : undef)
-					: ($i + 1);
-				push @raw, [ map {
-					ref $data->{$_} eq 'ARRAY' ? $data->{$_}[$i] : undef
-				} @cols ];
-			}
-		} elsif ($vt eq 'HASH') {                           # ---- HoH ----
-			$kind = 'HoH';
-			$total = scalar @keys;
-			my @rk = sort @keys;
-			my $show = $n < $total ? $n : $total;
-			my @shown = $show > 0 ? @rk[0 .. $show - 1] : ();
-			if ($ucols) {
-				@cols = @$ucols;
-			} else {
-				# PERF: gather unique inner keys, sort once.
-				my %seen;
-				for my $rkk (@shown) {
-					next unless ref $data->{$rkk} eq 'HASH';
-					$seen{$_} = 1 for keys %{ $data->{$rkk} };
-				}
-				@cols = sort keys %seen;
-			}
-			@cols = grep { $_ ne $label_col } @cols if defined $label_col;
-			# BUG FIX: honour the row_names alias here too (was 'row.names'
-			# only, so row_names => 'x' showed a 'row_name' header).
-			$lab_header = defined $label_col ? $label_col : 'row_name';
-			for my $rkk (@shown) {
-				push @labels, $rkk;
-				my $inner = ref $data->{$rkk} eq 'HASH' ? $data->{$rkk} : {};
-				push @raw, [ map { $inner->{$_} } @cols ];
-			}
-		} else {                                            # ---- flat hash ----
-			# BUG/FEATURE: a hash whose values are plain scalars
-			# ({ a => 1, b => 2, ... }) used to die ("neither ARRAY nor
-			# HASH"). Render it like write_table's flat hash: one row, keys
-			# as columns, a numeric '1' row label.
-			$kind = 'Hash';
-			$total = 1;
-			my $show = $n < $total ? $n : $total;
-			if ($ucols) {
-				@cols = @$ucols;
-			} else {
-				@cols = sort @keys;
-			}
-			my $lc = defined $label_col ? $label_col
-				   : (grep { $_ eq 'row_name' } @cols) ? 'row_name' : undef;
-			if (defined $lc) {
-				@cols = grep { $_ ne $lc } @cols;
-				$lab_header = $lc;
-			}
-			$lab_header = '' unless defined $lab_header;
-			for my $i (0 .. $show - 1) {
-				push @labels, defined $lc ? $data->{$lc} : ($i + 1);
-				push @raw, [ map { $data->{$_} } @cols ];
-			}
-		}
-	}
-
-	# numeric detection per column (drives right/left alignment)
-	my @numeric = (1) x scalar @cols;
-	for my $r (@raw) {
-		for my $j (0 .. $#cols) {
-			my $v = $r->[$j];
-			next unless defined $v;
-			$numeric[$j] = 0 unless looks_like_number($v);
-		}
-	}
-	my $lab_numeric = @labels ? 1 : 0;
-	for my $l (@labels) {
-		$lab_numeric = 0, last unless defined $l && looks_like_number($l);
-	}
-
-	# stringify + sanitize + truncate cells (column names left intact)
-	my $ell_len = length $ell;
-	my $clean = sub {
-		my $v = shift;
-		return $na unless defined $v;
-		$v = "$v";
-		$v =~ s/\t/\\t/g; $v =~ s/\r/\\r/g; $v =~ s/\n/\\n/g;
-		if ($maxw && length($v) > $maxw) {
-			my $keep = $maxw - $ell_len;
-			$keep = 0 if $keep < 0;
-			$v = substr($v, 0, $keep) . $ell;
-		}
-		return $v;
-	};
-	my @lab_s  = map { $clean->($_) } @labels;
-	my @rows_s = map { [ map { $clean->($_) } @$_ ] } @raw;
-	my @head_s = @cols;
-
-	# column widths
-	my $lab_w = length $lab_header;
-	for my $s (@lab_s) { my $l = length $s; $lab_w = $l if $l > $lab_w; }
-	my @w = map { length $_ } @head_s;
-	for my $r (@rows_s) {
-		for my $j (0 .. $#cols) {
-			my $l = length $r->[$j];
-			$w[$j] = $l if $l > $w[$j];
-		}
-	}
-
-	my $pad = sub {
-		my ($s, $width, $right) = @_;
-		my $g = $width - length $s; $g = 0 if $g < 0;
-		return $right ? (' ' x $g) . $s : $s . (' ' x $g);
-	};
-
-	my @out;
-	my $shown = scalar @rows_s;
-	push @out, sprintf("# %s: %d row%s x %d col%s  (showing %d)",
-		$kind, $total, ($total == 1 ? '' : 's'),
-		scalar(@cols), (@cols == 1 ? '' : 's'), $shown);
-
-	my @hcells = ( $pad->($lab_header, $lab_w, 0) );
-	push @hcells, $pad->($head_s[$_], $w[$_], $numeric[$_]) for 0 .. $#cols;
-	push @out, join($gap, @hcells);
-
-	for my $ri (0 .. $#rows_s) {
-		my @cells = ( $pad->($lab_s[$ri], $lab_w, $lab_numeric) );
-		push @cells, $pad->($rows_s[$ri][$_], $w[$_], $numeric[$_]) for 0 .. $#cols;
-		push @out, join($gap, @cells);
-	}
-	push @out, sprintf("# ... %d more row%s", $total - $shown,
-		($total - $shown == 1 ? '' : 's')) if $shown < $total;
-
-	my $str = join("\n", @out) . "\n";
-	unless ($quiet) { defined $fh ? print {$fh} $str : print $str; }
-	return $str;
-}
-
+# Column chunking depends on the terminal width (explicit 'width' arg, then
+# $ENV{COLUMNS}, then 80). Pin COLUMNS wide so every single-block layout test
+# below is deterministic regardless of the caller's terminal; the chunking
+# tests pass an explicit 'width' that overrides it.
+dies_ok {
+	view( undef );
+} 'view: dies when given undefined data';
+$ENV{COLUMNS} = 1000;
 
 my $aoh = [
 	{ row_name => 'p1', age => 41, sex => 'M', tt => 18.2 },
@@ -260,13 +34,13 @@ my $hoh = {
 	chr1 => { start =>   10, end =>  9999, strand => '+' },
 };
 
-# ---- NEW: rows is a synonym for n ----
+# ---- rows is a synonym for n ----
 is( view($aoh, n => 3, return_only => 1),
     view($aoh, rows => 3, return_only => 1),
     'rows is a synonym for n' );
 like( view($aoh, rows => 2, return_only => 1), qr/\(showing 2\)/, 'rows controls the count' );
 
-# ---- NEW: reject unknown args ----
+# ---- reject unknown args ----
 eval { view($aoh, bogus => 1, return_only => 1) };
 like( $@, qr/unknown argument\(s\): bogus/, 'unknown arg rejected' );
 eval { view($aoh, n => 2, rows => 2, return_only => 1) };
@@ -277,12 +51,12 @@ eval { view($aoh, n => 'x', return_only => 1) };
 like( $@, qr/non-negative integer/, 'non-numeric n rejected' );
 eval { view($aoh, n => undef, return_only => 1) };
 like( $@, qr/non-negative integer/, 'undef n rejected' );
-# known good args still accepted
+# known good args still accepted (now including 'width')
 eval { view($aoh, na => '.', max_width => 10, ellipsis => '~', gap => 1,
-             cols => ['age'], return_only => 1) };
+             cols => ['age'], width => 200, return_only => 1) };
 is( $@, '', 'all documented args accepted' );
 
-# ---- BUG FIX: n => 0 still lists column headers (AoH) ----
+# ---- n => 0 still lists column headers (AoH) ----
 {
 	my @lines = split /\n/, view($aoh, n => 0, return_only => 1);
 	is( scalar @lines, 3, 'n=0: banner + header + footer' );
@@ -290,37 +64,36 @@ is( $@, '', 'all documented args accepted' );
 	like( $lines[-1], qr/7 more rows/, 'n=0 footer reports all rows hidden' );
 }
 
-# ---- BUG FIX: empty hash does not die ----
+# ---- empty hash does not die ----
 {
 	my $s = eval { view({}, return_only => 1) };
 	is( $@, '', 'empty hash does not die' );
 	like( $s, qr/^# \w+: 0 rows x 0 cols/, 'empty hash -> 0x0 banner' );
 }
 
-# ---- BUG FIX: row_names alias drives the HoH label header ----
+# ---- row_names alias drives the HoH label header ----
 {
 	my $hoh2 = { a => { v => 1 }, b => { v => 2 } };
 	my @lines = split /\n/, view($hoh2, row_names => 'id', return_only => 1);
 	like( $lines[1], qr/^id\b/, 'HoH: row_names alias sets the label header' );
 }
 
-# ---- core behavior preserved ----
+# ---- core behavior preserved (banner uses a TAB before "(showing ...)") ----
 {
 	my $s = view($aoh, return_only => 1);
 	my @lines = split /\n/, $s;
-	like( $lines[0], qr/^# AoH: 7 rows x 3 cols  \(showing 6\)$/, 'AoH banner' );
+	like( $lines[0], qr/^# AoH: 7 rows x 3 cols\t\(showing 6\)$/, 'AoH banner' );
 	like( $lines[1], qr/^row_name\s+age\s+sex\s+tt/, 'AoH header order' );
 	like( $lines[-1], qr/^# \.\.\. 1 more row$/, 'AoH footer' );
-	like( $s, qr/\bNA\b/, 'undef -> NA' );
 }
 {
 	my @lines = split /\n/, view($hoa, return_only => 1);
-	like( $lines[0], qr/^# HoA: 7 rows x 2 cols  \(showing 6\)$/, 'HoA banner' );
+	like( $lines[0], qr/^# HoA: 7 rows x 2 cols\t\(showing 6\)$/, 'HoA banner' );
 	like( $lines[1], qr/^row_name\s+gene\s+logfc/, 'HoA header' );
 }
 {
 	my @lines = split /\n/, view($hoh, return_only => 1);
-	like( $lines[0], qr/^# HoH: 3 rows x 3 cols  \(showing 3\)$/, 'HoH banner' );
+	like( $lines[0], qr/^# HoH: 3 rows x 3 cols\t\(showing 3\)$/, 'HoH banner' );
 	like( $lines[2], qr/^chr1\b/, 'HoH sorted row labels' );
 }
 
@@ -348,16 +121,19 @@ is( $@, '', 'all documented args accepted' );
 	like( $@, qr/expected an ARRAY .* or HASH/, 'non-ref input dies' );
 }
 
-# ---- FEATURE: flat (scalar-valued) hash renders as a single row ----
+# ---- flat (scalar-valued) hash renders as a single row ----
 {
 	my @lines = split /\n/, view({ a => 1, b => 2, c => 3 }, return_only => 1);
-	like( $lines[0], qr/^# Hash: 1 row x 3 cols  \(showing 1\)$/, 'flat hash banner' );
+	like( $lines[0], qr/^# Hash: 1 row x 3 cols\t\(showing 1\)$/, 'flat hash banner' );
 	like( $lines[1], qr/^\s+a\s+b\s+c$/, 'flat hash header: sorted keys, leading label column' );
 	like( $lines[2], qr/^1\s+1\s+2\s+3$/, 'flat hash row: numeric label then values' );
 
-	# undef values become NA
+	# undef renders as the "undef" placeholder by default; na overrides it
 	my $s = view({ a => 1, b => undef }, return_only => 1);
-	like( $s, qr/\bNA\b/, 'flat hash: undef value -> NA' );
+	like( $s, qr/\bundef\b/, 'flat hash: undef value -> "undef" placeholder' );
+	unlike( $s, qr/\bNA\b/,  'flat hash: not shown as NA by default' );
+	like( view({ a => 1, b => undef }, na => 'NA', return_only => 1),
+		qr/\bNA\b/, "na => 'NA' overrides the placeholder" );
 
 	# cols selects/orders
 	@lines = split /\n/, view({ a => 1, b => 2, c => 3 }, cols => ['c','a'], return_only => 1);
@@ -372,6 +148,75 @@ is( $@, '', 'all documented args accepted' );
 	@lines = split /\n/, view({ id => 'x', v => 9 }, 'row.names' => 'id', return_only => 1);
 	like( $lines[1], qr/^id\s+v$/, 'flat hash: row.names header' );
 	like( $lines[2], qr/^x\s+9$/, 'flat hash: row.names value becomes the label' );
+}
+
+# ---- NEW: 'width' argument + R-style column chunking ----
+# A table wider than the terminal is split into successive column blocks, each
+# led by a repeated copy of the row-label column (as R does when a data frame
+# exceeds getOption("width")).
+{
+	# 8 data columns (each 2 wide) + a row_name label column (8 wide), gap = 2.
+	my $wide = [
+		{ row_name => 'r1', c1=>11, c2=>12, c3=>13, c4=>14, c5=>15, c6=>16, c7=>17, c8=>18 },
+		{ row_name => 'r2', c1=>21, c2=>22, c3=>23, c4=>24, c5=>25, c6=>26, c7=>27, c8=>28 },
+	];
+
+	# 'width' is an accepted argument
+	eval { view($wide, width => 80, return_only => 1) };
+	is( $@, '', "'width' is an accepted argument" );
+
+	# a wide-enough width keeps everything in one block
+	my @one = split /\n/, view($wide, width => 1000, return_only => 1);
+	is( scalar(grep { /^row_name/ } @one), 1, 'width=1000: a single column block' );
+	like( $one[0], qr/x 8 cols/, 'banner reports the full column count' );
+
+	# a narrow width splits the columns into repeated blocks
+	my @narrow = split /\n/, view($wide, width => 20, return_only => 1);
+	my @hdr = grep { /^row_name/ } @narrow;
+	cmp_ok( scalar @hdr, '>', 1, 'a narrow width splits into multiple blocks' );
+	is( scalar(grep { /^r1\b/ } @narrow), scalar @hdr, 'the label column repeats in every block' );
+	is( scalar(grep { /^# AoH:/ } @narrow), 1, 'the banner is printed exactly once' );
+	like( $narrow[0], qr/x 8 cols/, 'the banner still reports every column, not just one block' );
+
+	# every column appears once, in its original order, across the blocks
+	my @order;
+	for my $h (@hdr) { my @t = split ' ', $h; shift @t; push @order, @t; }
+	is_deeply( \@order, [qw(c1 c2 c3 c4 c5 c6 c7 c8)],
+		'columns are distributed across blocks in their original order' );
+
+	# no blank line is inserted between blocks (matches R): every non-banner,
+	# non-footer line is either a header or a data row -- none are empty
+	is( scalar(grep { $_ eq '' } @narrow), 0, 'no blank separator lines between blocks' );
+
+	# the row-truncation footer is printed once, not once per block
+	my @foot = split /\n/, view($wide, n => 1, width => 20, return_only => 1);
+	is( scalar(grep { /^# \.\.\. / } @foot), 1, 'the footer is printed once regardless of block count' );
+
+	# a single column wider than the width still renders (overflow, no infinite loop)
+	my @big = split /\n/, view([ { row_name => 'r1', huge => ('X' x 30) } ], width => 10, return_only => 1);
+	is( scalar(grep { /^row_name/ } @big), 1, 'an over-wide single column stays in one block' );
+	like( $big[1], qr/\bhuge\b/, 'the over-wide column header still shows' );
+	like( $big[2], qr/X{30}/, 'the over-wide value is rendered in full' );
+
+	# width validation
+	eval { view($wide, width => 0,   return_only => 1) }; like( $@, qr/width.*positive integer/, 'width => 0 rejected' );
+	eval { view($wide, width => -5,  return_only => 1) }; like( $@, qr/width.*positive integer/, 'negative width rejected' );
+	eval { view($wide, width => 'x', return_only => 1) }; like( $@, qr/width.*positive integer/, 'non-numeric width rejected' );
+	eval { view($wide, width => 3.5, return_only => 1) }; like( $@, qr/width.*positive integer/, 'non-integer width rejected' );
+
+	# $ENV{COLUMNS} is honoured when no width is given, but an explicit width wins
+	{
+		local $ENV{COLUMNS} = 18;
+		my @byenv = split /\n/, view($wide, return_only => 1);
+		cmp_ok( scalar(grep { /^row_name/ } @byenv), '>', 1, 'COLUMNS env drives chunking' );
+		my @byarg = split /\n/, view($wide, width => 1000, return_only => 1);
+		is( scalar(grep { /^row_name/ } @byarg), 1, 'an explicit width overrides COLUMNS' );
+	}
+	{
+		local $ENV{COLUMNS} = 'not-a-number';
+		my $s = eval { view($wide, return_only => 1) };
+		is( $@, '', 'an invalid COLUMNS is ignored rather than fatal' );
+	}
 }
 
 done_testing();

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Kea::Dhcpv6;
-$WebService::OPNsense::Kea::Dhcpv6::VERSION = '0.002';
+$WebService::OPNsense::Kea::Dhcpv6::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -56,7 +56,7 @@ WebService::OPNsense::Kea::Dhcpv6 - Kea DHCPv6 controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

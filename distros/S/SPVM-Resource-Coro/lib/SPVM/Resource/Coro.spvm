@@ -1,0 +1,10 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Resource::Coro {
+  version "0.001";
+  
+  static method my_method : void () {
+    
+  }
+}

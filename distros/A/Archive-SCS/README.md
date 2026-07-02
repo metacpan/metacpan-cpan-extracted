@@ -109,10 +109,11 @@ For non-trivial patches, I suggest you get in touch with me first,
 for example by posting in the
 [SCS forum thread](https://forum.scssoft.com/viewtopic.php?t=330746)
 (or send a PM to `nautofon`, if you prefer).
+CPAN users can also report issues through RT.
 
 ### License
 
-Copyright © 2025 [nautofon](https://github.com/nautofon)
+Copyright © 2026 [nautofon](https://github.com/nautofon)
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

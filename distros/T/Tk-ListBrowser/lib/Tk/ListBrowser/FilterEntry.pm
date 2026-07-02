@@ -3,7 +3,7 @@ package Tk::ListBrowser::FilterEntry;
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.10;
+$VERSION =  0.11;
 
 use base qw(Tk::Derived Tk::Entry);
 
@@ -50,6 +50,12 @@ sub filter {
 }
 
 sub filterinit { return $_[0]->{FILTERINIT} };
+
+sub get {
+	my $self = shift;
+	return '' if $self->filterinit;
+	return $self->SUPER::get(@_);
+}
 
 sub initialize {
 	my $self = shift;

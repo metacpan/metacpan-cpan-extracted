@@ -57,7 +57,7 @@ sub _build_client_auth_arguments ($self, $method, $url) {
     $form{client_assertion_type}  = $CLIENT_ASSERTION_TYPE;
     $form{client_assertion}       = $self->_build_client_assertion(1, $url);
   }
-  elsif ($method eq 'none') {
+  elsif ($method eq 'tls_client_auth' || $method eq 'none') {
     $form{client_id} = $self->id;
   }
   else {

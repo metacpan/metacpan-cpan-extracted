@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Firewall::OneToOne;
-$WebService::OPNsense::Firewall::OneToOne::VERSION = '0.002';
+$WebService::OPNsense::Firewall::OneToOne::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -30,7 +30,7 @@ WebService::OPNsense::Firewall::OneToOne - Firewall one-to-one NAT rule controll
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ version 0.002
             type        => $ONETOONE_NAT,
             protocol    => $PROTO_ANY,
             external    => '203.0.113.10',
-            internal    => '192.168.1.10',
+            internal    => '192.0.2.10',
             enabled     => $OPN_ENABLED,
         },
     });

@@ -1062,6 +1062,19 @@ You get all these when using DBIx::QuickORM.
             return $alias;
         };
 
+    These hooks also resolve relationship accessor name collisions. When a table has
+    two foreign keys to the same table (for example `sender_id` and `recipient_id`
+    both pointing at `users`), both relationships default to the same accessor name;
+    autofill croaks at schema-build time and names the conflict. Use `autoname link`
+    to give each relationship a distinct alias, or `autoname link_accessor` to give
+    each accessor a distinct name; both hooks receive the link and its columns. A
+    relationship accessor that would clash with a column accessor croaks the same
+    way.
+
+    The croak is deliberate rather than auto-renaming: an automatic name would be
+    forward-incompatible, because adding a second foreign key later would change the
+    accessor an existing single foreign key already produced.
+
     Can be nested under `autofill`.
 
 - `autohook HOOK =` sub { my %params = @\_; ... }>

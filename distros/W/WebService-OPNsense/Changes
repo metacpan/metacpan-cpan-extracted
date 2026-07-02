@@ -1,5 +1,15 @@
 Revision history for WebService-OPNsense
 
+0.003    2026-07-01
+    - Fix API path mismatches (singular -> plural search endpoints across
+      5 service modules, 8 files total).
+    - Fix Diagnostics dns_lookup (remove spurious query => wrapper).
+    - Fix TrafficShaper Service flushReload -> flushreload (case mismatch).
+    - Fix CaptivePortal Service template CRUD paths.
+    - Reorder methods alphabetically in 8 lib/ files.
+    - Add reverse_dns and service_info example scripts.
+    - Use RFC 5737 documentation IP ranges in all POD examples.
+
 0.002    2026-06-27
     - Add missing dependencies (Exporter::Shiny, Test::LWP::UserAgent).
     - Fix KeaItemCrud undef guard for unknown types.

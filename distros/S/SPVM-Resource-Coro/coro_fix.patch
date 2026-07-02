@@ -1,0 +1,68 @@
+diff --git b/lib/SPVM/Resource/Coro.native/include/coro.h a/lib/SPVM/Resource/Coro.native/include/coro.h
+index a90e366..ca39f2c 100644
+--- b/lib/SPVM/Resource/Coro.native/include/coro.h
++++ a/lib/SPVM/Resource/Coro.native/include/coro.h
+@@ -312,11 +312,11 @@ void coro_stack_free (struct coro_stack *stack);
+     && !defined CORO_SJLJ    && !defined CORO_LINUX \
+     && !defined CORO_IRIX    && !defined CORO_ASM \
+     && !defined CORO_PTHREAD && !defined CORO_FIBER
+-# if defined WINDOWS && (defined __i386__ || (__x86_64__ || defined _M_IX86 || defined _M_AMD64)
++# if defined WINDOWS && (defined __i386__ || (__x86_64__ || defined _M_IX86 || defined _M_AMD64))
+ #  define CORO_ASM 1
+ # elif defined WINDOWS || defined _WIN32
+ #  define CORO_LOSER 1 /* you don't win with windoze */
+-# elif __linux && (__i386__ || (__x86_64__ && !__ILP32__) /*|| (__arm__ && __ARM_ARCH == 7)), not working */
++# elif __linux && (__i386__ || (__x86_64__ && !__ILP32__)) /*|| (__arm__ && __ARM_ARCH == 7)), not working */
+ #  define CORO_ASM 1
+ # elif defined HAVE_UCONTEXT_H
+ #  define CORO_UCONTEXT 1
+@@ -384,7 +384,7 @@ struct coro_context
+   coro_jmp_buf env;
+ };
+ 
+-# define coro_transfer(p,n) do { if (!coro_setjmp ((p)->env)) coro_longjmp ((n)->env); } while (0)
++# define coro_transfer(p,n) do { if (!coro_setjmp (((struct coro_context*)p)->env)) coro_longjmp (((struct coro_context*)n)->env); } while (0)
+ # define coro_destroy(ctx) (void *)(ctx)
+ 
+ #elif CORO_ASM
+@@ -438,4 +438,3 @@ void coro_destroy (coro_context *ctx);
+ #endif
+ 
+ #endif
+-
+diff --git b/lib/SPVM/Resource/Coro.native/src/coro.c a/lib/SPVM/Resource/Coro.native/src/coro.c
+index a4de4c3..cd3a978 100644
+--- b/lib/SPVM/Resource/Coro.native/src/coro.c
++++ a/lib/SPVM/Resource/Coro.native/src/coro.c
+@@ -90,14 +90,14 @@ coro_init (void)
+   coro_transfer (new_coro, create_coro);
+ 
+ #if __GCC_HAVE_DWARF2_CFI_ASM && __amd64
+-  /*asm (".cfi_startproc");*/
+-  /*asm (".cfi_undefined rip");*/
++  /*__asm__ (".cfi_startproc");*/
++  /*__asm__ (".cfi_undefined rip");*/
+ #endif
+ 
+   func ((void *)arg);
+ 
+ #if __GCC_HAVE_DWARF2_CFI_ASM && __amd64
+-  /*asm (".cfi_endproc");*/
++  /*__asm__ (".cfi_endproc");*/
+ #endif
+ 
+   /* the new coro returned. bad. just abort() for now */
+@@ -133,7 +133,7 @@ trampoline (int sig)
+     #define CORO_WIN_TIB 1
+   #endif
+ 
+-  asm (
++  __asm__ (
+        "\t.text\n"
+        #if _WIN32 || __CYGWIN__
+        "\t.globl _coro_transfer\n"
+@@ -797,4 +797,3 @@ coro_stack_free (struct coro_stack *stack)
+ }
+ 
+ #endif
+-

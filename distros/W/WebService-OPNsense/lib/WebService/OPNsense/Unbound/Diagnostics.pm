@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Unbound::Diagnostics;
-$WebService::OPNsense::Unbound::Diagnostics::VERSION = '0.002';
+$WebService::OPNsense::Unbound::Diagnostics::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -72,7 +72,7 @@ WebService::OPNsense::Unbound::Diagnostics - Unbound diagnostics controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

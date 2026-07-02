@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.10;
+$VERSION = 0.11;
 
 use base qw(Tk::ListBrowser::Item);
 
@@ -192,9 +192,14 @@ sub drawSelect {
 	my $si = Tk::ListBrowser::SelectXPM->new($lb);
 	my @coords = $self->getRegion;
 	unless ($self->listMode) {
-		my $a = $si->selectimage(@coords);
+		my $pixmap = $si->selectimage(@coords);
+		my $image = $c->createImage($coords[0], $coords[1],
+			-image => $pixmap,
+			-anchor => 'nw',
+			-tags => ['sel'],
+		);
 		$self->setRegion(@coords);
-		$self->crect($a);
+		$self->crect($image);
 		return
 	}
 
@@ -204,8 +209,13 @@ sub drawSelect {
 	#draw left piece
 	my $lx = $coords[0];
 	$lx++ if $lx eq 0;
-	my $sl = $si->selectimage(0, $coords[1], $lx, $coords[3], 1, 0);
-	$self->cselectl($sl);
+	my $slpix = $si->selectimage(0, $coords[1], $lx, $coords[3], 1, 0);
+	my $slimg = $c->createImage(0, $coords[1],
+		-image => $slpix,
+		-anchor => 'nw',
+		-tags => ['sel'],
+	);
+	$self->cselectl($slimg);
 	
 	#draw right piece
 	my ($cw) = $self->canvasSize;
@@ -214,8 +224,14 @@ sub drawSelect {
 	my $rx1 = $coords[2];
 	my $rx2 = $cw - 4;
 	$rx1 -- if $rx1 eq $rx2;
-	my $sr = $si->selectimage($rx1, $coords[1], $rx2, $coords[3], 0, 1);
-	$self->cselectr($sr);
+	$rx2 = $rx1 + 300 if $rx2 < $rx1; #a little hack to prevent segfault exit when unmapped.
+	my $srpix = $si->selectimage($rx1, $coords[1], $rx2, $coords[3], 0, 1);
+	my $srimg = $c->createImage($rx1, $coords[1],
+		-image => $srpix,
+		-anchor => 'nw',
+		-tags => ['sel'],
+	);
+	$self->cselectr($srimg);
 }
 
 sub hasChildren {

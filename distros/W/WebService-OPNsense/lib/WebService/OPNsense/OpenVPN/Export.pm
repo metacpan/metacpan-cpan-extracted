@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::OpenVPN::Export;
-$WebService::OPNsense::OpenVPN::Export::VERSION = '0.002';
+$WebService::OPNsense::OpenVPN::Export::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -74,7 +74,7 @@ WebService::OPNsense::OpenVPN::Export - OpenVPN export controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

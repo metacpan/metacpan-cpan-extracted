@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000026';
+our $VERSION = '0.000027';
 
 use Carp qw/croak confess/;
 $Carp::Internal{ (__PACKAGE__) }++;
@@ -2593,6 +2593,19 @@ You can also set aliases for links before they are constructed:
 
         return $alias;
     };
+
+These hooks also resolve relationship accessor name collisions. When a table has
+two foreign keys to the same table (for example C<sender_id> and C<recipient_id>
+both pointing at C<users>), both relationships default to the same accessor name;
+autofill croaks at schema-build time and names the conflict. Use C<autoname link>
+to give each relationship a distinct alias, or C<autoname link_accessor> to give
+each accessor a distinct name; both hooks receive the link and its columns. A
+relationship accessor that would clash with a column accessor croaks the same
+way.
+
+The croak is deliberate rather than auto-renaming: an automatic name would be
+forward-incompatible, because adding a second foreign key later would change the
+accessor an existing single foreign key already produced.
 
 Can be nested under C<autofill>.
 

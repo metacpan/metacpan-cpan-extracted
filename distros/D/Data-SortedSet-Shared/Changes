@@ -1,0 +1,14 @@
+Revision history for Data-SortedSet-Shared
+
+0.02      2026-06-24
+          - Bundle string-keyed sets: Data::SortedSet::Shared::Strings (string
+            members, interned to ids via Data::Intern::Shared) now ships in this
+            distribution, with a native constructor Data::SortedSet::Shared->new_strings.
+          - New prerequisite: Data::Intern::Shared (for the string-keyed variant).
+          - DESTROY now nulls the handle SV before freeing (use-after-destroy
+            croaks cleanly; double DESTROY is a no-op).
+          - stats: compute index_load directly; range_by_score reuses the
+            lower-bound rank (one tree descent instead of two).
+
+0.01      2026-06-22
+          - Initial release.

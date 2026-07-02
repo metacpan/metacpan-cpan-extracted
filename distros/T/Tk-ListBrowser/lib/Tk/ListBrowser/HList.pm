@@ -94,14 +94,12 @@ sub draw {
 			-tags => ['main', 'guides'],
 		);
 		$item->cguideV($guidev);
-#		$c->lower($guidev);
 
-#		my @sel = $c->find('withtag', 'sel');
-#		my @ind = $c->find('withtag', 'indicator');
-#		for (@ind) {
-#			$c->raise($_, $guideh);
-#			$c->raise($_, $guidev);
-#		}
+		my @ind = $c->find('withtag', 'indicator');
+		for (@ind) {
+			$c->raise($_, $guideh);
+			$c->raise($_, $guidev);
+		}
 	}
 }
 

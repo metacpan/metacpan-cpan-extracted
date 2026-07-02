@@ -162,9 +162,12 @@ if (defined $app) {
 			for (@_) { print  "$_ " }
 			print "\n";
 		},
-	)->pack(-expand =>1, -fill => 'both');
+	); 
 	$ib->configure('-cellimageheight' => 38);
 	$ib->configure('-cellimagewidth' => 38);
+	newarrange;
+	pause(500);
+	$ib->pack(-expand =>1, -fill => 'both');
 
 	my $bf = $app->LabFrame(
 		-label => 'Tools',

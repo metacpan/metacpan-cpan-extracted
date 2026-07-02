@@ -64,7 +64,7 @@
    "provides" : {
       "Config::INI::RefVars" : {
          "file" : "lib/Config/INI/RefVars.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/AAHAZRED/perl-Config-INI-RefVars"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_bugtracker" : {
       "web" : "https://github.com/AAHAZRED/perl-Config-INI-RefVars/issues"
    },

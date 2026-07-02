@@ -1,5 +1,8 @@
 Revision history for Music-VoicePhrase
 
+0.0110 2026-07-01 10:24:54
+    - Oops. Fix patch isa.
+
 0.0109 2026-06-30 16:30:16
     - Add the patch attribute.
 

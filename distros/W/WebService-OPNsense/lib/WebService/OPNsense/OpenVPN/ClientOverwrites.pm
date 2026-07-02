@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::OpenVPN::ClientOverwrites;
-$WebService::OPNsense::OpenVPN::ClientOverwrites::VERSION = '0.002';
+$WebService::OPNsense::OpenVPN::ClientOverwrites::VERSION = '0.003';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -39,7 +39,7 @@ WebService::OPNsense::OpenVPN::ClientOverwrites - OpenVPN client overwrites cont
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

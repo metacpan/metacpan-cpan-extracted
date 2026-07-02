@@ -5,6 +5,8 @@ use Test2::V1               qw( is ok like subtest done_testing );
 use Test2::Tools::Exception qw( dies );
 use Test::LWP::UserAgent    ();
 
+require MIME::Base64;
+
 # Set VERSION before loading the main module so BUILD does not warn
 BEGIN { $WebService::OPNsense::VERSION = '0.001' }
 use WebService::OPNsense ();
@@ -84,10 +86,16 @@ subtest 'BUILD: trailing-slash strip' => sub {
     };
 };
 
-subtest 'BUILD: credentials' => sub {
+subtest 'BUILD: Authorization header' => sub {
     my ( undef, $ua ) = _build_opn;
-    my $creds = $ua->credentials('opnsense.example.com');
-    is( $creds, 'key:secret', 'credentials set on UA' );
+    my $auth = $ua->default_header('Authorization');
+    ok( defined $auth, 'Authorization header set' );
+    like( $auth, qr/^Basic /, 'Authorization is Basic scheme' );
+    is(
+        $auth,
+        'Basic ' . MIME::Base64::encode_base64( 'key:secret', q() ),
+        'Authorization header value is correct base64 encoding',
+    );
 };
 
 subtest 'BUILD: User-Agent header' => sub {

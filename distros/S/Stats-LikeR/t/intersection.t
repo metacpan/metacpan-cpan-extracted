@@ -91,7 +91,8 @@ eval { intersection([1, 2], 3); 1 } or $e_nonref = $@;
 no_leaks_ok {
 	eval { intersection([1, 2], 3) }
 } 'intersection: non-ref croak no leaks' unless $INC{'Devel/Cover.pm'};
-like   $e_nonref, qr/\bargument 1 is not an array ref\b/, 'intersection croaks on a non-ref argument with the real index';
+like $e_nonref, qr/argument index 1\b.*not an array reference/,
+	'intersection croaks on a non-ref argument at the real index';
 unlike $e_nonref, qr/%/,                                  'intersection non-ref croak leaves no literal % directive';
 
 # --- croak: undef inside a ref (real indices, no stray %) ----------------

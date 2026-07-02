@@ -10,7 +10,7 @@ use Getopt::Long;
 use Pod::Usage;
 use Config::Tiny;
 
-our $VERSION = '0.11.1';
+our $VERSION = '1.0.0';
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ into object attribute values.
 
 sub new {
   my $class = shift;
-  my $self = bless {port => 7007, root => '.'}, $class;
+  my $self = bless {host => '127.0.0.1', port => 7007, root => '.'}, $class;
 
   my $default_config_file = '.http_thisrc';
 
@@ -56,17 +56,25 @@ sub new {
   if ($config_file) {
     my $config = Config::Tiny->read($config_file)
       or die "FATAL: failed to read config file '$config_file'\n";
-    for my $key (qw(port name autoindex pretty)) {
-      $self->{$key} = $config->{_}->{$key} if $config->{_}->{$key};
+    for my $key (qw(port host name autoindex pretty)) {
+      if (defined $config->{_}->{$key} && $config->{_}->{$key} ne '') {
+        $self->{$key} = $config->{_}->{$key};
+      }
+    }
+    if ($config->{_}->{all}) {
+      $self->{host} = '0.0.0.0';
     }
     delete $self->{config};
   }
 
   GetOptions(
-    $self, "help", "man", "config=s", "host=s", "port=i", "name=s", "autoindex!", "pretty!"
+    $self, "help", "man", "config=s", "host=s", "port=i", "name=s", "autoindex!", "pretty!",
+    "all|promiscuous"
   ) || pod2usage(2);
   pod2usage(1) if $self->{help};
   pod2usage(-verbose => 2) if $self->{man};
+
+  $self->{host} = '0.0.0.0' if $self->{all};
 
   if (@ARGV > 1) {
     pod2usage("$0: Too many roots, only single root supported");
@@ -89,7 +97,7 @@ sub run {
 
   my $runner = Plack::Runner->new;
   $runner->parse_options(
-    ($self->{host} ? ('--host' => $self->{host}) : ()),
+    '--host'         => $self->{host},
     '--port'         => $self->{port},
     '--env'          => 'production',
     '--server_ready' => sub { $self->_server_ready(@_) },
@@ -117,12 +125,33 @@ sub run {
 sub _server_ready {
   my ($self, $args) = @_;
 
-  my $host  = $args->{host}  || '127.0.0.1';
+  my $host  = $args->{host};
   my $proto = $args->{proto} || 'http';
   my $port  = $args->{port};
 
+  # An unspecified, zero, or wildcard host means the server is listening on
+  # every network interface, not just this machine.
+  my $all_interfaces =
+       !defined $host
+    || $host eq ''
+    || $host eq '0'
+    || $host eq '0.0.0.0'
+    || $host eq '::';
+
+  my $ipv6     = defined $host && $host eq '::';
+  my $loopback = $ipv6 ? '::1' : '127.0.0.1';
+  my $display  = $all_interfaces ? $loopback : $host;
+  my $url_host = $display =~ /:/ ? "[$display]" : $display;
+
   print "Exporting '$self->{root}', available at:\n";
-  print "   $proto://$host:$port/\n";
+  print "   $proto://$url_host:$port/\n";
+
+  if ($all_interfaces) {
+    print "\n";
+    print "WARNING: this server is reachable on all network interfaces, so\n";
+    print "other machines on your network can access it. To limit access to\n";
+    print "this computer only, restart with: --host $loopback\n";
+  }
 
   return unless my $name = $self->{name};
 
@@ -156,4 +185,3 @@ L<http_this>, L<Plack>, L<Plack::App::DirectoryIndex>, and L<Net::Rendezvous::Pu
 And the Oscar goes to: Tatsuhiko Miyagawa.
 
 For L<Plack>, L<Plack::App::Directory> and many many others.
-

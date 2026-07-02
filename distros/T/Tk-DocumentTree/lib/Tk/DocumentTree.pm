@@ -8,11 +8,11 @@ Tk::DocumentTree - ITree based document list
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use base qw(Tk::Derived Tk::Frame);
 
-require Tk::ITree;
+require Tk::ListBrowser;
 use File::Basename;
 use Tk;
 use Config;
@@ -108,23 +108,30 @@ sub Populate {
 
 	my $sep = '/';
 	$sep = '\\' if $Config{osname} eq 'MSWin32';
-	$args->{'-scrollbars'} = 'osoe';
-	$args->{'-itemtype'} = 'imagetext';
-	$args->{'-browsecmd'} = ['EntryClick', $self];
-	$args->{'-separator'} = $sep;
-	$args->{'-selectmode'} = 'single';
-	$args->{'-exportselection'} = 0;
 
+	$self->{HAVECELLSIZE} = 0;
 	my $topbar = $self->CreatePathBar;
 	$self->Advertise(PATH => $topbar);
-	my $tree = $self->Scrolled('ITree',
+	my $tree = $self->ListBrowser(
+		-arrange => 'tree',
+		-autorefresh => 1,
+		-browsecmd => ['EntryClick', $self],
+		-filterforce => 1,
+		-itemtype => 'imagetext',
+		-selectmode => 'single',
+		-separator => $sep,
+		-textanchor => 'w',
+		-textside => 'right',
+		-width => 250,
 	)->pack(
 		-padx => 2, 
 		-pady => 2,
 		-expand => 1, 
 		-fill => 'both',
 	);
-	$tree->bind('<Button-3>' => [$self, 'lmPost', Ev('X'), Ev('Y')]);
+	$self->Advertise(Tree => $tree);
+	my $c = $tree->Subwidget('Canvas');
+	$c->Tk::bind('<ButtonRelease-3>', sub { $self->lmPost(Ev('X'), Ev('Y')) });
 
 	my (@contextmenu) = (
 		['command' => 'Collapse All', -command => ['collapseAll', $self]],
@@ -146,12 +153,11 @@ sub Populate {
 
 sub Add {
 	my ($self, $new, $type) = @_;
-
 	if ($type eq 'untracked') {
-		my @peers = $self->infoChildren('');
+		my @peers = $self->infoRoot;
 		my @op = (-image => $self->GetFileIcon($new));
 		for (@peers) {
-			if ($self->IsDir($_)) {
+			if ($self->isDir($_)) {
 				push @op, -before => $_;
 				last;
 			} elsif ($self->isFile($_)) {
@@ -162,10 +168,11 @@ sub Add {
 				last;
 			}
 		}
-		$self->add($new, @op,
+		my $n = $self->add($new, @op,
 			-text => $new,
 			-data => $type,
 		);
+		$self->setCellSize($n);
 	} else {
 		my $sep = $self->cget('-separator');
 		my $nsep = quotemeta($sep);
@@ -206,7 +213,7 @@ sub Add {
 				} else {
 					for (@peers) {
 						my $peer = $_;
-						if ($self->IsDir($peer) or $self->isUntracked($peer)) { #weed through the untracked and directory section of the list
+						if ($self->isDir($peer) or $self->isUntracked($peer)) { #weed through the untracked and directory section of the list
 						} elsif ($name lt $peer) {
 							push @op, -before => $peer;
 							last;
@@ -214,11 +221,11 @@ sub Add {
 					}
 					push @op, -image => $self->GetFileIcon($self->GetFileName($name));
 				}
-				$self->add($name, @op,
+				my $n = $self->add($name, @op,
 					-text => $title,
 					-data => $data,
 				);
-				$self->autosetmode;
+				$self->setCellSize($n)
 			}
 		}
 	}
@@ -226,14 +233,20 @@ sub Add {
 
 sub collapse {
 	my ($self, $entry) = @_;
-	$entry = '' unless defined $entry;
+	
+	my @children;
+	if (defined $entry) {
+		@children = $self->GetChildren($entry);
+	} else {
+		@children = $self->infoRoot;
+	}
 
-	my @children = $self->infoChildren($entry);
 	for (@children) {
 		if ($self->infoChildren($_)) {
 			$self->collapse($_);
 		}
 		$self->close($_);
+		$self->refreshPurge($self->index($_));
 		$self->update;
 	}
 }
@@ -278,7 +291,7 @@ sub DefaultSaveIcon {
 sub Delete {
 	my ($self, $entry) = @_;
 	my $par = $self->GetParent($entry);
-	$self->deleteEntry($entry);
+	$self->delete($entry);
 	if ($par ne '') {
 		my @peers = $self->infoChildren($par);
 		$self->Delete($par) unless @peers;
@@ -289,9 +302,9 @@ sub DirList {
 	my ($self, $path, $list) = @_;
 	$list = [] unless defined $list;
 	$path = '' unless defined $path;
-	my @children = $self->infoChildren($path);
+	my @children = $self->GetChildren($path);
 	for (@children) {
-		if ($self->IsDir($_)) {
+		if ($self->isDir($_)) {
 			push @$list, $_;
 			$self->ItemList($_, $list);
 		}
@@ -325,13 +338,13 @@ sub entryAdd {
 		my $reg = $compath . $sep;
 		$new =~ s/^$reg//
 	}
-
+#	$self->pause(5500);
 	$self->Add($new, $type);
 }
 
 sub EntryClick {
 	my ($self, $entry) = @_;
-	return if $self->IsDir($entry);
+	return if $self->isDir($entry);
 	$entry = $self->GetFileName($entry) unless $self->isUntracked($entry);
 	$self->Callback('-entryselect', $entry);
 }
@@ -349,13 +362,13 @@ sub entryDelete {
 	$entry =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
 	$entry = $self->StripPath($entry);
 
-	if ($self->IsDir($entry)) {
+	if ($self->isDir($entry)) {
 		warn "You cannot delete a directory: $entry";
 		return
 	}
 
 	$self->Delete($entry);
-	my @c = $self->infoChildren('');
+	my @c = $self->infoRoot;
 	if (@c) {
 		$self->GetCommonPath
 	} else {
@@ -374,7 +387,7 @@ sub entryModified {
 	my $sep = $self->cget('-separator');
 	$entry =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
 	$entry = $self->StripPath($entry);
-	$self->entryconfigure($entry, -image => $self->GetSaveIcon);
+	$self->entryConfigure($entry, -image => $self->GetSaveIcon);
 }
 
 =item B<entrySaved>I<($filename)>
@@ -388,7 +401,7 @@ sub entrySaved {
 	my $sep = $self->cget('-separator');
 	$entry =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
 	$entry = $self->StripPath($entry);
-	$self->entryconfigure($entry, -image => $self->GetFileIcon($entry));
+	$self->entryConfigure($entry, -image => $self->GetFileIcon($entry));
 }
 
 =item B<entrySelect>I<($filename)>
@@ -423,8 +436,9 @@ sub entryShow {
 	$entry =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
 	$entry = $self->StripPath($entry);
 	my $parent = $self->infoParent($entry);
-	while ($parent ne '') {
+	while (defined $parent) {
 		$self->open($parent);
+		$self->refreshPurge($self->index($parent));
 		$parent = $self->infoParent($parent);
 	}
 	$self->see($entry);
@@ -438,11 +452,16 @@ Opens all folders in the Tree widget.
 
 sub expandAll {
 	my ($self, $entry) = @_;
-	$entry = '' unless defined $entry;
-	my @children = $self->infoChildren($entry);
+	my @children;
+	if (defined $entry) {
+		@children = $self->GetChildren($entry);
+	} else {
+		@children = $self->infoRoot;
+	}
 	for (@children) {
 		if ($self->infoChildren($_)) {
 			$self->open($_);
+			$self->refreshPurge($self->index($_));
 			$self->expandAll($_);
 		}
 	}
@@ -462,6 +481,12 @@ sub fileList {
 	for (@list) {
 		push @out, $self->GetFileName($_);
 	}
+}
+
+sub GetChildren {
+	my ($self, $name) = @_;
+	return $self->infoRoot if $name eq'';
+	return $self->infoChildren($name)
 }
 
 sub GetCommonPath {
@@ -583,7 +608,10 @@ sub GetPath {
 
 sub GetPeers {
 	my ($self, $name) = @_;
-	return $self->infoChildren($self->GetParent($name))
+	my $par = $self->decodeParent($name);
+	return $self->infoRoot unless defined $par;
+	return $self->infoChildren($par) if $self->infoExists($par);
+	return ()
 }
 
 sub GetSaveIcon {
@@ -591,7 +619,7 @@ sub GetSaveIcon {
 	return $self->Callback('-saveiconcall', $name);
 }
 
-sub IsDir {
+sub isDir {
 	my ($self, $item) = @_;
 	return 1 if $self->infoData($item) eq 'dir';
 	return 0;
@@ -613,10 +641,10 @@ sub ItemList {
 	my ($self, $path, $list) = @_;
 	$list = [] unless defined $list;
 	$path = '' unless defined $path;
-	my @children = $self->infoChildren($path);
+	my @children = $self->GetChildren($path);
 	for (@children) {
 		if ($self->isUntracked($_)) { #ignoring untracked
-		} elsif ($self->IsDir($_)) {
+		} elsif ($self->isDir($_)) {
 			$self->ItemList($_, $list)
 		} else {
 			push @$list, $_
@@ -636,7 +664,7 @@ sub lmPost {
 		);
 		$menu->bind('<Leave>', [$self, 'lmUnpost']);
 		$self->{'l_menu'} = $menu;
-		$menu->post($x - 2, $y - 2);
+		$menu->post($x - 6, $y - 6);
 	}
 }
 
@@ -671,6 +699,24 @@ sub PathList {
 	return split /$sep/, $path
 }
 
+sub pause {
+	my ($self, $time) = @_;
+	my $var = 0;
+	$self->after($time, sub { $time = 1 });
+	$self->waitVariable(\$time);
+}
+
+sub setCellSize {
+	my ($self, $name) = @_;
+	my $t = $self->Subwidget('Tree');
+	unless ($self->{HAVECELLSIZE}) {
+#		my $i = $t->get($name);
+		$t->cellSize;
+		$self->{HAVECELLSIZE} = 1
+	}
+#	$t->refreshPurge($t->index($name))
+}
+
 sub SetPath {
 	my ($self, $path) = @_;
 	$path = $self->cget('-separator') . $path unless ($Config{osname} eq 'MSWin32');
@@ -697,7 +743,7 @@ Returns a list of all untracked items.
 
 sub untrackedList {
 	my $self = shift;
-	my @top = $self->infoChildren('');
+	my @top = $self->infoRoot('');
 	my @untracked = ();
 	for (@top) {
 		push @untracked, $_ if $self->infoData($_) eq 'untracked'
@@ -723,9 +769,7 @@ Unknown. If you find any, please contact the author.
 
 =over 4
 
-=item L<Tk::ITree>
-
-=item L<Tk::Tree>
+=item L<Tk::ListBrowser>
 
 =back
 

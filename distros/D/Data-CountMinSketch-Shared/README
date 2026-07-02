@@ -1,0 +1,207 @@
+NAME
+    Data::CountMinSketch::Shared - shared-memory Count-Min sketch for Linux
+
+SYNOPSIS
+        use Data::CountMinSketch::Shared;
+
+        # epsilon (error factor) 0.1%, delta (failure prob) 0.1%, anonymous mapping
+        my $cms = Data::CountMinSketch::Shared->new(undef, 0.001, 0.001);
+
+        $cms->add("alice");                 # count "alice" once
+        $cms->add("bob", 5);                # count "bob" five times
+
+        $cms->estimate("alice");            # 1  (never less than the true count)
+        $cms->estimate("bob");              # 5
+        $cms->estimate("carol");            # 0  (never added)
+
+        # bulk add in a single lock acquisition (each element counted once)
+        $cms->add_many([ map { "user-$_" } 1 .. 1000 ]);
+
+        # merge another sketch of identical geometry (cellwise add -> summed streams)
+        my $other = Data::CountMinSketch::Shared->new(undef, 0.001, 0.001);
+        $other->add_many([ map { "user-$_" } 500 .. 1500 ]);
+        $cms->merge($other);
+
+        # share across processes via a backing file
+        my $shared = Data::CountMinSketch::Shared->new("/tmp/freq.cms", 0.001, 0.001);
+
+DESCRIPTION
+    A Count-Min sketch in shared memory: a compact, fixed-size structure for
+    approximate frequency estimation over a stream. You add items
+    (optionally with a count), then ask for the estimated number of times
+    any item has been added. Memory is proportional to the configured error
+    parameters, not to the number of distinct items or the size of the
+    items; the sketch never stores the items themselves, only a small matrix
+    of counters.
+
+    The estimate has a one-sided guarantee: it never underestimates the true
+    count, and overestimates by at most "epsilon * total" with probability
+    at least "1 - delta", where "total" is the sum of all increments. (An
+    item never added estimates as 0 unless hash collisions with other items
+    inflate every one of its cells.) This makes the sketch ideal for finding
+    heavy hitters and approximate counts in a stream that is too large to
+    count exactly.
+
+    Each item is hashed once with XXH3 (128-bit); the two 64-bit halves
+    drive one column per row ("d"-row double hashing) into a "d" x "w"
+    matrix of 64-bit counters, with "w" a power of two. "add" increments the
+    "d" cells of the item (one per row); "estimate" returns the minimum of
+    those "d" cells -- since every collision only ever adds to a cell, the
+    smallest cell is the tightest upper bound, and is exact when at least
+    one of the item's cells suffered no collision. The matrix width "w" and
+    depth "d" are derived from the "epsilon" and "delta" you request.
+
+    Because the matrix lives in a shared mapping, several processes share
+    one sketch: any process that opens the same backing file, inherits the
+    anonymous mapping across "fork", or reopens a passed memfd, sees the
+    others' additions and contributes its own. A write-preferring futex
+    rwlock with dead-process recovery guards mutation, so many processes may
+    "add" and "estimate" concurrently. Two sketches of identical geometry
+    can be combined with "merge" (cellwise add), which yields a sketch whose
+    counts are the sum of the two input streams -- the merged estimate of
+    any item equals the sum of its estimates in the two inputs.
+
+    Items are added and queried by their byte content; wide-character
+    strings (any codepoint above 255) cause a "Wide character" croak --
+    encode such strings to bytes first (for example with
+    "Encode::encode_utf8"). Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $cms = Data::CountMinSketch::Shared->new($path, $epsilon, $delta);
+        my $cms = Data::CountMinSketch::Shared->new(undef, 0.001, 0.001);   # defaults
+        my $cms = Data::CountMinSketch::Shared->new_memfd($name, $epsilon, $delta);
+        my $cms = Data::CountMinSketch::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" or omitted for an anonymous mapping).
+    $epsilon is the target error factor and $delta the target failure
+    probability; both are optional, default to 0.001, and must be strictly
+    between 0 and 1. "new" and "new_memfd" croak if $epsilon or $delta is
+    out of range.
+
+    From $epsilon and $delta the sketch derives its geometry: a width of "w
+    = next_power_of_two(ceil(e / epsilon))" columns (with a floor of 2
+    columns) and a depth of "d = ceil(ln(1 / delta))" rows (clamped to the
+    range 1..32). Rounding the width up to a power of two means the realised
+    error factor at any given total is typically at or below the configured
+    target. When reopening an existing file or memfd, the stored geometry
+    wins and the caller's $epsilon/$delta arguments are ignored. "new_memfd"
+    creates a Linux memfd (transferable via its "memfd" descriptor);
+    "new_from_fd" reopens one in another process.
+
+    This is the standard Count-Min sketch (plain cell increments); it does
+    not use the conservative-update variant, which would make "merge"
+    unsound. The plain construction is what guarantees that merging two
+    sketches is exactly equivalent to having counted both streams into one.
+
+  Adding and estimating
+        my $total = $cms->add($item);           # add 1; returns the new grand total
+        my $total = $cms->add($item, $n);       # add $n; returns the new grand total
+        my $count = $cms->add_many(\@items);     # add 1 per element; returns how many added
+        my $est   = $cms->estimate($item);       # estimated count of $item (>= true count)
+        $cms->clear;                             # reset every counter (and total) to 0
+
+    "add" hashes $item (taken by its bytes; wide characters croak, encode
+    first) and increments its "d" cells by $n (default 1), returning the new
+    grand total -- the running sum of all increments across all items. $n is
+    an unsigned integer. "add_many" takes an array reference and adds each
+    element once under a single write lock, returning the number of elements
+    added (the array's length).
+
+    "estimate" returns the estimated number of times $item has been added:
+    the minimum of its "d" cells. This value never underestimates the true
+    count, and exceeds it by at most "epsilon * total" with probability at
+    least "1 - delta". An item that was never added estimates as 0 unless
+    every one of its cells happens to collide with other items.
+
+  Merging
+        $cms->merge($other);
+
+    Folds $other's counter matrix into $cms by cellwise addition, so $cms
+    then estimates, for every item, the sum of that item's counts in the two
+    sketches; $cms's "total" likewise becomes the sum of the two totals.
+    Both sketches must have identical geometry -- the same width and depth,
+    which follows from constructing both with the same $epsilon and $delta
+    ("merge" croaks on a mismatch). $other is read under its own lock into a
+    private snapshot first, so merging is deadlock-free even if two
+    processes merge each other concurrently; $other is not modified. Cells
+    that would overflow a 64-bit counter saturate at the maximum value.
+
+  Introspection and lifecycle
+        $cms->total; $cms->width; $cms->depth; $cms->cells; $cms->stats;
+        $cms->path; $cms->memfd; $cms->sync; $cms->unlink;   # or Class->unlink($path)
+
+    "total" is the running sum of all increments; "width" is the column
+    count "w" (a power of two); "depth" is the row count "d"; "cells" is
+    "width * depth", the number of counters. "sync" flushes the mapping to
+    its backing store (a no-op for anonymous and memfd sketches, which have
+    none); "unlink" removes the backing file (also callable as
+    "Class->unlink($path)"); "path" returns the backing path ("undef" for
+    anonymous, memfd, or fd-reopened sketches) and "memfd" the backing
+    descriptor -- the memfd of a "new_memfd" sketch or the dup'd fd of a
+    "new_from_fd" sketch, and -1 for file-backed or anonymous sketches.
+
+STATS
+    stats() returns a hashref describing the sketch:
+
+    *   "width" -- the column count "w" (a power of two).
+
+    *   "depth" -- the row count "d".
+
+    *   "total" -- the running sum of all increments.
+
+    *   "cells" -- "width * depth", the number of 64-bit counters.
+
+    *   "epsilon" -- the achieved error factor, "e / width". The per-item
+        overestimate is bounded by "epsilon * total" (with probability "1 -
+        delta"); a smaller value is a tighter bound.
+
+    *   "delta" -- the achieved failure probability, exp(-depth). This is
+        the chance that the overestimate exceeds the "epsilon * total" bound
+        for a given item; a smaller value is a stronger guarantee.
+
+    *   "ops" -- running count of mutating operations ("add", "add_many",
+        "merge", "clear").
+
+    *   "mmap_size" -- bytes of the shared mapping.
+
+SHARING ACROSS PROCESSES
+    The sketch lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path,
+    ...)" on the same path with matching epsilon and delta), an anonymous
+    mapping inherited across "fork", or a memfd whose descriptor is passed
+    to an unrelated process (over a UNIX socket via "SCM_RIGHTS", or via
+    "/proc/$pid/fd/$n") and reopened with new_from_fd($fd). Because the
+    mapping is shared, every process adds into and estimates against the
+    same counter matrix, so the counts reflect the combined stream all of
+    them have added.
+
+        # producer and consumer share one sketch with no coordination
+        my $cms = Data::CountMinSketch::Shared->new(undef, 0.001, 0.001);   # before fork
+        unless (fork) { $cms->add("ev-500") for 1 .. 10; exit }
+        wait;
+        print $cms->estimate("ev-500"), "\n";   # >= 10 -- the child's adds
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Each cell increment is a single word store, so
+    a crash leaves the sketch consistent up to the last completed "add".
+    Limitation: PID reuse is not detected (very unlikely in practice).
+
+SEE ALSO
+    Data::BloomFilter::Shared, Data::HyperLogLog::Shared,
+    Data::Intern::Shared, Data::SortedSet::Shared,
+    Data::SpatialHash::Shared, and the rest of the "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

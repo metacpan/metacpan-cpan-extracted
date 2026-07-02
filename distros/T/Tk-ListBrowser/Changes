@@ -1,6 +1,12 @@
 Revision history for Perl extension Tk::ListBrowser.
 
-0.10  Date
+0.11  Wed Jul 01 2026
+	- Headers respond to button release instead of button press.
+	- Fixed -filterforce option.
+	- Fixed delete and refreshPurge.
+	- Fixed selection drawing when unmapped.
+
+0.10  Thu Jun 18 2026
 	- Countless small optimizations.
 	- Fixed listWidth and cellWidth being undefined at create time.
 	- Indicators respond to button 1 release.

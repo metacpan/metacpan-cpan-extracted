@@ -1,0 +1,109 @@
+name: CI
+on:
+  push:
+    branches: ['*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl: ['5.40', '5.38', '5.36', '5.34', '5.32', '5.30', '5.28', '5.26', '5.24', '5.22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+      - run: cpanm -n Devel::PPPort
+      - run: perl Makefile.PL
+      - run: make
+      - run: make test
+
+  test-alpine:
+    runs-on: ubuntu-latest
+    container: alpine:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: apk add --no-cache perl perl-dev make gcc musl-dev linux-headers wget
+      - run: wget -qO- https://cpanmin.us | perl - App::cpanminus
+      - run: cpanm -n Devel::PPPort
+      - run: perl Makefile.PL && make && make test
+
+  test-asan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: cpanm -n Devel::PPPort
+      - run: perl Makefile.PL OPTIMIZE='-g -fsanitize=address -fno-omit-frame-pointer'
+      - run: make
+      - name: test under ASAN
+        run: |
+          ASAN_LIB=$(cc -print-file-name=libasan.so)
+          LD_PRELOAD=$ASAN_LIB ASAN_OPTIONS=detect_leaks=0 make test
+
+  test-arm:
+    runs-on: ubuntu-24.04-arm
+    name: ARM64 / Linux
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: cpanm -n Devel::PPPort
+      - run: perl Makefile.PL && make && make test
+
+  test-ubsan:
+    runs-on: ubuntu-latest
+    name: UBSan
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: cpanm -n Devel::PPPort
+      - run: perl Makefile.PL OPTIMIZE='-g -fsanitize=undefined -fno-omit-frame-pointer'
+      - run: make
+      - name: test under UBSan
+        run: |
+          UBSAN_LIB=$(cc -print-file-name=libubsan.so)
+          LD_PRELOAD=$UBSAN_LIB UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 make test
+
+  test-valgrind:
+    runs-on: ubuntu-latest
+    name: valgrind
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: sudo apt-get update && sudo apt-get install -y valgrind
+      - run: cpanm -n Devel::PPPort
+      - run: perl Makefile.PL && make
+      - name: test under valgrind
+        run: |
+          for t in t/*.t; do
+            echo "== valgrind $t =="
+            valgrind --leak-check=full --error-exitcode=42 \
+              --errors-for-leak-kinds=definite \
+              perl -Mblib "$t" || exit 1
+          done
+
+  test-xt:
+    runs-on: ubuntu-latest
+    name: AUTHOR_TESTING (xt/)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: cpanm -n Devel::PPPort Time::HiRes Test::Pod
+      - run: perl Makefile.PL && make
+      - run: AUTHOR_TESTING=1 prove -b -j2 xt/*.t
+        env:
+          AUTHOR_TESTING: 1

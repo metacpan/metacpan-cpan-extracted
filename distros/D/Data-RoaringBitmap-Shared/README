@@ -1,0 +1,246 @@
+NAME
+    Data::RoaringBitmap::Shared - shared-memory Roaring bitmap (compressed
+    uint32 set) for Linux
+
+SYNOPSIS
+        use Data::RoaringBitmap::Shared;
+
+        # anonymous shared mapping: a 256-slot container pool
+        my $a = Data::RoaringBitmap::Shared->new(undef, 256);
+
+        $a->add(5);              # 1 (newly added)
+        $a->add(5);              # 0 (already present)
+        $a->contains(5);         # true   ('test' is an alias)
+        $a->remove(5);           # 1 (removed; 'delete' is an alias)
+
+        $a->add_many([1, 2, 3, 1000, 70000]);   # returns count newly added
+        $a->cardinality;         # number of elements  ('count'/'size' are aliases)
+        $a->min; $a->max;        # smallest / largest element (undef if empty)
+        my $list = $a->to_array; # arrayref of every element, ascending
+
+        # in-place set operations against another bitmap
+        my $b = Data::RoaringBitmap::Shared->new(undef, 256);
+        $b->add_many([3, 4, 5]);
+        $a->union($b);           # a |= b   ('or' is an alias);  returns $a
+        $a->intersect($b);       # a &= b   ('and' is an alias);  returns $a
+
+        # share across processes via a backing file
+        my $shared = Data::RoaringBitmap::Shared->new("/tmp/ids.bin", 65536);
+
+DESCRIPTION
+    A Roaring bitmap in shared memory: a compressed set of 32-bit unsigned
+    integers. The 32-bit value space is split into 65536 buckets keyed by
+    the high 16 bits of each value; each bucket stores the low 16 bits of
+    its members in one of two container kinds, chosen automatically by
+    density:
+
+    *   an array container -- a sorted ascending "uint16" array, compact
+        when the bucket is sparse (up to 4096 elements);
+
+    *   a bitmap container -- a 65536-bit bitmap, efficient when the bucket
+        is dense.
+
+    A bucket starts as an array and is promoted to a bitmap once it would
+    exceed 4096 elements. Both kinds occupy one fixed 8192-byte slot from a
+    container pool, so the structure stays compact for sparse, clustered,
+    and dense sets alike. It supports membership tests, cardinality,
+    "min"/"max", "to_array", and in-place "union" and "intersect" with
+    another bitmap.
+
+    Because the bucket table and container pool live in a shared mapping,
+    several processes share one bitmap: any process that opens the same
+    backing file, inherits the anonymous mapping across "fork", or reopens a
+    passed memfd, sees the others' elements. A write-preferring futex rwlock
+    with dead-process recovery guards every mutation, so concurrent adds,
+    removals, and set operations serialize cleanly.
+
+    Values must fit in 32 bits (0 .. 4294967295); a value outside that range
+    croaks on "add"/"add_many" and is simply absent for "contains"/"remove".
+
+    v1 scope: array + bitmap containers (no run containers); union and
+    intersect only (no "xor" / "andnot" yet); a bitmap container is not
+    down-converted back to an array when removals make it sparse again.
+
+    Capacity is fixed at creation. The container pool holds
+    "container_capacity" slots; "add", "add_many" and "union" croak (after
+    releasing the lock) when the pool is exhausted. A bitmap that touches
+    every bucket as a dense bitmap needs all 65536 slots (512 MiB of pool);
+    a sparse set needs far fewer. Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $a = Data::RoaringBitmap::Shared->new($path, $container_capacity);
+        my $a = Data::RoaringBitmap::Shared->new(undef, $container_capacity); # anonymous
+        my $a = Data::RoaringBitmap::Shared->new_memfd($name, $container_capacity);
+        my $a = Data::RoaringBitmap::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" or omitted for an anonymous mapping).
+    $container_capacity (default 256) is the number of 8192-byte container
+    slots the pool holds; it must be ">= 1" and "<= 2**20". One slot is
+    consumed per non-empty bucket (a bucket is one container regardless of
+    whether it is an array or a bitmap), so size the pool for the number of
+    distinct high-16 groups your values fall into, with headroom. "new" and
+    "new_memfd" croak if the capacity is out of range. A freshly created
+    bitmap is empty ("cardinality == 0").
+
+    When reopening an existing file or memfd, the stored geometry wins and
+    the existing elements are preserved; the capacity you pass to "new" on a
+    reopen is used only when the file is brand new. "new_memfd" creates a
+    Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
+    reopens one in another process.
+
+  Adding and removing
+        my $new   = $a->add($x);          # 1 if newly added, 0 if already present
+        my $new   = $a->set($x);          # alias for add
+        my $added = $a->add_many(\@ints); # count of elements newly added
+        my $gone  = $a->remove($x);       # 1 if removed, 0 if absent
+        my $gone  = $a->delete($x);       # alias for remove
+
+    "add" (aliased "set") inserts $x, returning 1 if it was new or 0 if it
+    was already present. $x must be an unsigned integer that fits in 32
+    bits; a larger value croaks before any lock is taken. "add" croaks if
+    the container pool is exhausted (only adding to a brand-new bucket can
+    need a slot); the croak happens after the write lock is released and the
+    bitmap is left consistent.
+
+    "add_many" adds every value of the array reference (each range-checked
+    up front; an out-of-range value croaks before any lock). It returns the
+    number of elements that were newly added. It is not atomic on pool
+    exhaustion: values are added in order, and if the pool runs out partway,
+    "add_many" croaks with the already-processed elements left as members (a
+    set is order-independent, so the added ones are simply present).
+
+    "remove" (aliased "delete") removes $x, returning 1 if it was present or
+    0 if it was absent (an out-of-range value is treated as absent). When
+    the last element of a bucket is removed, the bucket's container slot is
+    returned to the pool. As noted in "DESCRIPTION", a bitmap container is
+    not converted back to an array on removal in v1.
+
+  Membership, cardinality, ordering
+        my $bool = $a->contains($x);   # true if $x is a member
+        my $bool = $a->test($x);       # alias for contains
+        my $n    = $a->cardinality;    # number of elements
+        my $n    = $a->count;          # alias for cardinality
+        my $n    = $a->size;           # alias for cardinality
+        my $bool = $a->is_empty;       # true when cardinality == 0
+        my $lo   = $a->min;            # smallest element, or undef if empty
+        my $hi   = $a->max;            # largest element, or undef if empty
+        my $list = $a->to_array;       # arrayref of all elements, ascending
+
+    "contains" (aliased "test") is a read; an out-of-range value is simply
+    not a member. "cardinality" (aliased "count"/"size") is the total number
+    of elements across all buckets. "min" and "max" scan for the
+    smallest/largest member and return "undef" on an empty set. "to_array"
+    returns a reference to a new array holding every element in ascending
+    order; for a large dense set this can be a long list. (The array is
+    pre-sized under a brief read lock and filled under the read lock; it is
+    a best-effort snapshot if the set is being mutated concurrently.)
+
+  Set operations (in place)
+        $a->union($other);       # a |= b  (set union);        returns $a
+        $a->or($other);          # alias for union
+        $a->intersect($other);   # a &= b  (set intersection);  returns $a
+        $a->and($other);         # alias for intersect
+
+    "union" (aliased "or") adds every element of $other to the receiver;
+    "intersect" (aliased "and") keeps only the elements present in both.
+    Both modify the receiver in place and return it (so calls chain). $other
+    must be a "Data::RoaringBitmap::Shared" object; combining a bitmap with
+    itself ("$a->union($a)") is a no-op.
+
+    "union" may need new container slots (one per bucket that $other
+    occupies and the receiver does not); it pre-checks capacity and croaks
+    before mutating (after releasing the locks) if the pool cannot satisfy
+    the operation, leaving the receiver unchanged. "intersect" only ever
+    shrinks or frees containers, so it never needs new slots and never
+    croaks for capacity.
+
+    Locking note: a set operation takes the receiver's write lock and
+    $other's read lock. To stay deadlock-free even if two processes run
+    "$a->union($b)" and "$b->union($a)" simultaneously, the two locks are
+    acquired in a fixed order keyed on a per-bitmap identity stored in
+    shared memory (so both processes compute the same order regardless of
+    how the handles happen to be laid out in each process), and the receiver
+    always takes the write lock. Calling a set op with two handles to the
+    same underlying bitmap (the same object, or a second handle that
+    reopened the same backing file or memfd) is detected and is a no-op.
+
+  Lifecycle
+        $a->clear;                                  # remove every element
+        $a->path; $a->memfd; $a->sync; $a->unlink;  # or Class->unlink($path)
+
+    "clear" empties the bitmap and returns every container slot to the pool.
+    "sync" flushes the mapping to its backing store (a no-op for anonymous
+    and memfd bitmaps); "unlink" removes the backing file (also callable as
+    "Class->unlink($path)"); "path" returns the backing path ("undef" for
+    anonymous, memfd, or fd-reopened bitmaps) and "memfd" the backing
+    descriptor -- the memfd of a "new_memfd" bitmap or the dup'd fd of a
+    "new_from_fd" bitmap, and -1 for file-backed or anonymous bitmaps.
+
+STATS
+    stats() returns a hashref describing the bitmap:
+
+    *   "cardinality" -- the total number of elements (same as
+        "cardinality").
+
+    *   "containers_used" -- the 1-based high-water of container slots
+        allocated since creation or the last "clear" (slot 0 is the reserved
+        NULL sentinel, so an empty pool reports 1).
+
+    *   "containers_capacity" -- the fixed container-pool capacity.
+
+    *   "buckets_used" -- the number of non-empty buckets (each is one
+        container, array or bitmap).
+
+    *   "ops" -- running count of mutating operations ("add", "add_many",
+        "remove", "union", "intersect", "clear").
+
+    *   "mmap_size" -- bytes of the shared mapping.
+
+SHARING ACROSS PROCESSES
+    The bitmap lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path,
+    ...)" on the same path), an anonymous mapping inherited across "fork",
+    or a memfd whose descriptor is passed to an unrelated process (over a
+    UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened
+    with new_from_fd($fd). Because the mapping is shared, every process adds
+    to and queries the same bitmap. All mutation is serialized by the write
+    lock, so the final contents are independent of how the processes
+    interleave.
+
+        # parent and children share one bitmap with no coordination
+        my $a = Data::RoaringBitmap::Shared->new(undef, 65536);   # before fork
+        unless (fork) { $a->add($_) for 1 .. 100000; exit }
+        wait;
+        print $a->cardinality, "\n";   # reflects the child's adds
+
+SECURITY
+    The mmap region is writable by all processes that open it, and a
+    reopened file is trusted: validation checks the header geometry but
+    cannot vet every internal container offset against a maliciously crafted
+    file. A hostile file could direct a read to an out-of-range container
+    slot. Do not share backing files with, or reopen files from, untrusted
+    processes.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Because every mutation performs its container
+    allocations under the lock after a capacity pre-check, a crash leaves
+    the bitmap consistent up to the last completed operation. Limitation:
+    PID reuse is not detected (very unlikely in practice).
+
+SEE ALSO
+    Data::RadixTree::Shared, Data::DisjointSet::Shared,
+    Data::Intern::Shared, Data::SortedSet::Shared,
+    Data::SpatialHash::Shared, Data::Histogram::Shared,
+    Data::CountMinSketch::Shared, Data::HyperLogLog::Shared,
+    Data::BloomFilter::Shared, and the rest of the "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

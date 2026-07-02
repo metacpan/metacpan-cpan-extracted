@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Cron::Service;
-$WebService::OPNsense::Cron::Service::VERSION = '0.002';
+$WebService::OPNsense::Cron::Service::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -36,7 +36,7 @@ WebService::OPNsense::Cron::Service - Cron service controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

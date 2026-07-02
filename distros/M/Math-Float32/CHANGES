@@ -1,5 +1,12 @@
 Revision history for Perl module Math::Float32
 
+0.03
+  - Remove source of flt_nextabove() and flt_nextbelow "redefined" warnings.
+  - Correction to "repository" location in Makefile.PL.
+  - In t/mpfr_checks.t we make allowance for *BSD sloppiness re the
+    calculations of log(), exp() and '**' operations, which can be
+    out by 1ULP.
+
 0.02
   -  More tests added.
   -  Add pack_flt_hex() function.

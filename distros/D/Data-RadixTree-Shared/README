@@ -1,0 +1,224 @@
+NAME
+    Data::RadixTree::Shared - shared-memory compressed radix tree (prefix
+    tree) for Linux
+
+SYNOPSIS
+        use Data::RadixTree::Shared;
+
+        # anonymous shared mapping: 4096-node pool, 64 KiB label arena
+        my $t = Data::RadixTree::Shared->new(undef, 4096, 65536);
+
+        $t->insert("foo", 1);          # 1 (newly inserted)
+        $t->insert("foobar", 2);       # 1
+        $t->insert("foo", 9);          # 0 (key existed -> value updated)
+
+        $t->lookup("foo");             # 9
+        $t->get("foobar");             # 2  ('get' is an alias for lookup)
+        $t->exists("foo");             # true
+        $t->contains("fo");            # false ('contains' is an alias for exists)
+
+        # longest-prefix match: the longest stored key that is a prefix of the query
+        $t->insert("10",       100);
+        $t->insert("10.0",     200);
+        $t->insert("10.0.0",   300);
+        $t->longest_prefix("10.0.0.5");   # 300 (value of "10.0.0")
+        $t->longest_prefix("9");          # undef (no stored key is a prefix)
+
+        $t->delete("foo");             # 1 (removed); 'remove' is an alias
+        $t->count;                     # number of stored keys ('size' is an alias)
+        $t->clear;                     # empty the tree
+
+        # share across processes via a backing file
+        my $shared = Data::RadixTree::Shared->new("/tmp/routes.bin", 1 << 16, 1 << 20);
+
+DESCRIPTION
+    A compressed radix tree (a radix-256, PATRICIA-style trie) in shared
+    memory. It maps arbitrary byte-string keys to unsigned-integer values.
+    Edge compression collapses chains of single-child nodes into one
+    labelled edge, so insert and lookup are O(key length) regardless of how
+    many keys are stored, and the structure stays compact.
+
+    Beyond exact lookup, a radix tree answers longest-prefix queries
+    efficiently: given a query string, "longest_prefix" returns the value of
+    the longest stored key that is a prefix of the query. This is exactly
+    what routing tables, dispatch tables and autocomplete back-ends need
+    (e.g. find the most specific CIDR-like prefix that covers an address).
+
+    Keys are raw bytes: a key containing wide characters croaks (encode to
+    bytes first, e.g. "utf8::encode" or "Encode::encode"). Values are
+    unsigned integers (a Perl "UV", stored as 64-bit). Because the node pool
+    and label arena live in a shared mapping, several processes share one
+    tree: any process that opens the same backing file, inherits the
+    anonymous mapping across "fork", or reopens a passed memfd, sees the
+    others' keys. A write-preferring futex rwlock with dead-process recovery
+    guards every mutation, so concurrent inserts and deletes serialize
+    cleanly.
+
+    "lookup", "get", "exists", "contains" and "longest_prefix" are pure
+    reads (no path compression) and take the read lock, so many processes
+    can query in parallel. "insert", "delete" and "clear" take the write
+    lock.
+
+    v1 NOTE -- delete is lazy: "delete" unmarks the key (so "lookup" and
+    "exists" no longer find it and "count" drops) but does not reclaim the
+    node-pool slots or the label-arena bytes the key occupied. Size the
+    capacities for your working set, or call "clear" to reset the whole tree
+    and reclaim all space at once.
+
+    Capacity is fixed at creation. The node pool holds "node_capacity" nodes
+    and the label arena holds "arena_capacity" bytes; "insert" croaks (after
+    releasing the lock) when either would overflow. A single insert consumes
+    at most two nodes and at most length(key) arena bytes, so size both with
+    headroom for your key set. Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $t = Data::RadixTree::Shared->new($path, $node_capacity, $arena_capacity);
+        my $t = Data::RadixTree::Shared->new(undef, $node_capacity, $arena_capacity); # anonymous
+        my $t = Data::RadixTree::Shared->new_memfd($name, $node_capacity, $arena_capacity);
+        my $t = Data::RadixTree::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" or omitted for an anonymous mapping).
+    $node_capacity (default 4096) is the number of tree nodes the pool
+    holds; it must be ">= 2" (one slot is the reserved NIL sentinel, one is
+    the root) and "<= 2**24". $arena_capacity (default 65536) is the number
+    of bytes the label arena holds; it must be ">= 1" and "<= 0xF0000000"
+    (~3.75 GiB). "new" and "new_memfd" croak if either capacity is out of
+    range. A freshly created tree is empty ("count == 0").
+
+    When reopening an existing file or memfd, the stored geometry wins and
+    the existing keys are preserved; the capacities you pass to "new" on a
+    reopen are only used when the file is brand new. "new_memfd" creates a
+    Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
+    reopens one in another process.
+
+  Insert, lookup, prefix queries
+        my $new   = $t->insert($key, $value);   # 1 if newly inserted, 0 if updated
+        my $value = $t->lookup($key);           # the stored value, or undef
+        my $value = $t->get($key);              # alias for lookup
+        my $bool  = $t->exists($key);           # true if $key is stored
+        my $bool  = $t->contains($key);         # alias for exists
+        my $value = $t->longest_prefix($query); # value of the longest stored prefix, or undef
+
+    "insert" stores $value (default 1) under $key, returning 1 if the key
+    was new or 0 if it already existed (the value is updated either way). It
+    croaks if the node pool or label arena is exhausted -- the croak happens
+    after the write lock is released, and the tree is left consistent (every
+    already-inserted key is still present and queryable).
+
+    Because the capacity check runs before the key is looked up, in a full
+    tree "insert" croaks even for an update of an existing key (which would
+    need no new space); size the capacities with headroom, or call "clear".
+
+    "lookup" (aliased "get") returns the value stored under $key, or "undef"
+    if the key is not present. "exists" (aliased "contains") returns a
+    boolean.
+
+    "longest_prefix" returns the value of the longest stored key that is a
+    prefix of $query, or "undef" if no stored key is a prefix of it. (The
+    empty string, if stored, is a prefix of every query.) It returns the
+    matched key's value, not the key itself; recovering the matched key
+    string is deferred to a future version.
+
+    Keys are byte strings; a key (or query) containing wide characters
+    croaks before any lock is taken. Values are unsigned integers stored as
+    64-bit.
+
+  Delete and clear
+        my $removed = $t->delete($key);   # 1 if removed, 0 if absent
+        my $removed = $t->remove($key);   # alias for delete
+        $t->clear;                        # remove every key
+
+    "delete" (aliased "remove") removes $key, returning 1 if it was present
+    or 0 if it was absent. As noted above, delete is lazy in v1: it unmarks
+    the key and decrements "count", but does not reclaim node or arena
+    space. Re-inserting the same key reuses its existing path at no extra
+    cost; inserting many distinct keys after deletes still consumes fresh
+    capacity. "clear" empties the tree and reclaims all node and arena space
+    at once.
+
+  Size and stats
+        my $n = $t->count;   # number of stored keys
+        my $n = $t->size;    # alias for count
+
+    "count" (aliased "size") is the current number of distinct stored keys.
+    See "STATS" for the full "stats" hashref.
+
+  Lifecycle
+        $t->path; $t->memfd; $t->sync; $t->unlink;   # or Class->unlink($path)
+
+    "sync" flushes the mapping to its backing store (a no-op for anonymous
+    and memfd trees, which have none); "unlink" removes the backing file
+    (also callable as "Class->unlink($path)"); "path" returns the backing
+    path ("undef" for anonymous, memfd, or fd-reopened trees) and "memfd"
+    the backing descriptor -- the memfd of a "new_memfd" tree or the dup'd
+    fd of a "new_from_fd" tree, and -1 for file-backed or anonymous trees.
+
+STATS
+    stats() returns a hashref describing the tree:
+
+    *   "keys" -- the number of distinct stored keys (same as "count").
+
+    *   "nodes_used" -- high-water number of node-pool slots ever allocated
+        (includes the NIL sentinel and the root). With lazy delete this
+        never decreases except on "clear".
+
+    *   "nodes_capacity" -- the fixed node-pool capacity.
+
+    *   "arena_used" -- bytes of label arena consumed (never decreases
+        except on "clear").
+
+    *   "arena_capacity" -- the fixed label-arena capacity in bytes.
+
+    *   "ops" -- running count of operations that took the write lock
+        ("insert", "delete", "clear").
+
+    *   "mmap_size" -- bytes of the shared mapping.
+
+SHARING ACROSS PROCESSES
+    The tree lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path,
+    ...)" on the same path), an anonymous mapping inherited across "fork",
+    or a memfd whose descriptor is passed to an unrelated process (over a
+    UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened
+    with new_from_fd($fd). Because the mapping is shared, every process
+    inserts into and queries the same tree. All mutation is serialized by
+    the write lock, so the final contents are independent of how the
+    processes interleave.
+
+        # parent and children share one radix tree with no coordination
+        my $t = Data::RadixTree::Shared->new(undef, 1 << 16, 1 << 20);   # before fork
+        unless (fork) { $t->insert("child-$_", $_) for 1 .. 1000; exit }
+        wait;
+        print $t->count, "\n";   # reflects the child's inserts
+
+SECURITY
+    The mmap region is writable by all processes that open it, and a
+    reopened file is trusted: validation checks the header geometry but
+    cannot vet every internal node index against a maliciously crafted file.
+    A hostile file could direct a walk to an out-of-range node index. Do not
+    share backing files with, or reopen files from, untrusted processes.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Because an "insert" performs all of its
+    node/arena allocations under the lock after a capacity pre-check, a
+    crash leaves the tree consistent up to the last completed "insert" or
+    "delete". Limitation: PID reuse is not detected (very unlikely in
+    practice).
+
+SEE ALSO
+    Data::DisjointSet::Shared, Data::Intern::Shared,
+    Data::SortedSet::Shared, Data::SpatialHash::Shared,
+    Data::Histogram::Shared, Data::CountMinSketch::Shared,
+    Data::HyperLogLog::Shared, Data::BloomFilter::Shared, and the rest of
+    the "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

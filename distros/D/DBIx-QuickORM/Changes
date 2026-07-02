@@ -1,3 +1,15 @@
+0.000027  2026-07-01 11:18:00-07:00 America/Los_Angeles
+
+    Features:
+    - A handle passed to handle() is now used as a query source: the inner query is spliced in as a derived table (aliased "subquery" by default, or via subquery_alias($alias)), its binds are threaded into the outer statement, and its real columns keep their types.
+
+    Bug Fixes:
+    - Autofill now croaks at schema-build time when two generated relationship accessors (or a relationship and a column accessor) would resolve to the same name, instead of silently dropping one; resolve with distinct link aliases or an autoname hook.
+    - Scalar-ref literal write values (e.g. \'NOW()') and literal-with-bind values ([\'expr ?', @binds]) in insert/update/upsert/cas are now emitted as SQL instead of being silently stored as a stringified reference; the row's cached value is recovered via RETURNING where supported, otherwise a refresh.
+
+    INCOMPATIBLE CHANGES:
+    - Passing an existing handle to handle() now wraps it as a subquery source instead of reusing/refining it; to refine a handle without wrapping it, call methods like where() on the handle directly (they return a refined clone).
+
 0.000026  2026-06-29 17:41:35-07:00 America/Los_Angeles
 
     Security:

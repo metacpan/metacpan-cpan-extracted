@@ -1,0 +1,220 @@
+NAME
+    Data::CuckooFilter::Shared - shared-memory Cuckoo filter for Linux
+
+SYNOPSIS
+        use Data::CuckooFilter::Shared;
+
+        # sized for 1_000_000 items, anonymous mapping
+        my $cf = Data::CuckooFilter::Shared->new(undef, 1_000_000);
+
+        $cf->add("alice");
+        $cf->add("bob");
+
+        $cf->contains("alice");             # 1 (probably present)
+        $cf->contains("carol");             # 0 (definitely absent)
+
+        # unlike a Bloom filter, you can delete
+        $cf->remove("alice");
+        $cf->contains("alice");             # 0
+
+        # add returns 0 when the table is full (a true no-op)
+        my $ok = $cf->add("item");          # 1 if stored, 0 if full
+
+        # bulk add in a single lock acquisition
+        my $n = $cf->add_many([ map { "user-$_" } 1 .. 1000 ]);
+
+        # share across processes via a backing file
+        my $shared = Data::CuckooFilter::Shared->new("/tmp/seen.cuckoo", 1_000_000);
+
+DESCRIPTION
+    A Cuckoo filter in shared memory: a compact, fixed-size structure for
+    approximate set membership that, unlike a Bloom filter, supports delete.
+    You add items, ask whether an item is present, and remove items you
+    previously added. The membership answer is either "definitely not
+    present" or "probably present": for items you have added (and not
+    removed) "contains" always returns true -- there are no false negatives
+    -- but there is a tiny rate of false positives (it may occasionally
+    report an item as present that was never added). It never stores the
+    items themselves, only a small fingerprint of each, so memory is
+    proportional to the configured capacity, not to the size of the items.
+
+    Each item is hashed once with XXH3 (128-bit). The high half yields a
+    16-bit fingerprint; the low half yields one candidate bucket, and
+    partial-key cuckoo hashing derives a second candidate bucket from the
+    first and the fingerprint. Each bucket holds four fingerprint slots.
+    "add" stores the fingerprint in either candidate bucket, evicting and
+    rehoming existing fingerprints (the "cuckoo" kick) when both are full.
+    The false-positive rate is governed by the fingerprint width and bucket
+    size and is approximately "2 * slots_per_bucket / 2**16" -- about 0.012%
+    with the fixed 16-bit fingerprint and 4-slot buckets.
+
+    The filter has a bounded capacity. When both candidate buckets are full
+    and a bounded sequence of cuckoo evictions cannot rehome a fingerprint,
+    "add" returns false and leaves the filter byte-for-byte unchanged -- a
+    failed insert is a true no-op, so it never drops a previously stored
+    fingerprint and never creates a false negative, even at the full
+    boundary. A real-world filter accepts roughly its configured capacity
+    (typically 95% or more) before reporting full.
+
+    Because the table lives in a shared mapping, several processes share one
+    filter: any process that opens the same backing file, inherits the
+    anonymous mapping across "fork", or reopens a passed memfd, sees the
+    others' additions and removals and contributes its own. A
+    write-preferring futex rwlock with dead-process recovery guards
+    mutation, so many processes may "add", "remove", and "contains"
+    concurrently.
+
+    Removal caveat. "remove" deletes one fingerprint matching the item.
+    Because the filter stores only a 16-bit fingerprint, removing an item
+    that was never added -- or one whose fingerprint happens to collide with
+    a different present item -- may delete the wrong fingerprint and corrupt
+    the filter (causing a false negative for some other item). Only remove
+    items you actually added. There is no de-duplication: re-adding an item
+    stores a second copy of its fingerprint (and "count" rises by one each
+    time), so to fully forget an item you must "remove" it as many times as
+    you added it. Cuckoo filters do not union cleanly, so there is no merge
+    operation.
+
+    Items are added, tested, and removed by their byte content;
+    wide-character strings (any codepoint above 255) cause a "Wide
+    character" croak -- encode such strings to bytes first (for example with
+    "Encode::encode_utf8"). Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $cf = Data::CuckooFilter::Shared->new($path, $capacity);
+        my $cf = Data::CuckooFilter::Shared->new(undef, 1_000_000);   # anonymous
+        my $cf = Data::CuckooFilter::Shared->new_memfd($name, $capacity);
+        my $cf = Data::CuckooFilter::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" or omitted for an anonymous mapping).
+    $capacity is the number of items you expect to add; it must be at least
+    1. "new" and "new_memfd" croak if $capacity is less than 1.
+
+    From $capacity the filter derives its geometry: a bucket array of
+    "num_buckets = next_power_of_two(ceil(capacity / 4 / 0.95))" buckets
+    (floor 2), each with four 16-bit fingerprint slots, for "4 *
+    num_buckets" slots total. The 0.95 target load factor and the rounding
+    up to a power of two mean the realised capacity at the full boundary is
+    typically at or above the requested $capacity. When reopening an
+    existing file or memfd, the stored geometry wins and the caller's
+    $capacity argument is ignored. "new_memfd" creates a Linux memfd
+    (transferable via its "memfd" descriptor); "new_from_fd" reopens one in
+    another process.
+
+  Adding, testing, removing
+        my $ok    = $cf->add($item);            # 1 if stored, 0 if the table is full
+        my $added = $cf->add_many(\@items);     # count of items stored
+        my $in    = $cf->contains($item);       # 1 if probably present, 0 if definitely absent
+        my $gone  = $cf->remove($item);         # 1 if a fingerprint was removed, else 0
+        $cf->clear;                             # reset to empty
+
+    "add" hashes $item (taken by its bytes; wide characters croak, encode
+    first) and stores its fingerprint in one of its two candidate buckets,
+    returning 1 on success. It returns 0 only when the table is full -- both
+    candidate buckets are occupied and a bounded run of cuckoo evictions
+    could not make room. A return of 0 is a true no-op: the filter is
+    unchanged, so nothing you previously added is lost (no false negatives
+    for added items, even when full). "add" does not de-duplicate: adding
+    the same item twice stores its fingerprint twice and increments "count"
+    by two. "add_many" takes an array reference and does the whole batch
+    under a single write lock, returning how many elements were stored (the
+    count of "add" calls that returned 1).
+
+    "contains" returns 1 if the item is probably present and 0 if it is
+    definitely absent. A 0 means definitely absent: an item you added and
+    have not removed will never return 0 (there are no false negatives). A 1
+    may be a false positive (a different item happens to share a fingerprint
+    and bucket). There are never false negatives for items that are
+    currently stored.
+
+    "remove" deletes one stored fingerprint of $item, returning 1 if one was
+    found and cleared or 0 if none matched. See the Removal caveat in
+    "DESCRIPTION": only remove items you added, and remove an item as many
+    times as it was added to forget it completely. "clear" empties the whole
+    filter (all slots zeroed, "count" reset to 0).
+
+  Introspection and lifecycle
+        $cf->count; $cf->capacity; $cf->buckets; $cf->slots; $cf->stats;
+        $cf->path; $cf->memfd; $cf->sync; $cf->unlink;   # or Class->unlink($path)
+
+    "count" is the number of fingerprints currently stored (maintained
+    exactly on every "add", "remove", and "clear"); since "add" stores
+    duplicates, this is the number of live fingerprints, not the number of
+    distinct items. "capacity" is the configured item capacity; "buckets" is
+    the bucket count (a power of two); "slots" is the total fingerprint-slot
+    count ("4 * buckets"). "sync" flushes the mapping to its backing store
+    (a no-op for anonymous and memfd filters); "unlink" removes the backing
+    file (also callable as "Class->unlink($path)"); "path" returns the
+    backing path ("undef" for anonymous, memfd, or fd-reopened filters) and
+    "memfd" the backing descriptor -- the memfd of a "new_memfd" filter or
+    the dup'd fd of a "new_from_fd" filter, and -1 for file-backed or
+    anonymous filters.
+
+    There is deliberately no merge method: cuckoo filters cannot be unioned
+    by a simple element-wise operation the way Bloom filters can.
+
+STATS
+    stats() returns a hashref describing the filter:
+
+    *   "capacity" -- the configured item capacity.
+
+    *   "buckets" -- the bucket count (a power of two).
+
+    *   "slots" -- the total number of fingerprint slots ("4 * buckets").
+
+    *   "count" -- the number of fingerprints currently stored.
+
+    *   "fill_ratio" -- "count / slots", between 0 and 1. As this approaches
+        1 the table is near full and "add" begins to fail; in practice
+        inserts start to fail somewhat below a full table.
+
+    *   "ops" -- running count of write-path calls ("add", "add_many",
+        "remove", "clear"), whether or not any fingerprint was actually
+        stored or removed.
+
+    *   "mmap_size" -- bytes of the shared mapping.
+
+SHARING ACROSS PROCESSES
+    The filter lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path,
+    ...)" on the same path with a matching capacity), an anonymous mapping
+    inherited across "fork", or a memfd whose descriptor is passed to an
+    unrelated process (over a UNIX socket via "SCM_RIGHTS", or via
+    "/proc/$pid/fd/$n") and reopened with new_from_fd($fd). Because the
+    mapping is shared, every process adds into, tests against, and removes
+    from the same table, so membership reflects the combined effect of what
+    all of them have done.
+
+        # producer and consumer share one filter with no coordination
+        my $cf = Data::CuckooFilter::Shared->new(undef, 100_000);   # before fork
+        unless (fork) { $cf->add_many([ map { "ev-$_" } 1 .. 1000 ]); exit }
+        wait;
+        print $cf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Each "add" commits with a single fingerprint
+    store (or, on the eviction path, an all-or-nothing sequence that rolls
+    back on failure), so a crash leaves the filter consistent up to the last
+    completed operation. Limitation: PID reuse is not detected (very
+    unlikely in practice).
+
+SEE ALSO
+    Data::BloomFilter::Shared (membership without delete),
+    Data::HyperLogLog::Shared, Data::Intern::Shared,
+    Data::SortedSet::Shared, Data::SpatialHash::Shared, and the rest of the
+    "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

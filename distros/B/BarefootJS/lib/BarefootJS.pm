@@ -1,5 +1,5 @@
 package BarefootJS;
-our $VERSION = "0.16.0";
+our $VERSION = "0.17.0";
 use strict;
 use warnings;
 use utf8;
@@ -8,6 +8,7 @@ no warnings 'experimental::signatures';
 
 use POSIX ();
 use Scalar::Util qw(looks_like_number weaken);
+use BarefootJS::Evaluator ();
 
 # NOTE: This runtime is template-engine-agnostic AND framework-agnostic by
 # design, so it can ship as a standalone CPAN distribution. It depends only on
@@ -1010,6 +1011,53 @@ sub replace ($self, $recv, $pattern, $replacement) {
     return substr($s, 0, $i) . $n . substr($s, $i + CORE::length($o));
 }
 
+# `queryHref(base, { … })` (#2042) — build `"$base?k=v&…"` from a flat list of
+# (guard, key, value) triples. A pair is included iff its guard is truthy AND
+# its value is a non-empty string, mirroring the client `queryHref`'s `if
+# (value)` over string values: the adapter passes the guard `1` for a plain
+# `key: v`, or the lowered condition for `key: cond ? v : undefined`. Repeating a
+# key overwrites the value at its first position (`URLSearchParams.set`
+# semantics).
+#
+# A value may instead be an array ref, which APPENDS one pair per non-empty
+# member (`{ tag => ['a','b'] }` → `tag=a&tag=b`, i.e. `URLSearchParams.append`);
+# empty members are skipped, so an empty/all-empty array contributes nothing.
+#
+# Keys/values are form-encoded to equal the browser render byte-for-byte; no
+# surviving pair yields the bare base.
+sub query ($self, $base, @triples) {
+    my $b = defined $base && !ref($base) ? "$base" : '';
+    my (@pairs, %pos);
+    my $i = 0;
+    while ($i + 2 < @triples) {
+        my ($guard, $key, $val) = @triples[$i, $i + 1, $i + 2];
+        $i += 3;
+        next unless $guard;
+        $key = defined $key && !ref($key) ? "$key" : '';
+        if (ref($val) eq 'ARRAY') {
+            # Append each non-empty member; appended pairs never overwrite, so
+            # they don't participate in the set()-position map.
+            for my $m (@$val) {
+                my $s = defined $m && !ref($m) ? "$m" : '';
+                next if $s eq '';
+                push @pairs, [$key, $s];
+            }
+            next;
+        }
+        $val = defined $val && !ref($val) ? "$val" : '';
+        next if $val eq '';
+        if (exists $pos{$key}) {
+            $pairs[$pos{$key}][1] = $val;
+        }
+        else {
+            $pos{$key} = scalar @pairs;
+            push @pairs, [$key, $val];
+        }
+    }
+    return $b unless @pairs;
+    return "$b?" . CORE::join('&', map { _form_escape($_->[0]) . '=' . _form_escape($_->[1]) } @pairs);
+}
+
 # `String.prototype.repeat(n)` — the receiver concatenated n times
 # (#1448 Tier B), via Perl's `x` operator. JS throws RangeError for a
 # negative count, but SSR templates degrade to the empty string rather
@@ -1088,6 +1136,49 @@ sub pad_end ($self, $recv, $target, $pad = undef) {
 #
 # A future `nulls => 'first' | 'last'` knob can land per key without
 # churn — the opts hash is the right place to grow.
+
+# Evaluator-driven sort / reduce (#2018): the comparator / reducer body rides
+# as a serialized-ParsedExpr JSON string and is evaluated per element, delegating
+# to the shared BarefootJS::Evaluator. The adapter emits `bf->sort_eval(...)` /
+# `bf->reduce_eval(...)` for any pure comparator / reducer body; a body it can't
+# model (e.g. localeCompare) keeps the legacy `bf->sort` / `bf->reduce` path.
+sub sort_eval ($self, $recv, $cmp_json, $param_a, $param_b, $base_env = {}) {
+    return BarefootJS::Evaluator::sort_by_json($recv, $cmp_json, $param_a, $param_b, $base_env);
+}
+
+sub reduce_eval ($self, $recv, $body_json, $acc_name, $item_name, $init, $direction = 'left', $base_env = {}) {
+    return BarefootJS::Evaluator::fold_json($recv, $body_json, $acc_name, $item_name, $init, $direction, $base_env);
+}
+
+# Evaluator-driven higher-order predicates (#2018, P2): the predicate body
+# rides as a serialized-ParsedExpr JSON string evaluated per element, delegating
+# to the shared BarefootJS::Evaluator. The adapter emits `bf->filter_eval(...)`
+# etc. for any pure predicate; a body it can't model (e.g. a method-call
+# predicate) keeps the legacy `grep` / `bf->find` path. `find_eval` /
+# `find_index_eval` take a `$forward` flag (false → findLast / findLastIndex).
+sub filter_eval ($self, $recv, $pred_json, $param, $base_env = {}) {
+    return BarefootJS::Evaluator::filter_json($recv, $pred_json, $param, $base_env);
+}
+
+sub every_eval ($self, $recv, $pred_json, $param, $base_env = {}) {
+    return BarefootJS::Evaluator::every_json($recv, $pred_json, $param, $base_env);
+}
+
+sub some_eval ($self, $recv, $pred_json, $param, $base_env = {}) {
+    return BarefootJS::Evaluator::some_json($recv, $pred_json, $param, $base_env);
+}
+
+sub find_eval ($self, $recv, $pred_json, $param, $forward = 1, $base_env = {}) {
+    return BarefootJS::Evaluator::find_json($recv, $pred_json, $param, $forward, $base_env);
+}
+
+sub find_index_eval ($self, $recv, $pred_json, $param, $forward = 1, $base_env = {}) {
+    return BarefootJS::Evaluator::find_index_json($recv, $pred_json, $param, $forward, $base_env);
+}
+
+sub flat_map_eval ($self, $recv, $proj_json, $param, $base_env = {}) {
+    return BarefootJS::Evaluator::flat_map_json($recv, $proj_json, $param, $base_env);
+}
 
 sub sort ($self, $recv, $opts = {}) {
     return [] unless ref($recv) eq 'ARRAY';
@@ -1264,6 +1355,18 @@ sub _to_attr_name ($key) {
     my $out = $key;
     $out =~ s/([A-Z])/-\L$1/g;
     return $out;
+}
+
+sub _form_escape ($s) {
+    # application/x-www-form-urlencoded serialisation, matching the browser's
+    # `URLSearchParams` (which the SSR query render must equal): keep ASCII
+    # alphanumerics and `* - . _`; encode every other byte as `%XX` (UPPER hex);
+    # space → `+`. Non-ASCII is encoded byte-wise over its UTF-8 bytes.
+    my $bytes = defined $s ? "$s" : '';
+    utf8::encode($bytes) if utf8::is_utf8($bytes);
+    $bytes =~ s/([^A-Za-z0-9*\-._ ])/sprintf('%%%02X', ord($1))/ge;
+    $bytes =~ tr/ /+/;
+    return $bytes;
 }
 
 sub _html_escape ($value) {

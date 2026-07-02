@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Exception;
-$WebService::OPNsense::Exception::VERSION = '0.002';
+$WebService::OPNsense::Exception::VERSION = '0.003';
 use Carp qw( croak );
 use Moo;
 use namespace::clean;
@@ -36,7 +36,7 @@ WebService::OPNsense::Exception - Structured exception class for OPNsense API er
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

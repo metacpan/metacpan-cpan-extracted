@@ -1,5 +1,14 @@
 Revision history for Perl distribution Future-IO-Impl-AnyEvent
 
+0.03 - 2026-07-01
+
+ - Implement the lower-level `poll` method introduced in Future::IO 0.19, which
+   is now used by ImplBase to provide sysread, syswrite, accept and connect. The
+   older `ready_for_read` and `ready_for_write` methods are kept for
+   compatibility with earlier versions of Future::IO.
+ - Warning: the test suite is failing on WSL2 but I believe this to be due to
+   Future::IO itself (not handling discrepency in that system).
+
 0.02 - 2024-11-30
 
  - Swictch to using the AE interface to AnyEvent.

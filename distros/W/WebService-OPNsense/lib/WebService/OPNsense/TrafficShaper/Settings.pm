@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::TrafficShaper::Settings;
-$WebService::OPNsense::TrafficShaper::Settings::VERSION = '0.002';
+$WebService::OPNsense::TrafficShaper::Settings::VERSION = '0.003';
 use Moo;
 use WebService::OPNsense::Normalize qw( validate_uuid );
 use namespace::clean;
@@ -17,11 +17,63 @@ sub _api_path {
 
 with 'WebService::OPNsense::Role::Settings';
 
-sub search_pipes {
-    my ( $self, %params ) = @_;
-    my $uri = $self->_path('searchPipe');
+sub add_pipe {
+    my ( $self, $pipe_data ) = @_;
+    my $uri = $self->_path('addPipe');
 
-    return $self->client->get( $uri, \%params );
+    return $self->client->post( $uri, $pipe_data );
+}
+
+sub add_queue {
+    my ( $self, $queue_data ) = @_;
+    my $uri = $self->_path('addQueue');
+
+    return $self->client->post( $uri, $queue_data );
+}
+
+sub add_rule {
+    my ( $self, $rule_data ) = @_;
+    my $uri = $self->_path('addRule');
+
+    return $self->client->post( $uri, $rule_data );
+}
+
+sub del_pipe {
+    my ( $self, $uuid ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'delPipe/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
+}
+
+sub del_queue {
+    my ( $self, $uuid ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'delQueue/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
+}
+
+sub del_rule {
+    my ( $self, $uuid ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'delRule/{uuid}', uuid => $uuid );
+
+    return $self->client->post($uri);
+}
+
+sub download_pipes {
+    my ($self) = @_;
+    my $uri = $self->_path('downloadPipes');
+
+    return $self->client->get($uri);
+}
+
+sub download_queues {
+    my ($self) = @_;
+    my $uri = $self->_path('downloadQueues');
+
+    return $self->client->get($uri);
 }
 
 sub get_pipe {
@@ -32,11 +84,41 @@ sub get_pipe {
     return $self->client->get($uri);
 }
 
-sub add_pipe {
-    my ( $self, $pipe_data ) = @_;
-    my $uri = $self->_path('addPipe');
+sub get_queue {
+    my ( $self, $uuid ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'getQueue/{uuid}', uuid => $uuid );
 
-    return $self->client->post( $uri, $pipe_data );
+    return $self->client->get($uri);
+}
+
+sub get_rule {
+    my ( $self, $uuid ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'getRule/{uuid}', uuid => $uuid );
+
+    return $self->client->get($uri);
+}
+
+sub search_pipes {
+    my ( $self, %params ) = @_;
+    my $uri = $self->_path('search_pipes');
+
+    return $self->client->get( $uri, \%params );
+}
+
+sub search_queues {
+    my ( $self, %params ) = @_;
+    my $uri = $self->_path('search_queues');
+
+    return $self->client->get( $uri, \%params );
+}
+
+sub search_rules {
+    my ( $self, %params ) = @_;
+    my $uri = $self->_path('search_rules');
+
+    return $self->client->get( $uri, \%params );
 }
 
 sub set_pipe {
@@ -49,60 +131,6 @@ sub set_pipe {
     );
 }
 
-sub del_pipe {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'delPipe/{uuid}', uuid => $uuid );
-
-    return $self->client->post($uri);
-}
-
-sub toggle_pipe {
-    my ( $self, $uuid, $enabled ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'togglePipe/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
-
-    return $self->client->post(
-        $uri,
-    );
-}
-
-sub download_pipes {
-    my ($self) = @_;
-    my $uri = $self->_path('downloadPipes');
-
-    return $self->client->get($uri);
-}
-
-sub upload_pipes {
-    my ( $self, $pipes_data ) = @_;
-    my $uri = $self->_path('uploadPipes');
-
-    return $self->client->post( $uri, $pipes_data );
-}
-
-sub search_queues {
-    my ( $self, %params ) = @_;
-    my $uri = $self->_path('searchQueue');
-
-    return $self->client->get( $uri, \%params );
-}
-
-sub get_queue {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'getQueue/{uuid}', uuid => $uuid );
-
-    return $self->client->get($uri);
-}
-
-sub add_queue {
-    my ( $self, $queue_data ) = @_;
-    my $uri = $self->_path('addQueue');
-
-    return $self->client->post( $uri, $queue_data );
-}
-
 sub set_queue {
     my ( $self, $uuid, $queue_data ) = @_;
     validate_uuid($uuid);
@@ -111,60 +139,6 @@ sub set_queue {
     return $self->client->post(
         $uri, $queue_data,
     );
-}
-
-sub del_queue {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'delQueue/{uuid}', uuid => $uuid );
-
-    return $self->client->post($uri);
-}
-
-sub toggle_queue {
-    my ( $self, $uuid, $enabled ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'toggleQueue/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
-
-    return $self->client->post(
-        $uri,
-    );
-}
-
-sub download_queues {
-    my ($self) = @_;
-    my $uri = $self->_path('downloadQueues');
-
-    return $self->client->get($uri);
-}
-
-sub upload_queues {
-    my ( $self, $queues_data ) = @_;
-    my $uri = $self->_path('uploadQueues');
-
-    return $self->client->post( $uri, $queues_data );
-}
-
-sub search_rules {
-    my ( $self, %params ) = @_;
-    my $uri = $self->_path('searchRule');
-
-    return $self->client->get( $uri, \%params );
-}
-
-sub get_rule {
-    my ( $self, $uuid ) = @_;
-    validate_uuid($uuid);
-    my $uri = $self->_path( 'getRule/{uuid}', uuid => $uuid );
-
-    return $self->client->get($uri);
-}
-
-sub add_rule {
-    my ( $self, $rule_data ) = @_;
-    my $uri = $self->_path('addRule');
-
-    return $self->client->post( $uri, $rule_data );
 }
 
 sub set_rule {
@@ -177,12 +151,24 @@ sub set_rule {
     );
 }
 
-sub del_rule {
-    my ( $self, $uuid ) = @_;
+sub toggle_pipe {
+    my ( $self, $uuid, $enabled ) = @_;
     validate_uuid($uuid);
-    my $uri = $self->_path( 'delRule/{uuid}', uuid => $uuid );
+    my $uri = $self->_path( 'togglePipe/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
 
-    return $self->client->post($uri);
+    return $self->client->post(
+        $uri,
+    );
+}
+
+sub toggle_queue {
+    my ( $self, $uuid, $enabled ) = @_;
+    validate_uuid($uuid);
+    my $uri = $self->_path( 'toggleQueue/{uuid}{/enabled}', uuid => $uuid, enabled => $enabled );
+
+    return $self->client->post(
+        $uri,
+    );
 }
 
 sub toggle_rule {
@@ -193,6 +179,20 @@ sub toggle_rule {
     return $self->client->post(
         $uri,
     );
+}
+
+sub upload_pipes {
+    my ( $self, $pipes_data ) = @_;
+    my $uri = $self->_path('uploadPipes');
+
+    return $self->client->post( $uri, $pipes_data );
+}
+
+sub upload_queues {
+    my ( $self, $queues_data ) = @_;
+    my $uri = $self->_path('uploadQueues');
+
+    return $self->client->post( $uri, $queues_data );
 }
 
 1;
@@ -209,7 +209,7 @@ WebService::OPNsense::TrafficShaper::Settings - Traffic shaper settings controll
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -223,77 +223,11 @@ Traffic shaper pipes, queues, and rules.
 
 =head1 METHODS
 
-=head2 get_settings
-
-    my $settings = $ts_settings->get_settings;
-
-Returns traffic shaper settings.
-
-=head2 set_settings
-
-    my $result = $ts_settings->set_settings($settings_data);
-
-Updates traffic shaper settings.
-
-=head2 search_pipes
-
-    my $pipes = $ts_settings->search_pipes(%params);
-
-Searches for pipes.
-
-=head2 get_pipe
-
-    my $pipe = $ts_settings->get_pipe($uuid);
-
-Returns a single pipe by UUID.
-
 =head2 add_pipe
 
     my $result = $ts_settings->add_pipe($pipe_data);
 
 Creates pipe.
-
-=head2 set_pipe
-
-    my $result = $ts_settings->set_pipe($uuid, $pipe_data);
-
-Updates pipe.
-
-=head2 del_pipe
-
-    my $result = $ts_settings->del_pipe($uuid);
-
-Deletes a pipe by UUID.
-
-=head2 toggle_pipe
-
-    my $result = $ts_settings->toggle_pipe($uuid, $enabled);
-
-Enables or disables a pipe.
-
-=head2 download_pipes
-
-    my $pipes = $ts_settings->download_pipes;
-
-Downloads all pipe configurations.
-
-=head2 upload_pipes
-
-    my $result = $ts_settings->upload_pipes($pipes_data);
-
-Uploads pipe configurations.
-
-=head2 search_queues
-
-    my $queues = $ts_settings->search_queues(%params);
-
-Searches for queues.
-
-=head2 get_queue
-
-    my $queue = $ts_settings->get_queue($uuid);
-
-Returns a single queue by UUID.
 
 =head2 add_queue
 
@@ -301,11 +235,23 @@ Returns a single queue by UUID.
 
 Creates queue.
 
-=head2 set_queue
+=head2 add_rule
 
-    my $result = $ts_settings->set_queue($uuid, $queue_data);
+    my $result = $ts_settings->add_rule($rule_data);
 
-Updates queue.
+Creates traffic shaper rule.
+
+=head2 client
+
+    my $http_client = $ts_settings->client;
+
+Returns the underlying HTTP client object used for API requests.
+
+=head2 del_pipe
+
+    my $result = $ts_settings->del_pipe($uuid);
+
+Deletes a pipe by UUID.
 
 =head2 del_queue
 
@@ -313,11 +259,17 @@ Updates queue.
 
 Deletes a queue by UUID.
 
-=head2 toggle_queue
+=head2 del_rule
 
-    my $result = $ts_settings->toggle_queue($uuid, $enabled);
+    my $result = $ts_settings->del_rule($uuid);
 
-Enables or disables a queue.
+Deletes a traffic shaper rule by UUID.
+
+=head2 download_pipes
+
+    my $pipes = $ts_settings->download_pipes;
+
+Downloads all pipe configurations.
 
 =head2 download_queues
 
@@ -325,17 +277,17 @@ Enables or disables a queue.
 
 Downloads all queue configurations.
 
-=head2 upload_queues
+=head2 get_pipe
 
-    my $result = $ts_settings->upload_queues($queues_data);
+    my $pipe = $ts_settings->get_pipe($uuid);
 
-Uploads queue configurations.
+Returns a single pipe by UUID.
 
-=head2 search_rules
+=head2 get_queue
 
-    my $rules = $ts_settings->search_rules(%params);
+    my $queue = $ts_settings->get_queue($uuid);
 
-Searches for traffic shaper rules.
+Returns a single queue by UUID.
 
 =head2 get_rule
 
@@ -343,11 +295,41 @@ Searches for traffic shaper rules.
 
 Returns a single traffic shaper rule by UUID.
 
-=head2 add_rule
+=head2 get_settings
 
-    my $result = $ts_settings->add_rule($rule_data);
+    my $settings = $ts_settings->get_settings;
 
-Creates traffic shaper rule.
+Returns traffic shaper settings.
+
+=head2 search_pipes
+
+    my $pipes = $ts_settings->search_pipes(%params);
+
+Searches for pipes.
+
+=head2 search_queues
+
+    my $queues = $ts_settings->search_queues(%params);
+
+Searches for queues.
+
+=head2 search_rules
+
+    my $rules = $ts_settings->search_rules(%params);
+
+Searches for traffic shaper rules.
+
+=head2 set_pipe
+
+    my $result = $ts_settings->set_pipe($uuid, $pipe_data);
+
+Updates pipe.
+
+=head2 set_queue
+
+    my $result = $ts_settings->set_queue($uuid, $queue_data);
+
+Updates queue.
 
 =head2 set_rule
 
@@ -355,11 +337,23 @@ Creates traffic shaper rule.
 
 Updates traffic shaper rule.
 
-=head2 del_rule
+=head2 set_settings
 
-    my $result = $ts_settings->del_rule($uuid);
+    my $result = $ts_settings->set_settings($settings_data);
 
-Deletes a traffic shaper rule by UUID.
+Updates traffic shaper settings.
+
+=head2 toggle_pipe
+
+    my $result = $ts_settings->toggle_pipe($uuid, $enabled);
+
+Enables or disables a pipe.
+
+=head2 toggle_queue
+
+    my $result = $ts_settings->toggle_queue($uuid, $enabled);
+
+Enables or disables a queue.
 
 =head2 toggle_rule
 
@@ -367,11 +361,17 @@ Deletes a traffic shaper rule by UUID.
 
 Enables or disables a traffic shaper rule.
 
-=head2 client
+=head2 upload_pipes
 
-    my $http_client = $ts_settings->client;
+    my $result = $ts_settings->upload_pipes($pipes_data);
 
-Returns the underlying HTTP client object used for API requests.
+Uploads pipe configurations.
+
+=head2 upload_queues
+
+    my $result = $ts_settings->upload_queues($queues_data);
+
+Uploads queue configurations.
 
 =head1 SEE ALSO
 

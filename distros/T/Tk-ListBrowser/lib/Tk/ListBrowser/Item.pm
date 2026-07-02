@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.10;
+$VERSION = 0.11;
 
 use base qw(Tk::ListBrowser::BaseItem);
 
@@ -271,13 +271,19 @@ sub drawSelect {
 	my $self = shift;
 	my $owner = $self->owner;
 	my $lb = $self->listbrowser;
+	my $c = $lb->Subwidget('Canvas');
 	my $si = Tk::ListBrowser::SelectXPM->new($lb);
 
 	my @coords = $self->getRegion;
-	my $a = $si->selectimage(@coords, 0, 0);
+	my $pixmap = $si->selectimage(@coords, 0, 0);
 	my ($x1, $y1, $x2, $y2) = @coords;
+	my $image = $c->createImage($x1, $y1,
+		-image => $pixmap,
+		-anchor => 'nw',
+		-tags => ['sel'],
+	);
 	$self->setRegion(@coords);
-	$self->crect($a);
+	$self->crect($image);
 }
 
 sub drawText {

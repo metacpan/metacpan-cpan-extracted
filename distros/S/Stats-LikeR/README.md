@@ -359,6 +359,83 @@ It changes `$df` in place and also returns it (handy for chaining).
 
 - Reusing a column name **overwrites** that column.
 
+## binom_test
+
+`binom_test` answers one question: you ran a yes/no experiment `n` times and
+got `x` successes — is that consistent with some assumed success rate, or is it
+too far off to be chance? It is the exact binomial test, the same as R's
+`binom.test`.
+
+### A toddler and two cards
+
+Show a toddler two cards each round and ask them to point at the one with the
+star. If he/she is only guessing, he/she will be right half the time, so the
+"pure guessing" success rate is `p = 0.5`.
+
+You play 10 rounds and the toddler gets 6 right. Real skill, or just luck?
+
+    use Stats::LikeR 'binom_test';
+
+    my $r = binom_test(6, 10, p => 0.5);   # 6 wins, 10 rounds, guessing rate 0.5
+
+    print $r->{p_value};                   # 0.7539
+
+The full result is a hashref:
+
+    {
+        statistic   => 6,            # times the toddler was right
+        parameter   => 10,           # rounds played
+        estimate    => 0.6,          # observed rate, 6/10
+        null_value  => 0.5,          # the "pure guessing" rate we test against
+        p_value     => 0.7539,
+        conf_int    => [0.262, 0.878],
+        conf_level  => 0.95,
+        alternative => 'two.sided',
+        method      => 'Exact binomial test',
+    }
+
+### Reading the p-value
+
+The p-value is the chance of seeing a result **at least this surprising** if the
+toddler were really just guessing.
+
+Here `p = 0.75`. That is enormous: a pure guesser scores 6/10 (or something
+even further from 5) about three times out of four. So 6/10 is completely
+ordinary luck — no evidence of skill.
+
+The common cutoff is `0.05`. Below it, you start to believe something real is
+going on. Above it, chance explains the result fine. `0.75` is nowhere close,
+so we call this **just chance**.
+
+### What "legit" would look like
+
+Suppose the toddler had gone 9 for 10 instead:
+
+    my $r = binom_test(9, 10, p => 0.5);
+
+    print $r->{p_value};                   # 0.0215
+
+Now `p = 0.02`, under `0.05`. A pure guesser almost never does that well, so
+this **is** good evidence the toddler can actually tell the cards apart.
+
+### The confidence interval
+
+`conf_int` is the plausible range for the toddler's true success rate. For
+6/10 it runs from about `0.26` to `0.88` — wide, and it comfortably includes
+`0.5`. That overlap with the guessing rate is another way of seeing that luck
+cannot be ruled out. For 9/10 the interval would sit well above `0.5`.
+
+### Options
+
+  - `p` is the assumed success rate (default `0.5`).
+  - `alternative` is `'two.sided'` (default), `'less'`, or `'greater'`. Use
+    `'greater'` when you only care whether the toddler beats guessing, not
+    whether they do worse.
+  - `conf_level` sets the interval width (default `0.95`).
+
+You can also pass the counts as `binom_test([6, 4])` — 6 right, 4 wrong — when
+you have wins and losses instead of wins and a total.
+
 ## cfilter
 
 Select **columns** out of a table and return it in the same shape. A column is
@@ -537,6 +614,73 @@ Flat Hash References evaluate Goodness of Fit while preserving your categorical 
 	};
 	
 	my $res = chisq_test($data);
+
+## chunk
+
+Split an array into contiguous, roughly equal groups by *position*. Unlike
+[`qcut`](#qcut), `chunk` does not inspect values, sort, or compute cutpoints; it
+slices the array in the order given. Use it for batching work, paginating, or
+grouping non-numeric data such as strings.
+
+### Signature
+
+    my @groups = chunk($data, size  => $n);   # fixed elements per group
+    my @groups = chunk($data, parts => $k);   # fixed number of groups
+
+  - `$data` — an array reference. Its contents are never examined or sorted;
+    elements are grouped in input order.
+
+Pass exactly one of `size` or `parts`. Passing both, or neither, is a fatal
+error — the two readings of "equal groups" differ (see below), so the caller
+chooses which one is meant rather than relying on a default.
+
+  - `size => $n` — each group holds `$n` elements; the final group holds
+    whatever remains.
+  - `parts => $k` — the array is divided into `$k` groups as equal as possible,
+    with any remainder spread across the leading groups.
+
+### Return value
+
+A list of array references, in input order — call it in list context:
+
+    my @groups = chunk($data, parts => 4);
+
+Passing more `parts` than there are elements yields trailing empty groups
+(matching `numpy.array_split`), so no elements are ever dropped. An empty input
+array returns an empty list.
+
+### Examples
+
+`size` fixes the elements per group; the last group is the remainder. Splitting
+the 26 letters into groups of five leaves one over:
+
+    my @groups = chunk(['a' .. 'z'], size => 5);
+    # 6 groups, sizes 5,5,5,5,5,1
+    # [a b c d e] [f g h i j] [k l m n o] [p q r s t] [u v w x y] [z]
+
+`parts` fixes the number of groups; the remainder is absorbed by the leading
+groups instead:
+
+    my @groups = chunk(['a' .. 'z'], parts => 5);
+    # 5 groups, sizes 5,5,5,5,6
+    # [a b c d e] [f g h i j] [k l m n o] [p q r s t] [u v w x y z]
+
+When the split is even the two forms agree:
+
+    my @a = chunk([1 .. 10], size  => 2);
+    my @b = chunk([1 .. 10], parts => 5);
+    # identical: 5 groups of 2
+
+Order is preserved — `chunk` never sorts. Sort the array yourself first if you
+want ordered groups:
+
+    my @groups = chunk([3, 1, 2], size => 2);
+    # ([3, 1], [2])
+
+More parts than elements gives empty trailing groups, losing nothing:
+
+    my @groups = chunk([1, 2, 3], parts => 5);
+    # 5 groups; flattening them back gives (1, 2, 3)
 
 ## `col2col`
 
@@ -1036,6 +1180,41 @@ which returns a hash reference:
         }
     });
 
+## get_union
+
+    my @all   = get_union(\@a, \@b, \@c); # every distinct value, any list
+    my $count = get_union(\@a, \@b, \@c); # how many distinct values
+
+Takes one or more array references and returns every value that appears in at
+least one of them. Duplicates collapse and the result keeps first-appearance
+order. In scalar context it returns the count. Values are compared by their
+string form (like Perl hash keys), so `1`, `"1"` and `1.0` are one element,
+while a UTF-8 flagged string stays distinct from the same bytes without the
+flag. A non-array-ref argument or an `undef` element is fatal. Mirrors
+`List::Compare`'s `get_union`.
+
+    my @a = (1, 2, 3, 3);
+    my @b = (3, 4);
+    my @u = get_union(\@a, \@b);            # (1, 2, 3, 4)
+
+## get_unique
+
+    my @only_first = get_unique(\@a, \@b, \@c);
+    my $count      = get_unique(\@a, \@b, \@c);
+
+Takes one or more array references and returns the values that appear in the
+**first** reference and in **no other** reference; with a single reference it
+returns that list's distinct values. Duplicates collapse, the result keeps
+first-appearance order, and scalar context returns the count. Values are
+compared by string form (see `get_union`). A non-array-ref argument or an
+`undef` element is fatal. Mirrors `List::Compare`'s `get_unique`, which
+likewise defaults to the first list.
+
+    my @a = (1, 2, 3);
+    my @b = (3, 4, 5);
+    my @c = (5, 6);
+    my @u = get_unique(\@a, \@b, \@c);      # (1, 2)  -- 3 is also in @b
+
 ## glm
 
 takes a hash of an array as input
@@ -1196,6 +1375,27 @@ completely independent of the input — changing one never affects the other.
 
 `hoa2aoh` is the reverse of `aoh2hoa`
 
+## hoa2hoh( \%hoa, $key )
+
+Converts a hash-of-arrays (column-major) into a hash-of-hashes keyed by the
+`$key` column, i.e. `{ $rowname => { col => value, ... } }`. Analogous to
+`hoa2aoh`, but rows are indexed by their `$key` value instead of positionally.
+
+    my %hoa = (
+        id => [ qw(a b c) ],
+        x  => [ 1, 2, 3 ],
+        y  => [ 4, 5, 6 ],
+    );
+    my $hoh = hoa2hoh( \%hoa, 'id' );
+    # { a => { id => 'a', x => 1, y => 4 }, b => {...}, c => {...} }
+
+The `$key` column is retained in each inner row. Columns are copied by value.
+Shorter columns are padded with `undef`, matching `hoa2aoh`.
+
+Dies if: the first argument is not a hashref of arrayrefs; `$key` is undef or
+names a missing/non-array column; the `$key` column holds an undefined value
+for any row; or two rows share the same `$key` value.
+
 ## hoh2hoa
 
 Convert a **hash of hashes** (row-major: outer key = row, inner key = column)
@@ -1290,7 +1490,7 @@ that appear in **every** array ref given.
 	my @t = intersection([1, 2, 3, 4], [2, 3, 4], [3, 4]); # (3, 4)
 	my $n = intersection([1, 2, 3], [2, 3, 4]);          # 2
 
-Every argument must be an array reference — each one is treated as a set.
+Every argument must be an array reference: each one is treated as a set.
 Unlike `mean` and `uniq`, bare scalars are not accepted; passing a non-reference
 (or a non-array reference) croaks.
 
@@ -1428,8 +1628,9 @@ For example:
 
 ## ljoin
 
-Consider a hash: `$h{$row}{$col}`, and another hash `$i{$row}{$col}`.
-`ljoin` will add information for `$col` in `%i` for each `$row` to `%h`, where `$row` exists in both `%h` and `%i`
+Consider a hash: `$h{$row}{$col}`, and another hash `$i{$row}{$col2}`.
+`ljoin` will add information for `$col` in `%i` for each `$row` to `%h`, where `$row` exists in both `%h` and `%i`.
+Similar to `cbind` in R.
 
 For example,
 
@@ -1475,6 +1676,22 @@ If your data contains missing numbers (`NA` or `undef`), `lm` handles listwise d
 the dot operator also works:
 
     $lm = lm(formula => 'y ~ .', data => $dot_data);
+
+## Lonly
+
+    my @left_only = Lonly(\@left, \@right);
+    my $count     = Lonly(\@left, \@right);
+
+Takes **exactly two** array references and returns the values in the left list
+that are absent from the right list. Duplicates collapse, the result keeps
+left-list order, and scalar context returns the count. Values are compared by
+string form (see `get_union`). A non-array-ref argument, an `undef` element,
+or anything other than two references is fatal. Mirrors `List::Compare`'s
+`get_Lonly`.
+
+    my @a = (1, 2, 3, 4);
+    my @b = (3, 4, 5);
+    my @l = Lonly(\@a, \@b);                # (1, 2)
 
 ## matrix
 
@@ -1833,6 +2050,119 @@ or `I()` transforms.
 - **It dies** on: a model that isn't a hashref or has no `coefficients`; an
   invalid `type`; or `newdata` that isn't a HoA/HoH hashref or AoH arrayref.
 
+## qcut
+
+Equal-frequency binning of a numeric column, which is the analog of pandas `qcut`.
+Where `cut` would slice a value range into equal-*width* intervals (and dump
+most of a skewed distribution into one bin), `qcut` chooses cutpoints so each
+bin holds roughly the same *number* of observations. This is the binning you
+usually want for ranked-list work: deciles, quartiles, top-5% tranches.
+
+Cutpoints are computed by linear interpolation between order statistics, the
+same method as numpy/pandas, so results match `pandas.qcut` exactly. Bins are
+right-closed, `(a, b]`, with the lowest bin closed on both ends, `[a, b]`, so
+the minimum value is always included.
+
+### Signature
+
+    qcut($data, $q, %options)
+
+  - `$data` — an array reference of numbers. `undef` entries are treated as
+    missing (NA): they are skipped when computing cutpoints and, when codes are
+    requested, come back as `undef` in their original positions.
+  - `$q` — either a positive integer (the number of equal-frequency bins) or an
+    array reference of probabilities in `[0, 1]` giving explicit cut
+    boundaries, e.g. `[0, 0.5, 0.95, 1]`.
+
+For a usage reminder at the prompt, call `qcut('h')` (or `qcut('H')`); it dies
+with a short help message.
+
+### What it returns
+
+By default `qcut` returns the **edge vector as a flat list** — the cheap,
+common query — so call it in list context:
+
+    my @edges = qcut($data, 4);          # ($e0, $e1, $e2, $e3, $e4)
+
+The per-element bin assignment (the expensive part) is opt-in. Ask for it with
+`codes => 1` and you get an array reference parallel to `$data`:
+
+    my $codes = qcut($data, 4, codes => 1);
+
+Ask for both in a single pass and you get two references, `($codes, $edges)`:
+
+    my ($codes, $edges) = qcut($data, 4, codes => 1, edges => 1);
+
+### Options
+
+  - `edges => 1` — include the edge vector. On by default; turned off
+    automatically when you request codes, so set it explicitly to get both.
+  - `codes => 1` — include the 0-based integer bin codes.
+  - `labels => [...]` — map the bin codes onto your own labels (implies
+    `codes => 1`). The list length must equal the number of bins.
+  - `labels => 'interval'` — label each element with its interval string,
+    e.g. `(3.25, 5.5]` (also implies codes).
+  - `duplicates => 'drop'` — if tied data produces non-unique cutpoints, merge
+    them into fewer bins instead of dying. The default, `'raise'`, throws an
+    error (as pandas does).
+
+### Examples
+
+Quartile edges (the default). The cutpoints match pandas exactly:
+
+    my @edges = qcut([1 .. 10], 4);
+    # @edges = (1, 3.25, 5.5, 7.75, 10)
+
+Bin codes. They are 0-based; note the tie distribution matches pandas (inner
+bins take 2 here, outer bins 3):
+
+    my $codes = qcut([1 .. 10], 4, codes => 1);
+    # $codes = [0, 0, 0, 1, 1, 2, 2, 3, 3, 3]
+
+Edges and codes together, computed in one pass:
+
+    my ($codes, $edges) = qcut([1 .. 10], 4, codes => 1, edges => 1);
+
+Equal frequency on clean data — 100 values into 4 bins of 25:
+
+    my $codes = qcut([1 .. 100], 4, codes => 1);
+    # 25 elements in each of bins 0, 1, 2, 3
+
+An explicit probability vector, for an asymmetric top-5% tranche:
+
+    my @edges = qcut([1 .. 100], [0, 0.5, 0.95, 1]);
+    my $codes = qcut([1 .. 100], [0, 0.5, 0.95, 1], codes => 1);
+    # bin 0: lower half (50), bin 1: next 45%, bin 2: top 5%
+
+Named labels instead of integer codes (implies codes):
+
+    my $labels = qcut([1 .. 10], 4, labels => [qw/Q1 Q2 Q3 Q4/]);
+    # ['Q1','Q1','Q1','Q2','Q2','Q3','Q3','Q4','Q4','Q4']
+
+Interval-string labels:
+
+    my $iv = qcut([1 .. 10], 4, labels => 'interval');
+    # $iv->[0]  eq '[1, 3.25]'
+    # $iv->[-1] eq '(7.75, 10]'
+
+Missing values are ignored for cutpoints, and (when codes are requested) pass
+straight through:
+
+    my $codes = qcut([1, 2, undef, 4, 5, 6, 7, 8, 9, 10], 4, codes => 1);
+    # $codes->[2] is undef; the rest are binned as usual
+
+Tied data and `duplicates`. Heavy ties can make adjacent cutpoints equal; the
+default raises, `'drop'` merges:
+
+    my @tied = ((0) x 8, 1, 2, 3, 4);
+    qcut(\@tied, 4);                         # dies: bin edges are not unique
+    my @edges = qcut(\@tied, 4, duplicates => 'drop');
+    # fewer than 5 edges; the empty quantile bands are collapsed
+
+Get the usage summary and stop:
+
+    qcut('h');   # dies with the help text above
+
 ## quantile
 
 Calculates sample quantiles using R's continuous Type 7 interpolation. 
@@ -1840,6 +2170,23 @@ Calculates sample quantiles using R's continuous Type 7 interpolation.
     my $quantile = quantile('x' => [1..99], probs => [0.05, 0.1, 0.25]);
 
 If the `probs` parameter is omitted, it behaves identically to R by defaulting to the 0, 25, 50, 75, and 100 percentiles (`c(0, .25, .5, .75, 1)`). The returned hash keys match R's standardized naming convention (e.g., `"25%"`, `"33.3%"`).
+
+## Ronly
+
+    my @right_only = Ronly(\@left, \@right);
+    my $count      = Ronly(\@left, \@right);
+
+Takes **exactly two** array references and returns the values in the right list
+that are absent from the left list. Duplicates collapse, the result keeps
+right-list order, and scalar context returns the count. Values are compared by
+string form (see `get_union`). A non-array-ref argument, an `undef` element,
+or anything other than two references is fatal. Mirrors `List::Compare`'s
+`get_Ronly`, and is the reverse of `Lonly`: `Ronly(\@a, \@b)` equals
+`Lonly(\@b, \@a)`.
+
+    my @a = (1, 2, 3, 4);
+    my @b = (3, 4, 5);
+    my @r = Ronly(\@a, \@b); # (5)
 
 ## rbinom
 
@@ -2493,7 +2840,17 @@ Args can also be accepted:
 
     write_table( 'data' => \%flat, 'file' => $f );
 
-# changes
+# Changes
+
+## 0.19
+
+numerous `SSize_t var1 = av_len(var) + 1` are changed to `size_t var1 = av_len(var) + 1` as `size_t`; as the result cannot be negative, in order to expand numerical range
+
+Addition of `hoa2hoh`, `binom_test`, `chunk`, `get_union`, `get_unique`, `Lonly`, `Ronly`, `qcut`, and 3 tukey functions
+
+Better warnings when non-array references are given to `intersection`
+
+`view` now breaks columns into chunks for very wide data sets, more closely matching R's behavior
 
 ## 0.18
 

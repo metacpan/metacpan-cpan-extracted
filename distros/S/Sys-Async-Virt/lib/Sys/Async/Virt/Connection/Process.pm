@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v12.4.0
+#                   and LibVirt version v12.5.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection::Process v0.6.4;
+class Sys::Async::Virt::Connection::Process v0.6.5;
 
 inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
@@ -26,7 +26,7 @@ use IO::Handle;
 use IPC::Open2;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::URI v12.4.0; # imports parse_url
+use Protocol::Sys::Virt::URI v12.5.0; # imports parse_url
 
 field $_url :param :reader;
 field $_pid;
@@ -42,7 +42,14 @@ async method close() {
 
 method _command( $url ) {
     my %c = parse_url( $url );
-    return $c{query}->{command};
+    my @rv;
+    if (exists $c{query}->{argv}) {
+        @rv = ( $c{query}->{command}, $c{query}->{argv}->@* );
+    }
+    else {
+        @rv = ( $c{query}->{command} );
+    }
+    return @rv;
 }
 
 async method connect() {
@@ -73,7 +80,7 @@ Sys::Async::Virt::Connection::Process - Connection to LibVirt server using
 
 =head1 VERSION
 
-v0.6.4
+v0.6.5
 
 =head1 SYNOPSIS
 

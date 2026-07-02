@@ -13,6 +13,19 @@ my %WriteMakefileArgs = (
     "bin/http_this"
   ],
   "LICENSE" => "artistic_2",
+  "META_MERGE" => {
+    "meta-spec" => { version => 2 },
+    "resources" => {
+      "repository" => {
+        "type" => "git",
+        "url" => "git://github.com/davorg-cpan/app-httpthis.git",
+        "web" => "https://github.com/davorg-cpan/app-httpthis",
+      },
+      "bugtracker" => {
+        "web" => "https://github.com/davorg-cpan/app-httpthis/issues"
+      },
+    },
+  },
   "NAME" => "App::HTTPThis",
   "PREREQ_PM" => {
     "Config::Tiny" => 0,

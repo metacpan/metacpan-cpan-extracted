@@ -1,5 +1,13 @@
 Revision History for Git::Server
 
+0.047  2026-07-01 14:00:00
+ - Default webhook for only push operations.
+ - Default logfile for only push operations.
+ - SECURITY: Make proxy sync honor write hooks
+   including ACLs and deploy triggers.
+ - Add emergency safety check to block illegal
+   writes even if pushed outside of git-server.
+
 0.046  2026-06-15 16:00:00
  - Run WebHooks serially to reduce server load.
  - Retry failed WebHooks for temporary hiccups.

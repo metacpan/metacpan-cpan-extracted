@@ -1,5 +1,16 @@
 Revision history for perl distribution Archive-SCS
 
+1.10 - 2026-07-02
+
+  - Change internal hash format to 16-byte hex string
+
+  - Installation no longer requires ExtUtils::CppGuess if you have g++
+    (should make installing on macOS and Linux easier)
+
+  - Reduce memory footprint of SCS HashFS v1
+
+  - Documentation: minor clarifications
+
 1.09 - 2025-09-28
 
   - Avoid conflicts between builtin compat modules (RT158702, GH#1)

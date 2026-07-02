@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v12.4.0
+#                   and LibVirt version v12.5.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -18,14 +18,14 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt::Domain v0.6.4;
+class Sys::Async::Virt::Domain v0.6.5;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::TypedParams v12.4.0;
-use Protocol::Sys::Virt::URI v12.4.0;
-use Protocol::Sys::Virt::Remote::XDR v12.4.0;
+use Protocol::Sys::Virt::TypedParams v12.5.0;
+use Protocol::Sys::Virt::URI v12.5.0;
+use Protocol::Sys::Virt::Remote::XDR v12.5.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -921,6 +921,10 @@ use constant {
     FD_ASSOCIATE_SECLABEL_WRITABLE                                    => (1 << 1),
     GRAPHICS_RELOAD_TYPE_ANY                                          => 0,
     GRAPHICS_RELOAD_TYPE_VNC                                          => 1,
+    ANNOUNCE_INTERFACE_INITIAL                                        => "initial",
+    ANNOUNCE_INTERFACE_MAX                                            => "max",
+    ANNOUNCE_INTERFACE_ROUNDS                                         => "rounds",
+    ANNOUNCE_INTERFACE_STEP                                           => "step",
 };
 
 
@@ -1466,6 +1470,13 @@ async method agent_set_response_timeout($timeout, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_AGENT_SET_RESPONSE_TIMEOUT,
         { dom => $_rpc_id, timeout => $timeout, flags => $flags // 0 }, unwrap => 'result' );
+}
+
+async method announce_interface($device, $params, $flags = 0) {
+    $params = await $_client->_filter_typed_param_string( $params );
+    return await $_client->_call(
+        $remote->PROC_DOMAIN_ANNOUNCE_INTERFACE,
+        { dom => $_rpc_id, device => $device, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 method attach_device($xml) {
@@ -2373,7 +2384,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.6.4
+v0.6.5
 
 =head1 SYNOPSIS
 
@@ -2581,6 +2592,14 @@ See documentation of L<virDomainAddIOThread|https://libvirt.org/html/libvirt-lib
   $result = await $dom->agent_set_response_timeout( $timeout, $flags = 0 );
 
 See documentation of L<virDomainAgentSetResponseTimeout|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainAgentSetResponseTimeout>.
+
+
+=head2 announce_interface
+
+  await $dom->announce_interface( $device, $params, $flags = 0 );
+  # -> (* no data *)
+
+See documentation of L<virDomainAnnounceInterface|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainAnnounceInterface>.
 
 
 =head2 attach_device
@@ -5487,6 +5506,14 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item GRAPHICS_RELOAD_TYPE_ANY
 
 =item GRAPHICS_RELOAD_TYPE_VNC
+
+=item ANNOUNCE_INTERFACE_INITIAL
+
+=item ANNOUNCE_INTERFACE_MAX
+
+=item ANNOUNCE_INTERFACE_ROUNDS
+
+=item ANNOUNCE_INTERFACE_STEP
 
 =back
 

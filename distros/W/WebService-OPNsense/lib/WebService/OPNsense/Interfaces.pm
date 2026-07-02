@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Interfaces;
-$WebService::OPNsense::Interfaces::VERSION = '0.002';
+$WebService::OPNsense::Interfaces::VERSION = '0.003';
 use Moo;
 use WebService::OPNsense::Normalize qw( optional_segment );
 use namespace::clean;
@@ -61,7 +61,7 @@ WebService::OPNsense::Interfaces - Interfaces API controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

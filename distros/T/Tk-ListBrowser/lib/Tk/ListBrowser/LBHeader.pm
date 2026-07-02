@@ -3,7 +3,7 @@ package Tk::ListBrowser::LBHeader;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.10;
+$VERSION = 0.11;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'LBHeader';
@@ -69,7 +69,7 @@ sub Populate {
 		$item->bind('<Button-3>', [$self, 'Callback', '-contextcall', Ev('x'), Ev('y')]);
 #		$item->bind('<Button-1>', [$self, 'SortClick']);
 		$item->bind('<B1-Motion>', [$self, 'B1Motion', $item, Ev('x')]);
-		$item->bind('<Button-1>', [$self, 'B1', $item, Ev('x')]);
+		$item->bind('<ButtonRelease-1>', [$self, 'B1', $item, Ev('x')]);
 	}
 
 	my $fg = $sort->cget('-foreground');

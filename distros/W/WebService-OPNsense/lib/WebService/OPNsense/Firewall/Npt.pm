@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::Firewall::Npt;
-$WebService::OPNsense::Firewall::Npt::VERSION = '0.002';
+$WebService::OPNsense::Firewall::Npt::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -30,7 +30,7 @@ WebService::OPNsense::Firewall::Npt - Firewall NPT (network prefix translation) 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

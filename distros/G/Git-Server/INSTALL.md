@@ -75,7 +75,7 @@ Receiving[...]
 [git@gitsrvhost ~]$
 ```
 
-You may want to make sure this "git" user has access
+You may want to make sure this `git` user has access
 to the proxy.url repo just to be safe:
 
 ```
@@ -92,9 +92,9 @@ Receiving[...]
 The git-server will only be able to proxy sync from
 remote git repo to local git repo if it has READ access.
 If you want two-way sync both directions, then this
-"git" user needs to have WRITE access too.
+`git` user needs to have WRITE access too.
 
-If the remote git repo is SSH and this "git" user doesn't
+If the remote git repo is SSH and this `git` user doesn't
 have SSH client access to the proxy.url, then it will try
 to utilize the Agent Forwarding of the real git client
 connection in order to reach the remote repo. It can be
@@ -127,7 +127,7 @@ You can add unlimited client users and SSH public keys.
 
 5. HOOKS
 
-By default, the "core.hooksPath" will point to the "hooks" folder
+By default, the `core.hooksPath` will point to the `hooks` folder
 of this installation to utilize these git-server features,
 but you can set it to wherever you wish. For example:
 
@@ -155,7 +155,9 @@ ACL settings you wish. For example:
 [git@gitsrvhost ProjX]$ git config log.daily true
 [git@gitsrvhost ProjX]$ git config log.rotate 61
 [git@gitsrvhost ProjX]$ git config log.compress true
+[git@gitsrvhost ProjX]$ git config log.operation pull,clone
 [git@gitsrvhost ProjX]$ git config webhook."https://site.io/op.cgi".method post
+[git@gitsrvhost ProjX]$ git config webhook."https://site.io/op.cgi".operation read,write,push,pull,clone
 [git@gitsrvhost ProjX]$ cd
 [git@gitsrvhost ~]$
 ```
@@ -178,7 +180,7 @@ Receiving[...]
 
 2. Optional Wrapper
 
-To use the "git-client" wrapper for improved "-o" support and .gitconfig overrides:
+To use the `git-client` wrapper for improved `-o` support and .gitconfig overrides:
 
 ```
 [admin@devbox ~]$ sudo wget -N -P /usr/local/bin https://raw.githubusercontent.com/hookbot/git-server/master/git-client
@@ -191,7 +193,7 @@ To use the "git-client" wrapper for improved "-o" support and .gitconfig overrid
 Config Directives
 =================
 
-On the git server host, make sure you get into the --bare repo
+On the git server host, make sure you get into the `--bare` repo
 folder of the unprivileged user (created above) before
 configuring any directives.
 
@@ -205,7 +207,7 @@ Last login: [...]
 
 ### acl.readers
 
-Comma-delimited list of REMOTE_USER settings from ~/.ssh/authorized_keys
+Comma-delimited list of `REMOTE_USER` settings from ~/.ssh/authorized_keys
 for all users you wish to allow read access to the repository.
 
 For example, these users can run: `git pull`
@@ -218,7 +220,7 @@ git config acl.readers 'jr,leaderboard'
 
 Comma-delimited list of users who you wish to receive instant
 updates immediately after someone pushes a change.
-All **deploy** users will also implicitly have **readers** access
+All `deploy` users will also implicitly have `readers` access
 since they are required to read from the repository.
 
 For example, these users can run: `git deploy`
@@ -230,7 +232,7 @@ git config acl.deploy 'deploykeywww1'
 ### acl.writers
 
 Comma-delimited list of users allowed to make changes to the
-respository. All **writers** users will implicitly have **readers**
+respository. All `writers` users will implicitly have `readers`
 access since they must be able to read in order to make changes.
 
 For example, these users will be able to run: `git push`
@@ -261,8 +263,8 @@ git config log.rotate 91
 
 ### log.compress
 
-Specify true or false whether to compress the rotated logfiles.
-The default is NO.
+Specify `true` or `false` whether to compress the rotated logfiles.
+The default is `false`, meaning NO compression.
 
 ```
 git config log.compress true
@@ -270,8 +272,8 @@ git config log.compress true
 
 ### log.daily
 
-Specify to rotate logs every day.
-The default is NO.
+Specify `true` or `false` whether to rotate logs every day.
+The default is `false`.
 
 ```
 git config log.daily true
@@ -279,20 +281,76 @@ git config log.daily true
 
 ### log.weekly
 
-Specify to rotate logs every week.
-The default is YES unless log.daily is set.
+Specify `true` or `false` whether to rotate logs every week.
+The default is `true` unless log.daily is set.
 
 ```
 git config log.weekly true
 ```
 
+### log.operation
+
+Specify a comma-delimited list of operations to log into log.logfile. The following are supported:
+
+- `push`: Any write operation
+- `pull`: Non-clone read operations, such as pull, fetch, ls-remote
+- `clone`: Initial clone checkout operation
+- `*`: All operations
+
+For security reasons, failed operations will always be logged.
+The default is `push` meaning to only log changes to the repo.
+
+```
+git config log.operation '*' # Log all read and write operations
+```
+
+### webhook.URL.method
+
+Specify method for webhook callback.
+
+- `post`: Use POST method
+
+The default is `post` if none is specified.
+
+```
+git config webhook."https://site.io/op.cgi".method post
+```
+
+### webhook.URL.transport
+
+Specify transport for webhook callback.
+
+- `json`: Submit information using `application/json` content.
+
+The default is `json` if none is specified.
+
+```
+git config webhook."https://site.io/op.cgi".method post
+```
+
+### webhook.URL.operation
+
+Specify a comma-delimited list of operations to invoke the callback URL for.
+The following are supported:
+
+- `push`: Any write operation
+- `pull`: Non-clone read operations, such as pull, fetch, ls-remote
+- `clone`: Initial clone checkout operation
+- `*`: All operations
+
+The default is `push` meaning to only invoke the callback URL for write operations.
+
+```
+git config webhook."https://site.io/op.cgi".operation '*' # Catch all read and write operations
+```
+
 ### acl.restrictemail
 
-Restrict committer user.email address to whitelist specified.
+Restrict committer `user.email` address to whitelist specified.
 Multiple acceptable emails can be specified in a comma-delimited list.
-Or "\*" can be used as wildcard match, like "\*@github\*".
-Or you can provide a regular expression in slashes, like "/bob@/".
-Default is no restrictions, meaning any email will be allowed.
+Or `*` can be used as wildcard match, like `*@github*`.
+Or you can provide a regular expression in slashes, like `/bob@/`.
+Default is no restrictions, meaning any email will be allowed to push changes.
 
 ```
 git config acl.restrictemail 'alice@gmail.com,bob@yahoo.com' # Must be either one
@@ -315,8 +373,8 @@ git config acl.restrictip '2a00:1450:400e:800::/56,96.0.0.0/8'   # Supports both
 
 ### restrictedbranch.BRANCH.pushers
 
-Specify which branches to block all **writers** from making
-changes to unless allowed in the pushers comma-delimited list.
+Specify which branches to block all `writers` from making
+changes to unless allowed in the `pushers` comma-delimited list.
 Default is no restrictions, meaning anyone can push to any branch.
 
 ```
@@ -327,14 +385,14 @@ git config restrictedbranch.'/^jira\/\d+/'.pushers 'bugmaster' # Use RegularExpr
 
 ### restrictedbranch.BRANCH.forcers
 
-Block --force from being used on specified branch.
-Warning: Those in the [forcers] comma-delimited list will be able
+Block `--force` from being used on specified branch.
+Warning: Those in the `forcers` comma-delimited list will be able
 to rewrite git history by editing previously-pushed comments and
 edit authors and can even undo commits by rolling backwards.
-Any branches NOT protected with [forcers] will be exposed to the
+Any branches NOT protected with `forcers` will be exposed to the
 security danger of some commits on the branch being overwritten
 or lost forever and may diminish proof of work.
-Default is no restrictions, meaning anyone can rewrite history using --force.
+Default is no restrictions, meaning anyone can rewrite history using `git push --force`.
 
 ```
 git config restrictedbranch.'*'.forcers NOBODY          # Block everyone from using 'git push --force' to rewrite git history on any branch (since REMOTE_USER=NOBODY doesn't exist).
@@ -345,7 +403,7 @@ git config restrictedbranch.'release/*'.forcers NOBODY  # Block everyone from lo
 
 ### restrictedfile.FILE.pushers
 
-Specify which file to block all **writers** from making
+Specify which file to block all `writers` from making
 changes to unless allowed in the pushers comma-delimited list.
 You can also specify a pattern or regex to restrict.
 Default is no restrictions, meaning anyone can commit changes to any file.
@@ -388,8 +446,8 @@ ssh-ed25519 AAAAC1NTE5/FiREggu4HKIZPpJSe puller@deploy-host
 
 3. Install the deploy SSH key on the git server host:
 
-Think of a name for this key, such as "push_notification_key1", and
-ensure this name is in the acl.deploy comma-delimited list.
+Think of a name for this key, such as `push_notification_key1`, and
+ensure this name is in the `acl.deploy` comma-delimited list.
 
 ```
 [admin@gitsrvhost ~]$ sudo su - git
@@ -417,13 +475,13 @@ Ensure the deploy key was installed properly.
 [puller@deploy-host ProjX]$ git deploy &
 ```
 
-Hopefully, if everything is working properly, the "git deploy"
+Hopefully, if everything is working properly, the `git deploy`
 command should just block. This means it is successfully
-waiting for one of the "writers" to push...
+waiting for one of the `writers` to push...
 
 5. Test push notification:
 
-Find another user with "writers" access to perform a push:
+Find another user with `writers` access to perform a push:
 
 ```
 [alice@dev ProjX]$ git push
@@ -439,9 +497,9 @@ To git@git-host:projectz
 [alice@dev ProjX]$
 ```
 
-That first "git deploy" puller blocked process on deploy-host should
+That first `git deploy` puller blocked process on deploy-host should
 immediately finish and deploy this fresh push. Then you know everything is
-configured perfectly for the "deploy" user and for the "writers" user.
+configured perfectly for the `deploy` user and for the `writers` user.
 And you can append a cron to keep the deployment daemon running.
 
 6. Install Deploy Cron:
@@ -476,4 +534,3 @@ To enable optional debugging, run this on any client host:
 [user1@devbox ProjX]$ export XMODIFIERS=DEBUG=1
 [user1@devbox ProjX]$
 ```
-

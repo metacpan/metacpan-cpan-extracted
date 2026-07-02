@@ -23,6 +23,8 @@ my @files = (
     'Makefile.PL',
     'README',
     'cpanfile',
+    'examples/reverse_dns.pl',
+    'examples/service_info.pl',
     'lib/WebService/OPNsense.pm',
     'lib/WebService/OPNsense/Backup.pm',
     'lib/WebService/OPNsense/CaptivePortal/Access.pm',

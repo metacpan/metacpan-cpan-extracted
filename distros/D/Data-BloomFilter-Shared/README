@@ -1,0 +1,202 @@
+NAME
+    Data::BloomFilter::Shared - shared-memory Bloom filter for Linux
+
+SYNOPSIS
+        use Data::BloomFilter::Shared;
+
+        # sized for 1_000_000 items at a 1% false-positive rate, anonymous mapping
+        my $bf = Data::BloomFilter::Shared->new(undef, 1_000_000, 0.01);
+
+        $bf->add("alice");
+        $bf->add("bob");
+
+        $bf->contains("alice");             # 1 (probably present)
+        $bf->contains("carol");             # 0 (definitely absent)
+
+        # "have I seen this before?" -- add returns 1 the first time, 0 after
+        my $first = $bf->add("event-42");   # 1: probably new
+        my $again = $bf->add("event-42");   # 0: all its bits were already set
+
+        # bulk add in a single lock acquisition
+        my $new = $bf->add_many([ map { "user-$_" } 1 .. 1000 ]);
+
+        # merge another filter of identical geometry (bitwise OR -> union)
+        my $other = Data::BloomFilter::Shared->new(undef, 1_000_000, 0.01);
+        $other->add_many([ map { "user-$_" } 500 .. 1500 ]);
+        $bf->merge($other);
+
+        # share across processes via a backing file
+        my $shared = Data::BloomFilter::Shared->new("/tmp/seen.bloom", 1_000_000, 0.01);
+
+DESCRIPTION
+    A Bloom filter in shared memory: a compact, fixed-size structure for
+    probabilistic set membership. You add items to it, then ask whether an
+    item is in the set. The answer is either "definitely not present" or
+    "probably present": the filter has no false negatives (if you added it,
+    "contains" always returns true) but a tunable rate of false positives
+    (it may occasionally report an item as present that was never added). It
+    never stores the items themselves, only a bit array, so memory is
+    proportional to the configured capacity and false-positive rate, not to
+    the size of the items.
+
+    Each item is hashed once with XXH3 (128-bit); the two 64-bit halves
+    drive "k" probe positions into a power-of-two bit array via
+    Kirsch-Mitzenmacher double hashing. "add" sets those "k" bits;
+    "contains" reports present only if all "k" are set. The number of hashes
+    "k" and the bit-array size are derived from the "capacity" and "fp_rate"
+    you request.
+
+    Because the bit array lives in a shared mapping, several processes share
+    one filter: any process that opens the same backing file, inherits the
+    anonymous mapping across "fork", or reopens a passed memfd, sees the
+    others' additions and contributes its own. A write-preferring futex
+    rwlock with dead-process recovery guards mutation, so many processes may
+    "add" and "contains" concurrently. Two filters of identical geometry can
+    be combined with "merge" (bitwise OR), which yields a filter whose
+    membership is the union of the two input sets.
+
+    Items are added and tested by their byte content; wide-character strings
+    (any codepoint above 255) cause a "Wide character" croak -- encode such
+    strings to bytes first (for example with "Encode::encode_utf8").
+    Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $bf = Data::BloomFilter::Shared->new($path, $capacity, $fp_rate);
+        my $bf = Data::BloomFilter::Shared->new(undef, 1_000_000);          # fp_rate 0.01
+        my $bf = Data::BloomFilter::Shared->new_memfd($name, $capacity, $fp_rate);
+        my $bf = Data::BloomFilter::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" or omitted for an anonymous mapping).
+    $capacity is the number of items you expect to add; it must be at least
+    1. $fp_rate is the target false-positive rate at that capacity; it is
+    optional, defaults to 0.01 (1%), and must be strictly between 0 and 1.
+    "new" and "new_memfd" croak if $capacity is less than 1 or $fp_rate is
+    out of range.
+
+    From $capacity and $fp_rate the filter derives its geometry: "k =
+    round(-log2(fp_rate))" hashes (clamped to the range 1..32), and a bit
+    array of "m = next_power_of_two(ceil(capacity * k / ln 2))" bits (with a
+    floor of 64 bits). Rounding the bit count up to a power of two means the
+    realised false-positive rate at capacity is typically at or below the
+    configured target. When reopening an existing file or memfd, the stored
+    geometry wins and the caller's $capacity/$fp_rate arguments are ignored.
+    "new_memfd" creates a Linux memfd (transferable via its "memfd"
+    descriptor); "new_from_fd" reopens one in another process.
+
+  Adding and testing
+        my $new   = $bf->add($item);            # 1 if probably new, else 0
+        my $added = $bf->add_many(\@items);     # count of items that were probably new
+        my $in    = $bf->contains($item);       # 1 if probably present, 0 if definitely absent
+        $bf->clear;                             # reset to empty (all bits 0)
+
+    "add" hashes $item (taken by its bytes; wide characters croak, encode
+    first) and sets its "k" bits, returning 1 if the item was probably new
+    -- that is, if at least one of its bits was previously unset -- and 0 if
+    all "k" bits were already set (the item was probably added before). A
+    return of 0 is therefore a "probably seen this already" signal, subject
+    to the same false-positive rate as "contains". "add_many" takes an array
+    reference and does the whole batch under a single write lock, returning
+    how many of its elements were probably new.
+
+    "contains" returns 1 if the item is probably present and 0 if it is
+    definitely absent. The contract is asymmetric and is the whole point of
+    a Bloom filter: a 0 is exact (the item was never added), while a 1 may
+    be a false positive (some other items happened to set all of this item's
+    bits). There are never false negatives: any item you have added always
+    reports as present.
+
+  Merging
+        $bf->merge($other);
+
+    Folds $other's bit array into $bf by bitwise OR, so $bf then reports as
+    present the union of the two filters' item sets (still with no false
+    negatives). Both filters must have identical geometry -- the same number
+    of bits and the same number of hashes, which follows from constructing
+    both with the same $capacity and $fp_rate ("merge" croaks on a
+    mismatch). $other is read under its own lock into a private snapshot
+    first, so merging is deadlock-free even if two processes merge each
+    other concurrently; $other is not modified.
+
+  Introspection and lifecycle
+        $bf->capacity; $bf->bits; $bf->hashes; $bf->fp_rate; $bf->count; $bf->stats;
+        $bf->path; $bf->memfd; $bf->sync; $bf->unlink;   # or Class->unlink($path)
+
+    "capacity" is the configured item capacity; "bits" is the bit-array size
+    in bits (a power of two); "hashes" is the number of hash probes "k";
+    "fp_rate" is the configured target false-positive rate. "count" returns
+    an estimate of the number of distinct items added, computed from the
+    fraction of bits set (accurate while the filter is not saturated, and
+    capped at "capacity" once it is). "sync" flushes the mapping to its
+    backing store (a no-op for anonymous and memfd filters, which have
+    none); "unlink" removes the backing file (also callable as
+    "Class->unlink($path)"); "path" returns the backing path ("undef" for
+    anonymous, memfd, or fd-reopened filters) and "memfd" the backing
+    descriptor -- the memfd of a "new_memfd" filter or the dup'd fd of a
+    "new_from_fd" filter, and -1 for file-backed or anonymous filters.
+
+STATS
+    stats() returns a hashref describing the filter:
+
+    *   "capacity" -- the configured item capacity.
+
+    *   "fp_rate" -- the configured target false-positive rate.
+
+    *   "bits" -- the bit-array size in bits (a power of two).
+
+    *   "hashes" -- the number of hash probes "k" per item.
+
+    *   "bits_set" -- how many bits are currently set.
+
+    *   "count" -- the estimated number of distinct items added.
+
+    *   "fill_ratio" -- "bits_set / bits", between 0 and 1. As this
+        approaches 0.5 the filter is near its designed capacity and the
+        realised false-positive rate approaches the configured target; well
+        above that the rate climbs.
+
+    *   "ops" -- running count of mutating operations ("add", "add_many",
+        "merge", "clear").
+
+    *   "mmap_size" -- bytes of the shared mapping.
+
+SHARING ACROSS PROCESSES
+    The filter lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path,
+    ...)" on the same path with matching capacity and rate), an anonymous
+    mapping inherited across "fork", or a memfd whose descriptor is passed
+    to an unrelated process (over a UNIX socket via "SCM_RIGHTS", or via
+    "/proc/$pid/fd/$n") and reopened with new_from_fd($fd). Because the
+    mapping is shared, every process adds into and tests against the same
+    bit array, so membership reflects the union of what all of them have
+    added.
+
+        # producer and consumer share one filter with no coordination
+        my $bf = Data::BloomFilter::Shared->new(undef, 100_000, 0.01);   # before fork
+        unless (fork) { $bf->add_many([ map { "ev-$_" } 1 .. 1000 ]); exit }
+        wait;
+        print $bf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Each bit set is a single word store, so a crash
+    leaves the filter consistent up to the last completed "add". Limitation:
+    PID reuse is not detected (very unlikely in practice).
+
+SEE ALSO
+    Data::HyperLogLog::Shared, Data::Intern::Shared,
+    Data::SortedSet::Shared, Data::SpatialHash::Shared, and the rest of the
+    "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

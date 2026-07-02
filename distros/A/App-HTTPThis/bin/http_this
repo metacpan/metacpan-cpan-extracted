@@ -17,6 +17,10 @@ __END__
 
 =encoding utf8
 
+=head1 NAME
+
+http_this - export the current directory over HTTP
+
 =head1 SYNOPSIS
 
     ## Export the current directory with HTTP
@@ -28,8 +32,11 @@ __END__
     ## Bind the server to a specific port
     $ http_this --port 9001
 
-    ## Bind the server to a specific host/IP address
-    $ http_this --host 0.0.0.0
+    ## Bind the server to one specific non-default interface
+    $ http_this --host 192.168.1.23
+
+    ## WARNING: Make the server reachable on all network interfaces
+    $ http_this --all
 
     ## Announces the HTTP server via Bonjour with the specified name
     $ http_this --name "My cool webserver"
@@ -61,6 +68,16 @@ with C<Ctrl-C>.
 All the files and directories will be availble to a browser under the
 URL the script outputs.
 
+=head1 WARNING
+
+As of version C<1.0.0>, C<http_this> no longer listens on all network
+interfaces by default. It now binds to C<127.0.0.1>, so only this computer
+can access it unless you explicitly opt in to broader access.
+
+If you need the pre-1.0.0 behaviour, use C<--all> (or its alias
+C<--promiscuous>), set C<all=1> in the config file, or choose a specific
+address with C<--host>.
+
 
 =head1 ARGUMENTS
 
@@ -77,6 +94,21 @@ The following options are available:
 =item --port PORT
 
 Start the HTTP server on a specific C<PORT>.
+
+=item --host HOST
+
+Bind the server to a specific C<HOST> or IP address, such as
+C<192.168.1.23> or C<::1>. By default the server binds to C<127.0.0.1>
+(localhost), which is a breaking change in version C<1.0.0>. Use
+C<--all> or C<--promiscuous> to restore the previous behaviour of listening
+on all network interfaces.
+
+=item --all / --promiscuous
+
+WARNING: this makes the server reachable on all network interfaces
+(equivalent to C<--host 0.0.0.0>). Other machines on your network may be able
+to access it. Use this only when you explicitly want the pre-1.0.0 behaviour
+or need to share the server beyond the local machine.
 
 =item --name NAME
 
@@ -130,6 +162,17 @@ The port to use for the HTTP server.
 =item B<name>:
 
 The name to use when announcing the server over Bonjour.
+
+=item B<host>:
+
+The host or IP address to bind to. If omitted, C<127.0.0.1> is used.
+Set this to a specific address if you do not want the localhost default.
+
+=item B<all>:
+
+WARNING: if set to a true value, the server will bind to all network
+interfaces (equivalent to C<host=0.0.0.0>), restoring the pre-1.0.0
+behaviour.
 
 =item B<autoindex>:
 

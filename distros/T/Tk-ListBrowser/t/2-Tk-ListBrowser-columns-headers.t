@@ -57,6 +57,7 @@ if (defined $app) {
 		-textjustify => 'left',
 		-selectmode => 'multiple',
 		-filtercolumns => 1,
+		-filterforce => 1,
 		-sortcase => 0,
 
 #		-marginleft => 80,
@@ -132,6 +133,7 @@ if (defined $app) {
 	)->pack(-side => 'left');
 
 	$app->geometry('500x400+200+200');
+	pause(300);
 }
 
 testaccessors($sc, qw/background cellimagewidth celltextwidth cellwidth forceWidth foreground header itemtype/);

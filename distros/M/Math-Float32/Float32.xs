@@ -26,6 +26,7 @@ SV * _itsa(pTHX_ SV * a) {
   if(SvNOK(a)) return newSVuv(3);    /* NV */
   if(sv_isobject(a)) {
     const char* h = HvNAME(SvSTASH(SvRV(a)));
+    if(strEQ(h, "Math::Bfloat16")) return newSVuv(20);
     if(strEQ(h, "Math::Float32")) return newSVuv(22);
   }
   croak("The Math::Float32::_itsa XSub has been given an invalid argument (probably undefined)");

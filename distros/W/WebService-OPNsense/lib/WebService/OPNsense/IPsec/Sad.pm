@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::Sad;
-$WebService::OPNsense::IPsec::Sad::VERSION = '0.002';
+$WebService::OPNsense::IPsec::Sad::VERSION = '0.003';
 use Carp qw( croak );
 use Moo;
 use namespace::clean;    # must be last
@@ -44,7 +44,7 @@ WebService::OPNsense::IPsec::Sad - IPsec Security Association Database (SAD) con
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

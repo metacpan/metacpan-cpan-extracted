@@ -4,7 +4,7 @@
 use strictures 2;
 
 package WebService::OPNsense::IPsec::Pools;
-$WebService::OPNsense::IPsec::Pools::VERSION = '0.002';
+$WebService::OPNsense::IPsec::Pools::VERSION = '0.003';
 use Moo;
 use namespace::clean;
 
@@ -30,7 +30,7 @@ WebService::OPNsense::IPsec::Pools - IPsec pool controller
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
