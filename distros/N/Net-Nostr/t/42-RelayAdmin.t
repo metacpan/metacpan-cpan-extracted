@@ -28,6 +28,16 @@ subtest 'POD: encode_request' => sub {
     is($data->{params}[1], 'spammer', 'reason in params');
 };
 
+subtest 'POD: encode role request' => sub {
+    my $body = encode_request(
+        method => 'createrole',
+        params => ['28b7e50f', 'king', 'ruler of the relay', 37, 1],
+    );
+    my $data = JSON->new->utf8->decode($body);
+    is($data->{method}, 'createrole', 'method is createrole');
+    is($data->{params}[0], '28b7e50f', 'role id');
+};
+
 ###############################################################################
 # POD example: decode a response
 ###############################################################################

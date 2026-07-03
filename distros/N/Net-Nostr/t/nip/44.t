@@ -153,6 +153,49 @@ subtest 'encrypt_decrypt_long_msg' => sub {
 };
 
 ###############################################################################
+# extended length prefix - valid boundary vectors
+###############################################################################
+
+subtest 'encrypt_decrypt extended length prefix boundary' => sub {
+    require Digest::SHA;
+
+    my $conv_key = pack('H*', 'c41c775356fd92eadc63ff5a0dc1da211b268cbea22316767095b2871ea1412d');
+    my $nonce    = pack('H*', '0000000000000000000000000000000000000000000000000000000000000001');
+
+    my @vectors = (
+        {
+            len              => 65535,
+            plaintext_sha256 => '6e1bebca6a8229364a162a72ef064826c4cd7457bf54f190ef782bd9deff3e42',
+            payload_sha256   => '6d8c2810d1e870fbaa1f0a0937126cca837a15f9260e27060c331d70a3c0bc84',
+        },
+        {
+            len              => 65536,
+            plaintext_sha256 => 'bf718b6f653bebc184e1479f1935b8da974d701b893afcf49e701f3e2f9f9c5a',
+            payload_sha256   => 'b7b4edb36ba92e267d322d56d9aebc22e7fa96ff52e3c12adc07f07a43cbc616',
+        },
+        {
+            len              => 65537,
+            plaintext_sha256 => '008ffc88d3c96a9f307524eb361e47c5222a887fc45fa0c1fb8d429c5c23b430',
+            payload_sha256   => 'eeb7c7c5373894ea2c1547cfd3ccb15d5a0b2d619da852e5c79df792dcc9e435',
+        },
+    );
+
+    for my $vec (@vectors) {
+        my $plaintext = 'a' x $vec->{len};
+        my $pt_bytes = Encode::encode('UTF-8', $plaintext);
+        is Digest::SHA::sha256_hex($pt_bytes), $vec->{plaintext_sha256},
+            "plaintext sha256 for length $vec->{len}";
+
+        my $payload = Net::Nostr::Encryption->encrypt($plaintext, $conv_key, $nonce);
+        is Digest::SHA::sha256_hex($payload), $vec->{payload_sha256},
+            "payload sha256 for length $vec->{len}";
+
+        is(Net::Nostr::Encryption->decrypt($payload, $conv_key), $plaintext,
+            "decrypt roundtrip for length $vec->{len}");
+    }
+};
+
+###############################################################################
 # invalid decrypt
 ###############################################################################
 
@@ -171,6 +214,7 @@ subtest 'invalid decrypt' => sub {
 
 subtest 'invalid encrypt_msg_lengths' => sub {
     for my $vec (@{$v2->{invalid}{encrypt_msg_lengths}}) {
+        next if $vec >= 65536; # old vector file predates the extended prefix
         my $conv_key = pack('H*', '0' x 64);  # dummy key
         my $nonce    = pack('H*', '0' x 64);
         ok dies {
@@ -247,14 +291,14 @@ subtest 'plaintext length validation' => sub {
     ok dies { Net::Nostr::Encryption->encrypt('', $conv_key) },
         'empty plaintext rejected';
 
-    ok dies { Net::Nostr::Encryption->encrypt('x' x 65536, $conv_key) },
-        'plaintext > 65535 bytes rejected';
-
     ok lives { Net::Nostr::Encryption->encrypt('x', $conv_key) },
         'single byte plaintext ok';
 
     ok lives { Net::Nostr::Encryption->encrypt('x' x 65535, $conv_key) },
         '65535 byte plaintext ok';
+
+    ok lives { Net::Nostr::Encryption->encrypt('x' x 65536, $conv_key) },
+        '65536 byte plaintext ok with extended prefix';
 };
 
 ###############################################################################

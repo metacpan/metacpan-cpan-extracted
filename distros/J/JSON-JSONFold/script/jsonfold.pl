@@ -94,11 +94,12 @@ sub read_input {
 
     my $json_text;
     if (defined $input) {
-        open my $fh, '<', $input or die "$input: $!\n";
+        open my $fh, '<:encoding(UTF-8)', $input or die "$input: $!\n";
         local $/;
         $json_text = <$fh>;
         close $fh or die "$input: $!\n";
     } else {
+        binmode STDIN, ":encoding(UTF-8)" ;
         local $/;
         $json_text = <STDIN>;
     }
@@ -161,6 +162,7 @@ sub main {
         return 0;
     }
 
+    binmode STDOUT, ':encoding(UTF-8)' ;
     my $verose = $opt->{verbose} ;
 
     my $data = $opt->{demo} ? demo_data() : read_input($opt->{input});
@@ -170,6 +172,7 @@ sub main {
     my $verbose = $opt->{verbose} ;
     my $native = $opt->{native} ;
 
+    print STDERR "Backend: ", $JSON::JSONFold::BACKEND || "-", "\n" if $verbose ;
     show_verbose("config", { $cfg->as_hash }) if $verbose ;
  
     my $info = write_json($data, \*STDOUT, $opt->{width}, $cfg, sort_keys => $opt->{sort_keys}, gold => !$native);

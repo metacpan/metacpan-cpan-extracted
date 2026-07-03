@@ -933,9 +933,11 @@ gp    # Get the current position of the playhead. Where am I?
 
 =over 8
 
-setpos <float:position_seconds>
+setpos <float:position_seconds> | <string: minutes:seconds> | <string: bar/beat[/tick]>
 
-setpos 65.5
+setpos 65.5 # set current position to 65.5 seconds.
+setpos 1/4  # set position to beginning of 4th beat, 1st bar
+
 
 =back
 
@@ -2260,13 +2262,15 @@ tmk 2 # Move to the mark with the index 2.
 
 =back
 
-=head4 B<add-mark> (mark amk k) - Drop a new mark at the current playback position. this will fail, if a mark is already placed on that exact position.
+=head4 B<add-mark> (mark amk k) - Create a mark, by default at the current playback position.
 
 =over 8
 
-add-mark [ <string:mark_id> ]
+add-mark [ <string:mark_id> ] [ <string:timevalue> ]
 
-mark start # Create a mark named "start" at the current position.
+mark start      # create a mark named "start" at the current position.
+mark chorus 4/1 # create a mark named "chorus" at first beat of 4th bar
+mark end 25.4   # create a mark named "end" at 25.4 seconds
 
 
 =back
@@ -3453,6 +3457,14 @@ edit-tempo-map
 
 =back
 
+=head4 B<reload-tempo-map> (rtm) - Re-import a tempo map
+
+=over 8
+
+reload-tempo-map 
+
+=back
+
 =head2 Midi commands
 
 =head4 B<set-tempo> (tempo tp) - Set MIDI tempo (bpm)
@@ -3470,6 +3482,24 @@ set-tempo <integer:tempo-setting>
 =over 8
 
 set-sample-rate <integer:sample-rate>
+
+=back
+
+=head2 Tempo commands
+
+=head4 B<notation-to-time> (ntt) - Print time value (seconds) of bar/beat/tick or other notation.
+
+=over 8
+
+notation-to-time <string:time_value>
+
+=back
+
+=head4 B<arm-metronome> (amm armm) - Set up metronome to start on next engine run
+
+=over 8
+
+arm-metronome 
 
 =back
 

@@ -2,6 +2,8 @@ package Net::Nostr::AppHandler;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -12,6 +14,8 @@ use Class::Tiny qw(
     content
     apps
     platforms
+    latest
+    next
 );
 
 # Known platform tag names
@@ -19,12 +23,12 @@ my %PLATFORM_TAGS = map { $_ => 1 } qw(web ios android);
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{apps}      //= [];
     $args{kinds}     //= [];
     $args{platforms} //= [];
     $args{content}   //= '';
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -32,7 +36,8 @@ sub new {
 }
 
 sub recommendation {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = $args{pubkey}     // croak "recommendation requires 'pubkey'";
     my $event_kind = $args{event_kind} // croak "recommendation requires 'event_kind'";
@@ -56,7 +61,8 @@ sub recommendation {
 }
 
 sub handler {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = $args{pubkey}     // croak "handler requires 'pubkey'";
     my $identifier = $args{identifier} // croak "handler requires 'identifier'";
@@ -67,6 +73,16 @@ sub handler {
 
     for my $k (@$kinds) {
         push @tags, ['k', "$k"];
+    }
+
+    for my $name (qw(latest next)) {
+        next unless defined $args{$name};
+        my $manifest = $args{$name};
+        croak "$name must be a hash reference" unless ref $manifest eq 'HASH';
+        my $coordinate = $manifest->{coordinate} // croak "$name requires 'coordinate'";
+        my @tag = ($name, $coordinate);
+        push @tag, $manifest->{relay} if defined $manifest->{relay};
+        push @tags, \@tag;
     }
 
     for my $p (@{$args{platforms} // []}) {
@@ -84,7 +100,8 @@ sub handler {
 }
 
 sub client_tag {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "client_tag requires 'name'" unless defined $args{name};
     croak "client_tag requires 'coordinate'" unless defined $args{coordinate};
     my @tag = ('client', $args{name}, $args{coordinate});
@@ -132,7 +149,7 @@ sub _parse_recommendation {
 sub _parse_handler {
     my ($class, $event) = @_;
 
-    my ($identifier, @kinds, @platforms);
+    my ($identifier, @kinds, @platforms, $latest, $next);
 
     for my $tag (@{$event->tags}) {
         next unless @$tag >= 2;
@@ -141,6 +158,14 @@ sub _parse_handler {
             $identifier = $tag->[1] // '';
         } elsif ($name eq 'k') {
             push @kinds, $tag->[1];
+        } elsif ($name eq 'latest' || $name eq 'next') {
+            my %manifest = (coordinate => $tag->[1]);
+            $manifest{relay} = $tag->[2] if @$tag > 2 && defined $tag->[2];
+            if ($name eq 'latest') {
+                $latest = \%manifest;
+            } else {
+                $next = \%manifest;
+            }
         } elsif ($PLATFORM_TAGS{$name}) {
             my %p = (platform => $name, url => $tag->[1]);
             $p{entity} = $tag->[2] if @$tag > 2 && defined $tag->[2];
@@ -153,6 +178,8 @@ sub _parse_handler {
         kinds      => \@kinds,
         content    => $event->content,
         platforms  => \@platforms,
+        latest     => $latest,
+        next       => $next,
     );
 }
 
@@ -174,7 +201,8 @@ sub validate {
 }
 
 sub recommendation_filter {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     return {
         kinds   => [31989],
         '#d'    => ["$args{event_kind}"],
@@ -183,7 +211,8 @@ sub recommendation_filter {
 }
 
 sub handler_filter {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     return {
         kinds   => [31990],
         '#k'    => ["$args{event_kind}"],
@@ -225,6 +254,14 @@ Net::Nostr::AppHandler - NIP-89 recommended application handlers
         identifier => 'zapstr',
         kinds      => ['31337'],
         content    => '{"name":"Zapstr","picture":"https://example.com/icon.png"}',
+        latest     => {
+            coordinate => "35128:$app_pk:zapstr-current",
+            relay      => 'wss://relay.example.com',
+        },
+        next       => {
+            coordinate => "35128:$app_pk:zapstr-next",
+            relay      => 'wss://relay.example.com',
+        },
         platforms  => [
             { platform => 'web', url => 'https://zapstr.live/a/<bech32>', entity => 'nevent' },
             { platform => 'web', url => 'https://zapstr.live/p/<bech32>', entity => 'nprofile' },
@@ -276,6 +313,8 @@ with NIP-19-encoded entities.
 
 =head2 new
 
+Accepts named arguments as either a flat list or a single hash reference.
+
     my $info = Net::Nostr::AppHandler->new(%fields);
 
 Creates a new C<Net::Nostr::AppHandler> object. Typically returned by
@@ -290,7 +329,8 @@ manual construction.
 
 Accepted fields: C<event_kind>, C<identifier>, C<kinds> (defaults to C<[]>),
 C<content> (defaults to C<''>), C<apps> (defaults to C<[]>),
-C<platforms> (defaults to C<[]>). Croaks on unknown arguments.
+C<platforms> (defaults to C<[]>), C<latest>, and C<next>. Croaks on
+unknown arguments.
 
 =head1 CLASS METHODS
 
@@ -320,6 +360,13 @@ included per spec.
         identifier => 'my-app',             # required (d tag)
         kinds      => ['31337', '30023'],   # required (k tags)
         content    => '{"name":"App"}',     # optional (kind:0-style JSON)
+        latest     => {                     # optional current nsite manifest
+            coordinate => '35128:pubkey:current',
+            relay      => 'wss://...',
+        },
+        next       => {                     # optional rollout nsite manifest
+            coordinate => '35128:pubkey:next',
+        },
         platforms  => [                     # optional
             { platform => 'web', url => 'https://app.com/<bech32>', entity => 'nevent' },
             { platform => 'ios', url => 'com.app:///<bech32>' },
@@ -331,6 +378,10 @@ C<identifier>, and C<kinds> are required.
 
 The C<content> field is an optional stringified JSON object with kind:0-style
 metadata. If empty, clients should use the pubkey's kind:0 profile instead.
+
+C<latest> and C<next> create C<latest> and C<next> tags pointing at NIP-89
+nsite manifest coordinates. Each is a hashref with required C<coordinate>
+and optional C<relay>.
 
 Each entry in C<platforms> becomes a platform tag. The C<entity> field is
 an optional NIP-19 entity type (e.g. C<nevent>, C<nprofile>). A platform
@@ -368,7 +419,7 @@ For kind 31989 (recommendation), the returned object has C<event_kind>
 and C<apps> accessors.
 
 For kind 31990 (handler), the returned object has C<identifier>, C<kinds>,
-C<content>, and C<platforms> accessors.
+C<content>, C<platforms>, C<latest>, and C<next> accessors.
 
 =head2 validate
 
@@ -451,6 +502,22 @@ The handler's metadata content (kind:0-style JSON string), or empty string.
 Arrayref of hashrefs describing platform handlers (kind 31990). Each
 hashref has C<platform> and C<url> keys. The C<entity> key is optional
 and specifies the NIP-19 entity type the URL handles.
+
+=head2 latest
+
+    my $latest = $info->latest;
+    # { coordinate => '35128:pk:current', relay => 'wss://...' }
+
+Hashref describing the current nsite manifest tag from a kind 31990 handler,
+or C<undef> when absent.
+
+=head2 next
+
+    my $next = $info->next;
+    # { coordinate => '35128:pk:next' }
+
+Hashref describing the next rollout nsite manifest tag from a kind 31990
+handler, or C<undef> when absent.
 
 =head1 SEE ALSO
 

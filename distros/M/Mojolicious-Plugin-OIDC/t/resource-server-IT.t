@@ -68,7 +68,6 @@ plugin 'OIDC' => {
       store_mode   => 'stash',
       id           => 'my_id',
       issuer       => 'my_issuer',
-      secret       => 'my_secret',
       role_prefix  => 'app.',
       jwks_url     => '/jwks',
       claim_mapping => {

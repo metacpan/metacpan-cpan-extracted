@@ -22,7 +22,11 @@ Dancer2::Plugin::OIDC - OIDC protocol integration for Dancer2
 =head1 DESCRIPTION
 
 This plugin makes it easy to integrate the OpenID Connect protocol
-into a Dancer2 application.
+into a Dancer2 application. It enables applications to act as an
+OpenID Connect Relying Party (RP) for user authentication and as an
+OAuth 2.0 Resource Server by validating Access Tokens issued by an
+external Authorization Server or OpenID Provider. It does not implement
+an OpenID Provider.
 
 It essentially uses the L<OIDC-Client|https://metacpan.org/dist/OIDC-Client>
 distribution.

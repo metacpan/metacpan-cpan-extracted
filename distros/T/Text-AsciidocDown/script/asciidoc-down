@@ -1,0 +1,216 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename qw(dirname basename);
+use File::Spec;
+use File::Temp qw(tempdir);
+use Getopt::Long qw(GetOptions);
+use Cwd qw(abs_path getcwd);
+use Pod::Usage qw(pod2usage);
+
+use lib File::Spec->catdir(dirname(dirname(abs_path(__FILE__))), 'lib');
+use Text::AsciidocDown;
+
+my @attrs;
+my $output;
+my $help;
+my $man;
+my $version;
+my $prepublish;
+my $postpublish;
+
+GetOptions(
+  'attribute|a=s@' => \@attrs,
+  'output|o=s' => \$output,
+  'help|h' => \$help,
+  'man' => \$man,
+  'version|v' => \$version,
+  'prepublish' => \$prepublish,
+  'postpublish' => \$postpublish,
+) or usage(1);
+
+if ($help) {
+  print "Usage: asciidoc-down [OPTION]... FILE\n";
+  print "Convert AsciiDoc FILE to Markdown.\n";
+  print "  -a, --attribute name=val   set attribute (repeatable)\n";
+  print "  -o, --output path|-        output path or stdout\n";
+  print "      --prepublish           convert and hide source\n";
+  print "      --postpublish          restore hidden source and remove output\n";
+  print "  -h, --help                 show help\n";
+  print "      --man                  show full man-page help\n";
+  print "  -v, --version              show version\n";
+  exit 0;
+}
+
+if ($man) {
+  pod2usage(-verbose => 2, -exitval => 0, -input => $0, -output => \*STDOUT);
+}
+
+if ($version) {
+  print $Text::AsciidocDown::VERSION, "\n";
+  exit 0;
+}
+
+my $input = shift @ARGV;
+$input = 'README.adoc' if !defined($input) && ($prepublish || $postpublish);
+usage(1) unless defined $input;
+
+if ($postpublish) {
+  my $out = defined($output) ? $output : to_output_path($input);
+  my $hidden = to_hidden_path($input);
+  rename $hidden, $input if -f $hidden;
+  unlink $out if defined($out) && $out ne '-' && -f $out;
+  exit 0;
+}
+
+my %attr_map = map { split_attr($_) } @attrs;
+
+my $source_text;
+if ($input eq '-') {
+  local $/;
+  $source_text = <STDIN>;
+} else {
+  open my $fh, '<:encoding(UTF-8)', $input or die "asciidoc-down: $input: $!\n";
+  local $/;
+  $source_text = <$fh>;
+  close $fh;
+}
+
+my $converter = Text::AsciidocDown->new(attributes => \%attr_map);
+my $out_text = $converter->convert($source_text, {
+  attributes => \%attr_map,
+  source_path => ($input eq '-' ? undef : abs_path($input)),
+}) . "\n";
+
+my $target = defined($output) ? $output : to_output_path($input);
+if ($target eq '-') {
+  print $out_text;
+} else {
+  open my $fh, '>:encoding(UTF-8)', $target or die "asciidoc-down: $target: $!\n";
+  print {$fh} $out_text;
+  close $fh;
+}
+
+if ($prepublish && $input ne '-') {
+  my $hidden = to_hidden_path($input);
+  rename $input, $hidden or die "asciidoc-down: cannot hide $input: $!\n";
+}
+
+exit 0;
+
+sub split_attr {
+  my ($raw) = @_;
+  my ($k, $v) = split /=/, $raw, 2;
+  $v = '' unless defined $v;
+  return ($k => $v);
+}
+
+sub to_output_path {
+  my ($path) = @_;
+  return '-' if $path eq '-';
+  (my $out = $path) =~ s/\.adoc$/.md/;
+  return $out;
+}
+
+sub to_hidden_path {
+  my ($path) = @_;
+  my $base = basename($path);
+  my $dir = dirname($path);
+  return File::Spec->catfile($dir, '.' . $base);
+}
+
+sub usage {
+  my ($code) = @_;
+  print STDERR "Usage: asciidoc-down [OPTION]... FILE\n";
+  exit $code;
+}
+
+__END__
+
+=head1 NAME
+
+asciidoc-down - Convert AsciiDoc to Markdown
+
+=head1 SYNOPSIS
+
+asciidoc-down [OPTION]... FILE
+
+=head1 DESCRIPTION
+
+C<asciidoc-down> reads AsciiDoc input and writes Markdown output.
+
+C<FILE> may be a path or C<-> for stdin.
+
+By default, output is written beside the input using the same base name with a
+C<.md> extension. Use C<-o> or C<--output> to override this or use C<-> for
+stdout.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-a>, B<--attribute> I<name=value>
+
+Set a runtime AsciiDoc attribute. Repeatable.
+
+=item B<-o>, B<--output> I<path>|B<->
+
+Write output to I<path> or to stdout when set to C<->.
+
+=item B<--prepublish>
+
+Prepare local docs for publication in repositories where source AsciiDoc files
+should not be visible after conversion.
+
+Behavior:
+
+1. Converts the input (default C<README.adoc>) to Markdown.
+2. Renames the source AsciiDoc file to a hidden path in the same directory
+  (for example C<README.adoc> becomes C<.README.adoc>).
+
+Use this when you want generated Markdown checked/published while temporarily
+hiding the source AsciiDoc file.
+
+If your document uses conditional environment attributes, pass them explicitly
+with C<--attribute>. For example:
+
+  --attribute env=npm --attribute env-npm
+
+or for Perl-oriented conditionals:
+
+  --attribute env=perl --attribute env-perl
+
+=item B<--postpublish>
+
+Undo the C<--prepublish> workflow after publication.
+
+Behavior:
+
+1. Restores the hidden source file (for example C<.README.adoc> back to
+  C<README.adoc>).
+2. Removes the generated Markdown output file.
+
+Use this to return the repository to its normal authoring state after a
+publish/release step.
+
+=item B<-h>, B<--help>
+
+Show short usage help.
+
+=item B<--man>
+
+Show full man-page style help.
+
+=item B<-v>, B<--version>
+
+Show version number.
+
+=back
+
+=head1 EXIT STATUS
+
+Returns C<0> on success. Errors are reported to stderr and return non-zero.
+
+=cut

@@ -2,6 +2,8 @@ package Net::Nostr::RelayMonitor;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -26,7 +28,7 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{nips}         //= [];
     $args{requirements} //= [];
     $args{topics}       //= [];
@@ -34,7 +36,7 @@ sub new {
     $args{languages}    //= [];
     $args{timeouts}     //= [];
     $args{checks}       //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -42,7 +44,8 @@ sub new {
 }
 
 sub discovery_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $relay_url = delete $args{relay_url}
         // croak "discovery_event requires 'relay_url'";
@@ -97,7 +100,8 @@ sub discovery_event {
 }
 
 sub announcement_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $frequency = delete $args{frequency}
         // croak "announcement_event requires 'frequency'";
@@ -308,6 +312,8 @@ trust a single monitor source.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $mon = Net::Nostr::RelayMonitor->new(%fields);
 

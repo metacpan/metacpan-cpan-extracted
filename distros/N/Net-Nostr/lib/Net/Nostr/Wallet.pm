@@ -2,6 +2,8 @@ package Net::Nostr::Wallet;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
@@ -26,13 +28,13 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{mints}        //= [];
     $args{proofs}       //= [];
     $args{del}          //= [];
     $args{e_tags}       //= [];
     $args{redeemed_ids} //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -42,7 +44,8 @@ sub new {
 # === Event creation ===
 
 sub wallet_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey  = $args{pubkey}  // croak "wallet_event requires 'pubkey'";
     my $content = $args{content} // croak "wallet_event requires 'content'";
@@ -52,7 +55,8 @@ sub wallet_event {
 }
 
 sub token_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey  = $args{pubkey}  // croak "token_event requires 'pubkey'";
     my $content = $args{content} // croak "token_event requires 'content'";
@@ -62,7 +66,8 @@ sub token_event {
 }
 
 sub history_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey       = $args{pubkey}       // croak "history_event requires 'pubkey'";
     my $content      = $args{content}      // croak "history_event requires 'content'";
@@ -79,7 +84,8 @@ sub history_event {
 }
 
 sub quote_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = $args{pubkey}     // croak "quote_event requires 'pubkey'";
     my $content    = $args{content}    // croak "quote_event requires 'content'";
@@ -96,7 +102,8 @@ sub quote_event {
 }
 
 sub delete_token {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey    = $args{pubkey}    // croak "delete_token requires 'pubkey'";
     my $event_ids = $args{event_ids} // croak "delete_token requires 'event_ids'";
@@ -115,7 +122,8 @@ sub delete_token {
 # === Content builders (return JSON for NIP-44 encryption) ===
 
 sub wallet_content {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $privkey = $args{privkey} // croak "wallet_content requires 'privkey'";
     my $mints   = $args{mints}   // croak "wallet_content requires 'mints'";
@@ -129,7 +137,8 @@ sub wallet_content {
 }
 
 sub token_content {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $mint   = $args{mint}   // croak "token_content requires 'mint'";
     my $proofs = $args{proofs} // croak "token_content requires 'proofs'";
@@ -146,7 +155,8 @@ sub token_content {
 }
 
 sub history_content {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $direction = $args{direction} // croak "history_content requires 'direction'";
     my $amount    = $args{amount}    // croak "history_content requires 'amount'";
@@ -428,6 +438,8 @@ payloads and parse decrypted content.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $w = Net::Nostr::Wallet->new(%fields);
 

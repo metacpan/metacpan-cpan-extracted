@@ -2,6 +2,8 @@ package Net::Nostr::MediaAttachment;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 
 use Class::Tiny qw(
@@ -32,10 +34,10 @@ my %KNOWN_FIELDS = map { $_ => 1 }
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{fallback} //= [];
     $args{fields}   //= {};
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -43,7 +45,8 @@ sub new {
 }
 
 sub imeta_tag {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $url = $args{url} // croak "imeta_tag requires 'url'";
 
@@ -171,6 +174,8 @@ Net::Nostr::MediaAttachment - NIP-92 Media Attachments
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $att = Net::Nostr::MediaAttachment->new(
         url      => 'https://example.com/photo.jpg',

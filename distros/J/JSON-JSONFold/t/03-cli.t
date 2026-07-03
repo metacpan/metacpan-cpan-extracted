@@ -5,7 +5,7 @@ use IPC::Open3;
 use Symbol qw(gensym);
 use JSON::PP qw(decode_json);
 
-my $cmd = "$^X -Iblib/lib blib/script/jsonfold.pl";
+my $cmd = "$^X -I. -Ilib ./script/jsonfold.pl";
 my $json = '{"b":[1,2,3],"a":{"x":1}}';
 
 my $err = gensym;

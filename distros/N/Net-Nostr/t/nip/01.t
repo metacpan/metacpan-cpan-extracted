@@ -535,6 +535,27 @@ sub connect_to_relay {
     return \$client_conn;
 }
 
+subtest 'relay rejects additional endpoint path segments' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $client = AnyEvent::WebSocket::Client->new;
+    $client->connect("ws://127.0.0.1:$port/extra")->cb(sub {
+        my $conn = eval { shift->recv };
+        if ($conn) {
+            $cv->send(0);
+        } else {
+            $cv->send(1);
+        }
+    });
+
+    ok($cv->recv, 'connection to extra path rejected');
+    $relay->stop;
+};
+
 # Helper: store events sequentially (waiting for OK each time), then query
 # Returns arrayref of event hashes from the query results
 sub relay_store_and_query {

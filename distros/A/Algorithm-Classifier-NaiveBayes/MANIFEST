@@ -1,0 +1,38 @@
+Changes
+examples/basic.pl
+examples/classify.pl
+examples/tokenizer_options.pl
+examples/train.pl
+lib/Algorithm/Classifier/NaiveBayes.pm
+lib/Algorithm/Classifier/NaiveBayes/App.pm
+lib/Algorithm/Classifier/NaiveBayes/App/Command.pm
+lib/Algorithm/Classifier/NaiveBayes/App/Command/classify.pm
+lib/Algorithm/Classifier/NaiveBayes/App/Command/explain.pm
+lib/Algorithm/Classifier/NaiveBayes/App/Command/info.pm
+lib/Algorithm/Classifier/NaiveBayes/App/Command/prune.pm
+lib/Algorithm/Classifier/NaiveBayes/App/Command/tokens.pm
+lib/Algorithm/Classifier/NaiveBayes/App/Command/train.pm
+lib/Algorithm/Classifier/NaiveBayes/App/Command/tweak.pm
+lib/Algorithm/Classifier/NaiveBayes/App/Command/untrain.pm
+src_bin/nb_tool
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/01-new.t
+t/02-tokenize.t
+t/03-train.t
+t/04-classify.t
+t/05-untrain.t
+t/06-string.t
+t/07-save-load.t
+t/08-listing.t
+t/09-prune.t
+t/10-explain.t
+t/11-app.t
+t/12-tweak.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -2,7 +2,7 @@ package Net::Nostr;
 
 use strictures 2;
 
-our $VERSION = '1.003001';
+our $VERSION = '2.001000';
 
 use Net::Nostr::Client;
 use Net::Nostr::Relay;
@@ -37,6 +37,29 @@ Net::Nostr is a Perl implementation of the Nostr protocol that provides both
 client and relay functionality. Most of the useful functionality lives in the
 individual modules listed below -- start with L<Net::Nostr::Key> for identity
 management and L<Net::Nostr::Event> for creating events.
+
+=head1 NAMED ARGUMENTS
+
+Constructors and named-argument builder/helper APIs accept either a flat list
+or a single hash reference when their documented argument list is entirely
+named:
+
+    my $event = Net::Nostr::Event->new(
+        pubkey  => $pubkey,
+        kind    => 1,
+        content => 'hello',
+    );
+
+    my $event = Net::Nostr::Event->new({
+        pubkey  => $pubkey,
+        kind    => 1,
+        content => 'hello',
+    });
+
+Positional parser APIs, such as C<parse($json)> and C<from_event($event)>, keep
+their positional arguments. Some positional APIs also accept trailing named
+options; pass those options as shown in the method documentation unless that
+method explicitly documents hash-reference option support.
 
 =head1 CLASS METHODS
 
@@ -177,8 +200,8 @@ Equivalent to C<< Net::Nostr::Relay->new >>.
 =head1 SUPPORTED NIPS
 
 Conformance target:
-L<nostr-protocol/nips commit 0a25dd52|https://github.com/nostr-protocol/nips/commit/0a25dd524389d642ec153d9009a16fb183eb23ce>
-(2026-04-10).
+L<nostr-protocol/nips commit 8f8444d0|https://github.com/nostr-protocol/nips/commit/8f8444d05a8842c40211ded5d10af3521541f865>
+(2026-07-01).
 
 =over 4
 

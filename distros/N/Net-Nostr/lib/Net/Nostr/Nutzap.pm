@@ -2,6 +2,8 @@ package Net::Nostr::Nutzap;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -23,12 +25,12 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{relays}     //= [];
     $args{mints}      //= [];
     $args{proofs}     //= [];
     $args{nutzap_ids} //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -36,7 +38,8 @@ sub new {
 }
 
 sub info_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey      = $args{pubkey}      // croak "info_event requires 'pubkey'";
     my $relays      = $args{relays}      // croak "info_event requires 'relays'";
@@ -57,7 +60,8 @@ sub info_event {
 }
 
 sub nutzap {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey    = $args{pubkey}    // croak "nutzap requires 'pubkey'";
     my $recipient = $args{recipient} // croak "nutzap requires 'recipient'";
@@ -92,7 +96,8 @@ sub nutzap {
 }
 
 sub redemption {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey        = $args{pubkey}        // croak "redemption requires 'pubkey'";
     my $nutzap_ids    = $args{nutzap_ids}    // croak "redemption requires 'nutzap_ids'";
@@ -320,6 +325,8 @@ tokens, tagging the original nutzap event(s) with a C<redeemed> marker.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $info = Net::Nostr::Nutzap->new(%fields);
 

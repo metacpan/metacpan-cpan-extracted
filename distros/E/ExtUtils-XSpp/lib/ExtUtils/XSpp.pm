@@ -5,6 +5,6 @@ use warnings;
 
 use ExtUtils::XSpp::Driver;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 1;

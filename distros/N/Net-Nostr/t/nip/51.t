@@ -39,6 +39,23 @@ subtest 'new croaks without kind' => sub {
     ok(dies { Net::Nostr::List->new }, 'croaks without kind');
 };
 
+subtest 'standardized list kinds added by latest NIP-51' => sub {
+    my @cases = (
+        [10013, relay => 'wss://private.example.com'],
+        [10054, url   => 'https://podcast.example.com/feed.xml'],
+        [10064, p     => $alice_pk],
+    );
+
+    for my $case (@cases) {
+        my ($kind, @tag) = @$case;
+        my $list = Net::Nostr::List->new(kind => $kind);
+        $list->add(@tag);
+        my $event = $list->to_event(pubkey => $alice_pk);
+        is($event->kind, $kind, "kind $kind event");
+        is($event->tags->[0], [@tag], "kind $kind tag preserved");
+    }
+};
+
 ###############################################################################
 # Adding public items
 ###############################################################################

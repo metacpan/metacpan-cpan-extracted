@@ -12,6 +12,7 @@ lib/Net/Nostr/ClassifiedListing.pm
 lib/Net/Nostr/Client.pm
 lib/Net/Nostr/Comment.pm
 lib/Net/Nostr/Community.pm
+lib/Net/Nostr/_ConstructorArgs.pm
 lib/Net/Nostr/Deletion.pm
 lib/Net/Nostr/DirectMessage.pm
 lib/Net/Nostr/DVM.pm
@@ -119,7 +120,10 @@ t/54-LiveActivity.t
 t/55-Wiki.t
 t/56-DVM.t
 t/57-Thread.t
-t/58-Makefile.t
+t/59-ConstructorArgs.t
+t/author/constructor-args.t
+t/author/makefile.t
+t/author/pod.t
 t/data/nip44.vectors.json
 t/lib/TestFixtures.pm
 t/nip/01.t
@@ -182,6 +186,5 @@ t/nip/94.t
 t/nip/98.t
 t/nip/99.t
 t/nip/B7.t
-t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

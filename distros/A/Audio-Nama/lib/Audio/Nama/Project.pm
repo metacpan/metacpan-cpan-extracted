@@ -88,7 +88,7 @@ sub initialize_project_data {
 	$project->{nama_version} = $VERSION;
 	( $project->{nama_commit} ) = 
 	qw( 
-		ceff2b486
+		699e32334
 
 	);
 	$project->{repo} = undef;
@@ -125,7 +125,7 @@ sub create_project_dirs {
 sub create_file_stubs {
 		write_file($file->state_store, "{}\n") unless -e $file->state_store;
 		write_file($file->midi_store,    "\n") unless -e $file->midi_store; 
-		write_file($file->tempo_map,     "\n") unless -e $file->tempo_map;
+#		write_file($file->tempo_map,     "\n") unless -e $file->tempo_map;
 }
 sub load_project {
 	logsub((caller(0))[3]);
@@ -157,7 +157,7 @@ sub load_project {
 	$config->{opts}->{M} = 0; # enable 
 	
 	initialize_mixer();
-	process_tempo_map() if $config->{use_metronome} and not $config->{opts}->{T};
+	import_tempo_map() if `which klick` and -e $file->tempo_map;
 
 	# possible null if Text mode
 	

@@ -1,3 +1,17 @@
+2.001000   2026-07-02
+
+  - Update supported NIP behavior to nostr-protocol/nips commit 8f8444d0
+  - Add NIP-29 naddr group identifiers, LiveKit metadata, and participants
+  - Add NIP-43 role definitions and NIP-86 role management validation
+  - Add NIP-44 extended length prefixes and NIP-59 ephemeral gift wraps
+  - Add NIP-78 kind 78 app data and NIP-89 latest/next manifest tags
+  - Enforce NIP-01 single relay endpoint paths and NIP-70 protected repost rules
+  - Update NIP-17 file thumbhash and NIP-34 fork/state metadata handling
+  - Tighten argument validation in updated NIP-29, NIP-34, and NIP-43 builders
+  - Accept either a flat hash or a single hash reference for constructors and
+    named-argument builder/helper APIs
+  - Normalize supported named-argument APIs through one shared internal helper
+
 1.003001   2026-06-27
 
   - Clarify UTF-8 byte/string boundaries for event serialization and message parsing

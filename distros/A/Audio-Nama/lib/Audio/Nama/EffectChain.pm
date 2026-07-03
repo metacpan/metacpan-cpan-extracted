@@ -411,7 +411,7 @@ sub summary {
 sub move_attributes {
 	my $ec_hash = shift;
 	map { $ec_hash->{attrib}->{$_} = delete $ec_hash->{$_}  } 
-	grep{ $ec_hash->{$_} }
+	grep{ defined $ec_hash->{$_} }
 	@attributes;
 }
 

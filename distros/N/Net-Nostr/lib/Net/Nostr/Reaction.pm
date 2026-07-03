@@ -2,6 +2,8 @@ package Net::Nostr::Reaction;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -18,7 +20,7 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -26,7 +28,8 @@ sub new {
 }
 
 sub react {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $event     = $args{event}     // croak "react requires 'event'";
     my $pubkey    = $args{pubkey}    // croak "react requires 'pubkey'";
@@ -65,7 +68,8 @@ sub react {
 }
 
 sub react_external {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey  = $args{pubkey}  // croak "react_external requires 'pubkey'";
     my $content = $args{content} // croak "react_external requires 'content'";
@@ -223,6 +227,8 @@ C<k> and C<i> tags instead of C<e> tags.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $info = Net::Nostr::Reaction->new(%fields);
 

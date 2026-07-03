@@ -1,0 +1,26 @@
+Revision history for Params-Signature
+
+0.01    2013-05-01 00:00:00
+        First release
+
+0.02    2013-05-17 00:00:00
+        Add type coercion
+
+0.03    2013-06-20 00:00:00
+        Performance improvements
+        Support subroutine references as type constraints
+        Drop support for raw key/value pairs
+
+0.04    2013-06-25 00:00:00
+        Performance improvements
+        Add back support for raw key/value pairs
+
+0.05    2026-07-02 00:00:00
+        Documentation fixes and improvements
+        - Fix POD syntax errors and copy/paste issues in Manual.pod and Signature.pm
+        - Replace RT/CPAN bug tracker links with GitHub issues
+        - Remove email references; direct users to GitHub issue tracker
+        - Add Multi dispatch documentation section to Manual.pod
+        - Add examples for dispatch() and resolve() in Params::Signature::Multi
+        - Fix broken internal POD link in Multi.pm
+

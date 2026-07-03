@@ -22,6 +22,7 @@ Straight to XS, no checks...
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 
@@ -43,6 +44,7 @@ Straight to XS, no checks...
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=X
 

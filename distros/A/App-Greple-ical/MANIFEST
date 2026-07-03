@@ -7,5 +7,6 @@ cpanfile
 lib/App/Greple/ical.pm
 minil.toml
 t/00_compile.t
+t/01_ical.t
 META.yml
 MANIFEST

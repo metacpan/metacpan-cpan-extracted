@@ -141,14 +141,64 @@ subtest 'repository: maintainers tag' => sub {
     is $m[0][2], $carol_pk, 'second maintainer';
 };
 
-subtest 'repository: personal-fork t tag' => sub {
+subtest 'repository: subordinate fork u tag' => sub {
     my $repo = Net::Nostr::Git->repository(
+        pubkey  => $alice_pk,
+        id      => 'my-fork',
+        fork_of => {
+            repository => "30617:$bob_pk:upstream",
+            relay      => 'wss://relay.example.com',
+            author     => $bob_pk,
+        },
+    );
+    my @u = grep { $_->[0] eq 'u' } @{$repo->tags};
+    is scalar @u, 1, 'has u tag';
+    is $u[0], ['u', "30617:$bob_pk:upstream", 'wss://relay.example.com', $bob_pk],
+        'u tag points to upstream repository';
+};
+
+subtest 'repository: fork_of requires full u tag data' => sub {
+    like dies { Net::Nostr::Git->repository(
+        pubkey  => $alice_pk,
+        id      => 'my-fork',
+        fork_of => 0,
+    ) }, qr/fork_of.*hash/i, 'non-hash fork_of rejected';
+
+    like dies { Net::Nostr::Git->repository(
+        pubkey  => $alice_pk,
+        id      => 'my-fork',
+        fork_of => {
+            repository => "30617:$bob_pk:upstream",
+            author     => $bob_pk,
+        },
+    ) }, qr/relay/, 'missing relay rejected';
+
+    like dies { Net::Nostr::Git->repository(
+        pubkey  => $alice_pk,
+        id      => 'my-fork',
+        fork_of => {
+            repository => "30617:$bob_pk:upstream",
+            relay      => 'wss://relay.example.com',
+        },
+    ) }, qr/author/, 'missing author rejected';
+
+    like dies { Net::Nostr::Git->repository(
+        pubkey  => $alice_pk,
+        id      => 'my-fork',
+        fork_of => {
+            repository => "30617:$bob_pk:upstream",
+            relay      => 'wss://relay.example.com',
+            author     => 'not-hex',
+        },
+    ) }, qr/author/, 'bad author rejected';
+};
+
+subtest 'repository: personal_fork argument is rejected' => sub {
+    ok dies { Net::Nostr::Git->repository(
         pubkey        => $alice_pk,
         id            => 'my-fork',
         personal_fork => 1,
-    );
-    my @t = grep { $_->[0] eq 't' && $_->[1] eq 'personal-fork' } @{$repo->tags};
-    is scalar @t, 1, 'has personal-fork t tag';
+    ) }, 'legacy personal_fork argument rejected';
 };
 
 subtest 'repository: hashtag t tags' => sub {
@@ -182,7 +232,11 @@ subtest 'repository: all optional tags together' => sub {
         relays              => ['wss://relay.example.com'],
         earliest_unique_commit => $commit_id,
         maintainers         => [$bob_pk],
-        personal_fork       => 1,
+        fork_of             => {
+            repository => "30617:$bob_pk:upstream",
+            relay      => 'wss://relay.example.com',
+            author     => $bob_pk,
+        },
         hashtags            => ['test'],
     );
     is $repo->kind, 30617, 'kind';
@@ -196,6 +250,7 @@ subtest 'repository: all optional tags together' => sub {
     ok $seen{relays}, 'has relays';
     ok $seen{r}, 'has r';
     ok $seen{maintainers}, 'has maintainers';
+    ok $seen{u}, 'has u';
     ok $seen{t}, 'has t';
 };
 
@@ -254,7 +309,7 @@ subtest 'repository_state: refs tags' => sub {
     is $refs[2][0], 'refs/tags/v1.0', 'tag ref';
 };
 
-subtest 'repository_state: no refs tags means stopped tracking' => sub {
+subtest 'repository_state: refs tags are optional' => sub {
     my $state = Net::Nostr::Git->repository_state(
         pubkey => $alice_pk,
         id     => 'my-project',
@@ -274,18 +329,28 @@ subtest 'repository_state: HEAD tag' => sub {
     is $h[0][1], 'ref: refs/heads/main', 'HEAD value';
 };
 
-subtest 'repository_state: refs with ancestor commit ids (MAY)' => sub {
-    my $state = Net::Nostr::Git->repository_state(
+subtest 'repository_state: refs reject removed ancestor extension' => sub {
+    ok dies { Net::Nostr::Git->repository_state(
         pubkey => $alice_pk,
         id     => 'my-project',
         refs   => [
             ['refs/heads/main', $commit_id, 'abc1234', 'def5678'],
         ],
-    );
-    my @refs = grep { $_->[0] eq 'refs/heads/main' } @{$state->tags};
-    is scalar @{$refs[0]}, 4, 'ref tag has 4 elements (name, commit, parent, grandparent)';
-    is $refs[0][2], 'abc1234', 'shorthand parent commit';
-    is $refs[0][3], 'def5678', 'shorthand grandparent commit';
+    ) }, 'ancestor extension rejected';
+};
+
+subtest 'repository_state: refs must be an arrayref' => sub {
+    like dies { Net::Nostr::Git->repository_state(
+        pubkey => $alice_pk,
+        id     => 'my-project',
+        refs   => 0,
+    ) }, qr/refs.*array/i, 'false non-array refs rejected';
+
+    like dies { Net::Nostr::Git->repository_state(
+        pubkey => $alice_pk,
+        id     => 'my-project',
+        refs   => 'refs/heads/main',
+    ) }, qr/refs.*array/i, 'string refs rejected';
 };
 
 subtest 'repository_state: content is empty' => sub {
@@ -1514,7 +1579,11 @@ subtest 'spec example: repository announcement' => sub {
         relays              => ['wss://relay.example.com'],
         earliest_unique_commit => $commit_id,
         maintainers         => [$bob_pk],
-        personal_fork       => 1,
+        fork_of             => {
+            repository => "30617:$bob_pk:upstream",
+            relay      => 'wss://relay.example.com',
+            author     => $bob_pk,
+        },
         hashtags            => ['nostr'],
     );
     is $repo->kind, 30617, 'kind';

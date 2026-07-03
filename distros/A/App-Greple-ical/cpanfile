@@ -1,4 +1,4 @@
-requires 'perl', '5.014';
+requires 'perl', 'v5.24';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

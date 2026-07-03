@@ -201,6 +201,39 @@ subtest 'POD wrap example' => sub {
         'wrap pubkey is random, not the sender');
 };
 
+subtest 'POD wrap example: ephemeral kind 21059' => sub {
+    my $sender    = Net::Nostr::Key->new;
+    my $recipient = Net::Nostr::Key->new;
+
+    my $rumor = Net::Nostr::GiftWrap->create_rumor(
+        pubkey  => $sender->pubkey_hex,
+        kind    => 1,
+        content => 'live-only',
+        tags    => [],
+    );
+
+    my $seal = Net::Nostr::GiftWrap->seal(
+        rumor            => $rumor,
+        sender_key       => $sender,
+        recipient_pubkey => $recipient->pubkey_hex,
+    );
+
+    my $wrap = Net::Nostr::GiftWrap->wrap(
+        seal             => $seal,
+        recipient_pubkey => $recipient->pubkey_hex,
+        kind             => 21059,
+    );
+
+    is($wrap->kind, 21059, 'ephemeral wrap kind is 21059');
+
+    my ($unwrapped, $sender_pubkey) = Net::Nostr::GiftWrap->unwrap(
+        event         => $wrap,
+        recipient_key => $recipient,
+    );
+    is($unwrapped->content, 'live-only', 'kind 21059 unwraps');
+    is($sender_pubkey, $sender->pubkey_hex, 'sender pubkey returned');
+};
+
 ###############################################################################
 # POD example: expiration (disappearing messages)
 ###############################################################################

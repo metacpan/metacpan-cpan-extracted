@@ -109,6 +109,50 @@ subtest 'encode: listallowedpubkeys' => sub {
     is($data->{method}, 'listallowedpubkeys', 'method name');
 };
 
+subtest 'encode: createrole' => sub {
+    my $body = encode_request(
+        method => 'createrole',
+        params => ['28b7e50f', 'king', 'ruler of the relay', 37, 1],
+    );
+    my $data = $JSON->decode($body);
+    is($data->{method}, 'createrole', 'method name');
+    is($data->{params}, ['28b7e50f', 'king', 'ruler of the relay', 37, 1],
+        'role definition params');
+};
+
+subtest 'encode: editrole' => sub {
+    my $body = encode_request(
+        method => 'editrole',
+        params => ['28b7e50f', 'king', 'updated description', 45, 2],
+    );
+    my $data = $JSON->decode($body);
+    is($data->{method}, 'editrole', 'method name');
+    is($data->{params}[0], '28b7e50f', 'role id');
+};
+
+subtest 'encode: deleterole' => sub {
+    my $body = encode_request(method => 'deleterole', params => ['28b7e50f']);
+    my $data = $JSON->decode($body);
+    is($data->{method}, 'deleterole', 'method name');
+    is($data->{params}, ['28b7e50f'], 'role id');
+};
+
+subtest 'encode: assignrole' => sub {
+    my $pk = 'aa' x 32;
+    my $body = encode_request(method => 'assignrole', params => [$pk, '28b7e50f']);
+    my $data = $JSON->decode($body);
+    is($data->{method}, 'assignrole', 'method name');
+    is($data->{params}, [$pk, '28b7e50f'], 'pubkey and role id');
+};
+
+subtest 'encode: unassignrole' => sub {
+    my $pk = 'bb' x 32;
+    my $body = encode_request(method => 'unassignrole', params => [$pk, '28b7e50f']);
+    my $data = $JSON->decode($body);
+    is($data->{method}, 'unassignrole', 'method name');
+    is($data->{params}, [$pk, '28b7e50f'], 'pubkey and role id');
+};
+
 subtest 'encode: listeventsneedingmoderation' => sub {
     my $body = encode_request(method => 'listeventsneedingmoderation', params => []);
     my $data = $JSON->decode($body);
@@ -263,6 +307,42 @@ subtest 'encode: unallowpubkey requires valid hex pubkey' => sub {
         dies { encode_request(method => 'unallowpubkey', params => ['short']) },
         qr/must be 64-char lowercase hex/,
         'short hex rejected'
+    );
+};
+
+subtest 'encode: role definition methods require id, color, and order' => sub {
+    like(
+        dies { encode_request(method => 'createrole', params => []) },
+        qr/requires role id/i,
+        'missing role id rejected'
+    );
+    like(
+        dies { encode_request(method => 'createrole', params => ['role', 'label', 'desc', 361, 1]) },
+        qr/color/i,
+        'invalid color rejected'
+    );
+    like(
+        dies { encode_request(method => 'editrole', params => ['role', 'label', 'desc', 37, 'one']) },
+        qr/order/i,
+        'invalid order rejected'
+    );
+};
+
+subtest 'encode: role assignment methods require pubkey and role id' => sub {
+    like(
+        dies { encode_request(method => 'assignrole', params => ['not-hex', 'role']) },
+        qr/pubkey/i,
+        'bad pubkey rejected'
+    );
+    like(
+        dies { encode_request(method => 'assignrole', params => ['aa' x 32]) },
+        qr/role id/i,
+        'missing role id rejected'
+    );
+    like(
+        dies { encode_request(method => 'unassignrole', params => ['aa' x 32, '']) },
+        qr/role id/i,
+        'empty role id rejected'
     );
 };
 

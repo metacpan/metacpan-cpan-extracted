@@ -2,6 +2,8 @@ package Net::Nostr::DVM;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
@@ -29,13 +31,13 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{inputs}    //= [];
     $args{params}    //= [];
     $args{relays}    //= [];
     $args{providers} //= [];
     $args{hashtags}  //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -68,7 +70,8 @@ sub request_kind {
 }
 
 sub job_request {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $kind = delete $args{kind}
         // croak "job_request requires 'kind'";
@@ -108,7 +111,8 @@ sub job_request {
 }
 
 sub job_result {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $request   = delete $args{request}
         // croak "job_result requires 'request'";
@@ -160,7 +164,8 @@ sub job_result {
 }
 
 sub job_feedback {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $request_id = delete $args{request_id}
         // croak "job_feedback requires 'request_id'";
@@ -445,6 +450,8 @@ NIP-89 kind for service provider discoverability announcements.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $dvm = Net::Nostr::DVM->new(
         status => 'processing',

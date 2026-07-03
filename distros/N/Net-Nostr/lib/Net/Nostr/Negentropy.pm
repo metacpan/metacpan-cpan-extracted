@@ -2,6 +2,8 @@ package Net::Nostr::Negentropy;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Digest::SHA qw(sha256);
 
@@ -11,7 +13,8 @@ my $IDLIST_THRESHOLD = 48;
 use constant INFINITY_TS => ~0;
 
 sub new {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my @unknown = grep { $_ ne 'frame_size_limit' } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
     return bless {
@@ -460,6 +463,8 @@ server lacks (C<have>) and which IDs the server has that it lacks
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $ne = Net::Nostr::Negentropy->new;
     my $ne = Net::Nostr::Negentropy->new(frame_size_limit => 4096);

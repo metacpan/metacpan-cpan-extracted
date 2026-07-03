@@ -21,6 +21,17 @@ reports which acceleration (if any) is wired up:
 The detection happens automatically the first time the module is loaded
 (the build is cached under _Inline/).  If no backend is active the
 module falls back to a pure-Perl implementation.
+
+Build flags are tunable via environment variables set before first load:
+
+  * IF_ARCH=<value>  -- -march=<value> (e.g. x86-64-v3, skylake, znver3)
+  * IF_NATIVE=1      -- shorthand for IF_ARCH=native; ignored if IF_ARCH is set
+  * IF_OPT=<-Olevel>  -- override the default -O3
+  * IF_NO_C=1        -- skip building the C backend entirely
+
+See "NATIVE ACCELERATION" in perldoc Algorithm::Classifier::IsolationForest
+for details and tradeoffs (in particular, why IF_NATIVE is not always a
+safe default choice).
 ' }
 
 sub validate { 1 }
@@ -66,6 +77,10 @@ sub execute {
 	print "  Inline::C : ", ( $has_c      ? "available\n" : "not available\n" );
 	print "  OpenMP    : ", ( $has_openmp ? "available\n" : "not available\n" );
 	print "  SIMD      : ", ( $has_simd   ? "available\n" : "not available\n" );
+	if ($has_c) {
+		printf "  Build flags: %s\n",
+			$Algorithm::Classifier::IsolationForest::OPT_LEVEL;
+	}
 	print "\n";
 
 	# Build a one-line backend summary that lists every active feature.

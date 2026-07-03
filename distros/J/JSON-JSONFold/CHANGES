@@ -1,0 +1,27 @@
+Revision history for Perl extension JSON::JSONFold
+
+0.2.0  2026-06-30
+    - Add grid layout support for arrays of similar arrays or objects.
+    - Add grid configuration options: grid_array_items, grid_obj_items,
+      grid_min_lines, grid_max_lines, grid_array_min, and grid_obj_min.
+    - Add classic and grid presets.
+    - Update default preset values to include grid support.
+    - Improve configuration handling and validation for named presets and overrides.
+    - Keep JSON::PP based output compatible with JSONFold folding rules.
+    - Expand POD documentation for configuration and public API.
+
+0.1.7  2026-06-19
+    - First CPAN release of JSON::JSONFold.
+    - Add functional API: format_json, write_json, fold_text, jsonfold_config,
+      create_writer, encode_json, and to_json.
+    - Add object-oriented API through JSON::JSONFold->new.
+    - Add streaming writer for folding pretty-printed JSON as it is written.
+    - Add presets: off, none, low, med, default, high, max, pack, fold, and join.
+    - Add formatting statistics for bytes and lines in/out.
+    - Add command-line script jsonfold.pl.
+    - Add tests for formatting behavior, CLI behavior, and JSON round trips.
+
+0.1.0  2026-06-18
+    - Initial development version.
+    - Port core JSONFold pack, fold, and join behavior to Perl.
+    - Add JSON::PP integration for pretty-printing input before folding.

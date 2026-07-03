@@ -11,6 +11,7 @@ use lib 't/lib';
 use TestFixtures qw(make_event);
 
 use Net::Nostr::Event;
+use Net::Nostr::Bech32 qw(encode_naddr);
 use Net::Nostr::Group;
 use Net::Nostr::List;
 
@@ -19,54 +20,76 @@ my $bob_pk   = 'b' x 64;
 my $carol_pk = 'c' x 64;
 my $relay_pk = 'd' x 64;
 my $event_id = '1' x 64;
+my $relay_url = 'wss://groups.nostr.com';
 
 ###############################################################################
 # Group identifier
 ###############################################################################
 
-subtest 'parse_id splits host and group_id' => sub {
-    my $parsed = Net::Nostr::Group->parse_id("groups.nostr.com'abcdef");
-    is($parsed->{host}, 'groups.nostr.com', 'host');
-    is($parsed->{group_id}, 'abcdef', 'group_id');
-};
-
-subtest 'parse_id with underscore group_id' => sub {
-    my $parsed = Net::Nostr::Group->parse_id("relay.com'my-group_1");
-    is($parsed->{host}, 'relay.com', 'host');
-    is($parsed->{group_id}, 'my-group_1', 'group_id');
-};
-
-subtest 'parse_id with host only infers _ as group_id (MAY)' => sub {
-    my $parsed = Net::Nostr::Group->parse_id("groups.nostr.com");
-    is($parsed->{host}, 'groups.nostr.com', 'host');
-    is($parsed->{group_id}, '_', 'inferred top-level group _');
-};
-
-subtest 'format_id produces host-tick-group string' => sub {
-    my $id = Net::Nostr::Group->format_id(
-        host     => 'groups.nostr.com',
-        group_id => 'abcdef',
+subtest 'parse_id decodes naddr metadata identifier' => sub {
+    my $naddr = encode_naddr(
+        identifier => 'abcdef',
+        pubkey     => $relay_pk,
+        kind       => 39000,
+        relays     => [$relay_url],
     );
-    is($id, "groups.nostr.com'abcdef", 'formatted id');
+    my $parsed = Net::Nostr::Group->parse_id($naddr);
+    is($parsed->{group_id}, 'abcdef', 'group_id');
+    is($parsed->{pubkey}, $relay_pk, 'relay self pubkey');
+    is($parsed->{kind}, 39000, 'kind 39000');
+    is($parsed->{relays}, [$relay_url], 'relay hint');
+    is($parsed->{relay}, $relay_url, 'first relay hint');
 };
 
-subtest 'validate_group_id accepts a-z0-9-_' => sub {
+subtest 'format_id produces naddr metadata identifier' => sub {
+    my $id = Net::Nostr::Group->format_id(
+        pubkey   => $relay_pk,
+        group_id => 'my-group_1',
+        relay    => $relay_url,
+    );
+    like($id, qr/\Anaddr1/, 'formatted id is naddr');
+    my $parsed = Net::Nostr::Group->parse_id($id);
+    is($parsed->{group_id}, 'my-group_1', 'group_id');
+    is($parsed->{pubkey}, $relay_pk, 'relay self pubkey');
+};
+
+subtest 'format_id rejects non-array relays' => sub {
+    like(dies { Net::Nostr::Group->format_id(
+        pubkey   => $relay_pk,
+        group_id => 'my-group_1',
+        relays   => $relay_url,
+    ) }, qr/relays.*array/i, 'non-array relays rejected');
+
+    like(dies { Net::Nostr::Group->format_id(
+        pubkey   => $relay_pk,
+        group_id => 'my-group_1',
+        relays   => 0,
+    ) }, qr/relays.*array/i, 'false non-array relays rejected');
+};
+
+subtest 'parse_id rejects legacy host-only form' => sub {
+    ok(dies { Net::Nostr::Group->parse_id("groups.nostr.com") },
+        'host-only id rejected');
+};
+
+subtest 'parse_id rejects legacy host-tick-group form' => sub {
+    ok(dies { Net::Nostr::Group->parse_id("groups.nostr.com'abcdef") },
+        'host tick id rejected');
+};
+
+subtest 'validate_group_id accepts arbitrary non-empty strings' => sub {
     ok(Net::Nostr::Group->validate_group_id('abc-def_123'), 'valid');
     ok(Net::Nostr::Group->validate_group_id('_'), 'underscore only');
     ok(Net::Nostr::Group->validate_group_id('a'), 'single char');
+    ok(Net::Nostr::Group->validate_group_id('ABC'), 'uppercase valid');
+    ok(Net::Nostr::Group->validate_group_id('ab cd'), 'space valid');
+    ok(Net::Nostr::Group->validate_group_id('ab.cd'), 'dot valid');
+    ok(Net::Nostr::Group->validate_group_id("ab'cd"), 'tick valid');
 };
 
-subtest 'validate_group_id rejects invalid characters' => sub {
-    ok(!Net::Nostr::Group->validate_group_id('ABC'), 'uppercase rejected');
-    ok(!Net::Nostr::Group->validate_group_id('ab cd'), 'space rejected');
-    ok(!Net::Nostr::Group->validate_group_id('ab.cd'), 'dot rejected');
-    ok(!Net::Nostr::Group->validate_group_id("ab'cd"), 'tick rejected');
+subtest 'validate_group_id rejects missing or empty values' => sub {
     ok(!Net::Nostr::Group->validate_group_id(''), 'empty rejected');
-};
-
-subtest 'parse_id croaks on invalid group_id characters' => sub {
-    ok(dies { Net::Nostr::Group->parse_id("relay.com'INVALID") },
-        'croaks on uppercase in group_id');
+    ok(!Net::Nostr::Group->validate_group_id(undef), 'undef rejected');
 };
 
 ###############################################################################
@@ -640,6 +663,40 @@ subtest 'metadata with property flags' => sub {
     }
 };
 
+subtest 'metadata with livekit and supported_kinds' => sub {
+    my $event = Net::Nostr::Group->metadata(
+        pubkey          => $relay_pk,
+        group_id        => 'pizza',
+        livekit         => 1,
+        supported_kinds => [9, 11],
+    );
+
+    my @livekit = grep { $_->[0] eq 'livekit' } @{$event->tags};
+    my @supported = grep { $_->[0] eq 'supported_kinds' } @{$event->tags};
+    is($livekit[0], ['livekit'], 'livekit tag indicates AV support');
+    is($supported[0], ['supported_kinds', '9', '11'], 'supported text kinds');
+};
+
+subtest 'metadata can advertise AV-only group with empty supported_kinds' => sub {
+    my $event = Net::Nostr::Group->metadata(
+        pubkey          => $relay_pk,
+        group_id        => 'av-only',
+        livekit         => 1,
+        supported_kinds => [],
+    );
+
+    my @supported = grep { $_->[0] eq 'supported_kinds' } @{$event->tags};
+    is($supported[0], ['supported_kinds'], 'empty supported_kinds tag');
+};
+
+subtest 'metadata rejects non-array supported_kinds' => sub {
+    like(dies { Net::Nostr::Group->metadata(
+        pubkey          => $relay_pk,
+        group_id        => 'pizza',
+        supported_kinds => '9',
+    ) }, qr/supported_kinds.*array/i, 'non-array supported_kinds rejected');
+};
+
 subtest 'metadata flags omitted when false/not set' => sub {
     my $event = Net::Nostr::Group->metadata(
         pubkey   => $relay_pk,
@@ -666,6 +723,42 @@ subtest 'metadata croaks without group_id' => sub {
     ok(dies { Net::Nostr::Group->metadata(
         pubkey => $relay_pk, name => 'Test',
     ) }, 'croaks without group_id');
+};
+
+###############################################################################
+# Kind 39004: livekit participants (relay-generated, addressable)
+###############################################################################
+
+subtest 'participants produces kind 39004 addressable event' => sub {
+    my $event = Net::Nostr::Group->participants(
+        pubkey       => $relay_pk,
+        group_id     => 'pizza',
+        participants => [$alice_pk, $bob_pk],
+    );
+    is($event->kind, 39004, 'kind is 39004');
+    ok($event->is_addressable, 'is addressable');
+
+    my @participants = grep { $_->[0] eq 'participant' } @{$event->tags};
+    is($participants[0][1], $alice_pk, 'first participant');
+    is($participants[1][1], $bob_pk, 'second participant');
+};
+
+subtest 'participants may be empty' => sub {
+    my $event = Net::Nostr::Group->participants(
+        pubkey       => $relay_pk,
+        group_id     => 'pizza',
+        participants => [],
+    );
+    my @participants = grep { $_->[0] eq 'participant' } @{$event->tags};
+    is(scalar @participants, 0, 'no participant tags');
+};
+
+subtest 'participants rejects non-array participants' => sub {
+    like(dies { Net::Nostr::Group->participants(
+        pubkey       => $relay_pk,
+        group_id     => 'pizza',
+        participants => $alice_pk,
+    ) }, qr/participants.*array/i, 'non-array participants rejected');
 };
 
 ###############################################################################
@@ -887,6 +980,8 @@ subtest 'metadata_from_event with all flags' => sub {
             ['restricted'],
             ['hidden'],
             ['closed'],
+            ['livekit'],
+            ['supported_kinds', '9', '11'],
         ],
     );
 
@@ -895,6 +990,8 @@ subtest 'metadata_from_event with all flags' => sub {
     is($meta->{restricted}, 1, 'restricted');
     is($meta->{hidden}, 1, 'hidden');
     is($meta->{closed}, 1, 'closed');
+    is($meta->{livekit}, 1, 'livekit');
+    is($meta->{supported_kinds}, ['9', '11'], 'supported_kinds');
 };
 
 subtest 'metadata_from_event without optional fields' => sub {
@@ -1032,6 +1129,35 @@ subtest 'roles_from_event croaks on wrong kind' => sub {
 };
 
 ###############################################################################
+# Parsing: participants_from_event
+###############################################################################
+
+subtest 'participants_from_event parses kind 39004' => sub {
+    my $event = make_event(
+        pubkey  => $relay_pk,
+        kind    => 39004,
+        content => '',
+        tags    => [
+            ['d', 'pizza'],
+            ['participant', $alice_pk],
+            ['participant', $bob_pk],
+        ],
+    );
+
+    my $result = Net::Nostr::Group->participants_from_event($event);
+    is($result->{group_id}, 'pizza', 'group_id');
+    is($result->{participants}, [$alice_pk, $bob_pk], 'participants');
+};
+
+subtest 'participants_from_event croaks on wrong kind' => sub {
+    my $event = make_event(
+        pubkey => $relay_pk, kind => 1, content => '',
+    );
+    ok(dies { Net::Nostr::Group->participants_from_event($event) },
+        'croaks on kind 1');
+};
+
+###############################################################################
 # Parsing: group_id_from_event (h or d tag)
 ###############################################################################
 
@@ -1163,17 +1289,21 @@ subtest 'round-trip: group_id through moderation events' => sub {
 ###############################################################################
 
 subtest 'group_id validation in event builders' => sub {
-    ok(dies { Net::Nostr::Group->join_request(
+    ok(lives { Net::Nostr::Group->join_request(
         pubkey => $bob_pk, group_id => 'INVALID',
-    ) }, 'croaks on invalid group_id in join_request');
+    ) }, 'uppercase group_id accepted in join_request');
 
-    ok(dies { Net::Nostr::Group->put_user(
+    ok(lives { Net::Nostr::Group->put_user(
         pubkey => $alice_pk, group_id => 'has spaces', target => $bob_pk,
-    ) }, 'croaks on invalid group_id in put_user');
+    ) }, 'space group_id accepted in put_user');
+
+    ok(dies { Net::Nostr::Group->join_request(
+        pubkey => $bob_pk, group_id => '',
+    ) }, 'empty group_id rejected');
 };
 
 subtest 'metadata events are addressable kind range' => sub {
-    for my $kind (39000, 39001, 39002, 39003) {
+    for my $kind (39000, 39001, 39002, 39003, 39004) {
         my $event = make_event(
             pubkey => $relay_pk, kind => $kind, content => '',
             tags => [['d', 'test']],
@@ -1231,15 +1361,19 @@ subtest 'arbitrary event kind with h tag identified by group_id_from_event' => s
 };
 
 ###############################################################################
-# Spec example: wss://groups.nostr.com host maps to groups.nostr.com
+# Spec example: naddr references the kind 39000 metadata event
 ###############################################################################
 
-subtest 'parse_id matches spec example (line 23)' => sub {
-    # "a group with id abcdef hosted at the relay wss://groups.nostr.com
-    #  would be identified by the string groups.nostr.com'abcdef"
-    my $parsed = Net::Nostr::Group->parse_id("groups.nostr.com'abcdef");
-    is($parsed->{host}, 'groups.nostr.com', 'host from spec example');
-    is($parsed->{group_id}, 'abcdef', 'group_id from spec example');
+subtest 'parse_id matches current naddr spec example' => sub {
+    my $naddr = Net::Nostr::Group->format_id(
+        pubkey   => $relay_pk,
+        group_id => 'abcdef',
+        relay    => $relay_url,
+    );
+    my $parsed = Net::Nostr::Group->parse_id($naddr);
+    is($parsed->{group_id}, 'abcdef', 'group_id');
+    is($parsed->{pubkey}, $relay_pk, 'relay self pubkey');
+    is($parsed->{relays}, [$relay_url], 'relay hint');
 };
 
 ###############################################################################
@@ -1271,9 +1405,19 @@ subtest 'group_id of any length works in event builders' => sub {
 ###############################################################################
 
 subtest 'kind 10009 simple groups list via NIP-51 List' => sub {
+    my $pizza_id = Net::Nostr::Group->format_id(
+        pubkey   => $relay_pk,
+        group_id => 'pizza',
+        relay    => 'wss://groups.nostr.com',
+    );
+    my $dev_id = Net::Nostr::Group->format_id(
+        pubkey   => $relay_pk,
+        group_id => 'dev',
+        relay    => 'wss://relay.example.com',
+    );
     my $list = Net::Nostr::List->new(kind => 10009);
-    $list->add('group', "groups.nostr.com'pizza", 'wss://groups.nostr.com', 'Pizza Lovers');
-    $list->add('group', "relay.example.com'dev", 'wss://relay.example.com');
+    $list->add('group', $pizza_id, 'wss://groups.nostr.com', 'Pizza Lovers');
+    $list->add('group', $dev_id, 'wss://relay.example.com');
     $list->add('r', 'wss://groups.nostr.com');
     $list->add('r', 'wss://relay.example.com');
 
@@ -1283,10 +1427,10 @@ subtest 'kind 10009 simple groups list via NIP-51 List' => sub {
 
     my @group_tags = grep { $_->[0] eq 'group' } @{$event->tags};
     is(scalar @group_tags, 2, 'two group tags');
-    is($group_tags[0][1], "groups.nostr.com'pizza", 'first group id');
+    is($group_tags[0][1], $pizza_id, 'first group id');
     is($group_tags[0][2], 'wss://groups.nostr.com', 'first group relay');
     is($group_tags[0][3], 'Pizza Lovers', 'first group name');
-    is($group_tags[1][1], "relay.example.com'dev", 'second group id');
+    is($group_tags[1][1], $dev_id, 'second group id');
     is($group_tags[1][2], 'wss://relay.example.com', 'second group relay');
 
     my @r_tags = grep { $_->[0] eq 'r' } @{$event->tags};
@@ -1294,8 +1438,13 @@ subtest 'kind 10009 simple groups list via NIP-51 List' => sub {
 };
 
 subtest 'kind 10009 round-trip via List' => sub {
+    my $group_id = Net::Nostr::Group->format_id(
+        pubkey   => $relay_pk,
+        group_id => 'test',
+        relay    => 'wss://relay.com',
+    );
     my $list = Net::Nostr::List->new(kind => 10009);
-    $list->add('group', "relay.com'test", 'wss://relay.com', 'Test Group');
+    $list->add('group', $group_id, 'wss://relay.com', 'Test Group');
     $list->add('r', 'wss://relay.com');
 
     my $event = $list->to_event(pubkey => $alice_pk);
@@ -1305,7 +1454,7 @@ subtest 'kind 10009 round-trip via List' => sub {
     my $items = $parsed->items;
     is(scalar @$items, 2, 'two items');
     is($items->[0][0], 'group', 'first item is group tag');
-    is($items->[0][1], "relay.com'test", 'group id round-trips');
+    is($items->[0][1], $group_id, 'group id round-trips');
     is($items->[0][3], 'Test Group', 'group name round-trips');
     is($items->[1][0], 'r', 'second item is r tag');
 };

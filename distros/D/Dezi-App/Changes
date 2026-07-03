@@ -1,5 +1,12 @@
 Revision history for Dezi-App
 
+0.017  02 July 2026
+  - Fix perldoc for CLI
+  - add FileRules and FileMatch support to Aggregator::Mail
+  - better handling of Mail attachments
+  - Fix path parsing for dot-files.
+  - Switch from Travis to Github Actions for CI
+
 0.016  27 April 2018
   - Change shebang line of deziapp tool to /usr/bin/perl so that CPAN will localize on install.
 

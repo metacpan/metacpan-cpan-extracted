@@ -6,9 +6,10 @@ with 'Dezi::Role';
 use Carp;
 use Data::Dump qw( dump );
 use Search::Tools::XML;
+use Search::Tools::UTF8;
 use Mail::Box::Manager;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 my $XMLer = Search::Tools::XML->new();
 
@@ -90,7 +91,7 @@ sub BUILD {
 # recurse through maildir, get all messages,
 # convert each message to xml, create Doc object and call index()
 
-=head2 crawl( I<path_to_maildir> )
+=head2 crawl( I<path_to_maildir>[, I<path_to_another_maildir>] )
 
 Create index.
 
@@ -99,6 +100,15 @@ Returns number of emails indexed.
 =cut
 
 sub crawl {
+    my $self  = shift;
+    my $count = 0;
+    for my $dir (@_) {
+        $count += $self->_crawl_maildir($dir);
+    }
+    return $count;
+}
+
+sub _crawl_maildir {
     my $self    = shift;
     my $maildir = shift or croak "maildir required";
     my $manager = Mail::Box::Manager->new;
@@ -123,7 +133,7 @@ sub _addresses {
 }
 
 sub _process_folder {
-    my $self = shift;
+    my $self   = shift;
     my $folder = shift or croak "folder required";
 
     my @subs    = sort $folder->listSubFolders;
@@ -134,8 +144,25 @@ sub _process_folder {
 
         warn "searching $sub\n" if $self->verbose;
 
+        if ( $self->_apply_file_rules($sub)
+            && !$self->_apply_file_match($sub) )
+        {
+            warn "skipping FileRules match $sub\n" if $self->verbose;
+            $subf->close( write => 'NEVER' );
+            next;
+        }
+
         foreach my $message ( $subf->messages ) {
-            my $doc = $self->get_doc( $sub, $message );
+            my $doc = $self->get_doc($message);
+
+            if ( $self->_apply_file_rules( $doc->url )
+                && !$self->_apply_file_match( $doc->url ) )
+            {
+                warn sprintf( "skipping FileRules match %s\n", $doc->url )
+                    if $self->verbose;
+                next;
+            }
+
             $indexer->process($doc);
             $self->_increment_count;
         }
@@ -156,6 +183,10 @@ sub _filter_attachment {
     my $filename = $attm->body->dispositionFilename;
     my $content  = $attm->decoded . '';                # force stringify
 
+    return $XMLer->escape_utf8($content) unless $filename;
+
+    my @filters;
+
     if ( $self->swish_filter_obj->can_filter($type) ) {
 
         my $f = $self->swish_filter_obj->convert(
@@ -169,15 +200,29 @@ sub _filter_attachment {
             || $f->is_binary )    # is is_binary necessary?
         {
             warn "skipping $filename in message $msg_url - filtering error\n";
-            return '';
+            return join( "",
+                "<type>$type</type>",      '<title>',
+                $XMLer->escape($filename), '</title>' );
         }
 
-        $content = ${ $f->fetch_doc };
+        $content = to_utf8( ${ $f->fetch_doc } );
+
+        # consider low ascii problematic
+        $content = '[unconverted]'
+            if $content =~ m/[^\x00-\x7F]/
+            or !is_valid_utf8($content);
+
+        @filters = map { ref $_->{name} } @{ $f->filters_used };
+    }
+    else {
+        $content = '[unconverted]';
     }
 
     return join( '',
-        '<title>',  $XMLer->escape($filename),
-        '</title>', $XMLer->escape($content) );
+        "<filter>",  join( ",", @filters ),
+        "</filter>", "<type>$type</type>",
+        '<title>',   $XMLer->escape($filename),
+        '</title>',  $XMLer->escape_utf8( $XMLer->strip_markup($content) ) );
 
 }
 
@@ -190,13 +235,13 @@ doc_class() object.
 
 sub get_doc {
     my $self    = shift;
-    my $folder  = shift or croak "folder required";
     my $message = shift or croak "mail meta required";
+    my $folder  = shift || $message->folder;
 
     # >head->createFromLine;
     my %meta = (
-        url => join( '.', $folder, $message->messageId ),
-        id  => $message->messageId,
+        url     => join( '.', $folder, $message->messageId ),
+        id      => $message->messageId,
         subject => $message->subject || '[ no subject ]',
         date    => $message->timestamp,
         size    => $message->size,
@@ -209,11 +254,24 @@ sub get_doc {
 
     my @parts = $message->parts;
 
+    # if we have only 2 parts, and they are text/plain and text/html
+    # then skip text/plain
+    my @part_types      = map { $_->body->mimeType->type } @parts;
+    my $skip_text_plain = 0;
+    if ( scalar @part_types > 1
+        and grep { $_ eq 'text/plain' } @part_types )
+    {
+        $skip_text_plain = 1;
+    }
+
     for my $part (@parts) {
-        push(
-            @{ $meta{parts} },
-            $self->_filter_attachment( $meta{url}, $part )
-        );
+        if (    $skip_text_plain
+            and $part->body->mimeType->type eq 'text/plain' )
+        {
+            next;
+        }
+        my $filtered_part = $self->_filter_attachment( $meta{url}, $part );
+        push( @{ $meta{parts} }, $filtered_part ) if $filtered_part;
     }
 
     my $title = $meta{subject};

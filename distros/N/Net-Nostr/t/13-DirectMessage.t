@@ -259,6 +259,7 @@ subtest 'POD create_file optional tags example' => sub {
         ox                   => 'a' x 64,
         size                 => '2048000',
         dim                  => '1920x1080',
+        thumbhash            => '1QcSHQRnh493V4dIh4eXh1h4kJUI',
         blurhash             => 'LEHV6nWB2yk8',
         thumb                => 'https://example.com/thumb.bin',
         fallback             => ['https://backup.example.com/photo.bin'],
@@ -273,6 +274,7 @@ subtest 'POD create_file optional tags example' => sub {
     is($tags{ox}[0], 'a' x 64, 'ox tag');
     is($tags{size}[0], '2048000', 'size tag');
     is($tags{dim}[0], '1920x1080', 'dim tag');
+    is($tags{thumbhash}[0], '1QcSHQRnh493V4dIh4eXh1h4kJUI', 'thumbhash tag');
     is($tags{blurhash}[0], 'LEHV6nWB2yk8', 'blurhash tag');
     is($tags{thumb}[0], 'https://example.com/thumb.bin', 'thumb tag');
     is($tags{fallback}[0], 'https://backup.example.com/photo.bin', 'fallback tag');

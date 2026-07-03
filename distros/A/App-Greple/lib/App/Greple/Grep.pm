@@ -13,6 +13,7 @@ our @ISA = qw(App::Greple::Text);
 use Data::Dumper;
 use List::Util qw(min max reduce sum);
 use Clone qw(clone);
+use POSIX ();
 
 use Getopt::EX::Func qw(callable);
 
@@ -87,6 +88,126 @@ package App::Greple::Grep::Result {
     sub number  { $_[0]->block->number }
 }
 
+##
+## Match multiple patterns in parallel using child processes.
+## Each child scans $_ (shared by copy-on-write) with a single
+## pattern and returns [from, to, index] triplets in packed binary
+## format.  Returns a list indexed by pattern number; undef elements
+## mean the pattern was not processed and should be matched in the
+## calling process.
+##
+use constant NO_INDEX => ~0;
+
+our $default_threshold = 1024 * 1024;
+
+sub parallel_match {
+    my $self = shift;
+    my $patlist = shift;
+    my $max = $self->{parallel} // 0;
+    return () if $max < 2;
+    my $threshold = $ENV{GREPLE_PARALLEL_THRESHOLD} // $default_threshold;
+    return () if length() < $threshold;
+    my @eligible = grep { not $patlist->[$_]->is_function } keys @$patlist;
+    return () if @eligible < 2;
+    warn sprintf("parallel_match: %d patterns, max %d processes\n",
+		 scalar @eligible, $max) if $debug{m};
+    my @result;
+    while (my @chunk = splice @eligible, 0, $max) {
+	my @child;
+	for my $i (@chunk) {
+	    my $pat = $patlist->[$i];
+	    pipe(my $r, my $w) or last;
+	    my $pid = fork;
+	    if (not defined $pid) {	# fall back to sequential
+		close $r; close $w;
+		last;
+	    }
+	    if ($pid == 0) {
+		close $r;
+		binmode $w;
+		my @p = match_regions(pattern => $pat->regex,
+				      group => $self->{group_index},
+				      index => $self->{group_index} >= 2);
+		my $data = pack 'J*',
+		    map { ($_->[0], $_->[1], $_->[2] // NO_INDEX) } @p;
+		syswrite $w, $data if length $data;
+		close $w;
+		POSIX::_exit(0);
+	    }
+	    close $w;
+	    binmode $r;
+	    push @child, [ $i, $pid, $r ];
+	}
+	for (@child) {
+	    my($i, $pid, $r) = @$_;
+	    my $data = do { local $/; <$r> };
+	    close $r;
+	    waitpid $pid, 0;
+	    next if $? != 0;		# fall back to sequential
+	    my @v = unpack 'J*', $data // '';
+	    my @p;
+	    for (my $j = 0; $j < @v; $j += 3) {
+		push @p, $v[$j+2] == NO_INDEX
+		    ? [ @v[$j, $j+1] ] : [ @v[$j .. $j+2] ];
+	    }
+	    $result[$i] = \@p;
+	}
+    }
+    @result;
+}
+
+##
+## Compute line borders in a child process, overlapping with pattern
+## matching in the calling process.  Border positions are independent
+## from the match result and required only after the search.
+##
+sub start_borders {
+    my $self = shift;
+    return if $self->{BORDERS_CHILD};	# already started
+    return if $self->{block}->@*;	# borders not used for --block
+    my $threshold = $ENV{GREPLE_PARALLEL_THRESHOLD} // $default_threshold;
+    return if length() < $threshold;
+    pipe(my $r, my $w) or return;
+    my $pid = fork;
+    if (not defined $pid) {		# fall back to sequential
+	close $r; close $w;
+	return;
+    }
+    if ($pid == 0) {
+	close $r;
+	binmode $w;
+	my $data = pack 'J*', match_borders $self->{border};
+	syswrite $w, $data if length $data;
+	close $w;
+	POSIX::_exit(0);
+    }
+    close $w;
+    binmode $r;
+    $self->{BORDERS_CHILD} = [ $pid, $r ];
+    warn "started borders child process\n" if $debug{m};
+}
+
+sub read_borders {
+    my $self = shift;
+    my($pid, $r) = @{delete $self->{BORDERS_CHILD}};
+    my $data = do { local $/; <$r> };
+    close $r;
+    waitpid $pid, 0;
+    return if $? != 0;			# fall back to sequential
+    unpack 'J*', $data // '';
+}
+
+sub discard_borders {
+    my $self = shift;
+    if (my $child = delete $self->{BORDERS_CHILD}) {
+	my($pid, $r) = @$child;
+	kill 'TERM', $pid;
+	close $r;
+	waitpid $pid, 0;
+    }
+    $self;
+}
+
 sub prepare {
     my $self = shift;
 
@@ -104,6 +225,7 @@ sub prepare {
     my $positive_count = 0;
     my $group_index_offset = 0;
     my @patlist = $pat_holder->patterns;
+    my @parallel = $self->parallel_match(\@patlist);
     while (my($i, $pat) = each @patlist) {
 	my($func, @args) = do {
 	    if ($pat->is_function) {
@@ -116,13 +238,15 @@ sub prepare {
 		    );
 	    }
 	};
-	my @p = $func->call(@args, &FILELABEL => $self->{filename});
+	my @p = $parallel[$i]
+	    ? @{$parallel[$i]}
+	    : $func->call(@args, &FILELABEL => $self->{filename});
 	if (@p == 0) {
 	    ##
 	    ## $self->{need} can be negative value, which means
 	    ## required pattern can be compromised upto that number.
 	    ##
-	    return $self if $pat->is_required and $self->{need} >= 0;
+	    return $self->discard_borders if $pat->is_required and $self->{need} >= 0;
 	    ##
 	    ## Update offset even when no match for --ci=G
 	    ##
@@ -135,6 +259,11 @@ sub prepare {
 	} else {
 	    bless $_, 'App::Greple::Grep::Match' for @p;
 	    if ($pat->is_positive) {
+		##
+		## Borders are required only when something matched.
+		## Do not fork a child process for unmatched files.
+		##
+		$self->start_borders if $self->{parallel} and not @blocks;
 		push @blocks, @{clone(\@p)};
 		$self->{stat}->{match_positive} += @p;
 		$positive_count++;
@@ -170,7 +299,7 @@ sub prepare {
     ##
     ## optimization for inadequate match
     ##
-    return $self if $positive_count < $self->{need} + $self->{must};
+    return $self->discard_borders if $positive_count < $self->{need} + $self->{must};
 
     ##
     ## --inside, --outside
@@ -227,6 +356,7 @@ sub prepare {
 	    ( [ 0, length ] );			# nothing matched
 	}
     } ];
+    $self->discard_borders;	# no-op if consumed by borders()
     while (my($i, $blk) = each @$bp) {
 	bless $blk, 'App::Greple::Grep::Block';
 	# set 1-origined block number in the 3rd entry
@@ -368,7 +498,14 @@ sub borders {
 	alarm $self->{alert_time};
         warn "alert timer start ($alarm_start)\n" if $debug{a};
     }
-    my @borders = match_borders $self->{border};
+    my @borders = do {
+	if ($self->{BORDERS_CHILD}) {
+	    my @b = $self->read_borders;
+	    @b ? @b : match_borders $self->{border};
+	} else {
+	    match_borders $self->{border};
+	}
+    };
     if (defined $alarm_start) {
 	if ($SIG{ALRM}) {
 	    alarm 0;
@@ -402,12 +539,34 @@ sub blocks {
     $obj->{BLOCKS}->@*;
 }
 
+##
+## Cut all result blocks (and gaps between them) from the text in a
+## single pass.  Returns ( gap0, block0, gap1, block1, ..., rest ),
+## or an empty list when not applicable.  Character based substr on
+## a large utf8 string requires linear scan for every call to convert
+## character offset to byte offset, so cutting each block separately
+## makes the output routine quadratic.
+##
+sub slice_blocks {
+    my $self = shift;
+    my @blocks = map { $_->block } $self->result;
+    return () if @blocks < 2;
+    my $pos = 0;
+    for (@blocks) {
+	return () if $_->[0] < $pos;	# not in order
+	$pos = $_->[1];
+    }
+    my $template = unpack_template(\@blocks, 0);
+    unpack $template, ${ $self->{text} };
+}
+
 sub slice_result {
     my $obj = shift;
     my $result = shift;
     my($block, @list) = @$result;
+    my $text = @_ ? shift : $obj->cut(@$block);
     my $template = unpack_template(\@list, $block->min);
-    unpack($template, $obj->cut(@$block));
+    unpack($template, $text);
 }
 
 sub slice_index {

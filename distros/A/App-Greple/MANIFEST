@@ -1,12 +1,12 @@
 Build.PL
 Changes
 DEFINE.md
-DEVELOPMENT.md
 Example.md
 LICENSE
 MANIFEST.SKIP
 META.json
 README.md
+RIPGREP-STUDY.md
 cpanfile
 dist.ini
 lib/App/Greple.pm
@@ -60,6 +60,8 @@ t/16_callback.t
 t/17_style.t
 t/18_capture_group.t
 t/19_filter_option.t
+t/20_parallel.t
+t/21_slice.t
 t/Checker.pm
 t/JA.txt
 t/SAMPLE.txt

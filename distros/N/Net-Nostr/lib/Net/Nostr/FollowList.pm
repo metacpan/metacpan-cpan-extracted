@@ -2,6 +2,8 @@ package Net::Nostr::FollowList;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -11,7 +13,7 @@ use Class::Tiny qw(_follows);
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "unknown argument(s): " . join(', ', sort keys %args) if %args;
     my $self = bless {}, $class;
     $self->_follows([]);
@@ -83,7 +85,8 @@ sub to_tags {
 }
 
 sub to_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     return Net::Nostr::Event->new(
         %args,
         kind    => 3,
@@ -140,6 +143,8 @@ Re-adding an existing pubkey updates the entry in place.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $fl = Net::Nostr::FollowList->new;
 

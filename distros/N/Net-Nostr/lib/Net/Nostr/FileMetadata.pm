@@ -2,6 +2,8 @@ package Net::Nostr::FileMetadata;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -32,9 +34,9 @@ my %SIMPLE_TAGS = map { $_ => 1 }
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{fallback} //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -42,7 +44,8 @@ sub new {
 }
 
 sub to_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $url = delete $args{url} // croak "to_event requires 'url'";
     my $m   = delete $args{m}   // croak "to_event requires 'm'";
@@ -195,6 +198,8 @@ C<service>.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $fm = Net::Nostr::FileMetadata->new(
         url  => 'https://example.com/photo.jpg',

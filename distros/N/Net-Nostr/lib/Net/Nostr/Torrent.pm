@@ -2,6 +2,8 @@ package Net::Nostr::Torrent;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -17,13 +19,13 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{files}       //= [];
     $args{trackers}    //= [];
     $args{identifiers} //= [];
     $args{hashtags}    //= [];
     $args{description} //= '';
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -31,7 +33,8 @@ sub new {
 }
 
 sub to_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $info_hash = delete $args{info_hash}
         // croak "to_event requires 'info_hash'";
@@ -72,7 +75,8 @@ sub to_event {
 }
 
 sub comment {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     return Net::Nostr::Event->new(
         %args,
@@ -237,6 +241,8 @@ C<t> tags like C<movie>, C<tv>, C<HD>, C<UHD>, etc.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $torrent = Net::Nostr::Torrent->new(
         info_hash => 'abc123',

@@ -1,7 +1,7 @@
 {
-   "abstract" : "High resolution time via clock_gettime(CLOCK_MONOTONIC)",
+   "abstract" : "Nanosecond time resolution via clock_gettime().",
    "author" : [
-      "Author"
+      "Scott Baker <scott@perturb.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -33,7 +33,8 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "0",
-            "XSLoader" : "0"
+            "XSLoader" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -43,6 +44,14 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.1.2",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/scottchiefbaker/time-Perl-Nanos/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/scottchiefbaker/time-Perl-Nanos"
+      }
+   },
+   "version" : "v0.1.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

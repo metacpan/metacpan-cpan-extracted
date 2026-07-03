@@ -21,6 +21,16 @@ subtest 'POD: store app-specific data' => sub {
     is($event->content, '{"theme":"dark","fontSize":14}', 'content');
 };
 
+subtest 'POD: store multiple normal app data events' => sub {
+    my $event = Net::Nostr::AppData->to_event(
+        pubkey  => $PK,
+        kind    => 78,
+        content => '{"entry":1}',
+    );
+    is($event->kind, 78, 'kind is 78');
+    ok($event->is_regular, 'normal event');
+};
+
 ###############################################################################
 # POD example: parse app data from event
 ###############################################################################
@@ -93,7 +103,7 @@ subtest 'constructor: unknown args rejected' => sub {
 
 subtest 'public methods available' => sub {
     can_ok('Net::Nostr::AppData',
-        qw(new to_event from_event validate d_tag content extra_tags));
+        qw(new to_event from_event validate kind d_tag content extra_tags));
 };
 
 done_testing;

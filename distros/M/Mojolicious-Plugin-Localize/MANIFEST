@@ -1,0 +1,27 @@
+lib/Mojolicious/Plugin/Localize.pm
+lib/Mojolicious/Plugin/Localize/Locale.pm
+lib/Mojolicious/Plugin/Localize/Preference.pm
+lib/Mojolicious/Plugin/Localize/Quantify.pm
+lib/Mojolicious/Plugin/Localize/Command/localize.pm
+t/localize.t
+t/localize_backtrack.t
+t/localize_command.t
+t/localize_config.t
+t/localize_dictionary.t
+t/localize_force.t
+t/localize_locale.t
+t/localize_mount.t
+t/localize_nested.t
+t/localize_pod.t
+t/localize_preference.t
+t/localize_quant.t
+t/dictionary.conf
+t/dictionary2.dict
+t/dictionary3.dict
+t/dictionary4.dict
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

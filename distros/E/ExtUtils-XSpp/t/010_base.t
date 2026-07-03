@@ -22,6 +22,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -51,6 +52,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 === Basic function
@@ -64,6 +66,7 @@ int foo( int a );
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo::Bar
 
@@ -95,6 +98,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -124,6 +128,7 @@ class Foo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -161,6 +166,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 void
@@ -189,6 +195,7 @@ class Foo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -219,6 +226,7 @@ class Foo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -286,6 +294,7 @@ class Foo
 
 
 MODULE=Foo
+
 ## comment after %module
 
 
@@ -337,6 +346,7 @@ bar( char* line, unsigned long %length{line} );
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Bar
 
 unsigned int
@@ -368,6 +378,7 @@ bar( char* line, unsigned long %length{line} )
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Bar
 
 unsigned int
@@ -391,6 +402,7 @@ bar( char* line, unsigned long %length{line} )
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Bar
 
@@ -426,6 +438,7 @@ bar( short a, unsigned short int b, unsigned c, unsigned int d, int e, unsigned 
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Bar
 
 short
@@ -458,6 +471,7 @@ bar( short a, unsigned short b, unsigned int c, unsigned int d, int e, unsigned 
 
 
 MODULE=Wx
+
 
 MODULE=Wx PACKAGE=Wx::RichTextCtrl
 

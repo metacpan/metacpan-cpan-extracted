@@ -178,7 +178,7 @@ subtest 'request: croaks without params' => sub {
 # Request payloads for each command
 # ==========================================================================
 
-# Spec: connect - [<remote-signer-pubkey>, <optional_secret>, <optional_requested_perms>]
+# Spec: connect - [<remote-signer-pubkey>, <optional_secret>, <optional_requested_perms>, <optional_client_metadata>]
 
 subtest 'request: connect with secret and perms' => sub {
     my $payload = Net::Nostr::RemoteSigning->request(
@@ -191,6 +191,34 @@ subtest 'request: connect with secret and perms' => sub {
     is $data->{params}[0], $remote_signer_pubkey, 'remote-signer-pubkey';
     is $data->{params}[1], 'mysecret', 'secret';
     is $data->{params}[2], 'nip44_encrypt,sign_event:4', 'perms';
+};
+
+subtest 'request: connect with client metadata' => sub {
+    my $metadata = JSON->new->utf8->canonical->encode({
+        name  => 'My Client',
+        url   => 'https://client.example.com',
+        image => 'https://client.example.com/icon.png',
+    });
+    my $payload = Net::Nostr::RemoteSigning->request(
+        id     => 'c2',
+        method => 'connect',
+        params => [$remote_signer_pubkey, 'mysecret', 'nip44_encrypt', $metadata],
+    );
+    my $data = JSON->new->utf8->decode($payload);
+    is $data->{method}, 'connect', 'method';
+    is $data->{params}[3], $metadata, 'metadata is fourth param';
+};
+
+subtest 'request: connect metadata without permissions uses empty perms slot' => sub {
+    my $metadata = JSON->new->utf8->canonical->encode({ name => 'My Client' });
+    my $payload = Net::Nostr::RemoteSigning->request(
+        id     => 'c3',
+        method => 'connect',
+        params => [$remote_signer_pubkey, 'mysecret', '', $metadata],
+    );
+    my $data = JSON->new->utf8->decode($payload);
+    is $data->{params}[2], '', 'empty requested perms slot';
+    is $data->{params}[3], $metadata, 'metadata remains fourth param';
 };
 
 # Spec: sign_event - [<{kind, content, tags, created_at}>]
@@ -237,6 +265,19 @@ subtest 'request: get_public_key' => sub {
     );
     my $data = JSON->new->utf8->decode($payload);
     is $data->{method}, 'get_public_key', 'method';
+};
+
+# Spec: logout - []
+
+subtest 'request: logout' => sub {
+    my $payload = Net::Nostr::RemoteSigning->request(
+        id     => 'l1',
+        method => 'logout',
+        params => [],
+    );
+    my $data = JSON->new->utf8->decode($payload);
+    is $data->{method}, 'logout', 'method';
+    is $data->{params}, [], 'empty params';
 };
 
 # Spec: nip04_encrypt - [<third_party_pubkey>, <plaintext_to_encrypt>]

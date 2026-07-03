@@ -13,7 +13,7 @@ has 'schema'        => ( is => 'rw', isa => 'HashRef', required => 1 );
 has 'use_quotes'    => ( is => 'rw', isa => 'Bool',    default  => sub {1} );
 has 'quote_char' => ( is => 'rw', isa => 'Str', default => sub {q/`/} );
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 my $XMLer = Search::Tools::XML->new();    # included in Utils
 

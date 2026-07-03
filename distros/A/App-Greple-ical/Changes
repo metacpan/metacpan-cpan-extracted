@@ -1,5 +1,14 @@
 Revision history for Perl extension App-Greple-ical
 
+1.00 2026-07-02T22:44:15Z
+
+    - Support recent macOS which stores calendar data in SQLite
+      database instead of individual .ics files.  Events are read
+      from Calendar.sqlitedb using sqlite3 command and searched in
+      paragraph mode.  Requires Full Disk Access privilege for the
+      terminal application.
+    - Require Perl 5.24, following App::Greple requirement.
+
 0.02 2022-10-09T09:57:39Z
 
     - minor misc updates

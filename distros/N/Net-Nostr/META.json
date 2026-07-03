@@ -66,6 +66,6 @@
          "url" : "https://github.com/NicholasBHubbard/Net-Nostr"
       }
    },
-   "version" : "1.003001",
+   "version" : "2.001000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,6 +2,8 @@ package Net::Nostr::Thread;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -19,7 +21,7 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -34,7 +36,8 @@ sub new {
 }
 
 sub reply {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $to      = $args{to}      // croak "reply requires 'to' (event being replied to)";
     my $pubkey  = $args{pubkey}  // croak "reply requires 'pubkey'";
     my $content = $args{content} // croak "reply requires 'content'";
@@ -91,7 +94,8 @@ sub reply {
 }
 
 sub quote {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $event     = $args{event}   // croak "quote requires 'event'";
     my $pubkey    = $args{pubkey}  // croak "quote requires 'pubkey'";
     my $content   = $args{content} // croak "quote requires 'content'";
@@ -227,6 +231,8 @@ Also parses deprecated positional C<e> tags for backward compatibility.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $thread = Net::Nostr::Thread->new(%fields);
 

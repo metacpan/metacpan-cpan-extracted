@@ -2,6 +2,8 @@ package Net::Nostr::RelayList;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -9,7 +11,7 @@ use Class::Tiny qw(_relays);
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "unknown argument(s): " . join(', ', sort keys %args) if %args;
     my $self = bless {}, $class;
     $self->_relays([]);
@@ -96,7 +98,8 @@ sub to_tags {
 }
 
 sub to_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     return Net::Nostr::Event->new(
         %args,
         kind    => 10002,
@@ -153,6 +156,8 @@ lists small (2-4 relays per category).
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $rl = Net::Nostr::RelayList->new;
 

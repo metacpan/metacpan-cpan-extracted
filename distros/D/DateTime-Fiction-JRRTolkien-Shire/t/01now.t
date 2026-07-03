@@ -15,7 +15,7 @@ use DateTime;
 use DateTime::Fiction::JRRTolkien::Shire;
 use Time::Local;
 
-plan tests => 9;
+plan tests => 17;
 
 my ( $dt, $shire );
 
@@ -41,3 +41,34 @@ is( $shire->time_zone_short_name(), 'floating',
     'now_local() produces floating' );
 $dt = DateTime->from_object( object => $shire );
 is( $dt->iso8601(), '2016-04-01T12:00:00', 'now_local() round-trip' );
+
+foreach my $arg ( qw{ accented traditional } ) {
+    local $@ = undef;
+    foreach my $method ( qw{ now today } ) {
+	my $rslt = eval {
+	    DateTime::Fiction::JRRTolkien::Shire->$method( $arg => 1 );
+	    1;
+	} || 0;
+	ok $rslt, "-$method() accepts ( $arg => 1 )";
+    }
+    {
+	my $rslt = eval {
+	    DateTime::Fiction::JRRTolkien::Shire->from_epoch(
+		epoch	=> $dt->epoch(),
+		$arg	=> 1,
+	    );
+	    1;
+	} || 0;
+	ok $rslt, "->from_epoch() accepts ( $arg => 1 )";
+    }
+    {
+	my $rslt = eval {
+	    DateTime::Fiction::JRRTolkien::Shire->from_object(
+		object	=> $dt,
+		$arg	=> 1,
+	    );
+	    1;
+	} || 0;
+	ok $rslt, "->from_object() accepts ( $arg => 1 )";
+    }
+}

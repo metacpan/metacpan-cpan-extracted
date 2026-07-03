@@ -2,6 +2,8 @@ package Net::Nostr::Bech32;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Exporter 'import';
 use Bitcoin::Crypto::Bech32 qw(
@@ -177,7 +179,7 @@ sub _decode_tlv {
 ###############################################################################
 
 sub encode_nprofile {
-    my (%args) = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $pubkey = $args{pubkey} // croak "nprofile requires 'pubkey'";
     croak "pubkey must be 64-char lowercase hex" unless $pubkey =~ $HEX64;
     my @tlvs;
@@ -212,7 +214,7 @@ sub decode_nprofile {
 ###############################################################################
 
 sub encode_nevent {
-    my (%args) = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $id = $args{id} // croak "nevent requires 'id'";
     croak "id must be 64-char lowercase hex" unless $id =~ $HEX64;
     my @tlvs;
@@ -261,7 +263,7 @@ sub decode_nevent {
 ###############################################################################
 
 sub encode_naddr {
-    my (%args) = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "naddr requires 'identifier'" unless defined $args{identifier};
     my $pubkey = $args{pubkey} // croak "naddr requires 'pubkey'";
     croak "pubkey must be 64-char lowercase hex" unless $pubkey =~ $HEX64;

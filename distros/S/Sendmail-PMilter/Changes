@@ -4,6 +4,10 @@ Revision history for Perl extension Sendmail::PMilter V1.1x and later.
 
 https://rt.cpan.org/Public/Dist/Display.html?Name=Sendmail-PMilter
 
+1.28
+    Thu 02 Jul 2026 08:57:57 BST released
+    - [179844] Proper handling of NULL mail-from
+
 1.27
     Sat 03 Feb 2024 16:25:32 GMT released
     - [150737] Proper handling of die

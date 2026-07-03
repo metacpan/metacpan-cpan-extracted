@@ -2,6 +2,8 @@ package Net::Nostr::Article;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 use Net::Nostr::Bech32 qw(encode_naddr);
@@ -17,9 +19,9 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{hashtags} //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -27,7 +29,9 @@ sub new {
 }
 
 sub _build_event {
-    my ($class, $kind, %args) = @_;
+    my $class = shift;
+    my $kind = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = $args{pubkey}     // croak "article requires 'pubkey'";
     my $content    = $args{content}    // croak "article requires 'content'";
@@ -60,12 +64,14 @@ sub _build_event {
 }
 
 sub article {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     return $class->_build_event(30023, %args);
 }
 
 sub draft {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     return $class->_build_event(30024, %args);
 }
 
@@ -110,7 +116,9 @@ sub validate {
 }
 
 sub to_naddr {
-    my ($class, $event, %args) = @_;
+    my $class = shift;
+    my $event = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     return encode_naddr(
         identifier => $event->d_tag,
         pubkey     => $event->pubkey,
@@ -145,7 +153,7 @@ Net::Nostr::Article - NIP-23 long-form content
         hashtags     => ['nostr', 'blog'],
     );
 
-    # Create a draft (kind 30024, same structure)
+    # Create a deprecated NIP-23 draft (kind 30024, same structure)
     my $draft = Net::Nostr::Article->draft(
         pubkey     => $pubkey,
         content    => "# WIP\n\nNot finished yet.",
@@ -169,9 +177,10 @@ Net::Nostr::Article - NIP-23 long-form content
 
 =head1 DESCRIPTION
 
-Implements NIP-23 long-form content (articles and drafts). Articles are
-kind 30023 addressable events with Markdown content and optional metadata
-tags. Drafts are kind 30024 with the same structure.
+Implements NIP-23 long-form content. Articles are kind 30023 addressable
+events with Markdown content and optional metadata tags. The older kind
+30024 draft form is still parsed and can still be created for compatibility,
+but it is deprecated by the current NIP-23 text.
 
 Content should be Markdown text. Clients creating articles MUST NOT hard
 line-break paragraphs and MUST NOT include HTML in the Markdown.
@@ -189,6 +198,8 @@ L<Net::Nostr::Comment>).
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $info = Net::Nostr::Article->new(%fields);
 
@@ -247,9 +258,9 @@ C<a>, C<p> tags for references).
         # same optional params as article()
     );
 
-Creates a kind 30024 draft event. Accepts the same parameters as
-L</article>. Drafts have the same structure as articles but are not
-intended for publication.
+Creates a deprecated kind 30024 draft event. Accepts the same parameters as
+L</article>. Drafts have the same structure as articles but are not intended
+for publication.
 
 =head2 from_event
 

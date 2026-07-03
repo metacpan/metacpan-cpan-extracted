@@ -11,7 +11,7 @@ use HTML::HeadParser;
 
 use namespace::autoclean;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 has 'http_response' => ( is => 'rw', isa => 'HTTP::Response' );
 has 'link_tags'     => ( is => 'rw', isa => 'HashRef' );

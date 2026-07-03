@@ -2,6 +2,8 @@ package Net::Nostr::Deletion;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -11,7 +13,7 @@ use Class::Tiny qw(reason _events _addresses _kinds);
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -44,7 +46,8 @@ sub event_ids { [@{$_[0]->_events}] }
 sub addresses { [@{$_[0]->_addresses}] }
 
 sub to_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my @tags;
     for my $id (@{$self->_events}) {
         push @tags, ['e', $id];
@@ -154,6 +157,8 @@ but there is no guarantee that events will be deleted from all relays.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $del = Net::Nostr::Deletion->new;
     my $del = Net::Nostr::Deletion->new(reason => 'posted by accident');

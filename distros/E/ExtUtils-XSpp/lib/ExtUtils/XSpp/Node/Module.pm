@@ -44,7 +44,7 @@ sub init {
 
 sub to_string { 'MODULE=' . $_[0]->module }
 
-sub print { return $_[0]->to_string . "\n" }
+sub print { return $_[0]->to_string . "\n\n" }
 
 =head1 ACCESSORS
 

@@ -2,6 +2,8 @@
 
 This plugin makes it easy to integrate the OpenID Connect protocol into a Catalyst application.
 
+Note that this is an OIDC **client** plugin, not an OpenID Connect provider plugin. If you're seeking a Catalyst provider plugin, please take a look at the [Catalyst::Plugin::OpenIDConnect](https://metacpan.org/pod/Catalyst::Plugin::OpenIDConnect) module.
+
 It essentially uses the [OIDC-Client](https://metacpan.org/dist/OIDC-Client) distribution.
 
 ## Features
@@ -29,5 +31,4 @@ When using Catalyst::Plugin::OIDC, it is highly recommended to configure the fra
 
 ## Limitations
 
-- no support for *tls_client_auth* client authentication method
 - no support for Implicit or Hybrid flows (applicable to front-end applications only and deprecated)

@@ -22,6 +22,7 @@ class Foo : public Moo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 void
@@ -56,6 +57,7 @@ class Foo : public %name{PlMoo} Moo, public Boo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 

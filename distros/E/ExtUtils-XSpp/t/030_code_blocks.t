@@ -21,6 +21,7 @@ __DATA__
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -41,6 +42,7 @@ boo( int a )
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -73,6 +75,7 @@ int foo(int a)
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -104,6 +107,7 @@ foo( int a )
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 void
@@ -124,6 +128,7 @@ boo( int a )
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -146,6 +151,7 @@ void foo(int a)
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 

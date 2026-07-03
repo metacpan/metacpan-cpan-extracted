@@ -12,7 +12,7 @@ use Data::Dump qw( dump );
 
 use namespace::autoclean;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 has 'set_parser_from_type' => ( is => 'rw', isa => Bool, default => sub {1} );
 has 'indexer' => (
@@ -353,7 +353,7 @@ sub _apply_file_rules {
         $self->{_file_rules} = File::Rules->new( $self->config->FileRules );
     }
     if ( $file_rules or exists $self->{_file_rules} ) {
-        $self->debug and warn "$file [applying DeziFileRules]\n";
+        $self->debug and warn "$file [applying FileRules]\n";
         my $rules = $file_rules || $self->{_file_rules};
         my $match = $rules->match($file);
         return $match;

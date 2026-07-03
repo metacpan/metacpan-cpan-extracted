@@ -2,6 +2,8 @@ package Net::Nostr::Label;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -15,11 +17,11 @@ my %TARGET_TAGS = map { $_ => 1 } qw(e p a r t);
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{namespaces} //= [];
     $args{labels}     //= [];
     $args{targets}    //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -39,7 +41,8 @@ sub label_tag {
 }
 
 sub label {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey    = $args{pubkey}    // croak "label requires 'pubkey'";
     my $labels    = $args{labels}    // croak "label requires 'labels'";
@@ -157,7 +160,8 @@ sub validate {
 }
 
 sub label_filter {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my %filter = (kinds => [1985]);
 
@@ -212,6 +216,8 @@ Net::Nostr::Label - NIP-32 Labeling
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $label = Net::Nostr::Label->new(
         namespaces => ['ISO-639-1'],

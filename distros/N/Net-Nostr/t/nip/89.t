@@ -136,6 +136,14 @@ subtest 'handler: creates kind 31990 event' => sub {
         pubkey     => $APP_PK,
         identifier => 'my-app',
         kinds      => ['31337'],
+        latest     => {
+            coordinate => "35128:$APP_PK:my-app-current",
+            relay      => 'wss://relay1',
+        },
+        next       => {
+            coordinate => "35128:$APP_PK:my-app-next",
+            relay      => 'wss://relay1',
+        },
         platforms  => [
             { platform => 'web', url => 'https://app.example.com/e/<bech32>', entity => 'nevent' },
         ],
@@ -143,6 +151,13 @@ subtest 'handler: creates kind 31990 event' => sub {
     is($event->kind, 31990, 'kind is 31990');
     ok($event->is_addressable, 'handler is addressable');
     is($event->d_tag, 'my-app', 'd tag is identifier');
+
+    my @latest = grep { $_->[0] eq 'latest' } @{$event->tags};
+    my @next = grep { $_->[0] eq 'next' } @{$event->tags};
+    is($latest[0], ['latest', "35128:$APP_PK:my-app-current", 'wss://relay1'],
+        'latest tag references current nsite manifest');
+    is($next[0], ['next', "35128:$APP_PK:my-app-next", 'wss://relay1'],
+        'next tag references rollout nsite manifest');
 };
 
 ###############################################################################
@@ -369,6 +384,8 @@ subtest 'from_event: parses kind 31990 handler' => sub {
             ['d', 'zapstr-handler'],
             ['k', '31337'],
             ['k', '30023'],
+            ['latest', "35128:$APP_PK:zapstr-current", 'wss://relay1'],
+            ['next', "35128:$APP_PK:zapstr-next", 'wss://relay1'],
             ['web', 'https://zapstr.live/a/<bech32>', 'nevent'],
             ['web', 'https://zapstr.live/p/<bech32>', 'nprofile'],
             ['ios', 'com.zapstr:///<bech32>'],
@@ -379,6 +396,10 @@ subtest 'from_event: parses kind 31990 handler' => sub {
     ok(defined $info, 'parsed successfully');
     is($info->identifier, 'zapstr-handler', 'identifier');
     is($info->kinds, ['31337', '30023'], 'kinds');
+    is($info->latest, { coordinate => "35128:$APP_PK:zapstr-current", relay => 'wss://relay1' },
+        'latest parsed');
+    is($info->next, { coordinate => "35128:$APP_PK:zapstr-next", relay => 'wss://relay1' },
+        'next parsed');
     is($info->platforms, [
         { platform => 'web', url => 'https://zapstr.live/a/<bech32>', entity => 'nevent' },
         { platform => 'web', url => 'https://zapstr.live/p/<bech32>', entity => 'nprofile' },
@@ -534,6 +555,8 @@ subtest 'round-trip: handler' => sub {
         identifier => 'test-app',
         kinds      => ['1', '31337'],
         content    => $meta,
+        latest     => { coordinate => "35128:$APP_PK:test-current", relay => 'wss://relay1' },
+        next       => { coordinate => "35128:$APP_PK:test-next" },
         platforms  => [
             { platform => 'web', url => 'https://app.com/<bech32>', entity => 'nevent' },
             { platform => 'ios', url => 'com.app:///<bech32>' },
@@ -543,6 +566,10 @@ subtest 'round-trip: handler' => sub {
     my $info = Net::Nostr::AppHandler->from_event($event);
     is($info->identifier, 'test-app', 'identifier round-trips');
     is($info->kinds, ['1', '31337'], 'kinds round-trip');
+    is($info->latest, { coordinate => "35128:$APP_PK:test-current", relay => 'wss://relay1' },
+        'latest round-trips');
+    is($info->next, { coordinate => "35128:$APP_PK:test-next" },
+        'next round-trips without relay');
     is(scalar @{$info->platforms}, 2, 'two platforms round-trip');
     is($info->platforms->[0]{platform}, 'web', 'web platform');
     is($info->platforms->[0]{url}, 'https://app.com/<bech32>', 'web url');

@@ -2,6 +2,8 @@ package Net::Nostr::Calendar;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -32,7 +34,7 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{locations}       //= [];
     $args{participants}    //= [];
     $args{hashtags}        //= [];
@@ -41,7 +43,7 @@ sub new {
     $args{calendar_events} //= [];
     $args{days}            //= [];
     $args{description}     //= '';
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -92,7 +94,8 @@ sub _build_common_tags {
 }
 
 sub date_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $start = delete $args{start}
         // croak "date_event requires 'start'";
@@ -114,7 +117,8 @@ sub date_event {
 }
 
 sub time_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $start = delete $args{start}
         // croak "time_event requires 'start'";
@@ -145,7 +149,8 @@ sub time_event {
 }
 
 sub calendar {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $identifier = delete $args{identifier}
         // croak "calendar requires 'identifier'";
@@ -171,7 +176,8 @@ sub calendar {
 }
 
 sub rsvp {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $identifier = delete $args{identifier}
         // croak "rsvp requires 'identifier'";
@@ -484,6 +490,8 @@ C<title> is not present.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $cal = Net::Nostr::Calendar->new(
         identifier => 'meeting',

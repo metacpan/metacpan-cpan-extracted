@@ -2,6 +2,8 @@ package Net::Nostr::HttpAuth;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use MIME::Base64 qw(encode_base64 decode_base64);
@@ -19,7 +21,7 @@ our @EXPORT_OK = qw(
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub create_auth_event {
-    my (%args) = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $pubkey = $args{pubkey} // croak "pubkey is required";
     my $url    = $args{url}    // croak "url is required";
     my $method = $args{method} // croak "method is required";
@@ -46,7 +48,7 @@ sub create_auth_event {
 }
 
 sub create_auth_header {
-    my (%args) = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $key    = $args{key}    // croak "key is required";
     my $url    = $args{url}    // croak "url is required";
     my $method = $args{method} // croak "method is required";

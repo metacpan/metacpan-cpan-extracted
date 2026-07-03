@@ -1,0 +1,32 @@
+---
+abstract: 'Localization Framework for Mojolicious'
+author:
+  - 'Nils Diewald'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Localize
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  I18N::LangTags: '0'
+  I18N::LangTags::Detect: '0'
+  List::MoreUtils: '0.416'
+  Mojolicious: '7.14'
+  Test::Output: '1.031'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Akron/Mojolicious-Plugin-Localize/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/Akron/Mojolicious-Plugin-Localize.git
+version: '0.23'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

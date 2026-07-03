@@ -2,6 +2,8 @@ package Net::Nostr::RelayInfo;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 
@@ -31,7 +33,7 @@ sub _copy_extension_fields {
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     @known{@STRUCT_FIELDS} = ();
 
@@ -181,6 +183,8 @@ correct Accept header, and handle CORS preflight OPTIONS requests.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $info = Net::Nostr::RelayInfo->new(
         name             => 'My Relay',

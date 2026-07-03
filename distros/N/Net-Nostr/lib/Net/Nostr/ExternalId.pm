@@ -2,6 +2,8 @@ package Net::Nostr::ExternalId;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 
 use Class::Tiny qw(
@@ -14,8 +16,8 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
-    my $self = bless \%args, $class;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -278,6 +280,8 @@ to interpret the id. Pass C<< hint => $url >> to any builder.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $id = Net::Nostr::ExternalId->new(
         type  => 'isbn',

@@ -5,7 +5,7 @@ use Carp qw/croak carp/;
 use Scalar::Util qw/blessed weaken/;
 use Mojo::Base 'Mojo::DOM';
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 sub DESTROY;
 
@@ -1448,7 +1448,7 @@ L<Renée Bäcker|https://github.com/reneeb>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2023, L<Nils Diewald|https://www.nils-diewald.de/>.
+Copyright (C) 2011-2026, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

@@ -2,6 +2,8 @@ package Net::Nostr::Zap;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
@@ -35,7 +37,8 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 ###############################################################################
 
 sub new_request {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "p is required for zap request" unless defined $args{p};
     croak "relays is required for zap request" unless $args{relays} && @{$args{relays}};
     $args{content} //= '';
@@ -43,7 +46,8 @@ sub new_request {
 }
 
 sub new_receipt {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "p is required for zap receipt" unless defined $args{p};
     croak "bolt11 is required for zap receipt" unless defined $args{bolt11};
     croak "description is required for zap receipt" unless defined $args{description};
@@ -101,7 +105,8 @@ sub receipt_from_event {
 ###############################################################################
 
 sub to_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     if ($self->_type eq 'request') {
         return $self->_request_to_event(%args);
@@ -111,7 +116,8 @@ sub to_event {
 }
 
 sub _request_to_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my @tags;
     push @tags, ['relays', @{$self->relays}];
     push @tags, ['amount', $self->amount]  if defined $self->amount;
@@ -130,7 +136,8 @@ sub _request_to_event {
 }
 
 sub _receipt_to_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my @tags;
     push @tags, ['p', $self->p];
     push @tags, ['P', $self->sender]       if defined $self->sender;
@@ -586,6 +593,8 @@ wallet when the invoice is paid, and published to relays.
 
 =head2 new_request
 
+Accepts named arguments as either a flat list or a single hash reference.
+
     my $zap = Net::Nostr::Zap->new_request(
         p       => $recipient_pubkey,   # required
         relays  => \@relay_urls,        # required
@@ -600,6 +609,8 @@ wallet when the invoice is paid, and published to relays.
 Creates a zap request. C<p> (recipient pubkey) and C<relays> are required.
 
 =head2 new_receipt
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $zap = Net::Nostr::Zap->new_receipt(
         p           => $recipient_pubkey,    # required

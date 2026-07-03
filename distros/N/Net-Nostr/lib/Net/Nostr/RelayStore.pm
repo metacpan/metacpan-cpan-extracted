@@ -2,11 +2,13 @@ package Net::Nostr::RelayStore;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my %known = map { $_ => 1 } qw(max_events);
     my @unknown = grep { !$known{$_} } keys %args;
@@ -469,6 +471,8 @@ via the C<store> constructor option.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $store = Net::Nostr::RelayStore->new;
     my $store = Net::Nostr::RelayStore->new(max_events => 5000);

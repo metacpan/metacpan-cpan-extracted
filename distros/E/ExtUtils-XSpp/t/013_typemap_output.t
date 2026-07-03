@@ -73,6 +73,7 @@ END
 
 MODULE=Foo2
 
+
 MODULE=Foo2 PACKAGE=bar
 
 int
@@ -122,6 +123,7 @@ END
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -163,6 +165,7 @@ END
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 

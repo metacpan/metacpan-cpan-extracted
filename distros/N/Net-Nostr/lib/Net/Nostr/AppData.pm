@@ -2,10 +2,13 @@ package Net::Nostr::AppData;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
 use Class::Tiny qw(
+    kind
     d_tag
     content
     extra_tags
@@ -13,9 +16,9 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{extra_tags} //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -23,13 +26,18 @@ sub new {
 }
 
 sub to_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
-    my $d_tag = delete $args{d_tag}
-        // croak "to_event requires 'd_tag'";
+    my $kind = delete $args{kind} // 30078;
+    croak "app data event MUST be kind 78 or 30078"
+        unless $kind == 78 || $kind == 30078;
+
+    my $d_tag = delete $args{d_tag};
+    croak "to_event requires 'd_tag'" if $kind == 30078 && !defined $d_tag;
 
     my @tags;
-    push @tags, ['d', $d_tag];
+    push @tags, ['d', $d_tag] if defined $d_tag;
 
     my $extra = delete $args{extra_tags};
     if ($extra) {
@@ -38,7 +46,7 @@ sub to_event {
 
     return Net::Nostr::Event->new(
         %args,
-        kind    => 30078,
+        kind    => $kind,
         content => $args{content} // '',
         tags    => \@tags,
     );
@@ -46,7 +54,7 @@ sub to_event {
 
 sub from_event {
     my ($class, $event) = @_;
-    return undef unless $event->kind == 30078;
+    return undef unless $event->kind == 78 || $event->kind == 30078;
 
     my $d_tag;
     my @extra;
@@ -60,6 +68,7 @@ sub from_event {
     }
 
     return $class->new(
+        kind       => $event->kind,
         d_tag      => $d_tag,
         content    => $event->content // '',
         extra_tags => \@extra,
@@ -69,7 +78,10 @@ sub from_event {
 sub validate {
     my ($class, $event) = @_;
 
-    croak "app data event MUST be kind 30078" unless $event->kind == 30078;
+    croak "app data event MUST be kind 78 or 30078"
+        unless $event->kind == 78 || $event->kind == 30078;
+
+    return 1 if $event->kind == 78;
 
     my $has_d;
     for my $tag (@{$event->tags}) {
@@ -100,6 +112,13 @@ Net::Nostr::AppData - NIP-78 Arbitrary Custom App Data
         content => '{"theme":"dark","fontSize":14}',
     );
 
+    # Store multiple normal app data events
+    my $entry = Net::Nostr::AppData->to_event(
+        pubkey  => $pubkey,
+        kind    => 78,
+        content => '{"entry":1}',
+    );
+
     # Parse app data from an event
     my $ad = Net::Nostr::AppData->from_event($event);
     say $ad->d_tag;    # com.example.myapp/settings
@@ -114,9 +133,10 @@ Implements NIP-78 (Arbitrary Custom App Data). Provides
 L<remoteStorage|https://remotestorage.io/>-like capabilities for custom
 applications that do not care about interoperability.
 
-Kind 30078 is an addressable event. The C<d> tag contains a reference to
-the app name and context (or any other arbitrary string). The C<content>
-and other tags can be anything or in any format.
+Kind 30078 is the default addressable event form. The C<d> tag contains a
+reference to the app name and context (or any other arbitrary string).
+Kind 78 is a normal event form for app data that should not replace prior
+events. The C<content> and other tags can be anything or in any format.
 
 Use cases include:
 
@@ -134,7 +154,10 @@ Use cases include:
 
 =head2 new
 
+Accepts named arguments as either a flat list or a single hash reference.
+
     my $ad = Net::Nostr::AppData->new(
+        kind    => 30078,
         d_tag   => 'myapp-settings',
         content => '{"theme":"dark"}',
     );
@@ -149,23 +172,25 @@ Typically returned by L</from_event>.
 
     my $event = Net::Nostr::AppData->to_event(
         pubkey     => $hex_pubkey,
+        kind       => 30078,
         d_tag      => 'com.example.myapp/settings',
         content    => '{"theme":"dark","fontSize":14}',
         extra_tags => [['version', '2']],
         created_at => time(),
     );
 
-Creates a kind 30078 addressable L<Net::Nostr::Event>. C<d_tag> is
-required and becomes the C<d> tag. C<content> defaults to empty string.
-C<extra_tags>, if provided, are appended after the C<d> tag. Any
+Creates a NIP-78 L<Net::Nostr::Event>. C<kind> defaults to C<30078>;
+C<78> may be supplied for normal app data events. C<d_tag> is required
+for kind 30078 and optional for kind 78. C<content> defaults to empty string.
+C<extra_tags>, if provided, are appended after any C<d> tag. Any
 remaining arguments are passed through to L<Net::Nostr::Event/new>.
 
 =head2 from_event
 
     my $ad = Net::Nostr::AppData->from_event($event);
 
-Parses a kind 30078 event into a C<Net::Nostr::AppData> object. Returns
-C<undef> if the event kind is not 30078.
+Parses a kind 78 or 30078 event into a C<Net::Nostr::AppData> object.
+Returns C<undef> if the event kind is not 78 or 30078.
 
     my $ad = Net::Nostr::AppData->from_event($event);
     say $ad->d_tag;
@@ -175,14 +200,17 @@ C<undef> if the event kind is not 30078.
 
     Net::Nostr::AppData->validate($event);
 
-Validates a NIP-78 event. Checks that the kind is 30078 and a C<d> tag
-is present. Croaks if the kind is wrong or the C<d> tag is missing.
-Returns 1 on success.
+Validates a NIP-78 event. Kind must be 78 or 30078. Kind 30078 requires
+a C<d> tag; kind 78 does not. Croaks if invalid. Returns 1 on success.
 
     eval { Net::Nostr::AppData->validate($event) };
     warn "Invalid: $@" if $@;
 
 =head1 ACCESSORS
+
+=head2 kind
+
+The app data event kind, C<78> or C<30078>, when parsed from an event.
 
 =head2 d_tag
 

@@ -73,15 +73,23 @@ hrtime(...)
                 want_list = 1;
             }
 
-            if (items > 1 && SvOK(ST(1))) {
+            {
                 STRLEN len;
-                const char *clock_name = SvPV(ST(1), len);
-                if (len == 9 && strnEQ(clock_name, "monotonic", 9)) {
+                const char *clock_name;
+                SV *sv = get_sv("Time::Nanos::CLOCK", GV_ADD);
+
+                if (!sv || !SvOK(sv)) {
+                    /* undef → default to monotonic */
                     use_realtime = 0;
-                } else if (len == 8 && strnEQ(clock_name, "realtime", 8)) {
-                    use_realtime = 1;
                 } else {
-                    croak("hrtime(): unknown clock source '%s' (valid: 'monotonic', 'realtime')", clock_name);
+                    clock_name = SvPV(sv, len);
+                    if (len == 9 && strnEQ(clock_name, "monotonic", 9)) {
+                        use_realtime = 0;
+                    } else if (len == 8 && strnEQ(clock_name, "realtime", 8)) {
+                        use_realtime = 1;
+                    } else {
+                        croak("hrtime(): unknown clock source '%s' (valid: 'monotonic', 'realtime')", clock_name);
+                    }
                 }
             }
 

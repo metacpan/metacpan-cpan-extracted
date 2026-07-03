@@ -3,18 +3,33 @@ package JSON::JSONFold ;
 use strict;
 use warnings;
 use 5.014 ;
-use JSON::PP ();
+use JSON::PP qw();
 
 use Exporter 'import';
 
-our $VERSION = '0.2.0';
-our @EXPORT = qw(
-    format_json write_json fold_text
-    encode_json to_json) ;
+our $VERSION = '0.2.2';   ## VERSION
+our @EXPORT = qw(format_json write_json fold_text write_folded) ;
+our $BACKEND ;
+
+BEGIN {
+    return if defined($BACKEND) ;
+    my $backend = $ENV{JSONFOLD_BACKEND} ;
+    if ( defined($backend)) {
+        $backend = "JSON::$backend" if $backend =~ /^\w+/ ;
+    } else {
+        $backend = JSON::MaybeXS::JSON() if eval { require JSON::MaybeXS } ;
+    }
+    if ( $backend ) {
+        eval "require $backend" or die "cannot load '$backend'";
+    }
+    $BACKEND = $backend || 'JSON::PP' ;
+}
 
 our @EXPORT_OK = qw(
 	jsonfold_config
 	create_writer
+    encode_json
+    to_json
 ) ;
 # Object Orient Interface
 
@@ -43,7 +58,7 @@ sub format {
     my $config = $self->{config} ;
 
     my $output = '' ;
-    open my $out, '>', \$output or die "open output: $!" ;
+    open my $out, '>:utf8', \$output or die "open output: $!" ;
 
     my $stream = _stream($out, $config, 0) ;
     my $json = $self->{json} ;
@@ -53,7 +68,7 @@ sub format {
 
     close $out or die "close output: $!" ;
     $output .= "\n" unless $output =~ /\n\z/;
-    return $output ;
+    return Encode::decode('UTF-8', $output) ;
 }
 
 sub fold {
@@ -73,21 +88,31 @@ sub fold {
     return $output ;
 }
 
-sub write {
+sub fold_to {
+    my ($self, $text, $fh) = @_ ;
+
+    my $stream = _stream($fh, $self->{config}, $self->{do_close}) ;
+
+    $stream->write($text);
+    $stream->finish ;
+    $stream->flush ;
+    $stream->close or die "close output: $!" ;
+    my $info = $stream->stats ;
+
+    return $info ;
+}
+
+sub format_to {
     my($self, $data, $fh) = @_ ;
 
-    my $config = $self->{config} ;
+    my $stream = _stream($fh, $self->{config}, $self->{do_close}) ;
 
-    my $do_close = $self->{do_close} ;
-    my $stream = _stream($fh, $config, $do_close) ;
-    my $json = $self->{json} ;
-
-    my $text = $json->encode($data) ;
+    my $text = $self->{json}->encode($data) ;
     $stream->write($text);
     $stream->finish;
     $stream->flush;
     my $info = $stream->stats ;
-    $stream->close() ;
+    $stream->close or die "close output: $!" ;
 
     return $info ;
 }
@@ -119,7 +144,7 @@ sub write_json {
     my($data, $fh, $width, $config, %overrides) = @_ ;
 
     my $fmt = __PACKAGE__->new(width => $width, config => $config, %overrides) ;
-    my $info = $fmt->write($data, $fh) ;
+    my $info = $fmt->format_to($data, $fh) ;
     return $info ;
 }
 
@@ -129,6 +154,14 @@ sub fold_text {
 
     return $fmt->fold($text) ;
 }
+
+sub write_folded {
+    my($text, $fh, $width, $config) = @_ ;
+    my $fmt = __PACKAGE__->new(width => $width, config => $config) ;
+
+    return $fmt->fold_to($text, $fh) ;
+}
+
 
 sub create_writer {
     my($fh, $width, $config, %overrides) = @_ ;
@@ -152,14 +185,18 @@ sub _stream {
 sub _json_coder {
     my ($gold, $indent, %opt) = @_;
     # Must have valid indent, otherwise cannot parse the data
-    my $json = JSON::PP->new->pretty ;
+    my $json = ($BACKEND || 'JSON::PP')->new->pretty ;
     if ( $gold ) {
         my $sort_keys = $opt{sort_keys} // 1 ;
+    # JSON has a bug with XS implementatio, may want to 
+    #   $indent ||= 2 if ! ($json->is('JSON') && $json->is_XS()) ;
         $indent //=2 ;
         $json->allow_nonref->canonical($sort_keys);
         $json->space_before(0)->space_after(1);
     }
-    $json->indent_length($indent) if defined $indent ;
+    # Some JSON coder can not set indent_length (JSON::XS), which is silently ignored
+    # Defaulting to indent of 3.
+    $json->indent_length($indent) if $indent && $json->can('indent_length') ;
     return $json;
 }
 
@@ -848,6 +885,7 @@ sub as_hash { return %{ $_[0] } }
 package JSON::JSONFold::Writer;
 use strict;
 use warnings;
+use Encode ;
 
 BEGIN {
     JSON::JSONFold::Line->import() ;
@@ -863,7 +901,7 @@ use constant {
     W_PENDING      => $SEQ++,
     W_STACK        => $SEQ++,
     W_STATS        => $SEQ++,
-    W_DO_CLOSE      => $SEQ++,
+    W_DO_CLOSE     => $SEQ++,
     W_UNUSED_LAST  => $SEQ++,
 } ;
 
@@ -923,6 +961,50 @@ sub write {
     return $len;
 }
 
+sub write_bytes {
+    my ($self, $s) = @_;
+    $s = '' unless defined $s;
+    my $len = length($s);
+    $self->[W_STATS]{bytes_in} += $len;
+
+    unless ($self->[W_CFG]) {
+        $self->[W_STATS]{lines_in} += _count_newlines($s);
+        return $self->_write_str($s);
+    }
+
+    my $nl = index($s, "\n");
+    if ($nl < 0) {
+        $self->[W_PENDING] .= $s;
+        return $len;
+    }
+
+    my $nl2 = index($s, "\n", $nl + 1);
+    if ($nl2 < 0) {
+        $self->[W_STATS]{lines_in}++;
+        my $line_data = $self->[W_PENDING] . substr($s, 0, $nl);
+        my $line_text = Encode::decode('UTF-8', $line_data) ;
+        $self->[W_PENDING] = substr($s, $nl + 1);
+        $self->_feed(JSON::JSONFold::Line->parse($line_text));
+        return $len;
+    }
+
+    # We have multiple lines - at least 2 new lines in the new buffer
+    $s = $self->[W_PENDING] . $s ;
+    my $last_nl = rindex($s, "\n") ;
+    # Move last partial lines to pending, remove from $s
+    $self->[W_PENDING] = substr(substr($s, $last_nl, length($s)-$last_nl, ""), 1) ;
+    my @lines = split("\n", Encode::decode('UTF-8', $s), -1) ;
+    for my $part ( @lines ) {
+        $self->_feed(JSON::JSONFold::Line->parse($part));
+
+    }    
+    $self->[W_STATS]{lines_in} += @lines;
+
+    return $len;
+}
+
+
+
 sub finish {
     my ($self) = @_;
     if (length $self->[W_PENDING]) {
@@ -947,6 +1029,7 @@ sub close {
     $self->finish;
     $self->flush;
     $self->[W_FH]->close if $self->[W_DO_CLOSE] ;
+    return 1;
 }
 
 sub _feed {
@@ -1363,14 +1446,16 @@ sub run {
         return 0;
     }
 
+    binmode STDOUT, ':encoding(UTF-8)' ;
     my $data = $opt->{demo} ? demo_data() : read_input($opt->{input});
     my %cfg ;
     my $config = JSON::JSONFold::config($opt->{compact}, $opt->{width}, %cfg);
     my $verbose = $opt->{verbose} ;
 
+    print STDERR "Backend: ", $JSON::JSONFold::BACKEND || "-", "\n" if $verbose ;
     show_verbose("config", { $config->as_hash } ) if $verbose ;
- 
-    my $info = JSON::JSONFold::write_json($data, \*STDOUT, $opt->{width}, $config, sort_keys => $opt->{sort_keys});
+
+    my $info = JSON::JSONFold::write_json($data, \*STDOUT, $opt->{width}, $config, sort_keys => $opt->{sort_keys}, indent => $opt->{indent} );
 
     show_verbose("stats", { % $info }) if $verbose ;
     return 0;
@@ -1398,7 +1483,9 @@ JSON::JSONFold - compact, readable JSON formatting
 
     my $folded = fold_text($pretty_json, 100, 'default');
 
-    # Object interface
+    write_folded($text, \*STDOUT, 100, 'default');
+
+    # Object Oriented interface
 
     my $fmt = JSON::JSONFold->new(
         width  => 100,
@@ -1406,6 +1493,9 @@ JSON::JSONFold - compact, readable JSON formatting
     );
 
     my $text = $fmt->format($data);
+    $fmt->format_to($data, $fh);
+    my $text = $fmt->fold($text_pp) ;
+    $fmt->fold_to($text_pp, $fh) ;
 
     # JSON-compatible interface
 
@@ -1458,13 +1548,14 @@ The following functions are exported by default:
     format_json
     write_json
     fold_text
-    encode_json
-    to_json
+    write_folded
 
 The following functions are exported on request:
 
     jsonfold_config
     create_writer
+    encode_json
+    to_json
 
 
 =head1 FUNCTIONAL INTERFACE
@@ -1498,7 +1589,13 @@ Returns formatting statistics.
 
 Folds existing pretty-printed JSON text and returns the folded result.
 
-=head1 OBJECT INTERFACE
+=head2 write_fold
+
+    my $text = fold_text($pretty_json, $fh, $width, $config);
+
+Folds existing pretty-printed JSON and writes the folded JSON to C<$fh>
+
+=head1 OBJECT ORIENTED INTERFACE
 
 =head2 new
 
@@ -1548,9 +1645,9 @@ Formats a Perl data structure and returns folded JSON text.
 
 Folds existing pretty-printed JSON text.
 
-=head2 write
+=head2 format_to
 
-    my $stats = $fmt->write($data, $fh);
+    my $stats = $fmt->format_to($data, $fh);
 
 Formats a Perl data structure and writes the result to C<$fh>.
 

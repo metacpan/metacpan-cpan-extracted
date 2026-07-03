@@ -13,13 +13,12 @@ use MIME::Base64 ();
 use POSIX qw(floor);
 
 use constant {
-    VERSION_2         => 2,
-    MIN_PLAINTEXT_LEN => 1,
-    MAX_PLAINTEXT_LEN => 65535,
-    MIN_PAYLOAD_LEN   => 132,
-    MAX_PAYLOAD_LEN   => 87472,
-    MIN_RAW_LEN       => 99,
-    MAX_RAW_LEN       => 65603,
+    VERSION_2                 => 2,
+    MIN_PLAINTEXT_LEN         => 1,
+    MAX_PLAINTEXT_LEN         => 4294967295,
+    EXTENDED_PREFIX_THRESHOLD => 65536,
+    MIN_PAYLOAD_LEN           => 132,
+    MIN_RAW_LEN               => 99,
 };
 
 sub get_conversation_key {
@@ -88,7 +87,10 @@ sub encrypt {
 
     # Pad
     my $padded_len = $class->calc_padded_len($unpadded_len);
-    my $padded = pack('n', $unpadded_len) . $unpadded . ("\x00" x ($padded_len - $unpadded_len));
+    my $prefix = $unpadded_len >= EXTENDED_PREFIX_THRESHOLD
+        ? pack('nN', 0, $unpadded_len)
+        : pack('n', $unpadded_len);
+    my $padded = $prefix . $unpadded . ("\x00" x ($padded_len - $unpadded_len));
 
     # Encrypt with ChaCha20
     my $chacha = Crypt::Stream::ChaCha->new($chacha_key, $chacha_nonce);
@@ -126,11 +128,11 @@ sub _decode_payload {
     my $plen = length($payload);
 
     croak "unknown version" if $plen == 0 || substr($payload, 0, 1) eq '#';
-    croak "invalid payload size" if $plen < MIN_PAYLOAD_LEN || $plen > MAX_PAYLOAD_LEN;
+    croak "invalid payload size" if $plen < MIN_PAYLOAD_LEN;
 
     my $data = MIME::Base64::decode_base64($payload);
     my $dlen = length($data);
-    croak "invalid data size" if $dlen < MIN_RAW_LEN || $dlen > MAX_RAW_LEN;
+    croak "invalid data size" if $dlen < MIN_RAW_LEN;
 
     my $version = ord(substr($data, 0, 1));
     croak "unknown version $version" unless $version == VERSION_2;
@@ -144,13 +146,26 @@ sub _decode_payload {
 
 sub _unpad {
     my ($class, $padded) = @_;
-    my $unpadded_len = unpack('n', substr($padded, 0, 2));
+    croak "invalid padding" if length($padded) < 2;
+
+    my $first_two = unpack('n', substr($padded, 0, 2));
+    my ($unpadded_len, $prefix_len);
+    if ($first_two == 0) {
+        croak "invalid padding" if length($padded) < 6;
+        $unpadded_len = unpack('N', substr($padded, 2, 4));
+        croak "invalid padding" if $unpadded_len < EXTENDED_PREFIX_THRESHOLD;
+        $prefix_len = 6;
+    } else {
+        $unpadded_len = $first_two;
+        $prefix_len = 2;
+    }
+
     croak "invalid padding" if $unpadded_len == 0;
 
-    my $unpadded = substr($padded, 2, $unpadded_len);
+    my $unpadded = substr($padded, $prefix_len, $unpadded_len);
     croak "invalid padding" unless length($unpadded) == $unpadded_len;
 
-    my $expected_padded_len = 2 + $class->calc_padded_len($unpadded_len);
+    my $expected_padded_len = $prefix_len + $class->calc_padded_len($unpadded_len);
     croak "invalid padding" unless length($padded) == $expected_padded_len;
 
     return decode('UTF-8', $unpadded);
@@ -277,7 +292,8 @@ otherwise a cryptographically random nonce is generated.
 
 Returns a base64-encoded payload string. The plaintext is UTF-8 encoded
 before encryption and UTF-8 decoded after decryption. Croaks if the
-plaintext is empty or exceeds 65535 bytes (after UTF-8 encoding).
+plaintext is empty or exceeds 4294967295 bytes (after UTF-8 encoding).
+Payloads of 65536 bytes and larger use NIP-44's extended length prefix.
 
     my $payload = Net::Nostr::Encryption->encrypt('secret message', $conv_key);
 

@@ -92,6 +92,27 @@ subtest 'start accepts WebSocket connections' => sub {
     $relay->stop;
 };
 
+subtest 'start rejects extra WebSocket endpoint path segments' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $client = AnyEvent::WebSocket::Client->new;
+    $client->connect("ws://127.0.0.1:$port/extra")->cb(sub {
+        my $conn = eval { shift->recv };
+        if ($conn) {
+            $cv->send(0);
+        } else {
+            $cv->send(1);
+        }
+    });
+
+    ok($cv->recv, 'client connection to extra path is rejected');
+    $relay->stop;
+};
+
 subtest 'start accepts secure WebSocket connections' => sub {
     my $port = free_port();
     my ($tmpdir, $cert_file, $key_file) = create_tls_material();

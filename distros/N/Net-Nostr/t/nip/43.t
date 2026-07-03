@@ -9,6 +9,65 @@ my $MEMBER1 = 'c308e1f882c1f1dff2a43d4294239ddeec04e575f2d1aad1fa21ea7684e61fb5'
 my $MEMBER2 = 'ee1d336e13779e4d4c527b988429d96de16088f958cbf6c074676ac9cfd9c958';
 
 ###############################################################################
+# Role Definition (kind 33534)
+###############################################################################
+
+subtest 'role_definition: kind 33534' => sub {
+    my $event = Net::Nostr::RelayAccess->role_definition(
+        pubkey      => $PK,
+        role_id     => '28b7e50f',
+        label       => 'king',
+        description => 'ruler of the relay',
+        color       => 37,
+        order       => 1,
+    );
+    is($event->kind, 33534, 'kind is 33534');
+    ok($event->is_addressable, 'addressable');
+};
+
+subtest 'role_definition: protected tag and d tag are required' => sub {
+    my $event = Net::Nostr::RelayAccess->role_definition(
+        pubkey  => $PK,
+        role_id => '28b7e50f',
+    );
+    ok($event->is_protected, 'has protected tag');
+    is($event->d_tag, '28b7e50f', 'd tag is role id');
+    ok(Net::Nostr::RelayAccess->validate($event), 'valid role definition');
+
+    my $bad = Net::Nostr::Event->new(
+        pubkey => $PK, kind => 33534, content => '', tags => [['-']],
+    );
+    like(dies { Net::Nostr::RelayAccess->validate($bad) },
+        qr/d tag/, 'missing d tag rejected');
+};
+
+subtest 'role_definition: optional tags' => sub {
+    my $event = Net::Nostr::RelayAccess->role_definition(
+        pubkey      => $PK,
+        role_id     => '28b7e50f',
+        label       => 'king',
+        description => 'ruler of the relay',
+        color       => 37,
+        order       => 1,
+    );
+    my %tags = map { $_->[0] => $_->[1] } @{$event->tags};
+    is($tags{label}, 'king', 'label tag');
+    is($tags{description}, 'ruler of the relay', 'description tag');
+    is($tags{color}, '37', 'color tag');
+    is($tags{order}, '1', 'order tag');
+};
+
+subtest 'role_definition: validates color and order' => sub {
+    like(dies { Net::Nostr::RelayAccess->role_definition(
+        pubkey => $PK, role_id => 'r', color => 361,
+    ) }, qr/color/, 'color above 360 rejected');
+
+    like(dies { Net::Nostr::RelayAccess->role_definition(
+        pubkey => $PK, role_id => 'r', order => 'one',
+    ) }, qr/order/, 'non-integer order rejected');
+};
+
+###############################################################################
 # Membership List (kind 13534)
 ###############################################################################
 
@@ -34,12 +93,13 @@ subtest 'membership_list: protected tag' => sub {
 subtest 'membership_list: member tags' => sub {
     my $event = Net::Nostr::RelayAccess->membership_list(
         pubkey  => $PK,
-        members => [$MEMBER1, $MEMBER2],
+        members => [$MEMBER1, { pubkey => $MEMBER2, roles => ['28b7e50f'] }],
     );
     my @m = grep { $_->[0] eq 'member' } @{$event->tags};
     is(scalar @m, 2, 'two member tags');
     is($m[0][1], $MEMBER1, 'first member');
     is($m[1][1], $MEMBER2, 'second member');
+    is($m[1][2], '28b7e50f', 'second member role');
 };
 
 # Spec: empty members list
@@ -74,6 +134,32 @@ subtest 'membership_list: members defaults to empty' => sub {
     );
     my @m = grep { $_->[0] eq 'member' } @{$event->tags};
     is(scalar @m, 0, 'no member tags');
+};
+
+subtest 'membership_list: rejects non-array members' => sub {
+    like(
+        dies {
+            Net::Nostr::RelayAccess->membership_list(
+                pubkey  => $PK,
+                members => $MEMBER1,
+            )
+        },
+        qr/members.*array/i,
+        'non-array members rejected'
+    );
+};
+
+subtest 'membership_list: rejects non-array member roles' => sub {
+    like(
+        dies {
+            Net::Nostr::RelayAccess->membership_list(
+                pubkey  => $PK,
+                members => [{ pubkey => $MEMBER1, roles => '28b7e50f' }],
+            )
+        },
+        qr/roles.*array/i,
+        'non-array member roles rejected'
+    );
 };
 
 ###############################################################################
@@ -336,15 +422,33 @@ subtest 'leave_request: spec example' => sub {
 # from_event: round-trip parsing
 ###############################################################################
 
+subtest 'from_event: role_definition round-trip' => sub {
+    my $event = Net::Nostr::RelayAccess->role_definition(
+        pubkey      => $PK,
+        role_id     => '28b7e50f',
+        label       => 'king',
+        description => 'ruler of the relay',
+        color       => 37,
+        order       => 1,
+    );
+    my $parsed = Net::Nostr::RelayAccess->from_event($event);
+    is($parsed->role_id, '28b7e50f', 'role_id');
+    is($parsed->label, 'king', 'label');
+    is($parsed->description, 'ruler of the relay', 'description');
+    is($parsed->color, '37', 'color');
+    is($parsed->order, '1', 'order');
+};
+
 subtest 'from_event: membership_list round-trip' => sub {
     my $event = Net::Nostr::RelayAccess->membership_list(
         pubkey  => $PK,
-        members => [$MEMBER1, $MEMBER2],
+        members => [$MEMBER1, { pubkey => $MEMBER2, roles => ['28b7e50f'] }],
     );
     my $parsed = Net::Nostr::RelayAccess->from_event($event);
     is(scalar @{$parsed->members}, 2, 'members count');
     is($parsed->members->[0], $MEMBER1, 'first member');
-    is($parsed->members->[1], $MEMBER2, 'second member');
+    is($parsed->members->[1]{pubkey}, $MEMBER2, 'second member');
+    is($parsed->members->[1]{roles}, ['28b7e50f'], 'second member roles');
 };
 
 subtest 'from_event: add_member round-trip' => sub {
@@ -406,6 +510,14 @@ subtest 'validate: valid membership_list' => sub {
     my $event = Net::Nostr::RelayAccess->membership_list(
         pubkey  => $PK,
         members => [$MEMBER1],
+    );
+    ok(Net::Nostr::RelayAccess->validate($event), 'valid');
+};
+
+subtest 'validate: valid role_definition' => sub {
+    my $event = Net::Nostr::RelayAccess->role_definition(
+        pubkey  => $PK,
+        role_id => '28b7e50f',
     );
     ok(Net::Nostr::RelayAccess->validate($event), 'valid');
 };

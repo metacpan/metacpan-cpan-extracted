@@ -38,6 +38,13 @@ use Algorithm::Classifier::IsolationForest;
 
 my $CLASS = 'Algorithm::Classifier::IsolationForest';
 
+# Run the undef-handling battery against each backend: pure-Perl always, C
+# when it compiled.  A missing C backend skips that arm rather than failing.
+# sklearn is run only once (it is unaffected by which Perl backend scores).
+my @BACKENDS = ( [ 'pure-perl' => 0 ] );
+push @BACKENDS, [ 'C' => 1 ]
+    if $Algorithm::Classifier::IsolationForest::HAS_C;
+
 use constant PI => 3.14159265358979;
 
 # -----------------------------------------------------------------------
@@ -292,9 +299,10 @@ else {
 # Per-dataset test battery
 # -----------------------------------------------------------------------
 sub run_dataset_tests {
-    my ( $ds, $sk_scores ) = @_;
+    my ( $ds, $sk_scores, $use_c ) = @_;
 
-    my $f = $CLASS->new( n_trees => 100, sample_size => 256, seed => 42 );
+    my $f = $CLASS->new(
+        n_trees => 100, sample_size => 256, seed => 42, use_c => $use_c );
     $f->fit( $ds->{train} );
 
     # ---- Subtest 1: score_samples bit-for-bit identity ----
@@ -376,18 +384,21 @@ sub run_dataset_tests {
 # -----------------------------------------------------------------------
 # Run the battery for each dataset
 # -----------------------------------------------------------------------
-for my $ds (@datasets) {
-    my $sk_scores = $sk_by_label && $sk_by_label->{ $ds->{label} };
-    if ( defined $sk_scores
-        && !( ref $sk_scores eq 'ARRAY'
-            && @$sk_scores == @{ $ds->{undef_test} } ) )
-    {
-        fail("sklearn output missing or wrong length for dataset '$ds->{label}'");
-        $sk_scores = undef;
+for my $be (@BACKENDS) {
+    my ( $be_name, $USE_C ) = @$be;
+    for my $ds (@datasets) {
+        my $sk_scores = $sk_by_label && $sk_by_label->{ $ds->{label} };
+        if ( defined $sk_scores
+            && !( ref $sk_scores eq 'ARRAY'
+                && @$sk_scores == @{ $ds->{undef_test} } ) )
+        {
+            fail("sklearn output missing or wrong length for dataset '$ds->{label}'");
+            $sk_scores = undef;
+        }
+        subtest "[$be_name] $ds->{label} ($ds->{n_feat} features)" => sub {
+            run_dataset_tests( $ds, $sk_scores, $USE_C );
+        };
     }
-    subtest "$ds->{label} ($ds->{n_feat} features)" => sub {
-        run_dataset_tests( $ds, $sk_scores );
-    };
 }
 
 done_testing;

@@ -9,29 +9,39 @@ use Test2::V0 -no_srand => 1;
 use lib 't/lib';
 use TestFixtures qw(make_event);
 
+use Net::Nostr::Bech32 qw(encode_naddr);
 use Net::Nostr::Group;
 
 my $pk = 'a' x 64;
 my $target_pk = 'b' x 64;
 my $eid = '1' x 64;
+my $relay = 'wss://groups.nostr.com';
 
 ###############################################################################
 # parse_id
 ###############################################################################
 
-subtest 'parse_id basic' => sub {
-    my $r = Net::Nostr::Group->parse_id("host.com'grp");
-    is($r->{host}, 'host.com', 'host');
+subtest 'parse_id naddr basic' => sub {
+    my $naddr = encode_naddr(
+        identifier => 'grp',
+        pubkey     => $pk,
+        kind       => 39000,
+        relays     => [$relay],
+    );
+    my $r = Net::Nostr::Group->parse_id($naddr);
     is($r->{group_id}, 'grp', 'group_id');
+    is($r->{pubkey}, $pk, 'relay self pubkey');
+    is($r->{kind}, 39000, 'metadata kind');
+    is($r->{relays}, [$relay], 'relay hint');
+    is($r->{relay}, $relay, 'first relay hint shortcut');
 };
 
-subtest 'parse_id host only' => sub {
-    my $r = Net::Nostr::Group->parse_id("host.com");
-    is($r->{group_id}, '_', 'defaults to _');
+subtest 'parse_id rejects legacy host-only form' => sub {
+    ok(dies { Net::Nostr::Group->parse_id("host.com") }, 'legacy host-only id rejected');
 };
 
-subtest 'parse_id croaks on invalid chars' => sub {
-    ok(dies { Net::Nostr::Group->parse_id("h'BAD") }, 'croaks');
+subtest 'parse_id rejects legacy host-tick-group form' => sub {
+    ok(dies { Net::Nostr::Group->parse_id("h'BAD") }, 'legacy host tick id rejected');
 };
 
 ###############################################################################
@@ -39,10 +49,18 @@ subtest 'parse_id croaks on invalid chars' => sub {
 ###############################################################################
 
 subtest 'format_id' => sub {
-    is(Net::Nostr::Group->format_id(host => 'h', group_id => 'g'), "h'g", 'formatted');
+    my $id = Net::Nostr::Group->format_id(
+        pubkey   => $pk,
+        group_id => 'g',
+        relay    => $relay,
+    );
+    my $parsed = Net::Nostr::Group->parse_id($id);
+    is($parsed->{group_id}, 'g', 'group_id');
+    is($parsed->{pubkey}, $pk, 'pubkey');
+    is($parsed->{relays}, [$relay], 'relay');
 };
 
-subtest 'format_id croaks without host' => sub {
+subtest 'format_id croaks without pubkey' => sub {
     ok(dies { Net::Nostr::Group->format_id(group_id => 'g') }, 'croaks');
 };
 
@@ -56,8 +74,10 @@ subtest 'format_id croaks without group_id' => sub {
 
 subtest 'validate_group_id' => sub {
     ok(Net::Nostr::Group->validate_group_id('ok-id_1'), 'valid');
-    ok(!Net::Nostr::Group->validate_group_id('NO'), 'invalid');
+    ok(Net::Nostr::Group->validate_group_id('NO'), 'uppercase valid');
+    ok(Net::Nostr::Group->validate_group_id('has spaces'), 'spaces valid');
     ok(!Net::Nostr::Group->validate_group_id(undef), 'undef');
+    ok(!Net::Nostr::Group->validate_group_id(''), 'empty invalid');
 };
 
 ###############################################################################
@@ -143,6 +163,31 @@ subtest 'metadata kind and d tag' => sub {
     is($e->d_tag, 'g', 'd_tag');
 };
 
+subtest 'metadata livekit and supported_kinds tags' => sub {
+    my $e = Net::Nostr::Group->metadata(
+        pubkey          => $pk,
+        group_id        => 'g',
+        livekit         => 1,
+        supported_kinds => [9, 11],
+    );
+    my @livekit = grep { $_->[0] eq 'livekit' } @{$e->tags};
+    my @supported = grep { $_->[0] eq 'supported_kinds' } @{$e->tags};
+    is($livekit[0], ['livekit'], 'livekit tag');
+    is($supported[0], ['supported_kinds', '9', '11'], 'supported_kinds tag');
+};
+
+subtest 'participants kind and parser' => sub {
+    my $e = Net::Nostr::Group->participants(
+        pubkey       => $pk,
+        group_id     => 'g',
+        participants => [$target_pk],
+    );
+    is($e->kind, 39004, 'kind');
+    my $parsed = Net::Nostr::Group->participants_from_event($e);
+    is($parsed->{group_id}, 'g', 'group_id');
+    is($parsed->{participants}, [$target_pk], 'participants');
+};
+
 subtest 'admins kind' => sub {
     my $e = Net::Nostr::Group->admins(
         pubkey => $pk, group_id => 'g',
@@ -173,12 +218,14 @@ subtest 'roles kind' => sub {
 subtest 'metadata_from_event' => sub {
     my $e = make_event(
         pubkey => $pk, kind => 39000, content => '',
-        tags => [['d', 'g'], ['name', 'N'], ['private']],
+        tags => [['d', 'g'], ['name', 'N'], ['private'], ['livekit'], ['supported_kinds', '9']],
     );
     my $m = Net::Nostr::Group->metadata_from_event($e);
     is($m->{group_id}, 'g', 'group_id');
     is($m->{name}, 'N', 'name');
     is($m->{private}, 1, 'private');
+    is($m->{livekit}, 1, 'livekit');
+    is($m->{supported_kinds}, ['9'], 'supported kinds');
 };
 
 subtest 'admins_from_event' => sub {
@@ -244,11 +291,13 @@ subtest 'croaks on missing required params' => sub {
         'metadata_from_event wrong kind');
 };
 
-subtest 'croaks on invalid group_id' => sub {
-    ok(dies { Net::Nostr::Group->join_request(pubkey => $pk, group_id => 'BAD') },
-        'uppercase rejected');
-    ok(dies { Net::Nostr::Group->create_group(pubkey => $pk, group_id => 'a b') },
-        'space rejected');
+subtest 'group_id accepts arbitrary non-empty strings' => sub {
+    ok(lives { Net::Nostr::Group->join_request(pubkey => $pk, group_id => 'BAD') },
+        'uppercase accepted');
+    ok(lives { Net::Nostr::Group->create_group(pubkey => $pk, group_id => 'a b') },
+        'space accepted');
+    ok(dies { Net::Nostr::Group->create_group(pubkey => $pk, group_id => '') },
+        'empty rejected');
 };
 
 ###############################################################################

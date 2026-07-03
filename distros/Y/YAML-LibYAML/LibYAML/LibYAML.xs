@@ -65,6 +65,7 @@ new(char *class_name, ...)
             yaml->anchor_prefix = "";
             yaml->cyclic_refs = 0;
             yaml->utf8 = 0;
+            yaml->boolean = 0;
             hash = newHV();
 
             if (items > 1) {
@@ -120,6 +121,23 @@ new(char *class_name, ...)
                             SV *sv = newSViv(intvalue);
                             hv_store(hash, "cyclic_refs", 11, sv, 0);
                             yaml->cyclic_refs = intvalue;
+                        }
+                        else if (strEQ(key, "boolean")) {
+                            stringvalue = SvPV_nolen(ST(i+1));
+                            intvalue = 0;
+                            if (strEQ(stringvalue, "JSON::PP")) {
+                                intvalue = BOOLEAN_JSON_PP;
+                            }
+                            else if (strEQ(stringvalue, "boolean")) {
+                                intvalue = BOOLEAN_BOOLEAN;
+                            }
+                            else {
+                                croak("%s",
+                                    "YAML::XS->new: boolean only accepts 'JSON::PP', 'boolean' or a false value");
+                            }
+                            SV *sv = newSViv(intvalue);
+                            hv_store(hash, "boolean", 7, sv, 0);
+                            yaml->boolean = intvalue;
                         }
                     }
                 }

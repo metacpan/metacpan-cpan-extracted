@@ -21,6 +21,7 @@ int foo(int a);
 
 
 MODULE=Foo
+
 int
 foo( int a )
   CODE:
@@ -48,6 +49,7 @@ int foo(int a)
 
 
 MODULE=Foo
+
 int
 foo( int a )
   CODE:
@@ -91,6 +93,7 @@ class Foo {
 
 
 MODULE=Foo
+
 int
 foo( int a )
   CODE:
@@ -173,6 +176,7 @@ int foo(int a)
 
 
 MODULE=Foo
+
 int
 foo( int a )
   CODE:
@@ -201,6 +205,7 @@ int foo(int a)
 
 
 MODULE=Foo
+
 int
 foo( int a )
   CODE:
@@ -236,6 +241,7 @@ int foo(int a)
 
 
 MODULE=Foo
+
 int
 foo( int a )
   CODE:
@@ -279,6 +285,7 @@ class Foo %catch{myException, myException3} {
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -319,6 +326,7 @@ class Foo %catch{myException, myException3} {
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -369,6 +377,7 @@ class Foo %catch{nothing} {
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 

@@ -2,6 +2,8 @@ package Net::Nostr::Filter;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 
 my @SCALAR_FIELDS  = qw(since until limit search);
@@ -44,7 +46,7 @@ for my $field (@LIST_FIELDS) {
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     {
         my %known = map { $_ => 1 } (@SCALAR_FIELDS, @LIST_FIELDS);
         my @unknown = grep { !$known{$_} && !/^#[a-zA-Z][a-zA-Z0-9_]*$/ } keys %args;
@@ -245,6 +247,8 @@ filters in a subscription are OR-ed (use C<matches_any>).
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $filter = Net::Nostr::Filter->new(
         ids     => ['a' x 64],

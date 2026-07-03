@@ -32,7 +32,7 @@ no_index:
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '26.06'
+    version: '26.07'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -193,7 +193,7 @@ resources:
   homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef.git
-version: '26.06'
+version: '26.07'
 x_authority: cpan:TRIZEN
 x_contributors:
   - 'Daniel Șuteu'

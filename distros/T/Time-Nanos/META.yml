@@ -1,7 +1,7 @@
 ---
-abstract: 'High resolution time via clock_gettime(CLOCK_MONOTONIC)'
+abstract: 'Nanosecond time resolution via clock_gettime().'
 author:
-  - Author
+  - 'Scott Baker <scott@perturb.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
@@ -21,5 +21,9 @@ no_index:
 requires:
   Exporter: '0'
   XSLoader: '0'
-version: v0.1.2
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/scottchiefbaker/time-Perl-Nanos/issues
+  repository: https://github.com/scottchiefbaker/time-Perl-Nanos
+version: v0.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

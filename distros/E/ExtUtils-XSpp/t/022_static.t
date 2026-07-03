@@ -22,6 +22,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int

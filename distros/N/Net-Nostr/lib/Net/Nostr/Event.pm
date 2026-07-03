@@ -2,6 +2,8 @@ package Net::Nostr::Event;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Digest::SHA qw(sha256_hex);
@@ -57,7 +59,7 @@ sub sig {
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
 
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
@@ -148,7 +150,7 @@ sub to_hash {
 
 sub is_regular {
     my $k = shift->kind;
-    return ($k == 1 || $k == 2 || ($k >= 4 && $k < 45) || ($k >= 1000 && $k < 10000));
+    return ($k == 1 || $k == 2 || ($k >= 4 && $k < 45) || $k == 78 || ($k >= 1000 && $k < 10000));
 }
 
 sub is_replaceable {
@@ -361,6 +363,8 @@ event ID and any existing signature.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $event = Net::Nostr::Event->new(
         pubkey     => $hex_pubkey,
@@ -631,7 +635,7 @@ inclusion in an event's tags. The reason is optional.
 
 =head2 is_regular
 
-    $event->is_regular;  # true for kinds 1, 2, 4-44, 1000-9999
+    $event->is_regular;  # true for kinds 1, 2, 4-44, 78, 1000-9999
 
 Returns true if the event kind is a regular (non-replaceable, non-ephemeral,
 non-addressable) kind.

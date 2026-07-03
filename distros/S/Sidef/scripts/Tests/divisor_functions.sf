@@ -6,30 +6,98 @@ var h = Hash(
     divisors => 'sigma',
     prime_divisors => 'prime_sigma',
     prime_power_divisors => 'prime_power_sigma',
+
     square_divisors => 'square_sigma',
     cube_divisors => 'cube_sigma',
+
     squarefree_divisors => 'squarefree_sigma',
     cubefree_divisors => 'cubefree_sigma',
 
+    squarefull_divisors => 'squarefull_sigma',
+    cubefull_divisors => 'cubefull_sigma',
+
+    squarefull_udivisors => 'squarefull_usigma',
+    cubefull_udivisors => 'cubefull_usigma',
+
     udivisors => 'usigma',
+    nudivisors => 'nusigma',
+
     prime_udivisors => 'prime_usigma',
     prime_power_udivisors => 'prime_power_usigma',
+
     square_udivisors => 'square_usigma',
     cube_udivisors => 'cube_usigma',
+
     squarefree_udivisors => 'squarefree_usigma',
     cubefree_udivisors => 'cubefree_usigma',
 
     edivisors => 'esigma',
+    nedivisors => 'nesigma',
+
     idivisors => 'isigma',
+    nidivisors => 'nisigma',
+
     bdivisors => 'bsigma',
+    nbdivisors => 'nbsigma',
 )
 
 var h2 = Hash(
     power_divisors => 'power_sigma',
     power_udivisors => 'power_usigma',
 
+    powerful_divisors => 'powerful_sigma',
+    powerful_udivisors => 'powerful_usigma',
+
     powerfree_divisors => 'powerfree_sigma',
     powerfree_udivisors => 'powerfree_usigma',
+)
+
+# Functions with two arguments
+var h3 = Hash(
+    usigma_sum => 'usigma',
+    sigma_sum => 'sigma',
+    isigma_sum => 'isigma',
+    bsigma_sum => 'bsigma',
+
+    nusigma_sum => 'nusigma',
+    nisigma_sum => 'nisigma',
+    nbsigma_sum => 'nbsigma',
+
+    uphi_sum => 'uphi',
+    nuphi_sum => 'nuphi',
+    iphi_sum => 'iphi',
+    phi_sum => 'phi',
+    pillai_sum => 'pillai',
+    omega_sum => 'omega',
+    bigomega_sum => 'bigomega',
+    exp_mangoldt_sum => 'exp_mangoldt',
+    cototient_sum => 'cototient',
+    psi_sum => 'psi',
+
+    exp_omega_sum => 'exp_omega',
+    exp_bigomega_sum => 'exp_bigomega',
+    exp_squarefree_omega_sum => 'exp_squarefree_omega',
+)
+
+# Functions with a single argument, only
+var h4 = Hash(
+    liouville_sum => 'liouville',
+    moebius_sum => 'moebius',
+    sopf_sum => 'sopf',
+    sopfr_sum => 'sopfr',
+    tau_sum => 'tau',
+
+    sigma0_sum => 'sigma0',
+    usigma0_sum => 'usigma0',
+    isigma0_sum => 'isigma0',
+    bsigma0_sum => 'bsigma0',
+
+    nusigma0_sum => 'nusigma0',
+    nisigma0_sum => 'nisigma0',
+    nbsigma0_sum => 'nbsigma0',
+
+    #lpf_sum => 'lpf',
+    #gpf_sum => 'gpf',
 )
 
 with([irand(3,10)!, 340282366920938463942989953348216553641, 92971590131496140210160].rand) {|n|
@@ -53,6 +121,18 @@ with([irand(3,10)!, 340282366920938463942989953348216553641, 9297159013149614021
     }
 }
 
+h3.each {|a,b|
+    for k in (0..3) {
+        var n = 1e2.irand
+        assert_eq(n.of { .(a)(k) }, n.of { .(b)(k) }.acc)
+    }
+}
+
+h4.each {|a,b|
+    var n = 1e2.irand
+    assert_eq(n.of { .(a) }, n.of { .(b) }.acc)
+}
+
 with (irand(5, 10)!) {|n|
     var D = n.divisors
     assert_eq(n.perfect_power_divisors,    D.grep{.is_power})
@@ -62,6 +142,13 @@ with (irand(5, 10)!) {|n|
     assert_eq(4.power_divisors(n), D.grep{.is_power(4)})
     assert_eq(5.power_divisors(n), D.grep{.is_power(5)})
     assert_eq(9.power_divisors(n), D.grep{.is_power(9)})
+
+    assert_eq(1.powerful_divisors(n), D.grep{.is_powerful(1)})
+    assert_eq(2.powerful_divisors(n), D.grep{.is_powerful(2)})
+    assert_eq(3.powerful_divisors(n), D.grep{.is_powerful(3)})
+    assert_eq(4.powerful_divisors(n), D.grep{.is_powerful(4)})
+    assert_eq(5.powerful_divisors(n), D.grep{.is_powerful(5)})
+    assert_eq(9.powerful_divisors(n), D.grep{.is_powerful(9)})
 }
 
 with (irand(10, 21)!) {|n|
@@ -73,10 +160,7 @@ with (irand(10, 21)!) {|n|
     assert_eq(4.power_udivisors(n), D.grep{.is_power(4)})
     assert_eq(5.power_udivisors(n), D.grep{.is_power(5)})
     assert_eq(9.power_udivisors(n), D.grep{.is_power(9)})
-}
 
-with (irand(10, 21)!) {|n|
-    var D = n.udivisors
     assert_eq(1.powerfree_udivisors(n), D.grep{.is_powerfree(1)})
     assert_eq(2.powerfree_udivisors(n), D.grep{.is_powerfree(2)})
     assert_eq(3.powerfree_udivisors(n), D.grep{.is_powerfree(3)})
@@ -94,6 +178,10 @@ for n in (0..50) {
     assert_eq(1.power_divisors(n), D1.grep { .is_power(1) })
     assert_eq(2.power_divisors(n), D1.grep { .is_power(2) })
     assert_eq(3.power_divisors(n), D1.grep { .is_power(3) })
+
+    assert_eq(1.powerful_divisors(n), D1.grep { .is_powerful(1) })
+    assert_eq(2.powerful_divisors(n), D1.grep { .is_powerful(2) })
+    assert_eq(3.powerful_divisors(n), D1.grep { .is_powerful(3) })
 
     assert_eq(n.pp_udivisors,       D2.grep { .is_power })
     assert_eq(1.power_udivisors(n), D2.grep { .is_power(1) })

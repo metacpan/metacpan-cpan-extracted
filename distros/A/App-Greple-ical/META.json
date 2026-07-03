@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "App::Greple" : "8.58",
-            "perl" : "v5.14.0"
+            "perl" : "v5.24.0"
          }
       },
       "test" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "App::Greple::ical" : {
          "file" : "lib/App/Greple/ical.pm",
-         "version" : "0.02"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -70,11 +70,11 @@
          "web" : "https://github.com/kaz-utashiro/greple-ical"
       }
    },
-   "version" : "0.02",
+   "version" : "1.00",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

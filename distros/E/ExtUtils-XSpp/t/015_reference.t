@@ -22,6 +22,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 void
@@ -50,6 +51,7 @@ class Foo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 

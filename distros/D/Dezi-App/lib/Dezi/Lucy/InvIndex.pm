@@ -2,7 +2,7 @@ package Dezi::Lucy::InvIndex;
 use Moose;
 extends 'Dezi::InvIndex';
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 =head1 NAME
 

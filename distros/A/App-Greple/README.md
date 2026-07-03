@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 10.04
+Version 10.05
 
 # SYNOPSIS
 
@@ -106,6 +106,7 @@ Version 10.04
       --error=action       action to take after a read error occurs
       --warn=type          runtime error handling type
       --alert [name=#]     set alert parameters (size/time)
+      -P, --parallel[=n]   search patterns in parallel (default: cpu cores)
       -d flags             display info (f:file d:dir c:color m:misc s:stat)
 
 # INSTALL
@@ -127,6 +128,9 @@ searching only within code blocks, comments, or other delimited
 regions.
 - **Block-oriented processing**: Define and search custom text blocks
 such as paragraphs or function definitions.
+- **Colorized output**: Matches are highlighted with terminal colors;
+multiple patterns are shown in different colors, and color maps are
+fully customizable.
 - **Multi-byte support**: Native handling of Japanese and other Asian
 languages with proper character encoding.
 - **Extensibility**: Module system allows custom search patterns and
@@ -134,7 +138,9 @@ filters for specific document types or use cases.
 
 While it can be used for general text search, greple excels at
 searching source code, structured documents, and multi-byte text where
-context and precision matter.
+context and precision matter.  It is not optimized for scanning a
+large number of files; for fast recursive searches across big
+directory trees, tools like ripgrep(1) are better suited.
 
 # DESCRIPTION
 
@@ -1737,6 +1743,25 @@ interpreted as a bare word.
 
         --alert size=0
 
+- **-P**\[_n_\], **--parallel**\[=_n_\]
+
+    (Experimental) Search multiple patterns in parallel using up to _n_
+    child processes.  When _n_ is omitted or zero, the number of CPU
+    cores is used.  Note that a separate numeric argument following
+    **-P** is taken as its value; use the attached form (`-P4`) or `-e`
+    to search a numeric pattern.  This is effective when scanning a large file with
+    multiple time-consuming patterns.  Function patterns are always
+    processed sequentially.  Parallel processing is applied only when the
+    target text is larger than 1MB (can be changed by
+    `GREPLE_PARALLEL_THRESHOLD` environment variable) and two or more
+    eligible patterns exist.
+
+    Also, line border decomposition is performed in another child
+    process, overlapping with the rest of the search process.  The child
+    process is started when the first match is found, so no extra process
+    is created for unmatched files.  This works even with a single search
+    pattern.
+
 - **-Mdebug**, **-d**_x_
 
     Debug option is described in [App::Greple::debug](https://metacpan.org/pod/App%3A%3AGreple%3A%3Adebug) module.
@@ -1751,6 +1776,11 @@ interpreted as a bare word.
 - **GREPLE\_NORC**
 
     If set non-empty string, startup file `~/.greplerc` is not processed.
+
+- **GREPLE\_PARALLEL\_THRESHOLD**
+
+    Minimum text size to enable parallel pattern matching with the
+    **--parallel** option.  Default is 1048576 (1MB).
 
 - **DEBUG\_GETOPT**
 

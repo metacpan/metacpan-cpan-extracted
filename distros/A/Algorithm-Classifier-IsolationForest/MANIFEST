@@ -30,9 +30,12 @@ t/80-sklearn-comparison.t
 t/31-undef-column-no-warnings.t
 t/32-pack-data.t
 t/33-parallel-fit.t
+t/34-missing-values.t
 t/01-accel-flags.t
 t/90-cli-commands.t
 t/02-accel-selection.t
+t/03-fit-determinism.t
+t/04-accel-tuning.t
 examples/README.md
 examples/basic-anomaly-detection.pl
 examples/axis-vs-extended.pl

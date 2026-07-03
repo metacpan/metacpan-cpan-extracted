@@ -2,6 +2,8 @@
 
 This plugin makes it easy to integrate the OpenID Connect protocol into a Dancer2 application.
 
+Note that this is an OIDC **client** plugin, not an OpenID Connect provider plugin.
+
 It essentially uses the [OIDC-Client](https://metacpan.org/dist/OIDC-Client) distribution.
 
 ## Features
@@ -29,5 +31,4 @@ When using Dancer2::Plugin::OIDC, it is highly recommended to configure the fram
 
 ## Limitations
 
-- no support for *tls_client_auth* client authentication method
 - no support for Implicit or Hybrid flows (applicable to front-end applications only and deprecated)

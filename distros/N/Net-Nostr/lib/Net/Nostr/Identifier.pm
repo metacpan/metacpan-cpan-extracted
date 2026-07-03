@@ -2,6 +2,8 @@ package Net::Nostr::Identifier;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use AnyEvent::HTTP;
@@ -12,7 +14,7 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -90,7 +92,8 @@ sub _build_fetch_url {
 }
 
 sub verify {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $identifier = $args{identifier} // croak "identifier required";
     my $pubkey     = $args{pubkey}     // croak "pubkey required";
     my $on_success = $args{on_success} // croak "on_success callback required";
@@ -130,7 +133,8 @@ sub verify {
 }
 
 sub lookup {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $identifier = $args{identifier} // croak "identifier required";
     my $on_success = $args{on_success} // croak "on_success callback required";
     croak "on_success must be a CODE ref" unless ref($on_success) eq 'CODE';
@@ -294,6 +298,8 @@ if none are found.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $ident = Net::Nostr::Identifier->new(%args);
 

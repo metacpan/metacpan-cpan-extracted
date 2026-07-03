@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-Copyright (c) 2016-2024 G.W. Haywood.  All rights reserved.
+Copyright (c) 2016-2026 G.W. Haywood.  All rights reserved.
   With thanks to all those who have trodden these paths before,
   including
 Copyright (c) 2002-2004 Todd Vierling.  All rights reserved.
@@ -50,11 +50,11 @@ use Carp;
 use Socket;
 use UNIVERSAL;
 
-use Sendmail::PMilter 1.27 qw(:all);
+use Sendmail::PMilter 1.28 qw(:all);
 
 # use Data::Dumper;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 $VERSION = eval $VERSION;
 
 =pod
@@ -218,13 +218,7 @@ sub main ($) {
 			$this->read_block(\$buf, $len - 1) || die "EOF in stream\n";
 
 			if ($cmd eq SMFIC_ABORT) {
-#				delete $this->{symbols}{&SMFIC_CONNECT};
-#				delete $this->{symbols}{&SMFIC_HELO};
 				delete $this->{symbols}{&SMFIC_MAIL};
-#				delete $this->{symbols}{&SMFIC_RCPT};
-#				delete $this->{symbols}{&SMFIC_DATA};
-#				delete $this->{symbols}{&SMFIC_EOH};
-#				delete $this->{symbols}{&SMFIC_BODYEOB};
 				$this->call_hooks('abort');
 			} elsif ($cmd eq SMFIC_BODY) {
 				$this->call_hooks('body', $buf, length($buf));
@@ -257,7 +251,6 @@ sub main ($) {
 					};
 				}
 				$this->call_hooks('connect', $host, $pack);
-#				delete $this->{symbols}{&SMFIC_CONNECT};
 			} elsif ($cmd eq SMFIC_MACRO) {
 				die "SMFIC_MACRO: empty packet\n" unless ($buf =~ s/^(.)//);
 				my $code = $this->{lastsymbol} = $1;
@@ -273,32 +266,24 @@ sub main ($) {
 				}
 			} elsif ($cmd eq SMFIC_BODYEOB) {
 				$this->call_hooks('eom');
-#				delete $this->{symbols}{&SMFIC_MAIL};
-#				delete $this->{symbols}{&SMFIC_DATA};
-#				delete $this->{symbols}{&SMFIC_EOH};
-#				delete $this->{symbols}{&SMFIC_BODYEOB};
 			} elsif ($cmd eq SMFIC_HELO) {
 				my $helo = &$split_buf;
 				die "SMFIC_HELO: bad packet\n" unless (@$helo == 1);
 				$this->call_hooks('helo', @$helo);
-#				delete $this->{symbols}{&SMFIC_HELO};
 			} elsif ($cmd eq SMFIC_HEADER) {
 				my $header = &$split_buf;
-
 				# empty value: ensure an empty string
 				push(@$header, '') if (@$header == 1);
 				$this->call_hooks('header', @$header);
 			} elsif ($cmd eq SMFIC_MAIL) {
 				if ($this->{lastsymbol} ne SMFIC_MAIL) { delete $this->{symbols}{&SMFIC_MAIL}; }
 				my $envfrom = &$split_buf;
-				$this->call_hooks('envfrom', @$envfrom)
-					if scalar @$envfrom >= 1;
-
-#				delete $this->{symbols}{&SMFIC_MAIL};
+				# null sender MAIL FROM:<> yields an empty arg list; ensure the
+				# envfrom hook still fires (and a reply is sent) instead of hanging.
+				push(@$envfrom, q{}) if (@$envfrom == 0);
+				$this->call_hooks(q{envfrom}, @$envfrom);
 			} elsif ($cmd eq SMFIC_EOH) {
 				$this->call_hooks('eoh');
-#				delete $this->{symbols}{&SMFIC_EOH};
-			
 			} elsif ($cmd eq SMFIC_OPTNEG) {
 
 				# Here we've established that the 'NEGOTIATE' command (SMFIC_OPTNEG) has been received in the incoming packet from the MTA.
@@ -410,7 +395,6 @@ sub main ($) {
 
 			} elsif ($cmd eq SMFIC_DATA) {
 				$this->call_hooks('data');
-#				delete $this->{symbols}{&SMFIC_DATA};
 			} elsif ($cmd eq SMFIC_QUIT) {
 				$this->call_hooks('quit');		# A long-felt want, but I'm not sure it will really do what I want.  Is it called if the client does *not* send the 'QUIT' command?
 				last;

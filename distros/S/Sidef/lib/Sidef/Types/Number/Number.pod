@@ -971,10 +971,14 @@ Returns the n-th Bell number modulo C<m>.
     bernoulli(n)
     bernoulli(n, x)
 
-Returns the n-th Bernoulli number. When an additional argument is provided, it returns the n-th Bernoulli polynomial evaluated at C<x>.
+Returns the n-th Bernoulli number of the first kind (with C<B_1 = -1/2>). When an additional argument is provided, it returns the n-th Bernoulli polynomial evaluated at C<x>.
 
     say bernoulli(10).as_rat       # B_10    = 5/66
     say bernoulli(10, 2).as_rat    # B_10(2) = 665/66
+
+For Bernoulli numbers of the second kind (with C<B_1 = 1/2>) use:
+
+    bernoulli(n, 1)     # here B_1 = 1/2
 
 Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
@@ -1004,9 +1008,14 @@ When C<x> is omitted, a Polynomial object is returned.
 
 =head2 bernreal
 
-    n.bernreal
+    bernreal(n)
+    bernreal(n,x)
 
 Return an approximation to the n-th Bernoulli number as a floating-point number.
+
+When a second argument C<x> is given, it return the n-th Bernoulli polynomial evaluated at C<x>:
+
+    B_n(x)      # as a floating-point number
 
 =cut
 
@@ -1084,6 +1093,22 @@ Returns the sum of the generalized Omega function C<Ω_k(j)>, for C<j=1..n>.
     say bigomega_sum(100, 0)      #=> 239
     say bigomega_sum(100, 1)      #=> 2815
     say bigomega_sum(100, 2)      #=> 66799
+
+=cut
+
+=head2 binomial
+
+    binomial(n,k)
+
+Returns the binomial coefficient C<n> over C<k>, also called the "choose" function.
+
+Equivalent to:
+
+                        n!
+    binomial(n, k) = --------
+                     k!(n-k)!
+
+Aliases: I<nok>
 
 =cut
 
@@ -1292,6 +1317,27 @@ Returns the count of the bi-unitary divisors of C<n>. (L<OEIS A286324|https://oe
     say 20.of { .bsigma0 }   #=> OEIS: A286324
 
 Aliases: I<biusigma0>
+
+=cut
+
+=head2 bsigma_sum
+
+    bsigma_sum(n,k=1)
+
+Sum of the C<bsigma(x,k)> function, for C<x = 1..n>.
+
+    say 30.of { .bsigma_sum(0) }   # OEIS: A306069
+    say 30.of { .bsigma_sum    }   # OEIS: A307159
+
+=cut
+
+=head2 bsigma0_sum
+
+    bsigma0_sum(n)
+
+Sum of number of bi-unitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .bsigma0_sum }    #=> OEIS: A306069
 
 =cut
 
@@ -1900,6 +1946,16 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =cut
 
+=head2 square_part
+
+    square_part(n)
+
+Largest square dividing C<n>. (L<OEIS A008833|https://oeis.org/A008833>)
+
+    say 30.of { .square_part }      #=> OEIS: A008833
+
+=cut
+
 =head2 core
 
     core(n)
@@ -1911,6 +1967,30 @@ Squarefree part of C<n>. (L<OEIS A007913|https://oeis.org/A007913>)
 Equivalent to PARI/GP C<core(n)> function.
 
 Aliases: I<squarefree_part>
+
+=cut
+
+=head2 cototient
+
+    cototient(n, k=1)
+
+Generalized cototient function:
+
+    n^k - J_k(n)
+
+where C<J_k(n)> is the Jordan totient function.
+
+For C<k=1>, it equals: C<n - phi(n)>.
+
+=cut
+
+=head2 cototient_sum
+
+    cototient_sum(n, k=1)
+
+Partial sums of the generalized cototient function, equivalent to:
+
+    faulhaber_sum(n, k) - totient_sum(n, k)
 
 =cut
 
@@ -2006,6 +2086,14 @@ Returns the cube of C<x>. Equivalent with C<x**3>.
 
 =cut
 
+=head2 cube_part
+
+    cube_part(n)
+
+Largest cube dividing C<n>. (L<OEIS  A008834|https://oeis.org/A008834>)
+
+=cut
+
 =head2 cube_divisors
 
     n.cube_divisors
@@ -2026,6 +2114,22 @@ Equivalent with:
     cubefree(a,b)
 
 Returns an array with the cubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubefree_part
+
+    cubefree_part(n)
+
+Cubefree part of C<n>. (L<OEIS  A050985|https://oeis.org/A050985>)
+
+=cut
+
+=head2 cubefree_kernel
+
+    cubefree_kernel(n)
+
+Largest cubefree number dividing C<n>. (L<OEIS  A007948|https://oeis.org/A007948>)
 
 =cut
 
@@ -2124,6 +2228,62 @@ Returns the number of unitary cubefree divisors of C<n>.
     cubefull(a,b)
 
 Returns an array with the cubefull numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubefull_part
+
+    cubefull_part(n)
+
+Largest divisor of C<n> that is a cubefull (3-powerful) number. (L<OEIS  A360540|https://oeis.org/A360540>)
+
+=cut
+
+=head2 cubefull_divisors
+
+    cubefull_divisors(n)
+
+Return an array with the cubefull (3-powerful) divisors of C<n>.
+
+=cut
+
+=head2 cubefull_udivisors
+
+    cubefull_udivisors(n)
+
+Return an array with the unitary cubefull (3-powerful) divisors of C<n>.
+
+=cut
+
+=head2 cubefull_sigma
+
+    cubefull_sigma(n, j=1)
+
+Sum of the cubefull (3-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+=cut
+
+=head2 cubefull_sigma0
+
+    cubefull_sigma0(n)
+
+Count of the cubefull (3-powerful) divisors of C<n>.
+
+=cut
+
+=head2 cubefull_usigma
+
+    cubefull_usigma(n, j=1)
+
+Sum of the unitary cubefull (3-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+=cut
+
+=head2 cubefull_usigma0
+
+    cubefull_usigma0(n)
+
+Count of the unitary cubefull (3-powerful) divisors of C<n>.
 
 =cut
 
@@ -2280,6 +2440,18 @@ Example:
     say 20.of { .dconv({.moebius}, {_}) }
 
 Aliases: I<dirichlet_convolution>
+
+=cut
+
+=head2 dinv
+
+    n.dinv(f)
+
+The Dirichlet inverse of a function C<f>.
+
+    say 30.of { .dinv { .sigma } }      # Dirichlet inverse of sigma function (OEIS: A046692)
+
+Aliases: I<dirichlet_inverse>
 
 =cut
 
@@ -2456,14 +2628,25 @@ This method computes the following sum in C<O(sqrt(n))> steps:
 
 where C<F> and C<G> are the partial sums of C<f> and C<g>, respectively.
 
-    say dirichlet_sum(1e6,
-            { .is_squarefree ? 1 : 0 },
-            { .square },
-            { .squarefree_count },
-            { .faulhaber(2) }
-    )
+Computing C<Sum_{k=1..n} Sum_{d|k, d is squarefree} (n/d)^2>:
 
-Aliases: I<dirichlet_hyperbola>
+    var f = { .is_squarefree ? 1 : 0 }
+    var g = { .square }
+    var F = { .squarefree_count }
+    var G = { .faulhaber_sum(2) }
+
+    say 30.of {|n| dirichlet_sum(n, f, g, F, G) }   # OEIS: A321973
+
+Computing C<Sum_{k=1..n} Sum_{d|k} n * mu(k/d)>:
+
+    var f = {|n| n }
+    var g = {|n| mu(n) }
+    var F = {|n| n*(n+1)/2 }
+    var G = {|n| mertens(n) }
+
+    say 30.of {|n| dirichlet_sum(n, f, g, F, G) }   # OEIS: A002088
+
+Aliases: I<dirichlet_hyperbola>, I<dsum>
 
 =cut
 
@@ -3506,7 +3689,11 @@ Returns the Hamming distance (number of bit-positions where the bits differ) bet
 
 Returns the n-th Harmonic number C<H_n>. The harmonic numbers are the sum of reciprocals of the first C<n> natural numbers: C<1 + 1/2 + 1/3 + ... + 1/n>.
 
+    say harmonic(10).as_rat     # 7381/2520
+
 When an additional argument is given, it returns the n-th Harmonic number of the k-th order.
+
+    say harmonic(10, 2).as_rat   # 55991/2520
 
 Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
 
@@ -3799,6 +3986,16 @@ Returns the modular inverse of C<n> modulo C<m>.
     iphi(n, k=1)
 
 Infinitary analog of Euler's phi function. (L<OEIS A091732|https://oeis.org/A091732>)
+
+=cut
+
+=head2 iphi_sum
+
+    iphi_sum(n,k=1)
+
+Partial sums of the infinitary totient function C<iphi(x,k)> for C<x=1..n>.
+
+    say 30.of { .iphi_sum }     #=> OEIS: A327572
 
 =cut
 
@@ -4244,6 +4441,27 @@ Returns the sum of the infinitary divisors of C<n>, each divisor raised to the k
 Returns the count of the infinitary divisors of C<n>. (L<OEIS A037445|https://oeis.org/A037445>)
 
     say 20.of { .isigma0 }      #=> OEIS: A037445
+
+=cut
+
+=head2 isigma_sum
+
+    isigma_sum(n, k=1)
+
+Sum of the C<isigma(x,k)> function, for C<x=1..n>.
+
+    say 30.of { .isigma_sum(0) }   # OEIS: A327573
+    say 30.of { .isigma_sum }      # OEIS: A327566
+
+=cut
+
+=head2 isigma0_sum
+
+    isigma0_sum(n)
+
+Sum of number of infinitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .isigma0_sum }    #=> OEIS: A327573
 
 =cut
 
@@ -5409,8 +5627,15 @@ Returns the natural logarithm of 2 constant.
 =head2 lnbern
 
     lnbern(n)
+    lnbern(n,x)
 
 Returns the natural logarithm of the n-th Bernoulli number.
+
+When a second argument C<x> is given, it returns the natural logarithm of the n-th Bernoulli polynomial, evaluated at C<x>:
+
+    log(B_n(x))     # as a floating-point number
+
+This is usually faster than C<log(bernreal(n,x))> for large C<n>, but it may be inaccurate in precision in the least significant digits for certain inputs.
 
 Aliases: I<bern_log>, I<lnbernreal>, I<bernoulli_log>
 
@@ -5691,6 +5916,22 @@ The product of the factors will give back C<n>. However, some factors may be com
 The Möbius function: μ(n). (L<OEIS A008683|https://oeis.org/A008683>)
 
 Aliases: I<μ>, I<mu>, I<mobius>, I<möbius>
+
+=cut
+
+=head2 moebius_inverse
+
+    n.moebius_inverse(f)
+
+The Möbius transform (inversion) of a function C<f>, defined as:
+
+    Sum_{d|n} mu(d) * f(n/d)
+
+Example:
+
+    say 30.of { .moebius_inverse { .psi } }   # Möbius transform of Dedekind psi function (OEIS: A063659)
+
+Aliases: I<moebius_transform>
 
 =cut
 
@@ -5987,6 +6228,27 @@ Returns the Not-a-Number special value (C<NaN>).
 
 =cut
 
+=head2 nbdivisors
+
+    nbdivisors(n)
+
+Returns an array with the non-bi-unitary divisors of C<n>.
+
+    say 720.nbdivisors   #=> [3, 4, 6, 12, 15, 20, 24, 30, 36, 48, 60, 120, 180, 240]
+
+Equivalent to the set difference between the divisors and the
+bi-unitary-divisors:
+
+    divisors(n) - bdivisors(n) == nbdivisors(n)
+
+These are divisors C<d> of C<n> that satisfy:
+
+    gcud(n/d, d) != 1
+
+Aliases: I<non_bi_unitary_divisors>, I<nbiudivisors>
+
+=cut
+
 =head2 nbsigma
 
     nbsigma(n, k=1)
@@ -6002,6 +6264,27 @@ Returns the sum of the non-bi-unitary divisors of C<n>, each divisor raised to t
     nbsigma0(n)
 
 Returns the count of the non-bi-unitary divisors of C<n>.
+
+=cut
+
+=head2 nbsigma_sum
+
+    nbsigma_sum(n,k=1)
+
+Sum of the C<nbsigma(x,k)> function, for C<x = 1..n>.
+
+    say 30.of { .nbsigma_sum(0) }   # Partial sums of OEIS A390957
+    say 30.of { .nbsigma_sum    }   # Partial sums of OEIS A319072
+
+=cut
+
+=head2 nbsigma0_sum
+
+    nbsigma0_sum(n)
+
+Sum of number of non-bi-unitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .nbsigma0_sum }    # Partial sums of OEIS A390957
 
 =cut
 
@@ -6031,6 +6314,53 @@ Aliases: I<rd>, I<st>, I<th>
     x.neg
 
 Negates the sign of C<x> (equivalent with: C<-x>).
+
+=cut
+
+=head2 necklaces
+
+    necklaces(n,k)
+
+Number of n-bead necklaces with k colors when turning over is not allowed.
+
+    say 30.of { .necklaces(2) }     #=> OEIS: A000031
+
+Defined as:
+
+    (1/n)*Sum_{d|n} phi(n/d)*k^d
+
+=cut
+
+=head2 necklaces_aperiodic
+
+    necklaces_aperiodic(n,k)
+
+Number of n-bead necklaces with beads of C<k> colors when turning over is not allowed and with primitive period C<n>.
+
+    say 30.of { .necklaces_aperiodic(2) }   #=> OEIS: A001037
+
+Also number of degree-n irreducible polynomials over C<GF(k)>.
+
+Defined as:
+
+    (1/n) * Sum_{d|n} mu(n/d) * k^d
+
+=cut
+
+=head2 nedivisors
+
+    nedivisors(n)
+
+Returns an array with the nonexponential divisors of C<n>.
+
+    say 120.nedivisors   #=> [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 40, 60]
+
+Equivalent to the set difference between the divisors and the exponential
+divisors:
+
+    divisors(n) - edivisors(n) == nedivisors(n)
+
+Aliases: I<non_exponential_divisors>
 
 =cut
 
@@ -6501,6 +6831,22 @@ Returns the negative infinity special value (C<-Inf>).
 
 =cut
 
+=head2 nidivisors
+
+    nidivisors(n)
+
+Returns an array with the noninfinitary divisors of C<n>.
+
+    say 240.nidivisors   #=> [2, 4, 6, 8, 10, 12, 20, 24, 30, 40, 60, 120]
+
+Equivalent to the set difference between the divisors and the infinitary divisors:
+
+    divisors(n) - idivisors(n) == nidivisors(n)
+
+Aliases: I<non_infinitary_divisors>
+
+=cut
+
 =head2 nisigma
 
     nisigma(n, k=1)
@@ -6521,20 +6867,24 @@ Returns the count of the noninfinitary divisors of C<n>. (L<OEIS A348341|https:/
 
 =cut
 
-=head2 nok
+=head2 nisigma_sum
 
-    nok(n,k)
-    binomial(n,k)
+    nisigma_sum(n,k=1)
 
-Returns the binomial coefficient C<n> over C<k>, also called the "choose" function.
+Sum of the C<nisigma(x,k)> function, for C<x = 1..n>.
 
-Equivalent to:
+    say 30.of { .nisigma_sum(0) }   # Partial sums of OEIS A348341
+    say 30.of { .nisigma_sum    }   # Partial sums of OEIS A348271
 
-                        n!
-    binomial(n, k) = --------
-                     k!(n-k)!
+=cut
 
-Aliases: I<binomial>
+=head2 nisigma0_sum
+
+    nisigma0_sum(n)
+
+Sum of number of noninfinitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .nisigma0_sum }    # Partial sums of OEIS A348341
 
 =cut
 
@@ -6931,9 +7281,47 @@ Although this may or may not be actually faster.
 
 =head2 nuphi
 
-    nuphi(n)
+    nuphi(n, k=1)
 
-The nonunitary totient function. (L<OEIS A254503|https://oeis.org/A254503>)
+The generalized nonunitary totient function (also called C<nphi>). (L<OEIS A254503|https://oeis.org/A254503>)
+
+Multiplicative with:
+
+       a(p, k) = p^k
+       a(p^e, k) = J_k(p^e) = (p^k - 1) * p^(k*(e-1)), for e > 1.
+
+Example:
+
+    say 30.of { .nuphi }        # OEIS: A254503
+    say 30.of { .nuphi(2) }     # OEIS: A254520
+
+=cut
+
+=head2 nuphi_sum
+
+    nuphi_sum(n,k=1)
+
+Partial sums of the nonunitary totient function C<nuphi(x,k)> for C<x=1..n>.
+
+=cut
+
+=head2 nudivisors
+
+    nudivisors(n)
+
+Returns an array with the non-unitary divisors of C<n>.
+
+    say 120.nudivisors   #=> [2, 4, 6, 10, 12, 20, 30, 60]
+
+Equivalent to the set difference between the divisors and the unitary-divisors:
+
+    divisors(n) - udivisors(n) == nudivisors(n)
+
+These are divisors C<d> of C<n> that satisfy:
+
+    gcd(n/d, d) != 1
+
+Aliases: I<non_unitary_divisors>
 
 =cut
 
@@ -6954,6 +7342,27 @@ Returns the sum of the nonunitary divisors of C<n>, each divisor raised to the k
 Returns the count of the nonunitary divisors of C<n>. (L<OEIS A048105|https://oeis.org/A048105>)
 
     say 30.of { .nusigma0 }    #=> OEIS: A048105
+
+=cut
+
+=head2 nusigma_sum
+
+    nusigma_sum(n,k=1)
+
+Sum of the C<nusigma(x,k)> function, for C<x = 1..n>.
+
+    say 30.of { .nusigma_sum(0) }   # Partial sums of OEIS A048105
+    say 30.of { .nusigma_sum    }   # Partial sums of OEIS A048146
+
+=cut
+
+=head2 nusigma0_sum
+
+    nusigma0_sum(n)
+
+Sum of number of nonunitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .nusigma0_sum }    # Partial sums of OEIS A048105
 
 =cut
 
@@ -7570,6 +7979,28 @@ Returns an array with the k-powerfree divisors of C<n>.
 
 =cut
 
+=head2 power_part
+
+    k.power_part(n)
+
+Returns the largest k-th power dividing C<n>.
+
+    say 2.power_part(n)     # largest square dividing n
+    say 3.power_part(n)     # largest cube dividing n
+
+=cut
+
+=head2 powerfree_kernel
+
+    k.powerfree_kernel(n)
+
+Returns the largest k-powerfree divisor of C<n>.
+
+    say 2.powerfree_kernel(n)       # rad(n)
+    say 3.powerfree_kernel(n)       # largest cubefree number dividing n (OEIS: A007948)
+
+=cut
+
 =head2 powerfree_part
 
     k.powerfree_part(n)
@@ -7680,6 +8111,73 @@ Returns an array with the k-powerful (or k-full) numbers <= C<n>, or in the rang
 
     say 2.powerful(100)          #=> 2-powerful numbers <= 100
     say 2.powerful(50, 100)      #=> 2-powerful numbers in the range 50..100
+
+=cut
+
+=head2 powerful_part
+
+    k.powerful_part(n)
+
+The k-powerful part of n: largest k-powerful number dividing C<n>.
+
+    say 2.powerful_part(n)      # squarefull part of n (OEIS: A057521)
+    say 3.powerful_part(n)      # cubefull part of n (OEIS: A360540)
+
+=cut
+
+=head2 powerful_divisors
+
+    k.powerful_divisors(n)
+
+Returns an array with the k-powerful divisors of C<n>.
+
+=cut
+
+=head2 powerful_udivisors
+
+    k.powerful_udivisors(n)
+
+Returns an array with the unitary k-powerful divisors of C<n>.
+
+Aliases: I<unitary_powerful_divisors>, I<powerful_unitary_divisors>
+
+=cut
+
+=head2 powerful_sigma
+
+    k.powerful_sigma(n, j=1)
+
+Sum of the k-powerful divisors of C<n>, each divisor raised to the power C<j>.
+
+    say 2.powerful_sigma(n)     # OEIS: A183097
+    say 3.powerful_sigma(n)     # OEIS: A385005
+
+=cut
+
+=head2 powerful_sigma0
+
+    k.powerful_sigma0(n)
+
+Count the number of k-powerful divisors of C<n>.
+
+=cut
+
+=head2 powerful_usigma
+
+    k.powerful_usigma(n, j=1)
+
+Sum of the unitary k-powerful divisors of C<n>, each divisor raised to the power C<j>.
+
+    say 30.of{|n| 2.powerful_usigma(n) }    # OEIS: A360720
+    say 30.of{|n| 3.powerful_usigma(n) }    # OEIS: A385048
+
+=cut
+
+=head2 powerful_usigma0
+
+    k.powerful_usigma0(n)
+
+Count the number of unitary k-powerful divisors of C<n>.
 
 =cut
 
@@ -9780,6 +10278,62 @@ Returns an array with the squarefull numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 squarefull_part
+
+    squarefull_part(n)
+
+Largest divisor of C<n> that is a squarefull (2-powerful) number. (L<OEIS A057521|https://oeis.org/A057521>)
+
+=cut
+
+=head2 squarefull_divisors
+
+    squarefull_divisors(n)
+
+Return an array with the squarefull (2-powerful) divisors of C<n>.
+
+=cut
+
+=head2 squarefull_udivisors
+
+    squarefull_udivisors(n)
+
+Return an array with the unitary squarefull (2-powerful) divisors of C<n>.
+
+=cut
+
+=head2 squarefull_sigma
+
+    squarefull_sigma(n, j=1)
+
+Sum of the squarefull (2-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+=cut
+
+=head2 squarefull_sigma0
+
+    squarefull_sigma0(n)
+
+Count of the squarefull (2-powerful) divisors of C<n>.
+
+=cut
+
+=head2 squarefull_usigma
+
+    squarefull_usigma(n, j=1)
+
+Sum of the unitary squarefull (2-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+=cut
+
+=head2 squarefull_usigma0
+
+    squarefull_usigma0(n)
+
+Count of the unitary squarefull (2-powerful) divisors of C<n>.
+
+=cut
+
 =head2 squarefull_each
 
     n.squarefull_each { ... }
@@ -10183,7 +10737,7 @@ Returns the sum of the Jordan totient function C<J_k(j)>, for C<j=1..n>.
     say totient_sum(100, 1)      #=> 3044
     say totient_sum(100, 2)      #=> 280608
 
-Aliases: I<euler_phi_sum>, I<jordan_totient_sum>
+Aliases: I<phi_sum>, I<euler_phi_sum>, I<jordan_totient_sum>
 
 =cut
 
@@ -10261,6 +10815,16 @@ The unitary totient function. (L<OEIS A047994|https://oeis.org/A047994>)
 
 =cut
 
+=head2 uphi_sum
+
+    uphi_sum(n,k=1)
+
+Partial sums of the unitary totient function C<uphi(x,k)> for C<x=1..n>.
+
+    say 30.of { .uphi_sum }     #=> OEIS: A177754
+
+=cut
+
 =head2 uphi_inverse
 
     n.uphi_inverse
@@ -10302,18 +10866,6 @@ Returns the sum of the unitary divisors of C<n>, each divisor raised to the powe
 
 =cut
 
-=head2 usigma_inverse
-
-    n.usigma_inverse
-
-Returns an array with all the solutions C<x> to C<usigma(x) = n>.
-
-    say usigma_inverse(120)      #=> [60, 87, 92, 95, 99]
-
-Aliases: I<inverse_usigma>
-
-=cut
-
 =head2 usigma0
 
     usigma0(n)
@@ -10325,6 +10877,39 @@ Equivalently, the count of squarefree divisors of C<n>.
     say usigma0(5040)   #=> 16
 
 Aliases: I<squarefree_sigma0>
+
+=cut
+
+=head2 usigma_sum
+
+    usigma_sum(n, k=1)
+
+Sum of the C<usigma(x,k)> function, for C<x = 1..n>.
+
+    say 30.of { .usigma_sum }       #=> OEIS: A064609
+    say 30.of { .usigma_sum(0) }    #=> OEIS: A064608
+
+=cut
+
+=head2 usigma0_sum
+
+    usigma0_sum(n)
+
+Sum of number of unitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .usigma0_sum }    #=> OEIS: A064608
+
+=cut
+
+=head2 usigma_inverse
+
+    n.usigma_inverse
+
+Returns an array with all the solutions C<x> to C<usigma(x) = n>.
+
+    say usigma_inverse(120)      #=> [60, 87, 92, 95, 99]
+
+Aliases: I<inverse_usigma>
 
 =cut
 

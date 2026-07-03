@@ -255,6 +255,41 @@ subtest 'gift wrap is kind 1059' => sub {
     is($wrap->kind, 1059, 'gift wrap kind is 1059');
 };
 
+subtest 'ephemeral gift wrap is kind 21059 with same structure' => sub {
+    my $rumor = Net::Nostr::GiftWrap->create_rumor(
+        pubkey  => $author_key->pubkey_hex,
+        kind    => 1,
+        content => 'hello live chat',
+        tags    => [],
+    );
+
+    my $seal = Net::Nostr::GiftWrap->seal(
+        rumor            => $rumor,
+        sender_key       => $author_key,
+        recipient_pubkey => $RECIPIENT_PUBKEY,
+    );
+
+    my $wrap = Net::Nostr::GiftWrap->wrap(
+        seal             => $seal,
+        recipient_pubkey => $RECIPIENT_PUBKEY,
+        kind             => 21059,
+    );
+
+    is($wrap->kind, 21059, 'ephemeral gift wrap kind is 21059');
+    ok($wrap->is_ephemeral, 'kind 21059 is ephemeral');
+
+    my @p_tags = grep { $_->[0] eq 'p' } @{$wrap->tags};
+    is(scalar @p_tags, 1, 'one p-tag');
+    is($p_tags[0][1], $RECIPIENT_PUBKEY, 'p-tag is recipient pubkey');
+
+    my ($unwrapped, $sender_pubkey) = Net::Nostr::GiftWrap->unwrap(
+        event         => $wrap,
+        recipient_key => $recipient_key,
+    );
+    is($sender_pubkey, $AUTHOR_PUBKEY, 'seal pubkey returned');
+    is($unwrapped->content, 'hello live chat', 'ephemeral wrap unwraps');
+};
+
 subtest 'gift wrap uses random one-time pubkey' => sub {
     my $rumor = Net::Nostr::GiftWrap->create_rumor(
         pubkey  => $author_key->pubkey_hex,
@@ -482,14 +517,14 @@ subtest 'same rumor wrapped individually for each recipient' => sub {
 # unwrap validation
 ###############################################################################
 
-subtest 'unwrap rejects non-1059 event' => sub {
+subtest 'unwrap rejects non-gift-wrap event' => sub {
     my $event = Net::Nostr::Event->new(
         pubkey => 'a' x 64, kind => 1, content => '', tags => [],
     );
     like(dies { Net::Nostr::GiftWrap->unwrap(
         event         => $event,
         recipient_key => $recipient_key,
-    ) }, qr/kind 1059/, 'rejects non-1059');
+    ) }, qr/kind 1059 or 21059/, 'rejects non-gift-wrap kind');
 };
 
 ###############################################################################

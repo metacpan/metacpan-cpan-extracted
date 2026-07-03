@@ -22,6 +22,7 @@ int bar(int y);
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 # trivial typemap

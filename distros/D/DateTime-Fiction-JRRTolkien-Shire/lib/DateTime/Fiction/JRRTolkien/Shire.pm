@@ -34,7 +34,7 @@ use Params::ValidationCompiler 0.13 ();
 # namespace::autoclean.
 *__t = \&DateTime::Fiction::JRRTolkien::Shire::Types::t;
 
-our $VERSION = '0.909';
+our $VERSION = '0.910';
 
 use constant DAY_NUMBER_MIDYEARS_DAY	=> 183;
 
@@ -233,7 +233,7 @@ sub _new {
 	    my ( $class, %arg ) = @_;
 
 	    my %my_arg;
-	    exists $my_arg{$_} and $my_arg{$_} = delete $arg{$_}
+	    exists $arg{$_} and $my_arg{$_} = delete $arg{$_}
 		for qw{ accented traditional };
 
 	    %my_arg = $validator->( %my_arg );

@@ -6,6 +6,7 @@ use 5.014;
 use FindBin;
 use lib "$FindBin::Bin/lib", "$FindBin::Bin/../lib", "lib";
 use JSON::JSONFold ;
+use JSON::PP ;
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Time::HiRes qw(time clock_gettime CLOCK_PROCESS_CPUTIME_ID);
@@ -18,17 +19,7 @@ use constant MEM_FRACTION => 0.10;
 use Carp qw(confess cluck);
 
 BEGIN {
-    $SIG{__DIE__} = sub {
-        return if $^S;
-        local $SIG{__DIE__};
-        Carp::confess(@_);
-    };
 
-
-    $SIG{__WARN__} = sub {
-        local $SIG{__WARN__};
-#        Carp::cluck(@_);
-    };
 }
 
 # ----------------------------------------------------------------------
@@ -133,6 +124,18 @@ sub json_pretty_encoder {
 # Case dispatch: same names as benchmark.py.
 # ----------------------------------------------------------------------
 sub run_case {
+    
+    local $SIG{__DIE__} = sub {
+        return if $^S;
+        local $SIG{__DIE__};
+        Carp::confess(@_);
+    };
+
+    local $SIG{__WARN__} = sub {
+        local $SIG{__WARN__};
+        Carp::cluck(@_);
+    };
+
     my ($data, $name, $show) = @_;
 
     if ($name eq 'base.dumps.plain') {
@@ -150,7 +153,7 @@ sub run_case {
 
     my ($kind, $func, $compact) = split /\./, $name;
 
-    if (defined($kind) && $kind eq 'jsonfold') {
+    if (defined($kind) && $kind eq 'jf') {
         if (defined($func) && $func eq 'dumps') {
             return sub {
                 run_jsonfold_dumps($data, $compact, $show);
@@ -342,22 +345,22 @@ sub default_tests {
     return qw(
         base.dump.plain
         base.dump.pretty
-        jsonfold.dump.off
-        jsonfold.dump.none
-        jsonfold.dump.default
-        jsonfold.dump.low
-        jsonfold.dump.med
-        jsonfold.dump.high
-        jsonfold.dump.max
-        jsonfold.dump.pack
-        jsonfold.dump.fold
-        jsonfold.dump.join
+        jf.dump.off
+        jf.dump.none
+        jf.dump.default
+        jf.dump.low
+        jf.dump.med
+        jf.dump.high
+        jf.dump.max
+        jf.dump.pack
+        jf.dump.fold
+        jf.dump.join
         base.dumps.plain
         base.dumps.pretty
-        jsonfold.dumps.none
-        jsonfold.dumps.default
-        jsonfold.dumps.high
-        jsonfold.dumps.max
+        jf.dumps.none
+        jf.dumps.default
+        jf.dumps.high
+        jf.dumps.max
     );
 }
 
@@ -367,6 +370,10 @@ sub run_one_size {
 
     my @tests = @$tests ? @$tests : default_tests();
     my @results;
+
+    my $backend = $JSON::JSONFold::BACKEND || "-" ;
+    my $count = scalar(@tests) ;
+    print STDERR "Becnharming $count tests, repeat=$REPEATS, Backend='$backend'\n" ;
 
     for my $name (@tests) {
         print STDERR "$name ($rows)... ";
@@ -399,11 +406,11 @@ usage: benchmark.pl [--show] [--repeat=N] [TEST ...] [ROWS ...] [-]
 Examples:
   perl benchmark.pl
   perl benchmark.pl 100 1000
-  perl benchmark.pl jsonfold.dump.default jsonfold.dump.max 1000
-  perl benchmark.pl jsonfold.dumps.default --show 3
+  perl benchmark.pl jf.dump.default jf.dump.max 1000
+  perl benchmark.pl jf.dumps.default --show 3
 
 Arguments match benchmark.py:
-  TEST    case name, e.g. base.dump.pretty or jsonfold.dump.default
+  TEST    case name, e.g. base.dump.pretty or jf.dump.default
   ROWS    row count; runs the current test filter for that size
   -       clears the current test filter
 

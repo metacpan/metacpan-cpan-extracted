@@ -1,0 +1,26 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README.md
+lib/Text/AsciidocDown.pm
+lib/Text/AsciidocDown/Include.pm
+lib/Text/AsciidocDown/Parser.pm
+lib/Text/AsciidocDown/Refs.pm
+lib/Text/AsciidocDown/Subs.pm
+script/asciidoc-down
+t/00-load.t
+t/01-convert-smoke.t
+t/01-pod.t
+t/02-core-parser.t
+t/02-manifest.t
+t/03-inline-and-macros.t
+t/04-blocks-code-lists.t
+t/05-tables-conditionals-xrefs.t
+t/06-cli-and-hardening.t
+t/07-include-premerge.t
+t/08-include-selectors.t
+META.json                                Module JSON meta-data (added by MakeMaker)

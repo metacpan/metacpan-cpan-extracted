@@ -275,6 +275,10 @@ sub _valid {
          my $tmp = (
              defined($sub) ? __PACKAGE__->new($sub->($$_)) : do {
                  my (undef, undef, undef, $caller) = caller(1);
+                 if (($$_ // '') eq '') {
+                     my ($func_name) = $caller =~ /::([^:]+)\z/;
+                     print STDERR "[ERROR] Probably not enough arguments provided to $func_name()?\n";
+                 }
                  die "[ERROR] Value <<$$_>> cannot be implicitly converted to a number, inside <<$caller>>!\n";
              }
          );
@@ -3891,6 +3895,7 @@ sub __inv__ {
     goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
 
   Scalar: {
+        CORE::abs($x) == 1 and return $x;
         $x = _any2mpz($x);
         goto Math_GMPz;
     }
@@ -3921,6 +3926,9 @@ sub __inv__ {
             $x = _mpz2mpfr($x);
             goto Math_MPFR;
         };
+
+        Math::GMPz::Rmpz_cmpabs_ui($x, 1) == 0
+          and return $x;
 
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_z($r, $x);
@@ -6338,6 +6346,17 @@ sub bernoulli_polynomial {
         }
     }
 
+    if (!$polynomial and __eq__($x, 0)) {
+        return _set_int($n)->bernfrac;
+    }
+    elsif (!$polynomial and __eq__($x, 1)) {
+        if ($n == 1) {
+            state $r = _str2obj('1/2');
+            return bless \$r;
+        }
+        return _set_int($n)->bernfrac;
+    }
+
     my @B = _bernoulli_numbers($n);
 
     my $u = $n + 1;
@@ -6381,8 +6400,7 @@ sub bernfrac {
     }
 
     if ($n == 1) {
-        my $q = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_ui($q, 1, 2);
+        state $q = _str2obj('-1/2');
         return bless \$q;
     }
 
@@ -6617,98 +6635,291 @@ sub tangent_number {
     bless \$r;
 }
 
-# TODO: add support for an optional argument and return B_n(x)
 sub bernreal {
-    my ($n) = @_;
+    my ($n_ref, $x_ref) = @_;
 
-    $n = _any2ui($$n) // goto &nan;
+    my $n = _any2ui($$n_ref) // goto &nan;
 
-    # |B(n)| = zeta(n) * n! / 2^(n-1) / pi^n
+    # Fast O(1) path for Bernoulli number B_n (when x is omitted)
+    if (!defined($x_ref)) {
+        $n == 0 and return ONE;
+        $n == 1 and return do {
+            my $half = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            Math::MPFR::Rmpfr_set_d($half, -0.5, $ROUND);
+            bless \$half;
+        };
+        $n % 2 and return ZERO;    # B_n = 0 for odd n > 1
 
-    $n == 0 and return ONE;
-    $n == 1 and return do { state $x = bless(\_str2obj('1/2')) };
-    $n % 2  and return ZERO;                                        # Bn = 0 for odd n>1
+        my $B_n = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $t   = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-    #local $PREC = CORE::int($n*CORE::log($n)+1);
+        Math::MPFR::Rmpfr_zeta_ui($B_n, $n, $ROUND);      # zeta(n)
+        Math::MPFR::Rmpfr_set_ui($t, $n + 1, $ROUND);
+        Math::MPFR::Rmpfr_gamma($t, $t, $ROUND);          # gamma(n+1) = n!
+        Math::MPFR::Rmpfr_mul($B_n, $B_n, $t, $ROUND);    # zeta(n) * n!
 
-    my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    my $p = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_const_pi($t, $ROUND);           # pi
+        Math::MPFR::Rmpfr_mul_ui($t, $t, 2, $ROUND);      # 2*pi
+        Math::MPFR::Rmpfr_pow_ui($t, $t, $n, $ROUND);     # (2*pi)^n
 
-    Math::MPFR::Rmpfr_zeta_ui($f, $n, $ROUND);                      # f = zeta(n)
-    Math::MPFR::Rmpfr_set_ui($p, $n + 1, $ROUND);                   # p = n+1
-    Math::MPFR::Rmpfr_gamma($p, $p, $ROUND);                        # p = gamma(p)
+        Math::MPFR::Rmpfr_div($B_n, $B_n, $t, $ROUND);    # (zeta(n)*n!) / (2*pi)^n
+        Math::MPFR::Rmpfr_mul_ui($B_n, $B_n, 2, $ROUND);  # 2 * ...
 
-    Math::MPFR::Rmpfr_mul($f, $f, $p, $ROUND);                      # f = f * p
+        Math::MPFR::Rmpfr_neg($B_n, $B_n, $ROUND) if $n % 4 == 0;
 
-    Math::MPFR::Rmpfr_const_pi($p, $ROUND);                         # p = PI
-    Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND);                   # p = p^n
+        return bless \$B_n;
+    }
 
-    Math::MPFR::Rmpfr_div_2ui($f, $f, $n - 1, $ROUND);              # f = f / 2^(n-1)
+    # Evaluate Bernoulli Polynomial B_n(x)
+    my $x_fr = _any2mpfr($$x_ref) // goto &nan;
 
-    Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);                      # f = f/p
-    Math::MPFR::Rmpfr_neg($f, $f, $ROUND) if $n % 4 == 0;
+    my $sum  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    my $term = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    my $B_j  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    my $t    = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    my $z    = Math::GMPz::Rmpz_init();
 
-    bless \$f;
+    Math::MPFR::Rmpfr_set_ui($sum, 0, $ROUND);
+
+    foreach my $j (0 .. $n) {
+        if ($j == 0) {
+            Math::MPFR::Rmpfr_set_ui($B_j, 1, $ROUND);
+        }
+        elsif ($j == 1) {
+            Math::MPFR::Rmpfr_set_d($B_j, -0.5, $ROUND);
+        }
+        elsif ($j % 2 != 0) {
+            next;    # B_j = 0 for odd j > 1
+        }
+        else {
+            # Compute B_j using Zeta and Gamma
+            Math::MPFR::Rmpfr_zeta_ui($B_j, $j, $ROUND);    # zeta(j)
+            Math::MPFR::Rmpfr_set_ui($t, $j + 1, $ROUND);
+            Math::MPFR::Rmpfr_gamma($t, $t, $ROUND);        # gamma(j+1)
+            Math::MPFR::Rmpfr_mul($B_j, $B_j, $t, $ROUND);
+
+            Math::MPFR::Rmpfr_const_pi($t, $ROUND);
+            Math::MPFR::Rmpfr_mul_ui($t, $t, 2, $ROUND);
+            Math::MPFR::Rmpfr_pow_ui($t, $t, $j, $ROUND);    # (2*pi)^j
+
+            Math::MPFR::Rmpfr_div($B_j, $B_j, $t, $ROUND);
+            Math::MPFR::Rmpfr_mul_ui($B_j, $B_j, 2, $ROUND);
+            Math::MPFR::Rmpfr_neg($B_j, $B_j, $ROUND) if $j % 4 == 0;
+        }
+
+        # term = binom(n, j) * B_j
+        Math::GMPz::Rmpz_bin_uiui($z, $n, $j);
+        Math::MPFR::Rmpfr_mul_z($term, $B_j, $z, $ROUND);
+
+        # term *= x^(n-j)
+        if ($n - $j > 0) {
+            Math::MPFR::Rmpfr_pow_ui($t, $x_fr, $n - $j, $ROUND);
+            Math::MPFR::Rmpfr_mul($term, $term, $t, $ROUND);
+        }
+
+        Math::MPFR::Rmpfr_add($sum, $sum, $term, $ROUND);
+    }
+
+    return bless \$sum;
 }
 
-# TODO: add support for an optional argument and return log(B_n(x))
 sub lnbernreal {
-    my ($n) = @_;
+    my ($n_ref, $x_ref) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    # Fast O(1) path for ln(B_n) when x is omitted
+    if (!defined($x_ref)) {
+        my $n = _any2mpz($$n_ref, 0) // goto &nan;
+        (Math::GMPz::Rmpz_sgn($n) || return ZERO) < 0 and goto &nan;
 
-    # log(|B(n)|) = (1 - n)*log(2) - n*log(π) + log(zeta(n)) + log(n!)
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+            my $L = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            Math::MPFR::Rmpfr_const_log2($L, $ROUND);
+            Math::MPFR::Rmpfr_neg($L, $L, $ROUND);
 
-    (Math::GMPz::Rmpz_sgn($n) || return ZERO) < 0 and goto &nan;
+            my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
 
-    my $L = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_const_log2($L, $ROUND);
+            my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            Math::MPC::Rmpc_set_fr_fr($c, $L, $pi, $ROUND);
+            return bless \$c;
+        }
 
-    if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
-        Math::MPFR::Rmpfr_neg($L, $L, $ROUND);
+        Math::GMPz::Rmpz_odd_p($n) && goto &ninf;
+
+        my $L  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $t  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPFR::Rmpfr_const_log2($t, $ROUND);
+        Math::MPFR::Rmpfr_set($L, $t, $ROUND);
+
+        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+        Math::MPFR::Rmpfr_mul_ui($t, $pi, 2, $ROUND);
+        Math::MPFR::Rmpfr_log($t, $t, $ROUND);
+        Math::MPFR::Rmpfr_mul_z($t, $t, $n, $ROUND);
+        Math::MPFR::Rmpfr_sub($L, $L, $t, $ROUND);
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            Math::MPFR::Rmpfr_zeta_ui($t, Math::GMPz::Rmpz_get_ui($n), $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_set_z($t, $n, $ROUND);
+            Math::MPFR::Rmpfr_zeta($t, $t, $ROUND);
+        }
+        Math::MPFR::Rmpfr_log($t, $t, $ROUND);
+        Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);
+
+        my $s = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add_ui($s, $n, 1);
+        Math::MPFR::Rmpfr_set_z($t, $s, $ROUND);
+        Math::MPFR::Rmpfr_lngamma($t, $t, $ROUND);
+        Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);
+
+        if (Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
+            my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            Math::MPC::Rmpc_set_fr_fr($c, $L, $pi, $ROUND);
+            return bless \$c;
+        }
+
         return bless \$L;
     }
 
-    Math::GMPz::Rmpz_odd_p($n) && goto &ninf;    # log(Bn) = -Inf for odd n>1
+    _valid(\$x_ref);
 
-    my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_const_pi($pi, $ROUND);     # pi = π
+    # Explicit calculation of ln(B_n(x)) using Log-Sum-Exp
+    my $n = _any2ui($$n_ref) // goto &nan;
 
-    my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_log($t, $pi, $ROUND);         # t = log(π)
-    Math::MPFR::Rmpfr_mul_z($t, $t, $n, $ROUND);    # t = n*log(π)
+    my $x_fr = _any2mpfr($$x_ref) // goto &nan;
 
-    my $s = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_ui_sub($s, 1, $n);             # s = 1-n
-
-    Math::MPFR::Rmpfr_mul_z($L, $L, $s, $ROUND);    # L = (1 - n)*log(2)
-    Math::MPFR::Rmpfr_sub($L, $L, $t, $ROUND);      # L -= n*log(π)
-
-    if (Math::GMPz::Rmpz_fits_ulong_p($n)) {        # n is a native unsigned integer
-        Math::MPFR::Rmpfr_zeta_ui($t, Math::GMPz::Rmpz_get_ui($n), $ROUND);
-    }
-    else {
-        Math::MPFR::Rmpfr_set_z($t, $n, $ROUND);    # t = n
-        Math::MPFR::Rmpfr_zeta($t, $t, $ROUND);     # t = zeta(n)
+    # Edge case: B_n(0) = B_n
+    if (Math::MPFR::Rmpfr_zero_p($x_fr)) {
+        return lnbernreal($n_ref);
     }
 
-    Math::MPFR::Rmpfr_log($t, $t, $ROUND);          # t = log(zeta(n))
-    Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(zeta(n))
+    my $log_x = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_abs($log_x, $x_fr, $ROUND);
+    Math::MPFR::Rmpfr_log($log_x, $log_x, $ROUND);
 
-    Math::GMPz::Rmpz_add_ui($s, $n, 1);             # s = n+1
-    Math::MPFR::Rmpfr_set_z($t, $s, $ROUND);        # t = n+1
-    Math::MPFR::Rmpfr_lngamma($t, $t, $ROUND);      # t = log(gamma(n+1)) = log(n!)
+    my $sgn_x = Math::MPFR::Rmpfr_sgn($x_fr);
 
-    Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(n!)
+    my $ln_n_fact = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_set_ui($ln_n_fact, $n + 1, $ROUND);
+    Math::MPFR::Rmpfr_lngamma($ln_n_fact, $ln_n_fact, $ROUND);    # ln(n!)
 
-    # If 4|n, then B_n is negative; log(-Re(x)) = log(Re(x)) + π*i, for x>0
-    if (Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
+    my $ln_2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_const_log2($ln_2, $ROUND);
+
+    my $ln_2pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_const_pi($ln_2pi, $ROUND);
+    Math::MPFR::Rmpfr_mul_ui($ln_2pi, $ln_2pi, 2, $ROUND);
+    Math::MPFR::Rmpfr_log($ln_2pi, $ln_2pi, $ROUND);              # ln(2π)
+
+    my @L;                                                        # Stores ln|T_k|
+    my @S;                                                        # Stores sign of T_k
+
+    my $t1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+    foreach my $k (0 .. $n) {
+        next if ($k > 1 && $k % 2 != 0);
+
+        my $L_k  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $sign = 1;
+
+        # Sign from x^(n-k)
+        $sign = -$sign if ($sgn_x < 0 && ($n - $k) % 2 != 0);
+
+        if ($k == 0) {
+
+            # L_0 = n * ln|x|
+            Math::MPFR::Rmpfr_mul_ui($L_k, $log_x, $n, $ROUND);
+        }
+        elsif ($k == 1) {
+
+            # B_1 = -1/2 -> sign is negative
+            $sign = -$sign;
+
+            # L_1 = ln(n) - ln(2) + (n-1)*ln|x|
+            Math::MPFR::Rmpfr_set_ui($t1, $n, $ROUND);
+            Math::MPFR::Rmpfr_log($t1, $t1, $ROUND);
+            Math::MPFR::Rmpfr_sub($L_k, $t1, $ln_2, $ROUND);
+
+            if ($n - 1 > 0) {
+                Math::MPFR::Rmpfr_mul_ui($t1, $log_x, $n - 1, $ROUND);
+                Math::MPFR::Rmpfr_add($L_k, $L_k, $t1, $ROUND);
+            }
+        }
+        else {
+            # Sign from B_k (negative for k = 4, 8, 12, ...)
+            $sign = -$sign if ($k % 4 == 0);
+
+            # L_k = ln(n!) - ln((n-k)!) + ln(2) - k*ln(2π) + ln(zeta(k)) + (n-k)*ln|x|
+            Math::MPFR::Rmpfr_set($L_k, $ln_n_fact, $ROUND);
+
+            Math::MPFR::Rmpfr_set_ui($t1, $n - $k + 1, $ROUND);
+            Math::MPFR::Rmpfr_lngamma($t1, $t1, $ROUND);
+            Math::MPFR::Rmpfr_sub($L_k, $L_k, $t1, $ROUND);
+
+            Math::MPFR::Rmpfr_add($L_k, $L_k, $ln_2, $ROUND);
+
+            Math::MPFR::Rmpfr_mul_ui($t1, $ln_2pi, $k, $ROUND);
+            Math::MPFR::Rmpfr_sub($L_k, $L_k, $t1, $ROUND);
+
+            Math::MPFR::Rmpfr_zeta_ui($t1, $k, $ROUND);
+            Math::MPFR::Rmpfr_log($t1, $t1, $ROUND);
+            Math::MPFR::Rmpfr_add($L_k, $L_k, $t1, $ROUND);
+
+            if ($n - $k > 0) {
+                Math::MPFR::Rmpfr_mul_ui($t1, $log_x, $n - $k, $ROUND);
+                Math::MPFR::Rmpfr_add($L_k, $L_k, $t1, $ROUND);
+            }
+        }
+
+        push @L, $L_k;
+        push @S, $sign;
+    }
+
+    # Log-Sum-Exp Accumulator
+    my $L_max = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_set($L_max, $L[0], $ROUND);
+    for my $i (1 .. $#L) {
+        Math::MPFR::Rmpfr_set($L_max, $L[$i], $ROUND) if (Math::MPFR::Rmpfr_cmp($L[$i], $L_max) > 0);
+    }
+
+    my $inner_sum = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_set_ui($inner_sum, 0, $ROUND);
+
+    for my $i (0 .. $#L) {
+        Math::MPFR::Rmpfr_sub($t1, $L[$i], $L_max, $ROUND);
+        Math::MPFR::Rmpfr_exp($t1, $t1, $ROUND);
+        if ($S[$i] < 0) {
+            Math::MPFR::Rmpfr_sub($inner_sum, $inner_sum, $t1, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_add($inner_sum, $inner_sum, $t1, $ROUND);
+        }
+    }
+
+    # Extremely rare exact cancellation across terms
+    goto &ninf if Math::MPFR::Rmpfr_zero_p($inner_sum);
+
+    my $sign_inner = Math::MPFR::Rmpfr_sgn($inner_sum);
+    Math::MPFR::Rmpfr_abs($inner_sum, $inner_sum, $ROUND);
+    Math::MPFR::Rmpfr_log($inner_sum, $inner_sum, $ROUND);
+
+    my $result = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_add($result, $L_max, $inner_sum, $ROUND);
+
+    # log(-Re(x)) = log(Re(x)) + i*π
+    if ($sign_inner < 0) {
+        my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+
         my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
-        Math::MPC::Rmpc_set_fr_fr($c, $L, $pi, $ROUND);
+        Math::MPC::Rmpc_set_fr_fr($c, $result, $pi, $ROUND);
         return bless \$c;
     }
 
-    bless \$L;
+    return bless \$result;
 }
 
 *lnbern        = \&lnbernreal;
@@ -8937,7 +9148,7 @@ sub linear_congruence {
 sub sqrt_cfrac_period_each {
     my ($n, $block, $max) = @_;
 
-    $n   = _any2mpz($$n, 0) // return ZERO;
+    $n   = _any2mpz($$n) // return ZERO;
     $max = defined($max) ? CORE::int($max) : (0 + 'inf');
 
     Math::GMPz::Rmpz_sgn($n) < 0
@@ -14441,12 +14652,30 @@ sub faulhaber_sum {
 
     _valid(\$p);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $p = _any2ui($$p)     // goto &nan;
+    $p = $$p;
+
+    if (ref($p)) {
+        $p = _any2ui($p) // goto &nan;
+    }
 
     if ($p == 0) {
-        return _set_int($n);
+        return $n->max(ZERO);
     }
+    elsif ($p < 0) {
+        goto &nan;
+    }
+
+    $n = $$n;
+
+    if (FAST_MODE and !ref($n) and $n >= 0) {
+        if (HAS_PRIME_UTIL and $n**($p + 1) < ULONG_MAX) {
+            return _set_int(Math::Prime::Util::powersum($n, $p));
+        }
+        return _set_int(Math::Prime::Util::GMP::powersum($n, $p));
+    }
+
+    $n = _any2mpz($n, 0) // goto &nan;
+    Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     if ($p == 1 or $p == 3) {
         state $r = Math::GMPz::Rmpz_init_nobless();
@@ -14602,6 +14831,46 @@ sub catalan {
 }
 
 *Catalan = \&catalan;
+
+sub necklaces {
+    my ($n, $k) = @_;
+
+    # (1/n)*sum_{d|n} phi(n/d)*k^d
+
+    $n->is_zero && return ONE;
+    $n->dirichlet_convolution(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $_[0]->euler_phi;
+            }
+        ),
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $k->ipow($_[0]);
+            }
+        )
+    )->idiv($n);
+}
+
+sub necklaces_aperiodic {
+    my ($n, $k) = @_;
+
+    # (1/n) * sum_{d|n} mu(d) * k^(n/d)
+
+    $n->is_zero && return ONE;
+    $n->dirichlet_convolution(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $_[0]->moebius;
+            }
+        ),
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $k->ipow($_[0]);
+            }
+        )
+    )->idiv($n);
+}
 
 sub binomial {
     my ($x, $y) = @_;
@@ -15498,6 +15767,10 @@ sub exp_omega_sum {
     }
 
     my $n_obj = bless \$n;
+
+    if (!HAS_PRIME_UTIL and $k->eq(TWO)) {
+        return $n_obj->usigma_sum(ZERO);
+    }
 
     my @terms;
     foreach my $i (0 .. CORE::int($n_obj->lgrt->numify) + 1) {
@@ -23712,29 +23985,23 @@ sub _prime_sum_mpz {
         return ZERO;
     }
 
-    my $r = Math::Prime::Util::GMP::sqrtint(Math::GMPz::Rmpz_get_str($n, 10));
+    my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
+    my $r     = Math::Prime::Util::GMP::sqrtint($n_str);
 
     goto &nan if ($r > ULONG_MAX);
 
-    my $t = Math::GMPz::Rmpz_init_set_ui(0);
+    state $t  = Math::GMPz::Rmpz_init_nobless();
     state $u  = Math::GMPz::Rmpz_init_nobless();
     state $p2 = Math::GMPz::Rmpz_init_nobless();
     state $ip = Math::GMPz::Rmpz_init_nobless();
-
-    my $t_obj = bless \$t;
-    my $k_obj = _set_int($k);
 
     my @S_small = (0);
     my @S_large = (0);
 
     for my $i (1 .. $r) {
-        Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $i);
-        push @S_large, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
-    }
-
-    for my $v (1 .. $r) {
-        Math::GMPz::Rmpz_set_ui($t, $v);
-        push @S_small, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
+        my $q = Math::Prime::Util::GMP::divint($n_str, $i);
+        push @S_large, Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::powersum($q, $k), 10);
+        push @S_small, Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::powersum($i, $k), 10);
     }
 
     my ($target, $max_i);
@@ -23790,23 +24057,15 @@ sub _prime_sum_native {
 
     goto &nan if ($r > ULONG_MAX);
 
-    my $t = Math::GMPz::Rmpz_init_set_ui(0);
+    state $t = Math::GMPz::Rmpz_init_nobless();
     state $u = Math::GMPz::Rmpz_init_nobless();
-
-    my $t_obj = bless \$t;
-    my $k_obj = _set_int($k);
 
     my @S_small = (0);
     my @S_large = (0);
 
     for my $i (1 .. $r) {
-        Math::GMPz::Rmpz_set_ui($t, CORE::int($n / $i));
-        push @S_large, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
-    }
-
-    for my $v (1 .. $r) {
-        Math::GMPz::Rmpz_set_ui($t, $v);
-        push @S_small, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
+        push @S_large, Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::powersum(CORE::int($n / $i), $k), 10);
+        push @S_small, Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::powersum($i,                 $k), 10);
     }
 
     my ($target, $max_i, $p2, $ip, $cp);
@@ -24835,6 +25094,56 @@ sub rad {    # A007947
 
 *squarefree_kernel = \&rad;
 
+sub powerfree_kernel {
+    my ($k, $n) = @_;
+
+    # Multiplicative with:
+    #   a(p^e) = p^(min(e, k-1))
+
+    _valid(\$n);
+
+    $k = _any2ui($$k) || goto &nan;
+    $n = _big2uistr($$n) // goto &nan;
+
+    $n || return ZERO;
+
+    _set_int(
+             Math::Prime::Util::GMP::vecprod(map { ($_->[1] == 1) ? $_->[0] : Math::Prime::Util::GMP::powint($_->[0], $_->[1]) }
+                                             map { [$_->[0], List::Util::min($k - 1, $_->[1])] } _factor_exp($n))
+            );
+}
+
+sub cubefree_kernel {
+    (THREE)->powerfree_kernel($_[0]);
+}
+
+sub powerful_part {
+    my ($k, $n) = @_;
+
+    # Multiplicative with:
+    #   a(p^e, k) = p^e, where e >= k
+
+    _valid(\$n);
+
+    $k = _any2ui($$k) || goto &nan;
+    $n = _big2uistr($$n) // goto &nan;
+
+    $n || return ZERO;
+
+    _set_int(
+             Math::Prime::Util::GMP::vecprod(map  { Math::Prime::Util::GMP::powint($_->[0], $_->[1]) }
+                                             grep { $_->[1] >= $k } _factor_exp($n))
+            );
+}
+
+sub squarefull_part {
+    (TWO)->powerful_part($_[0]);
+}
+
+sub cubefull_part {
+    (THREE)->powerful_part($_[0]);
+}
+
 sub powerfree_part {
     my ($k, $n) = @_;
 
@@ -24843,11 +25152,10 @@ sub powerfree_part {
 
     _valid(\$n);
 
-    $k = _any2ui($$k)    // goto &nan;
+    $k = _any2ui($$k) || goto &nan;
     $n = _big2uistr($$n) // goto &nan;
 
-    $k <= 0   and goto &nan;
-    $n eq '0' and return ZERO;
+    $n || return ZERO;
 
     _set_int(
              Math::Prime::Util::GMP::vecprod(map { ($_->[1] == 1) ? $_->[0] : Math::Prime::Util::GMP::powint($_->[0], $_->[1]) }
@@ -24860,6 +25168,25 @@ sub core {    # A007913
 }
 
 *squarefree_part = \&core;
+
+sub cubefree_part {    # A050985
+    (THREE)->powerfree_part($_[0]);
+}
+
+sub power_part {
+    my ($k, $n) = @_;
+    _valid(\$n);
+    $n->is_zero && return ZERO;
+    $n->div($k->powerfree_part($n));
+}
+
+sub square_part {
+    (TWO)->power_part($_[0]);
+}
+
+sub cube_part {
+    (THREE)->power_part($_[0]);
+}
 
 sub powerfree_part_sum {
     my ($k, $from, $to) = @_;
@@ -25728,12 +26055,12 @@ sub prime_signature {
 
     if (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX) {
         my @exp = Math::Prime::Util::prime_signature($n);
-        @exp = map { bless \$_ } @exp;
+        @exp = map { ($_ == 1) ? ONE : bless \$_ } @exp;
         return _array(\@exp);
     }
 
     my @exp = sort { $b <=> $a } map { $_->[1] } _factor_exp($n);
-    @exp = map { bless \$_ } @exp;
+    @exp = map { ($_ == 1) ? ONE : bless \$_ } @exp;
     _array(\@exp);
 }
 
@@ -27025,7 +27352,7 @@ sub qs_factor {
 sub dirichlet_convolution {
     my ($n, $f, $g) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     $f //= Sidef::Types::Block::Block->new(code => sub { ONE });
@@ -27052,17 +27379,101 @@ sub dirichlet_convolution {
 
 *dconv = \&dirichlet_convolution;
 
+sub dirichlet_inverse {
+    my ($n, $f) = @_;
+
+    $n = _any2mpz($$n) // goto &nan;
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return ZERO;
+    }
+
+    my @D = map { _any2mpz($_) } _divisors($n);
+
+    my @g;
+    my $f1 = ${$f->run(ONE)};
+    $g[0] = __inv__($f1);
+
+    ref($g[0]) eq 'Math::MPFR' and goto &nan;
+    ref($g[0]) eq 'Math::MPC'  and goto &nan;
+
+    my $q   = Math::GMPz::Rmpz_init();
+    my $sum = Math::GMPz::Rmpz_init();
+
+    foreach my $i (1 .. $#D) {
+        my $d = $D[$i];
+        Math::GMPz::Rmpz_set_ui($sum, 0);
+
+        foreach my $j (0 .. $i - 1) {
+            my $c = $D[$j];
+
+            if (Math::GMPz::Rmpz_divisible_p($d, $c)) {
+                Math::GMPz::Rmpz_divexact($q, $d, $c);
+                my $f_val = ${$f->run(_set_int($q))};
+                $sum += $g[$j] * $f_val;
+            }
+        }
+
+        $g[$i] = -$sum / $f1;
+    }
+
+    my $r = $g[-1];
+    bless \$r;
+}
+
+*dinv = \&dirichlet_inverse;
+
+sub moebius_inverse {
+    my ($n, $f) = @_;
+
+    $n = _big2uistr($$n) // goto &nan;
+
+    my $q   = Math::GMPz::Rmpz_init();
+    my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+    my $native_n = (HAS_PRIME_UTIL and $n < ULONG_MAX);
+
+    for my $d (map { $$_ } @{_set_int($n)->squarefree_divisors}) {
+
+        $d = Math::GMPz::Rmpz_get_ui($d)
+          if (ref($d) and Math::GMPz::Rmpz_fits_ulong_p($d));
+
+        my $mu =
+          (HAS_PRIME_UTIL and $d < ULONG_MAX)
+          ? Math::Prime::Util::moebius($d)
+          : Math::Prime::Util::GMP::moebius($d);
+
+        my $q =
+          $native_n
+          ? Math::Prime::Util::divint($n, $d)
+          : Math::Prime::Util::GMP::divint($n, $d);
+
+        my $f_val = ${$f->run(_set_int($q))};
+
+        if ($mu == 1) {
+            $sum += $f_val;
+        }
+        else {
+            $sum -= $f_val;
+        }
+    }
+
+    bless \$sum;
+}
+
+*moebius_transform = \&moebius_inverse;
+
 sub dirichlet_hyperbola {
     my ($n, $f, $g, $F, $G) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
-    $f //= Sidef::Types::Block::Block->new(code => sub { ONE });
-    $g //= Sidef::Types::Block::Block->new(code => sub { ONE });
+    $f //= sub { 1 };
+    $g //= sub { 1 };
 
-    $F //= Sidef::Types::Block::Block->new(code => sub { $_[0] });
-    $G //= Sidef::Types::Block::Block->new(code => sub { $_[0] });
+    $F //= sub { $_[0] };
+    $G //= sub { $_[0] };
 
     my $s = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sqrt($s, $n);
@@ -27078,9 +27489,8 @@ sub dirichlet_hyperbola {
         $q_obj = bless \(my $value = Math::GMPz::Rmpz_init_set_ui(0));
     }
 
-    my $sum = 0;
-
     my ($f_r, $g_r, $F_r, $G_r);
+    my @terms;
 
     foreach my $k (1 .. Math::GMPz::Rmpz_get_ui($s)) {
 
@@ -27121,10 +27531,21 @@ sub dirichlet_hyperbola {
         $F_r = $$F_r if ref($F_r);
         $G_r = $$G_r if ref($G_r);
 
-        $sum = __add__($sum, __add__(__mul__($f_r, $G_r), __mul__($g_r, $F_r)));
+        push @terms,
+          (
+            (
+             HAS_PRIME_UTIL ? Math::Prime::Util::mulint($f_r, $G_r)
+             : Math::Prime::Util::GMP::mulint($f_r, $G_r)
+            ),
+            (
+             HAS_PRIME_UTIL ? Math::Prime::Util::mulint($g_r, $F_r)
+             : Math::Prime::Util::GMP::mulint($g_r, $F_r)
+            )
+          );
     }
 
-    my $s_obj = _set_int($s);
+    my $sum   = Math::Prime::Util::GMP::vecsum(@terms);
+    my $s_obj = bless \$s;
 
     $F_r = $F->($s_obj);
     $G_r = $G->($s_obj);
@@ -27132,10 +27553,11 @@ sub dirichlet_hyperbola {
     $F_r = $$F_r if ref($F_r);
     $G_r = $$G_r if ref($G_r);
 
-    $sum = __sub__($sum, __mul__($F_r, $G_r));
-    bless \$sum;
+    $sum = Math::Prime::Util::GMP::subint($sum, Math::Prime::Util::GMP::mulint($F_r, $G_r));
+    _set_int($sum);
 }
 
+*dsum          = \&dirichlet_hyperbola;
 *dirichlet_sum = \&dirichlet_hyperbola;
 
 sub sum_remainders {
@@ -27666,36 +28088,20 @@ sub udivisors {
 
     $n = _big2pistr($$n) // return _array();
 
+    my $pp = Math::GMPz::Rmpz_init();
+
     my @d;
     foreach my $pe (_factor_exp($n)) {
         my ($p, $e) = @$pe;
 
-        my $pp;
-
-        if ($e <= 2) {    # p^e where e <= 2
-
-            if (FAST_MODE and $p < ULONG_MAX) {
-                $pp = Math::GMPz::Rmpz_init_set_ui($p);
-            }
-            else {
-                $pp = Math::GMPz::Rmpz_init_set_str("$p", 10);
-            }
-
-            if ($e == 2) {
-                Math::GMPz::Rmpz_mul($pp, $pp, $pp);
-            }
+        if (FAST_MODE and $p < ULONG_MAX) {
+            ($e == 1)
+              ? Math::GMPz::Rmpz_set_ui($pp, $p)
+              : Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
         }
-        else {    # p^e where e >= 3
-
-            $pp = Math::GMPz::Rmpz_init();
-
-            if (FAST_MODE and $p < ULONG_MAX) {
-                Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($pp, "$p", 10);
-                Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
-            }
+        else {
+            Math::GMPz::Rmpz_set_str($pp, "$p", 10);
+            Math::GMPz::Rmpz_pow_ui($pp, $pp, $e) if ($e > 1);
         }
 
         my @t;
@@ -27706,7 +28112,7 @@ sub udivisors {
             push @t, $t;
         }
 
-        push @d, $pp;
+        push @d, Math::GMPz::Rmpz_init_set($pp);
         push @d, @t;
     }
 
@@ -27720,26 +28126,118 @@ sub udivisors {
 
 *unitary_divisors = \&udivisors;
 
+sub nudivisors {
+    my ($n) = @_;
+    _valid(\$n);
+    $n = _big2pistr($$n) // return _array();
+
+    my @uni;
+    my @non_uni;
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        my $p = Math::GMPz::Rmpz_init();
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        # Pre-compute all powers of p: p^1, p^2, ..., p^e
+        my @powers;
+        my $curr = Math::GMPz::Rmpz_init_set($p);
+        push @powers, $curr;
+        for my $i (2 .. $e) {
+            my $next_p = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($next_p, $powers[-1], $p);
+            push @powers, $next_p;
+        }
+
+        # Elements carrying over by multiplying with p^0 (which is 1)
+        my @next_uni     = map { Math::GMPz::Rmpz_init_set($_) } @uni;
+        my @next_non_uni = map { Math::GMPz::Rmpz_init_set($_) } @non_uni;
+
+        # 1. Handle intermediate (impure) powers: p^1 ... p^(e-1)
+        # Any multiplication here transitions a combination into being non-unitary
+        for my $i (1 .. $e - 1) {
+            my $pw = $powers[$i - 1];
+
+            # pw * 1 (implicit base)
+            push @next_non_uni, Math::GMPz::Rmpz_init_set($pw);
+
+            # pw * uni
+            foreach my $d (@uni) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($t, $pw, $d);
+                push @next_non_uni, $t;
+            }
+
+            # pw * non_uni
+            foreach my $d (@non_uni) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($t, $pw, $d);
+                push @next_non_uni, $t;
+            }
+        }
+
+        # 2. Handle the full (pure) power: p^e
+        # Multiplication here maintains the state (uni stays uni, non_uni stays non_uni)
+        my $pw_e = $powers[$e - 1];
+
+        # pw_e * 1 (implicit base)
+        push @next_uni, Math::GMPz::Rmpz_init_set($pw_e);
+
+        # pw_e * uni
+        foreach my $d (@uni) {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($t, $pw_e, $d);
+            push @next_uni, $t;
+        }
+
+        # pw_e * non_uni
+        foreach my $d (@non_uni) {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($t, $pw_e, $d);
+            push @next_non_uni, $t;
+        }
+
+        @uni     = @next_uni;
+        @non_uni = @next_non_uni;
+    }
+
+    @non_uni = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_uni;
+    @non_uni = map  { bless \$_ } @non_uni;
+
+    _array(\@non_uni);
+}
+
+*non_unitary_divisors = \&nudivisors;
+
 sub edivisors {    # OEIS: A322791
     my ($n) = @_;
 
     $n = _big2pistr($$n) // return _array();
 
-    my @d = (Math::GMPz::Rmpz_init_set_ui(1));
-    my $r = Math::GMPz::Rmpz_init();
+    my @d     = (Math::GMPz::Rmpz_init_set_ui(1));
+    my $r     = Math::GMPz::Rmpz_init();
+    my $p_gmp = Math::GMPz::Rmpz_init();
 
     foreach my $pe (_factor_exp($n)) {
         my ($p, $e) = @$pe;
 
+        my $is_fast = (FAST_MODE and $p < ULONG_MAX);
+
+        if (!$is_fast) {
+            Math::GMPz::Rmpz_set_str($p_gmp, $p, 10);
+        }
+
         my @t;
         foreach my $k (_divisors($e)) {
 
-            if (FAST_MODE and $p < ULONG_MAX) {
+            if ($is_fast) {
                 Math::GMPz::Rmpz_ui_pow_ui($r, $p, $k);
             }
             else {
-                Math::GMPz::Rmpz_set_str($r, $p, 10);
-                Math::GMPz::Rmpz_pow_ui($r, $r, $k) if ($k > 1);
+                Math::GMPz::Rmpz_pow_ui($r, $p_gmp, $k);
             }
 
             foreach my $u (@d) {
@@ -27760,6 +28258,82 @@ sub edivisors {    # OEIS: A322791
 
 *exponential_divisors = \&edivisors;
 
+sub nedivisors {
+    my ($n) = @_;
+
+    $n = _big2pistr($$n) // return _array();
+
+    my @exp = (Math::GMPz::Rmpz_init_set_ui(1));
+    my @non_exp;
+
+    my $p = Math::GMPz::Rmpz_init();
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        # Save current states from previous prime stages
+        my @curr_exp     = @exp;
+        my @curr_non_exp = @non_exp;
+
+        my @next_exp;
+        my @next_non_exp;
+
+        # Initialize r = p^0 = 1
+        my $r = Math::GMPz::Rmpz_init_set_ui(1);
+
+        for my $k (0 .. $e) {
+            my $is_safe = ($k > 0 && $e % $k == 0);
+
+            if ($is_safe) {
+
+                # Safe exponent choice (Exponential)
+                # Tracks maintain their current classification
+                foreach my $u (@curr_exp) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @next_exp, $t;
+                }
+                foreach my $u (@curr_non_exp) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @next_non_exp, $t;
+                }
+            }
+            else {
+                # Forbidden exponent choice (Non-exponential)
+                # Anything multiplied by this choice becomes non-exponential
+                foreach my $u (@curr_exp) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @next_non_exp, $t;
+                }
+                foreach my $u (@curr_non_exp) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @next_non_exp, $t;
+                }
+            }
+
+            # Progressively multiply to get the next power: r = r * p
+            Math::GMPz::Rmpz_mul($r, $r, $p) if ($k < $e);
+        }
+
+        @exp     = @next_exp;
+        @non_exp = @next_non_exp;
+    }
+
+    @non_exp = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_exp;
+    @non_exp = map  { bless \$_ } @non_exp;
+
+    _array(\@non_exp);
+}
+
+*non_exponential_divisors = \&nedivisors;
+
 sub idivisors {    # OEIS: A077609
     my ($n) = @_;
 
@@ -27767,14 +28341,14 @@ sub idivisors {    # OEIS: A077609
 
     my @d = ($ONE);
     my $r = Math::GMPz::Rmpz_init();
+    my $p = Math::GMPz::Rmpz_init();
 
     foreach my $pe (_factor_exp($n)) {
-        my ($p, $e) = @$pe;
+        my ($q, $e) = @$pe;
 
-        $p =
-          (FAST_MODE and $p < ULONG_MAX)
-          ? Math::GMPz::Rmpz_init_set_ui($p)
-          : Math::GMPz::Rmpz_init_set_str("$p", 10);
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
 
         my @t;
         Math::GMPz::Rmpz_set($r, $p);
@@ -27803,6 +28377,78 @@ sub idivisors {    # OEIS: A077609
 
 *infinitary_divisors = \&idivisors;
 
+sub nidivisors {
+    my ($n) = @_;
+
+    $n = _big2pistr($$n) // return _array();
+
+    my @inf = ($ONE);
+    my @non_inf;
+
+    my $r = Math::GMPz::Rmpz_init();
+    my $p = Math::GMPz::Rmpz_init();
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        # Save the current incoming states from previous prime factor stages
+        my @curr_inf     = @inf;
+        my @curr_non_inf = @non_inf;
+
+        # Initialize next states with k = 0 (p^0 = 1 is always an infinitary choice)
+        @inf     = map { Math::GMPz::Rmpz_init_set($_) } @curr_inf;
+        @non_inf = map { Math::GMPz::Rmpz_init_set($_) } @curr_non_inf;
+
+        Math::GMPz::Rmpz_set($r, $p);
+
+        foreach my $k (1 .. $e) {
+
+            if (($e & $k) == $k) {
+
+                # Safe component choice (Infinitary)
+                # Maintains the state classification of the multiplying factor
+                foreach my $u (@curr_inf) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @inf, $t;
+                }
+                foreach my $u (@curr_non_inf) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_inf, $t;
+                }
+            }
+            else {
+                # Forbidden component choice (Non-infinitary)
+                # Any factor multiplied by this choice transitions to non-infinitary
+                foreach my $u (@curr_inf) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_inf, $t;
+                }
+                foreach my $u (@curr_non_inf) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_inf, $t;
+                }
+            }
+
+            Math::GMPz::Rmpz_mul($r, $r, $p) if ($k < $e);
+        }
+    }
+
+    @non_inf = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_inf;
+    @non_inf = map  { bless \$_ } @non_inf;
+
+    _array(\@non_inf);
+}
+
+*non_infinitary_divisors = \&nidivisors;
+
 sub biudivisors {    # OEIS: A222266
     my ($n) = @_;
 
@@ -27812,14 +28458,14 @@ sub biudivisors {    # OEIS: A222266
     my @d = ($ONE);
     my $r = Math::GMPz::Rmpz_init();
     my $w = Math::GMPz::Rmpz_init();
+    my $p = Math::GMPz::Rmpz_init();
 
     foreach my $pe (_factor_exp($n)) {
-        my ($p, $e) = @$pe;
+        my ($q, $e) = @$pe;
 
-        $p =
-          (FAST_MODE and $p < ULONG_MAX)
-          ? Math::GMPz::Rmpz_init_set_ui($p)
-          : Math::GMPz::Rmpz_init_set_str("$p", 10);
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
 
         my @t;
         Math::GMPz::Rmpz_set($r, $p);
@@ -27851,23 +28497,99 @@ sub biudivisors {    # OEIS: A222266
 *bdivisors           = \&biudivisors;
 *bi_unitary_divisors = \&biudivisors;
 
+sub nbdivisors {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n, 0) // return _array();
+    Math::GMPz::Rmpz_sgn($n) > 0 or return _array();
+
+    my @biu = ($ONE);
+    my @non_biu;
+
+    my $r = Math::GMPz::Rmpz_init();
+    my $w = Math::GMPz::Rmpz_init();
+    my $p = Math::GMPz::Rmpz_init();
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        # Save the current incoming states for this prime factor stage
+        my @curr_biu     = @biu;
+        my @curr_non_biu = @non_biu;
+
+        # Initialize next states with k = 0 (equivalent to multiplying by p^0 = 1)
+        @biu     = map { Math::GMPz::Rmpz_init_set($_) } @curr_biu;
+        @non_biu = map { Math::GMPz::Rmpz_init_set($_) } @curr_non_biu;
+
+        Math::GMPz::Rmpz_set($r, $p);
+
+        foreach my $k (1 .. $e) {
+            Math::GMPz::Rmpz_divexact($w, $n, $r);
+
+            if ((bless \$w)->gcud(bless \$r)->is_one) {
+
+                # Safe component choice (Bi-unitary)
+                # Maintains the state classification of the multiplying factor
+                foreach my $u (@curr_biu) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @biu, $t;
+                }
+                foreach my $u (@curr_non_biu) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_biu, $t;
+                }
+            }
+            else {
+                # Forbidden component choice (Non-bi-unitary)
+                # Any factor multiplied by this choice becomes non-bi-unitary
+                foreach my $u (@curr_biu) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_biu, $t;
+                }
+                foreach my $u (@curr_non_biu) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_biu, $t;
+                }
+            }
+
+            Math::GMPz::Rmpz_mul($r, $r, $p) if ($k < $e);
+        }
+    }
+
+    @non_biu = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_biu;
+    @non_biu = map  { bless \$_ } @non_biu;
+
+    _array(\@non_biu);
+}
+
+*non_bi_unitary_divisors = \&nbdivisors;
+*nbiudivisors            = \&nbdivisors;
+
 sub prime_power_divisors {
     my ($n) = @_;
 
     $n = _big2pistr($$n) // return _array();
 
     my $u = Math::GMPz::Rmpz_init();
+    my $p = Math::GMPz::Rmpz_init();
 
     my @d;
     foreach my $pe (_factor_exp($n)) {
-        my ($p, $e) = @$pe;
+        my ($q, $e) = @$pe;
 
-        $p =
-          (FAST_MODE and $p < ULONG_MAX)
-          ? Math::GMPz::Rmpz_init_set_ui($p)
-          : Math::GMPz::Rmpz_init_set_str("$p", 10);
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
 
-        push @d, $p;
+        push @d, (($q < ULONG_MAX) ? $q : Math::GMPz::Rmpz_init_set($p));
         next if ($e == 1);
 
         Math::GMPz::Rmpz_set($u, $p);
@@ -27878,7 +28600,7 @@ sub prime_power_divisors {
         }
     }
 
-    @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+    @d = sort { $a <=> $b } @d;
     @d = map  { bless \$_ } @d;
 
     _array(\@d);
@@ -27893,32 +28615,14 @@ sub prime_power_udivisors {
     foreach my $pe (_factor_exp($n)) {
         my ($p, $e) = @$pe;
 
-        my $pp;
+        my $pp = Math::GMPz::Rmpz_init();
 
-        if ($e <= 2) {    # p^e where e <= 2
-
-            if (FAST_MODE and $p < ULONG_MAX) {
-                $pp = Math::GMPz::Rmpz_init_set_ui($p);
-            }
-            else {
-                $pp = Math::GMPz::Rmpz_init_set_str("$p", 10);
-            }
-
-            if ($e == 2) {
-                Math::GMPz::Rmpz_mul($pp, $pp, $pp);
-            }
+        if (FAST_MODE and $p < ULONG_MAX) {
+            Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
         }
-        else {    # p^e where e >= 3
-
-            $pp = Math::GMPz::Rmpz_init();
-
-            if (FAST_MODE and $p < ULONG_MAX) {
-                Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($pp, $p, 10);
-                Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
-            }
+        else {
+            Math::GMPz::Rmpz_set_str($pp, "$p", 10);
+            Math::GMPz::Rmpz_pow_ui($pp, $pp, $e) if ($e > 1);
         }
 
         push @d, $pp;
@@ -27945,7 +28649,7 @@ sub powerfree_divisors {
         return _array([ONE]);
     }
 
-    my $r = Math::GMPz::Rmpz_init();
+    state $r = Math::GMPz::Rmpz_init_nobless();
 
     my @d;
     foreach my $pe (_factor_exp($n)) {
@@ -27992,20 +28696,124 @@ sub cubefree_divisors {
     (THREE)->powerfree_divisors($_[0]);
 }
 
+sub powerful_divisors {
+    my ($k, $n) = @_;
+
+    _valid(\$n);
+
+    $n = _big2pistr($$n) // return _array();
+    $k = _any2ui($$k) || return _array();
+
+    state $r = Math::GMPz::Rmpz_init_nobless();
+    state $p = Math::GMPz::Rmpz_init_nobless();
+
+    my @d;
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        next if ($e < $k);    # cannot be k-powerful if e < k
+
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        Math::GMPz::Rmpz_pow_ui($r, $p, $k);
+
+        my @t;
+        my $lim = $e - $k + 1;
+        foreach my $i (1 .. $lim) {
+            foreach my $d (@d) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($t, $r, $d);
+                push @t, $t;
+            }
+            push @t, Math::GMPz::Rmpz_init_set($r);
+            Math::GMPz::Rmpz_mul($r, $r, $p) if ($i < $lim);
+        }
+        push @d, @t;
+    }
+    @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+    @d = map  { bless \$_ } @d;
+    unshift @d, ONE;
+    _array(\@d);
+}
+
+sub squarefull_divisors {
+    (TWO)->powerful_divisors($_[0]);
+}
+
+sub cubefull_divisors {
+    (THREE)->powerful_divisors($_[0]);
+}
+
+sub powerful_udivisors {
+    my ($k, $n) = @_;
+    _valid(\$n);
+    $n = _big2pistr($$n) // return _array();
+    $k = _any2ui($$k) || return _array();
+
+    state $r = Math::GMPz::Rmpz_init_nobless();
+    state $p = Math::GMPz::Rmpz_init_nobless();
+    my @d;
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        next if ($e < $k);    # cannot be k-powerful if e < k
+
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        Math::GMPz::Rmpz_pow_ui($r, $p, $e);
+
+        my @t;
+        foreach my $d (@d) {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($t, $r, $d);
+            push @t, $t;
+        }
+        push @t, Math::GMPz::Rmpz_init_set($r);
+        push @d, @t;
+    }
+
+    @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+    @d = map  { bless \$_ } @d;
+    unshift @d, ONE;
+
+    _array(\@d);
+}
+
+*unitary_powerful_divisors = \&powerful_udivisors;
+*powerful_unitary_divisors = \&powerful_udivisors;
+
+sub squarefull_udivisors {
+    (TWO)->powerful_udivisors($_[0]);
+}
+
+*squarefull_unitary_divisors = \&squarefull_udivisors;
+*unitary_squarefull_divisors = \&squarefull_udivisors;
+
+sub cubefull_udivisors {
+    (THREE)->powerful_udivisors($_[0]);
+}
+
+*cubefull_unitary_divisors = \&cubefull_udivisors;
+*unitary_cubefull_divisors = \&cubefull_udivisors;
+
 my $power_divisors_func = sub {
     my ($k, $factor_exp) = @_;
 
     my @d = ($ONE);
     my $r = Math::GMPz::Rmpz_init();
+    my $p = Math::GMPz::Rmpz_init();
 
     foreach my $pe (grep { $_->[1] >= $k } @$factor_exp) {
+        my ($q, $e) = @$pe;
 
-        my ($p, $e) = @$pe;
-
-        $p =
-          (FAST_MODE and $p < ULONG_MAX)
-          ? Math::GMPz::Rmpz_init_set_ui($p)
-          : Math::GMPz::Rmpz_init_set_str("$p", 10);
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, $q, 10);
 
         my @t;
         for (my $i = $k ; $i <= $e ; $i += $k) {
@@ -28072,14 +28880,15 @@ sub cube_divisors {
 my $power_udivisors_func = sub {
     my ($k, $factor_exp) = @_;
 
+    my $pp = Math::GMPz::Rmpz_init();
+
     my @d = ($ONE);
     foreach my $pe (grep { $_->[1] % $k == 0 } @$factor_exp) {
-        my ($p, $e) = @$pe;
+        my ($q, $e) = @$pe;
 
-        my $pp =
-          (FAST_MODE and $p < ULONG_MAX)
-          ? Math::GMPz::Rmpz_init_set_ui($p)
-          : Math::GMPz::Rmpz_init_set_str("$p", 10);
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($pp, $q)
+          : Math::GMPz::Rmpz_set_str($pp, $q, 10);
 
         if ($e == 2) {
             Math::GMPz::Rmpz_mul($pp, $pp, $pp);
@@ -28294,7 +29103,8 @@ sub exp_mangoldt_sum {
 sub primitive_part {
     my ($n, $f) = @_;
     $f // return $n->exp_mangoldt;
-    my $z = _any2mpz($$n, 5) // goto &nan;
+
+    my $z = _any2mpz($$n) // goto &nan;
 
     my (@u, @v);
 
@@ -28390,7 +29200,7 @@ sub euler_phi {
 *euler_totient = \&euler_phi;
 *totient       = \&euler_phi;
 
-sub totient_sum {
+sub phi_sum {
     my ($n, $k) = @_;
 
     # TODO: use a faster formula
@@ -28400,12 +29210,17 @@ sub totient_sum {
 
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
+    if (HAS_PRIME_UTIL and $k == 1) {
+        $n = _big2uistr($$n) // return ZERO;
+        return _set_int(Math::Prime::Util::sumtotient($n));
+    }
+
     my $k_obj = bless \$k;
 
     my $f = sub { $_[0]->ipow($k_obj) };
     my $g = sub { $_[0]->moebius };
 
-    my $F = sub { $_[0]->faulhaber_sum($k_obj) };
+    my $F = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $k)) };
     my $G = sub { $_[0]->mertens };
 
     if ($k == 1) {
@@ -28418,8 +29233,30 @@ sub totient_sum {
     $n->dirichlet_hyperbola($f, $g, $F, $G);
 }
 
-*euler_phi_sum      = \&totient_sum;
-*jordan_totient_sum = \&totient_sum;
+*totient_sum            = \&phi_sum;
+*euler_phi_sum      = \&phi_sum;
+*jordan_totient_sum = \&phi_sum;
+
+sub cototient {
+    my ($n, $k) = @_;
+
+    if ($n->is_zero) {
+        return ZERO;
+    }
+
+    if (!defined($k)) {
+        return $n->sub($n->euler_phi);
+    }
+
+    $k //= ONE;
+    $n->ipow($k)->sub($n->jordan_totient($k));
+}
+
+sub cototient_sum {
+    my ($n, $k) = @_;
+    $k //= ONE;
+    $n->faulhaber_sum($k)->sub($n->phi_sum($k));
+}
 
 sub _n_over_d_divisors {
     my ($N, $d, $u, $D) = @_;
@@ -29344,7 +30181,7 @@ sub dedekind_psi_sum {
     my $g = sub { $_[0]->ipow($k_obj) };
 
     my $F = sub { $_[0]->squarefree_count };
-    my $G = sub { $_[0]->faulhaber_sum($k_obj) };
+    my $G = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $k)) };
 
     if ($k == 0) {
         $g = sub { 1 };
@@ -29727,6 +30564,79 @@ sub usigma {
     bless \_binsplit(\@terms, \&__mul__);
 }
 
+sub usigma_sum {
+    my ($n, $k) = @_;
+
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $n = _big2uistr($$n) // goto &nan;
+
+    # Fast sublinear path for k=0: sum_{i=1..n} 2^omega(i)
+    if (HAS_PRIME_UTIL and $k == 0) {
+        return _set_int($n)->exp_omega_sum(TWO);
+    }
+
+    my $s  = Math::Prime::Util::GMP::sqrtint($n);
+    my $ss = Math::Prime::Util::GMP::sqrtint($s);
+
+    my @M = (0);
+    my @F = (0);
+
+    my @moebius =
+      HAS_PRIME_UTIL
+      ? Math::Prime::Util::moebius(0, $s)
+      : Math::Prime::Util::GMP::moebius(0, $s);
+
+    # Precompute F(i) = mu(i) * i^k and its prefix sums M(i)
+    for my $i (1 .. $s) {
+        my $mu = $moebius[$i];
+
+        if ($mu == 0) {
+            push @F, 0;
+            push @M, $M[-1];
+            next;
+        }
+
+        my $ik = ($k == 0) ? 1 : ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
+        my $t  = $mu == -1 ? "-$ik" : $ik;
+
+        push @F, $t;
+        push @M, Math::Prime::Util::GMP::addint($M[-1], $t);
+    }
+
+    # Compute Part A: Sum_{i=1..ss} F[i] * sigma_sum(floor(n / i^2), k)
+    my @terms;
+    for my $i (1 .. $ss) {
+        $F[$i] || next;
+
+        my $i2   = Math::Prime::Util::GMP::mulint($i, $i);
+        my $nod2 = Math::Prime::Util::GMP::divint($n, $i2);
+
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], _sigma_sum($nod2, $k));
+    }
+
+    # Compute Part B: Sum_{i=1..s} sigma_k(i) * M[floor(sqrt(floor(n / i)))]
+    for my $i (1 .. $s) {
+        my $div_sum =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divisor_sum($i, $k)
+          : Math::Prime::Util::GMP::sigma($i, $k);
+
+        my $m_idx = Math::Prime::Util::GMP::sqrtint(Math::Prime::Util::GMP::divint($n, $i));
+        push @terms, Math::Prime::Util::GMP::mulint($div_sum, $M[$m_idx]);
+    }
+
+    my $total = Math::Prime::Util::GMP::vecsum(@terms);
+
+    # Final result: A + B - sigma_sum(s, k) * M[ss]
+    $total = Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint(_sigma_sum($s, $k), $M[$ss]));
+
+    _set_int($total);
+}
+
+sub usigma0_sum {
+    $_[0]->usigma_sum(ZERO);
+}
+
 sub nisigma0 {    # A348341: count non-infinitary divisors of n
     my ($n) = @_;
     $n->sigma0->sub($n->isigma0);
@@ -29737,6 +30647,16 @@ sub nisigma {    # A348271: sum of non-infinitary divisors of n
     $n->sigma($k)->sub($n->isigma($k));
 }
 
+sub nisigma_sum {
+    my ($n, $k) = @_;
+    $n->sigma_sum($k)->sub($n->isigma_sum($k));
+}
+
+sub nisigma0_sum {
+    my ($n) = @_;
+    $n->sigma0_sum->sub($n->isigma0_sum);
+}
+
 sub nusigma0 {    # A048105: count of non-unitary divisors of n
     my ($n) = @_;
     $n->sigma0->sub($n->usigma0);
@@ -29745,6 +30665,16 @@ sub nusigma0 {    # A048105: count of non-unitary divisors of n
 sub nusigma {    # A048146: sum of non-unitary divisors of n
     my ($n, $k) = @_;
     $n->sigma($k)->sub($n->usigma($k));
+}
+
+sub nusigma_sum {
+    my ($n, $k) = @_;
+    $n->sigma_sum($k)->sub($n->usigma_sum($k));
+}
+
+sub nusigma0_sum {
+    my ($n) = @_;
+    $n->sigma0_sum->sub($n->usigma0_sum);
 }
 
 sub bsigma0 {    # A286324: count of bi-unitary divisors of n.
@@ -29819,7 +30749,85 @@ sub bsigma {    # A188999: Bi-unitary sigma: sum of the bi-unitary divisors of n
 
 *biusigma = \&bsigma;
 
-sub nbsigma0 {    # Axxxxxx: count of non-bi-unitary divisors of n
+sub _bsigma_squarefull_aux {
+    my ($n, $k) = @_;
+
+    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+        return Math::Prime::Util::vecprod(
+            map {
+                my ($p, $e) = @$_;
+                $e == 2           ? ($k == 1 ? (-$p) : join('', '-', Math::Prime::Util::GMP::powint($p, $k)))
+                  : ($e % 2 == 0) ? Math::Prime::Util::mulint(-2, Math::Prime::Util::powint($p, $k * ($e >> 1)))
+                  :   Math::Prime::Util::addint(Math::Prime::Util::powint($p, $k * (($e >> 1) + 1)), Math::Prime::Util::powint($p, ($e >> 1) * $k));
+            } grep { $_->[1] >= 2 } Math::Prime::Util::factor_exp($n)
+        );
+    }
+
+    Math::Prime::Util::GMP::vecprod(
+        map {
+            my ($p, $e) = @$_;
+            $e == 2           ? (($k == 1) ? "-$p" : ('-' . Math::Prime::Util::GMP::powint($p, $k)))
+              : ($e % 2 == 0) ? Math::Prime::Util::GMP::mulint(-2, Math::Prime::Util::GMP::powint($p, $k * ($e >> 1)))
+              :   Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::powint($p, $k * (($e >> 1) + 1)), Math::Prime::Util::GMP::powint($p, ($e >> 1) * $k));
+        } grep { $_->[1] >= 2 } _factor_exp($n)
+    );
+}
+
+sub bsigma_sum {
+    my ($n, $k) = @_;
+
+    $n = _big2uistr($$n) // return ZERO;
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+    my $s = Math::Prime::Util::GMP::sqrtint($n);
+    my $P = HAS_PRIME_UTIL ? Math::Prime::Util::powerful_numbers(1, $n) : [map { $$_ } @{_set_int($n)->squarefull}];
+
+    my @F = ();
+    my @S = (0);
+
+    foreach my $m (@$P) {
+        my $t = _bsigma_squarefull_aux($m, $k);
+        push(@F, $t) if !($m > $s);
+        push @S, HAS_PRIME_UTIL
+          ? Math::Prime::Util::addint($S[-1], $t)
+          : Math::Prime::Util::GMP::addint($S[-1], $t);
+    }
+
+    my @terms;
+    foreach my $i (0 .. $#F) {
+        my $n_div_p = Math::Prime::Util::GMP::divint($n, $P->[$i]);
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], _sigma_sum($n_div_p, $k));
+    }
+
+    foreach my $m (1 .. $s) {
+        my $t =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($n, $m)
+          : Math::Prime::Util::GMP::divint($n, $m);
+        my $c =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powerful_count($t)
+          : Math::Prime::Util::GMP::powerful_count($t);
+        my $sig_k_m =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divisor_sum($m, $k)
+          : Math::Prime::Util::GMP::sigma($m, $k);
+        push @terms, HAS_PRIME_UTIL
+          ? Math::Prime::Util::mulint($sig_k_m, $S[$c])
+          : Math::Prime::Util::GMP::mulint($sig_k_m, $S[$c]);
+    }
+
+    my $A = Math::Prime::Util::GMP::vecsum(@terms);
+    my $B = Math::Prime::Util::GMP::mulint(_sigma_sum($s, $k), $S[Math::Prime::Util::GMP::powerful_count($s)]);
+
+    _set_int(Math::Prime::Util::GMP::subint($A, $B));
+}
+
+sub bsigma0_sum {
+    $_[0]->bsigma_sum(ZERO);
+}
+
+sub nbsigma0 {    # A390957: count of non-bi-unitary divisors of n
     my ($n) = @_;
     $n->sigma0->sub($n->bsigma0);
 }
@@ -29827,6 +30835,16 @@ sub nbsigma0 {    # Axxxxxx: count of non-bi-unitary divisors of n
 sub nbsigma {    # A319072: sum of non-bi-unitary divisors of n.
     my ($n, $k) = @_;
     $n->sigma($k)->sub($n->bsigma($k));
+}
+
+sub nbsigma_sum {
+    my ($n, $k) = @_;
+    $n->sigma_sum($k)->sub($n->bsigma_sum($k));
+}
+
+sub nbsigma0_sum {
+    my ($n) = @_;
+    $n->sigma0_sum->sub($n->bsigma0_sum);
 }
 
 sub isigma0 {    # A037445: count of infinitary divisors (or i-divisors) of n
@@ -29892,6 +30910,111 @@ sub isigma {    # A049417: sum of infinitary divisors of n
 
     @terms || return ONE;
     bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub _isigma_squarefull_aux {
+    my ($n, $k) = @_;
+
+    state %cache;
+
+    if (scalar(%cache) > 1e6) {
+        undef %cache;
+    }
+
+    Math::Prime::Util::GMP::vecprod(
+        map {
+            my ($p, $e) = @$_;
+
+            $cache{$p}{$e}{$k} //= do {
+                my $pk        = ($k == 1) ? $p : Math::Prime::Util::GMP::powint($p, $k);
+                my $pk_plus_1 = Math::Prime::Util::GMP::addint($pk, 1);
+
+                my @pow_vals = ($pk);
+                my @isig_res;
+
+                for my $exp ($e, $e - 1, $e - 2) {
+                    if ($exp == 0) {
+                        push @isig_res, 1;
+                        next;
+                    }
+                    my $ans  = 1;
+                    my $i    = 0;
+                    my $temp = $exp;
+                    while ($temp > 0) {
+                        if ($temp & 1) {
+                            while (@pow_vals <= $i) {
+                                push @pow_vals, Math::Prime::Util::GMP::mulint($pow_vals[-1], $pow_vals[-1]);
+                            }
+                            $ans = Math::Prime::Util::GMP::mulint($ans, Math::Prime::Util::GMP::addint($pow_vals[$i], 1));
+                        }
+                        $temp >>= 1;
+                        $i++;
+                    }
+                    push @isig_res, $ans;
+                }
+
+                my ($t1, $t2_raw, $t3_raw) = @isig_res;
+                my $t2 = Math::Prime::Util::GMP::mulint($pk_plus_1, $t2_raw);
+                my $t3 = Math::Prime::Util::GMP::mulint($pk,        $t3_raw);
+
+                Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::subint($t1, $t2), $t3);
+            };
+        } grep { $_->[1] >= 2 } (HAS_PRIME_UTIL ? Math::Prime::Util::factor_exp($n) : _factor_exp($n))
+    );
+}
+
+sub isigma_sum {
+    my ($n, $k) = @_;
+
+    $n = _big2uistr($$n) // return ZERO;
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+    my $s = Math::Prime::Util::GMP::sqrtint($n);
+    my $P = HAS_PRIME_UTIL ? Math::Prime::Util::powerful_numbers(1, $n) : [map { $$_ } @{_set_int($n)->squarefull}];
+
+    my @F = ();
+    my @S = (0);
+
+    foreach my $m (@$P) {
+        my $t = _isigma_squarefull_aux($m, $k);
+        push(@F, $t) if !($m > $s);
+        push @S, HAS_PRIME_UTIL
+          ? Math::Prime::Util::addint($S[-1], $t)
+          : Math::Prime::Util::GMP::addint($S[-1], $t);
+    }
+
+    my @terms;
+    foreach my $i (0 .. $#F) {
+        my $n_div_p = Math::Prime::Util::GMP::divint($n, $P->[$i]);
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], _sigma_sum($n_div_p, $k));
+    }
+
+    foreach my $m (1 .. $s) {
+        my $t =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($n, $m)
+          : Math::Prime::Util::GMP::divint($n, $m);
+        my $c =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powerful_count($t)
+          : Math::Prime::Util::GMP::powerful_count($t);
+        my $sig_k_m =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divisor_sum($m, $k)
+          : Math::Prime::Util::GMP::sigma($m, $k);
+        push @terms, HAS_PRIME_UTIL
+          ? Math::Prime::Util::mulint($sig_k_m, $S[$c])
+          : Math::Prime::Util::GMP::mulint($sig_k_m, $S[$c]);
+    }
+
+    my $A = Math::Prime::Util::GMP::vecsum(@terms);
+    my $B = Math::Prime::Util::GMP::mulint(_sigma_sum($s, $k), $S[Math::Prime::Util::GMP::powerful_count($s)]);
+
+    _set_int(Math::Prime::Util::GMP::subint($A, $B));
+}
+
+sub isigma0_sum {
+    $_[0]->isigma_sum(ZERO);
 }
 
 sub esigma0 {    # A049419: count of exponential divisors (or e-divisors) of n.
@@ -30040,15 +31163,95 @@ sub uphi {    # OEIS: A047994
     bless \_binsplit(\@terms, \&__mul__);
 }
 
-sub nuphi {    # OEIS: A254503
-    my ($n) = @_;
+sub _uphi_squarefull_aux {    # OEIS: A396336
+    my ($n, $k) = @_;
 
-    # TODO: generalize for k > 1.
+    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+        return Math::Prime::Util::vecprod(
+            map {
+                my ($p, $e) = @$_;
+                Math::Prime::Util::mulint(
+                                          ($e - 1),
+                                          (
+                                             ($k == 1)
+                                           ? ($p - 1)
+                                           : Math::Prime::Util::subint(Math::Prime::Util::powint($p, $k), 1)
+                                          )
+                                         )
+            } grep { $_->[1] >= 2 } Math::Prime::Util::factor_exp($n)
+        );
+    }
+
+    Math::Prime::Util::GMP::vecprod(
+        map {
+            my ($p, $e) = @$_;
+            Math::Prime::Util::GMP::mulint(($e - 1),
+                                           ($k == 1)
+                                           ? Math::Prime::Util::GMP::subint($p,                                     1)
+                                           : Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::powint($p, $k), 1))
+        } grep { $_->[1] >= 2 } _factor_exp($n)
+    );
+}
+
+sub uphi_sum {
+    my ($n, $j) = @_;
+
+    $n = _big2uistr($$n) // return ZERO;
+    $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+
+    my $s = Math::Prime::Util::GMP::sqrtint($n);
+    my $P = HAS_PRIME_UTIL ? Math::Prime::Util::powerful_numbers(1, $n) : [map { $$_ } @{_set_int($n)->squarefull}];
+
+    my @F = ();
+    my @S = (0);
+
+    foreach my $k (@$P) {
+        my $t = _uphi_squarefull_aux($k, $j);
+        push(@F, $t) if !($k > $s);
+        push @S, HAS_PRIME_UTIL
+          ? Math::Prime::Util::addint($S[-1], $t)
+          : Math::Prime::Util::GMP::addint($S[-1], $t);
+    }
+
+    my $j_obj = bless \$j;
+
+    my @terms;
+    foreach my $i (0 .. $#F) {
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], ${_set_int(Math::Prime::Util::GMP::divint($n, $P->[$i]))->phi_sum($j_obj)});
+    }
+
+    foreach my $k (1 .. $s) {
+        my $t =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($n, $k)
+          : Math::Prime::Util::GMP::divint($n, $k);
+        my $c =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powerful_count($t)
+          : Math::Prime::Util::GMP::powerful_count($t);
+        my $Jk =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::jordan_totient($j, $k)
+          : Math::Prime::Util::GMP::jordan_totient($j, $k);
+        push @terms, HAS_PRIME_UTIL
+          ? Math::Prime::Util::mulint($Jk, $S[$c])
+          : Math::Prime::Util::GMP::mulint($Jk, $S[$c]);
+    }
+
+    my $A = Math::Prime::Util::GMP::vecsum(@terms);
+    my $B = Math::Prime::Util::GMP::mulint(${_set_int($s)->phi_sum($j_obj)}, $S[Math::Prime::Util::GMP::powerful_count($s)]);
+
+    _set_int(Math::Prime::Util::GMP::subint($A, $B));
+}
+
+sub nuphi {    # OEIS: A254503 (Generalized for k)
+    my ($n, $k) = @_;
 
     # Multiplicative with:
-    #   a(p) = p
-    #   a(p^e) = phi(p^e) = (p-1) * p^(e-1), for e > 1.
+    #   a(p, k) = p^k
+    #   a(p^e, k) = J_k(p^e) = (p^k - 1) * p^(k*(e-1)), for e > 1.
 
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
     $n = $$n;
 
     if (ref($n)) {
@@ -30069,21 +31272,41 @@ sub nuphi {    # OEIS: A254503
 
         if (FAST_MODE and $p < ULONG_MAX) {
 
-            if ($e == 1) {
+            if ($e == 1 and $k == 1) {    # Optimization for e=1, k=1
                 push @terms, $p;
                 next;
             }
 
-            Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e - 1);
-            Math::GMPz::Rmpz_mul_ui($t, $t, $p - 1);
+            if ($e == 1) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+            }
+            else {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * ($e - 1));
+                if ($k == 1) {
+                    Math::GMPz::Rmpz_mul_ui($t, $t, $p - 1);
+                }
+                else {
+                    Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k);
+                    Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+                    Math::GMPz::Rmpz_mul($t, $t, $u);
+                }
+            }
         }
         elsif ($e == 1) {
             Math::GMPz::Rmpz_set_str($t, "$p", 10);
+            Math::GMPz::Rmpz_pow_ui($t, $t, $k) if $k > 1;
         }
         else {
             Math::GMPz::Rmpz_set_str($u, "$p", 10);
-            Math::GMPz::Rmpz_pow_ui($t, $u, $e - 1);
-            Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            Math::GMPz::Rmpz_pow_ui($t, $u, $k * ($e - 1));
+
+            if ($k == 1) {
+                Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            }
+            else {
+                Math::GMPz::Rmpz_pow_ui($u, $u, $k);
+                Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            }
             Math::GMPz::Rmpz_mul($t, $t, $u);
         }
 
@@ -30097,6 +31320,66 @@ sub nuphi {    # OEIS: A254503
 
     @terms || return ONE;
     bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub nuphi_sum {
+    my ($n, $k) = @_;
+
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $n = _big2uistr($$n) // goto &nan;
+
+    my $s  = Math::Prime::Util::GMP::sqrtint($n);
+    my $ss = Math::Prime::Util::GMP::sqrtint($s);
+
+    my @M = (0);
+    my @F = (0);
+
+    my @moebius =
+      HAS_PRIME_UTIL
+      ? Math::Prime::Util::moebius(0, $s)
+      : Math::Prime::Util::GMP::moebius(0, $s);
+
+    # Precompute F(i) = mu(i) * i^k and its prefix sums M(i)
+    for my $i (1 .. $s) {
+        my $mu = $moebius[$i];
+
+        if ($mu == 0) {
+            push @F, 0;
+            push @M, $M[-1];
+            next;
+        }
+
+        my $ik = ($k == 0) ? 1 : ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
+        my $t  = $mu == -1 ? "-$ik" : $ik;
+
+        push @F, $t;
+        push @M, Math::Prime::Util::GMP::addint($M[-1], $t);
+    }
+
+    my @terms;
+    for my $i (1 .. $ss) {
+        $F[$i] || next;
+
+        my $i2   = Math::Prime::Util::GMP::mulint($i, $i);
+        my $nod2 = Math::Prime::Util::GMP::divint($n, $i2);
+
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], Math::Prime::Util::GMP::powersum($nod2, $k));
+    }
+
+    for my $i (1 .. $s) {
+        my $div_sum =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powint($i, $k)
+          : Math::Prime::Util::GMP::powint($i, $k);
+
+        my $m_idx = Math::Prime::Util::GMP::sqrtint(Math::Prime::Util::GMP::divint($n, $i));
+        push @terms, Math::Prime::Util::GMP::mulint($div_sum, $M[$m_idx]);
+    }
+
+    my $total = Math::Prime::Util::GMP::vecsum(@terms);
+    $total = Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::powersum($s, $k), $M[$ss]));
+
+    _set_int($total);
 }
 
 sub iphi {    # OEIS: A091732 -- infinitary analog of Euler's phi function
@@ -30147,6 +31430,131 @@ sub iphi {    # OEIS: A091732 -- infinitary analog of Euler's phi function
 
     @terms || return ONE;
     bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub _iphi_squarefull_aux {
+    my ($n, $k) = @_;
+
+    state %cache;
+
+    if (scalar(%cache) > 1e6) {
+        undef %cache;
+    }
+
+    Math::Prime::Util::GMP::vecprod(
+        map {
+            my ($p, $e) = @$_;
+
+            $cache{$p}{$e}{$k} //= do {
+                my $pk = Math::Prime::Util::GMP::powint($p, $k);
+
+                my @P = ($pk);
+                my @T = (Math::Prime::Util::GMP::subint($pk, "1"));
+                my @h = ("1", "0");
+                my @J = ("0", $T[0]);
+
+                for my $i (2 .. $e) {
+                    my $iphi = "1";
+                    for (my ($temp_i, $bit) = ($i, 0) ; $temp_i > 0 ; ($temp_i >>= 1, $bit++)) {
+                        if ($temp_i & 1) {
+                            while (@P <= $bit) {
+                                push @P, HAS_PRIME_UTIL
+                                  ? Math::Prime::Util::mulint($P[-1], $P[-1])
+                                  : Math::Prime::Util::GMP::mulint($P[-1], $P[-1]);
+                                push @T, HAS_PRIME_UTIL
+                                  ? Math::Prime::Util::subint($P[-1], 1)
+                                  : Math::Prime::Util::GMP::subint($P[-1], "1");
+                            }
+                            $iphi =
+                              HAS_PRIME_UTIL
+                              ? Math::Prime::Util::mulint($iphi, $T[$bit])
+                              : Math::Prime::Util::GMP::mulint($iphi, $T[$bit]);
+                        }
+                    }
+
+                    my @terms;
+                    for my $m (1 .. $i) {
+                        next if $h[$i - $m] eq "0";
+                        while (@J <= $m) {
+                            push @J, HAS_PRIME_UTIL
+                              ? Math::Prime::Util::mulint($J[-1], $pk)
+                              : Math::Prime::Util::GMP::mulint($J[-1], $pk);
+                        }
+                        push @terms, HAS_PRIME_UTIL
+                          ? Math::Prime::Util::mulint($J[$m], $h[$i - $m])
+                          : Math::Prime::Util::GMP::mulint($J[$m], $h[$i - $m]);
+                    }
+                    my $sum =
+                      HAS_PRIME_UTIL
+                      ? Math::Prime::Util::vecsum(@terms)
+                      : Math::Prime::Util::GMP::vecsum(@terms);
+                    push @h, HAS_PRIME_UTIL
+                      ? Math::Prime::Util::subint($iphi, $sum)
+                      : Math::Prime::Util::GMP::subint($iphi, $sum);
+                }
+                $h[$e];
+            };
+        } grep { $_->[1] >= 2 } (HAS_PRIME_UTIL ? Math::Prime::Util::factor_exp($n) : _factor_exp($n))
+    );
+}
+
+sub iphi_sum {
+    my ($n, $j) = @_;
+
+    $n = _big2uistr($$n) // return ZERO;
+    $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+
+    if ($j == 0) {
+        $n eq '0' and return ZERO;
+        return ONE;
+    }
+
+    my $s = Math::Prime::Util::GMP::sqrtint($n);
+    my $P =
+      HAS_PRIME_UTIL
+      ? Math::Prime::Util::powerful_numbers(1, $n)
+      : [map { $$_ } @{_set_int($n)->squarefull}];
+
+    my @F = ();
+    my @S = (0);
+
+    foreach my $k (@$P) {
+        my $t = _iphi_squarefull_aux($k, $j);
+        push(@F, $t) if !($k > $s);
+        push @S, HAS_PRIME_UTIL
+          ? Math::Prime::Util::addint($S[-1], $t)
+          : Math::Prime::Util::GMP::addint($S[-1], $t);
+    }
+
+    my $j_obj = bless \$j;
+
+    my @terms;
+    foreach my $i (0 .. $#F) {
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], ${_set_int(Math::Prime::Util::GMP::divint($n, $P->[$i]))->phi_sum($j_obj)});
+    }
+
+    foreach my $k (1 .. $s) {
+        my $t =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($n, $k)
+          : Math::Prime::Util::GMP::divint($n, $k);
+        my $c =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powerful_count($t)
+          : Math::Prime::Util::GMP::powerful_count($t);
+        my $Jk =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::jordan_totient($j, $k)
+          : Math::Prime::Util::GMP::jordan_totient($j, $k);
+        push @terms, HAS_PRIME_UTIL
+          ? Math::Prime::Util::mulint($Jk, $S[$c])
+          : Math::Prime::Util::GMP::mulint($Jk, $S[$c]);
+    }
+
+    my $A = Math::Prime::Util::GMP::vecsum(@terms);
+    my $B = Math::Prime::Util::GMP::mulint(${_set_int($s)->phi_sum($j_obj)}, $S[Math::Prime::Util::GMP::powerful_count($s)]);
+
+    _set_int(Math::Prime::Util::GMP::subint($A, $B));
 }
 
 sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient function of n.
@@ -30207,7 +31615,9 @@ sub pillai {    # OEIS: A018804 -- Pillai's arithmetical function: Sum_{k=1..n} 
     else {
         $n < 0 and goto &nan;
     }
+
     $n eq '0' and return ZERO;
+    $k == 0   and return ONE;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
     state $u = Math::GMPz::Rmpz_init_nobless();
@@ -30268,20 +31678,20 @@ sub pillai_sum {
         $f = sub { $_[0]->mul($_[0]->tau) };
     }
 
-#<<<
-    # Alternative formula (slightly slower)
-    #~ my $f = sub { $_[0]->jordan_totient($k_obj) };
-    #~ my $g = sub { $_[0]->ipow($k_obj) };
+    # Alternative convolution:
+    if (HAS_PRIME_UTIL and $k == 1) {
+        $f = sub { $_[0]->jordan_totient($k_obj) };
+        $g = sub { $_[0]->ipow($k_obj) };
 
-    #~ my $F = sub { $_[0]->totient_sum($k_obj) };
-    #~ my $G = sub { $_[0]->faulhaber_sum($k_obj) };
+        $F = sub { $_[0]->phi_sum($k_obj) };
+        $G = sub { $_[0]->faulhaber_sum($k_obj) };
 
-    #~ if ($k == 1) {
-        #~ $g = sub { $_[0] };
-        #~ $f = sub { $_[0]->euler_phi };
-        #~ $F = sub { $_[0]->totient_sum };
-    #~ }
-#>>>
+        if ($k == 1) {
+            $g = sub { $_[0] };
+            $f = sub { $_[0]->euler_phi };
+            $F = sub { $_[0]->phi_sum };
+        }
+    }
 
     $n->dirichlet_hyperbola($f, $g, $F, $G);
 }
@@ -30364,36 +31774,6 @@ sub prime_power_usigma {
     }
 
     bless \$r;
-}
-
-sub squarefree_usigma0 {
-    (TWO)->powerfree_usigma0($_[0]);
-}
-
-sub cubefree_usigma0 {
-    (THREE)->powerfree_usigma0($_[0]);
-}
-
-sub squarefree_usigma {
-    (TWO)->powerfree_usigma($_[0], $_[1]);
-}
-
-sub cubefree_usigma {
-    (THREE)->powerfree_usigma($_[0], $_[1]);
-}
-
-*squarefree_sigma0 = \&usigma0;
-
-sub cubefree_sigma0 {
-    (THREE)->powerfree_sigma0($_[0]);
-}
-
-sub squarefree_sigma {
-    (TWO)->powerfree_sigma($_[0], $_[1]);
-}
-
-sub cubefree_sigma {
-    (THREE)->powerfree_sigma($_[0], $_[1]);
 }
 
 sub power_sigma0 {
@@ -30570,14 +31950,195 @@ sub cube_usigma {
     (THREE)->power_usigma($_[0], $_[1]);
 }
 
+sub powerful_sigma0 {
+    my ($k, $n) = @_;
+
+    # Multiplicative with:
+    #   a(p^e) = 1 if e < k
+    #   a(p^e) = e - k + 2 if e >= k
+
+    _valid(\$n);
+
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $n = _big2uistr($$n) // goto &nan;
+
+    $k > 0 or return ZERO;
+    $n eq '0' and return ZERO;
+
+    _set_int(Math::Prime::Util::GMP::vecprod(map { $_->[1] - $k + 2 } grep { $_->[1] >= $k } _factor_exp($n)));
+}
+
+sub powerful_sigma {
+    my ($k, $n, $j) = @_;
+
+    # Multiplicative with:
+    #   a(p^e, k, j) = 1 if e < k
+    #   a(p^e, k, j) = (p^(j*(e + 1)) - p^(j*k) + p^j - 1) / (p^j - 1) if e >= k
+
+    _valid(\$n);
+
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+
+    $k > 0 or return ZERO;
+
+    if ($j == 0) {
+        goto &powerful_sigma0;
+    }
+
+    $n = _big2uistr($$n) // goto &nan;
+    $n eq '0' and return ZERO;
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    state $u = Math::GMPz::Rmpz_init_nobless();
+    state $v = Math::GMPz::Rmpz_init_nobless();
+    my @terms;
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($p, $e) = @$pe;
+
+        next if ($e < $k);
+
+        if (FAST_MODE and $p < ULONG_MAX) {
+            Math::GMPz::Rmpz_ui_pow_ui($t, $p, $j);
+        }
+        else {
+            Math::GMPz::Rmpz_set_str($t, $p, 10);
+            Math::GMPz::Rmpz_pow_ui($t, $t, $j);
+        }
+
+        # Compute: (p^(j*(e + 1)) - p^(j*k) + p^j - 1) / (p^j - 1)
+        Math::GMPz::Rmpz_pow_ui($u, $t, $e + 1);    # u = p^(j*(e+1))
+        Math::GMPz::Rmpz_pow_ui($v, $t, $k);        # v = p^(j*k)
+        Math::GMPz::Rmpz_sub($u, $u, $v);           # u = p^(j*(e+1)) - p^(j*k)
+        Math::GMPz::Rmpz_add($u, $u, $t);           # u = p^(j*(e+1)) - p^(j*k) + p^j
+        Math::GMPz::Rmpz_sub_ui($u, $u, 1);         # u = p^(j*(e+1)) - p^(j*k) + p^j - 1
+        Math::GMPz::Rmpz_sub_ui($t, $t, 1);         # t = p^j - 1 (denominator)
+        Math::GMPz::Rmpz_divexact($u, $u, $t);      # u = u / t
+
+        push @terms,
+          (
+              Math::GMPz::Rmpz_fits_ulong_p($u)
+            ? Math::GMPz::Rmpz_get_ui($u)
+            : Math::GMPz::Rmpz_init_set($u)
+          );
+    }
+
+    @terms || return ONE;
+    bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub squarefull_sigma0 {
+    (TWO)->powerful_sigma0($_[0]);
+}
+
+sub cubefull_sigma0 {
+    (THREE)->powerful_sigma0($_[0]);
+}
+
+sub squarefull_sigma {
+    (TWO)->powerful_sigma($_[0], $_[1]);
+}
+
+sub cubefull_sigma {
+    (THREE)->powerful_sigma($_[0], $_[1]);
+}
+
+sub powerful_usigma0 {
+    my ($k, $n) = @_;
+
+    # Multiplicative with:
+    #   a(p^e) = 1 if e < k
+    #   a(p^e) = 2 if e >= k
+
+    _valid(\$n);
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $n = _big2uistr($$n) // goto &nan;
+    $k > 0 or return ZERO;
+    $n eq '0' and return ZERO;
+
+    # Each prime power with e >= k contributes exactly a factor of 2
+    _set_int(Math::Prime::Util::GMP::powint(2, scalar grep { $_->[1] >= $k } _factor_exp($n)));
+}
+
+sub powerful_usigma {
+    my ($k, $n, $j) = @_;
+
+    # Multiplicative with:
+    #   a(p^e, k, j) = 1 if e < k
+    #   a(p^e, k, j) = p^(j*e) + 1 if e >= k
+
+    _valid(\$n);
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+    $k > 0 or return ZERO;
+
+    if ($j == 0) {
+        goto &powerful_usigma0;
+    }
+
+    $n = _big2uistr($$n) // goto &nan;
+    $n eq '0' and return ZERO;
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    state $u = Math::GMPz::Rmpz_init_nobless();
+    my @terms;
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($p, $e) = @$pe;
+        next if ($e < $k);
+
+        # Compute t = p^j
+        if (FAST_MODE and $p < ULONG_MAX) {
+            Math::GMPz::Rmpz_ui_pow_ui($t, $p, $j);
+        }
+        else {
+            Math::GMPz::Rmpz_set_str($t, $p, 10);
+            Math::GMPz::Rmpz_pow_ui($t, $t, $j) if ($j > 1);
+        }
+
+        # Compute: p^(j*e) + 1  =>  (p^j)^e + 1  =>  t^e + 1
+        Math::GMPz::Rmpz_pow_ui($u, $t, $e);    # u = t^e
+        Math::GMPz::Rmpz_add_ui($u, $u, 1);     # u = u + 1
+
+        push @terms,
+          (
+              Math::GMPz::Rmpz_fits_ulong_p($u)
+            ? Math::GMPz::Rmpz_get_ui($u)
+            : Math::GMPz::Rmpz_init_set($u)
+          );
+    }
+
+    @terms || return ONE;
+    bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub squarefull_usigma0 {
+    (TWO)->powerful_usigma0($_[0]);
+}
+
+sub cubefull_usigma0 {
+    (THREE)->powerful_usigma0($_[0]);
+}
+
+sub squarefull_usigma {
+    (TWO)->powerful_usigma($_[0], $_[1]);
+}
+
+sub cubefull_usigma {
+    (THREE)->powerful_usigma($_[0], $_[1]);
+}
+
 sub powerfree_sigma0 {
     my ($k, $n) = @_;
 
     # Multiplicative with:
     #   a(p^e) = min(e, k-1) + 1
 
-    $k = defined($k) ? do { _valid(\$k); _any2ui($$k)    // goto &nan } : 1;
-    $n = defined($n) ? do { _valid(\$n); _big2uistr($$n) // goto &nan } : (goto &nan);
+    _valid(\$n);
+
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $n = _big2uistr($$n) // goto &nan;
 
     $k > 0 or return ZERO;
     $n eq '0' and return ZERO;
@@ -30591,6 +32152,8 @@ sub powerfree_sigma {
     # Multiplicative with:
     #   a(p^e) = (p^(j*(e+1)) - 1)/(p^j - 1), where e = min(e, k-1)
 
+    _valid(\$n);
+
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
     $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
 
@@ -30600,7 +32163,7 @@ sub powerfree_sigma {
         goto &powerfree_sigma0;
     }
 
-    $n = defined($n) ? do { _valid(\$n); _big2uistr($$n) // goto &nan } : (goto &nan);
+    $n = _big2uistr($$n) // goto &nan;
     $n eq '0' and return ZERO;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
@@ -30639,6 +32202,20 @@ sub powerfree_sigma {
     bless \_binsplit(\@terms, \&__mul__);
 }
 
+*squarefree_sigma0 = \&usigma0;
+
+sub cubefree_sigma0 {
+    (THREE)->powerfree_sigma0($_[0]);
+}
+
+sub squarefree_sigma {
+    (TWO)->powerfree_sigma($_[0], $_[1]);
+}
+
+sub cubefree_sigma {
+    (THREE)->powerfree_sigma($_[0], $_[1]);
+}
+
 sub powerfree_usigma0 {
     my ($k, $n) = @_;
 
@@ -30646,8 +32223,10 @@ sub powerfree_usigma0 {
     #   a(p^e) = 2          # for e < k
     #   a(p^e) = 1          # for e >= k
 
-    $k = defined($k) ? do { _valid(\$k); _any2ui($$k)    // goto &nan } : 1;
-    $n = defined($n) ? do { _valid(\$n); _big2uistr($$n) // goto &nan } : (goto &nan);
+    _valid(\$n);
+
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $n = _big2uistr($$n) // goto &nan;
 
     $k > 0 or return ZERO;
     $n eq '0' and return ZERO;
@@ -30715,6 +32294,22 @@ sub powerfree_usigma {
 
     @terms || return ONE;
     bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub squarefree_usigma0 {
+    (TWO)->powerfree_usigma0($_[0]);
+}
+
+sub cubefree_usigma0 {
+    (THREE)->powerfree_usigma0($_[0]);
+}
+
+sub squarefree_usigma {
+    (TWO)->powerfree_usigma($_[0], $_[1]);
+}
+
+sub cubefree_usigma {
+    (THREE)->powerfree_usigma($_[0], $_[1]);
 }
 
 sub prime_sigma {
@@ -30901,11 +32496,53 @@ sub sigma {
 
 *σ = \&sigma;
 
+# Fast summation of the sigma_k(n) function for n=1..x
+sub _sigma_sum {
+    my ($x, $k) = @_;
+
+    my $sx = Math::Prime::Util::GMP::sqrtint($x);
+
+    if ($k == 0) {
+        my @terms;
+        for my $i (1 .. $sx) {
+            push @terms, HAS_PRIME_UTIL
+              ? Math::Prime::Util::divint($x, $i)
+              : Math::Prime::Util::GMP::divint($x, $i);
+        }
+        my $total = Math::Prime::Util::GMP::vecsum(@terms);
+        return Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::mulint(2, $total), Math::Prime::Util::GMP::mulint($sx, $sx));
+    }
+
+    my @terms;
+    for my $i (1 .. $sx) {
+        my $x_div_i =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($x, $i)
+          : Math::Prime::Util::GMP::divint($x, $i);
+
+        push @terms, (HAS_PRIME_UTIL and $k <= 2)
+          ? Math::Prime::Util::powersum($x_div_i, $k)
+          : Math::Prime::Util::GMP::powersum($x_div_i, $k);
+
+        my $ik = ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
+        push @terms, $ik * $x_div_i;
+        $terms[-1] = Math::Prime::Util::GMP::mulint($ik, $x_div_i) if ($terms[-1] > ULONG_MAX);
+    }
+
+    my $total = Math::Prime::Util::GMP::vecsum(@terms);
+    return Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sx, Math::Prime::Util::GMP::powersum($sx, $k)));
+}
+
 sub sigma_sum {
     my ($n, $k, $j) = @_;
 
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
     $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 0;
+
+    if (FAST_MODE and $j == 0) {
+        $n = _big2uistr($$n) // return ZERO;
+        return _set_int(_sigma_sum($n, $k));
+    }
 
     $k += $j;
 
@@ -30915,8 +32552,8 @@ sub sigma_sum {
     my $f = sub { $_[0]->ipow($k_obj) };
     my $g = sub { $_[0]->ipow($j_obj) };
 
-    my $F = sub { $_[0]->faulhaber_sum($k_obj) };
-    my $G = sub { $_[0]->faulhaber_sum($j_obj) };
+    my $F = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $k)) };
+    my $G = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $j)) };
 
     if ($k == 0) {
         $f = sub { 1 };
@@ -36306,10 +37943,12 @@ sub perfect_power_sum {
     my $t = Math::GMPz::Rmpz_init();
     my $r = Math::GMPz::Rmpz_init_set_ui(0);
 
+    my $t_obj = bless \$t;
+
     foreach my $k (2 .. __ilog__($n, 2)) {
         my $mu = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k)) || next;
         Math::GMPz::Rmpz_root($t, $n, $k);
-        my $f = ${(bless \$t)->faulhaber_sum(bless \$k)} - 1;
+        my $f = ${$t_obj->faulhaber_sum(bless \$k)} - 1;
         if (ref($f)) {
             ($mu == 1)
               ? Math::GMPz::Rmpz_add($r, $r, $f)
@@ -36495,6 +38134,8 @@ sub powerful_sum {    # sum of k-powerful numbers
     my $t   = Math::GMPz::Rmpz_init();
     my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
+    my $t_obj = bless \$t;
+
     sub {
         my ($m, $r) = @_;
 
@@ -36502,7 +38143,7 @@ sub powerful_sum {    # sum of k-powerful numbers
         Math::GMPz::Rmpz_root($t, $t, $r);
 
         if ($r <= $k) {
-            my $w = ${(bless \$t)->faulhaber_sum(bless \$r)};
+            my $w = ${$t_obj->faulhaber_sum(bless \$r)};
             if (ref($w) eq 'Math::GMPz') {
                 Math::GMPz::Rmpz_addmul($sum, $m, $w);
             }

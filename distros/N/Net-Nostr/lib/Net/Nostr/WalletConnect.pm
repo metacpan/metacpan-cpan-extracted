@@ -2,6 +2,8 @@ package Net::Nostr::WalletConnect;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
@@ -41,7 +43,8 @@ sub parse_uri {
 }
 
 sub create_uri {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "wallet_pubkey is required" unless defined $args{wallet_pubkey};
     croak "relay is required"         unless defined $args{relay};
     croak "secret is required"        unless defined $args{secret};
@@ -66,7 +69,8 @@ sub create_uri {
 ###############################################################################
 
 sub info_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my @tags;
 
     if ($args{encryption} && @{$args{encryption}}) {
@@ -115,7 +119,8 @@ sub parse_info {
 ###############################################################################
 
 sub request {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "request requires 'method'" unless defined $args{method};
     croak "request requires 'params'" unless defined $args{params};
 
@@ -130,7 +135,8 @@ sub request {
 ###############################################################################
 
 sub request_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "request_event requires 'method'" unless defined $args{method};
     croak "request_event requires 'params'" unless defined $args{params};
     croak "request_event requires 'wallet_pubkey'" unless defined $args{wallet_pubkey};
@@ -173,7 +179,8 @@ sub parse_response {
 ###############################################################################
 
 sub response_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $content = JSON->new->utf8->canonical->encode({
         result_type => $args{result_type},
@@ -215,7 +222,8 @@ sub parse_notification {
 ###############################################################################
 
 sub notification_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $content = JSON->new->utf8->canonical->encode({
         notification_type => $args{notification_type},
@@ -307,7 +315,7 @@ sub _uri_decode {
     use Class::Tiny qw(wallet_pubkey secret lud16);
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
         $known{relays} = ();
         my @unknown = grep { !exists $known{$_} } keys %$self;
@@ -329,7 +337,7 @@ sub _uri_decode {
     use Class::Tiny ();
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known = map { $_ => 1 } @_ARRAY_FIELDS;
         my @unknown = grep { !exists $known{$_} } keys %$self;
         croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -370,7 +378,7 @@ sub _uri_decode {
     use Class::Tiny qw(result_type error result);
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
         my @unknown = grep { !exists $known{$_} } keys %$self;
         croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -400,7 +408,7 @@ sub _uri_decode {
     use Class::Tiny qw(notification_type notification);
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
         my @unknown = grep { !exists $known{$_} } keys %$self;
         croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -652,6 +660,8 @@ past.
 =head2 Connection
 
 Returned by L</parse_uri>. Croaks on unknown arguments.
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 
@@ -668,6 +678,8 @@ Returned by L</parse_uri>. Croaks on unknown arguments.
 =head2 Info
 
 Returned by L</parse_info>. Croaks on unknown arguments.
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 
@@ -689,6 +701,8 @@ Returned by L</parse_info>. Croaks on unknown arguments.
 
 Returned by L</parse_response>. Croaks on unknown arguments or missing
 C<result_type>.
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 
@@ -714,6 +728,8 @@ C<UNSUPPORTED_ENCRYPTION>, C<OTHER>, C<PAYMENT_FAILED>, C<NOT_FOUND>.
 
 Returned by L</parse_notification>. Croaks on unknown arguments or missing
 required fields (C<notification_type>, C<notification>).
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 

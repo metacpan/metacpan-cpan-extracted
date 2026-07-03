@@ -118,6 +118,25 @@ subtest 'POD repost: content override' => sub {
     is $event->content, '', 'empty content override';
 };
 
+subtest 'POD repost: protected event content defaults to empty' => sub {
+    my $protected = make_event(
+        id         => 'aa' x 32,
+        kind       => 1,
+        pubkey     => $other_pubkey,
+        created_at => 1000,
+        content    => 'members only',
+        tags       => [['-']],
+        sig        => 'bb' x 64,
+    );
+
+    my $event = Net::Nostr::Repost->repost(
+        event     => $protected,
+        pubkey    => $pubkey,
+        relay_url => $relay,
+    );
+    is $event->content, '', 'protected repost does not embed event';
+};
+
 subtest 'POD repost: created_at passthrough' => sub {
     my $event = Net::Nostr::Repost->repost(
         event      => $note,

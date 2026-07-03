@@ -27,6 +27,7 @@ class Y
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -76,6 +77,7 @@ class Y
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 

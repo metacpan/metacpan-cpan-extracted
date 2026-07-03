@@ -8,7 +8,7 @@ use POSIX       qw(ceil);
 use JSON::PP    ();
 use File::Slurp qw(read_file write_file);
 
-our $VERSION = '0.2.1';
+our $VERSION = '0.3.0';
 
 use constant EULER  => 0.5772156649015329;
 use constant TWO_PI => 6.283185307179586;
@@ -22,9 +22,11 @@ use constant _NODE_OBLIQUE => 2;
 # ---------------------------------------------------------------------------
 # Optional Inline::C accelerator for the scoring hot path.
 #
-# pack_input_xs(data_sv, out_sv, n_pts, n_feats)
+# pack_input_xs(data_sv, out_sv, n_pts, n_feats, miss_mode, fill_sv)
 #     Walks the Perl arrayref-of-arrayrefs and writes a packed double buffer
 #     into out_sv.  Replaces the dominant per-call Perl map-pack loop.
+#     miss_mode selects how an undef cell is packed: 0 => 0.0, 1 => the
+#     per-feature fill from fill_sv (impute), 2 => NaN (nan strategy).
 #
 # score_all_xs(nodes_av, idx_av, val_av, x_sv, sm_sv,
 #              n_pts, n_feats, n_trees, use_openmp)
@@ -66,9 +68,12 @@ use constant _NODE_OBLIQUE => 2;
 our $HAS_C      = 0;
 our $HAS_OPENMP = 0;
 our $HAS_SIMD   = 0;
+our $OPT_LEVEL  = '';    # the actual -O.../-march=... flags used to build, if any
 {
     my $C_CODE = <<'__INLINE_C__';
 #include <math.h>
+#include <string.h>
+#include <stdint.h>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -101,7 +106,7 @@ int has_simd_xs(){
 #endif
 }
 
-/* pack_input_xs(data_sv, out_sv, n_pts, n_feats)
+/* pack_input_xs(data_sv, out_sv, n_pts, n_feats, miss_mode, fill_sv)
  *
  * Walks a Perl arrayref-of-arrayrefs (n_pts rows of n_feats doubles each)
  * directly in C and writes the packed double buffer into out_sv (which the
@@ -110,10 +115,22 @@ int has_simd_xs(){
  *   pack('d*', map { my $r=$_; map { $r->[$_] // 0 } 0..$nf-1 } @$data)
  *
  * which was the dominant per-call overhead for high feature counts.
- * Undef cells (and missing rows) are coerced to 0.0 with no warning. */
-void pack_input_xs(SV* data_sv, SV* out_sv, int n_pts, int n_feats){
+ *
+ * miss_mode selects what an undef cell (or missing row) becomes:
+ *   0 => 0.0          (the 'die'/'zero' missing strategies)
+ *   1 => fill[k]      (the 'impute' strategy; fill_sv is a packed
+ *                      double buffer of n_feats per-feature fill values)
+ *   2 => NaN          (the 'nan' strategy; the C scorer's `<` / `<=`
+ *                      comparisons are both false for NaN, so a point
+ *                      missing the split feature falls to the right
+ *                      child -- matching how fit() routes it)
+ * fill_sv is only dereferenced when miss_mode == 1. */
+void pack_input_xs(SV* data_sv, SV* out_sv, int n_pts, int n_feats,
+                   int miss_mode, SV* fill_sv){
     STRLEN tl;
     double* out;
+    const double* fill = NULL;
+    double missval;
     AV* outer;
     int i, k;
 
@@ -123,12 +140,19 @@ void pack_input_xs(SV* data_sv, SV* out_sv, int n_pts, int n_feats){
     outer = (AV*)SvRV(data_sv);
     out   = (double*)SvPVbyte_force(out_sv, tl);
 
+    if (miss_mode == 1) {
+        STRLEN fl;
+        fill = (const double*)SvPVbyte(fill_sv, fl);
+    }
+    missval = (miss_mode == 2) ? NAN : 0.0;
+
     for (i = 0; i < n_pts; i++) {
         SV** row_pp = av_fetch(outer, i, 0);
         double* dst = out + (size_t)i * (size_t)n_feats;
         if (!row_pp || !*row_pp || !SvROK(*row_pp) ||
             SvTYPE(SvRV(*row_pp)) != SVt_PVAV) {
-            for (k = 0; k < n_feats; k++) dst[k] = 0.0;
+            for (k = 0; k < n_feats; k++)
+                dst[k] = (miss_mode == 1) ? fill[k] : missval;
             continue;
         }
         {
@@ -138,7 +162,7 @@ void pack_input_xs(SV* data_sv, SV* out_sv, int n_pts, int n_feats){
                 if (v && *v && SvOK(*v)) {
                     dst[k] = SvNV(*v);
                 } else {
-                    dst[k] = 0.0;
+                    dst[k] = (miss_mode == 1) ? fill[k] : missval;
                 }
             }
         }
@@ -417,7 +441,740 @@ void score_all_xs(SV* nodes_av_sv, SV* idx_av_sv, SV* val_av_sv,
         sm[i] = sum;
     }
 }
+
+/* ---------------------------------------------------------------------
+ * build_forest_xs -- C-accelerated fit() tree builder.
+ *
+ * Replaces the pure-Perl _subsample + _build_tree + _axis_split /
+ * _oblique_split recursion with an equivalent C implementation that
+ * partitions plain `int` row-index arrays instead of copying arrayrefs
+ * of Perl SVs at every split.  Random draws go through Drand01() --
+ * the exact generator Perl's own rand()/srand() use internally -- in
+ * the same call order the Perl code used, so a fit() with a given
+ * seed produces BIT-IDENTICAL trees whether use_c is on or off.  This
+ * is what lets fit() reuse the existing `use_c` knob instead of a new
+ * one: switching backends never changes the model, only how fast it's
+ * built.  (Verified by t/02-accel-selection.t's "identical seed =>
+ * identical trees" subtest, which exercises both backends.)
+ *
+ * Output trees are plain Perl arrayrefs in the same node shape
+ * _build_tree produces (leaf/axis/oblique -- see the file-top
+ * comment), so every downstream consumer (_pack_tree, to_json,
+ * from_json, the pure-Perl scorer) is unchanged.
+ *
+ * x_sv: packed row-major double buffer, n_pts rows of n_feats each
+ *       (from pack_input_xs -- NaN marks a missing cell under the
+ *       'nan' missing-strategy).
+ * mode_flag: 0 => axis-parallel splits, 1 => oblique (extended).
+ * ext_level: extension_level_used (ignored when mode_flag == 0).
+ * out_rv: pre-existing arrayref; filled with n_trees tree roots.
+ * ------------------------------------------------------------------ */
+
+/* Box-Muller normal draw, in the same rand() call order as _randn(). */
+static double _c_randn(pTHX) {
+    double u1 = Drand01();
+    double u2;
+    if (u1 == 0.0) u1 = 1e-12;
+    u2 = Drand01();
+    return sqrt(-2.0 * log(u1)) * cos(6.283185307179586 * u2);
+}
+
+static SV* _mk_leaf(pTHX_ int size) {
+    AV* av = newAV();
+    av_extend(av, 1);
+    AvARRAY(av)[0] = newSVnv(0.0);
+    AvARRAY(av)[1] = newSViv(size);
+    AvFILLp(av)    = 1;
+    return newRV_noinc((SV*)av);
+}
+
+static SV* _mk_axis(pTHX_ int attr, double split, SV* left, SV* right) {
+    AV* av = newAV();
+    av_extend(av, 4);
+    AvARRAY(av)[0] = newSVnv(1.0);
+    AvARRAY(av)[1] = newSViv(attr);
+    AvARRAY(av)[2] = newSVnv(split);
+    AvARRAY(av)[3] = left;
+    AvARRAY(av)[4] = right;
+    AvFILLp(av)    = 4;
+    return newRV_noinc((SV*)av);
+}
+
+static SV* _mk_oblique(pTHX_ const int* idx, const double* coef, int n,
+                        double b, SV* left, SV* right) {
+    AV *iav, *cav, *av;
+    int k;
+    iav = newAV();
+    cav = newAV();
+    if (n > 0) {
+        av_extend(iav, n - 1);
+        av_extend(cav, n - 1);
+    }
+    for (k = 0; k < n; k++) {
+        AvARRAY(iav)[k] = newSViv(idx[k]);
+        AvARRAY(cav)[k] = newSVnv(coef[k]);
+    }
+    AvFILLp(iav) = n - 1;
+    AvFILLp(cav) = n - 1;
+
+    av = newAV();
+    av_extend(av, 5);
+    AvARRAY(av)[0] = newSVnv(2.0);
+    AvARRAY(av)[1] = newRV_noinc((SV*)iav);
+    AvARRAY(av)[2] = newRV_noinc((SV*)cav);
+    AvARRAY(av)[3] = newSVnv(b);
+    AvARRAY(av)[4] = left;
+    AvARRAY(av)[5] = right;
+    AvFILLp(av)    = 5;
+    return newRV_noinc((SV*)av);
+}
+
+/* Builds one node from the point set `idxs` (row indices into `x`,
+ * length `size`); recurses left-then-right, matching _build_tree's
+ * traversal order so nested splits draw random numbers in the same
+ * sequence the pure-Perl path would.  Takes ownership of `idxs` --
+ * frees it before returning. */
+static SV* _build_node_c(pTHX_ const double* x, int nf, int* idxs, int size,
+                          int depth, int limit, int mode_flag,
+                          int ext_active) {
+    double *lo, *hi;
+    int *varying, nv, f;
+    SV *result;
+
+    if (depth >= limit || size <= 1) {
+        SV* leaf = _mk_leaf(aTHX_ size);
+        free(idxs);
+        return leaf;
+    }
+
+    lo = (double*)malloc(nf * sizeof(double));
+    hi = (double*)malloc(nf * sizeof(double));
+    for (f = 0; f < nf; f++) {
+        lo[f] = HUGE_VAL;
+        hi[f] = -HUGE_VAL;
+    }
+    for (int i = 0; i < size; i++) {
+        const double* row = x + (size_t)idxs[i] * (size_t)nf;
+        /* No isnan() guard needed: NaN < x and NaN > x are always false
+         * under IEEE 754, so a NaN cell (the 'nan' missing strategy)
+         * already leaves lo/hi untouched without an explicit check --
+         * one less branch, and it's what lets this loop vectorize
+         * cleanly as a plain elementwise min/max scan. */
+        #ifdef _OPENMP
+        #pragma omp simd
+        #endif
+        for (int f2 = 0; f2 < nf; f2++) {
+            double v = row[f2];
+            if (v < lo[f2]) lo[f2] = v;
+            if (v > hi[f2]) hi[f2] = v;
+        }
+    }
+
+    varying = (int*)malloc(nf * sizeof(int));
+    nv      = 0;
+    for (f = 0; f < nf; f++) {
+        if (lo[f] < hi[f]) varying[nv++] = f;
+    }
+
+    if (nv == 0) {
+        free(lo); free(hi); free(varying);
+        SV* leaf = _mk_leaf(aTHX_ size);
+        free(idxs);
+        return leaf;
+    }
+
+    if (mode_flag == 0) {
+        /* Axis-parallel split: one varying feature, one threshold. */
+        int attr      = varying[(int)(Drand01() * nv)];
+        double split  = lo[attr] + Drand01() * (hi[attr] - lo[attr]);
+        int *lidx = (int*)malloc(size * sizeof(int));
+        int *ridx = (int*)malloc(size * sizeof(int));
+        int ln = 0, rn = 0, i;
+        SV *left, *right;
+
+        for (i = 0; i < size; i++) {
+            int row = idxs[i];
+            double v = x[(size_t)row * (size_t)nf + attr];
+            if (v < split) lidx[ln++] = row; else ridx[rn++] = row;
+        }
+        free(idxs); free(lo); free(hi); free(varying);
+
+        left  = _build_node_c(aTHX_ x, nf, lidx, ln, depth + 1, limit,
+                               mode_flag, ext_active);
+        right = _build_node_c(aTHX_ x, nf, ridx, rn, depth + 1, limit,
+                               mode_flag, ext_active);
+        result = _mk_axis(aTHX_ attr, split, left, right);
+    } else {
+        /* Oblique split: a random hyperplane over `active` features. */
+        int active = ext_active + 1;
+        int *pool, *lidx, *ridx;
+        double *coef;
+        double b = 0.0;
+        int ln = 0, rn = 0, i, k;
+        SV *left, *right;
+
+        if (active > nv) active = nv;
+        pool = (int*)malloc(nv * sizeof(int));
+        memcpy(pool, varying, nv * sizeof(int));
+        for (i = 0; i < active; i++) {
+            int j = i + (int)(Drand01() * (nv - i));
+            int tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+        }
+
+        coef = (double*)malloc(active * sizeof(double));
+        for (k = 0; k < active; k++) {
+            int ff  = pool[k];
+            double c = _c_randn(aTHX);
+            double p = lo[ff] + Drand01() * (hi[ff] - lo[ff]);
+            coef[k] = c;
+            b += c * p;
+        }
+
+        lidx = (int*)malloc(size * sizeof(int));
+        ridx = (int*)malloc(size * sizeof(int));
+        for (i = 0; i < size; i++) {
+            int row = idxs[i];
+            double dot = 0.0;
+            for (k = 0; k < active; k++) {
+                dot += coef[k] * x[(size_t)row * (size_t)nf + pool[k]];
+            }
+            if (dot <= b) lidx[ln++] = row; else ridx[rn++] = row;
+        }
+        free(idxs); free(lo); free(hi); free(varying);
+
+        left  = _build_node_c(aTHX_ x, nf, lidx, ln, depth + 1, limit,
+                               mode_flag, ext_active);
+        right = _build_node_c(aTHX_ x, nf, ridx, rn, depth + 1, limit,
+                               mode_flag, ext_active);
+        result = _mk_oblique(aTHX_ pool, coef, active, b, left, right);
+        free(pool); free(coef);
+    }
+    return result;
+}
+
+void build_forest_xs(SV* x_sv, int n_pts, int n_feats, int n_trees,
+                      int psi, int limit, int mode_flag, int ext_level,
+                      SV* out_rv) {
+    dTHX;
+    STRLEN tl;
+    const double* x;
+    AV* out;
+    int* all;
+    int t, i;
+
+    if (!SvROK(out_rv) || SvTYPE(SvRV(out_rv)) != SVt_PVAV) {
+        croak("build_forest_xs: out must be an arrayref");
+    }
+    x   = (const double*)SvPVbyte(x_sv, tl);
+    out = (AV*)SvRV(out_rv);
+    av_clear(out);
+    if (n_trees > 0) av_extend(out, n_trees - 1);
+
+    all = (int*)malloc(n_pts * sizeof(int));
+    for (t = 0; t < n_trees; t++) {
+        int* sample;
+
+        for (i = 0; i < n_pts; i++) all[i] = i;
+        for (i = 0; i < psi; i++) {
+            int j = i + (int)(Drand01() * (n_pts - i));
+            int tmp = all[i]; all[i] = all[j]; all[j] = tmp;
+        }
+        sample = (int*)malloc(psi * sizeof(int));
+        memcpy(sample, all, psi * sizeof(int));
+
+        av_store(out, t,
+            _build_node_c(aTHX_ x, n_feats, sample, psi, 0, limit,
+                          mode_flag, ext_level));
+    }
+    free(all);
+}
+
+/* ---------------------------------------------------------------------
+ * build_forest_openmp_xs -- OpenMP-parallel fit() tree builder.
+ *
+ * build_forest_xs (above) is bit-identical to the pure-Perl path
+ * because every random draw goes through Drand01(), the same
+ * generator Perl's rand()/srand() use -- but that generator is a
+ * single mutable struct shared by the whole interpreter, so calling
+ * it concurrently from multiple OpenMP threads would be a data race.
+ * The same is true of any Perl API call (newAV, newSViv, ...): Perl's
+ * SV allocator isn't safe to call from multiple OS threads sharing one
+ * interpreter without a lock that would just serialise everything
+ * anyway.
+ *
+ * So this builder trades the bit-identical guarantee for real thread
+ * parallelism: each tree gets its own splitmix64 PRNG stream, seeded
+ * from a tree index (not thread id or scheduling order), so results
+ * are still reproducible for a fixed seed and n_trees regardless of
+ * OMP_NUM_THREADS -- just different from what build_forest_xs or the
+ * pure-Perl path would produce for the same seed. The one Drand01()
+ * call in this function happens before the parallel region starts
+ * (single-threaded), so the result still varies with the model's
+ * `seed` the way every other code path does; it isn't used inside the
+ * parallel loop.
+ *
+ * Each tree is built entirely with plain C data (row-index int arrays,
+ * a growable TreeBuf of packed doubles/ints) -- no Perl API call
+ * happens anywhere inside the parallel region. Each node record in
+ * TreeBuf uses _pack_tree's 6-double SoA layout (see the file-top
+ * comment), but the node ORDER differs: records are appended
+ * post-order (a node is pushed after both its children, since child
+ * indices must be known first), so the root is the last record --
+ * _pack_tree's pre-order puts it at 0.  _unpack_forest accounts for
+ * this.  Oblique coefficients are also always stored sparse (in the
+ * random pool's order) -- the dense-pack fast path is skipped because
+ * its only purpose is speeding up score_all_xs, and _rebuild_c_trees
+ * reapplies it anyway once the caller unpacks these buffers back into
+ * the standard Perl tree shape and re-derives the scoring buffers.
+ *
+ * After the parallel region, each tree's TreeBuf is copied into a Perl
+ * string SV (one memcpy each, serially) and stored into nodes_rv /
+ * idx_rv / val_rv -- the caller unpacks these into ordinary nested
+ * Perl trees for $self->{trees} (so to_json/persistence/_rebuild_c_trees
+ * are unaffected). ------------------------------------------------ */
+
+typedef struct {
+    double *nodes; size_t n_nodes, cap_nodes;
+    int    *idx;   size_t n_idx,   cap_idx;
+    double *val;   size_t n_val,   cap_val;
+} TreeBuf;
+
+static void tb_init(TreeBuf *b) {
+    b->nodes = NULL; b->n_nodes = 0; b->cap_nodes = 0;
+    b->idx   = NULL; b->n_idx   = 0; b->cap_idx   = 0;
+    b->val   = NULL; b->n_val   = 0; b->cap_val   = 0;
+}
+
+static void tb_free(TreeBuf *b) {
+    free(b->nodes); free(b->idx); free(b->val);
+}
+
+static int tb_push_node(TreeBuf *b, double f0, double f1, double f2,
+                         double f3, double f4, double f5) {
+    double *slot;
+    if (b->n_nodes == b->cap_nodes) {
+        size_t newcap = b->cap_nodes ? b->cap_nodes * 2 : 64;
+        b->nodes = (double*)realloc(b->nodes, newcap * 6 * sizeof(double));
+        b->cap_nodes = newcap;
+    }
+    slot = b->nodes + b->n_nodes * 6;
+    slot[0] = f0; slot[1] = f1; slot[2] = f2;
+    slot[3] = f3; slot[4] = f4; slot[5] = f5;
+    return (int)(b->n_nodes++);
+}
+
+/* Appends n (idx[k], val[k]) pairs and returns the offset they start
+ * at -- the `coff` an oblique node record stores. */
+static int tb_push_coef(TreeBuf *b, const int *idx, const double *val,
+                         int n) {
+    int off = (int)b->n_idx;
+    if (b->n_idx + (size_t)n > b->cap_idx) {
+        size_t newcap = b->cap_idx ? b->cap_idx * 2 : 64;
+        if (newcap < b->n_idx + (size_t)n) newcap = b->n_idx + (size_t)n;
+        b->idx     = (int*)realloc(b->idx, newcap * sizeof(int));
+        b->cap_idx = newcap;
+    }
+    if (b->n_val + (size_t)n > b->cap_val) {
+        size_t newcap = b->cap_val ? b->cap_val * 2 : 64;
+        if (newcap < b->n_val + (size_t)n) newcap = b->n_val + (size_t)n;
+        b->val     = (double*)realloc(b->val, newcap * sizeof(double));
+        b->cap_val = newcap;
+    }
+    memcpy(b->idx + b->n_idx, idx, (size_t)n * sizeof(int));
+    memcpy(b->val + b->n_val, val, (size_t)n * sizeof(double));
+    b->n_idx += n;
+    b->n_val += n;
+    return off;
+}
+
+/* splitmix64 -- fast, well-mixed, and per-stream state fits in one
+ * uint64_t, which is all a thread-private PRNG needs here. Not
+ * cryptographic; doesn't need to be. */
+static uint64_t sm64_next(uint64_t *s) {
+    uint64_t z = (*s += 0x9E3779B97F4A7C15ULL);
+    z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL;
+    z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
+    return z ^ (z >> 31);
+}
+
+static double sm64_drand(uint64_t *s) {
+    return (double)(sm64_next(s) >> 11) * (1.0 / 9007199254740992.0);
+}
+
+static double _ts_randn(uint64_t *s) {
+    double u1 = sm64_drand(s);
+    double u2;
+    if (u1 == 0.0) u1 = 1e-12;
+    u2 = sm64_drand(s);
+    return sqrt(-2.0 * log(u1)) * cos(6.283185307179586 * u2);
+}
+
+/* Thread-safe twin of _build_node_c: same split algorithm, but reads
+ * randomness from a thread-private splitmix64 stream instead of
+ * Drand01(), and writes into a TreeBuf instead of allocating Perl AVs
+ * -- so it touches no interpreter-global state and is safe to call
+ * concurrently from an OpenMP parallel region, one tree per thread. */
+static int _build_node_packed(const double* x, int nf, int* idxs, int size,
+                               int depth, int limit, int mode_flag,
+                               int ext_active, TreeBuf *buf, uint64_t *rng) {
+    double *lo, *hi;
+    int *varying, nv, f, my_idx;
+
+    if (depth >= limit || size <= 1) {
+        my_idx = tb_push_node(buf, 0.0, (double)size, 0.0, 0.0, 0.0, 0.0);
+        free(idxs);
+        return my_idx;
+    }
+
+    lo = (double*)malloc(nf * sizeof(double));
+    hi = (double*)malloc(nf * sizeof(double));
+    for (f = 0; f < nf; f++) {
+        lo[f] = HUGE_VAL;
+        hi[f] = -HUGE_VAL;
+    }
+    for (int i = 0; i < size; i++) {
+        const double* row = x + (size_t)idxs[i] * (size_t)nf;
+        /* See the matching comment in _build_node_c: no isnan() guard
+         * needed, since NaN < x / NaN > x are always false already --
+         * that's what lets this vectorize as a plain min/max scan.
+         * omp simd here is thread-safe to call from inside the caller's
+         * omp parallel region: it's a per-thread vectorization hint,
+         * not a team construct, so it doesn't nest into anything. */
+        #ifdef _OPENMP
+        #pragma omp simd
+        #endif
+        for (int f2 = 0; f2 < nf; f2++) {
+            double v = row[f2];
+            if (v < lo[f2]) lo[f2] = v;
+            if (v > hi[f2]) hi[f2] = v;
+        }
+    }
+
+    varying = (int*)malloc(nf * sizeof(int));
+    nv      = 0;
+    for (f = 0; f < nf; f++) {
+        if (lo[f] < hi[f]) varying[nv++] = f;
+    }
+
+    if (nv == 0) {
+        free(lo); free(hi); free(varying);
+        my_idx = tb_push_node(buf, 0.0, (double)size, 0.0, 0.0, 0.0, 0.0);
+        free(idxs);
+        return my_idx;
+    }
+
+    if (mode_flag == 0) {
+        int attr     = varying[(int)(sm64_drand(rng) * nv)];
+        double split = lo[attr] + sm64_drand(rng) * (hi[attr] - lo[attr]);
+        int *lidx = (int*)malloc(size * sizeof(int));
+        int *ridx = (int*)malloc(size * sizeof(int));
+        int ln = 0, rn = 0, i, li, ri;
+
+        for (i = 0; i < size; i++) {
+            int row  = idxs[i];
+            double v = x[(size_t)row * (size_t)nf + attr];
+            if (v < split) lidx[ln++] = row; else ridx[rn++] = row;
+        }
+        free(idxs); free(lo); free(hi); free(varying);
+
+        li = _build_node_packed(x, nf, lidx, ln, depth + 1, limit,
+                                 mode_flag, ext_active, buf, rng);
+        ri = _build_node_packed(x, nf, ridx, rn, depth + 1, limit,
+                                 mode_flag, ext_active, buf, rng);
+        my_idx = tb_push_node(buf, 1.0, (double)attr, split,
+                               (double)li, (double)ri, 0.0);
+    } else {
+        int active = ext_active + 1;
+        int *pool, *lidx, *ridx;
+        double *coef;
+        double b = 0.0;
+        int ln = 0, rn = 0, i, k, li, ri, coff;
+
+        if (active > nv) active = nv;
+        pool = (int*)malloc(nv * sizeof(int));
+        memcpy(pool, varying, nv * sizeof(int));
+        for (i = 0; i < active; i++) {
+            int j = i + (int)(sm64_drand(rng) * (nv - i));
+            int tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+        }
+
+        coef = (double*)malloc(active * sizeof(double));
+        for (k = 0; k < active; k++) {
+            int ff   = pool[k];
+            double c = _ts_randn(rng);
+            double p = lo[ff] + sm64_drand(rng) * (hi[ff] - lo[ff]);
+            coef[k]  = c;
+            b += c * p;
+        }
+
+        lidx = (int*)malloc(size * sizeof(int));
+        ridx = (int*)malloc(size * sizeof(int));
+        for (i = 0; i < size; i++) {
+            int row    = idxs[i];
+            double dot = 0.0;
+            for (k = 0; k < active; k++) {
+                dot += coef[k] * x[(size_t)row * (size_t)nf + pool[k]];
+            }
+            if (dot <= b) lidx[ln++] = row; else ridx[rn++] = row;
+        }
+        free(idxs); free(lo); free(hi); free(varying);
+
+        li = _build_node_packed(x, nf, lidx, ln, depth + 1, limit,
+                                 mode_flag, ext_active, buf, rng);
+        ri = _build_node_packed(x, nf, ridx, rn, depth + 1, limit,
+                                 mode_flag, ext_active, buf, rng);
+        coff   = tb_push_coef(buf, pool, coef, active);
+        my_idx = tb_push_node(buf, 2.0, (double)coff, (double)active,
+                               (double)li, (double)ri, b);
+        free(pool); free(coef);
+    }
+    return my_idx;
+}
+
+void build_forest_openmp_xs(SV* x_sv, int n_pts, int n_feats, int n_trees,
+                             int psi, int limit, int mode_flag,
+                             int ext_level, SV* nodes_rv, SV* idx_rv,
+                             SV* val_rv, int use_openmp) {
+    dTHX;
+    STRLEN tl;
+    const double* x;
+    AV *nodes_av, *idx_av, *val_av;
+    TreeBuf *bufs;
+    uint64_t base_seed;
+    int t;
+
+    if (!SvROK(nodes_rv) || SvTYPE(SvRV(nodes_rv)) != SVt_PVAV ||
+        !SvROK(idx_rv)   || SvTYPE(SvRV(idx_rv))   != SVt_PVAV ||
+        !SvROK(val_rv)   || SvTYPE(SvRV(val_rv))   != SVt_PVAV) {
+        croak("build_forest_openmp_xs: nodes/idx/val must be arrayrefs");
+    }
+    x        = (const double*)SvPVbyte(x_sv, tl);
+    nodes_av = (AV*)SvRV(nodes_rv);
+    idx_av   = (AV*)SvRV(idx_rv);
+    val_av   = (AV*)SvRV(val_rv);
+    av_clear(nodes_av); av_clear(idx_av); av_clear(val_av);
+    if (n_trees > 0) {
+        av_extend(nodes_av, n_trees - 1);
+        av_extend(idx_av,   n_trees - 1);
+        av_extend(val_av,   n_trees - 1);
+    }
+
+    /* Single Drand01() call, before the parallel region starts, so it's
+     * still a plain serial call into the interpreter's RNG state. */
+    base_seed = (uint64_t)(Drand01() * 18446744073709551615.0);
+
+    bufs = (TreeBuf*)malloc((size_t)n_trees * sizeof(TreeBuf));
+    for (t = 0; t < n_trees; t++) tb_init(&bufs[t]);
+
+    #ifdef _OPENMP
+    #pragma omp parallel for schedule(dynamic) if(use_openmp)
+    #endif
+    for (int t = 0; t < n_trees; t++) {
+        /* Seeded from the tree index, not thread id or iteration order,
+         * so the mapping from tree -> RNG stream is independent of
+         * OMP_NUM_THREADS / scheduling.  sm64_next() mixes once more so
+         * adjacent tree indices (which differ by one golden-ratio step)
+         * don't start from too-similar states. */
+        uint64_t rng = base_seed + (uint64_t)t * 0x9E3779B97F4A7C15ULL;
+        rng = sm64_next(&rng);
+        int *all = (int*)malloc((size_t)n_pts * sizeof(int));
+        int *sample;
+        int i;
+
+        for (i = 0; i < n_pts; i++) all[i] = i;
+        for (i = 0; i < psi; i++) {
+            int j = i + (int)(sm64_drand(&rng) * (n_pts - i));
+            int tmp = all[i]; all[i] = all[j]; all[j] = tmp;
+        }
+        sample = (int*)malloc((size_t)psi * sizeof(int));
+        memcpy(sample, all, (size_t)psi * sizeof(int));
+        free(all);
+
+        _build_node_packed(x, n_feats, sample, psi, 0, limit, mode_flag,
+                            ext_level, &bufs[t], &rng);
+    }
+
+    for (t = 0; t < n_trees; t++) {
+        /* newSVpvn(NULL, 0) makes an undef SV, not an empty-string one --
+         * axis-mode trees never call tb_push_coef, so idx/val stay NULL.
+         * Pass "" instead so the Perl side's unpack('...', $sv) always
+         * gets a defined (if empty) string, never undef. */
+        av_store(nodes_av, t, newSVpvn((char*)bufs[t].nodes,
+                     bufs[t].n_nodes * 6 * sizeof(double)));
+        av_store(idx_av, t, bufs[t].n_idx
+                     ? newSVpvn((char*)bufs[t].idx, bufs[t].n_idx * sizeof(int))
+                     : newSVpvn("", 0));
+        av_store(val_av, t, bufs[t].n_val
+                     ? newSVpvn((char*)bufs[t].val, bufs[t].n_val * sizeof(double))
+                     : newSVpvn("", 0));
+        tb_free(&bufs[t]);
+    }
+    free(bufs);
+}
+
+/* ---------------------------------------------------------------------
+ * impute_fill_xs(data_sv, n_pts, n_feats, how, out_rv)
+ *
+ * C replacement for _compute_impute_fill's Perl loop: walks the raw
+ * arrayref-of-arrayrefs directly (like pack_input_xs), collecting each
+ * feature's present (defined) values, then reduces them to one fill
+ * value per feature -- mean (how == 0) or median (how == 1) -- and
+ * writes n_feats doubles into out_rv.
+ *
+ * Values are collected in row order (i = 0..n_pts-1), the same order
+ * the Perl version's `grep { defined } map { $_->[$f] } @data` walks
+ * them in, so the mean's left-to-right summation lands on the exact
+ * same float as the Perl path -- use_c toggles speed here, not the
+ * computed fill, matching the rest of the module.
+ *
+ * The median is an exact order statistic (not summation-dependent), so
+ * it matches the Perl path's sort-based median by definition regardless
+ * of which selection algorithm finds it. Croaks with the same message
+ * as the Perl fallback if a feature has no present values anywhere in
+ * the dataset. */
+typedef struct { double *v; size_t n, cap; } DVec;
+
+static void dvec_push(DVec *d, double x) {
+    if (d->n == d->cap) {
+        size_t newcap = d->cap ? d->cap * 2 : 64;
+        d->v = (double*)realloc(d->v, newcap * sizeof(double));
+        d->cap = newcap;
+    }
+    d->v[d->n++] = x;
+}
+
+static void _dswap(double *a, double *b) { double t = *a; *a = *b; *b = t; }
+
+/* Lomuto partition with a median-of-three pivot (avoids the O(n^2)
+ * worst case a fixed pivot hits on already-sorted or reverse-sorted
+ * input, which real feature columns -- timestamps, counters -- often
+ * are). Returns the pivot's final index. */
+static int _partition_lomuto(double *a, int lo, int hi) {
+    int mid = lo + (hi - lo) / 2;
+    double pivot;
+    int i, j;
+    if (a[mid] < a[lo]) _dswap(&a[lo],  &a[mid]);
+    if (a[hi]  < a[lo]) _dswap(&a[lo],  &a[hi]);
+    if (a[hi]  < a[mid]) _dswap(&a[mid], &a[hi]);
+    _dswap(&a[mid], &a[hi]);
+    pivot = a[hi];
+    i = lo;
+    for (j = lo; j < hi; j++) {
+        if (a[j] < pivot) { _dswap(&a[i], &a[j]); i++; }
+    }
+    _dswap(&a[i], &a[hi]);
+    return i;
+}
+
+/* Quickselect: returns the k-th smallest (0-indexed) of a[0..n-1],
+ * reordering a[] in the process (fine -- it's a private scratch copy).
+ * O(n) average case vs. a full O(n log n) sort. */
+static double _kth_smallest(double *a, int n, int k) {
+    int lo = 0, hi = n - 1;
+    while (lo < hi) {
+        int p = _partition_lomuto(a, lo, hi);
+        if (p == k) return a[p];
+        if (p < k) lo = p + 1; else hi = p - 1;
+    }
+    return a[lo];
+}
+
+/* Median of a[0..n-1] (reorders a[]).  Odd n: the single middle order
+ * statistic.  Even n: quickselect finds the lower-median at k = n/2-1,
+ * which leaves every a[i > k] >= a[k] (the standard quickselect
+ * post-condition) -- so the upper-median is just the min of that
+ * remaining slice, one more linear scan instead of a second full
+ * selection pass. */
+static double _median_select(double *a, int n) {
+    if (n % 2 == 1) {
+        return _kth_smallest(a, n, n / 2);
+    } else {
+        int k = n / 2 - 1;
+        double lower = _kth_smallest(a, n, k);
+        double upper = a[k + 1];
+        int i;
+        for (i = k + 2; i < n; i++) {
+            if (a[i] < upper) upper = a[i];
+        }
+        return (lower + upper) / 2.0;
+    }
+}
+
+void impute_fill_xs(SV* data_sv, int n_pts, int n_feats, int how,
+                     SV* out_rv) {
+    dTHX;
+    AV *outer, *out;
+    DVec *cols;
+    int i, f;
+
+    if (!SvROK(data_sv) || SvTYPE(SvRV(data_sv)) != SVt_PVAV) {
+        croak("impute_fill_xs: data must be an arrayref");
+    }
+    if (!SvROK(out_rv) || SvTYPE(SvRV(out_rv)) != SVt_PVAV) {
+        croak("impute_fill_xs: out must be an arrayref");
+    }
+    outer = (AV*)SvRV(data_sv);
+    out   = (AV*)SvRV(out_rv);
+
+    cols = (DVec*)calloc((size_t)n_feats, sizeof(DVec));
+
+    for (i = 0; i < n_pts; i++) {
+        SV** row_pp = av_fetch(outer, i, 0);
+        AV* row;
+        if (!row_pp || !*row_pp || !SvROK(*row_pp) ||
+            SvTYPE(SvRV(*row_pp)) != SVt_PVAV) {
+            continue;
+        }
+        row = (AV*)SvRV(*row_pp);
+        for (f = 0; f < n_feats; f++) {
+            SV** v = av_fetch(row, f, 0);
+            if (v && *v && SvOK(*v)) {
+                dvec_push(&cols[f], SvNV(*v));
+            }
+        }
+    }
+
+    /* Validate every column before freeing anything: croak() longjmps
+     * out of this function, so any cleanup loop reachable after a
+     * partial computation has already started (and already freed some
+     * cols[i].v) risks a double free on those same pointers. Checking
+     * all columns up front, before the computation loop below frees
+     * anything, avoids that entirely. Matches the Perl fallback's
+     * behaviour of reporting the first empty column in feature order. */
+    for (f = 0; f < n_feats; f++) {
+        if (cols[f].n == 0) {
+            int col = f;
+            for (i = 0; i < n_feats; i++) free(cols[i].v);
+            free(cols);
+            croak("impute: feature column %d has no present values", col);
+        }
+    }
+
+    av_clear(out);
+    if (n_feats > 0) av_extend(out, n_feats - 1);
+
+    for (f = 0; f < n_feats; f++) {
+        double result;
+        if (how == 0) {
+            double sum = 0.0;
+            for (i = 0; i < (int)cols[f].n; i++) sum += cols[f].v[i];
+            result = sum / (double)cols[f].n;
+        } else {
+            result = _median_select(cols[f].v, (int)cols[f].n);
+        }
+        av_store(out, f, newSVnv(result));
+        free(cols[f].v);
+    }
+    free(cols);
+}
 __INLINE_C__
+
+    # IF_NO_C=1 skips even attempting to build the C backend -- useful for
+    # forcing the pure-Perl path without touching every constructor call
+    # (use_c => 0), e.g. to get a clean timing baseline or to avoid the
+    # compile attempt's overhead/noise in a container known to lack a
+    # compiler.  Everything below is skipped and $HAS_C stays 0.
+    unless ( $ENV{IF_NO_C} ) {
 
     # -O3 is safe to enable unconditionally and matters here: the
     # extended-mode oblique dot product is wrapped in `#pragma omp simd`,
@@ -425,21 +1182,61 @@ __INLINE_C__
     # scalar code.  Use OPTIMIZE (not CCFLAGS) -- CCFLAGS is prepended
     # to the cc line and would be shadowed by Perl's own `-O2 -g` that
     # ExtUtils::MakeMaker appends afterward (last `-O` wins in gcc).
-    #
-    # -march=native lets the compiler pick AVX2 gather + FMA tuned to
-    # the build host; it's opt-in via IF_NATIVE=1 because the cached
-    # artefact under _Inline/ would otherwise refuse to run on a CPU
-    # without the same instruction set extensions.
+    # IF_OPT overrides the level itself (e.g. IF_OPT=-O2 to work around a
+    # miscompile, or to shorten build time while developing); it's
+    # validated against a fixed set of GCC/Clang -O flags rather than
+    # interpolated as-is, since this string eventually reaches a shell
+    # command line via ExtUtils::MakeMaker.
     my $opt_level = '-O3';
-    $opt_level .= ' -march=native' if $ENV{IF_NATIVE};
+    if ( defined $ENV{IF_OPT} ) {
+        if ( $ENV{IF_OPT} =~ /\A-O[0123sgz]\z/ ) {
+            $opt_level = $ENV{IF_OPT};
+        }
+        else {
+            warn "Algorithm::Classifier::IsolationForest: ignoring invalid "
+                . "IF_OPT value '$ENV{IF_OPT}' (expected one of -O0 -O1 -O2 "
+                . "-O3 -Os -Og -Oz); using $opt_level\n";
+        }
+    }
+
+    # -march=<value> lets the compiler target specific instruction-set
+    # extensions (AVX2 gather + FMA, etc.) for the oblique dot product
+    # and the fit-time min/max scan's `#pragma omp simd` loops.
+    #
+    # IF_ARCH=<value> sets it explicitly (e.g. "x86-64-v3", "skylake",
+    # "znver3") -- validated against a conservative identifier charset
+    # since, like IF_OPT, it flows into a compiler command line.
+    # IF_NATIVE=1 remains as shorthand for IF_ARCH=native and is used
+    # when IF_ARCH isn't set. Prefer a specific IF_ARCH value over
+    # IF_NATIVE on a machine you don't control exclusively: blanket
+    # -march=native pulls in whatever the build host has, including
+    # AVX-512 on some Intel CPUs, which is known to trigger clock
+    # throttling under sustained heavy use and can make throughput
+    # *worse* than a conservative target like x86-64-v3 (AVX2, no
+    # AVX-512). Either way, the cached artefact under _Inline/ is then
+    # pinned to that instruction set, so leave both unset if the
+    # directory is shared across machines with different CPUs.
+    if ( defined $ENV{IF_ARCH} ) {
+        if ( $ENV{IF_ARCH} =~ /\A[A-Za-z0-9_.+=-]+\z/ ) {
+            $opt_level .= " -march=$ENV{IF_ARCH}";
+        }
+        else {
+            warn "Algorithm::Classifier::IsolationForest: ignoring invalid "
+                . "IF_ARCH value '$ENV{IF_ARCH}'\n";
+        }
+    }
+    elsif ( $ENV{IF_NATIVE} ) {
+        $opt_level .= ' -march=native';
+    }
 
     # Inline::C hashes the C source to decide whether to rebuild but
     # does NOT include CCFLAGS / OPTIMIZE in that hash.  Without the
-    # tag below, toggling IF_NATIVE (or editing the optimisation flags
-    # here) would silently reuse a cached binary built with stale
-    # flags.  Embedding the active flags as a leading comment forces
-    # the hash to differ when they change.  The OpenMP and serial
-    # builds get distinct tags so they cache to separate artefacts.
+    # tag below, toggling IF_NATIVE/IF_ARCH/IF_OPT (or editing the
+    # optimisation flags here) would silently reuse a cached binary
+    # built with stale flags.  Embedding the active flags as a leading
+    # comment forces the hash to differ when they change.  The OpenMP
+    # and serial builds get distinct tags so they cache to separate
+    # artefacts.
     my $omp_tag    = "/* if_build: openmp $opt_level */\n";
     my $serial_tag = "/* if_build: serial $opt_level */\n";
 
@@ -470,6 +1267,9 @@ __INLINE_C__
             $HAS_C = 1;
         };
     }
+    $OPT_LEVEL = $opt_level if $HAS_C;
+
+    } ## end unless IF_NO_C
     $HAS_OPENMP = ( $HAS_C && defined &has_openmp_xs && has_openmp_xs() )
         ? 1 : 0;
     $HAS_SIMD = ( $HAS_C && defined &has_simd_xs && has_simd_xs() )
@@ -504,7 +1304,10 @@ Algorithm::Classifier::IsolationForest - unsupervised anomaly detection via Isol
     my $reloaded = Algorithm::Classifier::IsolationForest->load('model.json');
 
     # Extended Isolation Forest (oblique hyperplane splits)
-    my $eif = IsolationForest->new(mode => 'extended', seed => 42);
+    my $eif = Algorithm::Classifier::IsolationForest->new(
+        mode => 'extended',
+        seed => 42,
+    );
     $eif->fit(\@data);
 
     # Parallel training (fork-based, Unix-like platforms): build the
@@ -541,7 +1344,7 @@ variant. Each split is a random hyperplane instead of an axis-aligned cut,
 which removes the rectangular, axis-aligned bias in the score field and
 tends to help on elongated or multi-modal data.
 
-psi refernced below is ψ or the pitchfork math symbol refrenced in paper,
+psi referenced below is ψ or the pitchfork math symbol referenced in the paper,
 Liu, Fei Tony & Ting, Kai & Zhou, Zhi-Hua. (2008). Isolation Forest. 413 - 422. 10.1109/ICDM.2008.17.
 
 ... or max samples.
@@ -550,9 +1353,9 @@ L<https://www.researchgate.net/publication/224384174_Isolation_Forest>
 
 =head1 NATIVE ACCELERATION (Inline::C and OpenMP)
 
-The scoring hot path (C<score_samples>, C<predict>, C<path_lengths>,
-C<score_predict_samples>, and C<score_predict_split>) is automatically
-accelerated through
+Both the scoring hot path (C<score_samples>, C<predict>, C<path_lengths>,
+C<score_predict_samples>, and C<score_predict_split>) and the C<fit()>
+tree builder are automatically accelerated through
 L<Inline::C> when it is installed and a working C compiler is reachable.
 If the toolchain also accepts C<-fopenmp> and can link against
 C<libgomp>, the per-point tree walk runs in parallel across all
@@ -561,30 +1364,150 @@ product is vectorised via C<#pragma omp simd> -- which on modern x86
 compilers translates to an unrolled FMA / AVX gather chain that's
 substantially faster for high-feature-count extended models.
 
+C<fit()>'s tree builder (subsampling plus the recursive axis/oblique
+split search) runs in C the same way when C<use_c> is on, replacing the
+per-node Perl arrayref copying with plain int-array partitioning --
+typically an order of magnitude faster, and dramatically more so at
+higher feature counts where the pure-Perl per-cell loop dominates. Its
+random draws go through the same generator C<rand()>/C<srand()> use
+internally, in the same call order the pure-Perl builder uses, so a
+given C<seed> produces bit-identical trees whether C<use_c> is on or
+off -- switching backends changes only how fast the model is built, not
+the model itself.
+
+By default this C builder is single-threaded per call, because Perl's
+RNG state isn't safe to share across OpenMP threads. Two ways to scale
+fit() across cores are available (see below for why they don't compose):
+
+=over 4
+
+=item * C<parallel_fit> forks N worker processes, each building its
+share of the trees with the (still single-threaded) C builder. Fixed
+IPC/serialisation overhead per worker means this can cost more than it
+saves once a fit already completes in milliseconds; it's most useful
+once a single-process fit is large enough that the fork/Storable
+overhead is small relative to the work being split.
+
+=item * C<use_openmp_fit> builds trees across OpenMP threads within a
+single process (one tree per thread), using a separate, thread-safe
+PRNG seeded per tree index instead of Perl's C<rand()>. This means
+trees built with C<use_openmp_fit> are I<not> bit-identical to the
+default C<use_c> path for the same seed -- but a fixed seed and
+C<n_trees> still reproduce the same trees regardless of
+C<OMP_NUM_THREADS> or how OpenMP schedules the work. It's off by
+default (unlike C<use_c>/C<use_openmp>, which only ever change speed,
+this changes which trees get built) and only takes effect when C<use_c>
+is also on and OpenMP is linked in.
+
+=back
+
+These two do NOT compose, despite both existing to parallelise fit().
+A process that has run any OpenMP region -- including plain
+C<score_samples()>/C<predict()> with the default C<use_openmp> -- and
+then C<fork()>s (as C<parallel_fit> does) hands each child a copy of
+libgomp's thread pool whose worker threads did not survive the fork. A
+child that then starts its own C<#pragma omp parallel> region (as
+C<use_openmp_fit> would) tries to reuse that now-invalid pool and
+hangs. This is a general limitation of combining C<fork()> with OpenMP,
+not something fixable from Perl, so C<parallel_fit>'s forked workers
+always use the single-threaded C builder regardless of
+C<use_openmp_fit> -- setting both just means C<parallel_fit> wins and
+C<use_openmp_fit> has no effect for that call.
+
 Detection happens once when the module is loaded; the compiled artefact
-is cached under C<_Inline/> and reused on subsequent runs.  Three
+is cached under C<_Inline/> and reused on subsequent runs.  Four
 package variables report what the build picked up:
 
     $Algorithm::Classifier::IsolationForest::HAS_C       # 0/1
     $Algorithm::Classifier::IsolationForest::HAS_OPENMP  # 0/1
     $Algorithm::Classifier::IsolationForest::HAS_SIMD    # 0/1 (OpenMP 4.0+)
+    $Algorithm::Classifier::IsolationForest::OPT_LEVEL   # e.g. "-O3 -march=native", '' if HAS_C is 0
 
 Neither dependency is required.  Without C<Inline::C> the module falls
 back to a pure-Perl implementation that produces identical results, just
 slower; without OpenMP the C backend runs single-threaded.
 
 The bundled C<iforest accel> subcommand performs a tiny fit + score and
-prints which backend is active, which is the recommended way to verify
-the build picked up the optional dependencies on a given machine.
+prints which backend is active (including the build flags below), which
+is the recommended way to verify the build picked up the optional
+dependencies on a given machine.
 
-The C backend is compiled with C<-O3> by default.  Set the environment
-variable C<IF_NATIVE=1> before first load to add C<-march=native>, which
-lets the compiler emit AVX2/AVX-512 gather and FMA instructions tuned
-to the build host.  This typically gives a meaningful speedup on the
-extended-mode oblique dot product at high feature counts.  The cached
-artefact under C<_Inline/> is pinned to the host CPU, so leave
-C<IF_NATIVE> unset if the directory is shared across machines with
-different instruction-set support.
+=head2 Tuning the C build
+
+These environment variables are read once, the first time the module is
+loaded, so they must be set before that -- e.g. in the shell before
+running a script, not via C<%ENV> inside the script itself.
+
+=over 4
+
+=item * C<IF_NO_C=1> -- skip attempting to build the C backend entirely.
+Equivalent to constructing every instance with C<use_c =E<gt> 0>, but
+without needing to touch every call site; useful for a clean pure-Perl
+timing baseline, or to avoid the compile attempt's overhead/noise on a
+host known to lack a C compiler (the attempt already fails gracefully
+without this, so it's a convenience, not a correctness fix).
+
+=item * C<IF_OPT=-O2> (or C<-O0>/C<-O1>/C<-Os>/C<-Og>/C<-Oz>) -- override
+the default C<-O3>, e.g. to shorten build time while iterating, or work
+around a miscompile on an unusual toolchain. Invalid values are ignored
+with a warning rather than passed through, since this string reaches a
+compiler command line.
+
+=item * C<IF_ARCH=E<lt>valueE<gt>> -- adds C<-march=E<lt>valueE<gt>> so the
+compiler can target specific instruction-set extensions (AVX2 gather +
+FMA, etc.) for the extended-mode oblique dot product and the fit-time
+min/max scan's C<#pragma omp simd> loops. Accepts values like
+C<x86-64-v3>, C<skylake>, or C<znver3> -- whatever your compiler's
+C<-march=> accepts. Also validated (a restricted character set, not
+passed through as-is) for the same reason as C<IF_OPT>.
+
+=item * C<IF_NATIVE=1> -- shorthand for C<IF_ARCH=native>; ignored if
+C<IF_ARCH> is also set. Prefer a specific C<IF_ARCH> value over this on
+a machine you don't control exclusively (a shared build host, a
+container base image): blanket C<-march=native> pulls in whatever
+instruction sets the build host happens to have, including AVX-512 on
+some Intel CPUs -- which is known to trigger clock throttling under
+sustained heavy use and can make throughput I<worse> than a
+conservative target like C<x86-64-v3> (AVX2, no AVX-512). If in doubt,
+benchmark both before committing to one.
+
+=back
+
+Whichever of these are used, the cached artefact under C<_Inline/> is
+pinned to that build's instruction set -- delete C<_Inline/> (or use a
+separate one per host) if the directory is shared across machines with
+different CPUs, or a stale binary built for a narrower instruction set
+than the current host will simply keep being reused.
+
+=head2 Tuning the OpenMP runtime
+
+These are standard OpenMP environment variables libgomp already reads
+at run time (set before running your script, no module-specific
+handling needed) -- listed here because they matter most for exactly
+the workloads this module has: C<score_all_xs>'s per-point parallel
+loop and C<use_openmp_fit>'s per-tree parallel loop.
+
+=over 4
+
+=item * C<OMP_NUM_THREADS=N> -- caps how many threads a parallel region
+uses. Useful to leave headroom for other work sharing the machine, or
+to pin down C<use_openmp_fit> reproducibility checks (see its docs
+above: results don't depend on this, but it's a natural thing to vary
+when confirming that).
+
+=item * C<OMP_PROC_BIND=close> / C<OMP_PLACES=cores> -- on multi-socket
+or otherwise NUMA machines, pins each thread to a core near where its
+data already lives instead of letting the OS scheduler migrate threads
+across sockets mid-run. Both C<score_all_xs> (each thread scans its own
+slice of the packed query buffer) and C<use_openmp_fit> (each thread
+builds one tree from packed training data) benefit from this when the
+input is large enough to not fit comfortably in one socket's cache.
+
+=back
+
+These cost nothing to try -- unlike C<IF_ARCH>/C<IF_NATIVE>, they're
+read fresh every run, not baked into a cached binary, so there's no
+downside to experimenting per invocation.
 
 =head1 GENERAL METHODS
 
@@ -621,6 +1544,27 @@ Inits the object.
           => no learned threshold (predict() falls back to 0.5).
         default :: undef
 
+    - missing :: how fit() treats undef (missing) feature cells. Scoring always
+          tolerates undef regardless of this setting; it governs fit().
+            die    :: croak from fit() if the training data contains any
+                      undef cell. Scoring still maps undef to 0 (the
+                      long-standing behaviour), so a model fitted on clean
+                      data can still score rows with missing features.
+            zero   :: treat a missing cell as the value 0, at fit and score.
+            impute :: replace a missing cell with the per-feature mean (or
+                      median, see impute_with) learned from the present
+                      values at fit time. The fill vector is stored on the
+                      model and reused for scoring and persistence.
+            nan    :: build feature ranges from present values only and route
+                      a point missing the split feature to the right child,
+                      consistently at fit and score time. Missingness is
+                      preserved as signal rather than filled.
+        default :: die
+
+    - impute_with :: 'mean' or 'median'; the statistic used to compute the
+          per-feature fill under missing => 'impute'. Ignored otherwise.
+        default :: mean
+
     - parallel_fit :: positive integer N => build the trees across N forked
           worker processes during fit(). Each worker gets a derived seed
           (parent seed + worker_id * 1009) so the parallel fit is
@@ -631,10 +1575,12 @@ Inits the object.
           platforms without a real fork() (e.g. Windows without Cygwin).
         default :: undef (serial)
 
-    - use_c :: boolean, override whether the Inline::C scoring backend is
-          used.  When false the instance falls back to pure Perl even if
-          the C backend compiled successfully.  When true (or unset) the
-          C backend is used if available ($HAS_C).
+    - use_c :: boolean, override whether the Inline::C backend is used for
+          both scoring and fit()'s tree builder.  When false the instance
+          falls back to pure Perl for both even if the C backend compiled
+          successfully.  When true (or unset) the C backend is used if
+          available ($HAS_C).  fit() with use_c on produces bit-identical
+          trees to use_c off for the same seed -- only build speed differs.
         default :: $HAS_C
 
     - use_openmp :: boolean, override whether OpenMP parallel scoring is
@@ -642,6 +1588,25 @@ Inits the object.
           single-threaded even if OpenMP was linked in.  Ignored when
           use_c is false (pure Perl has no OpenMP path).
         default :: $HAS_OPENMP
+
+    - use_openmp_fit :: boolean, build fit()'s trees across OpenMP threads
+          (one tree per thread) instead of the single-threaded C builder.
+          Opt-in and off by default: unlike use_c/use_openmp, this changes
+          which trees get built. Perl's RNG isn't safe to call from
+          multiple OS threads sharing one interpreter, so this path seeds
+          an independent PRNG per tree from the tree index rather than
+          Drand01() -- trees differ from the use_c (single-threaded)
+          and pure-Perl paths even with the same seed, though a fixed
+          seed and n_trees still reproduce the same trees regardless of
+          OMP_NUM_THREADS or scheduling. Does NOT compose with
+          parallel_fit: a forked child starting its own OpenMP region
+          after the parent process has used OpenMP for anything can
+          hang (a general fork()+libgomp limitation), so parallel_fit's
+          workers always use the single-threaded C builder regardless
+          of this setting -- setting both just means parallel_fit wins.
+          Ignored (clamped to 0) when use_c is false or OpenMP isn't
+          linked in.
+        default :: 0
 
 Note: log2 under Perl is as below...
 
@@ -655,6 +1620,23 @@ sub new {
 	my $mode = $args{mode} // 'axis';
 	croak "mode must be 'axis' or 'extended'"
 		unless $mode eq 'axis' || $mode eq 'extended';
+
+	# How fit() treats undef (missing) feature cells.  Scoring always
+	# tolerates undef regardless of this setting -- it governs fit only.
+	#   die    :: croak if the training data contains any undef cell (default)
+	#   zero   :: treat a missing cell as the value 0
+	#   impute :: replace a missing cell with the per-feature mean/median
+	#             learned from the present values at fit time
+	#   nan    :: build ranges over present values only and route a point
+	#             missing the split feature consistently to one branch, at
+	#             both fit and score time
+	my $missing = $args{missing} // 'die';
+	croak "missing must be one of: die, zero, impute, nan"
+		unless $missing =~ /\A(?:die|zero|impute|nan)\z/;
+
+	my $impute_with = $args{impute_with} // 'mean';
+	croak "impute_with must be 'mean' or 'median'"
+		unless $impute_with =~ /\A(?:mean|median)\z/;
 
 	if ( defined( $args{seed} ) ) {
 		$args{seed} = abs( int( $args{seed} ) );
@@ -676,6 +1658,12 @@ sub new {
 		: $HAS_OPENMP;
 	$use_openmp = 0 unless $use_c;
 
+	# Opt-in only (default 0, not $HAS_OPENMP): this path changes which
+	# trees fit() builds (see docs above), unlike use_c/use_openmp which
+	# only change speed.  Clamped the same way use_openmp is.
+	my $use_openmp_fit
+		= ( $args{use_openmp_fit} && $HAS_OPENMP && $use_c ) ? 1 : 0;
+
 	my $self = {
 		n_trees         => $args{n_trees}     // 100,
 		sample_size     => $args{sample_size} // 256,
@@ -685,8 +1673,12 @@ sub new {
 		extension_level => $args{extension_level},    # undef => max, resolved in fit()
 		contamination   => $args{contamination},      # undef => no learned threshold
 		parallel_fit    => $args{parallel_fit},       # undef/0/1 => serial; N>1 => fork
+		missing         => $missing,                  # die|zero|impute|nan
+		impute_with     => $impute_with,              # mean|median (impute mode only)
+		missing_fill    => undef,                     # per-feature fill, learned in fit() if impute
 		_use_c          => $use_c,
 		_use_openmp     => $use_openmp,
+		_use_openmp_fit => $use_openmp_fit,
 		threshold       => undef,                     # learned in fit() if contamination set
 		trees           => [],
 		c_psi           => undef,                     # c(psi), set during fit()
@@ -738,12 +1730,12 @@ of features. There is no upper limit on dimensionality.
         ...
     );
 
-Below shows a example of building a gausing cluster and using that for training.
+Below shows an example of building a gaussian cluster and using that for training.
 
     # so it is reproducible
     srand(7);
 
-    # build a gaussian cluster and add a handful out outliers...
+    # build a gaussian cluster and add a handful of outliers...
 
     use constant PI => 3.14159265358979;
     sub gaussian {
@@ -767,7 +1759,7 @@ Below shows a example of building a gausing cluster and using that for training.
         push @truth, 1;
     }
 
-    $iforest->fit(\@training_data);
+    $iforest->fit(\@data);
 
 =cut
 
@@ -779,9 +1771,17 @@ sub fit {
 	croak "each sample must be an arrayref of features"
 		unless ref $data->[0] eq 'ARRAY' && @{ $data->[0] };
 
-	my $n          = scalar @$data;
 	my $n_features = scalar @{ $data->[0] };
 	$self->{n_features} = $n_features;
+
+	# Apply the missing-value strategy before any tree is built.  Depending
+	# on the strategy this either croaks (die), returns a dense copy with
+	# undef cells filled (zero/impute), or passes the data through with
+	# undef preserved for the split logic to route (nan).  Everything below
+	# trains on $train, never the raw $data.
+	my $train = $self->_prepare_fit_data($data);
+
+	my $n = scalar @$train;
 
 	# The sub-sample cannot be larger than the data set itself.
 	my $psi = min( $self->{sample_size}, $n );
@@ -820,16 +1820,32 @@ sub fit {
 		&& _fork_supported() )
 	{
 		$self->{trees}
-			= $self->_fit_trees_parallel( $data, $psi, $limit, $workers );
+			= $self->_fit_trees_parallel( $train, $psi, $limit, $workers );
+	}
+	elsif ( $self->{_use_c} && $self->{_use_openmp_fit} ) {
+		$self->{trees}
+			= $self->_build_forest_openmp( $train, $psi, $limit,
+			$self->{n_trees} );
+	}
+	elsif ( $self->{_use_c} ) {
+		$self->{trees}
+			= $self->_build_forest_c( $train, $psi, $limit, $self->{n_trees} );
 	}
 	else {
 		my @trees;
 		for ( 1 .. $self->{n_trees} ) {
-			my $sample = _subsample( $data, $psi );
+			my $sample = _subsample( $train, $psi );
 			push @trees, $self->_build_tree( $sample, 0, $limit );
 		}
 		$self->{trees} = \@trees;
 	}
+
+	# On a re-fit, packed scoring buffers from the previous fit are still
+	# sitting on the object; score_samples() below would pick them up and
+	# learn the contamination threshold against the OLD forest.  Drop them
+	# so the training-set scoring runs pure-Perl against the trees just
+	# built; _rebuild_c_trees repacks from the new trees at the end.
+	delete @$self{qw(_c_nodes _c_coef_idx _c_coef_val)};
 
 	# If a contamination rate was requested, learn the score cutoff that flags
 	# that fraction of the training set. We place the threshold midway between
@@ -837,7 +1853,7 @@ sub fit {
 	# between flagged and unflagged points -- unambiguous and robust to the
 	# tiny float rounding introduced by JSON serialisation.
 	if ( defined $self->{contamination} ) {
-		my $scores = $self->score_samples($data);
+		my $scores = $self->score_samples($train);
 		my @desc   = sort { $b <=> $a } @$scores;
 		my $n_pts  = scalar @desc;
 		my $k      = int( $self->{contamination} * $n_pts + 0.5 );
@@ -878,15 +1894,15 @@ packed dataset built for a different feature count is a fatal error.
 
 =head2 path_lengths(\@data)
 
-Returns the mean isolation depth per sample, for inspection.
+Returns an arrayref of the mean isolation depth per sample, for inspection.
 
-    my @lenghts = $forest->path_lengths(\@data);
+    my $lengths = $forest->path_lengths(\@data);
 
     print "x, y, length\n";
 
     my $int=0;
     while (defined($data[$int])) {
-        print $data[$int][0].', '.$data[$int][1].', '.$lenghts[$int]."\n";
+        print $data[$int][0].', '.$data[$int][1].', '.$lengths->[$int]."\n";
 
         $int++;
     }
@@ -911,13 +1927,14 @@ sub path_lengths {
 		return $result;
 	}
 
-	$data = $self->_to_arrayref($data);
+	$data = $self->_prepare_perl_input($data);
+	my $nan = $self->{missing} eq 'nan' ? 1 : 0;
 
 	# Pure-Perl fallback (tree-outer, sample-inner for cache locality).
 	my @sums = (0) x @$data;
 	for my $tree (@$trees) {
 		for my $i ( 0 .. $#$data ) {
-			$sums[$i] += _path_length( $data->[$i], $tree, 0 );
+			$sums[$i] += _path_length( $data->[$i], $tree, 0, $nan );
 		}
 	}
 	return [ map { $_ / $t } @sums ];
@@ -927,7 +1944,8 @@ sub path_lengths {
 
 Returns an arrayref of 0/1 labels for the specified data.
 
-If theshold is not specified it uses whatever the set default.
+If threshold is not specified it uses the contamination-learned cutoff (if
+C<fit> was called with C<contamination>), otherwise 0.5.
 
     my $results = $forest->predict(\@data, $threshold);
 
@@ -991,9 +2009,9 @@ Scores well below 0.5 are normal.
 
 Scores ~0.5 means the points are hard to tell apart.
 
-    my $scores = $forest->path_lengths(\@data);
+    my $scores = $forest->score_samples(\@data);
 
-    print "x, y, length\n";
+    print "x, y, score\n";
 
     my $int=0;
     while (defined($data[$int])) {
@@ -1027,13 +2045,14 @@ sub score_samples {
 		return [ (0.5) x $n_pts ];
 	}
 
-	$data = $self->_to_arrayref($data);
+	$data = $self->_prepare_perl_input($data);
+	my $nan = $self->{missing} eq 'nan' ? 1 : 0;
 
 	# Pure-Perl fallback (tree-outer, sample-inner for cache locality).
 	my @sums = (0) x @$data;
 	for my $tree (@$trees) {
 		for my $i ( 0 .. $#$data ) {
-			$sums[$i] += _path_length( $data->[$i], $tree, 0 );
+			$sums[$i] += _path_length( $data->[$i], $tree, 0, $nan );
 		}
 	}
 
@@ -1049,10 +2068,12 @@ sub score_samples {
 
 =head2 score_predict_samples
 
-Returns a array ref of arrays. First value of each sub array is the score with the second being
+Returns an array ref of arrays. First value of each sub array is the score with the second being
 0/1 for if it is a anomaly or not.
 
-    my $results = $forest->predict(\@data, $threshold);
+C<$threshold> defaults the same way as in C<predict>.
+
+    my $results = $forest->score_predict_samples(\@data, $threshold);
 
     print "x, y, score, result\n";
 
@@ -1181,9 +2202,9 @@ sub score_predict_split {
 
 =head2 to_json
 
-Returns a JSON representation of the module.
+Returns a JSON representation of the model.
 
-Required being fit having to be called.
+Requires fit to have been called.
 
     my $json = $iforest->to_json;
 
@@ -1206,6 +2227,9 @@ sub to_json {
 			psi_used        => $self->{psi_used},
 			c_psi           => $self->{c_psi},
 			max_depth_used  => $self->{max_depth_used},
+			missing         => $self->{missing},
+			impute_with     => $self->{impute_with},
+			missing_fill    => $self->{missing_fill},
 		},
 		trees => $self->{trees},
 	};
@@ -1251,9 +2275,15 @@ sub from_json {
 		psi_used             => $p->{psi_used},
 		c_psi                => $p->{c_psi},
 		max_depth_used       => $p->{max_depth_used},
+		# Models saved before missing-value support lack these keys; default
+		# to 'zero', which reproduces the old undef -> 0 scoring behaviour.
+		missing              => $p->{missing} // 'zero',
+		impute_with          => $p->{impute_with} // 'mean',
+		missing_fill         => $p->{missing_fill},
 		trees                => $trees,
 		_use_c               => $HAS_C,
 		_use_openmp          => $HAS_OPENMP,
+		_use_openmp_fit      => 0,    # opt-in only; loaded models never re-fit implicitly
 	};
 	croak "model contains no trees" unless @{ $self->{trees} };
 
@@ -1280,7 +2310,7 @@ sub save {
 	write_file( $path, { 'atomic' => 1 }, $self->to_json );
 }
 
-=head2 load($path);
+=head2 load($path)
 
 Init the object from the model in the specified file.
 
@@ -1371,28 +2401,48 @@ sub _build_tree {
 	return [ _NODE_LEAF, $size ]
 		if $depth >= $limit || $size <= 1;
 
-	my $nf = $self->{n_features};
+	my $nf  = $self->{n_features};
+	my $nan = $self->{missing} eq 'nan';
 
-	# Per-feature min and max within this node, in a single pass.
+	# Per-feature min and max within this node, in a single pass.  Missing
+	# (undef) cells never reach here under die/zero/impute -- those fill the
+	# data before fit -- so the "next unless defined" guard is only needed
+	# in nan mode, where missing values must not constrain a feature's
+	# range; every other strategy skips it since every cell is defined and
+	# the check would never fire.
 	my ( @lo, @hi );
-	for my $row (@$X) {
-		for my $f ( 0 .. $nf - 1 ) {
-			my $v = $row->[$f];
-			$lo[$f] = $v if !defined $lo[$f] || $v < $lo[$f];
-			$hi[$f] = $v if !defined $hi[$f] || $v > $hi[$f];
+	if ($nan) {
+		for my $row (@$X) {
+			for my $f ( 0 .. $nf - 1 ) {
+				my $v = $row->[$f];
+				next unless defined $v;
+				$lo[$f] = $v if !defined $lo[$f] || $v < $lo[$f];
+				$hi[$f] = $v if !defined $hi[$f] || $v > $hi[$f];
+			}
+		}
+	}
+	else {
+		for my $row (@$X) {
+			for my $f ( 0 .. $nf - 1 ) {
+				my $v = $row->[$f];
+				$lo[$f] = $v if !defined $lo[$f] || $v < $lo[$f];
+				$hi[$f] = $v if !defined $hi[$f] || $v > $hi[$f];
+			}
 		}
 	}
 
-	# Features with spread are the only ones that can split the data.
-	my @varying = grep { $lo[$_] < $hi[$_] } 0 .. $nf - 1;
+	# Features with spread are the only ones that can split the data.  A
+	# feature whose values are all missing within this node has an undef
+	# range and is excluded.
+	my @varying = grep { defined $lo[$_] && $lo[$_] < $hi[$_] } 0 .. $nf - 1;
 
 	# No spread on any feature => all points identical => cannot isolate.
 	return [ _NODE_LEAF, $size ] unless @varying;
 
 	my $node
 		= $self->{mode} eq 'extended'
-		? $self->_oblique_split( $X, \@varying, \@lo, \@hi )
-		: _axis_split( $X, \@varying, \@lo, \@hi );
+		? $self->_oblique_split( $X, \@varying, \@lo, \@hi, $nan )
+		: _axis_split( $X, \@varying, \@lo, \@hi, $nan );
 
 	# Split functions leave the raw point arrays at the child slots so that
 	# _build_tree can recurse into them; the subtree refs replace them in-place.
@@ -1409,15 +2459,28 @@ sub _build_tree {
 # Returns [_NODE_AXIS, attr, split, \@left_pts, \@right_pts].
 # _build_tree overwrites slots 3 and 4 with the recursed subtrees.
 sub _axis_split {
-	my ( $X, $varying, $lo, $hi ) = @_;
+	my ( $X, $varying, $lo, $hi, $nan ) = @_;
 
 	my $attr  = $varying->[ int( rand( scalar @$varying ) ) ];
 	my $split = $lo->[$attr] + rand() * ( $hi->[$attr] - $lo->[$attr] );
 
+	# A point missing the split feature (nan mode only) routes to the right
+	# child -- the same side NaN reaches in the C scorer, where (NaN < split)
+	# is false.  Under die/zero/impute every cell is defined, so the
+	# "defined($v)" guard is dead weight there and skipped entirely.
 	my ( @left, @right );
-	for my $row (@$X) {
-		if   ( $row->[$attr] < $split ) { push @left,  $row }
-		else                            { push @right, $row }
+	if ($nan) {
+		for my $row (@$X) {
+			my $v = $row->[$attr];
+			if   ( defined($v) && $v < $split ) { push @left,  $row }
+			else                                { push @right, $row }
+		}
+	}
+	else {
+		for my $row (@$X) {
+			if   ( $row->[$attr] < $split ) { push @left,  $row }
+			else                            { push @right, $row }
+		}
 	}
 	return [ _NODE_AXIS, $attr, $split, \@left, \@right ];
 } ## end sub _axis_split
@@ -1429,7 +2492,7 @@ sub _axis_split {
 # Returns [_NODE_OBLIQUE, \@idx, \@coef, $b, \@left_pts, \@right_pts].
 # _build_tree overwrites slots 4 and 5 with the recursed subtrees.
 sub _oblique_split {
-	my ( $self, $X, $varying, $lo, $hi ) = @_;
+	my ( $self, $X, $varying, $lo, $hi, $nan ) = @_;
 
 	my $active = $self->{extension_level_used} + 1;
 	$active = scalar @$varying if $active > scalar @$varying;
@@ -1451,12 +2514,32 @@ sub _oblique_split {
 		$b += $c * $p;
 	}
 
+	# A point missing any feature on the hyperplane (nan mode only) routes
+	# to the right child: in the C scorer the dot product becomes NaN and
+	# (NaN <= b) is false, so this keeps fit and score consistent.  Under
+	# die/zero/impute every cell is defined, so the per-feature "defined"
+	# check and early-exit are dead weight there and skipped entirely.
 	my ( @left, @right );
-	for my $row (@$X) {
-		my $dot = 0.0;
-		$dot += $coef[$_] * $row->[ $idx[$_] ] for 0 .. $#idx;
-		if   ( $dot <= $b ) { push @left,  $row }
-		else                { push @right, $row }
+	if ($nan) {
+		for my $row (@$X) {
+			my $dot     = 0.0;
+			my $missing = 0;
+			for ( 0 .. $#idx ) {
+				my $v = $row->[ $idx[$_] ];
+				if ( !defined $v ) { $missing = 1; last }
+				$dot += $coef[$_] * $v;
+			}
+			if   ( !$missing && $dot <= $b ) { push @left,  $row }
+			else                             { push @right, $row }
+		}
+	}
+	else {
+		for my $row (@$X) {
+			my $dot = 0.0;
+			$dot += $coef[$_] * $row->[ $idx[$_] ] for 0 .. $#idx;
+			if   ( $dot <= $b ) { push @left,  $row }
+			else                { push @right, $row }
+		}
 	}
 	return [ _NODE_OBLIQUE, \@idx, \@coef, $b, \@left, \@right ];
 } ## end sub _oblique_split
@@ -1473,17 +2556,40 @@ sub _oblique_split {
 # The type tag is also used as a loop sentinel: 0 (_NODE_LEAF) is falsy.
 # No $self argument -- the node type encodes everything needed.
 #-------------------------------------------------------------------------------
+# The optional $nan flag selects the nan-strategy routing: a point missing
+# the split feature goes to the right child (matching the C scorer, where
+# the NaN comparison is false).  Without it, undef is coerced to 0 -- the
+# behaviour the die/zero/impute strategies rely on (their data is dense by
+# the time it reaches here, so the "// 0" is normally a no-op).
 sub _path_length {
-	my ( $x, $node, $depth ) = @_;
+	my ( $x, $node, $depth, $nan ) = @_;
 	while ( $node->[0] ) {                       # false only for leaf (type 0)
 		if ( $node->[0] == _NODE_AXIS ) {        # [1, attr, split, left, right]
-			$node = ( $x->[ $node->[1] ] // 0 ) < $node->[2]
-				? $node->[3] : $node->[4];
+			if ($nan) {
+				my $v = $x->[ $node->[1] ];
+				$node = ( defined($v) && $v < $node->[2] )
+					? $node->[3] : $node->[4];
+			} else {
+				$node = ( $x->[ $node->[1] ] // 0 ) < $node->[2]
+					? $node->[3] : $node->[4];
+			}
 		} else {                                 # [2, \@idx, \@coef, b, left, right]
 			my ( $idx, $coef, $b ) = ( $node->[1], $node->[2], $node->[3] );
-			my $dot = 0.0;
-			$dot += $coef->[$_] * ( $x->[ $idx->[$_] ] // 0 ) for 0 .. $#$idx;
-			$node = $dot <= $b ? $node->[4] : $node->[5];
+			if ($nan) {
+				my $dot     = 0.0;
+				my $missing = 0;
+				for ( 0 .. $#$idx ) {
+					my $v = $x->[ $idx->[$_] ];
+					if ( !defined $v ) { $missing = 1; last }
+					$dot += $coef->[$_] * $v;
+				}
+				$node = ( !$missing && $dot <= $b ) ? $node->[4] : $node->[5];
+			} else {
+				my $dot = 0.0;
+				$dot += $coef->[$_] * ( $x->[ $idx->[$_] ] // 0 )
+					for 0 .. $#$idx;
+				$node = $dot <= $b ? $node->[4] : $node->[5];
+			}
 		}
 		$depth++;
 	}
@@ -1647,7 +2753,8 @@ sub _check_fitted {
 # Fork-based parallel tree builder.  Used by fit() when parallel_fit > 1
 # and the platform has a real fork().  Divides n_trees evenly among
 # workers; each child seeds its own RNG ($seed + worker_id * 1009 so
-# fixed-worker-count runs are reproducible), builds its share, and
+# fixed-worker-count runs are reproducible), builds its share (via the
+# C builder when _use_c is on, same as the non-parallel path), and
 # returns the trees to the parent via Storable on a one-shot pipe.
 #
 # The trees that come back differ from a serial fit with the same seed
@@ -1688,12 +2795,32 @@ sub _fit_trees_parallel {
 			if ( defined $self->{seed} ) {
 				srand( $self->{seed} + $w * 1009 );
 			}
-			my @trees;
-			for ( 1 .. $share ) {
-				my $sample = _subsample( $data, $psi );
-				push @trees, $self->_build_tree( $sample, 0, $limit );
+			# Deliberately never _build_forest_openmp here, even when
+			# use_openmp_fit is on: if this process (or the parent that
+			# fork()ed us) already ran any OpenMP region before this
+			# fork -- including plain score_samples()/predict() with
+			# the default use_openmp -- libgomp's thread pool exists
+			# but its worker threads didn't survive the fork. A child
+			# starting its own #pragma omp parallel region then tries
+			# to reuse that now-invalid pool and hangs. This is a
+			# general fork()+libgomp limitation, not fixable from here,
+			# so forked workers always use the single-threaded C
+			# builder (or pure Perl) instead. See t/03-fit-determinism.t
+			# and the NATIVE ACCELERATION docs for the observed hang and
+			# why parallel_fit + use_openmp_fit isn't composed for real.
+			my $trees;
+			if ( $self->{_use_c} ) {
+				$trees = $self->_build_forest_c( $data, $psi, $limit, $share );
 			}
-			print $wh Storable::freeze( \@trees );
+			else {
+				my @t;
+				for ( 1 .. $share ) {
+					my $sample = _subsample( $data, $psi );
+					push @t, $self->_build_tree( $sample, 0, $limit );
+				}
+				$trees = \@t;
+			}
+			print $wh Storable::freeze($trees);
 			close $wh;
 			# _exit so we don't run parent END/DESTROY in the child.
 			POSIX::_exit(0);
@@ -1728,6 +2855,135 @@ sub _fit_trees_parallel {
 }
 
 #-------------------------------------------------------------------------------
+# C-accelerated fit(): builds $n_trees trees against $data (a subset or
+# the full training set) via build_forest_xs, which does its own
+# per-tree subsampling internally.  Random draws inside the C builder
+# go through Drand01() -- the same generator Perl's rand() uses -- in
+# the same call order _subsample/_build_tree used, so the returned
+# trees are bit-identical to what the pure-Perl path would build from
+# the same RNG state.  That's what lets fit() switch backends on the
+# existing `use_c` knob instead of a new one.
+#-------------------------------------------------------------------------------
+sub _build_forest_c {
+	my ( $self, $data, $psi, $limit, $n_trees ) = @_;
+	my $n  = scalar @$data;
+	my $nf = $self->{n_features};
+	my $x_packed = "\0" x ( $n * $nf * 8 );
+	my ( $mode, $fill ) = $self->_pack_args;
+	pack_input_xs( $data, $x_packed, $n, $nf, $mode, $fill );
+
+	my $mode_flag = $self->{mode} eq 'extended' ? 1 : 0;
+	my $ext_level = $self->{extension_level_used} // 0;
+
+	my $trees = [];
+	build_forest_xs( $x_packed, $n, $nf, $n_trees, $psi, $limit,
+		$mode_flag, $ext_level, $trees );
+	return $trees;
+}
+
+#-------------------------------------------------------------------------------
+# OpenMP-parallel fit(): builds $n_trees trees across OpenMP threads (one
+# tree per thread) via build_forest_openmp_xs.  Unlike _build_forest_c,
+# random draws come from a thread-private PRNG seeded per tree index
+# rather than Drand01() -- Perl's RNG state can't be shared safely
+# across OpenMP threads -- so the resulting trees are NOT bit-identical
+# to the use_c (serial) or pure-Perl paths for the same seed, though a
+# fixed seed + n_trees still reproduce the same trees regardless of
+# OMP_NUM_THREADS.  This is why it's gated by the separate, opt-in
+# use_openmp_fit knob rather than reusing use_c/use_openmp.
+#
+# Only called from fit()'s non-forked branch.  _fit_trees_parallel's
+# workers never call this, even when use_openmp_fit is on: a forked
+# child starting its own OpenMP region after the parent process has
+# used OpenMP for anything (this includes plain score_samples()) can
+# hang -- see the comment above that branch for the fork()+libgomp
+# hazard this avoids.
+#
+# build_forest_openmp_xs hands back three arrayrefs of per-tree packed
+# buffers (the same SoA layout _pack_tree produces) instead of Perl tree
+# structures -- that's how it avoids any Perl API call inside its
+# parallel region.  _unpack_forest converts them back into the ordinary
+# nested-arrayref tree shape so to_json/from_json/_rebuild_c_trees don't
+# need to know this path exists.
+#-------------------------------------------------------------------------------
+sub _build_forest_openmp {
+	my ( $self, $data, $psi, $limit, $n_trees ) = @_;
+	my $n  = scalar @$data;
+	my $nf = $self->{n_features};
+	my $x_packed = "\0" x ( $n * $nf * 8 );
+	my ( $mode, $fill ) = $self->_pack_args;
+	pack_input_xs( $data, $x_packed, $n, $nf, $mode, $fill );
+
+	my $mode_flag = $self->{mode} eq 'extended' ? 1 : 0;
+	my $ext_level = $self->{extension_level_used} // 0;
+
+	my ( @nodes, @idx, @val );
+	build_forest_openmp_xs( $x_packed, $n, $nf, $n_trees, $psi, $limit,
+		$mode_flag, $ext_level, \@nodes, \@idx, \@val, 1 );
+
+	return _unpack_forest( \@nodes, \@idx, \@val );
+}
+
+# Inverse of _pack_tree's SoA layout: given one tree's packed node
+# buffer plus the shared idx/val coefficient buffers, reconstructs the
+# ordinary nested-arrayref tree structure _build_tree/_build_node_c
+# produce.  li/ri fields hold the child's absolute node index, so this
+# just follows them recursively from whatever index the caller says the
+# root lives at.  NOTE: _pack_tree numbers nodes DFS pre-order (root at
+# 0), but build_forest_openmp_xs appends nodes post-order (children
+# before parent), putting the root LAST -- the caller must pass the
+# right root index for the buffer's origin.
+sub _unpack_node {
+	my ( $nodes, $idx, $val, $node_i ) = @_;
+	my $off  = $node_i * 6;
+	my $type = $nodes->[$off];
+
+	if ( $type == 0 ) {
+		return [ _NODE_LEAF, int( $nodes->[ $off + 1 ] ) ];
+	}
+	elsif ( $type == 1 ) {
+		my ( $attr, $split, $li, $ri )
+			= @{$nodes}[ $off + 1 .. $off + 4 ];
+		return [
+			_NODE_AXIS, int($attr), $split,
+			_unpack_node( $nodes, $idx, $val, int($li) ),
+			_unpack_node( $nodes, $idx, $val, int($ri) ),
+		];
+	}
+	else {
+		my ( $coff, $num, $li, $ri, $b ) = @{$nodes}[ $off + 1 .. $off + 5 ];
+		$coff = int($coff);
+		$num  = int($num);
+		return [
+			_NODE_OBLIQUE,
+			[ @{$idx}[ $coff .. $coff + $num - 1 ] ],
+			[ @{$val}[ $coff .. $coff + $num - 1 ] ],
+			$b,
+			_unpack_node( $nodes, $idx, $val, int($li) ),
+			_unpack_node( $nodes, $idx, $val, int($ri) ),
+		];
+	}
+} ## end sub _unpack_node
+
+# Unpacks every tree in the three per-tree packed-buffer arrayrefs
+# build_forest_openmp_xs returns into the ordinary nested tree shape.
+# The C builder pushes nodes post-order (a node is recorded after both
+# of its children), so each tree's root is the LAST node record, not
+# index 0 as in _pack_tree's pre-order layout.
+sub _unpack_forest {
+	my ( $nodes_list, $idx_list, $val_list ) = @_;
+	my @trees;
+	for my $i ( 0 .. $#$nodes_list ) {
+		my @nodes = unpack( 'd*', $nodes_list->[$i] );
+		my @idx   = unpack( 'l*', $idx_list->[$i] );
+		my @val   = unpack( 'd*', $val_list->[$i] );
+		my $root  = @nodes / 6 - 1;
+		push @trees, _unpack_node( \@nodes, \@idx, \@val, $root );
+	}
+	return \@trees;
+}
+
+#-------------------------------------------------------------------------------
 # Packed input wrapper.  pack_data() returns one of these so callers can
 # score the same dataset many times without re-walking the AV/AV refs on
 # every call -- a meaningful win at high feature counts where
@@ -1746,7 +3002,8 @@ sub pack_data {
 	my $n_pts    = scalar @$data;
 	my $nf       = $self->{n_features};
 	my $x_packed = "\0" x ( $n_pts * $nf * 8 );
-	pack_input_xs( $data, $x_packed, $n_pts, $nf );
+	my ( $mode, $fill ) = $self->_pack_args;
+	pack_input_xs( $data, $x_packed, $n_pts, $nf, $mode, $fill );
 	return bless {
 		packed  => $x_packed,
 		n_pts   => $n_pts,
@@ -1768,7 +3025,8 @@ sub _resolve_input {
 	my $n_pts    = scalar @$data;
 	my $nf       = $self->{n_features};
 	my $x_packed = "\0" x ( $n_pts * $nf * 8 );
-	pack_input_xs( $data, $x_packed, $n_pts, $nf );
+	my ( $mode, $fill ) = $self->_pack_args;
+	pack_input_xs( $data, $x_packed, $n_pts, $nf, $mode, $fill );
 	return ( $n_pts, $nf, $x_packed );
 }
 
@@ -1790,6 +3048,162 @@ sub _to_arrayref {
 		return \@rows;
 	}
 	croak "expected arrayref or PackedData, got " . ( ref($data) || 'scalar' );
+}
+
+# ---------------------------------------------------------------------------
+# Missing-value handling.
+#
+# The `missing` strategy chosen at new() decides how undef feature cells are
+# treated.  Scoring always tolerates undef; the strategy governs fit() and
+# how undef is represented for the scorer:
+#
+#   die    -- croak from fit() if the training data holds any undef cell.
+#             Scoring still maps undef -> 0 (the long-standing behaviour).
+#   zero   -- undef counts as the value 0, at fit and score time.
+#   impute -- undef is replaced by a learned per-feature mean/median; the
+#             fill vector is stored on the model and reused at score time.
+#   nan    -- ranges are built over present values only and a point missing
+#             the split feature is routed to the right child, consistently
+#             at fit (Perl) and score (C packs NaN; `<`/`<=` send it right).
+# ---------------------------------------------------------------------------
+
+# Returns the training data to actually build trees on, after applying the
+# missing-value strategy.  May croak (die), return a dense filled copy
+# (zero/impute), or pass $data through unchanged (nan).
+sub _prepare_fit_data {
+	my ( $self, $data ) = @_;
+	my $m  = $self->{missing};
+	my $nf = $self->{n_features};
+
+	if ( $m eq 'die' ) {
+		for my $i ( 0 .. $#$data ) {
+			my $row = $data->[$i];
+			for my $f ( 0 .. $nf - 1 ) {
+				next if defined $row->[$f];
+				croak "fit(): undef feature value at sample $i, column $f; "
+					. "construct with missing => 'zero', 'impute', or 'nan' "
+					. "to train on data with missing values";
+			}
+		}
+		return $data;
+	}
+
+	# nan: leave undef in place -- _build_tree / the split routers handle it.
+	return $data if $m eq 'nan';
+
+	# zero / impute: undef has to become a real number somewhere before a
+	# split can look at it.  The fill vector is computed either way (it's
+	# needed for persistence and for scoring later), but densifying $data
+	# into a second, fully separate Perl array here is only necessary for
+	# the pure-Perl tree builder (_build_tree assumes every cell is
+	# defined once missing != 'nan' -- see its lo/hi scan).  The C
+	# tree-building path -- _build_forest_c/_build_forest_openmp, and
+	# every parallel_fit worker, all of which go through pack_input_xs --
+	# already fills undef cells itself from this same fill vector, so
+	# skip the redundant whole-dataset copy when that's the path fit()
+	# will actually take.  Scoring the training set for a learned
+	# contamination threshold (below, in fit()) is unaffected: it always
+	# runs through the pure-Perl scorer regardless of use_c (fit() drops
+	# any previous fit's packed buffers before that scoring, and
+	# _rebuild_c_trees runs after), and that path already tolerates raw
+	# undef cells
+	# for both zero (_path_length's "// 0") and impute (_prepare_perl_input
+	# densifies on demand from missing_fill).
+	my $fill
+		= $m eq 'impute'
+		? $self->_compute_impute_fill($data)
+		: [ (0) x $nf ];
+	$self->{missing_fill} = $fill if $m eq 'impute';
+	delete $self->{_fill_packed};
+
+	return $data if $self->{_use_c};
+	return _densify( $data, $fill );
+}
+
+# Per-feature fill value (mean or median of the present values) for impute
+# mode.  Croaks if a feature has no present value to learn from.
+sub _compute_impute_fill {
+	my ( $self, $data ) = @_;
+	my $nf  = $self->{n_features};
+	my $how = $self->{impute_with};
+
+	# C fast path: walks the raw data directly and finds the median via
+	# quickselect (O(n) average) instead of the Perl fallback's full sort
+	# (O(n log n)).  Produces the same fill values either way -- see
+	# impute_fill_xs's file-top comment -- so use_c only changes speed
+	# here, matching the rest of the module.
+	if ( $self->{_use_c} ) {
+		my $n        = scalar @$data;
+		my $how_flag = $how eq 'median' ? 1 : 0;
+		my $fill     = [];
+		impute_fill_xs( $data, $n, $nf, $how_flag, $fill );
+		return $fill;
+	}
+
+	my @fill;
+	for my $f ( 0 .. $nf - 1 ) {
+		my @vals = grep { defined } map { $_->[$f] } @$data;
+		croak "impute: feature column $f has no present values"
+			unless @vals;
+		if ( $how eq 'median' ) {
+			my @s = sort { $a <=> $b } @vals;
+			my $k = scalar @s;
+			$fill[$f]
+				= $k % 2
+				? $s[ int( $k / 2 ) ]
+				: ( $s[ $k / 2 - 1 ] + $s[ $k / 2 ] ) / 2.0;
+		} else {    # mean
+			my $sum = 0;
+			$sum += $_ for @vals;
+			$fill[$f] = $sum / scalar @vals;
+		}
+	}
+	return \@fill;
+}
+
+# Return a dense copy of $data with every undef cell replaced by the
+# matching per-feature fill value.  Leaves present cells untouched.
+sub _densify {
+	my ( $data, $fill ) = @_;
+	my $nf = scalar @$fill;
+	return [
+		map {
+			my $r = $_;
+			[ map { defined $r->[$_] ? $r->[$_] : $fill->[$_] } 0 .. $nf - 1 ]
+		} @$data
+	];
+}
+
+# (miss_mode, fill_packed) pair for pack_input_xs, per the active strategy.
+# die/zero -> 0 (undef becomes 0.0); impute -> 1 (undef becomes fill[k]);
+# nan -> 2 (undef becomes NaN, which the C scorer routes right).
+sub _pack_args {
+	my ($self) = @_;
+	my $m = $self->{missing};
+	return ( 2, '' ) if $m eq 'nan';
+	if ( $m eq 'impute' ) {
+		my $fill = $self->{missing_fill};
+		croak "impute model is missing its fill vector"
+			unless ref $fill eq 'ARRAY' && @$fill == $self->{n_features};
+		$self->{_fill_packed} //= pack( 'd*', @$fill );
+		return ( 1, $self->{_fill_packed} );
+	}
+	return ( 0, '' );    # die, zero
+}
+
+# Pure-Perl fallback input prep: arrayref-ify, then fill for impute so the
+# tree walk sees dense rows.  zero/die rely on _path_length's "// 0"; nan
+# keeps undef in place for _path_length to route.  Returns the rows; the
+# caller passes the nan flag to _path_length separately.
+sub _prepare_perl_input {
+	my ( $self, $data ) = @_;
+	my $rows = $self->_to_arrayref($data);
+	if ( $self->{missing} eq 'impute' ) {
+		croak "impute model is missing its fill vector"
+			unless ref $self->{missing_fill} eq 'ARRAY';
+		$rows = _densify( $rows, $self->{missing_fill} );
+	}
+	return $rows;
 }
 
 # Minimal PackedData package: opaque token returned by pack_data().

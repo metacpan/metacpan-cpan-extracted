@@ -1,0 +1,28 @@
+Installation instructions for Text::AsciidocDown
+
+To install this module, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If you are on a platform that requires root privileges for 'make install',
+you may need to use 'sudo' for the final command.
+
+Dependencies
+============
+
+This module requires Perl 5.16.0 or later.
+
+All runtime and test dependencies are Perl core modules. No non-core
+CPAN packages need to be installed separately:
+
+  - Carp
+  - Cwd
+  - File::Basename
+  - File::Spec
+  - File::Temp
+  - Getopt::Long
+  - Pod::Usage
+  - version (0.77 or later)

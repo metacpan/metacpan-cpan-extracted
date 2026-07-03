@@ -24,6 +24,7 @@ int* boo(const int* a);
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int*
@@ -70,6 +71,7 @@ void boo(const std::string& a);
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 void
@@ -114,6 +116,7 @@ void foo2(std::vector<double> a, std::vector<double>& b);
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -174,6 +177,7 @@ void boo(const std::map<int, std::string> a);
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 
@@ -215,6 +219,7 @@ void foo(const std::vector<double>& a);
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 

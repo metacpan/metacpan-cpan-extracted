@@ -1,0 +1,15 @@
+Revision history for Perl extension Time-Nanos
+
+v0.1.4  2026-07-02
+    - Add option to return (seconds, units) arrays from nanos, micros, millis
+    - Add $CLOCK variable for external clock source selection
+    - Add Windows high-resolution timer support
+    - Add stopwatch example
+    - POD and documentation updates
+    - Whitespace and build fixes
+
+v0.1.2  2026-06-17
+    - Initial release
+    - Rename module to Time::Nanos
+    - Add MANIFEST
+    - Drop failing tests on slow ARM

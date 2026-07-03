@@ -24,6 +24,7 @@ sub rec_cleanup {
 		{
 			$project->{playback_position} = 0;
 			$setup->{_last_rec_tracks} = \@rec_tracks;
+			$setup->{_main_rw} = $tn{Main}->rw;
 		}
 
 		if( grep /Mixdown/, @files) { 
@@ -140,6 +141,7 @@ sub post_rec_configure {
 
 		$ui->global_version_buttons(); # recreate
 		adjust_offset_recordings();
+		$tn{Main}->set(rw => MON);
 
 		# toggle recorded tracks to PLAY for auditioning
 		

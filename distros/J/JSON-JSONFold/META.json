@@ -5,6 +5,14 @@
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "json",
+      "formatter",
+      "pretty-print",
+      "compact",
+      "streaming",
+      "folding"
+   ],
    "license" : [
       "mit"
    ],
@@ -33,11 +41,31 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "0",
-            "JSON::PP" : "0"
+            "JSON" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IPC::Open3" : "0",
+            "Symbol" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.2.0",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ylenga/jsonfold/issues"
+      },
+      "homepage" : "https://jsonfold.dev",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ylenga/jsonfold.git",
+         "web" : "https://github.com/ylenga/jsonfold"
+      }
+   },
+   "version" : "v0.2.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

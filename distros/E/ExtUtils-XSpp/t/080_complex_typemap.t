@@ -30,6 +30,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 foobar
@@ -63,6 +64,7 @@ class Foo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -98,6 +100,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -132,6 +135,7 @@ class Foo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -169,6 +173,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -204,6 +209,7 @@ class Foo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 

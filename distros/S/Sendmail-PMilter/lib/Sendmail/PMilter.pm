@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-Copyright (c) 2016-2024 G.W. Haywood.  All rights reserved.
+Copyright (c) 2016-2026 G.W. Haywood.  All rights reserved.
   With thanks to all those who have trodden these paths before,
   including
 Copyright (c) 2002-2004 Todd Vierling.  All rights reserved.
@@ -53,7 +53,7 @@ use Socket;
 use Symbol;
 use UNIVERSAL;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 $VERSION = eval $VERSION;
 
 our $DEBUG = 0;

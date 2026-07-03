@@ -2,6 +2,8 @@ package Net::Nostr::Badge;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -19,12 +21,12 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{thumbs}     //= [];
     $args{awardees}   //= [];
     $args{badges}     //= [];
     $args{badge_sets} //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -32,7 +34,8 @@ sub new {
 }
 
 sub definition {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $identifier = delete $args{identifier}
         // croak "definition requires 'identifier'";
@@ -65,7 +68,8 @@ sub definition {
 }
 
 sub award {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $badge = delete $args{badge}
         // croak "award requires 'badge'";
@@ -90,7 +94,8 @@ sub award {
 }
 
 sub profile_badges {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $badges = delete $args{badges}
         // croak "profile_badges requires 'badges'";
@@ -119,7 +124,8 @@ sub profile_badges {
 }
 
 sub badge_set {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $identifier = delete $args{identifier}
         // croak "badge_set requires 'identifier'";
@@ -373,6 +379,8 @@ Badge image recommended aspect ratio is 1:1 with a high-res size of
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $badge = Net::Nostr::Badge->new(%fields);
 

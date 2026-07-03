@@ -1,6 +1,8 @@
 package Net::Nostr::Wiki;
 
 use strictures 2;
+
+use Net::Nostr::_ConstructorArgs ();
 use feature 'unicode_strings';
 
 use Carp qw(croak);
@@ -33,8 +35,8 @@ my %KINDS = (
 
 sub new {
     my $class = shift;
-    my %args = @_;
-    my $self = bless \%args, $class;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -63,7 +65,8 @@ sub normalize_dtag {
 }
 
 sub article {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = delete $args{pubkey}
         // croak "article requires 'pubkey'";
@@ -108,7 +111,8 @@ sub article {
 }
 
 sub merge_request {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey      = delete $args{pubkey}
         // croak "merge_request requires 'pubkey'";
@@ -158,7 +162,8 @@ sub merge_request {
 }
 
 sub redirect {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = delete $args{pubkey}
         // croak "redirect requires 'pubkey'";
@@ -417,6 +422,8 @@ kind 10102 lists to indicate preferred relays for wiki content.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $w = Net::Nostr::Wiki->new(
         identifier => 'bitcoin',

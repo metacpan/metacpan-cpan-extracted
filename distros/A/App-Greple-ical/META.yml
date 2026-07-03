@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,17 +26,17 @@ no_index:
 provides:
   App::Greple::ical:
     file: lib/App/Greple/ical.pm
-    version: '0.02'
+    version: '1.00'
 requires:
   App::Greple: '8.58'
-  perl: v5.14.0
+  perl: v5.24.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-ical/issues
   homepage: https://github.com/kaz-utashiro/greple-ical
   repository: https://github.com/kaz-utashiro/greple-ical.git
-version: '0.02'
+version: '1.00'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

@@ -2,6 +2,8 @@ package Net::Nostr::Key;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Crypt::PK::ECC;
 use Crypt::PK::ECC::Schnorr;
@@ -11,7 +13,8 @@ use Net::Nostr::Event;
 use Class::Tiny qw(_cryptpkecc);
 
 sub new {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my %known_args = map { $_ => 1 } qw(privkey pubkey);
     my @unknown = grep { !exists $known_args{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -29,7 +32,9 @@ sub new {
 sub constructor_keys { qw(privkey pubkey) }
 
 sub from_mnemonic {
-    my ($class, $mnemonic, %args) = @_;
+    my $class = shift;
+    my $mnemonic = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "from_mnemonic requires a mnemonic" unless defined $mnemonic;
 
     require Bitcoin::Crypto::Key::ExtPrivate;
@@ -53,7 +58,8 @@ sub from_mnemonic {
 }
 
 sub generate_mnemonic {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     require Bitcoin::BIP39;
     my $bits = $args{bits} // 128;
     my $result = Bitcoin::BIP39::gen_bip39_mnemonic(bits => $bits);
@@ -174,7 +180,8 @@ sub sign_event {
 }
 
 sub create_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{pubkey} = $self->pubkey_hex;
     my $event = Net::Nostr::Event->new(%args);
     $self->sign_event($event);
@@ -265,6 +272,8 @@ the entropy size: C<128> (default) produces 12 words, C<256> produces
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $key = Net::Nostr::Key->new;
     my $key = Net::Nostr::Key->new(privkey => \$der_bytes);

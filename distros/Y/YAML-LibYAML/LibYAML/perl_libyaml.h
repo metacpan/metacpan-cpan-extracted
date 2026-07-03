@@ -24,6 +24,14 @@
 #define LOADERRMSG "YAML::XS::Load Error: "
 #define DUMPERRMSG "YAML::XS::Dump Error: "
 
+#ifndef LIBYAML_H
+#define LIBYAML_H
+
+extern int BOOLEAN_JSON_PP;
+extern int BOOLEAN_BOOLEAN;
+
+#endif
+
 typedef enum yaml_xs_scalar_type_e {
     YAML_XS_SCALAR_TYPE_STRING,
     YAML_XS_SCALAR_TYPE_BOOL_TRUE,
@@ -74,6 +82,7 @@ typedef struct {
     int require_footer;
     char *anchor_prefix;
     int cyclic_refs;
+    int boolean;
     int document;
 } perl_yaml_xs_t;
 

@@ -22,6 +22,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -51,6 +52,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -78,6 +80,7 @@ class Foo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -161,6 +164,7 @@ class Foo6
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo1
 

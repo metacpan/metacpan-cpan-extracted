@@ -1,3 +1,9 @@
+0.910		2026-07-02	T. R. Wyant
+    Methods now(), today(), and from_epoch() now accept all documented args.
+    Previously, they did not accept 'accented' and 'traditional', though the
+    documentation said they did. Add tests to ensure that these, plus
+    from_object(), continue to do so.
+
 0.909		2026-06-16	T. R. Wyant
     Remove references to the RT bug tracking system.
 

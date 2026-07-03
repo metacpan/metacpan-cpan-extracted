@@ -2,6 +2,8 @@ package Net::Nostr::KeyEncrypt;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Crypt::AuthEnc::ChaCha20Poly1305;
 use Crypt::PRNG qw(random_bytes);
@@ -70,7 +72,7 @@ my $MAX_BECH32_LENGTH = 5000;
 }
 
 sub encrypt_private_key {
-    my (%args) = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $privkey_hex  = $args{privkey_hex}  // croak "privkey_hex is required";
     my $password     = $args{password}     // croak "password is required";
     my $log_n        = $args{log_n}        // croak "log_n is required";

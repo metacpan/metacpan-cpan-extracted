@@ -2,6 +2,8 @@ package Net::Nostr::Marketplace;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
@@ -46,7 +48,7 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{categories} //= [];
     $args{images}     //= [];
     $args{shipping}   //= [];
@@ -54,7 +56,7 @@ sub new {
     $args{merchants}  //= [];
     $args{items}      //= [];
     $args{payment_options} //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -64,7 +66,8 @@ sub new {
 # === Event creation ===
 
 sub stall_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey   = $args{pubkey}   // croak "stall_event requires 'pubkey'";
     my $id       = $args{id}       // croak "stall_event requires 'id'";
@@ -104,7 +107,8 @@ sub _build_stall_shipping {
 }
 
 sub product_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey   = $args{pubkey}   // croak "product_event requires 'pubkey'";
     my $id       = $args{id}       // croak "product_event requires 'id'";
@@ -145,7 +149,8 @@ sub product_event {
 }
 
 sub marketplace_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey = $args{pubkey} // croak "marketplace_event requires 'pubkey'";
     my $id     = $args{id}     // croak "marketplace_event requires 'id'";
@@ -165,7 +170,8 @@ sub marketplace_event {
 }
 
 sub auction_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey       = $args{pubkey}       // croak "auction_event requires 'pubkey'";
     my $id           = $args{id}           // croak "auction_event requires 'id'";
@@ -197,7 +203,8 @@ sub auction_event {
 }
 
 sub bid_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey           = $args{pubkey}           // croak "bid_event requires 'pubkey'";
     croak "bid_event requires 'amount'"            unless exists $args{amount};
@@ -213,7 +220,8 @@ sub bid_event {
 }
 
 sub bid_confirmation_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey           = $args{pubkey}           // croak "bid_confirmation_event requires 'pubkey'";
     my $bid_event_id     = $args{bid_event_id}     // croak "bid_confirmation_event requires 'bid_event_id'";
@@ -237,7 +245,8 @@ sub bid_confirmation_event {
 # === Checkout message builders ===
 
 sub order_message {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $id          = $args{id}          // croak "order_message requires 'id'";
     my $items       = $args{items}       // croak "order_message requires 'items'";
@@ -258,7 +267,8 @@ sub order_message {
 }
 
 sub payment_request_message {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $id              = $args{id}              // croak "payment_request_message requires 'id'";
     my $payment_options = $args{payment_options} // croak "payment_request_message requires 'payment_options'";
@@ -274,7 +284,8 @@ sub payment_request_message {
 }
 
 sub order_status_message {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $id      = $args{id}      // croak "order_status_message requires 'id'";
     my $message = $args{message} // croak "order_status_message requires 'message'";
@@ -636,6 +647,8 @@ ln, lnurl).
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $info = Net::Nostr::Marketplace->new(%fields);
 

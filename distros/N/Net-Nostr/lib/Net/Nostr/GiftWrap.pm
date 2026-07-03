@@ -2,6 +2,8 @@ package Net::Nostr::GiftWrap;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
@@ -25,13 +27,15 @@ sub _rumor_hash {
 }
 
 sub create_rumor {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     delete $args{sig};  # rumors are unsigned
     return Net::Nostr::Event->new(%args);
 }
 
 sub seal {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $rumor            = $args{rumor}            // croak "rumor required";
     my $sender_key       = $args{sender_key}       // croak "sender_key required";
     my $recipient_pubkey = $args{recipient_pubkey} // croak "recipient_pubkey required";
@@ -58,13 +62,16 @@ sub seal {
 }
 
 sub wrap {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $seal             = $args{seal}             // croak "seal required";
     my $recipient_pubkey = $args{recipient_pubkey} // croak "recipient_pubkey required";
     croak "recipient_pubkey must be 64-char lowercase hex" unless $recipient_pubkey =~ $HEX64;
     my $wrapper_key      = $args{wrapper_key}      // Net::Nostr::Key->new;
     my $created_at       = $args{created_at}       // _random_timestamp();
     my $expiration       = $args{expiration};
+    my $kind             = $args{kind}             // 1059;
+    croak "gift wrap kind must be 1059 or 21059" unless $kind == 1059 || $kind == 21059;
 
     my $seal_json = JSON->new->utf8->canonical->encode($seal->to_hash);
 
@@ -77,7 +84,7 @@ sub wrap {
     push @tags, ['expiration', "$expiration"] if defined $expiration;
 
     return $wrapper_key->create_event(
-        kind       => 1059,
+        kind       => $kind,
         content    => $encrypted,
         tags       => \@tags,
         created_at => $created_at,
@@ -85,7 +92,8 @@ sub wrap {
 }
 
 sub seal_and_wrap {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $rumor            = $args{rumor}            // croak "rumor required";
     my $sender_key       = $args{sender_key}       // croak "sender_key required";
     my $recipient_pubkey = $args{recipient_pubkey} // croak "recipient_pubkey required";
@@ -100,16 +108,19 @@ sub seal_and_wrap {
     return $class->wrap(
         seal             => $seal,
         recipient_pubkey => $recipient_pubkey,
+        (defined $args{kind} ? (kind => $args{kind}) : ()),
         (defined $args{expiration} ? (expiration => $args{expiration}) : ()),
     );
 }
 
 sub unwrap {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $event         = $args{event}         // croak "event required";
     my $recipient_key = $args{recipient_key} // croak "recipient_key required";
 
-    croak "event must be kind 1059" unless $event->kind == 1059;
+    croak "event must be kind 1059 or 21059"
+        unless $event->kind == 1059 || $event->kind == 21059;
 
     # Decrypt the seal
     my $conv_key1 = Net::Nostr::Encryption->get_conversation_key(
@@ -190,7 +201,7 @@ event to obscure metadata. Uses three layers:
 =item B<Seal> (kind 13) - Encrypts the rumor with the sender's key. Identifies
 the author without revealing content or recipient. Tags are always empty.
 
-=item B<Gift wrap> (kind 1059) - Encrypts the seal with a random one-time key.
+=item B<Gift wrap> (kind 1059 or ephemeral kind 21059) - Encrypts the seal with a random one-time key.
 Includes a C<p> tag for routing to the recipient.
 
 =back
@@ -243,13 +254,14 @@ C<expiration> (add expiration tag for disappearing messages).
     say $wrap->kind;    # 1059
     say $wrap->pubkey;  # random one-time-use pubkey (not the sender)
 
-Creates a kind 1059 gift wrap event. The seal is JSON-encoded and encrypted
-with NIP-44 using a random one-time key. A C<p> tag is added for the
-recipient.
+Creates a kind 1059 gift wrap event by default. Pass C<kind =E<gt> 21059>
+to create the ephemeral gift wrap form. The seal is JSON-encoded and
+encrypted with NIP-44 using a random one-time key. A C<p> tag is added for
+the recipient.
 
 Optional arguments: C<wrapper_key> (override random key, for testing),
 C<created_at> (override random timestamp), C<expiration> (add expiration
-tag).
+tag), C<kind> (1059 or 21059).
 
 =head2 seal_and_wrap
 
@@ -259,7 +271,8 @@ tag).
         recipient_pubkey => $recipient->pubkey_hex,
     );
 
-Convenience method that calls L</seal> then L</wrap>.
+Convenience method that calls L</seal> then L</wrap>. Pass C<kind =E<gt>
+21059> to produce an ephemeral gift wrap.
 
 Optional arguments: C<expiration> (gift wrap expiration),
 C<seal_expiration> (seal expiration).
@@ -281,12 +294,12 @@ Expiration example (disappearing messages):
         recipient_key => $recipient,
     );
 
-Decrypts a kind 1059 gift wrap event. Returns the rumor (unsigned event)
-and the sender's public key (from the seal). The caller should verify
+Decrypts a kind 1059 or 21059 gift wrap event. Returns the rumor (unsigned
+event) and the sender's public key (from the seal). The caller should verify
 that C<$sender_pubkey> matches C<< $unwrapped->pubkey >> for authentication
 (L<Net::Nostr::DirectMessage/receive> does this automatically).
 
-Croaks if the event is not kind 1059 or the seal is not kind 13.
+Croaks if the event is not kind 1059 or 21059, or the seal is not kind 13.
 
 B<Trust boundary>: This method only decrypts and parses the layered
 structure. It checks kind numbers but does B<not> verify the gift wrap

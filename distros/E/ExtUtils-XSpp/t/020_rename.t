@@ -23,6 +23,7 @@ __DATA__
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo::Bar
 
 int
@@ -67,6 +68,7 @@ boo( int a )
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo::Bar
 
 int
@@ -104,6 +106,7 @@ boo( int a )
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo::Bar
 
 int
@@ -125,6 +128,7 @@ boo( int a )
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo::Bar
 
@@ -169,6 +173,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -198,6 +203,7 @@ class Foo
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Foo
 
@@ -238,6 +244,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 #undef  xsp_constructor_class
@@ -274,6 +281,7 @@ class Foo
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 void
@@ -303,6 +311,7 @@ Foo::destroy()
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=Bar::Baz
 

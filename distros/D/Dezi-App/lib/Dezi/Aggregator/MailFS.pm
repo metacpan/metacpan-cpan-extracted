@@ -6,7 +6,7 @@ use Dezi::Aggregator::Mail;    # delegate doc creation
 use Carp;
 use Data::Dump qw( dump );
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 =pod
 
@@ -133,7 +133,7 @@ around 'get_doc' => sub {
     my $msg = Mail::Message->read( \$doc->content );
 
     # and finally convert to the Dezi::Indexer::Doc we intend to return
-    my $mail = $self->{_mailer}->get_doc( $folder, $msg );
+    my $mail = $self->{_mailer}->get_doc( $msg, $folder );
 
     # reinstate original url from filesystem
     $mail->url( $doc->url );

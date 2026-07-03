@@ -15,7 +15,7 @@ use SWISH::3 qw( :constants );
 my $SWISH3 = SWISH::3->new();
 my $XML    = Search::Tools::XML->new;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 =pod
 
@@ -201,6 +201,12 @@ sub path_parts {
 
     # TODO build regex from ->config
     my ( $file, $path, $ext ) = fileparse( $url, $re );
+    if ( !$file and $ext ) {
+
+        # this is a dot-file (no extension, leading dot)
+        $file = $ext;
+        $ext  = '';
+    }
     return ( $path, $file, $ext );
 }
 

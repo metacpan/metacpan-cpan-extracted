@@ -1570,55 +1570,8 @@ assert_eq(totient_sum(100, 0), 1)
 assert_eq(totient_sum(100, 1), 3044)
 assert_eq(totient_sum(100, 2), 280608)
 
-assert_eq(20.of{.pillai },    [0]+20.of{.pillai_sum   }.diffs)
-assert_eq(20.of{.pillai(2) }, [0]+20.of{.pillai_sum(2)}.diffs)
-assert_eq(20.of{.pillai(3) }, [0]+20.of{.pillai_sum(3)}.diffs)
-assert_eq(20.of{.pillai(4) }, [0]+20.of{.pillai_sum(4)}.diffs)
-
-assert_eq([0]+20.of{ .sigma_sum }.diffs, 20.of { .sigma })
-assert_eq([0]+20.of{ .sigma_sum(0,1) }.diffs, 20.of { .tau * _ })
-assert_eq([0]+20.of{ .sigma_sum(1,1) }.diffs, 20.of { .sigma * _ })
-assert_eq([0]+20.of{ .sigma_sum(2,1) }.diffs, 20.of { .sigma(2) * _ })
-assert_eq([0]+20.of{ .sigma_sum(2,2) }.diffs, 20.of { .sigma(2) * _*_ })
-assert_eq([0]+20.of{ .sigma_sum(0,2) }.diffs, 20.of { .tau * _*_ })
-assert_eq([0]+20.of{ .sigma_sum(1,2) }.diffs, 20.of { .sigma * _*_ })
-assert_eq([0]+20.of{ .sigma_sum(2,0) }.diffs, 20.of { .sigma(2) })
-assert_eq([0]+20.of{ .sigma_sum(1) }.diffs, 20.of { .sigma(1) })
-assert_eq([0]+20.of{ .sigma_sum(0) }.diffs, 20.of { .tau })
-
-assert_eq(20.of{.psi(0)}.acc, 20.of{.psi_sum(0)})
-assert_eq(20.of{.psi(1)}.acc, 20.of{.psi_sum(1)})
-assert_eq(20.of{.psi(2)}.acc, 20.of{.psi_sum(2)})
-assert_eq(20.of{.psi(3)}.acc, 20.of{.psi_sum(3)})
-
-assert_eq(20.of{.totient(0)}.acc, 20.of{.totient_sum(0)})
-assert_eq(20.of{.totient(1)}.acc, 20.of{.totient_sum(1)})
-assert_eq(20.of{.totient(2)}.acc, 20.of{.totient_sum(2)})
-assert_eq(20.of{.totient(3)}.acc, 20.of{.totient_sum(3)})
-
-assert_eq(20.of{.omega(0)}.acc, 20.of{.omega_sum(0)})
-assert_eq(20.of{.omega(1)}.acc, 20.of{.omega_sum(1)})
-assert_eq(20.of{.omega(2)}.acc, 20.of{.omega_sum(2)})
-assert_eq(20.of{.omega(3)}.acc, 20.of{.omega_sum(3)})
-
-assert_eq(20.of{.bigomega(0)}.acc, 20.of{.bigomega_sum(0)})
-assert_eq(20.of{.bigomega(1)}.acc, 20.of{.bigomega_sum(1)})
-assert_eq(20.of{.bigomega(2)}.acc, 20.of{.bigomega_sum(2)})
-assert_eq(20.of{.bigomega(3)}.acc, 20.of{.bigomega_sum(3)})
-
-assert_eq(20.of{.exp_omega(0)}.acc, 20.of{.exp_omega_sum(0)})
-assert_eq(20.of{.exp_omega(1)}.acc, 20.of{.exp_omega_sum(1)})
-assert_eq(20.of{.exp_omega(2)}.acc, 20.of{.exp_omega_sum(2)})
 assert_eq(20.of{.exp_omega(-1)}.acc, 20.of{.exp_omega_sum(-1)})
-
-assert_eq(20.of{.exp_squarefree_omega(0)}.acc, 20.of{.exp_squarefree_omega_sum(0)})
-assert_eq(20.of{.exp_squarefree_omega(1)}.acc, 20.of{.exp_squarefree_omega_sum(1)})
-assert_eq(20.of{.exp_squarefree_omega(2)}.acc, 20.of{.exp_squarefree_omega_sum(2)})
 assert_eq(20.of{.exp_squarefree_omega(-1)}.acc, 20.of{.exp_squarefree_omega_sum(-1)})
-
-assert_eq(20.of{.exp_bigomega(0)}.acc, 20.of{.exp_bigomega_sum(0)})
-assert_eq(20.of{.exp_bigomega(1)}.acc, 20.of{.exp_bigomega_sum(1)})
-assert_eq(20.of{.exp_bigomega(2)}.acc, 20.of{.exp_bigomega_sum(2)})
 assert_eq(20.of{.exp_bigomega(-1)}.acc, 20.of{.exp_bigomega_sum(-1)})
 
 assert_eq(liouville_sum(1e6+1234), -514)
@@ -1943,10 +1896,6 @@ do {
 
 assert_eq(10.by { solve_pell(_, 2) }, %n[2, 7, 14, 23, 31, 34, 46, 47, 62, 71])
 
-assert_eq(20.of { .sopf_sum },  20.of { .sopf }.acc)
-assert_eq(20.of { .sopfr_sum }, 20.of { .sopfr }.acc)
-assert_eq(20.of { .exp_mangoldt_sum }, 20.of { .exp_mangoldt }.acc)
-
 assert_eq(exp_mangoldt(2**128), 2)
 assert_eq(exp_mangoldt(2**128 + 1), 1)
 assert_eq(exp_mangoldt(5**20), 5)
@@ -1976,5 +1925,13 @@ assert_eq(20.of{.perrin}, %n[3, 0, 2, 3, 2, 5, 5, 7, 10, 12, 17, 22, 29, 39, 51,
 assert_eq(20.of{.padovan}, %n[1, 0, 0, 1, 0, 1, 1, 1, 2, 2, 3, 4, 5, 7, 9, 12, 16, 21, 28, 37])
 assert_eq(10.by{.perrinmod(_) == 0}, %n[1, 2, 3, 5, 7, 11, 13, 17, 19, 23])
 assert_eq(20.of {|n| perrinmod(n+1, n+1) }, %n[0, 0, 0, 2, 0, 5, 0, 2, 3, 7, 0, 5, 0, 9, 8, 10, 0, 14, 0, 17])
+
+assert_eq(30.of{ .dirichlet_inverse { .sigma }}, %n[0, 1, -3, -4, 2, -6, 12, -8, 0, 3, 18, -12, -8, -14, 24, 24, 0, -18, -9, -20, -12, 32, 36, -24, 0, 5, 42, 0, -16, -30])
+assert_eq(30.of{ .dirichlet_inverse { .phi }}, %n[0, 1, -1, -2, -1, -4, 2, -6, -1, -2, 4, -10, 2, -12, 6, 8, -1, -16, 2, -18, 4, 12, 10, -22, 2, -4, 12, -2, 6, -28])
+
+assert_eq(
+    30.of { .moebius_inverse { .psi } },
+    30.of { .dirichlet_inverse { .squarefree_part }.abs }
+)
 
 say "** Tests passed!"

@@ -7,6 +7,24 @@ my $PK = 'a' x 64;
 my $MEMBER = 'c308e1f882c1f1dff2a43d4294239ddeec04e575f2d1aad1fa21ea7684e61fb5';
 
 ###############################################################################
+# POD example: role_definition
+###############################################################################
+
+subtest 'POD: role_definition' => sub {
+    my $event = Net::Nostr::RelayAccess->role_definition(
+        pubkey      => $PK,
+        role_id     => '28b7e50f',
+        label       => 'king',
+        description => 'ruler of the relay',
+        color       => 37,
+        order       => 1,
+    );
+    is($event->kind, 33534, 'kind');
+    ok($event->is_protected, 'protected');
+    is($event->d_tag, '28b7e50f', 'role id d tag');
+};
+
+###############################################################################
 # POD example: membership_list
 ###############################################################################
 
@@ -84,10 +102,11 @@ subtest 'POD: leave_request' => sub {
 subtest 'POD: from_event' => sub {
     my $event = Net::Nostr::RelayAccess->membership_list(
         pubkey  => $PK,
-        members => [$MEMBER],
+        members => [{ pubkey => $MEMBER, roles => ['28b7e50f'] }],
     );
     my $parsed = Net::Nostr::RelayAccess->from_event($event);
-    is($parsed->members->[0], $MEMBER);
+    is($parsed->members->[0]{pubkey}, $MEMBER);
+    is($parsed->members->[0]{roles}, ['28b7e50f']);
 };
 
 ###############################################################################
@@ -131,10 +150,10 @@ subtest 'constructor: unknown args rejected' => sub {
 
 subtest 'public methods available' => sub {
     can_ok('Net::Nostr::RelayAccess',
-        qw(new membership_list add_member remove_member
+        qw(new role_definition membership_list add_member remove_member
            join_request invite leave_request
            from_event validate
-           members member claim));
+           members member claim role_id label description color order));
 };
 
 done_testing;

@@ -2,42 +2,61 @@ package Net::Nostr::Group;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
+use Net::Nostr::Bech32 qw(encode_naddr decode_naddr);
 use Net::Nostr::Event;
 
-my $VALID_GROUP_ID = qr/\A[a-z0-9\-_]+\z/;
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub parse_id {
     my ($class, $str) = @_;
-    if ($str =~ /\A([^']+)'(.+)\z/) {
-        my ($host, $group_id) = ($1, $2);
-        croak "invalid group_id: must match $VALID_GROUP_ID"
-            unless $group_id =~ $VALID_GROUP_ID;
-        return { host => $host, group_id => $group_id };
-    }
-    # Host only -- infer _ as group_id (MAY per spec)
-    return { host => $str, group_id => '_' };
+    my $data = decode_naddr($str);
+    croak "group identifier MUST reference kind 39000 metadata"
+        unless $data->{kind} == 39000;
+    return {
+        group_id => $data->{identifier},
+        pubkey   => $data->{pubkey},
+        kind     => $data->{kind},
+        relays   => $data->{relays},
+        relay    => $data->{relays}[0],
+    };
 }
 
 sub format_id {
-    my ($class, %args) = @_;
-    my $host     = $args{host}     // croak "format_id requires 'host'";
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
+    my $pubkey   = $args{pubkey}   // croak "format_id requires 'pubkey'";
     my $group_id = $args{group_id} // croak "format_id requires 'group_id'";
-    return "${host}'${group_id}";
+    my @relays;
+    push @relays, $args{relay} if defined $args{relay};
+    if (defined $args{relays}) {
+        croak "relays must be an array reference"
+            unless ref $args{relays} eq 'ARRAY';
+        push @relays, @{$args{relays}};
+    }
+    return encode_naddr(
+        identifier => $group_id,
+        pubkey     => $pubkey,
+        kind       => 39000,
+        relays     => \@relays,
+    );
 }
 
 sub validate_group_id {
     my ($class, $id) = @_;
-    return defined $id && $id =~ $VALID_GROUP_ID ? 1 : 0;
+    return defined $id && !ref($id) && length($id) ? 1 : 0;
 }
 
 sub _validate_and_extract_group {
-    my ($class, $method, %args) = @_;
+    my $class = shift;
+    my $method = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $pubkey   = $args{pubkey}   // croak "$method requires 'pubkey'";
     my $group_id = $args{group_id} // croak "$method requires 'group_id'";
-    croak "invalid group_id: must match $VALID_GROUP_ID"
-        unless $group_id =~ $VALID_GROUP_ID;
+    croak "invalid group_id: must be a non-empty string"
+        unless $class->validate_group_id($group_id);
     return ($pubkey, $group_id);
 }
 
@@ -52,7 +71,8 @@ sub _build_tags_with_h {
 
 # Kind 9000: put-user
 sub put_user {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my ($pubkey, $group_id) = $class->_validate_and_extract_group('put_user', %args);
     my $target = $args{target} // croak "put_user requires 'target'";
     croak "target must be 64-char lowercase hex" unless $target =~ $HEX64;
@@ -72,7 +92,8 @@ sub put_user {
 
 # Kind 9001: remove-user
 sub remove_user {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my ($pubkey, $group_id) = $class->_validate_and_extract_group('remove_user', %args);
     my $target = $args{target} // croak "remove_user requires 'target'";
     croak "target must be 64-char lowercase hex" unless $target =~ $HEX64;
@@ -87,7 +108,8 @@ sub remove_user {
 
 # Kind 9002: edit-metadata
 sub edit_metadata {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my ($pubkey, $group_id) = $class->_validate_and_extract_group('edit_metadata', %args);
     my $reason = $args{reason} // '';
 
@@ -110,7 +132,8 @@ sub edit_metadata {
 
 # Kind 9005: delete-event
 sub delete_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my ($pubkey, $group_id) = $class->_validate_and_extract_group('delete_event', %args);
     my $event_id = $args{event_id} // croak "delete_event requires 'event_id'";
     croak "event_id must be 64-char lowercase hex" unless $event_id =~ $HEX64;
@@ -125,7 +148,8 @@ sub delete_event {
 
 # Kind 9007: create-group
 sub create_group {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my ($pubkey, $group_id) = $class->_validate_and_extract_group('create_group', %args);
     my $reason = $args{reason} // '';
 
@@ -137,7 +161,8 @@ sub create_group {
 
 # Kind 9008: delete-group
 sub delete_group {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my ($pubkey, $group_id) = $class->_validate_and_extract_group('delete_group', %args);
     my $reason = $args{reason} // '';
 
@@ -149,7 +174,8 @@ sub delete_group {
 
 # Kind 9009: create-invite
 sub create_invite {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my ($pubkey, $group_id) = $class->_validate_and_extract_group('create_invite', %args);
     my $code   = $args{code} // croak "create_invite requires 'code'";
     my $reason = $args{reason} // '';
@@ -163,7 +189,8 @@ sub create_invite {
 
 # Kind 9021: join-request
 sub join_request {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my ($pubkey, $group_id) = $class->_validate_and_extract_group('join_request', %args);
     my $reason = $args{reason} // '';
 
@@ -176,7 +203,8 @@ sub join_request {
 
 # Kind 9022: leave-request
 sub leave_request {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my ($pubkey, $group_id) = $class->_validate_and_extract_group('leave_request', %args);
     my $reason = $args{reason} // '';
 
@@ -188,7 +216,8 @@ sub leave_request {
 
 # Kind 39000: group metadata (relay-generated, addressable)
 sub metadata {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $pubkey   = $args{pubkey}   // croak "metadata requires 'pubkey'";
     my $group_id = $args{group_id} // croak "metadata requires 'group_id'";
 
@@ -197,18 +226,26 @@ sub metadata {
     push @tags, ['name', $args{name}]       if defined $args{name};
     push @tags, ['picture', $args{picture}] if defined $args{picture};
     push @tags, ['about', $args{about}]     if defined $args{about};
+    push @tags, ['livekit']                 if $args{livekit};
+    if (exists $args{supported_kinds}) {
+        croak "supported_kinds must be an array reference"
+            unless ref $args{supported_kinds} eq 'ARRAY';
+        push @tags, ['supported_kinds', map { "$_" } @{$args{supported_kinds}}];
+    }
 
     for my $flag (qw(private restricted hidden closed)) {
         push @tags, [$flag] if $args{$flag};
     }
 
-    delete @args{qw(group_id name picture about private restricted hidden closed)};
+    delete @args{qw(group_id name picture about livekit supported_kinds
+                    private restricted hidden closed)};
     return Net::Nostr::Event->new(%args, kind => 39000, content => '', tags => \@tags);
 }
 
 # Kind 39001: group admins (relay-generated, addressable)
 sub admins {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $pubkey   = $args{pubkey}   // croak "admins requires 'pubkey'";
     my $group_id = $args{group_id} // croak "admins requires 'group_id'";
     my $members  = $args{members}  // croak "admins requires 'members'";
@@ -226,7 +263,8 @@ sub admins {
 
 # Kind 39002: group members (relay-generated, addressable)
 sub members {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $pubkey   = $args{pubkey}   // croak "members requires 'pubkey'";
     my $group_id = $args{group_id} // croak "members requires 'group_id'";
     my $members  = $args{members}  // croak "members requires 'members'";
@@ -244,7 +282,8 @@ sub members {
 
 # Kind 39003: group roles (relay-generated, addressable)
 sub roles {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $pubkey   = $args{pubkey}   // croak "roles requires 'pubkey'";
     my $group_id = $args{group_id} // croak "roles requires 'group_id'";
     my $roles    = $args{roles}    // croak "roles requires 'roles'";
@@ -261,6 +300,28 @@ sub roles {
 
     delete @args{qw(group_id roles content)};
     return Net::Nostr::Event->new(%args, kind => 39003, content => $content, tags => \@tags);
+}
+
+# Kind 39004: livekit participants (relay-generated, addressable)
+sub participants {
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
+    my $pubkey       = $args{pubkey}       // croak "participants requires 'pubkey'";
+    my $group_id     = $args{group_id}     // croak "participants requires 'group_id'";
+    my $participants = $args{participants} // croak "participants requires 'participants'";
+    my $content      = $args{content}      // '';
+    croak "participants must be an array reference"
+        unless ref $participants eq 'ARRAY';
+
+    my @tags = (['d', $group_id]);
+    for my $participant (@$participants) {
+        croak "participant pubkey must be 64-char lowercase hex"
+            unless $participant =~ $HEX64;
+        push @tags, ['participant', $participant];
+    }
+
+    delete @args{qw(group_id participants content)};
+    return Net::Nostr::Event->new(%args, kind => 39004, content => $content, tags => \@tags);
 }
 
 # Parsing methods
@@ -282,6 +343,10 @@ sub metadata_from_event {
             $meta{picture} = $tag->[1];
         } elsif ($name eq 'about') {
             $meta{about} = $tag->[1];
+        } elsif ($name eq 'livekit') {
+            $meta{livekit} = 1;
+        } elsif ($name eq 'supported_kinds') {
+            $meta{supported_kinds} = [@{$tag}[1 .. $#$tag]];
         } elsif ($flags{$name}) {
             $meta{$name} = 1;
         }
@@ -353,6 +418,25 @@ sub roles_from_event {
     return \%result;
 }
 
+sub participants_from_event {
+    my ($class, $event) = @_;
+    croak "event must be kind 39004" unless $event->kind == 39004;
+
+    my %result;
+    my @participants;
+
+    for my $tag (@{$event->tags}) {
+        if ($tag->[0] eq 'd') {
+            $result{group_id} = $tag->[1];
+        } elsif ($tag->[0] eq 'participant') {
+            push @participants, $tag->[1];
+        }
+    }
+
+    $result{participants} = \@participants;
+    return \%result;
+}
+
 sub group_id_from_event {
     my ($class, $event) = @_;
     # h tag takes priority (user/mod events); d tag is fallback (metadata events)
@@ -379,20 +463,20 @@ Net::Nostr::Group - NIP-29 relay-based groups
 
     my $key = Net::Nostr::Key->new;
 
-    # Parse a group identifier
-    my $parsed = Net::Nostr::Group->parse_id("groups.nostr.com'pizza");
-    # { host => 'groups.nostr.com', group_id => 'pizza' }
-
-    # Format a group identifier
-    my $id = Net::Nostr::Group->format_id(
-        host     => 'groups.nostr.com',
+    # Format and parse a group identifier (naddr for kind 39000 metadata)
+    my $group_naddr = Net::Nostr::Group->format_id(
+        pubkey   => $relay_pubkey,
         group_id => 'pizza',
+        relay    => 'wss://groups.nostr.com',
     );
-    # "groups.nostr.com'pizza"
+
+    my $parsed = Net::Nostr::Group->parse_id($group_naddr);
+    # { group_id => 'pizza', pubkey => $relay_pubkey, kind => 39000, ... }
 
     # Validate a group_id
     Net::Nostr::Group->validate_group_id('my-group_1');  # 1
-    Net::Nostr::Group->validate_group_id('INVALID');      # 0
+    Net::Nostr::Group->validate_group_id('Pizza Fans');   # 1
+    Net::Nostr::Group->validate_group_id('');             # 0
 
     # Join a group (kind 9021)
     my $join = Net::Nostr::Group->join_request(
@@ -472,6 +556,8 @@ Net::Nostr::Group - NIP-29 relay-based groups
         about    => 'a group for pizza fans',
         private  => 1,
         closed   => 1,
+        livekit  => 1,
+        supported_kinds => [9, 11],
     );
 
     # Generate admin list (kind 39001, relay-generated)
@@ -501,20 +587,29 @@ Net::Nostr::Group - NIP-29 relay-based groups
         ],
     );
 
+    # Generate LiveKit participant list (kind 39004, relay-generated)
+    my $participant_event = Net::Nostr::Group->participants(
+        pubkey       => $relay_pubkey,
+        group_id     => 'pizza',
+        participants => [$pk1, $pk2],
+    );
+
     # Parse received events
     my $meta_info    = Net::Nostr::Group->metadata_from_event($event);
     my $admin_info   = Net::Nostr::Group->admins_from_event($event);
     my $member_info  = Net::Nostr::Group->members_from_event($event);
     my $role_info    = Net::Nostr::Group->roles_from_event($event);
+    my $part_info    = Net::Nostr::Group->participants_from_event($event);
     my $gid          = Net::Nostr::Group->group_id_from_event($event);
 
 =head1 DESCRIPTION
 
-Implements NIP-29 relay-based groups. Groups are identified by a string
-restricted to C<a-z0-9-_> and belong to a specific relay. Group state
-is managed through moderation events (kinds 9000-9009) and user events
-(kinds 9021-9022). Group metadata is published as addressable events
-(kinds 39000-39003) signed by the relay.
+Implements NIP-29 relay-based groups. Groups have arbitrary non-empty
+C<group_id> strings in event C<h> and C<d> tags. Public group identifiers
+are C<naddr> references to the group's kind 39000 metadata event. Group
+state is managed through moderation events (kinds 9000-9009) and user
+events (kinds 9021-9022). Relay-generated group state is published as
+addressable events (kinds 39000-39004) signed by the relay.
 
 All user and moderation events MUST include an C<h> tag with the group
 id. Group metadata events use a C<d> tag instead.
@@ -525,7 +620,12 @@ with C<group> and C<r> tags per NIP-51:
     use Net::Nostr::List;
 
     my $groups = Net::Nostr::List->new(kind => 10009);
-    $groups->add('group', "groups.nostr.com'pizza", 'wss://groups.nostr.com', 'Pizza Lovers');
+    my $group_id = Net::Nostr::Group->format_id(
+        pubkey   => $relay_pubkey,
+        group_id => 'pizza',
+        relay    => 'wss://groups.nostr.com',
+    );
+    $groups->add('group', $group_id, 'wss://groups.nostr.com', 'Pizza Lovers');
     $groups->add('r', 'wss://groups.nostr.com');
     my $event = $groups->to_event(pubkey => $key->pubkey_hex);
 
@@ -533,33 +633,36 @@ with C<group> and C<r> tags per NIP-51:
 
 =head2 parse_id
 
-    my $parsed = Net::Nostr::Group->parse_id("groups.nostr.com'pizza");
-    # { host => 'groups.nostr.com', group_id => 'pizza' }
+    my $parsed = Net::Nostr::Group->parse_id($naddr);
+    # { group_id => 'pizza', pubkey => $relay_pubkey, kind => 39000, ... }
 
-    my $parsed = Net::Nostr::Group->parse_id("groups.nostr.com");
-    # { host => 'groups.nostr.com', group_id => '_' }
-
-Parses a group identifier string in C<< <host>'<group-id> >> format.
-If only a host is given (no C<'>), infers C<_> as the group id per
-NIP-29. Croaks if the group id contains invalid characters.
+Parses a group identifier C<naddr> that references a kind 39000 metadata
+event. Returns the raw C<group_id>, relay pubkey, kind, relay hints, and
+the first relay hint as C<relay>. Croaks for legacy host-based identifiers,
+invalid bech32 data, or C<naddr> values that do not reference kind 39000.
 
 =head2 format_id
 
     my $id = Net::Nostr::Group->format_id(
-        host     => 'groups.nostr.com',
+        pubkey   => $relay_pubkey,
         group_id => 'pizza',
+        relay    => 'wss://groups.nostr.com',
     );
-    # "groups.nostr.com'pizza"
+    # naddr1...
 
-Formats a group identifier string from host and group_id components.
+Formats a public group identifier as an C<naddr> referencing the group's
+kind 39000 metadata event. C<pubkey> is the relay's self pubkey.
+C<relay> or C<relays> may be supplied as relay hints. C<relays> must be
+an arrayref.
 
 =head2 validate_group_id
 
     Net::Nostr::Group->validate_group_id('my-group');  # 1
-    Net::Nostr::Group->validate_group_id('NOPE');      # 0
+    Net::Nostr::Group->validate_group_id('Pizza Fans'); # 1
+    Net::Nostr::Group->validate_group_id('');           # 0
 
-Returns true if the group id matches the allowed character set
-C<a-z0-9-_>.
+Returns true if the group id is a defined non-empty scalar. Current
+NIP-29 does not restrict group ids to a specific character set.
 
 =head2 put_user
 
@@ -688,11 +791,14 @@ Creates a kind 9022 leave request event.
         restricted => 1,    # only members can write
         hidden     => 1,    # hide metadata from non-members
         closed     => 1,    # ignore join requests
+        livekit    => 1,    # group supports LiveKit A/V rooms
+        supported_kinds => [9, 11], # text event kinds supported by the group
     );
 
 Creates a kind 39000 addressable event describing group metadata.
 This event should be signed by the relay's master key. Uses a C<d>
-tag (not C<h>) with the group id.
+tag (not C<h>) with the group id. C<supported_kinds>, when supplied,
+must be an arrayref.
 
 =head2 admins
 
@@ -732,6 +838,19 @@ Creates a kind 39002 addressable event listing group members.
 
 Creates a kind 39003 addressable event listing supported roles.
 
+=head2 participants
+
+    my $event = Net::Nostr::Group->participants(
+        pubkey       => $relay_pubkey,
+        group_id     => 'pizza',
+        content      => 'participant list',  # optional
+        participants => [$pk1, $pk2],
+    );
+
+Creates a kind 39004 addressable event listing current LiveKit
+participants. C<participants> must be an arrayref. This event should be
+signed by the relay's master key.
+
 =head2 metadata_from_event
 
     my $meta = Net::Nostr::Group->metadata_from_event($event);
@@ -739,8 +858,9 @@ Creates a kind 39003 addressable event listing supported roles.
     #   about => '...', private => 1, closed => 1 }
 
 Parses a kind 39000 event. Returns a hashref with group metadata.
-Boolean flags (C<private>, C<restricted>, C<hidden>, C<closed>) are
-set to 1 when present. Croaks if the event is not kind 39000.
+Boolean flags (C<private>, C<restricted>, C<hidden>, C<closed>,
+C<livekit>) are set to 1 when present. C<supported_kinds> is returned
+as an arrayref when present. Croaks if the event is not kind 39000.
 
 =head2 admins_from_event
 
@@ -773,6 +893,14 @@ arrayref of role definitions. Croaks if the event is not kind 39003.
     for my $role (@{$result->{roles}}) {
         say "$role->{name}: $role->{description}";
     }
+
+=head2 participants_from_event
+
+    my $result = Net::Nostr::Group->participants_from_event($event);
+    # { group_id => '...', participants => [$pk1, $pk2] }
+
+Parses a kind 39004 event. Returns a hashref with group_id and an
+arrayref of participant pubkeys. Croaks if the event is not kind 39004.
 
 =head2 group_id_from_event
 

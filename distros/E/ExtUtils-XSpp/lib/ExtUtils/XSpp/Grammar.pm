@@ -1,6 +1,6 @@
 ####################################################################
 #
-#    This file was generated using Parse::Yapp version 1.05.
+#    This file was generated using Parse::Yapp version 1.21.
 #
 #        Don't edit this file, use source file instead.
 #
@@ -25,7 +25,8 @@ use strict;
 #
 # This notice should remain unchanged.
 #
-# (c) Copyright 1998-2001 Francois Desarmenien, all rights reserved.
+# Copyright © 1998, 1999, 2000, 2001, Francois Desarmenien.
+# Copyright © 2017 William N. Braswell, Jr.
 # (see the pod text in Parse::Yapp module for use and distribution rights)
 #
 
@@ -37,7 +38,8 @@ use strict;
 
 use vars qw ( $VERSION $COMPATIBLE $FILENAME );
 
-$VERSION = '1.05';
+# CORRELATION #py001: $VERSION must be changed in both Parse::Yapp & ExtUtils::XSpp::Grammar::YappDriver
+$VERSION = '1.21';
 $COMPATIBLE = '0.07';
 $FILENAME=__FILE__;
 
@@ -496,756 +498,764 @@ sub new {
         ref($class)
     and $class=ref($class);
 
-    my($self)=$class->SUPER::new( yyversion => '1.05',
+    my($self)=$class->SUPER::new( yyversion => '1.21',
                                   yystates =>
 [
 	{#State 0
 		ACTIONS => {
-			'ID' => 28,
-			'p_typemap' => 4,
-			'p_any' => 3,
-			'OPSPECIAL' => 33,
-			'COMMENT' => 7,
-			'p_exceptionmap' => 36,
-			"class" => 9,
-			'RAW_CODE' => 37,
-			"const" => 11,
-			"int" => 40,
-			'p_module' => 16,
-			"enum" => 47,
-			'p_package' => 46,
-			'p_loadplugin' => 45,
-			'PREPROCESSOR' => 17,
-			"short" => 18,
-			'p_file' => 49,
-			"void" => 19,
+			"enum" => 4,
+			'p_include' => 19,
+			'COMMENT' => 20,
+			'p_typemap' => 47,
+			'p_name' => 34,
+			"class" => 32,
+			'RAW_CODE' => 3,
+			'p_exceptionmap' => 17,
+			'p__type' => 14,
+			'p_file' => 1,
+			'PREPROCESSOR' => 27,
+			"void" => 29,
+			"const" => 24,
+			"char" => 13,
+			"short" => 42,
+			"int" => 54,
+			'OPSPECIAL' => 40,
+			'p_package' => 7,
+			'p_module' => 51,
+			'ID' => 6,
+			'p_loadplugin' => 49,
 			"unsigned" => 50,
-			'p_name' => 21,
-			'p_include' => 22,
-			"long" => 23,
-			'p__type' => 26,
-			"char" => 27
+			'p_any' => 48,
+			"long" => 37
 		},
 		GOTOS => {
-			'perc_loadplugin' => 29,
-			'class_name' => 1,
-			'top_list' => 2,
-			'perc_package' => 32,
-			'function' => 31,
-			'nconsttype' => 30,
-			'_top' => 5,
-			'looks_like_function' => 6,
-			'exceptionmap' => 34,
+			'basic_type' => 52,
+			'typemap' => 23,
+			'perc_include' => 22,
+			'decorate_class' => 21,
+			'perc_name' => 53,
+			'class' => 45,
+			'directive' => 44,
+			'perc_loadplugin' => 43,
+			'type' => 12,
+			'raw' => 18,
+			'class_name' => 46,
+			'perc_module' => 16,
+			'type_name' => 15,
+			'nconsttype' => 38,
+			'function_decl' => 39,
+			'special_block' => 5,
+			'class_decl' => 11,
+			'template' => 41,
+			'perc_package' => 10,
+			'perc_file' => 9,
+			'function' => 8,
+			'exceptionmap' => 30,
+			'top_list' => 26,
+			'_top' => 28,
+			'looks_like_function' => 25,
+			'enum' => 36,
 			'special_block_start' => 35,
-			'perc_name' => 8,
-			'class_decl' => 38,
-			'typemap' => 10,
-			'enum' => 39,
-			'decorate_class' => 12,
-			'special_block' => 13,
-			'perc_module' => 41,
-			'type_name' => 14,
-			'perc_file' => 44,
-			'perc_any' => 43,
-			'basic_type' => 42,
-			'template' => 15,
-			'looks_like_renamed_function' => 48,
-			'top' => 20,
-			'function_decl' => 51,
-			'perc_include' => 52,
-			'directive' => 53,
-			'type' => 24,
-			'class' => 25,
-			'raw' => 54
+			'perc_any' => 33,
+			'looks_like_renamed_function' => 31,
+			'top' => 2
 		}
 	},
 	{#State 1
 		ACTIONS => {
-			'OPANG' => 55
-		},
-		DEFAULT => -133
+			'OPCURLY' => 55
+		}
 	},
 	{#State 2
-		ACTIONS => {
-			'ID' => 28,
-			'' => 56,
-			'p_typemap' => 4,
-			'p_any' => 3,
-			'OPSPECIAL' => 33,
-			'COMMENT' => 7,
-			'p_exceptionmap' => 36,
-			"class" => 9,
-			'RAW_CODE' => 37,
-			"const" => 11,
-			"int" => 40,
-			'p_module' => 16,
-			"enum" => 47,
-			'p_package' => 46,
-			'p_loadplugin' => 45,
-			'PREPROCESSOR' => 17,
-			"short" => 18,
-			'p_file' => 49,
-			"void" => 19,
-			"unsigned" => 50,
-			'p_name' => 21,
-			'p_include' => 22,
-			"long" => 23,
-			"char" => 27
-		},
-		GOTOS => {
-			'perc_loadplugin' => 29,
-			'class_name' => 1,
-			'function' => 31,
-			'perc_package' => 32,
-			'nconsttype' => 30,
-			'_top' => 5,
-			'looks_like_function' => 6,
-			'exceptionmap' => 34,
-			'special_block_start' => 35,
-			'perc_name' => 8,
-			'class_decl' => 38,
-			'typemap' => 10,
-			'enum' => 39,
-			'decorate_class' => 12,
-			'special_block' => 13,
-			'perc_module' => 41,
-			'type_name' => 14,
-			'perc_file' => 44,
-			'perc_any' => 43,
-			'basic_type' => 42,
-			'template' => 15,
-			'looks_like_renamed_function' => 48,
-			'top' => 57,
-			'function_decl' => 51,
-			'perc_include' => 52,
-			'directive' => 53,
-			'type' => 24,
-			'class' => 25,
-			'raw' => 54
-		}
+		DEFAULT => -1
 	},
 	{#State 3
-		ACTIONS => {
-			'OPSPECIAL' => 33,
-			'OPCURLY' => 58
-		},
-		DEFAULT => -122,
-		GOTOS => {
-			'special_block' => 59,
-			'special_block_start' => 35
-		}
+		DEFAULT => -26
 	},
 	{#State 4
+		ACTIONS => {
+			'OPCURLY' => 57,
+			'ID' => 56
+		}
+	},
+	{#State 5
+		DEFAULT => -29
+	},
+	{#State 6
+		ACTIONS => {
+			'DCOLON' => 59
+		},
+		DEFAULT => -147,
+		GOTOS => {
+			'class_suffix' => 58
+		}
+	},
+	{#State 7
 		ACTIONS => {
 			'OPCURLY' => 60
 		}
 	},
-	{#State 5
-		DEFAULT => -4
-	},
-	{#State 6
-		DEFAULT => -86
-	},
-	{#State 7
-		DEFAULT => -27
-	},
 	{#State 8
-		ACTIONS => {
-			'ID' => 28,
-			"class" => 9,
-			"short" => 18,
-			"void" => 19,
-			"unsigned" => 50,
-			"const" => 11,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
-		},
-		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'looks_like_function' => 61,
-			'class_decl' => 62,
-			'type' => 24
-		}
+		DEFAULT => -9
 	},
 	{#State 9
 		ACTIONS => {
-			'ID' => 28
-		},
-		GOTOS => {
-			'class_name' => 63
+			'SEMICOLON' => 61
 		}
 	},
 	{#State 10
-		DEFAULT => -16
+		ACTIONS => {
+			'SEMICOLON' => 62
+		}
 	},
 	{#State 11
 		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 19,
-			"unsigned" => 50,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
-		},
-		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 64,
-			'template' => 15
+			'SEMICOLON' => 63
 		}
 	},
 	{#State 12
 		ACTIONS => {
-			'SEMICOLON' => 65
+			'ID' => 64
 		}
 	},
 	{#State 13
-		DEFAULT => -29
+		DEFAULT => -138
 	},
 	{#State 14
-		DEFAULT => -131
+		ACTIONS => {
+			'OPCURLY' => 65
+		}
 	},
 	{#State 15
-		DEFAULT => -132
+		DEFAULT => -131
 	},
 	{#State 16
 		ACTIONS => {
-			'OPCURLY' => 66
+			'SEMICOLON' => 66
 		}
 	},
 	{#State 17
-		DEFAULT => -28
+		ACTIONS => {
+			'OPCURLY' => 67
+		}
 	},
 	{#State 18
-		ACTIONS => {
-			"int" => 67
-		},
-		DEFAULT => -141
+		DEFAULT => -5
 	},
 	{#State 19
-		DEFAULT => -135
-	},
-	{#State 20
-		DEFAULT => -1
-	},
-	{#State 21
 		ACTIONS => {
 			'OPCURLY' => 68
 		}
 	},
+	{#State 20
+		DEFAULT => -27
+	},
+	{#State 21
+		ACTIONS => {
+			'SEMICOLON' => 69
+		}
+	},
 	{#State 22
 		ACTIONS => {
-			'OPCURLY' => 69
+			'SEMICOLON' => 70
 		}
 	},
 	{#State 23
-		ACTIONS => {
-			"int" => 70
-		},
-		DEFAULT => -140
+		DEFAULT => -16
 	},
 	{#State 24
 		ACTIONS => {
-			'ID' => 71
+			'ID' => 6,
+			"char" => 13,
+			"long" => 37,
+			"void" => 29,
+			"unsigned" => 50,
+			"int" => 54,
+			"short" => 42
+		},
+		GOTOS => {
+			'type_name' => 15,
+			'nconsttype' => 71,
+			'class_name' => 46,
+			'basic_type' => 52,
+			'template' => 41
 		}
 	},
 	{#State 25
-		DEFAULT => -6
+		DEFAULT => -86
 	},
 	{#State 26
 		ACTIONS => {
-			'OPCURLY' => 72
+			'p_package' => 7,
+			'ID' => 6,
+			"long" => 37,
+			"short" => 42,
+			'OPSPECIAL' => 40,
+			'p_file' => 1,
+			"void" => 29,
+			'PREPROCESSOR' => 27,
+			"const" => 24,
+			"enum" => 4,
+			'p_name' => 34,
+			"class" => 32,
+			'RAW_CODE' => 3,
+			'' => 73,
+			'p_module' => 51,
+			"unsigned" => 50,
+			'p_loadplugin' => 49,
+			'p_any' => 48,
+			"int" => 54,
+			"char" => 13,
+			'COMMENT' => 20,
+			'p_include' => 19,
+			'p_typemap' => 47,
+			'p_exceptionmap' => 17
+		},
+		GOTOS => {
+			'_top' => 28,
+			'looks_like_function' => 25,
+			'exceptionmap' => 30,
+			'perc_any' => 33,
+			'top' => 72,
+			'looks_like_renamed_function' => 31,
+			'enum' => 36,
+			'special_block_start' => 35,
+			'special_block' => 5,
+			'nconsttype' => 38,
+			'function_decl' => 39,
+			'perc_file' => 9,
+			'function' => 8,
+			'template' => 41,
+			'class_decl' => 11,
+			'perc_package' => 10,
+			'type' => 12,
+			'class' => 45,
+			'perc_loadplugin' => 43,
+			'directive' => 44,
+			'class_name' => 46,
+			'type_name' => 15,
+			'perc_module' => 16,
+			'raw' => 18,
+			'perc_include' => 22,
+			'decorate_class' => 21,
+			'typemap' => 23,
+			'basic_type' => 52,
+			'perc_name' => 53
 		}
 	},
 	{#State 27
-		DEFAULT => -138
+		DEFAULT => -28
 	},
 	{#State 28
-		ACTIONS => {
-			'DCOLON' => 74
-		},
-		DEFAULT => -147,
-		GOTOS => {
-			'class_suffix' => 73
-		}
+		DEFAULT => -4
 	},
 	{#State 29
-		ACTIONS => {
-			'SEMICOLON' => 75
-		}
+		DEFAULT => -135
 	},
 	{#State 30
-		ACTIONS => {
-			'AMP' => 76,
-			'STAR' => 77
-		},
-		DEFAULT => -128
+		DEFAULT => -17
 	},
 	{#State 31
-		DEFAULT => -9
+		DEFAULT => -95,
+		GOTOS => {
+			'function_metadata' => 74
+		}
 	},
 	{#State 32
 		ACTIONS => {
-			'SEMICOLON' => 78
+			'ID' => 6
+		},
+		GOTOS => {
+			'class_name' => 75
 		}
 	},
 	{#State 33
-		DEFAULT => -184
+		ACTIONS => {
+			'SEMICOLON' => 76
+		}
 	},
 	{#State 34
-		DEFAULT => -17
+		ACTIONS => {
+			'OPCURLY' => 77
+		}
 	},
 	{#State 35
 		ACTIONS => {
-			'CLSPECIAL' => 79,
-			'line' => 80
+			'CLSPECIAL' => 81,
+			'line' => 78
 		},
 		GOTOS => {
-			'special_block_end' => 81,
-			'lines' => 82
+			'special_block_end' => 79,
+			'lines' => 80
 		}
 	},
 	{#State 36
-		ACTIONS => {
-			'OPCURLY' => 83
-		}
+		DEFAULT => -8
 	},
 	{#State 37
-		DEFAULT => -26
+		ACTIONS => {
+			"int" => 82
+		},
+		DEFAULT => -140
 	},
 	{#State 38
 		ACTIONS => {
-			'SEMICOLON' => 84
-		}
+			'STAR' => 84,
+			'AMP' => 83
+		},
+		DEFAULT => -128
 	},
 	{#State 39
-		DEFAULT => -8
-	},
-	{#State 40
-		DEFAULT => -139
-	},
-	{#State 41
 		ACTIONS => {
 			'SEMICOLON' => 85
 		}
 	},
+	{#State 40
+		DEFAULT => -184
+	},
+	{#State 41
+		DEFAULT => -132
+	},
 	{#State 42
-		DEFAULT => -134
+		ACTIONS => {
+			"int" => 86
+		},
+		DEFAULT => -141
 	},
 	{#State 43
-		ACTIONS => {
-			'SEMICOLON' => 86
-		}
-	},
-	{#State 44
 		ACTIONS => {
 			'SEMICOLON' => 87
 		}
 	},
+	{#State 44
+		DEFAULT => -7
+	},
 	{#State 45
-		ACTIONS => {
-			'OPCURLY' => 88
-		}
+		DEFAULT => -6
 	},
 	{#State 46
+		ACTIONS => {
+			'OPANG' => 88
+		},
+		DEFAULT => -133
+	},
+	{#State 47
 		ACTIONS => {
 			'OPCURLY' => 89
 		}
 	},
-	{#State 47
-		ACTIONS => {
-			'ID' => 91,
-			'OPCURLY' => 90
-		}
-	},
 	{#State 48
-		DEFAULT => -95,
+		ACTIONS => {
+			'OPCURLY' => 90,
+			'OPSPECIAL' => 40
+		},
+		DEFAULT => -122,
 		GOTOS => {
-			'function_metadata' => 92
+			'special_block_start' => 35,
+			'special_block' => 91
 		}
 	},
 	{#State 49
 		ACTIONS => {
-			'OPCURLY' => 93
+			'OPCURLY' => 92
 		}
 	},
 	{#State 50
 		ACTIONS => {
-			"short" => 18,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
+			"char" => 13,
+			"long" => 37,
+			"int" => 54,
+			"short" => 42
 		},
 		DEFAULT => -136,
 		GOTOS => {
-			'basic_type' => 94
+			'basic_type' => 93
 		}
 	},
 	{#State 51
 		ACTIONS => {
-			'SEMICOLON' => 95
+			'OPCURLY' => 94
 		}
 	},
 	{#State 52
-		ACTIONS => {
-			'SEMICOLON' => 96
-		}
+		DEFAULT => -134
 	},
 	{#State 53
-		DEFAULT => -7
+		ACTIONS => {
+			"short" => 42,
+			"int" => 54,
+			"class" => 32,
+			'ID' => 6,
+			"unsigned" => 50,
+			"void" => 29,
+			"const" => 24,
+			"long" => 37,
+			"char" => 13
+		},
+		GOTOS => {
+			'basic_type' => 52,
+			'class_decl' => 96,
+			'template' => 41,
+			'type' => 12,
+			'type_name' => 15,
+			'class_name' => 46,
+			'nconsttype' => 38,
+			'looks_like_function' => 95
+		}
 	},
 	{#State 54
-		DEFAULT => -5
+		DEFAULT => -139
 	},
 	{#State 55
 		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 19,
-			"const" => 11,
-			"unsigned" => 50,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
+			'ID' => 98,
+			'DASH' => 97
 		},
 		GOTOS => {
-			'type_list' => 98,
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'type' => 97
+			'file_name' => 99
 		}
 	},
 	{#State 56
-		DEFAULT => 0
+		ACTIONS => {
+			'OPCURLY' => 100
+		}
 	},
 	{#State 57
-		DEFAULT => -2
+		DEFAULT => -32,
+		GOTOS => {
+			'enum_element_list' => 101
+		}
 	},
 	{#State 58
 		ACTIONS => {
-			'ID' => 102,
-			'p_any' => 99,
-			'p_name' => 21
+			'DCOLON' => 102
 		},
-		GOTOS => {
-			'perc_name' => 101,
-			'perc_any_arg' => 100,
-			'perc_any_args' => 103
-		}
+		DEFAULT => -148
 	},
 	{#State 59
-		DEFAULT => -24,
-		GOTOS => {
-			'mixed_blocks' => 104
+		ACTIONS => {
+			'ID' => 103
 		}
 	},
 	{#State 60
 		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 19,
-			"const" => 11,
-			"unsigned" => 50,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
+			'ID' => 6
 		},
 		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'type' => 105
+			'class_name' => 104
 		}
 	},
 	{#State 61
-		DEFAULT => -87
+		DEFAULT => -12
 	},
 	{#State 62
-		DEFAULT => -43
+		DEFAULT => -11
 	},
 	{#State 63
-		ACTIONS => {
-			'COLON' => 107
-		},
-		DEFAULT => -47,
-		GOTOS => {
-			'base_classes' => 106
-		}
+		DEFAULT => -38
 	},
 	{#State 64
 		ACTIONS => {
-			'AMP' => 76,
-			'STAR' => 77
-		},
-		DEFAULT => -127
-	},
-	{#State 65
-		DEFAULT => -39
-	},
-	{#State 66
-		ACTIONS => {
-			'ID' => 28
-		},
-		GOTOS => {
-			'class_name' => 108
+			'OPPAR' => 105
 		}
 	},
+	{#State 65
+		ACTIONS => {
+			"short" => 42,
+			"int" => 54,
+			'ID' => 6,
+			"unsigned" => 50,
+			"void" => 29,
+			"long" => 37,
+			"char" => 13,
+			"const" => 24
+		},
+		GOTOS => {
+			'type' => 106,
+			'type_name' => 15,
+			'class_name' => 46,
+			'nconsttype' => 38,
+			'basic_type' => 52,
+			'template' => 41
+		}
+	},
+	{#State 66
+		DEFAULT => -10
+	},
 	{#State 67
-		DEFAULT => -143
+		ACTIONS => {
+			'ID' => 107
+		}
 	},
 	{#State 68
 		ACTIONS => {
-			'ID' => 28
+			'ID' => 98,
+			'DASH' => 97
 		},
 		GOTOS => {
-			'class_name' => 109
+			'file_name' => 108
 		}
 	},
 	{#State 69
-		ACTIONS => {
-			'ID' => 111,
-			'DASH' => 112
-		},
-		GOTOS => {
-			'file_name' => 110
-		}
+		DEFAULT => -39
 	},
 	{#State 70
-		DEFAULT => -142
+		DEFAULT => -14
 	},
 	{#State 71
 		ACTIONS => {
-			'OPPAR' => 113
-		}
+			'STAR' => 84,
+			'AMP' => 83
+		},
+		DEFAULT => -127
 	},
 	{#State 72
-		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 19,
-			"const" => 11,
-			"unsigned" => 50,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
-		},
-		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'type' => 114
-		}
+		DEFAULT => -2
 	},
 	{#State 73
-		ACTIONS => {
-			'DCOLON' => 115
-		},
-		DEFAULT => -148
+		DEFAULT => 0
 	},
 	{#State 74
 		ACTIONS => {
-			'ID' => 116
+			'p_catch' => 112,
+			'p_postcall' => 113,
+			'p_any' => 48,
+			'p_alias' => 118,
+			'p_cleanup' => 116,
+			'p_code' => 120
+		},
+		DEFAULT => -88,
+		GOTOS => {
+			'perc_cleanup' => 111,
+			'perc_postcall' => 110,
+			'perc_catch' => 115,
+			'perc_any' => 114,
+			'_function_metadata' => 119,
+			'perc_alias' => 117,
+			'perc_code' => 109
 		}
 	},
 	{#State 75
-		DEFAULT => -13
+		ACTIONS => {
+			'COLON' => 121
+		},
+		DEFAULT => -47,
+		GOTOS => {
+			'base_classes' => 122
+		}
 	},
 	{#State 76
-		DEFAULT => -130
-	},
-	{#State 77
-		DEFAULT => -129
-	},
-	{#State 78
-		DEFAULT => -11
-	},
-	{#State 79
-		DEFAULT => -185
-	},
-	{#State 80
-		DEFAULT => -186
-	},
-	{#State 81
-		DEFAULT => -183
-	},
-	{#State 82
-		ACTIONS => {
-			'CLSPECIAL' => 79,
-			'line' => 117
-		},
-		GOTOS => {
-			'special_block_end' => 118
-		}
-	},
-	{#State 83
-		ACTIONS => {
-			'ID' => 119
-		}
-	},
-	{#State 84
-		DEFAULT => -38
-	},
-	{#State 85
-		DEFAULT => -10
-	},
-	{#State 86
 		DEFAULT => -15
 	},
+	{#State 77
+		ACTIONS => {
+			'ID' => 6
+		},
+		GOTOS => {
+			'class_name' => 123
+		}
+	},
+	{#State 78
+		DEFAULT => -186
+	},
+	{#State 79
+		DEFAULT => -183
+	},
+	{#State 80
+		ACTIONS => {
+			'line' => 124,
+			'CLSPECIAL' => 81
+		},
+		GOTOS => {
+			'special_block_end' => 125
+		}
+	},
+	{#State 81
+		DEFAULT => -185
+	},
+	{#State 82
+		DEFAULT => -142
+	},
+	{#State 83
+		DEFAULT => -130
+	},
+	{#State 84
+		DEFAULT => -129
+	},
+	{#State 85
+		DEFAULT => -40
+	},
+	{#State 86
+		DEFAULT => -143
+	},
 	{#State 87
-		DEFAULT => -12
+		DEFAULT => -13
 	},
 	{#State 88
 		ACTIONS => {
-			'ID' => 28
+			"const" => 24,
+			"long" => 37,
+			"char" => 13,
+			"unsigned" => 50,
+			"void" => 29,
+			'ID' => 6,
+			"int" => 54,
+			"short" => 42
 		},
 		GOTOS => {
-			'class_name' => 120
+			'class_name' => 46,
+			'type_name' => 15,
+			'type_list' => 127,
+			'template' => 41,
+			'nconsttype' => 38,
+			'type' => 126,
+			'basic_type' => 52
 		}
 	},
 	{#State 89
 		ACTIONS => {
-			'ID' => 28
+			'ID' => 6,
+			"long" => 37,
+			"char" => 13,
+			"const" => 24,
+			"unsigned" => 50,
+			"void" => 29,
+			"int" => 54,
+			"short" => 42
 		},
 		GOTOS => {
-			'class_name' => 121
+			'type_name' => 15,
+			'type' => 128,
+			'nconsttype' => 38,
+			'class_name' => 46,
+			'basic_type' => 52,
+			'template' => 41
 		}
 	},
 	{#State 90
-		DEFAULT => -32,
+		ACTIONS => {
+			'p_any' => 129,
+			'p_name' => 34,
+			'ID' => 133
+		},
 		GOTOS => {
-			'enum_element_list' => 122
+			'perc_name' => 130,
+			'perc_any_args' => 132,
+			'perc_any_arg' => 131
 		}
 	},
 	{#State 91
-		ACTIONS => {
-			'OPCURLY' => 123
+		DEFAULT => -24,
+		GOTOS => {
+			'mixed_blocks' => 134
 		}
 	},
 	{#State 92
 		ACTIONS => {
-			'p_any' => 3,
-			'p_alias' => 128,
-			'p_code' => 131,
-			'p_cleanup' => 125,
-			'p_postcall' => 127,
-			'p_catch' => 135
+			'ID' => 6
 		},
-		DEFAULT => -88,
 		GOTOS => {
-			'perc_postcall' => 130,
-			'perc_code' => 124,
-			'perc_any' => 132,
-			'perc_cleanup' => 133,
-			'perc_catch' => 126,
-			'_function_metadata' => 134,
-			'perc_alias' => 129
+			'class_name' => 135
 		}
 	},
 	{#State 93
-		ACTIONS => {
-			'ID' => 111,
-			'DASH' => 112
-		},
-		GOTOS => {
-			'file_name' => 136
-		}
-	},
-	{#State 94
 		DEFAULT => -137
 	},
+	{#State 94
+		ACTIONS => {
+			'ID' => 6
+		},
+		GOTOS => {
+			'class_name' => 136
+		}
+	},
 	{#State 95
-		DEFAULT => -40
+		DEFAULT => -87
 	},
 	{#State 96
-		DEFAULT => -14
+		DEFAULT => -43
 	},
 	{#State 97
-		DEFAULT => -145
+		DEFAULT => -153
 	},
 	{#State 98
 		ACTIONS => {
-			'CLANG' => 137,
-			'COMMA' => 138
+			'DOT' => 137,
+			'SLASH' => 138
 		}
 	},
 	{#State 99
-		DEFAULT => -24,
-		GOTOS => {
-			'mixed_blocks' => 139
+		ACTIONS => {
+			'CLCURLY' => 139
 		}
 	},
 	{#State 100
-		DEFAULT => -123
+		DEFAULT => -32,
+		GOTOS => {
+			'enum_element_list' => 140
+		}
 	},
 	{#State 101
 		ACTIONS => {
-			'SEMICOLON' => 140
+			'CLCURLY' => 142,
+			'OPSPECIAL' => 40,
+			'RAW_CODE' => 3,
+			'COMMENT' => 20,
+			'PREPROCESSOR' => 27,
+			'ID' => 143
+		},
+		GOTOS => {
+			'raw' => 141,
+			'special_block_start' => 35,
+			'enum_element' => 144,
+			'special_block' => 5
 		}
 	},
 	{#State 102
 		ACTIONS => {
-			'CLCURLY' => 141
+			'ID' => 145
 		}
 	},
 	{#State 103
-		ACTIONS => {
-			'p_any' => 99,
-			'p_name' => 21,
-			'CLCURLY' => 143
-		},
-		GOTOS => {
-			'perc_name' => 101,
-			'perc_any_arg' => 142
-		}
+		DEFAULT => -151
 	},
 	{#State 104
 		ACTIONS => {
-			'OPSPECIAL' => 33,
-			'OPCURLY' => 144
-		},
-		DEFAULT => -121,
-		GOTOS => {
-			'simple_block' => 146,
-			'special_block' => 145,
-			'special_block_start' => 35
+			'CLCURLY' => 146
 		}
 	},
 	{#State 105
 		ACTIONS => {
-			'CLCURLY' => 147
+			"int" => 54,
+			"short" => 42,
+			"long" => 37,
+			"char" => 13,
+			"const" => 24,
+			"unsigned" => 50,
+			"void" => 151,
+			'ID' => 6
+		},
+		DEFAULT => -160,
+		GOTOS => {
+			'arg_list' => 150,
+			'nonvoid_arg_list' => 149,
+			'template' => 41,
+			'basic_type' => 52,
+			'class_name' => 46,
+			'nconsttype' => 38,
+			'type' => 147,
+			'argument' => 148,
+			'type_name' => 15
 		}
 	},
 	{#State 106
 		ACTIONS => {
-			'COMMA' => 149
-		},
-		DEFAULT => -55,
-		GOTOS => {
-			'class_metadata' => 148
+			'CLCURLY' => 152
 		}
 	},
 	{#State 107
 		ACTIONS => {
-			"protected" => 153,
-			"private" => 152,
-			"public" => 150
-		},
-		GOTOS => {
-			'base_class' => 151
+			'CLCURLY' => 153
 		}
 	},
 	{#State 108
@@ -1254,160 +1264,152 @@ sub new {
 		}
 	},
 	{#State 109
-		ACTIONS => {
-			'CLCURLY' => 155
-		}
+		DEFAULT => -102
 	},
 	{#State 110
-		ACTIONS => {
-			'CLCURLY' => 156
-		}
+		DEFAULT => -104
 	},
 	{#State 111
-		ACTIONS => {
-			'DOT' => 158,
-			'SLASH' => 157
-		}
+		DEFAULT => -103
 	},
 	{#State 112
-		DEFAULT => -153
+		ACTIONS => {
+			'OPCURLY' => 155
+		}
 	},
 	{#State 113
 		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 160,
-			"unsigned" => 50,
-			"const" => 11,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
+			'OPSPECIAL' => 40
 		},
-		DEFAULT => -160,
 		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'nonvoid_arg_list' => 159,
-			'arg_list' => 162,
-			'argument' => 163,
-			'type' => 161
+			'special_block_start' => 35,
+			'special_block' => 156
 		}
 	},
 	{#State 114
-		ACTIONS => {
-			'CLCURLY' => 164
-		}
+		DEFAULT => -107
 	},
 	{#State 115
-		ACTIONS => {
-			'ID' => 165
-		}
+		DEFAULT => -105
 	},
 	{#State 116
-		DEFAULT => -151
+		ACTIONS => {
+			'OPSPECIAL' => 40
+		},
+		GOTOS => {
+			'special_block' => 157,
+			'special_block_start' => 35
+		}
 	},
 	{#State 117
-		DEFAULT => -187
+		DEFAULT => -106
 	},
 	{#State 118
-		DEFAULT => -182
+		ACTIONS => {
+			'OPCURLY' => 158
+		}
 	},
 	{#State 119
-		ACTIONS => {
-			'CLCURLY' => 166
-		}
+		DEFAULT => -94
 	},
 	{#State 120
 		ACTIONS => {
-			'CLCURLY' => 167
+			'OPSPECIAL' => 40
+		},
+		GOTOS => {
+			'special_block_start' => 35,
+			'special_block' => 159
 		}
 	},
 	{#State 121
 		ACTIONS => {
-			'CLCURLY' => 168
+			"private" => 163,
+			"protected" => 161,
+			"public" => 160
+		},
+		GOTOS => {
+			'base_class' => 162
 		}
 	},
 	{#State 122
 		ACTIONS => {
-			'ID' => 169,
-			'PREPROCESSOR' => 17,
-			'RAW_CODE' => 37,
-			'OPSPECIAL' => 33,
-			'COMMENT' => 7,
-			'CLCURLY' => 171
+			'COMMA' => 164
 		},
+		DEFAULT => -55,
 		GOTOS => {
-			'enum_element' => 170,
-			'special_block' => 13,
-			'raw' => 172,
-			'special_block_start' => 35
+			'class_metadata' => 165
 		}
 	},
 	{#State 123
-		DEFAULT => -32,
-		GOTOS => {
-			'enum_element_list' => 173
+		ACTIONS => {
+			'CLCURLY' => 166
 		}
 	},
 	{#State 124
-		DEFAULT => -102
+		DEFAULT => -187
 	},
 	{#State 125
-		ACTIONS => {
-			'OPSPECIAL' => 33
-		},
-		GOTOS => {
-			'special_block' => 174,
-			'special_block_start' => 35
-		}
+		DEFAULT => -182
 	},
 	{#State 126
-		DEFAULT => -105
+		DEFAULT => -145
 	},
 	{#State 127
 		ACTIONS => {
-			'OPSPECIAL' => 33
-		},
-		GOTOS => {
-			'special_block' => 175,
-			'special_block_start' => 35
+			'COMMA' => 168,
+			'CLANG' => 167
 		}
 	},
 	{#State 128
 		ACTIONS => {
-			'OPCURLY' => 176
+			'CLCURLY' => 169
 		}
 	},
 	{#State 129
-		DEFAULT => -106
-	},
-	{#State 130
-		DEFAULT => -104
-	},
-	{#State 131
-		ACTIONS => {
-			'OPSPECIAL' => 33
-		},
+		DEFAULT => -24,
 		GOTOS => {
-			'special_block' => 177,
-			'special_block_start' => 35
+			'mixed_blocks' => 170
 		}
 	},
+	{#State 130
+		ACTIONS => {
+			'SEMICOLON' => 171
+		}
+	},
+	{#State 131
+		DEFAULT => -123
+	},
 	{#State 132
-		DEFAULT => -107
+		ACTIONS => {
+			'p_name' => 34,
+			'p_any' => 129,
+			'CLCURLY' => 173
+		},
+		GOTOS => {
+			'perc_name' => 130,
+			'perc_any_arg' => 172
+		}
 	},
 	{#State 133
-		DEFAULT => -103
+		ACTIONS => {
+			'CLCURLY' => 174
+		}
 	},
 	{#State 134
-		DEFAULT => -94
+		ACTIONS => {
+			'OPSPECIAL' => 40,
+			'OPCURLY' => 177
+		},
+		DEFAULT => -121,
+		GOTOS => {
+			'special_block' => 176,
+			'special_block_start' => 35,
+			'simple_block' => 175
+		}
 	},
 	{#State 135
 		ACTIONS => {
-			'OPCURLY' => 178
+			'CLCURLY' => 178
 		}
 	},
 	{#State 136
@@ -1416,1003 +1418,1040 @@ sub new {
 		}
 	},
 	{#State 137
-		DEFAULT => -144
+		ACTIONS => {
+			'ID' => 180
+		}
 	},
 	{#State 138
 		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 19,
-			"const" => 11,
-			"unsigned" => 50,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
+			'DASH' => 97,
+			'ID' => 98
 		},
 		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'type' => 180
+			'file_name' => 181
 		}
 	},
 	{#State 139
-		ACTIONS => {
-			'OPCURLY' => 144,
-			'OPSPECIAL' => 33,
-			'SEMICOLON' => 181
-		},
-		GOTOS => {
-			'simple_block' => 146,
-			'special_block' => 145,
-			'special_block_start' => 35
-		}
+		DEFAULT => -112
 	},
 	{#State 140
-		DEFAULT => -126
-	},
-	{#State 141
-		DEFAULT => -24,
+		ACTIONS => {
+			'ID' => 143,
+			'COMMENT' => 20,
+			'CLCURLY' => 182,
+			'OPSPECIAL' => 40,
+			'PREPROCESSOR' => 27,
+			'RAW_CODE' => 3
+		},
 		GOTOS => {
-			'mixed_blocks' => 182
+			'special_block_start' => 35,
+			'raw' => 141,
+			'special_block' => 5,
+			'enum_element' => 144
 		}
 	},
+	{#State 141
+		DEFAULT => -37
+	},
 	{#State 142
-		DEFAULT => -124
+		ACTIONS => {
+			'SEMICOLON' => 183
+		}
 	},
 	{#State 143
-		DEFAULT => -119
+		ACTIONS => {
+			'EQUAL' => 184
+		},
+		DEFAULT => -35
 	},
 	{#State 144
 		ACTIONS => {
-			'ID' => 183
-		}
+			'COMMA' => 185
+		},
+		DEFAULT => -33
 	},
 	{#State 145
-		DEFAULT => -22
+		DEFAULT => -152
 	},
 	{#State 146
-		DEFAULT => -23
+		DEFAULT => -110
 	},
 	{#State 147
 		ACTIONS => {
-			'OPCURLY' => 184,
-			'SEMICOLON' => 185
+			'p_length' => 186,
+			'ID' => 187
 		}
 	},
 	{#State 148
-		ACTIONS => {
-			'OPCURLY' => 186,
-			'p_any' => 3,
-			'p_catch' => 135
-		},
-		GOTOS => {
-			'perc_any' => 188,
-			'perc_catch' => 187
-		}
+		DEFAULT => -158
 	},
 	{#State 149
 		ACTIONS => {
-			"protected" => 153,
-			"private" => 152,
-			"public" => 150
-		},
-		GOTOS => {
-			'base_class' => 189
-		}
-	},
-	{#State 150
-		ACTIONS => {
-			'ID' => 28,
-			'p_name' => 21
-		},
-		GOTOS => {
-			'perc_name' => 191,
-			'class_name' => 190,
-			'class_name_rename' => 192
-		}
-	},
-	{#State 151
-		DEFAULT => -45
-	},
-	{#State 152
-		ACTIONS => {
-			'ID' => 28,
-			'p_name' => 21
-		},
-		GOTOS => {
-			'perc_name' => 191,
-			'class_name' => 190,
-			'class_name_rename' => 193
-		}
-	},
-	{#State 153
-		ACTIONS => {
-			'ID' => 28,
-			'p_name' => 21
-		},
-		GOTOS => {
-			'perc_name' => 191,
-			'class_name' => 190,
-			'class_name_rename' => 194
-		}
-	},
-	{#State 154
-		DEFAULT => -111
-	},
-	{#State 155
-		DEFAULT => -108
-	},
-	{#State 156
-		DEFAULT => -114
-	},
-	{#State 157
-		ACTIONS => {
-			'ID' => 111,
-			'DASH' => 112
-		},
-		GOTOS => {
-			'file_name' => 195
-		}
-	},
-	{#State 158
-		ACTIONS => {
-			'ID' => 196
-		}
-	},
-	{#State 159
-		ACTIONS => {
-			'COMMA' => 197
+			'COMMA' => 188
 		},
 		DEFAULT => -156
 	},
-	{#State 160
+	{#State 150
+		ACTIONS => {
+			'CLPAR' => 189
+		}
+	},
+	{#State 151
 		ACTIONS => {
 			'CLPAR' => -157
 		},
 		DEFAULT => -135
 	},
+	{#State 152
+		DEFAULT => -3
+	},
+	{#State 153
+		ACTIONS => {
+			'OPCURLY' => 190
+		}
+	},
+	{#State 154
+		DEFAULT => -114
+	},
+	{#State 155
+		ACTIONS => {
+			'ID' => 6
+		},
+		GOTOS => {
+			'class_name_list' => 191,
+			'class_name' => 192
+		}
+	},
+	{#State 156
+		DEFAULT => -117
+	},
+	{#State 157
+		DEFAULT => -116
+	},
+	{#State 158
+		ACTIONS => {
+			'ID' => 193
+		}
+	},
+	{#State 159
+		DEFAULT => -115
+	},
+	{#State 160
+		ACTIONS => {
+			'ID' => 6,
+			'p_name' => 34
+		},
+		GOTOS => {
+			'class_name' => 196,
+			'perc_name' => 195,
+			'class_name_rename' => 194
+		}
+	},
 	{#State 161
 		ACTIONS => {
-			'ID' => 199,
-			'p_length' => 198
+			'p_name' => 34,
+			'ID' => 6
+		},
+		GOTOS => {
+			'class_name_rename' => 197,
+			'perc_name' => 195,
+			'class_name' => 196
 		}
 	},
 	{#State 162
-		ACTIONS => {
-			'CLPAR' => 200
-		}
+		DEFAULT => -45
 	},
 	{#State 163
-		DEFAULT => -158
-	},
-	{#State 164
-		DEFAULT => -3
-	},
-	{#State 165
-		DEFAULT => -152
-	},
-	{#State 166
 		ACTIONS => {
-			'OPCURLY' => 201
+			'ID' => 6,
+			'p_name' => 34
+		},
+		GOTOS => {
+			'class_name' => 196,
+			'perc_name' => 195,
+			'class_name_rename' => 198
 		}
 	},
+	{#State 164
+		ACTIONS => {
+			"private" => 163,
+			"protected" => 161,
+			"public" => 160
+		},
+		GOTOS => {
+			'base_class' => 199
+		}
+	},
+	{#State 165
+		ACTIONS => {
+			'OPCURLY' => 202,
+			'p_any' => 48,
+			'p_catch' => 112
+		},
+		GOTOS => {
+			'perc_catch' => 200,
+			'perc_any' => 201
+		}
+	},
+	{#State 166
+		DEFAULT => -108
+	},
 	{#State 167
-		DEFAULT => -113
+		DEFAULT => -144
 	},
 	{#State 168
-		DEFAULT => -110
+		ACTIONS => {
+			'ID' => 6,
+			"void" => 29,
+			"unsigned" => 50,
+			"const" => 24,
+			"char" => 13,
+			"long" => 37,
+			"short" => 42,
+			"int" => 54
+		},
+		GOTOS => {
+			'type_name' => 15,
+			'type' => 203,
+			'nconsttype' => 38,
+			'class_name' => 46,
+			'basic_type' => 52,
+			'template' => 41
+		}
 	},
 	{#State 169
 		ACTIONS => {
-			'EQUAL' => 202
-		},
-		DEFAULT => -35
+			'SEMICOLON' => 204,
+			'OPCURLY' => 205
+		}
 	},
 	{#State 170
 		ACTIONS => {
-			'COMMA' => 203
+			'OPCURLY' => 177,
+			'OPSPECIAL' => 40,
+			'SEMICOLON' => 206
 		},
-		DEFAULT => -33
+		GOTOS => {
+			'special_block' => 176,
+			'special_block_start' => 35,
+			'simple_block' => 175
+		}
 	},
 	{#State 171
-		ACTIONS => {
-			'SEMICOLON' => 204
-		}
+		DEFAULT => -126
 	},
 	{#State 172
-		DEFAULT => -37
+		DEFAULT => -124
 	},
 	{#State 173
-		ACTIONS => {
-			'ID' => 169,
-			'PREPROCESSOR' => 17,
-			'RAW_CODE' => 37,
-			'OPSPECIAL' => 33,
-			'COMMENT' => 7,
-			'CLCURLY' => 205
-		},
-		GOTOS => {
-			'enum_element' => 170,
-			'special_block' => 13,
-			'raw' => 172,
-			'special_block_start' => 35
-		}
+		DEFAULT => -119
 	},
 	{#State 174
-		DEFAULT => -116
+		DEFAULT => -24,
+		GOTOS => {
+			'mixed_blocks' => 207
+		}
 	},
 	{#State 175
-		DEFAULT => -117
+		DEFAULT => -23
 	},
 	{#State 176
-		ACTIONS => {
-			'ID' => 206
-		}
+		DEFAULT => -22
 	},
 	{#State 177
-		DEFAULT => -115
-	},
-	{#State 178
 		ACTIONS => {
-			'ID' => 28
-		},
-		GOTOS => {
-			'class_name' => 207,
-			'class_name_list' => 208
+			'ID' => 208
 		}
 	},
+	{#State 178
+		DEFAULT => -113
+	},
 	{#State 179
-		DEFAULT => -112
+		DEFAULT => -111
 	},
 	{#State 180
-		DEFAULT => -146
+		DEFAULT => -154
 	},
 	{#State 181
-		DEFAULT => -125
+		DEFAULT => -155
 	},
 	{#State 182
 		ACTIONS => {
-			'OPSPECIAL' => 33,
-			'OPCURLY' => 144
-		},
-		DEFAULT => -120,
-		GOTOS => {
-			'simple_block' => 146,
-			'special_block' => 145,
-			'special_block_start' => 35
+			'SEMICOLON' => 209
 		}
 	},
 	{#State 183
-		ACTIONS => {
-			'CLCURLY' => 209
-		}
+		DEFAULT => -30
 	},
 	{#State 184
 		ACTIONS => {
-			'ID' => 210
+			'FLOAT' => 213,
+			'QUOTED_STRING' => 211,
+			'DASH' => 216,
+			'INTEGER' => 212,
+			'ID' => 6
+		},
+		GOTOS => {
+			'class_name' => 210,
+			'value' => 214,
+			'expression' => 215
 		}
 	},
 	{#State 185
-		DEFAULT => -20
+		DEFAULT => -34
 	},
 	{#State 186
-		DEFAULT => -56,
-		GOTOS => {
-			'class_body_list' => 211
+		ACTIONS => {
+			'OPCURLY' => 217
 		}
 	},
 	{#State 187
-		DEFAULT => -53
-	},
-	{#State 188
-		DEFAULT => -54
-	},
-	{#State 189
-		DEFAULT => -46
-	},
-	{#State 190
-		DEFAULT => -51
-	},
-	{#State 191
-		ACTIONS => {
-			'ID' => 28
-		},
-		GOTOS => {
-			'class_name' => 212
-		}
-	},
-	{#State 192
-		DEFAULT => -48
-	},
-	{#State 193
-		DEFAULT => -50
-	},
-	{#State 194
-		DEFAULT => -49
-	},
-	{#State 195
-		DEFAULT => -155
-	},
-	{#State 196
-		DEFAULT => -154
-	},
-	{#State 197
-		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 19,
-			"const" => 11,
-			"unsigned" => 50,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
-		},
-		GOTOS => {
-			'argument' => 213,
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'type' => 161
-		}
-	},
-	{#State 198
-		ACTIONS => {
-			'OPCURLY' => 214
-		}
-	},
-	{#State 199
 		DEFAULT => -162,
 		GOTOS => {
-			'argument_metadata' => 215
+			'argument_metadata' => 218
 		}
 	},
-	{#State 200
+	{#State 188
 		ACTIONS => {
-			"const" => 216
+			"int" => 54,
+			"short" => 42,
+			"long" => 37,
+			"char" => 13,
+			"const" => 24,
+			"void" => 29,
+			"unsigned" => 50,
+			'ID' => 6
+		},
+		GOTOS => {
+			'class_name' => 46,
+			'type_name' => 15,
+			'template' => 41,
+			'nconsttype' => 38,
+			'argument' => 219,
+			'type' => 147,
+			'basic_type' => 52
+		}
+	},
+	{#State 189
+		ACTIONS => {
+			"const" => 220
 		},
 		DEFAULT => -80,
 		GOTOS => {
-			'const' => 217
+			'const' => 221
 		}
+	},
+	{#State 190
+		ACTIONS => {
+			"int" => 54,
+			"short" => 42,
+			"char" => 13,
+			"long" => 37,
+			"unsigned" => 50,
+			"void" => 29,
+			'ID' => 6
+		},
+		GOTOS => {
+			'basic_type' => 52,
+			'type_name' => 222,
+			'class_name' => 223
+		}
+	},
+	{#State 191
+		ACTIONS => {
+			'CLCURLY' => 225,
+			'COMMA' => 224
+		}
+	},
+	{#State 192
+		DEFAULT => -149
+	},
+	{#State 193
+		ACTIONS => {
+			'EQUAL' => 226
+		}
+	},
+	{#State 194
+		DEFAULT => -48
+	},
+	{#State 195
+		ACTIONS => {
+			'ID' => 6
+		},
+		GOTOS => {
+			'class_name' => 227
+		}
+	},
+	{#State 196
+		DEFAULT => -51
+	},
+	{#State 197
+		DEFAULT => -49
+	},
+	{#State 198
+		DEFAULT => -50
+	},
+	{#State 199
+		DEFAULT => -46
+	},
+	{#State 200
+		DEFAULT => -53
 	},
 	{#State 201
-		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 19,
-			"unsigned" => 50,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
-		},
-		GOTOS => {
-			'type_name' => 219,
-			'class_name' => 218,
-			'basic_type' => 42
-		}
+		DEFAULT => -54
 	},
 	{#State 202
-		ACTIONS => {
-			'ID' => 28,
-			'INTEGER' => 222,
-			'QUOTED_STRING' => 224,
-			'DASH' => 226,
-			'FLOAT' => 225
-		},
+		DEFAULT => -56,
 		GOTOS => {
-			'class_name' => 220,
-			'value' => 223,
-			'expression' => 221
+			'class_body_list' => 228
 		}
 	},
 	{#State 203
-		DEFAULT => -34
+		DEFAULT => -146
 	},
 	{#State 204
-		DEFAULT => -30
+		DEFAULT => -20
 	},
 	{#State 205
 		ACTIONS => {
-			'SEMICOLON' => 227
+			'ID' => 229
 		}
 	},
 	{#State 206
-		ACTIONS => {
-			'EQUAL' => 228
-		}
+		DEFAULT => -125
 	},
 	{#State 207
-		DEFAULT => -149
+		ACTIONS => {
+			'OPCURLY' => 177,
+			'OPSPECIAL' => 40
+		},
+		DEFAULT => -120,
+		GOTOS => {
+			'special_block_start' => 35,
+			'simple_block' => 175,
+			'special_block' => 176
+		}
 	},
 	{#State 208
 		ACTIONS => {
-			'COMMA' => 229,
 			'CLCURLY' => 230
 		}
 	},
 	{#State 209
-		DEFAULT => -25
+		DEFAULT => -31
 	},
 	{#State 210
 		ACTIONS => {
-			'CLCURLY' => 231
-		}
-	},
-	{#State 211
-		ACTIONS => {
-			'ID' => 250,
-			'p_typemap' => 4,
-			'p_any' => 3,
-			'OPSPECIAL' => 33,
-			"virtual" => 251,
-			'COMMENT' => 7,
-			"class_static" => 233,
-			"package_static" => 252,
-			"public" => 234,
-			'p_exceptionmap' => 36,
-			'RAW_CODE' => 37,
-			"const" => 11,
-			"static" => 256,
-			"int" => 40,
-			"private" => 240,
-			'CLCURLY' => 259,
-			'PREPROCESSOR' => 17,
-			"short" => 18,
-			"void" => 19,
-			"unsigned" => 50,
-			'p_name' => 21,
-			'TILDE' => 244,
-			"protected" => 245,
-			"long" => 23,
-			"char" => 27
-		},
-		DEFAULT => -71,
-		GOTOS => {
-			'class_name' => 1,
-			'nconsttype' => 30,
-			'looks_like_function' => 6,
-			'static' => 232,
-			'exceptionmap' => 253,
-			'special_block_start' => 35,
-			'perc_name' => 235,
-			'looks_like_member' => 236,
-			'typemap' => 237,
-			'class_body_element' => 254,
-			'method' => 255,
-			'special_block' => 13,
-			'vmethod' => 238,
-			'nmethod' => 239,
-			'access_specifier' => 241,
-			'type_name' => 14,
-			'ctor' => 242,
-			'perc_any' => 257,
-			'basic_type' => 42,
-			'template' => 15,
-			'member' => 243,
-			'virtual' => 258,
-			'looks_like_renamed_function' => 260,
-			'_vmethod' => 261,
-			'dtor' => 246,
-			'type' => 247,
-			'raw' => 262,
-			'method_decl' => 249,
-			'member_decl' => 248
-		}
-	},
-	{#State 212
-		DEFAULT => -52
-	},
-	{#State 213
-		DEFAULT => -159
-	},
-	{#State 214
-		ACTIONS => {
-			'ID' => 263
-		}
-	},
-	{#State 215
-		ACTIONS => {
-			'EQUAL' => 264,
-			'p_any' => 3
-		},
-		DEFAULT => -166,
-		GOTOS => {
-			'perc_any' => 266,
-			'_argument_metadata' => 265
-		}
-	},
-	{#State 216
-		DEFAULT => -79
-	},
-	{#State 217
-		DEFAULT => -85
-	},
-	{#State 218
-		DEFAULT => -133
-	},
-	{#State 219
-		ACTIONS => {
-			'CLCURLY' => 267
-		}
-	},
-	{#State 220
-		ACTIONS => {
-			'OPPAR' => 268
+			'OPPAR' => 231
 		},
 		DEFAULT => -171
 	},
-	{#State 221
-		DEFAULT => -36
+	{#State 211
+		DEFAULT => -170
 	},
-	{#State 222
+	{#State 212
 		DEFAULT => -167
 	},
-	{#State 223
+	{#State 213
+		DEFAULT => -169
+	},
+	{#State 214
 		ACTIONS => {
-			'AMP' => 269,
-			'PIPE' => 270
+			'PIPE' => 232,
+			'AMP' => 233
 		},
 		DEFAULT => -176
 	},
+	{#State 215
+		DEFAULT => -36
+	},
+	{#State 216
+		ACTIONS => {
+			'INTEGER' => 234
+		}
+	},
+	{#State 217
+		ACTIONS => {
+			'ID' => 235
+		}
+	},
+	{#State 218
+		ACTIONS => {
+			'EQUAL' => 236,
+			'p_any' => 48
+		},
+		DEFAULT => -166,
+		GOTOS => {
+			'_argument_metadata' => 237,
+			'perc_any' => 238
+		}
+	},
+	{#State 219
+		DEFAULT => -159
+	},
+	{#State 220
+		DEFAULT => -79
+	},
+	{#State 221
+		DEFAULT => -85
+	},
+	{#State 222
+		ACTIONS => {
+			'CLCURLY' => 239
+		}
+	},
+	{#State 223
+		DEFAULT => -133
+	},
 	{#State 224
-		DEFAULT => -170
+		ACTIONS => {
+			'ID' => 6
+		},
+		GOTOS => {
+			'class_name' => 240
+		}
 	},
 	{#State 225
-		DEFAULT => -169
+		DEFAULT => -118
 	},
 	{#State 226
 		ACTIONS => {
-			'INTEGER' => 271
+			'INTEGER' => 241
 		}
 	},
 	{#State 227
-		DEFAULT => -31
+		DEFAULT => -52
 	},
 	{#State 228
 		ACTIONS => {
-			'INTEGER' => 272
+			"virtual" => 272,
+			"long" => 37,
+			'ID' => 258,
+			'OPSPECIAL' => 40,
+			'CLCURLY' => 254,
+			"static" => 271,
+			"short" => 42,
+			"void" => 29,
+			'PREPROCESSOR' => 27,
+			"const" => 24,
+			"package_static" => 250,
+			'TILDE' => 251,
+			'RAW_CODE' => 3,
+			'p_name' => 34,
+			"unsigned" => 50,
+			'p_any' => 48,
+			"class_static" => 247,
+			"protected" => 248,
+			"private" => 264,
+			"int" => 54,
+			"public" => 246,
+			"char" => 13,
+			'p_exceptionmap' => 17,
+			'COMMENT' => 20,
+			'p_typemap' => 47
+		},
+		DEFAULT => -71,
+		GOTOS => {
+			'vmethod' => 268,
+			'looks_like_function' => 25,
+			'virtual' => 270,
+			'exceptionmap' => 269,
+			'looks_like_renamed_function' => 267,
+			'perc_any' => 266,
+			'special_block_start' => 35,
+			'nconsttype' => 38,
+			'special_block' => 5,
+			'looks_like_member' => 255,
+			'class_body_element' => 256,
+			'static' => 257,
+			'method_decl' => 252,
+			'member_decl' => 253,
+			'template' => 41,
+			'type' => 243,
+			'dtor' => 262,
+			'type_name' => 15,
+			'class_name' => 46,
+			'method' => 260,
+			'nmethod' => 259,
+			'member' => 261,
+			'raw' => 242,
+			'_vmethod' => 265,
+			'basic_type' => 52,
+			'typemap' => 249,
+			'ctor' => 245,
+			'perc_name' => 263,
+			'access_specifier' => 244
 		}
 	},
 	{#State 229
 		ACTIONS => {
-			'ID' => 28
-		},
-		GOTOS => {
-			'class_name' => 273
+			'CLCURLY' => 273
 		}
 	},
 	{#State 230
-		DEFAULT => -118
+		DEFAULT => -25
 	},
 	{#State 231
 		ACTIONS => {
-			'OPCURLY' => 274,
-			'OPSPECIAL' => 33
+			'FLOAT' => 213,
+			'DASH' => 216,
+			'INTEGER' => 212,
+			'ID' => 6,
+			'QUOTED_STRING' => 211
 		},
-		DEFAULT => -181,
+		DEFAULT => -175,
 		GOTOS => {
-			'special_blocks' => 276,
-			'special_block' => 275,
-			'special_block_start' => 35
+			'value' => 275,
+			'class_name' => 210,
+			'value_list' => 274
 		}
 	},
 	{#State 232
 		ACTIONS => {
-			'ID' => 28,
-			"class_static" => 233,
-			"package_static" => 252,
-			"short" => 18,
-			"void" => 19,
-			"unsigned" => 50,
-			"const" => 11,
-			'p_name' => 21,
-			"long" => 23,
-			"static" => 256,
-			"int" => 40,
-			"char" => 27
+			'DASH' => 216,
+			'INTEGER' => 212,
+			'ID' => 6,
+			'QUOTED_STRING' => 211,
+			'FLOAT' => 213
 		},
 		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'looks_like_function' => 6,
-			'static' => 232,
-			'perc_name' => 277,
-			'looks_like_renamed_function' => 260,
-			'nmethod' => 278,
-			'type' => 24
+			'class_name' => 210,
+			'value' => 276
 		}
 	},
 	{#State 233
-		DEFAULT => -83
+		ACTIONS => {
+			'FLOAT' => 213,
+			'QUOTED_STRING' => 211,
+			'INTEGER' => 212,
+			'ID' => 6,
+			'DASH' => 216
+		},
+		GOTOS => {
+			'value' => 277,
+			'class_name' => 210
+		}
 	},
 	{#State 234
-		ACTIONS => {
-			'COLON' => 279
-		}
+		DEFAULT => -168
 	},
 	{#State 235
 		ACTIONS => {
-			'ID' => 250,
-			"virtual" => 251,
-			"short" => 18,
-			"void" => 19,
-			"unsigned" => 50,
-			"const" => 11,
-			'p_name' => 21,
-			'TILDE' => 244,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
-		},
-		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'ctor' => 283,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'looks_like_function' => 61,
-			'virtual' => 258,
-			'perc_name' => 280,
-			'looks_like_member' => 281,
-			'_vmethod' => 261,
-			'dtor' => 284,
-			'type' => 247,
-			'vmethod' => 282
+			'CLCURLY' => 278
 		}
 	},
 	{#State 236
-		DEFAULT => -72
+		ACTIONS => {
+			'ID' => 6,
+			'INTEGER' => 212,
+			'DASH' => 216,
+			'QUOTED_STRING' => 211,
+			'FLOAT' => 213
+		},
+		GOTOS => {
+			'value' => 214,
+			'class_name' => 210,
+			'expression' => 279
+		}
 	},
 	{#State 237
-		DEFAULT => -60
+		DEFAULT => -161
 	},
 	{#State 238
-		DEFAULT => -76
+		DEFAULT => -163
 	},
 	{#State 239
-		DEFAULT => -75
+		ACTIONS => {
+			'OPCURLY' => 280
+		}
 	},
 	{#State 240
-		ACTIONS => {
-			'COLON' => 285
-		}
+		DEFAULT => -150
 	},
 	{#State 241
-		DEFAULT => -62
+		ACTIONS => {
+			'CLCURLY' => 281
+		}
 	},
 	{#State 242
-		DEFAULT => -77
+		DEFAULT => -59
 	},
 	{#State 243
-		DEFAULT => -63
+		ACTIONS => {
+			'ID' => 282
+		}
 	},
 	{#State 244
-		ACTIONS => {
-			'ID' => 286
-		}
+		DEFAULT => -62
 	},
 	{#State 245
-		ACTIONS => {
-			'COLON' => 287
-		}
+		DEFAULT => -77
 	},
 	{#State 246
-		DEFAULT => -78
+		ACTIONS => {
+			'COLON' => 283
+		}
 	},
 	{#State 247
-		ACTIONS => {
-			'ID' => 288
-		}
+		DEFAULT => -83
 	},
 	{#State 248
 		ACTIONS => {
-			'SEMICOLON' => 289
+			'COLON' => 284
 		}
 	},
 	{#State 249
-		ACTIONS => {
-			'SEMICOLON' => 290
-		}
+		DEFAULT => -60
 	},
 	{#State 250
-		ACTIONS => {
-			'DCOLON' => 74,
-			'OPPAR' => 291
-		},
-		DEFAULT => -147,
-		GOTOS => {
-			'class_suffix' => 73
-		}
-	},
-	{#State 251
-		DEFAULT => -81
-	},
-	{#State 252
 		DEFAULT => -82
 	},
+	{#State 251
+		ACTIONS => {
+			'ID' => 285
+		}
+	},
+	{#State 252
+		ACTIONS => {
+			'SEMICOLON' => 286
+		}
+	},
 	{#State 253
-		DEFAULT => -61
+		ACTIONS => {
+			'SEMICOLON' => 287
+		}
 	},
 	{#State 254
-		DEFAULT => -57
+		DEFAULT => -44
 	},
 	{#State 255
-		DEFAULT => -58
+		DEFAULT => -72
 	},
 	{#State 256
-		DEFAULT => -84
+		DEFAULT => -57
 	},
 	{#State 257
 		ACTIONS => {
-			'SEMICOLON' => 292
+			"short" => 42,
+			"static" => 271,
+			"int" => 54,
+			"class_static" => 247,
+			'ID' => 6,
+			"unsigned" => 50,
+			"long" => 37,
+			'p_name' => 34,
+			"void" => 29,
+			"package_static" => 250,
+			"const" => 24,
+			"char" => 13
+		},
+		GOTOS => {
+			'static' => 257,
+			'basic_type' => 52,
+			'looks_like_function' => 25,
+			'nconsttype' => 38,
+			'type' => 12,
+			'template' => 41,
+			'perc_name' => 289,
+			'class_name' => 46,
+			'nmethod' => 288,
+			'type_name' => 15,
+			'looks_like_renamed_function' => 267
 		}
 	},
 	{#State 258
 		ACTIONS => {
-			'ID' => 28,
-			"virtual" => 251,
-			"short" => 18,
-			"void" => 19,
-			"unsigned" => 50,
-			"const" => 11,
-			'p_name' => 21,
-			'TILDE' => 244,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
+			'DCOLON' => 59,
+			'OPPAR' => 290
 		},
+		DEFAULT => -147,
 		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'looks_like_function' => 293,
-			'virtual' => 296,
-			'perc_name' => 294,
-			'type' => 24,
-			'dtor' => 295
+			'class_suffix' => 58
 		}
 	},
 	{#State 259
-		DEFAULT => -44
+		DEFAULT => -75
 	},
 	{#State 260
-		DEFAULT => -95,
-		GOTOS => {
-			'function_metadata' => 297
-		}
+		DEFAULT => -58
 	},
 	{#State 261
-		DEFAULT => -98
+		DEFAULT => -63
 	},
 	{#State 262
-		DEFAULT => -59
+		DEFAULT => -78
 	},
 	{#State 263
 		ACTIONS => {
-			'CLCURLY' => 298
+			'ID' => 258,
+			"virtual" => 272,
+			"unsigned" => 50,
+			"long" => 37,
+			"short" => 42,
+			"int" => 54,
+			'TILDE' => 251,
+			"void" => 29,
+			"const" => 24,
+			"char" => 13,
+			'p_name' => 34
+		},
+		GOTOS => {
+			'basic_type' => 52,
+			'looks_like_member' => 294,
+			'_vmethod' => 265,
+			'nconsttype' => 38,
+			'template' => 41,
+			'perc_name' => 292,
+			'ctor' => 295,
+			'virtual' => 270,
+			'type' => 243,
+			'dtor' => 293,
+			'looks_like_function' => 95,
+			'vmethod' => 291,
+			'type_name' => 15,
+			'class_name' => 46
 		}
 	},
 	{#State 264
 		ACTIONS => {
-			'ID' => 28,
-			'INTEGER' => 222,
-			'QUOTED_STRING' => 224,
-			'DASH' => 226,
-			'FLOAT' => 225
-		},
-		GOTOS => {
-			'class_name' => 220,
-			'value' => 223,
-			'expression' => 299
+			'COLON' => 296
 		}
 	},
 	{#State 265
-		DEFAULT => -161
+		DEFAULT => -98
 	},
 	{#State 266
-		DEFAULT => -163
+		ACTIONS => {
+			'SEMICOLON' => 297
+		}
 	},
 	{#State 267
-		ACTIONS => {
-			'OPCURLY' => 300
+		DEFAULT => -95,
+		GOTOS => {
+			'function_metadata' => 298
 		}
 	},
 	{#State 268
-		ACTIONS => {
-			'ID' => 28,
-			'INTEGER' => 222,
-			'QUOTED_STRING' => 224,
-			'FLOAT' => 225,
-			'DASH' => 226
-		},
-		DEFAULT => -175,
-		GOTOS => {
-			'class_name' => 220,
-			'value_list' => 301,
-			'value' => 302
-		}
+		DEFAULT => -76
 	},
 	{#State 269
-		ACTIONS => {
-			'ID' => 28,
-			'INTEGER' => 222,
-			'QUOTED_STRING' => 224,
-			'DASH' => 226,
-			'FLOAT' => 225
-		},
-		GOTOS => {
-			'class_name' => 220,
-			'value' => 303
-		}
+		DEFAULT => -61
 	},
 	{#State 270
 		ACTIONS => {
-			'ID' => 28,
-			'INTEGER' => 222,
-			'QUOTED_STRING' => 224,
-			'DASH' => 226,
-			'FLOAT' => 225
+			"short" => 42,
+			'p_name' => 34,
+			"int" => 54,
+			"virtual" => 272,
+			"void" => 29,
+			"unsigned" => 50,
+			"const" => 24,
+			"long" => 37,
+			"char" => 13,
+			'TILDE' => 251,
+			'ID' => 6
 		},
 		GOTOS => {
-			'class_name' => 220,
-			'value' => 304
+			'virtual' => 299,
+			'basic_type' => 52,
+			'nconsttype' => 38,
+			'looks_like_function' => 300,
+			'dtor' => 301,
+			'type' => 12,
+			'template' => 41,
+			'class_name' => 46,
+			'perc_name' => 302,
+			'type_name' => 15
 		}
 	},
 	{#State 271
-		DEFAULT => -168
+		DEFAULT => -84
 	},
 	{#State 272
-		ACTIONS => {
-			'CLCURLY' => 305
-		}
+		DEFAULT => -81
 	},
 	{#State 273
-		DEFAULT => -150
+		ACTIONS => {
+			'OPSPECIAL' => 40,
+			'OPCURLY' => 305
+		},
+		DEFAULT => -181,
+		GOTOS => {
+			'special_blocks' => 303,
+			'special_block_start' => 35,
+			'special_block' => 304
+		}
 	},
 	{#State 274
 		ACTIONS => {
-			'p_any' => 99,
-			'p_name' => 21
-		},
-		GOTOS => {
-			'perc_name' => 101,
-			'perc_any_arg' => 100,
-			'perc_any_args' => 306
+			'COMMA' => 307,
+			'CLPAR' => 306
 		}
 	},
 	{#State 275
-		DEFAULT => -179
+		DEFAULT => -173
 	},
 	{#State 276
-		ACTIONS => {
-			'OPSPECIAL' => 33,
-			'SEMICOLON' => 308
-		},
-		GOTOS => {
-			'special_block' => 307,
-			'special_block_start' => 35
-		}
+		DEFAULT => -178
 	},
 	{#State 277
-		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 19,
-			"const" => 11,
-			"unsigned" => 50,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
-		},
-		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'looks_like_function' => 61,
-			'type' => 24
-		}
+		DEFAULT => -177
 	},
 	{#State 278
-		DEFAULT => -97
+		DEFAULT => -164
 	},
 	{#State 279
-		DEFAULT => -65
+		DEFAULT => -165
 	},
 	{#State 280
 		ACTIONS => {
-			'ID' => 309,
-			'TILDE' => 244,
-			'p_name' => 21,
-			"virtual" => 251
-		},
-		GOTOS => {
-			'perc_name' => 280,
-			'ctor' => 283,
-			'_vmethod' => 261,
-			'dtor' => 284,
-			'vmethod' => 282,
-			'virtual' => 258
+			'ID' => 308
 		}
 	},
 	{#State 281
-		DEFAULT => -73
+		DEFAULT => -109
 	},
 	{#State 282
-		DEFAULT => -99
+		ACTIONS => {
+			'OPPAR' => 105
+		},
+		DEFAULT => -69,
+		GOTOS => {
+			'member_metadata' => 309
+		}
 	},
 	{#State 283
-		DEFAULT => -90
+		DEFAULT => -65
 	},
 	{#State 284
-		DEFAULT => -92
+		DEFAULT => -66
 	},
 	{#State 285
-		DEFAULT => -67
-	},
-	{#State 286
 		ACTIONS => {
 			'OPPAR' => 310
 		}
 	},
-	{#State 287
-		DEFAULT => -66
-	},
-	{#State 288
-		ACTIONS => {
-			'OPPAR' => 113
-		},
-		DEFAULT => -69,
-		GOTOS => {
-			'member_metadata' => 311
-		}
-	},
-	{#State 289
-		DEFAULT => -42
-	},
-	{#State 290
+	{#State 286
 		DEFAULT => -41
 	},
-	{#State 291
+	{#State 287
+		DEFAULT => -42
+	},
+	{#State 288
+		DEFAULT => -97
+	},
+	{#State 289
 		ACTIONS => {
-			'ID' => 28,
-			"short" => 18,
-			"void" => 160,
+			"void" => 29,
 			"unsigned" => 50,
-			"const" => 11,
-			"long" => 23,
-			"int" => 40,
-			"char" => 27
+			"const" => 24,
+			"char" => 13,
+			"long" => 37,
+			'ID' => 6,
+			"short" => 42,
+			"int" => 54
+		},
+		GOTOS => {
+			'template' => 41,
+			'basic_type' => 52,
+			'class_name' => 46,
+			'looks_like_function' => 95,
+			'nconsttype' => 38,
+			'type' => 12,
+			'type_name' => 15
+		}
+	},
+	{#State 290
+		ACTIONS => {
+			"short" => 42,
+			"int" => 54,
+			'ID' => 6,
+			"void" => 151,
+			"unsigned" => 50,
+			"const" => 24,
+			"long" => 37,
+			"char" => 13
 		},
 		DEFAULT => -160,
 		GOTOS => {
-			'type_name' => 14,
-			'class_name' => 1,
-			'basic_type' => 42,
-			'nconsttype' => 30,
-			'template' => 15,
-			'nonvoid_arg_list' => 159,
-			'arg_list' => 312,
-			'argument' => 163,
-			'type' => 161
+			'template' => 41,
+			'arg_list' => 311,
+			'nonvoid_arg_list' => 149,
+			'class_name' => 46,
+			'type_name' => 15,
+			'basic_type' => 52,
+			'nconsttype' => 38,
+			'argument' => 148,
+			'type' => 147
 		}
 	},
+	{#State 291
+		DEFAULT => -99
+	},
 	{#State 292
-		DEFAULT => -64
+		ACTIONS => {
+			'ID' => 312,
+			'TILDE' => 251,
+			'p_name' => 34,
+			"virtual" => 272
+		},
+		GOTOS => {
+			'ctor' => 295,
+			'perc_name' => 292,
+			'virtual' => 270,
+			'vmethod' => 291,
+			'dtor' => 293,
+			'_vmethod' => 265
+		}
 	},
 	{#State 293
+		DEFAULT => -92
+	},
+	{#State 294
+		DEFAULT => -73
+	},
+	{#State 295
+		DEFAULT => -90
+	},
+	{#State 296
+		DEFAULT => -67
+	},
+	{#State 297
+		DEFAULT => -64
+	},
+	{#State 298
+		ACTIONS => {
+			'p_catch' => 112,
+			'p_postcall' => 113,
+			'p_any' => 48,
+			'p_alias' => 118,
+			'p_cleanup' => 116,
+			'p_code' => 120
+		},
+		DEFAULT => -96,
+		GOTOS => {
+			'_function_metadata' => 119,
+			'perc_postcall' => 110,
+			'perc_cleanup' => 111,
+			'perc_any' => 114,
+			'perc_code' => 109,
+			'perc_catch' => 115,
+			'perc_alias' => 117
+		}
+	},
+	{#State 299
+		ACTIONS => {
+			"virtual" => 272,
+			'TILDE' => 251,
+			'p_name' => 34
+		},
+		GOTOS => {
+			'perc_name' => 302,
+			'dtor' => 301,
+			'virtual' => 299
+		}
+	},
+	{#State 300
 		ACTIONS => {
 			'EQUAL' => 313
 		},
@@ -2421,282 +2460,245 @@ sub new {
 			'function_metadata' => 314
 		}
 	},
-	{#State 294
-		ACTIONS => {
-			'TILDE' => 244,
-			'p_name' => 21,
-			"virtual" => 251
-		},
-		GOTOS => {
-			'perc_name' => 294,
-			'dtor' => 284,
-			'virtual' => 296
-		}
-	},
-	{#State 295
+	{#State 301
 		DEFAULT => -93
 	},
-	{#State 296
-		ACTIONS => {
-			'TILDE' => 244,
-			'p_name' => 21,
-			"virtual" => 251
-		},
-		GOTOS => {
-			'perc_name' => 294,
-			'dtor' => 295,
-			'virtual' => 296
-		}
-	},
-	{#State 297
-		ACTIONS => {
-			'p_any' => 3,
-			'p_alias' => 128,
-			'p_code' => 131,
-			'p_cleanup' => 125,
-			'p_postcall' => 127,
-			'p_catch' => 135
-		},
-		DEFAULT => -96,
-		GOTOS => {
-			'perc_postcall' => 130,
-			'perc_code' => 124,
-			'perc_any' => 132,
-			'perc_cleanup' => 133,
-			'perc_catch' => 126,
-			'_function_metadata' => 134,
-			'perc_alias' => 129
-		}
-	},
-	{#State 298
-		DEFAULT => -164
-	},
-	{#State 299
-		DEFAULT => -165
-	},
-	{#State 300
-		ACTIONS => {
-			'ID' => 315
-		}
-	},
-	{#State 301
-		ACTIONS => {
-			'CLPAR' => 316,
-			'COMMA' => 317
-		}
-	},
 	{#State 302
-		DEFAULT => -173
+		ACTIONS => {
+			'p_name' => 34,
+			'TILDE' => 251,
+			"virtual" => 272
+		},
+		GOTOS => {
+			'dtor' => 293,
+			'perc_name' => 302,
+			'virtual' => 299
+		}
 	},
 	{#State 303
-		DEFAULT => -177
-	},
-	{#State 304
-		DEFAULT => -178
-	},
-	{#State 305
-		DEFAULT => -109
-	},
-	{#State 306
 		ACTIONS => {
-			'p_any' => 99,
-			'p_name' => 21,
-			'CLCURLY' => 318
+			'OPSPECIAL' => 40,
+			'SEMICOLON' => 316
 		},
 		GOTOS => {
-			'perc_name' => 101,
-			'perc_any_arg' => 142
+			'special_block_start' => 35,
+			'special_block' => 315
 		}
 	},
+	{#State 304
+		DEFAULT => -179
+	},
+	{#State 305
+		ACTIONS => {
+			'p_any' => 129,
+			'p_name' => 34
+		},
+		GOTOS => {
+			'perc_any_arg' => 131,
+			'perc_name' => 130,
+			'perc_any_args' => 317
+		}
+	},
+	{#State 306
+		DEFAULT => -172
+	},
 	{#State 307
-		DEFAULT => -180
+		ACTIONS => {
+			'FLOAT' => 213,
+			'QUOTED_STRING' => 211,
+			'INTEGER' => 212,
+			'ID' => 6,
+			'DASH' => 216
+		},
+		GOTOS => {
+			'value' => 318,
+			'class_name' => 210
+		}
 	},
 	{#State 308
-		DEFAULT => -18
+		ACTIONS => {
+			'CLCURLY' => 319
+		}
 	},
 	{#State 309
 		ACTIONS => {
-			'OPPAR' => 291
+			'p_any' => 48
+		},
+		DEFAULT => -74,
+		GOTOS => {
+			'_member_metadata' => 321,
+			'perc_any' => 320
 		}
 	},
 	{#State 310
 		ACTIONS => {
-			'CLPAR' => 319
+			'CLPAR' => 322
 		}
 	},
 	{#State 311
 		ACTIONS => {
-			'p_any' => 3
-		},
-		DEFAULT => -74,
-		GOTOS => {
-			'perc_any' => 321,
-			'_member_metadata' => 320
+			'CLPAR' => 323
 		}
 	},
 	{#State 312
 		ACTIONS => {
-			'CLPAR' => 322
+			'OPPAR' => 290
 		}
 	},
 	{#State 313
 		ACTIONS => {
-			'INTEGER' => 323
+			'INTEGER' => 324
 		}
 	},
 	{#State 314
 		ACTIONS => {
-			'p_any' => 3,
-			'p_alias' => 128,
-			'p_code' => 131,
-			'p_cleanup' => 125,
-			'p_postcall' => 127,
-			'p_catch' => 135
+			'p_catch' => 112,
+			'p_any' => 48,
+			'p_postcall' => 113,
+			'p_cleanup' => 116,
+			'p_alias' => 118,
+			'p_code' => 120
 		},
 		DEFAULT => -100,
 		GOTOS => {
-			'perc_postcall' => 130,
-			'perc_code' => 124,
-			'perc_any' => 132,
-			'perc_cleanup' => 133,
-			'perc_catch' => 126,
-			'_function_metadata' => 134,
-			'perc_alias' => 129
+			'perc_alias' => 117,
+			'perc_code' => 109,
+			'_function_metadata' => 119,
+			'perc_catch' => 115,
+			'perc_any' => 114,
+			'perc_cleanup' => 111,
+			'perc_postcall' => 110
 		}
 	},
 	{#State 315
-		ACTIONS => {
-			'CLCURLY' => 324
-		}
+		DEFAULT => -180
 	},
 	{#State 316
-		DEFAULT => -172
+		DEFAULT => -18
 	},
 	{#State 317
 		ACTIONS => {
-			'ID' => 28,
-			'INTEGER' => 222,
-			'QUOTED_STRING' => 224,
-			'DASH' => 226,
-			'FLOAT' => 225
+			'p_name' => 34,
+			'CLCURLY' => 325,
+			'p_any' => 129
 		},
 		GOTOS => {
-			'class_name' => 220,
-			'value' => 325
+			'perc_any_arg' => 172,
+			'perc_name' => 130
 		}
 	},
 	{#State 318
-		ACTIONS => {
-			'SEMICOLON' => 326
-		}
+		DEFAULT => -174
 	},
 	{#State 319
+		DEFAULT => -24,
+		GOTOS => {
+			'mixed_blocks' => 326
+		}
+	},
+	{#State 320
+		DEFAULT => -70
+	},
+	{#State 321
+		DEFAULT => -68
+	},
+	{#State 322
 		DEFAULT => -95,
 		GOTOS => {
 			'function_metadata' => 327
 		}
 	},
-	{#State 320
-		DEFAULT => -68
-	},
-	{#State 321
-		DEFAULT => -70
-	},
-	{#State 322
+	{#State 323
 		DEFAULT => -95,
 		GOTOS => {
 			'function_metadata' => 328
 		}
 	},
-	{#State 323
+	{#State 324
 		DEFAULT => -95,
 		GOTOS => {
 			'function_metadata' => 329
 		}
 	},
-	{#State 324
-		DEFAULT => -24,
-		GOTOS => {
-			'mixed_blocks' => 330
+	{#State 325
+		ACTIONS => {
+			'SEMICOLON' => 330
 		}
 	},
-	{#State 325
-		DEFAULT => -174
-	},
 	{#State 326
-		DEFAULT => -19
+		ACTIONS => {
+			'SEMICOLON' => 331,
+			'OPSPECIAL' => 40,
+			'OPCURLY' => 177
+		},
+		GOTOS => {
+			'special_block' => 176,
+			'simple_block' => 175,
+			'special_block_start' => 35
+		}
 	},
 	{#State 327
 		ACTIONS => {
-			'p_any' => 3,
-			'p_alias' => 128,
-			'p_code' => 131,
-			'p_cleanup' => 125,
-			'p_postcall' => 127,
-			'p_catch' => 135
+			'p_catch' => 112,
+			'p_any' => 48,
+			'p_postcall' => 113,
+			'p_cleanup' => 116,
+			'p_alias' => 118,
+			'p_code' => 120
 		},
 		DEFAULT => -91,
 		GOTOS => {
-			'perc_postcall' => 130,
-			'perc_code' => 124,
-			'perc_any' => 132,
-			'perc_cleanup' => 133,
-			'perc_catch' => 126,
-			'_function_metadata' => 134,
-			'perc_alias' => 129
+			'perc_cleanup' => 111,
+			'perc_postcall' => 110,
+			'perc_catch' => 115,
+			'perc_any' => 114,
+			'_function_metadata' => 119,
+			'perc_code' => 109,
+			'perc_alias' => 117
 		}
 	},
 	{#State 328
 		ACTIONS => {
-			'p_any' => 3,
-			'p_alias' => 128,
-			'p_code' => 131,
-			'p_cleanup' => 125,
-			'p_postcall' => 127,
-			'p_catch' => 135
+			'p_catch' => 112,
+			'p_postcall' => 113,
+			'p_any' => 48,
+			'p_alias' => 118,
+			'p_cleanup' => 116,
+			'p_code' => 120
 		},
 		DEFAULT => -89,
 		GOTOS => {
-			'perc_postcall' => 130,
-			'perc_code' => 124,
-			'perc_any' => 132,
-			'perc_cleanup' => 133,
-			'perc_catch' => 126,
-			'_function_metadata' => 134,
-			'perc_alias' => 129
+			'perc_any' => 114,
+			'perc_catch' => 115,
+			'perc_postcall' => 110,
+			'perc_cleanup' => 111,
+			'perc_alias' => 117,
+			'perc_code' => 109,
+			'_function_metadata' => 119
 		}
 	},
 	{#State 329
 		ACTIONS => {
-			'p_any' => 3,
-			'p_alias' => 128,
-			'p_code' => 131,
-			'p_cleanup' => 125,
-			'p_postcall' => 127,
-			'p_catch' => 135
+			'p_catch' => 112,
+			'p_postcall' => 113,
+			'p_any' => 48,
+			'p_alias' => 118,
+			'p_cleanup' => 116,
+			'p_code' => 120
 		},
 		DEFAULT => -101,
 		GOTOS => {
-			'perc_postcall' => 130,
-			'perc_code' => 124,
-			'perc_any' => 132,
-			'perc_cleanup' => 133,
-			'perc_catch' => 126,
-			'_function_metadata' => 134,
-			'perc_alias' => 129
+			'perc_code' => 109,
+			'perc_alias' => 117,
+			'_function_metadata' => 119,
+			'perc_catch' => 115,
+			'perc_any' => 114,
+			'perc_cleanup' => 111,
+			'perc_postcall' => 110
 		}
 	},
 	{#State 330
-		ACTIONS => {
-			'OPCURLY' => 144,
-			'OPSPECIAL' => 33,
-			'SEMICOLON' => 331
-		},
-		GOTOS => {
-			'simple_block' => 146,
-			'special_block' => 145,
-			'special_block_start' => 35
-		}
+		DEFAULT => -19
 	},
 	{#State 331
 		DEFAULT => -21

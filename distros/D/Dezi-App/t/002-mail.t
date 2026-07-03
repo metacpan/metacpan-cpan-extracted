@@ -1,12 +1,14 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Path::Class::Dir;
 use Path::Class::File;
 use Class::Load;
 use Try::Tiny;
+use Data::Dump qw( dump );
 
 use_ok('Dezi::Test::Indexer');
+use_ok('Dezi::Test::Searcher');
 
 my $num_tests = 4;
 
@@ -46,7 +48,7 @@ SKIP: {
     my $indexer = Dezi::Test::Indexer->new( 'invindex' => 't/mail.index' );
 
     # maildir requires the 'cur', 'tmp' and 'new' dirs to exist
-    my $maildir = Path::Class::Dir->new('t', 'maildir');
+    my $maildir = Path::Class::Dir->new( 't', 'maildir' );
     for my $dirname (qw( cur tmp new )) {
         Path::Class::Dir->new( $maildir, $dirname )->mkpath;
         Path::Class::Dir->new( $maildir, '.INBOX', $dirname )->mkpath;
@@ -70,40 +72,64 @@ SKIP: {
     is( $mail->crawl('t/maildir'), 1, "crawl" );
     ok( $mail->indexer->finish, "finish" );
 
+    # verify parsing
+    my $inv_index = $indexer->invindex;
+    my $searcher  = Dezi::Test::Searcher->new(
+        invindex      => $inv_index,
+        swish3_config => $indexer->swish3->get_config
+    );
+    my $res     = $searcher->search('Passage');
+    my $matches = () = $res->payload->docs->[0]->swishdefault =~ /Passage/g;
+    # dump $res;
+    is( $matches, 1, 'text/plain skipped in mail message multipart' );
+
     # clean up
     $maildir->rmtree();
 
 }
 
 __DATA__
-Return-Path: <peter@peknet.com>
-X-Original-To: swishtest@peknet.com
-Delivered-To: swishtest@peknet.com
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by peknet.com (Postfix) with ESMTP id BDADD126E23
-	for <swishtest@peknet.com>; Sat, 26 Jan 2008 21:21:00 -0600 (CST)
-X-Virus-Scanned: amavisd-new at peknet.com
-Received: from peknet.com ([127.0.0.1])
-	by localhost (louvin.peknet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ep8nklPQNilk for <swishtest@peknet.com>;
-	Sat, 26 Jan 2008 21:20:57 -0600 (CST)
-Received: from cenn-smtp.mc.mpls.visi.com (cenn.mc.mpls.visi.com [208.42.156.9])
-	by peknet.com (Postfix) with ESMTP id 23068126DDE
-	for <swishtest@peknet.com>; Sat, 26 Jan 2008 21:20:57 -0600 (CST)
-Received: from dhcp2.peknet.com (karman.dsl.visi.com [209.98.116.241])
-	by cenn-smtp.mc.mpls.visi.com (Postfix) with ESMTP id 6CB808129
-	for <swishtest@peknet.com>; Sat, 26 Jan 2008 21:21:01 -0600 (CST)
-Message-ID: <479BF89A.20602@peknet.com>
-Date: Sat, 26 Jan 2008 21:20:58 -0600
-From: Peter Karman <peter@peknet.com>
-Reply-To: peter@peknet.com
-User-Agent: Thunderbird 2.0.0.9 (Macintosh/20071031)
 MIME-Version: 1.0
-To: swishtest@peknet.com
-Subject: test
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Date: Fri, 30 Apr 2021 20:48:43 -0500
+Message-ID: <CAF6iaBOfD3w1KGzydUHgFE0=vBC_91jyqZ3tUo_D2bPJHS4Vgw@mail.gmail.com>
+Subject: Revolution
+From: Peter Karman <peknet@gmail.com>
+To: Peter Karman <peter@peknet.com>
+Content-Type: multipart/alternative; boundary="000000000000b7d02905c13aed12"
 
-hello world.
--- 
-Peter Karman  .  http://peknet.com/  .  peter@peknet.com
+--000000000000b7d02905c13aed12
+Content-Type: text/plain; charset="UTF-8"
+
+The revolution was still fresh
+Backmarket foodstuffs day by day
+Lying awake while voices called
+Outside in the streets
+The trains running again
+Coupling down in the yard
+While shipmen called their droning
+Patter over the darkness on the river
+
+I could smell you, like a memory,
+Like the folded corner of my favorite
+Passage
+--
+Peter Karman .  he/him/his  .  https://karpet.github.io/ . 785.337.0405
+
+--000000000000b7d02905c13aed12
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+The revolution was still fresh<div dir=3D"auto">Backmarket foodstuffs day b=
+y day</div><div dir=3D"auto">Lying awake while voices called=C2=A0</div><di=
+v dir=3D"auto">Outside in the streets</div><div dir=3D"auto">The trains run=
+ning again</div><div dir=3D"auto">Coupling down in the yard</div><div dir=
+=3D"auto">While shipmen called their droning</div><div dir=3D"auto">Patter =
+over the darkness on the river</div><div dir=3D"auto"><br></div><div dir=3D=
+"auto">I could smell you, like a memory,</div><div dir=3D"auto">Like the fo=
+lded corner of my favorite</div><div dir=3D"auto">Passage</div>-- <br><div =
+dir=3D"ltr" class=3D"gmail_signature" data-smartmail=3D"gmail_signature"><d=
+iv dir=3D"ltr"><div><div dir=3D"ltr"><div>Peter Karman .=C2=A0 he/him/his=
+=C2=A0 .=C2=A0 <a href=3D"https://karpet.github.io/" target=3D"_blank">http=
+s://karpet.github.io/</a>=C2=A0. 785.337.0405</div></div></div></div></div>
+
+--000000000000b7d02905c13aed12--

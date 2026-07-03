@@ -1,0 +1,7 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Algorithm::Classifier::NaiveBayes::App;
+Algorithm::Classifier::NaiveBayes::App->run;

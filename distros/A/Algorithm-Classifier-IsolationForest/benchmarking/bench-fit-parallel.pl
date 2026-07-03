@@ -5,13 +5,19 @@
 # counts.  The training data is the same for every run; only the
 # `parallel_fit` constructor option changes.
 #
-# Tree-building uses Perl rand() + recursion -- parallel_fit forks
-# workers and divvies up n_trees across them, with each worker fitting
-# its share in a child process and returning the trees to the parent
-# via Storable on a pipe.  Speedup is bounded by:
+# parallel_fit forks workers and divvies up n_trees across them, with
+# each worker fitting its share in a child process (via the C tree
+# builder when Inline::C is available, same as a non-parallel fit) and
+# returning the trees to the parent via Storable on a pipe.  Speedup is
+# bounded by:
 #   * core count
 #   * Storable freeze/thaw + pipe IPC overhead per worker
 #   * fork() cost (small but non-zero)
+#
+# With the C builder, a single-process fit is often fast enough that
+# this fixed per-worker overhead costs more than splitting the work
+# saves -- watch for parallel_fit making things *slower* on small/
+# medium datasets in the sweep below.
 #
 # Run with:
 #   perl -Ilib benchmarking/bench-fit-parallel.pl

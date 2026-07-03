@@ -2,6 +2,8 @@ package Net::Nostr::Client;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
 use AnyEvent;
@@ -17,7 +19,7 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my %allowed = map { $_ => 1 } qw(ssl_no_verify ssl_ca_file);
     my @unknown = grep { !$allowed{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -264,6 +266,8 @@ messages, counting events (NIP-45), and negentropy set reconciliation
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $client = Net::Nostr::Client->new;
 

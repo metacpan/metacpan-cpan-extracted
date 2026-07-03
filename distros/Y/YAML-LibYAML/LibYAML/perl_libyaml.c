@@ -1,5 +1,8 @@
 #include <perl_libyaml.h>
 
+int BOOLEAN_JSON_PP = 1;
+int BOOLEAN_BOOLEAN = 2;
+
 #if (PERL_REVISION > 5) || (PERL_REVISION == 5 && PERL_VERSION >= 36)
 #  define PERL_HAVE_BOOLEANS
 #endif
@@ -1734,11 +1737,23 @@ oo_load_scalar(perl_yaml_xs_t *self)
 
     /* bool true */
     if (scalar_type == YAML_XS_SCALAR_TYPE_BOOL_TRUE) {
+        if (self->boolean == BOOLEAN_JSON_PP) {
+            char *name = "JSON::PP::Boolean";
+            scalar = newSV(1);
+            scalar = sv_setref_iv(scalar, name, 1);
+        }
+        else if (self->boolean == BOOLEAN_BOOLEAN) {
+            char *name = "boolean";
+            scalar = newSV(1);
+            scalar = sv_setref_iv(scalar, name, 1);
+        }
+        else {
 #ifdef PERL_HAVE_BOOLEANS
-        scalar = newSVsv(&PL_sv_yes);
+            scalar = newSVsv(&PL_sv_yes);
 #else
-        scalar = &PL_sv_yes;
+            scalar = &PL_sv_yes;
 #endif
+        }
         if (tag && ! strEQ(tag, YAML_BOOL_TAG)) {
             croak("%s", oo_loader_error_msg( self, form("Invalid tag '%s' for value '%s'", tag, string)));
         }
@@ -1747,11 +1762,23 @@ oo_load_scalar(perl_yaml_xs_t *self)
 
     /* bool false */
     if (scalar_type == YAML_XS_SCALAR_TYPE_BOOL_FALSE) {
+        if (self->boolean == BOOLEAN_JSON_PP) {
+            char *name = "JSON::PP::Boolean";
+            scalar = newSV(1);
+            scalar = sv_setref_iv(scalar, name, 0);
+        }
+        else if (self->boolean == BOOLEAN_BOOLEAN) {
+            char *name = "boolean";
+            scalar = newSV(1);
+            scalar = sv_setref_iv(scalar, name, 0);
+        }
+        else {
 #ifdef PERL_HAVE_BOOLEANS
-        scalar = newSVsv(&PL_sv_no);
+            scalar = newSVsv(&PL_sv_no);
 #else
-        scalar = &PL_sv_no;
+            scalar = &PL_sv_no;
 #endif
+        }
         if (tag && ! strEQ(tag, YAML_BOOL_TAG)) {
             croak("%s", oo_loader_error_msg( self, form("Invalid tag '%s' for value '%s'", tag, string)));
         }
@@ -1931,6 +1958,8 @@ void
 oo_dump_node(perl_yaml_xs_t *self, SV *node)
 {
     yaml_char_t *anchor = NULL;
+    const char *class = NULL;
+
     if (SvROK(node)) {
         SV *rnode = SvRV(node);
         U32 ref_type = SvTYPE(rnode);
@@ -1938,6 +1967,25 @@ oo_dump_node(perl_yaml_xs_t *self, SV *node)
             oo_dump_hash(self, node, anchor);
         else if (ref_type == SVt_PVAV) {
             oo_dump_array(self, node, anchor);
+        }
+        else if (ref_type == SVt_PVMG) {
+            if (!SvMAGICAL(rnode)) {
+                class = sv_reftype(rnode, TRUE);
+                if (
+                        self->boolean == BOOLEAN_JSON_PP
+                        && strEQ(class, "JSON::PP::Boolean")
+                    ||
+                        self->boolean == BOOLEAN_BOOLEAN
+                        && strEQ(class, "boolean")
+                    ) {
+                    if (SvIV(node)) {
+                        oo_dump_scalar(self, &PL_sv_yes);
+                    }
+                    else {
+                        oo_dump_scalar(self, &PL_sv_no);
+                    }
+                }
+            }
         }
     }
     else {
@@ -2059,12 +2107,12 @@ oo_dump_scalar(perl_yaml_xs_t *self, SV *node)
             string_len = 5;
             style = YAML_PLAIN_SCALAR_STYLE;
         }
-        else if (isnan(val)) {
+        else if (Perl_isnan(val)) {
             string = ".nan";
             string_len = 4;
             style = YAML_PLAIN_SCALAR_STYLE;
         }
-        else if (isinf(val)) {
+        else if (Perl_isinf(val)) {
             if (val == -NV_INF) {
                 string = "-.inf";
                 string_len = 5;

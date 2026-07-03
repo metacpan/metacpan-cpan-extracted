@@ -1,17 +1,23 @@
 =head1 Dezi-App
 
-=begin html
-
-<p>
-  <img src="https://travis-ci.org/karpet/dezi-app.png?branch=master" alt="Travis CI build status">
-</p>
-
-=end html
+=for html <a href="https://github.com/karpet/dezi-app/actions/workflows/pull_request.yml"><img src="https://github.com/karpet/dezi-app/actions/workflows/pull_request.yml/badge.svg"></a>
 
 Dezi::App is a Moose port of SWISH::Prog.
 
 Dezi::App drops compatibility with Swish-e version 2.x and focuses
 on tight integration with SWISH::3 and Apache Lucy.
+
+=head2 DEVELOPMENT
+
+This module uses Dist::Zilla.
+
+  % git clone https://github.com/karpet/dezi-app
+  % cd dezi-app
+  % cpan Dist::Zilla Dist::Zilla::Role::ModuleMetadata
+  % cpan App::cpanminus
+  % dzil authordeps --missing | cpanm
+  % dzil build
+  % dzil test
 
 =head2 INSTALLATION
 
@@ -31,6 +37,9 @@ perldoc command.
 
 You can also look for information at:
 
+    Source
+        https://github.com/karpet/dezi-app
+
     RT, CPAN's request tracker
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi-App
 
@@ -40,8 +49,8 @@ You can also look for information at:
     CPAN Ratings
         http://cpanratings.perl.org/d/Dezi-App
 
-    Search CPAN
-        http://search.cpan.org/dist/Dezi-App/
+    Metacpan
+        https://metacpan.org/release/Dezi-App
 
 
 =head2 COPYRIGHT AND LICENCE

@@ -245,6 +245,7 @@ subtest 'kind 15 optional file tags' => sub {
         ox                   => 'b' x 64,
         size                 => '1024',
         dim                  => '800x600',
+        thumbhash            => '1QcSHQRnh493V4dIh4eXh1h4kJUI',
         blurhash             => 'LEHV6nWB2yk8',
         thumb                => 'https://example.com/thumb.bin',
         fallback             => ['https://backup.example.com/file.bin'],
@@ -257,6 +258,7 @@ subtest 'kind 15 optional file tags' => sub {
     is($tags{ox}[0], 'b' x 64, 'ox tag');
     is($tags{size}[0], '1024', 'size tag');
     is($tags{dim}[0], '800x600', 'dim tag');
+    is($tags{thumbhash}[0], '1QcSHQRnh493V4dIh4eXh1h4kJUI', 'thumbhash tag');
     is($tags{blurhash}[0], 'LEHV6nWB2yk8', 'blurhash tag');
     is($tags{thumb}[0], 'https://example.com/thumb.bin', 'thumb tag');
     is($tags{fallback}[0], 'https://backup.example.com/file.bin', 'fallback tag');

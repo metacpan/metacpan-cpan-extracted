@@ -35,6 +35,7 @@ enum Values
 
 
 MODULE=Foo
+
 // Values
 //     ONE
 //     TWO
@@ -55,6 +56,7 @@ enum
 
 
 MODULE=Foo
+
 // <anonymous>
 //     ONE
 //     TWO

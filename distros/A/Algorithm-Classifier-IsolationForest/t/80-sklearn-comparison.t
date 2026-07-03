@@ -35,6 +35,13 @@ use Algorithm::Classifier::IsolationForest;
 
 my $CLASS = 'Algorithm::Classifier::IsolationForest';
 
+# Compare each backend against sklearn: pure-Perl always, C when it compiled.
+# A missing C backend skips that arm rather than failing.  sklearn itself is
+# run only once (it is unaffected by which Perl backend scores).
+my @BACKENDS = ( [ 'pure-perl' => 0 ] );
+push @BACKENDS, [ 'C' => 1 ]
+    if $Algorithm::Classifier::IsolationForest::HAS_C;
+
 use constant PI => 3.14159265358979;
 
 # -----------------------------------------------------------------------
@@ -239,13 +246,14 @@ unless ( defined $py && ref $py eq 'HASH' ) {
 # Per-dataset test battery
 # -----------------------------------------------------------------------
 sub run_dataset_tests {
-    my ( $ds, $sk_all ) = @_;
+    my ( $ds, $sk_all, $use_c ) = @_;
 
     my $label = $ds->{label};
     my $n_in  = $ds->{n_in};
     my $n_out = $ds->{n_out};
 
-    my $f = $CLASS->new( n_trees => 100, sample_size => 256, seed => 42 );
+    my $f = $CLASS->new(
+        n_trees => 100, sample_size => 256, seed => 42, use_c => $use_c );
     $f->fit( $ds->{data} );
 
     my $perl_in_scores  = $f->score_samples( $ds->{inliers} );
@@ -310,15 +318,18 @@ sub run_dataset_tests {
 # -----------------------------------------------------------------------
 # Run the battery for each dataset
 # -----------------------------------------------------------------------
-for my $ds (@datasets) {
-    my $sk_all = $py->{ $ds->{label} };
-    unless ( ref $sk_all eq 'ARRAY' && @$sk_all == @{ $ds->{data} } ) {
-        fail( "sklearn output missing or wrong length for dataset '$ds->{label}'" );
-        next;
+for my $be (@BACKENDS) {
+    my ( $be_name, $USE_C ) = @$be;
+    for my $ds (@datasets) {
+        my $sk_all = $py->{ $ds->{label} };
+        unless ( ref $sk_all eq 'ARRAY' && @$sk_all == @{ $ds->{data} } ) {
+            fail( "sklearn output missing or wrong length for dataset '$ds->{label}'" );
+            next;
+        }
+        subtest "[$be_name] $ds->{label} ($ds->{n_feat} features)" => sub {
+            run_dataset_tests( $ds, $sk_all, $USE_C );
+        };
     }
-    subtest "$ds->{label} ($ds->{n_feat} features)" => sub {
-        run_dataset_tests( $ds, $sk_all );
-    };
 }
 
 done_testing;

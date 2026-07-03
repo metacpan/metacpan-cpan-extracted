@@ -1,7 +1,9 @@
 lib/JSON/JSONFold.pm
-lib/JSON/Stats.pm
-lib/JSON/Writer.pm
+lib/JSON/JSONFold/Stats.pm
+lib/JSON/JSONFold/Config.pm
+lib/JSON/JSONFold/Writer.pm
 Makefile.PL
+CHANGES
 LICENSE
 MANIFEST			This list of files
 MANIFEST.SKIP

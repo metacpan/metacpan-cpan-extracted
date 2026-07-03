@@ -1,0 +1,25 @@
+# the SHELL defaults to /bin/sh which may vary depending on OS
+SHELL=/bin/bash
+# quiet calling of make internally
+MAKEFLAGS += --no-print-directory
+
+.PHONY: help
+help: ## View this help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-24s\033[0m %s\n", $$1, $$2}'
+
+install: ## Install
+	dzil install --install-command 'cpanm -S -n -f .'
+
+test: ## Run tests
+	prove -Ilib t/
+
+deps: ## Install dependencies
+	dzil authordeps --missing | cpanm
+
+dist: ## Create distribution release
+	dzil build
+
+distclean: ## Remove old local dist packaging
+	rm -rf Dezi-App-*
+
+.PHONY: install test help deps dist distclean

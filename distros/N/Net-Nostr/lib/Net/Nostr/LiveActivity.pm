@@ -2,6 +2,8 @@ package Net::Nostr::LiveActivity;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -41,12 +43,12 @@ my %KINDS = (
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{hashtags}     //= [];
     $args{participants} //= [];
     $args{relays}       //= [];
     $args{pinned}       //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -54,7 +56,8 @@ sub new {
 }
 
 sub live_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $identifier = delete $args{identifier}
         // croak "live_event requires 'identifier'";
@@ -101,7 +104,8 @@ sub live_event {
 }
 
 sub chat_message {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $activity   = delete $args{activity}
         // croak "chat_message requires 'activity'";
@@ -126,7 +130,8 @@ sub chat_message {
 }
 
 sub meeting_space {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $identifier = delete $args{identifier}
         // croak "meeting_space requires 'identifier'";
@@ -165,7 +170,8 @@ sub meeting_space {
 }
 
 sub meeting_room {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $identifier = delete $args{identifier}
         // croak "meeting_room requires 'identifier'";
@@ -208,7 +214,8 @@ sub meeting_room {
 }
 
 sub room_presence {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $activity   = delete $args{activity}
         // croak "room_presence requires 'activity'";
@@ -415,6 +422,8 @@ reference and an optional C<hand> tag for raised hand.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $la = Net::Nostr::LiveActivity->new(
         identifier => 'my-stream',

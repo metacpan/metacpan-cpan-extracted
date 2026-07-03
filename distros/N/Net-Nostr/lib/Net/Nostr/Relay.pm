@@ -2,6 +2,8 @@ package Net::Nostr::Relay;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use AnyEvent ();
 use Carp qw(croak);
 use Net::Nostr::Message;
@@ -74,7 +76,7 @@ sub subscriptions {
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -127,10 +129,25 @@ sub new {
     $self->_sub_by_kind({});
     $self->_sub_no_kind({});
     $self->_server(AnyEvent::WebSocket::Server->new(
+        handshake => sub {
+            my ($req, $res) = @_;
+            my $resource = $req->resource_name // '/';
+            my ($path) = split /\?/, $resource, 2;
+            $path = '/' unless defined $path && length $path;
+            die "invalid relay endpoint path\n" unless $path eq $self->_websocket_path;
+            return $res;
+        },
         (defined $self->ssl_cert_file ? (ssl_cert_file => $self->ssl_cert_file) : ()),
         (defined $self->ssl_key_file  ? (ssl_key_file  => $self->ssl_key_file)  : ()),
     ));
     return $self;
+}
+
+sub _websocket_path {
+    my ($self) = @_;
+    return '/' unless defined $self->relay_url;
+    return $1 if $self->relay_url =~ m{\A[^:]+://[^/?#]+([^?#]*)} && length $1;
+    return '/';
 }
 
 sub events {
@@ -1116,6 +1133,8 @@ Supports all NIP-01 event semantics:
 
 =head2 new
 
+Accepts named arguments as either a flat list or a single hash reference.
+
     my $relay = Net::Nostr::Relay->new;
     my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
     my $relay = Net::Nostr::Relay->new(max_connections_per_ip => 10);
@@ -1329,6 +1348,11 @@ Starts listening for WebSocket connections on the given host and port.
 Returns immediately without blocking. Use this when you want to embed
 the relay in a larger application, run a client and relay in the same
 process, or compose with other AnyEvent watchers.
+
+Per NIP-01, the relay accepts WebSocket connections only at one endpoint.
+By default that endpoint is C</>. If C<relay_url> includes a path, that
+path is used instead. Additional path segments are rejected during the
+WebSocket handshake.
 
     # Run a relay and client together
     my $relay = Net::Nostr::Relay->new;

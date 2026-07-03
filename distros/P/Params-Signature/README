@@ -1,0 +1,64 @@
+Params-Signature
+================
+
+Params::Signature validates subroutine and method parameters using concise
+signature definitions. It supports positional, named, and mixed styles,
+default values, optional parameters, callbacks, and coercions provided by
+your type constraint system.
+
+Version
+-------
+
+0.05
+
+Installation
+------------
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Quick Start
+-----------
+
+Use Params::Signature as class methods, object methods, or exported
+subroutines:
+
+    use Params::Signature qw(:all);
+    use Types::Standard qw(Int Str);
+
+    sub greet {
+        my $p = validate(\@_, ["Str name", "Int times = 1"]);
+        return join q{ }, ($p->{name}) x $p->{times};
+    }
+
+Documentation
+-------------
+
+Canonical API reference:
+
+    perldoc Params::Signature
+
+Long-form guide:
+
+    perldoc Params::Signature::Manual
+
+Support
+-------
+
+Issue tracker:
+https://github.com/spatocs/params_signature/issues
+
+Author
+------
+
+Sandor Patocs
+
+License
+-------
+
+Copyright (C) 2013 Sandor Patocs.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License (2.0).

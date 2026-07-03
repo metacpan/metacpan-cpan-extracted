@@ -1,11 +1,11 @@
-#----- Tempo.pm ------
-# support for beats and bars
-
-package Audio::Nama::Tempo;
+# contains Tempo::Chunk, Tempo::Bar, Tempo::Beat, Tempo::Tick 
+# routines for reading tempo map are in the root namespace
+{
+package Audio::Nama::Tempo::Chunk;
 use v5.36;
 our $VERSION = 1.0;
 use Audio::Nama::Globals qw($config);
-use Audio::Nama::Object qw( label bars meter tempo ticks);
+use Audio::Nama::Object qw( label bars meter tempo tick index);
 use List::Util qw(sum);
 # we divide time in chunks specified by klick metronome tempo map
 # 
@@ -17,42 +17,81 @@ use List::Util qw(sum);
 # note: denominator of time signature, e.g. 4 means quarter note, 8 means eighth
 # count: numerator of time signature
 
-no warnings 'redefine';
+#no warnings 'redefine';
 
+
+our $index = 0;
 our @chunks;
 our @beats;
 our @bars;
+sub chunks { @chunks }
 
-sub note {
-	my $self = shift;
+sub locate_bar ($bar_index) { 
+	my $relative_bar = $bar_index;
+	my $in;
+	for my $chunk (@chunks){
+		if ($relative_bar  > $chunk->bars) # does not appear during this chunk
+			{ $relative_bar -= $chunk->bars }
+		else { $in = $chunk; last }
+	}	
+	$in->bar($relative_bar); 
+	
+}
+sub new ($class, %args) {
+		$args{meter} //= '4/4';
+		$args{index} = $index++;
+		my $self = bless \%args, $class;
+		push @chunks, $self;
+}
+sub my_length ($self) {
+	$self->bars * $self->count * $self->note_length;
+}
+sub previous ($self) {
+	$self->index > 0 and $chunks[$self->index - 1] 
+}
+
+sub start_pos ($self) {
+	$self->previous ? $self->previous->end_pos : 0;
+}
+sub end_pos ($self) {
+	$self->start_pos + $self->my_length
+}
+
+
+sub bar ($self, $bar_index) {
+	Audio::Nama::Tempo::Bar->new( chunk => $self,
+						index => $bar_index);
+}
+
+
+sub note ($self) {  # denominator, 4, in 2/4
 	my ($note) = $self->{meter} =~ m| / (\d+) |x;
 	$note;
 }
-sub count {
-	my $self = shift;
+sub count ($self) { # numerator, 2, in 2/4
 	my ($count) = $self->{meter} =~ m| (\d+) / |x;
 	$count;
 }
-sub beats {
-	my $self = shift;
+sub beats ($self) {
 	$self->bars * $self->count
 }
-sub ticks { 
-	my $self = shift;
+sub ticks ($self) { 
 	$self->quarter_notes * $config->{ticks_per_quarter_note}
 }
-sub quarter_notes {
-	my $self = shift;
+sub quarter_notes ($self) {
 	$self->beats * $self->note_fraction
 }
-sub note_lengths {
-	my $self = shift;
-	my @note_lengths;
+sub note_fraction ($self) {
+	4 / $self->note;
+}
+
+sub note_length ($self){
 	if ( $self->fixed_tempo ){
 		my $beat_length = 60 / $self->tempo;
 		my $seconds_per_note =  $beat_length * $self->note_fraction;
-		@note_lengths = $seconds_per_note x $self->notes;
 	}	
+}
+=comment
 	else {
 		my $nl_start = note_length($self->start_tempo, $self->note_fraction);
 		my $nl_end   = note_length($self->end_tempo,   $self->note_fraction);
@@ -61,62 +100,11 @@ sub note_lengths {
 			push @note_lengths, ($nl_start + $incr * $delta);
 		}
 	}
-	@note_lengths
-}
-sub bar_lengths {
-	my $self = shift;
-	my @beats = $self->beat_lengths;
-	my @bars;
-	while (scalar @beats){
-		push @bars, sum splice @beats, 0, $self->count; 
-	}
-	@bars
-}
-sub length {
-	my $self = shift;
-	my $length = sum $self->bar_lengths();
-}
+=cut;
 
-sub start_time {
-	my $self = shift;
-	my $time = 0;
-	for (@chunks){
-		last if $_ == $self; # exit before final increment
-		$time += $_->length;
-	}
-	$time
-}
-sub end_time {
-	my $self = shift;
-	my $time = 0;
-	for (@chunks){
-		$time += $_->length; # increment before exit
-		last if $_ == $self;
-	}
-	$time
-}
 sub ratio {
 	my ($start_bpm, $end_bpm, $beats) = @_;
 	my $ratio = exp( log(bpm_to_length($end_bpm) / bpm_to_length($start_bpm)) / $beats );
-
-	# To calculate the factor for multiplying by beat length of note n 
-	# to get beat length of note n+1
-	#
-	# t final / t initial = r^n
-	#
-	# where
-	# t final is the final beat interval
-	# t initial is the initial beat interval
-	# r is the ratio
-	# n is the number of beats for the transition
-	#
-	# Taking the natural logarithm of both sides,
-	#
-	# ln( t final / t initial ) = n ln r
-	#
-	# Hence
-	#
-	# r = exp [ ln( t final / t initial )  / n ]
 
 }
 
@@ -125,11 +113,6 @@ sub bpm_to_length {
 	60 / $bpm 
 }
 
-sub note_length { }
-sub note_position {
-	
-
-}
 sub note_position_during_tempo_ramp {
 
 =comment
@@ -226,25 +209,91 @@ sub end_tempo {
 	my ($end_bpm) = $self->fixed_tempo ? $self->tempo
 										 : $self->tempo =~ / - (\d+) /x;
 }
-
-sub note_fraction {
-	my $self = shift;
-	4 / $self->note;
 }
 
-	
-sub notation_to_time {
-	my $self = shift;
-	my ($bars, $beats, $ticks) = @_;
-	$beats-- unless ! $beats; # first beat is time zero
-	$bars--  unless ! $bars;  # first bar is time zero;
-	$ticks-- unless ! $ticks; # first tick is time zero;
-	my $position_in_ticks = ($bars * $self->count + $beats) * $self->note_fraction * $config->{ticks_per_quarter_note} + $ticks;
+{
+package Audio::Nama::Tempo::Bar;
+use v5.36;
+use Audio::Nama::Object qw(chunk index);
 
-	$self->fixed_tempo ? bpm_to_length($self->tempo) * $self->note_fraction / $config->{ticks_per_quarter_note}  * $position_in_ticks
-					   : linear_ramp_position_mth_of_n ( $self->start_tempo, $self->end_tempo, $self->ticks, $position_in_ticks )
+sub new ($class, %args) {
+	bless \%args, $class
+}
+sub start_pos ($self)
+{
+	$self->chunk->start_pos + ($self->index - 1) * $self->chunk->count * $self->chunk->note_length
+}
+sub end_pos ($self)
+{
+	$self->start_pos + $self->chunk->count * $self->chunk->note_length
+}
+sub beat ($self, $beat_index) {
+	Audio::Nama::Tempo::Beat->new( bar => $self,
+						index => $beat_index);
+}
+}
+
+
+{
+package Audio::Nama::Tempo::Beat;
+use v5.36;
+use Audio::Nama::Object qw(bar index);
+
+sub new ($class, %args) {
+	bless \%args, $class
+}
+sub end_pos ($self) {
+	my $bar = $self->bar;
+	my $chunk = $self->bar->chunk;
+	if ( $chunk->fixed_tempo ){
+		$bar->start_pos + $self->index * $chunk->note_length;
+	}
+	else { die "no support for tempo ramp" }
+
+}
+sub start_pos ($self) {
+	my $bar = $self->bar;
+	my $chunk = $self->bar->chunk;
+	if ( $chunk->fixed_tempo ){
+		$bar->start_pos + ($self->index - 1) * $chunk->note_length;
+	}
+	else { die "no support for tempo ramp" }
+
+}
+sub tick ($self, $tick_index) {
+	Audio::Nama::Tempo::Tick->new( beat => $self, index => $tick_index)
+}
 	
 
+}
+
+{
+package Audio::Nama::Tempo::Tick;
+use v5.36;
+use Audio::Nama::Object qw(beat index);
+
+sub new ($class, %args) {
+	bless \%args, $class
+}
+sub end_pos ($self) {
+	my $beat = $self->beat;
+	my $chunk = $beat->bar->chunk;
+	if ( $chunk->fixed_tempo ){
+		$beat->start_pos + $self->index * $chunk->note_length / 24;
+	}
+	else { die "no support for tempo ramp" }
+
+}
+sub start_pos ($self) {
+	my $beat = $self->beat;
+	my $bar = $beat->bar;
+	my $chunk = $bar->chunk;
+	if ( $chunk->fixed_tempo ){
+		$beat->start_pos + ($self->index - 1) * $chunk->note_length/ 24;
+	}
+	else { die "no support for tempo ramp" }
+
+}
 }
 
 package Audio::Nama;
@@ -263,80 +312,41 @@ my $chunks = qr| (?<tempo> \d+ ( - \d+)? )    |x;
 
 my @fields = qw( label bars meter tempo );
 
-sub beat {  
-	my $nth = shift;
-	sum @beats[0..$nth-1]
-}
-sub bar  {
-	my $nth = shift;
-	sum @bars[0..$nth-1]
-}
-sub barbeat { 					# position in time of nth bar, mth beat 
-	# advance bars
-	# 
-}
 sub change_in_tempo_map{ $config->{use_git} and git_diff($file->tempo_map) }
-sub refresh_tempo_map {
-		return; # XX disabled
-		return unless -e $file->tempo_map or change_in_tempo_map();
-		git_commit('change in tempo map', $file->tempo_map);
-		delete_tempo_marks();
+
+sub import_tempo_map {
+		my $is_update = shift;
+		local $this_track = metronome_track();
+
+		# don't process if metronome track contains audio
+		# unless we specifically request it
+
+		return if $this_track->version and not $is_update;
+
 		initialize_tempo_map();
 		read_tempo_map($file->tempo_map);
-		
-	if ( -e $file->tempo_map or git( 'ls-files' => $file->tempo_map)){
-			
-			# case 1 - tempo map appears
-			if (not git( 'ls-files' => $file->tempo_map)){
-				my $msg = 'tempo map created';
-				git( add => $file->tempo_map);
-				git( commit => '--quiet', '--message', $msg, $file->tempo_map);
-				process_tempo_map();
-				render_metronome_track();
-			}
-			# case 2 - change in tempo map
-			elsif (git( diff => $file->tempo_map ) ){
-				if (-e $file->tempo_map ){
-					my $msg = 'change in tempo map';
-					git( commit => '--quiet', '--message', $msg, $file->tempo_map);
-					process_tempo_map();
-					render_metronome_track();
-				} else { 
-					my $msg = 'delete tempo map';
-					Audio::Nama::pager('tempo map has been deleted, turning of metronome track');
-					$this_track = metronome_track()->set( rw => OFF );
-					git( commit => '--quiet', '--message', $msg, $file->tempo_map);
-					initialize_tempo_map();
-				};
-			}
-		}
+		mark_song_sections();
+		render_metronome_track();
 }
 
-sub process_tempo_map {
-	local $this_track = metronome_track();
-	-e $file->tempo_map or return;
-	initialize_tempo_map();
-	read_tempo_map_file($file->tempo_map);
-	create_marks_and_beat_index();
-}
 sub metronome_track {
 	my $m = 'metronome';
 	if ($tn{$m}){ $tn{$m} } else { add_track($m) }
 }
 
 sub initialize_tempo_map { 
-	@chunks = @bars = @beats = ();	
-	delete_tempo_marks();
+	@Audio::Nama::Tempo::Chunk::chunks = ();
+	remove_section_marks();
 }
-sub delete_tempo_marks { for( Audio::Nama::Mark::all() ){ $_->remove if ref $_ =~ /Tempo/  } }
+sub remove_section_marks { for( Audio::Nama::Mark::all() ){ $_->remove if $_->type eq 'song' } }
 
-sub read_tempo_map_file {
+sub read_tempo_map {
 	my $file = shift;
 	return unless -e $file;
 	my @lines = grep{ ! /^\s*$/ } Audio::Nama::strip_comments(read_file($file));
-	read_tempo_map( @lines );
+	parse_tempo_map( @lines );
 }
-sub read_tempo_map {
+sub parse_tempo_map {
 	my @lines = @_;
 	for ( @lines )
 	{
@@ -347,19 +357,14 @@ sub read_tempo_map {
 		#say "label: $+{label} bars: $+{bars} meter: $+{meter} tempo: $+{tempo}";
 		my %chunk;
 		@chunk{ @fields } = @+{ @fields };
-		$chunk{meter} //= '4/4';
-		my $chunk = bless \%chunk, 'Audio::Nama::Tempo';
-		#say Dumper $chunk;
-		push @chunks, $chunk;
+		Audio::Nama::Tempo::Chunk->new(%chunk);
 		# make real mark$tempo_mark{$chunk->label} = $chunk if $chunk->label;
 	}
 }
 
-sub create_marks_and_beat_index {
-	for my $chunk (@chunks){
-		push @bars, $chunk->bar_lengths;
-		push @beats, $chunk->beat_lengths;
-		Audio::Nama::TempoMark->new(name => $chunk->label, time => $chunk->start_time);
+sub mark_song_sections {
+	for my $chunk (@Audio::Nama::Tempo::Chunk::chunks) {
+		$chunk->label and drop_mark( name => $chunk->label, time => $chunk->start_pos, type => 'song' );
 	}
 }
 
@@ -379,17 +384,22 @@ sub render_metronome_track {
 }
 
 sub notation_to_time {
-	my( $bars, $beats, $ticks) = @_;
-	my $time = 0;
-	my $in;
-	for (@chunks){
-		if ($bars > $_->bars) # does not appear during this chunk
-			{ $bars -= $_->bars }
-		else { $in = $_, last }
-	}	
-	$time += $in->start_time;
-	$time += $in->notation_to_time($bars,$beats, $ticks)
+	my( $bar_index, $beat_index, $tick_index) = @_;
+	my ($bar) = Audio::Nama::Tempo::Chunk::locate_bar($bar_index);
+	return $bar->start_pos unless $beat_index; 
+	my $beat = $bar->beat($beat_index);
+	return $beat->start_pos unless $tick_index;
+	my $tick = $beat->tick($tick_index);
+	return $tick->start_pos;
 }
+sub arm_metronome {
+	Audio::Nama::throw(  q(tempo map ") . $file->tempo_map . q(" not found, skipping) ), return if not -e $file->tempo_map;
+	try { system('killall','klick') };
+	my $cmd = 'klick -t -f '. $file->tempo_map . '&';
+	system $cmd;
+	Audio::Nama::pager("metronome is armed");
+}
+	
 	
 1
 __END__

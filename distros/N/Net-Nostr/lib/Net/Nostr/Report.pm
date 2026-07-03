@@ -2,6 +2,8 @@ package Net::Nostr::Report;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -20,7 +22,7 @@ my %REPORT_TYPES = map { $_ => 1 }
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -28,7 +30,8 @@ sub new {
 }
 
 sub report {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey      = $args{pubkey}      // croak "report requires 'pubkey'";
     my $reported_pk = $args{reported_pk} // croak "report requires 'reported_pk'";
@@ -140,7 +143,8 @@ sub validate {
 }
 
 sub report_filter {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my %filter = (kinds => [1984]);
 
@@ -203,6 +207,8 @@ Net::Nostr::Report - NIP-56 Reporting
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $report = Net::Nostr::Report->new(
         reported_pubkey => $pubkey_hex,

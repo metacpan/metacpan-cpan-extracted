@@ -144,6 +144,7 @@ int bar();
 
 
 MODULE=Foo
+
 #if ONE
 #define XSpp_zzzzzzzz_017082
 
@@ -176,6 +177,7 @@ enum Foo
 
 
 MODULE=Foo
+
 #if ONE
 #define XSpp_zzzzzzzz_017082
 
@@ -209,6 +211,7 @@ class Foo
 
 
 MODULE=Foo
+
 #if ONE
 #define XSpp_zzzzzzzz_017082
 

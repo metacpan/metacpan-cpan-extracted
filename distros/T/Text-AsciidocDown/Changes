@@ -1,0 +1,8 @@
+Revision history for Text-AsciidocDown
+
+v0.1.0  2026-07-02
+  - Initial public release.
+  - OO API via Text::AsciidocDown->new and ->convert.
+  - AsciiDoc-to-Markdown parser with practical block/inline support.
+  - Include pre-merge support with selector policies.
+  - CLI utility script/asciidoc-down with prepublish/postpublish workflows.

@@ -1,0 +1,88 @@
+0.23 2026-07-03
+        - CPAN release.
+
+0.22 2024-03-15
+        - Introduce end keys.
+          WARNING: This may break dictionaries which use the
+          '.' as a key.
+
+0.21 2021-01-14
+        - Chomping instead of trimming values.
+
+0.20 2018-10-08
+        - Fix test for Mojolicious >= 8.01.
+        - Add localize->preference helper.
+        - Optimize localize->preference helper.
+
+0.19 2018-09-23
+        - Fix test for Mojolicious >= 8.
+        - Improve support for mounted apps.
+
+0.18 2018-06-24
+        - Fix encoding of generated dictionary templates.
+        - Fix dependency of Test::Output.
+        - Do not generate scalar references in dictionary templates,
+          so there is a possibility to create template strings.
+        - Prefix default keys in dictionary templates.
+
+0.17 2018-05-23
+        - Fix treatment of empty loc(undef) requests.
+
+0.16 2018-01-09
+        - Remove usage of deprecated slurp function.
+        - Fix localization branch detection in localize command.
+
+0.15 2016-09-12
+        - Added dictionary template generator.
+
+0.14 2016-09-08
+        - Fixed path error for default and preferred values.
+        - Improved debugging.
+
+0.13 2016-09-07
+        - Removed dictionary returning function in loc helper.
+        - Added localize->dictionary helper.
+
+0.12 2016-09-06
+        - Renamed M::P::Localize::Number to M::P::Localize::Quantify.
+        - Renamed num() to quant().
+        - Cleanup debugging.
+
+0.11 2016-09-05
+        - Fixed backtracking using recursive lookup.
+        - Improved preferred and default key checking by making it lazy.
+
+0.10 2016-07-24
+        - Improve support for Mojolicious 7.
+        - Improve backtracking.
+
+0.09 2015-05-27
+        - Make Localize installable without -force,
+          ignoring unsolved problems.
+
+0.08 2015-05-06
+        - Changed stash passing to subroutines in dictionaries.
+
+0.07 2015-01-03
+        - Improved debugging.
+
+0.06 2014-11-27
+        - Renamed uneven to odd.
+
+0.05 2014-09-16
+        - Fix bug where resources from config files weren't located
+          correctly.
+
+0.04 2014-09-10
+        - Added forcing capability for preferred and default keys.
+
+0.03 2014-09-07
+        - Added backtracking.
+        - Small doc improvements.
+
+0.02 2014-09-03
+        - Rename ->languages to ->locale.
+        - Small doc improvements.
+
+0.01 2014-09-02
+        - Initial submission to GitHub.

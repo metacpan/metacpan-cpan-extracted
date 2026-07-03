@@ -8,6 +8,12 @@ use Algorithm::Classifier::IsolationForest;
 
 my $CLASS = 'Algorithm::Classifier::IsolationForest';
 
+# Run against the pure-Perl backend always, and against C when it compiled.
+# A missing C backend skips that arm rather than failing.
+my @BACKENDS = ( [ 'pure-perl' => 0 ] );
+push @BACKENDS, [ 'C' => 1 ]
+    if $Algorithm::Classifier::IsolationForest::HAS_C;
+
 # Build a deterministic dataset: a dense, well-populated cluster of "normal"
 # points inside [-1, 1]^2, plus a handful of outliers placed far outside it.
 # The data contains no randomness, so the only stochastic element is the
@@ -25,61 +31,69 @@ for my $i ( -7 .. 7 ) {
 
 sub mean { @_ ? sum(@_) / @_ : 0 }
 
-subtest 'axis-parallel Isolation Forest separates outliers from inliers' => sub {
-    my $f = $CLASS->new( n_trees => 100, sample_size => 256, seed => 42 );
-    $f->fit( [ @inliers, @outliers ] );
+for my $be (@BACKENDS) {
+    my ( $be_name, $USE_C ) = @$be;
 
-    my $in_scores  = $f->score_samples( \@inliers );
-    my $out_scores = $f->score_samples( \@outliers );
+    subtest "[$be_name] axis-parallel Isolation Forest separates outliers from inliers" => sub {
+        my $f = $CLASS->new(
+            n_trees => 100, sample_size => 256, seed => 42, use_c => $USE_C );
+        $f->fit( [ @inliers, @outliers ] );
 
-    my $mean_in  = mean(@$in_scores);
-    my $mean_out = mean(@$out_scores);
+        my $in_scores  = $f->score_samples( \@inliers );
+        my $out_scores = $f->score_samples( \@outliers );
 
-    cmp_ok( $mean_out, '>', $mean_in + 0.2,
-        'outliers score clearly higher on average than inliers' );
-    cmp_ok( max(@$in_scores), '<', 0.55,
-        'inliers stay well below the 0.5 anomaly line' );
-    cmp_ok( min(@$out_scores), '>', 0.6,
-        'outliers sit well above the 0.5 anomaly line' );
-    cmp_ok( min(@$out_scores), '>', max(@$in_scores),
-        'every outlier scores higher than every inlier' );
+        my $mean_in  = mean(@$in_scores);
+        my $mean_out = mean(@$out_scores);
 
-    # predict() with the default 0.5 cutoff should recover the labelling.
-    is( sum( @{ $f->predict( \@outliers ) } ),
-        scalar @outliers, 'predict() flags all outliers at the default cutoff' );
-    cmp_ok( sum( @{ $f->predict( \@inliers ) } ), '<', 0.05 * @inliers,
-        'predict() flags very few inliers (< 5%)' );
-};
+        cmp_ok( $mean_out, '>', $mean_in + 0.2,
+            'outliers score clearly higher on average than inliers' );
+        cmp_ok( max(@$in_scores), '<', 0.55,
+            'inliers stay well below the 0.5 anomaly line' );
+        cmp_ok( min(@$out_scores), '>', 0.6,
+            'outliers sit well above the 0.5 anomaly line' );
+        cmp_ok( min(@$out_scores), '>', max(@$in_scores),
+            'every outlier scores higher than every inlier' );
 
-subtest 'Extended Isolation Forest also separates the outliers' => sub {
-    my $f = $CLASS->new(
-        n_trees     => 100,
-        sample_size => 256,
-        mode        => 'extended',
-        seed        => 7,
-    );
-    $f->fit( [ @inliers, @outliers ] );
+        # predict() with the default 0.5 cutoff should recover the labelling.
+        is( sum( @{ $f->predict( \@outliers ) } ),
+            scalar @outliers, 'predict() flags all outliers at the default cutoff' );
+        cmp_ok( sum( @{ $f->predict( \@inliers ) } ), '<', 0.05 * @inliers,
+            'predict() flags very few inliers (< 5%)' );
+    };
 
-    my $mean_in  = mean( @{ $f->score_samples( \@inliers ) } );
-    my $mean_out = mean( @{ $f->score_samples( \@outliers ) } );
-    cmp_ok( $mean_out, '>', $mean_in + 0.15,
-        'extended-mode outliers also score clearly higher than inliers' );
-};
+    subtest "[$be_name] Extended Isolation Forest also separates the outliers" => sub {
+        my $f = $CLASS->new(
+            n_trees     => 100,
+            sample_size => 256,
+            mode        => 'extended',
+            seed        => 7,
+            use_c       => $USE_C,
+        );
+        $f->fit( [ @inliers, @outliers ] );
 
-subtest 'seeding makes training reproducible' => sub {
-    my @train = ( @inliers, @outliers );
+        my $mean_in  = mean( @{ $f->score_samples( \@inliers ) } );
+        my $mean_out = mean( @{ $f->score_samples( \@outliers ) } );
+        cmp_ok( $mean_out, '>', $mean_in + 0.15,
+            'extended-mode outliers also score clearly higher than inliers' );
+    };
 
-    my $a = $CLASS->new( n_trees => 40, sample_size => 128, seed => 99 );
-    my $b = $CLASS->new( n_trees => 40, sample_size => 128, seed => 99 );
-    $a->fit( \@train );
-    $b->fit( \@train );
+    subtest "[$be_name] seeding makes training reproducible" => sub {
+        my @train = ( @inliers, @outliers );
 
-    my $sa = $a->score_samples( \@train );
-    my $sb = $b->score_samples( \@train );
+        my $a = $CLASS->new(
+            n_trees => 40, sample_size => 128, seed => 99, use_c => $USE_C );
+        my $b = $CLASS->new(
+            n_trees => 40, sample_size => 128, seed => 99, use_c => $USE_C );
+        $a->fit( \@train );
+        $b->fit( \@train );
 
-    my $diffs = grep { $sa->[$_] != $sb->[$_] } 0 .. $#$sa;
-    is( $diffs, 0,
-        'two forests built with the same seed produce identical scores' );
-};
+        my $sa = $a->score_samples( \@train );
+        my $sb = $b->score_samples( \@train );
+
+        my $diffs = grep { $sa->[$_] != $sb->[$_] } 0 .. $#$sa;
+        is( $diffs, 0,
+            'two forests built with the same seed produce identical scores' );
+    };
+}
 
 done_testing;

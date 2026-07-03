@@ -1,3 +1,5 @@
+=encoding utf-8
+
 =head1 NAME
 
 ical - Module to support Apple macOS Calendar data
@@ -6,54 +8,58 @@ ical - Module to support Apple macOS Calendar data
 
 greple -Mical [ options ]
 
-    --simple  print data in on line
-    --detail  print one line data with descrition if available
-
-Exported functions
-
-    &print_ical_simple
-    &print_ical_desc
-    &print_ical_detail
+    --simple  print data in one line
+    --detail  print one line data with description if available
 
 =head1 SAMPLES
 
-greple -Mical [ -dnf ] ...
+greple -Mical PATTERN
 
-greple -Mical --simple ...
+greple -Mical --simple PATTERN
 
-greple -Mical --detail ...
-
-greple -Mical --all --print print_desc ...
+greple -Mical --detail PATTERN
 
 =head1 DESCRIPTION
 
-Used without options, it will search all macOS Calendar files under
-user's home directory.
+This module searches Apple macOS Calendar data.
 
-With B<--simple> option, summarize content in single line.  Output is
-not sorted.
+Recent versions of macOS store calendar data in a SQLite database
+(F<Calendar.sqlitedb> under F<~/Library/Group Containers/group.com.apple.calendar>),
+instead of individual C<.ics> files which older versions used.  This
+module reads the database with the B<sqlite3> command and converts
+each event to a C<VEVENT>-like paragraph, which is then searched by
+B<greple> in paragraph mode:
+
+     BEGIN:VEVENT
+     DTSTART:20260903T163000
+     DTEND:20260903T190000
+     SUMMARY:映画：ローマの休日
+     LOCATION:Theater X
+     END:VEVENT
+
+Used without options, matched events are printed in the above format.
+
+With B<--simple> option, summarize content in single line:
+
+     2026/09/03 16:30-19:00 映画：ローマの休日 @[Theater X]
 
 With B<--detail> option, print summarized line with description data
 if it is attached.  The result is sorted.
 
-Sample:
+=head1 REQUIREMENTS
 
-     BEGIN:VEVENT
-     UID:19970901T130000Z-123401@host.com
-     DTSTAMP:19970901T1300Z
-     DTSTART:19970903T163000Z
-     DTEND:19970903T190000Z
-     SUMMARY:Annual Employee Review
-     CLASS:PRIVATE
-     CATEGORIES:BUSINESS,HUMAN RESOURCES
-     END:VEVENT
+The B<sqlite3> command is required (standard on macOS).
+
+The terminal application needs the B<Full Disk Access> privilege to
+read the calendar database.  If you get an "Operation not permitted"
+error, add your terminal application in: System Settings ->
+Privacy & Security -> Full Disk Access, and restart the terminal.
 
 =head1 TIPS
 
 Use C<-dfn> option to observe the command running status.
 
-Use C<-ds> option to see statistics information such as how many files
-were searched.
+Use C<-ds> option to see statistics information.
 
 =head1 SEE ALSO
 
@@ -65,7 +71,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2017-2022 Kazumasa Utashiro.
+Copyright 2017-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -74,14 +80,58 @@ it under the same terms as Perl itself.
 
 package App::Greple::ical;
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 use v5.14;
 use warnings;
 use Carp;
 use Exporter 'import';
 
-our @EXPORT = qw(&print_simple &print_detail &print_desc);
+use App::Greple::Common qw(FILELABEL);
+
+our @EXPORT = qw(&print_simple &print_detail &print_desc &ical_data);
+
+##
+## Convert Calendar.sqlitedb to VEVENT-like paragraphs.
+## Dates in the database are in Core Data epoch (seconds since
+## 2001-01-01 UTC); 978307200 is the offset to Unix epoch.
+##
+my $SQL = <<'END';
+SELECT 'BEGIN:VEVENT' || char(10)
+    || 'DTSTART:' || strftime(CASE WHEN i.all_day THEN '%Y%m%d' ELSE '%Y%m%dT%H%M%S' END,
+                              i.start_date + 978307200, 'unixepoch', 'localtime') || char(10)
+    || CASE WHEN i.end_date IS NOT NULL
+            THEN 'DTEND:' || strftime(CASE WHEN i.all_day THEN '%Y%m%d' ELSE '%Y%m%dT%H%M%S' END,
+                                      i.end_date + 978307200, 'unixepoch', 'localtime') || char(10)
+            ELSE '' END
+    || 'SUMMARY:' || replace(i.summary, char(10), ' ') || char(10)
+    || CASE WHEN loc.title IS NOT NULL
+            THEN 'LOCATION:' || replace(loc.title, char(10), ' ') || char(10)
+            ELSE '' END
+    || CASE WHEN i.description IS NOT NULL
+            THEN 'DESCRIPTION:' || replace(i.description, char(10), '\n') || char(10)
+            ELSE '' END
+    || 'END:VEVENT' || char(10)
+FROM CalendarItem i
+LEFT JOIN Location loc ON i.location_id = loc.ROWID
+WHERE i.summary IS NOT NULL AND i.start_date IS NOT NULL
+ORDER BY i.start_date
+END
+
+##
+## Input filter function.  Called with FILELABEL parameter, and
+## responsible to replace STDIN by the filtered stream (see
+## App::Greple::Filter).
+##
+sub ical_data {
+    my %arg = @_;
+    my $file = $arg{&FILELABEL} // croak "no filename";
+    my $pid = open(STDIN, '-|') // croak "process fork failed";
+    if ($pid == 0) {
+	exec 'sqlite3', '-noheader', $file, $SQL or die "sqlite3: $!\n";
+    }
+    $pid;
+}
 
 sub print_detail {
     $_ = &print_simple . &print_desc . "\n";
@@ -133,11 +183,13 @@ sub print_desc {
 __DATA__
 
 option default \
-	--chdir=~/Library/Calendars/*.caldav/*.calendar/Events \
-	--glob=*.ics
+	--chdir '~/Library/Group\ Containers/group.com.apple.calendar' \
+	--glob Calendar.sqlitedb \
+	--if &ical_data \
+	-p
 
 option --simple \
-	--all --print print_simple
+	--print print_simple
 
 option --detail \
-	--all --print print_detail --pf 'sort | tr \\015 \\012'
+	--print print_detail --pf 'sort | tr \\015 \\012'

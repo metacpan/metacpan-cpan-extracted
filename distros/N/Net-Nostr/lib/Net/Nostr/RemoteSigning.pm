@@ -2,6 +2,8 @@ package Net::Nostr::RemoteSigning;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
@@ -37,7 +39,8 @@ sub parse_bunker_uri {
 }
 
 sub create_bunker_uri {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "remote_signer_pubkey is required" unless defined $args{remote_signer_pubkey};
     croak "remote_signer_pubkey must be 64-char lowercase hex" unless $args{remote_signer_pubkey} =~ $HEX64;
     croak "relay is required" unless defined $args{relay};
@@ -92,7 +95,8 @@ sub parse_nostrconnect_uri {
 }
 
 sub create_nostrconnect_uri {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "client_pubkey is required" unless defined $args{client_pubkey};
     croak "client_pubkey must be 64-char lowercase hex" unless $args{client_pubkey} =~ $HEX64;
     croak "relay is required" unless defined $args{relay};
@@ -119,7 +123,8 @@ sub create_nostrconnect_uri {
 ###############################################################################
 
 sub request {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "request requires 'method'" unless defined $args{method};
     croak "request requires 'params'" unless defined $args{params};
 
@@ -137,7 +142,8 @@ sub request {
 ###############################################################################
 
 sub request_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "request_event requires 'method'" unless defined $args{method};
     croak "request_event requires 'params'" unless defined $args{params};
     croak "request_event requires 'remote_signer_pubkey'" unless defined $args{remote_signer_pubkey};
@@ -165,7 +171,8 @@ sub request_event {
 ###############################################################################
 
 sub response {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "response requires 'id'" unless defined $args{id};
 
     my %data = (id => $args{id});
@@ -180,7 +187,8 @@ sub response {
 ###############################################################################
 
 sub response_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $content = $class->response(
         id     => $args{id},
@@ -338,7 +346,8 @@ sub parse_discovery_event {
 }
 
 sub discovery_event {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my @tags = (['k', '24133']);
 
@@ -394,7 +403,7 @@ sub _generate_id {
     use Class::Tiny qw(remote_signer_pubkey secret);
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
         $known{relays} = ();
         my @unknown = grep { !exists $known{$_} } keys %$self;
@@ -415,7 +424,7 @@ sub _generate_id {
     use Class::Tiny qw(client_pubkey secret perms name url image);
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
         $known{relays} = ();
         my @unknown = grep { !exists $known{$_} } keys %$self;
@@ -436,7 +445,7 @@ sub _generate_id {
     use Class::Tiny qw(pubkey nostrconnect_url);
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
         $known{relays} = ();
         my @unknown = grep { !exists $known{$_} } keys %$self;
@@ -457,7 +466,7 @@ sub _generate_id {
     use Class::Tiny qw(pubkey nostrconnect_url);
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
         $known{relays} = ();
         my @unknown = grep { !exists $known{$_} } keys %$self;
@@ -478,7 +487,7 @@ sub _generate_id {
     use Class::Tiny qw(id method);
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
         $known{params} = ();
         my @unknown = grep { !exists $known{$_} } keys %$self;
@@ -503,7 +512,7 @@ sub _generate_id {
     use Class::Tiny qw(id result error);
     sub new {
         my $class = shift;
-        my $self = bless { @_ }, $class;
+        my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
         my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
         my @unknown = grep { !exists $known{$_} } keys %$self;
         croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -617,7 +626,8 @@ The signer sends a C<connect> response back to the client.
 =head2 Commands
 
 C<connect>, C<sign_event>, C<ping>, C<get_public_key>, C<nip04_encrypt>,
-C<nip04_decrypt>, C<nip44_encrypt>, C<nip44_decrypt>, C<switch_relays>.
+C<nip04_decrypt>, C<nip44_encrypt>, C<nip44_decrypt>, C<switch_relays>,
+C<logout>.
 
 =head1 CLASS METHODS
 
@@ -671,6 +681,19 @@ Creates a C<nostrconnect://> URI string.
 
 Builds a JSON-encoded request payload. Croaks if C<method> or C<params> is
 missing.
+
+The generic request builder supports all NIP-46 methods, including
+C<connect> with its optional metadata parameter and C<logout>:
+
+    my $connect = Net::Nostr::RemoteSigning->request(
+        method => 'connect',
+        params => [$client_pubkey, $secret, $perms, '{"name":"My Client"}'],
+    );
+
+    my $logout = Net::Nostr::RemoteSigning->request(
+        method => 'logout',
+        params => [],
+    );
 
 =head2 request_event
 
@@ -790,6 +813,8 @@ Croaks if C<pubkey> is missing or not 64-char lowercase hex.
 =head2 BunkerConnection
 
 Returned by L</parse_bunker_uri>. Croaks on unknown arguments.
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 
@@ -804,6 +829,8 @@ Returned by L</parse_bunker_uri>. Croaks on unknown arguments.
 =head2 NostrConnect
 
 Returned by L</parse_nostrconnect_uri>. Croaks on unknown arguments.
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 
@@ -826,6 +853,8 @@ Returned by L</parse_nostrconnect_uri>. Croaks on unknown arguments.
 =head2 Nip05Metadata
 
 Returned by L</parse_nip05_metadata>. Croaks on unknown arguments.
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 
@@ -840,6 +869,8 @@ Returned by L</parse_nip05_metadata>. Croaks on unknown arguments.
 =head2 Discovery
 
 Returned by L</parse_discovery_event>. Croaks on unknown arguments.
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 
@@ -855,6 +886,8 @@ Returned by L</parse_discovery_event>. Croaks on unknown arguments.
 
 Returned by L</parse_request>. Croaks on unknown arguments or missing
 required fields (C<id>, C<method>, C<params>). C<params> must be an arrayref.
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 
@@ -870,6 +903,8 @@ required fields (C<id>, C<method>, C<params>). C<params> must be an arrayref.
 
 Returned by L</parse_response>. Croaks on unknown arguments or missing
 C<id>.
+Its constructor accepts named arguments as either a flat list or a single hash
+reference.
 
 =over 4
 

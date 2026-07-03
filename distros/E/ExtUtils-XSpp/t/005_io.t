@@ -36,6 +36,7 @@ eq_or_diff( $out, <<EOT, 'Output on stdout' );
 
 
 MODULE=Foo::Bar::Baz
+
 #include <foo.h>
 
 

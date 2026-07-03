@@ -27,6 +27,7 @@ int foo( int a, int b, int c );
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int

@@ -7,70 +7,66 @@ Time::Nanos - Nanosecond time resolution via clock\_gettime().
 ```perl
 use Time::Nanos;
 
-my $nanoseconds             = nanos();
-my $microseconds            = micros();
-my $milliseconds            = millis();
+my $nanoseconds  = nanos();
+my $microseconds = micros();
+my $milliseconds = millis();
 
 my ($seconds, $nanoseconds) = nanos(1);
 ```
 
+## Variables
+
+### $CLOCK
+
+```
+$Time::Nanos::CLOCK = 'realtime';
+```
+
+Controls which clock source the functions use. Defaults to `'realtime'`.
+Valid values: `'monotonic'` or `'realtime'`.
+
 ## Functions
 
-### nanos
+### nanos()
 
 ```perl
 my $ns = nanos();
 my ($sec, $nsec) = nanos(1);
 ```
 
-Returns nanoseconds. In scalar context returns total nanoseconds. With optional
-second param returns a list of (seconds, nanoseconds) instead.
+Returns nanoseconds. In scalar context returns total nanoseconds. With a true
+argument returns a list of (seconds, nanoseconds) instead.
 
-Accepts optional arguments: `nanos($list, $clock)` where `$list` selects list
-context and `$clock` is `'monotonic'` (default) or `'realtime'`.
-
-### micros
+### micros()
 
 ```perl
 my $us = micros();
+my ($sec, $usec) = micros(1);
 ```
 
-Returns microseconds as an integer. Accepts optional clock argument:
-`micros(undef, 'realtime')`.
+Returns microseconds as an integer. In scalar context returns total
+microseconds. With a true argument returns a list of (seconds, microseconds)
+instead.
 
-### millis
+### millis()
 
 ```perl
 my $ms = millis();
+my ($sec, $msec) = millis(1);
 ```
 
-Returns milliseconds as an integer. Accepts optional clock argument:
-`millis(undef, 'realtime')`.
+Returns milliseconds as an integer. In scalar context returns total
+milliseconds. With a true argument returns a list of (seconds, milliseconds)
+instead.
 
 ## Description
 
-This module provides high-resolution time via `clock_gettime()`. The clock
-reference epoch is unspecified, so a single reading is not in itself a useful
-measurement of wall-clock time. These values are only meaningful when compared
-against each other to measure elapsed time.
+This module provides high-resolution time via `clock_gettime()`.
+The default clock is `CLOCK_REALTIME`. `'realtime'` uses the system clock,
+which measures time since the Unix epoch. This is susceptible to clock skew from
+NTP updates, user clock changes, etc.  When using `'realtime'`, it is possible
+(but rare) to observe a negative duration when comparing two successive calls.
 
-The default clock is `CLOCK_MONOTONIC`. An optional argument selects the
-clock: `'monotonic'` or `'realtime'`. `'realtime'` measures the system's
-uptime but is susceptible to clock skew from user clock changes, NTP updates,
-etc. When using `'realtime'`, it is possible (but rare) to observe a negative
-duration when comparing two successive calls.
-
-## Usage
-
-```
-nanos()                       # CLOCK_MONOTONIC, nanoseconds
-micros()                      # CLOCK_MONOTONIC, microseconds
-millis()                      # CLOCK_MONOTONIC, milliseconds
-
-nanos(1)                      # CLOCK_MONOTONIC, list (sec, nsec)
-nanos(undef, 'realtime')      # CLOCK_REALTIME, nanoseconds
-nanos(1, 'realtime')          # CLOCK_REALTIME, list (sec, nsec)
-
-micros(undef, 'realtime')     # CLOCK_REALTIME, microseconds
-millis(undef, 'realtime')     # CLOCK_REALTIME, milliseconds
-```
+When using `'monotonic'` the clock reference epoch is unspecified, so a single
+reading is not in itself a useful measurement of time. These values are only
+meaningful when compared against each other to measure elapsed time.

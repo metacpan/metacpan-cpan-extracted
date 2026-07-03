@@ -1,5 +1,5 @@
 package Audio::Nama;
-our $VERSION = "1.603";
+our $VERSION = "1.604";
 use v5.36;
 #use Carp::Always;
 no warnings qw(uninitialized syntax);
@@ -34,11 +34,15 @@ use Term::ReadLine;
 use Text::Diff;
 use Text::Format;
 use Tickit::Async;
+use Tickit::Widgets qw(Static VBox);
+use Tickit::Widget::Scroller;
+use Tickit::Widget::Scroller::Item::Text;
+use Audio::Nama::Entry;      # modified Tickit::Widget::Entry to bind printable keys
+use Audio::Nama::Completion; # modified Tickit::Widget::Entry::Plugin::Completion for directory handling
 use Tickit::Widget::Scroller::Item::Text;
 ### We use our versions of these modules
 use Audio::Nama::Entry;      # modified Tickit::Widget::Entry to bind printable keys
 use Audio::Nama::Completion; # modified Tickit::Widget::Entry::Plugin::Completion for directory handling
-use Audio::Nama::Console;	  # modified Tickit::Widget::Console to avoid redefine warnings
 use Tie::Simple;
 use Try::Tiny;
 use Path::Tiny;
@@ -286,8 +290,10 @@ setpos:
   type: transport
   what: Set current playhead position (in seconds).
   short: sp
-  parameters: <float:position_seconds>
-  example: setpos 65.5 # set current position to 65.5 seconds.
+  parameters: <float:position_seconds> | <string: minutes:seconds> | <string: bar/beat[/tick]>
+  example: |
+    setpos 65.5 # set current position to 65.5 seconds.
+    setpos 1/4  # set position to beginning of 4th beat, 1st bar
 forward:
   type: transport
   what: Move playback position forwards (in seconds).
@@ -1176,11 +1182,13 @@ to_mark:
     tmk 2 # Move to the mark with the index 2.
 add_mark:
   type: mark
-  what: Drop a new mark at the current playback position. this will fail, if a mark is already placed on that exact position.
+  what: create a mark, by default at the current playback position. 
   short: mark amk k
-  parameters: [ <string:mark_id> ]
+  parameters: [ <string:mark_id> ] [ <string:timevalue> ]
   example: |
-    mark start # Create a mark named "start" at the current position.
+    mark start      # create a mark named "start" at the current position.
+    mark chorus 4/1 # create a mark named "chorus" at first beat of 4th bar
+    mark end 25.4   # create a mark named "end" at 25.4 seconds
 remove_mark:
   type: mark
   what: Remove a mark
@@ -1904,6 +1912,10 @@ edit_tempo_map:
   short: etm
   what: edit tempo map file
   parameters: none
+reload_tempo_map:
+  short: rtm
+  what: re-import a tempo map
+  parameters: none
 set_tempo:
   short: tempo tp
   type: midi
@@ -1914,6 +1926,16 @@ set_sample_rate:
   short: ssr
   what: configure the sample rate for the current project or report sample rate if no parameter
   parameters: <integer:sample-rate>
+notation_to_time:
+  type: tempo
+  short: ntt
+  what: print time value (seconds) of bar/beat/tick or other notation.
+  parameters: <string:time_value>
+arm_metronome:
+  type: tempo
+  short: amm armm
+  what: set up metronome to start on next engine run
+  parameters: none
 ...
 
 @@ grammar
@@ -2139,7 +2161,7 @@ forward: _forward timevalue {
 	Audio::Nama::forward( $item{timevalue} ); 1}
 rewind: _rewind timevalue {
 	Audio::Nama::rewind( $item{timevalue} ); 1}
-timevalue: min_sec | decimal_seconds
+timevalue: bar_beat_tick | bar_beat | min_sec | decimal_seconds  
 seconds: samples  
 seconds: /\d+/
 samples: /\d+sa/ {
@@ -2147,6 +2169,12 @@ samples: /\d+sa/ {
  	$return = $samples/$Audio::Nama::project->{sample_rate}
 }
 min_sec: /\d+/ ':' /\d+/ { $item[1] * 60 + $item[3] }
+notation_to_time: _notation_to_time timevalue { Audio::Nama::pager_newline( $item{timevalue} );1 }
+bar_beat_tick: bar '/' beat '/' tick { Audio::Nama::notation_to_time(@item{qw(bar beat tick)}) } 
+bar_beat:      bar '/' beat          { Audio::Nama::notation_to_time(@item{qw(bar beat     )}) } 
+bar: dd
+beat: dd
+tick: dd 
 jump_to_start: _jump_to_start { Audio::Nama::jump_to_start(); 1 }
 jump_to_end: _jump_to_end { Audio::Nama::jump_to_end(); 1 }
 add_track: _add_track new_track_name {
@@ -2459,7 +2487,8 @@ remove_mark: _remove_mark {
 	return unless (ref $Audio::Nama::this_mark) =~ /Mark/;
 	$Audio::Nama::this_mark->remove;
 	1;}
-add_mark: _add_mark ident { Audio::Nama::drop_mark $item{ident}; 1}
+add_mark: _add_mark ident timevalue { Audio::Nama::drop_mark(name => $item{ident}, time => $item{timevalue}) ;1}
+add_mark: _add_mark ident { Audio::Nama::drop_mark(name => $item{ident}); 1}
 add_mark: _add_mark {  Audio::Nama::drop_mark(); 1}
 next_mark: _next_mark { Audio::Nama::next_mark(); 1}
 previous_mark: _previous_mark { Audio::Nama::previous_mark(); 1}
@@ -3230,6 +3259,7 @@ rerecord: _rerecord {
 				:  "No tracks in REC list. Skipping."
 		);
 		map{ $_->set(rw => Audio::Nama::REC) } @{$Audio::Nama::setup->{_last_rec_tracks}}; 
+		$Audio::Nama::tn{Main}->set(rw => $Audio::Nama::setup->{_main_rw});
 		Audio::Nama::restore_preview_mode();
 		1;
 }
@@ -3408,7 +3438,8 @@ set_effect_surname: _set_effect_surname ident { Audio::Nama::this_op_o->set_surn
 remove_effect_surname: _remove_effect_surname { Audio::Nama::this_op_o()->set_surname(); 1} 
 select_track: _select_track track_spec
 set_tempo: _set_tempo dd {Audio::Nama::midish_cmd("t $item{dd}")}
-edit_tempo_map: _edit_tempo_map { system("$ENV{EDITOR} ".$Audio::Nama::file->tempo_map); 1 }
+edit_tempo_map: _edit_tempo_map { system("$ENV{EDITOR} ".$Audio::Nama::file->tempo_map); Audio::Nama::import_tempo_map('update'); 1 }
+reload_tempo_map: _reload_tempo_map { Audio::Nama::import_tempo_map('update'); 1}
 route_track: _route_track source_id send_id { 
 	Audio::Nama::nama_cmd("source $item{source_id}");
 	Audio::Nama::nama_cmd("send $item{send_id}");
@@ -3430,6 +3461,7 @@ bus_off: _bus_off
 	print "bus_name: $bus_name\n";
 	$Audio::Nama::bn{$bus_name}->tracks_off 
 }
+arm_metronome: _arm_metronome { Audio::Nama::arm_metronome(); 1 }
 seconds: value
 exp: /[-+]?\d/ 
 
@@ -3678,8 +3710,11 @@ command: remove_effect_name
 command: remove_effect_surname
 command: select_track
 command: edit_tempo_map
+command: reload_tempo_map
 command: set_tempo
 command: set_sample_rate
+command: notation_to_time
+command: arm_metronome
 _help: /help\b/ | /h\b/ { "help" } 
 _help_effect: /help_effect\b/ | /hfx\b/ | /he\b/ { "help_effect" } 
 _find_effect: /find_effect\b/ | /ffx\b/ | /fe\b/ { "find_effect" } 
@@ -3925,8 +3960,11 @@ _remove_effect_name: /remove_effect_name\b/ | /ren\b/ { "remove_effect_name" }
 _remove_effect_surname: /remove_effect_surname\b/ | /res\b/ { "remove_effect_surname" } 
 _select_track: /select_track\b/ { "select_track" } 
 _edit_tempo_map: /edit_tempo_map\b/ | /etm\b/ { "edit_tempo_map" } 
+_reload_tempo_map: /reload_tempo_map\b/ | /rtm\b/ { "reload_tempo_map" } 
 _set_tempo: /set_tempo\b/ | /tempo\b/ | /tp\b/ { "set_tempo" } 
 _set_sample_rate: /set_sample_rate\b/ | /ssr\b/ { "set_sample_rate" } 
+_notation_to_time: /notation_to_time\b/ | /ntt\b/ { "notation_to_time" } 
+_arm_metronome: /arm_metronome\b/ | /amm\b/ | /armm\b/ { "arm_metronome" } 
 @@ ecasound_chain_operator_hints_yml
 ---
 -
@@ -4488,11 +4526,9 @@ devices:
 
 # ALSA soundcard device assignments and formats
 
-alsa_capture_device: consumer       # for ALSA/OSS
-alsa_playback_device: consumer      # for ALSA/OSS
-mixer_out_format: cd-stereo         # for ALSA/OSS
-
-# soundcard_channels: 10            # GUI input/output channel selection range
+alsa_capture_device: consumer
+alsa_playback_device: consumer
+mixer_out_format: cd-stereo
 
 # audio file format templates
 
@@ -4502,11 +4538,11 @@ cache_to_disk_format: s16_le,N,frequency,i
 
 mixdown_encodings: mp3 ogg
 
+volume_control_operator: ea   # set to 'ea' for setting as percent, 'eadb' for setting dB
+
 sample_rate: frequency
 
 realtime_profile: nonrealtime # other choices: realtime or auto
-
-use_metronome: 0
 
 press_space_to_start_transport: 1 
 
@@ -4520,8 +4556,6 @@ ecasound_globals:
   common: -z:mixmode,sum
   realtime: -z:db,100000 -z:nointbuf
   nonrealtime: -z:nodb -z:intbuf
-
-waveform_height: 200
 
 # ecasound_tcp_port: 2868  
 

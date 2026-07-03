@@ -77,7 +77,7 @@ has 'use_cookies' => ( is => 'rw', isa => Bool, default => sub {1} );
 
 #use LWP::Debug qw(+);
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 # shortcut
 my $UTILS = 'Dezi::Utils';

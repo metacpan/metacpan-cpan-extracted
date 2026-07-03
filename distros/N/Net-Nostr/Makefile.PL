@@ -33,7 +33,7 @@ WriteMakefile(
         'IO::Socket::SSL'     => 0,
     },
     test => {
-        TESTS => 't/*.t t/*/*.t',
+        TESTS => 't/*.t t/nip/*.t',
     },
     META_MERGE => {
         resources   => {

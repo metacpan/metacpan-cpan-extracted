@@ -20,6 +20,32 @@ subtest 'kind 30078 is addressable' => sub {
 };
 
 ###############################################################################
+# Kind 78 normal event
+###############################################################################
+
+subtest 'kind 78 is normal app data' => sub {
+    my $event = Net::Nostr::AppData->to_event(
+        pubkey  => $PK,
+        kind    => 78,
+        content => '{"one":1}',
+    );
+    is($event->kind, 78, 'kind is 78');
+    ok($event->is_regular, 'kind 78 is regular');
+    my @d_tags = grep { $_->[0] eq 'd' } @{$event->tags};
+    is(scalar @d_tags, 0, 'd tag not required for kind 78');
+};
+
+subtest 'kind 78 may use d tag for grouping' => sub {
+    my $event = Net::Nostr::AppData->to_event(
+        pubkey => $PK,
+        kind   => 78,
+        d_tag  => 'thread-1',
+    );
+    is($event->kind, 78, 'kind is 78');
+    is($event->d_tag, 'thread-1', 'optional d tag included');
+};
+
+###############################################################################
 # d tag contains app name / context reference
 ###############################################################################
 
@@ -43,7 +69,7 @@ subtest 'd_tag is required' => sub {
     like(
         dies { Net::Nostr::AppData->to_event(pubkey => $PK) },
         qr/d_tag/i,
-        'd_tag required'
+        'd_tag required for default kind 30078'
     );
 };
 
@@ -114,6 +140,22 @@ subtest 'from_event round-trip' => sub {
     is($ad->extra_tags, [['version', '2']], 'extra_tags round-trips');
 };
 
+subtest 'from_event kind 78 round-trip' => sub {
+    my $event = Net::Nostr::AppData->to_event(
+        pubkey     => $PK,
+        kind       => 78,
+        content    => 'entry one',
+        extra_tags => [['x', 'custom']],
+    );
+
+    my $ad = Net::Nostr::AppData->from_event($event);
+    ok($ad, 'from_event returns object');
+    is($ad->kind, 78, 'kind round-trips');
+    is($ad->d_tag, undef, 'd_tag can be absent');
+    is($ad->content, 'entry one', 'content round-trips');
+    is($ad->extra_tags, [['x', 'custom']], 'extra_tags round-trips');
+};
+
 subtest 'from_event minimal' => sub {
     my $event = Net::Nostr::AppData->to_event(
         pubkey => $PK,
@@ -140,6 +182,14 @@ subtest 'validate valid event' => sub {
     my $event = Net::Nostr::AppData->to_event(
         pubkey => $PK,
         d_tag  => 'myapp',
+    );
+    ok(Net::Nostr::AppData->validate($event), 'valid app data event');
+};
+
+subtest 'validate valid kind 78 event without d tag' => sub {
+    my $event = Net::Nostr::AppData->to_event(
+        pubkey => $PK,
+        kind   => 78,
     );
     ok(Net::Nostr::AppData->validate($event), 'valid app data event');
 };

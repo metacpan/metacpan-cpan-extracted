@@ -1,0 +1,22 @@
+Changes
+lib/Params/Signature.pm
+lib/Params/Signature/Multi.pm
+lib/Params/Signature/Manual.pod
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-check-moose.t
+t/01-check-mouse.t
+t/01-check-sub.t
+t/01-check-typesstd.t
+t/02-class-method.t
+t/02-object-method.t
+t/02-validate-subroutine.t
+t/03-callbacks.t
+t/04-normalize-keys.t
+t/05-multi.t
+t/06-register-type-subroutines.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

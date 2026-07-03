@@ -2,6 +2,8 @@ package Net::Nostr::Comment;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -22,7 +24,7 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -30,7 +32,8 @@ sub new {
 }
 
 sub comment {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey  = $args{pubkey}  // croak "comment requires 'pubkey'";
     my $content = $args{content} // croak "comment requires 'content'";
@@ -111,7 +114,8 @@ sub comment {
 }
 
 sub reply {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $to      = $args{to}      // croak "reply requires 'to'";
     my $pubkey  = $args{pubkey}  // croak "reply requires 'pubkey'";
@@ -279,6 +283,8 @@ L<Net::Nostr::Thread> (NIP-10) instead.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $info = Net::Nostr::Comment->new(%fields);
 

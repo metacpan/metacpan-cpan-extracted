@@ -12,6 +12,7 @@ use Net::Nostr::Message;
 use Net::Nostr::Client;
 use Net::Nostr::Relay;
 use Net::Nostr::Key;
+use Net::Nostr::Repost;
 
 my $PK = 'a' x 64;
 
@@ -242,6 +243,47 @@ subtest 'spec example: event structure' => sub {
     ok $event->is_protected, 'spec example event is protected';
     is $event->kind, 1, 'spec example is kind 1';
     is $event->content, 'hello members of the secret group', 'spec example content';
+};
+
+###############################################################################
+# Reposts of protected events
+###############################################################################
+
+subtest 'repost of protected event does not embed reposted event' => sub {
+    my $protected = make_event(
+        pubkey  => $PK,
+        kind    => 1,
+        tags    => [['-']],
+        content => 'private note',
+    );
+
+    my $repost = Net::Nostr::Repost->repost(
+        event     => $protected,
+        pubkey    => 'b' x 64,
+        relay_url => 'wss://relay.example.com',
+    );
+
+    is($repost->content, '', 'protected repost content is empty');
+    ok(Net::Nostr::Repost->validate($repost), 'empty protected repost validates');
+};
+
+subtest 'embedded repost of protected event is rejected' => sub {
+    my $protected = make_event(
+        pubkey  => $PK,
+        kind    => 1,
+        tags    => [['-']],
+        content => 'private note',
+    );
+
+    my $bad = make_event(
+        pubkey  => 'b' x 64,
+        kind    => 6,
+        content => JSON->new->utf8->encode($protected->to_hash),
+        tags    => [['e', $protected->id, 'wss://relay.example.com']],
+    );
+
+    like(dies { Net::Nostr::Repost->validate($bad) },
+        qr/protected.*embed/i, 'embedded protected repost rejected');
 };
 
 subtest 'spec example: full reject-then-auth-then-accept flow' => sub {

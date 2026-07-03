@@ -2,6 +2,8 @@ package Net::Nostr::Message;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Scalar::Util qw(blessed);
@@ -47,7 +49,7 @@ sub _extract_prefix {
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -468,6 +470,8 @@ C<serialize>, and parsed from JSON with C<parse>.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $msg = Net::Nostr::Message->new(type => $type, ...);
 

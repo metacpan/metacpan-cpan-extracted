@@ -17,27 +17,6 @@ for (1 .. 4) {
 print "\n";
 
 for (1 .. 4) {
-	my ($sec, $nsec) = nanos(1);
-	printf "Time (monotonic): %d.%09d seconds\n", $sec, $nsec;
-}
-
-print "\n";
-
-for (1 .. 4) {
-	my $ns = nanos(0, 'realtime');
-	printf "Time (realtime): %s nanoseconds\n", $ns;
-}
-
-print "\n";
-
-for (1 .. 4) {
-	my ($sec, $nsec) = nanos(1, 'realtime');
-	printf "Time (realtime): %d.%09d seconds\n", $sec, $nsec;
-}
-
-print "\n";
-
-for (1 .. 4) {
 	my $us = micros();
 	printf "Time (monotonic): %s microseconds\n", $us;
 }
@@ -47,6 +26,31 @@ print "\n";
 for (1 .. 4) {
 	my $ms = millis();
 	printf "Time (monotonic): %s milliseconds\n", $ms;
+}
+
+print "\n";
+
+for (1 .. 4) {
+	my ($sec, $nsec) = nanos(1);
+	printf "Time (monotonic): %d.%09d seconds\n", $sec, $nsec;
+}
+
+print "\n";
+
+{
+	local $Time::Nanos::CLOCK = 'realtime';
+
+	for (1 .. 4) {
+		my $ns = nanos();
+		printf "Time (realtime): %s nanoseconds\n", $ns;
+	}
+
+	print "\n";
+
+	for (1 .. 4) {
+		my ($sec, $nsec) = nanos(1);
+		printf "Time (realtime): %d.%09d seconds\n", $sec, $nsec;
+	}
 }
 
 my $total = stopwatch();

@@ -1,0 +1,39 @@
+# Avoid version control and editor artifacts
+\b\.git\b
+\b\.gitignore\b
+\.gitattributes$
+\.gitmodules$
+\.swp$
+\.swo$
+~$
+\#$
+\.DS_Store$
+
+# Avoid build artifacts
+\bblib\b
+\b_build\b
+\bMakefile\b
+\bMakefile\.old\b
+\pm_to_blib\b
+\bMYMETA\.(json|yml)\b
+
+# Avoid distribution artifacts
+\.tar\.gz$
+\.zip$
+\.ppd$
+\bMANIFEST\.bak\b
+
+# Avoid spec/planning docs (not part of distribution)
+\bprompts\b
+\bROADMAP\.md\b
+\bHIGH_LEVEL_DESIGN\.md\b
+\bdowndoc-behavior-spec-for-perl\.md\b
+\bCOMPATIBILITY_REPORT\.md\b
+\bDockerfile\b
+
+# Avoid npm/downdoc artifacts
+\bnpm\b
+\bbuild\b
+\bnpmrc\b
+\.eslintrc$
+\.mocharc\.js$

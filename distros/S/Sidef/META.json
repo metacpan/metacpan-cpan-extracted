@@ -102,7 +102,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "26.06"
+         "version" : "26.07"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -285,7 +285,7 @@
          "web" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "26.06",
+   "version" : "26.07",
    "x_authority" : "cpan:TRIZEN",
    "x_contributors" : [
       "Daniel Șuteu",

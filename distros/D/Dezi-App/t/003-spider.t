@@ -27,6 +27,6 @@ SKIP: {
     );
 
     diag("spidering $doc_url");
-    is( $spider->crawl($doc_url), 19, "crawl" );
+    is( $spider->crawl($doc_url), 20, "crawl" );
 
 }

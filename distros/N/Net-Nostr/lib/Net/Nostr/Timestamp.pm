@@ -2,6 +2,8 @@ package Net::Nostr::Timestamp;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Event;
 
@@ -11,7 +13,7 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -19,7 +21,8 @@ sub new {
 }
 
 sub to_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey   = $self->pubkey   // croak "pubkey is required";
     my $event_id = $self->event_id // croak "event_id is required";
@@ -113,6 +116,8 @@ SHOULD contain a single Bitcoin attestation and no pending attestations.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $ts = Net::Nostr::Timestamp->new(
         pubkey    => $pubkey_hex,

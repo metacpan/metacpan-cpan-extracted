@@ -2,6 +2,8 @@ package Net::Nostr::Git;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Net::Nostr::Bech32 qw(decode_naddr);
 use Net::Nostr::Event;
@@ -18,6 +20,7 @@ use Class::Tiny qw(
     relay_urls
     earliest_unique_commit
     maintainer_pubkeys
+    fork_of
     repository_address
     subject
     status_name
@@ -26,7 +29,7 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless { Net::Nostr::_ConstructorArgs::normalize(@_) }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -53,7 +56,8 @@ my %NIP34_KINDS = map { $_ => 1 } (30617, 30618, 1617, 1618, 1619, 1621,
                                      1630, 1631, 1632, 1633, 10317);
 
 sub repository {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey = $args{pubkey} // croak "repository requires 'pubkey'";
     my $id     = $args{id}     // croak "repository requires 'id'";
@@ -72,19 +76,30 @@ sub repository {
         }
         push @tags, ['maintainers', @{$args{maintainers}}];
     }
-    push @tags, ['t', 'personal-fork'] if $args{personal_fork};
+    croak "personal_fork is no longer part of NIP-34; use fork_of"
+        if $args{personal_fork};
+    if (defined $args{fork_of}) {
+        my $fork = $args{fork_of};
+        croak "fork_of must be a hash reference" unless ref $fork eq 'HASH';
+        my $repository = $fork->{repository} // croak "fork_of requires 'repository'";
+        my $relay      = $fork->{relay}      // croak "fork_of requires 'relay'";
+        my $author     = $fork->{author}     // croak "fork_of requires 'author'";
+        croak "fork_of author must be 64-char lowercase hex" unless $author =~ $HEX64;
+        push @tags, ['u', $repository, $relay, $author];
+    }
 
     if ($args{hashtags}) {
         push @tags, ['t', $_] for @{$args{hashtags}};
     }
 
     delete @args{qw(id name description web clone relays earliest_unique_commit
-                    maintainers personal_fork hashtags)};
+                    maintainers personal_fork fork_of hashtags)};
     return Net::Nostr::Event->new(%args, kind => 30617, content => '', tags => \@tags);
 }
 
 sub repository_state {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey = $args{pubkey} // croak "repository_state requires 'pubkey'";
     my $id     = $args{id}     // croak "repository_state requires 'id'";
@@ -92,8 +107,14 @@ sub repository_state {
     my @tags;
     push @tags, ['d', $id];
 
-    if ($args{refs}) {
+    if (defined $args{refs}) {
+        croak "repository_state refs must be an array reference"
+            unless ref $args{refs} eq 'ARRAY';
         for my $ref (@{$args{refs}}) {
+            croak "repository_state refs must be [ref, commit]"
+                unless ref $ref eq 'ARRAY' && @$ref == 2;
+            croak "repository_state ref must be refs/heads/... or refs/tags/..."
+                unless defined $ref->[0] && $ref->[0] =~ m{\Arefs/(?:heads|tags)/};
             push @tags, [@$ref];
         }
     }
@@ -107,7 +128,8 @@ sub repository_state {
 }
 
 sub patch {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = $args{pubkey}     // croak "patch requires 'pubkey'";
     my $content    = $args{content}    // croak "patch requires 'content'";
@@ -153,7 +175,8 @@ sub patch {
 }
 
 sub pull_request {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = $args{pubkey}     // croak "pull_request requires 'pubkey'";
     my $content    = $args{content}    // croak "pull_request requires 'content'";
@@ -197,7 +220,8 @@ sub pull_request {
 }
 
 sub pull_request_update {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = $args{pubkey}     // croak "pull_request_update requires 'pubkey'";
     my $repository = $args{repository} // croak "pull_request_update requires 'repository'";
@@ -238,7 +262,8 @@ sub pull_request_update {
 }
 
 sub issue {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = $args{pubkey}     // croak "issue requires 'pubkey'";
     my $content    = $args{content}    // croak "issue requires 'content'";
@@ -263,7 +288,8 @@ sub issue {
 }
 
 sub status {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey        = $args{pubkey}        // croak "status requires 'pubkey'";
     my $status        = $args{status}        // croak "status requires 'status'";
@@ -330,7 +356,8 @@ sub status {
 }
 
 sub grasp_list {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey = $args{pubkey} // croak "grasp_list requires 'pubkey'";
 
@@ -372,7 +399,7 @@ sub from_event {
 
 sub _parse_repository {
     my ($class, $event) = @_;
-    my (%info, @web, @clone_urls, @relay_urls, @maintainers, $euc);
+    my (%info, @web, @clone_urls, @relay_urls, @maintainers, $euc, $fork_of);
 
     for my $tag (@{$event->tags}) {
         my $name = $tag->[0];
@@ -386,6 +413,13 @@ sub _parse_repository {
             $euc = $tag->[1];
         }
         elsif ($name eq 'maintainers') { push @maintainers, @{$tag}[1 .. $#$tag]; }
+        elsif ($name eq 'u') {
+            $fork_of = {
+                repository => $tag->[1],
+                (defined $tag->[2] ? (relay => $tag->[2]) : ()),
+                (defined $tag->[3] ? (author => $tag->[3]) : ()),
+            };
+        }
     }
 
     return $class->new(
@@ -398,6 +432,7 @@ sub _parse_repository {
         relay_urls             => \@relay_urls,
         earliest_unique_commit => $euc,
         maintainer_pubkeys     => \@maintainers,
+        fork_of                => $fork_of,
     );
 }
 
@@ -491,7 +526,8 @@ sub _percent_decode {
 }
 
 sub nostr_clone_url {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     if (defined $args{naddr}) {
         decode_naddr($args{naddr});
@@ -710,6 +746,8 @@ L<Net::Nostr::Comment>).
 
 =head2 new
 
+Accepts named arguments as either a flat list or a single hash reference.
+
     my $info = Net::Nostr::Git->new(%fields);
 
 Creates a new C<Net::Nostr::Git> object.  Typically returned by
@@ -723,7 +761,7 @@ manual construction.
 
 Accepted fields: C<event_type>, C<repo_id>, C<repo_name>,
 C<repo_description>, C<web>, C<clone_urls>, C<relay_urls>,
-C<earliest_unique_commit>, C<maintainer_pubkeys>,
+C<earliest_unique_commit>, C<maintainer_pubkeys>, C<fork_of>,
 C<repository_address>, C<subject>, C<status_name>, C<grasp_servers>.
 Croaks on unknown arguments.
 
@@ -741,7 +779,11 @@ Croaks on unknown arguments.
         relays              => ['wss://...'],       # optional, multiple values
         earliest_unique_commit => $commit_hex,      # optional, r tag with euc
         maintainers         => [$pubkey, ...],      # optional, multiple values
-        personal_fork       => 1,                   # optional, adds t:personal-fork
+        fork_of             => {                    # optional, upstream repo u tag
+            repository => '30617:<owner-pk>:<repo-id>',
+            relay      => 'wss://...',
+            author     => $owner_pk,
+        },
         hashtags            => ['tag1', 'tag2'],    # optional
     );
 
@@ -751,6 +793,11 @@ Only C<pubkey> and C<id> are required; all other tags are optional per spec.
 The C<web>, C<clone>, C<relays>, and C<maintainers> tags support multiple
 values passed as arrayrefs.
 
+C<fork_of> must be a hashref. It marks the repository as a subordinate fork
+and creates a C<u> tag pointing to the upstream repository. It requires
+C<repository>, C<relay>, and C<author>. The legacy C<personal_fork> argument
+is rejected because C<t:personal-fork> is no longer part of NIP-34.
+
 =head2 repository_state
 
     my $event = Net::Nostr::Git->repository_state(
@@ -758,7 +805,7 @@ values passed as arrayrefs.
         id     => 'repo-id',
         refs   => [
             ['refs/heads/main', $commit_id],
-            ['refs/heads/dev',  $commit_id, $parent_short, $grandparent_short],
+            ['refs/tags/v1.0',  $tag_commit_id],
         ],
         head => 'main',  # optional, becomes HEAD tag
     );
@@ -766,11 +813,9 @@ values passed as arrayrefs.
 Creates a kind 30618 (addressable) repository state event. The C<d> tag
 matches the corresponding repository announcement.
 
-Each ref is an arrayref of C<[ref-path, commit-id, ...]>. Additional elements
-after the commit ID are optional shorthand ancestor commits for client use.
-
-If no C<refs> are provided, the author signals they are no longer tracking
-state.
+C<refs>, when supplied, must be an arrayref. Each ref is an arrayref of
+C<[ref-path, commit-id]>. Ref paths must be under C<refs/heads/> or
+C<refs/tags/>. The removed ancestor-shorthand extension is rejected.
 
 =head2 patch
 
@@ -1017,6 +1062,13 @@ Available on objects returned by L</from_event>.
 =head2 maintainer_pubkeys
 
     my $pks = $info->maintainer_pubkeys;  # arrayref
+
+=head2 fork_of
+
+    my $fork = $info->fork_of;
+    # { repository => '30617:pk:id', relay => 'wss://...', author => $pk }
+
+Hashref parsed from a repository C<u> tag, or C<undef> when absent.
 
 =head2 repository_address
 

@@ -12,6 +12,7 @@ use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Object qw( 
 				 name 
                  time
+				 type
 				 );
 
 sub initialize {
@@ -161,8 +162,10 @@ use Audio::Nama::Globals qw(:all);
 
 sub drop_mark {
 	logsub((caller(0))[3]);
-	my $name = shift;
-	my $here = ecasound_iam("getpos");
+	my %arg = @_;
+	my $name = $arg{name};
+	my $here = $arg{time} // ecasound_iam("getpos");
+	my $type = $arg{type};
 
 	if( my $mark = $Audio::Nama::Mark::by_name{$name}){
 		pager("$name: a mark with this name exists already at: ", 
@@ -175,7 +178,8 @@ sub drop_mark {
 	}
 
 	my $mark = Audio::Nama::Mark->new( time => $here, 
-							name => $name);
+							name => $name,
+							type => $type);
 
 	$ui->marker($mark); # for GUI
 }
@@ -353,13 +357,13 @@ our @ISA = 'Audio::Nama::Mark';
 	use Audio::Nama::Log qw(logpkg);
 	use Audio::Nama::Globals qw(:all);
 	our @ISA = 'Audio::Nama::Mark';
-	use SUPER; 
 	use Audio::Nama::Object qw( 
 					 name 
-					bars	
-					beats
-					ticks
+					bar
+					beat
+					tick
 					 );
+	sub time ($self) { notation_to_time($self->bar, $self->beat, $self->tick)  }
 }
 
 1;

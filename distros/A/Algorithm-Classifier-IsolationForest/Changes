@@ -1,5 +1,28 @@
 Revision history for Algorithm-Classifier-IsolationForest
 
+0.3.0   2026-07-02/23:00
+        - lots of POD fixes/cleanup
+		- various further C optmizations
+        - fit() can now handle training data with missing (undef) feature
+          cells, selectable via the new `missing =>` constructor option:
+            die    :: croak on undef in the training data (default)
+            zero   :: treat a missing cell as the value 0
+            impute :: fill with the per-feature mean/median (see `impute_with`)
+            nan    :: range over present values and route missing rows to the
+                      right child, consistently at fit and score time
+        - new `impute_with => 'mean'|'median'` option for impute mode ...
+          missing strategy + impute fill vector are persisted in saved models;
+          models from older releases load as `zero` (the prior undef -> 0
+          scoring behaviour)
+        - the C build is now tunable via environment variables read at first
+          module load: IF_ARCH=<value> adds -march=<value>, IF_NATIVE=1 is
+          shorthand for IF_ARCH=native, IF_OPT overrides the default -O3,
+          and IF_NO_C=1 skips building the C backend entirely; values are
+          validated (bad ones warn and fall back to the defaults) and the
+          flags actually used are exposed via $OPT_LEVEL
+        - Benchmarking: bench-sklearn-scoring.pl now compares pure Perl, C,
+          and C+OpenMP fit/score paths against sklearn side by side
+
 0.2.1   2026-06-30/14:30
         - derp... actually update MANIFEST so a bunch of files from last release
           are actually included

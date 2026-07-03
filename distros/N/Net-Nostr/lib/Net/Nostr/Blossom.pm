@@ -2,6 +2,8 @@ package Net::Nostr::Blossom;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use Digest::SHA qw(sha256_hex);
 use Net::Nostr::Event;
@@ -10,7 +12,7 @@ use Class::Tiny qw(_servers);
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     croak "unknown argument(s): " . join(', ', sort keys %args) if %args;
     my $self = bless {}, $class;
     $self->_servers([]);
@@ -69,7 +71,8 @@ sub to_tags {
 }
 
 sub to_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     return Net::Nostr::Event->new(
         %args,
         kind    => 10063,
@@ -168,6 +171,8 @@ content matches the 64-character hex string in the URL.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $bl = Net::Nostr::Blossom->new;
 

@@ -5,7 +5,7 @@ with 'Dezi::Role';
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 has 'doc'          => ( is => 'ro', isa => 'Object',  required => 1, );
 has 'score'        => ( is => 'ro', isa => 'Num',     required => 1 );

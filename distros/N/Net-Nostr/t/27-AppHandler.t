@@ -42,6 +42,14 @@ subtest 'SYNOPSIS: publish handler information' => sub {
         identifier => 'zapstr',
         kinds      => ['31337'],
         content    => '{"name":"Zapstr","picture":"https://example.com/icon.png"}',
+        latest     => {
+            coordinate => "35128:$app_pk:zapstr-current",
+            relay      => 'wss://relay.example.com',
+        },
+        next       => {
+            coordinate => "35128:$app_pk:zapstr-next",
+            relay      => 'wss://relay.example.com',
+        },
         platforms  => [
             { platform => 'web', url => 'https://zapstr.live/a/<bech32>', entity => 'nevent' },
             { platform => 'web', url => 'https://zapstr.live/p/<bech32>', entity => 'nprofile' },
@@ -50,6 +58,10 @@ subtest 'SYNOPSIS: publish handler information' => sub {
     );
     is($handler->kind, 31990, 'kind 31990');
     is($handler->d_tag, 'zapstr', 'd tag');
+    my @latest = grep { $_->[0] eq 'latest' } @{$handler->tags};
+    my @next = grep { $_->[0] eq 'next' } @{$handler->tags};
+    is($latest[0][1], "35128:$app_pk:zapstr-current", 'latest manifest tag');
+    is($next[0][1], "35128:$app_pk:zapstr-next", 'next manifest tag');
 };
 
 subtest 'SYNOPSIS: client tag' => sub {
@@ -173,10 +185,14 @@ subtest 'new() POD example' => sub {
         event_kind => '31337',
         apps       => [],
         kinds      => [1, 30023],
+        latest     => { coordinate => "35128:$app_pk:current" },
+        next       => { coordinate => "35128:$app_pk:next" },
     );
     is $info->event_kind, '31337';
     is $info->apps, [];
     is $info->kinds, [1, 30023];
+    is $info->latest->{coordinate}, "35128:$app_pk:current";
+    is $info->next->{coordinate}, "35128:$app_pk:next";
 };
 
 subtest 'new() rejects unknown arguments' => sub {

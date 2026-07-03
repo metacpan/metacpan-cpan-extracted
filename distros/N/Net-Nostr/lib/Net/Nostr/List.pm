@@ -2,6 +2,8 @@ package Net::Nostr::List;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
@@ -15,7 +17,8 @@ my $JSON = JSON->new->utf8;
 my %META_TAGS = map { $_ => 1 } qw(d title image description);
 
 sub new {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -53,7 +56,8 @@ sub private_items {
 }
 
 sub to_event {
-    my ($self, %args) = @_;
+    my $self = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $pubkey = $args{pubkey} // croak "to_event requires 'pubkey'";
     my $key = $args{key};
 
@@ -86,7 +90,9 @@ sub to_event {
 }
 
 sub from_event {
-    my ($class, $event, %args) = @_;
+    my $class = shift;
+    my $event = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my $key = $args{key};
 
     my $self = $class->new(kind => $event->kind);
@@ -220,6 +226,8 @@ appropriate for a given kind is left to the caller.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $list = Net::Nostr::List->new(kind => 10000);
     my $set  = Net::Nostr::List->new(kind => 30002, identifier => 'my-relays');

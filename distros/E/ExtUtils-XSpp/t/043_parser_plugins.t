@@ -32,6 +32,7 @@ class klass
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 int
@@ -111,6 +112,7 @@ klass::Bar()
 
 MODULE=Foo
 
+
 MODULE=Foo PACKAGE=Foo
 
 // directive MyComment
@@ -133,6 +135,7 @@ class klass
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=klass
 
@@ -167,5 +170,6 @@ class klass
 
 
 MODULE=Foo
+
 
 MODULE=Foo PACKAGE=klass

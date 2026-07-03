@@ -35,6 +35,7 @@ Audio::Nama::Effect
 Audio::Nama::EffectsRegistry
 Audio::Nama::Engine
 Audio::Nama::EngineSetup
+Audio::Nama::EntryItem
 Audio::Nama::Entry
 Audio::Nama::Fade
 Audio::Nama::Git

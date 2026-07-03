@@ -11,7 +11,7 @@ use Dezi::Types qw( DeziIndexerConfig DeziInvIndex DeziFileOrCodeRef );
 use Dezi::ReplaceRules;
 use namespace::autoclean;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 =head1 NAME
 

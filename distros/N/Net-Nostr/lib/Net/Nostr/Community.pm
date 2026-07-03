@@ -2,6 +2,8 @@ package Net::Nostr::Community;
 
 use strictures 2;
 
+use Net::Nostr::_ConstructorArgs ();
+
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
@@ -25,11 +27,11 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     $args{moderators}  //= [];
     $args{relays}      //= [];
     $args{communities} //= [];
-    my $self = bless \%args, $class;
+    my $self = bless { %args }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
@@ -37,7 +39,8 @@ sub new {
 }
 
 sub community {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey     = $args{pubkey}     // croak "community requires 'pubkey'";
     my $identifier = $args{identifier} // croak "community requires 'identifier'";
@@ -78,7 +81,8 @@ sub community {
 }
 
 sub post {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey  = $args{pubkey}  // croak "post requires 'pubkey'";
     my $content = $args{content} // croak "post requires 'content'";
@@ -116,7 +120,8 @@ sub post {
 }
 
 sub reply {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey  = $args{pubkey}  // croak "reply requires 'pubkey'";
     my $content = $args{content} // croak "reply requires 'content'";
@@ -163,7 +168,8 @@ sub reply {
 }
 
 sub approval {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
 
     my $pubkey = $args{pubkey} // croak "approval requires 'pubkey'";
     my $post   = $args{post}   // croak "approval requires 'post'";
@@ -331,7 +337,8 @@ sub validate {
 }
 
 sub community_filter {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my %filter = (kinds => [34550]);
     $filter{'#d'} = $args{identifiers} if $args{identifiers};
     $filter{authors} = $args{authors} if $args{authors};
@@ -339,7 +346,8 @@ sub community_filter {
 }
 
 sub approval_filter {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     my %filter = (kinds => [4550]);
     $filter{'#a'} = [$args{community}] if $args{community};
     $filter{authors} = $args{authors} if $args{authors};
@@ -347,7 +355,8 @@ sub approval_filter {
 }
 
 sub legacy_post_filter {
-    my ($class, %args) = @_;
+    my $class = shift;
+    my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
     return {
         kinds => [1],
         '#a'  => [$args{community}],
@@ -429,6 +438,8 @@ posts, both sets point to the community itself.
 =head1 CONSTRUCTOR
 
 =head2 new
+
+Accepts named arguments as either a flat list or a single hash reference.
 
     my $info = Net::Nostr::Community->new(%fields);
 

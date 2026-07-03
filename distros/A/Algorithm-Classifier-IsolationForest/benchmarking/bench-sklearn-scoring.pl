@@ -1,12 +1,17 @@
 #!/usr/bin/perl
 # benchmarking/bench-sklearn-scoring.pl
 #
-# Compares scoring throughput between this module and scikit-learn's
+# Compares scoring throughput among three Perl backends and scikit-learn's
 # IsolationForest across two axes:
 #   * query-set size       (fixed feature count)
 #   * feature-vector width (fixed query-set size)
 #
-# The same training CSV and query CSVs are used by both sides so the
+# Perl backends benchmarked (when available):
+#   pure perl   -- no Inline::C  (use_c => 0)
+#   C serial    -- Inline::C, single-threaded  (use_c => 1, use_openmp => 0)
+#   C+OpenMP    -- Inline::C + OpenMP parallel (use_c => 1, use_openmp => 1)
+#
+# The same training CSV and query CSVs are used by all sides so the
 # comparison is on identical data.  Models are pre-trained before any
 # timing starts.
 #
@@ -18,10 +23,11 @@
 #   Perl path_lengths          <-->  (no sklearn equivalent)
 #   (no Perl equivalent)       <-->  clf.decision_function(X)  (threshold-shifted score)
 #
-# The table shows "ratio = sklearn ops/s / Perl ops/s" for methods that
-# have direct equivalents.  >1 means sklearn is faster; <1 means Perl.
+# The ratio column shows sklearn ops/s / best-Perl ops/s.
+# >1 means sklearn is faster; <1 means Perl is faster.
 #
-# scikit-learn is optional: if not installed, only Perl results are shown.
+# Unavailable backends (Inline::C not installed, OpenMP not linked,
+# scikit-learn not installed) are omitted from the table.
 #
 # Run with:
 #   perl -Ilib benchmarking/bench-sklearn-scoring.pl
@@ -37,6 +43,9 @@ use JSON::PP    ();
 use Algorithm::Classifier::IsolationForest;
 
 use constant PI => 3.14159265358979;
+
+my $HAS_C      = $Algorithm::Classifier::IsolationForest::HAS_C;
+my $HAS_OPENMP = $Algorithm::Classifier::IsolationForest::HAS_OPENMP;
 
 # -----------------------------------------------------------------------
 # Data generation
@@ -83,22 +92,27 @@ sub write_csv {
 }
 
 sub build_model {
-    my ($train) = @_;
+    my ( $train, %opts ) = @_;
     return Algorithm::Classifier::IsolationForest->new(
         n_trees     => $N_TREES,
         sample_size => $PSI,
         seed        => 1,
+        %opts,
     )->fit($train);
 }
 
 # -----------------------------------------------------------------------
-# Build experiments (data + Perl model) once, outside all timing.
+# Build experiments (data + model variants) once, outside all timing.
 #
 # Each experiment is:
-#   { sweep, label, train_csv, query_csv, query_data, perl_model, n_features }
-# sweep is 'qsize' or 'features' and groups results into output tables.
-# Experiments that share a train_csv reuse the same Perl model (and
-# Python side caches its sklearn model by train_csv path too).
+#   { sweep, label, train_csv, query_csv, query_data, n_features,
+#     pure_model, c_model, omp_model }
+#
+# pure_model is always built (use_c => 0).
+# c_model    is built when $HAS_C      (use_c => 1, use_openmp => 0).
+# omp_model  is built when $HAS_OPENMP (use_c => 1, use_openmp => 1).
+#
+# Experiments sharing a training set reuse the same model objects.
 # -----------------------------------------------------------------------
 srand(42);
 
@@ -108,7 +122,9 @@ my @experiments;
 {
     my $train_data = make_data( $N_TRAIN, $N_FEATURES );
     my $train_csv  = write_csv($train_data);
-    my $model      = build_model($train_data);
+    my $pure_model = build_model( $train_data, use_c => 0, use_openmp => 0 );
+    my $c_model    = $HAS_C      ? build_model( $train_data, use_c => 1, use_openmp => 0 ) : undef;
+    my $omp_model  = $HAS_OPENMP ? build_model( $train_data, use_c => 1, use_openmp => 1 ) : undef;
     for my $sz (@query_sizes) {
         my $q = make_data( $sz, $N_FEATURES );
         push @experiments, {
@@ -117,18 +133,21 @@ my @experiments;
             train_csv  => $train_csv,
             query_csv  => write_csv($q),
             query_data => $q,
-            perl_model => $model,
+            pure_model => $pure_model,
+            c_model    => $c_model,
+            omp_model  => $omp_model,
             n_features => $N_FEATURES,
         };
     }
 }
 
 # Feature sweep: vary feature count, fix query size at $FEATURE_QUERY_SIZE.
-# Each feature count needs its own training set (and therefore its own model).
 for my $nf (@feature_sizes) {
     my $train_data = make_data( $N_TRAIN, $nf );
     my $train_csv  = write_csv($train_data);
-    my $model      = build_model($train_data);
+    my $pure_model = build_model( $train_data, use_c => 0, use_openmp => 0 );
+    my $c_model    = $HAS_C      ? build_model( $train_data, use_c => 1, use_openmp => 0 ) : undef;
+    my $omp_model  = $HAS_OPENMP ? build_model( $train_data, use_c => 1, use_openmp => 1 ) : undef;
     my $q          = make_data( $FEATURE_QUERY_SIZE, $nf );
     push @experiments, {
         sweep      => 'features',
@@ -136,12 +155,13 @@ for my $nf (@feature_sizes) {
         train_csv  => $train_csv,
         query_csv  => write_csv($q),
         query_data => $q,
-        perl_model => $model,
+        pure_model => $pure_model,
+        c_model    => $c_model,
+        omp_model  => $omp_model,
         n_features => $nf,
     };
 }
 
-# Unique key per experiment, used to join Perl + Python results.
 sub exp_key { "$_[0]{sweep}_$_[0]{label}" }
 
 # -----------------------------------------------------------------------
@@ -158,16 +178,6 @@ for my $cmd (qw(python3 python)) {
 
 # -----------------------------------------------------------------------
 # Python benchmarking script (embedded, written to a temp file).
-#
-# Receives:  bench_secs  spec1  spec2  ...
-# where each spec is  "train_csv|query_csv|label"  (| chosen to avoid
-# any collision with characters in tempfile paths).
-#
-# Models are cached by train_csv path so a single training set shared by
-# many experiments (e.g. the query-size sweep) is fit only once.
-#
-# Outputs JSON keyed by label:
-#   { "qsize_100": { "score_samples": N, "predict": N, ... }, ... }
 # -----------------------------------------------------------------------
 my $py_script = <<'END_PY';
 import sys, json
@@ -217,7 +227,7 @@ print(json.dumps(results))
 END_PY
 
 # -----------------------------------------------------------------------
-# Run Python (one subprocess, all experiments, to avoid repeated import cost)
+# Run Python (one subprocess for all experiments)
 # -----------------------------------------------------------------------
 my $sk;
 if ( defined $python_bin ) {
@@ -233,118 +243,181 @@ if ( defined $python_bin ) {
 }
 
 # -----------------------------------------------------------------------
-# Run Perl benchmarks (all methods, all experiments)
+# Run Perl benchmarks for all three backends
 # -----------------------------------------------------------------------
-my %pl;
+my ( %pure_pl, %c_pl, %omp_pl );
+
 for my $exp (@experiments) {
-    my $model = $exp->{perl_model};
-    my $q     = $exp->{query_data};
+    my $key = exp_key($exp);
+    my $q   = $exp->{query_data};
 
-    # Pre-pack the query data once so the *_packed rows measure scoring
-    # in isolation, without the per-call pack_input_xs cost.  Only the
-    # C backend supports packed input; if it's missing, just reuse $q
-    # so the bench still runs (and the "packed" rows match the unpacked
-    # ones).
-    my $packed
-        = $Algorithm::Classifier::IsolationForest::HAS_C
-        ? $model->pack_data($q)
-        : $q;
+    # Pure Perl
+    {
+        my $m = $exp->{pure_model};
+        $pure_pl{$key} = {
+            score_samples         => wall_rate( sub { $m->score_samples($q)         }, $BENCH_SECS ),
+            predict               => wall_rate( sub { $m->predict($q)               }, $BENCH_SECS ),
+            score_predict_samples => wall_rate( sub { $m->score_predict_samples($q) }, $BENCH_SECS ),
+            score_predict_split   => wall_rate( sub { $m->score_predict_split($q)   }, $BENCH_SECS ),
+            path_lengths          => wall_rate( sub { $m->path_lengths($q)          }, $BENCH_SECS ),
+        };
+    }
 
-    $pl{ exp_key($exp) } = {
-        score_samples         => wall_rate( sub { $model->score_samples($q)              }, $BENCH_SECS ),
-        score_samples_packed  => wall_rate( sub { $model->score_samples($packed)         }, $BENCH_SECS ),
-        predict               => wall_rate( sub { $model->predict($q)                    }, $BENCH_SECS ),
-        predict_packed        => wall_rate( sub { $model->predict($packed)               }, $BENCH_SECS ),
-        score_predict_samples => wall_rate( sub { $model->score_predict_samples($q)      }, $BENCH_SECS ),
-        score_predict_split   => wall_rate( sub { $model->score_predict_split($q)        }, $BENCH_SECS ),
-        score_predict_split_packed
-                              => wall_rate( sub { $model->score_predict_split($packed)   }, $BENCH_SECS ),
-        path_lengths          => wall_rate( sub { $model->path_lengths($q)               }, $BENCH_SECS ),
-    };
+    # C serial (single-threaded Inline::C)
+    if ($HAS_C) {
+        my $m      = $exp->{c_model};
+        my $packed = $m->pack_data($q);
+        $c_pl{$key} = {
+            score_samples              => wall_rate( sub { $m->score_samples($q)              }, $BENCH_SECS ),
+            score_samples_packed       => wall_rate( sub { $m->score_samples($packed)         }, $BENCH_SECS ),
+            predict                    => wall_rate( sub { $m->predict($q)                    }, $BENCH_SECS ),
+            predict_packed             => wall_rate( sub { $m->predict($packed)               }, $BENCH_SECS ),
+            score_predict_samples      => wall_rate( sub { $m->score_predict_samples($q)      }, $BENCH_SECS ),
+            score_predict_split        => wall_rate( sub { $m->score_predict_split($q)        }, $BENCH_SECS ),
+            score_predict_split_packed => wall_rate( sub { $m->score_predict_split($packed)   }, $BENCH_SECS ),
+            path_lengths               => wall_rate( sub { $m->path_lengths($q)               }, $BENCH_SECS ),
+        };
+    }
+
+    # C + OpenMP (parallel Inline::C)
+    if ($HAS_OPENMP) {
+        my $m      = $exp->{omp_model};
+        my $packed = $m->pack_data($q);
+        $omp_pl{$key} = {
+            score_samples              => wall_rate( sub { $m->score_samples($q)              }, $BENCH_SECS ),
+            score_samples_packed       => wall_rate( sub { $m->score_samples($packed)         }, $BENCH_SECS ),
+            predict                    => wall_rate( sub { $m->predict($q)                    }, $BENCH_SECS ),
+            predict_packed             => wall_rate( sub { $m->predict($packed)               }, $BENCH_SECS ),
+            score_predict_samples      => wall_rate( sub { $m->score_predict_samples($q)      }, $BENCH_SECS ),
+            score_predict_split        => wall_rate( sub { $m->score_predict_split($q)        }, $BENCH_SECS ),
+            score_predict_split_packed => wall_rate( sub { $m->score_predict_split($packed)   }, $BENCH_SECS ),
+            path_lengths               => wall_rate( sub { $m->path_lengths($q)               }, $BENCH_SECS ),
+        };
+    }
 }
 
 # -----------------------------------------------------------------------
 # Display
 # -----------------------------------------------------------------------
-# Row definitions: [ label, perl_key, sklearn_key ]
+
+# Row layout: [ label, pure_key, c_key, omp_key, sklearn_key ]
+# undef means "not applicable for this backend/side"
 my @rows = (
-    [ 'score_samples',              'score_samples',              'score_samples'     ],
-    [ 'score_samples (packed)',     'score_samples_packed',       undef               ],
-    [ 'predict',                    'predict',                    'predict'           ],
-    [ 'predict (packed)',           'predict_packed',             undef               ],
-    [ 'score_predict_samples',      'score_predict_samples',      undef               ],
-    [ 'score_predict_split',        'score_predict_split',        undef               ],
-    [ 'score_predict_split (packed)','score_predict_split_packed',undef               ],
-    [ 'path_lengths',               'path_lengths',               undef               ],
-    [ 'decision_function',          undef,                        'decision_function' ],
+    [ 'score_samples',               'score_samples',        'score_samples',        'score_samples',             'score_samples'     ],
+    [ 'score_samples (packed)',       undef,                  'score_samples_packed', 'score_samples_packed',      undef               ],
+    [ 'predict',                     'predict',              'predict',              'predict',                   'predict'           ],
+    [ 'predict (packed)',             undef,                  'predict_packed',       'predict_packed',            undef               ],
+    [ 'score_predict_samples',       'score_predict_samples','score_predict_samples','score_predict_samples',     undef               ],
+    [ 'score_predict_split',         'score_predict_split',  'score_predict_split',  'score_predict_split',       undef               ],
+    [ 'score_predict_split (packed)', undef,                 'score_predict_split_packed','score_predict_split_packed', undef         ],
+    [ 'path_lengths',                'path_lengths',         'path_lengths',         'path_lengths',              undef               ],
+    [ 'decision_function',           undef,                  undef,                  undef,                       'decision_function' ],
 );
+
+my $MW = 28;    # method column width
+my $NW = 12;    # numeric backend column width
+my $SW = 14;    # sklearn column width
+my $RW = 8;     # ratio column width
+
+sub fmt_rate { defined $_[0] && $_[0] ? sprintf( '%.1f', $_[0] ) : '--' }
 
 sub print_point {
     my ($key) = @_;
 
-    if ( defined $sk ) {
-        printf "  %-28s  %12s  %14s  %8s\n",
-            'method', 'Perl (ops/s)', 'sklearn (ops/s)', 'ratio';
-        printf "  %-28s  %12s  %14s  %8s\n",
-            '-' x 28, '-' x 12, '-' x 14, '-' x 8;
-    }
-    else {
-        printf "  %-28s  %12s\n", 'method', 'Perl (ops/s)';
-        printf "  %-28s  %12s\n", '-' x 28, '-' x 12;
-    }
+    # Header row
+    my @hdr = ( sprintf( "  %-*s", $MW, 'method' ) );
+    push @hdr, sprintf( "  %*s", $NW, 'perl (ops/s)' );
+    push @hdr, sprintf( "  %*s", $NW, 'C (ops/s)' )     if $HAS_C;
+    push @hdr, sprintf( "  %*s", $NW, 'C+OMP(ops/s)' )  if $HAS_OPENMP;
+    push @hdr, sprintf( "  %*s", $SW, 'sklearn(ops/s)' ) if defined $sk;
+    push @hdr, sprintf( "  %*s", $RW, 'ratio' )          if defined $sk;
+    print join( '', @hdr ), "\n";
+
+    # Separator row
+    my @sep = ( '  ' . '-' x $MW );
+    push @sep, '  ' . '-' x $NW;
+    push @sep, '  ' . '-' x $NW if $HAS_C;
+    push @sep, '  ' . '-' x $NW if $HAS_OPENMP;
+    push @sep, '  ' . '-' x $SW if defined $sk;
+    push @sep, '  ' . '-' x $RW if defined $sk;
+    print join( '', @sep ), "\n";
 
     for my $row (@rows) {
-        my ( $label, $pl_key, $sk_key ) = @$row;
-        my $pl_rate = $pl_key ? $pl{$key}{$pl_key}        : undef;
-        my $sk_rate = ( $sk_key && $sk ) ? $sk->{$key}{$sk_key} : undef;
+        my ( $label, $pure_key, $c_key, $omp_key, $sk_key ) = @$row;
+
+        # Skip rows where every available column would show '--'
+        next
+            unless $pure_key
+            || ( $c_key   && $HAS_C )
+            || ( $omp_key && $HAS_OPENMP )
+            || ( $sk_key  && $sk );
+
+        my $pure_rate = $pure_key                    ? $pure_pl{$key}{$pure_key}       : undef;
+        my $c_rate    = ( $c_key   && $HAS_C )       ? $c_pl{$key}{$c_key}             : undef;
+        my $omp_rate  = ( $omp_key && $HAS_OPENMP )  ? $omp_pl{$key}{$omp_key}         : undef;
+        my $sk_rate   = ( $sk_key  && $sk )          ? $sk->{$key}{$sk_key}            : undef;
+
+        # Best available Perl rate for the ratio denominator
+        my $best = $omp_rate // $c_rate // $pure_rate;
+
+        my @cols = ( sprintf( "  %-*s", $MW, $label ) );
+        push @cols, sprintf( "  %*s", $NW, fmt_rate($pure_rate) );
+        push @cols, sprintf( "  %*s", $NW, fmt_rate($c_rate) )   if $HAS_C;
+        push @cols, sprintf( "  %*s", $NW, fmt_rate($omp_rate) ) if $HAS_OPENMP;
 
         if ( defined $sk ) {
-            my $ratio
-                = ( $pl_rate && $sk_rate )
-                ? sprintf( '%.2f', $sk_rate / $pl_rate )
-                : '--';
-            printf "  %-28s  %12s  %14s  %8s\n",
-                $label,
-                $pl_rate ? sprintf( '%.1f', $pl_rate ) : '--',
-                $sk_rate ? sprintf( '%.1f', $sk_rate ) : '--',
-                $ratio;
+            push @cols, sprintf( "  %*s", $SW, fmt_rate($sk_rate) );
+            my $ratio = ( $best && $sk_rate )
+                ? sprintf( '%.2f', $sk_rate / $best ) : '--';
+            push @cols, sprintf( "  %*s", $RW, $ratio );
         }
-        else {
-            printf "  %-28s  %12s\n",
-                $label,
-                $pl_rate ? sprintf( '%.1f', $pl_rate ) : '--';
-        }
+
+        print join( '', @cols ), "\n";
     }
     print "\n";
 }
 
-print "=" x 67, "\n";
-print " Perl vs scikit-learn -- scoring speed (ops/second, higher = faster)\n";
-print "=" x 67, "\n";
+# -----------------------------------------------------------------------
+# Banner
+# -----------------------------------------------------------------------
+my $TW = 2 + $MW + 2 + $NW
+    + ( $HAS_C      ? 2 + $NW : 0 )
+    + ( $HAS_OPENMP ? 2 + $NW : 0 )
+    + ( defined $sk ? 2 + $SW + 2 + $RW : 0 );
+
+my $backends = 'pure-Perl'
+    . ( $HAS_C      ? ', C serial'  : '' )
+    . ( $HAS_OPENMP ? ', C+OpenMP'  : '' );
+
+print '=' x $TW, "\n";
+printf " Perl (%s) vs scikit-learn -- scoring speed (ops/s)\n", $backends;
+print '=' x $TW, "\n";
 printf " Training: %d samples, n_trees=%d, sample_size=%d\n",
     $N_TRAIN, $N_TREES, $PSI;
-printf " Each measurement: %.0fs wall-clock with 0.3s warmup\n", $BENCH_SECS;
-print " ratio = sklearn ops/s / Perl ops/s  (>1 = sklearn faster)\n";
-print " --  = no equivalent method on that side\n\n";
+printf " Each measurement: %.0fs wall-clock with warmup\n", $BENCH_SECS;
+print  " ratio = sklearn ops/s / best-Perl ops/s  (>1 = sklearn faster)\n";
+print  " --  = no equivalent or backend not available\n";
+print  " packed = pre-packed input (skips per-call AoA walk; C backend only)\n";
+print "\n";
 
 unless ( defined $sk ) {
     print " (scikit-learn not available; showing Perl results only)\n\n";
 }
 
-# ---- Query-size sweep ------------------------------------------------
-print "#" x 67, "\n";
+# ---- Query-size sweep -----------------------------------------------
+print '#' x $TW, "\n";
 printf "# Query-size sweep (features fixed at %d)\n", $N_FEATURES;
-print "#" x 67, "\n";
+print '#' x $TW, "\n";
 for my $exp ( grep { $_->{sweep} eq 'qsize' } @experiments ) {
     printf "--- %d query points ---\n", $exp->{label};
     print_point( exp_key($exp) );
 }
 
 # ---- Feature-dimension sweep ----------------------------------------
-print "#" x 67, "\n";
+print '#' x $TW, "\n";
 printf "# Feature-dimension sweep (query size fixed at %d)\n",
     $FEATURE_QUERY_SIZE;
-print "#" x 67, "\n";
+print '#' x $TW, "\n";
 for my $exp ( grep { $_->{sweep} eq 'features' } @experiments ) {
     printf "--- %d features ---\n", $exp->{label};
     print_point( exp_key($exp) );
