@@ -1,3 +1,25 @@
+2.002000   2026-07-03
+
+  - Split the project into Net-Nostr-Core, Net-Nostr-Client, Net-Nostr-Relay,
+    and Net-Nostr shim distributions
+  - Move protocol and NIP tooling into the Net-Nostr-Core distribution
+  - Move Net::Nostr::Client into Net-Nostr-Client and Net::Nostr::Relay plus
+    Net::Nostr::RelayStore into Net-Nostr-Relay
+  - Keep Net::Nostr as a compatibility shim that installs Core, Client, and
+    Relay
+  - Start Net-Nostr-Core, Net-Nostr-Client, and Net-Nostr-Relay at version
+    1.001000 while keeping the Net-Nostr shim at version 2.002000
+  - Make AnyEvent::HTTP optional for Net-Nostr-Core and lazy-load it only for
+    Net::Nostr::Identifier network lookup and verification
+  - Keep AnyEvent::HTTP as a hard dependency of the Net-Nostr shim distribution
+    for the full historical install
+  - Leave intra-Net::Nostr distribution dependencies unversioned for
+    split-release indexing
+  - Remove unrecommended NIPs 15, 28, 72, and 90 from the full install surface
+    by dropping Net::Nostr::Marketplace, Net::Nostr::Channel,
+    Net::Nostr::Community, and Net::Nostr::DVM from Net-Nostr-Core
+  - Use Makefile.PL as the single dependency source of truth
+
 2.001000   2026-07-02
 
   - Update supported NIP behavior to nostr-protocol/nips commit 8f8444d0

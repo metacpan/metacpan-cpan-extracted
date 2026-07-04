@@ -36,6 +36,7 @@ t/90-cli-commands.t
 t/02-accel-selection.t
 t/03-fit-determinism.t
 t/04-accel-tuning.t
+t/05-prebuilt-env.t
 examples/README.md
 examples/basic-anomaly-detection.pl
 examples/axis-vs-extended.pl

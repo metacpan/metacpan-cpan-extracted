@@ -89,11 +89,19 @@ sub as_hash
         }
     }
 
-    $self->_load_class( 'Module::Generic::Hash' ) ||
-        CORE::return( $self->pass_error );
-    # Since our array might contain reference, we instantiate first our special hash object, and then we add into it our elements
-    # Module::Generic::Hash, that uses Module::Generic::TieHash, knows how to handle keys as reference
-    my $ref = Module::Generic::Hash->new;
+    my $ref;
+    if( $opts->{strict} || $opts->{native} )
+    {
+        $ref = {};
+    }
+    else
+    {
+        $self->_load_class( 'Module::Generic::Hash' ) ||
+            CORE::return( $self->pass_error );
+        # Since our array might contain reference, we instantiate first our special hash object, and then we add into it our elements
+        # Module::Generic::Hash, that uses Module::Generic::TieHash, knows how to handle keys as reference
+        $ref = Module::Generic::Hash->new;
+    }
     @$ref{ @$self } = @$offsets;
     CORE::return( $ref );
 }

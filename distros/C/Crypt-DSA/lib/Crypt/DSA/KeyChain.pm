@@ -11,12 +11,12 @@ use File::Which ();
 use Symbol qw( gensym );
 use Crypt::SysRandom qw( random_bytes );
 
-our $VERSION = '1.21'; #VERSION
+our $VERSION = '1.23'; #VERSION
 
 use vars qw{$VERSION};
 
 use Crypt::DSA::Key;
-use Crypt::DSA::Util qw( bin2mp bitsize mod_exp makerandom isprime );
+use Crypt::DSA::Util qw( bin2mp bitsize mod_exp makerandom randombelow isprime );
 
 sub new {
     my $class = shift;
@@ -137,9 +137,9 @@ sub generate_keys {
     my $key = shift;
     my($priv_key, $pub_key);
     SCOPE: {
-        my $i = bitsize($key->q);
-        $priv_key = makerandom(Size => $i);
-        $priv_key -= $key->q if $priv_key >= $key->q;
+        # Private key must be uniform in [1, q-1]; randombelow() does not
+        # force the high bit, so (unlike makerandom) it is not biased.
+        $priv_key = randombelow($key->q);
         redo if $priv_key == 0;
     }
     $pub_key = mod_exp($key->g, $priv_key, $key->p);

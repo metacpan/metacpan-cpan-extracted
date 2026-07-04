@@ -830,7 +830,7 @@ Methods like L</token_escape> and L</value_as_string> use L<URI::Escape>, which 
 
 =item * B<Serialisation>
 
-Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe.
+Serialisation methods (C<FREEZE>, C<THAW>) operate on per-object state, making them thread-safe.
 
 =back
 

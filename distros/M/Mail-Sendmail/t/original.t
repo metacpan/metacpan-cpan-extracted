@@ -14,7 +14,7 @@ $mail{To}   = 'Sendmail Test <sendmail@alma.ch>';
 
 # if you want to get a copy of the test mail, you need to specify your
 # own server here, by name or IP address
-$server = 'mail.alma.ch';
+$server = 'smtp.freesmtpservers.com';
 #$server = 'my.usual.mail.server';
 
 BEGIN { $| = 1; print "1..2\n"; }

@@ -61,8 +61,8 @@ sub init
     my $debug = ( CORE::exists( $opts->{debug} ) ? CORE::delete( $opts->{debug} ) : undef );
     foreach my $opt ( keys( %$opts ) )
     {
-        my $ref;
-        $ref = $j->can( exists( $equi->{ $opt } ) ? $equi->{ $opt } : $opt ) || do
+        my $meth = exists( $equi->{ $opt } ) ? $equi->{ $opt } : $opt;
+        $j->can( $meth ) || do
         {
             warn( "Unknown JSON option '${opt}'\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
             next;
@@ -70,7 +70,7 @@ sub init
 
         eval
         {
-            $ref->( $j, $opts->{ $opt } );
+            $j->$meth( $opts->{ $opt } );
         };
         if( $@ )
         {
@@ -344,33 +344,33 @@ This takes an hash or hash reference of options and returns a new L<Module::Gene
 
 See the documentation for the module L<JSON> for more information, but below are the known methods supported by L<JSON>
 
-=head2 allow_blessed
+=for Pod::Coverage allow_blessed
 
-=head2 allow_nonref
+=for Pod::Coverage allow_nonref
 
-=head2 allow_tags
+=for Pod::Coverage allow_tags
 
-=head2 allow_unknown
+=for Pod::Coverage allow_unknown
 
-=head2 ascii
+=for Pod::Coverage ascii
 
-=head2 backend
+=for Pod::Coverage backend
 
-=head2 boolean
+=for Pod::Coverage boolean
 
-=head2 boolean_values
+=for Pod::Coverage boolean_values
 
-=head2 canonical
+=for Pod::Coverage canonical
 
-=head2 convert_blessed
+=for Pod::Coverage convert_blessed
 
-=head2 decode
+=for Pod::Coverage decode
 
 Decodes a JSON string and returns the resulting Perl data structure. On error, sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context or an empty list in list context:
 
     my $data = $j->decode( '{"a":1}' ) || die( $j->error );
 
-=head2 decode_prefix
+=for Pod::Coverage decode_prefix
 
 =head2 encode
 
@@ -378,33 +378,33 @@ Encodes a Perl data structure into a JSON string. On error, sets an L<error obje
 
     my $json_str = $j->encode( { a => 1 } ) || die( $j->error );
 
-=head2 filter_json_object
+=for Pod::Coverage filter_json_object
 
-=head2 filter_json_single_key_object
+=for Pod::Coverage filter_json_single_key_object
 
-=head2 indent
+=for Pod::Coverage indent
 
-=head2 is_pp
+=for Pod::Coverage is_pp
 
-=head2 is_xs
+=for Pod::Coverage is_xs
 
-=head2 latin1
+=for Pod::Coverage latin1
 
-=head2 max_depth
+=for Pod::Coverage max_depth
 
-=head2 max_size
+=for Pod::Coverage max_size
 
-=head2 pretty
+=for Pod::Coverage pretty
 
-=head2 property
+=for Pod::Coverage property
 
-=head2 relaxed
+=for Pod::Coverage relaxed
 
-=head2 space_after
+=for Pod::Coverage space_after
 
-=head2 space_before
+=for Pod::Coverage space_before
 
-=head2 utf8
+=for Pod::Coverage utf8
 
 =head1 CLASS FUNCTIONS
 
@@ -497,7 +497,7 @@ The underlying L<JSON> module (both L<JSON::XS> and L<JSON::PP>) is thread-safe 
 
 =item * B<Serialisation>
 
-Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe.
+Serialisation methods (C<FREEZE>, C<THAW>) operate on per-object state, making them thread-safe.
 
 =back
 

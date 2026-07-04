@@ -1,5 +1,23 @@
 TODO list for Perl module Perl5::Build::Warnings
 
-- Nothing yet
+2026-07-02:
 
+* Change author's email address away from cpan.org DONE
 
+* Consider moving locus of bug reports and patches to GitHub. DONE
+
+* When reading the output of 'make' or 'make test_prep', provide the user with
+an option to replace higher-order-ASCII open and close single-quote characters
+with a simple plain-text single quote.  Objective will be to make output of
+parse-build-warnings and similar programs using this module more readable. So
+instead of this:
+
+    op.c:5468:34: warning: argument ‘o’ might be clobbered by ‘longjmp’ or ‘vfork’ [-Wclobbered]
+
+... where we have 3 instances of \xE2\x80\x98 and 3 of \xE2\x80\x99, we
+will have 6 instances of '.
+
+    op.c:5468:34: warning: argument 'o' might be clobbered by 'longjmp' or 'vfork' [-Wclobbered]
+
+* Revise documentation -- and perhaps code -- to enable easy use on the output
+of 'make' on CPAN distributions, e.g., Tk.

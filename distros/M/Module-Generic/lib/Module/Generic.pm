@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.5.11
+## Version v1.6.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/06/06
+## Modified 2026/07/03
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -118,7 +118,7 @@ BEGIN
     # shared state on the way out.
     *_in_end_phase = sub{ ${^GLOBAL_PHASE} eq 'END' };
 
-    our $VERSION   = 'v1.5.11';
+    our $VERSION   = 'v1.6.0';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -235,6 +235,7 @@ sub will;
 sub _autoload_subs;
 sub _can;
 sub _can_overload;
+sub _dump_options;
 sub _get_args_as_array;
 sub _get_args_as_hash;
 sub _get_datetime_regexp;
@@ -314,6 +315,8 @@ sub _set_get_uuid;
 sub _set_get_version;
 sub _set_symbol;
 sub _str_val;
+sub _subinfo;
+sub _subname;
 sub _to_array_object;
 sub _warnings_is_enabled;
 sub _warnings_is_registered;
@@ -1532,22 +1535,22 @@ sub init
     no overloading;
     my $this = $self->_obj2h;
     no strict 'refs';
-    $this->{verbose} = defined( ${ $pkg . '::VERBOSE' } ) ? ${ $pkg . '::VERBOSE' } : 0 if( !length( $this->{verbose} ) );
-    $this->{debug}   = defined( ${ $pkg . '::DEBUG' } ) ? ${ $pkg . '::DEBUG' } : 0 if( !length( $this->{debug} ) );
-    $this->{version} = ${ $pkg . '::VERSION' } if( !defined( $this->{version} ) && defined( ${ $pkg . '::VERSION' } ) );
+    $this->{verbose}          = defined( ${ $pkg . '::VERBOSE' } ) ? ${ $pkg . '::VERBOSE' } : 0 if( !length( $this->{verbose} ) );
+    $this->{debug}            = defined( ${ $pkg . '::DEBUG' } ) ? ${ $pkg . '::DEBUG' } : 0 if( !length( $this->{debug} ) );
+    $this->{version}          = ${ $pkg . '::VERSION' } if( !defined( $this->{version} ) && defined( ${ $pkg . '::VERSION' } ) );
     # $this->{level}   = 0;
-    $this->{_colour_open} = undef unless( CORE::exists( $this->{_colour_open} ) );
-    $this->{_colour_close} = undef unless( CORE::exists( $this->{_colour_close} ) );
+    $this->{_colour_open}     = undef unless( CORE::exists( $this->{_colour_open} ) );
+    $this->{_colour_close}    = undef unless( CORE::exists( $this->{_colour_close} ) );
     $this->{_exception_class} = 'Module::Generic::Exception' unless( CORE::defined( $this->{_exception_class} ) && CORE::length( $this->{_exception_class} ) );
     $this->{_init_params_order} = [] unless( ref( $this->{_init_params_order} ) );
     # If no debug level was provided when calling message, this level will be assumed
     # Example: message( "Hello" );
     # If __message_default_level was set to 3, this would be equivalent to message( 3, "Hello" )
-    $this->{_init_strict_use_sub} = 0 unless( length( $this->{_init_strict_use_sub} ) );
-    $this->{_log_handler} = '' unless( length( $this->{_log_handler} ) );
+    $this->{_init_strict_use_sub}   = 0 unless( length( $this->{_init_strict_use_sub} ) );
+    $this->{_log_handler}           = '' unless( length( $this->{_log_handler} ) );
     $this->{_message_default_level} = 0;
-    $this->{_msg_no_exec_sub} = 0 unless( length( $this->{_msg_no_exec_sub} ) );
-    $this->{_error_max_length} = '' unless( length( $this->{_error_max_length} ) );
+    $this->{_msg_no_exec_sub}       = 0 unless( length( $this->{_msg_no_exec_sub} ) );
+    $this->{_error_max_length}      = '' unless( length( $this->{_error_max_length} ) );
     my $data = $this;
     if( $this->{_data_repo} )
     {
@@ -1685,10 +1688,11 @@ sub init
                 $self->__message( 114, "Calling method '$name' ($meth) with value '", $self->_str_val( $val // 'undef' ), "'" );
                 if( !defined( $meth->( $self, $val ) ) )
                 {
-                    if( defined( $val ) && $self->error )
+                    my $err = $self->error;
+                    if( defined( $val ) && $err )
                     {
                         $self->__message( 104, "Error while instantiating object for class '", ref( $self ), "': ", $self->error );
-                        warn( "Warning: method $name returned undef while initialising object ", ref( $self ), ": ", ( $self->error ? $self->error->message : '' ), "\n" );
+                        warn( "Warning: method $name returned undef while initialising object ", ref( $self ), ": ", ( $err ? $err->message : '' ), "\n" );
                         return;
                     }
                 }
@@ -2058,7 +2062,11 @@ sub pass_error
     {
         $self->__message( 106, "Passing on error..." );
         my $error;
-        if( Scalar::Util::blessed( $self ) )
+        if( Scalar::Util::blessed( $self ) &&
+            CORE::exists( $this->{error} ) &&
+            defined( $this->{error} ) &&
+            # Avoid overloaded stringification
+            CORE::length( $self->_str_val( $this->{error} ) ) )
         {
             $error = $this->{error};
             $self->__message( 106, "Error found from within our object: ", $self->_str_val( $error // 'undef' ) );
@@ -4962,7 +4970,7 @@ sub _set_get_hash : lvalue
             $field = undef;
         }
         # Should have been 'callbacks', but we catch it anyway.
-        $callbacks = $def->{callback} if( CORE::exists( $def->{callback} ) && ref( $def->{callback} ) eq 'HASH' );
+        $callbacks = $def->{callback}  if( CORE::exists( $def->{callback} ) &&  ref( $def->{callback} )  eq 'HASH' );
         $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
         $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
@@ -4973,6 +4981,12 @@ sub _set_get_hash : lvalue
             my $self = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
+            if( exists( $callbacks->{get} ) &&
+                $callbacks->{get} &&
+                ref( $callbacks->{get} ) eq 'CODE' )
+            {
+                return( $callbacks->{get}->( $self ) );
+            }
             return( $data->{ $field } );
         },
         set => sub
@@ -8239,6 +8253,20 @@ sub _can_overload
     }
 }
 PERL
+        # NOTE: _dump_options()
+        _dump_options => <<'PERL',
+sub _dump_options
+{
+    my $self = shift( @_ );
+    my $opts = shift( @_ ) || return( '' );
+    my $args = [];
+    foreach my $opt ( sort( keys( %$opts ) ) )
+    {
+        push( @$args, $opt, $self->_str_val( $opts->{ $opt } ) );
+    }
+    return( $self->Module::Generic::dump( $args ) );
+}
+PERL
         # NOTE: _get_args_as_array()
         _get_args_as_array => <<'PERL',
 # NOTE: sub _get_args_as_array() is now a XS method
@@ -8996,7 +9024,7 @@ sub _is_hash
     return(0) if( scalar( @_ ) < 2 );
     return(0) if( !defined( $_[1] ) );
     my $type;
-    if( @_ > 2 && defined( $_[2] ) && $_[2] eq 'strict' )
+    if( @_ > 2 && defined( $_[2] ) && ( $_[2] eq 'strict' || $_[2] eq 'native' ) )
     {
         $type = ref( $_[1] );
     }
@@ -10266,6 +10294,13 @@ sub _set_get_datetime : lvalue
             }
         }
 
+        if( $def->{prefer_dt_lite} && !$self->_is_a( $now => 'DateTime::Lite' ) )
+        {
+            $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
+            $now = DateTime::Lite->from_object( object => $now ) ||
+                return( $self->pass_error( DateTime::Lite->error ) );
+        }
+
         # We only set a default formatter if one was not set already
         if( defined( $fmt ) )
         {
@@ -10762,6 +10797,136 @@ sub _set_symbol
     }
 }
 PERL
+        # NOTE: _subinfo()
+        _subinfo => <<'PERL',
+# Credits: Inspired from Sub::Identify
+# Usage:
+# my $name = $self->_subinfo();         # auto-detect (best for named subs)
+# my $name = $self->_subinfo(__SUB__);  # explicit (works with closures/anon)
+# my @info = $self->_subinfo(__SUB__);  # list context = full info
+sub _subinfo
+{
+    my $self = shift( @_ );
+    my $coderef;
+    if( @_ )
+    {
+        # Something was provided to us, but not suitable.
+        $coderef = shift( @_ ) ||
+            return( $self->error( 'No subroutine code reference was provided. Call it like this: \$self->_subinfo(__SUB__)' ) );
+    }
+    # Auto-detect via caller if no argument was passed
+    else
+    {
+        my( $pkg, $file, $line, $subname ) = caller(1);
+        if( $subname )
+        {
+            # works well for named subs
+            $coderef = \&{ $subname };
+        }
+        else
+        {
+            return( $self->error( "Could not auto-detect current subroutine" ) );
+        }
+    }
+
+
+
+    # We make sure we are dealing with a code reference.
+    unless( ref( $coderef ) eq 'CODE' )
+    {
+        return( $self->error( 'Value provided to _subinfo is not a code reference. Call it like this: $self->_subinfo(__SUB__)' ) );
+    }
+    require B;
+    my $cv = B::svref_2object( $coderef );
+    # We make sure it is a valid CV
+    $cv->isa( 'B::CV' ) ||
+        return( $self->error( "Not a subroutine CV (got ", ref( $cv ), ")." ) );
+
+    my $gv = $cv->GV;
+
+    # If GV is undefined (possible in some edge cases with anonymous subs), bail out
+    unless( $gv && !$gv->isa( 'B::SPECIAL' ) )
+    {
+        return( $self->error( 'Could not get GV for subroutine' ) );
+    }
+
+    my $stash      = $gv->STASH;
+    my $name       = $gv->NAME;
+    my $class      = $stash ? $stash->NAME : '';
+    my $file       = $gv->FILE;
+    my $line       = $gv->LINE;
+    my $is_anon    = ( $name eq '__ANON__' ) ? 1 : 0;
+    my $is_closure = 0;
+
+    # This works well under perl v5.16.0 through v5.40.0
+    # See unit tests t/39.subinfo.t
+    my $padlist = eval{ $cv->PADLIST };
+    if( $padlist )
+    {
+        my $names = eval{ $padlist->can( 'NAMES' ) ? $padlist->NAMES : $padlist->ARRAYelt( 0 ) };
+
+        if( $names )
+        {
+            for( my $i = 0; $i <= $names->MAX; $i++ )
+            {
+                my $padname = eval{ $names->ARRAYelt( $i ) };
+                next if( !$padname || $padname->isa( 'B::SPECIAL' ) );
+
+                my $flags = eval{ $padname->FLAGS } || 0;
+
+                if( $padname->can( 'PVX' ) )
+                {
+                    my $pv = eval{ $padname->PVX } // '';
+                    next if( $pv !~ /^[\$\@\%\&]/ );
+
+                    if( defined( &B::SVf_FAKE ) && ( $flags & B::SVf_FAKE ) )
+                    {
+                        $is_closure = 1;
+                        last;
+                    }
+                }
+                elsif( $padname->can( 'FLAGS' ) )
+                {
+                    if( defined( &B::PADNAMEf_OUTER ) && ( $flags & B::PADNAMEf_OUTER ) )
+                    {
+                        $is_closure = 1;
+                        last;
+                    }
+                }
+            }
+        }
+    }
+    # my $is_xsub    = ( $cv->FLAGS & B::CVf_XSUB ) ? 1 : 0;
+    my $is_xsub = ( defined( &B::CVf_XSUB ) && ( $cv->FLAGS & B::CVf_XSUB ) ) ? 1 : 0;
+    # e.g. '$$@' or empty string
+    my $prototype  = $cv->PV // '';
+
+    # Construct fully qualified name
+    my $full_name = ( $class ? $class . '::' : '' ) . $name;
+    return( $name ) if( !wantarray );
+    return( $name, $full_name, $class, $file, $line, $is_anon, $is_closure, $is_xsub, $prototype,
+    {
+        name       => $name,
+        fullname   => $full_name,
+        class      => $class,
+        package    => $class,
+        file       => $file,
+        line       => $line,
+        is_anon    => $is_anon,
+        is_closure => $is_closure,
+        is_xsub    => $is_xsub,
+        prototype  => $prototype,
+    });
+}
+PERL
+        # NOTE: _subname
+        _subname => <<'PERL',
+# Credits: Inspired from Sub::Identify
+# Usage:
+# my $name = $self->_subname();         # auto-detect (best for named subs)
+# my $name = $self->_subname(__SUB__);  # explicit (works with closures/anon)
+sub _subname { return( scalar( shift->_subinfo( @_ ) ) ); }
+PERL
         # NOTE: as_hash()
         as_hash => <<'PERL',
 sub as_hash
@@ -10770,10 +10935,10 @@ sub as_hash
     my $p = $self->_get_args_as_hash( @_ );
     # $p = shift( @_ ) if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' );
     $p->{convert_array} //= 1;
-    my $me = $self->_obj2h;
-    my $seen = $p->{seen} || {};
+    my $me     = $self->_obj2h;
+    my $seen   = $p->{seen} || {};
     my $levels = $p->{levels} || [];
-    my $keys = $p->{fields} || [];
+    my $keys   = $p->{fields} || [];
 
     my $added_subs = CORE::exists( $me->{_added_method} ) && ref( $me->{_added_method} ) eq 'HASH'
         ? $me->{_added_method}
@@ -13352,7 +13517,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.5.11
+    v1.6.0
 
 =head1 DESCRIPTION
 
@@ -13389,6 +13554,10 @@ This methods calls L</init>, which does all the work of setting object propertie
 
 =head2 as_hash
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 This will recursively transform the object into an hash suitable to be encoded in json.
 
 It does this by calling each method of the object and build an hash reference with the method name as the key and the method returned value as the value.
@@ -13402,6 +13571,10 @@ It returns the hash reference built
 Alias for L</clear_error>
 
 =head2 clear_error
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Clear all error from the object and from the available global variable C<$ERROR>.
 
@@ -13425,11 +13598,19 @@ Note that all helper method such as C<_set_get_*> use this method when used as m
 
 =head2 clone
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Clone the current object if it is of type hash or array reference. It returns an error if the type is neither.
 
 It returns the clone.
 
 =head2 colour_close
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 The marker to be used to set the closing of a command line colour sequence.
 
@@ -13437,11 +13618,19 @@ Defaults to ">"
 
 =head2 colour_closest
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with a colour, this returns the closest standard one supported by terminal.
 
 A colour provided can be a colour name, or a 9 digits rgb value or an hexadecimal value
 
 =head2 colour_format
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Provided with a hash reference of parameters, this will return a string properly formatted to display colours on the command line.
 
@@ -13477,9 +13666,17 @@ The possible values are: I<bold>, I<italic>, I<underline>, I<blink>, I<reverse>,
 
 =head2 colour_max_depth
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Set or get the maximum level of recursion when processing colourised debugging message with L</message_colour>
 
 =head2 colour_open
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 The marker to be used to set the opening of a command line colour sequence.
 
@@ -13489,6 +13686,10 @@ Defaults to "<"
 
     $self->colour_parse( "And {bold light red on white}what about{/} {underline yellow}me too{/} ?" );
     $self->colour_parse( "And {style => 'i|b', color => green}what about{/} {style => 'blink', color => yellow}me{/} ?" );
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Parses a string or list of strings containing colour and style formatting tags and returns the string with appropriate ANSI escape codes applied for terminal display. The method supports nested formatting, custom delimiters, and both named colours (e.g., C<red>, C<light blue>) and RGB/RGBA formats. It is designed to work in both TTY (terminal) and non-TTY environments, with formatting stripped in non-TTY contexts.
 
@@ -13691,9 +13892,17 @@ See also L<Term::ANSIColor> for ANSI escape code details.
 
 =head2 colour_to_rgb
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Convert a human colour keyword like C<red>, C<green> into a rgb equivalent.
 
 =head2 coloured
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Provided with a colouring preference expressed as the first argument as string, and followed by 1 or more arguments that are concatenated to form the text string to format. For example:
 
@@ -13809,6 +14018,10 @@ Provided with a file to write to and some data, this will format the string repr
 
 =head2 dumper
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with some data, and optionally an hash reference of parameters as last argument, this will create a string representation of the data using L<Data::Dumper> and return it.
 
 This sets L<Data::Dumper> to be terse, to indent, to use C<qq> and optionally to not exceed a maximum I<depth> if it is provided in the argument hash reference.
@@ -13823,13 +14036,25 @@ Same as L</"dumper">, but using L<Data::Printer> to format the data.
 
 =head2 dumpto_printer
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Same as L</"dump_print"> above that is an alias of this method.
 
 =head2 dumpto_dumper
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Same as L</"dumpto_printer"> above, but using L<Data::Dumper>
 
 =head2 errno
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Sets or gets an error number.
 
@@ -14023,6 +14248,10 @@ You can enable it in your own package by initialising it in your own C<init> met
     }
 
 =head2 force_tty
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Set or get this flag that specify whether the environment is running under TTY or not.
 Normally, this is derived automatically with the method L</_is_tty>, but you can use this method to force your code.
@@ -14229,6 +14458,10 @@ Provided with a list of arguments, this method will check if the first argument 
 Alias for L</message_colour>
 
 =head2 message_colour
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 This is the same as L</"message">, except this will check for colour formatting, which
 L</"message"> does not do. For example:
@@ -14575,6 +14808,10 @@ Set or get the object property I<quiet> to true or false. If this is true, no wa
 
 =head2 save
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with some data and a file path, or alternatively an hash reference of options with the properties I<data>, I<encoding> and I<file>, this will write to the given file the provided I<data> using the encoding I<encoding>.
 
 This is designed to simplify the tedious task of write to files.
@@ -14663,6 +14900,10 @@ B<set>() sets object inner data type and takes arguments in a hash like fashion:
 
 =head2 subclasses
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with a I<CLASS> value, this method try to guess all the existing sub classes of the provided I<CLASS>.
 
 If I<CLASS> is not provided, the class into which was blessed the calling object will
@@ -14698,34 +14939,43 @@ in the module.
 B<AUTOLOAD>() will then try hard to process the request.
 For example, let's assue we have a routine B<foo>.
 
-It will first, check if an equivalent entry of the routine name that was called exist in
-the hash reference of the object. If there is and that more than one argument were
-passed to this non existing routine, those arguments will be stored as a reference to an
-array as a value of the key in the object. Otherwise the single argument will simply be stored
-as the value of the key of the object.
+It will first, check if an equivalent entry of the routine name that was called exist in the hash reference of the object. If there is and that more than one argument were passed to this non existing routine, those arguments will be stored as a reference to an array as a value of the key in the object. Otherwise the single argument will simply be stored as the value of the key of the object.
 
-Then, if called in list context, it will return a array if the value of the key entry was an array
-reference, or a hash list if the value of the key entry was a hash reference, or finally the value
-of the key entry.
+Then, if called in list context, it will return a array if the value of the key entry was an array reference, or a hash list if the value of the key entry was a hash reference, or finally the value of the key entry.
 
-If this non existing routine that was called is actually defined, the routine will be redeclared and
-the arguments passed to it.
+If this non existing routine that was called is actually defined, the routine will be redeclared and the arguments passed to it.
 
 If this fails too, it will try to check for an AutoLoadable file in C<auto/PackageName/routine_name.al>
 
 If the filed exists, it will be required, the routine name linked into the package name space and finally
 called with the arguments.
 
-If the require process failed or if the AutoLoadable routine file did not exist, B<AUTOLOAD>() will
-check if the special routine B<EXTRA_AUTOLOAD>() exists in the module. If it does, it will call it and pass
-it the arguments. Otherwise, B<AUTOLOAD> will die with a message explaining that the called routine did 
-not exist and could not be found in the current class.
+If the require process failed or if the AutoLoadable routine file did not exist, B<AUTOLOAD>() will check if the special routine B<EXTRA_AUTOLOAD>() exists in the module. If it does, it will call it and pass it the arguments. Otherwise, B<AUTOLOAD> will die with a message explaining that the called routine did not exist and could not be found in the current class.
 
 =head1 SUPPORT METHODS
 
 Those methods are designed to be called from the package inheriting from L<Module::Generic> to perform various function and speed up development.
 
+=head2 __colour_data
+
+    my $colour_data = $self->__colour_data;
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
+Returns the embedded colour-name table used internally by L</colour_to_rgb>.
+
+The returned value is a Perl string containing a hash definition whose keys are
+colour names and whose values are RGB triplets.
+
+This method is loaded lazily and is not intended to be called directly.
+
 =head2 __create_class
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Provided with an object property name and an hash reference representing a dictionary and this will produce a dynamically created class/module.
 
@@ -14796,10 +15046,6 @@ The current object is accessible in the callback as the special variable C<$_>
 
 This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
 
-=head2 _instantiate_object
-
-This does the same thing as L</"__instantiate_object"> and the purpose is for this method to be potentially superseded in your own module. In your own module, you would call L</"__instantiate_object">
-
 =head2 _can
 
 Provided with a value and a method name, and this will return true if the value provided is an object that L<UNIVERSAL/can> perform the method specified, or false otherwise.
@@ -14841,7 +15087,25 @@ Provided with some value and a string representing an operator, or an array refe
 
 It returns false otherwise.
 
+=head2 _dump_options
+
+    my $str = $self->_dump_options( \%options );
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
+Returns a debug-friendly dump of an options hash reference.
+
+The options are sorted by key, converted to a flat array of key/value pairs, and each value is normalised through L</_str_val> before being passed to L</dump>.
+
+If no hash reference is provided, this returns an empty string.
+
 =head2 _get_args_as_array
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Provided with arguments and this support method will return the arguments provided as an array reference irrespective of whether they were initially provided as array reference or a simple array.
 
@@ -14911,11 +15175,253 @@ Assuming C<@_> is C<foo bar baz 3 debug 4>
 
 This would set C<$ref> to be an hash reference with keys C<foo baz debug>
 
+=head2 _get_datetime_regexp
+
+    my $all = $self->_get_datetime_regexp;
+
+    my $re = $self->_get_datetime_regexp( 'iso8601' );
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
+Returns the regular expressions used internally to recognise date and datetime strings.
+
+When called without an argument, this returns a hash reference containing all available regular expressions.
+
+When called with a known key, this returns only the corresponding regular expression.
+
+If L<DateTime::Lite::TimeZone> v0.5.7 or later is available, its extended timezone aliases are used when building the timezone-aware expressions. Otherwise, the fallback alias list is limited.
+
+Supported keys are:
+
+=over 8
+
+=item * C<incomplete>
+
+=item * C<iso8601>
+
+=item * C<http>
+
+=item * C<non_standard>
+
+=item * C<non_standard2>
+
+=item * C<date_only>
+
+=item * C<us_short>
+
+=item * C<eu_short>
+
+=item * C<us_long>
+
+=item * C<eu_long>
+
+=item * C<date_only_eu>
+
+=item * C<date_roman>
+
+=item * C<date_digits>
+
+=item * C<japan>
+
+=item * C<unix>
+
+=item * C<relative>
+
+=item * C<all>
+
+=back
+
+The regular expressions are set dynamically in the following global variables:
+
+=over 4
+
+=item * C<$PARSE_DATE_FRACTIONAL1_RE>
+
+Match dates like C<2026-06-30T18:10:30>, C<2026-06-30T18:10:30+0900>, C<2026-06-30T18:10:30+JST>, C<2026-06-30T18:10:30 JST>
+
+=item * C<$PARSE_DATE_WITH_MILI_SECONDS_RE>
+
+Match dates like:
+
+=over 8
+
+=item * C<2019-06-19 23:23:57.000000000+0900>
+
+=item * C<2019-06-20 11:02:36.306917+09> (e.g.: from PostgreSQL)
+
+=item * C<2019-06-20 02:03:14> (e.g.: from SQLite)
+
+=item * C<2019-06-20 11:04:01> (e.g.: from MySQL)
+
+=item * C<2019-06-20T11:08:27> (e.g.: ISO 8601)
+
+=item * C<2019-06-20T11:08:27Z> (e.g.: ISO 8601)
+
+=item * C<2022-11-17T08:12:31+0900>
+
+=back
+
+=item * C<$PARSE_DATE_HTTP_RE>
+
+Match dates like C<Sun, 06 Oct 2019 06:41:11 GMT> which is used in HTTP protocol.
+
+=item * C<$PARSE_DATE_NON_STDANDARD_RE>
+
+Match dates like:
+
+=over 8
+
+=item * C<12 March 2001 17:07:30 JST>
+
+=item * C<12-March-2001 17:07:30 JST>
+
+=item * C<12/March/2001 17:07:30 JST>
+
+=item * C<12 March 2001 17:07>
+
+=item * C<12 March 2001 17:07 JST>
+
+=item * C<12 March 2001 17:07:30+0900>
+
+=item * C<12 March 2001 17:07:30 +0900>
+
+=item * C<Monday, 12 March 2001 17:07:30 JST>
+
+=item * C<Monday, 12 Mar 2001 17:07:30 JST>
+
+=item * C<03/Feb/1994:00:00:00 0000>
+
+=back
+
+=item * C<$PARSE_DATE_NON_STDANDARD2_RE>
+
+Match dates like:
+
+=over 8
+
+=item * C<Fri Mar 25 12:18:36 2011>
+
+=item * C<Fri Mar 25 12:16:25 ADT 2011>
+
+=item * C<Fri Mar 25 2011>
+
+=back
+
+=item * C<$PARSE_DATE_ONLY_RE>
+
+Match dates like:
+
+=over 8
+
+=item * C<2019-06-20>
+
+=item * C<2019/06/20>
+
+=item * C<2016.04.22>
+
+=back
+
+=item * C<$PARSE_DATE_ONLY_US_SHORT_RE>
+
+Match dates like C<2014, Feb 17>
+
+=item * C<$PARSE_DATE_ONLY_EU_SHORT_RE>
+
+Match dates like C<17 Feb, 2014>
+
+=item * C<$PARSE_DATE_ONLY_US_LONG_RE>
+
+Match dates like C<February 17, 2009>
+
+=item * C<$PARSE_DATE_ONLY_EU_LONG_RE>
+
+Match dates like C<15 July 2021>
+
+=item * C<$PARSE_DATE_DOTTED_ONLY_EU_RE>
+
+Match dates like:
+
+=over 8
+
+=item * C<22.04.2016>
+
+=item * C<22-04-2016>
+
+=item * C<17. 3. 2018.>
+
+=back
+
+=item * C<$PARSE_DATE_ROMAN_RE>
+
+Match dates like:
+
+=over 8
+
+=item * C<17.III.2020>
+
+=item * C<117. III. 2018.>
+
+=back
+
+=item * C<$PARSE_DATE_DIGITS_ONLY_RE>
+
+Match dates like C<20030613>
+
+=item * C<$PARSE_DATETIME_JP_RE>
+
+Match dates like:
+
+=over 8
+
+=item * C<2021年7月14日>
+
+=item * C<令和3年7月14日>
+
+=item * C<2021年7月14日18時7分10秒>
+
+=item * C<2021年7月14日18時7分>
+
+=item * C<令和3年7月14日18時7分10秒>
+
+=item * C<令和3年7月14日18時7分>
+
+=back
+
+=item * C<$PARSE_DATE_TIMESTAMP_RE>
+
+Match dates like C<1751538797> which is an epoch value,
+
+=item * C<$PARSE_DATETIME_RELATIVE_RE>
+
+Match relative dates like:
+
+=over 8
+
+=item * C<+3Y>, C<+3y>, C<+3M>, C<+3D>, C<+3d>, C<+3h>, C<+3m>, C<+3s>
+
+=item * C<3Y>, C<3y>, C<3M>, C<3D>, C<3d>, C<3h>, C<3m>, C<3s>
+
+=item * C<-3Y>, C<-3y>, C<-3M>, C<-3D>, C<-3d>, C<-3h>, C<-3m>, C<-3s>
+
+=back
+
+=item * C<$PARSE_DATES_ALL_RE>
+
+This is a regular expression that combines all of the above.
+
+=back
+
 =head2 _get_symbol
 
     my $obj = My::Class->new;
     my $sym = $obj->_get_symbol( '$VERSION' );
     my $sym = $obj->_get_symbol( 'Other::Class' => '$VERSION' );
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 This returns the symbol for the given variable in the current package, or, if a package is explicitly specified, in that package.
 
@@ -14943,6 +15449,10 @@ This is set to 1 so this very method is not included in the frames stack
 
 =head2 _has_base64
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with a value and this returns an array reference containing 2 code references: one for encoding and one for decoding.
 
 Value provided can be a simple true value, such as C<1>, and then C<_has_base64> will check if L<Crypt::Misc> and L<MIME::Base64> are installed on the system and will use in priority L<MIME::Base64>
@@ -14957,6 +15467,10 @@ Finally, the value provided can be a module class name. C<_has_base64> knows onl
     my $bool = $obj->_has_symbol( '$VERSION' );
     my $bool = $obj->_has_symbol( 'Other::Class' => '$VERSION' );
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 This returns true (1) if the specified variable exists in the current package, or, if a package is explicitly specified, in that package. It returns false (0) if the package does not have that variable.
 
 Variables can be C<scalar> with C<$>, C<array> with C<@>, C<hash> with C<%>, or C<code> with C<&>
@@ -14965,11 +15479,19 @@ If an error occurs, it sets an L<error object|Module::Generic::Exception> and re
 
 =head2 _implement_freeze_thaw
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with a list of package names and this method will implement in each of them the subroutines necessary to handle L<Storable::Improved> (or the legacy L<Storable>), L<CBOR|CBOR::XS> and L<Sereal> serialisation.
 
 In effect, it will check that the subroutines C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw> exists or sets up simple ones if they are not defined.
 
 This works for packages that use hash-based objects. However, you need to make sure there is no specific package requirements, and if there is, you might need to customise those subroutines by yourself.
+
+=head2 _instantiate_object
+
+This does the same thing as L</"__instantiate_object"> and the purpose is for this method to be potentially superseded in your own module. In your own module, you would call L</"__instantiate_object">
 
 =head2 _is_a
 
@@ -14990,6 +15512,10 @@ Of course, if you are sure the object is actually an object, then you can direct
     }
 
 =head2 _is_array
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Provided with some data, this checks if the data is of type array, even if it is an object.
 
@@ -15044,9 +15570,17 @@ If you are running under mod_perl, this method will use L<Apache2::Module/loaded
 
 =head2 _is_code
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with some value, possibly, undefined, and this returns true if it is a C<CODE>, such as a subroutine reference or an anonymous subroutine, or false otherwise.
 
 =head2 _is_empty
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 This checks if a value was provided, and if it is defined, or if it has a positive length, or is a scalar object that has the method C<defined>, which returns false.
 
@@ -15054,13 +15588,21 @@ Based on those checks, it returns true (1) if it appears the value is undefined 
 
 =head2 _is_glob
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with some value, possibly, undefined, and this returns true if it is a filehandle, or false otherwise.
 
 =head2 _is_hash
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Same as L</"_is_array">, but for hash reference.
 
-You can pass also the additional argument C<strict>, in which case, this will apply only to non-objects.
+You can pass also the additional argument C<strict> or alternatively C<native>, in which case, this will apply only to non-objects.
 
 For example:
 
@@ -15070,8 +15612,14 @@ For example:
     say $this->_is_hash( $obj ); # true
     # but...
     say $this->_is_hash( $obj => 'strict' ); # false
+    # or, alternatively
+    say $this->_is_hash( $obj => 'native' ); # false
 
 =head2 _is_integer
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Returns true if the value provided is an integer, or false otherwise. A valid value includes an integer starting with C<+> or C<->
 
@@ -15081,21 +15629,41 @@ Returns true if the given IP has a syntax compliant with IPv4 or IPv6 including 
 
 =head2 _is_number
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Returns true if the provided value looks like a number, false otherwise.
 
 =head2 _is_object
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Provided with some data, this checks if the data is an object. It uses L<Scalar::Util/"blessed"> to achieve that purpose.
 
 =head2 _is_overloaded
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with some value, presumably an object, and this will return true if it is overloaded in some way, or false if it is not.
 
 =head2 _is_scalar
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Provided with some data, this checks if the data is of type scalar reference, e.g. C<SCALAR(0x7fc0d3b7cea0)>, even if it is an object.
 
 =head2 _is_tty
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Returns true if the program is attached to a tty (terminal), meaning that it is run interactively, or false otherwise, such as when its output is piped.
 
@@ -15115,6 +15683,10 @@ An empty string or C<undef> can be provided and will not be checked.
 
     say $obj->_is_version( $vers ) ? "ok" : "not ok"; # ok
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 This takes a string, and checks if it looks like a version number based on a regular expression taken from L<Changes::Version>
 
 Returns true (C<1>) upon success or false C<0> if the string does not look like a version number.
@@ -15127,6 +15699,10 @@ Returns true (C<1>) upon success or false C<0> if the string does not look like 
     # possible types are: scalar, array, hash and code
     # specify a type to get only the symbols of that type
     my @symbols = $obj->_list_symbols( 'My::Class' => 'scalar' );
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 This returns a list of all the symbols for the current package, or, if a package is explicitly specified, from that package.
 
@@ -15172,6 +15748,38 @@ This is the equivalent of doing:
 The minimum version for this class to load. This value is passed directly to L<perlfunc/use>
 
 =back
+
+=head2 _looks_like_path
+
+    my $bool = $self->_looks_like_path( $value );
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
+Returns true if the supplied scalar looks like a filesystem path.
+
+This is a conservative heuristic used to distinguish likely path values from ordinary strings.
+
+It rejects undefined values, references, strings containing control characters, URL-like strings, non-file URI schemes such as C<mailto:>, and simple email-like strings.
+
+It recognises common path forms such as Windows drive paths, UNC paths, home expansion paths, relative paths, strings containing directory separators, and simple filenames with an extension.
+
+This method does not check whether the path exists on disk.
+
+=head2 _refaddr
+
+    my $addr = $self->_refaddr( $ref );
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
+Returns the internal reference address of the supplied reference.
+
+This is a thin wrapper around C<Scalar::Util::refaddr>, and is currently implemented in XS when available.
+
+If no value is provided, or if the supplied value is undefined, this returns C<undef>.
 
 =head3 THREAD SAFETY WARNING
 
@@ -15231,9 +15839,17 @@ As of version C<0.29.6>, this is an alias for L</_set_get_callback>, which provi
 
 =head2 _obj2h
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 This ensures the module object is an hash reference, such as when the module object is based on a file handle for example. This permits L<Module::Generic> to work no matter what is the underlying data type blessed into an object.
 
 =head2 _on_error
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Sets or gets a code reference, acting as a callback that will be triggered upon call to L</error> or L</pass_error> with an error.
 
@@ -15242,6 +15858,10 @@ Sets or gets a code reference, acting as a callback that will be triggered upon 
     return( $self->pass_error( $another_error_object ) ) if( $something_bad_happened );
 
 =head2 _parse_timestamp
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Provided with a string representing a date or datetime, and this will try to parse it and return a L<DateTime::Lite> object. It will also create a L<DateTime::Format::Lite> to preserve the original date/datetime string representation and assign it to the L<DateTime::Lite> object. So when the L<DateTime::Lite> object is stringified, it displays the same string that was originally parsed.
 
@@ -15880,6 +16500,10 @@ And this would store an array reference containing 2 objects with the above data
 
 =head2 _set_get_class_array_object
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 Same as L</_set_get_class_array>, but this returns an L<array object|Module::Generic::Array> instead of just a perl array.
 
 When called in list context, it will return its values as a list, otherwise it will return an L<array object|Module::Generic::Array>
@@ -15958,7 +16582,11 @@ or
         tz => 'UTC',
     }, @_ ) ); }
 
-Provided with an object property name and asome date or datetime string and this will attempt to parse it and save it as a L<DateTime::Lite> object.
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
+Provided with an instance property name and some date or datetime string and this will attempt to parse it and save it as a L<DateTime::Lite> object. Of course, if a L<DateTime::Lite> or L<DateTime> object is already provided, it will be re-used.
 
 If the data is a 10 digits integer, this will treat it as a unix timestamp.
 
@@ -15971,6 +16599,8 @@ Even if there is no value set, and this method is called in chain, it returns a 
     $object->created->iso8601
 
 Of course, the value of C<iso8601> will be empty since this is a fake method produced by L<Module::Generic::Null>. The return value of a method should always be checked.
+
+If the option C<prefer_dt_lite> was provided, this will convert the L<DateTim> object passed to a L<DateTime::Lite> object.
 
 Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
 
@@ -16000,6 +16630,10 @@ The object property name
 
 An optional format that will be used to create a L<DateTime::Format::Lite> that will be attached to the L<DateTime::Lite> object.
 
+=item * C<prefer_dt_lite>
+
+Converts the L<DateTime> object provided to a L<DateTime::Lite> object.
+
 =item * C<tz>
 
 A string representing the time zone for the the datetime.
@@ -16026,6 +16660,10 @@ A string representing the time zone for the the datetime.
             },
         },
     }, @_ ) ); }
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 This support method handles C<enum> values, i.e. a list of allowed values that can be set.
 
@@ -16277,6 +16915,10 @@ The object property name
 =back
 
 =head2 _set_get_hash_as_object
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
 
 Provided with an object property name, an optional class name and an hash reference and this does the same as in L</"_set_get_hash">, except it will create a class/package dynamically with a method for each of the hash keys, so that you can call the hash keys as method.
 
@@ -17262,6 +17904,10 @@ When called in get mode, it will convert any value pre-set, if any, into a versi
         value => $a_code_reference,
     );
 
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
 This method is used to dynamically add a new symbol to a given class, a.k.a. package. A proper symbol type can only be an array reference, an hash reference, a scalar, a code reference, or a glob. This is useful for metaprogramming or creating dynamically extensible APIs.
 
 This takes the following options:
@@ -17399,6 +18045,134 @@ This takes a value, possibly an object, especially one that stringifies, and it 
 This does the same thing as C<overload::StrVal>, expect it handles undefined value, and is called on your class object.
 
 If the value provided is C<undef>, or if no value was provided at all, this will simply return an empty string C<''>. This is designed so perl will not warn of undefined value being used.
+
+=head2 _subinfo
+
+    my $name = $self->_subinfo;
+
+    # __SUB__ is available only from perl v5.16.0
+    my $name = $self->_subinfo( __SUB__ );
+
+    my
+    (
+        $name,
+        $fullname,
+        $package,
+        $file,
+        $line,
+        $is_anon,
+        $is_closure,
+        $is_xsub,
+        $prototype,
+        $info
+    ) = $self->_subinfo( __SUB__ );
+
+This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
+
+This reduces memory footprint when the method is not used.
+
+Returns information about a subroutine.
+
+When called in scalar context, this returns only the short subroutine name.
+
+When called in list context, this returns the following values in order:
+
+=over 4
+
+=item 0. The short subroutine name.
+
+=item 1. The fully-qualified subroutine name.
+
+=item 2. The package (class) where the subroutine is defined.
+
+=item 3. The filename where the subroutine was compiled.
+
+=item 4. The line number where the subroutine starts.
+
+=item 5. A boolean indicating whether the subroutine is anonymous.
+
+=item 6. A boolean indicating whether the subroutine is a closure (captures lexical variables from an outer scope).
+
+=item 7. A boolean indicating whether the subroutine is an XSUB.
+
+=item 8. The subroutine prototype, if any.
+
+=item 9. A hash reference containing all of the above information using named keys.
+
+=back
+
+The returned hash reference contains the following keys:
+
+    {
+        name       => 'foo',
+        fullname   => 'My::Package::foo',
+        class      => 'My::Package',
+        package    => 'My::Package',
+        file       => '/path/to/module.pm',
+        line       => 123,
+        is_anon    => 0,
+        is_closure => 0,
+        is_xsub    => 0,
+        prototype  => '$$',
+    }
+
+This method accepts an optional code reference.
+
+When omitted, the caller subroutine is automatically detected.
+
+For named subroutines, simply calling:
+
+    my $name = $self->_subinfo;
+
+is usually sufficient.
+
+For anonymous subroutines or closures, passing C<__SUB__> is recommended:
+
+    my $info = $self->_subinfo( __SUB__ );
+
+Otherwise the automatic caller detection may identify the enclosing named subroutine instead of the anonymous subroutine currently executing.
+
+An L<error object|Module::Generic::Exception> is set, and C<undef> is returned in scalar context, or an empty list is returned in list context if the supplied argument is not a valid code reference.
+
+This method is implemented entirely in pure Perl using the core module L<B> and supports Perl v5.16.0 and later.
+
+B<Note:>
+
+The C<is_anon> and C<is_closure> flags are independent.
+
+An anonymous subroutine is not necessarily a closure, and a named subroutine may be a closure if it captures lexical variables from an outer scope.
+
+=head2 _subname
+
+    my $name = $self->_subname;
+
+    my $name = $self->_subname( __SUB__ );
+
+Returns the short name of a subroutine.
+
+This is a convenience wrapper around L</_subinfo> that always returns the short subroutine name in scalar context.
+
+If a code reference is provided, information is retrieved for that subroutine:
+
+    my $name = $self->_subname( __SUB__ );
+
+Otherwise, the caller subroutine is automatically detected:
+
+    sub foo
+    {
+        my $name = $self->_subname;   # "foo"
+    }
+
+For anonymous subroutines and closures, passing C<__SUB__> is recommended to ensure the correct subroutine is identified:
+
+    my $closure = sub
+    {
+        my $name = $self->_subname( __SUB__ );
+    };
+
+If the supplied argument is not a valid code reference, an exception is returned.
+
+See L</_subinfo> for the complete list of information available.
 
 =head2 _to_array_object
 

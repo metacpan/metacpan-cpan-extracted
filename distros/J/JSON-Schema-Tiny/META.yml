@@ -3,22 +3,12 @@ abstract: 'Validate data against a schema, minimally'
 author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
-  Data::Dumper: '0'
-  File::Spec: '0'
   List::Util: '1.50'
-  Math::BigInt: '0'
-  Module::Metadata: '0'
-  Mojo::File: '0'
-  Test2::API: '0'
   Test2::V0: '0'
   Test2::Warnings: '0'
   Test::Deep: '0'
   Test::JSON::Schema::Acceptance: '1.026'
-  Test::More: '0'
-  lib: '0'
-  open: '0'
   perl: '5.020'
-  utf8: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
   perl: '5.020'
@@ -45,37 +35,24 @@ no_index:
 provides:
   JSON::Schema::Tiny:
     file: lib/JSON/Schema/Tiny.pm
-    version: '0.033'
+    version: '0.034'
 requires:
-  B: '0'
-  Carp: '0'
-  Exporter: '5.57'
   Feature::Compat::Try: '0'
-  JSON::PP: '0'
-  Math::BigFloat: '0'
-  Mojo::JSON: '0'
-  Mojo::JSON::Pointer: '0'
-  Mojo::URL: '0'
   Mojolicious: '7.23'
-  Scalar::Util: '0'
   autovivification: '0'
   builtin::compat: '0.003003'
-  constant: '0'
   experimental: '0.026'
   if: '0'
-  namespace::clean: '0'
   perl: '5.020'
   stable: '0.031'
-  strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Tiny/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Tiny
   repository: https://github.com/karenetheridge/JSON-Schema-Tiny.git
-version: '0.033'
+version: '0.034'
 x_Dist_Zilla:
   perl:
-    version: '5.043010'
+    version: '5.044000'
   plugins:
     -
       class: inc::CheckConflicts
@@ -311,6 +288,14 @@ x_Dist_Zilla:
             - ':PerlExecFiles'
           plugins:
             -
+              class: Pod::Weaver::Section::GenerateSection
+              name: SUPPORT
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: VERSION
+              version: '4.020'
+            -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@Author::ETHER/EnsurePod5'
               version: '4.020'
@@ -411,9 +396,13 @@ x_Dist_Zilla:
               name: '@Author::ETHER/footer'
               version: '4.020'
             -
-              class: Pod::Weaver::Section::AllowOverride
-              name: 'append to SUPPORT'
-              version: '0.05'
+              class: inc::AppendSection
+              name: AppendSupport
+              version: ~
+            -
+              class: inc::AppendSection
+              name: AppendVersion
+              version: ~
       name: '@Author::ETHER/PodWeaver'
       version: '4.010'
     -
@@ -569,7 +558,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20260420'
+          Module::CoreList: '5.20260722'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -733,7 +722,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.033
+          tag: v0.034
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -866,6 +855,38 @@ x_Dist_Zilla:
       name: DevelopRequires
       version: '6.037'
     -
+      class: Dist::Zilla::Plugin::RemovePrereqs
+      config:
+        Dist::Zilla::Plugin::RemovePrereqs:
+          modules_to_remove:
+            - B
+            - Carp
+            - Data::Dumper
+            - Encode
+            - Exporter
+            - File::Spec
+            - IO::Handle
+            - IPC::Open3
+            - JSON::PP
+            - Math::BigFloat
+            - Math::BigInt
+            - Module::Metadata
+            - Mojo::File
+            - Mojo::JSON
+            - Mojo::JSON::Pointer
+            - Mojo::URL
+            - Scalar::Util
+            - Test2::API
+            - Test::More
+            - constant
+            - lib
+            - open
+            - strict
+            - utf8
+            - warnings
+      name: RemovePrereqs
+      version: '6.037'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
       version: '6.037'
@@ -917,7 +938,7 @@ x_Dist_Zilla:
 x_authority: cpan:ETHER
 x_contributors:
   - 'Matt S Trout <mst@shadowcat.co.uk>'
-x_generated_by_perl: v5.43.10
+x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

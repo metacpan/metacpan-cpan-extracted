@@ -2,7 +2,7 @@ use v5.28;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::Mountable 1.10;
+class Archive::SCS::Mountable 1.11;
 
 
 sub handles_path ($class, $path, $header) {

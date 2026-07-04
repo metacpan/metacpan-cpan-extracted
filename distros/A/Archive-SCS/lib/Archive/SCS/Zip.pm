@@ -2,7 +2,7 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::Zip 1.10
+class Archive::SCS::Zip 1.11
   :isa( Archive::SCS::Mountable );
 
 use builtin::compat qw( blessed true );
@@ -11,7 +11,7 @@ use stable 0.031 'isa';
 use Archive::SCS::CityHash 'cityhash64';
 use Archive::SCS::DirIndex;
 use Carp 'croak';
-use IO::Compress::Zip qw( :constants $ZipError );
+use IO::Compress::Zip qw( :constants :zip_method $ZipError );
 use IO::Uncompress::Unzip qw( $UnzipError );
 use Path::Tiny 0.054 ();
 

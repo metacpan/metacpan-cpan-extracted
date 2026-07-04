@@ -914,6 +914,9 @@ _is_hash( self, ... )
     SV* self
   PREINIT:
     SV* rv;
+    int strict;
+    STRLEN len;
+    const char* opt;
   CODE:
     {
         SV* val = mg_get_sv_arg( 1, items, &ST(0) );
@@ -928,15 +931,23 @@ _is_hash( self, ... )
             {
                 RETVAL = 0;
             }
-            else if( items > 2 && SvOK( ST(2) ) )
-            {
-                /* strict mode: mirrors ref($val) eq 'HASH'; unblessed only */
-                RETVAL = SvOBJECT( rv ) ? 0 : 1;
-            }
             else
             {
-                /* non-strict: mirrors reftype($val) eq 'HASH'; blessed or unblessed */
-                RETVAL = 1;
+                /* Strict mode is requested only when the option is the string
+                   'strict' or its alias 'native', mirroring ref($val) eq 'HASH'
+                   (unblessed only). Any other value, or no option at all, falls back
+                   to reftype($val) eq 'HASH' (blessed or unblessed). Both keywords are
+                   six bytes, so the length is checked first to avoid a needless compare. */
+                strict = 0;
+                if( items > 2 && SvOK( ST(2) ) )
+                {
+                    opt = SvPV( ST(2), len );
+                    if( len == 6 && ( memEQ( opt, "strict", 6 ) || memEQ( opt, "native", 6 ) ) )
+                    {
+                        strict = 1;
+                    }
+                }
+                RETVAL = strict ? ( SvOBJECT( rv ) ? 0 : 1 ) : 1;
             }
         }
     }

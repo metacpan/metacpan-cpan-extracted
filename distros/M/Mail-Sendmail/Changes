@@ -1,5 +1,13 @@
 Revision history for Perl module Mail::Sendmail
 
+0.83 2026-07-04 NEILB
+    - strip CR/LF from header values, to prevent insertion of rogue headers.
+      Deals with issue in CVE-2026-13092. Pull request from Olaf Alders++.
+    - Tried using [PkgVersion] so $VERSION would be auto managed, but
+      caused issues testing as the code expects $VERSION to be there pre-build.
+    - switched to a new test Sendmail server for t/original.t, as the old
+      one was no longer accepting connections.
+
 0.82 2025-07-14 NEILB
     - Improvement from Pete Houston to use Sys::Hostname::Long
 

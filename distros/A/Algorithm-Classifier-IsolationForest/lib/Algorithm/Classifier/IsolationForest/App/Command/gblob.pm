@@ -98,7 +98,7 @@ sub execute {
 			my @feats = map { $_ / $norm * $radius } @raw;
 			$data = $data . join( ',', @feats ) . ",1\n";
 		}
-	}
+	} ## end if ( $opt->{'a'} >= 1 )
 
 	if ( $opt->{'p'} ) {
 		print $data;

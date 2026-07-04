@@ -8,7 +8,7 @@ use Text::ParseWords;
 use Try::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 has 'rules' => ( is => 'rw', isa => 'ArrayRef' );
 

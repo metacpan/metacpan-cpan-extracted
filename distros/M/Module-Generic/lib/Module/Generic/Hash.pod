@@ -308,7 +308,7 @@ Returns true if the hash object contains no data, or false otherwise.
 
 This returns a L<JSON> representation of the hash. You can provided optionally an hash reference of parameters.
 
-All parameters supported by L</JSON> can be used here.
+All parameters supported by C<JSON> can be used here.
 
 For example:
 
@@ -541,7 +541,7 @@ Methods like L</json> use L<JSON>, L</clone> uses L<Clone>, and L</dump> uses L<
 
 =item * B<Serialisation>
 
-Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe:
+Serialisation methods (C<FREEZE>, C<THAW>) operate on per-object state, making them thread-safe:
 
     use threads;
     use Storable;

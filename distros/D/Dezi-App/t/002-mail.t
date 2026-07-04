@@ -10,7 +10,7 @@ use Data::Dump qw( dump );
 use_ok('Dezi::Test::Indexer');
 use_ok('Dezi::Test::Searcher');
 
-my $num_tests = 4;
+my $num_tests = 5;
 
 SKIP: {
 

@@ -25,9 +25,11 @@ my $status = Travel::Status::DE::IRIS->new(
 
 my @results = $status->results;
 
-my $re2_a  = $results[13];
+my $re2_a = $results[13];
 
-is($re2_a->train_no, '30030', 'transfer RE2: train_no is new no');
-is($re2_a->old_train_no, '10230', 'transfer RE2: old_train_no is old no');
-is($re2_a->train_id, '7760830705227608221', 'transfer RE2: train_id is new id');
-is($re2_a->old_train_id, '5716084173145223820', 'transfer RE2: old_train_id is new id');
+is( $re2_a->train_no,     '30030', 'transfer RE2: train_no is new no' );
+is( $re2_a->old_train_no, '10230', 'transfer RE2: old_train_no is old no' );
+is( $re2_a->train_id, '7760830705227608221',
+	'transfer RE2: train_id is new id' );
+is( $re2_a->old_train_id, '5716084173145223820',
+	'transfer RE2: old_train_id is new id' );

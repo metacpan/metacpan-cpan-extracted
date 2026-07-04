@@ -1,0 +1,5498 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+B<OpenSearch::Client::Manual::Paths>
+
+=head1 VERSION
+
+version 3.007002
+
+=head1 DESCRIPTION
+
+Find the methods in OpenSearch::Client associated with paths contained in the OpenSearch documentation.
+
+=head1 PATHS
+
+=head2 HEAD
+ 
+=head3 /
+
+C<HEAD />
+
+C<$client-E<gt>ping>
+ 
+=head3 /_alias/{name}
+
+C<HEAD /_alias/{name}>
+  
+C<$client-E<gt>indices-E<gt>exists_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_component_template/{name}
+
+C<HEAD /_component_template/{name}>
+  
+C<$client-E<gt>cluster-E<gt>exists_component_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_index_template/{name}
+
+C<HEAD /_index_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>exists_index_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_plugins/_ism/policies/{policy_id}
+
+C<HEAD /_plugins/_ism/policies/{policy_id}>
+  
+C<$client-E<gt>ism-E<gt>exists_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_template/{name}
+
+C<HEAD /_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>exists_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}
+
+C<HEAD /{index}>
+  
+C<$client-E<gt>indices-E<gt>exists>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_alias/{name}
+
+C<HEAD /{index}/_alias/{name}>
+  
+C<$client-E<gt>indices-E<gt>exists_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_doc/{id}
+
+C<HEAD /{index}/_doc/{id}>
+
+C<$client-E<gt>exists>
+ 
+=head3 /{index}/_source/{id}
+
+C<HEAD /{index}/_source/{id}>
+
+C<$client-E<gt>exists_source>
+
+=head2 GET
+ 
+=head3 /
+
+C<GET />
+
+C<$client-E<gt>info>
+ 
+=head3 /_alias
+
+C<GET /_alias>
+  
+C<$client-E<gt>indices-E<gt>get_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_alias/{name}
+
+C<GET /_alias/{name}>
+  
+C<$client-E<gt>indices-E<gt>get_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_analyze
+
+C<GET /_analyze>
+  
+C<$client-E<gt>indices-E<gt>analyze>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_cat
+
+C<GET /_cat>
+  
+C<$client-E<gt>cat-E<gt>help>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/aliases
+
+C<GET /_cat/aliases>
+  
+C<$client-E<gt>cat-E<gt>aliases>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/aliases/{name}
+
+C<GET /_cat/aliases/{name}>
+  
+C<$client-E<gt>cat-E<gt>aliases>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/allocation
+
+C<GET /_cat/allocation>
+  
+C<$client-E<gt>cat-E<gt>allocation>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/allocation/{node_id}
+
+C<GET /_cat/allocation/{node_id}>
+  
+C<$client-E<gt>cat-E<gt>allocation>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/cluster_manager
+
+C<GET /_cat/cluster_manager>
+  
+C<$client-E<gt>cat-E<gt>cluster_manager>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/count
+
+C<GET /_cat/count>
+  
+C<$client-E<gt>cat-E<gt>count>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/count/{index}
+
+C<GET /_cat/count/{index}>
+  
+C<$client-E<gt>cat-E<gt>count>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/fielddata
+
+C<GET /_cat/fielddata>
+  
+C<$client-E<gt>cat-E<gt>fielddata>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/fielddata/{fields}
+
+C<GET /_cat/fielddata/{fields}>
+  
+C<$client-E<gt>cat-E<gt>fielddata>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/health
+
+C<GET /_cat/health>
+  
+C<$client-E<gt>cat-E<gt>health>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/indices
+
+C<GET /_cat/indices>
+  
+C<$client-E<gt>cat-E<gt>indices>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/indices/{index}
+
+C<GET /_cat/indices/{index}>
+  
+C<$client-E<gt>cat-E<gt>indices>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/master
+
+C<GET /_cat/master>
+  
+C<$client-E<gt>cat-E<gt>master>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/nodeattrs
+
+C<GET /_cat/nodeattrs>
+  
+C<$client-E<gt>cat-E<gt>nodeattrs>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/nodes
+
+C<GET /_cat/nodes>
+  
+C<$client-E<gt>cat-E<gt>nodes>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/pending_tasks
+
+C<GET /_cat/pending_tasks>
+  
+C<$client-E<gt>cat-E<gt>pending_tasks>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/pit_segments
+
+C<GET /_cat/pit_segments>
+  
+C<$client-E<gt>cat-E<gt>pit_segments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/pit_segments/_all
+
+C<GET /_cat/pit_segments/_all>
+  
+C<$client-E<gt>cat-E<gt>all_pit_segments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/plugins
+
+C<GET /_cat/plugins>
+  
+C<$client-E<gt>cat-E<gt>plugins>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/recovery
+
+C<GET /_cat/recovery>
+  
+C<$client-E<gt>cat-E<gt>recovery>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/recovery/{index}
+
+C<GET /_cat/recovery/{index}>
+  
+C<$client-E<gt>cat-E<gt>recovery>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/repositories
+
+C<GET /_cat/repositories>
+  
+C<$client-E<gt>cat-E<gt>repositories>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/segment_replication
+
+C<GET /_cat/segment_replication>
+  
+C<$client-E<gt>cat-E<gt>segment_replication>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/segment_replication/{index}
+
+C<GET /_cat/segment_replication/{index}>
+  
+C<$client-E<gt>cat-E<gt>segment_replication>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/segments
+
+C<GET /_cat/segments>
+  
+C<$client-E<gt>cat-E<gt>segments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/segments/{index}
+
+C<GET /_cat/segments/{index}>
+  
+C<$client-E<gt>cat-E<gt>segments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/shards
+
+C<GET /_cat/shards>
+  
+C<$client-E<gt>cat-E<gt>shards>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/shards/{index}
+
+C<GET /_cat/shards/{index}>
+  
+C<$client-E<gt>cat-E<gt>shards>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/snapshots
+
+C<GET /_cat/snapshots>
+  
+C<$client-E<gt>cat-E<gt>snapshots>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/snapshots/{repository}
+
+C<GET /_cat/snapshots/{repository}>
+  
+C<$client-E<gt>cat-E<gt>snapshots>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/tasks
+
+C<GET /_cat/tasks>
+  
+C<$client-E<gt>cat-E<gt>tasks>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/templates
+
+C<GET /_cat/templates>
+  
+C<$client-E<gt>cat-E<gt>templates>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/templates/{name}
+
+C<GET /_cat/templates/{name}>
+  
+C<$client-E<gt>cat-E<gt>templates>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/thread_pool
+
+C<GET /_cat/thread_pool>
+  
+C<$client-E<gt>cat-E<gt>thread_pool>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cat/thread_pool/{thread_pool_patterns}
+
+C<GET /_cat/thread_pool/{thread_pool_patterns}>
+  
+C<$client-E<gt>cat-E<gt>thread_pool>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cat>
+ 
+=head3 /_cluster/allocation/explain
+
+C<GET /_cluster/allocation/explain>
+  
+C<$client-E<gt>cluster-E<gt>allocation_explain>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/decommission/awareness/{awareness_attribute_name}/_status
+
+C<GET /_cluster/decommission/awareness/{awareness_attribute_name}/_status>
+  
+C<$client-E<gt>cluster-E<gt>get_decommission_awareness>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/health
+
+C<GET /_cluster/health>
+  
+C<$client-E<gt>cluster-E<gt>health>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/health/{index}
+
+C<GET /_cluster/health/{index}>
+  
+C<$client-E<gt>cluster-E<gt>health>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/pending_tasks
+
+C<GET /_cluster/pending_tasks>
+  
+C<$client-E<gt>cluster-E<gt>pending_tasks>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/routing/awareness/{attribute}/weights
+
+C<GET /_cluster/routing/awareness/{attribute}/weights>
+  
+C<$client-E<gt>cluster-E<gt>get_weighted_routing>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/settings
+
+C<GET /_cluster/settings>
+  
+C<$client-E<gt>cluster-E<gt>get_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/state
+
+C<GET /_cluster/state>
+  
+C<$client-E<gt>cluster-E<gt>state>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/state/{metric}
+
+C<GET /_cluster/state/{metric}>
+  
+C<$client-E<gt>cluster-E<gt>state>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/state/{metric}/{index}
+
+C<GET /_cluster/state/{metric}/{index}>
+  
+C<$client-E<gt>cluster-E<gt>state>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/stats
+
+C<GET /_cluster/stats>
+  
+C<$client-E<gt>cluster-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/stats/nodes/{node_id}
+
+C<GET /_cluster/stats/nodes/{node_id}>
+  
+C<$client-E<gt>cluster-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/stats/{metric}/nodes/{node_id}
+
+C<GET /_cluster/stats/{metric}/nodes/{node_id}>
+  
+C<$client-E<gt>cluster-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/stats/{metric}/{index_metric}/nodes/{node_id}
+
+C<GET /_cluster/stats/{metric}/{index_metric}/nodes/{node_id}>
+  
+C<$client-E<gt>cluster-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_component_template
+
+C<GET /_component_template>
+  
+C<$client-E<gt>cluster-E<gt>get_component_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_component_template/{name}
+
+C<GET /_component_template/{name}>
+  
+C<$client-E<gt>cluster-E<gt>get_component_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_count
+
+C<GET /_count>
+
+C<$client-E<gt>count>
+ 
+=head3 /_dangling
+
+C<GET /_dangling>
+  
+C<$client-E<gt>dangling_indices-E<gt>list_dangling_indices>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::DanglingIndices>
+ 
+=head3 /_data_stream
+
+C<GET /_data_stream>
+  
+C<$client-E<gt>indices-E<gt>get_data_stream>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_data_stream/_stats
+
+C<GET /_data_stream/_stats>
+  
+C<$client-E<gt>indices-E<gt>data_streams_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_data_stream/{name}
+
+C<GET /_data_stream/{name}>
+  
+C<$client-E<gt>indices-E<gt>get_data_stream>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_data_stream/{name}/_stats
+
+C<GET /_data_stream/{name}/_stats>
+  
+C<$client-E<gt>indices-E<gt>data_streams_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_field_caps
+
+C<GET /_field_caps>
+
+C<$client-E<gt>field_caps>
+ 
+=head3 /_flush
+
+C<GET /_flush>
+  
+C<$client-E<gt>indices-E<gt>flush>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_index_template
+
+C<GET /_index_template>
+  
+C<$client-E<gt>indices-E<gt>get_index_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_index_template/{name}
+
+C<GET /_index_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>get_index_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_ingest/pipeline
+
+C<GET /_ingest/pipeline>
+  
+C<$client-E<gt>ingest-E<gt>get_pipeline>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingest>
+ 
+=head3 /_ingest/pipeline/_simulate
+
+C<GET /_ingest/pipeline/_simulate>
+  
+C<$client-E<gt>ingest-E<gt>simulate>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingest>
+ 
+=head3 /_ingest/pipeline/{id}
+
+C<GET /_ingest/pipeline/{id}>
+  
+C<$client-E<gt>ingest-E<gt>get_pipeline>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingest>
+ 
+=head3 /_ingest/pipeline/{id}/_simulate
+
+C<GET /_ingest/pipeline/{id}/_simulate>
+  
+C<$client-E<gt>ingest-E<gt>simulate>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingest>
+ 
+=head3 /_ingest/processor/grok
+
+C<GET /_ingest/processor/grok>
+  
+C<$client-E<gt>ingest-E<gt>processor_grok>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingest>
+ 
+=head3 /_insights/top_queries
+
+C<GET /_insights/top_queries>
+  
+C<$client-E<gt>insights-E<gt>top_queries>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Insights>
+ 
+=head3 /_list
+
+C<GET /_list>
+  
+C<$client-E<gt>list-E<gt>help>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::List>
+ 
+=head3 /_list/indices
+
+C<GET /_list/indices>
+  
+C<$client-E<gt>list-E<gt>indices>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::List>
+ 
+=head3 /_list/indices/{index}
+
+C<GET /_list/indices/{index}>
+  
+C<$client-E<gt>list-E<gt>indices>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::List>
+ 
+=head3 /_list/shards
+
+C<GET /_list/shards>
+  
+C<$client-E<gt>list-E<gt>shards>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::List>
+ 
+=head3 /_list/shards/{index}
+
+C<GET /_list/shards/{index}>
+  
+C<$client-E<gt>list-E<gt>shards>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::List>
+ 
+=head3 /_ltr
+
+C<GET /_ltr>
+  
+C<$client-E<gt>ltr-E<gt>list_stores>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_cachestats
+
+C<GET /_ltr/_cachestats>
+  
+C<$client-E<gt>ltr-E<gt>cache_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_feature
+
+C<GET /_ltr/_feature>
+  
+C<$client-E<gt>ltr-E<gt>search_features>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_feature/{id}
+
+C<GET /_ltr/_feature/{id}>
+  
+C<$client-E<gt>ltr-E<gt>get_feature>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_featureset
+
+C<GET /_ltr/_featureset>
+  
+C<$client-E<gt>ltr-E<gt>search_featuresets>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_featureset/{id}
+
+C<GET /_ltr/_featureset/{id}>
+  
+C<$client-E<gt>ltr-E<gt>get_featureset>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_model
+
+C<GET /_ltr/_model>
+  
+C<$client-E<gt>ltr-E<gt>search_models>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_model/{id}
+
+C<GET /_ltr/_model/{id}>
+  
+C<$client-E<gt>ltr-E<gt>get_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}
+
+C<GET /_ltr/{store}>
+  
+C<$client-E<gt>ltr-E<gt>get_store>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_feature
+
+C<GET /_ltr/{store}/_feature>
+  
+C<$client-E<gt>ltr-E<gt>search_features>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_feature/{id}
+
+C<GET /_ltr/{store}/_feature/{id}>
+  
+C<$client-E<gt>ltr-E<gt>get_feature>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_featureset
+
+C<GET /_ltr/{store}/_featureset>
+  
+C<$client-E<gt>ltr-E<gt>search_featuresets>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_featureset/{id}
+
+C<GET /_ltr/{store}/_featureset/{id}>
+  
+C<$client-E<gt>ltr-E<gt>get_featureset>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_model
+
+C<GET /_ltr/{store}/_model>
+  
+C<$client-E<gt>ltr-E<gt>search_models>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_model/{id}
+
+C<GET /_ltr/{store}/_model/{id}>
+  
+C<$client-E<gt>ltr-E<gt>get_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_mapping
+
+C<GET /_mapping>
+  
+C<$client-E<gt>indices-E<gt>get_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_mapping/field/{fields}
+
+C<GET /_mapping/field/{fields}>
+  
+C<$client-E<gt>indices-E<gt>get_field_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_mget
+
+C<GET /_mget>
+
+C<$client-E<gt>mget>
+ 
+=head3 /_msearch
+
+C<GET /_msearch>
+
+C<$client-E<gt>msearch>
+ 
+=head3 /_msearch/template
+
+C<GET /_msearch/template>
+
+C<$client-E<gt>msearch_template>
+ 
+=head3 /_mtermvectors
+
+C<GET /_mtermvectors>
+
+C<$client-E<gt>mtermvectors>
+ 
+=head3 /_nodes
+
+C<GET /_nodes>
+  
+C<$client-E<gt>nodes-E<gt>info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/hot_threads
+
+C<GET /_nodes/hot_threads>
+  
+C<$client-E<gt>nodes-E<gt>hot_threads>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/stats
+
+C<GET /_nodes/stats>
+  
+C<$client-E<gt>nodes-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/stats/{metric}
+
+C<GET /_nodes/stats/{metric}>
+  
+C<$client-E<gt>nodes-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/stats/{metric}/{index_metric}
+
+C<GET /_nodes/stats/{metric}/{index_metric}>
+  
+C<$client-E<gt>nodes-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/usage
+
+C<GET /_nodes/usage>
+  
+C<$client-E<gt>nodes-E<gt>usage>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/usage/{metric}
+
+C<GET /_nodes/usage/{metric}>
+  
+C<$client-E<gt>nodes-E<gt>usage>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{metric}
+
+C<GET /_nodes/{metric}>
+  
+C<$client-E<gt>nodes-E<gt>info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id_or_metric}
+
+C<GET /_nodes/{node_id_or_metric}>
+  
+C<$client-E<gt>nodes-E<gt>info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id}
+
+C<GET /_nodes/{node_id}>
+  
+C<$client-E<gt>nodes-E<gt>info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id}/hot_threads
+
+C<GET /_nodes/{node_id}/hot_threads>
+  
+C<$client-E<gt>nodes-E<gt>hot_threads>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id}/stats
+
+C<GET /_nodes/{node_id}/stats>
+  
+C<$client-E<gt>nodes-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id}/stats/{metric}
+
+C<GET /_nodes/{node_id}/stats/{metric}>
+  
+C<$client-E<gt>nodes-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id}/stats/{metric}/{index_metric}
+
+C<GET /_nodes/{node_id}/stats/{metric}/{index_metric}>
+  
+C<$client-E<gt>nodes-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id}/usage
+
+C<GET /_nodes/{node_id}/usage>
+  
+C<$client-E<gt>nodes-E<gt>usage>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id}/usage/{metric}
+
+C<GET /_nodes/{node_id}/usage/{metric}>
+  
+C<$client-E<gt>nodes-E<gt>usage>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id}/{metric}
+
+C<GET /_nodes/{node_id}/{metric}>
+  
+C<$client-E<gt>nodes-E<gt>info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_opendistro/_security/sslinfo
+
+C<GET /_opendistro/_security/sslinfo>
+  
+C<$client-E<gt>security-E<gt>get_sslinfo>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_asynchronous_search/stats
+
+C<GET /_plugins/_asynchronous_search/stats>
+  
+C<$client-E<gt>asynchronous_search-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::AsyncSearch>
+ 
+=head3 /_plugins/_asynchronous_search/{id}
+
+C<GET /_plugins/_asynchronous_search/{id}>
+  
+C<$client-E<gt>asynchronous_search-E<gt>get>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::AsyncSearch>
+ 
+=head3 /_plugins/_flow_framework/workflow/_search
+
+C<GET /_plugins/_flow_framework/workflow/_search>
+  
+C<$client-E<gt>flow_framework-E<gt>search>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_flow_framework/workflow/_steps
+
+C<GET /_plugins/_flow_framework/workflow/_steps>
+  
+C<$client-E<gt>flow_framework-E<gt>get_steps>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_flow_framework/workflow/state/_search
+
+C<GET /_plugins/_flow_framework/workflow/state/_search>
+  
+C<$client-E<gt>flow_framework-E<gt>search_state>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_flow_framework/workflow/{workflow_id}
+
+C<GET /_plugins/_flow_framework/workflow/{workflow_id}>
+  
+C<$client-E<gt>flow_framework-E<gt>get>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_flow_framework/workflow/{workflow_id}/_status
+
+C<GET /_plugins/_flow_framework/workflow/{workflow_id}/_status>
+  
+C<$client-E<gt>flow_framework-E<gt>get_status>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_ism/explain
+
+C<GET /_plugins/_ism/explain>
+  
+C<$client-E<gt>ism-E<gt>explain_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/explain/{index}
+
+C<GET /_plugins/_ism/explain/{index}>
+  
+C<$client-E<gt>ism-E<gt>explain_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/policies
+
+C<GET /_plugins/_ism/policies>
+  
+C<$client-E<gt>ism-E<gt>get_policies>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/policies/{policy_id}
+
+C<GET /_plugins/_ism/policies/{policy_id}>
+  
+C<$client-E<gt>ism-E<gt>get_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_knn/models/_search
+
+C<GET /_plugins/_knn/models/_search>
+  
+C<$client-E<gt>knn-E<gt>search_models>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_knn/models/{model_id}
+
+C<GET /_plugins/_knn/models/{model_id}>
+  
+C<$client-E<gt>knn-E<gt>get_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_knn/stats
+
+C<GET /_plugins/_knn/stats>
+  
+C<$client-E<gt>knn-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_knn/stats/{stat}
+
+C<GET /_plugins/_knn/stats/{stat}>
+  
+C<$client-E<gt>knn-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_knn/warmup/{index}
+
+C<GET /_plugins/_knn/warmup/{index}>
+  
+C<$client-E<gt>knn-E<gt>warmup>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_knn/{node_id}/stats
+
+C<GET /_plugins/_knn/{node_id}/stats>
+  
+C<$client-E<gt>knn-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_knn/{node_id}/stats/{stat}
+
+C<GET /_plugins/_knn/{node_id}/stats/{stat}>
+  
+C<$client-E<gt>knn-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_ltr/stats
+
+C<GET /_plugins/_ltr/stats>
+  
+C<$client-E<gt>ltr-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_plugins/_ltr/stats/{stat}
+
+C<GET /_plugins/_ltr/stats/{stat}>
+  
+C<$client-E<gt>ltr-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_plugins/_ltr/{node_id}/stats
+
+C<GET /_plugins/_ltr/{node_id}/stats>
+  
+C<$client-E<gt>ltr-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_plugins/_ltr/{node_id}/stats/{stat}
+
+C<GET /_plugins/_ltr/{node_id}/stats/{stat}>
+  
+C<$client-E<gt>ltr-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_plugins/_ml/agents/_search
+
+C<GET /_plugins/_ml/agents/_search>
+  
+C<$client-E<gt>ml-E<gt>search_agents>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/agents/{agent_id}
+
+C<GET /_plugins/_ml/agents/{agent_id}>
+  
+C<$client-E<gt>ml-E<gt>get_agent>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/connectors/_search
+
+C<GET /_plugins/_ml/connectors/_search>
+  
+C<$client-E<gt>ml-E<gt>search_connectors>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/connectors/{connector_id}
+
+C<GET /_plugins/_ml/connectors/{connector_id}>
+  
+C<$client-E<gt>ml-E<gt>get_connector>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/controllers/{model_id}
+
+C<GET /_plugins/_ml/controllers/{model_id}>
+  
+C<$client-E<gt>ml-E<gt>get_controller>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory
+
+C<GET /_plugins/_ml/memory>
+  
+C<$client-E<gt>ml-E<gt>get_all_memories>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/_search
+
+C<GET /_plugins/_ml/memory/_search>
+  
+C<$client-E<gt>ml-E<gt>search_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/message/{message_id}
+
+C<GET /_plugins/_ml/memory/message/{message_id}>
+  
+C<$client-E<gt>ml-E<gt>get_message>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/message/{message_id}/traces
+
+C<GET /_plugins/_ml/memory/message/{message_id}/traces>
+  
+C<$client-E<gt>ml-E<gt>get_message_traces>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/{memory_id}
+
+C<GET /_plugins/_ml/memory/{memory_id}>
+  
+C<$client-E<gt>ml-E<gt>get_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/{memory_id}/_search
+
+C<GET /_plugins/_ml/memory/{memory_id}/_search>
+  
+C<$client-E<gt>ml-E<gt>search_message>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/{memory_id}/messages
+
+C<GET /_plugins/_ml/memory/{memory_id}/messages>
+  
+C<$client-E<gt>ml-E<gt>get_all_messages>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/_search
+
+C<GET /_plugins/_ml/memory_containers/_search>
+  
+C<$client-E<gt>ml-E<gt>search_memory_container>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}
+
+C<GET /_plugins/_ml/memory_containers/{memory_container_id}>
+  
+C<$client-E<gt>ml-E<gt>get_memory_container>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/_search
+
+C<GET /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/_search>
+  
+C<$client-E<gt>ml-E<gt>search_agentic_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}
+
+C<GET /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}>
+  
+C<$client-E<gt>ml-E<gt>get_agentic_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/model_groups/_search
+
+C<GET /_plugins/_ml/model_groups/_search>
+  
+C<$client-E<gt>ml-E<gt>search_model_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/model_groups/{model_group_id}
+
+C<GET /_plugins/_ml/model_groups/{model_group_id}>
+  
+C<$client-E<gt>ml-E<gt>get_model_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/_search
+
+C<GET /_plugins/_ml/models/_search>
+  
+C<$client-E<gt>ml-E<gt>search_models>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}
+
+C<GET /_plugins/_ml/models/{model_id}>
+  
+C<$client-E<gt>ml-E<gt>get_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/profile
+
+C<GET /_plugins/_ml/profile>
+  
+C<$client-E<gt>ml-E<gt>get_profile>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/profile/models
+
+C<GET /_plugins/_ml/profile/models>
+  
+C<$client-E<gt>ml-E<gt>get_profile_models>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/profile/models/{model_id}
+
+C<GET /_plugins/_ml/profile/models/{model_id}>
+  
+C<$client-E<gt>ml-E<gt>get_profile_models>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/profile/tasks
+
+C<GET /_plugins/_ml/profile/tasks>
+  
+C<$client-E<gt>ml-E<gt>get_profile_tasks>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/profile/tasks/{task_id}
+
+C<GET /_plugins/_ml/profile/tasks/{task_id}>
+  
+C<$client-E<gt>ml-E<gt>get_profile_tasks>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/stats
+
+C<GET /_plugins/_ml/stats>
+  
+C<$client-E<gt>ml-E<gt>get_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/stats/{stat}
+
+C<GET /_plugins/_ml/stats/{stat}>
+  
+C<$client-E<gt>ml-E<gt>get_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/tasks/_search
+
+C<GET /_plugins/_ml/tasks/_search>
+  
+C<$client-E<gt>ml-E<gt>search_tasks>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/tasks/{task_id}
+
+C<GET /_plugins/_ml/tasks/{task_id}>
+  
+C<$client-E<gt>ml-E<gt>get_task>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/tools
+
+C<GET /_plugins/_ml/tools>
+  
+C<$client-E<gt>ml-E<gt>get_all_tools>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/tools/{tool_name}
+
+C<GET /_plugins/_ml/tools/{tool_name}>
+  
+C<$client-E<gt>ml-E<gt>get_tool>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/{node_id}/stats
+
+C<GET /_plugins/_ml/{node_id}/stats>
+  
+C<$client-E<gt>ml-E<gt>get_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/{node_id}/stats/{stat}
+
+C<GET /_plugins/_ml/{node_id}/stats/{stat}>
+  
+C<$client-E<gt>ml-E<gt>get_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_neural/stats
+
+C<GET /_plugins/_neural/stats>
+  
+C<$client-E<gt>neural-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Neural>
+ 
+=head3 /_plugins/_neural/stats/{stat}
+
+C<GET /_plugins/_neural/stats/{stat}>
+  
+C<$client-E<gt>neural-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Neural>
+ 
+=head3 /_plugins/_neural/{node_id}/stats
+
+C<GET /_plugins/_neural/{node_id}/stats>
+  
+C<$client-E<gt>neural-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Neural>
+ 
+=head3 /_plugins/_neural/{node_id}/stats/{stat}
+
+C<GET /_plugins/_neural/{node_id}/stats/{stat}>
+  
+C<$client-E<gt>neural-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Neural>
+ 
+=head3 /_plugins/_notifications/channels
+
+C<GET /_plugins/_notifications/channels>
+  
+C<$client-E<gt>notifications-E<gt>list_channels>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_notifications/configs
+
+C<GET /_plugins/_notifications/configs>
+  
+C<$client-E<gt>notifications-E<gt>get_configs>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_notifications/configs/{config_id}
+
+C<GET /_plugins/_notifications/configs/{config_id}>
+  
+C<$client-E<gt>notifications-E<gt>get_config>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_notifications/feature/test/{config_id}
+
+C<GET /_plugins/_notifications/feature/test/{config_id}>
+  
+C<$client-E<gt>notifications-E<gt>send_test>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_notifications/features
+
+C<GET /_plugins/_notifications/features>
+  
+C<$client-E<gt>notifications-E<gt>list_features>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_observability/_local/stats
+
+C<GET /_plugins/_observability/_local/stats>
+  
+C<$client-E<gt>observability-E<gt>get_localstats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Observability>
+ 
+=head3 /_plugins/_observability/object
+
+C<GET /_plugins/_observability/object>
+  
+C<$client-E<gt>observability-E<gt>list_objects>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Observability>
+ 
+=head3 /_plugins/_observability/object/{object_id}
+
+C<GET /_plugins/_observability/object/{object_id}>
+  
+C<$client-E<gt>observability-E<gt>get_object>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Observability>
+ 
+=head3 /_plugins/_ppl/stats
+
+C<GET /_plugins/_ppl/stats>
+  
+C<$client-E<gt>ppl-E<gt>get_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::PPL>
+ 
+=head3 /_plugins/_query/_datasources
+
+C<GET /_plugins/_query/_datasources>
+  
+C<$client-E<gt>query-E<gt>datasources_list>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Query>
+ 
+=head3 /_plugins/_query/_datasources/{datasource_name}
+
+C<GET /_plugins/_query/_datasources/{datasource_name}>
+  
+C<$client-E<gt>query-E<gt>datasource_retrieve>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Query>
+ 
+=head3 /_plugins/_replication/autofollow_stats
+
+C<GET /_plugins/_replication/autofollow_stats>
+  
+C<$client-E<gt>replication-E<gt>autofollow_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_replication/follower_stats
+
+C<GET /_plugins/_replication/follower_stats>
+  
+C<$client-E<gt>replication-E<gt>follower_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_replication/leader_stats
+
+C<GET /_plugins/_replication/leader_stats>
+  
+C<$client-E<gt>replication-E<gt>leader_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_replication/{index}/_status
+
+C<GET /_plugins/_replication/{index}/_status>
+  
+C<$client-E<gt>replication-E<gt>status>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_rollup/jobs/{id}
+
+C<GET /_plugins/_rollup/jobs/{id}>
+  
+C<$client-E<gt>rollups-E<gt>get>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Rollups>
+ 
+=head3 /_plugins/_rollup/jobs/{id}/_explain
+
+C<GET /_plugins/_rollup/jobs/{id}/_explain>
+  
+C<$client-E<gt>rollups-E<gt>explain>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Rollups>
+ 
+=head3 /_plugins/_search_relevance/experiments
+
+C<GET /_plugins/_search_relevance/experiments>
+  
+C<$client-E<gt>search_relevance-E<gt>get_experiments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/experiments/schedule
+
+C<GET /_plugins/_search_relevance/experiments/schedule>
+  
+C<$client-E<gt>search_relevance-E<gt>get_scheduled_experiments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/experiments/schedule/{experiment_id}
+
+C<GET /_plugins/_search_relevance/experiments/schedule/{experiment_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>get_scheduled_experiments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/experiments/{experiment_id}
+
+C<GET /_plugins/_search_relevance/experiments/{experiment_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>get_experiments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/judgments
+
+C<GET /_plugins/_search_relevance/judgments>
+  
+C<$client-E<gt>search_relevance-E<gt>get_judgments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/judgments/{judgment_id}
+
+C<GET /_plugins/_search_relevance/judgments/{judgment_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>get_judgments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/query_sets
+
+C<GET /_plugins/_search_relevance/query_sets>
+  
+C<$client-E<gt>search_relevance-E<gt>get_query_sets>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/query_sets/{query_set_id}
+
+C<GET /_plugins/_search_relevance/query_sets/{query_set_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>get_query_sets>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/search_configurations
+
+C<GET /_plugins/_search_relevance/search_configurations>
+  
+C<$client-E<gt>search_relevance-E<gt>get_search_configurations>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/search_configurations/{search_configuration_id}
+
+C<GET /_plugins/_search_relevance/search_configurations/{search_configuration_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>get_search_configurations>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/stats
+
+C<GET /_plugins/_search_relevance/stats>
+  
+C<$client-E<gt>search_relevance-E<gt>get_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/stats/{stat}
+
+C<GET /_plugins/_search_relevance/stats/{stat}>
+  
+C<$client-E<gt>search_relevance-E<gt>get_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/{node_id}/stats
+
+C<GET /_plugins/_search_relevance/{node_id}/stats>
+  
+C<$client-E<gt>search_relevance-E<gt>get_node_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/{node_id}/stats/{stat}
+
+C<GET /_plugins/_search_relevance/{node_id}/stats/{stat}>
+  
+C<$client-E<gt>search_relevance-E<gt>get_node_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_security/api/_upgrade_check
+
+C<GET /_plugins/_security/api/_upgrade_check>
+  
+C<$client-E<gt>security-E<gt>config_upgrade_check>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/account
+
+C<GET /_plugins/_security/api/account>
+  
+C<$client-E<gt>security-E<gt>get_account_details>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/actiongroups
+
+C<GET /_plugins/_security/api/actiongroups>
+  
+C<$client-E<gt>security-E<gt>get_action_groups>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/actiongroups/{action_group}
+
+C<GET /_plugins/_security/api/actiongroups/{action_group}>
+  
+C<$client-E<gt>security-E<gt>get_action_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/allowlist
+
+C<GET /_plugins/_security/api/allowlist>
+  
+C<$client-E<gt>security-E<gt>get_allowlist>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/audit
+
+C<GET /_plugins/_security/api/audit>
+  
+C<$client-E<gt>security-E<gt>get_audit_configuration>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/certificates
+
+C<GET /_plugins/_security/api/certificates>
+  
+C<$client-E<gt>security-E<gt>get_all_certificates>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/certificates/{node_id}
+
+C<GET /_plugins/_security/api/certificates/{node_id}>
+  
+C<$client-E<gt>security-E<gt>get_node_certificates>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/internalusers
+
+C<GET /_plugins/_security/api/internalusers>
+  
+C<$client-E<gt>security-E<gt>get_users>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/internalusers/{username}
+
+C<GET /_plugins/_security/api/internalusers/{username}>
+  
+C<$client-E<gt>security-E<gt>get_user>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/nodesdn
+
+C<GET /_plugins/_security/api/nodesdn>
+  
+C<$client-E<gt>security-E<gt>get_distinguished_names>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/nodesdn/{cluster_name}
+
+C<GET /_plugins/_security/api/nodesdn/{cluster_name}>
+  
+C<$client-E<gt>security-E<gt>get_distinguished_name>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/permissionsinfo
+
+C<GET /_plugins/_security/api/permissionsinfo>
+  
+C<$client-E<gt>security-E<gt>get_permissions_info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/roles
+
+C<GET /_plugins/_security/api/roles>
+  
+C<$client-E<gt>security-E<gt>get_roles>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/roles/{role}
+
+C<GET /_plugins/_security/api/roles/{role}>
+  
+C<$client-E<gt>security-E<gt>get_role>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/rolesmapping
+
+C<GET /_plugins/_security/api/rolesmapping>
+  
+C<$client-E<gt>security-E<gt>get_role_mappings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/rolesmapping/{role}
+
+C<GET /_plugins/_security/api/rolesmapping/{role}>
+  
+C<$client-E<gt>security-E<gt>get_role_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/securityconfig
+
+C<GET /_plugins/_security/api/securityconfig>
+  
+C<$client-E<gt>security-E<gt>get_configuration>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/ssl/certs
+
+C<GET /_plugins/_security/api/ssl/certs>
+  
+C<$client-E<gt>security-E<gt>get_certificates>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/tenancy/config
+
+C<GET /_plugins/_security/api/tenancy/config>
+  
+C<$client-E<gt>security-E<gt>get_tenancy_config>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/tenants
+
+C<GET /_plugins/_security/api/tenants>
+  
+C<$client-E<gt>security-E<gt>get_tenants>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/tenants/{tenant}
+
+C<GET /_plugins/_security/api/tenants/{tenant}>
+  
+C<$client-E<gt>security-E<gt>get_tenant>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/user
+
+C<GET /_plugins/_security/api/user>
+  
+C<$client-E<gt>security-E<gt>get_users_legacy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/user/{username}
+
+C<GET /_plugins/_security/api/user/{username}>
+  
+C<$client-E<gt>security-E<gt>get_user_legacy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/validate
+
+C<GET /_plugins/_security/api/validate>
+  
+C<$client-E<gt>security-E<gt>validate>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/authinfo
+
+C<GET /_plugins/_security/authinfo>
+  
+C<$client-E<gt>security-E<gt>authinfo>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/dashboardsinfo
+
+C<GET /_plugins/_security/dashboardsinfo>
+  
+C<$client-E<gt>security-E<gt>get_dashboards_info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/health
+
+C<GET /_plugins/_security/health>
+  
+C<$client-E<gt>security-E<gt>health>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/tenantinfo
+
+C<GET /_plugins/_security/tenantinfo>
+  
+C<$client-E<gt>security-E<gt>tenant_info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/whoami
+
+C<GET /_plugins/_security/whoami>
+  
+C<$client-E<gt>security-E<gt>who_am_i>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/whoamiprotected
+
+C<GET /_plugins/_security/whoamiprotected>
+  
+C<$client-E<gt>security-E<gt>who_am_i_protected>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security_analytics/alerts
+
+C<GET /_plugins/_security_analytics/alerts>
+  
+C<$client-E<gt>security_analytics-E<gt>get_alerts>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics>
+ 
+=head3 /_plugins/_security_analytics/findings/_search
+
+C<GET /_plugins/_security_analytics/findings/_search>
+  
+C<$client-E<gt>security_analytics-E<gt>get_findings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics>
+ 
+=head3 /_plugins/_security_analytics/findings/correlate
+
+C<GET /_plugins/_security_analytics/findings/correlate>
+  
+C<$client-E<gt>security_analytics-E<gt>search_finding_correlations>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics>
+ 
+=head3 /_plugins/_sm/policies
+
+C<GET /_plugins/_sm/policies>
+  
+C<$client-E<gt>sm-E<gt>get_policies>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
+ 
+=head3 /_plugins/_sm/policies/{policy_name}
+
+C<GET /_plugins/_sm/policies/{policy_name}>
+  
+C<$client-E<gt>sm-E<gt>get_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
+ 
+=head3 /_plugins/_sm/policies/{policy_name}/_explain
+
+C<GET /_plugins/_sm/policies/{policy_name}/_explain>
+  
+C<$client-E<gt>sm-E<gt>explain_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
+ 
+=head3 /_plugins/_sql/stats
+
+C<GET /_plugins/_sql/stats>
+  
+C<$client-E<gt>sql-E<gt>get_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SQL>
+ 
+=head3 /_plugins/_transform
+
+C<GET /_plugins/_transform>
+  
+C<$client-E<gt>transforms-E<gt>search>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Transforms>
+ 
+=head3 /_plugins/_transform/{id}
+
+C<GET /_plugins/_transform/{id}>
+  
+C<$client-E<gt>transforms-E<gt>get>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Transforms>
+ 
+=head3 /_plugins/_transform/{id}/_explain
+
+C<GET /_plugins/_transform/{id}/_explain>
+  
+C<$client-E<gt>transforms-E<gt>explain>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Transforms>
+ 
+=head3 /_plugins/geospatial/_upload/stats
+
+C<GET /_plugins/geospatial/_upload/stats>
+  
+C<$client-E<gt>geospatial-E<gt>get_upload_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
+ 
+=head3 /_plugins/geospatial/ip2geo/datasource
+
+C<GET /_plugins/geospatial/ip2geo/datasource>
+  
+C<$client-E<gt>geospatial-E<gt>get_ip2geo_datasource>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
+ 
+=head3 /_plugins/geospatial/ip2geo/datasource/{name}
+
+C<GET /_plugins/geospatial/ip2geo/datasource/{name}>
+  
+C<$client-E<gt>geospatial-E<gt>get_ip2geo_datasource>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
+ 
+=head3 /_rank_eval
+
+C<GET /_rank_eval>
+
+C<$client-E<gt>rank_eval>
+ 
+=head3 /_recovery
+
+C<GET /_recovery>
+  
+C<$client-E<gt>indices-E<gt>recovery>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_refresh
+
+C<GET /_refresh>
+  
+C<$client-E<gt>indices-E<gt>refresh>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_remote/info
+
+C<GET /_remote/info>
+  
+C<$client-E<gt>cluster-E<gt>remote_info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_render/template
+
+C<GET /_render/template>
+
+C<$client-E<gt>render_search_template>
+ 
+=head3 /_render/template/{id}
+
+C<GET /_render/template/{id}>
+
+C<$client-E<gt>render_search_template>
+ 
+=head3 /_resolve/index/{name}
+
+C<GET /_resolve/index/{name}>
+  
+C<$client-E<gt>indices-E<gt>resolve_index>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_script_context
+
+C<GET /_script_context>
+
+C<$client-E<gt>get_script_context>
+ 
+=head3 /_script_language
+
+C<GET /_script_language>
+
+C<$client-E<gt>get_script_languages>
+ 
+=head3 /_scripts/painless/_execute
+
+C<GET /_scripts/painless/_execute>
+
+C<$client-E<gt>scripts_painless_execute>
+ 
+=head3 /_scripts/{id}
+
+C<GET /_scripts/{id}>
+
+C<$client-E<gt>get_script>
+ 
+=head3 /_search
+
+C<GET /_search>
+
+C<$client-E<gt>search>
+ 
+=head3 /_search/pipeline
+
+C<GET /_search/pipeline>
+  
+C<$client-E<gt>search_pipeline-E<gt>get>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchPipeline>
+ 
+=head3 /_search/pipeline/{id}
+
+C<GET /_search/pipeline/{id}>
+  
+C<$client-E<gt>search_pipeline-E<gt>get>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchPipeline>
+ 
+=head3 /_search/point_in_time/_all
+
+C<GET /_search/point_in_time/_all>
+
+C<$client-E<gt>get_all_pits>
+ 
+=head3 /_search/scroll
+
+C<GET /_search/scroll>
+
+C<$client-E<gt>scroll>
+ 
+=head3 /_search/scroll/{scroll_id}
+
+C<GET /_search/scroll/{scroll_id}>
+
+C<$client-E<gt>scroll>
+ 
+=head3 /_search/template
+
+C<GET /_search/template>
+
+C<$client-E<gt>search_template>
+ 
+=head3 /_search_shards
+
+C<GET /_search_shards>
+
+C<$client-E<gt>search_shards>
+ 
+=head3 /_segments
+
+C<GET /_segments>
+  
+C<$client-E<gt>indices-E<gt>segments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_settings
+
+C<GET /_settings>
+  
+C<$client-E<gt>indices-E<gt>get_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_settings/{name}
+
+C<GET /_settings/{name}>
+  
+C<$client-E<gt>indices-E<gt>get_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_shard_stores
+
+C<GET /_shard_stores>
+  
+C<$client-E<gt>indices-E<gt>shard_stores>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_snapshot
+
+C<GET /_snapshot>
+  
+C<$client-E<gt>snapshot-E<gt>get_repository>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/_status
+
+C<GET /_snapshot/_status>
+  
+C<$client-E<gt>snapshot-E<gt>status>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}
+
+C<GET /_snapshot/{repository}>
+  
+C<$client-E<gt>snapshot-E<gt>get_repository>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/_status
+
+C<GET /_snapshot/{repository}/_status>
+  
+C<$client-E<gt>snapshot-E<gt>status>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/{snapshot}
+
+C<GET /_snapshot/{repository}/{snapshot}>
+  
+C<$client-E<gt>snapshot-E<gt>get>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/{snapshot}/_status
+
+C<GET /_snapshot/{repository}/{snapshot}/_status>
+  
+C<$client-E<gt>snapshot-E<gt>status>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_stats
+
+C<GET /_stats>
+  
+C<$client-E<gt>indices-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_stats/{metric}
+
+C<GET /_stats/{metric}>
+  
+C<$client-E<gt>indices-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_tasks
+
+C<GET /_tasks>
+  
+C<$client-E<gt>tasks-E<gt>list>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Tasks>
+ 
+=head3 /_tasks/{task_id}
+
+C<GET /_tasks/{task_id}>
+  
+C<$client-E<gt>tasks-E<gt>get>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Tasks>
+ 
+=head3 /_template
+
+C<GET /_template>
+  
+C<$client-E<gt>indices-E<gt>get_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_template/{name}
+
+C<GET /_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>get_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_upgrade
+
+C<GET /_upgrade>
+  
+C<$client-E<gt>indices-E<gt>get_upgrade>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_validate/query
+
+C<GET /_validate/query>
+  
+C<$client-E<gt>indices-E<gt>validate_query>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_wlm/query_group
+
+C<GET /_wlm/query_group>
+  
+C<$client-E<gt>wlm-E<gt>get_query_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::WLM>
+ 
+=head3 /_wlm/query_group/{name}
+
+C<GET /_wlm/query_group/{name}>
+  
+C<$client-E<gt>wlm-E<gt>get_query_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::WLM>
+ 
+=head3 /{index}
+
+C<GET /{index}>
+  
+C<$client-E<gt>indices-E<gt>get>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_alias
+
+C<GET /{index}/_alias>
+  
+C<$client-E<gt>indices-E<gt>get_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_alias/{name}
+
+C<GET /{index}/_alias/{name}>
+  
+C<$client-E<gt>indices-E<gt>get_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_analyze
+
+C<GET /{index}/_analyze>
+  
+C<$client-E<gt>indices-E<gt>analyze>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_count
+
+C<GET /{index}/_count>
+
+C<$client-E<gt>count>
+ 
+=head3 /{index}/_doc/{id}
+
+C<GET /{index}/_doc/{id}>
+
+C<$client-E<gt>get>
+ 
+=head3 /{index}/_explain/{id}
+
+C<GET /{index}/_explain/{id}>
+
+C<$client-E<gt>explain>
+ 
+=head3 /{index}/_field_caps
+
+C<GET /{index}/_field_caps>
+
+C<$client-E<gt>field_caps>
+ 
+=head3 /{index}/_flush
+
+C<GET /{index}/_flush>
+  
+C<$client-E<gt>indices-E<gt>flush>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_mapping
+
+C<GET /{index}/_mapping>
+  
+C<$client-E<gt>indices-E<gt>get_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_mapping/field/{fields}
+
+C<GET /{index}/_mapping/field/{fields}>
+  
+C<$client-E<gt>indices-E<gt>get_field_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_mget
+
+C<GET /{index}/_mget>
+
+C<$client-E<gt>mget>
+ 
+=head3 /{index}/_msearch
+
+C<GET /{index}/_msearch>
+
+C<$client-E<gt>msearch>
+ 
+=head3 /{index}/_msearch/template
+
+C<GET /{index}/_msearch/template>
+
+C<$client-E<gt>msearch_template>
+ 
+=head3 /{index}/_mtermvectors
+
+C<GET /{index}/_mtermvectors>
+
+C<$client-E<gt>mtermvectors>
+ 
+=head3 /{index}/_rank_eval
+
+C<GET /{index}/_rank_eval>
+
+C<$client-E<gt>rank_eval>
+ 
+=head3 /{index}/_recovery
+
+C<GET /{index}/_recovery>
+  
+C<$client-E<gt>indices-E<gt>recovery>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_refresh
+
+C<GET /{index}/_refresh>
+  
+C<$client-E<gt>indices-E<gt>refresh>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_search
+
+C<GET /{index}/_search>
+
+C<$client-E<gt>search>
+ 
+=head3 /{index}/_search/template
+
+C<GET /{index}/_search/template>
+
+C<$client-E<gt>search_template>
+ 
+=head3 /{index}/_search_shards
+
+C<GET /{index}/_search_shards>
+
+C<$client-E<gt>search_shards>
+ 
+=head3 /{index}/_segments
+
+C<GET /{index}/_segments>
+  
+C<$client-E<gt>indices-E<gt>segments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_settings
+
+C<GET /{index}/_settings>
+  
+C<$client-E<gt>indices-E<gt>get_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_settings/{name}
+
+C<GET /{index}/_settings/{name}>
+  
+C<$client-E<gt>indices-E<gt>get_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_shard_stores
+
+C<GET /{index}/_shard_stores>
+  
+C<$client-E<gt>indices-E<gt>shard_stores>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_source/{id}
+
+C<GET /{index}/_source/{id}>
+
+C<$client-E<gt>get_source>
+ 
+=head3 /{index}/_stats
+
+C<GET /{index}/_stats>
+  
+C<$client-E<gt>indices-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_stats/{metric}
+
+C<GET /{index}/_stats/{metric}>
+  
+C<$client-E<gt>indices-E<gt>stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_termvectors
+
+C<GET /{index}/_termvectors>
+
+C<$client-E<gt>termvectors>
+ 
+=head3 /{index}/_termvectors/{id}
+
+C<GET /{index}/_termvectors/{id}>
+
+C<$client-E<gt>termvectors>
+ 
+=head3 /{index}/_upgrade
+
+C<GET /{index}/_upgrade>
+  
+C<$client-E<gt>indices-E<gt>get_upgrade>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_validate/query
+
+C<GET /{index}/_validate/query>
+  
+C<$client-E<gt>indices-E<gt>validate_query>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/ingestion/_state
+
+C<GET /{index}/ingestion/_state>
+  
+C<$client-E<gt>ingestion-E<gt>get_state>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingestion>
+
+=head2 POST
+ 
+=head3 /_alias/{name}
+
+C<POST /_alias/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_aliases
+
+C<POST /_aliases>
+  
+C<$client-E<gt>indices-E<gt>update_aliases>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_aliases/{name}
+
+C<POST /_aliases/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_analyze
+
+C<POST /_analyze>
+  
+C<$client-E<gt>indices-E<gt>analyze>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_bulk
+
+C<POST /_bulk>
+
+C<$client-E<gt>bulk>
+ 
+=head3 /_bulk/stream
+
+C<POST /_bulk/stream>
+
+C<$client-E<gt>bulk_stream>
+ 
+=head3 /_cache/clear
+
+C<POST /_cache/clear>
+  
+C<$client-E<gt>indices-E<gt>clear_cache>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_cluster/allocation/explain
+
+C<POST /_cluster/allocation/explain>
+  
+C<$client-E<gt>cluster-E<gt>allocation_explain>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/reroute
+
+C<POST /_cluster/reroute>
+  
+C<$client-E<gt>cluster-E<gt>reroute>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/voting_config_exclusions
+
+C<POST /_cluster/voting_config_exclusions>
+  
+C<$client-E<gt>cluster-E<gt>post_voting_config_exclusions>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_component_template/{name}
+
+C<POST /_component_template/{name}>
+  
+C<$client-E<gt>cluster-E<gt>put_component_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_count
+
+C<POST /_count>
+
+C<$client-E<gt>count>
+ 
+=head3 /_dangling/{index_uuid}
+
+C<POST /_dangling/{index_uuid}>
+  
+C<$client-E<gt>dangling_indices-E<gt>import_dangling_index>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::DanglingIndices>
+ 
+=head3 /_delete_by_query/{task_id}/_rethrottle
+
+C<POST /_delete_by_query/{task_id}/_rethrottle>
+
+C<$client-E<gt>delete_by_query_rethrottle>
+ 
+=head3 /_field_caps
+
+C<POST /_field_caps>
+
+C<$client-E<gt>field_caps>
+ 
+=head3 /_flush
+
+C<POST /_flush>
+  
+C<$client-E<gt>indices-E<gt>flush>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_forcemerge
+
+C<POST /_forcemerge>
+  
+C<$client-E<gt>indices-E<gt>forcemerge>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_index_template/_simulate
+
+C<POST /_index_template/_simulate>
+  
+C<$client-E<gt>indices-E<gt>simulate_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_index_template/_simulate/{name}
+
+C<POST /_index_template/_simulate/{name}>
+  
+C<$client-E<gt>indices-E<gt>simulate_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_index_template/_simulate_index/{name}
+
+C<POST /_index_template/_simulate_index/{name}>
+  
+C<$client-E<gt>indices-E<gt>simulate_index_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_index_template/{name}
+
+C<POST /_index_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_index_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_ingest/pipeline/_simulate
+
+C<POST /_ingest/pipeline/_simulate>
+  
+C<$client-E<gt>ingest-E<gt>simulate>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingest>
+ 
+=head3 /_ingest/pipeline/{id}/_simulate
+
+C<POST /_ingest/pipeline/{id}/_simulate>
+  
+C<$client-E<gt>ingest-E<gt>simulate>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingest>
+ 
+=head3 /_ltr/_clearcache
+
+C<POST /_ltr/_clearcache>
+  
+C<$client-E<gt>ltr-E<gt>clear_cache>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_feature/{id}
+
+C<POST /_ltr/_feature/{id}>
+  
+C<$client-E<gt>ltr-E<gt>update_feature>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_featureset/{id}
+
+C<POST /_ltr/_featureset/{id}>
+  
+C<$client-E<gt>ltr-E<gt>update_featureset>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_featureset/{name}/_addfeatures
+
+C<POST /_ltr/_featureset/{name}/_addfeatures>
+  
+C<$client-E<gt>ltr-E<gt>add_features_to_set>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_featureset/{name}/_addfeatures/{query}
+
+C<POST /_ltr/_featureset/{name}/_addfeatures/{query}>
+  
+C<$client-E<gt>ltr-E<gt>add_features_to_set_by_query>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_featureset/{name}/_createmodel
+
+C<POST /_ltr/_featureset/{name}/_createmodel>
+  
+C<$client-E<gt>ltr-E<gt>create_model_from_set>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_clearcache
+
+C<POST /_ltr/{store}/_clearcache>
+  
+C<$client-E<gt>ltr-E<gt>clear_cache>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_feature/{id}
+
+C<POST /_ltr/{store}/_feature/{id}>
+  
+C<$client-E<gt>ltr-E<gt>update_feature>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_featureset/{id}
+
+C<POST /_ltr/{store}/_featureset/{id}>
+  
+C<$client-E<gt>ltr-E<gt>update_featureset>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_featureset/{name}/_addfeatures
+
+C<POST /_ltr/{store}/_featureset/{name}/_addfeatures>
+  
+C<$client-E<gt>ltr-E<gt>add_features_to_set>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_featureset/{name}/_addfeatures/{query}
+
+C<POST /_ltr/{store}/_featureset/{name}/_addfeatures/{query}>
+  
+C<$client-E<gt>ltr-E<gt>add_features_to_set_by_query>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_featureset/{name}/_createmodel
+
+C<POST /_ltr/{store}/_featureset/{name}/_createmodel>
+  
+C<$client-E<gt>ltr-E<gt>create_model_from_set>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_mget
+
+C<POST /_mget>
+
+C<$client-E<gt>mget>
+ 
+=head3 /_msearch
+
+C<POST /_msearch>
+
+C<$client-E<gt>msearch>
+ 
+=head3 /_msearch/template
+
+C<POST /_msearch/template>
+
+C<$client-E<gt>msearch_template>
+ 
+=head3 /_mtermvectors
+
+C<POST /_mtermvectors>
+
+C<$client-E<gt>mtermvectors>
+ 
+=head3 /_nodes/reload_secure_settings
+
+C<POST /_nodes/reload_secure_settings>
+  
+C<$client-E<gt>nodes-E<gt>reload_secure_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_nodes/{node_id}/reload_secure_settings
+
+C<POST /_nodes/{node_id}/reload_secure_settings>
+  
+C<$client-E<gt>nodes-E<gt>reload_secure_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Nodes>
+ 
+=head3 /_plugins/_asynchronous_search
+
+C<POST /_plugins/_asynchronous_search>
+  
+C<$client-E<gt>asynchronous_search-E<gt>search>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::AsyncSearch>
+ 
+=head3 /_plugins/_flow_framework/workflow
+
+C<POST /_plugins/_flow_framework/workflow>
+  
+C<$client-E<gt>flow_framework-E<gt>create>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_flow_framework/workflow/_search
+
+C<POST /_plugins/_flow_framework/workflow/_search>
+  
+C<$client-E<gt>flow_framework-E<gt>search>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_flow_framework/workflow/state/_search
+
+C<POST /_plugins/_flow_framework/workflow/state/_search>
+  
+C<$client-E<gt>flow_framework-E<gt>search_state>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_flow_framework/workflow/{workflow_id}/_deprovision
+
+C<POST /_plugins/_flow_framework/workflow/{workflow_id}/_deprovision>
+  
+C<$client-E<gt>flow_framework-E<gt>deprovision>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_flow_framework/workflow/{workflow_id}/_provision
+
+C<POST /_plugins/_flow_framework/workflow/{workflow_id}/_provision>
+  
+C<$client-E<gt>flow_framework-E<gt>provision>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_ism/add
+
+C<POST /_plugins/_ism/add>
+  
+C<$client-E<gt>ism-E<gt>add_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/add/{index}
+
+C<POST /_plugins/_ism/add/{index}>
+  
+C<$client-E<gt>ism-E<gt>add_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/change_policy
+
+C<POST /_plugins/_ism/change_policy>
+  
+C<$client-E<gt>ism-E<gt>change_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/change_policy/{index}
+
+C<POST /_plugins/_ism/change_policy/{index}>
+  
+C<$client-E<gt>ism-E<gt>change_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/explain
+
+C<POST /_plugins/_ism/explain>
+  
+C<$client-E<gt>ism-E<gt>explain_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/explain/{index}
+
+C<POST /_plugins/_ism/explain/{index}>
+  
+C<$client-E<gt>ism-E<gt>explain_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/remove
+
+C<POST /_plugins/_ism/remove>
+  
+C<$client-E<gt>ism-E<gt>remove_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/remove/{index}
+
+C<POST /_plugins/_ism/remove/{index}>
+  
+C<$client-E<gt>ism-E<gt>remove_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/retry
+
+C<POST /_plugins/_ism/retry>
+  
+C<$client-E<gt>ism-E<gt>retry_index>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/retry/{index}
+
+C<POST /_plugins/_ism/retry/{index}>
+  
+C<$client-E<gt>ism-E<gt>retry_index>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_knn/models/_search
+
+C<POST /_plugins/_knn/models/_search>
+  
+C<$client-E<gt>knn-E<gt>search_models>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_knn/models/_train
+
+C<POST /_plugins/_knn/models/_train>
+  
+C<$client-E<gt>knn-E<gt>train_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_knn/models/{model_id}/_train
+
+C<POST /_plugins/_knn/models/{model_id}/_train>
+  
+C<$client-E<gt>knn-E<gt>train_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_ml/_execute/{algorithm_name}
+
+C<POST /_plugins/_ml/_execute/{algorithm_name}>
+  
+C<$client-E<gt>ml-E<gt>execute_algorithm>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/_predict/{algorithm_name}/{model_id}
+
+C<POST /_plugins/_ml/_predict/{algorithm_name}/{model_id}>
+  
+C<$client-E<gt>ml-E<gt>predict>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/_train/{algorithm_name}
+
+C<POST /_plugins/_ml/_train/{algorithm_name}>
+  
+C<$client-E<gt>ml-E<gt>train>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/_train_predict/{algorithm_name}
+
+C<POST /_plugins/_ml/_train_predict/{algorithm_name}>
+  
+C<$client-E<gt>ml-E<gt>train_predict>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/agents/_register
+
+C<POST /_plugins/_ml/agents/_register>
+  
+C<$client-E<gt>ml-E<gt>register_agents>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/agents/_search
+
+C<POST /_plugins/_ml/agents/_search>
+  
+C<$client-E<gt>ml-E<gt>search_agents>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/agents/{agent_id}/_execute
+
+C<POST /_plugins/_ml/agents/{agent_id}/_execute>
+  
+C<$client-E<gt>ml-E<gt>execute_agent>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/agents/{agent_id}/_execute/stream
+
+C<POST /_plugins/_ml/agents/{agent_id}/_execute/stream>
+  
+C<$client-E<gt>ml-E<gt>execute_agent_stream>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/connectors/_create
+
+C<POST /_plugins/_ml/connectors/_create>
+  
+C<$client-E<gt>ml-E<gt>create_connector>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/connectors/_search
+
+C<POST /_plugins/_ml/connectors/_search>
+  
+C<$client-E<gt>ml-E<gt>search_connectors>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/controllers/{model_id}
+
+C<POST /_plugins/_ml/controllers/{model_id}>
+  
+C<$client-E<gt>ml-E<gt>create_controller>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory
+
+C<POST /_plugins/_ml/memory>
+  
+C<$client-E<gt>ml-E<gt>create_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/_search
+
+C<POST /_plugins/_ml/memory/_search>
+  
+C<$client-E<gt>ml-E<gt>search_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/{memory_id}/_search
+
+C<POST /_plugins/_ml/memory/{memory_id}/_search>
+  
+C<$client-E<gt>ml-E<gt>search_message>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/{memory_id}/messages
+
+C<POST /_plugins/_ml/memory/{memory_id}/messages>
+  
+C<$client-E<gt>ml-E<gt>create_message>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/_create
+
+C<POST /_plugins/_ml/memory_containers/_create>
+  
+C<$client-E<gt>ml-E<gt>create_memory_container>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/_search
+
+C<POST /_plugins/_ml/memory_containers/_search>
+  
+C<$client-E<gt>ml-E<gt>search_memory_container>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}/memories
+
+C<POST /_plugins/_ml/memory_containers/{memory_container_id}/memories>
+  
+C<$client-E<gt>ml-E<gt>add_agentic_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}/memories/sessions
+
+C<POST /_plugins/_ml/memory_containers/{memory_container_id}/memories/sessions>
+  
+C<$client-E<gt>ml-E<gt>create_memory_container_session>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/_delete_by_query
+
+C<POST /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/_delete_by_query>
+  
+C<$client-E<gt>ml-E<gt>delete_agentic_memory_query>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/model_groups/_register
+
+C<POST /_plugins/_ml/model_groups/_register>
+  
+C<$client-E<gt>ml-E<gt>register_model_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/model_groups/_search
+
+C<POST /_plugins/_ml/model_groups/_search>
+  
+C<$client-E<gt>ml-E<gt>search_model_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/_register
+
+C<POST /_plugins/_ml/models/_register>
+  
+C<$client-E<gt>ml-E<gt>register_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/_register_meta
+
+C<POST /_plugins/_ml/models/_register_meta>
+  
+C<$client-E<gt>ml-E<gt>register_model_meta>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/_search
+
+C<POST /_plugins/_ml/models/_search>
+  
+C<$client-E<gt>ml-E<gt>search_models>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/_undeploy
+
+C<POST /_plugins/_ml/models/_undeploy>
+  
+C<$client-E<gt>ml-E<gt>undeploy_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/_unload
+
+C<POST /_plugins/_ml/models/_unload>
+  
+C<$client-E<gt>ml-E<gt>unload_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/_upload
+
+C<POST /_plugins/_ml/models/_upload>
+  
+C<$client-E<gt>ml-E<gt>upload_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/meta
+
+C<POST /_plugins/_ml/models/meta>
+  
+C<$client-E<gt>ml-E<gt>create_model_meta>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}/_deploy
+
+C<POST /_plugins/_ml/models/{model_id}/_deploy>
+  
+C<$client-E<gt>ml-E<gt>deploy_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}/_load
+
+C<POST /_plugins/_ml/models/{model_id}/_load>
+  
+C<$client-E<gt>ml-E<gt>load_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}/_predict
+
+C<POST /_plugins/_ml/models/{model_id}/_predict>
+  
+C<$client-E<gt>ml-E<gt>predict_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}/_predict/stream
+
+C<POST /_plugins/_ml/models/{model_id}/_predict/stream>
+  
+C<$client-E<gt>ml-E<gt>predict_model_stream>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}/_undeploy
+
+C<POST /_plugins/_ml/models/{model_id}/_undeploy>
+  
+C<$client-E<gt>ml-E<gt>undeploy_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}/_unload
+
+C<POST /_plugins/_ml/models/{model_id}/_unload>
+  
+C<$client-E<gt>ml-E<gt>unload_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}/chunk/{chunk_number}
+
+C<POST /_plugins/_ml/models/{model_id}/chunk/{chunk_number}>
+  
+C<$client-E<gt>ml-E<gt>chunk_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}/upload_chunk/{chunk_number}
+
+C<POST /_plugins/_ml/models/{model_id}/upload_chunk/{chunk_number}>
+  
+C<$client-E<gt>ml-E<gt>upload_chunk>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/tasks/_search
+
+C<POST /_plugins/_ml/tasks/_search>
+  
+C<$client-E<gt>ml-E<gt>search_tasks>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/tools/_execute/{tool_name}
+
+C<POST /_plugins/_ml/tools/_execute/{tool_name}>
+  
+C<$client-E<gt>ml-E<gt>execute_tool>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_notifications/configs
+
+C<POST /_plugins/_notifications/configs>
+  
+C<$client-E<gt>notifications-E<gt>create_config>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_notifications/feature/test/{config_id}
+
+C<POST /_plugins/_notifications/feature/test/{config_id}>
+  
+C<$client-E<gt>notifications-E<gt>send_test>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_observability/object
+
+C<POST /_plugins/_observability/object>
+  
+C<$client-E<gt>observability-E<gt>create_object>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Observability>
+ 
+=head3 /_plugins/_ppl
+
+C<POST /_plugins/_ppl>
+  
+C<$client-E<gt>ppl-E<gt>query>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::PPL>
+ 
+=head3 /_plugins/_ppl/_explain
+
+C<POST /_plugins/_ppl/_explain>
+  
+C<$client-E<gt>ppl-E<gt>explain>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::PPL>
+ 
+=head3 /_plugins/_ppl/stats
+
+C<POST /_plugins/_ppl/stats>
+  
+C<$client-E<gt>ppl-E<gt>post_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::PPL>
+ 
+=head3 /_plugins/_query/_datasources
+
+C<POST /_plugins/_query/_datasources>
+  
+C<$client-E<gt>query-E<gt>datasources_create>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Query>
+ 
+=head3 /_plugins/_refresh_search_analyzers/{index}
+
+C<POST /_plugins/_refresh_search_analyzers/{index}>
+  
+C<$client-E<gt>ism-E<gt>refresh_search_analyzers>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_replication/_autofollow
+
+C<POST /_plugins/_replication/_autofollow>
+  
+C<$client-E<gt>replication-E<gt>create_replication_rule>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_replication/{index}/_pause
+
+C<POST /_plugins/_replication/{index}/_pause>
+  
+C<$client-E<gt>replication-E<gt>pause>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_replication/{index}/_resume
+
+C<POST /_plugins/_replication/{index}/_resume>
+  
+C<$client-E<gt>replication-E<gt>resume>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_replication/{index}/_stop
+
+C<POST /_plugins/_replication/{index}/_stop>
+  
+C<$client-E<gt>replication-E<gt>stop>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_rollup/jobs/{id}/_start
+
+C<POST /_plugins/_rollup/jobs/{id}/_start>
+  
+C<$client-E<gt>rollups-E<gt>start>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Rollups>
+ 
+=head3 /_plugins/_rollup/jobs/{id}/_stop
+
+C<POST /_plugins/_rollup/jobs/{id}/_stop>
+  
+C<$client-E<gt>rollups-E<gt>stop>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Rollups>
+ 
+=head3 /_plugins/_search_relevance/experiments/schedule
+
+C<POST /_plugins/_search_relevance/experiments/schedule>
+  
+C<$client-E<gt>search_relevance-E<gt>post_scheduled_experiments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/query_sets
+
+C<POST /_plugins/_search_relevance/query_sets>
+  
+C<$client-E<gt>search_relevance-E<gt>post_query_sets>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_security/api/_upgrade_perform
+
+C<POST /_plugins/_security/api/_upgrade_perform>
+  
+C<$client-E<gt>security-E<gt>config_upgrade_perform>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/authtoken
+
+C<POST /_plugins/_security/api/authtoken>
+  
+C<$client-E<gt>security-E<gt>authtoken>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/generateonbehalfoftoken
+
+C<POST /_plugins/_security/api/generateonbehalfoftoken>
+  
+C<$client-E<gt>security-E<gt>generate_obo_token>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/internalusers/{username}/authtoken
+
+C<POST /_plugins/_security/api/internalusers/{username}/authtoken>
+  
+C<$client-E<gt>security-E<gt>generate_user_token>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/migrate
+
+C<POST /_plugins/_security/api/migrate>
+  
+C<$client-E<gt>security-E<gt>migrate>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/user/{username}/authtoken
+
+C<POST /_plugins/_security/api/user/{username}/authtoken>
+  
+C<$client-E<gt>security-E<gt>generate_user_token_legacy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/authinfo
+
+C<POST /_plugins/_security/authinfo>
+  
+C<$client-E<gt>security-E<gt>authinfo>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/dashboardsinfo
+
+C<POST /_plugins/_security/dashboardsinfo>
+  
+C<$client-E<gt>security-E<gt>post_dashboards_info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/health
+
+C<POST /_plugins/_security/health>
+  
+C<$client-E<gt>security-E<gt>health>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/tenantinfo
+
+C<POST /_plugins/_security/tenantinfo>
+  
+C<$client-E<gt>security-E<gt>tenant_info>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/whoami
+
+C<POST /_plugins/_security/whoami>
+  
+C<$client-E<gt>security-E<gt>who_am_i>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_sm/policies/{policy_name}
+
+C<POST /_plugins/_sm/policies/{policy_name}>
+  
+C<$client-E<gt>sm-E<gt>create_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
+ 
+=head3 /_plugins/_sm/policies/{policy_name}/_start
+
+C<POST /_plugins/_sm/policies/{policy_name}/_start>
+  
+C<$client-E<gt>sm-E<gt>start_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
+ 
+=head3 /_plugins/_sm/policies/{policy_name}/_stop
+
+C<POST /_plugins/_sm/policies/{policy_name}/_stop>
+  
+C<$client-E<gt>sm-E<gt>stop_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
+ 
+=head3 /_plugins/_sql
+
+C<POST /_plugins/_sql>
+  
+C<$client-E<gt>sql-E<gt>query>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SQL>
+ 
+=head3 /_plugins/_sql/_explain
+
+C<POST /_plugins/_sql/_explain>
+  
+C<$client-E<gt>sql-E<gt>explain>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SQL>
+ 
+=head3 /_plugins/_sql/close
+
+C<POST /_plugins/_sql/close>
+  
+C<$client-E<gt>sql-E<gt>close>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SQL>
+ 
+=head3 /_plugins/_sql/stats
+
+C<POST /_plugins/_sql/stats>
+  
+C<$client-E<gt>sql-E<gt>post_stats>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SQL>
+ 
+=head3 /_plugins/_transform/_preview
+
+C<POST /_plugins/_transform/_preview>
+  
+C<$client-E<gt>transforms-E<gt>preview>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Transforms>
+ 
+=head3 /_plugins/_transform/{id}/_start
+
+C<POST /_plugins/_transform/{id}/_start>
+  
+C<$client-E<gt>transforms-E<gt>start>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Transforms>
+ 
+=head3 /_plugins/_transform/{id}/_stop
+
+C<POST /_plugins/_transform/{id}/_stop>
+  
+C<$client-E<gt>transforms-E<gt>stop>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Transforms>
+ 
+=head3 /_plugins/geospatial/geojson/_upload
+
+C<POST /_plugins/geospatial/geojson/_upload>
+  
+C<$client-E<gt>geospatial-E<gt>geojson_upload_post>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
+ 
+=head3 /_plugins/ubi/initialize
+
+C<POST /_plugins/ubi/initialize>
+  
+C<$client-E<gt>ubi-E<gt>initialize>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::UBI>
+ 
+=head3 /_rank_eval
+
+C<POST /_rank_eval>
+
+C<$client-E<gt>rank_eval>
+ 
+=head3 /_refresh
+
+C<POST /_refresh>
+  
+C<$client-E<gt>indices-E<gt>refresh>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_reindex
+
+C<POST /_reindex>
+
+C<$client-E<gt>reindex>
+ 
+=head3 /_reindex/{task_id}/_rethrottle
+
+C<POST /_reindex/{task_id}/_rethrottle>
+
+C<$client-E<gt>reindex_rethrottle>
+ 
+=head3 /_remotestore/_restore
+
+C<POST /_remotestore/_restore>
+  
+C<$client-E<gt>remote_store-E<gt>restore>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::RemoteStore>
+ 
+=head3 /_render/template
+
+C<POST /_render/template>
+
+C<$client-E<gt>render_search_template>
+ 
+=head3 /_render/template/{id}
+
+C<POST /_render/template/{id}>
+
+C<$client-E<gt>render_search_template>
+ 
+=head3 /_scripts/painless/_execute
+
+C<POST /_scripts/painless/_execute>
+
+C<$client-E<gt>scripts_painless_execute>
+ 
+=head3 /_scripts/{id}
+
+C<POST /_scripts/{id}>
+
+C<$client-E<gt>put_script>
+ 
+=head3 /_scripts/{id}/{context}
+
+C<POST /_scripts/{id}/{context}>
+
+C<$client-E<gt>put_script>
+ 
+=head3 /_search
+
+C<POST /_search>
+
+C<$client-E<gt>search>
+ 
+=head3 /_search/scroll
+
+C<POST /_search/scroll>
+
+C<$client-E<gt>scroll>
+ 
+=head3 /_search/scroll/{scroll_id}
+
+C<POST /_search/scroll/{scroll_id}>
+
+C<$client-E<gt>scroll>
+ 
+=head3 /_search/template
+
+C<POST /_search/template>
+
+C<$client-E<gt>search_template>
+ 
+=head3 /_search_shards
+
+C<POST /_search_shards>
+
+C<$client-E<gt>search_shards>
+ 
+=head3 /_snapshot/{repository}
+
+C<POST /_snapshot/{repository}>
+  
+C<$client-E<gt>snapshot-E<gt>create_repository>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/_cleanup
+
+C<POST /_snapshot/{repository}/_cleanup>
+  
+C<$client-E<gt>snapshot-E<gt>cleanup_repository>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/_verify
+
+C<POST /_snapshot/{repository}/_verify>
+  
+C<$client-E<gt>snapshot-E<gt>verify_repository>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/{snapshot}
+
+C<POST /_snapshot/{repository}/{snapshot}>
+  
+C<$client-E<gt>snapshot-E<gt>create>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/{snapshot}/_restore
+
+C<POST /_snapshot/{repository}/{snapshot}/_restore>
+  
+C<$client-E<gt>snapshot-E<gt>restore>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_tasks/_cancel
+
+C<POST /_tasks/_cancel>
+  
+C<$client-E<gt>tasks-E<gt>cancel>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Tasks>
+ 
+=head3 /_tasks/{task_id}/_cancel
+
+C<POST /_tasks/{task_id}/_cancel>
+  
+C<$client-E<gt>tasks-E<gt>cancel>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Tasks>
+ 
+=head3 /_template/{name}
+
+C<POST /_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_update_by_query/{task_id}/_rethrottle
+
+C<POST /_update_by_query/{task_id}/_rethrottle>
+
+C<$client-E<gt>update_by_query_rethrottle>
+ 
+=head3 /_upgrade
+
+C<POST /_upgrade>
+  
+C<$client-E<gt>indices-E<gt>upgrade>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_validate/query
+
+C<POST /_validate/query>
+  
+C<$client-E<gt>indices-E<gt>validate_query>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{alias}/_rollover
+
+C<POST /{alias}/_rollover>
+  
+C<$client-E<gt>indices-E<gt>rollover>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{alias}/_rollover/{new_index}
+
+C<POST /{alias}/_rollover/{new_index}>
+  
+C<$client-E<gt>indices-E<gt>rollover>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_alias/{name}
+
+C<POST /{index}/_alias/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_aliases/{name}
+
+C<POST /{index}/_aliases/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_analyze
+
+C<POST /{index}/_analyze>
+  
+C<$client-E<gt>indices-E<gt>analyze>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_bulk
+
+C<POST /{index}/_bulk>
+
+C<$client-E<gt>bulk>
+ 
+=head3 /{index}/_bulk/stream
+
+C<POST /{index}/_bulk/stream>
+
+C<$client-E<gt>bulk_stream>
+ 
+=head3 /{index}/_cache/clear
+
+C<POST /{index}/_cache/clear>
+  
+C<$client-E<gt>indices-E<gt>clear_cache>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_clone/{target}
+
+C<POST /{index}/_clone/{target}>
+  
+C<$client-E<gt>indices-E<gt>clone>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_close
+
+C<POST /{index}/_close>
+  
+C<$client-E<gt>indices-E<gt>close>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_count
+
+C<POST /{index}/_count>
+
+C<$client-E<gt>count>
+ 
+=head3 /{index}/_create/{id}
+
+C<POST /{index}/_create/{id}>
+
+C<$client-E<gt>create>
+ 
+=head3 /{index}/_delete_by_query
+
+C<POST /{index}/_delete_by_query>
+
+C<$client-E<gt>delete_by_query>
+ 
+=head3 /{index}/_doc
+
+C<POST /{index}/_doc>
+
+C<$client-E<gt>index>
+ 
+=head3 /{index}/_doc/{id}
+
+C<POST /{index}/_doc/{id}>
+
+C<$client-E<gt>index>
+ 
+=head3 /{index}/_explain/{id}
+
+C<POST /{index}/_explain/{id}>
+
+C<$client-E<gt>explain>
+ 
+=head3 /{index}/_field_caps
+
+C<POST /{index}/_field_caps>
+
+C<$client-E<gt>field_caps>
+ 
+=head3 /{index}/_flush
+
+C<POST /{index}/_flush>
+  
+C<$client-E<gt>indices-E<gt>flush>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_forcemerge
+
+C<POST /{index}/_forcemerge>
+  
+C<$client-E<gt>indices-E<gt>forcemerge>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_mapping
+
+C<POST /{index}/_mapping>
+  
+C<$client-E<gt>indices-E<gt>put_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_mget
+
+C<POST /{index}/_mget>
+
+C<$client-E<gt>mget>
+ 
+=head3 /{index}/_msearch
+
+C<POST /{index}/_msearch>
+
+C<$client-E<gt>msearch>
+ 
+=head3 /{index}/_msearch/template
+
+C<POST /{index}/_msearch/template>
+
+C<$client-E<gt>msearch_template>
+ 
+=head3 /{index}/_mtermvectors
+
+C<POST /{index}/_mtermvectors>
+
+C<$client-E<gt>mtermvectors>
+ 
+=head3 /{index}/_open
+
+C<POST /{index}/_open>
+  
+C<$client-E<gt>indices-E<gt>open>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_rank_eval
+
+C<POST /{index}/_rank_eval>
+
+C<$client-E<gt>rank_eval>
+ 
+=head3 /{index}/_refresh
+
+C<POST /{index}/_refresh>
+  
+C<$client-E<gt>indices-E<gt>refresh>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_search
+
+C<POST /{index}/_search>
+
+C<$client-E<gt>search>
+ 
+=head3 /{index}/_search/point_in_time
+
+C<POST /{index}/_search/point_in_time>
+
+C<$client-E<gt>create_pit>
+ 
+=head3 /{index}/_search/template
+
+C<POST /{index}/_search/template>
+
+C<$client-E<gt>search_template>
+ 
+=head3 /{index}/_search_shards
+
+C<POST /{index}/_search_shards>
+
+C<$client-E<gt>search_shards>
+ 
+=head3 /{index}/_shrink/{target}
+
+C<POST /{index}/_shrink/{target}>
+  
+C<$client-E<gt>indices-E<gt>shrink>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_split/{target}
+
+C<POST /{index}/_split/{target}>
+  
+C<$client-E<gt>indices-E<gt>split>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_termvectors
+
+C<POST /{index}/_termvectors>
+
+C<$client-E<gt>termvectors>
+ 
+=head3 /{index}/_termvectors/{id}
+
+C<POST /{index}/_termvectors/{id}>
+
+C<$client-E<gt>termvectors>
+ 
+=head3 /{index}/_update/{id}
+
+C<POST /{index}/_update/{id}>
+
+C<$client-E<gt>update>
+ 
+=head3 /{index}/_update_by_query
+
+C<POST /{index}/_update_by_query>
+
+C<$client-E<gt>update_by_query>
+ 
+=head3 /{index}/_upgrade
+
+C<POST /{index}/_upgrade>
+  
+C<$client-E<gt>indices-E<gt>upgrade>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_validate/query
+
+C<POST /{index}/_validate/query>
+  
+C<$client-E<gt>indices-E<gt>validate_query>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/ingestion/_pause
+
+C<POST /{index}/ingestion/_pause>
+  
+C<$client-E<gt>ingestion-E<gt>pause>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingestion>
+ 
+=head3 /{index}/ingestion/_resume
+
+C<POST /{index}/ingestion/_resume>
+  
+C<$client-E<gt>ingestion-E<gt>resume>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingestion>
+
+=head2 PUT
+ 
+=head3 /_alias
+
+C<PUT /_alias>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_alias/{name}
+
+C<PUT /_alias/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_aliases/{name}
+
+C<PUT /_aliases/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_bulk
+
+C<PUT /_bulk>
+
+C<$client-E<gt>bulk>
+ 
+=head3 /_bulk/stream
+
+C<PUT /_bulk/stream>
+
+C<$client-E<gt>bulk_stream>
+ 
+=head3 /_cluster/decommission/awareness/{awareness_attribute_name}/{awareness_attribute_value}
+
+C<PUT /_cluster/decommission/awareness/{awareness_attribute_name}/{awareness_attribute_value}>
+  
+C<$client-E<gt>cluster-E<gt>put_decommission_awareness>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/routing/awareness/{attribute}/weights
+
+C<PUT /_cluster/routing/awareness/{attribute}/weights>
+  
+C<$client-E<gt>cluster-E<gt>put_weighted_routing>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/settings
+
+C<PUT /_cluster/settings>
+  
+C<$client-E<gt>cluster-E<gt>put_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_component_template/{name}
+
+C<PUT /_component_template/{name}>
+  
+C<$client-E<gt>cluster-E<gt>put_component_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_data_stream/{name}
+
+C<PUT /_data_stream/{name}>
+  
+C<$client-E<gt>indices-E<gt>create_data_stream>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_index_template/{name}
+
+C<PUT /_index_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_index_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_ingest/pipeline/{id}
+
+C<PUT /_ingest/pipeline/{id}>
+  
+C<$client-E<gt>ingest-E<gt>put_pipeline>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingest>
+ 
+=head3 /_ltr
+
+C<PUT /_ltr>
+  
+C<$client-E<gt>ltr-E<gt>create_default_store>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_feature/{id}
+
+C<PUT /_ltr/_feature/{id}>
+  
+C<$client-E<gt>ltr-E<gt>create_feature>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_featureset/{id}
+
+C<PUT /_ltr/_featureset/{id}>
+  
+C<$client-E<gt>ltr-E<gt>create_featureset>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_model/{id}
+
+C<PUT /_ltr/_model/{id}>
+  
+C<$client-E<gt>ltr-E<gt>create_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}
+
+C<PUT /_ltr/{store}>
+  
+C<$client-E<gt>ltr-E<gt>create_store>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_feature/{id}
+
+C<PUT /_ltr/{store}/_feature/{id}>
+  
+C<$client-E<gt>ltr-E<gt>create_feature>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_featureset/{id}
+
+C<PUT /_ltr/{store}/_featureset/{id}>
+  
+C<$client-E<gt>ltr-E<gt>create_featureset>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_model/{id}
+
+C<PUT /_ltr/{store}/_model/{id}>
+  
+C<$client-E<gt>ltr-E<gt>create_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_plugins/_flow_framework/workflow/{workflow_id}
+
+C<PUT /_plugins/_flow_framework/workflow/{workflow_id}>
+  
+C<$client-E<gt>flow_framework-E<gt>update>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_ism/policies
+
+C<PUT /_plugins/_ism/policies>
+  
+C<$client-E<gt>ism-E<gt>put_policies>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ism/policies/{policy_id}
+
+C<PUT /_plugins/_ism/policies/{policy_id}>
+  
+C<$client-E<gt>ism-E<gt>put_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_ml/connectors/{connector_id}
+
+C<PUT /_plugins/_ml/connectors/{connector_id}>
+  
+C<$client-E<gt>ml-E<gt>update_connector>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/controllers/{model_id}
+
+C<PUT /_plugins/_ml/controllers/{model_id}>
+  
+C<$client-E<gt>ml-E<gt>update_controller>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/message/{message_id}
+
+C<PUT /_plugins/_ml/memory/message/{message_id}>
+  
+C<$client-E<gt>ml-E<gt>update_message>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/{memory_id}
+
+C<PUT /_plugins/_ml/memory/{memory_id}>
+  
+C<$client-E<gt>ml-E<gt>update_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}
+
+C<PUT /_plugins/_ml/memory_containers/{memory_container_id}>
+  
+C<$client-E<gt>ml-E<gt>update_memory_container>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}
+
+C<PUT /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}>
+  
+C<$client-E<gt>ml-E<gt>update_agentic_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/model_groups/{model_group_id}
+
+C<PUT /_plugins/_ml/model_groups/{model_group_id}>
+  
+C<$client-E<gt>ml-E<gt>update_model_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}
+
+C<PUT /_plugins/_ml/models/{model_id}>
+  
+C<$client-E<gt>ml-E<gt>update_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_notifications/configs/{config_id}
+
+C<PUT /_plugins/_notifications/configs/{config_id}>
+  
+C<$client-E<gt>notifications-E<gt>update_config>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_observability/object/{object_id}
+
+C<PUT /_plugins/_observability/object/{object_id}>
+  
+C<$client-E<gt>observability-E<gt>update_object>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Observability>
+ 
+=head3 /_plugins/_query/_datasources
+
+C<PUT /_plugins/_query/_datasources>
+  
+C<$client-E<gt>query-E<gt>datasources_update>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Query>
+ 
+=head3 /_plugins/_query/settings
+
+C<PUT /_plugins/_query/settings>
+  
+C<$client-E<gt>sql-E<gt>settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SQL>
+ 
+=head3 /_plugins/_replication/{index}/_start
+
+C<PUT /_plugins/_replication/{index}/_start>
+  
+C<$client-E<gt>replication-E<gt>start>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_replication/{index}/_update
+
+C<PUT /_plugins/_replication/{index}/_update>
+  
+C<$client-E<gt>replication-E<gt>update_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_rollup/jobs/{id}
+
+C<PUT /_plugins/_rollup/jobs/{id}>
+  
+C<$client-E<gt>rollups-E<gt>put>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Rollups>
+ 
+=head3 /_plugins/_search_relevance/experiments
+
+C<PUT /_plugins/_search_relevance/experiments>
+  
+C<$client-E<gt>search_relevance-E<gt>put_experiments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/judgments
+
+C<PUT /_plugins/_search_relevance/judgments>
+  
+C<$client-E<gt>search_relevance-E<gt>put_judgments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/query_sets
+
+C<PUT /_plugins/_search_relevance/query_sets>
+  
+C<$client-E<gt>search_relevance-E<gt>put_query_sets>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/search_configurations
+
+C<PUT /_plugins/_search_relevance/search_configurations>
+  
+C<$client-E<gt>search_relevance-E<gt>put_search_configurations>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_security/api/account
+
+C<PUT /_plugins/_security/api/account>
+  
+C<$client-E<gt>security-E<gt>change_password>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/actiongroups/{action_group}
+
+C<PUT /_plugins/_security/api/actiongroups/{action_group}>
+  
+C<$client-E<gt>security-E<gt>create_action_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/allowlist
+
+C<PUT /_plugins/_security/api/allowlist>
+  
+C<$client-E<gt>security-E<gt>create_allowlist>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/audit/config
+
+C<PUT /_plugins/_security/api/audit/config>
+  
+C<$client-E<gt>security-E<gt>update_audit_configuration>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/internalusers/{username}
+
+C<PUT /_plugins/_security/api/internalusers/{username}>
+  
+C<$client-E<gt>security-E<gt>create_user>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/nodesdn/{cluster_name}
+
+C<PUT /_plugins/_security/api/nodesdn/{cluster_name}>
+  
+C<$client-E<gt>security-E<gt>update_distinguished_name>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/roles/{role}
+
+C<PUT /_plugins/_security/api/roles/{role}>
+  
+C<$client-E<gt>security-E<gt>create_role>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/rolesmapping/{role}
+
+C<PUT /_plugins/_security/api/rolesmapping/{role}>
+  
+C<$client-E<gt>security-E<gt>create_role_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/securityconfig/config
+
+C<PUT /_plugins/_security/api/securityconfig/config>
+  
+C<$client-E<gt>security-E<gt>update_configuration>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/ssl/http/reloadcerts
+
+C<PUT /_plugins/_security/api/ssl/http/reloadcerts>
+  
+C<$client-E<gt>security-E<gt>reload_http_certificates>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/ssl/transport/reloadcerts
+
+C<PUT /_plugins/_security/api/ssl/transport/reloadcerts>
+  
+C<$client-E<gt>security-E<gt>reload_transport_certificates>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/tenancy/config
+
+C<PUT /_plugins/_security/api/tenancy/config>
+  
+C<$client-E<gt>security-E<gt>create_update_tenancy_config>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/tenants/{tenant}
+
+C<PUT /_plugins/_security/api/tenants/{tenant}>
+  
+C<$client-E<gt>security-E<gt>create_tenant>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/user/{username}
+
+C<PUT /_plugins/_security/api/user/{username}>
+  
+C<$client-E<gt>security-E<gt>create_user_legacy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_sm/policies/{policy_name}
+
+C<PUT /_plugins/_sm/policies/{policy_name}>
+  
+C<$client-E<gt>sm-E<gt>update_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
+ 
+=head3 /_plugins/_transform/{id}
+
+C<PUT /_plugins/_transform/{id}>
+  
+C<$client-E<gt>transforms-E<gt>put>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Transforms>
+ 
+=head3 /_plugins/geospatial/geojson/_upload
+
+C<PUT /_plugins/geospatial/geojson/_upload>
+  
+C<$client-E<gt>geospatial-E<gt>geojson_upload_put>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
+ 
+=head3 /_plugins/geospatial/ip2geo/datasource/{name}
+
+C<PUT /_plugins/geospatial/ip2geo/datasource/{name}>
+  
+C<$client-E<gt>geospatial-E<gt>put_ip2geo_datasource>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
+ 
+=head3 /_plugins/geospatial/ip2geo/datasource/{name}/_settings
+
+C<PUT /_plugins/geospatial/ip2geo/datasource/{name}/_settings>
+  
+C<$client-E<gt>geospatial-E<gt>put_ip2geo_datasource_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
+ 
+=head3 /_scripts/{id}
+
+C<PUT /_scripts/{id}>
+
+C<$client-E<gt>put_script>
+ 
+=head3 /_scripts/{id}/{context}
+
+C<PUT /_scripts/{id}/{context}>
+
+C<$client-E<gt>put_script>
+ 
+=head3 /_search/pipeline/{id}
+
+C<PUT /_search/pipeline/{id}>
+  
+C<$client-E<gt>search_pipeline-E<gt>put>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchPipeline>
+ 
+=head3 /_settings
+
+C<PUT /_settings>
+  
+C<$client-E<gt>indices-E<gt>put_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_snapshot/{repository}
+
+C<PUT /_snapshot/{repository}>
+  
+C<$client-E<gt>snapshot-E<gt>create_repository>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/{snapshot}
+
+C<PUT /_snapshot/{repository}/{snapshot}>
+  
+C<$client-E<gt>snapshot-E<gt>create>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/{snapshot}/_clone/{target_snapshot}
+
+C<PUT /_snapshot/{repository}/{snapshot}/_clone/{target_snapshot}>
+  
+C<$client-E<gt>snapshot-E<gt>clone>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_template/{name}
+
+C<PUT /_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_wlm/query_group
+
+C<PUT /_wlm/query_group>
+  
+C<$client-E<gt>wlm-E<gt>create_query_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::WLM>
+ 
+=head3 /_wlm/query_group/{name}
+
+C<PUT /_wlm/query_group/{name}>
+  
+C<$client-E<gt>wlm-E<gt>update_query_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::WLM>
+ 
+=head3 /{index}
+
+C<PUT /{index}>
+  
+C<$client-E<gt>indices-E<gt>create>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_alias
+
+C<PUT /{index}/_alias>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_alias/{name}
+
+C<PUT /{index}/_alias/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_aliases
+
+C<PUT /{index}/_aliases>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_aliases/{name}
+
+C<PUT /{index}/_aliases/{name}>
+  
+C<$client-E<gt>indices-E<gt>put_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_block/{block}
+
+C<PUT /{index}/_block/{block}>
+  
+C<$client-E<gt>indices-E<gt>add_block>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_bulk
+
+C<PUT /{index}/_bulk>
+
+C<$client-E<gt>bulk>
+ 
+=head3 /{index}/_bulk/stream
+
+C<PUT /{index}/_bulk/stream>
+
+C<$client-E<gt>bulk_stream>
+ 
+=head3 /{index}/_clone/{target}
+
+C<PUT /{index}/_clone/{target}>
+  
+C<$client-E<gt>indices-E<gt>clone>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_create/{id}
+
+C<PUT /{index}/_create/{id}>
+
+C<$client-E<gt>create>
+ 
+=head3 /{index}/_doc/{id}
+
+C<PUT /{index}/_doc/{id}>
+
+C<$client-E<gt>index>
+ 
+=head3 /{index}/_mapping
+
+C<PUT /{index}/_mapping>
+  
+C<$client-E<gt>indices-E<gt>put_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_settings
+
+C<PUT /{index}/_settings>
+  
+C<$client-E<gt>indices-E<gt>put_settings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_shrink/{target}
+
+C<PUT /{index}/_shrink/{target}>
+  
+C<$client-E<gt>indices-E<gt>shrink>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_split/{target}
+
+C<PUT /{index}/_split/{target}>
+  
+C<$client-E<gt>indices-E<gt>split>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+
+=head2 PATCH
+ 
+=head3 /_plugins/_security/api/actiongroups
+
+C<PATCH /_plugins/_security/api/actiongroups>
+  
+C<$client-E<gt>security-E<gt>patch_action_groups>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/actiongroups/{action_group}
+
+C<PATCH /_plugins/_security/api/actiongroups/{action_group}>
+  
+C<$client-E<gt>security-E<gt>patch_action_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/allowlist
+
+C<PATCH /_plugins/_security/api/allowlist>
+  
+C<$client-E<gt>security-E<gt>patch_allowlist>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/audit
+
+C<PATCH /_plugins/_security/api/audit>
+  
+C<$client-E<gt>security-E<gt>patch_audit_configuration>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/internalusers
+
+C<PATCH /_plugins/_security/api/internalusers>
+  
+C<$client-E<gt>security-E<gt>patch_users>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/internalusers/{username}
+
+C<PATCH /_plugins/_security/api/internalusers/{username}>
+  
+C<$client-E<gt>security-E<gt>patch_user>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/nodesdn
+
+C<PATCH /_plugins/_security/api/nodesdn>
+  
+C<$client-E<gt>security-E<gt>patch_distinguished_names>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/nodesdn/{cluster_name}
+
+C<PATCH /_plugins/_security/api/nodesdn/{cluster_name}>
+  
+C<$client-E<gt>security-E<gt>patch_distinguished_name>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/roles
+
+C<PATCH /_plugins/_security/api/roles>
+  
+C<$client-E<gt>security-E<gt>patch_roles>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/roles/{role}
+
+C<PATCH /_plugins/_security/api/roles/{role}>
+  
+C<$client-E<gt>security-E<gt>patch_role>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/rolesmapping
+
+C<PATCH /_plugins/_security/api/rolesmapping>
+  
+C<$client-E<gt>security-E<gt>patch_role_mappings>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/rolesmapping/{role}
+
+C<PATCH /_plugins/_security/api/rolesmapping/{role}>
+  
+C<$client-E<gt>security-E<gt>patch_role_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/securityconfig
+
+C<PATCH /_plugins/_security/api/securityconfig>
+  
+C<$client-E<gt>security-E<gt>patch_configuration>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/tenants
+
+C<PATCH /_plugins/_security/api/tenants>
+  
+C<$client-E<gt>security-E<gt>patch_tenants>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/tenants/{tenant}
+
+C<PATCH /_plugins/_security/api/tenants/{tenant}>
+  
+C<$client-E<gt>security-E<gt>patch_tenant>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+
+=head2 DELETE
+ 
+=head3 /_cluster/decommission/awareness
+
+C<DELETE /_cluster/decommission/awareness>
+  
+C<$client-E<gt>cluster-E<gt>delete_decommission_awareness>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/routing/awareness/weights
+
+C<DELETE /_cluster/routing/awareness/weights>
+  
+C<$client-E<gt>cluster-E<gt>delete_weighted_routing>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_cluster/voting_config_exclusions
+
+C<DELETE /_cluster/voting_config_exclusions>
+  
+C<$client-E<gt>cluster-E<gt>delete_voting_config_exclusions>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_component_template/{name}
+
+C<DELETE /_component_template/{name}>
+  
+C<$client-E<gt>cluster-E<gt>delete_component_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Cluster>
+ 
+=head3 /_dangling/{index_uuid}
+
+C<DELETE /_dangling/{index_uuid}>
+  
+C<$client-E<gt>dangling_indices-E<gt>delete_dangling_index>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::DanglingIndices>
+ 
+=head3 /_data_stream/{name}
+
+C<DELETE /_data_stream/{name}>
+  
+C<$client-E<gt>indices-E<gt>delete_data_stream>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_index_template/{name}
+
+C<DELETE /_index_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>delete_index_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_ingest/pipeline/{id}
+
+C<DELETE /_ingest/pipeline/{id}>
+  
+C<$client-E<gt>ingest-E<gt>delete_pipeline>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Ingest>
+ 
+=head3 /_ltr
+
+C<DELETE /_ltr>
+  
+C<$client-E<gt>ltr-E<gt>delete_default_store>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_feature/{id}
+
+C<DELETE /_ltr/_feature/{id}>
+  
+C<$client-E<gt>ltr-E<gt>delete_feature>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_featureset/{id}
+
+C<DELETE /_ltr/_featureset/{id}>
+  
+C<$client-E<gt>ltr-E<gt>delete_featureset>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/_model/{id}
+
+C<DELETE /_ltr/_model/{id}>
+  
+C<$client-E<gt>ltr-E<gt>delete_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}
+
+C<DELETE /_ltr/{store}>
+  
+C<$client-E<gt>ltr-E<gt>delete_store>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_feature/{id}
+
+C<DELETE /_ltr/{store}/_feature/{id}>
+  
+C<$client-E<gt>ltr-E<gt>delete_feature>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_featureset/{id}
+
+C<DELETE /_ltr/{store}/_featureset/{id}>
+  
+C<$client-E<gt>ltr-E<gt>delete_featureset>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_ltr/{store}/_model/{id}
+
+C<DELETE /_ltr/{store}/_model/{id}>
+  
+C<$client-E<gt>ltr-E<gt>delete_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::LTR>
+ 
+=head3 /_plugins/_asynchronous_search/{id}
+
+C<DELETE /_plugins/_asynchronous_search/{id}>
+  
+C<$client-E<gt>asynchronous_search-E<gt>delete>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::AsyncSearch>
+ 
+=head3 /_plugins/_flow_framework/workflow/{workflow_id}
+
+C<DELETE /_plugins/_flow_framework/workflow/{workflow_id}>
+  
+C<$client-E<gt>flow_framework-E<gt>delete>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+ 
+=head3 /_plugins/_ism/policies/{policy_id}
+
+C<DELETE /_plugins/_ism/policies/{policy_id}>
+  
+C<$client-E<gt>ism-E<gt>delete_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ISM>
+ 
+=head3 /_plugins/_knn/models/{model_id}
+
+C<DELETE /_plugins/_knn/models/{model_id}>
+  
+C<$client-E<gt>knn-E<gt>delete_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::KNN>
+ 
+=head3 /_plugins/_ml/agents/{agent_id}
+
+C<DELETE /_plugins/_ml/agents/{agent_id}>
+  
+C<$client-E<gt>ml-E<gt>delete_agent>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/connectors/{connector_id}
+
+C<DELETE /_plugins/_ml/connectors/{connector_id}>
+  
+C<$client-E<gt>ml-E<gt>delete_connector>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/controllers/{model_id}
+
+C<DELETE /_plugins/_ml/controllers/{model_id}>
+  
+C<$client-E<gt>ml-E<gt>delete_controller>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory/{memory_id}
+
+C<DELETE /_plugins/_ml/memory/{memory_id}>
+  
+C<$client-E<gt>ml-E<gt>delete_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}
+
+C<DELETE /_plugins/_ml/memory_containers/{memory_container_id}>
+  
+C<$client-E<gt>ml-E<gt>delete_memory_container>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}
+
+C<DELETE /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}>
+  
+C<$client-E<gt>ml-E<gt>delete_agentic_memory>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/model_groups/{model_group_id}
+
+C<DELETE /_plugins/_ml/model_groups/{model_group_id}>
+  
+C<$client-E<gt>ml-E<gt>delete_model_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/models/{model_id}
+
+C<DELETE /_plugins/_ml/models/{model_id}>
+  
+C<$client-E<gt>ml-E<gt>delete_model>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_ml/tasks/{task_id}
+
+C<DELETE /_plugins/_ml/tasks/{task_id}>
+  
+C<$client-E<gt>ml-E<gt>delete_task>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::ML>
+ 
+=head3 /_plugins/_notifications/configs
+
+C<DELETE /_plugins/_notifications/configs>
+  
+C<$client-E<gt>notifications-E<gt>delete_configs>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_notifications/configs/{config_id}
+
+C<DELETE /_plugins/_notifications/configs/{config_id}>
+  
+C<$client-E<gt>notifications-E<gt>delete_config>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Notifications>
+ 
+=head3 /_plugins/_observability/object
+
+C<DELETE /_plugins/_observability/object>
+  
+C<$client-E<gt>observability-E<gt>delete_objects>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Observability>
+ 
+=head3 /_plugins/_observability/object/{object_id}
+
+C<DELETE /_plugins/_observability/object/{object_id}>
+  
+C<$client-E<gt>observability-E<gt>delete_object>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Observability>
+ 
+=head3 /_plugins/_query/_datasources/{datasource_name}
+
+C<DELETE /_plugins/_query/_datasources/{datasource_name}>
+  
+C<$client-E<gt>query-E<gt>datasource_delete>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Query>
+ 
+=head3 /_plugins/_replication/_autofollow
+
+C<DELETE /_plugins/_replication/_autofollow>
+  
+C<$client-E<gt>replication-E<gt>delete_replication_rule>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Replication>
+ 
+=head3 /_plugins/_rollup/jobs/{id}
+
+C<DELETE /_plugins/_rollup/jobs/{id}>
+  
+C<$client-E<gt>rollups-E<gt>delete>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Rollups>
+ 
+=head3 /_plugins/_search_relevance/experiments/schedule/{experiment_id}
+
+C<DELETE /_plugins/_search_relevance/experiments/schedule/{experiment_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>delete_scheduled_experiments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/experiments/{experiment_id}
+
+C<DELETE /_plugins/_search_relevance/experiments/{experiment_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>delete_experiments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/judgments/{judgment_id}
+
+C<DELETE /_plugins/_search_relevance/judgments/{judgment_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>delete_judgments>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/query_sets/{query_set_id}
+
+C<DELETE /_plugins/_search_relevance/query_sets/{query_set_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>delete_query_sets>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_search_relevance/search_configurations/{search_configuration_id}
+
+C<DELETE /_plugins/_search_relevance/search_configurations/{search_configuration_id}>
+  
+C<$client-E<gt>search_relevance-E<gt>delete_search_configurations>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+ 
+=head3 /_plugins/_security/api/actiongroups/{action_group}
+
+C<DELETE /_plugins/_security/api/actiongroups/{action_group}>
+  
+C<$client-E<gt>security-E<gt>delete_action_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/cache
+
+C<DELETE /_plugins/_security/api/cache>
+  
+C<$client-E<gt>security-E<gt>flush_cache>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/internalusers/{username}
+
+C<DELETE /_plugins/_security/api/internalusers/{username}>
+  
+C<$client-E<gt>security-E<gt>delete_user>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/nodesdn/{cluster_name}
+
+C<DELETE /_plugins/_security/api/nodesdn/{cluster_name}>
+  
+C<$client-E<gt>security-E<gt>delete_distinguished_name>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/roles/{role}
+
+C<DELETE /_plugins/_security/api/roles/{role}>
+  
+C<$client-E<gt>security-E<gt>delete_role>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/rolesmapping/{role}
+
+C<DELETE /_plugins/_security/api/rolesmapping/{role}>
+  
+C<$client-E<gt>security-E<gt>delete_role_mapping>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/tenants/{tenant}
+
+C<DELETE /_plugins/_security/api/tenants/{tenant}>
+  
+C<$client-E<gt>security-E<gt>delete_tenant>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_security/api/user/{username}
+
+C<DELETE /_plugins/_security/api/user/{username}>
+  
+C<$client-E<gt>security-E<gt>delete_user_legacy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Security>
+ 
+=head3 /_plugins/_sm/policies/{policy_name}
+
+C<DELETE /_plugins/_sm/policies/{policy_name}>
+  
+C<$client-E<gt>sm-E<gt>delete_policy>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
+ 
+=head3 /_plugins/_transform/{id}
+
+C<DELETE /_plugins/_transform/{id}>
+  
+C<$client-E<gt>transforms-E<gt>delete>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Transforms>
+ 
+=head3 /_plugins/geospatial/ip2geo/datasource/{name}
+
+C<DELETE /_plugins/geospatial/ip2geo/datasource/{name}>
+  
+C<$client-E<gt>geospatial-E<gt>delete_ip2geo_datasource>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
+ 
+=head3 /_scripts/{id}
+
+C<DELETE /_scripts/{id}>
+
+C<$client-E<gt>delete_script>
+ 
+=head3 /_search/pipeline/{id}
+
+C<DELETE /_search/pipeline/{id}>
+  
+C<$client-E<gt>search_pipeline-E<gt>delete>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::SearchPipeline>
+ 
+=head3 /_search/point_in_time
+
+C<DELETE /_search/point_in_time>
+
+C<$client-E<gt>delete_pit>
+ 
+=head3 /_search/point_in_time/_all
+
+C<DELETE /_search/point_in_time/_all>
+
+C<$client-E<gt>delete_all_pits>
+ 
+=head3 /_search/scroll
+
+C<DELETE /_search/scroll>
+
+C<$client-E<gt>clear_scroll>
+ 
+=head3 /_search/scroll/{scroll_id}
+
+C<DELETE /_search/scroll/{scroll_id}>
+
+C<$client-E<gt>clear_scroll>
+ 
+=head3 /_snapshot/{repository}
+
+C<DELETE /_snapshot/{repository}>
+  
+C<$client-E<gt>snapshot-E<gt>delete_repository>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_snapshot/{repository}/{snapshot}
+
+C<DELETE /_snapshot/{repository}/{snapshot}>
+  
+C<$client-E<gt>snapshot-E<gt>delete>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+ 
+=head3 /_template/{name}
+
+C<DELETE /_template/{name}>
+  
+C<$client-E<gt>indices-E<gt>delete_template>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /_wlm/query_group/{name}
+
+C<DELETE /_wlm/query_group/{name}>
+  
+C<$client-E<gt>wlm-E<gt>delete_query_group>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::WLM>
+ 
+=head3 /{index}
+
+C<DELETE /{index}>
+  
+C<$client-E<gt>indices-E<gt>delete>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_alias/{name}
+
+C<DELETE /{index}/_alias/{name}>
+  
+C<$client-E<gt>indices-E<gt>delete_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_aliases/{name}
+
+C<DELETE /{index}/_aliases/{name}>
+  
+C<$client-E<gt>indices-E<gt>delete_alias>
+
+L<C<OpenSearch::Client::Core::3_0::Direct::Indices>
+ 
+=head3 /{index}/_doc/{id}
+
+C<DELETE /{index}/_doc/{id}>
+
+C<$client-E<gt>delete>
+
+=head1 MANUAL
+
+Documentation index L<OpenSearch::Client::Manual>
+
+=head1 HISTORY
+
+This distribution is derived from L<Search::Elasticsearch> version 7.714.
+All subsequent changes are unique to this distribution.
+
+=head1 AUTHOR
+
+Mark Dootson E<lt>mdootson@cpan.orgE<gt> ( current maintainer )
+
+=head1 CREDITS
+
+L<OpenSearch::Client> is based on L<Search::Elasticsearch> version 7.714
+by Enrico Zimuel E<lt>enrico.zimuel@elastic.coE<gt>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Mark Dootson ( this distribution )
+
+Copyright (C) 2021 by Elasticsearch BV ( original distribution ) 
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+
+=cut

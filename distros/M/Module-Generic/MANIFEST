@@ -30,6 +30,7 @@ lib/Module/Generic/Null.pm
 lib/Module/Generic/Null.pod
 lib/Module/Generic/Number.pm
 lib/Module/Generic/Number.pod
+lib/Module/Generic/Number/Format.pm
 lib/Module/Generic/RegexpCapture.pod
 lib/Module/Generic/Scalar.pm
 lib/Module/Generic/Scalar.pod
@@ -48,7 +49,7 @@ README
 README.md
 scripts/gen_magic_json.pl
 scripts/startup.pl
-SIGNATURE			Public-key signature (added by MakeMaker)
+SIGNATURE
 t/00.load.t
 t/01.core_methods.t
 t/02.num.t
@@ -83,6 +84,7 @@ t/30.modperl.t
 t/31.global.t
 t/32.file_magic.t
 t/33.xs_methods.t
+t/34.subinfo.t
 t/90.pod.t
 t/91.coverage.t
 t/93.signature.t

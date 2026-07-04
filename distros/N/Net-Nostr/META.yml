@@ -1,16 +1,12 @@
 ---
-abstract: 'Client and relay library for the Nostr protocol'
+abstract: 'Compatibility shim for the Nostr client and relay distributions'
 author:
   - 'Nicholas B. Hubbard <nicholashubbard@posteo.net>'
 build_requires:
-  Clone: '0'
-  ExtUtils::MakeMaker: '0'
+  AnyEvent: '0'
+  AnyEvent::WebSocket::Client: '0'
   IO::Socket::SSL: '0'
   Test2::V0: '0'
-  Test::Pod: '0'
-  Test::Pod::Coverage: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: gpl
@@ -23,21 +19,12 @@ no_index:
     - t
     - inc
 requires:
-  AnyEvent: '0'
   AnyEvent::HTTP: '0'
-  AnyEvent::WebSocket::Client: '0'
-  AnyEvent::WebSocket::Server: '0'
-  Bitcoin::BIP39: '0'
-  Bitcoin::Crypto: '0'
-  Class::Tiny: '0'
-  Crypt::PK::ECC::Schnorr: '0'
-  Crypt::ScryptKDF: '0'
-  CryptX: '0'
-  JSON: '0'
+  Net::Nostr::Client: '0'
+  Net::Nostr::Core: '0'
+  Net::Nostr::Relay: '0'
   perl: '5.016'
   strictures: '2'
-resources:
-  bugtracker: https://github.com/NicholasBHubbard/Net-Nostr/issues
-  repository: https://github.com/NicholasBHubbard/Net-Nostr
-version: '2.001000'
+resources: {}
+version: '2.002000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

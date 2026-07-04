@@ -23,6 +23,7 @@ t/04-pem.t
 t/06-fips.t
 t/07-openid.t
 t/08-cve-2026-12205.t
+t/09-CVE-2026-14570.t
 xt/meta.t
 xt/pmv.t
 xt/pod.t

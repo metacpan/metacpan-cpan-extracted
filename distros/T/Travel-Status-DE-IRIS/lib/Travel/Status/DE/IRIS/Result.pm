@@ -14,7 +14,7 @@ use List::Util      qw(any);
 use List::MoreUtils qw(uniq lastval);
 use Scalar::Util    qw(weaken);
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
 	qw(arrival arrival_delay arrival_has_realtime arrival_is_additional arrival_is_cancelled arrival_hidden
@@ -737,8 +737,18 @@ sub messages {
 	my @messages = reverse sort keys %{ $self->{messages} };
 	my @ret      = map {
 		[
-			$self->parse_ts( $self->{messages}->{$_}->[0] ),
-			$self->translate_msg( $self->{messages}->{$_}->[2] )
+			$self->parse_ts( $self->{messages}{$_}[0] ),
+			$self->translate_msg(
+				$self->{messages}{$_}[2],
+				$self->{messages}{$_}[1]
+			),
+			$_,
+			$self->{messages}{$_}[3]
+			? $self->parse_ts( $self->{messages}{$_}[3] )
+			: undef,
+			$self->{messages}{$_}[4]
+			? $self->parse_ts( $self->{messages}{$_}[4] )
+			: undef,
 		]
 	} @messages;
 
@@ -865,8 +875,11 @@ sub sched_route {
 }
 
 sub translate_msg {
-	my ( $self, $msg ) = @_;
+	my ( $self, $msg, $type ) = @_;
 
+	if ( $type and $type eq 'h' ) {
+		return $msg;
+	}
 	return $translation{$msg} // "?($msg)";
 }
 
@@ -940,7 +953,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

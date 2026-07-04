@@ -1,0 +1,12 @@
+1.001000   2026-07-03
+
+  - First independent Net-Nostr-Core release, split from Net-Nostr
+  - Provide core protocol and NIP tooling
+  - Make AnyEvent::HTTP optional for Core and lazy-load it only for
+    Net::Nostr::Identifier network lookup and verification
+  - Recommend AnyEvent::HTTP for Core installs; the Net::Nostr shim keeps it
+    as a hard dependency for the full historical install
+  - Remove support for unrecommended NIPs 15, 28, 72, and 90, including
+    Net::Nostr::Marketplace, Net::Nostr::Channel, Net::Nostr::Community, and
+    Net::Nostr::DVM
+  - Use Makefile.PL as the single dependency source of truth

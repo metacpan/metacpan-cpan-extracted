@@ -1,0 +1,32 @@
+---
+abstract: 'WebSocket relay server for the Nostr protocol'
+author:
+  - 'Nicholas B. Hubbard <nicholashubbard@posteo.net>'
+build_requires:
+  AnyEvent::WebSocket::Client: '0'
+  IO::Socket::SSL: '0'
+  Test2::V0: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Nostr-Relay
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '0'
+  AnyEvent::WebSocket::Server: '0'
+  Class::Tiny: '0'
+  Crypt::PK::ECC::Schnorr: '0'
+  CryptX: '0'
+  JSON: '0'
+  Net::Nostr::Core: '0'
+  perl: '5.016'
+  strictures: '2'
+resources: {}
+version: '1.001000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

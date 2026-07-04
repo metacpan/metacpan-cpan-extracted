@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
   Path::Tiny: '0.062'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,37 +26,37 @@ no_index:
 provides:
   Archive::SCS:
     file: lib/Archive/SCS.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::CityHash:
     file: lib/Archive/SCS/CityHash.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::DirIndex:
     file: lib/Archive/SCS/DirIndex.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::Directory:
     file: lib/Archive/SCS/Directory.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::GameDir:
     file: lib/Archive/SCS/GameDir.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::HashFS:
     file: lib/Archive/SCS/HashFS.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::HashFS2:
     file: lib/Archive/SCS/HashFS2.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::InMemory:
     file: lib/Archive/SCS/InMemory.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::Mountable:
     file: lib/Archive/SCS/Mountable.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::TObj:
     file: lib/Archive/SCS/TObj.pm
-    version: '1.10'
+    version: '1.11'
   Archive::SCS::Zip:
     file: lib/Archive/SCS/Zip.pm
-    version: '1.10'
+    version: '1.11'
 requires:
   Compress::Raw::Zlib: '2.070'
   IO::Compress::Zip: '0'
@@ -70,7 +70,7 @@ requires:
 resources:
   homepage: https://forum.scssoft.com/viewtopic.php?t=330746
   repository: git://github.com/nautofon/Archive-SCS.git
-version: '1.10'
+version: '1.11'
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

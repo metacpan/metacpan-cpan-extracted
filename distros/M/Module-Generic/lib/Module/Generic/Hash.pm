@@ -119,7 +119,7 @@ sub as_hash
     if( @_ )
     {
         my $opts = $self->_get_args_as_hash( @_ );
-        if( $opts->{strict} )
+        if( $opts->{strict} || $opts->{native} )
         {
             my $ref = { %$self };
             return( $ref );

@@ -1,0 +1,27 @@
+Revision history for File-Raw-Archive
+
+0.01    2026-05-05
+        - First public release. Archive container reader/writer with a
+          plugin API; built-in tar plugin reads ustar (POSIX 1988),
+          GNU @LongLink, and PAX extended-header tarballs (every
+          real-world tar dialect in active use). Writes ustar / GNU /
+          PAX / auto via the `format` option.
+        - Sub-second mtime round-trip via PAX `mtime=<sec>.<ns>`.
+        - PAX `SCHILY.xattr.*` xattr round-trip; xattrs applied during
+          extract on Linux/macOS/FreeBSD via the platform's setxattr.
+        - PAX `'g'` global header emission via `global_meta` write
+          option; readers inherit global keys until overridden.
+        - gzip composition: `compression => 'gzip' | 'auto'` streams
+          through libz on the way in/out, keeping RSS bounded.
+        - Filtered iteration via `entry_filter` predicate.
+        - Parallel extract worker pool: `extract_all($p, $dest,
+          parallel => N)` spawns N forked writer workers, each with
+          its own pipe carrying length-prefixed Storable jobs.
+          Round-robin dispatch with natural backpressure. Errors
+          aggregated and croaked as a single message at finish.
+          Windows falls back to sequential with a one-time warning.
+        - Path-traversal-safe `extract_all` (refuses `..` segments
+          and absolute paths unless `unsafe_paths => 1`).
+        - Publishes archive_plugin.h via ExtUtils::Depends so sister
+          dists (File::Raw::Archive::Zip, ::Cpio, ::Ar) can register
+          additional formats.

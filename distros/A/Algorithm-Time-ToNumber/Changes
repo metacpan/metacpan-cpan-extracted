@@ -1,5 +1,13 @@
 Revision history for Algorithm-Time-ToNumber
 
+0.1.1   2026-07-04/02:00
+        - derp... add missing files to MANIFEST
+
+0.1.0   2026-07-03/16:00
+        - angle_day, circle_day, suricata_to_angle_both, suricata_to_angle_day,
+          suricata_to_circle_both, and suricata_to_circle_day
+        - use XS for parsing a few of these for a slight bump in speed
+
 0.0.1   2026-07-03/01:30
         - init version
 

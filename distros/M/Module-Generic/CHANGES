@@ -1,5 +1,36 @@
 Revision history for Perl module Module::Generic
 
+v1.6.0 2026-07-03T21:53:26+0900
+    [New features]
+    - Added Module::Generic::_subinfo(), a pure-Perl introspection helper built on
+      the core B module. It returns detailed information about a subroutine,
+      including its short and fully-qualified names, package, source file and line,
+      prototype, whether it is anonymous, a closure or an XSUB, together with a
+      hash reference exposing the same information by name.
+    - Added Module::Generic::_subname() as a lightweight convenience wrapper around
+      _subinfo(), returning only the short subroutine name.
+
+    [Improvements]
+    - Refactored Module::Generic::Number so that number representation is fully
+      decoupled from formatting. Formatting state is now maintained by
+      Module::Generic::Number::Format, reducing the memory footprint of Number
+      objects that are used only as numeric values.
+    - Improved clone() handling in Module::Generic::Number so cloned objects also
+      clone and update their associated formatter, preserving formatting state
+      across numeric operations.
+    - Expanded the regression test suite for subroutine introspection, covering
+      named subroutines, methods, anonymous subroutines, closures, prototypes,
+      automatic caller detection, and compatibility across Perl releases from
+      v5.16 through v5.40.
+
+    [Bug fixes]
+    - Fixed format_bytes() so formatting failures are no longer masked by string
+      concatenation, allowing errors from clone() and format() to propagate
+      correctly.
+    - Fixed the class-method path of clone() in both Module::Generic::Number and
+      Module::Generic::Number::Format so the supplied numeric value is correctly
+      propagated to the new object.
+
 v1.5.11 2026-06-06T23:17:55+0900
     [Bug fixes]
     - t/02.num.t: expect the numeric thousand and decimal separators from LC_NUMERIC

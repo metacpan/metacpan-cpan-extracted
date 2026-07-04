@@ -1,5 +1,9 @@
 Revision history for perl distribution Archive-SCS
 
+1.11 - 2026-07-04
+
+  - Work around IO::Compress::Zip issue (GH #2)
+
 1.10 - 2026-07-02
 
   - Change internal hash format to 16-byte hex string

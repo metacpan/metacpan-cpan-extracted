@@ -34,6 +34,7 @@
          "requires" : {
             "Config::Tiny" : "0",
             "Getopt::Long" : "0",
+            "IO::Socket::INET" : "0",
             "Plack::App::DirectoryIndex" : "v0.2.3",
             "Plack::Runner" : "0",
             "Pod::Usage" : "0"
@@ -59,6 +60,6 @@
          "web" : "https://github.com/davorg-cpan/app-httpthis"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

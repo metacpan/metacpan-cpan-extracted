@@ -35,7 +35,7 @@
       "runtime" : {
          "requires" : {
             "Compress::Raw::Bzip2" : "2.218",
-            "Compress::Raw::Zlib" : "2.218",
+            "Compress::Raw::Zlib" : "2.222",
             "Encode" : "0",
             "Scalar::Util" : "0",
             "Time::Local" : "0"
@@ -54,6 +54,6 @@
          "web" : "https://github.com/pmqs/IO-Compress"
       }
    },
-   "version" : "2.221",
+   "version" : "2.223",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

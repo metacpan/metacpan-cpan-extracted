@@ -9,7 +9,7 @@ use Search::Tools::XML;
 use Search::Tools::UTF8;
 use Mail::Box::Manager;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 my $XMLer = Search::Tools::XML->new();
 

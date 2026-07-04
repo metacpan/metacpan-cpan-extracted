@@ -1,7 +1,7 @@
 package Perl5::Build::Warnings;
 use 5.14.0;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 use Carp;
 use IO::File;
 use IO::Zlib;
@@ -330,14 +330,13 @@ sub get_warnings_for_source {
 
 =head1 BUGS
 
-None reported so far.   The author prefers patches filed at
-L<http://rt.cpan.org> rather than pull requests at github.
+None reported so far.
 
 =head1 AUTHOR
 
     James E Keenan
     CPAN ID: JKEENAN
-    jkeenan@cpan.org
+    jkeenan@pobox.com
     http://thenceforward.net/perl/modules/Perl5-Build-Warnings/
 
 =head1 COPYRIGHT

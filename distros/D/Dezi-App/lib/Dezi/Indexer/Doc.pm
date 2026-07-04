@@ -15,7 +15,7 @@ use SWISH::3::Headers;
 
 use namespace::autoclean;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 my $default_headers = SWISH::3::Headers->new();
 

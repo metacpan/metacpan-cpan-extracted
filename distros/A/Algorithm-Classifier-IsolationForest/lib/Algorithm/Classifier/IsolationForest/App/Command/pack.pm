@@ -36,19 +36,17 @@ sub _read_packed {
 	my ( $magic, $version, $reserved, $n_pts, $n_feats ) = unpack( 'a8 v v V V', $hdr );
 	die "'$path' does not look like a .iforest-packed file\n"
 		unless $magic eq MAGIC;
-	die "'$path' is .iforest-packed version $version; only "
-		. VERSION . " is supported\n"
+	die "'$path' is .iforest-packed version $version; only " . VERSION . " is supported\n"
 		unless $version == VERSION;
 	die "'$path' has non-zero reserved field $reserved\n"
 		unless $reserved == 0;
 	my $bytes;
 	my $want = $n_pts * $n_feats * 8;
 	read( $fh, $bytes, $want ) == $want
-		or die "'$path' truncated: wanted $want bytes, got "
-		. ( defined $bytes ? length($bytes) : 0 ) . "\n";
+		or die "'$path' truncated: wanted $want bytes, got " . ( defined $bytes ? length($bytes) : 0 ) . "\n";
 	close $fh;
 	return ( $n_pts, $n_feats, $bytes );
-}
+} ## end sub _read_packed
 
 sub _write_packed {
 	my ( $path, $n_pts, $n_feats, $bytes ) = @_;
@@ -73,19 +71,21 @@ sub is_packed_file {
 
 sub opt_spec {
 	return (
-		[ 'm=s', 'Model JSON to validate n_features against.',
-			{ 'default' => 'iforest_model.json', 'completion' => 'files' } ],
-		[ 'i=s', 'Input CSV to pack.',
-			{ 'completion' => 'files' } ],
-		[ 'o=s', 'Output .iforest-packed file path.',
-			{ 'completion' => 'files' } ],
+		[
+			'm=s',
+			'Model JSON to validate n_features against.',
+			{ 'default' => 'iforest_model.json', 'completion' => 'files' }
+		],
+		[ 'i=s', 'Input CSV to pack.',                { 'completion' => 'files' } ],
+		[ 'o=s', 'Output .iforest-packed file path.', { 'completion' => 'files' } ],
 		[ 'w',   'Overwrite -o if it already exists.' ],
 	);
-}
+} ## end sub opt_spec
 
 sub abstract { 'Pre-pack a CSV dataset into a binary file the scoring commands can read directly' }
 
-sub description { 'Reads a CSV, validates that every row has the same numeric
+sub description {
+	'Reads a CSV, validates that every row has the same numeric
 column count as the model expects, runs the data through pack_data, and
 writes a self-contained binary (.iforest-packed) the other iforest
 commands can consume directly.
@@ -104,38 +104,34 @@ auto-detects it on its -i input.
 
 Requires the Inline::C backend; pure-Perl installs cannot produce or
 consume the packed format.
-' }
+';
+} ## end sub description
 
 sub validate {
 	my ( $self, $opt, $args ) = @_;
 
 	if ( !defined $opt->{'i'} ) {
 		$self->usage_error('-i has not been specified');
-	}
-	elsif ( !-f $opt->{'i'} ) {
+	} elsif ( !-f $opt->{'i'} ) {
 		$self->usage_error( '-i, "' . $opt->{'i'} . '", is not a file or does not exist' );
-	}
-	elsif ( !-r $opt->{'i'} ) {
+	} elsif ( !-r $opt->{'i'} ) {
 		$self->usage_error( '-i, "' . $opt->{'i'} . '", is not readable' );
 	}
 
 	if ( !defined $opt->{'o'} ) {
 		$self->usage_error('-o has not been specified');
-	}
-	elsif ( -e $opt->{'o'} && !$opt->{'w'} ) {
-		$self->usage_error(
-			'-o, "' . $opt->{'o'} . '", already exists and -w was not specified' );
+	} elsif ( -e $opt->{'o'} && !$opt->{'w'} ) {
+		$self->usage_error( '-o, "' . $opt->{'o'} . '", already exists and -w was not specified' );
 	}
 
 	if ( !-f $opt->{'m'} ) {
 		$self->usage_error( '-m, "' . $opt->{'m'} . '", is not a file or does not exist' );
-	}
-	elsif ( !-r $opt->{'m'} ) {
+	} elsif ( !-r $opt->{'m'} ) {
 		$self->usage_error( '-m, "' . $opt->{'m'} . '", is not readable' );
 	}
 
 	return 1;
-}
+} ## end sub validate
 
 sub execute {
 	my ( $self, $opt, $args ) = @_;
@@ -153,27 +149,24 @@ sub execute {
 		chomp $row;
 		next if $row =~ /^\s*$/;
 		my @f = split /,/, $row, -1;
-		die "line $line of '$opt->{i}' has "
-			. scalar(@f)
-			. " columns but model has $nf features\n"
+		die "line $line of '$opt->{i}' has " . scalar(@f) . " columns but model has $nf features\n"
 			unless scalar @f == $nf;
 		for my $v (@f) {
 			die "line $line of '$opt->{i}' value '$v' is not numeric\n"
 				unless looks_like_number($v);
 		}
 		push @data, \@f;
-	}
+	} ## end for my $row ( read_file( $opt->{'i'} ) )
 	die "input '$opt->{i}' contains no rows\n" unless @data;
 
 	my $packed = $model->pack_data( \@data );
-	_write_packed( $opt->{'o'},
-		$packed->n_pts, $packed->n_feats, $packed->{packed} );
+	_write_packed( $opt->{'o'}, $packed->n_pts, $packed->n_feats, $packed->{packed} );
 
 	printf "wrote %s (%d rows, %d features, %d bytes payload)\n",
 		$opt->{'o'}, $packed->n_pts, $packed->n_feats,
 		$packed->n_pts * $packed->n_feats * 8;
 
 	return 1;
-}
+} ## end sub execute
 
 return 1;

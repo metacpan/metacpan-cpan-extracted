@@ -1,5 +1,9 @@
 # Changes for App-HTTPThis
 
+1.0.1
+     * Add --wsl and config wsl=1 to bind to the WSL IP address for access from Windows browsers
+     * Ensure --config selects the config file before it is loaded
+
 1.0.0
      * Default to binding to 127.0.0.1 when no host is set in the CLI or config
      * Add --all (alias --promiscuous) and config all=1 to restore the previous all-interfaces behaviour

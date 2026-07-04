@@ -15,7 +15,7 @@ use SWISH::3 qw( :constants );
 my $SWISH3 = SWISH::3->new();
 my $XML    = Search::Tools::XML->new;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 =pod
 

@@ -5,7 +5,7 @@ with 'Dezi::Role';
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 has 'hits' => ( is => 'ro', isa => 'Int', required => 1 );
 has 'query' => ( is => 'ro', isa => 'Search::Query::Dialect', required => 1 );

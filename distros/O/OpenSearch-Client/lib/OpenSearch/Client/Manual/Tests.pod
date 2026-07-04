@@ -1,0 +1,97 @@
+
+=pod
+
+=encoding UTF-8
+
+=head1 Running the module tests
+
+
+B<NOTE - DO RUN THE TESTS AGAINST NODES WITH IMPORTANT CONTENT. THE TESTS MAY BE DESTRUCTIVE>
+
+The standard module tests run without connecting to any OpenSearch nodes.
+
+=head2 To include tests against an HTTP node:
+
+=over
+
+=item
+
+Specify the current default client version ( "3_0" )
+
+C<export CLIENT_VER="3_0">
+
+=item
+
+Specify a node that allows http connections
+
+C<export OS="192.168.100.10:9200">
+
+=item
+
+To run tests for the Bulk Helper module
+
+C<export OS_TEST_BULK_HELPERS=1>
+
+=item
+
+To run tests for the Scroll Helper module
+
+C<export OS_TEST_SCROLL_HELPERS=1>
+
+=back
+
+=head2 To also include tests against an HTTPS node
+
+=over
+
+=item
+
+Specify a node that allows https connections
+
+C<export OS_SSL="192.168.100.11:9200">
+
+=item
+
+If the node requires authentication
+
+C<export OS_USERINFO="username:password">
+
+=item
+
+By default, the tests will not verify the certificate of the host node.
+
+To verify a certificate signed by a local CA
+
+C<export OS_CA_PATH=/path/to/local-ca.pem>
+
+=back
+
+=head1 MANUAL
+
+Documentation index L<OpenSearch::Client::Manual>
+
+=head1 HISTORY
+
+This distribution is derived from L<Search::Elasticsearch> version 7.714.
+All subsequent changes are unique to this distribution.
+
+=head1 AUTHOR
+
+Mark Dootson E<lt>mdootson@cpan.orgE<gt> ( current maintainer )
+
+=head1 CREDITS
+
+L<OpenSearch::Client> is based on L<Search::Elasticsearch> version 7.714
+by Enrico Zimuel E<lt>enrico.zimuel@elastic.coE<gt>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Mark Dootson ( this distribution )
+
+Copyright (C) 2021 by Elasticsearch BV ( original distribution ) 
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

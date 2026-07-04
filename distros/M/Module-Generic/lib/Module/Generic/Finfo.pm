@@ -716,11 +716,11 @@ Returns true if the the effective user can write to the file.
 
 =head2 can_exec
 
-Returns true if the the effective user can execute the file. Same as L</execute>
+Returns true if the the effective user can execute the file. Same as C<execute>
 
 =head2 can_execute
 
-Returns true if the the effective user can execute the file. Same as L</exec>
+Returns true if the the effective user can execute the file. Same as C<exec>
 
 =head2 csize
 
@@ -856,7 +856,7 @@ Returns the number of (hard) links to the file.
 
 Returns the file permission as a 4 digits octal value, such as C<0755> or C<0644>
 
-=head2 protection
+=for Pod::Coverage protection
 
 =head2 rdev
 
@@ -944,7 +944,7 @@ Key considerations for thread and process safety:
 
 =item * B<Shared Variables>
 
-The C<has_local_tz> value in L</_datetime>, indicating system timezone support, is stored in L<Module::Generic::Global>’s C<local_tz> namespace as a system-wide global (accessed via C<local_tz => 'system'>). This is shared across all C<Module::Generic::*> modules (e.g., L<Module::Generic::Finfo>, L<Module::Generic::DateTime>) to avoid redundant timezone checks. Access is protected by thread locks, ensuring thread-safe initialization and retrieval:
+The C<has_local_tz> value in C<_datetime>, indicating system timezone support, is stored in L<Module::Generic::Global>’s C<local_tz> namespace as a system-wide global (accessed via C<local_tz => 'system'>). This is shared across all C<Module::Generic::*> modules (e.g., L<Module::Generic::Finfo>, L<Module::Generic::DateTime>) to avoid redundant timezone checks. Access is protected by thread locks, ensuring thread-safe initialization and retrieval:
 
     use threads;
     my $finfo = Module::Generic::Finfo->new( "example.txt" );
@@ -972,11 +972,11 @@ File metadata (e.g., L</filepath>, internal C<_data> array) is stored per-object
 
 =item * B<External Libraries>
 
-Methods like L</mime_type> use L<Module::Generic::File::Magic>, which is thread-safe as they operate on per-object state. L</_datetime> uses L<DateTime::Lite> and L<DateTime::Format::Lite>, both thread-safe when combined with L<Module::Generic::Global>’s locking for C<has_local_tz>.
+Methods like L</mime_type> use L<Module::Generic::File::Magic>, which is thread-safe as they operate on per-object state. C<_datetime> uses L<DateTime::Lite> and L<DateTime::Format::Lite>, both thread-safe when combined with L<Module::Generic::Global>’s locking for C<has_local_tz>.
 
 =item * B<Serialisation>
 
-Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe for use with L<CBOR::XS>, L<Sereal>, or L<Storable::Improved>:
+Serialisation methods (C<FREEZE>, C<THAW>) operate on per-object state, making them thread-safe for use with L<CBOR::XS>, L<Sereal>, or L<Storable::Improved>:
 
     use threads;
     use Sereal;
@@ -1003,7 +1003,7 @@ Avoid Perl functions like L<perlfunc/localtime> or L<perlfunc/getgrgid> (used in
 
 =item * B<Process Safety>
 
-File operations (e.g., L<perlfunc/stat> in L</init>, L</reset>) are process-safe, relying on system-level calls. The shared C<has_local_tz> is managed by L<Module::Generic::Global>, ensuring consistent access across processes:
+File operations (e.g., L<perlfunc/stat> in L</new>, L</reset>) are process-safe, relying on system-level calls. The shared C<has_local_tz> is managed by L<Module::Generic::Global>, ensuring consistent access across processes:
 
     use POSIX qw( fork );
     my $pid = fork();

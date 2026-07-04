@@ -39,6 +39,9 @@ my @warnings = warnings {
           map $_->{description},
           decode_json(path('t/additional-tests-'.$version.'/keyword-independence.json')->slurp)->@*
         ] },
+
+        # various edge cases that are difficult to accomodate
+        { file => 'integers.json', group_description => 'int64 range checks', test_description => 'beyond lower boundary' },
       ] ),
     },
   );

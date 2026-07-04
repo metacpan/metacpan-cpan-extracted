@@ -10,20 +10,21 @@ use Time::HiRes  qw(time);
 
 sub opt_spec {
 	return (
-		[ 'm=s',     'Input model JSON file path/name.',
-			{ 'default' => 'iforest_model.json', 'completion' => 'files' } ],
-		[ 'i=s',     'Input CSV (rows of features to score).',
-			{ 'completion' => 'files' } ],
-		[ 'secs|s=f', 'Seconds per measurement (after a 0.3s warm-up).',
-			{ 'default' => 2 } ],
-		[ 't=f',     'Threshold to use for predict / score_predict_*.',
-			{ 'default' => 0.5 } ],
+		[
+			'm=s',
+			'Input model JSON file path/name.',
+			{ 'default' => 'iforest_model.json', 'completion' => 'files' }
+		],
+		[ 'i=s',      'Input CSV (rows of features to score).',          { 'completion' => 'files' } ],
+		[ 'secs|s=f', 'Seconds per measurement (after a 0.3s warm-up).', { 'default'    => 2 } ],
+		[ 't=f',      'Threshold to use for predict / score_predict_*.', { 'default'    => 0.5 } ],
 	);
-}
+} ## end sub opt_spec
 
 sub abstract { 'Measure scoring throughput of a saved model on a CSV dataset' }
 
-sub description { 'Loads a model and a CSV dataset, then times each of the
+sub description {
+	'Loads a model and a CSV dataset, then times each of the
 public scoring methods over the configured wall-clock budget.  Reports
 ops-per-second for each.
 
@@ -38,25 +39,23 @@ Use this to answer:
   * how much does pack_data help on my data shape?
   * what is the per-call throughput I can expect at production-typical
     query-set sizes?
-' }
+';
+} ## end sub description
 
 sub validate {
 	my ( $self, $opt, $args ) = @_;
 
 	if ( !defined $opt->{'i'} ) {
 		$self->usage_error('-i has not been specified');
-	}
-	elsif ( !-f $opt->{'i'} ) {
+	} elsif ( !-f $opt->{'i'} ) {
 		$self->usage_error( '-i, "' . $opt->{'i'} . '", is not a file or does not exist' );
-	}
-	elsif ( !-r $opt->{'i'} ) {
+	} elsif ( !-r $opt->{'i'} ) {
 		$self->usage_error( '-i, "' . $opt->{'i'} . '", is not readable' );
 	}
 
 	if ( !-f $opt->{'m'} ) {
 		$self->usage_error( '-m, "' . $opt->{'m'} . '", is not a file or does not exist' );
-	}
-	elsif ( !-r $opt->{'m'} ) {
+	} elsif ( !-r $opt->{'m'} ) {
 		$self->usage_error( '-m, "' . $opt->{'m'} . '", is not readable' );
 	}
 
@@ -69,7 +68,7 @@ sub validate {
 	}
 
 	return 1;
-}
+} ## end sub validate
 
 # Standard bench helper: warm up briefly, then time exactly $secs of
 # back-to-back calls.  Returns ops/second.
@@ -101,9 +100,9 @@ sub _read_csv {
 				unless looks_like_number($v);
 		}
 		push @data, \@f;
-	}
+	} ## end for my $row ( read_file($path) )
 	return ( \@data, $expected );
-}
+} ## end sub _read_csv
 
 sub execute {
 	my ( $self, $opt, $args ) = @_;
@@ -111,8 +110,7 @@ sub execute {
 	my $model = Algorithm::Classifier::IsolationForest->load( $opt->{'m'} );
 
 	my ( $data, $cols ) = _read_csv( $opt->{'i'} );
-	die "input CSV has $cols feature columns but model expects "
-		. $model->{n_features} . "\n"
+	die "input CSV has $cols feature columns but model expects " . $model->{n_features} . "\n"
 		if $cols != $model->{n_features};
 
 	my $n_pts  = scalar @$data;
@@ -121,7 +119,7 @@ sub execute {
 	my $has_c  = $Algorithm::Classifier::IsolationForest::HAS_C ? 1 : 0;
 
 	printf "Model:    %s  (n_trees=%d, mode=%s, n_features=%d)\n",
-		$opt->{'m'}, scalar @{ $model->{trees} },
+		$opt->{'m'},    scalar @{ $model->{trees} },
 		$model->{mode}, $model->{n_features};
 	printf "Input:    %s  (%d rows)\n", $opt->{'i'}, $n_pts;
 	printf "Budget:   %.1fs per measurement (0.3s warm-up)\n", $secs;
@@ -135,31 +133,30 @@ sub execute {
 	my $packed = $has_c ? $model->pack_data($data) : undef;
 
 	my @bench = (
-		[ 'score_samples'              => sub { $model->score_samples($data) } ],
-		[ 'predict'                    => sub { $model->predict( $data, $thresh ) } ],
-		[ 'score_predict_samples'      => sub { $model->score_predict_samples( $data, $thresh ) } ],
-		[ 'score_predict_split'        => sub { my @r = $model->score_predict_split( $data, $thresh ); } ],
-		[ 'path_lengths'               => sub { $model->path_lengths($data) } ],
+		[ 'score_samples'         => sub { $model->score_samples($data) } ],
+		[ 'predict'               => sub { $model->predict( $data, $thresh ) } ],
+		[ 'score_predict_samples' => sub { $model->score_predict_samples( $data, $thresh ) } ],
+		[ 'score_predict_split'   => sub { my @r = $model->score_predict_split( $data, $thresh ); } ],
+		[ 'path_lengths'          => sub { $model->path_lengths($data) } ],
 	);
 
 	if ( defined $packed ) {
-		push @bench, (
-			[ 'score_samples (packed)'  => sub { $model->score_samples($packed) } ],
-			[ 'predict (packed)'        => sub { $model->predict( $packed, $thresh ) } ],
-			[ 'score_predict_split (packed)'
-				=> sub { my @r = $model->score_predict_split( $packed, $thresh ); } ],
-		);
+		push @bench,
+			(
+				[ 'score_samples (packed)'       => sub { $model->score_samples($packed) } ],
+				[ 'predict (packed)'             => sub { $model->predict( $packed, $thresh ) } ],
+				[ 'score_predict_split (packed)' => sub { my @r = $model->score_predict_split( $packed, $thresh ); } ],
+			);
 	}
 
-	printf "  %-30s  %14s  %14s\n", 'method', 'ops/s', 'ms/call';
+	printf "  %-30s  %14s  %14s\n", 'method', 'ops/s',  'ms/call';
 	printf "  %-30s  %14s  %14s\n", '-' x 30, '-' x 14, '-' x 14;
 	for my $row (@bench) {
 		my ( $label, $code ) = @$row;
 		my $rate = _bench( $code, $secs );
-		printf "  %-30s  %14.1f  %14.2f\n", $label, $rate,
-			$rate > 0 ? 1000 / $rate : 0;
+		printf "  %-30s  %14.1f  %14.2f\n", $label, $rate, $rate > 0 ? 1000 / $rate : 0;
 	}
 	return 1;
-}
+} ## end sub execute
 
 return 1;

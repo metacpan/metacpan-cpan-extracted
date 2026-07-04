@@ -34,7 +34,7 @@ my $encoder = (Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP')->new
 
 # like sprintf, but all list items are JSON-encoded. assumes placeholders are %s!
 sub json_sprintf {
-  sprintf(shift, map +(ref($_) =~ /^Math::Big(?:Int|Float)$/ ? ref($_).'->new(\''.$_.'\')' : $encoder->indent(0)->encode($_)), @_);
+  sprintf(shift, map +(ref($_) =~ /^Math::Big(?:Int|Float)\z/ ? ref($_).'->new(\''.$_.'\')' : $encoder->indent(0)->encode($_)), @_);
 }
 
 # deep comparison, with Test::Deep syntax sugar

@@ -1,12 +1,12 @@
 {
    "abstract" : "Parse make output for build-time warnings",
    "author" : [
-      "James E Keenan (jkeenan@cpan.org)"
+      "James E Keenan (jkeenan@pobox.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -46,7 +46,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl5-Build-Warnings"
+         "web" : "https://github.com/jkeenan/perl5-build-warnings/issues"
       },
       "homepage" : "http://thenceforward.net/perl/modules/Perl5-Build-Warnings/",
       "repository" : {
@@ -55,6 +55,6 @@
          "web" : "https://github.com/jkeenan/perl5-build-warnings"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

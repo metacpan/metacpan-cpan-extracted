@@ -952,7 +952,7 @@ subtest 'invalid $schema' => sub {
 subtest 'absoluteKeywordLocation' => sub {
   cmp_result(
     do {
-      local $JSON::Schema::Tiny::MAX_TRAVERSAL_DEPTH = 1;
+      local $JSON::Schema::Tiny::MAX_DEPTH = 1;
       evaluate(
         [ [ 1 ] ],
         { items => { '$ref' => '#' } },

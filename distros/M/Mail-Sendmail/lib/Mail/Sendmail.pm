@@ -10,9 +10,9 @@ Mail::Sendmail - Simple platform independent mailer
 
 =cut
 
-require 5.006;
+our $VERSION = "0.83";
 
-our $VERSION = "0.80";
+require 5.006;
 
 use strict;
 use warnings;
@@ -249,9 +249,18 @@ sub sendmail {
         $k =~ s/-(.)/"-" . uc($1)/ge;
         $mail{$k} = shift @_;
         if ($k !~ /^(Message|Body|Text)$/i) {
-            # normalize possible line endings in headers
-            $mail{$k} =~ s/\015\012?/\012/go;
-            $mail{$k} =~ s/\012/$CRLF/go;
+            # Strip any CR/LF characters from header values to prevent
+            # CRLF injection (SMTP header injection).  Attacker-controlled
+            # header values containing "\nBcc: attacker@evil.com" would
+            # otherwise inject new headers or body content.
+            # See CWE-93 (Improper Neutralization of CRLF Sequences) and
+            # the equivalent fixes in Email::MIME (CVE-2024-4140) and
+            # many other mail libraries.
+            if ($mail{$k} =~ /[\015\012]/) {
+                warn "Mail::Sendmail: stripping CR/LF from $k header to "
+                   . "prevent CRLF injection\n";
+                $mail{$k} =~ s/[\015\012]+//g;
+            }
         }
     }
 

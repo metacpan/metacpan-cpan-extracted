@@ -9,7 +9,7 @@ use Data::Dump qw( dump );
 use SWISH::3;
 use Try::Tiny;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 # we rely on file extensions to determine content type
 # and thus parser type. If a file has no extension,

@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Crypt::DES_EDE3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.21",
+  "VERSION" => "1.23",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,0 +1,7 @@
+1.001000   2026-07-03
+
+  - First independent Net-Nostr-Client release, split from Net-Nostr
+  - Provide Net::Nostr::Client as the WebSocket client implementation
+  - Depend on Net::Nostr::Core for protocol objects and message handling
+  - Leave the Net::Nostr::Core dependency unversioned for split-release indexing
+  - Use Makefile.PL as the single dependency source of truth

@@ -261,15 +261,6 @@
       "name" : "Köln Messe/Deutz Gl. 9-10"
    },
    {
-      "ds100" : "XILI",
-      "eva" : 8300157,
-      "latlong" : [
-         43.553983,
-         10.336626
-      ],
-      "name" : "Livorno Centrale"
-   },
-   {
       "ds100" : "LMDF",
       "eva" : 8012325,
       "latlong" : [

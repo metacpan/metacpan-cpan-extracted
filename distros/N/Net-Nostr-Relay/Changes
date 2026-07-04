@@ -1,0 +1,9 @@
+1.001000   2026-07-03
+
+  - First independent Net-Nostr-Relay release, split from Net-Nostr
+  - Provide Net::Nostr::Relay and Net::Nostr::RelayStore as the relay
+    implementation and default in-memory event store
+  - Depend on Net::Nostr::Core for protocol objects, relay information
+    documents, and validation helpers
+  - Leave the Net::Nostr::Core dependency unversioned for split-release indexing
+  - Use Makefile.PL as the single dependency source of truth

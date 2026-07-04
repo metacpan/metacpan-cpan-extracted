@@ -35,6 +35,9 @@ http_this - export the current directory over HTTP
     ## Bind the server to one specific non-default interface
     $ http_this --host 192.168.1.23
 
+    ## Bind to the WSL address for access from a Windows browser
+    $ http_this --wsl
+
     ## WARNING: Make the server reachable on all network interfaces
     $ http_this --all
 
@@ -102,6 +105,16 @@ C<192.168.1.23> or C<::1>. By default the server binds to C<127.0.0.1>
 (localhost), which is a breaking change in version C<1.0.0>. Use
 C<--all> or C<--promiscuous> to restore the previous behaviour of listening
 on all network interfaces.
+
+=item --wsl
+
+Bind the server to the non-loopback IPv4 address selected by the WSL
+default network route. This is useful when running C<http_this> inside WSL and
+opening the URL from a browser running on Windows. The command output will
+show the selected WSL IP address to use in the Windows browser.
+
+This is narrower than C<--all>, because it binds to one WSL address rather
+than C<0.0.0.0>.
 
 =item --all / --promiscuous
 
@@ -173,6 +186,13 @@ Set this to a specific address if you do not want the localhost default.
 WARNING: if set to a true value, the server will bind to all network
 interfaces (equivalent to C<host=0.0.0.0>), restoring the pre-1.0.0
 behaviour.
+
+=item B<wsl>:
+
+If set to a true value, the server will bind to the non-loopback IPv4
+address selected by the WSL default network route. This is useful when
+running C<http_this> inside WSL and opening the URL from a browser running
+on Windows.
 
 =item B<autoindex>:
 

@@ -9,8 +9,9 @@ use Plack::Runner;
 use Getopt::Long;
 use Pod::Usage;
 use Config::Tiny;
+use IO::Socket::INET;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 =head1 NAME
 
@@ -43,6 +44,14 @@ sub new {
   my $default_config_file = '.http_thisrc';
 
   my $config_file = $self->{config} || $ENV{HTTP_THIS_CONFIG};
+  {
+    my %early;
+    local @ARGV = @ARGV;
+    Getopt::Long::Configure(qw(pass_through));
+    GetOptions(\%early, "config=s") || pod2usage(2);
+    Getopt::Long::Configure(qw(default));
+    $config_file = $early{config} if defined $early{config};
+  }
 
   # There are apparently OSes where $ENV{HOME} is undefined
   for my $dir ('.', $ENV{HOME}) {
@@ -56,25 +65,32 @@ sub new {
   if ($config_file) {
     my $config = Config::Tiny->read($config_file)
       or die "FATAL: failed to read config file '$config_file'\n";
-    for my $key (qw(port host name autoindex pretty)) {
+    for my $key (qw(port host name autoindex pretty wsl)) {
       if (defined $config->{_}->{$key} && $config->{_}->{$key} ne '') {
         $self->{$key} = $config->{_}->{$key};
       }
     }
     if ($config->{_}->{all}) {
-      $self->{host} = '0.0.0.0';
+      $self->{host} = q{0.0.0.0};
     }
     delete $self->{config};
   }
 
+  my %cli;
   GetOptions(
-    $self, "help", "man", "config=s", "host=s", "port=i", "name=s", "autoindex!", "pretty!",
-    "all|promiscuous"
+    \%cli, "help", "man", "config=s", "host=s", "port=i", "name=s", "autoindex!", "pretty!",
+    "all|promiscuous", "wsl"
   ) || pod2usage(2);
-  pod2usage(1) if $self->{help};
-  pod2usage(-verbose => 2) if $self->{man};
+  pod2usage(1) if $cli{help};
+  pod2usage(-verbose => 2) if $cli{man};
 
-  $self->{host} = '0.0.0.0' if $self->{all};
+  for my $key (keys %cli) {
+    $self->{$key} = $cli{$key};
+  }
+
+  $self->{host} = q{0.0.0.0} if $self->{all};
+  $self->{host} = $self->_wsl_host
+    if $cli{wsl} || ($self->{wsl} && !exists $cli{host} && !exists $cli{all});
 
   if (@ARGV > 1) {
     pod2usage("$0: Too many roots, only single root supported");
@@ -120,6 +136,64 @@ sub run {
       if $e =~ /failed to listen to port/;
     die "FATAL: internal error - $e\n";
   }
+}
+
+sub _wsl_host {
+  my ($self) = @_;
+
+  for my $addr ($self->_wsl_addresses) {
+    return $addr
+      if $addr =~ /\A(?:[0-9]{1,3}\.){3}[0-9]{1,3}\z/
+      && $addr ne '127.0.0.1';
+  }
+
+  die "FATAL: cannot find a non-loopback IPv4 address for WSL\n";
+}
+
+sub _wsl_addresses {
+  my ($self) = @_;
+
+  my @addresses;
+  my %seen;
+  my %seen_addr;
+
+  for my $peer ($self->_wsl_default_gateway, '1.1.1.1') {
+    next unless defined $peer && length $peer;
+    next if $seen{$peer}++;
+
+    my $sock = IO::Socket::INET->new(
+      PeerAddr => $peer,
+      PeerPort => 9,
+      Proto    => 'udp',
+    );
+    next unless $sock;
+
+    my $addr = $sock->sockhost;
+    push @addresses, $addr
+      if defined $addr && length $addr && !$seen_addr{$addr}++;
+  }
+
+  die "FATAL: cannot determine WSL IP address from the network route\n"
+    unless @addresses;
+
+  return @addresses;
+}
+
+sub _wsl_default_gateway {
+  open my $fh, '<', '/proc/net/route' or return;
+
+  while (my $line = <$fh>) {
+    next if $line =~ /\AIface\b/;
+
+    my @fields = split ' ', $line;
+    next unless @fields >= 3;
+    next unless $fields[1] eq '00000000';
+    next unless $fields[2] =~ /\A[0-9A-Fa-f]{8}\z/;
+
+    return join '.', reverse map { hex } $fields[2] =~ /(..)/g;
+  }
+
+  return;
 }
 
 sub _server_ready {

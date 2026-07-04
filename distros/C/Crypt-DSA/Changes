@@ -1,5 +1,17 @@
 Revision history for Perl extension Crypt-DSA
 
+1.23 -- Fri Jul 03 17:18:40 ADT 2026
+
+    - Make CVE tests optional
+
+1.22 -- Fri Jul 03 09:27:46 ADT 2026
+
+    - This module is deprecated as of 1.20.  Crypt-DSA-GMP is a possible replacement.
+    - Hardening: Use a fresh, independent CSPRNG witness every round
+    - Security fix: Fixes CVE-2026-14570 modulo bias in key generation.
+    An attack with hundreds of signatures could lead to full private-key compromise.
+    Keys should be considered compromised and new keys should be generated.
+
 1.21 -- Sun Jun 14 16:52:15 ADT 2026
 
     - This module is now makred as deprecated.  Crypt-DSA-GMP is a possible replacement.

@@ -1,0 +1,41 @@
+=pod
+
+=encoding UTF-8
+
+=head1 OpenSearch::Client::Manual::Helpers
+
+OpenSearch::Client provides helper modules for bulk and scroll endpoints.
+
+L<Bulk|OpenSearch::Client::Core::3_0::Helper::Bulk>
+
+L<Scroll|OpenSearch::Client::Core::3_0::Helper::Scroll>
+
+=head1 MANUAL
+
+Documentation index L<OpenSearch::Client::Manual>
+
+=head1 HISTORY
+
+This distribution is derived from L<Search::Elasticsearch> version 7.714.
+All subsequent changes are unique to this distribution.
+
+=head1 AUTHOR
+
+Mark Dootson E<lt>mdootson@cpan.orgE<gt> ( current maintainer )
+
+=head1 CREDITS
+
+L<OpenSearch::Client> is based on L<Search::Elasticsearch> version 7.714
+by Enrico Zimuel E<lt>enrico.zimuel@elastic.coE<gt>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Mark Dootson ( this distribution )
+
+Copyright (C) 2021 by Elasticsearch BV ( original distribution ) 
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

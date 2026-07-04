@@ -60,7 +60,7 @@ my @files = (
     't/errors.t',
     't/lib/Acceptance.pm',
     't/lib/Helper.pm',
-    't/max_traversal_depth.t',
+    't/max_depth.t',
     't/pattern.t',
     't/ref.t',
     't/results/draft2019-09-acceptance.txt',

@@ -36,6 +36,7 @@ use warnings;
 BEGIN
 {
     use_ok( 'Module::Generic::Number' ) || BAIL_OUT( "Unable to load Module::Generic::Number" );
+    use_ok( 'Module::Generic::Number::Format' ) || BAIL_OUT( "Unable to load Module::Generic::Number::Format" );
 };
 POSIX::setlocale( &POSIX::LC_ALL, 'C.UTF-8' ) if( $DEBUG );
 my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
@@ -49,7 +50,7 @@ diag( "Current locale is '$curr_locale'" ) if( $DEBUG );
 # my $new_loc = POSIX::setlocale( &POSIX::LC_ALL, 'de_DE' );
 my $lconv = POSIX::localeconv();
 # $lconv = $Module::Generic::Number::DEFAULT if( !scalar( keys( %$lconv ) ) || ( scalar( keys( %$lconv ) ) == 1 && CORE::exists( $lconv->{decimal_point} ) ) );
-$lconv = $Module::Generic::Number::DEFAULT if( !$curr_locale );
+$lconv = $Module::Generic::Number::Format::DEFAULT if( !$curr_locale );
 # diag( "localeconv contains: ", Data::Dump::dump( $lconv ), "\n" ) if( $DEBUG );
 # $lconv->{mon_thousands_sep} = $lconv->{thousands_sep} = undef();
 #         my $fail = [qw(
@@ -84,7 +85,7 @@ sub normalise_lconv_grouping
 
 if( !scalar( keys( %$lconv ) ) || [split(/\./, $curr_locale)]->[0] eq 'C' )
 {
-    diag( "No locale could be found for language \"", ( $ENV{LANG} // '' ), "\"" );
+    diag( "No locale data could be found for language \"", ( POSIX::setlocale( &POSIX::LC_ALL ) // '' ), "\"" );
     $tho_sep = ',';
     $dec_sep = '.';
     $grouping = 3;
@@ -191,7 +192,7 @@ if( !defined( $n ) )
 #         $property, $lconv->{$property}, defined( $lconv->{$property} ) ? 'defined' : 'undefined', length( $lconv->{$property} ) );
 # }
 # diag( "Locale formatting properties are:\n$lconv_debug" );
-my $new_loc = $n->lang;
+my $new_loc = $n->locale;
 ## diag( "New locale is $new_loc" );
 my $n2 = $n->clone;
 is( $n2->locale, $new_loc, "Locale is kept with cloning" );
@@ -223,7 +224,7 @@ SKIP:
     {
         skip( 'Unsupported language', 4 );
     }
-    my $n_loc = Module::Generic::Number->new( 100, { lang => 'fr_FR', precede => 1, precision => 2, thousand => ' ', decimal => ',', debug => 0 });
+    my $n_loc = Module::Generic::Number->new( 100, { locale => 'fr_FR', precede => 1, precision => 2, thousand => ' ', decimal => ',', debug => 0 });
     isa_ok( $n_loc, 'Module::Generic::Number', 'Object with locale language string' );
     is( $n_loc->precision, 2, 'French precision => 2' );
     # RT #132667
@@ -231,6 +232,7 @@ SKIP:
     # [:blank:] does not catch non-breaking space, but horizontal space \h does
     like( $n_loc->thousand, qr/[[:blank:]\h]+/, 'French thousand separator => space' );
     is( $n_loc->decimal, ',', 'French decimal separator => comma' );
+    is( $n_loc->locale, 'fr_FR', 'locale is fr_FR' );
 };
 isa_ok( $n, 'Module::Generic::Number', 'Number Class Object' );
 isa_ok( $n2, 'Module::Generic::Number', 'Cloning object' );
@@ -322,8 +324,9 @@ is( $n2->precision, 2, "Precision -> '2'" );
 is( $n2->currency, '€', "Currency symbol -> '€'" );
 isa_ok( $n2->currency, 'Module::Generic::Scalar', 'Returns property as string object' );
 
-diag( "Number to unformat is '$n'" ) if( $DEBUG );
+diag( "Number to unformat is '$n' and \$n2 has locale '", ( $n2->locale // 'undef' ), "', and precision '", ( $n2->precision // 'undef' ), "'" ) if( $DEBUG );
 my $n3 = $n2->unformat( $n );
+diag( "\$n3 has locale '", ( $n3->locale // 'undef' ), "', and precision '", ( $n3->precision // 'undef' ), "'" ) if( $DEBUG );
 isa_ok( $n3, 'Module::Generic::Number', 'Unformat result in new object using unformat()' );
 diag( "Error unformating $n: ", $n2->error ) if( !defined( $n3 ) && $DEBUG );
 is( $n3, 1281284, 'Unformat resulting value' );
@@ -430,6 +433,9 @@ ok( $n4->is_positive, 'Is positive number' );
 ok( !$n4->is_negative, 'Is negative number' );
 ok( $n4->is_normal, 'Is normal number' );
 
+is( $n4->format_bytes( mode => 'iec60027' ), "1${dec_sep}22MiB", 'format_bytes() in IEC mode' );
+is( $n4->format_bytes( mode => 'iec' ),      "1${dec_sep}22MiB", 'format_bytes() in IEC mode (alias)' );
+
 my $inf = Module::Generic::Number->new( 9**9**9, debug => 3 );
 isa_ok( $inf, 'Module::Generic::Infinity', 'Infinity Class' );
 # diag( "Infinity: $inf -> ", overload::StrVal( $inf ) );
@@ -477,7 +483,7 @@ is( $n4->format_binary, '100111000110100000100', 'Formatting as binary' );
 is( $n4->from_hex( $n4->format_hex ), 1281284, 'Converting from hex' );
 is( $n4->from_binary( $n4->format_binary ), 1281284, 'Converting from binary' );
 
-isa_ok( Module::Generic::Number->new(0)->as_boolean, 'Module::Generic::Boolean', 'Number to boolean object' );
+ok( Module::Generic->_is_a( Module::Generic::Number->new(0)->as_boolean => 'Module::Generic::Boolean' ), 'Number to boolean object' );
 ok( !Module::Generic::Number->new(0)->as_boolean, 'Number to false boolean' );
 ok( Module::Generic::Number->new(2)->as_boolean, 'Number to true boolean' );
 ok( Module::Generic::Number->new(2)->as_boolean == 1, 'Number to boolean, checking value' );
@@ -497,12 +503,13 @@ subtest 'Additional functionality and edge cases' => sub
 {
     my $num = Module::Generic::Number->new( 3.14159, debug => $DEBUG );
     is( $num->round_zero, 3, 'round_zero' );
+    my $fmt = Module::Generic::Number::Format->new( 3.14159, debug => $DEBUG );
 
     my $lconv = POSIX::localeconv();
-    my $decoded = $num->decode_lconv( $lconv );
+    my $decoded = $fmt->decode_lconv( $lconv );
     ok( defined( $decoded ), 'decode_lconv' );
 
-    my $mult = $num->_get_multipliers(1000);
+    my $mult = $fmt->_get_multipliers(1000);
     is( $mult->{kilo}, 1000, '_get_multipliers kilo base 1000' );
 
     # Reset locale to C to ensure consistent formatting
@@ -554,7 +561,7 @@ subtest 'Thread-safe operations' => sub
             threads->create(sub
             {
                 my $tid = threads->tid();
-                my $num = Module::Generic::Number->new( 1000, lang => $locale, debug => $DEBUG );
+                my $num = Module::Generic::Number->new( 1000, locale => $locale, debug => $DEBUG );
                 if( !defined( $num ) )
                 {
                     diag( "Thread $tid: Failed to create number object: ", Module::Generic::Number->error ) if( $DEBUG );
@@ -589,7 +596,7 @@ subtest 'Thread-safe operations' => sub
         ok( $success, 'All threads performed operations successfully' );
         if( $locale ne 'C' )
         {
-            my $num = Module::Generic::Number->new( 1000, lang => $locale, debug => $DEBUG );
+            my $num = Module::Generic::Number->new( 1000, locale => $locale, debug => $DEBUG );
             my $formatted = $num->format;
             ok( defined($formatted), "Number formatted successfully in locale '$locale'" );
         }
@@ -647,6 +654,10 @@ subtest 'Monetary trio independent from numeric trio' => sub
         space_pos    => 0,
         debug        => $DEBUG,
     );
+    if( !defined( $n2 ) )
+    {
+        diag( "Error instantiating the number object for 1281284: ", Module::Generic::Number->error );
+    }
     is( $n2->format, '1,281,284.00', 'format() groups when numeric grouping is 3' );
     like( $n2->format_money, qr/\Q1281284.00\E€/, 'format_money() is not grouped when monetary grouping is 0' );
 
@@ -695,6 +706,110 @@ subtest 'Mixed locale resolution (LC_NUMERIC=C, LC_MONETARY=en_US)' => sub
         like( $n->format_money, qr/\Q1,281,284.00\E/, 'strict: money grouped following LC_MONETARY' );
     };
     POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
+};
+
+subtest 'Formatter propagation through clone()' => sub
+{
+    my $src = Module::Generic::Number->new( 42, precision => 3, decimal => ',', debug => $DEBUG );
+    my $c   = $src->clone(100);
+    is( $c,              100,  'clone has the right number' );
+    is( $c->precision,   3,    'clone propagates formatter precision' );
+    is( $c->decimal,     ',',  'clone propagates formatter decimal' );
+    isa_ok( $c, 'Module::Generic::Number', 'clone is a Number' );
+};
+
+subtest 'Rounding methods propagate formatter' => sub
+{
+    my $num = Module::Generic::Number->new( 3.14159, precision => 4, debug => $DEBUG );
+    my $r   = $num->round(2);
+    is( $r,            3.14, 'round() value' );
+    is( $r->precision, 4,    'round() preserves formatter precision' );
+    isa_ok( $r, 'Module::Generic::Number', 'round() returns a Number' );
+
+    my $r2 = $num->round2(2);
+    SKIP:
+    {
+        if( !defined( $r2 ) )
+        {
+            diag( "\$num->round2(2) returned undef: ", $num->error );
+            skip( "\$num->round2(2) returned undef", 2 );
+        }
+        is( $r2,            3.14, 'round2() value' );
+        is( $r2->precision, 4,    'round2() preserves formatter precision' );
+    };
+
+    my $rz = $num->round_zero;
+    SKIP:
+    {
+        if( !defined( $rz ) )
+        {
+            diag( "\$num->round_zero returned undef: ", $num->error );
+            skip( "\$num->round_zero returned undef", 2 );
+        }
+        is( $rz,            3, 'round_zero() value' );
+        is( $rz->precision, 4, 'round_zero() preserves formatter precision' );
+    };
+};
+
+subtest 'format_bytes' => sub
+{
+    my $nb = Module::Generic::Number->new( 1000000, precision => 2, debug => $DEBUG );
+    is( $nb->format_bytes( base => 1000 ), "1${dec_sep}00M", 'format_bytes() with base 1000' );
+};
+
+subtest 'locale propagated to formatter' => sub
+{
+    SKIP:
+    {
+        my $ok = eval{ POSIX::setlocale( &POSIX::LC_ALL, 'fr_FR.UTF-8' ) };
+        skip( 'fr_FR.UTF-8 not available', 2 ) unless( $ok );
+        my $num = Module::Generic::Number->new( 1234, precision => 2, debug => $DEBUG );
+        $num->locale( 'fr_FR.UTF-8' );
+        is( $num->locale, 'fr_FR.UTF-8', 'locale setter propagates to formatter' );
+        is( $num->decimal, ',', 'decimal updated after locale change' );
+        POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
+    };
+};
+
+subtest 'unformat' => sub
+{
+    my $num = Module::Generic::Number->new( 0,
+        precision    => 2,
+        decimal      => '.',
+        thousand     => ',',
+        grouping     => 3,
+        debug        => $DEBUG,
+    );
+    my $unf = $num->unformat( '1,234,567.89' );
+    isa_ok( $unf, 'Module::Generic::Number', 'unformat() returns a Number' );
+    is( $unf,            1234567.89, 'unformat() value' );
+    is( $unf->precision, 2,          'unformat() preserves formatter precision' );
+    is( $unf->decimal,   '.',        'unformat() preserves formatter decimal'   );
+};
+
+subtest 'formatter survives numeric clone' => sub
+{
+    my $n = Module::Generic::Number->new( 1281284, precision => 2, decimal => '.', debug => $DEBUG );
+    my $n2 = $n->clone( 1.22192764282227 );
+
+    is( $n2->precision, 2, 'cloned number keeps formatter precision' );
+    is( $n2->format, '1.22', 'cloned number formats with preserved precision' );
+};
+
+subtest 'formatter state survives numeric operation' => sub
+{
+    my $n = Module::Generic::Number->new( 1281284, precision => 2, decimal => '.', debug => $DEBUG );
+    my $n2 = $n->abs;
+
+    is( $n2->precision, 2, 'numeric operation preserves formatter precision' );
+    is( $n2->format_bytes, '1.22M', 'format_bytes uses preserved formatter precision' );
+};
+
+subtest 'clone as class method' => sub
+{
+    my $n = Module::Generic::Number->clone(42);
+
+    ok( !defined( $n ) && Module::Generic::Number->error, 'cannot call clone() as a class function of Module::Generic::Number' );
 };
 
 done_testing();

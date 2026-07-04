@@ -88,7 +88,6 @@ Module::Generic::Number - Number Manipulation Object Class
 
     $n2->format_negative # -1,024.00
     $n2->format_picture( '(x)' ) # (1,024.00)
-    $n2->formatter( $new_Number_Format_object );
     $n->from_binary( "1111101000" ) # 1000
     $n->from_hex( "0x400" ) # 1000
     my $n3 = $n->clone( 3.14159265358979323846 )->int # 3
@@ -100,17 +99,17 @@ Module::Generic::Number - Number Manipulation Object Class
     $n->log # 6.90775527898214
     $n->log2 # 9.96578428466209
     $n->log10 # 3
-    $n->max( 2000 ) # 2000
-    $n->min( 2000 ) # 1000
+    $n->max(2000) # 2000
+    $n->min(2000) # 1000
     $n->mod(3) # 1
     my $perm = Module::Generic::Number->new( '0700' );
     $perm->oct # 448
     printf( "%o\n", 448 ) # 700
-    $n->clone( 2 )->pow( 3 ) # 8
+    $n->clone(2)->pow(3) # 8
     # Change position of the currency sign
-    $n->precede( 1 ) # Set it to precede the number
+    $n->precede(1) # Set it to precede the number
     # Change precision
-    $n->precision( 0 )
+    $n->precision(0)
     # Based on 1000
     $n->rand # For example, returns 77.775465338589
     $n->rand->int # For example, would return a random integer 77
@@ -120,18 +119,17 @@ Module::Generic::Number - Number Manipulation Object Class
     $n->symbol # €
     $n->tan # 1.47032415570272
     $n->thousand # ,
-    $n->unformat( "€ 1,024.00" ) # 1024
 
     # Return the raw, underlying non-object real number
     my $num = $n->real;
 
 =head1 VERSION
 
-    v2.4.0
+    v2.5.0
 
 =head1 DESCRIPTION
 
-The purpos of this class/package is to provide a lightweight object-oriented approach to number manipulation.
+The purpose of this class/package is to provide a lightweight object-oriented approach to number manipulation.
 
 This uses perl core functions and POSIX functions only. This module's methods act as a wrapper to them.
 
@@ -172,7 +170,7 @@ Operators also works on the infinity object:
 
 Those are just basic arithmetics wrapped in object to enable object oriented interface and chaining. It does not do anything special and rely on perl and L<POSIX> for computation, depending on the function.
 
-=head1 METHODS
+=head1 CONSTRUCTOR
 
 =head2 new
 
@@ -290,6 +288,8 @@ Sets the thousand separator to be used uppon formatting.
 
 =back
 
+=head1 METHODS
+
 =head2 abs
 
 Return the absolute value of the number object. Same as L<perlfunc/"abs">
@@ -316,11 +316,11 @@ Return the number object as  a L<Module::Generic::Scalar> object.
 
 Returns the object string as a string.
 
-    my $n = Module::Generic::Number->new( 1000 );
+    my $n = Module::Generic::Number->new(1000);
     print( "I have $n books\n" );
     # I have 1000 books
     # But better like ths:
-    printf( "I have %s bools\n", $n->format( 0 ) );
+    printf( "I have %s books\n", $n->format(0) );
     # I have 1,000 books
 
 =head2 atan
@@ -329,7 +329,7 @@ Returns the arcus tangent for the number object. See L<POSIX/"atan">
 
     # Assuming $n is an object for 1000
     # atan2( Y, X ). Y = 1000 here
-    $n->atan2( 20 ) # produces 1.55079899282175
+    $n->atan2(20) # produces 1.55079899282175
 
 =head2 atan2
 
@@ -361,7 +361,7 @@ It can take an optional number that will be used
 
     my $n = Moduke::Generic::Number->new(1000);
     # $n is no 1000 with thousand separator set to "","", etc
-    my $n2 = $n->clone( 2020 );
+    my $n2 = $n->clone(2020);
     # Same properties as $n, but now the number is 2020 instead of 1000 and this is a new object
 
 =for Pod::Coverage compute
@@ -420,10 +420,10 @@ Provided with an optional precision and this format the number in a human readab
 
     $n->format # 1,000.00
     $n->format(
-        precision => 2,
+        precision    => 2,
         # Override object value
-        thousand => ',',
-        decimal => '.',
+        thousand     => ',',
+        decimal      => '.',
         # Boolean
         decimal_fill => 1,
     );
@@ -684,12 +684,6 @@ Sets or gets the megabytes suffix.
 
 Provided with another number and this returns the smallest of the two as an L<Module::Generic::Number> object.
 
-=head2 neg_format
-
-Sets or gets the format for formatting negative numbers.
-
-Returns a L<scalar object|Module::Generic::Scalar>
-
 =head2 mod
 
 Returns the remainder for the number bject divided by another number provided as additional argument. See L<POSIX/"fmod"> for more details.
@@ -709,6 +703,12 @@ Sets or gets the size of the groups of digits for monetary values, used by L</fo
 
 Sets or gets the monetary thousand separator used by L</format_money>. When not set explicitly, it is resolved from the C<LC_MONETARY> category of the current locale.
 
+=head2 neg_format
+
+Sets or gets the format for formatting negative numbers.
+
+Returns a L<scalar object|Module::Generic::Scalar>
+
 =head2 oct
 
 Provided an octal value, this returns the corresponding number as an object. See L<perlfunc/"oct"> for more details.
@@ -719,11 +719,43 @@ Boolean, true by default. Controls how the number and monetary formatting proper
 
 =head2 position_neg
 
-Set to true or false if the negative sign (typically "-") should be positioned at the begining (true) or at the end (false) of the number.
+    my $n = $fmt->position_neg;
+    $fmt->position_neg(1);
+
+Gets or sets the position of the sign symbol (typically "-") relative to the currency symbol and value for negative monetary amounts. Corresponds to C<POSIX::localeconv()-E<gt>{n_sign_posn}>. Accepted values:
+
+=over 4
+
+=item C<0>
+
+Parentheses surround the entire string.
+
+=item C<1>
+
+Sign appears before the string.
+
+=item C<2>
+
+Sign appears after the string.
+
+=item C<3>
+
+Sign appears immediately before the currency symbol.
+
+=item C<4>
+
+Sign appears immediately after the currency symbol.
+
+=back
+
+Returns a L<Module::Generic::Scalar> object.
 
 =head2 position_pos
 
-Set to true or false if the positive sign (typically "", i.e. empty, but could be set to "+") should be positioned at the begining (true) or at the end (false) of the number.
+    my $n = $fmt->position_pos;
+    $fmt->position_pos(1);
+
+Gets or sets the sign (typically "", i.e. empty, but could be set to "+") position for non-negative monetary values. Corresponds to C<POSIX::localeconv()-E<gt>{p_sign_posn}>. See L</position_neg> for the accepted values. Returns a L<Module::Generic::Scalar> object.
 
 =head2 pow
 
@@ -734,24 +766,22 @@ Returns the number object to the power of the number provided as arguments. See 
 
 =head2 precede
 
-Sets or gets the I<precede> property of this object. This is used by L<Number::Format> to determine if the currency symbol should be set before or after the number
+Sets or gets the I<precede> property of this object. This is used by L<Module::Generic::Number::Format> to determine if the currency symbol should be set before or after the number
 
 =head2 precede_neg
 
-Sets or gets the I<precede_neg> property of this object. This is used by L<Number::Format> to determine if the currency symbol should be set before or after the number when it is a negative number.
+Sets or gets the I<precede_neg> property of this object. This is used by L<Module::Generic::Number::Format> to determine if the currency symbol should be set before or after the number when it is a negative number.
 
 =head2 precede_pos
 
-Sets or gets the property value for I<precede>.
-
-1 if the currency symbol precedes the currency value for nonnegative values, 0 if it follows.
+Alias for L</precede>.
 
 =head2 precision
 
 Sets or gets the floating precision of the number.
 
     # Assuming $n is an object for 3.14159265358979323846
-    $n->precision( 4 );
+    $n->precision(4);
     $n->format # 3.1416
 
 =head2 rand
@@ -892,7 +922,7 @@ Number data (e.g., C<_number>, formatting properties like C<thousands_sep>) is s
 
 =item * B<Locale Handling>
 
-The L</init> method uses L<POSIX/setlocale> to retrieve locale-specific formatting properties when a C<lang> option is specified or when detecting the system's locale. This modifies process-wide state, which could potentially cause race conditions in a multi-threaded environment. To address this, the module uses a shared lock variable (C<$LOCALE_LOCK>) to synchronise access during locale changes, ensuring thread-safety:
+The L</new> method uses L<POSIX/setlocale> to retrieve locale-specific formatting properties when a C<lang> option is specified or when detecting the system's locale. This modifies process-wide state, which could potentially cause race conditions in a multi-threaded environment. To address this, the module uses a shared lock variable (C<$LOCALE_LOCK>) to synchronise access during locale changes, ensuring thread-safety:
 
     use threads;
     my @threads = map
@@ -913,7 +943,7 @@ This module relies on L<POSIX> functions (e.g., L<POSIX/atan>, L<POSIX/isinf>) f
 
 =item * B<Serialisation>
 
-Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe.
+Serialisation methods (C<FREEZE>, C<THAW>) operate on per-object state, making them thread-safe.
 
 =back
 
@@ -937,8 +967,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Copyright (c) 2000-2024 DEGUEST Pte. Ltd.
 
-You can use, copy, modify and redistribute this package and associated
-files under the same terms as Perl itself.
+You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 
 =cut
 

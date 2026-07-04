@@ -71,6 +71,7 @@ my @include = qw(
   JSON::PP
   Cpanel::JSON::XS
   JSON::XS
+  Math::BigInt
   Mojolicious
   builtin
   builtin::Backport

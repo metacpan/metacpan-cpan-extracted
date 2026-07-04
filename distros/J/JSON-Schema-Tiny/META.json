@@ -42,10 +42,6 @@
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
-            "Encode" : "0",
-            "File::Spec" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
             "Pod::Wordlist" : "0",
             "Test2::Warnings" : "0",
             "Test::CPAN::Changes" : "0.19",
@@ -55,7 +51,6 @@
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage::TrustMe" : "0.002001",
@@ -67,27 +62,14 @@
       },
       "runtime" : {
          "requires" : {
-            "B" : "0",
-            "Carp" : "0",
-            "Exporter" : "5.57",
             "Feature::Compat::Try" : "0",
-            "JSON::PP" : "0",
-            "Math::BigFloat" : "0",
-            "Mojo::JSON" : "0",
-            "Mojo::JSON::Pointer" : "0",
-            "Mojo::URL" : "0",
             "Mojolicious" : "7.23",
-            "Scalar::Util" : "0",
             "autovivification" : "0",
             "builtin::compat" : "0.003003",
-            "constant" : "0",
             "experimental" : "0.026",
             "if" : "0",
-            "namespace::clean" : "0",
             "perl" : "5.020",
-            "stable" : "0.031",
-            "strict" : "0",
-            "warnings" : "0"
+            "stable" : "0.031"
          },
          "suggests" : {
             "Cpanel::JSON::XS" : "0"
@@ -98,22 +80,12 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Data::Dumper" : "0",
-            "File::Spec" : "0",
             "List::Util" : "1.50",
-            "Math::BigInt" : "0",
-            "Module::Metadata" : "0",
-            "Mojo::File" : "0",
-            "Test2::API" : "0",
             "Test2::V0" : "0",
             "Test2::Warnings" : "0",
             "Test::Deep" : "0",
             "Test::JSON::Schema::Acceptance" : "1.026",
-            "Test::More" : "0",
-            "lib" : "0",
-            "open" : "0",
-            "perl" : "5.020",
-            "utf8" : "0"
+            "perl" : "5.020"
          }
       },
       "x_Dist_Zilla" : {
@@ -166,6 +138,7 @@
             "Dist::Zilla::Plugin::PromptIfStale" : "0",
             "Dist::Zilla::Plugin::Readme" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.142180",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
             "Dist::Zilla::Plugin::RewriteVersion::Transitional" : "0.006",
             "Dist::Zilla::Plugin::Run::AfterBuild" : "0.041",
             "Dist::Zilla::Plugin::Run::AfterRelease" : "0.038",
@@ -195,7 +168,7 @@
    "provides" : {
       "JSON::Schema::Tiny" : {
          "file" : "lib/JSON/Schema/Tiny.pm",
-         "version" : "0.033"
+         "version" : "0.034"
       }
    },
    "release_status" : "stable",
@@ -210,10 +183,10 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Tiny"
       }
    },
-   "version" : "0.033",
+   "version" : "0.034",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.043010"
+         "version" : "5.044000"
       },
       "plugins" : [
          {
@@ -520,6 +493,16 @@
                   ],
                   "plugins" : [
                      {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "SUPPORT",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "VERSION",
+                        "version" : "4.020"
+                     },
+                     {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@Author::ETHER/EnsurePod5",
                         "version" : "4.020"
@@ -645,9 +628,14 @@
                         "version" : "4.020"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::AllowOverride",
-                        "name" : "append to SUPPORT",
-                        "version" : "0.05"
+                        "class" : "inc::AppendSection",
+                        "name" : "AppendSupport",
+                        "version" : null
+                     },
+                     {
+                        "class" : "inc::AppendSection",
+                        "name" : "AppendVersion",
+                        "version" : null
                      }
                   ]
                }
@@ -858,7 +846,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20260420"
+                  "Module::CoreList" : "5.20260722"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1076,7 +1064,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.033",
+                  "tag" : "v0.034",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1259,6 +1247,42 @@
             "version" : "6.037"
          },
          {
+            "class" : "Dist::Zilla::Plugin::RemovePrereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::RemovePrereqs" : {
+                  "modules_to_remove" : [
+                     "B",
+                     "Carp",
+                     "Data::Dumper",
+                     "Encode",
+                     "Exporter",
+                     "File::Spec",
+                     "IO::Handle",
+                     "IPC::Open3",
+                     "JSON::PP",
+                     "Math::BigFloat",
+                     "Math::BigInt",
+                     "Module::Metadata",
+                     "Mojo::File",
+                     "Mojo::JSON",
+                     "Mojo::JSON::Pointer",
+                     "Mojo::URL",
+                     "Scalar::Util",
+                     "Test2::API",
+                     "Test::More",
+                     "constant",
+                     "lib",
+                     "open",
+                     "strict",
+                     "utf8",
+                     "warnings"
+                  ]
+               }
+            },
+            "name" : "RemovePrereqs",
+            "version" : "6.037"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
             "version" : "6.037"
@@ -1326,7 +1350,7 @@
    "x_contributors" : [
       "Matt S Trout <mst@shadowcat.co.uk>"
    ],
-   "x_generated_by_perl" : "v5.43.10",
+   "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0,

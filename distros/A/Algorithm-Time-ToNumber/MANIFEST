@@ -3,14 +3,21 @@ lib/Algorithm/Time/ToNumber.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
+ToNumber.xs
 t/00-load.t
 t/angle.t
+t/angle_day.t
 t/circle.t
+t/circle_day.t
 t/manifest.t
 t/midnight_fail.t
 t/noon_fail.t
 t/pod-coverage.t
 t/pod.t
+t/suricata_to_angle_both.t
+t/suricata_to_angle_day.t
 t/suricata_to_circle.t
+t/suricata_to_circle_both.t
+t/suricata_to_circle_day.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

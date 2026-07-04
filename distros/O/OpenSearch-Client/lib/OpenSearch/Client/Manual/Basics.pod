@@ -1,0 +1,299 @@
+
+=pod
+
+=encoding UTF-8
+
+=head1 OpenSearch::Client::Manual::Basics
+
+Basic use of OpenSearch::Client
+
+=head1 Creating a new instance
+
+The 'new' method returns a new L<client|OpenSearch::Client::Core::3_0::Direct>
+which can be used to run requests against the OpenSearch cluster.
+
+    use OpenSearch::Client;
+    my $os = OpenSearch::Client->new( %params );
+
+The most important arguments to 'new' are the following:
+
+=head2 C<nodes>
+
+The C<nodes> parameter tells the client which OpenSearch nodes it should
+talk to.  It can be a single node, multiples nodes or, if not
+specified, will default to C<localhost:9200>:
+
+    # default: localhost:9200
+    $os = OpenSearch::Client->new();
+
+    # single
+    $os = OpenSearch::Client->new( nodes => 'search_1:9200');
+
+    # multiple
+    $os = OpenSearch::Client->new(
+        nodes => [
+            'search_1:9200',
+            'search_2:9200'
+        ]
+    );
+
+Each C<node> can be a URL including a scheme, host, port, and path.
+For instance, this would be a valid node:
+
+    https://search.domain.com:443/prefix/path
+
+See L<OpenSearch::Client::Role::Cxn/node> for more on node specification.
+
+=head2 C<cxn_pool>
+
+The L<CxnPool|OpenSearch::Client::Role::CxnPool> modules manage connections to
+nodes in the OpenSearch cluster.  They handle the load balancing between
+nodes and failover when nodes fail. Which C<CxnPool> you should use depends on
+where your cluster is. There are three choices:
+
+=over
+
+=item * C<Static>
+
+    $os = OpenSearch::Client->new(
+        cxn_pool => 'Static'     # default
+        nodes    => [
+            'search1.domain.com:9200',
+            'search2.domain.com:9200'
+        ],
+    );
+
+The L<Static|OpenSearch::Client::CxnPool::Static> connection pool, which is the
+default, should be used when you don't have direct access to the OpenSearch
+cluster, eg when you are accessing the cluster through a proxy.  See
+L<OpenSearch::Client::CxnPool::Static> for more.
+
+=item * C<Sniff>
+
+    $os = OpenSearch::Client->new(
+        cxn_pool => 'Sniff',
+        nodes    => [
+            'search1:9200',
+            'search2:9200'
+        ],
+    );
+
+The L<Sniff|OpenSearch::Client::CxnPool::Sniff> connection pool should be used
+when you B<do> have direct access to the OpenSearch cluster, eg when
+your web servers and OpenSearch servers are on the same network.
+The nodes that you specify are used to I<discover> the cluster, which is
+then I<sniffed> to find the current list of live nodes that the cluster
+knows about. See L<OpenSearch::Client::CxnPool::Sniff>.
+
+=item * C<Static::NoPing>
+
+    $os = OpenSearch::Client->new(
+        cxn_pool => 'Static::NoPing'
+        nodes    => [
+            'proxy1.domain.com:80',
+            'proxy2.domain.com:80'
+        ],
+    );
+
+The L<Static::NoPing|OpenSearch::Client::CxnPool::Static::NoPing> connection
+pool should be used when your access to a remote cluster is so limited
+that you cannot ping individual nodes with a C<HEAD /> request.
+
+See L<OpenSearch::Client::CxnPool::Static::NoPing> for more.
+
+=back
+
+=head2 C<trace_to>
+
+For debugging purposes, it is useful to be able to dump the actual HTTP
+requests which are sent to the cluster, and the response that is received.
+This can be enabled with the C<trace_to> parameter, as follows:
+
+    # To STDERR
+    $os = OpenSearch::Client->new(
+        trace_to => 'Stderr'
+    );
+
+    # To a file
+    $os = OpenSearch::Client->new(
+        trace_to => ['File','/path/to/filename']
+    );
+
+Logging is handled by L<Log::Any>.  See L<OpenSearch::Client::Logger::LogAny>
+for more information.
+
+=head2 other
+
+Other arguments are explained in the respective L<module docs|/Modules>.
+
+=head1 Running Requests
+
+When you create a new instance of OpenSearch::Client, it returns a
+L<client|OpenSearch::Client::Core::3_0::Direct> object, which can be used for
+running requests.
+
+    use OpenSearch::Client;
+    my $os = OpenSearch::Client->new( %params );
+
+    # create an index
+    $os->indices->create( index => 'my_index' );
+
+    # index a document
+    $os->index(
+        index   => 'my_index',
+        type    => 'blog_post',
+        id      => 1,
+        body    => {
+            title   => 'OpenSearch clients',
+            content => 'Interesting content...',
+            date    => '2013-09-24'
+        }
+    );
+
+See L<OpenSearch::Client::Core::3_0::Direct> for more details about the requests that
+can be run.
+
+=head1 Modules
+
+Each chunk of functionality is handled by a different module,
+which can be specified in the call to 'new' as shown in L<cxn_pool> above.
+For instance, the following will use the L<OpenSearch::Client::CxnPool::Sniff>
+module for the connection pool.
+
+    $os = OpenSearch::Client->new(
+        cxn_pool => 'Sniff'
+    );
+
+Custom modules can be named with the appropriate prefix,
+eg C<OpenSearch::Client::CxnPool::>, or by prefixing the full class name
+with C<+>:
+
+    $os = OpenSearch::Client->new(
+        cxn_pool => '+My::Custom::CxnClass'
+    );
+
+The modules that you can override are specified with the following
+arguments to 'new':
+
+=head2 C<client>
+
+The class to use for the client functionality, which provides
+methods that can be called to execute requests, such as
+C<search()>, C<index()> or C<delete()>. The client parses the user's
+requests and passes them to the L</transport> class to be executed.
+
+The default version of the client is C<3_0::Direct>, which can
+be explicitly specified as follows:
+
+    $os = OpenSearch::Client->new(
+        client => '3_0::Direct'
+    );
+
+=head2 C<transport>
+
+The Transport class accepts a parsed request from the L</client> class,
+fetches a L</cxn> from its L</cxn_pool> and tries to execute the request,
+retrying after failure where appropriate. See:
+
+=over
+
+=item * L<OpenSearch::Client::Transport>
+
+=back
+
+=head2 C<cxn>
+
+The class which handles raw requests to OpenSearch nodes.
+See:
+
+=over
+
+=item * L<OpenSearch::Client::Cxn::HTTPTiny> (default)
+
+=item * L<OpenSearch::Client::Cxn::LWP>
+
+=back
+
+=head2 C<cxn_factory>
+
+The class which the L</cxn_pool> uses to create new L</cxn> objects.
+See:
+
+=over
+
+=item * L<OpenSearch::Client::Cxn::Factory>
+
+=back
+
+=head2 C<cxn_pool>
+
+The class to use for the L<connection pool|/cxn_pool> functionality.
+It calls the L</cxn_factory> class to create new L</cxn> objects when
+appropriate. See:
+
+=over
+
+=item * L<OpenSearch::Client::CxnPool::Static> (default)
+
+=item * L<OpenSearch::Client::CxnPool::Sniff>
+
+=item * L<OpenSearch::Client::CxnPool::Static::NoPing>
+
+=back
+
+=head2 C<logger>
+
+The class to use for logging events and tracing HTTP requests/responses.  See:
+
+=over
+
+=item * L<OpenSearch::Client::Logger::LogAny>
+
+=back
+
+=head2 C<serializer>
+
+The class to use for serializing request bodies and deserializing response
+bodies.  See:
+
+=over
+
+=item * L<OpenSearch::Client::Serializer::JSON> (default)
+
+=item * L<OpenSearch::Client::Serializer::JSON::Cpanel>
+
+=item * L<OpenSearch::Client::Serializer::JSON::XS>
+
+=item * L<OpenSearch::Client::Serializer::JSON::PP>
+
+=back
+
+=head1 MANUAL
+
+Documentation index L<OpenSearch::Client::Manual>
+
+=head1 HISTORY
+
+This distribution is derived from L<Search::Elasticsearch> version 7.714.
+All subsequent changes are unique to this distribution.
+
+=head1 AUTHOR
+
+Mark Dootson E<lt>mdootson@cpan.orgE<gt> ( current maintainer )
+
+=head1 CREDITS
+
+L<OpenSearch::Client> is based on L<Search::Elasticsearch> version 7.714
+by Enrico Zimuel E<lt>enrico.zimuel@elastic.coE<gt>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Mark Dootson ( this distribution )
+
+Copyright (C) 2021 by Elasticsearch BV ( original distribution ) 
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

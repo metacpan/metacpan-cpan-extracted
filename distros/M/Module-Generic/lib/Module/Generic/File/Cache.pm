@@ -1159,7 +1159,7 @@ When set, this will instruct the serialiser used (see option I<serialiser>) to b
 
 The value can be either a simple true value, such as C<1>, or a base64 encoder/decoder. Currently the only supported ones are: L<Crypt::Misc> and L<MIME::Base64>, or it can also be an array reference of 2 code references, one for encoding and one for decoding.
 
-=head2 binmode
+=for Pod::Coverage binmode
 
 =head2 cbor
 

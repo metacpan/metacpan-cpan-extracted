@@ -495,7 +495,7 @@ Alias for L</lc>
 
 This removes any new line and space characters, i.e. C<\r> and C<\n> at the B<begining> of the string.
 
-It takes an optional argument that can be an alternative string to remove at the end of the sstring or a regular expression, such as one provided with L</perlfunc/qr>
+It takes an optional argument that can be an alternative string to remove at the end of the sstring or a regular expression, such as one provided with C<qr> in L<perlfunc>
 
     $s->ltrim( qr/[[:blank:]\h]+/ ); # Remove all kind of leading whitespaces
 
@@ -647,7 +647,7 @@ See L<perlfunc/"rindex">
 
 This removes any new line and space characters, i.e. C<\r> and C<\n> at the B<end> of the string.
 
-It takes an optional argument that can be an alternative string to remove at the end of the sstring or a regular expression, such as one provided with L</perlfunc/qr>
+It takes an optional argument that can be an alternative string to remove at the end of the sstring or a regular expression, such as one provided with L<perlfunc/qr>
 
     $s->rtrim( qr/[[:blank:]\h]+/ ); # Remove all kind of trailing whitespaces
 

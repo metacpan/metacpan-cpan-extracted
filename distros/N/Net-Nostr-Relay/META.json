@@ -1,0 +1,48 @@
+{
+   "abstract" : "WebSocket relay server for the Nostr protocol",
+   "author" : [
+      "Nicholas B. Hubbard <nicholashubbard@posteo.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Nostr-Relay",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::WebSocket::Server" : "0",
+            "Class::Tiny" : "0",
+            "Crypt::PK::ECC::Schnorr" : "0",
+            "CryptX" : "0",
+            "JSON" : "0",
+            "Net::Nostr::Core" : "0",
+            "perl" : "5.016",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::WebSocket::Client" : "0",
+            "IO::Socket::SSL" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "1.001000",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

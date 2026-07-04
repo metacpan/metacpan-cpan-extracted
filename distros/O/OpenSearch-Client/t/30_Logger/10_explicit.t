@@ -1,0 +1,67 @@
+# OpenSearch::Client is an unofficial client for OpenSearch. 
+# It is derived from Search::Elasticsearch version 7.714
+# License details from the original work are contained in the
+# NOTICE file distributed with this work.
+#
+#-----------------------------------------------------------------------
+# OpenSearch::Client
+#-----------------------------------------------------------------------
+# Copyright 2026 Mark Dootson
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+use Test::More;
+use OpenSearch::Client;
+use File::Temp;
+my $file = File::Temp->new( EXLOCK => 0 );
+
+# default
+
+isa_ok my $l = OpenSearch::Client->new->logger,
+    'OpenSearch::Client::Logger::LogAny',
+    'Default Logger';
+
+is $l->log_as,   'opensearch.event', 'Log as';
+is $l->trace_as, 'opensearch.trace', 'Trace as';
+isa_ok $l->log_handle->adapter, 'Log::Any::Adapter::Null',
+    'Default - Log to NULL';
+isa_ok $l->trace_handle->adapter, 'Log::Any::Adapter::Null',
+    'Default - Trace to NULL';
+
+# stdout/stderr
+
+isa_ok $l
+    = OpenSearch::Client->new( log_to => 'Stderr', trace_to => 'Stdout' )
+    ->logger,
+    'OpenSearch::Client::Logger::LogAny',
+    'Std Logger';
+
+isa_ok $l->log_handle->adapter, 'Log::Any::Adapter::Stderr',
+    'Std - Log to Stderr';
+isa_ok $l->trace_handle->adapter, 'Log::Any::Adapter::Stdout',
+    'Std - Trace to Stdout';
+
+# file
+
+isa_ok $l = OpenSearch::Client->new(
+    log_to   => [ 'File', $file->filename ],
+    trace_to => [ 'File', $file->filename ]
+    )->logger, 'OpenSearch::Client::Logger::LogAny',
+    'File Logger';
+
+isa_ok $l->log_handle->adapter, 'Log::Any::Adapter::File',
+    'File - Log to file';
+isa_ok $l->trace_handle->adapter, 'Log::Any::Adapter::File',
+    'File - Trace to file';
+
+done_testing;

@@ -44,14 +44,36 @@ is_deeply(
 is_deeply(
 	[ $ice645->messages ],
 	[
-		[ '2014-01-03T20:02:00', 'Abweichende Wagenreihung' ],
-		[ '2014-01-03T20:01:00', 'Unwetter' ],
-		[ '2014-01-03T20:00:00', 'Witterungsbedingte Beeinträchtigungen' ],
-		[ '2014-01-03T19:59:00', 'Witterungsbedingte Beeinträchtigungen' ],
-		[ '2014-01-03T19:58:00', 'Witterungsbedingte Beeinträchtigungen' ],
-		[ '2014-01-03T19:48:00', 'Witterungsbedingte Beeinträchtigungen' ],
-		[ '2014-01-03T19:15:00', 'Witterungsbedingte Beeinträchtigungen' ],
-		[ '2014-01-03T19:03:00', 'Witterungsbedingte Beeinträchtigungen' ]
+		[
+			'2014-01-03T20:02:00', 'Abweichende Wagenreihung',
+			'r16669585',           undef,
+			undef
+		],
+		[ '2014-01-03T20:01:00', 'Unwetter', 'r16669574', undef, undef ],
+		[
+			'2014-01-03T20:00:00', 'Witterungsbedingte Beeinträchtigungen',
+			'r16669548', undef, undef
+		],
+		[
+			'2014-01-03T19:59:00', 'Witterungsbedingte Beeinträchtigungen',
+			'r16669529', undef, undef
+		],
+		[
+			'2014-01-03T19:58:00', 'Witterungsbedingte Beeinträchtigungen',
+			'r16669524', undef, undef
+		],
+		[
+			'2014-01-03T19:48:00', 'Witterungsbedingte Beeinträchtigungen',
+			'r16669306', undef, undef
+		],
+		[
+			'2014-01-03T19:15:00', 'Witterungsbedingte Beeinträchtigungen',
+			'r16668654', undef, undef
+		],
+		[
+			'2014-01-03T19:03:00', 'Witterungsbedingte Beeinträchtigungen',
+			'r16668407', undef, undef
+		]
 	],
 	'messages: with dups'
 );

@@ -7,11 +7,14 @@ use Algorithm::Classifier::IsolationForest::App -command;
 
 sub opt_spec {
 	return (
-		[ 'm=s',  'Input model JSON file path/name.',
-			{ 'default' => 'iforest_model.json', 'completion' => 'files' } ],
+		[
+			'm=s',
+			'Input model JSON file path/name.',
+			{ 'default' => 'iforest_model.json', 'completion' => 'files' }
+		],
 		[ 'json', 'Emit machine-readable JSON instead of the text table.' ],
 	);
-}
+} ## end sub opt_spec
 
 sub abstract { 'Show the constructor params, fit-time metadata, and tree stats of a saved model' }
 
@@ -29,12 +32,11 @@ sub validate {
 
 	if ( !-f $opt->{'m'} ) {
 		$self->usage_error( '-m, "' . $opt->{'m'} . '", is not a file or does not exist' );
-	}
-	elsif ( !-r $opt->{'m'} ) {
+	} elsif ( !-r $opt->{'m'} ) {
 		$self->usage_error( '-m, "' . $opt->{'m'} . '", is not readable' );
 	}
 	return 1;
-}
+} ## end sub validate
 
 # Tree-shape stats are derived once at load time.  Each tree is a
 # nested arrayref structure -- leaf [0, size] or interior [1, ...] /
@@ -52,7 +54,7 @@ sub _walk_tree {
 	my ( $li, $ri ) = $node->[0] == 1 ? ( 3, 4 ) : ( 4, 5 );
 	_walk_tree( $node->[$li], $depth + 1, $acc );
 	_walk_tree( $node->[$ri], $depth + 1, $acc );
-}
+} ## end sub _walk_tree
 
 sub _tree_stats {
 	my ($trees) = @_;
@@ -67,10 +69,10 @@ sub execute {
 	my $model = Algorithm::Classifier::IsolationForest->load( $opt->{'m'} );
 
 	# Tree stats are not stored on the model -- they're cheap to derive.
-	my $stats        = _tree_stats( $model->{trees} );
-	my $n_trees      = scalar @{ $model->{trees} };
-	my $avg_depth    = $stats->{leaves} ? $stats->{depth_sum} / $stats->{leaves} : 0;
-	my $avg_nodes    = $n_trees         ? $stats->{nodes}     / $n_trees         : 0;
+	my $stats     = _tree_stats( $model->{trees} );
+	my $n_trees   = scalar @{ $model->{trees} };
+	my $avg_depth = $stats->{leaves} ? $stats->{depth_sum} / $stats->{leaves} : 0;
+	my $avg_nodes = $n_trees         ? $stats->{nodes} / $n_trees             : 0;
 
 	my %info = (
 		'file'              => $opt->{'m'},
@@ -114,8 +116,8 @@ sub execute {
 			&& $v =~ /^-?\d+\.\d+/
 			&& $k !~ /^tree_total_/;
 		printf "  %-20s  %s\n", $k, $v;
-	}
+	} ## end for my $k (@order)
 	return 1;
-}
+} ## end sub execute
 
 return 1;

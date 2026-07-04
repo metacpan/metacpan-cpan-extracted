@@ -54,26 +54,26 @@ my @warnings = (
 );
 
 foreach my $index (0 .. $#warnings) {
-  my ($spec_version, $removed_keywords) = $warnings[$index]->@*;
+  my ($specification_version, $removed_keywords) = $warnings[$index]->@*;
 
-  note "\n", $spec_version;
-  my $js = JSON::Schema::Tiny->new(specification_version => $spec_version);
+  note "\n", $specification_version;
+  my $js = JSON::Schema::Tiny->new(specification_version => $specification_version);
   foreach my $keyword (@$removed_keywords) {
     cmp_result(
-      [ warnings { ok($js->evaluate(true, { $keyword => $schemas{$keyword} }), 'schema with "'.$keyword.'" still validates in '.$spec_version) } ],
+      [ warnings { ok($js->evaluate(true, { $keyword => $schemas{$keyword} }), 'schema with "'.$keyword.'" still validates in '.$specification_version) } ],
       [ re($strings{$keyword}), ],
-      'warned for "'.$keyword.'" in '.$spec_version,
+      'warned for "'.$keyword.'" in '.$specification_version,
     );
   }
 
   next if $index == $#warnings;
-  my ($next_spec_version, $removed_next_keywords) = $warnings[$index+1]->@*;
+  my ($next_specification_version, $removed_next_keywords) = $warnings[$index+1]->@*;
   foreach my $keyword (@$removed_next_keywords) {
     next if grep $keyword eq $_, @$removed_keywords;
     cmp_result(
       [ warnings { ok($js->evaluate(true, { $keyword => $schemas{$keyword} }), 'schema with "'.$keyword.'" still validates') } ],
       [],
-      'did not warn for "'.$keyword.'" in '.$spec_version,
+      'did not warn for "'.$keyword.'" in '.$specification_version,
     );
   }
 }

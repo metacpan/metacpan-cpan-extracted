@@ -39,16 +39,16 @@ sub acceptance_tests (%options) {
       : $ENV{TEST_PREFIXDIR} ? (test_dir => path($ENV{TEST_PREFIXDIR}, 'tests', $options{acceptance}{specification})) : (),
   );
 
-  my $js = JSON::Schema::Tiny->new($options{evaluator}->%*);
-  my $js_short_circuit = $ENV{NO_SHORT_CIRCUIT} || JSON::Schema::Tiny->new($options{evaluator}->%*, short_circuit => 1);
+  my $jst = JSON::Schema::Tiny->new($options{evaluator}->%*);
+  my $jst_short_circuit = $ENV{NO_SHORT_CIRCUIT} || JSON::Schema::Tiny->new($options{evaluator}->%*, short_circuit => 1);
 
   my $encoder = (Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP')->new->allow_nonref(1)->utf8(0)->canonical(1)->pretty(1);
   $encoder->indent_length(2) if $encoder->can('indent_length');
 
   $accepter->acceptance(
     validate_data => sub ($schema, $instance_data) {
-      my $result = $js->evaluate($instance_data, $schema);
-      my $result_short = $ENV{NO_SHORT_CIRCUIT} || $js_short_circuit->evaluate($instance_data, $schema);
+      my $result = $jst->evaluate($instance_data, $schema);
+      my $result_short = $ENV{NO_SHORT_CIRCUIT} || $jst_short_circuit->evaluate($instance_data, $schema);
 
       note 'result: ', $encoder->encode($result);
       note 'short-circuited result: ', ($encoder->encode($result_short) ? 'true' : 'false')
@@ -67,7 +67,7 @@ sub acceptance_tests (%options) {
           foreach
             grep +($_->{error} =~ /^EXCEPTION/
                 && $_->{error} !~ /but short_circuit is enabled/            # unevaluated*
-                && $_->{error} !~ /(max|min)imum value is not a number$/)   # optional/bignum.json
+                && $_->{error} !~ /(max|min)imum value is not a number\z/)   # optional/bignum.json
                 && !($in_todo //= grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*),
               ($r->{errors}//[])->@*;
       }

@@ -159,7 +159,7 @@ Key considerations for thread and process safety:
 
 =item * B<Object State>
 
-All methods, including L</new>, C<AUTOLOAD>, and serialisation subroutines (L</FREEZE>, L</THAW>), operate exclusively on the object’s internal hash, which is unique to each instance. This ensures thread-safe and process-safe behaviour without shared resources:
+All methods, including L</new>, C<AUTOLOAD>, and serialisation subroutines (C<FREEZE>, C<THAW>), operate exclusively on the object’s internal hash, which is unique to each instance. This ensures thread-safe and process-safe behaviour without shared resources:
 
     use threads;
     my $null = Module::Generic::Null->new( wants => 'HASH' );
@@ -190,7 +190,7 @@ Overloaded operators (stringification, equality, boolean) are pure functions ope
 
 =item * B<Serialisation>
 
-Serialisation methods (L</FREEZE>, L</THAW>) copy the object’s hash, which is per-object and thread-safe, supporting L<CBOR::XS>, L<Sereal>, and L<Storable::Improved>:
+Serialisation methods (C<FREEZE>, C<THAW>) copy the object’s hash, which is per-object and thread-safe, supporting L<CBOR::XS>, L<Sereal>, and L<Storable::Improved>:
 
     use threads;
     use Sereal;

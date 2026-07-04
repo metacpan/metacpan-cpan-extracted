@@ -8,14 +8,14 @@ use Crypt::URandom qw (urandom);
 use Fcntl;
 use Carp qw( croak );
 
-our $VERSION = '1.21'; #VERSION
+our $VERSION = '1.23'; #VERSION
 
 use vars qw( $VERSION @ISA @EXPORT_OK );
 use Exporter;
 
 BEGIN {
     @ISA       = qw( Exporter );
-    @EXPORT_OK = qw( bitsize bin2mp mp2bin mod_inverse mod_exp makerandom isprime );
+    @EXPORT_OK = qw( bitsize bin2mp mp2bin mod_inverse mod_exp makerandom randombelow isprime );
 }
 
 ## Nicked from Crypt::RSA::DataFormat.
@@ -64,17 +64,54 @@ sub makerandom {
     Math::BigInt->new('0x' . $r);
 }
 
+# Uniform random integer in [0, $n-1] with no modulo bias (rejection
+# sampling).  Unlike makerandom(), this does NOT force the high bit, so
+# it is correct for DSA nonces and private keys, which must be uniform
+# in [1, q-1].  makerandom() forces the high bit to obtain an exactly
+# N-bit value for prime search, which biases a nonce/key: folding its
+# output with "v -= q if v >= q" leaves the band [2^N-q, 2^(N-1)-1]
+# unreachable (CWE-330, biased-nonce -> lattice key recovery).
+sub randombelow {
+    my $n = shift;
+    $n = Math::BigInt->new("$n") unless ref($n) eq 'Math::BigInt';
+    croak "randombelow: argument must be > 0" unless $n > 0;
+    my $bits  = length($n->as_bin) - 2;
+    my $bytes = int(($bits + 7) / 8) + 1;          # one byte of headroom
+    my $rmax  = Math::BigInt->new(2) ** (8 * $bytes);
+    my $limit = $rmax - ($rmax % $n);              # largest multiple of $n <= rmax
+    my $r;
+    do {
+        $r = Math::BigInt->new('0x' . unpack('H*', urandom($bytes)));
+    } while $r >= $limit;
+    $r % $n;
+}
+
 # For testing, let us choose our isprime function:
 *isprime = \&isprime_algorithms_with_perl;
+
+# CSPRNG-drawn Miller-Rabin base, uniform enough in [2, n-2].  A witness
+# only has to be a random base in range for the strong-pseudoprime test
+# to be sound, so (unlike a secret nonce) a plain draw with a few extra
+# bytes of headroom is fine -- the modulo bias is immaterial here.
+sub _random_base {
+    my ($n) = @_;
+    my $range = $n - 3;                     # 0 .. n-4
+    my $bytes = int(bitsize($n) / 8) + 8;   # headroom keeps bias negligible
+    my $r = Math::BigInt->new('0x' . unpack 'H*', urandom($bytes));
+    ($r % $range) + 2;                      # 2 .. n-2
+}
 
 # from the book "Mastering Algorithms with Perl" by Jon Orwant,
 # Jarkko Hietaniemi, and John Macdonald
 sub isprime_algorithms_with_perl {
     use integer;
     my $n = shift;
+    return 0 if $n < 2;
+    return 1 if $n < 4;         # 2 and 3 are prime
+    return 0 unless $n % 2;     # even n > 2 (also keeps _random_base's
+                                # [2, n-2] range non-degenerate)
     my $n1 = $n - 1;
     my $one = $n - $n1;  # not just 1, but a bigint
-    my $witness = $one * 100;
 
     # find the power of two for the top bit of $n1
     my $p2 = $one;
@@ -88,10 +125,12 @@ sub isprime_algorithms_with_perl {
     $last_witness += (260 - $p2index) / 13 if $p2index < 260;
 
     for my $witness_count (1..$last_witness) {
-	$witness *= 1024;
-	$witness += int(rand(1024));  # XXXX use good rand
-	$witness = $witness % $n if $witness > $n;
-	$witness = $one * 100, redo if $witness == 0;
+	# Fresh, independent CSPRNG witness every round.  The old code
+	# accumulated witnesses from int(rand(1024)) -- Perl's predictable
+	# Mersenne-Twister PRNG, and correlated round-to-round -- which
+	# both weakens each round and breaks the independence the
+	# Miller-Rabin error bound assumes.
+	my $witness = _random_base($n);
 
 	my $prod = $one;
 	my $n1bits = $n1;

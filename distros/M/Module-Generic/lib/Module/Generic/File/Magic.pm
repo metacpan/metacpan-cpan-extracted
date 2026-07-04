@@ -1027,7 +1027,9 @@ Note that within the json backend, a text-content heuristic is applied before fa
 
 Returns the name of the active backend: C<"xs">, C<"json">, or C<"file">. Note that the reported value is the I<top-level> configured backend; the actual detection at runtime may cascade through multiple levels.
 
-=head2 check( [ $filename ] )
+=head2 check
+
+    $magic->check( [ $filename ] );
 
 Validates a magic database. B<xs backend only.>
 
@@ -1035,7 +1037,9 @@ Validates a magic database. B<xs backend only.>
 
 Releases the C<magic_t> cookie. No-op on non-xs backends.
 
-=head2 compile( $filename )
+=head2 compile
+
+    $magic->compile( $filename );
 
 Compiles a magic source file into a C<.mgc> database. B<xs backend only.>
 
@@ -1043,19 +1047,27 @@ Compiles a magic source file into a C<.mgc> database. B<xs backend only.>
 
 Getter/setter for the libmagic flags bitmask.
 
-=head2 from_buffer( $scalar )
+=head2 from_buffer
+
+    $magic->from_buffer( $scalar );
 
 Detects type from a raw byte scalar.
 
-=head2 from_file( $path )
+=head2 from_file
+
+    $magic->from_file( $path );
 
 Detects type from a file path.
 
-=head2 from_filehandle( $fh )
+=head2 from_filehandle
+
+    $magic->from_filehandle( $fh );
 
 Detects type from an open filehandle.
 
-=head2 list( [ $filename ] )
+=head2 list
+
+    $magic->list( [ $filename ] );
 
 Prints magic database entries to stdout. B<xs backend only.>
 
@@ -1063,43 +1075,63 @@ Prints magic database entries to stdout. B<xs backend only.>
 
 Getter/setter for the custom magic database path (xs backend only).
 
-=head2 max_read( [ $bytes ] )
+=head2 max_read
+
+    $magic->max_read( [ $bytes ] );
 
 Getter/setter for the maximum number of bytes read from a file when using pure-Perl backends. The default is 512 bytes, which covers all signatures in the bundled JSON database. Increase this value for formats whose signatures appear at large offsets (e.g. C<application/x-tar> at offset 257).
 
-=head2 mime_encoding_from_buffer( $scalar )
+=head2 mime_encoding_from_buffer
+
+    $magic->mime_encoding_from_buffer( $scalar );
 
 Returns the charset (e.g. C<binary>) for the given buffer.
 
-=head2 mime_encoding_from_file( $path )
+=head2 mime_encoding_from_file
+
+    $magic->mime_encoding_from_file( $path )
 
 Returns the charset (e.g. C<us-ascii>) for the given file.
 
-=head2 mime_encoding_from_filehandle( $fh )
+=head2 mime_encoding_from_filehandle
+
+    $magic->mime_encoding_from_filehandle( $fh );
 
 Returns the charset for the given filehandle.
 
-=head2 mime_from_buffer( $scalar )
+=head2 mime_from_buffer
+
+    $magic->mime_from_buffer( $scalar );
 
 Returns the full MIME string (e.g. C<application/gzip; charset=binary>) for the given buffer.
 
-=head2 mime_from_file( $path )
+=head2 mime_from_file
+
+    $magic->mime_from_file( $path );
 
 Returns the full MIME string for the given file.
 
-=head2 mime_from_filehandle( $fh )
+=head2 mime_from_filehandle
+
+    $magic->mime_from_filehandle( $fh );
 
 Returns the full MIME string for the given filehandle.
 
-=head2 mime_type_from_buffer( $scalar )
+=head2 mime_type_from_buffer
+
+    $magic->mime_type_from_buffer( $scalar );
 
 Returns the MIME type (e.g. C<application/gzip>) for the given buffer.
 
-=head2 mime_type_from_file( $path )
+=head2 mime_type_from_file
+
+    $magic->mime_type_from_file( $path );
 
 Returns the MIME type for the given file.
 
-=head2 mime_type_from_filehandle( $fh )
+=head2 mime_type_from_filehandle
+
+    $magic->mime_type_from_filehandle( $fh );
 
 Returns the MIME type for the given filehandle.
 
@@ -1115,19 +1147,27 @@ Returns the libmagic version string (e.g. C<"5.45">), or C<undef> when not using
     magic_mime_type( $path )
     magic_mime_encoding( $path )
 
-=head2 magic_from_buffer( $scalar [, $flags] )
+=head2 magic_from_buffer
+
+    $magic->magic_from_buffer( $scalar [, $flags] );
 
 Procedural interface to L</from_buffer>.  C<$flags> defaults to C<MAGIC_MIME_TYPE>.
 
-=head2 magic_from_file( $path [, $flags] )
+=head2 magic_from_file
+
+    $magic->magic_from_file( $path [, $flags] );
 
 Procedural interface to L</from_file>.  C<$flags> defaults to C<MAGIC_MIME_TYPE>.
 
-=head2 magic_mime_type( $path )
+=head2 magic_mime_type
+
+    $magic->magic_mime_type( $path );
 
 Returns the MIME type of C<$path>.  Equivalent to C<magic_from_file( $path, MAGIC_MIME_TYPE )>.
 
-=head2 magic_mime_encoding( $path )
+=head2 magic_mime_encoding
+
+    $magic->magic_mime_encoding( $path );
 
 Returns the charset of C<$path>.  Equivalent to C<magic_from_file( $path, MAGIC_MIME_ENCODING )>.
 

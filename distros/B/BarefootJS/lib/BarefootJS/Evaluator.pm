@@ -108,8 +108,32 @@ sub evaluate ($node, $env) {
         }
         return \%out;
     }
+    if ($kind eq 'array-method' && ($node->{method} // '') eq 'includes'
+        && @{ $node->{args} // [] } == 1)
+    {
+        # `.includes(x)` (#2075) — the one `array-method` in the evaluator
+        # subset, shared between `Array.prototype.includes` (SameValueZero
+        # membership) and `String.prototype.includes` (substring search),
+        # matching the receiver-type dispatch the SSR template lowering does
+        # at runtime (`bf_includes` / `$bf->includes`). Mirrors the JS
+        # reference's `includes()` (eval-reference.ts).
+        my $obj    = evaluate($node->{object}, $env);
+        my $needle = evaluate($node->{args}[0], $env);
+        if (ref $obj eq 'ARRAY') {
+            for my $el (@$obj) {
+                return _bool(1) if _same_value_zero($el, $needle);
+            }
+            return _bool(0);
+        }
+        if (_is_string($obj)) {
+            return _bool(index($obj, _to_string($needle)) != -1);
+        }
+        # Any other receiver is not a JS `.includes` target — degrade to
+        # false rather than throwing, mirroring the reference.
+        return _bool(0);
+    }
 
-    # arrow-fn / higher-order / array-method / unsupported: a callback body
+    # arrow-fn / higher-order / unsupported array-method: a callback body
     # containing these is refused upstream (BF101); never reached here.
     return undef;
 }
@@ -274,6 +298,19 @@ sub _strict_eq ($l, $r) {
     }
     return ($l eq $r ? 1 : 0) if _is_string($l) && _is_string($r);
     return 0;
+}
+
+# _same_value_zero: `Array.prototype.includes` membership test — `===`
+# except `NaN` equals itself (and +0/-0 are not distinguished, which the
+# JSON-decoded values here can't represent anyway). Reuses `_strict_eq`'s
+# type/value rules and only special-cases the two-NaN case that `_strict_eq`
+# (deliberately, for `===`) reports as unequal.
+sub _same_value_zero ($l, $r) {
+    if (_is_number($l) && _is_number($r)) {
+        my ($lf, $rf) = ($l + 0, $r + 0);
+        return 1 if $lf != $lf && $rf != $rf;    # NaN sameValueZero NaN
+    }
+    return _strict_eq($l, $r);
 }
 
 sub _unary ($op, $v) {
@@ -539,6 +576,21 @@ sub flat_map ($items, $proj, $param, $base_env = undef) {
     return \@out;
 }
 
+# map_items — project each element through $proj (a pure ParsedExpr), keeping
+# each result as one element (no flatten): JS value-producing `.map(cb)`
+# (#2073). Named map_items (not `map`) so the Perl builtin stays unshadowed.
+# Mirrors Go's MapEval. $base_env is optional.
+sub map_items ($items, $proj, $param, $base_env = undef) {
+    my @arr = ref $items eq 'ARRAY' ? @$items : ();
+    my %env = $base_env ? %$base_env : ();
+    my @out;
+    for my $item (@arr) {
+        $env{$param} = $item;
+        push @out, evaluate($proj, \%env);
+    }
+    return \@out;
+}
+
 # ---------------------------------------------------------------------------
 # JSON-string seams — the adapters emit `bf->filter_eval($recv, '<json>', …)`;
 # the predicate body arrives as a JSON string here, decoded then handed to the
@@ -573,6 +625,11 @@ sub find_index_json ($items, $pred_json, $param, $forward = 1, $base_env = undef
 sub flat_map_json ($items, $proj_json, $param, $base_env = undef) {
     require JSON::PP;
     return flat_map($items, JSON::PP->new->decode($proj_json), $param, $base_env);
+}
+
+sub map_json ($items, $proj_json, $param, $base_env = undef) {
+    require JSON::PP;
+    return map_items($items, JSON::PP->new->decode($proj_json), $param, $base_env);
 }
 
 1;

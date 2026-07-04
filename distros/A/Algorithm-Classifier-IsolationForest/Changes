@@ -1,8 +1,48 @@
 Revision history for Algorithm-Classifier-IsolationForest
 
+0.4.0   2026-07-03/22:45
+        - Implement named features and methods for testing single rows using
+          tagged data.
+        - The C backend can be built and installed at install time, meaning
+          nothing needs built unless changing the opts. See the docs for
+          more details.
+        - new IF_NO_OPENMP=1 selects/builds the serial C backend: no
+          libgomp linkage and no OpenMP runtime in the process at all
+          (unlike OMP_NUM_THREADS=1, which just caps the thread count);
+          IF_NO_OPENMP=0 re-enables OpenMP over a serial install default
+        - new IF_RUNTIME_BUILD=1 ignores the prebuilt object and forces
+          the classic runtime build even when the flags match
+        - iforest accel updated to reflect various changes to the C backend
+        - scoring: the per-leaf path-length adjustment c(size) is now
+          precomputed at tree-pack time and stored in the (previously
+          unused) third slot of packed leaf records, removing a log()
+          call per point per tree from the C scoring hot loop -- about
+          25% faster axis-mode scoring; results are bit-identical
+        - scoring: score_all_xs now picks between two loop shapes based
+          on total forest size: small forests keep the point-major loop
+          (whole forest stays cache-resident anyway), while forests
+          over 4 MB switch to a tree-blocked loop that walks a block of
+          points through one tree at a time so each tree stays hot in
+          L1/L2 instead of being re-streamed from memory per point --
+          measured ~3.2x faster extended-mode scoring at 400 trees
+          (20k points, 16 features); both shapes add the same terms in
+          the same order, so scores are bit-identical either way
+        - any -march (IF_ARCH / IF_NATIVE, configure- or run-time) now
+          automatically adds -ffp-contract=off: with FMA available the
+          compiler otherwise contracts a*b+c into fused multiply-adds
+          whose different rounding silently broke the use_c bit-parity
+          guarantee (one ulp in a split value builds a different tree);
+          the -march win comes from vectorization, so this costs ~nothing
+        - scoring: oblique nodes now prefetch both child records before
+          the dot product resolves which branch is taken, hiding the
+          next node's memory latency under the FMA work (~7-10% faster
+          extended-mode scoring on top of the tiling; axis path is
+          untouched -- its single compare has no work to hide a
+          prefetch under); purely a hint, results unchanged
+
 0.3.0   2026-07-02/23:00
         - lots of POD fixes/cleanup
-		- various further C optmizations
+        - various further C optmizations
         - fit() can now handle training data with missing (undef) feature
           cells, selectable via the new `missing =>` constructor option:
             die    :: croak on undef in the training data (default)

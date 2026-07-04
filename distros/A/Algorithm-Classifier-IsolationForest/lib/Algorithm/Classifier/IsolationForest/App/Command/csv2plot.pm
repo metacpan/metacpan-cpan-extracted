@@ -76,9 +76,9 @@ sub validate {
 sub execute {
 	my ( $self, $opt, $args ) = @_;
 
-	my @raw_csv = read_file( $opt->{'i'} );
+	my @raw_csv      = read_file( $opt->{'i'} );
 	my @first_fields = split( /,/, $raw_csv[0] );
-	my $ncols = scalar @first_fields;
+	my $ncols        = scalar @first_fields;
 
 	if ( $opt->{'p'} eq 'auto' && $ncols >= 4 ) {
 		$opt->{'p'} = '3range';
@@ -129,7 +129,11 @@ plot "' . $opt->{'i'} . '" using 1:2:' . $score_col . ' with points pt 7 ps ' . 
 			. '" using 1:($'
 			. $pred_col
 			. '==0 ? $2 : 1/0) with points pt 7  ps 1.2 lc rgb "#4575b4" title "normal", \
-     "' . $opt->{'i'} . '" using 1:($' . $pred_col . '==1 ? $2 : 1/0) with points pt 13 ps 2.0 lc rgb "#d73027" title "abnormal"
+     "'
+			. $opt->{'i'}
+			. '" using 1:($'
+			. $pred_col
+			. '==1 ? $2 : 1/0) with points pt 13 ps 2.0 lc rgb "#d73027" title "abnormal"
 ';
 	} elsif ( $opt->{'p'} eq '2heat' ) {
 		$gnu_plot_stuff = $gnu_plot_stuff . '

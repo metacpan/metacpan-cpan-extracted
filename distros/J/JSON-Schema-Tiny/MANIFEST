@@ -9,6 +9,7 @@ META.json
 META.yml
 README
 dist.ini
+inc/AppendSection.pm
 inc/CheckConflicts.pm
 lib/JSON/Schema/Tiny.pm
 t/00-report-prereqs.dd
@@ -63,7 +64,7 @@ t/equality.t
 t/errors.t
 t/lib/Acceptance.pm
 t/lib/Helper.pm
-t/max_traversal_depth.t
+t/max_depth.t
 t/pattern.t
 t/ref.t
 t/results/draft2019-09-acceptance.txt

@@ -1,0 +1,70 @@
+{
+   "abstract" : "A utility module for the ordo script",
+   "author" : [
+      "Nathaniel Graham <ngraham@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Ordo",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Parse" : "0",
+            "DateTime::TimeZone" : "0",
+            "Email::Valid" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "IO::Socket::INET" : "0",
+            "JSON" : "0",
+            "Mojo::UserAgent" : "0",
+            "POSIX" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::ReadKey" : "0",
+            "Term::ReadLine::Perl5" : "0",
+            "Text::Table::Tiny" : "1.02",
+            "Time::Local" : "0",
+            "feature" : "0",
+            "perl" : "5.008004",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Ordo" : {
+         "file" : "lib/App/Ordo.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://metacpan.org/dist/App-Ordo"
+   },
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

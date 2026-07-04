@@ -27,7 +27,7 @@ You have five installation options:
 * finalrewind.org APT repository for Debian-based distributions
 * Installing the latest release from CPAN
 * Installation from source
-* Using a Docker image
+* Using a Docker image (amd64 or arm64)
 
 Except for Docker, **db-iris** is available in your PATH after installation.
 You can run `db-iris --version` to verify this. Documentation is available via
@@ -233,7 +233,6 @@ is not always the case. Please do not rely on UIC IDs when managing stations.
 
 Mirrors of this repository are available at the following locations.
 
-* [Chaosdorf](https://chaosdorf.de/git/derf/Travel-Status-DE-IRIS)
 * [Codeberg](https://codeberg.org/derf/Travel-Status-DE-IRIS)
 * [Finalrewind](https://git.finalrewind.org/derf/Travel-Status-DE-IRIS)
 * [GitHub](https://github.com/derf/Travel-Status-DE-IRIS)

@@ -25,7 +25,7 @@ BEGIN
     use Module::Generic::Global ':const';
     use Scalar::Util ();
     use overload (
-        q{""}   => sub{ $_[0]->{dt}->stringify },
+        q{""}   => sub{ ( $_[0]->{dt} && Scalar::Util::blessed( $_[0]->{dt} ) ) ? $_[0]->{dt}->stringify : '' },
         bool    => sub{1},
         q{>}    => sub{ &op( @_, '>' ) },
         q{>=}   => sub{ &op( @_, '>=' ) },
@@ -522,7 +522,27 @@ sub FREEZE
     my $dt         = $self->{dt} || return;
     my $tz         = $dt->time_zone->name;
     my $fmt        = $dt->formatter;
-    my $locale     = $dt->locale->code;
+    # my $locale     = $dt->locale->code;
+    my $locale;
+    if( my $loc = $dt->locale )
+    {
+        # Typically DateTime::Locale::FromCLDR
+        if( $loc->can( 'locale' ) )
+        {
+            $locale = $loc->locale;
+        }
+        # Typically DateTime::Locale::FromData
+        elsif( $loc->can( 'code' ) )
+        {
+            $locale = $loc->code;
+        }
+        else
+        {
+            $locale = "$loc";
+        }
+    
+        $locale = "$locale" if( defined( $locale ) && CORE::ref( $locale ) );
+    }
     my $hash = 
     {
         year        => $dt->year,
@@ -1124,7 +1144,7 @@ If a L<DateTime::Lite> error occurs, it will be caught and an L<error|Module::Ge
 
 =head2 as_string
 
-This is an alias to L</stringify>
+This is an alias to C<stringify>
 
 =head2 datetime
 

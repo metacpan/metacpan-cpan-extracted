@@ -8,9 +8,9 @@ use Carp qw( croak );
 use Crypt::DSA::KeyChain;
 use Crypt::DSA::Key;
 use Crypt::DSA::Signature;
-use Crypt::DSA::Util qw( bitsize bin2mp mod_inverse mod_exp makerandom );
+use Crypt::DSA::Util qw( bitsize bin2mp mod_inverse mod_exp makerandom randombelow );
 
-our $VERSION = '1.21'; #VERSION
+our $VERSION = '1.23'; #VERSION
 
 use vars qw( $VERSION );
 
@@ -67,8 +67,9 @@ sub _sign_setup {
     my $key = shift;
     my($k, $r);
     {
-        $k = makerandom(Size => bitsize($key->q));
-        $k -= $key->q if $k >= $key->q;
+        # Nonce must be uniform in [1, q-1].  Do NOT use makerandom()
+        # (it forces the high bit, which biases the nonce after folding).
+        $k = randombelow($key->q);
         redo if $k == 0;
     }
     $r = mod_exp($key->g, $k, $key->p);

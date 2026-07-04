@@ -25,13 +25,18 @@ BEGIN
         if eval { require Test::NoWarnings ;  Test::NoWarnings->import; 1 };
 
 
-    my $DEP_VERSION = '2.218';
-    my @DEP_NAMES = qw(
-			Compress::Raw::Bzip2
+    my $VERSION           = '2.222';
+    my $DEP_ZLIB_VERSION  = '2.222';
+    my $DEP_BZIP2_VERSION = '2.218';
+
+    my @DEP_ZLIB_NAMES = qw(
 			Compress::Raw::Zlib
             );
 
-    my $VERSION = '2.221';
+    my @DEP_BZIP2_NAMES = qw(
+			Compress::Raw::Bzip2
+            );
+
     my @NAMES = qw(
 			Compress::Zlib
 
@@ -63,19 +68,26 @@ BEGIN
 
 			);
 
+    my @ALL_DEP_NAMES = (@DEP_ZLIB_NAMES, @DEP_BZIP2_NAMES, @NAMES);
+
     my @OPT = qw(
 			);
 
-    plan tests => 1 + 2 + @NAMES + @DEP_NAMES + @OPT + $extra ;
+    plan tests => 1 + 2 + @ALL_DEP_NAMES + @OPT + $extra ;
 
     foreach my $name (@NAMES)
     {
         use_ok($name, $VERSION);
     }
 
-    foreach my $name (@DEP_NAMES)
+    foreach my $name (@DEP_ZLIB_NAMES)
     {
-        use_ok($name, $DEP_VERSION);
+        use_ok($name, $DEP_ZLIB_VERSION);
+    }
+
+    foreach my $name (@DEP_BZIP2_NAMES)
+    {
+        use_ok($name, $DEP_BZIP2_VERSION);
     }
 
     foreach my $name (@OPT)

@@ -6349,7 +6349,7 @@ For example:
 
 =head2 fcntl
 
-=head2 fdopen
+=for Pod::Coverage fdopen
 
 Creates a new L<IO::Handle> object based on the file's file descriptor.
 
@@ -8412,7 +8412,7 @@ This ensures thread-safe writes, with L<perlfunc/flock> preventing concurrent fi
 
 =item * B<Auto-Removal>
 
-The L</auto_remove> feature, used by L</tempfile> and L</tempdir> with C<cleanup>, tracks files in the C<files_to_remove> namespace of L<Module::Generic::Global>, storing a boolean (1) to indicate removal eligibility. This repository is thread-safe, protected by L<Module::Generic::Global>’s synchronisation (C<CORE::lock> for ithreads or C<APR::ThreadRWLock> for rare mod_perl non-threaded cases). In L</DESTROY>, the module checks the instance’s C<auto_remove> flag independently of the repository state, ensuring robust cleanup:
+The L</auto_remove> feature, used by L</tempfile> and L</tempdir> with C<cleanup>, tracks files in the C<files_to_remove> namespace of L<Module::Generic::Global>, storing a boolean (1) to indicate removal eligibility. This repository is thread-safe, protected by L<Module::Generic::Global>’s synchronisation (C<CORE::lock> for ithreads or C<APR::ThreadRWLock> for rare mod_perl non-threaded cases). In C<DESTROY>, the module checks the instance’s C<auto_remove> flag independently of the repository state, ensuring robust cleanup:
 
     my $temp = Module::Generic::File->tempfile( cleanup => 1 );
     $temp->auto_remove(1); # Thread-safe, removed in DESTROY

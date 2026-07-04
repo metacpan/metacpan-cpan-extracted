@@ -3,42 +3,50 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+my %runtime_requires = (
+    'strictures'         => 2,
+    'AnyEvent::HTTP'     => 0,
+    'Net::Nostr::Core'   => 0,
+    'Net::Nostr::Client' => 0,
+    'Net::Nostr::Relay'  => 0,
+);
+
+my %test_requires = (
+    'Test2::V0'                   => 0,
+    'AnyEvent'                    => 0,
+    'AnyEvent::WebSocket::Client' => 0,
+    'IO::Socket::SSL'             => 0,
+);
+
 WriteMakefile(
     NAME         => 'Net::Nostr',
     DISTNAME     => 'Net-Nostr',
     AUTHOR       => 'Nicholas B. Hubbard <nicholashubbard@posteo.net>',
-    ABSTRACT     => 'Client and relay library for the Nostr protocol',
+    ABSTRACT     => 'Compatibility shim for the Nostr client and relay distributions',
     VERSION_FROM => 'lib/Net/Nostr.pm',
     LICENSE      => 'gpl_3',
     MIN_PERL_VERSION => '5.016',
-    PREREQ_PM    => {
-        'strictures'                    => 2,
-        'AnyEvent'                      => 0,
-        'AnyEvent::WebSocket::Client'   => 0,
-        'AnyEvent::WebSocket::Server'   => 0,
-        'AnyEvent::HTTP'                => 0,
-        'CryptX'                        => 0,
-        'Crypt::PK::ECC::Schnorr'      => 0,
-        'Crypt::ScryptKDF'             => 0,
-        'JSON'                          => 0,
-        'Class::Tiny'                   => 0,
-        'Bitcoin::Crypto'               => 0,
-        'Bitcoin::BIP39'                => 0,
-    },
-    TEST_REQUIRES => {
-        'Test2::V0'  => 0,
-        'Test::Pod'           => 0,
-        'Test::Pod::Coverage' => 0,
-        'Clone'      => 0,
-        'IO::Socket::SSL'     => 0,
-    },
+    PREREQ_PM    => \%runtime_requires,
+    TEST_REQUIRES => \%test_requires,
     test => {
         TESTS => 't/*.t t/nip/*.t',
     },
-    META_MERGE => {
-        resources   => {
-            repository  => 'https://github.com/NicholasBHubbard/Net-Nostr',
-            bugtracker  => 'https://github.com/NicholasBHubbard/Net-Nostr/issues',
+    META_ADD => {
+        'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                requires => {
+                    perl => '5.016',
+                    %runtime_requires,
+                },
+            },
+            test => {
+                requires => \%test_requires,
+            },
+        },
+        resources => {
+            repository => 'https://github.com/NicholasBHubbard/Net-Nostr',
+            bugtracker => 'https://github.com/NicholasBHubbard/Net-Nostr/issues',
         },
     },
 );

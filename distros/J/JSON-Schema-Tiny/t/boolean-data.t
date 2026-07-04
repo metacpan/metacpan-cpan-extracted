@@ -145,7 +145,7 @@ subtest '$SCALARREF_BOOLEANS = 1' => sub {
           my ($type, $value) = $_->@*;
           map +{
             $_->%*,
-            $_->{keywordLocation} =~ /\/type$/ ? (error => $_->{error} =~ s/^got .*, not/got $type, not/r) : (),
+            $_->{keywordLocation} =~ /\/type\z/ ? (error => $_->{error} =~ s/^got .*, not/got $type, not/r) : (),
           }, $failure_result->{errors}->@*,
         },
       ],

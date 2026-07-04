@@ -1,5 +1,8 @@
 Revision history for Dezi-App
 
+0.018  03 July 2026
+  - packaging only - fixes number of tests to skip when Mail::Box not installed
+
 0.017  02 July 2026
   - Fix perldoc for CLI
   - add FileRules and FileMatch support to Aggregator::Mail

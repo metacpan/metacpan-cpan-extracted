@@ -9,6 +9,8 @@ README
 bin/http_this
 lib/App/HTTPThis.pm
 t/00-compile.t
+t/default-host.t
+t/server-ready.t
 xt/author-distmeta.t
 xt/author-eol.t
 xt/author-no-tabs.t

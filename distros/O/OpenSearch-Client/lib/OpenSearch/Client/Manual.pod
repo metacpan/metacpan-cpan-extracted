@@ -1,0 +1,77 @@
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+B<OpenSearch::Client::Manual>
+
+=head1 VERSION
+
+version 3.007002
+
+=head1 Basics
+
+Start here
+
+L<OpenSearch::Client::Manual::Basics>
+
+=head1 Top level methods
+
+Several methods are available in the top level OpenSearch::Client namespace.
+
+L<OpenSearch::Client::Core::Direct|OpenSearch::Client::Core::3_0::Direct>
+
+=head1 Methods in other namespaces
+
+Most of the methods available in OpenSearch::Client are accessed through different namespaces.
+Each of these namespaces is served by a specific module.
+
+L<OpenSearch::Client::Manual::Modules>
+
+=head1 Paths in the OpenSearch API documentation
+
+You can lookup paths in the OpenSearch API documentation to find out which namespace and method is used for each path.
+
+L<OpenSearch::Client::Manual::Paths|OpenSearch::Client::Manual::Paths>
+
+=head1 Helper modules
+
+OpenSearch::Client provides helper modules to assist with some API endpoints.
+
+L<OpenSearch::Client::Manual::Helpers>
+
+=head1 Running the tests
+
+L<OpenSearch::Client::Manual::Tests>
+
+=head1 MANUAL
+
+Documentation index L<OpenSearch::Client::Manual>
+
+=head1 HISTORY
+
+This distribution is derived from L<Search::Elasticsearch> version 7.714.
+All subsequent changes are unique to this distribution.
+
+=head1 AUTHOR
+
+Mark Dootson E<lt>mdootson@cpan.orgE<gt> ( current maintainer )
+
+=head1 CREDITS
+
+L<OpenSearch::Client> is based on L<Search::Elasticsearch> version 7.714
+by Enrico Zimuel E<lt>enrico.zimuel@elastic.coE<gt>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Mark Dootson ( this distribution )
+
+Copyright (C) 2021 by Elasticsearch BV ( original distribution ) 
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

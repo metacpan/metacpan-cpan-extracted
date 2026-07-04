@@ -1,7 +1,22 @@
 Revision history for Perl module Perl5::Build::Warnings
 
+0.07 Fri Jul  3 03:55:29 PM EDT 2026
+    - Correction to MANIFEST needed so that test suite can locate file in
+      tarball.
+
+0.06 Fri Jul  3 03:14:18 PM EDT 2026
+    - No change in functionality -- yet
+    - But added a file used in testing and generated via 'make' when building
+      a CPAN module.  If this does well on CPANtesters, we will revise the
+      documentation to reflect extended usability of this module beyond the Perl 5
+      core distribution.
+    - In one test stanza, began to explore the possibility of offering the
+      user the option to replace "smart quotes" with ordinary double-quotes
+      (along the lines suggested by Yves Lubin in a pull request).
+    - Accepted https://github.com/jkeenan/perl5-build-warnings/pull/1 from
+      Mohammad S Anwar.
+
 0.05 Fri 10 Sep 2021 08:14:54 AM EDT
-    - No change in functionality
     - Provide programs with typical usage under examples/
 
 0.04 Thu Dec  5 17:42:24 EST 2019

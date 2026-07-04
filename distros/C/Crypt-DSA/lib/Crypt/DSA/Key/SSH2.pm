@@ -5,7 +5,7 @@ use warnings;
 use MIME::Base64 qw( decode_base64 );
 use Crypt::DSA::Key;
 
-our $VERSION = '1.21'; #VERSION
+our $VERSION = '1.23'; #VERSION
 
 use vars qw{$VERSION @ISA};
 BEGIN {

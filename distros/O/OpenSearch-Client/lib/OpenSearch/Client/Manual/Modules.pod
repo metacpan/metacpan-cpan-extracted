@@ -1,0 +1,254 @@
+=pod
+
+=encoding UTF-8
+
+=head1 OpenSearch::Client::Manual::Modules
+
+Most of the methods available in OpenSearch::Client are accessed through different namespaces.
+Each of these namespaces is served by a specific module.
+
+You can lookup which C<modulename-E<gt>methodname> corresponds to each path in the OpenSearch API documentation
+in L<OpenSearch::Client::Manual::Paths|OpenSearch::Client::Core::3_0::Manual::Paths>
+
+=head1 Namespaces
+
+=head2 asynchronous_search
+
+Searching large volumes of data can take a long time, especially if you're searching across warm nodes or multiple remote clusters. Asynchronous search in OpenSearch lets you send search requests that run in the background. You can monitor the progress of these searches and get back partial results as they become available. After the search finishes, you can save the results to examine at a later time.'
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::AsyncSearch>
+
+=head2 cat
+
+You can get essential statistics about your cluster in an easy-to-understand, tabular format using the compact and aligned text (CAT) API. The CAT API is a human-readable interface that returns plain text instead of traditional JSON. Using the CAT API, you can answer questions like which node is the elected cluster manager, what state the cluster is in, how many documents are in each index, and so on.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Cat>
+
+=head2 cluster
+
+The cluster APIs allow you to manage your cluster. You can use them to check cluster health, modify settings, retrieve statistics, and more.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Cluster>
+
+=head2 dangling_indices
+
+After a node joins a cluster, dangling indexes occur if any shards exist in the node's local directory that do not already exist in the cluster. Dangling indexes can be listed, deleted, or imported.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::DanglingIndices>
+
+=head2 flow_framework
+
+You can automate complex OpenSearch setup and preprocessing tasks by providing templates for common use cases. For example, automating machine learning (ML) setup tasks streamlines the use of OpenSearch ML offerings.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
+
+=head2 geospatial
+
+The ip2geo processor adds information about the geographical location of an IPv4 or IPv6 address. The ip2geo processor uses IP geolocation (GeoIP) data from an external endpoint and therefore requires an additional component, datasource, that defines from where to download GeoIP data and how frequently to update the data.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
+
+=head2 indices
+
+The index API operations let you interact with indexes in your cluster. Using these operations, you can create, delete, close, and complete other index-related operations.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Indices>
+
+=head2 ingest
+
+Ingest APIs are a valuable tool for loading data into a system. Ingest APIs work together with ingest pipelines and ingest processors to process or transform data from a variety of sources and in a variety of formats.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Ingest>
+
+=head2 ingestion
+
+Pull-based ingestion enables OpenSearch to ingest data from streaming sources such as Apache Kafka or Amazon Kinesis. Unlike traditional ingestion methods where clients actively push data to OpenSearch through REST APIs, pull-based ingestion allows OpenSearch to control the data flow by retrieving data directly from streaming sources. This approach provides native backpressure handling, helping prevent server overload during traffic spikes. Pull-based ingestion guarantees at-least-once ingestion semantics and uses external versioning to ensure data consistency.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Ingestion>
+
+=head2 insights
+
+To monitor and analyze the search queries within your OpenSearch cluster, you can obtain query insights.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Insights>
+
+=head2 ism
+
+Use the index state management operations to programmatically work with policies and managed indexes.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::ISM>
+
+=head2 knn
+
+In OpenSearch, vector search functionality is provided by the k-NN plugin and Neural Search plugin. The k-NN plugin provides basic k-NN functionality, while the Neural Search plugin provides automatic embedding generation at indexing and search time.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::KNN>
+
+=head2 list
+
+The List API retrieves statistics about indexes and shards in a paginated format. This streamlines the task of processing responses that include many indexes.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::List>
+
+=head2 ltr
+
+The Learning to Rank plugin for OpenSearch enables you to use machine learning (ML) and behavioral data to fine-tune the relevance of documents. It uses models from the XGBoost and RankLib libraries. These models rescore the search results, considering query-dependent features such as click-through data or field matches, which can further improve relevance.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::LTR>
+
+=head2 ml
+
+OpenSearch supports ML models that you can use to enhance search relevance through semantic understanding. You can either deploy models directly within your OpenSearch cluster or connect to models hosted on external platforms. These models can transform text into vector embeddings, enabling semantic search capabilities, or provide advanced features like text generation and question answering.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::ML>
+
+=head2 neural
+
+The Neural Search plugin provides several APIs for monitoring semantic and hybrid search features.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Neural>
+
+=head2 nodes
+
+The Nodes API makes it possible to retrieve information about individual nodes in your cluster.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Nodes>
+
+=head2 notifications
+
+The Notifications plugin provides a central location for all of your notifications from OpenSearch plugins. Using the plugin, you can configure which communication service you want to use and see relevant statistics and troubleshooting information. Currently, the Alerting and ISM plugins have integrated with the Notifications plugin.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Notifications>
+
+=head2 observability
+
+OpenSearch provides observability capabilities for monitoring applications, infrastructure, and AI agents.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Observability>
+
+=head2 ppl
+
+Use the SQL and PPL API to send queries to the SQL plugin. Use the _sql endpoint to send queries in SQL, and the _ppl endpoint to send queries in PPL. For both of these, you can also use the _explain endpoint to translate your query into OpenSearch domain-specific language (DSL) or to troubleshoot errors.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::PPL>
+
+=head2 query
+
+Configure metric analytics datasources
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Query>
+
+=head2 remote_store
+
+Remote-backed storage offers OpenSearch users a new way to protect against data loss by automatically creating backups of all index transactions and sending them to remote storage.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::RemoteStore>
+
+=head2 replication
+
+Use these replication operations to programmatically manage cross-cluster replication.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Replication>
+
+=head2 rollups
+
+Time series data increases storage costs, strains cluster health, and slows down aggregations over time. Index rollup lets you periodically reduce data granularity by rolling up old data into summarized indexes.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Rollups>
+
+=head2 search_pipeline
+
+You can use search pipelines to build new or reuse existing result rerankers, query rewriters, and other components that operate on queries or results. Search pipelines make it easier for you to process search queries and search results within OpenSearch. Moving some of your application functionality into an OpenSearch search pipeline reduces the overall complexity of your application. As part of a search pipeline, you specify a list of search processors that perform modular tasks. You can then easily add or reorder these processors to customize search results for your application.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::SearchPipeline>
+
+=head2 search_relevance
+
+In search applications, tuning relevance is a constant, iterative exercise intended to provide the right search results to your end users. The tooling in Search Relevance Workbench helps search relevance engineers and business users create the best search experience possible for application users. It does this without hiding internal information, enabling engineers to experiment and investigate details as necessary.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
+
+=head2 security
+
+Manage access control and authentication tokens.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Security>
+
+=head2 security_analytics
+
+Security Analytics includes a number of APIs to help administrators maintain and update an implementation. The APIs often mimic the same controls available for setting up Security Analytics in OpenSearch Dashboards, and they provide another option for administering the plugin.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics>
+
+=head2 sm
+
+Use the Snapshot Management (SM) API to automate taking snapshots.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
+
+=head2 snapshot
+
+The snapshot APIs allow you to manage snapshots and snapshot repositories.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Snapshot>
+
+=head2 sql
+
+Use the SQL and PPL API to send queries to the SQL plugin. Use the _sql endpoint to send queries in SQL, and the _ppl endpoint to send queries in PPL. For both of these, you can also use the _explain endpoint to translate your query into OpenSearch domain-specific language (DSL) or to troubleshoot errors.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::SQL>
+
+=head2 tasks
+
+A task is any operation that you run in a cluster. For example, searching your data collection of books for a title or author name is a task. When you run OpenSearch, a task is automatically created to monitor your cluster's health and performance. For more information about all of the tasks currently executing in your cluster, you can use the tasks API operation.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Tasks>
+
+=head2 transforms
+
+Whereas index rollup jobs let you reduce data granularity by rolling up old data into condensed indexes, transform jobs let you create a different, summarized view of your data centered around certain fields, so you can visualize or analyze the data in different ways.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::Transforms>
+
+=head2 ubi
+
+User Behavior Insights (UBI) is a schema for capturing user search behavior. Search behavior consists of the queries that the user submits, the results that are presented to them, and the actions they take on those results. The UBI schema links all user interactions (events) to the search result they were performed on. That is, it not only captures the chronological sequence of events but also captures the causal links between events. Analysis of this behavior is used for improving the quality of search results.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::UBI>
+
+=head2 wlm
+
+Workload management allows you to group search traffic and isolate network resources, preventing the overuse of network resources by specific requests.
+
+Module : L<OpenSearch::Client::Core::3_0::Direct::WLM>
+
+
+=head1 MANUAL
+
+Documentation index L<OpenSearch::Client::Manual>
+
+=head1 HISTORY
+
+This distribution is derived from L<Search::Elasticsearch> version 7.714.
+All subsequent changes are unique to this distribution.
+
+=head1 AUTHOR
+
+Mark Dootson E<lt>mdootson@cpan.orgE<gt> ( current maintainer )
+
+=head1 CREDITS
+
+L<OpenSearch::Client> is based on L<Search::Elasticsearch> version 7.714
+by Enrico Zimuel E<lt>enrico.zimuel@elastic.coE<gt>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Mark Dootson ( this distribution )
+
+Copyright (C) 2021 by Elasticsearch BV ( original distribution ) 
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

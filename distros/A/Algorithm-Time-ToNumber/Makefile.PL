@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
 	},
 	PREREQ_PM => {
 	},
+	LIBS => ['-lm'],
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES    => 'Algorithm-Time-ToNumber-*' },
 );
