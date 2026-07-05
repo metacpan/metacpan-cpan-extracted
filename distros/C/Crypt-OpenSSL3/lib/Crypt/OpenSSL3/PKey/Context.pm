@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::PKey::Context;
-$Crypt::OpenSSL3::PKey::Context::VERSION = '0.009';
+$Crypt::OpenSSL3::PKey::Context::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::PKey::Context - An operation using a PKey
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -70,11 +70,19 @@ version 0.009
 
 =head2 encrypt_init
 
+=head2 fromdata
+
+=head2 fromdata_init
+
 =head2 generate
 
 =head2 get_algor
 
 =head2 get_param
+
+=head2 get_peerkey
+
+=head2 get_pkey
 
 =head2 is_a
 
@@ -112,9 +120,10 @@ Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Leon Timmermans.
+This software is Copyright (c) 2025 by Leon Timmermans.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
 
 =cut

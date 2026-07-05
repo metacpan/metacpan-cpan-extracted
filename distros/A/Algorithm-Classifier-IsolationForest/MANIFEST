@@ -12,6 +12,7 @@ lib/Algorithm/Classifier/IsolationForest/App/Command/accel.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/bench.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/info.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/pack.pm
+lib/Algorithm/Classifier/IsolationForest/App/Command/set_voting.pm
 src_bin/iforest
 Makefile.PL
 t/pod.t
@@ -31,6 +32,8 @@ t/31-undef-column-no-warnings.t
 t/32-pack-data.t
 t/33-parallel-fit.t
 t/34-missing-values.t
+t/36-tagged-methods.t
+t/37-majority-voting.t
 t/01-accel-flags.t
 t/90-cli-commands.t
 t/02-accel-selection.t
@@ -53,5 +56,6 @@ benchmarking/bench-axis-fit-accel.pl
 benchmarking/bench-extended-predict-accel.pl
 benchmarking/bench-axis-predict-accel.pl
 benchmarking/BenchAccel.pm
+benchmarking/bench-voting.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

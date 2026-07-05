@@ -1,0 +1,344 @@
+#!/usr/bin/env perl
+
+# cpan-health: health analyser for CPAN distributions.
+# Accepts a local path, a CPAN dist name (Foo-Bar), or a module name (Foo::Bar).
+# Runs a battery of scored checks and prints a weighted score out of 100.
+
+use strict;
+use warnings;
+use autodie qw(:all);
+
+# Unicode glyphs in the terminal reporter require UTF-8 output.
+use open OUT => ':encoding(UTF-8)';
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
+# croak points errors at this script, not at internals.
+use Carp qw(croak);
+# File::Spec formats the absolute path shown in the "Checking ..." banner.
+use File::Spec;
+# Getopt::Long parses --format, --no-network, --min-score, etc. from @ARGV.
+use Getopt::Long qw(:config no_auto_abbrev bundling);
+# pod2usage prints the embedded POD as help text and exits.
+use Pod::Usage qw(pod2usage);
+
+our $VERSION = '0.1.0';
+
+# ---------------------------------------------------------------------------
+# Parse CLI arguments
+# ---------------------------------------------------------------------------
+
+# Defaults for options that can be omitted.
+my %opts = (
+	format    => 'terminal',   # terminal (default), json, html, tap
+	severity  => 3,            # Perl::Critic severity level 1-5
+	min_score => 0,            # exit 1 if overall score falls below this
+);
+
+GetOptions(
+	'format|f=s'                    => \$opts{format},
+	'check=s'                       => \$opts{check},
+	'skip=s'                        => \$opts{skip},
+	'no-network|no_network'         => \$opts{no_network},
+	'no-cover|no_cover'             => \$opts{no_cover},
+	'severity=i'                    => \$opts{severity},
+	'min-score|min_score=i'         => \$opts{min_score},
+	'cache-dir|cache_dir=s'         => \$opts{cache_dir},
+	'output|o=s'                    => \$opts{output},
+	'quiet|q'                       => \$opts{quiet},
+	'badge'                         => \$opts{badge},
+	'github-annotations'            => \$opts{github_annotations},
+	'list-checks'                   => \$opts{list_checks},
+	'history'                       => \$opts{history},
+	'ignore-abandoned|ignore_abandoned=s' => \$opts{ignore_abandoned},
+	'help|h'                        => sub { pod2usage(-verbose => 1, -exitval => 0) },
+	'man'                           => sub { pod2usage(-verbose => 2, -exitval => 0) },
+	'version|V'                     => sub { print "cpan-health $VERSION\n"; exit 0 },
+) or pod2usage(-verbose => 0, -exitval => 2);
+
+# Remaining positional argument is the target; default to the current directory.
+my $target = shift @ARGV // '.';
+
+# Reject unknown format values before doing any real work.
+my %VALID_FORMATS = map { $_ => 1 } qw(terminal json html tap markdown);
+unless ($VALID_FORMATS{ lc $opts{format} }) {
+	croak "Unknown --format '$opts{format}'. Valid formats: "
+		. join(', ', sort keys %VALID_FORMATS) . "\n";
+}
+
+# ---------------------------------------------------------------------------
+# Load the main module lazily so --help and --version are instantaneous.
+# ---------------------------------------------------------------------------
+require Test::CPAN::Health;
+
+# ---------------------------------------------------------------------------
+# --list-checks: print all available check metadata and exit.
+# ---------------------------------------------------------------------------
+if ($opts{list_checks}) {
+	my $checks = Test::CPAN::Health->list_checks;
+	printf "%-22s %-6s %-12s %s\n", 'ID', 'WEIGHT', 'CATEGORY', 'NAME';
+	printf "%s\n", '-' x 70;
+	for my $c (@{$checks}) {
+		printf "%-22s %-6s %-12s %s\n",
+			$c->{id}, $c->{weight}, $c->{category}, $c->{name};
+	}
+	exit 0;
+}
+
+# ---------------------------------------------------------------------------
+# --history: show score trend for the target distribution and exit.
+# ---------------------------------------------------------------------------
+if ($opts{history}) {
+	require Test::CPAN::Health::Cache;
+	my $cache = Test::CPAN::Health::Cache->new(
+		$opts{cache_dir} ? (cache_dir => $opts{cache_dir}) : (),
+	);
+	my $rows = $cache->score_history($target, 20);
+	if (!@{$rows}) {
+		print "No score history found for '$target'.\n";
+		exit 0;
+	}
+	printf "Score history for %s:\n", $target;
+	for my $row (@{$rows}) {
+		printf "  %s  v%-10s  %3d/100\n",
+			scalar localtime($row->{recorded}),
+			$row->{version} // '?',
+			$row->{score};
+	}
+	exit 0;
+}
+
+# ---------------------------------------------------------------------------
+# Classify the target and run the health analyser
+# ---------------------------------------------------------------------------
+
+_print_banner(\%opts, $target);
+
+my $health   = _build_health(\%opts, $target);
+my $report   = $health->analyse;
+my $rendered = $health->report_to($report);
+
+_write_output(\%opts, $rendered);
+_emit_badge(\%opts, $report)             if $opts{badge};
+_emit_annotations(\%opts, $report)      if $opts{github_annotations};
+_record_history(\%opts, $health, $report, $target);
+
+exit($report->overall_score < $opts{min_score} ? 1 : 0);
+
+# ---------------------------------------------------------------------------
+# Helper subroutines
+# ---------------------------------------------------------------------------
+
+sub _print_banner {
+	my ($opts_ref, $tgt) = @_;
+	return if lc($opts_ref->{format}) ne 'terminal';
+	return if $opts_ref->{quiet};
+	printf "Checking %s ...\n\n", (-e $tgt ? File::Spec->rel2abs($tgt) : $tgt);
+	return;
+}
+
+sub _build_health {
+	my ($opts_ref, $tgt) = @_;
+	my %tgt_arg;
+	if (-e $tgt) {
+		$tgt_arg{path} = $tgt;
+	} elsif ($tgt =~ / :: /x) {
+		$tgt_arg{module} = $tgt;
+	} else {
+		$tgt_arg{dist} = $tgt;
+	}
+	return Test::CPAN::Health->new(
+		%tgt_arg,
+		format     => lc $opts_ref->{format},
+		no_network => $opts_ref->{no_network} ? 1 : 0,
+		no_cover   => $opts_ref->{no_cover}   ? 1 : 0,
+		severity   => $opts_ref->{severity},
+		min_score  => $opts_ref->{min_score},
+		$opts_ref->{cache_dir}        ? (cache_dir        => $opts_ref->{cache_dir})                              : (),
+		$opts_ref->{check}            ? (checks           => [split / \s* , \s* /x, $opts_ref->{check}])          : (),
+		$opts_ref->{skip}             ? (skip             => [split / \s* , \s* /x, $opts_ref->{skip}])           : (),
+		$opts_ref->{ignore_abandoned} ? (ignore_abandoned => [split / \s* , \s* /x, $opts_ref->{ignore_abandoned}]) : (),
+	);
+}
+
+sub _write_output {
+	my ($opts_ref, $output_text) = @_;
+	if ($opts_ref->{output}) {
+		open my $fh, '>', $opts_ref->{output};
+		print {$fh} $output_text;
+		close $fh;
+		if (lc($opts_ref->{format}) eq 'terminal' && !$opts_ref->{quiet}) {
+			printf "Report written to %s\n", $opts_ref->{output};
+		}
+	} else {
+		print $output_text;
+		print "\n" unless $output_text =~ / \n \z /x;
+	}
+	return;
+}
+
+sub _emit_badge {
+	my ($opts_ref, $rpt) = @_;
+	my $score = $rpt->overall_score;
+	my $color = $score >= 90 ? 'brightgreen' : $score >= 70 ? 'yellow' : 'red';
+	printf "Badge: https://img.shields.io/badge/cpan--health-%d%%2F100-%s?style=flat-square\n",
+		$score, $color;
+	return;
+}
+
+sub _emit_annotations {
+	my ($opts_ref, $rpt) = @_;
+	for my $result (@{ $rpt->results }) {
+		my $status = $result->status;
+		next if $status eq 'pass' || $status eq 'skip';
+		my $level   = ($status eq 'fail' || $status eq 'error') ? 'error' : 'warning';
+		my $name    = $result->data->{name} // $result->check_id;
+		my $summary = $result->summary;
+		$summary =~ s/ :: / /gx;
+		printf "::%s title=cpan-health %s::%s\n", $level, $name, $summary;
+	}
+	return;
+}
+
+sub _record_history {
+	my ($opts_ref, $h, $rpt, $tgt) = @_;
+	require Test::CPAN::Health::Cache;
+	my $cache = Test::CPAN::Health::Cache->new(
+		$opts_ref->{cache_dir} ? (cache_dir => $opts_ref->{cache_dir}) : (),
+	);
+	my $dist_obj = $h->distribution;
+	if ($dist_obj) {
+		my $dist_name = $dist_obj->name    // $tgt;
+		my $version   = $dist_obj->version // '?';
+		$cache->record_history($dist_name, $version, $rpt->overall_score);
+	}
+	return;
+}
+
+__END__
+
+=head1 NAME
+
+cpan-health - Analyse a CPAN distribution and report a weighted health score
+
+=head1 VERSION
+
+0.01
+
+=head1 SYNOPSIS
+
+  cpan-health [options] [TARGET]
+
+  TARGET is a local filesystem path (default: .), a CPAN dist name such as
+  C<LWP-UserAgent>, or a Perl module name such as C<LWP::UserAgent>.
+
+  Options:
+    -f, --format FORMAT         Output format: terminal (default), json, html, tap, markdown
+        --check NAMES           Run only the named checks (comma-separated check ids)
+        --skip  NAMES           Skip the named checks (comma-separated check ids)
+        --no-network            Disable all network-dependent checks
+        --no-cover              Disable Devel::Cover (the test-coverage check is slow)
+        --severity N            Perl::Critic severity level 1-5 (default: 3)
+        --min-score N           Exit 1 if overall score is below N (default: 0)
+        --cache-dir DIR         Override the default cache directory
+    -o, --output FILE           Write the report to FILE instead of STDOUT
+    -q, --quiet                 Suppress banners and informational messages
+        --list-checks           Print all available checks and exit
+        --history               Show score history for TARGET and exit
+        --badge                 Print a shields.io badge URL after the report
+        --github-annotations    Emit GitHub Actions annotation lines (::error/::warning)
+        --ignore-abandoned MOD  Comma-separated modules to exclude from abandoned-deps check
+    -h, --help                  Show this help
+        --man                   Show the full manual page
+    -V, --version               Print the version number and exit
+
+=head1 DESCRIPTION
+
+C<cpan-health> runs a configurable battery of checks against a CPAN
+distribution and reports a weighted health score out of 100.
+
+Checks cover: semantic versioning, META validity, licensing, minimum Perl
+version, POD coverage, documentation quality, example scripts, benchmarks,
+Perl::Critic violations, code complexity, duplicate code, deprecation
+warnings, test coverage, kwalitee, CI configuration, stale and abandoned
+dependencies, known CVEs (via CPAN::Audit), CPAN Testers pass rate, and
+reverse dependency count.
+
+The overall score is the weighted mean of per-check scores.  Two hard caps
+apply: a failing SecurityAdvisories check caps the score at 60; a failing
+CPANTesters check caps it at 75.
+
+=head1 EXAMPLES
+
+  # Analyse the current directory
+  cpan-health
+
+  # Analyse a specific local checkout
+  cpan-health ~/src/LWP-UserAgent-6.77
+
+  # Analyse by CPAN dist name (downloads and unpacks automatically)
+  cpan-health LWP-UserAgent
+
+  # Analyse by module name, skipping all network-dependent checks
+  cpan-health --no-network LWP::UserAgent
+
+  # JSON output for editor or CI integration
+  cpan-health --format=json LWP-UserAgent
+
+  # Fail the build if the score drops below 80
+  cpan-health --min-score=80 --no-cover My-Dist
+
+  # TAP output -- pipe into a test harness
+  cpan-health --format=tap My-Dist | prove --stdin
+
+  # Run only the security and versioning checks
+  cpan-health --check=security_advisories,sem_ver My-Dist
+
+  # Skip the slow coverage and network checks
+  cpan-health --no-cover --no-network .
+
+=head1 EXIT STATUS
+
+  0   Score >= --min-score (or no threshold set); analysis completed normally
+  1   Score < --min-score, or a fatal error was encountered
+  2   Invalid arguments
+
+=head1 CHECKS
+
+Check ids for use with C<--check> and C<--skip>:
+
+  sem_ver               Semantic versioning (weight 3)
+  security_advisories   Known CVEs via CPAN::Audit (weight 10; hard cap 60)
+  cpan_testers          CPAN Testers pass rate (weight 8; hard cap 75)
+  meta_json             META.json/yml validity (weight 5)
+  license               SPDX licence declaration (weight 4)
+  min_perl              Minimum Perl version declaration (weight 3)
+  pod_coverage          POD coverage (weight 5)
+  doc_quality           Documentation quality (weight 4)
+  perlcritic            Perl::Critic violations (weight 6)
+  complexity            Code complexity via Perl::Metrics::Simple (weight 4)
+  test_coverage         Test coverage via Devel::Cover (weight 7)
+  kwalitee              CPANTS kwalitee metrics (weight 5)
+  ci_config             CI configuration presence (weight 4)
+  stale_deps            Stale dependencies (weight 5)
+  abandoned_deps        Abandoned dependencies (weight 5)
+  reverse_deps          Reverse dependency count (weight 2)
+  duplicate_code        Duplicate code detection (weight 3)
+  deprecations          Deprecated module usage (weight 4)
+  examples              Example scripts present (weight 2)
+  benchmarks            Benchmark scripts present (weight 1)
+
+=head1 AUTHOR
+
+Nigel Horne C<< <njh@nigelhorne.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2025-2026 Nigel Horne.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2 of the License, or (at your option)
+any later version.
+
+=cut

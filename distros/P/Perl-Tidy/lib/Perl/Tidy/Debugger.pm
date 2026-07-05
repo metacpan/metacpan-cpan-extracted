@@ -1,14 +1,15 @@
+package Perl::Tidy::Debugger;
+
 #####################################################################
 #
 # The Perl::Tidy::Debugger class shows line tokenization
 #
 #####################################################################
 
-package Perl::Tidy::Debugger;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 
 use constant EMPTY_STRING => q{};
 use constant SPACE        => q{ };

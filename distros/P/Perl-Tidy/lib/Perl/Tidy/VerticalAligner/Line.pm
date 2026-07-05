@@ -1,3 +1,5 @@
+package Perl::Tidy::VerticalAligner::Line;
+
 #####################################################################
 #
 # The Perl::Tidy::VerticalAligner::Line class supplies an object to
@@ -6,11 +8,10 @@
 #
 #####################################################################
 
-package Perl::Tidy::VerticalAligner::Line;
 use strict;
 use warnings;
 
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 use English qw( -no_match_vars );
 
 {

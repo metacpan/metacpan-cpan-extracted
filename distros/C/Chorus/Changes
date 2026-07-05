@@ -1,0 +1,58 @@
+Revision history for Chorus::Expert
+
+2.01    2026-06-21
+        - Engine.pm : add TERMINAL field to YAML DSL for declarative pipeline termination
+          (solved/failed callable from pure YAML rules)
+        - Engine.pm : promote setFilter/setScope/setCondition/setException/setEffect
+          to engine methods (was package-level functions relying on implicit $SELF)
+        - Engine.pm : apply_rec converted from named sub to proper closure
+        - Engine.pm : loop() guard against infinite loops (_MAX_CYCLES, default 10_000)
+        - Engine.pm : addrule() duplicate _ID detection and warning
+        - Engine.pm : YAML English aliases (RULE/FIND/ACTION/PREMISES) accepted
+          alongside French forms (REGLE/CHERCHER/EFFET/PREMISSES)
+        - Engine.pm : logging support (_LOG, _TRACE, _CYCLE fields in YAML rules)
+        - Frame.pm  : fmatch() fix — dead code 'Y' || () replaced with conditional
+          to avoid undef key in %filter
+        - Frame.pm  : fselect() added — selects the best-matching prototype frame
+          given observed slot/value pairs; options: _all, _from, _min
+        - Frame.pm  : _ON_DELETE demon added — fires when a slot is erased via delete()
+        - Frame.pm  : complete() method added — checks that all _TERMINAL_SLOTS are filled
+        - Frame.pm  : _ALTERNATIVES slot added — declares a neighbourhood of sibling
+          frames for use with fselect(_alternatives => ...)
+        - Frame.pm  : _reset() added — clears %FMAP, %REPOSITORY, %INSTANCES, %SERIAL,
+          $SELF, @Heap, $getMode (test isolation)
+        - doc/       : full bilingual documentation added (doc/en/, doc/fr/) covering
+          concepts, AI agent integration, application domains, chorus-* commands
+        - eca/skills/: chorus-pdf, chorus-feed, chorus-check, chorus-create-project,
+          chorus-import-project, chorus-strengthen skills added
+        - lib/Chorus/Engine/AIAgent.pod : AI agent integration reference added
+          (replaces ECA.pod; tool-neutral, covers all six chorus-* commands)
+        - Tests: t/28-Engine-addrule-dedup.t, t/29-Engine-yaml-aliases.t,
+          t/30-Engine-logging.t, t/31-Frame-fselect.t, t/32-Frame-on-delete.t,
+          t/33-Frame-complete.t, t/34-Frame-alternatives.t added
+          (total: 25 test files, 170 assertions)
+
+1.03    2015-12-14
+		- Some tests added (Chorus::Frame : get - set - delete - getZ - getN - fmatch - weaken
+		- Frame method inherits() renamed to _inherits()
+		- bug 90530 : fixed - pod test only if $ENV{AUTHOR_TESTING}
+
+1.02    2013-12-18
+        - Chorus::Frame : DESTROY debbuged (unblessed reference)
+        - Chorus::Frame : method _inherits() added
+        - Chorus::Frame : fmatch() new syntax fmatch(slot => 'SLOT_NAME') or fmatch(slot => ['SLOT1_NAME', 'SLOT2_NAME'])
+        - Chorus::Frame : fmatch() optimized with %INSTANCES
+        - Chorus::Frame : _push() method added
+        - Chorus::Frame : bug fixed with set + multiple inheritance
+        - Chorus::Sample::Cursors : Added        
+        - bug 90530 should be fixed
+        - bug 90166 fixed
+        
+1.01    2013-11-21
+        - Chorus::Frame - new syntax : fmatch( slots => $slots , from => $subset )
+        - Chorus::Engine - new methods last(), reorder(), solved()
+        
+0.01    2013-11-08
+        - First release to CPAN
+        
+        

@@ -16,9 +16,9 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( CSS::Object::Element );
-    use Want ();
+    use Wanted ();
     use overload (
-        '""' => 'as_string',
+        '""'     => 'as_string',
         fallback => 1,
     );
     our $VERSION = 'v0.2.0';
@@ -137,11 +137,11 @@ sub get_property_by_name
             $arr->push( $elem );
         }
     });
-    if( Want::want( 'OBJECT' ) )
+    if( Wanted::want( 'OBJECT' ) )
     {
         rreturn( $arr->length > 0 ? $arr->first : Module::Generic::Null->new );
     }
-    elsif( Want::want( 'LIST' ) )
+    elsif( Wanted::want( 'LIST' ) )
     {
         rreturn( $arr->length > 0 ? $arr->list : () );
     }

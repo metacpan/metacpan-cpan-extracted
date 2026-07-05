@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Array::Merge::Unique qw/unique_array/;
 use base qw/Import::Export/;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our (%helper, %cache);
 BEGIN {
 	%helper = (

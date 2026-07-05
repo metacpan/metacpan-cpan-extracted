@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Helper::Scroll;
-$OpenSearch::Client::Core::3_0::Helper::Scroll::VERSION = '3.007002';
+$OpenSearch::Client::Core::3_0::Helper::Scroll::VERSION = '3.007005';
 use Moo;
 use OpenSearch::Client::Util qw(parse_params throw);
 use namespace::clean;
@@ -147,7 +147,7 @@ OpenSearch::Client::Core::3_0::Helper::Scroll - A helper module for scrolled sea
 
 =head1 VERSION
 
-version 3.007002
+version 3.007005
 
 =head1 SYNOPSIS
 
@@ -280,10 +280,6 @@ a new batch of results is retrieved from the cluster.
 
 By default, the C<scroll_id> is passed as the C<body> to the
 L<scroll|OpenSearch::Client::Core::3_0::Direct/scroll()> request.
-
-The C<scroll> request uses C<GET> by default.  To use C<POST> instead,
-set L<send_get_body_as|OpenSearch::Client::Transport/send_get_body_as> to
-C<POST>.
 
 =head2 C<next()>
 

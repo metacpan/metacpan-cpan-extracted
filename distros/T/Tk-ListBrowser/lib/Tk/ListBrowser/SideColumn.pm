@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use vars qw ($VERSION);
 use Carp;
-$VERSION =  0.10;
+$VERSION =  0.12;
 
 use base qw(Tk::ListBrowser::BaseItem);
 
@@ -127,7 +127,9 @@ sub draw {
 	my $rtag = $c->createRectangle($self->region,
 		-fill => $self->background,
 		-outline => undef,
+		-tags => [$self->name],
 	);
+#	$self->anchorRaise($rtag);
 	$c->lower($rtag);
 	$self->crect($rtag);
 }

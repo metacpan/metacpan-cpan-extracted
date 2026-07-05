@@ -25,3 +25,7 @@ my $unwrapped = $ctx3->decapsulate($wrapped) or die;
 say unpack "H*", $unwrapped;
 
 say $pkey->get_param('max-size');
+
+say '----';
+
+say Dumper($pkey->todata(Crypt::OpenSSL3::PKey::KEYPAIR));

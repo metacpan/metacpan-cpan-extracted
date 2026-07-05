@@ -1,5 +1,5 @@
 package Audio::Nama;
-our $VERSION = "1.604";
+our $VERSION = "1.605";
 use v5.36;
 #use Carp::Always;
 no warnings qw(uninitialized syntax);
@@ -36,9 +36,6 @@ use Text::Format;
 use Tickit::Async;
 use Tickit::Widgets qw(Static VBox);
 use Tickit::Widget::Scroller;
-use Tickit::Widget::Scroller::Item::Text;
-use Audio::Nama::Entry;      # modified Tickit::Widget::Entry to bind printable keys
-use Audio::Nama::Completion; # modified Tickit::Widget::Entry::Plugin::Completion for directory handling
 use Tickit::Widget::Scroller::Item::Text;
 ### We use our versions of these modules
 use Audio::Nama::Entry;      # modified Tickit::Widget::Entry to bind printable keys

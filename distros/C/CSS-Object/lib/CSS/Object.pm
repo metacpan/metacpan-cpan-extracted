@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object.pm
-## Version v0.2.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/24
-## Modified 2024/09/05
+## Modified 2026/07/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,8 +26,8 @@ BEGIN
     use CSS::Object::Rule::Keyframes;
     use CSS::Object::Selector;
     use CSS::Object::Value;
-    use Want ();
-    our $VERSION = 'v0.2.0';
+    use Wanted ();
+    our $VERSION = 'v0.2.1';
 };
 
 sub init
@@ -160,11 +160,11 @@ sub get_rule_by_selector
         }
     }
     ## The user is calling this in a chain context, we make sure this is possible using the Module::Generic::Null class if needed
-    if( Want::want( 'OBJECT' ) )
+    if( Wanted::want( 'OBJECT' ) )
     {
         rreturn( $found->length > 0 ? $found->first : Module::Generic::Null->new );
     }
-    elsif( Want::want( 'LIST' ) )
+    elsif( Wanted::want( 'LIST' ) )
     {
         rreturn( @$found );
     }
@@ -409,7 +409,7 @@ Creating dynamically rules:
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

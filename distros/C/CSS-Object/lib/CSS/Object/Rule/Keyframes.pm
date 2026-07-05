@@ -18,9 +18,9 @@ BEGIN
     # We add CSS::Object in our @ISA so that we can add rule to our KeyframesRule package
     # KeyFrames are special rules that are blocks of further rules
     use parent qw( CSS::Object::Rule::At CSS::Object );
-    use Want ();
+    use Wanted ();
     use overload (
-        '""' => 'as_string',
+        '""'     => 'as_string',
         fallback => 1,
     );
     our $VERSION = 'v0.2.0';

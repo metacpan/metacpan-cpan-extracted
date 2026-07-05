@@ -1,5 +1,14 @@
 Revision history for Perl extension Tk::ListBrowser.
 
+0.12  Sat Jul 04 2026
+	- Fixed -filterforce option a bit better.
+	- Fixed arrow key navigation in tree mode.
+	- Fixed anchor drawing with columns.
+	- Fixed selection drawing in list mode.
+	- Fixed region setting selection drawing in list mode.
+	- Fixed scrolling when there is nothing to scroll.
+	- Set a sunken relief to the canvas.
+
 0.11  Wed Jul 01 2026
 	- Headers respond to button release instead of button press.
 	- Fixed -filterforce option.

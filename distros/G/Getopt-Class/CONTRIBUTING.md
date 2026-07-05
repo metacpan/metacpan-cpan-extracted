@@ -1,9 +1,9 @@
 ## How to contribute
  
 Thank you for considering contributing to this distribution.
-I welcome any contribution to Getopt::Class, including, but not limited to bug reports, feature requests, general comments, and patches.
+I welcome any contribution to Getopt::Class::Alias, including, but not limited to bug reports, feature requests, general comments, and patches.
 
-Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/Getopt-Class> and issue a pull request.
+Feel free to clone it from its gitlab repository at <https://gitlab.com/deguest/Getopt-Class> and issue a pull request.
 
 I am very flexible to collaboration and always eager to learn from others.
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://rt.cpan.org/Publi
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Getopt-Class-v1.1.3/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Getopt-Class-Alias-/README.md)
 
 ## Author
 

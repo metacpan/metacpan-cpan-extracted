@@ -315,7 +315,7 @@ BEGIN {
     sub {1},
 
 # 241 with more parentheses, a field is returned for each pair, even if some pairs don't match, in which case undefined values are returned in those positions
-    sub { @_=CORE::split(qr/(-)|(,)/,'1-10,20'); "@_" eq "1 -  10  , 20" },
+    sub { @_=CORE::split(qr/(-)|(,)/,'1-10,20'); join(q{ },map{defined($_)?$_:q{}}@_) eq "1 -  10  , 20" },
     sub { return 'SKIP' if $] =~ /^5\.006/; @_=CORE::split(qr/(-)|(,)/,'1-10,20'); not defined($_[2]) },
     sub { return 'SKIP' if $] =~ /^5\.006/; @_=CORE::split(qr/(-)|(,)/,'1-10,20'); not defined($_[4]) },
     sub {1},

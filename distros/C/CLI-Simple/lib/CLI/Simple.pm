@@ -23,8 +23,10 @@ use List::Util qw(zip none pairs any);
 use Log::Log4perl qw();
 use Pod::Usage;
 use Scalar::Util qw(reftype);
+use IO::Pager;
 
-our $VERSION              = '2.0.7';
+our $VERSION = '2.0.9';
+
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
 our $GETOPT_ERROR_MESSAGE;
@@ -43,6 +45,7 @@ __PACKAGE__->mk_accessors(
 our $USE_LOGGER   = $FALSE;
 our $AUTO_DEFAULT = $FALSE;
 our $AUTO_HELP    = $FALSE;
+our $PAGER        = $TRUE;
 
 our %INTERNAL_COMMANDS = (
   '-generate-completion' => \&_cmd_generate_completion,
@@ -51,7 +54,7 @@ our %INTERNAL_COMMANDS = (
   '-scaffold'            => \&_cmd_scaffold,
 );
 
-our @EXPORT_OK = qw($AUTO_HELP $AUTO_DEFAULT);
+our @EXPORT_OK = qw($AUTO_HELP $AUTO_DEFAULT $PAGER);
 
 use parent qw(Exporter Class::Accessor::Fast);
 
@@ -342,6 +345,11 @@ sub new {
 
   my $self = $class->SUPER::new( \%cli_options );
 
+  if ( !$self->can('get_help_sections') ) {
+    $self->mk_accessors('help_sections');
+    $self->set_help_sections( [qw( SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE )] );
+  }
+
   # AUTO_DEFAULT uses the only command as the default
   if ( $AUTO_DEFAULT && scalar keys %{$commands} == 1 ) {
     my ($command) = keys %{$commands};
@@ -508,10 +516,19 @@ sub usage {
 
   my $input = $wrapper eq 'cli-simple' ? $INC{'CLI/Simple/Shell.pm'} : $self->get__program;
 
+  if ($PAGER) {
+    eval {
+      require IO::Pager;
+      IO::Pager->new(*STDOUT);
+    };
+  }
+
   pod2usage(
     -noperldoc => 1,
     -exitval   => 'NOEXIT',
     -input     => $input,
+    -verbose   => 99,
+    -sections  => $self->get_help_sections,
   );
 
   return _leave($FAILURE);
@@ -842,7 +859,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.0.7.
+This documentation refers to version 2.0.9.
 
 =head1 FEATURES
 
@@ -867,6 +884,10 @@ This documentation refers to version 2.0.7.
 =item * built-in scaffolding tools for migrating legacy scripts to roles
 
 =item * bash completion script generation for modulino wrappers
+
+=item * optional pager support for help output via L<IO::Pager>
+
+=item * customizable help sections via C<help_sections>
 
 =back
 
@@ -1413,6 +1434,24 @@ that command.
 
 default: false
 
+=item C<$PAGER>
+
+Set the package variable C<$PAGER> to a true value to route help
+output through L<IO::Pager> when C<--help> is invoked. When enabled,
+C<IO::Pager> selects an appropriate pager (C<less>, C<more>, etc.)
+based on the C<PAGER> environment variable, falling back to a sensible
+default. Set to false to suppress pager use and write help directly to
+STDOUT.
+
+  use CLI::Simple qw($PAGER);
+  $PAGER = 0;  # disable pager
+
+default: true
+
+Note: L<IO::Pager> must be installed for pager support. If it is not
+available, help output is written directly to STDOUT regardless of the
+value of C<$PAGER>.
+
 =back
 
 =head1 CONSTANTS
@@ -1457,6 +1496,33 @@ add their own internal commands by pushing entries into the hash before
 calling C<new()>.
 
 =back
+
+=head1 CUSTOMIZING HELP OUTPUT
+
+=head2 C<help_sections>
+
+By default C<CLI::Simple> passes a standard set of POD section names to
+L<Pod::Usage> when rendering help output:
+
+  SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE
+
+You can override this by setting C<help_sections> on the object before
+or after construction:
+
+  my $cli = MyApp->new( ... );
+  $cli->set_help_sections( [qw( SYNOPSIS OPTIONS )] );
+
+Or by overriding in C<init>:
+
+  sub init {
+    my ($self) = @_;
+    $self->set_help_sections( [qw( SYNOPSIS OPTIONS EXAMPLES )] );
+    return $self->SUPER::init;
+  }
+
+Section names follow L<Pod::Usage> conventions. Subsections are
+specified with a C</> separator, e.g. C<DESCRIPTION/Commands> renders
+only the C<Commands> subsection under C<=head1 DESCRIPTION>.
 
 =head1 INTERNAL COMMANDS
 

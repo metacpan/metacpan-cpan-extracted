@@ -1,0 +1,41 @@
+##
+# RULE: R02-moisture
+# AGENT: CobIntro::Agent::Qualification  (pos. 1 / 4)
+# CORPUS: §2.2 — BS EN 1995-1-1 §2.3 — Moisture content at installation [10%, 18%]
+#
+# PURPOSE
+#   Checks that the timber moisture content at time of installation is within
+#   the allowed range [10%, 18%] as required by §2.2.
+#   Elements without a moisture_content slot are skipped silently.
+#
+# INPUTS  (slots read)
+#   needs_qualify     : targeting slot — set by Feed
+#   moisture_content  : float — moisture percentage at installation
+#
+# OUTPUTS (slots written)
+#   qualified        : 'NO' — element rejected if outside [10%, 18%]
+#   rejection_reason : description of the failure
+#   needs_qualify    : deleted after rejection
+#
+# GUARD — EXCEPTION: defined $f->{qualified}
+#   Idempotence — prevents re-processing an already-qualified Frame.
+##
+RULE: R02-moisture
+FIND:
+  f:
+    attribut: needs_qualify
+EXCEPTION: defined $f->{qualified}
+CONDITION: "defined $f->{moisture_content}"
+ACTION: |
+  my $mc = $f->{moisture_content};
+
+  # §2.2 — moisture must be within [10%, 18%]
+  if ($mc < 10 || $mc > 18) {
+    $f->set('qualified', 'NO');
+    $f->set('rejection_reason',
+      "Moisture content ${mc}% outside allowed range [10%, 18%] (§2.2)");
+    $f->set('needs_domain', 1);   # propagate through pipeline even on rejection
+    $f->delete('needs_qualify');
+    return 1;
+  }
+  1

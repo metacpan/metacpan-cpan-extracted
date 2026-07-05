@@ -20,17 +20,17 @@ no_index:
     - t
     - inc
 requires:
-  Module::Generic: v0.37.3
-  Want: '0.29'
-  overload: '1.22'
-  overloading: '0.02'
+  Module::Generic: v1.6.1
+  Wanted: v0.1.2
+  overload: '0'
+  overloading: '0'
   parent: '0'
-  perl: '5.026001'
+  perl: '5.016000'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://gitlab.com/jackdeguest/CSS-Object/issues
+  bugtracker: https://gitlab.com/deguest/CSS-Object/issues
   license: http://dev.perl.org/licenses/
-  repository: https://gitlab.com/jackdeguest/CSS-Object
-version: v0.2.0
+  repository: https://gitlab.com/deguest/CSS-Object
+version: v0.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

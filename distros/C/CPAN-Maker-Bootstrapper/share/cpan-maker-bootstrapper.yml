@@ -39,6 +39,7 @@ options:
 - stub|s=s
 - username|u=s
 extra_options:
+  - llm
   - llm_api_key_helper
   - dist_dir
   - import_file_listing

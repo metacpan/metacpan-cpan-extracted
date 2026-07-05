@@ -10,7 +10,7 @@ VERSION := $(shell test -e VERSION || echo 1.0.0 > VERSION; cat VERSION)
 
 BOOTSTRAPPER_VERSION := $(shell perl -MCPAN::Maker::Bootstrapper -e 'print $$CPAN::Maker::Bootstrapper::VERSION;' 2>/dev/null || true) 
 
-MODULE_NAME  ?= $(shell SOURCE=$(pwd) perl -MCwd=abs_path -MFile::Basename=basename -e '$$m=basename(abs_path($$ENV{SOURCE})); $$m =~s/\-/::/g; print $$m')
+MODULE_NAME  ?= $(shell SOURCE=$$(pwd) perl -MCwd=abs_path -MFile::Basename=basename -e '$$m=basename(abs_path($$ENV{SOURCE})); $$m =~s/\-/::/g; print $$m')
 
 MODULE_PATH = lib/$(shell echo $(MODULE_NAME) | perl -npe 's/::/\//g;').pm
 
@@ -25,15 +25,19 @@ UNIT_TEST_NAME = $(shell TEST_NAME=$(PROJECT_NAME) perl -e 'printf q{t/00-%s.t},
 BOOTSTRAPPER   := $(shell command -v bootstrapper)
 DOCKER         := $(shell command -v docker)
 GIT            := $(shell command -v git)
-MAKE_CPAN_DIST := $(shell command -v make-cpan-dist.pl)
+CPAN_MAKER     := $(shell command -v cpan-maker)
 MD_UTILS       := $(shell command -v md-utils.pl)
 POD2MARKDOWN   := $(shell command -v pod2markdown)
 PODEXTRACT     := $(shell command -v podextract)
 SCANDEPS       := $(shell command -v scandeps-static.pl)
 
-GIT_NAME     ?= $(shell $(GIT) config --global user.name || echo "Anonymouse")
-GIT_EMAIL    ?= $(shell $(GIT) config --global user.email || echo "anonymouse@example.org")
-GITHUB_USER  ?= $(shell $(GIT) config --global user.github || echo "anonymouse")
+ifeq ($(MD_UTILS),)
+    $(warning Markdown::Render is not installed - run: cpanm Markdown::Render to generate .md files from pod)
+endif
+
+GIT_NAME     ?= $(shell $(GIT) config --global user.name 2>/dev/null || echo "Anonymouse")
+GIT_EMAIL    ?= $(shell $(GIT) config --global user.email 2>/dev/null || echo "anonymouse@example.org")
+GITHUB_USER  ?= $(shell $(GIT) config --global user.github 2>/dev/null || echo "anonymouse")
 
 CONFIG_READER = CPAN::Maker::Bootstrapper::ConfigReader
 
@@ -41,7 +45,15 @@ BASEDIR  ?= $(shell perl -M$(CONFIG_READER) -e 'print $(CONFIG_READER)->new("$(C
 
 MIN_PERL_VERSION ?= 5.010
 
-SCAN ?= ON
+ifeq ($(SCANDEPS),)
+  SCAN = OFF
+else
+  SCAN ?= ON
+endif
+
+ifeq ($(BOOTSTRAPPER),)
+  $(error CPAN::Maker::Bootstrapper not installed - run cpanm CPAN::Maker::Bootstrapper)
+endif
 
 define find-files
 $(1) := $(patsubst %.in,%,$(shell for d in $(2); do test -d "$$d" && find $$d -type f -name "$(3)"; done))
@@ -56,9 +68,21 @@ POD_MODULES = $(PERL_MODULES:.pm=.pod)
 
 TARBALL = $(PROJECT_NAME)-$(VERSION).tar.gz
 
-.DEFAULT_GOAL := all
+DEPS = \
+    buildspec.yml \
+    README.md \
+    $(MODULE_PATH).in \
+    $(PERL_MODULES) \
+    $(BIN_FILES) \
+    requires \
+    cpanfile \
+    test-requires \
+    $(UNIT_TEST_NAME) \
+    ChangeLog
 
-all: update-available $(TARBALL) ## builds distribution tarball and dependencies
+.DEFAULT_GOAL := $(TARBALL)
+
+all: update-available 
 
 include .includes/perl.mk
 
@@ -78,43 +102,32 @@ quick: ## quick build, turns off scanning, perltidy, perlcritic
 
 cpanfile: requires test-requires 
 	$(NO_ECHO)if [[ -e requires ]] && [[ -e test-requires ]]; then \
-	  all_requires=$$(mktemp); trap 'rm -f $$all_requires' EXIT; \
-	  cp requires $$all_requires; \
-	  cat test-requires >>$$all_requires; \
-	  sort -u $$all_requires | perl -ne 'chomp; s/^[+]//; ($$m,$$v)=split/\s+/,$$_,2; print qq{requires "$$m", "$$v";\n} if $$m;' >$@; \
+	  $(CPAN_MAKER) create-cpanfile test-requires requires -o $@; \
 	else \
 	  echo >&2 "ERROR: make sure SCAN=on to produce requires, test-requires"; \
 	fi
-DEPS = \
-    buildspec.yml \
-    README.md \
-    $(MODULE_PATH).in \
-    $(PERL_MODULES) \
-    $(BIN_FILES) \
-    requires \
-    cpanfile \
-    test-requires \
-    $(UNIT_TEST_NAME) \
-    ChangeLog
 
 $(TARBALL): $(DEPS) \
     $(if $(tidy_on), $(PERL_MODULES:%=%.tdy) $(PERL_BIN_FILES:%=%.tdy)) \
     $(if $(critic_on), $(PERL_MODULES:%=%.crit) $(PERL_BIN_FILES:%=%.crit))
-	$(MAKE_CPAN_DIST) -l $(LOG_LEVEL) -b $<
+	$(CPAN_MAKER) -l $(LOG_LEVEL) -b $<
 
 module.pm.tmpl:
 	$(NO_ECHO)if [[ -n "$(STUB)" ]]; then \
 	  cp --preserve=all --update=none $(STUB) $@; \
 	  chmod +w $@; \
 	else \
+	  template=$$(perl -MFile::ShareDir=dist_file -e 'print dist_file(q{CPAN-Maker-Bootstrapper}, q{class-module.pm.tmpl});' 2>/dev/null || true); \
+	  chmod -f 644 $@ || true; \
 	  touch $@; \
-	fi; \
+	fi
 
-$(MODULE_PATH).in: | module.pm.tmpl
+$(MODULE_PATH).in: module.pm.tmpl
 	$(NO_ECHO)mkdir -p $$(dirname $@); \
 	test -e $@ || sed -e 's/[@]MODULE_NAME[@]/$(MODULE_NAME)/' \
 	    -e 's/[@]GIT_NAME[@]/$(GIT_NAME)/' \
-	    -e 's/[@]GIT_EMAIL[@]/$(GIT_EMAIL)/' < module.pm.tmpl > $@
+	    -e 's/[@]GIT_EMAIL[@]/$(GIT_EMAIL)/' < $< > $@; \
+	rm $<
 
 test.t.tmpl:
 	$(NO_ECHO)template=$$(perl -MFile::ShareDir=dist_file -e 'print dist_file(q{CPAN-Maker-Bootstrapper}, q{$@});' 2>/dev/null || true); \
@@ -131,15 +144,24 @@ $(UNIT_TEST_NAME): | test.t.tmpl
 ifeq ($(wildcard README.md.in),)
 # If README.md.in does NOT exist, use POD2MARKDOWN on the module
 README.md: $(MODULE_PATH)
-	$(NO_ECHO)tmpfile=$$(mktemp); \
-	trap 'rm -f $$tmpfile' EXIT; \
-	echo "@TOC@" > $$tmpfile; \
-	$(POD2MARKDOWN) $< >> $$tmpfile; \
-	$(MD_UTILS) $$tmpfile > $@;
+	$(NO_ECHO)if [[ -z "$(MD_UTILS)" ]] || [[ -z "$(POD2MARKDOWN)" ]]; then \
+	  echo "WARNING: install Markdown::Render and Pod::Markdown to generate .md files from pod"; \
+	else  \
+	  tmpfile=$$(mktemp); \
+	  trap 'rm -f $$tmpfile' EXIT; \
+	  echo "@TOC@" > $$tmpfile; \
+	  $(POD2MARKDOWN) $< >> $$tmpfile; \
+	  $(MD_UTILS) $$tmpfile > $@; \
+	fi
 else
 # If README.md.in DOES exist, use MD_UTILS on the template
 README.md: README.md.in
-	$(NO_ECHO)$(MD_UTILS) $< > $@
+	$(NO_ECHO)if [[ -z "$(MD_UTILS)" ]]; then \
+	  echo "WARNING: install Markdown::Render to generate .md files"; \
+	  cp $< $@; \
+	else \
+	  $(MD_UTILS) $< > $@; \
+	fi
 endif
 
 modulino.tmpl:
@@ -293,7 +315,6 @@ buildspec.yml: | buildspec.yml.tmpl
 	    -e 's/[@]GITHUB_USER[@]/$(GITHUB_USER)/g' \
 	    -e 's/[@]GIT_EMAIL[@]/$(GIT_EMAIL)/g' \
 	    -e 's/[@]PROJECT_NAME[@]/$(PROJECT_NAME)/g' \
-	    -e "s/[@]EXTRA_FILES[@]/$$extra_files/g" \
 	    -e "s/[@]SHARE_FILES[@]/$$share_files/g" \
 	    -e 's/[@]MIN_PERL_VERSION[@]/$(MIN_PERL_VERSION)/g' buildspec.yml.tmpl > $$buildspec; \
 	if test -e resources.yml; then \

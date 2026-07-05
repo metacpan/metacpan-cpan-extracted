@@ -1,0 +1,6 @@
+REGLE: decrease-above-5
+CHERCHER:
+  frame:
+    attribut: level
+    filtre: '$_->level > 5'
+EFFET: "$frame->decrease; 1"

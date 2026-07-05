@@ -1375,11 +1375,13 @@ XS_INTERNAL(xs_object_new_fallback) {
 
     arg_count = items - start_arg;
 
-    /* Detect named pairs: even count and first arg is a known property name or init_arg */
+    /* Detect named pairs: even count and first arg is a known property/init_arg name,
+       OR the class has defaults (unknown keys are dropped, defaults applied). */
     if (arg_count > 0 && (arg_count % 2) == 0 && SvPOK(ST(start_arg))) {
         STRLEN len;
         const char *pv = SvPV(ST(start_arg), len);
-        if (hv_exists(meta->prop_to_idx, pv, len) || hv_exists(meta->arg_to_idx, pv, len)) {
+        if (hv_exists(meta->prop_to_idx, pv, len) || hv_exists(meta->arg_to_idx, pv, len)
+            || meta->has_any_defaults) {
             is_named = 1;
         }
     }

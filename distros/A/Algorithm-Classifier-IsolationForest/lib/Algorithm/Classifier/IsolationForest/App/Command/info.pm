@@ -74,9 +74,16 @@ sub execute {
 	my $avg_depth = $stats->{leaves} ? $stats->{depth_sum} / $stats->{leaves} : 0;
 	my $avg_nodes = $n_trees         ? $stats->{nodes} / $n_trees             : 0;
 
+	# Feature-name tags are stored as an arrayref (via -t at fit time).
+	my $tags   = $model->{feature_names};
+	my $tagged = ( ref $tags eq 'ARRAY' && @$tags ) ? 1 : 0;
+
 	my %info = (
 		'file'              => $opt->{'m'},
 		'mode'              => $model->{mode},
+		'voting'            => $model->{voting},
+		'tagged'            => $tagged,
+		'feature_names'     => $tagged ? $tags : undef,
 		'n_trees'           => $n_trees,
 		'n_features'        => $model->{n_features},
 		'sample_size'       => $model->{sample_size},
@@ -100,8 +107,9 @@ sub execute {
 	}
 
 	# Text-table output, in a stable order, with undef shown as "(unset)".
+	# feature_names is an arrayref -- rendered separately below.
 	my @order = qw(
-		file mode n_trees n_features sample_size psi_used c_psi
+		file mode voting tagged n_trees n_features sample_size psi_used c_psi
 		max_depth_used extension_level contamination threshold
 		tree_total_nodes tree_total_leaves tree_max_depth
 		tree_avg_depth tree_avg_nodes
@@ -117,6 +125,14 @@ sub execute {
 			&& $k !~ /^tree_total_/;
 		printf "  %-20s  %s\n", $k, $v;
 	} ## end for my $k (@order)
+
+	# Feature-name tags, one per line, in stored (positional) order.
+	if ($tagged) {
+		printf "  %-20s  %s\n", 'feature_names', join( ', ', @$tags );
+		for my $i ( 0 .. $#$tags ) {
+			printf "    [%d]  %s\n", $i, $tags->[$i];
+		}
+	}
 	return 1;
 } ## end sub execute
 

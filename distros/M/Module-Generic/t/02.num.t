@@ -224,7 +224,7 @@ SKIP:
     {
         skip( 'Unsupported language', 4 );
     }
-    my $n_loc = Module::Generic::Number->new( 100, { locale => 'fr_FR', precede => 1, precision => 2, thousand => ' ', decimal => ',', debug => 0 });
+    my $n_loc = Module::Generic::Number->new( 100, { locale => 'fr_FR', precede => 1, precision => 2, thousand => ' ', decimal => ',', debug => $DEBUG });
     isa_ok( $n_loc, 'Module::Generic::Number', 'Object with locale language string' );
     is( $n_loc->precision, 2, 'French precision => 2' );
     # RT #132667
@@ -389,7 +389,9 @@ is( $n4->atan2(12), CORE::atan2( $n4, 12 ), 'atan2' );
 my $n5 = $n4->cbrt;
 # 108.612997866582
 # Use math fallback for perl < 5.022 where POSIX::cbrt does not exist.
-my $cbrt_expected = $] >= 5.022 ? POSIX::cbrt( $n4 ) : ( $n4 ** ( 1/3 ) );
+# my $cbrt_expected = $] >= 5.022 ? POSIX::cbrt( $n4 + 0 ) : ( $n4 ** ( 1/3 ) );
+my $n4_actual = $n4->{_number};
+my $cbrt_expected = $] >= 5.022 ? POSIX::cbrt( $n4 ) : ( $n4 < 0 ? -( ( -$n4 ) ** ( 1/3 ) ) : $n4 ** ( 1/3 ) );
 is( $n5, $cbrt_expected, 'cbrt' );
 # 109
 is( $n5->ceil, POSIX::ceil( $n5 ), 'ceil' );
@@ -398,7 +400,7 @@ is( $n5->floor, POSIX::floor( $n5 ), 'floor' );
 # -0.413777602170324
 is( $n4->cos, CORE::cos( $n4 ), 'cos' );
 # 20.0855369231877
-is( $n4->clone(3)->exp, POSIX::exp( 3 ), 'exp' );
+is( $n4->clone(3)->exp, POSIX::exp(3), 'exp' );
 # 108
 is( $n5->int, CORE::int( $n5 ), 'int' );
 ok( !$n5->is_negative, 'Not negative' );
@@ -409,7 +411,7 @@ ok( !$n3->is_positive, 'Is not positive' );
 is( $n4->log, CORE::log( $n4 ), 'log' );
 # 20.2891588576344
 # Ligne 313 du test
-my $log2_expected = $] >= 5.022 ? POSIX::log2( $n4 ) : ( CORE::log( $n4 ) / CORE::log(2) );
+my $log2_expected = $] >= 5.022 ? POSIX::log2( $n4 ) : ( CORE::log( $n4 + 0 ) / CORE::log(2) );
 is( $n4->log2, $log2_expected, 'log2' );
 # 6.10764540293951
 is( $n4->log10, POSIX::log10( $n4 ), 'log10' );
@@ -501,6 +503,7 @@ is( $a->[0], 10, 'as_array' );
 # NOTE: Additional functionality and edge cases
 subtest 'Additional functionality and edge cases' => sub
 {
+    my $saved_locale = POSIX::setlocale( &POSIX::LC_ALL );
     my $num = Module::Generic::Number->new( 3.14159, debug => $DEBUG );
     is( $num->round_zero, 3, 'round_zero' );
     my $fmt = Module::Generic::Number::Format->new( 3.14159, debug => $DEBUG );
@@ -523,6 +526,7 @@ subtest 'Additional functionality and edge cases' => sub
         my $round_err = $num->round(-1);
         ok( !defined( $round_err ), 'round with negative precision errors' );
     }
+    POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
 };
 
 # NOTE: Thread-safe operations
@@ -542,7 +546,9 @@ subtest 'Thread-safe operations' => sub
         my $locale;
         for my $try (qw( en_US fr_FR de_DE C ))
         {
+            my $saved_locale = POSIX::setlocale( &POSIX::LC_ALL );
             my $rv = eval{ POSIX::setlocale( &POSIX::LC_ALL, $try ) };
+            POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
             if( defined( $rv ) && $rv eq $try )
             {
                 $locale = $try;
@@ -761,13 +767,22 @@ subtest 'locale propagated to formatter' => sub
 {
     SKIP:
     {
+        my $saved_locale = POSIX::setlocale( &POSIX::LC_ALL );
         my $ok = eval{ POSIX::setlocale( &POSIX::LC_ALL, 'fr_FR.UTF-8' ) };
-        skip( 'fr_FR.UTF-8 not available', 2 ) unless( $ok );
+        # On BSDs, setlocale(LC_ALL) may return a composite string such as
+        # 'C/fr_FR.UTF-8/C/C/C/C' when not all categories can be set uniformly.
+        # That is not a failure per se, but it means the locale is not fully fr_FR,
+        # so localeconv() will not return fr_FR values. We skip in that case.
+        if( !defined( $ok ) || $ok ne 'fr_FR.UTF-8' )
+        {
+            POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
+            skip( 'fr_FR.UTF-8 not uniformly available on this system', 2 );
+        }
         my $num = Module::Generic::Number->new( 1234, precision => 2, debug => $DEBUG );
         $num->locale( 'fr_FR.UTF-8' );
         is( $num->locale, 'fr_FR.UTF-8', 'locale setter propagates to formatter' );
         is( $num->decimal, ',', 'decimal updated after locale change' );
-        POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
+        POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
     };
 };
 
@@ -792,7 +807,7 @@ subtest 'formatter survives numeric clone' => sub
     my $n = Module::Generic::Number->new( 1281284, precision => 2, decimal => '.', debug => $DEBUG );
     my $n2 = $n->clone( 1.22192764282227 );
 
-    is( $n2->precision, 2, 'cloned number keeps formatter precision' );
+    is( $n2->precision,  2,  'cloned number keeps formatter precision' );
     is( $n2->format, '1.22', 'cloned number formats with preserved precision' );
 };
 

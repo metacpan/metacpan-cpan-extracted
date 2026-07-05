@@ -1,5 +1,15 @@
 Revision history for File-Raw-Archive
 
+0.02    2026-07-04
+        - Archive.xs: PERL_VERSION_GE compat shim for Perls older than
+          5.33.3 (macro was missing; caused compile failure on 5.28 and
+          below, confirmed by CPAN Testers BINGOS report).
+        - Archive.xs: GvCV_set macro fallback for pre-5.14 builds where
+          the symbol is not exported.
+        - Archive.xs: caller_cx usage guarded behind PERL_VERSION_GE(5,14,0);
+          Perl 5.10 and 5.8 fall back to HvNAME(CopSTASH(PL_curcop)).
+        - Tested on Perl 5.8, 5.10, 5.14, 5.20, 5.36 via Docker.
+
 0.01    2026-05-05
         - First public release. Archive container reader/writer with a
           plugin API; built-in tar plugin reads ustar (POSIX 1988),

@@ -25,11 +25,11 @@ my %WriteMakefileArgs = (
         'strict'            => 0,
         'warnings'          => 0,
         'parent'            => 0,
-        'overload'          => '1.22',
-        'overloading'       => '0.02',
+        'overload'          => 0,
+        'overloading'       => 0,
         # 'Devel::Confess'    => '0.009004',
-        'Module::Generic'   => 'v0.37.3',
-        'Want'              => '0.29',
+        'Module::Generic'   => 'v1.6.1',
+        'Wanted'            => 'v0.1.2',
     },
     TEST_REQUIRES =>
     {
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
         'Test::Pod'     => '1.52',
     },
     LICENSE             => 'perl_5',
-    MIN_PERL_VERSION    => 'v5.26.1',
+    MIN_PERL_VERSION    => 'v5.16.0',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'CSS-Object-*' },
@@ -47,12 +47,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@gitlab.com:jackdeguest/CSS-Object.git',
-                web         => 'https://gitlab.com/jackdeguest/CSS-Object',
+                url         => 'git@gitlab.com:deguest/CSS-Object.git',
+                web         => 'https://gitlab.com/deguest/CSS-Object',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://gitlab.com/jackdeguest/CSS-Object/issues',
+                web         => 'https://gitlab.com/deguest/CSS-Object/issues',
             },
             license => [ 'http://dev.perl.org/licenses/' ],
         },

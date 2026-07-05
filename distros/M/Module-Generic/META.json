@@ -111,6 +111,6 @@
          "web" : "https://gitlab.com/deguest/Module-Generic"
       }
    },
-   "version" : "v1.6.0",
+   "version" : "v1.6.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

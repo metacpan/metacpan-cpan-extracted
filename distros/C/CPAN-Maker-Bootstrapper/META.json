@@ -67,7 +67,7 @@
    "provides" : {
       "CPAN::Maker::Bootstrapper" : {
          "file" : "lib/CPAN/Maker/Bootstrapper.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.4"
       },
       "CPAN::Maker::Bootstrapper::ConfigReader" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/ConfigReader.pm",
@@ -112,6 +112,10 @@
       "CPAN::Maker::Bootstrapper::Role::ScaffoldImporter" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm",
          "version" : "0"
+      },
+      "Git::ReleaseDiffs" : {
+         "file" : "lib/Git/ReleaseDiffs.pm",
+         "version" : "0"
       }
    },
    "release_status" : "stable",
@@ -127,6 +131,6 @@
          "web" : "http://github.com/rlauer6/CPAN-Maker-Bootstrapper"
       }
    },
-   "version" : "v2.0.2",
+   "version" : "v2.0.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

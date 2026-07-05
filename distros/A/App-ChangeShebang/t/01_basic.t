@@ -1,15 +1,16 @@
-use v5.16;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use Test::More;
 use lib "t/lib";
-use Util;
+use Util qw(tempdir spew slurp);
 
 use App::ChangeShebang;
 
 plan skip_all => "doesn't support windows!" if $^O eq 'MSWin32';
 
-subtest basic1 => sub {
+subtest basic1 => sub () {
     my $tempdir = tempdir;
     spew "$tempdir/hoge$_.pl", "#!/path/to/perl\n" for 1..3;
 
@@ -23,7 +24,7 @@ exec "$(dirname "$0")"/perl -x "$0" "$@"
 ...
 };
 
-subtest basic2 => sub {
+subtest basic2 => sub () {
     my $tempdir = tempdir;
     spew "$tempdir/hoge.pl", "#!/usr/bin/env perl\n";
     spew "$tempdir/hoge.rb", "#!/usr/bin/ruby\n";
@@ -39,7 +40,7 @@ exec "$(dirname "$0")"/perl -x "$0" "$@"
     is slurp("$tempdir/hoge.rb"), "#!/usr/bin/ruby\n";
 };
 
-subtest permission => sub {
+subtest permission => sub () {
     my $tempdir = tempdir;
     spew "$tempdir/hoge$_.pl", "#!/path/to/perl\n" for 1..3;
     chmod 0755, "$tempdir/hoge1.pl";
@@ -59,7 +60,7 @@ exec "$(dirname "$0")"/perl -x "$0" "$@"
     is( (stat "$tempdir/hoge3.pl")[2] & 07777, 0500 );
 };
 
-subtest 'remove "not running under some shell"' => sub {
+subtest 'remove "not running under some shell"' => sub () {
     my $tempdir = tempdir;
     spew "$tempdir/hoge1.pl", <<'...';
 #!/usr/bin/perl
@@ -76,14 +77,14 @@ eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
 
 use strict;
 ...
-spew "$tempdir/hoge3.pl", <<'...';
+    spew "$tempdir/hoge3.pl", <<'...';
 #!/usr/bin/perl
     eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
     if $running_under_some_shell;
 #!/usr/bin/perl
 use strict;
 ...
-spew "$tempdir/hoge4.pl", <<'...';
+    spew "$tempdir/hoge4.pl", <<'...';
 #!/usr/bin/perl
 
 eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'

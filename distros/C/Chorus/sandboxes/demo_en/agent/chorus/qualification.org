@@ -1,0 +1,215 @@
+#+TITLE: Agent Qualification
+#+AGENT: CobIntro::Agent::Qualification
+#+PIPELINE_POS: 1
+#+RULES_DIR: rules/qualification/
+
+* Domain
+  Validates the material qualification of each structural element:
+  - §2.1 BS EN 338 — Strength class against required minimum per element type
+  - §2.2 BS EN 1995-1-1 §2.3 — Moisture content within [10%, 18%]
+  - §2.3 EC5 §7.2 — Instantaneous deflection ≤ L/300
+
+  This is the first agent in the pipeline. It receives the initial feed slot
+  ~needs_qualify~ (set by Feed on every element). It sets ~qualified = 'YES'|'NO'~
+  and then triggers the next agent by setting ~needs_domain~ on qualifying elements.
+
+* Targeting Slots                                                        :SCOPE:
+** Chosen Strategy
+   - *Strategy B — presence slot*: ~needs_qualify~ set by Feed on every Frame.
+   Chosen strategy : B
+   Justification   : All frames must pass through qualification first; no Cartesian product needed.
+
+** Targeting Slots Table
+   | Slot            | Strategy | Set by | Value / condition       |
+   |-----------------+----------+--------+-------------------------|
+   | needs_qualify   | B        | Feed   | existence alone suffices |
+
+** Pre-Population Contract
+   Before this agent becomes active, every element Frame MUST carry:
+   - slot ~needs_qualify~ — set by: Feed (load_projet)
+
+* Pipeline — I/O Contract
+** Incoming Slots
+   | Slot              | Source Frame  | Set by | Description                                  |
+   |-------------------+---------------+--------+----------------------------------------------|
+   | needs_qualify     | Element       | Feed   | Targeting slot — triggers this agent         |
+   | type_element      | Element       | Feed   | Element type (stud, plate, rafter, joist…)   |
+   | strength_class    | Element       | Feed   | BS EN 338 class (C14, C16, C18, C24, C30…)   |
+   | moisture_content  | Element       | Feed   | Moisture % at installation                   |
+   | deflection_mm     | Element       | Feed   | Measured deflection in mm                    |
+   | span_mm           | Element       | Feed   | Span in mm (for deflection limit L/300)      |
+
+** Outgoing Slots
+   | Slot              | Target Frame | Type / values | Description                                  |
+   |-------------------+--------------+---------------+----------------------------------------------|
+   | qualified         | Element      | YES / NO      | Qualification result                         |
+   | rejection_reason  | Element      | string        | First failing criterion (if NO)              |
+   | needs_domain      | Element      | 1             | Targeting slot for Agent::Domain (set if YES)|
+
+* Ontology
+  - One Frame per structural element — all elements share the same Frame type.
+  - No inheritance hierarchy needed at this stage.
+  - Concept: ~Element~ with qualification slots.
+
+* Frame Catalogue
+** Frame: Element
+   Role: Represents one structural element of the timber frame.
+
+   | Slot              | Type   | Possible values           | Constraint       | Description                    |
+   |-------------------+--------+---------------------------+------------------+--------------------------------|
+   | needs_qualify     | flag   | 1 / undef                 | set by Feed      | Targeting slot for this agent  |
+   | type_element      | str    | load_bearing_stud, etc.   | required         | Element type                   |
+   | strength_class    | str    | C14..C40                  | required         | BS EN 338 class                |
+   | moisture_content  | float  | 0..100                    | required         | % moisture at installation     |
+   | deflection_mm     | float  | ≥ 0                       | optional         | Measured deflection (mm)       |
+   | span_mm           | float  | > 0                       | optional         | Span (mm) — for L/300 check    |
+   | qualified         | str    | YES / NO                  | set by R03/R04   | Final qualification verdict    |
+   | rejection_reason  | str    | free text                 | set if NO        | First failing criterion        |
+   | needs_domain      | flag   | 1 / undef                 | set if YES       | Targeting slot for Agent::Domain |
+
+   Inheritance (_ISA): —
+   Hooks: none
+
+* Slot Dictionary
+  | Slot              | Frame(s) | Role                     | fmatch target? |
+  |-------------------+----------+--------------------------+----------------|
+  | needs_qualify     | Element  | _SCOPE targeting (agent1)| yes            |
+  | type_element      | Element  | read — type routing      | no             |
+  | strength_class    | Element  | read — class check       | no             |
+  | moisture_content  | Element  | read — moisture check    | no             |
+  | deflection_mm     | Element  | read — deflection check  | no             |
+  | span_mm           | Element  | read — span reference    | no             |
+  | qualified         | Element  | write — verdict          | no             |
+  | rejection_reason  | Element  | write — failure detail   | no             |
+  | needs_domain      | Element  | write — next targeting   | yes (agent 2)  |
+
+* Rule Catalogue
+** Rule: R01-strength-class
+   Intent    : Check strength class against minimum required by element type (§2.1 BS EN 338)
+   Priority  : 1
+
+   FIND      :
+   - ~f~ → attribut: ~needs_qualify~  [no filter — strategy B]
+
+   EXCEPTION : ~defined $f->{qualified}~
+   CONDITION : ~defined $f->{strength_class} && defined $f->{type_element}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my $required = min_strength_class($f->{type_element});
+   if (defined $required) {
+     my $ok = strength_class_ok($f->{strength_class}, $required);
+     unless ($ok) {
+       $f->set('qualified', 'NO');
+       $f->set('rejection_reason', "Strength class $f->{strength_class} below required $required (§2.1)");
+       $f->delete('needs_qualify');
+       return 1;
+     }
+   }
+   1
+   #+END_SRC
+   Notes: delegates to Helpers min_strength_class() and strength_class_ok()
+
+** Rule: R02-moisture
+   Intent    : Check moisture content within [10%, 18%] (§2.2 BS EN 1995-1-1 §2.3)
+   Priority  : 2
+
+   FIND      :
+   - ~f~ → attribut: ~needs_qualify~
+
+   EXCEPTION : ~defined $f->{qualified}~
+   CONDITION : ~defined $f->{moisture_content}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my $mc = $f->{moisture_content};
+   if ($mc < 10 || $mc > 18) {
+     $f->set('qualified', 'NO');
+     $f->set('rejection_reason', "Moisture content ${mc}% outside [10%, 18%] (§2.2)");
+     $f->delete('needs_qualify');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R03-deflection
+   Intent    : Check instantaneous deflection ≤ L/300 (§2.3 EC5 §7.2)
+   Priority  : 3
+
+   FIND      :
+   - ~f~ → attribut: ~needs_qualify~
+
+   EXCEPTION : ~defined $f->{qualified}~
+   CONDITION : ~defined $f->{deflection_mm} && defined $f->{span_mm} && $f->{span_mm} > 0~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my $limit = $f->{span_mm} / 300;
+   $limit = 5 if $limit < 5;   # minimum 5 mm over 2 m span
+   if ($f->{deflection_mm} > $limit) {
+     $f->set('qualified', 'NO');
+     $f->set('rejection_reason',
+       sprintf("Deflection %.1f mm > L/300 = %.1f mm (§2.3)", $f->{deflection_mm}, $limit));
+     $f->delete('needs_qualify');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R04-qualify-conclude
+   Intent    : Mark element QUALIFIED if no rejection rule fired; trigger next agent
+   Priority  : 4
+
+   FIND      :
+   - ~f~ → attribut: ~needs_qualify~
+
+   EXCEPTION : ~defined $f->{qualified}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   $f->set('qualified', 'YES');
+   $f->set('needs_domain', 1);
+   $f->delete('needs_qualify');
+   1
+   #+END_SRC
+
+* Perl Helpers
+** min_strength_class
+   Signature   : ~sub min_strength_class($type_element) → $class_string | undef~
+   Description : Returns the minimum required BS EN 338 strength class for the given element type.
+                 Returns undef for element types not covered by §2.1 (e.g. insulation).
+   Called by   : R01-strength-class
+   Exported    : yes
+   Notes       : Source corpus §2.1 — BS EN 338
+
+   #+BEGIN_SRC perl
+   my %MIN_CLASS = (
+       load_bearing_stud  => 'C24',
+       sole_plate         => 'C24',
+       top_plate          => 'C24',
+       non_lb_stud        => 'C16',
+       rafter             => 'C18',
+       joist              => 'C24',
+   );
+   sub min_strength_class { return $MIN_CLASS{ $_[0] } }
+   #+END_SRC
+
+** strength_class_ok
+   Signature   : ~sub strength_class_ok($actual, $required) → 1|0~
+   Description : Returns 1 if $actual class is ≥ $required in the BS EN 338 ordered scale.
+   Called by   : R01-strength-class
+   Exported    : yes
+   Notes       : Class order: C14 < C16 < C18 < C24 < C30 < C35 < C40
+
+   #+BEGIN_SRC perl
+   my %CLASS_RANK = (C14=>1, C16=>2, C18=>3, C24=>4, C30=>5, C35=>6, C40=>7);
+   sub strength_class_ok {
+       my ($actual, $required) = @_;
+       my ($ra, $rr) = ($CLASS_RANK{$actual}//0, $CLASS_RANK{$required}//0);
+       return $ra >= $rr ? 1 : 0;
+   }
+   #+END_SRC
+
+* Constraints & Pitfalls
+  - [ ] R01 must fire before R04 — R04 only fires when ~qualified~ is still undef
+  - [ ] Elements without ~strength_class~ (e.g. insulation) skip R01 via CONDITION
+  - [ ] Elements without ~deflection_mm~ skip R03 via CONDITION — they still proceed to R04
+  - [ ] ~needs_qualify~ is deleted after processing (consumed targeting slot)
+  - [ ] Always end ACTION with ~1~ or truthy expression
+  - [ ] ~needs_domain~ must be set via ~$f->set()~ not ~$f->{needs_domain} = 1~

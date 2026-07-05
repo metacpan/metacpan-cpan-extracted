@@ -4,7 +4,7 @@
 
 [ 1. 載入模組 ]
   use mb;
-  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / big5 / gbk / uhc
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
 
 [ 2. 按字元操作 length / substr ]
   mb::length($str)              # 字元數（非位元組數）
@@ -29,7 +29,7 @@
   mb::getc(FH)     mb::tr($str,$from,$to)
 
 [ 7. 支援的編碼 ]
-  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
 
 [ 8. 範例 ]
   use mb;

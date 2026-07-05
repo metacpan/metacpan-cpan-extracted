@@ -124,14 +124,27 @@ subtest 'serial-C backend is reproducible for a fixed seed' => sub {
 subtest 'pure-Perl and serial-C build identical trees for the same seed' => sub {
 	plan skip_all => 'no Inline::C backend compiled in' unless $HAS_C;
 
+	# On a wide-NV perl (-Duselongdouble / -Dusequadmath) the pure-Perl
+	# builder rounds every stored value to double precision to keep this
+	# parity (see _NV_IS_DOUBLE in the module).  That makes axis mode
+	# exact, but extended mode also needs libm: long-double log/cos/sqrt
+	# narrowed to double disagree with the C builder's double libm calls
+	# on rounding ties, which no Perl-side rounding can repair -- so only
+	# the extended arm is skipped there.
+	my $nv_is_double = $Config{nvsize} == 8;
+
 	for my $mode (qw(axis extended)) {
-		my %opts = ( n_trees => 30, sample_size => 48, seed => 33, mode => $mode );
-		is(
-			fit_trees( %opts, use_c => 1 ),
-			fit_trees( %opts, use_c => 0 ),
-			"[$mode] use_c => 1 and use_c => 0 build the same trees"
-		);
-	}
+	SKIP: {
+			skip "[$mode] libm long-double vs double rounding differs (nvsize=$Config{nvsize})", 1
+				if $mode eq 'extended' && !$nv_is_double;
+			my %opts = ( n_trees => 30, sample_size => 48, seed => 33, mode => $mode );
+			is(
+				fit_trees( %opts, use_c => 1 ),
+				fit_trees( %opts, use_c => 0 ),
+				"[$mode] use_c => 1 and use_c => 0 build the same trees"
+			);
+		} ## end SKIP:
+	} ## end for my $mode (qw(axis extended))
 
 	for my $missing (qw(zero impute nan)) {
 		my %opts = (

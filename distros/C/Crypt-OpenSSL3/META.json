@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -60,219 +60,235 @@
    "provides" : {
       "Crypt::OpenSSL3" : {
          "file" : "lib/Crypt/OpenSSL3.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::ASN1" : {
          "file" : "lib/Crypt/OpenSSL3/ASN1.pm",
-         "version" : "0.009"
+         "version" : "0.010"
+      },
+      "Crypt::OpenSSL3::ASN1::Decoder" : {
+         "file" : "lib/Crypt/OpenSSL3/ASN1/Decoder.pm",
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::ASN1::Object" : {
          "file" : "lib/Crypt/OpenSSL3/ASN1/Object.pm",
-         "version" : "0.009"
+         "version" : "0.010"
+      },
+      "Crypt::OpenSSL3::ASN1::Value" : {
+         "file" : "lib/Crypt/OpenSSL3/ASN1/Value.pm",
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::BIO" : {
          "file" : "lib/Crypt/OpenSSL3/BIO.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::BIO::Address" : {
          "file" : "lib/Crypt/OpenSSL3/BIO/Address.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::BIO::PollDescriptor" : {
          "file" : "lib/Crypt/OpenSSL3/BIO/PollDescriptor.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::BigNum" : {
          "file" : "lib/Crypt/OpenSSL3/BigNum.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::BigNum::Context" : {
          "file" : "lib/Crypt/OpenSSL3/BigNum/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Cipher" : {
          "file" : "lib/Crypt/OpenSSL3/Cipher.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Cipher::Context" : {
          "file" : "lib/Crypt/OpenSSL3/Cipher/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Error" : {
          "file" : "lib/Crypt/OpenSSL3/Error.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::HPKE" : {
          "file" : "lib/Crypt/OpenSSL3/HPKE.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::HPKE::Context" : {
          "file" : "lib/Crypt/OpenSSL3/HPKE/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::KDF" : {
          "file" : "lib/Crypt/OpenSSL3/KDF.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::KDF::Context" : {
          "file" : "lib/Crypt/OpenSSL3/KDF/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::MAC" : {
          "file" : "lib/Crypt/OpenSSL3/MAC.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::MAC::Context" : {
          "file" : "lib/Crypt/OpenSSL3/MAC/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::MD" : {
          "file" : "lib/Crypt/OpenSSL3/MD.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::MD::Context" : {
          "file" : "lib/Crypt/OpenSSL3/MD/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::NID" : {
          "file" : "lib/Crypt/OpenSSL3/NID.pm",
-         "version" : "0.009"
+         "version" : "0.010"
+      },
+      "Crypt::OpenSSL3::PEM" : {
+         "file" : "lib/Crypt/OpenSSL3/PEM.pm",
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::PKCS7" : {
          "file" : "lib/Crypt/OpenSSL3/PKCS7.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::PKey" : {
          "file" : "lib/Crypt/OpenSSL3/PKey.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::PKey::Context" : {
          "file" : "lib/Crypt/OpenSSL3/PKey/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Random" : {
          "file" : "lib/Crypt/OpenSSL3/Random.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Random::Context" : {
          "file" : "lib/Crypt/OpenSSL3/Random/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::SSL" : {
          "file" : "lib/Crypt/OpenSSL3/SSL.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::SSL::Cipher" : {
          "file" : "lib/Crypt/OpenSSL3/SSL/Cipher.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::SSL::Context" : {
          "file" : "lib/Crypt/OpenSSL3/SSL/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::SSL::Method" : {
          "file" : "lib/Crypt/OpenSSL3/SSL/Method.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::SSL::Session" : {
          "file" : "lib/Crypt/OpenSSL3/SSL/Session.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Signature" : {
          "file" : "lib/Crypt/OpenSSL3/Signature.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Timestamp::Accuracy" : {
          "file" : "lib/Crypt/OpenSSL3/Timestamp/Accuracy.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Timestamp::Imprint" : {
          "file" : "lib/Crypt/OpenSSL3/Timestamp/Imprint.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Timestamp::Request" : {
          "file" : "lib/Crypt/OpenSSL3/Timestamp/Request.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Timestamp::Responder" : {
          "file" : "lib/Crypt/OpenSSL3/Timestamp/Responder.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Timestamp::Response" : {
          "file" : "lib/Crypt/OpenSSL3/Timestamp/Response.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Timestamp::StatusInfo" : {
          "file" : "lib/Crypt/OpenSSL3/Timestamp/StatusInfo.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Timestamp::TokenInfo" : {
          "file" : "lib/Crypt/OpenSSL3/Timestamp/TokenInfo.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::Timestamp::Verifier" : {
          "file" : "lib/Crypt/OpenSSL3/Timestamp/Verifier.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509" : {
          "file" : "lib/Crypt/OpenSSL3/X509.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Algorithm" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Algorithm.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Attribute" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Attribute.pm",
-         "version" : "0.009"
+         "version" : "0.010"
+      },
+      "Crypt::OpenSSL3::X509::EDIPartyName" : {
+         "file" : "lib/Crypt/OpenSSL3/X509/EDIPartyName.pm",
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Extension" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Extension.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::GeneralName" : {
          "file" : "lib/Crypt/OpenSSL3/X509/GeneralName.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Name" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Name.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Name::Entry" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Name/Entry.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Request" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Request.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Store" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Store.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Store::Context" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Store/Context.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Transparency::Evaluator" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Transparency/Evaluator.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Transparency::Log::Store" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Transparency/Log/Store.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::Transparency::Timestamp" : {
          "file" : "lib/Crypt/OpenSSL3/X509/Transparency/Timestamp.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::VerifyParam" : {
          "file" : "lib/Crypt/OpenSSL3/X509/VerifyParam.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::OpenSSL3::X509::VerifyResult" : {
          "file" : "lib/Crypt/OpenSSL3/X509/VerifyResult.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -286,9 +302,9 @@
          "web" : "https://github.com/Leont/crypt-openssl3"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_spdx_expression" : "Apache-2.0"
 }
 

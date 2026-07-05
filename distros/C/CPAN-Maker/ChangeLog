@@ -1,3 +1,42 @@
+Thu Jul  2 09:10:51 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.1]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.1.md: new
+	* VERSION: bump
+	* lib/CPAN/Maker.pm.in: modified
+	- pod updates
+	(cmd_create_cpanfile): new
+	(main)
+	- + --outfile option
+	- add cmd_create_cpanfile
+
+Mon Jun 29 17:05:33 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.0]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.0.md: new
+	* VERSION: bump
+	* lib/CPAN/Maker.pm.in
+	- refactored/remove use of bash script for final distribution build
+	(cmd_build)
+	- parses buildspec then maps old bash options to internal options
+	- runs steps (perl Makefile.pl, make manifest, make dist, make test)
+	- removes exec to bash script
+	- copy the provides file the build directory
+	- write a MANIFEST.SKIP file to exclude some files from distribution
+	(cmd_makefile)
+	- optionally write to STDOUT
+	(postamble)
+	(_apply_buildspec_args): new
+	(_run_cmd):new
+	(stage_distribution): new
+	(main)
+	- remove scandeps option
+	- +destdir, no-cleanup, preserve-makefile, skip-tests
+	- default_option => default_options
+	* bin/make-cpan-dist.in: removed
+
 Mon Jun 29 08:27:34 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.9.3]:

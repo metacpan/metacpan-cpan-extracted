@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -348,9 +348,15 @@ loop cycles.
 
 =item Switch B<-selectmode>
 
-Default value I<single>. Can either be I<single> or I<multiple>.
+Default value I<single>. Can either be I<single>, I<multiple> or I<exclusive>.
+
 In single mode only one entry in the list can be selected at all times.
+
 In multiple mode more than one entry can be selected.
+
+In exclusive mode also only
+one entry can be selected. However, after initial selection is set one entry will
+be selected at all times.
 
 =item Switch B<-selectstyle>
 
@@ -514,6 +520,7 @@ sub Populate {
 		#general
 		-arrange => ['METHOD', undef, undef, 'row'],
 		-autorefresh => ['PASSIVE', undef, undef, 0],
+		-borderwidth => [$c, 'borderWidth', 'BorderWidth', 1],
 		-browsecmd => ['CALLBACK'],
 		-cellwidth => ['METHOD', undef, undef, 0],
 		-cellheight => ['METHOD', undef, undef, 0],
@@ -528,6 +535,7 @@ sub Populate {
 		-motionselect => ['PASSIVE', undef, undef, ''],
 		-refreshentriespercycle => ['PASSIVE', undef, undef, 10],
 		-refreshinterval => ['PASSIVE', 'refreshInterval', 'RefreshInterval', 1],
+		-relief => [$c, 'relief', 'Relief', 'sunken'],
 		-scrollregion => [$c],
 		-selectmode => ['PASSIVE', undef, undef, 'single'],
 		-selectstyle => ['PASSIVE', undef, undef, 'anchor'],
@@ -841,6 +849,14 @@ sub anchorInitialize {
 	return ''
 }
 
+sub anchorRaise {
+	my ($self, $canvitem) = @_;
+	my $i = $self->anchorGet;
+	return unless defined $i;
+	my $c = $self->Subwidget('Canvas');
+	$c->raise($i->canchor, $canvitem);
+}
+
 sub anchorRefresh {
 	my $self = shift;
 	my $a = $self->anchorGet;
@@ -918,7 +934,7 @@ sub Button1 {
 		$self->Callback('-browsecmd', $item->name);
 		return
 	} else {
-		$self->selectionClear;
+		$self->selectionClear unless $self->cget('-selectmode') eq 'exclusive';
 	}
 }
 
@@ -1002,14 +1018,14 @@ sub Button2Release {
 sub canvasSize {
 	my $self = shift;
 	my $c = $self->Subwidget('Canvas');
-	my $offset = $c->cget('-highlightthickness') + $c->cget('-borderwidth');
-	return ($self->width - $offset, $self->height - $offset);
+	my $offset = $c->cget('-highlightthickness') + (2 * $c->cget('-borderwidth')) + 2;
+	return ($c->width - $offset, $c->height - $offset);
 }
 
 sub cellheight {
 	my $self = shift;
 	$self->{CELLHEIGHT} = shift if @_;
-	if ($self->columnCapable) {
+	if ($self->listMode) {
 		my $fh = $self->forceHeight;
 		return $fh if defined $fh;
 	}
@@ -1019,7 +1035,7 @@ sub cellheight {
 sub cellwidth {
 	my $self = shift;
 	$self->{CELLWIDTH} = shift if @_;
-	if ($self->columnCapable) {
+	if ($self->listMode) {
 		my $fw = $self->forceWidth;
 		return $fw if defined $fw;
 	}
@@ -1110,11 +1126,13 @@ sub clear {
 
 Hides all children of $entry.
 Call I<refresh> or I<refreshPurge> to see changes.
+Only works when I<-arrange> is set to 'tree'.
 
 =cut
 
 sub close {
 	my ($self, $entry) = @_;
+	return unless $self->cget('-arrange') eq 'tree';
 	my $i = $self->get($entry);
 	unless (defined $i) {
 		croak "Entry $entry not found";
@@ -1137,19 +1155,6 @@ sub closeAll {
 	for (@list) {
 		$self->close($_) if $self->infoChildren($_);
 	}
-}
-
-=item B<columnCapable>
-
-Returns true if I<-arrange> is set to 'hlist', 'list' or 'tree'.
-
-=cut
-
-sub columnCapable {
-	my $self = shift;
-	my $a = $self->cget('-arrange');
-	return 0 unless defined $a;
-	return exists $columnCapable{$a}
 }
 
 =item B<columnCget>I<($name, $option)>
@@ -1904,7 +1909,7 @@ sub headerMotion {
 
 sub headerPlace {
 	my $self = shift;
-	return unless $self->columnCapable;
+	return unless $self->listMode;
 	return unless $self->headerAvailable;
 
 	my $hf = $self->Subwidget('HeaderFrame');
@@ -1965,9 +1970,7 @@ sub headerPlace {
 			);
 			$self->Advertise('RMFrame', $frame)
 		}
-		my $yscroll = $self->Subwidget('YScrollbar');
-		$cw = $cw - $yscroll->width if $yscroll->ismapped;
-		$frame->place(-x => $x, -y => 0, -height => $hheight, -width => $cw - $x - 1);
+		$frame->place(-x => $x, -y => 0, -height => $hheight, -width => $cw - $x + 3);
 	} else {
 		my $frame = $self->Subwidget("RMFrame");
 		$frame->placeForget if defined $frame
@@ -2157,7 +2160,7 @@ sub infoFirstVisible {
 	my $self = shift;
 	my @pool = $self->getAll;
 	for (@pool) {
-		return $_->name unless $_->hidden
+		return $_->name unless $_->noshow
 	}
 	return undef
 }
@@ -2216,7 +2219,7 @@ sub infoLastVisible {
 	my $self = shift;
 	my @pool = $self->getAll;
 	for (reverse @pool) {
-		return $_->name unless $_->hidden
+		return $_->name if $_->ismapped
 	}
 	return undef
 }
@@ -2561,7 +2564,7 @@ sub KeyArrowNavig {
 	my $target;
 	if ($drow eq 0) { #horizontal move
 		my $flag = 1;
-		if ($self->hierarchy) {
+		if ($self->hierarchy and ($self->cget('-arrange') eq 'tree')) {
 			my $a = $self->anchorGet;
 			if (defined $a) {
 				my $n = $a->name;
@@ -2677,10 +2680,10 @@ sub KeyPress {
 	}
 	if ($key eq 'Escape') {
 		my $e = $self->Subwidget('FilterEntry');
-		if ((defined $e) and ($e->ismapped)) {
+		if ((defined $e) and ($e->ismapped) and (! $self->cget('-filterforce'))) {
 			$self->filterFlip
 		} else {
-			$self->selectionClear;
+			$self->selectionClear unless $self->cget('-selectmode') eq 'exclusive';
 			$self->anchorClear;
 		}
 		return
@@ -2734,7 +2737,11 @@ sub KeyPress {
 		return if $self->anchorInitialize;
 		my $i = $self->anchorGet;
 		my $name = $i->name;
-		$self->selectionFlip($name);
+		if ($self->cget('-selectmode') eq 'exclusive') {
+			$self->selectionSet($name);
+		} else {
+			$self->selectionFlip($name);
+		}
 		$self->Callback('-browsecmd', $name) if $i->selected;
 		return
 	}
@@ -2832,9 +2839,16 @@ sub lastRowInColumn {
 	return $column[@column - 1]->row;
 }
 
+=item B<listMode>
+
+Returns true if I<-arrange> is set to 'hlist', 'list' or 'tree'.
+
+=cut
+
 sub listMode {
 	my $self = shift;
 	my $arr = $self->cget('-arrange');
+	return '' unless defined $arr;
 	return (($arr ne 'column') and ($arr ne 'row') and ($arr ne 'bar'));
 }
 
@@ -2922,12 +2936,7 @@ sub OnConfigure {
 		return
 	}
 
-	#need to refresh if arrange is column or row
 	$self->refreshPurge;
-#	my $arrange = $self->cget('-arrange');
-#	my %a = (qw/column 1 row 1/);
-#	$self->refreshPurge if exists $a{$arrange};
-
 }
 
 sub OnConfigureTimer {
@@ -2939,11 +2948,13 @@ sub OnConfigureTimer {
 =item B<open>I<($name)>
 
 Shows all children of I<$name>. Call I<refresh> or I<refreshPurge> to see your changes.
+Only works when I<-arrange> is set to 'tree'.
 
 =cut
 
 sub open {
 	my ($self, $entry) = @_;
+	return unless $self->cget('-arrange') eq 'tree';
 	my $i = $self->get($entry);
 	unless (defined $i) {
 		croak "Entry $entry not found";
@@ -3090,7 +3101,7 @@ sub refreshLoop {
 			$self->refreshLoopActive(0);
 			$self->refreshPos(0);
 			$self->refreshRestoreView;
-			if ($self->columnCapable) {
+			if ($self->listMode) {
 				my $last = $self->infoLastVisible;
 				my $l = $self->get($last);
 			}
@@ -3306,6 +3317,7 @@ sub selectionClearChildren {
 
 sub selectionFlip {
 	my ($self, $begin, $end) = @_;
+	return if $self->cget('-selectmode') eq 'exclusive';
 	($begin, $end) = $self->selectionIndex($begin, $end);
 	for ($begin .. $end) {
 		my $i = $self->getIndex($_);
@@ -3355,7 +3367,7 @@ range from I<$begin> to I<$end> will be selected.
 
 sub selectionSet {
 	my ($self, $begin, $end) = @_;
-	if ($self->cget('-selectmode') eq 'single') {
+	if (($self->cget('-selectmode') eq 'single') or ($self->cget('-selectmode') eq 'exclusive')) {
 		$self->selectionSingle($begin);
 	} else {
 		($begin, $end) = $self->selectionIndex($begin, $end);
@@ -3392,15 +3404,19 @@ sub selectionUnSet {
 	}
 }
 
+sub separator {	return $_[0]->cget('-separator') }
+
 sub setScrollRegion {
 	my $self = shift;
 	my $last = $self->infoLastVisible;
 	if (defined $last) {
 		my $l = $self->get($last);
-		my $x = $l->maxX;
-		my $y = $l->maxY;
+		my $x = $l->maxX + $self->cget('-marginright');
+		my $y = $l->maxY + $self->cget('-marginbottom');
 
 		my ($sx, $sy) = $self->canvasSize;
+		$sx ++;
+		$sy ++;
 		my $xscroll = $self->Subwidget('XScrollbar');
 		$sy = $sy - $xscroll->width if $xscroll->ismapped;
 		my $yscroll = $self->Subwidget('YScrollbar');
@@ -3410,10 +3426,10 @@ sub setScrollRegion {
 		$y = $sy if $y < $sy;
 
 		$self->configure(-scrollregion => [0, 0, $x, $y]);
+	} else {
+		$self->configure(-scrollregion => [0, 0, 0, 0]) if @_;
 	}
 }
-
-sub separator {	return $_[0]->cget('-separator') }
 
 =item B<show>I<($name)>
 

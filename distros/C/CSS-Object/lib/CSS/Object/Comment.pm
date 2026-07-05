@@ -17,7 +17,7 @@ BEGIN
     use warnings;
     use parent qw( CSS::Object::Element );
     use overload (
-        '""' => 'as_string',
+        '""'     => 'as_string',
         fallback => 1,
     );
     our $VERSION = 'v0.2.0';

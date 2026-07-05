@@ -1,5 +1,9 @@
 Revision history for Perl module Getopt::Class
 
+v1.1.5 2026-07-04T15:29:22+0900
+    - No changes in API.
+    - Updated dependencies.
+
 v1.1.4 2025-03-13T06:16:27+0900
     - Minor maintenance update
 

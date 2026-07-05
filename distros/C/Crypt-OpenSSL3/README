@@ -27,17 +27,21 @@ DESCRIPTION
 
 RECENT CHANGES
 
-    Changes for version 0.009 (2026-06-25)
+    Changes for version 0.010 (2026-07-04)
 
-      * [BREAKING] Remove ASN1 value classes
+      * Change license to Apache 2.0
 
-      * Remove X509::Stack
+      * Add support for decoding der from/to strings.
 
-      * Add Timestamp Protocol responder
+      * Add ASN1::Value for generic ASN1 values
 
-      * Add various missing version guards
+      * Add get_all_certs to X509::Store
 
-      * Fix class argument in read_der_{public,private}_key
+      * Add PEM helper functions
+
+      * Add EDIPartyName class
+
+      * Fix various memory management issues
 
     See the Changes file for more details.
 
@@ -92,8 +96,9 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2025 by Leon Timmermans.
+    This software is Copyright (c) 2025 by Leon Timmermans.
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
 

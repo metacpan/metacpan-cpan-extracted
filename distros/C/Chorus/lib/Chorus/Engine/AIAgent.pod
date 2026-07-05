@@ -1,0 +1,360 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Chorus::Engine::AIAgent - AI agent integration for compliance-validation applications
+
+=head1 VERSION
+
+2.01
+
+=head1 DESCRIPTION
+
+Starting with version 2.01, C<Chorus::Engine> ships an optional companion
+directory, C<agent/>, that turns the inference engine into a B<normed-corpus
+compliance-validation platform> when used together with an B<AI agent>
+(Claude, Copilot, ECA…).
+
+The companion provides:
+
+=over 4
+
+=item * B<Agent knowledge templates> — org-mode files that capture the
+domain knowledge extracted from normative corpora (standards, DTUs, Eurocodes,
+regulations…) for each pipeline agent.
+
+=item * B<Six AI agent skills> — reusable prompt-driven workflows
+(C<chorus-pdf>, C<chorus-feed>, C<chorus-create-project>,
+C<chorus-import-project>, C<chorus-check>, C<chorus-strengthen>) that drive
+an AI agent to build and run complete validation applications from a corpus.
+
+=back
+
+The resulting workflow is entirely deterministic: the rules are derived from
+the corpus, encoded as transparent YAML files, and executed verbatim by the
+Chorus inference engine — no LLM in the hot path.
+
+=head1 OVERVIEW
+
+The architecture connects three layers:
+
+  ┌──────────────────────────────────────────────────────────┐
+  │  Normative corpus  (PDF, DTU, Eurocode, regulation…)     │
+  └────────────────────────┬─────────────────────────────────┘
+                           │  chorus-pdf (optional, PDF input)
+                           │  chorus-feed
+                           ▼
+  ┌──────────────────────────────────────────────────────────┐
+  │  KB org-mode  (agent/agents/<slug>.org)                  │
+  │  · Frames catalogue    · Slot dictionary                 │
+  │  · Rules catalogue     · Perl helpers (normative tables) │
+  └────────────────────────┬─────────────────────────────────┘
+                 ┌─────────┴──────────┐
+      chorus-check│                   │chorus-create-project
+                 ▼                   ▼
+  ┌──────────────────────┐   ┌──────────────────────────┐
+  │ YAML rules           │   │ project.json             │
+  │ Perl helpers         │   │ (test data or real       │
+  │ Feed.pm / Expert.pm  │   │  engineering project)    │
+  │ run.pl               │   └──────────────────────────┘
+  └────────────┬─────────┘
+               │  perl run.pl project.json
+               ▼
+  ┌──────────────────────────────────────────────────────────┐
+  │  Chorus::Expert pipeline                                 │
+  │  Agent1 → Agent2 → … → AgentN (termination)              │
+  └────────────────────────┬─────────────────────────────────┘
+                           │
+                           ▼
+               Compliance report (stdout)
+
+=head1 AI AGENT SKILLS
+
+The skills live in C<agent/skills/> and are loaded on demand by the AI agent.
+They cover the entire lifecycle of a compliance-validation application.
+
+=head2 chorus-pdf
+
+  chorus-pdf <sandbox-name> <file.pdf> [--out <slug>] [--auto] [--images]
+
+Extracts a PDF corpus into a plain-text or Markdown file suitable for
+C<chorus-feed>.  Three extraction modes are available:
+
+=over 4
+
+=item * B<Text mode> (default) — C<pdfminer.six>, no API key required.
+
+=item * B<Auto mode> (C<--auto>) — pdfminer for text pages, LLM vision for
+figure and table pages.  Recommended for mixed technical documents.
+
+=item * B<Images mode> (C<--images>) — LLM vision on every page.  Best for
+scanned PDFs or diagram-heavy documents.
+
+=back
+
+=head2 chorus-feed
+
+  chorus-feed <sandbox-name> <corpus> [--enrich]
+
+Reads a normative corpus and produces all the B<knowledge artefacts> for the
+sandbox:
+
+=over 4
+
+=item * One C<agent/agents/E<lt>slugE<gt>.org> KB file per agent (domain, Frame
+catalogue, slot dictionary, rules catalogue, Perl helpers).
+
+=item * One YAML rules file per rule (C<rules/E<lt>slugE<gt>/RNN-name.yml>).
+
+=item * One C<Helpers.pm> per agent (normative tables, computed thresholds).
+
+=item * C<agent/agents/index.org> (pipeline registry).
+
+=back
+
+C<chorus-feed> does B<not> generate any infrastructure code (C<Feed.pm>,
+C<Expert.pm>, C<run.pl>).  Infrastructure is the sole responsibility of
+C<chorus-check>.
+
+The C<--enrich> flag activates incremental-enrichment mode (Mode B): the
+existing KB is read and new corpus knowledge is merged into it.  Without
+C<--enrich>, the corpus is always treated as a fresh source.
+
+=head2 chorus-create-project
+
+  chorus-create-project <sandbox-name> <output.json> [--batch]
+
+Reads the KB org files of the sandbox and generates a B<project JSON file>
+populated with both conforming and non-conforming elements that exercise all
+rules.  The skill never reads C<Helpers.pm> or any generated C<.pm> file;
+the canonical source is always the KB org.
+
+C<--batch> generates the full four-file coverage suite
+(C<projet-rules-iso.json>, C<projet-edges.json>, C<projet-cross.json>,
+C<projet-scale.json>) in one pass.
+
+=head2 chorus-import-project
+
+  chorus-import-project <sandbox-name> <source...> [--out <file.json>] [--batch]
+
+Aligns the engineer's own project document (PDF, Word, Excel, plain text, or
+inline data) with the KB slot terminology and produces a valid project JSON
+file.  Three invocation modes are supported:
+
+=over 4
+
+=item * B<Unit mode> — one source file produces one JSON.
+
+=item * B<Fusion mode> — N source files (same project, complementary) produce
+one merged JSON.
+
+=item * B<Batch mode> — a directory or a glob produces one JSON per source
+file plus a synthesis report.
+
+=back
+
+=head2 chorus-check
+
+  chorus-check <sandbox-name> <project-file.json> [--all]
+
+The end-to-end validation command.  Given a sandbox with a complete KB (the
+output of C<chorus-feed>) and a project JSON file, it:
+
+=over 4
+
+=item 1. Detects whether the sandbox already contains generated infrastructure
+(C<run.pl>, C<Feed.pm>, C<Expert.pm>, at least one C<Agent/*.pm>).
+
+=item 2. B<Fast path> — if the infrastructure is already present and the KB
+is unchanged, goes directly to execution.
+
+=item 3. B<Full path> — if the infrastructure is absent or the KB has changed,
+generates C<Feed.pm>, one shell C<Agent/*.pm> per pipeline agent, C<Expert.pm>,
+and C<run.pl> from the KB, then executes the pipeline.
+
+=item 4. Displays the full compliance report verbatim (global rate, per-agent
+traversal, per-element-type breakdown, non-conformity summary).
+
+=back
+
+C<--all> runs every C<projet-*.json> file in the sandbox and produces a
+synthesis table.
+
+=head2 chorus-strengthen
+
+  chorus-strengthen <sandbox-name>
+
+Runs the full project suite, classifies every discordance and unprocessed
+element into a gap type (rule too strict / too permissive / Feed gap), and
+produces a structured enrichment roadmap for C<chorus-feed --enrich>.
+Never modifies any KB, YAML, or Perl file — read-only analysis.
+
+=head1 KB MODEL
+
+Each agent's knowledge is stored in a single org-mode file following the
+template C<agent/org/agents/_template.org>.  The template has ten sections:
+
+  * Domain               — agent speciality and corpus scope
+  * Targeting slots      — _SCOPE strategy + pre-population contract
+  * Pipeline I/O         — incoming slots (read) / outgoing slots (written)
+  * Ontology             — domain concepts → Frame mapping
+  * Frame catalogue      — per-Frame slot tables with constraints and hooks
+  * Slot dictionary      — flat slot reference for writing FIND/fmatch()
+  * Rules catalogue      — per-rule intent, FIND, CONDITION, EXCEPTION, ACTION
+  * Perl helpers         — normative helper signatures + full bodies
+  * Constraints          — domain-specific caveats and pitfalls
+
+The pipeline registry C<agent/agents/index.org> records all agents in pipeline
+order with their Perl module name, slug, KB file, and status.
+
+=head1 SANDBOX LAYOUT
+
+A sandbox is a self-contained directory that holds the corpus, the KB, the
+generated infrastructure, and the project files for one application domain:
+
+  <sandbox-name>/
+    README.org              pipeline overview, corpus list, agent status
+    corpus/
+      001-<source>.txt      normative corpus (numbered for incremental feed)
+    agent/
+      agents/
+        index.org           pipeline registry
+        <slug>.org          per-agent KB file
+    rules/
+      <slug>/
+        R01-<name>.yml      YAML rules (alphabetical order = load order)
+        R02-<name>.yml
+    lib/
+      <Namespace>/
+        Feed.pm             JSON → Chorus::Frame loader
+        Expert.pm           pipeline assembly + process()
+        Agent/
+          <Name>.pm         shell: build(), loadRules(), Helpers injection
+          <Name>/
+            Helpers.pm      normative tables and computations
+    run.pl                  entry point: Feed → Expert → report
+    project-01.json         project data files
+
+=head1 EXAMPLE
+
+The sandbox C<examples/sandboxes/cob-compliance_en> (included in the
+distribution) illustrates a full compliance pipeline for timber-frame
+construction (BS EN 338, EC5, Building Regulations Part L/B, BS EN 13501).
+
+Run it without an AI agent:
+
+  perl examples/sandboxes/cob-compliance_en/run.pl \
+       examples/sandboxes/cob-compliance_en/project-demo.json
+
+A French-language version is available in C<examples/sandboxes/cob-compliance_fr>.
+
+=head1 WORKFLOW SUMMARY
+
+  1. chorus-pdf  <sandbox> corpus/standard.pdf --auto   (optional, PDF input)
+        → corpus/001-standard-vision.md
+
+  2. chorus-feed <sandbox> corpus/001-standard-vision.md
+        → KB org files  + YAML rules  + Helpers.pm
+
+  3. chorus-create-project <sandbox> project.json       (or chorus-import-project)
+        → project.json  (conforming + non-conforming elements)
+
+  4. chorus-check <sandbox> project.json
+        → Feed.pm  Expert.pm  Agent/*.pm  run.pl  → compliance report
+
+  # Incremental enrichment with a second corpus:
+  5. chorus-feed <sandbox> <second-corpus.txt> --enrich
+        → updated KB + new YAML rules
+
+  # Identify rule gaps and get enrichment roadmap:
+  6. chorus-strengthen <sandbox>
+        → gap report + corpus-correctif.txt recommendation
+
+=head1 DESIGN PRINCIPLES
+
+=over 4
+
+=item * B<Separation of concerns> — C<chorus-feed> owns knowledge;
+C<chorus-check> owns infrastructure.  The two are orthogonal: a KB enrichment
+does not require a project, and a new project does not require re-feeding.
+
+=item * B<Full traceability> — every normative threshold and table in
+C<Helpers.pm> carries a C<# Source: §N — title> annotation.  Every YAML rule
+name maps to a section of the KB catalogue.
+
+=item * B<Deterministic execution> — the AI agent participates only in the
+knowledge-extraction and code-generation phases.  The hot path (rule firing,
+Frame inference, report) is pure Chorus — no LLM call at runtime.
+
+=item * B<Incremental design> — a sandbox accumulates knowledge across
+multiple C<chorus-feed> invocations.  The generated infrastructure is always
+derived from the current state of the KB.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item C<agent/skills/chorus-engine.md>
+
+Full engine reference (Frame, Engine, Expert, Collection, YAML DSL,
+anti-pitfalls). Loaded automatically by the AI agent when Perl code is
+created or modified inside the repository.
+
+=item C<agent/skills/chorus-pdf.md>
+
+Detailed instructions for the C<chorus-pdf> skill (extraction modes, prerequisites).
+
+=item C<agent/skills/chorus-feed.md>
+
+Detailed instructions for the C<chorus-feed> skill (Mode A + Mode B).
+
+=item C<agent/skills/chorus-check.md>
+
+Detailed instructions for the C<chorus-check> skill (fast path + full path).
+
+=item C<agent/skills/chorus-create-project.md>
+
+Detailed instructions for the C<chorus-create-project> skill.
+
+=item C<agent/skills/chorus-import-project.md>
+
+Detailed instructions for the C<chorus-import-project> skill (unit / fusion /
+batch modes).
+
+=item C<agent/skills/chorus-strengthen.md>
+
+Detailed instructions for the C<chorus-strengthen> skill (gap classification,
+enrichment roadmap).
+
+=item C<agent/org/agents/_template.org>
+
+Canonical KB template for a pipeline agent (all sections).
+
+=item C<agent/org/agents/index.org>
+
+Pipeline registry template (agent table, pipeline notes, corpus index).
+
+=back
+
+=head1 SEE ALSO
+
+L<Chorus::Engine>, L<Chorus::Expert>, L<Chorus::Frame>,
+L<Chorus::Collection::List>, L<Chorus::Collection::Filter>
+
+=head1 AUTHOR
+
+Christophe Ivorra, E<lt>ch.ivorra@free.frE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Christophe Ivorra.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published by
+the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut

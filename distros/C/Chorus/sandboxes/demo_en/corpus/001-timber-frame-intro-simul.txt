@@ -1,0 +1,139 @@
+Timber Frame Construction — Compliance Reference
+Condensed simulation corpus — 5 essential domains
+Sources: BS EN 338, BS EN 1995-1-1 (EC5), Building Regs Part L / Part B, BS EN 13501-1
+
+=============================================================================
+§1 — GENERAL
+=============================================================================
+
+§1.1 — Scope
+This document applies to timber-frame buildings up to 2 storeys (ground + first
+floor), in wind zones 1 to 4 and climate zones A, B, C.
+Main structural element types: load-bearing studs, non-load-bearing studs,
+sole plates, top plates, rafters, joists, insulation, vapour control layers.
+
+§1.2 — Contractor qualification
+The contractor must hold a recognised timber frame construction qualification
+(e.g. UKTFA member or equivalent) before commencing structural works.
+
+=============================================================================
+§2 — TIMBER MATERIALS — QUALIFICATION
+=============================================================================
+
+§2.1 — Strength classes (BS EN 338)
+Sawn timber is classified by ascending strength: C14, C16, C18, C24, C30, C35, C40.
+Minimum strength class required by element type:
+  - Load-bearing stud, sole plate, top plate : C24 minimum
+  - Non-load-bearing stud                    : C16 minimum
+  - Rafter (roof structure)                  : C18 minimum
+  - Joist (floor/roof)                       : C24 minimum
+Any element whose strength class is below the required minimum is REJECTED
+at qualification stage.
+
+§2.2 — Moisture content (BS EN 1995-1-1 §2.3)
+Timber moisture content at time of installation must be between 10% and 18%.
+Below 10%: risk of excessive moisture uptake after installation.
+Above 18%: risk of fungal development and differential shrinkage.
+Any element with moisture content outside [10%, 18%] is REJECTED.
+
+§2.3 — Allowable deflection (EC5 §7.2)
+Instantaneous deflection under load must satisfy:
+  - Allowable deflection = L / 300  (L = span in mm)
+  - Minimum floor value: 5 mm over 2 m span
+Any element whose measured deflection exceeds L/300 is REJECTED.
+
+=============================================================================
+§3 — FRAME GEOMETRY
+=============================================================================
+
+§3.1 — Stud spacing (BS EN 1995-1-1 §5.1)
+Stud centre-to-centre spacing must be between 300 mm and 600 mm.
+Standard values: 400 mm or 600 mm (± 5 mm tolerance).
+Spacing exceeding 600 mm is non-compliant.
+
+§3.2 — Minimum cross-sections for load-bearing studs (BS EN 1995-1-1 §5.2)
+Minimum cross-sections depend on clear height and spacing:
+  - Height ≤ 2700 mm, spacing ≤ 400 mm : 38 × 89 mm minimum
+  - Height ≤ 2700 mm, spacing ≤ 600 mm : 38 × 140 mm minimum
+  - Height ≤ 3000 mm, spacing ≤ 400 mm : 38 × 140 mm minimum
+  - Height ≤ 3000 mm, spacing ≤ 600 mm : 44 × 140 mm minimum
+  - Height > 3000 mm, any spacing       : 44 × 184 mm minimum
+Cross-section is compliant if b ≥ b_min AND h ≥ h_min.
+
+§3.3 — Minimum cross-sections for non-load-bearing studs
+Non-load-bearing studs require a minimum cross-section of 38 × 63 mm,
+regardless of clear height.
+
+§3.4 — Continuity of load-bearing studs (BS EN 1995-1-1 §5.4)
+A load-bearing stud must not contain a longitudinal splice (end-to-end joint
+within the storey height). The presence of a longitudinal splice on a
+load-bearing stud is a structural non-conformity.
+
+=============================================================================
+§4 — THERMAL PERFORMANCE AND VAPOUR CONTROL
+=============================================================================
+
+§4.1 — Minimum thermal resistance of insulation (Part L + BS EN ISO 6946)
+Thermal resistance R is calculated as:
+  R = thickness (mm) / (1000 × lambda)   [unit: m²·K/W]
+  lambda = thermal conductivity in W/(m·K)
+
+Minimum R required by climate zone:
+  - Zone A (highland / severe cold)   : R_min = 6.5 m²·K/W
+  - Zone B (temperate)                : R_min = 4.5 m²·K/W
+  - Zone C (mild — coastal south)     : R_min = 3.5 m²·K/W
+
+Typical conductivity values:
+  - Mineral wool 035 : lambda = 0.035 W/(m·K)
+  - Mineral wool 040 : lambda = 0.040 W/(m·K)
+  - Rigid PIR 022    : lambda = 0.022 W/(m·K)
+
+§4.2 — Vapour control layer: minimum Sd value (BS 5250 / BS EN ISO 13788)
+The vapour control layer must provide sufficient resistance to vapour
+diffusion (Sd value) according to the service class:
+  - Service class 1 (dry interior)   : Sd ≥ 5 m
+  - Service class 2 (humid interior) : Sd ≥ 18 m
+  - Service class 3 (very humid)     : Sd ≥ 50 m
+Any vapour control layer with Sd below the required minimum is NON-COMPLIANT.
+
+=============================================================================
+§5 — FIRE SAFETY
+=============================================================================
+
+§5.1 — Required fire resistance period (Building Regs Part B / BS EN 13501-2)
+Structural elements must achieve a minimum fire resistance period:
+  - Single occupancy dwelling (non-collective) : REI 30 minimum
+  - Multi-occupancy building (collective = 1)  : REI 60 minimum
+
+§5.2 — Reaction to fire of internal lining (BS EN 13501-1)
+The internal wall lining (typically plasterboard) must satisfy:
+  - Reaction to fire class: A1 or A2 minimum (Euroclasses)
+  - Surface mass: ≥ 8 kg/m² (standard 12.5 mm or 15 mm plasterboard)
+Any lining with a reaction class below A2 or insufficient mass is NON-COMPLIANT.
+
+§5.3 — Plasterboard thickness (Building Regs Part B §B3)
+To achieve the required fire resistance:
+  - REI 30 (non-collective) : plasterboard thickness ≥ 12.5 mm
+  - REI 60 (collective)     : plasterboard thickness ≥ 25 mm (two layers)
+
+=============================================================================
+§6 — GLOBAL COMPLIANCE
+=============================================================================
+
+§6.1 — Compliance conditions by element type
+An element is declared COMPLIANT if and only if all applicable conditions
+for its type are satisfied:
+
+  For all elements     : qualified = 'YES'
+  For structural elements (load-bearing studs, sole plates, top plates) :
+    + frame_ok = 'YES'
+  For insulation and vapour control layers :
+    + thermal_ok = 'YES'
+  For all elements if collective = 1 :
+    + fire_ok = 'YES'
+  For all elements if collective = 0 :
+    fire_ok = 'YES' also required (REI 30 minimum applies)
+
+§6.2 — Pipeline termination
+The pipeline terminates (solved) when all elements carrying the slot
+needs_compliance have received their compliance_status.

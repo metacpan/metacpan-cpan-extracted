@@ -1,6 +1,7 @@
 #!perl
-use v5.16;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use App::ChangeShebang;
 
@@ -33,4 +34,3 @@ change-shebang - change shebang lines for relocatable perl
 Shoichi Kaji
 
 =cut
-

@@ -3,6 +3,7 @@ Changes
 LICENSE
 MANIFEST
 META.json
+META.yml
 Makefile.PL
 NOTICE
 cpanfile
@@ -141,6 +142,7 @@ t/50_Cxn_Pool/56_max_retries.t
 t/60_Cxn/10_basic.t
 t/60_Cxn/20_process_response.t
 t/60_Cxn/30_http.t
+t/70_Request/10_detect.t
 t/Core_3_0/00_print_version.t
 t/Core_3_0/10_live.t
 t/Core_3_0/20_fork_httptiny.t
@@ -163,3 +165,4 @@ t/lib/index_test_data_7.pl
 t/lib/os_sync.pl
 t/lib/os_sync_auth.pl
 t/lib/os_sync_fork.pl
+xt/author/pod-syntax.t

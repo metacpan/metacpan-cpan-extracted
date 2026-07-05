@@ -1,0 +1,53 @@
+##
+# RULE: R03-fire-conclude
+# AGENT: CobIntro::Agent::Fire  (pos. 3 / 4)
+# CORPUS: §5.3 — Building Regs Part B §B3 — Plasterboard thickness + fire conclusion
+#
+# PURPOSE
+#   Final fire rule: fires on elements that passed R01 and R02 without rejection.
+#   Checks plasterboard thickness against the minimum for the required REI (§5.3).
+#   Sets fire_ok = 'YES' if thickness is sufficient (or absent), 'NO' otherwise.
+#   Always sets needs_compliance to trigger Agent::Compliance.
+#
+# INPUTS  (slots read)
+#   needs_fire    : targeting slot — set by Domain R07
+#   collective    : int — 0 or 1; defaults to 0
+#   pb_thickness_mm : float — plasterboard thickness in mm (optional)
+#
+# OUTPUTS (slots written)
+#   fire_ok           : 'YES' or 'NO'
+#   fire_note         : set only if 'NO' (thickness failure)
+#   needs_compliance  : 1 — always set (every element must reach compliance agent)
+#   needs_fire        : deleted
+#
+# HELPERS
+#   rei_required($collective) → $rei_minutes
+#   pb_thickness_min($rei) → $thickness_mm
+#
+# GUARD — EXCEPTION: defined $f->{fire_ok}
+#   Idempotence — fires only on Frames not yet evaluated by R01 or R02.
+##
+RULE: R03-fire-conclude
+FIND:
+  f:
+    attribut: needs_fire
+EXCEPTION: defined $f->{fire_ok}
+ACTION: |
+  my $required_rei = rei_required($f->{collective} // 0);
+  my $pb_min       = pb_thickness_min($required_rei);
+
+  # §5.3 — plasterboard thickness check (only if slot is present)
+  if (defined $f->{pb_thickness_mm} && $f->{pb_thickness_mm} < $pb_min) {
+    $f->set('fire_ok', 'NO');
+    $f->set('fire_note',
+      sprintf("Plasterboard %.1f mm < %.1f mm required for REI %d (§5.3 Part B §B3)",
+        $f->{pb_thickness_mm}, $pb_min, $required_rei));
+  } else {
+    # All fire checks passed (or no fire-specific data → default YES)
+    $f->set('fire_ok', 'YES');
+  }
+
+  # Always pass targeting slot to Compliance agent (pipeline pos. 4)
+  $f->set('needs_compliance', 1);
+  $f->delete('needs_fire');
+  1

@@ -81,6 +81,37 @@ subtest 'info --json emits parseable JSON' => sub {
 	is( $obj->{mode},    'axis', 'JSON mode matches' )    if $obj;
 };
 
+# --- 3b. info reports feature-name tags --------------------------------
+subtest 'info displays tag info' => sub {
+	# The baseline model was fit without -t, so it is untagged.
+	my $out = `$^X -Ilib $bin info -m $model 2>&1`;
+	like( $out, qr/tagged\s+0/, 'untagged model reports tagged=0' );
+	unlike( $out, qr/feature_names/, 'untagged model omits the feature_names block' );
+
+	# Fit a tagged model over the same 3-feature CSV.
+	my $tagged = "$tmp/tagged.json";
+	my $fit    = `$^X -Ilib $bin fit -i $train_csv -o $tagged -n 30 -m 16 -s 42 -t cpu -t mem -t disk 2>&1`;
+	is( $?, 0, 'tagged fit exits 0' ) or diag($fit);
+
+	my $t = `$^X -Ilib $bin info -m $tagged 2>&1`;
+	is( $?, 0, 'info on tagged model exits 0' );
+	like( $t, qr/tagged\s+1/,                     'reports tagged=1' );
+	like( $t, qr/feature_names\s+cpu, mem, disk/, 'lists the joined tags' );
+	like( $t, qr/\[0\]\s+cpu/,                    'lists tag [0] cpu' );
+	like( $t, qr/\[1\]\s+mem/,                    'lists tag [1] mem' );
+	like( $t, qr/\[2\]\s+disk/,                   'lists tag [2] disk' );
+
+	# --json carries the same info in machine-readable form.
+	my $j = `$^X -Ilib $bin info -m $tagged --json 2>&1`;
+	require JSON::PP;
+	my $obj = eval { JSON::PP->new->decode($j) };
+	ok( !$@, 'tagged --json parses' ) or diag("error: $@");
+	if ($obj) {
+		is( $obj->{tagged}, 1, 'JSON tagged=1' );
+		is_deeply( $obj->{feature_names}, [qw(cpu mem disk)], 'JSON feature_names matches tags' );
+	}
+}; ## end 'info displays tag info' => sub
+
 # --- 4. bench -----------------------------------------------------------
 subtest 'bench reports per-method ops/s' => sub {
 	# Short --secs so the bench finishes quickly in CI.

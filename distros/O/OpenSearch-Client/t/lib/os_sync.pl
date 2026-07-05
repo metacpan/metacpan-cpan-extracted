@@ -40,7 +40,6 @@ unless ($ENV{OS}) {
 }
 
 my $api      = "$ENV{CLIENT_VER}::Direct";
-my $body     = $ENV{OS_BODY} || 'GET';
 my $cxn      = $ENV{OS_CXN} || do "default_cxn.pl" || die( $@ || $! );
 my $cxn_pool = $ENV{OS_CXN_POOL} || 'Static';
 my $timeout  = $ENV{OS_TIMEOUT} || 30;
@@ -56,7 +55,6 @@ if ( $ENV{OS} ) {
             cxn              => $cxn,
             cxn_pool         => $cxn_pool,
             client           => $api,
-            send_get_body_as => $body,
             request_timeout  => $timeout,
             plugins          => \@plugins,
             %Auth

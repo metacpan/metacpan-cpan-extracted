@@ -19,7 +19,7 @@ BEGIN
     use CSS::Object::Comment;
     use CSS::Object::Format;
     use overload (
-        '""' => 'as_string',
+        '""'     => 'as_string',
         fallback => 1,
     );
     our $VERSION = 'v0.2.0';

@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "7.12"
   },
   "DISTNAME" => "Crypt-OpenSSL3",
-  "LICENSE" => "perl",
+  "LICENSE" => "apache",
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Crypt::OpenSSL3",
   "PREREQ_PM" => {
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "version" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

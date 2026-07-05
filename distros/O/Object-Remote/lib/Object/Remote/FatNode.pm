@@ -2,6 +2,7 @@ package Object::Remote::FatNode;
 
 use strictures 1;
 use Config;
+use Scalar::Util qw(blessed);
 use B qw(perlstring);
 
 my @exclude_mods = qw(XSLoader.pm DynaLoader.pm);
@@ -65,7 +66,9 @@ foreach(keys(%mods)) {
   }
 }
 
-my @non_core_non_arch = ( $file_names{'Devel/GlobalDestruction.pm'} );
+my @non_core_non_arch = ($file_names{'Devel/GlobalDestruction.pm'}
+                         ? ( $file_names{'Devel/GlobalDestruction.pm'} )
+                         : ());
 push @non_core_non_arch, grep +(
   not (
     #some of the config variables can be empty which will eval as a matching regex
@@ -131,19 +134,40 @@ my %files = map +($mods{$_} => scalar do { local (@ARGV, $/) = ($_); <> }),
 
 sub generate_fatpack_hash {
   my ($hash_name, $orig) = @_;
+  return '' unless $orig;
   (my $stub = $orig) =~ s/\.pm$//;
   my $name = uc join '_', split '/', $stub;
   my $data = $files{$orig} or die $orig; $data =~ s/^/  /mg;
   $data .= "\n" unless $data =~ m/\n$/;
   my $ret = '$'.$hash_name.'{'.perlstring($orig).qq!} = <<'${name}';\n!
     .qq!${data}${name}\n!;
-#  warn $ret;
   return $ret;
+}
+
+# HAARG notes that ideally Object::Remote should use Module::Reader to
+# pass the sources of fatpacked modules to the remote. However, it has
+# some problems with more recent Perl versions, which is why we go with
+# the approach below (for now)  --  EH 2025-07-20
+sub propagate_fatpacked {
+  my ($hash_name, $fat_hash) = @_;
+  warn 'Propagating fatpacked hash' . $fat_hash;
+  my @segments;
+  while (my ($orig, $data) = each %{$fat_hash}) {
+    (my $stub = $orig) =~ s/\.pm//;
+    my $name = uc join '_', split '/', $stub;
+    $data =~ s/^/  /mg;
+    $data .= "\n" unless $data =~ m/\n$/;
+    push @segments,
+      ('$'.$hash_name.'{'.perlstring($orig).qq!} = <<'${name}';\n!
+       .qq!${data}${name}\n!);
+  }
+  return @segments;
 }
 
 my @segments = (
   map(generate_fatpack_hash('fatpacked', $_), sort map $mods{$_}, @non_core_non_arch),
   map(generate_fatpack_hash('fatpacked_extra', $_), sort map $mods{$_}, @core_non_arch),
+  (map { propagate_fatpacked('fatpacked', $_) } grep { blessed($_) and ref($_) =~ m/^FatPacked::/ } @INC),
 );
 
 #print STDERR Dumper(\@segments);

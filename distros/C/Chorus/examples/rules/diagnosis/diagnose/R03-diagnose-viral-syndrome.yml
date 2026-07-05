@@ -1,0 +1,12 @@
+# low-grade fever + fatigue → viral syndrome (fallback hypothesis)
+RULE: diagnose-viral-syndrome
+FIND:
+  p:
+    attribut: fever_grade_value
+    filtre: '$_->fever_grade_value eq "low"'
+CONDITION: '$p->fatigue'
+EXCEPTION: 'defined $p->{hypothesis}'
+ACTION: |
+  $p->set('hypothesis', 'viral-syndrome');
+  $p->set('confidence', 0.65);
+  1

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number/Format.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/07/01
-## Modified 2026/07/01
+## Modified 2026/07/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -63,7 +63,7 @@ BEGIN
         threads::shared->import();
         our $LOCALE_LOCK :shared;
     }
-    our( $VERSION ) = 'v0.1.0';
+    our( $VERSION ) = 'v0.1.1';
 };
 
 # use strict;
@@ -523,18 +523,30 @@ sub init
     # Then, those basic values can be overriden by the options provided now upon instantiation
     my $default = $self->default;
     my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
-    if( defined( $curr_locale ) && 
-        CORE::length( $curr_locale ) && 
-        CORE::index( $curr_locale, ';' ) != -1 )
+    if( defined( $curr_locale ) &&
+        CORE::length( $curr_locale ) )
     {
-        my @parts = CORE::split( /;/, $curr_locale );
-        my $elems = {};
-        for( @parts )
+        if( CORE::index( $curr_locale, ';' ) != -1 )
         {
-            my( $n, $v ) = split( /=/, $_, 2 );
-            $elems->{ $n } = $v;
+            # GNU/Linux "LC_NAME=value;LC_NAME=value" composite format.
+            my @parts = CORE::split( /;/, $curr_locale );
+            my $elems = {};
+            for( @parts )
+            {
+                my( $n, $v ) = CORE::split( /=/, $_, 2 );
+                $elems->{ $n } = $v;
+            }
+            $curr_locale = $elems->{LC_NUMERIC} || $elems->{LC_MESSAGES} || $elems->{LC_MONETARY};
         }
-        $curr_locale = $elems->{LC_NUMERIC} || $elems->{LC_MESSAGES} || $elems->{LC_MONETARY};
+        # OpenBSD/FreeBSD "C/fr_FR.UTF-8/C/C/C/C"
+        # However the order LC_CTYPE/LC_COLLATE/LC_TIME/LC_NUMERIC/LC_MONETARY/LC_MESSAGES is not guaranteed across platforms.
+        elsif( CORE::index( $curr_locale, '/' ) != -1 )
+        {
+            # BSD "val1/val2/..." composite format: the string does not carry category names,
+            # so we query LC_NUMERIC directly — it is the category that drives localeconv()
+            # for numeric formatting.
+            $curr_locale = POSIX::setlocale( &POSIX::LC_NUMERIC ) // $curr_locale;
+        }
     }
     my $already_propagated = 0;
     if( $opts->{locale} )
@@ -590,8 +602,9 @@ sub init
     $num =~ tr/[\x{FF10}-\x{FF19}]＋ー/[0-9]+-/;
     if( $num !~ /^$NUMBER_RE$/ )
     {
-        my $clean = $self->unformat( $num ) || return( $self->pass_error );
-        $self->{_number} = $clean->as_string;
+        my $clean = $self->unformat( $num );
+        return( $self->pass_error ) if( !defined( $clean ) && $self->error );
+        $self->{_number} = $clean;
     }
     else
     {
@@ -629,13 +642,14 @@ sub clone
     else
     {
         my $num = @_ ? shift( @_ ) : $self->{_number};
-        if( isinf( $num ) || isnan( $num ) )
+        my $actual_num = $self->_is_a( $num => 'Module::Generic::Number' ) ? $num->{_number} : $num;
+        if( isinf( $actual_num ) || isnan( $actual_num ) )
         {
             return( $self->error( "The number provided is an Infinite or NaN, and cannot be formatted." ) );
         }
         $new = $self->SUPER::clone;
         return( $self->pass_error ) if( !defined( $new ) );
-        $new->{_number} = ( $self->_is_a( $num => 'Module::Generic::Number' ) ? $num->{_number} : $num );
+        $new->{_number} = $actual_num;
         $new->clear_error;
     }
     return( $new );
@@ -1380,29 +1394,39 @@ sub set_locale
     my $locale = shift( @_ ) ||
         return( $self->error( "No locale was provided to set." ) );
     return( $self->error( 'set_locale() can only be called on an instance of ', __PACKAGE__ ) ) unless( $self->_is_object( $self ) );
+    my( $locale, $locale_enc ) = split( /\./, $locale, 2 );
     $locale =~ tr/-/_/;
+    $locale = join( '.', $locale, $locale_enc ) if( defined( $locale_enc ) );
     # Lock the threads while we change the locale to check if it is available, and get its definition.
     my $default;
     lock( $LOCALE_LOCK ) if( HAS_THREADS );
     # try-catch
     local $@;
+    # We wrap our checks for locale in an anonymous subroutine to catch any fatal exception.
     my $try_locale = sub
     {
-        my $loc;
+        my $accepted = shift( @_ );
+        my $saved_locale = POSIX::setlocale( &POSIX::LC_ALL );
+        my $restore_locale = sub
+        {
+            # Set back the LC_ALL to what it was, because we do not want to disturb the user environment
+            POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
+        };
+        my( $loc, $lconv, $encoding );
         # The user provided only a language code such as fr_FR. We try it, and also other known combination like fr_FR.UTF-8 and fr_FR.ISO-8859-1, fr_FR.ISO8859-1
         # Try several possibilities
         # RT https://rt.cpan.org/Public/Bug/Display.html?id=132664
-        if( index( $_[0], '.' ) == -1 )
+        if( index( $accepted, '.' ) == -1 )
         {
-            $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
-            $_[0] =~ s/^(?<locale>[a-z]{2,3})_(?<country>[a-z]{2})$/$+{locale}_\U$+{country}\E/;
-            if( !$loc && CORE::exists( $SUPPORTED_LOCALES->{ $_[0] } ) )
+            $loc = POSIX::setlocale( &POSIX::LC_ALL, $accepted );
+            $accepted =~ s/^(?<locale>[a-z]{2,3})_(?<country>[a-z]{2})$/$+{locale}_\U$+{country}\E/;
+            if( !$loc && CORE::exists( $SUPPORTED_LOCALES->{ $accepted } ) )
             {
-                foreach my $supported ( @{$SUPPORTED_LOCALES->{ $_[0] }} )
+                foreach my $supported ( @{$SUPPORTED_LOCALES->{ $accepted }} )
                 {
                     if( ( $loc = POSIX::setlocale( &POSIX::LC_ALL, $supported ) ) )
                     {
-                        $_[0] = $supported;
+                        $accepted = $supported;
                         last;
                     }
                 }
@@ -1412,28 +1436,42 @@ sub set_locale
         # The user is specific, so we try as is
         else
         {
-            $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
+            $loc = POSIX::setlocale( &POSIX::LC_ALL, $accepted );
         }
-        return( $loc );
+
+        if( $loc )
+        {
+            # Encode and I18N::Langinfo are both core modules since before perl 5.26.1, which is our minimum requirement
+            if( !$self->_load_class( 'Encode' ) )
+            {
+                $restore_locale->();
+                die( $self->error );
+            }
+            if( !$self->_load_class( 'I18N::Langinfo' ) )
+            {
+                $restore_locale->();
+                die( $self->error );
+            }
+            $lconv = POSIX::localeconv();
+            # We do not want to pollute our local $@ at the beginning of 'set_locale'
+            local $@;
+            $encoding = eval
+            {
+                Encode::resolve_alias( I18N::Langinfo::langinfo( I18N::Langinfo::CODESET() ) );
+            } || 'utf-8';
+            if( $@ )
+            {
+                warn( "Error trying to resolve alias for POSIX::localeconv codeset: $@" ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+            }
+        }
+        $restore_locale->();
+        return( $loc, $lconv, $encoding, $accepted );
     };
     
-    if( my $loc = eval{ $try_locale->( $locale ) } )
+    my( $loc, $lconv, $encoding, $accepted ) = eval{ $try_locale->( $locale ) };
+    if( $loc )
     {
-        my $lconv = POSIX::localeconv();
-        # Encode and I18N::Langinfo are both core modules since before perl 5.26.1, which is our minimum requirement
-        $self->_load_class( 'Encode' ) || return( $self->pass_error );
-        $self->_load_class( 'I18N::Langinfo' ) || return( $self->pass_error );
-        my $encoding = eval
-        {
-            Encode::resolve_alias( I18N::Langinfo::langinfo( I18N::Langinfo::CODESET() ) );
-        } || 'utf-8';
-        if( $@ )
-        {
-            warn( "Error trying to resolve alias for POSIX::localeconv codeset: $@" ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
-        }
-        $self->encoding( $encoding );
-        # Set back the LC_ALL to what it was, because we do not want to disturb the user environment
-        POSIX::setlocale( &POSIX::LC_ALL, $locale );
+        $self->encoding( $encoding );  # could be undef
         if( $lconv && scalar( keys( %$lconv ) ) )
         {
             $lconv->{grouping}     = $self->_normalise_lconv_grouping( $lconv->{grouping} );
@@ -1453,8 +1491,14 @@ sub set_locale
     {
         return( $self->error( "Language \"$locale\" is not supported by your system." ) );
     }
+
+    unless( defined( $accepted ) )
+    {
+        return( $self->error( "An unexpected error occurred while setting the locale \"$locale\": the accepted locale was not returned." ) );
+    }
+    $self->{locale} = $accepted;
     $self->clear_error;
-    return( $locale );
+    return( $self->{locale} );
 }
 
 sub sign_neg { return( shift->_set_get_prop( 'sign_neg', @_ ) ); }
@@ -1873,7 +1917,7 @@ Module::Generic::Number::Format - Locale-aware number formatting for Module::Gen
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

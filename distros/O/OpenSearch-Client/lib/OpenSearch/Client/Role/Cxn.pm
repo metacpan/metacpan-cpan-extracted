@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Cxn;
-$OpenSearch::Client::Role::Cxn::VERSION = '3.007002';
+$OpenSearch::Client::Role::Cxn::VERSION = '3.007005';
 use Moo::Role;
 use OpenSearch::Client::Util qw(parse_params throw to_list);
 use List::Util qw(min);
@@ -62,6 +62,9 @@ has 'gzip'               => ( is => 'ro' );
 has 'ssl_options'        => ( is => 'ro', predicate => 'has_ssl_options' );
 has 'handle'             => ( is => 'lazy', clearer => 1 );
 has '_pid'               => ( is => 'rw', default => $$ );
+has 'http_proxy'         => ( is => 'ro', predicate => 'has_http_proxy' );
+has 'https_proxy'        => ( is => 'ro', predicate => 'has_https_proxy' );
+has 'no_proxy'           => ( is => 'ro', predicate => 'has_no_proxy' );
 
 my %Code_To_Error = (
     400 => 'Request',
@@ -449,7 +452,7 @@ OpenSearch::Client::Role::Cxn - Provides common functionality to HTTP Cxn implem
 
 =head1 VERSION
 
-version 3.007002
+version 3.007005
 
 =head1 DESCRIPTION
 
@@ -508,6 +511,16 @@ or to configure the client to present its own certificate.
 
 The values accepted by C<ssl_options> depend on the C<Cxn> class.  See the
 documentation for the C<Cxn> class that you are using.
+
+=head2 C<proxy options>
+
+Options for C<http_proxy>, C<https_proxy> and C<no_proxy> can be configured.
+
+    $os = OpenSearch::Client->new(
+        http_proxy  => 'http://192.168.200.250:8888',
+        https_proxy => 'http://192.168.200.250:8888',
+        no_proxy    => [ '192.168.200.81', '192.168.200.82', '192.168.200.83' ]  
+    );
 
 =head2 C<max_content_length>
 
@@ -720,11 +733,6 @@ Returns the maximum length in bytes that the HTTP body can have.
 Returns the HTTP URI to use for a particular request, combining the passed
 in C<path> parameter with any defined C<path_prefix>, and adding the
 query-string parameters.
-
-=head1 METHODS
-
-None of the methods listed below are useful to the user. They are
-documented for those who are writing alternative implementations only.
 
 =head2 C<host()>
 

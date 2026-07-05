@@ -14,7 +14,9 @@ examples/rsa.pl
 lib/Crypt/OpenSSL3.pm
 lib/Crypt/OpenSSL3.xs
 lib/Crypt/OpenSSL3/ASN1.pm
+lib/Crypt/OpenSSL3/ASN1/Decoder.pm
 lib/Crypt/OpenSSL3/ASN1/Object.pm
+lib/Crypt/OpenSSL3/ASN1/Value.pm
 lib/Crypt/OpenSSL3/BIO.pm
 lib/Crypt/OpenSSL3/BIO/Address.pm
 lib/Crypt/OpenSSL3/BIO/PollDescriptor.pm
@@ -32,6 +34,7 @@ lib/Crypt/OpenSSL3/MAC/Context.pm
 lib/Crypt/OpenSSL3/MD.pm
 lib/Crypt/OpenSSL3/MD/Context.pm
 lib/Crypt/OpenSSL3/NID.pm
+lib/Crypt/OpenSSL3/PEM.pm
 lib/Crypt/OpenSSL3/PKCS7.pm
 lib/Crypt/OpenSSL3/PKey.pm
 lib/Crypt/OpenSSL3/PKey/Context.pm
@@ -54,6 +57,7 @@ lib/Crypt/OpenSSL3/Timestamp/Verifier.pm
 lib/Crypt/OpenSSL3/X509.pm
 lib/Crypt/OpenSSL3/X509/Algorithm.pm
 lib/Crypt/OpenSSL3/X509/Attribute.pm
+lib/Crypt/OpenSSL3/X509/EDIPartyName.pm
 lib/Crypt/OpenSSL3/X509/Extension.pm
 lib/Crypt/OpenSSL3/X509/GeneralName.pm
 lib/Crypt/OpenSSL3/X509/Name.pm

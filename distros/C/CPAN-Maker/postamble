@@ -1,0 +1,3 @@
+install ::
+	-$(NOECHO) ln -sf $(INSTALLMAN3DIR)/CPAN::Maker.3pm $(DESTINSTALLMAN3DIR)/cpan-maker.3pm; 
+	$(NOECHO) echo $(INSTALLMAN3DIR)/cpan-maker.3pm >> $(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist

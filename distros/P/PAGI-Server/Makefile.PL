@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => "1.9764",
     "URI" => "1.60"
   },
-  "VERSION" => "0.002005",
+  "VERSION" => "0.002006",
   "test" => {
     "TESTS" => "t/*.t t/http2/*.t t/integration/*.t t/server/*.t t/utf8/*.t t/websocket/*.t"
   }

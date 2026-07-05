@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ChangeShebang
 
+v1.0.0  2026-07-05 11:35:22 JST
+
+    - Raise minimum Perl to v5.24
+
 0.10  2023-05-07 00:55:44 JST
 
     - Require perl v5.16

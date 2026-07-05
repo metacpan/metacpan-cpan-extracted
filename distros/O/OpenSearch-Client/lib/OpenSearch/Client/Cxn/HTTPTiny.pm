@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Cxn::HTTPTiny;
-$OpenSearch::Client::Cxn::HTTPTiny::VERSION = '3.007002';
+$OpenSearch::Client::Cxn::HTTPTiny::VERSION = '3.007005';
 use Moo;
 with 'OpenSearch::Client::Role::Cxn', 'OpenSearch::Client::Role::Is_Sync';
 
@@ -88,6 +88,10 @@ sub _build_handle {
             ? $self->ssl_options
             : { SSL_verify_mode => 0x01 };          
     }
+            
+    $args{http_proxy}  = $self->http_proxy  if $self->has_http_proxy;
+    $args{https_proxy} = $self->https_proxy if $self->has_https_proxy;
+    $args{no_proxy}    = $self->no_proxy    if $self->has_no_proxy;
     
     return HTTP::Tiny->new( %args, %{ $self->handle_args } );
 }
@@ -106,7 +110,7 @@ OpenSearch::Client::Cxn::HTTPTiny - A Cxn implementation which uses HTTP::Tiny
 
 =head1 VERSION
 
-version 3.007002
+version 3.007005
 
 =head1 DESCRIPTION
 
@@ -166,7 +170,7 @@ For example, to perform no validation of the remote host certificate
 
     use OpenSearch::Client;
     
-    my $es = OpenSearch::Client->new(
+    my $os = OpenSearch::Client->new(
         nodes => [
             "https://node1.mydomain.com:9200",
             "https://node2.mydomain.com:9200",
@@ -181,7 +185,7 @@ Authority but not verify the hostname
 
     use OpenSearch::Client;
     
-    my $es = OpenSearch::Client->new(
+    my $os = OpenSearch::Client->new(
         nodes => [
             "https://node1.mydomain.com:9200",
             "https://node2.mydomain.com:9200",
@@ -198,7 +202,7 @@ server, then use:
 
     use OpenSearch::Client;
     
-    my $es = OpenSearch::Client->new(
+    my $os = OpenSearch::Client->new(
         nodes => [
             "https://node1.mydomain.com:9200",
             "https://node2.mydomain.com:9200",
@@ -210,6 +214,16 @@ server, then use:
             SSL_cert_file       => '/path/to/client.pem',
             SSL_key_file        => '/path/to/client.pem',
         }
+    );
+
+=head1 Proxies
+
+Options for C<http_proxy>, C<https_proxy> and C<no_proxy> can be configured.
+
+    my $os = OpenSearch::Client->new(
+        http_proxy  => 'http://192.168.200.250:8888',
+        https_proxy => 'http://192.168.200.250:8888',
+        no_proxy    => [ '192.168.200.81', '192.168.200.82', '192.168.200.83' ]  
     );
 
 =head1 METHODS

@@ -1,5 +1,15 @@
 # Revision history for PAGI-Server
 
+0.002006 - 2026-07-04
+
+  Bug Fixes
+  - t/multiworker-startup-failure.t used a fixed 15s zombie-master safety-net
+    deadline; on very slow single-core smokers (e.g. armv6l) the master needs
+    longer just to compile, fork two workers, and fail lifespan startup, so the
+    run was misreported as a zombie regression. The deadline now scales by
+    PERL_TEST_TIME_OUT_FACTOR (clamped to >= 1x, like perl core's t/test.pl
+    watchdog) -- the convention slow-box CPAN Testers rigs set.
+
 0.002005 - 2026-06-30
 
   Features

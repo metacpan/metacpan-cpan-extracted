@@ -29,9 +29,14 @@ sub cmd_create_modulino {
   my $installbindir = $self->get_installbindir;
 
   if ( !$installbindir ) {
-    require Config;
-    ($installbindir) = Config::config_re(qr/installsitebin/xsm);
-    ($installbindir) = $installbindir =~ /=\'([^\']+)/xsm;
+    if ( defined $ENV{PERL_LOCAL_LIB_ROOT} ) {
+      $installbindir = "$ENV{PERL_LOCAL_LIB_ROOT}/bin";
+    }
+    else {
+      require Config;
+      ($installbindir) = Config::config_re(qr/installsitebin/xsm);
+      ($installbindir) = $installbindir =~ /=\'([^\']+)/xsm;
+    }
   }
 
   $installbindir = abs_path($installbindir);

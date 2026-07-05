@@ -1,31 +1,30 @@
-package App::ChangeShebang 0.10;
-use v5.16;
+package App::ChangeShebang v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
-use Getopt::Long ();
-use Pod::Usage ();
 use ExtUtils::MakeMaker ();
 use File::Basename ();
 use File::Temp ();
+use Getopt::Long ();
+use Pod::Usage ();
 
-sub prompt { ExtUtils::MakeMaker::prompt(@_) }
+our $TRIAL = 0;
 
-sub new {
-    my $class = shift;
-    bless {@_}, $class;
+sub new ($class) {
+    bless {}, $class;
 }
 
-sub parse_options {
-    my ($self, @argv) = @_;
+sub parse_options ($self, @argv) {
     my $parser = Getopt::Long::Parser->new(
         config => [qw(no_auto_abbrev no_ignore_case)],
     );
     $parser->getoptionsfromarray(
         \@argv,
-        "version|v" => sub { printf "%s %s\n", __PACKAGE__, __PACKAGE__->VERSION; exit },
+        "version|v" => sub (@) { printf "%s %s\n", __PACKAGE__, __PACKAGE__->VERSION; exit },
         "quiet|q"   => \$self->{quiet},
         "force|f"   => \$self->{force},
-        "help|h"    => sub { Pod::Usage::pod2usage(0) },
+        "help|h"    => sub (@) { Pod::Usage::pod2usage(0) },
     ) or Pod::Usage::pod2usage(1);
 
     my @file = @argv;
@@ -37,13 +36,12 @@ sub parse_options {
     $self;
 }
 
-sub run {
-    my $self = shift;
-    for my $file (@{ $self->{file} }) {
+sub run ($self) {
+    for my $file ($self->{file}->@*) {
         next unless -f $file && !-l $file;
         next unless $self->is_perl_shebang( $file );
         unless ($self->{force}) {
-            my $anser = prompt "change shebang line of $file? (y/N)", "N";
+            my $anser = ExtUtils::MakeMaker::prompt( "change shebang line of $file? (y/N)", "N" );
             next if $anser !~ /^y(es)?$/i;
         }
         $self->change_shebang($file);
@@ -51,8 +49,7 @@ sub run {
     }
 }
 
-sub is_perl_shebang {
-    my ($self, $file) = @_;
+sub is_perl_shebang ($self, $file) {
     open my $fh, "<:raw", $file or die "open $file: $!\n";
     read $fh, my $first, 100 or die "read $file: $!\n";
     return $first =~ /^#!([^\n]*)perl/ ? 1 : 0;
@@ -71,8 +68,7 @@ my $remove = do {
     qr/\A(?:$running_under_some_shell|$shebang)+/;
 };
 
-sub change_shebang {
-    my ($self, $file) = @_;
+sub change_shebang ($self, $file) {
     my $content = do {
         open my $fh, "<:raw", $file or die "open $file: $!\n";
         local $/; <$fh>;
@@ -93,7 +89,6 @@ exec "$(dirname "$0")"/perl -x "$0" "$@"
     close $tmp_fh;
     rename $tmp_name, $file or die "rename $tmp_name, $file: $!\n";
 }
-
 
 1;
 __END__
@@ -155,9 +150,12 @@ which means that scripts will be executed by the perl located in the same direct
 
 =back
 
-=head1 AUTHOR
+=head1 ARTIFACT ATTESTATIONS
 
-Shoichi Kaji <skaji@cpan.org>
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/change-shebang/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -167,4 +165,3 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-

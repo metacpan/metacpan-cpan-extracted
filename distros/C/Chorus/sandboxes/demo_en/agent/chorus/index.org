@@ -1,0 +1,62 @@
+#+TITLE: Pipeline — demo-cob-intro_en
+
+* Pipeline global
+  | Pos | Agent (module Perl)              | Slug          | KB                              | Status |
+  |-----+----------------------------------+---------------+---------------------------------+--------|
+  |   1 | CobIntro::Agent::Qualification   | qualification | agent/chorus/qualification.org  | draft  |
+  |   2 | CobIntro::Agent::Domain          | domain        | agent/chorus/domain.org         | draft  |
+  |   3 | CobIntro::Agent::Fire            | fire          | agent/chorus/fire.org           | draft  |
+  |   4 | CobIntro::Agent::Compliance      | compliance    | agent/chorus/compliance.org     | draft  |
+
+* Pipeline consistency
+  - Agent 1 (Qualification) targeting slot: ~needs_qualify~ — set by Feed (load_projet)
+  - Agent 2 (Domain) targeting slot: ~needs_domain~ — set by Qualification R04
+  - Agent 3 (Fire) targeting slot: ~needs_fire~ — set by Domain R07
+  - Agent 4 (Compliance) targeting slot: ~needs_compliance~ — set by Fire (R01/R02/R03)
+  - Termination: Agent 4 (Compliance) — pure Perl addrule() in Expert
+    → checks all elements have ~compliance_status~ → calls $agent->solved()
+
+* Integrated corpus
+  | Num | File                                    | Agents affected          |
+  |-----+-----------------------------------------+--------------------------|
+  | 001 | corpus/001-timber-frame-intro-simul.txt | all (initialisation)     |
+
+* Slot propagation chain
+  #+BEGIN_EXAMPLE
+  Feed
+    → sets: needs_qualify, type_element, strength_class, moisture_content,
+            deflection_mm, span_mm, stud_spacing_mm, clear_height_mm,
+            section_b_mm, section_h_mm, has_splice,
+            insulation_thick, insulation_lambda, climate_zone,
+            vcl_sd_value, service_class,
+            collective, fire_resistance_period, reaction_class,
+            surface_mass_kg_m2, pb_thickness_mm
+
+  Agent::Qualification
+    ← reads:  needs_qualify, type_element, strength_class, moisture_content,
+               deflection_mm, span_mm
+    → writes: qualified, rejection_reason, needs_domain (or rejection terminal)
+
+  Agent::Domain
+    ← reads:  needs_domain, type_element, stud_spacing_mm, clear_height_mm,
+               section_b_mm, section_h_mm, has_splice,
+               insulation_thick, insulation_lambda, climate_zone,
+               vcl_sd_value, service_class
+    → writes: frame_ok, domain_note, needs_fire
+
+  Agent::Fire
+    ← reads:  needs_fire, type_element, collective,
+               fire_resistance_period, reaction_class,
+               surface_mass_kg_m2, pb_thickness_mm
+    → writes: fire_ok, fire_note, needs_compliance
+
+  Agent::Compliance
+    ← reads:  needs_compliance, type_element, qualified, frame_ok, fire_ok, collective
+    → writes: compliance_status, compliance_note
+  #+END_EXAMPLE
+
+* Notes
+  - Namespace: CobIntro
+  - Language: English (RULE / FIND / ACTION)
+  - run.pl already present in sandbox root
+  - _MAX_CYCLES heuristic: N_elements × 16 × 4 × 10

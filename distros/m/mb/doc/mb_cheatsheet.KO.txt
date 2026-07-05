@@ -4,7 +4,7 @@
 
 [ 1. 모듈 로드 ]
   use mb;
-  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / big5 / gbk / uhc
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
 
 [ 2. 문자 단위 length / substr ]
   mb::length($str)              # 문자 수 (바이트 수 아님)
@@ -29,7 +29,7 @@
   mb::getc(FH)     mb::tr($str,$from,$to)
 
 [ 7. 지원 인코딩 ]
-  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
 
 [ 8. 예제 ]
   use mb;

@@ -10,6 +10,10 @@ use CLI::Simple::Constants qw(:booleans);
 use CLI::Simple::Utils qw(slurp);
 use CPAN::Maker::Bootstrapper::Constants qw(:all);
 use English qw(-no_match_vars);
+use File::Path qw(make_path);
+use Git::ReleaseDiffs;
+use IO::Scalar;
+use Pod::Extract qw(extract_pod);
 
 use Role::Tiny;
 
@@ -35,20 +39,22 @@ sub cmd_release_notes {
 
   my $llm = $self->_check_llm($api_key);
 
-  my @documents;
+  # produce release artifacts from staged changes
+  my $release = Git::ReleaseDiffs->new( release_version => $version );
+  $release->write_diffs;
+  $release->write_list;
+  $release->write_tarball;
 
-  my @file_list = map {"release-$version.$_"} qw(diffs lst tar.gz);
+  # verify artifacts exist
+  my @file_list = map { "release-$version.$_" } qw(diffs lst tar.gz);
 
   foreach my $file (@file_list) {
     die "ERROR: $file not found or empty!\n"
       if !-e $file || !-s $file;
   }
 
-  foreach my $file (@file_list) {
-    next if $file =~ /[.]tar[.]gz$/xsm;
-
-    push @documents, slurp $file;
-  }
+  # truncate ChangeLog to current release section only (in memory)
+  my $changelog_excerpt = _extract_changelog_section('ChangeLog');
 
   my @prompt;
 
@@ -56,24 +62,30 @@ sub cmd_release_notes {
 
   push @prompt,
     $llm->document(
-    data  => $documents[0],
+    data  => slurp("release-$version.diffs"),
     title => 'Diffs'
     );
 
   push @prompt,
     $llm->document(
-    data  => $documents[1],
+    data  => slurp("release-$version.lst"),
     title => 'Changed Files Listing'
     );
 
-  # this looks like we are sending a lot files, but in fact we only
-  # send the updated files in the repo to the LLM...but worth capping
+  if ($changelog_excerpt) {
+    push @prompt,
+      $llm->document(
+      data  => $changelog_excerpt,
+      title => 'ChangeLog'
+      );
+  }
+
+  # send updated files from tarball, stripping POD from Perl sources
   my $iter = Archive::Tar->iter( "release-$version.tar.gz", 1 );
 
   my $file_limit = $self->get_max_diff_files;
   my $file_count = 0;
 
-  # if there are more files in the tarball then $file_limit we dir
   while ( my $file = $iter->() ) {
 
     next if $file->is_dir;
@@ -85,6 +97,11 @@ sub cmd_release_notes {
 
     my $file_content = $file->get_content;
     next if !defined $file_content || $file_content eq q{};
+
+    # strip POD from Perl sources to reduce token cost
+    if ( $file->name =~ /[.]p[ml][.]in\z/xsm ) {
+      $file_content = _strip_pod($file_content);
+    }
 
     push @prompt,
       $llm->document(
@@ -104,19 +121,66 @@ sub cmd_release_notes {
     return $FAILURE;
   }
 
-  my $release_notes = sprintf 'release-notes-%s.md', $version;
+  my $release_notes_dir  = 'release-notes';
+  my $release_notes_file = sprintf '%s/release-notes-%s.md', $release_notes_dir, $version;
+  my $release_notes_link = 'release-notes.md';
 
-  open my $fh, '>', $release_notes
-    or die "ERROR: could not open $release_notes for writing\n$OS_ERROR";
+  make_path($release_notes_dir);
+
+  open my $fh, '>', $release_notes_file
+    or die "ERROR: could not open $release_notes_file for writing\n$OS_ERROR";
 
   print {$fh} $content->text;
 
   close $fh
-    or warn "WARNING: could not close $release_notes: $OS_ERROR\n";
+    or warn "WARNING: could not close $release_notes_file: $OS_ERROR\n";
+
+  # create/update symlink release-notes.md -> release-notes/release-notes-VERSION.md
+  unlink $release_notes_link
+    if -l $release_notes_link;
+
+  symlink $release_notes_file, $release_notes_link
+    or warn "WARNING: could not create symlink $release_notes_link: $OS_ERROR\n";
 
   $self->_print_token_usage( $llm_rsp, 'Release Notes: Token Usage Report' );
 
   return $SUCCESS;
+}
+
+########################################################################
+sub _extract_changelog_section {
+########################################################################
+  my ($changelog_file) = @_;
+
+  return q{} if !-e $changelog_file;
+
+  open my $fh, '<', $changelog_file
+    or return q{};
+
+  my $section = q{};
+  my $blocks  = 0;
+
+  while ( my $line = <$fh> ) {
+    $blocks++ if $line !~ /^\s/xsm && $line =~ /\S/xsm;
+    last if $blocks > 1;
+    $section .= $line;
+  }
+
+  close $fh;
+
+  return $section;
+}
+
+########################################################################
+sub _strip_pod {
+########################################################################
+  my ($content) = @_;
+
+  my $fh = IO::Scalar->new( \$content );
+
+  my ( undef, $code ) = extract_pod($fh);
+
+  return $code // $content;
 }
 
 1;

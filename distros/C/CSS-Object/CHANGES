@@ -1,5 +1,8 @@
 Revision history for Perl module CSS::Object
 
+v0.2.1 2026-07-05T02:25:58+0900
+    - Updating dependencies
+
 v0.2.0 2024-09-05T14:19:10+0900
     - Removing some dependencies
 

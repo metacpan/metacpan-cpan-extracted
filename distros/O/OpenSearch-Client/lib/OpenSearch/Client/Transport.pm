@@ -20,7 +20,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Transport;
-$OpenSearch::Client::Transport::VERSION = '3.007002';
+$OpenSearch::Client::Transport::VERSION = '3.007005';
 use Moo;
 
 use URI();
@@ -91,7 +91,7 @@ OpenSearch::Client::Transport - Provides interface between the client class and 
 
 =head1 VERSION
 
-version 3.007002
+version 3.007005
 
 =head1 DESCRIPTION
 
@@ -104,36 +104,16 @@ L<OpenSearch::Client::Role::Is_Sync>.
 
 =head1 CONFIGURATION
 
-=head2 C<send_get_body_as>
+=head2 C<send_body_as_source>
 
     $os = OpenSearch::Client->new(
-        send_get_body_as => 'POST'
+        send_body_as_source => 1
     );
 
-Certain endpoints default to using a C<GET> method, even when they
-include a request body.
-Some proxy servers do not support C<GET> requests with a body.  To work
-around this, the C<send_get_body_as>  parameter accepts the following:
-
-=over
-
-=item * C<GET>
-
-Request bodies are sent as C<GET> requests.
-
-=item * C<POST>
-
-The method is changed to C<POST> when a body is present.
-
-=item * C<source>
-
 The body is encoded as JSON and added to the query string as the C<source>
-parameter.  This has the advantage of still being a C<GET> request (for those
-filtering on request method) but has the disadvantage of being restricted
-in size.  The limit depends on the proxies between the client and
-OpenSearch, but usually is around 4kB.
-
-=back
+parameter.  This has the advantages for those filtering on request method
+but has the disadvantage of being restricted in size.  The limit depends
+on the proxies between the client and OpenSearch, but usually is around 4kB.
 
 =head1 METHODS
 

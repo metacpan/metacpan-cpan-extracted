@@ -69,6 +69,16 @@ for my $tester (@tester) {
         if (not defined($a) and not defined($b)) {
             return 1;
         }
+        elsif (not defined($a) or not defined($b)) {
+            my $sa = defined($a) ? $a : '';
+            my $sb = defined($b) ? $b : '';
+            if ($sa eq $sb) {
+                return 1;
+            }
+            else {
+                return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+            }
+        }
         elsif ($a eq $b) {
             return 1;
         }
@@ -99,6 +109,16 @@ for my $tester (@tester) {
         if (not defined($a) and not defined($b)) {
             return 1;
         }
+        elsif (not defined($a) or not defined($b)) {
+            my $sa = defined($a) ? $a : '';
+            my $sb = defined($b) ? $b : '';
+            if ($sa eq $sb) {
+                return 1;
+            }
+            else {
+                return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+            }
+        }
         elsif ($a eq $b) {
             return 1;
         }
@@ -128,6 +148,16 @@ for my $tester (@tester) {
         # returns result
         if (not defined($a) and not defined($b)) {
             return 1;
+        }
+        elsif (not defined($a) or not defined($b)) {
+            my $sa = defined($a) ? $a : '';
+            my $sb = defined($b) ? $b : '';
+            if ($sa eq $sb) {
+                return 1;
+            }
+            else {
+                return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+            }
         }
         elsif ($a eq $b) {
             return 1;
@@ -188,6 +218,16 @@ for my $tester (@tester) {
             if (not defined($a) and not defined($b)) {
                 return 1;
             }
+            elsif (not defined($a) or not defined($b)) {
+                my $sa = defined($a) ? $a : '';
+                my $sb = defined($b) ? $b : '';
+                if ($sa eq $sb) {
+                    return 1;
+                }
+                else {
+                    return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+                }
+            }
             elsif ($a eq $b) {
                 return 1;
             }
@@ -232,6 +272,16 @@ for my $tester (@tester) {
             if (not defined($a) and not defined($b)) {
                 return 1;
             }
+            elsif (not defined($a) or not defined($b)) {
+                my $sa = defined($a) ? $a : '';
+                my $sb = defined($b) ? $b : '';
+                if ($sa eq $sb) {
+                    return 1;
+                }
+                else {
+                    return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+                }
+            }
             elsif ($a eq $b) {
                 return 1;
             }
@@ -275,6 +325,16 @@ for my $tester (@tester) {
             # returns result
             if (not defined($a) and not defined($b)) {
                 return 1;
+            }
+            elsif (not defined($a) or not defined($b)) {
+                my $sa = defined($a) ? $a : '';
+                my $sb = defined($b) ? $b : '';
+                if ($sa eq $sb) {
+                    return 1;
+                }
+                else {
+                    return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+                }
             }
             elsif ($a eq $b) {
                 return 1;
@@ -323,6 +383,16 @@ for my $tester (@tester) {
             if (not defined($a) and not defined($b)) {
                 return 1;
             }
+            elsif (not defined($a) or not defined($b)) {
+                my $sa = defined($a) ? $a : '';
+                my $sb = defined($b) ? $b : '';
+                if ($sa eq $sb) {
+                    return 1;
+                }
+                else {
+                    return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+                }
+            }
             elsif ($a eq $b) {
                 return 1;
             }
@@ -361,6 +431,16 @@ for my $tester (@tester) {
             if (not defined($a) and not defined($b)) {
                 return 1;
             }
+            elsif (not defined($a) or not defined($b)) {
+                my $sa = defined($a) ? $a : '';
+                my $sb = defined($b) ? $b : '';
+                if ($sa eq $sb) {
+                    return 1;
+                }
+                else {
+                    return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+                }
+            }
             elsif ($a eq $b) {
                 return 1;
             }
@@ -398,6 +478,16 @@ for my $tester (@tester) {
             # returns result
             if (not defined($a) and not defined($b)) {
                 return 1;
+            }
+            elsif (not defined($a) or not defined($b)) {
+                my $sa = defined($a) ? $a : '';
+                my $sb = defined($b) ? $b : '';
+                if ($sa eq $sb) {
+                    return 1;
+                }
+                else {
+                    return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+                }
             }
             elsif ($a eq $b) {
                 return 1;
@@ -447,6 +537,16 @@ for my $tester (@tester) {
             if (not defined($a) and not defined($b)) {
                 return 1;
             }
+            elsif (not defined($a) or not defined($b)) {
+                my $sa = defined($a) ? $a : '';
+                my $sb = defined($b) ? $b : '';
+                if ($sa eq $sb) {
+                    return 1;
+                }
+                else {
+                    return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+                }
+            }
             elsif ($a eq $b) {
                 return 1;
             }
@@ -483,6 +583,16 @@ for my $tester (@tester) {
             if (not defined($a) and not defined($b)) {
                 return 1;
             }
+            elsif (not defined($a) or not defined($b)) {
+                my $sa = defined($a) ? $a : '';
+                my $sb = defined($b) ? $b : '';
+                if ($sa eq $sb) {
+                    return 1;
+                }
+                else {
+                    return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+                }
+            }
             elsif ($a eq $b) {
                 return 1;
             }
@@ -518,6 +628,16 @@ for my $tester (@tester) {
             # returns result
             if (not defined($a) and not defined($b)) {
                 return 1;
+            }
+            elsif (not defined($a) or not defined($b)) {
+                my $sa = defined($a) ? $a : '';
+                my $sb = defined($b) ? $b : '';
+                if ($sa eq $sb) {
+                    return 1;
+                }
+                else {
+                    return 0, sprintf("$tester $filename(%03o), core=($sa), mb=($sb)", $mode);
+                }
             }
             elsif ($a eq $b) {
                 return 1;

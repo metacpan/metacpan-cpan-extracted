@@ -1,0 +1,305 @@
+NAME
+    Desktop::Workspace::Util - Utilities related to DesktopWorkspace
+
+VERSION
+    This document describes version 0.001 of Desktop::Workspace::Util (from
+    Perl distribution Desktop-Workspace-Util), released on 2026-03-29.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes several utilities related to
+    DesktopWorkspace:
+
+    #INSERT_EXECS_LIST
+
+FUNCTIONS
+  get_desktop_workspace_module
+    Usage:
+
+     get_desktop_workspace_module(%args) -> any
+
+    Get the first Perl desktop workspace specification module.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   module* => *perl::modname*
+
+        (No description)
+
+    *   ns_prefixes => *array[perl::modname|str]* (default:
+        ["DesktopWorkspace",""])
+
+        List of namespaces to search for a Desktop Workspace specification
+        modules.
+
+    Return value: (any)
+
+  instantiate_desktop_workspace_module
+    Usage:
+
+     instantiate_desktop_workspace_module(%args) -> any
+
+    Instantiate the desktop workspace specification module (class).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   module* => *perl::modname*
+
+        (No description)
+
+    *   module_args => *hash*
+
+        (No description)
+
+    *   ns_prefixes => *array[perl::modname|str]* (default:
+        ["DesktopWorkspace",""])
+
+        List of namespaces to search for a Desktop Workspace specification
+        modules.
+
+    Return value: (any)
+
+  list_desktop_workspace_items
+    Usage:
+
+     list_desktop_workspace_items(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List the items from desktop workspace specification module, with
+    filtering options.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *bool*
+
+        Whether to include items that are not included by default (has
+        property `include_by_default`=0).
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   exclude_all_tags => *array[str]*
+
+        Exclude all items that have ALL tags specified.
+
+    *   exclude_any_tags => *array[str]*
+
+        Exclude all items that have any tags specified.
+
+    *   include_all_tags => *array[str]*
+
+        Include all items that have ALL tags specified.
+
+    *   include_any_tags => *array[str]*
+
+        Include all items that have any tag specified.
+
+    *   include_dir => *bool*
+
+        Whether to include dir items.
+
+    *   include_file => *bool*
+
+        Whether to include file items.
+
+    *   include_prog => *bool*
+
+        Whether to include program items.
+
+    *   include_url => *bool*
+
+        Whether to include URL items.
+
+    *   module* => *perl::modname*
+
+        (No description)
+
+    *   module_args => *hash*
+
+        (No description)
+
+    *   ns_prefixes => *array[perl::modname|str]* (default:
+        ["DesktopWorkspace",""])
+
+        List of namespaces to search for a Desktop Workspace specification
+        modules.
+
+    *   query => *array[str]*
+
+        (No description)
+
+    *   shuffle => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  open_desktop_workspace_items
+    Usage:
+
+     open_desktop_workspace_items(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Open desktop workspace items.
+
+    Some notes: - if you do not use "new_browser_window", then URLs will be
+    opened in the previous Firefox window which might be in another KDE
+    activity.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *bool*
+
+        Whether to include items that are not included by default (has
+        property `include_by_default`=0).
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   exclude_all_tags => *array[str]*
+
+        Exclude all items that have ALL tags specified.
+
+    *   exclude_any_tags => *array[str]*
+
+        Exclude all items that have any tags specified.
+
+    *   include_all_tags => *array[str]*
+
+        Include all items that have ALL tags specified.
+
+    *   include_any_tags => *array[str]*
+
+        Include all items that have any tag specified.
+
+    *   include_dir => *bool*
+
+        Whether to include dir items.
+
+    *   include_file => *bool*
+
+        Whether to include file items.
+
+    *   include_prog => *bool*
+
+        Whether to include program items.
+
+    *   include_url => *bool*
+
+        Whether to include URL items.
+
+    *   kde_activity => *str*
+
+        Switch to the specified KDE activity name.
+
+        Override's desktop workspace specification's "kde_activity"
+        property.
+
+    *   module* => *perl::modname*
+
+        (No description)
+
+    *   module_args => *hash*
+
+        (No description)
+
+    *   new_browser_window => *bool*
+
+        When having to open one or more browser tabs, open a new browser
+        window.
+
+        Override's desktop workspace specification's "new_browser_window"
+        property.
+
+    *   ns_prefixes => *array[perl::modname|str]* (default:
+        ["DesktopWorkspace",""])
+
+        List of namespaces to search for a Desktop Workspace specification
+        modules.
+
+    *   query => *array[str]*
+
+        (No description)
+
+    *   shuffle => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Desktop-Workspace-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Desktop-Workspace-Util>.
+
+SEE ALSO
+    DesktopWorkspace
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Desktop-Workspace-Uti
+    l>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

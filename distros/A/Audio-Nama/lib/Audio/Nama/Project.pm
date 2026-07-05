@@ -88,7 +88,7 @@ sub initialize_project_data {
 	$project->{nama_version} = $VERSION;
 	( $project->{nama_commit} ) = 
 	qw( 
-		699e32334
+		9bb448f75
 
 	);
 	$project->{repo} = undef;
@@ -157,7 +157,7 @@ sub load_project {
 	$config->{opts}->{M} = 0; # enable 
 	
 	initialize_mixer();
-	import_tempo_map() if `which klick` and -e $file->tempo_map;
+	import_tempo_map();
 
 	# possible null if Text mode
 	

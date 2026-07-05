@@ -4,7 +4,7 @@
 
 [ 1. ماڈیول لوڈ کریں ]
   use mb;
-  mb::set_script_encoding('utf8');
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
 
 [ 2. حرف پر مبنی length / substr ]
   mb::length($str)              # حروف کی تعداد (بائٹس نہیں)
@@ -26,7 +26,7 @@
   mb::getc(FH)     mb::tr($str,$from,$to)
 
 [ 7. سپورٹ کردہ انکوڈنگز ]
-  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
 
 [ 8. مثال ]
   use mb;

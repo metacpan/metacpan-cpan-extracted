@@ -83,6 +83,11 @@ ENVIRONMENT
         environment variable will be used as the path to the executable. If
         the variable is not set the path is 'perl'
 
+    OBJECT_REMOTE_LOOP
+        Forces the loop implementation to the named module. Defaults to "
+        Object::Remote::MiniLoop "; setting this value to " IO::Async::Loop
+        " integrates Object::Remote with IO::Async.
+
     OBJECT_REMOTE_LOG_LEVEL
         Setting this environment variable will enable logging and send all
         log messages at the specfied level or higher to STDERR. Valid level
@@ -169,6 +174,11 @@ KNOWN ISSUES
         Because of the load related issues Object::Remote disables log
         forwarding by default. See "Object::Remote::Logging" for information
         on log forwarding.
+
+    IO::Async::Loop fails on nested connections
+        The tests " t/bridged.t " and " t/chained.t " fail when using the
+        IO::Async loop, meaning that using remote objects from the remote
+        fails under IO::Async. (Fixes welcome!)
 
 SUPPORT
     IRC: #web-simple on irc.perl.org

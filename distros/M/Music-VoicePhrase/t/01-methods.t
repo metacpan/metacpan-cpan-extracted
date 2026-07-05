@@ -40,4 +40,15 @@ subtest pitches => sub {
     ok $same, 'pitches';
 };
 
+subtest size => sub {
+    my $obj = new_ok 'Music::VoicePhrase' => [
+        size => 5,
+    ];
+    is $obj->size, 5, 'size';
+    $obj = new_ok 'Music::VoicePhrase' => [
+        size => 2.5,
+    ];
+    is $obj->size, 2.5, 'size';
+};
+
 done_testing();

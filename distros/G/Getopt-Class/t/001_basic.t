@@ -31,16 +31,16 @@ isa_ok( $opt, 'Getopt::Class' );
     is( $opts->{dry_run}, 1, 'Boolean option enabled' );
     is( $opts->{debug}, 3, 'Scalar reference of integer set' );
     is( $opts->{name}, 'Bob', 'String assignment' );
-    isa_ok( $opts->{created}, 'DateTime', 'DateTime object set' );
+    isa_ok( $opts->{created}, 'DateTime::Lite', 'DateTime::Lite object set' );
     SKIP:
     {
-        if( !ref( $opts->{created} ) || ref( $opts->{created} ) ne 'DateTime' )
+        if( !ref( $opts->{created} ) || ref( $opts->{created} ) ne 'DateTime::Lite' )
         {
-            skip( 'DateTime object failed', 2 );
+            skip( 'DateTime::Lite object failed', 2 );
         }
         my $dt = $opts->{created};
-        is( $dt->year, 2020, 'DateTime year property' );
-        is( $dt->iso8601, '2020-04-12T07:30:10', 'DateTime value' );
+        is( $dt->year, 2020, 'DateTime::Lite year property' );
+        is( $dt->iso8601, '2020-04-12T07:30:10', 'DateTime::Lite value' );
     };
     is( Scalar::Util::reftype( $opts->{langs} ), 'ARRAY', 'Array type' );
     is( scalar( @{$opts->{langs}} ), 2, 'Array size' );

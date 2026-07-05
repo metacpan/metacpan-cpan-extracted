@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.5.0
+## Version v2.5.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2026/07/01
+## Modified 2026/07/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -157,7 +157,7 @@ BEGIN
         threads::shared->import();
         our $LOCALE_LOCK :shared;
     }
-    our( $VERSION ) = 'v2.5.0';
+    our( $VERSION ) = 'v2.5.1';
 };
 
 # use strict;
@@ -332,18 +332,44 @@ sub compute
         die( "No argument 'op' provided" );
     }
     my $op = $opts->{op};
-    my $other_val = Scalar::Util::blessed( $other ) ? $other : "\"$other\"";
-    my $operation = $swap ? ( defined( $other_val ) ? $other_val : 'undef' ) . " ${op} \$self->{_number}" : "\$self->{_number} ${op} " . ( defined( $other_val ) ? $other_val : 'undef' );
+
+    my $allowed =
+    {
+        '+'   => 1, '-'   => 1, '*'   => 1, '/'   => 1, '%'   => 1, '**'  => 1,
+        '&'   => 1, '|'   => 1, '^'   => 1, '<<'  => 1, '>>'  => 1, 'x'   => 1,
+        '+='  => 1, '-='  => 1, '*='  => 1, '/='  => 1, '%='  => 1, '**=' => 1,
+        '<<=' => 1, '>>=' => 1, 'x='  => 1,
+        '<'   => 1, '<='  => 1, '>'   => 1, '>='  => 1, '<=>' => 1,
+        '=='  => 1, '!='  => 1, 'eq'  => 1, 'ne'  => 1,
+    };
+    die( "Unsupported operator '$op'" ) if( !$allowed->{ $op } );
+
+    # my $other_val = Scalar::Util::blessed( $other ) ? $other : "\"$other\"";
+    # my $operation = $swap ? ( defined( $other_val ) ? $other_val : 'undef' ) . " ${op} \$self->{_number}" : "\$self->{_number} ${op} " . ( defined( $other_val ) ? $other_val : 'undef' );
+    my $left  = $self->{_number};
+    my $right = $other;
+    if( Scalar::Util::blessed( $right ) &&
+        ref( $right ) &&
+        exists( $right->{_number} ) )
+    {
+        $right = $right->{_number};
+    }
+
+    my $operation = $swap ? "\$right ${op} \$left" : "\$left ${op} \$right";
+
     no warnings 'uninitialized';
     no strict;
     local $@;
+    my $res = eval( $operation );
+    if( $@ )
+    {
+        warn( "Error with formula \"$operation\" using object $self having number '$self->{_number}': $@" )
+            if( $self->_warnings_is_enabled( 'Module::Generic' ) );
+        return;
+    }
+
     if( $opts->{return_object} )
     {
-        my $res = eval( $operation );
-        no overloading;
-        warn( "Error with return formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled( 'Module::Generic' ) );
-        return if( $@ );
-
         # Here we need to die, because we are inside 'compute', which is call in overloading. We simply cannot return an error object.
         $self->_load_class( 'Module::Generic::Scalar' ) ||
             die( "Unable to load Module::Generic::Scalar" );
@@ -351,22 +377,27 @@ sub compute
         return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
         return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
         # undef may be returned for example on platform supporting NaN when using <=>
-        return( $self->clone( $res ) ) if( defined( $res ) );
-        return;
+        return if( !defined( $res ) );
+        # If the operator is a self-assignent, then we modifie our own object, and return it
+        # 1) because there is no need to create a new object; and
+        # 2) because the user might expect the returned object to be the same (i.e. same even using Scalar::Util::refaddr) as the one before the operation
+        if( $op =~ /=$/ )
+        {
+            $self->{_number} = $res;
+            return( $self );
+        }
+        else
+        {
+            return( $self->clone( $res ) );
+        }
     }
     elsif( $opts->{boolean} )
     {
-        my $res = eval( $operation );
-        no overloading;
-        warn( "Error with boolean formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled( 'Module::Generic' ) );
-        return if( $@ );
         # return( $res ? $self->true : $self->false );
         return( $res );
     }
     else
     {
-        # return( eval( $operation ) );
-        my $res = eval( $operation );
         return( $res );
     }
 }

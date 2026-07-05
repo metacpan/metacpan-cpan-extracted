@@ -23,7 +23,7 @@ Audio::Nama::CacheTrack
 Audio::Nama::ChainSetup
 Audio::Nama::Completion
 Audio::Nama::Config
-Audio::Nama::Console
+Audio::Nama::Console-hacked
 Audio::Nama::Custom
 Audio::Nama::EcasoundCleanup
 Audio::Nama::EcasoundRun

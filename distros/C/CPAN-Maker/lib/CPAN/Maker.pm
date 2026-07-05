@@ -18,11 +18,14 @@ use ExtUtils::MM;
 use File::Basename qw(basename fileparse);
 use File::Find;
 use File::Process qw( process_file filter );
-use File::Temp qw( tempfile );
+use File::Temp qw( tempfile tempdir );
 use File::Copy qw(cp);
+use File::Path qw(make_path);
+use IPC::Open3;
+use Symbol qw(gensym);
 use File::ShareDir qw(dist_dir dist_file);
 use JSON qw( encode_json decode_json );
-use List::Util qw( pairs );
+use List::Util qw( pairs uniq );
 use Log::Log4perl::Level;
 use Scalar::Util qw( reftype );
 use YAML::Tiny qw(Load Dump LoadFile);
@@ -33,7 +36,7 @@ use Role::Tiny::With;
 with 'CPAN::Maker::Role::ModuleUtils';
 with 'CPAN::Maker::Role::FileUtils';
 
-our $VERSION = '1.9.3';
+our $VERSION = '2.0.1';
 
 __PACKAGE__->use_log4perl( level => 'info' );
 
@@ -122,6 +125,88 @@ sub cmd_version {
 }
 
 ########################################################################
+sub cmd_create_cpanfile {
+########################################################################
+  my ($self) = @_;
+
+  my @file_list = $self->get_args;
+
+  die "ERROR: usage cpan-maker create-cpanfile file1 file2 ...\n"
+    if !@file_list;
+
+  my @requires;
+
+  foreach (@file_list) {
+    push @requires, split /\n/xsm, slurp($_);
+  }
+
+  my @filtered_requires;
+
+  foreach (@requires) {
+    next if /^[#]/xsm;
+    s/^[+]//xsm;
+    push @filtered_requires, $_;
+  }
+
+  @requires = uniq sort @filtered_requires;
+
+  my $fh = choose {
+    my $outfile = $self->get_outfile;
+
+    return \*STDOUT
+      if $outfile eq q{-};
+
+    $outfile //= 'cpanfile';
+
+    $self->set_outfile($outfile);
+
+    open my $fh, '>', $outfile
+      or die "ERROR: could not open cpanfile for writing: $OS_ERROR\n";
+
+    return $fh;
+  };
+
+  foreach (@requires) {
+    my (@module) = split /\s+/xsm, $_;
+
+    my $req = {
+      module  => shift @module,
+      version => shift @module,
+    };
+
+    if (@module) {
+      foreach my $e (@module) {
+        die "ERROR: invalid entry only dist, url or mirror permitted after version\n"
+          if $e !~ /^(?:dist=|url=|mirror=)/xsm;
+
+        my (@args) = split /=/, $e;
+        $req->{ $args[0] } = $args[1];
+      }
+    }
+
+    if ( keys %{$req} == 2 ) {
+      print {$fh} sprintf qq{requires "%s", "%s";\n}, @{$req}{qw(module version)};
+    }
+    else {
+      my @extra;
+      foreach ( keys %{$req} ) {
+        next if /^(?:module|version)/xsm;
+        push @extra, sprintf '  %s => "%s"', $_, $req->{$_};
+      }
+
+      print {$fh} sprintf qq{requires "%s", "%s"}, @{$req}{qw(module version)};
+      print {$fh} sprintf ",\n%s", join ",\n", @extra;
+      print {$fh} ";\n";
+    }
+  }
+
+  close $fh
+    if $self->get_outfile ne '-';
+
+  return $SUCCESS;
+}
+
+########################################################################
 sub cmd_validate {
 ########################################################################
   my ($self) = @_;
@@ -156,25 +241,99 @@ sub cmd_build {
   die "ERROR: no buildspec.yml specified.\n"
     if !$self->get_buildspec;
 
-  # processing a build specification...
-  # parse buildspec and then call the bash script which actually builds the CPAN tarball
   my %args = $self->parse_buildspec;
 
-  my $log_level = $self->get_log_level;
+  $self->_apply_buildspec_args(%args);
 
-  if ( $log_level =~ /^(?:[12345])$/xsm ) {
-    $args{'-L'} = $log_level;
+  $self->get_logger->debug( sub { return Dumper( [ args => \%args ] ) } );
+
+  if ( $self->get_dryrun ) {
+    print {*STDOUT} Dumper( \%args );
+    return $SUCCESS;
   }
 
-  my $cmd = join $SPACE, %args;
+  my $builddir = tempdir( 'cpan-maker-XXXXXX', TMPDIR => $TRUE, CLEANUP => !$self->get_no_cleanup );
 
-  $self->get_logger->debug( sub { return Dumper( [ args    => \%args ] ); } );
-  $self->get_logger->trace( sub { return Dumper( [ command => $cmd ] ); } );
+  $self->get_logger->debug("builddir: $builddir");
 
-  exec 'make-cpan-dist ' . $cmd
-    if !$self->get_dryrun;
+  my $cwd          = getcwd;
+  my $project_root = $self->get_project_root // $cwd;
 
-  print {*STDOUT} sprintf "make-cpan-dist %s\n", $cmd;
+  chdir $project_root
+    or die "ERROR: could not chdir to $project_root: $OS_ERROR\n";
+
+  my $provides_file = $self->stage_distribution( builddir => $builddir, args => \%args );
+
+  $self->set_work_dir($builddir);
+
+  {
+    my $makefile_pl = "$builddir/Makefile.PL";
+
+    $self->get_logger->info("writing $makefile_pl");
+
+    # write provides into cwd ($project_root) before write_makefile reads it;
+    # it will be copied to $builddir after chdir
+    if ( $provides_file && -e $provides_file ) {
+      cp( $provides_file, 'provides' )
+        or die "ERROR: could not copy provides file: $OS_ERROR\n";
+    }
+
+    $self->write_makefile( dest => $makefile_pl );
+  }
+
+  chdir $builddir
+    or die "ERROR: could not chdir to $builddir: $OS_ERROR\n";
+
+  # move provides into builddir (write_makefile may have already used it;
+  # it must be in builddir for make manifest to find it, but excluded via MANIFEST.SKIP)
+  if ( -e "$project_root/provides" ) {
+    cp( "$project_root/provides", "$builddir/provides" )
+      or die "ERROR: could not copy provides to builddir: $OS_ERROR\n";
+    unlink "$project_root/provides";
+  }
+
+  my $destdir = $self->get_destdir // $cwd;
+
+  # write MANIFEST.SKIP to prevent MYMETA files, Makefile, and
+  # intermediate build artifacts from being included in the distribution
+  {
+    open my $fh, '>', 'MANIFEST.SKIP'
+      or die "ERROR: could not write MANIFEST.SKIP: $OS_ERROR\n";
+    print {$fh} "Makefile\$\nMYMETA.json\nMYMETA.yml\nprovides\n";
+    close $fh;
+  }
+
+  my @steps = ( [ $^X, 'Makefile.PL' ], [ 'make', 'manifest' ], [ 'make', 'dist' ], );
+
+  push @steps, [ 'make', 'test' ]
+    if !$self->get_skip_tests;
+
+  for my $step (@steps) {
+    my $rc = $self->_run_cmd( @{$step} );
+    if ( $rc != 0 ) {
+      chdir $cwd;
+      die sprintf "ERROR: '%s' failed with exit code %d\n", join( $SPACE, @{$step} ), $rc;
+    }
+  }
+
+  my @tarballs = glob '*.tar.gz';
+
+  die "ERROR: no tarball produced by make dist\n"
+    if !@tarballs;
+
+  my $tarball = ( sort @tarballs )[-1];
+
+  cp( $tarball, $destdir )
+    or die "ERROR: could not copy $tarball to $destdir: $OS_ERROR\n";
+
+  $self->get_logger->info("distribution written to $destdir/$tarball");
+
+  if ( $self->get_preserve_makefile ) {
+    cp( 'Makefile.PL', $destdir )
+      or die "ERROR: could not copy Makefile.PL to $destdir: $OS_ERROR\n";
+  }
+
+  chdir $cwd;
 
   return $SUCCESS;
 }
@@ -193,7 +352,7 @@ sub cmd_makefile {
   my $author   = $self->get_author   // 'Anonymouse <anonymouse@example.com>';
   my $abstract = $self->get_abstract // 'my awesome Perl module!';
 
-  return $self->write_makefile ? $SUCCESS : $FAILURE;
+  return $self->write_makefile( dest => \*STDOUT ) ? $SUCCESS : $FAILURE;
 }
 
 ########################################################################
@@ -456,7 +615,9 @@ sub write_provides {
 ########################################################################
 sub write_makefile {
 ########################################################################
-  my ($self) = @_;
+  my ( $self, %params ) = @_;
+
+  my $dest = $params{dest} // \*STDOUT;
 
   my $core            = $self->get_core_modules;
   my $MODULE_ABSTRACT = $self->get_abstract;
@@ -770,7 +931,16 @@ sub postamble {
 1;
 END_OF_MAKEFILE
 
-  print $MAKEFILE;
+  if ( ref $dest ) {
+    print {$dest} $MAKEFILE;
+  }
+  else {
+    open my $fh, '>', $dest
+      or die "ERROR: could not open $dest for writing: $OS_ERROR\n";
+    print {$fh} $MAKEFILE;
+    close $fh
+      or die "ERROR: could not close $dest: $OS_ERROR\n";
+  }
 
   $self->get_logger->debug( sub { return $MAKEFILE } );
 
@@ -1236,6 +1406,219 @@ sub _min_perl_version {
 }
 
 ########################################################################
+sub _apply_buildspec_args {
+########################################################################
+  my ( $self, %args ) = @_;
+
+  my %map = (
+    '-m' => 'module',
+    '-a' => 'author',
+    '-d' => 'abstract',
+    '-D' => 'requires',
+    '-T' => 'test_requires',
+    '-B' => 'build_requires',
+    '-Y' => 'recommends',
+    '-M' => 'min_perl_version',
+    '-V' => 'version_from',
+    '-l' => 'module_path',
+    '-S' => 'scripts_path',
+    '-t' => 'tests_path',
+    '-F' => 'postamble',
+    '-R' => 'recurse',
+  );
+
+  for my $flag ( keys %map ) {
+    next if !exists $args{$flag};
+    my $val = $args{$flag};
+    $val =~ s/^'(.*)'$/$1/xsm  # strip shell quoting added by parse_project
+      if defined $val;
+    $self->set( $map{$flag}, $val );
+  }
+
+  return;
+}
+
+########################################################################
+sub _run_cmd {
+########################################################################
+  my ( $self, @cmd ) = @_;
+
+  $self->get_logger->info( join $SPACE, @cmd );
+
+  my $err = gensym;
+  my $pid = open3( my $in, my $out, $err, @cmd );
+
+  close $in;
+
+  while ( my $line = <$out> ) {
+    chomp $line;
+    $self->get_logger->info($line);
+  }
+
+  while ( my $line = <$err> ) {
+    chomp $line;
+    $self->get_logger->warn($line);
+  }
+
+  waitpid $pid, 0;
+
+  return $CHILD_ERROR >> 8;
+}
+
+########################################################################
+sub stage_distribution {
+########################################################################
+  my ( $self, %params ) = @_;
+
+  my ( $builddir, $args ) = @params{qw(builddir args)};
+
+  my $buildspec    = $self->read_buildspec( $self->get_buildspec );
+  my $project_root = $self->get_project_root;
+
+  # --- lib/ ---
+  my $pm_path = $self->get_module_path // $buildspec->{path}{'pm-module'} // 'lib';
+
+  $pm_path = "$project_root/$pm_path"
+    if $pm_path !~ /^\//xsm;
+
+  if ( -d $pm_path ) {
+    my ( $provides_fh, $provides_file ) = tempfile( 'cpan-maker-provides-XXXXXX', TMPDIR => $TRUE );
+
+    find(
+      { follow => $TRUE,
+        wanted => sub {
+          return if -d $_;
+          return if !/\.(?:pm|pod)$/xsm;
+
+          my $rel = $File::Find::name;
+          $rel =~ s{^\Q$pm_path\E/?}{}xsm;
+
+          my $dest = "$builddir/lib/$rel";
+          make_path( File::Basename::dirname($dest) );
+          cp( $File::Find::name, $dest )
+            or die "ERROR: could not copy $File::Find::name to $dest: $OS_ERROR\n";
+
+          # record .pm files for the provides list
+          if (/\.pm$/xsm) {
+            my $module = $rel;
+            $module =~ s{/}{::}xsmg;
+            $module =~ s{\.pm$}{}xsm;
+            print {$provides_fh} "$module\n";
+          }
+        },
+      },
+      $pm_path,
+    );
+
+    close $provides_fh;
+    $params{provides_file_ref} = \$provides_file;
+  }
+
+  # --- bin/ (exe-files) ---
+  my $exe_path = $self->get_exec_path // $buildspec->{path}{'exe-files'};
+
+  if ($exe_path) {
+    $exe_path = "$project_root/$exe_path"
+      if $exe_path !~ /^\//xsm;
+
+    if ( -d $exe_path ) {
+      make_path("$builddir/bin");
+
+      my ( $list_fh, $list_file ) = tempfile( 'cpan-maker-exe-XXXXXX', TMPDIR => $TRUE );
+
+      find(
+        { follow => $TRUE,
+          wanted => sub {
+            return if -d $_ || !-x $_;
+            my $dest = "$builddir/bin/" . File::Basename::basename($File::Find::name);
+            cp( $File::Find::name, $dest )
+              or die "ERROR: could not copy $File::Find::name: $OS_ERROR\n";
+            print {$list_fh} "$dest\n";
+          },
+        },
+        $exe_path,
+      );
+
+      close $list_fh;
+      $self->set_exec_path($list_file);
+    }
+  }
+
+  # --- t/ ---
+  my $tests_path = $self->get_tests_path // $buildspec->{path}{tests};
+
+  if ($tests_path) {
+    $tests_path = "$project_root/$tests_path"
+      if $tests_path !~ /^\//xsm;
+
+    if ( -d $tests_path ) {
+      make_path("$builddir/t");
+      find(
+        { follow => $TRUE,
+          wanted => sub {
+            return if -d $_ || !/\.t$/xsm;
+            cp( $File::Find::name, "$builddir/t/" . File::Basename::basename($File::Find::name) )
+              or die "ERROR: could not copy $File::Find::name: $OS_ERROR\n";
+          },
+        },
+        $tests_path,
+      );
+    }
+  }
+
+  # --- extra-files ---
+  my $extra_files = $buildspec->{'extra-files'};
+
+  if ($extra_files) {
+    my @file_list;
+
+    for my $e ( @{$extra_files} ) {
+      if ( !ref $e ) {
+        push @file_list,
+          $self->fetch_file_list(
+          file_list    => [$e],
+          destination  => $EMPTY,
+          project_root => $project_root,
+          );
+      }
+      elsif ( ref $e eq 'HASH' ) {
+        my ($destdir) = keys %{$e};
+        my $file_list = $e->{$destdir};
+        push @file_list,
+          $self->fetch_file_list(
+          file_list    => $file_list,
+          destination  => $destdir,
+          project_root => $project_root,
+          );
+      }
+    }
+
+    for my $entry (@file_list) {
+      my ( $src, $dest ) = split /\s+/xsm, $entry, 2;
+
+      $src  = "$project_root/$src" if $src !~ /^\//xsm;
+      $dest = $dest ? "$builddir/$dest" : "$builddir/" . File::Basename::basename($src);
+
+      make_path( File::Basename::dirname($dest) );
+      cp( $src, $dest )
+        or die "ERROR: could not copy $src to $dest: $OS_ERROR\n";
+    }
+  }
+
+  # --- postamble ---
+  my $postamble = $self->get_postamble // $buildspec->{postamble};
+
+  if ( $postamble && -e $postamble ) {
+    cp( $postamble, "$builddir/postamble" )
+      or die "ERROR: could not copy postamble: $OS_ERROR\n";
+  }
+
+  my $provides_file = $params{provides_file_ref} ? ${ $params{provides_file_ref} } : $EMPTY;
+
+  return $provides_file;
+}
+
+########################################################################
 sub main {
 ########################################################################
 
@@ -1258,6 +1641,7 @@ sub main {
     module-path=s
     module|m=s
     overwrite
+    outfile|o=s
     pager|P!
     pl-files=s
     postamble=s
@@ -1267,7 +1651,10 @@ sub main {
     require-versions|R!
     requires|r=s
     resources=s
-    scandeps|s
+    destdir=s
+    no-cleanup
+    preserve-makefile
+    skip-tests
     scripts-path=s
     test-requires|t=s
     tests-path=s
@@ -1288,17 +1675,18 @@ sub main {
   };
 
   my %commands = (
-    default          => \&cmd_build,
-    build            => \&cmd_build,
-    version          => \&cmd_version,
-    'write-makefile' => \&cmd_makefile,
-    'validate'       => \&cmd_validate,
+    'build'           => \&cmd_build,
+    'create-cpanfile' => \&cmd_create_cpanfile,
+    'default'         => \&cmd_build,
+    'validate'        => \&cmd_validate,
+    'version'         => \&cmd_version,
+    'write-makefile'  => \&cmd_makefile,
   );
 
   my $cli = CPAN::Maker->new(
-    commands       => \%commands,
-    option_specs   => \@option_specs,
-    default_option => $default_options,
+    commands        => \%commands,
+    option_specs    => \@option_specs,
+    default_options => $default_options,
   );
 
   return $cli->run();
@@ -1310,58 +1698,51 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 CPAN::Maker - create a CPAN distribution
 
 =head1 SYNOPSIS
 
- cpan-maker options
-
  cpan-maker -b buildspec.yml
+ cpan-maker build -b buildspec.yml
+ cpan-maker create-cpanfile file1 file2 ...
 
 =head2 Options
 
  -a, --author                author
  -A, --abstract              description of the module
  -B, --build-requires        build dependencies
- -b, --buildspec             read a buildspec and create command line
-     --cleanup, --no-cleanup remove temp files, default: cleanup
+ -b, --buildspec             buildspec YAML file
+     --cleanup, --no-cleanup remove temp dir after build (default: cleanup)
      --create-buildspec      name of a buildspec file to create
  -d, --debug                 debug mode
-     --dryrun                dryrun
+     --destdir               destination directory for the tarball (default: cwd)
+     --dryrun                dump parsed buildspec args and exit
      --exe-files             path to the executables list
      --extra-path            path to the extra files list
  -h, --help                  help
  -l, --log-level             ERROR, WARN, INFO, DEBUG, TRACE
  -m, --module                module name
- -M, --min-perl-version      minimum perl version to consider core, default: 5.010
- -P, --pager, --no-pager     use a pager for help, default: use pager
+ -M, --min-perl-version      minimum perl version to consider core (default: 5.010)
+     --no-cleanup            preserve temp dir after build
+     --no-require-versions   omit version numbers from dependencies
+ -o, --outfile               output file for create-cpanfile (default: cpanfile, - for STDOUT)
+ -P, --pager, --no-pager     use a pager for help (default: use pager)
      --pl-files              path to the PL_FILES list (see perldoc ExtUtils::MakeMaker)
      --postamble             name of the file containing the postamble instructions
+     --preserve-makefile     copy Makefile.PL to destdir after build
  -p, --project-root          default: current working directory
-     --recurse               whether to recurse directors when searching for files
- -r, --requires              dependency list
+     --recurse               recurse directories when searching for files
  -R, --require-versions      add version numbers to dependencies
-     --no-require-versions   
      --scripts-path          path to the scripts listing
- -t, --test-requires         test dependencies
+     --skip-tests            skip C<make test> during build
      --tests-path            path to the tests listing
- -s, --scandeps              use scandeps for dependency checking
  -V, --verbose               verbose output
  -v, --version               version
-     --version-from          module name that provide version
-
-This script is typically called with the C<--buildspec> option
-specifying a YAML file that contains the options for building a CPAN
-distribution.  Calling this script without the C<--buildspec> option
-will only result in a C<Makefile.PL> being written to STDOUT.
-
-When invoked with a buildspec it will parse the YAML file and call the
-C<make-cpan-dist> bash script that actually creates the CPAN
-distribution.
-
-See man CPAN::Maker for more details.
+     --version-from          module that provides the version
 
 =head2 Commands
 
@@ -1370,8 +1751,7 @@ See man CPAN::Maker for more details.
 =item * build
 
 Parse a C<buildspec.yml> file and build the CPAN distribution tarball.
-This is the default command - it is invoked automatically when
-
+This is the default command and is invoked automatically when
 C<-b buildspec.yml> is passed without an explicit command.
 
   cpan-maker build -b buildspec.yml
@@ -1390,14 +1770,38 @@ fails, making it suitable for use in CI pipelines.
 I<Note: If your file uses underscore-style keys (C<pm_module>,
 C<extra_files>, etc.) they are automatically normalized to their
 canonical hyphenated forms and a corrected copy is written to
-`buildspec.yml.current`. Useful as a first step when migrating an
-existing project or upgrading C<CPAN::Maker>.>
+F<buildspec.yml.current>.>
 
 =item * write-makefile
 
-Generate a C<Makefile.PL> from the options passed by the
-C<make-cpan-dist> bash script. This command is invoked internally
-during the build pipeline and is not intended for direct use.
+Generate a C<Makefile.PL> to STDOUT from options passed on the command
+line. Useful for inspecting the generated C<Makefile.PL> without
+running a full build.
+
+  cpan-maker write-makefile -m Foo::Bar -r requires -a 'A. U. Thor <au@example.com>'
+
+=item * create-cpanfile
+
+Generate a F<cpanfile> from one or more dependency list files. Each file
+contains one dependency per line in the format:
+
+  Module::Name version [dist=name] [url=URL] [mirror=URL]
+
+Lines beginning with C<#> are treated as comments and ignored. A leading
+C<+> on a module name (as used in C<CPAN::Maker::Bootstrapper> dependency
+files to pin a version) is stripped before processing. Duplicate entries
+are removed and the output is sorted alphabetically.
+
+By default the result is written to F<cpanfile> in the current directory.
+Use C<-o -> to write to STDOUT instead.
+
+  cpan-maker create-cpanfile requires test-requires
+  cpan-maker create-cpanfile -o - requires > cpanfile
+  cpan-maker create-cpanfile -o my-cpanfile requires test-requires
+
+The optional C<dist=>, C<url=>, and C<mirror=> qualifiers map to the
+corresponding C<cpanfile> source directives, allowing you to pin
+dependencies to a specific distribution, URL, or mirror.
 
 =item * version
 
@@ -1407,95 +1811,35 @@ Print the installed version of C<CPAN::Maker> and exit.
 
 =back
 
-See man CPAN::Maker for more details.
-
 =head1 DESCRIPTION
 
-Utility that is part of a toolchain to create a CPAN distribution.
+C<CPAN::Maker> is a utility for creating CPAN distribution tarballs
+from a declarative YAML build specification. It handles dependency
+resolution, C<Makefile.PL> generation, file staging, and packaging
+entirely in Perl — no external bash scripts are required.
 
-This utility should normally be called with the C<--buildspec> option
-specifying a YAML file that describes the distribution to be
-packaged. The toolchain can:
-
-=over 5
-
-=item * find Perl module dependencies in your modules and scripts
-
-=item * create a C<Makefile.PL>
-
-=item * package your artifacts from your project hierarchy into a CPAN distribution
-
-=back
-
-If the script is passed a YAML file (C<--buildspec>) then the script
-will parse the build specification and call the bash script
-C<make-cpan-dist> with all of the necessary flags to build a
-tarball. If you do not provide a build specification this script will
-only create the C<Makefile.PL> file for you.  It will be left to you
-to modify the C<Makefile.PL> if necessary and then package the
-artifacts into a CPAN distribution.
-
-You can also call the bash script yourself, supplying all of the
-necessary options.  When L<using the bash script|/"USING THE BASH
-SCRIPT">, it will ultimately call this script to create the
-C<Makefile.PL> and before creating your CPAN distribution.
-
-=head1 ENVIRONMENT VARIABLES
+The build pipeline, invoked via C<cpan-maker -b buildspec.yml>:
 
 =over 5
 
-=item PRESERVE_MAKEFILE
+=item * parses and validates the build specification
 
-Set this environment variable to a true value if you want the script
-to preserve the F<Makefile.PL> after it builds the distribution
-(useful for inspecting the result of the build). It will be copied to
-your current working directory.
+=item * stages distribution files (lib, bin, t, extra-files, postamble)
+into a temporary build directory
 
-=item SKIP_TESTS
+=item * generates a C<Makefile.PL> in the build directory
 
-Set this environment variable to skip tests during the build.
+=item * runs C<perl Makefile.PL>, C<make manifest>, C<make dist>, and
+optionally C<make test>
 
-=item DEBUG
-
-Set this environment variable to enable debug mode. The bash script
-will echo all commands run. This is useful for debugging unexpected
-output or problems with the final distribution.
+=item * copies the resulting tarball to the destination directory
 
 =back
 
- See https://github.com/rlauer6/CPAN-Maker.git for more documentation.
-
-=head1 VERSION
-
-This documentation refers to version 1.9.3
-
-=head1 USING THE BASH SCRIPT
-
-Assuming you have a module named C<Foo::Bar> in a directory named
-F<lib> and some tests in a directory named F<t>, you might try:
-
- make-cpan-dist -l lib -t t -m Foo::Bar \
-  -a 'Rob Lauer <rlauer6@comcast.net>' -d 'the Foo::Bar module!'
-
-I<NOTE: Running the Bash script in any directory of your project if it
-is part of a F<git> repository will use the root of the repository as
-your project home directory.  If you are not in a F<git> repository
-AND do not supply the -H option (project home), then the current
-directory will be considered the project home directory. This means
-that options like -l will be relative to the current directory.>
-
-=head2 Using F<buildspec.yml>
-
- cpan-maker -b buildspec.yml
-
-Calling this utility directly with the C<-b> option will parse the
-buildspec and invoke the C<bash> script with all of the appropriate
-options. This is the preferred way of using this toolchain. The format
-of the YAML build file is described below.
-
-I<IMPORTANT: All files specified in the F<buildspec.ym> file must be
-specified as absolute paths or they should be relative to the
-project's root directory, B<NOT THE CURRENT WORKING DIRECTORY!>>
+I<Note: Prior to version 2.0.0, the build was delegated to an external
+bash script (C<make-cpan-dist>). That script is no longer invoked and
+is retained only as a compatibility shim. All build logic now runs
+within C<cpan-maker> itself.>
 
 =head1 OPTION DETAILS
 
@@ -1507,365 +1851,238 @@ A short description of the module purpose.
 
 =item -a, --author
 
-When supplying the author on the command line, include the email
-address in angle brackets as shown in the example.
+Author name and email address.
 
-Example: -a 'Rob Lauer <rlauer6@comcast.net>'
-
-If this is a I<git> project then the bash script will attempt to get
-your name and email from the git configuration.
+  Example: -a 'Rob Lauer <rlauer6@comcast.net>'
 
 =item -B, --build-requires
 
-Name of the file that contains the dependencies for building the distribution.
+Path to a file listing build-time dependencies.
 
 =item -b, --buildspec
 
-Name of build specification file in YAML format.  The build
-specification file will be parsed and supply the necessary options to
-the bash script for creating your distribution.  See L</BUILD SPECIFICATION FORMAT>.
+Path to the build specification file in YAML format.
+See L</BUILD SPECIFICATION FORMAT>.
 
-=item -c, --cleanup
+=item --cleanup, --no-cleanup
 
-Cleanup temp directories and files.  The default is to cleanup all
-temporary files, use the C<--no-cleanup> option if you want to examine
-some of the temporary files.
+Remove the temporary build directory after the build completes. The
+default is to remove it. Use C<--no-cleanup> to preserve the directory
+for inspection.
 
 =item -C, --create-buildspec
 
-Name of a buildspec file to create from the options passed to this
-script.
-
-I<Note that this file may need to be modified if the options passed to
-the file are not sufficient to create an acceptable buildspec.>
+Write a buildspec file derived from the current options to the named
+file.
 
 =item -d, --debug
 
-Debug mode. Outputs lot's of diagnostics for debugging the
-interpretation of the options passed and the F<Makefile.PL> creation
-process.
+Enable debug logging.
+
+=item --destdir
+
+Directory where the finished tarball (and C<Makefile.PL> if
+C<--preserve-makefile> is set) will be written. Defaults to the
+current working directory.
 
 =item --dryrun
 
-Typically used when calling the bash script directly, this will output
-the command to be executed and all of the options to
-F<cpan-maker>.
+Parse the buildspec and dump the resulting argument hash without
+running the build.
 
 =item -h, --help
 
-Print the options to F<cpan-maker> to STDOUT. For more help try
-C<make-cpan-dist -h> for the options to the bash script.
-
-Additional information can be found
-L<here|https://github.com/rlauer/make-cpan-dist>
+Print the option summary.
 
 =item -l, --log-level
 
-Log level.
-
-Valid values: error|warn|info|debug
-
-default: error
+Log level. Valid values: C<error>, C<warn>, C<info>, C<debug>,
+C<trace>. Default: C<error>.
 
 =item -m, --module
 
-Name of the Perl module to package.
+Name of the primary Perl module to package.
 
 =item -M, --min-perl-version
 
-The minium version of perl to consider core when resolving dependencies.
+Minimum Perl version used when determining which modules are core.
+Default: C<5.010>.
+
+=item --no-cleanup
+
+Preserve the temporary build directory after the build. Equivalent to
+C<--no-cleanup>; the directory path is logged at C<debug> level.
+
+=item -o, --outfile
+
+Output file path for the C<create-cpanfile> command. Defaults to
+F<cpanfile> in the current directory. Pass C<-> to write to STDOUT.
 
 =item -P, --pager, --no-pager
 
-Use a pager for help.
-
-default: --pager
+Route help output through a pager. Default: use pager.
 
 =item --pl-files
 
-Path to the PL_FILE list.
-
-From: https://metacpan.org/pod/ExtUtils::MakeMaker
-
-I<MakeMaker can run programs to generate files for you at build time. By
-default any file named *.PL (except Makefile.PL and Build.PL) in the
-top level directory will be assumed to be a Perl program and run
-passing its own basename in as an argument. This basename is actually
-a build target, and there is an intention, but not a requirement, that
-the *.PL file make the file passed to to as an argument. For
-example...>
-
- perl foo.PL foo
+Path to a file listing C<PL_FILES> targets.
+See L<ExtUtils::MakeMaker> for the format.
 
 =item --postamble
 
-Name of a file that contains the C<Makefile.PL> postamble section.
+Path to a file containing C<Makefile> postamble instructions to append
+to the generated C<Makefile.PL>.
+
+=item --preserve-makefile
+
+Copy the generated C<Makefile.PL> to C<--destdir> after the build.
+Useful for inspecting the result.
 
 =item -p, --project-root
 
-Root of the project to use when looking for files to package.
-
-default: current working directory
+Root of the project tree. Paths in the buildspec are resolved relative
+to this directory. Defaults to the current working directory.
 
 =item --recurse
 
-Recurse sub-directories when looking for files to package.
-
-=item -r, --requires
-
-Name of a file that contains the list of dependencies if other than F<requires>.
-
-default: requires
+Recurse into subdirectories of the C<pm-module> path when collecting
+modules. Default: yes.
 
 =item -R, --require-versions, --no-require-versions
 
-Whether to add version numbers to dependencies.
+Include version numbers in the generated C<PREREQ_PM> section.
+Default: include versions.
 
-default: --require-versions
+=item --skip-tests
 
-=item -s, --scandeps
-
-Use F<scandeps.pl> for dependency checking instead of
-F<scandeps-static.pl> (L<Module::ScanDeps::Static>).
-
-default: F<scandeps-static.pl>
-
-=item --scripts-path
-
-Path to the file containing a list of script files.
-
-=item -t, --test-requires
-
-Name of the file that contains the dependencies for running tests included in your distribution if other than F<test-requires>.
-
-default: test-requires
-
-=item --tests-path
-
-Path to the file containing a list of test files.
-
-=item -V, --verbose
-
-Verbose output.
-
-=item -v, --version
-
-Returns the version of this script.
+Skip C<make test> during the build.
 
 =item --version-from
 
-Name of the module that provides the package version. Defaults to the
-main module being packaged.
+Module name from which the distribution version is extracted.
+Defaults to the primary module.
 
 =back
 
+=head1 ENVIRONMENT VARIABLES
+
+No environment variables are used by C<cpan-maker>. Options previously
+controlled by C<PRESERVE_MAKEFILE>, C<SKIP_TESTS>, and C<DEBUG>
+environment variables (which applied to the now-removed bash script)
+are now available as C<--preserve-makefile>, C<--skip-tests>, and
+C<--debug> command-line options.
 
 =head1 BUILD SPECIFICATION FORMAT
 
-Example:
+The preferred way to use C<cpan-maker> is with a F<buildspec.yml>
+file:
 
-  version: 1.9.3
-  project:
-    git: https://github.com/rlauer6/perl-Amazon-Credentials
-    description: "AWS credentials discoverer"
-    author:
-      name: Rob Lauer
-      mailto: rlauer6@comcast.net
-  pm-module: Amazon::Credentials
-  include-version: no
-  dependencies:
-    resolver: scandeps
-    requires: requires
-    test-requires: test-requires
-    required-modules: no
-  path:
-    recurse: yes
-    pm-module: src/main/perl/lib
-    tests: src/main/perl/t
-    exe-files: src/main/perl/bin
-  exclude-files: exclude_files
-  extra: extra-files
-  extra-files:
-    - file
-    - /usr/local/share/my-project:
-      - file
-  provides: provides
-  postamble: postamble
-  man-links:
-  resources:
-    homepage: 'http://github.com/rlauer6/perl-Amazon-API'
-    bugtracker:
-      web: 'http://github.com/rlauer6/perl-Amazon-API/issues'
-      mailto: rlauer6@comcast.net
-    repository:
-      url: 'git://github.com/rlauer6/perl-Amazon-API.git'
-      web: 'http://github.com/rlauer6/perl-Amazon-API'
-      type: 'git'
+ cpan-maker -b buildspec.yml
 
-The sections are described below:
+=head2 Minimal example
 
-=over 10
+ project:
+   description: My awesome module
+   author:
+     name:   A. U. Thor
+     mailto: au@example.com
 
-=item version
+ pm-module: Foo::Bar
 
-The version of of the specification format.  This should correspond
-with the version of C<CPAN::Maker> that supports the format. It may be
-used in future versions to validate the specification file.
+ dependencies:
+   requires:      requires
+   test-requires: test-requires
+
+=head2 Full key reference
+
+=over 5
 
 =item project
 
 =over 15
 
-=item git
-
-The path to a C<git> project. If this is included in the buildspec
-then the bash script will clone that repo and use that repo as the
-target of the build.  If the cloned repo includes a F<configure.ac>
-file root directory the script will attempt to build the repo as a
-autoconfiscated project.
-
- autoconf -i --force
- ./configure
- make
-
-If F<configure.ac> is not found, the project will simply be cloned and
-it will be assumed the Perl modules and artifacts to be packaged are
-somewhere to be found in the project tree (as described in your
-buildspec file). You should make sure that you set the C<path> section
-accordingly so that the utility knows were to find your Perl modules.
-
-I<I'm actually not sure how useful this feature is. I'm guessing that
-the scenario for use might be if you have the buildspec file somewhere
-other than the repo you wish to build or you don't own or don't want
-to fork a project but want to build a CPAN distribution from it?>
-
 =item description
 
-The description of the module as it will be appear in the CPAN
-repository.
+Short description of the module. Used as C<ABSTRACT> in
+C<Makefile.PL>.
 
 =item author
 
-The I<author> section should contain a name and email address.
-
-=over 20
+=over 10
 
 =item name
 
-The author's name.
+Author's full name.
 
 =item mailto
 
-The author's email address.
+Author's email address.
 
 =back
+
+=item git
+
+URI of the project's git repository.
 
 =back
 
 =item pm-module
 
-The name of the Perl module.
+The fully-qualified name of the primary module to package
+(e.g. C<Foo::Bar>).
 
-=item postamble
+=item version-from
 
-The name of a file that contains additional C<makefile> statements
-that are appended to the F<Makefile> created by
-F<Makefile.PL>. Typically, this will look something like:
+Module from which the version number is read. Defaults to C<pm-module>.
 
- postamble ::
+=item min-perl-version
 
- install::
-        # do something
+Minimum Perl version to assume when deciding which modules are core.
+Default: C<5.010>.
 
 =item man-links
 
-Create symbolic links for executables to module man pages. Typically
-used to create symlinks to modulinos. For example if C<Foo::Bar> is
-implemented as a modulino and C<foo-bar> is the wrapper script, then
-adding:
+List of C<name: Module::Name> pairs. For each entry a man page symlink
+is created so that C<man name> resolves to the module's man page.
 
   man-links:
     - foo-bar: Foo::Bar
 
-...would allow C<man foo-bar> to bring up the man page for C<Foo::Bar>.
-The target module must contain POD - if no POD is found the link is
-silently skipped.
-
 =item include-version
 
-If dependencies are resolved automatically, include the version
-number. To disable this set this value to 'no'.
-
-default: yes
+Whether to include version numbers in dependency declarations.
+Set to C<no> to omit. Default: C<yes>.
 
 =item dependencies
 
-The I<dependencies> section, if present may contain the fully
-qualified path to a file that contains a list of dependencies. If
-the name of the file is F<cpanfile>, then the file is assumed to be in
-I<cpanfile> format, otherwise the file should be a simple list of Perl
-module names optionally followed by a version number.
-
- Amazon::Credentials 1.15
-
-By default, the script will look for F<scandeps-static.pl> as the
-dependency resolver, however you can override this by specifying the
-name of program that will produce a list of modules.  If you specify
-the special name I<scandeps>, the scripts will use F<scandeps.pl>.
-
-I<NOTE: F<scandeps-static.pl> is provided by
-L<Module::ScanDeps::Static> and is (at least by this author to be a
-bit superior to F<scandeps.pl>.>
-
 =over 15
-
-=item recommends
-
-Fully qualified path to a file listing optional recommended
-dependencies. Modules listed here will appear under
-C<prereqs.runtime.recommends> in the generated META files, and can be
-installed with C<cpanm --with-recommends>.
-
-Example F<recommends> file:
-
-  Apache::ConfigParser 0
-  Apache2::Request 0
-  Apache2::Upload 0
-  mod_perl2 0
 
 =item requires
 
-Fully qualified path to a dependency list for module.
+Path to a file listing runtime dependencies. Defaults to a file named
+F<requires> in the project root.
 
 =item test-requires
 
-Fully qualified path to a dependency list for tests.
+Path to a file listing test dependencies.
 
 =item build-requires
 
-Fully qualified path to a dependency list for build.
+Path to a file listing build-time dependencies.
+
+=item recommends
+
+Path to a file listing optional recommended dependencies. These appear
+under C<prereqs.runtime.recommends> in generated META files and are
+installed by C<cpanm --with-recommends>.
 
 =item resolver (optional)
 
-Name of a program that will provide a list of depenencies when passed
-a module name. Use the special name C<scandeps> to use Perl's
-C<scandeps.pl>.  When using C<scandeps.pl>, the C<-R> option will be
-used to prevent C<scandeps.pl> from recursing. Neither
-C</usr/lib/rpm/perl.req> or C<scandeps.pl> are completely
-reliable. Your methodology might be to use these to get a good start
-on a file containing dependencies and then add/subtract as required
-for your use case.
-
-When preparing the list of files to list as requirements in the
-C<PREREQ_PM> section of the C<Makefile.PL>, the script will
-automatically remove any modules that are already included with Perl.
+Name of a program that produces a dependency list when passed a module
+name. Use the special value C<scandeps> to invoke F<scandeps.pl>.
 
 =item required-modules
 
-If the resolver should look for modules that are C<required>d by your
-scripts and modules.
-
-default: yes
+Whether the resolver should follow C<require> statements. Default: C<yes>.
 
 =back
 
@@ -1875,173 +2092,126 @@ default: yes
 
 =item pm-module
 
-The path where the Perl module to be packaged can be found.  By
-default, the current working directory will be searched or the root of
-the search if the C<recurse> value is set to 'yes'.
-
-default: current working directory
+Directory containing the module files. Default: F<lib>.
 
 =item recurse (optional)
 
-Specifies whether to or not to look in subdirectories of the path
-specified by C<pm_module> for additional modules to package.
-
-default: yes
+Whether to recurse into subdirectories. Default: C<yes>.
 
 =item tests (optional)
 
-The path where tests to be specified in the F<Makefile.PL> will be
-found.
+Directory containing test files (C<*.t>).
 
 =item exe-files
 
-Path where executable Perl modules will be found. Files that are to be
-included in the distribution must have executable permissions.
+Directory containing executable Perl scripts. Only files with
+executable permissions are included.
 
-Examples:
-
- src/main/perl/bin
- bin/
+  Examples:
+    src/main/perl/bin
+    bin/
 
 =item scripts
 
-Path where executable scripts (e.g. bash) will be found. Files that are to be
-included in the distribution must have executable permissions.
-
-Examples:
-
- src/main/bash/bin
- bin/
+Directory containing non-Perl executable scripts (e.g. bash).
+Only files with executable permissions are included.
 
 =back
 
 =item provides (optional)
 
-By default the package will specify the primary module to be packaged
-and any additional modules that were found if the C<recurse> option
-was set to 'yes'.
-
-=item recommends
-
-Name of a file containing optional recommended dependencies. These are
-modules that enhance functionality but are not required for basic
-operation. When installed with C<cpanm --with-recommends>, these will
-be installed alongside the required dependencies. If not specified,
-defaults to a file named F<recommends> if present.
-
-Example use case: optional Apache/mod_perl dependencies that are only
-needed in a specific deployment environment.
+Explicit list of modules provided by this distribution. By default all
+C<.pm> files found under the C<pm-module> path are listed.
 
 =item resources (optional)
 
-Values to add to the I<resources> section of the META_MERGE argument
-passed to L<ExtUtils::MakeMaker> when creating the F<Makefile.PL>
-file.
-
-See L<https://metacpan.org/pod/CPAN::Meta::Spec> for more details.
-
-=item extra (optional)
-
-Name of a file that contains a list of files to be included in the
-package. These files are included in the package but not installed.
+Values added to the C<resources> section of C<META_MERGE> in the
+generated C<Makefile.PL>. See L<CPAN::Meta::Spec> for the format.
 
 =item extra-files (optional)
 
-List of files to be included in package.
+List of files to be included in the package.
 
-Example:
-
- extra-files:
-   - ChangeLog
-   - README
-   - examples:
-     - src/examples <= include all files in this directory
+Examples:
 
  extra-files:
    - ChangeLog
    - README
    - examples:
-      - src/examples/foo.pl
-      - src/examples/boo.pl
+       - src/examples  <= include all files in this directory
+
+ extra-files:
+   - ChangeLog
+   - README
+   - examples:
+       - src/examples/foo.pl
+       - src/examples/boo.pl
 
 I<CAUTION: specifying a directory will include ALL of the files in
-that directory. It is a better practice list the specific files you
-want to include or provide a manifest of files in the C<extra> key.>
+that directory. It is better practice to list the specific files you
+want to include, or provide a manifest of files via the C<extra> key:>
 
  extra: manifest
 
-If you include in your C<extra-files> specification, a 'share'
-directory, then that directory will be installed as part of the
-distribution. The location of those files will be relative to the
-distribution's share directory and can be found like this:
+If you include a C<share> destination in your C<extra-files>
+specification, those files will be installed as part of the
+distribution under the share directory. The installed location can be
+found at runtime with:
 
  perl -MFile::ShareDir=dist_dir -e 'print dist_dir(q{My-Project});'
 
 The specification...
 
  extra-files:
-   - share:   <= indicates ../auto/share/dist/My-Project
-     - resources/foo.cfg
+   - share:        <= indicates ../auto/share/dist/My-Project
+       - resources/foo.cfg
 
-...would package the file F<foo.cg> from your project's F<resources>
-directory to the distribution's share directory. While this specification...
+...would package F<resources/foo.cfg> from your project into the
+distribution's share directory root. While this specification...
 
  extra-files:
-   - share/resources: <= indicates ../auto/share/dist/My-Project/resources
-     - resources/foo.cfg
+   - share/resources:   <= indicates ../auto/share/dist/My-Project/resources
+       - resources/foo.cfg
 
-...would package the file F<foo.cfg> in the distribution's share
-directory under the F<resources> directory.
+...would package F<foo.cfg> into the F<resources> subdirectory of the
+distribution's share directory.
 
 I<All other files in the C<extra-files> section will be added to the
 root of the tarball but will not be installed.>
 
-=item scripts
+=item extra (optional)
 
-Array of script names or a path to the scripts that should be included
-in the distribution. Files should be relative to the project root.
-
-=item exe-files
-
-Array of Perl script names or a path to the scripts that should be included
-in the distribution. Files should be relative to the project root.
+Path to a manifest file listing additional files to include, one per
+line.
 
 =back
 
 =head2 Key Naming
 
-Keys in the buildspec may be written with either hyphens (C<pm-module>)
-or underscores (C<pm_module>). The hyphenated form is canonical.
-If underscore keys are detected, they are automatically normalized before
-parsing and a corrected copy of your buildspec is written to
-F<buildspec.yml.current> for your reference. Your original file is
-never modified.
+Keys may be written with hyphens (C<pm-module>) or underscores
+(C<pm_module>). The hyphenated form is canonical. If underscore keys
+are detected they are normalised before parsing and a corrected copy of
+the buildspec is written to F<buildspec.yml.current>. The original file
+is never modified.
 
 =head1 DEPENDENCIES
 
-By default the script will look for dependencies in files named
-F<requires> and F<test-requires>.  These can be created automatically
-by the C<bash> script (C<make-cpan-dist>).
+Runtime and test dependencies are read from plain-text files, one
+module per line with an optional version number:
 
-You can specify a different name for the files with the C<-r> and
-C<-t> options.
+  Amazon::Credentials 1.15
+  HTTP::Tiny
 
-B<You must however have a file that contains the dependency list in
-order to create a CPAN distribution.>
+By default the files are named F<requires> and F<test-requires>. The
+paths can be overridden in the C<dependencies> section of the
+buildspec.
 
-Again, if you use the C<bash> script that invokes this utility or are
-calling this utility with a F<buildspec.yml> file, these files can be
-I<automatically> created for you based on your options.  If you
-provide your own F<requires> or F<test-requires> file, modules should
-be specified as shown below unless the name of the dependency file is
-L<C<cpanfile>|/"dependencies">.
+If the dependency file is named F<cpanfile> it is parsed in cpanfile
+format.
 
-  module-name version
+=head1 VERSION
 
-Example:
-
- AWS::Signature4::Lite 1.0.0
- ...
+This documentation refers to version 2.0.1
 
 =head1 AUTHOR
 

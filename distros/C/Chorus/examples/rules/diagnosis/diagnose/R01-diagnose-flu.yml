@@ -1,0 +1,12 @@
+# flu hypothesis: high fever + cough + fatigue
+RULE: diagnose-flu
+FIND:
+  p:
+    attribut: fever_grade_value
+    filtre: '$_->fever_grade_value eq "high"'
+CONDITION: '$p->cough && $p->fatigue'
+EXCEPTION: 'defined $p->{hypothesis}'
+ACTION: |
+  $p->set('hypothesis',  'influenza');
+  $p->set('confidence',  0.85);
+  1

@@ -1,0 +1,99 @@
+{
+   "abstract" : "Perl inference engine and AI-assisted compliance-checking platform",
+   "author" : [
+      "Christophe Ivorra <ch.ivorra@free.fr>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "inference-engine",
+      "expert-system",
+      "rule-engine",
+      "compliance",
+      "symbolic-ai",
+      "llm",
+      "yaml",
+      "frames"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Chorus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "YAML" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Chorus" : {
+         "file" : "lib/Chorus.pm",
+         "version" : "v2.0.1"
+      },
+      "Chorus::Collection::Filter" : {
+         "file" : "lib/Chorus/Collection/Filter.pm",
+         "version" : "v2.0.1"
+      },
+      "Chorus::Collection::List" : {
+         "file" : "lib/Chorus/Collection/List.pm",
+         "version" : "v2.0.1"
+      },
+      "Chorus::Engine" : {
+         "file" : "lib/Chorus/Engine.pm",
+         "version" : "v2.0.1"
+      },
+      "Chorus::Expert" : {
+         "file" : "lib/Chorus/Expert.pm",
+         "version" : "v2.0.1"
+      },
+      "Chorus::Frame" : {
+         "file" : "lib/Chorus/Frame.pm",
+         "version" : "v2.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Chorus"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/civorra/Chorus.git",
+         "web" : "https://github.com/civorra/Chorus"
+      }
+   },
+   "version" : "v2.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

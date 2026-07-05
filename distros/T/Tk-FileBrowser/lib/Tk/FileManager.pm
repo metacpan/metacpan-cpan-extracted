@@ -9,7 +9,7 @@ Tk::FileManager - Tk::FileBrowser based filemanager
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.09;
+$VERSION = 0.12;
 
 use base qw(Tk::Derived Tk::FileBrowser);
 Construct Tk::Widget 'FileManager';
@@ -91,12 +91,13 @@ sub Populate {
 	$self->clipboardClear;
 	$self->cutOperation(0);
 
-	my $tree = $self->Subwidget('Tree');
-	$tree->bind('<Control-c>', [$self, 'clipboardCopy']);
-	$tree->bind('<Control-x>', [$self, 'clipboardCut']);
-	$tree->bind('<Control-v>', [$self, 'clipboardPaste']);
-	$tree->bind('<Delete>', [$self, 'trash']);
-	$tree->bind('<Shift-Delete>', [$self, 'delete']);
+	my $tree = $self->Subwidget('LB');
+	my $c = $tree->Subwidget('Canvas');
+	$c->Tk::bind('<Control-c>', [$self, 'clipboardCopy']);
+	$c->Tk::bind('<Control-x>', [$self, 'clipboardCut']);
+	$c->Tk::bind('<Control-v>', [$self, 'clipboardPaste']);
+	$c->Tk::bind('<Delete>', [$self, 'trash']);
+	$c->Tk::bind('<Shift-Delete>', [$self, 'delete']);
 	
 	my $not = $self->Label(
 		-anchor => 'w',
@@ -209,9 +210,9 @@ sub deleteConfirm {
 		my $item = $_;
 		my $image;
 		if (-d $item) {
-			$image = $self->GetDirIcon($item);
+			$image = $self->Callback('-diriconcall', $item, 'compact');
 		} else {
-			$image = $self->GetFileIcon($item);
+			$image = $self->Callback('-fileiconcall', $item, 'compact');
 		}
 		$dl->add($item, -itemtype => 'imagetext', -image => $image, -text => $item);
 	}

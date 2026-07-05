@@ -1,0 +1,11 @@
+REGLE: affecter-fm_d
+CHERCHER:
+  p:
+    attribut: classe_bois
+EXCEPTION: defined $p->{fm_d}
+EFFET: |
+  my %fmd = (C16 => 10.0, C24 => 16.0, C30 => 21.0, C40 => 26.0);
+  my $v = $fmd{ $p->{classe_bois} };
+  return unless defined $v;
+  $p->set('fm_d', $v);
+  1

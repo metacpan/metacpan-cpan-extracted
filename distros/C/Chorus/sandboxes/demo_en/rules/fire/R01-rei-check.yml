@@ -1,0 +1,49 @@
+##
+# RULE: R01-rei-check
+# AGENT: CobIntro::Agent::Fire  (pos. 3 / 4)
+# CORPUS: §5.1 — Building Regs Part B / BS EN 13501-2 — Required REI by occupancy
+#
+# PURPOSE
+#   Checks that the element achieves the minimum required fire resistance period:
+#   REI 30 for single occupancy (collective=0), REI 60 for multi-occupancy (collective=1).
+#   Elements without fire_resistance_period are skipped (no fire performance data).
+#
+# INPUTS  (slots read)
+#   needs_fire              : targeting slot — set by Domain R07
+#   fire_resistance_period  : int — achieved REI period in minutes
+#   collective              : int — 0 (single dwelling) or 1 (multi-occupancy); defaults to 0
+#
+# OUTPUTS (slots written)
+#   fire_ok           : 'NO' — element rejected if REI below required
+#   fire_note         : description of the failure
+#   needs_compliance  : 1 — set even on rejection (compliance agent must process all)
+#   needs_fire        : deleted after rejection
+#
+# HELPERS
+#   rei_required($collective) → $rei_minutes
+#
+# GUARD — EXCEPTION: defined $f->{fire_ok}
+#   Idempotence — prevents re-processing an already fire-evaluated Frame.
+##
+RULE: R01-rei-check
+FIND:
+  f:
+    attribut: needs_fire
+EXCEPTION: defined $f->{fire_ok}
+CONDITION: "defined $f->{fire_resistance_period}"
+ACTION: |
+  # §5.1 — required REI depends on occupancy type
+  my $required_rei = rei_required($f->{collective} // 0);
+
+  if ($f->{fire_resistance_period} < $required_rei) {
+    $f->set('fire_ok', 'NO');
+    $f->set('fire_note',
+      sprintf("REI %d < required REI %d (§5.1 Building Regs Part B)",
+        $f->{fire_resistance_period}, $required_rei));
+
+    # Always trigger compliance agent (even for fire failures)
+    $f->set('needs_compliance', 1);
+    $f->delete('needs_fire');
+    return 1;
+  }
+  1

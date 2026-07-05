@@ -30,6 +30,11 @@ sub opt_spec {
 			't=s@',
 			'Feature name tag. Pass once per feature (e.g. -t cpu -t mem -t disk); the count must match the number of CSV columns or the command will die.'
 		],
+		[
+			'voting=s',
+			"Scoring-time aggregation: 'mean' (classic averaged score) or 'majority' (MVIForest: each tree votes against the decision threshold and the label is the majority vote).",
+			{ 'default' => 'mean' }
+		],
 	);
 } ## end sub opt_spec
 
@@ -49,6 +54,7 @@ Switches to new args are like below...
 -m -> sample_size
 -e -> extension_level
 -c -> contamination
+--voting -> voting
 
 ';
 } ## end sub description
@@ -80,6 +86,10 @@ sub validate {
 
 	if ( defined( $opt->{'e'} ) && $opt->{'e'} < 0 ) {
 		$self->usage_error( '-e, "' . $opt->{'e'} . '", is less than 0... should be a float greater or equal to 0' );
+	}
+
+	if ( $opt->{'voting'} !~ /\A(?:mean|majority)\z/ ) {
+		$self->usage_error( '--voting, "' . $opt->{'voting'} . '", must be either mean or majority' );
 	}
 
 	return 1;
@@ -150,6 +160,7 @@ sub execute {
 		'extension_level' => $opt->{'e'},
 		'contamination'   => $opt->{'c'},
 		'feature_names'   => $opt->{'t'},
+		'voting'          => $opt->{'voting'},
 	);
 
 	$iforest->fit( \@data );

@@ -1,0 +1,20 @@
+# Materialise fever_grade on the patient frame.
+# The slot carries a _NEEDED that computes its value from temperature,
+# which itself uses a _NEEDED to infer from skin_temp (two-level backward chain).
+# After calling $p->fever_grade (which triggers both _NEEDED levels), we store
+# the result as a plain scalar under a dedicated slot 'fever_grade_value' so
+# that fmatch(slot => 'fever_grade_value') can find it in downstream rules.
+# A boolean flag 'fever_grade_ready' acts as the idempotence guard.
+RULE: materialise-fever-grade
+FIND:
+  p:
+    attribut: skin_temp
+EXCEPTION: '$p->{fever_grade_ready}'
+ACTION: |
+  my $grade = $p->fever_grade;
+  if (defined $grade) {
+      $p->set('fever_grade_value', $grade);
+      $p->set('fever_grade_ready', 1);
+      return 1;
+  }
+  0

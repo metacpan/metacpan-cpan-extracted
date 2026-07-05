@@ -1,90 +1,122 @@
-# CPAN::Maker::Bootstrapper 2.0.2 Release Notes
+# CPAN::Maker::Bootstrapper 2.0.4 Release Notes
 
 ## Overview
 
-A patch release addressing bugs shaken out during real-world use of the
-2.0.1 toolchain. The main themes are: immutability enforced on installed
-files, smarter `make update`, conditional linting dep installation,
-build-time deps embedded in `builder`, and two `find`/`scan` fixes for
-multi-directory projects.
+This release focuses on improving the LLM-powered release notes
+generation pipeline, introducing a new `Git::ReleaseDiffs` module,
+refining how source artifacts are prepared and sent to the LLM, and
+tidying up the build infrastructure.
+
+---
+
+## What's New
+
+### New Module: `Git::ReleaseDiffs`
+
+A new module `Git::ReleaseDiffs` has been introduced to encapsulate
+the logic for generating the release diff artifacts (`.diffs`, `.lst`,
+and `.tar.gz`) that are used as input to the LLM. Previously, this was
+handled externally via a shell script in the `release-notes.mk`
+Makefile include. The release artifact generation is now performed
+programmatically within Perl code, making the process more robust and
+testable.
+
+### Streamlined `release-notes` Make Target
+
+The `release-notes.mk` Makefile include has been significantly
+simplified. The previous multi-step shell script that manually invoked
+`git diff`, `git tag`, and `tar` has been replaced with a single call
+to `bootstrapper release-notes`:
+
+```makefile
+release-notes:
+    @bootstrapper release-notes
+```
+
+All artifact generation is now delegated to `Git::ReleaseDiffs` within
+the bootstrapper itself.
+
+---
+
+## Improvements
+
+### `CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes`
+
+Several enhancements have been made to the `cmd_release_notes`
+subroutine:
+
+- **Artifact generation via `Git::ReleaseDiffs`**: Release diff files
+  are now created programmatically using the new `Git::ReleaseDiffs`
+  module rather than relying on pre-existing files generated
+  externally.
+
+- **ChangeLog truncation**: Only the current release section of the
+  `ChangeLog` file is extracted and sent to the LLM. A new private
+  helper, `_extract_changelog_section`, reads the `ChangeLog` up to
+  (but not including) the second top-level block, keeping LLM context
+  focused and reducing token usage.
+
+- **POD stripping from Perl sources**: A new private helper,
+  `_strip_pod`, uses `Pod::Extract` and `IO::Scalar` to strip POD
+  documentation from `.pm.in` and `.pl.in` source files before they
+  are submitted to the LLM. This reduces token consumption without
+  losing meaningful code content.
+
+- **Organised output directory**: Generated release notes are now
+  written to a dedicated `release-notes/` subdirectory as
+  `release-notes/release-notes-{version}.md`, with a convenience
+  symlink `release-notes.md` pointing to the latest file. The output
+  directory is created automatically via `File::Path::make_path` if it
+  does not already exist.
+
+- **Symlink management**: The `release-notes.md` symlink is updated on
+  each run, replacing any existing symlink, so it always reflects the
+  most recently generated notes.
+
+---
+
+## Build Infrastructure
+
+### `builder` Script
+
+- **Idempotent repository cloning**: The builder script no longer
+  unconditionally clones a repository. It now checks whether the
+  target directory already exists and skips cloning if it does, making
+  repeated local runs more efficient.
+- **Unpinned extra dependencies**: Version pins have been removed from
+  `CPAN::Maker` and `Markdown::Render` in `EXTRA_DEPS`, allowing the
+  latest available versions to be installed.
+- **Improved installer verbosity**: The default `cpm` installer
+  command now includes `--show-build-log-on-failure` and `--verbose`
+  flags for better diagnostic output during CI builds.
+
+---
+
+## Dependencies Added
+
+| Module | Purpose |
+|---|---|
+| `Git::ReleaseDiffs` | Programmatic generation of release diff artifacts |
+| `File::Path` | Creating the `release-notes/` output directory |
+| `IO::Scalar` | In-memory file handle for POD stripping |
+| `Pod::Extract` | Extracting and stripping POD from Perl source files |
 
 ---
 
 ## Bug Fixes
 
-**`find-files` and `scan-deps` broken for multi-directory source trees**
-
-Both the `find-files` make function and the `scan-deps` recipe used
-`find $(2)` where `$(2)` could be a space-separated list such as
-`lib bin`. `find` interprets this as a single path argument and fails.
-Both are now wrapped in a `for d in $(2)` loop so multiple directories
-are traversed correctly.
-
-**`update-available` version comparison was string equality**
-
-The version check used `=` to compare the installed and available
-Bootstrapper versions, which would incorrectly report "up to date"
-whenever the strings matched exactly but fail to detect patch-level
-upgrades in some orderings. It now uses `version->parse()` from the
-core `version` module for a proper semantic comparison:
-
-```bash
-update_available=$(current="..." cpan="..." perl -Mversion -e \
-  'print version->parse($ENV{cpan}) > version->parse($ENV{current});')
-```
-
-**`make update` left managed files writable**
-
-The `update` target was setting files writable before copying but
-never restoring them to read-only afterward, leaving `Makefile` and
-`.includes/*` writable after every update. The target now explicitly
-runs `chmod -w` after all copies complete. The `post-update` loop also
-applies `chmod -w` immediately after each file is copied rather than
-before.
-
-**`_install_files` not enforcing immutability**
-
-The `bootstrapper` initializer set `.includes/*.mk` files to `0644`
-(writable by owner), making it easy to accidentally edit a managed
-file. Files are now installed as:
-
-- `.includes/*.mk` - `0444` (read-only)
-- `Makefile` - `0444` (read-only)
-- `builder` - `0555` (read-only, executable)
+- The `release-notes.mk` shell script could fail or produce unexpected
+  results when `LAST_TAG` was unset or when `git diff --staged`
+  produced no output. These edge cases are now handled within the
+  `Git::ReleaseDiffs` implementation.
 
 ---
 
-## Changes
+## Upgrade Notes
 
-**`builder` - build deps embedded, linting conditional on rc files**
-
-`build-requires` is removed as a separate file. The Perl build-time
-dependencies it contained are now embedded directly in `builder`'s
-`EXTRA_DEPS` array, eliminating one file for `make workflow` to manage
-and one potential source of drift between projects.
-
-`Perl::Tidy` and `Perl::Critic` (and its policy plugins) are now only
-installed when the corresponding rc file is detected in the repo
-(`$PERLTIDYRC` / `$PERLCRITICRC`). Previously they were always
-installed, adding unnecessary install time to projects that don't use
-them.
-
-**`build-ci` - build time recorded and `build.log` symlink**
-
-`make build-ci` now records total elapsed build time at the end of the
-log and creates a `build.log` symlink pointing to the timestamped log
-file, so `less build.log` always shows the most recent run without
-needing to remember the timestamp.
-
-**`test` and `check` targets added to Makefile**
-
-`make test` runs the unit test suite via `prove`. `make check` performs
-a syntax check and generates source files from `.in` templates - useful
-as a pre-build sanity step.
-
----
-
-## Deleted
-
-`build-requires` - contents absorbed into `builder`. Removed from
-`buildspec.yml` `extra-files` and no longer installed by `make workflow`.
+Consumers using the `release-notes` make target should ensure that the
+`bootstrapper` CLI tool is installed and accessible in `PATH`. The old
+shell-based workflow (producing `release-{version}.diffs`,
+`release-{version}.lst`, and `release-{version}.tar.gz` externally
+before invoking `make release-notes`) is no longer required — artifact
+generation is fully automated.

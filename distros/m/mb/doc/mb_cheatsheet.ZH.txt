@@ -4,7 +4,7 @@
 
 [ 1. 加载模块 ]
   use mb;
-  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / big5 / gbk / uhc
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
 
 [ 2. 按字符操作 length / substr ]
   mb::length($str)              # 字符数（非字节数）
@@ -35,7 +35,7 @@
   mb::tr($str, $from, $to)      # 字符替换
 
 [ 7. 支持的编码 ]
-  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
 
 [ 8. 示例 ]
   use mb;

@@ -126,7 +126,7 @@ sub area {
 
 sub company {
     my $class = shift;
-    make_table($class, 'jigyosyo/zip/jigyosyo.zip', 7, 2, 12, 5);
+    make_table($class, 'office/zip/jigyosyo.zip', 7, 2, 12, 5);
 }
 
 sub http_get_and_unzip {
@@ -134,7 +134,7 @@ sub http_get_and_unzip {
     my $basename = basename($file);
     my $stored_zip = "$STOREDIR/$basename";
     (my $uncompressed = $stored_zip) =~ s/\.zip$/\.csv/i;
-    my $url = sprintf 'http://www.post.japanpost.jp/zipcode/dl/%s', $file;
+    my $url = sprintf 'https://www.post.japanpost.jp/service/search/zipcode/download/%s', $file;
     _warn($url);
     my $res = LWP::Simple::mirror($url, $stored_zip);
     unless ($res == 200 || $res == 304) {

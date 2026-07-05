@@ -1,5 +1,12 @@
 Revision history for Perl extension Tk::FileBrowser.
 
+0.12  Date
+	- Major overhall using Tk::ListBrowser as basis instead of Tk::ITree.
+	- Added option -viewmode.
+	- Added Type as standard column.
+	- Implemented a quick search algorithm for positioning entries. Marginal succes.
+	- Columns can be configured on the fly.
+
 0.11  Fri Mar 21 2025
 	- Removed annoying print statement.
 

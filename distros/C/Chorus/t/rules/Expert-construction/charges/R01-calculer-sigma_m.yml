@@ -1,0 +1,15 @@
+REGLE: calculer-sigma_m
+CHERCHER:
+  p:
+    attribut: fm_d
+EXCEPTION: defined $p->{sigma_m}
+EFFET: |
+  my $q = $p->{q_lineique};
+  my $L = $p->{portee};
+  my $b = $p->{largeur};
+  my $h = $p->{hauteur};
+  my $W       = $b * $h * $h / 6;
+  my $M_max   = $q * $L * $L / 8;
+  my $sigma_m = $M_max / $W;
+  $p->set('sigma_m', $sigma_m);
+  1

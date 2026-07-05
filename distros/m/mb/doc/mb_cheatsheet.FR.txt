@@ -4,7 +4,7 @@
 
 [ 1. Chargement ]
   use mb;
-  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / big5 / gbk / uhc
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
 
 [ 2. length / substr par caractère ]
   mb::length($str)              # nombre de caractères (pas d'octets)
@@ -29,7 +29,7 @@
   mb::getc(FH)     mb::tr($str,$from,$to)
 
 [ 7. Encodages supportés ]
-  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
 
 [ 8. Exemple ]
   use mb;

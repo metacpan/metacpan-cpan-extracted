@@ -1,5 +1,8 @@
 Revision history for Music-VoicePhrase
 
+0.0111 2026-07-04 20:39:03
+    - Allow the $Music::Duration::Partition::size to be a float.
+
 0.0110 2026-07-01 10:24:54
     - Oops. Fix patch isa.
 

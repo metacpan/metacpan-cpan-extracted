@@ -1,13 +1,14 @@
+package Perl::Tidy::HtmlWriter;
+
 #####################################################################
 #
 # The Perl::Tidy::HtmlWriter class writes a copy of the input stream in html
 #
 #####################################################################
 
-package Perl::Tidy::HtmlWriter;
 use strict;
 use warnings;
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 
 use Carp;
 use English qw( -no_match_vars );
@@ -479,34 +480,55 @@ sub make_abbreviated_names {
     #      'hck'    => [qw(html-color-keyword)],
     #  etc
     my ( $class, $rexpansion ) = @_;
+    my $add_short_name = sub {
+
+        my ( $short_name, $long_name ) = @_;
+
+        # Add an abbreviation for a long name
+
+        # Given:
+        #   $short_name = the abbreviation
+        #   $long_name  = the expanded name
+
+        if ( $rexpansion->{$short_name} ) {
+
+            # A new option short name has been added which is already in use
+            my $existing_name = $rexpansion->{$short_name}->[0];
+            Perl::Tidy::Die(
+"redefining abbreviation '$short_name' for '$long_name'; already used for '$existing_name'\n"
+            );
+        }
+        $rexpansion->{$short_name} = [$long_name];
+        return;
+    }; ## end $add_short_name = sub
 
     # abbreviations for color/bold/italic properties
     foreach my $short_name ( keys %short_to_long_names ) {
         my $long_name = $short_to_long_names{$short_name};
-        ${$rexpansion}{"hc$short_name"}  = ["html-color-$long_name"];
-        ${$rexpansion}{"hb$short_name"}  = ["html-bold-$long_name"];
-        ${$rexpansion}{"hi$short_name"}  = ["html-italic-$long_name"];
-        ${$rexpansion}{"nhb$short_name"} = ["nohtml-bold-$long_name"];
-        ${$rexpansion}{"nhi$short_name"} = ["nohtml-italic-$long_name"];
+        $add_short_name->( "hc$short_name",  "html-color-$long_name" );
+        $add_short_name->( "hb$short_name",  "html-bold-$long_name" );
+        $add_short_name->( "hi$short_name",  "html-italic-$long_name" );
+        $add_short_name->( "nhb$short_name", "nohtml-bold-$long_name" );
+        $add_short_name->( "nhi$short_name", "nohtml-italic-$long_name" );
     }
 
     # abbreviations for all other html options
-    ${$rexpansion}{"hcbg"}  = ["html-color-background"];
-    ${$rexpansion}{"pre"}   = ["html-pre-only"];
-    ${$rexpansion}{"toc"}   = ["html-table-of-contents"];
-    ${$rexpansion}{"ntoc"}  = ["nohtml-table-of-contents"];
-    ${$rexpansion}{"nnn"}   = ["html-line-numbers"];
-    ${$rexpansion}{"hent"}  = ["html-entities"];
-    ${$rexpansion}{"nhent"} = ["nohtml-entities"];
-    ${$rexpansion}{"css"}   = ["html-linked-style-sheet"];
-    ${$rexpansion}{"nss"}   = ["nohtml-style-sheets"];
-    ${$rexpansion}{"ss"}    = ["stylesheet"];
-    ${$rexpansion}{"pod"}   = ["pod2html"];
-    ${$rexpansion}{"npod"}  = ["nopod2html"];
-    ${$rexpansion}{"frm"}   = ["frames"];
-    ${$rexpansion}{"nfrm"}  = ["noframes"];
-    ${$rexpansion}{"text"}  = ["html-toc-extension"];
-    ${$rexpansion}{"sext"}  = ["html-src-extension"];
+    $add_short_name->( "hcbg",  "html-color-background" );
+    $add_short_name->( "pre",   "html-pre-only" );
+    $add_short_name->( "toc",   "html-table-of-contents" );
+    $add_short_name->( "ntoc",  "nohtml-table-of-contents" );
+    $add_short_name->( "nnn",   "html-line-numbers" );
+    $add_short_name->( "hent",  "html-entities" );
+    $add_short_name->( "nhent", "nohtml-entities" );
+    $add_short_name->( "css",   "html-linked-style-sheet" );
+    $add_short_name->( "nss",   "nohtml-style-sheets" );
+    $add_short_name->( "ss",    "stylesheet" );
+    $add_short_name->( "pod",   "pod2html" );
+    $add_short_name->( "npod",  "nopod2html" );
+    $add_short_name->( "frm",   "frames" );
+    $add_short_name->( "nfrm",  "noframes" );
+    $add_short_name->( "text",  "html-toc-extension" );
+    $add_short_name->( "sext",  "html-src-extension" );
     return;
 } ## end sub make_abbreviated_names
 
@@ -1143,7 +1165,7 @@ sub pod_to_html_old {
                 push @args, "--no$kwd";
             }
             else {
-                # user did not set this keyword
+                ## user did not set this keyword
             }
         }
 
@@ -1171,7 +1193,7 @@ sub pod_to_html_old {
         $fh->close() or Warn("Cannot close $tmpfile\n");
     }
     else {
-        # this error shouldn't happen ... we just used this filename
+        ## this error shouldn't happen ... we just used this filename
         Perl::Tidy::Warn(
             "unable to open temporary file $tmpfile; cannot use Pod::Html\n");
         return;
@@ -1823,7 +1845,9 @@ EOM
                 return;
             }
         }
-        else { $line_character = 'Q' }
+        else {
+            $line_character = 'Q';
+        }
         $html_line = $self->markup_html_element( $input_line, $line_character );
     }
 

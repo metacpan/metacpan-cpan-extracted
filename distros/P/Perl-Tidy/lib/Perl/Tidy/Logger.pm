@@ -1,3 +1,5 @@
+package Perl::Tidy::Logger;
+
 #####################################################################
 #
 # The Perl::Tidy::Logger class writes any .LOG and .ERR files
@@ -5,10 +7,9 @@
 #
 #####################################################################
 
-package Perl::Tidy::Logger;
 use strict;
 use warnings;
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 use Carp;
 use English qw( -no_match_vars );
 

@@ -28,7 +28,7 @@ my $opt = Getopt::Class->new({
     is( $obj->debug, 3, 'Checking option value for scalar' );
     isa_ok( $obj->debug, 'Module::Generic::Scalar', 'Class for scalar' );
     isa_ok( $obj->dry_run, 'Module::Generic::Boolean', 'Class for boolean' );
-    isa_ok( $obj->created, 'DateTime', 'Class for datetime' );
+    isa_ok( $obj->created, 'DateTime::Lite', 'Class for datetime' );
     isa_ok( $obj->age, 'Module::Generic::Number', 'Class for numbers' );
     is( $obj->name->length, 3, 'Accessing scalar method' );
     isa_ok( $obj->langs, 'Module::Generic::Array', 'Class for array' );

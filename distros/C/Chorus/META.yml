@@ -1,0 +1,61 @@
+---
+abstract: 'Perl inference engine and AI-assisted compliance-checking platform'
+author:
+  - 'Christophe Ivorra <ch.ivorra@free.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - inference-engine
+  - expert-system
+  - rule-engine
+  - compliance
+  - symbolic-ai
+  - llm
+  - yaml
+  - frames
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chorus
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Chorus:
+    file: lib/Chorus.pm
+    version: v2.0.1
+  Chorus::Collection::Filter:
+    file: lib/Chorus/Collection/Filter.pm
+    version: v2.0.1
+  Chorus::Collection::List:
+    file: lib/Chorus/Collection/List.pm
+    version: v2.0.1
+  Chorus::Engine:
+    file: lib/Chorus/Engine.pm
+    version: v2.0.1
+  Chorus::Expert:
+    file: lib/Chorus/Expert.pm
+    version: v2.0.1
+  Chorus::Frame:
+    file: lib/Chorus/Frame.pm
+    version: v2.0.1
+requires:
+  Digest::MD5: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  YAML: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Chorus
+  repository: https://github.com/civorra/Chorus.git
+version: v2.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

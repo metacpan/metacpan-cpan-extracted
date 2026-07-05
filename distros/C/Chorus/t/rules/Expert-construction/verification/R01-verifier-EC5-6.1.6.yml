@@ -1,0 +1,13 @@
+REGLE: verifier-EC5-6.1.6
+CHERCHER:
+  p:
+    attribut: sigma_m
+EXCEPTION: defined $p->{statut}
+EFFET: |
+  if ($p->{sigma_m} <= $p->{fm_d}) {
+      $p->set('statut',    'CONFORME');
+  } else {
+      $p->set('statut',    'NON_CONFORME');
+      $p->set('ref_norme', 'EC5-6.1.6');
+  }
+  1

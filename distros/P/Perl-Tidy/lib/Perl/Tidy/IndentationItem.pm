@@ -1,3 +1,5 @@
+package Perl::Tidy::IndentationItem;
+
 #####################################################################
 #
 # The Perl::Tidy::IndentationItem class supplies items which contain
@@ -5,11 +7,10 @@
 #
 #####################################################################
 
-package Perl::Tidy::IndentationItem;
 use strict;
 use warnings;
 
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 
 BEGIN {
 

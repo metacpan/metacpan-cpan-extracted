@@ -54,7 +54,7 @@ sub _listen_ready {
   my $new = $fh->accept or die "Couldn't accept: $!";
   log_trace { "Setting file handle non-blocking" };
   $new->blocking(0);
-  my $f = Future->new;
+  my $f = Object::Remote->current_loop->new_future;
   log_trace { "Creating a new connection with the remote node" };
   my $c = use_module('Object::Remote::Connection')->new(
     receive_from_fh => $new,

@@ -1,5 +1,8 @@
 Revision history for Object-Proto
 
+0.18	2026-07-04
+	- Fix bug with named constructor
+
 0.17    2026-06-22
 	- Fix/remove PAX headers
 	- Fix pod

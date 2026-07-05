@@ -1,0 +1,18 @@
+#+TITLE: Chorus Agent Index
+#+DESCRIPTION: Registry of all agents generated for this project
+
+* Global Pipeline
+  | Pos | Agent (Perl module)                 | Slug         | KB                         | Status  |
+  |-----+-------------------------------------+--------------+----------------------------+---------|
+  |     |                                     |              |                            |         |
+
+  Status legend: ~draft~ | ~ready~ | ~generated~ | ~tested~
+
+* Pipeline Notes
+  - The order in the table corresponds to the ~register()~ order in Expert.pm
+  - Each agent must set the targeting slot of the next one before it becomes active
+  - The termination agent (Ctrl) is always in the last position
+
+* KB Files
+  One file per agent in this directory: ~<slug>.org~
+  Reference template: ~_template.org~

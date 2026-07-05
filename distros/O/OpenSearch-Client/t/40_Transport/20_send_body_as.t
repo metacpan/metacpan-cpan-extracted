@@ -24,9 +24,24 @@ use Test::More;
 use Test::Deep;
 use OpenSearch::Client;
 
-my $t = OpenSearch::Client->new( send_get_body_as => 'GET' )->transport;
+my $t = OpenSearch::Client->new( send_body_as_source => 1 )->transport;
+
+test_tidy( 'source-empty', { path => '/_search' }, {} );
+
+test_tidy(
+    'source-body',
+    { path => '/_search', body => { foo => 'bar' } },
+    {   method    => 'GET',
+        qs        => { source => '{"foo":"bar"}' },
+        mime_type => 'application/json',
+        serialize => 'std',
+    }
+);
+
+$t = OpenSearch::Client->new()->transport;
 
 test_tidy( 'GET-empty', { path => '/_search' }, {} );
+
 test_tidy(
     'GET-body',
     { path => '/_search', body => { foo => 'bar' } },
@@ -38,28 +53,13 @@ test_tidy(
     }
 );
 
-$t = OpenSearch::Client->new( send_get_body_as => 'POST' )->transport;
-
 test_tidy( 'POST-empty', { path => '/_search' }, {} );
 test_tidy(
-    'POST-eody',
-    { path => '/_search', body => { foo => 'bar' } },
+    'POST-body',
+    { method => 'POST', path => '/_search', body => { foo => 'bar' } },
     {   body      => { foo => 'bar' },
         data      => '{"foo":"bar"}',
         method    => 'POST',
-        mime_type => 'application/json',
-        serialize => 'std',
-    }
-);
-
-$t = OpenSearch::Client->new( send_get_body_as => 'source' )->transport;
-
-test_tidy( 'source-empty', { path => '/_search' }, {} );
-test_tidy(
-    'source-body',
-    { path => '/_search', body => { foo => 'bar' } },
-    {   method    => 'GET',
-        qs        => { source => '{"foo":"bar"}' },
         mime_type => 'application/json',
         serialize => 'std',
     }
@@ -69,8 +69,9 @@ test_tidy(
 sub test_tidy {
 #===================================
     my ( $title, $params, $test ) = @_;
+    my $method = $params->{method} || 'GET';
     $test = {
-        method => 'GET',
+        method => $method,
         path   => '/_search',
         qs     => {},
         ignore => [],

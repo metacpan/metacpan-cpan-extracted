@@ -28,6 +28,8 @@
   * [`$AUTO_HELP` and `$AUTO_DEFAULT`](#$autohelp-and-$autodefault)
 * [CONSTANTS](#constants)
 * [ADDITIONAL NOTES](#additional-notes)
+* [CUSTOMIZING HELP OUTPUT](#customizing-help-output)
+  * [`help_sections`](#helpsections)
 * [INTERNAL COMMANDS](#internal-commands)
   * [-generate-completion](#-generate-completion)
   * [-dump-spec](#-dump-spec)
@@ -197,7 +199,7 @@ distribution in one step.
 
 # VERSION
 
-This documentation refers to version 2.0.7.
+This documentation refers to version 2.0.9.
 
 # FEATURES
 
@@ -211,6 +213,8 @@ This documentation refers to version 2.0.7.
 - optional role-based architecture via YAML manifest
 - built-in scaffolding tools for migrating legacy scripts to roles
 - bash completion script generation for modulino wrappers
+- optional pager support for help output via [IO::Pager](https://metacpan.org/pod/IO%3A%3APager)
+- customizable help sections via `help_sections`
 
 # MODULINOS
 
@@ -668,6 +672,24 @@ a command or provide usage if no command is provided.
 
     default: false
 
+- `$PAGER`
+
+    Set the package variable `$PAGER` to a true value to route help
+    output through [IO::Pager](https://metacpan.org/pod/IO%3A%3APager) when `--help` is invoked. When enabled,
+    `IO::Pager` selects an appropriate pager (`less`, `more`, etc.)
+    based on the `PAGER` environment variable, falling back to a sensible
+    default. Set to false to suppress pager use and write help directly to
+    STDOUT.
+
+        use CLI::Simple qw($PAGER);
+        $PAGER = 0;  # disable pager
+
+    default: true
+
+    Note: [IO::Pager](https://metacpan.org/pod/IO%3A%3APager) must be installed for pager support. If it is not
+    available, help output is written directly to STDOUT regardless of the
+    value of `$PAGER`.
+
 # CONSTANTS
 
 `CLI::Simple` does not define its own constants directly, but it is often used
@@ -692,6 +714,33 @@ useful when writing scripts, including `choose`, `slurp`, and `dmp`.
 - `%INTERNAL_COMMANDS` is a package variable - subclasses can
 add their own internal commands by pushing entries into the hash before
 calling `new()`.
+
+# CUSTOMIZING HELP OUTPUT
+
+## `help_sections`
+
+By default `CLI::Simple` passes a standard set of POD section names to
+[Pod::Usage](https://metacpan.org/pod/Pod%3A%3AUsage) when rendering help output:
+
+    SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE
+
+You can override this by setting `help_sections` on the object before
+or after construction:
+
+    my $cli = MyApp->new( ... );
+    $cli->set_help_sections( [qw( SYNOPSIS OPTIONS )] );
+
+Or by overriding in `init`:
+
+    sub init {
+      my ($self) = @_;
+      $self->set_help_sections( [qw( SYNOPSIS OPTIONS EXAMPLES )] );
+      return $self->SUPER::init;
+    }
+
+Section names follow [Pod::Usage](https://metacpan.org/pod/Pod%3A%3AUsage) conventions. Subsections are
+specified with a `/` separator, e.g. `DESCRIPTION/Commands` renders
+only the `Commands` subsection under `=head1 DESCRIPTION`.
 
 # INTERNAL COMMANDS
 

@@ -1,0 +1,37 @@
+##
+# RULE: R07-domain-conclude
+# AGENT: CobIntro::Agent::Domain  (pos. 2 / 4)
+# CORPUS: §3.1–§4.2 — Domain compliance conclusion
+#
+# PURPOSE
+#   Marks an element as domain-compliant (frame_ok = 'YES') after all
+#   domain rejection rules (R01-R06) have been given the opportunity to fire.
+#   Sets needs_fire to hand off to Agent::Fire.
+#   Consumes and deletes needs_domain.
+#
+# INPUTS  (slots read)
+#   needs_domain : targeting slot — set by Qualification R04
+#
+# OUTPUTS (slots written)
+#   frame_ok     : 'YES' — element passes all domain checks
+#   needs_fire   : 1 — targeting slot for CobIntro::Agent::Fire
+#   needs_domain : deleted (consumed targeting slot)
+#
+# GUARD — EXCEPTION: defined $f->{frame_ok}
+#   Idempotence — fires only on Frames not yet processed by R01-R06.
+##
+RULE: R07-domain-conclude
+FIND:
+  f:
+    attribut: needs_domain
+EXCEPTION: defined $f->{frame_ok}
+ACTION: |
+  # All domain rejection checks passed — mark element as domain-compliant
+  $f->set('frame_ok', 'YES');
+
+  # Pass targeting slot to Fire agent (pipeline pos. 3)
+  $f->set('needs_fire', 1);
+
+  # Consume the domain targeting slot
+  $f->delete('needs_domain');
+  1

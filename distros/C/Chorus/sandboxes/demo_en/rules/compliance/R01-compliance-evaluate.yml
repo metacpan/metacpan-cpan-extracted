@@ -1,0 +1,73 @@
+##
+# RULE: R01-compliance-evaluate
+# AGENT: CobIntro::Agent::Compliance  (pos. 4 / 4)
+# CORPUS: §6.1 — Compliance conditions by element type
+#
+# PURPOSE
+#   Evaluates global compliance for each element per §6.1.
+#   Applies all applicable conditions for the element type and sets
+#   compliance_status = 'COMPLIANT' or 'NON-COMPLIANT'.
+#
+#   Conditions (§6.1):
+#   - All elements      : qualified = 'YES'
+#   - Structural (LB stud, sole plate, top plate) : frame_ok = 'YES'
+#   - Thermal elements (insulation, VCL)          : frame_ok = 'YES'
+#   - All elements (both collective=0 and =1)     : fire_ok = 'YES'
+#
+# INPUTS  (slots read)
+#   needs_compliance : targeting slot — set by Fire (R01/R02/R03)
+#   type_element     : element type — routing condition
+#   qualified        : 'YES' | 'NO' — set by Qualification
+#   frame_ok         : 'YES' | 'NO' — set by Domain
+#   fire_ok          : 'YES' | 'NO' — set by Fire
+#   collective       : int — 0 or 1 (used for context, not gate here)
+#
+# OUTPUTS (slots written)
+#   compliance_status : 'COMPLIANT' or 'NON-COMPLIANT'
+#   compliance_note   : explanation (conditions met, or list of failures)
+#   needs_compliance  : deleted (consumed targeting slot)
+#
+# GUARD — EXCEPTION: defined $f->{compliance_status}
+#   Idempotence — prevents re-processing an already-evaluated Frame.
+##
+RULE: R01-compliance-evaluate
+FIND:
+  f:
+    attribut: needs_compliance
+EXCEPTION: defined $f->{compliance_status}
+ACTION: |
+  my $type     = $f->{type_element} // '';
+  my @failures;
+
+  # §6.1a — all elements: must be qualified
+  push @failures, "not qualified (§6.1a)"
+    unless ($f->{qualified} // '') eq 'YES';
+
+  # §6.1b — structural elements: geometry compliance required
+  if ($type =~ /^(load_bearing_stud|sole_plate|top_plate)$/) {
+    push @failures, "frame geometry non-compliant (§6.1b)"
+      unless ($f->{frame_ok} // '') eq 'YES';
+  }
+
+  # §6.1c — thermal/vapour elements: thermal compliance required
+  if ($type =~ /^(insulation|vapour_control_layer)$/) {
+    push @failures, "thermal/vapour performance non-compliant (§6.1c)"
+      unless ($f->{frame_ok} // '') eq 'YES';
+  }
+
+  # §6.1d — all elements: fire compliance required (REI 30 min applies universally)
+  push @failures, "fire non-compliant (§6.1d)"
+    unless ($f->{fire_ok} // '') eq 'YES';
+
+  # Write final compliance verdict
+  if (@failures) {
+    $f->set('compliance_status', 'NON-COMPLIANT');
+    $f->set('compliance_note', join('; ', @failures));
+  } else {
+    $f->set('compliance_status', 'COMPLIANT');
+    $f->set('compliance_note', 'All applicable conditions satisfied (§6.1)');
+  }
+
+  # Consume the compliance targeting slot
+  $f->delete('needs_compliance');
+  1

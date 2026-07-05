@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::Extension;
-$Crypt::OpenSSL3::X509::Extension::VERSION = '0.009';
+$Crypt::OpenSSL3::X509::Extension::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::X509::Extension - A X509 extension.
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 METHODS
 
@@ -32,6 +32,10 @@ version 0.009
 =head2 create_by_NID
 
 =head2 create_by_OBJ
+
+=head2 decode_der
+
+=head2 encode_der
 
 =head2 get_critical
 
@@ -51,9 +55,10 @@ Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Leon Timmermans.
+This software is Copyright (c) 2025 by Leon Timmermans.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
 
 =cut

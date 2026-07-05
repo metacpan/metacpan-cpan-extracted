@@ -1,0 +1,39 @@
+##
+# RULE: R04-qualify-conclude
+# AGENT: CobIntro::Agent::Qualification  (pos. 1 / 4)
+# CORPUS: §2.1–§2.3 — BS EN 338 / EC5 — Qualification conclusion
+#
+# PURPOSE
+#   Marks an element as QUALIFIED (YES) once all rejection rules (R01-R03) have
+#   been given the opportunity to fire without rejecting it.
+#   Sets the targeting slot needs_domain to hand off to Agent::Domain.
+#   Consumes and deletes needs_qualify.
+#
+# INPUTS  (slots read)
+#   needs_qualify : targeting slot — set by Feed
+#
+# OUTPUTS (slots written)
+#   qualified     : 'YES' — element passes all qualification checks
+#   needs_domain  : 1 — targeting slot for CobIntro::Agent::Domain
+#   needs_qualify : deleted (consumed targeting slot)
+#
+# GUARD — EXCEPTION: defined $f->{qualified}
+#   Idempotence — fires only on Frames not yet qualified.
+#   Since R01-R03 all set qualified='NO' when they fire, this rule fires
+#   only on elements that passed all prior checks.
+##
+RULE: R04-qualify-conclude
+FIND:
+  f:
+    attribut: needs_qualify
+EXCEPTION: defined $f->{qualified}
+ACTION: |
+  # All rejection checks passed — mark element as qualified
+  $f->set('qualified', 'YES');
+
+  # Pass targeting slot to Domain agent (pipeline pos. 2)
+  $f->set('needs_domain', 1);
+
+  # Consume the qualification targeting slot
+  $f->delete('needs_qualify');
+  1

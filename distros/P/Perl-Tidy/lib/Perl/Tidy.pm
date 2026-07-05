@@ -1,4 +1,5 @@
-#
+package Perl::Tidy;
+
 ###########################################################
 #
 #    perltidy - a perl script indenter and formatter
@@ -51,8 +52,6 @@
 #        see the CHANGES file.
 #
 ############################################################
-
-package Perl::Tidy;
 
 # perlver reports minimum version needed is 5.8.1
 # 5.004 needed for IO::File
@@ -136,7 +135,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20260204';
+    $VERSION = '20260705';
 } ## end BEGIN
 
 {
@@ -583,6 +582,14 @@ sub get_iteration_count {
     return $rstatus->{iteration_count};
 }
 
+sub get_num_files {
+    return $rstatus->{num_files};
+}
+
+sub get_line_range_clipped {
+    return $rstatus->{line_range_clipped};
+}
+
 sub check_for_valid_words {
 
     my ($rcall_hash) = @_;
@@ -631,7 +638,8 @@ sub check_for_valid_words {
                 Fault("expecting {$key_name} to be a ref in call '$msg_end'\n");
             }
             if ( $ref eq 'ARRAY' ) {
-                $rthing = \map { $_ => 1 } @{$rthing};
+                my %hash = map { $_ => 1 } @{$rthing};
+                $rthing = \%hash;
             }
             if ( ref($rthing) ne 'HASH' ) {
                 Fault(
@@ -853,16 +861,18 @@ sub perltidy {
         opt_encode_output  => EMPTY_STRING,
         opt_max_iterations => EMPTY_STRING,
 
-        input_name        => '(unknown)',
-        output_name       => EMPTY_STRING,
-        char_mode_source  => 0,
-        char_mode_used    => 0,
-        input_decoded_as  => EMPTY_STRING,
-        output_encoded_as => EMPTY_STRING,
-        gcs_used          => 0,
-        iteration_count   => 0,
-        converged         => 0,
-        blinking          => 0,
+        input_name         => '(unknown)',
+        output_name        => EMPTY_STRING,
+        char_mode_source   => 0,
+        char_mode_used     => 0,
+        input_decoded_as   => EMPTY_STRING,
+        output_encoded_as  => EMPTY_STRING,
+        gcs_used           => 0,
+        iteration_count    => 0,
+        converged          => 0,
+        blinking           => 0,
+        num_files          => 0,
+        line_range_clipped => 0,
     };
 
     # Fix for issue git #57
@@ -1039,9 +1049,6 @@ EOM
         @ARGV_saved = ( $ARGV[-2], $ARGV[-1] );
     }
 
-    # see if -wvt was entered on the command line before @ARGV is changed
-    my $wvt_in_args = grep { /-(wvt|warn-variable-types)=/ } @ARGV;
-
     #-------------------------
     # get command line options
     #-------------------------
@@ -1123,6 +1130,7 @@ EOM
     # line parameters and is expecting formatted output to stdout.  Another
     # precaution, added elsewhere, is to ignore these in a .perltidyrc
     my $num_files = @Arg_files;
+    $rstatus->{num_files} = $num_files;
     foreach my $opt_name (
         qw(
         dump-block-summary
@@ -1134,6 +1142,7 @@ EOM
         dump-hash-keys
         dump-similar-keys
         dump-keyword-usage
+        dump-label-usage
         )
       )
     {
@@ -1198,9 +1207,9 @@ EOM
     my $line_range_clipped = $rOpts->{'line-range-tidy'}
       && ( $self->[_line_tidy_begin_] > 1
         || defined( $self->[_line_tidy_end_] ) );
+    $rstatus->{line_range_clipped} = $line_range_clipped;
 
-    Perl::Tidy::Formatter::check_options( $rOpts, $wvt_in_args, $num_files,
-        $line_range_clipped );
+    Perl::Tidy::Formatter::check_options($rOpts);
     Perl::Tidy::Tokenizer::check_options($rOpts);
     Perl::Tidy::VerticalAligner::check_options($rOpts);
     if ( $rOpts->{'format'} eq 'html' ) {
@@ -2263,9 +2272,9 @@ sub set_line_separator {
                 $rinput_string = \$buf;
             }
 
-            # unknown line ending scheme - leave it alone and let the tokenizer
-            # deal with it
+            # unknown line ending scheme
             else {
+                ## leave it alone and let the tokenizer deal with it
             }
         }
     }
@@ -3785,6 +3794,14 @@ sub generate_options {
     # Options with code '!' get standard negation ('no' for long names,
     # 'n' for abbreviations).  Categories follow the manual.
 
+    # Be careful not to re-use any of these --html short names.
+    # Use --dump-short-names to make this list.
+    #   hbc  hbcm hbco hbh  hbhh hbi  hbj  hbk  hbm  hbn  hbp  hbpd
+    #   hbpu hbq  hbs  hbsc hbv  hbw  hcbg hcc  hccm hcco hch  hchh
+    #   hci  hcj  hck  hcm  hcn  hcp  hcpd hcpu hcq  hcs  hcsc hcv
+    #   hcw  hent hic  hicm hico hih  hihh hii  hij  hik  him  hin
+    #   hip  hipd hipu hiq  his  hisc hiu  hiv  hiw
+
     ###########################
     $category = 0;    # I/O_Control
     ###########################
@@ -3862,6 +3879,11 @@ sub generate_options {
     $add_option->( 'brace-left-and-indent',                'bli',   '!' );
     $add_option->( 'brace-left-and-indent-list',           'blil',  '=s' );
     $add_option->( 'brace-left-and-indent-exclusion-list', 'blixl', '=s' );
+    $add_option->( 'heredoc-indentation-update',           'hiu',   '!' );
+    $add_option->( 'heredoc-convert-to',                   'hct',   '=s' );
+    $add_option->( 'heredoc-extra-spaces',                 'hxs',   '=s' );
+    $add_option->( 'heredoc-excess-length-option',         'hxlo',  '=i' );
+    $add_option->( 'heredoc-tag-exclusion-pattern',        'htxp',  '=s' );
 
     ########################################
     $category = 3;    # Whitespace control
@@ -3910,6 +3932,7 @@ sub generate_options {
     $add_option->( 'valign-exclusion-list',                     'vxl',   '=s' );
     $add_option->( 'valign-inclusion-list',                     'vil',   '=s' );
     $add_option->( 'valign-if-unless',                          'viu',   '!' );
+    $add_option->( 'valign-comparison-operators',               'vco',   '!' );
     $add_option->( 'valign-signed-numbers',                     'vsn',   '!' );
     $add_option->( 'valign-signed-numbers-limit',               'vsnl',  '=i' );
     $add_option->( 'valign-wide-equals',                        'vwe',   '!' );
@@ -3958,6 +3981,7 @@ sub generate_options {
     $category = 5;    # Linebreak controls
     ########################################
     $add_option->( 'add-newlines',                            'anl',   '!' );
+    $add_option->( 'blank-lines-prevent-cuddles',             'blpc',  '!' );
     $add_option->( 'block-brace-vertical-tightness',          'bbvt',  '=i' );
     $add_option->( 'block-brace-vertical-tightness-list',     'bbvtl', '=s' );
     $add_option->( 'brace-follower-vertical-tightness',       'bfvt',  '=i' );
@@ -4094,8 +4118,11 @@ sub generate_options {
     $add_option->( 'pass-version-line',            'pvl',  '!' );
     $add_option->( 'warn-variable-types',          'wvt',  '=s' );
     $add_option->( 'warn-variable-exclusion-list', 'wvxl', '=s' );
+    $add_option->( 'warn-label-types',             'wlt',  '=s' );
+    $add_option->( 'warn-label-exclusion-list',    'wlxl', '=s' );
     $add_option->( 'want-call-parens',             'wcp',  '=s' );
     $add_option->( 'nowant-call-parens',           'nwcp', '=s' );
+    $add_option->( 'warn-keyword-list',            'wkl',  '=s' );
 
     $add_option->( 'warn-unique-keys',                      'wuk',   '!' );
     $add_option->( 'warn-unique-keys-cutoff',               'wukc',  '=i' );
@@ -4108,6 +4135,9 @@ sub generate_options {
     $add_option->( 'warn-mismatched-return-types',          'wmrt',  '=s' );
     $add_option->( 'warn-mismatched-return-exclusion-list', 'wmrxl', '=s' );
     $add_option->( 'warn-similar-keys',                     'wsk',   '!' );
+    $add_option->( 'dump-c-style-for-loops',                'dcsfl', '!' );
+    $add_option->( 'warn-c-style-for-loops',                'wcsfl', '!' );
+    $add_option->( 'warn-unexpected-code-container',        'wucc',  '!' );
 
     $add_option->( 'add-interbracket-arrows',       'aia', '!' );
     $add_option->( 'delete-interbracket-arrows',    'dia', '!' );
@@ -4132,6 +4162,7 @@ sub generate_options {
     $add_option->( 'dump-mixed-call-parens',          'dmcp',  '!' );
     $add_option->( 'dump-keyword-usage',              'dku',   '!' );
     $add_option->( 'dump-keyword-usage-list',         'dkul',  '=s' );
+    $add_option->( 'dump-label-usage',                'dlu',   '!' );
     $add_option->( 'dump-options',                    'dop',   '!' );
     $add_option->( 'dump-profile',                    'dpro',  '!' );
     $add_option->( 'dump-short-names',                'dsn',   '!' );
@@ -4255,6 +4286,7 @@ sub generate_options {
       nouse-unicode-gcstring
       valign-code
       valign-block-comments
+      valign-comparison-operators
       valign-side-comments
       valign-signed-numbers
       space-for-semicolon
@@ -4267,6 +4299,7 @@ sub generate_options {
       code-skipping
       format-skipping
       detect-format-skipping-from-start
+      warn-unexpected-code-container
 
       pod2html
       html-table-of-contents
@@ -4316,6 +4349,7 @@ sub generate_options {
         'dump-block-minimum-lines'                  => [ 0, undef, 20 ],
         'entab-leading-whitespace'                  => [ 0, undef, 0 ],
         'fixed-position-side-comment'               => [ 0, undef, undef ],
+        'heredoc-excess-length-option'              => [ 0, 3,     0 ],
         'indent-columns'                            => [ 0, undef, 4 ],
         'integer-range-check'                       => [ 1, 3,     2 ],
         'interbracket-arrow-complexity'             => [ 0, 2,     1 ],
@@ -4974,6 +5008,7 @@ EOM
                 #  dump-want-left-space
                 #  dump-want-right-space
                 #  dump-keyword-usage
+                #  dump-label-usage
 
                 # The following dump configuration parameters which
                 # take =i or =s would still be allowed:
@@ -6266,7 +6301,7 @@ sub read_config_file {
             }
         }
         else {
-            # no abbreviations to untangle
+            ## no abbreviations to untangle
         }
 
         # Now store any parameters

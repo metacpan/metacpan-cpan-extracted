@@ -32,6 +32,6 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Remote
   license: http://dev.perl.org/licenses/
   repository: https://github.com/p5sagit/Object-Remote.git
-version: '0.004004'
+version: '0.005001'
 x_authority: cpan:MSTROUT
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,31 @@
+#+TITLE: Sandbox demo_en
+#+DATE: 2025-07-14
+#+STATUS: draft
+
+* Corpus
+  | Num | File                                     | Source                                   | Date       |
+  |-----+------------------------------------------+------------------------------------------+------------|
+  | 001 | corpus/001-timber-frame-intro-simul.txt  | BS EN 338, EC5, Part L/B, BS EN 13501-1  | 2025-07-14 |
+
+* Identified pipeline
+  | Pos | Agent (Perl module)          | Slug          | Speciality                                  |
+  |-----+------------------------------+---------------+---------------------------------------------|
+  |   1 | CobIntro::Agent::Qualification | qualification | Strength class, moisture, deflection        |
+  |   2 | CobIntro::Agent::Domain        | domain        | Frame geometry, thermal resistance, vapour  |
+  |   3 | CobIntro::Agent::Fire          | fire          | Fire resistance REI, lining, plasterboard   |
+  |   4 | CobIntro::Agent::Compliance    | compliance    | Global compliance evaluation + termination  |
+
+* Agent status
+  | Agent           | KB  | YAML | Helpers | Enrichments |
+  |-----------------+-----+------+---------+-------------|
+  | Qualification   | ✓   | ✓    | ✓       | 0           |
+  | Domain          | ✓   | ✓    | ✓       | 0           |
+  | Fire            | ✓   | ✓    | ✓       | 0           |
+  | Compliance      | ✓   | ✓    | -       | 0           |
+
+* Session notes
+  - Initial generation from corpus §1–§6 (condensed simulation corpus, 5 domains)
+  - Namespace: CobIntro
+  - Language: English (RULE / FIND / ACTION / PREMISES keywords)
+  - Corpus: English — rules use EN keywords
+  - _MAX_CYCLES heuristic: N_elements × 16 rules × 4 agents × 10

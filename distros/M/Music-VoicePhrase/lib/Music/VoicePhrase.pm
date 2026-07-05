@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct a measured phrase of notes
 
-our $VERSION = '0.0110';
+our $VERSION = '0.0111';
 
 use v5.36;
 use Moo;
@@ -73,7 +73,7 @@ sub _build_voice ($self) {
 
 has size => (
     is      => 'ro',
-    isa     => sub { croak "$_[0] is not a valid size" unless $_[0] =~ /^\d+$/ },
+    isa     => sub { croak "$_[0] is not a valid size" unless $_[0] =~ /^[\d.]+$/ },
     default => sub { 4 },
 );
 
@@ -219,7 +219,7 @@ Music::VoicePhrase - Construct a measured phrase of notes
 
 =head1 VERSION
 
-version 0.0110
+version 0.0111
 
 =head1 SYNOPSIS
 
@@ -290,7 +290,11 @@ Default: [-3, -2, -1, 1, 2, 3]
 
   $size = $mvp->size;
 
-Size of a measure.
+The number of beats in a phrase. This is usually an integer like C<4>
+beats for a measure. But it can also be a float, as the
+L<Music::Duration::Partition> module takes fractional numbers. For
+instance size C<2.5> represents C<5/8> time. Because a size of <5>
+represents C<5/4> time.
 
 Default: C<4>
 

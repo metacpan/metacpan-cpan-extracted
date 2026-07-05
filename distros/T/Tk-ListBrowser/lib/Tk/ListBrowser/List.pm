@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION = 0.10;
+$VERSION = 0.12;
 
 use base qw(Tk::ListBrowser::Row);
 

@@ -1,0 +1,43 @@
+# Version control
+^\.git/
+\.gitignore
+
+# ECA / session artefacts
+^agent/sessions/
+^agent/skills/cpan-release\.md$
+^\.eca/
+
+# Meta files (ECA / Claude — not part of the CPAN distribution)
+^CLAUDE\.md$
+^\.claude/
+
+# MCP server (not part of the CPAN distribution)
+^mcp/
+
+# User sandboxes — only README.md is distributed
+^sandboxes/
+# Exclude all sandbox content (.pm, .kb-hash, etc.)
+^\.kb-hash$
+
+# Build artefacts
+^blib/
+^_build/
+^Makefile$
+^MYMETA\.(yml|json)$
+^pm_to_blib
+^\.lwpcookies
+^cover_db/
+^nytprof/
+^MANIFEST\.bak$
+
+# Distribution tarballs
+\.tar\.gz$
+\.zip$
+Chorus-
+
+# Temp / editor files
+~$
+^\.\#
+\#$
+\.swp$
+\.orig$

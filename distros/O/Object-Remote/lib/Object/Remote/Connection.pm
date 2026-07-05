@@ -59,7 +59,7 @@ has read_channel => (
 );
 
 has on_close => (
-  is => 'rw', default => sub { $_[0]->_install_future_handlers(Future->new) },
+  is => 'rw', default => sub { $_[0]->_install_future_handlers(Object::Remote->current_loop->new_future) },
   trigger => sub {
     log_trace { "Installing handlers into future via trigger" };
     $_[0]->_install_future_handlers($_[1])
@@ -315,6 +315,7 @@ sub register_remote {
 
 sub send_free {
   my ($self, $id) = @_;
+  $id = '' unless defined $id;
   Dlog_trace { "sending request to free object '$id' for connection $_" } $self->_id;
   #TODO this shows up some times when a remote side dies in the middle of a remote
   #method invocation - possibly only when the object is being constructed?
@@ -326,7 +327,7 @@ sub send_free {
 sub send {
   my ($self, $type, @call) = @_;
 
-  my $future = Future->new;
+  my $future = Object::Remote->current_loop->new_future;
   my $remote = $self->remote_objects_by_id->{$call[0]};
 
   unshift @call, $type => $self->_local_object_to_id($future);
@@ -463,6 +464,7 @@ sub _receive {
 
 sub receive_free {
   my ($self, $id) = @_;
+  $id = '' unless defined $id;
   Dlog_trace { "got a receive_free for object '$id' for connection $_" } $self->_id;
   delete $self->local_objects_by_id->{$id}
     or warn "Free: no such object $id";

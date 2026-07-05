@@ -1,0 +1,53 @@
+##
+# RULE: R02-lb-stud-section
+# AGENT: CobIntro::Agent::Domain  (pos. 2 / 4)
+# CORPUS: §3.2 — BS EN 1995-1-1 §5.2 — Minimum cross-section for load-bearing studs
+#
+# PURPOSE
+#   Checks that the cross-section (b × h) of load-bearing studs meets the
+#   minimum required by §3.2, depending on clear height and stud spacing.
+#   Non-load-bearing studs and other types are skipped silently.
+#
+# INPUTS  (slots read)
+#   needs_domain    : targeting slot — set by Qualification R04
+#   type_element    : must be 'load_bearing_stud'
+#   section_b_mm    : float — section width b (mm)
+#   section_h_mm    : float — section height h (mm)
+#   clear_height_mm : float — clear storey height (mm) — defaults to 0 if absent
+#   stud_spacing_mm : float — centre-to-centre spacing (mm) — defaults to 400 if absent
+#
+# OUTPUTS (slots written)
+#   frame_ok     : 'NO' — element rejected if section below minimum
+#   domain_note  : description of the failure (actual vs required)
+#   needs_domain : deleted after rejection
+#
+# HELPERS
+#   lb_stud_section_min($clear_height_mm, $spacing_mm) → ($b_min, $h_min)
+#
+# GUARD — EXCEPTION: defined $f->{frame_ok}
+#   Idempotence — prevents re-processing an already-processed Frame.
+##
+RULE: R02-lb-stud-section
+FIND:
+  f:
+    attribut: needs_domain
+EXCEPTION: defined $f->{frame_ok}
+CONDITION: "($f->{type_element}//'') eq 'load_bearing_stud' && defined $f->{section_b_mm} && defined $f->{section_h_mm}"
+ACTION: |
+  # Look up minimum section from §3.2 table
+  my ($b_min, $h_min) = lb_stud_section_min(
+    $f->{clear_height_mm} // 0,
+    $f->{stud_spacing_mm} // 400
+  );
+
+  # §3.2 — section compliant if b >= b_min AND h >= h_min
+  if ($f->{section_b_mm} < $b_min || $f->{section_h_mm} < $h_min) {
+    $f->set('frame_ok', 'NO');
+    $f->set('domain_note',
+      sprintf("LB stud section %d×%d mm < min %d×%d mm (§3.2 BS EN 1995-1-1 §5.2)",
+        $f->{section_b_mm}, $f->{section_h_mm}, $b_min, $h_min));
+    $f->set('needs_fire', 1);   # propagate to Fire even on domain rejection
+    $f->delete('needs_domain');
+    return 1;
+  }
+  1

@@ -1,0 +1,73 @@
+---
+abstract: 'An unofficial Perl client for OpenSearch'
+author:
+  - 'Mark Dootson <mdootson@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  IO::Socket::SSL: '0'
+  Log::Any::Adapter::Callback: '0.09'
+  POSIX: '0'
+  TAP::Harness::JUnit: '0'
+  Test::Deep: '0'
+  Test::EOL: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::NoTabs: '0'
+  YAML: '0'
+  YAML::XS: '0'
+  base: '2.18'
+  lib: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenSearch-Client
+recommends:
+  URI::Escape::XS: '0'
+requires:
+  Any::URI::Escape: '0'
+  Data::Dumper: '0'
+  Devel::GlobalDestruction: '0'
+  Encode: '0'
+  HTTP::Headers: '0'
+  HTTP::Request: '0'
+  HTTP::Tiny: '0.089'
+  IO::Compress::Deflate: '0'
+  IO::Compress::Gzip: '0'
+  IO::Select: '0'
+  IO::Socket: '0'
+  IO::Uncompress::Gunzip: '0'
+  IO::Uncompress::Inflate: '0'
+  JSON::MaybeXS: '1.002002'
+  JSON::PP: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  Log::Any: '1.02'
+  Log::Any::Adapter: '0'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Moo: '2.001000'
+  Moo::Role: '0'
+  Net::IP: '0'
+  Package::Stash: '0.34'
+  Scalar::Util: '0'
+  Sub::Exporter: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  namespace::clean: '0'
+  overload: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/markdootson/opensearch-client-perl/issues
+  homepage: https://metacpan.org/pod/OpenSearch::Client
+  repository: git://github.com/markdootson/opensearch-client-perl.git
+version: '3.007005'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Apache-2.0

@@ -1,5 +1,6 @@
 use strictures 1;
 use Test::More;
+use Errno qw(EPIPE);
 
 $ENV{OBJECT_REMOTE_TEST_LOGGER} = 1;
 
@@ -19,7 +20,12 @@ alarm(3);
 
 eval { $remote->hang };
 
-like($@, qr/^Object::Remote connection lost: (?:eof|.*Broken pipe)/, "Correct error message");
+my $pipe_error = do {
+  local $! = EPIPE;
+  "$!";
+};
+
+like($@, qr/^Object::Remote connection lost: (?:eof|.*\Q$pipe_error\E)/, "Correct error message");
 
 done_testing;
 
@@ -38,8 +44,3 @@ sub hang {
     sleep(1);
   }
 }
-
-
-
-
-

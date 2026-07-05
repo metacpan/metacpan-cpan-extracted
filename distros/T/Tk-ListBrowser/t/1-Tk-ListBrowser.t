@@ -393,6 +393,7 @@ push @tests, (
 		return \@l
 	}, [], 'selectionGet no selection' ],
 	[ sub {
+		$ib->refresh;
 		return defined $ib->anchorGet
 	}, '', 'anchorGet no anchor' ],
 	[ sub {

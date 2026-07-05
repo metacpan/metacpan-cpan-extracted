@@ -1,5 +1,16 @@
 Revision history for Perl extension Command-Run
 
+1.02 2026-07-05T01:19:46Z
+
+    - Fix PerlIO encoding layer accumulation on STDIN/STDOUT in
+      nofork mode.  Layer changes are now undone before restoring
+      the handles, so long-running processes no longer degrade.
+      With the fix, nofork with :encoding is 50x faster than
+      before (316/s -> 15,997/s) and raw mode is optional rather
+      than necessary.
+    - Raw mode no longer leaks the :utf8 flag to the caller's
+      standard filehandles.
+
 1.01 2026-06-03T08:12:11Z
 
     - Tmpfile: add raw mode (new(raw => 1)) for byte-transparent

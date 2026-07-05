@@ -36,7 +36,6 @@ eval {
     diag "";
     diag "Client:   " . ref($es);
     diag "Cxn:      " . $es->transport->cxn_pool->cxn_factory->cxn_class;
-    diag "GET Body: " . $es->transport->send_get_body_as;
     diag "";
     pass "OS Version";
 } or fail "OS Version";

@@ -1,0 +1,44 @@
+##
+# RULE: R03-deflection
+# AGENT: CobIntro::Agent::Qualification  (pos. 1 / 4)
+# CORPUS: §2.3 — EC5 §7.2 — Instantaneous deflection limit L/300
+#
+# PURPOSE
+#   Checks that the measured instantaneous deflection does not exceed L/300,
+#   with a minimum floor value of 5 mm over 2 m span (§2.3 EC5 §7.2).
+#   Elements without deflection_mm or span_mm are skipped silently.
+#
+# INPUTS  (slots read)
+#   needs_qualify  : targeting slot — set by Feed
+#   deflection_mm  : float — measured deflection in mm
+#   span_mm        : float — element span in mm (must be > 0)
+#
+# OUTPUTS (slots written)
+#   qualified        : 'NO' — element rejected if deflection > L/300
+#   rejection_reason : description of the failure
+#   needs_qualify    : deleted after rejection
+#
+# GUARD — EXCEPTION: defined $f->{qualified}
+#   Idempotence — prevents re-processing an already-qualified Frame.
+##
+RULE: R03-deflection
+FIND:
+  f:
+    attribut: needs_qualify
+EXCEPTION: defined $f->{qualified}
+CONDITION: "defined $f->{deflection_mm} && defined $f->{span_mm} && $f->{span_mm} > 0"
+ACTION: |
+  # §2.3 — allowable deflection = L/300, minimum 5 mm over 2 m span
+  my $limit = $f->{span_mm} / 300;
+  $limit = 5 if $limit < 5;
+
+  if ($f->{deflection_mm} > $limit) {
+    $f->set('qualified', 'NO');
+    $f->set('rejection_reason',
+      sprintf("Deflection %.1f mm exceeds L/300 = %.1f mm (§2.3 EC5 §7.2)",
+        $f->{deflection_mm}, $limit));
+    $f->set('needs_domain', 1);   # propagate through pipeline even on rejection
+    $f->delete('needs_qualify');
+    return 1;
+  }
+  1

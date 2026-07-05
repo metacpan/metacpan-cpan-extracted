@@ -6,10 +6,11 @@ use warnings;
 use CLI::Simple qw(:roles);
 use parent qw(CLI::Simple);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.4';
 
 use Role::Tiny::With;
 with 'CPAN::Maker::Bootstrapper::Role::Init';
+with 'CPAN::Maker::Bootstrapper::Role::LLM::Utils';
 
 __PACKAGE__->use_log4perl( level => 'info' );
 
@@ -57,9 +58,13 @@ CPAN::Maker::Bootstrapper - Scaffold a new CPAN distribution in one command
 
 =head1 DESCRIPTION
 
-L<https://github.com/rlauer6/CPAN-Maker-Bootstrapper/actions/workflows/build.yml>
+=begin markdown
 
-L<CPAN::Maker::Bootstrapper> scaffolds a new CPAN distribution directory
+[![CPAN::Maker::Bootstrapper](https://github.com/rlauer6/CPAN-Maker-Bootstrapper/actions/workflows/build.yml/badge.svg)](https://github.com/rlauer6/CPAN-Maker-Bootstrapper/actions/workflows/build.yml)
+
+=end markdown
+
+C<CPAN::Maker::Bootstrapper> scaffolds a new CPAN distribution directory
 ready to build immediately. It installs a project Makefile, a
 C<buildspec.yml> pre-populated from your git config, stub source and test
 files, and supporting makefiles - then runs C<make> to generate the initial

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Transport;
-$OpenSearch::Client::Role::Transport::VERSION = '3.007002';
+$OpenSearch::Client::Role::Transport::VERSION = '3.007005';
 use Moo::Role;
 
 requires qw(perform_request);
@@ -32,7 +32,7 @@ use namespace::clean;
 
 has 'serializer'       => ( is => 'ro', required => 1 );
 has 'logger'           => ( is => 'ro', required => 1 );
-has 'send_get_body_as' => ( is => 'ro', default  => 'GET' );
+has 'send_body_as_source' => ( is => 'ro', default  => 0 );
 has 'cxn_pool'         => ( is => 'ro', required => 1 );
 
 #===================================
@@ -62,15 +62,9 @@ sub tidy_request {
         ? $self->serializer->encode($body)
         : $self->serializer->encode_bulk($body);
 
-    if ( $params->{method} eq 'GET' ) {
-        my $send_as = $self->send_get_body_as;
-        if ( $send_as eq 'POST' ) {
-            $params->{method} = 'POST';
-        }
-        elsif ( $send_as eq 'source' ) {
-            $params->{qs}{source} = delete $params->{data};
-            delete $params->{body};
-        }
+    if ( $self->send_body_as_source ) {
+        $params->{qs}{source} = delete $params->{data};
+        delete $params->{body};
     }
     
     if ( $params->{serialize} eq 'bulk' ) {
@@ -96,7 +90,7 @@ OpenSearch::Client::Role::Transport - Transport role providing interface between
 
 =head1 VERSION
 
-version 3.007002
+version 3.007005
 
 =head1 MANUAL
 

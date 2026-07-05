@@ -1,5 +1,14 @@
 Revision history for Crypt-OpenSSL3
 
+0.010     2026-07-04 16:49:07+02:00 Europe/Brussels
+          - Change license to Apache 2.0
+          - Add support for decoding der from/to strings.
+          - Add ASN1::Value for generic ASN1 values
+          - Add get_all_certs to X509::Store
+          - Add PEM helper functions
+          - Add EDIPartyName class
+          - Fix various memory management issues
+
 0.009     2026-06-25 02:52:08+02:00 Europe/Brussels
           - [BREAKING] Remove ASN1 value classes
           - Remove X509::Stack

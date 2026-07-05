@@ -9,6 +9,16 @@
 #6 c226.c226
 #7 c226.def
 #8 comments.comments6
+#9 git197.def
+#10 git197.git197
+#11 blpc.blpc
+#12 blpc.def
+#13 git205.def
+#14 git205.git205
+#15 here_indent.def
+#16 here_indent.here_indent1
+#17 here_indent.here_indent2
+#18 here_indent.here_indent3
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -26,6 +36,10 @@ BEGIN {
     # BEGIN SECTION 1: Parameter combinations #
     ###########################################
     $rparams = {
+        'blpc' => <<'----------',
+-blpc
+-ce
+----------
         'boct' => <<'----------',
 -boc -boct='f( ;'
 ----------
@@ -40,12 +54,52 @@ BEGIN {
 -dsc
 -ndfsfs
 ----------
+        'git197' => <<'----------',
+--maximum-line-length=100
+--continuation-indentation=4
+--extended-continuation-indentation
+----------
+        'git205' => <<'----------',
+--cuddled-blocks
+--cuddled-block-list=sort,map,grep
+----------
+        'here_indent1' => <<'----------',
+-heredoc-indentation-update
+-heredoc-excess-length-option=3
+-maximum-line-length=54
+----------
+        'here_indent2' => <<'----------',
+-heredoc-indentation-update
+-heredoc-convert-to='indented'
+-heredoc-extra-spaces='0;4'
+
+----------
+        'here_indent3' => <<'----------',
+-heredoc-convert-to='standard'
+# convert all to standard except IND3
+-heredoc-tag-exclusion-pattern='3$'
+----------
     };
 
     ############################
     # BEGIN SECTION 2: Sources #
     ############################
     $rsources = {
+
+        'blpc' => <<'----------',
+sub baz {
+    if ($foo) {
+        print "foo\n";
+    }
+
+    elsif ('x') {
+        #
+    }
+    else {
+        print "fo\n";
+    }
+}
+----------
 
         'boct' => <<'----------',
 my @list = (
@@ -201,6 +255,59 @@ my @list2; # this will be deleted with -dsc
              1, 2, 1,
              1, 3, 3, 1,
              1, 4, 6, 4, 1,);
+----------
+
+        'git197' => <<'----------',
+sub foo {
+    some_function_name(
+        sub { return some_function_name( 'foo', 'bar', 'baz', 'foobar', 'foobaz', '1234567' ); }, );
+}
+
+----------
+
+        'git205' => <<'----------',
+sub baz {
+    if ($foo) {
+        print "foo\n";
+
+    }
+    else {
+        print "fo\n";
+    }
+    grep { $_ > 1 } qw(3 2 1 0);
+}
+----------
+
+        'here_indent' => <<'----------',
+{
+    my $name = "Sir or Madam";
+    my $amt  = 3141.59;
+    ## line with both types of here docs
+    my $text = <<STD1 . <<~IND1 . <<STD2;
+=====
+STD1
+ Dear $name,
+
+ You just won \$$amt at our lottery!
+   To claim your prize, just click on the link below
+ IND1
+   **freemoney.malware.com**
+====
+STD2
+    print $text;
+}
+
+my %hash = (
+    no_text => <<~'IND2',
+  IND2
+    text_and_empty => <<~'IND3',
+  IND3 line 1
+
+  IND3
+    standard => <<'STD3',
+STD3 line 1
+STD3
+);
 ----------
     };
 
@@ -434,6 +541,248 @@ Some pod after __END__ to delete with -dp and trim with -trp
 
 
 #8...........
+        },
+
+        'git197.def' => {
+            source => "git197",
+            params => "def",
+            expect => <<'#9...........',
+sub foo {
+    some_function_name(
+        sub {
+            return some_function_name( 'foo', 'bar', 'baz', 'foobar', 'foobaz',
+                '1234567' );
+        },
+    );
+}
+
+#9...........
+        },
+
+        'git197.git197' => {
+            source => "git197",
+            params => "git197",
+            expect => <<'#10...........',
+sub foo {
+    some_function_name(
+        sub { return some_function_name( 'foo', 'bar', 'baz', 'foobar', 'foobaz', '1234567' ); }, );
+}
+
+#10...........
+        },
+
+        'blpc.blpc' => {
+            source => "blpc",
+            params => "blpc",
+            expect => <<'#11...........',
+sub baz {
+    if ($foo) {
+        print "foo\n";
+    }
+
+    elsif ('x') {
+        #
+    } else {
+        print "fo\n";
+    }
+}
+#11...........
+        },
+
+        'blpc.def' => {
+            source => "blpc",
+            params => "def",
+            expect => <<'#12...........',
+sub baz {
+    if ($foo) {
+        print "foo\n";
+    }
+
+    elsif ('x') {
+        #
+    }
+    else {
+        print "fo\n";
+    }
+}
+#12...........
+        },
+
+        'git205.def' => {
+            source => "git205",
+            params => "def",
+            expect => <<'#13...........',
+sub baz {
+    if ($foo) {
+        print "foo\n";
+
+    }
+    else {
+        print "fo\n";
+    }
+    grep { $_ > 1 } qw(3 2 1 0);
+}
+#13...........
+        },
+
+        'git205.git205' => {
+            source => "git205",
+            params => "git205",
+            expect => <<'#14...........',
+sub baz {
+    if ($foo) {
+        print "foo\n";
+
+    } else {
+        print "fo\n";
+    }
+    grep { $_ > 1 } qw(3 2 1 0);
+}
+#14...........
+        },
+
+        'here_indent.def' => {
+            source => "here_indent",
+            params => "def",
+            expect => <<'#15...........',
+{
+    my $name = "Sir or Madam";
+    my $amt  = 3141.59;
+    ## line with both types of here docs
+    my $text = <<STD1 . <<~IND1 . <<STD2;
+=====
+STD1
+ Dear $name,
+
+ You just won \$$amt at our lottery!
+   To claim your prize, just click on the link below
+ IND1
+   **freemoney.malware.com**
+====
+STD2
+    print $text;
+}
+
+my %hash = (
+    no_text => <<~'IND2',
+  IND2
+    text_and_empty => <<~'IND3',
+  IND3 line 1
+
+  IND3
+    standard => <<'STD3',
+STD3 line 1
+STD3
+);
+#15...........
+        },
+
+        'here_indent.here_indent1' => {
+            source => "here_indent",
+            params => "here_indent1",
+            expect => <<'#16...........',
+{
+    my $name = "Sir or Madam";
+    my $amt  = 3141.59;
+    ## line with both types of here docs
+    my $text = <<STD1 . <<~IND1 . <<STD2;
+=====
+STD1
+   Dear $name,
+
+   You just won \$$amt at our lottery!
+     To claim your prize, just click on the link below
+   IND1
+   **freemoney.malware.com**
+====
+STD2
+    print $text;
+}
+
+my %hash = (
+    no_text => <<~'IND2',
+    IND2
+    text_and_empty => <<~'IND3',
+    IND3 line 1
+
+    IND3
+    standard => <<'STD3',
+STD3 line 1
+STD3
+);
+#16...........
+        },
+
+        'here_indent.here_indent2' => {
+            source => "here_indent",
+            params => "here_indent2",
+            expect => <<'#17...........',
+{
+    my $name = "Sir or Madam";
+    my $amt  = 3141.59;
+    ## line with both types of here docs
+    my $text = <<~STD1 . <<~IND1 . <<~STD2;
+    =====
+    STD1
+    Dear $name,
+
+    You just won \$$amt at our lottery!
+      To claim your prize, just click on the link below
+    IND1
+       **freemoney.malware.com**
+    ====
+    STD2
+    print $text;
+}
+
+my %hash = (
+    no_text => <<~'IND2',
+        IND2
+    text_and_empty => <<~'IND3',
+        IND3 line 1
+
+        IND3
+    standard => <<~'STD3',
+        STD3 line 1
+        STD3
+);
+#17...........
+        },
+
+        'here_indent.here_indent3' => {
+            source => "here_indent",
+            params => "here_indent3",
+            expect => <<'#18...........',
+{
+    my $name = "Sir or Madam";
+    my $amt  = 3141.59;
+    ## line with both types of here docs
+    my $text = <<STD1 . <<IND1 . <<STD2;
+=====
+STD1
+Dear $name,
+
+You just won \$$amt at our lottery!
+  To claim your prize, just click on the link below
+IND1
+   **freemoney.malware.com**
+====
+STD2
+    print $text;
+}
+
+my %hash = (
+    no_text => <<'IND2',
+IND2
+    text_and_empty => <<~'IND3',
+  IND3 line 1
+
+  IND3
+    standard => <<'STD3',
+STD3 line 1
+STD3
+);
+#18...........
         },
     };
 

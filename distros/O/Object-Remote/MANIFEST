@@ -23,6 +23,7 @@ lib/Object/Remote/Logging/LogAnyInjector.pm
 lib/Object/Remote/Logging/Logger.pm
 lib/Object/Remote/Logging/Router.pm
 lib/Object/Remote/Logging/TestLogger.pm
+lib/Object/Remote/Loop.pm
 lib/Object/Remote/MiniLoop.pm
 lib/Object/Remote/ModuleLoader.pm
 lib/Object/Remote/ModuleSender.pm

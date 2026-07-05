@@ -1,0 +1,86 @@
+{
+   "abstract" : "Analyse a CPAN distribution and produce a comprehensive health report",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-CPAN-Health",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Audit" : "0",
+            "CPAN::Meta" : "0",
+            "Carp" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "File::Find::Rule" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::CPANTS::Analyse" : "0",
+            "Object::Configure" : "0",
+            "Params::Get" : "0",
+            "Params::Validate::Strict" : "0.35",
+            "Perl::Critic" : "0",
+            "Perl::Metrics::Simple" : "0",
+            "Perl::MinimumVersion" : "0",
+            "Pod::Checker" : "0",
+            "Pod::Coverage" : "0",
+            "Readonly" : "2",
+            "Scalar::Util" : "0",
+            "Sub::Protected" : "0",
+            "Term::ANSIColor" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IPC::System::Simple" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0",
+            "Test::Most" : "0",
+            "Test::Returns" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nigelhorne/Test-CPAN-Health/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nigelhorne/Test-CPAN-Health.git",
+         "web" : "https://github.com/nigelhorne/Test-CPAN-Health"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

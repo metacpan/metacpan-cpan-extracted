@@ -1,0 +1,41 @@
+##
+# RULE: R03-nlb-stud-section
+# AGENT: CobIntro::Agent::Domain  (pos. 2 / 4)
+# CORPUS: §3.3 — BS EN 1995-1-1 — Minimum cross-section for non-load-bearing studs
+#
+# PURPOSE
+#   Checks that the cross-section of non-load-bearing studs is at least
+#   38 × 63 mm as required by §3.3, regardless of clear height.
+#
+# INPUTS  (slots read)
+#   needs_domain : targeting slot — set by Qualification R04
+#   type_element : must be 'non_lb_stud'
+#   section_b_mm : float — section width b (mm)
+#   section_h_mm : float — section height h (mm)
+#
+# OUTPUTS (slots written)
+#   frame_ok     : 'NO' — element rejected if section below 38×63 mm
+#   domain_note  : description of the failure
+#   needs_domain : deleted after rejection
+#
+# GUARD — EXCEPTION: defined $f->{frame_ok}
+#   Idempotence — prevents re-processing an already-processed Frame.
+##
+RULE: R03-nlb-stud-section
+FIND:
+  f:
+    attribut: needs_domain
+EXCEPTION: defined $f->{frame_ok}
+CONDITION: "($f->{type_element}//'') eq 'non_lb_stud' && defined $f->{section_b_mm} && defined $f->{section_h_mm}"
+ACTION: |
+  # §3.3 — minimum section for non-load-bearing studs: 38 × 63 mm
+  if ($f->{section_b_mm} < 38 || $f->{section_h_mm} < 63) {
+    $f->set('frame_ok', 'NO');
+    $f->set('domain_note',
+      sprintf("NLB stud section %d×%d mm < min 38×63 mm (§3.3)",
+        $f->{section_b_mm}, $f->{section_h_mm}));
+    $f->set('needs_fire', 1);   # propagate to Fire even on domain rejection
+    $f->delete('needs_domain');
+    return 1;
+  }
+  1

@@ -1,0 +1,276 @@
+#+TITLE: Agent Domain
+#+AGENT: CobIntro::Agent::Domain
+#+PIPELINE_POS: 2
+#+RULES_DIR: rules/domain/
+
+* Domain
+  Validates the structural geometry and thermal/vapour performance of each element:
+  - §3.1 BS EN 1995-1-1 §5.1 — Stud centre-to-centre spacing [300, 600] mm
+  - §3.2 BS EN 1995-1-1 §5.2 — Minimum cross-section for load-bearing studs
+  - §3.3 — Minimum cross-section for non-load-bearing studs (38 × 63 mm)
+  - §3.4 BS EN 1995-1-1 §5.4 — No longitudinal splice on load-bearing studs
+  - §4.1 Part L / BS EN ISO 6946 — Minimum thermal resistance R by climate zone
+  - §4.2 BS 5250 / BS EN ISO 13788 — Minimum Sd value of vapour control layer
+
+  Receives ~needs_domain~ set by Agent::Qualification.
+  Sets ~frame_ok = 'YES'|'NO'~ and ~domain_note~ (optional detail).
+  On YES: sets ~needs_fire~ to trigger Agent::Fire.
+
+* Targeting Slots                                                        :SCOPE:
+** Chosen Strategy
+   Strategy B — presence slot ~needs_domain~ set by Agent::Qualification (R04).
+   Chosen strategy : B
+   Justification   : Only elements that passed qualification carry this slot.
+
+** Targeting Slots Table
+   | Slot          | Strategy | Set by                         | Value / condition        |
+   |---------------+----------+--------------------------------+--------------------------|
+   | needs_domain  | B        | CobIntro::Agent::Qualification | existence alone suffices |
+
+** Pre-Population Contract
+   Before this agent becomes active, each processed Frame must carry:
+   - slot ~needs_domain~ — set by: Agent::Qualification R04
+
+* Pipeline — I/O Contract
+** Incoming Slots
+   | Slot              | Source  | Set by               | Description                              |
+   |-------------------+---------+----------------------+------------------------------------------|
+   | needs_domain      | Element | Qualification R04    | Targeting slot                           |
+   | type_element      | Element | Feed                 | Element type routing                     |
+   | stud_spacing_mm   | Element | Feed                 | Centre-to-centre stud spacing (mm)       |
+   | clear_height_mm   | Element | Feed                 | Clear storey height (mm)                 |
+   | section_b_mm      | Element | Feed                 | Cross-section width b (mm)               |
+   | section_h_mm      | Element | Feed                 | Cross-section height h (mm)              |
+   | has_splice        | Element | Feed                 | 1 if longitudinal splice present         |
+   | insulation_thick  | Element | Feed                 | Insulation thickness (mm)                |
+   | insulation_lambda | Element | Feed                 | Thermal conductivity λ W/(m·K)           |
+   | climate_zone      | Element | Feed                 | A / B / C                                |
+   | vcl_sd_value      | Element | Feed                 | Vapour control layer Sd value (m)        |
+   | service_class     | Element | Feed                 | 1 / 2 / 3 (BS 5250)                      |
+
+** Outgoing Slots
+   | Slot          | Target  | Type / values | Description                                     |
+   |---------------+---------+---------------+-------------------------------------------------|
+   | frame_ok      | Element | YES / NO      | Domain compliance verdict                       |
+   | domain_note   | Element | string        | Detail of the first failing criterion (if NO)   |
+   | needs_fire    | Element | 1             | Targeting slot for Agent::Fire (set if YES)     |
+
+* Ontology
+  Same ~Element~ Frame as defined in Agent::Qualification.
+  No new Frame types. New slots added for geometry and thermal data.
+
+* Frame Catalogue
+** Frame: Element (continued)
+   Role: Same as qualification; extended with domain slots.
+
+   | Slot              | Type   | Values / range    | Constraint   | Description                        |
+   |-------------------+--------+-------------------+--------------+------------------------------------|
+   | needs_domain      | flag   | 1 / undef         | set upstream | Targeting slot for this agent      |
+   | stud_spacing_mm   | float  | 300..600          | optional     | Stud spacing (mm)                  |
+   | clear_height_mm   | float  | > 0               | optional     | Clear storey height (mm)           |
+   | section_b_mm      | float  | > 0               | optional     | Section width b (mm)               |
+   | section_h_mm      | float  | > 0               | optional     | Section height h (mm)              |
+   | has_splice        | int    | 0 / 1             | optional     | Longitudinal splice present        |
+   | insulation_thick  | float  | > 0               | optional     | Thickness mm                       |
+   | insulation_lambda | float  | > 0               | optional     | λ W/(m·K)                          |
+   | climate_zone      | str    | A / B / C         | optional     | Climate zone                       |
+   | vcl_sd_value      | float  | ≥ 0               | optional     | Sd value (m)                       |
+   | service_class     | int    | 1 / 2 / 3         | optional     | Service class BS 5250              |
+   | frame_ok          | str    | YES / NO          | set here     | Domain verdict                     |
+   | domain_note       | str    | free text         | set if NO    | Failure detail                     |
+   | needs_fire        | flag   | 1 / undef         | set if YES   | Targeting slot for Agent::Fire     |
+
+* Slot Dictionary
+  | Slot              | Frame    | Role                   | fmatch target? |
+  |-------------------+----------+------------------------+----------------|
+  | needs_domain      | Element  | _SCOPE targeting       | yes            |
+  | type_element      | Element  | read — routing         | no             |
+  | stud_spacing_mm   | Element  | read — spacing check   | no             |
+  | clear_height_mm   | Element  | read — section check   | no             |
+  | section_b_mm      | Element  | read — section b       | no             |
+  | section_h_mm      | Element  | read — section h       | no             |
+  | has_splice        | Element  | read — splice check    | no             |
+  | insulation_thick  | Element  | read — thermal calc    | no             |
+  | insulation_lambda | Element  | read — thermal calc    | no             |
+  | climate_zone      | Element  | read — R_min lookup    | no             |
+  | vcl_sd_value      | Element  | read — Sd check        | no             |
+  | service_class     | Element  | read — Sd min lookup   | no             |
+  | frame_ok          | Element  | write — verdict        | no             |
+  | domain_note       | Element  | write — failure detail | no             |
+  | needs_fire        | Element  | write — next targeting | yes (agent 3)  |
+
+* Rule Catalogue
+** Rule: R01-stud-spacing
+   Intent    : Check stud spacing ∈ [300, 600] mm for stud types (§3.1)
+   FIND      : ~f~ → attribut: ~needs_domain~
+   EXCEPTION : ~defined $f->{frame_ok}~
+   CONDITION : ~($f->{type_element}//'') =~ /stud/ && defined $f->{stud_spacing_mm}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my $sp = $f->{stud_spacing_mm};
+   if ($sp < 300 || $sp > 600) {
+     $f->set('frame_ok', 'NO');
+     $f->set('domain_note', "Stud spacing ${sp}mm outside [300,600] mm (§3.1)");
+     $f->delete('needs_domain');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R02-lb-stud-section
+   Intent    : Check minimum cross-section for load-bearing studs (§3.2)
+   FIND      : ~f~ → attribut: ~needs_domain~
+   EXCEPTION : ~defined $f->{frame_ok}~
+   CONDITION : ~($f->{type_element}//'') eq 'load_bearing_stud' && defined $f->{section_b_mm} && defined $f->{section_h_mm}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my ($b_min, $h_min) = lb_stud_section_min($f->{clear_height_mm}//0, $f->{stud_spacing_mm}//400);
+   if ($f->{section_b_mm} < $b_min || $f->{section_h_mm} < $h_min) {
+     $f->set('frame_ok', 'NO');
+     $f->set('domain_note',
+       sprintf("LB stud section %d×%d mm < min %d×%d mm (§3.2)",
+         $f->{section_b_mm}, $f->{section_h_mm}, $b_min, $h_min));
+     $f->delete('needs_domain');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R03-nlb-stud-section
+   Intent    : Check minimum cross-section 38×63 mm for non-load-bearing studs (§3.3)
+   FIND      : ~f~ → attribut: ~needs_domain~
+   EXCEPTION : ~defined $f->{frame_ok}~
+   CONDITION : ~($f->{type_element}//'') eq 'non_lb_stud' && defined $f->{section_b_mm} && defined $f->{section_h_mm}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   if ($f->{section_b_mm} < 38 || $f->{section_h_mm} < 63) {
+     $f->set('frame_ok', 'NO');
+     $f->set('domain_note',
+       sprintf("NLB stud section %d×%d mm < min 38×63 mm (§3.3)",
+         $f->{section_b_mm}, $f->{section_h_mm}));
+     $f->delete('needs_domain');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R04-stud-continuity
+   Intent    : Reject load-bearing stud with longitudinal splice (§3.4)
+   FIND      : ~f~ → attribut: ~needs_domain~
+   EXCEPTION : ~defined $f->{frame_ok}~
+   CONDITION : ~($f->{type_element}//'') eq 'load_bearing_stud' && defined $f->{has_splice}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   if ($f->{has_splice}) {
+     $f->set('frame_ok', 'NO');
+     $f->set('domain_note', "LB stud has longitudinal splice — structural non-conformity (§3.4)");
+     $f->delete('needs_domain');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R05-thermal-resistance
+   Intent    : Check thermal resistance R ≥ R_min by climate zone (§4.1)
+   FIND      : ~f~ → attribut: ~needs_domain~
+   EXCEPTION : ~defined $f->{frame_ok}~
+   CONDITION : ~($f->{type_element}//'') eq 'insulation' && defined $f->{insulation_thick} && defined $f->{insulation_lambda} && defined $f->{climate_zone}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my $R = $f->{insulation_thick} / (1000 * $f->{insulation_lambda});
+   my $R_min = thermal_r_min($f->{climate_zone});
+   if ($R < $R_min) {
+     $f->set('frame_ok', 'NO');
+     $f->set('domain_note',
+       sprintf("Thermal R=%.2f m²·K/W < R_min=%.1f (zone %s §4.1)", $R, $R_min, $f->{climate_zone}));
+     $f->delete('needs_domain');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R06-vapour-sd
+   Intent    : Check Sd value ≥ minimum by service class (§4.2)
+   FIND      : ~f~ → attribut: ~needs_domain~
+   EXCEPTION : ~defined $f->{frame_ok}~
+   CONDITION : ~($f->{type_element}//'') eq 'vapour_control_layer' && defined $f->{vcl_sd_value} && defined $f->{service_class}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my $sd_min = vcl_sd_min($f->{service_class});
+   if ($f->{vcl_sd_value} < $sd_min) {
+     $f->set('frame_ok', 'NO');
+     $f->set('domain_note',
+       sprintf("VCL Sd=%.1f m < min=%.0f m (class %d §4.2)", $f->{vcl_sd_value}, $sd_min, $f->{service_class}));
+     $f->delete('needs_domain');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R07-domain-conclude
+   Intent    : Mark domain OK for elements that passed all domain checks; trigger fire agent
+   FIND      : ~f~ → attribut: ~needs_domain~
+   EXCEPTION : ~defined $f->{frame_ok}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   $f->set('frame_ok', 'YES');
+   $f->set('needs_fire', 1);
+   $f->delete('needs_domain');
+   1
+   #+END_SRC
+
+* Perl Helpers
+** lb_stud_section_min
+   Signature   : ~sub lb_stud_section_min($clear_height_mm, $spacing_mm) → ($b_min, $h_min)~
+   Description : Returns minimum (b, h) mm for load-bearing studs per §3.2 table.
+   Called by   : R02-lb-stud-section
+   Exported    : yes
+   Notes       : Source corpus §3.2 — BS EN 1995-1-1 §5.2
+
+   #+BEGIN_SRC perl
+   # Source corpus: §3.2 — BS EN 1995-1-1 §5.2 — Minimum cross-sections LB studs
+   sub lb_stud_section_min {
+       my ($h, $sp) = @_;
+       return (44, 184) if $h > 3000;
+       if ($h <= 2700) {
+           return (38,  89) if $sp <= 400;
+           return (38, 140);
+       }
+       # 2700 < h <= 3000
+       return (38, 140) if $sp <= 400;
+       return (44, 140);
+   }
+   #+END_SRC
+
+** thermal_r_min
+   Signature   : ~sub thermal_r_min($zone) → $r_min~
+   Description : Returns minimum thermal resistance R (m²·K/W) by climate zone.
+   Called by   : R05-thermal-resistance
+   Exported    : yes
+   Notes       : Source corpus §4.1 — Part L + BS EN ISO 6946
+
+   #+BEGIN_SRC perl
+   # Source corpus: §4.1 — Part L + BS EN ISO 6946 — R_min by climate zone
+   my %R_MIN = (A => 6.5, B => 4.5, C => 3.5);
+   sub thermal_r_min { return $R_MIN{ $_[0] } // 4.5 }
+   #+END_SRC
+
+** vcl_sd_min
+   Signature   : ~sub vcl_sd_min($service_class) → $sd_min~
+   Description : Returns minimum Sd value (m) for vapour control layer by service class.
+   Called by   : R06-vapour-sd
+   Exported    : yes
+   Notes       : Source corpus §4.2 — BS 5250 / BS EN ISO 13788
+
+   #+BEGIN_SRC perl
+   # Source corpus: §4.2 — BS 5250 / BS EN ISO 13788 — Sd_min by service class
+   my %SD_MIN = (1 => 5, 2 => 18, 3 => 50);
+   sub vcl_sd_min { return $SD_MIN{ $_[0] } // 5 }
+   #+END_SRC
+
+* Constraints & Pitfalls
+  - [ ] R01-R06 are type-specific: elements of other types skip silently via CONDITION
+  - [ ] R07 fires on all remaining elements with ~needs_domain~ and no ~frame_ok~
+  - [ ] ~needs_domain~ deleted after processing (consumed targeting slot)
+  - [ ] Insulation and VCL elements skip all structural geometry rules (CONDITION type-guards)
+  - [ ] ~lb_stud_section_min~: clear_height defaults to 0 if absent (→ 38×89 bucket)

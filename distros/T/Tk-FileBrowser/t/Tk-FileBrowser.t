@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 23;
+use Test::More tests => 13;
 use Test::Tk;
 use Tk;
 
@@ -9,20 +9,19 @@ my $mswin = $Config{'osname'} eq 'MSWin32';
 
 
 BEGIN {
-	use_ok('Tk::FileBrowser::Header');
-	use_ok('Tk::FileBrowser::Images');
 	use_ok('Tk::FileBrowser');
 };
 
 #$delay = 1000;
-my $pause = 100;
+my $pause = 300;
 my $fb;
 my $testfolder = 't/testfolder';
 
 ########################################################
 #Setting up testfolder
 
-my @folders = ($testfolder, "$testfolder/Directory1", "$testfolder/directory2", "$testfolder/Folder1", "$testfolder/folder2");
+my @folders = ($testfolder, "$testfolder/Directory1", "$testfolder/directory2", "$testfolder/Folder1",
+	"$testfolder/folder2");
 #my @folders = ($testfolder);
 #my @folders = ();
 for (@folders) {
@@ -44,14 +43,20 @@ for (@folders) {
 
 sub shown {
 	my $path = shift;
-	$path = '' unless defined $path;
 	my @shown = ();
-	my @children = $fb->infoChildren($path);
+	my @children;
+	if (defined $path) {
+		@children = $fb->infoChildren($path);
+	} else {
+		@children = $fb->infoRoot;
+	}
 	for (@children) {
 		my $c = $_;
+		next if $c =~ /_place_holder_/;
 		unless ($fb->infoHidden($c)) {
 			push @shown, $c ;
-			if ($fb->infoData($c)->isDir) {
+			my $item = $fb->get($c);
+			if ($item->isDir) {
 				my $s = shown($c);
 				push @shown, @$s;
 			}
@@ -65,9 +70,11 @@ createapp;
 if (defined $app) {
 	$app->geometry('640x400+100+100');
 	$fb = $app->FileBrowser(
-		-columns => [qw[Size Modified Link Big]],
+		-columns => [qw[Size Modified Type Link Big]],
 		-columntypes => [
 			Big => {
+				data => sub { my $i = shift; return $i->type },
+				options => [-sortfield => 'data', -sortnumerical => 1],
 				display => sub {
 					my $data = shift;
 					my $size = $data->size;
@@ -78,12 +85,11 @@ if (defined $app) {
 				test => sub {
 					return $fb->testSize(@_);
 				},
+				width => 40,
 			},
 		],
 #		-directoriesfirst => 0,
 		-invokefile => sub { my $f = shift; print "invoking: $f\n" },
-#		-refreshfilterfolders => 1,
-		-selectmode => 'extended',
 #		-showhidden => 1,
 #		-sorton => 'Modified',
 #		-sorton => 'Size',
@@ -92,125 +98,98 @@ if (defined $app) {
 		-expand => 1,
 		-fill => 'both',
 	);
+	$app->Button(
+		-text => 'Refresh',
+		-command => sub { $fb->refresh },
+	)->pack;
 }
 
-testaccessors($fb, 'noRefresh', 'sorton', 'sortorder');
-
-my @firstload = ('Directory1', 'directory2', 'Folder1', 'folder2', 'File1.txt', 'file2.txt', 'Link1', 'link2');
+#testaccessors($fb, 'noRefresh', 'sorton', 'sortorder');
+#
+my @firstload = ('Directory1', 'directory2', 'Folder1', 'folder2', 'File1.txt', 'file2.txt',
+	'Link1', 'link2');
 @firstload = ('Directory1', 'directory2', 'Folder1', 'folder2', 'File1.txt', 'file2.txt') if $mswin;
+
 my @nodirsfirst = ('Directory1', 'directory2', 'File1.txt', 'file2.txt', 'Folder1', 'folder2', 'Link1', 'link2');
 @nodirsfirst = ('Directory1', 'directory2', 'File1.txt', 'file2.txt', 'Folder1', 'folder2') if $mswin;
+
 my @casesort = ('Directory1', 'File1.txt', 'Folder1', 'Link1', 'directory2', 'file2.txt', 'folder2', 'link2');
 @casesort = ('Directory1', 'File1.txt', 'Folder1', 'directory2', 'file2.txt', 'folder2') if $mswin;
-my @descendingsort = ('link2', 'folder2',  'file2.txt', 'directory2', 'Link1', 'Folder1', 'File1.txt', 'Directory1', );
-@descendingsort = ('folder2',  'file2.txt', 'directory2', 'Folder1', 'File1.txt', 'Directory1') if $mswin;
+
+my @descendingsort = ('link2', 'folder2', 'file2.txt', 'directory2','Link1', 'Folder1', 'File1.txt', 'Directory1');
+@descendingsort =  ('folder2', 'file2.txt', 'directory2', 'Folder1',  'File1.txt', 'Directory1') if $mswin;
+
 my @filter = ('folder2',  'file2.txt', 'directory2', 'Folder1', 'File1.txt', 'Directory1', );
+
 my @filtercase = ('folder2',  'file2.txt', 'directory2', 'Folder1', 'Directory1', );
+
 my @filterfolders = ('file2.txt', 'File1.txt');
+
 my @filterfolderscase = ('file2.txt');
 
 push @tests, (
 	[ sub { return defined $fb }, 1, 'FileBrowser widget created' ],
-	[ sub { return defined $fb->Subwidget('Tree') }, 1, 'Tree widget found' ],
+	[ sub { return defined $fb->Subwidget('LB') }, 1, 'ListBrowser widget found' ],
 
-	[ sub { 
-		$fb->load($testfolder); 
+	[ sub {
+		$fb->load($testfolder);
 		pause($pause);
-		return shown; 
+		my $shown = shown;
+		return $shown;
 	}, \@firstload, 'Loaded testfolder' ],
 
-	[ sub { 
+	[ sub {
 		$fb->configure(-directoriesfirst => 0);
-		$fb->after(1, ['refresh', $fb]);;
+		$fb->load($testfolder);
 		pause($pause);
-		return shown; 
+		return shown;
 	}, \@nodirsfirst, 'No directories first' ],
 
-	[ sub { 
+	[ sub {
 		$fb->configure(-casedependantsort => 1);
-		$fb->after(1, ['refresh', $fb]);;
+		$fb->load($testfolder);
 		pause($pause);
-		return shown; 
+		return shown;
 	}, \@casesort, 'Case dependant sort' ],
 
 	[ sub {
 		$fb->configure(-sortorder => 'descending');
-		$fb->after(1, ['refresh', $fb]);;
+		$fb->load($testfolder);
 		pause($pause);
-		return shown; 
+		return shown;
 	}, \@descendingsort, 'Sort name descending' ],
 
 	[ sub {
-		$fb->configure(-refreshfilter => 'fi');
-		$fb->after(1, ['refresh', $fb]);;
-		pause($pause);
-		return shown; 
-	}, \@filter, 'Refresh filter fi' ],
-
-	[ sub {
-		$fb->configure(-filtercase => 1);
-		$fb->after(1, ['refresh', $fb]);;
-		pause($pause);
-		return shown; 
-	}, \@filtercase, 'Refresh filter case fi' ],
-
-	[ sub {
-		$fb->configure(-filtercase => 0);
-		$fb->configure(-refreshfilterfolders => 1);
-		$fb->after(1, ['refresh', $fb]);;
-		pause($pause);
-		return shown; 
-	}, \@filterfolders, 'Refresh filter folder fi' ],
-
-	[ sub {
-		$fb->configure(-filtercase => 1);
-		$fb->after(1, ['refresh', $fb]);;
-		pause($pause);
-		return shown; 
-	}, \@filterfolderscase, 'Refresh filter case folder fi' ],
-
-	[ sub {
-		$fb->configure(-filtercase => 0);
-		$fb->configure(-refreshfilterfolders => 0);
-		$fb->configure(-refreshfilter => '');
 		$fb->configure(-loadfilter => 'fi');
-		$fb->after(1, ['reload', $fb]);;
+		$fb->load($testfolder);
 		pause($pause);
-		return shown; 
+		return shown;
 	}, \@filter, 'Load filter fi' ],
 
 	[ sub {
 		$fb->configure(-loadfilterfolders => 1);
-		$fb->after(1, ['reload', $fb]);;
+		$fb->load($testfolder);
 		pause($pause);
-		return shown; 
+		return shown;
 	}, \@filterfolders, 'Load filter folders fi' ],
 
 	[ sub {
-		$fb->configure(-filtercase => 1);
-		$fb->after(1, ['reload', $fb]);;
-		pause($pause);
-		return shown; 
-	}, \@filterfolderscase, 'Load filter folders fi' ],
-
-	[ sub { 
 		return 1 if $mswin; #skip Windows
-		$fb->configure(-filtercase => 0);
 		$fb->configure(-casedependantsort => 0);
 		$fb->configure(-directoriesfirst => 1);
 		$fb->configure(-loadfilter => '');
 		$fb->configure(-loadfilterfolders => 0);
 		$fb->configure(-sortorder => 'ascending');
-		pause(10);
 		$fb->load('~');
 		pause($pause);
 		my $home = $ENV{HOME};
-		return $fb->folder eq $home 
+		return $fb->folder eq $home
 	}, 1, 'Loaded home folder' ],
 
-	[ sub { 
-		$fb->after(1, ['load', $fb]);
-		return 1 
+	[ sub {
+#		pause($pause);
+		$fb->load;
+		return 1
 	}, 1, 'Loaded current folder' ],
 );
 

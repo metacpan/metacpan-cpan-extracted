@@ -1,5 +1,22 @@
 Revision history for Algorithm-Classifier-IsolationForest
 
+0.5.0   2026-07-04/14:30
+        - Wide-NV perls (-Duselongdouble / -Dusequadmath(maybe? does this
+          even exist? but possibly some idiot on github... but would fix
+          it in this case as well): the pure-Perl tree builder now rounds
+          every value it stores (split points, hyperplane coefficients and
+          offsets, impute fills) to C double precision at the same points
+          the C builder rounds preserving the seed-for-seed bit-identical
+          guarantee across backends. Possible breakages for the tests for
+          extended mode where -Duselongdouble is in play may exist so tests
+          for those systems where it is are skipped for now.
+        - Implement Majority Voting Isolation Forest (MVIForest --
+          Chabchoub, Togbe, Boly & Chiky 2022, IEEE Access,
+          doi:10.1109/ACCESS.2022.3144425) as new(voting => 'majority'):
+          Since this only affects how the trees are walked etc and not build,
+          the voting method can be switched between majority and mean.
+         - adjust how iforest info displays tag info
+
 0.4.0   2026-07-03/22:45
         - Implement named features and methods for testing single rows using
           tagged data.

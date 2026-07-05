@@ -3,7 +3,7 @@
 PERL       := $(shell command -v perl)
 PERLTIDY   := $(shell command -v perltidy)
 PERLCRITIC := $(shell command -v perlcritic)
-PODEXTRACT := $(shell command -v podextract)
+
 PERL_BIN_FILES = $(patsubst %.pl.in,%.pl,$(filter %.pl.in,$(BIN_FILES:%=%.in)))
 
 PERLINCLUDE ?= -I lib $(addprefix -I ,$(subst :, ,$(PERL5LIB)))
@@ -23,8 +23,14 @@ lint_off = $(filter off,$(shell echo $(LINT) | tr '[:upper:]' '[:lower:]'))
 
 # normalize - 'off' or empty disables, anything else enables
 syntax_on  = $(if $(lint_off),,$(filter-out off,$(shell echo $(SYNTAX_CHECKING) | tr '[:upper:]' '[:lower:]')))
-tidy_on    = $(if $(lint_off),,$(filter-out off,$(shell echo $(PERLTIDYRC)      | tr '[:upper:]' '[:lower:]')))
-critic_on  = $(if $(lint_off),,$(filter-out off,$(shell echo $(PERLCRITICRC)    | tr '[:upper:]' '[:lower:]')))
+
+ifneq ($(PERLTIDY),)
+  tidy_on = $(if $(lint_off),,$(filter-out off,$(shell echo $(PERLTIDYRC)      | tr '[:upper:]' '[:lower:]')))
+endif
+
+ifneq ($(PERLCRITIC),)
+  critic_on  = $(if $(lint_off),,$(filter-out off,$(shell echo $(PERLCRITICRC)    | tr '[:upper:]' '[:lower:]')))
+endif
 
 $(eval $(call find-files,TIDY_FILES,lib bin,*.tdy))
 $(eval $(call find-files,CRITIC_FILES,lib bin,*.crit))
@@ -38,6 +44,10 @@ CLEANFILES += $(TIDY_FILES) $(CRITIC_FILES) $(ERR_FILES)
 
 define run_podextract
 	if [[ "$$POD" =~ ^(extract|remove)$$ ]]; then \
+	  if [[ -z "$(PODEXTRACT)" ]]; then \
+	    echo >&2 "ERROR: Pod::Extract not installed - run cpanm Pod::Extract"; \
+	    exit 1; \
+	  fi; \
 	  nopod_tmp="$$(mktemp)"; \
 	  local_cleanfiles="$$local_cleanfiles $$nopod_tmp"; \
 	  if [[ "$$POD" = "extract" ]]; then \
@@ -72,7 +82,7 @@ define check_syntax_pl
 	if [[ "$$skip" -eq 0 ]]; then \
 	  errfile=$$(mktemp); \
 	  local_cleanfiles="$$local_cleanfiles $$errfile"; \
-	  perl -wc $(PERLINCLUDE) -M"$$module" -e 1 2>$$errfile \
+	  perl -wc $(PERLINCLUDE) -e 1 2>$$errfile \
 	    || { rm -f "$@"; cat $$errfile; exit 1; }; \
 	fi
 endef
@@ -128,7 +138,7 @@ ifneq ($(tidy_on),)
 	fi; \
 	echo >&2 "Checking tidiness...$<"; \
 	$(PERLTIDY) --profile="$(PERLTIDYRC)" $<; \
-	diff -q "$<" "$<.tdy" 2>/dev/null 2>&1 \
+	diff -q "$<" "$<.tdy" 2>/dev/null \
 	  || { echo "ERROR: $< is not tidy - run: make tidy"; rm -f "$<.tdy" "$@"; exit 1; }; \
 	rm -f "$<.tdy"; \
 	touch "$@"

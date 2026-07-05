@@ -5,7 +5,7 @@ use Carp;
 
 { #<<< A non-indenting brace to contain all lexical variables
 
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 use English qw( -no_match_vars );
 use Scalar::Util 'refaddr';    # perl 5.8.1 and later
 use Perl::Tidy::VerticalAligner::Alignment;
@@ -388,6 +388,17 @@ EOM
     }
     return;
 } ## end sub check_keys
+
+sub vertical_alignment_ok {
+    my ($tok) = @_;
+
+    # Return 1 if alignment ok
+    # Return 0 if do not align
+    return 1 if ( !%valign_control_hash );
+    my $align_ok = $valign_control_hash{$tok};
+    $align_ok = $valign_control_default unless ( defined($align_ok) );
+    return $align_ok;
+} ## end sub vertical_alignment_ok
 
 sub new {
 
@@ -1045,7 +1056,7 @@ sub valign_input {
     }
 
     else {
-        ##ok: no output needed
+        ## ok: no output needed
     }
 
     # --------------------------------------------------------------------
@@ -1522,7 +1533,7 @@ sub check_match {
                 $return_value = NO_MATCH;
             }
             else {
-                ##ok: continue
+                ## ok: continue
             }
         }
     }
@@ -2122,7 +2133,7 @@ EOM
                 }
             }
             else {
-                ##ok: continue
+                ## ok: continue
             }
 
             # See if the new line matches and fits the current group,
@@ -2191,7 +2202,7 @@ EOM
             }
 
             else {
-                ##ok: continue
+                ## ok: continue
             }
         } ## end loop over lines
 
@@ -2539,7 +2550,7 @@ sub sweep_left_to_right {
                 # spot to take special action on failure to move
             }
             else {
-                ##ok: (move==0)
+                ## ok: (move==0)
             }
         }
         return;
@@ -3316,7 +3327,9 @@ sub delete_unmatched_tokens_main_loop {
                     if ( $lev > $delete_above_level ) {
                         $delete_me ||= 1;
                     }
-                    else { $delete_above_level = undef }
+                    else {
+                        $delete_above_level = undef;
+                    }
                 }
 
                 # EXCEPTION 3: Remove all but certain tokens after an
@@ -4546,7 +4559,7 @@ sub is_marginal_match {
         }
     }
     else {
-        ##ok: (none of the above)
+        ## ok: (none of the above)
     }
 
     #-----------------------------------------------------
@@ -5445,7 +5458,7 @@ sub split_field {
               if ( !$ending_b );
         }
         else {
-            # strange - could not find the opening token
+            ## strange - could not find the opening token
         }
     }
 
@@ -5983,7 +5996,7 @@ EOM
             $current_line      = $line;
         }
         else {
-            # continuing with same alignment
+            ## continuing with same alignment
         }
 
         #-----------------------

@@ -17,6 +17,19 @@
 #include "perl.h"
 #include "XSUB.h"
 
+/* PERL_VERSION_GE was added to perl.h in 5.33.3; define it for older builds. */
+#ifndef PERL_VERSION_GE
+#  define PERL_VERSION_GE(r,v,s) \
+     (PERL_REVISION > (r) || (PERL_REVISION == (r) && \
+     (PERL_VERSION > (v) || (PERL_VERSION == (v) && PERL_SUBVERSION >= (s)))))
+#endif
+
+/* GvCV_set gained cache-invalidation semantics (and became a real function)
+ * around 5.14.  On older builds the simple assignment is equivalent. */
+#ifndef GvCV_set
+#  define GvCV_set(gv, cv) (GvCV(gv) = (cv))
+#endif
+
 #include "archive_plugin.h"
 #include "arch_io.h"
 #include "tar.h"
@@ -2765,10 +2778,17 @@ PPCODE:
     HV *caller_stash;
     {
         const char *caller_pkg = NULL;
+#if PERL_VERSION_GE(5, 14, 0)
+        /* caller_cx available since 5.13.5; tie to 5.14 (first stable release) */
         const PERL_CONTEXT *cx = caller_cx(0, NULL);
         if (cx && CxTYPE(cx) == CXt_SUB) {
             caller_pkg = HvNAME_get(CopSTASH(cx->blk_oldcop));
         }
+#else
+        /* On older Perls, PL_curcop inside an XSUB is still the caller's cop */
+        if (PL_curcop)
+            caller_pkg = HvNAME(CopSTASH(PL_curcop));
+#endif
         if (!caller_pkg) caller_pkg = "main";
         caller_stash = gv_stashpv(caller_pkg, GV_ADD);
     }

@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.11;
+$VERSION = 0.12;
 
 use base qw(Tk::ListBrowser::BaseItem);
 
@@ -65,6 +65,8 @@ sub clear {
 
 	$self->cimage(undef);
 	$self->ctext(undef);
+	$self->row(undef);
+	$self->column(undef);
 	$self->SUPER::clear;
 }
 
@@ -248,6 +250,7 @@ sub drawImage {
 	);
 
 	$self->cimage($itag);
+#	$self->anchorRaise($itag);
 }
 
 sub drawRect {
@@ -260,10 +263,11 @@ sub drawRect {
 	my $rtag = $c->createRectangle($x, $y, $dx, $dy,
 		-fill => $self->background,
 		-outline => $self->background,
-		-tags => $self->tags,
+		-tags => ['rect'],
 	);
 
 	$self->setRegion($x, $y, $dx, $dy);
+	$self->anchorRaise($rtag);
 	$self->crect($rtag);
 }
 
@@ -280,9 +284,10 @@ sub drawSelect {
 	my $image = $c->createImage($x1, $y1,
 		-image => $pixmap,
 		-anchor => 'nw',
-		-tags => ['sel'],
+		-tags => ['sel', 'rect', $self->name],
 	);
 	$self->setRegion(@coords);
+	$self->anchorRaise($image);
 	$self->crect($image);
 }
 
@@ -309,9 +314,10 @@ sub drawText {
 		-tags => $self->tags,
 	) if defined $text;
 
+#	$self->anchorRaise($ttag);
 	$self->ctext($ttag);
 
-	if ($self->columnCapable) {
+	if ($self->listMode) {
 		my $owner = $self->owner;
 		my @cl = $self->columnList;
 		if ($owner eq $lb) {
@@ -455,11 +461,16 @@ sub selected {
 sub setRegion {
 	my ($self, $x, $y, $dx, $dy) = @_;
 	my $owner = $self->owner;
-	if (($owner eq $self->listbrowser) and ($self->columnCapable)) {
+	my $lb = $self->listbrowser;
+	if (($owner eq $lb) and ($self->listMode)) {
 		my @columns = $self->columnList;
 		for (@columns) {
 			my $col = $self->columnGet($_);
 			$dx = $dx + $col->cget('-cellwidth') + 1;
+		}
+		unless (@columns) {
+			my ($cw) = $self->canvasSize;
+			$dx = $cw if $lb->ismapped;
 		}
 	}
 	$self->region($x, $y, $dx, $dy);

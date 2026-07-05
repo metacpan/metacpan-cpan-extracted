@@ -42,6 +42,9 @@ use vars qw(@test);
           ($w == 0) and ($r == 1) },                       # beyond: wtf8 no, rfc2279 yes
 # get/set round trip, and restore the default
     sub { mb::set_script_encoding('wtf8');    mb::get_script_encoding() eq 'wtf8' },
+    sub { mb::set_script_encoding('euctw');   mb::get_script_encoding() eq 'euctw' },
+    sub { mb::set_script_encoding('hp15');    mb::get_script_encoding() eq 'hp15' },
+    sub { mb::set_script_encoding('informixv6als'); mb::get_script_encoding() eq 'informixv6als' },
     sub { mb::set_script_encoding('utf8');    mb::get_script_encoding() eq 'utf8' },
 #
 );

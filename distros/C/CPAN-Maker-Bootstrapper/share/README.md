@@ -109,9 +109,9 @@ CPAN::Maker::Bootstrapper - Scaffold a new CPAN distribution in one command
 
 # DESCRIPTION
 
-[https://github.com/rlauer6/CPAN-Maker-Bootstrapper/actions/workflows/build.yml](https://github.com/rlauer6/CPAN-Maker-Bootstrapper/actions/workflows/build.yml)
+[![CPAN::Maker::Bootstrapper](https://github.com/rlauer6/CPAN-Maker-Bootstrapper/actions/workflows/build.yml/badge.svg)](https://github.com/rlauer6/CPAN-Maker-Bootstrapper/actions/workflows/build.yml)
 
-[CPAN::Maker::Bootstrapper](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3ABootstrapper) scaffolds a new CPAN distribution directory
+`CPAN::Maker::Bootstrapper` scaffolds a new CPAN distribution directory
 ready to build immediately. It installs a project Makefile, a
 `buildspec.yml` pre-populated from your git config, stub source and test
 files, and supporting makefiles - then runs `make` to generate the initial

@@ -3,21 +3,48 @@ package Algorithm::Classifier::IsolationForest;
 use strict;
 use warnings;
 use Carp        qw(croak);
+use Config      ();
 use List::Util  qw(min);
 use POSIX       qw(ceil);
 use JSON::PP    ();
 use File::Slurp qw(read_file write_file);
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
 
-use constant EULER  => 0.5772156649015329;
-use constant TWO_PI => 6.283185307179586;
+use constant EULER => 0.5772156649015329;
+
+# Narrowed to C double precision so _randn() multiplies by the exact
+# constant _c_randn() uses.  A no-op on nvsize == 8 perls.
+use constant TWO_PI => unpack( 'd', pack 'd', 6.283185307179586 );
 
 # Node-type tags stored in index 0 of every tree node arrayref.
 # 0 is falsy, so  while ($node->[0])  acts as  while (!leaf).
 use constant _NODE_LEAF    => 0;
 use constant _NODE_AXIS    => 1;
 use constant _NODE_OBLIQUE => 2;
+
+# The Inline::C tree builder computes everything in C doubles.  On a perl
+# whose NV is wider than a double (-Duselongdouble / -Dusequadmath) the
+# pure-Perl builder keeps extra low bits at every step, so the two
+# backends would stop producing bit-identical trees for the same seed
+# (the parity t/03-fit-determinism.t checks).  _NV_IS_DOUBLE guards
+# narrowing statements wherever the pure-Perl builder computes a value
+# that gets STORED in a tree (split points, hyperplane coefficients and
+# offsets, impute fills), rounding at the same points the C builder
+# rounds.  It is compile-time true on nvsize == 8 perls, so there the
+# guarded statements are optimised away and cost nothing.
+#
+# The row-partition loops (v < split, dot <= b) are deliberately NOT
+# narrowed: with both operands already double-exact an axis comparison
+# is identical anyway, and an oblique dot product accumulated in a wider
+# NV flips a comparison only when |dot - b| falls inside the NV-vs-double
+# rounding gap (~1e-19 relative) -- negligible, and those are the hot
+# loops.
+use constant _NV_IS_DOUBLE => $Config::Config{nvsize} == 8;
+
+# Round an NV to C double precision.  Only ever reached on wide-NV
+# perls -- see _NV_IS_DOUBLE.
+sub _to_double { unpack 'd', pack 'd', $_[0] }
 
 # ---------------------------------------------------------------------------
 # Optional Inline::C accelerator for the scoring hot path.
@@ -36,6 +63,15 @@ use constant _NODE_OBLIQUE => 2;
 #     so no synchronisation is needed).  Tree pointers are extracted from
 #     the AVs before the parallel region; the parallel region touches only
 #     raw int / double buffers.
+#
+# vote_all_xs(nodes_av, idx_av, val_av, x_sv, sm_sv,
+#             n_pts, n_feats, n_trees, depth_cut, min_votes, use_openmp)
+#     Majority-voting (voting => 'majority') counterpart of score_all_xs:
+#     instead of summing path lengths it counts, per point, how many trees
+#     "vote anomalous" (path length <= depth_cut).  min_votes == 0 writes
+#     the full vote count into sm[i]; min_votes > 0 writes a 0.0/1.0 label
+#     with per-point early exit once the majority outcome is decided --
+#     the MVIForest scoring loop.  See the function's own comment.
 #
 # Node layout (6 doubles per node, "IF_NZ = 6"):
 #   leaf:    [0, size, c(size), 0, 0, 0]
@@ -535,6 +571,182 @@ void score_all_xs(SV* nodes_av_sv, SV* idx_av_sv, SV* val_av_sv,
                 }
             }
         }
+    }
+}
+
+/* vote_all_xs(nodes_av, idx_av, val_av, x_sv, sm_sv,
+ *             n_pts, n_feats, n_trees, depth_cut, min_votes, use_openmp)
+ *
+ * Majority-voting (MVIForest) tree walk: a tree votes a point anomalous
+ * when the point's path length in that tree is <= depth_cut -- the
+ * depth-domain image of the per-tree score cutoff (the Perl side
+ * precomputes depth_cut = -c(psi) * log2(threshold), so no per-tree
+ * exp()/log() runs in here).
+ *
+ * min_votes == 0: sm[i] = the point's full vote count over all n_trees
+ *   trees (a small integer stored as a double, so the existing
+ *   finalize_* helpers work on the buffer unchanged).
+ * min_votes > 0:  sm[i] = 1.0/0.0 anomaly label, with per-point early
+ *   exit: the walk stops as soon as the point has min_votes votes (the
+ *   remaining trees can't change the outcome) or can no longer reach
+ *   min_votes.  This is MVIForest's "stop at majority" scoring loop.
+ *
+ * Always point-major, unlike score_all_xs's two loop shapes: the vote
+ * count / early exit is per-point state, so a tree-blocked loop would
+ * have to re-load it per walk and could never exit a point early.
+ * Votes are integer counts, so there is no summation-order concern
+ * either way.  Thread-safety matches score_all_xs: the parallel region
+ * reads extracted pointers and writes a unique sm[i] per iteration. */
+void vote_all_xs(SV* nodes_av_sv, SV* idx_av_sv, SV* val_av_sv,
+                 SV* x_sv, SV* sm_sv,
+                 int n_pts, int n_feats, int n_trees,
+                 double depth_cut, int min_votes, int use_openmp){
+    STRLEN tl;
+    AV *nodes_av, *idx_av, *val_av;
+    const double *xd;
+    double *sm;
+    int ti;
+
+    if (!SvROK(nodes_av_sv) || SvTYPE(SvRV(nodes_av_sv)) != SVt_PVAV ||
+        !SvROK(idx_av_sv)   || SvTYPE(SvRV(idx_av_sv))   != SVt_PVAV ||
+        !SvROK(val_av_sv)   || SvTYPE(SvRV(val_av_sv))   != SVt_PVAV) {
+        croak("vote_all_xs: nodes/idx/val must be arrayrefs");
+    }
+    nodes_av = (AV*)SvRV(nodes_av_sv);
+    idx_av   = (AV*)SvRV(idx_av_sv);
+    val_av   = (AV*)SvRV(val_av_sv);
+
+    const double *node_ptrs[n_trees];
+    const int    *idx_ptrs[n_trees];
+    const double *val_ptrs[n_trees];
+
+    for (ti = 0; ti < n_trees; ti++) {
+        SV** np = av_fetch(nodes_av, ti, 0);
+        SV** ip = av_fetch(idx_av,   ti, 0);
+        SV** vp = av_fetch(val_av,   ti, 0);
+        if (!np || !*np || !ip || !*ip || !vp || !*vp) {
+            croak("vote_all_xs: missing tree %d", ti);
+        }
+        node_ptrs[ti] = (const double*)SvPVbyte(*np, tl);
+        idx_ptrs[ti]  = (const int*)   SvPVbyte(*ip, tl);
+        val_ptrs[ti]  = (const double*)SvPVbyte(*vp, tl);
+    }
+
+    xd = (const double*)SvPVbyte(x_sv, tl);
+    sm = (double*)SvPVbyte_force(sm_sv, tl);
+
+#ifdef _OPENMP
+    #pragma omp parallel for schedule(static) if(use_openmp)
+#endif
+    for (int i = 0; i < n_pts; i++) {
+        const double *xi = xd + (size_t)i * (size_t)n_feats;
+        int votes = 0;
+        if (min_votes > 0) {
+            double label = 0.0;
+            for (int t = 0; t < n_trees; t++) {
+                if (if_walk_tree(node_ptrs[t], idx_ptrs[t],
+                                 val_ptrs[t], xi, n_feats) <= depth_cut) {
+                    votes++;
+                    if (votes >= min_votes) { label = 1.0; break; }
+                }
+                if (votes + (n_trees - 1 - t) < min_votes) break;
+            }
+            sm[i] = label;
+        } else {
+            for (int t = 0; t < n_trees; t++) {
+                votes += (if_walk_tree(node_ptrs[t], idx_ptrs[t],
+                                       val_ptrs[t], xi, n_feats)
+                          <= depth_cut) ? 1 : 0;
+            }
+            sm[i] = (double)votes;
+        }
+    }
+}
+
+/* vote_labels_xs(sm_sv, n_pts, out_rv)
+ *
+ * Converts the 0.0/1.0 label buffer vote_all_xs writes in early-exit
+ * mode into an arrayref of 0/1 IVs -- the majority-voting counterpart
+ * of predict_sums_xs (whose <= comparison points the wrong way for
+ * vote counts, where HIGH means anomalous). */
+void vote_labels_xs(SV* sm_sv, int n_pts, SV* out_rv){
+    STRLEN tl;
+    const double* sm;
+    AV* out;
+    int i;
+
+    if (!SvROK(out_rv) || SvTYPE(SvRV(out_rv)) != SVt_PVAV) {
+        croak("vote_labels_xs: out must be an arrayref");
+    }
+    sm  = (const double*)SvPVbyte(sm_sv, tl);
+    out = (AV*)SvRV(out_rv);
+    av_clear(out);
+    if (n_pts > 0) av_extend(out, n_pts - 1);
+    for (i = 0; i < n_pts; i++) {
+        av_store(out, i, newSViv(sm[i] != 0.0 ? 1 : 0));
+    }
+}
+
+/* vote_score_predict_xs(sm_sv, n_pts, t, min_votes, out_rv)
+ *
+ * Fills out_rv with [vote_fraction, majority_label] pairs from a
+ * vote-count buffer (vote_all_xs with min_votes == 0): score is
+ * votes/t, label is votes >= min_votes.  Same allocation pattern and
+ * refcount discipline as score_predict_xs. */
+void vote_score_predict_xs(SV* sm_sv, int n_pts, double t,
+                            double min_votes, SV* out_rv){
+    STRLEN tl;
+    const double* sm;
+    AV* out;
+    int i;
+
+    if (!SvROK(out_rv) || SvTYPE(SvRV(out_rv)) != SVt_PVAV) {
+        croak("vote_score_predict_xs: out must be an arrayref");
+    }
+    sm  = (const double*)SvPVbyte(sm_sv, tl);
+    out = (AV*)SvRV(out_rv);
+    av_clear(out);
+    if (n_pts > 0) av_extend(out, n_pts - 1);
+    for (i = 0; i < n_pts; i++) {
+        AV* row = newAV();
+        av_extend(row, 1);
+        AvARRAY(row)[0] = newSVnv(sm[i] / t);
+        AvARRAY(row)[1] = newSViv(sm[i] >= min_votes ? 1 : 0);
+        AvFILLp(row)    = 1;
+        av_store(out, i, newRV_noinc((SV*)row));
+    }
+}
+
+/* vote_score_predict_split_xs(sm_sv, n_pts, t, min_votes,
+ *                              scores_rv, labels_rv)
+ *
+ * Parallel-arrays variant of vote_score_predict_xs, mirroring
+ * score_predict_split_xs's shape for the majority-voting path. */
+void vote_score_predict_split_xs(SV* sm_sv, int n_pts, double t,
+                                  double min_votes,
+                                  SV* scores_rv, SV* labels_rv){
+    STRLEN tl;
+    const double* sm;
+    AV* scores;
+    AV* labels;
+    int i;
+
+    if (!SvROK(scores_rv) || SvTYPE(SvRV(scores_rv)) != SVt_PVAV ||
+        !SvROK(labels_rv) || SvTYPE(SvRV(labels_rv)) != SVt_PVAV) {
+        croak("vote_score_predict_split_xs: scores/labels must be arrayrefs");
+    }
+    sm     = (const double*)SvPVbyte(sm_sv, tl);
+    scores = (AV*)SvRV(scores_rv);
+    labels = (AV*)SvRV(labels_rv);
+    av_clear(scores);
+    av_clear(labels);
+    if (n_pts > 0) {
+        av_extend(scores, n_pts - 1);
+        av_extend(labels, n_pts - 1);
+    }
+    for (i = 0; i < n_pts; i++) {
+        av_store(scores, i, newSVnv(sm[i] / t));
+        av_store(labels, i, newSViv(sm[i] >= min_votes ? 1 : 0));
     }
 }
 
@@ -1570,6 +1782,15 @@ variant. Each split is a random hyperplane instead of an axis-aligned cut,
 which removes the rectangular, axis-aligned bias in the score field and
 tends to help on elongated or multi-modal data.
 
+With C<< voting => 'majority' >> the module implements the Majority Voting
+Isolation Forest (MVIForest) aggregation: each tree votes a sample
+anomalous or normal against the decision threshold and the label is the
+majority of the votes, with prediction stopping early once the majority is
+reached.  Trees are built identically either way, so this composes with
+both axis and extended mode, and an existing model can be flipped between
+the two modes with L</set_voting> without refitting; see C<voting> under
+L</new(%args)>.
+
 psi referenced below is ψ or the pitchfork math symbol referenced in the paper,
 Liu, Fei Tony & Ting, Kai & Zhou, Zhi-Hua. (2008). Isolation Forest. 413 - 422. 10.1109/ICDM.2008.17.
 
@@ -1599,7 +1820,11 @@ random draws go through the same generator C<rand()>/C<srand()> use
 internally, in the same call order the pure-Perl builder uses, so a
 given C<seed> produces bit-identical trees whether C<use_c> is on or
 off -- switching backends changes only how fast the model is built, not
-the model itself.
+the model itself. On perls whose NV is wider than a C double
+(C<-Duselongdouble> / C<-Dusequadmath>) the pure-Perl builder rounds
+each stored value to double precision to preserve this parity; axis
+mode matches exactly, while extended mode can still differ on rare
+libm rounding ties (double vs long-double transcendentals).
 
 By default this C builder is single-threaded per call, because Perl's
 RNG state isn't safe to share across OpenMP threads. Two ways to scale
@@ -1871,6 +2096,33 @@ Inits the object.
           per-feature fill under missing => 'impute'. Ignored otherwise.
         default :: mean
 
+    - voting :: how the per-tree results are aggregated at scoring time.
+          Trees are built identically in both settings -- only aggregation
+          changes -- so the knob composes with either mode (axis or
+          extended) and an existing model may switch it after the fact with
+          set_voting() (which relearns a contamination threshold for the
+          new mode).
+            mean     :: classic Isolation Forest: a sample's path lengths
+                        across all trees are averaged and normalised into
+                        one anomaly score; predict() thresholds that score.
+            majority :: Majority Voting Isolation Forest (MVIForest;
+                        Chabchoub, Togbe, Boly & Chiky 2022 -- see
+                        REFERENCES). Each tree scores the sample on its own
+                        (s_i = 2**(-h_i / c(psi))) and votes it anomalous
+                        when s_i >= the decision threshold; predict() flags
+                        the sample when more than half of the trees
+                        (int(n_trees/2) + 1) vote anomalous, and stops
+                        walking trees per sample as soon as the outcome is
+                        decided. The threshold argument/default of the
+                        predict methods is therefore the PER-TREE cutoff
+                        here, not a forest-level score cutoff.
+                        score_samples() returns the fraction of trees
+                        voting anomalous -- still in [0, 1], but discrete
+                        in steps of 1/n_trees. contamination composes: fit()
+                        learns the per-tree cutoff that flags the requested
+                        fraction of the training set.
+        default :: mean
+
     - parallel_fit :: positive integer N => build the trees across N forked
           worker processes during fit(). Each worker gets a derived seed
           (parent seed + worker_id * 1009) so the parallel fit is
@@ -1944,6 +2196,18 @@ sub new {
 	croak "impute_with must be 'mean' or 'median'"
 		unless $impute_with =~ /\A(?:mean|median)\z/;
 
+	# How per-tree results are aggregated at scoring time.  Trees are
+	# built identically either way -- this knob never touches fit()'s
+	# forest, only how score/predict combine the per-tree path lengths.
+	#   mean     :: classic IForest: average path length across trees,
+	#               normalised into one score (the default)
+	#   majority :: MVIForest (Chabchoub et al. 2022): each tree votes
+	#               anomalous/normal against the decision threshold and
+	#               the label is the majority of the tree votes
+	my $voting = $args{voting} // 'mean';
+	croak "voting must be 'mean' or 'majority'"
+		unless $voting =~ /\A(?:mean|majority)\z/;
+
 	if ( defined( $args{seed} ) ) {
 		$args{seed} = abs( int( $args{seed} ) );
 	}
@@ -1980,6 +2244,7 @@ sub new {
 		parallel_fit    => $args{parallel_fit},       # undef/0/1 => serial; N>1 => fork
 		missing         => $missing,                  # die|zero|impute|nan
 		impute_with     => $impute_with,              # mean|median (impute mode only)
+		voting          => $voting,                   # mean|majority (scoring-time aggregation)
 		missing_fill    => undef,                     # per-feature fill, learned in fit() if impute
 		_use_c          => $use_c,
 		_use_openmp     => $use_openmp,
@@ -2013,6 +2278,60 @@ set.
 =cut
 
 sub decision_threshold { return $_[0]->{threshold} }
+
+=head2 set_voting
+
+Switches the scoring-time aggregation between C<'mean'> and C<'majority'> on an
+existing model and returns C<$self> (so it chains). The forest itself is
+identical in both modes -- only the way per-tree results are combined changes
+-- so this never rebuilds a single tree.
+
+    $iforest->set_voting('majority');
+    $iforest->set_voting('mean', \@training_data);
+
+The one thing that does not carry over is a C<contamination>-learned
+L</decision_threshold>. That cutoff is a quantile of whichever per-point
+quantity the mode thresholds against -- the averaged anomaly score under
+C<'mean'>, the per-tree majority pivot under C<'majority'> -- and those live in
+different spaces, so a threshold learned in one mode flags the wrong fraction
+in the other. When the model was fitted with C<contamination>, C<set_voting>
+therefore relearns the threshold for the target mode, which requires the
+original training data to be passed as the second argument (the model does not
+retain it). Switching a model that had no C<contamination> needs no data:
+C<predict> falls back to C<0.5>, which is meaningful in both modes.
+
+Passing the current mode is a no-op (returns immediately, no data needed).
+Calling this before L</fit> just records the mode for the eventual fit.
+
+=cut
+
+sub set_voting {
+	my ( $self, $voting, $data ) = @_;
+
+	croak "set_voting: voting must be 'mean' or 'majority'"
+		unless defined $voting && $voting =~ /\A(?:mean|majority)\z/;
+
+	return $self if $self->{voting} eq $voting;
+
+	# A learned threshold only exists once a contamination-fitted model has
+	# been fit(); that value is mode-specific and must be relearned against
+	# the same training set (see _learn_contamination_threshold).  Everything
+	# else -- pre-fit models, and fitted models without contamination -- just
+	# flips the knob; predict()'s 0.5 fallback is valid in either mode.
+	my $fitted      = ref $self->{trees} eq 'ARRAY' && @{ $self->{trees} };
+	my $recalibrate = $fitted                       && defined $self->{contamination};
+	if ($recalibrate) {
+		croak "set_voting: switching a contamination-fitted model requires "
+			. "the original training data as the second argument to "
+			. "recalibrate the decision threshold"
+			unless ref $data eq 'ARRAY' && @$data;
+	}
+
+	$self->{voting} = $voting;
+	$self->_learn_contamination_threshold($data) if $recalibrate;
+
+	return $self;
+} ## end sub set_voting
 
 =head2 feature_names
 
@@ -2159,21 +2478,21 @@ sub fit {
 	delete @$self{qw(_c_nodes _c_coef_idx _c_coef_val)};
 
 	# If a contamination rate was requested, learn the score cutoff that flags
-	# that fraction of the training set. We place the threshold midway between
-	# the k-th and (k+1)-th highest training scores, so it sits in the gap
-	# between flagged and unflagged points -- unambiguous and robust to the
-	# tiny float rounding introduced by JSON serialisation.
-	if ( defined $self->{contamination} ) {
-		my $scores = $self->score_samples($train);
-		my @desc   = sort { $b <=> $a } @$scores;
-		my $n_pts  = scalar @desc;
-		my $k      = int( $self->{contamination} * $n_pts + 0.5 );
-		$k                 = 1      if $k < 1;
-		$k                 = $n_pts if $k > $n_pts;
-		$self->{threshold} = $k < $n_pts
-			? ( $desc[ $k - 1 ] + $desc[$k] ) / 2.0    # midpoint of the boundary
-			: $desc[ $n_pts - 1 ] - 1e-9;              # k == n: flag everything
-	} ## end if ( defined $self->{contamination} )
+	# that fraction of the training set. The threshold lands midway inside a
+	# real gap between flagged and unflagged training scores (ties at the
+	# k-boundary shift the cut to the nearest gap -- see
+	# _threshold_from_ranked), so it sits strictly between attainable values:
+	# unambiguous and robust to the tiny float rounding introduced by JSON
+	# serialisation.
+	#
+	# Under voting => 'majority' the value predict() thresholds against is
+	# the PER-TREE score, so the quantity to rank is each training point's
+	# majority pivot -- the per-tree cutoff at which that point loses its
+	# majority (see _majority_pivot_scores).  A point is flagged iff its
+	# pivot >= threshold, exactly the relation the mean-mode score has, so
+	# the midpoint selection below serves both modes unchanged.
+	$self->_learn_contamination_threshold($train)
+		if defined $self->{contamination};
 
 	$self->_rebuild_c_trees() if $self->{_use_c};
 	return $self;
@@ -2259,6 +2578,12 @@ Returns an arrayref of 0/1 labels for the specified data.
 If threshold is not specified it uses the contamination-learned cutoff (if
 C<fit> was called with C<contamination>), otherwise 0.5.
 
+Under C<< voting => 'majority' >> the threshold is the per-tree score
+cutoff each tree votes against, and a sample is labelled 1 when more than
+half of the trees (C<int(n_trees/2) + 1>) vote it anomalous.  Tree walking
+stops per sample as soon as the outcome is decided, so this is typically
+cheaper than scoring.
+
     my $results = $forest->predict(\@data, $threshold);
 
     print "x, y, result\n";
@@ -2279,6 +2604,44 @@ sub predict {
 		: defined $self->{threshold} ? $self->{threshold}
 		:                              0.5;
 	$self->_check_fitted;
+
+	# Majority voting: $threshold is the PER-TREE score cutoff and the
+	# label is the majority of the tree votes (int(t/2) + 1).  Both the C
+	# and the Perl loop stop walking a sample's remaining trees as soon
+	# as the outcome is decided -- MVIForest's "stop at majority" saving.
+	if ( $self->{voting} eq 'majority' ) {
+		my $trees = $self->{trees};
+		my $t     = scalar @$trees;
+		my $cut   = _depth_cut( $threshold, $self->{c_psi} );
+		my $maj   = _min_votes($t);
+
+		if ( $self->{_use_c} && $self->{_c_nodes} ) {
+			my ( $n_pts, $nf, $x_packed ) = $self->_resolve_input($data);
+			my $labels_packed = "\0" x ( $n_pts * 8 );
+			vote_all_xs( $self->{_c_nodes}, $self->{_c_coef_idx}, $self->{_c_coef_val},
+				$x_packed, $labels_packed, $n_pts, $nf, $t, $cut, $maj, $self->{_use_openmp} );
+			my $result = [];
+			vote_labels_xs( $labels_packed, $n_pts, $result );
+			return $result;
+		}
+
+		my $rows = $self->_prepare_perl_input($data);
+		my $nan  = $self->{missing} eq 'nan' ? 1 : 0;
+		my @labels;
+		for my $x (@$rows) {
+			my $votes = 0;
+			my $label = 0;
+			for my $ti ( 0 .. $t - 1 ) {
+				if ( _path_length( $x, $trees->[$ti], 0, $nan ) <= $cut ) {
+					$votes++;
+					if ( $votes >= $maj ) { $label = 1; last }
+				}
+				last if $votes + ( $t - 1 - $ti ) < $maj;
+			}
+			push @labels, $label;
+		} ## end for my $x (@$rows)
+		return \@labels;
+	} ## end if ( $self->{voting} eq 'majority' )
 
 	# Fast path: threshold the raw path-length sums directly, skipping the
 	# per-point exp() and the intermediate scores arrayref.
@@ -2402,6 +2765,12 @@ Scores well below 0.5 are normal.
 
 Scores ~0.5 means the points are hard to tell apart.
 
+Under C<< voting => 'majority' >> the returned value is instead the
+fraction of trees voting the sample anomalous at the model's decision
+threshold (the contamination-learned cutoff if present, otherwise 0.5) --
+still in [0, 1], but discrete in steps of C<1/n_trees>, with a majority
+label corresponding to a fraction strictly above 0.5.
+
     my $scores = $forest->score_samples(\@data);
 
     print "x, y, score\n";
@@ -2421,6 +2790,34 @@ sub score_samples {
 	my $c     = $self->{c_psi};
 	my $trees = $self->{trees};
 	my $t     = scalar @$trees;
+
+	# Majority voting: the "score" is the fraction of trees voting the
+	# sample anomalous at the model's decision threshold (contamination-
+	# learned if present, else 0.5) -- discrete in steps of 1/t.
+	if ( $self->{voting} eq 'majority' ) {
+		my $theta = defined $self->{threshold} ? $self->{threshold} : 0.5;
+		my $cut   = _depth_cut( $theta, $c );
+
+		if ( $self->{_use_c} && $self->{_c_nodes} ) {
+			my ( $n_pts, $nf, $x_packed ) = $self->_resolve_input($data);
+			my $votes_packed = "\0" x ( $n_pts * 8 );
+			vote_all_xs( $self->{_c_nodes}, $self->{_c_coef_idx}, $self->{_c_coef_val},
+				$x_packed, $votes_packed, $n_pts, $nf, $t, $cut, 0, $self->{_use_openmp} );
+
+			# votes/t is exactly the "divide the sum buffer by t" shape
+			# finalize_path_lengths_xs implements, so reuse it.
+			my $result = [];
+			finalize_path_lengths_xs( $votes_packed, $n_pts, $t + 0.0, $result );
+			return $result;
+		} ## end if ( $self->{_use_c} && $self->{_c_nodes} )
+
+		my $votes = $self->_vote_counts_perl( $self->_prepare_perl_input($data), $cut );
+		return [ map { $_ / $t } @$votes ] if _NV_IS_DOUBLE;
+
+		# Wide-NV perls: the C finalizers divide in double, so narrow the
+		# vote fraction to match -- see _NV_IS_DOUBLE.
+		return [ map { _to_double( $_ / $t ) } @$votes ];
+	} ## end if ( $self->{voting} eq 'majority' )
 
 	if ( $self->{_use_c} && $self->{_c_nodes} ) {
 		my ( $n_pts, $nf, $x_packed ) = $self->_resolve_input($data);
@@ -2490,6 +2887,10 @@ Returns an array ref of arrays. First value of each sub array is the score with 
 
 C<$threshold> defaults the same way as in C<predict>.
 
+Under C<< voting => 'majority' >> the score is the anomaly vote fraction at
+C<$threshold> (used as the per-tree cutoff) and the label is the majority
+vote, matching C<score_samples>/C<predict> semantics in that mode.
+
     my $results = $forest->score_predict_samples(\@data, $threshold);
 
     print "x, y, score, result\n";
@@ -2510,6 +2911,33 @@ sub score_predict_samples {
 		: defined $self->{threshold} ? $self->{threshold}
 		:                              0.5;
 	$self->_check_fitted;
+
+	# Majority voting: [vote_fraction, majority_label] pairs.  Needs the
+	# full vote counts (the fraction is part of the return shape), so no
+	# early exit here -- that saving is predict()-only.
+	if ( $self->{voting} eq 'majority' ) {
+		my $trees = $self->{trees};
+		my $t     = scalar @$trees;
+		my $cut   = _depth_cut( $threshold, $self->{c_psi} );
+		my $maj   = _min_votes($t);
+
+		if ( $self->{_use_c} && $self->{_c_nodes} ) {
+			my ( $n_pts, $nf, $x_packed ) = $self->_resolve_input($data);
+			my $votes_packed = "\0" x ( $n_pts * 8 );
+			vote_all_xs( $self->{_c_nodes}, $self->{_c_coef_idx}, $self->{_c_coef_val},
+				$x_packed, $votes_packed, $n_pts, $nf, $t, $cut, 0, $self->{_use_openmp} );
+			my $result = [];
+			vote_score_predict_xs( $votes_packed, $n_pts, $t + 0.0, $maj + 0.0, $result );
+			return $result;
+		}
+
+		my $votes = $self->_vote_counts_perl( $self->_prepare_perl_input($data), $cut );
+		return [ map { [ $_ / $t, ( $_ >= $maj ? 1 : 0 ) ] } @$votes ] if _NV_IS_DOUBLE;
+
+		# Wide-NV perls: match vote_score_predict_xs's double division --
+		# see _NV_IS_DOUBLE.
+		return [ map { [ _to_double( $_ / $t ), ( $_ >= $maj ? 1 : 0 ) ] } @$votes ];
+	} ## end if ( $self->{voting} eq 'majority' )
 
 	# Fast path: build [score, label] pairs straight from the sum buffer
 	# in one C call.  Avoids the intermediate scores arrayref + Perl
@@ -2608,6 +3036,36 @@ sub score_predict_split {
 		:                              0.5;
 	$self->_check_fitted;
 
+	# Majority voting: same values as the majority branch in
+	# score_predict_samples, returned as two flat arrayrefs.
+	if ( $self->{voting} eq 'majority' ) {
+		my $trees = $self->{trees};
+		my $t     = scalar @$trees;
+		my $cut   = _depth_cut( $threshold, $self->{c_psi} );
+		my $maj   = _min_votes($t);
+
+		if ( $self->{_use_c} && $self->{_c_nodes} ) {
+			my ( $n_pts, $nf, $x_packed ) = $self->_resolve_input($data);
+			my $votes_packed = "\0" x ( $n_pts * 8 );
+			vote_all_xs( $self->{_c_nodes}, $self->{_c_coef_idx}, $self->{_c_coef_val},
+				$x_packed, $votes_packed, $n_pts, $nf, $t, $cut, 0, $self->{_use_openmp} );
+			my $scores = [];
+			my $labels = [];
+			vote_score_predict_split_xs( $votes_packed, $n_pts, $t + 0.0, $maj + 0.0, $scores, $labels );
+			return ( $scores, $labels );
+		} ## end if ( $self->{_use_c} && $self->{_c_nodes} )
+
+		my $votes  = $self->_vote_counts_perl( $self->_prepare_perl_input($data), $cut );
+		my @scores = _NV_IS_DOUBLE
+			? map { $_ / $t }
+			@$votes
+			# Wide-NV perls: match vote_score_predict_split_xs's double
+			# division -- see _NV_IS_DOUBLE.
+			: map { _to_double( $_ / $t ) } @$votes;
+		my @labels = map { $_ >= $maj ? 1 : 0 } @$votes;
+		return ( \@scores, \@labels );
+	} ## end if ( $self->{voting} eq 'majority' )
+
 	# Fast path: fill two flat arrayrefs (scores + labels) directly from
 	# the sum buffer in one C call.  Skips the inner AV + RV per point
 	# that score_predict_samples has to allocate.
@@ -2674,6 +3132,7 @@ sub to_json {
 			impute_with     => $self->{impute_with},
 			missing_fill    => $self->{missing_fill},
 			feature_names   => $self->{feature_names},
+			voting          => $self->{voting},
 		},
 		trees => $self->{trees},
 	};
@@ -2721,14 +3180,17 @@ sub from_json {
 		max_depth_used       => $p->{max_depth_used},
 		# Models saved before missing-value support lack these keys; default
 		# to 'zero', which reproduces the old undef -> 0 scoring behaviour.
-		missing         => $p->{missing}     // 'zero',
-		impute_with     => $p->{impute_with} // 'mean',
-		missing_fill    => $p->{missing_fill},
-		feature_names   => $p->{feature_names},
+		missing       => $p->{missing}     // 'zero',
+		impute_with   => $p->{impute_with} // 'mean',
+		missing_fill  => $p->{missing_fill},
+		feature_names => $p->{feature_names},
+		# Models saved before majority-voting support lack the key; 'mean'
+		# reproduces their behaviour exactly.
+		voting          => $p->{voting} // 'mean',
 		trees           => $trees,
 		_use_c          => $HAS_C,
 		_use_openmp     => $HAS_OPENMP,
-		_use_openmp_fit => 0,                     # opt-in only; loaded models never re-fit implicitly
+		_use_openmp_fit => 0,                        # opt-in only; loaded models never re-fit implicitly
 	};
 	croak "model contains no trees" unless @{ $self->{trees} };
 
@@ -2781,6 +3243,10 @@ Sahand Hariri, Matias Carrasco Kind, Robert J. Brunner (2020). Extended Isolatio
 
 L<https://ieeexplore.ieee.org/document/8888179>
 
+Yousra Chabchoub, Maurras Ulbricht Togbe, Aliou Boly, Raja Chiky (2022). An In-Depth Study and Improvement of Isolation Forest. IEEE Access, vol. 10, 10219 - 10237. 10.1109/ACCESS.2022.3144425 (the Majority Voting Isolation Forest implemented by C<< voting => 'majority' >>)
+
+L<https://ieeexplore.ieee.org/document/9684896>
+
 =cut
 
 ###
@@ -2803,13 +3269,173 @@ sub _c {
 	return 2.0 * $harmonic - ( 2.0 * ( $n - 1 ) / $n );
 }
 
+#-------------------------------------------------------------------------------
+# Majority-voting (voting => 'majority') helpers.  MVIForest -- Chabchoub,
+# Togbe, Boly & Chiky 2022 (see REFERENCES) -- has each tree vote a point
+# anomalous when the tree's own score 2**(-h/c(psi)) clears the decision
+# threshold, and takes the majority of the votes as the label.  Trees are
+# untouched; only these scoring-time aggregation helpers differ from the
+# classic mean-path-length pipeline.
+#-------------------------------------------------------------------------------
+
+# Depth-domain image of the per-tree score cutoff: a tree votes a point
+# anomalous when 2**(-h/c) >= theta, i.e. h <= -c * log2(theta).  Doing the
+# log once here keeps exp/log out of the per-point per-tree loops (both C
+# and Perl compare raw path lengths against this cut).  Degenerate inputs
+# pin the cut so `h <= cut` still behaves: theta <= 0 is cleared by every
+# per-tree score (all in (0, 1]), so +inf lets every tree vote; c <= 0 only
+# happens for psi <= 1 forests, whose score convention is a flat 0.5 (see
+# score_samples), so all trees vote iff theta is at or below that pivot.
+sub _depth_cut {
+	my ( $theta, $c ) = @_;
+	return ( $theta <= 0.5 ? 9**9**9 : -1.0 ) if $c <= 0;
+	return 9**9**9                            if $theta <= 0;
+	return -$c * log($theta) / log(2);
+}
+
+# Smallest number of per-tree anomaly votes that constitutes a majority:
+# int(t/2) + 1, i.e. strictly more than half the trees for both odd and
+# even tree counts (the paper's "t/2 + 1").
+sub _min_votes { return int( $_[0] / 2 ) + 1 }
+
+#-------------------------------------------------------------------------------
+# Contamination threshold selection: given the training scores ranked
+# descending and the target flag count k, return a cutoff sitting midway
+# inside the gap between the last flagged and the first unflagged score.
+#
+# Tied scores at the k-boundary make an exact count of k unattainable (the
+# tie block can only go one way or the other) AND make the naive midpoint
+# degenerate -- it equals the tied value, leaving predict()'s >= comparison
+# balanced on exact float equality.  Mean-mode scores are continuous enough
+# that this practically never happens, but majority-mode pivots are
+# structurally quantized (path lengths at the depth cap take few distinct
+# values -- see _majority_pivot_scores), so ties there are the norm, and
+# the score <-> depth-cut conversion adds an exp/log round trip that needs
+# real slack around the cutoff rather than exact-equality behaviour.  The
+# whole tie block therefore goes to whichever side lands the flag count
+# closest to k, preferring the flagging side on a dead heat.
+#-------------------------------------------------------------------------------
+sub _threshold_from_ranked {
+	my ( $desc, $k ) = @_;
+	my $n = scalar @$desc;
+	return $desc->[ $n - 1 ] - 1e-9 if $k >= $n;    # flag everything
+
+	my $v = $desc->[ $k - 1 ];
+	return ( $v + $desc->[$k] ) / 2.0 if $desc->[$k] < $v;    # clean gap at k
+
+	# Tie block straddling the k-boundary: locate its edges.
+	my $i = $k - 1;
+	$i-- while $i > 0 && $desc->[ $i - 1 ] == $v;             # first index holding $v
+	my $j = $k;
+	$j++ while $j < $n && $desc->[$j] == $v;                  # first index below $v
+
+	if ( $i > 0 && ( $k - $i ) < ( $j - $k ) ) {
+
+		# Excluding the block lands closer to k: flag the $i points above it.
+		return ( $desc->[ $i - 1 ] + $v ) / 2.0;
+	}
+	return $j < $n
+		? ( $v + $desc->[$j] ) / 2.0                          # include the block: flag $j
+		: $desc->[ $n - 1 ] - 1e-9;                           # block runs to the end
+} ## end sub _threshold_from_ranked
+
+# Pure-Perl vote counter: votes[i] = how many trees give point i a path
+# length at or under the depth cut.  Tree-outer / sample-inner for cache
+# locality, mirroring the mean-mode fallback loops.  $data must already
+# be through _prepare_perl_input.
+sub _vote_counts_perl {
+	my ( $self, $data, $cut ) = @_;
+	my $trees = $self->{trees};
+	my $nan   = $self->{missing} eq 'nan' ? 1 : 0;
+	my @votes = (0) x @$data;
+	for my $tree (@$trees) {
+		for my $i ( 0 .. $#$data ) {
+			$votes[$i]++ if _path_length( $data->[$i], $tree, 0, $nan ) <= $cut;
+		}
+	}
+	return \@votes;
+} ## end sub _vote_counts_perl
+
+#-------------------------------------------------------------------------------
+# Contamination support for majority voting: each training point's majority
+# pivot -- the per-tree score threshold at which the point loses its
+# majority.  A point is flagged at cutoff theta iff at least min_votes of
+# its per-tree path lengths h satisfy h <= -c*log2(theta), which holds iff
+# its min_votes-th SMALLEST path length h_(maj) does, i.e. iff
+# 2**(-h_(maj)/c) >= theta.  So the pivot m = 2**(-h_(maj)/c) relates to
+# the majority-mode threshold exactly as the mean-mode score relates to
+# its threshold, and fit()'s midpoint selection works on either unchanged.
+#
+# Pure Perl by necessity: the per-tree path lengths never cross the C
+# boundary individually (score_all_xs/vote_all_xs only return per-point
+# aggregates), and fit() has already dropped any stale packed buffers when
+# this runs -- the same situation as mean mode's training-set scoring pass.
+#-------------------------------------------------------------------------------
+# Learn the contamination cutoff for the CURRENT voting mode from a training
+# set.  Ranks the per-point quantity the active aggregation thresholds against
+# -- the mean-mode anomaly score, or the majority pivot under
+# voting => 'majority' -- and lands the cutoff midway inside a real gap between
+# flagged and unflagged values (ties at the k-boundary shift it to the nearest
+# gap; see _threshold_from_ranked), so it sits strictly between attainable
+# values: unambiguous and robust to the float rounding JSON introduces.  A
+# point is flagged iff its statistic >= threshold in either mode, so the
+# midpoint selection serves both unchanged.  Shared by fit() (which passes the
+# prepared training set after dropping any stale packed buffers) and
+# set_voting() (which passes the caller-supplied training set against the
+# live, fully packed forest); $data may hold raw undef cells either way, since
+# the scorers below densify from missing_fill.
+sub _learn_contamination_threshold {
+	my ( $self, $data ) = @_;
+	my $scores
+		= $self->{voting} eq 'majority'
+		? $self->_majority_pivot_scores($data)
+		: $self->score_samples($data);
+	my @desc  = sort { $b <=> $a } @$scores;
+	my $n_pts = scalar @desc;
+	my $k     = int( $self->{contamination} * $n_pts + 0.5 );
+	$k                 = 1      if $k < 1;
+	$k                 = $n_pts if $k > $n_pts;
+	$self->{threshold} = _threshold_from_ranked( \@desc, $k );
+	return;
+} ## end sub _learn_contamination_threshold
+
+sub _majority_pivot_scores {
+	my ( $self, $data ) = @_;
+	my $trees = $self->{trees};
+	my $t     = scalar @$trees;
+	my $c     = $self->{c_psi};
+	my $maj   = _min_votes($t);
+	my $rows  = $self->_prepare_perl_input($data);
+	my $nan   = $self->{missing} eq 'nan' ? 1 : 0;
+
+	# psi <= 1 degenerate forest: every per-tree score is pinned at 0.5
+	# (matching score_samples' convention), so every pivot is too.
+	return [ (0.5) x @$rows ] unless $c > 0;
+
+	my $inv = log(2) / $c;
+	my @pivots;
+	for my $x (@$rows) {
+		my @paths = sort { $a <=> $b } map { _path_length( $x, $_, 0, $nan ) } @$trees;
+		push @pivots, exp( -$paths[ $maj - 1 ] * $inv );
+	}
+	return \@pivots;
+} ## end sub _majority_pivot_scores
+
 # One draw from the standard normal N(0,1) via Box-Muller. Used to pick the
 # random hyperplane orientations in Extended Isolation Forest mode.
 sub _randn {
 	my $u1 = rand() || 1e-12;
 	my $u2 = rand();
-	return sqrt( -2.0 * log($u1) ) * cos( TWO_PI * $u2 );
-}
+	return sqrt( -2.0 * log($u1) ) * cos( TWO_PI * $u2 ) if _NV_IS_DOUBLE;
+
+	# Wide-NV perls: round after every operation _c_randn() performs in
+	# double, so both backends draw the same coefficient bit patterns
+	# (up to libm's own double-vs-long-double disagreements on rare
+	# rounding ties).
+	my $s = _to_double( sqrt( -2.0 * _to_double( log($u1) ) ) );
+	my $c = _to_double( cos( _to_double( TWO_PI * $u2 ) ) );
+	return _to_double( $s * $c );
+} ## end sub _randn
 
 #-------------------------------------------------------------------------------
 # Draw $k samples without replacement via a partial Fisher-Yates shuffle of the
@@ -2905,8 +3531,17 @@ sub _build_tree {
 sub _axis_split {
 	my ( $X, $varying, $lo, $hi, $nan ) = @_;
 
-	my $attr  = $varying->[ int( rand( scalar @$varying ) ) ];
-	my $split = $lo->[$attr] + rand() * ( $hi->[$attr] - $lo->[$attr] );
+	my $attr = $varying->[ int( rand( scalar @$varying ) ) ];
+	my $split;
+	if (_NV_IS_DOUBLE) {
+		$split = $lo->[$attr] + rand() * ( $hi->[$attr] - $lo->[$attr] );
+	} else {
+		# Same value, but rounded to double after each of the three ops
+		# exactly as the C builder computes it -- see _NV_IS_DOUBLE.
+		$split = _to_double( $hi->[$attr] - $lo->[$attr] );
+		$split = _to_double( rand() * $split );
+		$split = _to_double( $lo->[$attr] + $split );
+	}
 
 	# A point missing the split feature (nan mode only) routes to the right
 	# child -- the same side NaN reaches in the C scorer, where (NaN < split)
@@ -2952,10 +3587,20 @@ sub _oblique_split {
 	$b = 0.0;
 	for my $f (@idx) {
 		my $c = _randn();
-		my $p = $lo->[$f] + rand() * ( $hi->[$f] - $lo->[$f] );    # point in the box
-		push @coef, $c;
-		$b += $c * $p;
-	}
+		if (_NV_IS_DOUBLE) {
+			my $p = $lo->[$f] + rand() * ( $hi->[$f] - $lo->[$f] );    # point in the box
+			push @coef, $c;
+			$b += $c * $p;
+		} else {
+			# Round each op to double in the same order as the C builder's
+			#   p = lo + rand() * (hi - lo);  b += c * p;
+			# -- see _NV_IS_DOUBLE.
+			my $p = _to_double( rand() * _to_double( $hi->[$f] - $lo->[$f] ) );
+			$p = _to_double( $lo->[$f] + $p );
+			push @coef, $c;
+			$b = _to_double( $b + _to_double( $c * $p ) );
+		}
+	} ## end for my $f (@idx)
 
 	# A point missing any feature on the hyperplane (nan mode only) routes
 	# to the right child: in the C scorer the dot product becomes NaN and
@@ -3581,9 +4226,20 @@ sub _compute_impute_fill {
 				: ( $s[ $k / 2 - 1 ] + $s[ $k / 2 ] ) / 2.0;
 		} else {    # mean
 			my $sum = 0;
-			$sum += $_ for @vals;
+			if (_NV_IS_DOUBLE) {
+				$sum += $_ for @vals;
+			} else {
+				# impute_fill_xs accumulates the sum in double (over
+				# SvNV-truncated cells); match its rounding step for step.
+				$sum = _to_double( $sum + _to_double($_) ) for @vals;
+			}
 			$fill[$f] = $sum / scalar @vals;
-		}
+		} ## end else [ if ( $how eq 'median' ) ]
+
+		# The fill crosses into the C backend as a double (pack 'd' /
+		# SvNV), so on wide-NV perls store it already narrowed and both
+		# builders densify with the identical value.
+		$fill[$f] = _to_double( $fill[$f] ) unless _NV_IS_DOUBLE;
 	} ## end for my $f ( 0 .. $nf - 1 )
 	return \@fill;
 } ## end sub _compute_impute_fill

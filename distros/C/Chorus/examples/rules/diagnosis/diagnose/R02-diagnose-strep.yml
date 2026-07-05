@@ -1,0 +1,23 @@
+# strep throat hypothesis: high fever + sore_throat
+# If rash is not yet defined, call replay_all() so Agent 1 can check it first.
+RULE: diagnose-strep
+FIND:
+  p:
+    attribut: fever_grade_value
+    filtre: '$_->fever_grade_value eq "high"'
+CONDITION: '$p->sore_throat && !defined $p->{hypothesis}'
+EXCEPTION: 'defined $p->{hypothesis}'
+ACTION: |
+  if (!defined $p->{rash_checked}) {
+      $p->set('rash_checked', 1);
+      $main::agent_diagnose->replay_all();
+      return 1;
+  }
+  if ($p->rash) {
+      $p->set('hypothesis', 'scarlet-fever');
+      $p->set('confidence', 0.82);
+  } else {
+      $p->set('hypothesis', 'strep-throat');
+      $p->set('confidence', 0.75);
+  }
+  1

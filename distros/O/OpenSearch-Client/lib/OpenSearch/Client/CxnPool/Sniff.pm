@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::CxnPool::Sniff;
-$OpenSearch::Client::CxnPool::Sniff::VERSION = '3.007002';
+$OpenSearch::Client::CxnPool::Sniff::VERSION = '3.007005';
 use Moo;
 with 'OpenSearch::Client::Role::CxnPool::Sniff',
     'OpenSearch::Client::Role::Is_Sync';
@@ -101,7 +101,7 @@ OpenSearch::Client::CxnPool::Sniff - A CxnPool for connecting to a local cluster
 
 =head1 VERSION
 
-version 3.007002
+version 3.007005
 
 =head1 SYNOPSIS
 

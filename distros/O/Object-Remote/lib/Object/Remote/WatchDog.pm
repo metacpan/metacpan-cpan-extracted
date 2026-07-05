@@ -1,6 +1,5 @@
 package Object::Remote::WatchDog;
 
-use Object::Remote::MiniLoop;
 use Object::Remote::Logging qw (:log :dlog router);
 use Moo;
 

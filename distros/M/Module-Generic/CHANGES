@@ -1,5 +1,23 @@
 Revision history for Perl module Module::Generic
 
+v1.6.1 2026-07-05T11:55:46+0900
+    [Bug fixes]
+    - Fixed Module::Generic::Number::Format locale handling so set_locale() returns
+      and stores the locale actually accepted by the system, rather than the originally
+      requested value.
+    - Fixed locale probing in Module::Generic::Number::Format so temporary POSIX locale
+      changes are restored after probing, preventing LC_ALL / LC_NUMERIC side effects
+      from leaking into later formatting operations.
+    - Fixed number formatting tests for platforms where POSIX::setlocale() may return
+      a composite LC_ALL value, such as "C/fr_FR.UTF-8/C/C/C/C", instead of a single
+      locale name.
+    - Fixed fallback cbrt tests on Perl versions before v5.22 by avoiding
+      locale-sensitive stringification during overloaded exponentiation.
+
+    [Tests]
+    - Improved t/02.num.t coverage for byte formatting, locale propagation, and
+      arithmetic overload behaviour on older Perl versions and non-glibc platforms.
+
 v1.6.0 2026-07-03T21:53:26+0900
     [New features]
     - Added Module::Generic::_subinfo(), a pure-Perl introspection helper built on

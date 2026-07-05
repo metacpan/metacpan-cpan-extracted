@@ -1,0 +1,17 @@
+# Materialise temperature on the patient frame.
+# The _NEEDED on the temperature slot infers the value from skin_temp.
+# We store the resolved value under 'temperature_value' (plain scalar)
+# and set 'temperature_ready' as an idempotence guard.
+RULE: materialise-temperature
+FIND:
+  p:
+    attribut: skin_temp
+EXCEPTION: '$p->{temperature_ready}'
+ACTION: |
+  my $t = $p->temperature;
+  if (defined $t) {
+      $p->set('temperature_value', $t);
+      $p->set('temperature_ready', 1);
+      return 1;
+  }
+  0

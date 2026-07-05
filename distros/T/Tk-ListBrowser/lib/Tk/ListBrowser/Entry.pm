@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.11;
+$VERSION = 0.12;
 
 use base qw(Tk::ListBrowser::Item);
 
@@ -59,13 +59,14 @@ sub new {
 
 sub anchor {
 	my ($self, $flag) = @_;
+	return unless $self->ismapped;
 	my $c = $self->Subwidget('Canvas');
 	$flag = 1 unless defined $flag;
 	$self->{ANCHOR} = $flag;
 	if ($flag) {
-		$self->drawAnchor
+		$self->refreshSingle($self->name) if $self->ismapped
 	} else {
-		$self->deleteAnchor
+		$self->deleteAnchor if $self->ismapped
 	}
 	return $self->{ANCHOR}
 }
@@ -165,23 +166,19 @@ sub drawAnchor {
 	my ($self, $force) = @_;
 	return unless $self->ismapped;
 	
-	my @coords = $self->getRegion;
+	my @coords = $self->region;
 	$self->deleteAnchor;
 	my $c = $self->Subwidget('Canvas');
 	if ($self->listMode) {
 		my ($cw) = $self->canvasSize;
-		my $yscroll = $self->Subwidget('YScrollbar');
-		$cw = $cw - $yscroll->width if $yscroll->ismapped;
 		$coords[0] = 0;
-		$coords[2] = $cw - 4;
+		$coords[2] = $cw;
 	}
 	my $a = $c->createRectangle(@coords,
 		-fill => undef,
 		-dash => [3, 2],
+		-tags => ['anchor'],
 	);
-	for ($self->crect, $self->cselectl, $self->cselectr, $self->ctext, $self->cimage) {
-		$c->raise($a, $_) if defined $_
-	}
 	$self->canchor($a);
 }
 
@@ -196,15 +193,17 @@ sub drawSelect {
 		my $image = $c->createImage($coords[0], $coords[1],
 			-image => $pixmap,
 			-anchor => 'nw',
-			-tags => ['sel'],
+			-tags => ['sel', $self->name],
 		);
 		$self->setRegion(@coords);
+		$self->anchorRaise($image);
 		$self->crect($image);
 		return
 	}
 
 	#draw centerpiece
 	$self->SUPER::drawSelect;
+
 
 	#draw left piece
 	my $lx = $coords[0];
@@ -213,24 +212,42 @@ sub drawSelect {
 	my $slimg = $c->createImage(0, $coords[1],
 		-image => $slpix,
 		-anchor => 'nw',
-		-tags => ['sel'],
+		-tags => ['sel', $self->name],
 	);
+	$self->anchorRaise($slimg);
 	$self->cselectl($slimg);
 	
 	#draw right piece
+	my @cols = $self->columnList;
+	my $last = pop @cols;
+	if (defined $last) {
+		@coords = $self->itemGet($self->name, $last)->getRegion;
+	}
+
 	my ($cw) = $self->canvasSize;
-	my $yscroll = $self->Subwidget('YScrollbar');
-	$cw = $cw - $yscroll->width if $yscroll->ismapped;
 	my $rx1 = $coords[2];
-	my $rx2 = $cw - 4;
+	my $rx2 = $cw;
+	if ($rx1 > $cw) {
+		$rx1 = $cw - 4;
+		$rx2 = $cw;
+	}
 	$rx1 -- if $rx1 eq $rx2;
 	$rx2 = $rx1 + 300 if $rx2 < $rx1; #a little hack to prevent segfault exit when unmapped.
 	my $srpix = $si->selectimage($rx1, $coords[1], $rx2, $coords[3], 0, 1);
 	my $srimg = $c->createImage($rx1, $coords[1],
 		-image => $srpix,
 		-anchor => 'nw',
-		-tags => ['sel'],
+		-tags => ['sel', $self->name],
 	);
+
+	my $r;
+	if (defined $last) {
+		$r = $self->itemGet($self->name, $last)->crect;
+	} else {
+		$r = $self->crect;
+	}
+	$c->raise($srimg, $r) if defined $r;
+	$self->anchorRaise($srimg);
 	$self->cselectr($srimg);
 }
 

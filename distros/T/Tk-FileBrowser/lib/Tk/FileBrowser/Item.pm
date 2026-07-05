@@ -11,12 +11,18 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION = 0.03;
+$VERSION = 0.12;
 
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWIN32';
 
+use base qw(Tk::ListBrowser::Entry);
+
 use File::Spec;
+
+#setting up support for File::MimeInfo;
+eval 'use File::MimeInfo::Magic qw(mimetype);' unless $mswin;
+eval 'use File::MimeInfo::Simple qw(mimetype);' if $mswin;
 
 =head1 SYNOPSIS
 
@@ -34,19 +40,24 @@ Item object used in Tk::FileBrowser. You should never have to create one yoursel
 =cut
 
 sub new {
-	my ($class, $item) = @_;
-	die "You need to specify a file, folder or link name" unless defined $item;
-	$item = File::Spec->rel2abs($item);
-	my $self = {
-		NAME => $item
-	};
-	if (-d $item) {
+	my $class = shift;
+
+	my $self = $class->SUPER::new(@_);
+
+	if ($self->isDir) {
 		$self->{LOADED} = 0;
 		$self->{CHILDREN} = {};
-		$self->{ISOPEN} = 0;
+		$self->opened(0);
 	}
-	bless $self, $class;
-	$self->loadStat($item);
+	$self->loadStat;
+
+	if ($self->isLink) {
+		my $lb = $self->listbrowser;
+		my $fm = $lb->parent;
+		my $lc = $fm->cget('-linkcolor');
+		$self->foreground($lc);
+	}
+
 	return $self
 }
 
@@ -77,6 +88,7 @@ sub child {
 	carp $self->name . " is not a directory"
 }
 
+
 =item B<children>
 
 Returns a list of children if this object represents a folder.
@@ -103,6 +115,63 @@ sub created {
 	return $_[0]->{CREATED};
 }
 
+=item B<fullname>I<(?$fullname?)>
+
+=cut
+
+sub fullname {
+	my $self = shift;
+	$self->{FULLNAME} = shift if @_;
+	return $self->{FULLNAME}
+}
+
+sub hasChildren {
+	my $self = shift;
+	return 0 unless $self->isDir;
+	my @c = $self->children;
+	my $ch = @c;
+	return $ch;
+}
+
+sub image {
+	my $self = shift;
+	my $lb = $self->listbrowser;
+	my $fm = $lb->parent;
+	my $mode = $fm->cget('-viewmode');
+	my $method = "image_$mode";
+	return unless $self->can($method);
+	my $img = $self->$method;
+	unless (defined $img) {
+		if ($self->isDir) {
+			$img = $fm->Callback('-diriconcall', $self->fullname, $mode)
+		} elsif ($self->isLink) {
+			$img = $fm->Callback('-linkiconcall', $self->fullname, $mode)
+		} else {
+			$img = $fm->Callback('-fileiconcall', $self->fullname, $mode)
+		}
+		$self->$method($img)
+	}
+	return $img;
+}
+
+sub image_compact {
+	my $self = shift;
+	$self->{IMAGECOMPACT} = shift if @_;
+	return $self->{IMAGECOMPACT}
+}
+
+sub image_icon {
+	my $self = shift;
+	$self->{IMAGEICON} = shift if @_;
+	return $self->{IMAGEICON}
+}
+
+sub image_detailed {
+	my $self = shift;
+	$self->{IMAGEDETAILED} = shift if @_;
+	return $self->{IMAGEDETAILED}
+}
+
 =item B<isDir>
 
 Returns true if this object reprents a directory.
@@ -110,7 +179,7 @@ Returns true if this object reprents a directory.
 =cut
 
 sub isDir {
-	return -d $_[0]->name;
+	return -d $_[0]->fullname;
 }
 
 =item B<isFile>
@@ -120,7 +189,7 @@ Returns true if this object reprents a file.
 =cut
 
 sub isFile {
-	return -f $_[0]->name;
+	return -f $_[0]->fullname;
 }
 
 =item B<isLink>
@@ -130,29 +199,12 @@ Returns true if this object reprents a symbolic link.
 =cut
 
 sub isLink {
-	return -l $_[0]->name;
-}
-
-=item B<isOpen>I<($flag)>
-
-Returns undef if this object does not represent a directory.
-Sets or returns the open flag.
-
-=cut
-
-sub isOpen {
-	my ($self, $flag) = @_;
-	if ($self->isDir) {
-		$self->{ISOPEN} = $flag if defined $flag;
-		return $self->{ISOPEN}
-	}
-	carp $self->name . " is not a directory"
+	return -l $_[0]->fullname;
 }
 
 =item B<loaded>I<($flag)>
 
-Returns undef if this object does not reprent a directory.
-Sets or returns the loaded flag.
+Sets or returns the loaded flag if this object represents a directory.
 
 =cut
 
@@ -162,7 +214,7 @@ sub loaded {
 		$self->{LOADED} = $flag if defined $flag;
 		return $self->{LOADED}
 	}
-	carp $self->name . " is not a directory"
+	carp $self->fullname . " is not a directory"
 }
 
 =item B<loadStat>I<($item)>
@@ -172,18 +224,20 @@ Loads the details of I<$item>. I<$item> can be a file, folder or symlink.
 =cut
 
 sub loadStat {
-	my ($self, $item) = @_;
+	my $self = shift;
+	my $item = $self->fullname;
+	return unless defined $item;
 	my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks);
 	if (-l $item) {
 		($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = lstat($item);
 	} else {
 		($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat($item);
 	}
-	$self->{NAME} = $item;
 	$self->{SIZE} = $size;
 	$self->{ACCESSED} = $atime;
 	$self->{MODIFIED} = $mtime;
 	$self->{CREATED} = $ctime;
+	$self->{TYPE} = mimetype($item);
 }
 
 =item B<modified>
@@ -194,16 +248,6 @@ Returns the modified time stamp.
 
 sub modified {
 	return $_[0]->{MODIFIED};
-}
-
-=item B<name>
-
-Returns the file nameof the disk item loaded.
-
-=cut
-
-sub name {
-	return $_[0]->{NAME}
 }
 
 =item B<size>
@@ -223,6 +267,17 @@ sub size {
 	}
 	return $size
 }
+
+=item B<type>
+
+Returns the mime type.
+
+=cut
+
+sub type {
+	return $_[0]->{TYPE};
+}
+
 
 =back
 

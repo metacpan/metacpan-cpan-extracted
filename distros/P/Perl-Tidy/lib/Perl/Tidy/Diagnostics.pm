@@ -1,3 +1,5 @@
+package Perl::Tidy::Diagnostics;
+
 #####################################################################
 #
 # The Perl::Tidy::Diagnostics class writes the DIAGNOSTICS file, which is
@@ -14,11 +16,10 @@
 #
 #####################################################################
 
-package Perl::Tidy::Diagnostics;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 
 use constant EMPTY_STRING => q{};
 

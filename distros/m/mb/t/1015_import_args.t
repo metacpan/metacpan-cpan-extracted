@@ -2,8 +2,9 @@ die "This script is for perl only. You are using $^X.\n" if $^X =~ /jperl/i;
 
 # Step 6 test for import() / main() argument acceptance and error messages.
 #
-# mb keeps accepting every encoding name (big5 / big5hkscs / eucjp / gb18030 /
-# gbk / rfc2279 / sjis / uhc / utf8 / wtf8) plus the runtime tokens *mb and %mb,
+# mb keeps accepting every encoding name (big5 / big5hkscs / eucjp / euctw /
+# gb18030 / gbk / hp15 / informixv6als / rfc2279 / sjis / uhc / utf8 / wtf8)
+# plus the runtime tokens *mb and %mb,
 # exactly as before (no narrowing). An unsupported argument must die with a
 # message that lists the usable arguments. The modulino main() -e handling dies
 # the same way for an unknown encoding. This file loads mb with require and only
@@ -22,7 +23,7 @@ my $mb = "$FindBin::Bin/../lib/mb.pm";
 my $child = "$FindBin::Bin/_import_args_$$.pl";
 
 # every token mb must keep accepting from use mb '...'
-my @accept = qw( *mb %mb big5 big5hkscs eucjp gb18030 gbk rfc2279 sjis uhc utf8 wtf8 );
+my @accept = qw( *mb %mb big5 big5hkscs eucjp euctw gb18030 gbk hp15 informixv6als rfc2279 sjis uhc utf8 wtf8 );
 
 sub spew {
     open(OUT, ">$_[0]") or die "can't write $_[0]: $!";
@@ -63,6 +64,9 @@ sub main_err {
     sub { import_err('nosuchthing') =~ /\*mb/                          },
     sub { import_err('nosuchthing') =~ /%mb/                           },
     sub { import_err('nosuchthing') =~ /\bbig5\b/                      },
+    sub { import_err('nosuchthing') =~ /\beuctw\b/                     },
+    sub { import_err('nosuchthing') =~ /\bhp15\b/                      },
+    sub { import_err('nosuchthing') =~ /\binformixv6als\b/             },
     sub { import_err('nosuchthing') =~ /\butf8\b/                      },
     sub { import_err('nosuchthing') =~ /\bwtf8\b/                      },
     sub { import_err('nosuchthing') =~ /'nosuchthing'/                 },
@@ -82,7 +86,10 @@ sub main_err {
 # 21 -- the main() listing names a representative encoding from each family
     sub { main_err('-ezzz', 'dummy.pl') =~ /\bbig5hkscs\b/             },
     sub { main_err('-ezzz', 'dummy.pl') =~ /\beucjp\b/                 },
+    sub { main_err('-ezzz', 'dummy.pl') =~ /\beuctw\b/                 },
     sub { main_err('-ezzz', 'dummy.pl') =~ /\bgb18030\b/               },
+    sub { main_err('-ezzz', 'dummy.pl') =~ /\bhp15\b/                  },
+    sub { main_err('-ezzz', 'dummy.pl') =~ /\binformixv6als\b/         },
     sub { main_err('-ezzz', 'dummy.pl') =~ /\bsjis\b/                  },
     sub { main_err('-ezzz', 'dummy.pl') =~ /\buhc\b/                   },
     sub {1},
@@ -91,18 +98,8 @@ sub main_err {
     sub { main_err('-ezzz', 'dummy.pl') !~ /%mb/                       },
     sub {1},
 # 29 -- every supported token is still accepted by use mb '...' (no regression)
-    sub { try_use('*mb')       =~ /ACCEPTED/ },
-    sub { try_use('%mb')       =~ /ACCEPTED/ },
-    sub { try_use('big5')      =~ /ACCEPTED/ },
-    sub { try_use('big5hkscs') =~ /ACCEPTED/ },
-    sub { try_use('eucjp')     =~ /ACCEPTED/ },
-    sub { try_use('gb18030')   =~ /ACCEPTED/ },
-    sub { try_use('gbk')       =~ /ACCEPTED/ },
-    sub { try_use('rfc2279')   =~ /ACCEPTED/ },
-    sub { try_use('sjis')      =~ /ACCEPTED/ },
-    sub { try_use('uhc')       =~ /ACCEPTED/ },
-    sub { try_use('utf8')      =~ /ACCEPTED/ },
-    sub { try_use('wtf8')      =~ /ACCEPTED/ },
+#       (generated from @accept so the list above stays the single source of truth)
+    (map { my $token = $_; sub { try_use($token) =~ /ACCEPTED/ } } @accept),
     sub {1},
 # 42 -- an accepted token never emits the rejection message
     sub { try_use('utf8') !~ /not supported/ },

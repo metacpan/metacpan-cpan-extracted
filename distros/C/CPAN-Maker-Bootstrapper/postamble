@@ -1,6 +1,6 @@
 install ::
-	$(NOECHO) ln -sf $(INSTALLMAN3DIR)/CPAN::Maker::Bootstrapper.3pm $(INSTALLMAN3DIR)/bootstrapper.3pm
+	-$(NOECHO) ln -sf $(INSTALLMAN3DIR)/CPAN::Maker::Bootstrapper.3pm $(DESTINSTALLMAN3DIR)/bootstrapper.3pm; 
 	$(NOECHO) echo $(INSTALLMAN3DIR)/bootstrapper.3pm >> $(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist
 install ::
-	$(NOECHO) ln -sf $(INSTALLMAN3DIR)/CPAN::Maker::Bootstrapper.3pm $(INSTALLMAN3DIR)/cpan-maker-bootstrapper.3pm
+	-$(NOECHO) ln -sf $(INSTALLMAN3DIR)/CPAN::Maker::Bootstrapper.3pm $(DESTINSTALLMAN3DIR)/cpan-maker-bootstrapper.3pm; 
 	$(NOECHO) echo $(INSTALLMAN3DIR)/cpan-maker-bootstrapper.3pm >> $(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist

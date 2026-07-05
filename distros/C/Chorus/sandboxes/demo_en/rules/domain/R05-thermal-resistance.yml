@@ -1,0 +1,50 @@
+##
+# RULE: R05-thermal-resistance
+# AGENT: CobIntro::Agent::Domain  (pos. 2 / 4)
+# CORPUS: §4.1 — Part L + BS EN ISO 6946 — Minimum thermal resistance R by climate zone
+#
+# PURPOSE
+#   Checks that the thermal resistance R of insulation elements meets the
+#   minimum required R_min for the declared climate zone (§4.1).
+#   R is calculated as: R = thickness_mm / (1000 × lambda).
+#   Only applies to elements of type 'insulation'.
+#
+# INPUTS  (slots read)
+#   needs_domain       : targeting slot — set by Qualification R04
+#   type_element       : must be 'insulation'
+#   insulation_thick   : float — thickness in mm
+#   insulation_lambda  : float — thermal conductivity λ in W/(m·K)
+#   climate_zone       : str — 'A', 'B', or 'C'
+#
+# OUTPUTS (slots written)
+#   frame_ok     : 'NO' — element rejected if R < R_min
+#   domain_note  : description of the failure (actual R vs R_min)
+#   needs_domain : deleted after rejection
+#
+# HELPERS
+#   thermal_r_min($zone) → $r_min (m²·K/W)
+#
+# GUARD — EXCEPTION: defined $f->{frame_ok}
+#   Idempotence — prevents re-processing an already-processed Frame.
+##
+RULE: R05-thermal-resistance
+FIND:
+  f:
+    attribut: needs_domain
+EXCEPTION: defined $f->{frame_ok}
+CONDITION: "($f->{type_element}//'') eq 'insulation' && defined $f->{insulation_thick} && defined $f->{insulation_lambda} && defined $f->{climate_zone}"
+ACTION: |
+  # §4.1 — R = thickness_mm / (1000 × lambda)
+  my $R     = $f->{insulation_thick} / (1000 * $f->{insulation_lambda});
+  my $R_min = thermal_r_min($f->{climate_zone});
+
+  if ($R < $R_min) {
+    $f->set('frame_ok', 'NO');
+    $f->set('domain_note',
+      sprintf("Thermal R = %.2f m²·K/W < R_min = %.1f (zone %s §4.1)",
+        $R, $R_min, $f->{climate_zone}));
+    $f->set('needs_fire', 1);   # propagate to Fire even on domain rejection
+    $f->delete('needs_domain');
+    return 1;
+  }
+  1

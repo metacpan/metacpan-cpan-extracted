@@ -1,5 +1,225 @@
 Revision history for this software.
 
+0.65  2026-07-05 JST (Japan Standard Time)
+  - add encoding 'hp15' (HP-15, HP-UX Japanese): the two-octet DBCS
+    [\x80-\xA0\xE0-\xFE][\x00-\xFF], verified against the legacy Char-HP15 /
+    Ehp15 $your_char and %range_tr.  The lead set is the discontinuous
+    [\x80-\xA0\xE0-\xFE]; \x80 and \xA0 are leads here (single octets in sjis),
+    and the single octets \xA1-\xDF (JIS X 0201 katakana) and \xFF sit outside
+    the lead set.  $over_ascii, the multibyte anchor (all perl-version
+    branches), mb::getc (lead reads a second octet), the encoding allow-lists
+    and "use one of" messages, and the old-package map (HP15::*) all gained
+    hp15.  The trailing octet 21..7E includes \x5C, so hp15 also joined the
+    MSWin32 trailing-\x5C filename paths (with its own lead set) and got a
+    dedicated [A-Z]-hyphen routine list_all_by_hyphen_hp15_like that intersects
+    ranges with the exact discontinuous lead / single-octet sets (the
+    contiguous-lead sjis/big5 helpers would mis-split).  POD: new "=head2 hp15"
+    catalog entry; Char-HP15 moved into the "Legacy single-encoding
+    distributions mapped to mb encoding names" table and the now-empty
+    partially-subsumed note was removed.  New t/1019_hp15_structure.t,
+    t/3031_charclass_hyphen_hp15.t and t/8113_old_package_hp15.t;
+    t/1013_valid_encodings.t gained an hp15 accept case; the 21
+    doc/mb_cheatsheet.*.txt encoding lists gained the name.
+  - add encoding 'informixv6als' (INFORMIX V6 ALS): the Shift_JIS-compatible
+    two-octet core ([\x81-\x9F\xE0-\xFC][\x00-\xFF]) plus the \xFD three-octet
+    user-defined plane (\xFD[\xA1-\xFE][\x00-\xFF]), verified against the legacy
+    Char-INFORMIXV6ALS / Einformixv6als $your_char and %range_tr.  $over_ascii,
+    the multibyte anchor (all perl-version branches), mb::getc (\xFD reads three
+    octets), the encoding allow-lists and "use one of" messages, the old-package
+    map (INFORMIXV6ALS::*), and the MSWin32 trailing-\x5C filename paths
+    (sjis-style) all gained informixv6als.  [A-Z]-hyphen ranges get a
+    dedicated list_all_by_hyphen_informixv6als_like: the one- and two-octet
+    cases are identical to sjis's own routine and are reused verbatim, with
+    new cases added for ranges that touch the three-octet \xFD plane -- the
+    one-octet-vs-three-octet cases need \xFD treated as ambiguous (a genuine
+    one-octet character only when NOT followed by \xA1-\xFE, via a negative
+    lookahead, since it is otherwise the plane's lead byte).
+    POD: new "=head2 informixv6als" catalog entry; Char-INFORMIXV6ALS moved into
+    the "Legacy single-encoding distributions mapped to mb encoding names" table
+    and removed from the partially-subsumed note.  New t/1018_informixv6als_
+    structure.t (now also exercising mb::getc through a real filehandle),
+    t/3032_charclass_hyphen_informixv6als.t and
+    t/8112_old_package_informixv6als.t; t/1013_valid_encodings.t
+    gained an informixv6als accept case; the 21 doc/mb_cheatsheet.*.txt encoding
+    lists gained the name.
+  - pre-publication QA pass on 0.65: t/1017_euctw_structure.t and
+    t/1019_hp15_structure.t gained mb::getc coverage through a real filehandle
+    (previously only sjis was exercised, in t/4006_mb_getc.t).
+  - second pre-publication QA pass on 0.65 (documentation and test parity
+    for the three encodings added in this release):
+    (1) POD: the two "script encoding and subroutines (1 of 2) / (2 of 2)"
+        old-package tables gained the missing EUCTW:: / HP15:: /
+        INFORMIXV6ALS:: columns (the aliases themselves already existed and
+        were already exercised by t/8111-t/8113).
+    (2) POD: the per-encoding regular-expression transpilation catalog under
+        "Each elements in regular expressions are transpiled as follows"
+        gained "on euctw / on hp15 / on informixv6als encoding" sections.
+        Every row of every section (13 encodings x 44 patterns = 572 rows,
+        including the 440 pre-existing rows) was verified byte-for-byte
+        against live mb::parse() output.
+    (3) POD: the DAMEMOJI escaping catalog gained an "on informixv6als
+        encoding" section; the escape output for the two-octet core was
+        verified byte-identical to sjis before copying the sjis table.
+        (An "on hp15 encoding" section was initially deferred pending the
+        HP-15 byte-to-character table; it has now been added, see below.)
+    (4) t/1015_import_args.t: the acceptance block is now generated from the
+        @accept list (single source of truth) and @accept, the header
+        comment, and the error-message listing checks all gained euctw /
+        hp15 / informixv6als, which were valid import arguments since their
+        addition but were never exercised by this test.
+    (5) the detect_system_encoding() comment now names only the encodings
+        the function can actually return (it had over-claimed euctw /
+        rfc2279 / wtf8).
+  - detect_system_encoding() now returns euctw for the EUC-TW system
+    locales of the three commercial UNIXes, each verified against the
+    vendor's own documentation before the mapping was added:
+    (1) Oracle Solaris: zh_TW and zh_TW.EUC -- "In the zh_TW locale, the
+        EUC scheme is used to encode CNS 11643.1992 codeset" (Solaris 7
+        International Language Environments Guide,
+        docs.oracle.com/cd/E19620-01/805-4123/new-71/index.html); Solaris 9
+        onward names it zh_TW.EUC explicitly
+        (docs.oracle.com/cd/E19683-01/806-6642/6jfipqu66/index.html).
+        zh_TW.BIG5 stays big5.
+    (2) IBM AIX: zh_TW with alias zh_TW.IBM-eucTW, code set IBM-eucTW
+        ("Supported languages and locales",
+        www.ibm.com/docs/en/aix/7.2.0?topic=globalization-supported-languages-locales).
+        The capital-Z Zh_TW / Zh_TW.big-5 stay big5; the lookup is
+        case-sensitive, as on AIX itself.
+    (3) HP-UX: zh_TW.eucTW ("Configuring HP-UX for Different Languages",
+        HP part number 5991-5907, Table A-1 Locale Names).
+        zh_TW.big5 stays big5.
+    The generic "Other Systems" branch is intentionally unchanged: a bare
+    zh_TW is Big5 on glibc systems, so euctw must not capture it there.
+    New t/1020_detect_system_encoding.t exercises the new euctw entries,
+    the unchanged big5 / big5hkscs / sjis / eucjp / gb18030 / gbk / uhc
+    neighbours, the utf8 fallback, the LC_ALL-over-LANG priority, and the
+    AIX case-sensitivity, via mb::set_OSNAME / mb::get_OSNAME.
+  - detect_system_encoding(): every locale-name-to-encoding map was
+    rewritten from bare qw() lists into commented entries, each citing the
+    vendor document that names the locale and its code set:
+    Microsoft Windows code pages -- "Code Page Identifiers"
+    (learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers;
+    the HKSCS code page 951 is annotated as an update-installed variant of
+    950 that is absent from that page); Oracle Solaris -- the Solaris 7 /
+    Solaris 9 / Solaris 11.3 International Language Environments Guides;
+    HP-UX -- "Configuring HP-UX for Different Languages" (UXL10N-90302)
+    Appendix A Table A-1, plus HP-UX 11i patch PHCO_26453 for
+    zh_CN.gb18030 and the newly added zh_HK.hkbig5; IBM AIX -- "Supported
+    languages and locales" in the AIX documentation; generic branch -- GNU
+    libc localedata/SUPPORTED.  Entries with no surviving official manual
+    (japanese, japanese.euc, japan, Japanese-EUC, ja_JP.mscode, ja_JP.AJEC,
+    ja_JP.EUC, ja_JP.ujis, Jp_JP, and HP-UX zh_HK.big5) are annotated as
+    legacy vendor UNIX locale names kept for compatibility.
+    The "Other Systems" branch gained the explicit euctw spellings
+    zh_TW.eucTW (HP-UX / Tru64 UNIX style) and zh_TW.EUC-TW (glibc), and,
+    applying the same verification to the other encodings, the glibc
+    SUPPORTED names ja_JP.EUC-JP (eucjp), ko_KR.EUC-KR (uhc), zh_CN,
+    zh_CN.GBK, zh_SG, zh_SG.GBK (gbk), zh_CN.GB18030 (gb18030), zh_HK and
+    zh_HK.BIG5-HKSCS (big5hkscs).  A bare zh_TW stays intentionally
+    unmapped in the generic branch (Big5 on glibc, EUC-encoded CNS 11643 on
+    the Solaris lineage), documented in a comment at the map.
+    t/1020_detect_system_encoding.t grew from 33 to 48 tests covering
+    every new entry, the non-regression of every pre-existing entry it
+    already covered, and the deliberate zh_TW-stays-utf8-fallback rule.
+  - POD: the DAMEMOJI escaping catalog gained the previously deferred
+    "on hp15 encoding" section.  Publicly available primary sources
+    settled the question that had deferred it: per Ken Lunde, "CJKV
+    Information Processing" 2nd ed. (O'Reilly Media, 2009), Appendix E
+    "Vendor Character Set Standards" and Appendix F "Vendor Encoding
+    Methods" (both published as free PDFs at
+    resources.oreilly.com/examples/9780596514471; the O'Reilly Japan
+    translation of the 1st edition carries the same material in printed
+    Appendixes C and D), the HP Kanji character set is ASCII/JIS-Roman
+    plus JIS X 0201 katakana plus JIS X 0208-1983 with NO vendor-defined
+    characters, and the standard two-octet area of HP-15 encodes
+    JIS X 0208 with the same octets as Shift-JIS (corroborated by
+    Columbia University's Kermit kanji.txt,
+    www.columbia.edu/kermit/ftp/e/kanji.txt); only the user-defined area
+    (up to 5,366 code points on the extra lead octets such as \x80, \xA0,
+    and \xF0-\xFE) is unique to HP-15 and has no character shapes by
+    definition.  Therefore the hp15 DAMEMOJI table is byte- and
+    glyph-identical to the sjis table; this was additionally verified at
+    build time by comparing live escape output of sjis and hp15 for all
+    nine metacharacter trailing octets (40 5B 5C 5D 5E 60 7B 7C 7D) under
+    lead \x83 -- zero differences.  The "=head2 hp15" catalog entry and
+    the $over_ascii source comment now carry these findings and the
+    reference URLs, including the Unicode Consortium JIS X 0208 /
+    Shift-JIS mapping tables
+    (www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/) from which
+    the complete HP-15 standard-area code table can be derived
+    mechanically.
+  - doc lib/mb.pm + README: fold three lineage elements from the ancestral Sjis
+    / Char-Sjis distributions into mb's documentation.
+    (1) JRE-style stack diagram: the "Runtime multibyte interface ..." section
+        gains a new "=head2 The runtime stack (a JRE-style view)" that redraws
+        the old Sjis JRE (JPerl Runtime Environment) layer diagram -- script on
+        top, mb.pm middle layer, byte-oriented perl (PVM) at the bottom -- but
+        updated to mb's three paths (filter / modulino / runtime) and noting
+        that the lineage's three files (Sjis.pm + Esjis.pm + Char.pm) have
+        collapsed into the single mb.pm.
+    (2) malformed final octet: the "strict vs lenient" section gains a new
+        "=head3 a malformed final octet is kept, not silently dropped
+        (encoding-dependent)" documenting that on the Shift_JIS family a lead
+        byte ending a string with no trail is kept as a one-octet unit (not
+        deleted, not merged), so mb::chop returns exactly that octet and leaves
+        the prefix intact -- the long-standing Esjis::chop behaviour -- while
+        under utf8 a dangling lead is reported invalid by mb::valid().  README
+        STRICT VS LENIENT gains a matching short note.
+    (3) 1998/1999 provenance: the "From 1998 To You" section now records the
+        Tokyo.pm 1999-September source-filter seed (the minimal "package SJIS;
+        use Filter::Util::Call; sub multibyte_filter" posting, with its URL) and
+        the first appearance of the Esjis run-time engine in ActivePerl Build
+        522 under MSWin32, compiled Nov 2 1999.
+    (4) encoding-name map: add "=head1 Legacy single-encoding distributions
+        mapped to mb encoding names" (placed right after the encoding catalog).
+        A table maps the 18 previously released single-encoding CPAN distributions
+        that mb fully subsumes -- Sjis/Char-Sjis, Char-EUCJP, Big5/Char-Big5Plus,
+        Big5HKSCS/Char-Big5HKSCS, GBK/Char-GBK, Char-GB18030, Char-UHC,
+        Char-KPS9566/KPS9566, KSC5601, Char-UTF2/UTF2/UTF8-R2, Char-OldUTF8 -- to
+        their mb encoding name (sjis, eucjp, big5, big5hkscs, gbk, gb18030, uhc,
+        utf8, rfc2279), showing the multibyte lead/trail byte ranges of BOTH sides
+        so the equivalence is visible ("==" identical, "<=" legacy is a subset).
+        The UTF-8 family ranges (utf8 strict RFC 3629, rfc2279 permissive) are
+        listed in full; KSC5601 (<= uhc) and Char-OldUTF8 (<= rfc2279, minus
+        overlong C0/C1) get subset notes; the three only-partially-subsumed
+        distributions (Char-EUCTW SS2 plane, Char-INFORMIXV6ALS 0xFD area,
+        Char-HP15 lead structure) are named as not in the table.  Byte ranges
+        were verified against the actual $your_char definitions of the legacy
+        modules.
+  - test t/4022_mb_chop_malformed.t (new): regression test pinning the malformed
+    final octet rule above.  Under sjis, mb::chop("\x82\xA0\x82") returns "\x82"
+    and leaves "\x82\xA0"; a lone lead byte, a clean full DBCS char, and a
+    single-octet half-width kana each chop as expected; mb::length counts the
+    stray octet as its own unit (length 2); mb::valid tolerates the dangling
+    lead under sjis (1) but rejects it under utf8 (0).  US-ASCII source, loaded
+    with require so it runs on perl 5.005_03 and later; closure-array TAP plan.
+  - $VERSION 0.64 -> 0.65.  lib/mb.pm code is unchanged (the diff is POD-only);
+    behaviour described by the new test was already present and is now pinned.
+  - add EUC-TW (euctw) script encoding, ported from the legacy Char-EUCTW /
+    Eeuctw engine.  This is the first mb encoding with an \x8E (SS2) four-octet
+    structure: CNS 11643 plane 1 is [\xA1-\xFE][\xA1-\xFE] (2 octets) and the
+    SS2 planes 2..16 are \x8E[\xA1-\xB0][\xA1-\xFE][\x00-\xFF] (4 octets).
+    Touched in lib/mb.pm: $over_ascii, the multibyte anchor (5.038+/5.030+/
+    5.010001+ branches), mb::getc, the import / set_script_encoding allow-lists
+    and "use one of" messages, mb::get_old_package (euctw -> EUCTW::), the
+    qr/[A-Z]/ hyphen helper (list_all_by_hyphen_euctw_like, modelled on the
+    gb18030/utf8 helpers and covering every octet-length endpoint pair
+    (1-1),(1-2),(1-4),(2-2),(2-4),(4-4) under the legacy length-first ordering,
+    skipping the non-existent 3-octet length) and its dispatch,
+    and POD (=head2 euctw catalog entry; Char-EUCTW moved into the legacy
+    mapping table and removed from the "partially subsumed" note).  Like eucjp,
+    euctw is a Unix encoding and is intentionally NOT added to the MSWin32
+    trailing-\x5C DAMEMOJI groups even though the 4-octet final octet can be
+    \x5C, because EUC-TW is not a Windows ANSI code page.  Stray high octets
+    follow mb's strict model (non-characters), matching how eucjp treats them.
+    New tests: t/1017_euctw_structure.t (4/2-octet length/substr/index/rindex/
+    reverse/chop, the transpiled anchor, and SS2 four-octet hyphen-range cases
+    including a char whose trailing octet is \x5C), t/3030_charclass_hyphen_euctw.t
+    (now exercising all six length-combination endpoint pairs via 1/2/4-octet
+    limits), t/8111_old_package_euctw.t; t/1013_valid_encodings.t gains a euctw
+    get/set round trip; euctw added to the supported-encoding list in all 21
+    doc/mb_cheatsheet.*.txt.
+
 0.64  2026-06-29 JST (Japan Standard Time)
   - doc lib/mb.pm + README (step 8 doc sub-step): expand the usage documentation
     of the three ways to run (filter / modulino / runtime).  The POD "=head1

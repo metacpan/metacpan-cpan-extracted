@@ -1,0 +1,51 @@
+##
+# RULE: R01-strength-class
+# AGENT: CobIntro::Agent::Qualification  (pos. 1 / 4)
+# CORPUS: §2.1 — BS EN 338 — Minimum strength class by element type
+#
+# PURPOSE
+#   Checks that each structural element's strength class meets the minimum
+#   required by §2.1 BS EN 338 for its element type.
+#   Elements without a strength_class slot (e.g. insulation) are skipped silently.
+#
+# INPUTS  (slots read)
+#   needs_qualify   : targeting slot — set by Feed (load_projet)
+#   type_element    : element type — load_bearing_stud, sole_plate, top_plate,
+#                     non_lb_stud, rafter, joist
+#   strength_class  : BS EN 338 class string (C14, C16, C18, C24, C30, C35, C40)
+#
+# OUTPUTS (slots written)
+#   qualified        : 'NO' — element rejected (set only if check fails)
+#   rejection_reason : description of the failure
+#   needs_qualify    : deleted after rejection (consumed targeting slot)
+#
+# HELPERS
+#   min_strength_class($type_element) → class string | undef
+#   strength_class_ok($actual, $required) → 1 | 0
+#
+# GUARD — EXCEPTION: defined $f->{qualified}
+#   Idempotence — prevents re-processing a Frame already handled (by this or another rule).
+##
+RULE: R01-strength-class
+FIND:
+  f:
+    attribut: needs_qualify
+EXCEPTION: defined $f->{qualified}
+CONDITION: "defined $f->{strength_class} && defined $f->{type_element}"
+ACTION: |
+  # Look up minimum required class for this element type
+  my $required = min_strength_class($f->{type_element});
+
+  # Element type not covered by §2.1 (e.g. insulation) → skip silently
+  return 0 unless defined $required;
+
+  # §2.1 — check class rank
+  unless (strength_class_ok($f->{strength_class}, $required)) {
+    $f->set('qualified', 'NO');
+    $f->set('rejection_reason',
+      "Strength class $f->{strength_class} below required $required for $f->{type_element} (§2.1)");
+    $f->set('needs_domain', 1);   # propagate through pipeline even on rejection
+    $f->delete('needs_qualify');
+    return 1;
+  }
+  1

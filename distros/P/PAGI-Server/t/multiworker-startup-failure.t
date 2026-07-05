@@ -47,7 +47,17 @@ subtest 'master exits non-zero when all workers fail startup (does not hang)' =>
     );
     $loop->add($proc);
 
-    my $timeout  = $loop->delay_future(after => 15)->then(sub { Future->done('timeout') });
+    # The deadline is only a safety net so this test cannot hang forever if the
+    # master genuinely fails to exit. Honor PERL_TEST_TIME_OUT_FACTOR (set by
+    # slow-box CPAN Testers smokers) so a slow single-core machine that merely
+    # needs longer to compile, fork two workers, and fail lifespan startup is not
+    # misreported as a zombie-master regression. Clamped to a minimum of 1x, like
+    # perl core's t/test.pl watchdog, so the factor can only lengthen the timeout.
+    my $factor = $ENV{PERL_TEST_TIME_OUT_FACTOR};
+    $factor = 1 unless defined $factor && $factor =~ /^\d+$/ && $factor >= 1;
+    my $timeout_secs = 15 * $factor;
+
+    my $timeout  = $loop->delay_future(after => $timeout_secs)->then(sub { Future->done('timeout') });
     my $finished = $proc->finish_future->then(sub { Future->done('finished') });
     my $which    = Future->wait_any($finished, $timeout)->get;
 

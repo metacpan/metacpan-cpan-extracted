@@ -1,6 +1,6 @@
 package Command::Run;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 use v5.14;
 use warnings;
@@ -128,7 +128,7 @@ sub execute {
 
     # Use nofork path for code references when requested
     if ($opt{nofork} and ref $command[0] eq 'CODE') {
-	return $obj->_execute_nofork(\@command, %opt);
+	return $obj->_execute_in_place(\@command, %opt);
     }
 
     my $stderr = $opt{stderr} // '';
@@ -213,7 +213,40 @@ sub _tmpfile {
     $fh;
 }
 
-sub _execute_nofork {
+##
+## Remove an encoding layer pushed on the handle.  Re-opening a
+## filehandle over a dup (open FH, '>&', ...) keeps the existing
+## layer stack, so without this the layer pushed for each execution
+## would accumulate indefinitely.
+## See https://github.com/kaz-utashiro/perl-perlio-leak-bench
+##
+sub _pop_encoding {
+    my $fh = shift;
+    my @layers = PerlIO::get_layers($fh);
+    if (grep { defined && /^encoding\b/ } @layers[-2 .. -1]) {
+	binmode $fh, ':pop';
+    }
+}
+
+sub _utf8_flagged {
+    my $fh = shift;
+    !! grep { $_ eq 'utf8' } PerlIO::get_layers($fh);
+}
+
+##
+## Undo the layer change made for the execution: pop the :encoding
+## layer (non-raw), or clear the :utf8 flag if we set it (raw).
+##
+sub _restore_encoding {
+    my($fh, $raw, $was_utf8) = @_;
+    if ($raw) {
+	binmode $fh, ':bytes' unless $was_utf8;
+    } else {
+	_pop_encoding($fh);
+    }
+}
+
+sub _execute_in_place {
     my $obj = shift;
     my $command = shift;
     my %opt = @_;
@@ -227,6 +260,7 @@ sub _execute_nofork {
 
     # Save and redirect STDOUT (always needed)
     open my $save_stdout, '>&', \*STDOUT or die "dup STDOUT: $!\n";
+    my $stdout_was_utf8 = _utf8_flagged(\*STDOUT);
     open STDOUT, '>&', $tmp_stdout or die "redirect STDOUT: $!\n";
     binmode STDOUT, $raw ? ':utf8' : ':encoding(utf8)';
 
@@ -243,16 +277,19 @@ sub _execute_nofork {
 
     # Handle STDIN — only save/redirect when needed
     my $save_stdin;
+    my $stdin_was_utf8;
     if (exists $opt{stdin}) {
 	my $tmp_stdin = $obj->_tmpfile('NOFORK_STDIN', raw => $raw);
 	$tmp_stdin->print($opt{stdin});
 	$tmp_stdin->seek(0, 0) or die "seek: $!\n";
 	open $save_stdin, '<&', \*STDIN or die "dup STDIN: $!\n";
+	$stdin_was_utf8 = _utf8_flagged(\*STDIN);
 	open STDIN, '<&', $tmp_stdin or die "redirect STDIN: $!\n";
 	binmode STDIN, $raw ? ':utf8' : ':encoding(utf8)';
     } elsif (my $input = $obj->{INPUT}) {
 	$input->seek(0, 0) or die "seek: $!\n";
 	open $save_stdin, '<&', \*STDIN or die "dup STDIN: $!\n";
+	$stdin_was_utf8 = _utf8_flagged(\*STDIN);
 	open STDIN, '<&', $input->fileno or die "redirect STDIN: $!\n";
 	binmode STDIN, $raw ? ':utf8' : ':encoding(utf8)';
     }
@@ -273,14 +310,19 @@ sub _execute_nofork {
 	$result = -1;
     }
 
-    # Flush and restore — only what was redirected
+    # Flush and restore — only what was redirected.  Undo the layer
+    # change made above; restoring by re-open keeps the layer stack,
+    # so it would persist (and :encoding would accumulate on every
+    # execution) otherwise.
     STDOUT->flush;
+    _restore_encoding(\*STDOUT, $raw, $stdout_was_utf8);
     open STDOUT, '>&', $save_stdout or die "restore STDOUT: $!\n";
     if ($save_stderr) {
 	STDERR->flush;
 	open STDERR, '>&', $save_stderr or die "restore STDERR: $!\n";
     }
     if ($save_stdin) {
+	_restore_encoding(\*STDIN, $raw, $stdin_was_utf8);
 	open STDIN, '<&', $save_stdin or die "restore STDIN: $!\n";
     }
     if (defined $orig_0) {
@@ -398,7 +440,7 @@ Command::Run - Execute external command or code reference
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -482,8 +524,7 @@ See L</NOFORK AND RAW MODE> for details.
 
 When true (with C<nofork>), use C<:utf8> instead of
 C<:encoding(utf8)> on I/O temporary files, avoiding encode/decode
-overhead and PerlIO layer leak.  See L</NOFORK AND RAW MODE> for
-details.
+overhead.  See L</NOFORK AND RAW MODE> for details.
 
     my $result = Command::Run->new(
         command => [\&process, @args],
@@ -628,7 +669,7 @@ fork-based execution for lightweight functions with small I/O.
 
 =head2 How Nofork Works
 
-In nofork mode, C<_execute_nofork> temporarily redirects the real
+In nofork mode, the module temporarily redirects the real
 STDOUT, STDERR, and STDIN file descriptors to temporary files using
 C<dup>, executes the code reference, then restores them:
 
@@ -664,24 +705,32 @@ be passed directly.  The C<:utf8> layer simply sets Perl's UTF-8 flag
 on strings read from the file without performing actual byte-level
 conversion.
 
-=head3 PerlIO Encoding Leak
+=head3 PerlIO Encoding Layer Accumulation
 
-There is an additional reason to prefer C<:utf8> over
-C<:encoding(utf8)> in long-running processes.  Repeatedly pushing and
-popping the C<:encoding(utf8)> layer (which happens on each nofork
-execution when opening and closing temporary files) causes a
-cumulative performance degradation in Perl's PerlIO subsystem.  This
-affects B<all> PerlIO operations in the process, not just the ones
-using the encoding layer.
+Nofork mode temporarily redirects the standard filehandles and
+restores them with C<open FH, 'E<gt>&', ...>.  Perl keeps the
+existing PerlIO layer stack when a filehandle is re-opened this way,
+and C<binmode FH, ':encoding(utf8)'> pushes a new layer even when one
+is already present.  In earlier versions of this module, the encoding
+layer pushed on each execution therefore accumulated on STDIN/STDOUT
+one layer per execution, making long-running processes progressively
+slower (nofork could end up slower than fork) and growing memory
+without bound.  See
+L<https://github.com/kaz-utashiro/perl-perlio-leak-bench> for the
+underlying Perl behavior.
 
-In benchmarks, nofork with C<:encoding(utf8)> is actually B<slower>
-than fork after many iterations, due to this leak.  Raw mode avoids
-the issue entirely.
+This is fixed: the layer change is now undone before the handles are
+restored, so the layer stack of the standard filehandles stays
+exactly as the caller left it.  With the fix, nofork is much faster
+than fork in either mode, and most of the historical gap between
+C<:encoding> and raw mode (which was caused by the accumulation) is
+gone:
 
-    # Benchmark: code ref with stdin (100-byte input, 1000 iterations)
-    fork:                  399/s (baseline)
-    nofork + :encoding:    316/s (0.8x — slower than fork!)
-    nofork + :utf8 (raw): 13,433/s (34x faster)
+    # Benchmark: code ref with stdin (100-byte input,
+    # 1000 iterations, object reused)
+    fork:                    495/s (baseline)
+    nofork + :encoding:   15,997/s (32x)
+    nofork + :utf8 (raw): 20,038/s (40x)
 
 =head2 Zero-Modification Callee Integration
 
@@ -706,7 +755,7 @@ nofork mode with method chaining:
 
 At step (1), C<require> loads the module and C<use open ':std'>
 applies C<:encoding(utf8)> to the B<original> STDOUT.  At step (2),
-C<_execute_nofork> redirects STDOUT to a fresh temporary file with
+nofork mode redirects STDOUT to a fresh temporary file with
 C<:utf8> layer.  The callee's encoding setup has already fired on the
 original STDOUT and does not affect the redirected one.
 
@@ -792,7 +841,7 @@ B<Command::Run> differs from these modules in several ways:
 
 =item * B<File descriptor path> - Output accessible via C</dev/fd/N>
 
-=item * B<Minimal footprint> - About 200 lines of code
+=item * B<Minimal footprint> - Compact, dependency-light implementation
 
 =item * B<Method chaining> - Fluent interface for readability
 

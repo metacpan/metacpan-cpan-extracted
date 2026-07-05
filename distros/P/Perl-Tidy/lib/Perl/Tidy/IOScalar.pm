@@ -1,3 +1,5 @@
+package Perl::Tidy::IOScalar;
+
 #####################################################################
 #
 # This is a stripped down version of IO::Scalar
@@ -6,11 +8,10 @@
 # a print method which reads lines (mode='w')
 #
 #####################################################################
-package Perl::Tidy::IOScalar;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 
 use constant DEVEL_MODE   => 0;
 use constant EMPTY_STRING => q{};

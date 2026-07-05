@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v1.1.4
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Getopt::Long with Class - ~/lib/m
+## Version v1.1.5
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2025/03/13
+## Modified 2026/07/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,14 +18,14 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     use Clone;
-    use DateTime;
-    use DateTime::Format::Strptime;
+    use DateTime::Lite;
+    use DateTime::Format::Lite;
     use Getopt::Long;
     use Module::Generic::Array;
     use Module::Generic::File qw( file );
     use Module::Generic::Scalar;
     use Scalar::Util;
-    our $VERSION = 'v1.1.4';
+    our $VERSION = 'v1.1.5';
 };
 
 use strict;
@@ -615,7 +615,7 @@ sub postprocess
         {
             $opts->{ $k } = Module::Generic::Scalar->new( $opts->{ $k } );
         }
-        elsif( $def->{type} eq 'integer' || $def->{decimal} )
+        elsif( $def->{type} eq 'integer' || $def->{type} eq 'number' || $def->{type} eq 'float' || $def->{type} eq 'decimal' || $def->{decimal} )
         {
             # Even though this is a number, this was set as a scalar reference, so we need to dereference it
             if( $self->_is_scalar( $opts->{ $k } ) )
@@ -699,7 +699,7 @@ sub init
     $self->SUPER::init( @_ ) || return( $self->pass_error( $self->error ) );
     return( $self->error( "No dictionary as provided." ) ) if( !$self->{dict} );
     return( $self->error( "No dictionary as provided." ) ) if( !$self->{aliases} );
-    return( $self->error( "Dictionary provided is not an hash reference." ) ) if( !$self->_is_hash( $self->{dict} ) );
+    return( $self->error( "Dictionary provided (", ( $self->{dict} // 'undef' ), ") is not an hash reference." ) ) if( !$self->_is_hash( $self->{dict} ) );
     return( $self->error( "Aliases provided is not an hash reference." ) ) if( !$self->_is_hash( $self->{aliases} ) );
     scalar( keys( %{$self->{dict}} ) ) || return( $self->error( "No dictionary data was provided." ) );
     return( $self->error( "Data provided is not an hash reference." ) ) if( !$self->_is_hash( $self->{data} ) );
@@ -757,6 +757,9 @@ AUTOLOAD
         return( $self->_set_get_scalar_as_object( $f, @_ ) );
     }
     elsif( $def->{type} eq 'integer' ||
+           $def->{type} eq 'number' ||
+           $def->{type} eq 'numeric' ||
+           $def->{type} eq 'float' || 
            $def->{type} eq 'decimal' )
     {
         return( $self->_set_get_number( $f, @_ ) );
@@ -1086,6 +1089,7 @@ sub STORE
     my $aliases = $self->{aliases};
     my( $pack, $file, $line ) = caller;
     my( $key, $val ) = @_;
+    no warnings 'uninitialized';
     my $dict = $self->{dict};
     my $enabled = $self->{enable};
     my $fallback = sub
@@ -1110,8 +1114,6 @@ sub STORE
             CORE::warn( "No alias property found. This should not happen.\n" ) if( $self->{warnings} );
             return( $fallback->( $key, $val ) );
         };
-        # $self->messagef_colour( 3, 'Found alias "{green}' . $alias . '{/}" with %d elements: {green}"%s"{/}', scalar( @$alias ), $alias->join( "', '" ) );
-        $self->messagef_colour( 3, "Found alias '<green>$alias</>' with %d elements: <green>'%s'</>", scalar( @$alias ), $alias->join( "', '" ) );
         if( Scalar::Util::reftype( $alias ) ne 'ARRAY' )
         {
             CORE::warn( "Alias property is not an array reference. This should not happen.\n" ) if( $self->{warnings} );
@@ -1219,7 +1221,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v1.1.4
+    v1.1.5
 
 =head1 DESCRIPTION
 
@@ -1357,7 +1359,7 @@ Type code implies an anonymous sub routine and should be accompanied with the at
 
 =item * C<datetime>
 
-This type will set the resulting value to be a L<DateTime> object of the value provided.
+This type will set the resulting value to be a L<DateTime::Lite> object of the value provided.
 
 =item * C<decimal>
 
@@ -1594,7 +1596,7 @@ A boolean is an object from L<Module::Generic::Boolean>
 
 An integer or decimal is an object from L<Text::Number>
 
-A date/dateime value is an object from L<DateTime>
+A date/dateime value is an object from L<DateTime::Lite>
 
     $opts->created->iso8601 # 2020-05-01T17:10:20
 

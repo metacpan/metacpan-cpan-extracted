@@ -1,5 +1,15 @@
 Revision history for OpenSearch::Client
 
+3.007005    2026-07-05
+            * added cxn parameters http_proxy, https_proxy and no_proxy
+            * replaced 'send_get_body_as' with 'send_body_as_source'
+
+3.007004    2026-07-04
+            Fixed versions
+
+3.007003    2026-07-04
+            Bad versions
+
 3.007002    2026-07-04
             Pod updates
 

@@ -1,5 +1,18 @@
 Revision history for Object-Remote
 
+0.005001 - 2026-07-04
+  - fix MANIFEST missing Object::Remote::Loop
+  - unbreak CPAN upload by hiding 'maybe' package from the indexer
+
+0.005000 - 2026-07-04
+  - fix compatibility with non-english locales
+  - make built-in loop compatible with IO::Async
+  - move code shared between both loops into loop-wrapper
+  - copy fatpacked modules to the remote on connection startup
+  - fix undefined variable warnings
+  - remove stale code
+  - add environment variable OBJECT_REMOTE_LOOP to select loop implementation
+
 0.004004 - 2024-05-23
   - fix Future::PP not being available when needed on remote side
   - fix tests to work without . in @INC

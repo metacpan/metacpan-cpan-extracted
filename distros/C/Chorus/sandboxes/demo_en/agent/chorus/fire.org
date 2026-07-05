@@ -1,0 +1,193 @@
+#+TITLE: Agent Fire
+#+AGENT: CobIntro::Agent::Fire
+#+PIPELINE_POS: 3
+#+RULES_DIR: rules/fire/
+
+* Domain
+  Validates fire safety compliance for each element:
+  - §5.1 Building Regs Part B / BS EN 13501-2 — Required REI fire resistance period
+  - §5.2 BS EN 13501-1 — Reaction to fire class of internal lining (A1 or A2 min) + surface mass ≥ 8 kg/m²
+  - §5.3 Building Regs Part B §B3 — Plasterboard thickness for REI 30 / REI 60
+
+  Receives ~needs_fire~ from Agent::Domain.
+  Sets ~fire_ok = 'YES'|'NO'~ and ~fire_note~ (optional detail).
+  On YES or NO: sets ~needs_compliance~ to trigger Agent::Compliance.
+
+* Targeting Slots                                                        :SCOPE:
+** Chosen Strategy
+   Strategy B — presence slot ~needs_fire~ set by Agent::Domain (R07).
+   Chosen strategy : B
+   Justification   : Only domain-compliant (or domain-processed) elements carry this slot.
+
+** Targeting Slots Table
+   | Slot          | Strategy | Set by               | Value / condition        |
+   |---------------+----------+----------------------+--------------------------|
+   | needs_fire    | B        | CobIntro::Agent::Domain R07 | existence alone suffices |
+
+** Pre-Population Contract
+   Before this agent becomes active, each Frame must carry:
+   - slot ~needs_fire~ — set by: Agent::Domain R07
+
+* Pipeline — I/O Contract
+** Incoming Slots
+   | Slot                  | Source  | Set by      | Description                                        |
+   |-----------------------+---------+-------------+----------------------------------------------------|
+   | needs_fire            | Element | Domain R07  | Targeting slot                                     |
+   | type_element          | Element | Feed        | Element type routing                               |
+   | collective            | Element | Feed        | 1 = multi-occupancy, 0 = single occupancy dwelling |
+   | fire_resistance_period| Element | Feed        | Achieved REI period (integer minutes)              |
+   | reaction_class        | Element | Feed        | Euroclass (A1, A2, B, C…) for lining              |
+   | surface_mass_kg_m2    | Element | Feed        | Surface mass of lining (kg/m²)                    |
+   | pb_thickness_mm       | Element | Feed        | Plasterboard thickness (mm)                        |
+
+** Outgoing Slots
+   | Slot               | Target  | Type / values | Description                                       |
+   |--------------------+---------+---------------+---------------------------------------------------|
+   | fire_ok            | Element | YES / NO      | Fire compliance verdict                           |
+   | fire_note          | Element | string        | Detail of failure (if NO)                        |
+   | needs_compliance   | Element | 1             | Targeting slot for Agent::Compliance              |
+
+* Ontology
+  Same ~Element~ Frame extended with fire-specific slots.
+
+* Frame Catalogue
+** Frame: Element (continued — fire slots)
+   | Slot                   | Type  | Values / range  | Constraint  | Description                        |
+   |------------------------+-------+-----------------+-------------+------------------------------------|
+   | needs_fire             | flag  | 1 / undef       | set upstream | Targeting slot                    |
+   | collective             | int   | 0 / 1           | optional     | Occupancy type                    |
+   | fire_resistance_period | int   | ≥ 0             | optional     | Achieved REI (min)                |
+   | reaction_class         | str   | A1/A2/B/C/D/E/F | optional     | Euroclass                         |
+   | surface_mass_kg_m2     | float | ≥ 0             | optional     | kg/m²                             |
+   | pb_thickness_mm        | float | ≥ 0             | optional     | Plasterboard thickness mm         |
+   | fire_ok                | str   | YES / NO        | set here     | Fire verdict                      |
+   | fire_note              | str   | free text       | set if NO   | Failure detail                    |
+   | needs_compliance       | flag  | 1 / undef       | set here     | Targeting slot for Compliance     |
+
+* Slot Dictionary
+  | Slot                   | Frame   | Role                     | fmatch target? |
+  |------------------------+---------+--------------------------+----------------|
+  | needs_fire             | Element | _SCOPE targeting         | yes            |
+  | type_element           | Element | read — routing           | no             |
+  | collective             | Element | read — REI lookup        | no             |
+  | fire_resistance_period | Element | read — REI check         | no             |
+  | reaction_class         | Element | read — class check       | no             |
+  | surface_mass_kg_m2     | Element | read — mass check        | no             |
+  | pb_thickness_mm        | Element | read — thickness check   | no             |
+  | fire_ok                | Element | write — verdict          | no             |
+  | fire_note              | Element | write — failure detail   | no             |
+  | needs_compliance       | Element | write — next targeting   | yes (agent 4)  |
+
+* Rule Catalogue
+** Rule: R01-rei-check
+   Intent    : Check achieved REI ≥ required minimum by occupancy type (§5.1)
+   FIND      : ~f~ → attribut: ~needs_fire~
+   EXCEPTION : ~defined $f->{fire_ok}~
+   CONDITION : ~defined $f->{fire_resistance_period}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my $required_rei = rei_required($f->{collective} // 0);
+   if ($f->{fire_resistance_period} < $required_rei) {
+     $f->set('fire_ok', 'NO');
+     $f->set('fire_note',
+       sprintf("REI %d < required REI %d (§5.1)", $f->{fire_resistance_period}, $required_rei));
+     $f->set('needs_compliance', 1);
+     $f->delete('needs_fire');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R02-lining-check
+   Intent    : Check reaction class ≥ A2 and surface mass ≥ 8 kg/m² for internal lining (§5.2)
+   FIND      : ~f~ → attribut: ~needs_fire~
+   EXCEPTION : ~defined $f->{fire_ok}~
+   CONDITION : ~defined $f->{reaction_class} || defined $f->{surface_mass_kg_m2}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my $ok = 1;
+   my $note = '';
+   if (defined $f->{reaction_class} && !reaction_class_ok($f->{reaction_class})) {
+     $ok = 0;
+     $note = "Reaction class $f->{reaction_class} < A2 min (§5.2)";
+   }
+   if ($ok && defined $f->{surface_mass_kg_m2} && $f->{surface_mass_kg_m2} < 8) {
+     $ok = 0;
+     $note = sprintf("Surface mass %.1f kg/m² < 8 kg/m² min (§5.2)", $f->{surface_mass_kg_m2});
+   }
+   unless ($ok) {
+     $f->set('fire_ok', 'NO');
+     $f->set('fire_note', $note);
+     $f->set('needs_compliance', 1);
+     $f->delete('needs_fire');
+     return 1;
+   }
+   1
+   #+END_SRC
+
+** Rule: R03-fire-conclude
+   Intent    : Mark fire OK if no fire rule failed; always trigger compliance agent (§5.3 + §6)
+   FIND      : ~f~ → attribut: ~needs_fire~
+   EXCEPTION : ~defined $f->{fire_ok}~
+   ACTION    :
+   #+BEGIN_SRC perl
+   my $required_rei = rei_required($f->{collective} // 0);
+   my $pb_min = pb_thickness_min($required_rei);
+   if (defined $f->{pb_thickness_mm} && $f->{pb_thickness_mm} < $pb_min) {
+     $f->set('fire_ok', 'NO');
+     $f->set('fire_note',
+       sprintf("Plasterboard %.1f mm < %.1f mm required for REI %d (§5.3)",
+         $f->{pb_thickness_mm}, $pb_min, $required_rei));
+   } else {
+     $f->set('fire_ok', 'YES');
+   }
+   $f->set('needs_compliance', 1);
+   $f->delete('needs_fire');
+   1
+   #+END_SRC
+
+* Perl Helpers
+** rei_required
+   Signature   : ~sub rei_required($collective) → $rei_minutes~
+   Description : Returns the required REI period in minutes based on occupancy (§5.1).
+   Called by   : R01-rei-check, R03-fire-conclude
+   Exported    : yes
+   Notes       : Source corpus §5.1 — Building Regs Part B / BS EN 13501-2
+
+   #+BEGIN_SRC perl
+   # Source corpus: §5.1 — Building Regs Part B — REI required by occupancy
+   sub rei_required { return $_[0] ? 60 : 30 }
+   #+END_SRC
+
+** reaction_class_ok
+   Signature   : ~sub reaction_class_ok($class) → 1|0~
+   Description : Returns 1 if the Euroclass is A1 or A2 (minimum required by §5.2).
+   Called by   : R02-lining-check
+   Exported    : yes
+   Notes       : Source corpus §5.2 — BS EN 13501-1
+
+   #+BEGIN_SRC perl
+   # Source corpus: §5.2 — BS EN 13501-1 — Reaction to fire: A1 or A2 minimum
+   my %CLASS_OK = (A1 => 1, A2 => 1);
+   sub reaction_class_ok { return $CLASS_OK{ $_[0] } // 0 }
+   #+END_SRC
+
+** pb_thickness_min
+   Signature   : ~sub pb_thickness_min($rei) → $thickness_mm~
+   Description : Returns minimum plasterboard thickness for the required REI period (§5.3).
+   Called by   : R03-fire-conclude
+   Exported    : yes
+   Notes       : Source corpus §5.3 — Building Regs Part B §B3
+
+   #+BEGIN_SRC perl
+   # Source corpus: §5.3 — Building Regs Part B §B3 — Plasterboard thickness
+   sub pb_thickness_min { return $_[0] >= 60 ? 25 : 12.5 }
+   #+END_SRC
+
+* Constraints & Pitfalls
+  - [ ] R01 and R02 can individually set fire_ok = 'NO'; R03 fires only if both skipped
+  - [ ] ~needs_compliance~ must be set even when fire_ok = 'NO' (§6 requires all elements)
+  - [ ] Elements without fire slots (no ~fire_resistance_period~, ~reaction_class~, ~pb_thickness_mm~)
+        skip R01 and R02, enter R03 → fire_ok = 'YES' unless pb check fails
+  - [ ] ~needs_fire~ deleted after processing in every branch
+  - [ ] collective defaults to 0 (non-collective) if absent

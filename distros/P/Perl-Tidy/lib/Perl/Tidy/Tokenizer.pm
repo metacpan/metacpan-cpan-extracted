@@ -1,3 +1,5 @@
+package Perl::Tidy::Tokenizer;
+
 #####################################################################
 #
 # Perl::Tidy::Tokenizer reads a source and breaks it into a stream of tokens
@@ -28,12 +30,11 @@
 #
 ########################################################################
 
-package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
 
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 
 use Carp;
 
@@ -264,7 +265,9 @@ BEGIN {
         _rclosing_brace_indentation_hash_    => $i++,
         _show_indentation_table_             => $i++,
         _rnon_indenting_brace_stack_         => $i++,
+        _rseqno_at_depth_                    => $i++,
         _rbareword_info_                     => $i++,
+        _rsaw_unknown_syntax_in_seqno_       => $i++,
     };
 } ## end BEGIN
 
@@ -651,8 +654,10 @@ EOM
     $self->[_maximum_level_]                      = 0;
     $self->[_true_brace_error_count_]             = 0;
     $self->[_rnon_indenting_brace_stack_]         = [];
+    $self->[_rseqno_at_depth_]                    = [SEQ_ROOT];
     $self->[_show_indentation_table_]             = 0;
     $self->[_rbareword_info_]                     = {};
+    $self->[_rsaw_unknown_syntax_in_seqno_]       = {};
 
     $self->[_rclosing_brace_indentation_hash_] = {
         valid                 => undef,
@@ -1399,21 +1404,28 @@ sub get_line {
 ##      _ending_in_quote           => 0,
     };
 
-    # must print line unchanged if we are in a here document
+    # Must print line unchanged if we are in a here document
     if ( $self->[_in_here_doc_] ) {
 
         $line_of_tokens->{_line_type} = 'HERE';
         my $here_doc_target      = $self->[_here_doc_target_];
         my $here_quote_character = $self->[_here_quote_character_];
         my $candidate_target     = $input_line;
+        my $leading_whitespace   = EMPTY_STRING;
         chomp $candidate_target;
 
         # Handle <<~ targets, which are indicated here by a leading space on
-        # the here quote character
-        if ( $here_quote_character =~ /^\s/ ) {
-            $candidate_target =~ s/^\s+//;
+        # the here quote character. c603 has test cases.
+        # the leading whitespace of all here text lines match it.
+        my $ix = rindex( $candidate_target, $here_doc_target );
+        if ( $ix > 0 && $here_quote_character =~ /^\s/ ) {
+            $leading_whitespace = substr( $candidate_target, 0, $ix );
+            if ( $leading_whitespace !~ /^\s*$/ ) {
+                $leading_whitespace = EMPTY_STRING;
+            }
         }
-        if ( $candidate_target eq $here_doc_target ) {
+
+        if ( $candidate_target eq $leading_whitespace . $here_doc_target ) {
             $self->[_nearly_matched_here_target_at_] = undef;
             $line_of_tokens->{_line_type} = 'HERE_END';
             $self->log_numbered_msg("Exiting HERE document $here_doc_target\n");
@@ -1515,7 +1527,7 @@ sub get_line {
             );
         }
         else {
-            # not a code-skipping control line
+            ## not a code-skipping control line
         }
         return $line_of_tokens;
     }
@@ -1567,7 +1579,7 @@ sub get_line {
         }
     }
     else {
-        # not a special control line
+        ## not a special control line
     }
 
     # check for a hash-bang line if we haven't seen one
@@ -1760,7 +1772,7 @@ sub get_line {
         return $line_of_tokens;
     }
     else {
-        # not in __END__ or __DATA__
+        ## not in __END__ or __DATA__
     }
 
     # now, finally, we know that this line is type 'CODE'
@@ -1800,7 +1812,7 @@ sub get_line {
         $self->log_numbered_msg("End of multi-line quote or pattern\n");
     }
     else {
-        # not at the edge of a quote
+        ## not at the edge of a quote
     }
 
     # we are returning a line of CODE
@@ -3279,7 +3291,11 @@ EOM
                                 && $last_nonblank_token =~ /^\$/ )
                             {
                                 $hint =
-                                  "Do you mean '$last_nonblank_token->(' ?\n";
+                                  "Do you mean '$last_nonblank_token->(' ?";
+                                if ( $is_for_foreach{ $rtokens->[0] } ) {
+                                    $hint .= " ... or is a ';' missing above?";
+                                }
+                                $hint .= "\n";
                             }
                         }
                         else {
@@ -3365,9 +3381,14 @@ EOM
 
         my $self = shift;
 
-        # ')'
         ( $type_sequence, $indent_flag ) =
           $self->decrease_nesting_depth( PAREN, $rtoken_map->[$i_tok] );
+
+        # ')'
+        if ( $expecting == TERM ) {
+            $self->error_if_expecting_TERM()
+              if ( !$self->[_rsaw_unknown_syntax_in_seqno_]->{$type_sequence} );
+        }
 
         my $rvars = $rparen_vars->[$paren_depth];
         if ( defined($rvars) ) {
@@ -3538,7 +3559,9 @@ EOM
                 $self->write_logfile_entry($msg);
             }
         }
-        else { $is_pattern = ( $expecting == TERM ) }
+        else {
+            $is_pattern = ( $expecting == TERM );
+        }
 
         if ($is_pattern) {
             $in_quote                = 1;
@@ -3573,6 +3596,12 @@ EOM
         my $self = shift;
 
         # '{'
+        if ( 0 && $next_tok eq '%' ) {
+            ## c583: Spot for possible future check for a '{% ' which starts
+            ## a simple macro. If there is a matching closing '%}' on this
+            ## line then mark the whole structure as a quote.
+        }
+
         # if we just saw a ')', we will label this block with
         # its type.  We need to do this to allow sub
         # code_block_type to determine if this brace starts a
@@ -3666,7 +3695,7 @@ EOM
             $want_paren = EMPTY_STRING;
         }
         else {
-            # not special
+            ## not special
         }
 
         # now identify which of the three possible types of
@@ -3779,12 +3808,21 @@ EOM
         if ( defined( $rbrace_package->[$brace_depth] ) ) {
             $current_package = $rbrace_package->[$brace_depth];
         }
-
-        # can happen on brace error (caught elsewhere)
         else {
+            ## can happen on brace error (caught elsewhere)
         }
         ( $type_sequence, $indent_flag ) =
           $self->decrease_nesting_depth( BRACE, $rtoken_map->[$i_tok] );
+
+        if ( $expecting == TERM ) {
+            $self->error_if_expecting_TERM()
+              if (
+                !$self->[_rsaw_unknown_syntax_in_seqno_]->{$type_sequence}
+
+                # c583: no error check at a possible end-of-macro combo '%}'
+                && $last_nonblank_type ne '%'
+              );
+        }
 
         if ( $rbrace_structural_type->[$brace_depth] eq 'L' ) {
             $type = 'R';
@@ -3829,6 +3867,7 @@ EOM
             }
         }
         else {
+            ## '&' is an operator
         }
         return;
     } ## end sub do_AMPERSAND
@@ -3857,6 +3896,7 @@ EOM
             }
         }
         else {
+            ## ok:  '<' is less than
         }
         return;
     } ## end sub do_LESS_THAN_SIGN
@@ -3917,7 +3957,9 @@ EOM
                 }
             }
         }
-        else { $is_pattern = ( $expecting == TERM ) }
+        else {
+            $is_pattern = ( $expecting == TERM );
+        }
 
         if ($is_pattern) {
             $in_quote                = 1;
@@ -4050,6 +4092,10 @@ EOM
         elsif ( !$rcurrent_depth->[QUESTION_COLON] ) {
             $type = 'A';
             $self->[_in_attribute_list_] = 1;
+
+            # and set a flag to skip error messages
+            my $seqno = $self->[_rseqno_at_depth_]->[$total_depth];
+            $self->[_rsaw_unknown_syntax_in_seqno_]->{$seqno} = 1 if ($seqno);
         }
 
         # otherwise, it should be part of a ?/: operator
@@ -4139,6 +4185,11 @@ EOM
         ( $type_sequence, $indent_flag ) =
           $self->decrease_nesting_depth( SQUARE_BRACKET,
             $rtoken_map->[$i_tok] );
+
+        if ( $expecting == TERM ) {
+            $self->error_if_expecting_TERM()
+              if ( !$self->[_rsaw_unknown_syntax_in_seqno_]->{$type_sequence} );
+        }
 
         if ( $rsquare_bracket_structural_type->[$square_bracket_depth] eq '{' )
         {
@@ -4289,7 +4340,7 @@ EOM
                         "Unconventional here-target: '$here_doc_target'\n");
                 }
                 else {
-                    # nothing to complain about
+                    ## nothing to complain about
                 }
             }
             elsif ( $expecting == TERM ) {
@@ -4311,10 +4362,11 @@ EOM
 
             # target not found, expecting == UNKNOWN
             else {
-                # assume it is a shift
+                ## assume it is a shift
             }
         }
         else {
+            ## '<<' is shift
         }
         return;
     } ## end sub do_LEFT_SHIFT
@@ -4357,7 +4409,7 @@ EOM
                         "Unconventional here-target: '$here_doc_target'\n");
                 }
                 else {
-                    # nothing to complain about
+                    ## nothing to complain about
                 }
 
                 # Note that we put a leading space on the here quote
@@ -5488,6 +5540,7 @@ EOM
                 }
             }
             else {
+                ## something else
             }
 
             if ( DEBUG_BAREWORD && $result ne 'other bareword' ) {
@@ -5631,13 +5684,14 @@ EOM
                 my $pos_shift = rindex( $qs, '<<' );
                 if (
 
-                    # '<<' in the last line
+                    # a '<<' in the last line
                     $pos_shift >= $len_qs
 
-                    # followed by a '}'
-                    && rindex( $qs, '}' ) > $pos_shift
+                    # and a '}' in the last line (c598: updated to allow
+                    # for the possibility of an extra '<<' after a here doc)
+                    && rindex( $qs, '}' ) >= $len_qs
 
-                    # preceded by '$' or '@'
+                    # and a '<<' preceded by '$' or '@'
                     && (   rindex( $qs, '$', $pos_shift ) >= 0
                         || rindex( $qs, '@', $pos_shift ) >= 0 )
                   )
@@ -6022,7 +6076,7 @@ EOM
                 $self->[_in_format_skipping_] = 0;
             }
             else {
-                # not a format skipping comment
+                ## not a format skipping comment
             }
 
             # Optional fast processing of a block comment
@@ -6150,7 +6204,7 @@ EOM
                         $self->complain("Should 'ne' be '!=' here ?\n");
                     }
                     else {
-                        # that's all
+                        ## that's all
                     }
                 }
 
@@ -6194,7 +6248,7 @@ EOM
                         }
                     }
                     else {
-                        # No other patches
+                        ## No other patches
                     }
                 }
             }
@@ -6603,7 +6657,7 @@ EOM
                     }
                 }
                 else {
-                    # valid token type other than ; and t
+                    ## valid token type other than ; and t
                 }
 
                 #----------------------------------------------------
@@ -7602,7 +7656,7 @@ sub decide_if_code_block {
             $j++;
         }
         else {
-            # none of the above
+            ## none of the above
         }
         if ( $j > $jbeg ) {
 
@@ -7809,6 +7863,12 @@ sub increase_nesting_depth {
 
     # make a new unique sequence number
     my $seqno = $next_sequence_number++;
+
+    # Remember the type sequence number at the current depth,
+    # but do not overwrite the root sequence number.
+    if ( $total_depth > 0 ) {
+        $self->[_rseqno_at_depth_]->[$total_depth] = $seqno;
+    }
 
     $rcurrent_sequence_number->[$aa]->[$cd_aa] = $seqno;
 
@@ -8653,9 +8713,8 @@ sub scan_bare_identifier_do {
                     $type = 'Z';
                 }
             }
-
-            # none of the above special types
             else {
+                ## none of the above special types
             }
         }
 
@@ -9215,7 +9274,7 @@ sub do_scan_package {
                           "Space in identifier, following $identifier\n";
                     }
                     else {
-                        # silently accept space after '$' and '@' sigils
+                        ## silently accept space after '$' and '@' sigils
                     }
                 }
             }
@@ -9686,7 +9745,7 @@ sub do_scan_package {
                 $id_scan_state = EMPTY_STRING;
 
                 # emergency return
-                goto RETURN;
+                goto SCAN_ID_EMERGENCY_RETURN;
             }
             $saw_type = !$saw_alpha;
         }
@@ -9852,7 +9911,7 @@ EOM
             $i   = $i_begin;
         }
 
-      RETURN:
+      SCAN_ID_EMERGENCY_RETURN:
 
         DEBUG_SCAN_ID && do {
             my ( $a, $b, $c ) = caller();
@@ -10082,6 +10141,7 @@ EOM
                 $tok = $last_nonblank_token;
             }
             else {
+                ##
             }
 
             $match ||= 1;
@@ -10237,9 +10297,8 @@ EOM
                     );
                 }
             }
-
-            # EOF technically ok
             else {
+                ## EOF technically ok
             }
 
             check_prototype( $proto, $package, $subname );
@@ -10247,7 +10306,7 @@ EOM
 
         # no match to either sub name or prototype, but line not blank
         else {
-
+            ##
         }
         return ( $i, $tok, $type, $id_scan_state );
     } ## end sub do_scan_sub
@@ -12084,7 +12143,8 @@ BEGIN {
     push @unary_ops, BACKSLASH;
     $is_binary_or_unary_operator_type{$_} = 1 for ( @binary_ops, @unary_ops );
 
-    my @binary_keywords = qw( and or err eq ne cmp );
+    # added xor ge gt le lt ( git #206 )
+    my @binary_keywords = qw( and or err eq ne cmp xor ge gt le lt );
     $is_binary_keyword{$_} = 1 for @binary_keywords;
 
     $is_binary_or_unary_keyword{$_} = 1 for ( @binary_keywords, 'not' );

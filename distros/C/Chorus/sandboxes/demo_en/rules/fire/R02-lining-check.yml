@@ -1,0 +1,58 @@
+##
+# RULE: R02-lining-check
+# AGENT: CobIntro::Agent::Fire  (pos. 3 / 4)
+# CORPUS: §5.2 — BS EN 13501-1 — Reaction to fire class and surface mass of internal lining
+#
+# PURPOSE
+#   Checks that the internal wall lining satisfies:
+#   - Reaction to fire Euroclass A1 or A2 minimum (§5.2)
+#   - Surface mass ≥ 8 kg/m² (§5.2)
+#   Elements without reaction_class or surface_mass_kg_m2 are skipped silently.
+#
+# INPUTS  (slots read)
+#   needs_fire          : targeting slot — set by Domain R07
+#   reaction_class      : str — Euroclass (A1, A2, B, C, D, E, F)
+#   surface_mass_kg_m2  : float — surface mass of lining in kg/m²
+#
+# OUTPUTS (slots written)
+#   fire_ok           : 'NO' — element rejected if class < A2 or mass < 8 kg/m²
+#   fire_note         : description of the first failing criterion
+#   needs_compliance  : 1 — set on rejection
+#   needs_fire        : deleted after rejection
+#
+# HELPERS
+#   reaction_class_ok($class) → 1 | 0
+#
+# GUARD — EXCEPTION: defined $f->{fire_ok}
+#   Idempotence — prevents re-processing an already fire-evaluated Frame.
+##
+RULE: R02-lining-check
+FIND:
+  f:
+    attribut: needs_fire
+EXCEPTION: defined $f->{fire_ok}
+CONDITION: "defined $f->{reaction_class} || defined $f->{surface_mass_kg_m2}"
+ACTION: |
+  my $ok   = 1;
+  my $note = '';
+
+  # §5.2 — reaction class must be A1 or A2 minimum
+  if (defined $f->{reaction_class} && !reaction_class_ok($f->{reaction_class})) {
+    $ok   = 0;
+    $note = "Reaction class $f->{reaction_class} < A2 minimum (§5.2 BS EN 13501-1)";
+  }
+
+  # §5.2 — surface mass must be >= 8 kg/m²
+  if ($ok && defined $f->{surface_mass_kg_m2} && $f->{surface_mass_kg_m2} < 8) {
+    $ok   = 0;
+    $note = sprintf("Surface mass %.1f kg/m² < 8 kg/m² minimum (§5.2)", $f->{surface_mass_kg_m2});
+  }
+
+  unless ($ok) {
+    $f->set('fire_ok', 'NO');
+    $f->set('fire_note', $note);
+    $f->set('needs_compliance', 1);
+    $f->delete('needs_fire');
+    return 1;
+  }
+  1

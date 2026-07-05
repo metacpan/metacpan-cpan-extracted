@@ -1,3 +1,5 @@
+package Perl::Tidy::VerticalAligner::Alignment;
+
 #####################################################################
 #
 # the Perl::Tidy::VerticalAligner::Alignment class holds information
@@ -5,11 +7,10 @@
 #
 #####################################################################
 
-package Perl::Tidy::VerticalAligner::Alignment;
 use strict;
 use warnings;
 
-our $VERSION = '20260204';
+our $VERSION = '20260705';
 
 sub new {
 

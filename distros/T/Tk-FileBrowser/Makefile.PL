@@ -3,18 +3,31 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my $pm = 'FileBrowser';
+use Config;
+my $mswin = 0;
+$mswin = 1 if $Config{'osname'} eq 'MSWin32';
+
+my %prereq = (
+	'File::Basename' => 0,
+	'File::Spec' => 0,
+	'File::Spec::Link' => '0.073',
+	'Test::Tk' => '3.04',
+	'Tk' => '804.032',
+	'Tk::ListBrowser' => '0.12',
+	'Tk::ListEntry' => '0.07',
+	'Tk::YADialog' => '0.05',
+);
+
+if ($mswin) {
+	$prereq{'File::MimeInfo::Simple'} = '0.7'
+} else {
+	$prereq{'File::MimeInfo'} = '0.35'
+}
+
 
 WriteMakefile(
 	NAME => "Tk::$pm",
 	PREREQ_PM => {
-		'File::Basename' => 0,
-		'File::Spec' => 0,
-		'File::Spec::Link' => '0.073',
-		'Test::Tk' => '3.02',
-		'Tk' => '804.032',
-		'Tk::ITree' => '0.03',
-		'Tk::ListEntry' => '0.05',
-		'Tk::YADialog' => '0.05',
 	},
 	ABSTRACT_FROM => "lib/Tk/$pm.pm",
 	VERSION_FROM => "lib/Tk/$pm.pm",
