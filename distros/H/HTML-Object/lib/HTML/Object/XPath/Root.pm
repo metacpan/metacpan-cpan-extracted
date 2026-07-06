@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/04
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,11 +42,11 @@ sub evaluate
 {
     my $self = shift( @_ );
     my $nodeset = shift( @_ );
-    
+
     # must only ever occur on 1 node
     die "Can't go to root on > 1 node!" unless $nodeset->size == 1;
     # return( $self->error( "Can't go to root on > 1 node!" ) ) unless( $nodeset->size == 1 );
-    
+
     my $newset = $self->new_nodeset;
     # $newset->push($nodeset->get_node(1)->getRootNode());
     my $node = $nodeset->get_node(1);
@@ -82,7 +82,7 @@ HTML::Object::XPath::Root - HTML Object
 
     use HTML::Object::XPath::Root;
     my $root = HTML::Object::XPath::Root->new || 
-        die( HTML::Object::XPath::Root->error, "\n" );
+        die( HTML::Object::XPath::Root->error );
 
 =head1 VERSION
 
@@ -128,7 +128,7 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

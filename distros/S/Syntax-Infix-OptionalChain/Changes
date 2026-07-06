@@ -1,5 +1,8 @@
 Revision history for Syntax-Infix-OptionalChain
 
+0.02	2026-07-05
+	- Remove PAX headings
+
 0.01    2026-06-20
         First version.
         - Lexically-scoped `?->` safe-navigation operator, built on Infix::Custom.

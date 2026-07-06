@@ -3,39 +3,29 @@ package Game::Cribbage::Play;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
-
+use Object::Proto::Sugar -types;
 use Game::Cribbage::Play::Card;
 use Game::Cribbage::Play::Score;
 use Game::Cribbage::Error;
 use ntheory qw/forcomb vecsum/;
 
-
-property [qw/id next_to_play/] => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1,
+has [qw/id next_to_play/] => (
+	is => 'rw',
 );
 
-property total => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1,
-	value => 0
+has total => (
+	is => 'rw',
+	isa => Int,
+	default => 0,
 );
 
-property [qw/cards scored/] => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1,
-	value => []
+has [qw/cards scored/] => (
+	is => 'rw',
+	isa => ArrayRef,
+	default => []
 );
 
-function test_card => sub {
+sub test_card {
 	my ($self, $player, $card) = @_;
 
 	my $total = $self->calculate_total([@{$self->cards}, $card], 0);
@@ -61,9 +51,9 @@ function test_card => sub {
 	$self->calculate_hits($score, $total);
 
 	return $score->score;
-};
+}
 
-function card => sub {
+sub card {
 	my ($self, $player, $card) = @_;
 
 	my $total = $self->calculate_total([@{$self->cards}, $card], 0);
@@ -97,9 +87,9 @@ function card => sub {
 		push @{$self->scored}, $score;
 	}
 	return $score;
-};
+}
 
-function force_card => sub {
+sub force_card {
 	my ($self, $player, $card) = @_;
 
 	for (@{$self->cards}) {
@@ -109,10 +99,10 @@ function force_card => sub {
 	}
 	
 	return $self->card($player, $card);
-};
+}
 
 
-function end_play => sub {
+sub end_play {
 	my ($self) = @_;
 
 	return unless $self->cards->[0];
@@ -126,27 +116,27 @@ function end_play => sub {
 	push @{$self->scored}, $score;
 
 	return $score;
-};
+}
 
-function calculate_pair => sub {
+sub calculate_pair {
 	my ($self, $score, $card) = @_;
 
 	if ($self->cards->[-1] && $self->cards->[-1]->symbol eq $card->symbol) {
 		if ($self->cards->[-2] && $self->cards->[-2]->symbol eq $card->symbol) {
 			if ($self->cards->[-3] && $self->cards->[-3]->symbol eq $card->symbol) {
-				$score->pair = 3;
+				$score->pair(3);
 			} else {
-				$score->pair = 2;
+				$score->pair(2);
 			}
 		} else {
-			$score->pair = 1;
+			$score->pair(1);
 		}
 	}
 
 	return 1;
-};
+}
 
-function calculate_run => sub {
+sub calculate_run {
 	my ($self, $score, $card) = @_; 
 	my @cards = map { $_->card } @{$self->cards};
 	my @values = map { $_->run_value } (@cards, $card);
@@ -165,15 +155,15 @@ function calculate_run => sub {
 			}
 		}
 		if ($match) {
-			$score->run = $match;
+			$score->run($match);
 			last;
 		}
 	}
 
 	return 1;
-};
+}
 
-function calculate_total => sub {
+sub calculate_total {
 	my ($self, $cards, $set) = @_;
 
 	my $total = 0;
@@ -181,22 +171,22 @@ function calculate_total => sub {
 		$total += $_->value;
 	}
 	if ($set) {
-		$self->total = $total;
+		$self->total($total);
 	}
 
 	return $total;
-};
+}
 
-function calculate_hits => sub {
+sub calculate_hits {
 	my ($self, $score, $total) = @_;
 	if ($total == 15) {
-		$score->fifteen = 1;
+		$score->fifteen(1);
 	} elsif ($total == 31) {
-		$score->pegged = 1;
-		$score->go = 1;
+		$score->pegged(1);
+		$score->go(1);
 	}
 
 	return 1;
-};
+}
 
 1;

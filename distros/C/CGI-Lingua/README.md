@@ -63,94 +63,35 @@ Based on that list CGI::Lingua tells the application which language the user wou
 
 Creates a CGI::Lingua object.
 
-Takes one mandatory parameter, `supported`,
-a list of languages, in RFC-1766 format,
-that the website supports.
-It can either be a simple string,
-if only one language is supported,
-or a reference to a list of languages.
+### API SPECIFICATION
 
-Language codes are of the form primary-code \[ - country-code \] e.g.
-'en', 'en-gb' for English and British English respectively.
+    Input:
+      supported  => ArrayRef[Str] | Str   # required; RFC-1766 language codes
+      cache      => Object                # optional; CHI-compatible (get/set)
+      config_file => Str                  # optional; YAML/XML/INI config path
+      logger     => Object                # optional; must implement warn/info/error
+      info       => Object                # optional; CGI::Info-compatible
+      data       => Any                   # optional; forwarded to I18N::AcceptLanguage
+      dont_use_ip => Bool                 # optional; disable IP-based fallback
+      syslog     => Bool | HashRef        # optional; Sys::Syslog integration
+      debug      => Bool                  # optional; enable debug logging
 
-For a list of primary codes refer to ISO-639 (e.g. 'en' for English).
-For a list of country codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
+    Returns: CGI::Lingua blessed hashref, or a clone when called on an object.
 
-    # Sample web page
-    use CGI::Lingua;
-    use CHI;
-    use Log::Abstraction;
+### MESSAGES
 
-    my $cache = CHI->new(driver => 'File', root_dir => '/tmp/cache');
+    "You must give a list of supported languages"  - no 'supported' key provided
+    "List of supported languages must be an array ref" - supported is wrong ref type
+    "Supported languages must be the short code"  - string too short or too long
+    "Logger must be a blessed object with warn/info/error methods" - bad logger arg
 
-    # We support English, French, British and American English, in that order
-    my $lingua = CGI::Lingua->new(
-        supported => ['en', 'fr', 'en-gb', 'en-us'],
-        cache     => $cache,
-        logger    => Log::Abstraction->new()
-    );
+### PSEUDOCODE
 
-    print "Content-Type: text/plain\n\n";
-    print 'Language: ', $lingua->language(), "\n";
-    print 'Country: ', $lingua->country(), "\n";
-    print 'Time Zone: ', $lingua->time_zone(), "\n";
-
-Supported\_languages is the same as supported.
-
-It takes several optional parameters:
-
-- `cache`
-
-    An object which is used to cache country lookups.
-    This cache object is an object that understands get() and set() messages,
-    such as a [CHI](https://metacpan.org/pod/CHI) object.
-
-- `config_file`
-
-    Points to a configuration file which contains the parameters to `new()`.
-    The file can be in any common format,
-    including `YAML`, `XML`, and `INI`.
-    This allows the parameters to be set at run time.
-
-- `logger`
-
-    Used for warnings and traces.
-    It can be an object that understands warn() and trace() messages,
-    such as a [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction), [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
-    a reference to code,
-    a reference to an array,
-    or a filename.
-    See [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) for further details.
-
-- `info`
-
-    Takes an optional parameter info, an object which can be used to see if a CGI
-    parameter is set, for example, an [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo) object.
-
-- `data`
-
-    Passed on to [I18N::AcceptLanguage](https://metacpan.org/pod/I18N%3A%3AAcceptLanguage).
-
-- `dont_use_ip`
-
-    By default, if none of the
-    requested languages is supported, CGI::Lingua->language() looks in the IP
-    address for the language to use.
-    This may not be what you want,
-    so use this option to disable the feature.
-
-- `syslog`
-
-    Takes an optional parameter syslog, to log messages to
-    [Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog).
-    It can be a boolean to enable/disable logging to syslog, or a reference
-    to a hash to be given to Sys::Syslog::setlogsock.
-
-Since emitting warnings from a CGI class can result in messages being lost (you
-may forget to look in your server's log), or appear to the client in
-amongst HTML causing invalid HTML, it is recommended either syslog
-or logger (or both) are set.
-If neither is given, [Carp](https://metacpan.org/pod/Carp) will be used.
+    1. Normalise args via Params::Get and Object::Configure
+    2. Validate logger (must be blessed with warn/info/error) if provided
+    3. Validate supported (required, string or arrayref)
+    4. If cache and REMOTE_ADDR set, attempt to thaw a previously stored state
+    5. Bless and return fresh object with sentinel flags set to GEO_UNKNOWN
 
 ## language
 
@@ -163,19 +104,10 @@ on a site that only serves British English, language() will return 'English'.
 If none of the requested languages is included within the supported lists,
 language() returns 'Unknown'.
 
-    use CGI::Lingua;
-    # Site supports English and British English
-    my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb']);
+### API SPECIFICATION
 
-If the browser requests 'en-us', then language will be 'English' and
-sublanguage will also be undefined, which may seem strange, but it
-ensures that sites behave sensibly.
-
-    # Site supports British English only
-    my $l = CGI::Lingua->new({ supported => ['fr', 'en-gb']} );
-
-If the script is not being run in a CGI environment, perhaps to debug it, the
-locale is used via the LANG environment variable.
+    Input:  none beyond $self
+    Returns: Str - human-readable language name, or 'Unknown'
 
 ## preferred\_language
 
@@ -183,15 +115,17 @@ Same as language().
 
 ## name
 
-Synonym for language, for compatibility with Local::Object::Language
+Synonym for language, for compatibility with Locale::Object::Language.
 
 ## sublanguage
 
-Tells the CGI what variant to use e.g. 'United Kingdom', or 'Unknown' if
+Tells the CGI what variant to use e.g. 'United Kingdom', or undef if
 it can't be determined.
 
-Sublanguages are handled sensibly, so that if a client requests U.S. English
-on a site that only serves British English, sublanguage() will return undef.
+### API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: Str | undef
 
 ## language\_code\_alpha2
 
@@ -200,6 +134,11 @@ when you've asked for en-gb.
 
 If none of the requested languages is included within the supported lists,
 language\_code\_alpha2() returns undef.
+
+### API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: Str (2 chars) | undef
 
 ## code\_alpha2
 
@@ -210,6 +149,11 @@ Synonym for language\_code\_alpha2, kept for historical reasons.
 Gives the two-character representation of the supported language, e.g. 'gb'
 when you've asked for en-gb, or undef.
 
+### API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: Str (2 chars) | undef
+
 ## requested\_language
 
 Gives a human-readable rendition of what language the user asked for whether
@@ -217,6 +161,11 @@ or not it is supported.
 
 Returns the sublanguage (if appropriate) in parentheses,
 e.g. "English (United Kingdom)"
+
+### API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: Str - e.g. "English (United Kingdom)" or "Unknown"
 
 ## country
 
@@ -226,6 +175,22 @@ If [IP::Country](https://metacpan.org/pod/IP%3A%3ACountry), [Geo::IPfree](https:
 CGI::Lingua will make use of that, otherwise, it will do a Whois lookup.
 If you do not have any of those installed I recommend you use the
 caching capability of CGI::Lingua.
+
+### API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: Str (2 lowercase chars) | undef
+      'Unknown' is only returned in the Baidu-EU special case via _handle_eu_country.
+
+### MESSAGES
+
+    "GEOIP_COUNTRY_CODE contains an invalid country code; ignoring"
+    "HTTP_CF_IPCOUNTRY contains an invalid country code; ignoring"
+    "X.X.X.X isn't a valid IP address"
+    "Can't determine country from LAN connection X"
+    "Can't determine country from loopback connection X"
+    "cache contains a numeric country: N"
+    "IP matches to a numeric country"
 
 ## locale
 
@@ -237,9 +202,10 @@ and is not 100% reliable.  But it's better than nothing ;-)
 
 Returns a [Locale::Object::Country](https://metacpan.org/pod/Locale%3A%3AObject%3A%3ACountry) object.
 
-To be clear, if you're in the US and request the language in Spanish,
-and the site supports it, language() will return 'Spanish', and locale() will
-try to return the Locale::Object::Country for the US.
+### API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: Locale::Object::Country | undef
 
 ## time\_zone
 
@@ -247,6 +213,66 @@ Returns the timezone of the web client.
 
 If [Geo::IP](https://metacpan.org/pod/Geo%3A%3AIP) is installed,
 CGI::Lingua will make use of that, otherwise it will use [ip-api.com](https://metacpan.org/pod/ip-api.com)
+
+### API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: Str (IANA timezone name) | undef
+
+### MESSAGES
+
+    "Couldn't determine the timezone"
+    "LWP::Simple::WithCache and LWP::Simple are both absent; cannot contact ip-api.com"
+      Returns undef rather than croaking; install either LWP variant to enable ip-api lookups.
+
+# LIMITATIONS
+
+- **Accept-Language left-to-right scan ignores q-values**
+
+    The second and third pass in `_accept_language_match()` scan the header
+    left-to-right and ignore quality (`q=0.x`) values.  A header such as
+    `de;q=0.9,en;q=0.1` on a site that only supports `en` would currently
+    fail to fall back to English.  Use `I18N::AcceptLanguage` passes only when
+    possible.
+
+- **Logger must be a blessed object**
+
+    The `logger` parameter is documented as accepting a code ref, array ref, or
+    filename, but the current implementation calls `$logger->$level()` and will
+    die on non-blessed values.  Wrap alternative logger types in a
+    `Log::Abstraction` instance before passing them to `new()`.
+
+- **es-419 sublanguage returns undef**
+
+    Three-part regional codes such as `es-419` (Latin American Spanish) do not
+    resolve to a `sublanguage()` value because ISO 3166-1 does not define '419'.
+    This is a known limitation of the Locale::Object layer.
+
+- **Whois lookups are slow and unreliable**
+
+    Without `IP::Country`, `Geo::IP`, or `Geo::IPfree` installed, `country()`
+    falls back to Whois queries against live RIPE/ARIN/IANA servers.  These can
+    time out under load.  Install at least one local geo-database module and enable
+    the CHI cache to avoid this.
+
+- **Sub::Private not yet enforced**
+
+    The `_*` private methods are currently accessible from outside the package.
+    `Sub::Private` should be added to enforce encapsulation once white-box tests
+    are updated to call only the public API.
+
+- **IPv4-mapped IPv6 addresses are normalised to IPv4**
+
+    `REMOTE_ADDR` values in the form `::ffff:a.b.c.d` (RFC 4291 section 2.5.5)
+    are silently rewritten to the embedded `a.b.c.d` IPv4 address before any
+    geo-lookup.  This is correct for country detection purposes but means the raw
+    address string is not preserved in cache keys or log messages.
+
+- **EU country code is irresolvable (with one exception)**
+
+    IP addresses that Whois reports as country `EU` are mapped to `'Unknown'`
+    unless they fall within Baidu's known subnet (RT-86809).  There is no ISO
+    3166-1 country code for the European Union.
 
 # AUTHOR
 
@@ -256,8 +282,9 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 Please report any bugs or feature requests to the author.
 
-If HTTP\_ACCEPT\_LANGUAGE is 3 characters, e.g., es-419,
-sublanguage() returns undef.
+If `HTTP_ACCEPT_LANGUAGE` contains a sub-tag with a 3-digit UN M.49 region
+code (e.g. `es-419` for Latin American Spanish), `sublanguage()` returns
+`undef` because ISO 3166-1 does not define numeric codes.
 
 Please report any bugs or feature requests to `bug-cgi-lingua at rt.cpan.org`,
 or through the web interface at
@@ -265,15 +292,15 @@ or through the web interface at
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-Uses [I18N::Acceptlanguage](https://metacpan.org/pod/I18N%3A%3AAcceptlanguage) to find the highest priority accepted language.
+Uses [I18N::AcceptLanguage](https://metacpan.org/pod/I18N%3A%3AAcceptLanguage) to find the highest priority accepted language.
 This means that if you support languages at a lower priority, it may be missed.
 
 # SEE ALSO
 
-- Testing Dashboard [https://nigelhorne.github.io/CGI-Lingua/coverage/](https://nigelhorne.github.io/CGI-Lingua/coverage/)
+- [Test Dashboard](https://nigelhorne.github.io/CGI-Lingua/coverage/)
 - VWF - Versatile Web Framework [https://github.com/nigelhorne/vwf](https://github.com/nigelhorne/vwf)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
-- [I18N::AcceptLangauge](https://metacpan.org/pod/I18N%3A%3AAcceptLangauge)
+- [I18N::AcceptLanguage](https://metacpan.org/pod/I18N%3A%3AAcceptLanguage)
 - [Locale::Country](https://metacpan.org/pod/Locale%3A%3ACountry)
 
 # SUPPORT
@@ -306,10 +333,22 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=CGI::Lingua](http://deps.cpantesters.org/?module=CGI::Lingua)
 
+# FORMAL SPECIFICATION
+
+## new
+
+    new : Class × Params → CGI::Lingua
+    ∀ p : Params • p.supported ≠ ∅ ⟹ result.language ∈ (p.supported ∪ {'Unknown'})
+
+## language
+
+    language : CGI::Lingua → Str
+    result ∈ {name(l) | l ∈ supported} ∪ {'Unknown'}
+
 # ACKNOWLEDGEMENTS
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2025 Nigel Horne.
+Copyright 2010-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2

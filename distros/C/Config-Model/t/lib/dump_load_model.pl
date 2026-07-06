@@ -115,14 +115,18 @@ return [
                     config_class_name => 'SlaveZ',
                 },
             },
-            [qw/lista listb listc/] => {
+            'a.string' => {
+                type => 'leaf',
+                value_type => 'uniline',
+            },
+            [qw/lista listb listc list.d/] => {
                 type       => 'list',
                 cargo => {
                     type => 'leaf',
                     value_type => 'string'
                 },
             },
-            [qw/hash_a hash_b/] => {
+            [qw/hash_a hash_b hash.c/] => {
                 type       => 'hash',
                 index_type => 'string',
                 cargo => {

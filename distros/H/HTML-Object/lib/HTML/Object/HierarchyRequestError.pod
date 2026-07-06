@@ -7,7 +7,7 @@ HTML::Object::HierarchyRequestError - HTML Hierarchy Exception
 =head1 SYNOPSIS
 
     use HTML::Object
-    my $parser = HTML::Object->new || die( HTML::Object->error, "\n" );
+    my $parser = HTML::Object->new || die( HTML::Object->error );
     my $doc = $parser->parse_file( $some_file ) || die( $parser->error );
     my $elem = $parser->new_element( tag => 'html' );
     $doc->append( $elem ) || die( $doc->error );
@@ -39,7 +39,7 @@ L<HTML::Object::Exception>
 
 Copyright (c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

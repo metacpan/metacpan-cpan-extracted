@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/06
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ HTML::Object::DOM::Element::Paragraph - HTML Object DOM Paragraph Class
 
     use HTML::Object::DOM::Element::Paragraph;
     my $paragraph = HTML::Object::DOM::Element::Paragraph->new ||
-        die( HTML::Object::DOM::Element::Paragraph->error, "\n" );
+        die( HTML::Object::DOM::Element::Paragraph->error );
 
 =head1 VERSION
 
@@ -93,7 +93,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLPar
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

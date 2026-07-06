@@ -76,28 +76,7 @@ foreach my $input (@ARGV) {
     if (-d $input) {
         $font->import_directory($input, incremental => $config{incremental});
     } else {
-        my $magic;
-
-        open(my $in, '<:raw', $input) or croak 'Cannot open: '.$input;
-
-        $in->read($magic, 10);
-        $in->seek(0, SEEK_SET) or croak 'Cannot seek on input: '.$input;
-        if ($magic eq "\0\x07SF\x0d\x0a\xc0\x0a\x06\0") {
-            $font->read($in);
-        } elsif ($input =~ m#[/\\][Uu]\+([0-9a-fA-F]{4,6})\.[^\.]+$#) {
-            my $codepoint = hex $1;
-            my $glyph = $font->import_glyph($input);
-            $font->glyph_for($codepoint => $glyph);
-        } elsif ($input =~ m#\.psf((?:\.gz)?)$#) {
-            $in->binmode('gzip') if length($1 // '');
-            $font->import_psf($in);
-        } elsif ($input =~ m#\.hex((?:\.gz)?)$#) {
-            $in->binmode('gzip') if length($1 // '');
-            $font->import_hex($in);
-        } else {
-            warn 'Strange input, trying to read as font file: '.$input;
-            $font->read($in);
-        }
+        $font->import_font(auto => $input);
     }
 }
 
@@ -130,8 +109,7 @@ $font->add_default_aliases($config{default_aliases}) if defined $config{default_
 $font->gc if $config{gc};
 
 if (defined $config{output}) {
-    open(my $out, '>:raw', $config{output}) or croak 'Cannot open output: '.$config{output};
-    $font->write($out);
+    $font->export_font(sf => $config{output});
 }
 
 #ll

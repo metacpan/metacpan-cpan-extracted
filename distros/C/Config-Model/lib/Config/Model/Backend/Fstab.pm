@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Fstab 2.163;
+package Config::Model::Backend::Fstab 2.164;
 
 use Mouse;
 use Carp;
@@ -28,6 +28,18 @@ my %opt_r_translate = (
     rw      => 'rw=1',
     bsddf   => 'statfs_behavior=bsddf',
     minixdf => 'statfs_behavior=minixdf',
+    noatime => 'atime=0',
+    noauto  => 'auto=0',
+    nodev => 'dev=0',
+    nodiratime => 'diratime=0',
+    noexec => 'exec=0',
+    noiversion => 'iversion=0',
+    nomand => 'mand=0',
+    norelatime => 'relatime=0',
+    nostrictatime => 'strictatime=0',
+    nolazytime => 'lazytime=0',
+    nosuid => 'suid=0',
+    nouser => 'user=0',
 );
 
 ## no critic (Subroutines::ProhibitBuiltinHomonyms)
@@ -75,16 +87,20 @@ sub read ($self, %args) {
 
         # now load fs options
         $logger->trace("fs_type $type options is $options");
-        my @options;
-        foreach ( split /,/, $options ) {
-            my $o = $opt_r_translate{$_} // $_;
-            $o =~ s/no(.*)/$1=0/;
-            $o .= '=1' unless $o =~ /=/;
-            push @options, $o;
+        # options can contain quoted values like
+        # fscontext="system_u:object_r:tmp_t:s0:c127,c456"
+
+        my @options = $options =~ m/("[^"]+"|[^,]+)(?:,\s*)?/g;
+        my @steps;
+        foreach my $opt ( @options ) {
+            # $v contains the quotes coming from /etc/fstab
+            my ($k,$v) = split /=/, $opt;
+            $v //= 1;
+            push @steps, $opt_r_translate{$k} // sprintf('"%s"=%s', $k, $v);
         }
 
-        $logger->debug("Loading:@options");
-        $fs_obj->fetch_element('fs_mntopts')->load( step => "@options", check => $check );
+        $logger->debug("Loading:@steps");
+        $fs_obj->fetch_element('fs_mntopts')->load( step => "@steps", check => $check );
     }
     return 1;
 }
@@ -158,7 +174,7 @@ Config::Model::Backend::Fstab - Read and write config from fstab file
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 

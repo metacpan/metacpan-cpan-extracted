@@ -1,3 +1,24 @@
+v0.08  2026-07-06Z
+    - Improved documentation
+    - Fixed a bug in saving font flags
+    - Hardened code against stray arguments
+    - Added $font->import_font()
+    - Marked $font->import_psf(), and $font->import_hex() as deprecated
+    - Fixed division by zero in sf-to-html
+    - General code cleanup
+    - Hardened some regex
+    - Added $sf->export_font() alike $font->import_font()
+    - Added support to export Roman's .hex format
+    - Added --width/--height/--bits to sf-to-html
+    - Added SIRTX::Font::Renderer to replace $font->render()
+    - Marked $font->render() as deprecated
+    - Added basic glyph attributes: resync, nomod, preskip, and postskip
+    - Added support for glyph attributes to $font->analyse()
+    - Added proportional rendering
+    - Added a way to calculate the bitmap size for a string rendering without doing the actual rendering
+    - Added proportional rendering example to sf-to-html
+    - Added --proportional to sf-render
+
 v0.07  2026-05-28Z
     - Improved output of sf-to-html significantly
     - Added new font attributes:

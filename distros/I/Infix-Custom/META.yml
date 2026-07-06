@@ -1,5 +1,5 @@
 ---
-abstract: 'lexically-scoped custom infix operators'
+abstract: 'custom infix operators'
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
@@ -20,5 +20,5 @@ no_index:
     - inc
 requires:
   perl: '5.038'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

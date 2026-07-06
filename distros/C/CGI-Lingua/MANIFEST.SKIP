@@ -43,7 +43,7 @@
 \.tmp$
 \.#
 \.rej$
-\.yml$
+schemas\.yml$
 \.swp$
 
 # Avoid OS-specific files/dirs
@@ -67,5 +67,9 @@
 \.releaserc
 \.lwpcookies
 CGI-.*
-t/online.enabled
+.test-script-*
 typescript
+mutation*
+^xt/mutant_\d
+CLAUDE.md
+\.claude

@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/09
 ## Modified 2025/10/16
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -65,7 +65,7 @@ sub text : lvalue { return( shift->_set_get_callback({
                 }
                 CORE::delete( $self->{_initial_text} );
             }
-    
+
             my $result = $self->new_array;
             # We purposively skip anything that is neither a space nor a text.
             # This is what web browser do, notwithstanding any tag that may exist in the <title> tag
@@ -92,7 +92,7 @@ sub text : lvalue { return( shift->_set_get_callback({
 #         for( my $i = 0; $i < scalar( @$nodes ); $i++ )
 #         {
 #         }
-        
+
         if( !defined( $nodes ) )
         {
             return( $self->pass_error );
@@ -132,7 +132,7 @@ HTML::Object::DOM::Element::Title - HTML Object DOM Title Class
 
     use HTML::Object::DOM::Element::Title;
     my $title = HTML::Object::DOM::Element::Title->new || 
-        die( HTML::Object::DOM::Element::Title->error, "\n" );
+        die( HTML::Object::DOM::Element::Title->error );
 
 =head1 VERSION
 
@@ -200,7 +200,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLTit
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

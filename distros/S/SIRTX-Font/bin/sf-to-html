@@ -25,6 +25,9 @@ my %_attribute_names = (
 
 my %config = (
     output          => undef,
+    width           => undef,
+    height          => undef,
+    bits            => undef,
     font            => undef,
     default_aliases => undef,
     gc              => undef,
@@ -39,6 +42,9 @@ my %config = (
     my %opts;
 
     $opts{'output|o=s'}         = \$config{output};
+    $opts{'width=i'}            = \$config{width};
+    $opts{'height=i'}           = \$config{height};
+    $opts{'bits=i'}             = \$config{bits};
     $opts{'font=s'}             = \$config{font};
     $opts{'default-aliases=s'}  = \$config{default_aliases};
     $opts{'gc!'}                = \$config{gc};
@@ -62,9 +68,13 @@ my %config = (
 
 my $font = SIRTX::Font->new;
 
+foreach my $key (qw(width height bits)) {
+    my $v = $config{$key} // next;
+    $font->can($key)->($font => $v);
+}
+
 if (defined($config{font})) {
-    open(my $in, '<:raw', $config{font}) or croak 'Cannot open: '.$config{font};
-    $font->read($in);
+    $font->import_font(auto => $config{font});
 }
 
 $font->add_default_aliases($config{default_aliases}) if defined $config{default_aliases};
@@ -76,17 +86,30 @@ if (defined $config{output}) {
     my %rows;
     my %missing_counts;
     my %extra_attributes;
-    my $example;
+    my @examples;
 
-    eval {
-        my $img = $font->render("The quick brown fox jumps over the lazy dog!\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.");
-        my $uri = URI->new('data:');
+    foreach my $proportional (0, 1) {
+        eval {
+            my $renderer = $font->renderer;
+            $renderer->proportional($proportional);
+            my $img = $renderer->render("The quick brown fox jumps over the lazy dog!\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.");
+            my $uri = URI->new('data:');
+            my @fontname;
 
-        $uri->media_type('image/png');
-        $uri->data($img->ImageToBlob(magick => 'png'));
+            $uri->media_type('image/png');
+            $uri->data($img->ImageToBlob(magick => 'png'));
 
-        $example = $uri;
-    };
+            push(@fontname, eval { $renderer->weight });
+            push(@fontname, eval { $renderer->reverse_slant ? 'reverse' : die });
+            push(@fontname, eval { $renderer->slant });
+            push(@fontname, eval { $renderer->proportional ? 'proportional' : 'monospace' });
+
+            push(@examples, {
+                    name => join(' ', grep {defined} @fontname),
+                    uri => $uri,
+                });
+        };
+    }
 
     if ($config{show_found}) {
         foreach my $codepoint (keys %{$font->{chars}}) { # TODO: FIXME! Internal API!
@@ -157,8 +180,8 @@ if (defined $config{output}) {
     }
     foreach my $list (values %missing_counts) {
         $list->{found}      = $list->{characters} - $list->{missing};
-        $list->{found_pc}   = sprintf('%.1f%%', 100 * $list->{found}   / $list->{characters});
-        $list->{missing_pc} = sprintf('%.1f%%', 100 * $list->{missing} / $list->{characters});
+        $list->{found_pc}   = $list->{characters} > 0 ? sprintf('%.1f%%', 100 * $list->{found}   / $list->{characters}) : 0;
+        $list->{missing_pc} = $list->{characters} > 0 ? sprintf('%.1f%%', 100 * $list->{missing} / $list->{characters}) : 0;
     }
 
     foreach my $key ($font->list_attributes) {
@@ -192,7 +215,7 @@ if (defined $config{output}) {
         }
 
         eval {
-            my $img = $font->render($as_string // $v);
+            my $img = $font->renderer->render($as_string // $v);
             my $uri = URI->new('data:');
 
             $uri->media_type('image/png');
@@ -216,7 +239,7 @@ if (defined $config{output}) {
                 glyphs => scalar($font->glyphs),
                 scale => $font->height <= 16 ? 2 : undef,
             },
-            example => $example,
+            examples => \@examples,
             missing_counts => \%missing_counts,
             missing_counts_keys => [sort keys %missing_counts],
             rows => [sort {$a->{first} <=> $b->{first}} values %rows],
@@ -419,9 +442,16 @@ span.example img {
             [% END %]
         </table>
         [% END %]
-        [% IF example %]
+        [% IF examples.0 %]
         <h2 id="example">Example</h2>
-        <div class="sf example"><img src="[% example | html %]"></div>
+        <table>
+        [% FOREACH example IN examples %]
+            <tr>
+                <td>[% example.name | html %]</td>
+                <td class="sf example"><img src="[% example.uri | html %]"></td>
+            </tr>
+        [% END %]
+        </table>
         [% END %]
         <h2 id="characters">Character list</h2>
         <table id="character-table">

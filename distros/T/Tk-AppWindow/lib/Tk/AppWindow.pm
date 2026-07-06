@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.22";
+$VERSION="0.23";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -229,6 +229,7 @@ sub Populate {
 		-linkiconcall => ['getLinkIcon', $self],
 	);
 	$self->Advertise('FilePicker', $picker);
+	$picker->geometry('640x400+100+100');
 
 
 	my $pre = $self->{PRECONFIG};
@@ -237,6 +238,10 @@ sub Populate {
 		print STDERR "$message\n";
 	};
 	$self->ConfigSpecs(
+		-compactviewsize =>  ['PASSIVE', undef, undef, 22],
+		-detailedviewsize => ['PASSIVE', undef, undef, 16],
+		-iconviewsize =>['PASSIVE', undef, undef, 128],
+		
 		-linkcolor => ['PASSIVE', 'linkColor', 'LinkColor', '#3030DF'],
 		-logcall => ['CALLBACK', undef, undef, $logcall], 
 		-logerrorcall => ['CALLBACK', undef, undef, $logcall], 
@@ -839,25 +844,29 @@ sub getArt {
 }
 
 sub getDirIcon {
-	my ($self, $name) = @_;
-	my $icon = $self->getArt('folder');
+	my ($self, $name, $mode) = @_;
+	my $opstring = '-' . $mode . 'viewsize';
+	my $size = $self->cget('-' . $mode . 'viewsize');
+	my $icon = $self->getArt('folder', $size);
 	return $icon if defined $icon;
 	return $self->Subwidget('FilePicker')->Subwidget('Browser')->DefaultDirIcon;
 }
 
 sub getFileIcon {
-	my ($self, $name) = @_;
+	my ($self, $name, $mode) = @_;
+	my $size = $self->cget('-' . $mode . 'viewsize');
 	my $art = $self->extGet('Art');
-	my $icon = $art->getFileIcon($name) if defined $art;
+	my $icon = $art->getFileIcon($name, $size) if defined $art;
 	return $icon if defined $icon;
-	return $self->Subwidget('FilePicker')->Subwidget('Browser')->DefaultFileIcon;
+	return $self->Subwidget('FilePicker')->Subwidget('Browser')->DefaultFileIcon($name, $mode);
 }
 
 sub getLinkIcon {
-	my ($self, $name) = @_;
-	my $icon = $self->getArt('emblem-symbolic-link');
+	my ($self, $name, $mode) = @_;
+	my $size = $self->cget('-' . $mode . 'viewsize');
+	my $icon = $self->getArt('emblem-symbolic-link', $size);
 	return $icon if defined $icon;
-	return $self->Subwidget('FilePicker')->Subwidget('Browser')->DefaultLinkIcon;
+	return $self->Subwidget('FilePicker')->Subwidget('Browser')->DefaultLinkIcon($name, $mode);
 }
 
 =item B<log>I<($message)>
@@ -1180,6 +1189,9 @@ sub PostConfig {
 
 	#create filepicker images
 	my @images = (
+		['-compactimage', 'view-list-details', 16],
+		['-detailsimage', 'view-list-tree', 16],
+		['-iconviewimage', 'view-list-icons', 16],
 		['-msgimage', 'dialog-information', 32],
 		['-newfolderimage', 'folder-new', 16],
 		['-reloadimage', 'appointment-recurring', 16],

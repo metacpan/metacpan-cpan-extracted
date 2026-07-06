@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct a measured phrase of notes
 
-our $VERSION = '0.0111';
+our $VERSION = '0.0113';
 
 use v5.36;
 use Moo;
@@ -16,28 +16,36 @@ use namespace::clean;
 
 
 has base => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not a valid note" unless $_[0] =~ /^[A-G][#b]?$/i },
     default => sub { 'C' },
 );
 
 
 has scale => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not a valid scale name" unless $_[0] =~ /^\w+$/ },
     default => sub { 'major' },
 );
 
 
 has octave => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not a valid octave" unless $_[0] =~ /^[0-9]$/ },
     default => sub { 0 },
 );
 
 
+has pitches_name => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not a valid pitches name" unless defined $_[0] },
+    default => sub { '2 octaves' },
+);
+
+
 has pitches => (
-    is      => 'lazy',
+    is      => 'rw',
+    lazy    => 1,
     isa     => sub { croak "$_[0] is not an array-ref" unless ref $_[0] eq 'ARRAY' },
     builder => '_build_pitches',
 );
@@ -51,14 +59,22 @@ sub _build_pitches ($self) {
 }
 
 
+has intervals_name => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not a valid intervals name" unless defined $_[0] },
+    default => sub { '-3..-1,1..3' },
+);
+
+
 has intervals => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not an array-ref" unless ref $_[0] eq 'ARRAY' },
     default => sub { [-3, -2, -1, 1, 2, 3] },
 );
 
 has voice => (
-    is      => 'lazy',
+    is      => 'rw',
+    lazy    => 1,
     builder => '_build_voice',
 );
 
@@ -72,34 +88,35 @@ sub _build_voice ($self) {
 
 
 has size => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not a valid size" unless $_[0] =~ /^[\d.]+$/ },
     default => sub { 4 },
 );
 
 
 has pool => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not an array-ref" unless ref $_[0] eq 'ARRAY' },
     default => sub { [qw(dhn hn qn)] },
 );
 
 
 has weights => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not an array-ref" unless ref $_[0] eq 'ARRAY' },
     default => sub { [1, 2, 2] },
 );
 
 
 has groups => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not an array-ref" unless ref $_[0] eq 'ARRAY' },
     default => sub { [0, 0, 0] },
 );
 
 has _rhythm => (
-    is      => 'lazy',
+    is      => 'rw',
+    lazy    => 1,
     builder => '_build__rhythm',
 );
 
@@ -135,7 +152,7 @@ has voices => (
 
 
 has patch => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not a valid patch" unless $_[0] =~ /^[0-9]+$/ },
     default => sub { 0 },
 );
@@ -177,7 +194,7 @@ has channel => (
 
 
 has verbose => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
     default => sub { 0 },
 );
@@ -219,7 +236,7 @@ Music::VoicePhrase - Construct a measured phrase of notes
 
 =head1 VERSION
 
-version 0.0111
+version 0.0113
 
 =head1 SYNOPSIS
 
@@ -269,6 +286,14 @@ Octave integer from C<0> to C<9>.
 
 Default: C<0>
 
+=head2 pitches_name
+
+  $pitches_name = $mvp->pitches_name;
+
+Name for the given B<pitches>, used in real-time processing.
+
+Default: C<'2 octaves'>
+
 =head2 pitches
 
   $pitches = $mvp->pitches;
@@ -277,6 +302,14 @@ The allowed pitches in MIDI number format.
 
 Default: 2 consecutive octaves given the B<base> note, B<scale> name,
 and starting B<octave>.
+
+=head2 intervals_name
+
+  $intervals_name = $mvp->intervals_name;
+
+Name for the given B<intervals>, used in real-time processing.
+
+Default: C<'-3..-1,1..3'>
 
 =head2 intervals
 

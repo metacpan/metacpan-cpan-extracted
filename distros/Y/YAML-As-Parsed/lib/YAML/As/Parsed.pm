@@ -3,13 +3,13 @@ use strict;
 use warnings;
 package YAML::As::Parsed; # git description: v1.72-7-g8682f63
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
-use Tie::IxHash;
+use Tie::OrderedHash;
 
 sub ordered_hash {
         my %hash = ();
-        tie(%hash, 'Tie::IxHash');
+        tie(%hash, 'Tie::OrderedHash');
         return \%hash;
 }
 
@@ -766,7 +766,7 @@ YAML::As::Parsed - Read/Write YAML predictably
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

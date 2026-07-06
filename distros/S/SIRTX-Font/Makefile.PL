@@ -17,14 +17,17 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "SIRTX::Font",
   "PREREQ_PM" => {
-    "Carp" => "1.35"
+    "Carp" => "1.35",
+    "Data::Identifier" => "0.29.0",
+    "Encode" => "3.19",
+    "SIRTX::Datecode" => "0.7.0"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.30",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.07",
+  "VERSION" => "v0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,6 +36,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.35",
+  "Data::Identifier" => "0.29.0",
+  "Encode" => "3.19",
+  "SIRTX::Datecode" => "0.7.0",
   "Test::Exception" => "0.30",
   "Test::More" => "1.3",
   "Test::Warn" => "0.30"

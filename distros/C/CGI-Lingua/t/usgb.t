@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 55;
+use Test::More tests => 56;
 use Test::Needs 'CHI';
 use Test::NoWarnings;
 
@@ -70,9 +70,10 @@ USGB: {
 		ok($l->country() eq 'gb');
 		ok($l->locale()->code_alpha2() eq 'gb');
 	}
+	ok($l->sublanguage_code_alpha2() eq 'us');
 	ok(defined($l->requested_language()));
 	ok($l->requested_language() eq 'English (United States)');
-	ok($l->language() eq 'English');
+	ok($l->name() eq 'English');
 	ok($l->sublanguage() eq 'United States');
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en';
@@ -109,6 +110,7 @@ USGB: {
 	# We want US English, but only British English is served, return English
 	# but with no sublanguage support
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-us';
+	undef $l;	# Try to force a DESTROY to test object caching
 	$l = new_ok('CGI::Lingua' => [
 		supported => ['en-gb'],
 		cache => $cache
@@ -122,6 +124,6 @@ USGB: {
 	}
 	ok(defined($l->requested_language()));
 	ok($l->requested_language() eq 'English (United States)');
-	ok($l->language() eq 'English');
+	ok($l->preferred_language() eq 'English');
 	ok(!defined($l->sublanguage()));
 }

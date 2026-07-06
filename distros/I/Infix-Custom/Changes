@@ -1,5 +1,8 @@
 Revision history for Infix-Custom
 
+0.02	2026-07-05
+	- Fix utf8 pod warning
+
 0.01    2026-06-20
         First version.
         - Lexically-scoped custom binary infix operators, built on core's

@@ -1,11 +1,11 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Document.pm
-## Version v0.3.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.3.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2025/10/16
-## All rights reserved
+## Modified 2026/07/04
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use HTML::Object::ErrorEvent;
     use Scalar::Util ();
     use Wanted;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -127,7 +127,7 @@ sub body : lvalue { return( shift->_set_get_callback({
         {
             die( "Element provided to set as new body element is not a HTML::Object::Element object." );
         }
-    
+
         my $body;
         for( my $pos = 0; $pos < scalar( @$children ); $pos++ )
         {
@@ -140,7 +140,7 @@ sub body : lvalue { return( shift->_set_get_callback({
                 last;
             }
         }
-    
+
         # No body was found, amazingly enough; add it now
         if( !defined( $body ) )
         {
@@ -203,6 +203,76 @@ sub children
 sub childNodes : lvalue { return( shift->_set_get_array_as_object( 'nodes', @_ ) ); }
 
 # Note: property children read-only inherited
+
+sub clone
+{
+    my $self = shift( @_ );
+    my $saved_nodes       = $self->{nodes};
+    my $saved_defaultview = $self->{defaultview};
+    # NOTE: keep the ORIGINAL children list (before SUPER::clone() touches
+    # anything) so we can map each entry to its already-cloned counterpart
+    # below, by object identity rather than by tag name. Some fragments
+    # (like this invoice template, which starts directly at <body> with no
+    # <html> wrapper) never trigger the 'html' narrowing in _init_nodes(),
+    # so 'children' ends up being the SAME full set as 'nodes' — not a
+    # single-element subset as the previous version assumed.
+    my $orig_children = $self->{children};
+    local $self->{nodes} = undef;
+    local $self->{defaultview} = undef;
+    my $new = $self->SUPER::clone();
+
+    # NOTE: temporary diagnostic — inventaire de tous les champs de $self,
+    # triés par taille décroissante, pour identifier le(s) champ(s) responsable(s)
+    # du surcoût restant, plutôt que de continuer à deviner des noms un par un.
+    foreach my $k ( sort { total_size( $self->{ $b } ) <=> total_size( $self->{ $a } ) } CORE::keys( %$self ) )
+    {
+        next unless( ref( $self->{ $k } ) );
+    }
+
+    # NOTE: defaultView/window represents the execution context, not document
+    # content — the clone reuses the SAME Window instance as the original
+    # rather than cloning it. No identity-mapping needed here (unlike
+    # 'nodes'/'children' above), since there's exactly one window, not a list.
+    $new->{defaultview} = $saved_defaultview if( defined( $saved_defaultview ) );
+
+    if( defined( $saved_nodes ) && $self->_is_a( $saved_nodes => 'Module::Generic::Array' ) )
+    {
+        # NOTE: Build a map from original child object address to its
+        # already-cloned counterpart. clone_list(), inside SUPER::clone(),
+        # clones each entry of 'children' in order, so zipping the original
+        # and new lists by index gives us that correspondence cheaply.
+        my %clone_of;
+        if( $self->_is_a( $orig_children => 'Module::Generic::Array' ) && $new->children )
+        {
+            # $orig_children->list returns an array, not an array reference.
+            my $orig_list = $orig_children;
+            my $new_list  = $new->children;
+            for( my $i = 0; $i < scalar( @$orig_list ); $i++ )
+            {
+                next unless( ref( $orig_list->[ $i ] ) && ref( $new_list->[ $i ] ) );
+                $clone_of{ Scalar::Util::refaddr( $orig_list->[ $i ] ) } = $new_list->[ $i ];
+            }
+        }
+
+        my $cloned_nodes = $saved_nodes->map(sub
+        {
+            my $n = shift( @_ );
+            my $addr = Scalar::Util::refaddr( $n );
+            # NOTE: already cloned via 'children' — reuse it, do not clone again.
+            return( $clone_of{ $addr } ) if( exists( $clone_of{ $addr } ) );
+            # Not part of 'children' (e.g. a leading DOCTYPE excluded by
+            # design) — clone_list() never touched it, clone independently.
+            my $c = $n->clone;
+            $c->parent( $new );
+            return( $c );
+        });
+        $new->{nodes}        = $cloned_nodes;
+        $self->{nodes}       = $saved_nodes;
+        $self->{defaultview} = $saved_defaultview;
+    }
+
+    return( $new );
+}
 
 # method cloneNode is inherited from HTML::Object::DOM::Node
 
@@ -290,11 +360,11 @@ sub createElement
         is_inline   => 0,
         };
     }
-    
+
     $opts->{debug} = $self->debug;
     @$opts{qw( is_empty is_inline )} = @$def{qw( is_empty is_inline )};
     $opts->{tag} = $tag;
-    
+
     my $e;
     $def->{class} //= '';
     if( $def->{class} )
@@ -854,7 +924,7 @@ sub title : lvalue { return( shift->_set_get_callback({
         {
             $e = $results->first;
         }
-        
+
         return( $e->text( $arg ) );
     },
 }, @_ ) ); }
@@ -1019,17 +1089,17 @@ HTML::Object::DOM::Document - HTML Object DOM Document Class
 
     use HTML::Object::DOM::Document;
     my $doc = HTML::Object::DOM::Document->new || 
-        die( HTML::Object::DOM::Document->error, "\n" );
+        die( HTML::Object::DOM::Document->error );
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 
 This module represents an HTML document. It inherits from L<HTML::Object::Document> and L<HTML::Object::DOM::Element>
 
-It is the top object in the hierarchy and thus has no parent. It should contain only one child, the C<html> element, and has one associated L<element|HTML::Object::DOM::Element>, the L<doctype|/doctype>, which can also be accessed with L</declaration>
+It is the top object in the hierarchy and thus has no parent. It should contain only one child, the C<html> element, and has one associated L<element|HTML::Object::DOM::Element>, the L<doctype|/doctype>, which can also be accessed with L</doctype>
 
 =head1 INHERITANCE
 
@@ -1269,7 +1339,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 This is read-only.
 
-Returns the date on which the document was last modified, if any, as a L<DateTime> object.
+Returns the date on which the document was last modified, if any, as a L<DateTime::Lite> object.
 
 This value exists if the document was read from a file, and it would contain the file last modification time.
 
@@ -1569,8 +1639,6 @@ Example:
     $doc->close();
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Document/close>
-
-=head2 contentType
 
 =head2 createAttribute
 
@@ -1918,14 +1986,6 @@ Returns the first child from the document list of nodes.
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild>
 
-=head2 firstElementChild
-
-=head2 getElementById
-
-Provided with an element C<id>, and this method returns the corresponding L<element object|HTML::Object::Element>.
-
-See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById>
-
 =head2 getAnimations
 
 This always returns C<undef> under perl.
@@ -1944,7 +2004,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 =head2 getElementById
 
-Provided with a string and this returns an element object whose C<id> attribute matches the string specified.
+Provided with a string and this returns an L<element object|HTML::Object::Element> whose C<id> attribute matches the string specified.
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById>
 
@@ -2514,11 +2574,11 @@ Upon execution, a new L<event|HTML::Object::Event> is passed of type C<readstate
 
 =over 4
 
-=item document
+=item document (readyState)
 
 The L<document object|HTML::Object::DOM::Document>
 
-=item state
+=item state (readyState)
 
 The state of the document parsing.
 
@@ -2572,7 +2632,7 @@ L<Mozilla documentation on DOM|https://developer.mozilla.org/en-US/docs/Web/API/
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

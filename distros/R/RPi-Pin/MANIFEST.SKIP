@@ -1,4 +1,5 @@
 ^images/
+.claude/
 .bs$
 .c$
 .o$

@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/22
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -80,7 +80,7 @@ HTML::Object::Text - HTML Object
 
     use HTML::Object::Text;
     my $txt = HTML::Object::Text->new || 
-        die( HTML::Object::Text->error, "\n" );
+        die( HTML::Object::Text->error );
 
 =head1 VERSION
 
@@ -116,23 +116,9 @@ Returns the original value or the value assigned with L</value>
 
 This is an alias for L</as_string>
 
-=head2 isEqualNode
-
-Returns a boolean value which indicates whether or not two elements are of the same type and all their defining data points match.
-
-Two elements are equal when they have the same type, defining characteristics (this would be their ID, number of children, and so forth), its attributes match, and so on. The specific set of data points that must match varies depending on the types of the elements. 
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/isEqualNode>
-
 =head2 lineage
 
 Returns an L<array object|Module::Generic::Array> of all the text element's ancestors.
-
-=head2 nodeValue
-
-This returns or sets the value of the current element.
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue>
 
 =head2 set_checksum
 
@@ -160,7 +146,7 @@ L<HTML::Object>, L<HTML::Object::Attribute>, L<HTML::Object::Boolean>, L<HTML::O
 
 Copyright (c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

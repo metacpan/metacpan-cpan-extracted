@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2025/10/16
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -44,7 +44,7 @@ sub init
         my $def = shift( @_ );
         # my $info = [caller(5)];
         # print( STDERR ref( $self ), "::children->callback(add): called from package ", $info->[0], " at line ", $info->[2], " for '", $def->{added}->[0], "'\n" );
-        
+
         # Our children were modified from outside our package.
         # We need to check if it affects our rows and reset the cache accordingly
         unless( $def->{caller}->[0] eq ref( $self ) )
@@ -541,7 +541,7 @@ sub _set_get_section : lvalue
                     $pos = $i;
                 }
             }
-        
+
             if( !defined( $pos ) )
             {
                 if( $tag eq 'caption' )
@@ -554,7 +554,7 @@ sub _set_get_section : lvalue
                     $pos = $len;
                 }
             }
-        
+
             $self->reset(1);
             $self->_reset_table( $tag );
             $new->parent( $self );
@@ -586,7 +586,7 @@ HTML::Object::DOM::Element::Table - HTML Object DOM Table Class
 
     use HTML::Object::DOM::Element::Table;
     my $table = HTML::Object::DOM::Element::Table->new || 
-        die( HTML::Object::DOM::Element::Table->error, "\n" );
+        die( HTML::Object::DOM::Element::Table->error );
 
 =head1 VERSION
 
@@ -916,7 +916,7 @@ Table is now:
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLTableElement/insertRow>
 
-=head2 DEPRECATED PROPERTIES
+=head1 DEPRECATED PROPERTIES
 
 =head2 align
 
@@ -984,7 +984,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLTab
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

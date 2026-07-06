@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Lister 2.163;
+package Config::Model::Lister 2.164;
 
 use strict;
 use warnings;
@@ -102,7 +102,7 @@ Config::Model::Lister - List available models and applications
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 

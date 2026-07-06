@@ -24,5 +24,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/rpi-pin/issues
   repository: https://github.com/stevieb9/rpi-pin.git
-version: '3.1801'
+version: '3.1802'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

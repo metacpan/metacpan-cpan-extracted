@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -54,7 +54,7 @@ HTML::Object::DOM::Boolean - HTML Object DOM Boolean
 
     use HTML::Object::DOM::Boolean;
     my $bool = HTML::Object::DOM::Boolean->new(1) || 
-        die( HTML::Object::DOM::Boolean->error, "\n" );
+        die( HTML::Object::DOM::Boolean->error );
     say $bool->toString;
     say $bool->valueOf;
 
@@ -90,7 +90,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/JavaScript/
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

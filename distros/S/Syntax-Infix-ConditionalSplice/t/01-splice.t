@@ -38,9 +38,9 @@ is($calls, 1, 'RHS NOT evaluated when condition false (short-circuit)');
 is_deeply(\@f, [], 'false: empty list');
 
 # --- context awareness -----------------------------------------------------
-my @s_true  = ( 1 ?| ('a', 'b') );      # scalar ctx: last value of the list
-my $s_false = ( 0 ?| ('a', 'b') );      # scalar ctx: undef
-is_deeply(\@s_true,  [qw/a b/],   'scalar context, true  -> last value');
+my $s_true  = ( 1 ?| ('b') );      # scalar ctx: last value of the list
+my $s_false = ( 0 ?| ('b') );      # scalar ctx: undef
+is($s_true,  'b',   'scalar context, true  -> last value');
 is($s_false, undef, 'scalar context, false -> undef');
 
 # --- several conditional elements in one list ------------------------------

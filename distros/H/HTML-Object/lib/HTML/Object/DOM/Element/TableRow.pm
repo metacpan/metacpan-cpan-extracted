@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/07
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -247,7 +247,7 @@ HTML::Object::DOM::Element::TableRow - HTML Object DOM TableRow Class
 
     use HTML::Object::DOM::Element::TableRow;
     my $tablerow = HTML::Object::DOM::Element::TableRow->new || 
-        die( HTML::Object::DOM::Element::TableRow->error, "\n" );
+        die( HTML::Object::DOM::Element::TableRow->error );
 
 =head1 VERSION
 
@@ -443,7 +443,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLTab
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

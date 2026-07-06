@@ -1,7 +1,13 @@
 Revision history for Perl extension Tk::FileBrowser.
 
-0.12  Date
-	- Major overhall using Tk::ListBrowser as basis instead of Tk::ITree.
+0.14  Sun Jul 05 2026
+	- Removed use statement for deleted module Images.
+
+0.13  Sun Jul 05 2026
+	- Fixed missing dependencies in Makefile.PL.
+
+0.12  Sat Jul 04 2026
+	- Major overhaul using Tk::ListBrowser as basis instead of Tk::ITree.
 	- Added option -viewmode.
 	- Added Type as standard column.
 	- Implemented a quick search algorithm for positioning entries. Marginal succes.

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.163;
+package Config::Model::Value 2.164;
 
 use v5.20;
 
@@ -39,6 +39,8 @@ with "Config::Model::Role::WarpMaster";
 with "Config::Model::Role::Grab";
 with "Config::Model::Role::HelpAsText";
 with "Config::Model::Role::ComputeFunction";
+# this requires backup method from Config::Model::AnyThing
+with "Config::Model::Role::WarpSubject";
 
 use feature qw/postderef signatures/;
 no warnings qw/experimental::postderef experimental::signatures/;
@@ -54,7 +56,7 @@ enum ValueType => qw/boolean enum uniline string integer number reference file d
 
 has fixes => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 
-has [qw/warp compute computed_refer_to backup migrate_from/] =>
+has [qw/warp compute computed_refer_to migrate_from/] =>
     ( is => 'rw', isa => 'Maybe[HashRef]' );
 
 has compute_obj => (
@@ -162,6 +164,11 @@ around BUILDARGS => sub ($orig, $class, %args) {
     my %h = map { ( $_ => $args{$_} ); } grep { defined $args{$_} } @backup_list;
     return $class->$orig( backup => dclone( \%h ), %args );
 };
+
+# used by roles
+sub allowed_warp_params {
+    return @allowed_warp_params;
+}
 
 sub BUILD {
     my $self = shift;
@@ -545,12 +552,10 @@ sub setup_grammar_check {
 # warning : call to 'set' are not cumulative. Default value are always
 # restored. Lest keeping track of what was modified with 'set' is
 # too confusing.
-sub set_properties ($self, @args) {
-    # cleanup all parameters that are handled by warp
-    for ( @allowed_warp_params ) { delete $self->{$_} }
+sub set_properties ($self, %raw_args) {
 
-    # merge data passed to the constructor with data passed to set_properties
-    my %args = ( %{ $self->backup // {} }, @args );
+    # merge data passed to set_properties with data passed to the constructor
+    my %args = $self->merge_properties(%raw_args);
 
     # these are handled by Node or Warper
     for ( qw/level/ ) { delete $args{$_} }
@@ -2022,7 +2027,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 
@@ -2523,7 +2528,7 @@ L<App::Cme::Command::update> for details)
 
 The Warp functionality enable a C<Value> object to change its
 properties (i.e. default value or its type) dynamically according to
-the value of another C<Value> object locate elsewhere in the
+the value of another C<Value> object located elsewhere in the
 configuration tree. (See L<Config::Model::Warper> for an
 explanation on warp mechanism).
 
@@ -2838,91 +2843,92 @@ or several pairs:
 
 =over 4
 
-=item mode
+=item *
 
-Whether to fetch default, custom, etc value. See below for details
+B<mode>: Whether to fetch default, custom, etc value. See below for details
 
-=item check
+=item *
 
-Whether to check if the value is valid or not before returning it. Default is 'yes'.
+B<check>: Whether to check if the value is valid or not before returning it. Default is 'yes'.
 Possible value are
 
 =over 4
 
-=item yes
+=item *
 
-Perform check and raise an exception for bad values
+B<yes>: Perform check and raise an exception for bad values
 
-=item skip
+=item *
 
-Perform check and return undef for bad values. A warning is issued when a bad value is skipped.
+B<skip>: Perform check and return undef for bad values. A warning is issued when a bad value is skipped.
 Set C<check> to C<no> to avoid warnings.
 
-=item no
+=item *
 
-Do not check and return values even if bad
+B<no>: Do not check and return values even if bad
 
 =back
 
-=item silent
+=item *
 
-When set to 1, warning are not displayed on STDOUT. User is expected to read warnings
+B<silent>: When set to 1, warning are not displayed on STDOUT. User is expected to read warnings
 with L<warning_msg> method.
 
 =back
 
-According to the C<mode> parameter, this method returns either:
+Depending on C<mode> parameter, this method returns either:
 
 =over
 
-=item empty mode parameter (default)
+=item *
 
-Value entered by user or default value if the value is different from upstream_default or
-layered value. Typically this value is written in a configuration file.
+B<empty mode parameter (default)>: Value entered by user or default
+value if the value is different from upstream_default or layered
+value. Typically this value is written in a configuration file.
 
-=item backend
+=item *
 
-Alias for default mode.
+B<backend>: Alias for default mode.
 
-=item custom
+=item *
 
-The value entered by the user (if different from built in, preset,
+B<custom>: The value entered by the user (if different from built in, preset,
 computed or default value)
 
-=item user
+=item *
 
-The value most useful to user: the value that is used by the application.
+B<user>: The value most useful to user: the value that is used by the application.
 
-=item preset
+=item *
 
-The value entered in preset mode
+B<preset>: The value entered in preset mode
 
-=item standard
+=item *
 
-The preset or computed or default or built in value.
+B<standard>: The preset or computed or default or built in value.
 
-=item default
+=item *
 
-The default value (defined by the configuration model)
+B<default>: The default value (defined by the configuration model)
 
-=item layered
+=item *
 
-The value found in included files (treated in layered mode: values specified
-there are handled as upstream default values).xs
+B<layered>: The value found in included files (treated in layered mode: values specified
+there are handled as upstream default values).
 
-=item upstream_default
+=item *
 
-The upstream_default value. (defined by the configuration model)
+B<upstream_default>: The upstream_default value. (defined by the configuration model)
 
-=item non_upstream_default
+=item *
 
-The custom or preset or computed or default value. Returns undef
+B<non_upstream_default>: The custom or preset or computed or default value. Returns undef
 if either of this value is identical to the upstream_default value. This
 feature is useful to reduce data to write in configuration file.
 
-=item allow_undef
+=item *
 
-With this mode, C<fetch()> behaves like in C<user> mode, but returns
+B<allow_undef>: With this mode, C<fetch()> behaves like in C<user> mode, but returns
 C<undef> for mandatory values. Normally, trying to fetch an undefined
 mandatory value leads to an exception.
 

@@ -217,9 +217,9 @@ for my $data (@test) {
 		));
 	}
 
-	$hand->starter = Game::Cribbage::Deck::Card->new(
+	$hand->starter(Game::Cribbage::Deck::Card->new(
 		%{$data->{starter}}
-	);
+	));
 
 	my $score = $hand->calculate_score();
 

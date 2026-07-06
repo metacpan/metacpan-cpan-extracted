@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/12
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,7 @@ HTML::Object::ElementDataMap - HTML Object Element Data Map Class
 
     use HTML::Object::ElementDataMap;
     my $map = HTML::Object::ElementDataMap->new( $html_element_object ) || 
-        die( HTML::Object::ElementDataMap->error, "\n" );
+        die( HTML::Object::ElementDataMap->error );
     $map->dateOfBirth( '1989-12-01' );
     # Related html element would now have an attribute data-date-of-birth set to 1989-12-01
 
@@ -164,7 +164,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLEle
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

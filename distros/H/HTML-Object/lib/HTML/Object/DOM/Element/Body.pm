@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -100,7 +100,7 @@ HTML::Object::DOM::Element::Body - HTML Object DOM Body Class
 
     use HTML::Object::DOM::Element::Body;
     my $body = HTML::Object::DOM::Element::Body->new || 
-        die( HTML::Object::DOM::Element::Body->error, "\n" );
+        die( HTML::Object::DOM::Element::Body->error );
 
 =head1 VERSION
 
@@ -318,7 +318,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLBod
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

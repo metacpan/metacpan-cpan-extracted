@@ -1,5 +1,10 @@
 =encoding utf8
 
+
+=head1 Abstract
+
+Access Matplotlib from Perl; providing consistent user interface between different plot types
+
 =head1 Synopsis
 
 Take a data structure in Perl, and automatically write a Python3 script using matplotlib to generate an image.  The Python3 script is saved in C</tmp>, to be edited at the user's discretion.
@@ -85,67 +90,45 @@ C<bar>, C<barh>, C<boxplot>, C<hexbin>, C<hist>, C<hist2d>, C<imshow>, C<pie>, C
 
 =head2 The C<p> argument
 
-C<p> is a single, uniform way to describe one I<or> many plots, so you no longer
-need a top-level C<plot.type> (or the older C<plots> array). Each plot is a hash,
-exactly like a single-plot call, and C<p> collects them.
+C<p> is a single, uniform way to describe one I<or> many subplots, so you no
+longer need a top-level C<plot.type> (or the older C<plots> array). Each plot is a
+hash, exactly like a single-plot call, and C<p> collects the subplots into one
+array.
 
-C<p> comes in two shapes:
+The rule is simple: B<< one element of C<p> is one subplot. >>
 
 =over
 
-=item * B<1‑D — an array of hashes:> one subplot. The first hash is the plot; any
-further hashes are I<additions> drawn on the B<same> axes (the same behaviour
-as C<add>).
 
-=item * B<2‑D — an array of arrays:> one subplot B<per inner array>. Within each
-inner array the first hash is that subplot's plot and the rest are additions
-on it. Lay the subplots out with C<ncol>/C<nrow> (aliases for C<ncols>/C<nrows>).
+=item * A B<hash> element is a subplot containing a single plot.
+
+
+=item * An B<array of hashes> element is a single subplot whose plots are drawn on
+
+the B<same> axes: the first hash is the base plot and the rest are
+I<additions> (overlays), exactly like C<add>.
 
 =back
 
-The first hash of a group supplies the axes-level options (C<title>, C<xlabel>,
-C<ylabel>, C<legend>, …) for that subplot.
 
-C<p> cannot be combined with C<plot.type>, C<data>, C<plots>, or C<add>. Mixing
-hashes and arrays inside one C<p> is an error — pick 1‑D I<or> 2‑D.
+The two forms may be B<mixed freely> in the same C<p>. The first (or only) hash
+of a subplot supplies that subplot's axes-level options (C<title>, C<xlabel>,
+C<ylabel>, C<legend>, …).
+
+If you don't give a grid, the subplots are laid out automatically on a
+near-square grid. Give C<ncol>/C<nrow> (aliases for C<ncols>/C<nrows>) to control
+it; supplying only one dimension derives the other (so C<< ncols =E<gt> 1 >> stacks the
+subplots in a single column), and supplying both is honored as given.
+
+C<p> cannot be combined with C<plot.type>, C<data>, C<plots>, or C<add>.
 
  > Arguments are now passed as a plain list — C<plt( ... )> — though the older
  > C<plt({ ... })> form still works.
 
-=head3 One subplot, several plots overlaid (1‑D)
+=head3 One subplot, several plots overlaid
 
-Because C<p> holds two hashes (not two arrays), both plots land on a single
-subplot:
-
- plt(
-     p => [
-         {
-             data => {
-                 E => [ 55, @{$x}, 160 ],
-                 B => [ @{$y}, 140 ],
-             },
-             'plot.type' => 'boxplot',
-             title       => 'Single Box Plot: Specified Colors',
-             colors      => { E => 'yellow', B => 'purple' },
-         },
-         {
-             data => {
-                 A => [ 55, @{$z} ],
-                 E => [ @{$y} ],
-                 B => [ 122, @{$z} ],
-             },
-             'plot.type' => 'violinplot',
-             title       => 'Single Violin Plot: Specified Colors',
-             colors      => { E => 'yellow', B => 'purple', A => 'green' },
-         },
-     ],
-     'output.file' => '1plot.svg',    # note: no C<plot.type> needed
- );
-
-=head3 Multiple subplots (2‑D)
-
-Wrap each plot in its own inner array and you get one subplot per array. With
-C<< ncol =E<gt> 2 >> the two subplots sit side by side:
+Wrap the plots in an inner array and they all land on a single subplot (the
+first is the base plot, the rest are additions):
 
  plt(
      p => [
@@ -159,8 +142,6 @@ C<< ncol =E<gt> 2 >> the two subplots sit side by side:
                  title       => 'Single Box Plot: Specified Colors',
                  colors      => { E => 'yellow', B => 'purple' },
              },
-         ],
-         [
              {
                  data => {
                      A => [ 55, @{$z} ],
@@ -173,12 +154,44 @@ C<< ncol =E<gt> 2 >> the two subplots sit side by side:
              },
          ],
      ],
+     'output.file' => '1plot.svg',    # note: no C<plot.type> needed
+ );
+
+=head3 Multiple subplots
+
+Give each subplot as its own element. A bare hash is a one-plot subplot, so two
+hashes make two subplots; with C<< ncol =E<gt> 2 >> they sit side by side:
+
+ plt(
+     p => [
+         {
+             data => {
+                 E => [ 55, @{$x}, 160 ],
+                 B => [ @{$y}, 140 ],
+             },
+             'plot.type' => 'boxplot',
+             title       => 'Box Plot: Specified Colors',
+             colors      => { E => 'yellow', B => 'purple' },
+         },
+         {
+             data => {
+                 A => [ 55, @{$z} ],
+                 E => [ @{$y} ],
+                 B => [ 122, @{$z} ],
+             },
+             'plot.type' => 'violinplot',
+             title       => 'Violin Plot: Specified Colors',
+             colors      => { E => 'yellow', B => 'purple', A => 'green' },
+         },
+     ],
      ncol          => 2,
      'output.file' => '2plots.svg',
  );
 
-To overlay extra plots on a subplot, add more hashes to that subplot's inner
-array (the first is the plot, the rest are additions).
+To overlay extra plots on any one subplot, make that element an array of hashes
+instead of a bare hash (the first is the plot, the rest are additions). Bare
+hashes and inner arrays may be intermixed in the same C<p>, for example
+C<< p =E<gt> [ \%single, [ \%base, \%overlay ], \%another ] >>.
 
 =head2 Options
 
@@ -1784,28 +1797,39 @@ are rejected with an explanatory error.
 
 =over
 
+
 =item * C<show.legend> — on by default (C<1>); set to C<0> to suppress labels. Only the
+
 hash form produces labels in the first place.
 
 =item * C<key.order> — array of keys (hash form) fixing the draw/legend order; defaults
+
 to the keys sorted alphabetically.
 
 =item * C<logscale> — array of axes to put on a log scale, e.g. C<[ 'x', 'y' ]>.
 
+
 =item * C<twinx> — draw selected series against a secondary y-axis.
+
 =over
+
 
 =item * hash data: a single key, or a hash whose keys are the series to twin;
 
+
 =item * array data: an integer index, or an array of indices.
+
 
 =back
 
+
 =item * C<twinx.args> — a hash keyed by data key (hash form) or index (array form);
+
 each value is a hash of axis options (e.g. C<ylabel>, C<set_ylim>) applied to
 that twin axis.
 
 =back
+
 
 Common axes options such as C<title>, C<xlabel>, C<ylabel>, and C<legend> are
 accepted here too, exactly as for the other plot types.
@@ -2350,11 +2374,23 @@ all files will be written to C<< $fh-E<gt>filename >>; be sure to put C<< execut
      execute           => 1,
  );
 
-=head1 Change log
+=head1 Changes
+
+=head2 0.301
+
+Fixes for changes introduced in 0.30 for CPAN testers: https://www.cpantesters.org/cpan/report/143e86c6-77fa-11f1-b73a-21df6d8775ea
+
+Removed files from build directory to shrink tarball
+
+=head2 0.30
+
+non-ASCII key names (e.g. C<ρ>, C<τ>) no longer crash the writer. The generated-Python filehandle is now given a UTF-8 encoding layer, fixing a fatal "Wide character in say" that occurred under the module's strict-fatal warnings; the layer is added only when not already present, so a caller-supplied filehandle is never double-encoded.
+
+C<p> option: a flat array of subplots where B<one element is one subplot> — a hash is a single-plot subplot, and an array of hashes is one subplot with the plots overlaid on the same axes (first hash is the base plot, the rest are additions). The two forms may be mixed in the same C<p>. When no grid is given the subplots are laid out on an auto-sized near-square grid; giving only C<ncol>/C<nrow> (or C<ncols>/C<nrows>) derives the other dimension.
 
 =head2 0.29
 
-addition of C<p> option
+addition of the C<p> option
 
 removal of SHA testing; changes in Matplotlib version 3.11 mean that SHA sums aren't compatible across different versions of Matplotlib
 
@@ -2525,3 +2561,7 @@ better warnings for incomplete data in "plot"
 "tick_params" is removed from plt methods
 fewer "my" for error arrays, using empty arrays from earlier; should increase efficiency slightly
 added tests for twinx in plot for both array and hash variants
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is free.  It is licensed under the same terms as Perl itself

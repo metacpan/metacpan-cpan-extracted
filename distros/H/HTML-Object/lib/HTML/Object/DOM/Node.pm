@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
 ## Modified 2026/03/29
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -53,7 +53,7 @@ BEGIN
         DOCUMENT_POSITION_CONTAINS
         DOCUMENT_POSITION_CONTAINED_BY
         DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
-        
+
         ELEMENT_NODE
         ATTRIBUTE_NODE
         TEXT_NODE
@@ -69,8 +69,9 @@ BEGIN
         SPACE_NODE
     );
     use overload (
-        '=='    => \&isSameNode,
-        'eq'    => \&isSameNode,
+        '=='     => \&isSameNode,
+        'eq'     => \&isSameNode,
+        fallback => 1,
     );
     our $XP;
     our $VERSION = 'v0.3.0_1';
@@ -276,7 +277,7 @@ sub compareDocumentPosition
     #     -> DOCUMENT_POSITION_CONTAINED_BY
     # 32 - The specified node and the current node have no common container node or the two nodes are different attributes of the same node.
     #     -> DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
-    
+
     # "If the two nodes being compared are the same node, then no flags are set on the return."
     # <https://www.w3.org/TR/DOM-Level-3-Core/core.html#DocumentPosition>
     return(0) if( Scalar::Util::refaddr( $self ) eq Scalar::Util::refaddr( $elem ) );
@@ -288,7 +289,7 @@ sub compareDocumentPosition
         # 2 attributes of the same node
         return(32) if( $self->ownerElement && $self->ownerElement eq $elem->ownerElement );
     }
-    
+
     my $parent = $self->parent;
     my $parent2 = $elem->parent;
     # "If neither of the two determining node is a child node and one determining node has a greater value of nodeType than the other, then the corresponding node precedes the other."
@@ -297,7 +298,7 @@ sub compareDocumentPosition
     {
         return( $self->nodeType < $elem->nodeType ? DOCUMENT_POSITION_FOLLOWING : DOCUMENT_POSITION_PRECEDING );
     }
-    
+
     my $root = $self->root;
     my $root2 = $elem->root;
     # Both elements are in different documents
@@ -305,7 +306,7 @@ sub compareDocumentPosition
     {
         return( DOCUMENT_POSITION_DISCONNECTED );
     }
-    
+
     my $bit = 0;
     my $lineage = $self->lineage;
     my $lineage2 = $elem->lineage;
@@ -335,7 +336,7 @@ sub compareDocumentPosition
         }
         return;
     };
-    
+
     # Check if our parent is among the other element's parents
     my $parent_pos = $lineage2->pos( $parent );
     # Check if the other element's parent is among our parents
@@ -369,7 +370,7 @@ sub compareDocumentPosition
     {
         # Neither our parent, nor the other's parent is in either lineage.
     }
-    
+
     if( $lineage->intersection( $lineage2 )->is_empty &&
         $lineage2->intersection( $lineage )->is_empty )
     {
@@ -384,7 +385,7 @@ sub compareDocumentPosition
     # 2) previous sibling
     # 3) descendant of previous sibling
     # 4) previous sibling of an ancestor
-    
+
     # "If one of the nodes being compared contains the other node, then the container precedes the contained node, and reversely the contained node follows the container."
     # <https://www.w3.org/TR/DOM-Level-3-Core/core.html#DocumentPosition>
     if( $lineage->has( $elem ) )
@@ -427,7 +428,7 @@ sub compareDocumentPosition
             }
         }
     }
-    
+
     # still no luck, check
     # 1) descendants
     # 2) following sibling
@@ -465,7 +466,7 @@ sub compareDocumentPosition
                 last;
             }
         }
-        
+
         # no luck so far. Checking previous sibling of an ancestor
         if( !( $bit & DOCUMENT_POSITION_FOLLOWING ) )
         {
@@ -535,7 +536,7 @@ sub findNode
     my $this = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $results = $self->new_array;
-    
+
     if( ref( $this ) && $self->_is_object( $this ) && $this->isa( 'HTML::Object::DOM::Element' ) )
     {
         my $a = $self->new_array( [ $this ] );
@@ -959,7 +960,7 @@ sub nodeType
     # We treat space separately, but the DOM normally treats it as text
     'HTML::Object::DOM::Space'       => SPACE_NODE,
     ];
-    
+
     # return( $map->{ [split( /::/, ( ref( $self ) || $self ) )]->[-1] } );
     for( my $i = 0; $i < scalar( @$map ); $i += 2 )
     {
@@ -1402,7 +1403,7 @@ HTML::Object::DOM::Node - HTML Object DOM Node Class
 
     use HTML::Object::DOM::Node;
     my $node = HTML::Object::DOM::Node->new || 
-        die( HTML::Object::DOM::Node->error, "\n" );
+        die( HTML::Object::DOM::Node->error );
 
 =head1 VERSION
 
@@ -1766,7 +1767,7 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 =head2 dispatchEvent
 
 Dispatches an event to this node in the DOM and returns a boolean value that indicates whether no handler canceled the event. This is inherited from L<HTML::Object::EventTarget>
- 
+
 See L<HTML::Object::EventTarget/dispatchEvent> for more information.
 
 =head2 find
@@ -2041,7 +2042,7 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 =head2 removeEventListener
 
 Removes an event listener from the node. This is inherited from L<HTML::Object::EventTarget>
- 
+
 See L<HTML::Object::EventTarget/removeEventListener> for more information.
 
 =head2 replaceChild
@@ -2192,7 +2193,7 @@ See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Nod
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

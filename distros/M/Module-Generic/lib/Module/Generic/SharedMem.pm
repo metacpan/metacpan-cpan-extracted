@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.5.5
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.5.6
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2026/01/22
+## Modified 2026/07/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -121,7 +121,7 @@ EOT
         lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
         'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.5.5';
+    our $VERSION = 'v0.5.6';
 };
 
 # use strict;
@@ -256,8 +256,6 @@ sub exists
         {
             my $arg = 0;
             my $found = semctl( $semid, SEM_MARKER, &IPC::SysV::GETVAL, $arg );
-            $arg = 0;
-            semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg );
             return( $found == SHM_EXISTS ? 1 : 0 );
         }
         else
@@ -393,8 +391,12 @@ sub op
     {
         my $serial = $self->serial ||
             return( $self->error( "Cannot get the serial" ) );
-        my $semid = semget( $serial, 3, IPC_CREAT | 0666 );
-        $rv = semop( $semid, $data );
+        my $new_semid = semget( $serial, 3, IPC_CREAT | 0666 );
+        return( $self->error( "Unable to recreate semaphore for serial '$serial': $!" ) ) if( !defined( $new_semid ) );
+        $rv = semop( $new_semid, $data );
+        # Update the stored semaphore ID so that subsequent operations use the
+        # newly created semaphore rather than the now-invalid original one.
+        $self->semid( $new_semid ) if( $rv );
     }
     return( $rv );
 }

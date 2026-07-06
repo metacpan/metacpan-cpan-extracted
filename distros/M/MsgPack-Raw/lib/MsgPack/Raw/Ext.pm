@@ -1,5 +1,5 @@
 package MsgPack::Raw::Ext;
-$MsgPack::Raw::Ext::VERSION = '0.05';
+$MsgPack::Raw::Ext::VERSION = '0.06';
 use strict;
 use warnings;
 use overload
@@ -29,7 +29,7 @@ MsgPack::Raw::Ext - msgpack Ext class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ use 5.038;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Infix::Custom', $VERSION);
@@ -13,13 +13,15 @@ XSLoader::load('Infix::Custom', $VERSION);
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Infix::Custom - custom infix operators
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2025/10/16
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -189,7 +189,7 @@ HTML::Object::DOM::Element::Option - HTML Object DOM Option Class
 
     use HTML::Object::DOM::Element::Option;
     my $opt = HTML::Object::DOM::Element::Option->new || 
-        die( HTML::Object::DOM::Element::Option->error, "\n" );
+        die( HTML::Object::DOM::Element::Option->error );
 
 =head1 VERSION
 
@@ -279,7 +279,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLOpt
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

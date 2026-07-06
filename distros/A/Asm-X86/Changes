@@ -1,9 +1,18 @@
 Revision history for Asm-X86
 
+2026-07-05	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.73
+	  Updated the instruction list. Some (invisible) improvements to the
+	  build system.
+	* lib/Asm/X86.pm (@instr_intel): Updated the instruction list from
+	  NASM version 3.02.
+
 2025-11-05	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.72
-	  Updated the instruction list.
+	  Updated the instruction list. Code simplifications. Other small
+	  changes.
 	* lib/Asm/X86.pm (@instr_intel): Updated the instruction and register
 	  lists from NASM version 3.01.
 	* lib/Asm/X86.pm: Simplified parameter assigning in subroutines.

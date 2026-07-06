@@ -31,7 +31,17 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "File::Basename" : "0",
+            "File::MimeInfo" : "0.35",
+            "File::Spec" : "0",
+            "File::Spec::Link" : "0.073",
+            "Test::Tk" : "3.04",
+            "Tk" : "804.032",
+            "Tk::ListBrowser" : "0.12",
+            "Tk::ListEntry" : "0.07",
+            "Tk::YADialog" : "0.05"
+         }
       }
    },
    "release_status" : "stable",
@@ -45,6 +55,6 @@
          "web" : "https://github.com/haje61/Tk-FileBrowser"
       }
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

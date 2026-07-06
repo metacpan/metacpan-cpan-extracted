@@ -10,6 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Syntax/Infix/ConditionalSplice.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.038',
+    macro => { TARFLAGS => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => '0' },
     TEST_REQUIRES    => { 'Test::More' => '0' },
     PREREQ_PM        => { 'Infix::Custom' => '0.01' },

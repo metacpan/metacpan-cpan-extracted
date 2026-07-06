@@ -1,6 +1,10 @@
 Revision history for Perl extension Tk::AppWindow.
 
-0.22 Date
+0.23 Sun Jul 05 2026
+	- Facilitating version 0.13 of Tk::FileBrowser.
+
+
+0.22 Sat Mar 22 2025
 	- Removed all references to a previously existing extension Balloon.
 	- Added methods abreviate and fontFams to Tk::AppWindow.
 	- Extension MDI sets and clears indicators on the document tabs.

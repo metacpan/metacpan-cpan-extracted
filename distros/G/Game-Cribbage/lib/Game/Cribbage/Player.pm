@@ -3,20 +3,21 @@ package Game::Cribbage::Player;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar -types;
 
-property [qw/id name number/] => (
-	initable => 1,
-	writeable => 0,
-	configurable => 0,
-	enumerable => 1
+has [qw/id number/] => (
+	is => 'ro',
+	isa => Int
 );
 
-function player => sub {
-	return 'player' . $_[0]->number;
-};
+has name => (
+	is => 'ro',
+	isa => Str
+);
 
-# should player have cards here to think.
+
+sub player {
+	return 'player' . $_[0]->number;
+}
 
 1;

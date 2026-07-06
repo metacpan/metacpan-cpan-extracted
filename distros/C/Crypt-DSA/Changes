@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt-DSA
 
+1.24 -- Sun Jul 05 20:26:37 ADT 2026
+
+    - Standardize on Crypt::SysRandom and drop the Crypt::URandom dependency
+
 1.23 -- Fri Jul 03 17:18:40 ADT 2026
 
     - Make CVE tests optional

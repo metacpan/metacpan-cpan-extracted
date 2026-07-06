@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/20
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -73,7 +73,7 @@ With just one argument, this default to search for everything (C<SHOW_ALL>) and 
 
     use HTML::Object::DOM::NodeIterator;
     my $nodes = HTML::Object::DOM::NodeIterator->new( $root_node ) || 
-        die( HTML::Object::DOM::NodeIterator->error, "\n" );
+        die( HTML::Object::DOM::NodeIterator->error );
 
 Or, passing an anonymous subroutine as the filter
 
@@ -81,7 +81,7 @@ Or, passing an anonymous subroutine as the filter
         $root_node,
         $what_to_show_bit,
         sub{ return( FILTER_ACCEPT ); }
-    ) || die( HTML::Object::DOM::NodeIterator->error, "\n" );
+    ) || die( HTML::Object::DOM::NodeIterator->error );
 
 Or, passing an hash reference with a property 'acceptNode' whose value is an anonymous subroutine, as the filter
 
@@ -91,7 +91,7 @@ Or, passing an hash reference with a property 'acceptNode' whose value is an ano
         {
             acceptNode => sub{ return( FILTER_ACCEPT ); }
         }
-    ) || die( HTML::Object::DOM::NodeIterator->error, "\n" );
+    ) || die( HTML::Object::DOM::NodeIterator->error );
 
 Or, passing an object that implements the method "acceptNode"
 
@@ -100,7 +100,7 @@ Or, passing an object that implements the method "acceptNode"
         $what_to_show_bit,
         # This object must implement the acceptNode method
         My::Customer::NodeFilter->new
-    ) || die( HTML::Object::DOM::NodeIterator->error, "\n" );
+    ) || die( HTML::Object::DOM::NodeIterator->error );
 
 There is also L<HTML::Object::DOM::TreeWalker>, which performs a somewhat similar function.
 
@@ -251,7 +251,7 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 
 Normally this is read-only, but under perl you can set whatever number value you want.
 
-Returns an unsigned long being a bitmask made of L<constants|/CONSTANTS> describing the types of L<Node|HTML::Object::DOM::Node> that must to be presented. Non-matching nodes are skipped, but their children may be included, if relevant.
+Returns an unsigned long being a bitmask made of L<constants|HTML::Object::DOM::NodeFilter/CONSTANTS> describing the types of L<Node|HTML::Object::DOM::Node> that must to be presented. Non-matching nodes are skipped, but their children may be included, if relevant.
 
 Possible constant values (exported by L<HTML::Object::DOM::NodeFilter>) are:
 
@@ -398,7 +398,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/NodeIte
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

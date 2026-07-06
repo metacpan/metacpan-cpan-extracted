@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
 ## Modified 2022/11/11
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,8 +25,10 @@ BEGIN
     our $BASE_CLASS = 'HTML::Object::XPath';
     our $DEBUG = 0;
     use overload (
-        '""'  => \&value,
-        'cmp' => \&cmp
+        '""'     => \&value,
+        'cmp'    => \&cmp,
+        'bool'   => \&value,
+        fallback => 1,
     );
     our $VERSION = 'v0.2.1';
 };
@@ -126,7 +128,7 @@ HTML::Object::XPath::Literal - HTML Object XPath Literal
 
     use HTML::Object::XPath::Literal;
     my $this = HTML::Object::XPath::Literal->new || 
-        die( HTML::Object::XPath::Literal->error, "\n" );
+        die( HTML::Object::XPath::Literal->error );
 
 =head1 VERSION
 
@@ -218,7 +220,7 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

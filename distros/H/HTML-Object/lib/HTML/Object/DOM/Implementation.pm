@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -110,7 +110,7 @@ HTML::Object::DOM::Implementation - HTML Object DOM Implementation
 
     use HTML::Object::DOM::Implementation;
     my $impl = HTML::Object::DOM::Implementation->new || 
-        die( HTML::Object::DOM::Implementation->error, "\n" );
+        die( HTML::Object::DOM::Implementation->error );
 
 =head1 VERSION
 
@@ -203,7 +203,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/DOMImpl
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

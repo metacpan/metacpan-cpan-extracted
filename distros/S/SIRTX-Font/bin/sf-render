@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2024-2025 Philipp Schafft
+# Copyright (c) 2024-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -16,15 +16,17 @@ use Getopt::Long;
 use SIRTX::Font;
 
 my %config = (
-    output      => undef,
-    font        => undef,
-    text        => undef,
+    output          => undef,
+    proportional    => undef,
+    font            => undef,
+    text            => undef,
 );
 
 {
     my %opts;
 
     $opts{'output|o=s'}     = \$config{output};
+    $opts{'proportional!'}  = \$config{proportional};
     $opts{'font=s'}         = \$config{font};
     $opts{'text=s'}         = \$config{text};
 
@@ -43,8 +45,7 @@ my %config = (
 my $font = SIRTX::Font->new;
 
 if (defined($config{font})) {
-    open(my $in, '<:raw', $config{font}) or croak 'Cannot open: '.$config{font};
-    $font->read($in);
+    $font->import_font(auto => $config{font});
 }
 
 if (defined $config{text}) {
@@ -61,7 +62,12 @@ foreach my $input (@ARGV) {
 }
 
 if (defined $config{output}) {
-    my $image = $font->render($config{text});
+    my $renderer = $font->renderer;
+    my $image;
+
+    $renderer->proportional($config{proportional});
+
+    $image = $renderer->render($config{text});
     $image->Write($config{output});
 }
 

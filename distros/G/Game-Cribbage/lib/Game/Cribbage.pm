@@ -1,12 +1,24 @@
 package Game::Cribbage;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar -types;
 use Game::Cribbage::Board;
 
-prototyped 'board' => undef, dealer => undef, crib_set => 0, starter_card => undef; 
+has board => (
+	is => 'rw',
+	isa => Object
+);
+
+has [qw/dealer crib_set/] => (
+	is => 'rw',
+	isa => Bool,
+	default => 0
+);
+
+has starter_card => (
+	is => 'rw'
+);
 
 sub start {
 	my ($self, %params) = @_;
@@ -28,7 +40,7 @@ sub start {
 
 	$board->start_game();
 
-	$self->board = $board;
+	$self->board($board);
 
 	$self->init_game();
 }
@@ -48,9 +60,9 @@ sub init_game {
 sub init_draw {
 	my ($self, $switch) = @_;
 
-	$self->crib_set = 0;
-	$self->starter_card = undef;
-	$self->dealer = !$self->dealer if $switch;
+	$self->crib_set(0);
+	$self->starter_card(undef);
+	$self->dealer(!$self->dealer) if $switch;
 
 	my $winner;
 	if ($self->board->score->player1->{current} > 120) {
@@ -84,25 +96,15 @@ sub init_draw {
 
 
 			my $hands = $self->board->get_hands;
-			unless (grep { !$_->{used} } @{$hands->player2->cards}, @{$hands->player1->cards}) {
+			unless (grep { !$_->used } @{$hands->player2->cards}, @{$hands->player1->cards}) {
 				eval {
 					$self->end_hands();
 				};
-				if ($@) {
-					while (1) {
-						print $@;
-					}
-				}
 				return $self->init_draw(1);
 			}
 
 			if ($self->board->no_player_can_play) {
 				eval { $self->board->next_play(); };
-				if ($@) {
-					while (1) {
-						print $@;
-					}
-				}
 			}
 		}
 	}
@@ -118,7 +120,7 @@ sub end_hands {
 
 	$self->board->end_hands();
 
-	$self->crib_set = 0;
+	$self->crib_set(0);
 
 	$self->clear_screen();
 
@@ -126,7 +128,8 @@ sub end_hands {
 	my $player1_score = $last->player1->score->total_score;
 	my $player2_score = $last->player2->score->total_score;
 	my $crib_player = $self->dealer ? $self->board->players->[-1]->name : 'Bot';
-	my $crib_score = $last->{$self->dealer ? 'player2' : 'player1'}->crib_score->total_score;
+	my $player = $self->dealer ? 'player2' : 'player1';
+	my $crib_score = $last->$player->crib_score->total_score;
 
 	$self->print_header(sprintf "Bot scored: %s - %s scored: %s - %s crib scored: %s",
 		$player1_score,
@@ -140,7 +143,8 @@ sub end_hands {
 
 	$self->render_player_cards($hands->player1->cards, 3, 20, 1);
 
-	$self->render_player_cards($hands->{$hands->crib_player}->crib, 15, 20, 1);
+	$crib_player = $hands->crib_player;
+	$self->render_player_cards($hands->$crib_player->crib, 15, 20, 1);
 
 	$self->render_player_cards($hands->player2->cards, 26, 20, 1);
 
@@ -153,10 +157,9 @@ sub play_hand {
 	my ($self) = @_;
 
 	my $hands = $self->board->get_hands;
-	
 	if ($self->board->next_to_play->player eq 'player1') { 
 		my $card = $self->board->best_run_play('player1');
-		if ($card->go) {
+		if ($card->can('go') && $card->go) {
 			$self->board->cannot_play('player1');
 			$self->draw_go(6, 2);
 		} else {
@@ -172,7 +175,7 @@ sub play_hand {
 		}
 	}
 
-	if ($self->board->player_cannot_play('player2')) {
+	if ($self->board->player_cannot_play('player2')) {	
 		if (!$self->board->player_cannot_play('player1')) {
 			$self->board->set_next_to_play('player1');
 		}
@@ -181,7 +184,7 @@ sub play_hand {
 
 	$_[0]->draw_scores();
 
-	$self->render_opponent_cards(scalar grep { !$_->{used} } @{$hands->player1->cards});
+	$self->render_opponent_cards(scalar grep { !$_->used } @{$hands->player1->cards});
 
 	$self->render_run_play();
 
@@ -204,7 +207,7 @@ sub play_hand {
 
 	if ($number eq 'b') {
 		my $card = $self->board->best_run_play('player2');
-		if ($card->go) {
+		if ($card->can('go') && $card->go) {
 			$self->board->cannot_play('player2');
 			$self->draw_go(6, 2);
 		} else {
@@ -271,7 +274,7 @@ sub split_cards {
 
 	$self->print_footer(q|Press enter to continue|);
 
-	$self->dealer = $dealer;
+	$self->dealer($dealer);
 
 	<STDIN>
 }
@@ -300,10 +303,16 @@ sub discard_cards {
 	my $cards_index  = <STDIN>;
 
 	chomp($cards_index);
-
-	my @cards = map {
-		$self->board->get_card('player2', $_ - 1);
-	} grep { $_ =~ m/^\d+$/ && $_ <= 6 } split " ", $cards_index;
+	
+	my @cards;
+	if ($cards_index =~ m/b/i) {
+		my @worst = $self->board->identify_worst_cards('player2');
+		@cards = @{$worst[0]};
+	} else {
+		@cards = map {
+			$self->board->get_card('player2', $_ - 1);
+		} grep { $_ =~ m/^\d+$/ && $_ <= 6 } split " ", $cards_index;
+	}
 
 	unless (scalar @cards == 2) {
 		$self->discard_cards();
@@ -316,7 +325,7 @@ sub discard_cards {
 
 	$self->board->crib_player_cards('player1', $bot[0]);
 
-	$self->crib_set = 1;
+	$self->crib_set(1);
 }
 
 sub starter {
@@ -324,10 +333,10 @@ sub starter {
 
 	$self->clear_screen();
 
-	my $count = scalar @{$self->board->deck->{deck}};
+	my $count = scalar @{$self->board->deck->deck};
 	if ($self->dealer) {
 		my $card = $self->board->deck->get(int(rand(39)));	
-		$self->starter_card = $card;
+		$self->starter_card($card);
 		$self->board->add_starter_card('player1', $card);
 		return;
 	}
@@ -349,7 +358,7 @@ sub starter {
 	}
 
 	my $card = $self->board->deck->get($number);
-	$self->starter_card = $card;
+	$self->starter_card($card);
 	my $scored = $self->board->add_starter_card('player2', $card);
 	return;
 }
@@ -414,7 +423,7 @@ sub render_player_cards {
 	my ($self, $cards, $top, $left, $all) = @_;
 	my $i = 1;
 	for (@{$cards}) {
-		if (!$all && $_->{used}) {
+		if (!$all && $_->used) {
 			$i++;
 			next;
 		}
@@ -618,7 +627,7 @@ sub say {
 
 sub print_header {
 	my ($self, $message) = @_;
-	$self->set_cursor_verical(0);
+	$self->set_cursor_vertical(0);
 	$self->set_cursor_horizontal(0);
  	print "\e[40;1m";
 	print pack("A100", " ");
@@ -648,7 +657,7 @@ Game::Cribbage - Cribbage game engine
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -760,7 +769,7 @@ The following functions are defined in L<Game::Cribbage>
 
         $board->start_game();
 /split
-        $game->board = $board;
+        $game->board($board);
 
 	$game->clear_screen;
 

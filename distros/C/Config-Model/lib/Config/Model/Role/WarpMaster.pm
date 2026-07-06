@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::WarpMaster 2.163;
+package Config::Model::Role::WarpMaster 2.164;
 
 # ABSTRACT: register and trigger a warped element
 
@@ -108,17 +108,17 @@ Config::Model::Role::WarpMaster - register and trigger a warped element
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 
- package Config::Model::Stuff;
+ package Config::Model::SomeStuff;
  use Mouse;
  with Config::Model::Role::WarpMaster
 
 =head1 DESCRIPTION
 
-This role enable a configuration element to become a warp maser, i.e. a parameter
+This role enable a configuration element to become a warp master, i.e. a parameter
 whose value can change the features of the configuration tree (by controlling a
 warped_node) or the feature of various elements like leaf, hash ...
 

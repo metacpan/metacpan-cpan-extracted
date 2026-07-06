@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/01
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -43,7 +43,7 @@ HTML::Object::DOM::NodeList - HTML Object DOM NodeList Class
 
     use HTML::Object::DOM::NodeList;
     my $list = HTML::Object::DOM::NodeList->new || 
-        die( HTML::Object::DOM::NodeList->error, "\n" );
+        die( HTML::Object::DOM::NodeList->error );
 
 =head1 VERSION
 
@@ -177,7 +177,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/NodeLis
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

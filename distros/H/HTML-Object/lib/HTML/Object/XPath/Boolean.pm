@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,8 +19,10 @@ BEGIN
     warnings::register_categories( 'HTML::Object' );
     use vars qw( $DEBUG $VERSION );
     use overload (
-        '""'  => \&value,
-        '<=>' => \&cmp
+        '""'     => \&value,
+        '<=>'    => \&cmp,
+        'bool'   => \&value,
+        fallback => 1,
     );
     our $DEBUG = 0;
     our $VERSION = 'v0.2.0';
@@ -93,7 +95,7 @@ HTML::Object::XPath::Boolean - HTML Object
 =head1 SYNOPSIS
 
     use HTML::Object::XPath::Boolean;
-    my $this = HTML::Object::XPath::Boolean->new || die( HTML::Object::XPath::Boolean->error, "\n" );
+    my $this = HTML::Object::XPath::Boolean->new || die( HTML::Object::XPath::Boolean->error );
 
 =head1 VERSION
 
@@ -163,7 +165,7 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

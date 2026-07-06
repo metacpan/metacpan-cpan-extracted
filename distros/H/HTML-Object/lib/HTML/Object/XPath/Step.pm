@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -102,7 +102,7 @@ sub as_string
     {
         $string .= $self->{literal};
     }
-    
+
     foreach( @{$self->{predicates}} )
     {
         next unless( defined( $_ ) );
@@ -117,9 +117,9 @@ sub as_xml
     my $string = "<Step>\n";
     $string .= "<Axis>" . $self->{axis} . "</Axis>\n";
     my $test = $self->{test};
-    
+
     $string .= "<Test>";
-    
+
     if( $test == TEST_NT_PI )
     {
         $string .= '<processing-instruction';
@@ -155,7 +155,7 @@ sub as_xml
         $string .= '<nametest>' . $self->{literal} . '</nametest>';
     }
     $string .= "</Test>\n";
-    
+
     foreach( @{$self->{predicates}} )
     {
         next unless( defined( $_ ) );
@@ -196,7 +196,7 @@ sub axis_ancestor_or_self
 {
     my $self = shift( @_ );
     my( $context, $results ) = @_;
-    
+
 #     START:
 #     return $results unless $context;
 #     if( $self->node_test( $context ) )
@@ -220,7 +220,7 @@ sub axis_attribute
 {
     my $self = shift( @_ );
     my( $context, $results ) = @_;
-    
+
     foreach my $attrib ( @{$context->getAttributes} )
     {
         if( $self->test_attribute( $attrib ) )
@@ -235,7 +235,7 @@ sub axis_child
     my $self = shift( @_ );
     my( $context, $results ) = @_;
     my $children = $context->getChildNodes;
-    
+
     foreach my $node ( @{$context->getChildNodes} )
     {
         if( $self->node_test( $node ) )
@@ -330,7 +330,7 @@ sub axis_namespace
 {
     my $self = shift( @_ );
     my( $context, $results ) = @_;
-    
+
     return( $results ) unless( $context->isElementNode );
     foreach my $ns ( @{$context->getNamespaces} )
     {
@@ -345,7 +345,7 @@ sub axis_parent
 {
     my $self = shift( @_ );
     my( $context, $results ) = @_;
-    
+
     my $parent = $context->getParentNode;
     return( $results ) unless( $parent );
     if( $self->node_test( $parent ) )
@@ -387,7 +387,7 @@ sub axis_self
 {
     my $self = shift( @_ );
     my( $context, $results ) = @_;
-    
+
     if( $self->node_test( $context ) )
     {
         $results->push( $context );
@@ -407,19 +407,19 @@ sub evaluate
         $from = $from_nodeset;
     }
     # warn "Step::evaluate called with ", $from->size, " length nodeset\n";
-    
+
     my $saved_context = $self->{pp}->_get_context_set;
     my $saved_pos = $self->{pp}->_get_context_pos;
     $self->{pp}->_set_context_set( $from );
-    
+
     my $initial_nodeset = $self->new_nodeset();
-    
+
     # See spec section 2.1, paragraphs 3,4,5:
     # The node-set selected by the location step is the node-set
     # that results from generating an initial node set from the
     # axis and node-test, and then filtering that node-set by
     # each of the predicates in turn.
-    
+
     # Make each node in the nodeset be the context node, one by one
     for( my $i = 1; $i <= $from->size; $i++ )
     {
@@ -435,9 +435,9 @@ sub evaluate
             $initial_nodeset->append( $tmp );
         }
     }
-    
+
     # warn "Step::evaluate initial nodeset size: ", $initial_nodeset->size, "\n";
-    
+
     $self->{pp}->_set_context_set( $saved_context );
     $self->{pp}->_set_context_pos( $saved_pos );
     return( $initial_nodeset );
@@ -451,7 +451,7 @@ sub evaluate_node
     # warn "Evaluate node: $self->{axis}\n";
     # warn "Node: ", $context->[node_name], "\n";
     my $method = $self->{axis_method};
-    
+
     my $results = $self->new_nodeset();
     no strict 'refs';
     eval{ $self->$method( $context, $results ); };
@@ -459,7 +459,7 @@ sub evaluate_node
     {
         die( "axis $method not implemented [$@]\n" );
     }
-    
+
     # warn("results: ", join('><', map {$_->string_value} @$results), "\n");
     # filter initial nodeset by each predicate
     foreach my $predicate ( @{$self->{predicates}} )
@@ -473,7 +473,7 @@ sub filter_by_predicate
 {
     my $self = shift( @_ );
     my( $nodeset, $predicate ) = @_;
-    
+
     # See spec section 2.4, paragraphs 2 & 3:
     # For each node in the node-set to be filtered, the predicate Expr
     # is evaluated with that node as the context node, with the number
@@ -485,9 +485,9 @@ sub filter_by_predicate
     {
         die( "No nodeset!!!" );
     }
-    
+
     # warn "Filter by predicate: $predicate\n";
-    
+
     my $newset = $self->new_nodeset();
 
     for( my $i = 1; $i <= $nodeset->size; $i++ )
@@ -531,7 +531,7 @@ sub node_test
     my $self = shift( @_ );
     my $node = shift( @_ );
     my $test_types = [qw( TEST_QNAME TEST_NCWILD TEST_ANY TEST_ATTR_QNAME TEST_ATTR_NCWILD TEST_ATTR_ANY TEST_NT_COMMENT TEST_NT_TEXT TEST_NT_PI TEST_NT_NODE )];
-    
+
     # if node passes test, return true
     my $test = $self->{test};
 
@@ -541,7 +541,7 @@ sub node_test
     {
         return(1) if( $node->isElementNode && defined( $node->getName ) );
     }
-        
+
     # local $^W;
     if( $test == TEST_NCWILD )
     {
@@ -627,7 +627,7 @@ sub test_namespace
     my $test = $self->{test};
     # True for all nodes of principal type
     return(1) if( $test == TEST_ANY );
-    
+
     if( $test == TEST_ANY )
     {
         return(1);
@@ -739,7 +739,7 @@ HTML::Object::XPath::Step - HTML Object XPath Step
 =head1 SYNOPSIS
 
     use HTML::Object::XPath::Step;
-    my $this = HTML::Object::XPath::Step->new || die( HTML::Object::XPath::Step->error, "\n" );
+    my $this = HTML::Object::XPath::Step->new || die( HTML::Object::XPath::Step->error );
 
 =head1 VERSION
 
@@ -873,7 +873,7 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

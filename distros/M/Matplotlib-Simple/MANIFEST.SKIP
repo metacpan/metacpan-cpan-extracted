@@ -1,0 +1,28 @@
+# Makemaker generated files and build artifacts
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^blibdirs$
+^MYMETA\.
+^MANIFEST\.bak$
+
+# Release archives and unpacked distribution directories
+^Matplotlib-Simple-.*\.tar\.gz$
+^Matplotlib-Simple-[\d\.]+/?$
+
+# Test output and artifacts
+^output\.images/?
+
+# Development notes and local config
+^dzil\.sh$
+^planned\.txt$
+^methods\.txt$
+^sha\.sums\.tsv$
+
+# Local development and helper scripts (Ignores all .pl EXCEPT Makefile.PL)
+^(?!Makefile\.PL$).*\.pl$
+
+# Version control (Standard best practice)
+^\.git/
+^\.gitignore$

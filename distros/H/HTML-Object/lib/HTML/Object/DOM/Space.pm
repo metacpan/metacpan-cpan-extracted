@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
 ## Modified 2026/03/29
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -92,7 +92,7 @@ HTML::Object::DOM::Space - HTML Object DOM Space Class
 
     use HTML::Object::DOM::Space;
     my $sp = HTML::Object::DOM::Space->new( value => $some_space ) || 
-        die( HTML::Object::DOM::Space->error, "\n" );
+        die( HTML::Object::DOM::Space->error );
 
 =head1 VERSION
 
@@ -202,7 +202,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Documen
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

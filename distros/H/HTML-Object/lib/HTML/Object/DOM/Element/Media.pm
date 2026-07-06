@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -333,7 +333,7 @@ HTML::Object::DOM::Element::Media - HTML Object DOM Media Class
 
     use HTML::Object::DOM::Element::Media;
     my $media = HTML::Object::DOM::Element::Media->new || 
-        die( HTML::Object::DOM::Element::Media->error, "\n" );
+        die( HTML::Object::DOM::Element::Media->error );
 
 =head1 VERSION
 
@@ -937,7 +937,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 =head2 setSinkId
 
-This does not do anything particular under perl, except setting the value of L</sinkid>.
+This does not do anything particular under perl, except setting the value of L</sinkId>.
 
 Normally, under JavaScript, this sets the ID of the audio device to use for output and returns a Promise. This only works when the application is authorized to use the specified device.
 
@@ -1545,7 +1545,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLMed
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

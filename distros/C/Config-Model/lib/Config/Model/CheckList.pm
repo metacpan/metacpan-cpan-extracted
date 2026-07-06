@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::CheckList 2.163;
+package Config::Model::CheckList 2.164;
 
 use Mouse;
 use 5.020;
@@ -30,6 +30,8 @@ with "Config::Model::Role::Grab";
 with "Config::Model::Role::HelpAsText";
 with "Config::Model::Role::ComputeFunction";
 with "Config::Model::Role::Utils";
+# this requires backup method from Config::Model::AnyThing
+with "Config::Model::Role::WarpSubject";
 
 my $logger = get_logger("Tree.Element.CheckList");
 my $user_logger   = get_logger("User");
@@ -39,7 +41,7 @@ my @introspect_params = qw/refer_to computed_refer_to/;
 my @accessible_params = qw/default_list upstream_default_list choice ordered/;
 my @allowed_warp_params = ( @accessible_params, qw/level/ );
 
-has [qw/backup data preset layered/] => ( is => 'rw', isa => 'HashRef', default => sub { {}; } );
+has [qw/data preset layered/] => ( is => 'rw', isa => 'HashRef', default => sub { {}; } );
 has computed_refer_to => ( is => 'rw', isa => 'Maybe[HashRef]' );
 has [qw/refer_to/]            => ( is => 'rw', isa => 'Str' );
 has [qw/ordered_data choice/] => ( is => 'rw', isa => 'ArrayRef', default => sub { []; } );
@@ -54,6 +56,11 @@ around BUILDARGS => sub {
     my %h     = map { ( $_ => $args{$_} ); } grep { defined $args{$_} } @allowed_warp_params;
     return $class->$orig( backup => dclone( \%h ), @_ );
 };
+
+# used by roles
+sub allowed_warp_params {
+    return @allowed_warp_params;
+}
 
 sub BUILD {
     my $self = shift;
@@ -105,20 +112,19 @@ sub value_type { return 'check_list'; }
 # warning : call to 'set' are not cumulative. Default value are always
 # restored. Lest keeping track of what was modified with 'set' is
 # too hard for the user.
-sub set_properties ($self, @args) {
+sub set_properties ($self, %raw_args) {
     # cleanup all parameters that are handled by warp
     for (@allowed_warp_params) {
         delete $self->{$_};
     }
 
     if ( $logger->is_trace() ) {
-        my %h = @args;
-        my $keys = join( ',', keys %h );
+        my $keys = join( ',', keys %raw_args );
         $logger->trace("set_properties called on $self->{element_name} with $keys");
     }
 
-    # merge data passed to the constructor with data passed to set
-    my %args = ( %{ $self->{backup} }, @args );
+    # merge data passed to set_properties with data passed to the constructor
+    my %args = $self->merge_properties(%raw_args);
 
     # these are handled by Node or Warper
     for (qw/level/) {
@@ -833,7 +839,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 

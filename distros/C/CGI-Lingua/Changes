@@ -1,5 +1,82 @@
 Revision history for CGI-Lingua
 
+0.81	Sun Jul  5 09:04:51 EDT 2026
+	[ Bug Fixes ]
+	- Fix ref() parenthesisation bug in new() that broke cache lookups for arrayref-supported
+	- Normalise _warn() to always accept a hashref { warning => ... }; plain-string calls silently lost the message when no logger was set
+	- _code2language() and _code2countryname() now return the computed value explicitly rather than the result of cache->set(), which is not guaranteed across all CHI drivers
+	- Logger validation now only checks blessed objects before Object::Configure; non-blessed values (arrayrefs, hashrefs) pass through for Object::Configure to convert, fixing t/logger.t regression
+	- Fix cache->remove() key in country(): was remove($ip) but the entry was stored under the namespaced key "CGI::Lingua:country:<ip>", leaving numeric-poisoned entries in the cache permanently
+	- Wrap JSON::Parse::parse_json() in eval{} in country() and time_zone(): a malformed response from geoplugin or ip-api.com previously propagated an uncaught die to the caller
+	- Use CORE::open in time_zone() local path: autodie suppressed the fallback to DateTime::TimeZone::Local on hosts without /etc/timezone (e.g. macOS)
+	- Add length($text) guard to _log(): a single undef argument passed the scalar(@messages) check but produced an empty string that was pushed to the messages array
+	- _resolve_sublanguage_match: cache stored language name ("English=en") as first field but
+	  the cache-hit reader expected the country name ("United Kingdom=en"); fixed the cache
+	  store to use "$language_name=$slanguage_code_alpha2" and removed the compensating
+	  overwrite that had been masking this mismatch since introduction
+	- _handle_eu_country: _info() was called with a hashref { warning => "..." } which _log()
+	  stringified as HASH(0x...); changed to a plain string argument
+	- _find_language notice: referenced $self->{supported} (raw string-or-ref from params)
+	  instead of $self->{_supported} (normalised arrayref); join() produced ARRAY(0x...) for
+	  arrayref-supported callers
+	- country(): IPv4-mapped IPv6 addresses (::ffff:a.b.c.d) were rejected by the untainting
+	  regex ([0-9a-fA-F:] excludes dots); extended regex with a mixed-notation alternative
+	  and added normalisation to plain IPv4 before any geo lookup
+	- time_zone(): IPv6 untainting regex lacked mixed-notation support (same fix as country())
+	- time_zone(): Carp::croak when both LWP::Simple::WithCache and LWP::Simple were absent
+	  killed the entire CGI request; demoted to _warn + return undef for graceful degradation
+	- Fix https://github.com/nigelhorne/CGI-Lingua/issues/38
+
+	[ Enhancement ]
+	- Latest testing dashboard
+	- Added sanity testing for the supported argument
+	- Decompose _find_language() into focused helper methods for readability and testability
+	- Add Readonly constants for all magic strings and sentinel values
+	- Add use autodie :file
+	- Add =head1 LIMITATIONS POD section
+	- Add API SPECIFICATION, MESSAGES, FORMAL SPECIFICATION sections to public method POD
+	- Add Purpose/Entry/Exit/Side-Effects comment headers to all private methods
+
+	[ Tests ]
+	- Replace Test::MockModule with Test::Mockingbird in t/30-basics.t
+	- Add t/locales.t: geographic (GB/US/FR/DE/CN) and POSIX locale independence tests
+	- Add t/function.t: white-box subtests for every public and private method (92 subtests)
+	- Add t/unit.t: black-box subtests driven strictly by POD API contracts (62 subtests)
+	- Add t/integration.t: end-to-end tests covering multi-method coherence, priority negotiation, cache DESTROY→thaw, concurrent object isolation, clone behaviour, spy-verified network routing, and optional-dependency fallback (27 subtests)
+	- Add t/edge_cases.t: hostile, pathological, boundary, and security subtests; exposed the cache-removal key bug and the uncaught JSON parse die (48 subtests)
+	- Add t/extended_tests.t: coverage-gap subtests targeting uncovered branches in _resolve_country_via_whois, _find_language_from_ip, _resolve_sublanguage_match, time_zone, locale, _log, and DESTROY (54 subtests)
+	- Fix t/function.t: _log test now injects spy logger directly to bypass Object::Configure
+	- Fix t/function.t: _warn test clears Object::Configure logger to exercise Carp path
+	- Fix t/function.t: locale() subtest now calls locale() and asserts return value
+	- Update t/function.t: document that plain hashref logger is converted by Object::Configure
+	- Fix t/30-basics.t: pre-require LWP::Simple::WithCache before mocking to prevent lazy-load
+	  overwriting the mock; wrap restore_all() in local $SIG{__WARN__} to suppress prototype
+	  mismatch warnings; changed v4-mapped IPv6 test IP from TEST-NET-1 to 8.8.8.8
+	- Fix t/integration.t: don't_use_ip subtest now explicitly sets _have_geoip and
+	  _have_geoipfree to 0 after construction so the test passes on machines where those
+	  modules are installed; extended to 29 subtests; added _inject_geoip and
+	  _inject_geoipfree helpers and subtests for Geo::IP and Geo::IPfree fallback paths
+	- Fix t/locales.t: add delete $ENV{LANG} inside each GeoIP subtest local %ENV block;
+	  fix concurrent-instances subtest to call country() inside the correct REMOTE_ADDR scope;
+	  add LANG env-var fallback subtest; add croak message locale-independence subtest
+
+	[ Security ]
+	- Validate and untaint HTTP_ACCEPT_LANGUAGE before use (taint-mode compliance)
+	- Validate GEOIP_COUNTRY_CODE and HTTP_CF_IPCOUNTRY against ISO 3166-1 alpha-2 format before use
+	- Validate and untaint REMOTE_ADDR via regex capture before passing to geo-lookup modules
+	- Replace string eval with block eval for dynamic loading of Geo::IP and Geo::IPfree
+	- Apply ISO 3166-1 alpha-2 validation to GEOIP_COUNTRY_CODE in locale() to match country()
+	- Validate and untaint REMOTE_ADDR in time_zone() before URL construction
+	- _what_language(): $ENV{LANG} was consumed without untainting, violating the security
+	  invariant applied to all other env-vars; added [A-Za-z0-9_.\-]{1,N} regex capture
+
+	[ Documentation ]
+	- country() POD: return spec incorrectly listed 'Unknown' as a normal return value
+	- Corrected es-419 BUGS description ("3 characters" -> "3-digit UN M.49 sub-tag")
+	- Fixed two misspellings of I18N::AcceptLanguage in SEE ALSO and BUGS sections
+	- Added LIMITATIONS entry documenting IPv4-mapped IPv6 normalisation behaviour
+	- Updated time_zone MESSAGES POD to reflect removal of the Carp::croak
+
 0.80	Wed Dec 17 07:44:05 EST 2025
 	Added a couple of test prereqs (RT#171642)
 	Reduce priority of messages when Locale::Object dies and note about country set to EU

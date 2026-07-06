@@ -30,14 +30,26 @@ subtest defaults => sub {
 
 subtest pitches => sub {
     my $obj = new_ok 'Music::VoicePhrase' => [
-        pitches   => [qw(60 64 67)],
-        motif_num => 20,
+        pitches      => [qw(60 64 67)],
+        pitches_name => 'abc',
+        motif_num    => 20,
     ];
-    my $same = 0;
+    my $got = 0;
     for my $voice ($obj->voices->@*) {
-        $same = any { $voice == $_ } $obj->pitches->@*;
+        $got = any { $voice == $_ } $obj->pitches->@*;
     }
-    ok $same, 'pitches';
+    ok $got, 'pitches';
+    is $obj->pitches_name, 'abc', 'pitches_name';
+};
+
+subtest intervals => sub {
+    my $obj = new_ok 'Music::VoicePhrase' => [
+        intervals      => [(-4 .. -1), (1 .. 4)],
+        intervals_name => 'xyz',
+        motif_num      => 20,
+    ];
+    # TODO not sure how to test intervals, yet. :\
+    is $obj->intervals_name, 'xyz', 'intervals_name';
 };
 
 subtest size => sub {

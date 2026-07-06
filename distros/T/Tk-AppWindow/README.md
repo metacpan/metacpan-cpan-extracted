@@ -23,8 +23,10 @@ Following Perl modules must be installed:
 
     * Data::Compare
     * File::Basename
+    * File::MimeInfo on Linux or File::MimeInfo::Simple on Windows
     * File::Path
     * File::Spec
+    * FreeDesktop::Icons
     * Imager
     * Imager::File::PNG
     * MIME::Base64
@@ -35,7 +37,8 @@ Following Perl modules must be installed:
     * Test::More
     * Tk
     * Tk::DocumentTree
-    * Tk::FontDialog
+    * Tk::DynaMouseWheelBind
+    * Tk::FileBrowser
     * Tk::PodViewer
     * Tk::QuickForm
     * Tk::YADialog
@@ -58,11 +61,6 @@ the Art extension locate the correct icon library.
 This will allow you to load vector graphics based themes like Breeze. We did not include it as a 
 prerequisite since it does not respond well to unattended install. It requires the gnome library 
 librsvg-2 and its development files to be installed.
-
-## Tk::DynaMouseWheelBind
-
-For mouse wheel scrolling of all kinds of Panes and Canvasses. We do not want to make it a prerequisite
-because it is failing a lot of tests on CPAN currently. The module seems fine though.
 
 ## On Windows
 

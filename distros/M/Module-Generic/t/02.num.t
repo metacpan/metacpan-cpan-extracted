@@ -222,7 +222,7 @@ SKIP:
     # diag( sprintf( "Found %d languages available on the system.", scalar( @ok_langs ) ) );
     if( !scalar( @ok_langs ) || !scalar( grep( /^fr_FR/, @ok_langs ) ) )
     {
-        skip( 'Unsupported language', 4 );
+        skip( 'Unsupported language', 5 );
     }
     my $n_loc = Module::Generic::Number->new( 100, { locale => 'fr_FR', precede => 1, precision => 2, thousand => ' ', decimal => ',', debug => $DEBUG });
     isa_ok( $n_loc, 'Module::Generic::Number', 'Object with locale language string' );
@@ -232,7 +232,10 @@ SKIP:
     # [:blank:] does not catch non-breaking space, but horizontal space \h does
     like( $n_loc->thousand, qr/[[:blank:]\h]+/, 'French thousand separator => space' );
     is( $n_loc->decimal, ',', 'French decimal separator => comma' );
-    is( $n_loc->locale, 'fr_FR', 'locale is fr_FR' );
+    # The locale stored may be a variant such as 'fr_FR.UTF-8' if the bare
+    # 'fr_FR' name was not accepted by the system and a supported variant was
+    # tried instead.
+    like( $n_loc->locale, qr/^fr_FR/, 'locale is fr_FR' );
 };
 isa_ok( $n, 'Module::Generic::Number', 'Number Class Object' );
 isa_ok( $n2, 'Module::Generic::Number', 'Cloning object' );
@@ -778,10 +781,21 @@ subtest 'locale propagated to formatter' => sub
             POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
             skip( 'fr_FR.UTF-8 not uniformly available on this system', 2 );
         }
+        # The locale name may be accepted by the OS but its numeric category may still
+        # carry C defaults (e.g. OpenBSD with a minimal locale table). We check
+        # localeconv() directly rather than assuming a comma, so the test remains honest
+        # on any platform.
+        my $lconv_fr = POSIX::localeconv();
+        my $expected_decimal = $lconv_fr->{decimal_point} // '';
+        if( !CORE::length( $expected_decimal ) || $expected_decimal eq '.' )
+        {
+            POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
+            skip( 'fr_FR.UTF-8 locale accepted but provides no distinct numeric decimal data on this system', 2 );
+        }
         my $num = Module::Generic::Number->new( 1234, precision => 2, debug => $DEBUG );
         $num->locale( 'fr_FR.UTF-8' );
         is( $num->locale, 'fr_FR.UTF-8', 'locale setter propagates to formatter' );
-        is( $num->decimal, ',', 'decimal updated after locale change' );
+        is( $num->decimal, $expected_decimal, 'decimal updated after locale change' );
         POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
     };
 };

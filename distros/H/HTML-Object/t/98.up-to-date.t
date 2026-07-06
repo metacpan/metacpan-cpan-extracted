@@ -21,9 +21,9 @@ BEGIN
 {
     # use Data::Dump;
     use Data::Pretty qw( dump );
-    use DateTime;
-    use DateTime::Format::Strptime;
-    use DateTime::TimeZone;
+    use DateTime::Lite;
+    use DateTime::Format::Lite;
+    use DateTime::Lite::TimeZone;
     use HTML::Entities ();
     use HTML::Object::DOM ':node', global_dom => 1;
     use HTML::Object::DOM::Element::Shared;
@@ -1021,7 +1021,7 @@ sub fetch_class_info_and_create_module
 
     &log( "Writing to module file \"${mod_file}\".\n" );
     $mod_file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || die( $mod_file->error, "\n" );
-    my $today = DateTime->now;
+    my $today = DateTime::Lite->now;
     my $ymd = $today->strftime( '%Y/%m/%d' );
     my $year = $today->year;
     my $rel_file = $mod_file->relative( $base_dir );
@@ -1687,17 +1687,17 @@ sub _check_cache_http
     diag( "Last-Modified header value found: '", ( $last_mod ? $last_mod->iso8601 : 'undef' ), "'" );
     unless( $tz )
     {
-        # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+        # DateTime::Lite::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
         # "Cannot determine local time zone"
         local $@;
         # try-catch
         eval
         {
-            $tz = DateTime::TimeZone->new( name => 'local' );
+            $tz = DateTime::Lite::TimeZone->new( name => 'local' );
         };
         if( $@ )
         {
-            $tz = DateTime::TimeZone->new( name => 'UTC' );
+            $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
             warn( "Your system is missing key timezone components. Reverting to UTC instead of local time zone.\n" );
         }
     }
@@ -1708,7 +1708,7 @@ sub _check_cache_http
     }
     else
     {
-        $last_mod = DateTime->now( time_zone => $tz );
+        $last_mod = DateTime::Lite->now( time_zone => $tz );
     }
 
     my $epoch = $last_mod->epoch;

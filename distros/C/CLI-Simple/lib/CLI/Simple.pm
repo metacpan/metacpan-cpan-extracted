@@ -23,9 +23,8 @@ use List::Util qw(zip none pairs any);
 use Log::Log4perl qw();
 use Pod::Usage;
 use Scalar::Util qw(reftype);
-use IO::Pager;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;

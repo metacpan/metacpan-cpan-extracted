@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -82,7 +82,7 @@ HTML::Object::XPath::Variable - HTML Object XPath Variable
 
     use HTML::Object::XPath::Variable;
     my $var = HTML::Object::XPath::Variable->new || 
-        die( HTML::Object::XPath::Variable->error, "\n" );
+        die( HTML::Object::XPath::Variable->error );
 
 =head1 VERSION
 
@@ -132,7 +132,7 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

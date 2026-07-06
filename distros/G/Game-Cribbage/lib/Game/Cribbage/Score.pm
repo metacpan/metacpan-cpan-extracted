@@ -3,23 +3,22 @@ package Game::Cribbage::Score;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar -types;
+
 use ntheory qw/forcomb vecsum/;
 
-property total_score => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1
+has total_score => (
+	is => 'rw',
+	isa => Int
 );
 
-property scored => (
-	initable => 1,
-	writeable => 0,
-	configurable => 0,
-	enumerable => 1,
-	value => {
+has scored => (
+	is => 'ro',
+	builder => 1
+);
+
+sub _build_scored { 
+	return {
 		fifteen => 2,
 		pair => 2,
 		three_of_a_kind => 6,
@@ -29,30 +28,33 @@ property scored => (
 		five_flush => 5,
 		nobs => 1
 	}
+}
+
+has [qw/fifteen pair three_of_a_kind four_of_a_kind run four_flush five_flush nobs cards/] => (
+	is => 'rw',
+	isa => ArrayRef,
+	default => []
 );
 
-property [qw/fifteen pair three_of_a_kind four_of_a_kind run four_flush five_flush nobs/] => (
-	initable => 1,
-	writeable => 0,
-	configurable => 1,
-	enumerable => 1,
-	value => []
+has with_starter => (
+	is => 'ro',
+	isa => Bool
 );
 
-function INITIALISED => sub {
+sub BUILD {
 	my ($self, $params) = @_;
-	my $starter = $params->{_cards}->[-1];
-	my @cards = sort { $b->value <=> $a->value } @{$params->{_cards}};
+	my $starter = $self->cards->[-1];
+	my @cards = sort { $b->value <=> $a->value } @{$self->cards};
 	$self->calculate_fifteen(@cards);
 	$self->calculate_of_a_kind(@cards);
 	$self->calculate_run(@cards);
 	$self->calculate_flush(@cards);
-	$self->calculate_nob($starter, @cards) if $params->{_with_starter};
+	$self->calculate_nob($starter, @cards) if $self->with_starter;
 	$self->calculate_total();
 	return $self;
-};
+}
 
-function calculate_nob => sub {
+sub calculate_nob {
 	my ($self, $starter, @cards) = @_;
 
 	return if ($starter->symbol eq 'J');
@@ -65,7 +67,7 @@ function calculate_nob => sub {
 	}
 };
 
-function calculate_run => sub {
+sub calculate_run {
 	my ($self, @cards) = @_;
 
 	my @values = map { $_->run_value } @cards;
@@ -95,15 +97,15 @@ function calculate_run => sub {
 	}
 	
 	if ($map{five}) {
-		$self->run = $map{five};
+		$self->run($map{five});
 	} elsif ($map{four}) {
-		$self->run = $map{four};
+		$self->run($map{four});
 	} elsif ($map{three}) {
-		$self->run = $map{three};
+		$self->run($map{three});
 	}
-};
+}
 
-function calculate_flush => sub {
+sub calculate_flush {
 	my ($self, @cards) = @_;
 	my %map;
 	push @{$map{$_->suit}}, $_ for (@cards);
@@ -116,9 +118,9 @@ function calculate_flush => sub {
 		}
 	}
 
-};
+}
 
-function calculate_fifteen => sub {
+sub calculate_fifteen {
 	my ($self, @cards) = @_;
 	my @values = map { $_->value } @cards;
 	foreach my $n (1 .. @values) {
@@ -126,9 +128,9 @@ function calculate_fifteen => sub {
 			push @{$self->fifteen}, [@cards[@_]] if vecsum(@values[@_]) == 15;
 		} @values, $n
 	}
-};
+}
 
-function calculate_of_a_kind => sub {
+sub calculate_of_a_kind {
 	my ($self, @cards) = @_;
 	my %map = ();
 	push @{$map{$_->symbol}}, $_ for (@cards);
@@ -143,9 +145,9 @@ function calculate_of_a_kind => sub {
 			push @{$self->four_of_a_kind}, $map{$_};
 		}
 	}
-};
+}
 
-function calculate_total => sub {
+sub calculate_total {
 	my ($self) = @_;
 	my $scored = $self->scored;
 	my $score = 0;
@@ -159,7 +161,7 @@ function calculate_total => sub {
 			}
 		}
 	}
-	$self->total_score = $score;
-};
+	$self->total_score($score);
+}
 
 1;

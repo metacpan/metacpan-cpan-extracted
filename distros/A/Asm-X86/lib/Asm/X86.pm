@@ -2,7 +2,7 @@
 # Asm::X86 - List of instructions and registers of x86-compatible processors,
 #   validating and converting instructions and memory references.
 #
-#	Copyright (C) 2008-2025 Bogdan 'bogdro' Drozdowski,
+#	Copyright (C) 2008-2026 Bogdan 'bogdro' Drozdowski,
 #	  bogdro (at) users . sourceforge . net
 #	  bogdro /at\ cpan . org
 #
@@ -60,11 +60,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.72
+Version 0.73
 
 =cut
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 =head1 DESCRIPTION
 
@@ -697,14 +697,15 @@ our @instr_intel = (
 	'tileloadd', 'tileloaddrs', 'tileloaddrst1', 'tileloaddt1', 'tilemovrow', 'tilerelease', 'tilestored',
 	'tilezero', 'tmmultf32ps', 'tlbsync', 'tpause', 'ttcmmimfp16ps', 'ttcmmrlfp16ps',
 	'ttdpbf16ps', 'ttdpfp16ps', 'ttmmultf32ps', 'ttransposed','tzcnt', 'tzmsk',
-	'ucomisd', 'ucomiss', 'ud0', 'ud1', 'ud2', 'ud2a', 'ud2b', 'udb', 'uiret', 'umonitor', 'umov',
+	'ucomisd', 'ucomiss', 'ud0', 'ud1', 'ud2', 'ud2a', 'ud2b', 'udb', 'udw', 'uiret', 'umonitor', 'umov',
 	'umwait', 'unpck', 'unpckbw', 'unpckd', 'unpckdq','unpckhpd', 'unpckhps', 'unpcklpd', 'unpcklps',
-	'v4dpwssd', 'v4dpwssds', 'v4fmaddps', 'v4fmaddss', 'v4fnmaddps', 'v4fnmaddss', 'vaddbf16',
+	'v4fmaddps', 'v4fmaddss', 'v4fnmaddps', 'v4fnmaddss', 'vaddbf16',
 	'vaddpd', 'vaddph', 'vaddps', 'vaddsd', 'vaddsh', 'vaddss', 'vaddsubpd', 'vaddsubps', 'vaesdec',
 	'vaesdeclast', 'vaesenc', 'vaesenclast', 'vaesimc', 'vaeskeygenassist', 'valignd',
 	'valignq', 'vandnpd', 'vandnps', 'vandpd', 'vandps', 'vbcstnebf162ps', 'vbcstnebf16ps',
-	'vbcstnesh2ps', 'vblendmpd', 'vblendmps', 'vblendpd', 'vblendps',
-	'vblendvpd', 'vblendvps', 'vbroadcastf128', 'vbroadcastf32x2', 'vbroadcastf32x4',
+	'vbcstnesh2ps', 'vbitrev', 'vblendmpd', 'vblendmps', 'vblendpd', 'vblendps',
+	'vblendvpd', 'vblendvps', 'vbmacor16x16x16', 'vbmacxor16x16x16',
+	'vbroadcastf128', 'vbroadcastf32x2', 'vbroadcastf32x4',
 	'vbroadcastf32x8', 'vbroadcastf64x2', 'vbroadcastf64x4', 'vbroadcasti128', 'vbroadcasti32x2',
 	'vbroadcasti32x4', 'vbroadcasti32x8', 'vbroadcasti64x2',
 	'vbroadcasti64x4', 'vbroadcastsd', 'vbroadcastss', 'vcmpbf16', 'vcmpeqpd',
@@ -3629,7 +3630,7 @@ Bogdan Drozdowski, C<< <bogdro at cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2008-2025 Bogdan Drozdowski, all rights reserved.
+Copyright 2008-2026 Bogdan Drozdowski, all rights reserved.
 
 =head1 LICENSE
 

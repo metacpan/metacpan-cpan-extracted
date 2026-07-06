@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -92,7 +92,7 @@ HTML::Object::DOM::Element::Button - HTML Object DOM Button Class
 
     use HTML::Object::DOM::Element::Button;
     my $button = HTML::Object::DOM::Element::Button->new || 
-        die( HTML::Object::DOM::Element::Button->error, "\n" );
+        die( HTML::Object::DOM::Element::Button->error );
 
 =head1 VERSION
 
@@ -220,19 +220,19 @@ Is a string indicating the behavior of the button. This is an enumerated attribu
 
 =over 4
 
-=item submit
+=item C<submit>
 
 The button submits the form. This is the default value if the attribute is not specified, or if it is dynamically changed to an empty or invalid value.
 
-=item reset
+=item C<reset>
 
 The button resets the form.
 
-=item button
+=item C<button>
 
 The button does nothing.
 
-=item menu
+=item C<menu>
 
 The button displays a menu.
 
@@ -286,7 +286,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLBut
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

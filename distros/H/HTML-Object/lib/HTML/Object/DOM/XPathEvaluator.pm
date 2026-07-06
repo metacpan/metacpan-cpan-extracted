@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/01
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -76,7 +76,7 @@ HTML::Object::DOM::XPathEvaluator - HTML Object DOM XPathEvaluator Class
 
     use HTML::Object::DOM::XPathEvaluator;
     my $this = HTML::Object::DOM::XPathEvaluator->new || 
-        die( HTML::Object::DOM::XPathEvaluator->error, "\n" );
+        die( HTML::Object::DOM::XPathEvaluator->error );
 
 =head1 VERSION
 
@@ -167,7 +167,7 @@ L<HTML::Selector::XPath>, L<HTML::Object::XPath>, L<HTML::Object::XPath::Expr>
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

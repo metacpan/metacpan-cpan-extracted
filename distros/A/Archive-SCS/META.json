@@ -26,10 +26,8 @@
          }
       },
       "configure" : {
-         "recommends" : {
-            "ExtUtils::CppGuess" : "0"
-         },
          "requires" : {
+            "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "7.12",
             "ExtUtils::MakeMaker::CPANfile" : "0.09",
             "Path::Tiny" : "0.062"
@@ -65,47 +63,47 @@
    "provides" : {
       "Archive::SCS" : {
          "file" : "lib/Archive/SCS.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::CityHash" : {
          "file" : "lib/Archive/SCS/CityHash.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::DirIndex" : {
          "file" : "lib/Archive/SCS/DirIndex.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::Directory" : {
          "file" : "lib/Archive/SCS/Directory.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::GameDir" : {
          "file" : "lib/Archive/SCS/GameDir.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::HashFS" : {
          "file" : "lib/Archive/SCS/HashFS.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::HashFS2" : {
          "file" : "lib/Archive/SCS/HashFS2.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::InMemory" : {
          "file" : "lib/Archive/SCS/InMemory.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::Mountable" : {
          "file" : "lib/Archive/SCS/Mountable.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::TObj" : {
          "file" : "lib/Archive/SCS/TObj.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Archive::SCS::Zip" : {
          "file" : "lib/Archive/SCS/Zip.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       }
    },
    "release_status" : "stable",
@@ -117,7 +115,7 @@
          "web" : "https://github.com/nautofon/Archive-SCS"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_contributors" : [
       "Karen Etheridge <ether@cpan.org>"
    ],

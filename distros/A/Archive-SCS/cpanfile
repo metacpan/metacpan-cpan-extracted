@@ -17,12 +17,14 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-  recommends "ExtUtils::CppGuess" => "0";
+  requires "Capture::Tiny" => "0"; # ExtUtils::CppGuess
   requires "ExtUtils::MakeMaker" => "7.12";
   requires "ExtUtils::MakeMaker::CPANfile" => "0.08";
   requires "Path::Tiny" => "0.062";
 };
 
 on 'develop' => sub {
+  requires "App::FatPacker" => "0";
+  requires "ExtUtils::CppGuess" => "0";
   suggests "Data::Hexdumper" => "3.00";
 };

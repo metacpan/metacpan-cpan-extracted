@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/09
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -77,7 +77,7 @@ HTML::Object::DOM::Element::Template - HTML Object DOM Template Class
 
     use HTML::Object::DOM::Element::Template;
     my $template = HTML::Object::DOM::Element::Template->new || 
-        die( HTML::Object::DOM::Element::Template->error, "\n" );
+        die( HTML::Object::DOM::Element::Template->error );
 
 =head1 VERSION
 
@@ -126,7 +126,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLTem
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

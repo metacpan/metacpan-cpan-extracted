@@ -1,5 +1,5 @@
 package MsgPack::Raw::Unpacker;
-$MsgPack::Raw::Unpacker::VERSION = '0.05';
+$MsgPack::Raw::Unpacker::VERSION = '0.06';
 use strict;
 use warnings;
 use MsgPack::Raw;
@@ -10,7 +10,7 @@ MsgPack::Raw::Unpacker - msgpack Unpacker class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

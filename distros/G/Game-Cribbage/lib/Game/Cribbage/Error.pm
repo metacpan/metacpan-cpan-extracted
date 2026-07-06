@@ -3,15 +3,10 @@ package Game::Cribbage::Error;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar;
 
-property [qw/error message over go/] => (
-	value => 1,
-	initable => 1,
-	writeable => 0,
-	configurable => 0,
-	enumerable => 1
+has [qw/error message over go score/] => (
+	is => 'ro',
 );
 
 1;

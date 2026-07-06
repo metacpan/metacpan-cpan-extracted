@@ -3,6 +3,7 @@ use v5.36.0;
 use lib 't/lib';
 
 use Sieve::Generator::Sugar '-all';
+use Sieve::Generator::Element::BracketComment;
 use Test::GeneratedSieve '-all';
 
 use Test::More;
@@ -91,7 +92,7 @@ sieve_is(
 );
 
 {
-  my $snooze = Sieve::Generator::Lines::Command->new({
+  my $snooze = Sieve::Generator::Element::Command->new({
     identifier  => 'snooze',
     tagged_args => {
       addflags  => [ qstr([ '$new' ]) ],
@@ -121,13 +122,13 @@ sieve_is(
 
   is(
     $snooze->_as_sieve_oneline,
-    qq{snooze :addflags [ "\$new" ] :mailboxid "000-111-222" :times [ "9:00", "12:00" ] :tzid "America/New_York" :weekdays [ "1", "2", "5" ];\n},
+    qq{snooze :addflags [ "\$new" ] :mailboxid "000-111-222" :times [ "9:00", "12:00" ] :tzid "America/New_York" :weekdays [ "1", "2", "5" ];},
     "can force long command to be one line",
   );
 }
 
 sieve_is(
-  ifelse('true', block(command('stop'))),
+  ifelse(test('true'), block(command('stop'))),
   <<~'END',
   if true {
     stop;
@@ -137,7 +138,7 @@ sieve_is(
 );
 
 sieve_is(
-  ifelse('true', command('stop')),
+  ifelse(test('true'), command('stop')),
   <<~'END',
   if true stop;
   END
@@ -146,7 +147,7 @@ sieve_is(
 
 sieve_is(
   ifelse(
-    'true',
+    test('true'),
     block(
       set('stopping', 'Y'),
       command('stop')
@@ -213,6 +214,16 @@ sieve_is(
 );
 
 sieve_is(
+  ifelse(negate(hasflag('\Seen')), block(command('stop'))),
+  <<~'END',
+  if not hasflag "\\Seen" {
+    stop;
+  }
+  END
+  "negate(hasflag(...))"
+);
+
+sieve_is(
   ifelse(
     test(string => { is => undef }, '${stop}', 'Y'),
     block(command('stop'))
@@ -239,13 +250,29 @@ sieve_is(
 );
 
 sieve_is(
-  ifelse(test(size => { over => undef }, \'100K'), block(command('stop'))),
+  ifelse(test(size => { over => undef }, number(100, 'K')), block(command('stop'))),
   <<~'END',
   if size :over 100K {
     stop;
   }
   END
-  "size"
+  "size with number"
+);
+
+sieve_is(
+  ifelse(test(size => { over => undef }, number(5, 'm')), block(command('stop'))),
+  <<~'END',
+  if size :over 5M {
+    stop;
+  }
+  END
+  "number with lowercase suffix is uppercased"
+);
+
+sieve_is(
+  command('whatever', number(42)),
+  qq{whatever 42;\n},
+  "number with no suffix"
 );
 
 sieve_is(
@@ -287,6 +314,12 @@ sieve_is(
   "heredoc escapes leading dots"
 );
 
+sieve_is(
+  Sieve::Generator::Element::Heredoc->new({ text => "body\n", comment => "This is a comment" }),
+  "text: # This is a comment\nbody\n.\n",
+  "heredoc with comment on text: line"
+);
+
 # noneof (also covers Junction noneof branch)
 sieve_is(
   ifelse(
@@ -314,29 +347,29 @@ sieve_is(
   "comment with ref content"
 );
 
-# block with plain string item
+# block item built with command sugar
 sieve_is(
-  ifelse('true', block("keep;")),
+  ifelse(test('true'), block(command('keep'))),
   <<~'END',
   if true {
     keep;
   }
   END
-  "block with plain string item"
+  "block item built with command sugar"
 );
 
-# document with plain string item
+# document item built with command sugar
 sieve_is(
-  sieve("stop;"),
+  sieve(command('stop')),
   "stop;\n",
-  "document with plain string item"
+  "document item built with command sugar"
 );
 
 # multiline condition indented correctly when nested
 sieve_is(
   sieve(
     ifelse(
-      'outer',
+      test('outer'),
       block(
         ifelse(
           anyof(
@@ -365,10 +398,10 @@ sieve_is(
 sieve_is(
   sieve(
     ifelse(
-      'outer',
+      test('outer'),
       block(
         ifelse(
-          'inner',
+          test('inner'),
           block(command('stop')),
           block(command('keep')),
         )
@@ -389,8 +422,8 @@ sieve_is(
 
 # IfElse constructed directly without elses attribute
 sieve_is(
-  Sieve::Generator::Lines::IfElse->new({
-    cond => 'true',
+  Sieve::Generator::Element::IfElse->new({
+    cond => test('true'),
     true => block(command('stop')),
   }),
   <<~'END',
@@ -401,16 +434,121 @@ sieve_is(
   "IfElse constructed directly with no elses"
 );
 
-# Document::append
-{
-  my $doc = sieve(command('stop'));
-  $doc->append(command('keep'));
-  sieve_is($doc, "stop;\nkeep;\n", "Document::append");
-}
+# command with heredoc args
+sieve_is(
+  command('somecommand', { tag => heredoc("tag value") }, heredoc("first"), heredoc("second")),
+  <<~'END',
+  somecommand :tag text:
+  tag value
+  .
+  text:
+  first
+  .
+  text:
+  second
+  .
+  ;
+  END
+  "command with tagged and positional heredoc args"
+);
+
+sieve_is(
+  ifelse(
+    negate(test(foo => { is => undef }, 'xyz')),
+    block(command('stop'))
+  ),
+  <<~'END',
+  if not foo :is "xyz" {
+    stop;
+  }
+  END
+  "negate wraps a test in not"
+);
 
 {
   my $doc = sieve(var_eq(true => 'Y'));
   sieve_is($doc, qq[string :is "\${true}" "Y"\n], "var_eq");
+}
+
+# command with block
+sieve_is(
+  Sieve::Generator::Element::Command->new({
+    identifier => 'foreverypart',
+    block      => block(command('discard')),
+  }),
+  <<~'END',
+  foreverypart {
+    discard;
+  }
+  END
+  "command with block"
+);
+
+sieve_is(
+  Sieve::Generator::Element::Command->new({
+    identifier      => 'foreverypart',
+    tagged_args     => { name => [] },
+    block           => block(command('discard')),
+  }),
+  <<~'END',
+  foreverypart :name {
+    discard;
+  }
+  END
+  "command with tagged arg and block"
+);
+
+# bracket comment
+sieve_is(
+  sieve(
+    Sieve::Generator::Element::BracketComment->new({ content => 'this is a comment' }),
+    command('stop'),
+  ),
+  <<~'END',
+  /* this is a comment */
+  stop;
+  END
+  "bracket comment in a document"
+);
+
+# -- find_elements --------------------------------------------------------
+
+{
+  my $doc = sieve(
+    command('require', ['fileinto', 'imap4flags']),
+    blank(),
+    ifelse(
+      test(exists => 'X-Spam'),
+      block(
+        command('addflag', '$Junk'),
+        command('fileinto', 'Spam'),
+      ),
+    ),
+    command('keep'),
+  );
+
+  my @commands = $doc->find_elements(sub ($el) {
+    $el->isa('Sieve::Generator::Element::Command') && $el->semicolon
+  });
+  is(scalar @commands, 4, "find_elements: found all 4 commands");
+  is($commands[0]->identifier, 'require', "find_elements: first is require");
+  is($commands[3]->identifier, 'keep',    "find_elements: last is keep");
+
+  my @fileinto = $doc->find_elements(sub ($el) {
+    $el->isa('Sieve::Generator::Element::Command')
+      && $el->identifier eq 'fileinto'
+  });
+  is(scalar @fileinto, 1, "find_elements: found fileinto inside if block");
+
+  my @blocks = $doc->find_elements(sub ($el) {
+    $el->isa('Sieve::Generator::Element::Block')
+  });
+  is(scalar @blocks, 1, "find_elements: found the one block");
+
+  my @leaves = $doc->find_elements(sub ($el) {
+    $el->isa('Sieve::Generator::Element::Qstr')
+  });
+  is(scalar @leaves, 3, "find_elements: found 3 Qstr leaves");
 }
 
 done_testing;

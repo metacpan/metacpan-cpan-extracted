@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/31
 ## Modified 2026/03/29
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -376,7 +376,7 @@ HTML::Object::DOM::Window - HTML Object DOM Window Class
 
     use HTML::Object::DOM::Window;
     my $window = HTML::Object::DOM::Window->new || 
-        die( HTML::Object::DOM::Window->error, "\n" );
+        die( HTML::Object::DOM::Window->error );
 
 =head1 VERSION
 
@@ -1167,7 +1167,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 =head2 open
 
-Under perl, this merely returns a new L<window object>.
+Under perl, this merely returns a new L<window object|HTML::Object::DOM::Window>.
 
 Under JavaScript, this opens a new window.
 
@@ -1209,7 +1209,7 @@ Example:
 Note that you can pass a list of events to this method using the following syntax:
 
     window->releaseEvents( KEYPRESS | KEYDOWN | KEYUP );
- 
+
 =head2 requestAnimationFrame
 
 This always returns C<undef> under perl.
@@ -1527,7 +1527,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Window>
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

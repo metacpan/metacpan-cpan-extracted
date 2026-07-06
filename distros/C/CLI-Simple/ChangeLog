@@ -13,6 +13,7 @@ Sat Jul  4 15:33:47 2026  Rob Lauer  <rclauer@gmail.com>
 	* lib/CLI/Simple.pm.in
 	- add pager support
 	- add support for custom help sections
+	* recommends: new
 
 Tue Jun 30 09:26:00 2026  Rob Lauer  <rclauer@gmail.com>
 

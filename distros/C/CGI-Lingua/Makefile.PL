@@ -76,15 +76,16 @@ my $test_requires = {
 	'Test::Carp' => 0,
 	'Test::Compile' => 0,
 	'Test::DescribeMe' => 0,
+	'Test::Memory::Cycle' => 0,
 	'Test::Mockingbird' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
 	'Test::Requires' => 0,
 	'Test::RequiresInternet' => 0,
+	'Test::Returns' => 0,
 	'Test::Which' => 0,
 	'Test::Without::Module' => 0
-	# 'Test::Kwalitee' => 0,
 };
 
 if($online_tests) {
@@ -105,14 +106,11 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
-    NAME                => 'CGI::Lingua',
-    AUTHOR              => q{Nigel Horne <njh@nigelhorne.com>},
-    VERSION_FROM        => 'lib/CGI/Lingua.pm',
-    ABSTRACT_FROM       => 'lib/CGI/Lingua.pm',
-    ((defined($ExtUtils::MakeMaker::VERSION) &&
-     ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-      ? ('LICENSE'=> 'GPL')
-      : ()),
+	NAME                => 'CGI::Lingua',
+	AUTHOR              => q{Nigel Horne <njh@nigelhorne.com>},
+	VERSION_FROM        => 'lib/CGI/Lingua.pm',
+	ABSTRACT_FROM       => 'lib/CGI/Lingua.pm',
+	LICENSE          => 'gpl_2',
 	PL_FILES	=> {}, CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
     }, TEST_REQUIRES => $test_requires,
@@ -131,6 +129,7 @@ WriteMakefile(
 	'NetAddr::IP' => 0,
 	'Object::Configure' => 0.14,
 	'Params::Get' => 0.13,
+	'Readonly' => 0,
 	'Class::Load' => 0,
 	'CGI::Info' => 0.60, # For AUTOLOAD
 	'Sys::Syslog' => 0,

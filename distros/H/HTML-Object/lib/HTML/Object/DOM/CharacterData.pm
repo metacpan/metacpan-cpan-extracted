@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/20
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ sub after
     my $list = $self->_get_from_list_of_elements_or_html( @_ );
     $self->_sanity_check_for_before_after( $list ) ||
         return( $self->pass_error );
-    
+
     $parent->children->splice( $pos + 1, 0, $list->list );
     $list->foreach(sub
     {
@@ -63,7 +63,7 @@ sub before
     my $list = $self->_get_from_list_of_elements_or_html( @_ );
     $self->_sanity_check_for_before_after( $list ) ||
         return( $self->pass_error );
-    
+
     $list->foreach(sub
     {
         $parent->children->splice( $pos, 0, $_ );
@@ -637,7 +637,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Charact
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

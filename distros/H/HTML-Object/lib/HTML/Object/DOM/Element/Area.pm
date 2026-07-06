@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/26
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -107,7 +107,7 @@ HTML::Object::DOM::Element::Area - HTML Object DOM Area Class
 
     use HTML::Object::DOM::Element::Area;
     my $area = HTML::Object::DOM::Element::Area->new || 
-        die( HTML::Object::DOM::Element::Area->error, "\n" );
+        die( HTML::Object::DOM::Element::Area->error );
 
 =head1 VERSION
 
@@ -224,7 +224,7 @@ Example:
         <area shape="circle" coords="234,57,30" alt="circle" href="#">
         <area shape="poly" coords="363,37,380,40,399,35,420,47,426,63,423,78,430,94,409,90,395,92,379,84,371,67,370,57" alt="polygon" href="#">
     </map>
-    
+
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLAreaElement/noHref>
 
 =head2 origin
@@ -422,7 +422,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLAre
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -10,7 +10,7 @@ use Crypt::DSA::Key;
 use Crypt::DSA::Signature;
 use Crypt::DSA::Util qw( bitsize bin2mp mod_inverse mod_exp makerandom randombelow );
 
-our $VERSION = '1.23'; #VERSION
+our $VERSION = '1.24'; #VERSION
 
 use vars qw( $VERSION );
 

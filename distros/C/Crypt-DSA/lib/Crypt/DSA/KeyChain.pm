@@ -11,7 +11,7 @@ use File::Which ();
 use Symbol qw( gensym );
 use Crypt::SysRandom qw( random_bytes );
 
-our $VERSION = '1.23'; #VERSION
+our $VERSION = '1.24'; #VERSION
 
 use vars qw{$VERSION};
 

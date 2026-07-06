@@ -3,8 +3,7 @@ package Game::Cribbage::Deck::Card;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar;
 
 our (%card_to_value_map, %card_run_to_value_map, %card_suit_to_symbol);
 BEGIN {
@@ -26,53 +25,48 @@ BEGIN {
 	);
 }
 
-property [qw/id used/] => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1,
-	value => 0
+has [qw/id used/] => (
+	is => 'rw',
+	default => sub { 0 }
 );
 
-property [qw/suit symbol/] => (
-	initable => 1,
-	writeable => 0,
-	configurable => 0,
-	enumerable => 1
+has [qw/suit symbol/] => (
+	is => 'ro'
 );
 
-function value => sub {
+sub value {
 	my ($self) = @_;
-	return $card_to_value_map{$self->{symbol}} || $self->{symbol};
-};
+	return $card_to_value_map{$self->symbol} || $self->symbol;
+}
 
-function run_value => sub {
+sub run_value {
 	my ($self) = @_;
-	return $card_run_to_value_map{$self->{symbol}} || $self->{symbol};
-};
+	return $card_run_to_value_map{$self->symbol} || $self->symbol;
+}
 
-function suit_symbol => sub {
+sub suit_symbol {
 	my ($self) = @_;
-	return $card_suit_to_symbol{$self->{suit}};
-};
+	return $card_suit_to_symbol{$self->suit};
+}
 
-function ui_stringify => sub {
+sub ui_stringify {
 	my ($self) = @_;
-	return sprintf "%s %s", $card_suit_to_symbol{$self->{suit}}, $self->{symbol};
-};
+	return sprintf "%s %s", $card_suit_to_symbol{$self->suit}, $self->symbol;
+}
 
-function stringify => sub {
+sub stringify {
 	my ($self) = @_;
-	return sprintf "%s%s", $self->{symbol}, $card_suit_to_symbol{$self->{suit}};
-};
+	return sprintf "%s%s", $self->symbol, $card_suit_to_symbol{$self->suit};
+}
 
-function match => sub {
+sub match {
 	my ($self, $card) = @_;
-	if ($self->suit eq $card->{suit} && $self->symbol =~ m/^($card->{symbol})$/) {
+	my $sym = $card->symbol;
+	if ($self->suit eq $card->suit && $self->symbol =~ m/^($sym)$/) {
 		return 1;
-	} 
+	}
 	return 0;
-};
+}
 
 1;
 

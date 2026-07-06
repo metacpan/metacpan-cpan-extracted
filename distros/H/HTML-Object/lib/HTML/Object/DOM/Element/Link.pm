@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/22
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -108,7 +108,7 @@ HTML::Object::DOM::Element::Link - HTML Object DOM Link Class
 
     use HTML::Object::DOM::Element::Link;
     my $link = HTML::Object::DOM::Element::Link->new || 
-        die( HTML::Object::DOM::Element::Link->error, "\n" );
+        die( HTML::Object::DOM::Element::Link->error );
 
 =head1 VERSION
 
@@ -252,7 +252,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLLin
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -1,5 +1,25 @@
 Revision history for Perl module Module::Generic
 
+v1.6.2 2026-07-06T11:20:51+0900
+    [Bug fixes]
+    - Fixed Module::Generic::SharedMem op() to update the stored semaphore identifier
+      when a new semaphore is created after a failed semop() call, preventing subsequent
+      locking operations from continuing to use the now-invalid identifier.
+    - Fixed Module::Generic::SharedMem exists() to no longer remove the semaphore set
+      after reading the existence marker. The method is now a pure read; removal is the
+      responsibility of remove().
+
+    [Tests]
+    - Fixed t/02.num.t locale-specific assertions to derive expected values from
+      localeconv() at runtime rather than hardcoding them, avoiding false failures on
+      platforms such as OpenBSD where a locale name is accepted but provides minimal
+      formatting data.
+    - Fixed t/02.num.t fr_FR subtest to match the locale name as a prefix rather than
+      an exact string, and corrected the skip count from 4 to 5.
+    - Added diagnostics to t/12.sharedmem.t to report the actual type and read error
+      when the shared memory data check fails, to assist diagnosis on platforms with
+      partial SysV IPC support.
+
 v1.6.1 2026-07-05T11:55:46+0900
     [Bug fixes]
     - Fixed Module::Generic::Number::Format locale handling so set_locale() returns

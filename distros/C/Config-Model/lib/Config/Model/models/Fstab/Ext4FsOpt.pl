@@ -9,6 +9,8 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
@@ -28,11 +30,10 @@ return [
       }
     ],
     'include' => [
-      'Fstab::Ext2FsOpt'
+      'Fstab::Ext3FsOpt'
     ],
     'license' => 'LGPL2',
     'name' => 'Fstab::Ext4FsOpt'
   }
 ]
 ;
-

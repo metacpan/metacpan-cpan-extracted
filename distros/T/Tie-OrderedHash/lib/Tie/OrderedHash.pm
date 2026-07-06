@@ -5,21 +5,9 @@ use strict;
 use warnings;
 use Tie::Hash ();
 
-# Load via DynaLoader (not XSLoader) so dl_load_flags is honoured.
-# We need RTLD_GLOBAL so our public C ABI (tie_oh_new /
-# tie_oh_store / tie_oh_iter_*) is visible to consumer XS modules
-# that link us via ExtUtils::Depends.  Without RTLD_GLOBAL, Linux's
-# dynamic loader keeps each .so's symbols in a local scope and any
-# consumer (eg File::Raw::JSON) fails at load time with
-# `undefined symbol: tie_oh_store`.  macOS uses dynamic_lookup and
-# defers resolution either way, hiding the bug locally.  Same
-# recipe File::Raw uses.
-#
-# XSLoader has a fast path that hard-codes dl_load_file flags=0 and
-# doesn't honour dl_load_flags, so we go through DynaLoader instead.
 use DynaLoader;
 our @ISA = ('Tie::Hash', 'DynaLoader');
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 sub dl_load_flags { 0x01 }   # RTLD_GLOBAL
 
 __PACKAGE__->bootstrap($VERSION);

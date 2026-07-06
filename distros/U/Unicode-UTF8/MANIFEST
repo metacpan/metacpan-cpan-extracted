@@ -29,10 +29,16 @@ t/170_steal.t
 t/200_leaks.t
 t/210_tainted.t
 t/220_magic.t
+t/300_read.t
 t/999_pod.t
 t/Util.pm
 t/quickbrown.txt
+utf8_advance_forward_unsafe.h
 utf8_dfa32.h
+utf8_distance_unsafe.h
+utf8_simd.h
+utf8_swar.h
 utf8_valid.h
+utf8_valid_stream.h
 xt/author/00-compile.t
 xt/author/pod-syntax.t

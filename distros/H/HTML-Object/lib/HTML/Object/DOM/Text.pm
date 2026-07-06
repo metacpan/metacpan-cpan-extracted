@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
 ## Modified 2026/03/29
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -63,6 +63,12 @@ sub is_inside
     return( $text->parent->is_inside( $node ) );
 }
 
+sub isAttributeNode { return(0); }
+
+sub isCommentNode   { return(0); }
+
+sub isElementNode   { return(0); }
+
 sub isEqualNode
 {
     my $self = shift( @_ );
@@ -71,12 +77,6 @@ sub isEqualNode
     return(0) if( !$self->_is_a( $e => 'HTML::Object::Text' ) );
     return( $self->value eq $e->value );
 }
-
-sub isAttributeNode { return(0); }
-
-sub isCommentNode   { return(0); }
-
-sub isElementNode   { return(0); }
 
 sub isNamespaceNode { return(0); }
 
@@ -234,7 +234,7 @@ HTML::Object::DOM::Text - HTML Object DOM Text Class
 
     use HTML::Object::DOM::Text;
     my $text = HTML::Object::DOM::Text->new( value => $some_text ) || 
-        die( HTML::Object::DOM::Text->error, "\n" );
+        die( HTML::Object::DOM::Text->error );
 
 =head1 VERSION
 
@@ -267,6 +267,8 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 =head2 nodeValue
 
 Sets or gets the text value for this element.
+
+See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue>
 
 =head2 wholeText
 
@@ -339,7 +341,11 @@ Returns false.
 
 =head2 isEqualNode
 
-Provided with another element object, and this returns true if both text element are the same, or false otherwise.
+Provided with another element object, and this returns a boolean value which indicates whether or not two elements are of the same type and all their defining data points match.
+
+Two elements are equal when they have the same type, defining characteristics (this would be their ID, number of children, and so forth), its attributes match, and so on. The specific set of data points that must match varies depending on the types of the elements. 
+
+See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/isEqualNode>
 
 =head2 isNamespaceNode
 
@@ -434,7 +440,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Text>
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

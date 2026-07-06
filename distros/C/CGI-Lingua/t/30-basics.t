@@ -5,7 +5,8 @@ use warnings;
 
 use File::Temp qw/tempfile/;
 use Test::Most;
-use Test::Needs 'CHI', 'IP::Country', 'Test::LWP::UserAgent', 'Test::MockModule';
+use Test::Mockingbird;
+use Test::Needs 'CHI', 'IP::Country', 'Test::LWP::UserAgent';
 use Test::Without::Module qw(Geo::IP);
 
 BEGIN { use_ok('CGI::Lingua') }
@@ -19,12 +20,13 @@ my $mock_env = {
 
 my $cache = CHI->new(driver => 'Memory', global => 1);
 
-# Mock IP geolocation responses
-my $mock_ip_country = Test::MockModule->new('IP::Country::Fast');
-$mock_ip_country->mock('inet_atocc', sub { 'US' });
+# Pre-require LWP::Simple::WithCache before mocking so the lazy require inside
+# time_zone() does not overwrite the mock (CLAUDE.md: "Pre-require before mocking").
+{ local $SIG{__WARN__} = sub {}; eval { require LWP::Simple::WithCache } }
 
-my $mock_lwp_simple = Test::MockModule->new('LWP::Simple::WithCache');
-$mock_lwp_simple->mock('get', sub { '{ "timezone": "America/New_York" }' });
+# Mock IP geolocation responses
+Test::Mockingbird::mock('IP::Country::Fast', 'inet_atocc', sub { 'US' });
+{ local $SIG{__WARN__} = sub {}; Test::Mockingbird::mock('LWP::Simple::WithCache', 'get', sub { '{ "timezone": "America/New_York" }' }) }
 
 # Basic language detection
 subtest 'Language Detection' => sub {
@@ -106,9 +108,8 @@ subtest 'Unsupported Language' => sub {
 };
 
 subtest 'Locale Detection' => sub {
-	my $mock_country = Test::MockModule->new('Locale::Object::Country');
-	$mock_country->mock('name', sub { 'MockCountry' });
-	$mock_country->mock('code_alpha2', sub { 'MC' });
+	Test::Mockingbird::mock('Locale::Object::Country', 'name', sub { 'MockCountry' });
+	Test::Mockingbird::mock('Locale::Object::Country', 'code_alpha2', sub { 'MC' });
 
 	# Locale from Locale::Object::Country
 	subtest 'From User-Agent' => sub {
@@ -129,28 +130,27 @@ subtest 'Locale Detection' => sub {
 		$ENV{GEOIP_COUNTRY_CODE} = 'XX';
 
 		# Mock _code2country to return our mock country object
-		my $mock_lingua = Test::MockModule->new('CGI::Lingua');
-		$mock_lingua->mock('_code2country', sub {
+		Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub {
 			my ($self, $code) = @_;
 			return bless { code => lc $code }, 'Locale::Object::Country';
 		});
 
 		my $lingua = CGI::Lingua->new(supported => ['en']);
-		$mock_lingua->mock('_code2country', sub { undef });
+		Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { undef });
 
 		ok(!defined $lingua->locale(), 'Undefined for invalid country code');
 	};
-	Test::MockModule->unmock_all();
+	{ local $SIG{__WARN__} = sub {}; Test::Mockingbird::restore_all() }
 };
 
 subtest 'IPv6 Handling' => sub {
 	my $ipv6_public = '2001:db8::1';	# Test documentation IP
 	my $ipv6_private = 'fd00::1';	# ULA private IP
 	my $ipv6_loopback = '::1';
-	my $ipv6_v4mapped = '::ffff:192.0.2.1';
+	my $ipv6_v4mapped = '::ffff:8.8.8.8';	# Google DNS — public, not TEST-NET-1
 
 	# Mock IP::Country for IPv6
-	$mock_ip_country->mock('inet_atocc', sub {
+	Test::Mockingbird::mock('IP::Country::Fast', 'inet_atocc', sub {
 		my ($self, $ip) = @_;
 		return $ip eq $ipv6_public ? 'DE' : undef;
 	});
@@ -190,7 +190,7 @@ subtest 'IPv6 Handling' => sub {
 		);
 
 		# Should treat as IPv4 192.0.2.1
-		$mock_ip_country->mock('inet_atocc', sub { 'US' });
+		Test::Mockingbird::mock('IP::Country::Fast', 'inet_atocc', sub { 'US' });
 
 		is($lingua->country, 'us', 'Handle v4-mapped IPv6 as IPv4');
 	};
@@ -199,7 +199,7 @@ subtest 'IPv6 Handling' => sub {
 		local %ENV = (%{$mock_env}, REMOTE_ADDR => $ipv6_public);
 
 		# Disable IP::Country mock
-		$mock_ip_country->unmock('inet_atocc');
+		Test::Mockingbird::unmock('IP::Country::Fast', 'inet_atocc');
 
 		my $lingua = CGI::Lingua->new(
 			supported => ['en'],
@@ -229,8 +229,7 @@ subtest 'Sublanguage Handling' => sub {
 	};
 
 	# Mock country to avoid IP lookup
-	my $mock_ip_country = Test::MockModule->new('IP::Country::Fast');
-	$mock_ip_country->mock('inet_atocc', sub { 'US' });
+	Test::Mockingbird::mock('IP::Country::Fast', 'inet_atocc', sub { 'US' });
 
 	subtest 'Exact Sublanguage Match' => sub {
 		local %ENV = (%{$mock_env}, HTTP_ACCEPT_LANGUAGE => 'en-gb, en;q=0.9');
@@ -305,7 +304,7 @@ subtest 'Sublanguage Handling' => sub {
 			REMOTE_ADDR => '8.8.8.8'	# US IP
 		);
 
-		$mock_ip_country->mock('inet_atocc', sub { 'US' });
+		Test::Mockingbird::mock('IP::Country::Fast', 'inet_atocc', sub { 'US' });
 
 		my $opts = {
 			supported => ['en', 'en-gb', 'en-us'],
@@ -413,7 +412,7 @@ subtest 'Sublanguage Handling' => sub {
 
 		is($lingua2->language(), 'French', 'Cached result');
 	};
-	Test::MockModule->unmock_all();
+	Test::Mockingbird::restore_all();
 };
 
 subtest 'should load config file if provided' => sub {

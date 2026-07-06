@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -49,6 +49,12 @@ sub getRootNode { return( shift->parent->getRootNode ); }
 
 sub getValue { return( shift->value ); }
 
+sub isAttributeNode { return(0); }
+
+sub isCommentNode   { return(1); }
+
+sub isElementNode   { return(0); }
+
 sub isEqualNode
 {
     my $self = shift( @_ );
@@ -57,12 +63,6 @@ sub isEqualNode
     return(0) if( !$self->_is_a( $e => 'HTML::Object::Comment' ) );
     return( $self->value eq $e->value );
 }
-
-sub isAttributeNode { return(0); }
-
-sub isCommentNode   { return(1); }
-
-sub isElementNode   { return(0); }
 
 sub isNamespaceNode { return(0); }
 
@@ -93,7 +93,7 @@ HTML::Object::DOM::Comment - HTML Object DOM Comment Class
 
     use HTML::Object::DOM::Comment;
     my $this = HTML::Object::DOM::Comment->new( value => $some_comment ) || 
-        die( HTML::Object::DOM::Comment->error, "\n" );
+        die( HTML::Object::DOM::Comment->error );
 
 =head1 VERSION
 
@@ -123,7 +123,11 @@ It inherits from L<HTML::Object::Comment> and L<HTML::Object::DOM::CharacterData
 
 =head2 nodeValue
 
-Sets or gets the text value for this element.
+Sets or gets the text value for the current node.
+
+For document, element or collection, this returns C<undef> and for attribute, text or comment, this returns the object value.
+
+See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue>
 
 =head1 METHODS
 
@@ -175,6 +179,12 @@ Returns false.
 
 Provided with another element object, and this returns true if both comment element are the same, or false otherwise.
 
+Returns a boolean value which indicates whether or not two elements are of the same type and all their defining data points match.
+
+Two elements are equal when they have the same type, defining characteristics (this would be their ID, number of children, and so forth), its attributes match, and so on. The specific set of data points that must match varies depending on the types of the elements. 
+
+See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/isEqualNode>
+
 =head2 isNamespaceNode
 
 Returns false.
@@ -190,6 +200,12 @@ Returns false.
 =head2 isTextNode
 
 Returns false.
+
+=head2 nodeValue
+
+This returns or sets the value of the current element.
+
+See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue>
 
 =head2 string_value
 
@@ -211,7 +227,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Comment
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

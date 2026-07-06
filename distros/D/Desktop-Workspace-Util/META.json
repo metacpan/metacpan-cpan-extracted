@@ -40,6 +40,7 @@
             "List::Util" : "1.54",
             "List::Util::Find" : "0.004",
             "Log::ger" : "0.038",
+            "Perinci::Sub::DepChecker" : "0",
             "Perinci::Sub::Util" : "0.472",
             "perl" : "5.010001",
             "strict" : "0",
@@ -58,7 +59,7 @@
    "provides" : {
       "Desktop::Workspace::Util" : {
          "file" : "lib/Desktop/Workspace/Util.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -73,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-Desktop-Workspace-Util"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

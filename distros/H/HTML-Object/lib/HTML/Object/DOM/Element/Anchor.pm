@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/21
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -104,7 +104,7 @@ HTML::Object::DOM::Element::Anchor - HTML Object DOM Link Class
 
     use HTML::Object::DOM::Element::Anchor;
     my $link = HTML::Object::DOM::Element::Anchor->new || 
-        die( HTML::Object::DOM::Element::Anchor->error, "\n" );
+        die( HTML::Object::DOM::Element::Anchor->error );
 
 =head1 VERSION
 
@@ -271,35 +271,35 @@ A proper value is one of the following:
 
 =over 4
 
-=item no-referrer
+=item C<no-referrer>
 
 The Referer header will be omitted entirely. No referrer information is sent along with requests.
 
-=item no-referrer-when-downgrade
+=item C<no-referrer-when-downgrade>
 
 The URL is sent as a referrer when the protocol security level stays the same (e.g.HTTP→HTTP, HTTPS→HTTPS), but is not sent to a less secure destination (e.g. HTTPS→HTTP).
 
-=item origin
+=item C<origin> (referrerpolicy value)
 
 Only send the origin of the document as the referrer in all cases. The document C<https://example.com/page.html> will send the referrer C<https://example.com/>.
 
-=item origin-when-cross-origin
+=item C<origin-when-cross-origin> (referrerpolicy value)
 
 Send a full URL when performing a same-origin request, but only send the origin of the document for other cases.
 
-=item same-origin
+=item C<same-origin> (referrerpolicy value)
 
 A referrer will be sent for same-site origins, but cross-origin requests will contain no referrer information.
 
-=item strict-origin
+=item C<strict-origin> (referrerpolicy value)
 
 Only send the origin of the document as the referrer when the protocol security level stays the same (e.g. HTTPS→HTTPS), but do not send it to a less secure destination (e.g. HTTPS→HTTP).
 
-=item strict-origin-when-cross-origin (default)
+=item C<strict-origin-when-cross-origin (default)>
 
 This is the user agent's default behavior if no policy is specified. Send a full URL when performing a same-origin request, only send the origin when the protocol security level stays the same (e.g. HTTPS→HTTPS), and send no header to a less secure destination (e.g. HTTPS→HTTP).
 
-=item unsafe-url
+=item C<unsafe-url>
 
 Send a full URL when performing a same-origin or cross-origin request. This policy will leak origins and paths from TLS-protected resources to insecure origins. Carefully consider the impact of this setting.
 
@@ -489,7 +489,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLAnc
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

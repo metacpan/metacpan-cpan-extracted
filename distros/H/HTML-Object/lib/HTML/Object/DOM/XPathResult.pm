@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/01
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -188,7 +188,7 @@ HTML::Object::DOM::XPathResult - HTML Object DOM XPath Result Class
 
     use HTML::Object::DOM::XPathResult;
     my $result = HTML::Object::DOM::XPathResult->new ||
-         die( HTML::Object::DOM::XPathResult->error, "\n" );
+         die( HTML::Object::DOM::XPathResult->error );
 
 =head1 VERSION
 
@@ -431,7 +431,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/XPathRe
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

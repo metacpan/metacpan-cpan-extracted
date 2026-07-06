@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Syntax/Infix/OptionalChain.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.038',
+    macro => { TARFLAGS => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

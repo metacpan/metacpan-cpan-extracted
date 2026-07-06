@@ -6,7 +6,7 @@ BEGIN
     use lib './lib';
     use vars qw( $DEBUG );
     use Test::More;
-    use DateTime;
+    use DateTime::Lite;
     use File::Spec;
     use utf8;
     use constant {
@@ -48,7 +48,7 @@ my $mtime = [stat(__FILE__)]->[9];
 is( $mtime, $file->lastModified, 'lastModified' );
 my $dt = $file->lastModifiedDate;
 $mtime = [stat(__FILE__)]->[9];
-my $dt2 = DateTime->from_epoch( epoch => $mtime );
+my $dt2 = DateTime::Lite->from_epoch( epoch => $mtime );
 isa_ok( $dt => 'Module::Generic::DateTime' );
 ok( $dt == $dt2, 'lastModifiedDate' );
 is( $file->name, [File::Spec->splitpath(__FILE__)]->[2], 'name' );

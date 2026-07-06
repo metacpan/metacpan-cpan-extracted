@@ -3,12 +3,12 @@ package Crypt::DSA::Util;
 use strict;
 use warnings;
 use Math::BigInt 1.78 try => 'GMP, Pari';
-use Crypt::URandom qw (urandom);
+use Crypt::SysRandom qw (random_bytes);
 
 use Fcntl;
 use Carp qw( croak );
 
-our $VERSION = '1.23'; #VERSION
+our $VERSION = '1.24'; #VERSION
 
 use vars qw( $VERSION @ISA @EXPORT_OK );
 use Exporter;
@@ -57,7 +57,7 @@ sub makerandom {
     my %param = @_;
     my $size = $param{Size};
     my $bytes = int($size / 8) + 1;
-    my $r = urandom($bytes);
+    my $r = random_bytes($bytes);
     my $down = $size - 1;
     $r = unpack 'H*', pack 'B*', '0' x ( $size % 8 ? 8 - $size % 8 : 0 ) .
         '1' . unpack "b$down", $r;
@@ -81,7 +81,7 @@ sub randombelow {
     my $limit = $rmax - ($rmax % $n);              # largest multiple of $n <= rmax
     my $r;
     do {
-        $r = Math::BigInt->new('0x' . unpack('H*', urandom($bytes)));
+        $r = Math::BigInt->new('0x' . unpack('H*', random_bytes($bytes)));
     } while $r >= $limit;
     $r % $n;
 }
@@ -97,7 +97,7 @@ sub _random_base {
     my ($n) = @_;
     my $range = $n - 3;                     # 0 .. n-4
     my $bytes = int(bitsize($n) / 8) + 8;   # headroom keeps bias negligible
-    my $r = Math::BigInt->new('0x' . unpack 'H*', urandom($bytes));
+    my $r = Math::BigInt->new('0x' . unpack 'H*', random_bytes($bytes));
     ($r % $range) + 2;                      # 2 .. n-2
 }
 

@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -68,7 +68,7 @@ HTML::Object::DOM::Element::Progress - HTML Object DOM Progress Class
 
     use HTML::Object::DOM::Element::Progress;
     my $progress = HTML::Object::DOM::Element::Progress->new || 
-        die( HTML::Object::DOM::Element::Progress->error, "\n" );
+        die( HTML::Object::DOM::Element::Progress->error );
 
 =head1 VERSION
 
@@ -151,7 +151,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLPro
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

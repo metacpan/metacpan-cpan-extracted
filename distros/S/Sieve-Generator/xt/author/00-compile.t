@@ -5,23 +5,24 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 15;
+plan tests => 16;
 
 my @module_files = (
     'Sieve/Generator.pm',
-    'Sieve/Generator/Lines.pm',
-    'Sieve/Generator/Lines/Block.pm',
-    'Sieve/Generator/Lines/Command.pm',
-    'Sieve/Generator/Lines/Comment.pm',
-    'Sieve/Generator/Lines/Document.pm',
-    'Sieve/Generator/Lines/Heredoc.pm',
-    'Sieve/Generator/Lines/IfElse.pm',
-    'Sieve/Generator/Lines/Junction.pm',
-    'Sieve/Generator/Sugar.pm',
-    'Sieve/Generator/Text.pm',
-    'Sieve/Generator/Text/Qstr.pm',
-    'Sieve/Generator/Text/QstrList.pm',
-    'Sieve/Generator/Text/Terms.pm'
+    'Sieve/Generator/Element.pm',
+    'Sieve/Generator/Element/Block.pm',
+    'Sieve/Generator/Element/BracketComment.pm',
+    'Sieve/Generator/Element/Command.pm',
+    'Sieve/Generator/Element/Comment.pm',
+    'Sieve/Generator/Element/Document.pm',
+    'Sieve/Generator/Element/Heredoc.pm',
+    'Sieve/Generator/Element/IfElse.pm',
+    'Sieve/Generator/Element/Junction.pm',
+    'Sieve/Generator/Element/Num.pm',
+    'Sieve/Generator/Element/Qstr.pm',
+    'Sieve/Generator/Element/QstrList.pm',
+    'Sieve/Generator/Element/Terms.pm',
+    'Sieve/Generator/Sugar.pm'
 );
 
 

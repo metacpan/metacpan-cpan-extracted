@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/27
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -111,7 +111,7 @@ HTML::Object::DOM::VTTCue - HTML Object DOM VTTCue Class
 
     use HTML::Object::DOM::VTTCue;
     my $cue = HTML::Object::DOM::VTTCue->new || 
-        die( HTML::Object::DOM::VTTCue->error, "\n" );
+        die( HTML::Object::DOM::VTTCue->error );
 
     <video controls src="https://example.org/some/where/media/video.mp4"></video>
 
@@ -389,7 +389,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/VTTCue>
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

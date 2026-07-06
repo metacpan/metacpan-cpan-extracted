@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -89,7 +89,7 @@ sub add
                     class => 'HTML::Object::HierarchyRequestError',
                 }) );
             }
-            
+
             my $tmpPos = $options->pos( $elem );
             if( defined( $tmpPos ) )
             {
@@ -275,7 +275,7 @@ sub selectedOptions
     $self->children->for(sub
     {
         my( $i, $elem ) = @_;
-        
+
     });
     # The content of the collection is refreshed, but the collection object itself does not change, so the user can poll it
     unless( $self->{_selected_options} )
@@ -331,7 +331,7 @@ HTML::Object::DOM::Element::Select - HTML Object DOM Select Class
 
     use HTML::Object::DOM::Element::Select;
     my $select = HTML::Object::DOM::Element::Select->new || 
-        die( HTML::Object::DOM::Element::Select->error, "\n" );
+        die( HTML::Object::DOM::Element::Select->error );
 
 =head1 VERSION
 
@@ -786,7 +786,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLSel
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

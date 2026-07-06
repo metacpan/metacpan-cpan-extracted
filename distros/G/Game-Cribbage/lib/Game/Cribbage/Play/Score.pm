@@ -3,39 +3,34 @@ package Game::Cribbage::Play::Score;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar -types;
 
-property scores => (
-	initable => 1,
-	writeable => 0,
-	configurable => 0,
-	enumerable => 1,
-	value => {
-		run => [3, 4, 5, 6, 7],
-		pair => [2, 6, 12],
-		fifteen => 2,
-		go => 1,
-		pegged => 1,
-		flipped => 1
+has scores => (
+	is => 'ro',
+	isa => HashRef,
+	builder => sub {
+		{
+			run => [3, 4, 5, 6, 7],
+			pair => [2, 6, 12],
+			fifteen => 2,
+			go => 1,
+			pegged => 1,
+			flipped => 1
+		}
 	}
 );
 
-property [qw/total_score pair run fifteen pegged go flipped/] => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1
+has [qw/total_score pair run fifteen pegged go flipped/] => (
+	is => 'rw',
+	isa => Int
 );
 
-property [qw/player card/] => (
-	initable => 1,
-	writeable => 0,
-	configurable => 0,
-	enumerable => 1
+has [qw/player card/] => (
+	is => 'ro',
+	isa => Object
 );
 
-function score => sub {
+sub score {
 	my ($self) = @_;
 	my $score = 0;
 	for (qw/fifteen go pegged flipped/) {
@@ -48,8 +43,8 @@ function score => sub {
 			$score += $self->scores->{$_}->[$self->$_ - 1];
 		}
 	}
-	$self->total_score = $score;
+	$self->total_score($score);
 	return $score;
-};
+}
 
 1;

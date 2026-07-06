@@ -2,7 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 32;
+
+use Test::Most tests => 33;
 use lib 't/lib';
 use MyLogger;
 
@@ -13,6 +14,11 @@ BEGIN {
 LANGUAGES: {
 	eval {
 		CGI::Lingua->new();
+	};
+	ok($@ =~ m/^Usage:/);
+
+	eval {
+		CGI::Lingua::new();
 	};
 	ok($@ =~ m/^Usage:/);
 
@@ -35,7 +41,7 @@ LANGUAGES: {
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = '';
         $ENV{'REMOTE_ADDR'} = '66.249.67.232';	# Google
-	$l = CGI::Lingua->new({supported => ['en', 'fr', 'en-gb', 'en-us']});
+	$l = CGI::Lingua->new({supported_languages => ['en', 'fr', 'en-gb', 'en-us']});
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));
 	SKIP: {

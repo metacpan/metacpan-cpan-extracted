@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -62,7 +62,7 @@ HTML::Object::DOM::Element::Source - HTML Object DOM Source Class
 
     use HTML::Object::DOM::Element::Source;
     my $source = HTML::Object::DOM::Element::Source->new || 
-        die( HTML::Object::DOM::Element::Source->error, "\n" );
+        die( HTML::Object::DOM::Element::Source->error );
 
 =head1 VERSION
 
@@ -156,7 +156,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLSou
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

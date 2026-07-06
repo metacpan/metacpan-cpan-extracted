@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/10
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -66,7 +66,7 @@ HTML::Object::DOM::Element::Meter - HTML Object DOM Meter Class
 
     use HTML::Object::DOM::Element::Meter;
     my $meter = HTML::Object::DOM::Element::Meter->new || 
-        die( HTML::Object::DOM::Element::Meter->error, "\n" );
+        die( HTML::Object::DOM::Element::Meter->error );
 
 =head1 VERSION
 
@@ -165,7 +165,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLMet
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

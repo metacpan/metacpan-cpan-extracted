@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/01
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -49,7 +49,7 @@ BEGIN
         SHOW_NOTATION               => 2048,
         # Show spaces; non-standard addition
         SHOW_SPACE                  => 4096,
-        
+
         FILTER_ACCEPT               => 1,
         FILTER_REJECT               => 2,
         FILTER_SKIP                 => 3,
@@ -91,7 +91,7 @@ HTML::Object::DOM::NodeFilter - HTML Object DOM Node Filter
 
     use HTML::Object::DOM::NodeFilter;
     my $filter = HTML::Object::DOM::NodeFilter->new || 
-        die( HTML::Object::DOM::NodeFilter->error, "\n" );
+        die( HTML::Object::DOM::NodeFilter->error );
 
 =head1 VERSION
 
@@ -269,7 +269,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/NodeFil
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

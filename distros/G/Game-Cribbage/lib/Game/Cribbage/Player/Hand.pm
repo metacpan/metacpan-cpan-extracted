@@ -3,8 +3,7 @@ package Game::Cribbage::Player::Hand;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar -types;
 use List::Util qw/first/;
 use Game::Cribbage::Score;
 use Game::Cribbage::Deck::Card;
@@ -12,22 +11,24 @@ use Game::Cribbage::Error;
 use ntheory qw/forcomb vecsum/;
 use Array::Diff;
 
-property [qw/id player crib starter score crib_score/] => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1
+has [qw/id/] => (
+	is => 'rw',
+	isa => Int
 );
 
-property [qw/cards play_scored/] => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1,
-	value => []
+has [qw/player score crib_score starter/] => (
+	is => 'rw',
+	isa => Object
 );
 
-function get => sub {
+
+has [qw/crib cards play_scored/] => (
+	is => 'rw',
+	isa => 'ArrayRef',
+	default => [],
+);
+
+sub get {
 	my ($self, $card_index) = @_;
 	my $card = ref $card_index ? $self->match($card_index) : $self->cards->[$card_index];
 	if (!$card) {
@@ -36,7 +37,7 @@ function get => sub {
 	return $card;
 };
 
-function match => sub {
+sub match {
 	my ($self, $card) = @_;
 	for (@{ $self->cards }) {
 		my $found = $_->match($card);
@@ -47,18 +48,18 @@ function match => sub {
 	return 0;
 };
 
-function add => sub {
+sub add {
 	my ($self, $card) = @_;
 	push @{$self->cards}, $card;
 };
 
-function add_by_index => sub {
+sub add_by_index {
 	my ($self, $index, $card) = @_;
 	$self->cards->[$index] = $card;
 	return 1;
 };
 
-function discard_cards => sub {
+sub discard_cards {
 	my ($self, $cards, $crib) = @_;
 	my $count = scalar @{$self->cards};
 	if ($count <= 4) {
@@ -66,7 +67,7 @@ function discard_cards => sub {
 	}
 	my %mapped = ();
 	for (@{$cards}) {
-		$mapped{$_->{suit}}{$_->{symbol}} = 1;
+		$mapped{$_->suit}{$_->symbol} = 1;
 	}
 	my @cribbed;
 	$cards = $self->cards;
@@ -78,11 +79,11 @@ function discard_cards => sub {
 			$i--;
 		}
 	}
-	$self->cards = $cards;
+	$self->cards($cards);
 	return \@cribbed;
 };
 
-function discard => sub {
+sub discard {
 	my ($self, $card, $crib) = @_;
 	my $count = scalar @{$self->cards};
 	if ($count <= 4) {
@@ -95,24 +96,24 @@ function discard => sub {
 	$crib->add_crib_card($card);
 };
 
-function add_crib_card => sub {
+sub add_crib_card {
 	my ($self, $card) = @_;
 	push @{$self->crib}, $card;
 };
 
-function calculate_score => sub {
+sub calculate_score {
 	my ($self) = @_;
 	my $starter = $self->starter ? 1 : 0;
 	my @cards = (@{$self->cards}, ($starter ? $self->starter : ()));
-	$self->score = Game::Cribbage::Score->new(_with_starter => $starter, _cards => \@cards);
+	$self->score(Game::Cribbage::Score->new(with_starter => $starter, cards => \@cards));
 	if ($self->crib && scalar @{$self->crib}) {
 		@cards = (@{$self->crib}, ($starter ? $self->starter : ()));
-		$self->crib_score = Game::Cribbage::Score->new(_with_starter => $starter, _cards => \@cards);
+		$self->crib_score(Game::Cribbage::Score->new(with_starter => $starter, cards => \@cards));
 	}
 	return $self->score->total_score + ($self->crib_score ? $self->crib_score->total_score : 0);
-};
+}
 
-function card_exists => sub {
+sub card_exists {
 	my ($self, $card) = @_;
 
 	for (@{ $self->cards }) {
@@ -134,10 +135,10 @@ function card_exists => sub {
 	return 0;
 };
 
-function identify_worst_cards => sub {
+sub identify_worst_cards {
 	my ($self) = @_;
 
-	if (! scalar @{$self->cards} == 6) {
+	if (!(scalar @{$self->cards} == 6)) {
 		die 'cards do not exists or two have been moved to the crib already';
 	}
 
@@ -149,7 +150,7 @@ function identify_worst_cards => sub {
 	);
 	forcomb {
 		my @test = @cards[@_];
-		my $score = Game::Cribbage::Score->new(_with_starter => 0, _cards => \@test);
+		my $score = Game::Cribbage::Score->new(with_starter => 0, cards => \@test);
 		if (($score->total_score + 0) > $best{score}) {
 			$best{score} = $score->total_score;
 			$best{cards} = [@_];
@@ -162,7 +163,7 @@ function identify_worst_cards => sub {
 	return (\@cards, @index);
 };
 
-function validate_crib_cards => sub {
+sub validate_crib_cards {
 	my ($self, $cards) = @_;
 
 	my $find_all = 1;
@@ -180,10 +181,10 @@ function validate_crib_cards => sub {
 	}
 
 	if (!$find_all) {
-		$self->crib = [];
+		$self->crib([]);
 		for (@{$cards}) {
 			push @{$self->crib}, Game::Cribbage::Deck::Card->new(
-				%{ $_ }
+				suit => $_->suit, symbol => $_->symbol
 			);
 		}
 	}
@@ -191,12 +192,12 @@ function validate_crib_cards => sub {
 	return 1;
 };
 
-function best_run_play => sub {
+sub best_run_play {
 	my ($self, $play) = @_;
 
 	my ($best, $card);
 
-	my @available = grep { ! $_->{used} } @{$self->cards};
+	my @available = grep { ! $_->used } @{$self->cards};
 
 	for (@available) {
 		my $test = $play->test_card($self->player, $_);
@@ -216,7 +217,7 @@ function best_run_play => sub {
 	if ($best == 0) {
 		my $total = $play->total;
 		@available = grep { ($total + $_->value) <= 31 } @available;
-		@available = grep { $_->value != 5 } @available if scalar @available > 1;
+		@available = grep { $_->value != 5 } @available if scalar @available > 1 && grep { $_->value != 5 } @available;
 		if (! scalar @available) {
 			return Game::Cribbage::Error->new(
 				message => 'No valid cards left to play for this run',
@@ -227,6 +228,6 @@ function best_run_play => sub {
 	}
 
 	return $card;
-};
+}
 
 1;

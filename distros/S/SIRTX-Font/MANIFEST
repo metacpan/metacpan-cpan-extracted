@@ -12,5 +12,6 @@ bin/sf-to-html
 cpanfile
 dist.ini
 lib/SIRTX/Font.pm
+lib/SIRTX/Font/Renderer.pm
 t/01_load.t
 xt/author/pod-syntax.t

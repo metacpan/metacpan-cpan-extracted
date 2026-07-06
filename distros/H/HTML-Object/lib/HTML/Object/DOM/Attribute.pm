@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -170,7 +170,7 @@ HTML::Object::DOM::Attribute - HTML Object
 =head1 SYNOPSIS
 
     use HTML::Object::DOM::Attribute;
-    my $this = HTML::Object::DOM::Attribute->new || die( HTML::Object::DOM::Attribute->error, "\n" );
+    my $this = HTML::Object::DOM::Attribute->new || die( HTML::Object::DOM::Attribute->error );
 
 =head1 VERSION
 
@@ -288,7 +288,7 @@ Provided with a node and this returns true if this attribute associated element 
 
 =head2 lineage
 
-Returns the value provided by calling C<lineage> on the associated element and adding it to the lineage, or an empty L<array object> if there is no associated element.
+Returns the value provided by calling C<lineage> on the associated element and adding it to the lineage, or an empty L<array object|Module::Generic::Array> if there is no associated element.
 
 =head2 localName
 
@@ -348,7 +348,7 @@ L<W3C standard on attributes|https://html.spec.whatwg.org/multipage/syntax.html#
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

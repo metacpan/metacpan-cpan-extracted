@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
 ## Modified 2025/10/16
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -205,7 +205,7 @@ sub cmp
     my $a_pile = $a->lineage->unshift( $a );
     my $b_pile = $b->lineage->unshift( $b );
     # $a->debug(4);
-    
+
     # the 2 elements are not in the same twig
     unless( $a_pile->last == $b_pile->last ) 
     {
@@ -340,7 +340,7 @@ sub getElementsByClassName
     my $totalClassRequired = $test->length->scalar;
     # Nothing to do somehow
     return( $results ) if( !$totalClassRequired );
-    
+
     my $seen = {};
     my $crawl;
     $crawl = sub
@@ -384,7 +384,7 @@ sub getElementsByTagName
     my $results = $self->new_array;
     # Nothing to do somehow
     return( $self->error( "No name was provided for getElementsByTagName()" ) ) if( !defined( $name ) || !CORE::length( "$name" ) );
-    
+
     my $seen = {};
     my $crawl;
     $crawl = sub
@@ -435,7 +435,7 @@ sub getElementsByTagNames
     {
         return( $results );
     }
-    
+
     my $tags = $self->new_array( $this );
     $tags->foreach(sub
     {
@@ -577,7 +577,7 @@ sub innerHTML : lvalue { return( shift->_set_get_callback({
         {
             die( "I was expecting some html data in replacement of html for this element \"" . $self->tag . "\", but instead got '" . ( CORE::length( $this ) > 1024 ? ( CORE::substr( $this, 0, 1024 ) . '...' ) : $this ) . "'." );
         }
-        
+
         $children->foreach(sub
         {
             $_->parent( $self );
@@ -632,7 +632,7 @@ sub innerText : lvalue { return( shift->_set_get_callback({
         {
             die( "I was expecting some text data in replacement of html for this element \"" . $self->tag . "\", but instead got '" . ( CORE::length( $this ) > 1024 ? ( CORE::substr( $this, 0, 1024 ) . '...' ) : $this ) . "'." );
         }
-        
+
         $children->foreach(sub
         {
             $_->parent( $self );
@@ -1284,14 +1284,14 @@ sub outerText : lvalue { return( shift->_set_get_callback({
         {
             die( "I was expecting some text data in replacement of html for this element \"" . $self->tag . "\", but instead got '" . ( CORE::length( $this ) > 1024 ? ( CORE::substr( $this, 0, 1024 ) . '...' ) : $this ) . "'." );
         }
-        
+
         my $parent = $self->parent;
         my $pos = $parent->children->pos( $self );
         if( !defined( $pos ) )
         {
             die( "Unable to find the current element among its parent's children." );
         }
-        
+
         $element->parent( $parent );
         $parent->splice( $pos, 1, $element );
         $self->parent( undef() );
@@ -1366,7 +1366,7 @@ sub querySelector
         code => 500,
         class => 'HTML::Object::SyntaxError',
     }) ) if( !scalar( @sels ) );
-    
+
     foreach my $sel ( @sels )
     {
         my $results = $self->findNode( $sel, { root => '.' } ) || 
@@ -1385,7 +1385,7 @@ sub querySelectorAll
         code => 500,
         class => 'HTML::Object::SyntaxError',
     }) ) if( !scalar( @sels ) );
-    
+
     my $results = $self->new_array;
     foreach my $sel ( @sels )
     {
@@ -1475,7 +1475,7 @@ sub replaceChildren
         return( $results );
     }
     my $new = $self->_list_to_nodes( @_ ) || return( $self->pass_error({ class => 'HTML::Object::SyntaxError' }) );
-    
+
     # We take some care to keep the same original array, so that if it is used or 
     # referenced elsewhere it continues to be valid, as a 'live' array of (new) elements
     $children->foreach(sub
@@ -1485,7 +1485,7 @@ sub replaceChildren
     $results->push( $children->list );
     # We empty it, and pu the new content inside
     $children->reset;  
-    
+
     $new->foreach(sub
     {
         $_->parent( $self );
@@ -1536,7 +1536,7 @@ sub setAttribute
         code => 500,
         class => 'HTML::Object::SyntaxError',
     }) ) if( !defined( $name ) || !CORE::length( $name ) );
-    
+
     # Inherited from HTML::Object::Element
     if( !$self->is_valid_attribute( $name ) )
     {
@@ -1547,7 +1547,7 @@ sub setAttribute
         }) );
     }
     $name = lc( $name );
-    
+
     if( !defined( $value ) )
     {
         return( $self->removeAttribute( $name ) );
@@ -1591,7 +1591,7 @@ sub setHTML : lvalue { return( shift->_set_get_callback({
         {
             die( "No html provided." );
         }
-        
+
         my $children;
         if( $self->_is_a( $this => 'HTML::Object::Element' ) )
         {
@@ -1682,7 +1682,7 @@ sub toggleAttribute
         code => 500,
         class => 'HTML::Object::SyntaxError',
     }) ) if( !defined( $name ) || !CORE::length( $name ) );
-    
+
     # Inherited from HTML::Object::Element
     if( !$self->is_valid_attribute( $name ) )
     {
@@ -1754,7 +1754,7 @@ sub _set_get_form_attribute : lvalue
             {
                 die( "Form object has no method \"$attr\"." );
             }
-            
+
             my $rv = $code->( $form );
             return( $rv );
         },
@@ -1772,7 +1772,7 @@ sub _set_get_form_attribute : lvalue
             {
                 die( "Form object has no method \"$attr\"." );
             }
-            
+
             $code->( $form, $arg );
             return( $arg ) if( $ctx->{assign} );
             return( $self );
@@ -1786,7 +1786,7 @@ sub _set_get_property : lvalue
 {
     my $self = shift( @_ );
     my $attr = shift( @_ );
-    
+
     my $def = {};
     # If the $attr parameter is an hash reference, it is used to provide more information
     # such as whether this property is a boolean
@@ -1796,7 +1796,7 @@ sub _set_get_property : lvalue
         $attr = $def->{attribute};
     }
     $def->{is_boolean} //= 0;
-    
+
     return( $self->_set_get_callback({
         get => sub
         {
@@ -1924,7 +1924,7 @@ sub _set_get_uri_property : lvalue
     search      => 'query',
     username    => 'userinfo',
     };
-    
+
     return( $self->_set_get_callback({
         get => sub
         {
@@ -2784,7 +2784,7 @@ Example:
 
     my $text = $doc->getElementById('divA')->textContent;
     # The text variable is now: 'This is some text!'
-    
+
     $doc->getElementById('divA')->textContent = 'This text is different!';
     # The HTML for divA is now:
     # <div id="divA">This text is different!</div>
@@ -2995,7 +2995,7 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 Dispatches an event to this element in the DOM and returns a boolean value that indicates whether no handler canceled the event.
 
 This is inherited from L<HTML::Object::EventTarget>
- 
+
 See L<HTML::Object::EventTarget/dispatchEvent> for more information.
 
 =for each
@@ -3635,7 +3635,7 @@ To access the matched element, see L<Module::Generic::Array/foreach> for example
     {
         my $elem = shift( @_ ); # $_ is available too
         # Do something with $elem
-        
+
         # To satisfy array object's foreach and avoid ending abruptly the loop
         return(1);
     });
@@ -3756,7 +3756,7 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node
 =head2 removeEventListener
 
 Removes an event listener from the element. This is inherited from L<HTML::Object::EventTarget>
- 
+
 See L<HTML::Object::EventTarget/removeEventListener> for more information.
 
 =head2 replaceChild
@@ -3985,7 +3985,7 @@ L<Mozilla DOM documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTM
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/04
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -126,9 +126,9 @@ sub findnodes
 {
     my $self = shift( @_ );
     my( $path, $context ) = @_;
-    
+
     my $results = $self->find( $path, $context );
-    
+
     if( $self->_is_a( $results => 'HTML::Object::XPath::NodeSet' ) )
     {
         return( wantarray() ? $results->get_nodelist : $results );
@@ -144,7 +144,7 @@ sub findnodes_as_string
 {
     my $self = shift( @_ );
     my( $path, $context ) = @_;
-    
+
     my $results = $self->find( $path, $context );
     if( $self->_is_a( $results => 'HTML::Object::XPath::NodeSet' ) )
     {
@@ -170,7 +170,7 @@ sub findnodes_as_strings
     my $self = shift( @_ );
     my( $path, $context ) = @_;
     my $results = $self->find( $path, $context );
-    
+
     if( $self->_is_a( $results => 'HTML::Object::XPath::NodeSet' ) )
     {
         return( map{ $_->getValue } $results->get_nodelist );
@@ -219,7 +219,7 @@ sub get_namespace
 {
     my $self = shift( @_ );
     my( $prefix, $node ) = @_;
-   
+
     my $ns = $node
         ? $node->getNamespace( $prefix )
         : $self->{uses_namespaces}
@@ -305,7 +305,7 @@ sub _arguments
     {
         return( $args );
     }
-    
+
     $args->push( $self->_expr( $tokens ) );
     while( $self->_match( $tokens, qr/\,/ ) )
     {
@@ -335,16 +335,16 @@ sub _expr
 sub _expr_additive
 {
     my( $self, $tokens ) = @_;
-    
+
     my $expr = $self->_expr_multiplicative( $tokens );
     while( $self->_match( $tokens, qr/[\+\-]/ ) )
     {
         my $add_expr = $self->new_expr( $self );
         $add_expr->set_lhs( $expr );
         $add_expr->set_op( $self->{_curr_match} );
-        
+
         my $rhs = $self->_expr_multiplicative( $tokens );
-        
+
         $add_expr->set_rhs( $rhs );
         $expr = $add_expr;
     }
@@ -370,16 +370,16 @@ sub _expr_and
 sub _expr_equality
 {
     my( $self, $tokens ) = @_;
-    
+
     my $expr = $self->_expr_relational( $tokens );
     while( $self->_match( $tokens, qr/!?=/ ) )
     {
         my $eq_expr = $self->new_expr( $self );
         $eq_expr->set_lhs( $expr );
         $eq_expr->set_op( $self->{_curr_match} );
-        
+
         my $rhs = $self->_expr_relational( $tokens );
-        
+
         $eq_expr->set_rhs( $rhs );
         $expr = $eq_expr;
     }
@@ -389,7 +389,7 @@ sub _expr_equality
 sub _expr_filter
 {
     my( $self, $tokens ) = @_;
-    
+
     my $expr = $self->_expr_primary( $tokens );
     while( $self->_match( $tokens, qr/\[/ ) )
     {
@@ -403,7 +403,7 @@ sub _expr_filter
 sub _expr_match
 {
     my( $self, $tokens ) = @_;
-    
+
     my $expr = $self->_expr_equality( $tokens );
 
     while( $self->_match( $tokens, qr/[=!]~/ ) )
@@ -411,9 +411,9 @@ sub _expr_match
         my $match_expr = $self->new_expr( $self );
         $match_expr->set_lhs( $expr );
         $match_expr->set_op( $self->{_curr_match} );
-        
+
         my $rhs = $self->_expr_equality( $tokens );
-        
+
         $match_expr->set_rhs( $rhs );
         $expr = $match_expr;
     }
@@ -423,16 +423,16 @@ sub _expr_match
 sub _expr_multiplicative
 {
     my( $self, $tokens ) = @_;
-    
+
     my $expr = $self->_expr_unary( $tokens );
     while( $self->_match( $tokens, qr/(\*|div|mod)/ ) )
     {
         my $mult_expr = $self->new_expr( $self );
         $mult_expr->set_lhs( $expr );
         $mult_expr->set_op( $self->{_curr_match} );
-        
+
         my $rhs = $self->_expr_unary( $tokens );
-        
+
         $mult_expr->set_rhs( $rhs );
         $expr = $mult_expr;
     }
@@ -442,7 +442,7 @@ sub _expr_multiplicative
 sub _expr_or
 {
     my( $self, $tokens ) = @_;
-    
+
     my $expr = $self->_expr_and( $tokens );
     while( $self->_match( $tokens, 'or' ) )
     {
@@ -465,11 +465,11 @@ sub _expr_path
     # Since we are being predictive we need to find out which function to call next, then.
     # LocationPath either starts with "/", "//", ".", ".." or a proper Step.
     my $expr = $self->new_expr( $self );
-    
+
     # $test is a fragment of the xpath initially provided and broken down into bits by
     # HTML::Object::XPath::_tokenize
     my $test = $tokens->[ $self->{_tokpos} ];
-    
+
     # Test for AbsoluteLocationPath and AbbreviatedRelativeLocationPath
     if( $test =~ /^(\/\/?|\.\.?)$/ )
     {
@@ -506,9 +506,9 @@ sub _expr_path
 sub _expr_primary
 {
     my( $self, $tokens ) = @_;
-    
+
     my $expr = $self->new_expr( $self );
-    
+
     if( $self->_match( $tokens, $LITERAL_RE ) )
     {
         # new Literal with $self->{_curr_match}...
@@ -570,16 +570,16 @@ sub _expr_primary
 sub _expr_relational
 {
     my( $self, $tokens ) = @_;
-    
+
     my $expr = $self->_expr_additive( $tokens );
     while( $self->_match( $tokens, qr/(<|>|<=|>=)/ ) )
     {
         my $rel_expr = $self->new_expr( $self );
         $rel_expr->set_lhs( $expr );
         $rel_expr->set_op( $self->{_curr_match} );
-        
+
         my $rhs = $self->_expr_additive( $tokens );
-        
+
         $rel_expr->set_rhs( $rhs );
         $expr = $rel_expr;
     }
@@ -590,7 +590,7 @@ sub _expr_unary
 {
     my( $self, $tokens ) = @_;
     # $tokens are an array object of expression tokens
-    
+
     if( $self->_match( $tokens, qr/-/ ) )
     {
         my $expr = $self->new_expr( $self );
@@ -609,14 +609,14 @@ sub _expr_union
 {
     my( $self, $tokens ) = @_;
     # $tokens are an array object of expression tokens
-    
+
     my $expr = $self->_expr_path( $tokens );
     while( $self->_match( $tokens, qr/\|/ ) )
     {
         my $un_expr = $self->new_expr( $self );
         $un_expr->set_lhs( $expr );
         $un_expr->set_op( '|' );
-        
+
         my $rhs = $self->_expr_path( $tokens );
         $un_expr->set_rhs( $rhs );
         $expr = $un_expr;
@@ -659,7 +659,7 @@ sub _location_path
 {
     my( $self, $tokens ) = @_;
     my $loc_path = $self->new_location_path;
-    
+
     if( $self->_match( $tokens, qr/\// ) )
     {
         # root
@@ -730,9 +730,9 @@ sub _match
 sub _optimise_descendant_or_self
 {
     my( $self, $tokens ) = @_;
-    
+
     my $tokpos = $self->{_tokpos};
-    
+
     # // must be followed by a Step.
     if( $tokens->[ $tokpos + 1 ] && $tokens->[ $tokpos + 1 ] eq '[' )
     {
@@ -769,7 +769,7 @@ sub _parse
     # $context is something like: //*[@att2="vv"]
     # my $context = join( '&&', $path, map { "$_=>$self->{namespaces}->{$_}" } sort keys %{$self->{namespaces}});
     my $context = $self->namespaces->keys->sort->map(sub{ sprintf( '%s=>%s', $_, $self->namespaces->get( $_ ) ); })->prepend( $path )->join( '&&' );
-    
+
     return( $CACHE->{ $context } ) if( $CACHE->{ $context } );
 
     # my $tokens = $self->_tokenize( $path ) || return( $self->pass_error );
@@ -778,7 +778,7 @@ sub _parse
 
     $self->{_tokpos} = 0;
     my $tree = $self->_analyze( $tokens );
-    
+
     if( $self->{_tokpos} < $tokens->length )
     {
         # didn't manage to parse entire expression - throw an exception
@@ -788,9 +788,9 @@ sub _parse
 
     $tree->{uses_namespaces}   = $self->{uses_namespaces};   
     $tree->{strict_namespaces} = $self->{strict_namespaces};   
- 
+
     $CACHE->{ $context } = $tree;
-    
+
     return( $tree );
 }
 
@@ -798,7 +798,7 @@ sub _relative_location_path
 {
     my( $self, $tokens ) = @_;
     my @steps;
-    
+
     push( @steps, $self->_step( $tokens ) );
     while( $self->_match( $tokens, qr/\/\/?/ ) )
     {
@@ -846,7 +846,7 @@ sub _step
     {
         # AxisSpecifier NodeTest Predicate(s?)
         my $token = $tokens->[ $self->{_tokpos} ];
-        
+
         my $step;
         if( $token eq 'processing-instruction' )
         {
@@ -1041,7 +1041,7 @@ sub _step
         {
             die( "token $token does not match format of a 'Step'\n" );
         }
-        
+
         while( $self->_match( $tokens, qr/\[/ ) )
         {
             push( @{$step->{predicates}}, $self->_expr( $tokens ) );
@@ -1056,10 +1056,10 @@ sub _tokenize
     my $self = shift( @_ );
     my $path = shift( @_ );
     my $tokens = $self->new_array;
-    
-    
+
+
     # Bug: We do not allow "'@' NodeType" which is in the grammar, but I think is just plain stupid.
-    
+
     # used to desambiguate conflicts (for REs)
     my $expected = '';
 
@@ -1110,7 +1110,7 @@ sub _tokenize
             $tokens->push( $token );
         }
     }
-    
+
     if( pos( $path ) < length( $path ) )
     {
         my $marker = ( '.' x ( pos( $path ) -1 ) );
@@ -1146,7 +1146,7 @@ HTML::Object::XPath - HTML Object XPath Class
     use HTML::Object;
     use HTML::Object::XQuery;
     use HTML::Object::XPath;
-    my $this = HTML::Object::XPath->new || die( HTML::Object::XPath->error, "\n" );
+    my $this = HTML::Object::XPath->new || die( HTML::Object::XPath->error );
 
     my $p = HTML::Object->new;
     my $doc = $p->parse_file( $path_to_html_file ) || die( $p->error );
@@ -1358,6 +1358,8 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/XPath/Intro
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

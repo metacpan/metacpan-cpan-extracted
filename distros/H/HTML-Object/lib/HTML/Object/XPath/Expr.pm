@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -84,14 +84,14 @@ sub evaluate
     my $self = shift( @_ );
     # HTML::Object::XPath::NodeSet
     my $node = shift( @_ );
-    
+
     # If there's an op, result is result of that op.
     # If no op, just resolve Expr
-    
+
 #    warn "Evaluate Expr: ", $self->as_string, "\n";
-    
+
     my $results;
-    
+
     if( $self->{op} )
     {
         die( "No RHS of ", $self->as_string ) unless( $self->{rhs} );
@@ -102,14 +102,14 @@ sub evaluate
         # HTML::Object::XPath::LocationPath
         $results = $self->{lhs}->evaluate( $node );
     }
-    
+
     if( !$self->predicates->is_empty )
     {
         if( !$self->_is_a( $results => 'HTML::Object::XPath::NodeSet' ) )
         {
             die( "Can't have predicates execute on object type: " . ref( $results ) );
         }
-        
+
         # filter initial nodeset by each predicate
         foreach my $predicate ( @{$self->{predicates}} )
         {
@@ -123,24 +123,24 @@ sub filter_by_predicate
 {
     my $self = shift( @_ );
     my( $nodeset, $predicate ) = @_;
-    
+
     # See spec section 2.4, paragraphs 2 & 3:
     # For each node in the node-set to be filtered, the predicate Expr
     # is evaluated with that node as the context node, with the number
     # of nodes in the node set as the context size, and with the
     # proximity position of the node in the node set with respect to
     # the axis as the context position.
-    
+
     # use ref because nodeset has a bool context
     if( !ref( $nodeset ) )
     {
         die( "No nodeset!!!" );
     }
-    
+
 #    warn "Filter by predicate: $predicate\n";
-    
+
     my $newset = $self->new_nodeset->new();
-    
+
     for( my $i = 1; $i <= $nodeset->size; $i++ )
     {
         # set context set each time 'cos a loc-path in the expr could change it
@@ -223,7 +223,7 @@ sub op_equals
 
     my $lh_results = $lhs->evaluate( $node );
     my $rh_results = $rhs->evaluate( $node );
-    
+
     if( $lh_results->isa( 'HTML::Object::XPath::NodeSet' ) &&
         $rh_results->isa( 'HTML::Object::XPath::NodeSet' ) )
     {
@@ -260,7 +260,7 @@ sub op_equals
             $nodeset = $rh_results;
             $other = $lh_results;
         }
-        
+
         # True if and only if there is a node in the
         # nodeset such that the result of performing
         # the comparison on <type>(string_value($node))
@@ -366,7 +366,7 @@ sub op_ge
 
     my $lh_results = $lhs->evaluate( $node );
     my $rh_results = $rhs->evaluate( $node );
-    
+
     if( $lh_results->isa( 'HTML::Object::XPath::NodeSet' ) &&
         $rh_results->isa( 'HTML::Object::XPath::NodeSet' ) )
     {
@@ -442,7 +442,7 @@ sub op_gt
 
     my $lh_results = $lhs->evaluate( $node );
     my $rh_results = $rhs->evaluate( $node );
-    
+
     if( $lh_results->isa( 'HTML::Object::XPath::NodeSet' ) &&
         $rh_results->isa( 'HTML::Object::XPath::NodeSet' ) )
     {
@@ -555,14 +555,14 @@ sub op_match
         );
     }
 }
-  
+
 sub op_minus
 {
     my $self = shift( @_ );
     my( $node, $lhs, $rhs ) = @_;
     my $lh_results = $lhs->evaluate( $node );
     my $rh_results = $rhs->evaluate( $node );
-    
+
     my $result = $lh_results->to_number->value - $rh_results->to_number->value;
     return( $self->new_number( $result ) );
 }
@@ -573,7 +573,7 @@ sub op_mod
     my( $node, $lhs, $rhs ) = @_;
     my $lh_results = $lhs->evaluate( $node );
     my $rh_results = $rhs->evaluate( $node );
-    
+
     my $result = $lh_results->to_number->value % $rh_results->to_number->value;
     return( $self->new_number( $result ) );
 }
@@ -584,7 +584,7 @@ sub op_mult
     my( $node, $lhs, $rhs ) = @_;
     my $lh_results = $lhs->evaluate( $node );
     my $rh_results = $rhs->evaluate( $node );
-    
+
     my $result = $lh_results->to_number->value * $rh_results->to_number->value;
     return( $self->new_number( $result ) );
 }
@@ -608,7 +608,7 @@ sub op_not_match
     my $lh_results = $lhs->evaluate( $node );
     my $rh_results = $rhs->evaluate( $node );
     my $rh_value   = $rh_results->string_value;
-    
+
     if( $lh_results->isa( 'HTML::Object::XPath::NodeSet' ) ) 
     {
         foreach my $lhnode ( $lh_results->get_nodelist ) 
@@ -646,7 +646,7 @@ sub op_plus
     my( $node, $lhs, $rhs ) = @_;
     my $lh_results = $lhs->evaluate( $node );
     my $rh_results = $rhs->evaluate( $node );
-    
+
     my $result = $lh_results->to_number->value + $rh_results->to_number->value;
     return( $self->new_number( $result ) );
 }
@@ -657,7 +657,7 @@ sub op_union
     my( $node, $lhs, $rhs ) = @_;
     my $lh_result = $lhs->evaluate( $node );
     my $rh_result = $rhs->evaluate( $node );
-    
+
     if( $lh_result->isa( 'HTML::Object::XPath::NodeSet' ) &&
         $rh_result->isa( 'HTML::Object::XPath::NodeSet' ) )
     {
@@ -709,7 +709,7 @@ sub predicates { return( shift->_set_get_array_as_object( 'predicates', @_ ) ); 
 sub push_predicate
 {
     my $self = shift( @_ );
-    
+
     die( "Only 1 predicate allowed on FilterExpr in W3C XPath 1.0" ) if( @{$self->{predicates}} );
     # push( @{$self->{predicates}}, $_[0] );
     $self->predicates->push( $_[0] );
@@ -759,7 +759,7 @@ HTML::Object::XPath::Expr - HTML Object XPath Expression
 =head1 SYNOPSIS
 
     use HTML::Object::XPath::Expr;
-    my $this = HTML::Object::XPath::Expr->new || die( HTML::Object::XPath::Expr->error, "\n" );
+    my $this = HTML::Object::XPath::Expr->new || die( HTML::Object::XPath::Expr->error );
 
 =head1 VERSION
 
@@ -785,7 +785,7 @@ Returns the expression as xml.
 
 =head2 evaluate
 
-Provided with a L<HTML::Object::XPath::NodeSet> object, and this will call L</op_eval> with an L<operator|/op> has been set, otherwise, it calls L<HTML::Object::XPath::LocationPath/evaluate> passing it the node set. It returns the result from either call.
+Provided with a L<HTML::Object::XPath::NodeSet> object, and this will call L</op_eval> with an the operator has been set, otherwise, it calls L<HTML::Object::XPath::LocationPath/evaluate> passing it the node set. It returns the result from either call.
 
 =head2 filter_by_predicate
 
@@ -833,7 +833,7 @@ Provided a L<node object|HTML::Object:Element>, a left-hand side and right-hand 
 
 =head2 op_eval
 
-This method will evaluate the L<node|HTML::Object::ELement> provided with the left-hand side and right-hand side L<LocationPath objects|HTML::Object::XPath::LocationPath> object also specified by calling the appropriate method in this module based on the operator value set with L</op>
+This method will evaluate the L<node|HTML::Object::Element> provided with the left-hand side and right-hand side L<LocationPath objects|HTML::Object::XPath::LocationPath> object also specified by calling the appropriate method in this module based on the operator value set with C</op>
 
 =head2 op_ge
 
@@ -939,7 +939,7 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

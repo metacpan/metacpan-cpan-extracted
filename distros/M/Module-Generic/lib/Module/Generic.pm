@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.6.1
+## Version v1.6.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/07/05
+## Modified 2026/07/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -118,7 +118,7 @@ BEGIN
     # shared state on the way out.
     *_in_end_phase = sub{ ${^GLOBAL_PHASE} eq 'END' };
 
-    our $VERSION   = 'v1.6.1';
+    our $VERSION   = 'v1.6.2';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -13517,7 +13517,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.6.1
+    v1.6.2
 
 =head1 DESCRIPTION
 

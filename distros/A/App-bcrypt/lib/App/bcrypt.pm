@@ -2,7 +2,7 @@ package App::bcrypt;
 use utf8;
 use v5.30;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 =encoding utf8
 
@@ -49,7 +49,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2023, brian d foy, All Rights Reserved.
+Copyright © 2023-2026, brian d foy, All Rights Reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

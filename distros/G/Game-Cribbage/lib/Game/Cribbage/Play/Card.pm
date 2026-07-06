@@ -3,22 +3,19 @@ package Game::Cribbage::Play::Card;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar -types;
 
-property [qw/player card/] => (
-	initable => 1,
-	writeable => 0,
-	configurable => 0,
-	enumerable => 1
+has [qw/player card/] => (
+	is => 'ro',
+	isa => Object
 );
 
-function value => sub {
+sub value {
 	$_[0]->card->value;
-};
+}
 
-function symbol => sub {
+sub symbol {
 	$_[0]->card->symbol;
-};
+}
 
 1;

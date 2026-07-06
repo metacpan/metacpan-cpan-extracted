@@ -157,7 +157,8 @@ README.md
 t/00.load.t
 t/01.element.t
 t/07.characterdata.t
-t/08.node.t
+t/08.node-constants.t
+t/08.node-manipulation.t
 t/09.node-event.t
 t/10.anchor.t
 t/10.document.t
@@ -177,7 +178,8 @@ t/10.element-outerhtml.t
 t/10.element-prepend.t
 t/10.element-sethtml.t
 t/10.element-textcontent.t
-t/10.input.t
+t/10.input-api.t
+t/10.input-step.t
 t/10.select.t
 t/10.table.t
 t/10.text.t
@@ -188,8 +190,8 @@ t/30.xquery-01-dom-css.t
 t/30.xquery-02-contents-data.t
 t/30.xquery-03-load.t
 t/30.xquery-04-wrap-contains.t
-t/30.xquery-05-utilities.t
-t/30.xquery.t
+t/30.xquery-05-utilities-dom.t
+t/30.xquery-05-utilities-pure.t
 t/90.pod.t
 t/91.coverage.t
 t/92.signature.t

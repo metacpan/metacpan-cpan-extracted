@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/22
 ## Modified 2025/10/16
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -84,8 +84,22 @@ HTML::Object::Attribute - HTML Object Element Attribute Class
 =head1 SYNOPSIS
 
     use HTML::Object::Attribute;
+
+    # Attribute name only
     my $attr = HTML::Object::Attribute->new( 'id' );
-    $attr->value = "hello";
+
+    # Name with properties as key-value pairs
+    my $attr = HTML::Object::Attribute->new( 'id', value => 'hello', element => $e );
+
+    # Name with properties as a hash reference
+    my $attr = HTML::Object::Attribute->new( 'id', { value => 'hello', element => $e } );
+
+    # Properties only, via SUPER::init key-value dispatch
+    my $attr = HTML::Object::Attribute->new( name => 'id', value => 'hello' );
+
+    $attr->value( 'hello' );
+    print $attr->name;   # id
+    print $attr->value;  # hello
 
 =head1 VERSION
 
@@ -93,157 +107,60 @@ HTML::Object::Attribute - HTML Object Element Attribute Class
 
 =head1 DESCRIPTION
 
-This class represent an element attribute. it is used as part of L<HTML::Object>, and also contains methods to interface with L<HTML::Object::XPath>
+This class represents an HTML element attribute. It is the base class used throughout the L<HTML::Object> framework to store an attribute name, its associated value, the element it belongs to, and its rank (position) within that element's attribute list.
+
+The DOM-oriented interface (node traversal, XPath coercions, stringification, and so on) is provided by the subclass L<HTML::Object::DOM::Attribute>, which extends this class.
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
-Creates a new C<HTML::Object::Attribute> objects.
-
-It may also take an hash like arguments, that also are method of the same name.
-
     my $attr = HTML::Object::Attribute->new( 'id' );
-    # or
-    my $attr = HTML::Object::Attribute->new( name => 'id' );
+    my $attr = HTML::Object::Attribute->new( 'id', value => 'hello', element => $e );
+    my $attr = HTML::Object::Attribute->new( 'id', { value => 'hello', element => $e } );
+    my $attr = HTML::Object::Attribute->new( name => 'id', value => 'hello' );
 
-=head1 PROPERTIES
+Creates and returns a new C<HTML::Object::Attribute> object.
 
-=head2 nodeValue
+The constructor accepts the attribute name as an optional leading positional argument (a plain string or any object that overloads stringification), followed by either a flat list of key-value pairs or a hash reference of properties. When no positional name is given, the name may be supplied via the C<name> key in the property list.
 
-This returns or sets the value of the current node.
-
-For document, element or collection, this returns C<undef> and for attribute, text or comment, this returns the objct value.
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue>
+Returns the new object on success, or sets an error and returns C<undef> on failure.
 
 =head1 METHODS
 
 =head2 element
 
-Returns the L<HTML::Object::Element> object to which this attribute belongs.
+    my $element = $attr->element;
+    $attr->element( $element );
 
-=head2 getAttributes
-
-Returns an L<array object|Module::Generic::Array> of the related element's attributes as L<HTML::Object::Attribute> objects.
-
-=head2 getLocalName
-
-Returns the attribute name.
-
-=head2 getName
-
-Returns the attribute name.
-
-=head2 getNextSibling
-
-Returns the next attribute object, or C<undef>.
-
-=head2 getParentNode
-
-Returns the parent L<HTML::Object::Element> object.
-
-=head2 getPreviousSibling
-
-Returns the previous attribute object, or C<undef>.
-
-=head2 getValue
-
-Returns the attribute value.
-
-=head2 isAttributeNode
-
-Always returns true.
-
-=head2 is_inside
-
-Provided with an L<HTML::Object::Element> and this will return true if this attribute is inside it, or false otherwise.
-
-=head2 lineage
-
-Add the parent element to our lineage. See L<HTML::Object::Element/lineage>
-
-=head2 localName
-
-Read-only.
-
-A string representing the local part of the qualified name of the attribute.
-
-This is the same as L</getName>, because this interface does not use xml C<prefix>
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Attr/localName>
+Gets or sets the L<HTML::Object::Element> object to which this attribute belongs. Accepts an C<HTML::Object::Element> instance or C<undef> to clear the association.
 
 =head2 name
 
-Set or get the attribute name.
+    my $name = $attr->name;
+    $attr->name( 'class' );
+
+Gets or sets the attribute name. Returns a L<scalar object|Module::Generic::Scalar>.
 
 Normally, under JavaScript, this is read-only, but under perl you can change it. Still be careful.
 
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Attr/name>
-
-=head2 namespaceURI
-
-Read-only
-
-A string representing the URI of the namespace of the attribute, or C<undef> if there is no namespace.
-
-This actually always return C<undef>, because this interface does not use xml C<prefix>
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Attr/namespaceURI>
-
-=head2 nodeValue
-
-This returns or sets the value of the current element.
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue>
-
-=head2 ownerElement
-
-Returns the L<element object|HTML::Object::Element> to which this attribute object belongs.
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Attr/ownerElement>
-
-=head2 prefix
-
-Read-only.
-
-This always return C<undef>, because this interface does not use xml C<prefix>
-
-Normally, under JavaScript, this would return a string representing the namespace prefix of the attribute, or c<undef> if a namespace without prefix or no namespace are specified.
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Attr/prefix>
+See also L<https://developer.mozilla.org/en-US/docs/Web/API/Attr/name>
 
 =head2 rank
 
-Set or get the attribute rank. This returns a L<number object|Module::Generic::Number>
+    my $rank = $attr->rank;
+    $attr->rank(3);
 
-=head2 string_value
-
-This is an alias for L</value>
-
-=head2 to_boolean
-
-Returns the attribute value as a L<boolean|Module::Generic::Boolean>
-
-=head2 to_literal
-
-Returns the attribute value as a L<litteral|HTML::Object::Litteral>
-
-=head2 to_number
-
-Returns the attribute value as a L<number|Module::Generic::Number>
-
-=head2 toString
-
-Returns a stringification of this attribute such as C<attribute="value">
+Gets or sets the position (rank) of this attribute within its parent element's attribute list. Returns a L<number object|Module::Generic::Number>.
 
 =head2 value
 
-Set or get the value of this attribute as a L<scalar object|Module::Generic::Scalar>. For example:
+    my $val = $attr->value;
+    $attr->value( 'hello' );
 
-    $attr->value( "hello" );
+Gets or sets the attribute value. Leading and trailing horizontal whitespace is stripped automatically when a value is set. Returns a L<scalar object|Module::Generic::Scalar>.
 
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Attr/value>
+See also L<https://developer.mozilla.org/en-US/docs/Web/API/Attr/value>
 
 =head1 AUTHOR
 
@@ -251,19 +168,21 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<HTML::Object>, L<HTML::Object::Attribute>, L<HTML::Object::Boolean>, L<HTML::Object::Closing>, L<HTML::Object::Collection>, L<HTML::Object::Comment>, L<HTML::Object::Declaration>, L<HTML::Object::Document>, L<HTML::Object::Element>, L<HTML::Object::Exception>, L<HTML::Object::Literal>, L<HTML::Object::Number>, L<HTML::Object::Root>, L<HTML::Object::Space>, L<HTML::Object::Text>, L<HTML::Object::XQuery>
+L<HTML::Object::DOM::Attribute>, the DOM subclass that adds node traversal, XPath coercion, C<toString>, C<nodeValue>, and the full attribute node interface.
+
+L<HTML::Object>, L<HTML::Object::Boolean>, L<HTML::Object::Closing>, L<HTML::Object::Collection>, L<HTML::Object::Comment>, L<HTML::Object::Declaration>, L<HTML::Object::Document>, L<HTML::Object::Element>, L<HTML::Object::Exception>, L<HTML::Object::Literal>, L<HTML::Object::Number>, L<HTML::Object::Root>, L<HTML::Object::Space>, L<HTML::Object::Text>, L<HTML::Object::XQuery>
 
 L<https://developer.mozilla.org/en-US/docs/Web/API/Attr>
 
-L<Mozilla reference|https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes>
+L<Mozilla HTML attributes reference|https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes>
 
-L<W3C standard on attributes|https://html.spec.whatwg.org/multipage/syntax.html#attributes-2>
+L<W3C attributes specification|https://html.spec.whatwg.org/multipage/syntax.html#attributes-2>
 
 =head1 COPYRIGHT & LICENSE
 
 Copyright (c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

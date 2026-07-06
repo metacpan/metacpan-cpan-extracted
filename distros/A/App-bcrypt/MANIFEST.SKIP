@@ -93,3 +93,5 @@ nytprof
 \A\.github\b
 \.gitattributes\b
 App-bcrypt-.*
+
+.downstream.json

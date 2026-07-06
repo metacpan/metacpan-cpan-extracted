@@ -50,6 +50,13 @@ my %_metadata_types = (
     displaycolour       => 'Data::Identifier',
 );
 
+my %_glyph_metadata_types = (
+    resync              => 'bool',
+    nomod               => 'bool',
+    preskip             => 'uint',
+    postskip            => 'uint',
+);
+
 my %_metadata_constrains = (
     (
         # base values:
@@ -74,6 +81,17 @@ my %_metadata_constrains = (
     ],
     version_major => [['<', 256]],
     version_minor => [['<',  64]],
+);
+
+my %_glyph_metadata_constrains = (
+    preskip => [
+        ['<', 4],
+        ['<', ':width'],
+    ],
+    postskip => [
+        ['<', 15],
+        ['<', ':width'],
+    ],
 );
 
 my %_char_lists = (
@@ -253,19 +271,30 @@ my %_drawing_single = (
     tblr    => 0x253C,
 );
 
-our $VERSION = v0.07;
+my %_ttf_encodings = (
+    1 => {
+        0 => 'MACINTOSH',
+    },
+    3 => {
+        0 => 'UCS-2', # Symbol !?!?
+        1 => 'UCS-2',
+    },
+);
+
+our $VERSION = v0.08;
 
 
 
 sub new {
     my ($pkg, @args) = @_;
     my $self = bless {
-        width   => undef,
-        height  => undef,
-        bits    => undef,
-        glyphs  => [],
-        chars   => {},
-        util    => Data::Identifier::Util->new,
+        width       => undef,
+        height      => undef,
+        bits        => undef,
+        glyphs      => [],
+        glyph_attr  => [],
+        chars       => {},
+        util        => Data::Identifier::Util->new,
     }, $pkg;
 
     croak 'Stray options passed' if scalar @args;
@@ -278,9 +307,18 @@ sub gc {
     my ($self) = @_;
     my $chars = $self->{chars};
     my $glyphs = $self->{glyphs};
+    my $glyph_attr = $self->{glyph_attr};
     my $new = 0;
     my %updates;
     my %dedup;
+    my %attr;
+
+    for (my $glyph = 0; $glyph < scalar(@{$glyphs}); $glyph++) {
+        if (defined $glyph_attr->[$glyph]) {
+            my $attr = $attr{$glyphs->[$glyph]} //= {};
+            %{$attr} = (%{$attr}, %{$glyph_attr->[$glyph]});
+        }
+    }
 
     foreach my $glyph (values %{$chars}) {
         $updates{$glyph} //= $dedup{$glyphs->[$glyph]};
@@ -298,29 +336,46 @@ sub gc {
             push(@n, $glyphs->[$glyph]);
         }
 
-        $self->{glyphs} = \@n;
+        $glyphs = $self->{glyphs} = \@n;
     }
 
     foreach my $char (keys %{$chars}) {
         $chars->{$char} = $updates{$chars->{$char}};
     }
 
+    @{$glyph_attr} = ();
+    for (my $glyph = 0; $glyph < scalar(@{$glyphs}); $glyph++) {
+        $glyph_attr->[$glyph] = $attr{$glyphs->[$glyph]} // next;
+    }
+
     return $self;
 }
 
 sub _check_constrains {
-    my ($self) = @_;
+    my ($self, $glyph) = @_;
+    my $constrains;
+    my $source;
 
-    foreach my $key (keys %_metadata_constrains) {
-        my $v = $self->{$key} // next;
-        foreach my $constraint (@{$_metadata_constrains{$key}}) {
+    if (defined $glyph) {
+        $constrains = \%_glyph_metadata_constrains;
+        $source = $self->{glyph_attr}[$glyph];
+    } else {
+        $constrains = \%_metadata_constrains;
+        $source = $self;
+    }
+
+    foreach my $key (keys %{$constrains}) {
+        my $v = $source->{$key} // next;
+        foreach my $constraint (@{$constrains->{$key}}) {
             my ($cmp, $ref) = @{$constraint};
             my $res;
 
             if ($ref =~ /^[0-9]+\z/) {
                 $ref = int($ref);
+            } elsif ($ref =~ /^:(.+)\z/) {
+                $ref = $self->{$1} // next;
             } else {
-                $ref = $self->{$ref} // next;
+                $ref = $source->{$ref} // next;
             }
 
             if ($cmp eq '<') {
@@ -345,9 +400,22 @@ sub _check_constrains {
 }
 
 sub _set_value {
-    my ($self, $key, $value) = @_;
-    my $type = $_metadata_types{$key // croak 'No key given'};
-    my $old = $self->{$key};
+    my ($self, $key, $value, $glyph) = @_;
+    my $type;
+    my $old;
+
+    if (defined $glyph) {
+        $type = $_glyph_metadata_types{$key // croak 'No key given'};
+        $old = $self->{glyph_attr}[$glyph]{$key};
+    } else {
+        $type = $_metadata_types{$key // croak 'No key given'};
+        $old = $self->{$key};
+    }
+
+    if ($key =~ s/:rgb\z//) {
+        require Data::Identifier::Generate;
+        $value = Data::Identifier::Generate->colour($value);
+    }
 
     croak 'Not a valid key: '.$key unless defined $type;
     croak 'No value given' unless defined $value;
@@ -377,9 +445,17 @@ sub _set_value {
         croak 'BUG';
     }
 
-    $self->{$key} = $value;
-    unless (eval {$self->_check_constrains}) {
-        $self->{$key} = $old;
+    if (defined $glyph) {
+        $self->{glyph_attr}[$glyph]{$key} = $value;
+    } else {
+        $self->{$key} = $value;
+    }
+    unless (eval {$self->_check_constrains($glyph)}) {
+        if (defined $glyph) {
+            $self->{glyph_attr}[$glyph]{$key} = $old;
+        } else {
+            $self->{$key} = $old;
+        }
         die $@;
     }
 }
@@ -437,11 +513,6 @@ sub set_attribute {
     my ($self, $key, $value, @opts) = @_;
 
     croak 'Stray options passed' if scalar @opts;
-
-    if ($key =~ s/:rgb\z//) {
-        require Data::Identifier::Generate;
-        $value = Data::Identifier::Generate->colour($value);
-    }
 
     $self->_set_value($key, $value);
 }
@@ -609,6 +680,29 @@ sub add_default_aliases {
     return $self;
 }
 
+
+sub get_glyph_attribute {
+    my ($self, $glyph, $key, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    croak 'No glyph given' unless defined $glyph;
+    croak 'Invalid glyph given' if $glyph < 0 || $glyph >= scalar(@{$self->{glyphs}});
+    croak 'No key given' unless defined $key;
+    croak 'No such key' unless defined $_glyph_metadata_types{$key};
+    croak 'No such glyph' unless exists $self->{glyph_attr}[$glyph];
+
+    return $self->{glyph_attr}[$glyph]{$key} // croak 'No value set';
+}
+
+
+sub set_glyph_attribute {
+    my ($self, $glyph, $key, $value, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $self->_set_value($key, $value, $glyph);
+}
 
 sub read {
     my ($self, $in) = @_;
@@ -897,11 +991,65 @@ sub import_attributes {
 }
 
 
+sub import_font {
+    my ($self, $type, $in, %opts) = @_;
+
+    croak 'No type given' unless defined $type;
+    croak 'No input given' unless defined $in;
+
+    if ($type eq 'auto' && !ref($in)) {
+        if ($in =~ m#\.(sf|psf|hex|ttf)((?:\.gz)?)\z#) {
+            $type = $1;
+        } elsif ($in =~ m#[/\\][Uu]\+([0-9a-fA-F]{4,6})\.[^\.]+\z#) {
+            $opts{codepoint} = hex $1;
+            $type = 'glyph';
+        }
+    }
+
+    $type = 'sf' if $type eq 'auto';
+
+    if ($type eq 'psf') {
+        return $self->import_psf($in, %opts);
+    } elsif ($type eq 'hex') {
+        return $self->import_hex($in, %opts);
+    } elsif ($type eq 'sf') {
+        croak 'Stray options passed' if scalar keys %opts;
+
+        if (!ref $in) {
+            my $gz = $in =~ /\.gz\z/;
+            my $fh;
+
+            open($fh, '<', $in) or croak $!;
+            $fh->binmode;
+            $fh->binmode('gzip') if $gz;
+            $in = $fh;
+        }
+
+        return $self->read($in);
+    } elsif ($type eq 'glyph') {
+        my $codepoint = delete($opts{codepoint}) // croak 'No codepoint given';
+        my $glyph;
+
+        croak 'Stray options passed' if scalar keys %opts;
+
+        $glyph = $self->import_glyph($in);
+        $self->glyph_for($codepoint => $glyph);
+    } elsif ($type eq 'ttf') {
+        return $self->_import_ttf($in, %opts);
+    } else {
+        croak 'Unknown type given: '.$type;
+    }
+}
+
+
+#@deprecated
 sub import_psf {
     my ($self, $in, %opts) = @_;
     my $first = scalar(@{$self->{glyphs}});
     my $chars = $self->{chars};
     my $data;
+
+    croak 'Stray options passed' if scalar keys %opts;
 
     if (!ref $in) {
         my $gz = $in =~ /\.gz$/;
@@ -974,14 +1122,12 @@ sub import_psf {
         }
 
         if ($flags) {
-            require Encode;
-            state $UTF_8 = Encode::find_encoding('UTF-8');
             my $cc = 0;
             local $/ = chr(0xFF);
 
             while (defined(my $entry = <$in>)) {
                 substr($entry, -1, 1, '');
-                $chars->{ord($_)} = $first + $cc for split //, $UTF_8->decode($entry);
+                $chars->{ord($_)} = $first + $cc for split //, UTF_8->decode($entry);
                 $cc++;
             }
         } else {
@@ -997,6 +1143,7 @@ sub import_psf {
 }
 
 
+#@deprecated
 sub import_hex {
     my ($self, $in, %opts) = @_;
     my $cur = scalar(@{$self->{glyphs}});
@@ -1044,6 +1191,102 @@ sub import_hex {
         push(@{$self->{glyphs}}, ~. $pixel);
         $chars->{$cp} = $cur++;
     }
+}
+
+sub _import_ttf {
+    require Font::FreeType;
+    Font::FreeType->import(qw(FT_RENDER_MODE_MONO));
+    require Image::Magick;
+
+    my ($self, $in, %opts) = @_;
+    my $face = Font::FreeType->new->face($in);
+    my $height = $self->height;
+    my $width = $self->width;
+    my $baseline = $self->{baseline};
+    my %flat_namedinfos;
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    $face->set_char_size($width, $height, 120, 72);
+
+    $baseline //= int($height*$face->ascender/$face->height); # no better idea...
+
+    {
+        my $info = $face->namedinfos;
+        foreach my $info (@{$info//[]}) {
+            my $name_id = $info->name_id;
+            my $platform_id = $info->platform_id;
+            my $language_id = $info->language_id;
+
+            if (($platform_id == 1 && $language_id == 0) || ($platform_id == 3 && $language_id == 0x0409)) {
+                my $encoding = $_ttf_encodings{$info->platform_id}{$info->encoding_id} // next;
+                my $value = Encode::decode($encoding, $info->string);
+                $flat_namedinfos{$name_id} //= $value;
+                $flat_namedinfos{$name_id} = [] if $flat_namedinfos{$name_id} ne $value;
+            }
+        }
+    }
+
+    $self->_set_value(baseline => $baseline);
+    $self->_set_value(slant => $face->is_italic ? 'italic' : 'roman');
+    $self->_set_value(weight => $face->is_bold ? 'bold' : 'normal');
+    $self->_set_value(reverse_slant => 0);
+    $self->_set_value(font_name => $face->family_name);
+
+    if (defined($flat_namedinfos{5}) && !ref($flat_namedinfos{5})) {
+        my $v = $flat_namedinfos{5};
+        my ($version_major, $version_minor);
+
+        if ($v =~ /^(?:MS core font:\s*)?[Vv]([0-9]+)\.([0-9]+)\s*\z/) {
+            ($version_major, $version_minor) = (int($1), int($2));
+        } elsif ($v =~ /^Version\s+([0-9]+)\.([0-9]+)(?:\s*;\s*[12][0-9]{3}-[01][0-9]-[0-3][0-9])?\s*\z/) {
+            ($version_major, $version_minor) = (int($1), int($2));
+        }
+
+        if (defined $version_major) {
+            $version_major =   0 if $version_major <   0;
+            $version_major = 255 if $version_major > 255;
+            $self->_set_value(version_major => $version_major);
+        }
+        if (defined $version_minor) {
+            $version_minor =   0 if $version_minor <   0;
+            $version_minor = 255 if $version_minor > 255;
+            $self->_set_value(version_minor => $version_minor);
+        }
+        #warn sprintf('version: %s.%s', $version_major // '<undef>', $version_minor // '<undef>');
+    }
+
+    $face->foreach_char(sub {
+            my $glyph = $_;
+            my $code_point = $glyph->char_code;
+            my ($bitmap, $left, $top) = $glyph->bitmap_magick(__PACKAGE__->FT_RENDER_MODE_MONO);
+            my $p; # = Image::Magick->new;
+            my $dy = $baseline - $top;
+            my $error = 0;
+            my $ok;
+
+            $dy = 0 if $dy < 0;
+
+            while ($error < 1) {
+                $p = Image::Magick->new;
+                $p->Set(size => sprintf('%ux%u', $width, $height));
+                $p->Read('canvas:black');
+                unless ($p->CopyPixels(image => $bitmap, x => 0, y => 0, dx => ($left > 0 ? $left : 0), dy => $dy)) {
+                    $ok = 1;
+                    last;
+                }
+                $error++;
+                #warn sprintf('error: %u, codepoint: U+%04X', $error, $code_point);
+                $left = 0;
+                $dy = 0;
+            }
+
+            return unless $ok;
+
+            $p->NegateImage;
+
+            $self->glyph_for($code_point => $self->_import_glyph_wbmp($p->ImageToBlob(magick => 'wbmp')));
+        });
 }
 
 
@@ -1124,6 +1367,49 @@ sub export_alias_map {
 
     foreach my $chars (grep {scalar(@{$_}) > 1} values %glyph_map) {
         $out->say(map {sprintf('U+%04X', $_)} sort {$a <=> $b} @{$chars});
+    }
+}
+
+
+sub export_font {
+    my ($self, $type, $out, %opts) = @_;
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    if (!ref $out) {
+        my $gz = $out =~ /\.gz\z/;
+        my $fh;
+
+        open($fh, '>', $out) or croak $!;
+        $fh->binmode;
+        $fh->binmode('gzip') if $gz;
+        $out = $fh;
+    }
+
+    if ($type eq 'sf') {
+        return $self->write($out);
+    } elsif ($type eq 'hex') {
+        return $self->_export_hex($out);
+    } else {
+        croak 'Unknown type given: '.$type;
+    }
+}
+
+sub _export_hex {
+    my ($self, $out) = @_;
+    my $width = $self->width;
+    my $chars = $self->{chars};
+    my $glyphs = $self->{glyphs};
+
+    $self->bits(1);
+    $self->height(16);
+
+    if ($width & 0x7) {
+        croak 'Unsupported font width for hex format: '.$width;
+    }
+
+    foreach my $codepoint (sort {$a <=> $b} keys %{$chars}) {
+        $out->printf("%04X:%s\n", $codepoint, uc unpack('H*', ~. $glyphs->[$chars->{$codepoint}]));
     }
 }
 
@@ -1376,8 +1662,54 @@ sub analyse {
         #warn sprintf('hmiddleline: %u, matches: %u', $hmiddleline, $hmatches);
     }
 
-    #use Data::Dumper;
-    #warn Dumper([map {sprintf('0x%02x', $_)} $self->_analyse_read_char(ord('A'))]);
+    foreach my $cp (sort {$a <=> $b} keys %{$self->{chars}}) {
+        my $attr = $self->{glyph_attr}[$self->{chars}{$cp}] // {};
+
+        $attr->{resync} //= 1 if $cp >= 0x2500 && $cp <= 0x257F;
+
+        if ($cp > 0x0020 && $cp < 0x007F && !$attr->{resync}) { # TODO: Improve check
+            my @lines = $self->_analyse_read_char($cp);
+            my $v = $lines[0];
+
+            $v &= $_ foreach @lines;
+
+            if (!defined($attr->{preskip})) {
+                my $x = $v << (24 - $w);
+                my $preskip = 0;
+
+                for (; $preskip < 3; $preskip++, $x <<= 1) {
+                    last if ($x & 0xC00000) != 0xC00000;
+                }
+
+                $attr->{preskip} = $preskip;
+                #warn sprintf('U+%04X %02x -> preskip=%u', $cp, $v, $preskip);
+            }
+
+            if (!defined($attr->{postskip})) {
+                my $x = $w & 7 ? $v >> (8 - ($w & 7)) : $v;
+                my $k = $x;
+                my $postskip = 0;
+
+                for (; $postskip < 15; $postskip++, $x >>= 1) {
+                    last if ($x & 0x03) != 0x03;
+                }
+
+                $postskip = 15 if $postskip > 15;
+                $attr->{postskip} = $postskip;
+                #warn sprintf('U+%04X %02x -> postskip=%u', $cp, $k, $postskip);
+            }
+
+            #warn sprintf('U+%04X %02x', $cp, $v);
+        }
+
+        if ($cp == 0x0020 && !defined($attr->{postskip})) {
+            my $postskip = int($w / 4);
+            $postskip = 15 if $postskip > 15;
+            $attr->{postskip} = $postskip;
+        }
+
+        $self->{glyph_attr}[$self->{chars}{$cp}] = $attr if scalar keys %{$attr};
+    }
 }
 
 sub _analyse_read_char {
@@ -1405,33 +1737,22 @@ sub _analyse_read_char {
 }
 
 
+#@returns SIRTX::Font::Renderer
+sub renderer {
+    my ($self, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    require SIRTX::Font::Renderer;
+
+    return SIRTX::Font::Renderer->new(font => $self);
+}
+
+
+#@deprecated
 sub render {
-    require List::Util;
-    require Image::Magick;
-
-    my ($self, $string) = @_;
-    my @lines = split(/\r?\n/, $string);
-    my $max_line = List::Util::max(map {length} @lines);
-    my $width = $self->width;
-    my $height = $self->height;
-    my $p = Image::Magick->new;
-    my %handle_cache;
-
-    $p->Set(size => sprintf('%ux%u', $max_line * $width, scalar(@lines) * $height));
-    $p->Read('canvas:white');
-
-    for (my $row = 0; $row < scalar(@lines); $row++) {
-        my $line = $lines[$row];
-        my $len  = length($line);
-
-        for (my $column = 0; $column < $len; $column++) {
-            my $c = substr($line, $column, 1);
-            my $handle = $handle_cache{ord $c} //= $self->export_glyph_as_image_magick($self->glyph_for(ord $c));
-            $p->CopyPixels(image => $handle, width => $width, height => $height, x => 0, y => 0, dx => $column * $width, dy => $row * $height);
-        }
-    }
-
-    return $p;
+    my ($self, @args) = @_;
+    return $self->renderer->render(@args);
 }
 
 # TODO: This is not yet part of public API. make it public. reconsider how it should work before doing so.
@@ -1468,9 +1789,9 @@ sub _render_font_flags {
 
     if ($weight eq 'normal') {
         $res |= 3;
-    } elsif ($slant eq 'bold') {
+    } elsif ($weight eq 'bold') {
         $res |= 1;
-    } elsif ($slant eq 'thin') {
+    } elsif ($weight eq 'thin') {
         $res |= 2;
     } else {
         $res |= 0;
@@ -1654,7 +1975,7 @@ SIRTX::Font - module for working with SIRTX font files
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -1865,12 +2186,18 @@ Creates a new font object. No parameters are supported.
 
     $font->gc;
 
-(experimental, since v0.01)
+(experimental since v0.01)
 
 Takes the trash out. This will remove unused glyphs and deduplicate glyphs that are still in use.
 
 B<Note:>
 After a call to this all glyph numbers become invalid.
+
+B<Note:>
+This function tries to merge glyph attributes. However it may not do this correctly.
+Problems can be avoided by calling this method before adding glyph attributes.
+For example by adding all glyphs, then calling this method, and then adding all glyph attributes.
+It is also safe when attributes of merged glyphs are equal.
 
 =head2 width
 
@@ -1900,7 +2227,7 @@ Sets or gets the bits per pixel of character cells.
 
     my @attributes = $font->list_attributes;
 
-(experimental, since v0.06)
+(experimental since v0.06)
 
 Lists known attribute keys.
 The returned list may depend on the currently loaded font.
@@ -1914,7 +2241,7 @@ This method will most likely be removed soon.
 
     my $value = $font->get_attribute($key);
 
-(experimental, since v0.06)
+(experimental since v0.06)
 
 Returns an attribute value or dies if it is unset.
 
@@ -1922,7 +2249,7 @@ Returns an attribute value or dies if it is unset.
 
     $font->set_attribute($key => $value);
 
-(experimental, since v0.06)
+(experimental since v0.06)
 
 Sets an attribute. Will die if the value does not validate.
 
@@ -1960,6 +2287,8 @@ Returns a true value if the code point is knowm, otherwise return a false value.
 
 Removes a code point from the font.
 This will not remove the glyph.
+To remove the glyph call L</gc> after this call.
+Note that it will be faster to first remove all code points and then perform a single call to L</gc> if you want to remove multiple codepoints.
 
 If the code point is not known this method will do nothing.
 
@@ -1996,7 +2325,7 @@ Removes all code points from the current font that are not in the given lists.
 This can be used to strip a larger font to a subset efficiently.
 
 B<Note:>
-This will only remove the code points, not the glyphs as per L</remove_codepoint>.
+This will only remove the code points, not the glyphs as per L</remove_codepoint>. See there for details on how to also remove the glyphs.
 
 =head2 glyph_for
 
@@ -2033,7 +2362,7 @@ Aliases the glyph for code point C<$from> to the same as code point C<$to> if C<
     # or:
     $font->add_default_aliases($level);
 
-(experimental, since v0.02)
+(experimental since v0.02)
 
 Adds aliases as per L</default_alias_glyph> for known homoglyphs.
 
@@ -2063,6 +2392,28 @@ This operation cannot easly be undone.
 B<Note:>
 The levels are not yet stable in this version. Future versions might use different sets of code points aliases.
 
+=head2 get_glyph_attribute
+
+    my $value = $font->get_glyph_attribute($glyph, $key);
+
+(experimental since v0.08)
+
+Returns an attribute value for a glyph or dies if it is unset.
+
+=head2 set_glyph_attribute
+
+    $font->set_glyph_attribute($glyph, $key => $value);
+
+(experimental since v0.08)
+
+Sets an attribute of a glyph. Will die if the value does not validate.
+
+See also notes about glyphs and garbage collection in L</gc>.
+
+B<Note:>
+As of v0.08 glyph attributes cannot be stored to any font file.
+Future versions of this module will allow this.
+
 =head2 read
 
     $font->read($handle);
@@ -2090,7 +2441,7 @@ See also L<Image::Magick>.
 
     $font->import_alias_map($filename);
 
-(experimental, since v0.04)
+(experimental since v0.04)
 
 Imports an alias map from the given file.
 
@@ -2109,7 +2460,7 @@ This method will ignore if a mapped glyph does not exists alike L</default_glyph
 
     $font->import_attributes($filename);
 
-(experimental, since v0.07)
+(experimental since v0.07)
 
 Imports an font attributes from the given file.
 
@@ -2117,11 +2468,60 @@ The format consist of simple key-value-pairs separated by a single C<=>, optiona
 
 Possible keys and values are the same as for L</set_attribute>.
 
+=head2 import_font
+
+    $font->import_font($type => $filename [, %opts] );
+
+(since v0.08)
+
+This allows to import fonts in different formats.
+
+Currently no options are supported.
+
+The following types are currently supported:
+
+=over
+
+=item C<auto>
+
+(experimental since v0.08)
+
+This tries to auto-detect the type of the font.
+The autodetection logic is still very unreliable as of v0.08.
+So it is best to avoid this feature when the type is actually known.
+
+=item C<hex>
+
+Imports Roman's .hex format. This supports both 8 and 16 pixel width glyphs.
+If the font is set to pixel width 8 pixel glyphs are extended with space to match 16 pixel.
+
+B<Note:>
+The font must be set to 8 or 16 pixel width before this function is called.
+See L</width> for details.
+
+=item C<psf>
+
+Imports a PC Screen Font (PSF) file into the font.
+
+Supports PSF1, and PSF2 files at this point.
+
+B<Note:>
+Files without a Unicode table might import incorrectly.
+
+=item C<sf>
+
+Imports a SIRTX Font. This is doing the same as L</read> (but accepts a filename).
+
+=back
+
 =head2 import_psf
 
     $font->import_psf($filename);
 
-(experimental since v0.06)
+(experimental since v0.06, deprecated since v0.08, will be removed in v0.10, may warn)
+
+B<Note:>
+This method is deprecated and will be removed soon. Please update all usage to L</import_font>.
 
 Imports a PC Screen Font (PSF) file into the font.
 
@@ -2133,7 +2533,10 @@ Note that files without a Unicode table might import incorrectly.
 
     $font->import_hex($filename);
 
-(since v0.07)
+(since v0.07, deprecated since v0.08, will be removed in v0.10, may warn)
+
+B<Note:>
+This method is deprecated and will be removed soon. Please update all usage to L</import_font>.
 
 Imports Roman's .hex format. This supports both 8 and 16 pixel width glyphs.
 If the font is set to pixel width 8 pixel glyphs are extended with space to match 16 pixel.
@@ -2146,7 +2549,7 @@ See L</width> for details.
 
     $font->import_directory($filename [, %opts ]);
 
-(experimental, since v0.02)
+(experimental since v0.02)
 
 Imports a directory into the font.
 The directory contains of files with a name of the code point plus the extention png or wbmp (e.g. C<U+1F981.png>).
@@ -2167,7 +2570,7 @@ In order to deduplicate entries a call to L</gc> might be considered.
 
     my Image::Magick $image = $font->export_glyph_as_image_magick($glyph);
 
-(experimental, since v0.01)
+(experimental since v0.01)
 
 Exports a single glyph as a image object.
 
@@ -2175,7 +2578,7 @@ Exports a single glyph as a image object.
 
     $font->export_alias_map($filename);
 
-(experimental, since v0.04)
+(experimental since v0.04)
 
 Exports the map of all aliases found in the font.
 This is the inverse of L</import_alias_map>.
@@ -2185,6 +2588,30 @@ This method cannot know which code points are aliases one way and which are alia
 This information is not included in the binary format.
 Therefore this method exports all aliases as both way aliases.
 This is the same behaviour as known from hardlinks.
+
+=head2 export_font
+
+    $font->export_font($type => $filename [, %opts] );
+
+(since v0.08)
+
+This allows to export fonts in different formats.
+
+Currently no options are supported.
+
+The following types are currently supported:
+
+=over
+
+=item C<hex>
+
+Exports Roman's .hex format. This supports both 8 and 16 pixel width glyphs.
+
+=item C<sf>
+
+Exports a SIRTX Font. This is doing the same as L</write> (but accepts a filename).
+
+=back
 
 =head2 make_up_glyphs
 
@@ -2211,13 +2638,21 @@ Code points are added as per L</default_glyph_for>.
 
     $font->analyse;
 
-(experimental, since v0.06)
+(experimental since v0.06)
 
 Analyses the font to find additional attributes automatically.
 
 This can be useful specifically when importing pre-existing fonts.
 
 However the result should be manually checked as the values might not reflect reality.
+
+=head2 renderer
+
+    my SIRTX::Font::Renderer $renderer = $font->renderer;
+
+(since v0.08)
+
+Returns a new renderer object which can be used to render text using this font.
 
 =head2 render
 
@@ -2227,7 +2662,12 @@ However the result should be manually checked as the values might not reflect re
     $image->Transparent(color => 'white'); # transparent background
     $image->Write('hello.png');
 
-(experimental, since v0.03)
+(experimental since v0.03, deprecated since v0.08, will be removed in v0.10, may warn)
+
+B<Note:>
+This method is now deprecated.
+Please use L<SIRTX::Font::Renderer>.
+See also L</renderer>.
 
 Renders a text using the loaded font.
 

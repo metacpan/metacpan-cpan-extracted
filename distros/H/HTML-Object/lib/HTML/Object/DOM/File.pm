@@ -1,11 +1,11 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/File.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/25
-## Modified 2022/09/18
-## All rights reserved
+## Modified 2026/07/04
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,9 +19,9 @@ BEGIN
     warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic::File );
     use vars qw( $VERSION );
-    use DateTime::Format::Strptime;
+    use DateTime::Format::Lite;
     use Module::Generic::Scalar;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -37,8 +37,8 @@ sub arrayBuffer
 sub lastModified
 {
     my $self = shift( @_ );
-    my $dt = $self->mtime;
-    my $fmt = DateTime::Format::Strptime->new( pattern => '%s' );
+    my $dt   = $self->mtime;
+    my $fmt  = DateTime::Format::Lite->new( pattern => '%s' );
     $dt->set_formatter( $fmt );
     return( $dt );
 }
@@ -110,11 +110,11 @@ HTML::Object::DOM::File - HTML Object DOM File Class
 
     use HTML::Object::DOM::File;
     my $file = HTML::Object::DOM::File->new || 
-        die( HTML::Object::DOM::File->error, "\n" );
+        die( HTML::Object::DOM::File->error );
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -130,7 +130,7 @@ It inherits from L<Module::Generic::File>
 
 Read-only.
 
-Returns the last modified time of the file, in second since the UNIX epoch (January 1st, 1970 at Midnight), as a L<Module::Generic::DateTime> object. The DateTime object stringifies to the seconds since epoch.
+Returns the last modified time of the file, in second since the UNIX epoch (January 1st, 1970 at Midnight), as a L<Module::Generic::DateTime> object. The DateTime::Lite object stringifies to the seconds since epoch.
 
 See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/File/lastModified>
 
@@ -224,7 +224,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/File>
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

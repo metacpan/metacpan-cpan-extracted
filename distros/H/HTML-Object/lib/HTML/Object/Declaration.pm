@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/19
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -80,7 +80,7 @@ HTML::Object::Declaration - HTML Object
 =head1 SYNOPSIS
 
     use HTML::Object::Declaration;
-    my $this = HTML::Object::Declaration->new || die( HTML::Object::Declaration->error, "\n" );
+    my $this = HTML::Object::Declaration->new || die( HTML::Object::Declaration->error );
 
 =head1 VERSION
 
@@ -186,7 +186,7 @@ L<HTML::Object>, L<HTML::Object::Attribute>, L<HTML::Object::Boolean>, L<HTML::O
 
 Copyright (c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Dumper 2.163;
+package Config::Model::Dumper 2.164;
 
 use Carp;
 use strict;
@@ -94,6 +94,7 @@ sub dump_tree ($self, %args) {
         # get value or only customized value
         my $value = quote( $value_obj->fetch( mode => $fetch_mode, check => $check ) );
         $index = id_quote($index);
+        $element = id_quote($element);
 
         my $pad = $compute_pad->($node);
 
@@ -117,6 +118,7 @@ sub dump_tree ($self, %args) {
         # get value or only customized value
         my $value = $value_obj->fetch( mode => $fetch_mode, check => $check );
         my $qvalue = quote($value);
+        $element = id_quote($element);
         $index = id_quote($index);
         my $pad = $compute_pad->($node);
 
@@ -136,10 +138,11 @@ sub dump_tree ($self, %args) {
     my $list_element_cb = sub ($scanner, $data_r, $node, $element, @keys) {
         my $pad      = $compute_pad->($node);
         my $list_obj = $node->fetch_element($element);
+        my $q_element = id_quote($element);
 
         # add annotation for list element
         my $list_note = note_quote( $list_obj->annotation );
-        $$data_r .= "\n$pad$element#$list_note" if $list_note;
+        $$data_r .= "\n$pad$q_element#$list_note" if $list_note;
 
         if ( $list_obj->cargo_type =~ 'node' ) {
             foreach my $k (@keys) {
@@ -150,7 +153,7 @@ sub dump_tree ($self, %args) {
             # write value comments
             foreach my $idx ( $list_obj->fetch_all_indexes ) {
                 my $note = $list_obj->fetch_with_id($idx)->annotation;
-                $$data_r .= "\n$pad$element:$idx#" . note_quote($note) if $note;
+                $$data_r .= "\n$pad$q_element:$idx#" . note_quote($note) if $note;
             }
 
             # skip undef values
@@ -158,7 +161,7 @@ sub dump_tree ($self, %args) {
                 grep { defined $_ }
                     $list_obj->fetch_all_values(mode  => $fetch_mode, check => $check)
                 );
-            $$data_r .= "\n$pad$element:=" . join( ',', @val ) if @val;
+            $$data_r .= "\n$pad$q_element:=" . join( ',', @val ) if @val;
         }
         return;
     };
@@ -166,10 +169,11 @@ sub dump_tree ($self, %args) {
     my $hash_element_cb = sub ($scanner, $data_r, $node, $element, @keys) {
         my $pad      = $compute_pad->($node);
         my $hash_obj = $node->fetch_element($element);
+        my $q_element = id_quote($element);
 
         # add annotation for list or hash element
         my $note = note_quote( $hash_obj->annotation );
-        $$data_r .= "\n$pad$element#$note" if $note;
+        $$data_r .= "\n$pad$q_element#$note" if $note;
 
         # resume exploration
         map { $scanner->scan_hash( $data_r, $node, $element, $_ ); } @keys;
@@ -190,7 +194,8 @@ sub dump_tree ($self, %args) {
         # ie foo#comment foo:bar#comment foo:bar=val#comment are fine
         # but foo#comment:bar if not valid -> foo#commaent foo:bar
 
-        my $head      = "\n$pad$element";
+        my $q_element = id_quote($element);
+        my $head      = "\n$pad$q_element";
         my $node_note = note_quote( $contained_node->annotation );
 
         if ( $type eq 'list' or $type eq 'hash' ) {
@@ -253,7 +258,7 @@ Config::Model::Dumper - Serialize data of config tree
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 

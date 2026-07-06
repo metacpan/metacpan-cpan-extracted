@@ -12,3 +12,4 @@ test:
 configure:
   requires:
     Devel::AssertC99: 0
+    Devel::PPPort: 0

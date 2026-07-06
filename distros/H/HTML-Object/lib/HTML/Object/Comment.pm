@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/19
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -88,7 +88,7 @@ HTML::Object::Comment - HTML Object Comment Element Class
 
     use HTML::Object::Comment;
     my $this = HTML::Object::Comment->new || 
-        die( HTML::Object::Comment->error, "\n" );
+        die( HTML::Object::Comment->error );
 
 =head1 VERSION
 
@@ -106,13 +106,7 @@ This module represents an HTML comment
 
 =head1 PROPERTIES
 
-=head2 nodeValue
-
-This returns or sets the value of the current node.
-
-For document, element or collection, this returns C<undef> and for attribute, text or comment, this returns the objct value.
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue>
+There are no properties.
 
 =head1 METHODS
 
@@ -127,20 +121,6 @@ Returns the comment as an XML string., which is almost the same format as with L
 =head2 close_seq
 
 Set or get the string used as a close sequence.
-
-=head2 isEqualNode
-
-Returns a boolean value which indicates whether or not two elements are of the same type and all their defining data points match.
-
-Two elements are equal when they have the same type, defining characteristics (this would be their ID, number of children, and so forth), its attributes match, and so on. The specific set of data points that must match varies depending on the types of the elements. 
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/isEqualNode>
-
-=head2 nodeValue
-
-This returns or sets the value of the current element.
-
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue>
 
 =head2 open_seq
 
@@ -172,6 +152,6 @@ L<HTML::Object>, L<HTML::Object::Attribute>, L<HTML::Object::Boolean>, L<HTML::O
 
 Copyright (c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

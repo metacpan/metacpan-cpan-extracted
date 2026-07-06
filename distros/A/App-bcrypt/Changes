@@ -2,6 +2,9 @@
 1.001 2023-06-14T10:46:01Z
 	* Initial release of a bcrypt utility in Perl
 
+1.003 2026-07-05T17:10:13Z
+	* adjust help.t test to scrub environment (#1)
+
 1.002 2024-02-11T21:42:08Z
 	* refresh distro, update email addresses, move to BRIANDFOY
 

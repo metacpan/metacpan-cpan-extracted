@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -101,7 +101,7 @@ HTML::Object::DOM::Element::Track - HTML Object DOM Track Class
 
     use HTML::Object::DOM::Element::Track;
     my $track = HTML::Object::DOM::Element::Track->new || 
-        die( HTML::Object::DOM::Element::Track->error, "\n" );
+        die( HTML::Object::DOM::Element::Track->error );
 
     my $video = $doc->getElementsByTagName('video')->[0];
     # or
@@ -312,7 +312,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLTra
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

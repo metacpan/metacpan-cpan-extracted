@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::HashId 2.163;
+package Config::Model::HashId 2.164;
 
 use Mouse;
 use 5.20.0;
@@ -31,6 +31,8 @@ extends qw/Config::Model::AnyId/;
 
 with "Config::Model::Role::Grab";
 with "Config::Model::Role::ComputeFunction";
+# this requires backup method from Config::Model::AnyThing
+with "Config::Model::Role::WarpSubject";
 
 has data => ( is => 'rw', isa => 'HashRef',  default => sub { {}; } );
 has list => (
@@ -563,7 +565,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 

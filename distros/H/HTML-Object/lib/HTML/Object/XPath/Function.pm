@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -362,7 +362,7 @@ sub string
     {
         return( $self->new_literal( $params[0]->string_value ) );
     }
-    
+
     # TODO - this MUST be wrong! - not sure now. -matt
     return( $self->new_literal( $node->string_value ) );
     # default to nodeset with just $node in.
@@ -511,7 +511,7 @@ HTML::Object::XPath::Function - HTML Object XPath Functions
 
     use HTML::Object::XPath::Function;
     my $func = HTML::Object::XPath::Function->new || 
-        die( HTML::Object::XPath::Function->error, "\n" );
+        die( HTML::Object::XPath::Function->error );
 
 =head1 VERSION
 
@@ -628,6 +628,8 @@ Returns th context position as a L<number|HTML::Object::XPath::Number>. It will 
 
 =head2 round
 
+Rounds the number to the precision provided.
+
 =head2 starts_with
 
 Provided with a L<node object|HTML::Object::Element> and two parameters and this will return L<true|HTML::Object::XPath::Boolean> if the string value of the second parameter is at the beginning of the first parameter, or L<false|HTML::Object::XPath::Boolean> otherwise.
@@ -688,7 +690,7 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

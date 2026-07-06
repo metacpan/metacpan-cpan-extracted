@@ -1,5 +1,10 @@
 Revision history for Syntax-Infix-EqualityInsensitive
 
+0.04    2026-07-05
+        - Guard against empty-string inputs before calling foldEQ_utf8, and
+          pass NULL for the pe endpoint parameters; attemp to fix assertion failure
+          (g1 || g2) in DEBUGGING perl builds.
+
 0.03    2026-06-22
         - Pass real end pointers to foldEQ_utf8 in pp_eqi and pp_nei.
 

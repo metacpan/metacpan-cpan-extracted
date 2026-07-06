@@ -27,7 +27,6 @@ my %WriteMakefileArgs = (
     "Convert::ASN1" => 0,
     "Convert::PEM" => "0.13",
     "Crypt::SysRandom" => 0,
-    "Crypt::URandom" => 0,
     "Data::Buffer" => "0.01",
     "Digest::SHA" => 0,
     "File::Spec" => 0,
@@ -40,7 +39,7 @@ my %WriteMakefileArgs = (
     "Crypt::DES_EDE3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.23",
+  "VERSION" => "1.24",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +51,6 @@ my %FallbackPrereqs = (
   "Convert::PEM" => "0.13",
   "Crypt::DES_EDE3" => 0,
   "Crypt::SysRandom" => 0,
-  "Crypt::URandom" => 0,
   "Data::Buffer" => "0.01",
   "Digest::SHA" => 0,
   "ExtUtils::MakeMaker" => "6.42",

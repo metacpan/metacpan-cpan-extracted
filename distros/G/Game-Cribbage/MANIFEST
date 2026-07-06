@@ -18,6 +18,8 @@ lib/Game/Cribbage/Rounds.pm
 lib/Game/Cribbage/Score.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-card.t
@@ -29,10 +31,14 @@ t/06-rounds.t
 t/07-player_hand_basic.t
 t/08-player_hand_score.t
 t/09-fixed_play.t
+t/10-deck-card-coverage.t
+t/11-board-coverage.t
+t/12-player-hand-coverage.t
+t/13-play-coverage.t
+t/14-round-hands-coverage.t
+t/15-cribbage-coverage.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 test.png
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

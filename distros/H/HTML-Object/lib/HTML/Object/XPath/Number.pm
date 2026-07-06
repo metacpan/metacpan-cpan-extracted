@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -106,7 +106,7 @@ HTML::Object::XPath::Number - HTML Object XPath Number Class
 
     use HTML::Object::XPath::Number;
     my $num = HTML::Object::XPath::Number->new || 
-        die( HTML::Object::XPath::Number->error, "\n" );
+        die( HTML::Object::XPath::Number->error );
 
 =head1 VERSION
 
@@ -182,6 +182,8 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 =head1 COPYRIGHT & LICENSE
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
+
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

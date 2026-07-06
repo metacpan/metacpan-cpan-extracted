@@ -21,6 +21,7 @@ meta-spec:
   version: '1.4'
 name: Sieve-Generator
 requires:
+  Carp: '0'
   JSON::MaybeXS: '0'
   Moo: '0'
   Moo::Role: '0'
@@ -33,7 +34,7 @@ resources:
   bugtracker: https://github.com/rjbs/Sieve-Generator/issues
   homepage: https://github.com/rjbs/Sieve-Generator
   repository: https://github.com/rjbs/Sieve-Generator.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -354,7 +355,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

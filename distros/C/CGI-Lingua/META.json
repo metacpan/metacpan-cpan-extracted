@@ -4,9 +4,9 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -51,6 +51,7 @@
             "NetAddr::IP" : "0",
             "Object::Configure" : "0.14",
             "Params::Get" : "0.13",
+            "Readonly" : "0",
             "Sys::Syslog" : "0",
             "perl" : "5.006002"
          }
@@ -67,12 +68,14 @@
             "Test::Carp" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Requires" : "0",
             "Test::RequiresInternet" : "0",
+            "Test::Returns" : "0",
             "Test::Which" : "0",
             "Test::Without::Module" : "0",
             "autodie" : "0"
@@ -93,6 +96,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.80",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.81",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -101,7 +101,7 @@ HTML::Object::DOM::Element::Image - HTML Object DOM Image Class
 
     use HTML::Object::DOM::Element::Image;
     my $img = HTML::Object::DOM::Element::Image->new || 
-        die( HTML::Object::DOM::Element::Image->error, "\n" );
+        die( HTML::Object::DOM::Element::Image->error );
 
 =head1 VERSION
 
@@ -332,7 +332,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLIma
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

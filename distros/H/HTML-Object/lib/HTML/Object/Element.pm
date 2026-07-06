@@ -1,11 +1,11 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.3.0_1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.3.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2026/03/29
-## All rights reserved
+## Modified 2026/07/04
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -34,7 +34,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.3.0_1';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -172,6 +172,7 @@ sub as_string
                 my $k = shift( @_ );
                 return(1) if( $k eq '/' );
                 my $v = $self->attributes->get( $k );
+                return if( !defined( $v ) );
                 # Ensure double quotes are escaped
                 $v =~ s/(?<!\\)\"/\\\"/gs;
                 $attr->push( sprintf( '%s="%s"', $k, $v ) );
@@ -286,7 +287,7 @@ sub as_text
                     $a->push( $e->as_string->scalar );
                 }
             }
-            
+
             unless( $e->isa( 'HTML::Object::Text' ) ||
                     $e->isa( 'HTML::Object::Space' ) )
             {
@@ -364,7 +365,7 @@ sub attr
             $self->attributes_sequence->remove( $attr );
             $old = $self->attributes->delete( $attr );
         }
-        
+
         # Check for attributes callback and execute it.
         # This is typically used for HTML::Object::TokenList by HTML::Object::DOM::Element and HTML::Object::DOM::AnchorElement
         my $callbacks = $self->{_internal_attribute_callbacks};
@@ -417,8 +418,53 @@ sub class { return( ref( $_[0] ) ); }
 sub clone
 {
     my $self = shift( @_ );
+    my $parent = $self->parent;
+    $self->parent( undef );
+    # Array reference of HTML::Object::Element objects
+    my $kids   = $self->children;
+    $self->children( [] );
     my $new = $self->SUPER::clone();
+
+    # NOTE: temporary diagnostic — body carries nearly all the document's
+    # real weight; dump its own fields by size the same way we did for
+    # Document, to find what's still duplicating something further down.
+    if( $self->tag eq 'body' )
+    {
+        foreach my $k ( sort { total_size( $self->{ $b } ) <=> total_size( $self->{ $a } ) } CORE::keys( %$self ) )
+        {
+            next unless( ref( $self->{ $k } ) );
+        }
+        # NOTE: drill one level deeper into close_tag itself, since it weighs
+        # disproportionately (24KB) for what should be a trivial marker object.
+        if( ref( $self->{close_tag} ) )
+        {
+            foreach my $k ( CORE::keys( %{ $self->{close_tag} } ) )
+            {
+                next unless( ref( $self->{close_tag}->{ $k } ) );
+            }
+        }
+        # NOTE: drill into a single Module::Generic::Number instance itself
+        # (body's own 'line' field) — every such field weighs an identical
+        # 10.09KB regardless of context, suggesting something inside the
+        # Number class itself, not the tree structure, is responsible.
+        if( ref( $self->{line} ) )
+        {
+            foreach my $k ( CORE::keys( %{ $self->{line} } ) )
+            {
+                my $v = $self->{line}->{ $k };
+                if( ref( $v ) )
+                {
+                }
+                else
+                {
+                }
+            }
+        }
+    }
+
     $new->{eid} = $self->_generate_uuid();
+    $self->parent( $parent );
+    $self->children( $kids );
     my $children = $self->clone_list;
     $new->children( $children );
     $children->foreach(sub
@@ -901,7 +947,7 @@ sub look
                 }
             }
         }
-        
+
         # We passed all checks, no checking our children
         $a->push( $e ) if( $ok );
         # Stop here since we reached the maximum number of matches
@@ -920,7 +966,7 @@ sub look
         $def->{level}--;
         return(1);
     };
-    
+
     $crawl_down = sub
     {
         my $kids = shift( @_ );
@@ -931,7 +977,7 @@ sub look
             $check_elem->( $_, $def );
         });
     };
-    
+
     my $def = { level => 0 };
     $check_elem->( $self, $def );
     # return( $a->length > 0 ? $a : '' );
@@ -1069,7 +1115,7 @@ sub new_from_lol
         }
         return( $elem );
     };
-    
+
     foreach my $this ( @args )
     {
         return( $self->error( "I was expecting an array reference, but instead got '$this'." ) ) if( !$self->_is_array( $this ) );
@@ -1510,7 +1556,7 @@ sub _get_from_list_of_elements_or_html
             {
                 return( $self->error( "I was expecting some HTML data, but got '", overload::StrVal( $this ), "'" ) );
             }
-            
+
             # if( "$this" =~ /$LOOK_LIKE_HTML/ )
             # LOOK_LIKE_HTML check for html tag starting at the beginning of the string
             # LOOK_LIKE_IT_HAS_HTML checks for tag anywhere
@@ -1645,11 +1691,11 @@ HTML::Object::Element - HTML Element Object
 
     use HTML::Object::Element;
     my $this = HTML::Object::Element->new ||
-        die( HTML::Object::Element->error, "\n" );
+        die( HTML::Object::Element->error );
 
 =head1 VERSION
 
-    v0.3.0_1
+    v0.3.1
 
 =head1 DESCRIPTION
 
@@ -1748,7 +1794,7 @@ If a cached version of that string exists, it is returned instead.
 Returns a string representation of the text content of the current element and its descendant.
 
 If a cached version of that string exists, it is returned instead.
- 
+
 It takes an optional hash or hash reference of parameters:
 
 =over 4
@@ -2129,8 +2175,6 @@ Provided with a string and this returns true if the string contains HTML tags, o
 
 Set or get a boolean of whether the element was modified. Actually this is not used.
 
-This returns a L<DateTime> object.
-
 =head2 new_attribute
 
 This creates a new L<HTML::Object::Attribute> object passing it any arguments provided, and returns the object thus created, or C<undef> if an L<error|Module::Generic/error> occurred.
@@ -2315,7 +2359,7 @@ L<Mozilla Element documentation|https://developer.mozilla.org/en-US/docs/Web/API
 
 Copyright (c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

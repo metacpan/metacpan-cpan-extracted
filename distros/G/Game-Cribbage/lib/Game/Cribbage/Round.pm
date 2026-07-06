@@ -3,51 +3,54 @@ package Game::Cribbage::Round;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar -types;
 
 use Game::Cribbage::Round::Score;
 use Game::Cribbage::Hands;
 
-property [qw/id number score current_hands/] => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1
+has id => (
+	is => 'rw',
+	isa => Int
 );
 
-property complete => (
-	initable => 1,
-	writeable => 0,
-	configurable => 0,
-	enumerable => 1,
-	value => 0
+has number => (
+	is => 'ro',
+	isa => Int
 );
 
-property history => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1,
-	value => []
+has [qw/score current_hands/] => (
+	is => 'rw',
+	isa => Object
 );
 
-function INITIALISED => sub {
-	my ($self, $params) = @_;
+has complete => (
+	is => 'rw',
+	isa => Bool,
+	default => 0
+);
+
+has history => (
+	is => 'rw',
+	isa => ArrayRef,
+	default => []
+);
+
+sub init {
+	my ($self, $game) = @_;
 	my %score = ();
-	for (@{$params->{_game}->players}) {
+	for (@{$game->players}) {
 		$score{$_->player} = {
 			current =>  0,
 			last => 0
 		};
 	}
-	$self->score = Game::Cribbage::Round::Score->new(%score);
-	$self->next_hands($params->{_game});
-};
+	$self->score(Game::Cribbage::Round::Score->new(%score));
+	$self->next_hands($game);
+}
 
-function reset_hands => sub {
+sub reset_hands {
 	my ($self, $game) = @_;
-	$self->history = [];
+	$self->history([]);
 	my %score = ();
 	for (@{$game->players}) {
 		$score{$_->player} = {
@@ -55,20 +58,20 @@ function reset_hands => sub {
 			last => 0
 		};
 	}
-	$self->score = Game::Cribbage::Round::Score->new(%score);
+	$self->score(Game::Cribbage::Round::Score->new(%score));
 	$self->next_hands($game);
-};
+}
 
-function next_hands => sub {
+sub next_hands {
 	my ($self, $game, %args) = @_;
 	$game->shuffle();
-	my $hands = Game::Cribbage::Hands->new(_game => $game, %args);
-	$self->current_hands = $hands;
+	my $hands = Game::Cribbage::Hands->new(%args)->init($game);
+	$self->current_hands($hands);
 	push @{$self->history}, $hands;
 	return $self;
-};
+}
 
-function end_hands => sub {
+sub end_hands {
 	my ($self, $game) = @_;
 	my $scored = $self->current_hands->score_hands();
 	for my $hand (keys %{$scored}) {
@@ -76,21 +79,21 @@ function end_hands => sub {
 		$self->score->$hand->{current} += $scored->{$hand};
 	}
 	$self->next_hands($game, crib_player => $self->next_crib_player($game));
-};
+}
 
-function add_player_card_by_index => sub {
+sub add_player_card_by_index {
 	my ($self, $index, $player, $card) = @_;
 	my $hand = ref $player ? $player->player : $player;
 	$self->current_hands->$hand->add_by_index($index, $card);
-};
+}
 
-function add_player_card => sub {
+sub add_player_card {
 	my ($self, $player, $card) = @_;
 	my $hand = ref $player ? $player->player : $player;
 	$self->current_hands->$hand->add($card);
-};
+}
 
-function add_starter_card => sub {
+sub add_starter_card {
 	my ($self, $player, $card) = @_;
 	my $score = $self->current_hands->add_starter_card($player, $card);
 	if (ref $score && $score->score) {
@@ -100,15 +103,15 @@ function add_starter_card => sub {
 		push @{$self->current_hands->$hand->play_scored}, $score;
 	}
 	return $score;
-};
+}
 
-function validate_crib_cards => sub {
+sub validate_crib_cards {
 	my ($self, $cards) = @_;
 	my $crib = $self->current_hands->crib_player;
 	$self->current_hands->$crib->validate_crib_cards($cards);
-};
+}
 
-function next_to_play => sub {
+sub next_to_play {
 	my ($self, $game) = @_;
 	my $next = $self->current_hands->play->next_to_play;
 	my $player;
@@ -119,15 +122,15 @@ function next_to_play => sub {
 		}
 	}
 	return $player;
-};
+}
 
-function next_to_play_id => sub {
+sub next_to_play_id {
 	my ($self, $game) = @_;
 	my $next = $self->next_to_play($game);
 	return $next->id;
-};
+}
 
-function get_crib_player => sub {
+sub get_crib_player {
 	my ($self, $game) = @_;
 	my $player;
 	for (@{$game->players}) {
@@ -137,9 +140,9 @@ function get_crib_player => sub {
 		}
 	}
 	return $player;
-};
+}
 
-function next_crib_player => sub {
+sub next_crib_player {
 	my ($self, $game) = @_;
 	my $current = $self->get_crib_player($game);
 	my $next;
@@ -149,41 +152,41 @@ function next_crib_player => sub {
 		$next = 'player' . ($current->number + 1);
 	}
 	return $next;
-};
+}
 
-function crib_player_id => sub {
+sub crib_player_id {
 	my ($self, $game) = @_;
 	my $player = $self->get_crib_player($game);
 	return $player ? $player->id : $player;
-};
+}
 
-function crib_player_name => sub {
+sub crib_player_name {
 	my ($self, $game) = @_;
 	my $player = $self->get_crib_player($game);
 	return $player ? $player->name : $player;
-};
+}
 
-function crib_player_number => sub {
+sub crib_player_number {
 	my ($self, $game) = @_;
 	my $player = $self->get_crib_player($game);
 	return $player ? $player->number : $player;
-};
+}
 
-function crib_player_cards => sub {
+sub crib_player_cards {
 	my ($self, $player, $cards) = @_;
 	my $hand = ref $player ? $player->player : $player;
 	my $crib = $self->current_hands->crib_player;
 	return $self->current_hands->$hand->discard_cards($cards, $self->current_hands->$crib);
-};
+}
 
-function crib_player_card => sub {
+sub crib_player_card {
 	my ($self, $player, $card_index) = @_;
 	my $hand = $player->player;
 	my $crib = $self->current_hands->crib_player;
 	$self->current_hands->$hand->discard($card_index, $self->current_hands->$crib);
-};
+}
 
-function force_play_card => sub {
+sub force_play_card {
 	my ($self, $card) = @_;
 	my ($score, $player) = $self->current_hands->force_play_card($card);
 	if (ref $score && $score->score) {
@@ -193,9 +196,9 @@ function force_play_card => sub {
 		push @{$self->current_hands->$hand->play_scored}, $score;
 	}
 	return $score;
-};
+}
 
-function play_player_card => sub {
+sub play_player_card {
 	my ($self, $player, $card_index) = @_;
 	my $score = $self->current_hands->play_card($player, $card_index);
 	if (ref $score && $score->score) {
@@ -205,34 +208,34 @@ function play_player_card => sub {
 		push @{$self->current_hands->$hand->play_scored}, $score;
 	}
 	return $score;
-};
+}
 
-function card_exists => sub {
+sub card_exists {
 	my ($self, $player, $card) = @_;
 	return $self->current_hands->card_exists($player, $card);
-};
+}
 
-function get_player_card => sub {
+sub get_player_card {
 	my ($self, $player, $card_index) = @_;
 	$self->current_hands->get_card($player, $card_index);
-};
+}
 
-function current_play_score => sub {
+sub current_play_score {
 	my ($self) = @_;
 	$self->current_hands->play_score();
-};
+}
 
-function last_play_score => sub {
+sub last_play_score {
 	my ($self) = @_;
 	$self->current_hands->last_play_score();
-};
+}
 
-function cannot_play_a_card => sub {
+sub cannot_play_a_card {
 	my ($self, $player) = @_;
 	$self->current_hands->cannot_play_a_card($player);
-};
+}
 
-function next_play => sub {
+sub next_play {
 	my ($self, $game) = @_;
 	my $score = $self->current_hands->next_play($game);
 	if (ref $score && $score->score) {
@@ -242,9 +245,9 @@ function next_play => sub {
 		push @{$self->current_hands->$hand->play_scored}, $score;
 	}
 	return $self->current_hands->play;
-};
+}
 
-function end_play => sub {
+sub end_play {
 	my ($self) = @_;
 	my $score = $self->current_hands->end_play();
 	if (ref $score && $score->score) {
@@ -254,20 +257,20 @@ function end_play => sub {
 		push @{$self->current_hands->$hand->play_scored}, $score;
 	}
 	return 1;
-};
+}
 
-function identify_worst_cards => sub {
+sub identify_worst_cards {
 	my ($self, $player) = @_;
 	my $hand = ref $player ? $player->player : $player;
 	$self->current_hands->$hand->identify_worst_cards();
-};
+}
 
-function best_run_play => sub {
+sub best_run_play {
 	my ($self, $player) = @_;
 	$self->current_hands->best_run_play($player);
-};
+}
 
-function hand_play_history => sub {
+sub hand_play_history {
 	my ($self, $player) = @_;
 	my @history = @{$self->current_hands->play_history};
 	my $current = pop @history;
@@ -279,6 +282,6 @@ function hand_play_history => sub {
 		used_count => $count_cards,
 		current_play => $current
 	};
-};
+}
 
 1;

@@ -3,32 +3,31 @@ package Game::Cribbage::Deck;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar -types;
 use List::Util qw//;
 use Game::Cribbage::Deck::Card;
 
-property deck => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1,
+has deck => (
+	is => 'rw',
+	isa => ArrayRef,
+	default => []
 );
 
-function cards => sub {
-	return $_[0]->deck;
-};
 
-function INITIALISED => sub {
+sub BUILD {
 	return $_[0]->reset();
-};
+}
 
-function reset => sub {
+sub cards {
+	return $_[0]->deck;
+}
+
+sub reset {
 	$_[0]->shuffle();
 	$_[0];
-};
+}
 
-function shuffle => sub {
+sub shuffle {
 	my $i = 0;
 	my @DECK;
 	for my $suit (qw/H S D C/) {
@@ -42,15 +41,15 @@ function shuffle => sub {
 				);
 		}
 	}
-	$_[0]->deck = [List::Util::shuffle @DECK];
+	$_[0]->deck([List::Util::shuffle @DECK]);
 	$_[0];
-};
+}
 
-function draw => sub {
+sub draw {
 	shift @{$_[0]->deck}
-};
+}
 
-function force_draw => sub {
+sub force_draw {
 	my ($self, $card) = @_;
 	
 	my $i = 0;
@@ -69,29 +68,32 @@ function force_draw => sub {
 	#}
 
 	return $force;
-};
+}
 
-function get => sub {
+sub get {
 	$_[0]->deck->[$_[1]];
-};
+}
 
-function card_exists => sub {
+sub card_exists {
 	my ($self, $card) = @_;
 
+	my ($suit, $sym) = ref($card) eq 'HASH'
+		? ($card->{suit}, $card->{symbol})
+		: ($card->suit, $card->symbol);
 	for (@{$self->deck}) {
-		if ($_->suit eq $card->{suit} && $_->symbol =~ m/^$card->{symbol}$/) {
+		if ($_->suit eq $suit && $_->symbol =~ m/^$sym$/) {
 			return 1;
 		}
 	}
 
 	return 0;
-};
+}
 
-function generate_card => sub {
+sub generate_card {
 	return Game::Cribbage::Deck::Card->new(
 		%{ $_[1] }
 	);
-};
+}
 
 1;
 

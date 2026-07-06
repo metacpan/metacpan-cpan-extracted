@@ -1,5 +1,9 @@
 Revision history for MsgPack-Raw
 
+0.06      2026-07-05 20:22:04+01:00 Europe/London
+
+ - Fix buffer overflow in MsgPack::Raw::Unpacker
+
 0.05      2019-11-23 09:37:55+00:00 Europe/London
 
  - Fix floating-point test

@@ -72,7 +72,7 @@ pass 'DESTROY called without errors';
 
 # Test with a mock logger
 my $log_message;
-Test::Mockingbird::mock('Log::Abstraction', 'warn', sub { $log_message = $_[1]->[0]->{'warning'} });
+Test::Mockingbird::mock('Log::Abstraction', 'warn', sub { $log_message = $_[1] });
 $obj = CGI::Lingua->new(supported_languages => ['en'], logger => new_ok('Log::Abstraction'));
 $obj->_warn({ warning => 'Test warning' });
 like($log_message, qr/Test warning/, 'Logger received warning');

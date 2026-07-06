@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ListId 2.163;
+package Config::Model::ListId 2.164;
 
 use 5.20.0;
 use Mouse;
@@ -21,6 +21,8 @@ extends qw/Config::Model::AnyId/;
 with "Config::Model::Role::Grab";
 with "Config::Model::Role::ComputeFunction";
 with "Config::Model::Role::Utils";
+# this requires backup method from Config::Model::AnyThing
+with "Config::Model::Role::WarpSubject";
 
 use feature qw/postderef signatures/;
 no warnings qw/experimental::signatures experimental::postderef/;
@@ -550,7 +552,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 

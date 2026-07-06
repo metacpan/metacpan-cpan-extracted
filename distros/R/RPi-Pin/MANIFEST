@@ -1,4 +1,3 @@
-.claude/settings.local.json
 Changes
 docs/pod.md
 ignore.txt
@@ -9,6 +8,7 @@ MANIFEST.SKIP
 README
 t/00-load.t
 t/05-pin.t
+t/10-validation.t
 t/15-pwm.t
 t/40-interrupt_and_pud.t
 t/manifest.t

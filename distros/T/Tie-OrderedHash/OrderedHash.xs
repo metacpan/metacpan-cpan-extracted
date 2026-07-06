@@ -115,10 +115,11 @@ CODE:
                 SvREFCNT_dec(vcopy);
         }
     } else {
-        /* New key: append, then record index in idx HV. */
-        STRLEN klen;
-        const char *kpv = SvPV(key, klen);
-        SV *key_sv = newSVpvn(kpv, klen);
+        /* New key: append, then record index in idx HV.
+         * newSVsv preserves the UTF-8 flag; plain newSVpvn(SvPV(...))
+         * would strip it, causing wide-char keys to come back as raw bytes
+         * from FIRSTKEY/NEXTKEY. */
+        SV *key_sv = newSVsv(key);
         SV *idx_sv;
         SSize_t newpos;
         vcopy = newSVsv(value);

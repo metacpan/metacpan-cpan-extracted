@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "List::Util" => "1.54",
     "List::Util::Find" => "0.004",
     "Log::ger" => "0.038",
+    "Perinci::Sub::DepChecker" => 0,
     "Perinci::Sub::Util" => "0.472",
     "strict" => 0,
     "warnings" => 0
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "List::Util" => "1.54",
   "List::Util::Find" => "0.004",
   "Log::ger" => "0.038",
+  "Perinci::Sub::DepChecker" => 0,
   "Perinci::Sub::Util" => "0.472",
   "Test::More" => 0,
   "strict" => 0,

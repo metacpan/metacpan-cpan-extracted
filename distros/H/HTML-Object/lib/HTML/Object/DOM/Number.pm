@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,27 @@ BEGIN
     use vars qw( $EPSILON $VERSION );
     use Config;
     # use Machine::Epsilon ();
-    use POSIX qw( Inf NaN );
+    require POSIX;
+    my( $POS_INF, $NEG_INF );
+    if( $] >= 5.022 )
+    {
+        POSIX->import( qw( isnan ) );
+        # NOTE: Inf and NaN are bare literals since 5.8.1 and do not need importing.
+        # POSIX only added them as exports in 5.22, hence the version guard.
+        $POS_INF =  9**9**9;
+        $NEG_INF = -9**9**9;
+    }
+    else
+    {
+        $POS_INF =  9**9**9;
+        $NEG_INF = -9**9**9;
+        *isnan = sub
+        {
+            return(0) if( !defined( $_[0] ) );
+            no warnings 'numeric';
+            return( $_[0] != $_[0] );
+        };
+    }
     use constant {
         MAX_SAFE_INTEGER    => (POSIX::pow(2,53) - 1),
         # MAX_VALUE           => (1.7976931348623157 * POSIX::pow(10,308)),
@@ -30,8 +50,8 @@ BEGIN
         MIN_VALUE           => POSIX::pow(2, -1074),
         # <https://perldoc.perl.org/perldata#Special-floating-point:-infinity-(Inf)-and-not-a-number-(NaN)>
         # NEGATIVE_INFINITY   => -9**9**9,
-        NEGATIVE_INFINITY   => -Inf,
-        POSITIVE_INFINITY   => Inf,
+        NEGATIVE_INFINITY   => $NEG_INF,
+        POSITIVE_INFINITY   => $POS_INF,
     };
     our $EPSILON;
     our $VERSION = 'v0.2.0';
@@ -76,11 +96,12 @@ sub EPSILON : lvalue { return( shift->_lvalue({
 
 # Note: property POSITIVE_INFINITY is a constant
 
-sub isFinite { return( $_[1] != Inf ); }
+my $POS_INF = POSITIVE_INFINITY;
+sub isFinite { return( $_[1] != $POS_INF ); }
 
 sub isInteger { return( shift->_is_integer( $_[0] ) ); }
 
-sub isNaN { return( POSIX::isnan( $_[1] ) ); }
+sub isNaN { return( isnan( $_[1] ) ); }
 
 sub isSafeInteger { return( $_[0]->_is_integer( $_[1] ) && abs( $_[1] ) < MAX_SAFE_INTEGER ); }
 
@@ -102,7 +123,7 @@ HTML::Object::DOM::Number - HTML Object DOM Number
 
     use HTML::Object::DOM::Number;
     my $this = HTML::Object::DOM::Number->new || 
-        die( HTML::Object::DOM::Number->error, "\n" );
+        die( HTML::Object::DOM::Number->error );
 
 =head1 VERSION
 
@@ -394,7 +415,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/JavaScript/
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

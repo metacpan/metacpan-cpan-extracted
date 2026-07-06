@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [34.0.1] - 2026-07-05
+### Fixed
+- [Dart] Fix automated release process?
+
+## [34.0.0] - 2026-07-05
+### Added
+- [Dart] Add initial `cucumber_messages` package. ([#431](https://github.com/cucumber/messages/pull/431/), [#470](https://github.com/cucumber/messages/pull/470))
+
+### Changed
+- [Ruby] Updated minimum Ruby version to 3.3 ([#472](https://github.com/cucumber/messages/pull/472)
+- [cpp] Replaced custom cmate script with native cmake and CPM. ([#432](https://github.com/cucumber/messages/pull/432))
+- [cpp] Moved all generated files to their own folder, does not change includes paths for dependent projects. ([#432](https://github.com/cucumber/messages/pull/432))
+- [jsonschema] Allow steps to contain both `DataTable` and `DocString`. ([#468](https://github.com/cucumber/messages/pull/468))
+
 ## [33.0.4] - 2026-06-27
 ### Fixed
 - [JavaScript] Update static version file at release time ([#459](https://github.com/cucumber/messages/pull/459))
@@ -166,7 +180,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Go] Switch to Google's UUID module ([#251](https://github.com/cucumber/messages/pull/251))
 
 ### Fixed
-- [Dotnet] Fixed code generation for types that accept List as parameters. Constructors were not properly handling null input. ([#249](https://github.com/cucumber/messages/pull/249) [clrudolphi](https://github.com/clrudolphi)))
+- [Dotnet] Fixed code generation for types that accept List as parameters. Constructors were not properly handling null input. ([#249](https://github.com/cucumber/messages/pull/249) [clrudolphi](https://github.com/clrudolphi))
 - Moved contents of the description of the StepDefinitionIds field from the StepMatchArgumentsList field where it had been mistakenly placed. ([#252](https://github.com/cucumber/messages/pull/252) [clrudolphi](https://github.com/clrudolphi)))
 
 ## [26.0.0] - 2024-08-15
@@ -700,7 +714,9 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v33.0.4...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v34.0.1...HEAD
+[34.0.1]: https://github.com/cucumber/messages/compare/v34.0.0...v34.0.1
+[34.0.0]: https://github.com/cucumber/messages/compare/v33.0.4...v34.0.0
 [33.0.4]: https://github.com/cucumber/messages/compare/v33.0.3...v33.0.4
 [33.0.3]: https://github.com/cucumber/messages/compare/v33.0.2...v33.0.3
 [33.0.2]: https://github.com/cucumber/messages/compare/v33.0.1...v33.0.2

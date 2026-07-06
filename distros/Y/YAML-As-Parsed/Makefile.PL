@@ -17,8 +17,9 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-   	'Tie::IxHash' => '0',
+   	'Tie::OrderedHash' => '0.04',
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'YAML-As-Parsed-*' },
 );

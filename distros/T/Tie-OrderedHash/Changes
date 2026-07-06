@@ -1,5 +1,8 @@
 Revision history for Tie-OrderedHash
 
+0.04	2026-07-05
+	- Add unit test for UTF8 keys and fix bugs
+
 0.03    2026-05-17
         - t/09-large-load.t: reduce to 10_000 from 100_000 to support smaller systems
 

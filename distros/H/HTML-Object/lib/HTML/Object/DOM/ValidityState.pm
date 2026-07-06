@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -80,7 +80,7 @@ HTML::Object::DOM::ValidityState - HTML Object DOM Valid State Class
 
     use HTML::Object::DOM::ValidityState;
     my $validity = HTML::Object::DOM::ValidityState->new || 
-        die( HTML::Object::DOM::ValidityState->error, "\n" );
+        die( HTML::Object::DOM::ValidityState->error );
 
 =head1 VERSION
 
@@ -233,7 +233,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

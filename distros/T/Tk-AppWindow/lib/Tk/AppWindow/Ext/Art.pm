@@ -10,7 +10,7 @@ Tk::AppWindow::Ext::Art - Use icon libraries quick & easy
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.22";
+$VERSION="0.23";
 use Config;
 my $mswin = 0;
 my $osname = $Config{'osname'};
@@ -143,7 +143,7 @@ sub new {
 	$self->{FDI} = $fdi;
 	$self->{THEMEPOOL} = {};
 	$self->{THEMES} = {};
-	$self->{ICONSIZE} = undef;
+#	$self->{ICONSIZE} = undef;
 
 	$self->cmdConfig(
 		available_icon_sizes => ['AvailableSizesCurrentTheme', $self],

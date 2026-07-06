@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/25
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -40,7 +40,7 @@ BEGIN
         fieldset    => [qw( disabled checkValidity form name reportValidity setCustomValidity validationMessage validity willValidate )],
         form    => [qw(
             accept autocapitalize autocomplete name
-            
+
             checkValidity reportValidity
         )],
         heading => [qw( align )],
@@ -502,7 +502,7 @@ Sets or gets the directionality of the element.
 
 =head2 disabled
 
-Set or returns a boolean value that represents the element's disabled attribute, indicating that the control is not available for interaction. The input values will not be submitted with the form. See also L</readonly>
+Set or returns a boolean value that represents the element's disabled attribute, indicating that the control is not available for interaction. The input values will not be submitted with the form. See also L</readOnly>
 
 =for Pod::Coverage download
 
@@ -739,7 +739,7 @@ Set or returns the current value of the control.
 
 =head2 valueAsDate
 
-Sets or returns the value of the element, interpreted as a L<DateTime> object, or C<undef> if conversion is not possible.
+Sets or returns the value of the element, interpreted as a L<DateTime::Lite> object, or C<undef> if conversion is not possible.
 
 =head2 valueAsNumber
 
@@ -826,7 +826,7 @@ L<HTML::Object::DOM::Element>, L<HTML::Object::DOM::Element::Anchor> L<HTML::Obj
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

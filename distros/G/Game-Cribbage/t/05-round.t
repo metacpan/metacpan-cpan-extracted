@@ -11,9 +11,8 @@ $board->add_player(name => 'Robert');
 $board->add_player(name => 'Luck');
 
 my $round = Game::Cribbage::Round->new(
-	_game => $board,
 	number => 1,
-);
+)->init($board);
 
 is($round->number(), 1);
 

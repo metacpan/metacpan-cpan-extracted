@@ -9,8 +9,10 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
-[
+return [
   {
     'author' => [
       'Dominique Dumont'
@@ -31,9 +33,11 @@ use warnings;
             'f1' => '- fs_vfstype'
           },
           'rules' => [
-            '$f1 eq \'proc\'',
             {
-              'default' => 'proc'
+              'apply' => {
+                'default' => 'proc'
+              },
+              'when' => '$f1 eq \'proc\''
             }
           ]
         }
@@ -49,13 +53,17 @@ use warnings;
             'f1' => '- fs_vfstype'
           },
           'rules' => [
-            '$f1 eq \'proc\'',
             {
-              'default' => '/proc'
+              'apply' => {
+                'default' => '/proc'
+              },
+              'when' => '$f1 eq \'proc\''
             },
-            '$f1 eq \'swap\'',
             {
-              'default' => 'none'
+              'apply' => {
+                'default' => 'none'
+              },
+              'when' => '$f1 eq \'swap\''
             }
           ]
         }
@@ -105,61 +113,89 @@ use warnings;
             'f1' => '- fs_vfstype'
           },
           'rules' => [
-            '$f1 eq \'proc\'',
             {
-              'config_class_name' => 'Fstab::CommonOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::CommonOptions'
+              },
+              'when' => '$f1 eq \'proc\''
             },
-            '$f1 eq \'auto\'',
             {
-              'config_class_name' => 'Fstab::CommonOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::CommonOptions'
+              },
+              'when' => '$f1 eq \'auto\''
             },
-            '$f1 eq \'vfat\'',
             {
-              'config_class_name' => 'Fstab::CommonOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::VfatOpt'
+              },
+              'when' => '$f1 eq \'vfat\''
             },
-            '$f1 eq \'swap\'',
             {
-              'config_class_name' => 'Fstab::SwapOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::SwapOptions'
+              },
+              'when' => '$f1 eq \'swap\''
             },
-            '$f1 eq \'ext2\'',
             {
-              'config_class_name' => 'Fstab::Ext2FsOpt'
+              'apply' => {
+                'config_class_name' => 'Fstab::Ext2FsOpt'
+              },
+              'when' => '$f1 eq \'ext2\''
             },
-            '$f1 eq \'ext3\'',
             {
-              'config_class_name' => 'Fstab::Ext3FsOpt'
+              'apply' => {
+                'config_class_name' => 'Fstab::Ext3FsOpt'
+              },
+              'when' => '$f1 eq \'ext3\''
             },
-            '$f1 eq \'ext4\'',
             {
-              'config_class_name' => 'Fstab::Ext4FsOpt'
+              'apply' => {
+                'config_class_name' => 'Fstab::Ext4FsOpt'
+              },
+              'when' => '$f1 eq \'ext4\''
             },
-            '$f1 eq \'usbfs\'',
             {
-              'config_class_name' => 'Fstab::UsbFsOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::UsbFsOptions'
+              },
+              'when' => '$f1 eq \'usbfs\''
             },
-            '$f1 eq \'davfs\'',
             {
-              'config_class_name' => 'Fstab::CommonOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::CommonOptions'
+              },
+              'when' => '$f1 eq \'davfs\''
             },
-            '$f1 eq \'iso9660\'',
             {
-              'config_class_name' => 'Fstab::Iso9660_Opt'
+              'apply' => {
+                'config_class_name' => 'Fstab::Iso9660_Opt'
+              },
+              'when' => '$f1 eq \'iso9660\''
             },
-            '$f1 eq \'nfs\'',
             {
-              'config_class_name' => 'Fstab::CommonOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::CommonOptions'
+              },
+              'when' => '$f1 eq \'nfs\''
             },
-            '$f1 eq \'nfs4\'',
             {
-              'config_class_name' => 'Fstab::CommonOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::CommonOptions'
+              },
+              'when' => '$f1 eq \'nfs4\''
             },
-            '$f1 eq \'none\'',
             {
-              'config_class_name' => 'Fstab::NoneOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::NoneOptions'
+              },
+              'when' => '$f1 eq \'none\''
             },
-            '$f1 eq \'debugfs\'',
             {
-              'config_class_name' => 'Fstab::CommonOptions'
+              'apply' => {
+                'config_class_name' => 'Fstab::CommonOptions'
+              },
+              'when' => '$f1 eq \'debugfs\''
             }
           ]
         }
@@ -180,11 +216,13 @@ use warnings;
             'isbound' => '- fs_mntopts bind'
           },
           'rules' => [
-            '$fstyp eq "none" and $isbound',
             {
-              'choice' => [
-                '0'
-              ]
+              'apply' => {
+                'choice' => [
+                  '0'
+                ]
+              },
+              'when' => '$fstyp eq "none" and $isbound'
             }
           ]
         }
@@ -202,9 +240,11 @@ use warnings;
             'isbound' => '- fs_mntopts bind'
           },
           'rules' => [
-            '$fstyp eq "none" and $isbound',
             {
-              'max' => '0'
+              'apply' => {
+                'max' => '0'
+              },
+              'when' => '$fstyp eq "none" and $isbound'
             }
           ]
         }

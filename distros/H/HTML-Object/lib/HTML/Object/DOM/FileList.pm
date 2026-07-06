@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/25
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -41,7 +41,7 @@ HTML::Object::DOM::FileList - HTML Object DOM FileList Class
 
     use HTML::Object::DOM::FileList;
     my $list = HTML::Object::DOM::FileList->new || 
-        die( HTML::Object::DOM::FileList->error, "\n" );
+        die( HTML::Object::DOM::FileList->error );
 
     <input id="fileItem" type="file" />
     my $file = $doc->getElementById('fileItem')->files->[0];
@@ -101,7 +101,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/FileLis
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/10/25
 ## Modified 2025/10/25
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -134,7 +134,7 @@ L<Mozila documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLFenc
 
 Copyright(c) 2025 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

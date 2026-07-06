@@ -1,4 +1,4 @@
-package Sieve::Generator 0.002;
+package Sieve::Generator 0.003;
 # ABSTRACT: generate Sieve email filter scripts
 
 use v5.36.0;
@@ -55,7 +55,7 @@ Sieve::Generator - generate Sieve email filter scripts
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

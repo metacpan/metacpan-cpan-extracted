@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/09
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -52,7 +52,7 @@ HTML::Object::DOM::Element::TextArea - HTML Object DOM TextArea Class
 
     use HTML::Object::DOM::Element::TextArea;
     my $textarea = HTML::Object::DOM::Element::TextArea->new || 
-        die( HTML::Object::DOM::Element::TextArea->error, "\n" );
+        die( HTML::Object::DOM::Element::TextArea->error );
 
 =head1 VERSION
 
@@ -132,7 +132,7 @@ Example:
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement/selectionchange_event>
 
-=head2 EVENT HANDLERS
+=head1 EVENT HANDLERS
 
 =head2 oninput
 
@@ -154,7 +154,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLTex
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

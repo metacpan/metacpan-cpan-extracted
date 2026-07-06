@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -49,7 +49,7 @@ sub as_xml
 {
     my $self = shift( @_ );
     my $string = "<LocationPath>\n";
-    
+
     for (my $i = 0; $i < @$self; $i++ )
     {
         $string .= $self->[ $i ]->as_xml;
@@ -64,11 +64,11 @@ sub evaluate
     # context _MUST_ be a single node
     my $context = shift( @_ );
     die( "No context" ) unless( $context );
-    
+
     # I _think_ this is how it should work :)
     my $nodeset = $self->new_nodeset();
     $nodeset->push( $context );
-    
+
     foreach my $step ( @$self )
     {
         # For each step
@@ -132,7 +132,7 @@ HTML::Object::XPath::LocationPath - HTML Object XPath Location Path
 
     use HTML::Object::XPath::LocationPath;
     my $this = HTML::Object::XPath::LocationPath->new || 
-        die( HTML::Object::XPath::LocationPath->error, "\n" );
+        die( HTML::Object::XPath::LocationPath->error );
 
 =head1 VERSION
 
@@ -188,7 +188,7 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

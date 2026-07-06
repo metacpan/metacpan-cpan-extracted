@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,8 +22,9 @@ BEGIN
     use vars qw( $TRUE $FALSE $BASE_CLASS $DEBUG $VERSION );
     use HTML::Object::XPath::Boolean;
     use overload (
-        '""'   => \&to_literal,
-        'bool' => \&to_boolean,
+        '""'     => \&to_literal,
+        'bool'   => \&to_boolean,
+        fallback => 1,
     );
     our $TRUE  = HTML::Object::XPath::Boolean->True;
     our $FALSE = HTML::Object::XPath::Boolean->False;
@@ -69,7 +70,7 @@ sub getElementById
     my $self = CORE::shift( @_ );
     return( CORE::map{ $_->getElementById } @$self );
 }
-       
+
 sub getRootNode
 {
     my $self = CORE::shift( @_ );
@@ -208,7 +209,7 @@ HTML::Object::XPath::NodeSet - HTML Object XPath Node Set
 
     use HTML::Object::XPath::NodeSet;
     my $set = HTML::Object::XPath::NodeSet->new || 
-        die( HTML::Object::XPath::NodeSet->error, "\n" );
+        die( HTML::Object::XPath::NodeSet->error );
 
     my $results = $xp->find( '//someelement' );
     if( !$results->isa( 'HTML::Object::XPath::NodeSet' ) )
@@ -216,7 +217,7 @@ HTML::Object::XPath::NodeSet - HTML Object XPath Node Set
         print( "Found $results\n" );
         exit;
     }
-    
+
     foreach my $context ( $results->get_nodelist )
     {
         my $newresults = $xp->find( './other/element', $context );
@@ -349,7 +350,7 @@ L<HTML::Object::XPath>, L<HTML::Object::XPath::Boolean>, L<HTML::Object::XPath::
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

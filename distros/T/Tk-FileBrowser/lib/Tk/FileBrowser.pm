@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.12';
+$VERSION = '0.14';
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
@@ -27,7 +27,6 @@ use File::Spec::Link;
 use Tie::Watch;
 use Tk;
 require Tk::ListBrowser;
-use Tk::FileBrowser::Images;
 use Tk::FileBrowser::Item;
 require Tk::Photo;
 require Tk::PNG;

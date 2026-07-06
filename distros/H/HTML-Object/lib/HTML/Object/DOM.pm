@@ -1,11 +1,11 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM.pm
-## Version v0.5.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.5.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2024/05/04
-## All rights reserved
+## Modified 2026/07/04
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -38,7 +38,7 @@ BEGIN
         DOCUMENT_POSITION_CONTAINS      => 8,
         DOCUMENT_POSITION_CONTAINED_BY  => 16,
         DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC => 32,
-        
+
         ELEMENT_NODE                    => 1,
         ATTRIBUTE_NODE                  => 2,
         TEXT_NODE                       => 3,
@@ -55,7 +55,7 @@ BEGIN
         NOTATION_NODE                   => 12,
         # non-standard addition, because we distinguish space from text
         SPACE_NODE                      => 13,
-        
+
         # For HTML::Object::DOM::Element::Media
         # There is no data yet. Also, readyState is HAVE_NOTHING.
         NETWORK_EMPTY       => 0,
@@ -65,7 +65,7 @@ BEGIN
         NETWORK_LOADING     => 2,
         # No HTMLMediaElement src found.
         NETWORK_NO_SOURCE   => 3,
-        
+
         # For HTML::Object::DOM::Element::Track
         # Indicates that the text track's cues have not been obtained.
         NONE                => 0,
@@ -75,16 +75,16 @@ BEGIN
         LOADED              => 2,
         # Indicates that the text track was enabled, but when the user agent attempted to obtain it, this failed in some way. Some or all of the cues are likely missing and will not be obtained.
         ERROR               => 3,
-        
+
         # For HTML::Object::Event
         # NONE            => 0,
         CAPTURING_PHASE     => 1,
         AT_TARGET           => 2,
         BUBBLING_PHASE      => 3,
-        
+
         CANCEL_PROPAGATION  => 1,
         CANCEL_IMMEDIATE_PROPAGATION => 2,
-        
+
         # HTML::Object::DOM::NodeFilter
         # Shows all nodes.
         SHOW_ALL                    => 4294967295,
@@ -114,11 +114,11 @@ BEGIN
         SHOW_NOTATION               => 2048,
         # Show spaces
         SHOW_SPACE                  => 4096,
-        
+
         FILTER_ACCEPT               => 1,
         FILTER_REJECT               => 2,
         FILTER_SKIP                 => 3,
-        
+
         # HTML::Object::DOM::XPathResult
         # A result set containing whatever type naturally results from evaluation of the expression. Note that if the result is a node-set then UNORDERED_NODE_ITERATOR_TYPE is always the resulting type.
         ANY_TYPE                        => 0,
@@ -143,7 +143,7 @@ BEGIN
     };
     our @EXPORT_OK = qw(
         screen window
-        
+
         DOCUMENT_POSITION_IDENTICAL
         DOCUMENT_POSITION_DISCONNECTED
         DOCUMENT_POSITION_PRECEDING
@@ -151,7 +151,7 @@ BEGIN
         DOCUMENT_POSITION_CONTAINS
         DOCUMENT_POSITION_CONTAINED_BY
         DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
-        
+
         ELEMENT_NODE
         ATTRIBUTE_NODE
         TEXT_NODE
@@ -165,16 +165,16 @@ BEGIN
         DOCUMENT_FRAGMENT_NODE
         NOTATION_NODE
         SPACE_NODE
-        
+
         NETWORK_EMPTY NETWORK_IDLE NETWORK_LOADING NETWORK_NO_SOURCE
         NONE LOADING LOADED ERROR
         CAPTURING_PHASE AT_TARGET BUBBLING_PHASE CANCEL_PROPAGATION CANCEL_IMMEDIATE_PROPAGATION
-        
+
         SHOW_ALL SHOW_ELEMENT SHOW_ATTRIBUTE SHOW_TEXT SHOW_CDATA_SECTION 
         SHOW_ENTITY_REFERENCE SHOW_ENTITY SHOW_PROCESSING_INSTRUCTION SHOW_COMMENT 
         SHOW_DOCUMENT SHOW_DOCUMENT_TYPE SHOW_DOCUMENT_FRAGMENT SHOW_NOTATION SHOW_SPACE
         FILTER_ACCEPT FILTER_REJECT FILTER_SKIP
-        
+
         ANY_TYPE NUMBER_TYPE STRING_TYPE BOOLEAN_TYPE
         UNORDERED_NODE_ITERATOR_TYPE ORDERED_NODE_ITERATOR_TYPE
         UNORDERED_NODE_SNAPSHOT_TYPE ORDERED_NODE_SNAPSHOT_TYPE
@@ -202,7 +202,7 @@ BEGIN
             DOCUMENT_POSITION_CONTAINS
             DOCUMENT_POSITION_CONTAINED_BY
             DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
-        
+
             ELEMENT_NODE
             ATTRIBUTE_NODE
             TEXT_NODE
@@ -231,7 +231,7 @@ BEGIN
     # An hash reference map to lowercase HTML tag name to perl class, for those who have special classes, otherwise the fallback is HTML::Object::Element.
     our $TAG_TO_CLASS = {};
     our $GLOBAL_DOM;
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.5.1';
 };
 
 use strict;
@@ -404,6 +404,7 @@ sub new_comment
     my $self = shift( @_ );
     my $e = HTML::Object::DOM::Comment->new( @_ ) ||
         return( $self->pass_error( HTML::Object::DOM::Comment->error ) );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -412,6 +413,7 @@ sub new_declaration
     my $self = shift( @_ );
     my $e = HTML::Object::DOM::Declaration->new( @_ ) ||
         return( $self->pass_error( HTML::Object::DOM::Declaration->error ) );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -422,6 +424,7 @@ sub new_document
         return( $self->pass_error( HTML::Object::DOM::Document->error ) );
     my $win = $self->window;
     $e->defaultView( $win );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -430,6 +433,7 @@ sub new_element
     my $self = shift( @_ );
     my $e = HTML::Object::DOM::Element->new( @_ ) ||
         return( $self->pass_error( HTML::Object::DOM::Element->error ) );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -446,6 +450,7 @@ sub new_text
     my $self = shift( @_ );
     my $e = HTML::Object::DOM::Text->new( @_ ) ||
         return( $self->pass_error( HTML::Object::DOM::Text->error ) );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -455,6 +460,7 @@ sub new_window
     my $e = HTML::Object::DOM::Window->new( @_ ) ||
         return( $self->pass_error( HTML::Object::DOM::Window->error ) );
     $e->screen( $SCREEN );
+    $e->debug( $self->debug );
     $WINDOW = $e unless( ref( $WINDOW ) );
     return( $e );
 }
@@ -522,11 +528,11 @@ HTML::Object::DOM - HTML Object DOM Class
 =head1 SYNOPSIS
 
     use HTML::Object::DOM;
-    my $this = HTML::Object::DOM->new || die( HTML::Object::DOM->error, "\n" );
+    my $this = HTML::Object::DOM->new || die( HTML::Object::DOM->error );
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.1
 
 =head1 DESCRIPTION
 
@@ -624,11 +630,11 @@ Upon execution, C<$_> is set to the L<HTML document object|HTML::Object::DOM::Do
 
 =over 4
 
-=item document
+=item * C<document>
 
 The L<document object|HTML::Object::DOM::Document>
 
-=item state
+=item * C<state>
 
 The state of the document parsing.
 
@@ -646,11 +652,11 @@ Upon execution, C<$_> is set to the L<HTML document object|HTML::Object::DOM::Do
 
 =over 4
 
-=item document
+=item * C<document>
 
 The L<document object|HTML::Object::DOM::Document>
 
-=item state
+=item * C<state>
 
 The state of the document parsing.
 
@@ -694,11 +700,11 @@ The event is being propagated through the target's ancestor objects. This proces
 
 =item AT_TARGET (2)
 
-The event has arrived at the event's target. Event listeners registered for this phase are called at this time. If L</bubbles> is false, processing the event is finished after this phase is complete.
+The event has arrived at the event's target. Event listeners registered for this phase are called at this time. If L<bubbles|HTML::Object::Event/bubbles> is false, processing the event is finished after this phase is complete.
 
 =item BUBBLING_PHASE (3)
 
-The event is propagating back up through the target's ancestors in reverse order, starting with the parent, and eventually reaching the containing L<document|HTML::Object::Document>. This is known as bubbling, and occurs only if L</bubbles> is true. Event listeners registered for this phase are triggered during this process.
+The event is propagating back up through the target's ancestors in reverse order, starting with the parent, and eventually reaching the containing L<document|HTML::Object::Document>. This is known as bubbling, and occurs only if L<bubbles|HTML::Object::Event/bubbles> is true. Event listeners registered for this phase are triggered during this process.
 
 =item CANCEL_PROPAGATION (1)
 
@@ -975,7 +981,7 @@ L<W3C standard|https://html.spec.whatwg.org/multipage/dom.html>, L<HTML elements
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

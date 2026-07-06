@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
 ## Modified 2023/11/06
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -181,9 +181,9 @@ sub _set_up_down
     $incr = POSIX::floor( "$incr" );
     my $dir = $opts->{direction} // 'down';
     my $val = $self->value;
-    $self->_load_class( 'DateTime' ) || return( $self->pass_error );
-    $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
-    $self->_load_class( 'DateTime::Duration' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Format::Lite' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Lite::Duration' ) || return( $self->pass_error );
     my $type2unit =
     {
     date                => { unit => 'day', pattern => '%Y-%m-%d', default => '1970-01-01', step_re => qr/^\d+$/ },
@@ -212,7 +212,7 @@ sub _set_up_down
         message => "This input step value provided '" . ( $step // 'undef' ) . "' (" . $self->_str_val( $step // 'undef' ) . ") is not a proper number.",
         class => 'HTML::Object::SyntaxError',
     }) ) if( !$self->_is_number( $step ) );
-    
+
     my $parse;
     $parse = sub
     {
@@ -223,14 +223,14 @@ sub _set_up_down
         {
             foreach my $pat ( @{$def->{pattern}} )
             {
-                $fmt = DateTime::Format::Strptime->new( pattern => $pat );
+                $fmt = DateTime::Format::Lite->new( pattern => $pat );
                 $dt = $fmt->parse_datetime( "$this" );
                 last if( $dt );
             }
         }
         else
         {
-            $fmt = DateTime::Format::Strptime->new( pattern => $def->{pattern} );
+            $fmt = DateTime::Format::Lite->new( pattern => $def->{pattern} );
             $dt = $fmt->parse_datetime( "$this" );
         }
         if( !defined( $dt ) )
@@ -240,10 +240,10 @@ sub _set_up_down
                 class => 'HTML::Object::InvalidStateError',
             }) );
         }
-        
+
         if( $def->{format} )
         {
-            $dt->set_formatter( DateTime::Format::Strptime->new( pattern => $def->{format} ) );
+            $dt->set_formatter( DateTime::Format::Lite->new( pattern => $def->{format} ) );
         }
         else
         {
@@ -251,7 +251,7 @@ sub _set_up_down
         }
         return( $dt );
     };
-    
+
     $max //= '';
     if( !defined( $val ) || !CORE::length( "$val" ) )
     {
@@ -294,7 +294,7 @@ sub _set_up_down
             $val = $def->{default};
         }
     }
-    
+
     # try-catch
     my $rv = eval
     {
@@ -310,7 +310,7 @@ sub _set_up_down
                 return( $self );
             }
         }
-        # We manage it ourself, i.e. without using DateTime::Format::Strptime, beecause 
+        # We manage it ourself, i.e. without using DateTime::Format::Lite, beecause 
         # the parser does not seem capable of recognising format like 2021-W23 even with 
         # the proper pattern
         elsif( $type eq 'week' )
@@ -326,10 +326,10 @@ sub _set_up_down
                     message => "Week number found \"$w\" is lower than the minimum possible 1",
                     class => 'HTML::Object::InvalidStateError',
                 }) ) if( int( $w ) < 1 );
-                my $dt = DateTime->from_day_of_year( year => $y, day_of_year => ( $w * 7 ) );
-                my $fmt = DateTime::Format::Strptime->new( pattern => $def->{pattern} );
+                my $dt = DateTime::Lite->from_day_of_year( year => $y, day_of_year => ( $w * 7 ) );
+                my $fmt = DateTime::Format::Lite->new( pattern => $def->{pattern} );
                 $dt->set_formatter( $fmt );
-                
+
                 if( $dir eq 'up' )
                 {
                     $dt->add( weeks => ( $step * $incr ) );
@@ -338,7 +338,7 @@ sub _set_up_down
                 {
                     $dt->subtract( weeks => ( $step * $incr ) );
                 }
-                
+
                 if( $dir eq 'down' && defined( $min ) && CORE::length( "$min" )  )
                 {
                     my( $min_year, $min_week );
@@ -353,7 +353,7 @@ sub _set_up_down
                             message => "Minimum week number found \"$min_week\" is lower than the minimum possible 1",
                             class => 'HTML::Object::InvalidStateError',
                         }) ) if( int( $min_week ) < 1 );
-                        my $dt_min = DateTime->from_day_of_year( year => $min_year, day_of_year => ( $min_week * 7 ) );
+                        my $dt_min = DateTime::Lite->from_day_of_year( year => $min_year, day_of_year => ( $min_week * 7 ) );
                         $dt_min->set_formatter( $fmt );
                         if( $dt < $dt_min )
                         {
@@ -383,7 +383,7 @@ sub _set_up_down
                             message => "Maximum week number found \"$max_week\" is lower than the minimum possible 1",
                             class => 'HTML::Object::InvalidStateError',
                         }) ) if( int( $max_week ) < 1 );
-                        my $dt_max = DateTime->from_day_of_year( year => $max_year, day_of_year => ( $max_week * 7 ) );
+                        my $dt_max = DateTime::Lite->from_day_of_year( year => $max_year, day_of_year => ( $max_week * 7 ) );
                         $dt_max->set_formatter( $fmt );
                         if( $dt > $dt_max )
                         {
@@ -414,7 +414,7 @@ sub _set_up_down
             my $dt = $parse->( $val );
             return( $self->pass_error ) if( !defined( $dt ) );
             # We can pass negative number to duration
-            my $interval = DateTime::Duration->new( "$def->{unit}s" => ( $step * $incr ) );
+            my $interval = DateTime::Lite::Duration->new( "$def->{unit}s" => ( $step * $incr ) );
             if( $dir eq 'up' )
             {
                 $dt->add_duration( $interval );
@@ -423,8 +423,8 @@ sub _set_up_down
             {
                 $dt->subtract_duration( $interval );
             }
-            
-            
+
+
             if( $dir eq 'down' && defined( $min ) && CORE::length( "$min" )  )
             {
                 my $dt_min = $parse->( "$min" );
@@ -491,7 +491,7 @@ HTML::Object::DOM::Element::Input - HTML Object DOM Input Class
 
     use HTML::Object::DOM::Element::Input;
     my $input = HTML::Object::DOM::Element::Input->new || 
-        die( HTML::Object::DOM::Element::Input->error, "\n" );
+        die( HTML::Object::DOM::Element::Input->error );
 
 =head1 VERSION
 
@@ -938,7 +938,7 @@ Decrements the value by (step * n), where n defaults to 1 if not specified. Retu
 
 =item * if the method is not applicable to for the current type value,
 
-=item * if the value cannot be converted to a number or recognised as a L<DateTime> object when applicable,
+=item * if the value cannot be converted to a number or recognised as a L<DateTime> or L<DateTime::Lite> object when applicable,
 
 =item * if the resulting value is above the L</max> or below the L</min> set by their respective HTML attribute.
 
@@ -1273,7 +1273,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLInp
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -34,17 +34,13 @@ feed (self, buffer)
 
 	PREINIT:
 		const char *b;
-		STRLEN size, available;
+		STRLEN size;
 
 	CODE:
 		b = SvPV (buffer, size);
 
-		available = msgpack_unpacker_buffer_capacity (&self->unpacker);
-		if (size > available)
-		{
-			STRLEN extra = size-available;
-			msgpack_unpacker_reserve_buffer (&self->unpacker, extra);
-		}
+		if (!msgpack_unpacker_reserve_buffer (&self->unpacker, size))
+			croak ("feed: out of memory");
 
 		memcpy (msgpack_unpacker_buffer (&self->unpacker), b, size);
 		msgpack_unpacker_buffer_consumed (&self->unpacker, size);

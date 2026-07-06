@@ -6,7 +6,7 @@ use Math::BigInt 1.78 try => 'GMP, Pari';
 use Carp qw( croak );
 use Crypt::DSA::Util qw( bitsize );
 
-our $VERSION = '1.23'; #VERSION
+our $VERSION = '1.24'; #VERSION
 
 use vars qw{$VERSION};
 

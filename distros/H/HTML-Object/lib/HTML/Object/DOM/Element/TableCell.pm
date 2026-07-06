@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/07
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -133,7 +133,7 @@ HTML::Object::DOM::Element::TableCell - HTML Object DOM TableCell Class
 
     use HTML::Object::DOM::Element::TableCell;
     my $cell = HTML::Object::DOM::Element::TableCell->new( tag => 'th' ) || 
-        die( HTML::Object::DOM::Element::TableCell->error, "\n" );
+        die( HTML::Object::DOM::Element::TableCell->error );
 
 =head1 VERSION
 
@@ -315,7 +315,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLTab
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

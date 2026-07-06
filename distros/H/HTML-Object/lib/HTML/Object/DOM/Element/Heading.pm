@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/06
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ HTML::Object::DOM::Element::Heading - HTML Object DOM Heading Class
 
     use HTML::Object::DOM::Element::Heading;
     my $heading = HTML::Object::DOM::Element::Heading->new ||
-        die( HTML::Object::DOM::Element::Heading->error, "\n" );
+        die( HTML::Object::DOM::Element::Heading->error );
 
 =head1 VERSION
 
@@ -93,7 +93,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLHea
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

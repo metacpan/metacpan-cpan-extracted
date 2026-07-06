@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/17
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ HTML::Object::ErrorEvent - HTML Object Error Event Class
 
     use HTML::Object::ErrorEvent;
     my $event = HTML::Object::ErrorEvent->new( 'WARN' ) || 
-        die( HTML::Object::ErrorEvent->error, "\n" );
+        die( HTML::Object::ErrorEvent->error );
 
 =head1 VERSION
 
@@ -97,7 +97,7 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Erro
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

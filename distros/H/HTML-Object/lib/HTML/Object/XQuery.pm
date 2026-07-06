@@ -1,11 +1,11 @@
 ##----------------------------------------------------------------------------
-## HTML Object - ~/lib/HTML/Object/XQuery.pm
-## Version v0.4.0
+## HTML Object - ~/lib/m
+## Version v0.4.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/01
-## Modified 2024/04/27
-## All rights reserved
+## Modified 2026/06/27
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,7 @@ BEGIN
     use vars qw( @EXPORT $DEBUG $VERSION );
     our @EXPORT = qw( xq );
     our $DEBUG = 0;
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -320,12 +320,12 @@ sub noop { return }
 sub now
 {
     my $self = shift( @_ );
-    $self->_load_class( 'DateTime' ) || return( $self->pass_error );
-    $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
-    my $fmt = DateTime::Format::Strptime->new(
+    $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Format::Lite' ) || return( $self->pass_error );
+    my $fmt = DateTime::Format::Lite->new(
         pattern => '%s',
     );
-    my $dt = DateTime->now(
+    my $dt = DateTime::Lite->now(
         formatter => $fmt,
     );
     return( $dt );
@@ -432,7 +432,7 @@ sub type
     {
         return( 'array' );
     }
-    elsif( $self->_is_a( $this => [qw( DateTime Module::Generic::DateTime )] ) )
+    elsif( $self->_is_a( $this => [qw( DateTime DateTime::Lite Module::Generic::DateTime )] ) )
     {
         return( 'date' );
     }
@@ -799,18 +799,19 @@ sub ajax
             my $dt;
             if( $ifmod->{since} =~ /^\d{10}$/ )
             {
+                $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
                 # try-catch
                 local $@;
                 $dt = eval
                 {
-                    DateTime->from_epoch( epoch => $ifmod->{since} );
+                    DateTime::Lite->from_epoch( epoch => $ifmod->{since} );
                 };
                 if( $@ )
                 {
                     return( $self->error( "Error with the timestamp provided for the option ifModified: $@" ) );
                 }
             }
-            elsif( $self->_is_a( $ifmod->{since} => [qw( DateTime Module::Generic::DateTime )] ) )
+            elsif( $self->_is_a( $ifmod->{since} => [qw( DateTime DateTime::Lite Module::Generic::DateTime )] ) )
             {
                 $dt = $ifmod->{since};
             }
@@ -819,12 +820,12 @@ sub ajax
                 return( $self->error( "Unsupported value provided to option ifModified->since: '", ( $ifmod->{since} // 'undef' ), "'" ) );
             }
 
-            $self->_load_class( 'DateTime::Format::Strptime' ) ||
+            $self->_load_class( 'DateTime::Format::Lite' ) ||
                 return( $self->pass_error );
             $dt->set_time_zone( 'GMT' );
-            my $fmt = DateTime::Format::Strptime->new(
-                pattern => '%a, %d %b %Y %H:%M:%S GMT',
-                locale  => 'en_GB',
+            my $fmt = DateTime::Format::Lite->new(
+                pattern   => '%a, %d %b %Y %H:%M:%S GMT',
+                locale    => 'en_GB',
                 time_zone => 'GMT',
             );
             $dt->set_formatter( $fmt );
@@ -2596,7 +2597,7 @@ sub html
                 my $p = $self->new_parser;
                 my $doc = $p->parse_data( "$html" ) || do
                 {
-                    warn( "Error while trying to parse html data returned by code reference supplied: ", $p->error, "\n" );
+                    warn( "Error while trying to parse html data returned by code reference supplied: ", $p->error );
                     # Switch to next element
                     return(1);
                 };
@@ -3618,12 +3619,7 @@ sub removeClass
     my $this;
     $this = shift( @_ ) if( @_ );
     my $a;
-    # No class provided, so we will remove all existing class
-    if( !defined( $this ) )
-    {
-        $a = $self->new_array;
-    }
-    elsif( $self->_is_array( $this ) )
+    if( $self->_is_array( $this ) )
     {
         $a = $self->new_array( $this );
         my $failed = 0;
@@ -3638,6 +3634,16 @@ sub removeClass
         });
         return( $self ) if( $failed );
     }
+    elsif( defined( $this ) )
+    {
+        $a = $self->new_array( "$this" );
+    }
+
+    # No class provided, so we will remove all existing class
+    if( !defined( $a ) )
+    {
+        $a = $self->new_array;
+    }
 
     my $process;
     $process = sub
@@ -3645,6 +3651,7 @@ sub removeClass
         my $e = shift( @_ );
         return( $e ) unless( $e->attributes->exists( 'class' ) );
         my $c = $self->new_array( [split( /[[:blank:]\h]+/, $e->attributes->get( 'class' ) )] );
+        my $new = $self->new_array;
         # Loop through the element classes
         $c->for(sub
         {
@@ -3662,17 +3669,35 @@ sub removeClass
                     $a = $self->new_array( [ $res ] );
                 }
             }
+            my $need_to_remove = 0;
             $a->foreach(sub
             {
                 my $to_remove = shift( @_ );
                 if( $v CORE::eq "$to_remove" )
                 {
-                    $c->splice( $i, 1 );
-                    $c->return( -1 );
+                    $need_to_remove++;
+                    return(1);
                 }
-                return;
             });
+            if( !$need_to_remove )
+            {
+                $new->push( $v );
+            }
         });
+        if( $c->length )
+        {
+            if( !$e->setAttribute( class => $new->join( ' ' )->scalar ) )
+            {
+                warn( "Error trying to set the class attribute for element '", $self->_str_val( $e ), "': ", $e->error ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
+            }
+        }
+        else
+        {
+            if( !$e->removeAttribute( 'class' ) )
+            {
+                warn( "Error trying to remove the class attribute from element '", $self->_str_val( $e ), "': ", $e->error ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
+            }
+        }
         $e->reset(1);
         return(1);
     };

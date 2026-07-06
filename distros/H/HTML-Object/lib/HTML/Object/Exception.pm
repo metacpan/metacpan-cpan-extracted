@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/11/27
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -52,46 +52,46 @@ sub toString { return( shift->as_string ); }
     {
         use parent -norequire, qw( HTML::Object::Exception );
     };
-    
+
     package HTML::Object::IndexSizeError;
     BEGIN
     {
         use parent -norequire, qw( HTML::Object::Exception );
     };
-    
+
     package
         HTML::Object::InvalidCharacterError;
     BEGIN
     {
         use parent -norequire, qw( HTML::Object::Exception );
     };
-    
+
     package
         HTML::Object::InvalidStateError;
     BEGIN
     {
         use parent -norequire, qw( HTML::Object::Exception );
     };
-    
+
     package HTML::Object::MediaError;
     BEGIN
     {
         use parent -norequire, qw( HTML::Object::Exception );
     };
-    
+
     package HTML::Object::NotFoundError;
     BEGIN
     {
         use parent -norequire, qw( HTML::Object::Exception );
     };
-    
+
     package
         HTML::Object::SyntaxError;
     BEGIN
     {
         use parent -norequire, qw( HTML::Object::Exception );
     };
-    
+
     package
         HTML::Object::TypeError;
     BEGIN
@@ -114,7 +114,7 @@ HTML::Object::Exception - HTML Object
 
     use HTML::Object::Exception;
     my $this = HTML::Object::Exception->new || 
-        die( HTML::Object::Exception->error, "\n" );
+        die( HTML::Object::Exception->error );
 
 =head1 VERSION
 
@@ -143,6 +143,8 @@ The file name where the error occurred. This is an alias for L<Module::Generic::
 An alias for L</fileName>
 
 =head2 lineno
+
+The Exception line number.
 
 =head2 lineNumber
 
@@ -230,7 +232,8 @@ L<HTML::Object>, L<HTML::Object::Attribute>, L<HTML::Object::Boolean>, L<HTML::O
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
+
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

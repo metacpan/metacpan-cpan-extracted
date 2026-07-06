@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/29
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -50,7 +50,7 @@ HTML::Object::DOM::TrackEvent - HTML Object DOM Track Event
 
     use HTML::Object::DOM::TrackEvent;
     my $event = HTML::Object::DOM::TrackEvent->new( $type ) || 
-        die( HTML::Object::DOM::TrackEvent->error, "\n" );
+        die( HTML::Object::DOM::TrackEvent->error );
 
 =head1 VERSION
 
@@ -150,7 +150,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/TrackEv
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

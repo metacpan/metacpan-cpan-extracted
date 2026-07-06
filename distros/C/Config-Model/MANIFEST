@@ -54,6 +54,7 @@ lib/Config/Model/Role/HelpAsText.pm
 lib/Config/Model/Role/NodeLoader.pm
 lib/Config/Model/Role/Utils.pm
 lib/Config/Model/Role/WarpMaster.pm
+lib/Config/Model/Role/WarpSubject.pm
 lib/Config/Model/SearchElement.pm
 lib/Config/Model/SimpleUI.pm
 lib/Config/Model/TermUI.pm
@@ -80,9 +81,10 @@ lib/Config/Model/models/Fstab/Iso9660_Opt.pl
 lib/Config/Model/models/Fstab/NoneOptions.pl
 lib/Config/Model/models/Fstab/SwapOptions.pl
 lib/Config/Model/models/Fstab/UsbFsOptions.pl
+lib/Config/Model/models/Fstab/VfatOpt.pl
 lib/Config/Model/models/PopCon.pl
 lib/Config/Model/models/PopCon.pod
-lib/Config/Model/scripts/translate_legacy
+lib/Config/Model/scripts/translate-legacy
 lib/Config/Model/system.d/fstab
 lib/Config/Model/system.d/popcon
 t/README.md

@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/06
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -48,7 +48,7 @@ HTML::Object::DOM::Element::Picture - HTML Object DOM Picture Class
 
     use HTML::Object::DOM::Element::Picture;
     my $picture = HTML::Object::DOM::Element::Picture->new ||
-        die( HTML::Object::DOM::Element::Picture->error, "\n" );
+        die( HTML::Object::DOM::Element::Picture->error );
 
 =head1 VERSION
 
@@ -84,7 +84,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLPic
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -33,6 +33,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "IO::Pager" : "0"
+         },
          "requires" : {
             "Class::Accessor::Fast" : "0.51",
             "File::ShareDir" : "1.118",
@@ -59,11 +62,11 @@
    "provides" : {
       "CLI::Simple" : {
          "file" : "lib/CLI/Simple.pm",
-         "version" : "v2.0.9"
+         "version" : "v2.0.10"
       },
       "CLI::Simple::Constants" : {
          "file" : "lib/CLI/Simple/Constants.pm",
-         "version" : "v2.0.9"
+         "version" : "v2.0.10"
       },
       "CLI::Simple::DumpSpec" : {
          "file" : "lib/CLI/Simple/DumpSpec.pm",
@@ -91,7 +94,7 @@
       },
       "CLI::Simple::Utils" : {
          "file" : "lib/CLI/Simple/Utils.pm",
-         "version" : "v2.0.9"
+         "version" : "v2.0.10"
       }
    },
    "release_status" : "stable",
@@ -107,6 +110,6 @@
          "web" : "http://github.com/rlauer6/CLI-Simple"
       }
    },
-   "version" : "v2.0.9",
+   "version" : "v2.0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

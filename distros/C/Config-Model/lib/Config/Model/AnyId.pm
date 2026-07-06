@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.163;
+package Config::Model::AnyId 2.164;
 
 use 5.020;
 
@@ -131,7 +131,7 @@ around BUILDARGS => sub {
     return $class->$orig( backup => dclone( \%h ), @_ );
 };
 
-has [qw/backup cargo/] => ( is => 'ro', isa => 'HashRef', required => 1 );
+has [qw/cargo/] => ( is => 'ro', isa => 'HashRef', required => 1 );
 has warp => ( is => 'ro', isa => 'Maybe[HashRef]' );
 has [qw/morph/] => ( is => 'ro', isa => 'Bool', default => 0 );
 has content_warning_list => ( is => 'rw', isa => 'ArrayRef', default => sub { []; } );
@@ -154,6 +154,11 @@ sub _config_model {
 sub config_class_name {
     my $self = shift;
     return $self->cargo->{config_class_name};
+}
+
+# used by roles
+sub allowed_warp_params {
+    return @allowed_warp_params;
 }
 
 sub BUILD {
@@ -186,16 +191,17 @@ sub BUILD {
 
 # this method can be called by the warp mechanism to alter (warp) the
 # feature of the Id object.
-sub set_properties ($self, @args) {
+sub set_properties ($self, %raw_args) {
     # mega cleanup
     for ( @allowed_warp_params ) { delete $self->{$_}; }
 
-    my %args = ( %{ $self->{backup} }, @args );
+    # merge data passed to set_properties with data passed to the constructor
+    my %args = $self->merge_properties(%raw_args);
 
     # these are handled by Node or Warper
     for ( qw/level/ ) { delete $args{$_}; }
 
-    $logger->trace( $self->name, " set_properties called with @args" );
+    $logger->trace( $self->name, " set_properties called with %raw_args" );
 
     for ( @common_params ) {
         $self->{$_} = delete $args{$_} if defined $args{$_};
@@ -402,8 +408,6 @@ sub handle_args ($self, %args) {
     for (qw/index_class index_type morph ordered/) {
         $self->{$_} = delete $args{$_} if defined $args{$_};
     }
-
-    $self->{backup} = dclone( \%args );
 
     $self->set_properties(%args) if defined $self->{index_type};
 
@@ -680,7 +684,7 @@ sub check_duplicates {
         $h{$v} = 0 unless defined $h{$v};
         $h{$v}++;
         if ( $h{$v} > 1 ) {
-            $logger->debug("got duplicates $i -> $v : $h{$v}");
+            $logger->info(qq!got $h{$v} duplicates key "$i" value "$v"!);
             push @to_delete, $i;
             push @issues,    qq!$i:"$v"!;
         }
@@ -689,20 +693,20 @@ sub check_duplicates {
     return unless @issues;
 
     if ($apply_fix) {
-        $logger->debug("Fixing duplicates @issues, removing @to_delete");
+        $logger->info("Fixing duplicates @issues, removing @to_delete");
         for (reverse @to_delete) { $self->remove($_) }
     }
     elsif ( $dup eq 'forbid' ) {
-        $logger->debug("Found forbidden duplicates @issues");
+        $logger->info("Found forbidden duplicates @issues");
         push @$error, "Forbidden duplicates value @issues";
     }
     elsif ( $dup eq 'warn' ) {
-        $logger->debug("warning condition: found duplicate @issues");
+        $logger->info("warning condition: found duplicate @issues");
         push @$warn, "Duplicated value: @issues";
         $self->add_fixes( scalar @issues);
     }
     elsif ( $dup eq 'suppress' ) {
-        $logger->debug("suppressing duplicates @issues");
+        $logger->info("suppressing duplicates @issues");
         for (reverse @to_delete) { $self->remove($_) }
     }
     else {
@@ -1075,7 +1079,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 
@@ -1365,31 +1369,41 @@ L<Config::Model::Warper> for explanation on warp mechanism)
 
 For instance, with this model:
 
- $model ->create_config_class 
-  (
+ $model ->create_config_class (
    name => 'Root',
-   'element'
-   => [
-       macro => { type => 'leaf',
-                  value_type => 'enum',
-                  name       => 'macro',
-                  choice     => [qw/A B C/],
-                },
-       warped_hash => { type => 'hash',
-                        index_type => 'integer',
-                        max_nb     => 3,
-                        warp       => {
-                                       follow => '- macro',
-                                       rules => { A => { max_nb => 1 },
-                                                  B => { max_nb => 2 }
-                                                }
-                                      },
-                        cargo => { type => 'node',
-                                   config_class_name => 'Dummy'
-                                 }
-                      },
-     ]
-  );
+   element => [
+     macro => {
+       type => 'leaf',
+       value_type => 'enum',
+       name       => 'macro',
+       choice     => [qw/A B C/]
+     },
+     warped_hash => {
+       type => 'hash',
+       index_type => 'integer',
+       max_nb     => 3,
+       warp => {
+         follow => {
+           macro => '- macro'
+         },
+         rules => [
+           {
+             apply => { max_nb => 2 },
+             when => '$macro eq "B"'
+           },
+           {
+             apply => { max_nb => 1 },
+             when => '$macro eq "A"'
+           }
+         ]
+       },
+       cargo => {
+         type => 'node',
+         config_class_name => 'Dummy'
+       }
+     },
+   ]
+ );
 
 Setting C<macro> to C<A> means that C<warped_hash> can only accept
 one C<Dummy> class item .
@@ -1400,13 +1414,22 @@ C<Dummy> class items.
 Like other warped class, a HashId or ListId can have multiple warp
 masters (See L<Config::Model::Warper/"Warp follow argument">:
 
-  warp => { follow => { m1 => '- macro1', 
-                        m2 => '- macro2' 
-                      },
-            rules  => [ '$m1 eq "A" and $m2 eq "A2"' => { max_nb => 1},
-                        '$m1 eq "A" and $m2 eq "B2"' => { max_nb => 2}
-                      ],
-          }
+  warp => {
+    follow => {
+      m1 => '- macro1',
+      m2 => '- macro2'
+    },
+    rules => [
+      {
+        apply => { max_nb => 1 },
+        when => '$m1 eq "A" and $m2 eq "A2"'
+      },
+      {
+        apply => { max_nb => 2 },
+        when => '$m1 eq "A" and $m2 eq "B2"'
+      }
+    ]
+  },
 
 =head2 Warp and auto_create_ids or auto_create_keys
 

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use RPi::Pin;
+use RPi::Const qw(:all);
 use Test::More;
 
 my $mod = 'RPi::Pin';
@@ -36,14 +37,25 @@ if ($> != 0){
 
     if (! $ENV{NO_BOARD}) {
         my $pin = $mod->new(18);
-        $pin->mode(2);
+        $pin->mode(PWM_OUT);
 
-        # GPIO 18 hardware PWM is ALT5 (2) on Pi 1-4, ALT3 (7) on Pi 5
+        # GPIO 18 hardware PWM reads back via get_alt() as ALT5 (2) on the
+        # legacy BCM boards (Pi 1-4) and ALT3 (7) on the Pi 5 / RP1
 
         my $alt = $pin->mode;
-        ok $alt == 2 || $alt == 7, "pin mode set to PWM ok, and we can read it ($alt)";
-        $pin->mode(0);
-        is $pin->mode, 0, "pin mode set back to INPUT";
+        ok $alt == ALT5 || $alt == ALT3,
+            "pin mode set to PWM ok, and we can read it ($alt)";
+
+        # Regression guard for the RP1: pwm() must accept a write once the pin
+        # is in PWM mode, on every board. The old pin-18 guard compared
+        # get_alt() against PWM_OUT (2) and wrongly died on the Pi 5, where the
+        # PWM alt reads back as ALT3 (7), not PWM_OUT.
+        ok eval { $pin->pwm(512); 1 },
+            "pwm() accepts a write while the pin is in PWM mode";
+        $pin->pwm(0);
+
+        $pin->mode(INPUT);
+        is $pin->mode, INPUT, "pin mode set back to INPUT";
     }
 }
 

@@ -9,6 +9,8 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
@@ -27,35 +29,15 @@ return [
         'value_type' => 'integer'
       },
       'devgid',
-      {
-        'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'integer'
-      },
+      '*devuid',
       'busuid',
-      {
-        'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'integer'
-      },
+      '*devuid',
       'budgid',
-      {
-        'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'integer'
-      },
+      '*devuid',
       'listuid',
-      {
-        'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'integer'
-      },
+      '*devuid',
       'listgid',
-      {
-        'type' => 'leaf',
-        'upstream_default' => '0',
-        'value_type' => 'integer'
-      },
+      '*devuid',
       'devmode',
       {
         'type' => 'leaf',
@@ -83,4 +65,3 @@ return [
   }
 ]
 ;
-

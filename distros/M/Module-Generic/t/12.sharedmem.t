@@ -155,6 +155,11 @@ SKIP:
             pass( "sub process exited rapidly" );
         }
         my $data = $s->read;
+        if( ref( $data ) ne 'HASH' )
+        {
+            diag( "Expected a HASH reference but got: ref='", ( ref( $data ) || 'none' ), "', value='", ( defined( $data ) ? $data : 'undef' ), "'" );
+            diag( "Read error: ", $s->error ) if( $s->error );
+        }
         ok( ref( $data ) eq 'HASH', 'shared updated data type' );
         if( ref( $data ) ne 'HASH' )
         {
@@ -341,6 +346,11 @@ subtest 'Module::Generic::SharedMemXS' => sub
                 pass( "sub process exited rapidly" );
             }
             my $data = $s->read;
+            if( ref( $data ) ne 'HASH' )
+            {
+                diag( "Expected a HASH reference but got: ref='", ( ref( $data ) || 'none' ), "', value='", ( defined( $data ) ? $data : 'undef' ), "'" );
+                diag( "Read error: ", $s->error ) if( $s->error );
+            }
             ok( ref( $data ) eq 'HASH', 'shared updated data type' );
             if( ref( $data ) ne 'HASH' )
             {

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.6.1
+## Version v0.6.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2026/03/29
+## Modified 2026/07/06
 ## All rights reserved
 ## 
 ## 
@@ -33,7 +33,7 @@ BEGIN
     use JSON;
     use Module::Generic::File qw( file );
     use Scalar::Util ();
-    our $VERSION = 'v0.6.1';
+    our $VERSION = 'v0.6.3';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -54,7 +54,7 @@ use warnings;
         eval
         {
             my $json = $tags_repo->load_utf8 ||
-                die( "Unable to open html tags json dictionary \"$tags_repo\": ", $tags_repo->error, "\n" );
+                die( "Unable to open html tags json dictionary \"$tags_repo\": ", $tags_repo->error );
             my $j = JSON->new->relaxed;
             my $hash = $j->decode( $json );
             die( "No html tags found inside dictionary file \"$tags_repo\"\n" ) if( !scalar( keys( %{$hash->{dict}} ) ) );
@@ -97,7 +97,7 @@ sub import
             $i--;
         }
     }
-    
+
     {
         local $Exporter::ExportLevel = 1;
         Exporter::import( $class, @_ );
@@ -111,13 +111,13 @@ sub import
     {
         $FATAL_ERROR = 1;
     }
-    
+
     if( $hash->{try_catch} )
     {
         require Nice::Try;
         Nice::Try->export_to_level( 1, @_ );
     }
-    
+
     if( $hash->{global_dom} || $hash->{xquery} )
     {
         Filter::Util::Call::filter_add( bless( $hash => ( ref( $class ) || $class ) ) );
@@ -153,7 +153,7 @@ sub filter
         {
             last;
         }
-        
+
         s{
             (?<!\\)\$\(
         }
@@ -400,7 +400,7 @@ sub add_start
         # and
         debug    => $self->debug,
     };
-    
+
     # If this tag is handled by a special class, instantiate the object by this class
     if( $def->{class} )
     {
@@ -491,6 +491,7 @@ sub new_comment
     my $self = shift( @_ );
     my $e = HTML::Object::Comment->new( @_ ) ||
         return( $self->pass_error( HTML::Object::Comment->error ) );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -499,6 +500,7 @@ sub new_declaration
     my $self = shift( @_ );
     my $e = HTML::Object::Declaration->new( @_ ) ||
         return( $self->pass_error( HTML::Object::Declaration->error ) );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -507,6 +509,7 @@ sub new_document
     my $self = shift( @_ );
     my $e = HTML::Object::Document->new( @_ ) ||
         return( $self->pass_error( HTML::Object::Document->error ) );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -515,6 +518,7 @@ sub new_element
     my $self = shift( @_ );
     my $e = HTML::Object::Element->new( @_ ) ||
         return( $self->pass_error( HTML::Object::Element->error ) );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -532,6 +536,7 @@ sub new_special
     my $class = shift( @_ );
     $self->_load_class( $class ) || return( $self->pass_error );
     my $e = $class->new( @_ ) || return( $self->pass_error( $class->error ) );
+    $e->debug( $self->debug );
     return( $e );
 }
 
@@ -581,7 +586,7 @@ sub parse_data
     {
         return( $self->error( "Error found while utf8 decoding ", length( $html ), " bytes of html data provided: $@" ) );
     }
-    
+
     my $e;
     if( length( $self->{current_parent} ) && $self->_is_object( $self->{current_parent} ) )
     {
@@ -694,7 +699,7 @@ sub parse_url
     {
         return( $self->error( "Bad url provided \"$uri\": $@" ) );
     }
-    
+
     my $content;
     my $resp;
     # try-catch
@@ -867,7 +872,7 @@ HTML::Object - HTML Parser, Modifier and Query Interface
 
     use HTML::Object;
     my $p = HTML::Object->new( debug => 5 );
-    my $doc = $p->parse( $file, { utf8 => 1 } ) || die( $p->error, "\n" );
+    my $doc = $p->parse( $file, { utf8 => 1 } ) || die( $p->error );
     print $doc->as_string;
 
 or, using the HTML DOM implementation same as the Web API:
@@ -875,7 +880,7 @@ or, using the HTML DOM implementation same as the Web API:
     use HTML::Object::DOM global_dom => 1;
     # then you can also use HTML::Object::XQuery for jQuery like DOM manipulation
     my $p = HTML::Object::DOM->new;
-    my $doc = $p->parse_data( $some_html ) || die( $p->error, "\n" );
+    my $doc = $p->parse_data( $some_html ) || die( $p->error );
     $('div.inner')->after( "<p>Test</p>" );
 
 You can also enable access to L<xQuery> class functions with the C<$.> prefix, like jQuery, by passing the C<xquery> option:
@@ -902,7 +907,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.6.1
+    v0.6.3
 
 =head1 DESCRIPTION
 
@@ -1169,8 +1174,10 @@ L<HTML::Object::DOM>, L<HTML::Object::Element>, L<HTML::Object::XQuery>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

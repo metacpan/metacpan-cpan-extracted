@@ -4,11 +4,13 @@ Unicode::UTF8 - Encoding and decoding of UTF-8 encoding form
 
 =head1 SYNOPSIS
 
-    use Unicode::UTF8 qw[decode_utf8 encode_utf8];
+    use Unicode::UTF8 qw[decode_utf8 encode_utf8 read_utf8];
     
     use warnings FATAL => 'utf8'; # fatalize encoding glitches
     $string = decode_utf8($octets);
     $octets = encode_utf8($string);
+    
+    $count = read_utf8($fh, $buf, $length);
 
 =head1 DESCRIPTION
 
@@ -27,8 +29,8 @@ string.
 
 C<$fallback> is an optional C<CODE> reference which provides a error-handling 
 mechanism, allowing customization of error handling. The default error-handling 
-mechanism is to replace any ill-formed UTF-8 sequences or encoded code points 
-which can't be interchanged with REPLACEMENT CHARACTER (U+FFFD).
+mechanism is to replace any ill-formed UTF-8 sequences with REPLACEMENT
+CHARACTER (U+FFFD).
 
     $string = $fallback->($octets, $is_usv, $position);
 
@@ -68,12 +70,43 @@ C<$fallback> must return a character string consisting of zero or more Unicode
 scalar values.Unicode scalar values consist of code points in the range 
 U+0000..U+D7FF and U+E000..U+10FFFF.
 
+=head2 read_utf8  
+
+    $count = read_utf8($fh, $buf, $length);
+    $count = read_utf8($fh, $buf, $length, $offset);
+
+Reads up to C<$length> UTF-8 encoded characters (code points) from the file handle
+C<$fh>, decoding and validating them in place, and stores the result in C<$buf>.
+Returns the number of characters actually read, C<0> at end of file, or C<undef>
+on a read error (with C<$!> set).
+
+Because C<read_utf8> reads and validates the octets directly, there is no need to
+apply a PerlIO encoding layer (such as C<:encoding(UTF-8)> or C<:utf8>) to C<$fh>.
+The handle should be a plain byte handle; the bytes are validated and decoded by
+C<read_utf8> itself.
+
+If C<$offset> is specified, the read data is written into C<$buf> starting at that
+character offset, preserving the existing content before it. A negative C<$offset>
+counts back from the end of C<$buf>. If the offset is past the end of the string,
+C<$buf> is zero-filled up to the offset first.
+
+Ill-formed and truncated input is not fatal: each maximal ill-formed subpart is
+replaced with the Unicode replacement character U+FFFD and a warning is emitted in
+the C<utf8> warnings category. The returned count includes the substituted code
+points.
+
+Tied file handles are not supported.
+
+Since version 0.71.
+
 =head2 valid_utf8
 
     $boolean = valid_utf8($octets);
 
 Returns a boolean indicating whether or not the given C<$octets> consist of 
 well-formed UTF-8 sequences.
+
+Since version 0.60.
 
 =head1 EXPORTS
 
@@ -113,8 +146,8 @@ of wide characters.
 
 =back
 
-The sub-categories: C<nonchar>, C<surrogate> and C<non_unicode> is only available 
-on Perl 5.14 or greater. See L<perllexwarn> for available categories and hierarchies.
+The sub-categories: C<surrogate> and C<non_unicode> is only available on Perl 5.14
+or greater. See L<perllexwarn> for available categories and hierarchies.
 
 =head1 COMPARISON
 
@@ -162,6 +195,8 @@ is to be considered a bug.
 
 =item L<Encode>
 
+=item L<Encode::Simple>
+
 =item L<http://www.unicode.org/>
 
 =back
@@ -170,8 +205,8 @@ is to be considered a bug.
 
 =head2 BUGS
 
-Please report any bugs by email to C<bug-unicode-utf8 at rt.cpan.org>, or 
-through the web interface at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Unicode-UTF8>. 
+Please report any bugs through the web interface at 
+L<https://github.com/chansen/p5-unicode-utf8/issues>.
 You will be automatically notified of any progress on the request by the system.
 
 =head2 SOURCE CODE
@@ -189,7 +224,7 @@ Christian Hansen C<chansen@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2011-2017 by Christian Hansen.
+Copyright 2011-2026 by Christian Hansen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

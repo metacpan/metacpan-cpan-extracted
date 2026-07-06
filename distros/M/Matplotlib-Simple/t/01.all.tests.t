@@ -8,7 +8,6 @@ use feature 'say';
 use File::Temp 'tempfile';
 use Matplotlib::Simple;
 use Test::Exception; # die_ok
-use File::Path 'rmtree';
 use Test::More;
 #use Digest::SHA 'sha512_base64';
 

@@ -2,16 +2,11 @@ NAME
     Desktop::Workspace::Util - Utilities related to DesktopWorkspace
 
 VERSION
-    This document describes version 0.001 of Desktop::Workspace::Util (from
+    This document describes version 0.002 of Desktop::Workspace::Util (from
     Perl distribution Desktop-Workspace-Util), released on 2026-03-29.
 
 SYNOPSIS
 DESCRIPTION
-    This distribution includes several utilities related to
-    DesktopWorkspace:
-
-    #INSERT_EXECS_LIST
-
 FUNCTIONS
   get_desktop_workspace_module
     Usage:
@@ -165,6 +160,8 @@ FUNCTIONS
 
     This function is not exported by default, but exportable.
 
+    This function supports dry-run operation.
+
     Arguments ('*' denotes required arguments):
 
     *   all => *bool*
@@ -244,6 +241,12 @@ FUNCTIONS
     *   shuffle => *bool*
 
         (No description)
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
 
     Returns an enveloped result (an array).
 

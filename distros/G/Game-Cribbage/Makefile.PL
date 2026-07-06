@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     },
     EXE_FILES => [ 'bin/cribbage' ],
     PREREQ_PM => {
-        'Rope' => '0.35',
+        'Object::Proto::Sugar' => '0.05',
 	'List::Util' => 0,
 	'ntheory' => 0,
 	'Array::Diff' => 0

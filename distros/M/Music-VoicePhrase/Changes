@@ -1,5 +1,11 @@
 Revision history for Music-VoicePhrase
 
+0.0113 2026-07-05 10:17:48
+    - Make all attributes read-write.
+
+0.0112 2026-07-05 09:24:00
+    - Add the pitches_name and intervals_name attributes.
+
 0.0111 2026-07-04 20:39:03
     - Allow the $Music::Duration::Partition::size to be a float.
 

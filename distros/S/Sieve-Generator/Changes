@@ -1,5 +1,15 @@
 Revision history for Sieve-Generator
 
+0.003     2026-07-05 20:25:47-04:00 America/New_York
+        - Element: a new role for all "things that can turn into Sieve"; this
+          covers Lines and Block
+        - Document: eliminate "append"; documents are now meant to be immutable
+        - BracketComment: for things /* like this */
+        - Command: can now have a "block" like "foreverypart" takes
+        - Heredoc: now supports a comment between "text:" and next line
+        - Num: to represent numeric literals (including with magnitude suffix)
+        - Sugar: add sugar for "negate" (Sieve's "not") and "number"
+
 0.002     2026-04-02 10:53:46-04:00 America/New_York
         - remove a bunch of sugar that didn't pull its weight
         - significantly improve the "command" sugar for more auto-typing and

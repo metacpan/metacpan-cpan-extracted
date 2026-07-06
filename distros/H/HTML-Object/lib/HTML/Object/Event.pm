@@ -1,11 +1,11 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Event.pm
-## Version v0.2.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/11
-## Modified 2023/11/06
-## All rights reserved
+## Modified 2026/07/04
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,10 +25,10 @@ BEGIN
         CAPTURING_PHASE => 1,
         AT_TARGET       => 2,
         BUBBLING_PHASE  => 3,
-        
+
         CANCEL_PROPAGATION  => 1,
         CANCEL_IMMEDIATE_PROPAGATION => 2,
-        
+
         ABORT           => 1,
         BLUR            => 2,
         CLICK           => 4,
@@ -71,7 +71,7 @@ BEGIN
         )],
         'phase' => [qw( NONE CAPTURING_PHASE AT_TARGET BUBBLING_PHASE )]
     );
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -195,14 +195,19 @@ sub setTimestamp
 {
     my $self = shift( @_ );
     my $now  = scalar( @_ ) ? shift( @_ ) : Time::HiRes::time();
+    $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
     # try-catch
     local $@;
     my $rv = eval
     {
         my $dt;
-        unless( $self->_is_a( $now => 'DateTime' ) )
+        unless( $self->_is_a( $now => [qw( DateTime::Lite DateTime )] ) )
         {
-            $dt = DateTime->from_epoch( epoch => $now );
+            $dt = DateTime::Lite->from_epoch( epoch => $now );
+        }
+        if( $self->_is_a( $now => 'DateTime' ) )
+        {
+            $dt = DateTime::Lite->from_object( object => $dt );
         }
         return( $self->_set_get_datetime( timeStamp => $dt ) );
     };
@@ -252,11 +257,11 @@ HTML::Object::Event - HTML Object Event Class
 
     use HTML::Object::Event;
     my $event = HTML::Object::Event->new || 
-        die( HTML::Object::Event->error, "\n" );
+        die( HTML::Object::Event->error );
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 
@@ -280,35 +285,35 @@ Parameters accepted:
 
 =over 4
 
-=item I<type>
+=item C<type>
 
 This is a string representing the type of the event.
 
-=item I<options hash or hash reference>
+=item C<options hash or hash reference>
 
 The options can have the following properties. All of them are optional. Each of them can be accessed or modified by they equivalent method listed below.
 
 =over 8
 
-=item I<bubbles>
+=item C<bubbles>
 
 A boolean value indicating whether the event bubbles. The default is true. 
 
 When true, this means the event will be passed on from the element that triggered it on to its parent and its parent's parent and so on up to the top L<element|HTML::Object::DOM::Document>. This is the default behaviour. When set to false, the event will not bubble up.
 
-=item I<cancelable>
+=item C<cancelable>
 
 A boolean value indicating whether the event can be cancelled. The default is true.
 
 It can also be called as C<cancellable> for non-American speakers.
 
-=item I<composed>
+=item C<composed>
 
 Because this is a perl environment, this value is always false, and discarded.
 
 A boolean value indicating whether the event will trigger listeners outside of a shadow root (see L</composed> for more details). The default is C<false>.
 
-=item I<detail>
+=item C<detail>
 
 An optional hash reference of arbitrary key-valu pairs that will be stored in the event object and can be later retrieved by the event handlers.
 
@@ -422,7 +427,7 @@ A reference to the L<object|HTML::Object::Element> to which the event was origin
 
 Read-only
 
-The time at which the event was created (in milliseconds). By specification, this value is time since epoch using L<Time::HiRes>. This is actually a L<DateTime> object. L<DateTime> object supports nanoseconds.
+The time at which the event was created (in milliseconds). By specification, this value is time since epoch using L<Time::HiRes>. This is actually a L<DateTime:Lite> object. L<DateTime::Lite> object supports nanoseconds.
 
 =head2 type
 
@@ -462,9 +467,9 @@ Under JavaScript, this method is used to stop the browser’s default behavior w
 
 =head2 setTimestamp
 
-Takes an optional unix timestamp or a L<DateTime> object, and this will set the event timestamp. If no argument is provided, this will resort to set the timestamp using L<Time::HiRes/time>, which provides a timestamp in milliseconds.
+Takes an optional unix timestamp or a L<DateTime::Lite> or L<DateTime> object, and this will set the event timestamp. If no argument is provided, this will resort to set the timestamp using L<Time::HiRes/time>, which provides a timestamp in milliseconds.
 
-It returns a L<DateTime> object.
+It returns a L<DateTime::Lite> object by default.
 
 =head2 stopImmediatePropagation
 
@@ -528,7 +533,7 @@ L<https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent>
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

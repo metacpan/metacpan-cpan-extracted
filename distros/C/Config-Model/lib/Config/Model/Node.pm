@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.163;
+package Config::Model::Node 2.164;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -1030,12 +1030,6 @@ sub migrate ($self, @args) {
     return $self->needs_save;
 }
 
-sub dump_annotations_as_pod ($self, @args) {
-    $self->init();
-    my $dumper = Config::Model::DumpAsData->new;
-    return $dumper->dump_annotations_as_pod( node => $self, @args );
-}
-
 sub describe ($self, @args) {
     $self->init();
 
@@ -1191,7 +1185,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.163
+version 2.164
 
 =head1 SYNOPSIS
 
@@ -1943,11 +1937,6 @@ string.  See L<Config::Model::Dumper/dump_tree> for parameter details.
 This string follows the syntax defined in
 L<Config::Model::Loader>. The string produced by C<dump_tree> can be
 passed to C<load>.
-
-=head2 dump_annotations_as_pod
-
-Dumps the configuration annotations of the node and its siblings into a
-string.  See L<Config::Model::Dumper/dump_annotations_as_pod> for parameter details.
 
 =head2 describe
 

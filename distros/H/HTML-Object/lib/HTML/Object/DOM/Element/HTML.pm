@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/05
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ HTML::Object::DOM::Element::HTML - HTML Object DOM HTML Class
 
     use HTML::Object::DOM::Element::HTML;
     my $html = HTML::Object::DOM::Element::HTML->new || 
-        die( HTML::Object::DOM::Element::HTML->error, "\n" );
+        die( HTML::Object::DOM::Element::HTML->error );
 
 =head1 VERSION
 
@@ -93,7 +93,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLHTm
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

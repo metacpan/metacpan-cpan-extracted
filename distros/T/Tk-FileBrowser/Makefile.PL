@@ -27,8 +27,7 @@ if ($mswin) {
 
 WriteMakefile(
 	NAME => "Tk::$pm",
-	PREREQ_PM => {
-	},
+	PREREQ_PM => \%prereq,
 	ABSTRACT_FROM => "lib/Tk/$pm.pm",
 	VERSION_FROM => "lib/Tk/$pm.pm",
 	AUTHOR => 'Hans Jeuken <hanje at cpan dot org>',

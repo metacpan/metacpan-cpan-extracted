@@ -20,10 +20,12 @@ pp_eqi(pTHX)
     sv_utf8_upgrade(b);
     sa = SvPVutf8(a, la);
     sb = SvPVutf8(b, lb);
-    char *ea = (char *)(sa + la);
-    char *eb = (char *)(sb + lb);
-    result = foldEQ_utf8(sa, &ea, (UV)la, TRUE,
-                         sb, &eb, (UV)lb, TRUE);
+
+    if (la == 0 || lb == 0)
+        result = (la == lb) ? 1 : 0;
+    else
+        result = foldEQ_utf8(sa, NULL, (UV)la, TRUE,
+                             sb, NULL, (UV)lb, TRUE);
     SETs(sv_2mortal(newSViv(result ? 1 : 0)));
     RETURN;
 }
@@ -42,10 +44,12 @@ pp_nei(pTHX)
     sv_utf8_upgrade(b);
     sa = SvPVutf8(a, la);
     sb = SvPVutf8(b, lb);
-    char *ea = (char *)(sa + la);
-    char *eb = (char *)(sb + lb);
-    result = foldEQ_utf8(sa, &ea, (UV)la, TRUE,
-                             sb, &eb, (UV)lb, TRUE);
+
+    if (la == 0 || lb == 0)
+        result = (la == lb) ? 1 : 0;
+    else
+        result = foldEQ_utf8(sa, NULL, (UV)la, TRUE,
+                             sb, NULL, (UV)lb, TRUE);
     SETs(sv_2mortal(newSViv(result ? 0 : 1)));
     RETURN;
 }

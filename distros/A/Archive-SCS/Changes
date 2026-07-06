@@ -1,5 +1,10 @@
 Revision history for perl distribution Archive-SCS
 
+1.12 - 2026-07-05
+
+  - Fatpack ExtUtils::CppGuess, in the hope that this will be a better
+    solution to our compilation problems
+
 1.11 - 2026-07-04
 
   - Work around IO::Compress::Zip issue (GH #2)

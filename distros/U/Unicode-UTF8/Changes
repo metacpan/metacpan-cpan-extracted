@@ -1,3 +1,13 @@
+0.71 2026-07-05
+ - Added read_utf8($fh, $buf, $length[, $offset]) for reading validated  
+   UTF-8 code points from a file handle. Bytes are validated as they are  
+   read using a streaming DFA validator, so no PerlIO encoding layer is  
+   required on the handle. Ill-formed and truncated sequences are replaced  
+   with U+FFFD per the maximal subpart rule and warned in the "utf8"  
+   category. Tied file handles are not supported.
+ - Replaced the deprecated utf8n_to_uvuni() with utf8n_to_uvchr() thanks to
+   James E Keenan (@keenan), PR #13.
+
 0.70 2026-03-19
  - Use utf8_check_ascii with a 16-byte ASCII fast path
 

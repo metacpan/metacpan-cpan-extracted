@@ -6,7 +6,7 @@ use warnings;
 
 use Infix::Custom ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Syntax::Infix::EqualityInsensitive', $VERSION);
@@ -39,7 +39,7 @@ Syntax::Infix::EqualityInsensitive - case-insensitive C<eqi> and C<nei> infix op
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

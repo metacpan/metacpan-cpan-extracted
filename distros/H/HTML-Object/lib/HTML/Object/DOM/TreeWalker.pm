@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/02
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -333,7 +333,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 Normally this is read-only, but under perl you can set whatever number value you want.
 
-Returns an unsigned long being a bitmask made of L<constants|/CONSTANTS> describing the types of L<Node|HTML::Object::DOM::Node> that must to be presented. Non-matching nodes are skipped, but their children may be included, if relevant.
+Returns an unsigned long being a bitmask made of L<constants|HTML::Object::DOM::NodeFilter/CONSTANTS> describing the types of L<Node|HTML::Object::DOM::Node> that must to be presented. Non-matching nodes are skipped, but their children may be included, if relevant.
 
 Possible constant values (exported by L<HTML::Object::DOM::NodeFilter>) are:
 
@@ -535,7 +535,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/TreeWal
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

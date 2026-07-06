@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/11
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -88,7 +88,7 @@ HTML::Object::EventListener - HTML Object Event Listener Class
 
     use HTML::Object::EventListener;
     my $handler = HTML::Object::EventListener->new || 
-        die( HTML::Object::EventListener->error, "\n" );
+        die( HTML::Object::EventListener->error );
 
 =head1 VERSION
 
@@ -152,7 +152,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/Events/Even
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

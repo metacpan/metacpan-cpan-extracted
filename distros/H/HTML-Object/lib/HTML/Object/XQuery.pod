@@ -8,11 +8,11 @@ HTML::Object::XQuery - HTML XQuery Extension
 
     use HTML::Object::DOM global_dom => 1;
     use HTML::Object::XQuery;
-    my $e = HTML::Object::Element->new || die( HTML::Object::Element->error, "\n" );
+    my $e = HTML::Object::Element->new || die( HTML::Object::Element->error );
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 
@@ -795,7 +795,7 @@ For example, the following will insert two new <div>s and an existing <div> as t
     my $newdiv1 = $( "<div id='object1'></div>" ),
     my $newdiv2 = $doc->createElement( "div" ),
     my $existingdiv1 = $doc->getElementById( "foo" );
-    
+
     $( "body" )->append( $newdiv1, [ newdiv2, existingdiv1 ] );
 
 L<https://api.jquery.com/append/>
@@ -941,7 +941,7 @@ would become:
 Another example:
 
     <p>Hello <a href="https://johnresig.com/">John</a>, how are you doing?</p>
- 
+
     $('p')
         ->contents()
         ->filter(sub
@@ -1326,7 +1326,7 @@ Most implementations will specify a success handler:
             my( $key, $val ) = @_;
             $items->push( "<li id='" . $key . "'>" . $val . "</li>" );
         });
-        
+
         $( "<ul/>", 
         {
             class => 'my-new-list',
@@ -1511,7 +1511,7 @@ Quoting jQuery documentation, for example, consider this html:
 Assuming this html is stored in a variable C<$html>:
 
     my $p = HTML::Object::DOM->new;
-    my $doc = $p->parse_data( $html ) || die( $p->error, "\n" );
+    my $doc = $p->parse_data( $html ) || die( $p->error );
 
 The content of <div class="demo-container"> can be set like this:
 
@@ -1761,7 +1761,7 @@ Checks against an existing collection of alternating list elements. Blue, altern
       <li>Firefox</li>
       <li>Opera</li>
     </ul>
- 
+
     my $alt = xq( "#browsers li:nth-child(2n)", $doc )->css( "background", "#0ff" );
     my $li = xq( "li" );
     if( $li->is( $alt ) )
@@ -2230,7 +2230,7 @@ L<https://api.jquery.com/dequeue/>
 
 =head2 each
 
-Quoting from L<jQuery documentation|>:
+Quoting from L<jQuery documentation|https://api.jquery.com/each/>:
 
 A generic iterator function, which can be used to seamlessly iterate over both hash reference and array references. Arrays and array-like objects with a length property (such as a function's arguments object) are iterated by numeric index, from 0 to length-1. Other objects are iterated via their named properties.
 
@@ -2343,7 +2343,7 @@ Merge two objects recursively, modifying the first.
         banana => { price => 200 },
         durian => 100,
     };
-    
+
     // Merge object2 into object1, recursively
     $.extend( $true, $hash1, $hash2 );
 
@@ -2360,7 +2360,7 @@ Merge defaults and options, without modifying the defaults. This is a common plu
 
     my $defaults = { validate => 0, limit => 5, name => "foo" };
     my $options = { validate => 1, name => "bar" };
-    
+
     # Merge defaults and options, without modifying defaults
     my $settings = $.extend( {}, $defaults, $options );
 
@@ -2598,7 +2598,7 @@ For example:
     # perl -MScalar::Util=looks_like_number -lE 'say looks_like_number("nan")'
     $.isNumeric( NaN );
     $.isNumeric( Inf );
-     
+
     # false (non-numeric)
     $.isNumeric( "-0x42" );
     $.isNumeric( "7.2acdgs" );
@@ -2725,7 +2725,7 @@ Using C<$.map()> to change the values of an array reference:
 
     my $arr = [ "a", "b", "c", "d", "e" ];
     say join( ", ", @$arr );
-    
+
 This would yield:
 
     a, b, c, d, e
@@ -2741,7 +2741,7 @@ This would yield:
 This would yield:
 
     A0, B1, C2, D3, E4
-    
+
     $arr = $.map( $arr, sub
     {
         my( $a ) = @_;
@@ -2813,7 +2813,7 @@ However, the problem in this example, is that, because the order in which the ha
 If the order is important to you, you might want to consider using L<Tie::IxHash> as mentioned in this L<perl FAQ|https://perldoc.perl.org/perlfaq4#How-can-I-make-my-hash-remember-the-order-I-put-elements-into-it?>
 
     use Tie::IxHash;
-    
+
     tie my %dimensions, 'Tie::IxHash';
     %dimensions = ( width => 10, height => 15, length => 20 );
     $arr = $.map( \%dimensions, sub
@@ -2920,7 +2920,9 @@ L<https://api.jquery.com/jQuery.noop/>
 
 =head2 now
 
-Return a L<DateTime object|DateTime> representing the current time and that stringifies to the number of seconds since epoch, resulting into the equivalent of L<perlfunc/time>
+Return a L<DateTime::Lite object|DateTime::Lite> representing the current time and that stringifies to the number of seconds since epoch, resulting into the equivalent of L<perlfunc/time>
+
+The new L<DateTime::Lite> object stringifies to the 10-digits epoch time.
 
 Under jQuery, this is an alias for C<Date.now()>
 
@@ -2951,7 +2953,7 @@ For example:
         my( $i, $el ) = @_;
         $nodeNames->[$i] = el->nodeName;
     }) || die( $xQuery::ERROR );
-    
+
     say $nodeNames->join( ', ' );
 
 This yields:
@@ -3072,7 +3074,7 @@ Determine the data type of a value, i.e.:
 
 =item * C<boolean> for boolean objects, such as L<Module::Generic::Boolean>, L<JSON::PP::Boolean>
 
-=item * C<date> for L<DateTime objects|DateTime>
+=item * C<date> for L<DateTime::Lite>, L<DateTime> or L<Module::Generic::DateTime> objects
 
 =item * C<error> for L<Module::Generic::Exception>, L<Error>, L<Throwable::Error>
 
@@ -3247,7 +3249,7 @@ L<HTML::Object::DOM>, L<HTML::Object::DOM::Attribute>, L<HTML::Object::DOM::Bool
 
 Copyright (c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

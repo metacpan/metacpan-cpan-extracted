@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/11/05
 ## Modified 2023/11/05
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -48,7 +48,7 @@ HTML::Object::DOM::Element::Search - HTML Object DOM Search Class
 
     use HTML::Object::DOM::Element::Search;
     my $search = HTML::Object::DOM::Element::Search->new ||
-        die( HTML::Object::DOM::Element::Search->error, "\n" );
+        die( HTML::Object::DOM::Element::Search->error );
 
 =head1 VERSION
 
@@ -100,7 +100,7 @@ L<Mozilla documentation on search element|https://developer.mozilla.org/en-US/do
 
 Copyright(c) 2022-2023 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

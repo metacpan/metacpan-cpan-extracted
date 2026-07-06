@@ -3,45 +3,37 @@ package Game::Cribbage::Rounds;
 use strict;
 use warnings;
 
-use Rope;
-use Rope::Autoload;
+use Object::Proto::Sugar -types;
 use Game::Cribbage::Round;
 
-property number => (
-	initable => 1,
-	writeable => 0,
-	configurable => 0,
-	enumerable => 1
+has number => (
+	is => 'ro',
+	isa => Int
 );
 
-property history => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1,
-	value => []
+has history => (
+	is => 'rw',
+	isa => ArrayRef,
+	default => []
 );
 
-property current_round => (
-	initable => 1,
-	writeable => 1,
-	configurable => 0,
-	enumerable => 1,
+has current_round => (
+	is => 'rw',
+	isa => Object,
 );
 
-function next_round => sub {
+sub next_round {
 	my ($self, $game, %args) = @_;
 	if (scalar @{$self->history} >= $self->number) {
 		die 'DISPLAY THE RESULT FOR THE GAME';
 	}
 	my $round = Game::Cribbage::Round->new(
-		_game => $game,
 		number => scalar @{$self->history} + 1,	
 		%args
-	);
+	)->init($game);
 	push @{$self->history}, $round;
-	$self->current_round = $round;
+	$self->current_round($round);
 	return $self;
-};
+}
 
 1;

@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/11
 ## Modified 2025/10/16
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -120,7 +120,7 @@ sub dispatchEvent
     my $event = shift( @_ ) || return( $self->error( "No event object was provided." ) );
     return( $self->error( "Event object provided ($event) is not an HTML::Object::Event" ) ) if( !$self->_is_a( $event => 'HTML::Object::Event' ) );
     $event->target( $self );
-    
+
     my $type = $event->type || return( $self->error( "The event has no type associated with it!" ) );
     $type = lc( $type );
     my $can_cancel = $event->cancelable;
@@ -207,7 +207,7 @@ sub handleEvent
     }) ) if( !$self->_is_a( $evt => 'HTML::Object::Event' ) );
     return( $self ) if( $evt->cancelled );
     my $can_cancel = $evt->cancelable;
-    
+
     my $repo = $self->{event_listeners};
     my $type = $evt->type || return( $self->error({
         message => "No event type was provided.",
@@ -218,7 +218,7 @@ sub handleEvent
         message => "Repository of event listener of type '$type' is not an hash reference!",
         class => 'HTML::Object::TypeError',
     }) ) if( ref( $repo->{ $type } ) ne 'HASH' );
-    
+
     return( $self->error({
         message => "Could not find the 'sequence' property in the repository of event listeners.",
         class => 'HTML::Object::SyntaxError',
@@ -251,7 +251,7 @@ sub handleEvent
                 class => 'HTML::Object::TypeError',
             }) );
         }
-        
+
         # check we are in the right phase
         if( ( $eventPhase eq $evt->AT_TARGET && $evt->target ne $self ) ||
             ( $eventPhase eq $evt->CAPTURING_PHASE && !$listener->capture ) ||
@@ -259,7 +259,7 @@ sub handleEvent
         {
             next;
         }
-        
+
         my $code = $listener->code;
         if( ref( $code ) ne 'CODE' )
         {
@@ -305,7 +305,7 @@ sub on : lvalue
 {
     my $self = shift( @_ );
     my $event = shift( @_ );
-    
+
     return( $self->_set_get_callback({
         get => sub
         {
@@ -435,8 +435,8 @@ HTML::Object::EventTarget - HTML Object Event Target Class
 
     use HTML::Object::EventTarget;
     my $eh = HTML::Object::EventTarget->new(
-        
-    ) || die( HTML::Object::EventTarget->error, "\n" );
+
+    ) || die( HTML::Object::EventTarget->error );
 
     $e->addEventListener( change => sub
     {
@@ -496,7 +496,7 @@ Possible options are:
 
 =over 4
 
-=item I<capture>
+=item C<capture>
 
 A boolean value indicating that events of this type will be dispatched to the registered listener before being dispatched to any L<EventTarget|HTML::Object::Element> beneath it in the L<DOM|HTML::Object::Document> tree. 
 
@@ -556,23 +556,23 @@ would register it in the bubbling phase, i.e. equivalent to:
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_bubbling_and_capture> and L<this|https://www.quirksmode.org/js/events_order.html>
 
-=item I<once>
+=item C<once>
 
 A boolean value indicating that the listener should be invoked at most once after being added. If true, the listener would be automatically removed when invoked.
 
-=item I<passive>
+=item C<passive>
 
 This, under perl, does nothing and thus always defaults to false.
 
 Under JavaScript, this would be a boolean value that, if true, indicates that the function specified by listener will never call C<preventDefault()>. If a passive listener does call C<preventDefault()>, the user agent will do nothing other than generate a console warning. See Improving scrolling performance with passive listeners to learn more.
 
-=item I<post_processing>
+=item C<post_processing>
 
 This is a non-standard addition and is a code reference (i.e. a subroutine reference or an anonymous subroutine) passed that will be called once the event handler has been set. It is passed the newly created L<event listener object|HTML::Object::EventListener>.
 
 This is used by L<HTML::Object::DOM::List> for example, to enable event listening on array or scalar only when an event listener is registered. So, upon adding an event listener, this post-processing callback is called and this callback takes the appropriate step to start listening to a specific array or scalar.
 
-=item I<signal>
+=item C<signal>
 
 A signal, such as C<ALRM>, C<INT>, or C<TERM>. The listener will be removed when the given C<signal> is called.
 
@@ -625,7 +625,7 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Even
 
 Provided with an L<event|HTML::Object::Event>, and this dispatches the event to this L<EventTarget|HTNL::Object::Element>.
 
-It will first call L</composedPath> to get the branch from this current element to the top one, and will start from the top in the C<capture> phase, checking every element from top up to the current one and calls L</handleEvent>, which, in turn, will check if there are any listeners registered in this C<capture> phase, and if there are calls each listener's L<HTML::Object::EventListener/handleEvent>.
+It will first call L<composedPath|HTML::Object::Event/composedPath> to get the branch from this current element to the top one, and will start from the top in the C<capture> phase, checking every element from top up to the current one and calls L</handleEvent>, which, in turn, will check if there are any listeners registered in this C<capture> phase, and if there are calls each listener's L<HTML::Object::EventListener/handleEvent>.
 
 Then once the C<capture> phase is done, it executes the event listeners on the current L<element|HTML::Object::Element>, if any.
 
@@ -690,7 +690,7 @@ Possible options, to identify the event handler to remove, are:
 
 =over 4
 
-=item I<capture>
+=item C<capture>
 
 A boolean value indicating that events of this type will be dispatched to the registered listener before being dispatched to any L<EventTarget|HTML::Object::Element> beneath it in the L<DOM|HTML::Object::Document> tree. 
 
@@ -741,7 +741,8 @@ L<https://www.quirksmode.org/js/events_access.html> discussion of the event obje
 
 Copyright(c) 2021 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
+
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

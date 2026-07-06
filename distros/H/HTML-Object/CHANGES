@@ -1,5 +1,15 @@
 Revision history for Perl module HTML::Object
 
+v0.6.3 2026-07-06T16:52:37+0900
+    - Re-submit for the version of Module::Generic version v1.6.2
+
+v0.6.2 2026-06-27T06:25:53+0900
+    - No API change
+    - Corrected the removeClass() method in HTML::Object::Object::XQuery; it was not storing the resulting class value properly.
+    - Changed the use of DateTime to DateTime::Lite by default
+    - Updated dependencies
+    - Improved the documentation on all modules
+
 v0.6.1 2026-03-30T09:28:10+0900
     - Corrected a minor error on arguments list in add_default() in HTML::Object
     - Corrected method firstElementChild() and lastElementChild() in HTML::Object::DOM::Element

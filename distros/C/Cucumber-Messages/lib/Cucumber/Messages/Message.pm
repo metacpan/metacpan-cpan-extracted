@@ -1,6 +1,6 @@
 
 package Cucumber::Messages::Message;
-$Cucumber::Messages::Message::VERSION = '33.0.4';
+$Cucumber::Messages::Message::VERSION = '34.0.1';
 =head1 NAME
 
 Cucumber::Messages::Message - Base class for cucumber messages

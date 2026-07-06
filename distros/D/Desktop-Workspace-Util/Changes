@@ -1,3 +1,11 @@
+0.002   2026-03-29  Released-By: PERLANCAR; Urgency: medium
+
+        - [function open_desktop_workspace_items] Add dry-run feature.
+
+        - [bugfix] When opening, make sure we list items with detail=>1 to
+          get the properties.
+
+
 0.001   2026-03-29  Released-By: PERLANCAR
 
         - First release.

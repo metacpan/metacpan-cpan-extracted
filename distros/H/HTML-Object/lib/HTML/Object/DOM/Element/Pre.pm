@@ -5,7 +5,7 @@
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/06
 ## Modified 2022/09/18
-## All rights reserved
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ HTML::Object::DOM::Element::Pre - HTML Object DOM Pre Class
 
     use HTML::Object::DOM::Element::Pre;
     my $pre = HTML::Object::DOM::Element::Pre->new || 
-        die( HTML::Object::DOM::Element::Pre->error, "\n" );
+        die( HTML::Object::DOM::Element::Pre->error );
 
 =head1 VERSION
 
@@ -93,7 +93,7 @@ L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLPre
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
