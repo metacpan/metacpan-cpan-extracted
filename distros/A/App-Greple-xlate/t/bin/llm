@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+
+##
+## Stub llm command for testing App::Greple::xlate::llm without API access.
+##
+## LLM_STUB_MODE:
+##   ok      - (default) return input JSON array elements uppercased
+##   fail    - exit 1 with an error message on stderr
+##   nomodel - prompt call fails; "llm models" output lacks gpt-5.5
+##   short   - drop the last element from the response array
+##   badjson - return non-JSON text
+##   swap    - swap the first two {{ ... }} expressions in each element
+##             (mimics legitimate word-order changes in translation)
+## LLM_STUB_LOG: append {"argv":[...],"stdin":"..."} JSON line per call
+##
+
+use strict;
+use warnings;
+use JSON::PP;
+
+binmode STDOUT, ':encoding(utf8)';
+binmode STDERR, ':encoding(utf8)';
+
+my $mode = $ENV{LLM_STUB_MODE} // 'ok';
+
+# "llm models" subcommand (used by the failure diagnosis)
+if (@ARGV and $ARGV[0] eq 'models') {
+    if ($mode eq 'nomodel') {
+        print "OpenAI Chat: gpt-4o-mini\n";
+    } else {
+        print "OpenAI Chat: gpt-5.5\n";
+        print "OpenAI Chat: test-model\n";
+    }
+    exit 0;
+}
+
+my $input = do { binmode STDIN, ':encoding(utf8)'; local $/; <STDIN> } // '';
+
+if (my $log = $ENV{LLM_STUB_LOG}) {
+    open my $fh, '>>:encoding(utf8)', $log or die "$log: $!\n";
+    print $fh JSON::PP->new->canonical->encode({ argv => \@ARGV, stdin => $input }), "\n";
+    close $fh;
+}
+
+if ($mode eq 'fail') {
+    print STDERR "stub llm: simulated failure\n";
+    exit 1;
+}
+if ($mode eq 'nomodel') {
+    print STDERR "Error: unknown model\n";
+    exit 1;
+}
+if ($mode eq 'badjson') {
+    print "I'm sorry, I can't do that.\n";
+    exit 0;
+}
+
+my $list = JSON::PP->new->decode($input);
+# A well-behaved model keeps XML-style marker tags verbatim; mimic
+# that: uppercase everything except tag-shaped spans.
+sub transform {
+    my $s = shift;
+    join '', map {
+        /\A<[a-z][a-z0-9_]* [a-z0-9_]+=\d+ *\/>\z/ ? $_ : uc
+    } split /(<[a-z][a-z0-9_]* [a-z0-9_]+=\d+ *\/>)/, $s;
+}
+my @out = map { transform($_) } @$list;
+if ($mode eq 'swap') {
+    for (@out) {
+        my @e = /(\{\{.*?\}\})/g or next;
+        next if @e < 2;
+        s/\Q$e[0]\E/\0/;
+        s/\Q$e[1]\E/$e[0]/;
+        s/\0/$e[1]/;
+    }
+}
+pop @out if $mode eq 'short';
+print JSON::PP->new->canonical->encode(\@out), "\n";

@@ -1,0 +1,342 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - greple을 위한 번역 지원 모듈  \n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. Currently DeepL (F<deepl.pm>) and ChatGPT (F<gpt3.pm>) module are implemented as a back-end engine. Experimental support for gpt-4 and gpt-4o are also included.\n",
+      "B<Greple> B<xlate> 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 교체합니다. 현재 DeepL (F<deepl.pm>) 및 ChatGPT (F<gpt3.pm>) 모듈이 백엔드 엔진으로 구현되어 있습니다. gpt-4 및 gpt-4o에 대한 실험적 지원도 포함되어 있습니다.  \n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<xlate::deepl> and C<perl> module like this:\n",
+      "Perl의 pod 스타일로 작성된 문서에서 일반 텍스트 블록을 번역하려면 B<greple> 명령을 C<xlate::deepl> 및 C<perl> 모듈과 함께 다음과 같이 사용하십시오:  \n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "이 명령에서 패턴 문자열 C<^([\\w\\pP].*\\n)+>는 알파-넘버 및 구두점 문자로 시작하는 연속적인 줄을 의미합니다. 이 명령은 번역할 영역을 강조 표시합니다. 옵션 B<--all>은 전체 텍스트를 생성하는 데 사용됩니다.\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the B<deepl> command output.\n",
+      "그런 다음 C<--xlate> 옵션을 추가하여 선택한 영역을 번역합니다. 그러면 원하는 섹션을 찾아 B<deepl> 명령 출력으로 교체합니다.  \n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "기본적으로 원본 및 번역된 텍스트는 L<git(1)>과 호환되는 \"충돌 마커\" 형식으로 인쇄됩니다. C<ifdef> 형식을 사용하면 L<unifdef(1)> 명령으로 원하는 부분을 쉽게 얻을 수 있습니다. 출력 형식은 B<--xlate-format> 옵션으로 지정할 수 있습니다.  \n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "전체 텍스트를 번역하려면 B<--match-all> 옵션을 사용하십시오. 이는 전체 텍스트와 일치하는 패턴 C<(?s).+>를 지정하는 단축키입니다.  \n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by C<sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "충돌 마커 형식 데이터는 C<sdif> 명령과 C<-V> 옵션을 사용하여 나란히 스타일로 볼 수 있습니다. 문자열 단위로 비교하는 것은 의미가 없으므로 C<--no-cdif> 옵션을 권장합니다. 텍스트에 색상을 지정할 필요가 없다면 C<--no-textcolor> (또는 C<--no-tc>)를 지정하십시오.  \n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "처리는 지정된 단위로 수행되지만, 비어 있지 않은 텍스트의 여러 줄이 연속된 경우 함께 하나의 줄로 변환됩니다. 이 작업은 다음과 같이 수행됩니다:  \n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "각 줄의 시작과 끝에서 공백을 제거합니다.  \n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "줄이 전각 구두점 문자로 끝나면 다음 줄과 연결합니다.  \n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "줄이 전각 문자로 끝나고 다음 줄이 전각 문자로 시작하면 줄을 연결합니다.  \n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "줄의 끝이나 시작이 전각 문자가 아닌 경우 공백 문자를 삽입하여 연결합니다.  \n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "캐시 데이터는 정규화된 텍스트를 기반으로 관리되므로 정규화 결과에 영향을 미치지 않는 수정이 이루어져도 캐시된 번역 데이터는 여전히 유효합니다.  \n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "이 정규화 과정은 첫 번째(0번째) 및 짝수 패턴에 대해서만 수행됩니다. 따라서 두 개의 패턴이 다음과 같이 지정되면, 첫 번째 패턴과 일치하는 텍스트는 정규화 후에 처리되고, 두 번째 패턴과 일치하는 텍스트에는 정규화 과정이 수행되지 않습니다.  \n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "따라서, 여러 줄을 하나의 줄로 결합하여 처리할 텍스트에는 첫 번째 패턴을 사용하고, 미리 형식이 지정된 텍스트에는 두 번째 패턴을 사용하십시오. 첫 번째 패턴에서 일치하는 텍스트가 없으면, C<(?!)>와 같이 아무것도 일치하지 않는 패턴을 사용하십시오.\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "가끔 번역하고 싶지 않은 텍스트 부분이 있습니다. 예를 들어, 마크다운 파일의 태그입니다. DeepL은 이러한 경우 번역에서 제외할 텍스트 부분을 XML 태그로 변환한 후 번역이 완료된 후 복원할 것을 제안합니다. 이를 지원하기 위해 번역에서 마스킹할 부분을 지정할 수 있습니다.  \n"
+   ],
+   [
+      "This will interpret each line of the file `MASKPATTERN` as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "이것은 파일 `MASKPATTERN`의 각 줄을 정규 표현식으로 해석하고, 일치하는 문자열을 번역한 후 처리 후 되돌립니다. C<#>로 시작하는 줄은 무시됩니다.  \n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escpaed newline.\n",
+      "복잡한 패턴은 백슬래시로 이스케이프된 줄 바꿈을 사용하여 여러 줄에 걸쳐 작성할 수 있습니다.\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "텍스트가 마스킹에 의해 어떻게 변형되는지는 B<--xlate-mask> 옵션을 통해 볼 수 있습니다.\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "이 인터페이스는 실험적이며 향후 변경될 수 있습니다.  \n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "일치하는 각 영역에 대해 번역 프로세스를 호출합니다.  \n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "이 옵션이 없으면 B<greple>는 일반 검색 명령처럼 작동합니다. 따라서 실제 작업을 시작하기 전에 파일의 어떤 부분이 번역 대상이 될지 확인할 수 있습니다.  \n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "명령 결과는 표준 출력으로 가므로 필요에 따라 파일로 리디렉션하거나 L<App::Greple::update> 모듈을 사용하는 것을 고려하십시오.  \n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "옵션 B<--xlate>는 B<--xlate-color> 옵션을 B<--color=never> 옵션과 함께 호출합니다.  \n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "B<--xlate-fold> 옵션을 사용하면 변환된 텍스트가 지정된 너비로 접힙니다. 기본 너비는 70이며 B<--xlate-fold-width> 옵션으로 설정할 수 있습니다. 실행 작업을 위해 네 개의 열이 예약되어 있으므로 각 줄은 최대 74자를 포함할 수 있습니다.  \n"
+   ],
+   [
+      "Specifies the translation engine to be used. If you specify the engine module directly, such as C<-Mxlate::deepl>, you do not need to use this option.\n",
+      "사용할 번역 엔진을 지정합니다. C<-Mxlate::deepl>와 같이 엔진 모듈을 직접 지정하면 이 옵션을 사용할 필요가 없습니다.  \n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "현재 다음 엔진을 사용할 수 있습니다.  \n"
+   ],
+   [
+      "B<gpt-4o>'s interface is unstable and cannot be guaranteed to work correctly at the moment.\n",
+      "B<gpt-4o>의 인터페이스는 불안정하며 현재 올바르게 작동할 것이라고 보장할 수 없습니다.  \n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "번역 엔진을 호출하는 대신 작업을 수행할 것으로 예상됩니다. 번역할 텍스트를 준비한 후 클립보드에 복사됩니다. 양식에 붙여넣고 결과를 클립보드에 복사한 후 반환 키를 누르기를 기대합니다.  \n"
+   ],
+   [
+      "Specify the target language. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "대상 언어를 지정합니다. B<DeepL> 엔진을 사용할 때 C<deepl languages> 명령으로 사용 가능한 언어를 확인할 수 있습니다.  \n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "원본 및 번역된 텍스트의 출력 형식을 지정합니다.  \n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, and specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "C<xtxt> 이외의 다음 형식은 번역할 부분이 여러 줄의 모음이라고 가정합니다. 실제로는 줄의 일부만 번역할 수 있으며, C<xtxt> 이외의 형식을 지정하면 의미 있는 결과를 생성하지 않습니다.  \n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "원본 및 변환된 텍스트는 L<git(1)> 충돌 마커 형식으로 인쇄됩니다.  \n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "다음 L<sed(1)> 명령으로 원본 파일을 복구할 수 있습니다.  \n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "```markdown\n<custom-container>\nThe original and translated text are output in a markdown's custom container style.\n원본 및 번역된 텍스트는 마크다운의 사용자 정의 컨테이너 스타일로 출력됩니다.\n</custom-container>\n```\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "위의 텍스트는 HTML로 다음과 같이 번역됩니다.\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "기본적으로 콜론의 수는 7입니다. C<:::::>와 같은 콜론 시퀀스를 지정하면 7개의 콜론 대신 사용됩니다.\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "원본 및 변환된 텍스트는 L<cpp(1)> C<#ifdef> 형식으로 인쇄됩니다.  \n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "B<unifdef> 명령으로 일본어 텍스트만 검색할 수 있습니다:  \n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "Original and converted text are printed separated by single blank line. \n원본 및 변환된 텍스트는 단일 공백 줄로 구분되어 인쇄됩니다.\nFor C<space+>, it also outputs a newline after the converted text.\nC<space+>의 경우, 변환된 텍스트 뒤에 새 줄도 출력됩니다.\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "형식이 C<xtxt> (번역된 텍스트) 또는 알 수 없는 경우, 번역된 텍스트만 인쇄됩니다.  \n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. Default value is set as for free DeepL account service: 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "한 번에 API에 전송할 최대 텍스트 길이를 지정합니다. 기본값은 무료 DeepL 계정 서비스에 대해 설정되어 있습니다: API (B<--xlate>)는 128K, 클립보드 인터페이스 (B<--xlate-labor>)는 5000입니다. Pro 서비스를 사용하는 경우 이러한 값을 변경할 수 있습니다.  \n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "한 번에 API에 전송할 최대 텍스트 줄 수를 지정합니다.\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "이 값을 1로 설정하면 한 번에 한 줄씩 번역할 수 있습니다. 이 옵션은 C<--xlate-maxlen> 옵션보다 우선합니다.  \n"
+   ],
+   [
+      "See the tranlsation result in real time in the STDERR output.\n",
+      "STDERR 출력에서 실시간으로 번역 결과를 확인하세요.  \n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "L<App::Greple::stripe> 모듈을 사용하여 지그재그 스트라이프 방식으로 일치하는 부분을 표시합니다. 이는 일치하는 부분이 서로 연결되어 있을 때 유용합니다.\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "색상 팔레트는 터미널의 배경 색상에 따라 전환됩니다.  \n명시적으로 지정하려면 B<--xlate-stripe-light> 또는 B<--xlate-stripe-dark>를 사용할 수 있습니다.\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "마스킹 기능을 수행하고 변환된 텍스트를 복원하지 않고 있는 그대로 표시합니다.\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "파일의 전체 텍스트를 대상 영역으로 설정합니다.  \n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "B<xlate> 모듈은 각 파일에 대한 번역의 캐시된 텍스트를 저장하고 실행 전에 이를 읽어 서버에 요청하는 오버헤드를 제거할 수 있습니다. 기본 캐시 전략 C<auto>를 사용하면 대상 파일에 대한 캐시 파일이 존재할 때만 캐시 데이터를 유지합니다.  \n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "B<--xlate-cache=clear>를 사용하여 캐시 관리를 시작하거나 기존의 모든 캐시 데이터를 정리하십시오. 이 옵션으로 실행하면, 존재하지 않는 경우 새로운 캐시 파일이 생성되고 이후 자동으로 유지 관리됩니다.\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "캐시 파일이 존재하는 경우 유지합니다.  \n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "빈 캐시 파일을 생성하고 종료합니다.  \n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "대상이 정상 파일인 한 캐시를 어쨌든 유지합니다.  \n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "먼저 캐시 데이터를 지웁니다.  \n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "캐시 파일이 존재하더라도 절대 사용하지 않습니다.  \n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "기본 동작으로 사용되지 않는 데이터는 캐시 파일에서 제거됩니다. 제거하지 않고 파일에 유지하려면 C<accumulate>를 사용하세요.  \n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "이 옵션은 필요하지 않더라도 캐시 파일을 업데이트하도록 강제합니다.\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "이 모듈은 배포에 포함된 C<xlate> 명령어를 사용하여 명령 줄에서 쉽게 사용할 수 있습니다. 사용법은 C<xlate> 매뉴얼 페이지를 참조하세요.\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "C<xlate> 명령은 Docker 환경과 함께 작동하므로, 손에 설치된 것이 없어도 Docker가 사용 가능하면 사용할 수 있습니다. C<-D> 또는 C<-C> 옵션을 사용하세요.  \n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "또한 다양한 문서 스타일에 대한 메이크파일이 제공되므로 특별한 명시 없이 다른 언어로 번역할 수 있습니다. C<-M> 옵션을 사용하세요.  \n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "Docker와 C<make> 옵션을 결합하여 C<make>를 Docker 환경에서 실행할 수 있습니다.\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "C<xlate -C>를 실행하면 현재 작업 중인 git 저장소가 마운트된 셸이 시작됩니다.\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "자세한 내용은 L</SEE ALSO> 섹션의 일본어 기사를 읽으세요.  \n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "Emacs 편집기에서 C<xlate> 명령을 사용하려면 리포지토리에 포함된 F<xlate.el> 파일을 로드하세요. C<xlate-region> 함수는 주어진 영역을 번역합니다. 기본 언어는 C<EN-US>이며 접두사 인수를 사용하여 언어를 지정할 수 있습니다.  \n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "DeepL 서비스에 대한 인증 키를 설정하세요.  \n"
+   ],
+   [
+      "OpenAI authentication key.\n",
+      "OpenAI 인증 키.  \n"
+   ],
+   [
+      "You have to install command line tools for DeepL and ChatGPT.\n",
+      "DeepL 및 ChatGPT를 위한 명령줄 도구를 설치해야 합니다.  \n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "L<https://github.com/DeepLcom/deepl-python>  \n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/tecolicom/App-gpty>  \n"
+   ],
+   [
+      "L<App::Greple::xlate>\n",
+      "L<App::Greple::xlate>  \n"
+   ],
+   [
+      "L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate::deepl>  \n"
+   ],
+   [
+      "L<App::Greple::xlate::gpt3>\n",
+      "L<App::Greple::xlate::gpt3>  \n"
+   ],
+   [
+      "Docker container image.\n",
+      "Docker 컨테이너 이미지.\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "DeepL Python 라이브러리 및 CLI 명령.  \n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "OpenAI Python 라이브러리  \n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "OpenAI 명령줄 인터페이스  \n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "대상 텍스트 패턴에 대한 자세한 내용은 B<greple> 매뉴얼을 참조하세요. B<--inside>, B<--outside>, B<--include>, B<--exclude> 옵션을 사용하여 일치하는 영역을 제한하세요.  \n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "C<-Mupdate> 모듈을 사용하여 B<greple> 명령의 결과로 파일을 수정할 수 있습니다.  \n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "B<sdif>를 사용하여 B<-V> 옵션과 함께 충돌 마커 형식을 나란히 표시합니다.  \n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "Greple B<stripe> 모듈은 B<--xlate-stripe> 옵션에 의해 사용됩니다.\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "DeepL API를 사용하여 필요한 부분만 번역하고 교체하는 Greple 모듈 (일본어)  \n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "DeepL API 모듈을 사용하여 15개 언어로 문서 생성 (일본어)  \n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "자동 번역 Docker 환경 DeepL API와 함께 (일본어로)\n"
+   ]
+]

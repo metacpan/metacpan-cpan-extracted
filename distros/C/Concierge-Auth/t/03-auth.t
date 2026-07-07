@@ -8,171 +8,174 @@ use Test2::V0;
 use File::Temp qw/tempdir/;
 
 use Concierge::Auth;
+use Concierge::Auth::Pwd;
 
 my $dir  = tempdir( CLEANUP => 1 );
 my $file = "$dir/auth.pwd";
-my $auth = Concierge::Auth->new({ file => $file });
+my $auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', file => $file );
 
-# ========== setPwd ==========
+# ========== enroll (was setPwd) ==========
 
-subtest 'setPwd - create user' => sub {
-    my ($ok, $msg) = $auth->setPwd('alice', 'password123');
-    ok( $ok, 'setPwd succeeds for new user' );
-    is( $msg, 'alice', 'message returns user ID' );
+subtest 'enroll - create user' => sub {
+    my $result = $auth->enroll('alice', 'password123');
+    ok( $result->{success}, 'enroll succeeds for new user' );
+    is( $result->{user_id}, 'alice', 'result carries the user ID' );
+    is( $result->{status}, 'created', 'status is created' );
 };
 
-subtest 'setPwd - duplicate ID rejected' => sub {
-    my ($ok, $msg) = $auth->setPwd('alice', 'otherpassword');
-    ok( !$ok, 'setPwd rejects duplicate ID' );
-    like( $msg, qr/previously used/i, 'message mentions previously used' );
+subtest 'enroll - duplicate ID rejected' => sub {
+    my $result = $auth->enroll('alice', 'otherpassword');
+    ok( !$result->{success}, 'enroll rejects duplicate ID' );
+    like( $result->{message}, qr/previously used/i, 'message mentions previously used' );
 };
 
-# ========== checkID ==========
+# ========== is_id_known (was checkID) ==========
 
-subtest 'checkID - existing user' => sub {
-    my ($ok, $msg) = $auth->checkID('alice');
-    ok( $ok, 'checkID finds existing user' );
-    like( $msg, qr/OK/i, 'message confirms ID OK' );
+subtest 'is_id_known - existing user' => sub {
+    my $result = $auth->is_id_known('alice');
+    ok( $result->{success}, 'is_id_known succeeds' );
+    ok( $result->{known}, 'is_id_known finds existing user' );
 };
 
-subtest 'checkID - missing user' => sub {
-    my ($ok, $msg) = $auth->checkID('nonexistent');
-    ok( !$ok, 'checkID rejects missing user' );
-    like( $msg, qr/not confirmed/i, 'message mentions not confirmed' );
+subtest 'is_id_known - missing user' => sub {
+    my $result = $auth->is_id_known('nonexistent');
+    ok( $result->{success}, 'is_id_known still succeeds (no I/O error)' );
+    ok( !$result->{known}, 'is_id_known reports missing user as not known' );
 };
 
-# ========== checkPwd ==========
+# ========== authenticate (was checkPwd) ==========
 
-subtest 'checkPwd - correct password' => sub {
-    my ($ok, $msg) = $auth->checkPwd('alice', 'password123');
-    ok( $ok, 'checkPwd succeeds with correct password' );
+subtest 'authenticate - correct password' => sub {
+    my $result = $auth->authenticate('alice', 'password123');
+    ok( $result->{success}, 'authenticate succeeds with correct password' );
 };
 
-subtest 'checkPwd - wrong password' => sub {
-    my ($ok, $msg) = $auth->checkPwd('alice', 'wrongpassword');
-    ok( !$ok, 'checkPwd rejects wrong password' );
-    like( $msg, qr/Invalid password/i, 'message mentions invalid password' );
+subtest 'authenticate - wrong password' => sub {
+    my $result = $auth->authenticate('alice', 'wrongpassword');
+    ok( !$result->{success}, 'authenticate rejects wrong password' );
+    like( $result->{message}, qr/Invalid password/i, 'message mentions invalid password' );
 };
 
-subtest 'checkPwd - missing user' => sub {
-    my ($ok, $msg) = $auth->checkPwd('nonexistent', 'password123');
-    ok( !$ok, 'checkPwd rejects missing user' );
-    like( $msg, qr/not found/i, 'message mentions not found' );
+subtest 'authenticate - missing user' => sub {
+    my $result = $auth->authenticate('nonexistent', 'password123');
+    ok( !$result->{success}, 'authenticate rejects missing user' );
+    like( $result->{message}, qr/not found/i, 'message mentions not found' );
 };
 
-# ========== resetPwd ==========
+# ========== change_credentials (was resetPwd) ==========
 
-subtest 'resetPwd - change password' => sub {
-    my ($ok, $msg) = $auth->resetPwd('alice', 'newpassword456');
-    ok( $ok, 'resetPwd succeeds' );
-    is( $msg, 'alice', 'message returns user ID' );
+subtest 'change_credentials - change password' => sub {
+    my $result = $auth->change_credentials('alice', 'newpassword456');
+    ok( $result->{success}, 'change_credentials succeeds' );
+    is( $result->{user_id}, 'alice', 'result carries the user ID' );
 
     # Old password should fail
-    my ($ok2, $msg2) = $auth->checkPwd('alice', 'password123');
-    ok( !$ok2, 'old password fails after reset' );
+    my $old = $auth->authenticate('alice', 'password123');
+    ok( !$old->{success}, 'old password fails after change' );
 
     # New password should succeed
-    my ($ok3, $msg3) = $auth->checkPwd('alice', 'newpassword456');
-    ok( $ok3, 'new password succeeds after reset' );
+    my $new = $auth->authenticate('alice', 'newpassword456');
+    ok( $new->{success}, 'new password succeeds after change' );
 };
 
-subtest 'resetPwd - missing user' => sub {
-    my ($ok, $msg) = $auth->resetPwd('nonexistent', 'password123');
-    ok( !$ok, 'resetPwd rejects missing user' );
-    like( $msg, qr/not found/i, 'message mentions not found' );
+subtest 'change_credentials - missing user' => sub {
+    my $result = $auth->change_credentials('nonexistent', 'password123');
+    ok( !$result->{success}, 'change_credentials rejects missing user' );
+    like( $result->{message}, qr/not found/i, 'message mentions not found' );
 };
 
-# ========== deleteID ==========
+# ========== revoke (was deleteID) ==========
 
-subtest 'deleteID - remove user' => sub {
+subtest 'revoke - remove user' => sub {
     # First confirm user exists
-    my ($exists) = $auth->checkID('alice');
-    ok( $exists, 'user exists before delete' );
+    my $exists = $auth->is_id_known('alice');
+    ok( $exists->{known}, 'user exists before revoke' );
 
-    my ($ok, $msg) = $auth->deleteID('alice');
-    ok( $ok, 'deleteID succeeds' );
+    my $result = $auth->revoke('alice');
+    ok( $result->{success}, 'revoke succeeds' );
+    is( $result->{user_id}, 'alice', 'result carries the user ID' );
 
     # Confirm user is gone
-    my ($gone) = $auth->checkID('alice');
-    ok( !$gone, 'user is gone after delete' );
+    my $gone = $auth->is_id_known('alice');
+    ok( !$gone->{known}, 'user is gone after revoke' );
 };
 
-subtest 'deleteID - missing user' => sub {
-    my ($ok, $msg) = $auth->deleteID('nonexistent');
-    ok( !$ok, 'deleteID rejects missing user' );
-    like( $msg, qr/not found/i, 'message mentions not found' );
+subtest 'revoke - missing user' => sub {
+    my $result = $auth->revoke('nonexistent');
+    ok( !$result->{success}, 'revoke rejects missing user' );
+    like( $result->{message}, qr/not found/i, 'message mentions not found' );
 };
 
 # ========== Validation failures passed through ==========
 
 subtest 'validation failures - bad ID' => sub {
-    my ($ok, $msg) = $auth->setPwd('', 'password123');
-    ok( !$ok, 'setPwd rejects empty ID' );
+    my $result = $auth->enroll('', 'password123');
+    ok( !$result->{success}, 'enroll rejects empty ID' );
 
-    ($ok, $msg) = $auth->checkID('x');
-    ok( !$ok, 'checkID rejects too-short ID' );
+    $result = $auth->is_id_known('x');
+    ok( !$result->{known}, 'is_id_known reports too-short ID as not known' );
 
-    ($ok, $msg) = $auth->checkPwd('', 'password123');
-    ok( !$ok, 'checkPwd rejects empty ID' );
+    $result = $auth->authenticate('', 'password123');
+    ok( !$result->{success}, 'authenticate rejects empty ID' );
 
-    ($ok, $msg) = $auth->resetPwd('', 'password123');
-    ok( !$ok, 'resetPwd rejects empty ID' );
+    $result = $auth->change_credentials('', 'password123');
+    ok( !$result->{success}, 'change_credentials rejects empty ID' );
 
-    ($ok, $msg) = $auth->deleteID('');
-    ok( !$ok, 'deleteID rejects empty ID' );
+    $result = $auth->revoke('');
+    ok( !$result->{success}, 'revoke rejects empty ID' );
 };
 
 subtest 'validation failures - bad password' => sub {
-    my ($ok, $msg) = $auth->setPwd('bob', 'short');
-    ok( !$ok, 'setPwd rejects short password' );
+    my $result = $auth->enroll('bob', 'short');
+    ok( !$result->{success}, 'enroll rejects short password' );
 
-    ($ok, $msg) = $auth->checkPwd('bob', 'short');
-    ok( !$ok, 'checkPwd rejects short password' );
+    $result = $auth->authenticate('bob', 'short');
+    ok( !$result->{success}, 'authenticate rejects short password (no match found)' );
 
-    ($ok, $msg) = $auth->resetPwd('bob', 'short');
-    ok( !$ok, 'resetPwd rejects short password' );
+    $result = $auth->change_credentials('bob', 'short');
+    ok( !$result->{success}, 'change_credentials rejects short password' );
 };
 
 subtest 'validation failures - undef/empty password arg' => sub {
-    # Exercises the `my $passwd = shift || ''` branch in setPwd/resetPwd
-    # when the caller passes an empty string or no second argument.
-    my ($ok, $msg) = $auth->setPwd('someuser', '');
-    ok( !$ok, 'setPwd rejects empty string password' );
-    like( $msg, qr/empty/i, 'message mentions empty' );
+    my $result = $auth->enroll('someuser', '');
+    ok( !$result->{success}, 'enroll rejects empty string password' );
+    like( $result->{message}, qr/empty/i, 'message mentions empty' );
 
-    ($ok, $msg) = $auth->resetPwd('someuser', '');
-    ok( !$ok, 'resetPwd rejects empty string password' );
-    like( $msg, qr/empty/i, 'message mentions empty' );
+    $result = $auth->change_credentials('someuser', '');
+    ok( !$result->{success}, 'change_credentials rejects empty string password' );
+    like( $result->{message}, qr/empty/i, 'message mentions empty' );
 };
 
 # ========== confirm/reject/reply response helpers ==========
-# These are undocumented package functions used internally;
-# tested here to cover their default-message branches.
+# These backend-specific helpers remain on Concierge::Auth::Pwd (they
+# back its file-management and generator wrapper methods, which retain
+# the old dual-return convention). Tested here to cover their
+# default-message branches.
 
 subtest 'confirm - default message' => sub {
-    my ($ok, $msg) = Concierge::Auth::confirm();
+    my ($ok, $msg) = Concierge::Auth::Pwd::confirm();
     ok( $ok, 'confirm() with no arg returns true' );
     like( $msg, qr/confirmation/i, 'default confirmation message used' );
 };
 
 subtest 'reject - default message' => sub {
-    my ($ok, $msg) = Concierge::Auth::reject();
+    my ($ok, $msg) = Concierge::Auth::Pwd::reject();
     ok( !$ok, 'reject() with no arg returns false' );
     like( $msg, qr/rejection/i, 'default rejection message used' );
 };
 
 subtest 'reply - single-arg forms' => sub {
     # With no message arg, the ternary picks the default based on $bool
-    my ($r1, $m1) = Concierge::Auth::reply(1);
+    my ($r1, $m1) = Concierge::Auth::Pwd::reply(1);
     ok( $r1, 'reply(1) returns true' );
     like( $m1, qr/confirmation/i, 'truthy bool gives confirmation default' );
 
-    my ($r0, $m0) = Concierge::Auth::reply(0);
+    my ($r0, $m0) = Concierge::Auth::Pwd::reply(0);
     ok( !$r0, 'reply(0) returns false' );
     like( $m0, qr/rejection/i, 'falsy bool gives rejection default' );
 
     # No args at all — $bool defaults to 0 via //
-    my ($rn, $mn) = Concierge::Auth::reply();
+    my ($rn, $mn) = Concierge::Auth::Pwd::reply();
     ok( !$rn, 'reply() with no args returns false' );
 };
 
@@ -195,34 +198,39 @@ subtest 'encryptPwd - invalid password rejected' => sub {
 
 # ========== no-file error paths ==========
 
-subtest 'checkID - no file configured' => sub {
+subtest 'is_id_known - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
-    my ($ok, $msg) = $nf->checkID('alice');
-    ok( !$ok, 'checkID fails when no file is set' );
-    like( $msg, qr/No auth file/i, 'message mentions no auth file' );
+    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
+    like( $w->[0], qr/Utilities only/i, 'constructor warns when no_file' );
+    my $result = $nf->is_id_known('alice');
+    ok( $result->{success}, 'is_id_known still succeeds when no file is set' );
+    ok( !$result->{known}, 'ID reported not known when no file is set' );
 };
 
-subtest 'checkPwd - no file configured' => sub {
+subtest 'authenticate - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
-    my ($ok, $msg) = $nf->checkPwd('alice', 'password123');
-    ok( !$ok, 'checkPwd fails when no file is set' );
+    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
+    like( $w->[0], qr/Utilities only/i, 'constructor warns when no_file' );
+    my $result;
+    my $pw = warnings { $result = $nf->authenticate('alice', 'password123') };
+    ok( !$result->{success}, 'authenticate fails when no file is set' );
 };
 
-subtest 'deleteID - no file configured' => sub {
+subtest 'revoke - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
-    my ($ok, $msg) = $nf->deleteID('alice');
-    ok( !$ok, 'deleteID fails when no file is set' );
+    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
+    like( $w->[0], qr/Utilities only/i, 'constructor warns when no_file' );
+    my $result = $nf->revoke('alice');
+    ok( !$result->{success}, 'revoke fails when no file is set' );
 };
 
-subtest 'resetPwd - no file configured' => sub {
+subtest 'change_credentials - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
-    my ($ok, $msg) = $nf->resetPwd('alice', 'password123');
-    ok( !$ok, 'resetPwd fails when no file is set' );
-    like( $msg, qr/Not OK/i, 'message reflects file validation failure' );
+    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
+    like( $w->[0], qr/Utilities only/i, 'constructor warns when no_file' );
+    my $result = $nf->change_credentials('alice', 'password123');
+    ok( !$result->{success}, 'change_credentials fails when no file is set' );
+    like( $result->{message}, qr/Not OK/i, 'message reflects file validation failure' );
 };
 
 done_testing;

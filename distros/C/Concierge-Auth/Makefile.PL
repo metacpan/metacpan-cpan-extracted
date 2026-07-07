@@ -29,7 +29,9 @@ WriteMakefile(
 
     PM => {
         'lib/Concierge/Auth.pm'              => '$(INST_LIB)/Concierge/Auth.pm',
+        'lib/Concierge/Auth/Base.pm'          => '$(INST_LIB)/Concierge/Auth/Base.pm',
         'lib/Concierge/Auth/Generators.pm'   => '$(INST_LIB)/Concierge/Auth/Generators.pm',
+        'lib/Concierge/Auth/Pwd.pm'           => '$(INST_LIB)/Concierge/Auth/Pwd.pm',
     },
 
     META_MERGE => {
@@ -47,11 +49,19 @@ WriteMakefile(
         provides => {
             'Concierge::Auth' => {
                 file    => 'lib/Concierge/Auth.pm',
-                version => 'v0.4.5',
+                version => 'v0.5.0',
+            },
+            'Concierge::Auth::Base' => {
+                file    => 'lib/Concierge/Auth/Base.pm',
+                version => 'v0.5.0',
             },
             'Concierge::Auth::Generators' => {
                 file    => 'lib/Concierge/Auth/Generators.pm',
                 version => 'v0.4.5',
+            },
+            'Concierge::Auth::Pwd' => {
+                file    => 'lib/Concierge/Auth/Pwd.pm',
+                version => 'v0.5.0',
             },
         },
     },

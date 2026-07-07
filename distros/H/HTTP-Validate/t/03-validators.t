@@ -3,7 +3,7 @@
 use lib 'lib';
 
 use strict;
-use Test::More tests => 4;
+use Test::More tests => 6;
 
 use HTTP::Validate qw(:keywords :validators);
 
@@ -11,7 +11,7 @@ use HTTP::Validate qw(:keywords :validators);
 
 # First test numeric parameter values
 
-subtest 'numeric validators' => sub {
+subtest 'INT_VALUE and DECI_VALUE' => sub {
     
     my ($result1, $result2, $result3, $result4);
     
@@ -98,7 +98,7 @@ subtest 'numeric validators' => sub {
 };
 
 
-subtest 'enum validators' => sub {
+subtest 'ENUM_VALUE' => sub {
     
     my ($r1, $r2);
     
@@ -124,7 +124,33 @@ subtest 'enum validators' => sub {
 };
 
 
-subtest 'match validators' => sub {
+subtest 'ENUM_VALUE hidden values' => sub {
+
+    my $v = HTTP::Validate->new;
+
+    eval {
+        $v->define_ruleset('enum hidden test' =>
+            { param => 'e',
+              valid => ENUM_VALUE('alpha', 'beta', '#', 'gamma', 'delta') });
+    };
+
+    ok( !$@, 'ENUM_VALUE hidden: define ruleset' ) or diag("    message was: $@");
+
+    my $r1 = $v->check_params('enum hidden test', {}, { e => 'alpha' });
+    ok( $r1->passed, 'ENUM_VALUE hidden: visible value accepted' );
+
+    my $r2 = $v->check_params('enum hidden test', {}, { e => 'gamma' });
+    ok( $r2->passed, 'ENUM_VALUE hidden: hidden value accepted' );
+
+    my $r3 = $v->check_params('enum hidden test', {}, { e => 'other' });
+    ok( !$r3->passed, 'ENUM_VALUE hidden: invalid value rejected' );
+    my ($errmsg) = $r3->errors;
+    cmp_ok( $errmsg, '=~', qr{'alpha'.*'beta'}, 'ENUM_VALUE hidden: error lists visible values' );
+    cmp_ok( $errmsg, '!~', qr{'gamma'|'delta'}, 'ENUM_VALUE hidden: error omits hidden values' );
+};
+
+
+subtest 'MATCH_VALUE' => sub {
 
     my ($r1, $r2, $r3);
     
@@ -158,6 +184,50 @@ subtest 'match validators' => sub {
     is_deeply([sort $r1->error_keys], ['match2', 'match3'], 'proper match errors');
     ok( ! $r2->passed, "match failed with 'foo'" );
     ok( $r3->passed, "match passed with 'bar'" );
+};
+
+
+subtest 'BOOLEAN_VALUE' => sub {
+
+    my $v = HTTP::Validate->new;
+
+    eval {
+        $v->define_ruleset('bool test' =>
+            { param => 'b1', valid => BOOLEAN_VALUE },
+            { param => 'b2', valid => BOOLEAN_VALUE },
+            { param => 'b3', valid => BOOLEAN_VALUE },
+            { param => 'b4', valid => BOOLEAN_VALUE },
+            { param => 'b5', valid => BOOLEAN_VALUE },
+            { param => 'b6', valid => BOOLEAN_VALUE },
+            { param => 'b7', valid => BOOLEAN_VALUE },
+            { param => 'b8', valid => BOOLEAN_VALUE });
+    };
+
+    ok( !$@, 'BOOLEAN_VALUE: define ruleset' ) or diag("    message was: $@");
+
+    my $r1 = $v->check_params('bool test', {},
+        [b1 => 'yes', b2 => 'no',  b3 => 'true', b4 => 'false',
+         b5 => 'on',  b6 => 'off', b7 => '1',    b8 => '0']);
+
+    ok( $r1->passed, 'BOOLEAN_VALUE: all accepted values pass' );
+    is( $r1->value('b1'), 1, 'BOOLEAN_VALUE: yes => 1' );
+    is( $r1->value('b2'), 0, 'BOOLEAN_VALUE: no => 0' );
+    is( $r1->value('b3'), 1, 'BOOLEAN_VALUE: true => 1' );
+    is( $r1->value('b4'), 0, 'BOOLEAN_VALUE: false => 0' );
+    is( $r1->value('b5'), 1, 'BOOLEAN_VALUE: on => 1' );
+    is( $r1->value('b6'), 0, 'BOOLEAN_VALUE: off => 0' );
+    is( $r1->value('b7'), 1, 'BOOLEAN_VALUE: 1 => 1' );
+    is( $r1->value('b8'), 0, 'BOOLEAN_VALUE: 0 => 0' );
+
+    my $r2 = $v->check_params('bool test', {},
+        [b1 => 'YES', b2 => 'True', b3 => 'OFF', b4 => 'No',
+         b5 => 'ON',  b6 => 'False', b7 => '1',  b8 => '0']);
+    ok( $r2->passed, 'BOOLEAN_VALUE: case-insensitive' );
+
+    my $r3 = $v->check_params('bool test', {}, [b1 => 'maybe']);
+    ok( !$r3->passed, 'BOOLEAN_VALUE: rejects invalid value' );
+    my ($errmsg) = $r3->errors;
+    cmp_ok( $errmsg, '=~', qr{yes|no|true|false}, 'BOOLEAN_VALUE: error message lists valid values' );
 };
 
 

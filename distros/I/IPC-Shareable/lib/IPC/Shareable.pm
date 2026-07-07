@@ -25,7 +25,7 @@ use Scalar::Util;
 use String::CRC32;
 use Storable 0.6 qw(freeze thaw);
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 # eval() returns 1 on success; // 0 coerces undef (failure) to 0 so callers
 # can boolean-test cleanly without checking definedness.
@@ -1046,7 +1046,12 @@ sub sysv_info {
             }
         }
     }
-    elsif ($^O eq 'freebsd') {
+    elsif ($^O eq 'freebsd' || $^O eq 'midnightbsd' || $^O eq 'netbsd') {
+        # MidnightBSD (FreeBSD-derived) and NetBSD share FreeBSD's kern.ipc
+        # sysctl namespace. NetBSD's semmni also defaults to 10, so exposing
+        # the limit there lets the test suite's free-set guard activate
+        # instead of dying ENOSPC mid-run.
+
         my $out = defined $sysctl_out ? $sysctl_out : do {
             open my $fh, '-|', 'sysctl', 'kern.ipc' or die "sysctl: $!";
             local $/;
@@ -1055,7 +1060,7 @@ sub sysv_info {
             $s;
         };
         for my $line (split /\n/, $out) {
-            if ($line =~ /^kern\.ipc\.((?:shm|sem)\w+):\s*(\S+)/) {
+            if ($line =~ /^kern\.ipc\.((?:shm|sem)\w+)\s*[:=]\s*(\S+)/) {
                 $info{$1} = $2;
             }
         }
@@ -1306,6 +1311,58 @@ sub clean_up_testing {
         else {
             warn "clean_up_testing(): could not remove shm segment $id: $!";
         }
+    }
+    close $ipcs_fh;
+
+    # Second pass: reclaim orphaned testing-tagged semaphore sets -- ones whose
+    # shm segment is already gone (eg. a crashed run died between removing the
+    # segment and removing its semaphore set). The first pass cannot see these
+    # because it walks ipcs -m. Each orphan pins a SEMMNI slot forever, and on
+    # hosts with a tiny limit (OpenBSD defaults to kern.seminfo.semmni=10) the
+    # accumulation eventually starves every subsequent semget() into ENOSPC --
+    # the mass CPAN tester failure mode. A tagged set whose segment is gone can
+    # never be re-attached by _tie() (the segment is always created before the
+    # semaphore set), so removing it is race-free.
+
+    open $ipcs_fh, '-|', 'ipcs', '-s' or die "ipcs -s: $!";
+
+    while (my $line = <$ipcs_fh>) {
+        my $raw_key;
+
+        if ($line =~ /^\s*s\s+\d+\s+(\S+)/) {
+            # BSD/macOS: s <semid> <key> ...
+            $raw_key = $1;
+        }
+        elsif ($line =~ /^\s*\d+\s+(0x[0-9a-fA-F]+)\s+/) {
+            # DragonFly BSD: <semid> <hex_key> ... (no type-letter column)
+            $raw_key = $1;
+        }
+        elsif ($line =~ /^\s*(\S+)\s+\d+\s+\S+/) {
+            # Linux: <key> <semid> ...
+            $raw_key = $1;
+        }
+        else {
+            next;
+        }
+
+        my $key_int = $raw_key =~ /^0x[0-9a-fA-F]+$/
+            ? hex($raw_key)
+            : $raw_key =~ /^-?\d+$/
+            ? int($raw_key)
+            : next;
+
+        next if $key_int == 0;
+
+        # A live segment means a healthy (or first-pass handled) pair
+
+        next if defined shmget($key_int, 0, 0);
+
+        my $sem = IPC::Semaphore->new($key_int, 0, 0);
+        next unless defined $sem;
+
+        next unless _testing_semaphore_value($sem) == $target;
+
+        $removed++ if $sem->remove;
     }
     close $ipcs_fh;
 
@@ -1758,13 +1815,17 @@ sub _tie {
         # semaphore set (eg. ENOSPC when the host's semaphore limit is hit).
         # Remove the segment we just made so it isn't orphaned -- but only when
         # we are the creator: a pure attacher (create => 0) must never remove a
-        # segment that another process owns. Preserve $! across the removal so
-        # the croak still reports the original failure (eg. "No space left on
-        # device") rather than the result of the cleanup's shmctl.
+        # segment that another process owns. An IPC_PRIVATE segment is always
+        # freshly created by shmget() regardless of the 'create' attribute, and
+        # is unreachable by key once we croak, so it must be removed too -- it
+        # would otherwise leak invisibly (clean_up_testing() cannot see key 0).
+        # Preserve $! across the removal so the croak still reports the
+        # original failure (eg. "No space left on device") rather than the
+        # result of the cleanup's shmctl.
 
         my $err = $!;
 
-        $seg->remove if $knot->attributes('create');
+        $seg->remove if $knot->attributes('create') || $key == IPC_PRIVATE;
         $! = $err;
 
         croak "Could not create semaphore set: $!\n";
@@ -1774,12 +1835,14 @@ sub _tie {
         # Lock acquisition failed before the knot was registered, so nothing
         # else will reclaim these. Tear down what we just made: the semaphore
         # set if we created it (its marker isn't set yet), and the segment if
-        # we are its creator. Preserve $! so the croak still names the cause.
+        # we are its creator (an IPC_PRIVATE segment is always freshly created,
+        # and unreachable by key hereafter, so it counts as ours too).
+        # Preserve $! so the croak still names the cause.
 
         my $err = $!;
 
         $sem->remove if $sem->getval(SEM_MARKER) != SHM_EXISTS;
-        $seg->remove if $knot->attributes('create');
+        $seg->remove if $knot->attributes('create') || $key == IPC_PRIVATE;
         $! = $err;
 
         croak "Could not obtain semaphore set lock: $!\n";
@@ -3523,6 +3586,15 @@ C<%global_register>: it will find and remove orphaned segments from previous
 crashed test runs.  Unlike L<clean_up_protected|/clean_up_protected($protect_key)>,
 it deliberately ignores the C<protected> attribute -- a matching segment tagged
 with C<testing> is removed regardless.
+
+A second pass reclaims B<orphaned testing semaphore sets> -- ones whose shared
+memory segment is already gone, eg. when a crashed run died between removing a
+segment and removing its semaphore set. Such a set can never be re-attached
+(the segment is always created before its semaphore set), yet it pins one of
+the system's C<SEMMNI> slots forever; on hosts with a tiny limit (OpenBSD
+defaults to C<kern.seminfo.semmni=10>) the accumulation eventually starves
+every subsequent C<semget()> into C<ENOSPC>. Only sets carrying the matching
+C<SEM_TESTING> marker are touched.
 
 The typical usage is at the top of the first test file (before any segments are
 created) to clear orphans, and optionally at the end of the last test file as a

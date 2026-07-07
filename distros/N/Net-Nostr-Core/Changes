@@ -1,3 +1,10 @@
+1.001001   2026-07-06
+
+  - Sign and verify NIP-01 Schnorr signatures over the 32-byte event id
+    instead of its hex string, so events interoperate with standard Nostr
+    implementations. Signatures produced by earlier versions are no longer
+    valid and must be regenerated.
+
 1.001000   2026-07-03
 
   - First independent Net-Nostr-Core release, split from Net-Nostr

@@ -2,7 +2,7 @@ package Net::Nostr::Relay;
 
 use strictures 2;
 
-our $VERSION = '1.001000';
+our $VERSION = '1.001001';
 
 use Net::Nostr::_ConstructorArgs ();
 
@@ -591,7 +591,7 @@ sub _validate_event {
             $pk->import_key_raw($compressed, 'secp256k1');
             my $verifier = Crypt::PK::ECC::Schnorr->new(\$pk->export_key_der('public'));
             my $sig_raw = pack('H*', $event->sig);
-            $verifier->verify_message($event->id, $sig_raw);
+            $verifier->verify_message(pack('H*', $event->id), $sig_raw);
         };
         return 'invalid: bad signature' unless $sig_valid;
     }

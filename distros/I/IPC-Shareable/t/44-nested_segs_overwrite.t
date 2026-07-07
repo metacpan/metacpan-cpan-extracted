@@ -8,7 +8,9 @@ use Test::More;
 
 use FindBin;
 use lib $FindBin::Bin;
-use IPCShareableTest qw(unique_glue assert_clean live_seg_count);
+use IPCShareableTest qw(unique_glue assert_clean live_seg_count require_free_sem_sets);
+
+require_free_sem_sets();
 
 # Verify that overwriting a tied child value with a new reference removes
 # the old child segment (no leak for flat overwrites; nested children of

@@ -8,7 +8,9 @@ use Test::More;
 
 use FindBin;
 use lib $FindBin::Bin;
-use IPCShareableTest qw(assert_clean_process unique_glue);
+use IPCShareableTest qw(assert_clean_process unique_glue require_free_sem_sets);
+
+require_free_sem_sets();
 
 # All keys are per-run unique (so two smokers running this file at once don't
 # collide on the same System V segment). hexkey() returns the lowercase

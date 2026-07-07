@@ -10,8 +10,9 @@ t/03-validators.t
 t/04-require.t
 t/05-docstrings.t
 t/06-messages.t
+t/07-coverage.t
 t/manifest.t
 t/pod.t
-Makefile.PL
 META.yml
 META.json
+Makefile.PL

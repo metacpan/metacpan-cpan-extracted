@@ -1,0 +1,22 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'clips';
+
+share {
+  start_url 'https://github.com/jtrujil43/FuzzyCLIPS/archive/refs/heads/master.tar.gz';
+
+  plugin Download => (
+    filename => 'FuzzyCLIPS-master.tar.gz',
+  );
+
+  plugin Extract => 'tar.gz';
+
+  build [
+    '%{make}',
+  ];
+
+  gather [
+    'if [ -f libclips.so ]; then cp libclips.so %{.install.lib}/libclips.so; fi',
+    'if [ -f clips ]; then cp clips %{.install.bin}/clips; fi',
+  ];
+};

@@ -9,10 +9,11 @@ use Digest::SHA qw(sha256_hex);
 use JSON ();
 
 use lib 't/lib';
-use TestFixtures qw(%FIATJAF_EVENT);
+use TestFixtures qw(%FIATJAF_EVENT @REAL_EVENTS);
 
 use Net::Nostr::Key;
 use Net::Nostr::Event;
+use Crypt::PK::ECC;
 
 my $EVENT = Net::Nostr::Event->new(%FIATJAF_EVENT);
 
@@ -310,7 +311,7 @@ subtest 'verify_sig()' => sub {
         pubkey => $key->pubkey_hex, kind => 1, content => 'test',
         created_at => 1000, tags => []
     );
-    my $sig_hex = unpack 'H*', $key->schnorr_sign($event->id);
+    my $sig_hex = unpack 'H*', $key->schnorr_sign(pack 'H*', $event->id);
     $event->sig($sig_hex);
     ok($event->verify_sig($key), 'valid sig verifies');
 
@@ -323,6 +324,29 @@ subtest 'validate()' => sub {
     my $key = Net::Nostr::Key->new;
     my $event = $key->create_event(kind => 1, content => 'validate me', tags => []);
     ok($event->validate, 'fully signed event validates');
+};
+
+subtest 'validate() accepts real ecosystem-signed events (NIP-01 BIP-340 over raw id bytes)' => sub {
+    for my $data (@REAL_EVENTS) {
+        my $event = Net::Nostr::Event->new(%$data);
+        ok($event->validate, "real event $data->{id} validates");
+    }
+};
+
+subtest 'signatures we produce verify under the standard raw-id-bytes convention' => sub {
+    my $key = Net::Nostr::Key->new;
+    my $event = $key->create_event(kind => 1, content => 'interop', tags => []);
+
+    # Independently verify with BIP-340 over the 32 raw bytes of the id, exactly
+    # as every standard Nostr implementation does. A signature over the hex
+    # string (the historical bug) would fail this check.
+    my $pk = Crypt::PK::ECC->new;
+    $pk->import_key_raw("\x02" . pack('H*', $event->pubkey), 'secp256k1');
+    my $verifier = Crypt::PK::ECC::Schnorr->new(\$pk->export_key_der('public'));
+    ok(
+        $verifier->verify_message(pack('H*', $event->id), pack('H*', $event->sig)),
+        'produced signature verifies over raw 32-byte id'
+    );
 };
 
 subtest 'validate() recomputes id' => sub {

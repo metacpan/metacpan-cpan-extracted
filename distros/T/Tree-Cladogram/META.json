@@ -71,6 +71,6 @@
          "web" : "https://github.com/ronsavage/Tree-Cladogram"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

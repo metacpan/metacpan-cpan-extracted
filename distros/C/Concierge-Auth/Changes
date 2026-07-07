@@ -1,5 +1,35 @@
 Revision history for Concierge-Auth
 
+v0.5.0  2026-07-05
+    - BREAKING: Concierge::Auth is now a thin backend factory, not a
+      monolithic password-auth implementation. All prior OO methods
+      (confirm/reject/reply, validateID/validatePwd/validateFile,
+      checkID/deleteID/checkPwd/setPwd/resetPwd, setFile/rmFile/clearFile,
+      encryptPwd, pfile, the gen_* wrappers) are removed outright -- no
+      deprecation shims. Code calling Concierge::Auth directly (rather
+      than through Concierge.pm) will need to migrate to the new backend
+      contract below.
+    - Added Concierge::Auth::Base: the domain-level contract every backend
+      must implement -- authenticate, is_id_known, enroll,
+      change_credentials, revoke (returning { success, message, ... }
+      hashrefs) -- plus working default implementations of the Generator
+      methods (gen_uuid, gen_random_id, gen_random_token,
+      gen_random_string, gen_word_phrase, gen_token, gen_crypt_token),
+      inherited for free unless a backend overrides them.
+    - Added Concierge::Auth::Pwd: the built-in password-file backend,
+      implementing Concierge::Auth::Base on top of the previous
+      file-backed primitives (now private to this module).
+      Concierge::Auth->new now requires backend => 'Concierge::Auth::Pwd'
+      (or another conforming backend class) instead of configuring a
+      password file directly.
+    - Fixed packaging: MANIFEST and Makefile.PL were missing
+      lib/Concierge/Auth/Base.pm and lib/Concierge/Auth/Pwd.pm (both new
+      in this release) from PM/provides -- would have shipped a CPAN
+      distribution missing required modules.
+    - Ported full t/ suite to the new contract; added factory-specific
+      coverage (missing backend, unloadable backend class, backend
+      constructor failure).
+
 v0.4.5  2026-05-25
     - Fix t/05-generators.t: skip dict-dependent subtest on systems without
       /usr/share/dict/web2 (Linux CPAN tester failure)

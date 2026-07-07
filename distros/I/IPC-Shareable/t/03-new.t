@@ -9,8 +9,10 @@ use Test::More;
 use FindBin;
 use lib $FindBin::Bin;
 use IPCShareableTest qw(
-    assert_clean_process barrier_new barrier_release barrier_wait unique_glue
+    assert_clean_process barrier_new barrier_release barrier_wait unique_glue require_free_sem_sets
 );
+
+require_free_sem_sets();
 use Test::SharedFork;
 
 

@@ -1,14 +1,16 @@
 use warnings;
 use strict;
 
-use IPC::SysV qw(IPC_RMID);
+use IPC::SysV qw(IPC_RMID IPC_STAT);
 use IPC::Semaphore;
 use Errno qw(ENOSPC);
 use Test::More;
 
 use FindBin;
 use lib $FindBin::Bin;
-use IPCShareableTest qw(assert_clean_process unique_glue);
+use IPCShareableTest qw(assert_clean_process unique_glue require_free_sem_sets);
+
+require_free_sem_sets();
 
 use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
@@ -148,6 +150,50 @@ IPC::Shareable->testing_set('IPC::Shareable');
     is $owner{alive}, 1, "attacher: the owner's data is intact";
 
     IPC::Shareable::clean_up_all;
+}
+
+# ---------------------------------------------------------------------------
+# IPC_PRIVATE: a failed semaphore create removes the just-created private
+# segment. shmget(IPC_PRIVATE) ALWAYS creates a fresh segment regardless of the
+# 'create' attribute (which a bare tie does not set), and a private segment is
+# unreachable by key after the croak -- before this fix it leaked
+# unconditionally, invisible even to clean_up_testing() (which skips key 0).
+# This was the ~4-segments-per-run growth observed on wedged OpenBSD smokers.
+# The segment id is captured via a pass-through wrap of SharedMem::new so the
+# assertion is id-exact and immune to unrelated IPC activity on the host.
+# ---------------------------------------------------------------------------
+{
+    my $seg_id;
+
+    {
+        no warnings 'redefine';
+
+        my $real_new = \&IPC::Shareable::SharedMem::new;
+
+        local *IPC::Shareable::SharedMem::new = sub {
+            my $seg = $real_new->(@_);
+            $seg_id = $seg->id if defined $seg;
+            return $seg;
+        };
+        local *IPC::Semaphore::new = sub { $! = ENOSPC; return };
+
+        my $ok = eval {
+            tie my $s, 'IPC::Shareable';   # No key, no create: IPC_PRIVATE
+            1;
+        };
+        ok ! $ok, 'IPC_PRIVATE: tie croaks when the semaphore set cannot be created';
+        like $@, qr/Could not create semaphore set/, '...with the expected message';
+    }
+
+    ok defined $seg_id,
+        'IPC_PRIVATE: a private segment was created during the failed tie';
+
+    my $stat_buf = '';
+    ok ! shmctl($seg_id, IPC_STAT, $stat_buf),
+        'IPC_PRIVATE: the private segment was removed, not orphaned';
+
+    # Safety net: reclaim it if a regression reintroduces the leak
+    shmctl($seg_id, IPC_RMID, 0) if defined $seg_id;
 }
 
 # ---------------------------------------------------------------------------

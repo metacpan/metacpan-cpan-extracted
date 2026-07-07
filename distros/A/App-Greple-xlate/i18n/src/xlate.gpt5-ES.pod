@@ -1,0 +1,553 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::xlate - módulo de soporte de traducción para greple
+
+=head1 SYNOPSIS
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine deepl --xlate pattern target-file
+
+=head1 VERSION
+
+Version 2.00
+
+=head1 DESCRIPTION
+
+B<Greple> B<xlate> module encuentra los bloques de texto deseados y los reemplaza por el texto traducido. El motor principal es GPT-5.5 (F<llm/gpt5.pm>), que llama al comando L<llm|https://llm.datasette.io/>; DeepL (F<deepl.pm>) y los motores heredados basados en B<gpty> también están incluidos.
+
+Las traducciones se almacenan en caché por archivo, por lo que volver a ejecutar un comando no cuesta nada para el texto sin cambios. Cuando se edita un documento, solo los párrafos modificados se envían de nuevo a la API; un motor consciente del contexto también recibe las traducciones circundantes, el texto fuente sin procesar alrededor del cambio y la versión anterior del párrafo editado, de modo que la nueva traducción mantenga la redacción establecida (véase B<--xlate-context-window>). Las cadenas sensibles pueden ocultarse antes de la transmisión (véase L</ANONYMIZATION AND TEMPLATES>).
+
+Si desea traducir bloques de texto normales en un documento escrito en el estilo pod de Perl, use el comando B<greple> con C<--xlate-engine gpt5> y el módulo C<perl> así:
+
+    greple -Mxlate --xlate-engine gpt5 -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
+
+En este comando, la cadena de patrón C<^([\w\pP].*\n)+> significa líneas consecutivas que comienzan con letras alfanuméricas y signos de puntuación. Este comando muestra el área a traducir resaltada. La opción B<--all> se utiliza para producir el texto completo.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
+</p>
+
+Luego agregue la opción C<--xlate> para traducir el área seleccionada. Entonces, encontrará las secciones deseadas y las reemplazará por la salida del motor de traducción.
+
+De forma predeterminada, el texto original y el traducido se imprimen en el formato de "marcador de conflicto" compatible con L<git(1)>. Usando el formato C<ifdef>, puede obtener la parte deseada fácilmente con el comando L<unifdef(1)>. El formato de salida puede especificarse con la opción B<--xlate-format>.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
+</p>
+
+Si desea traducir todo el texto, use la opción B<--match-all>. Este es un atajo para especificar el patrón C<(?s).+> que coincide con todo el texto.
+
+Los datos en formato de marcador de conflicto pueden visualizarse en estilo lado a lado con el comando L<sdif|App::sdif> y la opción C<-V>. Dado que no tiene sentido comparar por cadena, se recomienda la opción C<--no-cdif>. Si no necesita colorear el texto, especifique C<--no-textcolor> (o C<--no-tc>).
+
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+</p>
+
+=head1 NORMALIZATION
+
+El procesamiento se realiza en unidades especificadas, pero en el caso de una secuencia de múltiples líneas de texto no vacío, se convierten juntas en una sola línea. Esta operación se realiza de la siguiente manera:
+
+=over 2
+
+=item *
+
+Eliminar los espacios en blanco al principio y al final de cada línea.
+
+=item *
+
+Si una línea termina con un signo de puntuación de ancho completo, concatenar con la siguiente línea.
+
+=item *
+
+Si una línea termina con un carácter de ancho completo y la siguiente línea comienza con un carácter de ancho completo, concatenar las líneas.
+
+=item *
+
+Si el final o el comienzo de una línea no es un carácter de ancho completo, concatenarlas insertando un espacio.
+
+=back
+
+Los datos de caché se gestionan en función del texto normalizado, por lo que incluso si se realizan modificaciones que no afecten los resultados de la normalización, los datos de traducción en caché seguirán siendo efectivos.
+
+Este proceso de normalización se realiza solo para el primer (índice 0) y los patrones de número par. Por lo tanto, si se especifican dos patrones como se indica a continuación, el texto que coincida con el primer patrón se procesará después de la normalización, y no se realizará ningún proceso de normalización en el texto que coincida con el segundo patrón.
+
+    greple -Mxlate -E normalized -E not-normalized
+
+Por lo tanto, use el primer patrón para el texto que deba procesarse combinando múltiples líneas en una sola línea, y use el segundo patrón para texto preformateado. Si no hay texto que coincida en el primer patrón, use un patrón que no coincida con nada, como C<(?!)>.
+
+=head1 MASKING
+
+Ocasionalmente, hay partes del texto que no desea traducir. Por ejemplo, etiquetas en archivos markdown. DeepL sugiere que, en tales casos, la parte del texto a excluir se convierta en etiquetas XML, se traduzca y luego se restaure una vez completada la traducción. Para admitir esto, es posible especificar las partes que se deben enmascarar de la traducción.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+Esto interpretará cada línea del archivo C<MASKPATTERN> como una expresión regular, traducirá las cadenas que coincidan con ella y revertirá después del procesamiento. Las líneas que comienzan con C<#> se ignoran.
+
+Un patrón complejo puede escribirse en múltiples líneas con salto de línea escapado con barra invertida.
+
+Cómo se transforma el texto mediante el enmascaramiento puede verse con la opción B<--xlate-mask>.
+
+El enmascaramiento protege el marcado para que no se traduzca. Para ocultar cadenas sensibles al propio servicio de traducción, consulte L</ANONYMIZATION AND TEMPLATES>; ambos pueden usarse juntos.
+
+Esta interfaz es experimental y está sujeta a cambios en el futuro.
+
+=head1 ANONYMIZATION AND TEMPLATES
+
+Las cadenas sensibles pueden ocultarse antes de enviarse a la API de traducción y restaurarse en la salida. Hay tres fuentes de reglas de anonimización disponibles: un archivo de diccionario (B<--xlate-anonymize>), marcas en línea en el propio documento (B<--xlate-anonymize-mark>) y valores de front matter YAML (B<--xlate-frontmatter>). Cada cadena se sustituye por una etiqueta de categoría como C<< <person id=1 /> >> durante la transmisión. El objetivo de la ocultación es únicamente la transmisión a la API: los archivos de caché locales almacenan el texto sin formato restaurado. Use B<--xlate-dryrun> para inspeccionar exactamente qué se transmitiría.
+
+Para documentos de formulario (informes trimestrales y similares), defina los actores al principio y haga referencia a ellos en el cuerpo:
+
+    ---
+    報告者: 山田太郎
+    発注会社: アクメ株式会社
+    ---
+    本件について {{ 報告者 }} が調査を行った。
+
+Traduzca la plantilla una vez por idioma con C<--xlate-template> (y C<--xlate-frontmatter> cuando los valores se mantengan en el archivo), luego renderice cada caso con el modo autónomo de B<pandoc-embedz>: los valores bajo C<global:> en una configuración externa nunca llegan en absoluto a la API de traducción:
+
+    greple -Mxlate --xlate --xlate-engine=gpt5 --xlate-to=EN-US \
+           --xlate-template= --xlate-format=xtxt \
+           --match-paragraph --all --need=0 \
+           report-template.md > report-template.EN.md
+    pandoc-embedz --standalone report-template.EN.md \
+                  -c case-123.yaml -o report-123.EN.md < /dev/null
+
+Para marcas en línea, proporcionar una configuración de definición de macros hace que la misma plantilla traducida renderice los nombres reales o una versión redactada:
+
+    # macros.yaml           # macros-redacted.yaml
+    preamble: |             preamble: |
+      {% macro person(name) %}{{ name }}{% endmacro %}
+                              {% macro person(name) %}(関係者){% endmacro %}
+
+Excluya los bloques embedz de la traducción cuando un documento los contenga:
+
+    --exclude '^```embedz\n(?s:.*?)^```\n'
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--xlate>
+
+=item B<--xlate-color>
+
+=item B<--xlate-fold>
+
+=item B<--xlate-fold-width>=I<n> (Default: 70)
+
+Invoque el proceso de traducción para cada área coincidente.
+
+Sin esta opción, B<greple> se comporta como un comando de búsqueda normal. Así puede comprobar qué parte del archivo será objeto de la traducción antes de iniciar el trabajo real.
+
+El resultado del comando va a la salida estándar, así que rediríjalo a un archivo si es necesario, o considere usar el módulo L<App::Greple::update>.
+
+La opción B<--xlate> llama a la opción B<--xlate-color> con la opción B<--color=never>.
+
+Con la opción B<--xlate-fold>, el texto convertido se ajusta al ancho especificado. El ancho predeterminado es 70 y puede establecerse con la opción B<--xlate-fold-width>. Se reservan cuatro columnas para la operación de run-in, por lo que cada línea puede contener como máximo 74 caracteres.
+
+=item B<--xlate-engine>=I<engine>
+
+Especifica el motor de traducción que se utilizará.
+
+En este momento, están disponibles los siguientes motores
+
+=over 2
+
+=item * B<gpt5>: gpt-5.5 (via the C<llm> command)
+
+=item * B<deepl>: DeepL API (via the C<deepl> command)
+
+=item * B<gpt3>: gpt-3.5-turbo (legacy, via the C<gpty> command)
+
+=item * B<gpt4o>: gpt-4o-mini (legacy, via the C<gpty> command)
+
+=back
+
+Los módulos de motor se buscan primero en los espacios de nombres de backend (C<llm>, luego C<gpty>), y después directamente bajo C<App::Greple::xlate>. Por tanto, C<gpt5> carga C<App::Greple::xlate::llm::gpt5>, que llama al comando C<llm>, mientras que C<gpt4o> recurre a C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> para forzar un backend específico.
+
+=item B<--xlate-labor>
+
+=item B<--xlabor>
+
+En lugar de llamar al motor de traducción, se espera que usted trabaje manualmente. Después de preparar el texto a traducir, se copia al portapapeles. Se espera que lo pegue en el formulario, copie el resultado al portapapeles y presione regresar.
+
+=item B<--xlate-to> (Default: C<EN-US>)
+
+Especifique el idioma de destino. Los motores LLM aceptan cualquier nombre o código de idioma que el modelo entienda; se interpola en el prompt de traducción. Puede obtener los idiomas disponibles con el comando C<deepl languages> cuando use el motor B<DeepL>.
+
+=item B<--xlate-from> (Default: C<ORIGINAL>)
+
+Etiqueta utilizada para el texto original en los formatos de salida C<conflict>, C<colon> y C<ifdef>. Con el motor B<DeepL>, un valor no predeterminado también se pasa como idioma de origen.
+
+=item B<--xlate-format>=I<format> (Default: C<conflict>)
+
+Especifique el formato de salida para el texto original y el traducido.
+
+Los siguientes formatos distintos de C<xtxt> asumen que la parte a traducir es una colección de líneas. De hecho, es posible traducir solo una parte de una línea, pero especificar un formato distinto de C<xtxt> no producirá resultados significativos.
+
+=over 4
+
+=item B<conflict>, B<cm>
+
+El texto original y el convertido se imprimen en formato de marcadores de conflicto de L<git(1)>.
+
+    <<<<<<< ORIGINAL
+    original text
+    =======
+    translated Japanese text
+    >>>>>>> JA
+
+Puede recuperar el archivo original con el siguiente comando L<sed(1)>.
+
+    sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
+
+=item B<colon>, I<:::::::>
+
+El texto original y el traducido se muestran en un estilo de contenedor personalizado de markdown.
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+El texto anterior se traducirá a lo siguiente en HTML.
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+El número de dos puntos es 7 por defecto. Si especifica una secuencia de dos puntos como C<:::::>, se usa en lugar de 7 dos puntos.
+
+=item B<ifdef>
+
+El texto original y el convertido se imprimen en formato L<cpp(1)> C<#ifdef>.
+
+    #ifdef ORIGINAL
+    original text
+    #endif
+    #ifdef JA
+    translated Japanese text
+    #endif
+
+Puede recuperar solo el texto japonés con el comando B<unifdef>:
+
+    unifdef -UORIGINAL -DJA foo.ja.pm
+
+=item B<space>
+
+=item B<space+>
+
+El texto original y el convertido se imprimen separados por una sola línea en blanco. Para C<space+>, también se imprime una nueva línea después del texto convertido.
+
+=item B<xtxt>
+
+Si el formato es C<xtxt> (texto traducido) o desconocido, solo se imprime el texto traducido.
+
+=back
+
+=item B<--xlate-maxlen>=I<chars> (Default: 0)
+
+Especifique la longitud máxima del texto que se enviará a la API de una vez. El valor predeterminado 0 significa el límite propio del motor: para el servicio de cuenta gratuita de DeepL, es 128K para la API (B<--xlate>) y 5000 para la interfaz del portapapeles (B<--xlate-labor>). Es posible que pueda cambiar estos valores si utiliza el servicio Pro.
+
+=item B<--xlate-maxline>=I<n> (Default: 0)
+
+Especifique el número máximo de líneas de texto que se enviarán a la API de una vez.
+
+Establezca este valor en 1 si desea traducir una línea a la vez. Esta opción tiene prioridad sobre la opción C<--xlate-maxlen>.
+
+=item B<--xlate-prompt>=I<text>
+
+Especifique un prompt personalizado para enviarlo al motor de traducción. Esta opción está disponible para los motores LLM (C<gpt3>, C<gpt4o>, C<gpt5>), pero no para DeepL. Puede personalizar el comportamiento de la traducción proporcionando instrucciones específicas al modelo de IA. Si el prompt contiene C<%s>, se reemplazará por el nombre del idioma de destino.
+
+=item B<--xlate-context>=I<text>
+
+Especifique información de contexto adicional que se enviará al motor de traducción. Esta opción se puede usar varias veces para proporcionar múltiples cadenas de contexto. La información de contexto ayuda al motor de traducción a comprender el trasfondo y producir traducciones más precisas.
+
+=item B<--xlate-context-window>=I<n>
+
+(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+Número de bloques traducidos circundantes que se pasan como contexto de referencia al volver a traducir bloques modificados (predeterminado 2). El contexto también incluye el texto fuente sin procesar alrededor de la región modificada (encabezados, estructura de listas, leyendas) y, cuando está disponible, la versión anterior del texto modificado recuperada de la caché, de modo que se conserve la redacción sin cambios. Establézcalo en 0 para desactivar por completo la traducción con conocimiento del contexto. Tenga en cuenta que cada región modificada se traduce en su propia llamada a la API y que el contexto puede añadir hasta unos 8000 caracteres al prompt del sistema, por lo que la traducción con conocimiento del contexto intercambia algo de coste adicional por coherencia.
+
+=item B<--xlate-cache-seed>=I<file>
+
+Inicialice la caché de un documento nuevo a partir del archivo de caché de otro documento. Útil para informes periódicos: inicialice la caché del nuevo número con la del número anterior, de modo que los párrafos sin cambios no se vuelvan a traducir y los párrafos editados conserven la redacción del número anterior. La semilla se usa solo cuando la caché de destino está vacía; de lo contrario, se ignora con una advertencia. Con el C<--xlate-cache=auto> predeterminado, especificar una semilla también implica crear el archivo de caché del nuevo documento.
+
+=item B<--xlate-anonymize>=I<file>
+
+Anonimice las cadenas sensibles antes de que se envíen a la API de traducción y restáurelas en la salida. El archivo de diccionario proporciona una entrada por elemento: en JSON (canónico, generable por máquina)
+
+    [ { "category": "person",  "text": "山田太郎" },
+      { "category": "company", "regex": "アクメ(株式会社)?" } ]
+
+o en un formato de línea simple (C<category pattern>, C</.../> para regex). Cada elemento se reemplaza por una etiqueta de categoría como C<< <person id=1 /> >>; la misma cadena siempre obtiene la misma etiqueta, por lo que el modelo puede llevar la cuenta de quién es quién. Los campos JSON desconocidos se ignoran, por lo que los generadores (por ejemplo, un LLM local que extrae entidades) pueden añadir sus propias anotaciones. La categoría C<lit> está reservada. Los archivos de caché locales siguen almacenando texto plano restaurado: el objetivo de la ocultación es únicamente la transmisión a la API.
+
+Un diccionario puede generarse mediante una herramienta externa; por ejemplo, un modelo local que extrae entidades sensibles:
+
+    llm -m <local-model> \
+        -s 'Extract sensitive entities as a JSON array of objects
+            with "category" and "text" fields.' \
+        < report.md > report.anon.json
+    greple -Mxlate --xlate-anonymize=report.anon.json ...
+
+Se tolera una BOM UTF-8 en el archivo. Los valores en el formato de línea de front matter pueden llevar un comentario final solo en su propia línea, no después del valor.
+
+=item B<--xlate-anonymize-mark>[=I<regex>]
+
+Recoja entradas de anonimización de marcas en línea en el propio documento. Marque la primera aparición como C<{{ person("山田太郎") }}> y cada aparición de la cadena en todo el documento se anonimizará. La marca en sí permanece en el origen y en la traducción, de modo que un documento también pueda ser procesado por un procesador de macros de estilo Jinja2 (defina la macro C<person> para imprimir o redactar el nombre). Un I<regex> personalizado debe contener capturas con nombre C<< (?<category>...) >> y C<< (?<text>...) >>.
+
+Tenga en cuenta que, con una opción de valor opcional como esta, un argumento de archivo siguiente se tomaría como el valor: escriba C<--xlate-anonymize-mark=> (con un C<=> final) cuando use la notación predeterminada.
+
+Se pueden configurar notaciones alternativas, por ejemplo C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\n]+?)@@' >> para marcas de estilo C<@@person:NAME@@>, o una forma de comentario HTML que permanezca invisible en el Markdown renderizado. Las reglas de marca se recopilan por documento: una cadena marcada en un archivo de entrada no se oculta en otro archivo de la misma ejecución (a diferencia de los valores de front matter, que se acumulan entre archivos).
+
+=item B<--xlate-template>[=I<regex>]
+
+Trate las expresiones de plantilla (predeterminado: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) como marcadores de posición opacos: indique al modelo que las copie sin cambios y verifique, por bloque, que la respuesta contenga exactamente las mismas expresiones, cada una el mismo número de veces. Su orden puede cambiar, ya que la traducción las reordena legítimamente para seguir el orden de palabras del idioma de destino. Una expresión dañada aborta la ejecución; la caché se guarda en un punto de control y se congela, de modo que no se pierde nada pagado.
+
+Tenga en cuenta que, con una opción de valor opcional como esta, un argumento de archivo siguiente se tomaría como el valor: escriba C<--xlate-template=> (con un C<=> final) al usar la notación predeterminada.
+
+=item B<--xlate-frontmatter>
+
+Trate un bloque inicial C<---> ... C<---> como front matter YAML: exclúyalo de la traducción y de los fragmentos de contexto de la fase 2, y agregue sus valores planos C<key: value> a las reglas de anonimización (categoría C<var>) como red de seguridad. Con múltiples archivos de entrada, los valores recopilados se acumulan (pecando por exceso de ocultación).
+
+Deje siempre una línea en blanco después del C<---> de cierre. Con un patrón de coincidencia de estilo párrafo, el front matter que se une directamente al texto del cuerpo forma un bloque superpuesto que la exclusión no puede suprimir (en ese caso se imprime una advertencia); los valores siguen anonimizándose, pero el propio front matter se enviaría para traducción.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Especifique un ID de glosario que se utilizará para la traducción. Esta opción solo está disponible al usar el motor de DeepL. El ID de glosario debe obtenerse de su cuenta de DeepL y garantiza una traducción coherente de términos específicos.
+
+=item B<--xlate-dryrun>
+
+No llame a la API de traducción; en su lugar, muestre, a través de la visualización de progreso, cada payload exactamente como se transmitiría (después de la anonimización y el enmascaramiento). Útil para comprobar qué sale de la máquina y para estimar el coste de una ejecución.
+
+=item B<-->[B<no->]B<xlate-progress> (Default: True)
+
+Vea el resultado de la traducción en tiempo real en la salida STDERR. El payload C<From> se muestra tal como se transmitió, después de la anonimización y el enmascaramiento.
+
+=item B<--xlate-stripe>
+
+Use el módulo L<App::Greple::stripe> para mostrar la parte coincidente con un estilo de rayas tipo cebra. Esto es útil cuando las partes coincidentes están conectadas consecutivamente.
+
+La paleta de colores se cambia según el color de fondo de la terminal. Si desea especificarlo explícitamente, puede usar B<--xlate-stripe-light> o B<--xlate-stripe-dark>.
+
+=item B<--xlate-mask>
+
+Realice la función de enmascaramiento y muestre el texto convertido tal cual sin restauración.
+
+=item B<--match-all>
+
+Establezca todo el texto del archivo como área objetivo.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+En el caso de los formatos C<cm> y C<colon>, la salida se divide y se formatea línea por línea. Por lo tanto, si solo se traduce una parte de una línea, no se puede obtener el resultado esperado. Estos filtros corrigen la salida que se corrompe al traducir parte de una línea a una salida normal línea por línea.
+
+En la implementación actual, si se traducen múltiples partes de una línea, se generan como líneas independientes.
+
+=back
+
+=head1 CACHE OPTIONS
+
+El módulo B<xlate> puede almacenar en caché el texto de la traducción para cada archivo y leerlo antes de la ejecución para eliminar la sobrecarga de consultar al servidor. Con la estrategia de caché predeterminada C<auto>, mantiene los datos de la caché solo cuando el archivo de caché existe para el archivo de destino.
+
+Use B<--xlate-cache=clear> para iniciar la gestión de la caché o para limpiar todos los datos de caché existentes. Una vez ejecutado con esta opción, se creará un nuevo archivo de caché si no existe y luego se mantendrá automáticamente.
+
+=over 7
+
+=item --xlate-cache=I<strategy>
+
+=over 4
+
+=item C<auto> (Default)
+
+Mantenga el archivo de caché si existe.
+
+=item C<create>
+
+Cree un archivo de caché vacío y salga.
+
+=item C<always>, C<yes>, C<1>
+
+Mantén la caché de todos modos siempre que el destino sea un archivo normal.
+
+=item C<clear>
+
+Borra primero los datos de la caché.
+
+=item C<never>, C<no>, C<0>
+
+Nunca uses el archivo de caché aunque exista.
+
+=item C<accumulate>
+
+Por defecto, los datos no utilizados se eliminan del archivo de caché. Si no quieres eliminarlos y prefieres mantenerlos en el archivo, usa C<accumulate>.
+
+=back
+
+=item B<--xlate-update>
+
+Esta opción fuerza la actualización del archivo de caché aunque no sea necesaria.
+
+=back
+
+=head1 COMMAND LINE INTERFACE
+
+Puedes usar fácilmente este módulo desde la línea de comandos utilizando el comando C<xlate> incluido en la distribución. Consulta la página del manual C<xlate> para su uso.
+
+El comando C<xlate> admite opciones largas al estilo GNU como C<--to-lang>, C<--from-lang>, C<--engine> y C<--file>. Use C<xlate -h> para ver todas las opciones disponibles.
+
+El comando C<xlate> funciona en conjunto con el entorno Docker, por lo que, incluso si no tienes nada instalado localmente, puedes usarlo siempre que Docker esté disponible. Usa la opción C<-D> o C<-C>.
+
+Las operaciones de Docker son manejadas por L<App::dozo>, que también puede usarse como un comando independiente. El comando C<dozo> admite el archivo de configuración C<.dozorc> para ajustes persistentes del contenedor.
+
+Además, dado que se proporcionan makefiles para varios estilos de documentos, es posible la traducción a otros idiomas sin especificaciones especiales. Usa la opción C<-M>.
+
+También puedes combinar las opciones Docker y C<make> para poder ejecutar C<make> en un entorno Docker.
+
+Ejecutar como C<xlate -C> iniciará una shell con el repositorio git de trabajo actual montado.
+
+Lee el artículo en japonés en la sección L</SEE ALSO> para más detalles.
+
+=head1 EMACS
+
+Carga el archivo F<xlate.el> incluido en el repositorio para usar el comando C<xlate> desde el editor Emacs. La función C<xlate-region> traduce la región indicada. El idioma predeterminado es C<EN-US> y puedes especificar el idioma invocándola con un argumento prefijo.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
+
+=head1 ENVIRONMENT
+
+=over 7
+
+=item DEEPL_AUTH_KEY
+
+Configura tu clave de autenticación para el servicio DeepL.
+
+=item OPENAI_API_KEY
+
+Clave de autenticación de OpenAI, utilizada por los motores heredados B<gpty>. El motor B<gpt5> basado en C<llm> también lee esta variable, pero las claves almacenadas con C<llm keys set openai> también funcionan.
+
+=item GREPLE_XLATE_CACHE
+
+Configura la estrategia de caché predeterminada (consulta L</CACHE OPTIONS>).
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
+=head2 TOOLS
+
+Instala la herramienta de línea de comandos para el motor que uses: C<llm> para el motor B<gpt5>, C<deepl> para DeepL, C<gpty> para los motores GPT heredados.
+
+L<https://llm.datasette.io/>
+
+L<https://github.com/DeepLcom/deepl-python>
+
+L<https://github.com/tecolicom/App-gpty>
+
+=head1 SEE ALSO
+
+=head2 MODULES
+
+L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>
+
+L<App::dozo> - Ejecutor genérico de Docker utilizado por xlate para operaciones de contenedor
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+Consulta el manual B<greple> para más detalles sobre el patrón de texto objetivo. Usa las opciones B<--inside>, B<--outside>, B<--include>, B<--exclude> para limitar el área de coincidencia.
+
+=item * L<App::Greple::update>
+
+Puedes usar el módulo C<-Mupdate> para modificar archivos con el resultado del comando B<greple>.
+
+=item * L<App::sdif>
+
+Usa B<sdif> para mostrar el formato de marcador de conflicto junto con la opción B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Módulo de Greple B<stripe> usado con la opción B<--xlate-stripe>.
+
+=back
+
+=head2 RESOURCES
+
+=over 2
+
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
+
+Imagen de contenedor Docker.
+
+=item * L<https://github.com/tecolicom/getoptlong>
+
+La biblioteca C<getoptlong.sh> utilizada para el análisis de opciones en el script C<xlate> y L<App::dozo>.
+
+=item * L<https://llm.datasette.io/>
+
+El comando C<llm> utilizado por el motor B<gpt5> para acceder a modelos LLM.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
+
+Biblioteca de Python y comando CLI de DeepL.
+
+=item * L<https://github.com/openai/openai-python>
+
+Biblioteca de Python de OpenAI
+
+=item * L<https://github.com/tecolicom/App-gpty>
+
+Interfaz de línea de comandos de OpenAI
+
+=back
+
+=head2 ARTICLES
+
+=over 2
+
+=item * L<https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250>
+
+Módulo de Greple para traducir y reemplazar solo las partes necesarias con la API de DeepL (en japonés)
+
+=item * L<https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6>
+
+Generación de documentos en 15 idiomas con el módulo de la API de DeepL (en japonés)
+
+=item * L<https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd>
+
+Entorno Docker de traducción automática con la API de DeepL (en japonés)
+
+=back
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2023-2026 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

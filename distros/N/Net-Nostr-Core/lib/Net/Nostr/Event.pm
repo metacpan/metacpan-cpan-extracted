@@ -283,7 +283,7 @@ sub verify_sig {
         unless $key->pubkey_hex eq $self->pubkey;
     my $sig_raw = pack 'H*', $self->sig;
     my $verifier = Crypt::PK::ECC::Schnorr->new(\$key->pubkey_der);
-    return $verifier->verify_message($self->id, $sig_raw);
+    return $verifier->verify_message(pack('H*', $self->id), $sig_raw);
 }
 
 sub validate {
@@ -301,7 +301,7 @@ sub validate {
     my $verifier = Crypt::PK::ECC::Schnorr->new(\$pk->export_key_der('public'));
     my $sig_raw = pack 'H*', $self->sig;
     croak "signature is invalid"
-        unless $verifier->verify_message($self->id, $sig_raw);
+        unless $verifier->verify_message(pack('H*', $self->id), $sig_raw);
 
     return 1;
 }

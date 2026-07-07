@@ -83,11 +83,11 @@ use Hash::Util qw(lock_keys);
 sub new {
     my $class = shift;
     my $obj = bless {
-	ATTR => {},
-	TEXT => undef,
-	STRIPPED => undef,
-	NORMALIZED => undef,
-	UNSTRIP => undef,
+        ATTR => {},
+        TEXT => undef,
+        STRIPPED => undef,
+        NORMALIZED => undef,
+        UNSTRIP => undef,
     }, $class;
     lock_keys %{$obj};
     $obj->text = shift;
@@ -103,26 +103,26 @@ sub normalize {
     my $paragraph = $obj->attr->{paragraph};
     local $_ = $obj->text;
     my $normalized = do {
-	if (not $paragraph) {
-	    s{^.+}{
-		local $_ = ${^MATCH};
-		s/\A(\h*)(.*?)(\h*?)\z/$2/;
-		$_;
-	    }pmger;
-	} else {
-	    s{^.+(?:\n.+)*}{
-		local $_ = ${^MATCH};
-		# remove leading/trailing spaces
-		s/\A(\h*)(.*?)(\h*?)\z/$2/;
-		# remove newline after Japanese Punct char
-		s/(?<=\p{InFullwidth})(?<=\pP)\n//g;
-		# join Japanese lines without space
-		s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
-		# join ASCII lines with single space
-		s/\s+/ /g;
-		$_;
-	    }pmger;
-	}
+        if (not $paragraph) {
+            s{^.+}{
+                local $_ = ${^MATCH};
+                s/\A(\h*)(.*?)(\h*?)\z/$2/;
+                $_;
+            }pmger;
+        } else {
+            s{^.+(?:\n.+)*}{
+                local $_ = ${^MATCH};
+                # remove leading/trailing spaces
+                s/\A(\h*)(.*?)(\h*?)\z/$2/;
+                # remove newline after Japanese Punct char
+                s/(?<=\p{InFullwidth})(?<=\pP)\n//g;
+                # join Japanese lines without space
+                s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
+                # join ASCII lines with single space
+                s/\s+/ /g;
+                $_;
+            }pmger;
+        }
     };
     return $normalized;
 }
@@ -136,28 +136,28 @@ sub strip {
     my $obj = shift;
     my $text = $obj->text;
     if ($obj->attr->{paragraph}) {
-	return $obj->paragraph_strip;
+        return $obj->paragraph_strip;
     }
     my $line_re = qr/.*\n|.+\z/;
     my @text = $text =~ /$line_re/g;
     my @space = map {
-	[ s/\A(\s+)// ? $1 : '', s/(\h+)$// ? $1 : '' ]
+        [ s/\A(\s+)// ? $1 : '', s/(\h+)$// ? $1 : '' ]
     } @text;
     $obj->{STRIPPED} = join '', @text;
     $obj->{UNSTRIP} = sub {
-	for (@_) {
-	    my @text = /.*\n|.+\z/g;
-	    if (@space == @text + 1) {
-		push @text, '';
-	    }
-	    die "UNMATCH:\n".Dumper(\@text, \@space) if @text != @space;
-	    for my $i (keys @text) {
-		my($head, $tail) = @{$space[$i]};
-		$text[$i] =~ s/\A/$head/ if length $head > 0;
-		$text[$i] =~ s/\Z/$tail/ if length $tail > 0;
-	    }
-	    $_ = join '', @text;
-	}
+        for (@_) {
+            my @text = /.*\n|.+\z/g;
+            if (@space == @text + 1) {
+                push @text, '';
+            }
+            die "UNMATCH:\n".Dumper(\@text, \@space) if @text != @space;
+            for my $i (keys @text) {
+                my($head, $tail) = @{$space[$i]};
+                $text[$i] =~ s/\A/$head/ if length $head > 0;
+                $text[$i] =~ s/\Z/$tail/ if length $tail > 0;
+            }
+            $_ = join '', @text;
+        }
     };
     $obj;
 }
@@ -168,10 +168,10 @@ sub paragraph_strip {
     my $head = s/\A(\s+)// ? $1 : '' ;
     my $tail = s/(\h+)$//  ? $1 : '' ;
     $obj->{UNSTRIP} = sub {
-	for (@_) {
-	    s/\A/$head/ if length $head;
-	    s/\Z/$tail/ if length $tail;
-	}
+        for (@_) {
+            s/\A/$head/ if length $head;
+            s/\Z/$tail/ if length $tail;
+        }
     };
     $obj;
 }
@@ -180,7 +180,7 @@ sub unstrip {
     my $obj = shift;
     $obj->strip if not $obj->{UNSTRIP};
     if (my $unstrip = $obj->{UNSTRIP}) {
-	$unstrip->(@_);
+        $unstrip->(@_);
     }
     $obj;
 }

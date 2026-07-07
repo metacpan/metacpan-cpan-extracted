@@ -1,7 +1,7 @@
-package Concierge v0.8.4;
+package Concierge v0.9.0;
 use v5.36;
 
-our $VERSION = 'v0.8.4';
+our $VERSION = 'v0.9.0';
 
 # ABSTRACT: Service layer orchestrator for authentication, sessions, and user data
 
@@ -137,7 +137,27 @@ sub open_desk ($class, $desk_location) {
 	
 	# Instantiate users and auth from $concierge_config
 	$concierge->{users}	= Concierge::Users->new( $concierge_config->{users_config_file} );
-	$concierge->{auth}	= Concierge::Auth->new( { file => $concierge_config->{auth_file} } );
+
+	unless ($concierge_config->{auth_backend}) {
+		return { success => 0, message =>
+			"This desk must be built again to work with v0.5+ of Concierge::Auth, "
+			. "now shipping with Concierge v0.9+. Building the desk with the same "
+			. "original configuration will archive existing user data, but delete "
+			. "session and any credential storage, and will automatically install "
+			. "the default built-in ID-password authentication system. See the "
+			. "POD for how to use an alternative approach to user authentication."
+		};
+	}
+
+	my $auth;
+	eval {
+		$auth = Concierge::Auth->new(
+			backend	=> $concierge_config->{auth_backend},
+			%{ $concierge_config->{auth_args} || {} },
+		);
+	};
+	return { success => 0, message => "Failed to initialize auth backend: $@" } if $@;
+	$concierge->{auth} = $auth;
 
 	return { success => 1, message => 'Welcome!', concierge => $concierge };
 }
@@ -205,7 +225,8 @@ sub add_user ($self, $user_input) {
     }
 
     # Step 2: Set password in Auth component
-    my ($pwd_ok, $pwd_msg) = $self->auth->setPwd($user_id, $auth_data->{password});
+    my $enroll = $self->auth->enroll($user_id, $auth_data->{password});
+    my ($pwd_ok, $pwd_msg) = ($enroll->{success}, $enroll->{message});
     unless ($pwd_ok) {
         # Rollback: delete the user record since password failed
         $self->users->delete_user($user_id);
@@ -240,7 +261,8 @@ sub remove_user ($self, $user_id) {
     }
 
     # Step 2: Delete from Auth component
-    my ($auth_ok, $auth_msg) = $self->auth->deleteID($user_id);
+    my $revoked = $self->auth->revoke($user_id);
+    my ($auth_ok, $auth_msg) = ($revoked->{success}, $revoked->{message});
     if ($auth_ok) {
         push @deleted_from, 'Auth';
     } else {
@@ -304,7 +326,7 @@ sub verify_user ($self, $user_id) {
         unless defined $user_id && length($user_id);
 
     # Check Auth component (password file)
-    my $auth_exists = $self->auth->checkID($user_id);
+    my $auth_exists = $self->auth->is_id_known($user_id)->{known};
 
     # Check Users component (user data store)
     my $user_result = $self->users->get_user($user_id);
@@ -452,7 +474,7 @@ sub _make_user_closures ($self, $user_id) {
 
 # Admit visitor: assign user_key only (no session, no user data)
 sub admit_visitor ($self) {
-	my $visitor_id = Concierge::Auth->gen_random_string(13)
+	my $visitor_id = $self->auth->gen_random_string(13)
 		or return { success => 0, message => "Couldn't generate visitor ID" };
 
 	# Create user object for visitor (no session, no user_data, no backend access)
@@ -469,7 +491,7 @@ sub admit_visitor ($self) {
 
 # Checkin guest: assign a session with no user data backend or authentication
 sub checkin_guest ($self, $session_opts={}) {
-	my $guest_id = Concierge::Auth->gen_random_string(13)
+	my $guest_id = $self->auth->gen_random_string(13)
 		or return { success => 0, message => "Couldn't generate guest ID" };
 
 	# Shorter timeout for anonymous
@@ -642,7 +664,8 @@ sub login_user ($self, $credentials, $session_opts={}) {
         unless $user_result->{success};
 
     # Step 2: Authenticate with ID & password
-    my ($auth_ok, $auth_msg) = $self->auth->checkPwd($user_id, $password);
+    my $authed = $self->auth->authenticate($user_id, $password);
+    my ($auth_ok, $auth_msg) = ($authed->{success}, $authed->{message});
     return { success => 0, message => $auth_msg || 'Authentication failed' }
         unless $auth_ok;
 
@@ -695,7 +718,8 @@ sub verify_password ($self, $user_id, $password) {
         unless defined $password && length($password);
 
     # Check password via Auth component
-    my ($pwd_ok, $pwd_msg) = $self->auth->checkPwd($user_id, $password);
+    my $authed = $self->auth->authenticate($user_id, $password);
+    my ($pwd_ok, $pwd_msg) = ($authed->{success}, $authed->{message});
 
     return {
         success => $pwd_ok ? 1 : 0,
@@ -715,9 +739,10 @@ sub reset_password ($self, $user_id, $new_password) {
     return { success => 0, message => 'new_password is required' }
         unless defined $new_password && length($new_password);
 
-    # Reset existing password using Auth's resetPwd
+    # Reset existing password using Auth's change_credentials
     # Pass through Auth's messages (Auth provides detailed error messages)
-    my ($reset_ok, $reset_msg) = $self->auth->resetPwd($user_id, $new_password);
+    my $changed = $self->auth->change_credentials($user_id, $new_password);
+    my ($reset_ok, $reset_msg) = ($changed->{success}, $changed->{message});
 
     return {
         success => $reset_ok ? 1 : 0,
@@ -786,7 +811,7 @@ Concierge - Service layer orchestrator for authentication, sessions, and user da
 
 =head1 VERSION
 
-v0.8.4
+v0.9.0
 
 =head1 SYNOPSIS
 
@@ -850,8 +875,9 @@ B<Authentication> (L<Concierge::Auth>): Argon2id password hashing and
 verification; no plaintext credentials are ever written to disk. Also
 provides random token, UUID, word-passphrase, and hex-ID generators. The
 component is substitutable: any replacement implementing the same method
-contract (C<checkPwd>, C<setPwd>, C<resetPwd>, etc.) can replace it for
-LDAP, OAuth, or any other scheme.
+contract (C<authenticate>, C<enroll>, C<change_credentials>, etc. -- see
+L<Concierge::Auth::Base>) can replace it for LDAP, OAuth, or any other
+scheme.
 
 B<Sessions> (L<Concierge::Sessions>): Full session lifecycle -- creation,
 retrieval, expiry, and cleanup -- with SQLite, file, or in-memory backends.
@@ -1178,23 +1204,22 @@ long as the replacement implements the methods Concierge calls on it.
 
 B<Auth> -- Concierge calls:
 
-=over 4
+    $auth->authenticate($user_id, $credential)
+    $auth->is_id_known($user_id)
+    $auth->enroll($user_id, $credential, \%opts?)
+    $auth->change_credentials($user_id, $new_credential)
+    $auth->revoke($user_id)
 
-=item C<< Concierge::Auth->new(\%args) >> -- constructor; accepts C<file> key
-
-=item C<< $auth->checkID($user_id) >> -- returns true/false
-
-=item C<< $auth->checkPwd($user_id, $password) >> -- returns C<($ok, $message)>
-
-=item C<< $auth->setPwd($user_id, $password) >> -- returns C<($ok, $message)>
-
-=item C<< $auth->resetPwd($user_id, $new_password) >> -- returns C<($ok, $message)>
-
-=item C<< $auth->deleteID($user_id) >> -- returns C<($ok, $message)>
-
-=item C<< Concierge::Auth->gen_random_string($length) >> -- class method, returns string
-
-=back
+A substitute backend must implement this contract -- see
+L<Concierge::Auth::Base> -- and must also provide the
+L<Concierge::Auth::Generators> methods (used for visitor/guest
+identifiers, independent of authentication). Register it in
+C<Concierge::Desk::Setup>'s backend catalog so C<< auth => {
+backend => 'mybackend', ... } >> resolves to it at desk-build time,
+or bypass config entirely by constructing
+C<< Concierge::Auth->new(backend => 'My::Fully::Qualified::Class', ...) >>
+directly and assigning it to C<< $concierge->{auth} >> after
+C<open_desk>.
 
 B<Sessions> -- Concierge calls:
 

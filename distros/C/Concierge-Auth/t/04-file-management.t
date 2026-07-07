@@ -11,7 +11,7 @@ use Concierge::Auth;
 
 my $dir  = tempdir( CLEANUP => 1 );
 my $file = "$dir/auth.pwd";
-my $auth = Concierge::Auth->new({ file => $file });
+my $auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', file => $file );
 
 # ========== pfile ==========
 
@@ -23,7 +23,7 @@ subtest 'pfile - returns path when set' => sub {
 
 subtest 'pfile - rejects when unset' => sub {
     my $nofile_auth;
-    my $w = warnings { $nofile_auth = Concierge::Auth->new({ no_file => 1 }) };
+    my $w = warnings { $nofile_auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
     my ($path, $msg) = $nofile_auth->pfile();
     ok( !$path, 'pfile returns false when no file set' );
     like( $msg, qr/No auth file/i, 'message mentions no auth file' );
@@ -49,7 +49,7 @@ subtest 'setFile - set new file' => sub {
 subtest 'rmFile - remove file' => sub {
     # Create a temporary file to remove
     my $rmfile = "$dir/rm_test.pwd";
-    my $rm_auth = Concierge::Auth->new({ file => $rmfile });
+    my $rm_auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', file => $rmfile );
 
     ok( -e $rmfile, 'file exists before rmFile' );
 
@@ -63,12 +63,12 @@ subtest 'rmFile - remove file' => sub {
 subtest 'clearFile - clear and recreate' => sub {
     # Create a file with a user in it
     my $clrfile = "$dir/clear_test.pwd";
-    my $clr_auth = Concierge::Auth->new({ file => $clrfile });
-    $clr_auth->setPwd('testuser', 'password123');
+    my $clr_auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', file => $clrfile );
+    $clr_auth->enroll('testuser', 'password123');
 
     # Confirm user exists
-    my ($found) = $clr_auth->checkID('testuser');
-    ok( $found, 'user exists before clearFile' );
+    my $found = $clr_auth->is_id_known('testuser');
+    ok( $found->{known}, 'user exists before clearFile' );
 
     # Clear the file
     my ($ok, $msg) = $clr_auth->clearFile();
@@ -79,8 +79,8 @@ subtest 'clearFile - clear and recreate' => sub {
     ok( -e $clrfile, 'file still exists after clearFile' );
 
     # User should be gone
-    my ($gone) = $clr_auth->checkID('testuser');
-    ok( !$gone, 'user is gone after clearFile' );
+    my $gone = $clr_auth->is_id_known('testuser');
+    ok( !$gone->{known}, 'user is gone after clearFile' );
 };
 
 # ========== setFile - edge cases ==========
@@ -122,7 +122,7 @@ subtest 'setFile - existing file' => sub {
 
 subtest 'rmFile - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
+    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
     my ($result, $msg) = $nf->rmFile();
     ok( !$result, 'rmFile returns false when no file is set' );
     like( $msg, qr/No valid file/i, 'message mentions no valid file' );
@@ -132,7 +132,7 @@ subtest 'rmFile - no file configured' => sub {
 
 subtest 'clearFile - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
+    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
     my ($ok, $msg) = $nf->clearFile();
     ok( !$ok, 'clearFile returns false when no file is set' );
     like( $msg, qr/No valid file/i, 'message reflects rmFile failure' );

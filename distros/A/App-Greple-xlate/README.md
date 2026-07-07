@@ -5,27 +5,35 @@ App::Greple::xlate - translation support module for greple
 
 # SYNOPSIS
 
-    greple -Mxlate::deepl --xlate pattern target-file
-
-    greple -Mxlate::gpt5 --xlate pattern target-file
-
     greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
 # VERSION
 
-Version 1.0202
+Version 2.00
 
 # DESCRIPTION
 
 **Greple** **xlate** module find desired text blocks and replace them by
-the translated text.  Currently DeepL (`deepl.pm`) and GPT-5.5
-(`gpt5.pm`) module are implemented as a back-end engine.
+the translated text.  The primary engine is GPT-5.5 (`llm/gpt5.pm`),
+which calls the [llm](https://llm.datasette.io/) command; DeepL
+(`deepl.pm`) and legacy **gpty**-based engines are also included.
+
+Translations are cached per file, so re-running a command costs
+nothing for unchanged text.  When a document is edited, only the
+changed paragraphs are sent to the API again; a context-aware engine
+also receives the surrounding translations, the raw source text
+around the change, and the previous version of the edited paragraph,
+so the new translation keeps the established wording (see
+**--xlate-context-window**).  Sensitive strings can be concealed
+before transmission (see ["ANONYMIZATION AND TEMPLATES"](#anonymization-and-templates)).
 
 If you want to translate normal text blocks in a document written in
-the Perl's pod style, use **greple** command with `xlate::deepl` and
-`perl` module like this:
+the Perl's pod style, use **greple** command with `--xlate-engine gpt5`
+and `perl` module like this:
 
-    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
+    greple -Mxlate --xlate-engine gpt5 -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
 
 In this command, pattern string `^([\w\pP].*\n)+` means consecutive
 lines starting with alpha-numeric and punctuation letter.  This
@@ -39,8 +47,8 @@ is used to produce entire text.
 </div>
 
 Then add `--xlate` option to translate the selected area.  Then, it
-will find the desired sections and replace them by the **deepl**
-command output.
+will find the desired sections and replace them by the translation
+engine's output.
 
 By default, original and translated text is printed in the "conflict
 marker" format compatible with [git(1)](http://man.he.net/man1/git).  Using `ifdef` format, you
@@ -119,12 +127,64 @@ expression, translate strings matching it, and revert after
 processing.  Lines beginning with `#` are ignored.
 
 Complex pattern can be written on multiple lines with backslash
-escpaed newline.
+escaped newline.
 
 How the text is transformed by masking can be seen by **--xlate-mask**
 option.
 
+Masking protects markup from being translated.  To conceal sensitive
+strings from the translation service itself, see ["ANONYMIZATION AND
+TEMPLATES"](#anonymization-and-templates); both can be used together.
+
 This interface is experimental and subject to change in the future.
+
+# ANONYMIZATION AND TEMPLATES
+
+Sensitive strings can be concealed before they are sent to the
+translation API and restored in the output.  Three sources of
+anonymization rules are available: a dictionary file
+(**--xlate-anonymize**), inline marks in the document itself
+(**--xlate-anonymize-mark**), and YAML front matter values
+(**--xlate-frontmatter**).  Each string is replaced by a category tag
+such as `<person id=1 />` during transmission.  The concealment
+target is API transmission only: local cache files store restored
+plain text.  Use **--xlate-dryrun** to inspect exactly what would be
+transmitted.
+
+For form documents (quarterly reports and the like), define the
+actors up front and reference them in the body:
+
+    ---
+    報告者: 山田太郎
+    発注会社: アクメ株式会社
+    ---
+    本件について {{ 報告者 }} が調査を行った。
+
+Translate the template once per language with `--xlate-template`
+(and `--xlate-frontmatter` when the values are kept in the file),
+then render each case with **pandoc-embedz** standalone mode --
+values under `global:` in an external config never reach the
+translation API at all:
+
+    greple -Mxlate --xlate --xlate-engine=gpt5 --xlate-to=EN-US \
+           --xlate-template= --xlate-format=xtxt \
+           --match-paragraph --all --need=0 \
+           report-template.md > report-template.EN.md
+    pandoc-embedz --standalone report-template.EN.md \
+                  -c case-123.yaml -o report-123.EN.md < /dev/null
+
+For inline marks, providing a macro definition config makes the same
+translated template render either the real names or a redacted
+version:
+
+    # macros.yaml           # macros-redacted.yaml
+    preamble: |             preamble: |
+      {% macro person(name) %}{{ name }}{% endmacro %}
+                              {% macro person(name) %}(関係者){% endmacro %}
+
+Exclude embedz blocks from translation when a document contains them:
+
+    --exclude '^```embedz\n(?s:.*?)^```\n'
 
 # OPTIONS
 
@@ -152,20 +212,20 @@ This interface is experimental and subject to change in the future.
 
 - **--xlate-engine**=_engine_
 
-    Specifies the translation engine to be used. If you specify the engine
-    module directly, such as `-Mxlate::deepl`, you do not need to use
-    this option.
+    Specifies the translation engine to be used.
 
     At this time, the following engines are available
 
-    - **deepl**: DeepL API
-    - **gpt3**: gpt-3.5-turbo
-    - **gpt4o**: gpt-4o-mini
+    - **gpt5**: gpt-5.5 (via the `llm` command)
+    - **deepl**: DeepL API (via the `deepl` command)
+    - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
+    - **gpt4o**: gpt-4o-mini (legacy, via the `gpty` command)
 
-        **gpt-4o**'s interface is unstable and cannot be guaranteed to work
-        correctly at the moment.
-
-    - **gpt5**: gpt-5.5
+    Engine modules are searched in backend namespaces first (`llm`, then
+    `gpty`), then directly under `App::Greple::xlate`.  So `gpt5` loads
+    `App::Greple::xlate::llm::gpt5` which calls the `llm` command, while
+    `gpt4o` falls back to `App::Greple::xlate::gpty::gpt4o`.  Use
+    `--xlate-setopt backend=gpty` to force a specific backend.
 
 - **--xlate-labor**
 - **--xlabor**
@@ -177,8 +237,16 @@ This interface is experimental and subject to change in the future.
 
 - **--xlate-to** (Default: `EN-US`)
 
-    Specify the target language.  You can get available languages by
-    `deepl languages` command when using **DeepL** engine.
+    Specify the target language.  LLM engines accept any language name
+    or code the model understands; it is interpolated into the
+    translation prompt.  You can get available languages by `deepl
+    languages` command when using **DeepL** engine.
+
+- **--xlate-from** (Default: `ORIGINAL`)
+
+    Label used for the original text in `conflict`, `colon` and
+    `ifdef` output formats.  With the **DeepL** engine a non-default
+    value is also passed as the source language.
 
 - **--xlate-format**=_format_ (Default: `conflict`)
 
@@ -259,10 +327,10 @@ This interface is experimental and subject to change in the future.
 - **--xlate-maxlen**=_chars_ (Default: 0)
 
     Specify the maximum length of text to be sent to the API at once.
-    Default value is set as for free DeepL account service: 128K for the
-    API (**--xlate**) and 5000 for the clipboard interface
-    (**--xlate-labor**).  You may be able to change these value if you are
-    using Pro service.
+    The default value 0 means the engine's own limit: for the free DeepL
+    account service that is 128K for the API (**--xlate**) and 5000 for
+    the clipboard interface (**--xlate-labor**).  You may be able to
+    change these value if you are using Pro service.
 
 - **--xlate-maxline**=_n_ (Default: 0)
 
@@ -273,11 +341,11 @@ This interface is experimental and subject to change in the future.
 
 - **--xlate-prompt**=_text_
 
-    Specify a custom prompt to be sent to the translation engine.  This option
-    is only available when using ChatGPT engines (gpt3, gpt4o, gpt5).  You can
-    customize the translation behavior by providing specific instructions to the
-    AI model.  If the prompt contains `%s`, it will be replaced with the target
-    language name.
+    Specify a custom prompt to be sent to the translation engine.  This
+    option is available for the LLM engines (`gpt3`, `gpt4o`, `gpt5`)
+    but not for DeepL.  You can customize the translation behavior by
+    providing specific instructions to the AI model.  If the prompt
+    contains `%s`, it will be replaced with the target language name.
 
 - **--xlate-context**=_text_
 
@@ -286,15 +354,133 @@ This interface is experimental and subject to change in the future.
     context strings.  The context information helps the translation engine
     understand the background and produce more accurate translations.
 
+- **--xlate-context-window**=_n_
+
+    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    Number of surrounding translated blocks passed as reference context
+    when re-translating changed blocks (default 2).  The context also
+    includes the raw source text around the changed region (headings,
+    list structure, captions) and, when available, the previous version
+    of the changed text recovered from the cache, so that unchanged
+    wording is preserved.  Set to 0 to disable context-aware translation
+    entirely.
+    Note that each changed region is translated in its own API call and
+    the context can add up to about 8000 characters to the system
+    prompt, so context-aware translation trades some extra cost for
+    consistency.
+
+- **--xlate-cache-seed**=_file_
+
+    Initialize a new document's cache from another document's cache
+    file.  Useful for periodic reports: seed the new issue's cache with
+    the previous issue's, so unchanged paragraphs are not re-translated
+    and edited paragraphs keep the previous issue's wording.  The seed
+    is used only when the target cache is empty; otherwise it is
+    ignored with a warning.  With the default `--xlate-cache=auto`, specifying a seed also
+    implies creating the new document's cache file.
+
+- **--xlate-anonymize**=_file_
+
+    Anonymize sensitive strings before they are sent to the translation
+    API, and restore them in the output.  The dictionary file gives one
+    entry per item: in JSON (canonical, machine-generatable)
+
+        [ { "category": "person",  "text": "山田太郎" },
+          { "category": "company", "regex": "アクメ(株式会社)?" } ]
+
+    or in a simple line format (`category pattern`, `/.../` for regex).
+    Each item is replaced by a category tag such as `<person id=1 />`;
+    the same string always gets the same tag, so the model can keep track
+    of who is who.  Unknown JSON fields are ignored, so generators (e.g. a
+    local LLM extracting entities) may add their own annotations.
+    Category `lit` is reserved.  Local cache files still store restored
+    plain text: the concealment target is API transmission only.
+
+    A dictionary can be generated by an external tool -- for example a
+    local model extracting sensitive entities:
+
+        llm -m <local-model> \
+            -s 'Extract sensitive entities as a JSON array of objects
+                with "category" and "text" fields.' \
+            < report.md > report.anon.json
+        greple -Mxlate --xlate-anonymize=report.anon.json ...
+
+    A UTF-8 BOM in the file is tolerated.  Values in the front matter
+    line format may carry a trailing comment only on their own line, not
+    after the value.
+
+- **--xlate-anonymize-mark**\[=_regex_\]
+
+    Collect anonymization entries from inline marks in the document
+    itself.  Mark the first occurrence like `{{ person("山田太郎") }}`
+    and every occurrence of the string document-wide is anonymized.  The
+    mark itself stays in the source and in the translation, so a document
+    can also be processed by a Jinja2-style macro processor (define the
+    `person` macro to print or redact the name).  A custom _regex_ must
+    contain `(?<category>...)` and `(?<text>...)` named captures.
+
+    Note that with an optional-value option like this, a following
+    file argument would be taken as the value: write
+    `--xlate-anonymize-mark=` (with a trailing `=`) when using the
+    default notation.
+
+    Alternative notations can be configured, for example
+    `--xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\n]+?)@@'`
+    for `@@person:NAME@@`-style marks, or an HTML-comment form that stays
+    invisible in rendered Markdown.  Mark rules are collected per
+    document: a string marked in one input file is not concealed in
+    another file of the same run (unlike front matter values, which
+    accumulate across files).
+
+- **--xlate-template**\[=_regex_\]
+
+    Treat template expressions (default: Jinja2 `{{ ... }}`,
+    `{% ... %}`, `{# ... #}`) as opaque placeholders: instruct the
+    model to copy them unchanged and verify, per block, that the response
+    contains exactly the same expressions, each the same number of times.
+    Their order may change, since translation legitimately reorders them
+    to follow the target language word order.  A broken expression
+    aborts the run; the cache is checkpointed and frozen, so nothing paid
+    for is lost.
+
+    Note that with an optional-value option like this, a following
+    file argument would be taken as the value: write
+    `--xlate-template=` (with a trailing `=`) when using the
+    default notation.
+
+- **--xlate-frontmatter**
+
+    Treat a leading `---` ... `---` block as YAML front matter: exclude
+    it from translation and from the phase-2 context slices, and add its
+    flat `key: value` values to the anonymization rules (category
+    `var`) as a safety net.  With multiple input files the collected
+    values accumulate (erring on the side of concealment).
+
+    Always leave a blank line after the closing `---`.  With a
+    paragraph-style match pattern, front matter that runs directly into
+    the body text forms one straddling block that the exclusion cannot
+    suppress (a warning is printed in that case); the values are still
+    anonymized, but the front matter itself would be sent for
+    translation.
+
 - **--xlate-glossary**=_glossary_
 
     Specify a glossary ID to be used for translation.  This option is only
     available when using the DeepL engine.  The glossary ID should be obtained
     from your DeepL account and ensures consistent translation of specific terms.
 
+- **--xlate-dryrun**
+
+    Do not call the translation API; instead show, through the progress
+    display, each payload exactly as it would be transmitted (after
+    anonymization and masking).  Useful for checking what leaves the
+    machine and for estimating the cost of a run.
+
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
-    See the tranlsation result in real time in the STDERR output.
+    See the translation result in real time in the STDERR output.  The
+    `From` payload is shown as transmitted, after anonymization and
+    masking.
 
 - **--xlate-stripe**
 
@@ -419,7 +605,13 @@ language invoking it with prefix argument.
 
 - OPENAI\_API\_KEY
 
-    OpenAI authentication key.
+    OpenAI authentication key, used by the legacy **gpty** engines.  The
+    `llm`-based **gpt5** engine reads this variable too, but keys stored
+    with `llm keys set openai` also work.
+
+- GREPLE\_XLATE\_CACHE
+
+    Set the default cache strategy (see ["CACHE OPTIONS"](#cache-options)).
 
 # INSTALL
 
@@ -429,7 +621,11 @@ language invoking it with prefix argument.
 
 ## TOOLS
 
-You have to install command line tools for DeepL and ChatGPT.
+Install the command line tool for the engine you use: `llm` for the
+**gpt5** engine, `deepl` for DeepL, `gpty` for the legacy GPT
+engines.
+
+[https://llm.datasette.io/](https://llm.datasette.io/)
 
 [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
@@ -439,8 +635,8 @@ You have to install command line tools for DeepL and ChatGPT.
 
 ## MODULES
 
-[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl),
-[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
+[App::Greple::xlate::llm](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm),
+[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - Generic Docker runner used by xlate for container operations
 
@@ -476,6 +672,10 @@ You have to install command line tools for DeepL and ChatGPT.
 
     The `getoptlong.sh` library used for option parsing in the `xlate`
     script and [App::dozo](https://metacpan.org/pod/App%3A%3Adozo).
+
+- [https://llm.datasette.io/](https://llm.datasette.io/)
+
+    The `llm` command used by the **gpt5** engine to access LLM models.
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

@@ -24,7 +24,7 @@ use autouse 'Carp' => qw(croak);
 
 use constant SLUZ_INLINE => 'INLINE_TEMPLATE';
 
-our $VERSION = 'v0.9.4';
+our $VERSION = 'v0.9.6';
 
 ################################################################################
 # Built-in Sluz functions that can be used in templates
@@ -80,6 +80,7 @@ sub new {
         _blocks_cache       => {}, # Cached _get_blocks results (avoids re-tokenizing if payloads in loops)
         _if_rules_cache     => {}, # Cached parsed {if} rules (avoids re-parsing same if block in loops)
         _verified_sub_cache => {}, # Cached subs that succeeded once — skip eval/SIG overhead
+        _mod_cache          => {}, # Cached resolved modifier coderefs keyed by func name
     };
 
     bless $self, $class;
@@ -114,16 +115,12 @@ sub assign {
 
 sub fetch {
     my $self     = shift;
-    my $tpl_file = shift || '';
+    my $tpl_file = shift // SLUZ_INLINE;
     my $parent   = shift;
 
     if (!$self->{perl_file}) {
         $self->{perl_file}     = $self->_get_perl_file;
         $self->{perl_file_dir} = dirname($self->{perl_file});
-    }
-
-    if (!$tpl_file) {
-        $tpl_file = $self->_guess_tpl_file($self->{perl_file});
     }
 
     my $parent_tpl;
@@ -132,6 +129,7 @@ sub fetch {
     } else {
         $parent_tpl = $self->{parent_tpl};
     }
+
     if ($parent_tpl) {
         $self->assign('__CHILD_TPL', $tpl_file);
         $tpl_file = $parent_tpl;
@@ -203,6 +201,7 @@ sub set_delimiters {
     $self->{_convert_cache}      = {};
     $self->{_sub_cache}          = {};
     $self->{_verified_sub_cache} = {};
+    $self->{_mod_cache}          = {};
 
     return;
 }
@@ -397,6 +396,15 @@ sub _precompute_tags {
     # Precompiled simple if regex (no else/elseif)
     $self->{_re_if_simple} = qr/\Q$o\Eif (.+?)\Q$c\E(.+)\Q$o\E\/if\Q$c\E/s;
 
+    # Precomputed ord values for fast single-character delimiter checks
+    $self->{_od_ord}      = ord($o);
+    $self->{_cd_ord}      = ord($c);
+    $self->{_dollar_ord}  = ord('$');
+
+    # Precompiled modifier-split regexes (avoids per-modifier-call recompile)
+    $self->{_pipe_re}  = qr/\|(?![^"]*"(?:(?:[^"]*"){2})*[^"]*$)(?![^']*'(?:(?:[^']*'){2})*[^']*$)/;
+    $self->{_comma_re} = qr/,(?=(?:[^"]*"[^"]*")*[^"]*$)(?=(?:[^']*'[^']*')*[^']*$)/;
+
     return;
 }
 
@@ -413,16 +421,6 @@ sub _get_perl_file {
     return $file || __FILE__;
 }
 
-sub _guess_tpl_file {
-    my $self  = shift;
-    my $pfile = shift;
-
-    my $base = basename($pfile);
-    $base    =~ s/\.(pl|pm)$/.stpl/;
-
-    return "tpls/$base";
-}
-
 sub _get_tpl_content {
     my $self     = shift;
     my $tpl_file = shift // '';
@@ -433,10 +431,23 @@ sub _get_tpl_content {
         $tf = $self->{perl_file_dir} . "/$tf";
     }
 
+    if (!length($tpl_file)) {
+        $self->_error_out("Template file name is empty", 86801);
+    }
+
     if ($tpl_file eq SLUZ_INLINE) {
-        my $c = $self->_get_inline_content($self->{perl_file});
-        if (defined $c) { return $c }
+        my ($c, $line_offset) = $self->_get_inline_content($self->{perl_file});
+        if (defined $c) {
+            $self->{tpl_file_display} = $self->{perl_file};
+            $self->{tpl_line_offset}  = $line_offset;
+            return $c;
+        }
+        delete $self->{tpl_file_display};
+        delete $self->{tpl_line_offset};
         return '';
+    } else {
+        delete $self->{tpl_file_display};
+        delete $self->{tpl_line_offset};
     }
 
     if ($tf && !-r $tf) {
@@ -445,7 +456,7 @@ sub _get_tpl_content {
 
     if ($tf) {
         local $/;
-        open my $fh, '<', $tf or $self->_error_out("Cannot open <code>$tf</code>: $!", 42280);
+        open my $fh, '<', $tf or $self->_error_out("Cannot open <code>$tf</code>: $!", 13983);
         my $str = <$fh>;
         close $fh;
         return $str // '';
@@ -463,7 +474,9 @@ sub _get_inline_content {
     close $fh;
     my $idx = index($str, '__DATA__');
     if ($idx < 0) { return undef }
-    return substr($str, $idx + 9);
+    my $before = substr($str, 0, $idx + 9);
+    my $line_offset = $before =~ tr/\n//;
+    return (substr($str, $idx + 9), $line_offset);
 }
 
 # -------------------------------------------------------------------
@@ -570,8 +583,16 @@ sub _get_blocks {
                 my ($line, $col, $file) = $self->_get_char_location($i, $self->{tpl_file});
                 $self->_error_out("Missing closing <code>$self->{_tag_comment_close}</code> for comment in <code>$file</code> on line #$line", 48724);
             }
-            $start += $end + length($self->{_tag_comment_close});
-            $i = $start;
+            my $after = $start + $end + length($self->{_tag_comment_close});
+
+            my $pre_nl  = ($i == 0 || substr($str, $i - 1, 1) eq "\n");
+            my $post_nl = ($after >= $slen || substr($str, $after, 1) eq "\n");
+            if ($pre_nl && $post_nl && $after < $slen) {
+                $after++;
+            }
+
+            $start = $after;
+            $i = $start - 1;
         }
     }
 
@@ -611,8 +632,8 @@ sub _process_blocks {
     my $blocks = shift;
     my $out    = shift;  # Optional: ref to append output to (avoids temp string + concat)
 
-    my $od = $self->{open_delim};
-    my $cd = $self->{close_delim};
+    my $od_ord = $self->{_od_ord};
+    my $od     = $self->{open_delim};
     my $var_tag = "${od}\$";
     my $var_re  = $self->{_re_var_simple};
 
@@ -620,8 +641,7 @@ sub _process_blocks {
         for my $x (@$blocks) {
             my $block = $x->[0];
             next unless length $block;
-            my $first = substr($block, 0, 1);
-            if ($first ne $od) {
+            if (ord($block) != $od_ord) {
                 $$out .= $block;
                 next;
             }
@@ -638,7 +658,15 @@ sub _process_blocks {
                 }
                 if (ref $val eq 'ARRAY')  { $$out .= 'ARRAY' }
                 elsif (ref $val eq 'HASH') { $$out .= 'HASH' }
-                elsif (defined $val)       { $$out .= $self->_esc($val) }
+                elsif (defined $val)       { $$out .= ($self->{auto_escape} ? escape($val) : $val) }
+                next;
+            }
+            # If block fast path — skip _process_block dispatch (mirrors
+            # the $html branch so the $out path is equally fast).
+            if (substr($block, 0, $self->{_tag_if_len}) eq $self->{_tag_if}
+                && substr($block, -$self->{_tag_if_close_len}) eq $self->{_tag_if_close}) {
+                $self->{char_pos} = $x->[1];
+                $$out .= $self->_if_block($block);
                 next;
             }
             $$out .= $self->_process_block($block, $x->[1]);
@@ -650,8 +678,7 @@ sub _process_blocks {
     for my $x (@$blocks) {
         my $block = $x->[0];
         next unless length $block;
-        my $first = substr($block, 0, 1);
-        if ($first ne $od) {
+        if (ord($block) != $od_ord) {
             $html .= $block;
             next;
         }
@@ -667,7 +694,7 @@ sub _process_blocks {
             }
             if (ref $val eq 'ARRAY')  { $html .= 'ARRAY' }
             elsif (ref $val eq 'HASH') { $html .= 'HASH' }
-            elsif (defined $val)       { $html .= $self->_esc($val) }
+            elsif (defined $val)       { $html .= ($self->{auto_escape} ? escape($val) : $val) }
             next;
         }
         # If block fast path — skip _process_block dispatch
@@ -690,8 +717,8 @@ sub _process_block {
 
     $self->{char_pos} = $char_pos;
 
-    my $od = $self->{open_delim};
-    my $cd = $self->{close_delim};
+    my $od     = $self->{open_delim};
+    my $cd_ord = $self->{_cd_ord};
 
     # 1. Variable block {$foo} or {$foo|modifier}
     if (substr($str, 0, 2) eq "${od}\$" && $str =~ $self->{_re_var_full}) {
@@ -725,8 +752,9 @@ sub _process_block {
     }
 
     # 7. Unclosed tag
-    if (substr($str, -1) ne $cd) {
-        my ($line, $col, $file) = $self->_get_char_location($self->{char_pos}, $self->{tpl_file});
+    if (ord(substr($str, -1)) != $cd_ord) {
+        my $tag_start = $self->{char_pos} - length($str);
+        my ($line, $col, $file) = $self->_get_char_location($tag_start, $self->{tpl_file});
         $self->_error_out("Unclosed tag <code>$str</code> in <code>$file</code> on line #$line", 45821);
     }
 
@@ -754,7 +782,7 @@ sub _variable_block {
         }
         if (ref $ret eq 'ARRAY') { return 'ARRAY' }
         if (ref $ret eq 'HASH')  { return 'HASH' }
-        if (defined $ret) { return $self->_esc($ret) }
+        if (defined $ret) { return ($self->{auto_escape} ? escape($ret) : $ret) }
         return '';
     }
 
@@ -773,19 +801,20 @@ sub _variable_block {
             if (defined $ret) { return $ret }
             return '';
         } elsif (!$is_nothing && $is_default) {
-            return $self->array_dive($key, $self->{tpl_vars}) // '';
+            return $tmp // '';
         } else {
             if ($is_nothing) {
                 return '';
             }
-            my $pre = $self->array_dive($key, $self->{tpl_vars}) // '';
+            my $pre = $tmp;
 
             my $seen_escape   = 0;
 			my $seen_noescape = 0;
 
             # Split on | not inside double or single quotes (supports chained
-            # modifiers like {$x|uc|substr:0,3})
-            my $pipe_re = qr/\|(?![^"]*"(?:(?:[^"]*"){2})*[^"]*$)(?![^']*'(?:(?:[^']*'){2})*[^']*$)/;
+            # modifiers like {$x|uc|substr:0,3}). Regex precompiled in
+            # _precompute_tags to avoid per-call recompile cost.
+            my $pipe_re = $self->{_pipe_re};
             for my $m_part (split $pipe_re, $mod) {
                 my @x    = split /:/, $m_part, 2;
                 my $func = $x[0] // '';
@@ -797,41 +826,39 @@ sub _variable_block {
                 if (length $param_str) {
                     # Split on commas not inside double or single quotes
                     # (parameter separator in modifier calls like substr:2,2)
-                    my $comma_re = qr/,(?=(?:[^"]*"[^"]*")*[^"]*$)(?=(?:[^']*'[^']*')*[^']*$)/;
                     my @new = map {
                         my ($v) = $self->_peval($_);
                         $v;
-                    } split $comma_re, $param_str;
+                    } split $self->{_comma_re}, $param_str;
                     push @params, @new;
                 }
 
-                {
+                # Resolve the modifier coderef once per func name and cache it.
+                # Priority: main::, current package (Template::Sluz built-ins),
+                # then CORE:: built-in operators.
+                my $cref = $self->{_mod_cache}{$func};
+                if (!defined $cref) {
                     no strict 'refs';
-
-					# Priority: main::, Template::Sluz built-ins, then CORE::
-                    my $callable = defined &{"main::$func"} || defined &{$func} || defined &{"CORE::$func"};
-
-                    if (!$callable) {
-                        my ($line, $col, $file) = $self->_get_char_location($self->{char_pos}, $self->{tpl_file});
-                        $self->_error_out("Unknown function call <code>$func</code> in <code>$file</code> on line #$line", 47204);
-                    }
-
-                    if (defined &{"main::$func"}) {
-                        $pre = eval { &{"main::$func"}(@params) };
-                    } elsif (defined &{$func}) {
-                        $pre = eval { &{$func}(@params) };
-                    } else {
-                        $pre = eval { &{"CORE::$func"}(@params) };
-                    }
+                    if    (defined &{"main::$func"}) { $cref = \&{"main::$func"} }
+                    elsif (defined &{$func})         { $cref = \&{$func} }
+                    elsif (defined &{"CORE::$func"}) { $cref = \&{"CORE::$func"} }
+                    else                            { $cref = 0 }
+                    $self->{_mod_cache}{$func} = $cref;
                 }
 
+                if (!$cref) {
+                    my ($line, $col, $file) = $self->_get_char_location($self->{char_pos}, $self->{tpl_file});
+                    $self->_error_out("Unknown function call <code>$func</code> in <code>$file</code> on line #$line", 47204);
+                }
+
+                $pre = eval { $cref->(@params) };
                 if ($@) {
                     $self->_error_out("Exception: $@", 79134);
                 }
             }
 
             if ($self->{auto_escape} && !$seen_noescape && !$seen_escape) {
-                return $self->_esc($pre);
+                return escape($pre);
             }
             return $pre;
         }
@@ -840,7 +867,7 @@ sub _variable_block {
     my $ret = $self->array_dive($str, $self->{tpl_vars});
     if (ref $ret eq 'ARRAY') { return 'ARRAY' }
     if (ref $ret eq 'HASH')  { return 'HASH' }
-    if (defined $ret) { return $self->_esc($ret) }
+    if (defined $ret) { return ($self->{auto_escape} ? escape($ret) : $ret) }
     return '';
 }
 
@@ -881,10 +908,12 @@ sub _if_block {
         my $payload = $rule->[1];
         my ($res) = $self->_peval($test);
         if ($res) {
-            # Inline _get_blocks for cached payloads
+            # Inline _get_blocks for cached payloads. Pass \$ret to
+            # _process_blocks so it appends directly — avoids a temp
+            # string allocation + concat per if-payload render.
             my $cached = $self->{_blocks_cache}{$payload};
             my @in_blocks = $cached ? @$cached : $self->_get_blocks($payload);
-            $ret .= $self->_process_blocks(\@in_blocks);
+            $self->_process_blocks(\@in_blocks, \$ret);
             last;
         }
     }
@@ -905,14 +934,14 @@ sub _foreach_block {
 
     # Pre-classify blocks for fast dispatch in the loop (cached in block arrays)
     # type: -1=empty, 0=text, 1=simple_var, 2=if_block, 99=other
-    my $od = $self->{open_delim};
-    my $cd = $self->{close_delim};
+    my $od     = $self->{open_delim};
+    my $od_ord = $self->{_od_ord};
     for my $b (@blocks) {
         next if defined $b->[2];
         my $bs = $b->[0];
         if (!length $bs) {
             $b->[2] = -1;
-        } elsif (substr($bs, 0, 1) ne $od) {
+        } elsif (ord($bs) != $od_ord) {
             $b->[2] = 0;
         } elsif (substr($bs, 0, 2) eq "${od}\$" && index($bs, '|') < 0
                  && $bs =~ $self->{_re_var_simple}) {
@@ -1009,7 +1038,7 @@ sub _foreach_block {
                     }
                     if (ref $val eq 'ARRAY')  { $ret .= 'ARRAY' }
                     elsif (ref $val eq 'HASH') { $ret .= 'HASH' }
-                    elsif (defined $val)       { $ret .= $self->_esc($val) }
+                    elsif (defined $val)       { $ret .= ($self->{auto_escape} ? escape($val) : $val) }
                 } elsif ($type == 2) {
                     $self->{char_pos} = $b->[1];
                     $ret .= $self->_if_block($b->[0]);
@@ -1062,7 +1091,7 @@ sub _foreach_block {
                     }
                     if (ref $val eq 'ARRAY')  { $ret .= 'ARRAY' }
                     elsif (ref $val eq 'HASH') { $ret .= 'HASH' }
-                    elsif (defined $val)       { $ret .= $self->_esc($val) }
+                    elsif (defined $val)       { $ret .= ($self->{auto_escape} ? escape($val) : $val) }
                 } elsif ($type == 2) {
                     $self->{char_pos} = $b->[1];
                     $ret .= $self->_if_block($b->[0]);
@@ -1124,7 +1153,7 @@ sub _include_block {
     }
 
     local $/;
-    open my $fh, '<', $inc_tpl or $self->_error_out("Cannot open <code>$inc_tpl</code>: $!", 18485);
+    open my $fh, '<', $inc_tpl or $self->_error_out("Cannot open <code>$inc_tpl</code>: $!", 63579);
     my $content = <$fh>;
     close $fh;
 
@@ -1217,33 +1246,25 @@ sub _micro_optimize {
     if ($str =~ /^-?\d+(?:\.\d+)?$/) { return $str }
 
     if (!length $str) { return undef }
-    my $first = substr($str, 0, 1);
-    my $last  = substr($str, -1);
+    my $first = ord($str);
+    my $last  = ord(substr($str, -1));
 
-    if ($first eq "'" && $last eq "'") {
+    if ($first == 39 && $last == 39) {
         my $tmp = substr($str, 1, length($str) - 2);
         if (index($tmp, "'") < 0) { return $tmp }
     }
 
-    if ($first eq '"' && $last eq '"') {
+    if ($first == 34 && $last == 34) {
         my $tmp = substr($str, 1, length($str) - 2);
         if (index($tmp, '$') < 0 && index($tmp, '"') < 0) { return $tmp }
     }
 
-    if ($str =~ /^\$__S->\{sluz_pfx_(\w+)\}$/) {
-        if (exists $self->{tpl_vars}{$1}) { return $self->{tpl_vars}{$1} }
+    if ($str =~ /^(!?)\$__S->\{sluz_pfx_(\w+)\}$/ && exists $self->{tpl_vars}{$2}) {
+        return $1 ? !$self->{tpl_vars}{$2} : $self->{tpl_vars}{$2};
     }
 
-    if ($str =~ /^!\$__S->\{sluz_pfx_(\w+)\}$/) {
-        if (exists $self->{tpl_vars}{$1}) { return !$self->{tpl_vars}{$1} }
-    }
-
-    if ($str =~ /^(\w+)$/ && exists $self->{tpl_vars}{$1}) {
-        return $self->{tpl_vars}{$1};
-    }
-
-    if ($str =~ /^!(\w+)$/ && exists $self->{tpl_vars}{$1}) {
-        return !$self->{tpl_vars}{$1};
+    if ($str =~ /^(!?)(\w+)$/ && exists $self->{tpl_vars}{$2}) {
+        return $1 ? !$self->{tpl_vars}{$2} : $self->{tpl_vars}{$2};
     }
 
     return undef;
@@ -1331,8 +1352,16 @@ sub _get_char_location {
 
     if ($self->{inc_tpl_file}) { $tpl_file = $self->{inc_tpl_file} }
 
+    # Use display file name and line offset when available (e.g. inline DATA templates)
+    my $display_file = exists $self->{tpl_file_display} ? $self->{tpl_file_display} : $tpl_file;
+    my $line_offset  = exists $self->{tpl_line_offset}  ? $self->{tpl_line_offset}  : 0;
+
+    # Guard: no file context (e.g. parse_string) — skip _get_tpl_content
+    # to avoid trying to open the perl_file_dir directory as a template file
+    if (!length $tpl_file) { return (-1, -1, $display_file) }
+
     my $str = $self->_get_tpl_content($tpl_file);
-    if ($pos < 0 || !defined $str) { return (-1, -1, $tpl_file) }
+    if ($pos < 0 || !defined $str) { return (-1, -1, $display_file) }
 
     my $line = 1;
     my $col  = 0;
@@ -1342,11 +1371,11 @@ sub _get_char_location {
             $line++;
             $col = 0;
         }
-        if ($pos == $i) { return ($line, $col, $tpl_file) }
+        if ($pos == $i) { return ($line + $line_offset, $col, $display_file) }
     }
 
-    if ($pos == length $str) { return ($line, $col, $tpl_file) }
-    return (-1, -1, $tpl_file);
+    if ($pos == length $str) { return ($line + $line_offset, $col, $display_file) }
+    return (-1, -1, $display_file);
 }
 
 sub _extract_include_file {
@@ -1424,6 +1453,9 @@ sub _if_rules_from_tokens {
 
     my @ret;
     push @ret, [$conds[$_], $payloads[$_]] for 0 .. $#conds;
+    for my $rule (@ret) {
+        $rule->[1] = $self->ltrim_one($rule->[1], "\n");
+    }
     return @ret;
 }
 
@@ -1470,13 +1502,6 @@ Output:
 Create a new Template::Sluz instance.
 
     my $sluz = Template::Sluz->new();
-
-Options (all are optional):
-
-    my $sluz = Template::Sluz->new(
-        auto_escape => 1,   # auto HTML-escape all variable output
-        debug       => 1,   # enable debug mode (currently unused)
-    );
 
 =item B<assign>
 
@@ -1581,9 +1606,9 @@ All template syntax works the same way with alternate delimiters:
         Not adult
     </if>
 
-    {foreach $items as $item}
+    <foreach $items as $item>
         <$item>
-    {/foreach}
+    </foreach>
 
 This is useful when your template content contains curly braces that would
 conflict with the default delimiters.

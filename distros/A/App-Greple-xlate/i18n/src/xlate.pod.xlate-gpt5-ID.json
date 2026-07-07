@@ -1,0 +1,470 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - modul dukungan terjemahan untuk greple\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.5 (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
+      "B<Greple> B<xlate> modul menemukan blok teks yang diinginkan dan menggantinya dengan teks terjemahan. Mesin utama adalah GPT-5.5 (F<llm/gpt5.pm>), yang memanggil perintah L<llm|https://llm.datasette.io/>; DeepL (F<deepl.pm>) dan mesin lama berbasis B<gpty> juga disertakan.\n"
+   ],
+   [
+      "Translations are cached per file, so re-running a command costs nothing for unchanged text. When a document is edited, only the changed paragraphs are sent to the API again; a context-aware engine also receives the surrounding translations, the raw source text around the change, and the previous version of the edited paragraph, so the new translation keeps the established wording (see B<--xlate-context-window>). Sensitive strings can be concealed before transmission (see L</ANONYMIZATION AND TEMPLATES>).\n",
+      "Terjemahan di-cache per file, sehingga menjalankan ulang perintah tidak memerlukan biaya untuk teks yang tidak berubah. Ketika dokumen diedit, hanya paragraf yang berubah yang dikirim lagi ke API; mesin yang sadar konteks juga menerima terjemahan di sekitarnya, teks sumber mentah di sekitar perubahan, dan versi sebelumnya dari paragraf yang diedit, sehingga terjemahan baru mempertahankan pilihan kata yang sudah ditetapkan (lihat B<--xlate-context-window>). String sensitif dapat disembunyikan sebelum transmisi (lihat L</ANONYMIZATION AND TEMPLATES>).\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<--xlate-engine gpt5> and C<perl> module like this:\n",
+      "Jika Anda ingin menerjemahkan blok teks normal dalam dokumen yang ditulis dalam gaya pod Perl, gunakan perintah B<greple> dengan C<--xlate-engine gpt5> dan modul C<perl> seperti ini:\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "Dalam perintah ini, string pola C<^([\\w\\pP].*\\n)+> berarti baris-baris berurutan yang dimulai dengan huruf angka dan tanda baca. Perintah ini menampilkan area yang akan diterjemahkan dengan sorotan. Opsi B<--all> digunakan untuk menghasilkan seluruh teks.\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the translation engine's output.\n",
+      "Lalu tambahkan opsi C<--xlate> untuk menerjemahkan area yang dipilih. Kemudian, ini akan menemukan bagian yang diinginkan dan menggantinya dengan keluaran mesin terjemahan.\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "Secara bawaan, teks asli dan terjemahan dicetak dalam format \"penanda konflik\" yang kompatibel dengan L<git(1)>. Dengan menggunakan format C<ifdef>, Anda dapat mengambil bagian yang diinginkan dengan perintah L<unifdef(1)> dengan mudah. Format keluaran dapat ditentukan dengan opsi B<--xlate-format>.\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi B<--match-all>. Ini adalah jalan pintas untuk menentukan pola C<(?s).+> yang mencocokkan seluruh teks.\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "Data format penanda konflik dapat dilihat dalam gaya berdampingan dengan perintah L<sdif|App::sdif> bersama opsi C<-V>. Karena tidak masuk akal untuk membandingkan per string, opsi C<--no-cdif> direkomendasikan. Jika Anda tidak perlu mewarnai teks, tentukan C<--no-textcolor> (atau C<--no-tc>).\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "Pemrosesan dilakukan dalam unit yang ditentukan, tetapi dalam kasus rangkaian beberapa baris teks yang tidak kosong, teks tersebut digabungkan menjadi satu baris. Operasi ini dilakukan sebagai berikut:\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "Hapus spasi putih di awal dan akhir setiap baris.\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "Jika sebuah baris diakhiri dengan karakter tanda baca lebar penuh, gabungkan dengan baris berikutnya.\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "Jika sebuah baris diakhiri dengan karakter lebar penuh dan baris berikutnya dimulai dengan karakter lebar penuh, gabungkan baris-baris tersebut.\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "Jika salah satu dari akhir atau awal baris bukan karakter lebar penuh, gabungkan dengan menyisipkan satu karakter spasi.\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "Data cache dikelola berdasarkan teks yang dinormalisasi, sehingga meskipun dilakukan modifikasi yang tidak mempengaruhi hasil normalisasi, data terjemahan yang di-cache tetap efektif.\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "Proses normalisasi ini dilakukan hanya untuk pola pertama (ke-0) dan bernomor genap. Dengan demikian, jika dua pola ditentukan seperti berikut, teks yang cocok dengan pola pertama akan diproses setelah normalisasi, dan tidak ada proses normalisasi yang dilakukan pada teks yang cocok dengan pola kedua.\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "Oleh karena itu, gunakan pola pertama untuk teks yang akan diproses dengan menggabungkan beberapa baris menjadi satu baris, dan gunakan pola kedua untuk teks pra-format. Jika tidak ada teks yang cocok pada pola pertama, gunakan pola yang tidak mencocokkan apa pun, seperti C<(?!)>.\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "Terkadang, ada bagian teks yang tidak ingin Anda terjemahkan. Misalnya, tag dalam berkas markdown. DeepL menyarankan bahwa dalam kasus seperti itu, bagian teks yang dikecualikan diubah menjadi tag XML, diterjemahkan, lalu dipulihkan setelah terjemahan selesai. Untuk mendukung ini, dimungkinkan untuk menentukan bagian yang akan dimask dari terjemahan.\n"
+   ],
+   [
+      "This will interpret each line of the file C<MASKPATTERN> as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "Ini akan menafsirkan setiap baris dari berkas C<MASKPATTERN> sebagai ekspresi reguler, menerjemahkan string yang cocok dengannya, dan mengembalikannya setelah pemrosesan. Baris yang dimulai dengan C<#> akan diabaikan.\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escaped newline.\n",
+      "Pola kompleks dapat ditulis dalam beberapa baris dengan baris baru yang di-escape dengan backslash.\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "Bagaimana teks diubah oleh masking dapat dilihat dengan opsi B<--xlate-mask>.\n"
+   ],
+   [
+      "Masking protects markup from being translated. To conceal sensitive strings from the translation service itself, see L</ANONYMIZATION AND TEMPLATES>; both can be used together.\n",
+      "Masking melindungi markup agar tidak diterjemahkan. Untuk menyembunyikan string sensitif dari layanan terjemahan itu sendiri, lihat L</ANONYMIZATION AND TEMPLATES>; keduanya dapat digunakan bersama.\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "Antarmuka ini bersifat eksperimental dan dapat berubah di masa mendatang.\n"
+   ],
+   [
+      "Sensitive strings can be concealed before they are sent to the translation API and restored in the output. Three sources of anonymization rules are available: a dictionary file (B<--xlate-anonymize>), inline marks in the document itself (B<--xlate-anonymize-mark>), and YAML front matter values (B<--xlate-frontmatter>). Each string is replaced by a category tag such as C<< <person id=1 /> >> during transmission. The concealment target is API transmission only: local cache files store restored plain text. Use B<--xlate-dryrun> to inspect exactly what would be transmitted.\n",
+      "String sensitif dapat disembunyikan sebelum dikirim ke API terjemahan dan dipulihkan dalam output. Tersedia tiga sumber aturan anonimisasi: berkas kamus (B<--xlate-anonymize>), tanda inline dalam dokumen itu sendiri (B<--xlate-anonymize-mark>), dan nilai front matter YAML (B<--xlate-frontmatter>). Setiap string diganti dengan tag kategori seperti C<< <person id=1 /> >> selama transmisi. Target penyembunyian hanya transmisi API: berkas cache lokal menyimpan teks biasa yang telah dipulihkan. Gunakan B<--xlate-dryrun> untuk memeriksa secara persis apa yang akan ditransmisikan.\n"
+   ],
+   [
+      "For form documents (quarterly reports and the like), define the actors up front and reference them in the body:\n",
+      "Untuk dokumen formulir (laporan triwulanan dan sejenisnya), definisikan aktor di awal dan rujuk mereka di isi:\n"
+   ],
+   [
+      "Translate the template once per language with C<--xlate-template> (and C<--xlate-frontmatter> when the values are kept in the file), then render each case with B<pandoc-embedz> standalone mode -- values under C<global:> in an external config never reach the translation API at all:\n",
+      "Terjemahkan templat sekali per bahasa dengan C<--xlate-template> (dan C<--xlate-frontmatter> ketika nilainya disimpan di berkas), lalu render setiap kasus dengan mode mandiri B<pandoc-embedz> -- nilai di bawah C<global:> dalam konfigurasi eksternal sama sekali tidak pernah mencapai API terjemahan:\n"
+   ],
+   [
+      "For inline marks, providing a macro definition config makes the same translated template render either the real names or a redacted version:\n",
+      "Untuk tanda inline, menyediakan konfigurasi definisi makro membuat templat terjemahan yang sama merender baik nama asli maupun versi yang disamarkan:\n"
+   ],
+   [
+      "Exclude embedz blocks from translation when a document contains them:\n",
+      "Kecualikan blok embedz dari terjemahan ketika dokumen memuatnya:\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "Panggil proses terjemahan untuk setiap area yang cocok.\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "Tanpa opsi ini, B<greple> berperilaku sebagai perintah pencarian normal. Jadi Anda dapat memeriksa bagian mana dari berkas yang akan menjadi subjek terjemahan sebelum menjalankan pekerjaan yang sebenarnya.\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "Hasil perintah masuk ke standar keluaran, jadi arahkan ke berkas jika perlu, atau pertimbangkan untuk menggunakan modul L<App::Greple::update>.\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "Opsi B<--xlate> memanggil opsi B<--xlate-color> dengan opsi B<--color=never>.\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "Dengan opsi B<--xlate-fold>, teks yang dikonversi dilipat berdasarkan lebar yang ditentukan. Lebar default adalah 70 dan dapat diatur oleh opsi B<--xlate-fold-width>. Empat kolom dicadangkan untuk operasi run-in, jadi setiap baris dapat memuat paling banyak 74 karakter.\n"
+   ],
+   [
+      "Specifies the translation engine to be used.\n",
+      "Menentukan mesin penerjemahan yang akan digunakan.\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "Saat ini, mesin berikut tersedia\n"
+   ],
+   [
+      "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
+      "Modul mesin dicari terlebih dahulu di namespace backend (C<llm>, lalu C<gpty>), kemudian langsung di bawah C<App::Greple::xlate>. Jadi C<gpt5> memuat C<App::Greple::xlate::llm::gpt5> yang memanggil perintah C<llm>, sementara C<gpt4o> kembali menggunakan C<App::Greple::xlate::gpty::gpt4o>. Gunakan C<--xlate-setopt backend=gpty> untuk memaksa backend tertentu.\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "Alih-alih memanggil mesin terjemahan, Anda diharapkan bekerja secara manual. Setelah menyiapkan teks yang akan diterjemahkan, teks tersebut disalin ke papan klip. Anda diharapkan menempelkannya ke formulir, menyalin hasilnya ke papan klip, dan menekan return.\n"
+   ],
+   [
+      "Specify the target language. LLM engines accept any language name or code the model understands; it is interpolated into the translation prompt. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "Tentukan bahasa target. Mesin LLM menerima nama atau kode bahasa apa pun yang dipahami model; nilai tersebut diinterpolasikan ke dalam prompt terjemahan. Anda bisa mendapatkan bahasa yang tersedia dengan perintah C<deepl languages> saat menggunakan mesin B<DeepL>.\n"
+   ],
+   [
+      "Label used for the original text in C<conflict>, C<colon> and C<ifdef> output formats. With the B<DeepL> engine a non-default value is also passed as the source language.\n",
+      "Label yang digunakan untuk teks asli dalam format keluaran C<conflict>, C<colon> dan C<ifdef>. Dengan mesin B<DeepL>, nilai non-default juga diteruskan sebagai bahasa sumber.\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "Tentukan format keluaran untuk teks asli dan terjemahan.\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "Format berikut selain C<xtxt> mengasumsikan bahwa bagian yang akan diterjemahkan adalah kumpulan baris. Sebenarnya, memungkinkan untuk menerjemahkan hanya sebagian dari sebuah baris, tetapi menentukan format selain C<xtxt> tidak akan menghasilkan hasil yang bermakna.\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "Teks asli dan yang telah dikonversi dicetak dalam format penanda konflik L<git(1)>.\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "Anda dapat memulihkan berkas asli dengan perintah L<sed(1)> berikutnya.\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "Teks asli dan terjemahan dikeluarkan dalam gaya container kustom markdown.\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "Teks di atas akan diterjemahkan menjadi berikut ini dalam HTML.\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "Jumlah tanda titik dua adalah 7 secara default. Jika Anda menentukan urutan tanda titik dua seperti C<:::::>, itu digunakan sebagai pengganti 7 tanda titik dua.\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "Teks asli dan yang telah dikonversi dicetak dalam format L<cpp(1)> C<#ifdef>.\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "Anda dapat mengambil hanya teks bahasa Jepang dengan perintah B<unifdef>:\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "Teks asli dan teks yang dikonversi dicetak dipisahkan oleh satu baris kosong. Untuk C<space+>, juga mengeluarkan baris baru setelah teks yang dikonversi.\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "Jika formatnya C<xtxt> (teks terjemahan) atau tidak dikenal, hanya teks terjemahan yang dicetak.\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. The default value 0 means the engine's own limit: for the free DeepL account service that is 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "Tentukan panjang maksimum teks yang akan dikirim ke API sekaligus. Nilai default 0 berarti batas milik engine sendiri: untuk layanan akun DeepL gratis, yaitu 128K untuk API (B<--xlate>) dan 5000 untuk antarmuka papan klip (B<--xlate-labor>). Anda mungkin dapat mengubah nilai-nilai ini jika menggunakan layanan Pro.\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "Tentukan jumlah maksimum baris teks yang akan dikirim ke API sekaligus.\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "Setel nilai ini ke 1 jika Anda ingin menerjemahkan satu baris setiap kali. Opsi ini memiliki prioritas lebih tinggi daripada opsi C<--xlate-maxlen>.\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "Tentukan prompt khusus untuk dikirim ke mesin penerjemahan. Opsi ini tersedia untuk mesin LLM (C<gpt3>, C<gpt4o>, C<gpt5>) tetapi tidak untuk DeepL. Anda dapat menyesuaikan perilaku penerjemahan dengan memberikan instruksi spesifik kepada model AI. Jika prompt berisi C<%s>, itu akan diganti dengan nama bahasa target.\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "Tentukan informasi konteks tambahan yang akan dikirim ke mesin terjemahan. Opsi ini dapat digunakan beberapa kali untuk menyediakan beberapa string konteks. Informasi konteks membantu mesin terjemahan memahami latar belakang dan menghasilkan terjemahan yang lebih akurat.\n"
+   ],
+   [
+      "Number of surrounding translated blocks passed as reference context when re-translating changed blocks (default 2). The context also includes the raw source text around the changed region (headings, list structure, captions) and, when available, the previous version of the changed text recovered from the cache, so that unchanged wording is preserved. Set to 0 to disable context-aware translation entirely. Note that each changed region is translated in its own API call and the context can add up to about 8000 characters to the system prompt, so context-aware translation trades some extra cost for consistency.\n",
+      "Jumlah blok terjemahan di sekitarnya yang diteruskan sebagai konteks referensi saat menerjemahkan ulang blok yang berubah (default 2). Konteks juga mencakup teks sumber mentah di sekitar wilayah yang berubah (heading, struktur daftar, caption) dan, bila tersedia, versi sebelumnya dari teks yang berubah yang dipulihkan dari cache, sehingga susunan kata yang tidak berubah dipertahankan. Atur ke 0 untuk menonaktifkan terjemahan sadar konteks sepenuhnya. Perhatikan bahwa setiap wilayah yang berubah diterjemahkan dalam panggilan API-nya sendiri dan konteks dapat menambah hingga sekitar 8000 karakter ke prompt sistem, sehingga terjemahan sadar konteks menukar sedikit biaya tambahan demi konsistensi.\n"
+   ],
+   [
+      "Initialize a new document's cache from another document's cache file. Useful for periodic reports: seed the new issue's cache with the previous issue's, so unchanged paragraphs are not re-translated and edited paragraphs keep the previous issue's wording. The seed is used only when the target cache is empty; otherwise it is ignored with a warning. With the default C<--xlate-cache=auto>, specifying a seed also implies creating the new document's cache file.\n",
+      "Inisialisasi cache dokumen baru dari file cache dokumen lain. Berguna untuk laporan berkala: isi awal cache edisi baru dengan cache edisi sebelumnya, sehingga paragraf yang tidak berubah tidak diterjemahkan ulang dan paragraf yang diedit mempertahankan susunan kata edisi sebelumnya. Seed hanya digunakan ketika cache target kosong; jika tidak, seed diabaikan dengan peringatan. Dengan C<--xlate-cache=auto> default, menentukan seed juga menyiratkan pembuatan file cache dokumen baru.\n"
+   ],
+   [
+      "Anonymize sensitive strings before they are sent to the translation API, and restore them in the output. The dictionary file gives one entry per item: in JSON (canonical, machine-generatable)\n",
+      "Anonimkan string sensitif sebelum dikirim ke API terjemahan, dan pulihkan string tersebut dalam keluaran. File kamus memberikan satu entri per item: dalam JSON (kanonis, dapat dihasilkan mesin)\n"
+   ],
+   [
+      "or in a simple line format (C<category pattern>, C</.../> for regex). Each item is replaced by a category tag such as C<< <person id=1 /> >>; the same string always gets the same tag, so the model can keep track of who is who. Unknown JSON fields are ignored, so generators (e.g. a local LLM extracting entities) may add their own annotations. Category C<lit> is reserved. Local cache files still store restored plain text: the concealment target is API transmission only.\n",
+      "atau dalam format baris sederhana (C<category pattern>, C</.../> untuk regex). Setiap item diganti dengan tag kategori seperti C<< <person id=1 /> >>; string yang sama selalu mendapatkan tag yang sama, sehingga model dapat melacak siapa itu siapa. Field JSON yang tidak dikenal diabaikan, sehingga generator (mis. LLM lokal yang mengekstrak entitas) dapat menambahkan anotasi mereka sendiri. Kategori C<lit> dicadangkan. File cache lokal tetap menyimpan teks biasa yang dipulihkan: target penyembunyian hanya transmisi API.\n"
+   ],
+   [
+      "A dictionary can be generated by an external tool -- for example a local model extracting sensitive entities:\n",
+      "Kamus dapat dihasilkan oleh alat eksternal -- misalnya model lokal yang mengekstrak entitas sensitif:\n"
+   ],
+   [
+      "A UTF-8 BOM in the file is tolerated. Values in the front matter line format may carry a trailing comment only on their own line, not after the value.\n",
+      "BOM UTF-8 dalam file ditoleransi. Nilai dalam format baris front matter boleh memiliki komentar akhir hanya pada barisnya sendiri, bukan setelah nilai.\n"
+   ],
+   [
+      "Collect anonymization entries from inline marks in the document itself. Mark the first occurrence like C<{{ person(\"山田太郎\") }}> and every occurrence of the string document-wide is anonymized. The mark itself stays in the source and in the translation, so a document can also be processed by a Jinja2-style macro processor (define the C<person> macro to print or redact the name). A custom I<regex> must contain C<< (?<category>...) >> and C<< (?<text>...) >> named captures.\n",
+      "Kumpulkan entri anonimisasi dari mark inline dalam dokumen itu sendiri. Tandai kemunculan pertama seperti C<{{ person(\"山田太郎\") }}> dan setiap kemunculan string di seluruh dokumen dianonimkan. Mark itu sendiri tetap berada di sumber dan dalam terjemahan, sehingga dokumen juga dapat diproses oleh pemroses makro bergaya Jinja2 (definisikan makro C<person> untuk mencetak atau menyunting nama). I<regex> kustom harus berisi named capture C<< (?<category>...) >> dan C<< (?<text>...) >>.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-anonymize-mark=> (with a trailing C<=>) when using the default notation.\n",
+      "Perhatikan bahwa dengan opsi bernilai opsional seperti ini, argumen file berikutnya akan dianggap sebagai nilainya: tulis C<--xlate-anonymize-mark=> (dengan C<=> di akhir) saat menggunakan notasi default.\n"
+   ],
+   [
+      "Alternative notations can be configured, for example C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> for C<@@person:NAME@@>-style marks, or an HTML-comment form that stays invisible in rendered Markdown. Mark rules are collected per document: a string marked in one input file is not concealed in another file of the same run (unlike front matter values, which accumulate across files).\n",
+      "Notasi alternatif dapat dikonfigurasi, misalnya C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> untuk mark bergaya C<@@person:NAME@@>, atau bentuk komentar HTML yang tetap tidak terlihat dalam Markdown yang dirender. Aturan mark dikumpulkan per dokumen: string yang ditandai dalam satu file input tidak disembunyikan dalam file lain pada run yang sama (berbeda dengan nilai front matter, yang terakumulasi di seluruh file).\n"
+   ],
+   [
+      "Treat template expressions (default: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) as opaque placeholders: instruct the model to copy them unchanged and verify, per block, that the response contains exactly the same expressions, each the same number of times. Their order may change, since translation legitimately reorders them to follow the target language word order. A broken expression aborts the run; the cache is checkpointed and frozen, so nothing paid for is lost.\n",
+      "Perlakukan ekspresi templat (default: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) sebagai placeholder buram: instruksikan model untuk menyalinnya tanpa perubahan dan verifikasi, per blok, bahwa respons berisi ekspresi yang sama persis, masing-masing dengan jumlah kemunculan yang sama. Urutannya boleh berubah, karena terjemahan secara sah menyusun ulang ekspresi tersebut agar mengikuti urutan kata bahasa target. Ekspresi yang rusak membatalkan run; cache di-checkpoint dan dibekukan, sehingga tidak ada yang sudah dibayar menjadi hilang.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-template=> (with a trailing C<=>) when using the default notation.\n",
+      "Perhatikan bahwa dengan opsi bernilai opsional seperti ini, argumen file berikutnya akan diambil sebagai nilainya: tulis C<--xlate-template=> (dengan C<=> di akhir) saat menggunakan notasi default.\n"
+   ],
+   [
+      "Treat a leading C<---> ... C<---> block as YAML front matter: exclude it from translation and from the phase-2 context slices, and add its flat C<key: value> values to the anonymization rules (category C<var>) as a safety net. With multiple input files the collected values accumulate (erring on the side of concealment).\n",
+      "Perlakukan blok awal C<---> ... C<---> sebagai YAML front matter: kecualikan dari terjemahan dan dari irisan konteks fase-2, serta tambahkan nilai C<key: value> datarnya ke aturan anonimisasi (kategori C<var>) sebagai jaring pengaman. Dengan beberapa file input, nilai yang dikumpulkan akan terakumulasi (lebih memilih sisi penyembunyian).\n"
+   ],
+   [
+      "Always leave a blank line after the closing C<--->. With a paragraph-style match pattern, front matter that runs directly into the body text forms one straddling block that the exclusion cannot suppress (a warning is printed in that case); the values are still anonymized, but the front matter itself would be sent for translation.\n",
+      "Selalu sisakan satu baris kosong setelah penutup C<--->. Dengan pola pencocokan bergaya paragraf, front matter yang langsung menyambung ke teks isi membentuk satu blok yang melintang yang tidak dapat ditekan oleh pengecualian (peringatan dicetak dalam kasus tersebut); nilainya tetap dianonimkan, tetapi front matter itu sendiri akan dikirim untuk diterjemahkan.\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "Tentukan ID glosarium yang akan digunakan untuk terjemahan. Opsi ini hanya tersedia saat menggunakan mesin DeepL. ID glosarium harus diperoleh dari akun DeepL Anda dan memastikan terjemahan yang konsisten untuk istilah-istilah tertentu.\n"
+   ],
+   [
+      "Do not call the translation API; instead show, through the progress display, each payload exactly as it would be transmitted (after anonymization and masking). Useful for checking what leaves the machine and for estimating the cost of a run.\n",
+      "Jangan panggil API terjemahan; sebagai gantinya tampilkan, melalui tampilan progres, setiap payload persis seperti yang akan dikirimkan (setelah anonimisasi dan masking). Berguna untuk memeriksa apa yang keluar dari mesin dan untuk memperkirakan biaya suatu run.\n"
+   ],
+   [
+      "See the translation result in real time in the STDERR output. The C<From> payload is shown as transmitted, after anonymization and masking.\n",
+      "Lihat hasil terjemahan secara waktu nyata di keluaran STDERR. Payload C<From> ditampilkan seperti yang dikirimkan, setelah anonimisasi dan masking.\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "Gunakan modul L<App::Greple::stripe> untuk menampilkan bagian yang cocok dengan pola strip zebra. Ini berguna ketika bagian yang cocok tersambung berurutan.\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "Palet warna dialihkan sesuai dengan warna latar belakang terminal. Jika Anda ingin menentukan secara eksplisit, Anda dapat menggunakan B<--xlate-stripe-light> atau B<--xlate-stripe-dark>.\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "Lakukan fungsi masking dan tampilkan teks yang dikonversi apa adanya tanpa pemulihan.\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "Tetapkan seluruh teks file sebagai area target.\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "Dalam kasus format C<cm> dan C<colon>, keluaran dipecah dan diformat baris demi baris. Oleh karena itu, jika hanya sebagian dari suatu baris yang akan diterjemahkan, hasil yang diharapkan tidak dapat diperoleh. Filter ini memperbaiki keluaran yang rusak karena menerjemahkan sebagian baris menjadi keluaran normal baris demi baris.\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "Dalam implementasi saat ini, jika beberapa bagian dari suatu baris diterjemahkan, bagian-bagian tersebut dikeluarkan sebagai baris independen.\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "Modul B<xlate> dapat menyimpan teks terjemahan yang di-cache untuk setiap file dan membacanya sebelum eksekusi untuk menghilangkan overhead permintaan ke server. Dengan strategi cache default C<auto>, ia mempertahankan data cache hanya ketika file cache ada untuk file target.\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "Gunakan B<--xlate-cache=clear> untuk memulai manajemen cache atau membersihkan semua data cache yang ada. Setelah dijalankan dengan opsi ini, file cache baru akan dibuat jika belum ada dan kemudian secara otomatis dipelihara setelahnya.\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "Pertahankan file cache jika ada.\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "Buat file cache kosong dan keluar.\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "Pertahankan cache bagaimanapun juga selama target adalah file normal.\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "Bersihkan data cache terlebih dahulu.\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "Jangan pernah gunakan file cache meskipun ada.\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "Secara default, data yang tidak digunakan dihapus dari file cache. Jika Anda tidak ingin menghapusnya dan tetap menyimpannya di file, gunakan C<accumulate>.\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "Opsi ini memaksa pembaruan file cache meskipun tidak diperlukan.\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "Anda dapat dengan mudah menggunakan modul ini dari baris perintah dengan menggunakan perintah C<xlate> yang disertakan dalam distribusi. Lihat halaman manual C<xlate> untuk penggunaan.\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "Perintah C<xlate> mendukung opsi panjang gaya GNU seperti C<--to-lang>, C<--from-lang>, C<--engine>, dan C<--file>. Gunakan C<xlate -h> untuk melihat semua opsi yang tersedia.\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "Perintah C<xlate> bekerja selaras dengan lingkungan Docker, jadi meskipun Anda tidak memasang apa pun secara lokal, Anda dapat menggunakannya selama Docker tersedia. Gunakan opsi C<-D> atau C<-C>.\n"
+   ],
+   [
+      "Docker operations are handled by L<App::dozo>, which can also be used as a standalone command. The C<dozo> command supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "Operasi Docker ditangani oleh L<App::dozo>, yang juga dapat digunakan sebagai perintah mandiri. Perintah C<dozo> mendukung berkas konfigurasi C<.dozorc> untuk pengaturan kontainer yang persisten.\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "Selain itu, karena makefile untuk berbagai gaya dokumen disediakan, penerjemahan ke bahasa lain dimungkinkan tanpa spesifikasi khusus. Gunakan opsi C<-M>.\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "Anda juga dapat menggabungkan opsi Docker dan C<make> sehingga Anda dapat menjalankan C<make> di lingkungan Docker.\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "Menjalankan seperti C<xlate -C> akan meluncurkan shell dengan repositori git working directory saat ini di-mount.\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "Baca artikel berbahasa Jepang di bagian L</SEE ALSO> untuk detailnya.\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "Muat file F<xlate.el> yang disertakan dalam repositori untuk menggunakan perintah C<xlate> dari editor Emacs. Fungsi C<xlate-region> menerjemahkan region yang diberikan. Bahasa default adalah C<EN-US> dan Anda dapat menentukan bahasa dengan memanggilnya menggunakan argumen prefix.\n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "Atur kunci autentikasi Anda untuk layanan DeepL.\n"
+   ],
+   [
+      "OpenAI authentication key, used by the legacy B<gpty> engines. The C<llm>-based B<gpt5> engine reads this variable too, but keys stored with C<llm keys set openai> also work.\n",
+      "Kunci autentikasi OpenAI, digunakan oleh mesin B<gpty> legacy. Mesin B<gpt5> berbasis C<llm> juga membaca variabel ini, tetapi kunci yang disimpan dengan C<llm keys set openai> juga berfungsi.\n"
+   ],
+   [
+      "Set the default cache strategy (see L</CACHE OPTIONS>).\n",
+      "Atur strategi cache default (lihat L</CACHE OPTIONS>).\n"
+   ],
+   [
+      "Install the command line tool for the engine you use: C<llm> for the B<gpt5> engine, C<deepl> for DeepL, C<gpty> for the legacy GPT engines.\n",
+      "Pasang alat baris perintah untuk mesin yang Anda gunakan: C<llm> untuk mesin B<gpt5>, C<deepl> untuk DeepL, C<gpty> untuk mesin GPT legacy.\n"
+   ],
+   [
+      "L<https://llm.datasette.io/>\n",
+      "L<https://llm.datasette.io/>\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n"
+   ],
+   [
+      "L<App::dozo> - Generic Docker runner used by xlate for container operations\n",
+      "L<App::dozo> - Runner Docker generik yang digunakan oleh xlate untuk operasi kontainer\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "Lihat manual B<greple> untuk detail tentang pola teks target. Gunakan opsi B<--inside>, B<--outside>, B<--include>, B<--exclude> untuk membatasi area pencocokan.\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "Anda dapat menggunakan modul C<-Mupdate> untuk memodifikasi file berdasarkan hasil perintah B<greple>.\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "Gunakan B<sdif> untuk menampilkan format penanda konflik berdampingan dengan opsi B<-V>.\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "Modul Greple B<stripe> digunakan oleh opsi B<--xlate-stripe>.\n"
+   ],
+   [
+      "Docker container image.\n",
+      "Citra kontainer Docker.\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> script and L<App::dozo>.\n",
+      "Pustaka C<getoptlong.sh> digunakan untuk penguraian opsi dalam skrip C<xlate> dan L<App::dozo>.\n"
+   ],
+   [
+      "The C<llm> command used by the B<gpt5> engine to access LLM models.\n",
+      "Perintah C<llm> yang digunakan oleh mesin B<gpt5> untuk mengakses model LLM.\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "Pustaka Python dan perintah CLI DeepL.\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "Pustaka Python OpenAI\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "Antarmuka baris perintah OpenAI\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "Modul Greple untuk menerjemahkan dan mengganti hanya bagian yang diperlukan dengan DeepL API (dalam bahasa Jepang)\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "Menghasilkan dokumen dalam 15 bahasa dengan modul DeepL API (dalam bahasa Jepang)\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "Lingkungan Docker terjemahan otomatis dengan DeepL API (dalam bahasa Jepang)\n"
+   ]
+]

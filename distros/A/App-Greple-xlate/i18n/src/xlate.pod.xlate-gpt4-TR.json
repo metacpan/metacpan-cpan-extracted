@@ -1,0 +1,378 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - greple için çeviri destek modülü\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. Currently DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>), and GPT-5 (F<gpt5.pm>) module are implemented as a back-end engine.\n",
+      "B<Greple> B<xlate> modülü, istenen metin bloklarını bulur ve bunları çevrilmiş metinle değiştirir. Şu anda DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) ve GPT-5 (F<gpt5.pm>) modülleri arka uç motoru olarak uygulanmıştır.\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<xlate::deepl> and C<perl> module like this:\n",
+      "Perl'in pod stilinde yazılmış bir belgede normal metin bloklarını çevirmek istiyorsanız, B<greple> komutunu C<xlate::deepl> ve C<perl> modülleriyle şu şekilde kullanın:\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "Bu komutta, desen dizesi C<^([\\w\\pP].*\\n)+> alfa-sayısal ve noktalama işaretiyle başlayan ardışık satırları ifade eder. Bu komut, çevrilecek alanı vurgulanmış olarak gösterir. B<--all> seçeneği, tüm metni üretmek için kullanılır.\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the B<deepl> command output.\n",
+      "Daha sonra seçili alanı çevirmek için C<--xlate> seçeneğini ekleyin. Ardından, istenen bölümleri bulacak ve bunları B<deepl> komutunun çıktısıyla değiştirecektir.\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "Varsayılan olarak, orijinal ve çevrilmiş metin, L<git(1)> ile uyumlu \"çakışma işaretleyici\" formatında yazdırılır. C<ifdef> formatını kullanarak, L<unifdef(1)> komutuyla kolayca istediğiniz bölümü alabilirsiniz. Çıktı formatı B<--xlate-format> seçeneğiyle belirtilebilir.\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "Tüm metni çevirmek istiyorsanız, B<--match-all> seçeneğini kullanın. Bu, tüm metni eşleştiren C<(?s).+> desenini belirtmek için bir kısayoldur.\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "Çakışma işaretleyici biçimindeki veriler, L<sdif|App::sdif> komutu ile C<-V> seçeneği kullanılarak yan yana biçimde görüntülenebilir. Karşılaştırmanın dize bazında yapılmasının anlamı olmadığından, C<--no-cdif> seçeneği önerilir. Metni renklendirmenize gerek yoksa, C<--no-textcolor> (veya C<--no-tc>) belirtin.\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "İşlem belirtilen birimlerde yapılır, ancak birden fazla satırdan oluşan boş olmayan metin dizileri durumunda, bunlar birlikte tek bir satıra dönüştürülür. Bu işlem şu şekilde gerçekleştirilir:\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "Her satırın başındaki ve sonundaki boşluklar kaldırılır.\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "Bir satır tam genişlikte bir noktalama işaretiyle bitiyorsa, bir sonraki satırla birleştirilir.\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "Bir satır tam genişlikte bir karakterle bitiyor ve sonraki satır tam genişlikte bir karakterle başlıyorsa, satırlar birleştirilir.\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "Bir satırın sonu veya başı tam genişlikte bir karakter değilse, araya bir boşluk karakteri eklenerek birleştirilirler.\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "Önbellek verileri normalleştirilmiş metne göre yönetilir, bu nedenle normalleştirme sonuçlarını etkilemeyen değişiklikler yapılsa bile, önbelleğe alınmış çeviri verileri geçerli olmaya devam eder.\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "Bu normalleştirme işlemi yalnızca ilk (0. indeksli) ve çift numaralı desenler için gerçekleştirilir. Bu nedenle, aşağıdaki gibi iki desen belirtildiğinde, ilk desene uyan metin normalleştirmeden sonra işlenir ve ikinci desene uyan metin üzerinde normalleştirme işlemi yapılmaz.\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "Bu nedenle, birden fazla satırı tek bir satırda birleştirerek işlenecek metinler için ilk deseni, önceden biçimlendirilmiş metinler için ise ikinci deseni kullanın. İlk desende eşleşecek metin yoksa, C<(?!)> gibi hiçbir şeyle eşleşmeyen bir desen kullanın.\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "Bazen, çeviri yapılmasını istemediğiniz metin bölümleri olabilir. Örneğin, markdown dosyalarındaki etiketler gibi. DeepL, bu gibi durumlarda çevrilmeyecek metin bölümünün XML etiketlerine dönüştürülmesini, çevrilmesini ve ardından çeviri tamamlandıktan sonra eski haline getirilmesini önerir. Bunu desteklemek için, çeviriden maskelenecek bölümleri belirtmek mümkündür.\n"
+   ],
+   [
+      "This will interpret each line of the file `MASKPATTERN` as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "Bu, `MASKPATTERN` dosyasının her satırını bir düzenli ifade olarak yorumlar, eşleşen dizeleri çevirir ve işleme sonrası geri alır. C<#> ile başlayan satırlar yok sayılır.\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escpaed newline.\n",
+      "Karmaşık desenler, ters eğik çizgiyle kaçışlı yeni satır kullanılarak birden fazla satıra yazılabilir.\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "Maskelenerek metnin nasıl dönüştürüldüğü B<--xlate-mask> seçeneğiyle görülebilir.\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "Bu arayüz deneyseldir ve gelecekte değişikliğe tabidir.\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "Her eşleşen alan için çeviri işlemini başlatın.\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "Bu seçenek olmadan, B<greple> normal bir arama komutu gibi davranır. Yani, gerçek işlemi başlatmadan önce dosyanın hangi bölümünün çeviriye tabi olacağını kontrol edebilirsiniz.\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "Komut sonucu standart çıktıya gider, bu nedenle gerekirse dosyaya yönlendirin veya L<App::Greple::update> modülünü kullanmayı düşünün.\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "B<--xlate> seçeneği, B<--xlate-color> seçeneğini B<--color=never> seçeneğiyle çağırır.\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "B<--xlate-fold> seçeneğiyle, dönüştürülen metin belirtilen genişlikte katlanır. Varsayılan genişlik 70'tir ve B<--xlate-fold-width> seçeneğiyle ayarlanabilir. Dört sütun çalıştırma işlemi için ayrılmıştır, bu nedenle her satır en fazla 74 karakter tutabilir.\n"
+   ],
+   [
+      "Specifies the translation engine to be used. If you specify the engine module directly, such as C<-Mxlate::deepl>, you do not need to use this option.\n",
+      "Kullanılacak çeviri motorunu belirtir. C<-Mxlate::deepl> gibi motor modülünü doğrudan belirtirseniz, bu seçeneği kullanmanıza gerek yoktur.\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "Şu anda, aşağıdaki motorlar mevcuttur\n"
+   ],
+   [
+      "B<gpt-4o>'s interface is unstable and cannot be guaranteed to work correctly at the moment.\n",
+      "B<gpt-4o>'ün arayüzü kararsızdır ve şu anda düzgün çalışacağı garanti edilemez.\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "Çeviri motorunu çağırmak yerine, sizin çalışmanız beklenir. Çevrilecek metni hazırladıktan sonra, bunlar panoya kopyalanır. Bunları forma yapıştırmanız, sonucu panoya kopyalamanız ve enter tuşuna basmanız beklenir.\n"
+   ],
+   [
+      "Specify the target language. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "Hedef dili belirtin. B<DeepL> motorunu kullanırken C<deepl languages> komutuyla mevcut dilleri alabilirsiniz.\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "Orijinal ve çevrilmiş metin için çıktı biçimini belirtin.\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "C<xtxt> dışında aşağıdaki biçimler, çevrilecek bölümün bir satır koleksiyonu olduğunu varsayar. Aslında, bir satırın yalnızca bir bölümünü çevirmek mümkündür, ancak C<xtxt> dışında bir biçim belirtmek anlamlı sonuçlar üretmez.\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "Orijinal ve dönüştürülmüş metin L<git(1)> çakışma işaretleyici biçiminde yazdırılır.\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "Bir sonraki L<sed(1)> komutuyla orijinal dosyayı geri yükleyebilirsiniz.\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "Orijinal ve çevrilmiş metin, markdown'un özel kapsayıcı stilinde çıktı olarak verilir.\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "Yukarıdaki metin HTML olarak aşağıdaki şekilde çevrilecektir.\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "Varsayılan olarak iki nokta sayısı 7'dir. C<:::::> gibi bir iki nokta dizisi belirtirseniz, 7 yerine bu kullanılır.\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "Orijinal ve dönüştürülmüş metin L<cpp(1)> C<#ifdef> biçiminde yazdırılır.\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "Sadece Japonca metni B<unifdef> komutuyla alabilirsiniz:\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "Orijinal ve dönüştürülmüş metin tek bir boş satırla ayrılarak yazdırılır.\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "C<space+>\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. Default value is set as for free DeepL account service: 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "Ayrıca dönüştürülmüş metinden sonra da bir satır sonu ekler.\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "Eğer format C<xtxt> (çevirilmiş metin) veya bilinmiyorsa, sadece çevrilmiş metin yazdırılır.\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "API'ye bir seferde gönderilecek metnin maksimum uzunluğunu belirtin. Varsayılan değer, ücretsiz DeepL hesap servisi için ayarlanmıştır: API için 128K (B<--xlate>) ve pano arayüzü için 5000 (B<--xlate-labor>). Pro servisi kullanıyorsanız bu değerleri değiştirebilirsiniz.\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is only available when using ChatGPT engines (gpt3, gpt4, gpt4o). You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "Çeviri motoruna gönderilecek özel bir istem belirtin. Bu seçenek yalnızca ChatGPT motorları (gpt3, gpt4, gpt4o) kullanılırken mevcuttur. Yapay zeka modeline belirli talimatlar vererek çeviri davranışını özelleştirebilirsiniz. Eğer istemde C<%s> bulunuyorsa, bu kısım hedef dil adıyla değiştirilecektir.\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "Çeviri motoruna gönderilecek ek bağlam bilgisi belirtin. Bu seçenek birden fazla kez kullanılarak birden fazla bağlam dizesi sağlanabilir. Bağlam bilgisi, çeviri motorunun arka planı anlamasına ve daha doğru çeviriler üretmesine yardımcı olur.\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "Çeviri için kullanılacak bir sözlük kimliği belirtin. Bu seçenek yalnızca DeepL motoru kullanılırken mevcuttur. Sözlük kimliği DeepL hesabınızdan alınmalı ve belirli terimlerin tutarlı şekilde çevrilmesini sağlar.\n"
+   ],
+   [
+      "See the tranlsation result in real time in the STDERR output.\n",
+      "API'ye bir seferde gönderilecek maksimum metin satırı sayısını belirtin.\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "Her seferinde bir satır çevirmek istiyorsanız bu değeri 1 olarak ayarlayın. Bu seçenek C<--xlate-maxlen> seçeneğine öncelik verir.\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "Çeviri sonucunu gerçek zamanlı olarak STDERR çıktısında görün.\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "Eşleşen kısmı zebra şeritli şekilde göstermek için L<App::Greple::stripe> modülünü kullanın. Bu, eşleşen kısımlar arka arkaya bağlandığında kullanışlıdır.\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "Renk paleti, terminalin arka plan rengine göre değiştirilir. Açıkça belirtmek isterseniz B<--xlate-stripe-light> veya B<--xlate-stripe-dark> kullanabilirsiniz.\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "C<cm> ve C<colon> formatları durumunda, çıktı satır satır bölünür ve biçimlendirilir. Bu nedenle, bir satırın yalnızca bir kısmı çevrilecekse, beklenen sonuç elde edilemez. Bu filtreler, bir satırın bir kısmının çevrilmesiyle bozulan çıktıyı, normal satır satır çıktıya dönüştürür.\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "Mevcut uygulamada, bir satırın birden fazla kısmı çevrilirse, bunlar bağımsız satırlar olarak çıktı verilir.\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "Maskeleme işlevini gerçekleştirir ve dönüştürülmüş metni olduğu gibi restorasyon yapmadan gösterir.\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "Dosyanın tüm metnini hedef alan olarak ayarlayın.\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "B<xlate> modülü, her dosya için çeviri önbellekli metni depolayabilir ve çalıştırmadan önce okuyarak sunucuya sorma yükünü ortadan kaldırır. Varsayılan önbellek stratejisi C<auto> ile, hedef dosya için önbellek dosyası mevcutsa yalnızca önbellek verilerini tutar.\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "Önbellek yönetimini başlatmak veya mevcut tüm önbellek verilerini temizlemek için B<--xlate-cache=clear> kullanın. Bu seçenekle çalıştırıldığında, önbellek dosyası yoksa yeni bir tane oluşturulur ve ardından otomatik olarak yönetilir.\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "Önbellek dosyası mevcutsa onu koruyun.\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "Boş bir önbellek dosyası oluşturun ve çıkın.\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "Hedef normal dosya olduğu sürece her durumda önbelleği koruyun.\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "Önce önbellek verilerini temizleyin.\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "Önbellek dosyası mevcut olsa bile asla kullanmayın.\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "Varsayılan davranış olarak, kullanılmayan veriler önbellek dosyasından kaldırılır. Bunları kaldırmak istemiyorsanız ve dosyada tutmak istiyorsanız C<accumulate> kullanın.\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "C<xlate> komutu, C<--to-lang>, C<--from-lang>, C<--engine> ve C<--file> gibi GNU tarzı uzun seçenekleri destekler. Tüm mevcut seçenekleri görmek için C<xlate -h> kullanın.\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "Bu seçenek, gerek olmasa bile önbellek dosyasını güncellemeye zorlar.\n"
+   ],
+   [
+      "Docker operations are handled by the C<dozo> script, which can also be used as a standalone command. The C<dozo> script supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "Docker işlemleri, bağımsız bir komut olarak da kullanılabilen C<dozo> betiği tarafından yönetilir. C<dozo> betiği, kalıcı konteyner ayarları için C<.dozorc> yapılandırma dosyasını destekler.\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "Bu modülü komut satırından kolayca kullanmak için dağıtıma dahil edilen C<xlate> komutunu kullanabilirsiniz. Kullanımı için C<xlate> man sayfasına bakın.\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "C<xlate> komutu Docker ortamı ile birlikte çalışır, bu nedenle elinizde hiçbir şey kurulu olmasa bile Docker mevcut olduğu sürece kullanabilirsiniz. C<-D> veya C<-C> seçeneğini kullanın.\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "Ayrıca, çeşitli belge stilleri için makefile'lar sağlandığından, özel bir belirtim olmadan diğer dillere çeviri mümkündür. C<-M> seçeneğini kullanın.\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "Docker ve C<make> seçeneklerini birleştirerek C<make> komutunu Docker ortamında çalıştırabilirsiniz.\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "Depodaki F<xlate.el> dosyasını yükleyerek Emacs editöründen C<xlate> komutunu kullanabilirsiniz.\n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "C<xlate-region> fonksiyonu verilen bölgeyi çevirir.\n"
+   ],
+   [
+      "OpenAI authentication key.\n",
+      "Varsayılan dil C<EN-US>'dir ve önek argümanla çağırarak dili belirtebilirsiniz.\n"
+   ],
+   [
+      "You have to install command line tools for DeepL and ChatGPT.\n",
+      "DeepL servisi için kimlik doğrulama anahtarınızı ayarlayın.\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "OpenAI kimlik doğrulama anahtarı.\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "DeepL ve ChatGPT için komut satırı araçlarını yüklemeniz gerekir.\n"
+   ],
+   [
+      "L<App::Greple::xlate>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<App::Greple::xlate::deepl>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate::gpt4>\n",
+      "L<App::Greple::xlate::gpt4>\n"
+   ],
+   [
+      "L<App::Greple::xlate::gpt5>\n",
+      "L<App::Greple::xlate::gpt5>\n"
+   ],
+   [
+      "Docker container image.\n",
+      "L<App::Greple::xlate::deepl>\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> and C<dozo> scripts.\n",
+      "C<xlate> ve C<dozo> betiklerinde seçenek ayrıştırma için kullanılan C<getoptlong.sh> kütüphanesi.\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "L<App::Greple::xlate::gpt3>\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "Docker konteyner imajı.\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "DeepL Python kütüphanesi ve CLI komutu.\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "OpenAI Python Kütüphanesi\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "OpenAI komut satırı arayüzü\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "Hedef metin deseniyle ilgili ayrıntılar için B<greple> kılavuzuna bakın. Eşleşme alanını sınırlamak için B<--inside>, B<--outside>, B<--include>, B<--exclude> seçeneklerini kullanın.\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "C<-Mupdate> modülünü, B<greple> komutunun sonucu ile dosyaları değiştirmek için kullanabilirsiniz.\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "Çakışma işaretleyici biçimini B<-V> seçeneğiyle yan yana göstermek için B<sdif> kullanın.\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "Greple B<stripe> modülü, B<--xlate-stripe> seçeneğiyle kullanılır.\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "DeepL API ile yalnızca gerekli kısımları çevirip değiştiren Greple modülü (Japonca)\n"
+   ]
+]

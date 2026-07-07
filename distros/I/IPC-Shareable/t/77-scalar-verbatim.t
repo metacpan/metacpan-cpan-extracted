@@ -7,7 +7,9 @@ use Test::More;
 
 use FindBin;
 use lib $FindBin::Bin;
-use IPCShareableTest qw(assert_clean_process live_seg_count unique_glue relieve_ipc_pressure);
+use IPCShareableTest qw(assert_clean_process live_seg_count unique_glue relieve_ipc_pressure require_free_sem_sets);
+
+require_free_sem_sets();
 
 use JSON qw(encode_json decode_json);
 use POSIX ();

@@ -23,7 +23,9 @@ use Time::HiRes qw(time);
 
 use FindBin;
 use lib $FindBin::Bin;
-use IPCShareableTest qw(unique_glue assert_clean);
+use IPCShareableTest qw(unique_glue assert_clean require_free_sem_sets);
+
+require_free_sem_sets();
 
 # --- Test 1: LOCK_SH blocks until LOCK_EX released (enforced_write_locking disabled) ---
 {
@@ -61,6 +63,7 @@ use IPCShareableTest qw(unique_glue assert_clean);
     close $w;
     <$r>;    # wait until child holds LOCK_EX and has written 'updated'
     close $r;
+    my $ready = time();
 
     my $rt = tied $sv;
     my $t0 = time();
@@ -68,9 +71,22 @@ use IPCShareableTest qw(unique_glue assert_clean);
     my $t1 = time();
     my $wait = $t1 - $t0;
 
+    # The child holds LOCK_EX for 0.3s after signalling readiness, so the floor
+    # on the observed wait is whatever remained of that window when this
+    # process finally issued the lock call. On a loaded smoker the parent can
+    # be descheduled after the pipe read for longer than the whole window -- a
+    # fixed 0.28s floor then fails with waits as low as 0.000s (seen on CPAN
+    # testers). The functional assertions above are unaffected.
+
+    my $floor = 0.3 - ($t0 - $ready) - 0.02;
+    $floor = 0 if $floor < 0;
+
     is $got, 1,        "LOCK_SH (enforced_write_locking off): lock() returns 1 after LOCK_EX released";
     is $sv, 'updated', "LOCK_SH (enforced_write_locking off): reads value written by LOCK_EX holder";
-    ok($wait >= 0.28,  sprintf("Reader waited at least 0.28s for LOCK_SH (actual: %.3fs)", $wait));
+    ok(
+        $wait >= $floor,
+        sprintf("Reader blocked on LOCK_SH (waited %.3fs >= floor %.3fs)", $wait, $floor),
+    );
     $rt->unlock;
 
     waitpid($pid, 0);
@@ -257,6 +273,7 @@ use IPCShareableTest qw(unique_glue assert_clean);
     close $w;
     <$r>;    # wait until child holds LOCK_EX and has written 'updated'
     close $r;
+    my $ready = time();
 
     my $rt = tied $sv;
     my $t0 = time();
@@ -264,9 +281,18 @@ use IPCShareableTest qw(unique_glue assert_clean);
     my $t1 = time();
     my $wait = $t1 - $t0;
 
+    # Dynamic floor: see the LOCK_SH block in Test 1 for why a fixed 0.28s
+    # floor is a race on loaded smokers.
+
+    my $floor = 0.3 - ($t0 - $ready) - 0.02;
+    $floor = 0 if $floor < 0;
+
     is $got, 1,        "LOCK_EX: lock() returns 1 after previous LOCK_EX released";
     is $sv, 'updated', "LOCK_EX: reads value written by previous LOCK_EX holder";
-    ok($wait >= 0.28,  sprintf("Writer waited at least 0.28s for LOCK_EX (actual: %.3fs)", $wait));
+    ok(
+        $wait >= $floor,
+        sprintf("Writer blocked on LOCK_EX (waited %.3fs >= floor %.3fs)", $wait, $floor),
+    );
     $rt->unlock;
 
     waitpid($pid, 0);

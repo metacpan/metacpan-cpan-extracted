@@ -1,0 +1,378 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - modul de suport pentru traducere pentru greple\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. Currently DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>), and GPT-5 (F<gpt5.pm>) module are implemented as a back-end engine.\n",
+      "B<Greple> B<xlate> modulul găsește blocurile de text dorite și le înlocuiește cu textul tradus. În prezent, modulele DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) și GPT-5 (F<gpt5.pm>) sunt implementate ca motoare back-end.\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<xlate::deepl> and C<perl> module like this:\n",
+      "Dacă doriți să traduceți blocuri normale de text într-un document scris în stilul pod al Perl, folosiți comanda B<greple> cu C<xlate::deepl> și modulul C<perl> astfel:\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "În această comandă, șirul de pattern C<^([\\w\\pP].*\\n)+> înseamnă linii consecutive care încep cu litere alfanumerice sau semne de punctuație. Această comandă evidențiază zona care urmează să fie tradusă. Opțiunea B<--all> este folosită pentru a produce întregul text.\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the B<deepl> command output.\n",
+      "Apoi adăugați opțiunea C<--xlate> pentru a traduce zona selectată. Astfel, va găsi secțiunile dorite și le va înlocui cu rezultatul comenzii B<deepl>.\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "În mod implicit, textul original și cel tradus sunt tipărite în formatul „conflict marker” compatibil cu L<git(1)>. Folosind formatul C<ifdef>, puteți obține partea dorită cu comanda L<unifdef(1)> cu ușurință. Formatul de ieșire poate fi specificat cu opțiunea B<--xlate-format>.\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "Dacă doriți să traduceți întregul text, folosiți opțiunea B<--match-all>. Aceasta este o scurtătură pentru a specifica pattern-ul C<(?s).+> care se potrivește cu întregul text.\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "Datele în format de marcator de conflict pot fi vizualizate în stil side-by-side prin comanda L<sdif|App::sdif> cu opțiunea C<-V>. Deoarece nu are sens să comparați pe bază de șir, se recomandă opțiunea C<--no-cdif>. Dacă nu aveți nevoie să colorați textul, specificați C<--no-textcolor> (sau C<--no-tc>).\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "Procesarea se face în unități specificate, dar în cazul unei secvențe de mai multe linii de text ne-goale, acestea sunt convertite împreună într-o singură linie. Această operațiune se realizează astfel:\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "Se elimină spațiile albe de la începutul și sfârșitul fiecărei linii.\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "Dacă o linie se termină cu un caracter de punctuație de lățime completă, se concatenează cu linia următoare.\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "Dacă o linie se termină cu un caracter de lățime completă și linia următoare începe cu un caracter de lățime completă, liniile se concatenează.\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "Dacă fie sfârșitul, fie începutul unei linii nu este un caracter de lățime completă, se concatenează prin inserarea unui spațiu.\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "Datele din cache sunt gestionate pe baza textului normalizat, astfel încât chiar dacă se fac modificări care nu afectează rezultatele normalizării, datele de traducere din cache vor rămâne valabile.\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "Acest proces de normalizare se efectuează doar pentru primul (al 0-lea) și pentru pattern-urile cu număr par. Astfel, dacă sunt specificate două pattern-uri ca mai jos, textul care se potrivește cu primul pattern va fi procesat după normalizare, iar pe textul care se potrivește cu al doilea pattern nu se va efectua nicio normalizare.\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "Prin urmare, folosiți primul pattern pentru textul care trebuie procesat prin combinarea mai multor linii într-una singură și folosiți al doilea pattern pentru textul pre-formatat. Dacă nu există text care să se potrivească cu primul pattern, folosiți un pattern care nu se potrivește cu nimic, cum ar fi C<(?!)>.\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "Ocazional, există părți din text pe care nu doriți să le traduceți. De exemplu, etichetele din fișierele markdown. DeepL sugerează ca, în astfel de cazuri, partea de text care trebuie exclusă să fie convertită în etichete XML, tradusă, apoi restaurată după finalizarea traducerii. Pentru a susține acest lucru, este posibil să specificați părțile care trebuie mascate de la traducere.\n"
+   ],
+   [
+      "This will interpret each line of the file `MASKPATTERN` as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "Acest lucru va interpreta fiecare linie din fișierul `MASKPATTERN` ca o expresie regulată, va traduce șirurile care se potrivesc și va reveni după procesare. Liniile care încep cu C<#> sunt ignorate.\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escpaed newline.\n",
+      "Un model complex poate fi scris pe mai multe linii cu newline scăpat cu backslash.\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "Modul în care textul este transformat prin mascarea poate fi văzut cu opțiunea B<--xlate-mask>.\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "Această interfață este experimentală și poate suferi modificări în viitor.\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "Invocați procesul de traducere pentru fiecare zonă potrivită.\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "Fără această opțiune, B<greple> se comportă ca o comandă de căutare normală. Astfel, puteți verifica ce parte a fișierului va fi supusă traducerii înainte de a lansa efectiv procesul.\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "Rezultatul comenzii este trimis la ieșirea standard, deci redirecționați către un fișier dacă este necesar sau luați în considerare utilizarea modulului L<App::Greple::update>.\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "Opțiunea B<--xlate> apelează opțiunea B<--xlate-color> cu opțiunea B<--color=never>.\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "Cu opțiunea B<--xlate-fold>, textul convertit este împărțit pe lățimea specificată. Lățimea implicită este 70 și poate fi setată cu opțiunea B<--xlate-fold-width>. Patru coloane sunt rezervate pentru operațiunea run-in, astfel încât fiecare linie poate conține cel mult 74 de caractere.\n"
+   ],
+   [
+      "Specifies the translation engine to be used. If you specify the engine module directly, such as C<-Mxlate::deepl>, you do not need to use this option.\n",
+      "Specifică motorul de traducere care va fi folosit. Dacă specificați direct modulul motorului, cum ar fi C<-Mxlate::deepl>, nu este necesar să folosiți această opțiune.\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "În acest moment, următoarele motoare sunt disponibile\n"
+   ],
+   [
+      "B<gpt-4o>'s interface is unstable and cannot be guaranteed to work correctly at the moment.\n",
+      "Interfața B<gpt-4o> este instabilă și nu se poate garanta că funcționează corect în acest moment.\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "În loc să apelați motorul de traducere, se așteaptă să lucrați manual. După pregătirea textului de tradus, acesta este copiat în clipboard. Se așteaptă să îl lipiți în formular, să copiați rezultatul în clipboard și să apăsați return.\n"
+   ],
+   [
+      "Specify the target language. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "Specificați limba țintă. Puteți obține limbile disponibile cu comanda C<deepl languages> atunci când folosiți motorul B<DeepL>.\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "Specificați formatul de ieșire pentru textul original și cel tradus.\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "Următoarele formate, altele decât C<xtxt>, presupun că partea de tradus este o colecție de linii. De fapt, este posibil să traduceți doar o porțiune dintr-o linie, dar specificarea unui format diferit de C<xtxt> nu va produce rezultate semnificative.\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "Textul original și cel convertit sunt tipărite în formatul marker de conflict L<git(1)>.\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "Puteți recupera fișierul original cu următoarea comandă L<sed(1)>.\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "Textul original și cel tradus sunt afișate în stilul container personalizat al markdown-ului.\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "Textul de mai sus va fi tradus astfel în HTML.\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "Numărul de două puncte este 7 în mod implicit. Dacă specificați o secvență de două puncte ca C<:::::>, aceasta va fi folosită în loc de 7 două puncte.\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "Textul original și cel convertit sunt tipărite în formatul L<cpp(1)> C<#ifdef>.\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "Puteți prelua doar textul japonez cu comanda B<unifdef>:\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "Textul original și cel convertit sunt tipărite separate printr-un singur rând gol.\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "Pentru C<space+>, de asemenea, se afișează un rând nou după textul convertit.\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. Default value is set as for free DeepL account service: 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "Dacă formatul este C<xtxt> (text tradus) sau necunoscut, se afișează doar textul tradus.\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "Specificați lungimea maximă a textului care poate fi trimis la API odată. Valoarea implicită este setată ca pentru serviciul gratuit DeepL: 128K pentru API (B<--xlate>) și 5000 pentru interfața clipboard (B<--xlate-labor>). Este posibil să puteți schimba aceste valori dacă folosiți serviciul Pro.\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "Specificați numărul maxim de linii de text care pot fi trimise la API odată.\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is only available when using ChatGPT engines (gpt3, gpt4, gpt4o). You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "Specificați un prompt personalizat care va fi trimis motorului de traducere. Această opțiune este disponibilă doar atunci când utilizați motoarele ChatGPT (gpt3, gpt4, gpt4o). Puteți personaliza comportamentul traducerii oferind instrucțiuni specifice modelului AI. Dacă promptul conține C<%s>, acesta va fi înlocuit cu numele limbii țintă.\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "Specificați informații suplimentare de context care vor fi trimise motorului de traducere. Această opțiune poate fi folosită de mai multe ori pentru a furniza mai multe șiruri de context. Informațiile de context ajută motorul de traducere să înțeleagă fundalul și să producă traduceri mai precise.\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "Specificați un ID de glosar care va fi folosit pentru traducere. Această opțiune este disponibilă doar atunci când utilizați motorul DeepL. ID-ul de glosar trebuie obținut din contul dumneavoastră DeepL și asigură traducerea consecventă a anumitor termeni.\n"
+   ],
+   [
+      "See the tranlsation result in real time in the STDERR output.\n",
+      "Setați această valoare la 1 dacă doriți să traduceți o linie odată. Această opțiune are prioritate față de opțiunea C<--xlate-maxlen>.\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "Vedeți rezultatul traducerii în timp real în ieșirea STDERR.\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "Folosiți modulul L<App::Greple::stripe> pentru a evidenția partea potrivită în stil zebra striping. Acest lucru este util când părțile potrivite sunt conectate una după alta.\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "Paleta de culori este comutată în funcție de culoarea de fundal a terminalului. Dacă doriți să specificați explicit, puteți folosi B<--xlate-stripe-light> sau B<--xlate-stripe-dark>.\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "Efectuați funcția de mascarea și afișați textul convertit așa cum este, fără restaurare.\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "În cazul formatelor C<cm> și C<colon>, ieșirea este împărțită și formatată linie cu linie. Prin urmare, dacă doar o parte a unei linii trebuie tradusă, rezultatul așteptat nu poate fi obținut. Aceste filtre corectează ieșirea care este coruptă prin traducerea unei părți dintr-o linie într-o ieșire normală, linie cu linie.\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "În implementarea actuală, dacă mai multe părți ale unei linii sunt traduse, acestea sunt afișate ca linii independente.\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "Setați întregul text al fișierului ca zonă țintă.\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "Modulul B<xlate> poate stoca textul tradus în cache pentru fiecare fișier și îl poate citi înainte de execuție pentru a elimina timpul de așteptare la server. Cu strategia implicită de cache C<auto>, menține datele în cache doar când există un fișier cache pentru fișierul țintă.\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "Folosiți B<--xlate-cache=clear> pentru a iniția gestionarea cache-ului sau pentru a curăța toate datele cache existente. Odată executat cu această opțiune, va fi creat un fișier cache nou dacă nu există deja și apoi va fi menținut automat ulterior.\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "Menține fișierul cache dacă există.\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "Creează un fișier cache gol și iese.\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "Menține cache-ul oricum, atâta timp cât ținta este un fișier normal.\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "Șterge mai întâi datele din cache.\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "Nu folosi niciodată fișierul cache, chiar dacă există.\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "Prin comportamentul implicit, datele neutilizate sunt eliminate din fișierul cache. Dacă nu doriți să le eliminați și să le păstrați în fișier, folosiți C<accumulate>.\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "Această opțiune forțează actualizarea fișierului cache chiar dacă nu este necesar.\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "Comanda C<xlate> suportă opțiuni lungi în stil GNU, cum ar fi C<--to-lang>, C<--from-lang>, C<--engine> și C<--file>. Folosiți C<xlate -h> pentru a vedea toate opțiunile disponibile.\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "Puteți folosi cu ușurință acest modul din linia de comandă folosind comanda C<xlate> inclusă în distribuție. Consultați pagina de manual C<xlate> pentru utilizare.\n"
+   ],
+   [
+      "Docker operations are handled by the C<dozo> script, which can also be used as a standalone command. The C<dozo> script supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "Operațiunile Docker sunt gestionate de scriptul C<dozo>, care poate fi folosit și ca o comandă de sine stătătoare. Scriptul C<dozo> suportă fișierul de configurare C<.dozorc> pentru setările persistente ale containerului.\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "Comanda C<xlate> funcționează în colaborare cu mediul Docker, astfel încât chiar dacă nu aveți nimic instalat local, o puteți folosi atâta timp cât Docker este disponibil. Folosiți opțiunea C<-D> sau C<-C>.\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "De asemenea, deoarece sunt furnizate makefile-uri pentru diverse stiluri de documente, traducerea în alte limbi este posibilă fără specificații speciale. Folosiți opțiunea C<-M>.\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "Puteți combina și opțiunile Docker și C<make> astfel încât să puteți rula C<make> într-un mediu Docker.\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "Rularea ca C<xlate -C> va lansa un shell cu depozitul git curent montat.\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "Încarcă fișierul F<xlate.el> inclus în depozit pentru a folosi comanda C<xlate> din editorul Emacs. \n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "Funcția C<xlate-region> traduce regiunea dată. Limba implicită este C<EN-US> și poți specifica limba invocând-o cu argument prefix.\n"
+   ],
+   [
+      "OpenAI authentication key.\n",
+      "Setează cheia ta de autentificare pentru serviciul DeepL.\n"
+   ],
+   [
+      "You have to install command line tools for DeepL and ChatGPT.\n",
+      "Cheie de autentificare OpenAI.\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "Trebuie să instalezi unelte de linie de comandă pentru DeepL și ChatGPT.\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<App::Greple::xlate>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate>\n"
+   ],
+   [
+      "L<App::Greple::xlate::gpt4>\n",
+      "L<App::Greple::xlate::gpt4>\n"
+   ],
+   [
+      "L<App::Greple::xlate::gpt5>\n",
+      "L<App::Greple::xlate::gpt5>\n"
+   ],
+   [
+      "Docker container image.\n",
+      "L<App::Greple::xlate::gpt3>\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> and C<dozo> scripts.\n",
+      "Biblioteca C<getoptlong.sh> este folosită pentru analiza opțiunilor în scripturile C<xlate> și C<dozo>.\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "Imagine container Docker.\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "Bibliotecă Python DeepL și comandă CLI.\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "Bibliotecă Python OpenAI\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "Interfață de linie de comandă OpenAI\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "Vezi manualul B<greple> pentru detalii despre modelul textului țintă. Folosește opțiunile B<--inside>, B<--outside>, B<--include>, B<--exclude> pentru a limita zona de potrivire.\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "Poți folosi modulul C<-Mupdate> pentru a modifica fișierele în funcție de rezultatul comenzii B<greple>.\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "Folosește B<sdif> pentru a afișa formatul markerului de conflict alăturat cu opțiunea B<-V>.\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "Modulul Greple B<stripe> se folosește cu opțiunea B<--xlate-stripe>.\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "Modul Greple pentru a traduce și înlocui doar părțile necesare cu API-ul DeepL (în japoneză)\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "Generarea documentelor în 15 limbi cu modulul API DeepL (în japoneză)\n"
+   ]
+]

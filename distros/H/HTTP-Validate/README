@@ -1,6 +1,6 @@
-HTTP-Validate version 0.41
+HTTP-Validate
 
-validate and clean HTTP request parameter values according to a set of rules
+A Perl module to validate and clean HTTP request parameter values according to a set of rules
 
 INSTALLATION
 
@@ -21,16 +21,10 @@ perldoc command.
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-Validate
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-Validate
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/HTTP-Validate
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/HTTP-Validate
-
-    Search CPAN
-        http://search.cpan.org/dist/HTTP-Validate/
+    MetaCPAN:
+        https://metacpan.org/search?q=HTTP%3A%3AValidate
 
 
 LICENSE AND COPYRIGHT

@@ -1,0 +1,470 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate — модуль поддержки перевода для greple\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.5 (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
+      "B<Greple> B<xlate> модуль находит нужные текстовые блоки и заменяет их переведённым текстом. Основной движок — GPT-5.5 (F<llm/gpt5.pm>), который вызывает команду L<llm|https://llm.datasette.io/>; DeepL (F<deepl.pm>) и устаревшие движки на основе B<gpty> также включены.\n"
+   ],
+   [
+      "Translations are cached per file, so re-running a command costs nothing for unchanged text. When a document is edited, only the changed paragraphs are sent to the API again; a context-aware engine also receives the surrounding translations, the raw source text around the change, and the previous version of the edited paragraph, so the new translation keeps the established wording (see B<--xlate-context-window>). Sensitive strings can be concealed before transmission (see L</ANONYMIZATION AND TEMPLATES>).\n",
+      "Переводы кэшируются для каждого файла, поэтому повторный запуск команды ничего не стоит для неизменённого текста. Когда документ редактируется, в API снова отправляются только изменённые абзацы; движок, учитывающий контекст, также получает окружающие переводы, необработанный исходный текст вокруг изменения и предыдущую версию отредактированного абзаца, поэтому новый перевод сохраняет устоявшиеся формулировки (см. B<--xlate-context-window>). Конфиденциальные строки можно скрывать перед передачей (см. L</ANONYMIZATION AND TEMPLATES>).\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<--xlate-engine gpt5> and C<perl> module like this:\n",
+      "Если вы хотите перевести обычные текстовые блоки в документе, написанном в стиле pod Perl, используйте команду B<greple> с C<--xlate-engine gpt5> и модулем C<perl> следующим образом:\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "В этой команде строка шаблона C<^([\\w\\pP].*\\n)+> означает последовательные строки, начинающиеся с буквенно-цифрового символа и знака пунктуации. Эта команда показывает подсвеченную область для перевода. Опция B<--all> используется для вывода всего текста.\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the translation engine's output.\n",
+      "Затем добавьте опцию C<--xlate> для перевода выбранной области. После этого будут найдены нужные разделы и заменены выводом механизма перевода.\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "По умолчанию исходный и переведенный текст выводятся в формате «маркер конфликта», совместимом с L<git(1)>. Используя формат C<ifdef>, вы можете легко получить нужную часть командой L<unifdef(1)>. Формат вывода можно указать опцией B<--xlate-format>.\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "Если вы хотите перевести весь текст, используйте опцию B<--match-all>. Это сокращение для указания шаблона C<(?s).+>, который соответствует всему тексту.\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "Данные в формате маркеров конфликтов можно просматривать в поколоночном виде командой L<sdif|App::sdif> с опцией C<-V>. Поскольку не имеет смысла сравнивать построчно, рекомендуется опция C<--no-cdif>. Если вам не нужно раскрашивание текста, укажите C<--no-textcolor> (или C<--no-tc>).\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "Обработка выполняется в заданных единицах, но в случае последовательности из нескольких строк непустого текста они преобразуются вместе в одну строку. Эта операция выполняется следующим образом:\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "Удалите пробелы в начале и в конце каждой строки.\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "Если строка заканчивается полноширинным знаком препинания, объедините с следующей строкой.\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "Если строка заканчивается полноширинным символом и следующая строка начинается полноширинным символом, объедините строки.\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "Если либо конец, либо начало строки не является полноширинным символом, объедините их, вставив пробел.\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "Данные кэша управляются на основе нормализованного текста, поэтому даже если вносятся изменения, не влияющие на результаты нормализации, кэшированные данные перевода останутся эффективными.\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "Этот процесс нормализации выполняется только для первого (0-го) и четных шаблонов. Таким образом, если указаны два шаблона, как показано ниже, текст, соответствующий первому шаблону, будет обработан после нормализации, а к тексту, соответствующему второму шаблону, процесс нормализации применяться не будет.\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "Поэтому используйте первый шаблон для текста, который должен обрабатываться путем объединения нескольких строк в одну, а второй — для предварительно форматированного текста. Если в первом шаблоне нет текста для совпадения, используйте шаблон, который ни с чем не совпадает, например C<(?!)>.\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "Иногда встречаются части текста, которые не нужно переводить. Например, теги в файлах Markdown. DeepL рекомендует в таких случаях преобразовать исключаемую часть текста в XML‑теги, выполнить перевод, а затем восстановить её после завершения перевода. Для поддержки этого можно указать части, которые следует маскировать от перевода.\n"
+   ],
+   [
+      "This will interpret each line of the file C<MASKPATTERN> as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "Это будет интерпретировать каждую строку файла C<MASKPATTERN> как регулярное выражение, переводить соответствующие ему строки и откатывать изменения после обработки. Строки, начинающиеся с C<#>, игнорируются.\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escaped newline.\n",
+      "Сложный шаблон можно записывать на нескольких строках с экранированным обратной косой чертой переводом строки.\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "То, как текст преобразуется при маскировании, можно увидеть с опцией B<--xlate-mask>.\n"
+   ],
+   [
+      "Masking protects markup from being translated. To conceal sensitive strings from the translation service itself, see L</ANONYMIZATION AND TEMPLATES>; both can be used together.\n",
+      "Маскирование защищает разметку от перевода. Чтобы скрыть конфиденциальные строки от самой службы перевода, см. L</ANONYMIZATION AND TEMPLATES>; оба механизма можно использовать совместно.\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "Этот интерфейс является экспериментальным и может измениться в будущем.\n"
+   ],
+   [
+      "Sensitive strings can be concealed before they are sent to the translation API and restored in the output. Three sources of anonymization rules are available: a dictionary file (B<--xlate-anonymize>), inline marks in the document itself (B<--xlate-anonymize-mark>), and YAML front matter values (B<--xlate-frontmatter>). Each string is replaced by a category tag such as C<< <person id=1 /> >> during transmission. The concealment target is API transmission only: local cache files store restored plain text. Use B<--xlate-dryrun> to inspect exactly what would be transmitted.\n",
+      "Конфиденциальные строки можно скрыть до их отправки в API перевода и восстановить в выходных данных. Доступны три источника правил анонимизации: файл словаря (B<--xlate-anonymize>), встроенные пометки в самом документе (B<--xlate-anonymize-mark>) и значения YAML front matter (B<--xlate-frontmatter>). Каждая строка во время передачи заменяется тегом категории, например C<< <person id=1 /> >>. Цель сокрытия — только передача в API: локальные файлы кэша хранят восстановленный обычный текст. Используйте B<--xlate-dryrun>, чтобы проверить, что именно будет передано.\n"
+   ],
+   [
+      "For form documents (quarterly reports and the like), define the actors up front and reference them in the body:\n",
+      "Для документов-форм (квартальных отчетов и т. п.) заранее определите участников и ссылайтесь на них в основном тексте:\n"
+   ],
+   [
+      "Translate the template once per language with C<--xlate-template> (and C<--xlate-frontmatter> when the values are kept in the file), then render each case with B<pandoc-embedz> standalone mode -- values under C<global:> in an external config never reach the translation API at all:\n",
+      "Переведите шаблон один раз для каждого языка с C<--xlate-template> (и C<--xlate-frontmatter>, когда значения сохраняются в файле), затем визуализируйте каждый случай в автономном режиме B<pandoc-embedz> -- значения в C<global:> во внешней конфигурации вообще не попадают в API перевода:\n"
+   ],
+   [
+      "For inline marks, providing a macro definition config makes the same translated template render either the real names or a redacted version:\n",
+      "Для встроенных меток предоставление конфигурации определений макросов позволяет одному и тому же переведенному шаблону отображать либо реальные имена, либо отредактированную версию:\n"
+   ],
+   [
+      "Exclude embedz blocks from translation when a document contains them:\n",
+      "Исключайте блоки embedz из перевода, когда документ их содержит:\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "Запустить процесс перевода для каждой совпавшей области.\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "Без этой опции B<greple> работает как обычная команда поиска. Так вы можете проверить, какая часть файла будет подвергнута переводу, прежде чем запускать фактическую работу.\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "Результат команды выводится в стандартный вывод, поэтому при необходимости перенаправьте в файл или рассмотрите использование модуля L<App::Greple::update>.\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "Опция B<--xlate> вызывает опцию B<--xlate-color> с опцией B<--color=never>.\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "С опцией B<--xlate-fold> преобразованный текст переносится по указанной ширине. Ширина по умолчанию — 70 и может быть задана опцией B<--xlate-fold-width>. Четыре столбца зарезервированы для операции run‑in, поэтому каждая строка может содержать максимум 74 символа.\n"
+   ],
+   [
+      "Specifies the translation engine to be used.\n",
+      "Указывает используемый движок перевода.\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "В настоящее время доступны следующие движки\n"
+   ],
+   [
+      "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
+      "Модули движков сначала ищутся в пространствах имён backend (C<llm>, затем C<gpty>), затем непосредственно в C<App::Greple::xlate>. Поэтому C<gpt5> загружает C<App::Greple::xlate::llm::gpt5>, который вызывает команду C<llm>, тогда как C<gpt4o> откатывается к C<App::Greple::xlate::gpty::gpt4o>. Используйте C<--xlate-setopt backend=gpty>, чтобы принудительно задать конкретный backend.\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "Вместо вызова движка перевода предполагается, что вы выполните работу вручную. После подготовки текста к переводу он копируется в буфер обмена. Ожидается, что вы вставите его в форму, скопируете результат в буфер обмена и нажмёте Enter.\n"
+   ],
+   [
+      "Specify the target language. LLM engines accept any language name or code the model understands; it is interpolated into the translation prompt. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "Укажите целевой язык. Движки LLM принимают любое название языка или код, который понимает модель; оно подставляется в prompt перевода. Доступные языки можно получить командой C<deepl languages> при использовании движка B<DeepL>.\n"
+   ],
+   [
+      "Label used for the original text in C<conflict>, C<colon> and C<ifdef> output formats. With the B<DeepL> engine a non-default value is also passed as the source language.\n",
+      "Метка, используемая для исходного текста в форматах вывода C<conflict>, C<colon> и C<ifdef>. С движком B<DeepL> значение, отличное от значения по умолчанию, также передаётся как исходный язык.\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "Укажите формат вывода для исходного и переведённого текста.\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "Следующие форматы, кроме C<xtxt>, предполагают, что часть для перевода представляет собой набор строк. Фактически возможно переводить только часть строки, но указание формата, отличного от C<xtxt>, не даст осмысленных результатов.\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "Исходный и преобразованный текст выводятся в формате конфликтных маркеров L<git(1)>.\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "Вы можете восстановить исходный файл следующей командой L<sed(1)>.\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "Исходный и переведённый текст выводятся в стиле пользовательского контейнера markdown.\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "Приведённый выше текст будет преобразован в HTML следующим образом.\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "Количество двоеточий по умолчанию — 7. Если указать последовательность двоеточий, такую как C<:::::>, она будет использована вместо 7 двоеточий.\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "Исходный и преобразованный текст выводятся в формате L<cpp(1)> C<#ifdef>.\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "Вы можете получить только японский текст с помощью команды B<unifdef>:\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "Исходный и преобразованный текст выводятся, разделённые одной пустой строкой. Для C<space+> после преобразованного текста также выводится перевод строки.\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "Если формат — C<xtxt> (переведённый текст) или неизвестный, выводится только переведённый текст.\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. The default value 0 means the engine's own limit: for the free DeepL account service that is 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "Укажите максимальную длину текста, отправляемого в API за один раз. Значение по умолчанию 0 означает собственное ограничение движка: для бесплатного сервиса DeepL это 128K для API (B<--xlate>) и 5000 для интерфейса буфера обмена (B<--xlate-labor>). Вы можете изменить эти значения при использовании Pro-сервиса.\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "Укажите максимальное количество строк текста, отправляемых в API за один раз.\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "Установите значение 1, если хотите переводить по одной строке за раз. Этот параметр имеет приоритет над опцией C<--xlate-maxlen>.\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "Укажите пользовательский prompt, который будет отправлен движку перевода. Этот параметр доступен для движков LLM (C<gpt3>, C<gpt4o>, C<gpt5>), но не для DeepL. Вы можете настроить поведение перевода, предоставив конкретные инструкции AI-модели. Если prompt содержит C<%s>, он будет заменен названием целевого языка.\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "Укажите дополнительную контекстную информацию, передаваемую движку перевода. Эту опцию можно указывать несколько раз для передачи нескольких контекстных строк. Контекст помогает движку перевода понимать фон и выдавать более точные переводы.\n"
+   ],
+   [
+      "Number of surrounding translated blocks passed as reference context when re-translating changed blocks (default 2). The context also includes the raw source text around the changed region (headings, list structure, captions) and, when available, the previous version of the changed text recovered from the cache, so that unchanged wording is preserved. Set to 0 to disable context-aware translation entirely. Note that each changed region is translated in its own API call and the context can add up to about 8000 characters to the system prompt, so context-aware translation trades some extra cost for consistency.\n",
+      "Количество окружающих переведенных блоков, передаваемых как справочный контекст при повторном переводе измененных блоков (по умолчанию 2). Контекст также включает исходный текст вокруг измененной области (заголовки, структуру списков, подписи) и, когда доступно, предыдущую версию измененного текста, восстановленную из cache, чтобы неизмененная формулировка сохранялась. Установите 0, чтобы полностью отключить контекстно-зависимый перевод. Обратите внимание, что каждая измененная область переводится в отдельном API-вызове, а контекст может добавить до примерно 8000 символов в system prompt, поэтому контекстно-зависимый перевод обменивает некоторую дополнительную стоимость на согласованность.\n"
+   ],
+   [
+      "Initialize a new document's cache from another document's cache file. Useful for periodic reports: seed the new issue's cache with the previous issue's, so unchanged paragraphs are not re-translated and edited paragraphs keep the previous issue's wording. The seed is used only when the target cache is empty; otherwise it is ignored with a warning. With the default C<--xlate-cache=auto>, specifying a seed also implies creating the new document's cache file.\n",
+      "Инициализируйте cache нового документа из cache-файла другого документа. Полезно для периодических отчетов: заполните cache нового выпуска cache предыдущего выпуска, чтобы неизмененные абзацы не переводились повторно, а отредактированные абзацы сохраняли формулировку предыдущего выпуска. Seed используется только когда целевой cache пуст; иначе он игнорируется с предупреждением. При значении по умолчанию C<--xlate-cache=auto> указание seed также подразумевает создание cache-файла нового документа.\n"
+   ],
+   [
+      "Anonymize sensitive strings before they are sent to the translation API, and restore them in the output. The dictionary file gives one entry per item: in JSON (canonical, machine-generatable)\n",
+      "Анонимизируйте чувствительные строки перед их отправкой в API перевода и восстанавливайте их в выводе. Файл словаря задает по одной записи на элемент: в JSON (канонический, пригодный для машинной генерации)\n"
+   ],
+   [
+      "or in a simple line format (C<category pattern>, C</.../> for regex). Each item is replaced by a category tag such as C<< <person id=1 /> >>; the same string always gets the same tag, so the model can keep track of who is who. Unknown JSON fields are ignored, so generators (e.g. a local LLM extracting entities) may add their own annotations. Category C<lit> is reserved. Local cache files still store restored plain text: the concealment target is API transmission only.\n",
+      "или в простом построчном формате (C<category pattern>, C</.../> для regex). Каждый элемент заменяется тегом категории, таким как C<< <person id=1 /> >>; одна и та же строка всегда получает один и тот же тег, так что модель может отслеживать, кто есть кто. Неизвестные поля JSON игнорируются, поэтому генераторы (например, локальная LLM, извлекающая сущности) могут добавлять собственные аннотации. Категория C<lit> зарезервирована. Локальные cache-файлы по-прежнему хранят восстановленный обычный текст: цель concealment — только передача в API.\n"
+   ],
+   [
+      "A dictionary can be generated by an external tool -- for example a local model extracting sensitive entities:\n",
+      "Словарь может быть сгенерирован внешним инструментом — например, локальной моделью, извлекающей чувствительные сущности:\n"
+   ],
+   [
+      "A UTF-8 BOM in the file is tolerated. Values in the front matter line format may carry a trailing comment only on their own line, not after the value.\n",
+      "UTF-8 BOM в файле допускается. Значения в построчном формате front matter могут иметь завершающий комментарий только в отдельной строке, но не после значения.\n"
+   ],
+   [
+      "Collect anonymization entries from inline marks in the document itself. Mark the first occurrence like C<{{ person(\"山田太郎\") }}> and every occurrence of the string document-wide is anonymized. The mark itself stays in the source and in the translation, so a document can also be processed by a Jinja2-style macro processor (define the C<person> macro to print or redact the name). A custom I<regex> must contain C<< (?<category>...) >> and C<< (?<text>...) >> named captures.\n",
+      "Собирайте записи анонимизации из inline-меток в самом документе. Отметьте первое вхождение как C<{{ person(\"山田太郎\") }}>, и каждое вхождение строки по всему документу будет анонимизировано. Сама метка остается в исходном тексте и в переводе, поэтому документ также может обрабатываться макропроцессором в стиле Jinja2 (определите макрос C<person> для печати или редактирования имени). Пользовательский I<regex> должен содержать именованные захваты C<< (?<category>...) >> и C<< (?<text>...) >>.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-anonymize-mark=> (with a trailing C<=>) when using the default notation.\n",
+      "Обратите внимание, что для опции с необязательным значением, такой как эта, следующий аргумент-файл будет принят за значение: пишите C<--xlate-anonymize-mark=> (с завершающим C<=>) при использовании нотации по умолчанию.\n"
+   ],
+   [
+      "Alternative notations can be configured, for example C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> for C<@@person:NAME@@>-style marks, or an HTML-comment form that stays invisible in rendered Markdown. Mark rules are collected per document: a string marked in one input file is not concealed in another file of the same run (unlike front matter values, which accumulate across files).\n",
+      "Можно настроить альтернативные нотации, например C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> для меток в стиле C<@@person:NAME@@>, или форму HTML-комментария, которая остается невидимой в отрендеренном Markdown. Правила меток собираются для каждого документа: строка, отмеченная в одном входном файле, не скрывается в другом файле того же запуска (в отличие от значений front matter, которые накапливаются между файлами).\n"
+   ],
+   [
+      "Treat template expressions (default: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) as opaque placeholders: instruct the model to copy them unchanged and verify, per block, that the response contains exactly the same expressions, each the same number of times. Their order may change, since translation legitimately reorders them to follow the target language word order. A broken expression aborts the run; the cache is checkpointed and frozen, so nothing paid for is lost.\n",
+      "Обрабатывайте шаблонные выражения (по умолчанию: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) как непрозрачные placeholders: инструктируйте модель копировать их без изменений и проверяйте для каждого блока, что ответ содержит ровно те же выражения, каждое — то же число раз. Их порядок может измениться, поскольку перевод правомерно переставляет их в соответствии с порядком слов целевого языка. Поврежденное выражение прерывает выполнение; кэш сохраняется контрольной точкой и замораживается, так что ничего из оплаченного не теряется.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-template=> (with a trailing C<=>) when using the default notation.\n",
+      "Обратите внимание, что с опцией с необязательным значением, подобной этой, следующий файловый аргумент будет принят за значение: пишите C<--xlate-template=> (с завершающим C<=>) при использовании нотации по умолчанию.\n"
+   ],
+   [
+      "Treat a leading C<---> ... C<---> block as YAML front matter: exclude it from translation and from the phase-2 context slices, and add its flat C<key: value> values to the anonymization rules (category C<var>) as a safety net. With multiple input files the collected values accumulate (erring on the side of concealment).\n",
+      "Обрабатывайте начальный блок C<---> ... C<---> как YAML front matter: исключайте его из перевода и из контекстных срезов фазы 2, а его плоские значения C<key: value> добавляйте в правила анонимизации (категория C<var>) в качестве страховочной меры. При нескольких входных файлах собранные значения накапливаются (с уклоном в сторону сокрытия).\n"
+   ],
+   [
+      "Always leave a blank line after the closing C<--->. With a paragraph-style match pattern, front matter that runs directly into the body text forms one straddling block that the exclusion cannot suppress (a warning is printed in that case); the values are still anonymized, but the front matter itself would be sent for translation.\n",
+      "Всегда оставляйте пустую строку после закрывающего C<--->. При шаблоне сопоставления в стиле абзацев front matter, непосредственно переходящий в основной текст, образует один пересекающий границу блок, который исключение не может подавить (в этом случае выводится предупреждение); значения всё равно анонимизируются, но сам front matter будет отправлен на перевод.\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "Укажите идентификатор глоссария для использования при переводе. Эта опция доступна только при использовании движка DeepL. Идентификатор глоссария должен быть получен в вашем аккаунте DeepL и обеспечивает единообразный перевод специальных терминов.\n"
+   ],
+   [
+      "Do not call the translation API; instead show, through the progress display, each payload exactly as it would be transmitted (after anonymization and masking). Useful for checking what leaves the machine and for estimating the cost of a run.\n",
+      "Не вызывайте API перевода; вместо этого показывайте через индикатор хода выполнения каждую полезную нагрузку ровно в том виде, в каком она была бы передана (после анонимизации и маскирования). Полезно для проверки того, что покидает машину, и для оценки стоимости запуска.\n"
+   ],
+   [
+      "See the translation result in real time in the STDERR output. The C<From> payload is shown as transmitted, after anonymization and masking.\n",
+      "Смотрите результат перевода в реальном времени в выводе STDERR. Полезная нагрузка C<From> показывается в передаваемом виде, после анонимизации и маскирования.\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "Используйте модуль L<App::Greple::stripe> для подсветки совпавших частей в виде зебры. Это полезно, когда совпавшие части идут вплотную друг к другу.\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "Палитра цветов переключается в зависимости от фонового цвета терминала. Если хотите указать явно, используйте B<--xlate-stripe-light> или B<--xlate-stripe-dark>.\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "Выполнить маскирование и вывести преобразованный текст как есть, без восстановления.\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "Установить весь текст файла как целевую область.\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "В форматах C<cm> и C<colon> вывод разбивается и форматируется построчно. Поэтому, если требуется перевести только часть строки, ожидаемый результат получить нельзя. Эти фильтры исправляют вывод, искажённый переводом части строки, приводя его к нормальному построчному виду.\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "В текущей реализации, если переводятся несколько частей одной строки, они выводятся как независимые строки.\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "Модуль B<xlate> может кэшировать переводы для каждого файла и читать их перед выполнением, чтобы устранить накладные расходы на обращение к серверу. С стратегией кэширования по умолчанию C<auto> кэш поддерживается только если для целевого файла существует кэш-файл.\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "Используйте B<--xlate-cache=clear> для инициализации управления кэшем или очистки всех существующих кэш-данных. После выполнения с этой опцией новый кэш-файл будет создан, если его ещё нет, и впоследствии будет автоматически поддерживаться.\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "Поддерживать кэш-файл, если он существует.\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "Создать пустой кэш-файл и выйти.\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "В любом случае поддерживать кеш, если целевой объект — обычный файл.\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "Сначала очистите данные кеша.\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "Никогда не используйте файл кеша, даже если он существует.\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "По умолчанию неиспользуемые данные удаляются из файла кеша. Если вы не хотите их удалять и хотите сохранить в файле, используйте C<accumulate>.\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "Эта опция принудительно обновляет файл кеша, даже если в этом нет необходимости.\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "Вы можете легко использовать этот модуль из командной строки с помощью команды C<xlate>, включенной в дистрибутив. См. страницу руководства C<xlate> для использования.\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "Команда C<xlate> поддерживает длинные параметры в стиле GNU, такие как C<--to-lang>, C<--from-lang>, C<--engine> и C<--file>. Используйте C<xlate -h> для просмотра всех доступных параметров.\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "Команда C<xlate> работает совместно со средой Docker, поэтому, даже если у вас ничего не установлено, вы можете использовать её при наличии Docker. Используйте опцию C<-D> или C<-C>.\n"
+   ],
+   [
+      "Docker operations are handled by L<App::dozo>, which can also be used as a standalone command. The C<dozo> command supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "Операции Docker обрабатываются с помощью L<App::dozo>, который также можно использовать как самостоятельную команду. Команда C<dozo> поддерживает конфигурационный файл C<.dozorc> для постоянных настроек контейнера.\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "Кроме того, поскольку предоставлены makefile-файлы для различных стилей документов, перевод на другие языки возможен без специальной настройки. Используйте опцию C<-M>.\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "Вы также можете комбинировать опции Docker и C<make>, чтобы запускать C<make> в среде Docker.\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "Запуск вида C<xlate -C> откроет оболочку с примонтированным текущим рабочим репозиторием git.\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "Подробности см. в японской статье в разделе L</SEE ALSO>.\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "Загрузите файл F<xlate.el>, включённый в репозиторий, чтобы использовать команду C<xlate> из редактора Emacs. Функция C<xlate-region> переводит заданный регион. Язык по умолчанию — C<EN-US>, а язык можно указать, вызывая её с префиксным аргументом.\n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "Установите свой ключ аутентификации для сервиса DeepL.\n"
+   ],
+   [
+      "OpenAI authentication key, used by the legacy B<gpty> engines. The C<llm>-based B<gpt5> engine reads this variable too, but keys stored with C<llm keys set openai> also work.\n",
+      "Ключ аутентификации OpenAI, используемый устаревшими движками B<gpty>. Движок B<gpt5> на базе C<llm> также считывает эту переменную, но ключи, сохранённые с помощью C<llm keys set openai>, тоже работают.\n"
+   ],
+   [
+      "Set the default cache strategy (see L</CACHE OPTIONS>).\n",
+      "Установите стратегию кэша по умолчанию (см. L</CACHE OPTIONS>).\n"
+   ],
+   [
+      "Install the command line tool for the engine you use: C<llm> for the B<gpt5> engine, C<deepl> for DeepL, C<gpty> for the legacy GPT engines.\n",
+      "Установите инструмент командной строки для используемого вами движка: C<llm> для движка B<gpt5>, C<deepl> для DeepL, C<gpty> для устаревших движков GPT.\n"
+   ],
+   [
+      "L<https://llm.datasette.io/>\n",
+      "L<https://llm.datasette.io/>\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n"
+   ],
+   [
+      "L<App::dozo> - Generic Docker runner used by xlate for container operations\n",
+      "L<App::dozo> — универсальный запускатель Docker, используемый xlate для операций с контейнерами\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "См. руководство B<greple> для подробностей о целевом шаблоне текста. Используйте опции B<--inside>, B<--outside>, B<--include>, B<--exclude> для ограничения области сопоставления.\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "Вы можете использовать модуль C<-Mupdate> для изменения файлов по результатам команды B<greple>.\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "Используйте B<sdif> для отображения формата маркера конфликта рядом с опцией B<-V>.\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "Модуль Greple B<stripe> используется опцией B<--xlate-stripe>.\n"
+   ],
+   [
+      "Docker container image.\n",
+      "Образ контейнера Docker.\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> script and L<App::dozo>.\n",
+      "Библиотека C<getoptlong.sh>, используемая для разбора опций в скрипте C<xlate> и L<App::dozo>.\n"
+   ],
+   [
+      "The C<llm> command used by the B<gpt5> engine to access LLM models.\n",
+      "Команда C<llm>, используемая движком B<gpt5> для доступа к моделям LLM.\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "Библиотека DeepL на Python и утилита CLI.\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "Библиотека OpenAI для Python\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "Интерфейс командной строки OpenAI\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "Модуль Greple для перевода и замены только необходимых частей с помощью API DeepL (на японском)\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "Генерация документов на 15 языках с модулем API DeepL (на японском)\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "Среда Docker для автоматического перевода с API DeepL (на японском)\n"
+   ]
+]

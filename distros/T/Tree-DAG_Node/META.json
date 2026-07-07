@@ -69,6 +69,6 @@
          "web" : "https://github.com/ronsavage/Tree-DAG_Node"
       }
    },
-   "version" : "1.37",
+   "version" : "1.38",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -11,5 +11,5 @@ test:
     Encode: '1.9801'
 configure:
   requires:
-    Devel::AssertC99: 0
+    ExtUtils::CBuilder: 0
     Devel::PPPort: 0

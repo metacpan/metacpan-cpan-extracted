@@ -1,5 +1,45 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.19    2026-07-06
+    - Fix mass CPAN tester FAILs on OpenBSD (29 of 32 reports for 1.18): the
+      smoker host's 10 SysV semaphore-set slots (kern.seminfo.semmni=10) were
+      pre-exhausted by stale sets leaked from previously crashed runs, so
+      nearly every tie died with semget ENOSPC ("Could not create semaphore
+      set: No space left on device"), and each failing run leaked further
+      resources
+    - _tie(): an IPC_PRIVATE segment is now removed when semaphore-set
+      creation (or the initial lock) fails. shmget(IPC_PRIVATE) always
+      creates a fresh segment regardless of the 'create' attribute, and a
+      private segment is unreachable by key after the croak, so it leaked
+      invisibly (~4 segments per failed suite run on the wedged smoker)
+    - clean_up_testing(): added a second pass that reclaims orphaned
+      testing-tagged semaphore sets whose segment is already gone; these pin
+      a SEMMNI slot forever and were invisible to the ipcs -m based scan.
+      New regression test t/82-stale-ipc-reclaim.t
+    - t/00-base.t: reclaim a stale async_tests pair by name (pre-1.18
+      leftovers have 4-slot, unmarked semaphore sets that clean_up_testing()
+      cannot prove ownership of), and make the end-of-file segment count
+      adaptive for the attach case, fixing the off-by-one failure when a
+      stale async_tests segment existed
+    - t/IPCShareableTest.pm: added free_sem_sets() and
+      require_free_sem_sets($n) (default 8); the 26 tie-heavy test files
+      that FAILed on the wedged smoker now skip_all cleanly when the host
+      lacks free semaphore sets, instead of croaking mid-run and leaking
+    - t/24-lock_fork_blocking.t: replace the fixed 0.28s lock-wait floor
+      with one computed from when the parent actually issued the lock call;
+      on loaded smokers the parent could be descheduled past the child's
+      0.3s hold window, failing with waits of 0.000s (seen on Linux testers)
+    - t/19-lock_recursive.t: hold locks until the probing process signals
+      its LOCK_NB probes are done (second pipe), instead of for a fixed
+      0.3s/0.5s window; the FreeBSD 15 tester FAILs for 1.18 ("3-level:
+      level-2 grandchild LOCK_EX|LOCK_NB blocked") were this race
+    - t/20-lock_operation.t: replace the create-3-probe-sets resource check
+      with require_free_sem_sets(); the old probe's skip path still exited
+      255 on resource-starved smokers, and consumed scarce sets to probe
+    - sysv_info(): recognize MidnightBSD and NetBSD (kern.ipc sysctls, both
+      ':' and '=' output separators); NetBSD's semmni also defaults to 10,
+      so the test suite's free-set guard now activates there too
+
 1.18    2026-06-08
     - Fix intermittent CPAN failures under parallel smokers, which assumed
       exclusive use of System V IPC. Added t/IPCShareableTest.pm (unique_glue,

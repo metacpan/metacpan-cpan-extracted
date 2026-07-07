@@ -69,7 +69,7 @@ our %EXPORT_TAGS = (
     private => _export_private(),
 );
 
-our $VERSION = '1.14';
+our $VERSION = '1.16';
 
 use constant {
     CONFIG_FILE         => 'dist-mgr.json',
@@ -499,7 +499,7 @@ sub move_distribution_files {
     my @move_count = rmove_glob("$module_dir/*", '.')
         or croak("Can't move files from the '$module_dir' directory: $!");
 
-    my $dist_count = _default_distribution_file_count();
+    my $dist_count = _default_distribution_file_count($module);
 
     for my $outer_idx (0..$#move_count) {
         my $outer = $move_count[$outer_idx];
@@ -772,10 +772,21 @@ sub _default_distribution_file_count {
     # Returns the file count in a distribution
     # This is used to ensure everything moved OK
 
+    my ($module) = @_;
+
+    # The lib/ tree depth grows with the module's namespace depth
+    # (eg. Foo::Bar::Baz => lib/Foo/Bar/Baz.pm), so derive that entry's
+    # file/dir counts from the number of name components. For a module
+    # with N components, moving lib/ reports [N + 1, N, 0]. Accept either
+    # the '::' module form or the '-' distribution form for the count.
+
+    my @parts = defined $module ? split /::|-/, $module : ('Foo', 'Bar');
+    my $depth = scalar @parts;
+
     return [
         [ [1, 0, 0] ],
         [ [1, 0, 0] ],
-        [ [3, 2, 0] ],
+        [ [$depth + 1, $depth, 0] ],
         [ [1, 0, 0] ],
         [ [1, 0, 0] ],
         [ [1, 0, 0] ],

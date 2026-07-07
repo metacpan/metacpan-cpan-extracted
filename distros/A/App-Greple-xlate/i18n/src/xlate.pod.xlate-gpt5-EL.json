@@ -1,0 +1,470 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - μονάδα υποστήριξης μετάφρασης για το greple\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.5 (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
+      "B<Greple> B<xlate> το module βρίσκει τα επιθυμητά μπλοκ κειμένου και τα αντικαθιστά με το μεταφρασμένο κείμενο. Η κύρια μηχανή είναι το GPT-5.5 (F<llm/gpt5.pm>), το οποίο καλεί την εντολή L<llm|https://llm.datasette.io/>· περιλαμβάνονται επίσης το DeepL (F<deepl.pm>) και παλαιότερες μηχανές βασισμένες σε B<gpty>.\n"
+   ],
+   [
+      "Translations are cached per file, so re-running a command costs nothing for unchanged text. When a document is edited, only the changed paragraphs are sent to the API again; a context-aware engine also receives the surrounding translations, the raw source text around the change, and the previous version of the edited paragraph, so the new translation keeps the established wording (see B<--xlate-context-window>). Sensitive strings can be concealed before transmission (see L</ANONYMIZATION AND TEMPLATES>).\n",
+      "Οι μεταφράσεις αποθηκεύονται στην κρυφή μνήμη ανά αρχείο, έτσι η επανεκτέλεση μιας εντολής δεν κοστίζει τίποτα για αμετάβλητο κείμενο. Όταν ένα έγγραφο επεξεργάζεται, μόνο οι αλλαγμένες παράγραφοι αποστέλλονται ξανά στο API· μια μηχανή με επίγνωση συμφραζομένων λαμβάνει επίσης τις περιβάλλουσες μεταφράσεις, το ακατέργαστο κείμενο πηγής γύρω από την αλλαγή και την προηγούμενη έκδοση της επεξεργασμένης παραγράφου, ώστε η νέα μετάφραση να διατηρεί την καθιερωμένη διατύπωση (βλ. B<--xlate-context-window>). Ευαίσθητες συμβολοσειρές μπορούν να αποκρυφθούν πριν από τη μετάδοση (βλ. L</ANONYMIZATION AND TEMPLATES>).\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<--xlate-engine gpt5> and C<perl> module like this:\n",
+      "Αν θέλετε να μεταφράσετε κανονικά μπλοκ κειμένου σε ένα έγγραφο γραμμένο στο στυλ pod της Perl, χρησιμοποιήστε την εντολή B<greple> με C<--xlate-engine gpt5> και το module C<perl> ως εξής:\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "Σε αυτή την εντολή, η συμβολοσειρά μοτίβου C<^([\\w\\pP].*\\n)+> σημαίνει διαδοχικές γραμμές που αρχίζουν με αλφαριθμητικό και σημείο στίξης. Αυτή η εντολή εμφανίζει την περιοχή προς μετάφραση με επισήμανση. Η επιλογή B<--all> χρησιμοποιείται για την παραγωγή ολόκληρου του κειμένου.\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the translation engine's output.\n",
+      "Έπειτα προσθέστε την επιλογή C<--xlate> για να μεταφράσετε την επιλεγμένη περιοχή. Τότε, θα βρει τα επιθυμητά τμήματα και θα τα αντικαταστήσει με την έξοδο της μηχανής μετάφρασης.\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "Από προεπιλογή, το αρχικό και το μεταφρασμένο κείμενο εκτυπώνεται σε μορφή \"conflict marker\" συμβατή με το L<git(1)>. Χρησιμοποιώντας τη μορφή C<ifdef>, μπορείτε να λάβετε το επιθυμητό μέρος εύκολα με την εντολή L<unifdef(1)>. Η μορφή εξόδου μπορεί να καθοριστεί με την επιλογή B<--xlate-format>.\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "Αν θέλετε να μεταφράσετε ολόκληρο το κείμενο, χρησιμοποιήστε την επιλογή B<--match-all>. Αυτό είναι μια συντόμευση για να καθορίσετε το μοτίβο C<(?s).+> που ταιριάζει σε ολόκληρο το κείμενο.\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "Τα δεδομένα σε μορφή conflict marker μπορούν να προβληθούν σε διάταξη δίπλα-δίπλα με την εντολή L<sdif|App::sdif> και την επιλογή C<-V>. Εφόσον δεν έχει νόημα η σύγκριση σε βάση ανά-συμβολοσειρά, συνιστάται η επιλογή C<--no-cdif>. Αν δεν χρειάζεται να χρωματίσετε το κείμενο, καθορίστε C<--no-textcolor> (ή C<--no-tc>).\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "Η επεξεργασία γίνεται σε καθορισμένες μονάδες, αλλά στην περίπτωση ακολουθίας πολλαπλών γραμμών μη κενoύ κειμένου, αυτές μετατρέπονται μαζί σε μία μόνο γραμμή. Η λειτουργία εκτελείται ως εξής:\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "Αφαιρέστε τα κενά στην αρχή και στο τέλος κάθε γραμμής.\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "Αν μια γραμμή τελειώνει με χαρακτήρα σημείου στίξης πλήρους πλάτους, συγκολλήστε με την επόμενη γραμμή.\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "Αν μια γραμμή τελειώνει με χαρακτήρα πλήρους πλάτους και η επόμενη γραμμή αρχίζει με χαρακτήρα πλήρους πλάτους, συγκολλήστε τις γραμμές.\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "Αν είτε το τέλος είτε η αρχή μιας γραμμής δεν είναι χαρακτήρας πλήρους πλάτους, συγκολλήστε τις εισάγοντας έναν χαρακτήρα κενού.\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "Τα δεδομένα cache διαχειρίζονται βάσει του κανονικοποιημένου κειμένου, επομένως ακόμη κι αν γίνουν τροποποιήσεις που δεν επηρεάζουν τα αποτελέσματα κανονικοποίησης, τα αποθηκευμένα δεδομένα μετάφρασης θα παραμείνουν αποτελεσματικά.\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "Αυτή η διαδικασία κανονικοποίησης εκτελείται μόνο για το πρώτο (0ό) και τα ζυγά μοτίβα. Έτσι, αν καθοριστούν δύο μοτίβα ως εξής, το κείμενο που ταιριάζει με το πρώτο μοτίβο θα υποβληθεί σε επεξεργασία μετά την κανονικοποίηση, και δεν θα εκτελεστεί διαδικασία κανονικοποίησης στο κείμενο που ταιριάζει με το δεύτερο μοτίβο.\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "Επομένως, χρησιμοποιήστε το πρώτο μοτίβο για κείμενο που πρόκειται να υποβληθεί σε επεξεργασία συνδυάζοντας πολλές γραμμές σε μία μόνο γραμμή, και χρησιμοποιήστε το δεύτερο μοτίβο για προ-μορφοποιημένο κείμενο. Αν δεν υπάρχει κείμενο που να ταιριάζει στο πρώτο μοτίβο, χρησιμοποιήστε ένα μοτίβο που δεν ταιριάζει με τίποτα, όπως το C<(?!)>.\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "Περιστασιακά, υπάρχουν τμήματα κειμένου που δεν θέλετε να μεταφραστούν. Για παράδειγμα, ετικέτες σε αρχεία markdown. Η DeepL προτείνει ότι σε τέτοιες περιπτώσεις, το τμήμα του κειμένου που θα αποκλειστεί να μετατραπεί σε ετικέτες XML, να μεταφραστεί και στη συνέχεια να αποκατασταθεί μετά την ολοκλήρωση της μετάφρασης. Για να υποστηριχθεί αυτό, είναι δυνατό να καθοριστούν τα τμήματα που θα καλυφθούν (masked) από τη μετάφραση.\n"
+   ],
+   [
+      "This will interpret each line of the file C<MASKPATTERN> as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "Αυτό θα ερμηνεύσει κάθε γραμμή του αρχείου C<MASKPATTERN> ως κανονική έκφραση, θα μεταφράσει τις συμβολοσειρές που την αντιστοιχούν και θα επανέλθει μετά την επεξεργασία. Γραμμές που αρχίζουν με C<#> αγνοούνται.\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escaped newline.\n",
+      "Μπορεί να γραφτεί σύνθετο μοτίβο σε πολλές γραμμές με newline διαφυγμένο με ανάστροφη κάθετο.\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "Το πώς μετασχηματίζεται το κείμενο μέσω masking μπορεί να φανεί με την επιλογή B<--xlate-mask>.\n"
+   ],
+   [
+      "Masking protects markup from being translated. To conceal sensitive strings from the translation service itself, see L</ANONYMIZATION AND TEMPLATES>; both can be used together.\n",
+      "Το masking προστατεύει τη σήμανση από τη μετάφραση. Για να αποκρύψετε ευαίσθητες συμβολοσειρές από την ίδια την υπηρεσία μετάφρασης, δείτε L</ANONYMIZATION AND TEMPLATES>· και τα δύο μπορούν να χρησιμοποιηθούν μαζί.\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "Αυτό το περιβάλλον διεπαφής είναι πειραματικό και ενδέχεται να αλλάξει στο μέλλον.\n"
+   ],
+   [
+      "Sensitive strings can be concealed before they are sent to the translation API and restored in the output. Three sources of anonymization rules are available: a dictionary file (B<--xlate-anonymize>), inline marks in the document itself (B<--xlate-anonymize-mark>), and YAML front matter values (B<--xlate-frontmatter>). Each string is replaced by a category tag such as C<< <person id=1 /> >> during transmission. The concealment target is API transmission only: local cache files store restored plain text. Use B<--xlate-dryrun> to inspect exactly what would be transmitted.\n",
+      "Τα ευαίσθητα strings μπορούν να αποκρύπτονται πριν σταλούν στο translation API και να αποκαθίστανται στην έξοδο. Διατίθενται τρεις πηγές κανόνων ανωνυμοποίησης: ένα αρχείο dictionary (B<--xlate-anonymize>), inline marks στο ίδιο το έγγραφο (B<--xlate-anonymize-mark>), και τιμές YAML front matter (B<--xlate-frontmatter>). Κάθε string αντικαθίσταται από ένα category tag όπως C<< <person id=1 /> >> κατά τη μετάδοση. Ο στόχος απόκρυψης είναι μόνο η μετάδοση API: τα τοπικά cache files αποθηκεύουν αποκατεστημένο plain text. Χρησιμοποιήστε B<--xlate-dryrun> για να ελέγξετε ακριβώς τι θα μεταδιδόταν.\n"
+   ],
+   [
+      "For form documents (quarterly reports and the like), define the actors up front and reference them in the body:\n",
+      "Για έγγραφα φόρμας (τριμηνιαίες αναφορές και παρόμοια), ορίστε τους actors εκ των προτέρων και αναφερθείτε σε αυτούς στο σώμα:\n"
+   ],
+   [
+      "Translate the template once per language with C<--xlate-template> (and C<--xlate-frontmatter> when the values are kept in the file), then render each case with B<pandoc-embedz> standalone mode -- values under C<global:> in an external config never reach the translation API at all:\n",
+      "Μεταφράστε το template μία φορά ανά γλώσσα με C<--xlate-template> (και C<--xlate-frontmatter> όταν οι τιμές διατηρούνται στο αρχείο), έπειτα αποδώστε κάθε περίπτωση με τη standalone λειτουργία B<pandoc-embedz> -- οι τιμές κάτω από C<global:> σε εξωτερικό config δεν φτάνουν ποτέ καθόλου στο translation API:\n"
+   ],
+   [
+      "For inline marks, providing a macro definition config makes the same translated template render either the real names or a redacted version:\n",
+      "Για inline marks, η παροχή ενός config ορισμού macro κάνει το ίδιο μεταφρασμένο template να αποδίδει είτε τα πραγματικά ονόματα είτε μια redacted έκδοση:\n"
+   ],
+   [
+      "Exclude embedz blocks from translation when a document contains them:\n",
+      "Εξαιρέστε τα μπλοκ embedz από τη μετάφραση όταν ένα έγγραφο τα περιέχει:\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "Εκκινεί τη διαδικασία μετάφρασης για κάθε ταιριασμένη περιοχή.\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "Χωρίς αυτήν την επιλογή, το B<greple> συμπεριφέρεται ως κανονική εντολή αναζήτησης. Έτσι μπορείτε να ελέγξετε ποιο μέρος του αρχείου θα αποτελέσει αντικείμενο μετάφρασης πριν εκκινήσετε την πραγματική εργασία.\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "Το αποτέλεσμα της εντολής πηγαίνει στο standard out, οπότε κάντε ανακατεύθυνση σε αρχείο αν χρειάζεται, ή σκεφτείτε να χρησιμοποιήσετε το module L<App::Greple::update>.\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "Η επιλογή B<--xlate> καλεί την επιλογή B<--xlate-color> με την επιλογή B<--color=never>.\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "Με την επιλογή B<--xlate-fold>, το μετατρεπόμενο κείμενο διπλώνεται στο καθορισμένο πλάτος. Το προεπιλεγμένο πλάτος είναι 70 και μπορεί να οριστεί με την επιλογή B<--xlate-fold-width>. Τέσσερις στήλες δεσμεύονται για λειτουργία run-in, οπότε κάθε γραμμή μπορεί να χωρέσει το πολύ 74 χαρακτήρες.\n"
+   ],
+   [
+      "Specifies the translation engine to be used.\n",
+      "Καθορίζει τη μηχανή μετάφρασης που θα χρησιμοποιηθεί.\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "Αυτή τη στιγμή, οι ακόλουθες μηχανές είναι διαθέσιμες\n"
+   ],
+   [
+      "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
+      "Οι μονάδες μηχανής αναζητούνται πρώτα στους χώρους ονομάτων backend (C<llm>, έπειτα C<gpty>), και στη συνέχεια απευθείας κάτω από το C<App::Greple::xlate>. Έτσι, το C<gpt5> φορτώνει το C<App::Greple::xlate::llm::gpt5> που καλεί την εντολή C<llm>, ενώ το C<gpt4o> επιστρέφει εφεδρικά στο C<App::Greple::xlate::gpty::gpt4o>. Χρησιμοποιήστε το C<--xlate-setopt backend=gpty> για να επιβάλετε ένα συγκεκριμένο backend.\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "Αντί να καλέσετε μηχανή μετάφρασης, αναμένεται να εργαστείτε χειροκίνητα. Αφού προετοιμάσετε το κείμενο προς μετάφραση, αντιγράφεται στο πρόχειρο. Αναμένεται να το επικολλήσετε στη φόρμα, να αντιγράψετε το αποτέλεσμα στο πρόχειρο και να πατήσετε return.\n"
+   ],
+   [
+      "Specify the target language. LLM engines accept any language name or code the model understands; it is interpolated into the translation prompt. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "Καθορίστε τη γλώσσα-στόχο. Οι μηχανές LLM δέχονται οποιοδήποτε όνομα ή κωδικό γλώσσας κατανοεί το μοντέλο· παρεμβάλλεται στο prompt μετάφρασης. Μπορείτε να λάβετε τις διαθέσιμες γλώσσες με την εντολή C<deepl languages> όταν χρησιμοποιείτε τη μηχανή B<DeepL>.\n"
+   ],
+   [
+      "Label used for the original text in C<conflict>, C<colon> and C<ifdef> output formats. With the B<DeepL> engine a non-default value is also passed as the source language.\n",
+      "Ετικέτα που χρησιμοποιείται για το αρχικό κείμενο στις μορφές εξόδου C<conflict>, C<colon> και C<ifdef>. Με τη μηχανή B<DeepL>, μια μη προεπιλεγμένη τιμή μεταβιβάζεται επίσης ως γλώσσα προέλευσης.\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "Καθορίστε τη μορφή εξόδου για το αρχικό και το μεταφρασμένο κείμενο.\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "Οι ακόλουθες μορφές εκτός από το C<xtxt> υποθέτουν ότι το τμήμα προς μετάφραση είναι μια συλλογή γραμμών. Στην πράξη, είναι δυνατό να μεταφραστεί μόνο ένα μέρος μιας γραμμής, αλλά ο καθορισμός μορφής διαφορετικής από το C<xtxt> δεν θα παράγει ουσιαστικά αποτελέσματα.\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "Το αρχικό και το μετατρεπόμενο κείμενο εκτυπώνονται σε μορφή conflict marker του L<git(1)>.\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "Μπορείτε να ανακτήσετε το αρχικό αρχείο με την επόμενη εντολή L<sed(1)>.\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "Το αρχικό και το μεταφρασμένο κείμενο εξάγονται σε στυλ custom container του markdown.\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "Το παραπάνω κείμενο θα μετατραπεί ως εξής σε HTML.\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "Ο αριθμός των άνω και κάτω τελειών είναι 7 από προεπιλογή. Αν καθορίσετε ακολουθία άνω και κάτω τελειών όπως C<:::::>, αυτή χρησιμοποιείται αντί για 7 άνω και κάτω τελείες.\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "Το αρχικό και το μετατρεπόμενο κείμενο εκτυπώνονται σε μορφή L<cpp(1)> C<#ifdef>.\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "Μπορείτε να ανακτήσετε μόνο το ιαπωνικό κείμενο με την εντολή B<unifdef>:\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "Το αρχικό και το μετατρεπόμενο κείμενο εκτυπώνονται χωρισμένα από μια κενή γραμμή. Για το C<space+>, εξάγει επίσης μια αλλαγή γραμμής μετά το μετατρεπόμενο κείμενο.\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "Αν η μορφή είναι C<xtxt> (μεταφρασμένο κείμενο) ή άγνωστη, εκτυπώνεται μόνο το μεταφρασμένο κείμενο.\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. The default value 0 means the engine's own limit: for the free DeepL account service that is 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "Καθορίστε το μέγιστο μήκος κειμένου που θα αποστέλλεται στο API κάθε φορά. Η προεπιλεγμένη τιμή 0 σημαίνει το ίδιο το όριο της μηχανής: για τον δωρεάν λογαριασμό DeepL αυτό είναι 128K για το API (B<--xlate>) και 5000 για τη διεπαφή προχείρου (B<--xlate-labor>). Ίσως μπορείτε να αλλάξετε αυτές τις τιμές αν χρησιμοποιείτε την υπηρεσία Pro.\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "Καθορίστε το μέγιστο πλήθος γραμμών κειμένου που θα αποστέλλεται στο API κάθε φορά.\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "Ορίστε αυτήν την τιμή σε 1 αν θέλετε να μεταφράζετε μία γραμμή κάθε φορά. Αυτή η επιλογή υπερισχύει της επιλογής C<--xlate-maxlen>.\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "Καθορίστε μια προσαρμοσμένη προτροπή που θα σταλεί στη μηχανή μετάφρασης. Αυτή η επιλογή είναι διαθέσιμη για τις μηχανές LLM (C<gpt3>, C<gpt4o>, C<gpt5>) αλλά όχι για το DeepL. Μπορείτε να προσαρμόσετε τη συμπεριφορά μετάφρασης παρέχοντας συγκεκριμένες οδηγίες στο μοντέλο AI. Αν η προτροπή περιέχει C<%s>, θα αντικατασταθεί με το όνομα της γλώσσας-στόχου.\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "Καθορίστε πρόσθετες πληροφορίες συμφραζομένων που θα σταλούν στη μηχανή μετάφρασης. Αυτή η επιλογή μπορεί να χρησιμοποιηθεί πολλές φορές για να δοθούν πολλαπλές συμβολοσειρές συμφραζομένων. Οι πληροφορίες συμφραζομένων βοηθούν τη μηχανή μετάφρασης να κατανοήσει το υπόβαθρο και να παράγει πιο ακριβείς μεταφράσεις.\n"
+   ],
+   [
+      "Number of surrounding translated blocks passed as reference context when re-translating changed blocks (default 2). The context also includes the raw source text around the changed region (headings, list structure, captions) and, when available, the previous version of the changed text recovered from the cache, so that unchanged wording is preserved. Set to 0 to disable context-aware translation entirely. Note that each changed region is translated in its own API call and the context can add up to about 8000 characters to the system prompt, so context-aware translation trades some extra cost for consistency.\n",
+      "Αριθμός των γύρω μεταφρασμένων μπλοκ που περνούν ως συμφραζόμενα αναφοράς κατά την επαναμετάφραση αλλαγμένων μπλοκ (προεπιλογή 2). Τα συμφραζόμενα περιλαμβάνουν επίσης το ακατέργαστο πηγαίο κείμενο γύρω από την αλλαγμένη περιοχή (επικεφαλίδες, δομή λίστας, λεζάντες) και, όταν είναι διαθέσιμη, την προηγούμενη έκδοση του αλλαγμένου κειμένου που ανακτήθηκε από την cache, ώστε να διατηρείται η αμετάβλητη διατύπωση. Ορίστε σε 0 για να απενεργοποιήσετε πλήρως τη μετάφραση με επίγνωση συμφραζομένων. Σημειώστε ότι κάθε αλλαγμένη περιοχή μεταφράζεται στη δική της κλήση API και τα συμφραζόμενα μπορούν να προσθέσουν έως περίπου 8000 χαρακτήρες στην προτροπή συστήματος, επομένως η μετάφραση με επίγνωση συμφραζομένων ανταλλάσσει κάποιο επιπλέον κόστος με συνέπεια.\n"
+   ],
+   [
+      "Initialize a new document's cache from another document's cache file. Useful for periodic reports: seed the new issue's cache with the previous issue's, so unchanged paragraphs are not re-translated and edited paragraphs keep the previous issue's wording. The seed is used only when the target cache is empty; otherwise it is ignored with a warning. With the default C<--xlate-cache=auto>, specifying a seed also implies creating the new document's cache file.\n",
+      "Αρχικοποιήστε την cache ενός νέου εγγράφου από το αρχείο cache άλλου εγγράφου. Χρήσιμο για περιοδικές αναφορές: τροφοδοτήστε την cache του νέου τεύχους με εκείνη του προηγούμενου τεύχους, ώστε οι αμετάβλητες παράγραφοι να μην επαναμεταφράζονται και οι επεξεργασμένες παράγραφοι να διατηρούν τη διατύπωση του προηγούμενου τεύχους. Το seed χρησιμοποιείται μόνο όταν η cache-στόχος είναι κενή· διαφορετικά αγνοείται με προειδοποίηση. Με το προεπιλεγμένο C<--xlate-cache=auto>, ο καθορισμός seed συνεπάγεται επίσης τη δημιουργία του αρχείου cache του νέου εγγράφου.\n"
+   ],
+   [
+      "Anonymize sensitive strings before they are sent to the translation API, and restore them in the output. The dictionary file gives one entry per item: in JSON (canonical, machine-generatable)\n",
+      "Ανωνυμοποιήστε ευαίσθητες συμβολοσειρές πριν σταλούν στο API μετάφρασης και επαναφέρετέ τες στην έξοδο. Το αρχείο λεξικού δίνει μία καταχώριση ανά στοιχείο: σε JSON (κανονική, παραγώγιμη από μηχανή)\n"
+   ],
+   [
+      "or in a simple line format (C<category pattern>, C</.../> for regex). Each item is replaced by a category tag such as C<< <person id=1 /> >>; the same string always gets the same tag, so the model can keep track of who is who. Unknown JSON fields are ignored, so generators (e.g. a local LLM extracting entities) may add their own annotations. Category C<lit> is reserved. Local cache files still store restored plain text: the concealment target is API transmission only.\n",
+      "ή σε απλή μορφή γραμμής (C<category pattern>, C</.../> για regex). Κάθε στοιχείο αντικαθίσταται από μια ετικέτα κατηγορίας όπως C<< <person id=1 /> >>· η ίδια συμβολοσειρά λαμβάνει πάντα την ίδια ετικέτα, ώστε το μοντέλο να μπορεί να παρακολουθεί ποιος είναι ποιος. Άγνωστα πεδία JSON αγνοούνται, επομένως γεννήτριες (π.χ. ένα τοπικό LLM που εξάγει οντότητες) μπορούν να προσθέτουν τις δικές τους επισημάνσεις. Η κατηγορία C<lit> είναι δεσμευμένη. Τα τοπικά αρχεία cache εξακολουθούν να αποθηκεύουν επαναφερμένο απλό κείμενο: ο στόχος της απόκρυψης είναι μόνο η μετάδοση API.\n"
+   ],
+   [
+      "A dictionary can be generated by an external tool -- for example a local model extracting sensitive entities:\n",
+      "Ένα λεξικό μπορεί να παραχθεί από εξωτερικό εργαλείο -- για παράδειγμα ένα τοπικό μοντέλο που εξάγει ευαίσθητες οντότητες:\n"
+   ],
+   [
+      "A UTF-8 BOM in the file is tolerated. Values in the front matter line format may carry a trailing comment only on their own line, not after the value.\n",
+      "Ένα UTF-8 BOM στο αρχείο γίνεται ανεκτό. Οι τιμές στη μορφή γραμμής front matter μπορούν να φέρουν τελικό σχόλιο μόνο στη δική τους γραμμή, όχι μετά την τιμή.\n"
+   ],
+   [
+      "Collect anonymization entries from inline marks in the document itself. Mark the first occurrence like C<{{ person(\"山田太郎\") }}> and every occurrence of the string document-wide is anonymized. The mark itself stays in the source and in the translation, so a document can also be processed by a Jinja2-style macro processor (define the C<person> macro to print or redact the name). A custom I<regex> must contain C<< (?<category>...) >> and C<< (?<text>...) >> named captures.\n",
+      "Συλλέξτε καταχωρίσεις ανωνυμοποίησης από inline marks στο ίδιο το έγγραφο. Επισημάνετε την πρώτη εμφάνιση όπως C<{{ person(\"山田太郎\") }}> και κάθε εμφάνιση της συμβολοσειράς σε όλο το έγγραφο ανωνυμοποιείται. Το ίδιο το mark παραμένει στην πηγή και στη μετάφραση, ώστε ένα έγγραφο να μπορεί επίσης να υποβληθεί σε επεξεργασία από έναν macro processor τύπου Jinja2 (ορίστε τη macro C<person> ώστε να εκτυπώνει ή να αποκρύπτει το όνομα). Ένα προσαρμοσμένο I<regex> πρέπει να περιέχει named captures C<< (?<category>...) >> και C<< (?<text>...) >>.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-anonymize-mark=> (with a trailing C<=>) when using the default notation.\n",
+      "Σημειώστε ότι με μια επιλογή προαιρετικής τιμής όπως αυτή, ένα επόμενο όρισμα αρχείου θα λαμβανόταν ως η τιμή: γράψτε C<--xlate-anonymize-mark=> (με ένα τελικό C<=>) όταν χρησιμοποιείτε την προεπιλεγμένη σημειογραφία.\n"
+   ],
+   [
+      "Alternative notations can be configured, for example C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> for C<@@person:NAME@@>-style marks, or an HTML-comment form that stays invisible in rendered Markdown. Mark rules are collected per document: a string marked in one input file is not concealed in another file of the same run (unlike front matter values, which accumulate across files).\n",
+      "Μπορούν να ρυθμιστούν εναλλακτικές σημειογραφίες, για παράδειγμα C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> για marks τύπου C<@@person:NAME@@>, ή μια μορφή HTML-comment που παραμένει αόρατη στο rendered Markdown. Οι κανόνες marks συλλέγονται ανά έγγραφο: μια συμβολοσειρά που έχει επισημανθεί σε ένα αρχείο εισόδου δεν αποκρύπτεται σε άλλο αρχείο της ίδιας εκτέλεσης (σε αντίθεση με τις τιμές front matter, οι οποίες συσσωρεύονται μεταξύ αρχείων).\n"
+   ],
+   [
+      "Treat template expressions (default: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) as opaque placeholders: instruct the model to copy them unchanged and verify, per block, that the response contains exactly the same expressions, each the same number of times. Their order may change, since translation legitimately reorders them to follow the target language word order. A broken expression aborts the run; the cache is checkpointed and frozen, so nothing paid for is lost.\n",
+      "Αντιμετωπίστε τις εκφράσεις προτύπων (προεπιλογή: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) ως αδιαφανή placeholders: δώστε οδηγία στο μοντέλο να τις αντιγράψει αμετάβλητες και επαληθεύστε, ανά block, ότι η απάντηση περιέχει ακριβώς τις ίδιες εκφράσεις, καθεμία τον ίδιο αριθμό φορών. Η σειρά τους μπορεί να αλλάξει, καθώς η μετάφραση εύλογα τις αναδιατάσσει ώστε να ακολουθεί τη σειρά λέξεων της γλώσσας-στόχου. Μια σπασμένη έκφραση διακόπτει την εκτέλεση· η cache γίνεται checkpoint και παγώνει, ώστε να μη χαθεί τίποτα πληρωμένο.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-template=> (with a trailing C<=>) when using the default notation.\n",
+      "Σημειώστε ότι με μια επιλογή προαιρετικής τιμής όπως αυτή, ένα επόμενο όρισμα αρχείου θα θεωρούνταν ως η τιμή: γράψτε C<--xlate-template=> (με ένα τελικό C<=>) όταν χρησιμοποιείτε την προεπιλεγμένη σημειογραφία.\n"
+   ],
+   [
+      "Treat a leading C<---> ... C<---> block as YAML front matter: exclude it from translation and from the phase-2 context slices, and add its flat C<key: value> values to the anonymization rules (category C<var>) as a safety net. With multiple input files the collected values accumulate (erring on the side of concealment).\n",
+      "Αντιμετωπίστε ένα αρχικό block C<---> ... C<---> ως YAML front matter: εξαιρέστε το από τη μετάφραση και από τα τμήματα συμφραζομένων της φάσης 2, και προσθέστε τις επίπεδες τιμές C<key: value> του στους κανόνες ανωνυμοποίησης (κατηγορία C<var>) ως δίχτυ ασφαλείας. Με πολλαπλά αρχεία εισόδου, οι συλλεγμένες τιμές συσσωρεύονται (με προτίμηση προς την απόκρυψη).\n"
+   ],
+   [
+      "Always leave a blank line after the closing C<--->. With a paragraph-style match pattern, front matter that runs directly into the body text forms one straddling block that the exclusion cannot suppress (a warning is printed in that case); the values are still anonymized, but the front matter itself would be sent for translation.\n",
+      "Αφήνετε πάντα μια κενή γραμμή μετά το κλείσιμο C<--->. Με ένα μοτίβο αντιστοίχισης τύπου παραγράφου, front matter που συνεχίζεται απευθείας στο σώμα του κειμένου σχηματίζει ένα ενιαίο block που εκτείνεται και στις δύο περιοχές και το οποίο η εξαίρεση δεν μπορεί να καταστείλει (σε αυτήν την περίπτωση εκτυπώνεται προειδοποίηση)· οι τιμές εξακολουθούν να ανωνυμοποιούνται, αλλά το ίδιο το front matter θα αποστελλόταν για μετάφραση.\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "Καθορίστε ένα αναγνωριστικό γλωσσαρίου που θα χρησιμοποιηθεί για τη μετάφραση. Αυτή η επιλογή είναι διαθέσιμη μόνο όταν χρησιμοποιείται η μηχανή DeepL. Το αναγνωριστικό γλωσσαρίου πρέπει να ληφθεί από τον λογαριασμό σας στο DeepL και εξασφαλίζει συνεπή μετάφραση συγκεκριμένων όρων.\n"
+   ],
+   [
+      "Do not call the translation API; instead show, through the progress display, each payload exactly as it would be transmitted (after anonymization and masking). Useful for checking what leaves the machine and for estimating the cost of a run.\n",
+      "Μην καλείτε το API μετάφρασης· αντίθετα, εμφανίστε μέσω της ένδειξης προόδου κάθε payload ακριβώς όπως θα μεταδιδόταν (μετά την ανωνυμοποίηση και τη μάσκα). Χρήσιμο για τον έλεγχο του τι φεύγει από το μηχάνημα και για την εκτίμηση του κόστους μιας εκτέλεσης.\n"
+   ],
+   [
+      "See the translation result in real time in the STDERR output. The C<From> payload is shown as transmitted, after anonymization and masking.\n",
+      "Δείτε το αποτέλεσμα της μετάφρασης σε πραγματικό χρόνο στην έξοδο STDERR. Το payload C<From> εμφανίζεται όπως μεταδίδεται, μετά την ανωνυμοποίηση και τη μάσκα.\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "Χρησιμοποιήστε τη μονάδα L<App::Greple::stripe> για να προβάλετε το ταιριαστό τμήμα με τρόπο ζέβρας. Αυτό είναι χρήσιμο όταν τα ταιριαστά τμήματα είναι ενωμένα διαδοχικά.\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "Η παλέτα χρωμάτων αλλάζει ανάλογα με το χρώμα φόντου του τερματικού. Αν θέλετε να το ορίσετε ρητά, μπορείτε να χρησιμοποιήσετε B<--xlate-stripe-light> ή B<--xlate-stripe-dark>.\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "Εκτελέστε τη λειτουργία masking και εμφανίστε το μετατρεπόμενο κείμενο όπως είναι χωρίς αποκατάσταση.\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "Ορίστε ολόκληρο το κείμενο του αρχείου ως περιοχή στόχο.\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "Στις μορφές C<cm> και C<colon>, η έξοδος χωρίζεται και μορφοποιείται γραμμή προς γραμμή. Επομένως, αν πρόκειται να μεταφραστεί μόνο μέρος μιας γραμμής, δεν μπορεί να ληφθεί το αναμενόμενο αποτέλεσμα. Αυτά τα φίλτρα διορθώνουν έξοδο που έχει καταστραφεί μεταφράζοντας μέρος μιας γραμμής σε κανονική έξοδο ανά γραμμή.\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "Στην τρέχουσα υλοποίηση, αν μεταφραστούν πολλαπλά τμήματα μιας γραμμής, εξάγονται ως ανεξάρτητες γραμμές.\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "Η μονάδα B<xlate> μπορεί να αποθηκεύει προσωρινά μεταφρασμένο κείμενο για κάθε αρχείο και να το διαβάζει πριν την εκτέλεση για να εξαλείψει το κόστος ερωτήσεων προς τον διακομιστή. Με την προεπιλεγμένη στρατηγική cache C<auto>, διατηρεί δεδομένα cache μόνο όταν υπάρχει αρχείο cache για το αρχείο-στόχο.\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "Χρησιμοποιήστε το B<--xlate-cache=clear> για να εκκινήσετε τη διαχείριση της προσωρινής μνήμης ή για να καθαρίσετε όλα τα υπάρχοντα δεδομένα cache. Μόλις εκτελεστεί με αυτήν την επιλογή, θα δημιουργηθεί νέο αρχείο cache αν δεν υπάρχει και στη συνέχεια θα συντηρείται αυτόματα.\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "Διατηρήστε το αρχείο cache αν υπάρχει.\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "Δημιουργήστε κενό αρχείο cache και έξοδος.\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "Διατήρηση της προσωρινής μνήμης (cache) εφόσον ο προορισμός είναι κανονικό αρχείο.\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "Καθαρίστε πρώτα τα δεδομένα της προσωρινής μνήμης.\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "Να μην χρησιμοποιείται ποτέ αρχείο cache, ακόμα κι αν υπάρχει.\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "Σύμφωνα με την προεπιλεγμένη συμπεριφορά, τα μη χρησιμοποιούμενα δεδομένα αφαιρούνται από το αρχείο cache. Αν δεν θέλετε να τα αφαιρέσετε και να τα διατηρήσετε στο αρχείο, χρησιμοποιήστε το C<accumulate>.\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "Αυτή η επιλογή επιβάλλει την ενημέρωση του αρχείου cache ακόμα κι αν δεν είναι απαραίτητο.\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "Μπορείτε εύκολα να χρησιμοποιήσετε αυτό το module από τη γραμμή εντολών χρησιμοποιώντας την εντολή C<xlate> που περιλαμβάνεται στη διανομή. Δείτε τη σελίδα man C<xlate> για χρήση.\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "Η εντολή C<xlate> υποστηρίζει επιλογές τύπου GNU με μακριά ονόματα όπως C<--to-lang>, C<--from-lang>, C<--engine> και C<--file>. Χρησιμοποιήστε C<xlate -h> για να δείτε όλες τις διαθέσιμες επιλογές.\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "Η εντολή C<xlate> λειτουργεί σε συνδυασμό με το περιβάλλον Docker, οπότε ακόμα κι αν δεν έχετε τίποτα εγκατεστημένο τοπικά, μπορείτε να τη χρησιμοποιήσετε όσο είναι διαθέσιμο το Docker. Χρησιμοποιήστε την επιλογή C<-D> ή C<-C>.\n"
+   ],
+   [
+      "Docker operations are handled by L<App::dozo>, which can also be used as a standalone command. The C<dozo> command supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "Οι λειτουργίες Docker διαχειρίζονται από το L<App::dozo>, το οποίο μπορεί επίσης να χρησιμοποιηθεί ως αυτόνομη εντολή. Η εντολή C<dozo> υποστηρίζει το αρχείο διαμόρφωσης C<.dozorc> για επίμονες ρυθμίσεις κοντέινερ.\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "Επίσης, επειδή παρέχονται makefiles για διάφορα στυλ εγγράφων, είναι δυνατή η μετάφραση σε άλλες γλώσσες χωρίς ειδικές ρυθμίσεις. Χρησιμοποιήστε την επιλογή C<-M>.\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "Μπορείτε επίσης να συνδυάσετε τις επιλογές Docker και C<make> ώστε να εκτελείτε το C<make> σε περιβάλλον Docker.\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "Εκτέλεση όπως C<xlate -C> θα εκκινήσει ένα κέλυφος με το τρέχον αποθετήριο git του χώρου εργασίας προσαρτημένο.\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "Διαβάστε το ιαπωνικό άρθρο στην ενότητα L</SEE ALSO> για λεπτομέρειες.\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "Φορτώστε το αρχείο F<xlate.el> που περιλαμβάνεται στο αποθετήριο για να χρησιμοποιήσετε την εντολή C<xlate> από τον επεξεργαστή Emacs. Η συνάρτηση C<xlate-region> μεταφράζει την επιλεγμένη περιοχή. Η προεπιλεγμένη γλώσσα είναι C<EN-US> και μπορείτε να καθορίσετε γλώσσα καλώντας τη με prefix argument.\n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "Ορίστε το κλειδί ταυτοποίησης για την υπηρεσία DeepL.\n"
+   ],
+   [
+      "OpenAI authentication key, used by the legacy B<gpty> engines. The C<llm>-based B<gpt5> engine reads this variable too, but keys stored with C<llm keys set openai> also work.\n",
+      "Κλειδί ταυτοποίησης OpenAI, που χρησιμοποιείται από τις legacy μηχανές B<gpty>. Η βασισμένη σε C<llm> μηχανή B<gpt5> διαβάζει επίσης αυτή τη μεταβλητή, αλλά λειτουργούν και κλειδιά αποθηκευμένα με C<llm keys set openai>.\n"
+   ],
+   [
+      "Set the default cache strategy (see L</CACHE OPTIONS>).\n",
+      "Ορίστε την προεπιλεγμένη στρατηγική cache (βλ. L</CACHE OPTIONS>).\n"
+   ],
+   [
+      "Install the command line tool for the engine you use: C<llm> for the B<gpt5> engine, C<deepl> for DeepL, C<gpty> for the legacy GPT engines.\n",
+      "Εγκαταστήστε το εργαλείο γραμμής εντολών για τη μηχανή που χρησιμοποιείτε: C<llm> για τη μηχανή B<gpt5>, C<deepl> για DeepL, C<gpty> για τις legacy μηχανές GPT.\n"
+   ],
+   [
+      "L<https://llm.datasette.io/>\n",
+      "L<https://llm.datasette.io/>\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n"
+   ],
+   [
+      "L<App::dozo> - Generic Docker runner used by xlate for container operations\n",
+      "L<App::dozo> - Γενικός δρομέας Docker που χρησιμοποιείται από το xlate για λειτουργίες κοντέινερ\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "Δείτε το εγχειρίδιο B<greple> για λεπτομέρειες σχετικά με το μοτίβο στόχου κειμένου. Χρησιμοποιήστε τις επιλογές B<--inside>, B<--outside>, B<--include>, B<--exclude> για να περιορίσετε την περιοχή αντιστοίχισης.\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "Μπορείτε να χρησιμοποιήσετε το module C<-Mupdate> για να τροποποιήσετε αρχεία με το αποτέλεσμα της εντολής B<greple>.\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "Χρησιμοποιήστε το B<sdif> για να εμφανίσετε τη μορφή δεικτών σύγκρουσης σε παράθεση με την επιλογή B<-V>.\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "Το module Greple B<stripe> χρησιμοποιείται με την επιλογή B<--xlate-stripe>.\n"
+   ],
+   [
+      "Docker container image.\n",
+      "Εικόνα κοντέινερ Docker.\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> script and L<App::dozo>.\n",
+      "Η βιβλιοθήκη C<getoptlong.sh> που χρησιμοποιείται για την ανάλυση επιλογών στο σkript C<xlate> και στο L<App::dozo>.\n"
+   ],
+   [
+      "The C<llm> command used by the B<gpt5> engine to access LLM models.\n",
+      "Η εντολή C<llm> που χρησιμοποιείται από τη μηχανή B<gpt5> για πρόσβαση σε μοντέλα LLM.\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "Βιβλιοθήκη Python και εντολή CLI του DeepL.\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "Βιβλιοθήκη Python της OpenAI\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "Διεπαφή γραμμής εντολών OpenAI\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "Greple module για μετάφραση και αντικατάσταση μόνο των απαραίτητων τμημάτων με το DeepL API (στα Ιαπωνικά)\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "Δημιουργία εγγράφων σε 15 γλώσσες με το module DeepL API (στα Ιαπωνικά)\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "Περιβάλλον Docker αυτόματης μετάφρασης με το DeepL API (στα Ιαπωνικά)\n"
+   ]
+]

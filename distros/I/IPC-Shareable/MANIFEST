@@ -67,6 +67,7 @@ t/78-scalar-verbatim-edge.t
 t/79-sem-create-orphan.t
 t/80-SharedMem.t
 t/81-sem-removed-under-lock.t
+t/82-stale-ipc-reclaim.t
 t/85-clean.t
 t/86-exports.t
 t/90-pod_coverage.t

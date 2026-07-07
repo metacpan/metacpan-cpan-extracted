@@ -210,7 +210,7 @@ subtest 'check custom messages' => sub {
     is( @w13, 0, 'warning count 13' );
     is_deeply( \@e13, [ "at_most 'foo', 'bar'", "test_one" ], 'error messages 13' );
     
-    my $r14 = $valtest->check_params('test 1', {}, [ bar => 0 ]);
+    my $r14 = $valtest->check_params('test 1', {}, [ foo => 1, bar => 0 ]);
     my @e14 = sort $r14->errors;
     my @w14 = $r14->warnings;
     

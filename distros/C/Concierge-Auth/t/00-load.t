@@ -12,6 +12,12 @@ use Test2::V0;
 use Concierge::Auth;
 pass('Concierge::Auth Module loaded successfully');
 
+use Concierge::Auth::Base;
+pass('Concierge::Auth::Base Module loaded successfully');
+
+use Concierge::Auth::Pwd;
+pass('Concierge::Auth::Pwd Module loaded successfully');
+
 use Concierge::Auth::Generators;
 pass('Concierge::Auth::Generators Module loaded successfully');
 

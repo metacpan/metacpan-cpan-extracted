@@ -1,0 +1,378 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - greple 的翻译支持模块\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. Currently DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>), and GPT-5 (F<gpt5.pm>) module are implemented as a back-end engine.\n",
+      "B<Greple> B<xlate> 模块查找所需的文本块并用翻译后的文本替换它们。目前已实现 DeepL（F<deepl.pm>）、ChatGPT 4.1（F<gpt4.pm>）和 GPT-5（F<gpt5.pm>）模块作为后端引擎。\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<xlate::deepl> and C<perl> module like this:\n",
+      "如果你想翻译以 Perl 的 pod 风格编写的文档中的普通文本块，请使用 B<greple> 命令，并结合 C<xlate::deepl> 和 C<perl> 模块，如下所示：\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "在此命令中，模式字符串 C<^([\\w\\pP].*\\n)+> 表示以字母数字和标点符号开头的连续行。该命令会高亮显示需要翻译的区域。选项 B<--all> 用于输出完整文本。\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the B<deepl> command output.\n",
+      "然后添加 C<--xlate> 选项以翻译选定区域。这样，它会找到所需的部分，并用 B<deepl> 命令的输出替换它们。\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "默认情况下，原文和译文以与 L<git(1)> 兼容的“冲突标记”格式输出。使用 C<ifdef> 格式，可以通过 L<unifdef(1)> 命令轻松获取所需部分。输出格式可通过 B<--xlate-format> 选项指定。\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "如果你想翻译全部文本，请使用 B<--match-all> 选项。这是指定匹配整个文本的模式 C<(?s).+> 的快捷方式。\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "冲突标记格式的数据可以通过 L<sdif|App::sdif> 命令配合 C<-V> 选项以并排样式查看。由于逐字符串比较没有意义，建议使用 C<--no-cdif> 选项。如果不需要为文本着色，请指定 C<--no-textcolor>（或 C<--no-tc>）。\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "处理是按指定单元进行的，但对于多行非空文本的序列，会将它们合并为一行。该操作按如下方式执行：\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "去除每行开头和结尾的空白字符。\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "如果一行以全角标点符号结尾，则与下一行连接。\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "如果一行以全角字符结尾，且下一行以全角字符开头，则将两行连接。\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "如果一行的结尾或下一行的开头不是全角字符，则在连接时插入一个空格字符。\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "缓存数据是基于规范化文本管理的，因此即使进行了不影响规范化结果的修改，缓存的翻译数据仍然有效。\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "此规范化过程仅对第一个（第 0 个）和偶数编号的模式执行。因此，如果如下指定两个模式，匹配第一个模式的文本将在规范化后处理，而匹配第二个模式的文本则不会进行规范化处理。\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "因此，对于需要将多行合并为一行处理的文本，请使用第一个模式；对于预格式化文本，请使用第二个模式。如果第一个模式没有匹配的文本，请使用如 C<(?!)> 这样不会匹配任何内容的模式。\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "有时，您可能不希望翻译文本的某些部分。例如，markdown 文件中的标签。DeepL 建议在这种情况下，将不需要翻译的部分转换为 XML 标签，翻译后再还原。为支持此功能，可以指定需要屏蔽翻译的部分。\n"
+   ],
+   [
+      "This will interpret each line of the file `MASKPATTERN` as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "这会将文件 `MASKPATTERN` 的每一行解释为正则表达式，翻译匹配的字符串，并在处理后还原。以 C<#> 开头的行会被忽略。\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escpaed newline.\n",
+      "复杂的模式可以用反斜杠转义换行符分多行书写。\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "可以通过 B<--xlate-mask> 选项查看屏蔽后文本的变化。\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "此接口为实验性，未来可能会有变动。\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "对每个匹配区域调用翻译过程。\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "如果不使用此选项，B<greple> 会作为普通搜索命令运行。因此，您可以在实际翻译前检查文件中哪些部分将被翻译。\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "命令结果输出到标准输出，如有需要可重定向到文件，或考虑使用 L<App::Greple::update> 模块。\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "选项 B<--xlate> 会调用 B<--xlate-color> 选项并带有 B<--color=never> 选项。\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "使用 B<--xlate-fold> 选项时，转换后的文本会按指定宽度折行。默认宽度为 70，可通过 B<--xlate-fold-width> 选项设置。为嵌入操作预留了四列，因此每行最多可容纳 74 个字符。\n"
+   ],
+   [
+      "Specifies the translation engine to be used. If you specify the engine module directly, such as C<-Mxlate::deepl>, you do not need to use this option.\n",
+      "指定要使用的翻译引擎。如果直接指定引擎模块，如 C<-Mxlate::deepl>，则无需使用此选项。\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "目前可用的引擎如下\n"
+   ],
+   [
+      "B<gpt-4o>'s interface is unstable and cannot be guaranteed to work correctly at the moment.\n",
+      "B<gpt-4o> 的接口不稳定，目前无法保证正常工作。\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "不调用翻译引擎，而是由您手动操作。准备好要翻译的文本后，将其复制到剪贴板。您需要将其粘贴到表单中，复制结果到剪贴板，然后按回车键。\n"
+   ],
+   [
+      "Specify the target language. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "指定目标语言。使用 B<DeepL> 引擎时，可以通过 C<deepl languages> 命令获取可用语言。\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "指定原文和译文的输出格式。\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "除 C<xtxt> 外，以下格式假定要翻译的部分是多行集合。实际上，也可以只翻译一行的一部分，但指定除 C<xtxt> 以外的格式不会产生有意义的结果。\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "原文和转换后的文本以 L<git(1)> 冲突标记格式输出。\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "可以通过下一个 L<sed(1)> 命令恢复原始文件。\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "原文和译文以 markdown 的自定义容器样式输出。\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "上述文本将被翻译为以下 HTML。\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "默认冒号数量为 7。如果指定类似 C<:::::> 的冒号序列，则会用该序列代替 7 个冒号。\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "原文和转换后的文本以 L<cpp(1)> C<#ifdef> 格式输出。\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "您可以通过 B<unifdef> 命令仅获取日文文本：\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "原文和转换后的文本之间用一个空行分隔打印。\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "对于 C<space+>，在转换后的文本后面也会输出一个换行符。\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. Default value is set as for free DeepL account service: 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "如果格式为 C<xtxt>（翻译后的文本）或未知，则只打印翻译后的文本。\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "指定一次发送到 API 的最大文本长度。默认值设置为免费 DeepL 账户服务：API 为 128K（B<--xlate>），剪贴板接口为 5000（B<--xlate-labor>）。如果您使用的是 Pro 服务，可能可以更改这些值。\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "指定一次发送到 API 的最大文本行数。\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is only available when using ChatGPT engines (gpt3, gpt4, gpt4o). You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "指定要发送到翻译引擎的自定义提示。此选项仅在使用 ChatGPT 引擎（gpt3、gpt4、gpt4o）时可用。您可以通过向 AI 模型提供特定指令来自定义翻译行为。如果提示中包含 C<%s>，它将被替换为目标语言名称。\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "指定要发送到翻译引擎的附加上下文信息。此选项可以多次使用，以提供多个上下文字符串。上下文信息有助于翻译引擎理解背景并生成更准确的翻译。\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "指定用于翻译的术语表 ID。此选项仅在使用 DeepL 引擎时可用。术语表 ID 应从您的 DeepL 账户获取，并确保特定术语的一致翻译。\n"
+   ],
+   [
+      "See the tranlsation result in real time in the STDERR output.\n",
+      "如果您希望一次只翻译一行，请将此值设置为 1。此选项优先于 C<--xlate-maxlen> 选项。\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "在 STDERR 输出中实时查看翻译结果。\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "使用 L<App::Greple::stripe> 模块以斑马条纹方式显示匹配部分。当匹配部分首尾相连时，这很有用。\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "颜色调色板会根据终端的背景色切换。如果您想明确指定，可以使用 B<--xlate-stripe-light> 或 B<--xlate-stripe-dark>。\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "执行掩码功能，并按原样显示转换后的文本而不进行还原。\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "对于 C<cm> 和 C<colon> 格式，输出会被逐行拆分和格式化。因此，如果只翻译了一行的一部分，将无法获得预期的结果。这些过滤器可以修复因只翻译部分内容而导致输出损坏的问题，使其恢复为正常的逐行输出。\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "在当前的实现中，如果一行的多个部分被翻译，它们会作为独立的行输出。\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "将文件的全部文本设置为目标区域。\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "B<xlate> 模块可以为每个文件存储翻译的缓存文本，并在执行前读取，以消除向服务器请求的开销。使用默认的缓存策略 C<auto>，仅当目标文件存在缓存文件时才维护缓存数据。\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "使用 B<--xlate-cache=clear> 启动缓存管理或清除所有现有缓存数据。使用此选项执行后，如果不存在缓存文件，则会创建一个新缓存文件，并在之后自动维护。\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "如果缓存文件存在，则进行维护。\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "创建空缓存文件并退出。\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "只要目标是普通文件，无论如何都维护缓存。\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "首先清除缓存数据。\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "即使存在缓存文件也绝不使用缓存。\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "默认情况下，未使用的数据会从缓存文件中移除。如果您不想移除并希望保留在文件中，请使用 C<accumulate>。\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "即使没有必要，此选项也会强制更新缓存文件。\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "C<xlate> 命令支持 GNU 风格的长选项，例如 C<--to-lang>、C<--from-lang>、C<--engine> 和 C<--file>。使用 C<xlate -h> 查看所有可用选项。\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "您可以通过分发包中包含的 C<xlate> 命令在命令行中轻松使用此模块。用法请参见 C<xlate> man 页面。\n"
+   ],
+   [
+      "Docker operations are handled by the C<dozo> script, which can also be used as a standalone command. The C<dozo> script supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "Docker 操作由 C<dozo> 脚本处理，该脚本也可以作为独立命令使用。C<dozo> 脚本支持 C<.dozorc> 配置文件用于持久化容器设置。\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "C<xlate> 命令可与 Docker 环境协同工作，因此即使您手头没有安装任何东西，只要有 Docker 可用，也可以使用。请使用 C<-D> 或 C<-C> 选项。\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "此外，由于提供了各种文档样式的 makefile，无需特殊指定即可翻译成其他语言。请使用 C<-M> 选项。\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "您还可以结合 Docker 和 C<make> 选项，在 Docker 环境中运行 C<make>。\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "像 C<xlate -C> 这样运行会启动一个挂载了当前工作 git 仓库的 shell。\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "加载仓库中包含的 F<xlate.el> 文件，以便在 Emacs 编辑器中使用 C<xlate> 命令。C<xlate-region> 函数用于翻译选定区域。默认语言为 C<EN-US>，你可以通过前缀参数指定语言。\n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "设置你的 DeepL 服务认证密钥。\n"
+   ],
+   [
+      "OpenAI authentication key.\n",
+      "OpenAI 认证密钥。\n"
+   ],
+   [
+      "You have to install command line tools for DeepL and ChatGPT.\n",
+      "你需要为 DeepL 和 ChatGPT 安装命令行工具。\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate>\n",
+      "L<App::Greple::xlate>\n"
+   ],
+   [
+      "L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate::deepl>\n"
+   ],
+   [
+      "L<App::Greple::xlate::gpt4>\n",
+      "L<App::Greple::xlate::gpt4>\n"
+   ],
+   [
+      "L<App::Greple::xlate::gpt5>\n",
+      "L<App::Greple::xlate::gpt5>\n"
+   ],
+   [
+      "Docker container image.\n",
+      "Docker 容器镜像。\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> and C<dozo> scripts.\n",
+      "C<getoptlong.sh> 库用于 C<xlate> 和 C<dozo> 脚本中的选项解析。\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "DeepL Python 库和 CLI 命令。\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "OpenAI Python 库\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "OpenAI 命令行界面\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "有关目标文本模式的详细信息，请参见 B<greple> 手册。使用 B<--inside>、B<--outside>、B<--include>、B<--exclude> 选项来限制匹配区域。\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "你可以使用 C<-Mupdate> 模块，根据 B<greple> 命令的结果修改文件。\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "使用 B<sdif>，结合 B<-V> 选项，可以并排显示冲突标记格式。\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "Greple B<stripe> 模块通过 B<--xlate-stripe> 选项使用。\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "Greple 模块仅用 DeepL API 翻译并替换必要部分（仅日文）\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "使用 DeepL API 模块生成 15 种语言的文档（仅日文）\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "使用 DeepL API 的自动翻译 Docker 环境（仅日文）\n"
+   ]
+]

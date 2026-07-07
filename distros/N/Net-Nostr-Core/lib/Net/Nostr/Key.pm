@@ -173,7 +173,9 @@ sub sign_event {
     my $expected_id = sha256_hex($event->json_serialize);
     croak "id does not match event body"
         unless $event->id eq $expected_id;
-    my $sig_raw = $self->schnorr_sign($event->id);
+    # NIP-01: the signature is a BIP-340 Schnorr signature over the 32 raw bytes
+    # of the event id, not over its hex-string representation.
+    my $sig_raw = $self->schnorr_sign(pack 'H*', $event->id);
     my $sig_hex = unpack 'H*', $sig_raw;
     $event->sig($sig_hex);
     return $sig_hex;

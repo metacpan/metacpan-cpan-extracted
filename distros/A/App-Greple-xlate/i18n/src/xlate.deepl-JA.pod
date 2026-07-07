@@ -1,0 +1,553 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::xlate - greple 用の翻訳サポートモジュール
+
+=head1 SYNOPSIS
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine deepl --xlate pattern target-file
+
+=head1 VERSION
+
+Version 2.00
+
+=head1 DESCRIPTION
+
+B<Greple> B<xlate> モジュールが対象のテキストブロックを検索し、翻訳されたテキストに置き換えます。メインのエンジンは GPT-5.5 (F<llm/gpt5.pm>) で、L<llm|https://llm.datasette.io/> コマンドを呼び出します。 DeepL (F<deepl.pm>) や、従来の B<gpty> ベースのエンジンも含まれています。
+
+翻訳結果はファイルごとにキャッシュされるため、変更のないテキストに対してコマンドを再実行してもコストはかかりません。 ドキュメントが編集された場合、変更された段落のみが再度APIに送信されます。また、コンテキスト認識型エンジンには、周囲の翻訳、変更箇所の前後の原文、および編集された段落の以前のバージョンも送信されるため、新しい翻訳でも従来の表現が維持されます（B<--xlate-context-window>を参照）。 機密性の高い文字列は、送信前に非表示にすることができます（L</ANONYMIZATION AND TEMPLATES>を参照）。
+
+Perlのpodスタイルで記述されたドキュメント内の通常のテキストブロックを翻訳したい場合は、B<greple>コマンドをC<--xlate-engine gpt5>およびC<perl>モジュールと組み合わせて、次のように使用します：
+
+    greple -Mxlate --xlate-engine gpt5 -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
+
+このコマンドのパターン文字列C<^([ \wpP].*n)+> は、英数字と句読点で始まる連続した行を意味します。このコマンドは、翻訳される領域が強調表示されます。オプションB<--all>はテキスト全体を翻訳するのに使われます。
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
+</p>
+
+その後、C<--xlate> オプションを追加して、選択した領域を翻訳します。これにより、対象のセクションが検出され、翻訳エンジンの出力に置き換えられます。
+
+デフォルトでは、原文と訳文は L<git(1)> と互換性のある "conflict marker" フォーマットで出力されます。C<ifdef>形式を使えば、L<unifdef(1)>コマンドで簡単に目的の部分を得ることができます。出力形式はB<--xlate-format>オプションで指定できます。
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
+</p>
+
+テキスト全体を翻訳したい場合は、B<--match-all>オプションを使います。これはテキスト全体にマッチするパターンC<(?s).+>を指定するショートカットです。
+
+L<sdif|App::sdif>コマンドにC<-V>オプションをつけると、競合マーカーフォーマットのデータを並べて表示することができます。文字列ごとに比較するのは意味がないので、C<--no-cdif>オプションの使用をお勧めします。テキストに色をつける必要がない場合はC<--no-textcolor>（またはC<--no-tc>）を指定してください。
+
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+</p>
+
+=head1 NORMALIZATION
+
+処理は指定された単位で行われるが、空でないテキストが複数行連続している場合は、それらをまとめて1行に変換します。この処理は次のように行われる：
+
+=over 2
+
+=item *
+
+各行の先頭と末尾の空白を取り除く。
+
+=item *
+
+行末が全角句読点の場合は、次の行と連結します。
+
+=item *
+
+ある行が全角文字で終わり、次の行が全角文字で始まる場合、その行を連結します。
+
+=item *
+
+行末または行頭が全角文字でない場合は、スペース文字を挿入して連結します。
+
+=back
+
+キャッシュデータは正規化されたテキストに基づいて管理されるため、正規化結果に影響を与えない範囲で修正を加えても、キャッシュされた翻訳データは有効です。
+
+この正規化処理は、最初の（0 番目の）偶数パターンに対してのみ行われます。したがって、以下のように2つのパターンを指定した場合、1つ目のパターンにマッチするテキストは正規化処理後に処理され、2つ目のパターンにマッチするテキストには正規化処理は行われないです。
+
+    greple -Mxlate -E normalized -E not-normalized
+
+したがって、複数行を1行にまとめて処理するテキストには最初のパターンを使い、整形済みテキストには2番目のパターンを使う。最初のパターンにマッチするテキストがない場合は、C<(?!)>のように何もマッチしないパターンを使う。
+
+=head1 MASKING
+
+時々、翻訳してほしくないテキストの部分があります。例えば、マークダウン・ファイルのタグなどです。DeepL では、このような場合、除外するテキストの部分を XML タグに変換して翻訳し、翻訳完了後に復元することを推奨しています。これをサポートするために、翻訳からマスクする部分を指定できます。
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+ファイルC<MASKPATTERN>の各行を正規表現として解釈し、一致する文字列を翻訳後、処理後に元に戻します。C<#>で始まる行は無視されます。
+
+複雑なパターンは、バックスラッシュでエスケープした改行を含めて複数行で記述できます。
+
+マスキングによってテキストがどのように変換されるかは、B<--xlate-mask>オプションで見ることができます。
+
+マスキングにより、マークアップが翻訳されるのを防ぐことができます。翻訳サービス自体から機密性の高い文字列を隠すには、L</ANONYMIZATION AND TEMPLATES>を参照してください。両方を併用することも可能です。
+
+このインターフェースは実験的なものであり、将来変更される可能性があります。
+
+=head1 ANONYMIZATION AND TEMPLATES
+
+機密性の高い文字列は、翻訳APIに送信される前に隠蔽し、出力時に復元することができます。 匿名化ルールのソースとして、辞書ファイル（B<--xlate-anonymize>）、ドキュメント内のインラインマーク（B<--xlate-anonymize-mark>）、YAMLフロントマターの値（B<--xlate-frontmatter>）の3つが利用可能です。 各文字列は、送信中に C<< <person id=1 /> >> のようなカテゴリタグに置き換えられます。非表示の対象は API への送信時のみです。ローカルのキャッシュファイルには、復元されたプレーンテキストが保存されます。実際に送信される内容を正確に確認するには、B<--xlate-dryrun> を使用してください。
+
+定型文書（四半期報告書など）の場合は、事前にアクターを定義し、本文内でそれらを参照します：
+
+    ---
+    報告者: 山田太郎
+    発注会社: アクメ株式会社
+    ---
+    本件について {{ 報告者 }} が調査を行った。
+
+C<--xlate-template> を使用して、テンプレートを言語ごとに一度翻訳し （値がファイル内に保持されている場合は C<--xlate-frontmatter> を使用）、その後、B<pandoc-embedz> を使用して各ケースをレンダリングします。スタンドアロンモードでは、外部設定ファイル内の C<global:> 以下の値は翻訳 API に一切到達しません：
+
+    greple -Mxlate --xlate --xlate-engine=gpt5 --xlate-to=EN-US \
+           --xlate-template= --xlate-format=xtxt \
+           --match-paragraph --all --need=0 \
+           report-template.md > report-template.EN.md
+    pandoc-embedz --standalone report-template.EN.md \
+                  -c case-123.yaml -o report-123.EN.md < /dev/null
+
+インラインマークの場合、マクロ定義設定を指定することで、同じ翻訳済みテンプレートから実名または伏せ字版のいずれかをレンダリングできます：
+
+    # macros.yaml           # macros-redacted.yaml
+    preamble: |             preamble: |
+      {% macro person(name) %}{{ name }}{% endmacro %}
+                              {% macro person(name) %}(関係者){% endmacro %}
+
+ドキュメントにembedzブロックが含まれている場合は、それらを翻訳対象から除外します：
+
+    --exclude '^```embedz\n(?s:.*?)^```\n'
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--xlate>
+
+=item B<--xlate-color>
+
+=item B<--xlate-fold>
+
+=item B<--xlate-fold-width>=I<n> (Default: 70)
+
+マッチした各領域に対して翻訳処理を起動します。
+
+このオプションをつけないと、B<greple>は通常の検索コマンドとして動作します。したがって、実際の作業を開始する前に、ファイルのどの部分が翻訳の対象となるかをチェックすることができます。
+
+コマンドの結果は標準出力されますので、必要に応じてファイルにリダイレクトするか、L<App::Greple::update>モジュールの使用を検討してください。
+
+B<--xlate> オプションは B<--xlate-color> オプションを B<--color=never> オプションで呼び出します。
+
+B<--xlate-fold> オプションを指定すると、変換されたテキストは指定した幅で折り返されます。デフォルトの幅は70で、B<--xlate-fold-width>オプションで設定できます。ランイン操作のために4つのカラムが予約されているので、各行は最大74文字を保持できます。
+
+=item B<--xlate-engine>=I<engine>
+
+使用する翻訳エンジンを指定します。
+
+現時点では、以下のエンジンが利用可能です。
+
+=over 2
+
+=item * B<gpt5>: gpt-5.5 (via the C<llm> command)
+
+=item * B<deepl>: DeepL API (via the C<deepl> command)
+
+=item * B<gpt3>: gpt-3.5-turbo (legacy, via the C<gpty> command)
+
+=item * B<gpt4o>: gpt-4o-mini (legacy, via the C<gpty> command)
+
+=back
+
+エンジンモジュールは、まずバックエンドネームスペース（C<llm>、次に C<gpty>）で検索され、その後 C<App::Greple::xlate> の直下で検索されます。 したがって、C<gpt5>はC<App::Greple::xlate::llm::gpt5>を読み込み、それがC<llm>コマンドを呼び出しますが、C<gpt4o>はC<App::Greple::xlate::gpty::gpt4o>にフォールバックします。特定のバックエンドを強制するには、C<--xlate-setopt backend=gpty>を使用してください。
+
+=item B<--xlate-labor>
+
+=item B<--xlabor>
+
+翻訳エンジンを呼び出す代わりに、以下の作業を行うことになります。翻訳するテキストを準備すると、クリップボードにコピーされます。フォームに貼り付け、結果をクリップボードにコピーし、returnを押してください。
+
+=item B<--xlate-to> (Default: C<EN-US>)
+
+対象言語を指定します。LLMエンジンは、モデルが理解できる任意の言語名またはコードを受け付け、それが翻訳プロンプトに挿入されます。B<DeepL>エンジンを使用する場合、C<deepl languages>コマンドで利用可能な言語を取得できます。
+
+=item B<--xlate-from> (Default: C<ORIGINAL>)
+
+C<conflict>、C<colon>、およびC<ifdef>出力形式における原文に付与されるラベルです。B<DeepL>エンジンを使用する場合、デフォルト以外の値もソース言語として渡されます。
+
+=item B<--xlate-format>=I<format> (Default: C<conflict>)
+
+原文と訳文の出力形式を指定します。
+
+C<xtxt>以外の以下の書式は、翻訳される部分が行の集まりであることを前提としています。実際、行の一部だけを翻訳することは可能ですが、 C<xtxt>以外の書式を指定しても意味のある結果は得られません。
+
+=over 4
+
+=item B<conflict>, B<cm>
+
+原文と訳文はL<git(1)> conflict marker形式で出力されます。
+
+    <<<<<<< ORIGINAL
+    original text
+    =======
+    translated Japanese text
+    >>>>>>> JA
+
+次のL<sed(1)>コマンドで元のファイルを復元できます。
+
+    sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
+
+=item B<colon>, I<:::::::>
+
+元のテキストと翻訳されたテキストは、マークダウンのカスタム・コンテナ・スタイルで出力されます。
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+上記のテキストはHTMLでは以下のように翻訳されます。
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+コロンの数はデフォルトでは7です。C<::::>のようにコロン列を指定すると、7コロンの代わりにそれが使われます。
+
+=item B<ifdef>
+
+原文と訳文はL<cpp(1)> C<#ifdef>形式で出力されます。
+
+    #ifdef ORIGINAL
+    original text
+    #endif
+    #ifdef JA
+    translated Japanese text
+    #endif
+
+B<unifdef>コマンドで日本語のテキストだけを取り出すことができます：
+
+    unifdef -UORIGINAL -DJA foo.ja.pm
+
+=item B<space>
+
+=item B<space+>
+
+変換前のテキストと変換後のテキストは1行の空白行で区切られて出力されます。C<space+>の場合は、変換後のテキストの後に改行も出力されます。
+
+=item B<xtxt>
+
+形式がC<xtxt>（翻訳済みテキスト）または未知の場合は、翻訳済みテキストのみが印刷されます。
+
+=back
+
+=item B<--xlate-maxlen>=I<chars> (Default: 0)
+
+API に一度に送信するテキストの最大長を指定します。 デフォルト値の 0 は、エンジン独自の制限を意味します。DeepLの無料アカウントサービスの場合、API (B<--xlate>) では128K、クリップボードインターフェース (B<--xlate-labor>) では5000です。 Proサービスをご利用の場合は、これらの値を変更できる場合があります。
+
+=item B<--xlate-maxline>=I<n> (Default: 0)
+
+APIに一度に送信するテキストの最大行数を指定します。
+
+一度に1行ずつ翻訳したい場合は、この値を1に設定します。このオプションはC<--xlate-maxlen>オプションより優先されます。
+
+=item B<--xlate-prompt>=I<text>
+
+翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはLLMエンジン（C<gpt3>、C<gpt4o>、C<gpt5>）で利用可能ですが、DeepLでは利用できません。 AIモデルに具体的な指示を与えることで、翻訳の挙動をカスタマイズできます。プロンプトに C<%s> が含まれている場合、それは対象言語名に置き換えられます。
+
+=item B<--xlate-context>=I<text>
+
+翻訳エンジンに送信する追加コンテキスト情報を指定します。このオプションは、複数のコンテキスト文字列を提供するために複数回使用することができます。コンテキスト情報は、翻訳エンジンが背景を理解し、より正確な翻訳を生成するのに役立ちます。
+
+=item B<--xlate-context-window>=I<n>
+
+(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+変更されたブロックを再翻訳する際に、参照コンテキストとして渡される周囲の翻訳済みブロックの数（デフォルトは 2）。このコンテキストには、変更された領域の周囲の生のソーステキスト（見出し、リスト構造、キャプション）や、利用可能な場合はキャッシュから復元された変更前のテキストも含まれるため、変更されていない表現が保持されます。 コンテキスト対応翻訳を完全に無効にするには、0 に設定します。変更された各領域は個別の API 呼び出しで翻訳され、コンテキストによってシステムプロンプトに最大約 8000 文字が追加される可能性があるため、コンテキスト対応翻訳は一貫性を確保するために多少の追加コストを伴います。
+
+=item B<--xlate-cache-seed>=I<file>
+
+別のドキュメントのキャッシュファイルから、新しいドキュメントのキャッシュを初期化します。定期的なレポートの作成に有用です。新しい号のキャッシュに前の号のキャッシュをシードすることで、変更されていない段落が再翻訳されるのを防ぎ、編集された段落は前の号の表現を維持します。 シードは、ターゲットキャッシュが空の場合にのみ使用されます。それ以外の場合は、警告が表示され無視されます。デフォルトの C<--xlate-cache=auto> では、シードを指定すると、新しいドキュメントのキャッシュファイルも作成されることになります。
+
+=item B<--xlate-anonymize>=I<file>
+
+機密性の高い文字列を翻訳APIに送信する前に匿名化し、出力時に復元します。辞書ファイルには、項目ごとに1つのエントリが記載されます：JSON形式（標準的、機械生成可能）
+
+    [ { "category": "person",  "text": "山田太郎" },
+      { "category": "company", "regex": "アクメ(株式会社)?" } ]
+
+または単純な行形式（C<category pattern>、正規表現の場合は C</.../>）。 各項目は C<< <person id=1 /> >> のようなカテゴリタグに置き換えられます。同じ文字列には常に同じタグが割り当てられるため、モデルは各項目を識別できます。未知の JSON フィールドは無視されるため、ジェネレータ（例：エンティティを抽出するローカル LLM）は独自の注釈を追加できます。 カテゴリ C<lit> は予約済みです。ローカルキャッシュファイルには、復元されたプレーンテキストが引き続き保存されます。隠蔽の対象はAPI経由の送信のみです。
+
+辞書は外部ツール（例えば、機密エンティティを抽出するローカルモデルなど）によって生成できます：
+
+    llm -m <local-model> \
+        -s 'Extract sensitive entities as a JSON array of objects
+            with "category" and "text" fields.' \
+        < report.md > report.anon.json
+    greple -Mxlate --xlate-anonymize=report.anon.json ...
+
+ファイル内の UTF-8 BOM は許容されます。フロントマター行形式の値には、値の直後ではなく、その行の末尾にのみコメントを付加できます。
+
+=item B<--xlate-anonymize-mark>[=I<regex>]
+
+文書自体に含まれるインラインマークから匿名化エントリを収集します。 最初の出現箇所を C<{{ person("山田太郎") }}> のようにマークすると、文書全体におけるその文字列のすべての出現箇所が匿名化されます。マーク自体はソースおよび翻訳文に残るため、文書を Jinja2 スタイルのマクロプロセッサで処理することも可能です（名前を出力または伏字にするには、C<person> マクロを定義します）。 カスタム I<regex> には、C<< (?<category>...) >> および C<< (?<text>...) >> という名前のキャプチャが含まれている必要があります。
+
+このようなオプション値を持つオプションの場合、後続のファイル引数が値として扱われることに注意してください。デフォルトの表記法を使用する場合は、C<--xlate-anonymize-mark=>（末尾に C<=> を付加）と記述します。
+
+代替表記を設定することも可能です。例えば、C<@@person:NAME@@> 形式のマークには C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\n]+?)@@' >> を使用したり、レンダリングされた Markdown では表示されない HTML コメント形式を使用したりできます。 マークルールはドキュメントごとに収集されます。つまり、ある入力ファイルでマークされた文字列は、同じ実行内の別のファイルでは非表示にはなりません（ファイル間で蓄積されるフロントマターの値とは異なります）。
+
+=item B<--xlate-template>[=I<regex>]
+
+テンプレート式（デフォルト：Jinja2 C<{{ ... }}>、C<{% ... %}>、C<{# ... #}>）を不透明なプレースホルダーとして扱います。モデルに対して、それらをそのままコピーし、ブロックごとに、応答にまったく同じ式が、それぞれ同じ回数含まれていることを確認するよう指示します。 翻訳処理において、対象言語の語順に合わせてこれらの順序が変更される可能性があるため、順序は変わる場合があります。式に不備がある場合、実行は中止されます。キャッシュはチェックポイントとして保存され凍結されるため、支払済みの処理内容は失われることはありません。
+
+このようなオプション値を持つオプションの場合、後続のファイル引数が値として扱われることに注意してください。デフォルトの表記法を使用する場合は、C<--xlate-template=>（末尾に C<=> を付加）と記述します。
+
+=item B<--xlate-frontmatter>
+
+先頭の C<---> ... C<---> ブロックを YAML フロントマターとして扱う：翻訳およびフェーズ 2 のコンテキストスライスから除外し、そのフラットな C<key: value> 値を安全策として匿名化ルール（カテゴリ C<var>）に追加します。 入力ファイルが複数ある場合、収集された値は累積されます（隠蔽を優先します）。
+
+閉じタグ C<---> の後には常に空行を挿入してください。段落形式のマッチパターンを使用する場合、本文に直接続くフロントマターは、除外処理では抑制できない1つのまたがりブロックを形成します（その場合は警告が表示されます）。 値自体は匿名化されますが、フロントマター自体は翻訳のために送信されてしまいます。
+
+=item B<--xlate-glossary>=I<glossary>
+
+翻訳に使用する用語集IDを指定します。このオプションは、DeepL エンジンを使用する場合にのみ使用できます。用語集 ID は、DeepL アカウントから取得する必要があり、特定の用語の一貫した翻訳を保証します。
+
+=item B<--xlate-dryrun>
+
+翻訳APIを呼び出さないでください。代わりに、進行状況表示を通じて、各ペイロードが（匿名化およびマスキング後に）送信されるのと同じ状態で正確に表示してください。これは、マシンから送信される内容を確認したり、実行コストを見積もったりするのに役立ちます。
+
+=item B<-->[B<no->]B<xlate-progress> (Default: True)
+
+STDERR出力で翻訳結果をリアルタイムで確認できます。C<From>のペイロードは、匿名化およびマスキング処理後の送信時のまま表示されます。
+
+=item B<--xlate-stripe>
+
+L<App::Greple::stripe>モジュールを使うと、一致した部分をゼブラストライプで表示することができます。これは、マッチした部分が背中合わせに接続されている場合に便利です。
+
+カラーパレットは端末の背景色に応じて切り替わります。明示的に指定したい場合は、 B<--xlate-stripe-light> または B<--xlate-stripe-dark> を使ってください。
+
+=item B<--xlate-mask>
+
+マスキング機能を実行し、変換されたテキストを復元せずにそのまま表示します。
+
+=item B<--match-all>
+
+ファイルの全文を対象領域に設定します。
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+C<cm>とC<colon>形式の場合、出力は一行ごとに分割され、整形されます。従って、行の一部だけが変換される場合、期待された結果は得られません。これらのフィルタは、行の一部を通常の行単位の出力に変換することによって破損した出力を修正します。
+
+現在の実装では、行の複数の部分が翻訳された場合、それらは独立した行として出力されます。
+
+=back
+
+=head1 CACHE OPTIONS
+
+B<xlate>モジュールは、各ファイルの翻訳テキストをキャッシュしておき、実行前に読み込むことで、サーバーに問い合わせるオーバーヘッドをなくすことができます。デフォルトのキャッシュ戦略C<auto>では、対象ファイルに対してキャッシュファイルが存在する場合にのみキャッシュデータを保持します。
+
+B<--xlate-cache=clear>を使用して、キャッシュ管理を開始するか、既存のキャッシュデータをすべてクリーンアップします。このオプションを実行すると、キャッシュファイルが存在しない場合は新しいキャッシュファイルが作成され、その後は自動的にメンテナンスされます。
+
+=over 7
+
+=item --xlate-cache=I<strategy>
+
+=over 4
+
+=item C<auto> (Default)
+
+キャッシュ・ファイルが存在すれば、それを維持します。
+
+=item C<create>
+
+空のキャッシュ・ファイルを作成して終了します。
+
+=item C<always>, C<yes>, C<1>
+
+対象が通常ファイルである限り、とにかくキャッシュを維持します。
+
+=item C<clear>
+
+最初にキャッシュデータをクリアします。
+
+=item C<never>, C<no>, C<0>
+
+キャッシュファイルが存在しても使用しないです。
+
+=item C<accumulate>
+
+デフォルトの動作では、未使用のデータはキャッシュ・ファイルから削除されます。削除せず、ファイルに残しておきたい場合は、C<accumulate>を使ってください。
+
+=back
+
+=item B<--xlate-update>
+
+このオプションは、キャッシュ・ファイルを更新する必要がない場合でも、強制的に更新します。
+
+=back
+
+=head1 COMMAND LINE INTERFACE
+
+配布物に含まれている C<xlate> コマンドを使えば、コマンドラインから簡単にこのモジュールを使うことができます。使い方は C<xlate> のマニュアルページを参照してください。
+
+C<xlate>コマンドはC<--to-lang>, C<--from-lang>, C<--engine>, C<--file>のようなGNUスタイルの長いオプションをサポートしています。C<xlate -h>を使うと利用可能な全てのオプションが表示されます。
+
+C<xlate>コマンドはDocker環境と協調して動作するため、手元に何もインストールされていなくても、Dockerが利用可能であれば使用することができます。C<-D>またはC<-C>オプションを使用してください。
+
+Dockerの操作はL<App::dozo>で処理され、スタンドアロンコマンドとしても使用できます。C<dozo>コマンドは、永続的なコンテナ設定のためのC<.dozorc>設定ファイルをサポートします。
+
+また、様々なドキュメントスタイルに対応したmakefileが提供されているので、特別な指定なしに他言語への翻訳が可能です。C<-M>オプションを使用してください。
+
+Docker と C<make> オプションを組み合わせて、Docker 環境で C<make> を実行することもできます。
+
+C<xlate -C> のように実行すると、現在作業中の git リポジトリがマウントされたシェルが起動します。
+
+詳しくはL</SEE ALSO>セクションの日本語記事を読んでください。
+
+=head1 EMACS
+
+EmacsエディタからC<xlate>コマンドを使うには、リポジトリに含まれるF<xlate.el>ファイルを読み込みます。C<xlate-region>関数は指定された領域を翻訳します。デフォルトの言語はC<EN-US>で、prefix引数で言語を指定できます。
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
+
+=head1 ENVIRONMENT
+
+=over 7
+
+=item DEEPL_AUTH_KEY
+
+DeepLサービスの認証キーを設定します。
+
+=item OPENAI_API_KEY
+
+レガシーなB<gpty>エンジンで使用されるOpenAI認証キー。 C<llm>ベースのB<gpt5>エンジンもこの変数を読み取りますが、C<llm keys set openai>で保存されたキーも機能します。
+
+=item GREPLE_XLATE_CACHE
+
+デフォルトのキャッシュ戦略を設定します（L</CACHE OPTIONS>を参照）。
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
+=head2 TOOLS
+
+使用しているエンジン用のコマンドラインツールをインストールします：C<llm>（B<gpt5>エンジン用）、C<deepl>（DeepL用）、C<gpty>（レガシーGPTエンジン用）。
+
+L<https://llm.datasette.io/>
+
+L<https://github.com/DeepLcom/deepl-python>
+
+L<https://github.com/tecolicom/App-gpty>
+
+=head1 SEE ALSO
+
+=head2 MODULES
+
+L<App::Greple::xlate::llm>、L<App::Greple::xlate::deepl>
+
+L<App::dozo> - xlateがコンテナ操作に使用する汎用Dockerランナー。
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+ターゲット・テキスト・パターンの詳細については、B<greple> のマニュアルを参照してください。B<--inside>、B<--outside>、B<--include>、B<--exclude>オプションを使用して、マッチング範囲を制限します。
+
+=item * L<App::Greple::update>
+
+C<-Mupdate> モジュールを使って、B<greple> コマンドの結果によってファイルを変更することができます。
+
+=item * L<App::sdif>
+
+B<sdif>を使うと、B<-V>オプションでコンフリクトマーカの書式を並べて表示することができます。
+
+=item * L<App::Greple::stripe>
+
+B<--xlate-stripe>オプションでB<stripe>モジュールを使用します。
+
+=back
+
+=head2 RESOURCES
+
+=over 2
+
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
+
+Dockerコンテナイメージ。
+
+=item * L<https://github.com/tecolicom/getoptlong>
+
+C<getoptlong.sh> ライブラリは C<xlate> スクリプトと L<App::dozo> のオプション解析に使われます。
+
+=item * L<https://llm.datasette.io/>
+
+B<gpt5>エンジンがLLMモデルにアクセスするために使用するC<llm>コマンド。
+
+=item * L<https://github.com/DeepLcom/deepl-python>
+
+DeepL Python ライブラリと CLI コマンド。
+
+=item * L<https://github.com/openai/openai-python>
+
+OpenAI Python ライブラリ
+
+=item * L<https://github.com/tecolicom/App-gpty>
+
+OpenAI コマンドラインインタフェース
+
+=back
+
+=head2 ARTICLES
+
+=over 2
+
+=item * L<https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250>
+
+DeepL APIで必要な部分だけを翻訳・置換するGrepleモジュール
+
+=item * L<https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6>
+
+DeepL APIモジュールによる15言語のドキュメント生成
+
+=item * L<https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd>
+
+DeepL APIによる自動翻訳Docker環境
+
+=back
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2023-2026 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

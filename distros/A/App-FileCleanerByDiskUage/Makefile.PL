@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
 	},
 	PREREQ_PM => {
 		'Filesys::Df'            => '0',
-		'File::Find::Rule'       => '0',
 		'JSON'                   => '0',
 		'Net::Server::Daemonize' => '0',
 	},

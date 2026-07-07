@@ -1,0 +1,470 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - Greple tõlkimise tugimoodul\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.5 (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
+      "B<Greple> B<xlate> moodulid leiavad soovitud tekstilõigud ja asendavad need tõlgitud tekstiga. Peamine mootor on GPT-5.5 (F<llm/gpt5.pm>), mis kutsub välja käsu L<llm|https://llm.datasette.io/>; Samuti on kaasatud DeepL (F<deepl.pm>) ja vanemad B<gpty>-põhised mootorid.\n"
+   ],
+   [
+      "Translations are cached per file, so re-running a command costs nothing for unchanged text. When a document is edited, only the changed paragraphs are sent to the API again; a context-aware engine also receives the surrounding translations, the raw source text around the change, and the previous version of the edited paragraph, so the new translation keeps the established wording (see B<--xlate-context-window>). Sensitive strings can be concealed before transmission (see L</ANONYMIZATION AND TEMPLATES>).\n",
+      "Tõlked salvestatakse failipõhiselt vahemällu, seega ei maksa muutumatu teksti puhul käsu uuesti käivitamine midagi. Dokumendi redigeerimisel saadetakse API-le uuesti ainult muudetud lõigud; kontekstist lähtuv mootor saab ka ümbritsevad tõlked, muudatuse ümbruse algteksti ning redigeeritud lõigu eelmise versiooni, nii et uus tõlge säilitab väljakujunenud sõnastuse (vt B<--xlate-context-window>). Tundlikud stringid saab enne edastamist varjata (vt L</ANONYMIZATION AND TEMPLATES>).\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<--xlate-engine gpt5> and C<perl> module like this:\n",
+      "Kui soovite tõlkida tavalisi tekstilõike dokumendis, mis on kirjutatud Perli pod-stiilis, kasutage käsku B<greple> koos moodulitega C<--xlate-engine gpt5> ja C<perl> järgmiselt:\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "Selles käsus tähendab musterjada C<^([\\w\\pP].*\\n)+> järjestikuseid ridu, mis algavad tähtnumbrilise ja kirjavahemärgiga. See käsk näitab tõlgitavat ala esile tõstetud kujul. Valikut B<--all> kasutatakse kogu teksti koostamiseks.\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the translation engine's output.\n",
+      "Seejärel lisage valitud ala tõlkimiseks valik C<--xlate>. Seejärel leiab süsteem soovitud lõigud ja asendab need tõlkemootori väljundiga.\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "Vaikimisi trükitakse algne ja tõlgitud tekst L<git(1)>-ga ühilduvas \"konfliktimärkide\" formaadis. Kasutades C<ifdef> formaati, saab soovitud osa hõlpsasti kätte käsuga L<unifdef(1)>. Väljundi formaati saab määrata valikuga B<--xlate-format>.\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "Kui soovite tõlkida kogu teksti, kasutage valikut B<--match-all>. See on otsetee, et määrata muster C<(?s).+>, mis vastab kogu tekstile.\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "Konfliktimärkide formaadis andmeid saab vaadata kõrvuti, kasutades käsku L<sdif|App::sdif> koos valikuga C<-V>. Kuna stringide kaupa pole mõtet võrrelda, on soovitatav kasutada C<--no-cdif> valikut. Kui teil ei ole vaja teksti värvida, määrake C<--no-textcolor> (või C<--no-tc>).\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "Töötlemine toimub kindlaksmääratud ühikutes, kuid mitme mittetäieliku tekstirea järjestuse korral teisendatakse need kokku üheks reaks. See operatsioon toimub järgmiselt:\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "Eemaldatakse valge tühik iga rea alguses ja lõpus.\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "Kui rida lõpeb täies laiuses kirjavahemärgiga, ühendage see järgmise reaga.\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "Kui rida lõpeb täies laiuses märgiga ja järgmine rida algab täies laiuses märgiga, ühendatakse read.\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "Kui rea lõpp või algus ei ole täies laiuses märk, ühendage need, lisades tühiku.\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "Vahemälu andmeid hallatakse normaliseeritud teksti alusel, nii et isegi kui tehakse muudatusi, mis ei mõjuta normaliseerimise tulemusi, on vahemälus olevad tõlkeandmed ikkagi tõhusad.\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "See normaliseerimisprotsess viiakse läbi ainult esimese (0.) ja paarisnumbrilise mustri puhul. Seega, kui kaks mustrit on määratud järgmiselt, töödeldakse pärast normaliseerimist esimesele mustrile vastavat teksti ja teisele mustrile vastavat teksti ei normaliseerita.\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "Seetõttu kasutage esimest mustrit teksti puhul, mida tuleb töödelda mitme rea ühendamise teel üheks reaks, ja teist mustrit eelnevalt vormindatud teksti puhul. Kui esimeses mustris ei ole sobivat teksti, kasutage mustrit, mis ei vasta millelegi, näiteks C<(?!)>.\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "Mõnikord on tekstiosasid, mida te ei soovi tõlkida. Näiteks markdown-failide sildid. DeepL soovitab sellistel juhtudel konverteerida välja jäetav tekstiosa XML-tähtedeks, tõlkida ja pärast tõlkimise lõpetamist taastada. Selle toetamiseks on võimalik määrata osad, mis tuleb tõlkimisest välja jätta.\n"
+   ],
+   [
+      "This will interpret each line of the file C<MASKPATTERN> as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "See tõlgendab faili C<MASKPATTERN> iga rida regulaarse väljendina, tõlgib sellega sobivad stringid ja taastab pärast töötlemist. Ridadega, mis algavad C<#>, ei arvestata.\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escaped newline.\n",
+      "Keerukaid mustreid saab kirjutada mitmele reale, kasutades tagasikaldkriipsuga eskapitud reavahetust.\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "Seda, kuidas tekst on maskeerimise abil muudetud, saab näha valiku B<--xlate-mask> abil.\n"
+   ],
+   [
+      "Masking protects markup from being translated. To conceal sensitive strings from the translation service itself, see L</ANONYMIZATION AND TEMPLATES>; both can be used together.\n",
+      "Maskimine kaitseb märgistust tõlkimise eest. Tundlike stringide varjamiseks tõlketeenuse enda eest vaadake L</ANONYMIZATION AND TEMPLATES>; mõlemat saab kasutada koos.\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "See liides on eksperimentaalne ja võib tulevikus muutuda.\n"
+   ],
+   [
+      "Sensitive strings can be concealed before they are sent to the translation API and restored in the output. Three sources of anonymization rules are available: a dictionary file (B<--xlate-anonymize>), inline marks in the document itself (B<--xlate-anonymize-mark>), and YAML front matter values (B<--xlate-frontmatter>). Each string is replaced by a category tag such as C<< <person id=1 /> >> during transmission. The concealment target is API transmission only: local cache files store restored plain text. Use B<--xlate-dryrun> to inspect exactly what would be transmitted.\n",
+      "Tundlikud stringid saab varjata enne nende saatmist tõlke-API-le ja taastada väljundis. Anonüümimise reegleid on saadaval kolmest allikast: sõnastikufailist (B<--xlate-anonymize>), dokumendis endas olevatest sisseehitatud märgetest (B<--xlate-anonymize-mark>) ja YAML-i esiosade väärtustest (B<--xlate-frontmatter>). Iga string asendatakse edastamise ajal kategooriasildiga, näiteks C<< <person id=1 /> >>. Varjamise sihtmärk on ainult API-edastus: kohalikud vahemälufailid salvestavad taastatud tavateksti. Kasutage B<--xlate-dryrun>, et täpselt kontrollida, mis edastataks.\n"
+   ],
+   [
+      "For form documents (quarterly reports and the like), define the actors up front and reference them in the body:\n",
+      "Vormidokumentide puhul (kvartaliaruanded jms) määrake osalised eelnevalt kindlaks ja viidake neile tekstis:\n"
+   ],
+   [
+      "Translate the template once per language with C<--xlate-template> (and C<--xlate-frontmatter> when the values are kept in the file), then render each case with B<pandoc-embedz> standalone mode -- values under C<global:> in an external config never reach the translation API at all:\n",
+      "Tõlkige mall üks kord iga keele kohta, kasutades C<--xlate-template> (ja C<--xlate-frontmatter>, kui väärtused säilitatakse failis), seejärel renderdage iga juhtum B<pandoc-embedz> eraldiseisvas režiimis – väärtused, mis asuvad välises konfiguratsioonis C<global:> all, ei jõua tõlke-API-ni üldse:\n"
+   ],
+   [
+      "For inline marks, providing a macro definition config makes the same translated template render either the real names or a redacted version:\n",
+      "Sisestusmärkide puhul võimaldab makrodefinitsiooni konfiguratsiooni esitamine renderida samal tõlgitud mallil kas tegelikud nimed või redigeeritud versiooni:\n"
+   ],
+   [
+      "Exclude embedz blocks from translation when a document contains them:\n",
+      "Jäta embedz-plokid tõlkimisest välja, kui dokument neid sisaldab:\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "Käivitage tõlkimisprotsess iga sobitatud ala jaoks.\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "Ilma selle valikuta käitub B<greple> nagu tavaline otsingukäsklus. Seega saate enne tegeliku töö käivitamist kontrollida, millise faili osa kohta tehakse tõlge.\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "Käsu tulemus läheb standardväljundisse, nii et vajadusel suunake see faili ümber või kaaluge mooduli L<App::Greple::update> kasutamist.\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "Valik B<--xlate> kutsub B<--xlate-color> valiku B<--color=never> valikul.\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "Valikuga B<--xlate-fold> volditakse konverteeritud tekst määratud laiusega. Vaikimisi laius on 70 ja seda saab määrata valikuga B<--xlate-fold-width>. Neli veergu on reserveeritud sisselülitamiseks, nii et iga rida võib sisaldada maksimaalselt 74 märki.\n"
+   ],
+   [
+      "Specifies the translation engine to be used.\n",
+      "Määrab kasutatava tõlkemootori.\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "Praegu on saadaval järgmised mootorid\n"
+   ],
+   [
+      "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
+      "Mootorimooduleid otsitakse esmalt tagapõhja nimeruumi alt (C<llm>, seejärel C<gpty>), seejärel otse C<App::Greple::xlate> all. Seega laadib C<gpt5> sisse C<App::Greple::xlate::llm::gpt5>, mis kutsub välja käsu C<llm>, samas kui C<gpt4o> kasutab tagavarana C<App::Greple::xlate::gpty::gpt4o>. Kasutage C<--xlate-setopt backend=gpty>, et sundida kasutama konkreetset backendit.\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "Selle asemel, et kutsuda tõlkemootorit, oodatakse tööd. Pärast tõlgitava teksti ettevalmistamist kopeeritakse need lõikelauale. Eeldatakse, et te kleebite need vormi, kopeerite tulemuse lõikelauale ja vajutate return.\n"
+   ],
+   [
+      "Specify the target language. LLM engines accept any language name or code the model understands; it is interpolated into the translation prompt. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "Määrake sihtkeel. LLM-mootorid aktsepteerivad mis tahes keelenime või koodi, mida mudel mõistab; see interpoleeritakse tõlkeprompti. Saadavalolevad keeled saate teada käsu C<deepl languages> abil, kui kasutate mootorit B<DeepL>.\n"
+   ],
+   [
+      "Label used for the original text in C<conflict>, C<colon> and C<ifdef> output formats. With the B<DeepL> engine a non-default value is also passed as the source language.\n",
+      "Silt, mida kasutatakse algteksti jaoks väljundvormingutes C<conflict>, C<colon> ja C<ifdef>. Mootori B<DeepL> puhul edastatakse allikakeelena ka mitte-vaikimisi väärtus.\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "Määrake originaal- ja tõlgitud teksti väljundformaat.\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "Järgmised vormingud, välja arvatud C<xtxt>, eeldavad, et tõlgitav osa on ridade kogum. Tegelikult on võimalik tõlkida ainult osa reast, kuid muu formaadi kui C<xtxt> määramine ei anna mõttekaid tulemusi.\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "Algne ja teisendatud tekst trükitakse L<git(1)> konfliktimärgistuse formaadis.\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "Originaalfaili saate taastada järgmise käsuga L<sed(1)>.\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "Algne ja tõlgitud tekst väljastatakse markdowni kohandatud konteineri stiilis.\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "Ülaltoodud tekst tõlgitakse HTML-is järgmiselt.\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "Koolonite arv on vaikimisi 7. Kui määrate koolonite järjestuse nagu C<:::::>, kasutatakse seda 7 kooloni asemel.\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "Algne ja teisendatud tekst trükitakse L<cpp(1)> C<#ifdef> formaadis.\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "Saate ainult jaapani teksti taastada käsuga B<unifdef>:\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "Algne ja teisendatud tekst on trükitud ühe tühja reaga eraldatud. C<space+> puhul väljastab see ka uue rea pärast teisendatud teksti.\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "Kui formaat on C<xtxt> (tõlgitud tekst) või tundmatu, trükitakse ainult tõlgitud tekst.\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. The default value 0 means the engine's own limit: for the free DeepL account service that is 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "Määrake API-le korraga saadetava teksti maksimaalne pikkus. Vaikimisi väärtus 0 tähendab mootori enda piirangut: DeepLi tasuta kontoteenuse puhul on see API-le (B<--xlate>) 128K ja lõikelauale (B<--xlate-labor>) 5000. Kui kasutate Pro-teenust, võite neid väärtusi muuta.\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "Määrake API-le korraga saadetava teksti maksimaalne ridade arv.\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "Määrake selle väärtuseks 1, kui soovite tõlkida ühe rea korraga. See valik on ülimuslik valikust C<--xlate-maxlen>.\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "Määrake tõlkemootorile saadetav kohandatud käsk. See valik on saadaval LLM-mootorite (C<gpt3>, C<gpt4o>, C<gpt5>) puhul, kuid mitte DeepL-i puhul. Võite kohandada tõlkimiskäitumist, andes AI-mudelile konkreetseid juhiseid. Kui käsk sisaldab C<%s>, asendatakse see sihtkeele nimega.\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "Määrake lisakonteksti teave, mis saadetakse tõlkemootorile. Seda valikut saab kasutada mitu korda, et anda mitu kontekstijada. Kontekstiandmed aitavad tõlkemootoril mõista tausta ja toota täpsemaid tõlkeid.\n"
+   ],
+   [
+      "Number of surrounding translated blocks passed as reference context when re-translating changed blocks (default 2). The context also includes the raw source text around the changed region (headings, list structure, captions) and, when available, the previous version of the changed text recovered from the cache, so that unchanged wording is preserved. Set to 0 to disable context-aware translation entirely. Note that each changed region is translated in its own API call and the context can add up to about 8000 characters to the system prompt, so context-aware translation trades some extra cost for consistency.\n",
+      "Muudetud plokkide uuesti tõlkimisel viitekontekstina edastatavate ümbritsevate tõlgitud plokkide arv (vaikimisi 2). Kontekst hõlmab ka muudetud piirkonna ümbruses olevat töötlemata allikateksti (pealkirjad, loendistruktuur, allkirjad) ning, kui see on kättesaadav, vahemälust taastatud muudetud teksti eelmist versiooni, et säilitada muutmata sõnastus. Määrake väärtuseks 0, et kontekstipõhine tõlkimine täielikult välja lülitada. Pange tähele, et iga muudetud piirkond tõlgitakse omaette API-kõnes ning kontekst võib süsteemi käsklusele lisada kuni umbes 8000 tähemärki, seega kontekstipõhine tõlkimine toob järjepidevuse nimel kaasa mõningaid lisakulusid.\n"
+   ],
+   [
+      "Initialize a new document's cache from another document's cache file. Useful for periodic reports: seed the new issue's cache with the previous issue's, so unchanged paragraphs are not re-translated and edited paragraphs keep the previous issue's wording. The seed is used only when the target cache is empty; otherwise it is ignored with a warning. With the default C<--xlate-cache=auto>, specifying a seed also implies creating the new document's cache file.\n",
+      "Initsialiseerige uue dokumendi vahemälu teise dokumendi vahemälufaili põhjal. Kasulik perioodiliste aruannete puhul: algandmetena kasutage uue väljaande vahemälus eelmise väljaande andmeid, nii et muutmata lõikeid ei tõlgita uuesti ja muudetud lõigud säilitavad eelmise väljaande sõnastuse. Alustust kasutatakse ainult siis, kui sihtvahemälu on tühi; muidu ignoreeritakse seda koos hoiatusega. Vaikimisi C<--xlate-cache=auto> puhul tähendab alustuse määramine ka uue dokumendi vahemälufaili loomist.\n"
+   ],
+   [
+      "Anonymize sensitive strings before they are sent to the translation API, and restore them in the output. The dictionary file gives one entry per item: in JSON (canonical, machine-generatable)\n",
+      "Anonüümistage tundlikud stringid enne nende saatmist tõlke-API-le ja taastage need väljundis. Sõnastikufailis on iga elemendi kohta üks kanne: JSON-vormingus (kanoniline, masinloetav)\n"
+   ],
+   [
+      "or in a simple line format (C<category pattern>, C</.../> for regex). Each item is replaced by a category tag such as C<< <person id=1 /> >>; the same string always gets the same tag, so the model can keep track of who is who. Unknown JSON fields are ignored, so generators (e.g. a local LLM extracting entities) may add their own annotations. Category C<lit> is reserved. Local cache files still store restored plain text: the concealment target is API transmission only.\n",
+      "või lihtsas ridaformaadis (C<category pattern>, C</.../> regulaaravaldiste jaoks). Iga kirje asendatakse kategooriasildiga, näiteks C<< <person id=1 /> >>; sama string saab alati sama sildi, nii et mudel saab jälgida, kes on kes. Tundmatuid JSON-välju ignoreeritakse, seega võivad genereerijad (nt entiteete eraldav kohalik LLM) lisada oma märkusi. Kategooria C<lit> on reserveeritud. Kohalikud vahemälufailid salvestavad endiselt taastatud lihtteksti: varjamise eesmärk on ainult API-ülekande puhul.\n"
+   ],
+   [
+      "A dictionary can be generated by an external tool -- for example a local model extracting sensitive entities:\n",
+      "Sõnastiku saab genereerida välise tööriistaga – näiteks tundlikke entiteete eraldava kohaliku mudeliga:\n"
+   ],
+   [
+      "A UTF-8 BOM in the file is tolerated. Values in the front matter line format may carry a trailing comment only on their own line, not after the value.\n",
+      "Failis olevat UTF-8 BOM-i aktsepteeritakse. Esilehe rea formaadis olevad väärtused võivad sisaldada lõpus kommentaari ainult oma eraldi real, mitte väärtuse järel.\n"
+   ],
+   [
+      "Collect anonymization entries from inline marks in the document itself. Mark the first occurrence like C<{{ person(\"山田太郎\") }}> and every occurrence of the string document-wide is anonymized. The mark itself stays in the source and in the translation, so a document can also be processed by a Jinja2-style macro processor (define the C<person> macro to print or redact the name). A custom I<regex> must contain C<< (?<category>...) >> and C<< (?<text>...) >> named captures.\n",
+      "Koguge anonüümimise kanded dokumendi enda sisseehitatud märkidest. Märgi esimene esinemine näiteks C<{{ person(\"山田太郎\") }}> ja kogu dokumendis esinev string anonüümistatakse. Märge ise jääb nii allikasse kui ka tõlkesse, seega saab dokumenti töödelda ka Jinja2-stiilis makroprotsessoriga (määratle makro C<person> nime väljastamiseks või redigeerimiseks). Kohandatud I<regex> peab sisaldama nimelisi püüdmisi C<< (?<category>...) >> ja C<< (?<text>...) >>.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-anonymize-mark=> (with a trailing C<=>) when using the default notation.\n",
+      "Pange tähele, et sellise valikulise väärtusega valiku puhul võetakse järgnev failiargument väärtusena: kirjutage C<--xlate-anonymize-mark=> (koos lõpus oleva C<=>-ga), kui kasutate vaikimisi märgistust.\n"
+   ],
+   [
+      "Alternative notations can be configured, for example C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> for C<@@person:NAME@@>-style marks, or an HTML-comment form that stays invisible in rendered Markdown. Mark rules are collected per document: a string marked in one input file is not concealed in another file of the same run (unlike front matter values, which accumulate across files).\n",
+      "Võimalik on konfigureerida alternatiivseid märkimisviise, näiteks C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> C<@@person:NAME@@>-stiilis märkide jaoks või HTML-kommentaari vorm, mis jääb renderdatud Markdownis nähtamatuks. Märgistuseeskirjad kogutakse dokumendi kaupa: ühes sisendfailis märgistatud stringi ei peeta sama käivituse teises failis varjatuks (erinevalt esilehe väärtustest, mis kogunevad failide vahel).\n"
+   ],
+   [
+      "Treat template expressions (default: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) as opaque placeholders: instruct the model to copy them unchanged and verify, per block, that the response contains exactly the same expressions, each the same number of times. Their order may change, since translation legitimately reorders them to follow the target language word order. A broken expression aborts the run; the cache is checkpointed and frozen, so nothing paid for is lost.\n",
+      "Käsitle malliväljendeid (vaikimisi: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) läbipaistmatute asendusmärkidena: anna mudelile juhis need muutmata kujul kopeerida ja kontrolli iga ploki puhul, et vastus sisaldaks täpselt samu väljendeid, igaüht sama arv kordi. Nende järjekord võib muutuda, kuna tõlkimisel järjestatakse need sihtkeele sõnajärje järgi ümber. Rikkis väljend katkestab töö; vahemälu salvestatakse ja külmutatakse, nii et midagi makstud tööd ei lähe kaotsi.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-template=> (with a trailing C<=>) when using the default notation.\n",
+      "Pange tähele, et sellise valikulise väärtusega valiku puhul võetakse järgnev failiargument väärtusena: kirjutage C<--xlate-template=> (koos lõpus oleva C<=>-ga), kui kasutate vaikimisi märgistust.\n"
+   ],
+   [
+      "Treat a leading C<---> ... C<---> block as YAML front matter: exclude it from translation and from the phase-2 context slices, and add its flat C<key: value> values to the anonymization rules (category C<var>) as a safety net. With multiple input files the collected values accumulate (erring on the side of concealment).\n",
+      "Käsitlege alguses olevat C<---> ... C<---> plokki kui YAML-i esiosa: jäta see tõlkest ja 2. faasi kontekstilõikudest välja ning lisa selle lihtsad C<key: value> väärtused anonüümimise reeglitesse (kategooria C<var>) turvavõrguna. Mitme sisendfaili korral kogunevad kogutud väärtused (eelistades varjamist).\n"
+   ],
+   [
+      "Always leave a blank line after the closing C<--->. With a paragraph-style match pattern, front matter that runs directly into the body text forms one straddling block that the exclusion cannot suppress (a warning is printed in that case); the values are still anonymized, but the front matter itself would be sent for translation.\n",
+      "Jäta alati tühirida sulgevate C<---> järel. Lõigu-stiilis sobitusmustri korral moodustab sissejuhatus, mis ulatub otse põhiteksti sisse, ühe üle ulatuva ploki, mida välistamine ei suuda maha suruda (sel juhul kuvatakse hoiatus); väärtused anonüümistatakse ikkagi, kuid sissejuhatav tekst ise saadetakse tõlkimiseks.\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "Määrake sõnastiku ID, mida kasutatakse tõlkimisel. See valik on saadaval ainult siis, kui kasutatakse DeepL mootorit. Sõnastiku ID tuleks saada teie DeepL kontolt ja see tagab konkreetsete terminite järjepideva tõlkimise.\n"
+   ],
+   [
+      "Do not call the translation API; instead show, through the progress display, each payload exactly as it would be transmitted (after anonymization and masking). Useful for checking what leaves the machine and for estimating the cost of a run.\n",
+      "Ära kutsu tõlke-API-d; näita selle asemel edastusnäidiku kaudu iga andmepaketti täpselt nii, nagu see edastataks (pärast anonüümistamist ja maskeerimist). See on kasulik selle kontrollimiseks, mis masinast väljub, ning töökäigu maksumuse hindamiseks.\n"
+   ],
+   [
+      "See the translation result in real time in the STDERR output. The C<From> payload is shown as transmitted, after anonymization and masking.\n",
+      "Vaata tõlketulemust reaalajas STDERR-väljundis. Andmepakett C<From> kuvatakse edastatuna, pärast anonüümimist ja maskeerimist.\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "Kasutage L<App::Greple::stripe> moodulit, et näidata sobitatud osa sebratriibu moodi. See on kasulik siis, kui sobitatud osad on omavahel ühendatud.\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "Värvipalett vahetatakse vastavalt terminali taustavärvile. Kui soovite seda selgesõnaliselt määrata, võite kasutada B<--xlate-stripe-light> või B<--xlate-stripe-dark>.\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "Sooritage maskeerimisfunktsioon ja kuvage teisendatud tekst sellisena, nagu see on, ilma taastamiseta.\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "Määrake kogu faili tekst sihtkohaks.\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "Formaatide C<cm> ja C<colon> puhul jagatakse ja vormistatakse väljund rida-realt. Seega, kui tõlgitakse ainult osa reast, ei saa oodatud tulemust. Need filtrid parandavad väljundi, mis on rikutud, kui osa reast tõlgitakse tavalise rea kaupa väljundiks.\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "Praeguses rakenduses, kui rea mitu osa tõlgitakse, väljastatakse need sõltumatute ridadega.\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "B<xlate> moodul võib salvestada iga faili tõlketeksti vahemällu ja lugeda seda enne täitmist, et kõrvaldada serveri küsimisega kaasnev koormus. Vaikimisi vahemälustrateegia C<auto> puhul säilitab ta vahemälu andmeid ainult siis, kui vahemälufail on sihtfaili jaoks olemas.\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "Kasutage B<--xlate-cache=clear>, et alustada vahemälu haldamist või puhastada kõik olemasolevad vahemälu andmed. Selle valikuga käivitamisel luuakse uus vahemälufail, kui seda ei ole veel olemas, ja seejärel hooldatakse seda automaatselt.\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "Säilitada vahemälufaili, kui see on olemas.\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "Loob tühja vahemälufaili ja väljub.\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "Säilitab vahemälu andmed niikuinii, kui sihtfail on tavaline fail.\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "Tühjendage esmalt vahemälu andmed.\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "Ei kasuta kunagi vahemälufaili, isegi kui see on olemas.\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "Vaikimisi käitumise kohaselt eemaldatakse kasutamata andmed vahemälufailist. Kui te ei soovi neid eemaldada ja failis hoida, kasutage C<accumulate>.\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "See valik sunnib uuendama vahemälufaili isegi siis, kui see pole vajalik.\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "Seda moodulit saab hõlpsasti kasutada käsurealt, kasutades jaotuses sisalduvat käsku C<xlate>. Kasutamise kohta vaata man-lehte C<xlate>.\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "Käsk C<xlate> toetab GNU stiilis pikki valikuid nagu C<--to-lang>, C<--from-lang>, C<--engine> ja C<--file>. Kasutage C<xlate -h>, et näha kõiki olemasolevaid valikuid.\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "C<xlate> käsk töötab koos Dockeri keskkonnaga, nii et isegi kui teil ei ole midagi paigaldatud, saate seda kasutada, kui Docker on saadaval. Kasutage valikut C<-D> või C<-C>.\n"
+   ],
+   [
+      "Docker operations are handled by L<App::dozo>, which can also be used as a standalone command. The C<dozo> command supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "Dockeri operatsioone käsitletakse L<App::dozo>, mida saab kasutada ka iseseisva käsuna. Käsk C<dozo> toetab C<.dozorc> konfiguratsioonifaili püsivate konteineri seadete jaoks.\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "Samuti, kuna makefile'id erinevate dokumendistiilide jaoks on olemas, on tõlkimine teistesse keeltesse võimalik ilma spetsiaalse täpsustuseta. Kasutage valikut C<-M>.\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "Saate ka kombineerida Dockeri ja C<make> valikuid, nii et saate käivitada C<make> Dockeri keskkonnas.\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "Käivitamine nagu C<xlate -C> käivitab shell'i, kuhu on paigaldatud praegune töötav git-repositoorium.\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "Lugege üksikasjalikult Jaapani artiklit L</SEE ALSO> osas.\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "Laadige repositooriumis sisalduv fail F<xlate.el>, et kasutada C<xlate> käsku Emacs redaktorist. C<xlate-region> funktsioon tõlkida antud piirkonda. Vaikimisi keel on C<EN-US> ja te võite määrata keele, kutsudes seda prefix-argumendiga.\n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "Määrake oma autentimisvõti DeepL teenuse jaoks.\n"
+   ],
+   [
+      "OpenAI authentication key, used by the legacy B<gpty> engines. The C<llm>-based B<gpt5> engine reads this variable too, but keys stored with C<llm keys set openai> also work.\n",
+      "OpenAI autentimise võti, mida kasutavad vanemad B<gpty>-mootorid. Ka C<llm>-põhine B<gpt5>-mootor loeb seda muutujat, kuid toimivad ka C<llm keys set openai>-ga salvestatud võtmed.\n"
+   ],
+   [
+      "Set the default cache strategy (see L</CACHE OPTIONS>).\n",
+      "Määra vaikimisi vahemälustrateegia (vaata L</CACHE OPTIONS>).\n"
+   ],
+   [
+      "Install the command line tool for the engine you use: C<llm> for the B<gpt5> engine, C<deepl> for DeepL, C<gpty> for the legacy GPT engines.\n",
+      "Paigalda kasutatava mootori jaoks mõeldud käsurea tööriist: C<llm> mootori B<gpt5> jaoks, C<deepl> DeepL-i jaoks, C<gpty> vanemate GPT-mootorite jaoks.\n"
+   ],
+   [
+      "L<https://llm.datasette.io/>\n",
+      "L<https://llm.datasette.io/>\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n"
+   ],
+   [
+      "L<App::dozo> - Generic Docker runner used by xlate for container operations\n",
+      "L<App::dozo> - üldine Docker runner, mida xlate kasutab konteineroperatsioonideks.\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "Vt B<greple> käsiraamatust üksikasjalikult sihttekstimustri kohta. Kasutage B<--inside>, B<--outside>, B<--include>, B<--exclude> valikuid, et piirata sobitusala.\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "Saate kasutada C<-Mupdate> moodulit, et muuta faile B<greple> käsu tulemuse järgi.\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "Kasutage B<sdif>, et näidata konfliktimärkide formaati kõrvuti valikuga B<-V>.\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "Greple B<xlate-stripe> mooduli kasutamine B<--xlate-stripe> valikuga.\n"
+   ],
+   [
+      "Docker container image.\n",
+      "Dockeri konteineri kujutis.\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> script and L<App::dozo>.\n",
+      "C<getoptlong.sh> raamatukogu, mida kasutatakse C<xlate> skripti ja L<App::dozo> valikute parsimiseks.\n"
+   ],
+   [
+      "The C<llm> command used by the B<gpt5> engine to access LLM models.\n",
+      "C<llm>-käsk, mida B<gpt5>-mootor kasutab LLM-mudelitele juurdepääsuks.\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "DeepL Pythoni raamatukogu ja CLI käsk.\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "OpenAI Pythoni raamatukogu\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "OpenAI käsurea liides\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "Greple moodul tõlkida ja asendada ainult vajalikud osad DeepL API (jaapani keeles)\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "Dokumentide genereerimine 15 keeles DeepL API mooduliga (jaapani keeles).\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "Automaatne tõlkekeskkond Docker koos DeepL API-ga (jaapani keeles)\n"
+   ]
+]

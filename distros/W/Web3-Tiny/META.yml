@@ -1,0 +1,29 @@
+---
+abstract: 'A small, dependency-light way to talk to Ethereum from Perl'
+author:
+  - 'Alex Pepper <axpepper@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web3-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CryptX: '0.081'
+  HTTP::Tiny: '0'
+  JSON::PP: '0'
+  Math::BigInt: '0'
+  perl: '5.016'
+resources:
+  repository: https://github.com/axpepper/Web3-Tiny.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

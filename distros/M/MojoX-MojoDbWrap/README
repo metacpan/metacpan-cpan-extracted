@@ -1,0 +1,258 @@
+NAME
+
+    MojoX::MojoDbWrap - Light wrapper around Mojo::Pg/SQLite/...
+
+VERSION
+
+    This document describes MojoX::MojoDbWrap version 0.002.
+
+SYNOPSIS
+
+       use MojoX::MojoDbWrap;
+    
+       # use anything good for Mojo::Pg or Mojo::SQLite constructor
+       my $wrap = MojoX::MojoDbWrap->new(
+          db_url         => $db_url,  # e.g. 'postgres://...'
+          migrations_for => { Pg => ..., SQLite => ... },
+       );
+    
+       # if using a different class, create an object and pass it as db_url
+       my $mdb = My::Class->new(...);
+       my $wrap = MojoX::MojoDbWrap->new(
+          db_url => $mdb,
+          migrations_for => { ... },
+          inserter_for => {
+             'My::Class' => sub ($wrapper, $tablish, $data, $opts) { ... },
+          },
+       );
+       # Alternatively, My::Class must implement method
+       # "insert_returning_id" accepting the same parameters as the inserter
+       # above
+    
+       say $wrap->mdb_module; # "Mojo::Pg" or "Mojo::SQLite" or...
+       say $wrap->mdb_class;  # ditto, but the class is also `require`d
+    
+       # get the underlying instance of Mojo::Pg or Mojo::SQLite or ... object
+       my $mojodb = $wrap->mdb;
+    
+       # get the `db` for actual query calling (like calling the underlying
+       # instances's `db` method)
+       my $db = $wrap->db;
+    
+       # assuming a column called `id`, get the id of the element corresponding
+       # to a condition. The `$condition` is something good for a `select` on
+       # the `$wrap->db` instance.
+       my $id_existing = $wrap->id_of($table, $conditon);
+    
+       # if the identifier column is called in another way, pass it with the
+       # table name like this:
+       my $id_existing = $wrap->id_of([$table, $id_column_name], $condition);
+       # also with optional $options as last parameter
+    
+       # ensure there's something - either get the id, or insert stuff and
+       # get the id back anyway
+       my $id_ensure = $wrap->id_or_insert($table, $condition, $default);
+    
+       # wrapper around $wrap->mdb->db->select(...)
+    $wrap->select(@select_args...);
+    
+       # do the init with the relevant migration, if provided
+       $wrap->init;
+    
+       # extensibility
+       my $wrap = MojoX::MojoDbWrap->new(
+          db_url => $whatever,
+          wrappers => [
+             {
+                class => 'My::Class1',
+                create => sub ($class, $db_url) { ... },
+                insert => sub (@args) { ... },
+             },
+             {
+                class => 'My::Class1',
+                create => sub ($class, $db_url) { ... },
+                insert => sub (@args) { ... },
+             },
+             ...
+          ],
+       );
+
+DESCRIPTION
+
+    This module acts as a light wrapper around classes like Mojo::Pg or
+    Mojo::SQLite, which provide a much overlapping interface with the
+    notable difference regarding how to take the identifier of a new record
+    upon its creation. While at it, this class also provides a couple of
+    useful functions like select.
+
+INTERFACE
+
+ db
+
+       my $db = $wrap->new;
+
+    Same as $wrap->mdb->db.
+
+ db_url
+
+       my $url = $wrap->db_url;
+
+    The URL provided in "new".
+
+ id_of
+
+       my $id = $wrap->id_of($tablish, $cond);  # OR
+       my $id = $wrap->id_of($tablish, $cond, $opts);
+
+    Get the identifier of a record result of searching for condition $cond,
+    optionally with options in $opts.
+
+    Parameter $tablish can either be a string, holding the name of the
+    table where to run the query, or an array reference that is supposed to
+    carry two strings, the first being the table name and the second being
+    the name of the identifier column.
+
+ id_or_insert
+
+       my $id = $wrap->id_or_insert($tablish, $cond, $default); # OR
+       my $id = $wrap->id_or_insert($tablish, $cond, $default, $opts);
+
+    Retrieve the identifier of the record result of searching for condition
+    $cond, creating the record in case it is missing with values in
+    $default.
+
+    $opts is an optional hash that can contain options associated to keys
+    select (for searching the identifier using "id_of") and insert (in case
+    we need to insert a new record using $default).
+
+    Parameter $tablish is the same as in "id_of" (and used to call that
+    method).
+
+ init
+
+       $wrap->init; # OR
+       $wrap->init($name);
+
+    If available via "migrations_for", runs the migrations based on the
+    specific class. $name defaults to the string migrations.
+
+ mdb
+
+       my $mdb = $wrap->mdb;
+
+    Get the wrapped object (i.e. an instance of Mojo::Pg, Mojo::SQLite, or
+    whatever else was instantiated through any of the wrappers provided in
+    "new").
+
+ mdb_class
+
+       my $mdb = $wrap->mdb_class;
+
+    The class of the wrapped object. Technically the wrapped object might
+    be of another class, this is what is passed in the class slot of the
+    selected wrapper in wrappers as passed to "new".
+
+    The value of this method is used to select the relevant migration when
+    calling "init".
+
+ mdb_module
+
+       my $mdb = $wrap->mdb_module;
+
+    Alias for "mdb_class".
+
+ migrations_for
+
+       my $hashref = $wrap->migrations_for;
+
+    Retrieve a hash reference with keys corresponding to the supported
+    classes for wrapped objects, and values corresponding to the
+    migrations.
+
+ new
+
+       my $wrap = MojoX::MojoDbWrap->new(%args); # OR
+       my $wrap = MojoX::MojoDbWrap->new(\%args);
+
+    Create a new instance. Keys in %args can be used to set "db_url"
+    (required) and "migrations_for", as well as an array reference for
+    wrappers as explained below.
+
+    Parameter db_url is in general supposed to be a string that can be used
+    to instantiate a Mojo::Pg object (if it starts with postgres:// or
+    postgresql://) or a Mojo::SQLite object (any other string). These are
+    the two classes wrapped by default.
+
+    Parameter wrappers allows providing a list of wrappers in case you want
+    to support further classes too. This list is given as an array
+    reference holding hashes with the following keys:
+
+    class
+
+      the name of the class, which in case of selection will also be used
+      to select a migration.
+
+    create
+
+      a sub reference for creating a new instance, it will be called like
+      this:
+
+         $sub->($class, $db_url)
+
+      with $class the same as class above and $db_url the same as the
+      parameter db_url.
+
+      The sub can return either undef, in case it is not capable of
+      handling $db_url, or an object that becomes the wrapped instance (as
+      returned by "mdb").
+
+    insert
+
+      a sub reference for inserting a new record. It will be called like
+      this:
+
+         $sub->($wrap, $tablish, $data, $opts)
+
+      where $wrap is a reference to the MojoX::MojoDbWrap object, $tablish
+      is the name of the table or an array with the name of the table and
+      the name of the identifier column (much like "id_of" and
+      "id_or_insert"), $data is the data to use for the insert and $opts
+      are any insert options passed by "id_or_insert".
+
+      The return value must be the identifier of the newly inserted record.
+
+    When needed the wrapper instantiation, items in wrappers are used in
+    succession to call the create sub, until one returns a true value that
+    is taken as the wrapped object. If none is matched, Mojo::Pg and
+    Mojo::SQLite are tried last, in ths order.
+
+ select
+
+       my $x = $wrap->select(@args);
+
+    Wrapper around $wrap->mdb->db->select(@args).
+
+BUGS AND LIMITATIONS
+
+    Minimul perl version 5.24.
+
+AUTHOR
+
+    Flavio Poletti <flavio@polettix.it>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+

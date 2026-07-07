@@ -13,7 +13,7 @@ WriteMakefile(
         'Carp'               => 0,
         'JSON::PP'           => 0,
         'Params::Filter'     => '0.014',
-        'Concierge::Auth'    => 0,
+        'Concierge::Auth'    => '0.5.0',
         'Concierge::Sessions' => 0,
         'Concierge::Users'   => 0,
     },
@@ -46,19 +46,19 @@ WriteMakefile(
         provides => {
             'Concierge' => {
                 file    => 'lib/Concierge.pm',
-                version => 'v0.8.4',
+                version => 'v0.9.0',
             },
             'Concierge::Desk::Base' => {
                 file    => 'lib/Concierge/Desk/Base.pm',
-                version => 'v0.8.4',
+                version => 'v0.9.0',
             },
             'Concierge::Desk::Setup' => {
                 file    => 'lib/Concierge/Desk/Setup.pm',
-                version => 'v0.8.4',
+                version => 'v0.9.0',
             },
             'Concierge::Desk::User' => {
                 file    => 'lib/Concierge/Desk/User.pm',
-                version => 'v0.8.4',
+                version => 'v0.9.0',
             },
         },
     },

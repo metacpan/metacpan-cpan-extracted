@@ -9,7 +9,9 @@ use Time::HiRes qw(time);
 
 use FindBin;
 use lib $FindBin::Bin;
-use IPCShareableTest qw(unique_glue assert_clean);
+use IPCShareableTest qw(unique_glue assert_clean require_free_sem_sets);
+
+require_free_sem_sets();
 
 # --- Test 1: LOCK_EX on root holds child semaphore (LOCK_NB returns 0) ---
 {
@@ -23,24 +25,33 @@ use IPCShareableTest qw(unique_glue assert_clean);
     $h{a} = { x => 1 };
     my $child = tied(%{ $h{a} });
 
-    pipe(my $r, my $w) or die "pipe: $!";
+    pipe(my $r,  my $w)  or die "pipe1: $!";
+    pipe(my $r2, my $w2) or die "pipe2: $!";
 
     my $pid = fork;
     defined $pid or die "fork: $!";
 
     if ($pid == 0) {
-        close $w;
+        close $w;   # child doesn't write to pipe1
+        close $r2;  # child doesn't read from pipe2
         <$r>;   # wait for parent to hold LOCK_EX
         close $r;
         my $got = $child->lock(LOCK_EX | LOCK_NB);
         is $got, 0, "LOCK_EX on root: child LOCK_EX|LOCK_NB returns 0 while parent holds lock";
+        print $w2 "done\n"; close $w2;
         exit 0;
     }
 
-    close $r;
+    # Hold LOCK_EX until the child's NB probe has completed, rather than for a
+    # fixed interval: on a loaded smoker the child can be descheduled past any
+    # fixed hold window, at which point its NB attempt would succeed and the
+    # assertion would fail (seen on CPAN testers).
+
+    close $r;   # parent doesn't read from pipe1
+    close $w2;  # parent doesn't write to pipe2
     $root->lock(LOCK_EX);
     print $w "ready\n"; close $w;
-    select(undef, undef, undef, 0.3);
+    <$r2>; close $r2;   # wait for child probe done
     $root->unlock;
 
     waitpid($pid, 0);
@@ -103,13 +114,15 @@ use IPCShareableTest qw(unique_glue assert_clean);
     $h{a} = { x => 1 };
     my $child = tied(%{ $h{a} });
 
-    pipe(my $r, my $w) or die "pipe: $!";
+    pipe(my $r,  my $w)  or die "pipe1: $!";
+    pipe(my $r2, my $w2) or die "pipe2: $!";
 
     my $pid = fork;
     defined $pid or die "fork: $!";
 
     if ($pid == 0) {
         close $w;
+        close $r2;
         <$r>;
         close $r;
 
@@ -122,13 +135,17 @@ use IPCShareableTest qw(unique_glue assert_clean);
         my $ex_got = $child->lock(LOCK_EX | LOCK_NB);
         is $ex_got, 0, "LOCK_SH on root: child LOCK_EX|LOCK_NB blocked while parent holds LOCK_SH";
 
+        print $w2 "done\n"; close $w2;
         exit 0;
     }
 
+    # Hold LOCK_SH until the child's probes are done (see Test 1)
+
     close $r;
+    close $w2;
     $root->lock(LOCK_SH);
     print $w "ready\n"; close $w;
-    select(undef, undef, undef, 0.3);
+    <$r2>; close $r2;
     $root->unlock;
 
     waitpid($pid, 0);
@@ -175,13 +192,15 @@ use IPCShareableTest qw(unique_glue assert_clean);
     my $a_knot = tied(%{ $h{a} });
     my $b_knot = tied(%{ $h{a}{b} });
 
-    pipe(my $r, my $w) or die "pipe: $!";
+    pipe(my $r,  my $w)  or die "pipe1: $!";
+    pipe(my $r2, my $w2) or die "pipe2: $!";
 
     my $pid = fork;
     defined $pid or die "fork: $!";
 
     if ($pid == 0) {
         close $w;
+        close $r2;
         <$r>;
         close $r;
 
@@ -191,13 +210,19 @@ use IPCShareableTest qw(unique_glue assert_clean);
         my $b_got = $b_knot->lock(LOCK_EX | LOCK_NB);
         is $b_got, 0, "3-level: level-2 grandchild LOCK_EX|LOCK_NB blocked";
 
+        print $w2 "done\n"; close $w2;
         exit 0;
     }
 
+    # Hold LOCK_EX until the child's probes are done (see Test 1); the fixed
+    # 0.3s hold raced against child scheduling and failed on loaded smokers
+    # (the FreeBSD 15 CPAN tester FAILs for 1.18 were exactly this test)
+
     close $r;
+    close $w2;
     $root->lock(LOCK_EX);
     print $w "ready\n"; close $w;
-    select(undef, undef, undef, 0.3);
+    <$r2>; close $r2;
     $root->unlock;
 
     waitpid($pid, 0);
@@ -218,22 +243,26 @@ use IPCShareableTest qw(unique_glue assert_clean);
     my $a_knot = tied(%{ $h{a} });
     my $b_knot = tied(%{ $h{a}{b} });
 
-    pipe(my $r, my $w) or die "pipe: $!";
+    pipe(my $r,  my $w)  or die "pipe1: $!";
+    pipe(my $r2, my $w2) or die "pipe2: $!";
 
     my $pid = fork;
     defined $pid or die "fork: $!";
 
     if ($pid == 0) {
-        # child holds LOCK_EX on grandchild to block the parent's NB attempt
+        # Child holds LOCK_EX on the grandchild until the parent has finished
+        # its NB probes (see Test 1 for why a fixed hold interval is a race)
         close $r;
+        close $w2;
         $b_knot->lock(LOCK_EX);
         print $w "locked\n"; close $w;
-        select(undef, undef, undef, 0.5);
+        <$r2>; close $r2;   # wait for parent probes done
         $b_knot->unlock;
         exit 0;
     }
 
     close $w;
+    close $r2;
     <$r>;   # grandchild is now locked by child process
     close $r;
 
@@ -246,6 +275,8 @@ use IPCShareableTest qw(unique_glue assert_clean);
     # Verify root's semaphore was also released (NB attempt should succeed now for root alone)
     my $root_nb = $root->lock(LOCK_EX | LOCK_NB);
     is $root_nb, 0, "LOCK_NB rollback: root semaphore released (still blocked by held grandchild)";
+
+    print $w2 "done\n"; close $w2;
 
     waitpid($pid, 0);
 

@@ -4,13 +4,13 @@
       "Michael McClennen <mmcclenn@geology.wisc.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTTP-Validate",
    "prereqs" : {
@@ -33,7 +33,7 @@
    "provides" : {
       "HTTP::Validate" : {
          "file" : "lib/HTTP/Validate.pm",
-         "version" : "0.982"
+         "version" : "1.0"
       },
       "HTTP::Validate::Result" : {
          "file" : "lib/HTTP/Validate.pm"
@@ -45,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.982",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

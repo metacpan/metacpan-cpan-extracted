@@ -1,6 +1,6 @@
 package App::Greple::xlate::null;
 
-our $VERSION = "1.0202";
+our $VERSION = "2.00";
 
 use v5.14;
 use warnings;

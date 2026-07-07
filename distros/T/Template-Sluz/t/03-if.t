@@ -43,4 +43,10 @@ sluz_test($sluz, '{if $bogus_var}a{elseif $debug}b{elseif $true}c{else}d{/if}'  
 sluz_test($sluz, '{if $bogus_var}a{elseif $bogus_var2}b{elseif $true}c{else}d{/if}'      , 'c'       , 'If #29 - Multiple elseif (second match)');
 sluz_test($sluz, '{if $bogus_var}a{elseif $bogus_var2}b{elseif $bogus_var3}c{else}d{/if}', 'd'       , 'If #30 - Multiple elseif (all false, else)');
 
+# Whitespace parity: leading newline stripped from if/else/elseif payloads
+sluz_test($sluz, "{if \$x}\nYES\n{/if}"                                                   , "YES\n"  , 'If #31 - Leading newline stripped from true branch');
+sluz_test($sluz, "{if \$zero}\nYES\n{else}\nNO\n{/if}"                                    , "NO\n"   , 'If #32 - Leading newline stripped from else branch');
+sluz_test($sluz, "{if \$zero}\n1\n{elseif \$debug}\n2\n{else}\n3\n{/if}"                   , "2\n"    , 'If #33 - Leading newline stripped from elseif branch');
+sluz_test($sluz, "{if \$bogus_var}\n1\n{elseif \$bogus_var2}\n2\n{elseif \$debug}\n3\n{else}\n4\n{/if}", "3\n", 'If #34 - Leading newline stripped from latter elseif branch');
+
 done_testing();

@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 - Source modules live in `lib/App/Greple/` (e.g., `lib/App/Greple/xlate.pm` and `lib/App/Greple/xlate/`).
 - Executables are in `script/` (primary CLI: `script/xlate`).
-- Tests are in `t/` (helpers under `t/runner`), examples in `examples/`, and docs in `docs/`.
+- Tests are in `t/` (helpers under `t/runner`), examples in `examples/`, generated multi-language docs in `i18n/`, and development docs in `docs/`.
 - Shared assets/resources are under `share/`; containerization files under `docker/`.
 
 ## Build, Test, and Development Commands

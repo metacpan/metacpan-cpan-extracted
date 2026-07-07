@@ -30,6 +30,7 @@ t/200_leaks.t
 t/210_tainted.t
 t/220_magic.t
 t/300_read.t
+t/301_read_layers.t
 t/999_pod.t
 t/Util.pm
 t/quickbrown.txt

@@ -16,7 +16,7 @@
 `prove -lrf`
 
 ### Build the README from the POD
-`pod2github pod2github lib/**/*.pm > README.md`
+`pod2github lib/**/*.pm > README.md`
 
 ### Make the .tar.gz
 `make tardist`

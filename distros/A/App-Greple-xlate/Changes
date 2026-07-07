@@ -1,5 +1,47 @@
 Revision history for Perl extension App-Greple-xlate
 
+2.00 2026-07-06T19:58:24Z
+
+    - New llm backend: the gpt5 engine now calls the general-purpose
+      llm command (https://llm.datasette.io/) instead of gpty.  The
+      gpty-based engines (gpt3, gpt4, gpt4o) are retained under the
+      gpty namespace; engine names are resolved backend-first (llm,
+      then gpty, then bare).  Use --xlate-setopt backend=gpty to force
+      a specific backend.
+    - Context-aware differential translation: when a cached document
+      is edited, each changed region is translated in its own API call
+      together with the surrounding translated pairs, the raw source
+      text around the change, and the previous translation of the
+      edited part, so unchanged wording is preserved.  Controlled by
+      --xlate-context-window (default 2, set 0 to disable).
+    - Anonymization: conceal sensitive strings from the translation
+      API with --xlate-anonymize (JSON or line-format dictionary) or
+      --xlate-anonymize-mark (inline first-occurrence marks).  Strings
+      are replaced by category tags like <person id=1 /> during
+      transmission and restored in the output; local cache files keep
+      restored plain text.
+    - Template support: --xlate-template protects Jinja2-style
+      expressions as opaque placeholders and verifies that they
+      survive translation; --xlate-frontmatter excludes YAML front
+      matter from translation and anonymizes its values.  Designed to
+      work with macro processors such as pandoc-embedz.
+    - Add --xlate-cache-seed to initialize a new document's cache from
+      another document's cache file (useful for periodic reports).
+    - Behavior change: the progress From display and the --xlate-dryrun
+      preview now show each payload as transmitted, after anonymization
+      and masking.
+    - A failed translation run no longer discards cache data: results
+      already obtained are saved and the cache file is left untouched
+      afterward.
+    - Fix cache lookup bugs: duplicate normalized keys could fake
+      cache hits, and default settings were shared between cache
+      objects.
+    - Revise the manual for the new engine layout; document the
+      previously missing --xlate-dryrun and --xlate-from options and
+      the GREPLE_XLATE_CACHE environment variable.
+    - Move the generated multilingual documentation from docs/ to
+      i18n/; docs/ now holds development documentation only.
+
 1.0202 2026-06-17T09:49:59Z
 
     - Revert gpt5 default batch size to 3000 chars; 10000 made large

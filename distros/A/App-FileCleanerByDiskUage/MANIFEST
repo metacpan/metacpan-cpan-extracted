@@ -4,9 +4,11 @@ Makefile.PL
 MANIFEST			This list of files
 README.md
 t/00-load.t
+t/clean.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/removal_loop.t
 src_bin/file_cleaner_by_du
 .perlcriticrc
 .perltidyrc

@@ -44,15 +44,6 @@ Info: red / 39
     my $sluz = Template::Sluz->new();
     ```
 
-    Options (all are optional):
-
-    ```perl
-    my $sluz = Template::Sluz->new(
-        auto_escape => 1,   # auto HTML-escape all variable output
-        debug       => 1,   # enable debug mode (currently unused)
-    );
-    ```
-
 - **assign**
 
     Assign template variables.
@@ -181,9 +172,9 @@ All template syntax works the same way with alternate delimiters:
     Not adult
 </if>
 
-{foreach $items as $item}
+<foreach $items as $item>
     <$item>
-{/foreach}
+</foreach>
 ```
 
 This is useful when your template content contains curly braces that would

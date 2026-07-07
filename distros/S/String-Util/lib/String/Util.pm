@@ -8,7 +8,7 @@ use v5.14;
 # version
 # https://blogs.perl.org/users/grinnz/2018/04/a-guide-to-versions-in-perl.html
 # https://github.com/andk/pause/blob/master/doc/operating-model.md#36-developer-releases
-our $VERSION  = '1.35';
+our $VERSION  = '1.36';
 our $FGC_MODE = 'UTF-8';
 
 #------------------------------------------------------------------------------
@@ -186,8 +186,8 @@ sub trim {
 		return undef;
 	}
 
-	$s =~ s/^\s*//u;
-	$s =~ s/\s*$//u;
+	$s =~ s/^\s+//u;
+	$s =~ s/\s+$//u;
 
 	return $s;
 }
@@ -207,7 +207,7 @@ sub ltrim {
 		return undef;
 	}
 
-	$s =~ s/^\s*//u;
+	$s =~ s/^\s+//u;
 
 	return $s;
 }
@@ -219,7 +219,7 @@ sub rtrim {
 		return undef;
 	}
 
-	$s =~ s/\s*$//u;
+	$s =~ s/\s+$//u;
 
 	return $s;
 }
@@ -463,7 +463,7 @@ sub eqq {
 
 =head2 neqq($scalar1, $scalar2)
 
-The opposite of C<neqq>, returns true if the two values are *not* the same.
+The opposite of C<eqq>, returns true if the two values are B<not> the same.
 Here are some examples and what they return.
 
   $var = neqq('x', 'x');     # False
@@ -639,12 +639,12 @@ sub contains {
 
 Checks if the string starts with the characters in substring
 
-  $var = startwith("Hello world", "Hello"); # true
-  $var = startwith("Hello world", "H");     # true
-  $var = startwith("Hello world", "");      # true
-  $var = startwith("Hello world", "Q");     # false
-  $var = startwith(undef, "Q");             # false
-  $var = startwith("Hello world", undef);   # false
+  $var = startswith("Hello world", "Hello"); # true
+  $var = startswith("Hello world", "H");     # true
+  $var = startswith("Hello world", "");      # true
+  $var = startswith("Hello world", "Q");     # false
+  $var = startswith(undef, "Q");             # false
+  $var = startswith("Hello world", undef);   # false
 
   # Also works with grep
   @arr = grep { startswith("X") } @input;

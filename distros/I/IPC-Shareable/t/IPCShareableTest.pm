@@ -16,10 +16,19 @@ use IPC::Semaphore;
 # (macOS ~87, Linux ~32000).
 use constant LOW_SEM_SETS => 32;
 
+# Default minimum of FREE semaphore sets a tie-using test file requires before
+# it will run (see require_free_sem_sets()). Chosen as a safe ceiling on any
+# single test file's peak concurrent tie count (root ties plus nested-ref
+# children), so that a file which starts is very unlikely to die ENOSPC
+# mid-run. On a healthy small host (OpenBSD semmni=10, nothing else running)
+# everything still runs; on one pre-wedged by stale sets, files skip cleanly
+# instead of failing.
+use constant FREE_SEM_SETS_NEEDED => 8;
+
 our @EXPORT_OK = qw(
     assert_clean assert_clean_process barrier_new barrier_release barrier_wait
-    live_seg_count low_sem_resources relieve_ipc_pressure sem_set_limit
-    tree_seg_count unique_glue
+    free_sem_sets live_seg_count low_sem_resources relieve_ipc_pressure
+    require_free_sem_sets sem_set_limit tree_seg_count unique_glue
 );
 
 # A token that is unique to this process and stable across fork() (it is
@@ -127,6 +136,23 @@ sub barrier_wait {
     close $barrier->{reader};
 }
 
+# Number of SysV semaphore sets still available on the host: the SEMMNI limit
+# minus the sets currently in use system-wide (by ANY process). Returns undef
+# when the limit cannot be determined. Unlike low_sem_resources() -- which
+# looks only at the LIMIT -- this accounts for sets already consumed, eg. by a
+# concurrent smoker or stale sets leaked by previously crashed runs, which is
+# what actually starves semget() into ENOSPC on wedged hosts.
+
+sub free_sem_sets {
+    my $limit = sem_set_limit();
+
+    return undef if ! defined $limit;
+
+    my $free = $limit - IPC::Shareable::sem_count();
+
+    return $free < 0 ? 0 : $free;
+}
+
 # Count of IPC::Shareable segments currently live and owned by THIS process
 # (a tied structure's root plus its nested-reference children), via the
 # module's own global register. Process-scoped, so it is immune to unrelated
@@ -164,6 +190,33 @@ sub low_sem_resources {
 
 sub relieve_ipc_pressure {
     IPC::Shareable::clean_up_all if low_sem_resources();
+}
+
+# Skip the entire test file when the host does not have at least $needed free
+# SysV semaphore sets. Every tie consumes one set, so a file whose peak
+# concurrent tie count cannot be satisfied dies mid-run with "Could not create
+# semaphore set: No space left on device" (ENOSPC) -- the mass CPAN tester
+# FAIL mode on OpenBSD smokers (semmni=10) pre-wedged by stale sets from
+# previously crashed runs. Skipping is the honest grade there: the environment
+# cannot run the file, and a FAIL cascade (croaking mid-test and leaking yet
+# more IPC resources on the way down) helps nobody. No-op when the limit
+# cannot be determined. Call it before the first tie, after testing_set().
+
+sub require_free_sem_sets {
+    my ($needed) = @_;
+
+    $needed = FREE_SEM_SETS_NEEDED if ! defined $needed;
+
+    my $free = free_sem_sets();
+
+    return 1 if ! defined $free;
+
+    if ($free < $needed) {
+        plan skip_all => "insufficient free SysV semaphore sets "
+                       . "(free: $free, need: $needed)";
+    }
+
+    return 1;
 }
 
 # Return the system-wide limit on SysV semaphore sets (SEMMNI) for the current

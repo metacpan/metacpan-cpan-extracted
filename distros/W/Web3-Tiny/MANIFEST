@@ -1,0 +1,23 @@
+Changes
+lib/Web3/Tiny.pm
+lib/Web3/Tiny/ABI.pm
+lib/Web3/Tiny/Contract.pm
+lib/Web3/Tiny/Keccak256.pm
+lib/Web3/Tiny/RLP.pm
+lib/Web3/Tiny/RPC.pm
+lib/Web3/Tiny/Secp256k1.pm
+lib/Web3/Tiny/Util.pm
+lib/Web3/Tiny/Wallet.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/10-keccak256.t
+t/11-keccak256-vectors.t
+t/20-secp256k1.t
+t/30-rlp.t
+t/40-abi.t
+t/50-wallet.t
+t/60-util.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

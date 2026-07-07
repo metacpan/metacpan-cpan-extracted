@@ -1,0 +1,6 @@
+requires 'Alien::Base';
+requires 'Alien::Build';
+
+on 'test' => sub {
+  requires 'Test::More';
+};

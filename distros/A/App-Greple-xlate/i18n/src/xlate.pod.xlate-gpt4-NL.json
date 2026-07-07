@@ -1,0 +1,378 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - vertaalondersteuningsmodule voor greple\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. Currently DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>), and GPT-5 (F<gpt5.pm>) module are implemented as a back-end engine.\n",
+      "B<Greple> B<xlate> module vindt de gewenste tekstblokken en vervangt deze door de vertaalde tekst. Momenteel zijn DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) en GPT-5 (F<gpt5.pm>) modules geïmplementeerd als back-end engine.\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<xlate::deepl> and C<perl> module like this:\n",
+      "Als je normale tekstblokken in een document geschreven in de Perl's pod-stijl wilt vertalen, gebruik dan het B<greple> commando met C<xlate::deepl> en C<perl> module zoals dit:\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "In dit commando betekent de patroonstring C<^([\\w\\pP].*\\n)+> opeenvolgende regels die beginnen met een alfanumeriek teken of leesteken. Dit commando toont het te vertalen gebied gemarkeerd. Optie B<--all> wordt gebruikt om de volledige tekst te produceren.\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the B<deepl> command output.\n",
+      "Voeg vervolgens de C<--xlate> optie toe om het geselecteerde gebied te vertalen. Dan worden de gewenste secties gevonden en vervangen door de uitvoer van het B<deepl> commando.\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "Standaard worden originele en vertaalde tekst afgedrukt in het \"conflict marker\" formaat dat compatibel is met L<git(1)>. Met het C<ifdef> formaat kun je het gewenste deel eenvoudig verkrijgen met het L<unifdef(1)> commando. Het uitvoerformaat kan worden gespecificeerd met de B<--xlate-format> optie.\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "Als je de volledige tekst wilt vertalen, gebruik dan de B<--match-all> optie. Dit is een snelkoppeling om het patroon C<(?s).+> te specificeren dat overeenkomt met de volledige tekst.\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "Conflictmarkeringformaatgegevens kunnen in zij-aan-zij stijl worden bekeken met het L<sdif|App::sdif> commando met de C<-V> optie. Aangezien het geen zin heeft om per tekenreeks te vergelijken, wordt de C<--no-cdif> optie aanbevolen. Als u de tekst niet hoeft te kleuren, geef dan C<--no-textcolor> (of C<--no-tc>) op.\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "De verwerking gebeurt in opgegeven eenheden, maar in het geval van een reeks van meerdere regels niet-lege tekst, worden deze samen omgezet in één regel. Deze bewerking wordt als volgt uitgevoerd:\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "Verwijder witruimte aan het begin en einde van elke regel.\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "Als een regel eindigt met een volbreedte leesteken, voeg samen met de volgende regel.\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "Als een regel eindigt met een volbreedte teken en de volgende regel begint met een volbreedte teken, voeg de regels samen.\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "Als het einde of het begin van een regel geen volbreedte teken is, voeg ze dan samen door een spatie toe te voegen.\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "Cachegegevens worden beheerd op basis van de genormaliseerde tekst, dus zelfs als er wijzigingen worden aangebracht die geen invloed hebben op het normalisatieresultaat, blijft de vertaalde cachegegevens effectief.\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "Dit normalisatieproces wordt alleen uitgevoerd voor het eerste (0e) en even genummerde patroon. Dus als twee patronen als volgt worden opgegeven, wordt de tekst die overeenkomt met het eerste patroon verwerkt na normalisatie, en wordt er geen normalisatie uitgevoerd op de tekst die overeenkomt met het tweede patroon.\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "Gebruik daarom het eerste patroon voor tekst die moet worden verwerkt door meerdere regels samen te voegen tot één regel, en gebruik het tweede patroon voor vooraf opgemaakte tekst. Als er geen tekst is die overeenkomt met het eerste patroon, gebruik dan een patroon dat nergens mee overeenkomt, zoals C<(?!)>.\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "Af en toe zijn er delen van tekst die je niet wilt vertalen. Bijvoorbeeld, tags in markdown-bestanden. DeepL stelt voor om in zulke gevallen het te vertalen deel om te zetten naar XML-tags, te vertalen, en daarna na de vertaling te herstellen. Om dit te ondersteunen, is het mogelijk om de delen die van vertaling uitgesloten moeten worden, te specificeren.\n"
+   ],
+   [
+      "This will interpret each line of the file `MASKPATTERN` as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "Dit zal elke regel van het bestand `MASKPATTERN` interpreteren als een reguliere expressie, strings die hiermee overeenkomen vertalen, en na verwerking terugzetten. Regels die beginnen met C<#> worden genegeerd.\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escpaed newline.\n",
+      "Complexe patronen kunnen over meerdere regels worden geschreven met een backslash-escaped nieuwe regel.\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "Hoe de tekst wordt getransformeerd door maskering kan worden bekeken met de B<--xlate-mask> optie.\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "Deze interface is experimenteel en kan in de toekomst veranderen.\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "Start het vertaalproces voor elk overeenkomend gebied.\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "Zonder deze optie gedraagt B<greple> zich als een normale zoekopdracht. Zo kun je controleren welk deel van het bestand onderwerp van vertaling zal zijn voordat je het daadwerkelijke werk uitvoert.\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "Het resultaat van het commando gaat naar standaarduitvoer, dus omleiden naar een bestand indien nodig, of overweeg het gebruik van de L<App::Greple::update> module.\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "Optie B<--xlate> roept de B<--xlate-color> optie aan met de B<--color=never> optie.\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "Met de B<--xlate-fold> optie wordt de geconverteerde tekst opgevouwen tot de opgegeven breedte. De standaardbreedte is 70 en kan worden ingesteld met de B<--xlate-fold-width> optie. Vier kolommen zijn gereserveerd voor run-in-operatie, dus elke regel kan maximaal 74 tekens bevatten.\n"
+   ],
+   [
+      "Specifies the translation engine to be used. If you specify the engine module directly, such as C<-Mxlate::deepl>, you do not need to use this option.\n",
+      "Specificeert de te gebruiken vertaalmachine. Als je het engine-module direct specificeert, zoals C<-Mxlate::deepl>, hoef je deze optie niet te gebruiken.\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "Op dit moment zijn de volgende engines beschikbaar\n"
+   ],
+   [
+      "B<gpt-4o>'s interface is unstable and cannot be guaranteed to work correctly at the moment.\n",
+      "B<gpt-4o>'s interface is instabiel en kan momenteel niet gegarandeerd correct werken.\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "In plaats van de vertaalmachine aan te roepen, wordt van je verwacht dat je het werk uitvoert. Nadat de te vertalen tekst is voorbereid, worden ze naar het klembord gekopieerd. Je wordt geacht ze in het formulier te plakken, het resultaat naar het klembord te kopiëren en op enter te drukken.\n"
+   ],
+   [
+      "Specify the target language. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "Specificeer de doeltaal. Je kunt beschikbare talen opvragen met het C<deepl languages> commando wanneer je de B<DeepL> engine gebruikt.\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "Specificeer het uitvoerformaat voor originele en vertaalde tekst.\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "De volgende formaten anders dan C<xtxt> gaan ervan uit dat het te vertalen deel een verzameling regels is. In feite is het mogelijk om slechts een deel van een regel te vertalen, maar het specificeren van een ander formaat dan C<xtxt> zal geen zinvolle resultaten opleveren.\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "Originele en geconverteerde tekst worden afgedrukt in L<git(1)> conflictmarkeringsformaat.\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "Je kunt het originele bestand herstellen met het volgende L<sed(1)> commando.\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "De originele en vertaalde tekst worden weergegeven in een aangepaste containerstijl van markdown.\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "Bovenstaande tekst wordt als volgt vertaald naar HTML.\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "Het aantal dubbele punten is standaard 7. Als je een dubbelepuntreeks opgeeft zoals C<:::::>, wordt deze gebruikt in plaats van 7 dubbele punten.\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "Originele en geconverteerde tekst worden afgedrukt in L<cpp(1)> C<#ifdef> formaat.\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "Je kunt alleen Japanse tekst ophalen met het B<unifdef> commando:\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "Originele en geconverteerde tekst worden afgedrukt, gescheiden door een enkele lege regel.\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "Voor C<space+> wordt er ook een nieuwe regel na de geconverteerde tekst toegevoegd.\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. Default value is set as for free DeepL account service: 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "Als het formaat C<xtxt> (vertaalde tekst) of onbekend is, wordt alleen de vertaalde tekst afgedrukt.\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "Specificeer de maximale lengte van de tekst die in één keer naar de API mag worden gestuurd. De standaardwaarde is ingesteld zoals voor de gratis DeepL-accountservice: 128K voor de API (B<--xlate>) en 5000 voor de klembordinterface (B<--xlate-labor>). Mogelijk kunt u deze waarde wijzigen als u de Pro-service gebruikt.\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "Specificeer het maximaal aantal regels tekst dat in één keer naar de API mag worden gestuurd.\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is only available when using ChatGPT engines (gpt3, gpt4, gpt4o). You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "Geef een aangepaste prompt op die naar de vertaalmachine wordt gestuurd. Deze optie is alleen beschikbaar bij gebruik van ChatGPT-engines (gpt3, gpt4, gpt4o). Je kunt het vertaalgedrag aanpassen door specifieke instructies aan het AI-model te geven. Als de prompt C<%s> bevat, wordt deze vervangen door de naam van de doeltaal.\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "Geef extra contextinformatie op die naar de vertaalmachine wordt gestuurd. Deze optie kan meerdere keren worden gebruikt om meerdere contextstrings te leveren. De contextinformatie helpt de vertaalmachine de achtergrond te begrijpen en nauwkeurigere vertalingen te produceren.\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "Geef een woordenlijst-ID op die voor de vertaling wordt gebruikt. Deze optie is alleen beschikbaar bij gebruik van de DeepL-engine. De woordenlijst-ID moet uit je DeepL-account worden verkregen en zorgt voor consistente vertaling van specifieke termen.\n"
+   ],
+   [
+      "See the tranlsation result in real time in the STDERR output.\n",
+      "Stel deze waarde in op 1 als u één regel tegelijk wilt vertalen. Deze optie heeft voorrang op de C<--xlate-maxlen>-optie.\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "Bekijk het vertaalresultaat in realtime in de STDERR-uitvoer.\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "Gebruik de L<App::Greple::stripe>-module om het overeenkomende gedeelte in zebra-streepjesstijl weer te geven. Dit is handig wanneer de overeenkomende delen direct aan elkaar zijn gekoppeld.\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "Het kleurenpalet wordt aangepast aan de achtergrondkleur van de terminal. Als u dit expliciet wilt opgeven, kunt u B<--xlate-stripe-light> of B<--xlate-stripe-dark> gebruiken.\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "Voer de maskeringsfunctie uit en toon de geconverteerde tekst zoals deze is, zonder herstel.\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "In het geval van de C<cm>- en C<colon>-formaten wordt de uitvoer regel voor regel gesplitst en opgemaakt. Daarom kan het verwachte resultaat niet worden verkregen als slechts een deel van een regel wordt vertaald. Deze filters herstellen uitvoer die is beschadigd door een deel van een regel te vertalen naar normale regel-voor-regel uitvoer.\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "In de huidige implementatie worden meerdere vertaalde delen van een regel als onafhankelijke regels weergegeven.\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "Stel de volledige tekst van het bestand in als doelgebied.\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "De B<xlate>-module kan gecachte vertaalde tekst per bestand opslaan en deze vóór uitvoering lezen om de overhead van het opvragen bij de server te elimineren. Met de standaard cache-strategie C<auto> wordt cachedata alleen onderhouden als het cachebestand voor het doelbestand bestaat.\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "Gebruik B<--xlate-cache=clear> om cachebeheer te starten of om alle bestaande cachedata op te schonen. Na uitvoering met deze optie wordt een nieuw cachebestand aangemaakt als er nog geen bestaat en daarna automatisch onderhouden.\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "Onderhoud het cachebestand als het bestaat.\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "Maak een leeg cachebestand aan en sluit af.\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "Onderhoud de cache in ieder geval zolang het doel een normaal bestand is.\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "Wis eerst de cachedata.\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "Gebruik nooit een cachebestand, zelfs niet als het bestaat.\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "Standaard wordt ongebruikte data uit het cachebestand verwijderd. Als u deze niet wilt verwijderen en in het bestand wilt houden, gebruik dan C<accumulate>.\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "Met deze optie wordt het cachebestand geforceerd bijgewerkt, zelfs als dit niet nodig is.\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "Het C<xlate> commando ondersteunt GNU-stijl lange opties zoals C<--to-lang>, C<--from-lang>, C<--engine> en C<--file>. Gebruik C<xlate -h> om alle beschikbare opties te zien.\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "U kunt deze module eenvoudig vanaf de opdrachtregel gebruiken met het C<xlate>-commando dat bij de distributie is inbegrepen. Zie de C<xlate>-manpagina voor gebruik.\n"
+   ],
+   [
+      "Docker operations are handled by the C<dozo> script, which can also be used as a standalone command. The C<dozo> script supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "Docker-bewerkingen worden afgehandeld door het C<dozo> script, dat ook als een zelfstandige opdracht kan worden gebruikt. Het C<dozo> script ondersteunt het C<.dozorc> configuratiebestand voor blijvende containerinstellingen.\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "Het C<xlate>-commando werkt samen met de Docker-omgeving, dus zelfs als u niets hebt geïnstalleerd, kunt u het gebruiken zolang Docker beschikbaar is. Gebruik de C<-D>- of C<-C>-optie.\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "Omdat er ook makefiles voor verschillende documentstijlen worden meegeleverd, is vertaling naar andere talen mogelijk zonder speciale specificatie. Gebruik de C<-M>-optie.\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "U kunt ook de Docker- en C<make>-opties combineren, zodat u C<make> in een Docker-omgeving kunt uitvoeren.\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "Uitvoeren zoals C<xlate -C> start een shell met de huidige werkende git-repository aangekoppeld.\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "Laad het F<xlate.el> bestand dat in de repository is opgenomen om het C<xlate> commando vanuit de Emacs-editor te gebruiken. C<xlate-region> functie vertaalt het opgegeven gebied. De standaardtaal is C<EN-US> en je kunt de taal specificeren door het met een prefix-argument aan te roepen.\n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "Stel je authenticatiesleutel voor de DeepL-service in.\n"
+   ],
+   [
+      "OpenAI authentication key.\n",
+      "OpenAI authenticatiesleutel.\n"
+   ],
+   [
+      "You have to install command line tools for DeepL and ChatGPT.\n",
+      "Je moet de commandoregeltools voor DeepL en ChatGPT installeren.\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate>\n",
+      "L<App::Greple::xlate>\n"
+   ],
+   [
+      "L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate::deepl>\n"
+   ],
+   [
+      "L<App::Greple::xlate::gpt4>\n",
+      "L<App::Greple::xlate::gpt4>\n"
+   ],
+   [
+      "L<App::Greple::xlate::gpt5>\n",
+      "L<App::Greple::xlate::gpt5>\n"
+   ],
+   [
+      "Docker container image.\n",
+      "Docker container image.\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> and C<dozo> scripts.\n",
+      "De C<getoptlong.sh> bibliotheek wordt gebruikt voor optieparsing in de C<xlate> en C<dozo> scripts.\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "DeepL Python-bibliotheek en CLI-commando.\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "OpenAI Python-bibliotheek\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "OpenAI commandoregelinterface\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "Zie de B<greple> handleiding voor details over het doeltekstpatroon. Gebruik de opties B<--inside>, B<--outside>, B<--include>, B<--exclude> om het zoekgebied te beperken.\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "Je kunt de C<-Mupdate> module gebruiken om bestanden aan te passen op basis van het resultaat van het B<greple> commando.\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "Gebruik B<sdif> om het conflictmarkeringsformaat naast elkaar te tonen met de B<-V> optie.\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "Greple B<stripe> module wordt gebruikt met de B<--xlate-stripe> optie.\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "Greple-module om alleen de noodzakelijke delen te vertalen en te vervangen met de DeepL API (in het Japans)\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "Documenten genereren in 15 talen met de DeepL API-module (in het Japans)\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "Automatische vertaal-Dockeromgeving met DeepL API (in het Japans)\n"
+   ]
+]

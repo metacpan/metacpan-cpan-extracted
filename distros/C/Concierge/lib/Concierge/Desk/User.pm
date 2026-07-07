@@ -1,7 +1,7 @@
-package Concierge::Desk::User v0.8.4;
+package Concierge::Desk::User v0.9.0;
 use v5.36;
 
-our $VERSION = 'v0.8.4';
+our $VERSION = 'v0.9.0';
 
 # ABSTRACT: User object enabled by Concierge
 
@@ -9,7 +9,7 @@ use File::Spec;
 use File::Path qw/make_path/;
 
 # === COMPONENT MODULES ===
-use Concierge::Auth;
+use Concierge::Auth::Generators qw(gen_random_string);
 use Concierge::Sessions;
 use Concierge::Users;
 
@@ -27,7 +27,7 @@ sub enable_user {
 
     my $self = bless {
         user_id  => $user_id,
-        user_key => $options->{user_key} || scalar(Concierge::Auth->gen_random_string(13)),
+        user_key => $options->{user_key} || scalar(gen_random_string(13)),
     }, $class;
 
     # Store session reference and ID if provided
@@ -178,7 +178,7 @@ Concierge::Desk::User - User object enabled by Concierge
 
 =head1 VERSION
 
-v0.8.4
+v0.9.0
 
 =head1 SYNOPSIS
 

@@ -53,11 +53,19 @@
    "provides" : {
       "Concierge::Auth" : {
          "file" : "lib/Concierge/Auth.pm",
-         "version" : "v0.4.5"
+         "version" : "v0.5.0"
+      },
+      "Concierge::Auth::Base" : {
+         "file" : "lib/Concierge/Auth/Base.pm",
+         "version" : "v0.5.0"
       },
       "Concierge::Auth::Generators" : {
          "file" : "lib/Concierge/Auth/Generators.pm",
          "version" : "v0.4.5"
+      },
+      "Concierge::Auth::Pwd" : {
+         "file" : "lib/Concierge/Auth/Pwd.pm",
+         "version" : "v0.5.0"
       }
    },
    "release_status" : "stable",
@@ -71,6 +79,6 @@
          "web" : "https://github.com/bwva/Concierge-Auth"
       }
    },
-   "version" : "v0.4.5",
+   "version" : "v0.5.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

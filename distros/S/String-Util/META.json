@@ -49,6 +49,6 @@
          "web" : "https://github.com/scottchiefbaker/String-Util"
       }
    },
-   "version" : "1.35",
+   "version" : "1.36",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

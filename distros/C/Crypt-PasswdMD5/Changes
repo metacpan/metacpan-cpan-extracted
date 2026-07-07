@@ -1,5 +1,11 @@
 Revision history for Perl extension Crypt::PasswdMD5.
 
+1.45  2026-07-07T10:28:00
+	- Replace LICENCE file with output of the software-license program which ships
+		with the module App::Software::License. The specific command I ran is (all on 1 line):
+		software-license --type license --holder "Luis E. Muñoz" --license Perl_5
+		--year 1998 > LICENSE
+
 1.44  2026-06-29
 	- Replace the file LICENSE-GPL-3 with the file LICENSE
 		containing what is recommended at

@@ -1,0 +1,470 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - greple 用の翻訳サポートモジュール\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.5 (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
+      "B<Greple> B<xlate> モジュールが対象のテキストブロックを検索し、翻訳されたテキストに置き換えます。メインのエンジンは GPT-5.5 (F<llm/gpt5.pm>) で、L<llm|https://llm.datasette.io/> コマンドを呼び出します。 DeepL (F<deepl.pm>) や、従来の B<gpty> ベースのエンジンも含まれています。\n"
+   ],
+   [
+      "Translations are cached per file, so re-running a command costs nothing for unchanged text. When a document is edited, only the changed paragraphs are sent to the API again; a context-aware engine also receives the surrounding translations, the raw source text around the change, and the previous version of the edited paragraph, so the new translation keeps the established wording (see B<--xlate-context-window>). Sensitive strings can be concealed before transmission (see L</ANONYMIZATION AND TEMPLATES>).\n",
+      "翻訳結果はファイルごとにキャッシュされるため、変更のないテキストに対してコマンドを再実行してもコストはかかりません。 ドキュメントが編集された場合、変更された段落のみが再度APIに送信されます。また、コンテキスト認識型エンジンには、周囲の翻訳、変更箇所の前後の原文、および編集された段落の以前のバージョンも送信されるため、新しい翻訳でも従来の表現が維持されます（B<--xlate-context-window>を参照）。 機密性の高い文字列は、送信前に非表示にすることができます（L</ANONYMIZATION AND TEMPLATES>を参照）。\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<--xlate-engine gpt5> and C<perl> module like this:\n",
+      "Perlのpodスタイルで記述されたドキュメント内の通常のテキストブロックを翻訳したい場合は、B<greple>コマンドをC<--xlate-engine gpt5>およびC<perl>モジュールと組み合わせて、次のように使用します：\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "このコマンドのパターン文字列C<^([ \\wpP].*n)+> は、英数字と句読点で始まる連続した行を意味する。このコマンドは、翻訳される領域が強調表示される。オプションB<--all>はテキスト全体を翻訳するのに使われる。\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the translation engine's output.\n",
+      "その後、C<--xlate> オプションを追加して、選択した領域を翻訳します。これにより、対象のセクションが検出され、翻訳エンジンの出力に置き換えられます。\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "デフォルトでは、原文と訳文は L<git(1)> と互換性のある \"conflict marker\" フォーマットで出力されます。C<ifdef>形式を使えば、L<unifdef(1)>コマンドで簡単に目的の部分を得ることができます。出力形式はB<--xlate-format>オプションで指定できます。\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "テキスト全体を翻訳したい場合は、B<--match-all>オプションを使います。これはテキスト全体にマッチするパターンC<(?s).+>を指定するショートカットです。\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "L<sdif|App::sdif>コマンドにC<-V>オプションをつけると、競合マーカーフォーマットのデータを並べて表示することができます。文字列ごとに比較するのは意味がないので、C<--no-cdif>オプションの使用をお勧めします。テキストに色をつける必要がない場合はC<--no-textcolor>（またはC<--no-tc>）を指定してください。\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "処理は指定された単位で行われるが、空でないテキストが複数行連続している場合は、それらをまとめて1行に変換する。この処理は次のように行われる：\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "各行の先頭と末尾の空白を取り除く。\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "行末が全角句読点の場合は、次の行と連結する。\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "ある行が全角文字で終わり、次の行が全角文字で始まる場合、その行を連結する。\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "行末または行頭が全角文字でない場合は、スペース文字を挿入して連結する。\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "キャッシュデータは正規化されたテキストに基づいて管理されるため、正規化結果に影響を与えない範囲で修正を加えても、キャッシュされた翻訳データは有効です。\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "この正規化処理は、最初の（0 番目の）偶数パターンに対してのみ行われる。したがって、以下のように2つのパターンを指定した場合、1つ目のパターンにマッチするテキストは正規化処理後に処理され、2つ目のパターンにマッチするテキストには正規化処理は行われない。\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "したがって、複数行を1行にまとめて処理するテキストには最初のパターンを使い、整形済みテキストには2番目のパターンを使う。最初のパターンにマッチするテキストがない場合は、C<(?!)>のように何もマッチしないパターンを使う。\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "時々、翻訳してほしくないテキストの部分があります。例えば、マークダウン・ファイルのタグなどです。DeepL では、このような場合、除外するテキストの部分を XML タグに変換して翻訳し、翻訳完了後に復元することを推奨しています。これをサポートするために、翻訳からマスクする部分を指定できます。\n"
+   ],
+   [
+      "This will interpret each line of the file C<MASKPATTERN> as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "ファイルC<MASKPATTERN>の各行を正規表現として解釈し、一致する文字列を翻訳後、処理後に元に戻します。C<#>で始まる行は無視されます。\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escaped newline.\n",
+      "複雑なパターンは、バックスラッシュでエスケープした改行を含めて複数行で記述できます。\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "マスキングによってテキストがどのように変換されるかは、B<--xlate-mask>オプションで見ることができる。\n"
+   ],
+   [
+      "Masking protects markup from being translated. To conceal sensitive strings from the translation service itself, see L</ANONYMIZATION AND TEMPLATES>; both can be used together.\n",
+      "マスキングにより、マークアップが翻訳されるのを防ぐことができます。翻訳サービス自体から機密性の高い文字列を隠すには、L</ANONYMIZATION AND TEMPLATES>を参照してください。両方を併用することも可能です。\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "このインターフェースは実験的なものであり、将来変更される可能性がある。\n"
+   ],
+   [
+      "Sensitive strings can be concealed before they are sent to the translation API and restored in the output. Three sources of anonymization rules are available: a dictionary file (B<--xlate-anonymize>), inline marks in the document itself (B<--xlate-anonymize-mark>), and YAML front matter values (B<--xlate-frontmatter>). Each string is replaced by a category tag such as C<< <person id=1 /> >> during transmission. The concealment target is API transmission only: local cache files store restored plain text. Use B<--xlate-dryrun> to inspect exactly what would be transmitted.\n",
+      "機密性の高い文字列は、翻訳APIに送信される前に隠蔽し、出力時に復元することができます。 匿名化ルールのソースとして、辞書ファイル（B<--xlate-anonymize>）、ドキュメント内のインラインマーク（B<--xlate-anonymize-mark>）、YAMLフロントマターの値（B<--xlate-frontmatter>）の3つが利用可能です。 各文字列は、送信中に C<< <person id=1 /> >> のようなカテゴリタグに置き換えられます。非表示の対象は API への送信時のみです。ローカルのキャッシュファイルには、復元されたプレーンテキストが保存されます。実際に送信される内容を正確に確認するには、B<--xlate-dryrun> を使用してください。\n"
+   ],
+   [
+      "For form documents (quarterly reports and the like), define the actors up front and reference them in the body:\n",
+      "定型文書（四半期報告書など）の場合は、事前にアクターを定義し、本文内でそれらを参照します：\n"
+   ],
+   [
+      "Translate the template once per language with C<--xlate-template> (and C<--xlate-frontmatter> when the values are kept in the file), then render each case with B<pandoc-embedz> standalone mode -- values under C<global:> in an external config never reach the translation API at all:\n",
+      "C<--xlate-template> を使用して、テンプレートを言語ごとに一度翻訳し （値がファイル内に保持されている場合は C<--xlate-frontmatter> を使用）、その後、B<pandoc-embedz> を使用して各ケースをレンダリングします。スタンドアロンモードでは、外部設定ファイル内の C<global:> 以下の値は翻訳 API に一切到達しません：\n"
+   ],
+   [
+      "For inline marks, providing a macro definition config makes the same translated template render either the real names or a redacted version:\n",
+      "インラインマークの場合、マクロ定義設定を指定することで、同じ翻訳済みテンプレートから実名または伏せ字版のいずれかをレンダリングできます：\n"
+   ],
+   [
+      "Exclude embedz blocks from translation when a document contains them:\n",
+      "ドキュメントにembedzブロックが含まれている場合は、それらを翻訳対象から除外します：\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "マッチした各領域に対して翻訳処理を起動する。\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "このオプションをつけないと、B<greple>は通常の検索コマンドとして動作する。したがって、実際の作業を開始する前に、ファイルのどの部分が翻訳の対象となるかをチェックすることができる。\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "コマンドの結果は標準出力されますので、必要に応じてファイルにリダイレクトするか、L<App::Greple::update>モジュールの使用を検討してください。\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "B<--xlate> オプションは B<--xlate-color> オプションを B<--color=never> オプションで呼び出します。\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "B<--xlate-fold> オプションを指定すると、変換されたテキストは指定した幅で折り返されます。デフォルトの幅は70で、B<--xlate-fold-width>オプションで設定できます。ランイン操作のために4つのカラムが予約されているので、各行は最大74文字を保持できる。\n"
+   ],
+   [
+      "Specifies the translation engine to be used.\n",
+      "使用する翻訳エンジンを指定します。\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "現時点では、以下のエンジンが利用可能です。\n"
+   ],
+   [
+      "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
+      "エンジンモジュールは、まずバックエンドネームスペース（C<llm>、次に C<gpty>）で検索され、その後 C<App::Greple::xlate> の直下で検索されます。 したがって、C<gpt5>はC<App::Greple::xlate::llm::gpt5>を読み込み、それがC<llm>コマンドを呼び出しますが、C<gpt4o>はC<App::Greple::xlate::gpty::gpt4o>にフォールバックします。特定のバックエンドを強制するには、C<--xlate-setopt backend=gpty>を使用してください。\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "翻訳エンジンを呼び出す代わりに、以下の作業を行うことになります。翻訳するテキストを準備すると、クリップボードにコピーされます。フォームに貼り付け、結果をクリップボードにコピーし、returnを押してください。\n"
+   ],
+   [
+      "Specify the target language. LLM engines accept any language name or code the model understands; it is interpolated into the translation prompt. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "対象言語を指定します。LLMエンジンは、モデルが理解できる任意の言語名またはコードを受け付け、それが翻訳プロンプトに挿入されます。B<DeepL>エンジンを使用する場合、C<deepl languages>コマンドで利用可能な言語を取得できます。\n"
+   ],
+   [
+      "Label used for the original text in C<conflict>, C<colon> and C<ifdef> output formats. With the B<DeepL> engine a non-default value is also passed as the source language.\n",
+      "C<conflict>、C<colon>、およびC<ifdef>出力形式における原文に付与されるラベルです。B<DeepL>エンジンを使用する場合、デフォルト以外の値もソース言語として渡されます。\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "原文と訳文の出力形式を指定します。\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "C<xtxt>以外の以下の書式は、翻訳される部分が行の集まりであることを前提としています。実際、行の一部だけを翻訳することは可能ですが、 C<xtxt>以外の書式を指定しても意味のある結果は得られません。\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "原文と訳文はL<git(1)> conflict marker形式で出力されます。\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "次のL<sed(1)>コマンドで元のファイルを復元できます。\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "元のテキストと翻訳されたテキストは、マークダウンのカスタム・コンテナ・スタイルで出力されます。\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "上記のテキストはHTMLでは以下のように翻訳されます。\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "コロンの数はデフォルトでは7です。C<::::>のようにコロン列を指定すると、7コロンの代わりにそれが使われます。\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "原文と訳文はL<cpp(1)> C<#ifdef>形式で出力されます。\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "B<unifdef>コマンドで日本語のテキストだけを取り出すことができます：\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "変換前のテキストと変換後のテキストは1行の空白行で区切られて出力されます。C<space+>の場合は、変換後のテキストの後に改行も出力される。\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "形式がC<xtxt>（翻訳済みテキスト）または未知の場合は、翻訳済みテキストのみが印刷されます。\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. The default value 0 means the engine's own limit: for the free DeepL account service that is 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "API に一度に送信するテキストの最大長を指定します。 デフォルト値の 0 は、エンジン独自の制限を意味します。DeepLの無料アカウントサービスの場合、API (B<--xlate>) では128K、クリップボードインターフェース (B<--xlate-labor>) では5000です。 Proサービスをご利用の場合は、これらの値を変更できる場合があります。\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "APIに一度に送信するテキストの最大行数を指定します。\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "一度に1行ずつ翻訳したい場合は、この値を1に設定する。このオプションはC<--xlate-maxlen>オプションより優先される。\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはLLMエンジン（C<gpt3>、C<gpt4o>、C<gpt5>）で利用可能ですが、DeepLでは利用できません。 AIモデルに具体的な指示を与えることで、翻訳の挙動をカスタマイズできます。プロンプトに C<%s> が含まれている場合、それは対象言語名に置き換えられます。\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "翻訳エンジンに送信する追加コンテキスト情報を指定します。このオプションは、複数のコンテキスト文字列を提供するために複数回使用することができます。コンテキスト情報は、翻訳エンジンが背景を理解し、より正確な翻訳を生成するのに役立ちます。\n"
+   ],
+   [
+      "Number of surrounding translated blocks passed as reference context when re-translating changed blocks (default 2). The context also includes the raw source text around the changed region (headings, list structure, captions) and, when available, the previous version of the changed text recovered from the cache, so that unchanged wording is preserved. Set to 0 to disable context-aware translation entirely. Note that each changed region is translated in its own API call and the context can add up to about 8000 characters to the system prompt, so context-aware translation trades some extra cost for consistency.\n",
+      "変更されたブロックを再翻訳する際に、参照コンテキストとして渡される周囲の翻訳済みブロックの数（デフォルトは 2）。このコンテキストには、変更された領域の周囲の生のソーステキスト（見出し、リスト構造、キャプション）や、利用可能な場合はキャッシュから復元された変更前のテキストも含まれるため、変更されていない表現が保持されます。 コンテキスト対応翻訳を完全に無効にするには、0 に設定します。変更された各領域は個別の API 呼び出しで翻訳され、コンテキストによってシステムプロンプトに最大約 8000 文字が追加される可能性があるため、コンテキスト対応翻訳は一貫性を確保するために多少の追加コストを伴います。\n"
+   ],
+   [
+      "Initialize a new document's cache from another document's cache file. Useful for periodic reports: seed the new issue's cache with the previous issue's, so unchanged paragraphs are not re-translated and edited paragraphs keep the previous issue's wording. The seed is used only when the target cache is empty; otherwise it is ignored with a warning. With the default C<--xlate-cache=auto>, specifying a seed also implies creating the new document's cache file.\n",
+      "別のドキュメントのキャッシュファイルから、新しいドキュメントのキャッシュを初期化します。定期的なレポートの作成に有用です。新しい号のキャッシュに前の号のキャッシュをシードすることで、変更されていない段落が再翻訳されるのを防ぎ、編集された段落は前の号の表現を維持します。 シードは、ターゲットキャッシュが空の場合にのみ使用されます。それ以外の場合は、警告が表示され無視されます。デフォルトの C<--xlate-cache=auto> では、シードを指定すると、新しいドキュメントのキャッシュファイルも作成されることになります。\n"
+   ],
+   [
+      "Anonymize sensitive strings before they are sent to the translation API, and restore them in the output. The dictionary file gives one entry per item: in JSON (canonical, machine-generatable)\n",
+      "機密性の高い文字列を翻訳APIに送信する前に匿名化し、出力時に復元します。辞書ファイルには、項目ごとに1つのエントリが記載されます：JSON形式（標準的、機械生成可能）\n"
+   ],
+   [
+      "or in a simple line format (C<category pattern>, C</.../> for regex). Each item is replaced by a category tag such as C<< <person id=1 /> >>; the same string always gets the same tag, so the model can keep track of who is who. Unknown JSON fields are ignored, so generators (e.g. a local LLM extracting entities) may add their own annotations. Category C<lit> is reserved. Local cache files still store restored plain text: the concealment target is API transmission only.\n",
+      "または単純な行形式（C<category pattern>、正規表現の場合は C</.../>）。 各項目は C<< <person id=1 /> >> のようなカテゴリタグに置き換えられます。同じ文字列には常に同じタグが割り当てられるため、モデルは各項目を識別できます。未知の JSON フィールドは無視されるため、ジェネレータ（例：エンティティを抽出するローカル LLM）は独自の注釈を追加できます。 カテゴリ C<lit> は予約済みです。ローカルキャッシュファイルには、復元されたプレーンテキストが引き続き保存されます。隠蔽の対象はAPI経由の送信のみです。\n"
+   ],
+   [
+      "A dictionary can be generated by an external tool -- for example a local model extracting sensitive entities:\n",
+      "辞書は外部ツール（例えば、機密エンティティを抽出するローカルモデルなど）によって生成できます：\n"
+   ],
+   [
+      "A UTF-8 BOM in the file is tolerated. Values in the front matter line format may carry a trailing comment only on their own line, not after the value.\n",
+      "ファイル内の UTF-8 BOM は許容されます。フロントマター行形式の値には、値の直後ではなく、その行の末尾にのみコメントを付加できます。\n"
+   ],
+   [
+      "Collect anonymization entries from inline marks in the document itself. Mark the first occurrence like C<{{ person(\"山田太郎\") }}> and every occurrence of the string document-wide is anonymized. The mark itself stays in the source and in the translation, so a document can also be processed by a Jinja2-style macro processor (define the C<person> macro to print or redact the name). A custom I<regex> must contain C<< (?<category>...) >> and C<< (?<text>...) >> named captures.\n",
+      "文書自体に含まれるインラインマークから匿名化エントリを収集します。 最初の出現箇所を C<{{ person(\"山田太郎\") }}> のようにマークすると、文書全体におけるその文字列のすべての出現箇所が匿名化されます。マーク自体はソースおよび翻訳文に残るため、文書を Jinja2 スタイルのマクロプロセッサで処理することも可能です（名前を出力または伏字にするには、C<person> マクロを定義します）。 カスタム I<regex> には、C<< (?<category>...) >> および C<< (?<text>...) >> という名前のキャプチャが含まれている必要があります。\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-anonymize-mark=> (with a trailing C<=>) when using the default notation.\n",
+      "このようなオプション値を持つオプションの場合、後続のファイル引数が値として扱われることに注意してください。デフォルトの表記法を使用する場合は、C<--xlate-anonymize-mark=>（末尾に C<=> を付加）と記述します。\n"
+   ],
+   [
+      "Alternative notations can be configured, for example C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> for C<@@person:NAME@@>-style marks, or an HTML-comment form that stays invisible in rendered Markdown. Mark rules are collected per document: a string marked in one input file is not concealed in another file of the same run (unlike front matter values, which accumulate across files).\n",
+      "代替表記を設定することも可能です。例えば、C<@@person:NAME@@> 形式のマークには C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> を使用したり、レンダリングされた Markdown では表示されない HTML コメント形式を使用したりできます。 マークルールはドキュメントごとに収集されます。つまり、ある入力ファイルでマークされた文字列は、同じ実行内の別のファイルでは非表示にはなりません（ファイル間で蓄積されるフロントマターの値とは異なります）。\n"
+   ],
+   [
+      "Treat template expressions (default: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) as opaque placeholders: instruct the model to copy them unchanged and verify, per block, that the response contains exactly the same expressions, each the same number of times. Their order may change, since translation legitimately reorders them to follow the target language word order. A broken expression aborts the run; the cache is checkpointed and frozen, so nothing paid for is lost.\n",
+      "テンプレート式（デフォルト：Jinja2 C<{{ ... }}>、C<{% ... %}>、C<{# ... #}>）を不透明なプレースホルダーとして扱います。モデルに対して、それらをそのままコピーし、ブロックごとに、応答にまったく同じ式が、それぞれ同じ回数含まれていることを確認するよう指示します。 翻訳処理において、対象言語の語順に合わせてこれらの順序が変更される可能性があるため、順序は変わる場合があります。式に不備がある場合、実行は中止されます。キャッシュはチェックポイントとして保存され凍結されるため、支払済みの処理内容は失われることはありません。\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-template=> (with a trailing C<=>) when using the default notation.\n",
+      "このようなオプション値を持つオプションの場合、後続のファイル引数が値として扱われることに注意してください。デフォルトの表記法を使用する場合は、C<--xlate-template=>（末尾に C<=> を付加）と記述します。\n"
+   ],
+   [
+      "Treat a leading C<---> ... C<---> block as YAML front matter: exclude it from translation and from the phase-2 context slices, and add its flat C<key: value> values to the anonymization rules (category C<var>) as a safety net. With multiple input files the collected values accumulate (erring on the side of concealment).\n",
+      "先頭の C<---> ... C<---> ブロックを YAML フロントマターとして扱う：翻訳およびフェーズ 2 のコンテキストスライスから除外し、そのフラットな C<key: value> 値を安全策として匿名化ルール（カテゴリ C<var>）に追加する。 入力ファイルが複数ある場合、収集された値は累積されます（隠蔽を優先します）。\n"
+   ],
+   [
+      "Always leave a blank line after the closing C<--->. With a paragraph-style match pattern, front matter that runs directly into the body text forms one straddling block that the exclusion cannot suppress (a warning is printed in that case); the values are still anonymized, but the front matter itself would be sent for translation.\n",
+      "閉じタグ C<---> の後には常に空行を挿入してください。段落形式のマッチパターンを使用する場合、本文に直接続くフロントマターは、除外処理では抑制できない1つのまたがりブロックを形成します（その場合は警告が表示されます）。 値自体は匿名化されますが、フロントマター自体は翻訳のために送信されてしまいます。\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "翻訳に使用する用語集IDを指定します。このオプションは、DeepL エンジンを使用する場合にのみ使用できます。用語集 ID は、DeepL アカウントから取得する必要があり、特定の用語の一貫した翻訳を保証します。\n"
+   ],
+   [
+      "Do not call the translation API; instead show, through the progress display, each payload exactly as it would be transmitted (after anonymization and masking). Useful for checking what leaves the machine and for estimating the cost of a run.\n",
+      "翻訳APIを呼び出さないでください。代わりに、進行状況表示を通じて、各ペイロードが（匿名化およびマスキング後に）送信されるのと同じ状態で正確に表示してください。これは、マシンから送信される内容を確認したり、実行コストを見積もったりするのに役立ちます。\n"
+   ],
+   [
+      "See the translation result in real time in the STDERR output. The C<From> payload is shown as transmitted, after anonymization and masking.\n",
+      "STDERR出力で翻訳結果をリアルタイムで確認できます。C<From>のペイロードは、匿名化およびマスキング処理後の送信時のまま表示されます。\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "L<App::Greple::stripe>モジュールを使うと、一致した部分をゼブラストライプで表示することができます。これは、マッチした部分が背中合わせに接続されている場合に便利です。\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "カラーパレットは端末の背景色に応じて切り替わります。明示的に指定したい場合は、 B<--xlate-stripe-light> または B<--xlate-stripe-dark> を使ってください。\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "マスキング機能を実行し、変換されたテキストを復元せずにそのまま表示する。\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "ファイルの全文を対象領域に設定する。\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "C<cm>とC<colon>形式の場合、出力は一行ごとに分割され、整形されます。従って、行の一部だけが変換される場合、期待された結果は得られません。これらのフィルタは、行の一部を通常の行単位の出力に変換することによって破損した出力を修正します。\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "現在の実装では、行の複数の部分が翻訳された場合、それらは独立した行として出力されます。\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "B<xlate>モジュールは、各ファイルの翻訳テキストをキャッシュしておき、実行前に読み込むことで、サーバーに問い合わせるオーバーヘッドをなくすことができます。デフォルトのキャッシュ戦略C<auto>では、対象ファイルに対してキャッシュファイルが存在する場合にのみキャッシュデータを保持します。\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "B<--xlate-cache=clear>を使用して、キャッシュ管理を開始するか、既存のキャッシュデータをすべてクリーンアップする。このオプションを実行すると、キャッシュファイルが存在しない場合は新しいキャッシュファイルが作成され、その後は自動的にメンテナンスされる。\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "キャッシュ・ファイルが存在すれば、それを維持する。\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "空のキャッシュ・ファイルを作成して終了する。\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "対象が通常ファイルである限り、とにかくキャッシュを維持する。\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "最初にキャッシュデータをクリアする。\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "キャッシュファイルが存在しても使用しない。\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "デフォルトの動作では、未使用のデータはキャッシュ・ファイルから削除されます。削除せず、ファイルに残しておきたい場合は、C<accumulate>を使ってください。\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "このオプションは、キャッシュ・ファイルを更新する必要がない場合でも、強制的に更新する。\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "配布物に含まれている C<xlate> コマンドを使えば、コマンドラインから簡単にこのモジュールを使うことができます。使い方は C<xlate> のマニュアルページを参照してください。\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "C<xlate>コマンドはC<--to-lang>, C<--from-lang>, C<--engine>, C<--file>のようなGNUスタイルの長いオプションをサポートしています。C<xlate -h>を使うと利用可能な全てのオプションが表示されます。\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "C<xlate>コマンドはDocker環境と協調して動作するため、手元に何もインストールされていなくても、Dockerが利用可能であれば使用することができます。C<-D>またはC<-C>オプションを使用してください。\n"
+   ],
+   [
+      "Docker operations are handled by L<App::dozo>, which can also be used as a standalone command. The C<dozo> command supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "Dockerの操作はL<App::dozo>で処理され、スタンドアロンコマンドとしても使用できます。C<dozo>コマンドは、永続的なコンテナ設定のためのC<.dozorc>設定ファイルをサポートします。\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "また、様々なドキュメントスタイルに対応したmakefileが提供されているので、特別な指定なしに他言語への翻訳が可能です。C<-M>オプションを使用してください。\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "Docker と C<make> オプションを組み合わせて、Docker 環境で C<make> を実行することもできます。\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "C<xlate -C> のように実行すると、現在作業中の git リポジトリがマウントされたシェルが起動します。\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "詳しくはL</SEE ALSO>セクションの日本語記事を読んでください。\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "EmacsエディタからC<xlate>コマンドを使うには、リポジトリに含まれるF<xlate.el>ファイルを読み込みます。C<xlate-region>関数は指定された領域を翻訳します。デフォルトの言語はC<EN-US>で、prefix引数で言語を指定できます。\n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "DeepLサービスの認証キーを設定します。\n"
+   ],
+   [
+      "OpenAI authentication key, used by the legacy B<gpty> engines. The C<llm>-based B<gpt5> engine reads this variable too, but keys stored with C<llm keys set openai> also work.\n",
+      "レガシーなB<gpty>エンジンで使用されるOpenAI認証キー。 C<llm>ベースのB<gpt5>エンジンもこの変数を読み取りますが、C<llm keys set openai>で保存されたキーも機能します。\n"
+   ],
+   [
+      "Set the default cache strategy (see L</CACHE OPTIONS>).\n",
+      "デフォルトのキャッシュ戦略を設定します（L</CACHE OPTIONS>を参照）。\n"
+   ],
+   [
+      "Install the command line tool for the engine you use: C<llm> for the B<gpt5> engine, C<deepl> for DeepL, C<gpty> for the legacy GPT engines.\n",
+      "使用しているエンジン用のコマンドラインツールをインストールします：C<llm>（B<gpt5>エンジン用）、C<deepl>（DeepL用）、C<gpty>（レガシーGPTエンジン用）。\n"
+   ],
+   [
+      "L<https://llm.datasette.io/>\n",
+      "L<https://llm.datasette.io/>\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate::llm>、L<App::Greple::xlate::deepl>\n"
+   ],
+   [
+      "L<App::dozo> - Generic Docker runner used by xlate for container operations\n",
+      "L<App::dozo> - xlateがコンテナ操作に使用する汎用Dockerランナー。\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "ターゲット・テキスト・パターンの詳細については、B<greple> のマニュアルを参照してください。B<--inside>、B<--outside>、B<--include>、B<--exclude>オプションを使用して、マッチング範囲を制限します。\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "C<-Mupdate> モジュールを使って、B<greple> コマンドの結果によってファイルを変更することができます。\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "B<sdif>を使うと、B<-V>オプションでコンフリクトマーカの書式を並べて表示することができます。\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "B<--xlate-stripe>オプションでB<stripe>モジュールを使用する。\n"
+   ],
+   [
+      "Docker container image.\n",
+      "Dockerコンテナイメージ。\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> script and L<App::dozo>.\n",
+      "C<getoptlong.sh> ライブラリは C<xlate> スクリプトと L<App::dozo> のオプション解析に使われます。\n"
+   ],
+   [
+      "The C<llm> command used by the B<gpt5> engine to access LLM models.\n",
+      "B<gpt5>エンジンがLLMモデルにアクセスするために使用するC<llm>コマンド。\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "DeepL Python ライブラリと CLI コマンド。\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "OpenAI Python ライブラリ\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "OpenAI コマンドラインインタフェース\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "DeepL APIで必要な部分だけを翻訳・置換するGrepleモジュール\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "DeepL APIモジュールによる15言語のドキュメント生成\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "DeepL APIによる自動翻訳Docker環境\n"
+   ]
+]

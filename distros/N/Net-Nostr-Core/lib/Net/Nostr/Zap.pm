@@ -301,7 +301,7 @@ sub _verify_sig {
     $pk->import_key_raw("\x02" . $pubkey_raw, 'secp256k1');
     my $verifier = Crypt::PK::ECC::Schnorr->new(\$pk->export_key_der('public'));
     croak "invalid zap request signature"
-        unless $verifier->verify_message($event->id, $sig_raw);
+        unless $verifier->verify_message(pack('H*', $event->id), $sig_raw);
 }
 
 sub _validate_event_coordinate {

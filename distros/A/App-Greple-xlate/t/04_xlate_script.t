@@ -89,11 +89,11 @@ subtest 'PERMUTE disabled - options after filename pass through' => sub {
     # -s after filename should NOT be interpreted as xlate's --silent
     my $out = `$xlate -n -t JA test.txt -s 2>&1`;
     unlike($out, qr/--no-xlate-progress/,
-	   '-s after filename is not interpreted as --silent');
+           '-s after filename is not interpreted as --silent');
     like($out, qr/test\.txt\b/,
-	 'filename is in the command');
+         'filename is in the command');
     like($out, qr/test\.txt.*-s/,
-	 '-s is passed through to greple after filename');
+         '-s is passed through to greple after filename');
 
     # Unknown greple options after filename should not cause error
     $out = `$xlate -n -t JA test.txt --color=never 2>&1`;
@@ -101,7 +101,7 @@ subtest 'PERMUTE disabled - options after filename pass through' => sub {
     is($exit, 0,
        'unknown option after filename does not cause error');
     like($out, qr/--color=never/,
-	 'greple option is passed through');
+         'greple option is passed through');
 };
 
 done_testing;

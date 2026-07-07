@@ -12,35 +12,15 @@ use Test::More;
 
 use FindBin;
 use lib $FindBin::Bin;
-use IPCShareableTest qw(assert_clean_process unique_glue);
+use IPCShareableTest qw(assert_clean_process require_free_sem_sets unique_glue);
 use Test::SharedFork;
 
+# The shared guard replaces the old create-3-probe-sets check: it skips
+# cleanly via plan skip_all (the probe's done_testing()/exit path still ended
+# in a 255 exit on resource-starved smokers), and it does not consume any of
+# the few remaining semaphore sets just to probe them.
 
-# Probe for adequate semaphore resources. OpenBSD defaults to semmni=10
-# (max 10 concurrent semaphore sets system-wide), so we only probe with 3
-# to avoid consuming the entire system capacity for the probe itself.
-{
-    my @tmp_sems;
-    my $probe_ok = eval {
-        for (1..3) {
-            my $s = IPC::Semaphore->new(
-                IPC::Shareable::_shm_key(undef, "_probe_20_$_"),
-                4,
-                IPC_CREAT | 0600
-            );
-            die "semaphore creation returned undef\n" unless defined $s;
-            push @tmp_sems, $s;
-        }
-        1;
-    };
-    $_->remove for grep { defined $_ } @tmp_sems;
-
-    if (! $probe_ok) {
-        diag "Semaphore resources exhausted; skipping t/20-lock_operation.t";
-        done_testing();
-        exit 0;
-    }
-}
+require_free_sem_sets();
 
 my $sv;
 

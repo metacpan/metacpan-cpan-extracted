@@ -1,0 +1,470 @@
+[
+   [
+      "App::Greple::xlate - translation support module for greple\n",
+      "App::Greple::xlate - وحدة دعم الترجمة لأداة greple\n"
+   ],
+   [
+      "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.5 (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
+      "B<Greple> B<xlate> تعثر الوحدة على كتل النص المطلوبة وتستبدلها بالنص المترجم. المحرك الأساسي هو GPT-5.5 (F<llm/gpt5.pm>)، والذي يستدعي الأمر L<llm|https://llm.datasette.io/>؛ كما يتم تضمين DeepL (F<deepl.pm>) والمحركات القديمة المستندة إلى B<gpty>.\n"
+   ],
+   [
+      "Translations are cached per file, so re-running a command costs nothing for unchanged text. When a document is edited, only the changed paragraphs are sent to the API again; a context-aware engine also receives the surrounding translations, the raw source text around the change, and the previous version of the edited paragraph, so the new translation keeps the established wording (see B<--xlate-context-window>). Sensitive strings can be concealed before transmission (see L</ANONYMIZATION AND TEMPLATES>).\n",
+      "تُخزَّن الترجمات مؤقتًا لكل ملف، لذا فإن إعادة تشغيل الأمر لا تكلّف شيئًا للنص غير المتغيّر. عند تحرير مستند، تُرسل الفقرات التي تغيّرت فقط إلى واجهة API مرة أخرى؛ ويتلقى المحرك الواعي بالسياق أيضًا الترجمات المحيطة، ونص المصدر الخام حول التغيير، والإصدار السابق من الفقرة المحررة، بحيث تحافظ الترجمة الجديدة على الصياغة المعتمدة (انظر B<--xlate-context-window>). يمكن إخفاء السلاسل الحساسة قبل الإرسال (انظر L</ANONYMIZATION AND TEMPLATES>).\n"
+   ],
+   [
+      "If you want to translate normal text blocks in a document written in the Perl's pod style, use B<greple> command with C<--xlate-engine gpt5> and C<perl> module like this:\n",
+      "إذا كنت تريد ترجمة كتل نصية عادية في مستند مكتوب بأسلوب pod الخاص بـ Perl، فاستخدم أمر B<greple> مع C<--xlate-engine gpt5> ووحدة C<perl> كما يلي:\n"
+   ],
+   [
+      "In this command, pattern string C<^([\\w\\pP].*\\n)+> means consecutive lines starting with alpha-numeric and punctuation letter. This command show the area to be translated highlighted. Option B<--all> is used to produce entire text.\n",
+      "في هذا الأمر، تعني سلسلة النمط C<^([\\w\\pP].*\\n)+> أسطرًا متتالية تبدأ بحروف وأرقام وعلامات ترقيم. يعرض هذا الأمر المنطقة المراد ترجمتها مميّزة. يُستخدم الخيار B<--all> لإنتاج النص الكامل.\n"
+   ],
+   [
+      "Then add C<--xlate> option to translate the selected area. Then, it will find the desired sections and replace them by the translation engine's output.\n",
+      "ثم أضف الخيار C<--xlate> لترجمة المنطقة المحددة. عندها سيعثر على الأقسام المطلوبة ويستبدلها بمخرجات محرك الترجمة.\n"
+   ],
+   [
+      "By default, original and translated text is printed in the \"conflict marker\" format compatible with L<git(1)>. Using C<ifdef> format, you can get desired part by L<unifdef(1)> command easily. Output format can be specified by B<--xlate-format> option.\n",
+      "افتراضيًا، يُطبع النص الأصلي والمُترجَم بصيغة \"علامات التعارض\" المتوافقة مع L<git(1)>. باستخدام صيغة C<ifdef> يمكنك الحصول على الجزء المطلوب بواسطة أمر L<unifdef(1)> بسهولة. يمكن تحديد تنسيق الإخراج عبر الخيار B<--xlate-format>.\n"
+   ],
+   [
+      "If you want to translate entire text, use B<--match-all> option. This is a short-cut to specify the pattern C<(?s).+> which matches entire text.\n",
+      "إذا كنت تريد ترجمة النص بالكامل، فاستخدم الخيار B<--match-all>. هذا اختصار لتحديد النمط C<(?s).+> الذي يطابق النص بأكمله.\n"
+   ],
+   [
+      "Conflict marker format data can be viewed in side-by-side style by L<sdif|App::sdif> command with C<-V> option. Since it makes no sense to compare on a per-string basis, the C<--no-cdif> option is recommended. If you do not need to color the text, specify C<--no-textcolor> (or C<--no-tc>).\n",
+      "يمكن عرض بيانات تنسيق علامات التعارض بأسلوب جنبًا إلى جنب بواسطة أمر L<sdif|App::sdif> مع الخيار C<-V>. ولأنه لا معنى للمقارنة على أساس كل سطر على حدة، يُنصح بالخيار C<--no-cdif>. إذا لم تكن بحاجة إلى تلوين النص، فحدّد C<--no-textcolor> (أو C<--no-tc>).\n"
+   ],
+   [
+      "Processing is done in specified units, but in the case of a sequence of multiple lines of non-empty text, they are converted together into a single line. This operation is performed as follows:\n",
+      "تُجرى المعالجة بوحدات محددة، ولكن في حالة تسلسل من عدة أسطر من نص غير فارغ، تُحوَّل معًا إلى سطر واحد. تُنفَّذ هذه العملية على النحو التالي:\n"
+   ],
+   [
+      "Remove white space at the beginning and end of each line.\n",
+      "أزل المسافات البيضاء من بداية ونهاية كل سطر.\n"
+   ],
+   [
+      "If a line ends with a full-width punctuation character, concatenate with next line.\n",
+      "إذا انتهى السطر بعلامة ترقيم بعرض كامل، فادمجه مع السطر التالي.\n"
+   ],
+   [
+      "If a line ends with a full-width character and the next line begins with a full-width character, concatenate the lines.\n",
+      "إذا انتهى السطر بمحرف بعرض كامل وبدأ السطر التالي بمحرف بعرض كامل، فادمج السطرين.\n"
+   ],
+   [
+      "If either the end or the beginning of a line is not a full-width character, concatenate them by inserting a space character.\n",
+      "إذا لم يكن أحد طرفي السطر (النهاية أو البداية) محرفًا بعرض كامل، فادمجهما بإدراج مسافة.\n"
+   ],
+   [
+      "Cache data is managed based on the normalized text, so even if modifications are made that do not affect the normalization results, the cached translation data will still be effective.\n",
+      "تُدار بيانات التخزين المؤقت بناءً على النص المُطَبَّع، لذا حتى إذا أُجريت تعديلات لا تؤثر في نتائج التطبيع، ستظل بيانات الترجمة المخبأة فعّالة.\n"
+   ],
+   [
+      "This normalization process is performed only for the first (0th) and even-numbered pattern. Thus, if two patterns are specified as follows, the text matching the first pattern will be processed after normalization, and no normalization process will be performed on the text matching the second pattern.\n",
+      "تُجرى عملية التطبيع فقط للنمط الأول (ذي الفهرس 0) والأنماط ذات الأرقام الزوجية. لذلك، إذا تم تحديد نمطين كما يلي، فسيُعالَج النص المطابق للنمط الأول بعد التطبيع، ولن تُجرى أي عملية تطبيع على النص المطابق للنمط الثاني.\n"
+   ],
+   [
+      "Therefore, use the first pattern for text that is to be processed by combining multiple lines into a single line, and use the second pattern for pre-formatted text. If there is no text to match in the first pattern, use a pattern that does not match anything, such as C<(?!)>.\n",
+      "لذا استخدم النمط الأول للنص الذي سيُعالَج بضمّ عدة أسطر إلى سطر واحد، واستخدم النمط الثاني للنص مُسبق التنسيق. إذا لم يكن هناك نص يطابق النمط الأول، فاستخدم نمطًا لا يطابق أي شيء مثل C<(?!)>.\n"
+   ],
+   [
+      "Occasionally, there are parts of text that you do not want translated. For example, tags in markdown files. DeepL suggests that in such cases, the part of the text to be excluded be converted to XML tags, translated, and then restored after the translation is complete. To support this, it is possible to specify the parts to be masked from translation.\n",
+      "أحيانًا توجد أجزاء من النص لا تريد ترجمتها. على سبيل المثال، الوسوم في ملفات Markdown. تقترح DeepL في مثل هذه الحالات تحويل الجزء المراد استثناؤه إلى وسوم XML، ثم ترجمته، ثم استعادته بعد اكتمال الترجمة. لدعم ذلك، يمكن تحديد الأجزاء التي سيتم حجبها من الترجمة.\n"
+   ],
+   [
+      "This will interpret each line of the file C<MASKPATTERN> as a regular expression, translate strings matching it, and revert after processing. Lines beginning with C<#> are ignored.\n",
+      "سيتم تفسير كل سطر من الملف C<MASKPATTERN> كتعبير منتظم، وترجمة السلاسل المطابقة له، ثم الرجوع عن التغييرات بعد المعالجة. يتم تجاهل الأسطر التي تبدأ بـ C<#>.\n"
+   ],
+   [
+      "Complex pattern can be written on multiple lines with backslash escaped newline.\n",
+      "يمكن كتابة نمط معقد على عدة أسطر مع إخفاء سطر جديد بواسطة الشرطة المائلة العكسية.\n"
+   ],
+   [
+      "How the text is transformed by masking can be seen by B<--xlate-mask> option.\n",
+      "يمكن رؤية كيفية تحويل النص بواسطة الحجب عبر خيار B<--xlate-mask>.\n"
+   ],
+   [
+      "Masking protects markup from being translated. To conceal sensitive strings from the translation service itself, see L</ANONYMIZATION AND TEMPLATES>; both can be used together.\n",
+      "يحمي الحجب العلامات من الترجمة. لإخفاء السلاسل الحساسة عن خدمة الترجمة نفسها، راجع L</ANONYMIZATION AND TEMPLATES>؛ ويمكن استخدامهما معًا.\n"
+   ],
+   [
+      "This interface is experimental and subject to change in the future.\n",
+      "هذا الواجهة تجريبية وقابلة للتغيير في المستقبل.\n"
+   ],
+   [
+      "Sensitive strings can be concealed before they are sent to the translation API and restored in the output. Three sources of anonymization rules are available: a dictionary file (B<--xlate-anonymize>), inline marks in the document itself (B<--xlate-anonymize-mark>), and YAML front matter values (B<--xlate-frontmatter>). Each string is replaced by a category tag such as C<< <person id=1 /> >> during transmission. The concealment target is API transmission only: local cache files store restored plain text. Use B<--xlate-dryrun> to inspect exactly what would be transmitted.\n",
+      "يمكن إخفاء السلاسل الحساسة قبل إرسالها إلى واجهة API للترجمة ثم استعادتها في المخرجات. تتوفر ثلاثة مصادر لقواعد إخفاء الهوية: ملف قاموس (B<--xlate-anonymize>)، وعلامات مضمنة في المستند نفسه (B<--xlate-anonymize-mark>)، وقيم YAML front matter (B<--xlate-frontmatter>). تُستبدل كل سلسلة بوسم فئة مثل C<< <person id=1 /> >> أثناء الإرسال. هدف الإخفاء هو إرسال واجهة API فقط: تخزن ملفات التخزين المؤقت المحلية النص العادي المستعاد. استخدم B<--xlate-dryrun> لفحص ما سيُرسل بالضبط.\n"
+   ],
+   [
+      "For form documents (quarterly reports and the like), define the actors up front and reference them in the body:\n",
+      "بالنسبة إلى مستندات النماذج (التقارير الفصلية وما شابه)، عرّف الأطراف الفاعلة مسبقًا وأشر إليها في المتن:\n"
+   ],
+   [
+      "Translate the template once per language with C<--xlate-template> (and C<--xlate-frontmatter> when the values are kept in the file), then render each case with B<pandoc-embedz> standalone mode -- values under C<global:> in an external config never reach the translation API at all:\n",
+      "ترجم القالب مرة واحدة لكل لغة باستخدام C<--xlate-template> (وC<--xlate-frontmatter> عندما تُحفظ القيم في الملف)، ثم اعرض كل حالة باستخدام وضع B<pandoc-embedz> المستقل -- القيم الموجودة تحت C<global:> في تهيئة خارجية لا تصل إلى واجهة API للترجمة إطلاقًا:\n"
+   ],
+   [
+      "For inline marks, providing a macro definition config makes the same translated template render either the real names or a redacted version:\n",
+      "بالنسبة إلى العلامات المضمنة، فإن توفير تهيئة تعريف ماكرو يجعل القالب المترجم نفسه يعرض إما الأسماء الحقيقية أو نسخة منقحة:\n"
+   ],
+   [
+      "Exclude embedz blocks from translation when a document contains them:\n",
+      "استبعد كتل embedz من الترجمة عندما يحتويها المستند:\n"
+   ],
+   [
+      "Invoke the translation process for each matched area.\n",
+      "تفعيل عملية الترجمة لكل منطقة مطابقة.\n"
+   ],
+   [
+      "Without this option, B<greple> behaves as a normal search command. So you can check which part of the file will be subject of the translation before invoking actual work.\n",
+      "بدون هذا الخيار، يتصرف B<greple> كأمر بحث عادي. لذا يمكنك التحقق من أي جزء من الملف سيكون موضوعًا للترجمة قبل تنفيذ العمل الفعلي.\n"
+   ],
+   [
+      "Command result goes to standard out, so redirect to file if necessary, or consider to use L<App::Greple::update> module.\n",
+      "تذهب نتيجة الأمر إلى المخرج القياسي، لذا أعد توجيهها إلى ملف عند الحاجة، أو فكر في استخدام وحدة L<App::Greple::update>.\n"
+   ],
+   [
+      "Option B<--xlate> calls B<--xlate-color> option with B<--color=never> option.\n",
+      "الخيار B<--xlate> يستدعي خيار B<--xlate-color> مع خيار B<--color=never>.\n"
+   ],
+   [
+      "With B<--xlate-fold> option, converted text is folded by the specified width. Default width is 70 and can be set by B<--xlate-fold-width> option. Four columns are reserved for run-in operation, so each line could hold 74 characters at most.\n",
+      "مع خيار B<--xlate-fold>، يُطوى النص المحول بعرض محدد. العرض الافتراضي 70 ويمكن تعيينه بواسطة خيار B<--xlate-fold-width>. تُحجز أربع أعمدة لعملية الإدراج، لذا يمكن لكل سطر أن يحمل حتى 74 حرفًا كحد أقصى.\n"
+   ],
+   [
+      "Specifies the translation engine to be used.\n",
+      "يحدد محرك الترجمة المراد استخدامه.\n"
+   ],
+   [
+      "At this time, the following engines are available\n",
+      "في هذا الوقت، المحركات التالية متاحة\n"
+   ],
+   [
+      "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
+      "تُبحث وحدات المحرك أولاً في مساحات أسماء الواجهة الخلفية (C<llm>، ثم C<gpty>)، ثم مباشرةً تحت C<App::Greple::xlate>. لذلك يحمّل C<gpt5> الوحدة C<App::Greple::xlate::llm::gpt5> التي تستدعي الأمر C<llm>، بينما يعود C<gpt4o> إلى C<App::Greple::xlate::gpty::gpt4o>. استخدم C<--xlate-setopt backend=gpty> لفرض واجهة خلفية محددة.\n"
+   ],
+   [
+      "Instead of calling translation engine, you are expected to work for. After preparing text to be translated, they are copied to the clipboard. You are expected to paste them to the form, copy the result to the clipboard, and hit return.\n",
+      "بدلاً من استدعاء محرك الترجمة، يُتوقع أن تقوم بالعمل يدويًا. بعد تحضير النص المراد ترجمته، تُنسخ إلى الحافظة. يُتوقع منك لصقها في النموذج، نسخ النتيجة إلى الحافظة، ثم الضغط على Enter.\n"
+   ],
+   [
+      "Specify the target language. LLM engines accept any language name or code the model understands; it is interpolated into the translation prompt. You can get available languages by C<deepl languages> command when using B<DeepL> engine.\n",
+      "حدد اللغة الهدف. تقبل محركات LLM أي اسم لغة أو رمز يفهمه النموذج؛ ويُدرج ذلك في موجّه الترجمة. يمكنك الحصول على اللغات المتاحة بواسطة أمر C<deepl languages> عند استخدام محرك B<DeepL>.\n"
+   ],
+   [
+      "Label used for the original text in C<conflict>, C<colon> and C<ifdef> output formats. With the B<DeepL> engine a non-default value is also passed as the source language.\n",
+      "التسمية المستخدمة للنص الأصلي في تنسيقات الإخراج C<conflict> وC<colon> وC<ifdef>. مع محرك B<DeepL>، تُمرَّر القيمة غير الافتراضية أيضًا كلغة المصدر.\n"
+   ],
+   [
+      "Specify the output format for original and translated text.\n",
+      "حدد تنسيق الإخراج للنص الأصلي والمترجم.\n"
+   ],
+   [
+      "The following formats other than C<xtxt> assume that the part to be translated is a collection of lines. In fact, it is possible to translate only a portion of a line, but specifying a format other than C<xtxt> will not produce meaningful results.\n",
+      "تفترض التنسيقات التالية غير C<xtxt> أن الجزء المراد ترجمته عبارة عن مجموعة من الأسطر. في الواقع، من الممكن ترجمة جزء فقط من السطر، لكن تحديد تنسيق غير C<xtxt> لن ينتج نتائج ذات معنى.\n"
+   ],
+   [
+      "Original and converted text are printed in L<git(1)> conflict marker format.\n",
+      "يُطبع النص الأصلي والنص المحول بتنسيق علامات تعارض L<git(1)>.\n"
+   ],
+   [
+      "You can recover the original file by next L<sed(1)> command.\n",
+      "يمكنك استعادة الملف الأصلي بالأمر التالي L<sed(1)>.\n"
+   ],
+   [
+      "The original and translated text are output in a markdown's custom container style.\n",
+      "يُخرَج النص الأصلي والنص المترجم بأسلوب الحاوية المخصصة في Markdown.\n"
+   ],
+   [
+      "Above text will be translated to the following in HTML.\n",
+      "سيُترجم النص أعلاه إلى ما يلي في HTML.\n"
+   ],
+   [
+      "Number of colon is 7 by default. If you specify colon sequence like C<:::::>, it is used instead of 7 colons.\n",
+      "عدد النقطتين الرأسيتين هو 7 افتراضيًا. إذا حددت تسلسل نقطتين مثل C<:::::>، فسيُستخدم بدلًا من 7 نقطتين.\n"
+   ],
+   [
+      "Original and converted text are printed in L<cpp(1)> C<#ifdef> format.\n",
+      "يُطبع النص الأصلي والمحّول بتنسيق L<cpp(1)> C<#ifdef>.\n"
+   ],
+   [
+      "You can retrieve only Japanese text by the B<unifdef> command:\n",
+      "يمكنك جلب النص الياباني فقط بواسطة الأمر B<unifdef>:\n"
+   ],
+   [
+      "Original and converted text are printed separated by single blank line. For C<space+>, it also outputs a newline after the converted text.\n",
+      "يتم طباعة النص الأصلي والمحَوَّل مفصولين بسطر فارغ واحد. بالنسبة إلى C<space+>، يتم أيضًا إخراج سطر جديد بعد النص المحوَّل.\n"
+   ],
+   [
+      "If the format is C<xtxt> (translated text) or unkown, only translated text is printed.\n",
+      "إذا كان التنسيق C<xtxt> (النص المترجم) أو غير معروف، فسيتم طباعة النص المترجم فقط.\n"
+   ],
+   [
+      "Specify the maximum length of text to be sent to the API at once. The default value 0 means the engine's own limit: for the free DeepL account service that is 128K for the API (B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>). You may be able to change these value if you are using Pro service.\n",
+      "حدد الحد الأقصى لطول النص الذي سيتم إرساله إلى واجهة برمجة التطبيقات مرة واحدة. تعني القيمة الافتراضية 0 حدّ المحرك نفسه: بالنسبة إلى خدمة حساب DeepL المجانية، يكون ذلك 128K لواجهة برمجة التطبيقات (B<--xlate>) و5000 لواجهة الحافظة (B<--xlate-labor>). قد تتمكن من تغيير هذه القيم إذا كنت تستخدم خدمة Pro.\n"
+   ],
+   [
+      "Specify the maximum lines of text to be sent to the API at once.\n",
+      "حدد الحد الأقصى لعدد أسطر النص التي سيتم إرسالها إلى واجهة برمجة التطبيقات مرة واحدة.\n"
+   ],
+   [
+      "Set this value to 1 if you want to translate one line at a time. This option takes precedence over the C<--xlate-maxlen> option.\n",
+      "عيّن هذه القيمة إلى 1 إذا كنت تريد ترجمة سطر واحد في كل مرة. لهذا الخيار أولوية على خيار C<--xlate-maxlen>.\n"
+   ],
+   [
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name.\n",
+      "حدّد موجّهًا مخصصًا ليتم إرساله إلى محرك الترجمة. يتوفر هذا الخيار لمحركات LLM (C<gpt3>، C<gpt4o>، C<gpt5>) لكنه لا يتوفر لـ DeepL. يمكنك تخصيص سلوك الترجمة من خلال تقديم تعليمات محددة إلى نموذج الذكاء الاصطناعي. إذا كان الموجّه يحتوي على C<%s>، فسيُستبدل باسم اللغة الهدف.\n"
+   ],
+   [
+      "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
+      "حدد معلومات سياقية إضافية تُرسل إلى محرك الترجمة. يمكن استخدام هذا الخيار عدة مرات لتقديم عدة سلاسل سياقية. تساعد المعلومات السياقية محرك الترجمة على فهم الخلفية وإنتاج ترجمات أكثر دقة.\n"
+   ],
+   [
+      "Number of surrounding translated blocks passed as reference context when re-translating changed blocks (default 2). The context also includes the raw source text around the changed region (headings, list structure, captions) and, when available, the previous version of the changed text recovered from the cache, so that unchanged wording is preserved. Set to 0 to disable context-aware translation entirely. Note that each changed region is translated in its own API call and the context can add up to about 8000 characters to the system prompt, so context-aware translation trades some extra cost for consistency.\n",
+      "عدد الكتل المترجمة المحيطة التي تُمرَّر كسياق مرجعي عند إعادة ترجمة الكتل المتغيرة (الافتراضي 2). يتضمن السياق أيضًا نص المصدر الخام حول المنطقة المتغيرة (العناوين، بنية القوائم، التعليقات التوضيحية)، وعند توفره، الإصدار السابق من النص المتغير المستعاد من ذاكرة التخزين المؤقت، بحيث تُحفظ الصياغة غير المتغيرة. اضبطه على 0 لتعطيل الترجمة الواعية بالسياق بالكامل. لاحظ أن كل منطقة متغيرة تُترجم في استدعاء API خاص بها، ويمكن للسياق أن يضيف ما يصل إلى نحو 8000 محرف إلى موجّه النظام، لذلك تستبدل الترجمة الواعية بالسياق بعض التكلفة الإضافية بالاتساق.\n"
+   ],
+   [
+      "Initialize a new document's cache from another document's cache file. Useful for periodic reports: seed the new issue's cache with the previous issue's, so unchanged paragraphs are not re-translated and edited paragraphs keep the previous issue's wording. The seed is used only when the target cache is empty; otherwise it is ignored with a warning. With the default C<--xlate-cache=auto>, specifying a seed also implies creating the new document's cache file.\n",
+      "هيّئ ذاكرة التخزين المؤقت لمستند جديد من ملف ذاكرة التخزين المؤقت لمستند آخر. مفيد للتقارير الدورية: زوّد ذاكرة التخزين المؤقت للإصدار الجديد بذاكرة الإصدار السابق، حتى لا تُعاد ترجمة الفقرات غير المتغيرة وتحتفظ الفقرات المحررة بصياغة الإصدار السابق. لا تُستخدم البذرة إلا عندما تكون ذاكرة التخزين المؤقت الهدف فارغة؛ وإلا فتُتجاهل مع تحذير. مع C<--xlate-cache=auto> الافتراضي، فإن تحديد بذرة يعني أيضًا إنشاء ملف ذاكرة التخزين المؤقت للمستند الجديد.\n"
+   ],
+   [
+      "Anonymize sensitive strings before they are sent to the translation API, and restore them in the output. The dictionary file gives one entry per item: in JSON (canonical, machine-generatable)\n",
+      "أخفِ هوية السلاسل الحساسة قبل إرسالها إلى API الترجمة، واستعدها في المخرجات. يعطي ملف القاموس إدخالًا واحدًا لكل عنصر: بصيغة JSON (قياسية، قابلة للتوليد آليًا)\n"
+   ],
+   [
+      "or in a simple line format (C<category pattern>, C</.../> for regex). Each item is replaced by a category tag such as C<< <person id=1 /> >>; the same string always gets the same tag, so the model can keep track of who is who. Unknown JSON fields are ignored, so generators (e.g. a local LLM extracting entities) may add their own annotations. Category C<lit> is reserved. Local cache files still store restored plain text: the concealment target is API transmission only.\n",
+      "أو بتنسيق أسطر بسيط (C<category pattern>، C</.../> للتعبير النمطي). يُستبدل كل عنصر بوسم فئة مثل C<< <person id=1 /> >>؛ وتحصل السلسلة نفسها دائمًا على الوسم نفسه، بحيث يمكن للنموذج تتبع من هو من. تُتجاهل حقول JSON غير المعروفة، لذا يمكن للمولّدات (مثل LLM محلي يستخرج الكيانات) إضافة تعليقاتها التوضيحية الخاصة. الفئة C<lit> محجوزة. لا تزال ملفات ذاكرة التخزين المؤقت المحلية تخزن النص العادي المستعاد: هدف الإخفاء هو إرسال API فقط.\n"
+   ],
+   [
+      "A dictionary can be generated by an external tool -- for example a local model extracting sensitive entities:\n",
+      "يمكن إنشاء قاموس بواسطة أداة خارجية -- على سبيل المثال نموذج محلي يستخرج الكيانات الحساسة:\n"
+   ],
+   [
+      "A UTF-8 BOM in the file is tolerated. Values in the front matter line format may carry a trailing comment only on their own line, not after the value.\n",
+      "يُتسامح مع BOM بصيغة UTF-8 في الملف. قد تحمل القيم في تنسيق أسطر المادة الأمامية تعليقًا لاحقًا فقط على سطر مستقل، وليس بعد القيمة.\n"
+   ],
+   [
+      "Collect anonymization entries from inline marks in the document itself. Mark the first occurrence like C<{{ person(\"山田太郎\") }}> and every occurrence of the string document-wide is anonymized. The mark itself stays in the source and in the translation, so a document can also be processed by a Jinja2-style macro processor (define the C<person> macro to print or redact the name). A custom I<regex> must contain C<< (?<category>...) >> and C<< (?<text>...) >> named captures.\n",
+      "اجمع إدخالات إخفاء الهوية من العلامات المضمّنة في المستند نفسه. علّم أول ظهور مثل C<{{ person(\"山田太郎\") }}> وسيُخفى كل ظهور للسلسلة في كامل المستند. تبقى العلامة نفسها في المصدر وفي الترجمة، لذلك يمكن أيضًا معالجة المستند بواسطة معالج ماكرو بأسلوب Jinja2 (عرّف الماكرو C<person> لطباعة الاسم أو حجبه). يجب أن يحتوي I<regex> مخصص على الالتقاطين المسمّيين C<< (?<category>...) >> وC<< (?<text>...) >>.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-anonymize-mark=> (with a trailing C<=>) when using the default notation.\n",
+      "لاحظ أنه مع خيار ذي قيمة اختيارية مثل هذا، سيُؤخذ وسيط الملف التالي كقيمة: اكتب C<--xlate-anonymize-mark=> (مع C<=> لاحق) عند استخدام الترميز الافتراضي.\n"
+   ],
+   [
+      "Alternative notations can be configured, for example C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> for C<@@person:NAME@@>-style marks, or an HTML-comment form that stays invisible in rendered Markdown. Mark rules are collected per document: a string marked in one input file is not concealed in another file of the same run (unlike front matter values, which accumulate across files).\n",
+      "يمكن تكوين ترميزات بديلة، على سبيل المثال C<< --xlate-anonymize-mark='@@(?<category>[a-z][a-z0-9_]*):(?<text>[^\\n]+?)@@' >> لعلامات بأسلوب C<@@person:NAME@@>، أو صيغة تعليق HTML تبقى غير مرئية في Markdown المعروض. تُجمع قواعد العلامات لكل مستند: السلسلة المعلّمة في ملف إدخال واحد لا تُخفى في ملف آخر من التشغيل نفسه (بخلاف قيم المادة الأمامية، التي تتراكم عبر الملفات).\n"
+   ],
+   [
+      "Treat template expressions (default: Jinja2 C<{{ ... }}>, C<{% ... %}>, C<{# ... #}>) as opaque placeholders: instruct the model to copy them unchanged and verify, per block, that the response contains exactly the same expressions, each the same number of times. Their order may change, since translation legitimately reorders them to follow the target language word order. A broken expression aborts the run; the cache is checkpointed and frozen, so nothing paid for is lost.\n",
+      "عامِل تعبيرات القوالب (الافتراضي: Jinja2 C<{{ ... }}>، C<{% ... %}>، C<{# ... #}>) كعناصر نائبة معتمة: وجّه النموذج إلى نسخها دون تغيير والتحقق، لكل كتلة، من أن الاستجابة تحتوي بالضبط على التعبيرات نفسها، وبالعدد نفسه من المرات لكل منها. قد يتغير ترتيبها، لأن الترجمة قد تعيد ترتيبها بشكل مشروع لتتبع ترتيب كلمات اللغة الهدف. يؤدي التعبير المعطوب إلى إجهاض التشغيل؛ وتُحفظ ذاكرة التخزين المؤقت كنقطة تحقق وتُجمّد، بحيث لا يضيع أي شيء مدفوع الثمن.\n"
+   ],
+   [
+      "Note that with an optional-value option like this, a following file argument would be taken as the value: write C<--xlate-template=> (with a trailing C<=>) when using the default notation.\n",
+      "لاحظ أنه مع خيار ذي قيمة اختيارية مثل هذا، ستُعد وسيطة الملف التالية قيمةً له: اكتب C<--xlate-template=> (مع C<=> لاحقة) عند استخدام الترميز الافتراضي.\n"
+   ],
+   [
+      "Treat a leading C<---> ... C<---> block as YAML front matter: exclude it from translation and from the phase-2 context slices, and add its flat C<key: value> values to the anonymization rules (category C<var>) as a safety net. With multiple input files the collected values accumulate (erring on the side of concealment).\n",
+      "عامِل كتلة بادئة C<---> ... C<---> كواجهة أمامية YAML: استثنِها من الترجمة ومن شرائح سياق المرحلة 2، وأضف قيم C<key: value> المسطّحة الخاصة بها إلى قواعد إخفاء الهوية (الفئة C<var>) كشبكة أمان. عند وجود ملفات إدخال متعددة، تتراكم القيم المجمّعة (مع الميل إلى جانب الإخفاء).\n"
+   ],
+   [
+      "Always leave a blank line after the closing C<--->. With a paragraph-style match pattern, front matter that runs directly into the body text forms one straddling block that the exclusion cannot suppress (a warning is printed in that case); the values are still anonymized, but the front matter itself would be sent for translation.\n",
+      "اترك دائمًا سطرًا فارغًا بعد C<---> الختامية. مع نمط مطابقة بأسلوب الفقرات، فإن الواجهة الأمامية التي تمتد مباشرة إلى نص المتن تُشكّل كتلة واحدة عابرة للحدود لا يمكن للاستثناء كبتها (تُطبع رسالة تحذير في هذه الحالة)؛ تظل القيم مجهولة الهوية، لكن الواجهة الأمامية نفسها ستُرسل للترجمة.\n"
+   ],
+   [
+      "Specify a glossary ID to be used for translation. This option is only available when using the DeepL engine. The glossary ID should be obtained from your DeepL account and ensures consistent translation of specific terms.\n",
+      "حدد معرّف مسرد لاستخدامه في الترجمة. هذا الخيار متاح فقط عند استخدام محرك DeepL. يجب الحصول على معرّف المسرد من حساب DeepL لديك ويضمن ترجمة متسقة للمصطلحات المحددة.\n"
+   ],
+   [
+      "Do not call the translation API; instead show, through the progress display, each payload exactly as it would be transmitted (after anonymization and masking). Useful for checking what leaves the machine and for estimating the cost of a run.\n",
+      "لا تستدعِ واجهة برمجة تطبيقات الترجمة؛ بل اعرض، من خلال عرض التقدم، كل حمولة بالضبط كما كانت ستُرسَل (بعد إخفاء الهوية والتقنيع). مفيد للتحقق مما يغادر الجهاز ولتقدير تكلفة التشغيل.\n"
+   ],
+   [
+      "See the translation result in real time in the STDERR output. The C<From> payload is shown as transmitted, after anonymization and masking.\n",
+      "اعرض نتيجة الترجمة في الوقت الحقيقي في مخرجات STDERR. تُعرض حمولة C<From> كما أُرسلت، بعد إخفاء الهوية والتقنيع.\n"
+   ],
+   [
+      "Use L<App::Greple::stripe> module to show the matched part by zebra striping fashion. This is useful when the matched parts are connected back-to-back.\n",
+      "استخدم وحدة L<App::Greple::stripe> لإظهار الجزء المطابق بأسلوب التظليل المخطط (zebra striping). يكون هذا مفيدًا عندما تكون الأجزاء المتطابقة متصلة على التوالي.\n"
+   ],
+   [
+      "The color palette is switched according to the background color of the terminal. If you want to specify explicitly, you can use B<--xlate-stripe-light> or B<--xlate-stripe-dark>.\n",
+      "يتم تبديل لوحة الألوان وفقًا للون خلفية الطرفية. إذا أردت التحديد صراحة، يمكنك استخدام B<--xlate-stripe-light> أو B<--xlate-stripe-dark>.\n"
+   ],
+   [
+      "Perform masking function and display the converted text as is without restoration.\n",
+      "نفّذ وظيفة الإخفاء واعرض النص المحوَّل كما هو دون استرجاع.\n"
+   ],
+   [
+      "Set the whole text of the file as a target area.\n",
+      "عيّن كامل نص الملف كمنطقة هدف.\n"
+   ],
+   [
+      "In the case of the C<cm> and C<colon> formats, the output is split and formatted line by line. Therefore, if only a portion of a line is to be translated, the expected result cannot be obtained. These filters fix output that is corrupted by translating part of a line into normal line-by-line output.\n",
+      "في حالتي تنسيقي C<cm> وC<colon>، يتم تقسيم الإخراج وتنسيقه سطرًا بسطر. لذلك، إذا كان من المقرر ترجمة جزء فقط من سطر، فلن يمكن الحصول على النتيجة المتوقعة. تعمل هذه المرشحات على إصلاح الإخراج الذي فسد بسبب ترجمة جزء من السطر إلى إخراج طبيعي سطرًا بسطر.\n"
+   ],
+   [
+      "In the current implementation, if multiple parts of a line are translated, they are output as independent lines.\n",
+      "في التنفيذ الحالي، إذا تُرجمت أجزاء متعددة من سطر واحد، يتم إخراجها كسطور مستقلة.\n"
+   ],
+   [
+      "B<xlate> module can store cached text of translation for each file and read it before execution to eliminate the overhead of asking to server. With the default cache strategy C<auto>, it maintains cache data only when the cache file exists for target file.\n",
+      "يمكن لوحدة B<xlate> تخزين نص مترجم مؤقتًا لكل ملف وقراءته قبل التنفيذ لإزالة كلفة الاستعلام من الخادم. باستخدام استراتيجية التخزين المؤقت الافتراضية C<auto>، تتم المحافظة على بيانات التخزين المؤقت فقط عندما يوجد ملف التخزين المؤقت للملف الهدف.\n"
+   ],
+   [
+      "Use B<--xlate-cache=clear> to initiate cache management or to clean up all existing cache data. Once executed with this option, a new cache file will be created if one does not exist and then automatically maintained afterward.\n",
+      "استخدم B<--xlate-cache=clear> لبدء إدارة التخزين المؤقت أو لتنظيف جميع بيانات التخزين المؤقت الموجودة. بعد التنفيذ بهذا الخيار، سيتم إنشاء ملف تخزين مؤقت جديد إن لم يكن موجودًا ثم تتم صيانته تلقائيًا بعد ذلك.\n"
+   ],
+   [
+      "Maintain the cache file if it exists.\n",
+      "حافظ على ملف التخزين المؤقت إذا كان موجودًا.\n"
+   ],
+   [
+      "Create empty cache file and exit.\n",
+      "أنشئ ملف تخزين مؤقت فارغًا ثم اخرج.\n"
+   ],
+   [
+      "Maintain cache anyway as far as the target is normal file.\n",
+      "حافظ على ذاكرة التخزين المؤقت على أي حال طالما أن الهدف ملف عادي.\n"
+   ],
+   [
+      "Clear the cache data first.\n",
+      "امسح بيانات ذاكرة التخزين المؤقت أولاً.\n"
+   ],
+   [
+      "Never use cache file even if it exists.\n",
+      "لا تستخدم ملف ذاكرة التخزين المؤقت مطلقًا حتى إذا كان موجودًا.\n"
+   ],
+   [
+      "By default behavior, unused data is removed from the cache file. If you don't want to remove them and keep in the file, use C<accumulate>.\n",
+      "وفقًا للسلوك الافتراضي، تتم إزالة البيانات غير المستخدمة من ملف ذاكرة التخزين المؤقت. إذا كنت لا تريد إزالتها وتريد الاحتفاظ بها في الملف، استخدم C<accumulate>.\n"
+   ],
+   [
+      "This option forces to update cache file even if it is not necessary.\n",
+      "يفرض هذا الخيار تحديث ملف ذاكرة التخزين المؤقت حتى إذا لم يكن ذلك ضروريًا.\n"
+   ],
+   [
+      "You can easily use this module from the command line by using the C<xlate> command included in the distribution. See the C<xlate> man page for usage.\n",
+      "يمكنك استخدام هذه الوحدة بسهولة من سطر الأوامر باستخدام أمر C<xlate> المُضمَّن في التوزيعة. راجع صفحة الدليل C<xlate> للاستخدام.\n"
+   ],
+   [
+      "The C<xlate> command supports GNU-style long options such as C<--to-lang>, C<--from-lang>, C<--engine>, and C<--file>. Use C<xlate -h> to see all available options.\n",
+      "يدعم الأمر C<xlate> خيارات طويلة بأسلوب GNU مثل C<--to-lang> وC<--from-lang> وC<--engine> وC<--file>. استخدم C<xlate -h> لرؤية جميع الخيارات المتاحة.\n"
+   ],
+   [
+      "The C<xlate> command works in concert with the Docker environment, so even if you do not have anything installed on hand, you can use it as long as Docker is available. Use C<-D> or C<-C> option.\n",
+      "يعمل أمر C<xlate> بالتنسيق مع بيئة Docker، لذا حتى إذا لم يكن لديك أي شيء مُثبّت محليًا، يمكنك استخدامه طالما أن Docker متاح. استخدم خيار C<-D> أو C<-C>.\n"
+   ],
+   [
+      "Docker operations are handled by L<App::dozo>, which can also be used as a standalone command. The C<dozo> command supports the C<.dozorc> configuration file for persistent container settings.\n",
+      "تتم إدارة عمليات Docker بواسطة L<App::dozo>، والذي يمكن استخدامه أيضًا كأمر مستقل. يدعم أمر C<dozo> ملف الإعدادات C<.dozorc> لإعدادات الحاوية الدائمة.\n"
+   ],
+   [
+      "Also, since makefiles for various document styles are provided, translation into other languages is possible without special specification. Use C<-M> option.\n",
+      "أيضًا، نظرًا لتوفّر ملفات make لأنماط مستندات متنوعة، فإن الترجمة إلى لغات أخرى ممكنة دون مواصفات خاصة. استخدم خيار C<-M>.\n"
+   ],
+   [
+      "You can also combine the Docker and C<make> options so that you can run C<make> in a Docker environment.\n",
+      "يمكنك أيضًا الجمع بين خياري Docker وC<make> بحيث يمكنك تشغيل C<make> في بيئة Docker.\n"
+   ],
+   [
+      "Running like C<xlate -C> will launch a shell with the current working git repository mounted.\n",
+      "التشغيل مثل C<xlate -C> سيؤدي إلى إطلاق صدفة مع ربط مستودع git العامل الحالي.\n"
+   ],
+   [
+      "Read Japanese article in L</SEE ALSO> section for detail.\n",
+      "اقرأ المقال الياباني في قسم L</SEE ALSO> للتفاصيل.\n"
+   ],
+   [
+      "Load the F<xlate.el> file included in the repository to use C<xlate> command from Emacs editor. C<xlate-region> function translate the given region. Default language is C<EN-US> and you can specify language invoking it with prefix argument.\n",
+      "حمّل ملف F<xlate.el> المُضمَّن في المستودع لاستخدام أمر C<xlate> من محرر Emacs. تقوم دالة C<xlate-region> بترجمة المنطقة المحددة. اللغة الافتراضية هي C<EN-US> ويمكنك تحديد اللغة عند استدعائها مع معامل بادئة.\n"
+   ],
+   [
+      "Set your authentication key for DeepL service.\n",
+      "عيّن مفتاح المصادقة لخدمة DeepL.\n"
+   ],
+   [
+      "OpenAI authentication key, used by the legacy B<gpty> engines. The C<llm>-based B<gpt5> engine reads this variable too, but keys stored with C<llm keys set openai> also work.\n",
+      "مفتاح مصادقة OpenAI، يُستخدم بواسطة محركات B<gpty> القديمة. يقرأ محرك B<gpt5> المستند إلى C<llm> هذا المتغير أيضًا، لكن المفاتيح المخزنة باستخدام C<llm keys set openai> تعمل أيضًا.\n"
+   ],
+   [
+      "Set the default cache strategy (see L</CACHE OPTIONS>).\n",
+      "عيّن استراتيجية التخزين المؤقت الافتراضية (انظر L</CACHE OPTIONS>).\n"
+   ],
+   [
+      "Install the command line tool for the engine you use: C<llm> for the B<gpt5> engine, C<deepl> for DeepL, C<gpty> for the legacy GPT engines.\n",
+      "ثبّت أداة سطر الأوامر للمحرك الذي تستخدمه: C<llm> لمحرك B<gpt5>، وC<deepl> لـ DeepL، وC<gpty> لمحركات GPT القديمة.\n"
+   ],
+   [
+      "L<https://llm.datasette.io/>\n",
+      "L<https://llm.datasette.io/>\n"
+   ],
+   [
+      "L<https://github.com/DeepLcom/deepl-python>\n",
+      "L<https://github.com/DeepLcom/deepl-python>\n"
+   ],
+   [
+      "L<https://github.com/tecolicom/App-gpty>\n",
+      "L<https://github.com/tecolicom/App-gpty>\n"
+   ],
+   [
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n",
+      "L<App::Greple::xlate::llm>, L<App::Greple::xlate::deepl>\n"
+   ],
+   [
+      "L<App::dozo> - Generic Docker runner used by xlate for container operations\n",
+      "L<App::dozo> - مشغّل Docker عام يُستخدم بواسطة xlate لعمليات الحاويات\n"
+   ],
+   [
+      "See the B<greple> manual for the detail about target text pattern. Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to limit the matching area.\n",
+      "راجع دليل B<greple> للتفاصيل حول نمط نص الهدف. استخدم الخيارات B<--inside> وB<--outside> وB<--include> وB<--exclude> لتقييد منطقة المطابقة.\n"
+   ],
+   [
+      "You can use C<-Mupdate> module to modify files by the result of B<greple> command.\n",
+      "يمكنك استخدام وحدة C<-Mupdate> لتعديل الملفات بنتيجة أمر B<greple>.\n"
+   ],
+   [
+      "Use B<sdif> to show conflict marker format side by side with B<-V> option.\n",
+      "استخدم B<sdif> لإظهار تنسيق علامات التعارض جنبًا إلى جنب مع خيار B<-V>.\n"
+   ],
+   [
+      "Greple B<stripe> module use by B<--xlate-stripe> option.\n",
+      "تُستخدم وحدة Greple B<stripe> بواسطة خيار B<--xlate-stripe>.\n"
+   ],
+   [
+      "Docker container image.\n",
+      "صورة حاوية Docker.\n"
+   ],
+   [
+      "The C<getoptlong.sh> library used for option parsing in the C<xlate> script and L<App::dozo>.\n",
+      "مكتبة C<getoptlong.sh> المستخدمة لتحليل الخيارات في البرنامج النصي C<xlate> وL<App::dozo>.\n"
+   ],
+   [
+      "The C<llm> command used by the B<gpt5> engine to access LLM models.\n",
+      "الأمر C<llm> الذي يستخدمه المحرك B<gpt5> للوصول إلى نماذج LLM.\n"
+   ],
+   [
+      "DeepL Python library and CLI command.\n",
+      "مكتبة DeepL لبايثون وأمر CLI.\n"
+   ],
+   [
+      "OpenAI Python Library\n",
+      "مكتبة OpenAI لبايثون\n"
+   ],
+   [
+      "OpenAI command line interface\n",
+      "واجهة سطر الأوامر لـ OpenAI\n"
+   ],
+   [
+      "Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)\n",
+      "وحدة Greple للترجمة والاستبدال للأجزاء الضرورية فقط باستخدام واجهة DeepL API (باللغة اليابانية)\n"
+   ],
+   [
+      "Generating documents in 15 languages with DeepL API module (in Japanese)\n",
+      "إنشاء مستندات بـ 15 لغة باستخدام وحدة DeepL API (باللغة اليابانية)\n"
+   ],
+   [
+      "Automatic translation Docker environment with DeepL API (in Japanese)\n",
+      "بيئة Docker للترجمة الآلية باستخدام DeepL API (باللغة اليابانية)\n"
+   ]
+]

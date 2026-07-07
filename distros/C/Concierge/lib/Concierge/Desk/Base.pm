@@ -1,7 +1,7 @@
-package Concierge::Desk::Base v0.8.4;
+package Concierge::Desk::Base v0.9.0;
 use v5.36;
 
-our $VERSION = 'v0.8.4';
+our $VERSION = 'v0.9.0';
 
 # ABSTRACT: Records-store base class for Concierge component modules
 
@@ -51,7 +51,7 @@ Concierge::Desk::Base - Records-store base class for Concierge component modules
 
 =head1 VERSION
 
-v0.8.4
+v0.9.0
 
 =head1 SYNOPSIS
 
@@ -228,7 +228,8 @@ component, add a key for it in that file:
     {
         "sessions_dir": "/path/to/desk",
         "users_config_file": "/path/to/desk/users.conf",
-        "auth_file": "/path/to/desk/auth.json",
+        "auth_backend": "pwd",
+        "auth_args": { "file": "/path/to/desk/auth.pwd" },
         "organizations_config": {
             "backend": "sqlite",
             "db_file": "/path/to/desk/orgs.db"

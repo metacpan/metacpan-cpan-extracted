@@ -27,5 +27,12 @@ t/tpls/var_scope.stpl
 tpls/child.stpl
 tpls/extra.stpl
 tpls/parent.stpl
+docs/01-variables.pl
+docs/02-if.pl
+docs/03-foreach.pl
+docs/04-comments.pl
+docs/05-modifiers.pl
+docs/06-delimiters.pl
+docs/07-literal.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

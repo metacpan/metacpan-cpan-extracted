@@ -1,6 +1,6 @@
 package App::Greple::xlate::deepl;
 
-our $VERSION = "1.0202";
+our $VERSION = "2.00";
 
 use v5.14;
 use warnings;
@@ -26,16 +26,16 @@ my %param = (
 sub deepl {
     state $deepl = Command::Run->new;
     state $command = do {
-	my $glossary = $App::Greple::xlate::glossary;
-	my   @c = ('deepl', 'text');
-	push @c,  ('--to', $lang_to);
-	push @c,  ('--from', $lang_from) if $lang_from ne 'ORIGINAL';
-	push @c,  ('--auth-key', $auth_key) if $auth_key;
-	push @c,  ('--glossary-id', $glossary) if $glossary;
-	if (my @contexts = @{$opt{contexts}}) {
-	    push @c, '--context' => join "\n", @contexts;
-	}
-	\@c;
+        my $glossary = $App::Greple::xlate::glossary;
+        my   @c = ('deepl', 'text');
+        push @c,  ('--to', $lang_to);
+        push @c,  ('--from', $lang_from) if $lang_from ne 'ORIGINAL';
+        push @c,  ('--auth-key', $auth_key) if $auth_key;
+        push @c,  ('--glossary-id', $glossary) if $glossary;
+        if (my @contexts = @{$opt{contexts}}) {
+            push @c, '--context' => join "\n", @contexts;
+        }
+        \@c;
     };
     $deepl->command(@$command, shift)->update->data;
 }
@@ -46,11 +46,11 @@ sub clipboard {
     my $length = length $from;
     Clipboard->copy($from);
     STDERR->printflush(
-	"$length characters stored in the clipboard.\n",
-	"Translate it to \"$lang_to\" and clip again.\n",
-	"Then hit enter: ");
+        "$length characters stored in the clipboard.\n",
+        "Translate it to \"$lang_to\" and clip again.\n",
+        "Then hit enter: ");
     if (open my $fh, "/dev/tty" or die) {
-	my $answer = <$fh>;
+        my $answer = <$fh>;
     }
     my $to = Clipboard->paste;
     $to = decode('utf8', $to) if not utf8::is_utf8($_);
@@ -69,7 +69,7 @@ sub xlate_each {
     my @out = $to =~ /.*\n/g;
     _progress("To:\n", map s/^/\t> /mgr, @out);
     if (@out < sum @count) {
-	die "Unexpected response:\n\n$to\n";
+        die "Unexpected response:\n\n$to\n";
     }
     map { join '', splice @out, 0, $_ } @count;
 }
@@ -79,15 +79,15 @@ sub xlate {
     my @to;
     my $max = $App::Greple::xlate::max_length || $param{$method}->{max} // die;
     while (@from) {
-	my @tmp;
-	my $len = 0;
-	while (@from) {
-	    my $next = length $from[0];
-	    last if $len + $next > $max;
-	    $len += $next;
-	    push @tmp, shift @from;
-	}
-	push @to, xlate_each @tmp;
+        my @tmp;
+        my $len = 0;
+        while (@from) {
+            my $next = length $from[0];
+            last if $len + $next > $max;
+            $len += $next;
+            push @tmp, shift @from;
+        }
+        push @to, xlate_each @tmp;
     }
     @to;
 }

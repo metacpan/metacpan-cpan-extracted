@@ -1,3 +1,9 @@
+1.001001   2026-07-06
+
+  - Verify NIP-01 Schnorr signatures over the 32-byte event id instead of
+    its hex string, matching the Net::Nostr::Core fix, so the relay accepts
+    events signed by standard Nostr implementations.
+
 1.001000   2026-07-03
 
   - First independent Net-Nostr-Relay release, split from Net-Nostr

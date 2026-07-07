@@ -1,5 +1,63 @@
 Revision history for Concierge
 
+v0.9.0  2026-07-05
+    - BREAKING: Auth backend is now selected via a friendly name resolved
+      through Desk::Setup's %AUTH_BACKENDS catalog, matching the 5-verb
+      contract introduced in Concierge::Auth v0.5.0. Desks built before
+      this change (bare auth_file, no auth_backend/auth_args in
+      concierge.conf) will fail at open_desk() -- there is no migration
+      path or fallback; affected desks must be rebuilt via
+      build_desk()/build_quick_desk(). Requires Concierge::Auth >= 0.5.0
+      (bumped in PREREQ_PM); running against an older Concierge::Auth
+      will fail outright since it no longer has the backend factory.
+    - open_desk(): instantiating the configured Auth backend is now
+      wrapped so failures return gracefully instead of croaking. A
+      pre-v0.5 desk (missing auth_backend) gets a specific
+      { success => 0, message => '...' } explaining that the desk must
+      be rebuilt, that rebuilding will archive existing user data but
+      delete session/credential storage and install the default
+      built-in ID-password auth system, and pointing at the POD for
+      alternative auth approaches. Any other backend init failure (bad
+      backend name, backend constructor error) returns a generic
+      wrapped { success => 0, message => "Failed to initialize auth
+      backend: ..." } instead of propagating the croak.
+    - Desk::Setup: added %AUTH_BACKENDS catalog (currently 'pwd' ->
+      Concierge::Auth::Pwd); build_desk() and validate_setup_config()
+      resolve/validate auth.backend through it. Documented (POD +
+      commented-out catalog entries) that additional backends -- e.g.
+      OAuth, SAML, or a non-Concierge::-namespaced class -- can be added
+      as one-entry additions; the backend class is not required to live
+      under the Concierge:: namespace.
+    - Concierge.pm: six call sites (add_user, remove_user, verify_user,
+      login_user, verify_password, reset_password) converted from the
+      old Auth primitives to the new authenticate/is_id_known/enroll/
+      change_credentials/revoke verbs.
+    - Fixed three call sites (admit_visitor, checkin_guest,
+      Desk::User::enable_user) that called Concierge::Auth as a class
+      method for ID generation -- broken outright under the new factory,
+      which has no class methods; now call the configured backend
+      instance or Concierge::Auth::Generators directly.
+    - BREAKING: Desk::Setup's build_desk() config is reshaped: the
+      former storage => { base_dir, sessions_dir, users_dir, auth_dir }
+      block is gone. base_dir is now a top-level setting (it was the
+      only entry left in storage once each component's own directory
+      moved into its own block), and each component's storage location
+      is a 'dir' setting within that component's own block (auth.dir,
+      sessions.dir, users.dir), keeping location and backend settings
+      together per component instead of split across two structures.
+      Each 'dir' defaults to the top-level base_dir if omitted; a
+      relative 'dir' is resolved *against* base_dir (so it moves along
+      with it), while an absolute 'dir' is used as-is, letting a
+      component's storage live entirely outside the rest of the desk
+      (e.g. a more restrictively permissioned location for the 'pwd'
+      backend's password file). auth.file remains a filename only
+      (default 'auth.pwd' for 'pwd'), never a path -- previously an
+      explicit path in auth.file that was given relative to '.' could
+      silently end up outside the desk directory once base_dir '.'/
+      './' was normalized to './desk'; naming (file) and location
+      (dir) are now fully independent, and passing a full path in
+      auth.file is no longer supported.
+
 v0.8.4  2026-06-05
     - Desk::Setup POD: add UI Formatting Hints section documenting format_as
       with template example using app-native tokens (t/b/sel)

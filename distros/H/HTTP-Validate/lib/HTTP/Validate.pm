@@ -11,27 +11,30 @@ use Scalar::Util qw( reftype weaken looks_like_number );
 # for casefolding enum values.  Otherwise, we default to 'lc'.
 
 my $case_fold = $] >= 5.016		    ? eval 'sub { return CORE::fc $_[0] }'
-	      : $INC{'Unicode/CaseFold.pm'} ? eval 'sub { return Unicode:CaseFold::fc $_[0] }'
+	      : $INC{'Unicode/CaseFold.pm'} ? eval 'sub { return Unicode::CaseFold::fc $_[0] }'
 	      : 			      eval 'sub { return lc $_[0] }';
 
-our $VERSION = '0.982';
+our $VERSION = '1.0';
 
 =head1 NAME
 
 HTTP::Validate - validate and clean HTTP parameter values according to a set of rules
 
-Version 0.982
+Version 1.0
 
 =head1 DESCRIPTION
 
-This module provides validation of HTTP request parameters against a set of
-clearly defined rules.  It is designed to work with L<Dancer>, L<Mojolicious>,
-L<Catalyst>, and similar web application frameworks, both for interactive apps
-and for data services.  It can also be used with L<CGI>, although the use of
-L<CGI::Fast> or another similar solution is recommended to avoid paying the
-penalty of loading this module and initializing all of the rulesets over again
-for each request.  Both an object-oriented interface and a procedural
-interface are provided.
+This module provides validation of a set of parameter values against a set of clearly
+defined rules. It is designed to work with L<Dancer>, L<Mojolicious>, L<Catalyst>,
+L<Web::DataService>, and similar web application frameworks, both for interactive apps
+and for data services. It can also be used with L<CGI>, although the use of L<CGI::Fast>
+or another similar solution is recommended to avoid paying the penalty of loading this
+module and initializing all of the rulesets over again for each request. Both an
+object-oriented interface and a procedural interface are provided.
+
+There are several use cases for this module. It was originally designed for
+validating HTTP request parameters, but it can also be used to validate other
+sets of parameters and values, such as the body of an HTTP POST request.
 
 The rule definition mechanism is very flexible.  A ruleset can be defined once
 and used with multiple URL paths, and rulesets can be combined using the rule
@@ -60,8 +63,8 @@ then be converted to HTML, TeX, nroff, etc. as needed.
 	    "If either 'lat' or 'lng' is given, the other must be as well.",
         { param => 'id', valid => POS_VALUE },
 	    "Return the dataset with the given identifier",
-        { param => 'name', valid => STR_VALUE },
-	    "Return all datasets with the given name");
+        { param => 'name', valid => ANY_VALUE },
+	    "Return all datasets that match the given name");
     
     define_ruleset( 'display' => 
         { optional => 'full', valid => FLAG_VALUE },
@@ -69,9 +72,9 @@ then be converted to HTML, TeX, nroff, etc. as needed.
         { optional => 'short', valid => FLAG_VALUE },
 	    "If specified, then a brief summary of the datasets is returned.  No value is necessary",
         { at_most_one => ['full', 'short'] },
-        { optional => 'limit', valid => [POS_ZERO_VALUE, ENUM('all')], default => 'all',
+        { optional => 'limit', valid => [POS_ZERO_VALUE, ENUM_VALUE('all')], default => 'all',
           errmsg => "acceptable values for 'limit' are either 'all', 0, or a positive integer" },
-	    "Limits the number of results returned.  Acceptable values are 'all', 0, or a positive integer.");
+	    "Limits the number of results returned. Acceptable values are 'all', 0, or a positive integer.");
     
     define_ruleset( 'dataset_query' =>
 	"This URL queries for stored datasets.  The following parameters select the datasets",
@@ -81,11 +84,10 @@ then be converted to HTML, TeX, nroff, etc. as needed.
 	"The following optional parameters control how the data is returned:",
         { allow => 'display' });
     
-    # Validate the parameters found in %ARGS against the ruleset
-    # 'dataset_query'.  This is just one example, and in general the parameters
-    # may be found in various places depending upon which module (CGI,
-    # Dancer, Mojolicious, etc.)  you are using to accept and process HTTP
-    # requests.
+    # Validate the parameters found in %ARGS against the ruleset 'dataset_query'. This
+    # is just one example, and in general the parameters may be found in various places
+    # depending upon which module (CGI, Dancer, Mojolicious, etc.) you are using to
+    # accept and process HTTP requests.
     
     my $result = check_params('dataset_query', \%ARGS);
     
@@ -95,16 +97,20 @@ then be converted to HTML, TeX, nroff, etc. as needed.
         # request and report the error back to the end user
     }
     
-    # Otherwise, $result->values will return the cleaned parameter
-    # values for use in processing the request.
+    else
+    {
+        my %param_value = $result->values;
 
+        # do whatever is necessary to process the request
+    }
+    
 =head1 THE VALIDATION PROCESS
 
 The validation process starts with the definition of one or more sets of rules.
 This is done via the L</define_ruleset> keyword.  For example:
 
     define_ruleset 'some_params' =>
-        { param => 'id', valid => POS_VALUE };
+        { param => 'id', valid => POS_VALUE },
         { param => 'short', valid => FLAG_VALUE },
 	{ param => 'full', valid => FLAG_VALUE },
         { at_most_one => ['short', 'full'],
@@ -135,89 +141,80 @@ request.
 
 =back
 
-You can define as many rulesets as you wish.  For each URL path recognized by
-your code, you can use the L</check_params> function to validate the request
-parameters against the appropriate ruleset for that path.  If the given
-parameter values are not valid, one or more error messages will be returned.
-These messages should be sent back to the HTTP client, in order to instruct
-the user or programmer who originally generated the request how to amend the
-parameters so that the request will succeed.
+You can define as many rulesets as you wish. For each URL path recognized by your code,
+you can use the L</check_params> function to validate the request parameters against the
+appropriate ruleset for that path. If the given parameter values are not valid, one or
+more error messages will be returned. These messages should be sent back to the HTTP
+client, in order to instruct the user or programmer who originally generated the request
+how to amend the parameters so that the request will succeed.
 
-During the validation process, a set of parameter values are considered to
-"pass" against a given ruleset if they are consistent with all of its rules.
-Rulesets may be included inside other rulesets by means of L</allow> and
-L</require> rules.  This allows you to define common rulesets to validate
-various groups of parameters, and then combine them together into specific
-rulesets for use with different URL paths.
+During the validation process, a set of parameter values are considered to "pass"
+against a given ruleset if they are consistent with all of its rules. Rulesets may be
+included inside other rulesets by means of L</allow> and L</require> rules. This allows
+you to define common rulesets to validate various groups of parameters, and then combine
+them together into specific rulesets for use with different URL paths.
 
-A ruleset is considered to be "fulfilled" by a request if at least one
-parameter mentioned in a L</param> or L</mandatory> rule is included in that
-request, or trivially if the ruleset does not contain any rules of those
-types.  When you use L</check_params> to validate a request against a
-particular ruleset, the request will be rejected unless the following are both
-true:
+A ruleset is considered to be "fulfilled" by a request if at least one parameter
+mentioned in a L</param> rule is included in that request, or trivially if the ruleset
+does not contain any rules of those types. When you use L</check_params> to validate a
+request against a particular ruleset, the request will be rejected unless the following
+are both true:
 
 =over 4
 
 =item *
 
-The request passes against the specified ruleset and all those that it
-includes.
+The request passes against the specified ruleset and all those that it includes.
 
 =item *
 
 The specified ruleset is fulfilled, along with any other rulesets included by
-L</require> rules.  Rulesets included by L</allow> rules do not have to be
-fulfilled.
+L</require> rules. Rulesets included by L</allow> rules do not have to be fulfilled.
 
 =back
 
-This provides you with a lot of flexibilty as to requiring or not requiring
-various parameters.  Note that a ruleset without any L</param> or
-L</mandatory> rules is automatically fulfilled, which allows you to make all
-of the paramters optional if you wish.  You can augment this mechanism by
-using L</together> and L</at_most_one> rules to specify which parameters must
-or must not be used together.
+This provides you with a lot of flexibilty as to requiring or not requiring various
+parameters. Note that a ruleset without any L</param> rules is automatically fulfilled,
+which allows you to make all of the paramters optional if you wish. You can augment this
+mechanism by using L</together> and L</at_most_one> rules to specify which parameters
+must or must not be used together.
 
 =head2 Ruleset names
 
-Each ruleset must have a unique name, which can be any non-empty
-string.  You may name them after paths, parameters, functionality ("display",
-"filter") or whatever else makes sense to you.
+Each ruleset must have a unique name, which can be any non-empty string. You may name
+them after paths, parameters, functionality ("display", "filter") or whatever else makes
+sense to you.
 
 =head2 Ordering of rules
 
-The rules in a given ruleset are always checked in the order they were
-defined.  Rulesets that are included via L</allow> and L</require> rules are
-checked immediately when the including rule is evaluated.  Each ruleset is
-checked at most once per validation, even if it is included multiple times.
+The rules in a given ruleset are always checked in the order they were defined. Rulesets
+that are included via L</allow> and L</require> rules are checked immediately when the
+including rule is evaluated. Each ruleset is checked at most once per validation, even
+if it is included multiple times.
 
-You should be cautious about including multiple parameter rules that
-correspond to the same parameter name, as this can lead to situations where no
-possible value is correct.
+You should be cautious about including multiple parameter rules that correspond to the
+same parameter name, as this can lead to situations where no possible value is correct.
 
 =head2 Unrecognized parameters
 
-By default, a request will be rejected with an appropriate error message if it
-contains any parameters not mentioned in any of the checked rulesets.  This
-can be overridden (see below) to generate warnings instead.  However, please
-think carefully before choosing this option.  Allowing unrecognized parameters
-opens up the possibility that optional parameters will be accidentally
-misspelled and thus ignored, so that the results are mysteriously different
-from what was expected.  If you override this behavior, you should make sure that
-any resulting warnings are explicitly displayed in the response that you
+By default, a request will be rejected with an appropriate error message if it contains
+any parameters not mentioned in any of the checked rulesets. This can be overridden (see
+below) to generate warnings instead. However, please think carefully before choosing
+this option. Allowing unrecognized parameters opens up the possibility that optional
+parameters will be accidentally misspelled and thus ignored, so that the results are
+mysteriously different from what was expected. If you override this behavior, you should
+make sure that any resulting warnings are explicitly displayed in the response that you
 generate.
 
 =head2 Rule syntax
 
-Every rule is represented by a hashref that contains a key indicating the rule
-type.  For clarity, you should always write this key first.  It is an error to
-include more than one of these keys in a single rule.  You may optionally
-include additional keys to specify what are the acceptable values for this
-parameter, what error message should be returned if the parameter value is not
-acceptable, and L<many other options|/Other keys>.
+Every rule is represented by a hashref that contains a key indicating the rule type. For
+clarity, you should always write this key first. It is an error to include more than one
+of these keys in a single rule. You may optionally include additional keys to specify
+what are the acceptable values for this parameter, what error message should be returned
+if the parameter value is not acceptable, and L<many other options|/Other keys>.
 
-=head3 parameter rules
+=head3 Parameter rules
 
 The following three types of rules define the recognized parameter names.
 
@@ -225,115 +222,111 @@ The following three types of rules define the recognized parameter names.
 
     { param => <parameter_name>, valid => <validator> ... }
 
-If the specified parameter is present with a non-empty value, then its value
-must pass one of the specified validators.  If it passes any of them, the rest
-are ignored.  If it does not pass any of them, then an appropriate error
-message will be generated.  If no validators are specified, then the value
-will be accepted no matter what it is.
+If the specified parameter is present with a non-empty value, then its value must pass
+one of the specified validators. If it passes any of them, the rest are ignored. If it
+does not pass any of them, then an appropriate error message will be generated. If no
+validators are specified, then the value will be accepted no matter what it is.
 
-If the specified parameter is present and its value is valid, then the
-containing ruleset will be marked as "fulfilled".  You could use this, for
-example, with a query URL in order to require that the query not be empty
-but instead contain at least one significant criterion.  The parameters that
-count as "significant" would be declared by C<param> rules, the others by
-C<optional> rules.
+If the specified parameter is present, then the containing ruleset will be marked as
+"fulfilled". You could use this, for example, with a query URL in order to require that
+the query not be empty but instead contain at least one significant criterion. The
+parameters that count as "significant" would be declared by C<param> rules, the others
+by C<optional> rules.
 
 =head4 optional
 
     { optional => <parameter_name>, valid => <validator> ... }
 
-An C<optional> rule is identical to a C<param> rule, except that the presence
-or absence of the parameter will have no effect on whether or not the
-containing ruleset is fulfilled. A ruleset in which all of the parameter rules
-are C<optional> will always be fulfilled.  This kind of rule is useful in
-validating URL parameters, especially for GET requests.
+An C<optional> rule is identical to a C<param> rule, except that the presence or absence
+of the parameter will have no effect on whether or not the containing ruleset is
+fulfilled. A ruleset in which all of the parameter rules are C<optional> will always be
+fulfilled. This kind of rule is useful in validating URL parameters, especially for GET
+requests.
 
 =head4 mandatory
 
     { mandatory => <parameter_name>, valid => <validator> ... }
 
-A C<mandatory> rule is identical to a C<param> rule, except that this
-parameter is required to be present with a non-empty value regardless of the
-presence or absence of other parameters.  If it is not, then an error message
-will be generated.  This kind of rule can be useful when validating HTML form
-submissions, for use with fields such as "name" that must always be filled in.
+A C<mandatory> rule is identical to an C<optional> rule, except that this parameter is
+required to be present with a non-empty value regardless of the presence or absence of
+other parameters. If it is not, then an error message will be generated. This kind of
+rule can be useful when validating HTML form submissions, for use with fields such as
+"name" that must always be filled in.
 
-=head3 parameter constraint rules
+=head3 Parameter constraint rules
 
-The following rule types can be used to specify additional constraints on the
-presence or absence of parameter names.
+The following rule types can be used to specify additional constraints on the presence
+or absence of parameter names.
 
 =head4 together
 
     { together => [ <parameter_name> ... ] }
 
-If one of the listed parameters is present, then all of them must be.
-This can be used with parameters such as 'longitude' and 'latitude', where
-neither one makes sense without the other.
+If one of the listed parameters is present, then all of them must be. This can be used
+with parameters such as 'longitude' and 'latitude', where neither one makes sense
+without the other.
 
 =head4 at_most_one
 
     { at_most_one => [ <parameter_name> ... ] }
 
-At most one of the listed parameters may be present.  This can be used along
-with a series of C<param> rules to require that exactly one of a particular
-set of parameters is provided.
+At most one of the listed parameters may be present. This can be used along with a
+series of C<param> rules to require that exactly one of a particular set of parameters
+is provided.
 
 =head4 ignore
 
     { ignore => [ <parameter_name> ... ] }
 
-The specified parameter or parameters will be ignored if present, and will not
-be included in the set of reported parameter values.  This rule can be used to
-prevent requests from being rejected with "unrecognized parameter" errors in
-cases where spurious parameters may be present.  If you are specifying only one
-parameter name, it does need not be in a listref.
+The specified parameter or parameters will be ignored if present, and will not be
+included in the set of reported parameter values. This rule can be used to prevent
+requests from being rejected with "unrecognized parameter" errors in cases where
+spurious parameters may be present. If you are specifying only one parameter name, it
+does need not be in a listref.
 
-=head3 inclusion rules
+=head3 Inclusion rules
 
-The following rule types can be used to include one ruleset inside of another.
-This allows you, for example, to define rulesets for validating different
-groups of parameters and then combine them into specific rulesets for use with
-different URL paths.
+The following rule types can be used to include one ruleset inside of another. This
+allows you, for example, to define rulesets for validating different groups of
+parameters and then combine them into specific rulesets for use with different URL
+paths.
 
-It is okay for an included ruleset to itself include other rulesets.  A given
-ruleset is checked at most once per validation no matter how many times it is
-included.
+It is okay for an included ruleset to itself include other rulesets. A given ruleset is
+checked at most once per validation no matter how many times it is included.
 
 =head4 allow
 
     { allow => <ruleset_name> }
 
-A rule of this type is essentially an 'include' statement.  If this rule is
-encountered during a validation, it causes the named ruleset to be checked
-immediately.  The parameters must pass against this ruleset, but it does not
-have to be fulfilled.
+A rule of this type is essentially an 'include' statement. If this rule is encountered
+during a validation, it causes the named ruleset to be checked immediately. The
+parameters must pass against this ruleset, but it does not have to be fulfilled.
 
 =head4 require
 
     { require => <ruleset_name> }
 
-This is a variant of C<allow>, with an additional constraint.  The validation
-will fail unless the named ruleset not only passes but is also fulfilled by
-the parameters.  You could use this, for example, with a query URL in order to
-require that the query not be empty but instead contain at least one
-significant criterion.  The parameters that count as "significant" would be
-declared by L</param> rules, the others by L</optional> rules.
+This is a variant of C<allow>, with an additional constraint. The validation will fail
+unless the named ruleset not only passes but is also fulfilled by the parameters. You
+could use this, for example, with a query URL in order to require that the query not be
+empty but instead contain at least one significant criterion. The parameters that count
+as "significant" would be declared by L</param> rules, the others by L</optional> or
+L</mandatory> rules.
 
-=head3 inclusion constraint rules
+=head3 Inclusion constraint rules
 
-The following rule types can be used to specify additional constraints on the
-inclusion of rulesets.
+The following rule types can be used to specify additional constraints on the inclusion
+of rulesets.
 
 =head4 require_one
 
     { require_one => [ <ruleset_name> ... ] }
 
-You can use a rule of this type to place an additional constraint on a list of
-rulesets already included with L<inclusion rules|/inclusion rules>.  Exactly
-one of the named rulesets must be fulfilled, or else the request is rejected.
-You can use this, for example, to ensure that a request includes either a
-parameter from group A or one from group B, but not both.
+You can use a rule of this type to place an additional constraint on a list of rulesets
+already included with L<inclusion rules|/inclusion rules>. Exactly one of the named
+rulesets must be fulfilled, or else the request is rejected. You can use this, for
+example, to ensure that a request includes either a parameter from group A or one from
+group B, but not both.
 
 =head4 require_any
 
@@ -351,7 +344,7 @@ of the listed rulesets is fulfilled, but will pass if either none of them or
 just one of them is fulfilled.  This can be used to allow optional parameters
 from either group A or group B, but not from both groups. 
 
-=head3 other rules
+=head3 Other rules
 
 =head4 content_type
 
@@ -398,7 +391,7 @@ This attribute specifies the error message to be returned if the rule fails,
 overriding the default message.  For example:
 
     define_ruleset( 'specifier' => 
-        { param => 'name', valid => STRING_VALUE },
+        { param => 'name', valid => ANY_VALUE },
         { param => 'id', valid => POS_VALUE });
     
     define_ruleset( 'my_route' =>
@@ -543,6 +536,27 @@ with an empty value.  If the rule also includes a validator and/or a cleaner,
 the specified default value will be passed to it when the ruleset is defined.
 An exception will be thrown if the default value does not pass the validator.
 
+=head3 allow_empty
+
+If this attribute is given a true value, then if the corresponding parameter has
+the value I<undef>, that value will be reported for the parameter. Otherwise,
+parameters with an undefined value will be ignored. This attribute is useful for
+rulesets used to validate records for insertion into a database, because it
+allows nulls to be expressed as I<undef>.
+
+=head3 before
+
+This attribute can be used to change the order in which the rules are listed.
+Its value should be the name of a parameter rule or an inclusion rule in the
+same ruleset. The rule will be placed in the list immediately before the named
+rule, if it can be found. Otherwise, it will be placed at the end of the list as
+usual.
+
+=head3 note
+
+This attribute attaches an arbitrary string to the rule. It can be used to
+provide hints to other code modules as to how the rule should be displayed.
+
 =head3 undocumented
 
 If this attribute is given with a true value, then this rule will be ignored
@@ -617,10 +631,9 @@ start with one of these special characters.
 
 =back
 
-Note that modifier rules such as C<at_most_one>, C<require_one>, etc. are
-ignored when generating documentation.  Any documentation strings following
-them will be treated as if they apply to the most recently preceding parameter
-rule or inclusion rule.
+Note that modifier rules such as C<at_most_one>, C<require_one>, etc. are not explicitly
+documented. Any documentation strings following them will be treated as if they apply to
+the most recently preceding parameter rule or inclusion rule.
 
 =cut
 
@@ -630,7 +643,7 @@ BEGIN {
 
     @EXPORT_OK = qw(
 	define_ruleset check_params validation_settings ruleset_defined document_params
-	list_params 
+	list_params list_rulesets list_rules
 	INT_VALUE POS_VALUE POS_ZERO_VALUE
 	DECI_VALUE
 	ENUM_VALUE
@@ -643,8 +656,8 @@ BEGIN {
 		     ENUM_VALUE MATCH_VALUE BOOLEAN_VALUE FLAG_VALUE ANY_VALUE);
 
     %EXPORT_TAGS = (
-	keywords => [qw(define_ruleset check_params validation_settings ruleset_defined document_params
-		        list_params)],
+	keywords => [qw(define_ruleset check_params validation_settings ruleset_defined 
+			document_params list_params list_rulesets list_rules)],
 	validators => \@VALIDATORS,
     );
 };
@@ -759,7 +772,7 @@ sub define_ruleset {
     
     my $self = ref $_[0] eq 'HTTP::Validate' ? shift : $DEFAULT_INSTANCE;
 
-    my ($ruleset_name, @rules) = @_;
+    my ($ruleset_name, @rest) = @_;
     
     # Next make sure we know where this is called from, for the purpose of
     # generating useful error messages.
@@ -773,9 +786,9 @@ sub define_ruleset {
     
     my $rs = $self->create_ruleset($ruleset_name, $filename, $line);
     
-    # Then add the rules.
+    # Then add the rules and documentation strings.
     
-    $self->add_rules($rs, @rules);
+    $self->add_rules($rs, @rest);
     
     # If we get here without any errors, install the ruleset and return.
     
@@ -819,7 +832,7 @@ You can use the L</passed> method on the returned object to determine if the
 validation passed or failed.  In the latter case, you can return an HTTP error
 response to the user, or perhaps redisplay a submitted form.
 
-Note that you can validate against multiple rulesets at once by defining a new
+Note that you can validate against multiple rulesets at once by defining a
 ruleset with inclusion rules referring to all of the rulesets
 you wish to validate against.
 
@@ -869,8 +882,9 @@ If specified, then unrecognized parameters will be ignored entirely.
 
 =back
 
-You may also specify one or more of the following keys, each followed by a string.  These
-allow you to redefine the messages that are generated when parameter errors are detected:
+You may also specify one or more of the following keys, each followed by a string. These
+allow you to redefine the default messages that are generated when parameter errors are
+detected:
 
 ERR_INVALID, ERR_BAD_VALUES, ERR_MULT_NAMES, ERR_MULT_VALUES, ERR_MANDATORY, ERR_TOGETHER, 
 ERR_AT_MOST, ERR_REQ_SINGLE, ERR_REQ_MULT, ERR_REQ_ONE, ERR_MEDIA_TYPE, ERR_DEFAULT
@@ -948,7 +962,7 @@ sub ruleset_defined {
 =head3 document_params
 
 This function generates L<documentation|/Documentation> for the given
-ruleset, in L<Pod|perlpod> format.  This only works if you have included
+ruleset, in L<Pod|perlpod> format.  This works best if you have included
 documentation strings in your calls to L</define_ruleset>.  The method returns
 I<undef> if the specified ruleset is not found.
 
@@ -981,8 +995,7 @@ sub document_params {
     
     return unless defined $ruleset_name;
     
-    my $rs = $self->{RULESETS}{$ruleset_name};
-    return unless $rs;
+    my $rs = $self->{RULESETS}{$ruleset_name} or return;
     
     # Now generate the requested documentation.
     
@@ -995,7 +1008,7 @@ sub document_params {
 This function returns a list of the names of all parameters accepted by the
 specified ruleset, including those accepted by included rulesets.
 
-    my @parameter_names = list_ruleset_params($ruleset_name);
+    my @parameter_names = list_params($ruleset_name);
 
 This may be useful if your validations allow unrecognized parameters, as it
 enables you to determine which of the parameters in a given request are
@@ -1016,8 +1029,7 @@ sub list_params {
     
     return unless defined $ruleset_name;
     
-    my $rs = $self->{RULESETS}{$ruleset_name};
-    return unless $rs;
+    my $rs = $self->{RULESETS}{$ruleset_name} or return;
     
     # Now generate the requested list.
     
@@ -1025,8 +1037,55 @@ sub list_params {
 }
 
 
-# Here are the implementing functions:
-# ====================================
+=head3 list_rulesets
+
+This function returns a list of defined ruleset names.
+
+=cut
+
+sub list_rulesets {
+
+    # If we were called as a method, use the object on which we were called.
+    # Otherwise, use the globally defined instance.
+    
+    my $self = ref $_[0] eq 'HTTP::Validate' ? shift : $DEFAULT_INSTANCE;
+    
+    return keys %{$self->{RULESETS}};
+}
+
+
+=head3 list_rules
+
+This function returns a list of the rules belonging to the specified ruleset and
+any included rulesets.
+
+    my @rules = list_rules($ruleset_name);
+
+=cut
+
+sub list_rules {
+
+    # If we were called as a method, use the object on which we were called.
+    # Otherwise, use the globally defined instance.
+    
+    my $self = ref $_[0] eq 'HTTP::Validate' ? shift : $DEFAULT_INSTANCE;
+    
+    my ($ruleset_name) = @_;
+    
+    # Make sure we have a valid ruleset, or else return false.
+    
+    return unless defined $ruleset_name;
+    
+    my $rs = $self->{RULESETS}{$ruleset_name} or return;
+    
+    # Now generate the requested list.
+    
+    return $self->generate_rule_list($ruleset_name);
+}
+
+
+# Here are the implementing functions for the methods listed above:
+# =================================================================
 
 # create_ruleset ( ruleset_name, filename, line )
 # 
@@ -1040,7 +1099,8 @@ sub create_ruleset {
     # Make sure that a non-empty name was given, and that no ruleset has
     # already been defined under that name.
     
-    croak "you must provide a non-empty name for the ruleset" if $ruleset_name eq '';
+    croak "you must provide a non-empty string as the ruleset name"
+	if $ruleset_name eq '' || ref $ruleset_name;
     
     if ( exists $validator->{RULESETS}{$ruleset_name} )
     {
@@ -1068,37 +1128,40 @@ sub create_ruleset {
 # value is 2 indicate the rule type, and at most one of these may be included
 # per rule.  The others are optional.
 
-my %DIRECTIVE = ( 'param' => 2, 'optional' => 2, 'mandatory' => 2,
-		  'together' => 2, 'at_most_one' => 2, 'ignore' => 2,
-		  'require' => 2, 'allow' => 2, 'require_one' => 2,
-		  'require_any' => 2, 'allow_one' => 2, 'content_type' => 2,
-		  'valid' => 1, 'clean' => 1, 
-		  'multiple' => 1, 'split' => 1, 'list' => 1, 'bad_value' => 1, 
-		  'error' => 1, 'errmsg' => 1, 'warn' => 1, 'undocumented' => 1,
-		  'alias' => 1, 'key' => 1, 'default' => 1);
+my %DIRECTIVE = ( param => 2, optional => 2, mandatory => 2,
+		  together => 2, at_most_one => 2, ignore => 2,
+		  require => 2, allow => 2, require_one => 2,
+		  require_any => 2, allow_one => 2, content_type => 2,
+		  valid => 1, clean => 1, allow_empty => 1, note => 1,
+		  multiple => 1, split => 1, list => 1, bad_value => 1, 
+		  error => 1, errmsg => 1, warn => 1, undocumented => 1,
+		  alias => 1, key => 1, default => 1, before => 1 );
+
 
 # Categorize the rule types
 
-my %CATEGORY = ( 'param' => 'param', 
-		 'optional' => 'param', 
-		 'mandatory' => 'param',
-		 'together' => 'modifier', 
-		 'at_most_one' => 'modifier', 
-		 'ignore' => 'modifier',
-		 'require' => 'include', 
-		 'allow' => 'include',
-		 'require_one' => 'constraint',
-		 'allow_one' => 'constraint',
-		 'require_any' => 'constraint',
-		 'content_type' => 'content' );		 
+my %CATEGORY = ( param => 'param', 
+		 optional => 'param', 
+		 mandatory => 'param',
+		 together => 'modifier', 
+		 at_most_one => 'modifier', 
+		 ignore => 'modifier',
+		 require => 'include', 
+		 allow => 'include',
+		 require_one => 'constraint',
+		 allow_one => 'constraint',
+		 require_any => 'constraint',
+		 content_type => 'content' );		 
+
 
 # List the special validators.
 
-my (%VALIDATOR_DEF) = ( 'FLAG_VALUE' => 1, 'ANY_VALUE' => 1 );
+my (%VALIDATOR_DEF) = ( FLAG_VALUE => 1, ANY_VALUE => 1 );
 
 my (%CLEANER_DEF) = ( 'uc' => eval 'sub { return uc $_[0] }',
 		      'lc' => eval 'sub { return lc $_[0] }',
 		      'fc' => $case_fold );
+
 
 # add_rules ( ruleset, rule ... )
 # 
@@ -1198,10 +1261,39 @@ sub add_rules {
 	# If we get here, assume the item represents a rule and create a new record to
 	# represent it.
 	
-	my $rr = { rs => $rs, rn => scalar(@{$rs->{rules}}) + 1 };
-	push @{$rs->{rules}}, $rr;
+	my $rr = { rn => scalar(@{$rs->{rules}}) + 1 };
+
+	# If the item has the 'before' attribute set, add the new rule before
+	# the rule whose parameter name is equal to the value of 'before', if one
+	# such is found.
 	
-	weaken($rr->{rs});
+	my $inserted;
+	
+	if ( my $search_for = $rule->{before} )
+	{
+	    foreach my $i ( 0 .. $rs->{rules}->$#* )
+	    {
+		my $rule_i = $rs->{rules}[$i];
+		
+		if ( $rule_i->{type} eq 'param' &&
+		     $search_for eq ($rule_i->{param} || $rule_i->{optional} ||
+				     $rule_i->{mandatory}) ||
+		     $rule_i->{type} eq 'include' && 
+		     $search_for eq $rule_i->{ruleset} )
+		{
+		    splice $rs->{rules}->@*, $i, 0, $rr;
+		    $inserted = 1;
+		    last;
+		}
+	    }
+	}
+	
+	# Otherwise, add it to the end of the rule list.
+	
+	unless ( $inserted )
+	{
+	    push @{$rs->{rules}}, $rr;
+	}
 	
 	# Check all of the keys in the rule definition, making sure that all
 	# are valid, and determine the rule type.
@@ -1304,9 +1396,10 @@ sub add_rules {
 	croak "each record must include a key that specifies the rule type, e.g. 'param' or 'allow'"
 	    unless $type;
 	
-	# If we have any documentation strings collected up, then they belong to the previous
-	# rule.  If the current rule is a parameter rule, then add the collected documentation to
-	# the previous rule and set this new rule as the target for subsequent documentation.
+	# If we have any documentation strings collected up, then they belong to the
+	# previous rule. If the current rule is a parameter rule or inclusion rule, then
+	# add the collected documentation to the previous rule and set this new rule as
+	# the target for subsequent documentation.
 	
 	if ( $CATEGORY{$type} ne 'modifier' )
 	{
@@ -1314,20 +1407,7 @@ sub add_rules {
 	    $doc_rule = $rr;
 	    @doc_lines = ();
 	}
-	
-	# If the previous rule is an 'include' or 'constraint' rule, then any subsequent
-	# documentation should become an ordinary paragraph; so set $doc_rule to undefined.  If
-	# the previous rule is a 'modifier' rule, and if $doc_rule is not empty, then its
-	# documentation should be added to that previously encountered parameter rule.
-	
-	# elsif ( $CATEGORY{$type} ne 'modifier' )
-	# {
-	#     $self->add_doc($rs, $doc_rule);
-	#     $self->add_doc($rs, undef, @doc_lines);
-	#     $doc_rule = undef;
-	#     @doc_lines = ();
-	# }
-	
+		
 	# Now process the rule according to its type.
 	
 	my $typevalue = $rule->{$type};
@@ -1352,6 +1432,7 @@ sub add_rules {
 		{
 		    $rr->{flag} = 1 if $v eq 'FLAG_VALUE';
 		    push @{$rr->{validators}}, \&boolean_value if $v eq 'FLAG_VALUE';
+		    push @{$rr->{validators}}, \&any_value if $v eq 'ANY_VALUE' && @validators > 1;
 		}
 		
 		elsif ( defined $v )
@@ -1365,17 +1446,16 @@ sub add_rules {
 	    
 	    $rr->{$type} = 1 if $type eq 'optional' || $type eq 'mandatory';
 	    
-	    if ( $type ne 'optional' )
+	    if ( $type eq 'param' )
 	    {
 		push @{$rs->{fulfill_order}}, $typevalue unless $rs->{params}{$typevalue};
 	    }
 	    
 	    $rs->{params}{$typevalue} = 1;
 	    
-	    # If a default value was given, run it through all of the
-	    # validators in turn until it passes one of them.  Store the
-	    # resulting clean value.  If the default does not pass any of the
-	    # validators, throw an error.
+	    # If a default value was given, run it through all of the validators in turn
+	    # until it passes one of them. Store the resulting clean value. If the
+	    # default does not pass any of the validators, throw an exception.
 	    
 	    if ( defined $rr->{default} )
 	    {
@@ -1411,8 +1491,6 @@ sub add_rules {
 	    
 	    foreach my $arg (@params)
 	    {
-		# croak "parameter '$arg' was not defined" unless defined
-		# $rs->{params}{$arg} || $type eq 'ignore';
 		push @{$rr->{param}}, $arg;
 	    }
 	    
@@ -1432,6 +1510,19 @@ sub add_rules {
 	    croak "ruleset '$typevalue' not found" unless defined $self->{RULESETS}{$typevalue};
 	    
 	    $rs->{includes}{$typevalue} = 1;
+	    
+	    # Every ruleset that was included in the named ruleset is also
+	    # recursively included in this one.
+	    
+	    my $included_rs = $self->{RULESETS}{$typevalue};
+	    
+	    if ( ref $included_rs->{includes} eq 'HASH' )
+	    {
+		foreach my $key ( keys %{$included_rs->{includes}} )
+		{
+		    $rs->{includes}{$key} = 1;
+		}
+	    }
 	}
 	
 	elsif ( $CATEGORY{$type} eq 'constraint' )
@@ -1447,7 +1538,9 @@ sub add_rules {
 	    {
 		next unless defined $arg && $arg ne '';
 		
-		croak "ruleset '$arg' was not included by any rule" unless defined $rs->{includes}{$arg};
+		croak "ruleset '$arg' was not included by any rule"
+		    unless defined $rs->{includes}{$arg};
+		
 		push @{$rr->{ruleset}}, $arg;
 	    }
 	    
@@ -1477,8 +1570,8 @@ sub add_rules {
 		my ($short, $long) = split /\s*=\s*/, $t;
 		$long ||= $MEDIA_TYPE{$short};
 		
-		croak "unknown content type for '$short': you must specify a full content type with '$short=some/type'"
-		    unless $long;
+		croak "unknown content type for '$short': you must specify a full content " .
+		    "type with '$short=some/type'" unless $long;
 		
 		croak "type '$short' cannot be specified twice" if defined $rr->{type_map}{$short};
 		
@@ -1496,10 +1589,9 @@ sub add_rules {
     }
     
     # If we have documentation strings collected up, then they belong to the
-    # last-defined rule.  Then call add_doc with a special parameter
-    # to close any pending lists.
+    # last-defined rule. So call add_doc to close any pending lists.
     
-    $self->add_doc($rs, $doc_rule, @doc_lines);
+    $self->add_doc($rs, $doc_rule, @doc_lines) if @doc_lines;
 }
 
 
@@ -1580,7 +1672,12 @@ sub add_doc {
     {
 	push @{$rs->{doc_items}}, $rr;
 	weaken $rs->{doc_items}[-1];
-	push @{$rs->{doc_items}}, process_doc($body, 1) if defined $body;
+	if ( defined $body )
+	{
+	    push @{$rs->{doc_items}}, process_doc($body, 1);
+	    $rr->{doc_ref} = \$rs->{doc_items}[-1];
+	    weaken $rr->{doc_ref};
+	}
     }
     
     # If this is an include rule, then we add a special line to include the
@@ -1602,7 +1699,7 @@ sub add_doc {
 }
 
 
-# process_doc ( )
+# process_doc ( docstring, item_body )
 # 
 # Make sure that the indicated string is valid POD.  In particular, if there
 # are any unclosed =over sections, close them at the end.  Throw an exception
@@ -1610,7 +1707,7 @@ sub add_doc {
 
 sub process_doc {
 
-    my ($docstring, $item_body) = @_;
+    my ($docstring, $is_item_body) = @_;
     
     my ($list_level) = 0;
     
@@ -1634,7 +1731,7 @@ sub process_doc {
 	
 	elsif ( $1 eq '=head' )
 	{
-	    croak "invalid POD string: =head inside =over" if $list_level > 0 or $item_body;
+	    croak "invalid POD string: =head inside =over" if $list_level > 0 or $is_item_body;
 	}
     }
     
@@ -1770,6 +1867,38 @@ sub generate_param_list {
 }
 
 
+# generate_rule_list ( ruleset )
+#
+# Generate a list of the rules contained in this ruleset and its included
+# rulesets if any.
+
+sub generate_rule_list {
+
+    my ($self, $rs_name, $uniq) = @_;
+
+    $uniq ||= {};
+
+    return if $uniq->{$rs_name}; $uniq->{$rs_name} = 1;
+    
+    my @rules;
+    
+    foreach my $item ( $self->{RULESETS}{$rs_name}{rules}->@* )
+    {
+	if ( ref $item && $item->{type} eq 'include' )
+	{
+	    push @rules, $self->generate_rule_list($item->{ruleset}, $uniq);
+	}
+
+	elsif ( ref $item eq 'HASH' )
+	{
+	    push @rules, { %$item };
+	}
+    }
+    
+    return @rules;
+}
+
+
 # new_execution ( context, params )
 # 
 # Create a new validation-execution control record, using the given context
@@ -1784,7 +1913,7 @@ sub new_execution {
     croak "the second parameter to check_params() must be a hashref if defined"
 	if defined $context && (!ref $context || reftype $context ne 'HASH');
     
-    $context = {} unless defined $context;
+    $context ||= {};
     
     croak "the third parameter to check_params() must be a hashref or listref"
 	unless ref $input_params;
@@ -1804,10 +1933,12 @@ sub new_execution {
     elsif ( reftype $input_params eq 'ARRAY' )
     {
 	# Look for hashrefs at the beginning of the list and unpack them.
+
+	my @input_params = @$input_params;
 	
-	while ( ref $input_params->[0] && reftype $input_params->[0] eq 'HASH' )
+	while ( ref $input_params[0] && reftype $input_params[0] eq 'HASH' )
 	{
-	    my $p = shift @$input_params;
+	    my $p = shift @input_params;
 	    
 	    foreach my $x (keys %$p)
 	    {
@@ -1817,9 +1948,9 @@ sub new_execution {
 	
 	# All other items must be name/value pairs.
 	
-	while ( @$input_params )
+	while ( @input_params )
 	{
-	    my $p = shift @$input_params;
+	    my $p = shift @input_params;
 	    
 	    if ( ref $p )
 	    {
@@ -1828,7 +1959,7 @@ sub new_execution {
 	    
 	    else
 	    {
-		add_param($unpacked_params, $p, shift @$input_params);
+		add_param($unpacked_params, $p, shift @input_params);
 	    }
 	}
     }
@@ -1889,6 +2020,8 @@ sub add_param {
 }
 
 
+# execute_validation ( validation_record, ruleset_name )
+# 
 # This function performs a validation using the given validation-progress
 # record, starting with the given ruleset, and returns a hash with the
 # results.
@@ -1946,8 +2079,8 @@ sub execute_validation {
     $result->{wn} = $vr->{wn};
     $result->{ig} = $vr->{ig};
     
-    # Now check for unrecognized parameters, and generate errors or warnings
-    # for them.
+    # Unless the 'ignore_unrecognized' setting was specified, check for unrecognized
+    # parameters, and generate errors or warnings for them.
     
     return $result if $self->{SETTINGS}{ignore_unrecognized};
     
@@ -2015,7 +2148,7 @@ sub validate_ruleset {
 	
 	if ( $type eq 'param' )
 	{
-	    my (%names_found, @names_found, @raw_values);
+	    my (%names_found, @names_found, @raw_values, $empty_string);
 	    
 	    # Skip this rule if a previous 'ignore' was encountered.
 	    
@@ -2027,25 +2160,41 @@ sub validate_ruleset {
 	    foreach my $name ( $rr->{param}, @{$rr->{alias}} )
 	    {
 		next unless exists $vr->{raw}{$name};
+		
 		$names_found{$name} = 1;
+		
 		my $v = $vr->{raw}{$name};
-		push @raw_values, grep { defined $_ && $_ ne '' } ref $v eq 'ARRAY' ? @$v : $v;
+		
+		foreach my $subv ( ref $v eq 'ARRAY' ? @$v : $v )
+		{
+		    if ( defined $subv && $subv ne '' )
+		    {
+			push @raw_values, $subv;
+		    }
+		    
+		    elsif ( defined $subv && $subv eq '' )
+		    {
+			$empty_string = 1;
+		    }
+		}
+		
 		# Make sure this parameter exists in {ps}, but don't
 		# change its status if any.
+		
 		$vr->{ps}{$name} = undef unless exists $vr->{ps}{$name};
 	    }
 	    
 	    # If more than one of the aliases for this parameter was specified, and the 'multiple'
 	    # option was not specified, then generate an error and go on to the next rule.  We
-	    # mark the parameter status as "error" (0), and we also mark the ruleset as fulfilled (2)
-	    # if this was a 'param' or 'mandatory' rule.  This last is done to avoid generating a
-	    # spurious error message if the ruleset is not fulfilled by any other parameters.
+	    # mark the parameter status as "error" (0), and we also mark the ruleset as fulfilled
+	    # (2) if this was a 'param' rule.  This last is done to avoid generating a spurious
+	    # error message if the ruleset is not fulfilled by any other parameters.
 	    
 	    if ( keys(%names_found) > 1 && ! $rr->{multiple} )
 	    {
 		add_error($vr, $rr, 'ERR_MULT_NAMES', { param => [ sort keys %names_found ] });
 		$vr->{ps}{$param} = 0;
-		$vr->{rs}{$ruleset_name} = 2 unless $rr->{optional};
+		$vr->{rs}{$ruleset_name} = 2 unless $rr->{optional} || $rr->{mandatory};
 		next RULE;
 	    }
 	    
@@ -2067,18 +2216,19 @@ sub validate_ruleset {
 		next RULE;
 	    }
 	    
-	    # If more than one value was given and the rule does not include the 'multiple'
-	    # directive, signal an error.  We mark the parameter status as "error" (0), and we
-	    # also mark the ruleset as fulfilled (2) if this was a 'param' or 'mandatory' rule.
-	    # This last is done to avoid generating a spurious error message if the ruleset is not
-	    # fulfilled by any other parameters.
+	    # If more than one value was given and the rule does not include any of the
+	    # directives 'multiple', 'split', or 'list', signal an error. We mark the
+	    # parameter status as "error" (0), and we also mark the ruleset as fulfilled
+	    # (2) if this was a 'param' rule. This last is done to avoid generating a
+	    # spurious error message if the ruleset is not fulfilled by any other
+	    # parameters.
 	    
-	    elsif ( @raw_values > 1 && ! $rr->{multiple} )
+	    elsif ( @raw_values > 1 && ! ($rr->{multiple} || $rr->{split} || $rr->{list}) )
 	    {
 		add_error($vr, $rr, 'ERR_MULT_VALUES',
 		      { param => [ sort keys %names_found ], value => \@raw_values });
 		$vr->{ps}{$param} = 0;
-		$vr->{rs}{$ruleset_name} = 2 unless $rr->{optional};
+		$vr->{rs}{$ruleset_name} = 2 unless $rr->{optional} || $rr->{mandatory};
 		next RULE;
 	    }
 	    
@@ -2087,10 +2237,14 @@ sub validate_ruleset {
 	    
 	    if ( $rr->{split} )
 	    {
-		# Split all of the raw values, and discard empty strings.
+		# Split all of the raw string values, and discard empty strings.
+		# Unpack arrayrefs into individual values. If there are raw
+		# values but not any split values, we take the value to be the
+		# empty string.
 		
 		my @new_values = grep { defined $_ && $_ ne '' } 
 				    map { split $rr->{split}, $_ } @raw_values;
+		$empty_string = 1 if @raw_values && ! @new_values;
 		@raw_values = @new_values;
 	    }
 	    
@@ -2103,7 +2257,9 @@ sub validate_ruleset {
 	    }
 	    
 	    # At this point, if there are no values then generate an error if
-	    # the parameter is mandatory.  Otherwise just skip this rule.
+	    # the parameter is mandatory. Otherwise just skip this rule unless
+	    # this rule has the 'allow_empty' attribute and at least one of the
+	    # parameter names was specified.
 	    
 	    unless ( @raw_values )
 	    {
@@ -2111,10 +2267,9 @@ sub validate_ruleset {
 		{
 		    add_error($vr, $rr, 'ERR_MANDATORY', { param => $rr->{param} });
 		    $vr->{ps}{$param} = 0;
-		    $vr->{rs}{$ruleset_name} = 2 unless $rr->{optional};
 		}
 		
-		next RULE;
+		next RULE unless $rr->{allow_empty} && keys %names_found;
 	    }
 	    
 	    # Now indicate that at least one value was found for this
@@ -2174,15 +2329,15 @@ sub validate_ruleset {
 		
 		if ( ref $result and $result->{error} )
 		{
-		    # If the rule contains a 'warn' directive, then generate a
-		    # warning.  But the value is still bad, and will be
-		    # ignored.
+		    # If the rule contains a 'warn' directive, then generate a warning.
+		    # But the value is still bad, and will be ignored.
 		    
 		    if ( $rr->{warn} )
 		    {
 			my $msg = $rr->{warn} ne '1' ? $rr->{warn} :
 			    $rr->{ERR_INVALID} || $rr->{errmsg} || $result->{error};
-			add_warning($vr, $rr, $msg, { param => [ keys %names_found ], value => $raw_val });
+			add_warning($vr, $rr, $msg, { param => [ keys %names_found ],
+						      value => $raw_val });
 		    }
 		    
 		    # Otherwise, generate an error.
@@ -2190,25 +2345,26 @@ sub validate_ruleset {
 		    else
 		    {
 			my $msg = $rr->{ERR_INVALID} || $rr->{errmsg} || $result->{error};
-			add_error($vr, $rr, $msg, { param => [ sort keys %names_found ], value => $raw_val });
+			add_error($vr, $rr, $msg, { param => [ sort keys %names_found ],
+						    value => $raw_val });
 		    }
 		    
 		    $error_flag = 1;
 		    next VALUE;
 		}
 		
-		# If the result contains a 'warn' field, then generate a
-		# warning.  In this case, the value is still assumed to be
-		# good.
+		# If the result contains a 'warn' field, then generate a warning. In
+		# this case, the value is still assumed to be good.
 		
 		if ( ref $result and $result->{warn} )
 		{
-		    add_warning($vr, $rr, $result->{warn}, { param => [ sort keys %names_found ], value => $raw_val });
+		    add_warning($vr, $rr, $result->{warn}, { param => [ sort keys %names_found ],
+							     value => $raw_val });
 		}
 		
-		# If we get here, then the value is good.  If the result was a
-		# hash ref with a 'value' field, we use that for the clean
-		# value. Otherwise, we use the raw value.
+		# If we get here, then the value is good. If the result was a hash ref
+		# with a 'value' field, we use that for the clean value. Otherwise, we
+		# use the raw value.
 		
 		my $value = ref $result && exists $result->{value} ? $result->{value} : $raw_val;
 		
@@ -2218,6 +2374,15 @@ sub validate_ruleset {
 		$value = $rr->{cleaner}($value) if ref $rr->{cleaner} eq 'CODE';
 		
 		push @clean_values, $value;
+	    }
+	    
+	    # If no raw values were found, and this rule has the 'allow_empty'
+	    # attribute, add the empty string or the undefined value depending
+	    # on $empty_string.
+	    
+	    if ( $rr->{allow_empty} && ! @raw_values )
+	    {
+		push @clean_values, $empty_string ? '' : undef;
 	    }
 	    
 	    # If clean values were found, store them.  If multiple values are
@@ -2270,26 +2435,23 @@ sub validate_ruleset {
 	    
 	    $vr->{ps}{$param} = $error_flag ? 0 : 1;
 	    
-	    # If this rule is not 'optional', then set the status of this
-	    # ruleset to 'fulfilled' (2).  That does not mean that the validation
-	    # passes, because the parameter value may still have generated an
-	    # error.
+	    # If this rule is not 'optional' or 'mandatory', then set the status of this
+	    # ruleset to 'fulfilled' (2). That does not mean that the validation passes,
+	    # because the parameter value may still have generated an error.
 	    
-	    unless ( $rr->{optional} )
+	    unless ( $rr->{optional} || $rr->{mandatory} )
 	    {
 		$vr->{rs}{$ruleset_name} = 2;
 	    }
 	}
 	
-	# An 'ignore' directive causes the parameter to be recognized, but no
-	# cleaned value is generated and the containing ruleset is not
-	# triggered.  No error messages will be generated for this parameter,
-	# either.
+	# An 'ignore' directive causes the parameter to be recognized, but no cleaned
+	# value is generated and the containing ruleset is not triggered. No error
+	# messages will be generated for this parameter, either.
 	
 	elsif ( $rr->{type} eq 'ignore' )
 	{
-	    # Make sure that the parameter is counted as having been
-	    # recognized.
+	    # Make sure that the parameter is counted as having been recognized.
 	    
 	    foreach my $param ( @{$rr->{param}} )
 	    {
@@ -2438,7 +2600,7 @@ sub validate_ruleset {
 	    }
 	}
     }
-};
+}
 
 
 # Helper function - given a hashref to use as a scratchpad, returns true the
@@ -2474,14 +2636,14 @@ sub add_error {
 	$msg = $rr->{$msg} || $vr->{settings}{$msg} || $ERROR_MSG{$msg} || $ERROR_MSG{ERR_DEFAULT};
     }
     
-    # Next, figure out the error key.  If the rule has a 'key' directive, use
-    # that.  Otherwise determine it according to the rule type, ruleset name,
-    # and rule number.
+    # Next, figure out the error key. If the rule has a 'key' directive, use that. If
+    # the rule is a parameter rule, use the parameter name. Otherwise use the
+    # stringified rule reference as a key.
     
     my $err_key = $rr->{key}				      ? $rr->{key}
 		: $rr->{type} eq 'param'		      ? $rr->{param}
 		: $rr->{type} eq 'content_type'		      ? '_content_type'     
-		:						"_$rr->{rs}{name}_$rr->{rn}";
+		:						"_$rr";
     
     # Record the error message under the key, and add the key to the error
     # list.  Other rules might later remove or alter the error
@@ -2513,14 +2675,14 @@ sub add_warning {
 	$msg = $rr->{$msg} || $vr->{settings}{$msg} || $ERROR_MSG{$msg} || $ERROR_MSG{ERR_DEFAULT};
     }
     
-    # Next, figure out the warning key.  If the rule has a 'key' directive, use
-    # that.  Otherwise determine it according to the rule type, ruleset name,
-    # and rule number.
+    # Next, figure out the warning key. If the rule has a 'key' directive, use that. If
+    # the rule is a parameter rule, use the parameter name. Otherwise use the
+    # stringified rule reference as a key.
     
     my $warn_key = $rr->{key}				      ? $rr->{key}
 		 : $rr->{type} eq 'param'		      ? $rr->{param}
 		 : $rr->{type} eq 'content_type'	      ? '_content_type'     
-		 :						"_$rr->{rs}{name}_$rr->{rn}";
+		 :						"_$rr";
     
     # Record the warning message under the key.  Other rules might later
     # alter the warning message if they use the same key.
@@ -2585,6 +2747,8 @@ sub subst_error {
 	    $value = "''";
 	}
 	
+	no warnings 'uninitialized';
+	
 	$message = "$1$value$3" if defined $value and $value ne '';
     }
     
@@ -2631,6 +2795,8 @@ sub passed {
 
 
 =head3 errors
+
+=head3 errors(key)
 
 In a scalar context, this returns the number of errors generated by this
 validation.  In a list context, it returns a list of error messages.  If an
@@ -2681,6 +2847,8 @@ sub error_keys {
 
 
 =head3 warnings
+
+=head3 warnings(key)
 
 In a scalar context, this returns the number of warnings generated by the
 validation.  In a list context, it returns a list of warning messages.  If an
@@ -2765,10 +2933,12 @@ sub values {
     return $self->{clean};
 }
 
-=head3 value
 
-Returns the value of the specified parameter, or undef if that parameter was
-not specified in the request or if its value was invalid.
+=head3 value(parameter_name)
+
+Returns the cleaned value of the specified parameter, or undef if that parameter was not
+specified in the request or if its value was invalid. If the parameter can take multiple
+values, then the result of this function will be a listref.
 
 =cut
 
@@ -2780,7 +2950,35 @@ sub value {
 }
 
 
-=head3 specified
+=head3 value_list(parameter_name)
+
+If called in list context, this method returns the cleaned value(s) of the specified
+parameter, or the empty list if that parameter was not specified in the request or if no
+valid values were given. If called in scalar context, it returns the number of values.
+You would typically use this with a parameter whose rule hashref includes either 'list',
+'split', or 'multiple'.
+
+=cut
+
+sub value_list {
+
+    my ($self, $param) = @_;
+    
+    return () unless exists $self->{clean}{$param};
+    
+    if ( ref $self->{clean}{$param} eq 'ARRAY' )
+    {
+	return @{$self->{clean}{$param}};
+    }
+    
+    else
+    {
+	return ($self->{clean}{$param});
+    }
+}
+
+
+=head3 specified(parameter_name)
 
 Returns true if the specified parameter was specified in the request with at least
 one value, whether or not that value was valid.  Returns false otherwise.
@@ -2806,7 +3004,7 @@ submission resulted in errors.
 
 sub raw {
     
-    my ($self, $param) = @_;
+    my ($self) = @_;
     
     return $self->{raw};
 }
@@ -2969,7 +3167,7 @@ sub DECI_VALUE {
 };
 
 
-=head3 MATCH_VALUE
+=head3 MATCH_VALUE(pattern)
 
 This validator accepts any string that matches the specified pattern, and
 rejects any that does not.  If you specify the pattern as a string, it will be
@@ -3051,10 +3249,8 @@ sub ENUM_VALUE {
 	push @documented, $k unless $undoc;
     }
     
-    #my @non_empty = grep { defined $_ && $_ ne '' } @_;
     croak "ENUM_VALUE requires at least one value" unless keys %accepted;
     
-    # my %accepted = map { $case_fold->($_) => $_ } @non_empty;
     my $good_list = "'" . join("', '", @documented) . "'";
     
     return sub { return enum_value(shift, shift, \%accepted, $good_list) };
@@ -3109,39 +3305,6 @@ and behaves like 'BOOLEAN_VALUE' otherwise.
 sub FLAG_VALUE { return 'FLAG_VALUE'; };
 
 
-# =head3 EMPTY_VALUE
-
-# This validator accepts only the empty value.  You can use this when you want a
-# ruleset to be fulfilled even if the specified parameter is given an empty
-# value.  This will typically be used along with at least one other validator for the
-# same parameter.  For example:
-
-#     define_ruleset foo =>
-#         { param => 'bar', valid => [EMPTY_VALUE, POS_VALUE] };
-
-# This rule would be satisfied if the parameter 'bar' is given either an empty
-# value or a value that is a positive integer.  The ruleset will be fulfilled in
-# either case, but will not be fulfilled if 'bar' is not mentioned at all.  For
-# best results EMPTY_VALUE should not be the last validator in the list, because
-# if a value fails all of the validators then the last error message is reported
-# and its error message is by necessity not very helpful.
-
-# =cut
-
-# sub empty_value {
-    
-#     my ($value, $context) = @_;
-    
-#     return if !defined $value || $value eq '';
-#     return { error => "parameter {param} must be empty unless it is given a valid value" };
-# }
-
-# sub EMPTY_VALUE {
-
-#     return 'EMPTY_VALUE';
-# };
-
-
 =head3 ANY_VALUE
 
 This validator accepts any non-empty value.  Using this validator
@@ -3149,9 +3312,16 @@ is equivalent to not specifying any validator at all.
 
 =cut
 
+sub any_value {
+
+    my ($value, $context) = @_;
+    
+    return { value => $value };
+}
+
 sub ANY_VALUE {
     
-    return 'ANY_VALUE';
+    return \&any_value;
 };
 
 

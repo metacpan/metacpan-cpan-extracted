@@ -3,7 +3,7 @@ package App::FileCleanerByDiskUage;
 use 5.006;
 use strict;
 use warnings;
-use File::Find::Rule;
+use File::Find             ();
 use Filesys::Df            qw( df );
 use Net::Server::Daemonize qw(check_pid_file create_pid_file unlink_pid_file);
 
@@ -13,11 +13,11 @@ App::FileCleanerByDiskUage - Removes files based on disk space usage till it dro
 
 =head1 VERSION
 
-Version 0.4.1
+Version 0.5.0
 
 =cut
 
-our $VERSION = '0.4.1';
+our $VERSION = '0.5.0';
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ sub clean {
 	my @paths;
 
 	my $du_path;
-	# file paths should end with / or other wise if it is a symlink File::Find::Rule will skip it
+	# file paths should end with / or otherwise if the path is a symlink File::Find will not descend into it
 	# so fix that up while we are doing the path check
 	if ( !defined( $opts{path} ) ) {
 		if ( $opts{use_pid} ) {
@@ -241,7 +241,14 @@ sub clean {
 		$opts{dry_run} = 1,;
 	}
 
-	my $df = df($du_path);
+	# df() is normally Filesys::Df::df, but may be overridden internally via the
+	# _df option so the removal loop's disk-usage logic can be tested without a
+	# real filesystem. _resync bounds how many files may be removed between real
+	# df() checks (see the removal loop below).
+	my $df_func = ( ref( $opts{_df} ) eq 'CODE' ) ? $opts{_df} : \&df;
+	my $resync = ( defined( $opts{_resync} ) && $opts{_resync} =~ /^\d+$/ && $opts{_resync} > 0 ) ? $opts{_resync} : 64;
+
+	my $df = $df_func->($du_path);
 
 	# the results to be returned
 	my $results = {
@@ -275,18 +282,36 @@ sub clean {
 		return $results;
 	}
 
-	my @files;
-	if ( defined( $opts{ignore} ) ) {
-		my $ignore_rule = File::Find::Rule->new;
-		$ignore_rule->name(qr/$opts{ignore}/);
-		@files = File::Find::Rule->file()->not($ignore_rule)->in(@paths);
-	} else {
-		@files = File::Find::Rule->file()->in(@paths);
-	}
-	$results->{found_files_count} = $#files + 1;
+	# compile the ignore regexp once, if specified, and reuse it below
+	my $ignore_re = defined( $opts{ignore} ) ? qr/$opts{ignore}/ : undef;
 
-	# if we have a min number of files specified, make sure have that many defined
-	if ( $opts{min_files} && !defined( $files[ $opts{min_files} ] ) ) {
+	# Recursively find regular files under the requested paths, statting each
+	# one inline during the traversal. Doing the stat here means a single stat
+	# syscall per file (the traversal and the mtime lookup share it) and avoids
+	# building a separate array of path strings alongside the file info.
+	my @files_info;
+	File::Find::find(
+		sub {
+			# $_ is the basename (we are chdir'd into the containing dir),
+			# $File::Find::name is the full path. stat($_) populates the "_"
+			# handle so the -f test below reuses it rather than statting again.
+			my @stat = stat($_);
+			return unless @stat;    # skip on stat failure (races, broken symlinks)
+			return unless -f _;     # regular files only, matching the old ->file rule
+			return if defined($ignore_re) && $_ =~ $ignore_re;    # ignore by basename
+			# blocks ($stat[12], 512-byte units) is the space actually freed by
+			# unlinking, used by the removal loop to estimate disk usage between
+			# df() calls. apparent size would over-count sparse/small files.
+			push( @files_info, { name => $File::Find::name, mtime => $stat[9], blocks => $stat[12] } );
+		},
+		@paths
+	);
+	$results->{found_files_count} = scalar(@files_info);
+
+	# if we have a min number of files specified, make sure we found more than
+	# that many. min_files elements at indexes 0 .. min_files-1, so index
+	# min_files existing means there is at least one file eligible for removal.
+	if ( $opts{min_files} && !defined( $files_info[ $opts{min_files} ] ) ) {
 		$results->{min_files} = $opts{min_files};
 		if ( $opts{use_pid} ) {
 			unlink_pid_file($pid_file);
@@ -294,60 +319,90 @@ sub clean {
 		return $results;
 	}
 
-	# get the stats for all the files
-	my @files_info;
-	foreach my $file (@files) {
-		my %file_info;
-		my $not_used;
-		(
-			$not_used, $not_used, $not_used, $not_used, $not_used,
-			$not_used, $not_used, $not_used, $not_used, $file_info{mtime},
-			$not_used, $not_used, $not_used
-		) = stat($file);
-		$file_info{name} = $file;
-		push( @files_info, \%file_info );
-	} ## end foreach my $file (@files)
+	# sort files oldest to newest based on mtime, numerically
+	@files_info = sort { $a->{mtime} <=> $b->{mtime} } @files_info;
+	# save the full, sorted list into the results; the unlink loop below is
+	# bounded by an index so it never touches this array, meaning we don't
+	# need a defensive copy here
+	$results->{found_files} = \@files_info;
 
-	# sort files oldest to newest based on mtime
-	@files_info = sort { $a->{mtime} cmp $b->{mtime} } @files_info;
-	# set this here as we are saving it into the hashref as a array ref
-	my @files_info_copy = @files_info;
-	$results->{found_files} = \@files_info_copy;
-
-	# remove the newest files if mins_files is greater than or equal to 1
+	# the newest min_files files are kept regardless of disk usage. As the list
+	# is sorted oldest to newest, those are the last min_files entries, so we
+	# simply stop the removal loop before reaching them rather than removing
+	# them from the array.
+	my $min_files = 0;
 	if ( defined( $opts{min_files} ) && $opts{min_files} > 0 ) {
-		$results->{min_files} = $opts{min_files};
-		my $min_files_int = 1;
-		while ( $min_files_int <= $opts{min_files} ) {
-			pop(@files_info);
-
-			$min_files_int++;
-		}
+		$min_files            = $opts{min_files};
+		$results->{min_files} = $min_files;
 	}
+	# index of the last (oldest end) file eligible for removal
+	my $last_removable = $#files_info - $min_files;
 
-	# go through files and remove the oldest till we
-	my $int = 0;
-	while ( $df->{per} >= $opts{du} && defined( $files_info[$int] ) ) {
+	# go through files and remove the oldest till we drop below the threshold.
+	#
+	# Rather than calling df() after every single unlink (a statvfs syscall each
+	# time, which dominates the loop on high latency filesystems), we estimate
+	# how much space we still need to free from the block counts we already have
+	# and only consult the real df() when the estimate says we should be close.
+	# The real df() remains the authoritative stop condition, so this never
+	# under removes; the $resync cap bounds how far a bad estimate (concurrent
+	# writers, files held open elsewhere) can run us past the target.
+	my $per = $df->{per};
+
+	# bytes the user may occupy, used to translate a percentage into bytes. The
+	# byte mode df() (block size of 1) reports used/bavail in bytes.
+	my $df_bytes = $df_func->( $du_path, 1 );
+	my $user_total = ( $df_bytes->{used} || 0 ) + ( $df_bytes->{bavail} || 0 );
+	# estimated bytes still to free to reach the target, and bytes freed since
+	# the last real df() check
+	my $need  = ( ( $per - $opts{du} ) / 100 ) * $user_total;
+	my $freed = 0;
+
+	my $int             = 0;
+	my $since_resync    = 0;
+	while ( $per >= $opts{du} && $int <= $last_removable ) {
+		my $file = $files_info[$int];
 		eval {
-			if ( $opts{dry_run} && !-w $files_info[$int]{name} ) {
-				die('file is not writable');
+			if ( $opts{dry_run} ) {
+				# dry run: never remove anything, just verify the file would be
+				# removable by checking it is writable by the current user
+				if ( !-w $file->{name} ) {
+					die('file is not writable');
+				}
 			} else {
-				unlink( $files_info[$int]{name} ) or die($!);
+				unlink( $file->{name} ) or die($!);
 			}
 
 		};
-		my %tmp_hash = %{ $files_info[$int] };
 		if ($@) {
-			push( @{ $results->{unlink_errors} }, 'Failed to remove "' . $files_info[$int]{name} . '"... ' . $@ );
-			push( @{ $results->{unlink_failed} }, \%tmp_hash );
+			push( @{ $results->{unlink_errors} }, 'Failed to remove "' . $file->{name} . '"... ' . $@ );
+			push( @{ $results->{unlink_failed} }, $file );
 		} else {
-			push( @{ $results->{unlinked} }, \%tmp_hash );
+			push( @{ $results->{unlinked} }, $file );
+			# a failed unlink frees nothing, so only count successful removals
+			$freed += ( $file->{blocks} || 0 ) * 512 unless $opts{dry_run};
 		}
 
 		$int++;
-		$df = df($du_path);
-	} ## end while ( $df->{per} >= $opts{du} && defined( $files_info...))
+		$since_resync++;
 
+		# a dry run never changes disk usage, so re-checking df() would loop
+		# forever on the same $per; the index bound above is what stops it.
+		next if $opts{dry_run};
+
+		# consult the real df() only once we estimate we have freed enough, or
+		# once $resync files have gone by, whichever comes first
+		if ( $freed >= $need || $since_resync >= $resync ) {
+			$df           = $df_func->($du_path);
+			$per          = $df->{per};
+			$need         = ( ( $per - $opts{du} ) / 100 ) * $user_total;
+			$freed        = 0;
+			$since_resync = 0;
+		}
+	} ## end while ( $per >= $opts{du} && $int <= $last_removable )
+
+	# make sure du_ending reflects real disk usage, not the last estimate
+	$df = $df_func->($du_path);
 	$results->{du_ending} = $df->{per};
 	if ( defined( $results->{unlinked}[0] ) ) {
 		$results->{unlinked_count} = $#{ $results->{unlinked} } + 1;

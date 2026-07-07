@@ -9,7 +9,9 @@ use Test::More;
 
 use FindBin;
 use lib $FindBin::Bin;
-use IPCShareableTest qw(assert_clean_process);
+use IPCShareableTest qw(assert_clean_process require_free_sem_sets);
+
+require_free_sem_sets();
 
 
 # deprecated string key param

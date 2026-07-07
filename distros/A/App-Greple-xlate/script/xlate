@@ -73,7 +73,7 @@ xlate [ options ] -t LANG FILE [ greple options ]
 
 =head1 VERSION
 
-    Version 1.0202
+    Version 2.00
 
 =cut
 
@@ -303,7 +303,7 @@ find_gmake() {
     (( $# == 0 )) && set make gmake gnumake
     for make in "$@"
     do
-	[[ $("$make" --version) =~ GNU ]] && { echo "$make"; return 0; }
+        [[ $("$make" --version) =~ GNU ]] && { echo "$make"; return 0; }
     done
     return 1
 }
@@ -373,27 +373,27 @@ option+=(--all)
 declare -a area
 case ${1:-} in
     *.txt)
-	area=(-E '^(.+\n)+')
-	;;
+        area=(-E '^(.+\n)+')
+        ;;
     *.md)
-	area=(-E '(?x) ^[-+#].*\n | ^\h+\K.*\n | ^(.+\n)+ ')
-	;;
+        area=(-E '(?x) ^[-+#].*\n | ^\h+\K.*\n | ^(.+\n)+ ')
+        ;;
     *.pm|*.pod)
-	module+=(-Mperl)
-	option+=(--pod)
-	option+=(--exclude '^=head\d +(VERSION|AUTHOR|LICENSE|COPYRIGHT|SEE.?ALSO).*\n(?s:.*?)(?=^=|\z)')
-	area=(-E '^([\w\pP].+\n)+')
-	;;
+        module+=(-Mperl)
+        option+=(--pod)
+        option+=(--exclude '^=head\d +(VERSION|AUTHOR|LICENSE|COPYRIGHT|SEE.?ALSO).*\n(?s:.*?)(?=^=|\z)')
+        area=(-E '^([\w\pP].+\n)+')
+        ;;
     *.doc|*.docx|*.pptx|*.xlsx)
-	module+=(-Mmsdoc)
-	;&
+        module+=(-Mmsdoc)
+        ;&
     *.stxt)
-	option+=(--exclude '^\[.*\b(doc|docx|pptx|xlsx)\b.*\]\n')
-	area=(-E '^.+\n')
-	;;
+        option+=(--exclude '^\[.*\b(doc|docx|pptx|xlsx)\b.*\]\n')
+        area=(-E '^.+\n')
+        ;;
     *)
-	area=(-E '^(.+\n)+')
-	;;
+        area=(-E '^(.+\n)+')
+        ;;
 esac
 
 # Build pattern options from -p and -f

@@ -2,3 +2,4 @@ local
 perltidyrc
 tidyall.ini
 perlcriticrc
+cover_db

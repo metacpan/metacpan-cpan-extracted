@@ -3,6 +3,7 @@ use v5.36;
 use lib 'lib';
 use Test2::V0;
 use File::Temp qw(tempdir);
+use JSON::PP qw(decode_json encode_json);
 
 use Concierge::Desk::Setup;
 use Concierge;
@@ -29,7 +30,7 @@ subtest 'open_desk initializes components' => sub {
     my $result = Concierge->open_desk($test_dir);
     my $concierge = $result->{concierge};
 
-    isa_ok $concierge->auth, ['Concierge::Auth'], 'auth component initialized';
+    isa_ok $concierge->auth, ['Concierge::Auth::Pwd'], 'auth component initialized';
     isa_ok $concierge->sessions, ['Concierge::Sessions'], 'sessions component initialized';
     isa_ok $concierge->users, ['Concierge::Users'], 'users component initialized';
 };
@@ -63,6 +64,40 @@ subtest 'open_desk fails with invalid JSON config' => sub {
     my $result = Concierge->open_desk($bad_dir);
     ok !$result->{success}, 'open_desk fails with invalid JSON';
     like $result->{message}, qr/invalid json/i, 'error mentions invalid JSON';
+};
+
+subtest 'open_desk fails gracefully for a pre-v0.5 desk (missing auth_backend)' => sub {
+    use File::Spec;
+    my $stale_dir = tempdir(CLEANUP => 1);
+    Concierge::Desk::Setup::build_quick_desk($stale_dir);
+
+    # Hand-corrupt concierge.conf to look like a desk built before the
+    # v0.5 Auth backend factory: bare auth_file, no auth_backend/auth_args.
+    my $conf_file = File::Spec->catfile($stale_dir, 'concierge.conf');
+    open my $fh, '<', $conf_file or die "Cannot read: $!";
+    local $/;
+    my $config = decode_json(<$fh>);
+    close $fh;
+    delete $config->{auth_backend};
+    delete $config->{auth_args};
+    $config->{auth_file} = File::Spec->catfile($stale_dir, 'auth.pwd');
+
+    open my $wfh, '>', $conf_file or die "Cannot write: $!";
+    print $wfh encode_json($config);
+    close $wfh;
+
+    my $result = Concierge->open_desk($stale_dir);
+    ok !$result->{success}, 'open_desk fails for a pre-v0.5 desk';
+    like $result->{message}, qr/must be built again/i,
+        'error explains the desk must be rebuilt';
+    like $result->{message}, qr/archive existing user data/i,
+        'error explains user data will be archived';
+    like $result->{message}, qr/delete session and any credential storage/i,
+        'error explains session/credential storage will be deleted';
+    like $result->{message}, qr/default built-in ID-password authentication/i,
+        'error explains the default backend that will be installed';
+    like $result->{message}, qr/POD/,
+        'error points to POD for alternative auth approaches';
 };
 
 subtest 'open_desk runs cleanup_sessions' => sub {

@@ -12,7 +12,9 @@ examples/09-generators-architecture.pl
 examples/10-architecture-comparison.pl
 examples/README.md
 lib/Concierge/Auth.pm
+lib/Concierge/Auth/Base.pm
 lib/Concierge/Auth/Generators.pm
+lib/Concierge/Auth/Pwd.pm
 LICENSE
 Makefile.PL
 MANIFEST

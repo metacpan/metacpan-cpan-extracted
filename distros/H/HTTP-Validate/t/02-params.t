@@ -3,7 +3,7 @@
 use lib 'lib';
 
 use strict;
-use Test::More tests => 14;
+use Test::More tests => 19;
 
 use HTTP::Validate qw(:keywords :validators);
 
@@ -242,6 +242,36 @@ subtest 'empty params' => sub {
 };
 
 
+# Test 'allow_empty' attribute.
+
+subtest 'allow_empty' => sub {
+
+    my ($r1, $r2, $r3);
+
+    eval {
+        define_ruleset 'allow_empty test' =>
+            { optional => 'foo', valid => ANY_VALUE, allow_empty => 1 },
+            { optional => 'bar', valid => ANY_VALUE, allow_empty => 1 };
+
+        $r1 = check_params('allow_empty test', {}, { foo => 'hello', bar => '' });
+        $r2 = check_params('allow_empty test', {}, { foo => undef });
+        $r3 = check_params('allow_empty test', {}, {});
+    };
+
+    ok( !$@, 'allow_empty: define and check' ) or diag("    message was: $@");
+
+    ok( $r1->passed, 'allow_empty: r1 passed' );
+    is( $r1->value('foo'), 'hello', 'allow_empty: normal value stored correctly' );
+    ok( $r1->specified('bar'), 'allow_empty: empty string param is specified' );
+    is( $r1->value('bar'), '', 'allow_empty: empty string stored as empty string' );
+
+    ok( $r2->specified('foo'), 'allow_empty: undef param is specified' );
+    is( $r2->value('foo'), undef, 'allow_empty: undef stored as undef' );
+
+    ok( !$r3->specified('foo'), 'allow_empty: absent param is not specified' );
+};
+
+
 # Test that 'validation_settings' works properly
 
 subtest 'validation_settings' => sub {
@@ -347,6 +377,69 @@ subtest 'attribute: key' => sub {
 };
 
 
+# Test that the 'note' attribute is accepted and does not interfere with validation.
+
+subtest 'note attribute' => sub {
+
+    eval {
+        define_ruleset 'note test' =>
+            { param => 'foo', note => 'this is a note for external tools' };
+    };
+
+    ok( !$@, 'note attribute accepted in define_ruleset' ) or diag("    message was: $@");
+
+    my $r = check_params('note test', {}, { foo => 'bar' });
+    ok( $r->passed, 'note: validation passes normally' );
+};
+
+
+# Test single-string alias (not in an arrayref).
+# Existing tests only use alias => ['name1', 'name2'].
+
+subtest 'single string alias' => sub {
+
+    my $v = HTTP::Validate->new;
+
+    eval {
+        $v->define_ruleset('alias test' =>
+            { param => 'foo', alias => 'foo_alias' });
+    };
+
+    ok( !$@, 'single-string alias: accepted in define_ruleset' ) or diag("    message was: $@");
+
+    my $r = $v->check_params('alias test', {}, { foo_alias => '42' });
+
+    ok( $r->passed, 'single-string alias: request passes when alias is used' );
+    is( $r->value('foo'), '42', 'single-string alias: value reported under canonical name' );
+    is( $r->value('foo_alias'), undef, 'single-string alias: no value under alias name' );
+};
+
+
+# Test 'ignore' rule in actual parameter validation (existing tests only
+# verify define_ruleset accepts ignore rules, not that they work at runtime).
+
+subtest 'ignore in validation' => sub {
+
+    my $v = HTTP::Validate->new;
+
+    eval {
+        $v->define_ruleset('ignore test' =>
+            { param => 'good' },
+            { ignore => ['spurious1', 'spurious2'] });
+    };
+
+    ok( !$@, 'ignore: define ruleset' ) or diag("    message was: $@");
+
+    my $r = $v->check_params('ignore test', {},
+        { good => 'yes', spurious1 => 'x', spurious2 => 'y' });
+
+    ok( $r->passed, 'ignore: request passes with ignored params present' );
+    is( $r->value('spurious1'), undef, 'ignore: no clean value for spurious1' );
+    is( $r->value('spurious2'), undef, 'ignore: no clean value for spurious2' );
+    is( $r->errors, 0, 'ignore: no errors for ignored params' );
+};
+
+
 # Test that content_type works properly
 
 subtest 'content_type' => sub {
@@ -402,4 +495,37 @@ subtest 'keys and values' => sub {
     my $values2 = $r1->values;
     
     ok( $values2->{extra}, "can manipulate values" );
-}
+};
+
+
+# Test value_list method (not covered by any existing test).
+
+subtest 'value_list' => sub {
+
+    my $v = HTTP::Validate->new;
+
+    eval {
+        $v->define_ruleset('vl test' =>
+            { optional => 'multi',  valid => POS_VALUE, multiple => 1 },
+            { optional => 'single', valid => ANY_VALUE });
+    };
+
+    my $r = $v->check_params('vl test', {},
+        ['multi', '1', 'multi', '2', 'multi', '3', 'single', 'hello']);
+
+    ok( $r->passed, 'value_list: result passed' );
+
+    my @multi = $r->value_list('multi');
+    is_deeply( \@multi, [1, 2, 3], 'value_list: list for multi-value param' );
+
+    my @single = $r->value_list('single');
+    is_deeply( \@single, ['hello'], 'value_list: single-element list for scalar param' );
+
+    my @absent = $r->value_list('absent');
+    is_deeply( \@absent, [], 'value_list: empty list for absent param' );
+
+    my $count = $r->value_list('multi');
+    is( $count, 3, 'value_list: count in scalar context' );
+};
+
+

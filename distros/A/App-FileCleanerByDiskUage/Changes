@@ -1,5 +1,12 @@
 Revision history for App-FileCleanerByDiskUage
 
+0.5.0   2026-07-06/14:15
+        - reduce number of df calls via keeping track of amoung being removed and only checking every so often
+        - use File::Find instead of File::Find::Rule
+        - fix dry run
+        - misc cleanups
+        - add some actual tests
+
 0.4.1   2025-07-16/14:45
         - Fix behavior for missing paths.
 
@@ -8,10 +15,10 @@ Revision history for App-FileCleanerByDiskUage
 
 0.3.0   2023-11-11/15:00
         - Add PID file to prevent multiple instances from starting up if calling via cron.
-		- convert to use Pod::Usage
-		- remove -v and -h short options for --version and and --help
-		- add writing results to a file using the -w flag using File::Slurp write_file in atomic mode
-		- add -q for quiet
+        - convert to use Pod::Usage
+        - remove -v and -h short options for --version and and --help
+        - add writing results to a file using the -w flag using File::Slurp write_file in atomic mode
+        - add -q for quiet
 
 0.2.1   2023-09-01/14:30
         - Fix handling of extra / on the end of the path.

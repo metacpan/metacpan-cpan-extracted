@@ -8,18 +8,49 @@ use warnings;
 use 5.008001;
 use ExtUtils::MakeMaker;
 
-use Devel::AssertC99;
 ("\t" eq "\x09")
   or die("OS unsupported\n");
+
+use Config;
 use Devel::PPPort;
 Devel::PPPort::WriteFile() unless -e 'ppport.h';
+
+# C99 standard flag: only GCC/Clang need one, and they are exactly the
+# compilers that set gccversion. MSVC and vendor compilers (xlc, Solaris
+# cc) neither set it nor accept -std=c99, so leave it empty there.
+my $c99 = $Config{gccversion} ? '-std=c99' : '';
+
+# Confirm the compiler accepts C99 by building a snippet that uses C99
+# features rather than trusting __STDC_VERSION__ (MSVC does not advertise
+# it). This distribution is XS-only, so fail configuration early.
+my $xs_ok = 0;
+if (eval { require ExtUtils::CBuilder; ExtUtils::CBuilder->new(quiet => 1)->have_compiler }) {
+  my $cb  = ExtUtils::CBuilder->new(quiet => 1);
+  my $src = 'conftest.c';
+  open my $fh, '>', $src or die "Cannot write $src: $!";
+  print $fh "#include <stdint.h>\n";
+  print $fh "int main(void) {\n";
+  print $fh "  uint32_t n = 0;              // C99 // comment + <stdint.h>\n";
+  print $fh "  for (int i = 0; i < 3; i++)  // declaration inside for\n";
+  print $fh "    n += (uint32_t)i;\n";
+  print $fh "  return (int)n - 3;\n";
+  print $fh "}\n";
+  close $fh;
+  eval {
+    $cb->compile(source => $src, extra_compiler_flags => [grep length, $c99]);
+    $xs_ok = 1;
+  };
+  unlink $src, glob('conftest.*');
+}
+$xs_ok
+  or die "No C99 compiler found; Unicode::UTF8 requires a C99 compiler.\n";
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Encoding and decoding of UTF-8 encoding form",
   "AUTHOR" => "Christian Hansen <chansen\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "Devel::AssertC99" => 0,
     "Devel::PPPort" => 0,
+    "ExtUtils::CBuilder" => 0,
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Unicode-UTF8",
@@ -38,10 +69,15 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => "0.006",
     "Test::More" => "0.47"
   },
-  "VERSION" => "0.71",
+  "VERSION" => "0.72",
   "test" => {
     "TESTS" => "t/*.t t/*/*.t"
   }
+);
+
+%WriteMakefileArgs = (
+    %WriteMakefileArgs,
+    CCFLAGS => (length $c99 ? "$Config{ccflags} $c99" : $Config{ccflags}),
 );
 
 my %FallbackPrereqs = (

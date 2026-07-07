@@ -3,7 +3,7 @@
 use lib 'lib';
 
 use strict;
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 use HTTP::Validate qw(:keywords :validators);
 
@@ -384,8 +384,56 @@ subtest 'content_type rules' => sub {
 };
 
 
+# Test ruleset_defined.
+
 subtest 'ruleset_defined' => sub {
     
     ok( ruleset_defined('content_type good'), "found ruleset 'content_type good'" );
     ok( ! ruleset_defined('not a ruleset'), "didn't find ruleset 'not a ruleset'" );
 };
+
+
+# Test list_rulesets.
+
+subtest 'list_rulesets' => sub {
+
+    my $v = HTTP::Validate->new;
+    $v->define_ruleset('rs_alpha' => { param => 'a' });
+    $v->define_ruleset('rs_beta'  => { param => 'b' });
+    $v->define_ruleset('rs_gamma' => { param => 'c' });
+
+    my @names = sort $v->list_rulesets;
+    is_deeply( \@names, ['rs_alpha', 'rs_beta', 'rs_gamma'],
+               'list_rulesets returns all defined ruleset names' );
+};
+
+
+# Test list_rules with a 'require' include rule.
+# This exercises the fixed lookup (using $item->{ruleset}) in generate_rule_list.
+# Without the fix, $item->{allow} || $item->{require} returns 1 for require
+# rules, so the recursion silently fails and included rules are not returned.
+
+subtest 'list_rules with require include' => sub {
+
+    my $v = HTTP::Validate->new;
+
+    eval {
+        $v->define_ruleset('lr_base' =>
+            { param => 'foo' },
+            { optional => 'bar' });
+
+        $v->define_ruleset('lr_outer' =>
+            { require => 'lr_base' },
+            { param => 'baz' });
+    };
+
+    ok( !$@, 'list_rules: define rulesets' ) or diag("    message was: $@");
+
+    my @rules = $v->list_rules('lr_outer');
+    my @param_names = sort map { $_->{param} } grep { $_->{type} eq 'param' } @rules;
+
+    is_deeply( \@param_names, ['bar', 'baz', 'foo'],
+               'list_rules recurses into require-included rulesets' );
+};
+
+

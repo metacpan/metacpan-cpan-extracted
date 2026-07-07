@@ -1,3 +1,12 @@
+0.72 2026-07-07
+ - read_utf8() now takes a single-pass fast path on PerlIO fast-gets layers,
+   validating/copying/counting straight out of the layer buffer (up to ~11%
+   faster on multibyte-heavy input; see benchmarks/).
+ - Fixed read_utf8() on non-buffered handles stranding the trailing
+   incomplete sequence that was read to satisfy the requested length: the
+   pending bytes are now pushed back with PerlIO_unread() so the following
+   read sees them, matching decode_utf8() when drained to end of file.
+
 0.71 2026-07-05
  - Added read_utf8($fh, $buf, $length[, $offset]) for reading validated  
    UTF-8 code points from a file handle. Bytes are validated as they are  

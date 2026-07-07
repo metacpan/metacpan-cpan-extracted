@@ -7,7 +7,6 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0.98'
-  perl: v5.8.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -20,7 +19,7 @@ name: Devel-Cover-Report-Codecovbash
 provides:
   Devel::Cover::Report::Codecovbash:
     file: lib/Devel/Cover/Report/Codecovbash.pm
-    version: v0.41.0
+    version: v0.42.0
 requires:
   File::Spec: '0'
   JSON::MaybeXS: '0'
@@ -31,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/perlpunk/Devel-Cover-Report-Codecovbash/issues
   repository: https://github.com/perlpunk/Devel-Cover-Report-Codecovbash
-version: v0.41.0
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: v0.42.0
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

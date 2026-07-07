@@ -1,5 +1,9 @@
 Revision history for Dist-Mgr
 
+1.15    2026-07-06
+    - Fix issue in move_distribution_files() where counts will mismatch if
+      a new distribution has three levels (eg: A::B::C)
+
 1.14    2026-06-12
     - In distmgr when run with '--ci' with no --user and --repo, we'd throw an
       error for 'badges', not 'ci'. This is now fixed (fixes #60)

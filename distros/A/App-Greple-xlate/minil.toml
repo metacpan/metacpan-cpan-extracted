@@ -9,7 +9,7 @@ static_install = "auto"
 [release]
 branch = "main"
 hooks = [
-    "make -C docs",
+    "make -C i18n",
     "perl -Ilib -MApp::Greple::xlate=\$VERSION -i -pE 's/^\s*Version \K(\d+(\.\d+)*)$/$VERSION/i' script/xlate",
     "sed -i '' '/^1;$/q' lib/App/xlate.pm && greple -Mperl -h --nocolor :pod script/xlate >> lib/App/xlate.pm"
 ]

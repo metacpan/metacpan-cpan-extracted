@@ -1,5 +1,11 @@
 Revision history for HTTP-Validate
 
+1.0     2026-06-06
+
+        - Added methods 'list_rulesets', 'list_rules', 'value_list'.
+	- Fixed quite a few bugs, using Claude.
+	- Added tests written by Claude to ensure full coverage.
+
 0.982	2018-12-19
 
 	- The BOOLEAN_VALUE validator now accepts any reference with 'boolean' in its class name.
