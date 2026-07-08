@@ -15,7 +15,7 @@ use Scalar::Util qw(reftype);
 use Storable qw(nfreeze);
 use YAML::XS ();
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.2.0';
 
 # Package variables for serialization options
 our $JSON_PRETTY = 1;  # Controls whether JSON output is pretty or compact
@@ -31,23 +31,28 @@ sub new {
   my $init_data = ref $args[0] ? shift @args : {};
   my @kv_list   = @args;
 
-  # If the first argument is a hash reference, use it; otherwise, start with an empty structure
-  my $self = bless { data => _is_hash($init_data) ? $init_data : {} }, $class;
+  # Accept a hash ref OR an array ref as the data root; anything else
+  # (a non-ref first arg) is treated as the start of the kv list.
+  my $data
+    = ( _is_hash($init_data) || _is_array($init_data) ) ? $init_data : {};
 
-  # If $init_data wasn't a hash ref, treat it as a key-value pair
-  if ( !_is_hash($init_data) ) {
+  my $self = bless { data => $data }, $class;
+
+  # If the first arg wasn't usable as init data, treat it as a kv element.
+  if ( !_is_hash($init_data) && !_is_array($init_data) ) {
     @kv_list = ( $init_data, @kv_list );
   }
 
-  # Short-circuit if no key-value pairs are provided
   return $self
     if !@kv_list;
 
-  # Ensure key-value pairs are valid
   croak 'Must provide key-value pairs'
-    if @kv_list && @kv_list % 2 != 0;
+    if @kv_list % 2 != 0;
 
-  # Populate the structure using `set`
+  # set() only makes sense against a hash root; reject kv pairs on an array root.
+  croak 'Cannot set key-value pairs on an array-rooted structure'
+    if _is_array( $self->{data} ) && @kv_list;
+
   $self->set(@kv_list);
 
   return $self;
@@ -79,8 +84,15 @@ sub _parse_path {
   my @segments;
 
   for my $part ( split /[.]/, $path ) {
-    if ( $part =~ /\A (.+?) \[ (-?\d+) \] \z/xsm ) {
-      push @segments, { key => $1, index => $2 + 0 };
+    if ( $part =~ /\A (.*?) \[ (-?\d+) \] \z/xsm ) {
+      my ( $key, $idx ) = ( $1, $2 + 0 );
+
+      if ( length $key ) {
+        push @segments, { key => $key, index => $idx };
+      }
+      else {
+        push @segments, { index => $idx };  # bare subscript: [0], [-1]
+      }
     }
     else {
       push @segments, { key => $part, index => undef };
@@ -109,19 +121,21 @@ sub _walk {
   for my $seg ( @{$segments}[ 0 .. $#{$segments} - 1 ] ) {
     my ( $key, $idx ) = @{$seg}{qw(key index)};
 
-    # Step into the hash key
-    if ( _is_hash($current) ) {
-      $current->{$key} //= {} if $create && !exists $current->{$key};
+    # Step into the hash key only if this segment has one.
+    if ( exists $seg->{key} ) {
+      if ( _is_hash($current) ) {
+        $current->{$key} //= {} if $create && !exists $current->{$key};
 
-      return ( undef, undef ) if !exists $current->{$key};
+        return ( undef, undef ) if !exists $current->{$key};
 
-      $current = $current->{$key};
+        $current = $current->{$key};
+      }
+      else {
+        return ( undef, undef );
+      }
     }
-    else {
-      return ( undef, undef );
-    }
 
-    # If this segment also carries an array subscript, step into it
+    # If this segment carries an array subscript, step into it.
     if ( defined $idx ) {
       return ( undef, undef ) if !_is_array($current);
 
@@ -213,13 +227,16 @@ sub get {
     for my $seg (@segments) {
       my ( $key, $idx ) = @{$seg}{qw(key index)};
 
-      if ( _is_hash($current) && exists $current->{$key} ) {
-        $current = $current->{$key};
-      }
-      else {
-        $current = undef;
-        $ok      = 0;
-        last;
+      # Step into a hash key only if this segment has one.
+      if ( exists $seg->{key} ) {
+        if ( _is_hash($current) && exists $current->{$key} ) {
+          $current = $current->{$key};
+        }
+        else {
+          $current = undef;
+          $ok      = 0;
+          last;
+        }
       }
 
       if ( defined $idx ) {
@@ -406,6 +423,16 @@ Negative indices count from the end of the array (C<-1> is the last element).
   items[-1].name                  # last element of the items array
   a.b[2].c.d[-1]                  # deeply nested mix of hashes and arrays
 
+The root of the structure may itself be an array. A path that begins with a
+bare subscript indexes the top-level array directly:
+
+  [0].name        # 'name' field of the first top-level element
+  [-1]            # the last top-level element
+
+Array subscript notation is supported in C<get>, C<exists_key>, and C<delete>
+(including bare leading subscripts against an array root). It is B<not>
+supported in C<set> (see below).
+
 Array subscript notation is supported in C<get>, C<exists_key>, and C<delete>.
 C<set> continues to operate on plain dot-separated hash paths only.
 
@@ -444,11 +471,14 @@ Specifies the serialization format. Supported formats:
 
 =head1 METHODS AND SUBROUTINES
 
-=head2 new([$hash_ref], @kv_list)
+=head2 new([$data_ref], @kv_list)
 
 Creates a new Data::NestedKey object. If no arguments are provided, initializes
-with an empty structure. Optionally, an initial hash reference can be supplied.
-Key-value pairs may also be provided for immediate population.
+with an empty structure. Optionally, an initial data reference can be supplied
+as the root: either a B<hash reference> or an B<array reference>. Key-value
+pairs may also be provided for immediate population, but only when the root is
+a hash (or defaulted) — supplying key-value pairs together with an array-ref
+root throws an exception, since C<set> operates on dot-separated hash keys.
 
 Returns a C<Data::NestedKey> object.
 
@@ -456,7 +486,10 @@ Returns a C<Data::NestedKey> object.
 
 Inserts, updates, appends, or removes values in the nested structure using
 dot-separated keys. Array subscript notation (e.g. C<key[0]>) is B<not>
-supported in set paths; an exception will be thrown if one is used.
+supported in C<set> paths — nor can values be set against an array-rooted
+structure — and an exception is thrown in either case. To modify array
+contents, retrieve the parent with C<get>, alter the Perl structure directly,
+and construct a new object if needed.
 
 =over 4
 
@@ -495,6 +528,12 @@ indices count from the end):
   my $uri  = $nk->get('repositories[0].repositoryUri');
   my $last = $nk->get('items[-1].name');
 
+The root may be an array, in which case a leading subscript indexes it
+directly:
+
+  my $first = $nk->get('[0]');
+  my $name  = $nk->get('[0].name');
+
 Returns C<undef> for any path that does not exist or whose subscript is out
 of range.  In list context returns all requested values; in scalar context
 returns the first.
@@ -528,7 +567,7 @@ Returns a string representation of the data.
 
 =head1 AUTHOR
 
-Rob Lauer <rlauer6@comcast.net>
+Rob Lauer <rlauer@treasurersbriefcase.com>
 
 =head1 SEE ALSO
 

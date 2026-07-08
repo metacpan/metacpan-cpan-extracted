@@ -16,7 +16,7 @@ use warnings;
 
 our ($XS_VERSION, $VERSION);
 BEGIN {
-$VERSION = "1.649"; # ==> ALSO update the version in the pod text below!
+$VERSION = "1.650"; # ==> ALSO update the version in the pod text below!
 $XS_VERSION = $VERSION;
 $VERSION =~ tr/_//d;
 }
@@ -148,7 +148,7 @@ sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.649
+This is the DBI specification that corresponds to DBI version 1.650
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -7137,7 +7137,8 @@ a ref to an empty hash because they can't pre-determine the names.
 It is possible that the keys in the hash returned by C<ParamValues>
 are not exactly the same as those implied by the prepared statement.
 For example, DBD::Oracle translates 'C<?>' placeholders into 'C<:pN>'
-where N is a sequence number starting at 1.
+where N is a sequence number starting at C<1> with a hard limit of
+C<99999>.
 
 * Values:
 
@@ -7239,7 +7240,8 @@ integer.
 It is also possible that the keys in the hash returned by
 C<ParamArrays> are not exactly the same as those implied by the
 prepared statement.  For example, DBD::Oracle translates 'C<?>'
-placeholders into 'C<:pN>' where N is a sequence number starting at 1.
+placeholders into 'C<:pN>' where N is a sequence number starting at
+C<1> with a hard limit of C<99999>.
 
 =head3 C<RowsInCache>
 
@@ -8342,8 +8344,10 @@ development, and rapidly get something specific and valuable in return.
 
 =head1 ACKNOWLEDGEMENTS
 
+The creator: Tim Bunce!
+
 I would like to acknowledge the valuable contributions of the many
-people I have worked with on the DBI project, especially in the early
+people Tim has worked with on the DBI project, especially in the early
 years (1992-1994). In no particular order: Kevin Stock, Buzz Moschetti,
 Kurt Andersen, Ted Lemon, William Hails, Garth Kennedy, Michael Peppler,
 Neil S. Briscoe, Jeff Urlwin, David J. Hughes, Jeff Stander,
@@ -8371,12 +8375,16 @@ The development of the swap_inner_handle() method was sponsored by BizRate.com
 
 The development of DBD::Gofer and related modules was sponsored by Shopzilla.com (L<https::connexity.com>).
 
+After the release of version 1.643, the development was lead by H.Merijn Brand
+with the help of the DBI team. Thanks to all that added issues, did Pull
+Requests or helped in any way to keep the DBI healthy.
+
 =head1 CONTRIBUTING
 
 As you can see above, many people have contributed to the DBI and
 drivers in many ways over many years.
 
-If you'd like to help then see L<http://dbi.perl.org/contributing>.
+If you'd like to help then see F<CONTRIBUTING.md>.
 
 If you'd like the DBI to do something new or different then a good way
 to make that happen is to do it yourself and send me a patch to the

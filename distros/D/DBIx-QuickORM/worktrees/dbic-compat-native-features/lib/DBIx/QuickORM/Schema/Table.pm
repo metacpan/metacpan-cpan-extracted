@@ -2,11 +2,11 @@ package DBIx::QuickORM::Schema::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
-use DBIx::QuickORM::Util qw/column_key merge_hash_of_objs clone_hash_of_objs/;
+use DBIx::QuickORM::Util qw/column_key merge_hash_of_objs clone_hash_of_objs load_class/;
 
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::Linked';
@@ -17,6 +17,7 @@ use Object::HashBase qw{
     +columns
     <unique
     <row_class
+    <handle_class
     <row_class_autofill
     <created
     <compiled
@@ -77,6 +78,12 @@ Hashref of unique constraints keyed by column key.
 =item row_class
 
 The row class used when fetching rows from this table.
+
+=item handle_class
+
+The L<DBIx::QuickORM::Handle> subclass bound to this table, if any. When set,
+handles created for this source are promoted into this class so its extra query
+methods are available (and survive chaining). Stored as a package-name string.
 
 =item row_class_autofill
 
@@ -274,6 +281,11 @@ sub init {
             my $col = $self->{+COLUMNS}->{$cname} or croak "Primary Key column '$cname' is not present in the column list";
             croak "Primary key column '$cname' is set to be omitted, this is not allowed" if $col->omit;
         }
+    }
+
+    if (my $hc = $self->{+HANDLE_CLASS}) {
+        my $loaded = load_class($hc) or croak "Could not load handle class '$hc'${debug}: $@";
+        croak "Handle class '$hc' is not a subclass of 'DBIx::QuickORM::Handle'${debug}" unless $loaded->isa('DBIx::QuickORM::Handle');
     }
 
     $self->{+UNIQUE}  //= {};

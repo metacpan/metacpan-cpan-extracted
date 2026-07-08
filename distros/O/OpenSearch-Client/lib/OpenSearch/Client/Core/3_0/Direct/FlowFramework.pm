@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::FlowFramework;
-$OpenSearch::Client::Core::3_0::Direct::FlowFramework::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::FlowFramework::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for flow_framework.|https://docs.opensearch.org/l
 
 =head1 METHODS
     
-=head2 flow_framework->create
+=head2 create
 
 Creates a new workflow template.
 
@@ -101,9 +101,9 @@ C<POST /_plugins/_flow_framework/workflow>
         'source'         =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for flow_framework.create|https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/>
+L<OpenSearch documentation for flow_framework-E<gt>create|https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/>
     
-=head2 flow_framework->delete
+=head2 delete
 
 Deletes a workflow template.
 
@@ -135,9 +135,9 @@ C<DELETE /_plugins/_flow_framework/workflow/{workflow_id}>
         'source'        =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for flow_framework.delete|https://opensearch.org/docs/latest/automating-configurations/api/delete-workflow/>
+L<OpenSearch documentation for flow_framework-E<gt>delete|https://opensearch.org/docs/latest/automating-configurations/api/delete-workflow/>
     
-=head2 flow_framework->deprovision
+=head2 deprovision
 
 Deprovision workflow's resources when you no longer need them.
 
@@ -169,9 +169,9 @@ C<POST /_plugins/_flow_framework/workflow/{workflow_id}/_deprovision>
         'source'        =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for flow_framework.deprovision|https://opensearch.org/docs/latest/automating-configurations/api/deprovision-workflow/>
+L<OpenSearch documentation for flow_framework-E<gt>deprovision|https://opensearch.org/docs/latest/automating-configurations/api/deprovision-workflow/>
     
-=head2 flow_framework->get
+=head2 get
 
 Retrieves a workflow template.
 
@@ -199,9 +199,9 @@ C<GET /_plugins/_flow_framework/workflow/{workflow_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for flow_framework.get|https://opensearch.org/docs/latest/automating-configurations/api/get-workflow/>
+L<OpenSearch documentation for flow_framework-E<gt>get|https://opensearch.org/docs/latest/automating-configurations/api/get-workflow/>
     
-=head2 flow_framework->get_status
+=head2 get_status
 
 Retrieves the current workflow provisioning status.
 
@@ -233,9 +233,9 @@ C<GET /_plugins/_flow_framework/workflow/{workflow_id}/_status>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for flow_framework.get_status|https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-status/>
+L<OpenSearch documentation for flow_framework-E<gt>get_status|https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-status/>
     
-=head2 flow_framework->get_steps
+=head2 get_steps
 
 Retrieves available workflow steps.
 
@@ -263,9 +263,9 @@ C<GET /_plugins/_flow_framework/workflow/_steps>
         'source'         =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for flow_framework.get_steps|https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-steps/>
+L<OpenSearch documentation for flow_framework-E<gt>get_steps|https://opensearch.org/docs/latest/automating-configurations/api/get-workflow-steps/>
     
-=head2 flow_framework->provision
+=head2 provision
 
 Provisioning a workflow. This API is also executed when the Create or Update Workflow API is called with the provision parameter set to true.
 
@@ -295,9 +295,9 @@ C<POST /_plugins/_flow_framework/workflow/{workflow_id}/_provision>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for flow_framework.provision|https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/>
+L<OpenSearch documentation for flow_framework-E<gt>provision|https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/>
     
-=head2 flow_framework->search
+=head2 search
 
 Search for workflows by using a query matching a field.
 
@@ -326,9 +326,9 @@ C<POST /_plugins/_flow_framework/workflow/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for flow_framework.search|https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/>
+L<OpenSearch documentation for flow_framework-E<gt>search|https://opensearch.org/docs/latest/automating-configurations/api/provision-workflow/>
     
-=head2 flow_framework->search_state
+=head2 search_state
 
 Search for workflows by using a query matching a field.
 
@@ -357,9 +357,9 @@ C<POST /_plugins/_flow_framework/workflow/state/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for flow_framework.search_state|https://opensearch.org/docs/latest/automating-configurations/api/search-workflow-state/>
+L<OpenSearch documentation for flow_framework-E<gt>search_state|https://opensearch.org/docs/latest/automating-configurations/api/search-workflow-state/>
     
-=head2 flow_framework->update
+=head2 update
 
 Updates a workflow template that has not been provisioned.
 
@@ -397,7 +397,7 @@ C<PUT /_plugins/_flow_framework/workflow/{workflow_id}>
         'source'         =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for flow_framework.update|https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/>
+L<OpenSearch documentation for flow_framework-E<gt>update|https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/>
 
 =head1 MANUAL
 

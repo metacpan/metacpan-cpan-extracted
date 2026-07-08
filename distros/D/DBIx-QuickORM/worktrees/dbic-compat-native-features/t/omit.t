@@ -43,19 +43,17 @@ do_for_all_dbs {
     $row = undef;
     $row = $orm->handle('example')->one({name => 'a'});
 
-    return;
-
     ok($row, "got row");
     isnt("$row", $addr, "uncached copy");
     ok(!exists($row->row_data->{stored}->{data}), "did not fetch data");
 
     $row = undef;
 
-    $row = $orm->handle('example')->one({name => 'a'}, omit => {'name' => 1});
-    ok(!exists($row->row_data->{stored}->{name}), "Did not fetch name");
+    $row = $orm->handle('example')->omit(['name'])->one({name => 'a'});
+    ok(!exists($row->row_data->{stored}->{name}), "Did not fetch name (query-level omit via omit())");
 
     like(
-        dies { $orm->handle('example')->one({name => 'a'}, omit => {id => 1}) },
+        dies { $orm->handle('example')->omit(['id'])->one({name => 'a'}) },
         qr/Cannot omit primary key field 'id'/,
         "Cannot omit a primary key field"
     );

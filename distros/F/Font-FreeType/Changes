@@ -1,4 +1,7 @@
-0.17
+0.18 2026-07-07 dmol@cpan.org
+ - Fix manifest
+
+0.17 2026-07-02 dmol@cpan.org
  - Include license text
 
 0.16 2020-05-12 dmol@cpan.org

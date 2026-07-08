@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Cxn::Factory;
-$OpenSearch::Client::Cxn::Factory::VERSION = '3.007005';
+$OpenSearch::Client::Cxn::Factory::VERSION = '3.007006';
 use Moo;
 use OpenSearch::Client::Util qw(parse_params load_plugin);
 use namespace::clean;
@@ -71,7 +71,7 @@ OpenSearch::Client::Cxn::Factory - Used by CxnPools to create new Cxn instances.
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 DESCRIPTION
 

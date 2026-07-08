@@ -1,0 +1,135 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Scan lib/ for STYLE_GUIDE.md "Naming and structure" violations:
+# named subs defined in object modules (use Object::HashBase, or
+# `with '...'`) must be methods. A method either shifts an invokant,
+# declares it via `my ($self, ...) = @_;`, or accesses $_[0] as the
+# invokant. Bare `sub name { ... }` with no invokant touch is a
+# function and a violation.
+#
+# Constants / declarative metadata (TABLE, COLUMNS, etc.) and Perl
+# specials (DESTROY, BEGIN, ...) are allowed to be argless. Two further
+# shapes are allowed (see STYLE_GUIDE.md "Naming and structure"):
+#   - a no-op stub whose body is empty or a bare `return` (it ignores its
+#     args and returns nothing regardless of how it is called);
+#   - a deliberate dual-call helper that reads its argument positionally
+#     via `pop` (works both as a function and as a method).
+#
+# Exits 1 on any violation, 0 on clean.
+#
+# Heuristic-driven: walks each sub's declaration line plus its first
+# ~8 body lines looking for the invokant. The declaration line is
+# included so signature-style methods (`sub foo ($self, ...)`) count
+# their signature invokant. Multi-line / complex methods stay clean
+# because the invokant pickup almost always lives in the signature or
+# at the very top of the sub.
+
+use File::Find ();
+
+my @ROOTS = @ARGV ? @ARGV : ('lib');
+
+my %SPECIAL = map { $_ => 1 } qw(
+    BEGIN END INIT CHECK UNITCHECK DESTROY AUTOLOAD CLONE CLONE_SKIP
+    import unimport
+);
+
+my %ALLOW_ARGLESS_CONSTANT = map { $_ => 1 } qw(
+    TABLE PRIMARY_KEY COLUMNS JSON_COLUMNS ROW DB_CLASS
+);
+
+my @hits;
+
+for my $root (@ROOTS) {
+    File::Find::find(
+        {
+            no_chdir => 1,
+            wanted   => sub {
+                return unless /\.pm\z/ && -f $File::Find::name;
+                _audit_file($File::Find::name);
+            },
+        },
+        $root,
+    );
+}
+
+if (@hits) {
+    print "STYLE_GUIDE.md \"Naming and structure\" violations:\n";
+    print "  $_\n" for @hits;
+    print "\nFix by either accepting an invokant (`my \$self = shift;`)\n";
+    print "or calling via the invokant (\$obj->name(...)) per STYLE_GUIDE.md.\n";
+    exit 1;
+}
+
+print "OK: no named function-style subs in object modules.\n";
+exit 0;
+
+sub _audit_file {
+    my ($path) = @_;
+    open(my $fh, '<', $path) or die "open '$path': $!";
+    my @lines = <$fh>;
+    close($fh);
+    chomp @lines;
+
+    my $src = join("\n", @lines);
+    return unless $src =~ /^use Object::HashBase\b|^with\s+['"]|^with\s+qw/m;
+
+    for (my $i = 0; $i < @lines; $i++) {
+        next unless $lines[$i] =~ /^sub ([a-zA-Z_][a-zA-Z0-9_]*)\s*[\({]/;
+        my $name  = $1;
+        my $start = $i + 1;
+
+        next if $SPECIAL{$name};
+        next if $ALLOW_ARGLESS_CONSTANT{$name};
+
+        # If sub opens and closes on the same line, look at that single
+        # line for $_[0] / shift; otherwise scan the next ~6 lines.
+        my $oneliner = $lines[$i];
+        if ($oneliner =~ /\}\s*$/ && $oneliner =~ /\{(.*)\}/) {
+            my $body = $1;
+            next if _has_invokant($body);
+            next if _is_constant_body($body);
+            next if _is_noop_body($body);
+            push @hits, "$path:$start sub $name";
+            next;
+        }
+
+        my $body = $lines[$i] . "\n";
+        for my $k (1 .. 8) {
+            last if $i + $k >= @lines;
+            last if $lines[$i + $k] =~ /^sub\s/;
+            $body .= $lines[$i + $k] . "\n";
+        }
+
+        next if _has_invokant($body);
+        next if _is_constant_body($body);
+        next if _is_noop_body($body);
+        push @hits, "$path:$start sub $name";
+    }
+}
+
+sub _has_invokant {
+    my ($body) = @_;
+    return 1 if $body =~ /\$self\b/;
+    return 1 if $body =~ /\$class\b/;
+    return 1 if $body =~ /\bshift\s*[;\(]/;
+    return 1 if $body =~ /\$_\[0\]/;
+    # A deliberate dual-call helper reads its argument positionally via pop
+    # so it works both as a function and as a method (STYLE_GUIDE.md).
+    return 1 if $body =~ /\bpop\b/;
+    return 0;
+}
+
+# A no-op stub whose body is empty or just `return` is allowed to be argless:
+# it ignores its arguments and returns nothing however it is called.
+sub _is_noop_body {
+    my ($body) = @_;
+    return $body =~ /\A\s*(?:return\s*;?\s*)?\z/ ? 1 : 0;
+}
+
+sub _is_constant_body {
+    my ($body) = @_;
+    return 1 if $body =~ /^\s*(?:return\s+)?(['"\d\[\{]|qw[\s\W])/;
+    return 0;
+}

@@ -1,7 +1,7 @@
 # ABSTRACT: Generate board context summary for embedding
 
 package App::karr::Cmd::Context;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -120,6 +120,12 @@ sub execute {
 
 sub _render_markdown {
   my ($self, $board_name, $total, $active, $blocked, $overdue, $sections) = @_;
+  # The "kanban-md" spelling in these BEGIN/END markers (and the matching
+  # regex in _write_to_file below) is an intentional interop contract: karr
+  # and kanban-md maintain the same context block inside a shared host file
+  # (e.g. AGENTS.md) by matching identical sentinels, so switching tools
+  # updates the same block and leaves no orphaned markers. Do NOT rename to
+  # "karr".
   my $md = "<!-- BEGIN kanban-md context -->\n";
   $md .= "## Board: $board_name\n\n";
   $md .= "**$total tasks** | $active active | $blocked blocked | $overdue overdue\n\n";
@@ -211,7 +217,7 @@ App::karr::Cmd::Context - Generate board context summary for embedding
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

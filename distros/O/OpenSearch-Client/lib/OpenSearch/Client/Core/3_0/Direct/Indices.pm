@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Indices;
-$OpenSearch::Client::Core::3_0::Direct::Indices::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Indices::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Indices>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for indices.|https://docs.opensearch.org/latest/a
 
 =head1 METHODS
     
-=head2 indices->add_block
+=head2 add_block
 
 Adds a block to an index.
 
@@ -105,9 +105,9 @@ C<PUT /{index}/_block/{block}>
         'source'                   =>  $qval11,    # string
     );
 
-L<OpenSearch documentation for indices.add_block|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>add_block|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->analyze
+=head2 analyze
 
 Performs the analysis process on a text and return the tokens breakdown of the text.
 
@@ -150,9 +150,9 @@ C<POST /{index}/_analyze>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for indices.analyze|https://opensearch.org/docs/latest/api-reference/analyze-apis/perform-text-analysis/>
+L<OpenSearch documentation for indices-E<gt>analyze|https://opensearch.org/docs/latest/api-reference/analyze-apis/perform-text-analysis/>
     
-=head2 indices->clear_cache
+=head2 clear_cache
 
 Clears all or specific caches for one or more indexes.
 
@@ -195,9 +195,9 @@ C<POST /{index}/_cache/clear>
         'source'              =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for indices.clear_cache|https://opensearch.org/docs/latest/api-reference/index-apis/clear-index-cache/>
+L<OpenSearch documentation for indices-E<gt>clear_cache|https://opensearch.org/docs/latest/api-reference/index-apis/clear-index-cache/>
     
-=head2 indices->clone
+=head2 clone
 
 Clones an index.
 
@@ -240,9 +240,9 @@ C<PUT /{index}/_clone/{target}>
         'source'                   =>  $qval11,    # string
     );
 
-L<OpenSearch documentation for indices.clone|https://opensearch.org/docs/latest/api-reference/index-apis/clone/>
+L<OpenSearch documentation for indices-E<gt>clone|https://opensearch.org/docs/latest/api-reference/index-apis/clone/>
     
-=head2 indices->close
+=head2 close
 
 Closes an index.
 
@@ -280,9 +280,9 @@ C<POST /{index}/_close>
         'source'                   =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for indices.close|https://opensearch.org/docs/latest/api-reference/index-apis/close-index/>
+L<OpenSearch documentation for indices-E<gt>close|https://opensearch.org/docs/latest/api-reference/index-apis/close-index/>
     
-=head2 indices->create
+=head2 create
 
 Creates an index with optional settings and mappings.
 
@@ -319,9 +319,9 @@ C<PUT /{index}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.create|https://opensearch.org/docs/latest/api-reference/index-apis/create-index/>
+L<OpenSearch documentation for indices-E<gt>create|https://opensearch.org/docs/latest/api-reference/index-apis/create-index/>
     
-=head2 indices->create_data_stream
+=head2 create_data_stream
 
 Creates or updates a data stream.
 
@@ -351,9 +351,9 @@ C<PUT /_data_stream/{name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for indices.create_data_stream|https://opensearch.org/docs/latest/im-plugin/data-streams/>
+L<OpenSearch documentation for indices-E<gt>create_data_stream|https://opensearch.org/docs/latest/im-plugin/data-streams/>
     
-=head2 indices->data_streams_stats
+=head2 data_streams_stats
 
 Provides statistics on operations happening in a data stream.
 
@@ -384,9 +384,9 @@ C<GET /_data_stream/{name}/_stats>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for indices.data_streams_stats|https://opensearch.org/docs/latest/im-plugin/data-streams/>
+L<OpenSearch documentation for indices-E<gt>data_streams_stats|https://opensearch.org/docs/latest/im-plugin/data-streams/>
     
-=head2 indices->delete
+=head2 delete
 
 Deletes an index.
 
@@ -423,9 +423,9 @@ C<DELETE /{index}>
         'source'                   =>  $qval11,    # string
     );
 
-L<OpenSearch documentation for indices.delete|https://opensearch.org/docs/latest/api-reference/index-apis/delete-index/>
+L<OpenSearch documentation for indices-E<gt>delete|https://opensearch.org/docs/latest/api-reference/index-apis/delete-index/>
     
-=head2 indices->delete_alias
+=head2 delete_alias
 
 Deletes an alias.
 
@@ -463,9 +463,9 @@ C<DELETE /{index}/_aliases/{name}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for indices.delete_alias|https://opensearch.org/docs/latest/im-plugin/index-alias/#delete-aliases>
+L<OpenSearch documentation for indices-E<gt>delete_alias|https://opensearch.org/docs/latest/im-plugin/index-alias/#delete-aliases>
     
-=head2 indices->delete_data_stream
+=head2 delete_data_stream
 
 Deletes a data stream.
 
@@ -493,9 +493,9 @@ C<DELETE /_data_stream/{name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for indices.delete_data_stream|https://opensearch.org/docs/latest/im-plugin/data-streams/>
+L<OpenSearch documentation for indices-E<gt>delete_data_stream|https://opensearch.org/docs/latest/im-plugin/data-streams/>
     
-=head2 indices->delete_index_template
+=head2 delete_index_template
 
 Deletes an index template.
 
@@ -529,9 +529,9 @@ C<DELETE /_index_template/{name}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for indices.delete_index_template|https://opensearch.org/docs/latest/im-plugin/index-templates/#delete-a-template>
+L<OpenSearch documentation for indices-E<gt>delete_index_template|https://opensearch.org/docs/latest/im-plugin/index-templates/#delete-a-template>
     
-=head2 indices->delete_template
+=head2 delete_template
 
 Deletes an index template.
 
@@ -565,9 +565,9 @@ C<DELETE /_template/{name}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for indices.delete_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>delete_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->exists
+=head2 exists
 
 Returns information about whether a particular index exists.
 
@@ -605,9 +605,9 @@ C<HEAD /{index}>
         'source'                   =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for indices.exists|https://opensearch.org/docs/latest/api-reference/index-apis/exists/>
+L<OpenSearch documentation for indices-E<gt>exists|https://opensearch.org/docs/latest/api-reference/index-apis/exists/>
     
-=head2 indices->exists_alias
+=head2 exists_alias
 
 Returns information about whether a particular alias exists.
 
@@ -646,9 +646,9 @@ C<HEAD /{index}/_alias/{name}>
         'source'              =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.exists_alias|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>exists_alias|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->exists_index_template
+=head2 exists_index_template
 
 Returns information about whether a particular index template exists.
 
@@ -683,9 +683,9 @@ C<HEAD /_index_template/{name}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.exists_index_template|https://opensearch.org/docs/latest/im-plugin/index-templates/>
+L<OpenSearch documentation for indices-E<gt>exists_index_template|https://opensearch.org/docs/latest/im-plugin/index-templates/>
     
-=head2 indices->exists_template
+=head2 exists_template
 
 Returns information about whether a particular index template exists.
 
@@ -720,9 +720,9 @@ C<HEAD /_template/{name}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.exists_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>exists_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->flush
+=head2 flush
 
 Performs the flush operation on one or more indexes.
 
@@ -767,9 +767,9 @@ C<POST /{index}/_flush>
         'source'              =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for indices.flush|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>flush|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->forcemerge
+=head2 forcemerge
 
 Performs the force merge operation on one or more indexes.
 
@@ -811,9 +811,9 @@ C<POST /{index}/_forcemerge>
         'source'                =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for indices.forcemerge|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>forcemerge|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->get
+=head2 get
 
 Returns information about one or more indexes.
 
@@ -852,9 +852,9 @@ C<GET /{index}>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for indices.get|https://opensearch.org/docs/latest/api-reference/index-apis/get-index/>
+L<OpenSearch documentation for indices-E<gt>get|https://opensearch.org/docs/latest/api-reference/index-apis/get-index/>
     
-=head2 indices->get_alias
+=head2 get_alias
 
 Returns an alias.
 
@@ -899,9 +899,9 @@ C<GET /{index}/_alias/{name}>
         'source'              =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.get_alias|https://opensearch.org/docs/latest/im-plugin/index-alias/>
+L<OpenSearch documentation for indices-E<gt>get_alias|https://opensearch.org/docs/latest/im-plugin/index-alias/>
     
-=head2 indices->get_data_stream
+=head2 get_data_stream
 
 Returns data streams.
 
@@ -932,9 +932,9 @@ C<GET /_data_stream/{name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for indices.get_data_stream|https://opensearch.org/docs/latest/im-plugin/data-streams/>
+L<OpenSearch documentation for indices-E<gt>get_data_stream|https://opensearch.org/docs/latest/im-plugin/data-streams/>
     
-=head2 indices->get_field_mapping
+=head2 get_field_mapping
 
 Returns mapping for one or more fields.
 
@@ -974,9 +974,9 @@ C<GET /{index}/_mapping/field/{fields}>
         'source'              =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for indices.get_field_mapping|https://opensearch.org/docs/latest/field-types/index/>
+L<OpenSearch documentation for indices-E<gt>get_field_mapping|https://opensearch.org/docs/latest/field-types/index/>
     
-=head2 indices->get_index_template
+=head2 get_index_template
 
 Returns an index template.
 
@@ -1014,9 +1014,9 @@ C<GET /_index_template/{name}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.get_index_template|https://opensearch.org/docs/latest/im-plugin/index-templates/>
+L<OpenSearch documentation for indices-E<gt>get_index_template|https://opensearch.org/docs/latest/im-plugin/index-templates/>
     
-=head2 indices->get_mapping
+=head2 get_mapping
 
 Returns mappings for one or more indexes.
 
@@ -1057,9 +1057,9 @@ C<GET /{index}/_mapping>
         'source'                   =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for indices.get_mapping|https://opensearch.org/docs/latest/field-types/index/#get-a-mapping>
+L<OpenSearch documentation for indices-E<gt>get_mapping|https://opensearch.org/docs/latest/field-types/index/#get-a-mapping>
     
-=head2 indices->get_settings
+=head2 get_settings
 
 Returns settings for one or more indexes.
 
@@ -1108,9 +1108,9 @@ C<GET /{index}/_settings/{name}>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for indices.get_settings|https://opensearch.org/docs/latest/api-reference/index-apis/get-settings/>
+L<OpenSearch documentation for indices-E<gt>get_settings|https://opensearch.org/docs/latest/api-reference/index-apis/get-settings/>
     
-=head2 indices->get_template
+=head2 get_template
 
 Returns an index template.
 
@@ -1148,9 +1148,9 @@ C<GET /_template/{name}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.get_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>get_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->get_upgrade
+=head2 get_upgrade
 
 The `_upgrade` API is no longer useful and will be removed.
 
@@ -1187,9 +1187,9 @@ C<GET /{index}/_upgrade>
         'source'              =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for indices.get_upgrade|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>get_upgrade|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->open
+=head2 open
 
 Opens an index.
 
@@ -1229,9 +1229,9 @@ C<POST /{index}/_open>
         'source'                   =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for indices.open|https://opensearch.org/docs/latest/api-reference/index-apis/open-index/>
+L<OpenSearch documentation for indices-E<gt>open|https://opensearch.org/docs/latest/api-reference/index-apis/open-index/>
     
-=head2 indices->put_alias
+=head2 put_alias
 
 Creates or updates an alias.
 
@@ -1298,9 +1298,9 @@ C<PUT /{index}/_aliases/{name}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for indices.put_alias|https://opensearch.org/docs/latest/api-reference/index-apis/update-alias/>
+L<OpenSearch documentation for indices-E<gt>put_alias|https://opensearch.org/docs/latest/api-reference/index-apis/update-alias/>
     
-=head2 indices->put_index_template
+=head2 put_index_template
 
 Creates or updates an index template.
 
@@ -1340,9 +1340,9 @@ C<PUT /_index_template/{name}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.put_index_template|https://opensearch.org/docs/latest/im-plugin/index-templates/>
+L<OpenSearch documentation for indices-E<gt>put_index_template|https://opensearch.org/docs/latest/im-plugin/index-templates/>
     
-=head2 indices->put_mapping
+=head2 put_mapping
 
 Updates the index mappings.
 
@@ -1385,9 +1385,9 @@ C<PUT /{index}/_mapping>
         'source'                   =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for indices.put_mapping|https://opensearch.org/docs/latest/api-reference/index-apis/put-mapping/>
+L<OpenSearch documentation for indices-E<gt>put_mapping|https://opensearch.org/docs/latest/api-reference/index-apis/put-mapping/>
     
-=head2 indices->put_settings
+=head2 put_settings
 
 Updates the index settings.
 
@@ -1431,9 +1431,9 @@ C<PUT /{index}/_settings>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for indices.put_settings|https://opensearch.org/docs/latest/api-reference/index-apis/update-settings/>
+L<OpenSearch documentation for indices-E<gt>put_settings|https://opensearch.org/docs/latest/api-reference/index-apis/update-settings/>
     
-=head2 indices->put_template
+=head2 put_template
 
 Creates or updates an index template.
 
@@ -1473,9 +1473,9 @@ C<PUT /_template/{name}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.put_template|https://opensearch.org/docs/latest/im-plugin/index-templates/>
+L<OpenSearch documentation for indices-E<gt>put_template|https://opensearch.org/docs/latest/im-plugin/index-templates/>
     
-=head2 indices->recovery
+=head2 recovery
 
 Returns information about ongoing index shard recoveries.
 
@@ -1511,9 +1511,9 @@ C<GET /{index}/_recovery>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for indices.recovery|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>recovery|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->refresh
+=head2 refresh
 
 Performs the refresh operation in one or more indexes.
 
@@ -1556,9 +1556,9 @@ C<POST /{index}/_refresh>
         'source'              =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for indices.refresh|https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/remote-store/index/#refresh-level-and-request-level-durability>
+L<OpenSearch documentation for indices-E<gt>refresh|https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/remote-store/index/#refresh-level-and-request-level-durability>
     
-=head2 indices->resolve_index
+=head2 resolve_index
 
 Returns information about any matching indexes, aliases, and data streams.
 
@@ -1590,9 +1590,9 @@ C<GET /_resolve/index/{name}>
         'source'            =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for indices.resolve_index|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>resolve_index|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->rollover
+=head2 rollover
 
 Updates an alias to point to a new index when the existing index
 is considered to be too large or too old.
@@ -1635,9 +1635,9 @@ C<POST /{alias}/_rollover/{new_index}>
         'source'                   =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for indices.rollover|https://opensearch.org/docs/latest/dashboards/im-dashboards/rollover/>
+L<OpenSearch documentation for indices-E<gt>rollover|https://opensearch.org/docs/latest/dashboards/im-dashboards/rollover/>
     
-=head2 indices->segments
+=head2 segments
 
 Provides low-level information about segments in a Lucene index.
 
@@ -1675,9 +1675,9 @@ C<GET /{index}/_segments>
         'source'              =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.segments|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>segments|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->shard_stores
+=head2 shard_stores
 
 Provides store information for shard copies of indexes.
 
@@ -1715,9 +1715,9 @@ C<GET /{index}/_shard_stores>
         'source'              =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.shard_stores|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>shard_stores|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->shrink
+=head2 shrink
 
 Allow to shrink an existing index into a new index with fewer primary shards.
 
@@ -1761,9 +1761,9 @@ C<PUT /{index}/_shrink/{target}>
         'source'                   =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for indices.shrink|https://opensearch.org/docs/latest/api-reference/index-apis/shrink-index/>
+L<OpenSearch documentation for indices-E<gt>shrink|https://opensearch.org/docs/latest/api-reference/index-apis/shrink-index/>
     
-=head2 indices->simulate_index_template
+=head2 simulate_index_template
 
 Simulate matching the given index name against the index templates in the system.
 
@@ -1798,9 +1798,9 @@ C<POST /_index_template/_simulate_index/{name}>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for indices.simulate_index_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>simulate_index_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->simulate_template
+=head2 simulate_template
 
 Simulate resolving the given template name or body.
 
@@ -1840,9 +1840,9 @@ C<POST /_index_template/_simulate/{name}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for indices.simulate_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>simulate_template|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->split
+=head2 split
 
 Allows you to split an existing index into a new index with more primary shards.
 
@@ -1886,9 +1886,9 @@ C<PUT /{index}/_split/{target}>
         'source'                   =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for indices.split|https://opensearch.org/docs/latest/api-reference/index-apis/split/>
+L<OpenSearch documentation for indices-E<gt>split|https://opensearch.org/docs/latest/api-reference/index-apis/split/>
     
-=head2 indices->stats
+=head2 stats
 
 Provides statistics on operations happening in an index.
 
@@ -1938,9 +1938,9 @@ C<GET /{index}/_stats/{metric}>
         'source'                      =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for indices.stats|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>stats|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->update_aliases
+=head2 update_aliases
 
 Updates index aliases.
 
@@ -1972,9 +1972,9 @@ C<POST /_aliases>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for indices.update_aliases|https://opensearch.org/docs/latest/api-reference/index-apis/alias/>
+L<OpenSearch documentation for indices-E<gt>update_aliases|https://opensearch.org/docs/latest/api-reference/index-apis/alias/>
     
-=head2 indices->upgrade
+=head2 upgrade
 
 The `_upgrade` API is no longer useful and will be removed.
 
@@ -2013,9 +2013,9 @@ C<POST /{index}/_upgrade>
         'source'                 =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for indices.upgrade|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>upgrade|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
     
-=head2 indices->validate_query
+=head2 validate_query
 
 Allows a user to validate a potentially expensive query without executing it.
 
@@ -2069,7 +2069,7 @@ C<POST /{index}/_validate/query>
         'source'              =>  $qval17,    # string
     );
 
-L<OpenSearch documentation for indices.validate_query|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+L<OpenSearch documentation for indices-E<gt>validate_query|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
 
 =head1 MANUAL
 

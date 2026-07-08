@@ -38,7 +38,7 @@ Readonly my $TYPE_STRING  => 'string';
 # --------------------------------------------------
 Readonly my @JSON_MODULES => qw(JSON::MaybeXS JSON);
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 =head1 NAME
 
@@ -46,7 +46,7 @@ App::Test::Generator::CoverageGuidedFuzzer - AFL-style coverage-guided fuzzing f
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,11 @@ Version 0.41
     );
 
     my $report = $fuzzer->run();
+
+    # Optional: trim corpus to minimum branch-covering subset before saving
+    my $stats = $fuzzer->minimize_corpus();
+    printf "corpus %d -> %d entries\n", $stats->{before}, $stats->{after};
+
     $fuzzer->save_corpus('t/corpus/validate.json');
 
 =head1 DESCRIPTION
@@ -436,6 +441,128 @@ sub load_corpus {
 			coverage => {},
 		};
 	}
+}
+
+=head2 minimize_corpus
+
+Reduce the corpus to the smallest subset that still covers every
+branch hit by the full corpus, using a greedy set-cover algorithm.
+
+Entries without branch data (loaded from a previous run, or kept by
+random sampling when Devel::Cover is unavailable) are deduplicated by
+input fingerprint and retained in full — they cannot be evaluated for
+coverage contribution without re-running them.  Bug-triggering inputs
+are always kept regardless of coverage contribution.
+
+    my $stats = $fuzzer->minimize_corpus();
+    printf "Corpus: %d -> %d entries (%d branches covered)\n",
+        $stats->{before}, $stats->{after}, $stats->{branches};
+
+=head3 Returns
+
+A hashref with keys C<before> (corpus size before), C<after> (corpus
+size after), and C<branches> (total unique branches still covered).
+
+=head3 API specification
+
+=head4 input
+
+    { self => { type => OBJECT, isa => 'App::Test::Generator::CoverageGuidedFuzzer' } }
+
+=head4 output
+
+    {
+        type       => HASHREF,
+        constraint => sub { defined $_[0]{before} && defined $_[0]{after} && defined $_[0]{branches} },
+    }
+
+=cut
+
+sub minimize_corpus {
+	my ($self) = @_;
+
+	my @all    = @{ $self->{corpus} };
+	my $before = scalar @all;
+
+	my @with_cov    = grep {  %{ $_->{coverage} } } @all;
+	my @without_cov = grep { !%{ $_->{coverage} } } @all;
+
+	# Greedy set-cover: find the smallest subset of with-coverage entries
+	# that still covers every branch seen across the whole corpus.
+	my %uncovered;
+	$uncovered{$_} = 1 for map { keys %{ $_->{coverage} } } @with_cov;
+	my $total_branches = scalar keys %uncovered;
+
+	my @selected;
+	while (%uncovered && @with_cov) {
+		my ($best, $best_idx, $best_n) = (undef, -1, 0);
+		for my $i (0 .. $#with_cov) {
+			my $n = grep { $uncovered{$_} } keys %{ $with_cov[$i]{coverage} };
+			if ($n > $best_n) {
+				$best_n   = $n;
+				$best_idx = $i;
+				$best     = $with_cov[$i];
+			}
+		}
+		last unless $best_n;
+
+		push @selected, $best;
+		splice @with_cov, $best_idx, 1;
+		delete $uncovered{$_} for keys %{ $best->{coverage} };
+	}
+
+	# Deduplicate no-coverage entries by input fingerprint so that repeated
+	# loads of the same corpus file do not cause the entry count to grow.
+	my %seen;
+	my @deduped;
+	for my $entry (@without_cov) {
+		my $key = _fingerprint($entry->{input});
+		next if $seen{$key}++;
+		push @deduped, $entry;
+	}
+
+	my @minimized = (@selected, @deduped);
+
+	# Bug-triggering inputs are always kept — they are the most valuable
+	# findings regardless of whether they add unique branch coverage.
+	my %kept = map { _fingerprint($_->{input}) => 1 } @minimized;
+	for my $bug (@{ $self->{bugs} }) {
+		my $key = _fingerprint($bug->{input});
+		unless ($kept{$key}++) {
+			push @minimized, { input => $bug->{input}, coverage => {} };
+		}
+	}
+
+	$self->{corpus} = \@minimized;
+
+	return {
+		before   => $before,
+		after    => scalar @minimized,
+		branches => $total_branches,
+	};
+}
+
+# --------------------------------------------------
+# _fingerprint
+#
+# Purpose:    Produce a stable, canonical string key
+#             for an arbitrary Perl value, for use as
+#             a deduplication key.
+#
+# Entry:      $val - any Perl value (scalar, ref, undef).
+# Exit:       Returns a deterministic string.
+# Side effects: None.
+#
+# Notes:      Uses the JSON module in canonical mode so
+#             hash keys are always sorted.  Avoids
+#             Data::Dumper whose output includes blessed
+#             class names that vary across Perl versions.
+# --------------------------------------------------
+sub _fingerprint {
+	my ($val) = @_;
+	return 'null' unless defined $val;
+	my $mod = _load_json_module();
+	return eval { $mod->new->canonical(1)->encode($val) } // "$val";
 }
 
 # --------------------------------------------------

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Ingest;
-$OpenSearch::Client::Core::3_0::Direct::Ingest::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Ingest::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Ingest>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for ingest.|https://docs.opensearch.org/latest/ap
 
 =head1 METHODS
     
-=head2 ingest->delete_pipeline
+=head2 delete_pipeline
 
 Deletes an ingest pipeline.
 
@@ -101,9 +101,9 @@ C<DELETE /_ingest/pipeline/{id}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for ingest.delete_pipeline|https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/>
+L<OpenSearch documentation for ingest-E<gt>delete_pipeline|https://opensearch.org/docs/latest/api-reference/ingest-apis/delete-ingest/>
     
-=head2 ingest->get_pipeline
+=head2 get_pipeline
 
 Returns an ingest pipeline.
 
@@ -139,9 +139,9 @@ C<GET /_ingest/pipeline/{id}>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ingest.get_pipeline|https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/>
+L<OpenSearch documentation for ingest-E<gt>get_pipeline|https://opensearch.org/docs/latest/api-reference/ingest-apis/get-ingest/>
     
-=head2 ingest->processor_grok
+=head2 processor_grok
 
 Returns a list of built-in grok patterns.
 
@@ -169,9 +169,9 @@ C<GET /_ingest/processor/grok>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ingest.processor_grok|https://docs.opensearch.org/latest/api-reference/ingest-apis/index/>
+L<OpenSearch documentation for ingest-E<gt>processor_grok|https://docs.opensearch.org/latest/api-reference/ingest-apis/index/>
     
-=head2 ingest->put_pipeline
+=head2 put_pipeline
 
 Creates or updates an ingest pipeline.
 
@@ -207,9 +207,9 @@ C<PUT /_ingest/pipeline/{id}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for ingest.put_pipeline|https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/>
+L<OpenSearch documentation for ingest-E<gt>put_pipeline|https://docs.opensearch.org/latest/ingest-pipelines/create-ingest/>
     
-=head2 ingest->simulate
+=head2 simulate
 
 Simulates an ingest pipeline with example documents.
 
@@ -252,7 +252,7 @@ C<POST /_ingest/pipeline/{id}/_simulate>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ingest.simulate|https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/>
+L<OpenSearch documentation for ingest-E<gt>simulate|https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/>
 
 =head1 MANUAL
 

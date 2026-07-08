@@ -3,7 +3,7 @@ package Chandra::Pack;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
 use File::Raw qw(import);
 use Cwd ();
@@ -864,6 +864,8 @@ sub _dir_size {
 1;
 
 __END__
+
+=encoding utf8
 
 =head1 NAME
 

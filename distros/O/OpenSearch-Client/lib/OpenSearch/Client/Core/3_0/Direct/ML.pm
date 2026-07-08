@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::ML;
-$OpenSearch::Client::Core::3_0::Direct::ML::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::ML::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::ML>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for ml.|https://docs.opensearch.org/latest/ml-com
 
 =head1 METHODS
     
-=head2 ml->add_agentic_memory
+=head2 add_agentic_memory
 
 Add agentic memory to a memory container.
 
@@ -97,9 +97,9 @@ C<POST /_plugins/_ml/memory_containers/{memory_container_id}/memories>
         'source'               =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.add_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>add_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->chunk_model
+=head2 chunk_model
 
 Uploads model chunk.
 
@@ -130,9 +130,9 @@ C<POST /_plugins/_ml/models/{model_id}/chunk/{chunk_number}>
         'source'        =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.chunk_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>chunk_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->create_connector
+=head2 create_connector
 
 Creates a standalone connector.
 
@@ -158,9 +158,9 @@ C<POST /_plugins/_ml/connectors/_create>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.create_connector|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>create_connector|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->create_controller
+=head2 create_controller
 
 Creates a controller.
 
@@ -190,9 +190,9 @@ C<POST /_plugins/_ml/controllers/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.create_controller|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>create_controller|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->create_memory
+=head2 create_memory
 
 Create a memory.
 
@@ -218,9 +218,9 @@ C<POST /_plugins/_ml/memory>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.create_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>create_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->create_memory_container
+=head2 create_memory_container
 
 Create a memory container.
 
@@ -246,9 +246,9 @@ C<POST /_plugins/_ml/memory_containers/_create>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.create_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>create_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->create_memory_container_session
+=head2 create_memory_container_session
 
 Create session in a memory container.
 
@@ -278,9 +278,9 @@ C<POST /_plugins/_ml/memory_containers/{memory_container_id}/memories/sessions>
         'source'               =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.create_memory_container_session|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>create_memory_container_session|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->create_message
+=head2 create_message
 
 Create a message.
 
@@ -310,9 +310,9 @@ C<POST /_plugins/_ml/memory/{memory_id}/messages>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.create_message|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>create_message|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->create_model_meta
+=head2 create_model_meta
 
 Registers model metadata.
 
@@ -338,9 +338,9 @@ C<POST /_plugins/_ml/models/meta>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.create_model_meta|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>create_model_meta|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_agent
+=head2 delete_agent
 
 Delete an agent.
 
@@ -368,9 +368,9 @@ C<DELETE /_plugins/_ml/agents/{agent_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.delete_agent|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_agent|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_agentic_memory
+=head2 delete_agentic_memory
 
 Delete a specific memory by its type and ID.
 
@@ -400,9 +400,9 @@ C<DELETE /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{
         'source'               =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.delete_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_agentic_memory_query
+=head2 delete_agentic_memory_query
 
 Delete multiple memories using a query to match specific criteria.
 
@@ -433,9 +433,9 @@ C<POST /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/_de
         'source'               =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.delete_agentic_memory_query|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_agentic_memory_query|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_connector
+=head2 delete_connector
 
 Deletes a standalone connector.
 
@@ -463,9 +463,9 @@ C<DELETE /_plugins/_ml/connectors/{connector_id}>
         'source'        =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.delete_connector|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_connector|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_controller
+=head2 delete_controller
 
 Deletes a controller.
 
@@ -493,9 +493,9 @@ C<DELETE /_plugins/_ml/controllers/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.delete_controller|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_controller|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_memory
+=head2 delete_memory
 
 Delete a memory.
 
@@ -523,9 +523,9 @@ C<DELETE /_plugins/_ml/memory/{memory_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.delete_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_memory_container
+=head2 delete_memory_container
 
 Delete a memory container.
 
@@ -558,9 +558,9 @@ C<DELETE /_plugins/_ml/memory_containers/{memory_container_id}>
         'source'               =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ml.delete_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_model
+=head2 delete_model
 
 Deletes a model.
 
@@ -588,9 +588,9 @@ C<DELETE /_plugins/_ml/models/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.delete_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_model_group
+=head2 delete_model_group
 
 Deletes a model group.
 
@@ -618,9 +618,9 @@ C<DELETE /_plugins/_ml/model_groups/{model_group_id}>
         'source'          =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.delete_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->delete_task
+=head2 delete_task
 
 Deletes a task.
 
@@ -648,9 +648,9 @@ C<DELETE /_plugins/_ml/tasks/{task_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.delete_task|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>delete_task|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->deploy_model
+=head2 deploy_model
 
 Deploys a model.
 
@@ -678,9 +678,9 @@ C<POST /_plugins/_ml/models/{model_id}/_deploy>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.deploy_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>deploy_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->execute_agent
+=head2 execute_agent
 
 Execute an agent.
 
@@ -710,9 +710,9 @@ C<POST /_plugins/_ml/agents/{agent_id}/_execute>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.execute_agent|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>execute_agent|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->execute_agent_stream
+=head2 execute_agent_stream
 
 Execute an agent in streaming mode.
 
@@ -742,9 +742,9 @@ C<POST /_plugins/_ml/agents/{agent_id}/_execute/stream>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.execute_agent_stream|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>execute_agent_stream|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->execute_algorithm
+=head2 execute_algorithm
 
 Execute an algorithm.
 
@@ -774,9 +774,9 @@ C<POST /_plugins/_ml/_execute/{algorithm_name}>
         'source'          =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.execute_algorithm|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>execute_algorithm|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->execute_tool
+=head2 execute_tool
 
 Execute a tool.
 
@@ -806,9 +806,9 @@ C<POST /_plugins/_ml/tools/_execute/{tool_name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.execute_tool|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>execute_tool|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_agent
+=head2 get_agent
 
 Get an agent.
 
@@ -836,9 +836,9 @@ C<GET /_plugins/_ml/agents/{agent_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_agent|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_agent|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_agentic_memory
+=head2 get_agentic_memory
 
 Get a specific memory by its type and ID.
 
@@ -868,9 +868,9 @@ C<GET /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}
         'source'               =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_all_memories
+=head2 get_all_memories
 
 Get all memories.
 
@@ -899,9 +899,9 @@ C<GET /_plugins/_ml/memory>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ml.get_all_memories|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_all_memories|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_all_messages
+=head2 get_all_messages
 
 Get all messages in a memory.
 
@@ -934,9 +934,9 @@ C<GET /_plugins/_ml/memory/{memory_id}/messages>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ml.get_all_messages|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_all_messages|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_all_tools
+=head2 get_all_tools
 
 Get tools.
 
@@ -960,9 +960,9 @@ C<GET /_plugins/_ml/tools>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_all_tools|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_all_tools|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_connector
+=head2 get_connector
 
 Retrieves a standalone connector.
 
@@ -990,9 +990,9 @@ C<GET /_plugins/_ml/connectors/{connector_id}>
         'source'        =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_connector|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_connector|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_controller
+=head2 get_controller
 
 Retrieves a controller.
 
@@ -1020,9 +1020,9 @@ C<GET /_plugins/_ml/controllers/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_controller|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_controller|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_memory
+=head2 get_memory
 
 Get a memory.
 
@@ -1050,9 +1050,9 @@ C<GET /_plugins/_ml/memory/{memory_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_memory_container
+=head2 get_memory_container
 
 Get a memory container.
 
@@ -1080,9 +1080,9 @@ C<GET /_plugins/_ml/memory_containers/{memory_container_id}>
         'source'               =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_message
+=head2 get_message
 
 Get a message.
 
@@ -1110,9 +1110,9 @@ C<GET /_plugins/_ml/memory/message/{message_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_message|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_message|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_message_traces
+=head2 get_message_traces
 
 Get a message traces.
 
@@ -1145,9 +1145,9 @@ C<GET /_plugins/_ml/memory/message/{message_id}/traces>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ml.get_message_traces|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_message_traces|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_model
+=head2 get_model
 
 Retrieves a model.
 
@@ -1175,9 +1175,9 @@ C<GET /_plugins/_ml/models/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_model_group
+=head2 get_model_group
 
 Retrieves a model group.
 
@@ -1205,9 +1205,9 @@ C<GET /_plugins/_ml/model_groups/{model_group_id}>
         'source'          =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_profile
+=head2 get_profile
 
 Get a profile.
 
@@ -1233,9 +1233,9 @@ C<GET /_plugins/_ml/profile>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_profile|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_profile|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_profile_models
+=head2 get_profile_models
 
 Get a profile models.
 
@@ -1268,9 +1268,9 @@ C<GET /_plugins/_ml/profile/models/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_profile_models|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_profile_models|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_profile_tasks
+=head2 get_profile_tasks
 
 Get a profile tasks.
 
@@ -1303,9 +1303,9 @@ C<GET /_plugins/_ml/profile/tasks/{task_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_profile_tasks|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_profile_tasks|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_stats
+=head2 get_stats
 
 Get stats.
 
@@ -1343,9 +1343,9 @@ C<GET /_plugins/_ml/{node_id}/stats/{stat}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_stats|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_stats|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_task
+=head2 get_task
 
 Retrieves a task.
 
@@ -1373,9 +1373,9 @@ C<GET /_plugins/_ml/tasks/{task_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_task|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_task|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->get_tool
+=head2 get_tool
 
 Get tools.
 
@@ -1403,9 +1403,9 @@ C<GET /_plugins/_ml/tools/{tool_name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.get_tool|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>get_tool|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->load_model
+=head2 load_model
 
 Deploys a model.
 
@@ -1433,9 +1433,9 @@ C<POST /_plugins/_ml/models/{model_id}/_load>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.load_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>load_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->predict
+=head2 predict
 
 Predicts new data with trained model.
 
@@ -1466,9 +1466,9 @@ C<POST /_plugins/_ml/_predict/{algorithm_name}/{model_id}>
         'source'          =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.predict|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>predict|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->predict_model
+=head2 predict_model
 
 Predicts a model.
 
@@ -1498,9 +1498,9 @@ C<POST /_plugins/_ml/models/{model_id}/_predict>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.predict_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>predict_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->predict_model_stream
+=head2 predict_model_stream
 
 Predicts a model in streaming mode.
 
@@ -1530,9 +1530,9 @@ C<POST /_plugins/_ml/models/{model_id}/_predict/stream>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.predict_model_stream|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>predict_model_stream|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->register_agents
+=head2 register_agents
 
 Register an agent.
 
@@ -1558,9 +1558,9 @@ C<POST /_plugins/_ml/agents/_register>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.register_agents|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>register_agents|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->register_model
+=head2 register_model
 
 Registers a model.
 
@@ -1586,9 +1586,9 @@ C<POST /_plugins/_ml/models/_register>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.register_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>register_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->register_model_group
+=head2 register_model_group
 
 Registers a model group.
 
@@ -1614,9 +1614,9 @@ C<POST /_plugins/_ml/model_groups/_register>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.register_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>register_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->register_model_meta
+=head2 register_model_meta
 
 Registers model metadata.
 
@@ -1642,9 +1642,9 @@ C<POST /_plugins/_ml/models/_register_meta>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.register_model_meta|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>register_model_meta|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->search_agentic_memory
+=head2 search_agentic_memory
 
 Search for memories of a specific type within a memory container.
 
@@ -1675,9 +1675,9 @@ C<GET /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/_sea
         'source'               =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.search_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>search_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->search_agents
+=head2 search_agents
 
 Search agents.
 
@@ -1706,9 +1706,9 @@ C<POST /_plugins/_ml/agents/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.search_agents|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>search_agents|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->search_connectors
+=head2 search_connectors
 
 Searches for standalone connectors.
 
@@ -1737,9 +1737,9 @@ C<POST /_plugins/_ml/connectors/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.search_connectors|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>search_connectors|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->search_memory
+=head2 search_memory
 
 Search memory.
 
@@ -1768,9 +1768,9 @@ C<POST /_plugins/_ml/memory/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.search_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>search_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->search_memory_container
+=head2 search_memory_container
 
 Search memory containers.
 
@@ -1799,9 +1799,9 @@ C<POST /_plugins/_ml/memory_containers/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.search_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>search_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->search_message
+=head2 search_message
 
 Search messages.
 
@@ -1834,9 +1834,9 @@ C<POST /_plugins/_ml/memory/{memory_id}/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.search_message|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>search_message|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->search_model_group
+=head2 search_model_group
 
 Searches for model groups.
 
@@ -1865,9 +1865,9 @@ C<POST /_plugins/_ml/model_groups/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.search_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>search_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->search_models
+=head2 search_models
 
 Searches for models.
 
@@ -1896,9 +1896,9 @@ C<POST /_plugins/_ml/models/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.search_models|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>search_models|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->search_tasks
+=head2 search_tasks
 
 Searches for tasks.
 
@@ -1927,9 +1927,9 @@ C<POST /_plugins/_ml/tasks/_search>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.search_tasks|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>search_tasks|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->train
+=head2 train
 
 Trains a model synchronously.
 
@@ -1959,9 +1959,9 @@ C<POST /_plugins/_ml/_train/{algorithm_name}>
         'source'          =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.train|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>train|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->train_predict
+=head2 train_predict
 
 Trains a model and predicts against the same training dataset.
 
@@ -1991,9 +1991,9 @@ C<POST /_plugins/_ml/_train_predict/{algorithm_name}>
         'source'          =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.train_predict|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>train_predict|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->undeploy_model
+=head2 undeploy_model
 
 Undeploys a model.
 
@@ -2026,9 +2026,9 @@ C<POST /_plugins/_ml/models/{model_id}/_undeploy>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.undeploy_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>undeploy_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->unload_model
+=head2 unload_model
 
 Unloads a model.
 
@@ -2061,9 +2061,9 @@ C<POST /_plugins/_ml/models/{model_id}/_unload>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.unload_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>unload_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->update_agentic_memory
+=head2 update_agentic_memory
 
 Update a specific memory by its type and ID.
 
@@ -2095,9 +2095,9 @@ C<PUT /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}
         'source'               =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.update_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>update_agentic_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->update_connector
+=head2 update_connector
 
 Updates a standalone connector.
 
@@ -2127,9 +2127,9 @@ C<PUT /_plugins/_ml/connectors/{connector_id}>
         'source'        =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.update_connector|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>update_connector|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->update_controller
+=head2 update_controller
 
 Updates a controller.
 
@@ -2159,9 +2159,9 @@ C<PUT /_plugins/_ml/controllers/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.update_controller|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>update_controller|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->update_memory
+=head2 update_memory
 
 Update a memory.
 
@@ -2191,9 +2191,9 @@ C<PUT /_plugins/_ml/memory/{memory_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.update_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>update_memory|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->update_memory_container
+=head2 update_memory_container
 
 Update a memory container.
 
@@ -2223,9 +2223,9 @@ C<PUT /_plugins/_ml/memory_containers/{memory_container_id}>
         'source'               =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.update_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>update_memory_container|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->update_message
+=head2 update_message
 
 Update a message.
 
@@ -2255,9 +2255,9 @@ C<PUT /_plugins/_ml/memory/message/{message_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.update_message|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>update_message|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->update_model
+=head2 update_model
 
 Updates a model.
 
@@ -2287,9 +2287,9 @@ C<PUT /_plugins/_ml/models/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.update_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>update_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->update_model_group
+=head2 update_model_group
 
 Updates a model group.
 
@@ -2319,9 +2319,9 @@ C<PUT /_plugins/_ml/model_groups/{model_group_id}>
         'source'          =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.update_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>update_model_group|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->upload_chunk
+=head2 upload_chunk
 
 Uploads model chunk.
 
@@ -2352,9 +2352,9 @@ C<POST /_plugins/_ml/models/{model_id}/upload_chunk/{chunk_number}>
         'source'        =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.upload_chunk|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>upload_chunk|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
     
-=head2 ml->upload_model
+=head2 upload_model
 
 Registers a model.
 
@@ -2380,7 +2380,7 @@ C<POST /_plugins/_ml/models/_upload>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ml.upload_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+L<OpenSearch documentation for ml-E<gt>upload_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
 
 =head1 MANUAL
 

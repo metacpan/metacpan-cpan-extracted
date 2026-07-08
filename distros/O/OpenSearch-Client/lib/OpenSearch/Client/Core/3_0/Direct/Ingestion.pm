@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Ingestion;
-$OpenSearch::Client::Core::3_0::Direct::Ingestion::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Ingestion::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Ingestion>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for ingestion.|https://docs.opensearch.org/latest
 
 =head1 METHODS
     
-=head2 ingestion->get_state
+=head2 get_state
 
 Use this API to retrieve the ingestion state for a given index.
 
@@ -101,9 +101,9 @@ C<GET /{index}/ingestion/_state>
         'source'       =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for ingestion.get_state|https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/>
+L<OpenSearch documentation for ingestion-E<gt>get_state|https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/>
     
-=head2 ingestion->pause
+=head2 pause
 
 Use this API to pause ingestion for a given index.
 
@@ -136,9 +136,9 @@ C<POST /{index}/ingestion/_pause>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ingestion.pause|https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/>
+L<OpenSearch documentation for ingestion-E<gt>pause|https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/>
     
-=head2 ingestion->resume
+=head2 resume
 
 Use this API to resume ingestion for the given index.
 
@@ -173,7 +173,7 @@ C<POST /{index}/ingestion/_resume>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ingestion.resume|https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/>
+L<OpenSearch documentation for ingestion-E<gt>resume|https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/>
 
 =head1 MANUAL
 

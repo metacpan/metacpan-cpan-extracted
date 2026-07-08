@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Neural;
-$OpenSearch::Client::Core::3_0::Direct::Neural::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Neural::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Neural>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for neural.|https://docs.opensearch.org/latest/ve
 
 =head1 METHODS
     
-=head2 neural->stats
+=head2 stats
 
 Provides information about the current status of the neural-search plugin.
 
@@ -113,7 +113,7 @@ C<GET /_plugins/_neural/{node_id}/stats/{stat}>
         'source'                    =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for neural.stats|https://docs.opensearch.org/latest/vector-search/api/neural/>
+L<OpenSearch documentation for neural-E<gt>stats|https://docs.opensearch.org/latest/vector-search/api/neural/>
 
 =head1 MANUAL
 

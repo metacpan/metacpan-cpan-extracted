@@ -39,12 +39,18 @@ unless ($ENV{OS}) {
     exit;
 }
 
-my $api      = "$ENV{CLIENT_VER}::Direct";
-my $cxn      = $ENV{OS_CXN} || do "default_cxn.pl" || die( $@ || $! );
-my $cxn_pool = $ENV{OS_CXN_POOL} || 'Static';
-my $timeout  = $ENV{OS_TIMEOUT} || 30;
+my $api       = "$ENV{CLIENT_VER}::Direct";
+my $cxn       = $ENV{OS_CXN} || do "default_cxn.pl" || die( $@ || $! );
+my $cxn_pool  = $ENV{OS_CXN_POOL} || 'Static';
+my $timeout   = $ENV{OS_TIMEOUT} || 30;
+my $userinfo  = $ENV{OS_USERINFO};
+my $use_https = $ENV{OS_ALWAYS_SSL};
 my @plugins  = split /,/, ( $ENV{OS_PLUGINS} || '' );
 our %Auth;
+
+if ( $userinfo && $use_https ) {
+    %Auth = ( use_https => 1, userinfo => $userinfo );
+}
 
 my $es;
 if ( $ENV{OS} ) {

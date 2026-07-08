@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct;
-$OpenSearch::Client::Core::3_0::Direct::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -159,7 +159,7 @@ B<OpenSearch::Client::Core::3_0::Direct>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -188,7 +188,7 @@ C<$client-E<gt>create( 'index' =E<gt> 'an_index', 'body' =E<gt> $indexdef )>
 
 =back
 
-L<See OpenSearch documentation for $client].|https://docs.opensearch.org/latest/api-reference/>
+L<See OpenSearch documentation for $client|https://docs.opensearch.org/latest/api-reference/>
 
 =head1 METHODS
     
@@ -246,7 +246,7 @@ C<PUT /{index}/_bulk>
         'source'                  =>  $qval16,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>bulk|https://opensearch.org/docs/latest/api-reference/document-apis/bulk/>
+L<OpenSearch documentation for bulk|https://opensearch.org/docs/latest/api-reference/document-apis/bulk/>
     
 =head2 bulk_stream
 
@@ -303,7 +303,7 @@ C<PUT /{index}/_bulk/stream>
         'source'                  =>  $qval17,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>bulk_stream|https://opensearch.org/docs/latest/api-reference/document-apis/bulk-streaming/>
+L<OpenSearch documentation for bulk_stream|https://opensearch.org/docs/latest/api-reference/document-apis/bulk-streaming/>
     
 =head2 clear_scroll
 
@@ -339,7 +339,7 @@ C<DELETE /_search/scroll/{scroll_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>clear_scroll|https://opensearch.org/docs/latest/api-reference/scroll/>
+L<OpenSearch documentation for clear_scroll|https://opensearch.org/docs/latest/api-reference/scroll/>
     
 =head2 count
 
@@ -398,7 +398,7 @@ C<POST /{index}/_count>
         'source'              =>  $qval19,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>count|https://opensearch.org/docs/latest/api-reference/count/>
+L<OpenSearch documentation for count|https://opensearch.org/docs/latest/api-reference/count/>
     
 =head2 create
 
@@ -447,7 +447,7 @@ C<PUT /{index}/_create/{id}>
         'source'                  =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>create|https://opensearch.org/docs/latest/api-reference/document-apis/index-document/>
+L<OpenSearch documentation for create|https://opensearch.org/docs/latest/api-reference/document-apis/index-document/>
     
 =head2 create_pit
 
@@ -486,7 +486,7 @@ C<POST /{index}/_search/point_in_time>
         'source'                      =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>create_pit|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#create-a-pit>
+L<OpenSearch documentation for create_pit|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#create-a-pit>
     
 =head2 delete
 
@@ -529,7 +529,7 @@ C<DELETE /{index}/_doc/{id}>
         'source'                  =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>delete|https://opensearch.org/docs/latest/api-reference/document-apis/delete-document/>
+L<OpenSearch documentation for delete|https://opensearch.org/docs/latest/api-reference/document-apis/delete-document/>
     
 =head2 delete_all_pits
 
@@ -556,7 +556,7 @@ C<DELETE /_search/point_in_time/_all>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>delete_all_pits|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits>
+L<OpenSearch documentation for delete_all_pits|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits>
     
 =head2 delete_by_query
 
@@ -625,7 +625,7 @@ C<POST /{index}/_delete_by_query>
         'source'                  =>  $qval38,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>delete_by_query|https://opensearch.org/docs/latest/api-reference/document-apis/delete-by-query/>
+L<OpenSearch documentation for delete_by_query|https://opensearch.org/docs/latest/api-reference/document-apis/delete-by-query/>
     
 =head2 delete_by_query_rethrottle
 
@@ -660,7 +660,7 @@ C<POST /_delete_by_query/{task_id}/_rethrottle>
         'source'               =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>delete_by_query_rethrottle|https://docs.opensearch.org/latest/api-reference/>
+L<OpenSearch documentation for delete_by_query_rethrottle|https://docs.opensearch.org/latest/api-reference/>
     
 =head2 delete_pit
 
@@ -689,7 +689,7 @@ C<DELETE /_search/point_in_time>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>delete_pit|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits>
+L<OpenSearch documentation for delete_pit|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#delete-pits>
     
 =head2 delete_script
 
@@ -726,7 +726,7 @@ C<DELETE /_scripts/{id}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>delete_script|https://opensearch.org/docs/latest/api-reference/script-apis/delete-script/>
+L<OpenSearch documentation for delete_script|https://opensearch.org/docs/latest/api-reference/script-apis/delete-script/>
     
 =head2 exists
 
@@ -771,7 +771,7 @@ C<HEAD /{index}/_doc/{id}>
         'source'            =>  $qval15,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>exists|https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/>
+L<OpenSearch documentation for exists|https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/>
     
 =head2 exists_source
 
@@ -815,7 +815,7 @@ C<HEAD /{index}/_source/{id}>
         'source'            =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>exists_source|https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/>
+L<OpenSearch documentation for exists_source|https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/>
     
 =head2 explain
 
@@ -867,7 +867,7 @@ C<POST /{index}/_explain/{id}>
         'source'            =>  $qval17,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>explain|https://opensearch.org/docs/latest/api-reference/explain/>
+L<OpenSearch documentation for explain|https://opensearch.org/docs/latest/api-reference/explain/>
     
 =head2 field_caps
 
@@ -917,7 +917,7 @@ C<POST /{index}/_field_caps>
         'source'              =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>field_caps|https://opensearch.org/docs/latest/field-types/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations>
+L<OpenSearch documentation for field_caps|https://opensearch.org/docs/latest/field-types/supported-field-types/alias/#using-aliases-in-field-capabilities-api-operations>
     
 =head2 get
 
@@ -962,7 +962,7 @@ C<GET /{index}/_doc/{id}>
         'source'            =>  $qval15,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>get|https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/>
+L<OpenSearch documentation for get|https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/>
     
 =head2 get_all_pits
 
@@ -989,7 +989,7 @@ C<GET /_search/point_in_time/_all>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>get_all_pits|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#list-all-pits>
+L<OpenSearch documentation for get_all_pits|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/#list-all-pits>
     
 =head2 get_script
 
@@ -1025,7 +1025,7 @@ C<GET /_scripts/{id}>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>get_script|https://opensearch.org/docs/latest/api-reference/script-apis/get-stored-script/>
+L<OpenSearch documentation for get_script|https://opensearch.org/docs/latest/api-reference/script-apis/get-stored-script/>
     
 =head2 get_script_context
 
@@ -1052,7 +1052,7 @@ C<GET /_script_context>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>get_script_context|https://opensearch.org/docs/latest/api-reference/script-apis/get-script-contexts/>
+L<OpenSearch documentation for get_script_context|https://opensearch.org/docs/latest/api-reference/script-apis/get-script-contexts/>
     
 =head2 get_script_languages
 
@@ -1079,7 +1079,7 @@ C<GET /_script_language>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>get_script_languages|https://opensearch.org/docs/latest/api-reference/script-apis/get-script-language/>
+L<OpenSearch documentation for get_script_languages|https://opensearch.org/docs/latest/api-reference/script-apis/get-script-language/>
     
 =head2 get_source
 
@@ -1123,7 +1123,7 @@ C<GET /{index}/_source/{id}>
         'source'            =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>get_source|https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/>
+L<OpenSearch documentation for get_source|https://opensearch.org/docs/latest/api-reference/document-apis/get-documents/>
     
 =head2 index
 
@@ -1177,7 +1177,7 @@ C<PUT /{index}/_doc/{id}>
         'source'                  =>  $qval16,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>index|https://opensearch.org/docs/latest/api-reference/document-apis/index-document/>
+L<OpenSearch documentation for index|https://opensearch.org/docs/latest/api-reference/document-apis/index-document/>
     
 =head2 info
 
@@ -1195,7 +1195,7 @@ C<GET />
 
     $resp = $client->info();
 
-L<OpenSearch documentation for $client-E<gt>info|https://docs.opensearch.org/latest/api-reference/>
+L<OpenSearch documentation for info|https://docs.opensearch.org/latest/api-reference/>
     
 =head2 mget
 
@@ -1248,7 +1248,7 @@ C<POST /{index}/_mget>
         'source'            =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>mget|https://opensearch.org/docs/latest/api-reference/document-apis/multi-get/>
+L<OpenSearch documentation for mget|https://opensearch.org/docs/latest/api-reference/document-apis/multi-get/>
     
 =head2 msearch
 
@@ -1301,7 +1301,7 @@ C<POST /{index}/_msearch>
         'source'                         =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>msearch|https://opensearch.org/docs/latest/api-reference/multi-search/>
+L<OpenSearch documentation for msearch|https://opensearch.org/docs/latest/api-reference/multi-search/>
     
 =head2 msearch_template
 
@@ -1351,7 +1351,7 @@ C<POST /{index}/_msearch/template>
         'source'                   =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>msearch_template|https://opensearch.org/docs/latest/search-plugins/search-template/>
+L<OpenSearch documentation for msearch_template|https://opensearch.org/docs/latest/search-plugins/search-template/>
     
 =head2 mtermvectors
 
@@ -1408,7 +1408,7 @@ C<POST /{index}/_mtermvectors>
         'source'            =>  $qval17,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>mtermvectors|https://docs.opensearch.org/latest/api-reference/>
+L<OpenSearch documentation for mtermvectors|https://docs.opensearch.org/latest/api-reference/>
     
 =head2 ping
 
@@ -1435,7 +1435,7 @@ C<HEAD />
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>ping|https://docs.opensearch.org/latest/api-reference/>
+L<OpenSearch documentation for ping|https://docs.opensearch.org/latest/api-reference/>
     
 =head2 put_script
 
@@ -1485,7 +1485,7 @@ C<PUT /_scripts/{id}/{context}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>put_script|https://opensearch.org/docs/latest/api-reference/script-apis/create-stored-script/>
+L<OpenSearch documentation for put_script|https://opensearch.org/docs/latest/api-reference/script-apis/create-stored-script/>
     
 =head2 rank_eval
 
@@ -1534,7 +1534,7 @@ C<POST /{index}/_rank_eval>
         'source'              =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>rank_eval|https://opensearch.org/docs/latest/api-reference/rank-eval/>
+L<OpenSearch documentation for rank_eval|https://opensearch.org/docs/latest/api-reference/rank-eval/>
     
 =head2 reindex
 
@@ -1577,7 +1577,7 @@ C<POST /_reindex>
         'source'                  =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>reindex|https://opensearch.org/docs/latest/im-plugin/reindex-data/>
+L<OpenSearch documentation for reindex|https://opensearch.org/docs/latest/im-plugin/reindex-data/>
     
 =head2 reindex_rethrottle
 
@@ -1612,7 +1612,7 @@ C<POST /_reindex/{task_id}/_rethrottle>
         'source'               =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>reindex_rethrottle|https://docs.opensearch.org/latest/api-reference/>
+L<OpenSearch documentation for reindex_rethrottle|https://docs.opensearch.org/latest/api-reference/>
     
 =head2 render_search_template
 
@@ -1654,7 +1654,7 @@ C<POST /_render/template/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>render_search_template|https://opensearch.org/docs/latest/search-plugins/search-template/>
+L<OpenSearch documentation for render_search_template|https://opensearch.org/docs/latest/search-plugins/search-template/>
     
 =head2 scripts_painless_execute
 
@@ -1686,7 +1686,7 @@ C<POST /_scripts/painless/_execute>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>scripts_painless_execute|https://opensearch.org/docs/latest/api-reference/script-apis/exec-script/>
+L<OpenSearch documentation for scripts_painless_execute|https://opensearch.org/docs/latest/api-reference/script-apis/exec-script/>
     
 =head2 scroll
 
@@ -1734,7 +1734,7 @@ C<POST /_search/scroll/{scroll_id}>
         'source'                  =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>scroll|https://opensearch.org/docs/latest/api-reference/scroll/#path-and-http-methods>
+L<OpenSearch documentation for scroll|https://opensearch.org/docs/latest/api-reference/scroll/#path-and-http-methods>
     
 =head2 search
 
@@ -1827,7 +1827,7 @@ C<POST /{index}/_search>
         'source'                         =>  $qval53,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>search|https://opensearch.org/docs/latest/api-reference/search/>
+L<OpenSearch documentation for search|https://opensearch.org/docs/latest/api-reference/search/>
     
 =head2 search_shards
 
@@ -1878,7 +1878,7 @@ C<POST /{index}/_search_shards>
         'source'              =>  $qval11,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>search_shards|https://docs.opensearch.org/latest/api-reference/>
+L<OpenSearch documentation for search_shards|https://docs.opensearch.org/latest/api-reference/>
     
 =head2 search_template
 
@@ -1938,7 +1938,7 @@ C<POST /{index}/_search/template>
         'source'                   =>  $qval20,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>search_template|https://opensearch.org/docs/latest/search-plugins/search-template/>
+L<OpenSearch documentation for search_template|https://opensearch.org/docs/latest/search-plugins/search-template/>
     
 =head2 termvectors
 
@@ -1995,7 +1995,7 @@ C<POST /{index}/_termvectors/{id}>
         'source'            =>  $qval16,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>termvectors|https://docs.opensearch.org/latest/api-reference/>
+L<OpenSearch documentation for termvectors|https://docs.opensearch.org/latest/api-reference/>
     
 =head2 update
 
@@ -2044,7 +2044,7 @@ C<POST /{index}/_update/{id}>
         'source'                  =>  $qval17,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>update|https://opensearch.org/docs/latest/api-reference/document-apis/update-document/>
+L<OpenSearch documentation for update|https://opensearch.org/docs/latest/api-reference/document-apis/update-document/>
     
 =head2 update_by_query
 
@@ -2115,7 +2115,7 @@ C<POST /{index}/_update_by_query>
         'source'                  =>  $qval39,    # string
     );
 
-L<OpenSearch documentation for $client-E<gt>update_by_query|https://opensearch.org/docs/latest/api-reference/document-apis/update-by-query/>
+L<OpenSearch documentation for update_by_query|https://opensearch.org/docs/latest/api-reference/document-apis/update-by-query/>
     
 =head2 update_by_query_rethrottle
 
@@ -2150,7 +2150,7 @@ C<POST /_update_by_query/{task_id}/_rethrottle>
         'source'               =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for $client-E<gt>update_by_query_rethrottle|https://docs.opensearch.org/latest/api-reference/>
+L<OpenSearch documentation for update_by_query_rethrottle|https://docs.opensearch.org/latest/api-reference/>
 
 =head2 bulk_helper
 
@@ -2167,7 +2167,7 @@ Returns a new instance of the scroll_helper_class - a helper module for scrolled
 
    my $helper = $client->scroll_helper( @args );
 
-L<Scroll Helper documentation|OpenSearch::Client::Core::3_0::Scroll>
+L<Scroll Helper documentation|OpenSearch::Client::Core::3_0::Helper::Scroll>
 
 =head1 MANUAL
 

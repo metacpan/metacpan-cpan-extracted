@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::WLM;
-$OpenSearch::Client::Core::3_0::Direct::WLM::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::WLM::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::WLM>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for wlm.|https://docs.opensearch.org/latest/tunin
 
 =head1 METHODS
     
-=head2 wlm->create_query_group
+=head2 create_query_group
 
 Creates a new query group and sets the resource limits for the new query group.
 
@@ -93,9 +93,9 @@ C<PUT /_wlm/query_group>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for wlm.create_query_group|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/>
+L<OpenSearch documentation for wlm-E<gt>create_query_group|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/>
     
-=head2 wlm->delete_query_group
+=head2 delete_query_group
 
 Deletes the specified query group.
 
@@ -123,9 +123,9 @@ C<DELETE /_wlm/query_group/{name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for wlm.delete_query_group|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/>
+L<OpenSearch documentation for wlm-E<gt>delete_query_group|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/>
     
-=head2 wlm->get_query_group
+=head2 get_query_group
 
 Retrieves the specified query group. If no query group is specified, all query groups in the cluster are retrieved.
 
@@ -156,9 +156,9 @@ C<GET /_wlm/query_group/{name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for wlm.get_query_group|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/>
+L<OpenSearch documentation for wlm-E<gt>get_query_group|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/>
     
-=head2 wlm->update_query_group
+=head2 update_query_group
 
 Updates the specified query group.
 
@@ -188,7 +188,7 @@ C<PUT /_wlm/query_group/{name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for wlm.update_query_group|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/>
+L<OpenSearch documentation for wlm-E<gt>update_query_group|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/>
 
 =head1 MANUAL
 

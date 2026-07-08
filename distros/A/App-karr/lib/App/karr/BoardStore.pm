@@ -1,11 +1,11 @@
 # ABSTRACT: Ref-backed board storage for karr
 
 package App::karr::BoardStore;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
-use File::Temp qw( tempdir );
 use Path::Tiny qw( path );
 use YAML::XS qw( DumpFile LoadFile );
+use Time::Piece;
 use App::karr::Config;
 
 has git => (
@@ -28,9 +28,7 @@ sub load_config_overrides {
 
 sub load_config {
     my ($self) = @_;
-    my $defaults = App::karr::Config->default_config;
-    my $overrides = $self->load_config_overrides;
-    return _merge_hashes( $defaults, $overrides );
+    return App::karr::Config->effective_config( $self->load_config_overrides );
 }
 
 sub effective_config {
@@ -47,20 +45,14 @@ sub all_status_names {
 
 sub status_requires_claim {
     my ($self, $status_name) = @_;
-    my $ec = $self->effective_config;
-    my ($sc) = grep {
-        (ref $_ ? $_->{name} : $_) eq $status_name
-    } @{$ec->{statuses} // []};
-    return 0 unless $sc;
-    return 0 if !ref $sc;
-    return $sc->{require_claim} ? 1 : 0;
+    return App::karr::Config->from_merged( $self->effective_config )
+        ->status_requires_claim($status_name);
 }
 
 
 sub is_terminal_status {
     my ($self, $status_name) = @_;
-    return 1 if $status_name eq 'done' || $status_name eq 'archived';
-    return 0;
+    return App::karr::Config->is_terminal_status($status_name);
 }
 
 
@@ -103,6 +95,12 @@ sub find_task {
 
 sub save_task {
     my ( $self, $task ) = @_;
+    # Bump `updated` centrally on every mutation of an existing task, so
+    # move/edit/pick/handoff/archive get a fresh timestamp for free. A brand
+    # new task keeps its own `updated` (== created); the restore/import path in
+    # serialize_from bypasses this via git->save_task_ref to preserve stamps.
+    my $ref = "refs/karr/tasks/" . $task->id . "/data";
+    $task->updated( gmtime->datetime . 'Z' ) if $self->git->ref_exists($ref);
     return $self->git->save_task_ref($task);
 }
 
@@ -141,6 +139,51 @@ sub materialize_to {
     return $board_dir;
 }
 
+sub file_view_gitignore_entries {
+    # The disposable file view materialize_to writes: config.yml + tasks/*.md.
+    # These must always be gitignored -- refs/karr/* is the canonical state and
+    # the view is never committed. Mirror the exact names used by materialize_to.
+    return ( 'tasks/', 'config.yml' );
+}
+
+sub ensure_gitignore {
+    my ( $self, $board_dir ) = @_;
+    $board_dir = path($board_dir);
+    my $gitignore = $board_dir->child('.gitignore');
+
+    my @entries  = $self->file_view_gitignore_entries;
+    my $existing = $gitignore->exists ? $gitignore->slurp_utf8 : '';
+
+    # Line-exact presence (whitespace-insensitive), so we never duplicate an
+    # entry -- or our header -- that is already there.
+    my %present;
+    for my $line ( split /\n/, $existing ) {
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        $present{$line} = 1 if length $line;
+    }
+
+    my @missing = grep { !$present{$_} } @entries;
+    return () unless @missing;
+
+    my $header         = '# karr materialized task view -- never commit';
+    my $header_present = $present{$header} ? 1 : 0;
+
+    # Idempotent append that keeps the existing file intact: terminate a
+    # dangling last line, separate a fresh karr block with a blank line, and
+    # only emit the header when starting one.
+    my $append = '';
+    if ( length $existing ) {
+        $append .= "\n" unless $existing =~ /\n\z/;
+        $append .= "\n" unless $header_present;
+    }
+    $append .= "$header\n" unless $header_present;
+    $append .= "$_\n" for @missing;
+
+    $gitignore->append_utf8($append);
+    return @missing;
+}
+
 sub serialize_from {
     my ( $self, $board_dir ) = @_;
     $board_dir = path($board_dir);
@@ -157,7 +200,9 @@ sub serialize_from {
         require App::karr::Task;
         for my $file ( $tasks_dir->children(qr/\.md$/) ) {
             my $task = App::karr::Task->from_file($file);
-            $self->save_task($task);
+            # Restore/import path: persist verbatim so the original `updated`
+            # timestamps survive, even when overwriting pre-existing refs.
+            $self->git->save_task_ref($task);
             $seen{ $task->id } = 1;
         }
     }
@@ -165,6 +210,16 @@ sub serialize_from {
     for my $id ( $self->git->list_task_refs ) {
         next if $seen{$id};
         $self->delete_task($id);
+    }
+
+    # Bootstrap fix (#30): import does not require a pre-existing board, so on a
+    # fresh repo meta/next-id is missing and a following `karr create` would
+    # re-allocate an already-imported id. Seed next-id past the highest imported
+    # id when the stored next-id is missing or stale, but never lower a next-id
+    # that is already ahead of the view (an existing healthy board is untouched).
+    if (%seen) {
+        my ($max_id) = sort { $b <=> $a } keys %seen;
+        $self->set_next_id( $max_id + 1 ) if $self->peek_next_id <= $max_id;
     }
 
     return 1;
@@ -190,25 +245,6 @@ sub restore_snapshot {
         $self->git->write_ref( $ref, $refs->{$ref} );
     }
     return 1;
-}
-
-sub temp_board_dir {
-    my ($self) = @_;
-    my $dir = path( tempdir( CLEANUP => 1 ) );
-    return $self->materialize_to($dir);
-}
-
-sub _merge_hashes {
-    my ( $base, $overrides ) = @_;
-    my %merged = %{$base // {}};
-    for my $key ( keys %{ $overrides // {} } ) {
-        if ( ref($merged{$key}) eq 'HASH' && ref($overrides->{$key}) eq 'HASH' ) {
-            $merged{$key} = _merge_hashes( $merged{$key}, $overrides->{$key} );
-        } else {
-            $merged{$key} = $overrides->{$key};
-        }
-    }
-    return \%merged;
 }
 
 sub _diff_hashes {
@@ -265,7 +301,7 @@ App::karr::BoardStore - Ref-backed board storage for karr
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

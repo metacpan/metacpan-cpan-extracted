@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::LTR;
-$OpenSearch::Client::Core::3_0::Direct::LTR::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::LTR::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::LTR>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for ltr.|https://docs.opensearch.org/latest/searc
 
 =head1 METHODS
     
-=head2 ltr->add_features_to_set
+=head2 add_features_to_set
 
 Add features to an existing feature set in the default feature store.
 
@@ -107,9 +107,9 @@ C<POST /_ltr/{store}/_featureset/{name}/_addfeatures>
         'source'       =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for ltr.add_features_to_set|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>add_features_to_set|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->add_features_to_set_by_query
+=head2 add_features_to_set_by_query
 
 Add features to an existing feature set in the default feature store.
 
@@ -148,9 +148,9 @@ C<POST /_ltr/{store}/_featureset/{name}/_addfeatures/{query}>
         'source'       =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for ltr.add_features_to_set_by_query|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>add_features_to_set_by_query|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->cache_stats
+=head2 cache_stats
 
 Retrieves cache statistics for all feature stores.
 
@@ -174,9 +174,9 @@ C<GET /_ltr/_cachestats>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.cache_stats|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>cache_stats|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->clear_cache
+=head2 clear_cache
 
 Clears the store caches.
 
@@ -207,9 +207,9 @@ C<POST /_ltr/{store}/_clearcache>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.clear_cache|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>clear_cache|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->create_default_store
+=head2 create_default_store
 
 Creates the default feature store.
 
@@ -233,9 +233,9 @@ C<PUT /_ltr>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.create_default_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>create_default_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->create_feature
+=head2 create_feature
 
 Create or update a feature in the default feature store.
 
@@ -273,9 +273,9 @@ C<PUT /_ltr/{store}/_feature/{id}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ltr.create_feature|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>create_feature|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->create_featureset
+=head2 create_featureset
 
 Create or update a feature set in the default feature store.
 
@@ -313,9 +313,9 @@ C<PUT /_ltr/{store}/_featureset/{id}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ltr.create_featureset|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>create_featureset|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->create_model
+=head2 create_model
 
 Create or update a model in the default feature store.
 
@@ -353,9 +353,9 @@ C<PUT /_ltr/{store}/_model/{id}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ltr.create_model|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>create_model|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->create_model_from_set
+=head2 create_model_from_set
 
 Create a model from an existing feature set in the default feature store.
 
@@ -393,9 +393,9 @@ C<POST /_ltr/{store}/_featureset/{name}/_createmodel>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ltr.create_model_from_set|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>create_model_from_set|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->create_store
+=head2 create_store
 
 Creates a new feature store with the specified name.
 
@@ -423,9 +423,9 @@ C<PUT /_ltr/{store}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.create_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>create_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->delete_default_store
+=head2 delete_default_store
 
 Deletes the default feature store.
 
@@ -449,9 +449,9 @@ C<DELETE /_ltr>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.delete_default_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>delete_default_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->delete_feature
+=head2 delete_feature
 
 Delete a feature from the default feature store.
 
@@ -483,9 +483,9 @@ C<DELETE /_ltr/{store}/_feature/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.delete_feature|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>delete_feature|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->delete_featureset
+=head2 delete_featureset
 
 Delete a feature set from the default feature store.
 
@@ -517,9 +517,9 @@ C<DELETE /_ltr/{store}/_featureset/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.delete_featureset|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>delete_featureset|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->delete_model
+=head2 delete_model
 
 Delete a model from the default feature store.
 
@@ -551,9 +551,9 @@ C<DELETE /_ltr/{store}/_model/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.delete_model|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>delete_model|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->delete_store
+=head2 delete_store
 
 Deletes a feature store with the specified name.
 
@@ -581,9 +581,9 @@ C<DELETE /_ltr/{store}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.delete_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>delete_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->get_feature
+=head2 get_feature
 
 Get a feature from the default feature store.
 
@@ -615,9 +615,9 @@ C<GET /_ltr/{store}/_feature/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.get_feature|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>get_feature|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->get_featureset
+=head2 get_featureset
 
 Get a feature set from the default feature store.
 
@@ -649,9 +649,9 @@ C<GET /_ltr/{store}/_featureset/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.get_featureset|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>get_featureset|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->get_model
+=head2 get_model
 
 Get a model from the default feature store.
 
@@ -683,9 +683,9 @@ C<GET /_ltr/{store}/_model/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.get_model|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>get_model|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->get_store
+=head2 get_store
 
 Checks if a store exists.
 
@@ -713,9 +713,9 @@ C<GET /_ltr/{store}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.get_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>get_store|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->list_stores
+=head2 list_stores
 
 Lists all available feature stores.
 
@@ -739,9 +739,9 @@ C<GET /_ltr>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ltr.list_stores|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>list_stores|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->search_features
+=head2 search_features
 
 Search for features in a feature store.
 
@@ -778,9 +778,9 @@ C<GET /_ltr/{store}/_feature>
         'source'       =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for ltr.search_features|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>search_features|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->search_featuresets
+=head2 search_featuresets
 
 Search for feature sets in a feature store.
 
@@ -817,9 +817,9 @@ C<GET /_ltr/{store}/_featureset>
         'source'       =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for ltr.search_featuresets|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>search_featuresets|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->search_models
+=head2 search_models
 
 Search for models in a feature store.
 
@@ -856,9 +856,9 @@ C<GET /_ltr/{store}/_model>
         'source'       =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for ltr.search_models|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>search_models|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->stats
+=head2 stats
 
 Provides information about the current status of the LTR plugin.
 
@@ -900,9 +900,9 @@ C<GET /_plugins/_ltr/{node_id}/stats/{stat}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ltr.stats|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>stats|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->update_feature
+=head2 update_feature
 
 Update a feature in the default feature store.
 
@@ -940,9 +940,9 @@ C<POST /_ltr/{store}/_feature/{id}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ltr.update_feature|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>update_feature|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
     
-=head2 ltr->update_featureset
+=head2 update_featureset
 
 Update a feature set in the default feature store.
 
@@ -980,7 +980,7 @@ C<POST /_ltr/{store}/_featureset/{id}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ltr.update_featureset|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+L<OpenSearch documentation for ltr-E<gt>update_featureset|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
 
 =head1 MANUAL
 

@@ -1,5 +1,5 @@
 package Business::NAB::FileContainer;
-$Business::NAB::FileContainer::VERSION = '0.04';
+$Business::NAB::FileContainer::VERSION = '0.05';
 # undocument abstract class
 
 use strict;

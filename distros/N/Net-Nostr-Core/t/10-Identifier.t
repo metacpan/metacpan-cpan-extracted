@@ -29,6 +29,34 @@ subtest 'base_url accessor' => sub {
     is $default->base_url, undef, 'base_url defaults to undef';
 };
 
+subtest 'base_url is validated as an HTTP base URL' => sub {
+    for my $url (
+        'not a url',
+        'ftp://example.com',
+        'https://',
+        'https://user@example.com',
+        'https://example.com?x=1',
+        'https://example.com#frag',
+        'https://example.com:0',
+        'https://example.com:70000',
+        "https://example.com/\npath",
+    ) {
+        like(
+            dies { Net::Nostr::Identifier->new(base_url => $url) },
+            qr/base_url/i,
+            "$url rejected"
+        );
+    }
+};
+
+subtest 'base_url composes NIP-05 fetch URL with URI semantics' => sub {
+    my $ident = Net::Nostr::Identifier->new(base_url => 'https://example.com/base/');
+    my ($url, $local) = $ident->_build_fetch_url('alice@example.net');
+    is $local, 'alice', 'local-part returned';
+    is $url, 'https://example.com/base/.well-known/nostr.json?name=alice',
+        'base path and query composed';
+};
+
 ###############################################################################
 # parse
 ###############################################################################

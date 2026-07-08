@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Serializer;
-$OpenSearch::Client::Role::Serializer::VERSION = '3.007005';
+$OpenSearch::Client::Role::Serializer::VERSION = '3.007006';
 use Moo::Role;
 
 requires qw(encode decode encode_pretty encode_bulk mime_type);
@@ -40,7 +40,7 @@ OpenSearch::Client::Role::Serializer - An interface for Serializer modules
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 DESCRIPTION
 

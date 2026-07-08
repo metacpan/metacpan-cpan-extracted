@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SearchPipeline;
-$OpenSearch::Client::Core::3_0::Direct::SearchPipeline::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::SearchPipeline::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SearchPipeline>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for search_pipeline.|https://docs.opensearch.org/
 
 =head1 METHODS
     
-=head2 search_pipeline->delete
+=head2 delete
 
 Deletes the specified search pipeline.
 
@@ -100,9 +100,9 @@ C<DELETE /_search/pipeline/{id}>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for search_pipeline.delete|https://docs.opensearch.org/latest/search-plugins/search-pipelines/index/>
+L<OpenSearch documentation for search_pipeline-E<gt>delete|https://docs.opensearch.org/latest/search-plugins/search-pipelines/index/>
     
-=head2 search_pipeline->get
+=head2 get
 
 Retrieves information about a specified search pipeline.
 
@@ -137,9 +137,9 @@ C<GET /_search/pipeline/{id}>
         'source'                   =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for search_pipeline.get|https://docs.opensearch.org/latest/search-plugins/search-pipelines/index/>
+L<OpenSearch documentation for search_pipeline-E<gt>get|https://docs.opensearch.org/latest/search-plugins/search-pipelines/index/>
     
-=head2 search_pipeline->put
+=head2 put
 
 Creates or replaces the specified search pipeline.
 
@@ -174,7 +174,7 @@ C<PUT /_search/pipeline/{id}>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for search_pipeline.put|https://opensearch.org/docs/latest/search-plugins/search-pipelines/creating-search-pipeline/>
+L<OpenSearch documentation for search_pipeline-E<gt>put|https://opensearch.org/docs/latest/search-plugins/search-pipelines/creating-search-pipeline/>
 
 =head1 MANUAL
 

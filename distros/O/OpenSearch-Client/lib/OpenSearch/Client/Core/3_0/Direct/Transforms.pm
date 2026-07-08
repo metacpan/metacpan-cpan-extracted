@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Transforms;
-$OpenSearch::Client::Core::3_0::Direct::Transforms::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Transforms::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Transforms>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for transforms.|https://docs.opensearch.org/lates
 
 =head1 METHODS
     
-=head2 transforms->delete
+=head2 delete
 
 Delete an index transform.
 
@@ -95,9 +95,9 @@ C<DELETE /_plugins/_transform/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for transforms.delete|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#delete-a-transform-job>
+L<OpenSearch documentation for transforms-E<gt>delete|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#delete-a-transform-job>
     
-=head2 transforms->explain
+=head2 explain
 
 Returns the status and metadata of a transform job.
 
@@ -125,9 +125,9 @@ C<GET /_plugins/_transform/{id}/_explain>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for transforms.explain|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-the-status-of-a-transform-job>
+L<OpenSearch documentation for transforms-E<gt>explain|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-the-status-of-a-transform-job>
     
-=head2 transforms->get
+=head2 get
 
 Returns the status and metadata of a transform job.
 
@@ -155,9 +155,9 @@ C<GET /_plugins/_transform/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for transforms.get|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details>
+L<OpenSearch documentation for transforms-E<gt>get|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details>
     
-=head2 transforms->preview
+=head2 preview
 
 Returns a preview of what a transformed index would look like.
 
@@ -183,9 +183,9 @@ C<POST /_plugins/_transform/_preview>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for transforms.preview|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#preview-a-transform-jobs-results>
+L<OpenSearch documentation for transforms-E<gt>preview|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#preview-a-transform-jobs-results>
     
-=head2 transforms->put
+=head2 put
 
 Create an index transform, or update a transform if `if_seq_no` and `if_primary_term` are provided.
 
@@ -220,9 +220,9 @@ C<PUT /_plugins/_transform/{id}>
         'source'           =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for transforms.put|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#create-a-transform-job>
+L<OpenSearch documentation for transforms-E<gt>put|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#create-a-transform-job>
     
-=head2 transforms->search
+=head2 search
 
 Returns the details of all transform jobs.
 
@@ -254,9 +254,9 @@ C<GET /_plugins/_transform>
         'source'         =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for transforms.search|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details>
+L<OpenSearch documentation for transforms-E<gt>search|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#get-a-transform-jobs-details>
     
-=head2 transforms->start
+=head2 start
 
 Start transform.
 
@@ -284,9 +284,9 @@ C<POST /_plugins/_transform/{id}/_start>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for transforms.start|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#start-a-transform-job>
+L<OpenSearch documentation for transforms-E<gt>start|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#start-a-transform-job>
     
-=head2 transforms->stop
+=head2 stop
 
 Stop transform.
 
@@ -314,7 +314,7 @@ C<POST /_plugins/_transform/{id}/_stop>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for transforms.stop|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#stop-a-transform-job>
+L<OpenSearch documentation for transforms-E<gt>stop|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#stop-a-transform-job>
 
 =head1 MANUAL
 

@@ -13,6 +13,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Chandra/EPUB.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.008003',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'File::ShareDir::Install' => '0.06',
@@ -21,10 +22,10 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-	    'Chandra'  => '0.06',
+	    'Chandra'  => '0.27',
 	    'Archive::Zip' => '0',
 	    'MIME::Base64' => '0',
-    	'Encode' => '0',
+    	    'Encode' => '0',
 	    'File::ShareDir' => '1.00',
     },
     EXE_FILES => ['bin/chandra-epub'],

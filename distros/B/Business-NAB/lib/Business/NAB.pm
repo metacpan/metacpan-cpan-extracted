@@ -8,7 +8,7 @@ Business::NAB
 
 =head1 VERSION
 
-0.04
+0.05
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ Class for parsing NAB file acknowledgements, which are XML files
 
 =cut
 
-$Business::NAB::VERSION = '0.04';
+$Business::NAB::VERSION = '0.05';
 
 =head1 AUTHOR
 

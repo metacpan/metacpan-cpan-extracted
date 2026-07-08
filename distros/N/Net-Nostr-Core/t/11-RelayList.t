@@ -27,6 +27,36 @@ subtest 'add requires a URL' => sub {
     like(dies { $rl->add(undef) }, qr/url required/i, 'undef rejected');
 };
 
+subtest 'add rejects malformed relay URLs' => sub {
+    my $rl = Net::Nostr::RelayList->new;
+
+    for my $url (
+        'not a uri',
+        'https://relay.example.com',
+        'wss://',
+        'wss://?x',
+        'wss://user@relay.example.com',
+        'wss://relay.example.com?x=1',
+        'wss://relay.example.com#frag',
+        'wss://relay.example.com:0',
+        'wss://relay.example.com:70000',
+        "wss://relay.example.com/\npath",
+    ) {
+        like(
+            dies { $rl->add($url) },
+            qr/relay URL/i,
+            "$url rejected"
+        );
+    }
+};
+
+subtest 'add accepts structured relay URLs' => sub {
+    my $rl = Net::Nostr::RelayList->new;
+    ok(lives { $rl->add('wss://relay.example.com/nostr') }, 'path accepted');
+    ok(lives { $rl->add('ws://127.0.0.1:8080') }, 'ws with port accepted');
+    ok(lives { $rl->add('wss://[::1]:443') }, 'bracketed IPv6 accepted');
+};
+
 subtest 'add rejects invalid marker' => sub {
     my $rl = Net::Nostr::RelayList->new;
     like(dies { $rl->add('wss://r.com', marker => 'both') },
@@ -54,6 +84,22 @@ subtest 'from_event requires kind 10002' => sub {
     );
     like(dies { Net::Nostr::RelayList->from_event($event) },
         qr/kind 10002/, 'wrong kind rejected');
+};
+
+subtest 'from_event rejects malformed relay URLs' => sub {
+    require Net::Nostr::Event;
+    my $event = Net::Nostr::Event->new(
+        pubkey  => 'a' x 64,
+        kind    => 10002,
+        content => '',
+        tags    => [['r', 'wss://?x']],
+    );
+
+    like(
+        dies { Net::Nostr::RelayList->from_event($event) },
+        qr/relay URL/i,
+        'malformed relay URL rejected while parsing event'
+    );
 };
 
 ###############################################################################

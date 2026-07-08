@@ -12,6 +12,7 @@ my %runtime_requires = (
     'Crypt::ScryptKDF'         => 0,
     'Bitcoin::Crypto'          => 0,
     'Bitcoin::BIP39'           => 0,
+    'URI'                      => 0,
 );
 
 my %test_requires = (

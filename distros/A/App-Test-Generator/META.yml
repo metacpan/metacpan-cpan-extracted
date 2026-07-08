@@ -15,6 +15,7 @@ build_requires:
   Symbol: '0'
   Test::DescribeMe: '0'
   Test::LectroTest: '0'
+  Test::LectroTest::Compat: '0'
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0.1'
   Test::Most: '0'
@@ -36,6 +37,11 @@ no_index:
   directory:
     - t
     - inc
+optional_features:
+  coverage_guided_fuzzing:
+    description: 'Coverage-guided corpus pruning in CoverageGuidedFuzzer'
+    recommends:
+      Devel::Cover: '1.51'
 requires:
   Carp: '0'
   Config::Abstraction: '0.36'
@@ -64,6 +70,7 @@ requires:
   Return::Set: '0.03'
   Safe: '0'
   Template: '0'
+  Text::Balanced: '0'
   URI: '0'
   UUID::Tiny: '0'
   WWW::RT::CPAN: '0'
@@ -74,5 +81,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

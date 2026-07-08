@@ -1,7 +1,7 @@
 # ABSTRACT: Sync karr board with remote
 
 package App::karr::Cmd::Sync;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use feature 'say';
@@ -40,12 +40,12 @@ sub execute {
     my $pull_only = $self->pull && !$self->push;
 
     unless ($push_only) {
-        say "Pulling refs/karr/ from remote...";
+        print STDERR "Pulling refs/karr/ from remote...\n" unless $self->quiet;
         $git->pull;
     }
 
     unless ($pull_only) {
-        say "Pushing refs/karr/ to remote...";
+        print STDERR "Pushing refs/karr/ to remote...\n" unless $self->quiet;
         $git->push;
     }
 
@@ -66,7 +66,7 @@ App::karr::Cmd::Sync - Sync karr board with remote
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

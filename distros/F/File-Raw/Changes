@@ -1,5 +1,9 @@
 Revision history for File-Raw
 
+0.14    2026-07-07
+        - Fix Perl 5.12.x build failure: add op_contextualize compat macro
+          in include/file_compat.h
+
 0.13    2026-05-17
         - Windows: file_plugin_dispatch_stream (the each_line entry)
           now opens with O_BINARY. 

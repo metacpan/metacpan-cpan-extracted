@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Tasks;
-$OpenSearch::Client::Core::3_0::Direct::Tasks::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Tasks::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Tasks>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for tasks.|https://docs.opensearch.org/latest/api
 
 =head1 METHODS
     
-=head2 tasks->cancel
+=head2 cancel
 
 Cancels a task, if it can be cancelled through an API.
 
@@ -105,9 +105,9 @@ C<POST /_tasks/{task_id}/_cancel>
         'source'               =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for tasks.cancel|https://opensearch.org/docs/latest/api-reference/tasks/#task-canceling>
+L<OpenSearch documentation for tasks-E<gt>cancel|https://opensearch.org/docs/latest/api-reference/tasks/#task-canceling>
     
-=head2 tasks->get
+=head2 get
 
 Returns information about a task.
 
@@ -140,9 +140,9 @@ C<GET /_tasks/{task_id}>
         'source'               =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for tasks.get|https://opensearch.org/docs/latest/api-reference/tasks/>
+L<OpenSearch documentation for tasks-E<gt>get|https://opensearch.org/docs/latest/api-reference/tasks/>
     
-=head2 tasks->list
+=head2 list
 
 Returns a list of tasks.
 
@@ -176,7 +176,7 @@ C<GET /_tasks>
         'source'               =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for tasks.list|https://opensearch.org/docs/latest/api-reference/tasks/>
+L<OpenSearch documentation for tasks-E<gt>list|https://opensearch.org/docs/latest/api-reference/tasks/>
 
 =head1 MANUAL
 

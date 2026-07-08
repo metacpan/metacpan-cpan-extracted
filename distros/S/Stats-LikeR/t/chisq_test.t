@@ -2,8 +2,6 @@
 
 require 5.010;
 use warnings FATAL => 'all';
-use feature 'say';
-use File::Temp;
 use Scalar::Util 'looks_like_number';
 use Stats::LikeR;
 use Test::Exception; # dies_ok

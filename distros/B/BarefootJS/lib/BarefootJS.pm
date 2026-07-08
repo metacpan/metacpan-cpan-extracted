@@ -1,5 +1,5 @@
 package BarefootJS;
-our $VERSION = "0.17.1";
+our $VERSION = "0.18.4";
 use strict;
 use warnings;
 use utf8;
@@ -168,7 +168,11 @@ sub props_attr ($self) {
     return '' unless $props && %$props;
     # encode_json returns a character string (not bytes) for safe embedding
     # in templates (the Mojo backend uses Mojo::JSON::to_json).
-    my $json = $self->backend->encode_json($props);
+    # The JSON must then be attribute-escaped: a raw `'` inside a string
+    # value (e.g. a blog paragraph) terminates the single-quoted attribute
+    # and truncates the hydration payload. The browser entity-decodes the
+    # attribute value, so the client's JSON.parse sees the original text.
+    my $json = _html_escape($self->backend->encode_json($props));
     return qq{ bf-p='$json'};
 }
 
@@ -345,8 +349,72 @@ sub render_child ($self, $name, @args) {
 # it takes precedence over the manifest's `ssrDefaults` for that
 # child, allowing callers to mix manual overrides with auto-derived
 # defaults for siblings.
+#
+# Multi-component modules (#2132): a registry module exporting several
+# components from one file (`ui/toast/index.tsx` → ToastProvider, Toast,
+# ToastTitle, ...) compiles to one template PER component, listed in the
+# entry's `components` map (`{ ToastProvider => { markedTemplate,
+# ssrDefaults }, ... }`). Compiled parent templates invoke each one under
+# its snake_cased component name (`render_child('toast_provider')`), so a
+# renderer is registered per component. These run AFTER the directory-name
+# registration and win on collision — for `ui/toast/index` the key `toast`
+# must resolve to Toast's own template, not the module's first template
+# (ToastProvider), which is all the bare `markedTemplate` carries.
 sub register_components_from_manifest ($self, $manifest, %opts) {
     my $signal_inits = $opts{signal_init} // {};
+
+    for my $entry_name (keys %$manifest) {
+        # `__barefoot__` is the runtime entry, not a component.
+        next if $entry_name eq '__barefoot__';
+        # Only UI registry components (path shape `ui/<name>/index`)
+        # become child renderers; top-level page components are the
+        # render target rather than a child.
+        next unless $entry_name =~ m{^ui/([^/]+)/index$};
+        my $slot_key = $1;
+        my $entry = $manifest->{$entry_name};
+
+        # Directory-name registration — the pre-`components` convention,
+        # kept so manifests from older builds (no `components` map) still
+        # resolve single-component modules like `button`.
+        $self->_register_manifest_child(
+            $slot_key, $entry->{markedTemplate},
+            $signal_inits->{$slot_key}, $entry->{ssrDefaults},
+        );
+
+        # Per-component registrations (#2132), keyed by the snake_cased
+        # component name the compiled templates actually call.
+        my $components = $entry->{components};
+        next unless ref($components) eq 'HASH';
+        for my $component_name (sort keys %$components) {
+            my $component = $components->{$component_name};
+            next unless ref($component) eq 'HASH';
+            my $component_key = _snake_case($component_name);
+            $self->_register_manifest_child(
+                $component_key, $component->{markedTemplate},
+                $signal_inits->{$component_key}, $component->{ssrDefaults},
+            );
+        }
+    }
+}
+
+# PascalCase → snake_case, mirroring the Mojo adapter's `toTemplateName`
+# (prefix every uppercase letter with `_`, lowercase the whole string,
+# strip the leading `_`): `ToastProvider` → `toast_provider`.
+sub _snake_case ($name) {
+    my $s = $name;
+    $s =~ s/([A-Z])/_$1/g;
+    $s = CORE::lc $s;
+    $s =~ s/^_//;
+    return $s;
+}
+
+# Register one manifest-driven child renderer: `$slot_key` becomes the
+# `render_child` name, `$marked` locates the template, and `$signal_init`
+# / `$manifest_defaults` seed the child's template vars (see
+# `register_components_from_manifest` for the contract).
+sub _register_manifest_child ($self, $slot_key, $marked, $signal_init, $manifest_defaults) {
+    $marked //= '';
+    return unless $marked;
     my $parent_scope = $self->_scope_id;
     # Weaken the parent capture so the child-renderer closures stored on
     # `$self->_child_renderers` don't keep `$self` alive (the direct
@@ -357,76 +425,63 @@ sub register_components_from_manifest ($self, $manifest, %opts) {
     # stored on `$parent`, so `$parent` outlives every invocation).
     weaken(my $parent = $self);
 
-    for my $entry_name (keys %$manifest) {
-        # `__barefoot__` is the runtime entry, not a component.
-        next if $entry_name eq '__barefoot__';
-        # Only UI registry components (path shape `ui/<name>/index`)
-        # become child renderers; top-level page components are the
-        # render target rather than a child.
-        next unless $entry_name =~ m{^ui/([^/]+)/index$};
-        my $slot_key = $1;
-        my $marked = $manifest->{$entry_name}{markedTemplate} // '';
-        next unless $marked;
-        # `templates/ui/button/index.html.ep` → `ui/button/index`
-        my $template_name = $marked;
-        $template_name =~ s{^templates/}{};
-        $template_name =~ s{\.html\.ep$}{};
+    # `templates/ui/button/index.html.ep` → `ui/button/index`
+    my $template_name = $marked;
+    $template_name =~ s{^templates/}{};
+    $template_name =~ s{\.html\.ep$}{};
 
-        my $signal_init = $signal_inits->{$slot_key};
-        my $manifest_defaults = $manifest->{$entry_name}{ssrDefaults};
-        $self->register_child_renderer($slot_key, sub {
-            # `$caller` is the instance whose template invoked
-            # `render_child` (#1897) — for a nested render that is a child
-            # instance, and the grandchild's scope/slot identity must chain
-            # off ITS scope id (`root_s0_s0`), not the registrant's.
-            my ($props, $caller) = @_;
-            my $host = $caller // $parent;
-            my $host_scope = $host->_scope_id // $parent_scope;
-            # Child shares the parent's backend so nested renders go
-            # through the same engine + controller (and inherit any
-            # injected json_encoder). The controller is fetched via the weak
-            # `$parent` at call time — never captured strongly — so the
-            # closure adds no edge to the per-request reference cycle.
-            my $child_bf = BarefootJS->new($parent->c, { backend => $parent->backend });
-            my $slot_id = delete $props->{_bf_slot};
-            # JSX `key` (a reserved prop) → data-key on the child's scope root
-            # for keyed-loop reconciliation (see `data_key_attr`).
-            my $data_key = delete $props->{key};
-            $child_bf->_data_key($data_key) if defined $data_key;
-            $child_bf->_scope_id(
-                $slot_id ? $host_scope . '_' . $slot_id
-                         : $template_name . '_' . substr(rand() =~ s/^0\.//r, 0, 6)
-            );
-            $child_bf->_is_child(1);
-            # (#1249) Slot identity: host scope + slot id. Emitted as
-            # bf-h / bf-m attributes by hydration_attrs.
-            if ($slot_id) {
-                $child_bf->_bf_parent($host_scope);
-                $child_bf->_bf_mount($slot_id);
-            }
-            # Share the root registry so the child's own template can
-            # render further imported components (#1897).
-            $child_bf->_child_renderers($parent->_child_renderers);
-            $child_bf->_scripts($parent->_scripts);
-            $child_bf->_script_seen($parent->_script_seen);
+    $self->register_child_renderer($slot_key, sub {
+        # `$caller` is the instance whose template invoked
+        # `render_child` (#1897) — for a nested render that is a child
+        # instance, and the grandchild's scope/slot identity must chain
+        # off ITS scope id (`root_s0_s0`), not the registrant's.
+        my ($props, $caller) = @_;
+        my $host = $caller // $parent;
+        my $host_scope = $host->_scope_id // $parent_scope;
+        # Child shares the parent's backend so nested renders go
+        # through the same engine + controller (and inherit any
+        # injected json_encoder). The controller is fetched via the weak
+        # `$parent` at call time — never captured strongly — so the
+        # closure adds no edge to the per-request reference cycle.
+        my $child_bf = BarefootJS->new($parent->c, { backend => $parent->backend });
+        my $slot_id = delete $props->{_bf_slot};
+        # JSX `key` (a reserved prop) → data-key on the child's scope root
+        # for keyed-loop reconciliation (see `data_key_attr`).
+        my $data_key = delete $props->{key};
+        $child_bf->_data_key($data_key) if defined $data_key;
+        $child_bf->_scope_id(
+            $slot_id ? $host_scope . '_' . $slot_id
+                     : $template_name . '_' . substr(rand() =~ s/^0\.//r, 0, 6)
+        );
+        $child_bf->_is_child(1);
+        # (#1249) Slot identity: host scope + slot id. Emitted as
+        # bf-h / bf-m attributes by hydration_attrs.
+        if ($slot_id) {
+            $child_bf->_bf_parent($host_scope);
+            $child_bf->_bf_mount($slot_id);
+        }
+        # Share the root registry so the child's own template can
+        # render further imported components (#1897).
+        $child_bf->_child_renderers($parent->_child_renderers);
+        $child_bf->_scripts($parent->_scripts);
+        $child_bf->_script_seen($parent->_script_seen);
 
-            my %extra;
-            if ($signal_init) {
-                %extra = $signal_init->($props);
-            } elsif ($manifest_defaults) {
-                %extra = _derive_stash_from_defaults($manifest_defaults, $props);
-            }
+        my %extra;
+        if ($signal_init) {
+            %extra = $signal_init->($props);
+        } elsif ($manifest_defaults) {
+            %extra = _derive_stash_from_defaults($manifest_defaults, $props);
+        }
 
-            # Render the child template with $child_bf bound as the active
-            # instance for the nested render. The backend owns the
-            # engine-specific binding + restore (stash juggle for Mojo).
-            my $html = $parent->backend->render_named(
-                $template_name, $child_bf, { %$props, %extra },
-            );
-            chomp $html;
-            return $html;
-        });
-    }
+        # Render the child template with $child_bf bound as the active
+        # instance for the nested render. The backend owns the
+        # engine-specific binding + restore (stash juggle for Mojo).
+        my $html = $parent->backend->render_named(
+            $template_name, $child_bf, { %$props, %extra },
+        );
+        chomp $html;
+        return $html;
+    });
 }
 
 # Derive template-stash kvs from a manifest entry's `ssrDefaults`
@@ -805,6 +860,59 @@ sub flat ($self, $recv, $depth = 1) {
         }
     }
     return \@out;
+}
+
+# `Array.prototype.flat(depth)` with a DYNAMIC depth (#2094) — the depth is
+# itself an arbitrary runtime value (e.g. a prop), not a compile-time literal,
+# so it must be coerced with JS's `ToIntegerOrInfinity` before delegating to
+# `flat` above: truncate toward zero; negative -> 0; NaN / non-numeric -> 0;
+# +Infinity or a huge finite value -> flatten fully.
+#
+# Deliberately a SEPARATE entry point from `flat`, not a smarter version of
+# it: the literal-depth path's `-1` argument is a compile-time SENTINEL baked
+# into the template source, meaning "the source literally said `Infinity`". A
+# genuinely dynamic depth that happens to evaluate to `-1` at render time
+# means the OPPOSITE in real JS (`[1,[2]].flat(-1)` never recurses — same as
+# `.flat(0)`). Since both paths would otherwise hand the same literal-looking
+# argument to one shared function, that function couldn't tell which case
+# it's in — so the two stay separate. Mirrors Go's `FlatDynamicDepth` /
+# `coerceFlatDepth` in bf.go.
+sub flat_dynamic ($self, $recv, $depth) {
+    return $self->flat($recv, _coerce_flat_depth($depth));
+}
+
+# _coerce_flat_depth: JS `ToIntegerOrInfinity` for a dynamic `.flat(depth)`
+# argument, collapsed to `flat`'s int contract (`-1` == flatten fully).
+#
+# Perl's scalar type system blurs string/number duality, so `looks_like_number`
+# (already the codebase's ToNumber-style coercion check, see BarefootJS::
+# Evaluator's `_to_number`) is reused here rather than inventing a new
+# convention. `looks_like_number` on this Perl (5.38) already recognises the
+# strings "Infinity" / "-Infinity" / "NaN" as numeric (verified empirically:
+# `perl -MScalar::Util=looks_like_number -e 'print looks_like_number("Infinity")'`
+# prints 1), and `$str + 0` on those strings yields the corresponding Perl
+# non-finite double, so no extra string special-casing is needed here.
+sub _coerce_flat_depth ($depth) {
+    return 0 unless defined $depth;
+    my $f;
+    if (ref($depth) eq 'JSON::PP::Boolean') {
+        $f = $depth ? 1 : 0;
+    }
+    elsif (!ref($depth) && looks_like_number($depth)) {
+        $f = $depth + 0;
+    }
+    else {
+        # undef handled above; anything else non-numeric (a plain string
+        # that isn't a number, a HASH/ARRAY ref, ...) coerces via NaN.
+        return 0;
+    }
+    return 0 if $f != $f;              # NaN
+    return -1 if $f == 9**9**9;        # +Infinity -> flatten fully sentinel
+    return 0  if $f == -(9**9**9);     # -Infinity -> 0
+    my $trunc = int($f);               # Perl's int() truncates toward zero
+    return 0  if $trunc < 0;
+    return -1 if $trunc > 1_000_000;   # huge finite ~= flatten fully
+    return $trunc;
 }
 
 # `Array.prototype.flatMap(fn)` value-returning field projection
@@ -1419,6 +1527,25 @@ sub _style_to_css ($value) {
         push @parts, "$prop:$v";
     }
     return @parts ? CORE::join(';', @parts) : undef;
+}
+
+
+# Object-rest residual for a `.map()` destructure binding
+# (`{ id, ...rest } => …`, #2087 Phase B): returns a NEW hashref holding
+# every key of `$bag` except those named in `$keys` (an ARRAY ref of key
+# strings). This is plain JS destructure semantics (`const { id, ...rest }
+# = item`) — unlike `spread_attrs` below, there's no event-handler /
+# `children` filtering or key remapping here, because the residual is a
+# *value* the template may read fields off of (`$rest->{flag}`) or later
+# forward wholesale to `spread_attrs` (`{...rest}` on an element) — either
+# consumer applies its own rules downstream. A non-hashref `$bag` returns
+# an empty hashref rather than dying, so this stays safe as a `my` local
+# initializer even off unexpected/absent data (same defensive contract as
+# `spread_attrs`'s "no bag → nothing").
+sub omit ($self, $bag, $keys) {
+    return {} unless defined $bag && ref($bag) eq 'HASH';
+    my %exclude = map { $_ => 1 } @$keys;
+    return { map { $_ => $bag->{$_} } grep { !$exclude{$_} } keys %$bag };
 }
 
 sub spread_attrs ($self, $bag) {

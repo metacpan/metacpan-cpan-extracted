@@ -1,5 +1,70 @@
 Revision history for App-Test-Generator
 
+0.42	Tue Jul  7 08:23:44 EDT 2026
+	[New features]
+	- Add CoverageGuidedFuzzer->minimize_corpus(): reduces the accumulated
+	  fuzz corpus to the minimum subset that still covers every branch
+	  discovered in the current run, using a greedy set-cover algorithm.
+	  Entries without branch data (loaded from a previous run or kept by
+	  random sampling when Devel::Cover is unavailable) are deduplicated
+	  by canonical JSON fingerprint. Bug-triggering inputs are always
+	  retained regardless of coverage contribution. Returns a hashref
+	  with keys before, after, and branches.
+	- Add --minimize-corpus flag to bin/extract-schemas: calls
+	  minimize_corpus() between run() and save_corpus() so corpus files
+	  stay bounded in size across repeated CI runs.
+	- Add POD example round-trip testing: new module
+	  App::Test::Generator::PodExampleExtractor extracts runnable code
+	  examples from =head1 SYNOPSIS, =head2 SYNOPSIS, and =for example
+	  begin/end blocks, plus annotated inline examples of the form
+	  "# returns value" or "# => value". New script bin/pod-example-tester
+	  generates a Test::Most-based .t file from any .pm file; each
+	  subtest wraps the example in eval{}, asserts it does not die, and
+	  (for annotated examples) compares the return value with is().
+	  SchemaExtractor::_extract_pod_examples now also accepts =head1
+	  SYNOPSIS (previously only =head2) and collects =for example blocks.
+	- Add GitHub Actions workflow deployment: new script bin/deploy-workflows
+	  copies dashboard.yml and mutate.yml (both embedded verbatim in the
+	  script via Data::Section::Simple __DATA__ sections) into the target
+	  repository's .github/workflows/ directory. Supports --target DIR,
+	  --force (overwrite existing files), --dry-run (preview without
+	  writing), --version, and --help. Prints git add/commit/push next-step
+	  instructions on success. The embedded workflow files are identical to
+	  the master copies in .github/workflows/ and work without any sibling
+	  files, maintaining the portability guarantee introduced in 0.41.
+	- Add automatic benchmark generation: new module
+	  App::Test::Generator::BenchmarkGenerator and new script
+	  bin/benchmark-generator produce self-contained Perl benchmark scripts
+	  (using Benchmark::cmpthese) from any ATG YAML schema. Each transform
+	  defined in the schema becomes a named cmpthese variant; representative
+	  input values are derived from each parameter's type and range
+	  constraints (min/max midpoint, or type defaults). OOP schemas (those
+	  with a new: key) emit a constructor call before the benchmark loop.
+	- Add CPAN Testers reproduction harness to bin/test-generator-index:
+	  for each FAIL report where installed-module data is available, a
+	  self-contained shell script (cover_html/reproduce/reproduce-GUID.sh)
+	  is generated that pins every installed module version with cpanm
+	  and suggests the matching Perl via perlbrew/plenv, allowing any
+	  developer to reproduce the exact failing environment locally.
+	  Scripts are linked as downloadable "Script" links in the CPAN
+	  Testers failure table on the dashboard.
+
+	[Bug fixes]
+	- Fix SchemaExtractor::_compile_signature_isolated to degrade gracefully
+	  when the isolated subprocess fails. Previously a subprocess error
+	  (stderr) triggered an unconditional croak, propagating a fatal
+	  exception through _extract_type_params_schema's "or return" guard
+	  (which catches falsy returns but not exceptions). The croak now
+	  becomes a verbose-gated carp followed by a plain return so the caller
+	  falls back to heuristic analysis as intended. A secondary guard in the
+	  subprocess heredoc now checks that the return value of signature_for()
+	  is a blessed object with a parameters() method before calling it, so
+	  older Type::Params (< 2.x) installations — which install the
+	  constraint but return undef rather than the signature object — no
+	  longer cause the subprocess to die and write to stderr. Reported via
+	  CPAN Testers (t/integration.t "degrades gracefully without
+	  BSD::Resource" subtest, App-Test-Generator-0.41).
+
 0.41	Sun Jun 28 08:01:43 EDT 2026
 	[Bug fixes]
 	- Fix bin/test-generator-mutate's per-mutant prove invocation: switch

@@ -1,3 +1,40 @@
+Tue Jul  7 07:18:55 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.0]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/Data/NestedKey.pm.in: modified
+	* .gitignore: updated by CPAN::Maker::Bootstrapper
+	* requires: +CLI::Simple
+	* test-requires: removed core modules
+	* release-notes.md: updated
+	* release-notes/release-notes-1.2.0.md: new
+	* Makefile: updated by CPAN::Maker::Bootstrapper
+	* .includes/version.mk: moved & updated by CPAN::Maker::Bootstrapper
+	* .includes/release-notes.mk: moved & likewise
+	* lib/Data/NestedKey.pm.in
+	(new)
+	- support arrays or hashes
+	(_parse_path)
+	- support top-level arrays
+	(set): croak if trying to set array
+	(get): support top-level arrays
+	(delete): likewise
+	(exists): likewise
+	* lib/Data/NestedKey/CLI.pm.in: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* t/00-data-nestedkey.t: new
+	* t/01-subscript.t: new
+	* t/02-array.t: new
+	* bin/dnk.in: new
+	* cpanfile: new
+	* test-requires.skip: new
+	* requires.skip: new
+
 Sun Jun 28 16:06:55 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.1.0]:

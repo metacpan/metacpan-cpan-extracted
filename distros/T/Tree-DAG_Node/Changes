@@ -1,5 +1,9 @@
 Revision history for Perl module Tree::DAG_Node.
 
+1.39  2026-07-08T08:50:14
+	- Update Software::License from CPAN.
+	- Re-generate the LICENSE file.
+
 1.38  2026-07-07T10:28:00
 	- Replace LICENCE file with output of the software-license program which ships
 		with the module App::Software::License. The specific command I ran is (all on 1 line):

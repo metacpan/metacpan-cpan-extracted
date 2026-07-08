@@ -7,7 +7,7 @@ use Cpanel::JSON::XS ();
 use Chandra::Component;
 use Chandra::Element;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
 BEGIN {
     Object::Proto::define('Chandra::Table',

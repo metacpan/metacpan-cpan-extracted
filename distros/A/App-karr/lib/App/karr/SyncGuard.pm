@@ -1,7 +1,7 @@
 # ABSTRACT: Push guard with automatic retry on scope exit
 
 package App::karr::SyncGuard;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use strict;
 use warnings;
@@ -15,6 +15,11 @@ has git => (
 has _done => (
     is       => 'rw',
     default  => 0,
+);
+
+has quiet => (
+    is      => 'ro',
+    default => 0,
 );
 
 has _errors => (
@@ -43,19 +48,28 @@ sub DESTROY {
     my $err  = '';
 
     for my $attempt ( 1 .. 3 ) {
-        print STDERR "Push attempt $attempt of 3...\n";
+        # Retry-only (#27): the first attempt is silent; only announce retries,
+        # and honour --quiet. Errors and the final guidance are always shown.
+        print STDERR "Push retry $attempt of 3...\n"
+          if $attempt > 1 && !$self->{quiet};
         $ok = $git->push;
         if ($ok) {
             $self->{_done} = 1;
             return;
         }
-        $err = "git push failed (exit code $?)";
+        # Native Git::Native/libgit2 ops set no shell exit code; the failure
+        # detail lives in $git->last_error (see App::karr::Git).
+        $err = "git push failed: " . ( $git->last_error // 'unknown error' );
         push @{$self->{_errors}}, $err;
         print STDERR "  $err\n";
         sleep 1 if $attempt < 3;
     }
 
-    die "Push failed after 3 attempts. Local refs are intact.\n"
+    # Never die() here: DESTROY typically runs while another exception unwinds
+    # the stack, where a die is turned into a swallowed "(in cleanup)" warning
+    # (or lost entirely during global destruction), masking this message. Warn
+    # so the "refs are intact, run karr sync" guidance always reaches STDERR.
+    warn "Push failed after 3 attempts. Local refs are intact.\n"
       . "Run 'karr sync' to retry.\n"
       . "Errors: " . join( ', ', $self->errs ) . "\n";
 }
@@ -74,7 +88,7 @@ App::karr::SyncGuard - Push guard with automatic retry on scope exit
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 
@@ -85,7 +99,7 @@ version 0.303
     undef $guard;
 
     # If die/croak happens before sync_after:
-    # Guard DESTROY runs sync_after with 3 retries, then dies with clear error
+    # Guard DESTROY retries the push 3 times, then warns with a clear error
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 # ABSTRACT: Delete a task
 
 package App::karr::Cmd::Delete;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -23,9 +23,12 @@ option yes => (
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
+  $self->check_positional_args($args_ref, 1);
+
   $self->sync_before;
 
-  my $id_str = $args_ref->[0] or die "Usage: karr delete ID[,ID,...] [--yes] [--json]\n";
+  my @pos = $self->positional_args($args_ref);
+  my $id_str = $pos[0] or die "Usage: karr delete ID[,ID,...] [--yes] [--json]\n";
   my @ids = $self->parse_ids($id_str);
 
   my @results;
@@ -44,16 +47,14 @@ sub execute {
       }
     }
 
-    $task->file_path->remove;
+    $self->delete_task($task->id);
     push @results, { id => $task->id, title => $task->title, deleted => \1 };
     printf "Deleted task %d: %s\n", $task->id, $task->title unless $self->json;
   }
 
   $self->sync_after;
 
-  if ($self->json) {
-    $self->print_json(@results == 1 ? $results[0] : \@results);
-  }
+  $self->print_json_results(@results);
 }
 
 1;
@@ -70,7 +71,7 @@ App::karr::Cmd::Delete - Delete a task
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

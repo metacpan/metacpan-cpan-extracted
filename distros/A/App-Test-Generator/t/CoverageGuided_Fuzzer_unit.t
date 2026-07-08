@@ -492,4 +492,140 @@ subtest 'corpus size increases after successive runs' => sub {
 	ok($size2 >= $size1, 'corpus size does not decrease on second run');
 };
 
+# ==================================================================
+# minimize_corpus()
+#
+# POD spec:
+#   Greedy set-cover on entries with branch data.
+#   Fingerprint-dedup on entries without branch data.
+#   Bug inputs always retained.
+#   Returns hashref { before, after, branches }.
+# ==================================================================
+
+# Helper: bless a synthetic corpus directly into the fuzzer to avoid
+# needing a real target_sub for coverage-data tests.
+sub _fuzzer_with_corpus {
+	my ($corpus_entries, $bugs) = @_;
+	return bless {
+		corpus       => $corpus_entries,
+		bugs         => $bugs // [],
+		covered      => {},
+		stats        => {},
+		schema       => { input => { type => 'string' } },
+		iterations   => 0,
+		seed         => 0,
+		timeout_secs => 0,
+		_cover_available => 0,
+	}, 'App::Test::Generator::CoverageGuidedFuzzer';
+}
+
+subtest 'minimize_corpus() returns required keys' => sub {
+	my $f = _fuzzer_with_corpus([]);
+	my $stats = $f->minimize_corpus();
+	ok(exists $stats->{before},   'return has before');
+	ok(exists $stats->{after},    'return has after');
+	ok(exists $stats->{branches}, 'return has branches');
+};
+
+subtest 'minimize_corpus() on empty corpus' => sub {
+	my $f = _fuzzer_with_corpus([]);
+	my $stats = $f->minimize_corpus();
+	is($stats->{before},   0, 'before = 0');
+	is($stats->{after},    0, 'after = 0');
+	is($stats->{branches}, 0, 'branches = 0');
+	is(scalar @{ $f->corpus() }, 0, 'corpus stays empty');
+};
+
+subtest 'minimize_corpus() drops redundant with-coverage entries' => sub {
+	# Entry A covers branches 1+2, entry B covers only branch 1 — B is redundant.
+	my $f = _fuzzer_with_corpus([
+		{ input => 'a', coverage => { br1 => 1, br2 => 1 } },
+		{ input => 'b', coverage => { br1 => 1 } },
+	]);
+	my $stats = $f->minimize_corpus();
+	is($stats->{before},   2, 'before = 2');
+	is($stats->{after},    1, 'after = 1 (redundant entry dropped)');
+	is($stats->{branches}, 2, 'branches = 2 (both still covered)');
+	my @inputs = map { $_->{input} } @{ $f->corpus() };
+	ok(grep({ $_ eq 'a' } @inputs), 'covering entry retained');
+	ok(!grep({ $_ eq 'b' } @inputs), 'redundant entry dropped');
+};
+
+subtest 'minimize_corpus() keeps all branches covered' => sub {
+	# Four entries each contributing unique coverage.
+	my $f = _fuzzer_with_corpus([
+		{ input => 1, coverage => { A => 1, B => 1 } },
+		{ input => 2, coverage => { B => 1, C => 1 } },
+		{ input => 3, coverage => { A => 1 } },           # redundant: A covered by 1
+		{ input => 4, coverage => { D => 1 } },
+	]);
+	my $stats = $f->minimize_corpus();
+	is($stats->{branches}, 4, 'all 4 branches still counted');
+	ok($stats->{after} < $stats->{before}, 'corpus shrunk');
+
+	# Reconstruct covered set from minimized corpus
+	my %covered;
+	for my $entry (@{ $f->corpus() }) {
+		$covered{$_} = 1 for keys %{ $entry->{coverage} };
+	}
+	ok($covered{A} && $covered{B} && $covered{C} && $covered{D},
+		'all branches still reachable from minimized corpus');
+};
+
+subtest 'minimize_corpus() deduplicates no-coverage entries by fingerprint' => sub {
+	my $f = _fuzzer_with_corpus([
+		{ input => 'x', coverage => {} },
+		{ input => 'x', coverage => {} },   # duplicate
+		{ input => 'y', coverage => {} },
+	]);
+	my $stats = $f->minimize_corpus();
+	is($stats->{before}, 3, 'before = 3');
+	is($stats->{after},  2, 'after = 2 (duplicate removed)');
+	my @inputs = map { $_->{input} } @{ $f->corpus() };
+	is(scalar(grep { $_ eq 'x' } @inputs), 1, 'x appears exactly once');
+	is(scalar(grep { $_ eq 'y' } @inputs), 1, 'y retained');
+};
+
+subtest 'minimize_corpus() always retains bug-triggering inputs' => sub {
+	my $f = _fuzzer_with_corpus(
+		[
+			{ input => 'safe', coverage => { br1 => 1 } },
+		],
+		[
+			{ input => 'crasher', error => 'die!' },
+		],
+	);
+	my $stats = $f->minimize_corpus();
+	my @inputs = map { $_->{input} } @{ $f->corpus() };
+	ok(grep({ $_ eq 'crasher' } @inputs),
+		'bug input retained even though not in set-cover result');
+};
+
+subtest 'minimize_corpus() is idempotent' => sub {
+	my $f = _fuzzer_with_corpus([
+		{ input => 'a', coverage => { br1 => 1, br2 => 1 } },
+		{ input => 'b', coverage => { br1 => 1 } },
+		{ input => 'x', coverage => {} },
+		{ input => 'x', coverage => {} },
+	]);
+	my $stats1 = $f->minimize_corpus();
+	my $after1  = $stats1->{after};
+	my $stats2  = $f->minimize_corpus();
+	is($stats2->{after}, $after1, 'second call leaves corpus size unchanged');
+};
+
+subtest 'minimize_corpus() handles all no-coverage corpus' => sub {
+	# When Devel::Cover is unavailable all entries have empty coverage —
+	# minimize_corpus() should deduplicate and return a valid stats hashref.
+	my $f = _fuzzer_with_corpus([
+		{ input => 1,   coverage => {} },
+		{ input => 2,   coverage => {} },
+		{ input => 1,   coverage => {} },   # dup of first
+	]);
+	my $stats = $f->minimize_corpus();
+	is($stats->{branches}, 0, 'no branches when no coverage data');
+	is($stats->{before},   3, 'before = 3');
+	is($stats->{after},    2, 'after = 2 (dup removed)');
+};
+
 done_testing();

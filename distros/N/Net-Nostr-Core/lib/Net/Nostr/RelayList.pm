@@ -3,6 +3,7 @@ package Net::Nostr::RelayList;
 use strictures 2;
 
 use Net::Nostr::_ConstructorArgs ();
+use Net::Nostr::_URI qw(validate_relay_url);
 
 use Carp qw(croak);
 use Net::Nostr::Event;
@@ -25,7 +26,7 @@ sub from_event {
     for my $tag (@{$event->tags}) {
         next unless $tag->[0] eq 'r';
         push @{$self->_relays}, {
-            url    => $tag->[1],
+            url    => validate_relay_url($tag->[1], label => 'relay URL'),
             marker => $tag->[2] // '',
         };
     }
@@ -35,6 +36,7 @@ sub from_event {
 sub add {
     my ($self, $url, %opts) = @_;
     croak "url required" unless defined $url;
+    $url = validate_relay_url($url, label => 'relay URL');
     my $marker = $opts{marker} // '';
     croak "marker must be 'read', 'write', or omitted"
         unless $marker eq '' || $marker eq 'read' || $marker eq 'write';
@@ -168,7 +170,8 @@ Creates an empty relay list. Croaks on unknown arguments.
     my $rl = Net::Nostr::RelayList->from_event($event);
 
 Parses a kind 10002 event into a RelayList. Extracts all C<r> tags and
-ignores other tag types. Croaks if the event is not kind 10002.
+ignores other tag types. Croaks if the event is not kind 10002 or if any
+C<r> tag contains a malformed relay URL.
 
     my $event = Net::Nostr::Event->new(
         pubkey => 'a' x 64, kind => 10002, content => '',
@@ -186,8 +189,12 @@ ignores other tag types. Croaks if the event is not kind 10002.
     $rl->add($url, marker => 'read');
 
 Adds a relay entry. C<marker> must be C<'read'>, C<'write'>, or omitted
-(meaning both). If the URL already exists, the entry is updated in place.
-Returns C<$self> for chaining.
+(meaning both). C<$url> must be a strict C<ws://> or C<wss://> relay URL:
+it must include an authority and host, must not include userinfo, query,
+fragment, control characters, or space characters, and any explicit port
+must be between 1 and 65535. Paths and bracketed IPv6 hosts are accepted.
+If the URL already exists, the entry is updated in place. Returns C<$self>
+for chaining.
 
     $rl->add('wss://relay1.com')
        ->add('wss://relay2.com', marker => 'write');

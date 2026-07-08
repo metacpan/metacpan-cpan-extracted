@@ -470,7 +470,7 @@ _sign_doc(doc, identity, hash_alg, reason, location, contact, name, signing_time
                     hv_iterinit(fh);
                     while ((val = hv_iternextsv(fh, &key, &keylen))) {
                         if (!SvOK(val)) continue;
-                        ap_names[i] = pdfmake_xs_strndup(key, (size_t)keylen);
+                        ap_names[i] = pdfmake_xs_strndup(aTHX_ key, (size_t)keylen);
                         ap_bases[i] = strdup(SvPV_nolen(val));
                         i++;
                     }
@@ -498,7 +498,7 @@ _sign_doc(doc, identity, hash_alg, reason, location, contact, name, signing_time
                     hv_iterinit(xh);
                     while ((val = hv_iternextsv(xh, &key, &keylen))) {
                         if (!SvOK(val)) continue;
-                        ap_xo_names[i] = pdfmake_xs_strndup(key, (size_t)keylen);
+                        ap_xo_names[i] = pdfmake_xs_strndup(aTHX_ key, (size_t)keylen);
                         ap_xo_nums[i]  = (uint32_t)SvUV(val);
                         i++;
                     }
@@ -513,13 +513,13 @@ _sign_doc(doc, identity, hash_alg, reason, location, contact, name, signing_time
         pdfmake_err_t err = pdfmake_doc_sign(doc, &config, &out);
         /* Free the font name/base allocations regardless of outcome. */
         if (ap_xo_names) {
-            for (size_t i = 0; i < ap_xo_count; i++) free(ap_xo_names[i]);
+            for (size_t i = 0; i < ap_xo_count; i++) Safefree(ap_xo_names[i]);
             free(ap_xo_names);
             free(ap_xo_nums);
         }
         if (ap_names) {
             for (size_t i = 0; i < ap_font_count; i++) {
-                free(ap_names[i]);
+                Safefree(ap_names[i]);
                 if (ap_bases) free(ap_bases[i]);
             }
             free(ap_names);

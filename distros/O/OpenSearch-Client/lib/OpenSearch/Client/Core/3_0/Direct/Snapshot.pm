@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Snapshot;
-$OpenSearch::Client::Core::3_0::Direct::Snapshot::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Snapshot::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Snapshot>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for snapshot.|https://docs.opensearch.org/latest/
 
 =head1 METHODS
     
-=head2 snapshot->cleanup_repository
+=head2 cleanup_repository
 
 Removes any stale data from a snapshot repository.
 
@@ -101,9 +101,9 @@ C<POST /_snapshot/{repository}/_cleanup>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for snapshot.cleanup_repository|https://docs.opensearch.org/latest/api-reference/snapshots/index/>
+L<OpenSearch documentation for snapshot-E<gt>cleanup_repository|https://docs.opensearch.org/latest/api-reference/snapshots/index/>
     
-=head2 snapshot->clone
+=head2 clone
 
 Creates a clone of all or part of a snapshot in the same repository as the original snapshot.
 
@@ -140,9 +140,9 @@ C<PUT /_snapshot/{repository}/{snapshot}/_clone/{target_snapshot}>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for snapshot.clone|https://docs.opensearch.org/latest/api-reference/snapshots/index/>
+L<OpenSearch documentation for snapshot-E<gt>clone|https://docs.opensearch.org/latest/api-reference/snapshots/index/>
     
-=head2 snapshot->create
+=head2 create
 
 Creates a snapshot within an existing repository.
 
@@ -182,9 +182,9 @@ C<PUT /_snapshot/{repository}/{snapshot}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for snapshot.create|https://opensearch.org/docs/latest/api-reference/snapshots/create-snapshot/>
+L<OpenSearch documentation for snapshot-E<gt>create|https://opensearch.org/docs/latest/api-reference/snapshots/create-snapshot/>
     
-=head2 snapshot->create_repository
+=head2 create_repository
 
 Creates a snapshot repository.
 
@@ -224,9 +224,9 @@ C<PUT /_snapshot/{repository}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for snapshot.create_repository|https://opensearch.org/docs/latest/api-reference/snapshots/create-repository/>
+L<OpenSearch documentation for snapshot-E<gt>create_repository|https://opensearch.org/docs/latest/api-reference/snapshots/create-repository/>
     
-=head2 snapshot->delete
+=head2 delete
 
 Deletes a snapshot.
 
@@ -260,9 +260,9 @@ C<DELETE /_snapshot/{repository}/{snapshot}>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for snapshot.delete|https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot/>
+L<OpenSearch documentation for snapshot-E<gt>delete|https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot/>
     
-=head2 snapshot->delete_repository
+=head2 delete_repository
 
 Deletes a snapshot repository.
 
@@ -296,9 +296,9 @@ C<DELETE /_snapshot/{repository}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for snapshot.delete_repository|https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot-repository/>
+L<OpenSearch documentation for snapshot-E<gt>delete_repository|https://opensearch.org/docs/latest/api-reference/snapshots/delete-snapshot-repository/>
     
-=head2 snapshot->get
+=head2 get
 
 Returns information about a snapshot.
 
@@ -334,9 +334,9 @@ C<GET /_snapshot/{repository}/{snapshot}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for snapshot.get|https://docs.opensearch.org/latest/api-reference/snapshots/index/>
+L<OpenSearch documentation for snapshot-E<gt>get|https://docs.opensearch.org/latest/api-reference/snapshots/index/>
     
-=head2 snapshot->get_repository
+=head2 get_repository
 
 Returns information about a snapshot repository.
 
@@ -373,9 +373,9 @@ C<GET /_snapshot/{repository}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for snapshot.get_repository|https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-repository/>
+L<OpenSearch documentation for snapshot-E<gt>get_repository|https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-repository/>
     
-=head2 snapshot->restore
+=head2 restore
 
 Restores a snapshot.
 
@@ -412,9 +412,9 @@ C<POST /_snapshot/{repository}/{snapshot}/_restore>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for snapshot.restore|https://opensearch.org/docs/latest/api-reference/snapshots/restore-snapshot/>
+L<OpenSearch documentation for snapshot-E<gt>restore|https://opensearch.org/docs/latest/api-reference/snapshots/restore-snapshot/>
     
-=head2 snapshot->status
+=head2 status
 
 Returns information about the status of a snapshot.
 
@@ -455,9 +455,9 @@ C<GET /_snapshot/{repository}/{snapshot}/_status>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for snapshot.status|https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-status/>
+L<OpenSearch documentation for snapshot-E<gt>status|https://opensearch.org/docs/latest/api-reference/snapshots/get-snapshot-status/>
     
-=head2 snapshot->verify_repository
+=head2 verify_repository
 
 Verifies a repository.
 
@@ -491,7 +491,7 @@ C<POST /_snapshot/{repository}/_verify>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for snapshot.verify_repository|https://opensearch.org/docs/latest/api-reference/snapshots/verify-snapshot-repository/>
+L<OpenSearch documentation for snapshot-E<gt>verify_repository|https://opensearch.org/docs/latest/api-reference/snapshots/verify-snapshot-repository/>
 
 =head1 MANUAL
 

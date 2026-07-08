@@ -2,8 +2,8 @@ NAME
     App::PDFUtils - Command-line utilities related to PDF files
 
 VERSION
-    This document describes version 0.017 of App::PDFUtils (from Perl
-    distribution App-PDFUtils), released on 2026-02-02.
+    This document describes version 0.019 of App::PDFUtils (from Perl
+    distribution App-PDFUtils), released on 2026-06-27.
 
 SYNOPSIS
 DESCRIPTION
@@ -17,7 +17,8 @@ DESCRIPTION
     5. pdf-has-password
     6. pdfgrep
     7. pdfnopass
-    8. remove-pdf-password
+    8. pdfsplit
+    9. remove-pdf-password
 
 FUNCTIONS
   add_pdf_password
@@ -212,6 +213,57 @@ FUNCTIONS
 
     Return value: (any)
 
+  pdfsplit
+    Usage:
+
+     pdfsplit(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Split PDF into parts by pages.
+
+    You can specify the number of parts and the utility will group roughly
+    the same number of pages:
+
+     % pdfsplit --num-parts=5 990_pages.pdf
+     Creating 990_pages-part1of5_page001_198.pdf ...
+     Creating 990_pages-part2of5_page199_396.pdf ...
+     Creating 990_pages-part3of5_page397_594.pdf ...
+     Creating 990_pages-part4of5_page595_792.pdf ...
+     Creating 990_pages-part5of5_page596_990.pdf ...
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file* => *filename*
+
+        Input file.
+
+    *   num_pages_per_part => *posint*
+
+        Specify number of pages per part.
+
+    *   num_parts => *posint*
+
+        Specify number of parts.
+
+    *   overwrite => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   remove_pdf_password
     Usage:
 
@@ -290,6 +342,9 @@ SEE ALSO
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

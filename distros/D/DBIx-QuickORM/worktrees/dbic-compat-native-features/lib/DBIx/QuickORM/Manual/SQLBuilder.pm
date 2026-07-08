@@ -2,7 +2,7 @@ package DBIx::QuickORM::Manual::SQLBuilder;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 1;
 
@@ -382,6 +382,13 @@ Returns C<< { statement, bind, source } >>.
 C<_format_insert_and_update_data> wraps each insert/update value in
 C<< { -value => $v } >> so SQL::Abstract treats it as a literal bind rather than
 trying to interpret a hash- or array-ref value as an operator/sub-query.
+
+Intentional SQL literals are the exception. A scalar ref (C<\'NOW()'>) is
+emitted as SQL verbatim, and an arrayref whose first element is a scalar ref
+(C<[\'col + ?', $n]>) becomes a literal-with-bind expression whose bind values
+keep the column's affinity. The database computes such values, so the row layer
+reads the result back after the write (via C<RETURNING> where the dialect
+supports it, otherwise a refresh) and the cached row reflects the stored value.
 
 =item qorm_and / qorm_or
 

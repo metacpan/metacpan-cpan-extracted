@@ -25,7 +25,7 @@
             "DBD::DuckDB" : "0",
             "DBD::MariaDB" : "0",
             "DBD::Pg" : "0",
-            "DBD::SQLite" : "1.64",
+            "DBD::SQLite" : "1.70",
             "DBD::mysql" : "0",
             "DateTime::Format::MySQL" : "0",
             "DateTime::Format::Pg" : "0",
@@ -40,7 +40,7 @@
             "Carp" : "0",
             "Compress::Zstd" : "0.06",
             "Cpanel::JSON::XS" : "3.0224",
-            "DBD::SQLite" : "1.64",
+            "DBD::SQLite" : "1.70",
             "DBI" : "1.628",
             "Data::Dumper" : "2.171",
             "DateTime" : "0",
@@ -69,7 +69,7 @@
             "DBD::DuckDB" : "0",
             "DBD::MariaDB" : "0",
             "DBD::Pg" : "0",
-            "DBD::SQLite" : "1.64",
+            "DBD::SQLite" : "1.70",
             "DBD::mysql" : "0",
             "DateTime::Format::MySQL" : "0",
             "DateTime::Format::Pg" : "0",
@@ -97,7 +97,7 @@
          "url" : "https://github.com/exodist/DBIx-QuickORM/"
       }
    },
-   "version" : "0.000027",
+   "version" : "0.000028",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

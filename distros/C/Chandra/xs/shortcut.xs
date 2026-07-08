@@ -612,7 +612,6 @@ CODE:
 
         js = newSVpvs(
             "(function(){\n"
-            "if(window.__chandraShortcut)return;\n"
             "var bindings={\n"
         );
 
@@ -657,7 +656,10 @@ CODE:
             "return p.join('+');\n"
             "}\n"
 
-            "document.addEventListener('keydown',function(e){\n"
+            "if(window.__chandraShortcutHandler){\n"
+            "document.removeEventListener('keydown',window.__chandraShortcutHandler,true);\n"
+            "}\n"
+            "window.__chandraShortcutHandler=function(e){\n"
             "var combo=normKey(e);\n"
             "if(!combo)return;\n"
 
@@ -690,7 +692,8 @@ CODE:
             "if(bindings[combo].pd)e.preventDefault();\n"
             "window.chandra.invoke('__chandra_shortcut',[combo]);\n"
             "}\n"
-            "},true);\n"
+            "};\n"
+            "document.addEventListener('keydown',window.__chandraShortcutHandler,true);\n"
 
             "window.__chandraShortcut={\n"
             "register:function(c,o){bindings[c]=o||{};},\n"
@@ -713,21 +716,15 @@ inject(self)
 CODE:
 {
     HV *hv = (HV *)SvRV(self);
-    SV **injected_svp;
     SV **bindings_svp;
 
-    injected_svp = hv_fetchs(hv, "_injected", 0);
-    if (injected_svp && SvTRUE(*injected_svp)) {
-        RETVAL = SvREFCNT_inc(self);
-    } else {
+    {
         bindings_svp = hv_fetchs(hv, "bindings", 0);
         if (!bindings_svp || !SvROK(*bindings_svp)
             || HvUSEDKEYS((HV *)SvRV(*bindings_svp)) == 0) {
             RETVAL = SvREFCNT_inc(self);
         } else {
             SV *js;
-
-            (void)hv_stores(hv, "_injected", newSViv(1));
 
             /* Get JS code */
             {

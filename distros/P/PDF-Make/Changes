@@ -1,5 +1,14 @@
 Revision history for PDF::Make
 
+0.06  2026-07-07
+      - pdfmake_format_real: replace hand-rolled digit-extraction loop with
+        sprintf("%.6f") + trailing-zero strip.
+      - pdfmake_xs_strndup in Make.xs: add pTHX_ and switch from malloc to
+        Newx / Safefree.  XSUB.h redefines malloc→PerlMem_malloc on Windows
+        PERL_IMPLICIT_SYS builds; without pTHX_ the expansion references
+        my_perl which is undeclared in a plain static function, causing a
+        compile error
+
 0.05  2026-06-29
       - t/73-watermarks.t: switched the three watermark opacity / colour
         assertions (default 0.3 opacity, custom [0.8,0.2,0.2] colour,

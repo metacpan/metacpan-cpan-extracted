@@ -5,12 +5,13 @@ use strict;
 use warnings;
 use Log::ger;
 
+use File::chdir;
 use Perinci::Object;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-02-02'; # DATE
+our $DATE = '2026-06-27'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 our %SPEC;
 
@@ -537,6 +538,126 @@ sub compress_pdf {
     $envres->as_struct;
 }
 
+$SPEC{pdfsplit} = {
+    v => 1.1,
+    summary => 'Split PDF into parts by pages',
+    description => <<'MARKDOWN',
+
+You can specify the number of parts and the utility will group roughly the same
+number of pages:
+
+    % pdfsplit --num-parts=5 990_pages.pdf
+    Creating 990_pages-part1of5_page001_198.pdf ...
+    Creating 990_pages-part2of5_page199_396.pdf ...
+    Creating 990_pages-part3of5_page397_594.pdf ...
+    Creating 990_pages-part4of5_page595_792.pdf ...
+    Creating 990_pages-part5of5_page596_990.pdf ...
+
+MARKDOWN
+    args => {
+        %argspec0_file,
+        %argspecopt_overwrite,
+        num_parts => {
+            summary => 'Specify number of parts',
+            schema => 'posint*',
+            cmdline_aliases => {n=>{}},
+        },
+        num_pages_per_part => {
+            summary => 'Specify number of pages per part',
+            schema => 'posint*',
+            cmdline_aliases => {p=>{}},
+        },
+    },
+    examples => [
+        {
+            summary => 'Split a PDF file into 5 roughly equal parts (number of pages)',
+            src => '[[prog]] -n5 somefile.pdf',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Split a PDF file into chunks of one-hundred pages each',
+            src => '[[prog]] -p100 somefile.pdf',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
+    args_rels => {
+        req_one => [qw/num_parts num_pages_per_part/],
+    },
+    deps => {
+        prog => 'pdftk',
+    },
+};
+sub pdfsplit {
+    require Cwd;
+    require File::Temp;
+    require IPC::System::Options;
+    require List::MoreUtils;
+    require List::NSect;
+    require Number::Format::FitWidth;
+
+    my %args = @_;
+    my $file = $args{file};
+    defined($file) or return [400, "Please specify input file"];
+    my $abs_file = Cwd::abs_path($file);
+
+    my ($file_prefix) = $file =~ /(.+)\.(?:pdf)\z/i
+        or return [400, "Input file must end with .pdf"];
+
+    my $tempdir = File::Temp::tempdir(CLEANUP => 1);
+
+    my $num_pages;
+    my @page_pdf;
+    {
+        local $CWD = $tempdir;
+        IPC::System::Options::system({log=>1, die=>1}, "pdftk", $abs_file, "burst");
+        @page_pdf = glob("*.pdf");
+        $num_pages = scalar(@page_pdf);
+    }
+
+    my ($num_parts, $num_pages_per_part, @parts_pdf);
+    if (defined $args{num_parts}) {
+        $num_parts = $args{num_parts};
+        if ($num_parts > $num_pages) {
+            log_warn "Reducing number of parts from %d to %d because there are just that number of pages", $num_parts, $num_pages;
+            $num_parts = $num_pages;
+        }
+        @parts_pdf = List::NSect::nsect($num_parts, @page_pdf);
+    } else {
+        $num_pages_per_part = $args{num_pages_per_part};
+        $num_parts = int($num_pages / $num_pages_per_part);
+        return [412, "Please choose a smaller num_pages_per_part (currently: $args{num_pages_per_part}) because number of pages is just $num_pages"]
+            unless $num_parts >= 1;
+        my $iter = List::MoreUtils::natatime($num_pages_per_part, @page_pdf);
+        while (my @part_pdf = $iter->()) {
+            push @parts_pdf, \@part_pdf;
+        }
+    }
+
+    return [304, "There will be just one part"] unless $num_parts > 1;
+
+    my $page_num = 1;
+    for my $part (1 .. scalar(@parts_pdf)) {
+        my $part_file = sprintf(
+            "%s-part%sof%d_page%s_%s.pdf",
+            $file_prefix,
+            Number::Format::FitWidth::format_fitwidth({zero_prefix=>1, max=>$num_parts}, $part),
+            scalar(@parts_pdf),
+            Number::Format::FitWidth::format_fitwidth({zero_prefix=>1, max=>$num_pages}, $page_num),
+            Number::Format::FitWidth::format_fitwidth({zero_prefix=>1, max=>$num_pages}, $page_num + $#{ $parts_pdf[$part-1] }),
+        );
+        log_info "Creating part %d of %d: %s ...",
+            $part, scalar(@parts_pdf), $part_file;
+        IPC::System::Options::system({log=>1, die=>1}, "pdftk", (map { "$tempdir/$_" } @{ $parts_pdf[$part-1] }), "cat", "output", $part_file);
+        $page_num += @{ $parts_pdf[$part-1] };
+    }
+
+    [200];
+}
+
 1;
 # ABSTRACT: Command-line utilities related to PDF files
 
@@ -552,7 +673,7 @@ App::PDFUtils - Command-line utilities related to PDF files
 
 =head1 VERSION
 
-This document describes version 0.017 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2026-02-02.
+This document describes version 0.019 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2026-06-27.
 
 =head1 SYNOPSIS
 
@@ -577,7 +698,9 @@ files:
 
 =item 7. L<pdfnopass>
 
-=item 8. L<remove-pdf-password>
+=item 8. L<pdfsplit>
+
+=item 9. L<remove-pdf-password>
 
 =back
 
@@ -800,6 +923,62 @@ Return value:  (any)
 
 
 
+=head2 pdfsplit
+
+Usage:
+
+ pdfsplit(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Split PDF into parts by pages.
+
+You can specify the number of parts and the utility will group roughly the same
+number of pages:
+
+ % pdfsplit --num-parts=5 990_pages.pdf
+ Creating 990_pages-part1of5_page001_198.pdf ...
+ Creating 990_pages-part2of5_page199_396.pdf ...
+ Creating 990_pages-part3of5_page397_594.pdf ...
+ Creating 990_pages-part4of5_page595_792.pdf ...
+ Creating 990_pages-part5of5_page596_990.pdf ...
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<file>* => I<filename>
+
+Input file.
+
+=item * B<num_pages_per_part> => I<posint>
+
+Specify number of pages per part.
+
+=item * B<num_parts> => I<posint>
+
+Specify number of parts.
+
+=item * B<overwrite> => I<bool>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
 =head2 remove_pdf_password
 
 Usage:
@@ -882,6 +1061,12 @@ L<diff-pdf-text> from L<App::DiffPDFText>.
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 CONTRIBUTING
 

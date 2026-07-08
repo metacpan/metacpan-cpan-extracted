@@ -1,5 +1,14 @@
 Revision history for Chandra
 
+0.28 2026-07-07
+  - xs/shortcut.xs: fix keyboard shortcuts broken by double injection after document.open().
+
+0.27 2026-07-07
+  - chandra_internal.h CHANDRA_ROUTER_JS: fix navigation links broken by double injection.
+
+0.26 2026-07-07
+  - chandra_canvas.h _canvas_nv_str: replace Gconvert with SvPV.
+
 0.25 2026-05-17
   - Fix MANIFEST
 

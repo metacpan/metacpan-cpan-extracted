@@ -30,6 +30,9 @@ extract-schemas - Extract test schemas from Perl modules
                           (no short form, to avoid conflict with --fuzz/-f)
       --fuzz-all          Fuzz all methods, including those with no input schema
       --corpus-dir DIR    Directory to persist fuzz corpora (default: schemas/corpus/)
+      --minimize-corpus   After fuzzing, trim each corpus to the minimum subset
+                          that still covers all discovered branches (greedy set-cover).
+                          Keeps the corpus file small across many CI runs.
       --help              Show this help message
       --man               Show full documentation
 
@@ -39,6 +42,7 @@ extract-schemas - Extract test schemas from Perl modules
       extract-schemas --fuzz lib/MyModule.pm
       extract-schemas --fuzz --fuzz-iters 300 --corpus-dir t/corpus lib/MyModule.pm
       extract-schemas --fuzz --fuzz-all lib/MyModule.pm
+      extract-schemas --fuzz --minimize-corpus lib/MyModule.pm
 
 =head1 QUICK START
 
@@ -106,10 +110,16 @@ The fuzzer will:
 
 =item * Persist a corpus to C<--corpus-dir> for incremental improvement across runs
 
+=item * Optionally minimise the corpus with C<--minimize-corpus> to keep file sizes bounded
+
 =back
 
 Corpus files are named C<< <corpus-dir>/<method>.json >> and are automatically
-loaded on subsequent runs, so each run builds on the last.
+loaded on subsequent runs, so each run builds on the last.  Without
+C<--minimize-corpus> the corpus grows by several entries per run; with it, only
+the entries that provide unique branch coverage are retained (greedy set-cover),
+plus a deduplicated set of entries from prior runs that cannot be re-evaluated.
+Bug-triggering inputs are always kept regardless of coverage contribution.
 
 =cut
 
@@ -128,21 +138,23 @@ my %extractor_opts = (
     verbose    => 0,
 );
 
-my $fuzz       = 0;
-my $fuzz_all   = 0;
-my $fuzz_iters = 100;
+my $fuzz            = 0;
+my $fuzz_all        = 0;
+my $fuzz_iters      = 100;
+my $minimize_corpus = 0;
 my $corpus_dir;   # default set after output_dir is known
 
 GetOptions(
-	'output-dir|o=s'  => \$extractor_opts{output_dir},
-	'strict-pod|s=s'  => \$extractor_opts{strict_pod},
-	'verbose|v'       => \$extractor_opts{verbose},
-	'fuzz|f'          => \$fuzz,
-	'fuzz-all'        => \$fuzz_all,
-	'fuzz-iters=i'    => \$fuzz_iters,
-	'corpus-dir|c=s'  => \$corpus_dir,
-	'help|h'          => \$cli_opts{help},
-	'man|m'           => \$cli_opts{man},
+	'output-dir|o=s'   => \$extractor_opts{output_dir},
+	'strict-pod|s=s'   => \$extractor_opts{strict_pod},
+	'verbose|v'        => \$extractor_opts{verbose},
+	'fuzz|f'           => \$fuzz,
+	'fuzz-all'         => \$fuzz_all,
+	'fuzz-iters=i'     => \$fuzz_iters,
+	'corpus-dir|c=s'   => \$corpus_dir,
+	'minimize-corpus'  => \$minimize_corpus,
+	'help|h'           => \$cli_opts{help},
+	'man|m'            => \$cli_opts{man},
 ) or pod2usage(2);
 
 pod2usage(-exitval => 0, -verbose => 1) if $cli_opts{help};
@@ -237,13 +249,24 @@ if ($fuzz) {
         $fuzzer->load_corpus($corpus_file) if -f $corpus_file;
 
         my $report = $fuzzer->run();
+
+        if ($minimize_corpus) {
+            my $stats = $fuzzer->minimize_corpus();
+            printf "%d bugs, %d branches covered, corpus %d->%d entries\n",
+                $report->{bugs_found},
+                $report->{branches_covered},
+                $stats->{before},
+                $stats->{after};
+        }
+
         $fuzzer->save_corpus($corpus_file);
 
         $fuzz_results{$method} = $report;
 
         printf "%d bugs, %d branches covered\n",
             $report->{bugs_found},
-            $report->{branches_covered};
+            $report->{branches_covered}
+            unless $minimize_corpus;
     }
 
     print "\n";
@@ -456,6 +479,12 @@ Limited information. Manual review required.
 
     # Subsequent runs: loads corpus and extends it
     extract-schemas --fuzz lib/MyModule.pm
+
+=head2 Keep corpus bounded with minimization
+
+    # Trims each corpus to the smallest subset that still covers every branch,
+    # preventing unbounded growth across many CI runs.
+    extract-schemas --fuzz --minimize-corpus lib/MyModule.pm
 
 =head2 Verbose Mode
 

@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie qw(:all);
+
+use App::Test::Generator::BenchmarkGenerator;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage;
+use YAML::XS qw(LoadFile);
+
+=head1 NAME
+
+benchmark-generator - Generate Benchmark harnesses from ATG schema files
+
+=head1 SYNOPSIS
+
+  benchmark-generator -i schemas/my_func.yml
+  benchmark-generator -i schemas/abs.yml -o benchmarks/abs.pl
+  benchmark-generator -i schemas/abs.yml -r
+
+=head1 DESCRIPTION
+
+Reads an ATG YAML schema (the same format used by C<fuzz-harness-generator>)
+and emits a self-contained Perl benchmark script using L<Benchmark/cmpthese>.
+
+Each transform in the schema becomes one variant in the C<cmpthese> call.
+When no transforms are defined a single C<'default'> variant is generated.
+Representative input values are derived from each parameter's type and
+range constraints.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--input|-i> FILE
+
+The schema YAML file to read (required unless positional argument given).
+
+=item B<--output|-o> FILE
+
+Output file for the generated benchmark.  Defaults to STDOUT.
+
+=item B<--run|-r>
+
+Execute the generated benchmark with C<perl> immediately after generating it.
+Implies a temporary output file when B<--output> is not given.
+
+=item B<--version|-V>
+
+Print the L<App::Test::Generator> version and exit.
+
+=item B<--help|-h>
+
+Show this help message and exit.
+
+=back
+
+=cut
+
+my ($infile, $outfile, $run, $help, $version);
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'input|i=s'   => \$infile,
+	'output|o=s'  => \$outfile,
+	'run|r'       => \$run,
+	'help|h'      => \$help,
+	'version|V'   => \$version,
+) or pod2usage(2);
+
+pod2usage(-exitval => 0, -verbose => 1) if $help;
+
+if($version) {
+	print $App::Test::Generator::BenchmarkGenerator::VERSION, "\n";
+	exit 0;
+}
+
+$infile //= shift @ARGV;
+pod2usage(-message => 'ERROR: no input schema given', -exitval => 2)
+	unless defined $infile;
+
+my $schema = LoadFile($infile);
+
+my $bg     = App::Test::Generator::BenchmarkGenerator->new(schema => $schema);
+my $source = $bg->generate();
+
+if($outfile) {
+	open my $fh, '>', $outfile;
+	print $fh $source;
+	close $fh;
+	print "Wrote benchmark to $outfile\n";
+} elsif($run) {
+	require File::Temp;
+	my $tmp = File::Temp->new(SUFFIX => '.pl', UNLINK => 1);
+	print $tmp $source;
+	close $tmp;
+	system($^X, "$tmp");
+} else {
+	print $source;
+}

@@ -1,3 +1,108 @@
+0.000028  2026-07-07 15:13:35-07:00 America/Los_Angeles
+
+    Features:
+    - Volatile columns: a column whose stored value the database may set or change on write can be marked `volatile` (generated, identity, server-default, on-update, and trigger-set columns are auto-detected during introspection). QuickORM does not keep a stale value for one: a value you send is kept, but a value the database fills or changes is lazily fetched from the database on next access instead of trusting what was sent (a column that is both volatile and omitted is cleared after the write); use auto_refresh to read the whole row back at once. Tables can be marked volatile-free with `no_volatile` (DSL or `quick(no_volatile => [...])`) to assert no volatility and silence the per-table trigger warning; the connection can list the tables that have no volatile columns.
+    - Column affinity is now derived from the database's own type catalog when a type name is not in the built-in name map: the numeric SQL type code is mapped to an affinity, so standard numeric/char/binary/date types no longer need a code patch. On PostgreSQL, a type the generic catalog does not list is resolved from pg_type as well: an enum and the built-in range, network (inet/cidr/macaddr), and geometric types map to string affinity, and a domain inherits its base type's affinity. Array, composite, and unknown/extension types still warn once (asking for a ticket) and default to string, since an array comes back as an arrayref that no scalar affinity can compare.
+
+    Bug Fixes:
+    - A trigger-driven column value is now read back consistently across databases: because a RETURNING clause is computed before AFTER triggers run, a table with triggers is detected during introspection (has_triggers) and its writes read the row back with a follow-up fetch instead of trusting RETURNING, matching how databases without RETURNING already behave. Trigger detection is implemented for SQLite, PostgreSQL, and MySQL/MariaDB.
+    - Defining two tables (or two schemas, dbs, or servers) with the same name in one registry now croaks instead of silently letting the last definition win (re-opening an alt/variant frame is unaffected).
+    - Importing DBIx::QuickORM with 'only' or 'skip' no longer strips the generated import()/builder() helpers, so a downstream `use My::ORM` keeps working.
+    - An unknown import 'type' now croaks at use-time instead of being silently accepted.
+    - `no DBIx::QuickORM` now removes DSL functions that were installed under a renamed name (via the 'rename' import option).
+    - A database whose registered name contains a dot is now fetchable by that name; the server.db form is only taken when the leading segment names a defined server.
+    - DSL argument parsing (index, column, link, plugins, autoskip, and the table class-path) no longer truncates its remaining arguments when an argument stringifies false, such as the literal '0'.
+    - The autoname 'table' and 'link' hooks no longer corrupt other hooks registered for the same stage; the mutated table hashref / links arrayref is threaded through instead of a name string or undef.
+    - Merging an introspected schema with a declaration that renames a physical table via db_name now collapses them into a single source under the declared ORM name, instead of leaving both the declared name and the database name behind.
+    - A generated relationship accessor that collides with a column accessor is now caught even when the relationship is only introduced by the merged (declared) schema, rather than being silently dropped.
+    - Table definitions now croak when a unique constraint or index references a column that does not exist, or when a link entry is not a Link object; undefined/expression index key-parts surfaced by introspection are ignored.
+    - The cached row manager now amortizes a sweep of dead cache entries, so a workload that inserts an unending stream of distinct primary keys no longer grows memory unbounded.
+    - A statement handle that outlives a connection reconnect no longer croaks when it finalizes: clearing an async/aside/fork entry from a registry that reconnect wiped is now a silent no-op.
+    - Using a driver-level async statement handle after its connection has reconnected now croaks with a clear "invalidated by a database reconnect" message instead of a raw driver error, and such a handle finalizes cleanly at destruction without a stray warning; aside and forked handles run on their own connections and are unaffected.
+    - A forked write whose child fails now warns from its destructor instead of throwing an exception out of it.
+    - Reading a forked statement handle (next/result/ready) from a different process than the one that created it now croaks instead of stealing frames off the shared pipe.
+    - SQLite introspection: a permanent table shadowed by a temporary table of the same name now keeps its own column, index, foreign-key, and DDL metadata instead of being poisoned with the temporary table's.
+    - DuckDB generated-column detection now handles comma-bearing types like DECIMAL(10,2) and ignores GENERATED text inside string literals and comments, so generated columns are classified correctly.
+    - DuckDB now clears its in-transaction flag even when a COMMIT or ROLLBACK is rejected, so a later transaction is no longer wrongly refused as already open, and the flag only tracks the dialect's own handle.
+    - DuckDB supports_type now reports native names for text (TEXT) and varchar (VARCHAR).
+    - JSON type deflation no longer requires an affinity argument and encodes the value directly.
+    - Writes (insert/update/delete/cas) through a handle-as-subquery (derived-table) source now croak with a clear message instead of dying deep in statement construction or on a missing method.
+    - omit() on a handle-as-subquery source now croaks (its columns are not enumerable) instead of silently returning the column it was told to omit.
+    - handle() now croaks on an unknown -flag (e.g. a misspelled -allow_overide) instead of silently storing and ignoring it, which previously left the intended protection disabled with no diagnostic.
+    - upsert() on an already-stored bound row now reports an "upsert" error instead of the shared insert body's "insert" wording.
+    - Two columns that resolve to the same generated accessor name now croak during autorow generation instead of silently dropping one (matching the existing link-vs-link collision behavior).
+    - Generated field lists (and thus SELECT column order) are now deterministic, ordered by each column's position instead of hash order.
+    - and(), or(), and the join methods (left_join/right_join/inner_join/full_join/cross_join) now croak when called in void context, like the other query-building methods, instead of silently doing nothing.
+    - Declaring a table's primary_key twice now croaks (pass { override => 1 } to intentionally replace it) instead of silently keeping only the last declaration.
+    - Referencing a table class through view() (or a view class through table()) now croaks on the kind mismatch instead of silently building the wrong source type.
+    - SQLite introspection no longer records a partial (WHERE ...) or expression unique index as a table-level unique constraint (which previously produced spurious desyncs or a garbage unique key).
+    - Invalidating a row no longer emits a spurious "pending data" warning from a rolled-back frame, and resurrecting an invalidated row clears its stale invalidation reason.
+    - An async single-row proxy now resolves boolean and ready() opportunistically, so a completed-empty result reads as false/ready without needing another method call first.
+    - Autorow generation no longer silently swallows a compile error in a user's row/base class (it rethrows instead of substituting the stock Row), and builds the correct %INC key for multi-part class names.
+    - Saving or deleting a join row now fans out to its sub-rows in a deterministic foreign-key-safe order (parents before children on save, children first on delete) instead of hash order.
+    - An async/aside/forked statement handle inherited by a forked child no longer touches the shared driver socket or pipe when the child is destroyed, avoiding corruption of the owner's connection.
+    - Reads on a handle bound to a row whose table has no primary key now croak instead of scanning the whole table (and possibly returning the wrong row).
+    - Building a join from a non-table source (e.g. a literal/derived-table source) now croaks early instead of failing deep in join construction with obscure errors.
+    - A hashref link spec without local_table resolved on a join now croaks with a clear message instead of dying on a missing name() method.
+    - A bare (unqualified) field that exists in more than one joined component now reports a clean ambiguity instead of silently binding to the first match.
+    - Inferring a join's from-side now detects an ambiguous table even when it is the primary source (self-join), and alias.field protos split on the first dot consistently; a caller-supplied join alias must be a valid identifier.
+    - Resolving links on a join whose components link to the same third table via same-named columns no longer croaks; distinct links are kept and reported as a clean ambiguity.
+    - A self-join no longer duplicates a link's aliases when merging its repeated links, fixing a false "Ambiguous link" error.
+    - Join::Row field accessors now return undef for a LEFT-JOIN-missed sub-row and croak cleanly on an unknown alias instead of dying on an undefined value.
+    - Join::Row is_valid now requires every sub-row to be valid, so a join row with an invalidated sub-row is no longer both valid and invalid.
+    - A hashref link spec with an unknown key now croaks clearly instead of misreading the key as the other-table name.
+    - Extending a cloned Join (re-joining a table already present) no longer corrupts the original join's alias lookup.
+    - Committing or rolling back an outer transaction object from inside a nested transaction's action now croaks instead of silently resolving the inner transaction.
+    - A blessed row_manager instance already in use by another live connection can no longer be silently rebound; it croaks instead of corrupting the first connection's state, but once that connection is disconnected the manager is free to rebind.
+    - Connections now have an explicit disconnect() (and a connected() predicate), and $orm->disconnect actually disconnects the cached handle instead of only dropping the reference.
+    - A database handle returned by a connect callback now gets the same default attributes (RaiseError, AutoCommit, etc.) as the DSN path instead of only AutoInactiveDestroy.
+    - Committing a transaction whose rollback was refused by a guard now croaks instead of silently issuing a ROLLBACK while reporting success.
+    - auto_retry_txn(action => sub {...}) (the two-element flat form) now retries as documented instead of running the action exactly once.
+    - Cancelling an async query no longer tries to collect its result (which croaks) or run its on_ready callback after the cancel.
+    - reconnect() after a fork no longer explicitly disconnects the handle inherited from the parent, which could tear down the parent's database session.
+    - A forked query whose child dies before producing a result is now detected by ready() instead of hanging wait()/DESTROY forever.
+    - Destroying a parent transaction while a child savepoint is still open no longer wedges the connection with a phantom open transaction.
+    - A delete or update committed by a savepoint now correctly clears/updates the row state of the enclosing transaction instead of leaving stale stored data or a masked update.
+    - merge_hash_of_objs no longer crashes when the second hash maps a key to an explicit undef while the first holds a reference.
+    - Affinity detection now recognizes datetime, character, character varying, and smallserial so user-declared columns of those types no longer croak.
+    - by_id() now rejects an undefined primary key value instead of silently degrading to a "primary key IS NULL" lookup that can never match.
+    - Upserts on dialects without RETURNING support no longer corrupt a literal write value that contains the word "returning".
+    - DSL variants, coderef defaults, and table-class metadata now preserve the intended user values.
+    - The DSL exports connect/index/socket shadow the Perl built-ins in the importing package; a call shaped like the built-in now croaks with a hint to use CORE:: instead of silently misrouting into the builder.
+    - JSON deflate no longer dies on top-level booleans and now honors TO_JSON for blessed values.
+    - Inserts that only provide database-generated columns now croak cleanly instead of emitting invalid empty INSERT SQL.
+    - Bulk deletes on primary-key-less tables now skip cache maintenance instead of failing before the delete runs.
+    - cas() now croaks on unsupported limit, offset, order_by, and distinct clauses instead of silently ignoring them.
+    - cas() guard warnings now inspect structured where guards without treating operator keys as column names.
+    - Bulk update/delete diagnostics now describe deferred-handle restrictions correctly and fix a garbled internal-transaction message.
+    - Table merges now croak when column aliasing would map two database columns to one ORM field instead of silently dropping one.
+    - Declared links now treat a target table's primary key as unique even when the key is not also listed in the table's unique constraints.
+    - Merging duplicate links now preserves uniqueness when either link knows the relationship points to one row.
+    - Link parsing now keeps unique and aliases options from confusing single-key table shorthand.
+    - Link cloning now honors an explicit created override instead of always dropping created state.
+    - MySQL-family CAS reliability checks now inspect the real MariaDB found-rows attribute name.
+    - SQL type affinity detection now recognizes PostgreSQL int/float aliases and DuckDB unsigned and huge integer types as numeric.
+    - Column affinity validation now rejects invalid explicit affinities and avoids caching dialect-dependent type-object affinities across dialects.
+    - Columns declared with type class names now keep using those classes for field inflate/deflate.
+    - Schema merge utilities now preserve scalar and falsey hash values while cloning nested metadata.
+    - UUID comparisons now treat matching non-UUID raw values as equal instead of croaking during desync checks.
+    - Plugins without a custom munge hook now work as no-op plugins instead of failing every build.
+    - Lazy field fetches inside transactions now roll back with the transaction instead of leaking into the row's base state.
+    - CAS field-list guards now croak when the guarded field was not fetched instead of treating it as NULL.
+    - by_id() now validates primary-key arguments, honors extra hash constraints on loaded rows, and returns hashrefs in data_only mode even on cache hits.
+    - Upserts now preserve RETURNING clauses when literal write SQL contains the word "returning".
+    - Handle omit() can now append to an existing omit set, and all_fields() now clears any previous omit.
+    - Columns declared with blessed type instances now use those instances for field inflate/deflate.
+    - Table names are now quoted in FROM clauses, fixing queries against reserved-word or mixed-case table names.
+    - Non-RETURNING inserts now preserve caller-supplied primary keys instead of replacing them with last_insert_id().
+    - JSON typed columns can now read back scalar JSON values written by the ORM, such as strings and numbers.
+    - Masked inflated values now delegate numeric comparisons to the wrapped object instead of forcing direct numification.
+    - Row-bound handle operations now reject rows from a different source or connection instead of applying their primary keys to the wrong query.
+    - update() now validates desync on non-updated fields before staging, preventing a failed update from leaving its changes armed in PENDING.
+    - Passing a non-object as `row` to a handle now croaks with the ORM's own message instead of dying on an unblessed-reference method call.
+    - The async-mode croak in all() now correctly directs users to iterator() instead of the sync-only iterate().
+    - Row _field() no longer rejects a column named "0" due to a truthiness check on the field name.
+
 0.000027  2026-07-01 11:18:00-07:00 America/Los_Angeles
 
     Features:
@@ -73,7 +178,7 @@
 0.000022  2026-05-28 13:26:49-07:00 America/Los_Angeles
 
     Bug fixes:
-    - SQLite dialect now queries sqlite_master/sqlite_temp_master instead of the modern sqlite_schema/sqlite_temp_schema aliases (which require SQLite 3.33+, 2020). Bump DBD::SQLite minimum to 1.64, which embeds SQLite 3.31.1 and is the first version with pragma_table_xinfo's `hidden` flag for GENERATED columns (relied on by generated-column detection added in 0.000021).
+    - SQLite dialect now queries sqlite_master/sqlite_temp_master instead of the modern sqlite_schema/sqlite_temp_schema aliases (which require SQLite 3.33+, 2020). Bump DBD::SQLite minimum to 1.70, which embeds SQLite 3.36 and is the first bundled version with the RETURNING clause (SQLite 3.35) the dialect emits; this is also well past pragma_table_xinfo's `hidden` flag for GENERATED columns (SQLite 3.31, relied on by generated-column detection added in 0.000021).
 
     Internal / cleanup:
     - Audit dist.ini prereq minimums against actual feature usage. Bump pinned versions where the code uses features that require a specific minimum (List::Util zip/mesh -> 1.56, Sub::Util set_subname -> 1.40, Data::Dumper Trailingcomma -> 2.171, Role::Tiny -> 2.000003, Cpanel::JSON::XS -> 3.0224, etc.). Core / basic-usage modules left at 0.

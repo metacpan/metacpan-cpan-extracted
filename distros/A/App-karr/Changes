@@ -1,3 +1,194 @@
+0.400     2026-07-07 00:03:01Z
+
+    - `karr init` and `karr materialize` now ensure the board-root .gitignore
+      covers the materialized file view (tasks/ + config.yml), appending the
+      entries idempotently and preserving any existing content. Previously karr
+      never managed .gitignore, so running `karr materialize` in a repo that had
+      not ignored the view produced an untracked, accidentally-committable
+      config.yml + tasks/. refs/karr/* stays the canonical state; the file view
+      is disposable and never committed.
+    - Fix a bootstrap id collision after `karr import`: importing a kanban-md
+      tasks/ view into a fresh repo (no board) left refs/karr/meta/next-id
+      unset, so the next `karr create` re-allocated from id 1 and collided with
+      an already-imported task. Import now seeds next-id past the highest
+      imported id when the stored next-id is missing or stale, while leaving a
+      next-id that is already ahead of the view untouched.
+    - New commands `karr materialize` and `karr import`: the file-view bridge
+      from ADR 0001. `materialize` writes refs/karr/* out to the board root as
+      a kanban-md compatible view (config.yml + tasks/*.md) for grepping or
+      interop; it reads refs only and syncs nothing. `import` reads such a view
+      back into refs, preserving task timestamps verbatim. Because it replaces
+      task refs and drops refs with no matching file, it requires --yes and
+      refuses to run when no tasks/ view is present, so it can never silently
+      wipe the board. config.yml now joins tasks/ in .gitignore so the whole
+      materialized view stays disposable.
+    - CLI exit codes now follow a stable 0/1/2 contract (ADR 0002): 0 success,
+      1 runtime failure (task not found, board missing, Git/sync error, a
+      destructive command refused without --yes), 2 usage error (unknown
+      command, unknown option, invalid option value, surplus or missing
+      positional). Replaces the previous accidental 255/1/2 mix; scripting
+      agents can now distinguish misuse (2) from operation failure (1). The
+      contract is documented in the karr POD under EXIT CODES.
+    - Fix the redundant push fired before every syncing command: the SyncGuard
+      returned by sync_before was discarded immediately (nobody held it), so
+      it pushed before the command body even ran — the doubled "Push attempt"
+      seen on every karr move/handoff — and the documented die-insurance never
+      actually engaged. The guard is now retained for the whole command body
+      and neutralized after a successful sync_after, so a crash mid-command
+      triggers exactly one insurance push and a clean run pushes exactly once.
+    - Sync output is now retry-only: the first pull/push attempt is silent
+      (no more "Pull attempt 1 of 3..." noise on every command), retries are
+      announced from attempt 2 ("Pull retry 2 of 3..."), and errors always
+      reach STDERR. A new --quiet flag on every syncing command additionally
+      suppresses the retry announcements — never the errors. `karr sync` moves
+      its progress lines from STDOUT to the same STDERR convention.
+    - Fix SyncGuard's push-failure reporting: the message showed a meaningless
+      shell "(exit code $?)" although all Git operations run natively through
+      libgit2 (no shell involved); it now carries the real libgit2 error text.
+      The guard also no longer die()s inside DESTROY — which Perl downgrades to
+      a swallowed "(in cleanup)" warning while an exception is already
+      unwinding — so the "local refs are intact, run 'karr sync' to retry"
+      guidance now reliably reaches STDERR.
+    - Internal refactor, no user-visible behavior change: the status/claim
+      config helpers (`is_terminal_status`, `status_requires_claim`, hash
+      merging) now live once in `App::karr::Config`, with `BoardStore` keeping
+      thin delegating wrappers. While folding the duplicates, a latent
+      divergence in dead code was fixed: `Config->status_requires_claim`
+      claimed a bare-string status requires a claim, while the store copy every
+      caller actually used says it does not — bare statuses never require a
+      claim, only an explicit `require_claim: 1` does.
+    - Internal refactor, no user-visible behavior change: the JSON output
+      snippets copy-pasted across commands now live once —
+      `Role::Output->print_json_results` (the shared move/edit/delete/archive
+      results tail) and `Task->to_json_hash` (the frontmatter+body payload of
+      show/pick/handoff). The previously untested `--json` paths of
+      move/edit/show/pick/handoff are now pinned by tests.
+    - Internal refactor, no user-visible behavior change: the ~900-line
+      karr-foundation module is split along its natural seams into three
+      focused collaborators — `Foundation::Runner` (agent command execution
+      and common-error classification), `Foundation::State` (lock file, JSON
+      state, cooldown backoff, attempt counters) and `Foundation::Overview`
+      (the read-only dashboard) — with `Foundation` staying the orchestrator
+      and delegating, so every existing call site keeps working unchanged.
+    - `karr backup`, `karr restore` and `karr destroy` now run through the
+      shared sync lifecycle instead of hand-rolled pull/push calls, so the
+      most destructive commands get the same 3x pull/push retry and
+      push-on-crash insurance as every other mutating command (backup is
+      read-only and takes only the retrying pull — it never pushes).
+    - `karr config` and `karr skill` now accept options placed before the
+      action (`karr config --json show`, `karr skill --json install`) instead
+      of misreading the leading flag as the action ("Unknown action: --json").
+      Both commands read their action (and config's key/value) through the same
+      option-aware positional parsing the id-taking commands already use, now
+      extracted into a shared `App::karr::Role::CliArgs`. Surplus positionals
+      are rejected too: `karr skill` takes exactly the action, and `karr config`
+      enforces its per-action arity (`config get KEY extra` is rejected).
+    - Internal dead-code cleanup, no user-visible behavior change: remove the
+      unused `Config->next_id` method (ids are allocated from the next-id ref
+      via `BoardStore->allocate_next_id`), the dead `board_dir` attribute and
+      its lone passthrough, and the unused `BoardStore->temp_board_dir`; and
+      simplify `karr pick`, whose locking path was gated on an `is_repo` check
+      that is always true by the time it runs (a board lives in refs/karr/*,
+      reachable only inside a Git repo), so the lock/log path is now
+      unconditional.
+    - Fix `karr agent-name` (the dashed spelling used throughout the docs)
+      not running: it never reached the AgentName command and errored with
+      "Unknown command" instead of printing a generated name. The dashed form
+      is now aliased to the command like `set-refs`/`get-refs` already were.
+      `karr --help` also now lists the `log` and `agent-name` commands, which
+      were missing from its command summary.
+    - Fix the karr-foundation board sweep silently skipping real boards whose
+      refs had been packed (`git gc` / `git pack-refs`) or that live in a git
+      worktree. Board detection tested for the loose file
+      `.git/refs/karr/config`, which disappears once refs are packed and never
+      exists under a worktree's gitdir indirection, so those boards were
+      dropped from the scan. Detection now resolves `refs/karr/config` through
+      libgit2; the scan-directory sweep additionally confirms the resolved
+      repository root is the scanned child itself, so a plain directory nested
+      inside a karr repo is not mistaken for a board.
+    - Fix the documented global `--dir` option being silently ignored:
+      commands always operated on the board of the current directory, so
+      `karr --dir /other/repo create "X"` quietly wrote to — and synced —
+      whatever board the caller happened to be standing in. `--dir` is now a
+      real option on every board command (`karr list --dir PATH`, the root
+      form `karr --dir PATH list`, and bare `karr --dir PATH` for the board
+      summary all work), seeding repository discovery before any store or
+      sync activity; init, backup, restore,
+      and destroy, which previously hardcoded the current directory, honor
+      it too. A `--dir` that does not lead to a Git repository fails loudly
+      instead of falling back to the current directory.
+    - Options may now be placed before, between, or after positional
+      arguments (`karr archive --json 1`, `karr handoff --claim tester 1`,
+      `karr edit --title New 3`), matching how the kanban-md CLI behaves.
+      Previously the raw option token was read as the task id, giving opaque
+      errors like "Task --claim not found" — and `karr show --last N` crashed
+      outright. The real positionals are now extracted from argv using each
+      command's own option metadata (value-taking options swallow their
+      value, `--opt=value` and short aliases like `-a` included), which also
+      closes a hole in the surplus-argument guard: `karr archive 1 --json 99`
+      used to silently drop the 99 while still archiving task 1.
+    - Fix `karr delete` crashing on every ref-backed task ("Can't call method
+      \"remove\" on an undefined value") — it tried to unlink the task's
+      on-disk file, which tasks loaded from `refs/karr/*` never have, and
+      which would only have removed the materialized view anyway, never the
+      canonical ref. Deletion now goes through the board store and removes
+      the task ref itself, like every other mutating command. On a refs-first
+      board, delete previously could not delete anything at all.
+    - Surplus positional arguments are now rejected before a command does any
+      work ("unexpected extra argument: '99'" plus the usage line, non-zero
+      exit) instead of being silently dropped — `karr archive 4 99` used to
+      archive task 4 and swallow the 99 without a trace, so batch-looking
+      invocations quietly did less than asked. Matching kanban-md, the comma
+      list (`karr archive 4,5,6`) stays the one batch syntax; show/archive/
+      delete/edit/handoff/create accept one positional, move accepts two.
+    - Fix `karr list --status archived` (and `--status done`) returning
+      nothing: the default done/archived exclusion ran before the explicit
+      `--status` filter, so terminal statuses could never be requested and
+      archived tasks were unreachable except via `karr show ID`. The default
+      exclusion now applies only when no `--status` filter is given
+      (kanban-md parity), so plain `karr list` is unchanged while an explicit
+      filter surfaces done/archived tasks — including combined with `--tag`,
+      `--sort`, and `--json`.
+    - An unknown subcommand (`karr definitely-not-a-command`) now fails loudly
+      with "Unknown command: ..." on STDERR and a non-zero exit instead of
+      silently printing the board summary with exit 0 — a typo like
+      `karr agent-name` (for `agentname`) used to look like success. Bare
+      `karr` (with or without options like `--done`) still renders the board.
+    - `karr archive` with IDs that do not exist now exits non-zero, matching
+      the die-based behaviour of every other id-taking command (show, move,
+      edit, delete, handoff already did this). In a comma-separated batch
+      (`karr archive 5,99`) the existing tasks are still archived and the
+      missing ones reported — partial success is kept, the exit code reports
+      the failure (kanban-md parity). Re-archiving an already-archived task
+      remains a successful no-op.
+    - `karr board` (and bare `karr`) no longer lists done tasks by default —
+      on a living board the Done section grows forever and drowns the open
+      work. The footer instead notes how many were hidden ("10 tasks (5 done
+      hidden)"), and the new `--done` flag restores the full listing. Applies
+      to the default, `--tags`, and `--json` renderings (JSON keeps the done
+      column and its real count but empties its task list unless `--done` is
+      given); `--compact` still shows every status. This deliberately deviates
+      from kanban-md, whose board always renders done tasks.
+    - Fix the `updated` timestamp never being bumped when a task is mutated
+      through the ref-backed store: move, edit, pick, handoff, and archive all
+      left `updated` at its previous value, so `karr show` (most recently
+      updated), `karr show --last N`, and `karr list --sort updated` gave
+      wrong answers. The bump now happens centrally in the board store
+      whenever an existing task ref is saved — matching kanban-md, which
+      stamps `Updated` in every mutating command. Creating a task keeps
+      `updated` equal to `created`, restore/import paths preserve the
+      original timestamps verbatim, and materializing the on-disk view no
+      longer rewrites `updated` to the current time (it copies the ref values
+      unchanged).
+    - Fix `karr archive` dying with an opaque Path::Tiny error ("paths require
+      defined, positive-length parts") on ref-backed tasks — the normal case
+      since boards moved to `refs/karr/*`. Archive was the only mutating
+      command still calling `$task->save` (which needs an on-disk `file_path`)
+      instead of persisting through the board store like move/edit/pick/
+      handoff do. `Task::save` without a directory argument now croaks with a
+      clear message when the task has no `file_path`, instead of the
+      Path::Tiny error.
+
 0.303     2026-06-28 02:07:23Z
 
     - Docker: build Alien::FFI against the system libffi (apt libffi-dev) instead

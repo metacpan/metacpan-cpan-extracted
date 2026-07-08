@@ -1,6 +1,6 @@
 package Game::Cribbage;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 use Object::Proto::Sugar -types;
 use Game::Cribbage::Board;
@@ -657,7 +657,7 @@ Game::Cribbage - Cribbage game engine
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 

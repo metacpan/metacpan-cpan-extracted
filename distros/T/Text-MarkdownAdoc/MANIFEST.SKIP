@@ -1,0 +1,46 @@
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.hg\b
+\B\.bzr\b
+
+# Avoid Makemaker generated and utility files.
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib$
+\bblibdirs$
+\bManifest\.bak$
+
+# Avoid temp and backup files.
+~$
+\.bak$
+\.perlbak$
+\.tmp$
+\.old$
+\.orig$
+\#.+\#$
+\.swp$
+\.swpx$
+\.sw[po]$
+
+# Avoid OS-specific files.
+\b\.DS_Store$
+\bThumbs\.db$
+
+# Avoid NFS temp files.
+\.nfs[0-9a-f]+$
+
+# Avoid MYMETA files.
+\bMYMETA\.(yml|json)$
+
+# Avoid editor config.
+\b\.vscode/
+\b\.idea/
+\b\.project$
+
+# Development artifacts
+\bdocs/

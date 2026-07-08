@@ -1,0 +1,11 @@
+CREATE TABLE users(
+    user_id INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name    VARCHAR(32) NOT NULL,
+    active  INTEGER     NOT NULL DEFAULT 0,
+    org_id  INTEGER     NOT NULL DEFAULT 0
+);
+
+CREATE TABLE widgets(
+    widget_id INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name      VARCHAR(32) NOT NULL
+);

@@ -32,6 +32,7 @@
             "Crypt::ScryptKDF" : "0",
             "CryptX" : "0",
             "JSON" : "0",
+            "URI" : "0",
             "perl" : "5.016",
             "strictures" : "2"
          }
@@ -47,6 +48,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "1.001001",
+   "version" : "1.001002",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

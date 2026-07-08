@@ -1,7 +1,7 @@
 # ABSTRACT: Restore the ref-backed karr board from YAML
 
 package App::karr::Cmd::Restore;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -9,8 +9,11 @@ use MooX::Options (
 );
 use Path::Tiny;
 use YAML::XS qw( Load );
-use App::karr::Git;
-use App::karr::BoardStore;
+use App::karr::Role::BoardDiscovery;
+use App::karr::Role::SyncLifecycle;
+
+with 'App::karr::Role::BoardDiscovery';
+with 'App::karr::Role::SyncLifecycle';
 
 
 option input => (
@@ -30,12 +33,13 @@ sub execute {
   die "Ref restore is destructive and replaces all refs/karr/*. Re-run with --yes.\n"
     unless $self->yes;
 
-  my $git = App::karr::Git->new( dir => '.' );
-  die "Not a git repository. karr requires Git.\n" unless $git->is_repo;
+  # store honours --dir (both call forms) and dies loudly if the target is
+  # not a Git repository, instead of hardcoding the current directory.
+  my $store = $self->store;
 
-  my $root = $git->repo_root;
-  $git = App::karr::Git->new( dir => $root->stringify );
-  $git->pull if $git->has_remote;
+  # Restore rewrites refs/karr/*: run the full sync lifecycle so the pull and
+  # the mirror-back push both retry, and the guard insures the push on a crash.
+  $self->sync_before;
 
   my $payload = $self->_load_payload;
   my $snapshot = eval { Load($payload) };
@@ -46,9 +50,9 @@ sub execute {
   die "Backup payload must contain a refs hash\n"
     unless ref $snapshot->{refs} eq 'HASH';
 
-  my $store = App::karr::BoardStore->new( git => $git );
   $store->restore_snapshot($snapshot);
-  $git->push if $git->has_remote;
+
+  $self->sync_after;
 
   print STDERR "Restored refs/karr/* from snapshot\n";
 }
@@ -80,7 +84,7 @@ App::karr::Cmd::Restore - Restore the ref-backed karr board from YAML
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

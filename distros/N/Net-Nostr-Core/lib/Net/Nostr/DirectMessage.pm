@@ -3,13 +3,13 @@ package Net::Nostr::DirectMessage;
 use strictures 2;
 
 use Net::Nostr::_ConstructorArgs ();
+use Net::Nostr::_URI qw(validate_relay_url);
 
 use Carp qw(croak);
 use Net::Nostr::Event;
 use Net::Nostr::GiftWrap;
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
-my $RELAY_URI = qr{\A(?:ws|wss)://\S+\z};
 
 sub _build_recipient_tags {
     my ($recipients) = @_;
@@ -40,8 +40,7 @@ sub _validate_sha256_hex {
 sub _validate_relay_uri {
     my ($relay) = @_;
 
-    croak "relay URI must be a ws:// or wss:// URI"
-        unless defined $relay && $relay =~ $RELAY_URI;
+    validate_relay_url($relay, label => 'relay URI');
 }
 
 sub create {
@@ -431,8 +430,11 @@ calling C<receive>.
 
 Creates a kind 10050 replaceable event listing preferred DM relays.
 Tags use the C<relay> tag name (not C<r>). C<relays> must be a non-empty
-arrayref of C<ws://> or C<wss://> relay URIs. Clients SHOULD keep lists
-small (1-3 relays).
+arrayref of strict C<ws://> or C<wss://> relay URIs. Relay URIs must include
+an authority and host, must not include userinfo, query, fragment, control
+characters, or space characters, and any explicit port must be between 1 and
+65535. Paths and bracketed IPv6 hosts are accepted. Clients SHOULD keep
+lists small (1-3 relays).
 
 =head2 chat_members
 

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Cluster;
-$OpenSearch::Client::Core::3_0::Direct::Cluster::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Cluster::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Cluster>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for cluster.|https://docs.opensearch.org/latest/a
 
 =head1 METHODS
     
-=head2 cluster->allocation_explain
+=head2 allocation_explain
 
 Explains how shards are allocated in the current cluster and provides an explanation for why unassigned shards can't be allocated to a node.
 
@@ -101,9 +101,9 @@ C<POST /_cluster/allocation/explain>
         'source'                 =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for cluster.allocation_explain|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-allocation/>
+L<OpenSearch documentation for cluster-E<gt>allocation_explain|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-allocation/>
     
-=head2 cluster->delete_component_template
+=head2 delete_component_template
 
 Deletes a component template.
 
@@ -137,9 +137,9 @@ C<DELETE /_component_template/{name}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for cluster.delete_component_template|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
+L<OpenSearch documentation for cluster-E<gt>delete_component_template|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
     
-=head2 cluster->delete_decommission_awareness
+=head2 delete_decommission_awareness
 
 Recommissions a decommissioned zone.
 
@@ -163,9 +163,9 @@ C<DELETE /_cluster/decommission/awareness>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for cluster.delete_decommission_awareness|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone>
+L<OpenSearch documentation for cluster-E<gt>delete_decommission_awareness|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone>
     
-=head2 cluster->delete_voting_config_exclusions
+=head2 delete_voting_config_exclusions
 
 Clears any cluster voting configuration exclusions.
 
@@ -193,9 +193,9 @@ C<DELETE /_cluster/voting_config_exclusions>
         'source'            =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for cluster.delete_voting_config_exclusions|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
+L<OpenSearch documentation for cluster-E<gt>delete_voting_config_exclusions|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
     
-=head2 cluster->delete_weighted_routing
+=head2 delete_weighted_routing
 
 Delete weighted shard routing weights.
 
@@ -221,9 +221,9 @@ C<DELETE /_cluster/routing/awareness/weights>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for cluster.delete_weighted_routing|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-deleting-weights>
+L<OpenSearch documentation for cluster-E<gt>delete_weighted_routing|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-deleting-weights>
     
-=head2 cluster->exists_component_template
+=head2 exists_component_template
 
 Returns information about whether a particular component template exist.
 
@@ -257,9 +257,9 @@ C<HEAD /_component_template/{name}>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for cluster.exists_component_template|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
+L<OpenSearch documentation for cluster-E<gt>exists_component_template|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
     
-=head2 cluster->get_component_template
+=head2 get_component_template
 
 Returns one or more component templates.
 
@@ -297,9 +297,9 @@ C<GET /_component_template/{name}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for cluster.get_component_template|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
+L<OpenSearch documentation for cluster-E<gt>get_component_template|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
     
-=head2 cluster->get_decommission_awareness
+=head2 get_decommission_awareness
 
 Retrieves the decommission status for all zones.
 
@@ -327,9 +327,9 @@ C<GET /_cluster/decommission/awareness/{awareness_attribute_name}/_status>
         'source'                    =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for cluster.get_decommission_awareness|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-getting-zone-decommission-status>
+L<OpenSearch documentation for cluster-E<gt>get_decommission_awareness|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-getting-zone-decommission-status>
     
-=head2 cluster->get_settings
+=head2 get_settings
 
 Returns cluster settings.
 
@@ -361,9 +361,9 @@ C<GET /_cluster/settings>
         'source'                   =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for cluster.get_settings|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-settings/>
+L<OpenSearch documentation for cluster-E<gt>get_settings|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-settings/>
     
-=head2 cluster->get_weighted_routing
+=head2 get_weighted_routing
 
 Fetches weighted shard routing weights.
 
@@ -391,9 +391,9 @@ C<GET /_cluster/routing/awareness/{attribute}/weights>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for cluster.get_weighted_routing|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-getting-weights-for-all-zones>
+L<OpenSearch documentation for cluster-E<gt>get_weighted_routing|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-getting-weights-for-all-zones>
     
-=head2 cluster->health
+=head2 health
 
 Returns basic information about the health of the cluster.
 
@@ -440,9 +440,9 @@ C<GET /_cluster/health/{index}>
         'source'                           =>  $qval18,    # string
     );
 
-L<OpenSearch documentation for cluster.health|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-health/>
+L<OpenSearch documentation for cluster-E<gt>health|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-health/>
     
-=head2 cluster->pending_tasks
+=head2 pending_tasks
 
 Returns a list of pending cluster-level tasks, such as index creation, mapping updates,
 or new allocations.
@@ -473,9 +473,9 @@ C<GET /_cluster/pending_tasks>
         'source'                   =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for cluster.pending_tasks|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
+L<OpenSearch documentation for cluster-E<gt>pending_tasks|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
     
-=head2 cluster->post_voting_config_exclusions
+=head2 post_voting_config_exclusions
 
 Updates the cluster voting configuration by excluding certain node IDs or names.
 
@@ -505,9 +505,9 @@ C<POST /_cluster/voting_config_exclusions>
         'source'       =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for cluster.post_voting_config_exclusions|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
+L<OpenSearch documentation for cluster-E<gt>post_voting_config_exclusions|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
     
-=head2 cluster->put_component_template
+=head2 put_component_template
 
 Creates or updates a component template.
 
@@ -547,9 +547,9 @@ C<PUT /_component_template/{name}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for cluster.put_component_template|https://opensearch.org/docs/latest/im-plugin/index-templates/#use-component-templates-to-create-an-index-template>
+L<OpenSearch documentation for cluster-E<gt>put_component_template|https://opensearch.org/docs/latest/im-plugin/index-templates/#use-component-templates-to-create-an-index-template>
     
-=head2 cluster->put_decommission_awareness
+=head2 put_decommission_awareness
 
 Decommissions a cluster zone based on awareness. This can greatly benefit multi-zone deployments, where awareness attributes can aid in applying new upgrades to a cluster in a controlled fashion.
 
@@ -578,9 +578,9 @@ C<PUT /_cluster/decommission/awareness/{awareness_attribute_name}/{awareness_att
         'source'                     =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for cluster.put_decommission_awareness|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone>
+L<OpenSearch documentation for cluster-E<gt>put_decommission_awareness|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-decommission/#example-decommissioning-and-recommissioning-a-zone>
     
-=head2 cluster->put_settings
+=head2 put_settings
 
 Updates the cluster settings.
 
@@ -613,9 +613,9 @@ C<PUT /_cluster/settings>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for cluster.put_settings|https://opensearch.org/docs/latest/api-reference/cluster-settings/>
+L<OpenSearch documentation for cluster-E<gt>put_settings|https://opensearch.org/docs/latest/api-reference/cluster-settings/>
     
-=head2 cluster->put_weighted_routing
+=head2 put_weighted_routing
 
 Updates weighted shard routing weights.
 
@@ -645,9 +645,9 @@ C<PUT /_cluster/routing/awareness/{attribute}/weights>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for cluster.put_weighted_routing|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-weighted-round-robin-search>
+L<OpenSearch documentation for cluster-E<gt>put_weighted_routing|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-awareness/#example-weighted-round-robin-search>
     
-=head2 cluster->remote_info
+=head2 remote_info
 
 Returns the information about configured remote clusters.
 
@@ -671,9 +671,9 @@ C<GET /_remote/info>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for cluster.remote_info|https://opensearch.org/docs/latest/api-reference/remote-info/>
+L<OpenSearch documentation for cluster-E<gt>remote_info|https://opensearch.org/docs/latest/api-reference/remote-info/>
     
-=head2 cluster->reroute
+=head2 reroute
 
 Allows to manually change the allocation of individual shards in the cluster.
 
@@ -709,9 +709,9 @@ C<POST /_cluster/reroute>
         'source'                   =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for cluster.reroute|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
+L<OpenSearch documentation for cluster-E<gt>reroute|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
     
-=head2 cluster->state
+=head2 state
 
 Returns comprehensive information about the state of the cluster.
 
@@ -758,9 +758,9 @@ C<GET /_cluster/state/{metric}/{index}>
         'source'                     =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for cluster.state|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
+L<OpenSearch documentation for cluster-E<gt>state|https://docs.opensearch.org/latest/api-reference/cluster-api/index/>
     
-=head2 cluster->stats
+=head2 stats
 
 Returns a high-level overview of cluster statistics.
 
@@ -804,7 +804,7 @@ C<GET /_cluster/stats/{metric}/{index_metric}/nodes/{node_id}>
         'source'         =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for cluster.stats|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-stats/>
+L<OpenSearch documentation for cluster-E<gt>stats|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-stats/>
 
 =head1 MANUAL
 

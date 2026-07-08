@@ -14,9 +14,10 @@ use App::karr::Role::BoardAccess;
 {
     package TestBoard;
     use Moo;
+    use MooX::Options;
     with 'App::karr::Role::BoardAccess';
-    has dir => ( is => 'ro', required => 1 );
-    has has_dir => ( is => 'ro', default => sub { 1 } );
+    # dir / has_dir now come from Role::BoardDiscovery's `option dir`, just as
+    # every real command gets them by composing BoardAccess.
 }
 
 sub _git_ok {

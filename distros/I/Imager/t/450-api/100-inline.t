@@ -19,9 +19,10 @@ plan skip_all => "perl 5.005_04, 5.005_05 too buggy"
 
 -d "testout" or mkdir "testout";
 
+Imager->open_log(log => "testout/100-inline.log", loglevel => 4);
+
 print STDERR "Inline version $Inline::VERSION\n";
 
-plan tests => 126;
 require Inline;
 Inline->import(with => 'Imager');
 Inline->import("FORCE"); # force rebuild
@@ -507,6 +508,16 @@ tags_is_int(Imager im, const char *name) {
   return 1;
 }
 
+void
+decode_exif(Imager im, SV *data) {
+  SvGETMAGIC(data);
+  if (!SvOK(data)) return;
+  STRLEN len;
+  const char *pv = SvPV(data, len);
+  /* return value is unfortunately not useful */
+  (void)im_decode_exif(im, (const unsigned char *)pv, len);
+}
+
 EOS
 
 my $im = Imager->new(xsize=>50, ysize=>50);
@@ -746,6 +757,45 @@ ok(test_slots(), "call slot APIs");
   is(tags_get_int($im, "uintmax"), -1);
   ok(!tags_is_int($im, "uintmax"), "uintmax not stored as int");
 }
+
+{
+    my $im = Imager->new(xsize => 1, ysize => 1);
+    my $ok = decode_exif($im, "not exif");
+    ok(!$ok, "fail to parse non-exif");
+    my @tags = grep $_->[0] =~ /^exif_/, $im->tags;
+    is_deeply(\@tags, [], "decode_exif obviously not exif");
+
+    ($im, $ok) = do_one_exif("t/data/exifgood.bin");
+    is($im->tags(name => "exif_make"), "Canon", "valid exif model");
+    is($im->tags(name => "exif_artist"), "Tony Cook", "valid exif artist");
+
+    ($im, $ok) = do_one_exif("t/data/exifbadoff.bin");
+    ok(!$ok, "fail to load exif with bad offset");
+
+    ($im, $ok) = do_one_exif("t/data/exifbadderoff.bin");
+    ok(!$ok, "fail to load exif with very large offset");
+
+    ($im, $ok) = do_one_exif("t/data/exifbadifdoff1.bin");
+    ok(!$ok, "fail to load exif with bad exif ifd offset");
+}
+
+sub do_one_exif {
+    my ($exif_name) = @_;
+    
+    open my $exif_fh, "<", $exif_name
+        or die "Cannot open $exif_name: $!";
+    binmode $exif_fh;
+    my $exif_data = do { local $/; <$exif_fh> };
+    close $exif_fh;
+    $im = Imager->new(xsize => 1, ysize => 1);
+    my $ok = decode_exif($im, $exif_data);
+    
+    return ($im, $ok);
+}
+
+done_testing();
+
+Imager->close_log();
 
 sub _get_error {
   my @errors = Imager::i_errors();

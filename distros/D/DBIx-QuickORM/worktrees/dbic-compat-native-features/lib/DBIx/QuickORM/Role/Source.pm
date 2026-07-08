@@ -2,7 +2,7 @@ package DBIx::QuickORM::Role::Source;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak confess/;
 
@@ -38,6 +38,13 @@ The abstract source kind: C<TABLE>, C<VIEW>, C<JOIN>, or C<LITERAL>.
 =item $class = $source->row_class
 
 =item $cols = $source->primary_key
+
+=item $class_or_undef = $source->handle_class
+
+The L<DBIx::QuickORM::Handle> subclass bound to this source, or undef when the
+source has no per-source binding. A default of undef is provided by this role,
+so only sources that support per-source query methods (currently
+L<DBIx::QuickORM::Schema::Table>) need override it.
 
 =item $type = $source->field_type($field)
 
@@ -84,6 +91,8 @@ sub cachable {
     return 1 if @$pk;
     return 0;
 }
+
+sub handle_class { undef }
 
 1;
 

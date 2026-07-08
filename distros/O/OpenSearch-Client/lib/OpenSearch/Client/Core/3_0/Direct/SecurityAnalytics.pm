@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics;
-$OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for security_analytics.|https://docs.opensearch.o
 
 =head1 METHODS
     
-=head2 security_analytics->get_alerts
+=head2 get_alerts
 
 Retrieve alerts related to a specific detector type or detector ID.
 
@@ -106,9 +106,9 @@ C<GET /_plugins/_security_analytics/alerts>
         'source'         =>  $qval17,    # string
     );
 
-L<OpenSearch documentation for security_analytics.get_alerts|https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-alerts>
+L<OpenSearch documentation for security_analytics-E<gt>get_alerts|https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-alerts>
     
-=head2 security_analytics->get_findings
+=head2 get_findings
 
 Retrieve findings related to a specific detector type or detector ID.
 
@@ -148,9 +148,9 @@ C<GET /_plugins/_security_analytics/findings/_search>
         'source'         =>  $qval18,    # string
     );
 
-L<OpenSearch documentation for security_analytics.get_findings|https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-findings>
+L<OpenSearch documentation for security_analytics-E<gt>get_findings|https://docs.opensearch.org/docs/latest/security-analytics/api-tools/alert-finding-api/#get-findings>
     
-=head2 security_analytics->search_finding_correlations
+=head2 search_finding_correlations
 
 List correlations for a finding.
 
@@ -181,7 +181,7 @@ C<GET /_plugins/_security_analytics/findings/correlate>
         'source'           =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for security_analytics.search_finding_correlations|https://docs.opensearch.org/docs/latest/security-analytics/api-tools/correlation-eng/#list-correlations-for-a-finding-belonging-to-a-log-type>
+L<OpenSearch documentation for security_analytics-E<gt>search_finding_correlations|https://docs.opensearch.org/docs/latest/security-analytics/api-tools/correlation-eng/#list-correlations-for-a-finding-belonging-to-a-log-type>
 
 =head1 MANUAL
 

@@ -1,5 +1,5 @@
 package Business::NAB::Australian::DirectEntry::Report;
-$Business::NAB::Australian::DirectEntry::Report::VERSION = '0.04';
+$Business::NAB::Australian::DirectEntry::Report::VERSION = '0.05';
 =head1 NAME
 
 Business::NAB::Australian::DirectEntry::Report

@@ -1,5 +1,9 @@
 Revision history for Heap-PQ
 
+0.06  2026-07-07
+      - guard PUSH_MULTICALL / dMULTICALL /
+        MULTICALL / POP_MULTICALL behind PERL_VERSION_GE(5,11,0). 
+
 0.05  2026-04-28
       - Fix stack bug in pp_nv_delete
       - Fix Perl_custom_op_register fallback in xop_compat.h

@@ -3,10 +3,12 @@ package Net::Nostr::WalletConnect;
 use strictures 2;
 
 use Net::Nostr::_ConstructorArgs ();
+use Net::Nostr::_URI qw(parse_uri_query validate_relay_url);
 
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
+use URI ();
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
@@ -16,21 +18,25 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub parse_uri {
     my ($class, $uri) = @_;
-    croak "URI must use nostr+walletconnect:// protocol"
-        unless $uri =~ m{^nostr\+walletconnect://([0-9a-f]{64})\?(.+)$}i;
-
-    my ($wallet_pubkey, $query) = (lc($1), $2);
+    my ($wallet_pubkey, @query) = parse_uri_query(
+        $uri,
+        label  => 'URI',
+        scheme => 'nostr+walletconnect',
+    );
+    $wallet_pubkey = lc $wallet_pubkey;
+    croak "nostr+walletconnect:// URI wallet_pubkey must be 64-char lowercase hex"
+        unless $wallet_pubkey =~ $HEX64;
 
     my (@relays, $secret, $lud16);
-    for my $pair (split /&/, $query) {
-        my ($key, $val) = split /=/, $pair, 2;
-        $val = _uri_decode($val) if defined $val;
+    while (@query) {
+        my ($key, $val) = splice @query, 0, 2;
         if ($key eq 'relay')    { push @relays, $val }
         elsif ($key eq 'secret') { $secret = $val }
         elsif ($key eq 'lud16')  { $lud16  = $val }
     }
 
     croak "URI must contain at least one relay parameter" unless @relays;
+    @relays = map { validate_relay_url($_, label => 'relay URL') } @relays;
     croak "URI must contain a secret parameter" unless defined $secret;
     croak "secret must be 64-char lowercase hex" unless $secret =~ $HEX64;
 
@@ -52,16 +58,19 @@ sub create_uri {
     croak "secret must be 64-char lowercase hex" unless $args{secret} =~ $HEX64;
 
     my @relays = ref $args{relay} eq 'ARRAY' ? @{$args{relay}} : ($args{relay});
+    croak "relay is required" unless @relays;
+    @relays = map { validate_relay_url($_, label => 'relay URL') } @relays;
 
-    my $uri = "nostr+walletconnect://$args{wallet_pubkey}?";
+    my $uri = URI->new("nostr+walletconnect://$args{wallet_pubkey}");
     my @params;
     for my $r (@relays) {
-        push @params, "relay=" . _uri_encode($r);
+        push @params, relay => $r;
     }
-    push @params, "secret=" . _uri_encode($args{secret});
-    push @params, "lud16=" . _uri_encode($args{lud16}) if defined $args{lud16};
+    push @params, secret => $args{secret};
+    push @params, lud16 => $args{lud16} if defined $args{lud16};
 
-    return $uri . join('&', @params);
+    $uri->query_form(@params);
+    return $uri->as_string;
 }
 
 ###############################################################################
@@ -290,22 +299,6 @@ sub is_expired {
 }
 
 ###############################################################################
-# URI helpers
-###############################################################################
-
-sub _uri_encode {
-    my ($str) = @_;
-    $str =~ s/([^A-Za-z0-9\-_.~])/sprintf("%%%02X", ord($1))/ge;
-    return $str;
-}
-
-sub _uri_decode {
-    my ($str) = @_;
-    $str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
-    return $str;
-}
-
-###############################################################################
 # Inner classes
 ###############################################################################
 
@@ -522,7 +515,8 @@ C<make_hold_invoice>, C<cancel_hold_invoice>, C<settle_hold_invoice>.
 Parses a C<nostr+walletconnect://> connection URI. Returns a
 L</Connection> object. The pubkey is lowercased during parsing to
 ensure consistency. Croaks if the URI is malformed or missing required
-parameters (C<relay>, C<secret>).
+parameters (C<relay>, C<secret>). Relay parameters must be strict
+C<ws://> or C<wss://> relay URLs.
 
 =head2 create_uri
 
@@ -533,8 +527,9 @@ parameters (C<relay>, C<secret>).
         lud16         => 'user@domain.com',  # optional
     );
 
-Creates a C<nostr+walletconnect://> URI string. The C<relay> parameter
-accepts a single URL string or an arrayref of URLs.
+Creates a C<nostr+walletconnect://> URI string using L<URI>. The C<relay>
+parameter accepts a single strict C<ws://> or C<wss://> relay URL string,
+or a non-empty arrayref of strict relay URLs.
 
 =head2 info_event
 

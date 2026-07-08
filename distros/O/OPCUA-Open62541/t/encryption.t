@@ -184,7 +184,7 @@ SKIP: {
 	client_trustList => [$ca->{certs}{ca_client}{cert_pem}]
     );
 
-    is($client->{client}->connect($client->url()), STATUSCODE_BADCONNECTIONCLOSED,
+    like($client->{client}->connect($client->url()), qr/^BadCertificateChainIncomplete|BadConnectionClosed$/,
        "client connect not trusted fail");
 
     # https://github.com/open62541/open62541/commit/19ecf3e5627ae1d0c20ce661aee8e0164b03d86c
@@ -207,7 +207,7 @@ SKIP: {
 	client_revocationList => [$ca->{certs}{ca_server}{crl_pem}]
     );
 
-    is($client->{client}->connect($client->url()), STATUSCODE_BADCONNECTIONCLOSED,
+    like($client->{client}->connect($client->url()), qr/^BadCertificateUseNotAllowed|BadConnectionClosed$/,
        "client connect use not allowed fail");
 
     ok($client->{log}->loggrep("Receiving the response failed with StatusCode BadCertificateUseNotAllowed"),
@@ -225,7 +225,7 @@ SKIP: {
 	client_revocationList => [$ca->{certs}{ca_server}{crl_pem}]
     );
 
-    is($client->{client}->connect($client->url()), STATUSCODE_BADCONNECTIONCLOSED,
+    like($client->{client}->connect($client->url()), qr/^BadCertificateTimeInvalid|BadConnectionClosed$/,
        "client connect cert expired fail");
 
     ok($client->{log}->loggrep("Receiving the response failed with StatusCode BadCertificateTimeInvalid"),
@@ -243,7 +243,7 @@ SKIP: {
 	client_revocationList => [$ca->{certs}{ca_server}{crl_pem}]
     );
 
-    is($client->{client}->connect($client->url()), STATUSCODE_BADCONNECTIONCLOSED,
+    like($client->{client}->connect($client->url()), qr/^BadCertificateRevoked|BadConnectionClosed$/,
        'client connect cert revoked fail');
 
     ok($client->{log}->loggrep('Receiving the response failed with StatusCode BadCertificateRevoked'),
@@ -277,7 +277,8 @@ SKIP: {
 	server_trustList      => [$ca->{certs}{ca_server}{cert_pem}],
     );
 
-    is($client->{client}->connect($client->url()), STATUSCODE_BADCONNECTIONCLOSED,
+    like($client->{client}->connect($client->url()),
+	qr/^(BadTimeout|BadConnectionClosed|BadCertificateChainIncomplete)$/,
        'client connect validation server not trusted fail');
 
     # https://github.com/open62541/open62541/commit/19ecf3e5627ae1d0c20ce661aee8e0164b03d86c

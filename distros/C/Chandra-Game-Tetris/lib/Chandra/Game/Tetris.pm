@@ -9,7 +9,7 @@ use Chandra::App;
 use Chandra::Game::Tetris::Engine;
 use Cpanel::JSON::XS ();
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has conf => (
 	isa => HashRef

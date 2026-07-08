@@ -99,6 +99,64 @@ subtest 'POD create_nostrconnect_uri' => sub {
     like $uri, qr/^nostrconnect:\/\//, 'protocol prefix';
 };
 
+subtest 'parse_bunker_uri rejects relay parameter without a value' => sub {
+    my $uri = "bunker://${remote_signer_pubkey}?relay&secret=mysecret";
+    ok !eval { Net::Nostr::RemoteSigning->parse_bunker_uri($uri) },
+        'croaks on missing relay value';
+    like $@, qr/relay/, 'error mentions relay';
+};
+
+subtest 'parse_bunker_uri rejects malformed relay URLs' => sub {
+    my $uri = "bunker://${remote_signer_pubkey}?relay=wss%3A%2F%2F%3Fx&secret=mysecret";
+    ok !eval { Net::Nostr::RemoteSigning->parse_bunker_uri($uri) },
+        'croaks on malformed relay URL';
+    like $@, qr/relay/, 'error mentions relay';
+};
+
+subtest 'parse_nostrconnect_uri rejects relay parameter without a value' => sub {
+    my $uri = "nostrconnect://${client_pubkey}?relay&secret=0s8j2djs";
+    ok !eval { Net::Nostr::RemoteSigning->parse_nostrconnect_uri($uri) },
+        'croaks on missing relay value';
+    like $@, qr/relay/, 'error mentions relay';
+};
+
+subtest 'parse_nostrconnect_uri rejects malformed relay URLs' => sub {
+    my $uri = "nostrconnect://${client_pubkey}?relay=wss%3A%2F%2F%3Fx&secret=0s8j2djs";
+    ok !eval { Net::Nostr::RemoteSigning->parse_nostrconnect_uri($uri) },
+        'croaks on malformed relay URL';
+    like $@, qr/relay/, 'error mentions relay';
+};
+
+subtest 'URI builders reject malformed relay URLs' => sub {
+    ok !eval { Net::Nostr::RemoteSigning->create_bunker_uri(
+        remote_signer_pubkey => $remote_signer_pubkey,
+        relay                => 'wss://?x',
+    ) }, 'bunker builder croaks on malformed relay';
+    like $@, qr/relay/, 'bunker error mentions relay';
+
+    ok !eval { Net::Nostr::RemoteSigning->create_nostrconnect_uri(
+        client_pubkey => $client_pubkey,
+        relay         => 'wss://?x',
+        secret        => '0s8j2djs',
+    ) }, 'nostrconnect builder croaks on malformed relay';
+    like $@, qr/relay/, 'nostrconnect error mentions relay';
+};
+
+subtest 'URI builders reject empty relay arrays' => sub {
+    ok !eval { Net::Nostr::RemoteSigning->create_bunker_uri(
+        remote_signer_pubkey => $remote_signer_pubkey,
+        relay                => [],
+    ) }, 'bunker builder croaks on empty relay array';
+    like $@, qr/relay/, 'bunker error mentions relay';
+
+    ok !eval { Net::Nostr::RemoteSigning->create_nostrconnect_uri(
+        client_pubkey => $client_pubkey,
+        relay         => [],
+        secret        => '0s8j2djs',
+    ) }, 'nostrconnect builder croaks on empty relay array';
+    like $@, qr/relay/, 'nostrconnect error mentions relay';
+};
+
 # --- POD: response ---
 
 subtest 'POD response' => sub {

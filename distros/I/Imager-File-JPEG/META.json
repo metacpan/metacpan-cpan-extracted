@@ -23,19 +23,19 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Imager" : "1.008",
+            "Imager" : "1.033",
             "Test::More" : "0.47"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Imager" : "1.008"
+            "Imager" : "1.033"
          }
       },
       "runtime" : {
          "requires" : {
-            "Imager" : "1.008",
+            "Imager" : "1.033",
             "XSLoader" : "0"
          }
       },
@@ -57,6 +57,6 @@
          "web" : "https://github.com/tonycoz/imager.git"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

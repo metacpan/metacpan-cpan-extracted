@@ -1,5 +1,14 @@
 Revision history for Music-VoicePhrase
 
+0.0116 2026-07-07 19:04:26
+    - Add the gate attribute for use in rt-midi.
+
+0.0115 2026-07-07 13:27:33
+    - Add clearer methods to the voice and motifs attributes.
+
+0.0114 2026-07-07 11:13:01
+    - Add missing verbosity.
+
 0.0113 2026-07-05 10:17:48
     - Make all attributes read-write.
 

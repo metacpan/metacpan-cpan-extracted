@@ -1,0 +1,15 @@
+CREATE TABLE things (
+    id   INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    tag  TEXT
+);
+
+CREATE TRIGGER things_ai AFTER INSERT ON things
+BEGIN
+    UPDATE things SET tag = 'DB:' || NEW.name WHERE id = NEW.id;
+END;
+
+CREATE TABLE plain (
+    id   INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);

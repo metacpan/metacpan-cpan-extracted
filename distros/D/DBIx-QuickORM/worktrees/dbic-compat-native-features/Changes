@@ -1,5 +1,24 @@
 {{$NEXT}}
 
+    Features:
+    - A table can now bind a DBIx::QuickORM::Handle subclass with handle_class inside its table block; handles for that source are promoted into the class so its query methods are available and survive chaining (e.g. $con->handle('users')->active->in_org($id)). A per-table binding replaces the ORM-level default for that source.
+    - Handles gain group_by() and having() refinements plus a column() aggregate helper (sum/min/max/avg/count/func and all/iterator). Grouped/aggregate results are read via data_only (or column()/count()); fetching Rows from a grouped handle throws, and writes reject group_by/having.
+
+    Bug Fixes:
+    - A handle's and()/or() now apply the given condition on its own when the handle has no existing WHERE, instead of throwing on an empty-sided -and/-or; this lets them be used as the first refinement in a chain.
+
+0.000027  2026-07-01 11:18:00-07:00 America/Los_Angeles
+
+    Features:
+    - A handle passed to handle() is now used as a query source: the inner query is spliced in as a derived table (aliased "subquery" by default, or via subquery_alias($alias)), its binds are threaded into the outer statement, and its real columns keep their types.
+
+    Bug Fixes:
+    - Autofill now croaks at schema-build time when two generated relationship accessors (or a relationship and a column accessor) would resolve to the same name, instead of silently dropping one; resolve with distinct link aliases or an autoname hook.
+    - Scalar-ref literal write values (e.g. \'NOW()') and literal-with-bind values ([\'expr ?', @binds]) in insert/update/upsert/cas are now emitted as SQL instead of being silently stored as a stringified reference; the row's cached value is recovered via RETURNING where supported, otherwise a refresh.
+
+    INCOMPATIBLE CHANGES:
+    - Passing an existing handle to handle() now wraps it as a subquery source instead of reusing/refining it; to refine a handle without wrapping it, call methods like where() on the handle directly (they return a refined clone).
+
 0.000026  2026-06-29 17:41:35-07:00 America/Los_Angeles
 
     Security:

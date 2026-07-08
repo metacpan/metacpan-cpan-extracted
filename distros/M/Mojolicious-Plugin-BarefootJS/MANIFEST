@@ -8,5 +8,6 @@ MANIFEST
 Makefile.PL
 t/dev_reload.t
 t/manifest_defaults.t
+t/render_named.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

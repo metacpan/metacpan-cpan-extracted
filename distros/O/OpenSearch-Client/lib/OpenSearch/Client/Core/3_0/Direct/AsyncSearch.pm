@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::AsyncSearch;
-$OpenSearch::Client::Core::3_0::Direct::AsyncSearch::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::AsyncSearch::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::AsyncSearch>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for asynchronous_search.|https://docs.opensearch.
 
 =head1 METHODS
     
-=head2 asynchronous_search->delete
+=head2 delete
 
 Deletes any responses from an asynchronous search.
 
@@ -95,9 +95,9 @@ C<DELETE /_plugins/_asynchronous_search/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for asynchronous_search.delete|https://opensearch.org/docs/latest/search-plugins/async/index/#delete-searches-and-results>
+L<OpenSearch documentation for asynchronous_search-E<gt>delete|https://opensearch.org/docs/latest/search-plugins/async/index/#delete-searches-and-results>
     
-=head2 asynchronous_search->get
+=head2 get
 
 Gets partial responses from an asynchronous search.
 
@@ -125,9 +125,9 @@ C<GET /_plugins/_asynchronous_search/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for asynchronous_search.get|https://opensearch.org/docs/latest/search-plugins/async/index/#get-partial-results>
+L<OpenSearch documentation for asynchronous_search-E<gt>get|https://opensearch.org/docs/latest/search-plugins/async/index/#get-partial-results>
     
-=head2 asynchronous_search->search
+=head2 search
 
 Performs an asynchronous search.
 
@@ -160,9 +160,9 @@ C<POST /_plugins/_asynchronous_search>
         'source'                       =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for asynchronous_search.search|https://opensearch.org/docs/latest/search-plugins/async/index/#rest-api>
+L<OpenSearch documentation for asynchronous_search-E<gt>search|https://opensearch.org/docs/latest/search-plugins/async/index/#rest-api>
     
-=head2 asynchronous_search->stats
+=head2 stats
 
 Monitors any asynchronous searches that are `running`, `completed`, or `persisted`.
 
@@ -186,7 +186,7 @@ C<GET /_plugins/_asynchronous_search/stats>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for asynchronous_search.stats|https://opensearch.org/docs/latest/search-plugins/async/index/#monitor-stats>
+L<OpenSearch documentation for asynchronous_search-E<gt>stats|https://opensearch.org/docs/latest/search-plugins/async/index/#monitor-stats>
 
 =head1 MANUAL
 

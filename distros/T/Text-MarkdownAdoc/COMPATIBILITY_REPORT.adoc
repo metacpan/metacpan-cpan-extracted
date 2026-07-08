@@ -1,0 +1,257 @@
+= Compatibility Report for Text::MarkdownAdoc
+
+== Overview
+
+`Text::MarkdownAdoc` is a pure Perl converter that transforms Markdown documents
+into AsciiDoc output suitable for use with Asciidoctor.  It targets practical
+Markdown as found in real technical documentation: GitHub-Flavored Markdown (GFM)
+plus kramdown extensions (definition lists, footnotes).  It is not a full
+CommonMark spec implementation; it makes pragmatic choices that work well for
+technical documents.
+
+== Supported Features
+
+=== Headings
+
+* ATX headings (`#` prefix), levels 1–6, with optional trailing `#` stripped
+* Setext headings (level 1 `=` underline, level 2 `-` underline)
+* Explicit anchor extraction from heading text (`<a name="id"></a>`)
+* Auto-generated heading IDs (opt-in via `--auto-ids`)
+
+=== Text Formatting
+
+* Bold: `**text**` or `__text__` → `*text*`
+* Italic: `*text*` or `_text_` → `_text_`
+* Code span: `` `code` `` → `` `code` ``
+* Strikethrough: `~~text~~` → `[.line-through]#text#`
+* Hard line breaks: trailing two spaces or trailing `\` → ` +`
+* Unicode smart quotes (U+201C/D, U+2018/9) converted to AsciiDoc typographic syntax
+* Typographic em dash: `---` in inline context → `--`
+
+=== Links and Images
+
+* Inline links: `[text](url)` → `url[text]`
+* Anchor links: `[text](#anchor)` → `<<anchor,text>>`
+* Cross-file links: `[text](other.md)` → `xref:other.adoc[text]`
+* Reference-style links: `[text][ref]` with deferred resolution
+* Shorthand reference links: `[ref]`
+* Autolinks: `<url>` → bare URL
+* Inline images: `![alt](src)` → `image:src[alt]`
+* Block images (sole paragraph content): `![alt](src)` → `image::src[alt]`
+* Reference-style images: `![alt][ref]`
+
+=== Code Blocks
+
+* Fenced code blocks: ` ```lang ` / `~~~` with optional language annotation → `[source,lang]\n----`
+* Diagram blocks: ` ```plantuml ` / ` ```mermaid ` → `[plantuml]\n....`
+* Indented code blocks: 4-space or tab indentation (outside list context only) → `....`
+
+=== Lists
+
+* Unordered lists: `-`, `*`, `+` markers → `*` / `**` / `***`
+* Ordered lists: `1.`, `2)` markers → `.` / `..` / `...`
+* Task lists (GFM): `[ ]` and `[x]` checkboxes preserved
+* Nested lists: unordered inside ordered and vice versa
+* Tight vs. loose list detection (blank-line-aware)
+* List item continuation lines
+
+=== Tables
+
+* GFM pipe tables with header row
+* Column alignment: left (`:---`), right (`---:`), center (`:---:`)
+* Compact format: all cells on one line per row
+
+=== Block Elements
+
+* Blockquotes: `> ` → `____` / `______` AsciiDoc quote blocks
+* Nested blockquotes: depth tracked; deeper levels use longer delimiters
+* Thematic breaks: `---`, `***`, `___` and spaced variants → `'''`
+* Paragraphs: accumulated across line continuations; blank-line separated
+
+=== Admonitions
+
+* Paragraph-style: `Note: text` → `NOTE: text`
+  (labels: `Note`, `Tip`, `Important`, `Warning`, `Caution`)
+* Blockquote-style: `> **Note:** text` → `NOTE: text`
+* Multi-paragraph admonitions: blockquote with multiple paragraphs → `[NOTE]\n====\n...\n====`
+
+=== HTML Handling
+
+* Inline HTML — known tags converted to AsciiDoc equivalents:
+  `<strong>`, `<b>`, `<em>`, `<i>`, `<code>`, `<del>`, `<s>`, `<mark>`,
+  `<sup>`, `<sub>`, `<br>`
+* Inline HTML — unknown tags wrapped in `+++` passthrough delimiters
+* Block HTML comments: `<!-- text -->` → `// text` (single-line) or `////` block
+* HTML comment directives: `<!-- ! key: value -->` → `// key: value`
+* Other block HTML: wrapped in `++++` passthrough blocks
+* HTML entities: `&nbsp;` → `{nbsp}`; other entities pass through unchanged
+
+=== Front Matter
+
+* YAML front matter (`---` delimited block at document start) extracted as
+  AsciiDoc header attributes (`:key: value`)
+* The `title` key becomes the document title if the body has no level-1 heading
+
+=== Definition Lists
+
+* Standard form: term line followed by `: Definition` → `Term::\nDefinition`
+* Bold-term form: `**Term**:: Definition` → `Term::\nDefinition`
+* Multiple definitions per term supported
+
+=== Footnotes
+
+* Footnote references: `[^label]` → `footnote:fnID[text]`
+* Footnote definitions: `[^label]: text` (with multi-line continuation)
+* Repeated references to the same footnote: first gets full text, subsequent get `footnote:fnID[]`
+* Inline formatting inside footnote text is preserved
+
+=== Math (STEM)
+
+* Inline math: `$...$` → `stem:[...]`
+* Block math: `$$...$$` → `[stem]\n++++`
+* Fenced math: ` ```math ` → `[stem]\n++++`
+* `:stem: latexmath` attribute injected automatically when math is detected
+
+=== Wrap Modes
+
+* `preserve` (default): emit lines exactly as they appear in the source
+* `none`: join all lines of a paragraph into a single line
+* `ventilate`: join lines and re-break at sentence boundaries
+
+== Conversion Reference
+
+[cols="2,2"]
+|===
+| Markdown | AsciiDoc
+
+| `# Heading 1` | `= Heading 1`
+| `## Heading 2` | `== Heading 2`
+| `**bold**` | `*bold*`
+| `*italic*` | `_italic_`
+| `` `code` `` | `` `code` ``
+| `~~strike~~` | `[.line-through]#strike#`
+| `[text](url)` | `url[text]`
+| `[text](#anchor)` | `<<anchor,text>>`
+| `[text](other.md)` | `xref:other.adoc[text]`
+| `![alt](src)` (inline) | `image:src[alt]`
+| `![alt](src)` (block) | `image::src[alt]`
+| `> quote` | `____\nquote\n____`
+| ` ```lang\ncode\n``` ` | `[source,lang]\n----\ncode\n----`
+| `---` (thematic break) | `'''`
+| `- item` | `* item`
+| `1. item` | `. item`
+| `\| A \| B \|` (GFM table) | `\|===\n\| A \| B\n\|\n\| ...\n\|===`
+| `Note: text` | `NOTE: text`
+| `[^1]` / `[^1]: text` | `footnote:fn1[text]`
+| `$E = mc^2$` | `stem:[E = mc^2]`
+| `$$\nE = mc^2\n$$` | `[stem]\n++++\nE = mc^2\n++++`
+|===
+
+== Intentionally Unsupported
+
+[cols="2,3"]
+|===
+| Feature | Rationale
+
+| Full CommonMark spec compliance
+| Targets practical GFM + kramdown subset used in real technical documents.
+  Edge cases not found in typical documentation are not handled.
+
+| HTML table conversion
+| Block HTML is emitted as passthrough blocks, not converted to AsciiDoc tables.
+
+| Full HTML entity table
+| Only `&nbsp;` is converted to `{nbsp}`; all other entities pass through unchanged.
+
+| AST/DOM pipeline
+| The converter uses a line-oriented state machine by design.  Features requiring
+  a full document tree are outside scope.
+
+| Indented code blocks inside list context
+| Indented content within lists is treated as list item continuation.
+
+| Full CommonMark flanking-delimiter rules for italic
+| Word-boundary constraints are used instead.  This handles common cases but
+  does not implement the full left/right-flanking delimiter run algorithm.
+|===
+
+== Known Limitations
+
+=== Italic with underscores in identifiers
+
+The converter uses word-boundary constraints to avoid treating underscores in
+identifiers (e.g., `snake_case`) as italic delimiters.  This means `_italic_`
+works correctly in prose, but `_italic_` adjacent to word characters may not
+be recognized.  Use `*italic*` for reliability.
+
+=== Reference link label matching
+
+Labels are matched case-insensitively with whitespace normalization.  Full
+CommonMark link label normalization (Unicode case folding, entity expansion)
+is not implemented.
+
+=== Block HTML as passthrough
+
+Block HTML is emitted inside `++++` passthrough blocks rather than being
+converted to native AsciiDoc equivalents.  The HTML is preserved but may not
+render identically in all Asciidoctor backends.
+
+=== Nested blockquotes
+
+Blockquotes nested more than two levels deep are supported; the AsciiDoc
+delimiter length scales with depth (`____` for depth 1, `______` for depth 2,
+etc.).  Very deep nesting may produce non-standard AsciiDoc.
+
+=== Wrap mode and structural lines
+
+Wrap modes `none` and `ventilate` operate on prose paragraphs only.  Headings,
+list markers, table rows, code blocks, and passthrough blocks are always emitted
+unchanged regardless of wrap mode.
+
+== Differences from kramdown-asciidoc
+
+[cols="2,3"]
+|===
+| Area | Difference
+
+| Table body format
+| Uses compact format: all cells on one line per row.
+  `kramdown-asciidoc` uses one cell per line for body rows.
+
+| Inline HTML passthrough
+| Unknown inline HTML tags are wrapped in `+++` passthrough delimiters.
+  `kramdown-asciidoc` emits them as raw pass-through.
+
+| Multi-paragraph admonitions
+| Uses `[NOTE]\n====\n...\n====` delimited block.
+  `kramdown-asciidoc` emits separate `NOTE:` labels per paragraph.
+
+| Diagram blocks
+| Uses `....` (literal block) delimiter for `plantuml`/`mermaid` blocks.
+  `kramdown-asciidoc` uses `====` (example block).
+
+| Wrap mode
+| Supports `preserve`, `none`, and `ventilate` wrap modes.
+  `kramdown-asciidoc` does not have an equivalent option.
+|===
+
+== Round-Trip Compatibility
+
+`Text::MarkdownAdoc` is designed to be the return leg of a round-trip with
+`Text::AsciidocDown`:
+
+----
+AsciiDoc  →  Text::AsciidocDown  →  Markdown  →  Text::MarkdownAdoc  →  AsciiDoc
+----
+
+The round-trip guarantee: an AsciiDoc document converted to Markdown via
+`Text::AsciidocDown` and then converted back to AsciiDoc via `Text::MarkdownAdoc`
+must produce no data loss.  This is a first-class design requirement and is
+verified by the test suite (`t/07-roundtrip.t`).
+
+Constructs covered by the round-trip guarantee include: headings, paragraphs,
+inline formatting (bold, italic, code, strikethrough), links, images, fenced
+code blocks, blockquotes, ordered and unordered lists, GFM tables, thematic
+breaks, definition lists, footnotes, admonitions, and front matter attributes.
+
+The test suite passes in full.  See `t/07-roundtrip.t` for the verified scenarios.

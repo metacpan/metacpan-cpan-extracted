@@ -77,9 +77,9 @@ my $wide = [
 	is(scalar @L, 5, 'AoH: summary + header + 3 data rows');
 	like($L[0], qr/^# AoH: 3 rows x 3 cols	\(showing 3\)$/, 'AoH summary line');
 	like($L[1], qr/id.*name.*score/, 'header lists columns in sorted order');
-	like($L[2], qr/^1\b/,	 'row 1 labelled 1');
+	like($L[2], qr/^0\b/,	 'row 0 labelled 0');
 	like($L[2], qr/Alice/,	 'row 1 carries its data');
-	like($L[4], qr/^3\b/,	 'row 3 labelled 3');
+	like($L[4], qr/^2\b/,	 'row 2 labelled 2');
 }
 
 #--------
@@ -89,7 +89,7 @@ my $wide = [
 	my $hoa = { id => [1, 2, 30], name => ['Alice', 'Bob', 'Cara'] };
 	my @L = _lines(view($hoa, return_only => 1, color => 0));
 	like($L[0], qr/^# HoA: 3 rows x 2 cols/, 'HoA summary line');
-	like($L[2], qr/^1\b.*Alice/, 'HoA row 1');
+	like($L[2], qr/^0\b.*Alice/, 'HoA row 0');
 }
 
 #--------
@@ -111,7 +111,7 @@ my $wide = [
 	my @L = _lines(view({ alpha => 1, beta => 'two', gamma => 3.5 }, return_only => 1, color => 0));
 	like($L[0], qr/^# Hash: 1 row x 3 cols/, 'flat hash single-row summary');
 	is(scalar @L, 3, 'flat hash: summary + header + 1 row');
-	like($L[2], qr/^1\b/, 'flat hash row labelled 1');
+	like($L[2], qr/^0\b/, 'flat hash row labelled 0');
 }
 
 #--------
@@ -391,5 +391,79 @@ view($wide, width => 20, return_only => 1, color => 0);
 no_leaks_ok {
 	my $s = view($wide, width => 20, return_only => 1, color => 0);
 } 'view: no memory leaks on a chunked (multi-block) render' unless $INC{'Devel/Cover.pm'};
+
+#--------
+# auto row labels are 0-based indexes (Perl style), not 1-based counts (R style)
+#--------
+{
+	my @A = _lines(view([ { v => 'a' }, { v => 'b' }, { v => 'c' } ], return_only => 1, color => 0));
+	like($A[2], qr/^0\b/, 'AoH auto label: first row is 0');
+	like($A[3], qr/^1\b/, 'AoH auto label: second row is 1');
+	like($A[4], qr/^2\b/, 'AoH auto label: third row is 2');
+
+	my @H = _lines(view({ v => ['a', 'b', 'c'] }, return_only => 1, color => 0));
+	like($H[2], qr/^0\b/, 'HoA auto label: first row is 0');
+	like($H[3], qr/^1\b/, 'HoA auto label: second row is 1');
+
+	my @Q = _lines(view([ ['a'], ['b'], ['c'] ], return_only => 1, color => 0));
+	like($Q[2], qr/^0\b/, 'AoA auto label: first row is 0');
+	like($Q[3], qr/^1\b/, 'AoA auto label: second row is 1');
+
+	my @F = _lines(view({ only => 'x' }, return_only => 1, color => 0));
+	like($F[2], qr/^0\b/, 'flat hash: single row labelled 0');
+
+	# HoH is unaffected: labels remain the (sorted) outer keys
+	my @K = _lines(view({ beta => { x => 1 }, alpha => { x => 2 } }, return_only => 1, color => 0));
+	like($K[2], qr/^alpha\b/, 'HoH label unchanged: still the outer key');
+	like($K[3], qr/^beta\b/,  'HoH second label is the outer key');
+
+	no_leaks_ok {
+		my $s = view([ { v => 'a' }, { v => 'b' } ], return_only => 1, color => 0);
+	} 'view: no memory leaks rendering 0-based auto labels' unless $INC{'Devel/Cover.pm'};
+}
+
+#--------
+# regression: an already-decoded (utf8-flagged) wide char -- e.g. a "ΔG range"
+# header written under `use utf8` -- must be encoded to bytes on output, so
+# print() never warns "Wide character in print". Warnings are lexically scoped
+# to the module, so we trap them here with a __WARN__ handler rather than
+# relying on this file's FATAL => 'all'.
+#--------
+{
+	my $hdr = "\xCE\x94G range";   # the UTF-8 bytes for "ΔG range" ...
+	utf8::decode($hdr);            # ... promoted to an already-decoded char string
+	ok(utf8::is_utf8($hdr), 'the header under test really is utf8-flagged');
+
+	my (@w, $buf);
+	$buf = '';
+	{
+		local $SIG{__WARN__} = sub { push @w, $_[0] };
+		open my $fh, '>', \$buf or die "open: $!";
+		view([ { $hdr => 'x', v => 1 } ], to => $fh, color => 0);
+		close $fh;
+	}
+	is(scalar(grep { /Wide character/i } @w), 0,
+		'no "Wide character in print" warning for a utf8-flagged header');
+	ok(length $buf,          'output was written');
+	ok(!utf8::is_utf8($buf), 'the rendered string is bytes, not wide chars');
+	like($buf, qr/\xCE\x94/, 'the wide char is emitted as its UTF-8 bytes');
+
+	# same again for a wide char in a cell value, not just the header
+	my $val = "\xCE\x94"; utf8::decode($val);
+	my ($b2, @w2) = ('');
+	{
+		local $SIG{__WARN__} = sub { push @w2, $_[0] };
+		open my $fh2, '>', \$b2 or die "open: $!";
+		view([ { g => $val } ], to => $fh2, color => 0);
+		close $fh2;
+	}
+	is(scalar(grep { /Wide character/i } @w2), 0, 'no warning for a utf8-flagged value');
+	like($b2, qr/\xCE\x94/, 'wide value emitted as UTF-8 bytes');
+
+	no_leaks_ok {
+		my $h = "\xCE\x94"; utf8::decode($h);
+		my $s = view([ { $h => 1 } ], return_only => 1, color => 0);
+	} 'view: no memory leaks on a utf8-flagged wide char' unless $INC{'Devel/Cover.pm'};
+}
 
 done_testing;

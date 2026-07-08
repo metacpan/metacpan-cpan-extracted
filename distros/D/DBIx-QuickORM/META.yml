@@ -23,7 +23,7 @@ requires:
   Carp: '0'
   Compress::Zstd: '0.06'
   Cpanel::JSON::XS: '3.0224'
-  DBD::SQLite: '1.64'
+  DBD::SQLite: '1.70'
   DBI: '1.628'
   Data::Dumper: '2.171'
   DateTime: '0'
@@ -49,7 +49,7 @@ requires:
 resources:
   bugtracker: https://github.com/exodist/DBIx-QuickORM/issues
   repository: https://github.com/exodist/DBIx-QuickORM/
-version: '0.000027'
+version: '0.000028'
 x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

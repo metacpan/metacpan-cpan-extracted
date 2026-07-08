@@ -1360,6 +1360,7 @@ static void heap_sift_up_custom(pTHX_ Heap *h, IV idx) {
 
     if (idx <= 0) return;
 
+#if HEAP_USE_MULTICALL
     {
         dMULTICALL;
         I32 gimme = G_SCALAR;
@@ -1383,6 +1384,20 @@ static void heap_sift_up_custom(pTHX_ Heap *h, IV idx) {
 
         POP_MULTICALL;
     }
+#else
+    while (idx > 0) {
+        IV parent = (idx - 1) >> 1;
+        HEAP_CMP_CALL(h, h->data[idx], h->data[parent], cmp_result);
+        if (h->type == HEAP_MIN ? cmp_result < 0 : cmp_result > 0) {
+            SV *tmp = h->data[idx];
+            h->data[idx] = h->data[parent];
+            h->data[parent] = tmp;
+            idx = parent;
+        } else {
+            break;
+        }
+    }
+#endif
 }
 
 static void heap_sift_down_custom(pTHX_ Heap *h, IV idx) {
@@ -1391,6 +1406,7 @@ static void heap_sift_down_custom(pTHX_ Heap *h, IV idx) {
 
     if (h->size <= 1) return;
 
+#if HEAP_USE_MULTICALL
     {
         dMULTICALL;
         I32 gimme = G_SCALAR;
@@ -1429,6 +1445,33 @@ static void heap_sift_down_custom(pTHX_ Heap *h, IV idx) {
 
         POP_MULTICALL;
     }
+#else
+    while (1) {
+        IV left = (idx << 1) + 1;
+        IV right = left + 1;
+        IV best = idx;
+
+        if (left < h->size) {
+            HEAP_CMP_CALL(h, h->data[left], h->data[best], cmp_result);
+            if (h->type == HEAP_MIN ? cmp_result < 0 : cmp_result > 0)
+                best = left;
+        }
+        if (right < h->size) {
+            HEAP_CMP_CALL(h, h->data[right], h->data[best], cmp_result);
+            if (h->type == HEAP_MIN ? cmp_result < 0 : cmp_result > 0)
+                best = right;
+        }
+
+        if (best != idx) {
+            SV *tmp = h->data[idx];
+            h->data[idx] = h->data[best];
+            h->data[best] = tmp;
+            idx = best;
+        } else {
+            break;
+        }
+    }
+#endif
 }
 
 static int heap_free(pTHX_ SV *sv, MAGIC *mg) {

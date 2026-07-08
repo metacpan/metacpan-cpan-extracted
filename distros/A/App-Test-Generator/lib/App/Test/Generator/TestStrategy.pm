@@ -39,11 +39,11 @@ Readonly my $TEST_BOUNDARY        => 'boundary_tests';
 Readonly my $TEST_CHAINING        => 'chaining_test';
 Readonly my $TEST_BASIC           => 'basic_test';
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =head1 DESCRIPTION
 
@@ -69,12 +69,14 @@ Construct a new TestStrategy.
 
 =item * C<schema>
 
-A hashref of method name to schema hashref. Optional — defaults to
+A hashref of method name to schema hashref
+Optional - defaults to
 an empty hashref.
 
 =item * C<thresholds>
 
-A hashref of threshold configuration. Optional — defaults to
+A hashref of threshold configuration.
+Optional - defaults to
 C<< { confidence => 'medium' } >>.
 
 =back

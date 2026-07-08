@@ -2,16 +2,13 @@
 
 require 5.010;
 use warnings FATAL => 'all';
-use feature 'say';
 use Stats::LikeR;
 use Test::Exception; # die_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
 use Devel::Confess 'color';
 
-# -------------------------------------------------------------------
 # Hash-of-Hashes — return type
-# -------------------------------------------------------------------
 
 ok( ref(transpose({ a => { 'x' => 1 } })) eq 'HASH', 'transpose HoH: returns a hash ref' );
 

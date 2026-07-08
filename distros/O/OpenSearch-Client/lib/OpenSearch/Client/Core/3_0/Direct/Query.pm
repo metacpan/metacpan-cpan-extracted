@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Query;
-$OpenSearch::Client::Core::3_0::Direct::Query::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Query::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Query>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for query.|https://docs.opensearch.org/latest/obs
 
 =head1 METHODS
     
-=head2 query->datasource_delete
+=head2 datasource_delete
 
 Deletes a specific data source by name.
 
@@ -95,9 +95,9 @@ C<DELETE /_plugins/_query/_datasources/{datasource_name}>
         'source'           =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for query.datasource_delete|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
+L<OpenSearch documentation for query-E<gt>datasource_delete|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
     
-=head2 query->datasource_retrieve
+=head2 datasource_retrieve
 
 Retrieves a specific data source by name.
 
@@ -125,9 +125,9 @@ C<GET /_plugins/_query/_datasources/{datasource_name}>
         'source'           =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for query.datasource_retrieve|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
+L<OpenSearch documentation for query-E<gt>datasource_retrieve|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
     
-=head2 query->datasources_create
+=head2 datasources_create
 
 Creates a new query data source.
 
@@ -153,9 +153,9 @@ C<POST /_plugins/_query/_datasources>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for query.datasources_create|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
+L<OpenSearch documentation for query-E<gt>datasources_create|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
     
-=head2 query->datasources_list
+=head2 datasources_list
 
 Retrieves a list of all available data sources.
 
@@ -179,9 +179,9 @@ C<GET /_plugins/_query/_datasources>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for query.datasources_list|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
+L<OpenSearch documentation for query-E<gt>datasources_list|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
     
-=head2 query->datasources_update
+=head2 datasources_update
 
 Updates an existing query data source.
 
@@ -207,7 +207,7 @@ C<PUT /_plugins/_query/_datasources>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for query.datasources_update|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
+L<OpenSearch documentation for query-E<gt>datasources_update|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
 
 =head1 MANUAL
 

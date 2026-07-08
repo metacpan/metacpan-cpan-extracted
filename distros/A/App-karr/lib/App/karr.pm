@@ -1,7 +1,7 @@
 # ABSTRACT: Kanban Assignment & Responsibility Registry
 
 package App::karr;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options;
@@ -11,11 +11,15 @@ use App::karr::Role::BoardAccess;
 with 'App::karr::Role::BoardAccess';
 
 
-option dir => (
+# The --dir option is provided by App::karr::Role::BoardDiscovery (composed via
+# BoardAccess), so it is a single, shared declaration usable both here on the
+# root (`karr --dir PATH CMD`) and on every subcommand (`karr CMD --dir PATH`).
+
+# Forwarded to the default board view so bare `karr --done` behaves like
+# `karr board --done`.
+option done => (
   is => 'ro',
-  format => 's',
-  doc => 'Path used as the starting point for Git repository discovery',
-  predicate => 1,
+  doc => 'Include the Done section in the default board view',
 );
 
 my @COMMANDS = (
@@ -33,10 +37,13 @@ my @COMMANDS = (
   [ destroy   => 'Delete the entire refs/karr/* board' ],
   [ config    => 'View or modify board config' ],
   [ context   => 'Generate board context summary' ],
+  [ log       => 'Show activity log' ],
   [ backup    => 'Export refs/karr/* as YAML' ],
   [ restore   => 'Replace refs/karr/* from YAML' ],
+  [ materialize => 'Write refs/karr/* out as a tasks/ file view' ],
+  [ import    => 'Import a tasks/ file view into refs/karr/*' ],
   [ sync      => 'Sync board with remote' ],
-  [ agentname => 'Generate a random agent name' ],
+  [ 'agent-name' => 'Generate a random agent name' ],
   [ skill     => 'Install/update agent skills' ],
   [ 'set-refs' => 'Store helper payloads in a Git ref' ],
   [ 'get-refs' => 'Fetch and print helper payloads from a Git ref' ],
@@ -75,6 +82,11 @@ sub _print_help {
   $out .= "\nRun " . colored("karr <command> --help", 'bold') . " for command-specific options.\n";
 
   if ($code > 0) { warn $out } else { print $out }
+  # Exit-code contract (ADR 0002): a positive code here is a usage/option-parse
+  # error from MooX::Options (unknown option, bad value on the root command), so
+  # normalize it to 2. Help requests (-h/--help) arrive with code 0 -> exit 0.
+  # A negative code means "print, do not exit" and is left untouched.
+  $code = 2 if $code > 0;
   exit $code if $code >= 0;
 }
 
@@ -84,12 +96,32 @@ around options_short_usage => sub { $_[1]->_print_help($_[2]) };
 
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
-  # Default action: show board summary
+
+  # A leftover positional here means MooX::Cmd could not dispatch it to any
+  # App::karr::Cmd::* subcommand: it is an unknown command, not a request for
+  # the default board view. MooX::Cmd echoes already-parsed option flags AND
+  # the values they consumed (e.g. `--done`, or `--dir PATH` in space form)
+  # back into $args_ref, so run the leftover argv through the option-aware
+  # positional_args extractor rather than a raw non-dash grep -- otherwise a
+  # space-form option value such as the `--dir PATH` path is misread as an
+  # unknown bare command. Bare `karr` and `karr --done` legitimately fall
+  # through to the board summary below.
+  my ($unknown) = $self->positional_args($args_ref);
+  if (defined $unknown) {
+    die "Unknown command: $unknown\nRun 'karr --help' to see the available commands.\n";
+  }
+
+  # Default action: show board summary. The default Board is constructed
+  # directly (not dispatched by MooX::Cmd), so it has no command_chain to adopt
+  # --dir from; forward the root's own --dir explicitly so bare
+  # `karr --dir PATH` targets PATH rather than silently falling back to cwd.
   eval {
     require App::karr::Cmd::Board;
-    App::karr::Cmd::Board->new(
-      board_dir => $self->board_dir,
-    )->execute($args_ref, $chain_ref);
+    my %board_args = (
+      done      => $self->done,
+    );
+    $board_args{dir} = $self->dir if $self->has_dir;
+    App::karr::Cmd::Board->new(%board_args)->execute($args_ref, $chain_ref);
   };
   if ($@) {
     if ($@ =~ /No karr board found/) {
@@ -113,7 +145,7 @@ App::karr - Kanban Assignment & Responsibility Registry
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 
@@ -246,8 +278,14 @@ CLI.
 =head1 BOARD DISCOVERY
 
 Most commands automatically search upward from the current directory for a Git
-repository that contains C<refs/karr/*>. The global C<--dir> option overrides
-the starting directory used for that repository discovery.
+repository that contains C<refs/karr/*>. The C<--dir> option overrides the
+starting directory used for that repository discovery and is accepted in either
+position: before the subcommand (C<karr --dir PATH list>) or on the subcommand
+itself (C<karr list --dir PATH>). Both forms behave identically. The upward walk
+still applies from the given path, so C<--dir> names any directory inside the
+target repository, not necessarily its root. If no Git repository is found from
+the given path, the command fails loudly rather than falling back to the current
+directory.
 
 =head1 DEFAULT BEHAVIOUR
 

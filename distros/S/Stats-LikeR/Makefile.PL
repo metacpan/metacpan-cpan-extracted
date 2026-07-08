@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Stats::LikeR",
   "PREREQ_PM" => {
+    "Cwd" => 0,
     "Devel::Confess" => 0,
     "Scalar::Util" => "1.22",
     "Test::Exception" => 0,
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.19",
+  "VERSION" => "0.22",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
+  "Cwd" => 0,
   "Devel::Confess" => 0,
   "Scalar::Util" => "1.22",
   "Test::Exception" => 0,

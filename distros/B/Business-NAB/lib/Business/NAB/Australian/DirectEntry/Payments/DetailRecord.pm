@@ -1,5 +1,5 @@
 package Business::NAB::Australian::DirectEntry::Payments::DetailRecord;
-$Business::NAB::Australian::DirectEntry::Payments::DetailRecord::VERSION = '0.04';
+$Business::NAB::Australian::DirectEntry::Payments::DetailRecord::VERSION = '0.05';
 =head1 NAME
 
 Business::NAB::Australian::DirectEntry::Payments::DetailRecord
@@ -177,6 +177,10 @@ sub new_from_record ( $class, $line ) {
         $orig_user_id = $rest;
     }
 
+    # Account numbers may be padded with leading spaces
+    # which we strip to preserve round-tripping
+    $account_number =~ s/^ +//;
+
     return $class->new(
         bsb_number           => $bsb_number,
         account_number       => $account_number,
@@ -224,7 +228,7 @@ sub to_record ( $self ) {
         $self->_pack_template(),
         $self->record_type,
         $self->bsb_number,
-        $self->account_number,
+        sprintf( '% 9s', $self->account_number ),
 
         $self->record_type eq '1'
         ? $self->indicator

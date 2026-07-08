@@ -22,6 +22,7 @@
 
 use Test::More;
 use POSIX ":sys_wait_h";
+use Time::HiRes;
 
 my $es        = do "os_sync.pl" or die( $@ || $! );
 my $cxn_class = ref $es->transport->cxn_pool->cxns->[0];
@@ -42,8 +43,9 @@ for my $child ( 1 .. $Kids ) {
         last;
     }
 
-    for ( 1 .. 100 ) {
+    for ( 1 .. 10 ) {
         $es->info;
+        Time::HiRes::sleep(0.1);
     }
     exit;
 }

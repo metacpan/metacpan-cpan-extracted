@@ -1,14 +1,12 @@
 ---
 abstract: Data::NestedKey
 author:
-  - 'Rob Lauer <rlauer@treasurersbriefcase.com>'
+  - 'Rob Lauer <rclauer@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
-  JSON: '0'
-  Storable: '0'
-  Test::More: '0'
-  YAML::XS: '0'
+  JSON: '4.10'
+  YAML::XS: v0.904.0
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -26,15 +24,20 @@ no_index:
 provides:
   Data::NestedKey:
     file: lib/Data/NestedKey.pm
-    version: v1.1.0
+    version: v1.2.0
+  Data::NestedKey::CLI:
+    file: lib/Data/NestedKey/CLI.pm
+    version: '0'
 requires:
-  JSON: '0'
-  List::Util: '1.32'
-  YAML::XS: '0'
+  CLI::Simple: v2.0.11
+  CLI::Simple::Constants: v2.0.11
+  CLI::Simple::Utils: v2.0.11
+  JSON: '4.10'
+  YAML::XS: v0.904.0
   perl: '5.010'
 resources:
-  bugtracker: http://github.com/rlauer6/data-nestedkey/issues
-  homepage: http://github.com/rlauer6/data-nestedkey.git
-  repository: git://github.com/rlauer6/data-nestedkey.git
-version: v1.1.0
+  bugtracker: https://github.com/rlauer6/Data-NestedKey/issues
+  homepage: https://github.com/rlauer6/Data-NestedKey
+  repository: https://github.com/rlauer6/Data-NestedKey
+version: v1.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

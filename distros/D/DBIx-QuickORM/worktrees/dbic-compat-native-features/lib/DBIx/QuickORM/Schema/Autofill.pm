@@ -2,7 +2,7 @@ package DBIx::QuickORM::Schema::Autofill;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak/;
 use DBIx::QuickORM::Util qw/load_class/;
@@ -202,9 +202,15 @@ sub process_column {
 
 Load (or autovivify) the row class, then install field accessors for each column
 and link accessors for each link, honoring the C<field_accessor> and
-C<link_accessor> hooks and never clobbering accessors that already exist.
+C<link_accessor> hooks.
 
-=back
+An accessor that already exists on the row class is left untouched. Each
+generated accessor name must be unique on the row class; if two relationships,
+or a relationship and a column, resolve to the same name this croaks and names
+the conflict. Names are resolved after any C<aliases> and
+C<link_accessor>/C<link> hooks, so those hooks resolve a collision: give the
+relationships distinct aliases, or a name hook that returns a distinct name for
+each.
 
 =cut
 
@@ -221,6 +227,11 @@ sub define_autorow {
         $INC{$row_file} = __FILE__;
     }
 
+    # Accessor name => description of what claimed it. Used to detect and report
+    # a relationship accessor that collides with a column accessor or with
+    # another relationship accessor.
+    my %claimed;
+
     for my $column ($table->columns) {
         my $field = $column->name;
         my $accessor = $self->hook(field_accessor => {table => $table, name => $field, field => $field, column => $column}, $field);
@@ -228,6 +239,8 @@ sub define_autorow {
 
         no strict 'refs';
         next if defined &{"$row_class\::$accessor"};
+
+        $claimed{$accessor} = "the '$field' column accessor";
         *{"$row_class\::$accessor"} = sub { shift->field($field, @_) };
     }
 
@@ -240,11 +253,62 @@ sub define_autorow {
         for my $alias (@$aliases) {
             my $accessor = $self->hook(link_accessor => {table => $table, linked_table => $link->other_table, name => $alias, link => $link}, $alias);
             next unless $accessor;
+
+            croak $self->_autorow_collision_error($row_class, $accessor, $claimed{$accessor}, $link)
+                if $claimed{$accessor};
+
             no strict 'refs';
             next if defined &{"$row_class\::$accessor"};
+
+            $claimed{$accessor} = $self->_link_description($link);
             *{"$row_class\::$accessor"} = $link->unique ? sub { shift->obtain($link) } : sub { shift->follow($link) };
         }
     }
+}
+
+=pod
+
+=item $desc = $autofill->_link_description($link)
+
+Return a human-readable description of a link for collision diagnostics: the
+table it points to, the local columns it joins on, and where the link was
+defined.
+
+=cut
+
+sub _link_description {
+    my $self = shift;
+    my ($link) = @_;
+
+    my $local   = join(', ', @{$link->local_columns});
+    my $other   = join(', ', @{$link->other_columns});
+    my $created = $link->created;
+
+    my $desc = "the relationship to '" . $link->other_table . "' ($local => $other)";
+    $desc .= " defined at $created" if $created && $created ne 'unknown';
+
+    return $desc;
+}
+
+=pod
+
+=item $msg = $autofill->_autorow_collision_error($row_class, $accessor, $claimed_by, $link)
+
+Build the croak message for an accessor-name collision: name the row class and
+accessor, describe both sides of the collision, and tell the user how to
+resolve it.
+
+=back
+
+=cut
+
+sub _autorow_collision_error {
+    my $self = shift;
+    my ($row_class, $accessor, $claimed_by, $link) = @_;
+
+    return join "\n",
+        "Cannot generate the '$accessor' accessor on row class '$row_class': it is wanted by both $claimed_by and " . $self->_link_description($link) . ".",
+        "Give the relationships distinct aliases, or provide an 'autoname link_accessor' (or 'autoname link') name hook that returns a distinct name for each.";
 }
 
 1;

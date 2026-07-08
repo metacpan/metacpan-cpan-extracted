@@ -1,5 +1,6 @@
 Changes
 lib/Net/Nostr/_ConstructorArgs.pm
+lib/Net/Nostr/_URI.pm
 lib/Net/Nostr/AppData.pm
 lib/Net/Nostr/AppHandler.pm
 lib/Net/Nostr/Article.pm
@@ -105,6 +106,7 @@ t/53-RelayAccess.t
 t/54-LiveActivity.t
 t/55-Wiki.t
 t/57-Thread.t
+t/author/00-author.t
 t/data/nip44.vectors.json
 t/lib/TestFixtures.pm
 t/nip/03.t

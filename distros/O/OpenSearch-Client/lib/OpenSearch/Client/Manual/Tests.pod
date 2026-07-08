@@ -6,7 +6,7 @@
 =head1 Running the module tests
 
 
-B<NOTE - DO RUN THE TESTS AGAINST NODES WITH IMPORTANT CONTENT. THE TESTS MAY BE DESTRUCTIVE>
+B<NOTE - DO NOT RUN THE TESTS AGAINST NODES WITH IMPORTANT CONTENT. THE TESTS MAY BE DESTRUCTIVE>
 
 The standard module tests run without connecting to any OpenSearch nodes.
 
@@ -22,9 +22,35 @@ C<export CLIENT_VER="3_0">
 
 =item
 
-Specify a node that allows http connections
+Specify a node that allows http or https connections
 
 C<export OS="192.168.100.10:9200">
+
+If your node uses SSL, also export
+
+C<export OS_ALWAYS_SSL=1>
+
+If your node uses SSL and requires authentication
+
+C<export OS_USERINFO="username:password">
+
+=item
+
+Specify a type of connection
+
+Choose between HTTP::Tiny and LWP::UserAgent. The default is HTTP::Tiny.
+
+C<export OS_CXN="LWP">
+
+C<export OS_CXN="HTTPTiny">
+
+=item
+
+Specify a type of connection pool.
+
+The default is C<Static> but you may need C<Static::NoPing> if your node is behind some load balancer or reverse proxy.
+
+C<export OS_CXN_POOL="Static::NoPing">
 
 =item
 
@@ -40,7 +66,7 @@ C<export OS_TEST_SCROLL_HELPERS=1>
 
 =back
 
-=head2 To also include tests against an HTTPS node
+=head2 To also include HTTPS specific tests
 
 =over
 

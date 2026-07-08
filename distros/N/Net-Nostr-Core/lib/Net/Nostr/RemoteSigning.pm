@@ -3,10 +3,12 @@ package Net::Nostr::RemoteSigning;
 use strictures 2;
 
 use Net::Nostr::_ConstructorArgs ();
+use Net::Nostr::_URI qw(parse_uri_query validate_relay_url);
 
 use Carp qw(croak);
 use JSON ();
 use Net::Nostr::Event;
+use URI ();
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
@@ -16,20 +18,24 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
 sub parse_bunker_uri {
     my ($class, $uri) = @_;
-    croak "URI must use bunker:// protocol"
-        unless $uri =~ m{^bunker://([0-9a-f]{64})\?(.+)$}i;
-
-    my ($pubkey, $query) = (lc($1), $2);
+    my ($pubkey, @query) = parse_uri_query(
+        $uri,
+        label  => 'URI',
+        scheme => 'bunker',
+    );
+    $pubkey = lc $pubkey;
+    croak "bunker:// URI remote_signer_pubkey must be 64-char lowercase hex"
+        unless $pubkey =~ $HEX64;
 
     my (@relays, $secret);
-    for my $pair (split /&/, $query) {
-        my ($key, $val) = split /=/, $pair, 2;
-        $val = _uri_decode($val) if defined $val;
+    while (@query) {
+        my ($key, $val) = splice @query, 0, 2;
         if ($key eq 'relay')    { push @relays, $val }
         elsif ($key eq 'secret') { $secret = $val }
     }
 
     croak "URI must contain at least one relay parameter" unless @relays;
+    @relays = map { validate_relay_url($_, label => 'relay URL') } @relays;
 
     return Net::Nostr::RemoteSigning::BunkerConnection->new(
         remote_signer_pubkey => $pubkey,
@@ -46,15 +52,18 @@ sub create_bunker_uri {
     croak "relay is required" unless defined $args{relay};
 
     my @relays = ref $args{relay} eq 'ARRAY' ? @{$args{relay}} : ($args{relay});
+    croak "relay is required" unless @relays;
+    @relays = map { validate_relay_url($_, label => 'relay URL') } @relays;
 
-    my $uri = "bunker://$args{remote_signer_pubkey}?";
+    my $uri = URI->new("bunker://$args{remote_signer_pubkey}");
     my @params;
     for my $r (@relays) {
-        push @params, "relay=" . _uri_encode($r);
+        push @params, relay => $r;
     }
-    push @params, "secret=" . _uri_encode($args{secret}) if defined $args{secret};
+    push @params, secret => $args{secret} if defined $args{secret};
 
-    return $uri . join('&', @params);
+    $uri->query_form(@params);
+    return $uri->as_string;
 }
 
 ###############################################################################
@@ -63,15 +72,18 @@ sub create_bunker_uri {
 
 sub parse_nostrconnect_uri {
     my ($class, $uri) = @_;
-    croak "URI must use nostrconnect:// protocol"
-        unless $uri =~ m{^nostrconnect://([0-9a-f]{64})\?(.+)$}i;
-
-    my ($pubkey, $query) = (lc($1), $2);
+    my ($pubkey, @query) = parse_uri_query(
+        $uri,
+        label  => 'URI',
+        scheme => 'nostrconnect',
+    );
+    $pubkey = lc $pubkey;
+    croak "nostrconnect:// URI client_pubkey must be 64-char lowercase hex"
+        unless $pubkey =~ $HEX64;
 
     my (@relays, $secret, $perms, $name, $url, $image);
-    for my $pair (split /&/, $query) {
-        my ($key, $val) = split /=/, $pair, 2;
-        $val = _uri_decode($val) if defined $val;
+    while (@query) {
+        my ($key, $val) = splice @query, 0, 2;
         if    ($key eq 'relay')  { push @relays, $val }
         elsif ($key eq 'secret') { $secret = $val }
         elsif ($key eq 'perms')  { $perms  = $val }
@@ -81,6 +93,7 @@ sub parse_nostrconnect_uri {
     }
 
     croak "URI must contain at least one relay parameter" unless @relays;
+    @relays = map { validate_relay_url($_, label => 'relay URL') } @relays;
     croak "URI must contain a secret parameter" unless defined $secret;
 
     return Net::Nostr::RemoteSigning::NostrConnect->new(
@@ -103,19 +116,22 @@ sub create_nostrconnect_uri {
     croak "secret is required" unless defined $args{secret};
 
     my @relays = ref $args{relay} eq 'ARRAY' ? @{$args{relay}} : ($args{relay});
+    croak "relay is required" unless @relays;
+    @relays = map { validate_relay_url($_, label => 'relay URL') } @relays;
 
-    my $uri = "nostrconnect://$args{client_pubkey}?";
+    my $uri = URI->new("nostrconnect://$args{client_pubkey}");
     my @params;
     for my $r (@relays) {
-        push @params, "relay=" . _uri_encode($r);
+        push @params, relay => $r;
     }
-    push @params, "secret=" . _uri_encode($args{secret});
-    push @params, "perms=" . _uri_encode($args{perms}) if defined $args{perms};
-    push @params, "name=" . _uri_encode($args{name}) if defined $args{name};
-    push @params, "url=" . _uri_encode($args{url}) if defined $args{url};
-    push @params, "image=" . _uri_encode($args{image}) if defined $args{image};
+    push @params, secret => $args{secret};
+    push @params, perms  => $args{perms} if defined $args{perms};
+    push @params, name   => $args{name}  if defined $args{name};
+    push @params, url    => $args{url}   if defined $args{url};
+    push @params, image  => $args{image} if defined $args{image};
 
-    return $uri . join('&', @params);
+    $uri->query_form(@params);
+    return $uri->as_string;
 }
 
 ###############################################################################
@@ -371,23 +387,6 @@ sub discovery_event {
     );
 }
 
-###############################################################################
-# URI helpers
-###############################################################################
-
-sub _uri_encode {
-    my ($str) = @_;
-    $str =~ s/([^A-Za-z0-9\-_.~])/sprintf("%%%02X", ord($1))/ge;
-    return $str;
-}
-
-sub _uri_decode {
-    my ($str) = @_;
-    $str =~ s/\+/ /g;
-    $str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
-    return $str;
-}
-
 sub _generate_id {
     my @chars = ('a'..'z', '0'..'9');
     return join '', map { $chars[rand @chars] } 1..16;
@@ -637,7 +636,8 @@ C<logout>.
 
 Parses a C<bunker://> connection URI. Returns a L</BunkerConnection> object.
 Croaks if the URI is malformed or missing the required C<relay> parameter.
-The C<secret> parameter is optional.
+Relay parameters must be strict C<ws://> or C<wss://> relay URLs. The
+C<secret> parameter is optional.
 
 =head2 create_bunker_uri
 
@@ -647,7 +647,9 @@ The C<secret> parameter is optional.
         secret               => $secret_string,    # optional
     );
 
-Creates a C<bunker://> URI string.
+Creates a C<bunker://> URI string using L<URI>. The C<relay> parameter
+accepts a single strict C<ws://> or C<wss://> relay URL string, or a
+non-empty arrayref of strict relay URLs.
 
 =head2 parse_nostrconnect_uri
 
@@ -655,7 +657,7 @@ Creates a C<bunker://> URI string.
 
 Parses a C<nostrconnect://> connection URI. Returns a L</NostrConnect> object.
 Croaks if the URI is malformed or missing required parameters (C<relay>,
-C<secret>).
+C<secret>). Relay parameters must be strict C<ws://> or C<wss://> relay URLs.
 
 =head2 create_nostrconnect_uri
 
@@ -669,7 +671,9 @@ C<secret>).
         image         => 'https://app.example.com/i.png', # optional
     );
 
-Creates a C<nostrconnect://> URI string.
+Creates a C<nostrconnect://> URI string using L<URI>. The C<relay> parameter
+accepts a single strict C<ws://> or C<wss://> relay URL string, or a
+non-empty arrayref of strict relay URLs.
 
 =head2 request
 

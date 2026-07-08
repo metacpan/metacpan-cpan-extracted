@@ -2,7 +2,6 @@
 
 require 5.010;
 use warnings FATAL => 'all';
-use feature 'say';
 use Test::Exception; # dies_ok
 use Test::More;
 use Stats::LikeR;
@@ -33,9 +32,9 @@ sub is_approx {
 	}
 }
 
-# --------
+#
 # Setup basic test HoH
-# --------
+#
 my $hoh_data = {
  row_c => { id => 3, val => 30, tag => 'C' },
  row_a => { id => 1, val => 10, tag => 'A' },
@@ -63,9 +62,9 @@ no_leaks_ok {
 	csort($hoh_data, sub { $b->{id} <=> $a->{id} }, 'hoa');
 } 'csort(HoH, hoa) descending via coderef: no memory leaks' unless $INC{'Devel/Cover.pm'};
 is(ref $res_hoa, 'HASH', 'csort(HoH, hoa) returns Hash-of-Arrays (HoA) output successfully');
-is_deeply($res_hoa->{id},  [3, 2, 1],         'Column ID correctly mapped and sorted descending');
-is_deeply($res_hoa->{val}, [30, 20, 10],      'Values vector aligns cleanly with sorted ID row index');
-is_deeply($res_hoa->{tag}, ['C', 'B', 'A'],   'String tags follow identical positional sort logic');
+is_deeply($res_hoa->{id},  [3, 2, 1],       'Column ID correctly mapped and sorted descending');
+is_deeply($res_hoa->{val}, [30, 20, 10],    'Values vector aligns cleanly with sorted ID row index');
+is_deeply($res_hoa->{tag}, ['C', 'B', 'A'], 'String tags follow identical positional sort logic');
 # --------
 # 3. Handling Edge Cases
 # --------

@@ -1,10 +1,36 @@
 ==================================================
-Changes from 2025-04-13 00:00:00 +0000 to present.
+Changes from 2025-07-08 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.04 at 2026-04-13 10:01:16 +0000
+version 0.05 at 2026-07-08 06:52:55 +0000
 -----------------------------------------
+
+  Change: 577cc23bdfaadd3ef125a0b18b51fa49ce2cc539
+  Author: Lee J <lee@payprop.com>
+  Date : 2026-07-08 08:49:12 +0000
+
+    Merge pull request #2 from jjatria/mint-release
+
+    Prepare for a 0.05 release 
+
+  Change: cee2fe6125faecc92684ba85dfbbe4af5f74e467
+  Author: JosÃ© JoaquÃ­n Atria <joaquin.atria@payprop.com>
+  Date : 2026-07-07 17:14:27 +0000
+
+    Prepare for a 0.05 release 
+
+  Change: 4e5ce29bed6623dd7df2e3ad9d923a6cb090f26a
+  Author: JosÃ© JoaquÃ­n Atria <joaquin.atria@payprop.com>
+  Date : 2026-07-07 16:52:23 +0000
+
+    Left-pad account number records with spaces
+
+    If the account number is shorter than 9 characters, we need to
+    left-pad it with spaces when making writing outputting to a file. The
+    code was using `pack` to enforce the 9-character limit, but this was
+    accidentally _right-padding_ the number, which would cause payments
+    to be rejected on shorter account numbers. 
 
   Change: 835ac898feb3531defa5c7f51bc0317eeb6491a3
   Author: Lee Johnson <lee@payprop.com>

@@ -231,3 +231,224 @@ sub best_run_play {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Game::Cribbage::Player::Hand - a player's hand of cards within a hands cycle
+
+=head1 VERSION
+
+Version 0.12
+
+=cut
+
+=head1 SYNOPSIS
+
+	use Game::Cribbage::Player::Hand;
+	use Game::Cribbage::Deck::Card;
+
+	my $hand = Game::Cribbage::Player::Hand->new(player => 'player1');
+
+	$hand->add(Game::Cribbage::Deck::Card->new(suit => 'H', symbol => 'K'));
+
+	my $card = $hand->get(0);
+	my $card = $hand->get($other_card);  # match by card object
+
+	$hand->discard(0, $crib_hand);
+
+	my $score = $hand->calculate_score();
+
+=head1 PROPERTIES
+
+=head2 id
+
+Read/write integer property for a database or external identifier.
+
+	$hand->id;
+	$hand->id($id);
+
+=head2 player
+
+Read/write string or object property identifying which player owns this hand
+(e.g. C<'player1'>).
+
+	$hand->player;
+
+=head2 score
+
+Read/write object property holding the L<Game::Cribbage::Score> result for
+the main hand, populated by C<calculate_score>.
+
+	$hand->score;
+
+=head2 crib_score
+
+Read/write object property holding the L<Game::Cribbage::Score> result for
+the crib cards, populated by C<calculate_score> when crib cards are present.
+
+	$hand->crib_score;
+
+=head2 starter
+
+Read/write object property holding the starter L<Game::Cribbage::Deck::Card>,
+used when scoring the hand.
+
+	$hand->starter;
+	$hand->starter($card);
+
+=head2 cards
+
+Read/write arrayref of L<Game::Cribbage::Deck::Card> objects forming the
+player's main hand.
+
+	$hand->cards;
+
+=head2 crib
+
+Read/write arrayref of L<Game::Cribbage::Deck::Card> objects in the crib
+(cards discarded by this player or assigned to them as crib holder).
+
+	$hand->crib;
+
+=head2 play_scored
+
+Read/write arrayref of L<Game::Cribbage::Play::Score> objects recording
+points earned during the play phase.
+
+	$hand->play_scored;
+
+=head1 FUNCTIONS
+
+=head2 get
+
+Returns the card at position C<$card_index> in C<cards> when given an
+integer, or performs a C<match> lookup when given a card object.  Dies with
+C<'NO CARD FOUND'> if no matching card exists.
+
+	my $card = $hand->get(0);
+	my $card = $hand->get($other_card);
+
+=head2 match
+
+Searches C<cards> for a card matching C<$card> (by suit and symbol) and
+returns it, or returns 0 if not found.
+
+	my $found = $hand->match($card);
+
+=head2 add
+
+Appends C<$card> to the C<cards> arrayref.
+
+	$hand->add($card);
+
+=head2 add_by_index
+
+Places C<$card> at the specified index in C<cards>, replacing whatever was
+there.
+
+	$hand->add_by_index(2, $card);
+
+=head2 discard_cards
+
+Discards all cards in C<$cards> (arrayref of card objects to identify by
+suit/symbol) from this hand into C<$crib> hand's crib.  Dies with
+C<'CANNOT DISCARD'> if the hand has four or fewer cards.  Returns an
+arrayref of the discarded cards.
+
+	my $discarded = $hand->discard_cards(\@cards, $crib_hand);
+
+=head2 discard
+
+Discards a single card (by index or card object) from this hand into
+C<$crib> hand's crib.  Dies with C<'CANNOT DISCARD'> if the hand has four
+or fewer cards.
+
+	$hand->discard(0, $crib_hand);
+	$hand->discard($card, $crib_hand);
+
+=head2 add_crib_card
+
+Appends C<$card> to the C<crib> arrayref.
+
+	$hand->add_crib_card($card);
+
+=head2 calculate_score
+
+Scores the main hand (and crib if present) using L<Game::Cribbage::Score>,
+setting C<score> and optionally C<crib_score>.  Returns the combined numeric
+score.
+
+	my $total = $hand->calculate_score();
+
+=head2 card_exists
+
+Returns 1 if C<$card> is found in either C<cards> or C<crib>; otherwise 0.
+
+	$hand->card_exists($card);
+
+=head2 identify_worst_cards
+
+Finds the best 4-card subset of the 6-card hand by brute-force combination
+scoring, then returns a list C<(\@worst_cards, @worst_indexes)> identifying
+the two cards to discard.  Dies if the hand does not have exactly 6 cards.
+
+	my ($cards, @indexes) = $hand->identify_worst_cards();
+
+=head2 validate_crib_cards
+
+Checks that all cards in C<$cards> exist in the current C<crib>.  If not,
+replaces the entire crib with the supplied cards.  Always returns 1.
+
+	$hand->validate_crib_cards(\@cards);
+
+=head2 best_run_play
+
+Selects the best card to play from the unused cards in this hand, preferring
+cards that score points.  Returns the chosen L<Game::Cribbage::Deck::Card>,
+or a L<Game::Cribbage::Error> with C<go> set when no valid card remains.
+
+	my $card = $hand->best_run_play($play);
+
+=head1 AUTHOR
+
+LNATION, C<< <email at lnation.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-game-cribbage at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Game-Cribbage>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Game::Cribbage
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Cribbage>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/Game-Cribbage>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2024 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

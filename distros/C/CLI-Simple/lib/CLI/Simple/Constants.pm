@@ -7,7 +7,7 @@ use Log::Log4perl::Level;
 
 use parent qw(Exporter);
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 use Readonly;
 
@@ -44,6 +44,7 @@ our %EXPORT_TAGS = (
       $DOT
       $EMPTY
       $EQUALS_SIGN
+      $EQUALS
       $FAT_ARROW
       $OCTOTHORP
       $PERIOD
@@ -70,6 +71,7 @@ Readonly::Scalar our $DASH               => q{-};
 Readonly::Scalar our $DOT                => q{.};
 Readonly::Scalar our $EMPTY              => q{};
 Readonly::Scalar our $EQUALS_SIGN        => q{=};
+Readonly::Scalar our $EQUALS             => q{=};
 Readonly::Scalar our $FAT_ARROW          => q{=>};
 Readonly::Scalar our $OCTOTHORP          => q{#};
 Readonly::Scalar our $PERIOD             => q{.};

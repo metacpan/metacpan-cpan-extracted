@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::GeoSpatial;
-$OpenSearch::Client::Core::3_0::Direct::GeoSpatial::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::GeoSpatial::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for geospatial.|https://docs.opensearch.org/docs/
 
 =head1 METHODS
     
-=head2 geospatial->delete_ip2geo_datasource
+=head2 delete_ip2geo_datasource
 
 Delete a specific IP2Geo data source.
 
@@ -95,9 +95,9 @@ C<DELETE /_plugins/geospatial/ip2geo/datasource/{name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for geospatial.delete_ip2geo_datasource|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#deleting-the-ip2geo-data-source>
+L<OpenSearch documentation for geospatial-E<gt>delete_ip2geo_datasource|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#deleting-the-ip2geo-data-source>
     
-=head2 geospatial->geojson_upload_post
+=head2 geojson_upload_post
 
 Use an OpenSearch query to upload `GeoJSON`, operation will fail if index exists.
 - When type is `geo_point`, only Point geometry is allowed
@@ -125,9 +125,9 @@ C<POST /_plugins/geospatial/geojson/_upload>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for geospatial.geojson_upload_post|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo>
+L<OpenSearch documentation for geospatial-E<gt>geojson_upload_post|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo>
     
-=head2 geospatial->geojson_upload_put
+=head2 geojson_upload_put
 
 Use an OpenSearch query to upload `GeoJSON` regardless if index exists.
 - When type is `geo_point`, only Point geometry is allowed
@@ -155,9 +155,9 @@ C<PUT /_plugins/geospatial/geojson/_upload>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for geospatial.geojson_upload_put|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo>
+L<OpenSearch documentation for geospatial-E<gt>geojson_upload_put|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo>
     
-=head2 geospatial->get_ip2geo_datasource
+=head2 get_ip2geo_datasource
 
 Get one or more IP2Geo data sources, defaulting to returning all if no names specified.
 
@@ -188,9 +188,9 @@ C<GET /_plugins/geospatial/ip2geo/datasource/{name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for geospatial.get_ip2geo_datasource|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#sending-a-get-request>
+L<OpenSearch documentation for geospatial-E<gt>get_ip2geo_datasource|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#sending-a-get-request>
     
-=head2 geospatial->get_upload_stats
+=head2 get_upload_stats
 
 Retrieves statistics for all geospatial uploads.
 
@@ -214,9 +214,9 @@ C<GET /_plugins/geospatial/_upload/stats>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for geospatial.get_upload_stats|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo>
+L<OpenSearch documentation for geospatial-E<gt>get_upload_stats|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo>
     
-=head2 geospatial->put_ip2geo_datasource
+=head2 put_ip2geo_datasource
 
 Create a specific IP2Geo data source.
 Default values:
@@ -249,9 +249,9 @@ C<PUT /_plugins/geospatial/ip2geo/datasource/{name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for geospatial.put_ip2geo_datasource|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#data-source-options>
+L<OpenSearch documentation for geospatial-E<gt>put_ip2geo_datasource|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#data-source-options>
     
-=head2 geospatial->put_ip2geo_datasource_settings
+=head2 put_ip2geo_datasource_settings
 
 Update a specific IP2Geo data source.
 
@@ -281,7 +281,7 @@ C<PUT /_plugins/geospatial/ip2geo/datasource/{name}/_settings>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for geospatial.put_ip2geo_datasource_settings|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#updating-an-ip2geo-data-source>
+L<OpenSearch documentation for geospatial-E<gt>put_ip2geo_datasource_settings|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#updating-an-ip2geo-data-source>
 
 =head1 MANUAL
 

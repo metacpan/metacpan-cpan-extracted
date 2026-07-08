@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::RemoteStore;
-$OpenSearch::Client::Core::3_0::Direct::RemoteStore::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::RemoteStore::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::RemoteStore>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for remote_store.|https://opensearch.org/docs/lat
 
 =head1 METHODS
     
-=head2 remote_store->restore
+=head2 restore
 
 Restores from remote store.
 
@@ -98,7 +98,7 @@ C<POST /_remotestore/_restore>
         'source'                   =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for remote_store.restore|https://opensearch.org/docs/latest/opensearch/remote/#restoring-from-a-backup>
+L<OpenSearch documentation for remote_store-E<gt>restore|https://opensearch.org/docs/latest/opensearch/remote/#restoring-from-a-backup>
 
 =head1 MANUAL
 

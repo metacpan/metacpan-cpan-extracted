@@ -22,7 +22,7 @@
 
 package OpenSearch::Client::Core::3_0;
 
-our $VERSION='3.007005';
+our $VERSION='3.007006';
 
 use OpenSearch::Client 3.000000 ();
 

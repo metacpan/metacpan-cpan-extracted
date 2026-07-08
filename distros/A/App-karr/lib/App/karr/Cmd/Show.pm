@@ -1,7 +1,7 @@
 # ABSTRACT: Show full details of a task
 
 package App::karr::Cmd::Show;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -36,9 +36,7 @@ sub _show_task {
   my ($self, $task) = @_;
 
   if ($self->json) {
-    my $data = $task->to_frontmatter;
-    $data->{body} = $task->body if $task->body;
-    $self->print_json($data);
+    $self->print_json($task->to_json_hash);
     return;
   }
 
@@ -110,7 +108,10 @@ sub _select_tasks {
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
-  my @tasks = $self->_select_tasks($args_ref->[0]);
+  $self->check_positional_args($args_ref, 1);
+
+  my @pos = $self->positional_args($args_ref);
+  my @tasks = $self->_select_tasks($pos[0]);
 
   unless (@tasks) {
     print "No tasks found.\n" unless $self->json;
@@ -119,11 +120,7 @@ sub execute {
   }
 
   if ($self->json) {
-    my @data = map {
-      my $d = $_->to_frontmatter;
-      $d->{body} = $_->body if $_->body;
-      $d;
-    } @tasks;
+    my @data = map { $_->to_json_hash } @tasks;
     # A single explicit lookup stays a bare object for backward compatibility.
     $self->print_json(@data == 1 ? $data[0] : \@data);
     return;
@@ -149,7 +146,7 @@ App::karr::Cmd::Show - Show full details of a task
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

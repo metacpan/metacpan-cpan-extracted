@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -700,6 +700,19 @@ In scalar context croak due to 1.0 API incompatibility.
 
 =back
 
+=item $status_code = $client->Subscriptions_create_async(\%request, $subscriptionContext, \&statusChangeCallback, \&deleteCallback, \&callback, $data, \$reqId)
+
+=over 8
+
+=item $statusChangeCallback = sub { my ($client, $subscriptionId, $subscriptionContext, $notification) = @_ }
+
+=item $deleteCallback = sub { my ($client, $subscriptionId, $subscriptionContext) = @_ }
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%response) = @_ }
+
+=back
+
+
 =item $response = $client->Subscriptions_modify(\%request)
 
 =item $response = $client->Subscriptions_delete(\%request)
@@ -725,6 +738,32 @@ In scalar context croak due to 1.0 API incompatibility.
 
 =item $response = $client->MonitoredItems_createDataChanges(\%request,
 	\@monitoredContexts, \@dataChangeCallbacks, \@deleteCallbacks)
+
+=over 8
+
+=item $dataChangeCallback = sub { my ($client, $subscriptionId,
+	$subscriptionContext, $monitoredId, $monitoredContext, $value) = @_ }
+
+=item $deleteCallback = sub { my ($client, $subscriptionId,
+	$subscriptionContext, $monitoredId, $monitoredContext) = @_ }
+
+=back
+
+=item $status_code = $client->MonitoredItems_createDataChanges_async(\%request,
+	\@monitoredContexts, \@dataChangeCallbacks, \@deleteCallbacks,
+	\&createCallback, $data, \$reqId)
+
+=over 8
+
+=item $dataChangeCallback = sub { my ($client, $subscriptionId,
+	$subscriptionContext, $monitoredId, $monitoredContext, $value) = @_ }
+
+=item $deleteCallback = sub { my ($client, $subscriptionId,
+	$subscriptionContext, $monitoredId, $monitoredContext) = @_ }
+
+=item $createCallback = sub { my ($client, $userdata, $requestId, \%response) = @_ }
+
+=back
 
 =item $response  = $client->MonitoredItems_delete(\%request)
 

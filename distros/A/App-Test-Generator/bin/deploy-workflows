@@ -1,0 +1,422 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie qw(:all);
+
+use Data::Section::Simple qw(get_data_section);
+use File::Path qw(make_path);
+use File::Spec;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage;
+
+our $VERSION = '0.42';
+
+=head1 NAME
+
+deploy-workflows - Deploy ATG GitHub Actions workflows to a CPAN module repository
+
+=head1 SYNOPSIS
+
+  deploy-workflows
+  deploy-workflows --target /path/to/my-module
+  deploy-workflows --force
+  deploy-workflows --dry-run
+
+=head1 DESCRIPTION
+
+Copies the two L<App::Test::Generator> GitHub Actions workflow files into
+the C<.github/workflows/> directory of the target repository:
+
+=over 4
+
+=item * C<dashboard.yml> — generates the HTML test dashboard on every push
+and after each mutation run; deploys to GitHub Pages.
+
+=item * C<mutate.yml> — runs mutation testing on a monthly schedule and on
+manual dispatch.
+
+=back
+
+Both files are embedded in this script verbatim from the ATG distribution
+and work without any sibling files or additional configuration.
+
+After deploying, commit the two new files and push to your repository.
+The workflows will activate on the next push to C<main> or C<master>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--target|-t> DIR
+
+Root directory of the target module repository.  Defaults to the current
+working directory.
+
+=item B<--force|-f>
+
+Overwrite existing workflow files.  Without this flag the script exits with
+an error if either file already exists.
+
+=item B<--dry-run|-n>
+
+Show what would be written without creating any files.
+
+=item B<--version|-V>
+
+Print the version of L<App::Test::Generator> and exit.
+
+=item B<--help|-h>
+
+Show this help and exit.
+
+=back
+
+=cut
+
+my ($target, $force, $dry_run, $help, $version);
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'target|t=s' => \$target,
+	'force|f'    => \$force,
+	'dry-run|n'  => \$dry_run,
+	'version|V'  => \$version,
+	'help|h'     => \$help,
+) or pod2usage(2);
+
+pod2usage(-exitval => 0, -verbose => 1) if $help;
+
+if($version) {
+	print $VERSION, "\n";
+	exit 0;
+}
+
+$target //= File::Spec->curdir();
+$target = File::Spec->rel2abs($target);
+
+die "deploy-workflows: target directory '$target' does not exist\n" unless -d $target;
+
+my $wf_dir = File::Spec->catdir($target, '.github', 'workflows');
+
+my %files = (
+	'dashboard.yml' => get_data_section('dashboard.yml'),
+	'mutate.yml'    => get_data_section('mutate.yml'),
+);
+
+# Pre-flight: check for existing files before writing anything
+unless($force || $dry_run) {
+	for my $name (sort keys %files) {
+		my $dest = File::Spec->catfile($wf_dir, $name);
+		if(-e $dest) {
+			die "deploy-workflows: '$dest' already exists; use --force to overwrite\n";
+		}
+	}
+}
+
+if($dry_run) {
+	print "Would create: $wf_dir/\n" unless -d $wf_dir;
+	for my $name (sort keys %files) {
+		my $dest = File::Spec->catfile($wf_dir, $name);
+		print -e $dest ? "Would overwrite: $dest\n" : "Would write: $dest\n";
+	}
+	exit 0;
+}
+
+make_path($wf_dir) unless -d $wf_dir;
+
+for my $name (sort keys %files) {
+	my $dest = File::Spec->catfile($wf_dir, $name);
+	open my $fh, '>', $dest;
+	print $fh $files{$name};
+	close $fh;
+	print "Wrote: $dest\n";
+}
+
+print "\nNext steps:\n";
+print "  git add .github/workflows/dashboard.yml .github/workflows/mutate.yml\n";
+print "  git commit -m 'Add ATG GitHub Actions workflows'\n";
+print "  git push\n";
+
+__DATA__
+
+@@ dashboard.yml
+---
+# Create test dashboard on GitHub Pages, e.g. https://nigelhorne.github.io/$module_name/coverage/
+#   for any CPAN module.  Just copy to .github/workflows/dashboard.yml to your repo
+name: Test Dashboard
+
+permissions:
+  contents: write  # needed to push to gh-pages
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_run:
+    workflows: ["Mutation Testing"]
+    types: [completed]
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    strategy:
+      matrix:
+        perl: ["5.40"]
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+
+      # Install Perl via perlbrew
+      - name: Setup Perl environment
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+          # install cpanminus
+          # cpanm-options: --notest
+
+      # Install module dependencies (from cpanfile or manually)
+      - name: Install dependencies
+        run: |
+          cpanm --skip-satisfied --notest --installdeps .
+          cpanm -iqn --skip-satisfied \
+              Test::Most \
+              Test::Mockingbird \
+              'Devel::Cover@1.51' \
+              Devel::Cover::Report::Html \
+              File::Slurp \
+              Readonly \
+              IPC::Run3 \
+              IPC::System::Simple \
+              WWW::RT::CPAN \
+              BSD::Resource \
+              HTML::Entities \
+              URI::Escape \
+              JSON::MaybeXS \
+              PPI \
+              App::Prove \
+              File::Copy::Recursive \
+              Test::LectroTest::Compat
+          cpanm -iqn Data::Random::String::Matches Data::Random::Structure Data::Random Data::Random::String
+        timeout-minutes: 10
+
+      - name: Set snapshot variables
+        run: |
+          echo "SNAPSHOT_TIMESTAMP=$(date +%Y-%m-%d)" >> $GITHUB_ENV
+          echo "SNAPSHOT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Add local bin to PATH
+        run: echo "$(pwd)/local/bin" >> $GITHUB_PATH
+
+      - name: Install App::Test::Generator
+        run: |
+          if [ "${{ github.repository }}" = "nigelhorne/App-Test-Generator" ]; then
+            echo "Running on ATG itself — using repo version"
+            perl Makefile.PL && make install
+          else
+            echo "Install ATG"
+            cpanm -iqn App::Test::Generator@0.41
+          fi
+
+      - name: Generate dashboard
+        env:
+          AUTOMATED_TESTING: 1
+          NO_NETWORK_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
+        run: |
+          if [ "${{ github.repository }}" = "nigelhorne/App-Test-Generator" ]; then
+            bin/generate-test-dashboard \
+              --exclude lib/Devel \
+              --exclude lib/App/Test/Generator/Sample
+          else
+            generate-test-dashboard
+          fi
+
+      - name: Save updated mutation results
+        if: github.event_name != 'pull_request'
+        run: |
+          git add mutation.json
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update mutation results (${SNAPSHOT_TIMESTAMP} ${SNAPSHOT_SHA})"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi
+
+      - name: Add new coverage snapshot to archive
+        if: github.event_name != 'pull_request'
+        run: |
+          mkdir -p coverage_history
+          if [ -f cover_html/cover.json ]; then
+            cp cover_html/cover.json "coverage_history/${SNAPSHOT_TIMESTAMP}-${SNAPSHOT_SHA}.json"
+          else
+            echo "::error::cover_html/cover.json not found"
+            find cover_db cover_html coverage -print 2>/dev/null || true
+            exit 1
+          fi
+
+      - name: Save coverage snapshot archive
+        if: github.event_name != 'pull_request'
+        run: |
+          git add coverage_history/
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add coverage snapshot for ${SNAPSHOT_TIMESTAMP} (${SNAPSHOT_SHA})"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi
+
+      - name: Save generated mutant test stubs
+        if: github.event_name != 'pull_request'
+        run: |
+          git add xt/mutant_*.t xt/conf/mutant_*.yml 2>/dev/null || true
+          find xt -name 'mutant_*.t' -o -name 'mutant_*.yml' | xargs git add 2>/dev/null || true
+          git diff --cached --stat
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add generated mutant test stubs (${SNAPSHOT_TIMESTAMP} ${SNAPSHOT_SHA})"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi
+
+      # Deploy HTML report to GitHub Pages
+      - name: Publish test dashboard
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./cover_html
+          destination_dir: coverage
+          user_name: github-actions
+          user_email: github-actions@github.com
+          keep_files: true
+          enable_jekyll: false
+
+@@ mutate.yml
+---
+# Run a mutation test.  They can take a long time so only run then on demand or every month, not on each commit
+name: Mutation Testing
+permissions:
+  contents: write
+
+# on: [push, pull_request]
+on:
+  schedule:
+    - cron: '12 23 26 * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mutate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+      - uses: shogo82148/actions-setup-perl@v1
+
+      - run: cpanm --skip-satisfied --installdeps .
+      - run: prove -l t/
+
+      - run: echo "$(pwd)/local/bin" >> $GITHUB_PATH
+
+      - run: perl Makefile.PL && make
+
+      - name: Find last code commit
+        run: |
+          BASE=$(git log --oneline | grep -v "^\S\+ \(Add generated mutant\|Add coverage snapshot\|Update mutation results\)" | head -1 | awk '{print $1}')
+          if [ -z "$BASE" ]; then
+            echo "::warning::Could not determine a base commit from git log; test-generator-mutate will fall back to HEAD~1"
+          fi
+          echo "MUTATION_BASE_SHA=$BASE" >> $GITHUB_ENV
+          echo "Base commit for mutation diff: $BASE"
+          if [ -z "$BASE" ]; then
+            echo "No code commit found outside bot-generated commits; skipping diff"
+          elif git rev-parse "${BASE}^" >/dev/null 2>&1; then
+            git diff --name-only "${BASE}^" HEAD
+          else
+            echo "Base commit is the root commit, no parent to diff against"
+          fi
+
+      - name: Install App::Test::Generator
+        run: |
+          if [ "${{ github.repository }}" != "nigelhorne/App-Test-Generator" ]; then
+            cpanm -iqn Data::Random::Structure Data::Random::String::Matches Data::Random::String Data::Random
+            cpanm -iqn App::Test::Generator@0.41
+          fi
+
+      - name: Generate the mutants
+        env:
+          AUTOMATED_TESTING: 1
+          NO_NETWORK_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
+        run: |
+          if [ -n "$MUTATION_BASE_SHA" ]; then
+            BASE_SHA_FLAG="--base_sha $MUTATION_BASE_SHA"
+          else
+            BASE_SHA_FLAG=""
+          fi
+          if [ "${{ github.repository }}" = "nigelhorne/App-Test-Generator" ]; then
+            MUTATE_CMD="perl -Ilib -Iblib/lib bin/test-generator-mutate"
+            $MUTATE_CMD \
+              --lib lib \
+              --tests t \
+              --json mutation.json \
+              --changed_only \
+              $BASE_SHA_FLAG \
+              --mutation_level fast \
+              --exclude lib/Devel \
+              --exclude lib/App/Test/Generator/Sample
+          else
+            ATG_CMD=$(which test-generator-mutate) || { echo "test-generator-mutate not found — did App::Test::Generator install correctly?"; exit 1; }
+            MUTATE_CMD="perl -Ilib -Iblib/lib $ATG_CMD"
+            if [ -n "$MUTATION_BASE_SHA" ]; then
+              BASE_SHA_FLAG="--base_sha $MUTATION_BASE_SHA"
+            else
+              BASE_SHA_FLAG=""
+            fi
+            # shellcheck disable=SC2086
+            $MUTATE_CMD \
+              --lib lib \
+              --tests t \
+              --json mutation.json \
+              --changed_only \
+              $BASE_SHA_FLAG \
+              --mutation_level fast
+          fi
+
+      - name: Commit mutation results
+        run: |
+          git add mutation.json
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update mutation results ($(date +%Y-%m-%d) $(git rev-parse --short HEAD))"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi

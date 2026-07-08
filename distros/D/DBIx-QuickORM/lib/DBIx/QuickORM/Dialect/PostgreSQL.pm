@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak/;
 use DBIx::QuickORM::Util qw/column_key/;
@@ -14,7 +14,7 @@ use DBIx::QuickORM::Schema::Table::Column;
 use DBIx::QuickORM::Schema::View;
 
 use parent 'DBIx::QuickORM::Dialect';
-use Object::HashBase;
+use Object::HashBase qw{ +all_triggers };
 
 =pod
 
@@ -97,34 +97,26 @@ sub async_cancel           { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->db
 
 =pod
 
-=item $dialect->start_txn(%params)
-
-=item $dialect->commit_txn(%params)
-
-=item $dialect->rollback_txn(%params)
-
 =item $dialect->create_savepoint(%params)
 
 =item $dialect->commit_savepoint(%params)
 
 =item $dialect->rollback_savepoint(%params)
 
-Transaction and savepoint control via C<DBD::Pg>. Each accepts an optional
-C<dbh> parameter, defaulting to the dialect's own handle; savepoint methods
-take a C<savepoint> name.
+Savepoint control via C<DBD::Pg>'s native savepoint API. Each accepts an
+optional C<dbh> parameter, defaulting to the dialect's own handle, and a
+C<savepoint> name. Transaction control uses the inherited driver-level
+defaults.
 
 =cut
 
-# {{{ Transactions and savepoints
+# {{{ Savepoints
 
-sub start_txn          { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $dbh->begin_work }
-sub commit_txn         { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $dbh->commit }
-sub rollback_txn       { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $dbh->rollback }
 sub create_savepoint   { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $dbh->pg_savepoint($p{savepoint}) }
 sub commit_savepoint   { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $dbh->pg_release($p{savepoint}) }
 sub rollback_savepoint { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $dbh->pg_rollback_to($p{savepoint}) }
 
-# }}} Transactions and savepoints
+# }}} Savepoints
 
 =pod
 
@@ -368,10 +360,12 @@ sub build_columns_from_db {
         # otherwise; _col_field_to_bool treats 'NEVER' as false.
         $col->{generated} = 1 if $self->_col_field_to_bool($res->{is_generated});
 
+        $col->{volatile} //= 1 if $self->column_is_volatile_by_metadata($col, default => $res->{column_default});
+
         $col->{affinity} //= affinity_from_type($res->{udt_name}) // affinity_from_type($res->{data_type});
         $col->{affinity} //= 'string'  if grep { $self->_col_field_to_bool($res->{$_}) } grep { m/character/ } keys %$res;
         $col->{affinity} //= 'numeric' if grep { $self->_col_field_to_bool($res->{$_}) } grep { m/numeric/ } keys %$res;
-        $col->{affinity} //= 'string';
+        $col->{affinity} //= $self->affinity_from_db_type($res->{udt_name}, $res->{data_type});
 
         $params{autofill}->process_column($col);
 
@@ -385,32 +379,6 @@ sub build_columns_from_db {
 }
 
 =pod
-
-=head1 PRIVATE METHODS
-
-=over 4
-
-=item $bool = $dialect->_col_field_to_bool($val)
-
-Normalizes an C<information_schema> truthy/falsey string (C<YES>/C<NO>,
-etc.) to a 1/0 boolean.
-
-=back
-
-=cut
-
-sub _col_field_to_bool {
-    my $self = shift;
-    my ($val) = @_;
-
-    return 0 unless defined $val;
-    return 0 unless $val;
-    $val = lc($val);
-    return 0 if $val eq 'no';
-    return 0 if $val eq 'undef';
-    return 0 if $val eq 'never';
-    return 1;
-}
 
 =pod
 
@@ -459,9 +427,35 @@ sub build_indexes_from_db {
 
 =pod
 
+=over 4
+
+=item @triggers = $dialect->triggers_for_table($table)
+
+Returns the insert/update/delete triggers on a table (across the search-path
+schemas), each as a C<< { event => ..., body => $function_source } >> hashref,
+for volatile-column and has-triggers detection.
+
+=back
+
+=cut
+
+sub triggers_for_table {
+    my $self = shift;
+    my ($table) = @_;
+    return @{$self->_all_triggers->{$table} // []};
+}
+
+=pod
+
 =head1 PRIVATE METHODS (schema introspection)
 
 =over 4
+
+=item $by_table = $dialect->_all_triggers
+
+All non-internal triggers keyed by table name, fetched once per dialect from the
+C<pg_catalog> trigger/function catalogs (scoped to the search-path schemas and
+cached), so trigger detection adds a single query rather than one per table.
 
 =item $by_schema = $dialect->_fetch_all_columns($schemas)
 
@@ -486,6 +480,45 @@ pre-fetched rows. Each issues one query scoped to C<$table> in C<$tschema>.
 =back
 
 =cut
+
+sub _all_triggers {
+    my $self = shift;
+
+    return $self->{+ALL_TRIGGERS} if $self->{+ALL_TRIGGERS};
+
+    my $schemas = $self->_search_path_schemas;
+    my %map;
+
+    if (@$schemas) {
+        my $in = join(', ' => ('?') x @$schemas);
+
+        # pg_trigger.tgtype is a bitmask: INSERT = 4, DELETE = 8, UPDATE = 16.
+        # tgisinternal excludes the system triggers backing foreign keys, etc.
+        # The trigger's real logic lives in its function, so pull pg_proc.prosrc
+        # for the best-effort column parse.
+        my $sql = <<"        SQL";
+            SELECT c.relname AS tbl,
+                   (CASE WHEN (tg.tgtype &  4) > 0 THEN 'INSERT ' ELSE '' END ||
+                    CASE WHEN (tg.tgtype & 16) > 0 THEN 'UPDATE ' ELSE '' END ||
+                    CASE WHEN (tg.tgtype &  8) > 0 THEN 'DELETE ' ELSE '' END) AS event,
+                   p.prosrc AS body
+              FROM pg_catalog.pg_trigger   tg
+              JOIN pg_catalog.pg_class     c ON c.oid = tg.tgrelid
+              JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+              JOIN pg_catalog.pg_proc      p ON p.oid = tg.tgfoid
+             WHERE NOT tg.tgisinternal
+               AND n.nspname IN ($in)
+        SQL
+
+        my $rows = eval { $self->dbh->selectall_arrayref($sql, {Slice => {}}, @$schemas) } || [];
+        for my $r (@$rows) {
+            next unless defined $r->{tbl};
+            push @{$map{$r->{tbl}}} => {event => $r->{event}, body => $r->{body}};
+        }
+    }
+
+    return $self->{+ALL_TRIGGERS} = \%map;
+}
 
 sub _fetch_all_columns {
     my $self = shift;
@@ -687,6 +720,120 @@ sub _search_path_schemas {
     }
 
     return \@schemas;
+}
+
+=pod
+
+=item $affinity_or_undef = $dialect->_affinity_from_native_type($type)
+
+Resolve an affinity for a PostgreSQL type the generic driver catalog does not
+list. An enum stores and compares as its label string, so it maps to C<string>;
+a domain inherits the affinity of the base type it wraps; otherwise the type's
+C<pg_type> category decides. Only categories whose values DBD::Pg returns as a
+plain scalar are resolved -- numeric, boolean, string, date/time, range (and
+multirange), network, and geometric -- so string affinity's C<eq> comparison is
+valid. Array, composite, and unknown/extension types are deliberately left
+unresolved (an array comes back as an arrayref, which no scalar affinity can
+compare), so they fall through to the warning that prompts a proper C<Type>.
+Returns undef when the name is not a resolvable type, letting the caller warn and
+default. This keeps enum, range, C<inet>, and geometric columns from tripping the
+"unrecognized type" warning during introspection.
+
+=cut
+
+sub _affinity_from_native_type {
+    my $self = shift;
+    my ($name) = @_;
+
+    my $tname = $self->_normalize_type_name($name);
+    return undef unless length $tname;
+
+    # information_schema reports 'USER-DEFINED' as a column's data_type; it is a
+    # placeholder, never a pg_type name, so do not bother the catalog with it.
+    return undef if $tname eq 'user-defined';
+
+    my ($typtype, $typcategory, $base) = $self->_pg_type_info($tname);
+    return undef unless defined $typtype;
+
+    # Enum: values are stored and compared as their label strings.
+    return 'string' if $typtype eq 'e';
+
+    # Domain: inherits the affinity of the base type it constrains. (In practice
+    # information_schema already reports a domain column as its base type, so this
+    # is belt-and-suspenders for callers that hand us the domain name directly.)
+    return $self->affinity_from_db_type($base) if $typtype eq 'd' && defined($base) && length $base;
+
+    # Otherwise lean on the type's broad pg_type category. Only categories whose
+    # values DBD::Pg hands back as a plain scalar string (so string affinity's eq
+    # comparison is correct) are resolved here: numeric, boolean, string, date/
+    # time, range/multirange (R), network address (I), and geometric (G) all
+    # fetch as scalars. Array (A) is intentionally NOT mapped -- DBD::Pg expands
+    # arrays to arrayrefs, which no scalar affinity can compare -- so an array
+    # column falls through to the warning, prompting a proper Type. Composite (C)
+    # and the user/extension grab-bag (U) likewise fall through.
+    my %BY_CATEGORY = (
+        N => 'numeric',    # numeric
+        B => 'boolean',    # boolean
+        S => 'string',     # string
+        D => 'string',     # date/time
+        R => 'string',     # range / multirange
+        I => 'string',     # network address (inet/cidr/macaddr)
+        G => 'string',     # geometric (point/line/box/...)
+    );
+    return $BY_CATEGORY{$typcategory // ''};
+}
+
+=pod
+
+=item ($typtype, $typcategory, $base_name) = $dialect->_pg_type_info($type)
+
+Look a type name up in C<pg_type>, scoped to the connection's search-path
+schemas plus C<pg_catalog> (where the built-in range/network/geometric types
+live). First match in search-path order wins, with C<pg_catalog> last, so a
+user-defined type shadows a built-in of the same name, mirroring PostgreSQL's own
+unqualified-name resolution. Returns the type's C<typtype> and C<typcategory>
+plus, for a domain, the name of the base type it wraps. Returns an empty list
+when the name is not found.
+
+=cut
+
+sub _pg_type_info {
+    my $self = shift;
+    my ($tname) = @_;
+
+    my $dbh = $self->dbh or return ();
+
+    # Look in the search-path schemas (user-defined types such as enums live
+    # there) and also in pg_catalog, where the built-in types the driver catalog
+    # did not list -- ranges, network, and geometric types -- are defined.
+    # _search_path_schemas drops pg_catalog (correct for table introspection),
+    # so add it back here at the lowest priority: a user type shadows a built-in
+    # of the same name, matching how PostgreSQL resolves unqualified names.
+    my @schemas = (@{$self->_search_path_schemas}, 'pg_catalog');
+    return () unless @schemas;
+
+    my $in  = join(', ' => ('?') x @schemas);
+    my $sth = $dbh->prepare(<<"    EOT");
+        SELECT t.typtype, t.typcategory, bt.typname AS base_name, n.nspname
+          FROM pg_catalog.pg_type      t
+          JOIN pg_catalog.pg_namespace n  ON n.oid = t.typnamespace
+     LEFT JOIN pg_catalog.pg_type      bt ON bt.oid = t.typbasetype
+         WHERE t.typname = ?
+           AND n.nspname IN ($in)
+    EOT
+    $sth->execute($tname, @schemas);
+
+    my %rank;
+    @rank{@schemas} = (1 .. @schemas);
+
+    my $best;
+    while (my $row = $sth->fetchrow_hashref) {
+        next if $best && $rank{$best->{nspname}} <= $rank{$row->{nspname}};
+        $best = $row;
+    }
+
+    return () unless $best;
+    return ($best->{typtype}, $best->{typcategory}, $best->{base_name});
 }
 
 =pod

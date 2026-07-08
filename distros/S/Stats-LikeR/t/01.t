@@ -63,9 +63,7 @@ dies_ok {
 dies_ok {
 	min(1, [2,undef]);
 } 'min: dies with undefined values inside array references';
-#----------------------
-#		max
-#----------------------
+# max
 is_approx( max(1,2,3), 3, 'max of scalars');
 is_approx(max(@test_data), $test_data[-1], 'max of array');
 is_approx(max($test_data), $test_data[-1], 'max of array reference');
@@ -92,9 +90,7 @@ dies_ok {
 dies_ok {
 	max(1, [2,undef]);
 } 'max: dies with undefined values inside array references';
-#----------------------
-#		mean
-#----------------------
+# mean
 is_approx(mean(1,2,3), 2, 'mean: simple example works', 0);
 my @arr = 1..8;
 if (mean(@arr, 4, 5) == 4.5) {
@@ -127,9 +123,9 @@ dies_ok {
 dies_ok {
 	mean(1, [2,undef]);
 } 'mean: dies with undefined values inside array references';
-# -------------------------------
+#
 # standard deviation
-# -------------------------------
+# 
 my $stdev = sd(2,4,4,4,5,5,7,9);
 my $correct = 2.1380899352994;
 if (abs($stdev - $correct) < 1e-14) {
@@ -2887,9 +2883,10 @@ no_leaks_ok {
 		);
 	};
 } 'write_table: no leaks with hash-of-array input'  unless $INC{'Devel/Cover.pm'};
+unlink '/tmp/hoa.test.tsv';
 my $f = '/tmp/hoa.test2.tsv';
 write_table(
-	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A'], 'undef.val' => 'NA'
+	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A'], 'row.names' => 1, 'undef.val' => 'NA'
 );
 $str = file2string($f);
 $expected = "\tB\tC\tA\n1\t-3\t9\t1\n2\t-2\t3\t2\n3\t-1\t4\t3\n4\t0\tNA\t4\n5\t1\tNA\tNA\n6\t2\tNA\tNA\n7\t3\tNA\tNA\n";
@@ -2902,9 +2899,10 @@ no_leaks_ok {
 #----- repeat above with nondigit
 %hoa = (A => ['x',1..4], B => ['y',-3..3], C => ['z',9,3,4]);
 write_table(
-	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A'], 'undef.val' => 'NA'
+	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A'], 'row.names' => 1, 'undef.val' => 'NA'
 );
 $str = file2string($f);
+unlink $f;
 $expected = "\tB\tC\tA\n1\ty\tz\tx\n2\t-3\t9\t1\n3\t-2\t3\t2\n4\t-1\t4\t3\n5\t0\tNA\t4\n6\t1\tNA\tNA\n7\t2\tNA\tNA\n8\t3\tNA\tNA\n";
 is($str, $expected, 'write_table: hoa input with col.names and nondigit input');
 %correct = (
@@ -2912,10 +2910,10 @@ is($str, $expected, 'write_table: hoa input with col.names and nondigit input');
 	'r2' => [99, undef, 'quote"here', undef],
 	'r3' => [undef, "tab\tin", undef, undef],
 );
-$fh = File::Temp->new(DIR => '/tmp', SUFFIX => '.tsv', UNLINK => 0);
+$fh = File::Temp->new(DIR => '/tmp', SUFFIX => '.tsv', UNLINK => 1);
 close $fh;
 write_table(
-	\%correct,	$fh->filename,	sep => "\t"
+	\%correct,	$fh->filename,	sep => "\t", 'undef.val' => 'NA'
 );
 $test_data = read_table( $fh->filename, sep => "\t", 'output.type' => 'hoa');
 
@@ -3307,9 +3305,7 @@ my $x1_is_nan = (!defined $lm_coll->{coefficients}{x1} || $lm_coll->{coefficient
 my $x2_is_nan = (!defined $lm_coll->{coefficients}{x2} || $lm_coll->{coefficients}{x2} =~ m/nan/i);
 
 ok($x1_is_nan || $x2_is_nan, 'lm: perfectly collinear variables are still properly aliased and dropped');
-#----------------------------------------------
 #  lm & aov: Memory-safe Exception Pathways
-#----------------------------------------------
 # 'lm & aov: Memory-safe croak and validation'
 # 1. 0 Degrees of Freedom (Parameters >= Observations)
 # In the previous architecture, these would allocate large C arrays and then leak them when croaking.
@@ -3557,9 +3553,7 @@ foreach my $s (1..3) {
 		}
 	} "sample: array with $s samples doesn't have leaks" unless $INC{'Devel/Cover.pm'};
 }
-#---------------
-#   oneway_test
-#---------------
+# oneway_test
 # hash of array
 $test_data = oneway_test({
 	yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
@@ -3800,96 +3794,7 @@ no_leaks_ok {
 dies_ok {
 	mode()
 } 'mode: dies with 0 values entered';
-#---------
-# aoh2hoh
-#---------
-#@arr = (
-#	{
-#		a => 'A',
-#		b => 'B',
-#		r => '1st'
-#	},
-#	{
-#		a => 'C',
-#		b => 'D',
-#		r => '2nd'
-#	}
-#);
-#$test_data = aoh2hoh( \@arr,  'r' );
-#if ((scalar keys %{ $test_data }) == scalar @arr) {
-#	pass('aoh2hoh: 1 index in @arr is 1 hash key in the resulting hash-of-hash');
-#} else {
-#	fail('aoh2hoh: 1 index in @arr is NOT 1 hash key in the resulting hash-of-hash');
-#}
-#foreach my $hashkey ('1st', '2nd') {
-#	if (defined $test_data->{$hashkey}) {
-#		pass("aoh2hoh: \"$hashkey\" is defined in hoh");
-#	} else {
-#		fail("aoh2hoh: \"$hashkey\" is NOT defined in hoh");
-#	}
-#	if ((scalar keys %{ $test_data->{$hashkey} }) == 2) {
-#		pass("aoh2hoh: \"$hashkey\" has the correct # of elements");
-#	} else {
-#		fail("aoh2hoh: \"$hashkey\" does NOT have the correct # of elements");
-#	}
-#	if ((defined $test_data->{$hashkey}{a}) && (defined $test_data->{$hashkey}{b})) {
-#		pass("aoh2hoh: $hashkey has both keys defined");
-#	} else {
-#		fail("aoh2hoh: $hashkey does NOT have both keys defined");
-#	}
-#}
-#if ($test_data->{'1st'}{a} eq 'A') {
-#	pass('aoh2hoh: 1st key "a" is correct');
-#} else {
-#	fail('aoh2hoh: 1st key "a" is NOT correct');
-#}
-#if ($test_data->{'1st'}{b} eq 'B') {
-#	pass('aoh2hoh: 1st key "b" is correct');
-#} else {
-#	fail('aoh2hoh: 1st key "b" is NOT correct');
-#}
-#if ($test_data->{'2nd'}{a} eq 'C') {
-#	pass('aoh2hoh: 2nd key "a" is correct');
-#} else {
-#	fail('aoh2hoh: 2nd key "a" is NOT correct');
-#}
-#if ($test_data->{'2nd'}{b} eq 'D') {
-#	pass('aoh2hoh: 2nd key "b" is correct');
-#} else {
-#	fail('aoh2hoh: 2nd key "b" is NOT correct');
-#}
-#$test_data = aoh2hoh( \@arr );
-#if ((scalar keys %{ $test_data }) == scalar @arr) {
-#	pass('aoh2hoh: 1 index in @arr is 1 hash key in the resulting hash-of-hash');
-#} else {
-#	fail('aoh2hoh: 1 index in @arr is NOT 1 hash key in the resulting hash-of-hash');
-#}
-#foreach my $hashkey (0, 1) {
-#	if (defined $test_data->{$hashkey}) {
-#		pass("aoh2hoh: \"$hashkey\" is defined in hoh");
-#	} else {
-#		fail("aoh2hoh: \"$hashkey\" is NOT defined in hoh");
-#	}
-#	if ((scalar keys %{ $test_data->{$hashkey} }) == 3) {
-#		pass("aoh2hoh: \"$hashkey\" has the correct # of elements");
-#	} else {
-#		fail("aoh2hoh: \"$hashkey\" does NOT have the correct # of elements");
-#	}
-#	if ( 3 == scalar grep {defined $test_data->{$hashkey}{$_}} ('a', 'b', 'r')) {
-#		pass("aoh2hoh: $hashkey has all 3 keys defined");
-#	} else {
-#		fail("aoh2hoh: $hashkey does NOT have all 3 keys defined");
-#	}
-#}
-#if (
-#	($test_data->{0}{a} eq 'A') &&	($test_data->{0}{b} eq 'B') &&
-#	($test_data->{0}{r} eq '1st') &&	($test_data->{1}{a} eq 'C') &&
-#	($test_data->{1}{b} eq 'D') &&	($test_data->{1}{r} eq '2nd')
-#) {
-#	pass('aoh2hoh: values are all correct without pivot key defined');
-#} else {
-#	fail('aoh2hoh: values are NOT all correct without pivot key defined');
-#}
+
 #-----------
 # dnorm
 #-----------

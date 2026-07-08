@@ -1,0 +1,317 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Path qw(make_path);
+use File::Spec;
+use FindBin;
+use Getopt::Long;
+use Pod::Usage;
+use lib "$FindBin::Bin/../lib";
+
+use App::Test::Generator::PodExampleExtractor;
+
+=head1 NAME
+
+pod-example-tester - Generate round-trip tests from POD code examples
+
+=head1 SYNOPSIS
+
+    pod-example-tester [options] <module.pm>
+
+    Options:
+      --output FILE   Write test file to FILE (default: t/pod_examples.t)
+      --no-annotated  Skip annotated single-line examples; only use verbatim blocks
+      --help          Show this help message
+      --man           Show full documentation
+
+    Examples:
+      pod-example-tester lib/My/Module.pm
+      pod-example-tester --output t/synopsis.t lib/My/Module.pm
+
+=head1 DESCRIPTION
+
+Reads a Perl module, extracts code examples from its POD (from
+C<=head1 SYNOPSIS>, C<=head2 SYNOPSIS>, C<=for example begin>/C<=for example end>
+blocks, and annotated inline examples), and generates a Test::Most-based
+C<.t> file that runs every example as a subtest.
+
+Each subtest:
+
+=over 4
+
+=item * Wraps the example code in C<eval { ... }>
+
+=item * Asserts the example does not die
+
+=item * If the example has a C<# returns value> or C<< # => value >> annotation,
+additionally asserts the return value with C<is()>
+
+=back
+
+Running this test suite after any code change ensures that all documented
+examples still work — the "round-trip" between documentation and code.
+
+=head1 ANNOTATION FORMAT
+
+Append C<# => value> or C<# returns value> to any indented line in the POD
+to document the expected return value:
+
+    my $status = $obj->validate_score(75.5);  # returns 'Pass'
+    my $x      = add(2, 3);                   # => 5
+
+The generated test will assert C<is($result, 'Pass', ...)> etc.
+
+=cut
+
+my %opts = (
+	output      => 't/pod_examples.t',
+	annotated   => 1,
+	help        => 0,
+	man         => 0,
+);
+
+GetOptions(
+	'output|o=s'   => \$opts{output},
+	'annotated!'   => \$opts{annotated},
+	'help|h'       => \$opts{help},
+	'man|m'        => \$opts{man},
+) or pod2usage(2);
+
+pod2usage(-exitval => 0, -verbose => 1) if $opts{help};
+pod2usage(-exitval => 0, -verbose => 2) if $opts{man};
+
+my $input_file = shift @ARGV or pod2usage('Error: No input file specified');
+die "Error: File not found: $input_file\n" unless -f $input_file;
+
+# Derive the package name from the source file
+my $package = _detect_package($input_file)
+	or die "Error: Could not determine package name from $input_file\n";
+
+my $extractor = App::Test::Generator::PodExampleExtractor->new(file => $input_file);
+my $examples  = $extractor->extract();
+
+unless(@$examples) {
+	warn "No POD examples found in $input_file\n";
+	exit 0;
+}
+
+# Apply --no-annotated filter
+if(!$opts{annotated}) {
+	$examples = [ grep { !defined $_->{annotated_line} } @$examples ];
+}
+
+unless(@$examples) {
+	warn "No examples remaining after filtering\n";
+	exit 0;
+}
+
+# Ensure output directory exists
+my $out_dir = (File::Spec->splitpath($opts{output}))[1];
+make_path($out_dir) if $out_dir && !-d $out_dir;
+
+open my $fh, '>', $opts{output}
+	or die "Error: Cannot write to $opts{output}: $!\n";
+
+_emit_test_file($fh, $package, $input_file, $examples);
+
+close $fh;
+
+printf "Wrote %d example test(s) to %s\n", scalar(@$examples), $opts{output};
+
+# ---------------------------------------------------------------------------
+# _emit_test_file
+# ---------------------------------------------------------------------------
+sub _emit_test_file {
+	my ($fh, $package, $source, $examples) = @_;
+
+	print $fh "#!/usr/bin/env perl\n";
+	print $fh "#\n";
+	print $fh "# POD round-trip tests for $package\n";
+	print $fh "# Generated from $source by pod-example-tester\n";
+	print $fh "# DO NOT EDIT — regenerate with: pod-example-tester $source\n";
+	print $fh "#\n\n";
+	print $fh "use strict;\n";
+	print $fh "use warnings;\n";
+	print $fh "use Test::Most;\n\n";
+	print $fh "use_ok('$package') or BAIL_OUT(\"Cannot load $package\");\n\n";
+
+	my $ctor = _detect_constructor($package);
+
+	for my $ex (@$examples) {
+		_emit_subtest($fh, $ex, $package, $ctor);
+	}
+
+	print $fh "\ndone_testing();\n";
+}
+
+# ---------------------------------------------------------------------------
+# _emit_subtest — write one subtest block
+# ---------------------------------------------------------------------------
+sub _emit_subtest {
+	my ($fh, $ex, $package, $ctor) = @_;
+
+	my $label    = $ex->{label};
+	my $code     = $ex->{code};
+	my $expected = $ex->{expected};
+	my $is_annotated = defined $ex->{annotated_line};
+
+	# Escape label for Perl string
+	(my $safe_label = $label) =~ s/'/\\'/g;
+
+	print $fh "subtest '$safe_label' => sub {\n";
+
+	if($is_annotated) {
+		# Single annotated call: wrap in eval, capture return value, compare.
+		# Strip 'my $var =' prefix so the eval captures the bare expression
+		# value directly rather than shadowing with an inner variable.
+		my $expr = $code;
+		$expr =~ s/^\s*my\s+\$\w+\s*=\s*//;
+		$expr =~ s/\s*;\s*$//;
+
+		my $n_tests = defined($expected) ? 2 : 1;
+		print $fh "\tplan tests => $n_tests;\n";
+
+		if($ctor && $expr =~ /\$obj\s*->/) {
+			print $fh "\tmy \$obj = $ctor;\n";
+		}
+
+		print $fh "\tmy \$result = eval { $expr };\n";
+		print $fh "\tok(!\$\@, 'example runs without error') or diag \$\@;\n";
+
+		if(defined $expected) {
+			print $fh "\tis(\$result, $expected, 'returns expected value from POD annotation');\n";
+		}
+	} else {
+		# Verbatim block: run whole block in eval, check no exception.
+		# Stub any variables the snippet uses but doesn't declare so the
+		# generated file compiles cleanly under "use strict".
+		print $fh "\tplan tests => 1;\n";
+		print $fh "\tmy \$ok = eval {\n";
+		my @stubs = _stub_undeclared_vars($code);
+		if(@stubs) {
+			print $fh "\t\tmy (", join(', ', @stubs), ");\n";
+		}
+		for my $line (split /\n/, $code) {
+			if(my $neutralized = _neutralize_exec($line)) {
+				print $fh "\t\t$neutralized\n";
+			} else {
+				print $fh "\t\t$line\n";
+			}
+		}
+		print $fh "\t\t1;\n";
+		print $fh "\t};\n";
+		print $fh "\tok(\$ok && !\$\@, 'example runs without error') or diag \$\@;\n";
+	}
+
+	print $fh "};\n\n";
+}
+
+# ---------------------------------------------------------------------------
+# _neutralize_exec — if a line from a verbatim SYNOPSIS block would invoke
+# a shell command (system, exec, backticks, qx), return a replacement
+# note() call that describes what would have run instead of executing it.
+# Returns the empty string (false) for safe lines so the caller can pass
+# them through unchanged.
+#
+# Lines that are already comments are left alone — they can't execute.
+# ---------------------------------------------------------------------------
+sub _neutralize_exec {
+	my ($line) = @_;
+	return '' if $line =~ /^\s*#/;    # pure comment — harmless
+	return '' unless $line =~ /\b(?:system|exec)\s*\(|`|\bqx\s*[{(\[\/|]/;
+
+	(my $msg = $line) =~ s/^\s+//;    # strip leading whitespace for display
+	$msg =~ s/'/\\'/g;                 # escape single quotes for q{}
+	$msg =~ s/\s+$//;
+
+	return "note('pod-example-tester: skipped shell call: $msg');";
+}
+
+# ---------------------------------------------------------------------------
+# _stub_undeclared_vars — return sorted list of sigil+name variables (e.g.
+# '$dir', '@items') that appear in the code block but are not declared with
+# my/our/local.  Used to inject stub declarations so generated eval blocks
+# compile cleanly under "use strict" even when SYNOPSIS snippets assume
+# surrounding context (e.g. a $dir variable set up by the caller).
+#
+# Well-known Perl builtins (@_, @INC, @ARGV, %ENV, %INC, %SIG, $_) are
+# excluded because they exist without explicit declaration.
+# ---------------------------------------------------------------------------
+{
+	my %PERL_BUILTINS = map { $_ => 1 } qw(
+		$_ @_ @INC @ARGV %ENV %INC %SIG
+	);
+
+	sub _stub_undeclared_vars {
+		my ($code) = @_;
+
+		my %declared;
+		# Capture every variable following a my/our/local keyword, including
+		# list forms: my ($a, $b) and foreach my $x(...)
+		while($code =~ /\b(?:my|our|local)\b[^;{]*?([\$\@\%]\w+)/g) {
+			$declared{$1} = 1;
+		}
+
+		my %used;
+		while($code =~ /([\$\@\%])([a-zA-Z_]\w*)/g) {
+			$used{"$1$2"} = 1;
+		}
+
+		return sort grep { !$declared{$_} && !$PERL_BUILTINS{$_} } keys %used;
+	}
+}
+
+# ---------------------------------------------------------------------------
+# _detect_package — extract 'package Foo::Bar' from source
+# ---------------------------------------------------------------------------
+sub _detect_package {
+	my ($file) = @_;
+	open my $fh, '<', $file or return;
+	while(<$fh>) {
+		return $1 if /^package\s+([\w:]+)\s*[;{]/;
+	}
+	return;
+}
+
+# ---------------------------------------------------------------------------
+# _detect_constructor — return a string like 'Foo::Bar->new()' if the
+# package has a new() method, else undef
+# ---------------------------------------------------------------------------
+sub _detect_constructor {
+	my ($package) = @_;
+
+	# Try loading and querying can()
+	eval { (my $mod = $package) =~ s{::}{/}g; require "$mod.pm" };
+	return unless !$@;
+	return "${package}->new()" if $package->can('new');
+	return;
+}
+
+__END__
+
+=head1 EXAMPLES
+
+=head2 Generate tests for a single module
+
+    pod-example-tester lib/My/Module.pm
+
+=head2 Custom output path
+
+    pod-example-tester --output t/my_pod_roundtrip.t lib/My/Module.pm
+
+=head2 Verbatim blocks only (skip annotated single-liners)
+
+    pod-example-tester --no-annotated lib/My/Module.pm
+
+=head1 SEE ALSO
+
+L<App::Test::Generator::PodExampleExtractor>,
+L<App::Test::Generator>
+
+=head1 AUTHOR
+
+Nigel Horne
+
+=cut

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Client;
-$OpenSearch::Client::Role::Client::VERSION = '3.007005';
+$OpenSearch::Client::Role::Client::VERSION = '3.007006';
 use Moo::Role;
 use namespace::clean;
 
@@ -52,7 +52,7 @@ OpenSearch::Client::Role::Client - Provides common functionality for Client impl
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 DESCRIPTION
 

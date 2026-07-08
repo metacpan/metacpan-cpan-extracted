@@ -128,7 +128,7 @@ OpenSearch::Client::Role::Serializer::JSON - A Serializer role for JSON modules
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 DESCRIPTION
 

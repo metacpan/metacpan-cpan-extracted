@@ -1,0 +1,946 @@
+Revision history for Stats-LikeR
+
+   # Changes
+
+0.22 2026-07-07 CDT
+
+ - returned `Devel::Confess` to required dependencies to fix for CPAN testers.
+
+0.21 2026-07-07 CDT
+
+ - Better warning message for undefined data for `aoh2hoh`, `assign`, `dropna`
+
+ - addition of `agg`, `concat`, `drop_cols`, `rank`, `rename_cols`, `select_cols` functions
+
+ - Improving Kwalitee (sic): added `[PodWeaver]` to dist.ini; as well as `Changes` file
+
+ [assign]
+
+ - `assign` now accepts two kinds of column value, so a function that already returns a whole column (like `rank`) drops in without wrapping.
+
+ - **Per-row coderef** (unchanged): called once per row, `$_` is the row, and the single scalar it returns is the cell. A single arrayref return is still stored *as the cell*, so arrayref-valued columns keep working.
+ - **Whole-column coderef** (new): if the coderef returns a *list* of more than one value, that whole list becomes the column, laid down positionally. This is what makes `'ΔG rank' => sub { rank( vals($df, 'dG_kcal_mol') ) }` work directly — no `[ ... ]` needed.
+ - **Arrayref value** (new): a ready-made column, e.g. `col => [ rank(...) ]`, copied into the frame.
+
+ - The coderef is probed once (row 0 for AoH/HoH, the first synthesized view for HoA) to decide per-row vs whole-column, so per-row code is never run twice on row 0. Every column value is length-checked against the row count and a mismatch dies. HoH is now a supported, documented shape alongside AoH and HoA; whole-column and arrayref values align to sorted key order.
+
+ - Tests: `assign.t` (AoH + HoA) and `assign_HoH.t` were expanded to cover every shape × value-kind combination — per-row scalar, whole-column list, arrayref value, single-arrayref-as-cell, `rank()` integration, chaining, `$_[1]` index, `$_[2]` row key (HoH), overwrite, ragged HoA columns, empty frames, length-mismatch and bad-value / odd-arg / non-hash-row death paths, and `no_leaks_ok` guards on the new whole-column and arrayref paths.
+
+ [read_table]
+
+ - Fixed handling of commented-out header lines and made filter columns
+   referenceable by the name as it appears in the file.
+
+ - **Commented-out header recovery.** `_parse_csv_file` treats a line whose
+     comment marker is followed by whitespace (e.g. `# PDB<TAB>score`) as a
+     comment and drops it, so a header written that way never reached the
+     callback and the first *data* row was silently mistaken for the header.
+     `read_table` now recovers it: the first physical line, if it is
+     `marker + whitespace` and splits into two or more fields, is held as a
+     candidate header and confirmed only when its field count matches the first
+     data row. If the counts disagree the candidate was an ordinary leading
+     comment and is discarded, so a prose comment that happens to contain the
+     separator (e.g. `# note, see README`) is never mistaken for a header. A
+     marker hugging its text (`#id,val`) is delivered by the parser and
+     un-commented in the callback as before. The marker and any following
+     whitespace are stripped, so `# PDB` is stored as the clean name `PDB`.
+
+ - **Filter columns may be named as written in the file.** Filter keys are
+     matched against the header by exact name first, then retried with the
+     leading comment marker (and surrounding whitespace) stripped, so a
+     commented-header column resolves whether it is referenced as `# PDB` or by
+     its clean name `PDB`:
+
+     read_table(
+     'regression_rank.tabular.tsv',
+     filter => { '# PDB' => sub { $_ == 2 } },
+     );
+
+ - **Clearer "column not found" error.** The failure now names the file and
+     lists the actual header instead of printing it to STDOUT (a library
+     shouldn't print):
+
+     read_table: Filter column 'nope' not found in the header of FILE;
+     header is: 'PDB', 'score'
+
+ - ## 0.20
+
+ - addition of `ncol`, `nrow`, and `pnorm` functions
+
+ - `filter` can filter by row names with `$_[1]`
+
+ - `view` now accepts array of arrays in addition to AoH, HoA, and HoH
+
+ [csort]
+
+ - Two behavioural changes, both contained to the `csort` XSUB (the `cs_*` helpers are untouched).
+
+ - Row names survive a Hash-of-Hashes sort. Sorting a HoH previously discarded the outer keys. Now each row is folded into a *fresh* row hash (a private container over aliased, read-only cells) that carries its outer key under a `row.name` column, so the name flows into whichever shape you request:
+
+     my $hoh = { alpha => { id => 1 }, beta => { id => 2 } };
+
+     csort($hoh, 'id');          # AoH: each row gains a row.name field
+     csort($hoh, 'id', 'hoa');   # HoA: an aligned row.name column
+
+ - The column name defaults to `row.name` and can be overridden with an optional 4th argument (mirroring `hoa2hoh`'s named-key style): `csort($df, 'id', 'aoh', 'sample')`.
+ - The outer key is authoritative — it wins over any pre-existing same-named field in the row.
+ - Once present, the column is sortable like any other: `csort($hoh, 'row.name')`.
+ - Because rows are now *copied* rather than shared, the caller's HoH is never mutated by the injection. (Minor behaviour change: output rows are no longer the same refs as the source rows.)
+
+ - Clearer usage message. The signature is now `csort(...)`, so xsubpp no longer emits the misleading auto-generated `Usage: Stats::LikeR::csort(data, by, output=&PL_sv_undef)`. Argument count is checked by hand, and the croak now shows both real calling forms:
+
+     Usage: csort($df, 'column.name', 'HoA')
+     or  csort($df, sub { $b->{'No.'} <=> $a->{'No.'} }, 'hoa')
+     (optional 4th arg names the row-name column when sorting a HoH; default 'row.name')
+
+ - `data`/`by`/`output` are read as `ST(0..2)`; `output` still defaults to matching the input shape.
+
+ - Tightened validation messages. The `$data` croak now reads `hash-ref (HoA or HoH)`, and the `$by` croak includes a concrete example: `a column name (e.g. 'No.') or a comparator code-ref using $a and $b, e.g. sub { $b->{'No.'} <=> $a->{'No.'} }`. Existing HoA croaks (`unequal lengths`, `not found`, `not an array-ref`) are unchanged.
+
+ - When sorting, undefined values in the sorting column are placed at the bottom
+
+ [cor]
+
+ - Fixed an unsigned-integer underflow in `kendall_tau_b` and added a regression test.
+
+ - Bug:
+
+ - In `kendall_tau_b`, concordant/discordant counts `C` and `D` are declared `size_t` (unsigned). The numerator was computed as:
+
+     return (NV)(C - D) / denom;
+
+ - The subtraction `C - D` happens in unsigned arithmetic *before* the cast to `NV`. When discordant pairs dominate (`D > C`), the result wraps to a huge positive value instead of going negative.
+
+ - For the arrays:
+
+     dG_kcal_mol:  -7.765, -9.328, -10.326, -9.038, -9.608, -9.779, -9.975, -6.906
+     anomaly_rank: 154, 155, 161, 188, 76, 172, 173, 69
+
+ - there are `C = 9` concordant and `D = 19` discordant pairs (no ties). `9 - 19` wraps to `18446744073709551607`, so the function returned ~`6.6e17` instead of the correct `-10/28 = -0.3571428571`.
+
+ - Fix:
+
+ - Cast each operand to `NV` before subtracting, so the arithmetic is signed:
+
+     return ((NV)C - (NV)D) / denom;
+
+ - Only that one line changed. The denominator sums (`C + D + tie_x`, `C + D + tie_y`) are non-negative, so they were left as-is.
+
+ - Regression test — `cor.t`:
+
+ - Kendall on the offending arrays pinned to `-0.3571428571`.
+ - Explicit `[-1, 1]` range guard (the real backstop — the pre-fix value `~6.6e17` blows past the bound regardless of exact magnitude), plus a negative-sign assertion.
+ - Pearson (`-0.4889102301`), Spearman (`-0.4761904762`), and default-method coverage of the three `compute_cor` branches.
+ - Kendall boundary cases: perfectly concordant (`+1`), perfectly discordant (`-1`), self-correlation (`+1`), and a tie case exercising `tie_x` in the denominator.
+ - `no_leaks_ok` per method (guarded with `unless $INC{'Devel/Cover.pm'}`).
+ - Croak paths: length mismatch, unknown method, zero-variance input.
+
+ [XS refactor]
+
+ - Consolidate helper functions to reduce binary size, find bugs, and back the changes with tests. Every change was validated by translating the XS (`ExtUtils::ParseXS`) and compiling the result
+   with the module's own `ccflags`.
+
+ - Outcome:
+
+ - **Net change to the source:** ~154 fewer lines; helper-function count down by 4 (7 removed, 3 added).
+ - **Genuine bugs fixed:** two instances of the same latent defect (see below). The rest of the work was behavior-preserving consolidation.
+
+ - Function consolidation:
+
+ - | Change | Before | After |
+   |---|---|---|
+   | Three-way `NV` comparator | `compare_rank`, `cmp_rank_item`, `cmp_rank_info`, `compare_NVs` | single `cmp_nv3` (reads the leading `NV` member, valid for `RankInfo`/`RankItem`/raw `NV`) |
+   | Average-rank routine | `compute_ranks` + `compare_index` restoration sort | existing `rank_data` (scatters ranks into `out[idx]`, no second sort) |
+   | String comparator | `cmp_string_wt`, `lm_str_qsort` (byte-identical) | single `cmp_string_wt` |
+   | Set difference | `Lonly` + `Ronly` (duplicated bodies) | shared `set_difference()`; `Ronly` passes the arrays swapped |
+   | Multiplicity filter | `intersection` + `get_unique` (~90% shared) | shared `set_multiplicity()` with an "all vs. one" mode flag |
+
+ - All merges were confirmed behavior-preserving: the collapsed comparators are
+   equivalent on ordinary values, `NaN`, and infinities, and `compute_ranks` and
+   `rank_data` produce identical average ranks.
+
+ - Bugs:
+
+ - Two comparators stabilized their sort by returning `a->idx - b->idx` directly,
+   where the index field is an unsigned `size_t`. The subtraction wraps and is then
+   truncated to `int`, which is implementation-defined and gives the wrong sign
+   once a difference exceeds `INT_MAX`.
+
+ - `compare_index` — removed entirely (the routine that used it, `compute_ranks`, was replaced by `rank_data`).
+ - `cmp_pval` — the tie-break comparator in the p-adjust path. **Missed in the initial review; found later** via a `-Wconversion` compile of the earlier source. Fixed to compare with the `(a > b) - (a < b)` idiom.
+
+ - Caveat on severity: on every mainstream ABI (LP64, LLP64, ILP32), the
+   low-word truncation happens to reproduce the correct sign for any array smaller
+   than ~2^31 elements, so this never produces a wrong result at realistic sizes.
+   It is a portability/UB issue, not a runtime failure, which is why no functional
+   test detects it (see "Testing", below).
+
+ -  `LikeR.xs` — consolidated helpers; `compare_index` removed; `cmp_pval` fixed.
+
+ [`view`]
+ -  non-ASCII characters now print
+
+ [`write_table`]
+
+ - new option to output to LaTeX table
+
+ - ## 0.19
+
+ - numerous `SSize_t var1 = av_len(var) + 1` are changed to `size_t var1 = av_len(var) + 1` as `size_t`; as the result cannot be negative, in order to expand numerical range
+
+ - Addition of `hoa2hoh`, `binom_test`, `chunk`, `get_union`, `get_unique`, `Lonly`, `Ronly`, `qcut`, and 3 tukey functions
+
+ - Better warnings when non-array references are given to `intersection`
+
+ - `view` now breaks columns into chunks for very wide data sets, more closely matching R's behavior
+
+ - ## 0.18
+
+ - `restrict` keyword added to numerous places within `intersection` to decrease CPU time
+
+ - fix to dist.ini for dependencies
+
+ - fixed POD rendering
+
+ - ## 0.17
+
+ - addition of `assign`, which adds new columns based on calculations from other columns
+
+ - addition of `hoa2aoh`, transforming hash of arrays to array of hashes
+
+ - addition of `predict`, using results from `aov`, `glm`, and `lm`
+
+ - addition of `aoh2hoh` transforming array of hash into hash of hashes, `intersection`, `uniq`, and `vals`
+
+ [`aov`]
+
+ - Bug fixes:
+ - **`size_t` underflow on empty arrays.** Three loops were bounded by `av_len(...)`
+     compared against an unsigned counter; `av_len` returns `-1` for an empty array,
+     which turned `k <= len` into a `SIZE_MAX` loop. The `stack()` value loop, the `.`
+     column-expansion loop, and the `group_stats` column loop now use a signed
+     `SSize_t` bound.
+ - **HoH row count.** Row count for hash-of-hashes input was taken from the return
+     value of `hv_iterinit`; it now uses `HvUSEDKEYS(hv)` with a separate
+     `hv_iterinit`, matching `predict`.
+ - **Buffer overflow in interaction parsing.** `strcpy(right, colon + 1)` into a
+     fixed `char right[256]` is now `snprintf(right, sizeof(right), ...)`.
+
+ - Performance / memory:
+ - **Removed the per-row `row_x` scratch allocation.** Design rows are built
+     directly into `X_mat[valid_n]`; `valid_n` simply does not advance on a rejected
+     row. Interaction columns read their operands from the same in-progress row, so
+     the logic is unchanged.
+ - **`row_names` is no longer dead.** Surviving row names are transferred (pointer
+     move, no copy) into `surv_names` to key `fitted.values`; rejected rows are freed
+     in place.
+ - **Dropped a `restrict` UB.** `orig_data_sv` aliases `data_sv`; the `restrict`
+     qualifier was removed.
+
+ - New, `predict`-compatible output keys:
+ - **`coefficients`** — OLS estimates recovered by back-substitution on the R factor
+     left in `X_mat` against Q'y in `Y` (no re-derivation). Keys are the expanded term
+     names (`Intercept`, continuous names, `base.level` dummies, and `a:b` interaction
+     products). Aliased columns are reported as `NaN`, which `predict` drops.
+ - **`fitted.values`** — `Xb` over the non-aliased columns, keyed by surviving row
+     name. Computed from a snapshot of the design (`Dsav`) taken before the QR
+     overwrites `X_mat`. Costs one transient copy of the design matrix; negligible for
+     typical ANOVA where the column count is small.
+ - **`xlevels`** — sorted level list per factor, index 0 = reference, aligned with
+     the contrast coding used to build the dummies.
+ - **`family`** — `"gaussian"`.
+
+ - Cleanup-path correctness:
+ - `xlevels_hv`, `Dsav`, and `surv_names` are freed on both the "0 degrees of
+     freedom" croak and the normal exit. The interaction-main-effects croak in
+     PHASE 3 also frees `xlevels_hv`.
+
+ - Known limitations (unchanged):
+ - The intercept-stripping string surgery (`-1`, `+0`, `+1`, ...) operates on the
+     whole RHS and can still mangle `I(x-1)`-style transforms; treat `I()` with
+     arithmetic constants carefully.
+ - Top-level keys `coefficients` / `fitted.values` / `xlevels` / `family` /
+     `group_stats` share the return hash with the ANOVA rows; a predictor literally
+     named one of those would collide.
+
+ [`predict`]
+
+ - New: factor-bearing interaction terms:
+ - Previously, interaction coefficients such as `GroupB:Sexmale` or `GroupB:x` fell
+   through to the continuous `evaluate_term` path and died on a nonexistent column.
+   They are now handled directly:
+
+ - **`dummy_hv`** stores each dummy's factor base index (an `IV`) instead of
+     `&PL_sv_yes`, so a dummy name maps back to its `(base, level)` in O(1)
+     (`level == name + strlen(base)`). `hv_exists` lookups are unaffected.
+ - During coefficient caching, any `:` term with at least one factor-dummy component
+     is routed to a separate list (`icopy` / `ibeta`); pure-continuous interactions
+     (e.g. `x:z`) stay on the existing `evaluate_term` path, so prior behavior is
+     preserved.
+ - Each routed term is parsed once into flat component arrays. Factor components
+     store a base index and level pointer; continuous components store the term string
+     and get the same up-front column-existence validation as main terms.
+ - Per row, each factor's raw level is read once into `raw_lv[]` and reused by both
+     main effects and interactions (no duplicate `get_data_string_alloc`). An
+     interaction's value is the product of its components: a factor component
+     contributes `1.0` iff the row's level matches the dummy's level (reference levels
+     give `0`), continuous components go through `evaluate_term`.
+
+ - This covers factor×factor, factor×continuous, continuous×continuous, and n-way
+   combinations.
+
+ - Other:
+ - HoH row count uses `HvUSEDKEYS` (already present).
+ - The unseen-factor-level croak now frees every level string already read for the
+     current row, not just the current one.
+
+ [Tests]
+
+ - **`aov.t`** — one-way ANOVA against hand-computed values (Df / Sum Sq / Mean Sq /
+     F / decomposition); identical results across HoA / HoH / AoH / stacked input;
+     simple regression; `.` expansion; intercept removal (`-1`); two-way with
+     interaction (Type I SS on a balanced design); NaN listwise deletion; all croak
+     paths; leak checks.
+ - **`predict.t`** — `predict(training) == fitted.values` round-trips for one-way,
+     regression, factor×factor, factor×continuous, and continuous×continuous models;
+     explicit predicted values; agreement across HoA / AoH / HoH / flat newdata;
+     no-newdata path; binomial `link` vs `response`; gaussian identity link; all croak
+     paths; leak checks.
+
+ - Leak tests use `no_leaks_ok` guarded by `unless $INC{'Devel/Cover.pm'}` and skipped
+   when `Test::LeakTrace` is absent.
+
+ - Assumptions worth confirming:
+ - The NaN-deletion test relies on `evaluate_term` returning `NaN` for a non-finite
+     response value (an `Inf - Inf` NaN is fed in deterministically).
+ - The continuous×continuous round-trip relies on `evaluate_term("x:z")` yielding
+     `x * z` — the same assumption the pre-existing `predict` continuous-interaction
+     path already made. If that path was untested, this round-trip now exercises it.
+
+ [`view`]
+
+ - now returns colored output; fixed bug with incorrect widths; undefined values show as `undef` rather than `NA`, as in Data::Printer
+
+ [`csort`]
+
+ - now accepts Hash of Hashes; addition of `restrict` which should decrease calculation time
+
+ [filter]
+
+ - **Added hash-of-hashes (HoH) input.** In addition to AoH and HoA, `filter` now accepts an HoH (`{ key => { col => val, ... }, ... }`); each inner hash is one row, and matching keys are preserved by default (HoH -> HoH).
+ - **Added `output.type`.** `filter($df, $pred, 'output.type' => 'aoh'|'hoa')` selects the returned shape (aliases `out` / `output_type`; a bare positional type also works). When omitted, the input shape is preserved. `hoh` is not a selectable output, since it would require choosing a key column.
+ - **`col()` reworked, not removed.** Both predicate forms are kept: `col('age') >= 18` still works and is the concise/composable option, while a coderef covers everything else. Internally `col()` is now **pure Perl** — an overloaded class that builds a per-row closure — and `filter` unwraps that closure so `col()` and a coderef share one evaluation path. The previous standalone XS predicate evaluator (`filt_eval`/`filt_ctx`) is gone; delete it if your tree still has it. One consequence: a `col()` comparison now costs the same per row as the equivalent coderef (a Perl call), rather than being evaluated in C.
+ - **Unchanged guarantees:** the input frame is never modified; `undef` (and, for numeric ops, non-numeric) cells never match a `col()` comparison; AoH/HoH rows are shared rather than copied where possible; keep-all/keep-none shapes are well defined per output type; Perl 5.10 compatibility is retained. A latent `SvTRUE(POPs)` double-evaluation in the per-row call helper (which crashed on perls where `SvTRUE` is a multi-eval macro) was fixed along the way.
+
+ [read_table]
+
+ - Added an opt-in `auto.row.names` argument so `read_table` can read the file R
+   produces by default from `write.table(x, sep="\t")`.
+
+ - The problem:
+
+ - R's `write.table` defaults to `row.names=TRUE, col.names=TRUE`, which writes the
+   row-names column in every data row but emits no header label for it. So a
+   frame with N columns comes out as N header fields over N+1 data fields — e.g.
+   `mtcars` gives 11 headers but 12-field rows. By default `read_table` (correctly)
+   rejects that as ragged:
+
+     Alignment error on mtcars.tsv data row 1 (12 fields vs 11 headers).
+
+ - The change:
+
+ - `auto.row.names` turns on R's own `read.table` rule: **when, and only when, the
+   header is exactly one field short of the data rows, treat the first field of
+   each row as an (unlabelled) row-names column.**
+
+     # default: the leading column is named 'row_name'
+     my $df = read_table('mtcars.tsv', 'auto.row.names' => 1);
+
+     # or give it a name
+     my $df = read_table('mtcars.tsv', 'auto.row.names' => 'model');
+
+ - The synthesized column behaves like any other first column: it appears in `aoh`
+   and `hoa` output, and for `hoh` it becomes the default key (so rows are keyed by
+   the model name). This also lines up with the existing handling of R's
+   `col.names=NA` output (a blank leading header), which still produces a
+   `row_name` column with no flag needed.
+
+ - What did not change:
+
+ - The strict alignment check is still the default. Without `auto.row.names` the
+   lopsided file still croaks, and even with it, a row that is off by anything
+   other than exactly one field still croaks — so the corruption guard only relaxes
+   for the one case R itself treats specially.
+
+ - Tested in `t/read_table.2.t` (16 assertions, Perl 5.10.1 and 5.38): aoh / hoa /
+   hoh output, custom column name, the already-aligned file (flag is a no-op), the
+   `col.names=NA` path, and the strict / ragged croak paths.
+
+ - additional bugfix:
+
+     # This is a comment
+     id,name,val
+     1,Alice,10.5
+     2,Bob,
+     3,Charlie,15.2
+
+ - would not be read correctly using `read_table`, but now is read correctly
+
+ [value_counts]
+
+ - now accepts array of hashes
+
+ - ## 0.16
+
+ - changes to dist.ini, the minimum Perl version disappeared when I fixed other problems
+
+ - clarifications between run time and test dependencies
+
+ - addition of `csort` function to sort AoH and HoA
+
+ - addition of `aoh2hoa` to translate array of hashes into a hash of arrays
+
+ - fix of long double functions: https://www.cpantesters.org/cpan/report/5d5d9836-6a5f-11f1-aadb-63fd6d8775ea
+
+ [`glm`]
+
+ - output residual keys now use names, not integers
+
+ [`lm`]
+
+ [Bug fixes]
+
+ - Memory leak on the zero-degrees-of-freedom error path. When
+   `valid_n <= p`, the cleanup freed the `valid_row_names` *array* but not the
+   per-row name strings it held (those had been transferred out of `row_names`,
+   whose own array was already freed). The strings leaked on every such error.
+   Added the per-entry `Safefree` loop before freeing the array, matching the
+   normal path.
+
+ - HoH input validated only the first row. Only the first hash value was
+   checked to be a `HASHREF`; subsequent values were `SvRV`'d unconditionally, so
+   a malformed row (`{ a => {...}, b => 5 }`) dereferenced a non-reference. Every
+   row is now validated, with the partial allocations cleaned up before the
+   `croak`, mirroring the existing AoH path.
+
+ - `isspace` on a possibly-signed `char`. `isspace(*src)` is undefined for
+   byte values ≥ 0x80 on platforms where `char` is signed. Cast to
+   `(unsigned char)` before the call.
+
+ [Speed / RAM improvements]
+
+ - Formula buffer is now heap-allocated to fit. `char f_cpy[512]` silently
+   truncated any longer formula. Replaced with a buffer sized to
+   `strlen(formula) + 1`, so there is no fixed limit and no truncation.
+
+ - `.`-expansion buffer is now a growable heap buffer. `char rhs_expanded[2048]`
+   silently dropped expanded terms once full. It is now a buffer that doubles on
+   demand. Appends also went from `strcat` (which rescans from the start every
+   time — O(n²) over many columns) to an O(1) amortised append that tracks the
+   write position.
+
+ - No more per-row scratch allocation in matrix construction. The original
+   `safemalloc`'d a `row_x` buffer, filled it, copied it into `X`, and freed it
+   *for every row* — `n` allocations plus `n*p` copies. Each candidate row is now
+   written straight into `X` at its prospective commit slot; a row that fails
+   listwise deletion is simply overwritten by the next candidate. This removes the
+   `n` allocate/free cycles and the copy loop entirely.
+
+ - Categorical levels sorted with `qsort`. The level list used an O(n²) bubble
+   sort; replaced with `qsort` (relevant only for high-cardinality factors).
+
+ - Unused tail of `X` reclaimed after listwise deletion. `X` is allocated for
+   all `n` rows up front (`valid_n` is unknown until rows are scanned). When rows
+   are dropped, `X` is now `Renew`ed down to `valid_n * p`, returning the unused
+   tail to the allocator before the OLS phase.
+
+ - Minor robustness. The argument-parsing index was widened from
+   `unsigned short` to `I32` to match `items`, and the HoH row count now uses
+   `HvUSEDKEYS` rather than relying on `hv_iterinit`'s return value.
+
+ [Known limitations (left unchanged)]
+
+ - A multi-way term such as `a*b*c` is split only on the first `*`, so it yields
+     `a`, `b*c`, and `a:b*c` rather than a full three-way expansion. Deeper
+     interactions silently fail (the unparsable term evaluates to `NaN` and the
+     rows are dropped). This matches the documented two-way `*` support.
+ - HoA input takes the row count from the first column; columns shorter than
+     that simply contribute dropped rows rather than raising an error.
+
+ [`oneway_test`]
+
+ - Bug fixes:
+
+ - Memory leaks on error paths. Nearly every `croak` after an allocation
+   leaked memory. `croak` does a `longjmp`, so anything allocated but not yet
+   freed is lost. Affected paths:
+
+ - AoA and hash first-pass errors leaked `sizes` and any `gnames[]` entries
+     allocated so far.
+ - Formula-mode "not found as an array ref" errors leaked `lhs` and `rhs`.
+
+ - All post-allocation errors now route through a single `fail:` label that frees
+   every pointer unconditionally. Pointers are initialised to `NULL` and `gnames`
+   is zero-allocated with `Newxz`, so the cleanup is always safe to run.
+
+ - Undefined and non-numeric cells silently coerced to `0.0`. The original
+   second pass used `(svp && *svp) ? SvNV(*svp) : 0.0`, meaning an `undef` or
+   non-numeric cell was quietly treated as zero, silently corrupting the
+   F-statistic. Each cell is now validated with `SvOK` and `looks_like_number`;
+   the call dies naming the group and observation index, consistent with the rest
+   of `Stats::LikeR` (`mean`, `sum`, `cor`, etc.).
+
+ - Unsigned wraparound on empty array input. `k = (size_t)av_len(in_av) + 1`
+   cast to `size_t` *before* adding, so an empty array (`av_len` returns `-1`)
+   produced `SIZE_MAX` rather than `0`. Changed to
+   `k = (size_t)(av_len(in_av) + 1)` so the `+1` is done in signed arithmetic
+   before the cast.
+
+ - Unreliable group count from `hv_iterinit`. `hv_iterinit` returns the
+   number of buckets in use rather than the number of keys for tied hashes.
+   Replaced with `HvUSEDKEYS`, which always returns the correct key count.
+
+ - Improvements:
+
+ - `var.equal` accepted as an alias for `var_equal`. R users write
+   `var.equal`; the argument parser now accepts both spellings.
+
+ - Perl memory API used throughout. `safemalloc` and manual `memcpy` replaced
+   with `Newx`, `Newxz`, `savepv`, and `savepvn`. `savepvn` additionally
+   preserves embedded NUL bytes in group key strings, which the previous
+   `strlen`-based copies silently truncated.
+
+ - Known limitations (not changed):
+
+ - A factor column named `Residuals` or `group_stats` in a formula call will
+     collide with reserved top-level keys in the result hash.
+ - Group names containing an embedded NUL are stored correctly but are still
+     truncated at `strlen` when written into the output hash keys.
+
+ [`view`]
+
+ - default view shifted to 80 characters to match Linux window length
+
+ - New features:
+
+ - **`rows` is accepted as a synonym for `n`** (the number of rows shown).
+     Passing both `n` and `rows` is an error.
+ - **Unknown arguments are now rejected.** `view` validates its argument names
+     against the documented set (`n`, `rows`, `na`, `max_width`, `ellipsis`,
+     `gap`, `cols`, `columns`, `to`, `return_only`, `row.names`, `row_names`) and
+     dies listing any it does not recognise, so a misspelt option (e.g. `widht`)
+     is caught instead of silently ignored.
+ - **`n` / `rows` is validated.** It must be a non-negative integer; `undef` or
+     a non-numeric value now dies with a clear message instead of producing
+     warnings and being treated as `0`.
+ - **flat/simple hashes are accepted as input**
+
+ - Bug fixes:
+
+ - **`n => 0` now still prints the column header.** Column names were collected
+     only from the rows being shown, so requesting zero rows produced an empty
+     header line. At least one row is now scanned (when data exists) so the
+     header always lists the columns.
+ - **An empty hash (`{}`) no longer dies.** It was rejected as
+     *"neither ARRAY nor HASH"*; it is now shown as an empty table
+     (`0 rows x 0 cols`), matching the handling of an empty array.
+ - **The `row_names` alias now drives the Hash-of-Hashes label header.** The
+     header for the row-label column consulted only `row.names`, so
+     `row_names => 'id'` displayed `row_name` instead of `id`. Both spellings are
+     now honoured consistently.
+ - **Malformed nested values degrade gracefully.** A Hash-of-Arrays column or
+     Hash-of-Hashes row whose value is not actually an array/hash reference now
+     renders as empty cells rather than throwing a dereference error.
+
+ - Performance:
+
+ - Column gathering no longer sorts once per scanned row. Unique column names
+     are collected across the scanned rows and sorted a single time (same output
+     order), and the ellipsis length is computed once rather than per cell.
+
+ - Tests:
+
+ - `t/view.t` is self-contained (the `view` implementation is inlined; it loads
+     no other files) and covers the new argument handling, the bug fixes above,
+     and the existing AoH / HoA / HoH behaviour, alignment, truncation, and
+     output-path handling.
+
+ [`wilcox_test`]
+
+ - Corrected four bugs in the `wilcox_test` XSUB plus a portability fix in its exact signed-rank helper. Behaviour on valid input is unchanged: the R-agreement cases (unpaired `W = 58`, `p = 0.13292`; paired one-sided `V = 40`, `p = 0.019531`; separated exact `W = 0`, `p = 0.028571`) all still match R's `wilcox.test`.
+
+ - Bug fixes:
+
+ - **Invalid `alternative` is now rejected.** Any value other than `less` or `greater` previously fell through to the two-sided branch and returned a two-sided result mislabelled with the bad string, so a typo like `alternative => "twosided"` silently "worked". It now croaks unless `alternative` is one of `two.sided`, `less`, `greater`.
+ - **Zero/negative variance is guarded.** When every observation is tied the approximation's variance collapses to 0 and the old code divided by `sqrt(0)`: `wilcox_test([5,5,5], [5,5,5])` returned `p = 0` (a "significant" difference between identical samples). It now warns and returns `p = 1`.
+ - **Two-sided continuity correction at `z = 0`.** R uses `sign(z) * 0.5`, so the correction is `0` when the statistic sits exactly on its mean; the old code used `-0.5`. Example: `wilcox_test([1,4], [2,3], exact => 0)` changed from `p = 0.698535` to `p = 1` (matches R).
+ - **`exp` no longer shadows libm.** The local `exp` accumulator (mean of the statistic) shadowed the C library `exp()`; renamed to `mean_w` (two-sample) and `mean_v` (signed-rank). No active miscompute, removed as a latent hazard.
+
+ - Cosmetic:
+
+ - Collapsed a no-op ternary that assigned the same signed-rank exact method string on both branches; the `method` field is now simply `Wilcoxon signed rank exact test`.
+
+ - Portability (exact signed-rank helper):
+
+ - **`exact_psignrank` no longer calls `powl()`.** The `2^n` normaliser is now built by exact repeated doubling, which has no long-double libm dependency. This fixes an `Undefined symbol "powl"` load failure reported by a CPAN smoker (FreeBSD, perl 5.20, `nvtype=double`) whose libm lacks the long-double math functions; the symbol resolved on glibc, which is why local builds passed. `long double` accumulation in the DP is retained — only the `powl` call was at fault.
+ - **`int` → `size_t`** for `n`, `max_v`, and the DP loop counters, which also removes a `size_t`-to-`int` narrowing at the call site. The `floor()` result (`k`) stays signed so its negative-`q` sentinel still fires, and is cast to `size_t` only after the `k < 0` check.
+
+ - Tests:
+
+ - Added `t/wilcox_test.t` (flat, no subtests): R-agreement cases, option handling (`paired`, `correct`, `exact`, `mu`, named/positional `x`/`y`, NA dropping), regressions for all four bug fixes, argument-error and `alternative`-validation checks, output shape, and `no_leaks_ok` coverage of the two-sample, exact, and paired allocation paths.
+
+ - ## 0.15
+
+ - `view` function added, similar to R's `head`
+
+ - `read_table`:
+     filter => {
+     'Testosterone, total (nmol/L)' => sub { defined $_ },
+     }
+
+ - was broken by the change in undefined variables in 0.14, but is back to being `undef`
+
+ - `col2col` improvement in sectioning in README
+
+ - Numerous changes to prevent quadmath/long double CPAN test failures
+
+ - Minimum Scalar::Util version in dist.ini is now 1.22, see https://www.cpantesters.org/cpan/report/6b682236-6567-11f1-a3bc-a055f9c4ba34
+
+ - `Digest::SHA` is no longer needed, and removed as a dependency
+
+ [`read_table`]
+
+ - Bug fixes:
+
+ - **A comment-prefixed header is now read correctly.** `read_table` strips a
+     leading comment marker from the header line (so a file may begin with
+     `#id,val`), but that strip was dead code: the XS parser skipped *every* line
+     beginning with the comment string before the callback ever saw it, so a
+     commented header was silently dropped and the first data row was mistaken for
+     the header. The parser now delivers the first content line even when it
+     begins with the comment marker, and only skips comment lines after the header
+     has been seen.
+
+ - **Carriage returns inside quoted fields are preserved.** The parser stripped
+     `\r` unconditionally, so a quoted value such as `"x\ry"` lost its carriage
+     return and would not survive a `write_table` -> `read_table` round-trip. `\r`
+     is now stripped only as part of a trailing CRLF line ending and as a stray CR
+     *outside* quotes; inside quotes it is literal data.
+
+ - **Duplicate column names no longer corrupt `hoa` output.** With
+     `output.type => 'hoa'`, a repeated column name pushed the same cell once per
+     occurrence, so the affected columns came out longer than the others and the
+     arrays no longer lined up by row. Columns are now keyed by unique header name
+     (first-seen order preserved, later values win, one warning emitted).
+
+ - **A defined non-CODE callback is now an error.** Passing a defined argument
+     that was not a CODE reference silently fell through to slurp mode and ignored
+     the argument; it now croaks
+     (*"callback must be a CODE reference"*).
+
+ - **An undefined/empty `hoh` row-name now dies instead of keying on `""`.**
+     With `output.type => 'hoh'`, a row whose row-name column was empty/undef was
+     stored under the `''` key and raised *"uninitialized value"* warnings. It now
+     dies, naming the column and the offending data row.
+
+ - **A numeric filter key past the last column now dies.** A 1-based numeric
+     filter key greater than the column count was accepted, then silently extended
+     every row through the `$_` write-back. It is now rejected up front with a
+     message naming the column count.
+
+ - **`sep` and `delim` together now die.** Supplying both silently preferred
+     `delim`; passing both is now an explicit error (`delim` remains an alias for
+     `sep` when used alone).
+
+ - **The library no longer prints to STDOUT.** The unknown-argument path used
+     `say` to dump the offending names to STDOUT before dying; the names are now
+     carried in the `die` message itself.
+
+ - Better diagnostics:
+
+ - Alignment errors now report **which data row** is ragged
+     (*"Alignment error on FILE data row N (X fields vs Y headers)"*), instead of
+     only the field/header counts.
+
+ - Memory-leak fixes (exception paths):
+
+ - The parser allocated its working buffers (`current_row`, `field`, and — in
+   slurp mode — `data`) in the XS `INIT:` block, i.e. *before* any validation, and
+   freed them only by falling off the end of the function. Any non-local exit
+   therefore leaked:
+
+ - the open-failure `croak` leaked the row buffer and field (and the slurp
+     accumulator);
+ - far more commonly, a `die` thrown **inside the row callback** — which
+     `read_table` does routinely on alignment errors, bad row names, and filter
+     exceptions — unwound straight out of the XS frame and leaked the field, the
+     current row, the line buffer, the slurp accumulator, *and the open file
+     handle*.
+
+ - Allocations now happen in `CODE:` after every croak-able check, and every
+   long-lived resource (the file handle via `SAVEDESTRUCTOR_X`, the buffers via
+   `SAVEFREESV`) is tied to the save stack, which an exception unwinds. Measured
+   with `Test::LeakTrace`: a `die` mid-file went from 5 leaked SVs to 0, and an
+   open failure from 2 to 0. This is the likely source of the constant-size leaks
+   seen in CPAN-tester reports for the exception-path tests.
+
+ - Performance:
+
+ - **~2.5x faster parsing** (57 -> 145 MB/s on a 100k-row quoted file). The core
+     loop appended one character at a time with `sv_catpvn(field, &ch, 1)`; it now
+     scans runs of ordinary bytes with `memchr` / a bounded scan and appends each
+     run in a single `sv_catpvn`, copying field contents in bulk rather than byte
+     by byte.
+
+ - Internal / non-behavioral:
+
+ - XS declarations moved from `INIT:` to `PREINIT:`; allocations deferred into
+     `CODE:` (see the leak fixes above).
+ - The filter loop now aliases the row hash with `local *_ = \%line_hash`
+     instead of copying it with `local %_ = %line_hash`. This removes a full
+     per-row hash copy for every filtered row and fixes a latent staleness bug:
+     after a filter mutated `$_` and the change was written back, `%_` still
+     reflected the pre-mutation copy, so a subsequent filter in the same row saw
+     stale values. With aliasing, `%_` *is* the row, so write-backs are always
+     visible.
+
+ - Known limitation (not changed):
+
+ - **`undef.val` does not round-trip back to `undef`.** `write_table` renders an
+     `undef` cell as an empty field by default, and `read_table` maps an empty
+     field back to `undef`, so the *default* round-trip is clean. But if a file is
+     written with a token such as `'undef.val' => 'NA'`, `read_table` has no
+     inverse option and reads `NA` back as the string `'NA'`. `read_table` also
+     cannot distinguish a deliberately quoted empty string (`""`) from a missing
+     value -- both become `undef`. Adding an `na.strings`-style option to
+     `read_table` (mapping configurable tokens and/or empty fields to `undef`)
+     would close this gap.
+
+ [`write_table`]
+
+ - Behavior change:
+
+ - **`undef` cells now write as an empty field, not an empty string.** A missing
+     or `undef` value renders as nothing between separators (`a,,c`) rather than a
+     quoted empty string (`a,'',c` / `a,"",c`). Supplying `'undef.val' => 'NA'`
+     (or any other token) still overrides this, exactly as before. This is the
+     only change that can alter the bytes of an existing output file; if you relied
+     on the previous default, pass `'undef.val' => ''` to keep an explicit empty
+     field, or your chosen placeholder.
+
+ - Bug fixes:
+
+ - **Wide-character / UTF-8 column names and row keys now round-trip.**
+     Previously, cells were looked up with the raw bytes of the column name
+     (`hv_fetch(..., SvPV_nolen(name), strlen(name), ...)`), which fails to match a
+     UTF-8-flagged hash key: the column header printed correctly but every cell
+     under it came back empty. All lookups now fetch by SV (`hv_fetch_ent`), header
+     lists are gathered and sorted as SVs (`sortsv` + `sv_cmp`, preserving the
+     flag) instead of being round-tripped through `char *`, and the `row.names`
+     column is matched with `sv_eq` rather than `strcmp`. Embedded NUL bytes in
+     keys are handled correctly as a side effect.
+
+ - **`col.names => []` no longer loops forever.** An empty `col.names` array made
+     `av_len()` return `-1`, which — compared against an unsigned `size_t` loop
+     index — wrapped to `SIZE_MAX` and ran effectively without end. This was fixed
+     for flat hashes previously; it was still present for hash-of-hashes,
+     hash-of-arrays, and array-of-hashes, plus both `row.names` header-filtering
+     loops. All such loops now use a signed index.
+
+ - **Tables wider than 65,535 columns no longer hang.** One header loop used an
+     `unsigned short` index that silently wrapped past 65,535 and never terminated.
+     It now uses `size_t` like the rest of the code.
+
+ - **Flat-hash cells holding a reference now croak.** Every other input shape
+     rejects a nested reference with
+     *"Cannot write nested reference types to table"*; a flat hash instead
+     stringified it (e.g. `ARRAY(0x55...)`) into the file. It now croaks
+     consistently.
+
+ - **`'undef.val' => undef` is handled cleanly.** It previously called
+     `SvPV_nolen` on `undef`, raising an *"uninitialized value"* warning and
+     yielding an empty string by accident. It is now treated explicitly as an empty
+     field, with no warning.
+
+ - Memory-leak fixes (exception paths):
+
+ - The row-key list gathered for hash-of-hashes input was leaked when the output
+     file could not be opened.
+ - The *"Could not get headers"* croak on hash-of-arrays input leaked both the
+     already-open filehandle and the headers array.
+
+ - Internal / non-behavioral:
+
+ - Numeric row labels are now formatted into a reused stack buffer instead of a
+     per-row `savepv()` / `safefree()` allocation (no functional change; removes a
+     cast-away-`const` and one allocation per row).
+ - Several signed/unsigned index types were made consistent (`SSize_t` vs
+     `size_t`) to match `av_len()` and silence the conditions behind the loop bugs
+     above.
+
+ - Tests:
+
+ - `t/write_table.t` expanded from 17 to 69 assertions. New coverage targets each
+     fix above: the empty-field default and `undef.val => undef` (no warning),
+     `col.names => []` termination across all four input shapes, the
+     >65,535-column header loop (gated behind `EXTENDED_TESTING=1`), in-sequence
+     numeric row labels, nested-reference rejection, CSV quoting corners
+     (carriage return, separators inside column names, multi-character separators),
+     empty input writing no file, and UTF-8 column names and row keys. Two leak
+     assertions cover the exception paths above.
+
+ - ## 0.14
+
+ - `filter` function added for rows
+
+ - `read_table` reads undefined values to `undef` instead of `NA`, which makes calculations easier
+
+ - `write_table` writes undef by default as an empty string `''`
+
+ - `hoh2hoa` transforms a hash of hashes into an hash of arrays
+
+ - `quantile` uses `NV` instead of `double` to allow for high-precision 128-bit floats to be used on quadmath machines when available: https://www.cpantesters.org/cpan/report/296f4868-631f-11f1-abba-ff15558d240b
+
+ - Numerous switches from `double` to `NV` for local precision, like above
+
+ - numerous changes to `col2col` for ease of use and working with datasets with numerous undefined values
+
+ - dist.ini now links to math library when compiling: https://www.cpantesters.org/cpan/report/785e26d8-6397-11f1-89c0-dc066e8775ea
+
+ - `fisher_test` now should be complete, errors with confidence intervals fixed
+
+ - ## 0.13
+
+ - `read_table`: speed improvements; commented headers are now allowed
+
+ - `write_table`: fix for 
+
+     Attempt to free temp prematurely: SV 0x56417a2ae610 at t/write_table.t line 182.
+     main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
+     Attempt to free unreferenced scalar: SV 0x56417a2ae610 at t/write_table.t line 183.
+     main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
+
+ - `write_table` gives better warnings for incorrect types of data given
+
+ - Numerous changes to dist.ini to improve CPAN testing, especially for Win32
+
+ - ## 0.12
+
+ - `add_data` can also take hash of arrays, and various mixes of data types
+
+ - `ljoin`: Addition of `restrict` keywords in many places; should improve CPU performance
+
+ - Better POD formatting, correction of output hash for README's `add_data`
+
+ - `chisq_test` can now accept hash of hashes as input
+
+ - new `transpose` function for switching 2D hash keys and 2D array indices, and `col2col` for comparing columns against columns
+
+ - removed unused function from C helpers
+
+ - `value_counts`: addition of restrict keywords in preinit, should improve CPU performance
+
+ - MANIFEST.skip changed to MANIFEST.SKIP to improve CPAN testing
+
+ - using `is_deeply` for tests of `transpose`, which may or may not work with CPAN testers (experimental)
+
+ - Added function name to warnings, so I actually know which function is producing the error
+
+ - `write_table` can also take `file` and `data` as args, in addition to positions
+
+ - fixed `write_table` as it could hang if given empty `col.names` or `row.names`
+
+ - Added `__EXTENSIONS__` to source XS file for better CPAN testing
+
+ - ## 0.11
+
+ - better POD formatting for tables
+
+ - addition of MANIFEST.skip to get better testing results on CPAN
+
+ - `glm`: bugfix for when there is no intercept in the formula, new test cases in t/glm.t
+
+ - `write_table` now accepts simple hashes as input, in addition to hash of arrays, hash of hashes, and arrays of hashes
+
+ - Better documentation for t-test
+
+ - ## 0.10
+
+ - changes to compilation for CPAN, trying to get this work on Windows
+
+ - Addition of `prcomp` and `value_counts`
+
+ - `matrix` will work without key names, just like in R.  Testing for `matrix` has improved.
+
+ - ## 0.09
+
+ - context changes in XS `dTHX`, `pTHX_`, and `aTHX_` to get better CPAN testing results
+
+ - `restrict` keywords added to `lm` to increase speed
+
+ - ## 0.08
+
+ - Speed improvement in `summary` of hashes.
+
+ - Addition of `add_data`, `dnorm`, `group_by`, `ljoin`, and `mode` functions
+
+ - Chi-squared function no longer has Perl wrapper, and all code is in XS, which should result in a minor speed increase with 1 less function call.
+
+ - Compiler changes for GNU source and inclusion of `strings.h`, to ensure more CPAN testing works better.
+
+ - `read_table` now returns hash-of-hash in {row}{column}
+
+ - ## 0.07
+
+ - Addition of `summary` function.
+
+ - Formulas can now be omitted from `aov`, resulting in a stacked calculation as R would think.
+
+ - Addition of `oneway_test` for multi-group comparisons that does not assume normality like `aov` does.
+
+ - `read_table` and `write_table` now automatically set separators for `.csv` files as `,` and `.tsv` files as `"\t"`, respectively, so these values no longer need to be specified separately from the file name.
+
+ - ## 0.06
+
+ - Changed compiler options so that Solaris will work
+
+ - signed integers changed to unsigned in `glm`
+
+ - Added restrict keywords to `power_t_test`, and made `int` to `unsigned int`
+
+ - ## 0.05
+
+ - Leak testing for `sample`
+
+ - removal of Data::Printer dependency for easier CPAN testing
+
+ - switched several `unsigned int` variable to `I32` so that clang doesn't complain
+
+ - added restrict keyword for `sample`
+
+0.04 2026-5-17 CDT
+
+ - addition of `sample` function
+
+ - GNU source, to maximize compatibility and ease installation
+
+ - removal of JSON dependency to ease installation
+
+0.03 2026-5-13 CDT
+
+ - Compatibility back to Perl 5.10
+
+0.02 2026-5-7 CDT
+
+ - back-compatible to Perl 5.10, instead of original 5.40, ensuring more people can use it
+
+ - added var_test
+
+ - mean, min, sum, median, var, and max die with undefined values, and print the offending indices
+
+ - "group_stats" added to aov, for TukeyHSD in the future
+
+ - "cor" dies when given data with standard deviation of 0
+
+ - `write_table` now has `undef.val` option, which shows how undefined values are printed to tables, which is `NA` by default.
+

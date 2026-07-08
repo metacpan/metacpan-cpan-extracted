@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Replication;
-$OpenSearch::Client::Core::3_0::Direct::Replication::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Replication::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Replication>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for replication.|https://docs.opensearch.org/late
 
 =head1 METHODS
     
-=head2 replication->autofollow_stats
+=head2 autofollow_stats
 
 Retrieves information about any auto-follow activity and any replication rules configured on the specified cluster.
 
@@ -91,9 +91,9 @@ C<GET /_plugins/_replication/autofollow_stats>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.autofollow_stats|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-auto-follow-stats>
+L<OpenSearch documentation for replication-E<gt>autofollow_stats|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-auto-follow-stats>
     
-=head2 replication->create_replication_rule
+=head2 create_replication_rule
 
 Automatically starts the replication on indexes matching a specified pattern.
 
@@ -119,9 +119,9 @@ C<POST /_plugins/_replication/_autofollow>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.create_replication_rule|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#create-replication-rule>
+L<OpenSearch documentation for replication-E<gt>create_replication_rule|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#create-replication-rule>
     
-=head2 replication->delete_replication_rule
+=head2 delete_replication_rule
 
 Deletes the specified replication rule.
 
@@ -147,9 +147,9 @@ C<DELETE /_plugins/_replication/_autofollow>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.delete_replication_rule|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#delete-replication-rule>
+L<OpenSearch documentation for replication-E<gt>delete_replication_rule|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#delete-replication-rule>
     
-=head2 replication->follower_stats
+=head2 follower_stats
 
 Retrieves information about any follower (syncing) indexes on a specified cluster.
 
@@ -173,9 +173,9 @@ C<GET /_plugins/_replication/follower_stats>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.follower_stats|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-follower-cluster-stats>
+L<OpenSearch documentation for replication-E<gt>follower_stats|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-follower-cluster-stats>
     
-=head2 replication->leader_stats
+=head2 leader_stats
 
 Retrieves information about any replicated leader indexes on a specified cluster.
 
@@ -199,9 +199,9 @@ C<GET /_plugins/_replication/leader_stats>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.leader_stats|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-leader-cluster-stats>
+L<OpenSearch documentation for replication-E<gt>leader_stats|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-leader-cluster-stats>
     
-=head2 replication->pause
+=head2 pause
 
 Pauses the replication of the leader index.
 
@@ -231,9 +231,9 @@ C<POST /_plugins/_replication/{index}/_pause>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.pause|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#pause-replication>
+L<OpenSearch documentation for replication-E<gt>pause|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#pause-replication>
     
-=head2 replication->resume
+=head2 resume
 
 Resumes replication of the leader index.
 
@@ -263,9 +263,9 @@ C<POST /_plugins/_replication/{index}/_resume>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.resume|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#resume-replication>
+L<OpenSearch documentation for replication-E<gt>resume|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#resume-replication>
     
-=head2 replication->start
+=head2 start
 
 Initiates the replication of an index from the leader cluster to the follower cluster.
 
@@ -295,9 +295,9 @@ C<PUT /_plugins/_replication/{index}/_start>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.start|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#start-replication>
+L<OpenSearch documentation for replication-E<gt>start|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#start-replication>
     
-=head2 replication->status
+=head2 status
 
 Retrieves the the status of an index replication.
 
@@ -325,9 +325,9 @@ C<GET /_plugins/_replication/{index}/_status>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.status|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-replication-status>
+L<OpenSearch documentation for replication-E<gt>status|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#get-replication-status>
     
-=head2 replication->stop
+=head2 stop
 
 Terminates the replication and converts the follower index to a standard index.
 
@@ -357,9 +357,9 @@ C<POST /_plugins/_replication/{index}/_stop>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.stop|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#stop-replication>
+L<OpenSearch documentation for replication-E<gt>stop|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#stop-replication>
     
-=head2 replication->update_settings
+=head2 update_settings
 
 Updates any settings on the follower index.
 
@@ -389,7 +389,7 @@ C<PUT /_plugins/_replication/{index}/_update>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for replication.update_settings|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#update-settings>
+L<OpenSearch documentation for replication-E<gt>update_settings|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#update-settings>
 
 =head1 MANUAL
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # script to update Date::Holidays::GB with the latest bank holiday dates from
 # https://www.gov.uk/bank-holidays

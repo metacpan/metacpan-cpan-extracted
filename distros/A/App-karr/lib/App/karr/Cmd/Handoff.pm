@@ -1,7 +1,7 @@
 # ABSTRACT: Hand off a task for review
 
 package App::karr::Cmd::Handoff;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -49,9 +49,12 @@ option release => (
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
+  $self->check_positional_args($args_ref, 1);
+
   $self->sync_before;
 
-  my $id = $args_ref->[0] or die "Usage: karr handoff ID --claim NAME [--note TEXT] [--block REASON] [--release]\n";
+  my @pos = $self->positional_args($args_ref);
+  my $id = $pos[0] or die "Usage: karr handoff ID --claim NAME [--note TEXT] [--block REASON] [--release]\n";
 
   my $ec = $self->store->effective_config;
 
@@ -101,9 +104,7 @@ sub execute {
   $self->sync_after;
 
   if ($self->json) {
-    my $data = $task->to_frontmatter;
-    $data->{body} = $task->body if $task->body;
-    $self->print_json($data);
+    $self->print_json($task->to_json_hash);
     return;
   }
 
@@ -127,7 +128,7 @@ App::karr::Cmd::Handoff - Hand off a task for review
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

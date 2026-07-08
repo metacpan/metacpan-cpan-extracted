@@ -1,7 +1,7 @@
 # ABSTRACT: Modify an existing task
 
 package App::karr::Cmd::Edit;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -95,9 +95,12 @@ option unblock => (
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
+  $self->check_positional_args($args_ref, 1);
+
   $self->sync_before;
 
-  my $id_str = $args_ref->[0] or die "Usage: karr edit ID[,ID,...] [FLAGS]\n";
+  my @pos = $self->positional_args($args_ref);
+  my $id_str = $pos[0] or die "Usage: karr edit ID[,ID,...] [FLAGS]\n";
   my @ids = $self->parse_ids($id_str);
 
   my @results;
@@ -153,9 +156,7 @@ sub execute {
 
   $self->sync_after;
 
-  if ($self->json) {
-    $self->print_json(@results == 1 ? $results[0] : \@results);
-  }
+  $self->print_json_results(@results);
 }
 
 1;
@@ -172,7 +173,7 @@ App::karr::Cmd::Edit - Modify an existing task
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

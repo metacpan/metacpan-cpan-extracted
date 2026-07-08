@@ -30,5 +30,5 @@ resources:
   bugtracker: https://github.com/ronsavage/Crypt-PasswdMD5/issues
   license: http://opensource.org/licenses/Perl
   repository: https://github.com/ronsavage/Crypt-PasswdMD5.git
-version: '1.45'
+version: '1.46'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

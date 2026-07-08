@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::UBI;
-$OpenSearch::Client::Core::3_0::Direct::UBI::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::UBI::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::UBI>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for ubi.|https://docs.opensearch.org/latest/searc
 
 =head1 METHODS
     
-=head2 ubi->initialize
+=head2 initialize
 
 Initializes the UBI indexes.
 
@@ -91,7 +91,7 @@ C<POST /_plugins/ubi/initialize>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ubi.initialize|https://docs.opensearch.org/latest/search-plugins/ubi/index/>
+L<OpenSearch documentation for ubi-E<gt>initialize|https://docs.opensearch.org/latest/search-plugins/ubi/index/>
 
 =head1 MANUAL
 

@@ -1,7 +1,7 @@
 # ABSTRACT: Single-shot foundation daemon — periodic agent execution across karr boards
 
 package App::karr::Foundation;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Options (
   usage_string => 'USAGE: karr-foundation [options]',
@@ -9,13 +9,14 @@ use MooX::Options (
 use Carp qw( croak );
 use Path::Tiny;
 use YAML::XS ();
-use JSON::MaybeXS qw( encode_json decode_json );
 use Time::Piece;
-use IO::Select;
 use Digest::MD5 qw( md5_hex );
 use Try::Tiny;
 use App::karr::Git;
 use App::karr::BoardStore;
+use App::karr::Foundation::Runner;
+use App::karr::Foundation::State;
+use App::karr::Foundation::Overview;
 
 # Instruction handed to a synthesized agent command via the $PROMPT variable
 # when neither the .karr file nor the config overrides it.
@@ -84,6 +85,46 @@ sub _build_config_data {
   };
   croak "Config must be a YAML mapping" unless ref $data eq 'HASH';
   return $data;
+}
+
+# Collaborators split out of this module along its natural seams (see the
+# App::karr::Foundation::* classes). Each holds a weak back-reference to this
+# foundation for shared options/helpers; delegation keeps the historical
+# method names callable directly on the foundation object.
+
+has _runner => (
+  is      => 'lazy',
+  handles => [qw( _run_command _error_patterns _match_error )],
+);
+
+sub _build__runner {
+  my ( $self ) = @_;
+  return App::karr::Foundation::Runner->new( foundation => $self );
+}
+
+has _state => (
+  is      => 'lazy',
+  handles => [qw(
+    _lock_held _acquire_lock _release_lock
+    _state_get _state_set
+    _cooldown_active _set_cooldown _clear_cooldown
+    _bump_attempts _reset_attempts
+  )],
+);
+
+sub _build__state {
+  my ( $self ) = @_;
+  return App::karr::Foundation::State->new( foundation => $self );
+}
+
+has _overview => (
+  is      => 'lazy',
+  handles => [qw( _print_overview )],
+);
+
+sub _build__overview {
+  my ( $self ) = @_;
+  return App::karr::Foundation::Overview->new( foundation => $self );
 }
 
 
@@ -159,13 +200,28 @@ sub _discover_repos {
       # .karr file takes precedence; also detect karr-init'd repos
       if ( $child->child('.karr')->exists ) {
         push @repos, $child;
-      } elsif ( $child->child('.git/refs/karr/config')->exists ) {
+      } elsif ( $self->_is_karr_board_root( $child ) ) {
         push @repos, $child;
       }
     }
   }
 
   return @repos;
+}
+
+# True when $dir is *itself* the root of a karr-init'd repo — resolves via
+# libgit2 so packed refs (git gc / pack-refs) and worktree gitdir indirection
+# are handled, unlike a bare .git/refs/karr/config file check. libgit2's
+# open_ext walks up to find an enclosing .git, so a plain directory nested
+# inside a karr repo would spuriously match; guard by confirming the resolved
+# repo root is $dir, not an ancestor.
+sub _is_karr_board_root {
+  my ( $self, $dir ) = @_;
+  my $git = App::karr::Git->new( dir => "$dir" );
+  return 0 unless $git->is_repo;
+  my $root = $git->repo_root or return 0;
+  return 0 unless $root->realpath eq path( $dir )->realpath;
+  return $git->ref_exists('refs/karr/config');
 }
 
 # ---------------------------------------------------------------------------
@@ -175,9 +231,11 @@ sub _discover_repos {
 sub _process_repo {
   my ( $self, $repo ) = @_;
 
-  # Check if repo has karr board (either .karr file or karr refs)
+  # Check if repo has karr board (either .karr file or karr refs). Resolve the
+  # ref via libgit2 so packed refs and worktrees are handled — $repo is an
+  # already-known repo root here, so open_ext's walk-up cannot false-match.
   my $has_karr = $repo->child('.karr')->exists
-              || $repo->child('.git/refs/karr/config')->exists;
+              || App::karr::Git->new( dir => "$repo" )->ref_exists('refs/karr/config');
   unless ( $has_karr ) {
     $self->_say_verbose("skip $repo — no karr board");
     return;
@@ -424,52 +482,6 @@ sub _drain_repo {
 }
 
 # ---------------------------------------------------------------------------
-# Common-error detection
-# ---------------------------------------------------------------------------
-
-sub _error_patterns {
-  my ( $self, $karr ) = @_;
-  my @default = (
-    'rate limit', 'rate-limit', 'usage limit', 'quota exceeded', 'quota',
-    'overloaded', 'too many requests', '429', '529',
-    'unauthorized', 'forbidden', 'authentication', 'invalid api key',
-    'credentials', '401', '403',
-    'connection refused', 'connection reset', 'network', 'timed out',
-    'service unavailable', '503', '500 internal',
-  );
-  return [ @default, @{ $karr->{error_patterns} // [] } ];
-}
-
-sub _match_error {
-  my ( $self, $text, $patterns ) = @_;
-  return undef unless defined $text && length $text;
-  for my $p ( @$patterns ) {
-    return $p if $text =~ /\Q$p\E/i;
-  }
-  return undef;
-}
-
-# ---------------------------------------------------------------------------
-# Attempt counter (per task, persisted in .karr.state)
-# ---------------------------------------------------------------------------
-
-sub _bump_attempts {
-  my ( $self, $repo, $id ) = @_;
-  my $a = $self->_state_get( $repo, 'attempts' ) // {};
-  $a->{$id} = ( $a->{$id} // 0 ) + 1;
-  $self->_state_set( $repo, attempts => $a );
-  return $a->{$id};
-}
-
-sub _reset_attempts {
-  my ( $self, $repo, $id ) = @_;
-  my $a = $self->_state_get( $repo, 'attempts' ) // {};
-  return unless exists $a->{$id};
-  delete $a->{$id};
-  $self->_state_set( $repo, attempts => $a );
-}
-
-# ---------------------------------------------------------------------------
 # Auto-block (in-process via BoardStore, no karr CLI)
 # ---------------------------------------------------------------------------
 
@@ -485,201 +497,6 @@ sub _autoblock_task {
   $git->push;   # best-effort propagate to remote
   $self->_append_log( $repo, "AUTOBLOCK task#$id: $reason" );
   return 1;
-}
-
-# ---------------------------------------------------------------------------
-# Exponential cooldown (1, 2, 4, 8, ... minutes, capped) on common-error
-# ---------------------------------------------------------------------------
-
-sub _cooldown_active {
-  my ( $self, $repo ) = @_;
-  my $until = $self->_state_get( $repo, 'cooldown_until' ) or return 0;
-  return time < $until ? 1 : 0;
-}
-
-sub _set_cooldown {
-  my ( $self, $repo, $karr ) = @_;
-  return if $self->dry_run;
-  my $base    = $karr->{cooldown_base} // 1;    # minutes at level 0
-  my $cap     = $karr->{cooldown_max}  // 64;   # minutes ceiling
-  my $level   = $self->_state_get( $repo, 'cooldown_level' ) // 0;
-  my $minutes = $base * ( 2 ** $level );
-  $minutes = $cap if $minutes > $cap;
-  $self->_state_set( $repo,
-    cooldown_level => $level + 1,
-    cooldown_until => time + $minutes * 60,
-  );
-  $self->_say_verbose( "cooldown $repo — ${minutes}m (level " . ( $level + 1 ) . ")" );
-  return $minutes;
-}
-
-sub _clear_cooldown {
-  my ( $self, $repo ) = @_;
-  return if $self->dry_run;
-  my $level = $self->_state_get( $repo, 'cooldown_level' ) // 0;
-  return unless $level;
-  $self->_state_set( $repo, cooldown_level => 0, cooldown_until => 0 );
-}
-
-# ---------------------------------------------------------------------------
-# Command execution
-# ---------------------------------------------------------------------------
-
-sub _run_command {
-  my ( $self, $repo, $karr, $cmd ) = @_;
-  my $command      = $cmd // $karr->{command};
-  my $max_runtime  = $karr->{max_runtime} // 1800;
-  my $stream_terms = $self->_stream_to_terminal;
-
-  # Environment for the child (and all karr calls it spawns). Set before the
-  # substitution so a command template — including the synthesized claude
-  # command — can reference $PROMPT, $KARR_REPO, etc.
-  local $ENV{KARR_REPO} = "$repo";
-  local $ENV{KARR_ROLE} = 'agent';
-  local $ENV{PROMPT}    = $self->_prompt_for($karr);
-
-  # Env-var substitution in command string
-  $command =~ s/\$\{(\w+)\}/$ENV{$1} \/\/ ''/ge;
-  $command =~ s/\$(\w+)/$ENV{$1} \/\/ ''/ge;
-
-  $self->_append_log( $repo, "START command=$command" );
-  $self->_say_verbose("exec in $repo: $command");
-
-  if ( $self->dry_run ) {
-    $self->_append_log( $repo, "DRY-RUN (skipped)" );
-    return ( 0, '' );
-  }
-
-  my $log_file = $repo->child('.karr.log');
-
-  # Native pipe: the child writes stdout+stderr, the parent reads. The parent
-  # is the tee — it fans each chunk to the persistent log, the terminal (when
-  # streaming), and an in-memory buffer for error scanning. No external tee
-  # process to race, and the run's output is captured directly (no re-slurping
-  # the log via byte offsets).
-  pipe( my $reader, my $writer ) or croak "pipe failed: $!";
-
-  my $pid = fork;
-  croak "fork failed: $!" unless defined $pid;
-
-  if ( $pid == 0 ) {
-    # child
-    close $reader;
-    chdir "$repo" or die "chdir $repo: $!";
-    open( STDOUT, '>&', $writer ) or die "dup stdout: $!";
-    open( STDERR, '>&STDOUT' )    or die "dup stderr: $!";
-    exec( '/bin/sh', '-c', $command ) or die "exec: $!";
-  }
-
-  # parent
-  close $writer;
-  open( my $log_fh, '>>', "$log_file" ) or croak "open log: $!";
-  $log_fh->autoflush(1);
-
-  my $started   = time;
-  my $output    = '';
-  my $timed_out = 0;
-  my $sel       = IO::Select->new($reader);
-
-  while (1) {
-    my $wait;
-    if ( $max_runtime > 0 ) {
-      $wait = $max_runtime - ( time - $started );
-      if ( $wait <= 0 ) { $timed_out = 1; last }
-    }
-    # undef $wait => block indefinitely (max_runtime: 0 disables the timeout).
-    my @ready = $sel->can_read($wait);
-    unless (@ready) {
-      # Spurious wakeup (signal) or deadline. Only the deadline ends the loop.
-      next unless $max_runtime > 0;
-      if ( time - $started >= $max_runtime ) { $timed_out = 1; last }
-      next;
-    }
-    my $chunk;
-    my $n = sysread( $reader, $chunk, 65536 );
-    last if !defined $n;   # read error
-    last if $n == 0;       # EOF — the command closed its output
-    print {$log_fh} $chunk;
-    print $chunk if $stream_terms;
-    $output .= $chunk;
-  }
-
-  my $exit_code;
-  if ($timed_out) {
-    my $elapsed = time - $started;
-    $self->_append_log( $repo, "TIMEOUT after ${elapsed}s — sending SIGTERM to $pid" );
-    kill 'TERM', $pid;
-    sleep 2;
-    kill 'KILL', $pid;
-    waitpid( $pid, 0 );
-    $exit_code = -1;
-  } else {
-    waitpid( $pid, 0 );
-    $exit_code = $? >> 8;
-  }
-
-  close $reader;
-  close $log_fh;
-
-  my $elapsed = time - $started;
-  $self->_append_log( $repo, "END elapsed=${elapsed}s exit=$exit_code" );
-  return ( $exit_code, $output );
-}
-
-# ---------------------------------------------------------------------------
-# Lock file
-# ---------------------------------------------------------------------------
-
-sub _lock_file { path( $_[1]->child('.karr.lock') ) }
-
-sub _lock_held {
-  my ( $self, $repo ) = @_;
-  my $lock = $self->_lock_file( $repo );
-  return 0 unless $lock->exists;
-  my $pid = $lock->slurp_utf8;
-  chomp $pid;
-  return 0 unless $pid =~ /^\d+$/;
-  # Check if PID is alive
-  return kill( 0, $pid ) ? 1 : 0;
-}
-
-sub _acquire_lock {
-  my ( $self, $repo ) = @_;
-  return if $self->dry_run;
-  $self->_lock_file( $repo )->spew_utf8( "$$\n" );
-}
-
-sub _release_lock {
-  my ( $self, $repo ) = @_;
-  return if $self->dry_run;
-  my $lock = $self->_lock_file( $repo );
-  $lock->remove if $lock->exists;
-}
-
-# ---------------------------------------------------------------------------
-# State file
-# ---------------------------------------------------------------------------
-
-sub _state_file { path( $_[1]->child('.karr.state') ) }
-
-sub _state_get {
-  my ( $self, $repo, $key ) = @_;
-  my $state_file = $self->_state_file( $repo );
-  return undef unless $state_file->exists;
-  my $data = try { decode_json( $state_file->slurp_utf8 ) } catch { {} };
-  return $data->{$key};
-}
-
-sub _state_set {
-  my ( $self, $repo, %kv ) = @_;
-  return if $self->dry_run;
-  my $state_file = $self->_state_file( $repo );
-  my $data = {};
-  if ( $state_file->exists ) {
-    $data = try { decode_json( $state_file->slurp_utf8 ) } catch { {} };
-  }
-  $data->{$_} = $kv{$_} for keys %kv;
-  $state_file->spew_utf8( encode_json( $data ) );
 }
 
 # ---------------------------------------------------------------------------
@@ -760,48 +577,6 @@ sub _prompt_for {
       // $DEFAULT_PROMPT;
 }
 
-# ---------------------------------------------------------------------------
-# Overview (read-only dashboard)
-# ---------------------------------------------------------------------------
-
-sub _print_overview {
-  my ( $self, $repos ) = @_;
-  for my $repo (@$repos) {
-    my $karr   = $self->_load_karr($repo);
-    my %states = $self->_task_states($repo);
-
-    my %count;
-    my ( @in_progress, @blocked );
-    for my $id ( sort { $a <=> $b } keys %states ) {
-      my $st = $states{$id};
-      $count{ $st->{status} // 'unknown' }++;
-      push @in_progress, $id if ( $st->{status} // '' ) eq 'in-progress';
-      push @blocked,     $id if $st->{blocked};
-    }
-
-    my @flags;
-    push @flags, 'agent-running' if $self->_lock_held($repo);
-    if ( $self->_cooldown_active($repo) ) {
-      my $until = $self->_state_get( $repo, 'cooldown_until' ) // 0;
-      push @flags, 'cooldown ' . ( $until - time ) . 's';
-    }
-    push @flags, 'agent' if defined $self->_agent_command( $repo, $karr );
-
-    my $total = keys %states;
-    printf "%s\n", $repo->basename;
-    printf "  %d tasks", $total;
-    print '  [' . join( ', ', @flags ) . ']' if @flags;
-    print "\n";
-    if (%count) {
-      printf "  %s\n", join( '  ', map { "$_:$count{$_}" } sort keys %count );
-    }
-    printf "  in-progress: %s\n", join( ', ', map { "#$_" } @in_progress ) if @in_progress;
-    printf "  blocked:     %s\n", join( ', ', map { "#$_" } @blocked )     if @blocked;
-    print "\n";
-  }
-  return;
-}
-
 1;
 
 __END__
@@ -816,7 +591,7 @@ App::karr::Foundation - Single-shot foundation daemon — periodic agent executi
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

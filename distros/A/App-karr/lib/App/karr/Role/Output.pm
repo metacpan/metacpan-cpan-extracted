@@ -1,7 +1,7 @@
 # ABSTRACT: Role providing common output format options
 
 package App::karr::Role::Output;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo::Role;
 use MooX::Options;
 
@@ -22,6 +22,13 @@ sub print_json {
   print JSON::MaybeXS::encode_json($data) . "\n";
 }
 
+
+sub print_json_results {
+  my ($self, @results) = @_;
+  return unless $self->json;
+  $self->print_json(@results == 1 ? $results[0] : \@results);
+}
+
 1;
 
 __END__
@@ -36,12 +43,21 @@ App::karr::Role::Output - Role providing common output format options
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 DESCRIPTION
 
 Small role that adds shared output options for commands with alternate
 renderings and provides a JSON printer used throughout the CLI.
+
+=head2 print_json_results
+
+  $self->print_json_results(@results);
+
+Emits a batch of per-item result hashes as JSON when C<--json> is active, and
+is a no-op otherwise. A single result is rendered as a bare JSON object and
+multiple results as a JSON array, matching the output convention shared by the
+C<move>, C<edit>, C<delete>, and C<archive> commands.
 
 =head1 SUPPORT
 

@@ -1,7 +1,7 @@
 # ABSTRACT: Board configuration management
 
 package App::karr::Config;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use YAML::XS qw( LoadFile DumpFile );
 use Path::Tiny;
@@ -51,14 +51,6 @@ sub priorities {
   return @{ $self->data->{priorities} // [qw(low medium high critical)] };
 }
 
-sub next_id {
-  my ($self) = @_;
-  my $id = $self->data->{next_id} // 1;
-  $self->data->{next_id} = $id + 1;
-  $self->save;
-  return $id;
-}
-
 sub claim_timeout {
   my ($self) = @_;
   return $self->data->{claim_timeout} // '1h';
@@ -95,7 +87,7 @@ sub status_requires_claim {
     (ref $_ ? $_->{name} : $_) eq $status_name
   } @{$self->data->{statuses} // []};
   return 0 unless $sc;
-  return 1 if !ref $sc;
+  return 0 if !ref $sc;
   return $sc->{require_claim} ? 1 : 0;
 }
 
@@ -164,7 +156,7 @@ App::karr::Config - Board configuration management
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,13 @@
 # ABSTRACT: Task object representing a single kanban card
 
 package App::karr::Task;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use YAML::XS qw( Load Dump );
 use Path::Tiny;
 use Time::Piece;
 use JSON::MaybeXS qw( encode_json );
+use Carp qw( croak );
 
 
 has id         => ( is => 'ro', required => 1 );
@@ -84,6 +85,14 @@ sub to_frontmatter {
   return \%fm;
 }
 
+
+sub to_json_hash {
+  my ($self) = @_;
+  my $data = $self->to_frontmatter;
+  $data->{body} = $self->body if $self->body;
+  return $data;
+}
+
 sub to_markdown {
   my ($self) = @_;
   my $yaml = Dump($self->to_frontmatter);
@@ -118,7 +127,8 @@ sub from_file {
 
 sub save {
   my ($self, $dir) = @_;
-  $self->updated(gmtime->datetime . 'Z');
+  croak "Task has no file_path; ref-backed tasks must be persisted via BoardStore/save_task"
+    if !$dir && !$self->has_file_path;
   my $file = $dir ? path($dir)->child($self->filename) : path($self->file_path);
   $file->spew_utf8($self->to_markdown);
   $self->file_path($file);
@@ -139,7 +149,7 @@ App::karr::Task - Task object representing a single kanban card
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 
@@ -163,6 +173,15 @@ while they run.
 
 L<karr>, L<App::karr>, L<App::karr::BoardStore>, L<App::karr::Git>,
 L<App::karr::Config>
+
+=head2 to_json_hash
+
+  my $data = $task->to_json_hash;
+
+Returns the task as a plain hash reference ready for JSON encoding: the
+frontmatter fields from L</to_frontmatter> plus a C<body> key when the task has
+a non-empty body. Used by the C<show>, C<pick>, and C<handoff> commands to
+build their C<--json> payload.
 
 =head1 SUPPORT
 

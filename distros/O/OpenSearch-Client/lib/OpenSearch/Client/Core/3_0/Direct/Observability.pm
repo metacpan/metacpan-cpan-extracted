@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Observability;
-$OpenSearch::Client::Core::3_0::Direct::Observability::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Observability::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Observability>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for observability.|https://docs.opensearch.org/la
 
 =head1 METHODS
     
-=head2 observability->create_object
+=head2 create_object
 
 Creates a new observability object.
 
@@ -93,9 +93,9 @@ C<POST /_plugins/_observability/object>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for observability.create_object|https://docs.opensearch.org/latest/observing-your-data/>
+L<OpenSearch documentation for observability-E<gt>create_object|https://docs.opensearch.org/latest/observing-your-data/>
     
-=head2 observability->delete_object
+=head2 delete_object
 
 Deletes specific observability object specified by ID.
 
@@ -123,9 +123,9 @@ C<DELETE /_plugins/_observability/object/{object_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for observability.delete_object|https://docs.opensearch.org/latest/observing-your-data/>
+L<OpenSearch documentation for observability-E<gt>delete_object|https://docs.opensearch.org/latest/observing-your-data/>
     
-=head2 observability->delete_objects
+=head2 delete_objects
 
 Deletes specific observability objects specified by ID or a list of IDs.
 
@@ -154,9 +154,9 @@ C<DELETE /_plugins/_observability/object>
         'source'        =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for observability.delete_objects|https://docs.opensearch.org/latest/observing-your-data/>
+L<OpenSearch documentation for observability-E<gt>delete_objects|https://docs.opensearch.org/latest/observing-your-data/>
     
-=head2 observability->get_localstats
+=head2 get_localstats
 
 Retrieves local stats of all observability objects.
 
@@ -180,9 +180,9 @@ C<GET /_plugins/_observability/_local/stats>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for observability.get_localstats|https://docs.opensearch.org/latest/observing-your-data/>
+L<OpenSearch documentation for observability-E<gt>get_localstats|https://docs.opensearch.org/latest/observing-your-data/>
     
-=head2 observability->get_object
+=head2 get_object
 
 Retrieves specific observability object specified by ID.
 
@@ -210,9 +210,9 @@ C<GET /_plugins/_observability/object/{object_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for observability.get_object|https://docs.opensearch.org/latest/observing-your-data/>
+L<OpenSearch documentation for observability-E<gt>get_object|https://docs.opensearch.org/latest/observing-your-data/>
     
-=head2 observability->list_objects
+=head2 list_objects
 
 Retrieves list of all observability objects.
 
@@ -236,9 +236,9 @@ C<GET /_plugins/_observability/object>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for observability.list_objects|https://docs.opensearch.org/latest/observing-your-data/>
+L<OpenSearch documentation for observability-E<gt>list_objects|https://docs.opensearch.org/latest/observing-your-data/>
     
-=head2 observability->update_object
+=head2 update_object
 
 Updates an existing observability object.
 
@@ -268,7 +268,7 @@ C<PUT /_plugins/_observability/object/{object_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for observability.update_object|https://docs.opensearch.org/latest/observing-your-data/>
+L<OpenSearch documentation for observability-E<gt>update_object|https://docs.opensearch.org/latest/observing-your-data/>
 
 =head1 MANUAL
 

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SQL;
-$OpenSearch::Client::Core::3_0::Direct::SQL::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::SQL::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SQL>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ Use the SQL and PPL API to send queries to the SQL plugin. Use the _sql endpoint
 
 =head1 METHODS
     
-=head2 sql->close
+=head2 close
 
 Closes an open cursor to free server-side resources.
 
@@ -96,9 +96,9 @@ C<POST /_plugins/_sql/close>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for sql.close|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
+L<OpenSearch documentation for sql-E<gt>close|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
     
-=head2 sql->explain
+=head2 explain
 
 Returns the execution plan for a SQL or PPL query.
 
@@ -129,9 +129,9 @@ C<POST /_plugins/_sql/_explain>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for sql.explain|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
+L<OpenSearch documentation for sql-E<gt>explain|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
     
-=head2 sql->get_stats
+=head2 get_stats
 
 Retrieves performance metrics for the SQL plugin.
 
@@ -160,9 +160,9 @@ C<GET /_plugins/_sql/stats>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for sql.get_stats|https://opensearch.org/docs/latest/search-plugins/sql/monitoring/>
+L<OpenSearch documentation for sql-E<gt>get_stats|https://opensearch.org/docs/latest/search-plugins/sql/monitoring/>
     
-=head2 sql->post_stats
+=head2 post_stats
 
 Retrieves filtered performance metrics for the SQL plugin.
 
@@ -193,9 +193,9 @@ C<POST /_plugins/_sql/stats>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for sql.post_stats|https://opensearch.org/docs/latest/search-plugins/sql/monitoring/>
+L<OpenSearch documentation for sql-E<gt>post_stats|https://opensearch.org/docs/latest/search-plugins/sql/monitoring/>
     
-=head2 sql->query
+=head2 query
 
 Executes SQL or PPL queries against OpenSearch indexes.
 
@@ -226,9 +226,9 @@ C<POST /_plugins/_sql>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for sql.query|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
+L<OpenSearch documentation for sql-E<gt>query|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
     
-=head2 sql->settings
+=head2 settings
 
 Updates SQL plugin settings in the OpenSearch cluster configuration.
 
@@ -258,7 +258,7 @@ C<PUT /_plugins/_query/settings>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for sql.settings|https://opensearch.org/docs/latest/search-plugins/sql/settings/>
+L<OpenSearch documentation for sql-E<gt>settings|https://opensearch.org/docs/latest/search-plugins/sql/settings/>
 
 =head1 MANUAL
 

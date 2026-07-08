@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::CxnPool::Static;
-$OpenSearch::Client::Role::CxnPool::Static::VERSION = '3.007005';
+$OpenSearch::Client::Role::CxnPool::Static::VERSION = '3.007006';
 use Moo::Role;
 with 'OpenSearch::Client::Role::CxnPool';
 requires 'next_cxn';
@@ -63,7 +63,7 @@ OpenSearch::Client::Role::CxnPool::Static - A CxnPool role for connecting to a r
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 METHODS
 

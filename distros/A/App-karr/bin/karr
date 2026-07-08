@@ -9,9 +9,35 @@ use App::karr;
 if (@ARGV) {
     $ARGV[0] = 'setrefs' if $ARGV[0] eq 'set-refs';
     $ARGV[0] = 'getrefs' if $ARGV[0] eq 'get-refs';
+    $ARGV[0] = 'agentname' if $ARGV[0] eq 'agent-name';
 }
 
-App::karr->new_with_cmd;
+my $ran = eval { App::karr->new_with_cmd; 1 };
+if ( !$ran ) {
+    my $err = $@;
+
+    # Exit-code contract (ADR 0002): 0 success / 1 runtime failure / 2 usage
+    # error. This is the central handler the ADR calls for: it catches every
+    # uncaught die from a command body and turns it into a deterministic 1 or 2,
+    # replacing the accidental 255 an uncaught die used to leak.
+    #
+    # Usage-error dies carry one of these stable leading markers:
+    #   "Unknown command:"          the dispatch guard in App::karr
+    #   "unexpected extra argument"  surplus positionals (Role::CliArgs)
+    #   "Usage:"                     a missing required positional
+    # Any new usage-error die must start with one of these. Everything else --
+    # task not found, board missing, a Git/sync failure, a refused destructive
+    # operation -- is a runtime failure (1).
+    #
+    # Option-parse errors (unknown option, invalid option value) never reach
+    # here: MooX::Options exits 2 directly via App::karr::Role::ExitCodes (and
+    # the root's _print_help), so those exits bypass this eval.
+    my $is_usage = defined $err
+        && $err =~ /\A(?:Unknown command:|unexpected extra argument|Usage:)/;
+
+    print STDERR $err if defined $err && length $err;
+    exit( $is_usage ? 2 : 1 );
+}
 
 __END__
 
@@ -25,7 +51,7 @@ karr - Kanban Assignment & Responsibility Registry
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 
@@ -204,6 +230,30 @@ Stores arbitrary helper payloads in allowed refs outside protected namespaces.
 Fetches one helper ref and prints only its payload to standard output.
 
 =back
+
+=head1 EXIT CODES
+
+F<karr>'s primary callers are agents scripting the CLI, for whom C<$?> is part
+of the interface. The exit code is therefore a stable contract (see
+F<docs/adr/0002-exit-code-contract.md>):
+
+=over 4
+
+=item * B<0> — success, including no-op successes such as re-archiving a task
+that is already archived.
+
+=item * B<1> — runtime failure: a task id was not found, the board is missing,
+a Git or sync operation failed, a destructive command was refused for want of
+C<--yes>, or a batch committed partial work but at least one item failed.
+
+=item * B<2> — usage error: an unknown command, an unknown option, an invalid
+option value, or a surplus or missing positional argument.
+
+=back
+
+The C<1>-versus-C<2> split is what lets a scripting agent tell "I called this
+wrong" apart from "the operation failed". This deviates deliberately from
+kanban-md, which exits C<1> for everything.
 
 =head1 DOCKER USAGE
 

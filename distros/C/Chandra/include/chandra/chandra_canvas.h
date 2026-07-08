@@ -182,16 +182,37 @@ _canvas_push_op_6nv(pTHX_ AV *buf, int op, NV v1, NV v2, NV v3, NV v4, NV v5, NV
  * __float128 (NV_DIG <= 36 in any current Perl build). */
 #define CANVAS_NV_BUFSZ 64
 
-/* Stringify an NV from cmd[idx]. Uses Gconvert which is portable across
- * NV types (double, long double, __float128) - unlike literal "%g" in
- * sv_catpvf, which reads only `double` from va_args and produces garbage
- * when NV is wider. */
+/* Stringify an NV from cmd[idx] into buf (CANVAS_NV_BUFSZ bytes).
+ *
+ * We use SvPV rather than Gconvert(nv, NV_DIG, 0, buf).  Gconvert works
+ * correctly only when its fourth argument is a local char array, because
+ * on quadmath perls it expands to
+ *   quadmath_snprintf(buf, sizeof(buf), "%.*Qg", NV_DIG, nv)
+ * and sizeof(char*) = 8, giving a dangerously small output buffer.
+ * On non-quadmath Linux perls Gconvert uses sprintf(buf,"%.*g",n,x) where
+ * x is NV=__float128; %g reads only the low 8 bytes (all zeros for most
+ * values), producing "0" for every coordinate.
+ *
+ * SvPV delegates to Perl's own NV→string path, which uses Gconvert on an
+ * internal fixed-size char array where sizeof is correct, so it works for
+ * double, long double, and __float128 alike. */
 static const char *
 _canvas_nv_str(pTHX_ AV *cmd, SSize_t idx, char *buf)
 {
     SV **svp = av_fetch(cmd, idx, 0);
-    NV nv = (svp && *svp) ? SvNV(*svp) : 0.0;
-    Gconvert(nv, NV_DIG, 0, buf);
+    if (svp && *svp) {
+        STRLEN len;
+        const char *pv = SvPV(*svp, len);
+        if (len < CANVAS_NV_BUFSZ) {
+            memcpy(buf, pv, len + 1);
+        } else {
+            memcpy(buf, pv, CANVAS_NV_BUFSZ - 1);
+            buf[CANVAS_NV_BUFSZ - 1] = '\0';
+        }
+    } else {
+        buf[0] = '0';
+        buf[1] = '\0';
+    }
     return buf;
 }
 

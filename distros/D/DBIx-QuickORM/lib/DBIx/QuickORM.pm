@@ -3,16 +3,15 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak confess/;
 $Carp::Internal{ (__PACKAGE__) }++;
 
-use Storable qw/dclone/;
 use Sub::Util qw/set_subname/;
 use Scalar::Util qw/blessed/;
+use Role::Tiny ();
 
-use Scope::Guard();
 use DBIx::QuickORM::Schema::Autofill();
 
 use DBIx::QuickORM::Util qw/load_class find_modules/;
@@ -60,6 +59,7 @@ my @EXPORT = qw{
      row_class
      tables
      table
+      no_volatile
      view
       db_name
       column
@@ -67,6 +67,7 @@ my @EXPORT = qw{
        nullable
        not_null
        identity
+       volatile
        affinity
        type
        sql
@@ -78,6 +79,8 @@ my @EXPORT = qw{
      link
 };
 
+my %INSTALLED_NAMES;
+
 sub import {
     my $class = shift;
     my %params = @_;
@@ -86,6 +89,8 @@ sub import {
     my $rename = $params{rename} // {};
     my $skip   = $params{skip}   // {};
     my $only   = $params{only};
+
+    croak "Unknown import type '$type'" unless $type eq 'orm' || $type eq 'table';
 
     $only = {map {($_ => 1)} @$only} if $only;
 
@@ -103,17 +108,29 @@ sub import {
 
     for my $name (@EXPORT) {
         my $meth = $name;
-        $export{$name} //= set_subname("${caller}::$meth" => sub { shift @_ if @_ && $_[0] && "$_[0]" eq $caller; $builder->$meth(@_) });
+        $export{$name} //= set_subname("${caller}::$meth" => sub {
+            shift @_ if @_ && $_[0] && "$_[0]" eq $caller;
+            __PACKAGE__->_assert_not_core_shadow($meth, \@_);
+            return $builder->$meth(@_);
+        });
     }
 
     my %seen;
     for my $sym (keys %export) {
         my $name = $rename->{$sym} // $sym;
-        next if $skip->{$name} || $skip->{$sym};
-        next if $only && !($only->{$name} || $only->{$sym});
+
+        # 'import' and 'builder' are the machinery that makes a downstream
+        # `use My::ORM` work; an only/skip meant to filter the DSL functions
+        # must not silently disable them.
+        unless ($sym eq 'import' || $sym eq 'builder') {
+            next if $skip->{$name} || $skip->{$sym};
+            next if $only && !($only->{$name} || $only->{$sym});
+        }
+
         next if $seen{$name}++;
         no strict 'refs';
         *{"${caller}\::${name}"} = $export{$sym};
+        $INSTALLED_NAMES{$caller}{$name} = 1;
     }
 }
 
@@ -122,7 +139,6 @@ sub _caller {
 
     my $i = 0;
     while (my @caller = caller($i++)) {
-        return unless @caller;
         next if eval { $caller[0]->isa(__PACKAGE__) };
         return \@caller;
     }
@@ -143,7 +159,11 @@ sub unimport_from {
 
     my $stash = do { no strict 'refs'; \%{"$caller\::"} };
 
-    for my $item (@EXPORT, 'builder') {
+    # Remove exactly the names that were installed for this caller, which may
+    # differ from the default export names when a 'rename' was used at import.
+    my @items = $INSTALLED_NAMES{$caller} ? keys %{$INSTALLED_NAMES{$caller}} : (@EXPORT, 'builder');
+
+    for my $item (@items) {
         next unless exists $stash->{$item} && defined(*{$stash->{$item}}{CODE});
 
         my $glob = delete $stash->{$item};
@@ -186,8 +206,12 @@ sub quick {
     my $dialect = delete $params{dialect};
     my $autorow = delete $params{autorow};    # 0 = off (default), 1 = generated namespace, or a class-name prefix
     my $row_manager = delete $params{row_manager} // 'DBIx::QuickORM::RowManager::Cached';
+    my $no_volatile = delete $params{no_volatile};    # 1 = every table, or an arrayref of table names
 
     croak "Unknown parameter(s) to quick(): " . join(', ', sort keys %params) if keys %params;
+
+    croak "'no_volatile' must be a true scalar (every table) or an arrayref of table names"
+        if defined($no_volatile) && ref($no_volatile) && ref($no_volatile) ne 'ARRAY';
 
     croak "quick() requires exactly one of 'credentials' or 'connect'"
         unless (($creds ? 1 : 0) + ($connect ? 1 : 0)) == 1;
@@ -201,6 +225,9 @@ sub quick {
     require DBIx::QuickORM::DB;
     my %db_params = (dialect => $dialect_class, db_name => $db_name);
     if ($creds) {
+        if (my @bad = grep { $_ !~ /^(?:dsn|user|pass|attrs|dbd)$/ } keys %$creds) {
+            croak "Unknown credentials key(s): " . join(', ' => sort @bad) . " (valid: dsn, user, pass, attrs, dbd)";
+        }
         $db_params{dsn}        = $creds->{dsn}   if defined $creds->{dsn};
         $db_params{user}       = $creds->{user}  if defined $creds->{user};
         $db_params{pass}       = $creds->{pass}  if defined $creds->{pass};
@@ -219,9 +246,9 @@ sub quick {
     }
 
     my %autofill_args = (types => \%type_map, affinities => \%affinities, hooks => {}, skip => {});
+    $autofill_args{no_volatile} = $no_volatile if defined $no_volatile;
     if ($autorow) {
         my $base = "$autorow" eq '1' ? $class->_generate_autorow_base : $autorow;
-        $autofill_args{autorow} = $base;
         $autofill_args{hooks}{post_table} = [$class->_autorow_hook($base, undef, (caller)[1])];
     }
     my $autofill = DBIx::QuickORM::Schema::Autofill->new(%autofill_args);
@@ -253,7 +280,15 @@ sub _autorow_hook {
     };
 
     local $@;
-    my $parent = load_class($base) // load_class('DBIx::QuickORM::Row') or die $@;
+    my $parent = load_class($base);
+    unless ($parent) {
+        # Only fall back to the stock Row class when the base genuinely does not
+        # exist on disk; a base that exists but fails to compile must surface
+        # its error rather than silently losing the user's methods.
+        my $err = $@;
+        die $err unless $err =~ m/Can't locate .+ in \@INC/;
+        $parent = load_class('DBIx::QuickORM::Row') or die $@;
+    }
 
     return sub {
         my %params = @_;
@@ -264,13 +299,18 @@ sub _autorow_hook {
         my $package = "$base\::$postfix";
 
         local $@;
-        load_class($package);
+        unless (load_class($package)) {
+            # A missing per-table row class is expected (autofill generates it);
+            # a compile error in an existing one must not be swallowed.
+            my $err = $@;
+            die $err unless $err =~ m/Can't locate .+ in \@INC/;
+        }
 
         my $isa = do { no strict 'refs'; \@{"$package\::ISA"} };
         push @$isa => $parent unless @$isa;
 
         my $file = $package;
-        $file =~ s{::}{/};
+        $file =~ s{::}{/}g;
         $file .= ".pm";
         $INC{$file} ||= $caller_file;
 
@@ -416,7 +456,8 @@ sub plugins {
 
     my @out;
 
-    while (my $proto = shift @_) {
+    while (@_) {
+        my $proto = shift @_;
         if (@_ && ref($_[0]) eq 'HASH') {
             my $params = shift @_;
             push @out => $self->plugin($proto, $params);
@@ -461,7 +502,6 @@ sub build_class {
 sub server {
     my $self = shift;
 
-    my $top   = $self->top;
     my $into  = $self->{+SERVERS};
     my $frame = {building => 'SERVER'};
 
@@ -479,21 +519,37 @@ sub db {
         $bld_orm = 1;
     }
 
-    if (@_ == 1 && $_[0] =~ m/^(\S+)\.([^:\s]+)(?::(\S+))?$/) {
+    # Only treat a dotted argument as a server-qualified lookup when the leading
+    # segment is actually a defined server; otherwise fall through to the plain
+    # single-name registry path so a db whose own name contains a dot is still
+    # fetchable.
+    if (@_ == 1 && $_[0] =~ m/^(\S+)\.([^:\s]+)(?::(\S+))?$/ && $self->{+SERVERS}->{$1}) {
         my ($server_name, $db_name, $variant_name) = ($1, $2, $3);
 
         my $server = $self->{+SERVERS}->{$server_name} or croak "'$server_name' is not a defined server";
         my $db = $server->{meta}->{dbs}->{$db_name} or croak "'$db_name' is not a defined database on server '$server_name'";
 
-        return $top->{meta}->{db} = $db if $bld_orm;
+        if ($bld_orm) {
+            # Binding a db to an orm stores the definition; a variant selection
+            # would be silently discarded here, so refuse it rather than ignore.
+            croak "Cannot select a variant ('$variant_name') when binding a db to an orm" if defined $variant_name;
+            return $top->{meta}->{db} = $db;
+        }
         return $self->compile($db, $variant_name);
     }
 
     my $into = $self->{+DBS};
     my $frame = {building => 'DB', class => 'DBIx::QuickORM::DB'};
 
-    return $top->{meta}->{db} = $self->_build('DB', into => $into, frame => $frame, args => \@_, no_compile => 1)
-        if $bld_orm;
+    if ($bld_orm) {
+        # `db 'name'` fetches a previously-defined db from the shared registry
+        # (needs `into` to resolve the name). An inline `db name => sub {...}`
+        # DEFINES one; it is captured by reference in the ORM's meta, so it must
+        # NOT register into the shared registry -- otherwise a second ORM with a
+        # same-named inline db croaks on the redefinition guard.
+        my $inline_define = grep { ref($_) } @_;
+        return $top->{meta}->{db} = $self->_build('DB', ($inline_define ? () : (into => $into)), frame => $frame, args => \@_, no_compile => 1);
+    }
 
     my $force_build = 0;
     if ($top->{building} eq 'SERVER') {
@@ -507,10 +563,14 @@ sub db {
             server => $top->{name} // $top->{created},
         };
 
+        # The variant (alt) hashref is inherited from the server frame via the
+        # shallow copy above; sharing it would let a variant redefined on this
+        # db mutate the server and its sibling dbs. Deep-copy it.
+        $frame->{alt} = $self->_clone_ref($top->{alt}) if $top->{alt};
+
         delete $frame->{name};
         delete $frame->{meta}->{name};
         delete $frame->{meta}->{dbs};
-        delete $frame->{prefix} unless defined $frame->{prefix};
 
         $into = $top->{meta}->{dbs} //= {};
     }
@@ -604,6 +664,7 @@ sub autoname {
             my %params = @_;
             my $table = $params{table} // return;
             $table->{name} = $callback->(table => $table, name => $table->{name}) || $table->{name};
+            return $table;
         });
     }
     elsif ($type eq 'link') {
@@ -611,18 +672,24 @@ sub autoname {
             my %params = @_;
 
             my $links = $params{links} // return;
-            return unless @$links;
+            return $links unless @$links;
             for my $link_pair (@$links) {
                 my ($a, $b) = @$link_pair;
-                my $table_a = $a->[0];
-                my $table_b = $b->[0];
 
-                push @$a => $callback->(in_table => $a->[0], fetch_table => $b->[0], in_fields => $a->[1], fetch_fields => $b->[1])
-                    unless @$a > 2; # Skip if it has an alias
+                # Only claim an alias when the callback actually returns one; a
+                # falsy ("no opinion") return must leave the pair unaliased so
+                # later naming hooks still get a chance at it.
+                unless (@$a > 2) {    # Skip if it already has an alias
+                    my $name = $callback->(in_table => $a->[0], fetch_table => $b->[0], in_fields => $a->[1], fetch_fields => $b->[1]);
+                    push @$a => $name if $name;
+                }
 
-                push @$b => $callback->(in_table => $b->[0], fetch_table => $a->[0], in_fields => $b->[1], fetch_fields => $a->[1])
-                    unless @$b > 2; # Skip if it has an alias
+                unless (@$b > 2) {    # Skip if it already has an alias
+                    my $name = $callback->(in_table => $b->[0], fetch_table => $a->[0], in_fields => $b->[1], fetch_fields => $a->[1]);
+                    push @$b => $name if $name;
+                }
             }
+            return $links;
         });
     }
     else {
@@ -663,7 +730,8 @@ sub autoskip {
 
     my $last = pop @args;
     my $into = $top->{meta}->{skip}->{$type} //= {};
-    while (my $level = shift @args) {
+    while (@args) {
+        my $level = shift @args;
         $into = $into->{$level} //= {};
     }
     $into->{$last} = 1;
@@ -737,7 +805,7 @@ sub creds {
     croak "Neither 'host' or 'socket' keys were provided by the credential subroutine" unless $creds{host} || $creds{socket};
 
     my @keys = keys %creds;
-    @{$top->{meta} // {}}{@keys} = @creds{@keys};
+    @{$top->{meta}}{@keys} = @creds{@keys};
 
     return;
 }
@@ -762,7 +830,12 @@ sub schema {
     my $top = $self->top;
     if ($top->{building} eq 'ORM') {
         croak "Schema has already been defined" if $top->{meta}->{schema};
-        return $top->{meta}->{schema} = $self->_build('Schema', into => $into, frame => $frame, args => \@_, no_compile => 1);
+        # `schema 'name'` fetches from the shared registry (needs `into`); an
+        # inline `schema name => sub {...}` DEFINES one, captured by reference in
+        # the ORM's meta, so it must not register into the shared registry (else
+        # a second ORM with a same-named inline schema croaks on the guard).
+        my $inline_define = grep { ref($_) } @_;
+        return $top->{meta}->{schema} = $self->_build('Schema', ($inline_define ? () : (into => $into)), frame => $frame, args => \@_, no_compile => 1);
     }
 
     return $self->_build('Schema', into => $into, frame => $frame, args => \@_);
@@ -807,6 +880,43 @@ sub _load_table {
     return $table;
 }
 
+sub _assert_not_core_shadow {
+    my $self = shift;
+    my ($meth, $args) = @_;
+
+    # connect/index/socket are exported as DSL builders, and importing
+    # DBIx::QuickORM installs them into the caller's package where they shadow
+    # the Perl built-ins of the same name. A call whose arguments have the
+    # shape of the built-in almost certainly meant the built-in, so rather than
+    # quietly misroute it into the builder, tell the caller how to disambiguate.
+    my $looks_builtin
+        = ($meth eq 'connect' && @$args == 2 && ref($args->[0]))                                        ? 1
+        : ($meth eq 'index'   && @$args == 2 && !ref($args->[0]) && !ref($args->[1]))                    ? 1
+        : ($meth eq 'index'   && @$args == 3 && !grep { ref($_) } @$args)                                ? 1
+        : ($meth eq 'socket'  && @$args == 4)                                                            ? 1
+        :                                                                                                  0;
+
+    return unless $looks_builtin;
+
+    croak "'$meth' here is DBIx::QuickORM's DSL builder, which shadows the "
+        . "built-in $meth() in this package, but these arguments look like a call "
+        . "to the Perl built-in $meth(). Use CORE::$meth(...) to reach the "
+        . "built-in; the DSL only shadows connect/index/socket in a package that "
+        . "imported DBIx::QuickORM.";
+}
+
+sub _clone_ref {
+    my $self = shift;
+    my ($value) = @_;
+
+    my $ref = ref($value) or return $value;
+    return $value if $ref eq 'CODE';
+    return do { my $copy = $$value; \$copy } if $ref eq 'SCALAR';
+    return [map { $self->_clone_ref($_) } @$value] if $ref eq 'ARRAY';
+    return {map { $_ => $self->_clone_ref($value->{$_}) } keys %$value} if $ref eq 'HASH';
+    return $value;
+}
+
 sub table {
     my $self = shift;
     $self->_table('DBIx::QuickORM::Schema::Table', @_);
@@ -831,14 +941,14 @@ sub _table {
         $self->unimport_from($self->{+PACKAGE});
 
         my $pkg       = $self->{+PACKAGE};
-        my $row_class = $table->{row_class} // '+DBIx::QuickORM::Row';
-        my $loaded_class = load_class($row_class, 'DBIx::QuickORM::Row') or croak "Could not load row class '$row_class': $@";
+        my $row_class = $table->{meta}->{row_class} // 'DBIx::QuickORM::Row';
+        my $loaded_class = load_class($row_class) or croak "Could not load row class '$row_class': $@";
         $table->{row_class} = $self->{+PACKAGE};
         $table->{meta}->{row_class} = $self->{+PACKAGE};
 
         {
             no strict 'refs';
-            *{"$pkg\::qorm_table"} = sub { dclone($table) };
+            *{"$pkg\::qorm_table"} = sub { $self->_clone_ref($table) };
             push @{"$pkg\::ISA"} => $loaded_class;
         }
 
@@ -857,7 +967,8 @@ sub _table {
         my @args = @_;
         my ($class, $name, $cb, $no_match);
 
-        while (my $arg = shift @args) {
+        while (@args) {
+            my $arg = shift @args;
             if    ($arg =~ m/::/) { $class = $arg }
             elsif (my $ref = ref($arg)) {
                 if   ($ref eq 'CODE') { $cb       = $arg }
@@ -868,6 +979,10 @@ sub _table {
 
         if ($class && !$no_match) {
             my $table = $self->_load_table($class);
+
+            croak "'$class' defines a $table->{class}, not a $make"
+                if $table->{class} && $table->{class} ne $make;
+
             $name //= $table->{name};
             $into->{$name} = $table;
 
@@ -888,7 +1003,8 @@ sub index {
     my $self = shift;
     my ($name, $cols, $params);
 
-    while (my $arg = shift @_) {
+    while (@_) {
+        my $arg = shift @_;
         my $ref = ref($arg);
         if    (!$ref)           { $name = $arg }
         elsif ($ref eq 'HASH')  { $params = {%{$params // {}}, %{$arg}} }
@@ -928,10 +1044,11 @@ sub column {
             my $extra = $params{extra};
             my $meta  = $params{meta};
 
-            while (my $arg = shift @$extra) {
+            while (@$extra) {
+                my $arg = shift @$extra;
                 local $@;
                 if (blessed($arg)) {
-                    if ($arg->DOES('DBIx::QuickORM::Role::Type')) {
+                    if (Role::Tiny::does_role($arg, 'DBIx::QuickORM::Role::Type')) {
                         $meta->{type} = $arg;
                     }
                     else {
@@ -958,6 +1075,9 @@ sub column {
                 elsif ($arg eq 'omit') {
                     $meta->{omit} = 1;
                 }
+                elsif ($arg eq 'volatile') {
+                    $meta->{volatile} = 1;
+                }
                 elsif ($arg eq 'sql_default' || $arg eq 'perl_default') {
                     $meta->{$arg} = shift @$extra;
                 }
@@ -965,7 +1085,7 @@ sub column {
                     $meta->{affinity} = $arg;
                 }
                 elsif (my $class = load_class($arg, 'DBIx::QuickORM::Type')) {
-                    croak "Class '$class' does not implement DBIx::QuickORM::Role::Type" unless $class->DOES('DBIx::QuickORM::Role::Type');
+                    croak "Class '$class' does not implement DBIx::QuickORM::Role::Type" unless Role::Tiny::does_role($class, 'DBIx::QuickORM::Role::Type');
                     $meta->{type} = $class;
                 }
                 else {
@@ -982,17 +1102,20 @@ sub columns {
 
     my $top = $self->_in_builder(qw{table});
 
-    my (@names, $other);
+    my (@names, $other, $cb);
     for my $arg (@_) {
         my $ref = ref($arg);
         if    (!$ref)          { push @names => $arg }
         elsif ($ref eq 'HASH') { croak "Cannot provide multiple hashrefs" if $other; $other = $arg }
+        elsif ($ref eq 'CODE') { croak "Only one builder is supported"    if $cb;    $cb = $arg }
         else                   { croak "Not sure what to do with '$arg' ($ref)" }
     }
 
-    return [map { $self->column($_, $other) } @names] if defined wantarray;
+    my @extra = grep { defined } ($other, $cb);
 
-    $self->column($_, $other) for @names;
+    return [map { $self->column($_, @extra) } @names] if defined wantarray;
+
+    $self->column($_, @extra) for @names;
 
     return;
 }
@@ -1039,7 +1162,7 @@ sub _check_type {
 
     return $type if ref($type) eq 'SCALAR';
     return undef if ref($type);
-    return $type if $type->DOES('DBIx::QuickORM::Role::Type');
+    return $type if Role::Tiny::does_role($type, 'DBIx::QuickORM::Role::Type');
 
     my $class = load_class($type, 'DBIx::QuickORM::Type') or return undef;
     return $class;
@@ -1068,6 +1191,7 @@ sub type {
 }
 
 sub omit     { defined(wantarray) ? (($_[1] // 1) ? 'omit'     : ())         : ($_[0]->_in_builder('column')->{meta}->{omit}     = $_[1] // 1) }
+sub volatile { defined(wantarray) ? (($_[1] // 1) ? 'volatile' : ())         : ($_[0]->_in_builder('column')->{meta}->{volatile} = $_[1] // 1) }
 sub identity { defined(wantarray) ? (($_[1] // 1) ? 'identity' : ())         : ($_[0]->_in_builder('column')->{meta}->{identity} = $_[1] // 1) }
 sub nullable { defined(wantarray) ? (($_[1] // 1) ? 'nullable' : 'not_null') : ($_[0]->_in_builder('column')->{meta}->{nullable} = $_[1] // 1) }
 sub not_null { defined(wantarray) ? (($_[1] // 1) ? 'not_null' : 'nullable') : ($_[0]->_in_builder('column')->{meta}->{nullable} = ($_[1] // 1) ? 0 : 1) }
@@ -1126,6 +1250,13 @@ sub row_class {
     $top->{meta}->{row_class} = $class;
 }
 
+sub no_volatile {
+    my $self = shift;
+
+    my $top = $self->_in_builder(qw{table});
+    return $top->{meta}->{no_volatile} = (@_ ? ($_[0] ? 1 : 0) : 1);
+}
+
 sub primary_key {
     my $self = shift;
     my (@list) = @_;
@@ -1153,6 +1284,9 @@ sub primary_key {
         croak "Not enough arguments" unless @list;
         $meta = $top->{meta};
     }
+
+    croak "primary_key is already defined for this table; pass { override => 1 } to replace it, or use the table-level list form for a composite key"
+        if $meta->{primary_key} && !$opts->{override};
 
     $meta->{primary_key} = \@list;
     $meta->{primary_key_override} = 1 if $opts->{override};
@@ -1211,7 +1345,8 @@ sub link {
     }
 
     my @nodes;
-    while (my $first = shift @args) {
+    while (@args) {
+        my $first = shift @args;
         my $fref = ref($first);
         if (!$fref) {
             my $second = shift(@args);
@@ -1244,6 +1379,7 @@ sub link {
         ($other) = @nodes;
     }
     else {
+        croak "link requires exactly two nodes (a local and an other), got " . scalar(@nodes) unless @nodes == 2;
         ($local, $other) = @nodes;
     }
 
@@ -1267,7 +1403,6 @@ sub orm {
 
 my %RECURSE = (
     DB       => {},
-    LINK     => {},
     COLUMN   => {},
     AUTOFILL => {},
     ORM      => {schema  => 1, db => 1, autofill => 1},
@@ -1325,6 +1460,32 @@ sub compile {
     return $out;
 }
 
+sub _variant_exists {
+    my $self = shift;
+    my ($frame, $variant) = @_;
+
+    return 1 if $frame->{alt}->{$variant};
+
+    my $recurse = $RECURSE{$frame->{building}} or return 0;
+    my $meta = $frame->{meta} // {};
+
+    for my $field (keys %$recurse) {
+        my $val = $meta->{$field} // next;
+
+        if ($recurse->{$field} > 1) {
+            for my $name (keys %$val) {
+                return 1 if $self->_variant_exists($val->{$name}, $variant);
+            }
+
+            next;
+        }
+
+        return 1 if $self->_variant_exists($val, $variant);
+    }
+
+    return 0;
+}
+
 sub _merge {
     my $self = shift;
     my ($a, $b) = @_;
@@ -1339,7 +1500,8 @@ sub _merge {
     # Not a ref, a wins
     return $a // $b unless $ref_a;
 
-    return { %$a, %$b } if $ref_a eq 'HASH';
+    return { %$b, %$a } if $ref_a eq 'HASH';
+    return $a if $ref_a eq 'ARRAY' || $ref_a eq 'SCALAR' || $ref_a eq 'CODE';
 
     croak "Not sure how to merge $a and $b";
 }
@@ -1362,7 +1524,15 @@ sub _build {
     for my $arg (@$args) {
         my $ref = ref($arg);
         if    (!$ref)          { if ($name) { push @extra => $arg } else { $name = $arg } }
-        elsif ($ref eq 'CODE') { croak "Multiple builders provided!" if $builder; $builder = $arg }
+        elsif ($ref eq 'CODE') {
+            if (@extra && $extra[-1] eq 'perl_default') {
+                push @extra => $arg;
+            }
+            else {
+                croak "Multiple builders provided!" if $builder;
+                $builder = $arg;
+            }
+        }
         elsif ($ref eq 'HASH') { croak "Multiple meta hashes provided!" if $meta_arg; $meta_arg = $arg }
         else                   { push @extra => $arg }
     }
@@ -1378,6 +1548,7 @@ sub _build {
     # Simple fetch
     if ($name && !$builder && !$meta_arg && !$force_build) {
         croak "'$name' is not a defined $type" unless $into->{$name};
+        croak "'$alt' is not a defined $type variant for '$name'" if $alt && !$self->_variant_exists($into->{$name}, $alt);
         return $self->compile($into->{$name}, $alt) unless $params{no_compile};
         return $into->{$name};
     }
@@ -1413,7 +1584,15 @@ sub _build {
     if ($into) {
         my $ref = ref($into);
         if ($ref eq 'HASH') {
-            $into->{$name} = $frame if $name;
+            if ($name) {
+                # A re-opened alt frame is the same reference we were handed, so
+                # only a genuinely new definition landing on an existing name is
+                # a conflict.
+                croak "$type '$name' has already been defined"
+                    if $into->{$name} && $into->{$name} != $frame;
+
+                $into->{$name} = $frame;
+            }
         }
         elsif ($ref eq 'SCALAR') {
             ${$into} = $frame;
@@ -1461,6 +1640,65 @@ With this ORM builder you can specify:
 
 =back
 
+=head1 EARLY DEVELOPMENT NOTICE
+
+It is important to note that if you use DBIx::QuickORM currently you will be an
+early adopter. The userbase is still small, so a lot has not been battle
+tested. Also with a small userbase I still feel free to try a few things out
+and make breaking changes. This will change if enough people indicate active
+use of this project. Once it has an active userbase it will stabilize and
+breaking changes will require good reason. Also with active users come bug
+reports that will help make the project more robust.
+
+=head2 NOTES ON AI USE IN THIS PROJECT
+
+=head3 HUMAN WRITTEN FROM THE START
+
+This project was initially entirely human authored for ~2 years. Most of the
+code is still human written.
+
+Recently AI/LLM has been leveraged to find bugs and write some missing
+documentation.
+
+Some partially implemented features have also been completed with AI/LLM
+assistance.
+
+=head3 AI/LLM IS ALLOWED
+
+I will not police what tools contributors use to write and submit their
+contributions, this includes AI/LLM. I will however verify quality of any and
+all submissions.
+
+I expect all PRs, bug reports, and feature requests to be:
+
+=over 4
+
+=item Reasonably sized
+
+Nobody likes a wall of text or code that takes forever to read.
+
+=item Human Reviewable
+
+If a human (usually me) cannot read, digest, and understand the review, it will
+not be merged. I may delegate this to other trusted DBIx::QuickORM contributors
+who have a proven track record.
+
+=item Understood by the one submitting them
+
+For a PR you MUST understand what you are submitting, full stop.
+
+For bug reports it is ok to report a bug that is affecting you, even if you do
+not understand the bug. Usually bugs come from misunderstanding, so this bullet
+point is largely about code submissions.
+
+=item Documentation must not be in "the uncanny valley"
+
+AI Authored documentation is fine, as long as it can be read and understood
+easily. A lot of AI documentation can look good on the surface, but be utterly
+perplexing when a human reads it, which is not acceptable.
+
+=back
+
 =head1 DOCUMENTATION
 
 The best place to start is L<DBIx::QuickORM::Manual::QuickStart>, which walks
@@ -1479,6 +1717,17 @@ an end-to-end guide - for that, start with the manual.
 =head1 ORM BUILDER EXPORTS
 
 You get all these when using DBIx::QuickORM.
+
+Three of these exports (C<connect>, C<index>, and C<socket>) have the same
+names as Perl built-ins, so importing DBIx::QuickORM shadows those built-ins
+B<in the importing package only> (it is a lexical-scope import, not a global
+change). Inside such a package, C<connect(...)>, C<index(...)>, and
+C<socket(...)> call the DSL builders below. If you need the Perl built-in in
+that package, call it explicitly as C<CORE::connect(...)>,
+C<CORE::index(...)>, or C<CORE::socket(...)>. As a convenience, a call to one
+of these that has the exact argument shape of the built-in (for example
+C<index($string, $substr)>) croaks with a reminder to use C<CORE::> rather
+than silently misrouting into the builder.
 
 =over 4
 
@@ -2074,6 +2323,48 @@ specification without a builder.
 
 Can be nested under C<column>.
 
+=item C<volatile>
+
+Marks a column as B<volatile>. A volatile column is one whose stored value the
+database may set or change during a write, so the value the caller sent cannot be
+trusted as the in-memory truth. Common sources are generated columns, identity or
+sequence-backed columns, server-side defaults, C<ON UPDATE> clauses, and triggers.
+
+    column updated_at => sub {
+        affinity 'string';
+        volatile;
+    };
+
+After a write QuickORM does not keep a stale in-memory value for a volatile
+column the database owns. Instead of trusting the sent value it lazily fetches
+the real stored value the next time the column is read:
+
+=over 4
+
+=item When you explicitly send a value for a non-omitted column on an insert, that value is kept (a server default does not override a value you provided).
+
+=item When the database fills a column you did not send (a generated or defaulted column), that column is dropped and lazily re-fetched on the next read.
+
+=item When a column is both volatile and omitted, its sent value is cleared and lazily re-fetched on the next read.
+
+=item When the write is an update, every volatile column is lazily re-fetched, because an C<ON UPDATE> clause or a trigger may have changed it.
+
+=item When you call C<auto_refresh> (or C<insert_and_refresh>), the whole row is read back from the database immediately instead of lazily.
+
+=back
+
+QuickORM auto-marks the columns it can detect as volatile during introspection
+(generated, identity or sequence-backed, server-default, and on-update columns,
+plus columns a trigger is seen to set). Use this marker for anything
+auto-detection cannot see.
+
+In a non-void context it returns the string C<volatile> for use in a column
+specification without a builder.
+
+    column updated_at => ('string', 'volatile');
+
+Can be nested under C<column>.
+
 =item C<nullable()>
 
 =item C<nullable(1)>
@@ -2296,6 +2587,27 @@ The options hashref works under a column builder too:
         ...
         primary_key({override => 1});
     };
+
+=item C<no_volatile>
+
+=item C<no_volatile(1)>
+
+=item C<no_volatile(0)>
+
+Marks a whole table as B<volatile-free>: an explicit assertion that none of its
+columns are volatile (see C<volatile> under C<column>). Use it to opt a table
+out of the conservative trigger handling and to silence the per-table warning
+QuickORM emits when it finds a trigger whose column effects it cannot resolve.
+
+    table events => sub {
+        no_volatile;
+        column id => sub { primary_key; affinity 'numeric' };
+        ...
+    };
+
+The same assertion can be made for one or more tables from the C<quick>
+interface with C<< no_volatile => [ 'events', ... ] >> (or C<< no_volatile => 1 >>
+for every table). Can be nested under C<table>.
 
 =item C<unique>
 

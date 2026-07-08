@@ -1,0 +1,11 @@
+CREATE TABLE foo (
+    foo_id  INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name    VARCHAR(20) NOT NULL,
+
+    UNIQUE(name)
+);
+
+CREATE TABLE has_foo (
+    has_foo_id  INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    foo_id      INTEGER REFERENCES foo(foo_id)
+);

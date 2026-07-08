@@ -5,7 +5,7 @@ use warnings;
 
 use Chandra;  # Loads XS which includes Window functions
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
 # All methods are implemented in XS (xs/window.xs)
 # See POD below for API documentation

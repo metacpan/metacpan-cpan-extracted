@@ -125,4 +125,11 @@
 #  endif
 #endif
 
+/* op_contextualize: introduced in Perl 5.13.6; ppport.h provides no backport.
+ * G_SCALAR -> scalar(o), G_ARRAY -> list(o), anything else -> identity. */
+#ifndef op_contextualize
+#  define op_contextualize(o, c) \
+    ((c) == G_SCALAR ? scalar(o) : (c) == G_ARRAY ? list(o) : (o))
+#endif
+
 #endif /* FILE_COMPAT_H */

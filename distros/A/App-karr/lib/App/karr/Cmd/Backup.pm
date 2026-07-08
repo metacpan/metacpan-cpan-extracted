@@ -1,7 +1,7 @@
 # ABSTRACT: Export the ref-backed karr board as YAML
 
 package App::karr::Cmd::Backup;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -9,8 +9,11 @@ use MooX::Options (
 );
 use Path::Tiny;
 use YAML::XS qw( Dump );
-use App::karr::Git;
-use App::karr::BoardStore;
+use App::karr::Role::BoardDiscovery;
+use App::karr::Role::SyncLifecycle;
+
+with 'App::karr::Role::BoardDiscovery';
+with 'App::karr::Role::SyncLifecycle';
 
 
 option output => (
@@ -22,14 +25,15 @@ option output => (
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
-  my $git = App::karr::Git->new( dir => '.' );
-  die "Not a git repository. karr requires Git.\n" unless $git->is_repo;
+  # store honours --dir (both call forms) and dies loudly if the target is
+  # not a Git repository, instead of hardcoding the current directory.
+  my $store = $self->store;
 
-  my $root = $git->repo_root;
-  $git = App::karr::Git->new( dir => $root->stringify );
-  $git->pull if $git->has_remote;
+  # Backup is read-only: take the retrying pull half of the sync lifecycle,
+  # then mark the guard done so this read path never pushes on exit or on die.
+  my $guard = $self->sync_before;
+  $guard->done;
 
-  my $store = App::karr::BoardStore->new( git => $git );
   die "No karr board found. Run 'karr init' to create one.\n"
     unless $store->board_exists;
 
@@ -60,7 +64,7 @@ App::karr::Cmd::Backup - Export the ref-backed karr board as YAML
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

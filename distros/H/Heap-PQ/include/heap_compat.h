@@ -78,4 +78,31 @@
 #  define newSVpvn_flags(s,len,flags) newSVpvn(s,len)
 #endif
 
+/* PUSH_MULTICALL on pre-5.11 perls inlines cxinc() directly into the .so.
+ * On FreeBSD (and other platforms) with a static libperl.a, cxinc is not
+ * reachable via dlopen even when the perl binary was linked with -Wl,-E.
+ * We define a portable call_sv fallback used by heap_sift_{up,down}_custom
+ * on those perls; the MULTICALL fast path is used on 5.11+. */
+#if PERL_VERSION_GE(5, 11, 0)
+#  define HEAP_USE_MULTICALL 1
+#else
+#  define HEAP_USE_MULTICALL 0
+#endif
+
+/* Portable comparison call: set $a/$b then invoke the comparator via call_sv.
+ * Used in the pre-5.11 fallback path inside heap_sift_{up,down}_custom. */
+#define HEAP_CMP_CALL(h, sv_a, sv_b, result_var) \
+    STMT_START { \
+        int _heap_cnt; \
+        GvSV((h)->gv_a) = (sv_a); \
+        GvSV((h)->gv_b) = (sv_b); \
+        ENTER; SAVETMPS; \
+        PUSHMARK(SP); \
+        PUTBACK; \
+        _heap_cnt = call_sv((h)->comparator, G_SCALAR); \
+        SPAGAIN; \
+        (result_var) = _heap_cnt > 0 ? SvIV(POPs) : 0; \
+        PUTBACK; FREETMPS; LEAVE; \
+    } STMT_END
+
 #endif /* HEAP_COMPAT_H */

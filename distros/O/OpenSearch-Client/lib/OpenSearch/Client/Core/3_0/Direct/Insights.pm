@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Insights;
-$OpenSearch::Client::Core::3_0::Direct::Insights::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Insights::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Insights>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for insights.|https://docs.opensearch.org/latest/
 
 =head1 METHODS
     
-=head2 insights->top_queries
+=head2 top_queries
 
 Retrieves the top queries based on the given metric type (latency, CPU, or memory).
 
@@ -95,7 +95,7 @@ C<GET /_insights/top_queries>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for insights.top_queries|https://docs.opensearch.org/latest/observing-your-data/query-insights/index/>
+L<OpenSearch documentation for insights-E<gt>top_queries|https://docs.opensearch.org/latest/observing-your-data/query-insights/index/>
 
 =head1 MANUAL
 

@@ -116,6 +116,12 @@ subtest 'callback_url with existing query params' => sub {
     like $url, qr{amount=1000}, 'amount added';
 };
 
+subtest 'callback_url inserts query before fragment' => sub {
+    my $url = callback_url('https://pay.test/cb?token=abc#frag', amount => 1000, lnurl => 'lnurl1test');
+    is $url, 'https://pay.test/cb?token=abc&amount=1000&lnurl=lnurl1test#frag',
+        'new query parameters appear before fragment';
+};
+
 ###############################################################################
 # new_request validation
 ###############################################################################

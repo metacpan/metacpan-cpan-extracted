@@ -17,6 +17,64 @@ DESCRIPTION
 
     Plugins to use.
 
+EARLY DEVELOPMENT NOTICE
+
+    It is important to note that if you use DBIx::QuickORM currently you
+    will be an early adopter. The userbase is still small, so a lot has not
+    been battle tested. Also with a small userbase I still feel free to try
+    a few things out and make breaking changes. This will change if enough
+    people indicate active use of this project. Once it has an active
+    userbase it will stabilize and breaking changes will require good
+    reason. Also with active users come bug reports that will help make the
+    project more robust.
+
+ NOTES ON AI USE IN THIS PROJECT
+
+  HUMAN WRITTEN FROM THE START
+
+    This project was initially entirely human authored for ~2 years. Most
+    of the code is still human written.
+
+    Recently AI/LLM has been leveraged to find bugs and write some missing
+    documentation.
+
+    Some partially implemented features have also been completed with
+    AI/LLM assistance.
+
+  AI/LLM IS ALLOWED
+
+    I will not police what tools contributors use to write and submit their
+    contributions, this includes AI/LLM. I will however verify quality of
+    any and all submissions.
+
+    I expect all PRs, bug reports, and feature requests to be:
+
+    Reasonably sized
+
+      Nobody likes a wall of text or code that takes forever to read.
+
+    Human Reviewable
+
+      If a human (usually me) cannot read, digest, and understand the
+      review, it will not be merged. I may delegate this to other trusted
+      DBIx::QuickORM contributors who have a proven track record.
+
+    Understood by the one submitting them
+
+      For a PR you MUST understand what you are submitting, full stop.
+
+      For bug reports it is ok to report a bug that is affecting you, even
+      if you do not understand the bug. Usually bugs come from
+      misunderstanding, so this bullet point is largely about code
+      submissions.
+
+    Documentation must not be in "the uncanny valley"
+
+      AI Authored documentation is fine, as long as it can be read and
+      understood easily. A lot of AI documentation can look good on the
+      surface, but be utterly perplexing when a human reads it, which is
+      not acceptable.
+
 DOCUMENTATION
 
     The best place to start is DBIx::QuickORM::Manual::QuickStart, which
@@ -36,6 +94,17 @@ DOCUMENTATION
 ORM BUILDER EXPORTS
 
     You get all these when using DBIx::QuickORM.
+
+    Three of these exports (connect, index, and socket) have the same names
+    as Perl built-ins, so importing DBIx::QuickORM shadows those built-ins
+    in the importing package only (it is a lexical-scope import, not a
+    global change). Inside such a package, connect(...), index(...), and
+    socket(...) call the DSL builders below. If you need the Perl built-in
+    in that package, call it explicitly as CORE::connect(...),
+    CORE::index(...), or CORE::socket(...). As a convenience, a call to one
+    of these that has the exact argument shape of the built-in (for example
+    index($string, $substr)) croaks with a reminder to use CORE:: rather
+    than silently misrouting into the builder.
 
     orm $NAME => sub { ... }
 
@@ -634,6 +703,54 @@ ORM BUILDER EXPORTS
 
       Can be nested under column.
 
+    volatile
+
+      Marks a column as volatile. A volatile column is one whose stored
+      value the database may set or change during a write, so the value the
+      caller sent cannot be trusted as the in-memory truth. Common sources
+      are generated columns, identity or sequence-backed columns,
+      server-side defaults, ON UPDATE clauses, and triggers.
+
+          column updated_at => sub {
+              affinity 'string';
+              volatile;
+          };
+
+      After a write QuickORM does not keep a stale in-memory value for a
+      volatile column the database owns. Instead of trusting the sent value
+      it lazily fetches the real stored value the next time the column is
+      read:
+
+      When you explicitly send a value for a non-omitted column on an
+      insert, that value is kept (a server default does not override a
+      value you provided).
+
+      When the database fills a column you did not send (a generated or
+      defaulted column), that column is dropped and lazily re-fetched on
+      the next read.
+
+      When a column is both volatile and omitted, its sent value is cleared
+      and lazily re-fetched on the next read.
+
+      When the write is an update, every volatile column is lazily
+      re-fetched, because an ON UPDATE clause or a trigger may have changed
+      it.
+
+      When you call auto_refresh (or insert_and_refresh), the whole row is
+      read back from the database immediately instead of lazily.
+
+      QuickORM auto-marks the columns it can detect as volatile during
+      introspection (generated, identity or sequence-backed,
+      server-default, and on-update columns, plus columns a trigger is seen
+      to set). Use this marker for anything auto-detection cannot see.
+
+      In a non-void context it returns the string volatile for use in a
+      column specification without a builder.
+
+          column updated_at => ('string', 'volatile');
+
+      Can be nested under column.
+
     nullable()
 
     nullable(1)
@@ -860,6 +977,28 @@ ORM BUILDER EXPORTS
               ...
               primary_key({override => 1});
           };
+
+    no_volatile
+
+    no_volatile(1)
+
+    no_volatile(0)
+
+      Marks a whole table as volatile-free: an explicit assertion that none
+      of its columns are volatile (see volatile under column). Use it to
+      opt a table out of the conservative trigger handling and to silence
+      the per-table warning QuickORM emits when it finds a trigger whose
+      column effects it cannot resolve.
+
+          table events => sub {
+              no_volatile;
+              column id => sub { primary_key; affinity 'numeric' };
+              ...
+          };
+
+      The same assertion can be made for one or more tables from the quick
+      interface with no_volatile => [ 'events', ... ] (or no_volatile => 1
+      for every table). Can be nested under table.
 
     unique
 

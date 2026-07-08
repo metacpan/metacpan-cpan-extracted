@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Notifications;
-$OpenSearch::Client::Core::3_0::Direct::Notifications::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Notifications::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Notifications>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for notifications.|https://docs.opensearch.org/la
 
 =head1 METHODS
     
-=head2 notifications->create_config
+=head2 create_config
 
 Create channel configuration.
 
@@ -93,9 +93,9 @@ C<POST /_plugins/_notifications/configs>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for notifications.create_config|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#create-channel-configuration>
+L<OpenSearch documentation for notifications-E<gt>create_config|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#create-channel-configuration>
     
-=head2 notifications->delete_config
+=head2 delete_config
 
 Delete a channel configuration.
 
@@ -123,9 +123,9 @@ C<DELETE /_plugins/_notifications/configs/{config_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for notifications.delete_config|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration>
+L<OpenSearch documentation for notifications-E<gt>delete_config|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration>
     
-=head2 notifications->delete_configs
+=head2 delete_configs
 
 Delete multiple channel configurations.
 
@@ -154,9 +154,9 @@ C<DELETE /_plugins/_notifications/configs>
         'source'          =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for notifications.delete_configs|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration>
+L<OpenSearch documentation for notifications-E<gt>delete_configs|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#delete-channel-configuration>
     
-=head2 notifications->get_config
+=head2 get_config
 
 Get a specific channel configuration.
 
@@ -184,9 +184,9 @@ C<GET /_plugins/_notifications/configs/{config_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for notifications.get_config|https://docs.opensearch.org/latest/observing-your-data/notifications/index/>
+L<OpenSearch documentation for notifications-E<gt>get_config|https://docs.opensearch.org/latest/observing-your-data/notifications/index/>
     
-=head2 notifications->get_configs
+=head2 get_configs
 
 Get multiple channel configurations with filtering.
 
@@ -255,9 +255,9 @@ C<GET /_plugins/_notifications/configs>
         'source'                                        =>  $qval45,    # string
     );
 
-L<OpenSearch documentation for notifications.get_configs|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-configurations>
+L<OpenSearch documentation for notifications-E<gt>get_configs|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-configurations>
     
-=head2 notifications->list_channels
+=head2 list_channels
 
 List created notification channels.
 
@@ -281,9 +281,9 @@ C<GET /_plugins/_notifications/channels>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for notifications.list_channels|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-channels>
+L<OpenSearch documentation for notifications-E<gt>list_channels|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-all-notification-channels>
     
-=head2 notifications->list_features
+=head2 list_features
 
 List supported channel configurations.
 
@@ -307,9 +307,9 @@ C<GET /_plugins/_notifications/features>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for notifications.list_features|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-supported-channel-configurations>
+L<OpenSearch documentation for notifications-E<gt>list_features|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#list-supported-channel-configurations>
     
-=head2 notifications->send_test
+=head2 send_test
 
 Send a test notification.
 
@@ -340,9 +340,9 @@ C<POST /_plugins/_notifications/feature/test/{config_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for notifications.send_test|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#send-test-notification>
+L<OpenSearch documentation for notifications-E<gt>send_test|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#send-test-notification>
     
-=head2 notifications->update_config
+=head2 update_config
 
 Update channel configuration.
 
@@ -372,7 +372,7 @@ C<PUT /_plugins/_notifications/configs/{config_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for notifications.update_config|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#update-channel-configuration>
+L<OpenSearch documentation for notifications-E<gt>update_config|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#update-channel-configuration>
 
 =head1 MANUAL
 

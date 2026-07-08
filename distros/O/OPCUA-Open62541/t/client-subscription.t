@@ -293,19 +293,15 @@ is($response->{CreateSubscriptionResponse_responseHeader}{ResponseHeader_service
    "BadTooManySubscriptions",
    "subscription create response too many");
 
-$client->stop();
-
 ($deleted, $context) = (undef, undef);
 no_leaks_ok {
-    $client->{client}->connect($client->{url});
     $response = $client->{client}->Subscriptions_create(
 	$request,
 	$context,
 	sub {},
 	sub {$deleted = 1; $context = "foo"},
     );
-    # open52651 1.3 disconnect calls the callback that frees the context
-    $client->{client}->disconnect();
 } "Subscriptions create too many callback leak";
 
+$client->stop();
 $server->stop();

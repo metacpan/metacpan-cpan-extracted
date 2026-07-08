@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Client::Direct;
-$OpenSearch::Client::Role::Client::Direct::VERSION = '3.007005';
+$OpenSearch::Client::Role::Client::Direct::VERSION = '3.007006';
 use Moo::Role;
 with 'OpenSearch::Client::Role::Client';
 use OpenSearch::Client::Util qw(load_plugin is_compat throw);
@@ -232,7 +232,7 @@ OpenSearch::Client::Role::Client::Direct - Request parsing for Direct clients
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 DESCRIPTION
 

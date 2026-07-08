@@ -1,3 +1,13 @@
+0.019   2026-06-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add examples and short aliases (-n, -p) for pdfsplit.
+
+
+0.018   2026-06-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: pdfsplit.
+
+
 0.017   2026-02-02  Released-By: PERLANCAR; Urgency: medium
 
         - Make tempfile also ends with .pdf instead of .tmp to avoid

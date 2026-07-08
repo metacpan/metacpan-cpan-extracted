@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::PPL;
-$OpenSearch::Client::Core::3_0::Direct::PPL::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::PPL::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::PPL>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for ppl.|https://docs.opensearch.org/latest/sql-a
 
 =head1 METHODS
     
-=head2 ppl->explain
+=head2 explain
 
 Returns the execution plan for a PPL query.
 
@@ -98,9 +98,9 @@ C<POST /_plugins/_ppl/_explain>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ppl.explain|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
+L<OpenSearch documentation for ppl-E<gt>explain|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
     
-=head2 ppl->get_stats
+=head2 get_stats
 
 Retrieves performance metrics for the PPL plugin.
 
@@ -129,9 +129,9 @@ C<GET /_plugins/_ppl/stats>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ppl.get_stats|https://opensearch.org/docs/latest/search-plugins/sql/monitoring/>
+L<OpenSearch documentation for ppl-E<gt>get_stats|https://opensearch.org/docs/latest/search-plugins/sql/monitoring/>
     
-=head2 ppl->post_stats
+=head2 post_stats
 
 Retrieves filtered performance metrics for the PPL plugin.
 
@@ -162,9 +162,9 @@ C<POST /_plugins/_ppl/stats>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ppl.post_stats|https://opensearch.org/docs/latest/search-plugins/sql/monitoring/>
+L<OpenSearch documentation for ppl-E<gt>post_stats|https://opensearch.org/docs/latest/search-plugins/sql/monitoring/>
     
-=head2 ppl->query
+=head2 query
 
 Executes a PPL query against OpenSearch indexes.
 
@@ -195,7 +195,7 @@ C<POST /_plugins/_ppl>
         'source'       =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ppl.query|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
+L<OpenSearch documentation for ppl-E<gt>query|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
 
 =head1 MANUAL
 

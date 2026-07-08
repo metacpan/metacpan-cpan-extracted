@@ -22,10 +22,8 @@ WriteMakefile(
     # is a file named Makefile.PL in a sub-directory. Should be customized if such a file needs to be
     # processed by ExtUtils.
     DIR              => [],
-    NO_MYMETA => 1,
     META_MERGE => {
       'meta-spec' => { version => 2 },
-      # Goes with NO_MYMETA (which would provide the dynamic config).
       dynamic_config => 0,
       no_index => {
         directory => [ 'local', 'vendor', 't' ],

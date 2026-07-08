@@ -24,7 +24,7 @@ use Log::Log4perl qw();
 use Pod::Usage;
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -180,8 +180,15 @@ sub use_log4perl {
 
   my $class = ref $self || $self;
 
-  my ( $log_level, $level, $log4perl_conf ) = @args{qw(log_level level config)};
-  $level //= $log_level;
+  foreach my $o ( keys %args ) {
+    die "ERROR: unknown argument ($_)\n"
+      if none { $o eq $_ } qw(log_level level loglevel log-level config);
+  }
+
+  my ($level) = grep {defined} @args{qw(log_level log-level loglevel level)};
+  $level //= 'error';
+
+  my $log4perl_conf = $args{config};
 
   {
     no strict 'refs'; ## no critic (ProhibitNoStrict)

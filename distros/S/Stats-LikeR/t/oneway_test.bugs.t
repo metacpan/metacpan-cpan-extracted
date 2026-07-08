@@ -6,8 +6,6 @@
 #   * a clean run still returns the documented Welch statistics
 require 5.010;
 use warnings FATAL => 'all';
-use feature 'say';
-use Scalar::Util 'looks_like_number';
 use Stats::LikeR;
 use Test::Exception;
 use Test::More;
@@ -42,10 +40,9 @@ my %ok_groups = (
 	ctrl  => [1,   1,   1,   0,   0,   0  ],
 );
 
-# ---------------------------------------------------------------------------
 # BUG: undef / non-numeric observations were silently treated as 0.0, quietly
 # corrupting the statistic. They must now make the call die.
-# ---------------------------------------------------------------------------
+#
 {
 	my %undef_hash = (yield => [5.5, undef, 5.8, 4.5], ctrl => [1, 1, 0, 0]);
 	throws_ok { oneway_test(\%undef_hash) } qr/undefined|not defined|numeric/i,
@@ -81,9 +78,9 @@ my %ok_groups = (
 		'hash whose values are not array refs dies';
 }
 
-# ---------------------------------------------------------------------------
+#
 # A clean run still produces the documented Welch one-way result.
-# ---------------------------------------------------------------------------
+#
 {
 	my $res = oneway_test(\%ok_groups);
 	is ref($res), 'HASH', 'clean run returns a hash ref';
@@ -99,12 +96,11 @@ my %ok_groups = (
 	is $res->{group_stats}{size}{ctrl},  6, 'group size (ctrl)';
 }
 
-# ---------------------------------------------------------------------------
 # Leak guards. Test::LeakTrace tracks Perl SV leaks; a successful call and a
 # caught error must not leak scalars. (Raw C-buffer leaks on the croak paths
 # are not visible here -- those need a C checker such as valgrind.)
-# ---------------------------------------------------------------------------
-{
+#
+unless ($INC{'Devel/Cover.pm'}) {
 	no_leaks_ok { oneway_test(\%ok_groups) } 'no SV leak on a successful run';
 	no_leaks_ok { eval { oneway_test([[1], [2, 3]]) } } 'no SV leak on a croak path';
 }

@@ -29,6 +29,7 @@ requires 'Readonly::Values::Boolean';
 requires 'Return::Set', '0.03';
 requires 'Safe';
 requires 'Template';
+requires 'Text::Balanced';
 requires 'URI';
 requires 'UUID::Tiny';
 requires 'WWW::RT::CPAN';

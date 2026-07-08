@@ -2,9 +2,7 @@
 require 5.010;
 use warnings FATAL => 'all';
 use strict;
-use feature 'say';
 use File::Temp;
-use Scalar::Util 'looks_like_number';
 use Stats::LikeR qw(assign col dropna summary read_table view);
 use Test::Exception; # dies_ok / lives_ok
 use Test::More;

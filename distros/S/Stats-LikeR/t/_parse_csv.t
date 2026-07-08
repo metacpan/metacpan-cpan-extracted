@@ -2,16 +2,13 @@
 
 require 5.010;
 use warnings FATAL => 'all';
-use feature 'say';
 use File::Temp;
 use Stats::LikeR;
 use Test::Exception;
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
 
-#
 # 1. Multi-character separators (the memcmp branch)
-#
 my $content = "col1||col2||col3\nval1||val2||val3";
 my $fh = File::Temp->new(DIR => '/tmp', UNLINK => 1);
 print $fh $content;

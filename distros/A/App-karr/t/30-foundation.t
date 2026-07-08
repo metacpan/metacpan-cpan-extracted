@@ -5,6 +5,7 @@ use Path::Tiny qw( path tempdir );
 use YAML::XS ();
 
 use App::karr::Foundation;
+use App::karr::Git;
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -42,6 +43,14 @@ sub write_config {
   my $cfg_file = $cfg_dir->child('config.yml');
   $cfg_file->spew_utf8( "dirs:\n" . join( '', map { "  - $_\n" } @$dirs ) );
   return ( $cfg_dir, $cfg_file );
+}
+
+# karr-init a repo the way `karr init` does: write refs/karr/config, no .karr
+# file. Detection must therefore rely on the ref, not a sidecar file.
+sub init_karr_board {
+  my ( $dir ) = @_;
+  App::karr::Git->new( dir => "$dir" )
+    ->write_config_ref( { board => { name => 'Test Board' } } );
 }
 
 # ---------------------------------------------------------------------------
@@ -111,6 +120,109 @@ subtest '_discover_repos: scan parent dir' => sub {
   my @repos = $f->_discover_repos;
   is scalar @repos, 1, 'only the repo with .karr found';
   like "$repos[0]", qr/proj1/, 'correct repo discovered';
+};
+
+# --- Regression: board detection must resolve refs (bug #16) ----------------
+# A karr board with no .karr file used to be detected by testing for the loose
+# file .git/refs/karr/config. That file disappears after `git gc` / `git
+# pack-refs` (the ref is still there, just packed) and never exists at all in a
+# worktree (gitdir indirection), so real boards were silently skipped.
+
+subtest '_discover_repos: scan finds a karr repo whose refs are packed (#16)' => sub {
+  my $parent = tempdir( CLEANUP => 1 );
+  my $repo   = $parent->child('board');
+  $repo->mkpath;
+  system( 'git', '-C', "$repo", 'init', '-q' ) == 0 or die "git init failed";
+  system( 'git', '-C', "$repo", 'config', 'user.email', 'test@example.invalid' );
+  system( 'git', '-C', "$repo", 'config', 'user.name',  'Test' );
+
+  # karr-init'd repo, no .karr file — detection must rely on refs/karr/config.
+  init_karr_board( $repo );
+
+  # git gc / pack-refs moves the loose ref into packed-refs; the loose file
+  # .git/refs/karr/config vanishes although the ref still resolves.
+  system( 'git', '-C', "$repo", 'pack-refs', '--all' ) == 0 or die "pack-refs failed";
+  ok ! $repo->child('.git/refs/karr/config')->exists,
+    'loose ref file gone after pack-refs (old path check would miss the board)';
+
+  my $cfg_dir = tempdir( CLEANUP => 1 );
+  my $cfg     = $cfg_dir->child('config.yml');
+  $cfg->spew_utf8( "scan:\n  - $parent\n" );
+
+  my $f     = new_foundation( config => "$cfg" );
+  my @repos = $f->_discover_repos;
+  is scalar @repos, 1, 'packed-ref karr board still discovered';
+  like "$repos[0]", qr/board/, 'correct repo discovered';
+};
+
+subtest '_discover_repos: scan finds a karr board inside a git worktree (#16)' => sub {
+  my $main = make_git_repo();
+  # Worktrees need a commit to branch from.
+  $main->child('README')->spew_utf8("x\n");
+  system( 'git', '-C', "$main", 'add', 'README' ) == 0 or die "git add failed";
+  system( 'git', '-C', "$main", 'commit', '-q', '-m', 'init' ) == 0 or die "git commit failed";
+
+  my $parent = tempdir( CLEANUP => 1 );
+  my $wt     = $parent->child('wt');
+  system( 'git', '-C', "$main", 'worktree', 'add', '-q', '-b', 'feature', "$wt" ) == 0
+    or die "worktree add failed";
+  ok -f "$wt/.git", '.git in worktree is a file, not a directory';
+
+  # Init the board from inside the worktree — refs/karr/* are shared refs.
+  init_karr_board( $wt );
+
+  my $cfg_dir = tempdir( CLEANUP => 1 );
+  my $cfg     = $cfg_dir->child('config.yml');
+  $cfg->spew_utf8( "scan:\n  - $parent\n" );
+
+  my $f     = new_foundation( config => "$cfg" );
+  my @repos = $f->_discover_repos;
+  is scalar @repos, 1, 'karr board in a worktree is discovered (gitdir indirection)';
+  like "$repos[0]", qr/wt/, 'the worktree dir is the discovered board';
+};
+
+subtest '_discover_repos: plain dir nested in a karr repo is not a board (walk-up guard)' => sub {
+  # The scan dir sits INSIDE a karr repo. libgit2's open_ext walks up to find a
+  # .git, so a naive ref check on a plain child would resolve the ANCESTOR's
+  # refs/karr/config — a false positive. The board root must be $child itself.
+  my $outer = make_git_repo();
+  init_karr_board( $outer );
+
+  my $scan = $outer->child('scan');
+  $scan->mkpath;
+  my $plain = $scan->child('plain');   # not its own repo; ancestor is a karr repo
+  $plain->mkpath;
+
+  my $cfg_dir = tempdir( CLEANUP => 1 );
+  my $cfg     = $cfg_dir->child('config.yml');
+  $cfg->spew_utf8( "scan:\n  - $scan\n" );
+
+  my $f     = new_foundation( config => "$cfg" );
+  my @repos = $f->_discover_repos;
+  is scalar @repos, 0, 'plain dir nested in a karr repo is not discovered as a board';
+
+  ok ! $f->_is_karr_board_root( $plain ),
+    'walk-up guard: resolved repo root is the ancestor, not the child';
+  ok $f->_is_karr_board_root( $outer ),
+    'the actual karr repo root IS detected as a board root';
+};
+
+subtest '_process_repo: packed-ref board is processed, not skipped (#16)' => sub {
+  # Exercises the second detection site directly: with the old loose-file check
+  # a packed-ref board without a .karr file was skipped as "no karr board", so
+  # its agent never ran. The sentinel proves the command executed.
+  my $repo = make_git_repo();
+  init_karr_board( $repo );
+  system( 'git', '-C', "$repo", 'pack-refs', '--all' ) == 0 or die "pack-refs failed";
+
+  my $cfg_dir = tempdir( CLEANUP => 1 );
+  my $cfg     = $cfg_dir->child('config.yml');
+  $cfg->spew_utf8( "default_command: touch __sentinel__\n" );
+
+  my $f = new_foundation( config => "$cfg", force => 1 );
+  $f->_process_repo( $repo );
+  ok $repo->child('__sentinel__')->exists,
+    'agent command ran — packed-ref board detected by _process_repo';
 };
 
 # ---------------------------------------------------------------------------

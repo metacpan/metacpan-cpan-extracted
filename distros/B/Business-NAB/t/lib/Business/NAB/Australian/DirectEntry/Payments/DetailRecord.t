@@ -31,7 +31,7 @@ subtest 'parse' => sub {
     );
 
     is( $DetailRecord->bsb_number,           '083-047',           '->bsb_number' );
-    is( $DetailRecord->account_number,       '111111111',         '->account_number' );
+    is( $DetailRecord->account_number,       '12345678',          '->account_number' );
     is( $DetailRecord->indicator,            ' ',                 '->indicator' );
     is( $DetailRecord->transaction_code,     '13',                '->transaction_code' );
     is( $DetailRecord->amount,               '0000130511',        '->amount' );
@@ -55,7 +55,7 @@ subtest 'instantiation' => sub {
     isa_ok(
         my $DetailRecord = $class->new(
             bsb_number           => '083-047',
-            account_number       => '111111111',
+            account_number       => '12345678', # Short account number on purpose
             transaction_code     => '13',
             amount               => 1305.11 * 100,
             title_of_account     => ' Beneficiary 1',
@@ -186,4 +186,4 @@ subtest 'coercion' => sub {
 done_testing();
 
 __DATA__
-1083-047111111111 130000130511 Beneficiary 1                  FOR DEMONSTRATION 083-047123456789NAB SAMPLE  TEST00000000
+1083-047 12345678 130000130511 Beneficiary 1                  FOR DEMONSTRATION 083-047123456789NAB SAMPLE  TEST00000000

@@ -1,0 +1,840 @@
+#!/usr/bin/env perl
+
+use 5.016;
+use strict;
+use warnings;
+
+#===========================================================================
+# CLI wrapper for Text::MarkdownAdoc
+#===========================================================================
+
+use Text::MarkdownAdoc;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+Main:
+{
+   my $cli = _parse_options(@ARGV);
+   exit _run($cli);
+}
+
+#===========================================================================
+# Option parsing
+#===========================================================================
+
+sub _parse_options
+{
+   my (@args) = @_;
+
+   my %opts;
+   my $cli = {
+              attributes => {},
+              help       => 0,
+              man        => 0,
+              version    => 0,
+              };
+
+   Getopt::Long::Configure('pass_through');
+   GetOptions(
+      'o|output=s'    => \$cli->{output},
+      'a|attribute=s' => sub {
+         my ($name, $val) = @_;
+         _parse_attribute($cli->{attributes}, $val);
+      },
+      'imagesdir=s'   => \$opts{imagesdir},
+      'auto-ids'      => \$opts{auto_ids},
+      'idprefix=s'    => \$opts{idprefix},
+      'idseparator=s' => \$opts{idseparator},
+      'wrap=s'        => \$opts{wrap},
+      'man'           => \$cli->{man},
+      'h|help'        => \$cli->{help},
+      'v|version'     => \$cli->{version},
+     ) or
+     _error("Invalid options.");
+
+   if ($cli->{help})
+   {
+      _print_help();
+      exit 0;
+   }
+
+   if ($cli->{man})
+   {
+      pod2usage(-verbose => 2, -exitval => 0, -input => $0, -output => \*STDOUT);
+   }
+
+   if ($cli->{version})
+   {
+      _print_version();
+      exit 0;
+   }
+
+   my @remaining = @ARGV;
+
+   if (@remaining == 0)
+   {
+      _error("Missing input file.  Use - for stdin.");
+   }
+
+   if (@remaining > 1)
+   {
+      _error("Too many arguments.  Only one input file expected.");
+   }
+
+   $cli->{input} = $remaining[0];
+   $cli->{opts}  = \%opts;
+
+   return $cli;
+}
+
+# Parse -a KEY=VALUE, -a KEY (empty), -a KEY! (unset)
+sub _parse_attribute
+{
+   my ($attrs, $val) = @_;
+
+   if ($val =~ m/^(.*?)\s*=\s*(.*)/)
+   {
+      my $key   = $1;
+      my $value = $2;
+      $attrs->{$key} = $value;
+   }
+   elsif ($val =~ m/^(.+)!$/)
+   {
+      my $key = $1;
+      $attrs->{$key} = '';
+   }
+   else
+   {
+      $attrs->{$val} = '';
+   }
+}
+
+#===========================================================================
+# Main run logic
+#===========================================================================
+
+sub _run
+{
+   my ($cli) = @_;
+
+   my $input_file  = $cli->{input};
+   my $output_file = $cli->{output};
+   my $attrs       = $cli->{attributes};
+   my $opts        = $cli->{opts};
+
+   # Read input
+   my $text;
+   if ($input_file eq '-')
+   {
+      local $/;
+      $text = <STDIN>;
+   }
+   else
+   {
+      if (!-f $input_file)
+      {
+         _error("Input file '$input_file' does not exist or is not a regular file.");
+      }
+      open(my $fh, '<', $input_file) or
+        _error("Cannot open '$input_file': $!");
+      local $/;
+      $text = <$fh>;
+      close($fh);
+   }
+
+   # Determine output destination
+   my %convert_opts;
+   if (%$attrs)
+   {
+      $convert_opts{attributes} = $attrs;
+   }
+   for my $k (qw(imagesdir auto_ids idprefix idseparator wrap))
+   {
+      if (exists $opts->{$k})
+      {
+         $convert_opts{$k} = $opts->{$k};
+      }
+   }
+
+   # Build converter and convert
+   my $converter = Text::MarkdownAdoc->new;
+   my $result    = $converter->convert($text, \%convert_opts);
+
+   # Write output
+   if (defined $output_file)
+   {
+      if ($output_file eq '-')
+      {
+         print $result;
+      }
+      else
+      {
+         _check_same_file($input_file, $output_file);
+         open(my $fh, '>', $output_file) or
+           _error("Cannot write to '$output_file': $!");
+         print $fh $result;
+         close($fh);
+      }
+   }
+   else
+   {
+      if ($input_file eq '-')
+      {
+         print $result;
+      }
+      else
+      {
+         my $out = _default_output($input_file);
+         _check_same_file($input_file, $out);
+         open(my $fh, '>', $out) or
+           _error("Cannot write to '$out': $!");
+         print $fh $result;
+         close($fh);
+      }
+   }
+
+   return 0;
+}
+
+#===========================================================================
+# Helpers
+#===========================================================================
+
+sub _default_output
+{
+   my ($input) = @_;
+
+   my $out = $input;
+   $out =~ s/\.md$/.adoc/;
+   $out =~ s/\.markdown$/.adoc/;
+   $out =~ s/\.mdown$/.adoc/;
+   $out =~ s/\.mkd$/.adoc/;
+   $out =~ s/\.mkdn$/.adoc/;
+
+   return $out;
+}
+
+sub _check_same_file
+{
+   my ($input, $output) = @_;
+
+   return if $input eq '-';
+   return if $output eq '-';
+
+   # Resolve both paths
+   my ($in_real, $out_real);
+   $in_real  = _resolve_path($input);
+   $out_real = _resolve_path($output);
+
+   if (defined $in_real && defined $out_real && $in_real eq $out_real)
+   {
+      _error("Input and output cannot be the same file: '$input'");
+   }
+}
+
+sub _resolve_path
+{
+   my ($path) = @_;
+
+   return $path if $path =~ m{^/};
+
+   my $cwd;
+   chomp($cwd = `pwd`);
+
+   # Simple resolution: remove ./, ../
+   my $resolved = "$cwd/$path";
+   $resolved =~ s{/\./}{/}g;
+   while ($resolved =~ s{/[^/]+/\.\./}{/}) { }
+
+   return $resolved;
+}
+
+sub _print_help
+{
+   print <<'HELP';
+Usage: markdown-adoc [OPTIONS] FILE
+       markdown-adoc [OPTIONS] -
+
+Convert Markdown to AsciiDoc.
+
+Options:
+  -o, --output=FILE        Output file path; use - for stdout.
+                           Default: replace .md extension with .adoc.
+  -a, --attribute=KEY=VALUE  Set an AsciiDoc attribute (repeatable).
+                           KEY (empty value) and KEY! (unset) also accepted.
+  --imagesdir=DIR          Set the imagesdir option.
+  --auto-ids               Enable auto-generated heading IDs.
+  --idprefix=STRING        Set the ID prefix (default: _).
+  --idseparator=CHAR       Set the ID separator (default: _).
+  --wrap=preserve|none|ventilate  Line wrap mode (default: preserve).
+  --man                    Display full man-page help and exit.
+  -h, --help               Display this help and exit.
+  -v, --version            Display version and exit.
+
+Input:
+  FILE                     Input Markdown file to convert.
+  -                        Read from stdin.
+HELP
+}
+
+sub _print_version
+{
+   my $version = $Text::MarkdownAdoc::VERSION // '0.1.0';
+   print "markdown-adoc version $version\n";
+}
+
+sub _error
+{
+   my ($msg) = @_;
+
+   print STDERR "markdown-adoc: $msg\n";
+   exit 1;
+}
+
+__END__
+
+=head1 NAME
+
+markdown-adoc - Convert Markdown (GFM + kramdown extensions) to AsciiDoc
+
+=head1 SYNOPSIS
+
+markdown-adoc [OPTIONS] FILE
+
+markdown-adoc [OPTIONS] -
+
+=head1 DESCRIPTION
+
+C<markdown-adoc> reads Markdown input and writes AsciiDoc output suitable for
+use with Asciidoctor.  The converter targets practical Markdown as found in
+real technical documentation: GitHub-Flavored Markdown (GFM) plus kramdown
+extensions (definition lists, footnotes).
+
+C<FILE> may be a path to a Markdown file or C<-> for stdin.
+
+By default, output is written beside the input using the same base name with a
+C<.adoc> extension (replacing C<.md>, C<.markdown>, C<.mdown>, C<.mkd>, or
+C<.mkdn>).  Use C<-o> or C<--output> to override this or use C<-> for stdout.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-o>, B<--output> I<path>|B<->
+
+Write output to I<path> or to stdout when set to C<->.
+
+Default: replace the input extension with C<.adoc>.
+
+=item B<-a>, B<--attribute> I<KEY=VALUE>
+
+Set an AsciiDoc attribute in the output document header.  Repeatable.
+
+Variants:
+
+  -a KEY=VALUE    Set KEY to VALUE.
+  -a KEY          Set KEY with empty value.
+  -a KEY!         Unset KEY (emit C<:KEY!:>).
+
+=item B<--imagesdir> I<DIR>
+
+Set the C<imagesdir> option for the conversion (propagated to attribute
+processing and link/image rewriting).
+
+=item B<--auto-ids>
+
+Enable auto-generation of heading IDs (C<[[_heading_text]]> anchors).
+By default, heading IDs are not emitted unless the input contains explicit
+C<< <a name="id"></a> >> anchors.
+
+=item B<--idprefix> I<STRING>
+
+Set the prefix for auto-generated heading IDs (default: C<_>).
+
+Example: C<--idprefix sect-> produces C<[[sect-introduction]]>.
+
+=item B<--idseparator> I<CHAR>
+
+Set the word separator for auto-generated heading IDs (default: C<_>).
+
+Example: C<--idseparator -> produces C<[[_heading-text]]>.
+
+=item B<--wrap> I<MODE>
+
+Control how paragraph text lines are emitted in the output.
+
+=over 4
+
+=item C<preserve> (default)
+
+Emit lines exactly as they appear in the source.
+
+=item C<none>
+
+Join all lines of a paragraph into a single line (unwrap).
+
+=item C<ventilate>
+
+Join lines but re-break at sentence boundaries (after C<.>, C<?>, C<!>, C<;>
+followed by whitespace).
+
+=back
+
+Wrap mode does not affect code blocks, literal blocks, or passthrough blocks.
+
+=item B<--man>
+
+Display this full man-page help and exit.
+
+=item B<-h>, B<--help>
+
+Display short usage help and exit.
+
+=item B<-v>, B<--version>
+
+Display version number and exit.
+
+=back
+
+=head1 EXIT STATUS
+
+Returns C<0> on success.  Errors are reported to stderr and the program exits
+with a non-zero status.
+
+=head1 COMMONMARK COMPATIBILITY
+
+C<markdown-adoc> is I<not> a full CommonMark spec implementation.  It targets
+the practical subset of Markdown found in real technical documentation and
+accepts GFM + kramdown extensions.  This section documents areas where the
+converter intentionally deviates from or extends the spec.
+
+=head2 Supported Features
+
+All features listed in L<Text::MarkdownAdoc> are supported:
+
+=over 4
+
+=item * Headings
+
+ATX (C<#> prefix) and setext (C<===>/C<---> underline) styles, levels 1--6.
+
+=item * Paragraphs
+
+Accumulated across line continuations; blank-line separated.
+
+=item * Hard line breaks
+
+Trailing two spaces or trailing backslash (C<\>) produce a C< +> marker.
+
+=item * Inline formatting
+
+Bold (C<**> / C<__>), italic (C<*> / C<_>), code spans (C<`>),
+strikethrough (C<~~>).
+
+=item * Links
+
+Inline C<[text](url)>, reference-style C<[text][ref]>, shorthand C<[ref]>,
+autolinks C<< <url> >>.
+
+=item * Images
+
+Inline C<![alt](src)> and reference-style C<![alt][ref]>.
+
+=item * Fenced code blocks
+
+C<```lang> / C<~~~> with optional language annotation.
+
+=item * Indented code blocks
+
+Four-space or tab indentation (outside list context only).
+
+=item * Blockquotes
+
+Nested C<>> quotes, scaled to C<____> / C<______> AsciiDoc delimiters.
+
+=item * Lists
+
+Unordered (C<->, C<*>, C<+>), ordered (C<1.>, C<2)>), task lists
+(C<[ ]>, C<[x]>), nested and mixed lists.
+
+=item * Tables
+
+GFM pipe tables with header row and alignment (C<:--->, C<:---:>, C<--->:).
+
+=item * Thematic breaks
+
+C<--->, C<***>, C<___> and spaced variants.
+
+=item * Front matter
+
+YAML C<---> delimited block at document start extracted as AsciiDoc header
+attributes (C<:key: value>).  The C<title> key becomes the document title
+if the body has no level-1 heading.
+
+=item * Smart quotes
+
+Unicode smart quotes (U+201C/D, U+2018/9) converted to AsciiDoc typographic
+syntax.
+
+=item * HTML entities
+
+C<&nbsp;> converted; other entities pass through.
+
+=item * Inline HTML
+
+Known tags (C<< strong >>, C<< em >>, C<< code >>, C<< del >>, C<< mark >>,
+C<< sup >>, C<< sub >>, C<< br >>) converted to AsciiDoc equivalents.
+Unknown tags wrapped in C<++++> passthrough delimiters.
+
+=item * Block HTML
+
+HTML comments become AsciiDoc comments (C<//> or C<////>).
+Other block-level HTML is wrapped in passthrough blocks (C<++++>).
+
+=item * Diagram blocks
+
+Fenced blocks with C<plantuml> or C<mermaid> language tags use C<....>
+delimiters.
+
+=item * Math
+
+Inline C<$...$>, block C<$$...$$>, and fenced C<```math> blocks converted
+to AsciiDoc stem blocks.  The C<:stem: latexmath> attribute is injected
+automatically when math is detected.
+
+=back
+
+=head2 Known Limitations
+
+=over 4
+
+=item * No spec-level compliance
+
+The converter does not implement every CommonMark edge case for delimiter
+runs, link label matching, or entity handling.  It makes pragmatic choices
+that work for technical documents.
+
+=item * Underscore-based italic
+
+Only C<*> for italic and C<**> for bold are recommended in practice
+because the converter's C<_> italic matching uses word-boundary constraints
+to avoid breaking identifiers like C<snake_case>.  Full CommonMark
+flanking-delimiter matching is not implemented.
+
+=item * Reference link label matching
+
+Labels are matched case-insensitively with whitespace normalization but do
+not implement the full CommonMark link label normalization rules (Unicode
+folding, entity expansion).
+
+=item * No raw HTML passthrough semantics
+
+Block HTML is emitted inside C<++++> passthrough blocks rather than being
+converted to native AsciiDoc equivalents.  This preserves the HTML but may
+not render identically in all Asciidoctor backends.
+
+=back
+
+=head1 ADVANCED FEATURES: MARKDOWN REPRESENTATION
+
+This section explains how advanced (non-native Markdown) features should be
+written in the Markdown source to produce the correct AsciiDoc output.
+These conventions are based on kramdown syntax and the target AsciiDoc
+structure.
+
+=head2 Definition Lists (Description Lists)
+
+=head3 Standard form (single term with definition text on following lines)
+
+ Markdown input:
+
+  Term
+  : Definition text here that describes the term.
+
+ AsciiDoc output:
+
+  Term:: Definition text here that describes the term.
+
+=head3 Bold-term form (term and definition on same line)
+
+ Markdown input:
+
+  **Term**:: Definition text here.
+
+ AsciiDoc output:
+
+  Term:: Definition text here.
+
+=head3 Multiple definitions for one term
+
+Use multiple C<: > lines:
+
+ Markdown input:
+
+  Term
+  : First definition.
+  : Second definition.
+
+ AsciiDoc output:
+
+  Term:: First definition.
+  +
+  Second definition.
+
+=head3 Multi-level (nested) definition lists
+
+Nesting is indicated by the number of colons after the term:
+
+ Markdown input:
+
+  **Outer Term**:: Outer definition text.
+  **Inner Term**::: Inner definition text.
+
+ AsciiDoc output:
+
+  Outer Term:: Outer definition text.
+  Inner Term::: Inner definition text.
+
+The level of nesting corresponds to the number of colons (C<::> for level 1,
+C<:::> for level 2, C<::::> for level 3, etc.).
+
+=head2 Footnotes
+
+=head3 Simple footnote
+
+ Markdown input:
+
+  Here is a sentence.[^1]
+
+  [^1]: This is the footnote text.
+
+ AsciiDoc output:
+
+  Here is a sentence.footnote:fn1[This is the footnote text.]
+
+=head3 Multiple references to the same footnote
+
+ Markdown input:
+
+  First ref.[^1] Second ref.[^1]
+
+  [^1]: The footnote text.
+
+ AsciiDoc output:
+
+  First ref.footnote:fn1[The footnote text.] Second ref.footnote:fn1[]
+
+The first reference includes the full footnote text; subsequent references
+use an empty C<[]>.
+
+=head3 Footnotes with inline formatting
+
+ Markdown input:
+
+  [^a]: This has **bold** and _italic_ text.
+
+ Inline formatting inside the footnote definition is preserved in the output.
+
+=head2 Admonitions
+
+=head3 Paragraph-style admonition
+
+ Markdown input:
+
+  Note: This is an informational note.
+
+ AsciiDoc output:
+
+  NOTE: This is an informational note.
+
+The label is case-insensitive.  Supported labels: C<Note>, C<Tip>,
+C<Important>, C<Warning>, C<Caution>.
+
+=head3 Multi-paragraph admonition (blockquote form)
+
+ Markdown input:
+
+  > **Note:** This is the first paragraph.
+  >
+  > This is the second paragraph of the note.
+
+ AsciiDoc output:
+
+  [NOTE]
+  ====
+  This is the first paragraph.
+  This is the second paragraph of the note.
+  ====
+
+The bold label C<**Note:**> must appear on the first line of the blockquote.
+The blockquote marker C<< > >> is consumed by the converter.
+
+=head2 Diagrams
+
+=head3 PlantUML block
+
+ Markdown input:
+
+  ```plantuml
+  Alice -> Bob: Hello
+  Bob -> Alice: Hi
+  ```
+
+ AsciiDoc output:
+
+  [plantuml]
+  ....
+  Alice -> Bob: Hello
+  Bob -> Alice: Hi
+  ....
+
+=head3 Mermaid block
+
+Same convention with C<```mermaid>.
+
+=head2 Math
+
+=head3 Inline math
+
+ Markdown input:
+
+  The formula $E = mc^2$ is famous.
+
+ AsciiDoc output:
+
+  The formula stem:[E = mc^2] is famous.
+
+The C<:stem: latexmath> attribute is automatically added to the document
+header when math is present.
+
+=head3 Block math
+
+ Markdown input:
+
+  $$
+  E = mc^2
+  $$
+
+ AsciiDoc output:
+
+  [stem]
+  ++++
+  E = mc^2
+  ++++
+
+=head3 Fenced math block
+
+ Markdown input:
+
+  ```math
+  E = mc^2
+  ```
+
+ AsciiDoc output (same as block C<$$>):
+
+  [stem]
+  ++++
+  E = mc^2
+  ++++
+
+=head2 Front Matter
+
+YAML front matter at the top of the document is extracted as AsciiDoc
+header attributes:
+
+ Markdown input:
+
+  ---
+  title: My Document
+  author: Jane Doe
+  toc: auto
+  ---
+
+  # Introduction
+
+  This is the body.
+
+ AsciiDoc output (body has a level-1 heading, so C<title> is not reused):
+
+  :author: Jane Doe
+  :toc: auto
+
+  = Introduction
+
+  This is the body.
+
+When the body does I<not> contain a level-1 heading, the C<title> key
+becomes the document title:
+
+  :author: Jane Doe
+  :toc: auto
+
+  = My Document
+
+  This is the body.
+
+=head2 Cross-References
+
+=head3 Anchor links
+
+ Markdown input:
+
+  [See the introduction](#introduction)
+
+ AsciiDoc output:
+
+  <<introduction,See the introduction>>
+
+C<.md> file links are rewritten to C<.adoc> xref:
+
+ Markdown input:
+
+  [Reference](other.md)
+
+ AsciiDoc output:
+
+  xref:other.adoc[Reference]
+
+=head2 Heading IDs (Auto-Generated)
+
+When C<--auto-ids> is used, headings without anchors get generated IDs:
+
+ Markdown input:
+
+  ## Introduction
+
+ AsciiDoc output (with C<--auto-ids>):
+
+  [[_introduction]]
+  == Introduction
+
+=head2 Heading IDs (Explicit)
+
+ Markdown input:
+
+  ## <a name="intro"></a>Introduction
+
+ AsciiDoc output:
+
+  [[intro]]
+  == Introduction
+
+=head1 SEE ALSO
+
+L<Text::MarkdownAdoc>, L<Text::MarkdownAdoc::Parser>,
+L<Text::MarkdownAdoc::Inline>, L<Text::MarkdownAdoc::Refs>,
+L<Text::AsciidocDown>, L<Asciidoctor|https://asciidoctor.org/>
+
+For a full list of supported Markdown constructs, conversion mappings,
+known limitations, and differences from C<kramdown-asciidoc>, see
+F<COMPATIBILITY_REPORT.adoc> included in the distribution.
+
+=head1 AUTHOR
+
+Sandor Patocs
+
+=head1 LICENSE
+
+This program is distributed under the same terms as Perl itself.
+
+=cut

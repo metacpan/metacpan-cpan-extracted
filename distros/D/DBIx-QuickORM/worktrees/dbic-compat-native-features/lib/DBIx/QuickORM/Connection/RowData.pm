@@ -2,7 +2,7 @@ package DBIx::QuickORM::Connection::RowData;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/confess croak carp/;
 use Scalar::Util qw/reftype blessed/;

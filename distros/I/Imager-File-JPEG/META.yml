@@ -4,11 +4,11 @@ author:
   - 'Tony Cook <tonyc@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Imager: '1.008'
+  Imager: '1.033'
   Test::More: '0.47'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  Imager: '1.008'
+  Imager: '1.033'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -21,11 +21,11 @@ no_index:
     - t
     - inc
 requires:
-  Imager: '1.008'
+  Imager: '1.033'
   XSLoader: '0'
 resources:
   bugtracker: https://github.com/tonycoz/imager/issues
   homepage: http://imager.perl.org/
   repository: git://github.com/tonycoz/imager.git
-version: '1.003'
+version: '1.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

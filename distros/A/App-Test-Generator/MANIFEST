@@ -1,9 +1,11 @@
+bin/benchmark-generator
 bin/demo_extractor.pl
+bin/deploy-workflows
 bin/extract-schemas
-bin/extract-schemas2
 bin/fuzz-harness-generator
 bin/generate-test-dashboard
 bin/instrument-modules
+bin/pod-example-tester
 bin/test-generator-index
 bin/test-generator-mutate
 Changes
@@ -16,6 +18,7 @@ lib/App/Test/Generator/Analyzer/Complexity.pm
 lib/App/Test/Generator/Analyzer/Return.pm
 lib/App/Test/Generator/Analyzer/ReturnMeta.pm
 lib/App/Test/Generator/Analyzer/SideEffect.pm
+lib/App/Test/Generator/BenchmarkGenerator.pm
 lib/App/Test/Generator/CoverageGuidedFuzzer.pm
 lib/App/Test/Generator/Emitter/Perl.pm
 lib/App/Test/Generator/Exporter/YAML.pm
@@ -34,6 +37,7 @@ lib/App/Test/Generator/Planner/Fixture.pm
 lib/App/Test/Generator/Planner/Grouping.pm
 lib/App/Test/Generator/Planner/Isolation.pm
 lib/App/Test/Generator/Planner/Mock.pm
+lib/App/Test/Generator/PodExampleExtractor.pm
 lib/App/Test/Generator/Sample/Module.pm
 lib/App/Test/Generator/SchemaExtractor.pm
 lib/App/Test/Generator/Template.pm
@@ -54,8 +58,10 @@ t/Analyzer-Return.t
 t/Analyzer-ReturnMeta.t
 t/Analyzer-SideEffect.t
 t/app.t
+t/BenchmarkGenerator_unit.t
+t/cli-benchmark-generator.t
+t/cli-deploy-workflows.t
 t/cli-extract-schemas.t
-t/cli-extract-schemas2.t
 t/cli-fuzz-harness-generator.t
 t/cli-test-generator-mutate.t
 t/conf-corpus.t
@@ -97,6 +103,7 @@ t/Model-Method_unit.t
 t/modern.t
 t/moosex_params_validate.t
 t/Mutant.t
+t/mutant_killers.t
 t/Mutant_unit.t
 t/Mutation-Base.t
 t/Mutation-Base_unit.t
@@ -124,6 +131,7 @@ t/pod-coverage.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
+t/PodExampleExtractor_unit.t
 t/relationship_tests.t
 t/return.t
 t/schema_input.t

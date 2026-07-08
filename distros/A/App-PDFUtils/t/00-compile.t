@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/PDFUtils.pm',
@@ -20,6 +20,7 @@ my @scripts = (
     'script/pdf-has-password',
     'script/pdfgrep',
     'script/pdfnopass',
+    'script/pdfsplit',
     'script/remove-pdf-password'
 );
 

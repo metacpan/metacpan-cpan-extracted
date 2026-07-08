@@ -58,9 +58,12 @@ The Go implementation at `../kanban-md/` is the feature reference. Key docs:
 
 ### Board state (refs-first)
 
-Canonical state lives in `refs/karr/*`. The `tasks/` directory is a materialized
-view generated on demand (C<karr materialize>), not the source of truth, and is
-always in F<.gitignore> — never committed.
+Canonical state lives in `refs/karr/*`. The `tasks/` directory (with its
+`config.yml`) is a materialized view, not the source of truth, and is always in
+F<.gitignore> — never committed. `karr materialize` writes that file view from
+the refs (`BoardStore->materialize_to`) and `karr import --yes` reads it back in
+(`serialize_from`) — a bridge for kanban-md interop and grepping files, not a
+storage backend.
 
 ## Commands (current / planned)
 
@@ -78,11 +81,13 @@ always in F<.gitignore> — never committed.
 | `archive` | implemented | `archive` |
 | `handoff` | implemented | `handoff` |
 | `metrics` | TODO | `metrics` |
-| `log` | TODO | `log` |
+| `log` | implemented | `log` |
 | `config` | implemented | `config` |
 | `context` | implemented | `context` |
 | `agent-name` | implemented | `agent-name` |
 | `skill` | implemented | `skill` |
+| `materialize` | implemented | — (refs→files bridge) |
+| `import` | implemented | — (files→refs bridge) |
 
 ## Key design decisions
 

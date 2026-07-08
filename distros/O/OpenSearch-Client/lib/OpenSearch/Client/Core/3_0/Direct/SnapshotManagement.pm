@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SnapshotManagement;
-$OpenSearch::Client::Core::3_0::Direct::SnapshotManagement::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::SnapshotManagement::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for sm.|https://docs.opensearch.org/latest/tuning
 
 =head1 METHODS
     
-=head2 sm->create_policy
+=head2 create_policy
 
 Creates a snapshot management policy.
 
@@ -97,9 +97,9 @@ C<POST /_plugins/_sm/policies/{policy_name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for sm.create_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
+L<OpenSearch documentation for sm-E<gt>create_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
     
-=head2 sm->delete_policy
+=head2 delete_policy
 
 Deletes a snapshot management policy.
 
@@ -127,9 +127,9 @@ C<DELETE /_plugins/_sm/policies/{policy_name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for sm.delete_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
+L<OpenSearch documentation for sm-E<gt>delete_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
     
-=head2 sm->explain_policy
+=head2 explain_policy
 
 Explains the state of the snapshot management policy.
 
@@ -157,9 +157,9 @@ C<GET /_plugins/_sm/policies/{policy_name}/_explain>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for sm.explain_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
+L<OpenSearch documentation for sm-E<gt>explain_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
     
-=head2 sm->get_policies
+=head2 get_policies
 
 Retrieves all snapshot management policies with optional pagination and filtering.
 
@@ -191,9 +191,9 @@ C<GET /_plugins/_sm/policies>
         'source'       =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for sm.get_policies|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
+L<OpenSearch documentation for sm-E<gt>get_policies|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
     
-=head2 sm->get_policy
+=head2 get_policy
 
 Retrieves a specific snapshot management policy by name.
 
@@ -221,9 +221,9 @@ C<GET /_plugins/_sm/policies/{policy_name}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for sm.get_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
+L<OpenSearch documentation for sm-E<gt>get_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
     
-=head2 sm->start_policy
+=head2 start_policy
 
 Starts a snapshot management policy.
 
@@ -251,9 +251,9 @@ C<POST /_plugins/_sm/policies/{policy_name}/_start>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for sm.start_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
+L<OpenSearch documentation for sm-E<gt>start_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
     
-=head2 sm->stop_policy
+=head2 stop_policy
 
 Stops a snapshot management policy.
 
@@ -281,9 +281,9 @@ C<POST /_plugins/_sm/policies/{policy_name}/_stop>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for sm.stop_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
+L<OpenSearch documentation for sm-E<gt>stop_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
     
-=head2 sm->update_policy
+=head2 update_policy
 
 Updates an existing snapshot management policy. Requires `if_seq_no` and `if_primary_term`.
 
@@ -318,7 +318,7 @@ C<PUT /_plugins/_sm/policies/{policy_name}>
         'source'           =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for sm.update_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
+L<OpenSearch documentation for sm-E<gt>update_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
 
 =head1 MANUAL
 

@@ -5,7 +5,7 @@ use warnings;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 our $Debug   = 0;
-our $VERSION = '1.38';
+our $VERSION = '1.39';
 
 use File::Slurper 'read_lines';
 
@@ -3088,7 +3088,7 @@ $daughter->walk_down($options) for each daughter (in order, of
 course), where options_hashref is the same hashref it was called with.
 When this returns, decrements I<_depth>.
 
-=item Callbackback
+=item o Callbackback
 
 If there's a I<callbackback>, call just it as with I<callback> (but
 tossing out the return value).  Note that I<callback> returning false

@@ -7,6 +7,7 @@
 #include "pdfmake_writer.h"
 #include "pdfmake_filter.h"
 #include "pdfmake_crypt.h"
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -121,17 +122,6 @@ int pdfmake_format_int(char *buf, int64_t value) {
 
 int pdfmake_format_real(char *buf, double value) {
     int len;
-    double int_part;
-    double frac_part;
-    char tmp[24];
-    int ipos;
-    uint64_t iv;
-    int frac_digits;
-    double scaled;
-    char frac_buf[16];
-    int i;
-    int digit;
-    int j;
 
     /* Handle special cases. */
     if (isnan(value)) {
@@ -153,65 +143,31 @@ int pdfmake_format_real(char *buf, double value) {
         return pdfmake_format_int(buf, (int64_t)value);
     }
 
-    /* Handle negative numbers. */
-    len = 0;
-    if (value < 0) {
-        buf[len++] = '-';
-        value = -value;
+    /* Format with 6 decimal places then strip trailing zeros.
+     *
+     * The previous hand-rolled digit-extraction loop multiplied the
+     * fractional part by 10 and took the floor repeatedly.  For values
+     * like 0.3 (which is 0.2999999… in IEEE 754 double) the loop
+     * produced "299999999999999" — 15 nines — because the accumulated
+     * error never crossed the 1e-14 convergence threshold.  On
+     * quadmath/longdouble builds the same problem surfaced, causing the
+     * CPAN-Testers failure:
+     *   expected "0.1 0.2 0.3 0.4 K"
+     *   got      "0.1 0.2 0.299999999999999 0.4 K"
+     *
+     * sprintf("%.6f") lets the C runtime do the rounding correctly:
+     * 0.2999999… rounds to 0.300000, which strips to "0.3".  Six
+     * decimal places give sub-micrometre precision for PDF coordinates
+     * and a millionth-unit resolution for colour components — both more
+     * than the PDF spec requires. */
+    len = sprintf(buf, "%.6f", value);
+
+    /* Strip trailing zeros after the decimal point, and the point itself
+     * if no fractional digit remains. */
+    if (memchr(buf, '.', (size_t)len)) {
+        while (len > 1 && buf[len - 1] == '0') len--;
+        if (buf[len - 1] == '.') len--;
     }
-
-    /* Format with sufficient precision for round-trip.
-     * PDF allows a lot of flexibility, but we aim for minimal representation.
-     * We try progressively more digits until round-trip succeeds. */
-
-    /* Split into integer and fractional parts. */
-    frac_part = modf(value, &int_part);
-
-    /* Write integer part. */
-    if (int_part == 0) {
-        buf[len++] = '0';
-    } else {
-        ipos = 0;
-        iv = (uint64_t)int_part;
-        do {
-            tmp[ipos++] = '0' + (iv % 10);
-            iv /= 10;
-        } while (iv > 0);
-        while (ipos > 0) {
-            buf[len++] = tmp[--ipos];
-        }
-    }
-
-    /* Write fractional part with minimal digits for round-trip. */
-    if (frac_part > 0) {
-        buf[len++] = '.';
-
-        /* Generate up to 15 fractional digits. */
-        frac_digits = 0;
-        scaled = frac_part;
-
-        for (i = 0; i < 15; i++) {
-            scaled *= 10.0;
-            digit = (int)scaled;
-            if (digit > 9) digit = 9;  /* Clamp rounding errors */
-            frac_buf[frac_digits++] = '0' + digit;
-            scaled -= digit;
-
-            /* Check if we've captured enough precision. */
-            if (scaled < 1e-14) break;
-        }
-
-        /* Trim trailing zeros. */
-        while (frac_digits > 1 && frac_buf[frac_digits - 1] == '0') {
-            frac_digits--;
-        }
-
-        /* Copy fractional digits. */
-        for (j = 0; j < frac_digits; j++) {
-            buf[len++] = frac_buf[j];
-        }
-    }
-
     buf[len] = '\0';
     return len;
 }

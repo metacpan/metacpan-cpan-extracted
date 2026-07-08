@@ -53,7 +53,11 @@ which it missed (survived).
 =item * B<CPAN Testers failure analysis>, showing which Perl versions
 and operating systems are failing, with automatic root cause detection
 including Perl version cliffs, locale sensitivity, and dependency
-version cliffs.
+version cliffs.  For each failure report where installed-module data is
+available, the dashboard also generates a self-contained shell script
+(C<cover_html/reproduce/reproduce-GUID.sh>) that reproduces the exact
+environment — pinning every installed module version with C<cpanm> and
+suggesting the matching Perl via perlbrew/plenv.
 
 =back
 
@@ -102,9 +106,15 @@ each CI push via C<.github/workflows/dashboard.yml>.
 
 =head1 OUTPUTS
 
-  cover_html/index.html     - Main dashboard (coverage table, trend chart,
-                              CPAN Testers failures, mutation report)
-  cover_html/mutation_html/ - Per-file mutation heatmap pages
+  cover_html/index.html          - Main dashboard (coverage table, trend chart,
+                                   CPAN Testers failures, mutation report)
+  cover_html/mutation_html/      - Per-file mutation heatmap pages
+  cover_html/reproduce/          - CPAN Testers reproduction scripts, one per
+                                   FAIL report where installed-module data was
+                                   available (reproduce-GUID.sh, mode 0755).
+                                   Each script pins every installed module
+                                   version with cpanm and suggests the matching
+                                   Perl via perlbrew/plenv.
 
 =head1 OPTIONS
 
@@ -287,10 +297,14 @@ Readonly my $MAX_REPORTS_PER_GRADE => 20;
 
 # --------------------------------------------------
 # Enable dependency correlation analysis against
-# CPAN Testers reports. Set to 0 to disable if the
-# API is unreachable or the analysis is too slow.
+# CPAN Testers reports. Disabled automatically when
+# NO_NETWORK_TESTING is set in the environment.
 # --------------------------------------------------
-Readonly my $ENABLE_DEP_ANALYSIS => 1;
+Readonly my $ENABLE_DEP_ANALYSIS => $ENV{NO_NETWORK_TESTING} ? 0 : 1;
+
+# Per-GUID cache of installed module hashes from fetch_report_html;
+# populated by aggregate_dependency_stats, consumed by repro generation
+my %module_cache;
 
 # Read and decode data
 my $cover_db = eval { decode_json(read_file($config{cover_db})) };
@@ -1561,6 +1575,19 @@ HTML
 			}
 		}
 
+		my %repro_links;
+		my $cover_html_dir = dirname($config{output});
+		for my $r (@fail_reports) {
+			my $guid = $r->{guid} or next;
+			next unless exists $module_cache{$guid};
+			my $script = generate_reproduction_script(
+				$dist_name, $version, $r,
+				$module_cache{$guid},
+				$cover_html_dir,
+			);
+			$repro_links{$guid} = "reproduce/$script" if $script;
+		}
+
 		push @html, <<"HTML";
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -1643,6 +1670,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		<span class="label">New</span> <span class="arrow">&#x25B2;</span>
 	</th>
 	<th>Report</th>
+	<th>Repro</th>
 </tr>
 </thead>
 <tbody>
@@ -1702,16 +1730,21 @@ HTML
 			my $is_new = !$prev_fail_set{make_key($r)};
 			my $new_html = $is_new ? '<span class="new-failure">NEW</span>' : '';
 
+			my $repro_cell = ($guid && $repro_links{$guid})
+				? qq{<a href="$repro_links{$guid}" download>Script</a>}
+				: '';
+
 			push @html, sprintf(
 				qq{<tr class="%s"><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
-				<td><a href="%s" target="_blank">View</a></td></tr>},
+				<td><a href="%s" target="_blank">View</a></td><td>%s</td></tr>},
 				$row_class,
 				$date,
 				$os,
 				$perl,
 				$reporter,
 				$new_html,
-				$url
+				$url,
+				$repro_cell
 			);
 		}
 
@@ -1947,6 +1980,7 @@ sub aggregate_dependency_stats {
 
 		my $html = fetch_report_html($guid) or next;
 		my $mods = extract_installed_modules($html);
+		$module_cache{$guid} = $mods if %$mods;
 
 		for my $m (keys %$mods) {
 			$stats->{$m}{$grade}++;
@@ -1955,6 +1989,53 @@ sub aggregate_dependency_stats {
 	}
 
 	return $stats;
+}
+
+sub generate_reproduction_script {
+	my ($dist, $version, $report, $installed_mods, $outdir) = @_;
+
+	my $guid     = $report->{guid}     or return;
+	my $perl     = $report->{perl}     // 'unknown';
+	my $os       = $report->{osname}   // 'unknown';
+	my $reporter = $report->{reporter} // '';
+	$reporter =~ s/"//g;
+	$reporter =~ s/<[^>]+>//g;
+	$reporter =~ s/\s+$//g;
+
+	my $repro_dir  = File::Spec->catdir($outdir, 'reproduce');
+	make_path($repro_dir) unless -d $repro_dir;
+
+	my $script_name = "reproduce-$guid.sh";
+	my $script_path = File::Spec->catfile($repro_dir, $script_name);
+
+	open my $fh, '>', $script_path or return;
+
+	print $fh "#!/bin/sh\n";
+	print $fh "# Reproduction script for CPAN Testers report $guid\n";
+	print $fh "# Distribution: $dist-$version\n";
+	print $fh "# Perl: $perl  OS: $os\n";
+	print $fh "# Reporter: $reporter\n";
+	print $fh "# Report: https://www.cpantesters.org/cpan/report/$guid\n";
+	print $fh "# Generated by test-generator-index (App::Test::Generator)\n";
+	print $fh "set -e\n\n";
+	print $fh "# Use Perl $perl (perlbrew / plenv recommended)\n";
+	print $fh "# perlbrew install perl-$perl && perlbrew use perl-$perl\n\n";
+
+	if(%$installed_mods) {
+		print $fh "# Install exact dependency versions from the failing report\n";
+		my @mod_lines = map { "\t'$_\@$installed_mods->{$_}'" }
+		                sort keys %$installed_mods;
+		print $fh "cpanm --notest \\\n", join(" \\\n", @mod_lines), "\n\n";
+	}
+
+	print $fh "# Install and test the failing distribution\n";
+	print $fh "cpanm --look $dist\@$version\n";
+	print $fh "# or from a local checkout: perl Makefile.PL && make && make test\n";
+
+	close $fh;
+	chmod 0755, $script_path;
+
+	return $script_name;
 }
 
 sub fetch_report_html {
@@ -5702,6 +5783,65 @@ sub _own_file_coverage_pct {
 
 	return $count ? $sum / $count : undef;
 }
+
+=head1 FUNCTIONS
+
+=head2 generate_reproduction_script
+
+  my $name = generate_reproduction_script($dist, $version, $report, $installed_mods, $outdir);
+
+Generates a self-contained POSIX shell script that reproduces the exact
+environment of a CPAN Testers failure report, then returns the script's
+filename (C<reproduce-GUID.sh>) on success, or C<undef> if the report has
+no C<guid> field.
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$dist> — distribution name (e.g. C<Foo-Bar>).
+
+=item * C<$version> — distribution version string (e.g. C<1.23>).
+
+=item * C<$report> — hashref with at minimum C<guid>, C<perl>, C<osname>,
+and C<reporter> keys as returned by the CPAN Testers API.
+
+=item * C<$installed_mods> — hashref of C<< Module => version >> pairs from
+L</extract_installed_modules>, or an empty hashref.
+
+=item * C<$outdir> — root output directory.  The script is written to
+C<$outdir/reproduce/reproduce-$guid.sh> (mode 0755).
+
+=back
+
+=head3 Output script content
+
+The generated script contains:
+
+=over 4
+
+=item * A C<set -e> guard followed by a perlbrew advisory comment.
+
+=item * If C<$installed_mods> is non-empty: a C<cpanm --notest> command that
+pins every installed module at its exact failing version (modules are
+single-quoted and sorted alphabetically to prevent shell-injection).
+
+=item * A C<cpanm --look Dist@version> command to open the distribution's
+source, plus a comment showing the local-checkout alternative
+(C<perl Makefile.PL && make && make test>).
+
+=back
+
+=head2 extract_installed_modules
+
+  my $mods = extract_installed_modules($html);
+
+Parses the C<Installed modules:> section from a CPAN Testers report HTML
+page and returns a hashref of C<< Module => version >> pairs.  Returns an
+empty hashref if C<$html> is undef or the section is absent.
+
+Module names are validated against C<[A-Z]\w*(?:::\w+)*> and versions
+against C<[\d._]+>, so the returned hashref is safe for shell interpolation.
 
 =head1 AUTHOR
 

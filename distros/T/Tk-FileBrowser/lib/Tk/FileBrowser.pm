@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
@@ -34,43 +34,14 @@ require Tk::LabFrame;
 require Tk::ListEntry;
 require Tk::YADialog;
 require Tk::Balloon;
-#require Tk::YAMessage;
 
 my $iconfolder = Tk::findINC('Tk/FileBrowser/Icons');
-
-my $osname = $Config{'osname'};
 
 my %timedata = (
 	Accessed => 'atime',
 	Created => 'ctime',
 	Modified => 'mtime',
 );
-
-my %viewoptions = (
-	icon => {
-		-arrange => 'row',
-		-textside => 'bottom',
-		-textlength => 50,
-		-textanchor => '',
-		-wraplength => 110,
-	},
-	compact => {
-		-arrange => 'column',
-		-textlength => 30,
-		-textside => 'right',
-		-textanchor => 'w',
-		-wraplength => 0,
-	},
-	detailed => {
-		-arrange => 'tree',
-		-textlength => 0,
-		-textside => 'right',
-		-textanchor => 'w',
-		-wraplength => 0,
-	},
-);
-
-my $sample;
 
 =head1 SYNOPSIS
 
@@ -368,10 +339,35 @@ sub Populate {
 			$column_types{$key} = $data;
 		}
 	}
-	
+
+	#define view options
+	$self->{VIEWOPTIONS} = {
+		icon => {
+			-arrange => 'row',
+			-textside => 'bottom',
+			-textlength => 50,
+			-textanchor => '',
+			-wraplength => 110,
+		},
+		compact => {
+			-arrange => 'column',
+			-textlength => 30,
+			-textside => 'right',
+			-textanchor => 'w',
+			-wraplength => 0,
+		},
+		detailed => {
+			-arrange => 'tree',
+			-textlength => 0,
+			-textside => 'right',
+			-textanchor => 'w',
+			-wraplength => 0,
+		},
+	};
+
 	my $basetxt = '';
 	my $sep = '/';
-	$sep = '\\' if $osname eq 'MSWin32';
+	$sep = '\\' if $mswin;
 	$self->{BASE} = undef;
 	$self->{COLTYPES} = \%column_types;
 	$self->{JOBSTACK} = [];
@@ -423,6 +419,7 @@ sub Populate {
 	
 	my $createfolderbutton = $lframe->Button(
 		-text => 'New folder',
+		-relief => 'flat',
 		-command => ['createFolder', $self],
 	);
 	$self->Advertise('CreateDirButton', $createfolderbutton);
@@ -433,7 +430,7 @@ sub Populate {
 	#setting up the listbrowser widget
 
 
-	my $lbopt = $viewoptions{'tree'};
+	my $lbopt = $self->viewOptions->{'tree'};
 	my $lb = $self->ListBrowser(%$lbopt,
 		-autorefresh => 1,
 		-command => ['Invoke', $self],
@@ -1753,18 +1750,9 @@ sub viewmode {
 		$self->viewCurrent($mode);
 		my $lb = $self->Subwidget('LB');
 	
-		#setting up a sample item to set up display mode
-		unless (defined $sample) {
-			$sample = new Tk::FileBrowser::Item(
-				-name => 'FileBrowser',
-				-fullname => Tk::findINC('Tk/FileBrowser'),
-				-listbrowser => $lb,
-				-text => 'Xi XiXi Xi XiXiX iXi XiXi XiXi XiXi XiXi XiX iXi XiXiX iXi XiXiXiXiX iXi XiXi XiXi XiXi XiXi XiX iXi XiXiX iXi XiXi',
-			);
-		}
 	
 		#switch view mode;
-		my $opt = $viewoptions{$mode};
+		my $opt = $self->viewOptions->{$mode};
 		unless (defined $opt) {
 			croak "invalid view mode $mode";
 			return
@@ -1780,8 +1768,18 @@ sub viewmode {
 	
 		$lb->clear;
 		for (keys %$opt) {
-			$lb->configure($_, $opt->{$_})
+			$lb->configure($_, $opt->{$_});
 		}
+
+		#setting up a sample item to set up display mode
+		my $sample = new Tk::FileBrowser::Item(
+			-name => 'FileBrowser',
+			-fullname => Tk::findINC('Tk/FileBrowser'),
+			-listbrowser => $lb,
+			-owner => $lb,
+			-text => 'Xi XiXi Xi XiXiX iXi XiXi XiXi XiXi XiXi XiX iXi XiXiX iXi XiXiXiXiX iXi XiXi XiXi XiXi XiXi XiX iXi XiXiX iXi XiXi',
+		);
+
 		$lb->cellSize($sample);
 		my $h = $lb->handler;
 		my $sy = $lb->cget('-margintop');
@@ -1790,6 +1788,10 @@ sub viewmode {
 		$lb->refreshPurge;
 	}
 	return $self->viewCurrent
+}
+
+sub viewOptions {
+	return $_[0]->{VIEWOPTIONS}
 }
 
 =back

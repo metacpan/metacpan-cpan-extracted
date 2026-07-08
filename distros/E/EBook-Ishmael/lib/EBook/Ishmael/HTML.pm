@@ -1,6 +1,6 @@
 package EBook::Ishmael::HTML;
 use 5.016;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 use strict;
 use warnings;
 
@@ -27,7 +27,8 @@ sub text2html {
 }
 
 my %STRIP_NODES = map { $_ => 1 } qw(img style);
-my $STRIP_XPATH = join ' | ', map { "//$_" } keys %STRIP_NODES;
+# local-name() hack lets us ignore namespace prefixes
+my $STRIP_XPATH = join ' | ', map { "//*[local-name() = '$_']" } keys %STRIP_NODES;
 
 sub prepare_html {
 

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::List;
-$OpenSearch::Client::Core::3_0::Direct::List::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::List::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::List>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for list.|https://docs.opensearch.org/latest/api-
 
 =head1 METHODS
     
-=head2 list->help
+=head2 help
 
 Returns help for the List APIs.
 
@@ -91,9 +91,9 @@ C<GET /_list>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for list.help|https://opensearch.org/docs/latest/api-reference/list/index/>
+L<OpenSearch documentation for list-E<gt>help|https://opensearch.org/docs/latest/api-reference/list/index/>
     
-=head2 list->indices
+=head2 indices
 
 Returns paginated information about indexes including number of primaries and replicas, document counts, disk size.
 
@@ -144,9 +144,9 @@ C<GET /_list/indices/{index}>
         'source'                     =>  $qval22,    # string
     );
 
-L<OpenSearch documentation for list.indices|https://opensearch.org/docs/latest/api-reference/list/list-indices/>
+L<OpenSearch documentation for list-E<gt>indices|https://opensearch.org/docs/latest/api-reference/list/list-indices/>
     
-=head2 list->shards
+=head2 shards
 
 Returns paginated details of shard allocation on nodes.
 
@@ -193,7 +193,7 @@ C<GET /_list/shards/{index}>
         'source'                   =>  $qval18,    # string
     );
 
-L<OpenSearch documentation for list.shards|https://opensearch.org/docs/latest/api-reference/list/list-shards/>
+L<OpenSearch documentation for list-E<gt>shards|https://opensearch.org/docs/latest/api-reference/list/list-shards/>
 
 =head1 MANUAL
 

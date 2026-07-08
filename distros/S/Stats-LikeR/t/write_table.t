@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use feature 'say';
 use File::Temp qw(tempdir tempfile);
 use Stats::LikeR;
 use Test::Exception;
@@ -81,7 +80,7 @@ no_leaks_ok {
 #---------
 write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan');
 $str = file2string('/tmp/undef.val.tsv');
-$expected = "\tr1\tr2\tr3\n1\t42\t99\tnan\n2\thello,world\tnan\t\"tab\tin\"\n3\tnan\t\"quote\"\"here\"\tnan\n4\tnan\tnan\tnan\n";
+$expected = "r1\tr2\tr3\n42\t99\tnan\nhello,world\tnan\t\"tab\tin\"\nnan\t\"quote\"\"here\"\tnan\nnan\tnan\tnan\n";
 is($str, $expected, 'undefined values are switched to nan');
 
 # ==============================================================================
@@ -117,7 +116,6 @@ write_table(
 	'row.names' => 0, 'undef.val' => 'NA'
 );
 $str = file2string($fh->filename);
-say $str;
 if ($str eq 'a	b
 1	4
 2	5
@@ -151,13 +149,13 @@ like($lines1[0], qr/^(?:""|'')?A(?:""|'')?,(?:""|'')?B(?:""|'')?$/, "Flat hash (
 like($lines1[1], qr/^(?:""|'')?1(?:""|'')?,(?:""|'')?2(?:""|'')?$/, "Flat hash (rownames=0) Values are on row 1");
 
 # ---------------------------------------------------------
-# Test 2: Flat hash with row.names = 1 (Default behavior)
+# Test 2: Flat hash with row.names => 1 (explicit; no longer the default)
 # Output gracefully prepends the implicit "1" row identifier:
 # "",A,B
 # "1",1,2
 # ---------------------------------------------------------
 my ($fh2, $file2) = tempfile(SUFFIX => '.csv', UNLINK => 1);
-write_table($flat_hash, $file2, sep => ',');
+write_table($flat_hash, $file2, sep => ',', 'row.names' => 1);
 
 open my $in2, '<', $file2 or die "Could not open temp file: $!";
 my @lines2 = <$in2>;
@@ -184,53 +182,53 @@ my %hoh  = ( 'r1' => { 'a' => 1, 'b' => 2 }, 'r2' => { 'a' => 3, 'b' => 4 } );
 my @aoh  = ( { 'x' => 1, 'y' => 2 }, { 'x' => 3, 'y' => 4 } );
 my %flat = ( 'a' => 1, 'b' => 2, 'c' => 3 );
 # 1. Hash of arrays: columns sorted, numeric row names by default.
-wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n", 'HoA: sorted cols + numeric row names', \%hoa, 'undef.val' => 'NA' );
+wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n", 'HoA: sorted cols + numeric row names', \%hoa, 'row.names' => 1, 'undef.val' => 'NA' );
 # 2. Hash of hashes: rows sorted, columns sorted, outer key as the row label.
-wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n", 'HoH: sorted rows and columns', \%hoh, 'undef.val' => 'NA' );
+wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n", 'HoH: sorted rows and columns', \%hoh, 'row.names' => 1, 'undef.val' => 'NA' );
 # 3. Array of hashes: union of keys sorted, numeric row names.
-wrote_ok( ",x,y\n1,1,2\n2,3,4\n", 'AoH: union of keys, numeric row names', \@aoh, 'undef.val' => 'NA' );
+wrote_ok( ",x,y\n1,1,2\n2,3,4\n", 'AoH: union of keys, numeric row names', \@aoh, 'row.names' => 1, 'undef.val' => 'NA' );
 # 4. Flat hash: one row, columns sorted.
-wrote_ok( ",a,b,c\n1,1,2,3\n", 'flat hash: single row', \%flat );
+wrote_ok( "a,b,c\n1,2,3\n", 'flat hash: single row', \%flat );
 # 5. col.names selects/orders columns.
-wrote_ok( ",name\n1,Alice\n2,Bob\n", 'col.names selects a subset in order', \%hoa, 'col.names' => [ 'name' ], 'undef.val' => 'NA' );
+wrote_ok( "name\nAlice\nBob\n", 'col.names selects a subset in order', \%hoa, 'col.names' => [ 'name' ], 'undef.val' => 'NA' );
 # 6. row.names => 0 turns off the row-name column.
 wrote_ok( "age,name\n30,Alice\n25,Bob\n", 'row.names => 0 omits the label column', \%hoa, 'row.names' => 0, 'undef.val' => 'NA' );
 # 7. row.names => 'col' uses that column as the labels and drops it from headers.
 wrote_ok( ",age\nAlice,30\nBob,25\n", "row.names => 'name' uses that column as labels", \%hoa, 'row.names' => 'name', 'undef.val' => 'NA' );
 # 8. Explicit separator.
-wrote_ok( ";a;b;c\n1;1;2;3\n", 'sep => ";" is honored', \%flat, 'sep' => ';', 'undef.val' => 'NA' );
+wrote_ok( "a;b;c\n1;2;3\n", 'sep => ";" is honored', \%flat, 'sep' => ';', 'undef.val' => 'NA' );
 # 9. delim is an alias for sep.
-wrote_ok( "|a|b|c\n1|1|2|3\n", 'delim => "|" is honored', \%flat, 'delim' => '|', 'undef.val' => 'NA' );
+wrote_ok( "a|b|c\n1|2|3\n", 'delim => "|" is honored', \%flat, 'delim' => '|', 'undef.val' => 'NA' );
 # 10. undef.val fills missing cells (jagged hash of arrays).
 my %jag = ( 'a' => [ 1, 2 ], 'b' => [ 10 ] );
-wrote_ok( ",a,b\n1,1,10\n2,2,NA\n", 'missing cells default to NA', \%jag, 'undef.val' => 'NA' );
-wrote_ok( ",a,b\n1,1,10\n2,2,NULL\n", 'undef.val overrides the fill', \%jag, 'undef.val' => 'NULL' );
+wrote_ok( "a,b\n1,10\n2,NA\n", 'missing cells default to NA', \%jag, 'undef.val' => 'NA' );
+wrote_ok( "a,b\n1,10\n2,NULL\n", 'undef.val overrides the fill', \%jag, 'undef.val' => 'NULL' );
 # 11. CSV quoting: separators, quotes and newlines are quoted; quotes are doubled.
 my %quote = ( 'a' => [ 'x,y' ], 'b' => [ 'p"q' ], 'c' => [ "line1\nline2" ]);
-wrote_ok( qq{,a,b,c\n1,"x,y","p""q","line1\nline2"\n}, 'quoting: comma, quote, newline', \%quote, 'undef.val' => 'NA' );
+wrote_ok( qq{a,b,c\n"x,y","p""q","line1\nline2"\n}, 'quoting: comma, quote, newline', \%quote, 'undef.val' => 'NA' );
 # 12. Auto-detect tab separator from a .tsv extension.
 {
 	my $f = "$dir/auto.tsv";
 	write_table( \%flat, $f );
-	is( slurp($f), "\ta\tb\tc\n1\t1\t2\t3\n", '.tsv extension selects a tab separator' );
+	is( slurp($f), "a\tb\tc\n1\t2\t3\n", '.tsv extension selects a tab separator' );
 }
 # 13. Auto-detect comma from .csv (and an explicit sep still wins over the extension).
 {
 	my $f = "$dir/auto2.tsv";
 	write_table( \%flat, $f, 'sep' => ',' );
-	is( slurp($f), ",a,b,c\n1,1,2,3\n", 'explicit sep overrides the extension' );
+	is( slurp($f), "a,b,c\n1,2,3\n", 'explicit sep overrides the extension' );
 }
 # 14. Fully-named calling style (exercises the positional/named disambiguation).
 {
 	my $f = path();
 	write_table( 'data' => \%flat, 'file' => $f );
-	is( slurp($f), ",a,b,c\n1,1,2,3\n", 'data => ..., file => ... works' );
+	is( slurp($f), "a,b,c\n1,2,3\n", 'data => ..., file => ... works' );
 }
 # 15. Positional data with a named file.
 {
 	my $f = path();
 	write_table( \%flat, 'file' => $f );
-	is( slurp($f), ",a,b,c\n1,1,2,3\n", 'positional data + named file works' );
+	is( slurp($f), "a,b,c\n1,2,3\n", 'positional data + named file works' );
 }
 # 16. Bad inputs die with a clear message.
 dies_ok { write_table() } 'no data dies';
@@ -253,7 +251,7 @@ lives_ok { write_table( \%flat, path(), 'col.names' => [], 'row.names' => 0 ) } 
 
 # 18. Default undef rendering is an empty field (no 'undef.val' supplied).
 my %u_jag = ( 'a' => [ 1, 2 ], 'b' => [ 10 ] );
-wrote_ok( ",a,b\n1,1,10\n2,2,\n", 'default undef renders as an empty field', \%u_jag );
+wrote_ok( "a,b\n1,10\n2,\n", 'default undef renders as an empty field', \%u_jag );
 
 # 19. 'undef.val' => undef must behave like the default and emit NO
 #     "uninitialized value" warning (regression: SvPV_nolen on PL_sv_undef).
@@ -262,12 +260,12 @@ wrote_ok( ",a,b\n1,1,10\n2,2,\n", 'default undef renders as an empty field', \%u
 	local $SIG{__WARN__} = sub { push @warnings, @_ };
 	my $f = path();
 	write_table( \%u_jag, $f, 'undef.val' => undef );
-	is( slurp($f), ",a,b\n1,1,10\n2,2,\n", "undef.val => undef behaves like the default" );
+	is( slurp($f), "a,b\n1,10\n2,\n", "undef.val => undef behaves like the default" );
 	is( scalar @warnings, 0, "undef.val => undef emits no warnings" )
 		or diag( join '', @warnings );
 	$f = path();
 	write_table( \%u_jag, $f, 'undef.val' => '' );
-	is( slurp($f), ",a,b\n1,1,10\n2,2,\n", "undef.val => '' is identical to the default" );
+	is( slurp($f), "a,b\n1,10\n2,\n", "undef.val => '' is identical to the default" );
 }
 
 # 20. Empty col.names per input shape. A HANG on any of these is the
@@ -276,14 +274,14 @@ wrote_ok( ",a,b\n1,1,10\n2,2,\n", 'default undef renders as an empty field', \%u
 	# HoH: degenerate but defined output - only the row-label column survives.
 	my %hoh2 = ( 'r1' => { 'a' => 1 }, 'r2' => { 'a' => 2 } );
 	my $f = path();
-	lives_ok { write_table( \%hoh2, $f, 'col.names' => [] ) }
+	lives_ok { write_table( \%hoh2, $f, 'col.names' => [], 'row.names' => 1 ) }
 		'HoH: empty col.names terminates';
 	is( slurp($f), "\nr1\nr2\n", 'HoH: empty col.names leaves only sorted row labels' );
 
 	# AoH: numeric row labels survive.
 	my @aoh2 = ( { 'x' => 1 }, { 'x' => 2 } );
 	$f = path();
-	lives_ok { write_table( \@aoh2, $f, 'col.names' => [] ) }
+	lives_ok { write_table( \@aoh2, $f, 'col.names' => [], 'row.names' => 1 ) }
 		'AoH: empty col.names terminates';
 	is( slurp($f), "\n1\n2\n", 'AoH: empty col.names leaves only numeric row labels' );
 
@@ -312,7 +310,7 @@ wrote_ok( ",a,b\n1,1,10\n2,2,\n", 'default undef renders as an empty field', \%u
 {
 	my @many = map { { 'v' => $_ * 10 } } 1 .. 12;
 	my $expected = ",v\n" . join( '', map { "$_," . ( $_ * 10 ) . "\n" } 1 .. 12 );
-	wrote_ok( $expected, 'numeric row labels 1..12 correct in sequence', \@many );
+	wrote_ok( $expected, 'numeric row labels 1..12 correct in sequence', \@many, 'row.names' => 1 );
 }
 
 # 23. Unopenable output path: must die, and must not leak the pre-gathered
@@ -328,7 +326,7 @@ wrote_ok( ",a,b\n1,1,10\n2,2,\n", 'default undef renders as an empty field', \%u
 
 # 24. Quoting corners.
 # Carriage return forces quoting just like newline.
-wrote_ok( qq{,a\n1,"x\ry"\n}, 'embedded \r is quoted', { 'a' => [ "x\ry" ] } );
+wrote_ok( qq{a\n"x\ry"\n}, 'embedded \r is quoted', { 'a' => [ "x\ry" ] } );
 # A column NAME containing the separator is quoted in the header row.
 wrote_ok( qq{"a,b"\n1\n}, 'column name containing the separator is quoted',
 	{ 'a,b' => [ 1 ] }, 'row.names' => 0 );
@@ -337,7 +335,7 @@ wrote_ok( qq{a::b\n"x::y"::x:y\n}, 'multi-char separator: full match quotes, par
 	{ 'a' => [ 'x::y' ], 'b' => [ 'x:y' ] }, 'sep' => '::', 'row.names' => 0 );
 
 # 25. undef entries inside col.names are skipped, order otherwise preserved.
-wrote_ok( ",b,a\n1,2,1\n", 'undef entries in col.names are skipped',
+wrote_ok( "b,a\n2,1\n", 'undef entries in col.names are skipped',
 	{ 'a' => [ 1 ], 'b' => [ 2 ] }, 'col.names' => [ 'b', undef, 'a' ] );
 
 # 26. col.names naming a column absent from the data pads with undef.val
@@ -390,9 +388,91 @@ SKIP: {
 
 	my $row = "zeile\x{263a}";
 	$f = path();
-	write_table( { $row => { 'a' => 9 } }, $f );
+	write_table( { $row => { 'a' => 9 } }, $f, 'row.names' => 1 );
 	is( slurp($f), ",a\nzeile\x{e2}\x{98}\x{ba},9\n",
 		'wide-character HoH row key sorts and fetches correctly (UTF-8 bytes on disk)' );
 }
+
+# ==============================================================================
+# 31+. Non-ASCII / UTF-8 write coverage and full write->read round trips.
+#
+# write_table opens the output as a byte stream (PerlIO_open ... "w") and writes
+# each cell's bytes verbatim via SvPV: a byte string is written as-is, and a
+# wide-character (UTF-8-flagged) string is written as its internal UTF-8 bytes.
+# Test 30 above covered wide-character KEYS; the tests below cover non-ASCII
+# VALUES and prove that write_table + read_table round-trip non-ASCII data
+# byte-for-byte. Byte values are spelled out explicitly (\xC3\xA9 = LATIN SMALL
+# LETTER E WITH ACUTE, \xE2\x98\x83 = SNOWMAN) so the expectations never depend
+# on this file's own on-disk encoding.
+# ==============================================================================
+my $utf8_cafe = "caf\xC3\xA9";	# 'cafe' + e-acute  (byte string, no UTF-8 flag)
+my $utf8_ole  = "ol\xC3\xA9";	# 'ol'  + e-acute
+my $utf8_snow = "\xE2\x98\x83";	# U+2603 SNOWMAN
+
+# 31. A non-ASCII byte value is written verbatim (flat hash, no quoting needed).
+wrote_ok( "greeting\n$utf8_cafe\n", 'UTF-8 bytes in a value are written verbatim',
+	{ 'greeting' => $utf8_cafe }, 'row.names' => 0 );
+
+# 32. A non-ASCII value that also contains the separator is quoted, bytes intact.
+wrote_ok( qq{a\n"$utf8_cafe,$utf8_ole"\n},
+	'UTF-8 value containing the separator is quoted, bytes preserved',
+	{ 'a' => [ "$utf8_cafe,$utf8_ole" ] } );
+
+# 33. A wide-character (UTF-8-flagged, code point > 0xFF) VALUE is written as
+#     its UTF-8 bytes -- the value-side analogue of test 30's key check.
+{
+	my $f = path();
+	write_table( { 'r1' => { 'a' => "\x{263a}" } }, $f );
+	is( slurp($f), "a\n\x{e2}\x{98}\x{ba}\n",
+		'a wide-character value is written as its UTF-8 bytes on disk' );
+}
+
+# 34. Writing a wide-character value emits no "Wide character in print" warning:
+#     the XS writes bytes straight to a byte stream, bypassing Perl's print.
+{
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	write_table( { 'r1' => { 'a' => "\x{263a}" } }, path() );
+	is( scalar @warnings, 0, 'writing a wide-character value emits no warnings' )
+		or diag "warnings seen: @warnings";
+}
+no_leaks_ok {
+	eval { write_table( { 'r1' => { 'a' => "\x{263a}" } }, path() ) };
+} 'write_table: no memory leaks writing a wide-character value' unless $INC{'Devel/Cover.pm'};
+
+# 35. Full round trip: write non-ASCII column names and values, then read them
+#     back in the aoh and hoa shapes. Both functions are byte-transparent, so
+#     the bytes must survive identically.
+{
+	my $f = path();
+	write_table( [ { $utf8_cafe => $utf8_ole, 'city' => $utf8_snow } ], $f, 'row.names' => 0 );
+	ok( index( slurp($f), $utf8_ole )  >= 0, 'round trip: UTF-8 value bytes reached the disk' );
+	ok( index( slurp($f), $utf8_cafe ) >= 0, 'round trip: UTF-8 column-name bytes reached the disk' );
+
+	my $aoh = read_table( $f );
+	is( $aoh->[0]{$utf8_cafe}, $utf8_ole,  'round trip (aoh): value under a non-ASCII column name is byte-identical' );
+	is( $aoh->[0]{'city'},     $utf8_snow, 'round trip (aoh): a non-ASCII value is byte-identical' );
+
+	my $hoa = read_table( $f, 'output.type' => 'hoa' );
+	is( $hoa->{$utf8_cafe}[0], $utf8_ole,  'round trip (hoa): value under a non-ASCII column key is byte-identical' );
+	is( $hoa->{'city'}[0],     $utf8_snow, 'round trip (hoa): a non-ASCII column value is byte-identical' );
+}
+
+# 36. Round trip through the hoh shape with a non-ASCII row key and value.
+{
+	my $f = path();
+	write_table( [ { 'id' => $utf8_snow, 'val' => $utf8_cafe } ], $f, 'row.names' => 0 );
+	my $hoh = read_table( $f, 'output.type' => 'hoh', 'row.names' => 'id' );
+	ok( exists $hoh->{$utf8_snow}, 'round trip (hoh): a non-ASCII row key survives' );
+	is( $hoh->{$utf8_snow}{'val'}, $utf8_cafe,
+		'round trip (hoh): the value under a non-ASCII row key is byte-identical' );
+}
+no_leaks_ok {
+	eval {
+		my $f = path();
+		write_table( [ { $utf8_cafe => $utf8_ole, 'city' => $utf8_snow } ], $f, 'row.names' => 0 );
+		read_table( $f );
+	};
+} 'write_table/read_table: no memory leaks on a UTF-8 round trip' unless $INC{'Devel/Cover.pm'};
 
 done_testing();

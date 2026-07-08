@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use open ':std', ':encoding(UTF-8)';
 
 use Capture::Tiny qw(capture);
 use File::Temp qw(tempfile);

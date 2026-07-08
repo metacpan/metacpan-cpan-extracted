@@ -1,11 +1,11 @@
 # ABSTRACT: Show board summary
 
 package App::karr::Cmd::Board;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
-  usage_string => 'USAGE: karr board [--json] [--compact] [--tags]',
+  usage_string => 'USAGE: karr board [--json] [--compact] [--tags] [--done]',
 );
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
@@ -18,6 +18,11 @@ with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 option tags => (
   is => 'ro',
   doc => 'Show each task\'s tags on an extra indented line',
+);
+
+option done => (
+  is => 'ro',
+  doc => 'Include the Done section (hidden by default)',
 );
 
 
@@ -58,10 +63,13 @@ sub execute {
     );
     for my $status (@statuses) {
       my $tasks_in_status = $by_status{$status} // [];
+      # Hide done task payloads by default (keep the column and its real count
+      # so the all-columns shape and total stay intact); --done reveals them.
+      my $hide = $status eq 'done' && !$self->done;
       my %col = (
         status => $status,
         count  => scalar @$tasks_in_status,
-        tasks  => [ map { $_->to_frontmatter } @$tasks_in_status ],
+        tasks  => $hide ? [] : [ map { $_->to_frontmatter } @$tasks_in_status ],
       );
       push @{$board_data{columns}}, \%col;
     }
@@ -92,9 +100,11 @@ sub execute {
 
   print $c->("# $board_name", 'bold cyan'), "\n";
 
-  # Skip empty archived unless it has tasks
+  # Skip empty archived unless it has tasks; hide done unless --done was given
+  # (the footer still notes how many done tasks were hidden).
   my @display_statuses = grep {
-    $_ ne 'archived' || @{$by_status{$_} // []}
+    ($_ ne 'archived' || @{$by_status{$_} // []})
+      && ($_ ne 'done' || $self->done)
   } @statuses;
 
   for my $status (@display_statuses) {
@@ -134,7 +144,10 @@ sub execute {
   # Summary footer
   my $blocked = grep { $_->has_blocked } @tasks;
   my $claimed = grep { $_->has_claimed_by && $_->status ne 'done' && $_->status ne 'archived' } @tasks;
-  my @summary = ( scalar(@tasks) . ' tasks' );
+  my $done_hidden = $self->done ? 0 : scalar @{ $by_status{done} // [] };
+  my $total_label = scalar(@tasks) . ' tasks';
+  $total_label .= " ($done_hidden done hidden)" if $done_hidden;
+  my @summary = ( $total_label );
   push @summary, "$claimed claimed" if $claimed;
   push @summary, "$blocked blocked" if $blocked;
   print "\n", $c->(join('  ', @summary), 'bold'), "\n";
@@ -154,7 +167,7 @@ App::karr::Cmd::Board - Show board summary
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 
@@ -162,6 +175,7 @@ version 0.303
     karr board --tags
     karr board --compact
     karr board --json
+    karr board --done
 
 =head1 DESCRIPTION
 
@@ -179,14 +193,22 @@ JSON modes remain available for automation and scripting.
 =item * Default output
 
 Lists every status as a C<## Status> section (in board order, empty sections
-included; an empty C<archived> is hidden). Each task renders as
-C<- id | title> followed by C<priority> (non-default only), C<@claimant>,
-C<blocked:reason>, and C<due:date> tokens where applicable. A footer line totals
-tasks, claims, and blocks.
+included; an empty C<archived> is hidden, and C<done> is hidden unless C<--done>
+is given). Each task renders as C<- id | title> followed by C<priority>
+(non-default only), C<@claimant>, C<blocked:reason>, and C<due:date> tokens where
+applicable. A footer line totals tasks, claims, and blocks, and — when the
+C<done> section is hidden and non-empty — appends a C<(N done hidden)> hint so
+the count is not silently lost.
 
 =item * C<--tags>
 
 Adds an extra indented line of C<#tag> tokens beneath each task that has tags.
+
+=item * C<--done>
+
+Includes the C<done> section, which is hidden by default, and suppresses the
+hidden-count footer hint. Applies to the default, C<--tags>, and C<--json>
+renderings; C<--compact> always lists every status regardless.
 
 =item * C<--compact>
 

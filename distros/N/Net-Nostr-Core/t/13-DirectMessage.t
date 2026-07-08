@@ -141,6 +141,32 @@ subtest 'create_relay_list rejects invalid relay URIs' => sub {
     ) }, qr/relay URI/i, 'invalid relay URI rejected');
 };
 
+subtest 'create_relay_list rejects structurally invalid relay URIs' => sub {
+    for my $relay (
+        'https://relay.example.com',
+        'wss://',
+        'wss://?x',
+        'wss://user@relay.example.com',
+        'wss://relay.example.com?x=1',
+        'wss://relay.example.com#frag',
+        'wss://relay.example.com:0',
+        'wss://relay.example.com:70000',
+        "wss://relay.example.com/\npath",
+    ) {
+        like(dies { Net::Nostr::DirectMessage->create_relay_list(
+            pubkey => $PUBKEY,
+            relays => [$relay],
+        ) }, qr/relay URI/i, "$relay rejected");
+    }
+};
+
+subtest 'create_relay_list accepts structured relay URIs' => sub {
+    ok(lives { Net::Nostr::DirectMessage->create_relay_list(
+        pubkey => $PUBKEY,
+        relays => ['wss://relay.example.com/nostr', 'ws://127.0.0.1:8080', 'wss://[::1]:443'],
+    ) }, 'valid structured relay URIs accepted');
+};
+
 ###############################################################################
 # receive validation
 ###############################################################################

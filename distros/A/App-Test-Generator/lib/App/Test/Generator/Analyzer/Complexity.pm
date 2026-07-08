@@ -38,11 +38,11 @@ Readonly my @EXCEPTION_TOKENS => qw(
 	die croak confess try catch eval
 );
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =head1 DESCRIPTION
 

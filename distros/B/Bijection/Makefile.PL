@@ -23,6 +23,7 @@ WriteMakefile(
  		'Carp' => '0',
 		'Import::Export' => '1.00',
 	},
+    	macro => { TARFLAGS   => "--format=ustar -c -v -f" },
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES => 'Bijection-*' },
 	META_MERGE => {

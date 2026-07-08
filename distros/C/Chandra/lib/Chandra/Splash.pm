@@ -3,13 +3,15 @@ package Chandra::Splash;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
 use Chandra;
 
 1;
 
 __END__
+
+=encoding utf8
 
 =head1 NAME
 

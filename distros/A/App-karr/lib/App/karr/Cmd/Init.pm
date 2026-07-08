@@ -1,7 +1,7 @@
 # ABSTRACT: Initialize a new karr board
 
 package App::karr::Cmd::Init;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -9,8 +9,9 @@ use MooX::Options (
 );
 use Path::Tiny;
 use App::karr::Config;
-use App::karr::Git;
-use App::karr::BoardStore;
+use App::karr::Role::BoardDiscovery;
+
+with 'App::karr::Role::BoardDiscovery';
 
 
 option name => (
@@ -32,11 +33,11 @@ option claude_skill => (
 
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
-  my $git = App::karr::Git->new( dir => '.' );
-  die "Not a git repository. karr requires Git.\n" unless $git->is_repo;
 
-  my $root = $git->repo_root;
-  my $store = App::karr::BoardStore->new( git => App::karr::Git->new( dir => $root->stringify ) );
+  # git_root honours --dir (both call forms) and dies loudly if the target is
+  # not a Git repository, instead of hardcoding the current directory.
+  my $root  = $self->git_root;
+  my $store = $self->store;
   die "Board already exists in refs/karr/\n" if $store->board_exists;
 
   my $overrides = { version => 1 };
@@ -52,6 +53,13 @@ sub execute {
   $store->set_next_id(1);
 
   print "Initialized karr board in refs/karr/\n";
+
+  # The materialized file view (config.yml + tasks/) is a disposable view of the
+  # canonical refs and must never be committed. Ensure the board-root .gitignore
+  # covers it, appending idempotently -- kanban-md does the same at init time.
+  my @ignored = $store->ensure_gitignore( $root->stringify );
+  print "Added .gitignore entries for the file view: " . join( ', ', @ignored ) . "\n"
+    if @ignored;
 
   if ($self->claude_skill) {
     $self->_install_claude_skill($root);
@@ -104,7 +112,7 @@ App::karr::Cmd::Init - Initialize a new karr board
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

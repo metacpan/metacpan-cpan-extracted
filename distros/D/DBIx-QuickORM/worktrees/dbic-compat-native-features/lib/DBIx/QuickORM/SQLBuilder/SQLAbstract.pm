@@ -2,11 +2,12 @@ package DBIx::QuickORM::SQLBuilder::SQLAbstract;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak confess/;
 use Sub::Util qw/set_subname/;
 use Scalar::Util qw/blessed/;
+use DBIx::QuickORM::Util qw/literal_write_value/;
 use parent 'SQL::Abstract';
 
 use Role::Tiny::With qw/with/;
@@ -126,6 +127,37 @@ BEGIN {
 
             $stmt =~ s/^(\s*SELECT)\b/$1 DISTINCT/i if $params{distinct};
 
+            # GROUP BY / HAVING / ORDER BY are appended here (only for select, and
+            # in that SQL clause order) rather than left to SQL::Abstract's select(),
+            # which would emit ORDER BY immediately after WHERE. Their binds are raw
+            # [col, val] pairs like the where binds and are tagged together below, so
+            # they land positionally between the where binds and the limit binds.
+            if ($meth eq 'select') {
+                if (defined(my $group = $params{group_by})) {
+                    my ($gsql, @gbind) = $self->_group_by($group);
+                    if (length $gsql) {
+                        $stmt .= $gsql;
+                        push @bind => @gbind;
+                    }
+                }
+
+                if (defined(my $having = $params{having})) {
+                    my ($hsql, @hbind) = $self->_recurse_where($having);
+                    if (defined($hsql) && length($hsql)) {
+                        $stmt .= $self->_sqlcase(' having ') . $hsql;
+                        push @bind => @hbind;
+                    }
+                }
+
+                if (defined(my $order = $params{order_by})) {
+                    my ($osql, @obind) = $self->_order_by($order);
+                    if (length $osql) {
+                        $stmt .= $osql;
+                        push @bind => @obind;
+                    }
+                }
+            }
+
             my $param = 1;
             @bind = map { my ($f, $v) = @{$_}; +{param => $param++, value => $v, type => 'field', field => $f} } @bind;
 
@@ -192,13 +224,27 @@ sub qorm_upsert {
         # built after SQL::Abstract runs, so its quote_char never reaches it.
         # The bind spec keeps the raw db name because field_affinity/field_type
         # look it up unquoted.
-        push @inject => $dbh->quote_identifier($db_field) . " = ?";
-        push @$binds => {
-            field => $db_field,
-            value => $changes->{$field},
-            type  => 'field',
-            param => $counter++,
-        };
+        my $col = $dbh->quote_identifier($db_field);
+        my $v   = $changes->{$field};
+
+        # Mirror the literal handling in _format_insert_and_update_data so the
+        # conflict-UPDATE half stays symmetric with the INSERT half: a scalar
+        # ref is emitted as SQL, [\'sql ?', @binds] is emitted with its binds,
+        # and everything else is bound as data.
+        unless (literal_write_value($v)) {
+            push @inject => "$col = ?";
+            push @$binds => {field => $db_field, value => $v, type => 'field', param => $counter++};
+            next;
+        }
+
+        if (ref($v) eq 'SCALAR') {
+            push @inject => "$col = $$v";
+            next;
+        }
+
+        my ($sql, @lits) = @$v;
+        push @inject => "$col = $$sql";
+        push @$binds => {field => $db_field, value => $_, type => 'field', param => $counter++} for @lits;
     }
     # When every field is part of the primary key there is nothing to update
     # on conflict, but the conflict clause still needs an assignment (and
@@ -242,6 +288,8 @@ sub _insert_args {
     confess "insert() with a 'limit' clause is not currently supported"     if defined $params->{limit};
     confess "insert() with an 'offset' clause is not currently supported"   if defined $params->{offset};
     confess "insert() with an 'order_by' clause is not currently supported" if $params->{order_by};
+    confess "insert() with a 'group_by' clause is not currently supported"  if $params->{group_by};
+    confess "insert() with a 'having' clause is not currently supported"    if $params->{having};
     confess "insert() with 'distinct' set is not currently supported"       if $params->{distinct};
 
     my $values = $params->{insert} // croak "'insert' is required";
@@ -259,6 +307,8 @@ sub _delete_args {
     confess "delete() with a 'limit' clause is not currently supported"     if defined $params->{limit};
     confess "delete() with an 'offset' clause is not currently supported"   if defined $params->{offset};
     confess "delete() with an 'order_by' clause is not currently supported" if $params->{order_by};
+    confess "delete() with a 'group_by' clause is not currently supported"  if $params->{group_by};
+    confess "delete() with a 'having' clause is not currently supported"    if $params->{having};
     confess "delete() with 'distinct' set is not currently supported"       if $params->{distinct};
 
     my $where = $params->{where} // undef;
@@ -274,6 +324,8 @@ sub _update_args {
     confess "update() with a 'limit' clause is not currently supported"     if defined $params->{limit};
     confess "update() with an 'offset' clause is not currently supported"   if defined $params->{offset};
     confess "update() with an 'order_by' clause is not currently supported" if $params->{order_by};
+    confess "update() with a 'group_by' clause is not currently supported"  if $params->{group_by};
+    confess "update() with a 'having' clause is not currently supported"    if $params->{having};
     confess "update() with 'distinct' set is not currently supported"       if $params->{distinct};
 
     my $values    = $params->{update} or croak "'update' is required";
@@ -290,9 +342,11 @@ sub _select_args {
 
     my $fields = $params->{fields} or croak "'fields' is required";
     my $where  = $params->{where};
-    my $order  = $params->{order_by};
 
-    return ($fields, $where, $order);
+    # ORDER BY (and GROUP BY / HAVING) are appended after the fact in qorm_select
+    # so GROUP BY / HAVING can be slotted between WHERE and ORDER BY; do not hand
+    # order_by to SQL::Abstract's select() here or it would emit ORDER BY too early.
+    return ($fields, $where);
 }
 
 sub _where_args {
@@ -307,33 +361,81 @@ sub _where_args {
 
 =pod
 
+=item ($sql, @bind) = $builder->_group_by($group)
+
+Render a C<GROUP BY> clause (with a leading space) for a column or an arrayref
+of columns. A plain string is quoted as an identifier; a scalar ref is emitted
+as literal SQL. Returns an empty string when there is nothing to group by.
+
+=cut
+
+sub _group_by {
+    my $self = shift;
+    my ($group) = @_;
+
+    my @cols = ref($group) eq 'ARRAY' ? @$group : ($group);
+
+    my (@parts, @bind);
+    for my $col (@cols) {
+        next unless defined $col;
+        my $ref = ref $col;
+        if ($ref eq 'SCALAR') {
+            push @parts => $$col;                                   # literal SQL, verbatim
+        }
+        elsif ($ref eq 'REF' && ref($$col) eq 'ARRAY') {
+            my ($csql, @cbind) = @{$$col};                          # \[ 'expr ?', @binds ]
+            push @parts => $csql;
+            push @bind  => map { [undef, $_] } @cbind;
+        }
+        else {
+            push @parts => $self->_quote($col);                     # plain column -> quoted
+        }
+    }
+
+    return ('') unless @parts;
+
+    return ($self->_sqlcase(' group by ') . join(', ', @parts), @bind);
+}
+
+=pod
+
 =item $cond = $builder->qorm_and($a, $b)
 
 =item $cond = $builder->qorm_or($a, $b)
 
 Combine two where-conditions with C<SQL::Abstract>'s C<-and> / C<-or>
-operators.
+operators. Undefined operands are dropped first, so combining onto an absent
+condition (e.g. C<< $handle->and(...) >> before any C<where> is set) returns
+the remaining condition alone rather than an empty-sided C<-and>/C<-or>.
 
 =cut
 
 sub qorm_and {
     my $self = shift;
-    my ($a, $b) = @_;
-    return +{'-and' => [$a, $b]}
+    my @parts = grep { defined } @_;
+    return undef    unless @parts;
+    return $parts[0] if @parts == 1;
+    return +{'-and' => \@parts};
 }
 
 sub qorm_or {
     my $self = shift;
-    my ($a, $b) = @_;
-    return +{'-or' => [$a, $b]}
+    my @parts = grep { defined } @_;
+    return undef    unless @parts;
+    return $parts[0] if @parts == 1;
+    return +{'-or' => \@parts};
 }
 
 =pod
 
 =item $formatted = $builder->_format_insert_and_update_data(\%data)
 
-Wrap each value in a C<< { -value => ... } >> so C<SQL::Abstract> treats it as
-a literal bind value rather than interpreting it.
+Wrap each data value in a C<< { -value => ... } >> so C<SQL::Abstract> binds it
+rather than interpreting a hashref or arrayref value as an operator expression.
+Intentional SQL literals are the exception: a scalar ref (C<\'NOW()'>) is emitted
+verbatim, and an arrayref whose first element is a scalar ref (C<[\'col + ?', $n]>)
+becomes a literal-with-bind expression whose bind values keep the column's
+affinity.
 
 =back
 
@@ -343,9 +445,30 @@ sub _format_insert_and_update_data {
     my $self = shift;
     my ($data) = @_;
 
-    $data = { map { $_ => {'-value' => $data->{$_}} } keys %$data };
+    my %out;
+    for my $field (keys %$data) {
+        my $v = $data->{$field};
 
-    return $data;
+        unless (literal_write_value($v)) {
+            $out{$field} = {'-value' => $v};
+            next;
+        }
+
+        # A bare scalar ref is literal SQL; SQL::Abstract emits it verbatim.
+        if (ref($v) eq 'SCALAR') {
+            $out{$field} = $v;
+            next;
+        }
+
+        # [\'sql ?', @binds] -> SQL::Abstract's \[ $sql, [col => bind], ... ]
+        # literal-with-bind form. With bindtype 'columns' each bind must be a
+        # [column, value] pair, so tag every bind with this field so affinity
+        # and deflation still apply.
+        my ($sql, @binds) = @$v;
+        $out{$field} = \[ $$sql, map { [$field => $_] } @binds ];
+    }
+
+    return \%out;
 }
 
 =pod
@@ -379,6 +502,11 @@ sub _translate_params {
     $params->{returning} = $self->_translate_fields($source, $params->{returning}) if $params->{returning};
     $params->{where}     = $self->_translate_where($source, $params->{where})     if defined $params->{where};
     $params->{order_by}  = $self->_translate_order($source, $params->{order_by})  if defined $params->{order_by};
+    # group_by translates like an order-by column list; having is a where-style
+    # condition. Aggregate aliases are unknown to the source and pass through
+    # unchanged, so a HAVING can reference them.
+    $params->{group_by}  = $self->_translate_order($source, $params->{group_by})  if defined $params->{group_by};
+    $params->{having}    = $self->_translate_where($source, $params->{having})    if defined $params->{having};
 
     return;
 }

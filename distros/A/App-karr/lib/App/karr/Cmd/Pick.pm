@@ -1,7 +1,7 @@
 # ABSTRACT: Atomically find and claim the next available task
 
 package App::karr::Cmd::Pick;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -56,7 +56,6 @@ sub execute {
     @tasks = grep { $allowed{$_->status} } @tasks;
   } else {
     # Exclude terminal statuses
-    # Exclude terminal statuses
     @tasks = grep { !App::karr::Config->is_terminal_status($_->status) } @tasks;
   }
 
@@ -93,21 +92,17 @@ sub execute {
     return;
   }
 
-  # Try to lock + claim
-  my $use_lock = $self->git->is_repo;
-  my $lock;
-  if ($use_lock) {
-    require App::karr::Lock;
-    $lock = App::karr::Lock->new(git => $self->git);
-  }
-  my $email = $use_lock ? ($self->git->git_user_email || $self->claim) : $self->claim;
+  # Try to lock + claim. A karr board lives in refs/karr/*, which exist only
+  # inside a Git repo, so reaching this point means we are in one -- the
+  # locking path is unconditional.
+  require App::karr::Lock;
+  my $lock  = App::karr::Lock->new(git => $self->git);
+  my $email = $self->git->git_user_email || $self->claim;
 
   my $picked;
   for my $task (@tasks) {
-    if ($use_lock) {
-      my ($ok, $msg) = $lock->acquire($task->id, $email);
-      next unless $ok;
-    }
+    my ($ok, $msg) = $lock->acquire($task->id, $email);
+    next unless $ok;
 
     $task->claimed_by($self->claim);
     $task->claimed_at(gmtime->datetime . 'Z');
@@ -133,24 +128,18 @@ sub execute {
   $self->sync_after;
 
   # Log the pick action
-  if ($use_lock) {
-    $self->append_log($self->git,
-      agent   => $self->claim,
-      action  => 'pick',
-      task_id => $picked->id,
-      detail  => $picked->status,
-    );
-  }
+  $self->append_log($self->git,
+    agent   => $self->claim,
+    action  => 'pick',
+    task_id => $picked->id,
+    detail  => $picked->status,
+  );
 
   # Release lock AFTER sync
-  if ($use_lock) {
-    $lock->release($picked->id, $email);
-  }
+  $lock->release($picked->id, $email);
 
   if ($self->json) {
-    my $data = $picked->to_frontmatter;
-    $data->{body} = $picked->body if $picked->body;
-    $self->print_json($data);
+    $self->print_json($picked->to_json_hash);
     return;
   }
 
@@ -175,7 +164,7 @@ App::karr::Cmd::Pick - Atomically find and claim the next available task
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

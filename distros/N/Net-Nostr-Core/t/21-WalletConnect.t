@@ -202,6 +202,18 @@ subtest 'parse_uri rejects non-hex secret' => sub {
     like $@, qr/secret/, 'error mentions secret';
 };
 
+subtest 'parse_uri rejects relay parameter without a value' => sub {
+    my $uri = "nostr+walletconnect://${wallet_pubkey}?relay&secret=${client_secret}";
+    ok !eval { Net::Nostr::WalletConnect->parse_uri($uri) }, 'croaks on missing relay value';
+    like $@, qr/relay/, 'error mentions relay';
+};
+
+subtest 'parse_uri rejects malformed relay URLs' => sub {
+    my $uri = "nostr+walletconnect://${wallet_pubkey}?relay=wss%3A%2F%2F%3Fx&secret=${client_secret}";
+    ok !eval { Net::Nostr::WalletConnect->parse_uri($uri) }, 'croaks on malformed relay URL';
+    like $@, qr/relay/, 'error mentions relay';
+};
+
 subtest 'create_uri rejects non-hex wallet_pubkey' => sub {
     ok !eval { Net::Nostr::WalletConnect->create_uri(
         wallet_pubkey => 'not-hex',
@@ -218,6 +230,24 @@ subtest 'create_uri rejects non-hex secret' => sub {
         secret        => 'bad-secret',
     ) }, 'croaks on bad secret';
     like $@, qr/secret/, 'error mentions secret';
+};
+
+subtest 'create_uri rejects malformed relay URLs' => sub {
+    ok !eval { Net::Nostr::WalletConnect->create_uri(
+        wallet_pubkey => $wallet_pubkey,
+        relay         => 'wss://?x',
+        secret        => $client_secret,
+    ) }, 'croaks on bad relay';
+    like $@, qr/relay/, 'error mentions relay';
+};
+
+subtest 'create_uri rejects empty relay arrays' => sub {
+    ok !eval { Net::Nostr::WalletConnect->create_uri(
+        wallet_pubkey => $wallet_pubkey,
+        relay         => [],
+        secret        => $client_secret,
+    ) }, 'croaks on empty relay array';
+    like $@, qr/relay/, 'error mentions relay';
 };
 
 subtest 'WalletConnect inner classes reject unknown arguments' => sub {

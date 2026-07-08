@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::KNN;
-$OpenSearch::Client::Core::3_0::Direct::KNN::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::KNN::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::KNN>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for knn.|https://docs.opensearch.org/latest/vecto
 
 =head1 METHODS
     
-=head2 knn->delete_model
+=head2 delete_model
 
 Used to delete a particular model in the cluster.
 
@@ -95,9 +95,9 @@ C<DELETE /_plugins/_knn/models/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for knn.delete_model|https://docs.opensearch.org/latest/vector-search/api/knn/#delete-a-model>
+L<OpenSearch documentation for knn-E<gt>delete_model|https://docs.opensearch.org/latest/vector-search/api/knn/#delete-a-model>
     
-=head2 knn->get_model
+=head2 get_model
 
 Used to retrieve information about models present in the cluster.
 
@@ -125,9 +125,9 @@ C<GET /_plugins/_knn/models/{model_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for knn.get_model|https://docs.opensearch.org/latest/vector-search/api/knn/#get-a-model>
+L<OpenSearch documentation for knn-E<gt>get_model|https://docs.opensearch.org/latest/vector-search/api/knn/#get-a-model>
     
-=head2 knn->search_models
+=head2 search_models
 
 Use an OpenSearch query to search for models in the index.
 
@@ -201,9 +201,9 @@ C<POST /_plugins/_knn/models/_search>
         'source'                         =>  $qval47,    # string
     );
 
-L<OpenSearch documentation for knn.search_models|https://docs.opensearch.org/latest/vector-search/api/knn/#search-for-a-model>
+L<OpenSearch documentation for knn-E<gt>search_models|https://docs.opensearch.org/latest/vector-search/api/knn/#search-for-a-model>
     
-=head2 knn->stats
+=head2 stats
 
 Provides information about the current status of the k-NN plugin.
 
@@ -245,9 +245,9 @@ C<GET /_plugins/_knn/{node_id}/stats/{stat}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for knn.stats|https://docs.opensearch.org/latest/vector-search/api/knn/#stats>
+L<OpenSearch documentation for knn-E<gt>stats|https://docs.opensearch.org/latest/vector-search/api/knn/#stats>
     
-=head2 knn->train_model
+=head2 train_model
 
 Create and train a model that can be used for initializing k-NN native library indexes during indexing.
 
@@ -284,9 +284,9 @@ C<POST /_plugins/_knn/models/{model_id}/_train>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for knn.train_model|https://docs.opensearch.org/latest/vector-search/api/knn/#train-a-model>
+L<OpenSearch documentation for knn-E<gt>train_model|https://docs.opensearch.org/latest/vector-search/api/knn/#train-a-model>
     
-=head2 knn->warmup
+=head2 warmup
 
 Preloads native library files into memory, reducing initial search latency for specified indexes.
 
@@ -314,7 +314,7 @@ C<GET /_plugins/_knn/warmup/{index}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for knn.warmup|https://docs.opensearch.org/latest/vector-search/api/knn/#warmup-operation>
+L<OpenSearch documentation for knn-E<gt>warmup|https://docs.opensearch.org/latest/vector-search/api/knn/#warmup-operation>
 
 =head1 MANUAL
 

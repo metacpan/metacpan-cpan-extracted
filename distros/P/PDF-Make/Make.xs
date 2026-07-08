@@ -167,18 +167,17 @@ pdfmake_imgr_err_t pdfmake_decoded_image_resize(
     pdfmake_arena_t *arena);
 
 /* Portable strndup: POSIX 2008 / GNU only, not in C99/C11 and missing from
- * Windows UCRT.  Returned buffer is malloc'd; free with plain free(). */
-static char *pdfmake_xs_strndup(const char *s, size_t n)
+ * Windows UCRT.  Uses Newx so callers must Safefree the returned buffer.
+ * pTHX_ is required: XSUB.h redefines malloc→PerlMem_malloc on Windows
+ * PERL_IMPLICIT_SYS builds, which needs the thread context. */
+static char *pdfmake_xs_strndup(pTHX_ const char *s, size_t n)
 {
     char *p;
     size_t i;
 
     if (!s) return NULL;
-    /* Honour the n-byte cap even if s is shorter (don't read past the
-     * caller's buffer; mirrors POSIX strndup semantics). */
     for (i = 0; i < n && s[i]; i++) ;
-    p = (char *)malloc(i + 1);
-    if (!p) return NULL;
+    Newx(p, i + 1, char);
     memcpy(p, s, i);
     p[i] = '\0';
     return p;

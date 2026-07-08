@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::ISM;
-$OpenSearch::Client::Core::3_0::Direct::ISM::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::ISM::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::ISM>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for ism.|https://docs.opensearch.org/latest/im-pl
 
 =head1 METHODS
     
-=head2 ism->add_policy
+=head2 add_policy
 
 Adds a policy to an index.
 
@@ -104,9 +104,9 @@ C<POST /_plugins/_ism/add/{index}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ism.add_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#add-policy>
+L<OpenSearch documentation for ism-E<gt>add_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#add-policy>
     
-=head2 ism->change_policy
+=head2 change_policy
 
 Updates the managed index policy to a new policy.
 
@@ -143,9 +143,9 @@ C<POST /_plugins/_ism/change_policy/{index}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ism.change_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#update-managed-index-policy>
+L<OpenSearch documentation for ism-E<gt>change_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#update-managed-index-policy>
     
-=head2 ism->delete_policy
+=head2 delete_policy
 
 Deletes a policy.
 
@@ -173,9 +173,9 @@ C<DELETE /_plugins/_ism/policies/{policy_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ism.delete_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#delete-policy>
+L<OpenSearch documentation for ism-E<gt>delete_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#delete-policy>
     
-=head2 ism->exists_policy
+=head2 exists_policy
 
 Checks for the existence of a policy.
 
@@ -203,9 +203,9 @@ C<HEAD /_plugins/_ism/policies/{policy_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ism.exists_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#get-policy>
+L<OpenSearch documentation for ism-E<gt>exists_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#get-policy>
     
-=head2 ism->explain_policy
+=head2 explain_policy
 
 Retrieves the currently applied policy on the specified indexes.
 
@@ -244,9 +244,9 @@ C<POST /_plugins/_ism/explain/{index}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ism.explain_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#explain-index>
+L<OpenSearch documentation for ism-E<gt>explain_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#explain-index>
     
-=head2 ism->get_policies
+=head2 get_policies
 
 Retrieves the policies.
 
@@ -270,9 +270,9 @@ C<GET /_plugins/_ism/policies>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ism.get_policies|https://opensearch.org/docs/latest/im-plugin/ism/api/#get-policy>
+L<OpenSearch documentation for ism-E<gt>get_policies|https://opensearch.org/docs/latest/im-plugin/ism/api/#get-policy>
     
-=head2 ism->get_policy
+=head2 get_policy
 
 Retrieves a specific policy.
 
@@ -300,9 +300,9 @@ C<GET /_plugins/_ism/policies/{policy_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ism.get_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#put-policy>
+L<OpenSearch documentation for ism-E<gt>get_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#put-policy>
     
-=head2 ism->put_policies
+=head2 put_policies
 
 Creates or updates policies.
 
@@ -334,9 +334,9 @@ C<PUT /_plugins/_ism/policies>
         'source'           =>  $qval8,     # string
     );
 
-L<OpenSearch documentation for ism.put_policies|https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy>
+L<OpenSearch documentation for ism-E<gt>put_policies|https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy>
     
-=head2 ism->put_policy
+=head2 put_policy
 
 Creates or updates a policy.
 
@@ -371,9 +371,9 @@ C<PUT /_plugins/_ism/policies/{policy_id}>
         'source'           =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for ism.put_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy>
+L<OpenSearch documentation for ism-E<gt>put_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#create-policy>
     
-=head2 ism->refresh_search_analyzers
+=head2 refresh_search_analyzers
 
 Refreshes search analyzers in real time.
 
@@ -401,9 +401,9 @@ C<POST /_plugins/_refresh_search_analyzers/{index}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for ism.refresh_search_analyzers|https://opensearch.org/docs/latest/im-plugin/refresh-analyzer/>
+L<OpenSearch documentation for ism-E<gt>refresh_search_analyzers|https://opensearch.org/docs/latest/im-plugin/refresh-analyzer/>
     
-=head2 ism->remove_policy
+=head2 remove_policy
 
 Removes a policy from an index.
 
@@ -438,9 +438,9 @@ C<POST /_plugins/_ism/remove/{index}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ism.remove_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#remove-policy>
+L<OpenSearch documentation for ism-E<gt>remove_policy|https://opensearch.org/docs/latest/im-plugin/ism/api/#remove-policy>
     
-=head2 ism->retry_index
+=head2 retry_index
 
 Retries the failed action for an index.
 
@@ -477,7 +477,7 @@ C<POST /_plugins/_ism/retry/{index}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for ism.retry_index|https://opensearch.org/docs/latest/im-plugin/ism/api/#retry-failed-index>
+L<OpenSearch documentation for ism-E<gt>retry_index|https://opensearch.org/docs/latest/im-plugin/ism/api/#retry-failed-index>
 
 =head1 MANUAL
 

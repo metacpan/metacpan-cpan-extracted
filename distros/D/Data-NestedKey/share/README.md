@@ -1,3 +1,19 @@
+# Table of Contents
+
+* [NAME](#name)
+* [SYNOPSIS](#synopsis)
+* [DESCRIPTION](#description)
+* [METHODS AND SUBROUTINES](#methods-and-subroutines)
+  * [new(\[$data\_ref\], @kv\_list)](#new\[$data\ref\]-kv\list)
+  * [set(@kv\_list)](#setkv\list)
+  * [get(@key\_paths)](#getkey\paths)
+  * [delete(@key\_paths)](#deletekey\paths)
+  * [exists\_key(@key\_paths)](#exists\keykey\paths)
+  * [as\_string()](#as\string)
+* [AUTHOR](#author)
+* [SEE ALSO](#see-also)
+* [LICENSE](#license)
+* [POD ERRORS](#pod-errors)
 # NAME
 
 Data::NestedKey - Object-oriented handling of deeply nested hash structures.
@@ -38,6 +54,16 @@ Negative indices count from the end of the array (`-1` is the last element).
     items[-1].name                  # last element of the items array
     a.b[2].c.d[-1]                  # deeply nested mix of hashes and arrays
 
+The root of the structure may itself be an array. A path that begins with a
+bare subscript indexes the top-level array directly:
+
+    [0].name        # 'name' field of the first top-level element
+    [-1]            # the last top-level element
+
+Array subscript notation is supported in `get`, `exists_key`, and `delete`
+(including bare leading subscripts against an array root). It is **not**
+supported in `set` (see below).
+
 Array subscript notation is supported in `get`, `exists_key`, and `delete`.
 `set` continues to operate on plain dot-separated hash paths only.
 
@@ -72,11 +98,14 @@ package variables:
 
 # METHODS AND SUBROUTINES
 
-## new(\[$hash\_ref\], @kv\_list)
+## new(\[$data\_ref\], @kv\_list)
 
 Creates a new Data::NestedKey object. If no arguments are provided, initializes
-with an empty structure. Optionally, an initial hash reference can be supplied.
-Key-value pairs may also be provided for immediate population.
+with an empty structure. Optionally, an initial data reference can be supplied
+as the root: either a **hash reference** or an **array reference**. Key-value
+pairs may also be provided for immediate population, but only when the root is
+a hash (or defaulted) — supplying key-value pairs together with an array-ref
+root throws an exception, since `set` operates on dot-separated hash keys.
 
 Returns a `Data::NestedKey` object.
 
@@ -84,7 +113,10 @@ Returns a `Data::NestedKey` object.
 
 Inserts, updates, appends, or removes values in the nested structure using
 dot-separated keys. Array subscript notation (e.g. `key[0]`) is **not**
-supported in set paths; an exception will be thrown if one is used.
+supported in `set` paths — nor can values be set against an array-rooted
+structure — and an exception is thrown in either case. To modify array
+contents, retrieve the parent with `get`, alter the Perl structure directly,
+and construct a new object if needed.
 
 - If a key already exists and holds a scalar, assigning a new value will **replace** it.
 - If the `+` prefix is used (e.g., `+key`), the value will be **appended**:
@@ -117,6 +149,12 @@ indices count from the end):
 
     my $uri  = $nk->get('repositories[0].repositoryUri');
     my $last = $nk->get('items[-1].name');
+
+The root may be an array, in which case a leading subscript indexes it
+directly:
+
+    my $first = $nk->get('[0]');
+    my $name  = $nk->get('[0].name');
 
 Returns `undef` for any path that does not exist or whose subscript is out
 of range.  In list context returns all requested values; in scalar context
@@ -151,7 +189,7 @@ Returns a string representation of the data.
 
 # AUTHOR
 
-Rob Lauer <rlauer6@comcast.net>
+Rob Lauer <rlauer@treasurersbriefcase.com>
 
 # SEE ALSO
 
@@ -161,3 +199,11 @@ Rob Lauer <rlauer6@comcast.net>
 
 This library is free software; you may redistribute it and/or modify it
 under the same terms as Perl itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 480:
+
+    Non-ASCII character seen before =encoding in '—'. Assuming UTF-8

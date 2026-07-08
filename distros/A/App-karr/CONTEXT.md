@@ -55,6 +55,14 @@ no agent is configured) — per board: status counts and what is
 in-progress/claimed/blocked, plus which repos are locked (agent running) or in
 cooldown. Fires no agent.
 
+**Context block**:
+The sentinel-delimited board summary (`karr context --write-to`) maintained
+inside a host file such as `AGENTS.md`. karr deliberately writes kanban-md's
+markers (`<!-- BEGIN kanban-md context -->`) so both tools can update the same
+block and switching tools leaves no orphaned markers — an interop decision,
+not a branding leftover.
+_Avoid_: renaming the sentinels to "karr" (breaks cross-tool round-trips).
+
 **Claim name**:
 The ephemeral two-word agentname (e.g. `agent-fox`) passed per `pick`/`move`
 via `--claim`, stored in `claimed_by` and in the **Activity log** entry's

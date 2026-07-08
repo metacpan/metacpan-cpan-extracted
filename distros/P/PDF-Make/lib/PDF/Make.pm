@@ -3,7 +3,7 @@ package PDF::Make;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use DynaLoader;
 our @ISA = ('DynaLoader');
@@ -56,11 +56,6 @@ PDF::Make - PDF generation, parsing, and editing
     $doc->to_file('hello.pdf');
 
 =head1 DESCRIPTION
-
-C<PDF::Make> is a from-scratch PDF implementation for the Semantic ecosystem.
-The engine is a pure-C library (C<libpdfmake>) with zero runtime dependencies
--- no zlib, OpenSSL, libjpeg, or ICU. All compression, encryption, font
-handling, and image decoding is implemented in C.
 
 The distribution provides two API layers:
 

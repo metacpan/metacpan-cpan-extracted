@@ -1,9 +1,7 @@
 #!/usr/bin/env perl
 require 5.010;
 use warnings FATAL => 'all';
-use feature 'say';
 use File::Temp;
-use Scalar::Util 'looks_like_number';
 use Stats::LikeR;
 use Test::Exception; # die_ok
 use Test::More;
@@ -39,9 +37,7 @@ sub tmp_csv {
 	return $fh->filename, $fh;	 # keep the object alive in the caller
 }
 
-#--------
 # a comment line before the header is skipped (the reported bug)
-#--------
 {
 	my ($f, $keep) = tmp_csv(<<'CSV');
 # This is a comment
@@ -58,18 +54,14 @@ CSV
 	is($r->[2]{val}, '15.2', 'row 3 val');
 }
 
-#--------
 # a commented header (marker hugging content) is used as the header
-#--------
 {
 	my ($f, $keep) = tmp_csv("#id,val\n\n   \n# a full comment line\n1,10\n2,20\n");
 	is_deeply( read_table($f), [ { id => 1, val => 10 }, { id => 2, val => 20 } ],
 		"a #-prefixed header has its marker stripped; blank/whitespace/comment lines skipped" );
 }
 
-#--------
 # multiple leading comments, and a comment interspersed in the data
-#--------
 {
 	my ($f, $keep) = tmp_csv(<<'CSV');
 # comment one
@@ -94,9 +86,7 @@ CSV
 	is($r->[0]{id}, '1', 'no-comment file: first row parsed');
 }
 
-#--------
 # a comment marker INSIDE a quoted field is preserved (not treated as a comment)
-#--------
 {
 	my ($f, $keep) = tmp_csv(<<'CSV');
 id,name
@@ -106,9 +96,7 @@ CSV
 	is($r->[0]{name}, 'Charlie #3', 'a # inside a quoted field is kept verbatim');
 }
 
-#--------
 # undef propagates through hoa and hoh outputs too
-#--------
 {
 	my ($f, $keep) = tmp_csv(<<'CSV');
 # header below
@@ -125,18 +113,14 @@ CSV
 	is($hoh->{'1'}{name}, 'Alice', 'hoh: keyed by first column');
 }
 
-#--------
 # a custom comment marker is honoured before the header
-#--------
 {
 	my ($f, $keep) = tmp_csv("// note\nid,name\n1,Alice\n");
 	my $r = read_table($f, comment => '//');
 	is_deeply([sort keys %{ $r->[0] }], [qw(id name)], 'custom comment marker skipped before header');
 }
 
-#--------
 # memory
-#--------
 my ($lf, $lkeep) = tmp_csv(<<'CSV');
 # c
 id,name,val

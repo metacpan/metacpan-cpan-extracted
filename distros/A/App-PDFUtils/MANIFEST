@@ -16,6 +16,7 @@ script/less-pdf-text
 script/pdf-has-password
 script/pdfgrep
 script/pdfnopass
+script/pdfsplit
 script/remove-pdf-password
 t/00-compile.t
 t/author-critic.t

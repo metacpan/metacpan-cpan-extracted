@@ -1,5 +1,14 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.13 - 2026-07-07
+
+ - Fix the invalid version number in App::pmarkdown.
+
+1.12 - 2026-07-07
+
+ - Let the Makefile.PL generates MYMETA files to ease installation with
+   non-standard toolchains.
+
 1.11 - 2025-04-21
 
  - Add support for directive container blocks, controlled by the

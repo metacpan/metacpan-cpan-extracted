@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak confess/;
 $Carp::Internal{ (__PACKAGE__) }++;
@@ -522,9 +522,18 @@ sub handle_class {
     my $self = shift;
     my ($proto) = @_;
 
-    my $top = $self->_in_builder(qw{orm});
+    my $top = $self->_in_builder(qw{orm table});
 
-    $top->{meta}->{default_handle_class} = load_class($proto, 'DBIx::QuickORM::Handle') or croak "Could not load handle class '$proto': $@";
+    my $class = load_class($proto, 'DBIx::QuickORM::Handle') or croak "Could not load handle class '$proto': $@";
+
+    # In an orm builder this is the connection-wide default; in a table builder
+    # it binds the class to that one source (per-source query methods).
+    if (uc($top->{building}) eq 'TABLE') {
+        $top->{meta}->{handle_class} = $class;
+    }
+    else {
+        $top->{meta}->{default_handle_class} = $class;
+    }
 
     return;
 }
@@ -2440,18 +2449,41 @@ Can be used at the top level or nested under any builder.
 
 =item C<handle_class 'MyHandleClass'>
 
-Set the default handle class for the ORM. Handles are the objects returned when
-you query the ORM for rows.
+Set a handle class. Handles are the objects returned when you query the ORM for
+rows. Where this keyword is used determines what it binds:
+
+=over 4
+
+=item Inside C<orm()>
+
+Sets the default handle class for the whole ORM.
+
+=item Inside C<table()>
+
+Binds the handle class to that one table. Handles created for that source are
+promoted into this class, so its extra query methods are available and survive
+chaining (C<< $con->handle('users')->active->in_org($id) >>). The class must be
+a subclass of C<DBIx::QuickORM::Handle>. A per-table binding replaces (does not
+layer on top of) the ORM-level default for that source.
+
+=back
 
 If the class name has a plus C<+> it will be stripped off and the class name
 will not be altered further. If there is no C<+> then C<DBIx::QuickORM::Handle>
 is assumed.
 
     orm my_orm => sub {
-        handle_class '+My::Handle::Class';
+        handle_class '+My::Handle::Class';          # ORM-wide default
+
+        schema my_schema => sub {
+            table users => sub {
+                handle_class '+My::Handle::User';   # bound to this table
+                ...
+            };
+        };
     };
 
-Can be nested under C<orm>.
+Can be nested under C<orm> or C<table>.
 
 =item C<< autofill() >>
 
@@ -2593,6 +2625,19 @@ You can also set aliases for links before they are constructed:
 
         return $alias;
     };
+
+These hooks also resolve relationship accessor name collisions. When a table has
+two foreign keys to the same table (for example C<sender_id> and C<recipient_id>
+both pointing at C<users>), both relationships default to the same accessor name;
+autofill croaks at schema-build time and names the conflict. Use C<autoname link>
+to give each relationship a distinct alias, or C<autoname link_accessor> to give
+each accessor a distinct name; both hooks receive the link and its columns. A
+relationship accessor that would clash with a column accessor croaks the same
+way.
+
+The croak is deliberate rather than auto-renaming: an automatic name would be
+forward-incompatible, because adding a second foreign key later would change the
+accessor an existing single foreign key already produced.
 
 Can be nested under C<autofill>.
 

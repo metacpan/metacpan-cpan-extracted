@@ -126,7 +126,7 @@ is( $@, '', 'all documented args accepted' );
 	my @lines = split /\n/, view({ a => 1, b => 2, c => 3 }, return_only => 1);
 	like( $lines[0], qr/^# Hash: 1 row x 3 cols\t\(showing 1\)$/, 'flat hash banner' );
 	like( $lines[1], qr/^\s+a\s+b\s+c$/, 'flat hash header: sorted keys, leading label column' );
-	like( $lines[2], qr/^1\s+1\s+2\s+3$/, 'flat hash row: numeric label then values' );
+	like( $lines[2], qr/^0\s+1\s+2\s+3$/, 'flat hash row: 0-based numeric label then values' );
 
 	# undef renders as the "undef" placeholder by default; na overrides it
 	my $s = view({ a => 1, b => undef }, return_only => 1);
@@ -217,6 +217,30 @@ is( $@, '', 'all documented args accepted' );
 		my $s = eval { view($wide, return_only => 1) };
 		is( $@, '', 'an invalid COLUMNS is ignored rather than fatal' );
 	}
+}
+
+# ---- auto row labels are 0-based indexes (Perl-style), not 1-based (R-style) ----
+# String values keep the label digit unambiguous vs the data.
+{
+	my @lines = split /\n/,
+		view([ { v => 'a' }, { v => 'b' }, { v => 'c' } ], return_only => 1);
+	like( $lines[2], qr/^0\b/, 'AoH: first data row labelled 0 (0-based index)' );
+	like( $lines[3], qr/^1\b/, 'AoH: second data row labelled 1' );
+	like( $lines[4], qr/^2\b/, 'AoH: third data row labelled 2' );
+
+	@lines = split /\n/, view({ v => ['a','b','c'] }, return_only => 1);
+	like( $lines[2], qr/^0\b/, 'HoA: first data row labelled 0' );
+	like( $lines[3], qr/^1\b/, 'HoA: second data row labelled 1' );
+
+	@lines = split /\n/, view([ ['a'], ['b'], ['c'] ], return_only => 1);
+	like( $lines[2], qr/^0\b/, 'AoA: first data row labelled 0' );
+	like( $lines[3], qr/^1\b/, 'AoA: second data row labelled 1' );
+	like( $lines[4], qr/^2\b/, 'AoA: third data row labelled 2' );
+
+	# HoH keeps its outer keys as labels -- unaffected by the 0-based change
+	@lines = split /\n/, view({ b => { x => 1 }, a => { x => 2 } }, return_only => 1);
+	like( $lines[2], qr/^a\b/, 'HoH: row label is still the (sorted) outer key' );
+	like( $lines[3], qr/^b\b/, 'HoH: second row label is the outer key' );
 }
 
 done_testing();

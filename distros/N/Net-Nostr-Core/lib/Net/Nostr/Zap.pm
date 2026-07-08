@@ -3,6 +3,7 @@ package Net::Nostr::Zap;
 use strictures 2;
 
 use Net::Nostr::_ConstructorArgs ();
+use Net::Nostr::_URI qw(append_query_params);
 
 use Carp qw(croak);
 use JSON ();
@@ -426,30 +427,23 @@ sub bolt11_amount {
     return int($msats);
 }
 
-sub _uri_escape {
-    my ($str) = @_;
-    $str =~ s/([^A-Za-z0-9\-_.~])/sprintf("%%%02X", ord($1))/ge;
-    return $str;
-}
-
 sub callback_url {
     my ($base_url, %params) = @_;
 
     my @parts;
     if (defined $params{amount}) {
-        push @parts, "amount=$params{amount}";
+        push @parts, amount => $params{amount};
     }
     if (defined $params{nostr}) {
         my $event = $params{nostr};
         my $json = JSON->new->utf8->canonical->encode($event->to_hash);
-        push @parts, "nostr=" . _uri_escape($json);
+        push @parts, nostr => $json;
     }
     if (defined $params{lnurl}) {
-        push @parts, "lnurl=$params{lnurl}";
+        push @parts, lnurl => $params{lnurl};
     }
 
-    my $sep = $base_url =~ /\?/ ? '&' : '?';
-    return $base_url . $sep . join('&', @parts);
+    return append_query_params($base_url, @parts);
 }
 
 sub calculate_splits {
@@ -872,7 +866,9 @@ Amount multiplier suffixes:
 
 Constructs the HTTP GET URL for sending a zap request to the recipient's
 LNURL callback endpoint (Appendix B). The C<nostr> parameter should be a
-L<Net::Nostr::Event> object which will be JSON-encoded and URI-escaped.
+L<Net::Nostr::Event> object which will be JSON-encoded and added as a URI
+query parameter. Existing query parameters are preserved, and new parameters
+are inserted before any fragment.
 
     my $url = callback_url('https://lnurl.example.com/callback',
         amount => 21000,

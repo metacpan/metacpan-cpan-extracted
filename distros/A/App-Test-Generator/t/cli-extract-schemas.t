@@ -190,4 +190,47 @@ END_PM
 	}
 }
 
+# --------------------------------------------------------------------
+# --minimize-corpus: reduces corpus to minimum covering set.
+# Reuses the TestFuzzModule already at $libdir/TestFuzzModule.pm
+# (the module path must contain a 'lib/' component so the script can
+# determine the package name; lib-minimize/ would not be found).
+# --------------------------------------------------------------------
+
+{
+	my $corpus_dir = File::Spec->catdir($tmpdir, 'minimize-corpus');
+	my $schema_dir = File::Spec->catdir($tmpdir, 'minimize-schemas');
+
+	# TestFuzzModule.pm was written to $tmpdir/lib/ by the earlier block
+	my $min_module = File::Spec->catfile($tmpdir, 'lib', 'TestFuzzModule.pm');
+
+	# First run: populate corpus without minimization
+	my ($exit1, $out1, $err1) = run_cmd(
+		$script,
+		'--fuzz',
+		'--fuzz-iters', 10,
+		'--output-dir', $schema_dir,
+		'--corpus-dir', $corpus_dir,
+		$min_module,
+	);
+	is($exit1, 0, 'first --fuzz run (corpus population) exits cleanly')
+		or diag("stdout: $out1\nstderr: $err1");
+
+	# Second run: with --minimize-corpus
+	my ($exit2, $out2, $err2) = run_cmd(
+		$script,
+		'--fuzz',
+		'--fuzz-iters', 5,
+		'--minimize-corpus',
+		'--output-dir', $schema_dir,
+		'--corpus-dir', $corpus_dir,
+		$min_module,
+	);
+	is($exit2, 0, '--minimize-corpus exits cleanly')
+		or diag("stdout: $out2\nstderr: $err2");
+	like($out2, qr/Corpus|minimiz|before|after/i,
+		'--minimize-corpus reports minimization stats')
+		or diag("stdout: $out2\nstderr: $err2");
+}
+
 done_testing();

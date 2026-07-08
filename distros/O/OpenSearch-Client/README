@@ -1,0 +1,86 @@
+NAME
+    OpenSearch::Client
+
+DESCRIPTION
+    An unofficial client for OpenSearch
+    
+INSTALL
+    Perl Makefile.PL
+    make
+    make test
+    make install
+    
+TESTS
+    The standard module tests run without connecting to any OpenSearch nodes.
+    You can configure the environment to run tests against an OpenSearch
+    node but beware THESE TESTS MAY BE DESTRUCTIVE.
+    
+    ---------------------------------------
+    To include tests against an HTTP node:
+    ---------------------------------------
+
+    Specify the current default client version ( "3_0" )
+    export CLIENT_VER="3_0"
+
+    Specify a node that allows http or https connections
+    export OS="192.168.100.10:9200"
+
+    If your node uses SSL, also export
+    export OS_ALWAYS_SSL=1
+
+    If your node uses SSL and requires authentication
+    export OS_USERINFO="username:password"
+
+    Specify a type of connection
+    Choose between HTTP::Tiny and LWP::UserAgent.
+    The default is HTTP::Tiny.
+
+    export OS_CXN="LWP"
+    export OS_CXN="HTTPTiny"
+
+    Specify a type of connection pool.
+    The default is "Static" but you may need "Static::NoPing"
+    if your node is behind some load balancer or reverse proxy.
+
+    export OS_CXN_POOL="Static::NoPing"
+
+    To run tests for the Bulk Helper module
+    export OS_TEST_BULK_HELPERS=1
+
+    To run tests for the Scroll Helper module
+    export OS_TEST_SCROLL_HELPERS=1
+
+    ------------------------------------
+    To also include HTTPS specific tests
+    ------------------------------------
+
+    Specify a node that allows https connections
+    export OS_SSL="192.168.100.11:9200"
+
+    If the node requires authentication
+    export OS_USERINFO="username:password"
+
+    By default, the tests will not verify the certificate
+    of the host node.
+
+    To verify a certificate signed by a local CA
+    export OS_CA_PATH=/path/to/local-ca.pem
+
+HISTORY
+    This distribution is derived from Search::Elasticsearch version 7.714.
+    All subsequent changes are unique to this distribution.
+
+AUTHOR
+    Mark Dootson  ( current maintainer )
+
+CREDITS
+    OpenSearch::Client is based on Search::Elasticsearch version 7.714
+    by Enrico Zimuel
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2026 by Mark Dootson ( this distribution )
+    Copyright (C) 2021 by Elasticsearch BV ( original distribution ) 
+
+    This is free software, licensed under:
+    The Apache License, Version 2.0, January 2004
+

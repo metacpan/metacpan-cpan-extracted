@@ -1,16 +1,20 @@
 # ABSTRACT: Install, check, and update bundled agent skills
 
 package App::karr::Cmd::Skill;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
   usage_string => 'USAGE: karr skill [install|check|update|show] [--agent NAME] [--global] [--force]',
 );
 use App::karr::Role::Output;
+use App::karr::Role::CliArgs;
+use App::karr::Role::ExitCodes;
 use Path::Tiny;
 
-with 'App::karr::Role::Output';
+# ExitCodes: unknown option / bad option value exits 2, not 1 (ADR 0002). Skill
+# is board-less, so it does not inherit ExitCodes via BoardDiscovery.
+with 'App::karr::Role::Output', 'App::karr::Role::CliArgs', 'App::karr::Role::ExitCodes';
 
 
 option agent => (
@@ -37,7 +41,9 @@ my %AGENTS = (
 
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
-  my $action = $args_ref->[0] // 'install';
+  my @pos    = $self->positional_args($args_ref);
+  my $action = $pos[0] // 'install';
+  $self->check_positional_args($args_ref, 1);   # only the action is a positional
 
   if ($action eq 'install') {
     $self->_install;
@@ -208,7 +214,7 @@ App::karr::Cmd::Skill - Install, check, and update bundled agent skills
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

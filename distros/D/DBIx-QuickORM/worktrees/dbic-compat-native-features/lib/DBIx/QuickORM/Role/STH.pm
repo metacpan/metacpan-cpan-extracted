@@ -2,7 +2,7 @@ package DBIx::QuickORM::Role::STH;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak/;
 

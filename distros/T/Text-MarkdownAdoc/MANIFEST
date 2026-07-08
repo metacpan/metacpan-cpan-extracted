@@ -1,0 +1,23 @@
+Changes
+COMPATIBILITY_REPORT.adoc
+lib/Text/MarkdownAdoc.pm
+lib/Text/MarkdownAdoc/Inline.pm
+lib/Text/MarkdownAdoc/Parser.pm
+lib/Text/MarkdownAdoc/Refs.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+script/markdown-adoc
+t/00-load.t
+t/01-headings-paragraphs.t
+t/02-inline-formatting.t
+t/03-blocks-lists.t
+t/04-tables-html-defs.t
+t/05-footnotes-cli.t
+t/06-extended.t
+t/07-roundtrip.t
+t/08-correctness-fixes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

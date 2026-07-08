@@ -1,3 +1,25 @@
+Tue Jul  7 10:48:12 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.11]:
+	* VERSION: modified
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.11.md: new
+	* lib/CLI/Simple.pm.in
+	(use_log4perl)
+	- accept log-level, log_level, loglevel level
+	- die if unknown argument
+	* lib/CLI/Simple/Constants.pm.in
+	(chars): +$EQUALS
+	* lib/CLI/Simple/Utils.pm.in
+	(slurp): allow file handle argument
+
+Sun Jul  5 06:16:50 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.10]:
+	* VERSION: modified
+	* lib/CLI/Simple.pm.in
+	- remove use IO::Pager
+
 Sat Jul  4 15:33:47 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.9]:

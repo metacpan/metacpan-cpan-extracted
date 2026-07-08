@@ -1,5 +1,13 @@
 Revision history for OpenSearch::Client
 
+3.007006    2026-07-08
+            * POD link corrections
+            * Tweak tests to run OK against an AWS Managed instance
+            * Add options to test environment to test against, for example
+              an AWS Managed OpenSearch instance or anything else behind
+              a load balancer or reverse proxy.
+            * added README
+
 3.007005    2026-07-05
             * added cxn parameters http_proxy, https_proxy and no_proxy
             * replaced 'send_get_body_as' with 'send_body_as_source'

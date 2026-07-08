@@ -17,9 +17,7 @@ sub spit {
 	return $f;
 }
 
-# ----------------------------------------------------------------------------
 # basic parsing through read_table
-# ----------------------------------------------------------------------------
 {
 	my $f = spit("a,b,c\n1,2,3\n4,5,6\n");
 	my $aoh = read_table($f);
@@ -57,9 +55,7 @@ sub spit {
 		'empty cells become undef' );
 }
 
-# ----------------------------------------------------------------------------
 # quoting: embedded sep, escaped quotes, multiline, \r preservation
-# ----------------------------------------------------------------------------
 {
 	my $f = spit(qq{a,b\n"x,y","p""q"\n});
 	is_deeply( read_table($f),
@@ -103,9 +99,7 @@ sub spit {
 	is_deeply( $back, $aoh, 'write_table -> read_table round-trip (quote, newline, sep, \r, undef)' );
 }
 
-# ----------------------------------------------------------------------------
 # header edge cases
-# ----------------------------------------------------------------------------
 {
 	my $f = spit(",a,b\nr1,1,2\n");
 	my $hoh = read_table($f, 'output.type' => 'hoh');
@@ -124,9 +118,7 @@ sub spit {
 		'hoa with duplicate header: later wins, columns equal length' );
 }
 
-# ----------------------------------------------------------------------------
 # filters
-# ----------------------------------------------------------------------------
 {
 	my $f = spit("name,age\nann,41\nbob,\ncat,33\n");
 	# named-column filter, $_ is the normalized (undef-for-empty) value
@@ -161,9 +153,7 @@ sub spit {
 		'$_ mutation written back and visible to later filters through %_' );
 }
 
-# ----------------------------------------------------------------------------
 # error paths (messages + behavior)
-# ----------------------------------------------------------------------------
 {
 	my $good = spit("a,b\n1,2\n");
 	throws_ok { read_table("$dir/definitely-missing.csv") } qr/is not a file/,
@@ -176,8 +166,8 @@ sub spit {
 		'sep + delim together die';
 	throws_ok { read_table($good, filter => \'x') } qr/CODE or HASH/,
 		'bad filter type dies';
-	throws_ok { read_table($good, filter => { ghost => sub { 1 } }) }
-		qr/Filter column 'ghost' not found/, 'unknown filter column dies';
+	throws_ok { read_table("$good", filter => { nope => sub { 1 } }) }
+	qr/Filter column 'nope' not found/,	'unknown filter column dies';
 	throws_ok { read_table($good, filter => { 5 => sub { 1 } }) }
 		qr/exceeds the 2 columns/, 'numeric filter key past last column dies';
 	throws_ok { read_table($good, 'output.type' => 'hoh', 'row.names' => 'zz') }
@@ -197,18 +187,14 @@ sub spit {
 		'XS: defined non-CODE callback croaks instead of silently slurping';
 }
 
-# ----------------------------------------------------------------------------
 # direct XS slurp mode
-# ----------------------------------------------------------------------------
 {
 	my $f = spit("a,b\n1,2\n");
 	my $rows = Stats::LikeR::_parse_csv_file($f, ',', '#');
 	is_deeply( $rows, [ ['a','b'], ['1','2'] ], 'slurp mode returns AoA of raw fields' );
 }
 
-# ----------------------------------------------------------------------------
 # leaks: the headline fixes
-# ----------------------------------------------------------------------------
 SKIP: {
 	skip 'leak tests skipped under Devel::Cover', 5 if $INC{'Devel/Cover.pm'};
 	my $good   = spit("a,b\n1,2\n3,4\n");

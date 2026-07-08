@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Rollups;
-$OpenSearch::Client::Core::3_0::Direct::Rollups::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Rollups::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Rollups>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for rollups.|https://docs.opensearch.org/latest/i
 
 =head1 METHODS
     
-=head2 rollups->delete
+=head2 delete
 
 Deletes an index rollup job configuration.
 
@@ -95,9 +95,9 @@ C<DELETE /_plugins/_rollup/jobs/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for rollups.delete|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job>
+L<OpenSearch documentation for rollups-E<gt>delete|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#delete-an-index-rollup-job>
     
-=head2 rollups->explain
+=head2 explain
 
 Retrieves the execution status information for an index rollup job.
 
@@ -125,9 +125,9 @@ C<GET /_plugins/_rollup/jobs/{id}/_explain>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for rollups.explain|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job>
+L<OpenSearch documentation for rollups-E<gt>explain|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#explain-an-index-rollup-job>
     
-=head2 rollups->get
+=head2 get
 
 Retrieves an index rollup job configuration by ID.
 
@@ -155,9 +155,9 @@ C<GET /_plugins/_rollup/jobs/{id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for rollups.get|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job>
+L<OpenSearch documentation for rollups-E<gt>get|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#get-an-index-rollup-job>
     
-=head2 rollups->put
+=head2 put
 
 Creates or updates an index rollup job configuration.
 
@@ -192,9 +192,9 @@ C<PUT /_plugins/_rollup/jobs/{id}>
         'source'           =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for rollups.put|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job>
+L<OpenSearch documentation for rollups-E<gt>put|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#create-or-update-an-index-rollup-job>
     
-=head2 rollups->start
+=head2 start
 
 Starts the execution of an index rollup job.
 
@@ -222,9 +222,9 @@ C<POST /_plugins/_rollup/jobs/{id}/_start>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for rollups.start|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job>
+L<OpenSearch documentation for rollups-E<gt>start|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job>
     
-=head2 rollups->stop
+=head2 stop
 
 Stops the execution of an index rollup job.
 
@@ -252,7 +252,7 @@ C<POST /_plugins/_rollup/jobs/{id}/_stop>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for rollups.stop|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job>
+L<OpenSearch documentation for rollups-E<gt>stop|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job>
 
 =head1 MANUAL
 

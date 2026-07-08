@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 NOTICE
+README
 cpanfile
 lib/OpenSearch/Client.pm
 lib/OpenSearch/Client/Core/3_0.pm

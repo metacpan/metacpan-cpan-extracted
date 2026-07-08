@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::DanglingIndices;
-$OpenSearch::Client::Core::3_0::Direct::DanglingIndices::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::DanglingIndices::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::DanglingIndices>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for dangling_indices.|https://docs.opensearch.org
 
 =head1 METHODS
     
-=head2 dangling_indices->delete_dangling_index
+=head2 delete_dangling_index
 
 Deletes the specified dangling index.
 
@@ -102,9 +102,9 @@ C<DELETE /_dangling/{index_uuid}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for dangling_indices.delete_dangling_index|https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/>
+L<OpenSearch documentation for dangling_indices-E<gt>delete_dangling_index|https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/>
     
-=head2 dangling_indices->import_dangling_index
+=head2 import_dangling_index
 
 Imports the specified dangling index.
 
@@ -139,9 +139,9 @@ C<POST /_dangling/{index_uuid}>
         'source'                   =>  $qval9,     # string
     );
 
-L<OpenSearch documentation for dangling_indices.import_dangling_index|https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/>
+L<OpenSearch documentation for dangling_indices-E<gt>import_dangling_index|https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/>
     
-=head2 dangling_indices->list_dangling_indices
+=head2 list_dangling_indices
 
 Returns all dangling indexes.
 
@@ -165,7 +165,7 @@ C<GET /_dangling>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for dangling_indices.list_dangling_indices|https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/>
+L<OpenSearch documentation for dangling_indices-E<gt>list_dangling_indices|https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/>
 
 =head1 MANUAL
 

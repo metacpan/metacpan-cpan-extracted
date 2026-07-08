@@ -160,24 +160,51 @@ BEGIN {
 }
 
 #
+# undef / missing cells always sort last (column mode)
+#
+{
+	# AoH: defined values first (ascending), then undef, then missing
+	my $aoh = [
+		{ id => 1, v => 5 },
+		{ id => 2 },             # missing v
+		{ id => 3, v => undef }, # explicit undef
+		{ id => 4, v => 1 },
+	];
+	my $s = csort($aoh, 'v');
+	is_deeply( [ map { $_->{id} } @$s ], [ 4, 1, 2, 3 ],
+		'AoH: defined values sort first (asc), undef/missing last' );
+
+	# HoA: same rule
+	my $hoa = {
+		id => [ 1, 2, 3, 4 ],
+		v  => [ 5, undef, undef, 1 ],
+	};
+	my $out = csort($hoa, 'v');
+	is_deeply( $out->{id}, [ 4, 1, 2, 3 ],
+		'HoA: defined values sort first (asc), undef last' );
+
+	# string column: undef/missing still sort last, defined lexically first
+	my $saoh = [ { k => 'b' }, { k => undef }, { k => 'a' }, {} ];
+	my $ss = csort($saoh, 'k');
+	is_deeply( [ map { defined $_->{k} ? $_->{k} : '<undef>' } @$ss ],
+		[ 'a', 'b', '<undef>', '<undef>' ],
+		'AoH string column: undef/missing sort last' );
+}
+
+#
 # Error handling
 #
 {
 	eval { csort('notaref', 'x') };
-	like $@, qr/array-ref \(AoH\) or hash-ref \(HoA, HoH\)/, 'rejects non-ref data';
-
+	like $@, qr/array-ref \(AoH or AoA\) or hash-ref \(HoA or HoH\)/, 'rejects non-ref data';
 	eval { csort([ { x => 1 } ], undef) };
-	like $@, qr/column name or a comparator/, 'rejects undef $by';
-
+	like $@, qr/column name.*or a comparator/, 'rejects undef $by';
 	eval { csort([ { x => 1 } ], [1,2,3]) };
-	like $@, qr/column name or a comparator/, 'rejects non-code ref $by';
-
+	like $@, qr/column name.*or a comparator/, 'rejects non-code ref $by';
 	eval { csort({ a => [1,2], b => [1] }, 'a') };
 	like $@, qr/unequal lengths/, 'HoA unequal column lengths croaks';
-
 	eval { csort({ a => [1,2] }, 'missing') };
 	like $@, qr/not found/, 'HoA missing sort column croaks';
-
 	eval { csort({ a => 'notarray' }, 'a') };
 	like $@, qr/not an array-ref/, 'HoA non-array column croaks';
 }
@@ -272,7 +299,7 @@ BEGIN {
 # Bad output type is rejected
 {
 	eval { csort([ { x => 1 } ], 'x', 'frame') };
-	like $@, qr/output type must be 'aoh' or 'hoa'/, 'rejects bogus output type';
+	like $@, qr/output type must be 'aoh', 'hoa', or 'aoa'/, 'rejects bogus output type';
 }
 
 #
@@ -280,8 +307,8 @@ BEGIN {
 # skipped under Devel::Cover, whose instrumentation registers false leaks.
 #
 SKIP: {
-	skip 'Test::LeakTrace not installed', 7 unless $HAVE_LEAKTRACE;
-	skip 'Devel::Cover skews leak detection', 7 if $INC{'Devel/Cover.pm'};
+	skip 'Test::LeakTrace not installed', 9 unless $HAVE_LEAKTRACE;
+	skip 'Devel::Cover skews leak detection', 9 if $INC{'Devel/Cover.pm'};
 
 	my @aoh = map { { id => $_, v => int(rand(100)), w => "s$_" } } 1 .. 40;
 	my %hoa = ( id => [ 1 .. 40 ],
@@ -289,7 +316,7 @@ SKIP: {
 				w  => [ map { "s$_" }          1 .. 40 ] );
 	my $cmp = sub { $a->{v} <=> $b->{v} };
 
-	# --- clean (successful) paths --------------------------------------
+	# --- clean (successful) paths
 	no_leaks_ok { my $s = csort([@aoh], 'v') }
 		'no leaks: AoH column sort' unless $INC{'Devel/Cover.pm'};
 	no_leaks_ok { my $s = csort({%hoa}, 'v') }
@@ -299,7 +326,7 @@ SKIP: {
 	no_leaks_ok { my $s = csort({%hoa}, $cmp, 'aoh') }
 		'no leaks: HoA->AoH comparator sort (synthesizes per-row views)';
 
-	# --- croak paths: allocations must unwind cleanly ------------------
+	# --- croak paths: allocations must unwind cleanly
 	no_leaks_ok {
 		eval { csort({%hoa}, sub { die "boom\n" }) };
 	} 'no leaks (synthesized rows) when the comparator dies mid-sort';
@@ -311,6 +338,15 @@ SKIP: {
 	no_leaks_ok {
 		eval { csort([@aoh], 'v', 'frame') };
 	} 'no leaks when the output type is invalid (croak)';
+
+	# --- undef/missing cells in column mode
+	no_leaks_ok {
+		my $s = csort([ { v => 3 }, {}, { v => undef }, { v => 1 } ], 'v')
+	} 'no leaks: AoH column sort with undef/missing cells';
+
+	no_leaks_ok {
+		my $s = csort({ id => [ 1, 2, 3 ], v => [ 3, undef, 1 ] }, 'v')
+	} 'no leaks: HoA column sort with undef cells';
 }
 
 done_testing();

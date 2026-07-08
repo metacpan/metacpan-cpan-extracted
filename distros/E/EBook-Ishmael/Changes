@@ -1,5 +1,9 @@
 Revision history for Perl module EBook::Ishmael.
 
+2.05  Jul 07 2026
+  - Fix cleaning up HTML for formats that use XML namespaces like EPUBs and
+    FictionBook2.
+
 2.04  Mar 27 2026
   - ishmael now attempts to clean up HTML prior to dumping by removing
     unnecessary elements like <img> and <style>.

@@ -31,7 +31,7 @@ BEGIN {
         if $Config{osvers} =~ /xen/ # eg 2.6.18-4-xen-amd64
         and $ENV{AUTOMATED_TESTING};
 
-    plan tests => 60;
+    plan tests => 61;
 }
 
 $Data::Dumper::Indent = 1;
@@ -458,8 +458,51 @@ is("@$totals", "27.00 2.93 0.11 0.01 0.23 1023110000.00 1023110010.00",
    'merged time foo/bar');
 is($total_time, 2.93, 'merged nodes foo/bar time');
 
+subtest "CVE-2026-14380" => sub {
+
+    plan tests => 3;
+
+    {
+        my $marker = sprintf('dbi-test-payload-%1.6f-%u-%u-%u', $], time, $$, 1);
+        local $ENV{DBI_PROFILE} = payload_for($marker);
+        my $dbh = eval {
+            DBI->connect("dbi:Sponge:", "", "", { RaiseError => 0 })
+        };
+        ok !( -e "/tmp/$marker" ), "ENV DBI_PROFILE payload";
+        unlink "/tmp/$marker" if -e "/tmp/$marker";
+    }
+
+    {
+        my $marker = sprintf('dbi-test-payload-%1.6f-%u-%u-%u', $], time, $$, 2);
+        my $dbh = DBI->connect("dbi:Sponge:", "", "", { RaiseError => 0 });
+        eval {
+            $dbh->{Profile} = payload_for($marker);
+        };
+        ok !( -e "/tmp/$marker" ), "Set Profile payload";
+        unlink "/tmp/$marker" if -e "/tmp/$marker";
+    }
+
+    {
+        my $marker = sprintf('dbi-test-payload-%1.6f-%u-%u-%u', $], time, $$, 3);
+        my $payload = payload_for($marker);
+        my $dsn = "dbi:Sponge(Profile=>$payload):";
+        my $dbh = eval {
+            DBI->connect($dsn, "", "", { RaiseError => 0 })
+        };
+        ok !( -e "/tmp/$marker" ), "DSN payload";
+        unlink "/tmp/$marker" if -e "/tmp/$marker";
+    }
+
+};
+
 exit 0;
 
+sub payload_for {
+    my ($marker) = @_;
+    # Single-quoted q{...} so \x2f is literal backslash-x-2-f for split;
+    # the inner qq(...) re-interprets \x2f = / at eval-time.
+    return qq{2/system(qq(touch \\x2ftmp\\x2f$marker))};
+}
 
 sub sanitize_tree {
     my $data = shift;

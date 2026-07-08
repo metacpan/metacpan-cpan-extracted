@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SearchRelevance;
-$OpenSearch::Client::Core::3_0::Direct::SearchRelevance::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::SearchRelevance::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for search_relevance.|https://docs.opensearch.org
 
 =head1 METHODS
     
-=head2 search_relevance->delete_experiments
+=head2 delete_experiments
 
 Deletes a specified experiment.
 
@@ -95,9 +95,9 @@ C<DELETE /_plugins/_search_relevance/experiments/{experiment_id}>
         'source'         =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.delete_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>delete_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->delete_judgments
+=head2 delete_judgments
 
 Deletes a specified judgment.
 
@@ -125,9 +125,9 @@ C<DELETE /_plugins/_search_relevance/judgments/{judgment_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.delete_judgments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>delete_judgments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->delete_query_sets
+=head2 delete_query_sets
 
 Deletes a query set.
 
@@ -155,9 +155,9 @@ C<DELETE /_plugins/_search_relevance/query_sets/{query_set_id}>
         'source'        =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.delete_query_sets|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>delete_query_sets|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->delete_scheduled_experiments
+=head2 delete_scheduled_experiments
 
 Deletes a specified scheduled experiment.
 
@@ -185,9 +185,9 @@ C<DELETE /_plugins/_search_relevance/experiments/schedule/{experiment_id}>
         'source'         =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.delete_scheduled_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>delete_scheduled_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->delete_search_configurations
+=head2 delete_search_configurations
 
 Deletes a specified search configuration.
 
@@ -215,9 +215,9 @@ C<DELETE /_plugins/_search_relevance/search_configurations/{search_configuration
         'source'                   =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.delete_search_configurations|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>delete_search_configurations|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->get_experiments
+=head2 get_experiments
 
 Gets experiments.
 
@@ -248,9 +248,9 @@ C<GET /_plugins/_search_relevance/experiments/{experiment_id}>
         'source'         =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.get_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>get_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->get_judgments
+=head2 get_judgments
 
 Gets judgments.
 
@@ -281,9 +281,9 @@ C<GET /_plugins/_search_relevance/judgments/{judgment_id}>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.get_judgments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>get_judgments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->get_node_stats
+=head2 get_node_stats
 
 Gets stats by node.
 
@@ -323,9 +323,9 @@ C<GET /_plugins/_search_relevance/{node_id}/stats/{stat}>
         'source'                    =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for search_relevance.get_node_stats|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>get_node_stats|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->get_query_sets
+=head2 get_query_sets
 
 Lists the current query sets available.
 
@@ -356,9 +356,9 @@ C<GET /_plugins/_search_relevance/query_sets/{query_set_id}>
         'source'        =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.get_query_sets|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>get_query_sets|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->get_scheduled_experiments
+=head2 get_scheduled_experiments
 
 Gets the scheduled experiments.
 
@@ -389,9 +389,9 @@ C<GET /_plugins/_search_relevance/experiments/schedule/{experiment_id}>
         'source'         =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.get_scheduled_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>get_scheduled_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->get_search_configurations
+=head2 get_search_configurations
 
 Gets the search configurations.
 
@@ -422,9 +422,9 @@ C<GET /_plugins/_search_relevance/search_configurations/{search_configuration_id
         'source'                   =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.get_search_configurations|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>get_search_configurations|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->get_stats
+=head2 get_stats
 
 Gets stats.
 
@@ -463,9 +463,9 @@ C<GET /_plugins/_search_relevance/stats/{stat}>
         'source'                    =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for search_relevance.get_stats|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>get_stats|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->post_query_sets
+=head2 post_query_sets
 
 Creates a new query set by sampling queries from the user behavior data.
 
@@ -491,9 +491,9 @@ C<POST /_plugins/_search_relevance/query_sets>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.post_query_sets|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>post_query_sets|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->post_scheduled_experiments
+=head2 post_scheduled_experiments
 
 Creates a scheduled experiment.
 
@@ -519,9 +519,9 @@ C<POST /_plugins/_search_relevance/experiments/schedule>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.post_scheduled_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>post_scheduled_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->put_experiments
+=head2 put_experiments
 
 Creates an experiment.
 
@@ -547,9 +547,9 @@ C<PUT /_plugins/_search_relevance/experiments>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.put_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>put_experiments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->put_judgments
+=head2 put_judgments
 
 Creates a judgment.
 
@@ -575,9 +575,9 @@ C<PUT /_plugins/_search_relevance/judgments>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.put_judgments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>put_judgments|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->put_query_sets
+=head2 put_query_sets
 
 Creates a new query set by uploading manually.
 
@@ -603,9 +603,9 @@ C<PUT /_plugins/_search_relevance/query_sets>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.put_query_sets|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>put_query_sets|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
     
-=head2 search_relevance->put_search_configurations
+=head2 put_search_configurations
 
 Creates a search configuration.
 
@@ -631,7 +631,7 @@ C<PUT /_plugins/_search_relevance/search_configurations>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for search_relevance.put_search_configurations|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+L<OpenSearch documentation for search_relevance-E<gt>put_search_configurations|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
 
 =head1 MANUAL
 

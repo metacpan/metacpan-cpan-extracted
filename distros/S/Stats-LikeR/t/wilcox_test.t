@@ -2,9 +2,6 @@
 
 require 5.010;
 use warnings FATAL => 'all';
-use feature 'say';
-use File::Temp;
-use Scalar::Util 'looks_like_number';
 use Stats::LikeR;
 use Test::Exception; # dies_ok / lives_ok
 use Test::More;
@@ -36,9 +33,7 @@ sub is_approx {
 my @x = (1.83,  0.50,  1.62,  2.48, 1.68, 1.88, 1.55, 3.06, 1.30);
 my @y = (0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29);
 
-#----------------------------------------
-#		wilcox_test: agreement with R
-#----------------------------------------
+# wilcox_test: agreement with R
 # Two-sample rank sum. The y values contain ties, so R (and we) use the
 # normal approximation with continuity correction.
 my $rs = wilcox_test(\@x, \@y);
@@ -99,7 +94,7 @@ is( $forced_off->{method}, 'Wilcoxon rank sum test with continuity correction',
 }
 
 # Named x / y override the positional slots.
-my $named = wilcox_test(x => \@x, y => \@y);
+my $named = wilcox_test(x => \@x, 'y' => \@y);
 is_approx( $named->{statistic}, $rs->{statistic},
 	'wilcox_test: named form equals positional form', 0 );
 
@@ -108,9 +103,7 @@ my $dirty = wilcox_test([1,2,undef,3,'NA',4], [5,'x',6,7,8,undef]);
 is_approx( $dirty->{statistic}, $ex->{statistic}, 'wilcox_test: NA/undef dropped (W)', 0 );
 is_approx( $dirty->{p_value},   $ex->{p_value},   'wilcox_test: NA/undef dropped (p)', 1e-12 );
 
-#----------------------------------------
-#		wilcox_test: regressions
-#----------------------------------------
+# wilcox_test: regressions
 # Zero variance (all values identical) must not divide by zero.
 {
 	my @w;
@@ -133,9 +126,7 @@ foreach my $alt (qw(two.sided less greater)) {
 		"wilcox_test: alternative '$alt' accepted";
 }
 
-#----------------------------------------
-#		wilcox_test: argument validation
-#----------------------------------------
+#	wilcox_test: argument validation
 eval { wilcox_test(x => 42) };
 like( $@, qr/ARRAY reference/, 'wilcox_test: non-arrayref x dies' );
 dies_ok { wilcox_test() }                            'wilcox_test: missing x dies' ;
@@ -144,18 +135,14 @@ dies_ok { wilcox_test(\@x, \@y, 'paired') }          'wilcox_test: odd trailing 
 dies_ok { wilcox_test(\@x, 'bogus' => 1) }           'wilcox_test: unknown named arg dies' ;
 dies_ok { wilcox_test([1,2,3], [1,2], paired => 1) } 'wilcox_test: paired length mismatch dies' ;
 
-#----------------------------------------
 #		wilcox_test: output shape
-#----------------------------------------
 my $shape = wilcox_test(\@x, \@y);
 is( ref $shape, 'HASH', 'wilcox_test: returns a hashref' );
 foreach my $k (qw(statistic p_value method alternative)) {
 	ok( exists $shape->{$k}, "wilcox_test: output has '$k'" );
 }
 
-#----------------------------------------
-#		wilcox_test: memory
-#----------------------------------------
+# wilcox_test: memory
 no_leaks_ok {
 	eval { wilcox_test(\@x, \@y) }
 } 'wilcox_test(): no memory leaks (two-sample approximation)' unless $INC{'Devel/Cover.pm'};

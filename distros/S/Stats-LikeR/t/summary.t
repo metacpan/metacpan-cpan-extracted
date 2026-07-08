@@ -9,7 +9,8 @@
 use strict;
 use warnings;
 use Test::More;
-use Stats::LikeR qw(summary);
+use Test::Exception;
+use Stats::LikeR 'summary';
 
 # summary prints to STDOUT; silence it while capturing the returned arrayref.
 sub quiet_summary {

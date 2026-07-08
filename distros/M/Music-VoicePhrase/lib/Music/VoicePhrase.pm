@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct a measured phrase of notes
 
-our $VERSION = '0.0113';
+our $VERSION = '0.0116';
 
 use v5.36;
 use Moo;
@@ -55,6 +55,7 @@ sub _build_pitches ($self) {
         get_scale_MIDI($self->base, $self->octave, $self->scale),
         get_scale_MIDI($self->base, $self->octave + 1, $self->scale),
     );
+    say 'Built pitches: ', join ' ', @pitches if $self->verbose;
     return \@pitches;
 }
 
@@ -76,6 +77,7 @@ has voice => (
     is      => 'rw',
     lazy    => 1,
     builder => '_build_voice',
+    clearer => 'clear_voice',
 );
 
 sub _build_voice ($self) {
@@ -83,6 +85,7 @@ sub _build_voice ($self) {
         pitches   => $self->pitches,
         intervals => $self->intervals,
     );
+    say "Built voice: $voice" if $self->verbose;
     return $voice;
 }
 
@@ -127,6 +130,8 @@ sub _build__rhythm ($self) {
       weights => $self->weights,
       groups  => $self->groups,
   );
+  say "Built rhythm generator: $mdp" if $self->verbose;
+  return $mdp;
 }
 
 
@@ -141,6 +146,7 @@ has motifs => (
     is      => 'rw',
     lazy    => 1,
     builder => 'build_motifs',
+    clearer => 'clear_motifs',
 );
 
 
@@ -155,6 +161,13 @@ has patch => (
     is      => 'rw',
     isa     => sub { croak "$_[0] is not a valid patch" unless $_[0] =~ /^[0-9]+$/ },
     default => sub { 0 },
+);
+
+
+has gate => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not a valid gate" unless $_[0] =~ /^[0-9.-]+$/ && $_[0] >= 0 && $_[0] <= 2 },
+    default => sub { 1 },
 );
 
 
@@ -207,12 +220,14 @@ has verbose => (
 
 sub build_motifs ($self) {
     my @motifs = $self->_rhythm->motifs($self->motif_num);
+    say "Built motifs: @motifs" if $self->verbose;
     return \@motifs;
 }
 
 
 sub build_voices ($self) {
     my @voices = map { $self->voice->rand } $self->motifs->@*;
+    say "Built voices: @voices" if $self->verbose;
     return \@voices;
 }
 
@@ -236,7 +251,7 @@ Music::VoicePhrase - Construct a measured phrase of notes
 
 =head1 VERSION
 
-version 0.0113
+version 0.0116
 
 =head1 SYNOPSIS
 
@@ -387,6 +402,18 @@ Default: C<4> voices
 Patch / synth program integer from C<0> to C<127>.
 
 Default: C<0> (GM piano)
+
+=head2 gate
+
+  $gate = $mvp->gate;
+
+A possibly fractional amount representing how long a note-length is
+between C<0> and C<2>. A C<0> value means that the note is not played.
+A C<2> means the note is to be held twice as long.
+
+This is used in real-time processing.
+
+Default: C<1> (unity)
 
 =head2 queue
 

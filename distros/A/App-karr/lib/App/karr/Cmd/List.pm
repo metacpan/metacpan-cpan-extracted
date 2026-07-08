@@ -1,7 +1,7 @@
 # ABSTRACT: List tasks with filtering and sorting
 
 package App::karr::Cmd::List;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -110,8 +110,11 @@ sub _filter {
   my ($self, $tasks) = @_;
   my @filtered = @$tasks;
 
-  # Exclude archived by default
-  @filtered = grep { !App::karr::Config->is_terminal_status($_->status) } @filtered;
+  # Exclude terminal statuses (done/archived) by default, but let an explicit
+  # --status request surface them.
+  unless ($self->status) {
+    @filtered = grep { !App::karr::Config->is_terminal_status($_->status) } @filtered;
+  }
 
   if ($self->status) {
     my %statuses = map { $_ => 1 } split /,/, $self->status;
@@ -174,7 +177,7 @@ App::karr::Cmd::List - List tasks with filtering and sorting
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

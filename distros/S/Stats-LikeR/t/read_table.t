@@ -145,4 +145,70 @@ sub tmpcsv {
 	is( $rows->[0]{b}, 'keep', 'a value left alone by the filter is preserved' );
 	ok( !defined $rows->[1]{b}, 'a value blanked inside a filter is written back as undef' );
 }
+# ==============================================================================
+# Non-ASCII / UTF-8 read coverage.
+#
+# _parse_csv_file opens the file as a byte stream (PerlIO_open ... "r") and
+# builds every field with sv_gets/sv_catpvn/newSVsv, none of which set the
+# UTF-8 flag, so read_table returns the field bytes verbatim. A UTF-8 file
+# therefore round-trips at the byte level. These fixtures embed raw UTF-8 bytes
+# (tmpcsv uses binmode) and compare against the same byte strings. Byte values
+# are spelled out explicitly (\xC3\xA9 = LATIN SMALL LETTER E WITH ACUTE,
+# \xE2\x98\x83 = SNOWMAN) so the assertions never depend on this .t file's own
+# on-disk encoding.
+# ==============================================================================
+my $cafe = "caf\xC3\xA9";	# 'cafe' + e-acute
+my $ole  = "ol\xC3\xA9";	# 'ol'  + e-acute
+my $snow = "\xE2\x98\x83";	# U+2603 SNOWMAN
+
+# A multibyte UTF-8 sequence must never be split on the separator: each of its
+# bytes is >= 0x80 while the comma (0x2C) is ASCII, so the byte-level parser
+# keeps the whole field intact.
+{
+	my $f = tmpcsv("a,b\n$cafe,2\n");
+	my $rows = read_table($f);
+	is( scalar @$rows, 1, 'utf8: one data row read' );
+	is( $rows->[0]{a}, $cafe, 'utf8: a multibyte field is kept intact, not split on the separator' );
+	is( $rows->[0]{b}, 2,     'utf8: the field after a multibyte one is unaffected' );
+}
+# A quoted field keeps both its embedded separator and its UTF-8 bytes as a
+# single field (exercises the in-quotes path with multibyte content).
+{
+	my $f = tmpcsv(qq{a,b\n"$cafe, $ole",2\n});
+	my $rows = read_table($f);
+	is( $rows->[0]{a}, "$cafe, $ole",
+		'utf8: a quoted multibyte field with an embedded separator stays one field' );
+	is( $rows->[0]{b}, 2, 'utf8: the field after a quoted multibyte field is parsed correctly' );
+}
+# A non-ASCII column name becomes the (byte-string) hash key.
+{
+	my $age = "\xC3\xA2ge";	# 'a' + circumflex ... 'ge'
+	my $f = tmpcsv("nom,$age\nAlice,30\n");
+	my $rows = read_table($f);
+	ok( exists $rows->[0]{$age}, 'utf8: a non-ASCII column name becomes the hash key' );
+	is( $rows->[0]{$age}, 30,    'utf8: the value under a non-ASCII column name is read' );
+}
+# hoa: a column of non-ASCII byte values is preserved in order.
+{
+	my $f = tmpcsv("a,b\n$snow,2\n$cafe,4\n");
+	my $h = read_table($f, 'output.type' => 'hoa');
+	is_deeply( $h->{a}, [ $snow, $cafe ],
+		'utf8: hoa preserves a column of multibyte values in order' );
+}
+# hoh: a non-ASCII row-name VALUE becomes the outer key.
+{
+	my $f = tmpcsv("id,v\n$snow,1\n");
+	my $h = read_table($f, 'output.type' => 'hoh', 'row.names' => 'id');
+	ok( exists $h->{$snow}, 'utf8: a non-ASCII row-name value becomes the outer hoh key' );
+	is( $h->{$snow}{v}, 1,  'utf8: the value under a non-ASCII row key is read' );
+}
+# Reading a non-ASCII file must not emit any warnings.
+{
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $f = tmpcsv("a,b\n$cafe,$snow\n");
+	read_table($f);
+	is( scalar @warnings, 0, 'utf8: reading a non-ASCII file emits no warnings' )
+		or diag "warnings seen: @warnings";
+}
 done_testing();

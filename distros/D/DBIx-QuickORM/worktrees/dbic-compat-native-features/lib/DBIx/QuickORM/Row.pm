@@ -6,12 +6,12 @@ use Carp qw/confess croak/;
 use Storable qw/dclone/;
 use List::Util qw/zip/;
 use Scalar::Util qw/blessed/;
-use DBIx::QuickORM::Util qw/column_key/;
+use DBIx::QuickORM::Util qw/column_key literal_write_value/;
 
 use DBIx::QuickORM::Affinity();
 use DBIx::QuickORM::Link();
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use DBIx::QuickORM::Connection::RowData qw{
     STORED
@@ -589,6 +589,13 @@ sub _raw_field {
     return undef unless $from;
     return undef unless exists $from->{$field};
     my $val = $from->{$field};
+
+    # A staged SQL literal (\'NOW()' or [\'expr ?', @binds]) is not table data;
+    # it must pass through untouched. Deflating it would corrupt the literal.
+    # This is deliberately narrow: a decoded JSON hashref/arrayref is data and
+    # must still be deflated back to its stored form, so only literal shapes
+    # pass through here.
+    return $val if literal_write_value($val);
 
     return $val->qorm_deflate($self->conflate_args($field, $val))
         if blessed($val) && $val->can('qorm_deflate');

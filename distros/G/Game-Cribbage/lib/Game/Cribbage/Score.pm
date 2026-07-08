@@ -165,3 +165,216 @@ sub calculate_total {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Game::Cribbage::Score - hand scoring calculator
+
+=head1 VERSION
+
+Version 0.12
+
+=cut
+
+=head1 SYNOPSIS
+
+	use Game::Cribbage::Score;
+
+	# score a 4-card hand without the starter
+	my $score = Game::Cribbage::Score->new(
+		with_starter => 0,
+		cards        => \@cards,
+	);
+	print $score->total_score;
+
+	# score with the starter (5th card)
+	my $score = Game::Cribbage::Score->new(
+		with_starter => 1,
+		cards        => [@hand_cards, $starter],
+	);
+	print $score->total_score;
+
+=head1 DESCRIPTION
+
+Calculates the cribbage hand score for a set of L<Game::Cribbage::Deck::Card>
+objects by enumerating all scoring combinations: fifteens, pairs, three/four of
+a kind, runs, flushes, and nobs.  Scoring is performed in C<BUILD> immediately
+after construction; the result is available via C<total_score>.
+
+=head1 PROPERTIES
+
+=head2 total_score
+
+Read/write integer property holding the computed total score. Set by
+C<calculate_total> during construction.
+
+	$score->total_score;
+
+=head2 scored
+
+Readonly hashref containing the point value for each scoring category.
+Built automatically.
+
+	$score->scored;
+	# {
+	#   fifteen        => 2,
+	#   pair           => 2,
+	#   three_of_a_kind => 6,
+	#   four_of_a_kind  => 12,
+	#   run            => [3, 4, 5],
+	#   four_flush     => 4,
+	#   five_flush     => 5,
+	#   nobs           => 1,
+	# }
+
+=head2 fifteen
+
+Read/write arrayref of card-group arrayrefs, each group summing to 15.
+
+	$score->fifteen;
+
+=head2 pair
+
+Read/write arrayref of paired card groups.
+
+	$score->pair;
+
+=head2 three_of_a_kind
+
+Read/write arrayref of three-of-a-kind card groups.
+
+	$score->three_of_a_kind;
+
+=head2 four_of_a_kind
+
+Read/write arrayref of four-of-a-kind card groups.
+
+	$score->four_of_a_kind;
+
+=head2 run
+
+Read/write arrayref of run card groups (runs of three, four, or five).
+
+	$score->run;
+
+=head2 four_flush
+
+Read/write arrayref populated when exactly four cards share a suit.
+
+	$score->four_flush;
+
+=head2 five_flush
+
+Read/write arrayref populated when all five cards (including starter) share
+a suit.
+
+	$score->five_flush;
+
+=head2 nobs
+
+Read/write arrayref populated when the hand contains a Jack whose suit
+matches the starter card.
+
+	$score->nobs;
+
+=head2 cards
+
+Read/write arrayref of L<Game::Cribbage::Deck::Card> objects to score.
+The last element is treated as the starter when C<with_starter> is true.
+
+	$score->cards;
+
+=head2 with_starter
+
+Readonly boolean indicating whether the last element of C<cards> is the
+starter card.  When true, nobs scoring is applied.
+
+	$score->with_starter;
+
+=head1 FUNCTIONS
+
+=head2 calculate_nob
+
+Checks whether the hand contains a Jack matching the starter suit, and if so
+pushes it onto C<nobs>.  Only called when C<with_starter> is true.
+
+	$score->calculate_nob($starter, @cards);
+
+=head2 calculate_run
+
+Enumerates all card subsets to find runs of three, four, or five consecutive
+run-values and stores them in C<run>.
+
+	$score->calculate_run(@cards);
+
+=head2 calculate_flush
+
+Detects four-card or five-card flushes and populates C<four_flush> or
+C<five_flush> accordingly.
+
+	$score->calculate_flush(@cards);
+
+=head2 calculate_fifteen
+
+Finds all card subsets whose pip values sum to 15 and pushes them onto
+C<fifteen>.
+
+	$score->calculate_fifteen(@cards);
+
+=head2 calculate_of_a_kind
+
+Groups cards by symbol and populates C<pair>, C<three_of_a_kind>, or
+C<four_of_a_kind> as appropriate.
+
+	$score->calculate_of_a_kind(@cards);
+
+=head2 calculate_total
+
+Sums the contribution of every populated scoring category and stores the
+result in C<total_score>.
+
+	$score->calculate_total();
+
+=head1 AUTHOR
+
+LNATION, C<< <email at lnation.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-game-cribbage at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Game-Cribbage>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Game::Cribbage
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Cribbage>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/Game-Cribbage>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2024 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

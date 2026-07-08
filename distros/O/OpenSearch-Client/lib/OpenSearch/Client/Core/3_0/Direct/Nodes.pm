@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Nodes;
-$OpenSearch::Client::Core::3_0::Direct::Nodes::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Nodes::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Nodes>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for nodes.|https://docs.opensearch.org/latest/api
 
 =head1 METHODS
     
-=head2 nodes->hot_threads
+=head2 hot_threads
 
 Returns information about hot threads on each node in the cluster.
 
@@ -107,9 +107,9 @@ C<GET /_nodes/{node_id}/hot_threads>
         'source'               =>  $qval11,    # string
     );
 
-L<OpenSearch documentation for nodes.hot_threads|https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-hot-threads/>
+L<OpenSearch documentation for nodes-E<gt>hot_threads|https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-hot-threads/>
     
-=head2 nodes->info
+=head2 info
 
 Returns information about nodes in the cluster.
 
@@ -152,9 +152,9 @@ C<GET /_nodes/{node_id}/{metric}>
         'source'         =>  $qval7,     # string
     );
 
-L<OpenSearch documentation for nodes.info|https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-info/>
+L<OpenSearch documentation for nodes-E<gt>info|https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-info/>
     
-=head2 nodes->reload_secure_settings
+=head2 reload_secure_settings
 
 Reloads secure settings.
 
@@ -191,9 +191,9 @@ C<POST /_nodes/{node_id}/reload_secure_settings>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for nodes.reload_secure_settings|https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-reload-secure/>
+L<OpenSearch documentation for nodes-E<gt>reload_secure_settings|https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-reload-secure/>
     
-=head2 nodes->stats
+=head2 stats
 
 Returns statistical information about nodes in the cluster.
 
@@ -249,9 +249,9 @@ C<GET /_nodes/{node_id}/stats/{metric}/{index_metric}>
         'source'                      =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for nodes.stats|https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-usage/>
+L<OpenSearch documentation for nodes-E<gt>stats|https://opensearch.org/docs/latest/api-reference/nodes-apis/nodes-usage/>
     
-=head2 nodes->usage
+=head2 usage
 
 Returns low-level information about REST actions usage on nodes.
 
@@ -293,7 +293,7 @@ C<GET /_nodes/{node_id}/usage/{metric}>
         'source'       =>  $qval6,     # string
     );
 
-L<OpenSearch documentation for nodes.usage|https://docs.opensearch.org/latest/api-reference/nodes-apis/index/>
+L<OpenSearch documentation for nodes-E<gt>usage|https://docs.opensearch.org/latest/api-reference/nodes-apis/index/>
 
 =head1 MANUAL
 

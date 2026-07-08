@@ -7,6 +7,9 @@ use Test::Exception;	# dies_ok, throws_ok, lives_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
 
+dies_ok {
+	aoh2hoh(undef, 'x');
+} 'aoh2hoh: dies when given undefined AoH';
 #--------
 # basic: index by key, key column retained in inner hash
 #--------

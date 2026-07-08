@@ -7,65 +7,83 @@ use Net::Nostr::_ConstructorArgs ();
 use Carp qw(croak);
 use Digest::SHA qw(sha256_hex);
 use Net::Nostr::Event;
+use Scalar::Util qw(blessed);
+use URI ();
 
 use Class::Tiny qw(_servers);
+
+my $SERVER_LIST_KIND = 10063;
+my $HEX64 = qr/\A[0-9a-fA-F]{64}\z/;
 
 sub new {
     my $class = shift;
     my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
+
+    my $servers = delete $args{servers};
     croak "unknown argument(s): " . join(', ', sort keys %args) if %args;
+
+    if (!defined $servers) {
+        $servers = [];
+    } else {
+        croak "servers must be an arrayref"
+            unless ref($servers) eq 'ARRAY';
+    }
+
+    my @servers = map { _validate_server_url($_) } @$servers;
     my $self = bless {}, $class;
-    $self->_servers([]);
+    $self->_servers(\@servers);
     return $self;
 }
 
 sub from_event {
     my ($class, $event) = @_;
-    croak "event must be kind 10063" unless $event->kind == 10063;
-    my $self = $class->new;
-    for my $tag (@{$event->tags}) {
-        next unless $tag->[0] eq 'server';
-        push @{$self->_servers}, $tag->[1];
+
+    croak "event is required"
+        unless defined $event;
+    croak "event must be a Net::Nostr::Event object"
+        unless blessed($event) && $event->isa('Net::Nostr::Event');
+
+    my $kind = $event->kind;
+    croak "event must be kind 10063"
+        unless defined $kind && !ref($kind) && $kind =~ /\A\d+\z/ && $kind == $SERVER_LIST_KIND;
+
+    my $tags = $event->_tags;
+    croak "tags must be an arrayref"
+        unless ref($tags) eq 'ARRAY';
+
+    my @servers;
+    for my $tag (@$tags) {
+        croak "each tag must be an arrayref"
+            unless ref($tag) eq 'ARRAY';
+        for my $elem (@$tag) {
+            croak "tag elements must be defined strings"
+                unless defined $elem && !ref($elem);
+        }
+
+        next unless @$tag && $tag->[0] eq 'server';
+
+        croak "server tag requires a URL"
+            unless defined $tag->[1] && length $tag->[1];
+        push @servers, _validate_server_url($tag->[1]);
     }
-    return $self;
-}
 
-sub add {
-    my ($self, $url) = @_;
-    croak "url required" unless defined $url;
-    # deduplicate
-    for my $existing (@{$self->_servers}) {
-        return $self if $existing eq $url;
-    }
-    push @{$self->_servers}, $url;
-    return $self;
-}
+    croak "kind 10063 event requires at least one server tag"
+        unless @servers;
 
-sub remove {
-    my ($self, $url) = @_;
-    $self->_servers([grep { $_ ne $url } @{$self->_servers}]);
-    return $self;
-}
-
-sub contains {
-    my ($self, $url) = @_;
-    for my $s (@{$self->_servers}) {
-        return 1 if $s eq $url;
-    }
-    return 0;
-}
-
-sub count {
-    my ($self) = @_;
-    return scalar @{$self->_servers};
+    return $class->new(servers => \@servers);
 }
 
 sub servers {
     my ($self) = @_;
-    return @{$self->_servers};
+    return wantarray ? @{$self->_servers} : [@{$self->_servers}];
 }
 
-sub to_tags {
+sub primary_server {
+    my ($self) = @_;
+    return $self->_servers->[0];
+}
+
+sub server_tags {
     my ($self) = @_;
     return [map { ['server', $_] } @{$self->_servers}];
 }
@@ -73,40 +91,104 @@ sub to_tags {
 sub to_event {
     my $self = shift;
     my %args = Net::Nostr::_ConstructorArgs::normalize(@_);
+
+    croak "kind 10063 event requires at least one server tag"
+        unless @{$self->_servers};
+
     return Net::Nostr::Event->new(
         %args,
-        kind    => 10063,
+        kind    => $SERVER_LIST_KIND,
         content => '',
-        tags    => $self->to_tags,
+        tags    => $self->server_tags,
     );
 }
 
 sub extract_hash {
-    my ($class, $url) = @_;
-    if ($url =~ /([0-9a-fA-F]{64})(?:\.([a-zA-Z0-9]+))?(?:\?.*)?$/) {
-        return ($1, $2);
+    my ($class, $input) = @_;
+    return (undef, undef)
+        unless defined $input && !ref($input);
+
+    my ($hash, $ext);
+    while ($input =~ /(?<![0-9a-fA-F])([0-9a-fA-F]{64})(?![0-9a-fA-F])(?:\.([A-Za-z0-9]+)(?=\z|[?#]))?/g) {
+        ($hash, $ext) = (lc($1), $2);
     }
-    return (undef, undef);
+
+    return defined $hash ? ($hash, $ext) : (undef, undef);
 }
 
-sub resolve_urls {
-    my ($class, $url, $servers) = @_;
-    my ($hash, $ext) = $class->extract_hash($url);
+sub fallback_urls {
+    my ($self, $url) = @_;
+    croak "fallback_urls must be called on a Net::Nostr::Blossom object"
+        unless blessed($self) && $self->isa(__PACKAGE__);
+
+    my ($hash, $ext) = __PACKAGE__->extract_hash($url);
     return () unless defined $hash;
 
     my $path = defined $ext ? "$hash.$ext" : $hash;
-    my @urls;
-    for my $server (@$servers) {
-        my $base = $server;
-        $base =~ s{/+$}{};
-        push @urls, "$base/$path";
-    }
-    return @urls;
+    return map {
+        my $base = $_;
+        $base =~ s{/+\z}{};
+        "$base/$path";
+    } @{$self->_servers};
 }
 
 sub verify_sha256 {
     my ($class, $data, $expected) = @_;
+    croak "expected hash must be 64-char hex"
+        unless defined $expected && !ref($expected) && $expected =~ $HEX64;
+
     return sha256_hex($data) eq lc($expected);
+}
+
+sub _validate_server_url {
+    my ($url) = @_;
+
+    croak "server url is required"
+        unless defined $url && !ref($url);
+    croak "server url must not contain control or space characters"
+        if $url =~ /[[:cntrl:]\s]/;
+
+    my $uri = URI->new($url);
+    my $scheme = $uri->scheme;
+    croak "server url must use http or https"
+        unless defined $scheme && (lc($scheme) eq 'http' || lc($scheme) eq 'https');
+
+    my $authority = $uri->authority;
+    croak "server url must include an authority/host"
+        unless defined $authority && length $authority;
+
+    croak "server url must not include userinfo"
+        if defined($uri->userinfo) || $authority =~ /@/;
+    croak "server url must not include a query"
+        if defined $uri->query;
+    croak "server url must not include a fragment"
+        if defined $uri->fragment;
+
+    my $host = $uri->host;
+    croak "server url must include an authority/host"
+        unless defined $host && length $host;
+
+    _validate_authority_port($authority);
+    return $url;
+}
+
+sub _validate_authority_port {
+    my ($authority) = @_;
+
+    my $port;
+    if ($authority =~ /\A\[[^\]]+\](?::([^:]*))?\z/) {
+        $port = $1;
+    } elsif ($authority =~ /\A[^:]*:(.*)\z/) {
+        $port = $1;
+    } else {
+        croak "server url must bracket IPv6 host"
+            if $authority =~ /:/;
+        return;
+    }
+
+    return unless defined $port;
+    croak "server url port must be between 1 and 65535"
+        unless $port =~ /\A\d+\z/ && $port >= 1 && $port <= 65535;
 }
 
 1;
@@ -115,40 +197,37 @@ __END__
 
 =head1 NAME
 
-Net::Nostr::Blossom - NIP-B7 Blossom media server lists
+Net::Nostr::Blossom - strict Nostr/Blossom server-list integration helpers
 
 =head1 SYNOPSIS
 
     use Net::Nostr::Blossom;
 
-    # Build a Blossom server list
-    my $bl = Net::Nostr::Blossom->new;
-    $bl->add('https://blossom.self.hosted');
-    $bl->add('https://cdn.blossom.cloud');
+    my $bl = Net::Nostr::Blossom->new(
+        servers => [
+            'https://blossom.self.hosted',
+            'https://cdn.blossom.cloud',
+        ],
+    );
 
-    # Convert to a kind 10063 event for publishing
+    say $bl->primary_server;  # https://blossom.self.hosted
+
     my $event = $bl->to_event(pubkey => $key->pubkey_hex);
     $key->sign_event($event);
     $client->publish($event);
 
-    # Parse from a received kind 10063 event
-    my $bl = Net::Nostr::Blossom->from_event($event);
-    for my $url ($bl->servers) {
+    my $parsed = Net::Nostr::Blossom->from_event($event);
+    for my $url ($parsed->servers) {
         say $url;
     }
 
-    # Extract SHA-256 hash from a Blossom URL
-    my $url = "https://old-server.com/${\('a' x 64)}.png";
-    my ($hash, $ext) = Net::Nostr::Blossom->extract_hash($url);
-    # $hash = 'aaa...aaa' (64 hex chars), $ext = 'png'
-
-    # Generate alternative URLs from other Blossom servers
-    my @urls = Net::Nostr::Blossom->resolve_urls(
-        "https://dead-server.com/${\('a' x 64)}.png",
-        ['https://blossom.self.hosted', 'https://cdn.blossom.cloud'],
+    my $hash = 'a' x 64;
+    my ($found_hash, $ext) = Net::Nostr::Blossom->extract_hash(
+        "https://old-server.com/$hash.png"
     );
 
-    # Verify downloaded content matches expected SHA-256
+    my @fallback = $bl->fallback_urls("https://dead-server.com/$hash.png");
+
     use Digest::SHA qw(sha256_hex);
     my $data = 'file contents';
     my $expected_hash = sha256_hex($data);
@@ -156,19 +235,20 @@ Net::Nostr::Blossom - NIP-B7 Blossom media server lists
 
 =head1 DESCRIPTION
 
-Implements NIP-B7 Blossom media integration. Blossom is a set of standards
-for dealing with servers that store files addressable by their SHA-256 hashes.
+C<Net::Nostr::Blossom> implements the Nostr-facing pieces of NIP-B7 and
+BUD-03: C<kind:10063> Blossom server-list events, ordered C<server> tags,
+hash extraction from Blossom-like URLs, fallback URL generation, and SHA-256
+content verification.
 
-Nostr clients SHOULD fetch C<kind:10063> lists of Blossom servers for each
-user. When a URL in an event ends with a 64-character hex string (with or
-without a file extension) and is no longer available, clients SHOULD look up
-the user's C<kind:10063> server list and try the same hash on alternative
-servers.
+This module does not implement Blossom HTTP client behavior, server behavior,
+uploads, authorization, payments, blob discovery, or other BUD APIs.
 
-When downloading files, clients SHOULD verify that the SHA-256 hash of the
-content matches the 64-character hex string in the URL.
+Server lists are ordered. The first server is the primary server. Duplicate
+servers are preserved because BUD-03 gives ordering semantic value and does
+not specify deduplication; this helper serializes the list exactly as provided
+after validation.
 
-=head1 CONSTRUCTOR
+=head1 CONSTRUCTORS
 
 =head2 new
 
@@ -176,126 +256,138 @@ Accepts named arguments as either a flat list or a single hash reference.
 
     my $bl = Net::Nostr::Blossom->new;
 
-Creates an empty Blossom server list. Croaks on unknown arguments.
+    my $bl = Net::Nostr::Blossom->new(
+        servers => [
+            'https://blossom.self.hosted',
+            'https://cdn.blossom.cloud',
+        ],
+    );
+
+Creates a Blossom server list. C<servers>, when provided, must be an arrayref.
+Each server URL is strictly validated. The constructor copies the list, so
+later caller mutations do not change the object.
+
+Server URLs must be HTTP or HTTPS base URLs. They must include an authority
+and host, must not include userinfo, query, fragment, control characters, or
+space characters, and any explicit port must be between 1 and 65535. Paths are
+allowed. Bracketed IPv6 authorities are supported where L<URI> supports them.
 
 =head2 from_event
 
     my $bl = Net::Nostr::Blossom->from_event($event);
 
-Parses a kind 10063 event into a Blossom server list. Extracts all
-C<server> tags and ignores other tag types. Croaks if the event is not
-kind 10063.
+Parses a C<kind:10063> L<Net::Nostr::Event> into a server list. This parser
+accepts only C<Net::Nostr::Event> objects, not plain hashrefs. Hashrefs should
+be parsed by L<Net::Nostr::Event> first so event validation has a single owner.
+
+C<from_event> rejects missing events, non-event values, wrong or malformed
+kinds, malformed tag lists, C<server> tags without URL values, invalid server
+URLs, and events with no C<server> tags. Non-C<server> tags are ignored.
 
     my $event = Net::Nostr::Event->new(
-        pubkey => 'a' x 64, kind => 10063, content => '',
-        tags => [['server', 'https://blossom.example.com']],
+        pubkey  => 'a' x 64,
+        kind    => 10063,
+        content => '',
+        tags    => [['server', 'https://blossom.example.com']],
     );
     my $bl = Net::Nostr::Blossom->from_event($event);
-    say $bl->count;  # 1
+    say $bl->primary_server;
 
 =head1 METHODS
-
-=head2 add
-
-    $bl->add($url);
-
-Adds a Blossom server URL. If the URL already exists, it is not duplicated.
-Returns C<$self> for chaining.
-
-    $bl->add('https://server1.com')
-       ->add('https://server2.com');
-
-=head2 remove
-
-    $bl->remove($url);
-
-Removes the server with the given URL. No-op if not present.
-Returns C<$self> for chaining.
-
-=head2 contains
-
-    my $bool = $bl->contains($url);
-
-Returns true if the given server URL is in the list.
-
-    $bl->add('https://blossom.example.com');
-    say $bl->contains('https://blossom.example.com');  # 1
-    say $bl->contains('https://other.com');             # 0
-
-=head2 count
-
-    my $n = $bl->count;
-
-Returns the number of servers in the list.
 
 =head2 servers
 
     my @urls = $bl->servers;
+    my $urls = $bl->servers;
 
-Returns the list of server URLs in the order they were added.
+Returns the server URLs in order. In list context it returns a list. In scalar
+context it returns a new arrayref. Mutating the returned arrayref does not
+mutate the object.
 
-=head2 to_tags
+=head2 primary_server
 
-    my $tags = $bl->to_tags;
-    # [['server', 'https://blossom.self.hosted'], ['server', 'https://cdn.blossom.cloud']]
+    my $url = $bl->primary_server;
 
-Returns the server list as an arrayref of tag arrays.
+Returns the first server URL, or C<undef> for an empty list.
+
+=head2 server_tags
+
+    my $tags = $bl->server_tags;
+
+Returns a new arrayref of ordered C<server> tag arrays suitable for a
+C<kind:10063> event.
+
+    # [
+    #   ['server', 'https://blossom.self.hosted'],
+    #   ['server', 'https://cdn.blossom.cloud'],
+    # ]
 
 =head2 to_event
 
     my $event = $bl->to_event(pubkey => $pubkey_hex);
     my $event = $bl->to_event(pubkey => $pubkey_hex, created_at => time());
 
-Creates a kind 10063 L<Net::Nostr::Event> from the server list. All extra
-arguments are passed through to C<< Net::Nostr::Event->new >>. The C<kind>,
-C<content>, and C<tags> fields are set automatically.
+Creates a C<kind:10063> L<Net::Nostr::Event> with empty content and ordered
+C<server> tags. Extra arguments are passed through to
+C<< Net::Nostr::Event->new >>, but C<kind>, C<content>, and C<tags> are always
+set from the server list. Croaks if the list is empty because BUD-03 requires
+at least one C<server> tag.
 
 =head2 extract_hash
 
     my ($hash, $ext) = Net::Nostr::Blossom->extract_hash($url);
 
-Extracts a 64-character hex string (SHA-256 hash) from a URL. Returns the
-hash and optional file extension, or C<(undef, undef)> if the URL does not
-contain a recognizable Blossom hash.
+Extracts the last bounded 64-character hexadecimal string from the input and
+returns it lowercased with an optional alphanumeric extension. The extension
+is captured only when it appears immediately after the hash as C<.ext> and is
+followed by the end of the input, a query, or a fragment. Longer hex runs are
+not matched.
 
+Returns C<(undef, undef)> when no hash exists.
+
+    my $hash = 'a' x 64;
     my ($h, $ext) = Net::Nostr::Blossom->extract_hash(
-        'https://server.com/abc123...def.png'
+        "https://server.com/$hash.pdf?download=1"
     );
-    # $h   = 'abc123...def'  (64 hex chars)
-    # $ext = 'png'
+    # $h   = 'aaaa...'  (64 lowercase hex chars)
+    # $ext = 'pdf'
 
-=head2 resolve_urls
+=head2 fallback_urls
 
-    my @urls = Net::Nostr::Blossom->resolve_urls($url, \@servers);
+    my @urls = $bl->fallback_urls($original_url);
 
-Given a URL containing a SHA-256 hash and a list of Blossom server URLs,
-generates alternative URLs by combining each server with the hash (and
-optional file extension). Returns an empty list if the URL does not contain
-a recognizable hash.
+Extracts the hash and optional extension from C<$original_url> and generates
+fallback URLs using this object's ordered servers:
 
-    my @urls = Net::Nostr::Blossom->resolve_urls(
-        "https://unavailable.com/${\ ('b' x 64)}.jpg",
-        ['https://blossom.self.hosted', 'https://cdn.blossom.cloud'],
+    <server without trailing slash>/<hash>[.<ext>]
+
+Returns an empty list when C<$original_url> does not contain a bounded
+64-character hex hash.
+
+    my $bl = Net::Nostr::Blossom->new(
+        servers => ['https://blossom.self.hosted', 'https://cdn.blossom.cloud'],
     );
-    # ('https://blossom.self.hosted/bbb...bbb.jpg',
-    #  'https://cdn.blossom.cloud/bbb...bbb.jpg')
+    my @urls = $bl->fallback_urls(
+        "https://unavailable.com/${\ ('b' x 64)}.jpg"
+    );
 
 =head2 verify_sha256
 
     my $ok = Net::Nostr::Blossom->verify_sha256($data, $expected_hash);
 
-Verifies that the SHA-256 hash of C<$data> matches C<$expected_hash>.
-Returns true on match, false otherwise. Clients SHOULD call this after
-downloading files from Blossom servers.
+Computes the SHA-256 hash of C<$data> and compares it to C<$expected_hash>.
+The expected hash must be a 64-character hexadecimal string; malformed
+expected hashes croak. Valid but non-matching hashes return false.
 
     my $data = 'file contents';
     my $hash = Digest::SHA::sha256_hex($data);
-    Net::Nostr::Blossom->verify_sha256($data, $hash);   # true
-    Net::Nostr::Blossom->verify_sha256('tampered', $hash);  # false
+    Net::Nostr::Blossom->verify_sha256($data, $hash);      # true
+    Net::Nostr::Blossom->verify_sha256('tampered', $hash); # false
 
 =head1 SEE ALSO
 
 L<NIP-B7|https://github.com/nostr-protocol/nips/blob/master/B7.md>,
-L<Net::Nostr>, L<Net::Nostr::Event>
+L<BUD-03|https://github.com/hzrd149/blossom/blob/master/buds/03.md>,
+L<Net::Nostr::Event>
 
 =cut

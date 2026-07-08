@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Cat;
-$OpenSearch::Client::Core::3_0::Direct::Cat::VERSION = '3.007005';
+$OpenSearch::Client::Core::3_0::Direct::Cat::VERSION = '3.007006';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Cat>
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ L<See OpenSearch documentation for cat.|https://docs.opensearch.org/latest/api-r
 
 =head1 METHODS
     
-=head2 cat->aliases
+=head2 aliases
 
 Shows information about aliases currently configured to indexes, including filter and routing information.
 
@@ -108,9 +108,9 @@ C<GET /_cat/aliases/{name}>
         'source'            =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for cat.aliases|https://opensearch.org/docs/latest/api-reference/cat/cat-aliases/>
+L<OpenSearch documentation for cat-E<gt>aliases|https://opensearch.org/docs/latest/api-reference/cat/cat-aliases/>
     
-=head2 cat->all_pit_segments
+=head2 all_pit_segments
 
 Lists all active CAT point-in-time segments.
 
@@ -143,9 +143,9 @@ C<GET /_cat/pit_segments/_all>
         'source'       =>  $qval11,    # string
     );
 
-L<OpenSearch documentation for cat.all_pit_segments|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/>
+L<OpenSearch documentation for cat-E<gt>all_pit_segments|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/>
     
-=head2 cat->allocation
+=head2 allocation
 
 Provides a snapshot of how many shards are allocated to each data node and how much disk space they are using.
 
@@ -188,9 +188,9 @@ C<GET /_cat/allocation/{node_id}>
         'source'                   =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for cat.allocation|https://opensearch.org/docs/latest/api-reference/cat/cat-allocation/>
+L<OpenSearch documentation for cat-E<gt>allocation|https://opensearch.org/docs/latest/api-reference/cat/cat-allocation/>
     
-=head2 cat->cluster_manager
+=head2 cluster_manager
 
 Returns information about the cluster-manager node.
 
@@ -225,9 +225,9 @@ C<GET /_cat/cluster_manager>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for cat.cluster_manager|https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/>
+L<OpenSearch documentation for cat-E<gt>cluster_manager|https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/>
     
-=head2 cat->count
+=head2 count
 
 Provides quick access to the document count of the entire cluster or of an individual index.
 
@@ -266,9 +266,9 @@ C<GET /_cat/count/{index}>
         'source'       =>  $qval10,    # string
     );
 
-L<OpenSearch documentation for cat.count|https://opensearch.org/docs/latest/api-reference/cat/cat-count/>
+L<OpenSearch documentation for cat-E<gt>count|https://opensearch.org/docs/latest/api-reference/cat/cat-count/>
     
-=head2 cat->fielddata
+=head2 fielddata
 
 Shows how much heap memory is currently being used by field data on every data node in the cluster.
 
@@ -309,9 +309,9 @@ C<GET /_cat/fielddata/{fields}>
         'source'       =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for cat.fielddata|https://opensearch.org/docs/latest/api-reference/cat/cat-field-data/>
+L<OpenSearch documentation for cat-E<gt>fielddata|https://opensearch.org/docs/latest/api-reference/cat/cat-field-data/>
     
-=head2 cat->health
+=head2 health
 
 Returns a concise representation of the cluster health.
 
@@ -345,9 +345,9 @@ C<GET /_cat/health>
         'source'       =>  $qval12,    # string
     );
 
-L<OpenSearch documentation for cat.health|https://opensearch.org/docs/latest/api-reference/cat/cat-health/>
+L<OpenSearch documentation for cat-E<gt>health|https://opensearch.org/docs/latest/api-reference/cat/cat-health/>
     
-=head2 cat->help
+=head2 help
 
 Returns help for the Cat APIs.
 
@@ -371,9 +371,9 @@ C<GET /_cat>
         'source'       =>  $qval5,     # string
     );
 
-L<OpenSearch documentation for cat.help|https://opensearch.org/docs/latest/api-reference/cat/index/>
+L<OpenSearch documentation for cat-E<gt>help|https://opensearch.org/docs/latest/api-reference/cat/index/>
     
-=head2 cat->indices
+=head2 indices
 
 Lists information related to indexes, that is, how much disk space they are using, how many shards they have, their health status, and so on.
 
@@ -421,9 +421,9 @@ C<GET /_cat/indices/{index}>
         'source'                     =>  $qval19,    # string
     );
 
-L<OpenSearch documentation for cat.indices|https://opensearch.org/docs/latest/api-reference/cat/cat-indices/>
+L<OpenSearch documentation for cat-E<gt>indices|https://opensearch.org/docs/latest/api-reference/cat/cat-indices/>
     
-=head2 cat->master
+=head2 master
 
 Returns information about the cluster-manager node.
 
@@ -458,9 +458,9 @@ C<GET /_cat/master>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for cat.master|https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/>
+L<OpenSearch documentation for cat-E<gt>master|https://opensearch.org/docs/latest/api-reference/cat/cat-cluster_manager/>
     
-=head2 cat->nodeattrs
+=head2 nodeattrs
 
 Returns information about custom node attributes.
 
@@ -495,9 +495,9 @@ C<GET /_cat/nodeattrs>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for cat.nodeattrs|https://opensearch.org/docs/latest/api-reference/cat/cat-nodeattrs/>
+L<OpenSearch documentation for cat-E<gt>nodeattrs|https://opensearch.org/docs/latest/api-reference/cat/cat-nodeattrs/>
     
-=head2 cat->nodes
+=head2 nodes
 
 Returns basic statistics about the performance of cluster nodes.
 
@@ -535,9 +535,9 @@ C<GET /_cat/nodes>
         'source'                   =>  $qval16,    # string
     );
 
-L<OpenSearch documentation for cat.nodes|https://opensearch.org/docs/latest/api-reference/cat/cat-nodes/>
+L<OpenSearch documentation for cat-E<gt>nodes|https://opensearch.org/docs/latest/api-reference/cat/cat-nodes/>
     
-=head2 cat->pending_tasks
+=head2 pending_tasks
 
 Returns a concise representation of the cluster's pending tasks.
 
@@ -573,9 +573,9 @@ C<GET /_cat/pending_tasks>
         'source'                   =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for cat.pending_tasks|https://opensearch.org/docs/latest/api-reference/cat/cat-pending-tasks/>
+L<OpenSearch documentation for cat-E<gt>pending_tasks|https://opensearch.org/docs/latest/api-reference/cat/cat-pending-tasks/>
     
-=head2 cat->pit_segments
+=head2 pit_segments
 
 Lists one or several CAT point-in-time segments.
 
@@ -610,9 +610,9 @@ C<GET /_cat/pit_segments>
         'source'       =>  $qval11,    # string
     );
 
-L<OpenSearch documentation for cat.pit_segments|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/>
+L<OpenSearch documentation for cat-E<gt>pit_segments|https://opensearch.org/docs/latest/search-plugins/point-in-time-api/>
     
-=head2 cat->plugins
+=head2 plugins
 
 Returns information about the names, components, and versions of the installed plugins.
 
@@ -647,9 +647,9 @@ C<GET /_cat/plugins>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for cat.plugins|https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/>
+L<OpenSearch documentation for cat-E<gt>plugins|https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/>
     
-=head2 cat->recovery
+=head2 recovery
 
 Returns all completed and ongoing index and shard recoveries.
 
@@ -693,9 +693,9 @@ C<GET /_cat/recovery/{index}>
         'source'       =>  $qval15,    # string
     );
 
-L<OpenSearch documentation for cat.recovery|https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/>
+L<OpenSearch documentation for cat-E<gt>recovery|https://opensearch.org/docs/latest/api-reference/cat/cat-plugins/>
     
-=head2 cat->repositories
+=head2 repositories
 
 Returns information about all snapshot repositories for a cluster.
 
@@ -730,9 +730,9 @@ C<GET /_cat/repositories>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for cat.repositories|https://opensearch.org/docs/latest/api-reference/cat/cat-repositories/>
+L<OpenSearch documentation for cat-E<gt>repositories|https://opensearch.org/docs/latest/api-reference/cat/cat-repositories/>
     
-=head2 cat->segment_replication
+=head2 segment_replication
 
 Returns information about active and last-completed segment replication events on each replica shard, including related shard-level metrics. 
 These metrics provide information about how far behind the primary shard the replicas are lagging.
@@ -784,9 +784,9 @@ C<GET /_cat/segment_replication/{index}>
         'source'              =>  $qval22,    # string
     );
 
-L<OpenSearch documentation for cat.segment_replication|https://opensearch.org/docs/latest/api-reference/cat/cat-segment-replication/>
+L<OpenSearch documentation for cat-E<gt>segment_replication|https://opensearch.org/docs/latest/api-reference/cat/cat-segment-replication/>
     
-=head2 cat->segments
+=head2 segments
 
 Provides low-level information about the segments in the shards of an index.
 
@@ -828,9 +828,9 @@ C<GET /_cat/segments/{index}>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for cat.segments|https://opensearch.org/docs/latest/api-reference/cat/cat-segments/>
+L<OpenSearch documentation for cat-E<gt>segments|https://opensearch.org/docs/latest/api-reference/cat/cat-segments/>
     
-=head2 cat->shards
+=head2 shards
 
 Lists the states of all primary and replica shards and how they are distributed.
 
@@ -874,9 +874,9 @@ C<GET /_cat/shards/{index}>
         'source'                   =>  $qval15,    # string
     );
 
-L<OpenSearch documentation for cat.shards|https://opensearch.org/docs/latest/api-reference/cat/cat-shards/>
+L<OpenSearch documentation for cat-E<gt>shards|https://opensearch.org/docs/latest/api-reference/cat/cat-shards/>
     
-=head2 cat->snapshots
+=head2 snapshots
 
 Lists all of the snapshots stored in a specific repository.
 
@@ -920,9 +920,9 @@ C<GET /_cat/snapshots/{repository}>
         'source'                   =>  $qval15,    # string
     );
 
-L<OpenSearch documentation for cat.snapshots|https://opensearch.org/docs/latest/api-reference/cat/cat-snapshots/>
+L<OpenSearch documentation for cat-E<gt>snapshots|https://opensearch.org/docs/latest/api-reference/cat/cat-snapshots/>
     
-=head2 cat->tasks
+=head2 tasks
 
 Lists the progress of all tasks currently running on the cluster.
 
@@ -959,9 +959,9 @@ C<GET /_cat/tasks>
         'source'          =>  $qval15,    # string
     );
 
-L<OpenSearch documentation for cat.tasks|https://opensearch.org/docs/latest/api-reference/cat/cat-tasks/>
+L<OpenSearch documentation for cat-E<gt>tasks|https://opensearch.org/docs/latest/api-reference/cat/cat-tasks/>
     
-=head2 cat->templates
+=head2 templates
 
 Lists the names, patterns, order numbers, and version numbers of index templates.
 
@@ -1003,9 +1003,9 @@ C<GET /_cat/templates/{name}>
         'source'                   =>  $qval13,    # string
     );
 
-L<OpenSearch documentation for cat.templates|https://opensearch.org/docs/latest/api-reference/cat/cat-templates/>
+L<OpenSearch documentation for cat-E<gt>templates|https://opensearch.org/docs/latest/api-reference/cat/cat-templates/>
     
-=head2 cat->thread_pool
+=head2 thread_pool
 
 Returns cluster-wide thread pool statistics per node.
 By default the active, queued, and rejected statistics are returned for all thread pools.
@@ -1049,7 +1049,7 @@ C<GET /_cat/thread_pool/{thread_pool_patterns}>
         'source'                   =>  $qval14,    # string
     );
 
-L<OpenSearch documentation for cat.thread_pool|https://opensearch.org/docs/latest/api-reference/cat/cat-thread-pool/>
+L<OpenSearch documentation for cat-E<gt>thread_pool|https://opensearch.org/docs/latest/api-reference/cat/cat-thread-pool/>
 
 =head1 MANUAL
 

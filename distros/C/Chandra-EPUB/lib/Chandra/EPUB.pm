@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Chandra::App;
 use Chandra::Element;
@@ -122,10 +122,10 @@ sub run {
 		$spa->route("/chapter/$i" => sub {
 			my $body = extract_body($chapters->[$idx]{html});
 			my @nav_children;
-			push @nav_children, { tag => 'a', href => '/chapter/' . ($idx - 1), data => "\x{2190} Previous" }
+			push @nav_children, { tag => 'a', href => '/chapter/' . ($idx - 1), data => "< Previous" }
 			if $idx > 1;
 			push @nav_children, { tag => 'a', href => '/toc', data => 'Contents' };
-			push @nav_children, { tag => 'a', href => '/chapter/' . ($idx + 1), data => "Next \x{2192}" }
+			push @nav_children, { tag => 'a', href => '/chapter/' . ($idx + 1), data => "Next >" }
 			if $idx < $#$chapters;
 
 			Chandra::Element->new({
@@ -625,7 +625,7 @@ Chandra::EPUB - Epub reader built with Perl and Chandra
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

@@ -117,6 +117,296 @@ When the target is a Hash of Arrays, incoming arrays are pushed onto the existin
 
 NB: If `add_data` is called on a completely empty target reference (e.g., `$data = {}` or `$data = []`), it will intelligently infer the required inner structure (Hashes vs Arrays) by inspecting the first valid row of the source data.
 
+## agg
+
+Split-apply-combine over a data frame: split the rows into groups, apply one or
+more aggregators to chosen columns, and combine the results into a new frame.
+This is the *combine* half that `group_by` (which only splits) leaves to you,
+and the analog of pandas `df.groupby(...).agg(...)`. With no `by` it collapses
+the whole frame to a single row, like pandas `df.agg(...)`.
+
+`agg` accepts all four data-frame shapes and, by default, returns the same shape
+it was given:
+
+    AoA  [ [ .. ], [ .. ] ]      array of arrayrefs   (positional columns)
+    AoH  [ { .. }, { .. } ]      array of hashrefs    (the read_table default)
+    HoA  { c => [ .. ], .. }     hash of arrayrefs    (column-major)
+    HoH  { r => { .. }, .. }     hash of hashrefs     (named rows)
+
+For AoA the column identifiers in `by` and in the `agg` spec are integer
+positions; for the other three shapes they are column names. The original frame
+is never modified.
+
+### Usage
+
+    use Stats::LikeR;
+
+    # grouped, one aggregator per column
+    my $out = agg($df, by => 'sex', agg => { wt => 'mean' });
+
+    # grouped, several aggregators, several columns
+    my $out = agg($df,
+        by  => 'sex',
+        agg => { wt => [ 'mean', 'sd' ], age => [ 'mean', 'count' ] },
+    );
+
+    # ungrouped: the whole frame becomes one row
+    my $out = agg($df, agg => { wt => 'mean', age => 'count' });
+
+    # group on two columns and emit a hash of hashes
+    my $out = agg($df,
+        by            => [ 'a', 'b' ],
+        agg           => { v => 'sum' },
+        'output.type' => 'hoh',
+    );
+
+### Arguments
+
+`agg` takes the data frame first, then `name => value` pairs.
+
+- **agg** (required) — a hashref mapping each column to an aggregator
+  *spec*. A spec is one of: a single aggregator name (string), an arrayref of
+  names, or a coderef. See [Aggregators](#aggregators) below.
+- **by** — a single column or an arrayref of columns to group on. Omit it to
+  aggregate the entire frame into one row.
+- **skipna** — `1` (default) drops undef cells before a numeric aggregator
+  runs. `0` makes any undef in a group poison the numeric result for that group
+  (the cell comes back undef), matching pandas `skipna=False`. `count`, `n`,
+  `nunique`, `first`, and `last` ignore this flag.
+- **sort** — `1` (default) sorts the output groups by key (numerically when
+  every key looks like a number, otherwise as strings); `0` keeps first-seen
+  order.
+- **output.type** — `aoa`, `aoh`, `hoa`, or `hoh`. Defaults to the same family
+  as the input frame.
+
+### Aggregators
+
+Named aggregators may be combined in any order per column:
+
+| name      | result                                                      |
+|-----------|-------------------------------------------------------------|
+| `mean`    | arithmetic mean (needs ≥ 1 defined cell, else undef)        |
+| `median`  | median (needs ≥ 1)                                          |
+| `sum`     | sum (needs ≥ 1)                                             |
+| `sd`      | sample standard deviation (needs ≥ 2, else undef)           |
+| `var`     | sample variance (needs ≥ 2, else undef)                     |
+| `min`     | minimum (needs ≥ 1)                                          |
+| `max`     | maximum (needs ≥ 1)                                          |
+| `count`   | number of *defined* cells                                   |
+| `n`       | number of cells, undef included                             |
+| `nunique` | number of distinct defined cells                            |
+| `first`   | first defined cell (undef if none)                          |
+| `last`    | last defined cell (undef if none)                           |
+| `mode`    | modal defined cell; ties broken deterministically           |
+
+The numeric aggregators call the module's XS functions of the same name, so they
+inherit their precision. `agg` filters undef itself before calling them, so they
+never croak on missing cells. `mode` is made deterministic: on a tie it returns
+the smallest number, or the lowest string when the values are not numeric.
+
+A **coderef** may be supplied instead of a name for full control. It is called
+once per group as `$code->(\@cells)`, where `@cells` are every cell for that
+column in the group **including undef**, and must return a single scalar:
+
+    # count the missing values in each group
+    my $out = agg($df, by => 'sex', agg => {
+        age => sub {
+            my $cells = shift;
+            scalar grep { !defined } @$cells;
+        },
+    });
+
+### Output shape and column naming
+
+Output columns are laid out deterministically: the `by` columns first, in the
+order given, then the aggregated columns sorted (numerically for AoA integer
+columns, otherwise as strings), each expanded over its aggregator list in the
+order supplied.
+
+A column reduced by a **single** aggregator keeps its own name; reduced by
+**two or more** it becomes `<col>_<func>`:
+
+    my $df = [
+        { sex => 'M', wt => 70, age => 30    },
+        { sex => 'F', wt => 60, age => 25    },
+        { sex => 'M', wt => 80, age => 40    },
+        { sex => 'F', wt => 55, age => undef },
+    ];
+
+    my $out = agg($df,
+        by  => 'sex',
+        agg => { wt => [ 'mean', 'sd' ], age => [ 'mean', 'count' ] },
+    );
+
+**Resulting Structure** (AoH in, AoH out):
+
+    [
+        {
+            sex       => 'F',
+            wt_mean   => 57.5,
+            wt_sd     => 3.53553390593274,
+            age_mean  => 25,     # the undef age was skipped
+            age_count => 1,      # count excludes the undef
+        },
+        {
+            sex       => 'M',
+            wt_mean   => 75,
+            wt_sd     => 7.07106781186548,
+            age_mean  => 35,
+            age_count => 2,
+        },
+    ]
+
+### Ungrouped
+
+Without `by`, the frame collapses to one row:
+
+    my $out = agg($df, agg => { wt => 'mean', age => 'count' });
+
+    # [ { wt => 66.25, age => 3 } ]
+
+### Array of Arrays (AoA)
+
+Columns are integer positions. Grouping on column 0 and reducing column 1:
+
+    my $aoa = [ [ 'M', 70 ], [ 'F', 60 ], [ 'M', 80 ] ];
+    my $out = agg($aoa, by => 0, agg => { 1 => [ 'mean', 'max' ] });
+
+    # [ [ 'F', 60, 60 ], [ 'M', 75, 80 ] ]
+    #     ^grp  ^mean ^max
+
+The output row is positional: the `by` columns first, then each aggregated
+column in the plan order.
+
+### Hash of Hashes (HoH) output
+
+With `output.type => 'hoh'` the row label is the group value; multiple `by`
+columns are joined with a dot, an ungrouped result is keyed `all`, and a
+collision is made unique with a `.N` suffix.
+
+    my $out = agg($df, by => 'sex', agg => { wt => 'mean' }, 'output.type' => 'hoh');
+
+    # {
+    #     F => { sex => 'F', wt => 57.5 },
+    #     M => { sex => 'M', wt => 75   },
+    # }
+
+### Missing values
+
+By default (`skipna => 1`) undef cells are removed before a numeric aggregator
+runs, so a group of `(60, 55)` with a third undef still yields the mean of the
+two defined values. `count` reports only defined cells while `n` counts undef
+too. With `skipna => 0`, a group containing any undef returns undef for the
+numeric aggregators (`mean median sum sd var mode`); the counting and
+positional aggregators are unaffected.
+
+A group without enough data yields undef rather than an error: `sd` and `var`
+need at least two defined cells, the other numeric aggregators need at least
+one.
+
+### Errors
+
+`agg` dies (with a trailing newline, so the message prints cleanly) when:
+
+- the first argument is not an ARRAY or HASH ref;
+- no `agg` spec is given, or it is not a non-empty hashref;
+- an unknown option is passed;
+- an aggregator name is not recognized;
+- an aggregator list for a column is empty;
+- `output.type` is not one of `aoa`, `aoh`, `hoa`, `hoh`;
+- the trailing arguments are not `name => value` pairs.
+
+### See also
+
+`group_by` (the split step), `concat` / `rbind` (row-binding frames),
+`dropna`, `assign`, `value_counts`.
+
+## anova
+
+Sequential (Type-I) ANOVA table for a linear model, in the same shape `aov`
+returns. `anova` fits `response ~ terms`, then decomposes the model sum of
+squares one term at a time, **in formula order**, and F-tests each term
+against the residual mean square.
+
+    anova(
+    {
+        yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+        ctrl  => [1,     1,   1,   0,   0,   0]
+    },
+    'yield ~ ctrl');
+
+returns
+
+    {
+        ctrl        {
+            Df          1,
+            "F value"   25.6000000000001,
+            "Mean Sq"   1.70666666666667,
+            "Pr(>F)"    0.00718232855871859,
+            "Sum Sq"    1.70666666666667
+        },
+        Residuals   {
+            Df          4,
+            "Mean Sq"   0.0666666666666665,
+            "Sum Sq"    0.266666666666666
+        }
+    }
+
+Two-way (and higher) models use the `*` operator, which implicitly evaluates
+the main effects alongside the interaction (`a * b` expands to `a + b + a:b`;
+`a * b * c` to the full factorial `a + b + c + a:b + a:c + b:c + a:b:c`):
+
+    my $res_2way = anova($data_2way, 'len ~ supp * dose');
+
+Bare string columns are treated as factors and treatment-coded (first level =
+reference); numeric columns and `I(x^2)` enter as single regressors. It is
+robust against rank deficiency: collinear terms gracefully receive 0 degrees
+of freedom and 0 sum of squares, matching R's behavior.
+
+### Input Parameters
+| Parameter | Type | Default | Description | Example |
+| --- | --- | --- | --- | --- |
+| `data_sv` | `HashRef` or `ArrayRef` | *(Required)* | The dataset. A Hash of Arrays (HoA, columns) or Array of Hashes (AoH, rows) — the same forms `aov`/`lm` accept. |
+| `formula_sv` | `String` | *(Required)* | Symbolic model `'response ~ rhs'`, with `+`, `:` and `*`. Unlike `aov`, `anova` does **not** auto-stack, so a formula is mandatory. | `'yield ~ N * P'` |
+
+### Output Variables
+A single `HashRef`; keys are the parsed term names, so the structure varies
+with the formula.
+| Parameter | Type | Description | Example |
+| --- | --- | --- | --- |
+| *(Term Name)* | `HashRef` | ANOVA-table stats for each term (`'ctrl'`, `'N:P'`, …). `'Mean Sq'`, `'F value'` and `'Pr(>F)'` are omitted for 0-df (aliased) terms. | `{'Df'=>1,'Sum Sq'=>14.2,'Mean Sq'=>14.2,'F value'=>25.81,'Pr(>F)'=>0.0004}` |
+| `Residuals` | `HashRef` | Residual (error) statistics; never carries an F test. | `{'Df'=>10,'Sum Sq'=>5.5,'Mean Sq'=>0.55}` |
+
+### `anova` vs `aov` — what's the difference?
+
+For a **single model they compute the identical Type-I table** — in R,
+`anova(lm(f))` and `summary(aov(f))` return the same sums of squares, and the
+same holds here (`anova(\%d,'yield ~ ctrl')` reproduces the `aov` table
+above exactly). The difference is one of role, not arithmetic:
+
+- **`aov` is the model-*fitting* idiom for designed experiments.** It leans
+  toward factors and balanced designs, and in this module it adds two
+  conveniences `anova` deliberately leaves out: it can **auto-stack** a named
+  list when you omit the formula (R's `stack()` + `Value ~ Group`), and it
+  returns a `group_stats` block of per-group means and counts alongside the
+  table. Reach for `aov` when your question is "do these treatment groups
+  differ, and what do the groups look like?"
+
+- **`anova` is the model-*table* idiom.** It always wants an explicit formula
+  and returns just the decomposition — nothing descriptive. Reach for it when
+  you already have a model in mind and only want its term-by-term SS /
+  F-tests, or when you want the leaner object to feed onward.
+
+In short: same numbers for one model; `aov` is the richer "fit + describe"
+call (and the only one that stacks), `anova` is the minimal "give me the
+table" call. Note that both are **Type-I / sequential**, so term order in the
+formula matters, and both share this module's `pf`, so p-values agree with
+`oneway_test` and the rest of Stats::LikeR.
+
+*(R's `anova` generic can additionally compare several nested models,
+`anova(m1, m2)`, giving an F/LRT between them — a capability neither this
+`anova` nor `aov` currently provides. Ask if that would be useful.)*
+
 ## aoh2hoa
 
 `aoh2hoa($aoh)` — transpose an **array-of-hashes** (row-major) into a **hash-of-arrays** (column-major).
@@ -315,48 +605,63 @@ is the equivalent of:
 in R
 
 ## assign
-
-Add new columns to a data frame, computed from the columns already there.
+Add new columns to a data frame, computed from the columns already there — or handed in ready-made.
 
 ### Usage
+    assign($df, new_name => VALUE, another => VALUE, ...);
 
-    assign($df, new_name => sub { ... }, another => sub { ... }, ...);
-
-- **`$df`** — your data frame, in either shape:
+- **`$df`** — your data frame, in any of three shapes:
   - **AoH** — arrayref of row hashrefs: `[ {weight=>70, height=>1.75}, ... ]`
   - **HoA** — hashref of column arrayrefs: `{ weight=>[70,...], height=>[1.75,...] }`
-- **`new_name => sub { ... }`** — one or more pairs. Each sub computes one cell of the new column and is called once per row:
-  - `$_` is the current row as a hashref, so you read other columns with `$_->{colname}`.
-  - `$_[1]` is the row's index (0-based), if you need it.
-  - whatever the sub returns becomes the cell value.
+  - **HoH** — hashref of row hashrefs, keyed by row name: `{ Alice=>{weight=>65}, ... }`
+- **`new_name => VALUE`** — one or more pairs. `VALUE` is either a **coderef** (computed) or an **arrayref** (a ready-made column).
 
 It changes `$df` in place and also returns it (handy for chaining).
 
-### Example
+### Coderef values
+A coderef is classified by what it returns in list context:
 
+- **One scalar → per-row.** The sub is called once per row and that scalar is the cell.
+  - `$_` (and `$_[0]`) is the current row as a hashref, so you read other columns with `$_->{colname}`.
+  - `$_[1]` is the row's index (0-based).
+  - `$_[2]` is the row key — **HoH only**.
+  - A single arrayref return is stored *as the cell*, so `sub { [split /,/, $_->{tags}] }` gives an arrayref-valued column.
+- **A list of more than one value → whole column.** The list becomes the entire column, distributed positionally. This is the natural fit for column functions like `rank`:
+
+        assign($df, 'ΔG rank' => sub { rank( vals($df, 'dG_kcal_mol') ) });
+        # rank() returns a list, so the whole ranking lands in one column.
+
+### Arrayref values
+Pass a column you already have and it is copied in:
+
+    assign($df, 'ΔG rank' => [ rank( vals($df, 'dG_kcal_mol') ) ]);
+
+This is also how you install a computed *list* when you'd otherwise trip the "single arrayref = one cell" rule above.
+
+### Ordering and length
+- **AoH** distributes by array order; **HoH** by **sorted key order** — so any list you compute or hand in must be in `sort keys %$df` order.
+- Whole-column and arrayref values must have exactly one entry per row; a length mismatch dies.
+
+### Example
     my $df = [
         { weight => 70, height => 1.75 },
         { weight => 90, height => 1.80 },
     ];
     assign($df, bmi => sub { $_->{weight} / $_->{height} ** 2 });
-
     # $df is now:
     # [ { weight=>70, height=>1.75, bmi=>22.86 },
     #   { weight=>90, height=>1.80, bmi=>27.78 } ]
 
 ### Good to know
-
 - **Pairs run in order**, so a later column can use one you just made:
 
-    assign($df,
-      bmi   => sub { $_->{weight} / $_->{height} ** 2 },
-      class => sub { $_->{bmi} > 25 ? 'high' : 'ok' },   # uses bmi
-    );
+        assign($df,
+            bmi   => sub { $_->{weight} / $_->{height} ** 2 },
+            class => sub { $_->{bmi} > 25 ? 'high' : 'ok' },   # uses bmi
+        );
 
-- **Same recipe, both shapes.** The exact same `sub { $_->{weight} / ... }` works whether `$df` is AoH or HoA; you always read the row through `$_`.
-
+- **Same recipe, all shapes.** The same per-row `sub { $_->{weight} / ... }` works for AoH, HoA, and HoH; you always read the row through `$_`.
 - **It modifies your data frame.** If you need to keep the original, pass a copy: `assign(clone($df), ...)`.
-
 - Reusing a column name **overwrites** that column.
 
 ## binom_test
@@ -896,6 +1201,164 @@ Only errors from **your function** are trapped. Mistakes in the call itself
   `y` is the inner ("to") key. So `$result->{A}{B}` reading `…deviation of y is 0`
   means column `B` is the degenerate one for that pair.
 
+## colnames
+
+Return the column names of a data frame, as a list (like R's `colnames`).
+Works on all four Stats::LikeR frame shapes and mirrors the column order
+`view` shows:
+
+  * `AoA` — 0-based integer indices, `0 .. widest_row-1`
+  * `AoH` — the string-sorted union of the keys of every row
+  * `HoA` — the string-sorted keys (the keys *are* the columns)
+  * `HoH` — the string-sorted union of the inner-row keys
+
+In scalar context it returns the count, so `scalar colnames($df)` equals
+`ncol($df)` for a rectangular frame.
+
+    my $aoh = [ { b => 2, a => 1 }, { a => 3, c => 9 } ];
+    my @cols = colnames($aoh);        # ('a', 'b', 'c')  -- union, sorted
+
+    my $hoa = { z => [1,2], a => [3,4], m => [5,6] };
+    my @cols = colnames($hoa);        # ('a', 'm', 'z')
+
+    my $aoa = [ [1,2,3], [4,5,6] ];
+    my @cols = colnames($aoa);        # (0, 1, 2)
+
+    my $n = colnames($hoa);           # 3  (scalar context == ncol)
+
+## concat
+
+Row-bind two or more data frames: stack their rows into one new frame, the
+analog of pandas `concat(..., axis=0)` and R's `rbind`. `rbind` is provided as a
+true synonym (the same subroutine), so the two names are interchangeable.
+
+`concat` accepts all four data-frame shapes and returns a new frame of that same
+shape:
+
+    AoA  [ [ .. ], [ .. ] ]      array of arrayrefs   (positional columns)
+    AoH  [ { .. }, { .. } ]      array of hashrefs    (the read_table default)
+    HoA  { c => [ .. ], .. }     hash of arrayrefs    (column-major)
+    HoH  { r => { .. }, .. }     hash of hashrefs     (named rows)
+
+Every frame must be the same shape; mixing shapes dies with a hint to convert
+first (`aoh2hoa`, `hoa2aoh`, `hoh2hoa`, `aoh2hoh`). undef frames and empty
+frames are skipped, and the shape is taken from the first non-empty frame. The
+original frames are never modified.
+
+### Usage
+
+    use Stats::LikeR;
+
+    my $all = concat($df1, $df2, $df3);   # any number of frames
+    my $all = rbind($df1, $df2);          # identical: rbind is a synonym
+
+### Array of Arrays (AoA)
+
+The outer arrays are concatenated in order and the row arrayrefs are reused by
+reference (not copied). Ragged rows are kept as-is; reading past a short row
+yields undef.
+
+    my $a = [ [ 1, 2 ], [ 3, 4 ] ];
+    my $b = [ [ 5, 6 ], [ 7 ]    ];   # ragged last row
+    my $c = concat($a, $b);
+
+**Resulting Structure:**
+
+    [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], [ 7 ] ]
+
+### Array of Hashes (AoH)
+
+The rows are concatenated in order and the row hashrefs are reused by reference.
+The result is the union of columns; a column absent from a given row simply
+reads as undef, matching this module's "missing key means undef" convention
+(as used by `dropna`, `view`, and `summary`).
+
+    my $a = [ { id => 1, x => 10 } ];
+    my $b = [ { id => 2, x => 20, y => 99 } ];   # extra column y
+    my $c = concat($a, $b);
+
+**Resulting Structure:**
+
+    [
+        { id => 1, x => 10           },   # no 'y' key -> reads as undef
+        { id => 2, x => 20, y => 99  },
+    ]
+
+### Hash of Arrays (HoA)
+
+The output columns are the union of all input columns, sorted for a
+deterministic layout. Each column is the per-frame arrays joined in frame order.
+Because HoA is column-major, a column missing from a frame — or a ragged short
+column within a frame — is padded with undef so every output column ends up the
+same length (the total number of rows).
+
+    my $a = { g => [ 'a', 'a' ], v => [ 1, 2 ] };
+    my $b = { g => [ 'b' ],      w => [ 9 ]    };   # v absent here, w is new
+    my $c = concat($a, $b);
+
+**Resulting Structure:**
+
+    {
+        g => [ 'a',   'a',   'b' ],
+        v => [ 1,     2,     undef ],   # padded for the frame that lacked 'v'
+        w => [ undef, undef, 9     ],   # padded for the frame that lacked 'w'
+    }
+
+### Hash of Hashes (HoH)
+
+The outer hashes are merged in frame order and the inner row hashrefs are reused
+by reference. Because a Perl hash cannot hold duplicate keys, a repeated row
+name is made unique R-style — `name`, `name.1`, `name.2`, … — and a single
+warning is emitted noting that row names collided.
+
+    my $a = { r => { v => 1 } };
+    my $b = { r => { v => 2 } };
+    my $c = concat($a, $b);
+    # warns: concat: duplicate HoH row name(s) made unique with a .N suffix
+
+**Resulting Structure:**
+
+    {
+        r     => { v => 1 },
+        'r.1' => { v => 2 },
+    }
+
+### Empty and single inputs
+
+undef and empty frames are skipped, so they can be threaded through a pipeline
+harmlessly:
+
+    concat(undef, [], [ { n => 1 } ], [ { n => 2 } ]);   # two rows
+
+When every frame is empty the result is an empty frame matching the first
+argument's reference type (`[]` for an arrayref, `{}` for a hashref). A single
+frame round-trips unchanged.
+
+### rbind
+
+`rbind` is the same subroutine as `concat`, exported under a second name for
+readers who know it from R:
+
+    my $c = rbind($df1, $df2);
+
+    # they are literally the same code reference:
+    \&Stats::LikeR::rbind == \&Stats::LikeR::concat;   # true
+
+### Errors
+
+`concat` (and therefore `rbind`) dies (with a trailing newline) when:
+
+- no usable frame is given;
+- a frame is neither an ARRAY nor a HASH ref;
+- the frames are not all the same shape (the message names the two shapes and
+  suggests the relevant converter);
+- an AoA element is not an arrayref, or an AoH/HoH row is not a hashref.
+
+### See also
+
+`agg` (split-apply-combine), `add_data` (which also appends HoA columns and
+merges HoH rows), `ljoin`, `aoh2hoa`, `hoa2aoh`, `hoh2hoa`, `aoh2hoh`.
+
 ## cor
 
     cor($array1, $array2, $method = 'pearson'),
@@ -932,46 +1395,124 @@ or
 
 ## csort
 
-Sort a table by a column or by a custom comparator. Works on both common Perl table shapes and can transpose between them on the way out. Stable, non-destructive.
-
-### Signature
+Sort a data frame by a column or a custom comparator, returning a new
+(sorted) copy. The input is never mutated.
 
     my $sorted = csort($data, $by);
-    my $sorted = csort($data, $by, $output);
+    my $sorted = csort($data, $by, $output_shape);
+    my $sorted = csort($hoh,  $by, 'aoh', 'row.name');   # HoH only
 
-- **`$data`** — your table, in either shape:
-  - **AoH** — arrayref of hashrefs (a list of rows): `[ {id=>1, v=>10}, {id=>2, v=>20} ]`
-  - **HoA** — hashref of arrayrefs (parallel columns): `{ id=>[1,2], v=>[10,20] }`
-- **`$by`** — *how* to sort:
-  - a **column name** (string), or
-  - a **comparator** coderef using `$a` / `$b`, just like Perl's `sort`
-- **`$output`** *(optional)* — `'aoh'` or `'hoa'` (case-insensitive). Defaults to the input shape; `undef` also means "same as input".
+`$data` may be any of four shapes:
 
-Returns a **new** structure. The input is never modified.
+    AoH   array-of-hashes    [ { col => val, ... }, ... ]   columns are hash keys
+    HoA   hash-of-arrays      { col => [ val, ... ], ... }   columns are hash keys
+    HoH   hash-of-hashes      { rowname => { col => val }, ... }
+    AoA   array-of-arrays    [ [ val, ... ], ... ]           columns are integer indices
 
-### What it does
+The shape is detected automatically. An array-ref whose first row is
+itself an array-ref is treated as an AoA; otherwise an array-ref is an
+AoH. A hash-ref whose first value is a hash-ref is a HoH (its outer keys
+are folded into a row-name column, see below); any other hash-ref is a
+HoA.
 
-- **Column-name sort** — numeric if every defined value in that column looks like a number, otherwise string comparison. Missing / `undef` values sort **last** (matching R's `na.last`).
-- **Comparator sort** — `$a` and `$b` are set in the comparator's *own* package, so a named sub from another package still sees its own `$a`/`$b`. For AoH they're the row hashrefs; for HoA they're per-row hashref views synthesized from the columns.
-- **Stable** — equal keys keep their original order (merge sort, same as Perl `sort` and R `order()`).
-- **Shape control** — keep the input shape, or transpose: AoH→HoA builds the union of all row keys (ordered by first appearance, gaps filled with `undef`); HoA→AoH emits one hashref per row.
+`$by` selects the sort key:
 
-### Examples
+    'No.'                          # a column: name (AoH/HoA/HoH) or integer index (AoA)
+    2                              # AoA: sort by column index 2
+    sub { $a->{'No.'} <=> $b->{'No.'} }   # comparator; $a/$b are the rows
 
-    # by column, ascending numeric, AoH in / AoH out
-    my $rows = csort($aoh, 'score');
+For a column sort the values are compared numerically when every present
+value looks like a number, and with string `cmp` otherwise. For a
+comparator, `$a` and `$b` are the row references (a hash-ref for
+AoH/HoA/HoH, an array-ref for AoA), exactly as with Perl's own `sort`.
 
-    # custom comparator (descending), HoA in / HoA out
-    my $cols = csort($hoa, sub { $b->{score} <=> $a->{score} });
+### Sorting an AoA
 
-    # sort an AoH but hand it back as columns (HoA)
-    my $cols = csort($aoh, 'name', 'hoa');
+Columns in an AoA are addressed by non-negative integer index:
 
-### Notes
+    my $rows = [
+        [ 3, 30, 'gamma' ],
+        [ 1, 10, 'alpha' ],
+        [ 2, 20, 'beta'  ],
+    ];
 
-- **Non-destructive:** AoH output reuses the original row hashrefs (re-ordered); HoA output permutes every column in lockstep.
-- Empty and single-row tables are handled for all four in/out combinations.
-- An invalid `$output` value croaks.
+    my $s = csort($rows, 0);       # by column 0 -> id 1, 2, 3
+    my $s = csort($rows, 2);       # by column 2 -> alpha, beta, gamma
+    my $s = csort($rows, sub { $b->[1] <=> $a->[1] });   # by column 1, descending
+
+The result reuses the original row array-refs (a reorder, not a deep
+copy), so it is cheap and the caller's data is left untouched. A
+non-integer or negative index croaks; an index no row contains is
+reported as a missing column.
+
+### Undefined and missing values
+
+Undefined or missing cells always sort to the end. A "missing" cell is a
+row that lacks the key (AoH/HoH) or is shorter than the index (AoA); it
+is treated the same as an explicit `undef`. Defined values are ordered
+first (ascending, or per the comparison type), undef/missing last, and
+undef rows keep their original relative order.
+
+    my $rows = [
+        [ 1, 5 ],
+        [ 2 ],           # no column 1
+        [ 3, undef ],
+        [ 4, 1 ],
+    ];
+    my $s = csort($rows, 1);       # column-0 order: 4, 1, 2, 3
+
+This holds for every shape, for numeric and string columns, and for
+**both** a column/index sort and a comparator sort:
+
+    # no need to guard undef yourself -- this does not warn or die,
+    # even under  use warnings FATAL => 'all'
+    my $s = csort($df, sub { $a->{'tau p'} <=> $b->{'tau p'} }, 'hoa');
+
+For a comparator, csort can't see which field you key on, so it probes
+each row once (comparing the row to itself) to find rows whose comparator
+would read an `undef`; those rows are moved to the end and the rest are
+sorted normally, so your comparator never sees an `undef`. A few
+consequences worth knowing:
+
+* If your comparator reads several keys (a tie-break), a row is treated as
+  undef-keyed when *any* key the comparator actually evaluates for that
+  row is undef. Such rows go to the bottom.
+* A comparator that handles undef itself (e.g. `$a->{v} // 0`) never trips
+  the probe, so csort leaves its ordering completely alone.
+* A comparator that dies for a real reason still propagates that error
+  unchanged.
+* The probe calls your comparator once per row, so keep comparators free
+  of side effects (they should be anyway).
+
+### Choosing the output shape
+
+The optional third argument picks the returned shape, one of `'aoh'`,
+`'hoa'`, or `'aoa'` (case-insensitive). It defaults to the input shape
+(HoH defaults to AoH). Any shape can be converted to any other:
+
+    csort($aoa, 0)               # AoA -> AoA (default)
+    csort($aoa, 0, 'hoa')        # AoA -> HoA
+    csort($aoh, 'No.', 'aoa')    # AoH -> AoA
+
+When the target is AoH or HoA, an AoA's columns are keyed by their
+stringified index (`'0'`, `'1'`, ...). When the target is AoA, the
+positional column order is deterministic:
+
+    from HoA   sorted column-key name
+    from AoH   union of the rows' keys, sorted by name
+    from AoA   integer index 0 .. widest-row-1 (ragged rows pad with undef)
+
+Because Perl randomizes hash iteration order, the sort of key names is
+what makes keyed-to-AoA conversions reproducible from run to run.
+
+### Sorting a HoH
+
+For a HoH, each outer key is the row name. It is folded into a real
+column so it survives into the output; the column is named `row.name` by
+default, overridable with a fourth argument:
+
+    my $s = csort($hoh, 'score', 'aoh');           # row name in 'row.name'
+    my $s = csort($hoh, 'score', 'aoh', 'sample'); # ... named 'sample' instead
 
 ## dnorm
 
@@ -988,6 +1529,26 @@ Usage:
 but default mean, standard deviation, and log can be passed as parameters:
 
     $x = dnorm(0, mean => 0, sd => 2, 'log' => 0);
+
+## drop_cols
+
+Return a new data frame with the named columns removed and the rest kept —
+`df.drop(columns=[...])`. Same identifiers and argument forms as
+`select_cols`.
+
+    my $hoa = { a => [1,4], b => [2,5], c => [3,6] };
+    drop_cols($hoa, 'b');
+    # { a => [1,4], c => [3,6] }
+
+    my $aoa = [ [1,2,3], [4,5,6] ];
+    drop_cols($aoa, 1);          # result is re-indexed 0,1
+    # [ [1,3], [4,6] ]
+
+Unlike `select_cols`, `drop_cols` touches only the keys a row actually has,
+so a ragged frame stays ragged:
+
+    drop_cols([ {a=>1,b=>2}, {a=>3,c=>9} ], 'a');
+    # [ { b => 2 }, { c => 9 } ]
 
 ## dropna
 
@@ -1054,7 +1615,7 @@ Return a new data frame containing only the rows of `$df` that match a predicate
 `filter` accepts a predicate in one of two forms:
 
 1. a **`col()` expression** — a small, composable comparison built with overloaded operators, and
-2. a **code reference** — for anything the operators can't express (multiple columns, regexes, arbitrary logic), in the same spirit as the `filter` option of [`read_table`](#).
+2. a **code reference** — for anything the operators can't express (multiple columns, regexes, matching on the row name, arbitrary logic), in the same spirit as the `filter` option of [`read_table`](#).
 
 Both `filter` and `col` are exported by default.
 
@@ -1063,7 +1624,7 @@ Both `filter` and `col` are exported by default.
 | Position | Name | Description |
 | --- | --- | --- |
 | 1 | `$df` | The data frame: an **array of hashes** (AoH, the default `read_table` output), a **hash of arrays** (HoA), or a **hash of hashes** (HoH, e.g. `read_table` with `'output.type' => 'hoh'`). |
-| 2 | predicate | A `col()` comparison object **or** a `CODE` reference. |
+| 2 | predicate | A `col()` comparison object **or** a `CODE` reference. A coderef receives the row as `$_` / `$_[0]` and the row identifier as `$_[1]` (see below). |
 | 3 + | `'output.type' => 'aoh'\|'hoa'` | *Optional.* The shape of the returned frame. Omit it to keep the input's own shape. `'out'` and `'output_type'` are accepted aliases, and a bare `filter($df, $pred, 'aoh')` also works. |
 
 ### The `col()` form
@@ -1089,9 +1650,16 @@ Comparison operators bind more tightly than `&` and `|`, so `(col('a') > 4) & (c
 
 > Note: `col('age') > 32` works because `col('age')` is an object whose `>` is overloaded. A **bare string** cannot do this — `'age' > 32` is computed by Perl to a plain boolean (the string numifies to 0) before `filter` is ever called, so the column name is lost. Always wrap the column in `col(...)`.
 
+> `col()` addresses **columns only** — it has no handle on a HoH's row name (the outer key). It also cannot express a regex match: there is no `=~` operator to overload, so `col('name') =~ /re/` runs the match immediately on the stringified object and never reaches `filter`. For either case, use the code-reference form below.
+
 ### The code-reference form
 
-For logic the operators can't express, pass a `sub`. It is called once per row; the **row is a hash reference**, available both as `$_` and as the first argument `$_[0]`. Return a true value to keep the row.
+For logic the operators can't express, pass a `sub`. It is called once per row and is given:
+
+- the **row** as a hash reference, available both as `$_` and as the first argument `$_[0]`, and
+- the **row identifier** as the second argument, `$_[1]` — the **outer key (the row name)** for a HoH, or the **0-based row index** for an AoH or HoA.
+
+Return a true value to keep the row.
 
     filter($df, sub { $_->{x} > 4 && $_->{grp} eq 'a' });
     filter($df, sub { $_->{name} =~ /^A/ });
@@ -1099,6 +1667,22 @@ For logic the operators can't express, pass a `sub`. It is called once per row; 
     filter($df, sub { $_[0]{score} > $_[0]{threshold} });
 
 For a HoA, each row is assembled into a temporary `{ column => value, ... }` hash before the sub (or the `col()` test) is called, so the same `$_->{column}` syntax works regardless of the input shape.
+
+#### Filtering on the row name (`$_[1]`)
+
+In a HoH the row name is the **outer key**, not a field inside each row hash — so `$_->{row_name}` is `undef`. Match on `$_[1]` instead:
+
+    # HoH keyed by structure id; keep the rows named in @ids
+    my $grps = join '|', @ids;
+    my $keep = filter($score, sub { $_[1] =~ m/^(?:$grps)$/ });
+
+    # combine the row name with an ordinary column test
+    filter($score, sub { $_[1] =~ /^1/ && $_->{anomaly_rank} < 100 });
+
+For an AoH or HoA, `$_[1]` is the 0-based row index:
+
+    filter($aoh, sub { $_[1] % 2 == 0 });   # keep even-indexed rows
+    filter($hoa, sub { $_[1] < 10 });        # keep the first ten rows
 
 ### Choosing the output shape
 
@@ -1127,12 +1711,17 @@ The two selectable output types are `'aoh'` and `'hoa'`. `'hoh'` is **not** sele
     my $hoh = read_table('patients.csv', 'output.type' => 'hoh');
     my $keep = filter($hoh, col('Age') > 32);
 
+    # hash of hashes: filter on the row name (the outer key) via $_[1]
+    my $grps    = join '|', qw(1cka 1d4t);
+    my $by_name = filter($hoh, sub { $_[1] =~ m/^(?:$grps)$/ });
+
     # convert shape while filtering
     my $as_hoa = filter($df, col('Age') > 32, 'output.type' => 'hoa');
 
 ### Behavior and notes
 
 - **The input is never modified.** `filter` builds and returns a new frame; `$df` is left untouched.
+- **The predicate receives the row identifier as `$_[1]`.** For a HoH it is the outer key (the row name); for an AoH or HoA it is the 0-based row index. In a HoH the row name lives in the *key*, not inside each row hash, so `$_->{row_name}` is `undef` — filter on `$_[1]` instead. `col()` expressions see only columns, never the row key.
 - **A missing or `undef` cell never matches a `col()` comparison.** `col('x') > 0` silently drops any row whose `x` is absent or `undef`; for numeric operators a non-numeric cell is likewise dropped. With a coderef, `undef` is whatever your sub makes of it.
 - **Rows are shared, not deep-copied, wherever possible.** When an AoH or HoH row is kept (output left as AoH/HoH, or converted to `aoh`), the returned frame references the *same* inner row hashes as the input. Mutating such a row in the result would also change it in the original. HoA inputs and any `hoa` output build fresh arrays and fresh cell values.
 - **Keep-all / keep-none are well defined.** A predicate true for every row returns the whole frame in the chosen shape; true for none returns an empty frame: `[]` for `aoh`, a hash of empty (but present) columns for `hoa`, and `{}` for `hoh`.
@@ -1519,6 +2108,56 @@ offending position:
 This matches the undef-handling of `mean` and `uniq` and the rest of the
 numeric reducers in Stats::LikeR.
 
+## is_equivalent
+
+`is_equivalent(\@a, \@b, ...)` returns **1** if every list holds the same
+*set* of distinct values, and **0** otherwise. Order and duplicates don't
+count — only which values are present.
+
+Think of each list as a bag, dump each bag into its own set, and ask: are all
+the sets identical?
+
+    is_equivalent([1,2,3], [3,2,1])     # 1  same values, different order
+    is_equivalent([1,1,2], [2,1])       # 1  duplicates ignored
+    is_equivalent([1,2,3], [1,2])       # 0  right is missing 3
+    is_equivalent([1,2],   [1,2,3])     # 0  right has an extra 4
+    is_equivalent([1,2], [2,1], [1,2])  # 1  works for any number of lists
+
+It generalises `List::Compare`'s `is_LequivalentR()` from two lists to N.
+
+### How it decides
+
+Equivalence is transitive: if every list equals the first list, they all equal
+each other. So the check is simple — build the distinct-value set of the
+**first** list, then hold each other list up against it. A list matches when:
+
+1. it contains **no value outside** the first set, and
+2. it **covers every value** in the first set.
+
+Fail either test for any list and the answer is 0.
+
+### Edge cases
+
+    is_equivalent([], [])        # 1  two empty sets are equal
+    is_equivalent([], [1])       # 0  empty vs non-empty
+    is_equivalent([1], [1], [1]) # 1
+
+Values are compared **as strings** (like hash keys), so `1` and `"1"` are the
+same, but `2` and `"2.0"` are not.
+
+### Rules
+
+- Pass **at least two** array refs. Fewer croaks.
+- Every argument must be an **array ref**; anything else croaks.
+- **`undef` inside a list croaks** — decide what a missing value means before
+  calling, rather than letting it silently match.
+
+### Why it's cheap
+
+One pass over each list. Memory is just the first list's set plus one small
+reusable set for de-duping the list currently being checked. A mismatch bails
+out immediately, so unequal lists are usually rejected quickly
+
 ## kruskal_test
 
 Essentially the test determines if all groups have the same median (same distribution) (an excellent review is at https://library.virginia.edu/data/articles/getting-started-with-the-kruskal-wallis-test)
@@ -1760,6 +2399,95 @@ Takes either an array or an array reference, and returns an array of the most co
     @arr = mode([1,3,3,3]); # returns (3)
 
     @arr = mode('a','a','c','c','z'); # returns ('a', 'c')
+## ncol
+
+`ncol($frame)` returns how many **columns** a data frame has. Like `nrow`, it
+works on all the Stats::LikeR frame shapes, so you don't have to remember which
+one you're holding:
+
+    ncol([ [1,2,3], [4,5,6] ])         # 3   array of arrays  (AoA)
+    ncol([ {a=>1,b=>2}, {a=>3,b=>4} ]) # 2   array of hashes  (AoH)
+    ncol({ a=>[1,2], b=>[3,4] })       # 2   hash of arrays   (HoA)
+    ncol({ r1=>{...}, r2=>{...} })     # 2   hash of hashes   (HoH)
+
+### NB
+
+A **column** is one field of each record. Where the fields live depends on the
+shape:
+
+- **Array of hashes** (AoH) — each row is a hash; the columns are its keys, so
+  the count is how many keys a row has.
+- **Array of arrays** (AoA) — each row is a list; the columns are its slots, so
+  the count is how long a row is.
+- **Hash of arrays** (HoA) — the keys *are* the columns, so the count is the
+  number of keys.
+- **Hash of hashes** (HoH) — each value is a row hash; the columns are that
+  hash's keys, so the count is how many keys a row has.
+
+A plain flat list (`[1,2,3]`) is treated as a single column.
+
+### Edge cases
+
+    ncol([])                    # 0
+    ncol({})                    # 0
+    ncol({ a=>[], b=>[] })      # 2
+
+Empty frames are 0 columns. Note the last one: a HoA still has its columns even
+when they hold no rows — the keys are the columns, rows or not.
+
+### What it refuses to do
+
+`ncol` would rather stop than hand back a wrong number:
+
+- **Ragged frame** — if the rows disagree on how many columns they have (AoH,
+  AoA, or HoH), there is no single column count, so it dies instead of guessing.
+- **Junk input** — `undef`, a plain scalar, a SCALAR/CODE/GLOB ref, or a hash
+  whose values aren't all arrays (HoA) or all hashes (HoH) dies with a message
+  saying what it got.
+
+Blessed frames are fine — it looks at the underlying array/hash, so your
+objects count just like plain refs.
+
+## nrow
+
+`nrow($frame)` returns how many **rows** a data frame has. It works on all the
+Stats::LikeR frame shapes, so you don't have to remember which one you're
+holding:
+
+    nrow([ [1,2,3], [4,5,6] ])       # 2   array of arrays  (AoA)
+    nrow([ {a=>1}, {a=>2} ])         # 2   array of hashes  (AoH)
+    nrow({ a=>[1,2,3], b=>[4,5,6] }) # 3   hash of arrays   (HoA)
+    nrow({ r1=>{...}, r2=>{...} })   # 2   hash of hashes   (HoH)
+
+### NB
+
+A **row** is one record. Where the records live depends on the shape:
+
+- **Array on the outside** (AoH, AoA, or a plain list) — each top-level
+  element is a row, so the count is just the array's length.
+- **Hash of hashes** (HoH) — each key is a row, so the count is the number of
+  keys.
+- **Hash of arrays** (HoA) — the keys are *columns*, not rows; the row count is
+  how long those columns are.
+
+### Edge cases
+
+    nrow([])   # 0
+    nrow({})   # 0
+
+Empty frames are 0 rows, whatever the shape.
+
+### What it refuses to do
+
+`nrow` would rather stop than hand back a wrong number:
+
+- **Ragged HoA** — if the columns have different lengths there is no single row
+  count, so it croaks instead of guessing.
+- **Junk input** — `undef`, a plain scalar, or a hash whose values aren't all
+  arrays (HoA) or all hashes (HoH) croaks with a message saying what it got.
+
+Blessed frames are fine — it looks at the underlying array/hash, so your
+objects count just like plain refs.
 
 ## oneway_test
 
@@ -1905,6 +2633,46 @@ It also allows configuring the test type (`type => 'one.sample'`, `'two.sample'`
 | `alternative` | String | `"two.sided"` | One- or two-sided test: `"two.sided"`, `"one.sided"`, `"greater"`, or `"less"`. |
 | `strict` | Boolean | 0 (False) | Use strict interpretation of two-sided power calculations. |
 | `tol` | Float | ~`1.22e-4` | Numerical tolerance used for the internal root-finding algorithm. |
+
+## pnorm
+
+The normal cumulative distribution function: the probability that a normal random variable is `<= x`. Ports R's `pnorm`.
+That is, take the integral from negative infinity to the point that you want.
+
+    my $p = pnorm(1.96);            # 0.9750021  (standard normal, P(X <= 1.96))
+
+`x` may be a single number or an array reference; an array reference returns an array reference of the same length.
+
+    my $ps = pnorm([-1.96, 0, 1.96]);   # [0.0249979, 0.5, 0.9750021]
+
+### Arguments
+
+| Position | Name | Default | Description |
+| --- | --- | --- | --- |
+| 1 | `x` | — | A number, or an array reference of numbers. |
+| 2 + | `mean` | `0` | Mean of the distribution. |
+| | `sd` | `1` | Standard deviation. |
+| | `lower` | `1` (true) | `1` = lower tail `P(X <= x)`; `0` = upper tail `P(X > x)`. `'lower.tail'` is an accepted alias. |
+| | `log` | `0` (false) | If true, return the log of the probability. `'log.p'` is an accepted alias. |
+
+### Examples
+
+    pnorm(1.96);                    # lower tail:  0.9750021
+    pnorm(1.96, lower => 0);        # upper tail:  0.0249979
+    pnorm(1.96, log => 1);          # log lower tail: -0.02531565
+    pnorm(2, mean => 1, sd => 0.5); # standardizes to z = 2: 0.9772499
+
+Use `log => 1` for tails that would otherwise underflow to `0`:
+
+    pnorm(-40);           # 0  (underflows)
+    pnorm(-40, log => 1); # -804.6084
+
+### Notes
+
+- `sd => 0` gives a step at the mean: `x < mean` returns `0`, otherwise `1`.
+- `sd < 0` returns `NaN` and warns.
+- A `NaN` input (or an `undef` element of an array reference) yields `NaN`.
+- `+Inf` returns `1`, `-Inf` returns `0`.
 
 ## prcomp
 
@@ -2171,6 +2939,39 @@ Calculates sample quantiles using R's continuous Type 7 interpolation.
 
 If the `probs` parameter is omitted, it behaves identically to R by defaulting to the 0, 25, 50, 75, and 100 percentiles (`c(0, .25, .5, .75, 1)`). The returned hash keys match R's standardized naming convention (e.g., `"25%"`, `"33.3%"`).
 
+## rank
+
+Rank values like R's `rank()`. Takes flat scalars and/or array refs (like `min`), with optional trailing `ties.method` / `na.last` options. Returns the list of ranks in input order.
+
+    my @r = rank(3, 1, 4, 1, 5);                           # 3, 1.5, 4, 1.5, 5
+    my @r = rank([3, 1, 4, 1, 5], 'ties.method' => 'min'); # 3, 1, 4, 1, 5
+
+Ranks are 1-based; `average` may return half-ranks. `undef` and NaN are treated as NA.
+
+### ties.method
+
+How tied values share ranks (default `average`):
+
+| value     | behavior                       | `rank(3, 1, 4, 1, 5)` |
+| --------- | ------------------------------ | --------------------- |
+| `average` | mean of the tied ranks         | 3, 1.5, 4, 1.5, 5     |
+| `min`     | lowest rank in the group       | 3, 1, 4, 1, 5         |
+| `max`     | highest rank in the group      | 3, 2, 4, 2, 5         |
+| `first`   | ties keep input order          | 3, 1, 4, 2, 5         |
+| `last`    | ties keep reverse input order  | 3, 2, 4, 1, 5         |
+| `random`  | ties broken randomly (srand-aware) | varies            |
+
+### na.last
+
+How `undef`/NaN elements are placed (default `true`):
+
+| value           | behavior                   | `rank(5, undef, 1, ...)` |
+| --------------- | -------------------------- | ------------------------ |
+| `true`          | NAs get the highest ranks  | 2, 3, 1                  |
+| `false`         | NAs get the lowest ranks   | 3, 1, 2                  |
+| `keep`          | NAs stay undef, in place   | 2, undef, 1              |
+| `na` (or undef) | NAs dropped (shorter list) | 2, 1                     |
+
 ## Ronly
 
     my @right_only = Ronly(\@left, \@right);
@@ -2194,33 +2995,25 @@ Create a binomial distribution of numbers
 
     my $binom = rbinom( n => $n, prob => 0.5, size => 9);
 
-It hooks directly into Perl's internal PRNG system, respecting `srand()` seeds. 
-
 ## read_table
 
-I've tried to make this as simple as possible, trying to follow from R:
+minimal example:
 
     my $test_data = read_table('t/HepatitisCdata.csv');
 
 ### options
-
 | Option | Description | Example |
 | -------- | ------- | ------- |
-|`comment` | Comment character, by default `#` | `comment => %` or whatever; does not apply with header|
+|`comment` | Comment character, by default `#`; lines beginning with it are skipped | `comment => '%'` |
 |`output.type`| data type for output: array of hash, hash of array, or hash of hash | `'output.type' => 'aoh'`|
-|`filter`| Only take in rows with a certain filter | `filter => {	Sex => sub {$_ eq 'f'} }`|
+|`filter`| Only take in rows matching a filter | `filter => { Sex => sub {$_ eq 'f'} }`|
 |`row.names` | include row names in retrieved data; off by default | |
 |`sep` | field separator character; synonym with `delim`| `sep => "\t"` |
 | `delim`| field separator character; synonym with `sep`| `delim => "\t"` |
-
-output types can be AOH (aoa), HOA (hoa), HOH (hoh)
-
+output types can be AOH (aoh), HOA (hoa), HOH (hoh)
     read_table($filename, 'output.type' => 'aoh');
-
     read_table($filename, 'output.type' => 'hoa');
-
 and, like Text::CSV_XS, filters can be applied in order to save RAM on big files:
-
     $test_data = read_table(
         't/HepatitisCdata.csv',
         filter => {
@@ -2228,9 +3021,84 @@ and, like Text::CSV_XS, filters can be applied in order to save RAM on big files
         },
         'output.type' => 'aoh'
     );
-
 the default delimiter is `,`
 Suffixes `.csv` and `.tsv` are automatically detected from file names, but if specified, are overridden by `delim` and/or `sep`. `sep` is given priority.
+### commented-out headers
+A header that is itself commented out is detected and used automatically, so
+    # PDB	score
+    1a2b	10
+    3c4d	20
+reads as though the header were `PDB, score` (the comment marker and any
+following whitespace are stripped from the first column). A commented line is
+only taken as the header when its field count matches the data, so ordinary
+leading comments are never mistaken for one. You may name such a column in a
+`filter` either as it appears in the file or by its clean name:
+    read_table('ranks.tabular.tsv', filter => { '# PDB' => sub { $_ == 2 } });
+
+## rename_cols
+
+Return a new data frame with columns renamed — `df.rename(columns={...})`.
+Columns not named are kept unchanged. The mapping may be given as
+`old => new` pairs or as a single hashref. `AoA` frames have no column
+labels, so `rename_cols` on an `AoA` dies (convert to `AoH`/`HoA` first).
+
+    my $aoh = [ { a => 1, b => 2 }, { a => 3, b => 4 } ];
+    rename_cols($aoh, a => 'x');
+    # [ { x => 1, b => 2 }, { x => 3, b => 4 } ]
+
+    my $hoa = { a => [1,4], b => [2,5] };
+    rename_cols($hoa, { b => 'B' });
+    # { a => [1,4], B => [2,5] }
+
+A swap is fine because the target names stay distinct:
+
+    rename_cols($aoh, a => 'b', b => 'a');   # columns exchanged
+
+### views, speed, and memory
+
+All three verbs return a **new frame** and never modify the source, but the
+result is a **shallow view** built for speed on large frames:
+
+  * the row shapes (`AoH`, `HoH`, `AoA`) build fresh row containers but
+    **share the cell scalars** with the source — no per-cell copy;
+  * `HoA` **shares the whole column arrayrefs**.
+
+The operation itself never mutates the source. Because the underlying data is
+shared, a later *in-place* change reaches the source: mutating a result cell
+(`$r->[0]{a}++`, `chomp $r->[0]{a}`) or a `push`/`splice` on a result `HoA`
+column will be visible through the original. Assigning a whole cell
+(`$r->[0]{a} = ...`) is always safe. If you need a fully independent frame,
+clone the result (e.g. `Storable::dclone`).
+
+The row shapes run in XS, which shares cells and hashes each column key once
+instead of once per row. Measured against the equivalent pure-Perl rebuild
+(300k-row `AoH`, 8 columns):
+
+    select 3/8 cols :  ~2x faster, and lower peak RAM (no copied cells)
+    drop   2/8 cols :  ~3x faster
+    rename 2/8 cols :  ~4x faster
+
+`HoA` and `AoA`-by-drop are pure-Perl aliases and already near-free (a slice
+of an 8-column, million-row `HoA` is sub-second). The memory saving grows
+with rows × selected columns: at scale the row shapes allocate only the new
+row containers, never a second copy of every cell.
+
+### strictness
+
+Mistakes are fatal rather than silently corrupting a frame (validated in Perl
+before any XS runs):
+
+  * a requested (or renamed) column not present anywhere dies;
+  * a duplicate column in a `select_cols`/`drop_cols` list dies (a hash-keyed
+    shape would otherwise collapse it);
+  * a `rename_cols` whose targets are not distinct — two columns landing on
+    one name — dies (checked against the whole column set, so an `a<->b` swap
+    is fine but `a->b` onto an existing `b` is caught).
+
+Shape is classified by the same `_df_shape` detector `agg` uses, so these
+accept exactly the frames `agg`/`view` accept; as with that family the check
+is `ref`-based, so hand it an unblessed frame.
+
 
 ## rnorm
 
@@ -2238,6 +3106,39 @@ Make a normal distribution of numbers, with pre-set mean `mean`, standard deviat
 
     my ($rmean, $sd, $n) = (10, 2, 9999);
     my $normals = rnorm( n => $n, mean => $rmean, sd => $sd);
+
+## rownames
+
+Return the row names of a data frame, as a list (like R's `rownames`).
+Only `HoH` carries genuine row labels; the other shapes are positional and
+so yield 0-based indices, again matching `view`:
+
+  * `AoA` / `AoH` — `0 .. $#$df` (one index per top-level element)
+  * `HoA` — `0 .. longest_column-1`
+  * `HoH` — the string-sorted outer keys (the row labels)
+
+In scalar context it returns the count, so `scalar rownames($df)` equals
+`nrow($df)` for a rectangular frame.
+
+    my $hoh = { r2 => { x => 1 }, r1 => { x => 2 }, r3 => { x => 3 } };
+    my @rows = rownames($hoh);        # ('r1', 'r2', 'r3')  -- sorted labels
+
+    my $aoh = [ { a => 1 }, { a => 2 } ];
+    my @rows = rownames($aoh);        # (0, 1)
+
+    my $hoa = { a => [1,2,3], b => [4,5,6] };
+    my @rows = rownames($hoa);        # (0, 1, 2)
+
+    my $n = rownames($hoh);           # 3  (scalar context == nrow)
+
+### notes
+
+Shape is detected with the same `_df_shape` classifier `agg` uses, so both
+functions accept exactly the frames `agg`/`view` accept. A ragged frame is
+tolerated for enumeration: `colnames` spans the widest row and `rownames`
+the longest column. An empty frame returns an empty list. Because the
+classifier is `ref`-based (not `reftype`), pass an unblessed frame — blessed
+frames are the one case `ncol`/`nrow` accept that this family does not.
 
 ## runif
 
@@ -2294,6 +3195,33 @@ Correct answer is 2.1380899352994
     my $stdev = sd([2,4,4,4,5,5,7,9]);
 
 As of version 0.02, sd will croak/die if any undefined values are provided.
+
+## select_cols
+
+Return a new data frame containing only the named columns, in the order
+requested — the Stats::LikeR form of pandas `df[['a','b']]`. Works on all
+four frame shapes. For `AoA` the identifiers are 0-based integer positions;
+for `AoH`, `HoA`, and `HoH` they are column names. Columns may be given as a
+list or as a single arrayref.
+
+    my $aoh = [ { a => 1, b => 2, c => 3 },
+                { a => 4, b => 5, c => 6 } ];
+    my $sub = select_cols($aoh, 'a', 'c');
+    # [ { a => 1, c => 3 }, { a => 4, c => 6 } ]
+
+    my $hoa = { a => [1,4], b => [2,5], c => [3,6] };
+    my $sub = select_cols($hoa, ['c', 'a']);   # order preserved
+    # { c => [3,6], a => [1,4] }
+
+    my $aoa = [ [1,2,3], [4,5,6] ];
+    my $sub = select_cols($aoa, 0, 2);
+    # [ [1,3], [4,6] ]
+
+A column that appears in only some `AoH`/`HoH` rows is filled with `undef` in
+the rows that lack it, so the selection comes back rectangular:
+
+    select_cols([ {a=>1,b=>2}, {a=>3,c=>9} ], 'a', 'c');
+    # [ { a => 1, c => undef }, { a => 3, c => 9 } ]
 
 ## seq
 
@@ -2677,14 +3605,14 @@ as well as a ratio (from R: the hypothesized ratio of the population variances o
 An R-style `head` for the structures `read_table` returns. Prints the first
 few rows of a dataframe as an aligned text table, with numeric columns
 right-justified, string columns left-justified, and undefined cells shown as
-`NA`. Works on all three `output.type` values:
+`NA`.
 
-| `output.type` | Perl structure     | What `view` shows                          |
-|---------------|--------------------|--------------------------------------------|
-| `aoh`         | array of hash refs | one line per row, sequential row numbers   |
-| `hoa`         | hash of array refs | values gathered column-wise by row index   |
-| `hoh`         | hash of hash refs  | top-level keys become the row label column |
-
+| Input type | Perl structure     | What `view` shows                          |
+|------------|--------------------|--------------------------------------------|
+| `aoa`      | array of array refs| values gathered column-wise by row index   |
+| `aoh`      | array of hash refs | one line per row, sequential row numbers   |
+| `hoa`      | hash of array refs | values gathered column-wise by row index   |
+| `hoh`      | hash of hash refs  | top-level keys become the row label column |
 
 ### Synopsis
 
@@ -2718,18 +3646,18 @@ displayed. A footer appears only when rows are hidden.
 
 All arguments after the data reference are optional name/value pairs.
 
-| Argument        | Default | Meaning                                                                 |
+| Argument        | Default | Meaning |
 |-----------------|---------|-------------------------------------------------------------------------|
 | `n`             | `6`     | Number of rows to show. `n` greater than the table shows everything.    |
 | `rows`          | `6`     | Number of rows to show. `n` greater than the table shows everything  (synonymous with `n`)|
 | `cols` / `columns` | —    | Array ref pinning column order (and which columns appear).              |
 | `row.names`     | —       | Column to use as the row label (for `aoh`/`hoa`). See ordering note.    |
-| `na`            | `'NA'`  | Token printed for undefined cells.                                      |
-| `max_width`     | `80`    | Truncate any cell wider than this (column names are never truncated).   |
-| `ellipsis`      | `'...'` | Marker appended to truncated cells.                                     |
-| `gap`           | `2`     | Spaces between columns.                                                 |
-| `to`            | STDOUT  | Filehandle to print to.                                                 |
-| `return_only`   | `0`     | If true, return the string and print nothing.                           |
+| `na`            | `'NA'`  | Token printed for undefined cells |
+| `max_width`     | `80`    | Truncate any cell wider than this (column names are never truncated)   |
+| `ellipsis`      | `'...'` | Marker appended to truncated cells |
+| `gap`           | `2`     | Spaces between columns |
+| `to`            | STDOUT  | Filehandle to print to.   |
+| `return_only`   | `0`     | If true, return the string and print nothing |
 
 `view` always returns the formatted string, whether or not it also prints.
 
@@ -2826,6 +3754,11 @@ mimics R's `write.table`, with data as first argument to subroutine, and output 
 
     write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
 
+`write_table` accepts every data-frame shape: a flat hash (one row), a hash of arrays (HoA), a hash of hashes (HoH), an array of hashes (AoH), and an array of arrays (AoA). For an AoA the first inner array is taken as the header row unless `col.names` is given, in which case every inner array is treated as data:
+
+    write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
+    write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
+
 You can also precisely filter and reorder which columns are written by passing an array reference to `col.names`:
 
     write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
@@ -2840,7 +3773,225 @@ Args can also be accepted:
 
     write_table( 'data' => \%flat, 'file' => $f );
 
+### LaTeX output (`tex`)
+
+`write_table` can write the output file as a LaTeX `tabular` instead of a delimited table. This is selected either by naming the file `*.tex` (auto-detected) or by passing `tex => 1`; an explicit `tex => 0` forces a delimited file even when the name ends in `.tex`. The LaTeX table is built from the same rows as the delimited writer, so it works for every shape above (including arrays of arrays):
+
+    write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
+    write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
+
+The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. The `tex.*` options tune the output:
+
+    write_table(\@rows, 'table.tex',
+        'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
+        'tex.bold.1st.col' => 0,                     # default 1: bold the first column
+        'tex.format'       => 1,                     # %.4g-format numeric cells
+        'tex.size'         => '\small',              # size directive after \begin{tabular}
+        'tex.comment'      => ['run 3', 'q < 0.05'], # % comment line(s): string or array ref
+    );
+
+The `xlsx`, worksheet, and JSON side outputs of the original stand-alone routine are not included.
+
+### Options
+
+| option | default | applies to | meaning |
+|---|---|---|---|
+| `data` (1st positional, or `data =>`) | *required* | both | the table: flat hash, HoA, HoH, AoH, or AoA |
+| `file` (2nd positional, or `file =>`) | *required* | both | output path; written as a delimited table, or as LaTeX when `tex` is on |
+| `sep` / `delim` | from extension (`,` for `.csv`, tab for `.tsv`), else `,` | delimited | field separator; the two are aliases |
+| `row.names` | `1` (on) | both | true prepends a label column (numeric index, or the outer key for a HoH); `0` omits it; for a HoA/AoH a non-numeric *column name* uses that column's values as the labels and drops it from the body |
+| `col.names` | all columns, sorted | both | array ref selecting and ordering columns; for an AoA it also supplies the column names |
+| `undef.val` | `''` (empty field) | both | text written for an undefined/missing cell, e.g. `'NA'` |
+| `tex` | auto: `1` when `file` ends in `.tex`, else `0` | LaTeX | write the output file as a LaTeX `tabular` instead of a delimited table; `tex => 0` forces delimited even for a `.tex` name |
+| `tex.col.align` | `'c'` | LaTeX | per-column alignment: `'c'`, `'l'`, or `'r'` |
+| `tex.bold.1st.col` | `1` (on) | LaTeX | bold the first column of each data row |
+| `tex.format` | `0` (off) | LaTeX | render numeric cells with `%.4g` |
+| `tex.size` | *(none)* | LaTeX | size directive emitted after `\begin{tabular}`, e.g. `\small` |
+| `tex.comment` | *(none)* | LaTeX | `%` comment line(s) at the top of the LaTeX file: a string, or an array ref of strings |
+
 # Changes
+
+## 0.22 2026-07-07 CDT
+
+returned `Devel::Confess` to required dependencies to fix for CPAN testers.
+
+## 0.21 2026-07-07 CDT
+
+Better warning message for undefined data for `aoh2hoh`, `assign`, `dropna`
+
+addition of `agg`, `concat`, `drop_cols`, `rank`, `rename_cols`, `select_cols` functions
+
+Improving Kwalitee (sic): added `[PodWeaver]` to dist.ini; as well as `Changes` file
+
+### assign
+
+`assign` now accepts two kinds of column value, so a function that already returns a whole column (like `rank`) drops in without wrapping.
+
+- **Per-row coderef** (unchanged): called once per row, `$_` is the row, and the single scalar it returns is the cell. A single arrayref return is still stored *as the cell*, so arrayref-valued columns keep working.
+- **Whole-column coderef** (new): if the coderef returns a *list* of more than one value, that whole list becomes the column, laid down positionally. This is what makes `'ΔG rank' => sub { rank( vals($df, 'dG_kcal_mol') ) }` work directly — no `[ ... ]` needed.
+- **Arrayref value** (new): a ready-made column, e.g. `col => [ rank(...) ]`, copied into the frame.
+
+The coderef is probed once (row 0 for AoH/HoH, the first synthesized view for HoA) to decide per-row vs whole-column, so per-row code is never run twice on row 0. Every column value is length-checked against the row count and a mismatch dies. **HoH** is now a supported, documented shape alongside AoH and HoA; whole-column and arrayref values align to **sorted key order**.
+
+Tests: `assign.t` (AoH + HoA) and `assign_HoH.t` were expanded to cover every shape × value-kind combination — per-row scalar, whole-column list, arrayref value, single-arrayref-as-cell, `rank()` integration, chaining, `$_[1]` index, `$_[2]` row key (HoH), overwrite, ragged HoA columns, empty frames, length-mismatch and bad-value / odd-arg / non-hash-row death paths, and `no_leaks_ok` guards on the new whole-column and arrayref paths.
+
+### read_table
+
+Fixed handling of commented-out header lines and made filter columns
+referenceable by the name as it appears in the file.
+
+- **Commented-out header recovery.** `_parse_csv_file` treats a line whose
+  comment marker is followed by whitespace (e.g. `# PDB<TAB>score`) as a
+  comment and drops it, so a header written that way never reached the
+  callback and the first *data* row was silently mistaken for the header.
+  `read_table` now recovers it: the first physical line, if it is
+  `marker + whitespace` and splits into two or more fields, is held as a
+  candidate header and confirmed only when its field count matches the first
+  data row. If the counts disagree the candidate was an ordinary leading
+  comment and is discarded, so a prose comment that happens to contain the
+  separator (e.g. `# note, see README`) is never mistaken for a header. A
+  marker hugging its text (`#id,val`) is delivered by the parser and
+  un-commented in the callback as before. The marker and any following
+  whitespace are stripped, so `# PDB` is stored as the clean name `PDB`.
+
+- **Filter columns may be named as written in the file.** Filter keys are
+  matched against the header by exact name first, then retried with the
+  leading comment marker (and surrounding whitespace) stripped, so a
+  commented-header column resolves whether it is referenced as `# PDB` or by
+  its clean name `PDB`:
+
+        read_table(
+            'regression_rank.tabular.tsv',
+            filter => { '# PDB' => sub { $_ == 2 } },
+        );
+
+- **Clearer "column not found" error.** The failure now names the file and
+  lists the actual header instead of printing it to STDOUT (a library
+  shouldn't print):
+
+        read_table: Filter column 'nope' not found in the header of FILE;
+        header is: 'PDB', 'score'
+
+## 0.20
+
+addition of `ncol`, `nrow`, and `pnorm` functions
+
+`filter` can filter by row names with `$_[1]`
+
+`view` now accepts array of arrays in addition to AoH, HoA, and HoH
+
+### csort
+
+Two behavioural changes, both contained to the `csort` XSUB (the `cs_*` helpers are untouched).
+
+**Row names survive a Hash-of-Hashes sort.** Sorting a HoH previously discarded the outer keys. Now each row is folded into a *fresh* row hash (a private container over aliased, read-only cells) that carries its outer key under a `row.name` column, so the name flows into whichever shape you request:
+
+    my $hoh = { alpha => { id => 1 }, beta => { id => 2 } };
+
+    csort($hoh, 'id');          # AoH: each row gains a row.name field
+    csort($hoh, 'id', 'hoa');   # HoA: an aligned row.name column
+
+- The column name defaults to `row.name` and can be overridden with an optional 4th argument (mirroring `hoa2hoh`'s named-key style): `csort($df, 'id', 'aoh', 'sample')`.
+- The outer key is authoritative — it wins over any pre-existing same-named field in the row.
+- Once present, the column is sortable like any other: `csort($hoh, 'row.name')`.
+- Because rows are now *copied* rather than shared, the caller's HoH is never mutated by the injection. (Minor behaviour change: output rows are no longer the same refs as the source rows.)
+
+**Clearer usage message.** The signature is now `csort(...)`, so xsubpp no longer emits the misleading auto-generated `Usage: Stats::LikeR::csort(data, by, output=&PL_sv_undef)`. Argument count is checked by hand, and the croak now shows both real calling forms:
+
+    Usage: csort($df, 'column.name', 'HoA')
+       or  csort($df, sub { $b->{'No.'} <=> $a->{'No.'} }, 'hoa')
+      (optional 4th arg names the row-name column when sorting a HoH; default 'row.name')
+
+`data`/`by`/`output` are read as `ST(0..2)`; `output` still defaults to matching the input shape.
+
+**Tightened validation messages.** The `$data` croak now reads `hash-ref (HoA or HoH)`, and the `$by` croak includes a concrete example: `a column name (e.g. 'No.') or a comparator code-ref using $a and $b, e.g. sub { $b->{'No.'} <=> $a->{'No.'} }`. Existing HoA croaks (`unequal lengths`, `not found`, `not an array-ref`) are unchanged.
+
+When sorting, undefined values in the sorting column are placed at the bottom
+
+### cor
+
+Fixed an unsigned-integer underflow in `kendall_tau_b` and added a regression test.
+
+#### Bug
+
+In `kendall_tau_b`, concordant/discordant counts `C` and `D` are declared `size_t` (unsigned). The numerator was computed as:
+
+    return (NV)(C - D) / denom;
+
+The subtraction `C - D` happens in unsigned arithmetic *before* the cast to `NV`. When discordant pairs dominate (`D > C`), the result wraps to a huge positive value instead of going negative.
+
+For the arrays:
+
+    dG_kcal_mol:  -7.765, -9.328, -10.326, -9.038, -9.608, -9.779, -9.975, -6.906
+    anomaly_rank: 154, 155, 161, 188, 76, 172, 173, 69
+
+there are `C = 9` concordant and `D = 19` discordant pairs (no ties). `9 - 19` wraps to `18446744073709551607`, so the function returned ~`6.6e17` instead of the correct `-10/28 = -0.3571428571`.
+
+#### Fix
+
+Cast each operand to `NV` before subtracting, so the arithmetic is signed:
+
+    return ((NV)C - (NV)D) / denom;
+
+Only that one line changed. The denominator sums (`C + D + tie_x`, `C + D + tie_y`) are non-negative, so they were left as-is.
+
+#### Regression test — `cor.t`
+
+- Kendall on the offending arrays pinned to `-0.3571428571`.
+- Explicit `[-1, 1]` range guard (the real backstop — the pre-fix value `~6.6e17` blows past the bound regardless of exact magnitude), plus a negative-sign assertion.
+- Pearson (`-0.4889102301`), Spearman (`-0.4761904762`), and default-method coverage of the three `compute_cor` branches.
+- Kendall boundary cases: perfectly concordant (`+1`), perfectly discordant (`-1`), self-correlation (`+1`), and a tie case exercising `tie_x` in the denominator.
+- `no_leaks_ok` per method (guarded with `unless $INC{'Devel/Cover.pm'}`).
+- Croak paths: length mismatch, unknown method, zero-variance input.
+
+### XS refactor
+
+Consolidate helper functions to reduce binary size, find bugs, and back the changes with tests. Every change was validated by translating the XS (`ExtUtils::ParseXS`) and compiling the result
+with the module's own `ccflags`.
+
+#### Outcome
+
+- **Net change to the source:** ~154 fewer lines; helper-function count down by 4 (7 removed, 3 added).
+- **Genuine bugs fixed:** two instances of the same latent defect (see below). The rest of the work was behavior-preserving consolidation.
+
+#### Function consolidation
+
+| Change | Before | After |
+|---|---|---|
+| Three-way `NV` comparator | `compare_rank`, `cmp_rank_item`, `cmp_rank_info`, `compare_NVs` | single `cmp_nv3` (reads the leading `NV` member, valid for `RankInfo`/`RankItem`/raw `NV`) |
+| Average-rank routine | `compute_ranks` + `compare_index` restoration sort | existing `rank_data` (scatters ranks into `out[idx]`, no second sort) |
+| String comparator | `cmp_string_wt`, `lm_str_qsort` (byte-identical) | single `cmp_string_wt` |
+| Set difference | `Lonly` + `Ronly` (duplicated bodies) | shared `set_difference()`; `Ronly` passes the arrays swapped |
+| Multiplicity filter | `intersection` + `get_unique` (~90% shared) | shared `set_multiplicity()` with an "all vs. one" mode flag |
+
+All merges were confirmed behavior-preserving: the collapsed comparators are
+equivalent on ordinary values, `NaN`, and infinities, and `compute_ranks` and
+`rank_data` produce identical average ranks.
+
+#### Bugs
+
+Two comparators stabilized their sort by returning `a->idx - b->idx` directly,
+where the index field is an unsigned `size_t`. The subtraction wraps and is then
+truncated to `int`, which is implementation-defined and gives the wrong sign
+once a difference exceeds `INT_MAX`.
+
+- `compare_index` — removed entirely (the routine that used it, `compute_ranks`, was replaced by `rank_data`).
+- `cmp_pval` — the tie-break comparator in the p-adjust path. **Missed in the initial review; found later** via a `-Wconversion` compile of the earlier source. Fixed to compare with the `(a > b) - (a < b)` idiom.
+
+**Caveat on severity:** on every mainstream ABI (LP64, LLP64, ILP32), the
+low-word truncation happens to reproduce the correct sign for any array smaller
+than ~2^31 elements, so this never produces a wrong result at realistic sizes.
+It is a portability/UB issue, not a runtime failure, which is why no functional
+test detects it (see "Testing", below).
+
+ `LikeR.xs` — consolidated helpers; `compare_index` removed; `cmp_pval` fixed.
+
+### `view`
+ non-ASCII characters now print
+
+### `write_table`
+
+new option to output to LaTeX table
 
 ## 0.19
 
@@ -3576,7 +4727,7 @@ switched several `unsigned int` variable to `I32` so that clang doesn't complain
 
 added restrict keyword for `sample`
 
-## 0.04
+## 0.04 2026-5-17 CDT
 
 addition of `sample` function
 
@@ -3584,11 +4735,11 @@ GNU source, to maximize compatibility and ease installation
 
 removal of JSON dependency to ease installation
 
-## 0.03
+## 0.03 2026-5-13 CDT
 
 Compatibility back to Perl 5.10
 
-## 0.02
+## 0.02 2026-5-7 CDT
 
 back-compatible to Perl 5.10, instead of original 5.40, ensuring more people can use it
 
@@ -3602,3 +4753,6 @@ mean, min, sum, median, var, and max die with undefined values, and print the of
 
 `write_table` now has `undef.val` option, which shows how undefined values are printed to tables, which is `NA` by default.
 
+# COPYRIGHT AND LICENSE
+
+This software is free.  It is licensed under the same terms as Perl itself

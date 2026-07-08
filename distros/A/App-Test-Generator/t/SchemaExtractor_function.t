@@ -2458,14 +2458,52 @@ subtest '_extract_pod_examples() returns hints reference' => sub {
 	ok(defined $result, 'returns defined value');
 };
 
-subtest '_extract_pod_examples() extracts named args from SYNOPSIS' => sub {
+subtest '_extract_pod_examples() extracts named args from =head2 SYNOPSIS' => sub {
 	my $e = _extractor();
 	my %hints = ( valid_inputs => [], boundary_values => [],
 	              invalid_inputs => [], equivalence_classes => [] );
 	my $pod = "=head2 SYNOPSIS\n\n\$obj->my_method(name => 'foo', count => 5);\n\n=cut\n";
 	$e->_extract_pod_examples($pod, \%hints);
-	# May or may not extract depending on implementation details
-	ok(1, '_extract_pod_examples ran without crash on SYNOPSIS');
+	ok(1, '_extract_pod_examples ran without crash on =head2 SYNOPSIS');
+};
+
+subtest '_extract_pod_examples() accepts =head1 SYNOPSIS (module-level)' => sub {
+	my $e = _extractor();
+	my %hints = ( valid_inputs => [], boundary_values => [],
+	              invalid_inputs => [], equivalence_classes => [] );
+	my $pod = "=head1 SYNOPSIS\n\n\$obj->my_method(name => 'Alice', count => 3);\n\n=cut\n";
+	my $result = $e->_extract_pod_examples($pod, \%hints);
+	is(ref($result), 'HASH', 'returns a hashref even for =head1 SYNOPSIS');
+	ok(exists $result->{valid_inputs}, 'valid_inputs key present');
+};
+
+subtest '_extract_pod_examples() collects =for example begin/end blocks' => sub {
+	my $e = _extractor();
+	my %hints = ( valid_inputs => [], boundary_values => [],
+	              invalid_inputs => [], equivalence_classes => [] );
+	my $pod = join("\n",
+		'=head2 greet',
+		'',
+		'=for example begin',
+		'',
+		"  \$obj->greet(name => 'Alice');",
+		'',
+		'=for example end',
+		'',
+		'=cut',
+	);
+	my $result = $e->_extract_pod_examples($pod, \%hints);
+	is(ref($result), 'HASH', 'returns hashref with =for example input');
+	ok(exists $result->{valid_inputs}, 'valid_inputs key present');
+};
+
+subtest '_extract_pod_examples() returns empty valid_inputs for POD with no SYNOPSIS or =for example' => sub {
+	my $e = _extractor();
+	my %hints = ( valid_inputs => [], boundary_values => [],
+	              invalid_inputs => [], equivalence_classes => [] );
+	my $pod = "=head1 DESCRIPTION\n\nSome text with no code examples.\n\n=cut\n";
+	my $result = $e->_extract_pod_examples($pod, \%hints);
+	is(scalar @{ $result->{valid_inputs} }, 0, 'no examples from description-only POD');
 };
 
 # ==================================================================

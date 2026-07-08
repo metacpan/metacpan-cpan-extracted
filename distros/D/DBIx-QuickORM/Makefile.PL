@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Compress::Zstd" => "0.06",
     "Cpanel::JSON::XS" => "3.0224",
-    "DBD::SQLite" => "1.64",
+    "DBD::SQLite" => "1.70",
     "DBI" => "1.628",
     "Data::Dumper" => "2.171",
     "DateTime" => 0,
@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000060",
     "ok" => 0
   },
-  "VERSION" => "0.000027",
+  "VERSION" => "0.000028",
   "test" => {
     "TESTS" => "t/*.t t/AI/*.t t/AI/handle/*.t t/handle/*.t"
   }
@@ -79,7 +79,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Compress::Zstd" => "0.06",
   "Cpanel::JSON::XS" => "3.0224",
-  "DBD::SQLite" => "1.64",
+  "DBD::SQLite" => "1.70",
   "DBI" => "1.628",
   "Data::Dumper" => "2.171",
   "DateTime" => 0,

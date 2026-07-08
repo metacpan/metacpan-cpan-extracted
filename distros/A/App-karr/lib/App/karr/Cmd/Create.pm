@@ -1,7 +1,7 @@
 # ABSTRACT: Create a new task
 
 package App::karr::Cmd::Create;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -71,9 +71,12 @@ option body => (
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
+  $self->check_positional_args($args_ref, 1);
+
   $self->sync_before;
 
-  my $title = $self->title // $args_ref->[0]
+  my @pos = $self->positional_args($args_ref);
+  my $title = $self->title // $pos[0]
     or die "Title is required. Use --title or pass as argument.\n";
 
   my $ec = $self->store->effective_config;
@@ -115,7 +118,7 @@ App::karr::Cmd::Create - Create a new task
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

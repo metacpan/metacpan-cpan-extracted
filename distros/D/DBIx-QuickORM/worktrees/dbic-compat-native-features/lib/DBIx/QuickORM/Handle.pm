@@ -3,13 +3,13 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/confess croak carp/;
 use Sub::Util qw/set_subname/;
 use List::Util qw/mesh/;
 use Scalar::Util qw/blessed/;
-use DBIx::QuickORM::Util qw{debug};
+use DBIx::QuickORM::Util qw{debug literal_write_value};
 
 use POSIX();
 use Scope::Guard();
@@ -27,6 +27,7 @@ use DBIx::QuickORM::Raw();
 sub new;
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::Handle';
+with 'DBIx::QuickORM::Role::Source';
 
 use Object::HashBase qw{
     +connection
@@ -34,10 +35,14 @@ use Object::HashBase qw{
     +sql_builder
     +sql_builder_cache
 
+    +subquery_alias
+
     +row
 
     +where
     +order_by
+    +group_by
+    +having
     +limit
     +offset
     +fields
@@ -242,6 +247,17 @@ sub init {
     my $source = $self->{+SOURCE} or croak "No source provided";
     confess "Source '$source' does not implement the 'DBIx::QuickORM::Role::Source' role"
         unless blessed($source) && $source->DOES('DBIx::QuickORM::Role::Source');
+
+    # Promote this handle into the source's bound handle class (per-source query
+    # methods) only while we are still at the connection's default class. Every
+    # chained clone re-blesses into ref($self), so once promoted the guard is
+    # false and we neither re-promote nor downgrade a custom subclass.
+    my $default = $con->default_handle_class;
+    if ($default && ref($self) eq $default) {
+        if (my $hc = $source->handle_class) {
+            bless($self, $hc) if $hc ne ref($self);
+        }
+    }
 
     $self->{+INTERNAL_TRANSACTIONS} //= $con->default_internal_txn // 1;
 
@@ -1215,6 +1231,24 @@ string was emitted verbatim, so C<'name DESC'> or C<'COUNT(*)'> ran as raw SQL
 -- which also allowed SQL injection (CVE-2026-13766). Such a bare string is now
 treated as one (nonexistent) quoted column.
 
+=item $group_by = $h->group_by()
+
+=item $new_h = $h->group_by(@columns)
+
+Get the C<GROUP BY> columns, or clone the handle with new ones. Each plain
+string is a database column, quoted as an identifier; a scalar reference is
+literal SQL (C<< \'date_trunc(...)' >>). A grouped result is a set of aggregate
+tuples with no row identity, so it must be read with C<data_only> (or via
+C<column()> / C<count()>); fetching Rows from a grouped handle throws.
+
+=item $having = $h->having()
+
+=item $new_h = $h->having(\%cond)
+
+Get the C<HAVING> condition, or clone the handle with a new one. The condition
+uses the same structure as C<where> and may reference aggregate aliases from the
+field list. C<HAVING> is only meaningful alongside C<group_by>.
+
 =back
 
 =cut
@@ -1310,9 +1344,151 @@ sub order_by {
     return $self->clone(ORDER_BY() => @_ > 1 ? [@_] : $_[0]);
 }
 
+sub group_by {
+    my $self = shift;
+    croak "Must not be called in void context" unless defined wantarray;
+    return $self->{+GROUP_BY} unless @_;
+    return $self->clone(GROUP_BY() => @_ > 1 ? [@_] : $_[0]);
+}
+
+sub having {
+    my $self = shift;
+    croak "Must not be called in void context" unless defined wantarray;
+    return $self->{+HAVING} unless @_;
+    return $self->clone(HAVING() => $_[0]);
+}
+
 ###################
 # }}} Immucessors #
 ###################
+
+##########################
+# {{{ Subquery source     #
+##########################
+
+=pod
+
+=head2 Subquery source
+
+Any handle can be used as the B<source> of another query: pass it to
+C<< $con->handle(...) >> and it is rendered to its statement and binds and
+spliced in as a derived table, C<< ( <inner query> ) AS <alias> >>. Its binds
+are threaded into the outer statement ahead of the outer WHERE, and its real
+(non-computed) columns keep their types, so values fetched through the outer
+query inflate the same way they would from the inner source.
+
+    my $recent = $con->handle('events')->where({ts => {'>' => $cutoff}});
+
+    $con->handle($recent)->where({kind => 'click'})->all;
+    # SELECT * FROM ( SELECT ... FROM events WHERE ts > ? ) AS subquery
+    #   WHERE kind = ?
+
+The derived table is aliased C<subquery> by default; use C<subquery_alias($alias)>
+to choose a different name (required if two subqueries share one statement).
+Computed or literal output columns (e.g. C<COUNT(*)>) carry no metadata, so they
+come back untyped; the derived table exposes the inner statement's emitted
+column names.
+
+To refine an existing handle B<without> wrapping it in a subquery, call refining
+methods on the handle directly (e.g. C<< $recent->where(...) >>), which return a
+refined clone.
+
+=over 4
+
+=item $alias = $h->subquery_alias()
+
+=item $new_h = $h->subquery_alias($alias)
+
+With no argument, returns the derived-table alias set on this handle (C<undef>
+if none was set, in which case the source renders with the default alias
+C<subquery>). With an argument, returns a clone whose derived-table alias is
+C<$alias>. Naming the table is the only thing this does — a handle is usable as
+a source with or without it:
+
+    my $recent = $con->handle('events')
+        ->where({ts => {'>' => $cutoff}})
+        ->subquery_alias('recent');
+
+    $con->handle($recent)->where({kind => 'click'})->all;
+    # SELECT * FROM ( SELECT ... FROM events WHERE ts > ? ) AS recent
+    #   WHERE kind = ?
+
+=back
+
+=cut
+
+sub subquery_alias {
+    my $self = shift;
+    croak "Must not be called in void context" unless defined wantarray;
+    return $self->{+SUBQUERY_ALIAS} unless @_;
+    return $self->clone(SUBQUERY_ALIAS() => $_[0]);
+}
+
+# {{{ Role::Source interface (handle as a derived-table source)
+
+sub source_db_moniker {
+    my $self = shift;
+
+    my $source = $self->{+SOURCE} or croak "Cannot use this handle as a source: it has no source to query";
+    my $alias  = $self->{+SUBQUERY_ALIAS} // 'subquery';
+    croak "Subquery alias '$alias' is not a valid identifier" unless $alias =~ /\A\w+\z/;
+
+    my $sql = $self->sql_builder->qorm_select(%{$self->_builder_args});
+
+    # SQL::Abstract (bindtype 'columns') wants each literal bind as a
+    # [column, value] pair and threads them ahead of the outer WHERE binds.
+    # LIMIT/OFFSET binds have no column, so use an empty name; the outer
+    # _do_binds treats an unknown field as untyped and binds it as-is.
+    my @pairs = map { [$_->{field} // '', $_->{value}] } @{$sql->{bind} // []};
+
+    return \["( $sql->{statement} ) AS $alias", @pairs];
+}
+
+sub source_orm_name { my $self = shift; return $self->{+SUBQUERY_ALIAS} // 'subquery' }
+
+sub primary_key        { my $self = shift; return undef }
+sub row_class          { my $self = shift; return undef }
+sub source_has_aliases { my $self = shift; return 0 }
+sub field_is_generated { my $self = shift; return 0 }
+sub fields_to_fetch    { my $self = shift; return ['*'] }
+sub fields_list_all    { my $self = shift; return ['*'] }
+sub fields_to_omit     { my $self = shift; return undef }
+
+# The derived table exposes the inner statement's emitted column names, so the
+# name accessors are identity; metadata is delegated to the inner source.
+sub field_db_name  { my $self = shift; my ($field) = @_; return $field }
+sub field_orm_name { my $self = shift; my ($field) = @_; return $field }
+
+sub has_field {
+    my $self = shift;
+    my ($field) = @_;
+    # A derived table's output columns are not enumerable (computed/literal
+    # columns carry no metadata), so accept any name and let the database
+    # reject genuinely unknown ones. Typing still keys off the inner source.
+    return 1;
+}
+
+sub field_type {
+    my $self = shift;
+    my ($field) = @_;
+    my $source = $self->{+SOURCE};
+    return undef unless $source && $source->has_field($field);
+    return $source->field_type($field);
+}
+
+sub field_affinity {
+    my $self = shift;
+    my ($field, $dialect) = @_;
+    my $source = $self->{+SOURCE};
+    return 'string' unless $source && $source->has_field($field);
+    return $source->field_affinity($field, $dialect);
+}
+
+# }}} Role::Source interface
+
+##########################
+# }}} Subquery source     #
+##########################
 
 #######################
 # {{{ State Accessors #
@@ -1803,6 +1979,13 @@ via the named setter, returning the handle unchanged when no args are given.
 
 =cut
 
+sub _assert_not_grouped_rows {
+    my $self = shift;
+    return if $self->{+DATA_ONLY};
+    return unless defined($self->{+GROUP_BY}) || defined($self->{+HAVING});
+    croak "Cannot fetch rows from a grouped or aggregate query: a grouped result has no single-row identity. Use data_only to read the tuples, or column()/count() for aggregate values";
+}
+
 sub _builder_args {
     my $self = shift;
 
@@ -1812,6 +1995,8 @@ sub _builder_args {
         limit    => $self->{+LIMIT},
         offset   => $self->{+OFFSET},
         order_by => $self->{+ORDER_BY},
+        group_by => $self->{+GROUP_BY},
+        having   => $self->{+HAVING},
         distinct => $self->{+DISTINCT},
         fields   => $self->fields,
         dialect  => $self->dialect,
@@ -1891,7 +2076,7 @@ row's view of the generated column reflects the database-computed value.
 
 sub upsert {
     my $self = shift->_row_or_hashref(TARGET() => @_);
-    return $self->_insert_and_refresh(upsert => 1) if $self->{+AUTO_REFRESH};
+    return $self->_insert_and_refresh(upsert => 1) if $self->{+AUTO_REFRESH} || $self->_write_has_literal;
     return $self->_insert(upsert => 1);
 }
 
@@ -1902,7 +2087,7 @@ sub upsert_and_refresh {
 
 sub insert {
     my $self = shift->_row_or_hashref(TARGET() => @_);
-    return $self->_insert_and_refresh() if $self->{+AUTO_REFRESH};
+    return $self->_insert_and_refresh() if $self->{+AUTO_REFRESH} || $self->_write_has_literal;
     return $self->_insert();
 }
 
@@ -1917,6 +2102,13 @@ sub insert_and_refresh {
 
 =over 4
 
+=item $bool = $h->_write_has_literal
+
+True when the data this handle is about to insert/upsert contains a literal SQL
+write value (a scalar ref or C<[\'sql ?', @binds]>) and the source has a primary
+key. Such writes route through the refresh path so the database-computed value
+replaces the literal in the row's cached state.
+
 =item $row = $h->_insert_and_refresh(%params)
 
 Insert and then refresh the row, using 'returning on insert' when available or
@@ -1930,6 +2122,25 @@ row, applying per-column defaults and returning-clause handling.
 =back
 
 =cut
+
+sub _write_has_literal {
+    my $self = shift;
+
+    # Routing a literal write through the refresh path only makes sense when the
+    # row can be recovered afterward, which needs a primary key.
+    return 0 unless $self->_has_pk;
+
+    my $data;
+    if (ref($self->{+TARGET}) eq 'HASH') {
+        $data = $self->{+TARGET};
+    }
+    elsif (my $row = $self->{+ROW}) {
+        $data = $row->pending_data;
+    }
+
+    return 0 unless ref($data) eq 'HASH';
+    return scalar grep { literal_write_value($_) } values %$data;
+}
 
 sub _insert_and_refresh {
     my $self = shift;
@@ -1961,6 +2172,8 @@ sub _insert {
     croak "Cannot insert rows using a handle with a limit set"     if defined $self->{+LIMIT};
     croak "Cannot insert rows using a handle with an offset set"   if defined $self->{+OFFSET};
     croak "Cannot insert rows using a handle with an order_by set" if defined $self->{+ORDER_BY};
+    croak "Cannot insert rows using a handle with a group_by set"  if defined $self->{+GROUP_BY};
+    croak "Cannot insert rows using a handle with a having set"    if defined $self->{+HAVING};
     croak "Cannot insert rows using a handle with distinct set"    if $self->{+DISTINCT};
 
     my $data;
@@ -2044,6 +2257,11 @@ sub _insert {
                 $row_data = { %$data };
             }
 
+            # RETURNING (above) fills literal write values with the
+            # database-computed result. Drop any literal not returned so a later
+            # read fetches it on demand.
+            delete @{$row_data}{ grep { literal_write_value($row_data->{$_}) } keys %$row_data };
+
             my $sent = 0;
             return sub { $sent++ ? () : $row_data };
         },
@@ -2095,6 +2313,12 @@ Keys in C<%CHANGES> that name a database-generated column are silently dropped
 before SQL generation. If filtering leaves no fields to write, C<update>
 croaks with "Changes may not be empty".
 
+A literal SQL change value (a scalar ref like C<\'NOW()'>) is computed by the
+database. When updating a specific row its value is read back so the row's cached
+state reflects it. A bulk update (a where clause, no specific row) writes the
+database correctly but does not refresh already-loaded row objects matching that
+where; refresh them to see the computed value.
+
 =item $h->update($row_obj)
 
 Write pending changes to the row.
@@ -2143,6 +2367,10 @@ For example, a simple incrementing integer is sufficient:
 But on database engines with high resolution timestamps you might use:
 
  my $result = $row->cas('last_update', {last_update => \'CURRENT_TIMESTAMP()'});
+
+A scalar-ref change value like this is emitted as SQL and computed by the
+database; on a win the row is refreshed so its cached C<last_update> reflects the
+stored value.
 
 This is the no-throw path: a failed guard is a normal C<lost> result, but real
 database errors still propagate. On an async or aside handle the result comes
@@ -2267,6 +2495,8 @@ sub update {
     croak "update() with a 'limit' clause is not currently supported"     if defined $self->{+LIMIT};
     croak "update() with an 'offset' clause is not currently supported"   if defined $self->{+OFFSET};
     croak "update() with an 'order_by' clause is not currently supported" if $self->{+ORDER_BY};
+    croak "update() with a 'group_by' clause is not currently supported"  if $self->{+GROUP_BY};
+    croak "update() with a 'having' clause is not currently supported"    if $self->{+HAVING};
     croak "update() with distinct set is not currently supported"         if $self->{+DISTINCT};
 
     # A bound row normally provides the WHERE clause via its primary key. With
@@ -2307,10 +2537,21 @@ sub update {
     my $do_cache          = $pk_fields && @$pk_fields && $con->state_does_cache;
     my $changes_pk_fields = $pk_fields ? (grep { exists $changes->{$_} } @$pk_fields) : ();
 
+    # Literal SQL write values (\'NOW()', [\'expr ?', @binds]) are computed by the
+    # database, so the cached row takes their value from the database: via
+    # UPDATE ... RETURNING when the dialect supports it (no extra round trip),
+    # otherwise via a refresh.
+    my @literal_fields    = grep { literal_write_value($changes->{$_}) } keys %$changes;
+    my $literal_returning = @literal_fields && $row && $sync && $pk_fields && @$pk_fields && $dialect->supports_returning_update;
+    if ($literal_returning) {
+        my %seen;
+        $builder_args->{returning} = [ grep { !$seen{$_}++ } @$pk_fields, @literal_fields ];
+    }
+
     my $sql = $self->sql_builder->qorm_update(%$builder_args, update => $changes);
 
     my $handle_row = sub {
-        my ($row) = @_;
+        my ($row, $db_row) = @_;
 
         my ($old_pk, $new_pk, $fetched);
         if (blessed($row)) {
@@ -2320,6 +2561,16 @@ sub update {
         else {
             $old_pk = $changes_pk_fields ? [ map { $row->{$_} } @$pk_fields ] : undef;
             $fetched = { %$row, %$changes };
+        }
+
+        # Take literal fields from the RETURNING row when we have it; the refresh
+        # fallback (below) covers dialects without RETURNING-on-update.
+        if (@literal_fields) {
+            delete @{$fetched}{@literal_fields};
+            if ($db_row) {
+                my $got = $self->sql_builder->qorm_row_to_orm($source, $db_row);
+                $fetched->{$_} = $got->{$_} for grep { exists $got->{$_} } @literal_fields;
+            }
         }
 
         $new_pk = $changes_pk_fields ? [ map { $fetched->{$_} } @$pk_fields ] : undef;
@@ -2340,7 +2591,11 @@ sub update {
     # row's state when there is one).
     unless ($do_cache) {
         my $sth = $self->_make_sth($sql, no_rows => 1);
-        $handle_row->($row) if $row;
+        if ($row) {
+            my $db_row = $literal_returning ? $sth->sth->fetchrow_hashref : undef;
+            $handle_row->($row, $db_row);
+            $row->refresh if @literal_fields && $sync && !$literal_returning;
+        }
         return $sth unless $sync;
         return;
     }
@@ -2359,7 +2614,8 @@ sub update {
         }
 
         if ($row) {
-            $handle_row->($row);
+            my $db_row = $literal_returning ? $sth->fetchrow_hashref : undef;
+            $handle_row->($row, $db_row);
             return;
         }
 
@@ -2395,6 +2651,10 @@ sub update {
 
     $finish->($sth->dbh, $sth->sth);
 
+    # A literal write on a dialect without RETURNING-on-update leaves the
+    # computed columns unknown to the cache; re-read them.
+    $row->refresh if $row && @literal_fields && $sync && !$literal_returning;
+
     return undef;
 }
 
@@ -2408,6 +2668,8 @@ sub cas {
     croak "cas() requires a changes hashref"           unless ref($changes) eq 'HASH';
     croak "cas() is not supported with data_only set"  if $self->{+DATA_ONLY};
     croak "cas() is not supported with forked handles" if $self->is_forked;
+    croak "cas() with a 'group_by' clause is not currently supported" if defined $self->{+GROUP_BY};
+    croak "cas() with a 'having' clause is not currently supported"   if defined $self->{+HAVING};
 
     my $source    = $self->{+SOURCE};
     my $pk_fields = $self->_has_pk or croak "cas() requires a source with a primary key";
@@ -2628,8 +2890,14 @@ sub _cas_sync_row {
     my $self = shift;
     my ($row, $changes, $pk_fields) = @_;
 
+    # Literal SQL write values are computed by the database. cas() recovers them
+    # with a refresh, not RETURNING: RETURNING moves the affected-row count into
+    # the result set, which would break cas()'s win/loss detection.
+    my @literal = grep { literal_write_value($changes->{$_}) } keys %$changes;
+
     my $changes_pk = grep { exists $changes->{$_} } @$pk_fields;
     my $fetched    = { %{$row->stored_data}, %$changes };
+    delete @{$fetched}{@literal} if @literal;
 
     my $old_pk = $changes_pk ? [ $row->primary_key_value_list ]      : undef;
     my $new_pk = $changes_pk ? [ map { $fetched->{$_} } @$pk_fields ] : undef;
@@ -2641,6 +2909,8 @@ sub _cas_sync_row {
         source          => $self->{+SOURCE},
         row             => $row,
     );
+
+    $row->refresh if @literal;
 
     return;
 }
@@ -2766,6 +3036,7 @@ In data_only mode this will provide hashrefs instead of blessed row objects.
 
 sub one {
     my $self = shift->_row_or_hashref(WHERE() => @_);
+    $self->_assert_not_grouped_rows;
 
     croak "Cannot return 'data_only' for one() with async/aside/forked" if $self->{+DATA_ONLY} && !$self->is_sync;
 
@@ -2792,6 +3063,7 @@ sub one {
 
 sub first {
     my $self = shift->_row_or_hashref(WHERE() => @_);
+    $self->_assert_not_grouped_rows;
 
     croak "Cannot return 'data_only' for first() with async/aside/forked" if $self->{+DATA_ONLY} && !$self->is_sync;
 
@@ -2818,6 +3090,7 @@ sub first {
 
 sub all {
     my $self = shift->_row_or_hashref(WHERE() => @_);
+    $self->_assert_not_grouped_rows;
 
     croak "all() cannot be used asynchronously, use iterate() to get an async iterator instead"
         unless $self->is_sync;
@@ -2843,6 +3116,7 @@ sub all {
 
 sub iterator {
     my $self = shift->_row_or_hashref(WHERE() => @_);
+    $self->_assert_not_grouped_rows;
 
     my $sth = $self->_do_select();
 
@@ -2882,9 +3156,46 @@ sub count {
 
 =pod
 
+=over 4
+
+=item $col = $h->column($name_or_expr)
+
+Return a L<DBIx::QuickORM::Handle::Column> bound to this handle and the given
+column. Use it for aggregate reads (C<< $h->column('price')->sum >>) and
+single-column value lists (C<< $h->column('name')->all >>). A plain string is a
+column name; a scalar reference is literal SQL (C<< \'price * qty' >>).
+
+=back
+
+=cut
+
+sub column {
+    my $self = shift;
+    my ($column) = @_;
+
+    croak "column() requires a column name or expression" unless defined $column;
+
+    require DBIx::QuickORM::Handle::Column;
+    return DBIx::QuickORM::Handle::Column->new(handle => $self, column => $column);
+}
+
+=pod
+
 =head1 PRIVATE METHODS
 
 =over 4
+
+=item $val = $h->_aggregate_one($expr)
+
+=item @vals = $h->_aggregate_all($expr)
+
+=item $iter = $h->_aggregate_iterator($expr)
+
+Select a single expression aliased as C<value> and return, respectively, the
+value from the first row, the list of values from every row, or an iterator over
+them. Backs L<DBIx::QuickORM::Handle::Column>. The value is the raw database
+scalar (no type inflation), the result never enters the identity map, and the
+handle must be synchronous.
 
 =item $sql = $h->_count_expression
 
@@ -2928,10 +3239,51 @@ sub _count_expression {
     return "COUNT(DISTINCT $prefix$db)";
 }
 
+# Build the aggregate/single-column clone. The expression is aliased 'value' so
+# the fetched result key is deterministic (an unaliased expression's key is
+# driver-specific). OMIT/DISTINCT are cleared for the same reasons as count():
+# omit reconciliation would prepend primary key fields, and distinct belongs
+# inside the aggregate, not on the SELECT.
+sub _aggregate_clone {
+    my $self = shift;
+    my ($expr) = @_;
+    return $self->clone(FIELDS() => [\"$expr AS value"], OMIT() => undef, DISTINCT() => undef);
+}
+
+sub _aggregate_one {
+    my $self = shift;
+    my ($expr) = @_;
+    croak "aggregate column helpers cannot be used on an async handle" unless $self->is_sync;
+    my $sth = $self->_aggregate_clone($expr)->_do_select;
+    my $row = $sth->next or return undef;
+    return $row->{value};
+}
+
+sub _aggregate_all {
+    my $self = shift;
+    my ($expr) = @_;
+    croak "aggregate column helpers cannot be used on an async handle" unless $self->is_sync;
+    my $sth = $self->_aggregate_clone($expr)->_do_select;
+    my @out;
+    while (my $row = $sth->next) { push @out => $row->{value} }
+    return @out;
+}
+
+sub _aggregate_iterator {
+    my $self = shift;
+    my ($expr) = @_;
+    my $sth = $self->_aggregate_clone($expr)->_do_select;
+    return DBIx::QuickORM::Iterator->new(
+        sub { my $row = $sth->next or return; $row->{value} },
+        sub { $sth->ready },
+    );
+}
+
 sub iterate {
     my $cb = pop;
     croak "The final argument to iterate must be a coderef, got '" . ($cb // '<UNDEF>') . "'" unless $cb && ref($cb) eq 'CODE';
     my $self = shift->_row_or_hashref(WHERE() => @_);
+    $self->_assert_not_grouped_rows;
     croak "iterate() cannot be used on an async handle" unless $self->is_sync;
 
     my $sth = $self->_do_select();

@@ -3,6 +3,7 @@ package Net::Nostr::Identifier;
 use strictures 2;
 
 use Net::Nostr::_ConstructorArgs ();
+use Net::Nostr::_URI qw(build_nip05_url validate_http_base_url);
 
 use Carp qw(croak);
 use JSON ();
@@ -17,6 +18,8 @@ sub new {
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     my @unknown = grep { !exists $known{$_} } keys %$self;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
+    $self->{base_url} = validate_http_base_url($self->{base_url}, label => 'base_url')
+        if defined $self->{base_url};
     return $self;
 }
 
@@ -41,7 +44,7 @@ sub parse {
 sub url {
     my ($class, $identifier) = @_;
     my ($local, $domain) = $class->parse($identifier);
-    return "https://$domain/.well-known/nostr.json?name=$local";
+    return build_nip05_url("https://$domain", $local);
 }
 
 sub display_name {
@@ -95,9 +98,9 @@ sub _build_fetch_url {
     my ($self, $identifier) = @_;
     my ($local, $domain) = Net::Nostr::Identifier->parse($identifier);
     if (defined $self->base_url) {
-        return ($self->base_url . "/.well-known/nostr.json?name=$local", $local);
+        return (build_nip05_url($self->base_url, $local), $local);
     }
-    return ("https://$domain/.well-known/nostr.json?name=$local", $local);
+    return (build_nip05_url("https://$domain", $local), $local);
 }
 
 sub verify {
@@ -333,7 +336,11 @@ Croaks on unknown arguments.
 =item base_url
 
 Optional base URL override for testing. When set, HTTP requests go to
-this URL instead of C<https://E<lt>domainE<gt>>.
+this URL instead of C<https://E<lt>domainE<gt>>. The value is strictly
+validated as an HTTP or HTTPS base URL and is composed with
+C</.well-known/nostr.json> using L<URI>. Existing base paths are preserved.
+Queries, fragments, userinfo, control characters, spaces, missing hosts, and
+ports outside C<1..65535> are rejected.
 
 =back
 

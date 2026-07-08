@@ -20,7 +20,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Transport;
-$OpenSearch::Client::Transport::VERSION = '3.007005';
+$OpenSearch::Client::Transport::VERSION = '3.007006';
 use Moo;
 
 use URI();
@@ -91,7 +91,7 @@ OpenSearch::Client::Transport - Provides interface between the client class and 
 
 =head1 VERSION
 
-version 3.007005
+version 3.007006
 
 =head1 DESCRIPTION
 

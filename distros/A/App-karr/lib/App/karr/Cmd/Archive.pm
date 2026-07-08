@@ -1,7 +1,7 @@
 # ABSTRACT: Archive a task (soft-delete)
 
 package App::karr::Cmd::Archive;
-our $VERSION = '0.303';
+our $VERSION = '0.400';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -17,18 +17,23 @@ with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
+  $self->check_positional_args($args_ref, 1);
+
   $self->sync_before;
 
-  my $id_str = $args_ref->[0] or die "Usage: karr archive ID[,ID,...]\n";
+  my @pos = $self->positional_args($args_ref);
+  my $id_str = $pos[0] or die "Usage: karr archive ID[,ID,...]\n";
 
   my @ids = $self->parse_ids($id_str);
   my @results;
+  my $not_found = 0;
 
   for my $id (@ids) {
     my $task = $self->find_task($id);
     unless ($task) {
       push @results, { id => $id + 0, error => "not found" };
       warn "Task $id not found\n" unless $self->json;
+      $not_found++;
       next;
     }
 
@@ -46,7 +51,7 @@ sub execute {
 
     my $old_status = $task->status;
     $task->status('archived');
-    $task->save;
+    $self->save_task($task);
 
     push @results, {
       id          => $task->id,
@@ -60,9 +65,13 @@ sub execute {
 
   $self->sync_after;
 
-  if ($self->json) {
-    $self->print_json(@results == 1 ? $results[0] : \@results);
-  }
+  $self->print_json_results(@results);
+
+  # Existing ids are already committed above; a missing id in the batch still
+  # makes the whole command report failure via a non-zero exit, matching the
+  # die-based not-found behaviour of the other id-taking commands (kanban-md
+  # parity: partial success committed, overall exit non-zero).
+  exit 1 if $not_found;
 }
 
 1;
@@ -79,7 +88,7 @@ App::karr::Cmd::Archive - Archive a task (soft-delete)
 
 =head1 VERSION
 
-version 0.303
+version 0.400
 
 =head1 SYNOPSIS
 

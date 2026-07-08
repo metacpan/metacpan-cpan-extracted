@@ -11,9 +11,6 @@ use warnings;
 use autodie qw(:all);
 
 use utf8;
-binmode STDOUT, ':utf8';
-binmode STDERR, ':utf8';
-
 use open qw(:std :encoding(UTF-8));
 
 use App::Test::Generator::Template;
@@ -37,7 +34,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use constant {
 	DEFAULT_ITERATIONS => 30,
@@ -156,12 +153,12 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =head1 SYNOPSIS
 
 C<App::Test::Generator> is a suite to help the testing of CPAN modules.
-It consists of 4 modules:
+It consists of 6 subsystems:
 
 =over 4
 
@@ -173,32 +170,49 @@ It consists of 4 modules:
 
 =item * Test Dashboard
 
+=item * Benchmark Generation
+
+=item * Workflow Deployment
+
 =back
 
 From the command line:
 
   # Takes the formal definition of a routine, creates tests against that routine, and runs the test
-  fuzz-harness-generator -r t/conf/add.yml
+  fuzz-harness-generator -r t/conf/abs.yml
 
   # Attempt to create a formal definition from a routine package, then run tests against that formal definition
   # This is the holy grail of automatic test generation, just by looking at the source code
   extract-schemas lib/App/Test/Generator/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yml
 
+  # Fuzz a module and keep the corpus bounded: trim to the minimum subset that still covers every branch
+  extract-schemas --fuzz --minimize-corpus lib/My/Module.pm
+
+  # Generate round-trip tests that run every code example in a module's POD and verify the results
+  pod-example-tester lib/My/Module.pm --output t/pod_examples.t
+
+  # Generate a Benchmark::cmpthese script from a schema; each transform becomes one timed variant
+  benchmark-generator -i schemas/abs.yml -o benchmarks/abs.pl
+
+  # Copy dashboard.yml and mutate.yml into a module repository's .github/workflows/ directory
+  deploy-workflows --target /path/to/my-module
+
 From Perl:
 
   use App::Test::Generator qw(generate);
+  use App::Test::Generator::SchemaExtractor;
 
   # Generate to STDOUT
-  App::Test::Generator->generate("t/conf/add.yml");
+  App::Test::Generator->generate("t/conf/abs.yml");
 
   # Generate directly to a file
-  App::Test::Generator->generate('t/conf/add.yml', 't/add_fuzz.t');
+  App::Test::Generator->generate('t/conf/abs.yml', 't/add_fuzz.t');
 
   # Holy grail mode - read a Perl file, generate tests, and run them
   # This is a long way away yet, but see t/schema_input.t for a proof of concept
   my $extractor = App::Test::Generator::SchemaExtractor->new(
-    input_file => 'Foo.pm',
-    output_dir => $dir
+    input_file => 'lib/App/Test/Generator/Template.pm',
+    output_dir => '/tmp',
   );
   my $schemas = $extractor->extract_all();
   foreach my $schema(keys %{$schemas}) {
@@ -207,7 +221,7 @@ From Perl:
       schema => $schemas->{$schema},
       output_file => $tempfile,
     );
-    system("$^X -I$dir $tempfile");
+    system("$^X -Ilib $tempfile");
     unlink $tempfile;
   }
 
@@ -234,6 +248,28 @@ The generated tests combine:
 This approach strengthens your test suite by probing both expected and
 unexpected inputs, helping you to catch boundary errors, invalid data
 handling, and regressions without manually writing every case.
+
+=head1 TOOLS
+
+The distribution ships the following command-line tools:
+
+=over 4
+
+=item * L<benchmark-generator> - generate a self-contained L<Benchmark> C<cmpthese> script from a YAML schema. Each transform in the schema becomes one named variant; representative input values are derived from each parameter's type and range constraints.
+
+=item * L<deploy-workflows> - copy C<dashboard.yml> and C<mutate.yml> into the target repository's C<.github/workflows/> directory. Both files are embedded verbatim in the script, so no ATG source tree is needed after installation. Supports C<--target>, C<--force>, and C<--dry-run>.
+
+=item * L<extract-schemas> - heuristically extract YAML parameter schemas from a C<.pm> file, with optional coverage-guided fuzzing (C<--fuzz>) and corpus minimization (C<--minimize-corpus>).
+
+=item * L<fuzz-harness-generator> - generate a C<Test::Most> fuzzing harness from a YAML schema.
+
+=item * L<pod-example-tester> - generate a C<Test::Most> round-trip test file from a module's POD code examples. Annotated examples (C<# returns value> / C<< # => value >>) get C<is()> assertions; unannotated verbatim blocks are wrapped in C<eval{}> and checked for no exception.
+
+=item * L<test-generator-mutate> - run mutation testing against a module's test suite.
+
+=item * L<test-generator-index> - generate the HTML test-quality dashboard, combining Devel::Cover statement/branch data, LCSAJ path coverage, mutation results, and CPAN Testers failure analysis. For each CPAN Testers FAIL report, also writes a self-contained shell script (C<cover_html/reproduce/reproduce-GUID.sh>) that pins every installed module at its exact failing version, enabling local reproduction of the failure environment.
+
+=back
 
 =head1 DESCRIPTION
 
@@ -1329,9 +1365,15 @@ Property-based testing with transforms is particularly useful for:
 
 =head3 Requirements
 
-Property-based testing requires L<Test::LectroTest> to be installed:
+Property-based testing requires both L<Test::LectroTest> and
+L<Test::LectroTest::Compat> to be installed:
 
-  cpanm Test::LectroTest
+  cpanm Test::LectroTest Test::LectroTest::Compat
+
+L<Test::LectroTest::Compat> provides the C<use_ok> bridge between
+L<Test::LectroTest> and L<Test::Most>; it is used in every generated
+property-based test file.  Both are declared in the distribution's
+C<TEST_REQUIRES> so they are installed automatically during C<make test>.
 
 If not installed, the generated tests will automatically skip the property-based
 portion with a message.
@@ -2006,10 +2048,10 @@ sub generate
 	# When the schema says output type is 'array', capture into @_r then take a ref.
 	if(($output{type} // '') eq 'array') {
 		if(defined($call_code)) {
-			$call_code =~ s/^\$result = (.*?);/my \@_r = ($1); \$result = \\\@_r;/s;
+			$call_code =~ s/\A\$result = ([^;]+);/my \@_r = ($1); \$result = \\\@_r;/;
 		}
 		if(defined($position_code)) {
-			$position_code =~ s/^\$result = (.*?);/my \@_r = ($1); \$result = \\\@_r;/s;
+			$position_code =~ s/\A\$result = ([^;]+);/my \@_r = ($1); \$result = \\\@_r;/;
 		}
 	}
 
@@ -3361,6 +3403,7 @@ sub perl_quote {
 
 sub _perl_quote {
 	my ($v, $depth) = @_;
+	no warnings 'recursion';    ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 	croak('perl_quote: structure too deeply nested (circular reference?)') if $depth > 100;
 
 	# Undef produces the Perl literal 'undef'

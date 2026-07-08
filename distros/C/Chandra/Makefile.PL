@@ -81,7 +81,7 @@ WriteMakefile(
     AUTHOR            => 'LNATION <email@lnation.org>',
     LICENSE           => 'mit',
     MIN_PERL_VERSION  => '5.010',
-    
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     TYPEMAPS          => ['typemap'],
     INC               => '-I. -Iinclude -Iinclude/chandra',
     OBJECT            => 'Chandra$(OBJ_EXT)',

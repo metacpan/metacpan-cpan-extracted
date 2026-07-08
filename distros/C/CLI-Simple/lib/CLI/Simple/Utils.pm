@@ -8,6 +8,7 @@ use Data::Dumper;
 use English qw(-no_match_vars);
 use JSON qw(decode_json);
 use List::Util qw(none);
+use Scalar::Util qw(openhandle);
 
 use parent qw(Exporter);
 
@@ -23,7 +24,7 @@ our @EXPORT_OK = qw(
   to_snake_case
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 sub toPascalCase { goto &_toCamelCase; }
 sub ToCamelCase  { goto &_toCamelCase; }
@@ -109,6 +110,9 @@ sub slurp {
   my ($file) = @_;
 
   local $RS = undef;
+
+  return <$file>
+    if openhandle $file;
 
   open my $fh, '<:raw', $file
     or croak "ERROR: could not open $file\n";

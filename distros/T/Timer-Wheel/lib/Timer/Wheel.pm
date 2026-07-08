@@ -7,7 +7,7 @@ use warnings;
 use Object::Proto ();
 use Heap::PQ 'import';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 BEGIN {
 	Object::Proto::define('Timer::Wheel::Timer',
@@ -200,7 +200,7 @@ Timer::Wheel - Lightweight timer/event scheduler
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

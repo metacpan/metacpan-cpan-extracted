@@ -4,7 +4,7 @@ author:
   - 'DBI team (dbi-users@perl.org)'
 build_requires:
   ExtUtils::MakeMaker: '6.48'
-  Test::Simple: '0.90'
+  Test::Simple: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -19,6 +19,7 @@ no_index:
     - t
     - inc
 requires:
+  Module::Load: '0.22'
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#dbi
@@ -27,7 +28,7 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/dbi
-version: '1.649'
+version: '1.650'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_suggests:
   Clone: 0.47

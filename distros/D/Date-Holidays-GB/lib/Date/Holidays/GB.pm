@@ -1,8 +1,8 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
-# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2026
+# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2028
 
 use strict;
 use warnings;
@@ -196,7 +196,7 @@ sub _holiday {
     return join( ', ', @strings );
 }
 
-sub date_generated { '2024-04-08' }
+sub date_generated { '2026-01-04' }
 
 1;
 
@@ -618,3 +618,57 @@ __DATA__
 2026-12-28	EAW	Boxing Day
 2026-12-28	NIR	Boxing Day
 2026-12-28	SCT	Boxing Day
+2027-01-01	EAW	New Year’s Day
+2027-01-01	NIR	New Year’s Day
+2027-01-01	SCT	New Year’s Day
+2027-01-04	SCT	2nd January
+2027-03-17	NIR	St Patrick’s Day
+2027-03-26	EAW	Good Friday
+2027-03-26	NIR	Good Friday
+2027-03-26	SCT	Good Friday
+2027-03-29	EAW	Easter Monday
+2027-03-29	NIR	Easter Monday
+2027-05-03	EAW	Early May bank holiday
+2027-05-03	NIR	Early May bank holiday
+2027-05-03	SCT	Early May bank holiday
+2027-05-31	EAW	Spring bank holiday
+2027-05-31	NIR	Spring bank holiday
+2027-05-31	SCT	Spring bank holiday
+2027-07-12	NIR	Battle of the Boyne (Orangemen’s Day)
+2027-08-02	SCT	Summer bank holiday
+2027-08-30	EAW	Summer bank holiday
+2027-08-30	NIR	Summer bank holiday
+2027-11-30	SCT	St Andrew’s Day
+2027-12-27	EAW	Christmas Day
+2027-12-27	NIR	Christmas Day
+2027-12-27	SCT	Christmas Day
+2027-12-28	EAW	Boxing Day
+2027-12-28	NIR	Boxing Day
+2027-12-28	SCT	Boxing Day
+2028-01-03	EAW	New Year’s Day
+2028-01-03	NIR	New Year’s Day
+2028-01-03	SCT	New Year’s Day
+2028-01-04	SCT	2nd January
+2028-03-17	NIR	St Patrick’s Day
+2028-04-14	EAW	Good Friday
+2028-04-14	NIR	Good Friday
+2028-04-14	SCT	Good Friday
+2028-04-17	EAW	Easter Monday
+2028-04-17	NIR	Easter Monday
+2028-05-01	EAW	Early May bank holiday
+2028-05-01	NIR	Early May bank holiday
+2028-05-01	SCT	Early May bank holiday
+2028-05-29	EAW	Spring bank holiday
+2028-05-29	NIR	Spring bank holiday
+2028-05-29	SCT	Spring bank holiday
+2028-07-12	NIR	Battle of the Boyne (Orangemen’s Day)
+2028-08-07	SCT	Summer bank holiday
+2028-08-28	EAW	Summer bank holiday
+2028-08-28	NIR	Summer bank holiday
+2028-11-30	SCT	St Andrew’s Day
+2028-12-25	EAW	Christmas Day
+2028-12-25	NIR	Christmas Day
+2028-12-25	SCT	Christmas Day
+2028-12-26	EAW	Boxing Day
+2028-12-26	NIR	Boxing Day
+2028-12-26	SCT	Boxing Day

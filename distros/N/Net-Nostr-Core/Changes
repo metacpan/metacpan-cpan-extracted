@@ -1,3 +1,20 @@
+1.001002   2026-07-07
+
+  - Rework Net::Nostr::Blossom as a strict NIP-B7/BUD-03 integration
+    helper for kind 10063 server-list events, server URL validation, hash
+    extraction, fallback URL generation, and SHA-256 content verification.
+    This intentionally changes the early Blossom API: server lists are now
+    constructed with new(servers => \@urls), duplicates are preserved, and
+    malformed server-list events are rejected.
+  - Tighten Blossom URL hash extraction so file extensions are captured only
+    at the end of the input or before a query or fragment.
+  - Add URI as a runtime dependency for structured server URL parsing.
+  - Use URI-backed parsing and composition for relay URLs, NIP-05 base URLs,
+    NIP-46/NIP-47 connection URIs, and zap callback URLs. This tightens relay
+    URL validation for NIP-17 and NIP-65 helpers and rejects malformed or
+    valueless relay parameters and empty relay lists in NIP-46/NIP-47
+    connection URIs.
+
 1.001001   2026-07-06
 
   - Sign and verify NIP-01 Schnorr signatures over the 32-byte event id
