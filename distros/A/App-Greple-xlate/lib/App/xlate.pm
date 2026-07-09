@@ -1,6 +1,6 @@
 package App::xlate;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 1;
 =encoding utf-8
@@ -18,20 +18,26 @@ xlate [ options ] -t LANG FILE [ greple options ]
         --version     show version
     -d, --debug       debug mode (currently enables trace)
         --trace       trace mode
-    -n, --dryrun      dry-run
-    -a, --api         use API
+    -n, --dryrun      dry-run (-nn: preview transmission)
+    -a, --api         use API (default; negate with --no-api)
     -c, --check       just check translation area
     -r, --refresh     refresh cache
     -u, --update      force update cache
     -s, --silent      silent mode
     -t, --to-lang=#   target language (required, no default)
     -b, --from-lang=# base language (informational)
-    -e, --engine=#    translation engine (*deepl, gpt5, ...)
+    -e, --engine=#    translation engine (*gpt5, deepl, ...)
     -p, --pattern=#   pattern string to determine translation area
     -f, --file=#      pattern file to determine translation area
     -o, --format=#    output format (*xtxt, cm, ifdef, space, space+, colon)
     -x, --maskfile=#  file containing mask patterns
     -g, --glossary=#  glossary file
+    --anonymize=#     anonymization dictionary file
+    --mark[=#]        collect inline anonymization marks
+    --template[=#]    protect template expressions
+    --frontmatter     exclude/anonymize YAML front matter
+    --seed=#          seed cache from another cache file
+    --context=#       context blocks for re-translation
     -w, --wrap=#      wrap line by # width
     -m, --maxlen=#    max length per API call
     -l, --library=#   show library files (XLATE.mk, xlate.el)
@@ -40,7 +46,7 @@ xlate [ options ] -t LANG FILE [ greple options ]
 
   Make options:
     -M, --make        run make
-    -n, --dryrun      dry-run
+    -n, --dryrun      dry-run (make -n)
 
   Docker options:
     -D, --docker *    run xlate on the container with the same parameters
@@ -64,11 +70,31 @@ xlate [ options ] -t LANG FILE [ greple options ]
   Control Files:
     *.LANG    translation languages
     *.FORMAT  translation format (xtxt, cm, ifdef, colon, space)
-    *.ENGINE  translation engine (deepl, gpt5, ...)
+    *.ENGINE  translation engine (gpt5, deepl, ...)
+    *.ANONYMIZE  anonymization dictionary for the file
 
 =head1 VERSION
 
-    Version 2.00
+    Version 2.01
+
+=head1 INCOMPATIBLE CHANGES IN 2.0
+
+=over 2
+
+=item *
+
+The default translation engine changed from C<deepl> to C<gpt5>.
+Cache file names include the engine name
+(F<FILE.xlate-gpt5-LANG.json>), so running without C<-e deepl>
+creates a new cache for existing DeepL-translated documents.
+
+=item *
+
+API translation is now the default.  The clipboard-based manual
+translation mode requires B<--no-api> (the former default);
+B<-a>/B<--api> remains valid as an explicit default.
+
+=back
 
 =cut
 =head1 DESCRIPTION
@@ -114,7 +140,7 @@ specify the engine:
 
     xlate -e deepl -t JA example.txt
 
-Available engines: deepl, gpt5, ...
+Available engines: gpt5, deepl, ...
 
 =head2 Output Formats
 
@@ -214,11 +240,19 @@ Enable trace mode (set -x).
 
 =item B<-n>, B<--dryrun>
 
-Perform a dry-run without making any changes.
+Given once, print the composed B<greple> command line without
+executing it.  Given twice (C<-nn>), execute the command with
+C<--xlate-dryrun>: no translation API is called, and each payload is
+shown exactly as it would be transmitted, after anonymization and
+masking.  In make mode (C<-M>), this option always means C<make -n>.
 
 =item B<-a>, B<--api>
 
-Use API for translation.
+Use the translation API.  This is the default since 2.0; use
+B<--no-api> to fall back to the clipboard-based manual translation
+(labor) mode.  In make mode (C<-M>), the clipboard mode is not
+available; C<XLATE_USEAPI> is kept only for backward compatibility,
+since the API is used by default regardless of its value.
 
 =item B<-c>, B<--check>
 
@@ -246,7 +280,7 @@ Specify the base language (optional).
 
 =item B<-e> I<engine>, B<--engine>=I<engine>
 
-Specify the translation engine to use.
+Specify the translation engine to use.  Default is C<gpt5>.
 
 =item B<-p> I<pattern>, B<--pattern>=I<pattern>
 
@@ -270,6 +304,41 @@ See L<App::Greple::xlate/MASKING>.
 =item B<-g> I<file>, B<--glossary>=I<file>
 
 Specify a glossary file.
+
+=item B<--anonymize>=I<file>
+
+Anonymize sensitive strings before they are sent to the translation
+API using the dictionary I<file> (JSON or line format), and restore
+them in the output.  See L<App::Greple::xlate/ANONYMIZATION AND
+TEMPLATES> for the dictionary format.
+
+=item B<--mark>[=I<regex>]
+
+Collect anonymization entries from inline marks in the document,
+such as C<{{ person("NAME") }}>.  An optional I<regex> selects an
+alternative mark notation; it must contain C<< (?<category>...) >>
+and C<< (?<text>...) >> named captures.
+
+=item B<--template>[=I<regex>]
+
+Treat template expressions (default: Jinja2) as opaque placeholders:
+they are protected from translation and verified afterwards.
+
+=item B<--frontmatter>
+
+Exclude a leading YAML front matter block from translation and add
+its values to the anonymization rules.  Leave a blank line after the
+closing C<--->.
+
+=item B<--seed>=I<file>
+
+Initialize a new document's translation cache from another
+document's cache I<file>.  Useful for periodic reports.
+
+=item B<--context>=I<n>
+
+Number of surrounding translated blocks passed as context when
+re-translating changed blocks (default 2, 0 to disable).
 
 =item B<-w> I<width>, B<--wrap>=I<width>
 
@@ -295,7 +364,7 @@ Run make.
 
 =item B<-n>, B<--dryrun>
 
-Dry-run.
+Dry-run (C<make -n>).
 
 =back
 
@@ -414,6 +483,11 @@ Specifies translation format.
 
 Specifies translation engine.
 
+=item F<*.ANONYMIZE>
+
+Anonymization dictionary applied to the file (used by the make
+workflow; takes precedence over C<XLATE_ANONYMIZE>).
+
 =back
 
 =head1 EXAMPLES
@@ -430,9 +504,18 @@ Specifies translation engine.
 
    xlate -C sdif -V --nocdif example.EN-US.cm
 
-4. Translate without using API (via clipboard):
+4. Translate without using API (via clipboard-based manual labor):
 
-   xlate -t JA README.md
+   xlate --no-api -t JA README.md
+
+5. Translate a report template whose actors are defined in YAML front
+matter, keeping template expressions intact and sending no real
+names to the API, then render each case with B<pandoc-embedz>:
+
+   xlate -t EN-US --frontmatter --template report-template.md \
+         > report-template.EN.md
+   pandoc-embedz --standalone report-template.EN.md \
+                 -c case-123.yaml -o report-123.EN.md < /dev/null
 
 =head1 SEE ALSO
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'ITree based document list'
+abstract: 'Tk::ListBrowser based document list'
 author:
   - 'Hans Jeuken <hanje at cpan dot org>'
 build_requires:
@@ -19,10 +19,10 @@ no_index:
     - inc
 requires:
   File::Spec: '0'
-  Test::Tk: '3.01'
+  Test::Tk: '3.04'
   Tk: '800.024'
-  Tk::ListBrowser: '0.11'
+  Tk::ListBrowser: '0.12'
 resources:
   repository: git://github.com/haje61/Tk-DocumentTree.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

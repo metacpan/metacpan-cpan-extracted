@@ -1,9 +1,11 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 @Data::Deque::Shared::Int::ISA = ('Data::Deque::Shared');
 @Data::Deque::Shared::Str::ISA = ('Data::Deque::Shared');
 1;
@@ -51,15 +53,15 @@ B<Linux-only>. Requires 64-bit Perl. Capacity must be E<lt>= 2^31.
 Used only as a FIFO (C<push_back> + C<pop_front>), it's effectively a
 fixed-slot lock-free string queue: 1.3x-4.7x faster than
 L<Data::Queue::Shared::Str> under multi-producer contention, at the cost
-of per-slot fixed memory (C<capacity × max_len>).
+of per-slot fixed memory (C<capacity x max_len>).
 
 =head2 Concurrency
 
 Push and pop are safe under multi-producer / multi-consumer workloads.
 Each slot carries a 64-bit control word (state + generation) that acts
 as a publication gate: a pusher atomically transitions the slot through
-C<empty → writing → filled>, and a popper transitions it through
-C<filled → reading → empty> with the generation bumped on completion.
+C<empty -> writing -> filled>, and a popper transitions it through
+C<filled -> reading -> empty> with the generation bumped on completion.
 A consumer that claims position C<n> via the head/tail CAS therefore
 always observes the publication transition of the corresponding push
 before reading the value.
@@ -116,8 +118,14 @@ publishing the value.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it.
-Do not share backing files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 BENCHMARKS
 

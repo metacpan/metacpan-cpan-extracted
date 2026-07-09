@@ -1,40 +1,40 @@
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
 
-use Data::Dumper;
 use Test::Most tests => 7;
 
-use lib 'lib';
 use Test::Mockingbird;
 
-cmp_ok(MyClass::do_something('arg0'), 'eq', 'done something', 'routine is called before being spied on');
+cmp_ok MyClass::do_something('arg0'), 'eq', 'done something',
+	'routine is called before being spied on';
 
-# Spy on a method
 my $spy = Test::Mockingbird::spy('MyClass', 'do_something');
 MyClass::do_something('arg1');
-cmp_ok(MyClass::do_something('arg2', 'arg3'), 'eq', 'done something', 'routine is called when being spied on');
+cmp_ok MyClass::do_something('arg2', 'arg3'), 'eq', 'done something',
+	'routine is called while being spied on';
 
 my @calls = $spy->();
-diag(Data::Dumper->new([\@calls])->Dump()) if($ENV{'TEST_VERBOSE'});
-is(scalar(@calls), 2, 'Captured two calls');
-is_deeply($calls[0], ['MyClass::do_something', 'arg1'], 'Captured first call arguments');
-is_deeply($calls[1], ['MyClass::do_something', 'arg2', 'arg3'], 'Captured second call arguments');
+
+# Dump call records only when TEST_VERBOSE is set; lazy-load Data::Dumper
+if ($ENV{TEST_VERBOSE}) {
+	require Data::Dumper;
+	diag Data::Dumper::Dumper(\@calls);
+}
+
+is scalar @calls, 2, 'captured two calls';
+is_deeply $calls[0], [ 'MyClass::do_something', 'arg1' ],
+	'first call arguments correct';
+is_deeply $calls[1], [ 'MyClass::do_something', 'arg2', 'arg3' ],
+	'second call arguments correct';
 
 Test::Mockingbird::restore_all();
 
-cmp_ok(MyClass::do_something('arg4'), 'eq', 'done something', 'routine is called before after spied on');
-is(scalar(@calls), 2, 'No longer capturing calls');
-
-1;
+cmp_ok MyClass::do_something('arg4'), 'eq', 'done something',
+	'routine called normally after spy removed';
+is scalar @calls, 2, 'call list frozen after restore';
 
 package MyClass;
 
-sub do_something
-{
-	# ::diag($_[0]);
-	return 'done something';
-}
+sub do_something { 'done something' }
 
 1;

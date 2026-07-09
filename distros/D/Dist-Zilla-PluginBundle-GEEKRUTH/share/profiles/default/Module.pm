@@ -1,6 +1,4 @@
-package {
-   {$name}
-};
+package {{$name}};
 use Modern::Perl;
 use Carp;
 

@@ -13,6 +13,7 @@ t/author-critic.t
 t/manifest.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
+t/storage-redis-unit.t
 t/storage-redis.t
 xt/pod-coverage.t
 xt/pod.t

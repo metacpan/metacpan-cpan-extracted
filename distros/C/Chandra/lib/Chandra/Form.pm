@@ -5,7 +5,7 @@ use warnings;
 
 use Chandra ();
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 1;
 

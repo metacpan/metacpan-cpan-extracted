@@ -279,18 +279,34 @@ static inline void nda_recover_dead_readers(NdaHandle *h) {
     }
 
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < NDA_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = 0;   /* no slotless readers here: scanning slots is complete */
+            for (uint32_t i = 0; !live_now && i < NDA_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && nda_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < NDA_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || nda_pid_alive(pid)) continue;
-            nda_drain_dead_slot(h, i, pid);
+        if (drain_ok) {
+            for (uint32_t i = 0; i < NDA_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || nda_pid_alive(p)) continue;
+                nda_drain_dead_slot(h, i, p);
+            }
         }
     }
 }
@@ -347,11 +363,11 @@ static inline void nda_rwlock_rdlock(NdaHandle *h) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur > 0 && cur < NDA_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < NDA_RWLOCK_SPIN_LIMIT, 1)) {
@@ -360,7 +376,10 @@ static inline void nda_rwlock_rdlock(NdaHandle *h) {
         }
         nda_park_reader(h);
         cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur >= NDA_RWLOCK_WRITER_BIT || cur == 0) {
+        if (cur >= NDA_RWLOCK_WRITER_BIT ||
+            (cur == 0 && __atomic_load_n(writers_waiting, __ATOMIC_RELAXED))) {
+            /* park on a free lock only to yield to a waiting writer; with no
+             * writer, re-loop and acquire -- else nobody would ever wake us. */
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
                               &nda_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
@@ -665,8 +684,25 @@ static inline int nda_validate_header(const NdaHeader *hdr, uint64_t file_size) 
     return 1;
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int nda_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { NDA_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        NDA_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    NDA_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static NdaHandle *nda_create(const char *path, int dtype,
-                             const uint64_t *shape, uint32_t ndim, char *errbuf) {
+                             const uint64_t *shape, uint32_t ndim, mode_t mode, char *errbuf) {
     uint64_t size, strides[NDA_MAX_DIMS], data_bytes;
     if (!nda_validate_create_args(dtype, shape, ndim, &size, strides, &data_bytes, errbuf))
         return NULL;
@@ -682,8 +718,8 @@ static NdaHandle *nda_create(const char *path, int dtype,
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { NDA_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { NDA_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = nda_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { NDA_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat stt;
         if (fstat(fd, &stt) < 0) { NDA_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -748,6 +784,15 @@ static NdaHandle *nda_open_fd(int fd, char *errbuf) {
 
 static void nda_destroy(NdaHandle *h) {
     if (!h) return;
+    /* Release our reader slot on clean teardown (else short-lived-reader churn
+     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+    if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
+        h->cached_fork_gen == __atomic_load_n(&nda_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        uint32_t expected = h->cached_pid;
+        __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
+                &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
     free(h->path);

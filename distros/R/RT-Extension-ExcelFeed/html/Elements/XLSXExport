@@ -50,7 +50,7 @@ $Class => undef
 $Collection
 $Format
 $PreserveNewLines => 0
-$RowsPerPage => 100
+$RowsPerPage => RT->Config->Get('ExcelFeedProgressiveRows') // RT->Config->Get('ProgressiveSearchResultRows') // 1000
 </%ARGS>
 <%ONCE>
 my $no_html = HTML::Scrubber->new( deny => '*' );
@@ -118,13 +118,12 @@ foreach my $column (@columns){
     }
 }
 
-$RowsPerPage = 100 if !$RowsPerPage || $RowsPerPage > 1000;
-$Collection->RowsPerPage($RowsPerPage);
+$Collection->RowsPerPage($RowsPerPage) if $RowsPerPage;
 
 my $i = 0;
 # Start at 1, header row is in 0
 my $current_row = 1;
-while ( my $row = ( $Collection->Next || ( $Collection->NextPage && $Collection->Next ) ) ) {
+while ( my $row = $RowsPerPage ? ( $Collection->Next || ( $Collection->NextPage && $Collection->Next ) ) : $Collection->Next ) {
     for my $col (@columns) {
         my @row_values = map {
             my $val = ProcessColumnMapValue($_->{map}, Arguments => [$row, $i++], Escape => 0);

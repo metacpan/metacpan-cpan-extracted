@@ -54,6 +54,7 @@ t/QuickDB/PostgreSQL.t
 t/QuickDB/QuickDB.pm
 t/QuickDB/SQLite.t
 t/Tools/QuickDB.t
+t/broken_mariadb_versions.t
 t/clone_dir.t
 t/clone_sequence.t
 t/fast_destroy.t

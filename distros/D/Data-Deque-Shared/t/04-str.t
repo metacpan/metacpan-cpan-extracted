@@ -8,7 +8,7 @@ use Data::Deque::Shared;
 my $dq = Data::Deque::Shared::Str->new(undef, 10, 32);
 ok $dq, 'created Str deque';
 is $dq->size, 0;
-is $dq->capacity, 10;
+is $dq->capacity, 16, 'capacity rounds up to a power of 2 (10 -> 16)';
 ok $dq->is_empty;
 
 ok $dq->push_back("alpha"), 'push_back alpha';
@@ -23,13 +23,13 @@ ok !defined $dq->pop_front, 'pop_front on empty';
 ok !defined $dq->pop_back,  'pop_back on empty';
 
 # Fill to capacity
-ok $dq->push_back("item_$_"), "push $_" for 1..10;
-ok $dq->is_full, 'full after 10 pushes';
+ok $dq->push_back("item_$_"), "push $_" for 1 .. $dq->capacity;
+ok $dq->is_full, 'full after capacity pushes';
 ok !$dq->push_back("overflow"), 'push_back fails when full';
 ok !$dq->push_front("overflow"), 'push_front fails when full';
 
 # Pop them back out in order
-for my $i (1..10) {
+for my $i (1 .. $dq->capacity) {
     is $dq->pop_front, "item_$i", "pop_front returns item_$i";
 }
 ok $dq->is_empty;

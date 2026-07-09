@@ -73,7 +73,7 @@
    "provides" : {
       "App::Greple::xlate" : {
          "file" : "lib/App/Greple/xlate.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "App::Greple::xlate::Cache" : {
          "file" : "lib/App/Greple/xlate/Cache.pm"
@@ -92,39 +92,39 @@
       },
       "App::Greple::xlate::deepl" : {
          "file" : "lib/App/Greple/xlate/deepl.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "App::Greple::xlate::gpty::gpt3" : {
          "file" : "lib/App/Greple/xlate/gpty/gpt3.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "App::Greple::xlate::gpty::gpt4" : {
          "file" : "lib/App/Greple/xlate/gpty/gpt4.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "App::Greple::xlate::gpty::gpt4o" : {
          "file" : "lib/App/Greple/xlate/gpty/gpt4o.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "App::Greple::xlate::gpty::gpt5" : {
          "file" : "lib/App/Greple/xlate/gpty/gpt5.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "App::Greple::xlate::llm" : {
          "file" : "lib/App/Greple/xlate/llm.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "App::Greple::xlate::llm::gpt5" : {
          "file" : "lib/App/Greple/xlate/llm/gpt5.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "App::Greple::xlate::null" : {
          "file" : "lib/App/Greple/xlate/null.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "App::xlate" : {
          "file" : "lib/App/xlate.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       }
    },
    "release_status" : "stable",
@@ -139,7 +139,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-xlate"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

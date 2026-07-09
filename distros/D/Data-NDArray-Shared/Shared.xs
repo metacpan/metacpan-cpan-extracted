@@ -67,41 +67,38 @@ static SV *nda_get_sv(pTHX_ NdaHandle *h, uint64_t e) {
  * element width (float -> SvNV, signed -> (intN)SvIV, unsigned -> (uintN)SvUV).
  * Out-of-range integer values wrap to the element width per C cast rules.
  * ---------------------------------------------------------------- */
-static void nda_set_sv(pTHX_ NdaHandle *h, uint64_t e, SV *val) {
-    char *base = nda_data(h);
-    switch (h->hdr->dtype) {
-        case NDA_F64: { double   v = (double)SvNV(val); memcpy(base + e*8, &v, 8); break; }
-        case NDA_F32: { float    v = (float)SvNV(val);  memcpy(base + e*4, &v, 4); break; }
-        case NDA_I64: { int64_t  v = (int64_t)SvIV(val); memcpy(base + e*8, &v, 8); break; }
-        case NDA_I32: { int32_t  v = (int32_t)SvIV(val); memcpy(base + e*4, &v, 4); break; }
-        case NDA_I16: { int16_t  v = (int16_t)SvIV(val); memcpy(base + e*2, &v, 2); break; }
-        case NDA_I8:  { int8_t   v = (int8_t)SvIV(val);  base[e] = (char)v;         break; }
-        case NDA_U64: { uint64_t v = (uint64_t)SvUV(val); memcpy(base + e*8, &v, 8); break; }
-        case NDA_U32: { uint32_t v = (uint32_t)SvUV(val); memcpy(base + e*4, &v, 4); break; }
-        case NDA_U16: { uint16_t v = (uint16_t)SvUV(val); memcpy(base + e*2, &v, 2); break; }
-        case NDA_U8:  { uint8_t  v = (uint8_t)SvUV(val);  base[e] = (char)v;        break; }
+/* Encode val to its dtype's raw bytes BEFORE locking: SvNV/SvIV/SvUV can croak
+ * (overload/FATAL-numeric/tied FETCH), which under the wrlock would leak it. */
+static uint32_t nda_encode(pTHX_ uint8_t dtype, SV *val, char *out) {
+    switch (dtype) {
+        case NDA_F64: { double   v = (double)SvNV(val);   memcpy(out, &v, 8); return 8; }
+        case NDA_F32: { float    v = (float)SvNV(val);    memcpy(out, &v, 4); return 4; }
+        case NDA_I64: { int64_t  v = (int64_t)SvIV(val);  memcpy(out, &v, 8); return 8; }
+        case NDA_I32: { int32_t  v = (int32_t)SvIV(val);  memcpy(out, &v, 4); return 4; }
+        case NDA_I16: { int16_t  v = (int16_t)SvIV(val);  memcpy(out, &v, 2); return 2; }
+        case NDA_I8:  { int8_t   v = (int8_t)SvIV(val);   out[0] = (char)v;   return 1; }
+        case NDA_U64: { uint64_t v = (uint64_t)SvUV(val); memcpy(out, &v, 8); return 8; }
+        case NDA_U32: { uint32_t v = (uint32_t)SvUV(val); memcpy(out, &v, 4); return 4; }
+        case NDA_U16: { uint16_t v = (uint16_t)SvUV(val); memcpy(out, &v, 2); return 2; }
+        case NDA_U8:  { uint8_t  v = (uint8_t)SvUV(val);  out[0] = (char)v;   return 1; }
     }
+    return 0;
+}
+/* Store pre-encoded bytes at element e (call under the write lock). */
+static void nda_store_bytes(NdaHandle *h, uint64_t e, const char *enc, uint32_t nb) {
+    memcpy(nda_data(h) + e * nb, enc, nb);
 }
 
 /* ----------------------------------------------------------------
  * Fill every element with the typed value of val.
  * ---------------------------------------------------------------- */
-static void nda_fill_locked(pTHX_ NdaHandle *h, SV *val) {
+/* Splat pre-encoded bytes across every element (call under the write lock).
+ * The croak-prone numeric conversion is done by nda_encode BEFORE locking. */
+static void nda_fill_bytes(NdaHandle *h, const char *enc, uint32_t nb) {
     uint64_t size = h->hdr->size, e;
     char *base = nda_data(h);
-    /* Decode once, then splat the raw bytes for speed + consistency. */
-    switch (h->hdr->dtype) {
-        case NDA_F64: { double   v = (double)SvNV(val); for (e=0;e<size;e++) memcpy(base+e*8,&v,8); break; }
-        case NDA_F32: { float    v = (float)SvNV(val);  for (e=0;e<size;e++) memcpy(base+e*4,&v,4); break; }
-        case NDA_I64: { int64_t  v = (int64_t)SvIV(val); for (e=0;e<size;e++) memcpy(base+e*8,&v,8); break; }
-        case NDA_I32: { int32_t  v = (int32_t)SvIV(val); for (e=0;e<size;e++) memcpy(base+e*4,&v,4); break; }
-        case NDA_I16: { int16_t  v = (int16_t)SvIV(val); for (e=0;e<size;e++) memcpy(base+e*2,&v,2); break; }
-        case NDA_I8:  { int8_t   v = (int8_t)SvIV(val);  memset(base, (int)(unsigned char)v, (size_t)size); break; }
-        case NDA_U64: { uint64_t v = (uint64_t)SvUV(val); for (e=0;e<size;e++) memcpy(base+e*8,&v,8); break; }
-        case NDA_U32: { uint32_t v = (uint32_t)SvUV(val); for (e=0;e<size;e++) memcpy(base+e*4,&v,4); break; }
-        case NDA_U16: { uint16_t v = (uint16_t)SvUV(val); for (e=0;e<size;e++) memcpy(base+e*2,&v,2); break; }
-        case NDA_U8:  { uint8_t  v = (uint8_t)SvUV(val);  memset(base, (int)v, (size_t)size); break; }
-    }
+    if (nb == 1) { memset(base, (unsigned char)enc[0], (size_t)size); return; }
+    for (e = 0; e < size; e++) memcpy(base + e * nb, enc, nb);
 }
 
 /* ----------------------------------------------------------------
@@ -125,11 +122,18 @@ static void nda_fill_locked(pTHX_ NdaHandle *h, SV *val) {
     else           { CT s = (CT)suv; for (e=0;e<size;e++) p[e] = (CT)((UT)p[e] * (UT)s); } \
 } while (0)
 
-static void nda_scalar_op_locked(pTHX_ NdaHandle *h, SV *sv, int op) {
+/* Read the scalar into its dtype form BEFORE the wrlock: SvNV/SvIV/SvUV can
+ * croak (overload / FATAL-numeric / tied FETCH), which under the lock leaks it. */
+static void nda_read_scalar(pTHX_ uint8_t dt, SV *sv, double *s, int64_t *siv, uint64_t *suv) {
+    SvGETMAGIC(sv);
+    if (nda_is_float(dt)) *s = SvNV(sv);
+    else if (nda_is_signed(dt)) *siv = SvIV(sv);
+    else *suv = SvUV(sv);
+}
+static void nda_scalar_op_locked(NdaHandle *h, double s, int64_t siv, uint64_t suv, int op) {
     uint64_t size = h->hdr->size, e;
     char *base = nda_data(h);
     if (nda_is_float(h->hdr->dtype)) {
-        double s = (double)SvNV(sv);
         if (h->hdr->dtype == NDA_F64) {
             double *p = (double *)base;
             if (op == '+') for (e=0;e<size;e++) p[e] += s; else for (e=0;e<size;e++) p[e] *= s;
@@ -138,7 +142,6 @@ static void nda_scalar_op_locked(pTHX_ NdaHandle *h, SV *sv, int op) {
             if (op == '+') for (e=0;e<size;e++) p[e] += fs; else for (e=0;e<size;e++) p[e] *= fs;
         }
     } else if (nda_is_signed(h->hdr->dtype)) {
-        int64_t siv = (int64_t)SvIV(sv);
         switch (h->hdr->dtype) {
             case NDA_I64: NDA_SCALAR_INT(int64_t, uint64_t); break;
             case NDA_I32: NDA_SCALAR_INT(int32_t, uint32_t); break;
@@ -146,7 +149,6 @@ static void nda_scalar_op_locked(pTHX_ NdaHandle *h, SV *sv, int op) {
             case NDA_I8:  NDA_SCALAR_INT(int8_t,  uint32_t); break;
         }
     } else {
-        uint64_t suv = (uint64_t)SvUV(sv);
         switch (h->hdr->dtype) {
             case NDA_U64: NDA_SCALAR_UINT(uint64_t, uint64_t); break;
             case NDA_U32: NDA_SCALAR_UINT(uint32_t, uint32_t); break;
@@ -289,10 +291,24 @@ new(class, ...)
   CODE:
     {
         SV *label; int dt;
-        uint32_t ndim = nda_resolve_ctor_args(aTHX_ ax, items,
+        /* Opt-in cross-user sharing: an optional trailing \%opts (e.g.
+           { mode => 0660 }) sets the backing-file mode; default 0600.  @shape
+           is greedy, so mode cannot be a bare trailing positional (0600 is a
+           valid u8 dimension) -- it rides in a hashref, unambiguous and inert
+           for every existing ($path,$dtype,@shape) call. */
+        mode_t mode = 0600;
+        I32 eff_items = items;
+        if (items > 3 && SvROK(ST(items - 1))
+                      && SvTYPE(SvRV(ST(items - 1))) == SVt_PVHV) {
+            HV *opts = (HV *)SvRV(ST(items - 1));
+            SV **msv = hv_fetchs(opts, "mode", 0);
+            if (msv && (SvGETMAGIC(*msv), SvOK(*msv))) mode = (mode_t)SvUV(*msv);
+            eff_items = items - 1;
+        }
+        uint32_t ndim = nda_resolve_ctor_args(aTHX_ ax, eff_items,
             "Data::NDArray::Shared->new", &label, &dt, dims);   /* croaks before any alloc */
-        const char *p = SvOK(label) ? SvPV_nolen(label) : NULL;
-        NdaHandle *h = nda_create(p, dt, dims, ndim, errbuf);
+        const char *p = (SvGETMAGIC(label), SvOK(label)) ? SvPV_nolen(label) : NULL;
+        NdaHandle *h = nda_create(p, dt, dims, ndim, mode, errbuf);
         if (!h) croak("Data::NDArray::Shared->new: %s", errbuf);
         MAKE_OBJ(class, h);
     }
@@ -310,7 +326,7 @@ new_memfd(class, ...)
         SV *label; int dt;
         uint32_t ndim = nda_resolve_ctor_args(aTHX_ ax, items,
             "Data::NDArray::Shared->new_memfd", &label, &dt, dims);
-        const char *nm = SvOK(label) ? SvPV_nolen(label) : NULL;
+        const char *nm = (SvGETMAGIC(label), SvOK(label)) ? SvPV_nolen(label) : NULL;
         NdaHandle *h = nda_create_memfd(nm, dt, dims, ndim, errbuf);
         if (!h) croak("Data::NDArray::Shared->new_memfd: %s", errbuf);
         MAKE_OBJ(class, h);
@@ -348,19 +364,31 @@ get(self, ...)
     uint64_t idx[NDA_MAX_DIMS];
   CODE:
     {
-        uint32_t ndim = h->hdr->ndim;
-        if ((uint32_t)(items - 1) != ndim)
-            croak("Data::NDArray::Shared->get: expected %u indices, got %d", ndim, (int)(items - 1));
-        for (uint32_t d = 0; d < ndim; d++) {
-            UV ix = SvUV(ST(1 + d));
-            if (ix >= h->hdr->shape[d])
-                croak("Data::NDArray::Shared->get: index %u = %" UVuf " out of range (dim size %" UVuf ")",
-                      d, ix, (UV)h->hdr->shape[d]);
-            idx[d] = (uint64_t)ix;
-        }
-        uint64_t e = nda_flat_offset(h, idx, ndim);
+        uint32_t nix = (uint32_t)(items - 1);
+        if (nix > NDA_MAX_DIMS)
+            croak("Data::NDArray::Shared->get: too many indices (%u)", nix);
+        for (uint32_t d = 0; d < nix; d++)          /* read the args before locking */
+            idx[d] = (uint64_t)SvUV(ST(1 + d));
+        /* Validate shape + compute the flat offset UNDER the read lock: a concurrent
+           reshape() mutates ndim/shape/strides under the write lock, so doing this
+           lock-free could bound-check one shape yet offset with another -> OOB. */
         nda_rwlock_rdlock(h);
-        RETVAL = nda_get_sv(aTHX_ h, e);
+        uint32_t ndim = h->hdr->ndim;
+        if (nix != ndim) { nda_rwlock_rdunlock(h);
+            croak("Data::NDArray::Shared->get: expected %u indices, got %u", ndim, nix); }
+        for (uint32_t d = 0; d < ndim; d++)
+            if (idx[d] >= h->hdr->shape[d]) { uint64_t sz = h->hdr->shape[d]; nda_rwlock_rdunlock(h);
+                croak("Data::NDArray::Shared->get: index %u = %" UVuf " out of range (dim size %" UVuf ")",
+                      d, (UV)idx[d], (UV)sz); }
+        uint64_t off = nda_flat_offset(h, idx, ndim);
+        /* Layer B: strides[] are read from the shared segment; a local peer with
+           write access to the backing file could corrupt them so an in-range
+           multi-index still yields a flat offset past the element count -> OOB
+           read.  Canonical row-major strides always keep off < size, so this
+           never fires for good data. */
+        if (off >= h->hdr->size) { nda_rwlock_rdunlock(h);
+            croak("Data::NDArray::Shared->get: computed offset out of range"); }
+        RETVAL = nda_get_sv(aTHX_ h, off);
         nda_rwlock_rdunlock(h);
     }
   OUTPUT:
@@ -374,21 +402,31 @@ set(self, ...)
     uint64_t idx[NDA_MAX_DIMS];
   CODE:
     {
-        uint32_t ndim = h->hdr->ndim;
-        /* items = self + ndim indices + value */
-        if ((uint32_t)(items - 2) != ndim)
-            croak("Data::NDArray::Shared->set: expected %u indices + value, got %d args", ndim, (int)(items - 1));
-        for (uint32_t d = 0; d < ndim; d++) {
-            UV ix = SvUV(ST(1 + d));
-            if (ix >= h->hdr->shape[d])
-                croak("Data::NDArray::Shared->set: index %u = %" UVuf " out of range (dim size %" UVuf ")",
-                      d, ix, (UV)h->hdr->shape[d]);
-            idx[d] = (uint64_t)ix;
-        }
+        if (items < 2) croak("Data::NDArray::Shared->set: expected indices + value");
+        uint32_t nix = (uint32_t)(items - 2);       /* self + ndim indices + value */
+        if (nix > NDA_MAX_DIMS)
+            croak("Data::NDArray::Shared->set: too many indices (%u)", nix);
         SV *val = ST(items - 1);
-        uint64_t e = nda_flat_offset(h, idx, ndim);
+        for (uint32_t d = 0; d < nix; d++)          /* read the args before locking */
+            idx[d] = (uint64_t)SvUV(ST(1 + d));
+        char enc[8]; uint32_t nb = nda_encode(aTHX_ h->hdr->dtype, val, enc);  /* encode val lock-free */
+        /* Validate + compute the offset UNDER the write lock (see get: serializes the
+           shape read + offset against a concurrent reshape to prevent an OOB index). */
         nda_rwlock_wrlock(h);
-        nda_set_sv(aTHX_ h, e, val);
+        uint32_t ndim = h->hdr->ndim;
+        if (nix != ndim) { nda_rwlock_wrunlock(h);
+            croak("Data::NDArray::Shared->set: expected %u indices + value, got %u args", ndim, nix); }
+        for (uint32_t d = 0; d < ndim; d++)
+            if (idx[d] >= h->hdr->shape[d]) { uint64_t sz = h->hdr->shape[d]; nda_rwlock_wrunlock(h);
+                croak("Data::NDArray::Shared->set: index %u = %" UVuf " out of range (dim size %" UVuf ")",
+                      d, (UV)idx[d], (UV)sz); }
+        uint64_t off = nda_flat_offset(h, idx, ndim);
+        /* Layer B: bound the strides-derived flat offset against the element
+           count before writing -- corrupted strides in the shared segment must
+           not drive an OOB write (see get; never fires for canonical data). */
+        if (off >= h->hdr->size) { nda_rwlock_wrunlock(h);
+            croak("Data::NDArray::Shared->set: computed offset out of range"); }
+        nda_store_bytes(h, off, enc, nb);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
         nda_rwlock_wrunlock(h);
     }
@@ -420,8 +458,9 @@ set_flat(self, e, val)
     if (e >= h->hdr->size)
         croak("Data::NDArray::Shared->set_flat: index %" UVuf " out of range (size %" UVuf ")",
               e, (UV)h->hdr->size);
+    char enc[8]; uint32_t nb = nda_encode(aTHX_ h->hdr->dtype, val, enc);  /* encode before locking */
     nda_rwlock_wrlock(h);
-    nda_set_sv(aTHX_ h, (uint64_t)e, val);
+    nda_store_bytes(h, (uint64_t)e, enc, nb);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
 
@@ -432,8 +471,9 @@ fill(self, val)
   PREINIT:
     EXTRACT(self);
   CODE:
+    char enc[8]; uint32_t nb = nda_encode(aTHX_ h->hdr->dtype, val, enc);  /* encode before locking */
     nda_rwlock_wrlock(h);
-    nda_fill_locked(aTHX_ h, val);
+    nda_fill_bytes(h, enc, nb);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
     SvREFCNT_inc(self);
@@ -560,8 +600,10 @@ add_scalar(self, s)
   PREINIT:
     EXTRACT(self);
   CODE:
+    double sd=0; int64_t si=0; uint64_t su=0;
+    nda_read_scalar(aTHX_ h->hdr->dtype, s, &sd, &si, &su);  /* pre-read lock-free */
     nda_rwlock_wrlock(h);
-    nda_scalar_op_locked(aTHX_ h, s, '+');
+    nda_scalar_op_locked(h, sd, si, su, '+');
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
     SvREFCNT_inc(self);
@@ -576,8 +618,10 @@ mul_scalar(self, s)
   PREINIT:
     EXTRACT(self);
   CODE:
+    double sd=0; int64_t si=0; uint64_t su=0;
+    nda_read_scalar(aTHX_ h->hdr->dtype, s, &sd, &si, &su);  /* pre-read lock-free */
     nda_rwlock_wrlock(h);
-    nda_scalar_op_locked(aTHX_ h, s, '*');
+    nda_scalar_op_locked(h, sd, si, su, '*');
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
     SvREFCNT_inc(self);
@@ -650,10 +694,18 @@ shape(self)
     EXTRACT(self);
   PPCODE:
     {
-        uint32_t ndim = h->hdr->ndim, d;
+        uint64_t snap[NDA_MAX_DIMS]; uint32_t ndim, d;
+        /* Snapshot ndim+shape under the read lock: reshape mutates them under
+         * the write lock, so an unlocked read could tear (a new ndim with a
+         * stale shape[]).  Copy out, unlock, then build the SVs. */
+        nda_rwlock_rdlock(h);
+        ndim = h->hdr->ndim;
+        if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
+        for (d = 0; d < ndim; d++) snap[d] = (uint64_t)h->hdr->shape[d];
+        nda_rwlock_rdunlock(h);
         EXTEND(SP, (SSize_t)ndim);
         for (d = 0; d < ndim; d++)
-            PUSHs(sv_2mortal(newSVuv((UV)h->hdr->shape[d])));
+            PUSHs(sv_2mortal(newSVuv((UV)snap[d])));
     }
 
 void
@@ -663,10 +715,17 @@ strides(self)
     EXTRACT(self);
   PPCODE:
     {
-        uint32_t ndim = h->hdr->ndim, d;
+        uint64_t snap[NDA_MAX_DIMS]; uint32_t ndim, d;
+        /* Snapshot ndim+strides under the read lock (see shape): reshape mutates
+         * them under the write lock; an unlocked read could tear. */
+        nda_rwlock_rdlock(h);
+        ndim = h->hdr->ndim;
+        if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
+        for (d = 0; d < ndim; d++) snap[d] = (uint64_t)h->hdr->strides[d];
+        nda_rwlock_rdunlock(h);
         EXTEND(SP, (SSize_t)ndim);
         for (d = 0; d < ndim; d++)
-            PUSHs(sv_2mortal(newSVuv((UV)h->hdr->strides[d])));
+            PUSHs(sv_2mortal(newSVuv((UV)snap[d])));
     }
 
 UV
@@ -675,7 +734,7 @@ ndim(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = (UV)h->hdr->ndim;   /* immutable shape rank is stable; reshape keeps 1..8 */
+    RETVAL = (UV)h->hdr->ndim;   /* current rank (1..8); reshape() can change it */
   OUTPUT:
     RETVAL
 
@@ -816,6 +875,7 @@ stats(self)
         nda_rwlock_rdlock(h);
         dtype    = h->hdr->dtype;
         ndim     = h->hdr->ndim;
+        if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
         itemsize = h->hdr->itemsize;
         size     = h->hdr->size;
         ops      = h->hdr->stat_ops;
@@ -874,6 +934,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::NDArray::Shared")) {
         NdaHandle *h = INT2PTR(NdaHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

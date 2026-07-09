@@ -1,10 +1,23 @@
 package Data::PubSub::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Data::PubSub::Shared', $VERSION);
+
+# ithreads: blessed shared-memory handles must never be cloned into a
+# child thread -- the clone would double-free the handle on thread exit.
+{ no strict 'refs'; *{"${_}::CLONE_SKIP"} = sub { 1 } for qw(
+  Data::PubSub::Shared::Int
+  Data::PubSub::Shared::Int::Sub
+  Data::PubSub::Shared::Int16
+  Data::PubSub::Shared::Int16::Sub
+  Data::PubSub::Shared::Int32
+  Data::PubSub::Shared::Int32::Sub
+  Data::PubSub::Shared::Str
+  Data::PubSub::Shared::Str::Sub
+); }
 
 sub _enable_keywords {
     my ($pkg, @kws) = @_;
@@ -96,7 +109,7 @@ B<Linux-only>. Requires 64-bit Perl.
 
 =item * Lock-free subscribers for all variants (seqlock)
 
-=item * Variable-length Str messages (circular arena)
+=item * Variable-length Str messages (byte arena)
 
 =item * Futex-based blocking poll with timeout
 
@@ -130,7 +143,7 @@ Best for status codes, small enums, sensor readings.
 =item L<Data::PubSub::Shared::Str> -- variable-length strings
 
 Mutex-protected publish, lock-free subscribers. Messages stored in a
-circular arena (max capped at C<msg_size>, default 256 bytes). UTF-8
+arena (max capped at C<msg_size>, default 256 bytes). UTF-8
 flag preserved. Best for log lines, JSON, serialized payloads.
 
 =back
@@ -247,6 +260,12 @@ Lost messages are counted in C<overflow_count>.
     my $p = $ps->path;       # undef for anonymous/memfd
     my $s = $ps->stats;      # diagnostic hashref
 
+Call C<clear> only when publishers are quiescent. The C<int>/C<int32>/C<int16>
+publish path is lock-free, so C<clear> cannot exclude an in-flight publish;
+racing the two can leave a stale sequence in the freshly-zeroed ring, which a
+subscriber may see as duplicate re-delivery or a brief stall. (C<str> publish
+takes the ring mutex, so C<str> C<clear> is not exposed to this.)
+
 =head2 Keyword API
 
     use Data::PubSub::Shared::Int;
@@ -309,6 +328,17 @@ L<Data::Graph::Shared> - directed weighted graph
 L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
 
 L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
+=head1 SECURITY
+
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 AUTHOR
 

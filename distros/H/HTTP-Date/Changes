@@ -1,5 +1,11 @@
 Change history for HTTP-Date
 
+6.08      2026-07-09 02:04:21Z
+
+    - [SECURITY] Reject input longer than 64 characters in parse_date()
+      to prevent quadratic regex backtracking (a denial of service) on
+      hostile date strings. Fixes CVE-2026-14741. (Olaf Alders)
+
 6.07      2026-06-25 15:12:09Z
 
     - Add test with Time::Zone (GH#25) (Michal Josef Špaček)

@@ -325,18 +325,34 @@ static inline void si_recover_dead_readers(SiHandle *h) {
      * Only after the CAS resolves do we wipe the deferred dead slots,
      * keeping that work outside the race-sensitive window. */
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < SI_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = 0;   /* no slotless readers here: scanning slots is complete */
+            for (uint32_t i = 0; !live_now && i < SI_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && si_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < SI_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || si_pid_alive(pid)) continue;
-            si_drain_dead_slot(h, i, pid);
+        if (drain_ok) {
+            for (uint32_t i = 0; i < SI_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || si_pid_alive(p)) continue;
+                si_drain_dead_slot(h, i, p);
+            }
         }
     }
 }
@@ -409,11 +425,11 @@ static inline void si_rwlock_rdlock(SiHandle *h) {
          * already active (cur>=1), new readers may join freely. */
         if (cur > 0 && cur < SI_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < SI_RWLOCK_SPIN_LIMIT, 1)) {
@@ -423,7 +439,10 @@ static inline void si_rwlock_rdlock(SiHandle *h) {
         si_park_reader(h);
         cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         /* Sleep when write-locked OR when yielding to waiting writers */
-        if (cur >= SI_RWLOCK_WRITER_BIT || cur == 0) {
+        if (cur >= SI_RWLOCK_WRITER_BIT ||
+            (cur == 0 && __atomic_load_n(writers_waiting, __ATOMIC_RELAXED))) {
+            /* park on a free lock only to yield to a waiting writer; with no
+             * writer, re-loop and acquire -- else nobody would ever wake us. */
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
                               &si_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
@@ -600,7 +619,24 @@ static int si_validate_create_args(uint32_t max_strings, uint32_t *arena_bytes_i
     return 1;
 }
 
-static SiHandle *si_create(const char *path, uint32_t max_strings, uint32_t arena_bytes, char *errbuf) {
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int si_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { SI_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        SI_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    SI_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
+static SiHandle *si_create(const char *path, uint32_t max_strings, uint32_t arena_bytes, mode_t mode, char *errbuf) {
     uint32_t hash_slots;
     if (!si_validate_create_args(max_strings, &arena_bytes, &hash_slots, errbuf)) return NULL;
 
@@ -615,8 +651,8 @@ static SiHandle *si_create(const char *path, uint32_t max_strings, uint32_t aren
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { SI_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { SI_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = si_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { SI_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { SI_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -679,6 +715,15 @@ static SiHandle *si_open_fd(int fd, char *errbuf) {
 
 static void si_destroy(SiHandle *h) {
     if (!h) return;
+    /* Release our reader slot on clean teardown (else short-lived-reader churn
+     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+    if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
+        h->cached_fork_gen == __atomic_load_n(&si_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        uint32_t expected = h->cached_pid;
+        __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
+                &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->hdr) munmap(h->hdr, h->mmap_size);
     free(h->path);
@@ -714,16 +759,37 @@ static inline const char *si_arena_str(SiHandle *h, uint32_t off, uint32_t *len)
 /* slot for (s,n): if *found, an occupied matching slot; else the first empty
    slot for insertion. A probe always terminates (hash_slots > max_strings >= count). */
 static inline uint32_t si_idx_find(SiHandle *h, const char *s, size_t n, uint64_t hash, int *found) {
-    uint32_t mask = h->hdr->hash_slots - 1;
+    uint32_t hslots = h->hdr->hash_slots;
+    uint32_t mask = hslots - 1;
     uint32_t i = (uint32_t)(hash & mask);
     uint8_t want_fp = (uint8_t)(hash & 0xff);
+    uint32_t count = h->hdr->count;
+    uint32_t used  = h->hdr->arena_used;
+    uint32_t probes = 0;
     while (h->slots[i].state) {
         if (h->slots[i].fp == want_fp) {
-            uint32_t l;
-            const char *cand = si_arena_str(h, h->reverse[h->slots[i].id], &l);
-            if (l == n && memcmp(cand, s, n) == 0) { *found = 1; return i; }
+            /* slots[i].id, reverse[id] and the arena length prefix all come from
+             * the mmap'd file; a local peer can corrupt them. Bound each before
+             * dereferencing so a bad value skips this slot instead of trapping:
+             * id must be a live id (< count), and the record [off .. off+4+len]
+             * must lie within arena_used. For a valid table every check holds,
+             * so a real hit is never dropped. */
+            uint32_t id = h->slots[i].id;
+            if (id < count) {
+                uint32_t off = h->reverse[id];
+                if (off <= used && used - off >= sizeof(uint32_t)) {
+                    uint32_t l;
+                    const char *cand = si_arena_str(h, off, &l);
+                    if (l <= used - off - (uint32_t)sizeof(uint32_t)
+                        && l == n && memcmp(cand, s, n) == 0) { *found = 1; return i; }
+                }
+            }
         }
         i = (i + 1) & mask;
+        /* Cap the probe at the table size: a corrupted, fully-occupied slot
+         * table (every state=1) would otherwise loop forever on a miss. A valid
+         * table always has an empty slot (hash_slots > max_strings >= count). */
+        if (++probes >= hslots) break;
     }
     *found = 0;
     return i;
@@ -757,8 +823,19 @@ static int64_t si_intern_locked(SiHandle *h, const char *s, size_t n) {
     h->reverse[id] = off;
     h->slots[slot].id    = id;
     h->slots[slot].fp    = (uint8_t)(hash & 0xff);
-    h->slots[slot].state = 1;
+    /* Crash-consistent commit order: publish the arena bytes, reverse[id] and
+     * slot id/fp, THEN commit the id (count++), THEN -- last -- make the slot
+     * findable (state=1). A writer SIGKILL'd mid-commit then leaves at worst a
+     * committed-but-unfindable id (a re-intern makes a harmless duplicate) or
+     * a few leaked arena bytes. The old order (state=1 before count++) instead
+     * left a FINDABLE slot whose id `count` had not advanced past, so the next
+     * intern reused that id and collided (string(id) then returned the wrong
+     * bytes). The release fences keep the order visible to a process that takes
+     * the lock after dead-writer recovery. */
+    __atomic_thread_fence(__ATOMIC_RELEASE);
     hdr->count++;
+    __atomic_thread_fence(__ATOMIC_RELEASE);
+    h->slots[slot].state = 1;
     return id;
 }
 

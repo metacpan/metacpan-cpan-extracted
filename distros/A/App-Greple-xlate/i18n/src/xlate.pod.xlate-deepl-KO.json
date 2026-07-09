@@ -437,7 +437,7 @@
    ],
    [
       "The C<getoptlong.sh> library used for option parsing in the C<xlate> script and L<App::dozo>.\n",
-      "C<getoptlong.sh> - C<xlate> 스크립트 및 L<App::dozo>에서 옵션 구문 분석에 사용되는 <m id=5 /> 라이브러리.\n"
+      "C<getoptlong.sh> - C<xlate> 스크립트 및 L<App::dozo>에서 옵션 구문 분석에 사용되는 라이브러리.\n"
    ],
    [
       "The C<llm> command used by the B<gpt5> engine to access LLM models.\n",

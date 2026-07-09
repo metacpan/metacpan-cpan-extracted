@@ -11,23 +11,21 @@ use Text::ParseWords;
 
 # builtin libsodium (these comments are to be updated when bundled lib is updated):
 
-# the libsodium release from 1.0.21 will again be from the upstream stable
-# branch snapshot. to the best of my knowledge, this is from the upstream
-# commit:
-# https://github.com/jedisct1/libsodium/commit/aa1d5c8d66abc0d246cc85d0e275a7eedc480ef4
-# it is the stable release as of Jan 21 2026 03:00:00 +0000
-
-# a minisign signature is included with the bundled library tarball. this can
-# be verified with the `minisign` utility or `pminisign` from this cpan
-# distribution. you will need to already have libsodium, on which they both
-# depend.
-
-# $ pminisign -P RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3 -Vm libsodium-1.0.21-stable.tar.gz
-# Signature and comment signature verified
-# Trusted comment: timestamp:1768955633   file:libsodium-stable.tar.gz    hashed
-
-# sha256: bef95e3e4aecd123c6489048cf1b896cc8b35bc661556ca342b3dac61e8ae378  libsodium-1.0.21-stable.tar.gz
-# sha512: 71b0f0f3f2c4f2780871c0df122b9b74e26f05b6c583b62312a71d1620043dbf7137c148ada818a5b1f3d730eabe5092d8397bd960472319b415130069a23b14  libsodium-1.0.21-stable.tar.gz
+# gpg: Signature made Thu Apr  9 22:46:33 2026 UTC
+# gpg:                using RSA key 0C7983A8FD9A104C623172CB62F25B592B6F76DA
+# gpg: Good signature from "Frank Denis (Jedi/Sector One) <0daydigest@pureftpd.org>" [unknown]
+# gpg:                 aka "Frank Denis (Jedi/Sector One) <j@pureftpd.org>" [unknown]
+# gpg:                 aka "Frank Denis <github@pureftpd.org>" [unknown]
+# gpg:                 aka "Frank Denis <frank.denis@corp.ovh.com>" [unknown]
+# gpg: Signature notation: manu=2,2.5+1.12,2,3
+# Primary key fingerprint: 54A2 B889 2CC3 D6A5 97B9  2B6C 2106 27AA BA70 9FE1
+#      Subkey fingerprint: 0C79 83A8 FD9A 104C 6231  72CB 62F2 5B59 2B6F 76DA
+# if building from the source rather than a distribution, put in src/:
+# https://download.libsodium.org/libsodium/releases/libsodium-1.0.22.tar.gz
+# https://download.libsodium.org/libsodium/releases/libsodium-1.0.22.tar.gz.sig
+# check the signature, or at least:
+# sha256: adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349  libsodium-1.0.22.tar.gz
+# sha512: 8f392de781f09578d9a32000a4198e8d199ab910743017af3b3c5cae8053f745bcc885a9417fcaffb03b832400d829aef3a93c065bbb77b92598d882b6dcf187  libsodium-1.0.22.tar.gz
 
 # see main module INSTALLATION section for how to install with a different
 # release.
@@ -40,7 +38,7 @@ use Text::ParseWords;
 die "OS unsupported\n" if $^O eq 'MSWin32';
 
 my $src_dir = File::Spec->catdir(getcwd(), "src");
-my $libsodium_version = '1.0.21-stable';
+my $libsodium_version = '1.0.22';
 my $libsodium_major_minimum = '10';
 my $libsodium_minor_minimum = '3';
 my $bundled_src_path = File::Spec->catfile($src_dir, "libsodium-$libsodium_version.tar.gz");

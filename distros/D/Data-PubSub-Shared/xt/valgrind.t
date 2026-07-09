@@ -17,7 +17,6 @@ for my $t (sort @tests) {
     my $exit = $? >> 8;
     my $ok = ($exit != 42);
     ok $ok, "valgrind: $name" or do {
-        # extract valgrind summary
         my @lines = grep { /ERROR SUMMARY|definitely lost|Invalid/ } split /\n/, $out;
         diag join("\n", @lines);
     };

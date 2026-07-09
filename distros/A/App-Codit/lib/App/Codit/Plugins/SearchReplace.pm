@@ -9,7 +9,7 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.20';
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 use Tk;
@@ -60,6 +60,7 @@ sub new {
 
 	$self->{CASE} = \$casesensitive;
 	$self->{CURRENT} = undef;
+	$self->{FINDACTIVE} = 0;
 	$self->{LASTRESULTS} = [];
 	$self->{MODE} = \$searchmode;
 	$self->{OFFSET} = {};
@@ -271,7 +272,8 @@ sub Clear {
 	$self->{OFFSET} = {};
 	$self->repl(0);
 	$self->skipped(0);
-	$self->ShowResults;
+	$self->FindActive(0);
+#	$self->ShowResults;
 }
 
 sub Current {
@@ -318,6 +320,13 @@ sub Find {
 		$self->FindInResults;
 	}
 	$self->ShowResults(1);
+	$self->FindActive(1);
+}
+
+sub FindActive {
+	my $self = shift;
+	$self->{FINDACTIVE} = shift if @_;
+	return $self->{FINDACTIVE}
 }
 
 sub FindInDoc {
@@ -588,7 +597,8 @@ sub Report {
 	my $skp = $self->skipped;
 	my $text = "Made $rep replaces and skipped $skp";
 	$text = "Replacing finished. $text" if $flag;
-	$self->log($text)
+	$self->log($text);
+	$self->FindActive(0) if $flag;
 }
 
 sub Select {
@@ -627,6 +637,7 @@ sub SelectLast {
 
 sub ShowResults {
 	my ($self, $log) = @_;
+	return unless $self->FindActive;
 	$log = 0 unless defined $log;
 	my $mdi = $self->mdi;
 	my $name = $mdi->docSelected;

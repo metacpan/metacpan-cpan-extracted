@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 =encoding utf-8
 
@@ -16,7 +16,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 2.00
+Version 2.01
 
 =head1 DESCRIPTION
 
@@ -1115,6 +1115,8 @@ sub cache_update {
             $maskobj->reset;
         }
         _progress({label => "From"}, @preview);
+        # Populate cache with original text so callback can fetch it
+        @cache{@{$region->{texts}}} = @from;
         return @from;
     }
     my @result = eval {

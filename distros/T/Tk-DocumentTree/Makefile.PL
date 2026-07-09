@@ -8,9 +8,9 @@ WriteMakefile(
 	NAME => "Tk::$pm",
 	PREREQ_PM => {
 		'File::Spec' => 0,
-		'Test::Tk' => '3.01',
+		'Test::Tk' => '3.04',
 		'Tk' => '800.024',
-		'Tk::ListBrowser' => '0.11',
+		'Tk::ListBrowser' => '0.12',
 	},
 	ABSTRACT_FROM => "lib/Tk/$pm.pm",
 	VERSION_FROM => "lib/Tk/$pm.pm",

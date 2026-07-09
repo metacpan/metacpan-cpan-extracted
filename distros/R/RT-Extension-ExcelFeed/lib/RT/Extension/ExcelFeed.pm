@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ExcelFeed;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =head1 NAME
 
@@ -57,6 +57,20 @@ RT_SiteConfig.pm:
 
     Set( $HideChartDownloadButton, 1 );
 
+=item C<$ExcelFeedProgressiveRows>
+
+When generating an Excel file, ExcelFeed progressively pages through the search
+results C<$ExcelFeedProgressiveRows> rows at a time. This does not change the
+output, but can significantly reduce memory usage on large result sets.
+
+Set this to 0 to disable progressive generation and load the entire result set
+into memory at once:
+
+    Set( $ExcelFeedProgressiveRows, 0 );
+
+If this option is not defined, ExcelFeed falls back to RT's core
+C<$ProgressiveSearchResultRows>, and if that is also not defined, to 1000.
+
 =back
 
 =cut
@@ -69,11 +83,19 @@ if ( RT->Config->can('RegisterPluginConfig') ) {
                 Name => 'HideChartDownloadButton',
                 Help => 'https://metacpan.org/pod/RT::Extension::ExcelFeed#$HideChartDownloadButton',
             },
+            {
+                Name => 'ExcelFeedProgressiveRows',
+                Help => 'https://metacpan.org/pod/RT::Extension::ExcelFeed#$ExcelFeedProgressiveRows',
+            },
         ],
         Meta    => {
             HideChartDownloadButton => {
                 Type   => 'SCALAR',
                 Widget => '/Widgets/Form/Boolean',
+            },
+            ExcelFeedProgressiveRows => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Integer',
             },
         }
     );

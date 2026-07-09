@@ -3,7 +3,7 @@ package Chandra::Bridge;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 # XS methods are registered under the Chandra bootstrap.
 # Ensure the shared object is loaded.

@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use File::Which qw/which/;
 use File::Temp qw/tempfile/;
-use File::Slurper qw/write_text/;
+use File::Slurper qw/write_text write_binary/;
 
 use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::PKCS10 qw( :const );
@@ -52,7 +52,7 @@ isa_ok($req, "Crypt::OpenSSL::PKCS10");
 $req->set_subject("/C=CA/ST=New Brunswick/O=XML::Sig/OU=perl");
 $req->add_ext(Crypt::OpenSSL::PKCS10::NID_key_usage,"critical,digitalSignature,keyEncipherment");
 $req->add_ext(Crypt::OpenSSL::PKCS10::NID_ext_key_usage,"serverAuth, nsSGC, msSGC, 1.3.4");
-$req->add_ext(Crypt::OpenSSL::PKCS10::NID_subject_alt_name,"email:timlegge\@cpan.org");
+$req->add_ext(Crypt::OpenSSL::PKCS10::NID_subject_alt_name,"email:timlegge\@gmail.com");
 #$req->add_custom_ext('1.2.3.3',"My new extension");
 $req->add_ext_final();
 
@@ -74,7 +74,6 @@ isa_ok($signer, "Crypt::OpenSSL::SignCSR");
 
 my $cert = $signer->sign($request);
 
-my $certfile = tempfile();
 my ($certfh, $certfilename) = tempfile();
 
 write_text($certfilename, $cert);
@@ -90,5 +89,34 @@ unlink $certfilename;
 
 like($result, qr/Issuer:.*XML::Sig.*perl/, "Certificate - Issuer OK");
 like($result, qr/Signature Algorithm: sha512WithRSAEncryption/, "Certificate - Signature OK");
+
+# Repeat in DER format
+$signer = Crypt::OpenSSL::SignCSR->new(
+                                            $privkey,
+                                            {
+                                                format  => "der",
+                                                days    => 760,
+                                                digest  => "SHA512",
+                                            }
+                                        );
+
+isa_ok($signer, "Crypt::OpenSSL::SignCSR");
+
+$cert = $signer->sign($request);
+
+($certfh, $certfilename) = tempfile();
+
+write_binary($certfilename, $cert);
+
+$openssl = which('openssl');
+
+eval {
+    $result = `$openssl x509 -in $certfilename -inform DER -text`;
+};
+
+unlink $certfilename;
+
+like($result, qr/Issuer:.*XML::Sig.*perl/, "Certificate DER format - Issuer OK");
+like($result, qr/Signature Algorithm: sha512WithRSAEncryption/, "Certificate DER format - Signature OK");
 
 done_testing

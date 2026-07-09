@@ -9,7 +9,7 @@ App::Codit::Plugins::Snippets - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.20';
 
 use Carp;
 
@@ -99,7 +99,7 @@ sub new {
 		-height => 4,
 		-width => 20,
 	)->pack(@padding, -expand => 1, -fill => 'both');
-	$self->after(200, sub {
+	$self->after(3000, sub {
 		$text->configure('-font', $self->mdi->docWidget->cget('-font'))
 	});
 	$self->{TEXT} = $text;

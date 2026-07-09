@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a9ac686557104a331580804f646a9d26af127ca0a0bf4394208b6773e2acc219 Changes
+SHA256 8da6f92395392359eb1da692479b69804ad8be079641afc8a9687179fbd14c54 MANIFEST
+SHA256 e2afb46d2edc78ef6efa006abbc8bf25f030543211ba59ec36cbd217c6e5d46f META.yml
+SHA256 7ea214dd0b465e8f8cee85262978377c98908abed1a5c2b3c7eb20200c96009f Makefile.PL
+SHA256 ee4d38c326a4116bbfda092260cc95dd782a56f1baa732080c2dd963040be642 README
+SHA256 efcb3a7c220c7433b00ead3b70a894a1ed1acb5de4e60e349b1e8c91d4cbdaf3 html/Callbacks/RT-Extension-ExcelFeed/Dashboards/Subscription.html/MassageSubscriptionFields
+SHA256 5d73c3f75169a352253b017bac3e74a12b606194c0a7f616a58c3826a7a3c85b html/Callbacks/RT-Extension-ExcelFeed/Dashboards/Subscription.html/SubscriptionFields
+SHA256 d7c63e22290a55b49593ef15caebccf3892b9261efd88d10f8ed6c6738d3ddb8 html/Callbacks/RT-Extension-ExcelFeed/Dashboards/Subscription.html/SubscriptionFormEnd
+SHA256 68998f1b05bf38f002c7099c1e842f05f04c6e54a93910ec3ea3cedcdf799ac7 html/Callbacks/RT-Extension-ExcelFeed/Elements/Tabs/Privileged
+SHA256 f1d651a2ee27d7729222f97302862ed6ae31038e0056d9f9fc9bb1cbf5e23ce1 html/Callbacks/RT-Extension-ExcelFeed/Search/Elements/Chart/AfterChartTable
+SHA256 9395486429e78131b6d12a8b29fd51b634494d30032756f7f8456428e4fc69d5 html/Elements/XLSXExport
+SHA256 8583da70fdd1b84239b2d04ee0a1f4ec0ee5c2e210db695f65cd0f639b102cc7 html/Search/Chart.xlsx
+SHA256 f025708c7d2d1d29fc2e380fd15170add155b0a1b644808182916bbcc8d6f49d html/Search/Results.xlsx
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 aa71b16c882fd2d8af83ac3e9761ef314bb45627905359435ae986d3129b199a inc/Module/Install/Include.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 b6fc26cb9dc4f44a3177907e32f8055bf9acf5ef454d11770d3ed16cca9300da inc/Module/Install/RTx.pm
+SHA256 4de9bf212dc3aade42ae92be5b573572b4f3f1da9a5f9ff3288068dcd473e0c2 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 7c4ad7f9916feb5fa7e045af6ac6ecf8230942c18576c100509f978f6504a1db inc/YAML/Tiny.pm
+SHA256 2696dfcc3df33069399b98181a463ac46d07abb3703a158619f7c2d3d1873900 lib/RT/Dashboard/Mailer_Vendor.pm
+SHA256 99695205907bc69113dcb5747caa223437f5d83dde9d0424120716be30a2c597 lib/RT/Extension/ExcelFeed.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbn9h2azDQTpw4+gUmnkrNzXUEXIFAmpOsn8ACgkQmnkrNzXU
+EXJoug//bQEjJKiMcLY7Py7f17BWfm4K9joIGAkdYI9zFzk9r8t0z9ku7sJ10ACV
+nYmHVl1mt7nHymt3JK1HtpTqmVOitxjqPz9IFTx7oiJBjERsael0vi/7kK6gSZHJ
+DHxqDOLli3yRWs4QxDEUkOF7l5PRqivf6rMc+OWljhWGJYWCgcEFvhvPTN6PF6TL
+1FqsRdt7CSPmD5/IEsIBJ+ociBYr8DMWhMQkuH7orhN9ReQ38gJ57AY1wBmT/Q9B
+Nwz2T7o9e9ce+C66mGOBqjOtDyXJ05gd7BeruWzBhe+0JJ8IbtXJhNo4ScNHvGJP
+4Yr67L55HUx1QvMMf2luTA4vL0EmtWtxV63H2A23mKRFnuQTqULoh8tBbkG6hT28
+bmYyERqJ+jQTdPlwflon1m5ciSuBZyA1jGSfJQC6roTF9xRVzzk/UKn4sUEnlklk
+Sl9f1BAzIYroqe85k9p3Flox1ira9Tcer0eMobrwyMu7MHe5gqRqJa3IE00JpCw4
+q0gUIG531130FW1HTMllubPuGZ3YkJVVp7hhFd5avBdJ4bx6SNMnb3anvBDmCd0l
+L4VoBTrQcCevp+eSi62OuejCUR2GTQPL7QDmOZOm6bg5P4j3prsPdmM3O7zyC9QP
+0NmcOqFO2pIiecaJiblvGfTxjVopoccTYZZ5MVQyWpZhJZaS1U8=
+=0tyT
+-----END PGP SIGNATURE-----

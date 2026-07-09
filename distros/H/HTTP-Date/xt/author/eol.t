@@ -13,6 +13,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/date.t',
     't/numeric-date-order.t',
+    't/redos.t',
     't/unicode-digits.t'
 );
 

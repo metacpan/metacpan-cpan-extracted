@@ -75,7 +75,8 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0",
+            "Test::More" : "0.96",
+            "Time::HiRes" : "0",
             "warnings" : "0"
          }
       }
@@ -94,7 +95,7 @@
       "x_IRC" : "irc://irc.perl.org/#lwp",
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "6.07",
+   "version" : "6.08",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042002"
@@ -639,7 +640,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v6.07",
+                  "tag" : "v6.08",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -736,6 +737,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
             "version" : "6.037"
          },
          {

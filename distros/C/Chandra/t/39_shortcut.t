@@ -307,20 +307,18 @@ use_ok('Chandra::Shortcut');
     is($sc->js_code, '', 'js_code empty without bindings');
 }
 
-# --- inject sets _injected flag ---
+# --- inject evals JS ---
 {
     my @evaled;
     my $mock = _mock_app_eval(\@evaled);
     my $sc = Chandra::Shortcut->new(app => $mock);
     $sc->bind('ctrl+s', sub { });
 
-    ok(!$sc->{_injected}, 'not injected initially');
     $sc->inject;
-    ok($sc->{_injected}, 'injected after inject()');
     ok(scalar @evaled >= 1, 'eval called during inject');
 }
 
-# --- inject is idempotent ---
+# --- inject re-injects on every call (no idempotency guard) ---
 {
     my @evaled;
     my $mock = _mock_app_eval(\@evaled);
@@ -330,7 +328,7 @@ use_ok('Chandra::Shortcut');
     $sc->inject;
     my $count = scalar @evaled;
     $sc->inject;
-    is(scalar @evaled, $count, 'second inject does nothing');
+    is(scalar @evaled, $count * 2, 'second inject re-injects');
 }
 
 # --- chord bindings appear in js_code ---

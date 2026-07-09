@@ -7,7 +7,7 @@ use warnings;
 
 require Exporter;
 
-our $VERSION  = "0.14";
+our $VERSION = '0.16';
 
 our @ISA = qw(Exporter);
 
@@ -40,7 +40,7 @@ Crypt::OpenSSL::SignCSR - Sign a Certificate Signing Request in XS.
                                 {   # OPTIONAL
                                     days    => $days,   # Number of days for the certificate
                                     digest  => $digest, # Signature digest default (SHA256)
-                                    format  => $format, # Output format "text" or "pem" (default)
+                                    format  => $format, # Output format "text", "pem" (default) or "der"
                                 });
   my $cert   = $signer->sign(
                                 $request, # CSR in PEM format
@@ -93,13 +93,13 @@ Returns a string
 
 Set the format that should be used to output the the certificate.
 
-Supported formats are "text" and "pem" (default).
+Supported formats are "text", "pem" (default) and "der".
 
 Returns true (1) if successful and false (0) for a failure.
 
 Arguments:
 
- * $format - the specified output format ("pem", "text")
+ * $format - the specified output format ("pem", "text", "der")
 
 =head2 get_format()
 
@@ -134,7 +134,7 @@ Crypt::OpenSSL::PKCS10 allows you to generate a Certificate Signing Request (CSR
 
 =head1 AUTHOR
 
-Timothy Legge, E<lt>timlegge@cpan.orgE<gt>
+Timothy Legge, E<lt>timlegge@gmail.comE<gt>
 
 =head1 COPYRIGHT
 

@@ -658,6 +658,11 @@ use strict;
 				olson_description => "Atlantic - New Brunswick",
 				timezone_name => "America/Moncton",
 			},
+			"CST - AB, BC(E), NT(E), SK(W)" => {
+				location_coords => "+5333-11328",
+				olson_description => "CST - AB, BC(E), NT(E), SK(W)",
+				timezone_name => "America/Edmonton",
+			},
 			"CST - SK (midwest)" => {
 				location_coords => "+5017-10750",
 				olson_description => "CST - SK (midwest)",
@@ -727,11 +732,6 @@ use strict;
 				location_coords => "+6404-13925",
 				olson_description => "MST - Yukon (west)",
 				timezone_name => "America/Dawson",
-			},
-			"Mountain - AB, BC(E), NT(E), SK(W)" => {
-				location_coords => "+5333-11328",
-				olson_description => "Mountain - AB, BC(E), NT(E), SK(W)",
-				timezone_name => "America/Edmonton",
 			},
 			"Mountain - NT (west)" => {
 				location_coords => "+682059-1334300",

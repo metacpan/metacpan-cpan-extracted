@@ -7,6 +7,7 @@ use Data::Deque::Shared;
 
 my $dq = Data::Deque::Shared::Int->new(undef, 10);
 ok $dq, 'created';
+is $dq->capacity, 16, 'capacity rounds up to a power of 2 (10 -> 16)';
 is $dq->size, 0;
 ok $dq->is_empty;
 
@@ -54,7 +55,7 @@ is $dq->pop_back, 1;
 ok $dq->is_empty;
 
 # full
-ok $dq->push_back($_), "push $_" for 1..10;
+ok $dq->push_back($_), "push $_" for 1 .. $dq->capacity;
 ok $dq->is_full;
 ok !$dq->push_back(99), 'push_back fails when full';
 ok !$dq->push_front(99), 'push_front fails when full';
@@ -70,7 +71,7 @@ my $t0 = time;
 ok !defined $dq->pop_front_wait(0.1), 'pop_front_wait timeout';
 cmp_ok time - $t0, '<', 30, 'pop_front_wait returned (not hung)';
 
-$dq->push_back($_) for 1..10;
+$dq->push_back($_) for 1 .. $dq->capacity;
 $t0 = time;
 ok !$dq->push_back_wait(99, 0.1), 'push_back_wait timeout when full';
 cmp_ok time - $t0, '<', 30, 'push_back_wait returned (not hung)';
@@ -82,7 +83,7 @@ ok !defined $dq->pop_back_wait(0.1), 'pop_back_wait timeout';
 cmp_ok time - $t0, '<', 30, 'pop_back_wait returned (not hung)';
 
 # push_front_wait timeout
-$dq->push_back($_) for 1..10;
+$dq->push_back($_) for 1 .. $dq->capacity;
 $t0 = time;
 ok !$dq->push_front_wait(99, 0.1), 'push_front_wait timeout when full';
 cmp_ok time - $t0, '<', 30, 'push_front_wait returned (not hung)';
@@ -113,7 +114,7 @@ my $s = $dq->stats;
 ok ref $s eq 'HASH';
 ok $s->{pushes} > 0;
 ok $s->{pops} > 0;
-is $s->{capacity}, 10;
+is $s->{capacity}, 16;
 
 # --- file-backed persistence ---
 

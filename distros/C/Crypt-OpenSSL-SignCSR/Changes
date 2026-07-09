@@ -1,5 +1,31 @@
 Revision history for Crypt-OpenSSL-SignCSR.
 
+0.16 -- Wed Jul 08 07:42:38 ADT 2026
+
+    [Changes since 0.14]
+    - Fix a few minor bugs and memory leaks flagged by review
+    - Support "der" as an output
+    - Add Security Policy
+    - Replace maintainer email address
+
+    [Detailed Changes]
+    - Also see 0.15
+    - 5b7bd29 (HEAD -> main) Increment Version
+    - f9b2ee3 (tag: 0.15, origin/main, origin/HEAD) v0.15
+
+0.15 -- Wed Jul 08 00:05:04 ADT 2026
+
+    - 30542d6 Remove UploadToCPAN use SigStore
+    - 695f81b Add a stop word for der spelling
+    - 16bc964 Fix an issue in the version format
+    - 97c61ef Add a SECURITY Policy
+    - 9701412 Replace cpan.org email address
+    - 87b92c1 Update version for a release
+    - 6e6126e Update packaging settings
+    - 48fe1bf Add support for DER file output for the certificate file
+    - 2cb844c Fix a few minor bugs and memory leaks flagged by review
+    - f9ca6de (tag: 0.14) v0.14
+
 0.14 -- Wed Jul 26 21:53:12 ADT 2023
 
     - 46298e7 Support openbsd's LibreSSL

@@ -12,10 +12,6 @@ my $curve25519 = Crypt::Sodium::XS->curve25519(primitive => 'ed25519');
 
 for my $alg ($curve25519->primitives) {
 
-  if ($alg eq 'ristretto255' and !$scalarmult->ristretto255_available) {
-    # should be impossible to have the primitive here and no support there
-    ok($scalarmult->ristretto255_available, "scalarmult ristretto255 available");
-  }
   $curve25519->primitive($alg);
   $scalarmult->primitive($alg);
 

@@ -64,7 +64,7 @@ BEGIN
 
 {
     no warnings 'once';
-    $DateTime::Lite::IsPurePerl = 1;
+    $DateTime::Lite::IsPurePerl //= 1;
 }
 
 my @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
@@ -431,10 +431,17 @@ my @subs = qw(
 foreach my $sub ( @subs )
 {
     no strict 'refs';
-    # Only install the PP fallback if the XS version has not already
-    # populated the glob (i.e. we are running in pure-Perl mode).
-    *{ 'DateTime::Lite::' . $sub } = __PACKAGE__->can( $sub )
-        unless( defined( &{ 'DateTime::Lite::' . $sub } ) );
+    my $target = 'DateTime::Lite::' . $sub;
+    # Install the PP fallback if either:
+    # - We are running in pure-Perl mode ($IsPurePerl = 1). This guarantees the
+    #   fallback is in place even if XS loading partially populated the DateTime::Lite::
+    #   namespace with empty XSUB stubs before failing (observed on MSWin32 with
+    #   Strawberry Perl 5.14 to 5.20).
+    # - The XS version has not populated the glob (normal path).
+    if( $DateTime::Lite::IsPurePerl || !defined( &{ $target } ) )
+    {
+        *{ $target } = __PACKAGE__->can( $sub );
+    }
 }
 
 1;

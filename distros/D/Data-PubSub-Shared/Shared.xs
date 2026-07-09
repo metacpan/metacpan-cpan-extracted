@@ -111,15 +111,16 @@ BOOT:
     REGISTER_PS_KW(str, lag,     "Data::PubSub::Shared::Str::Sub::lag");
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[PUBSUB_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT, 0, errbuf);
+    mode_t fmode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT, 0, fmode, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -539,6 +540,13 @@ poll_cb(self, cb)
     int64_t value;
   CODE:
     RETVAL = 0;
+    /* Keep the backing handle alive across the callback: a callback that
+     * drops self's last reference would free `sub` mid-loop (UAF).  Guard
+     * the referent (the blessed handle), not the RV container -- assigning
+     * undef to self overwrites the container and frees the referent. */
+    SV *psx_guard = SvRV(self);
+    SvREFCNT_inc_simple_void_NN(psx_guard);
+    SAVEFREESV(psx_guard);
     while (pubsub_int_poll(sub, &value)) {
         dSP;
         ENTER; SAVETMPS;
@@ -596,8 +604,9 @@ new(class, path, capacity, ...)
     uint32_t msg_size;
   CODE:
     msg_size = (items > 3) ? (uint32_t)SvUV(ST(3)) : 0;
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_STR, msg_size, errbuf);
+    mode_t fmode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_STR, msg_size, fmode, errbuf);
     if (!h) croak("Data::PubSub::Shared::Str->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -660,12 +669,9 @@ publish(self, value)
     EXTRACT_HANDLE("Data::PubSub::Shared::Str", self);
   CODE:
     STRLEN len;
+    SvGETMAGIC(value);   /* run get-magic/overload before reading the UTF8 flag */
     bool utf8 = SvUTF8(value) ? true : false;
-    const char *str;
-    if (utf8)
-        str = SvPVutf8(value, len);
-    else
-        str = SvPV(value, len);
+    const char *str = SvPV_nomg(value, len);
     int r = pubsub_str_publish(h, str, (uint32_t)len, utf8);
     if (r == -1) croak("publish: message too long (%u > %u)", (unsigned)len, h->msg_size);
     RETVAL = &PL_sv_yes;
@@ -691,9 +697,9 @@ publish_multi(self, ...)
         SAVEFREEPV(args);
         for (uint32_t i = 0; i < count; i++) {
             SV *val = ST(i + 1);
+            SvGETMAGIC(val);
             args[i].utf8 = SvUTF8(val) ? true : false;
-            args[i].str = args[i].utf8 ? SvPVutf8(val, args[i].len)
-                                       : SvPV(val, args[i].len);
+            args[i].str = SvPV_nomg(val, args[i].len);
         }
         pubsub_mutex_lock(h->hdr);
         for (uint32_t i = 0; i < count; i++) {
@@ -718,12 +724,9 @@ publish_notify(self, value)
     EXTRACT_HANDLE("Data::PubSub::Shared::Str", self);
   CODE:
     STRLEN len;
+    SvGETMAGIC(value);   /* run get-magic/overload before reading the UTF8 flag */
     bool utf8 = SvUTF8(value) ? true : false;
-    const char *str;
-    if (utf8)
-        str = SvPVutf8(value, len);
-    else
-        str = SvPV(value, len);
+    const char *str = SvPV_nomg(value, len);
     int r = pubsub_str_publish(h, str, (uint32_t)len, utf8);
     if (r == -1) croak("publish_notify: message too long (%u > %u)", (unsigned)len, h->msg_size);
     pubsub_notify(h);
@@ -1095,6 +1098,13 @@ poll_cb(self, cb)
     bool utf8;
   CODE:
     RETVAL = 0;
+    /* Keep the backing handle alive across the callback: a callback that
+     * drops self's last reference would free `sub` mid-loop (UAF).  Guard
+     * the referent (the blessed handle), not the RV container -- assigning
+     * undef to self overwrites the container and frees the referent. */
+    SV *psx_guard = SvRV(self);
+    SvREFCNT_inc_simple_void_NN(psx_guard);
+    SAVEFREESV(psx_guard);
     while (pubsub_str_poll(sub, &str, &len, &utf8) == 1) {
         dSP;
         ENTER; SAVETMPS;
@@ -1150,15 +1160,16 @@ fileno(self)
 MODULE = Data::PubSub::Shared  PACKAGE = Data::PubSub::Shared::Int32
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[PUBSUB_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT32, 0, errbuf);
+    mode_t fmode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT32, 0, fmode, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int32->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -1578,6 +1589,13 @@ poll_cb(self, cb)
     int32_t value;
   CODE:
     RETVAL = 0;
+    /* Keep the backing handle alive across the callback: a callback that
+     * drops self's last reference would free `sub` mid-loop (UAF).  Guard
+     * the referent (the blessed handle), not the RV container -- assigning
+     * undef to self overwrites the container and frees the referent. */
+    SV *psx_guard = SvRV(self);
+    SvREFCNT_inc_simple_void_NN(psx_guard);
+    SAVEFREESV(psx_guard);
     while (pubsub_int32_poll(sub, &value)) {
         dSP;
         ENTER; SAVETMPS;
@@ -1626,15 +1644,16 @@ fileno(self)
 MODULE = Data::PubSub::Shared  PACKAGE = Data::PubSub::Shared::Int16
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[PUBSUB_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT16, 0, errbuf);
+    mode_t fmode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT16, 0, fmode, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int16->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -2054,6 +2073,13 @@ poll_cb(self, cb)
     int16_t value;
   CODE:
     RETVAL = 0;
+    /* Keep the backing handle alive across the callback: a callback that
+     * drops self's last reference would free `sub` mid-loop (UAF).  Guard
+     * the referent (the blessed handle), not the RV container -- assigning
+     * undef to self overwrites the container and frees the referent. */
+    SV *psx_guard = SvRV(self);
+    SvREFCNT_inc_simple_void_NN(psx_guard);
+    SAVEFREESV(psx_guard);
     while (pubsub_int16_poll(sub, &value)) {
         dSP;
         ENTER; SAVETMPS;

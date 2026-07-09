@@ -11,13 +11,16 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Redis storage for WWW::Session",
-  "AUTHOR" => "Jeffrey Goff <jeffrey.goff\@evozon.com>",
+  "AUTHOR" => [
+    "Jeffrey Goff <jeffrey.goff\@evozon.com>",
+    "Horea Gligan <horea.gligan\@devnest.ro>"
+  ],
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "WWW-Session-Storage-Redis",
   "EXE_FILES" => [],
-  "LICENSE" => "perl",
+  "LICENSE" => "gpl_3",
   "NAME" => "WWW::Session::Storage::Redis",
   "PREREQ_PM" => {
     "Cache::Redis" => 0,
@@ -30,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

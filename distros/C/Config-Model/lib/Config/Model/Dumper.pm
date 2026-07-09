@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Dumper 2.164;
+package Config::Model::Dumper 2.165;
 
 use Carp;
 use strict;
@@ -25,11 +25,11 @@ sub new {
 }
 
 sub quote (@args) {
-    return _quote( qr/[\s~"#*]/, @args ); # "
+    return _quote( qr/[\s~'"#*]/, @args ); # "
 }
 
 sub id_quote (@args) {
-    return _quote( qr/[\s~"@*<>.=#]/, @args ); # " ))
+    return _quote( qr/[\s~'"@*<>.=#]/, @args ); # " ))
 }
 
 sub _quote ($re, @res) {
@@ -258,7 +258,7 @@ Config::Model::Dumper - Serialize data of config tree
 
 =head1 VERSION
 
-version 2.164
+version 2.165
 
 =head1 SYNOPSIS
 

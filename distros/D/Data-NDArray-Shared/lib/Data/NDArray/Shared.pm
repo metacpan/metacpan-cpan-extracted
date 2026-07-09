@@ -2,9 +2,11 @@ package Data::NDArray::Shared;
 use strict;
 use warnings;
 use Carp ();
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::NDArray::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 
 *numel = \&size;
 *flat  = \&to_list;
@@ -204,9 +206,9 @@ float dtypes accumulate reductions in C<double>.
 
 A write-preferring futex rwlock with dead-process recovery guards every
 mutation, so writes from many processes serialize cleanly. The immutable header
-fields (C<dtype>, C<ndim>, C<size>, C<itemsize>, C<shape>, C<strides>) are read
-without locking (C<reshape> updates C<shape>/C<strides>/C<ndim> under the write
-lock). B<Linux-only>. Requires 64-bit Perl.
+fields C<dtype>, C<size>, and C<itemsize> are immutable; C<ndim>, C<shape>, and
+C<strides> can change under C<reshape> (which holds the write lock), so element
+access reads them under the read lock. B<Linux-only>. Requires 64-bit Perl.
 
 =head1 METHODS
 
@@ -245,8 +247,9 @@ another process.
 
 C<get>/C<set> take exactly C<ndim> indices; each index must be in
 C<< 0 .. shape[d]-1 >>. The flat index for C<get_flat>/C<set_flat> must be in
-C<< 0 .. size-1 >>. A wrong index count or an out-of-range index croaks
-B<before> any lock is taken (so a caught croak never leaks a lock). C<get> and
+C<< 0 .. size-1 >>. A wrong index count or an out-of-range index is rejected
+under the read lock, which is released before the croak, so a caught croak
+never leaks a lock. C<get> and
 C<get_flat> return the B<dtype-correct> scalar (a floating-point number for
 float dtypes, a signed integer for the signed-int dtypes, an unsigned integer
 for the unsigned-int dtypes). C<set>/C<set_flat> store the value in the element
@@ -459,8 +462,14 @@ they interleave.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it. Do not share backing
-files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> via a C<< mode => 0660 >> option to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 

@@ -63,10 +63,10 @@ DESCRIPTION
 
     *   Keyword API via XS::Parse::Keyword for maximum speed
 
-    *   Opt-in LRU eviction — clock/second-chance algorithm; reads stay
+    *   Opt-in LRU eviction -- clock/second-chance algorithm; reads stay
         lock-free
 
-    *   Opt-in per-key TTL expiry — lazy removal on access; monotonic clock
+    *   Opt-in per-key TTL expiry -- lazy removal on access; monotonic clock
 
     *   Stale lock recovery for both writers and readers (dead PIDs detected
         and drained automatically)
@@ -101,6 +101,8 @@ DESCRIPTION
         my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl);
         my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl, $lru_skip);
         my $map = Data::HashMap::Shared::SS->new($path, $max_entries, 0, 0, 0, $arena_cap); # explicit arena bytes
+        my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl, $lru_skip, $arena_cap, $file_mode);
+        my $map = Data::HashMap::Shared::II->new_sharded($prefix, $shards, $max_entries, $max_size, $ttl, $lru_skip, $arena_cap, $file_mode);
         my $map = Data::HashMap::Shared::II->new_memfd($name, $max_entries, ...); # memfd-backed
         my $map = Data::HashMap::Shared::II->new_from_fd($fd);            # reopen memfd
         my $fd  = $map->memfd;                                            # -1 if not memfd
@@ -114,11 +116,12 @@ DESCRIPTION
     duped+open). "new_from_fd" reopens such a descriptor. Both require a
     64-bit Perl on Linux (memfd_create(2)).
 
-    $max_entries, $max_size, $ttl, $lru_skip, and $arena_cap are used only
-    when creating a new file; when opening an existing one, all parameters
-    are read from the stored header and the constructor arguments are
-    ignored. Multiple processes can open the same file simultaneously. Dies
-    if the file exists but was created by a different variant or is corrupt.
+    $max_entries, $max_size, $ttl, $lru_skip, $arena_cap, and $file_mode are
+    used only when creating a new file; when opening an existing one, all
+    parameters are read from the stored header and the constructor arguments
+    are ignored. Multiple processes can open the same file simultaneously.
+    Dies if the file exists but was created by a different variant or is
+    corrupt.
 
     Optional $max_size enables LRU eviction: when the map reaches $max_size
     entries, the least-recently-used entry is evicted on insert. Set to 0
@@ -137,7 +140,7 @@ DESCRIPTION
     reorders the recency list: higher values skip more promotions. Promotion
     runs only when an operation updates an existing entry under the write
     lock ("put"/"incr"/"get_or_set" on a hit, the update family); plain
-    "get" and "get_with_ttl" never promote — they set a lock-free accessed
+    "get" and "get_with_ttl" never promote -- they set a lock-free accessed
     bit that the clock eviction consumes. Skipping promotions cuts
     write-lock churn for Zipfian (power-law) patterns where a few hot keys
     dominate. The LRU tail (eviction victim) is never skipped, preserving
@@ -145,12 +148,19 @@ DESCRIPTION
 
     Optional $arena_cap (bytes) sizes the string-storage arena explicitly,
     decoupling it from $max_entries. By default the arena holds roughly 128
-    bytes per entry (4096 minimum), so a map with a few large strings — keys
-    or values — can exhaust it while the table is nearly empty; pass an
-    $arena_cap sized for your strings instead. Clamped to "[4096,
+    bytes per entry (4096 minimum), so a map with a few large strings --
+    keys or values -- can exhaust it while the table is nearly empty; pass
+    an $arena_cap sized for your strings instead. Clamped to "[4096,
     0xFFFFFFFF]" (arena offsets are 32-bit). Integer-only variants
     ("II"/"I16"/"I32") have no arena and ignore it. For sharded maps it is
     the per-shard cap, like $max_entries.
+
+    Optional $file_mode (octal, default 0600) sets the permission bits used
+    when the backing file is created, with open(2) semantics (masked by the
+    process umask). It is ignored when attaching an existing file and for
+    anonymous or memfd-backed maps. The default is owner-only; pass a wider
+    mode such as 0666 to opt in to cross-user sharing. Before version 0.14
+    the default was 0666.
 
     Zero-cost when disabled: with both "$max_size=0" and "$ttl=0", the fast
     lock-free read path is used. The only overhead is a branch (predicted
@@ -174,7 +184,7 @@ DESCRIPTION
 
     String-value variants ("SS", "IS", "I16S", "I32S") store the SV UTF-8
     flag alongside each value and round-trip it on retrieval. The "cas"
-    comparison of $expected against the stored value is byte-only — the
+    comparison of $expected against the stored value is byte-only -- the
     UTF-8 flag on $expected is ignored (same rationale as string-key
     equality).
 
@@ -245,7 +255,7 @@ DESCRIPTION
 
     "get_or_set" returns the existing value, or stores and returns $default
     when the key is absent. It returns "undef" only if the key is absent and
-    the value cannot be stored — the map is at "max_entries", or
+    the value cannot be stored -- the map is at "max_entries", or
     (string-value variants) the arena is full.
 
     "cas" is available for all variants. Returns true when the stored value
@@ -256,8 +266,8 @@ DESCRIPTION
 
     "swap" returns the previous value, or "undef" when the key did not exist
     (a fresh insert). "undef" is also returned when the new value cannot be
-    stored — the map is already at "max_entries" capacity, or (string-value
-    variants) the arena is full — in which case an existing key keeps its
+    stored -- the map is already at "max_entries" capacity, or (string-value
+    variants) the arena is full -- in which case an existing key keeps its
     old value. "swap" by itself therefore cannot distinguish a fresh insert
     from a full-map failure; check "exists" or "size" first if that matters.
     On TTL maps, "swap" refreshes an existing entry's TTL to the default and
@@ -358,7 +368,7 @@ DESCRIPTION
     shard, for sharded maps) and dies on error. Use it to force durability
     of a file-backed map; it is a no-op for anonymous mappings, which have
     no backing file. Changes are visible to other processes sharing the
-    mapping without "sync" — it only affects on-disk persistence.
+    mapping without "sync" -- it only affects on-disk persistence.
 
   Crash Safety
     If a process dies (e.g., SIGKILL, OOM kill) while holding the write
@@ -372,7 +382,7 @@ DESCRIPTION
     per process, claimed lazily on first lock; fork()'d children claim a
     fresh slot via "pthread_atfork"). On a writer-lock timeout the recovery
     scan CAS-claims each dead PID's slot, drains the waiter counts, and
-    force-resets the reader counter once no live reader holds it — so a
+    force-resets the reader counter once no live reader holds it -- so a
     worker killed mid-"incr_by" no longer pins the rwlock indefinitely. If a
     live reader is concurrently present, the dead slot is left intact for
     the next recovery cycle (preserves the only record of the stuck
@@ -387,7 +397,7 @@ DESCRIPTION
     reused PID from the original. Hitting a false "alive" requires a process
     to die in the brief window it holds a read lock and the kernel to cycle
     through the entire PID space back to that exact number within the
-    ~2-second recovery window and hand it to a long-lived process — i.e. a
+    ~2-second recovery window and hand it to a long-lived process -- i.e. a
     runaway fork storm. Even then the effect is bounded: writers stall until
     the recycled process exits; reads are unaffected and no data is
     corrupted. Writer-crash recovery is immune (the writer PID lives in the
@@ -459,7 +469,8 @@ BENCHMARKS
     *   4.5x faster cross-process reads than LMDB; 3.4x faster writes than
         SharedMem
 
-    *   LRU reads are lock-free (clock eviction) — no overhead vs plain maps
+    *   LRU reads are lock-free (clock eviction) -- no overhead vs plain
+        maps
 
     *   Atomic "incr" is 9x faster than get+put on competitors
 
@@ -491,6 +502,17 @@ SEE ALSO
     Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
 
     Data::RingBuffer::Shared - fixed-size overwriting ring buffer
+
+SECURITY
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 AUTHOR
     vividsnow

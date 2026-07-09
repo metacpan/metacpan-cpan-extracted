@@ -1,10 +1,35 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
+
+# ithreads: blessed shared-memory handles must never be cloned into a
+# child thread -- the clone would double-free the handle on thread exit.
+{ no strict 'refs'; *{"${_}::CLONE_SKIP"} = sub { 1 } for qw(
+  Data::HashMap::Shared::I16
+  Data::HashMap::Shared::I16::Cursor
+  Data::HashMap::Shared::I16S
+  Data::HashMap::Shared::I16S::Cursor
+  Data::HashMap::Shared::I32
+  Data::HashMap::Shared::I32::Cursor
+  Data::HashMap::Shared::I32S
+  Data::HashMap::Shared::I32S::Cursor
+  Data::HashMap::Shared::II
+  Data::HashMap::Shared::II::Cursor
+  Data::HashMap::Shared::IS
+  Data::HashMap::Shared::IS::Cursor
+  Data::HashMap::Shared::SI
+  Data::HashMap::Shared::SI::Cursor
+  Data::HashMap::Shared::SI16
+  Data::HashMap::Shared::SI16::Cursor
+  Data::HashMap::Shared::SI32
+  Data::HashMap::Shared::SI32::Cursor
+  Data::HashMap::Shared::SS
+  Data::HashMap::Shared::SS::Cursor
+); }
 
 1;
 
@@ -82,9 +107,9 @@ B<Linux-only>. Requires 64-bit Perl.
 
 =item * Keyword API via XS::Parse::Keyword for maximum speed
 
-=item * Opt-in B<LRU eviction> — clock/second-chance algorithm; reads stay lock-free
+=item * Opt-in B<LRU eviction> -- clock/second-chance algorithm; reads stay lock-free
 
-=item * Opt-in B<per-key TTL> expiry — lazy removal on access; monotonic clock
+=item * Opt-in B<per-key TTL> expiry -- lazy removal on access; monotonic clock
 
 =item * Stale lock recovery for both writers and readers (dead PIDs detected and drained automatically)
 
@@ -136,6 +161,8 @@ C<get(4464)> address the same entry. C<incr>/C<decr> wrap the same way
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl);
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl, $lru_skip);
     my $map = Data::HashMap::Shared::SS->new($path, $max_entries, 0, 0, 0, $arena_cap); # explicit arena bytes
+    my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl, $lru_skip, $arena_cap, $file_mode);
+    my $map = Data::HashMap::Shared::II->new_sharded($prefix, $shards, $max_entries, $max_size, $ttl, $lru_skip, $arena_cap, $file_mode);
     my $map = Data::HashMap::Shared::II->new_memfd($name, $max_entries, ...); # memfd-backed
     my $map = Data::HashMap::Shared::II->new_from_fd($fd);            # reopen memfd
     my $fd  = $map->memfd;                                            # -1 if not memfd
@@ -149,10 +176,10 @@ can be passed to another process (via C<SCM_RIGHTS>, C<fork>+C<exec>, or
 duped+open). C<new_from_fd> reopens such a descriptor. Both require a
 64-bit Perl on Linux (C<memfd_create(2)>).
 
-C<$max_entries>, C<$max_size>, C<$ttl>, C<$lru_skip>, and C<$arena_cap> are
-used only when creating a new file; when opening an existing one, all
-parameters are read from the stored header and the constructor arguments are
-ignored.
+C<$max_entries>, C<$max_size>, C<$ttl>, C<$lru_skip>, C<$arena_cap>, and
+C<$file_mode> are used only when creating a new file; when opening an
+existing one, all parameters are read from the stored header and the
+constructor arguments are ignored.
 Multiple processes can open the same file simultaneously.
 Dies if the file exists but was created by a different variant or is corrupt.
 
@@ -172,7 +199,7 @@ Optional C<$lru_skip> (0-99, default 0) reduces how often LRU promotion
 reorders the recency list: higher values skip more promotions. Promotion runs
 only when an operation updates an existing entry under the write lock
 (C<put>/C<incr>/C<get_or_set> on a hit, the update family); plain C<get> and
-C<get_with_ttl> never promote — they set a lock-free accessed bit that the clock
+C<get_with_ttl> never promote -- they set a lock-free accessed bit that the clock
 eviction consumes. Skipping promotions cuts write-lock churn for Zipfian
 (power-law) patterns where a few hot keys dominate. The LRU tail (eviction
 victim) is never skipped, preserving eviction correctness. Set to 0 for strict
@@ -180,11 +207,18 @@ LRU ordering.
 
 Optional C<$arena_cap> (bytes) sizes the string-storage arena explicitly,
 decoupling it from C<$max_entries>. By default the arena holds roughly 128
-bytes per entry (4096 minimum), so a map with a few large strings — keys or
-values — can exhaust it while the table is nearly empty; pass an C<$arena_cap>
+bytes per entry (4096 minimum), so a map with a few large strings -- keys or
+values -- can exhaust it while the table is nearly empty; pass an C<$arena_cap>
 sized for your strings instead. Clamped to C<[4096, 0xFFFFFFFF]> (arena offsets are
 32-bit). Integer-only variants (C<II>/C<I16>/C<I32>) have no arena and ignore
 it. For sharded maps it is the per-shard cap, like C<$max_entries>.
+
+Optional C<$file_mode> (octal, default C<0600>) sets the permission bits
+used when the backing file is created, with C<open(2)> semantics (masked
+by the process umask). It is ignored when attaching an existing file and
+for anonymous or memfd-backed maps. The default is owner-only; pass a
+wider mode such as C<0666> to opt in to cross-user sharing. Before
+version 0.14 the default was C<0666>.
 
 B<Zero-cost when disabled>: with both C<$max_size=0> and C<$ttl=0>, the fast
 lock-free read path is used. The only overhead is a branch (predicted away).
@@ -216,7 +250,7 @@ C<Encode::encode_utf8> before use.
 
 String-value variants (C<SS>, C<IS>, C<I16S>, C<I32S>) store the SV UTF-8
 flag alongside each value and round-trip it on retrieval. The C<cas>
-comparison of C<$expected> against the stored value is byte-only — the
+comparison of C<$expected> against the stored value is byte-only -- the
 UTF-8 flag on C<$expected> is ignored (same rationale as string-key
 equality).
 
@@ -288,7 +322,7 @@ C<i32s>, C<is>, C<si16>, C<si32>, C<si>, C<ss>.
 
 C<get_or_set> returns the existing value, or stores and returns C<$default>
 when the key is absent. It returns C<undef> only if the key is absent and the
-value cannot be stored — the map is at C<max_entries>, or (string-value
+value cannot be stored -- the map is at C<max_entries>, or (string-value
 variants) the arena is full.
 
 C<cas> is available for all variants. Returns true when the stored value
@@ -299,8 +333,8 @@ the byte-only comparison rule.
 
 C<swap> returns the previous value, or C<undef> when the key did not exist
 (a fresh insert). C<undef> is B<also> returned when the new value cannot be
-stored — the map is already at C<max_entries> capacity, or (string-value
-variants) the arena is full — in which case an existing key keeps its old
+stored -- the map is already at C<max_entries> capacity, or (string-value
+variants) the arena is full -- in which case an existing key keeps its old
 value. C<swap> by itself therefore cannot distinguish a fresh insert from a
 full-map failure; check C<exists> or C<size> first if that matters. On TTL
 maps, C<swap> refreshes an existing entry's TTL to the default and assigns the
@@ -398,7 +432,7 @@ C<sync> issues a synchronous C<msync(2)> over the whole mapping (every
 shard, for sharded maps) and dies on error. Use it to force durability of
 a file-backed map; it is a no-op for anonymous mappings, which have no
 backing file. Changes are visible to other processes sharing the mapping
-without C<sync> — it only affects on-disk persistence.
+without C<sync> -- it only affects on-disk persistence.
 
 =head2 Crash Safety
 
@@ -412,7 +446,7 @@ Reader-side recovery uses a 1024-slot table in the shared mmap (one slot
 per process, claimed lazily on first lock; fork()'d children claim a
 fresh slot via C<pthread_atfork>).  On a writer-lock timeout the recovery
 scan CAS-claims each dead PID's slot, drains the waiter counts, and
-force-resets the reader counter once no live reader holds it — so a
+force-resets the reader counter once no live reader holds it -- so a
 worker killed mid-C<incr_by> no longer pins the rwlock indefinitely.
 If a live reader is concurrently present, the dead slot is left intact
 for the next recovery cycle (preserves the only record of the stuck
@@ -427,7 +461,7 @@ Recovery uses C<kill($pid, 0)> for liveness, which cannot distinguish a
 reused PID from the original. Hitting a false "alive" requires a process to
 die in the brief window it holds a read lock B<and> the kernel to cycle
 through the entire PID space back to that exact number within the ~2-second
-recovery window B<and> hand it to a long-lived process — i.e. a runaway fork
+recovery window B<and> hand it to a long-lived process -- i.e. a runaway fork
 storm. Even then the effect is bounded: writers stall until the recycled
 process exits; reads are unaffected and no data is corrupted. Writer-crash
 recovery is immune (the writer PID lives in the lock word and is reclaimed
@@ -498,7 +532,7 @@ Key takeaways:
 
 =item * B<4.5x> faster cross-process reads than LMDB; B<3.4x> faster writes than SharedMem
 
-=item * LRU reads are lock-free (clock eviction) — no overhead vs plain maps
+=item * LRU reads are lock-free (clock eviction) -- no overhead vs plain maps
 
 =item * Atomic C<incr> is B<9x> faster than get+put on competitors
 
@@ -533,6 +567,17 @@ L<Data::Graph::Shared> - directed weighted graph
 L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
 
 L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
+=head1 SECURITY
+
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 AUTHOR
 

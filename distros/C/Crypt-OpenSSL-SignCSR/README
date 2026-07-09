@@ -9,7 +9,7 @@ SYNOPSIS
                                     {   # OPTIONAL
                                         days    => $days,   # Number of days for the certificate
                                         digest  => $digest, # Signature digest default (SHA256)
-                                        format  => $format, # Output format "text" or "pem" (default)
+                                        format  => $format, # Output format "text", "pem" (default) or "der"
                                     });
       my $cert   = $signer->sign(
                                     $request, # CSR in PEM format
@@ -56,13 +56,13 @@ METHODS
   set_format($format)
     Set the format that should be used to output the the certificate.
 
-    Supported formats are "text" and "pem" (default).
+    Supported formats are "text", "pem" (default) and "der".
 
     Returns true (1) if successful and false (0) for a failure.
 
     Arguments:
 
-     * $format - the specified output format ("pem", "text")
+     * $format - the specified output format ("pem", "text", "der")
 
   get_format()
     Get the output format that is currently set.
@@ -92,7 +92,7 @@ SEE ALSO
     Request (CSR)
 
 AUTHOR
-    Timothy Legge, <timlegge@cpan.org>
+    Timothy Legge, <timlegge@gmail.com>
 
 COPYRIGHT
     Copyright (C) 2023 by Timothy Legge Copyright 1995-2022 The OpenSSL

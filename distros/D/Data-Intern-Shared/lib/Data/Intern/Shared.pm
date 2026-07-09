@@ -1,9 +1,11 @@
 package Data::Intern::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::Intern::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 1;
 __END__
 
@@ -59,7 +61,7 @@ per-string removal (see L</LIMITS>). B<Linux-only>. Requires 64-bit Perl.
 
 =head2 Constructors
 
-    my $in = Data::Intern::Shared->new($path, $max_strings, $arena_bytes);
+    my $in = Data::Intern::Shared->new($path, $max_strings, $arena_bytes, $mode);
     my $in = Data::Intern::Shared->new(undef, $max_strings);          # anonymous
     my $in = Data::Intern::Shared->new_memfd($name, $max_strings, $arena_bytes);
     my $in = Data::Intern::Shared->new_from_fd($fd);
@@ -68,6 +70,10 @@ C<$path> is the backing file (C<undef> for an anonymous mapping); C<$max_strings
 is the id/string capacity; C<$arena_bytes> is the total string-bytes capacity and
 is optional (defaults to C<$max_strings * 32>, capped at 4 GB). When reopening an
 existing file or memfd, the stored header wins and the caller's sizes are ignored.
+Backing files are created with mode 0600 (owner-only) by default; pass an octal
+C<$mode> (e.g. C<0666>, subject to umask) to allow cross-user sharing. C<$mode>
+applies only when the file is created -- it is ignored when attaching to an
+existing file, and for anonymous and memfd tables.
 C<new_memfd> creates a Linux memfd (transferable via its C<memfd> descriptor);
 C<new_from_fd> reopens one in another process.
 
@@ -144,8 +150,14 @@ construction and cannot grow.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it. Do not share backing
-files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 

@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "1.2";
+our $VERSION = "1.3";
 
 1;
 
@@ -16,7 +16,7 @@ App::GUI::GoLP - A GUI for viewing and editing Life-like cellular automata, in P
 
 =head1 VERSION
 
-Version 1.2
+Version 1.3
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,9 @@ I<Rules> allows the user to select from a preset list of birth/survival rules, o
 
 I<Zoom> opens the zoom dialog.
 
-I<Live cell color> allows the user to select the color of a 'live' cell.
+I<Color Scheme> allows the user to select how live cells are colored. You can choose a static color, or one of several color maps that color cells dynamically based on their age (e.g. Plasma, Viridis, Inferno).
+
+I<Live cell color> allows the user to select the color of a 'live' cell (only if color scheme is set to static).
 
 I<Dead cell color> allows the user to select the color of a 'dead' cell.
 
@@ -96,7 +98,7 @@ L<Game::Life::Faster>
 
 =head1 AUTHOR
 
-Matt Johnson, C<< <mjohnson at cpan.org> >>
+Matt Johnson, C<< <mjohnson at affectivesilicon.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 

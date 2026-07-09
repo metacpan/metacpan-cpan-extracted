@@ -10,7 +10,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 # VERSION
 
-Version 2.00
+Version 2.01
 
 # DESCRIPTION
 
@@ -451,7 +451,7 @@ Docker와 `make` 옵션을 결합하여 `make`를 Docker 환경에서 실행할 
 
 - [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
 
-    `getoptlong.sh` - `xlate` 스크립트 및 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo)에서 옵션 구문 분석에 사용되는 &lt;m id=5 /> 라이브러리.
+    `getoptlong.sh` - `xlate` 스크립트 및 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo)에서 옵션 구문 분석에 사용되는 라이브러리.
 
 - [https://llm.datasette.io/](https://llm.datasette.io/)
 

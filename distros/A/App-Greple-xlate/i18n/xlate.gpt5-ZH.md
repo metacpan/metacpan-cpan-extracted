@@ -10,7 +10,7 @@ App::Greple::xlate - greple 的翻译支持模块
 
 # VERSION
 
-Version 2.00
+Version 2.01
 
 # DESCRIPTION
 

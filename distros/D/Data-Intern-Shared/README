@@ -1,0 +1,156 @@
+NAME
+    Data::Intern::Shared - shared-memory string interning table for Linux
+
+SYNOPSIS
+        use Data::Intern::Shared;
+
+        # up to 1M distinct strings, 32 MB of string bytes, anonymous mapping
+        my $in = Data::Intern::Shared->new(undef, 1_000_000, 32 << 20);
+
+        my $id = $in->intern("alice");   # 0  (assigns and stores the string once)
+        $in->intern("bob");              # 1
+        $in->intern("alice");            # 0  (same bytes -> same id)
+
+        my $same = $in->id_of("alice");  # 0, or undef if never interned
+        my $str  = $in->string(0);       # "alice"
+        $in->exists("carol");            # false
+
+        # pair with Data::SortedSet::Shared (int64 members) for a string-keyed ZSET:
+        $zset->add($in->intern($key), $score);
+        my @names = map { $in->string($_) } $zset->rev_range_by_rank(0, 9);
+
+DESCRIPTION
+    A string interning table in shared memory: it maps arbitrary byte
+    strings to dense "uint32" ids (0, 1, 2, ... in interning order) and
+    back. Each distinct string is stored once in an append-only arena;
+    interning the same bytes again returns the same id.
+
+    It exists so that string-keyed shared structures can store a cheap
+    fixed-size id while the string itself is held once, and -- because the
+    table lives in shared memory -- so that several processes agree on the
+    same string<->id mapping (a per-process Perl hash cannot do that). In
+    particular it turns the int64-keyed Data::SortedSet::Shared into a
+    string-keyed sorted set: intern the key, store the id, map ids back to
+    strings on the way out.
+
+    Lookups are O(1): an open-addressed forward hash (xxhash) finds the id;
+    a dense "id -> arena offset" array gives the string back. A
+    write-preferring futex rwlock with dead-process recovery guards
+    mutation, so many processes may intern and look up concurrently.
+
+    Strings are interned by their byte content (encode wide/utf8 strings
+    first). Interning is permanent: ids are stable for the life of the
+    table; there is no per-string removal (see "LIMITS"). Linux-only.
+    Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $in = Data::Intern::Shared->new($path, $max_strings, $arena_bytes, $mode);
+        my $in = Data::Intern::Shared->new(undef, $max_strings);          # anonymous
+        my $in = Data::Intern::Shared->new_memfd($name, $max_strings, $arena_bytes);
+        my $in = Data::Intern::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" for an anonymous mapping);
+    $max_strings is the id/string capacity; $arena_bytes is the total
+    string-bytes capacity and is optional (defaults to "$max_strings * 32",
+    capped at 4 GB). When reopening an existing file or memfd, the stored
+    header wins and the caller's sizes are ignored. Backing files are
+    created with mode 0600 (owner-only) by default; pass an octal $mode
+    (e.g. 0666, subject to umask) to allow cross-user sharing. $mode applies
+    only when the file is created -- it is ignored when attaching to an
+    existing file, and for anonymous and memfd tables. "new_memfd" creates a
+    Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
+    reopens one in another process.
+
+  Interning
+        my $id = $in->intern($str);   # id (>=0); undef if the id space or arena is full
+        $in->id_of($str);             # id, or undef if $str was never interned
+        $in->string($id);             # the string, or undef if $id is out of range
+        $in->exists($str);
+        $in->clear;                   # forget everything (all ids invalidated)
+
+    "intern" returns the (existing or newly assigned) id, or "undef" if
+    either the id space ($max_strings) or the arena ($arena_bytes) is
+    exhausted -- an already-interned string always succeeds since it needs
+    no new id or storage. $str is taken by its bytes; a string containing
+    wide characters croaks (encode it first). The empty string and strings
+    with embedded NULs are valid keys.
+
+  Introspection and lifecycle
+        $in->count; $in->max_strings; $in->arena_used; $in->arena_bytes; $in->stats;
+        $in->path; $in->memfd; $in->sync; $in->unlink;     # or Class->unlink($path)
+
+    "count" is the number of distinct interned strings (also the next id to
+    be assigned). "sync" flushes the mapping to its backing store (a no-op
+    for anonymous and memfd tables, which have none); "unlink" removes the
+    backing file (also callable as "Class->unlink($path)"); "path" returns
+    the backing path ("undef" for anonymous, memfd, or fd-reopened tables)
+    and "memfd" the backing descriptor -- the memfd of a "new_memfd" table
+    or the dup'd fd of a "new_from_fd" table, and -1 for file-backed or
+    anonymous tables.
+
+SHARING ACROSS PROCESSES
+    The table lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path,
+    ...)" on the same path), an anonymous mapping inherited across "fork",
+    or a memfd whose descriptor is passed to an unrelated process (over a
+    UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened
+    with new_from_fd($fd). Because the mapping is shared, every process
+    resolves a given string to the same id and can turn any id back into the
+    string -- which is the whole point.
+
+        # producer and consumer agree on ids with no coordination
+        my $in = Data::Intern::Shared->new(undef, 100_000);   # before fork
+        unless (fork) { my $id = $in->intern("session-42"); ...; exit }
+        # parent: $in->id_of("session-42") yields the child's id; string($id) agrees
+
+STATS
+    stats() returns a hashref: "count", "max_strings", "hash_slots",
+    "hash_load" (occupied fraction of the forward hash), "arena_used",
+    "arena_bytes", "arena_load", "ops" (running count of "intern" calls),
+    and "mmap_size" (bytes).
+
+LIMITS
+    *   Permanent interning. There is no per-string removal; ids never
+        change. This is ideal for a bounded key universe (usernames,
+        symbols, paths): add/remove churn of the same key in a consuming
+        structure never grows the arena. For an unbounded stream of unique
+        strings the arena grows until full; "clear" is the only reset.
+
+    *   Byte keys. Strings are interned by byte content; encode wide strings
+        first.
+
+    *   Fixed sizes. $max_strings (<= 2^30) and $arena_bytes (<= 4 GB) are
+        set at construction and cannot grow.
+
+SECURITY
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. The arena and tables are append-only and never
+    rewritten in place, so a crash leaves the table consistent up to the
+    last completed "intern". Limitation: PID reuse is not detected (very
+    unlikely in practice).
+
+SEE ALSO
+    Data::SortedSet::Shared (the int64-keyed sorted set this interns keys
+    for), Data::SpatialHash::Shared, and the rest of the "Data::*::Shared"
+    family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

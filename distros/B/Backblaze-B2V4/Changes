@@ -1,5 +1,11 @@
 Revision history for Perl extension Backblaze-B2V4
 
+0.04 2026-07-09T01:44:03Z
+
+     - Fix bug in retrieving results for b2_upload_file
+     - Show new guid for upload function in b2_client
+     - Small typo fixes
+
 0.03 2026-07-01T03:27:57Z
 
      - Fix cpanfile typos, so that Marlin installs

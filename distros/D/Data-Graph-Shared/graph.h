@@ -153,7 +153,7 @@ static inline int graph_bit_set(uint64_t *bm, uint32_t idx) {
     return (word >> (idx % 64)) & 1;
 }
 
-static inline int32_t graph_bit_alloc(uint64_t *bm, uint32_t bwords, uint32_t max) {
+static inline int64_t graph_bit_alloc(uint64_t *bm, uint32_t bwords, uint32_t max) {
     for (uint32_t w = 0; w < bwords; w++) {
         uint64_t word = __atomic_load_n(&bm[w], __ATOMIC_RELAXED);
         if (word == ~(uint64_t)0) continue;
@@ -161,7 +161,7 @@ static inline int32_t graph_bit_alloc(uint64_t *bm, uint32_t bwords, uint32_t ma
         uint32_t idx = w * 64 + bit;
         if (idx >= max) return -1;
         __atomic_fetch_or(&bm[w], (uint64_t)1 << bit, __ATOMIC_RELEASE);
-        return (int32_t)idx;
+        return (int64_t)idx;   /* int64 so a valid idx >= 2^31 is not sign-flipped to a spurious failure */
     }
     return -1;
 }
@@ -174,8 +174,8 @@ static inline void graph_bit_free(uint64_t *bm, uint32_t idx) {
  * Graph operations (must hold mutex)
  * ================================================================ */
 
-static inline int32_t graph_add_node_locked(GraphHandle *h, int64_t data) {
-    int32_t idx = graph_bit_alloc(h->node_bitmap, h->node_bwords, h->hdr->max_nodes);
+static inline int64_t graph_add_node_locked(GraphHandle *h, int64_t data) {
+    int64_t idx = graph_bit_alloc(h->node_bitmap, h->node_bwords, h->hdr->max_nodes);
     if (idx < 0) return -1;
     h->node_data[idx] = data;
     h->node_heads[idx] = GRAPH_NONE;
@@ -187,7 +187,7 @@ static inline int graph_add_edge_locked(GraphHandle *h, uint32_t src, uint32_t d
     if (src >= h->hdr->max_nodes || dst >= h->hdr->max_nodes) return 0;
     if (!graph_bit_set(h->node_bitmap, src) || !graph_bit_set(h->node_bitmap, dst))
         return 0;
-    int32_t eidx = graph_bit_alloc(h->edge_bitmap, h->edge_bwords, h->hdr->max_edges);
+    int64_t eidx = graph_bit_alloc(h->edge_bitmap, h->edge_bwords, h->hdr->max_edges);
     if (eidx < 0) return 0;
     h->edges[eidx].dst = dst;
     h->edges[eidx].weight = weight;
@@ -203,6 +203,7 @@ static inline int graph_remove_node_locked(GraphHandle *h, uint32_t node) {
     /* free all outgoing edges */
     uint32_t eidx = h->node_heads[node];
     while (eidx != GRAPH_NONE) {
+        if (eidx >= h->hdr->max_edges) break;   /* corrupt/attacker edge index: stop */
         uint32_t next = h->edges[eidx].next;
         graph_bit_free(h->edge_bitmap, eidx);
         __atomic_fetch_sub(&h->hdr->edge_count, 1, __ATOMIC_RELAXED);
@@ -226,6 +227,7 @@ static inline int graph_remove_node_full_locked(GraphHandle *h, uint32_t node) {
         uint32_t *slot = &h->node_heads[src];
         uint32_t eidx = *slot;
         while (eidx != GRAPH_NONE) {
+            if (eidx >= h->hdr->max_edges) break;
             uint32_t next = h->edges[eidx].next;
             if (h->edges[eidx].dst == node) {
                 *slot = next;
@@ -244,9 +246,9 @@ static inline int graph_remove_node_full_locked(GraphHandle *h, uint32_t node) {
  * Public API (lock + operation + unlock)
  * ================================================================ */
 
-static inline int32_t graph_add_node(GraphHandle *h, int64_t data) {
+static inline int64_t graph_add_node(GraphHandle *h, int64_t data) {
     graph_mutex_lock(h->hdr);
-    int32_t r = graph_add_node_locked(h, data);
+    int64_t r = graph_add_node_locked(h, data);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     graph_mutex_unlock(h->hdr);
     return r;
@@ -287,6 +289,7 @@ static inline uint32_t graph_degree(GraphHandle *h, uint32_t node) {
     uint32_t count = 0;
     uint32_t eidx = h->node_heads[node];
     while (eidx != GRAPH_NONE) {
+        if (eidx >= h->hdr->max_edges) break;
         count++;
         eidx = h->edges[eidx].next;
     }
@@ -383,13 +386,37 @@ static inline int graph_validate_header(const GraphHeader *hdr, uint64_t file_si
     return 1;
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int graph_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { GRAPH_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        GRAPH_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    GRAPH_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t max_edges,
-                                  char *errbuf) {
+                                  mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (max_nodes == 0) { GRAPH_ERR("max_nodes must be > 0"); return NULL; }
     if (max_edges == 0) { GRAPH_ERR("max_edges must be > 0"); return NULL; }
     if (max_nodes > UINT32_MAX - 63) { GRAPH_ERR("max_nodes too large"); return NULL; }
     if (max_edges > UINT32_MAX - 63) { GRAPH_ERR("max_edges too large"); return NULL; }
+
+    /* Round max_nodes up to even so the node bitmap -- an array of uint64_t
+     * touched with __atomic_fetch_or/and -- starts 8-byte aligned.  Its offset
+     * is 128 + max_nodes*(8+4), 8-aligned iff max_nodes is even; an odd count
+     * leaves it 4-aligned and aarch64 atomic ops SIGBUS on it.  New files only:
+     * existing odd-count files keep their stored offsets and still attach. */
+    max_nodes = (max_nodes + 1u) & ~1u;
 
     uint64_t total = graph_total_size(max_nodes, max_edges);
     int anonymous = (path == NULL);
@@ -402,8 +429,8 @@ static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t 
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { GRAPH_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { GRAPH_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = graph_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { GRAPH_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { GRAPH_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -439,6 +466,7 @@ static GraphHandle *graph_create_memfd(const char *name, uint32_t max_nodes, uin
     if (max_nodes > UINT32_MAX - 63 || max_edges > UINT32_MAX - 63) {
         GRAPH_ERR("max_nodes/max_edges too large"); return NULL;
     }
+    max_nodes = (max_nodes + 1u) & ~1u;   /* even -> 8-byte-aligned node bitmap (see graph_create) */
     uint64_t total = graph_total_size(max_nodes, max_edges);
     int fd = memfd_create(name ? name : "graph", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { GRAPH_ERR("memfd_create: %s", strerror(errno)); return NULL; }

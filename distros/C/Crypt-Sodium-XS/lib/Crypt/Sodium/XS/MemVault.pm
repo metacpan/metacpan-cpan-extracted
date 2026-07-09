@@ -372,12 +372,11 @@ information about the protected memory.
   my $pos = $mv->index($substr, $offset);
 
 Searches for an occurence of C<$substr> in protected memory. This is similar to
-perl's own index function. Returns the first match of C<$substr> at or after
-C<$offset>, or -1 if C<$substr> is not found.
+perl's own index function. Returns the 0-based index of the first match of
+C<$substr> at or after C<$offset>, or -1 if C<$substr> is not found.
 
-C<$offset> is optional. If not provided, the search will begin at the start of
-the protected memory. Unlike perl's index function, C<$offset> may not be
-negative, and the method will croak if offset is beyond the last byte of
+C<$offset> is optional. If provided, the search will begin after skipping
+C<$offset> bytes. Otherwise, the search will begin at the start of the
 protected memory.
 
 This method should only be used when protected memory starts with non-sensitive

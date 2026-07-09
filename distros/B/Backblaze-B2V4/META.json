@@ -63,7 +63,7 @@
    "provides" : {
       "Backblaze::B2V4" : {
          "file" : "lib/Backblaze/B2V4.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/ericschernoff/backblaze-b2v4"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "Eric Chernoff <eric@Mac.lan>",
       "Eric Chernoff <eric@weaverstreet.net>",

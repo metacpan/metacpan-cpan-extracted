@@ -228,20 +228,35 @@ static inline void buf_recover_dead_readers(BufHandle *h) {
      * to keep the race window with new readers narrow, then wipe the
      * deferred dead slots. */
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < BUF_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = 0;   /* no slotless readers here: scanning slots is complete */
+            for (uint32_t i = 0; !live_now && i < BUF_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && buf_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 any_recovery = 1;
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < BUF_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0) continue;
-            if (buf_pid_alive(pid)) continue;
-            if (buf_drain_dead_slot(h, i, pid)) any_recovery = 1;
+        if (drain_ok) {
+            for (uint32_t i = 0; i < BUF_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || buf_pid_alive(p)) continue;
+                if (buf_drain_dead_slot(h, i, p)) any_recovery = 1;
+            }
         }
     }
     if (any_recovery)
@@ -326,11 +341,11 @@ static inline void buf_rwlock_rdlock(BufHandle *h) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur > 0 && cur < BUF_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < BUF_RWLOCK_SPIN_LIMIT, 1)) {
@@ -430,11 +445,17 @@ static inline uint32_t buf_seqlock_read_begin(BufHeader *hdr) {
 }
 
 static inline int buf_seqlock_read_retry(uint32_t *seq, uint32_t start) {
-    return __atomic_load_n(seq, __ATOMIC_ACQUIRE) != start;
+    /* Acquire FENCE (LoadLoad): the section's data loads must retire before we
+     * re-read seq; a plain acquire load is the wrong direction (ARM64 torn read). */
+    __atomic_thread_fence(__ATOMIC_ACQUIRE);
+    return __atomic_load_n(seq, __ATOMIC_RELAXED) != start;
 }
 
 static inline void buf_seqlock_write_begin(uint32_t *seq) {
-    __atomic_add_fetch(seq, 1, __ATOMIC_RELEASE);
+    __atomic_add_fetch(seq, 1, __ATOMIC_RELEASE);  /* seq becomes odd */
+    /* StoreStore: publish the odd seq before the section's data writes, else an
+     * ARM64 reader could see an even seq with half-written data (Linux smp_wmb). */
+    __atomic_thread_fence(__ATOMIC_RELEASE);
 }
 
 static inline void buf_seqlock_write_end(uint32_t *seq) {
@@ -443,19 +464,35 @@ static inline void buf_seqlock_write_end(uint32_t *seq) {
 
 /* ---- mmap create/open ---- */
 
+/* Race-safe create-or-attach with restrictive perms + symlink refusal.
+ * The backing file is created 0600 by default (see file_mode); a local peer
+ * cannot pre-create it as a symlink (O_NOFOLLOW) nor open a wider-permissioned
+ * copy.  Sets *created=1 iff this call won the O_EXCL race and made the file. */
+static int buf_secure_open(const char *path, mode_t file_mode, int *created, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, file_mode);
+        if (fd >= 0) { (void)fchmod(fd, file_mode); *created = 1; return fd; }  /* exact mode: umask narrowed the create */
+        if (errno != EEXIST) {
+            snprintf(errbuf, BUF_ERR_BUFLEN, "create(%s): %s", path, strerror(errno));
+            return -1;
+        }
+        fd = open(path, O_RDWR | O_NOFOLLOW | O_CLOEXEC);
+        if (fd >= 0) { *created = 0; return fd; }
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        snprintf(errbuf, BUF_ERR_BUFLEN, "open(%s): %s", path, strerror(errno));
+        return -1;
+    }
+    snprintf(errbuf, BUF_ERR_BUFLEN, "open(%s): create/attach kept racing", path);
+    return -1;
+}
+
 static BufHandle *buf_create_map(const char *path, uint64_t capacity,
                                   uint32_t elem_size, uint32_t variant_id,
-                                  char *errbuf) {
+                                  mode_t file_mode, char *errbuf) {
     errbuf[0] = '\0';
     int created = 0;
-    int fd = open(path, O_RDWR | O_CREAT | O_EXCL, 0666);
-    if (fd >= 0) {
-        created = 1;
-    } else if (errno == EEXIST) {
-        fd = open(path, O_RDWR);
-    }
+    int fd = buf_secure_open(path, file_mode, &created, errbuf);
     if (fd < 0) {
-        snprintf(errbuf, BUF_ERR_BUFLEN, "open(%s): %s", path, strerror(errno));
         return NULL;
     }
 
@@ -518,6 +555,13 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
     BufHeader *hdr = (BufHeader *)base;
 
     if (created || hdr->magic == 0) {
+        /* A pre-existing but uninitialized file (magic==0, not created by us) may
+         * be smaller than the region we are about to zero; a hostile peer could
+         * pre-create an undersized file to drive the init memset out of bounds. */
+        if (!created && (uint64_t)st.st_size < total_size) {
+            snprintf(errbuf, BUF_ERR_BUFLEN, "%s: file too small to initialize", path);
+            goto fail;
+        }
         /* Initialize header */
         memset(hdr, 0, sizeof(BufHeader));
         hdr->magic = BUF_MAGIC;
@@ -555,9 +599,10 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
         }
         if (hdr->elem_size == 0 ||
             hdr->reader_slots_off < sizeof(BufHeader) ||
+            hdr->reader_slots_off > (uint64_t)st.st_size ||
             hdr->reader_slots_off + reader_slots_size > (uint64_t)st.st_size ||
             hdr->data_off < hdr->reader_slots_off + reader_slots_size ||
-            hdr->data_off >= (uint64_t)st.st_size ||
+            hdr->data_off > (uint64_t)st.st_size ||
             hdr->capacity > ((uint64_t)st.st_size - hdr->data_off) / hdr->elem_size) {
             snprintf(errbuf, BUF_ERR_BUFLEN, "%s: corrupt header (data doesn't fit in file)", path);
             goto fail;
@@ -749,8 +794,10 @@ static BufHandle *buf_open_fd(int fd, uint32_t elem_size, uint32_t variant_id,
     uint64_t reader_slots_size = (uint64_t)BUF_READER_SLOTS * sizeof(BufReaderSlot);
     if (hdr->elem_size == 0 ||
         hdr->reader_slots_off < sizeof(BufHeader) ||
+        hdr->reader_slots_off > (uint64_t)st.st_size ||
         hdr->reader_slots_off + reader_slots_size > (uint64_t)st.st_size ||
         hdr->data_off < hdr->reader_slots_off + reader_slots_size ||
+        hdr->data_off > (uint64_t)st.st_size ||
         hdr->total_size != (uint64_t)st.st_size ||
         hdr->capacity > ((uint64_t)st.st_size - hdr->data_off) / hdr->elem_size) {
         snprintf(errbuf, BUF_ERR_BUFLEN, "fd=%d: corrupt header", fd);
@@ -831,7 +878,9 @@ static void buf_close_map(BufHandle *h) {
      * since we claimed it.  A forked child that inherits the handle but never
      * acquired the lock itself must NOT clear the parent's slot. */
     if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
-        h->cached_fork_gen == __atomic_load_n(&buf_fork_gen, __ATOMIC_RELAXED)) {
+        h->cached_fork_gen == __atomic_load_n(&buf_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        /* subcount==0: a still-held lock's slot must survive for recovery */
         uint32_t expected = h->cached_pid;
         /* CAS pid → 0; do NOT clear subcount/wp/writp — between the CAS and
          * a follow-up store, a new process could claim the slot, and our
@@ -866,16 +915,16 @@ static void buf_close_map(BufHandle *h) {
 
 #ifdef BUF_IS_FIXEDSTR
 static BufHandle *BUF_FN(create)(const char *path, uint64_t capacity,
-                                  uint32_t str_len, char *errbuf) {
+                                  uint32_t str_len, mode_t file_mode, char *errbuf) {
     if (str_len == 0) {
         snprintf(errbuf, BUF_ERR_BUFLEN, "str_len must be > 0");
         return NULL;
     }
-    return buf_create_map(path, capacity, str_len, BUF_VARIANT_ID, errbuf);
+    return buf_create_map(path, capacity, str_len, BUF_VARIANT_ID, file_mode, errbuf);
 }
 #else
-static BufHandle *BUF_FN(create)(const char *path, uint64_t capacity, char *errbuf) {
-    return buf_create_map(path, capacity, BUF_ELEM_SIZE, BUF_VARIANT_ID, errbuf);
+static BufHandle *BUF_FN(create)(const char *path, uint64_t capacity, mode_t file_mode, char *errbuf) {
+    return buf_create_map(path, capacity, BUF_ELEM_SIZE, BUF_VARIANT_ID, file_mode, errbuf);
 }
 #endif
 

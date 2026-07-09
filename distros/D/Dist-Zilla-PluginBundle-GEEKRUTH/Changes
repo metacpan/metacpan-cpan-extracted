@@ -1,5 +1,29 @@
 Revision history for Dist-Zilla-PluginBundle-GEEKRUTH
 
+4.0000 2026-07-08T19:54:18-04:00 America/New_York
+ [MAJOR]
+ - Move to Codeberg
+
+ [MINOR]
+ - Add SecurityPolicy plugin
+
+ [STATISTICS]
+ - code churn: 13 files changed, 34 insertions(+), 251 deletions(-)
+
+3.0000 2025-07-28T19:02:25-04:00 America/New_York
+ [MAJOR]
+ - Switch to GitHub
+
+ [STATISTICS]
+ - code churn: 5 files changed, 17 insertions(+), 12 deletions(-)
+
+2.0003 2022-11-13T17:04:56-05:00 America/New_York
+ [BUG FIXES]
+ - 'parent' isn't a valid prereq!
+
+ [STATISTICS]
+ - code churn: 2 files changed, 11 insertions(+), 3 deletions(-)
+
 2.0002 2022-11-12T22:10:15-05:00 America/New_York
  [BUG FIXES]
  - CopyFilesFromBuild is not needed here.
@@ -64,7 +88,5 @@ Revision history for Dist-Zilla-PluginBundle-GEEKRUTH
  - code churn: 4 files changed, 16 insertions(+), 14 deletions(-)
 
 1.0000 2022-01-08
- - First release
-
  [STATISTICS]
  - code churn: 6 files changed, 522 insertions(+)

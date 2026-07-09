@@ -1,5 +1,11 @@
 Revision history for Data::Deque::Shared
 
+0.06  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+    - Str variant now preserves the UTF-8 flag on round-trip; Str max_len
+      must be < 2 GiB.
+
 0.05  2026-06-01
     - Str pop paths: free temp buffer via SAVEFREEPV (leak on OOM-croak)
 

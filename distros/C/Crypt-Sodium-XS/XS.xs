@@ -64,10 +64,21 @@
 /* 1.0.21: major: 26 minor: 3 */
 #undef SODIUM_HAS_IPCODECS
 #undef SODIUM_HAS_IPCRYPT
+#undef SODIUM_HAS_XOF
 #if (SODIUM_LIBRARY_VERSION_MAJOR > 26U) || \
     ((SODIUM_LIBRARY_VERSION_MAJOR == 26U) && (SODIUM_LIBRARY_VERSION_MINOR >= 3U))
 #define SODIUM_HAS_IPCODECS 1U
 #define SODIUM_HAS_IPCRYPT 1U
+#define SODIUM_HAS_XOF 1U
+#endif
+
+/* 1.0.22: major: 26 minor: 4 */
+#undef SODIUM_HAS_KEM
+#undef SODIUM_HAS_SHA3
+#if (SODIUM_LIBRARY_VERSION_MAJOR > 26U) || \
+    ((SODIUM_LIBRARY_VERSION_MAJOR == 26U) && (SODIUM_LIBRARY_VERSION_MINOR >= 4U))
+#define SODIUM_HAS_KEM 1U
+#define SODIUM_HAS_SHA3 1U
 #endif
 
 /* 00000011 */
@@ -475,48 +486,52 @@ void _define_constants()
 const char *
 sodium_version_string()
 
-INCLUDE: inc/base64.xs
+INCLUDE: xs/base64.xs
 
-INCLUDE: inc/util.xs
+INCLUDE: xs/util.xs
 
-INCLUDE: inc/protmem.xs
+INCLUDE: xs/protmem.xs
 
-INCLUDE: inc/memvault.xs
+INCLUDE: xs/memvault.xs
 
-INCLUDE: inc/core.xs
+INCLUDE: xs/core.xs
 
-INCLUDE: inc/curve25519.xs
+INCLUDE: xs/curve25519.xs
 
-INCLUDE: inc/kx.xs
+INCLUDE: xs/kx.xs
 
-INCLUDE: inc/kdf.xs
+INCLUDE: xs/kdf.xs
 
-INCLUDE: inc/hkdf.xs
+INCLUDE: xs/hkdf.xs
 
-INCLUDE: inc/secretbox.xs
+INCLUDE: xs/kem.xs
 
-INCLUDE: inc/box.xs
+INCLUDE: xs/secretbox.xs
 
-INCLUDE: inc/sign.xs
+INCLUDE: xs/box.xs
 
-INCLUDE: inc/secretstream.xs
+INCLUDE: xs/sign.xs
 
-INCLUDE: inc/aead.xs
+INCLUDE: xs/secretstream.xs
 
-INCLUDE: inc/stream.xs
+INCLUDE: xs/aead.xs
 
-INCLUDE: inc/shorthash.xs
+INCLUDE: xs/stream.xs
 
-INCLUDE: inc/generichash.xs
+INCLUDE: xs/shorthash.xs
 
-INCLUDE: inc/pwhash.xs
+INCLUDE: xs/generichash.xs
 
-INCLUDE: inc/hash.xs
+INCLUDE: xs/pwhash.xs
 
-INCLUDE: inc/auth.xs
+INCLUDE: xs/hash.xs
 
-INCLUDE: inc/onetimeauth.xs
+INCLUDE: xs/auth.xs
 
-INCLUDE: inc/scalarmult.xs
+INCLUDE: xs/onetimeauth.xs
 
-INCLUDE: inc/ipcrypt.xs
+INCLUDE: xs/scalarmult.xs
+
+INCLUDE: xs/ipcrypt.xs
+
+INCLUDE: xs/xof.xs

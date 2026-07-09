@@ -1,5 +1,9 @@
 Revision history for Data-PubSub-Shared
 
+0.07  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.06  2026-06-01
     - Str publish_multi: hoist SvPV out of the mutex so a tied/overloaded
       argument that dies mid-batch can't abandon the lock and deadlock peers

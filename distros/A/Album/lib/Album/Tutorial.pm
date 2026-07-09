@@ -1,10 +1,10 @@
 package Album::Tutorial;
 
-( $VERSION ) = '$Revision: 1.10 $ ' =~ /\$Revision:\s+([^\s]+)/;
-
 # NOTE: This is a documentation-only module.
 
 use strict;
+
+our $VERSION = "1.901.0";
 
 =pod
 
@@ -30,11 +30,9 @@ it as follows:
   No info.dat, adding images from large
   info.dat: Cannot update (does not exist)
   Number of entries = 7 (7 added)
-  mkdir thumbnails
+  mkdir index
   mkdir icons
-  mkdir css
   Creating icons: first-gr.png first.png ... sound.png movie.jpg
-  Creating style sheets: common.css index.css ... journal.css
   im023.jpg: thumbnail OK
   im024.jpg: thumbnail OK
   im025.jpg: thumbnail OK
@@ -49,11 +47,13 @@ it as follows:
 
 Your results will vary, but be similar to this example run. What you
 can see is that 'album' found 7 images in the 'large' directory,
-created thumbnails, icons and css directories, created thumbnails by
+created index and icons directories, created thumbnails by
 resizing the images, and finally created the HTML pages. You can
-inspect your first photo album by opening file 'index.html' with your
+inspect your first photo album by opening file 'index/index001.html' with your
 favorite browser. You can click on any image to see the larger
-version. Navigation buttons are provided to the left of the image.
+version. Navigation buttons are provided to the left of the image. You
+can also navigate from the keyboard: space (next), backspace
+(previous), enter (larger image), and 'd' (index).
 
 It is interesting to run 'album' again:
 
@@ -92,12 +92,12 @@ any images in the 'large' directory (which is considered 'original work');
 
 =item *
 
-any images in the 'medium' and 'thumbnails' directories (but see
+any images in the 'medium' and 'index' directories (but see
 B<--clobber> below);
 
 =item *
 
-any icons or stylesheets, so it is save to customize these;
+any icons, so it is safe to customize these;
 
 =back
 
@@ -222,6 +222,12 @@ what to do about that.
 
 =head2 Summary of 'info.dat' control commands
 
+The first line can be used to designate a coding system, in case the
+information needs to contain non-ASCII characters. For example, to
+designate that the data is in ISO 8895.1 (Latin-1) encoding, use:
+
+  #    -*- coding: iso8859-1 -*-
+
 Most settings can also obtained with command line options, as shown.
 
 =over
@@ -229,6 +235,11 @@ Most settings can also obtained with command line options, as shown.
 =item B<!title> I<XXX>
 
 Sets the title to I<XXX>, override with B<--title>.
+
+=item B<!home> I<XXX>
+
+Provides an 'up' link on the index pages. Override with B<--home>.
+Note that this link is relative to the location of the index directory.
 
 =item B<!page> I<N>B<x>I<M>
 
@@ -245,6 +256,8 @@ Includes medium sized images (B<--medium>) of default size.
 =item B<!mediumsize> I<NNN>
 
 Specifies the desired width for medium sized images (B<--mediumsize>).
+To enforce this width, even if the original image is smaller, specify
+C<!> after the size.
 
 =item B<!tag> I<XXX>
 
@@ -397,6 +410,188 @@ be skipped.
 Note that when you click on an external reference thumbnail, a new
 browser window will be opened to show the referenced information.
 
+=head2 Journal mode
+
+I<Warning: Journal mode is still under development and may change in
+future versions.>
+
+Journal mode is enabled with the control B<!journal> in C<info.dat>.
+
+When journal mode is enabled, the data from C<info.dat> is considered
+to be a series of paragraphs. Paragraphs are separated using one or
+more empty lines.
+
+The first line of a paragraph may contain image info, preceeded by an
+asterisk and whitespace. For example:
+
+  !journal
+
+  !tag 2004/06/01
+
+  A bright, shiny day.
+
+  * im023.jpg  Sunrise
+  This morning, we were surprised by a fantastic sunrise like
+  we have never seen before.
+
+  * im024.jpg  Overview
+  This picture shows an overview of the area.
+
+This way it is possible to attach extended pieces of text to a images.
+
+An additional series of pages is generated, the journal pages. Each
+journal page contains the extended text and thumbnail images of all
+entries that belong to a single tag. The idea is that the tags are
+dates, and each journal page contains the text and images of a single
+day.
+
+If the extended text starts with C<< < >> it is assumed to be HTML and
+included literally.
+
+The medium and large image pages have an additional icon to jump to
+the journal entry for an image. The extended text can be also viewed
+on the medium and large image pages when the mouse is placed over the
+info at the right side above the image, e.g., C<My First Album: Image
+1 of 9>.
+
+Note that journal mode can not be mixed with normal mode.
+
+=head2 External formats and style sheets
+
+I<Warning: External formats and style sheets are still under
+development and may change in future versions.>
+
+Internally, 'album' uses formats (templates) to build the generated
+HTML pages, and cascading style sheets (CSS) to specify how the
+browser should show the pages. Formats and style sheets can be
+exported (written to external directories), and 'album' will then use
+the external information. So you can have ultimate control over how
+pages must look like.
+
+=head2 External formats
+
+When 'album' is run with B<--extformats> it will create a directory
+'formats' and, in this directory, the HTML templates for all types of
+pages that 'album' will generate. Existing files in this directory
+will B<not> be overwritten, so it is safe to change the templates to
+your liking. When 'album' is run again to process images, it will use
+the templates from the 'formats' directory if they are available.
+
+The templates are plain HTML and contain variables that will be
+substituted with actual values. Some of the variables are:
+
+=over 12
+
+=item $title
+
+The title of the album.
+
+=item $css
+
+The code to get the style sheet of this page. This can be in-line
+specifications, or a link to an external stylesheet.
+
+=item $ltop
+
+Index and image pages only: The text above each image, left.
+
+=item $rtop
+
+Index and image pages only: The text above each image, right.
+
+=item $vbuttons
+
+The navigation buttons, arranged vertically.
+
+=item $hbuttons
+
+The navigation buttons, arranged horizontally.
+
+=item $jscript
+
+The javascript for keyboard navigation.
+
+=item $image
+
+Image pages only: The actual image.
+
+=item $lbot
+
+Image pages only: The text below the image, left.
+
+=item $rbot
+
+Image pages only: The text below the image, right.
+
+=item $contents
+
+Index pages only: The table with all the images for this page.
+
+=item $tag
+
+Journal pages only: The tag for this page.
+
+=item $journal
+
+Journal pages only: The journal for this page.
+
+=back
+
+=head3 External style sheets
+
+When 'album' is run with B<--extcss> it will create a directory 'css'
+and, in this directory, the css style sheets for all types of pages
+that 'album' will generate. Existing files in this directory will
+B<not> be overwritten, so it is safe to change the templates to your
+liking. When 'album' is run again to process images, it will use the
+external style sheets if they are available.
+
+To obtain good results, the style sheets must match the formats.
+'album' will try to verify this by reading the first line of the style
+sheets and the formats, and verify that it contains a version
+indication of the form
+
+  ALBUM-FMT-VERSION: <major>.<minor>   (for formats)
+  ALBUM-CSS-VERSION: <major>.<minor>   (for style sheets)
+
+For all style sheet - format pairs, the major numbers must be the
+same.
+
+Older versions of 'album' always created external style sheets. As a
+consequence, if you upgrade to the newer version, you'll get a fatal
+error the first time you run 'album'.
+
+ *************************************************************************
+ Existing style sheet ... is not compatible with this version.
+ It has probably been created by an older version of this program, or it
+ has been modified manually.
+
+ If you did not change any style sheets, just remove the css directory and
+ try again.
+
+ If you did modify the style sheets move them away to a backup location,
+ run the program with '--extcss', and apply your changes to the new style
+ sheets.
+ *************************************************************************
+
+We apologise for the inconvenience.
+
+=head2 Keyboard navigation
+
+While browsing the album, some actions can be performed from the keyboard.
+
+The C<Enter> key will go to an enlarged version of the image, if available.
+
+The C<Space> key will advance to the next page.
+
+The C<Backspace> key will advance to the previous page.
+
+Key C<d> will go to the index page.
+
+Key C<u> will go up, i.e., the reverse of the C<Enter> key.
+
+Key C<j> will go to the journal entry of the current image.
+
 =head2 Additional notes
 
 The B<--clobber> command line option will force regeneration of all
@@ -430,7 +625,7 @@ Johan Vromans (jvromans@squirrel.nl) wrote this module.
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2004 by Squirrel Consultancy. All
+This program is Copyright 2004,2007 by Squirrel Consultancy. All
 rights reserved.
 
 This program is free software; you can redistribute it and/or modify
@@ -448,4 +643,4 @@ GNU General Public License or the Artistic License for more details.
 
 1;
 
-# $Id: Tutorial.pm,v 1.10 2006/10/20 14:47:13 jv Exp $
+# $Id: Tutorial.pm,v 1.12 2007/05/31 21:01:34 jv Exp $

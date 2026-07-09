@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::CdsFile 2.164;
+package Config::Model::Backend::CdsFile 2.165;
 
 use 5.020;
 use Carp;
@@ -75,7 +75,7 @@ Config::Model::Backend::CdsFile - Read and write config as a Cds data structure
 
 =head1 VERSION
 
-version 2.164
+version 2.165
 
 =head1 SYNOPSIS
 

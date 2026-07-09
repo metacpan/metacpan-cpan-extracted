@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::ListBrowser.
 
+0.13 Date
+	- Limited Configure events to resize events in method OnConfigure and removed the timer. Things are smoother.
+	- Fiddled around with setScrollRegion to avoid oscillating scrollbars. Not completely succesful.
+
 0.12  Sat Jul 04 2026
 	- Fixed -filterforce option a bit better.
 	- Fixed arrow key navigation in tree mode.

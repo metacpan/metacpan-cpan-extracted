@@ -46,7 +46,8 @@ _define_constants();
   ];
 
   our %EXPORT_TAGS = (
-    all => [ @$default, @$ed25519 ],
+    all => [ @$features, @$default, @$ed25519 ],
+    features => $features,
     default => $default,
     ed25519 => $ed25519,
     ristretto255 => $ristretto255,
@@ -54,6 +55,8 @@ _define_constants();
 
   our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 }
+
+*ristretto255_available = \&scalarmult_ristretto255_available;
 
 package Crypt::Sodium::XS::OO::scalarmult;
 use parent 'Crypt::Sodium::XS::OO::Base';
@@ -79,7 +82,7 @@ my %methods = (
     scalarmult => \&Crypt::Sodium::XS::scalarmult::scalarmult_ed25519,
     scalarmult_noclamp => \&Crypt::Sodium::XS::scalarmult::scalarmult_ed25519_noclamp,
   },
-  Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255_available() ? (
+  Crypt::Sodium::XS::scalarmult->ristretto255_available ? (
     ristretto255 => {
       BYTES => \&Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255_BYTES,
       PRIMITIVE => sub { 'ristretto255' },
@@ -96,8 +99,7 @@ $methods{x25519} = $methods{default};
 
 sub Crypt::Sodium::XS::scalarmult::primitives { keys %methods }
 *primitives = \&Crypt::Sodium::XS::scalarmult::primitives;
-
-sub ristretto255_available { goto \&Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255_available }
+*ristretto255_available = \&Crypt::Sodium::XS::scalarmult::ristretto255_available;
 
 sub BYTES { my $self = shift; goto $methods{$self->{primitive}}->{BYTES}; }
 sub PRIMITIVE { my $self = shift; goto $methods{$self->{primitive}}->{PRIMITIVE}; }
@@ -178,6 +180,17 @@ Gets or sets the primitive used for all operations by this object. It must be
 one of the primitives listed in L</PRIMITIVES>, including C<default>.
 
 =head1 METHODS
+
+=head2 ristretto255_available
+
+  my $has_r255 = $scalarmult->ristretto255_available;
+  my $has_r255 = Crypt::Sodium::XS::scalarmult->ristretto255_available;
+
+Returns true if L<Crypt::Sodium::XS::scalarmult> supports Ristretto, false
+otherwise. Ristretto will only be supported if L<Crypt::Sodium::XS> was built
+with a new enough version of libsodium (at least 1.0.18).
+
+Can be called as a class method.
 
 =head2 primitives
 
@@ -326,6 +339,8 @@ Compared to Curve25519 points encoded as their coordinates, ristretto makes it
 easier to safely implement protocols originally designed for prime-order
 groups.
 
+See L</ristretto255_available>.
+
 =back
 
 =head1 FUNCTIONS
@@ -333,11 +348,16 @@ groups.
 The object API above is the recommended way to use this module. The functions
 and constants documented below can be imported instead or in addition.
 
-Nothing is exported by default. A C<:default> tag imports the functions and
-constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
-provided for each of the primitives listed in L</PRIMITIVES>. These tags import
-the C<scalarmult_E<lt>primitiveE<gt>_*> functions and constants for that
-primitive.  A C<:all> tag imports everything.
+Nothing is exported by default. A C<:features> tag imports the C<*_available>
+feature test functions. A C<:default> tag imports the functions and constants
+documented below. A separate C<:E<lt>primitiveE<gt>> import tag is provided for
+each of the primitives listed in L</PRIMITIVES>. These tags import the
+C<scalarmult_E<lt>primitiveE<gt>_*> functions and constants for that primitive.
+A C<:all> tag imports everything.
+
+=head2 scalarmult_ristretto255_available
+
+Same as L</ristretto255_available>.
 
 =head2 scalarmult_base
 

@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MariaDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000051';
+our $VERSION = '0.000052';
 
 use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;
@@ -59,6 +59,40 @@ sub _default_config {
     return %config;
 }
 
+# Releases where an information_schema 'table_constraints' or
+# 'referential_constraints' scan that reaches information_schema's own tables
+# locks a never-initialized ACL mutex under --skip-grant-tables and blocks
+# forever: immune to KILL, and it prevents graceful server shutdown. QuickDB
+# always starts the server with --skip-grant-tables, so these releases are not
+# safe to use. Broken by upstream MDEV-38209, fixed by MDEV-38811.
+my %BROKEN_IS_ACL_VERSIONS = (
+    '10.11.16' => 'fixed in 10.11.17',
+    '11.4.10'  => 'fixed in 11.4.11',
+    '11.8.6'   => 'fixed in 11.8.7',
+    '12.2.2'   => 'never fixed, 12.2.2 is the final 12.2 release; use another series',
+    '12.3.1'   => 'fixed in 12.3.2',
+);
+
+sub broken_version_check {
+    my $this = shift;
+    my ($bin) = @_;
+
+    return undef if $ENV{QDB_MARIADB_IGNORE_BROKEN};
+    return undef unless $bin && -x $bin;
+
+    my ($out) = capture { system($bin, '-V') };
+    return undef unless $out && $out =~ m/\bVer\s+(\d+\.\d+\.\d+)-MariaDB\b/;
+
+    my $version = $1;
+    my $fix = $BROKEN_IS_ACL_VERSIONS{$version} or return undef;
+
+    return "MariaDB $version hangs unkillably on information_schema"
+        . " 'table_constraints' and 'referential_constraints' scans under"
+        . " --skip-grant-tables, which DBIx::QuickDB always uses (upstream bug"
+        . " MDEV-38811; $fix). Set QDB_MARIADB_IGNORE_BROKEN=1 to use this"
+        . " server anyway.";
+}
+
 sub viable {
     my $this = shift;
     my ($spec) = @_;
@@ -83,6 +117,12 @@ sub viable {
 
         if ($spec->{load_sql}) {
             push @bad => "'mysql' and 'mariadb' commands are missing, needed for load_sql" unless $check{client} && -x $check{client};
+        }
+
+        if (($spec->{bootstrap} || $spec->{autostart}) && $check{server} && -x $check{server}) {
+            if (my $broken = $this->broken_version_check($check{server})) {
+                push @bad => $broken;
+            }
         }
     }
 
@@ -145,7 +185,49 @@ DBD::MariaDB is preferred with a fallback to DBD::MySQL.
 
 =back
 
+=head1 KNOWN BROKEN SERVER VERSIONS
+
+The following MariaDB releases are refused by C<viable()> (so driver selection
+skips them and C<get_db>/C<build_db> will not silently use them):
+
+=over 4
+
+=item * 10.11.16 (fixed in 10.11.17)
+
+=item * 11.4.10 (fixed in 11.4.11)
+
+=item * 11.8.6 (fixed in 11.8.7)
+
+=item * 12.2.2 (never fixed; 12.2.2 is the final 12.2 release)
+
+=item * 12.3.1 (fixed in 12.3.2)
+
+=back
+
+On these releases any C<information_schema.table_constraints> or
+C<information_schema.referential_constraints> query whose scan reaches
+information_schema's own tables (for example a scan without an effective
+C<WHERE table_schema = DATABASE()> filter, or a join whose plan defeats that
+filter's pushdown) locks an ACL mutex that is never initialized when the
+server runs with C<--skip-grant-tables> - which DBIx::QuickDB always uses.
+The query thread then blocks forever: it burns no CPU, C<KILL QUERY> and
+C<KILL CONNECTION> cannot terminate it, and a graceful server shutdown waits
+on it forever (the QuickDB watcher's SIGKILL escalation still reclaims the
+server at teardown). The client is stuck in a C-level read inside libmariadb,
+so Perl-level C<alarm()> or C<%SIG> handlers in the calling process never
+fire; only C<SIGKILL> (or killing the server) frees it.
+
+This is upstream bug MDEV-38811 (introduced by MDEV-38209). If you accept the
+risk - for example your code never queries those two information_schema
+tables - you can set the C<QDB_MARIADB_IGNORE_BROKEN> environment variable to
+use such a server anyway.
+
 =head1 ENVIRONMENT VARIABLES
+
+=head2 QDB_MARIADB_IGNORE_BROKEN
+
+Set to a true value to let C<viable()> accept MariaDB releases listed under
+L</"KNOWN BROKEN SERVER VERSIONS"> anyway.
 
 =head2 QDB_MYSQL_SSL_FIPS
 

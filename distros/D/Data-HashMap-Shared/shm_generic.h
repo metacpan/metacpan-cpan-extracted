@@ -57,7 +57,9 @@
 
 #define SHM_MAGIC       0x53484D31U  /* "SHM1" */
 #define SHM_VERSION     9U
+#ifndef SHM_READER_SLOTS
 #define SHM_READER_SLOTS 1024  /* max concurrent reader processes for dead-process recovery */
+#endif
 #define SHM_INITIAL_CAP 16
 #define SHM_MAX_STR_LEN 0x3FFFFFFFU  /* ~1GB, bit 30 reserved for inline flag */
 #define SHM_LRU_NONE    UINT32_MAX
@@ -248,7 +250,9 @@ typedef struct {
                                         (reader write-preferring yield signal) */
     uint64_t arena_cap;       /* 72: immutable, read by seqlock string path */
     uint64_t reader_slots_off;/* 80: offset of reader-PID slot table for dead-reader recovery */
-    uint8_t  _reserved1[40];  /* 88-127 */
+    uint32_t slotless_readers;/* 88: live readers holding the lock with no reader-slot (was reserved) */
+    uint32_t arena_large_free;/* 92: head of the >2^19 large-block free list (was reserved; 0=empty) */
+    uint8_t  _reserved1[32];  /* 96-127 */
 
     /* ---- Cache line 2 (128-191): rwlock + write-hot fields ---- */
     uint32_t rwlock;          /* 128: 0=unlocked, 1..0x7FFFFFFF=readers, 0x80000000|pid=writer */
@@ -298,6 +302,7 @@ typedef struct ShmHandle_s {
     uint32_t   my_slot_idx;  /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t   cached_pid;   /* getpid() cached at last slot claim */
     uint32_t   cached_fork_gen; /* shm_fork_gen value at last slot claim — mismatch triggers reclaim */
+    uint32_t slotless_held; /* rwlock read-locks held with no reader-slot */
     size_t     mmap_size;
     uint32_t   max_mask;    /* max_table_cap - 1, for seqlock bounds clamping */
     uint32_t   iter_pos;
@@ -321,6 +326,7 @@ typedef struct ShmHandle_s {
 typedef struct {
     ShmHandle *handle;       /* for single maps, direct handle; for sharded, the dispatcher */
     ShmHandle *current;      /* current shard handle (== handle for single maps) */
+    SV        *owner;        /* ref to the map's referent SV; keeps the mmap/handle alive while the cursor lives */
     uint32_t   iter_pos;
     uint32_t   gen;          /* table_gen snapshot — reset on mismatch */
     uint32_t   shard_idx;    /* current shard index (0 for single maps) */
@@ -452,6 +458,7 @@ static inline void shm_claim_reader_slot(ShmHandle *h) {
     cur_gen = __atomic_load_n(&shm_fork_gen, __ATOMIC_RELAXED);
     uint32_t now_pid = (uint32_t)getpid();
     h->cached_pid = now_pid;
+    if (cur_gen != h->cached_fork_gen) h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
     h->cached_fork_gen = cur_gen;
     h->my_slot_idx = UINT32_MAX;
     uint32_t start = now_pid % SHM_READER_SLOTS;
@@ -567,20 +574,40 @@ static inline void shm_recover_dead_readers(ShmHandle *h) {
      *       rwlock(0 → 1) succeeds cleanly.
      * Only after the CAS resolves do we wipe the deferred dead slots,
      * keeping that work outside the race-sensitive window. */
+    /* A live reader with no slot (table was full) is invisible to the scan
+     * above but still holds a +1 in the lock word; never force-reset under it. */
+    if (__atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0)
+        any_live_reader = 1;
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < SHM_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = __atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0;
+            for (uint32_t i = 0; !live_now && i < SHM_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && shm_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 any_recovery = 1;
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < SHM_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || shm_pid_alive(pid)) continue;
-            if (shm_drain_dead_slot(h, i, pid)) any_recovery = 1;
+        if (drain_ok) {
+            for (uint32_t i = 0; i < SHM_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || shm_pid_alive(p)) continue;
+                if (shm_drain_dead_slot(h, i, p)) any_recovery = 1;
+            }
         }
     }
     if (any_recovery)
@@ -636,6 +663,28 @@ static inline void shm_unpark_writer(ShmHandle *h) {
     }
 }
 
+/* Reader accounting: a reader mirrors its +1 in the lock word so dead-reader
+ * recovery can see it. A slotted reader uses its slot subcount; a reader that
+ * could not claim a slot (table full) uses the global hdr->slotless_readers,
+ * so recovery's force-reset never fires out from under it. leave() peels
+ * slotless first so a later slot claim cannot misattribute the decrement. */
+static inline void shm_reader_enter(ShmHandle *h) {
+    if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    } else {
+        __atomic_add_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        h->slotless_held++;
+    }
+}
+static inline void shm_reader_leave(ShmHandle *h) {
+    if (h->slotless_held > 0) {
+        h->slotless_held--;
+        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+    } else if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    }
+}
+
 static inline void shm_rwlock_rdlock(ShmHandle *h) {
     shm_claim_reader_slot(h);
     ShmHeader *hdr = h->hdr;
@@ -648,8 +697,7 @@ static inline void shm_rwlock_rdlock(ShmHandle *h) {
      * killed between rwlock CAS-success and subcount++ would let recovery
      * force-reset rwlock to 0 underneath us, causing a UINT32_MAX wrap on
      * our eventual rdunlock dec. */
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    shm_reader_enter(h);
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         /* Write-preferring: when lock is free (cur==0) and writers are
@@ -657,11 +705,11 @@ static inline void shm_rwlock_rdlock(ShmHandle *h) {
          * already active (cur>=1), new readers may join freely. */
         if (cur > 0 && cur < SHM_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < SHM_RWLOCK_SPIN_LIMIT, 1)) {
@@ -694,8 +742,7 @@ static inline void shm_rwlock_rdunlock(ShmHandle *h) {
      * window where we still own a unit of rwlock but our slot subcount is
      * 0, letting recovery force-reset rwlock underneath us. */
     uint32_t prev = __atomic_sub_fetch(&hdr->rwlock, 1, __ATOMIC_RELEASE);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    shm_reader_leave(h);
     if (prev == 0 && __atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -777,6 +824,10 @@ static inline int shm_seqlock_read_retry(uint32_t *seq, uint32_t start) {
 
 static inline void shm_seqlock_write_begin(uint32_t *seq) {
     __atomic_add_fetch(seq, 1, __ATOMIC_RELEASE);  /* seq becomes odd */
+    /* StoreStore (Linux write_seqcount_begin's smp_wmb): the odd seq must be
+     * visible before the entry writes that follow, or an ARM64 reader could
+     * load an even seq yet observe half-written data and pass read_retry. */
+    __atomic_thread_fence(__ATOMIC_RELEASE);
 }
 
 static inline void shm_seqlock_write_end(uint32_t *seq) {
@@ -809,6 +860,21 @@ static inline uint32_t shm_arena_alloc(ShmHeader *hdr, char *arena, uint32_t len
         hdr->arena_free[cls] = next;
         return head;
     }
+    if (cls < 0) {
+        /* Large request: first-fit over the large free list before bumping. */
+        uint32_t prev = 0, cur = hdr->arena_large_free;
+        while (cur != 0) {
+            uint32_t next, blk;
+            memcpy(&next, arena + cur, sizeof(uint32_t));
+            memcpy(&blk, arena + cur + sizeof(uint32_t), sizeof(uint32_t));
+            if (blk >= asize) {
+                if (prev == 0) hdr->arena_large_free = next;
+                else memcpy(arena + prev, &next, sizeof(uint32_t));
+                return cur;
+            }
+            prev = cur; cur = next;
+        }
+    }
 
     uint64_t off = hdr->arena_bump;
     if (off + asize > hdr->arena_cap || off + asize > (uint64_t)UINT32_MAX)
@@ -821,8 +887,17 @@ static inline void shm_arena_free_block(ShmHeader *hdr, char *arena,
                                          uint32_t off, uint32_t len) {
     uint32_t asize = shm_arena_round_up(len);
     int cls = shm_arena_class_index(asize);
-    if (cls < 0 || off == 0) return;
-
+    if (off == 0) return;
+    if (cls < 0) {
+        /* Large block (> 2^19): single first-fit free list keyed by size, so
+         * churn of >512 KiB values recycles instead of leaking to bump-only.
+         * The block (>= 2^20 bytes) has ample room for the [next][size] head. */
+        uint32_t old_head = hdr->arena_large_free;
+        memcpy(arena + off, &old_head, sizeof(uint32_t));                  /* next */
+        memcpy(arena + off + sizeof(uint32_t), &asize, sizeof(uint32_t));  /* size */
+        hdr->arena_large_free = off;
+        return;
+    }
     uint32_t old_head = hdr->arena_free[cls];
     memcpy(arena + off, &old_head, sizeof(uint32_t));
     hdr->arena_free[cls] = off;
@@ -853,11 +928,19 @@ static inline void shm_str_free(ShmHeader *hdr, char *arena,
 
 /* Copy string data (inline or arena) into a destination buffer */
 static inline void shm_str_copy(char *dst, uint32_t off, uint32_t len_field,
-                                 const char *arena, uint32_t len) {
-    if (SHM_IS_INLINE(len_field))
+                                 const char *arena, uint32_t arena_cap, uint32_t len) {
+    if (SHM_IS_INLINE(len_field)) {
         shm_inline_read(off, len_field, dst);
-    else
+    } else if ((uint64_t)off + len <= arena_cap) {
         memcpy(dst, arena + off, len);
+    } else {
+        /* off/len come from the mmap'd node and a local peer
+         * can corrupt the backing file. A poisoned record delivers zeros here
+         * rather than reading out of bounds (CWE-125). The get path already
+         * bounded this; centralizing it covers every other caller
+         * (each/keys/values/pop/shift/take/swap/drain/cursor). */
+        memset(dst, 0, len);
+    }
 }
 
 /* ---- Utility ---- */
@@ -1250,11 +1333,33 @@ static ShmHandle *shm_alloc_handle(void *base, uint64_t total_size,
     return h;
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at
+ * file_mode, default 0600 = owner-only), or attach an existing file
+ * (O_RDWR|O_NOFOLLOW, no O_CREAT). Blocks a symlink swap or a pre-seeded/
+ * hard-linked backing file; cross-user sharing is opt-in via a wider file_mode. */
+static int shm_secure_open(const char *path, mode_t file_mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, file_mode);
+        if (fd >= 0) { (void)fchmod(fd, file_mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) {
+            if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "create(%s): %s", path, strerror(errno));
+            return -1;
+        }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "open(%s): %s", path, strerror(errno));
+        return -1;
+    }
+    if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "open(%s): create/attach kept racing", path);
+    return -1;
+}
+
 static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
                                   uint32_t node_size, uint32_t variant_id,
                                   int has_arena, uint32_t max_size,
                                   uint32_t default_ttl, uint32_t lru_skip,
-                                  uint64_t arena_cap_override, char *errbuf) {
+                                  uint64_t arena_cap_override, mode_t file_mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     uint32_t max_tcap = shm_max_tcap_from_entries(max_entries);
 
@@ -1278,8 +1383,8 @@ static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
         if (base == MAP_FAILED) { SHM_ERR("mmap(anon): %s", strerror(errno)); return NULL; }
         is_new = 1;
     } else {
-        fd = open(path, O_RDWR | O_CREAT | O_CLOEXEC, 0666);
-        if (fd < 0) { SHM_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
+        fd = shm_secure_open(path, file_mode, errbuf);
+        if (fd < 0) return NULL;
 
         while (flock(fd, LOCK_EX) < 0) {
             if (errno == EINTR) continue;  /* retry: a signal interrupted the blocking lock */
@@ -1460,7 +1565,9 @@ static void shm_close_map(ShmHandle *h) {
      * it).  The fork-generation check distinguishes the original owner
      * from a fork descendant that's about to exit. */
     if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
-        h->cached_fork_gen == __atomic_load_n(&shm_fork_gen, __ATOMIC_RELAXED)) {
+        h->cached_fork_gen == __atomic_load_n(&shm_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        /* subcount==0: a still-held lock's slot must survive for recovery */
         uint32_t expected = h->cached_pid;
         /* Just CAS pid → 0; do NOT clear subcount here — between the CAS
          * and the store, a new process could claim the slot and start
@@ -1482,7 +1589,7 @@ static ShmHandle *shm_create_sharded(const char *path_prefix, uint32_t num_shard
                                       uint32_t variant_id, int has_arena,
                                       uint32_t max_size, uint32_t default_ttl,
                                       uint32_t lru_skip, uint64_t arena_cap_override,
-                                      char *errbuf) {
+                                      mode_t file_mode, char *errbuf) {
     if (!path_prefix) {
         if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "new_sharded requires a path_prefix");
         return NULL;
@@ -1500,6 +1607,7 @@ static ShmHandle *shm_create_sharded(const char *path_prefix, uint32_t num_shard
 
     h->num_shards = num_shards;
     h->shard_mask = num_shards - 1;
+    h->backing_fd = -1;   /* dispatcher owns no fd; calloc left it 0 (=stdin) */
     h->path = strdup(path_prefix);
     if (!h->path) {
         if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "strdup: out of memory");
@@ -1522,7 +1630,7 @@ static ShmHandle *shm_create_sharded(const char *path_prefix, uint32_t num_shard
         }
         h->shard_handles[i] = shm_create_map(shard_path, max_entries, node_size,
                                                variant_id, has_arena, max_size,
-                                               default_ttl, lru_skip, arena_cap_override, errbuf);
+                                               default_ttl, lru_skip, arena_cap_override, file_mode, errbuf);
         if (!h->shard_handles[i]) {
             /* Clean up already-created shards */
             for (uint32_t j = 0; j < i; j++)
@@ -1667,11 +1775,11 @@ typedef struct {
 static ShmHandle *SHM_FN(create)(const char *path, uint32_t max_entries,
                                   uint32_t max_size, uint32_t default_ttl,
                                   uint32_t lru_skip, uint64_t arena_cap_override,
-                                  char *errbuf) {
+                                  mode_t file_mode, char *errbuf) {
     return shm_create_map(path, max_entries,
                            (uint32_t)sizeof(SHM_NODE_TYPE),
                            SHM_VARIANT_ID, SHM_HAS_ARENA,
-                           max_size, default_ttl, lru_skip, arena_cap_override, errbuf);
+                           max_size, default_ttl, lru_skip, arena_cap_override, file_mode, errbuf);
 }
 
 static ShmHandle *SHM_FN(create_sharded)(const char *path_prefix,
@@ -1679,11 +1787,11 @@ static ShmHandle *SHM_FN(create_sharded)(const char *path_prefix,
                                           uint32_t max_entries,
                                           uint32_t max_size, uint32_t default_ttl,
                                           uint32_t lru_skip, uint64_t arena_cap_override,
-                                          char *errbuf) {
+                                          mode_t file_mode, char *errbuf) {
     return shm_create_sharded(path_prefix, num_shards, max_entries,
                                (uint32_t)sizeof(SHM_NODE_TYPE),
                                SHM_VARIANT_ID, SHM_HAS_ARENA,
-                               max_size, default_ttl, lru_skip, arena_cap_override, errbuf);
+                               max_size, default_ttl, lru_skip, arena_cap_override, file_mode, errbuf);
 }
 
 static ShmHandle *SHM_FN(create_memfd)(const char *name, uint32_t max_entries,
@@ -1920,7 +2028,11 @@ static inline void SHM_FN(maybe_grow)(ShmHandle *h) {
     ShmHeader *hdr = h->hdr;
     uint32_t size = hdr->size, tomb = hdr->tombstones, cap = hdr->table_cap;
     if (__builtin_expect((uint64_t)(size + tomb) * 4 > (uint64_t)cap * 3, 0)) {
-        if (h->iterating > 0) { h->deferred = 1; return; }
+        /* Grow even while iterating: a load-driven insert must never silently
+         * fail below max_entries.  Both iterators auto-reset on the resulting
+         * table_gen bump (built-in each via iter_gen, cursors via c->gen), so
+         * an abandoned each or long-lived cursor can no longer wedge the table
+         * at capacity.  (Tombstone compaction below and shrink stay deferred.) */
         if (cap < hdr->max_table_cap)  /* cap is pow2; cap*2 can't overflow here */
             SHM_FN(resize)(h, cap * 2);
         else if (tomb > size || tomb > cap / 4)
@@ -2947,7 +3059,7 @@ static int SHM_FN(swap)(ShmHandle *h,
                     shm_rwlock_wrunlock(h);
                     return 0;
                 }
-                shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, old_vl);
+                shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, h->hdr->arena_cap, old_vl);
                 *out_str = h->copy_buf;
                 *out_len = old_vl;
                 *out_utf8 = SHM_UNPACK_UTF8(nodes[idx].val_len);
@@ -3092,7 +3204,7 @@ static int SHM_FN(take)(ShmHandle *h,
                     shm_rwlock_wrunlock(h);
                     return 0;
                 }
-                shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
+                shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, h->hdr->arena_cap, vl);
                 *out_str = h->copy_buf;
                 *out_len = vl;
                 *out_utf8 = SHM_UNPACK_UTF8(nodes[idx].val_len);
@@ -3293,7 +3405,7 @@ static int SHM_FN(pop)(ShmHandle *h,
             shm_rwlock_wrunlock(h);
             return 0;
         }
-        shm_str_copy(h->copy_buf, nodes[idx].key_off, nodes[idx].key_len, h->arena, kl);
+        shm_str_copy(h->copy_buf, nodes[idx].key_off, nodes[idx].key_len, h->arena, h->hdr->arena_cap, kl);
         *out_key_str = h->copy_buf;
         *out_key_len = kl;
         *out_key_utf8 = SHM_UNPACK_UTF8(nodes[idx].key_len);
@@ -3312,7 +3424,7 @@ static int SHM_FN(pop)(ShmHandle *h,
             return 0;
         }
         *out_key_str = h->copy_buf;
-        shm_str_copy(h->copy_buf + kl, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
+        shm_str_copy(h->copy_buf + kl, nodes[idx].val_off, nodes[idx].val_len, h->arena, h->hdr->arena_cap, vl);
         *out_val_str = h->copy_buf + kl;
 #else
         if (!shm_ensure_copy_buf(h, vl + 1)) {
@@ -3320,7 +3432,7 @@ static int SHM_FN(pop)(ShmHandle *h,
             shm_rwlock_wrunlock(h);
             return 0;
         }
-        shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
+        shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, h->hdr->arena_cap, vl);
         *out_val_str = h->copy_buf;
 #endif
         *out_val_len = vl;
@@ -3419,7 +3531,7 @@ static int SHM_FN(shift)(ShmHandle *h,
             shm_rwlock_wrunlock(h);
             return 0;
         }
-        shm_str_copy(h->copy_buf, nodes[idx].key_off, nodes[idx].key_len, h->arena, kl);
+        shm_str_copy(h->copy_buf, nodes[idx].key_off, nodes[idx].key_len, h->arena, h->hdr->arena_cap, kl);
         *out_key_str = h->copy_buf;
         *out_key_len = kl;
         *out_key_utf8 = SHM_UNPACK_UTF8(nodes[idx].key_len);
@@ -3437,7 +3549,7 @@ static int SHM_FN(shift)(ShmHandle *h,
             return 0;
         }
         *out_key_str = h->copy_buf;
-        shm_str_copy(h->copy_buf + kl, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
+        shm_str_copy(h->copy_buf + kl, nodes[idx].val_off, nodes[idx].val_len, h->arena, h->hdr->arena_cap, vl);
         *out_val_str = h->copy_buf + kl;
 #else
         if (!shm_ensure_copy_buf(h, vl + 1)) {
@@ -3445,7 +3557,7 @@ static int SHM_FN(shift)(ShmHandle *h,
             shm_rwlock_wrunlock(h);
             return 0;
         }
-        shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
+        shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, h->hdr->arena_cap, vl);
         *out_val_str = h->copy_buf;
 #endif
         *out_val_len = vl;
@@ -3532,7 +3644,7 @@ static uint32_t SHM_FN(drain_inner)(ShmHandle *h, uint32_t limit,
             uint32_t kl = SHM_STR_LEN(nodes[idx].key_len);
             if ((uint64_t)buf_used + kl > UINT32_MAX) break;  /* drain buffer would exceed 4GB */
             if (!shm_grow_buf(buf, buf_cap, buf_used + kl)) break;
-            shm_str_copy(*buf + buf_used, nodes[idx].key_off, nodes[idx].key_len, h->arena, kl);
+            shm_str_copy(*buf + buf_used, nodes[idx].key_off, nodes[idx].key_len, h->arena, h->hdr->arena_cap, kl);
             out[count].key_off = buf_used;
             out[count].key_len = kl;
             out[count].key_utf8 = SHM_UNPACK_UTF8(nodes[idx].key_len);
@@ -3545,7 +3657,7 @@ static uint32_t SHM_FN(drain_inner)(ShmHandle *h, uint32_t limit,
             uint32_t vl = SHM_STR_LEN(nodes[idx].val_len);
             if ((uint64_t)buf_used + vl > UINT32_MAX) break;  /* drain buffer would exceed 4GB */
             if (!shm_grow_buf(buf, buf_cap, buf_used + vl)) break;
-            shm_str_copy(*buf + buf_used, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
+            shm_str_copy(*buf + buf_used, nodes[idx].val_off, nodes[idx].val_len, h->arena, h->hdr->arena_cap, vl);
             out[count].val_off = buf_used;
             out[count].val_len = vl;
             out[count].val_utf8 = SHM_UNPACK_UTF8(nodes[idx].val_len);
@@ -4187,7 +4299,7 @@ static int SHM_FN(get_with_ttl)(ShmHandle *h,
                     shm_rwlock_rdunlock(h);
                     return 0;
                 }
-                shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
+                shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, h->hdr->arena_cap, vl);
                 *out_str = h->copy_buf;
                 *out_len = vl;
                 *out_utf8 = SHM_UNPACK_UTF8(nodes[idx].val_len);
@@ -4693,6 +4805,7 @@ static void SHM_FN(clear)(ShmHandle *h) {
     if (h->arena) {
         hdr->arena_bump = SHM_ARENA_MIN_ALLOC;
         memset(hdr->arena_free, 0, sizeof(hdr->arena_free));
+        hdr->arena_large_free = 0;
         madvise(h->arena, (size_t)hdr->arena_cap, MADV_DONTNEED);
     }
 
@@ -4815,7 +4928,7 @@ static int SHM_FN(get_or_set)(ShmHandle *h,
                     shm_rwlock_wrunlock(h);
                     return 0;
                 }
-                shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
+                shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, h->hdr->arena_cap, vl);
                 *out_str = h->copy_buf;
                 *out_len = vl;
                 *out_utf8 = SHM_UNPACK_UTF8(nodes[idx].val_len);
@@ -4985,7 +5098,7 @@ static int SHM_FN(each)(ShmHandle *h,
                     shm_rwlock_rdunlock(h);
                     return 0;
                 }
-                shm_str_copy(h->copy_buf, nodes[pos].key_off, nodes[pos].key_len, h->arena, kl);
+                shm_str_copy(h->copy_buf, nodes[pos].key_off, nodes[pos].key_len, h->arena, h->hdr->arena_cap, kl);
                 *out_key_str = h->copy_buf;
                 *out_key_len = kl;
                 *out_key_utf8 = SHM_UNPACK_UTF8(nodes[pos].key_len);
@@ -4996,7 +5109,7 @@ static int SHM_FN(each)(ShmHandle *h,
                 uint32_t vl = SHM_STR_LEN(nodes[pos].val_len);
 #ifndef SHM_KEY_IS_INT
                 uint32_t kl = SHM_STR_LEN(nodes[pos].key_len);
-                shm_str_copy(h->copy_buf + kl, nodes[pos].val_off, nodes[pos].val_len, h->arena, vl);
+                shm_str_copy(h->copy_buf + kl, nodes[pos].val_off, nodes[pos].val_len, h->arena, h->hdr->arena_cap, vl);
                 *out_val_str = h->copy_buf + kl;
 #else
                 if (!shm_ensure_copy_buf(h, vl)) {
@@ -5006,7 +5119,7 @@ static int SHM_FN(each)(ShmHandle *h,
                     shm_rwlock_rdunlock(h);
                     return 0;
                 }
-                shm_str_copy(h->copy_buf, nodes[pos].val_off, nodes[pos].val_len, h->arena, vl);
+                shm_str_copy(h->copy_buf, nodes[pos].val_off, nodes[pos].val_len, h->arena, h->hdr->arena_cap, vl);
                 *out_val_str = h->copy_buf;
 #endif
                 *out_val_len = vl;
@@ -5083,7 +5196,7 @@ static int SHM_FN(cursor_next)(ShmCursor *c,
                         shm_rwlock_rdunlock(h);
                         return 0;
                     }
-                    shm_str_copy(c->copy_buf, nodes[pos].key_off, nodes[pos].key_len, h->arena, kl);
+                    shm_str_copy(c->copy_buf, nodes[pos].key_off, nodes[pos].key_len, h->arena, h->hdr->arena_cap, kl);
                     *out_key_str = c->copy_buf;
                     *out_key_len = kl;
                     *out_key_utf8 = SHM_UNPACK_UTF8(nodes[pos].key_len);
@@ -5094,14 +5207,14 @@ static int SHM_FN(cursor_next)(ShmCursor *c,
                     uint32_t vl = SHM_STR_LEN(nodes[pos].val_len);
 #ifndef SHM_KEY_IS_INT
                     uint32_t kl = SHM_STR_LEN(nodes[pos].key_len);
-                    shm_str_copy(c->copy_buf + kl, nodes[pos].val_off, nodes[pos].val_len, h->arena, vl);
+                    shm_str_copy(c->copy_buf + kl, nodes[pos].val_off, nodes[pos].val_len, h->arena, h->hdr->arena_cap, vl);
                     *out_val_str = c->copy_buf + kl;
 #else
                     if (!shm_cursor_ensure_copy_buf(c, vl)) {
                         shm_rwlock_rdunlock(h);
                         return 0;
                     }
-                    shm_str_copy(c->copy_buf, nodes[pos].val_off, nodes[pos].val_len, h->arena, vl);
+                    shm_str_copy(c->copy_buf, nodes[pos].val_off, nodes[pos].val_len, h->arena, h->hdr->arena_cap, vl);
                     *out_val_str = c->copy_buf;
 #endif
                     *out_val_len = vl;

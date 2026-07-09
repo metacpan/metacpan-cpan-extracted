@@ -1,18 +1,19 @@
 {
-   "abstract" : "Redis-based session management engine for web applications",
+   "abstract" : "Redis storage for WWW::Session",
    "author" : [
-      "Jeffrey Goff <jeffrey.goff@evozon.com>"
+      "Jeffrey Goff <jeffrey.goff@evozon.com>",
+      "Horea Gligan <horea.gligan@devnest.ro>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
-   "name" : "WWW-Session-Session-Redis",
+   "name" : "WWW-Session-Storage-Redis",
    "no_index" : {
       "directory" : [
          "t",
@@ -32,7 +33,14 @@
       },
       "runtime" : {
          "requires" : {
+            "Cache::Redis" : "0",
+            "JSON" : "0",
             "Storable" : "0",
+            "WWW::Session" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
@@ -40,5 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

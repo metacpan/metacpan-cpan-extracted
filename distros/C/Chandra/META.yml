@@ -26,5 +26,5 @@ requires:
   Object::Proto: '0.16'
   perl: '5.010'
 resources: {}
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

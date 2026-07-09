@@ -39,7 +39,18 @@
  * The default is a no-op; the compiler may warn about missing returns
  * but the code is correct. */
 #ifndef dtl_unreachable
-#  if defined(__GNUC__) || defined(__clang__)
+   /* __builtin_unreachable() requires GCC 4.5+ (April 2010) or clang. On
+    * older GCC such as GCC 4.4 (Strawberry Perl 5.12 on MSWin32), it is
+    * absent and using it produces an "undefined reference" link error.
+    * Falling back to a no-op is safe: the compiler may emit a warning
+    * about missing returns but the generated code remains correct. */
+#  if defined(__clang__)
+#    if __has_builtin(__builtin_unreachable)
+#      define dtl_unreachable() __builtin_unreachable()
+#    else
+#      define dtl_unreachable() ((void)0)
+#    endif
+#  elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
 #    define dtl_unreachable() __builtin_unreachable()
 #  else
 #    define dtl_unreachable() ((void)0)

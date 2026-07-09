@@ -79,6 +79,9 @@ _define_constants();
   our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 }
 
+*aes256gcm_available = \&aead_aes256gcm_available;
+*aegis_available = \&aead_aegis_available;
+
 package Crypt::Sodium::XS::OO::aead;
 use parent 'Crypt::Sodium::XS::OO::Base';
 
@@ -111,7 +114,7 @@ my %methods = (
     keygen => \&Crypt::Sodium::XS::aead::aead_chacha20poly1305_ietf_keygen,
     nonce => \&Crypt::Sodium::XS::aead::aead_chacha20poly1305_ietf_nonce,
   },
-  Crypt::Sodium::XS::aead::aead_aegis_available() ? (
+  Crypt::Sodium::XS::aead->aegis_available ? (
     aegis128l => {
       ABYTES => \&Crypt::Sodium::XS::aead::aead_aegis128l_ABYTES,
       KEYBYTES => \&Crypt::Sodium::XS::aead::aead_aegis128l_KEYBYTES,
@@ -141,7 +144,7 @@ my %methods = (
       nonce => \&Crypt::Sodium::XS::aead::aead_aegis256_nonce,
     },
   ) : (),
-  Crypt::Sodium::XS::aead::aead_aes256gcm_available() ? (
+  Crypt::Sodium::XS::aead->aes256gcm_available ? (
     aes256gcm => {
       ABYTES => \&Crypt::Sodium::XS::aead::aead_aes256gcm_ABYTES,
       KEYBYTES => \&Crypt::Sodium::XS::aead::aead_aes256gcm_KEYBYTES,
@@ -175,9 +178,8 @@ my %methods = (
 
 sub Crypt::Sodium::XS::aead::primitives { keys %methods }
 *primitives = \&Crypt::Sodium::XS::aead::primitives;
-
-sub aes256gcm_available { goto \&Crypt::Sodium::XS::aead::aead_aes256gcm_available }
-sub aegis_available { goto \&Crypt::Sodium::XS::aead::aead_aegis_available }
+*aes256gcm_available = \&Crypt::Sodium::XS::aead::aes256gcm_available;
+*aegis_available = \&Crypt::Sodium::XS::aead::aegis_available;
 
 sub ABYTES { my $self = shift; goto $methods{$self->{primitive}}->{ABYTES}; }
 sub KEYBYTES { my $self = shift; goto $methods{$self->{primitive}}->{KEYBYTES}; }
@@ -205,13 +207,12 @@ Crypt::Sodium::XS::aead - Authenticated encryption with additional data
 =head1 SYNOPSIS
 
   use Crypt::Sodium::XS;
-  use Crypt::Sodium::XS::aead ":features";
+  use Crypt::Sodium::XS::aead;
   use Crypt::Sodium::XS::Util "sodium_increment";
 
-  my $primitive = 'xchacha20poly1305_ietf';
-  $primitive = 'aes256gcm' if aead_aes256gcm_available;
-  $primitive = 'aegis256' if aead_aegis_available;
-  my $aead = Crypt::Sodium::XS->aead(primitive => $primitive);
+  my $aead = Crypt::Sodium::XS->aead(primitive => 'xchacha20poly1305_ietf');
+  $aead->primitive('aes256gcm') if $aead->aes256gcm_available;
+  $aead->primitive('aegis256') if $aead->aegis_available;
 
   my $key = $aead->keygen;
   my $nonce = $aead->nonce;
@@ -288,18 +289,24 @@ C<default> primitive, and this attribute is always identical to L</PRIMITIVE>.
 =head2 aes256gcm_available
 
   my $has_aes256gcm = $aead->aes256gcm_available;
+  my $has_aes256gcm = Crypt::Sodium::XS::aead->aes256gcm_available;
 
 Returns true if the current environment supports the C<aes256gcm> primitive,
 false otherwise.
 
+Can be called as a class method.
+
 =head2 aegis_available
 
   my $has_aegis = $aead->aegis_available;
+  my $has_aegis = Crypt::Sodium::XS::aead->aegis_available;
 
 Returns true if L<Crypt::Sodium::XS> supports AEGIS primitives, false
 otherwise. AEGIS will only be supported if L<Crypt::Sodium::XS> was built with
-a new enough version of libsodium headers. A newer dynamic library at runtime
-will not enable support.
+a new enough version of libsodium headers (at least 1.0.19). A newer dynamic
+library at runtime will not enable support.
+
+Can be called as a class method.
 
 =head2 primitives
 
@@ -571,8 +578,15 @@ Returns the detached encrypted ciphertext and its authentication tag.
 
 =item * aes256gcm
 
-Check L</aead_aes256gcm_available> to see if this primitive can be used and
-read the important note below.
+See L</aes256gcm_available>.
+
+=item * aegis128l
+
+See L</aegis_available>.
+
+=item * aegis256
+
+See L</aegis_available>.
 
 =back
 
@@ -613,21 +627,11 @@ primitive.
 
 =head2 aead_aes256gcm_available
 
-  my $has_aes256gcm = aead_aes256gcm_available();
-  my $has_aes256gcm = Crypt::Sodium::XS::aead->aead_aes256gcm_available();
-
 Same as L</aes256gcm_available>.
-
-Can be called as a class method.
 
 =head2 aead_aegis_available
 
-  my $has_aegis = aead_aegis_available();
-  my $has_aegis = Crypt::Sodium::XS::aead->aead_aegis_available();
-
 Same as L</aegis_available>.
-
-Can be called as a class method.
 
 =head2 aead_aes256gcm_beforenm
 

@@ -9,13 +9,12 @@ App::Codit::Plugins::PerlSubs - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.20';
 use base qw( App::Codit::BaseClasses::TextModPlugin );
 
 use Data::Compare;
 use Tk;
-require Tk::HList;
-require Tk::FileBrowser::Header;
+require Tk::ListBrowser;
 
 =head1 DESCRIPTION
 
@@ -45,36 +44,38 @@ sub new {
 	$self->{SORTON} = 'Line';
 	$self->{SORTORDER} = 'ascending';
 	
-	my $hlist = $page->Scrolled('HList',
+	my $list = $page->ListBrowser(
+		-arrange => 'list',
+#		-autorefresh => 1,
 		-browsecmd => ['Select', $self],
-		-columns => 2,
-		-header => 1,
-		-scrollbars => 'osoe',
+		-filterforce => 1,
+		-itemtype => 'text',
+		-selectmode => 'single',
+		-textanchor => 'w',
+		-textside => 'right',
 	)->pack(-expand => 1, -fill => 'both');
-	$self->{HLIST} = $hlist;
-	my $count = 0;
-	for ('Sub', 'Line') {
-		my $header = $hlist->Header(
-			-column => $count,
-			-sortcall => ['Sortcall', $self],
-			-text => $_,
-		);
-		$hlist->headerCreate($count,
-			-headerbackground => $self->configGet('-background'),
-			-itemtype => 'window', 
-			-widget => $header
-		);
-		$count ++;
-	}
-	my $h2 = $hlist->headerCget(1, '-widget');
-	$h2->configure(-sortorder => 'ascending');
+	$self->{LIST} = $list;
+	$list->forceWidth(100);
+	$list->headerCreate('',
+		-text => 'Sub',
+		-sortable => 1,
+	);
+	my $col = $list->columnCreate('Line', 
+		-sortnumerical => 1,
+	);
+	$col->forceWidth(50);
+	$list->headerCreate('Line',
+		-text => 'Line',
+		-sortable => 1,
+	);
+	$list->headerPlace;
 
 	return $self;
 }
 
 sub Clear {
 	my $self = shift;
-	my $hlist = $self->{HLIST};
+	my $hlist = $self->{LIST};
 	$hlist->deleteAll;
 }
 
@@ -87,10 +88,10 @@ sub Current {
 sub FillList {
 	my ($self, $new, $select) = @_;
 	$select = 1 unless defined $select;
-	my $hlist = $self->{HLIST};
+	my $hlist = $self->{LIST};
 	my $cursel;
 	( $cursel ) = $hlist->infoSelection;
-	my $lastvisible = $hlist->nearest($hlist->height - 1);
+#	my $lastvisible = $hlist->nearest($hlist->height - 1);
 	$self->Clear;
 
 	for (@$new) {
@@ -101,17 +102,21 @@ sub FillList {
 			$item = "$name$count";
 			$count ++
 		}
-		$hlist->add($item, -data => $num);
-		$hlist->itemCreate($item, 0, -text => $name);
-		$hlist->itemCreate($item, 1, -text => $num);
+		$hlist->add($item, -data => $num, -text => $name);
+		$hlist->itemCreate($item, 'Line', -text => $num);
 	}
 
 	#find and set selection
 	if ($select) {
 		$hlist->selectionSet($cursel) if (defined $cursel) and $hlist->infoExists($cursel);
-		$hlist->see($lastvisible) if (defined $lastvisible) and $hlist->infoExists($lastvisible);
+#		$hlist->see($lastvisible) if (defined $lastvisible) and $hlist->infoExists($lastvisible);
 	}
 	$self->Current($new);
+	$hlist->clear;
+	my $c = $hlist->Subwidget('Canvas');
+	my ($view) = $c->yview;
+	$hlist->refresh;
+	$c->yview('moveto', $view);
 }
 
 sub Refresh {
@@ -144,7 +149,7 @@ sub Refresh {
 
 sub Select {
 	my ($self, $name) = @_;
-	my $hlist = $self->{HLIST};
+	my $hlist = $self->{LIST};
 	my $doc = $self->mdi->docWidget;
 	if (defined $doc) {
 		my $line = $hlist->infoData($name);
@@ -180,7 +185,7 @@ sub Sortcall {
 	my ($self, $on, $order) = @_;
 	$self->SortOn($on);
 	$self->SortOrder($order);
-	my $hlist = $self->{HLIST};
+	my $hlist = $self->{LIST};
 
 	my $col;
 	$col = 0 if $on eq 'Sub';
@@ -243,20 +248,3 @@ If you find any bugs, please report them here L<https://github.com/haje61/App-Co
 
 
 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

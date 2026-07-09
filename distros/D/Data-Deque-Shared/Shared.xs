@@ -211,15 +211,16 @@ MODULE = Data::Deque::Shared  PACKAGE = Data::Deque::Shared::Int
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[DEQ_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    DeqHandle *h = deq_create(p, capacity, sizeof(int64_t), DEQ_VAR_INT, errbuf);
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    DeqHandle *h = deq_create(p, capacity, sizeof(int64_t), DEQ_VAR_INT, mode, errbuf);
     if (!h) croak("Data::Deque::Shared::Int->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -357,7 +358,7 @@ MODULE = Data::Deque::Shared  PACKAGE = Data::Deque::Shared::Str
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity, max_len)
+new(class, path, capacity, max_len, ...)
     const char *class
     SV *path
     UV capacity
@@ -366,11 +367,12 @@ new(class, path, capacity, max_len)
     char errbuf[DEQ_ERR_BUFLEN];
   CODE:
     if (max_len == 0) croak("max_len must be > 0");
-    if (max_len > (UV)(UINT32_MAX - sizeof(uint32_t)))
-        croak("max_len too large");
+    if (max_len >= 0x80000000u)   /* bit 31 of the stored length is the UTF8 flag */
+        croak("max_len too large (>= 2 GiB)");
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    DeqHandle *h = deq_create(p, capacity, elem_size, DEQ_VAR_STR, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    DeqHandle *h = deq_create(p, capacity, elem_size, DEQ_VAR_STR, mode, errbuf);
     if (!h) croak("Data::Deque::Shared::Str->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -386,8 +388,8 @@ new_memfd(class, name, capacity, max_len)
     char errbuf[DEQ_ERR_BUFLEN];
   CODE:
     if (max_len == 0) croak("max_len must be > 0");
-    if (max_len > (UV)(UINT32_MAX - sizeof(uint32_t)))
-        croak("max_len too large");
+    if (max_len >= 0x80000000u)   /* bit 31 of the stored length is the UTF8 flag */
+        croak("max_len too large (>= 2 GiB)");
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
     DeqHandle *h = deq_create_memfd(name, capacity, elem_size, DEQ_VAR_STR, errbuf);
     if (!h) croak("Data::Deque::Shared::Str->new_memfd: %s", errbuf);
@@ -418,10 +420,10 @@ push_back(self, val)
     STRLEN slen;
     const char *s = SvPV(val, slen);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;
+    if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen;
+    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
     RETVAL = deq_try_push_back(h, buf, h->elem_size);
@@ -439,10 +441,10 @@ push_front(self, val)
     STRLEN slen;
     const char *s = SvPV(val, slen);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;
+    if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen;
+    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
     RETVAL = deq_try_push_front(h, buf, h->elem_size);
@@ -462,10 +464,10 @@ push_back_wait(self, val, ...)
     STRLEN slen;
     const char *s = SvPV(val, slen);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;
+    if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen;
+    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
     RETVAL = deq_push_wait(h, buf, h->elem_size, 0, timeout);
@@ -485,10 +487,10 @@ push_front_wait(self, val, ...)
     STRLEN slen;
     const char *s = SvPV(val, slen);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
-    if (slen > max_len) slen = max_len;
+    if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen;
+    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
     RETVAL = deq_push_wait(h, buf, h->elem_size, 1, timeout);
@@ -506,11 +508,14 @@ pop_front(self)
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
     if (deq_try_pop_front(h, buf)) {
-        uint32_t len;
-        memcpy(&len, buf, sizeof(uint32_t));
+        uint32_t l32;
+        memcpy(&l32, buf, sizeof(uint32_t));
+        int is_utf8 = (l32 & 0x80000000u) != 0;
+        uint32_t len = l32 & 0x7FFFFFFFu;
         uint32_t max_len = h->elem_size - sizeof(uint32_t);
         if (len > max_len) len = max_len;
         RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+        if (is_utf8) SvUTF8_on(RETVAL);
     } else {
         RETVAL = &PL_sv_undef;
     }
@@ -527,11 +532,14 @@ pop_back(self)
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
     if (deq_try_pop_back(h, buf)) {
-        uint32_t len;
-        memcpy(&len, buf, sizeof(uint32_t));
+        uint32_t l32;
+        memcpy(&l32, buf, sizeof(uint32_t));
+        int is_utf8 = (l32 & 0x80000000u) != 0;
+        uint32_t len = l32 & 0x7FFFFFFFu;
         uint32_t max_len = h->elem_size - sizeof(uint32_t);
         if (len > max_len) len = max_len;
         RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+        if (is_utf8) SvUTF8_on(RETVAL);
     } else {
         RETVAL = &PL_sv_undef;
     }
@@ -550,11 +558,14 @@ pop_front_wait(self, ...)
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
     if (deq_pop_wait(h, buf, 0, timeout)) {
-        uint32_t len;
-        memcpy(&len, buf, sizeof(uint32_t));
+        uint32_t l32;
+        memcpy(&l32, buf, sizeof(uint32_t));
+        int is_utf8 = (l32 & 0x80000000u) != 0;
+        uint32_t len = l32 & 0x7FFFFFFFu;
         uint32_t max_len = h->elem_size - sizeof(uint32_t);
         if (len > max_len) len = max_len;
         RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+        if (is_utf8) SvUTF8_on(RETVAL);
     } else {
         RETVAL = &PL_sv_undef;
     }
@@ -573,11 +584,14 @@ pop_back_wait(self, ...)
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
     if (deq_pop_wait(h, buf, 1, timeout)) {
-        uint32_t len;
-        memcpy(&len, buf, sizeof(uint32_t));
+        uint32_t l32;
+        memcpy(&l32, buf, sizeof(uint32_t));
+        int is_utf8 = (l32 & 0x80000000u) != 0;
+        uint32_t len = l32 & 0x7FFFFFFFu;
         uint32_t max_len = h->elem_size - sizeof(uint32_t);
         if (len > max_len) len = max_len;
         RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+        if (is_utf8) SvUTF8_on(RETVAL);
     } else {
         RETVAL = &PL_sv_undef;
     }

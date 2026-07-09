@@ -1,5 +1,32 @@
 Revision history for Perl extension App-Greple-xlate
 
+2.01 2026-07-09T05:59:30Z
+
+    - Renew the `xlate` command-line front-end for the 2.0 module.
+      Incompatible changes in the `xlate` command (the -Mxlate module
+      interface is unchanged):
+        * The default engine changes from deepl to gpt5.  Cache file
+          names include the engine name, so run with `-e deepl` to keep
+          using DeepL for existing documents.
+        * API translation is now the default.  The clipboard-based
+          manual translation mode is now `--no-api` (`-a`/`--api`
+          remains valid as an explicit default).
+        * `-n` is now a counting flag: once prints the composed greple
+          command as before, twice (`-nn`) runs it with --xlate-dryrun
+          to preview the transmission payload without calling the API.
+    - Add first-class `xlate` options for the 2.0 module features:
+      --anonymize, --mark, --template, --frontmatter, --seed and
+      --context, mapping to the corresponding --xlate-* options.
+    - share/XLATE.mk defaults to gpt5 and carries the new options via
+      XLATE_ANONYMIZE, XLATE_MARK, XLATE_TEMPLATE, XLATE_FRONTMATTER,
+      XLATE_SEED and XLATE_CONTEXT_WINDOW; a per-file FILE.ANONYMIZE
+      control file is used as that file's anonymization dictionary.
+    - Fix: --xlate-dryrun no longer prints "!!! TRANSLATION ERROR !!!"
+      for cache misses with a substituting output format.
+    - Fix: --xlate-dryrun combined with --xlate-cache=clear no longer
+      truncates the on-disk cache file.
+    - Fix a stray masking tag left in the Korean DeepL documentation.
+
 2.00 2026-07-06T19:58:24Z
 
     - New llm backend: the gpt5 engine now calls the general-purpose

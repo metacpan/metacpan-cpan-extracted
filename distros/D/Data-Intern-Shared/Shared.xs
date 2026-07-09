@@ -22,7 +22,7 @@ MODULE = Data::Intern::Shared  PACKAGE = Data::Intern::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, max_strings, arena_bytes = 0)
+new(class, path, max_strings, arena_bytes = 0, ...)
     const char *class
     SV *path
     UV max_strings
@@ -30,10 +30,12 @@ new(class, path, max_strings, arena_bytes = 0)
   PREINIT:
     char errbuf[SI_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Opt-in file mode for cross-user sharing; default 0600 (owner-only). */
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     if (max_strings > SI_MAX_STRINGS) croak("Data::Intern::Shared->new: max_strings exceeds 2^30");
     if (arena_bytes > UINT32_MAX) croak("Data::Intern::Shared->new: arena_bytes exceeds 2^32");
-    SiHandle *h = si_create(p, (uint32_t)max_strings, (uint32_t)arena_bytes, errbuf);
+    SiHandle *h = si_create(p, (uint32_t)max_strings, (uint32_t)arena_bytes, mode, errbuf);
     if (!h) croak("Data::Intern::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -48,7 +50,7 @@ new_memfd(class, name, max_strings, arena_bytes = 0)
   PREINIT:
     char errbuf[SI_ERR_BUFLEN];
   CODE:
-    const char *nm = SvOK(name) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     if (max_strings > SI_MAX_STRINGS) croak("Data::Intern::Shared->new_memfd: max_strings exceeds 2^30");
     if (arena_bytes > UINT32_MAX) croak("Data::Intern::Shared->new_memfd: arena_bytes exceeds 2^32");
     SiHandle *h = si_create_memfd(nm, (uint32_t)max_strings, (uint32_t)arena_bytes, errbuf);
@@ -179,14 +181,33 @@ string(self, id)
   CODE:
     si_rwlock_rdlock(h);
     {
-        SV *out = &PL_sv_undef;
+        char *tmp = NULL; uint32_t tl = 0; int found = 0;
+        /* id, reverse[id] and the arena length prefix are all file-stored and
+         * attacker-controlled; bound each before dereferencing so a corrupted
+         * segment yields undef instead of an out-of-bounds read/trap. Valid
+         * data always satisfies off+4+len <= arena_used, so behavior is
+         * unchanged in normal use. */
         if (id < h->hdr->count) {
-            uint32_t l;
-            const char *str = si_arena_str(h, h->reverse[id], &l);
-            out = newSVpvn(str, l);
+            uint32_t off = h->reverse[id];
+            uint32_t used = h->hdr->arena_used;
+            if (off <= used && used - off >= sizeof(uint32_t)) {
+                uint32_t l;
+                const char *str = si_arena_str(h, off, &l);
+                if (l <= used - off - (uint32_t)sizeof(uint32_t)) {
+                    found = 1; tl = l;
+                    /* Copy out with a non-croaking malloc so the SV can be
+                     * built AFTER unlocking: newSVpvn can croak on OOM, and a
+                     * croak while holding the rdlock would leak it and wedge
+                     * every writer. */
+                    if (l) { tmp = (char *)malloc(l); if (tmp) memcpy(tmp, str, l); }
+                }
+            }
         }
         si_rwlock_rdunlock(h);
-        RETVAL = out;
+        if (!found)          RETVAL = &PL_sv_undef;
+        else if (tl == 0)    RETVAL = newSVpvn("", 0);
+        else if (tmp)      { RETVAL = newSVpvn(tmp, tl); free(tmp); }
+        else croak("Data::Intern::Shared->string: out of memory");
     }
   OUTPUT:
     RETVAL
@@ -268,6 +289,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::Intern::Shared")) {
         SiHandle *h = INT2PTR(SiHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.19';
+$VERSION = '0.20';
 use Tk;
 use App::Codit::CodeTextManager;
 use Config;

@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::Sodium::XS::hkdf 'hkdf_available';
+use Crypt::Sodium::XS::hkdf;
 
-plan skip_all => 'no hkdf available' unless hkdf_available;
+plan skip_all => 'no hkdf available' unless Crypt::Sodium::XS::hkdf->available;
 
 use FindBin '$Bin';
 use lib "$Bin/lib";

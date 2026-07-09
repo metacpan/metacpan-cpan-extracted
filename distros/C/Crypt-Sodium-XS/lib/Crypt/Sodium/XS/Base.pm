@@ -20,6 +20,7 @@ sub hash { shift; sodium_op(hash => @_) }
 sub hkdf { shift; sodium_op(hkdf => @_) }
 sub ipcrypt { shift; sodium_op(ipcrypt => @_) }
 sub kdf { shift; sodium_op(kdf => @_) }
+sub kem { shift; sodium_op(kem => @_) }
 sub kx { shift; sodium_op(kx => @_) }
 sub onetimeauth { shift; sodium_op(onetimeauth => @_) }
 sub pwhash { shift; sodium_op(pwhash => @_) }
@@ -29,5 +30,6 @@ sub secretstream { shift; sodium_op(secretstream => @_) }
 sub shorthash { shift; sodium_op(shorthash => @_) }
 sub sign { shift; sodium_op(sign => @_) }
 sub stream { shift; sodium_op(stream => @_) }
+sub xof { shift; sodium_op(xof => @_) }
 
 1;

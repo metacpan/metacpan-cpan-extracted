@@ -5,7 +5,7 @@ package Backblaze::B2V4;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use v5.38; # or higher
 use Cpanel::JSON::XS;
@@ -346,7 +346,7 @@ sub b2_upload_file ($self, $args) {
 	}
 
 	# send the special request
-	my $response => $self->send_request(
+	my $response = $self->send_request(
 		'url' => $upload_info->{upload_url},
 		'authorization' => $upload_info->{authorization_token},
 		'file_contents' => $file_contents,

@@ -97,7 +97,7 @@ my %WriteMakefileArgs = (
         'Config'                     => 0,
         'Cwd'                        => 0,
         # Non-core runtime dependencies (minimal set)
-        'DateTime::Locale::FromCLDR' => 'v0.8.5',
+        'DateTime::Locale::FromCLDR' => 'v0.8.7',
         # DBD::SQLite is used by DateTime::Lite::TimeZone for the bundled SQLite
         # timezone database. If unavailable, it falls back to DateTime::TimeZone
         # automatically.
@@ -125,7 +125,7 @@ my %WriteMakefileArgs = (
             ? ( 'JSON' => '2.20' )
             : ()
         ),
-        'Locale::Unicode'            => 'v0.4.0',
+        'Locale::Unicode'            => 'v0.4.3',
         'POSIX'                      => 0,
         'Scalar::Util'               => 0,
         # 'Storable'                   => 0,

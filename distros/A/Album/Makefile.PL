@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Jul  9 15:45:48 2004
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Mar 21 10:22:21 2007
-# Update Count    : 25
+# Last Modified On: Wed Jul  8 17:31:55 2026
+# Update Count    : 33
 # Status          : Experimental
 
 use strict;
@@ -48,21 +48,46 @@ print STDERR <<EOD;
 EOD
 checkexec("mplayer");
 
+# Image::Magick doesn't build, so do not depend.
+print STDERR <<EOD;
+
+  Image::Magick  is used for various image manipulations.
+              Please make sure you have it installed.
+
+EOD
+
+
 print STDERR ("\n");
 
 WriteMakefile
   (
-   NAME         => ucfirst($scripts[0]),
-   VERSION_FROM => "script/$scripts[0]",
+   NAME         => "Album",
+   VERSION_FROM => "lib/Album.pm",
    ($] >= 5.005) ?
    ( AUTHOR	=> 'Johan Vromans (jvromans@squirrel.nl)',
      ABSTRACT	=> 'Creates HTML based photo albums' ) : (),
-   PREREQ_PM	=> { 'Getopt::Long' => 2.1,
+   PREREQ_PM	=> { 'Getopt::Long' => 2.13,
 		     'Image::Info' => 1.16,
-		     'Image::Magick' => 6,
+#		     'Image::Magick' => 6,
 		     'File::Spec' => 0,
 		   },
    EXE_FILES    => [ map { "script/$_" } @scripts ],
+   META_MERGE => {
+    no_index => {
+        file => [
+		  "lib/Album/Tutorial.pm",
+        ]
+    },
+    resources    => {
+      repository => 'https://github.com/sciurius/album',
+      bugtracker => "https://github.com/sciurius/album/issues",
+      license    => "https://dev.perl.org/licenses/",
+    },
+    'meta-spec' => {
+      version => '2',
+      url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
+    },
+  },
  );
 
 sub checkexec {

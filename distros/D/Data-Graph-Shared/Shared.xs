@@ -29,7 +29,7 @@ MODULE = Data::Graph::Shared  PACKAGE = Data::Graph::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, max_nodes, max_edges)
+new(class, path, max_nodes, max_edges, ...)
     const char *class
     SV *path
     UV max_nodes
@@ -37,10 +37,13 @@ new(class, path, max_nodes, max_edges)
   PREINIT:
     char errbuf[GRAPH_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (p && strlen(p) != (size_t)SvCUR(path))
+        croak("Data::Graph::Shared->new: path contains an embedded NUL");
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     if (max_nodes > UINT32_MAX || max_edges > UINT32_MAX)
         croak("Data::Graph::Shared->new: max_nodes/max_edges exceed 2^32");
-    GraphHandle *h = graph_create(p, (uint32_t)max_nodes, (uint32_t)max_edges, errbuf);
+    GraphHandle *h = graph_create(p, (uint32_t)max_nodes, (uint32_t)max_edges, mode, errbuf);
     if (!h) croak("Data::Graph::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -179,7 +182,7 @@ add_node(self, data)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
-    int32_t idx = graph_add_node(h, (int64_t)data);
+    int64_t idx = graph_add_node(h, (int64_t)data);
     RETVAL = (idx >= 0) ? newSViv((IV)idx) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -281,6 +284,7 @@ neighbors(self, node)
     }
     uint32_t i = 0;
     while (eidx != GRAPH_NONE && i < deg) {
+        if (eidx >= h->hdr->max_edges) break;   /* corrupt/attacker edge index: stop */
         dsts[i] = h->edges[eidx].dst;
         wts[i]  = h->edges[eidx].weight;
         eidx = h->edges[eidx].next;

@@ -657,6 +657,10 @@ my $autogrow = 1;
 my $ticks = 0;
 my $status = 1;
 my $colordialog;
+my @cell_age;
+my $active_color_mode = 'static';
+my $active_color_map = 'plasma';
+use App::GUI::GoLP::Colors;
 
 # From https://conwaylife.com/wiki/List_of_Life-like_rules
 my %rule_name_to_BS = (
@@ -911,6 +915,28 @@ my $w = Prima::MainWindow->new(
                         }
                     } ],
                     [],
+                    [ '~Color Scheme' => do {
+                        my @items = (
+                            [ '*(color_static' => 'Static (Standard colors)' => sub {
+                                $_[0]->menu->check('color_static');
+                                $active_color_mode = 'static';
+                                $_[0]->repaint();
+                            }]
+                        );
+                        my @maps = sort keys %App::GUI::GoLP::Colors::maps;
+                        for my $i (0 .. $#maps) {
+                            my $m = $maps[$i];
+                            my $name = 'color_map_' . $m;
+                            $name .= ')' if $i == $#maps;
+                            push @items, [ $name => "Age: " . ucfirst($m) => sub {
+                                $_[0]->menu->check('color_map_' . $m);
+                                $active_color_mode = 'age';
+                                $active_color_map = $m;
+                                $_[0]->repaint();
+                            }];
+                        }
+                        \@items;
+                    }],
                     ['live_color' => '~Live cell color...' => sub {
                         handle_color($_[0], \$livecolor, \$live_r, \$live_g, \$live_b);
                     } ],
@@ -935,7 +961,7 @@ my $w = Prima::MainWindow->new(
             ]],                
             [],
             ['About' => sub {
-                    message_box("GoLP", "App::GUI::GoLP v1.2\nby Matt Johnson (MJOHNSON)", mb::Information);
+                    message_box("GoLP", "App::GUI::GoLP v1.3\nby Matt Johnson (MJOHNSON)", mb::Information);
             }],
     ],
 
@@ -1009,7 +1035,11 @@ my $w = Prima::MainWindow->new(
                                 $board_pos = to_board_pos($x, $y, $vp_w, $vp_h);
                                 
                                 if ( defined $board_pos ) {
-                                    $game->toggle_point( $board_pos->[1], $board_pos->[0] );
+                                    my $r = $board_pos->[1];
+                                    my $c = $board_pos->[0];
+                                    $game->toggle_point( $r, $c );
+                                    my $new_grid = $game->get_grid();
+                                    $cell_age[$r][$c] = $new_grid->[$r][$c] ? 1 : 0;
                                     $self->repaint();
                                 }
                             }
@@ -1033,7 +1063,11 @@ my $w = Prima::MainWindow->new(
                             	$board_pos = to_board_pos($x, $y, $vp_w, $vp_h);
                             	
                             	if ( $self->{mb_left} && $edit_mode ) {
-                            		$game->toggle_point( $board_pos->[1], $board_pos->[0] );
+                                    my $r = $board_pos->[1];
+                                    my $c = $board_pos->[0];
+                            		$game->toggle_point( $r, $c );
+                                    my $new_grid = $game->get_grid();
+                                    $cell_age[$r][$c] = $new_grid->[$r][$c] ? 1 : 0;
                             	}
                             	elsif ( $self->{mb_right} || ($self->{mb_left} && !$edit_mode) ) {
 	                                $self->{cur_vel} = [$x - $self->{prev_pos}[0], $y - $self->{prev_pos}[1]];
@@ -1083,6 +1117,17 @@ sub step_simulation {
     if ( $game_ready) {
         $game->process();
         $ticks++;		    
+        
+        my $new_data = $game->get_grid();
+        for my $r (0 .. $board_height - 1) {
+            for my $c (0 .. $board_width - 1) {
+                if ( $new_data->[$r][$c] ) {
+                    $cell_age[$r][$c]++;
+                } else {
+                    $cell_age[$r][$c] = 0;
+                }
+            }
+        }
 
         if ( $autogrow ) {
             my $boundary;
@@ -1150,6 +1195,19 @@ sub grow_board {
     $game = Game::Life::Faster->new( [$new_board_width, $new_board_height], $birth, $survival );
     $game->place_text_points( $row_start, $col_start, 'X', @board );
 
+    my @new_cell_age;
+    for (1 .. $add_top) {
+        push @new_cell_age, [ (0) x $new_board_width ];
+    }
+    foreach my $old_row (@cell_age) {
+        my @new_row = ( (0) x $add_left, @{$old_row}, (0) x $add_right );
+        push @new_cell_age, \@new_row;
+    }
+    for (1 .. $add_bottom) {
+        push @new_cell_age, [ (0) x $new_board_width ];
+    }
+    @cell_age = @new_cell_age;
+
     $board_width = $new_board_width;
     $board_height = $new_board_height;
    
@@ -1186,10 +1244,17 @@ sub new_game {
     }
     
     my @points;
+    @cell_age = ();
     for (1..$board_height) {
         my @row;
-        push @row, $cellfunc->($params->{probability}) for (1..$board_width);
+        my @age_row;
+        for (1..$board_width) {
+            my $val = $cellfunc->($params->{probability});
+            push @row, $val;
+            push @age_row, $val ? 1 : 0;
+        }
         push @points, \@row;
+        push @cell_age, \@age_row;
     }
     $game->place_points(0, 0, \@points);
     
@@ -1236,6 +1301,21 @@ sub load_game {
     my $insert_row = int($board_height/2) - int($grid->{rows}/2);
 
     $game->place_points( $insert_row, $insert_col, $grid->{data} ); 
+    
+    @cell_age = ();
+    for (1..$board_height) {
+        push @cell_age, [ (0) x $board_width ];
+    }
+    my $r = $insert_row;
+    foreach my $row_data (@{$grid->{data}}) {
+        my $c = $insert_col;
+        foreach my $val (@{$row_data}) {
+            $cell_age[$r][$c] = 1 if $val;
+            $c++;
+        }
+        $r++;
+    }
+
     $game_ready = 1;    
 
     return 1;
@@ -1465,6 +1545,16 @@ sub render {
                    
                     $cr->rectangle ($x_start, $y_start, $x_dim, $y_dim );
                     
+                    my ($cell_r, $cell_g, $cell_b) = ($live_r, $live_g, $live_b);
+                    if ($col && ($active_color_mode eq 'age') ) {
+                        my $age = $cell_age[$p_row][$p_col] || 0;
+                        my $index = $age > 255 ? 0 : 255 - $age;
+                        my $rgb = $App::GUI::GoLP::Colors::maps{$active_color_map}[$index];
+                        if (defined $rgb) {
+                            ($cell_r, $cell_g, $cell_b) = @$rgb;
+                        }
+                    }
+
                     if ( $hover && !$col ) {
                     	my $r_diff = $live_r - $dead_r;
                     	my $g_diff = $live_g - $dead_g;
@@ -1474,15 +1564,21 @@ sub render {
                         $cr->set_source_rgb($live_r, $live_g, $live_b);
                     }
                     elsif ( $hover && $col ) {
-                    	my $r_diff = $live_r - $dead_r;
-                    	my $g_diff = $live_g - $dead_g;
-                    	my $b_diff = $live_b - $dead_b;
+                    	my $r_diff = $cell_r - $dead_r;
+                    	my $g_diff = $cell_g - $dead_g;
+                    	my $b_diff = $cell_b - $dead_b;
                         $cr->set_source_rgb($dead_r+($r_diff/4), $dead_g+($g_diff/4), $dead_b+($b_diff/4));
                         $cr->fill;                    
                         $cr->set_source_rgb($live_r, $live_g, $live_b);
                     }
                     elsif ( $col ) {
+                        if ($active_color_mode eq 'age') {
+                            $cr->set_source_rgb($cell_r, $cell_g, $cell_b);
+                        }
                         $cr->fill;
+                        if ($active_color_mode eq 'age') {
+                            $cr->set_source_rgb($live_r, $live_g, $live_b);
+                        }
                     }
                 }
             }            

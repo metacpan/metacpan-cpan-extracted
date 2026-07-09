@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::GEEKRUTH - Be like GeekRuthie when you build your dis
 
 # VERSION
 
-version 2.0002
+version 4.0000
 
 # DESCRIPTION
 
@@ -19,8 +19,11 @@ her distributions. It's roughly equivalent to
     [InstallGuide]
     [Covenant]
     [ContributorCovenant]
-    [GitLab::Update]
-    [GitLab::Meta]
+    [SecurityPolicy]
+    -policy = Individual
+
+    [Codeberg::Update]
+    [Codeberg::Meta]
        p3rl = 1
        metacpan = 0
 
@@ -73,12 +76,9 @@ her distributions. It's roughly equivalent to
     branch     = releases
     
     [Git::Commit]
-    [UploadToCPAN]
+    [FakeRelease]
     [Git::Push]
     push_to = origin main releases
-    
-    [InstallRelease]
-    install_command = cpanm .
     
     [SchwartzRatio]
     [RunExtraTests]
@@ -97,16 +97,6 @@ her distributions. It's roughly equivalent to
     Passed to [Dist::Zilla::Plugin::Authority](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AAuthority).
 
     Defaults to `cpan:GEEKRUTH`.
-
-- `fake_release`
-
-    If given a true value, uses [Dist::Zilla::Plugin::FakeRelease](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AFakeRelease)
-    instead of
-    [Dist::Zilla::Plugin::Git::Push](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AGit%3A%3APush),
-    [Dist::Zilla::Plugin::UploadToCPAN](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AUploadToCPAN), and
-    [Dist::Zilla::Plugin::InstallRelease](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AInstallRelease)
-
-    Can also be triggered via the _FAKE_ environment variable.
 
 - `builder`
 
@@ -148,7 +138,7 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by D Ruth Holloway.
+This software is copyright (c) 2026 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

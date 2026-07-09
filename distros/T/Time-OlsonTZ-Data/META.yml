@@ -14,7 +14,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ name: Time-OlsonTZ-Data
 provides:
   Time::OlsonTZ::Data:
     file: lib/Time/OlsonTZ/Data.pm
-    version: '0.202602'
+    version: '0.202603'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -37,5 +37,5 @@ resources:
   bugtracker: https://github.com/Grinnz/Time-OlsonTZ-Data/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Grinnz/Time-OlsonTZ-Data.git
-version: '0.202602'
+version: '0.202603'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

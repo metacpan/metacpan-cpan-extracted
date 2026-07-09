@@ -1,10 +1,12 @@
-package Album;
+#! perl
 
-( $VERSION ) = '$Revision: 1.9 $ ' =~ /\$Revision:\s+([^\s]+)/;
+package Album;
 
 # NOTE: This is a documentation-only module.
 
 use strict;
+
+our $VERSION = "1.901.1";
 
 =head1 NAME
 
@@ -18,13 +20,10 @@ generated as well. Also, it is possible to embed other albums.
 
 The album will be organised as follows:
 
-  index.html       first or only index page
-  indexN.html      subsequent index pages (N = 1, 2, ...)
+  index/           index pages and thumbnails
   icons/           directory with navigation icons
-  css/		   directory with stylesheets
   large/           original (large) images, with HTML pages
   medium/          optional medium sized images, with HTML pages
-  thumbnail/       thumbnail images
 
 Each image can be labeled with a description, a tag (applies to a
 group of images, e.g. a date), the image name, and some
@@ -95,7 +94,7 @@ Web site: L<http://www.squirrel.nl/people/jvromans/Album/index.html>.
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2004 by Squirrel Consultancy. All
+This program is Copyright 2007,2004 by Squirrel Consultancy. All
 rights reserved.
 
 This program is free software; you can redistribute it and/or modify

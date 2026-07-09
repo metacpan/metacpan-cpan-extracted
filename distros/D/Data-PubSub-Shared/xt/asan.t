@@ -23,7 +23,6 @@ for my $t (@tests) {
     ok $ok, "asan: $name" or diag $out;
 }
 
-# Rebuild without ASAN
 diag "rebuilding without ASAN...";
 `make clean 2>/dev/null; perl Makefile.PL 2>&1 && make 2>&1`;
 

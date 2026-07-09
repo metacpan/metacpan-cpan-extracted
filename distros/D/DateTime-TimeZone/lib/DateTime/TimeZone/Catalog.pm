@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.68';
+our $VERSION = '2.69';
 
 our @ALL =
 qw(
@@ -1864,7 +1864,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2026b' }
+sub OlsonVersion { '2026c' }
 
 
 1;
@@ -2445,7 +2445,7 @@ so that applications can easily present a list of timezones.
   America/Rankin_Inlet - Central - NU (central)
   America/Regina - CST - SK (most areas)
   America/Swift_Current - CST - SK (midwest)
-  America/Edmonton - Mountain - AB, BC(E), NT(E), SK(W)
+  America/Edmonton - CST - AB, BC(E), NT(E), SK(W)
   America/Cambridge_Bay - Mountain - NU (west)
   America/Inuvik - Mountain - NT (west)
   America/Vancouver - MST - BC (most areas)

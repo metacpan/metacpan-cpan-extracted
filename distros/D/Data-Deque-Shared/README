@@ -35,23 +35,26 @@ DESCRIPTION
     Used only as a FIFO ("push_back" + "pop_front"), it's effectively a
     fixed-slot lock-free string queue: 1.3x-4.7x faster than
     Data::Queue::Shared::Str under multi-producer contention, at the cost of
-    per-slot fixed memory ("capacity × max_len").
+    per-slot fixed memory ("capacity x max_len").
 
   Concurrency
     Push and pop are safe under multi-producer / multi-consumer workloads.
     Each slot carries a 64-bit control word (state + generation) that acts
     as a publication gate: a pusher atomically transitions the slot through
-    "empty → writing → filled", and a popper transitions it through "filled
-    → reading → empty" with the generation bumped on completion. A consumer
-    that claims position "n" via the head/tail CAS therefore always observes
-    the publication transition of the corresponding push before reading the
-    value.
+    "empty -" writing -> filled>, and a popper transitions it through
+    "filled -" reading -> empty> with the generation bumped on completion. A
+    consumer that claims position "n" via the head/tail CAS therefore always
+    observes the publication transition of the corresponding push before
+    reading the value.
 
-    "drain" is safe under concurrent "push"/"pop", but it will spin-wait on
-    any slot whose pusher is mid-publish; if that pusher has crashed between
-    winning its position CAS and publishing the slot value, drain will block
-    indefinitely on that slot. Use "drain" for orderly draining, not as a
-    crash-recovery primitive.
+    "drain" is safe under concurrent "push"/"pop": it spin-waits on any slot
+    whose pusher is mid-publish, then releases each slot through the state
+    machine. If a pusher crashes after winning its position CAS but before
+    publishing the value (i.e. anywhere in the cursor-CAS to publish
+    window), drain waits ~2 seconds and then force-recovers the slot via a
+    generation bump (counted in "stats->{recoveries}"). A stalled- but-live
+    pusher whose slot was force-recovered will silently drop its late
+    publish rather than resurrect the slot as FILLED.
 
   Compatibility
     File format bumped to v2 in this release (per-slot control array added
@@ -71,7 +74,7 @@ METHODS
         $dq->size;  $dq->capacity;  $dq->is_empty;  $dq->is_full;
         $dq->clear;    # NOT concurrency-safe
         my $n = $dq->drain;  # concurrency-safe, returns count drained
-        $dq->stats;    # {size, capacity, pushes, pops, waits, timeouts, mmap_size}
+        $dq->stats;    # {size, capacity, pushes, pops, waits, timeouts, recoveries, mmap_size}
 
   Common
         $dq->path;  $dq->memfd;  $dq->sync;  $dq->unlink;
@@ -82,11 +85,20 @@ METHODS
 
 STATS
     stats() returns: "size", "capacity", "pushes", "pops", "waits",
-    "timeouts", "mmap_size".
+    "timeouts", "recoveries", "mmap_size". "recoveries" counts slots that
+    drain force-skipped because a pusher crashed (or stalled > 2s) between
+    winning the cursor CAS and publishing the value.
 
 SECURITY
-    The mmap region is writable by all processes that open it. Do not share
-    backing files with untrusted processes.
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 BENCHMARKS
     Single-process (1M ops, x86_64 Linux, Perl 5.40):

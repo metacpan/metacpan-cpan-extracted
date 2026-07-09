@@ -389,6 +389,9 @@ SV * new(class, ...)
             }
         }
 
+        if (private_key == NULL)
+            croak("Crypt::OpenSSL::SignCSR->new requires a non-empty PEM private key");
+
         // Get the private key and save it in memory
         keyString = SvPV(private_key, keyStringLength);
         bio = BIO_new_mem_buf(keyString, keyStringLength);
@@ -398,6 +401,7 @@ SV * new(class, ...)
 
         // Create the PrivateKey as EVP_PKEY
         EVP_PKEY *pkey = PEM_read_bio_PrivateKey(bio, NULL, 0, NULL);
+        BIO_free(bio);
         if (pkey == NULL) {
             croak("Failed operation error code %d\n", errno);
         }
@@ -459,16 +463,12 @@ IV set_digest(self, SV* digest)
         STRLEN digestname_length;
 
         RETVAL = 0;
-        // Get digestname parameter - verify that it is valid
-#if OPENSSL_API_COMPAT >= 30101
-        const EVP_MD *dgst;
-#else
-        EVP_MD * md = NULL;
-#endif
+        const EVP_MD *md = NULL;
+
         if (digest != NULL) {
             digestname = (const char*) SvPV(digest, digestname_length);
             // printf("Digest Name: %s\n", digestname);
-            md = (EVP_MD *)EVP_get_digestbyname(digestname);
+            md = EVP_get_digestbyname(digestname);
         }
 
         if (md != NULL) {
@@ -511,7 +511,9 @@ IV set_format(self, SV* format)
         RETVAL = 0;
 
         if (sv_cmp(format, newSVpv("pem", 0)) == 0 ||
-                sv_cmp(format, newSVpv("text", 0)) == 0 )
+                sv_cmp(format, newSVpv("text", 0)) == 0 ||
+                sv_cmp(format, newSVpv("der", 0)) == 0
+                )
         {
             if((hv_store(self, "format", 6, newRV_inc(format), 0)) == NULL)
                 RETVAL = 0;
@@ -629,6 +631,7 @@ SV * sign(self, request_SV)
             croak ("Bio for CRS Request is null **** \n");
         }
         csr = PEM_read_bio_X509_REQ(csrbio, NULL, NULL, NULL);
+        BIO_free(csrbio);
 
         if (csr == NULL) {
             croak ("PEM_read_bio_X509_REQ failed **** \n");
@@ -700,6 +703,8 @@ SV * sign(self, request_SV)
 
         if (sno != NULL && !X509_set_serialNumber(x, sno))
             croak("X509_set_serialNumber cannot set serial number\n");
+        // X509_set_serialNumber() dups its argument; free our copy.
+        ASN1_INTEGER_free(sno);
 
         set_cert_times(x, NULL, NULL, (int) days);
 
@@ -718,7 +723,7 @@ SV * sign(self, request_SV)
         X509V3_set_ctx(&ext_ctx, issuer_cert, x, NULL, NULL, X509V3_CTX_REPLACE);
         if (!X509V3_set_issuer_pkey(&ext_ctx, private_key))
             croak("X509V3_set_issuer_pkey cannot set issuer private key\n");
-#elseif OPENSSL_API_COMPAT >=10010
+#elif OPENSSL_API_COMPAT >= 10010
         X509V3_set_ctx(&ext_ctx, issuer_cert, x, csr, NULL, X509V3_CTX_REPLACE);
 #else
         X509V3_set_ctx(&ext_ctx, issuer_cert, x, csr, NULL, 0);
@@ -732,22 +737,22 @@ SV * sign(self, request_SV)
 #endif
             croak("X509_set_version cannot set version 3\n");
 
-        // Get digestname parameter - verify that it is valid
-#if OPENSSL_API_COMPAT >= 30101
-        const EVP_MD *dgst;
-#else
-        EVP_MD * md = NULL;
-#endif
-        if (digest != NULL) {
+        if (digest != NULL)
             digestname = (const char*) SvPV(digest, digestname_length);
-            md = (EVP_MD *)EVP_get_digestbyname(digestname);
-        }
-        if (md != NULL)
-            digestname = (const char *) digestname;
-        else {
+        else
             digestname = NULL;
-            printf("Failed to set the digest md = Null\n");
+#if OPENSSL_API_COMPAT >= 30101
+        if (digestname != NULL) {
+            EVP_MD *probe = EVP_MD_fetch(libctx, digestname, propq);
+            if (probe == NULL)
+                digestname = NULL;
+            else
+                EVP_MD_free(probe);
         }
+#else
+        const EVP_MD *md = (digestname != NULL)
+                         ? EVP_get_digestbyname(digestname) : NULL;
+#endif
         //printf ("DIGEST NAME = %s\n", digestname);
         // Allocate and a new digest context for certificate signing
 #if OPENSSL_API_COMPAT <= 10100
@@ -774,6 +779,8 @@ SV * sign(self, request_SV)
         if (sv_cmp(format, newSVpv("pem", 0)) == 0){
             // Output the PEM encoded certificate
             i = PEM_write_bio_X509(out, x);}
+        else if (sv_cmp(format, newSVpv("der", 0)) == 0){
+            i = i2d_X509_bio(out, x);}
         else
             // Output the text format of the certificate
             i = X509_print_ex(out, x, get_nameopt(), 0);
@@ -782,6 +789,13 @@ SV * sign(self, request_SV)
             croak("unable to output certificate data\n");
 
         RETVAL = extractBioString(aTHX_ out);
+#if OPENSSL_API_COMPAT <= 10100
+        EVP_MD_CTX_destroy(mctx);
+#else
+        EVP_MD_CTX_free(mctx);
+#endif
+        X509_REQ_free(csr);
+        X509_free(x);
 
     OUTPUT:
 

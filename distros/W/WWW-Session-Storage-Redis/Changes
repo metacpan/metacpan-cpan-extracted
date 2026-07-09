@@ -1,4 +1,30 @@
 Revision history for WWW-Session-Storage-Redis
 
+0.04    2026-07-09
+        - License changed from the Perl 5 terms (Artistic/GPL) to the
+          GNU General Public License, Version 3; no copyright holder is
+          named anymore
+        - Added Horea Gligan as co-author/maintainer
+        - Sessions saved with expires = -1 ("never expire") are now
+          stored with an explicit ten-year TTL; previously they silently
+          expired after Cache::Redis's default_expires_in (30 days)
+        - new() now croaks with a clear message when Cache::Redis is not
+          installed or when the "server" option is missing, instead of
+          failing later with an obscure error
+        - Fixed SYNOPSIS: retrieve() typo and the server option shown as
+          an arrayref instead of a scalar
+        - Assorted POD fixes (copy-paste references to the file storage
+          backend, typos, empty sections)
+        - Test suite: fixed inverted skip condition, wrong constructor
+          option name (servers vs server), added strict/warnings, honest
+          test names, and a mock-based unit test that runs without a
+          redis server
+        - Corrected stale META.json (wrong distribution name, version
+          and prerequisites)
+
+0.03    (no changelog recorded)
+
+0.02    (no changelog recorded)
+
 0.01    2015-02-15
         First version

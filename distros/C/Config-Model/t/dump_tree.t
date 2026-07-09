@@ -138,7 +138,7 @@ olist:1
   X=Bv
   DX=Dv -
 string_with_def="yada yada"
-a_uniline="yada yada"
+a_uniline_with_default="yada yada"
 a_string="toto \"titi\" tata"
 a_string2=dod@foo.com
 a_string_to_test_newline="foo
@@ -184,7 +184,7 @@ olist:1
   X=Bv
   DX=Dv -
 string_with_def="yada yada"
-a_uniline="yada yada"
+a_uniline_with_default="yada yada"
 a_string="toto \"titi\" tata"
 a_string2=dod@foo.com
 a_string_to_test_newline="foo
@@ -233,7 +233,7 @@ olist:1
   X=Bv
   DX=Dv -
 string_with_def="yada yada"
-a_uniline="yada yada"
+a_uniline_with_default="yada yada"
 a_string=""
 a_string2=dod@foo.com
 a_string_to_test_newline="foo
@@ -348,6 +348,24 @@ my $cds2 = $root3->dump_tree( mode => 'user' );
 print "Dump second instance with annotations:\n$cds2" if $trace;
 
 is( $cds2, $cds, "check both dumps" );
+
+subtest "test dump of quoted values" => sub {
+    my $inst2 = $model->instance(
+        root_class_name => 'Master',
+        model_file      => 'dump_load_model.pl',
+        instance_name   => 'test_quote'
+    );
+    my $root2 = $inst2->config_root;
+    my $uni = $root2->fetch_element('a_uniline');
+
+    $uni->store('""');
+    my $q_cds = $root2->dump_tree;
+    is($q_cds, q!a_uniline="\"\"" -!."\n", 'check dump of ""');
+
+    $uni->store("''");
+    $q_cds = $root2->dump_tree;
+    is($q_cds, q!a_uniline="''" -!."\n", "check dump of ''");
+};
 
 memory_cycle_ok( $model, "memory cycles" );
 

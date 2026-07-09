@@ -1005,4 +1005,336 @@ subtest 'spy(): longhand 2-arg form works correctly' => sub {
 	restore_all();
 };
 
+# ===========================================================================
+# 18. mock_scoped multi-longhand: first pair CODE, second pair non-CODE
+#     Targets line 422 in Mockingbird.pm.
+#     The branch condition ref($args[2]) eq 'CODE' is satisfied by the FIRST
+#     code ref, so we enter the multi-longhand arm.  The inner while-loop then
+#     discovers the second pair's value is not a CODE ref and croaks.
+# ===========================================================================
+
+subtest 'mock_scoped: multi-longhand second pair non-CODE croaks at inner check' => sub {
+	{ package MS::LH2; sub fn1 { 1 } sub fn2 { 2 } }
+
+	# 5 args (odd), args[2] = sub{} (CODE) -> enters multi-longhand arm.
+	# Inner loop: fn1 pair OK; fn2 pair is 'not_code' -> croak.
+	throws_ok {
+		mock_scoped('MS::LH2', 'fn1', sub { 'ok' }, 'fn2', 'not_code');
+	} qr/expected coderef for method 'fn2'/,
+		'inner non-CODE in multi-longhand arm croaks at line 422';
+
+	restore_all();
+};
+
+# ===========================================================================
+# 19. spy: empty method string -- $method false sub-condition (line 490)
+#     The croak condition is `unless $package && $method`.  Prior tests only
+#     covered $package false.  Here we test $package truthy but $method ''.
+# ===========================================================================
+
+subtest 'spy: empty method string triggers croak' => sub {
+	throws_ok { spy('Some::Pkg', '') }
+		qr/Package and method are required for spying/,
+		'spy croaks when $method is empty string';
+};
+
+# ===========================================================================
+# 20. spy: non-existent method -- defined(&{$full_method}) false (line 501)
+#     When the target method has never been defined, orig_existed must be 0.
+#     We install the spy but do NOT call through (the original undef-stub
+#     would die with "Undefined subroutine").
+# ===========================================================================
+
+subtest 'spy: non-existent method records orig_existed = 0' => sub {
+	# SpyNE::ghost is never declared anywhere; CODE slot is undefined.
+	my $spy = spy 'SpyNE::ghost';
+
+	my $meta = diagnose_mocks()->{'SpyNE::ghost'};
+	is $meta->{layers}[0]{original_existed}, 0,
+		'orig_existed = 0 for never-defined method';
+
+	restore_all();
+
+	# After restore the placeholder undef-stub is back; defined() is false.
+	ok !defined(&SpyNE::ghost),
+		'method is still undefined after spy is removed';
+};
+
+# ===========================================================================
+# 21. inject: 2-arg form with undef first argument
+#     Line 570: `if (@_ == 2 && defined $_[0] && ...)`.
+#     @_ == 2 is true but defined $_[0] is false (undef) -> else branch taken;
+#     $package = undef -> croak.
+# ===========================================================================
+
+subtest 'inject: 2-arg with undef first arg croaks' => sub {
+	throws_ok { inject(undef, 'val') }
+		qr/Package and dependency are required for injection/,
+		'undef first arg in 2-arg inject() croaks';
+};
+
+# ===========================================================================
+# 22. mock_sequence: undef target
+#     Line 946: `unless defined $target && @values`.
+#     `defined $target` false sub-condition never covered by prior tests.
+# ===========================================================================
+
+subtest 'mock_sequence: undef target croaks' => sub {
+	throws_ok { mock_sequence(undef, 1, 2, 3) }
+		qr/mock_sequence requires a target and at least one value/,
+		'undef target in mock_sequence() croaks';
+};
+
+# ===========================================================================
+# 23. Async: mock_future_sequence with undef target (Async.pm line 202)
+#     `unless defined $target && @items` -- $target = undef case.
+# ===========================================================================
+
+subtest 'Async: mock_future_sequence undef target croaks' => sub {
+	if (!eval { require Future; 1 }) {
+		plan skip_all => 'Future not installed';
+		return;
+	}
+	require Test::Mockingbird::Async;
+	my $fn = \&Test::Mockingbird::Async::mock_future_sequence;
+	throws_ok { $fn->(undef, 'item') }
+		qr/mock_future_sequence requires a target and at least one item/,
+		'undef target in mock_future_sequence() croaks';
+	restore_all();
+};
+
+# ===========================================================================
+# 24. Async: mock_future_sequence with a non-Future blessed object
+#     Async.pm line 213: `ref($item) && $item->isa('Future')`
+#     When ref is true but isa('Future') is false the item must be wrapped
+#     via Future->done($item), not passed through as-is.
+# ===========================================================================
+
+subtest 'Async: mock_future_sequence wraps non-Future blessed ref' => sub {
+	if (!eval { require Future; 1 }) {
+		plan skip_all => 'Future not installed';
+		return;
+	}
+	require Test::Mockingbird::Async;
+	{ package Fake::NotFuture; sub new { bless {}, shift } }
+	{ package Async::BlessedSeq; sub fn { 'orig' } }
+
+	my $mfs = \&Test::Mockingbird::Async::mock_future_sequence;
+
+	# Blessed object is NOT a Future -> isa('Future') false -> wrapped.
+	my $not_a_future = Fake::NotFuture->new();
+	$mfs->('Async::BlessedSeq::fn', $not_a_future);
+
+	my $f = Async::BlessedSeq::fn();
+	isa_ok $f, 'Future', 'result is a Future (non-Future obj was wrapped)';
+	my $inner = $f->get();
+	isa_ok $inner, 'Fake::NotFuture', 'wrapped object retrieved via ->get()';
+
+	restore_all();
+};
+
+# ===========================================================================
+# 25. Async: async_spy with empty method argument (Async.pm line 313)
+#     `unless $package && $method` -- $method false sub-condition uncovered.
+# ===========================================================================
+
+subtest 'Async: async_spy empty method string croaks' => sub {
+	if (!eval { require Future; 1 }) {
+		plan skip_all => 'Future not installed';
+		return;
+	}
+	require Test::Mockingbird::Async;
+	my $asp = \&Test::Mockingbird::Async::async_spy;
+	throws_ok { $asp->('Some::Pkg', '') }
+		qr/Package and method are required for async_spy/,
+		'empty method string in async_spy() croaks';
+	restore_all();
+};
+
+# ===========================================================================
+# 26. DeepMock: expectation entry has BOTH 'order' and 'tag' (line 292)
+#     `next if exists $exp->{order} && !exists $exp->{tag}`
+#     When tag is ALSO present the condition is false -> we do NOT skip ->
+#     the first pass processes the tag expectations AND the second pass
+#     runs assert_call_order for the order key.
+# ===========================================================================
+
+subtest 'DeepMock: expectation with both order and tag runs both passes' => sub {
+	{ package DM::OT; sub a { 1 } sub b { 2 } }
+	clear_call_log();
+
+	# spy_a expectation carries both 'tag' and 'order': first pass checks
+	# call-count for spy_a; second pass runs assert_call_order.
+	deep_mock(
+		{
+			mocks => [
+				{ target => 'DM::OT::a', type => 'spy', tag => 'spy_a' },
+				{ target => 'DM::OT::b', type => 'spy' },
+			],
+			expectations => [
+				{
+					tag   => 'spy_a',
+					calls => 1,
+					order => ['DM::OT::a', 'DM::OT::b'],
+				},
+			],
+		},
+		sub { DM::OT::a(); DM::OT::b() }
+	);
+
+	pass 'expectation with order+tag processed correctly (both passes executed)';
+};
+
+# ===========================================================================
+# 27. DeepMock: args_like / args_eq / args_deeply with fewer actual calls
+#     than expected patterns -- hits `$calls[$i] // []` default on each
+#     path (lines 312 / 327 / 341).  For the overflow element the default
+#     produces an empty arrayref, making @args empty and $args[$j] = undef.
+#
+#     Pattern choices that pass cleanly for the overflow element:
+#       args_like:   qr// matches the empty string that undef becomes
+#       args_eq:     undef eq undef -> passes
+#       args_deeply: cmp_deeply(undef, undef) -> passes
+# ===========================================================================
+
+subtest 'DeepMock: args_like overflow index hits $calls[$i] // [] default' => sub {
+	{ package DM::ALC; sub fn { $_[0] } }
+	my $spy  = Test::Mockingbird::spy('DM::ALC', 'fn');
+	my %h = (s => { spy => $spy });
+	DM::ALC::fn('hello');   # only 1 call; pattern[1] will hit the overflow
+
+	local $SIG{__WARN__} = sub {};   # qr// vs undef may warn in some perls
+	Test::Mockingbird::DeepMock::_run_expectations(
+		[{ tag => 's', calls => 1, args_like => [[qr/hello/], [qr//]] }],
+		\%h,
+	);
+	Test::Mockingbird::restore_all();
+	pass 'args_like overflow index exercised';
+};
+
+subtest 'DeepMock: args_eq overflow index hits $calls[$i] // [] default' => sub {
+	{ package DM::AEC; sub fn { $_[0] } }
+	my $spy  = Test::Mockingbird::spy('DM::AEC', 'fn');
+	my %h = (s => { spy => $spy });
+	DM::AEC::fn('hello');
+
+	# Call[1] overflow -> $call = [] -> $args[0] = undef; is(undef, undef) passes.
+	Test::Mockingbird::DeepMock::_run_expectations(
+		[{ tag => 's', calls => 1, args_eq => [['hello'], [undef]] }],
+		\%h,
+	);
+	Test::Mockingbird::restore_all();
+	pass 'args_eq overflow index exercised';
+};
+
+subtest 'DeepMock: args_deeply overflow index hits $calls[$i] // [] default' => sub {
+	{ package DM::ADC; sub fn { $_[0] } }
+	my $spy  = Test::Mockingbird::spy('DM::ADC', 'fn');
+	my %h = (s => { spy => $spy });
+	DM::ADC::fn('hello');
+
+	# Call[1] overflow -> $call = [] -> $args[0] = undef; cmp_deeply(undef, undef) passes.
+	Test::Mockingbird::DeepMock::_run_expectations(
+		[{ tag => 's', calls => 1, args_deeply => [['hello'], [undef]] }],
+		\%h,
+	);
+	Test::Mockingbird::restore_all();
+	pass 'args_deeply overflow index exercised';
+};
+
+# ===========================================================================
+# 28. DeepMock _apply_time_plan: truthy but non-HASH value (line 374)
+#     `return unless $time && ref $time eq 'HASH'`
+#     Case: $time truthy (42) but ref $time is '' (scalar, not HASH) -> return.
+# ===========================================================================
+
+subtest 'DeepMock: truthy non-HASH time plan is silently ignored' => sub {
+	lives_ok {
+		deep_mock(
+			{ time => 42 },    # truthy scalar -- ref() is '' not 'HASH'
+			sub { pass 'code block ran despite non-HASH time plan' }
+		);
+	} 'truthy non-HASH time plan does not croak';
+};
+
+# ===========================================================================
+# 29. DeepMock _apply_time_plan: valid empty HASH -- all `if exists` false
+#     Lines 377 / travel / advance / rewind branches: freeze key absent ->
+#     each `if exists` evaluates false.  This is the primary way to cover
+#     the `freeze` key absence branch (line 377 * 50).
+# ===========================================================================
+
+subtest 'DeepMock: empty time-plan hashref is a valid no-op' => sub {
+	Test::Mockingbird::TimeTravel::restore_all();
+
+	lives_ok {
+		deep_mock(
+			{ time => {} },    # valid HASH but no freeze/travel/advance/rewind keys
+			sub { pass 'code block ran with empty time plan' }
+		);
+	} 'empty time-plan hashref does not croak';
+
+	ok !$Test::Mockingbird::TimeTravel::ACTIVE,
+		'TimeTravel not activated by empty time plan';
+};
+
+# ===========================================================================
+# 30. DeepMock _install_mocks: mock entry with no 'target' key croaks
+#     Line in _install_mocks: `my $target = $m->{target} or croak '...'`
+# ===========================================================================
+
+subtest 'DeepMock: mock entry missing target key croaks' => sub {
+	throws_ok {
+		deep_mock(
+			{ mocks => [{ type => 'mock', with => sub { 1 } }] },
+			sub { }
+		);
+	} qr/mock entry missing target/,
+		'missing target in mock entry croaks';
+	restore_all();
+};
+
+# ===========================================================================
+# 31. DeepMock _install_mocks: unknown mock type croaks
+#     Line: `croak "Unknown mock type '$type' for target '$target'"`.
+# ===========================================================================
+
+subtest 'DeepMock: unknown mock type in plan croaks' => sub {
+	{ package DM::UT2; sub fn { 1 } }
+	throws_ok {
+		deep_mock(
+			{
+				mocks => [{
+					target => 'DM::UT2::fn',
+					type   => 'bogus_type',
+					with   => sub { 1 },
+				}],
+			},
+			sub { }
+		);
+	} qr/Unknown mock type 'bogus_type'/,
+		'unknown mock type string croaks';
+	restore_all();
+};
+
+# ===========================================================================
+# DEAD CODE ANNOTATIONS
+# The following conditions are unreachable via the public API and cannot be
+# covered by tests without manipulating internal state directly.
+#
+# lib/Test/Mockingbird.pm line 1231: `if (defined $final_prev)` in
+#   _drain_and_restore().  The while loop always assigns $final_prev from the
+#   non-empty mock stack (the function is only called when %mocked has an entry).
+#   The `false` branch (defined $final_prev = false) requires %mocked to hold
+#   a key with an *empty* arrayref, which the public API never produces.
+#   Status: DEFENSIVE GUARD -- genuinely unreachable in normal usage.
+#
+# lib/Test/Mockingbird.pm line 1275: `return '(unknown)'` in _caller_info().
+#   caller($level) returning an empty list requires $level to exceed the call
+#   stack depth.  In test context mock/spy/inject are always called from inside
+#   a subtest body with multiple frames above them.
+#   Status: REACHABLE only from top-level script scope, not from within tests.
+# ===========================================================================
+
 done_testing();
+

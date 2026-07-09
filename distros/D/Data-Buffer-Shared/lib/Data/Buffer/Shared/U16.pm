@@ -2,7 +2,7 @@ package Data::Buffer::Shared::U16;
 use strict;
 use warnings;
 use Data::Buffer::Shared;
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 sub import {
     $^H{"Data::Buffer::Shared::U16/buf_u16_get"} = 1;

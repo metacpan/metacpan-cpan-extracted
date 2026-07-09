@@ -58,7 +58,7 @@ DESCRIPTION
 
     *   Lock-free subscribers for all variants (seqlock)
 
-    *   Variable-length Str messages (circular arena)
+    *   Variable-length Str messages (byte arena)
 
     *   Futex-based blocking poll with timeout
 
@@ -83,8 +83,8 @@ DESCRIPTION
 
     Data::PubSub::Shared::Str -- variable-length strings
         Mutex-protected publish, lock-free subscribers. Messages stored in a
-        circular arena (max capped at "msg_size", default 256 bytes). UTF-8
-        flag preserved. Best for log lines, JSON, serialized payloads.
+        arena (max capped at "msg_size", default 256 bytes). UTF-8 flag
+        preserved. Best for log lines, JSON, serialized payloads.
 
   Int vs Str
     Int (including Int32/Int16): lock-free, zero contention between
@@ -186,6 +186,13 @@ API
         my $p = $ps->path;       # undef for anonymous/memfd
         my $s = $ps->stats;      # diagnostic hashref
 
+    Call "clear" only when publishers are quiescent. The
+    "int"/"int32"/"int16" publish path is lock-free, so "clear" cannot
+    exclude an in-flight publish; racing the two can leave a stale sequence
+    in the freshly-zeroed ring, which a subscriber may see as duplicate
+    re-delivery or a brief stall. ("str" publish takes the ring mutex, so
+    "str" "clear" is not exposed to this.)
+
   Keyword API
         use Data::PubSub::Shared::Int;
 
@@ -243,6 +250,17 @@ SEE ALSO
     Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
 
     Data::RingBuffer::Shared - fixed-size overwriting ring buffer
+
+SECURITY
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 AUTHOR
     vividsnow

@@ -31,16 +31,34 @@ _define_constants();
     (map { "hash_sha512_$_" } @bases),
     (map { "hash_sha512_$_" } @constant_bases),
   ];
+  my $sha3256 = [
+    "hash_sha3256",
+    (map { "hash_sha3256_$_" } @bases),
+    (map { "hash_sha3256_$_" } @constant_bases),
+  ];
+  my $sha3512 = [
+    "hash_sha3512",
+    (map { "hash_sha3512_$_" } @bases),
+    (map { "hash_sha3512_$_" } @constant_bases),
+  ];
+  my $features = ['hash_sha3_available'];
 
   our %EXPORT_TAGS = (
-    all => [ @$default, @$sha256, @$sha512 ],
+    all => [ @$features, @$default, @$sha256, @$sha512 ],
+    features => $features,
     default => $default,
+    sha2 => [ @$sha256, @$sha512 ],
     sha256 => $sha256,
     sha512 => $sha512,
+    sha3 => [ @$sha3256, @$sha3512 ],
+    sha3256 => $sha3256,
+    sha3512 => $sha3512,
   );
 
   our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 }
+
+*sha3_available = \&hash_sha3_available;
 
 package Crypt::Sodium::XS::OO::hash;
 use parent 'Crypt::Sodium::XS::OO::Base';
@@ -64,10 +82,25 @@ my %methods = (
     hash => \&Crypt::Sodium::XS::hash::hash_sha512,
     init => \&Crypt::Sodium::XS::hash::hash_sha512_init,
   },
+  Crypt::Sodium::XS::hash->sha3_available ? (
+    sha3256 => {
+      BYTES => \&Crypt::Sodium::XS::hash::hash_sha3256_BYTES,
+      PRIMITIVE => sub { 'sha3256' },
+      hash => \&Crypt::Sodium::XS::hash::hash_sha3256,
+      init => \&Crypt::Sodium::XS::hash::hash_sha3256_init,
+    },
+    sha3512 => {
+      BYTES => \&Crypt::Sodium::XS::hash::hash_sha3512_BYTES,
+      PRIMITIVE => sub { 'sha3512' },
+      hash => \&Crypt::Sodium::XS::hash::hash_sha3512,
+      init => \&Crypt::Sodium::XS::hash::hash_sha3512_init,
+    },
+  ) : (),
 );
 
 sub Crypt::Sodium::XS::hash::primitives { keys %methods }
 *primitives = \&Crypt::Sodium::XS::hash::primitives;
+*sha3_available = \&Crypt::Sodium::XS::hash::sha3_available;
 
 sub BYTES { my $self = shift; goto $methods{$self->{primitive}}->{BYTES}; }
 sub PRIMITIVE { my $self = shift; goto $methods{$self->{primitive}}->{PRIMITIVE}; }
@@ -98,10 +131,10 @@ Crypt::Sodium::XS::hash - SHA2 cryptographic hashing
 
 =head1 DESCRIPTION
 
-The SHA-256 and SHA-512 functions are provided for interoperability with other
-applications. If you are looking for a generic hash function and not
-specifically SHA-2, using L<Crypt::Sodium::XS::generichash> (BLAKE2b) might be
-a better choice.
+The SHA-2 (SHA-256 and SHA-512) and SHA-3 (SHA3-256 and SHA3-512)  functions are
+provided for interoperability with other applications. If you are looking for a
+generic hash function and not specifically SHA-2 or SHA-3, using
+L<Crypt::Sodium::XS::generichash> (BLAKE2b) might be a better choice.
 
 These functions are also not suitable for hashing passwords or deriving keys
 from passwords. Use L<Crypt::Sodium::XS::pwhash> instead.
@@ -135,6 +168,17 @@ Gets or sets the primitive used for all operations by this object. It must be
 one of the primitives listed in L</PRIMITIVES>, including C<default>.
 
 =head1 METHODS
+
+=head2 sha3_available
+
+  my $has_sha3 = $xs_hash->sha3_available;
+  my $has_sha3 = Crypt::Sodium::XS::hash->sha3_available;
+
+Returns true if L<Crypt::Sodium::XS> supports SHA-3, false otherwise. SHA-3
+will only be supported if L<Crypt::Sodium::XS> was built with a new enough
+version of libsodium (at least 1.0.22).
+
+Can be called as a class method.
 
 =head2 primitives
 
@@ -215,18 +259,30 @@ L<Crypt::Sodium::XS::MemVault>.
 
 =item * sha512 (default)
 
+=item * sha3256
+
+=item * sha3512
+
 =back
+
+Note: SHA3-256 and SHA3-512 were added in libsodium 1.0.22. Check for
+availability with L</sha3_available>.
 
 =head1 FUNCTIONS
 
 The object API above is the recommended way to use this module. The functions
 and constants documented below can be imported instead or in addition.
 
-Nothing is exported by default. A C<:default> tag imports the functions and
-constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
-provided for each of the primitives listed in L</PRIMITIVES>. These tags import
-the C<hash_E<lt>primitiveE<gt>_*> functions and constants for that primitive. A
+Nothing is exported by default. A C<:features> tag imports the C<*_available>
+feature test functions. A C<:default> tag imports the functions and constants
+documented below. A separate C<:E<lt>primitiveE<gt>> import tag is provided for
+each of the primitives listed in L</PRIMITIVES>. These tags import the
+C<hash_E<lt>primitiveE<gt>_*> functions and constants for that primitive. A
 C<:all> tag imports everything.
+
+=head2 hash_sha3_available
+
+Same as L</sha3_available>.
 
 =head2 hash (function)
 
@@ -234,9 +290,7 @@ C<:all> tag imports everything.
 
   my $hash = hash($message);
 
-Same as L</hash> (method).
-
-=head2 MULTI-PART INTERFACE
+Same as L</hash> (in L</METHODS> above).
 
 =head2 hash_init
 
@@ -246,13 +300,13 @@ Same as L</hash> (method).
 
 Same as L</init>.
 
-=head1 CONTSANTS
+=head1 CONSTANTS
 
 =head2 hash_PRIMITIVE
 
   my $default_primitive = hash_PRIMITIVE();
 
-Returns the name of the default primitive.
+Same as L</PRIMITIVE>.
 
 =head2 hash_BYTES
 
@@ -269,6 +323,8 @@ Same as L</BYTES>.
 =item L<Crypt::Sodium::XS>
 
 =item L<https://doc.libsodium.org/advanced/sha-2_hash_function>
+
+=item L<https://libsodium.gitbook.io/doc/advanced/sha-3_hash_function>
 
 =back
 

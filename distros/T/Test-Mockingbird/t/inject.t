@@ -1,31 +1,22 @@
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
 
 use Test::Most tests => 3;
 
-use lib 'lib';
 use Test::Mockingbird;
 
-is(MyClass::db_connect(), 'Original code', 'Check system behaves');
+is MyClass::db_connect(), 'Original code', 'original behaviour confirmed';
 
-# Inject mock object
-my $mock_db = sub { return 'Mock DB Connection' };
+# inject() stores the coderef itself; caller must invoke it
+my $mock_db = sub { 'Mock DB Connection' };
 Test::Mockingbird::inject('MyClass', 'db_connect', $mock_db);
-is(MyClass::db_connect()->(), 'Mock DB Connection', 'Dependency injected successfully');
+is MyClass::db_connect()->(), 'Mock DB Connection', 'injected coderef invokable';
 
 Test::Mockingbird::restore_all();
-
-is(MyClass::db_connect(), 'Original code', 'Check system restored');
-
-1;
+is MyClass::db_connect(), 'Original code', 'original restored after restore_all';
 
 package MyClass;
 
-sub db_connect
-{
-	return 'Original code';
-}
+sub db_connect { 'Original code' }
 
 1;

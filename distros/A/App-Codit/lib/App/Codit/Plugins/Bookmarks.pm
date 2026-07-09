@@ -9,7 +9,7 @@ App::Codit::Plugins::Bookmarks - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.20';
 
 use Data::Compare;
 require Tk::ITree;
@@ -108,6 +108,8 @@ sub bmAdd {
 		unless ($self->bmExists($name, $mark)) {
 			#calculate position
 			my @ch = $t->infoChildren($name);
+			my $text = $mark;
+			$mark =~ s/\@/_/g;
 			my $newmark = $name . '@' . $mark;
 			my $line = $self->bmLineNumber($newmark);
 			my @op;
@@ -120,7 +122,8 @@ sub bmAdd {
 			}
 	
 			#add bookmark
-			$t->add($newmark, -text => $mark, @op);
+			print "bookmark $newmark\n";
+			$t->add($newmark, -text => $text, @op);
 		}
 		$t->autosetmode(1);
 	}

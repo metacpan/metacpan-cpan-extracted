@@ -1,8 +1,176 @@
 Revision history for Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies
 
+0.11	Wed Jul  8 12:43:17 EDT 2026
+
+  [Bug fixes]
+
+  - Fixed restore_all($pkg) scoped form: after draining the mock stack for a
+    package's methods, the corresponding keys were not removed from %mocked
+    and %mock_meta.  This caused diagnose_mocks() to continue reporting those
+    methods as active even after restore_all('Pkg') had fully restored the
+    original implementations.  Fixed by adding delete $mocked{$key} and
+    delete $mock_meta{$key} inside the per-method loop, matching the behaviour
+    of the global restore_all() form.  Discovered by a new integration test
+    in t/integration.t.
+
+  - Fixed "Prototype mismatch" warnings emitted by mock() when replacing a
+    function that carries a Perl prototype (such as the () no-args prototype).
+    The existing set_prototype() call correctly equates prototypes before the
+    glob assignment, but on some Perl builds the GV-level prototype check fires
+    before the CV slot update is fully visible, causing the warning to leak
+    through.  Fixed by adding 'prototype' to the no warnings pragma in the
+    glob-assignment block -- tightly scoped to that single statement so no
+    legitimate warnings from surrounding code are affected.
+    Reported by: https://www.cpantesters.org/cpan/report/42ed27a2-6477-11f1-a3bc-a055f9c4ba34
+
+  [New features]
+
+  - New module Test::Mockingbird::Async providing Future-based async mocking:
+
+      mock_future_return($target, @values)
+          Replaces the target with a stub returning Future->done(@values).
+
+      mock_future_fail($target, $message, @details)
+          Replaces the target with a stub returning Future->fail($message, @details).
+          No exception is thrown at the call site; the caller receives a
+          pre-failed Future.
+
+      mock_future_sequence($target, @items)
+          Returns each item in sequence over successive calls; last item
+          repeats when exhausted.  Each item is either a plain value
+          (wrapped in Future->done) or a pre-built Future (passed through).
+
+      mock_future_once($target, @values)
+          Returns Future->done(@values) on the first call, then automatically
+          restores the previous implementation.
+
+      async_spy($target)
+          Wraps the target, records each call as a hashref
+          { args => [$method, @args], future => $returned_future }, and
+          returns a coderef that retrieves the call list.  Writes to the
+          call-order log so assert_call_order() works across plain and
+          async spies.
+
+    All functions use the core mock stack; restore_all(), unmock(), and
+    diagnose_mocks() work identically.  Future is an optional runtime
+    dependency; the module croaks with a helpful message if it is absent.
+
+  - intercept_new($class, $obj_or_coderef) intercepts the C<new> constructor
+    of any class so that each call returns a controlled value instead of a
+    real instance.  Two forms are supported:
+
+      intercept_new 'My::Service' => $stub_obj;
+          Every call to My::Service->new returns $stub_obj unchanged.
+          Plain scalars, undef, and pre-built objects are all valid.
+
+      intercept_new 'My::Service' => sub { ... };
+          Every call invokes the coderef with the original arguments
+          (including the class name as the first argument) and returns
+          whatever the coderef returns.
+
+    intercept_new is a thin wrapper around mock(), so the usual mock stack
+    semantics apply: layers can be stacked and peeled with unmock(), the
+    full stack is cleared by restore_all(), and diagnose_mocks() records
+    each layer with type 'intercept_new'.  Works for classes with no own
+    new() (inherited constructors are intercepted in the same way).
+
+  - inject_all($package, \%deps) injects multiple mock dependencies into a
+    package in a single call.  Each key in the hashref is treated as a
+    dependency name; the corresponding value is passed to inject() as the
+    mock object.  All injected dependencies are tracked by the usual mock
+    stack and are restored by restore_all() or individual unmock() calls.
+    An empty hashref is a no-op.  Exported by default alongside inject().
+
+  - Call ordering: assert_call_order(@methods) verifies that spied methods
+    were invoked in the declared left-to-right sequence.  Intervening calls
+    to other methods are ignored; only the relative order of the named
+    methods is checked.  Returns a boolean and emits a single TAP ok/not-ok.
+
+  - clear_call_log() resets the call-order log without tearing down spies
+    or mocks.  restore_all() continues to clear the log automatically.
+
+  - Test::Mockingbird::DeepMock now accepts an C<order> key in the
+    expectations array.  It takes an arrayref of fully-qualified method
+    names and delegates to assert_call_order() after all per-spy
+    expectations have been checked.  The key does not require a spy tag.
+
+  [Bug fixes and refactoring]
+
+  - Fixed unmock() meta-pop bug: previously deleted the entire %mock_meta key
+    on every unmock call (wiping metadata for all lower layers); now correctly
+    pops only the top-most meta entry to mirror the mock stack.
+
+  - Fixed ghost-method bug in mock() and spy(): previously captured \&{method}
+    without no-strict-refs, which under some conditions left stale CODE slots
+    in the GV after restore.  Now always captures via no strict 'refs' so the
+    same GV object is reused across mock/restore cycles.  Documented in
+    LIMITATIONS that ->can() may return truthy for auto-vivified GVs; use
+    defined(&Pkg::method) instead.
+
+  - Fixed inject() to respect the $Test::Mockingbird::TYPE package variable
+    so that callers can override the diagnostic layer type (matching the
+    pattern used by mock_return, mock_exception, and Async functions).
+
+  - Fixed restore_all($pkg) to prune @call_log entries for the specified
+    package (previously cleared only %mocked and %mock_meta).
+
+  - Added _caller_info() private helper that climbs the call stack past any
+    Test::Mockingbird frame to record the user's actual call site in
+    installed_at diagnostics (previously pointed to sugar-function internals).
+
+  - Deduplicated DeepMock::_normalize_target(): now delegates to the
+    authoritative Test::Mockingbird::_parse_target() to ensure consistent
+    target parsing across the library.  The function name is kept as a thin
+    wrapper for backwards-compatibility with white-box tests.
+
+  - Fixed TimeTravel: die $err in with_frozen_time() changed to croak $err
+    for consistency with the rest of the library.
+
+  - VERSION POD in all four modules corrected from '0.10' to '0.11'.
+
+  - Removed duplicate =head1 SUPPORT section from core module.
+
+  - Removed spurious double '1;' at end of DeepMock.pm.
+
+  [New files]
+
+  - t/locales.t: POSIX locale tests verifying the module loads and croak
+    error messages are locale-independent pure-Perl strings under
+    en_US.UTF-8, de_DE.UTF-8, and ja_JP.UTF-8 LC_ALL settings.
+
+  -  Bump minimum version: Fixes https://github.com/nigelhorne/Test-Mockingbird/issues/6
+
+  [Tests]
+
+  - Added t/intercept_new.t (14 subtests) covering: plain object, plain
+    scalar, and undef return values; coderef factory with arg forwarding;
+    factory returning a different class; restore_all and unmock restores;
+    LIFO stacking of two interceptors; diagnose_mocks type; inherited
+    constructor interception; combination with spy; and all error cases
+    (undef class, empty class, missing factory argument).
+
+  - Added t/async.t (24 subtests) covering all five Async exports: scalar,
+    list, and undef return values; failure with and without category/detail;
+    sequence ordering and last-item repeat; pre-built Future pass-through;
+    mixed plain/Future sequences; once-fires-once; async_spy arg capture,
+    Future capture, longhand target, diagnose_mocks type, and
+    assert_call_order integration; and all error cases.
+
+  - Added t/inject_all.t covering: basic multi-dependency injection, empty
+    hashref no-op, restore_all cleanup, individual unmock of one injected
+    dependency, error on missing package, error on non-hashref second arg,
+    and diagnose_mocks recording all injected layers.
+
+  - Added t/call_order.t covering: correct-order pass, wrong-order fail
+    (return value verified via local $TODO), intervening-call tolerance,
+    clear_call_log() mid-test reset, and the DeepMock order expectation.
+
+  - Added call-ordering subtests to t/unit.t (_run_expectations order key)
+    and t/integration.t (end-to-end via deep_mock).
+
 0.10	Fri May  8 15:11:42 EDT 2026
 
-  Bug fixes
+  [Bug fixes]
 
   - _parse_target() used !defined $arg3 to detect the single-argument
     shorthand form ('Pkg::method').  Because no caller ever passes three
@@ -32,7 +200,7 @@ Revision history for Test::Mockingbird - Advanced mocking library for Perl with 
     risk of the imported alias inheriting the (&$) prototype constraint
     at the call site.
 
-  Notes
+  [Notes]
 
   - spy() installs its wrapper coderef directly without going through
     mock(), so it does not benefit from the set_prototype fix and still
@@ -40,7 +208,7 @@ Revision history for Test::Mockingbird - Advanced mocking library for Perl with 
     function.  This is a known limitation documented in the test suite
     and will be addressed separately.
 
-  Tests
+  [Tests]
 
   - Added prototype-preservation subtests to all four test files:
 
@@ -68,6 +236,7 @@ Revision history for Test::Mockingbird - Advanced mocking library for Perl with 
                   the prototype; mock_scoped() delegating correctly to
                   mock(); spy() documented as a known limitation that
                   still emits the mismatch warning; and ($$) full cycle.
+
 0.09	Mon May  4 20:22:49 EDT 2026
 
   Bug fixes

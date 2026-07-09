@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-data-hashmap-shared/issues
   repository: https://github.com/vividsnow/perl5-data-hashmap-shared.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

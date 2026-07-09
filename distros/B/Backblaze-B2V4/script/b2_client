@@ -12,6 +12,8 @@ use Cwd;
 my $dispatch = {
 	'get' => 'download_file',
 	'put' => 'upload_file',
+	'download' => 'download_file',
+	'upload' => 'upload_file',
 	'file_info' => 'file_info',
 	'list_items' => 'list_items',
 	'new_bucket' => 'new_bucket',
@@ -65,12 +67,16 @@ sub upload_file {
 	
 	# login in and upload the file
 	my $b2 = get_b2_session();
-	$b2->b2_upload_file(
+	my $new_guid = $b2->b2_upload_file(
 		'bucket_name' => $args[0],
 		'file_location' => $args[1],
 	);
 	
-	return show_result($b2, "Success: $args[1] uploaded to bucket $args[0]");
+	if (!$new_guid) {
+		return get_error_message($b2);
+	}	
+	
+	return show_result($b2, "Success: $args[1] uploaded to bucket $args[0]\nNew GUID: $new_guid");
 }
 
 sub list_items {
@@ -174,11 +180,11 @@ Both arguments are required. Saves your B2 API key tokens to ~/.b2_tokens . Prov
 
 # b2_client get BUCKET_NAME FILE_NAME [DESTINATION_DIRECTORY]
 
-Downloads a file from B2. Required arguments are the name of the bucket containing the file and the name of the file in B2 (not the ID). Optional third argument is a destination directory, defaulting to the current working directory. Be sure you can write to the destination directory.
+Downloads a file from B2. Required arguments are the name of the bucket containing the file and the name of the file in B2 (not the ID). Optional third argument is a destination directory, defaulting to the current working directory. Be sure you can write to the destination directory. Can substitute 'download' for 'get'.
 
 # b2_client put BUCKET_NAME PATH_TO_FILE
 
-Upload a file to B2. Required arguments are the name of the destination B2 bucket and the path to the file to be uploaded. Best if the file has a standard extension (i.e. .txt, .png, .js, etc.)
+Upload a file to B2. Required arguments are the name of the destination B2 bucket and the path to the file to be uploaded. Best if the file has a standard extension (i.e. .txt, .png, .js, etc.). Can substitute 'upload' for 'put'.
 
 # b2_client list_items [BUCKET_NAME] [START_FILE_NAME]
 
@@ -285,7 +291,7 @@ sub show_result {
 		return get_error_message($b2); 
 	}
 
-	return $result_message . "\n";
+	return "\n" . $result_message . "\n";
 }
 
 sub get_error_message {

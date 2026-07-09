@@ -4,7 +4,7 @@ HTTP::Date - HTTP::Date - date conversion routines
 
 # VERSION
 
-version 6.07
+version 6.08
 
 # SYNOPSIS
 
@@ -62,6 +62,12 @@ time2str() and str2time(), are exported by default.
 
     If the date is unrecognized, then the empty list is returned (`undef` in
     scalar context).
+
+    As a safeguard against pathological input, strings longer than 64
+    characters are rejected without being parsed.  The length is measured on the
+    string as given, before any leading or trailing whitespace is trimmed, so
+    heavily padded input may be rejected even if its trimmed payload would fit.
+    Every date format this module recognizes is far shorter than this limit.
 
     The function is able to parse the following formats:
 

@@ -30,10 +30,10 @@ use Data::Deque::Shared;
 
 # --- odd capacity ---
 {
-    my $d = Data::Deque::Shared::Int->new(undef, 11);
-    $d->push_back($_) for 1..11;
+    my $d = Data::Deque::Shared::Int->new(undef, 11);   # rounds up to 16 (power of 2)
+    $d->push_back($_) for 1 .. $d->capacity;
     ok $d->is_full;
-    is $d->pop_front, $_, "FIFO pop_front $_" for 1..11;
+    is $d->pop_front, $_, "FIFO pop_front $_" for 1 .. $d->capacity;
     ok $d->is_empty;
 }
 

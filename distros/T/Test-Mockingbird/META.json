@@ -1,12 +1,12 @@
 {
    "abstract" : "Advanced mocking library for Perl with support for dependency injection and spies",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -31,19 +31,28 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Future" : "0.33"
+         },
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "6.64",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "perl" : "5.016003"
          }
       },
       "test" : {
          "requires" : {
             "Class::Simple" : "0",
+            "IPC::System::Simple" : "0",
             "Readonly" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Memory::Cycle" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
+            "Test::Returns" : "0",
             "Test::Strict" : "0",
             "Test::Vars" : "0",
             "Test::Warnings" : "0"
@@ -54,8 +63,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Test-Mockingbird@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Test-Mockingbird/issues",
-         "x_url" : "https://github.com/nigelhorne/Test-Mockingbird/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Mockingbird",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Mockingbird"
       },
       "repository" : {
          "type" : "git",
@@ -64,6 +73,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Mockingbird"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

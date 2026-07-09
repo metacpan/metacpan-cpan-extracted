@@ -2,7 +2,7 @@ App-GUI-GoLP
 
 App::GUI::GoLP - A GUI for viewing and editing Life-like cellular automata, in Perl/Prima
 
-Version 1.2
+Version 1.3
 
 SYNOPSIS
 
@@ -42,7 +42,9 @@ Rules allows the user to select from a preset list of birth/survival rules, or u
 
 Zoom opens the zoom dialog.
 
-Live cell color allows the user to select the color of a 'live' cell.
+Color Scheme allows the user to select how live cells are colored. You can choose a static color, or one of several color maps that color cells dynamically based on their age (e.g. Plasma, Viridis, Inferno).
+
+Live cell color allows the user to select the color of a 'live' cell (only if color scheme is set to static).
 
 Dead cell color allows the user to select the color of a 'dead' cell.
 

@@ -1,14 +1,13 @@
-README
-CHANGES
+README.md
+Changes
 script/album
+script/merge
 helper/README
-helper/shellrun.c
-helper/shellrun.exe
-helper/autorun.inf
-helper/Makefile
+helper/Makefile.eg
 Makefile.PL
 t/basic.t
 MANIFEST
 lib/Album.pm
 lib/Album/Tutorial.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

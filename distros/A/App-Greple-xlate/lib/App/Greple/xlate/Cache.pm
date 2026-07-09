@@ -109,7 +109,7 @@ sub json {
 sub open {
     my $obj = shift;
     my $file = $obj->name || return;
-    if ($obj->clear) {
+    if ($obj->clear and not $obj->readonly) {
         warn "created $file\n" unless -f $file;
         CORE::open my $fh, '>', $file or die "$file: $!\n";
         print $fh "{}\n";

@@ -212,6 +212,10 @@ return [
             a_uniline => {
                 type       => 'leaf',
                 value_type => 'uniline',
+            },
+            a_uniline_with_default => {
+                type       => 'leaf',
+                value_type => 'uniline',
                 default    => 'yada yada'
             },
             a_string => {

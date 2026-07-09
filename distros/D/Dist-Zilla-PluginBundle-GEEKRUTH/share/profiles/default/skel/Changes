@@ -1,5 +1,5 @@
 Revision history for {{$dist->name}}
 
-{{ '{{$NEXT}}' }}
+{{$NEXT}}
 
   - First version.

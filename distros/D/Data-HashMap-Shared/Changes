@@ -1,5 +1,9 @@
 Revision history for Data-HashMap-Shared
 
+0.14  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.13  2026-06-24
     - Docs: abstract and description now highlight LRU and per-key TTL
     - Add Cookbook, examples, and an oracle test (no code change)

@@ -1,3 +1,7 @@
+1.03 2026-07-02
+ - Add config for number of rows per page
+ - Default to 1000 rows per page instead of 100
+
 1.02 2026-05-20
  - Suppress user avatars when generating Excel files
  - Use paging to reduce memory usage

@@ -5,8 +5,7 @@ use Test::More;
 use Crypt::Sodium::XS::Util qw(sodium_bin2ip sodium_ip2bin);
 use Crypt::Sodium::XS::ipcrypt;
 
-plan skip_all => 'no ipcrypt available'
-  unless Crypt::Sodium::XS::ipcrypt::ipcrypt_available();
+plan skip_all => 'no ipcrypt available' unless Crypt::Sodium::XS::ipcrypt->available;
 
 use FindBin '$Bin';
 use lib "$Bin/lib";

@@ -18,7 +18,7 @@ sub encode_base64url { (my $str = encode_base64($_[0], '')) =~ tr,+/=,-_,d; $str
 
 my @mv_datas = (
   "this is a string of things.",
-  "so is \x{ef}\x{bb}\x{bf} this one", # utf-8 encoded U+FFEF
+  "so is \x{ef}\x{bb}\x{bf} this one.", # utf-8 encoded U+FFEF
 );
 
 
@@ -109,11 +109,14 @@ for my $mv_data (@mv_datas) {
   like($@, qr/Invalid offset/, "extract invalid offset (-100)");
   is($mv->extract(0, -3), substr($mv_str, 0, -3), "extract negative length");
 
+  # FIXME: use different test strings for this.
+  is($mv->index("#"), index($mv_str, "#"), "index no match");
   is($mv->index("t"), index($mv_str, "t"), "index single char");
   is($mv->index("this"), index($mv_str, "this"), "index word");
   is($mv->index("t", 5), index($mv_str, "t", 5), "index single char with offset");
   is($mv->index("thi", 9), index($mv_str, "thi", 9), "index word with offset");
   is($mv->index("t", 999), index($mv_str, "t", 999), "index single char offset out of range");
+  is($mv->index(".", length($mv_str) - 1), index($mv_str, "."), "index single char offset last char");
 
   $mv->lock;
 
@@ -378,22 +381,22 @@ for my $size (1025, 2047, 36863) {
 
 $mv = Crypt::Sodium::XS::MemVault->new("foobar")->unlock;
 my $x = $mv->pad(16);
-is($mv->pad(16)->to_hex, "666f6f62617280000000000000000000", "sodium_pad foobar blocksize 16");
-is($x->unpad(16)->to_hex, "666f6f626172", "sodium_unpad foobar blocksize 16");
+is($mv->pad(16)->to_hex, "666f6f62617280000000000000000000", "pad foobar blocksize 16");
+is($x->unpad(16)->to_hex, "666f6f626172", "unpad foobar blocksize 16");
 $x = $mv->pad(15);
-is($x->to_hex, "666f6f626172800000000000000000", "sodium_pad foobar blocksize 15");
-is($x->unpad(15)->to_hex, "666f6f626172", "sodium_unpad foobar blocksize 15");
+is($x->to_hex, "666f6f626172800000000000000000", "pad foobar blocksize 15");
+is($x->unpad(15)->to_hex, "666f6f626172", "unpad foobar blocksize 15");
 $x = $mv->pad(3);
-is($x->to_hex, "666f6f626172800000", "sodium_pad foobar blocksize 3");
-is($x->unpad(3)->to_hex, "666f6f626172", "sodium_unpad foobar blocksize 3");
+is($x->to_hex, "666f6f626172800000", "pad foobar blocksize 3");
+is($x->unpad(3)->to_hex, "666f6f626172", "unpad foobar blocksize 3");
 $mv = Crypt::Sodium::XS::MemVault->new("fooba")->unlock;
 $x = $mv->pad(3);
-is($x->to_hex, "666f6f626180", "sodium_pad fooba blocksize 3");
-is($x->unpad(3)->to_hex, "666f6f6261", "sodium_unpad foobar blocksize 3");
+is($x->to_hex, "666f6f626180", "pad fooba blocksize 3");
+is($x->unpad(3)->to_hex, "666f6f6261", "unpad fooba blocksize 3");
 $mv = Crypt::Sodium::XS::MemVault->new("foobarz")->unlock;
 $x = $mv->pad(3);
-is($x->to_hex, "666f6f6261727a8000", "sodium_unpad foobar blocksize 3");
-is($x->unpad(3)->to_hex, "666f6f6261727a", "sodium_unpad foobar blocksize 3");
+is($x->to_hex, "666f6f6261727a8000", "pad foobarz blocksize 3");
+is($x->unpad(3)->to_hex, "666f6f6261727a", "unpad foobarz blocksize 3");
 
 
 done_testing();

@@ -43,7 +43,8 @@ _define_constants();
   ]];
 
   our %EXPORT_TAGS = (
-    all => [ @$ed25519, @$ristretto255, @$features, ],
+    all => [ @$features, @$ed25519, @$ristretto255, @$features, ],
+    features => $features,
     ed25519 => $ed25519,
     features => $features,
     ristretto255 => $ristretto255,
@@ -51,6 +52,8 @@ _define_constants();
 
   our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 }
+
+*ristretto255_available = \&core_ristretto255_available;
 
 package Crypt::Sodium::XS::OO::curve25519;
 use parent 'Crypt::Sodium::XS::OO::Base';
@@ -77,7 +80,7 @@ my %methods = (
     scalar_sub => \&Crypt::Sodium::XS::curve25519::core_ed25519_scalar_sub,
     sub => \&Crypt::Sodium::XS::curve25519::core_ed25519_sub,
   },
-  Crypt::Sodium::XS::curve25519::core_ristretto255_available() ? (
+  Crypt::Sodium::XS::curve25519->ristretto255_available ? (
     ristretto255 => {
       BYTES => \&Crypt::Sodium::XS::curve25519::core_ristretto255_BYTES,
       HASHBYTES => \&Crypt::Sodium::XS::curve25519::core_ristretto255_HASHBYTES,
@@ -104,8 +107,7 @@ my %methods = (
 
 sub Crypt::Sodium::XS::curve25519::primitives { keys %methods }
 *primitives = \&Crypt::Sodium::XS::curve25519::primitives;
-
-sub ristretto255_available { goto \&Crypt::Sodium::XS::curve25519::core_ristretto255_available }
+*ristretto255_available = \&Crypt::Sodium::XS::curve25519::ristretto255_available;
 
 sub BYTES { my $self = shift; goto $methods{$self->{primitive}}->{BYTES}; }
 sub HASHBYTES { my $self = shift; goto $methods{$self->{primitive}}->{HASHBYTES}; }
@@ -174,10 +176,13 @@ C<default> primitive, and this attribute is always identical to L</PRIMITIVE>.
 
 =head2 ristretto255_available
 
-  my $ristretto255_available = $curve25519->ristretto255_available;
+  my $r255_available = $curve25519->ristretto255_available;
+  my $r255_available = Crypt::Sodium::XS::curve25519->ristretto255_available;
 
 Returns true if the version of libsodium this module was built with had the
 ristretto255 primitive available, false otherwise.
+
+Can be called as a class method.
 
 =head2 primitives
 
@@ -341,7 +346,7 @@ L</from_hash> method.
 
 =item * ristretto255
 
-Check L</ristretto255_available> to see if this primitive can be used.
+See L</ristretto255_available>.
 
 =back
 
@@ -350,10 +355,11 @@ Check L</ristretto255_available> to see if this primitive can be used.
 The object API above is the recommended way to use this module. The functions
 and constants documented below can be imported instead or in addition.
 
-Nothing is exported by default. A separate C<:E<lt>primitiveE<gt>> import tag
-is provided for each of the primitives listed in L</PRIMITIVES>. These tags
-import the C<core_E<lt>primitiveE<gt>_*> functions and constants for that
-primitive. A C<:all> tag imports everything.
+Nothing is exported by default. A C<:features> tag imports the C<*_available>
+feature test functions. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in L</PRIMITIVES>. These tags import
+the C<core_E<lt>primitiveE<gt>_*> functions and constants for that primitive. A
+C<:all> tag imports everything.
 
 B<Note>: L<Crypt::Sodium::XS::curve25519> does provide generic functions for
 curve25519. Only the primitive-specific functions are available, so there is no
@@ -362,14 +368,9 @@ C<:default> tag.
 B<Note>: Functions are prefixed with C<core_> (not C<curve25519_>) for
 consistency with libsodium function names.
 
-=head2 ristretto255_available (function)
+=head2 core_ristretto255_available
 
-  my $has_ristretto255 = ristretto255_available();
-  my $ristretto255_available = Crypt::Sodium::XS::curve25519->ristretto255_available;
-
-Same as L</ristretto255_available> (method).
-
-Can be called as a class method.
+Same as L</ristretto255_available>.
 
 =head2 core_E<lt>primitiveE<gt>_add
 

@@ -1,5 +1,23 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.8.0 2026-07-09T06:34:38+0900
+    [Maintenance]
+    - SQLite database updated with the newly released IANA data version 2026c.
+    - No API change.
+
+    [Bug Fixes]
+    - Fix build on MSWin32 with Perl < 5.22: dtl_isfinite fallback via _finite() from
+      <float.h>. Previously, the entire block of XS helpers (_normalize_tai_seconds,
+      _normalize_leap_seconds, _rd_to_epoch, _epoch_to_rd, _normalize_nanoseconds,
+      _compare_rd) was silently excluded from compilation, resulting in "Method
+      _normalize_nanoseconds() is not defined" errors at runtime.
+    - Fix build on MSWin32 with GCC < 4.5 (Strawberry Perl 5.12):
+      __builtin_unreachable() is only used when the compiler supports it.
+      Previously, GCC 4.4.3 produced "undefined reference to __builtin_unreachable"
+      at link time.
+    - Harden PP fallback installation in DateTime::Lite::PP: install the subroutines
+      when running in pure-Perl mode, regardless of any prior glob state.
+
 v0.7.3 2026-06-03T11:14:29+0900
     [Improvement]
     - Method from_object() now preserves the source object's time zone and formatter when

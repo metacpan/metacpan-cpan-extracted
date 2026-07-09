@@ -1,618 +1,569 @@
 # NAME
 
-Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies
+Test::Mockingbird - Advanced mocking library for Perl with support for
+dependency injection, spies, call ordering, constructor interception, and
+async Future mocking
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
     use Test::Mockingbird;
 
-    # Mocking
-    Test::Mockingbird::mock('My::Module', 'method', sub { return 'mocked!' });
+    # Mocking (shorthand form)
+    mock 'My::Module::method' => sub { 'mocked' };
+
+    # Mocking (longhand form)
+    mock('My::Module', 'method', sub { 'mocked' });
 
     # Spying
-    my $spy = Test::Mockingbird::spy('My::Module', 'method');
-    My::Module::method('arg1', 'arg2');
-    my @calls = $spy->(); # Get captured calls
+    my $spy = spy 'My::Module::method';
+    My::Module::method('arg1');
+    my @calls = $spy->();   # ( ['My::Module::method', 'arg1'], ... )
 
-    # Dependency Injection
-    Test::Mockingbird::inject('My::Module', 'Dependency', $mock_object);
+    # Dependency injection
+    inject 'My::Module::Dependency' => $mock_object;
 
-    # Unmocking
-    Test::Mockingbird::unmock('My::Module', 'method');
+    # Batch dependency injection
+    inject_all('My::Module', {
+        DB     => $mock_db,
+        Logger => $mock_logger,
+    });
+
+    # Constructor interception
+    intercept_new 'My::Service' => $stub_obj;
+    intercept_new 'My::Service' => sub { My::Double->new(@_[1..$#_]) };
+
+    # Unmock one layer
+    unmock 'My::Module::method';
 
     # Restore everything
-    Test::Mockingbird::restore_all();
+    restore_all();
+
+    # Call ordering
+    spy 'A::fetch';
+    spy 'B::process';
+    A::fetch();
+    B::process();
+    assert_call_order('A::fetch', 'B::process');
+    clear_call_log();
 
 # DESCRIPTION
 
-Test::Mockingbird provides powerful mocking, spying, and dependency injection capabilities to streamline testing in Perl.
+Test::Mockingbird provides mocking, spying, dependency injection,
+call-order verification, and constructor interception for Perl test suites.
 
 # DIAGNOSTICS
 
-Test::Mockingbird provides optional, non-intrusive diagnostic routines
-that allow inspection of the current mocking state during test execution.
-These routines are purely observational. They do not modify any mocking
-behaviour, symbol table entries, or internal state.
-
-Diagnostics are useful when debugging complex test suites, verifying
-mock layering behaviour, or understanding interactions between multiple
-mocking primitives such as mock, spy, inject, and the sugar functions.
-
 ## diagnose\_mocks
 
-Return a structured hashref describing all currently active mock layers.
-Each entry includes the fully qualified method name, the number of active
-layers, whether the original method existed, and metadata for each layer
-(type and installation location). See the diagnose\_mocks method for full
-API details.
+Returns a structured hashref of all active mock layers.
 
 ## diagnose\_mocks\_pretty
 
-Return a human-readable, multi-line string describing all active mock
-layers. This routine is intended for debugging and inspection during test
-development. The output format is stable for human consumption but is not
-guaranteed for machine parsing. See the diagnose\_mocks\_pretty method for
-full API details.
+Returns a human-readable multi-line string of all active mock layers.
 
 ## Diagnostic Metadata
 
-Diagnostic information is recorded automatically whenever a mock layer is
-successfully installed. Each layer records:
+Each installed layer records:
 
-    * type          The category of mock layer (for example: mock, spy,
-                    inject, mock_return, mock_exception, mock_sequence,
-                    mock_once, mock_scoped)
+    type          -- category (mock, spy, inject, mock_return, ...)
+    installed_at  -- file and line number of the outermost user call site
 
-    * installed_at  The file and line number where the layer was created
+# LIMITATIONS
 
-This metadata is maintained in parallel with the internal mock stack and
-is automatically cleared when a method is fully restored via unmock or
-restore\_all.
+- `->can()` may return truthy after unmocking a never-existed method
 
-Diagnostics never alter the behaviour of the mocking engine and may be
-safely invoked at any point during a test run.
+    Perl's typeglob (GV) system auto-vivifies a GV entry the first time
+    `\&{$full_method}` is called internally (in `mock()`, `spy()`, or
+    `inject()`). After unmocking, this GV entry remains in the stash with an
+    "undefined sub" placeholder in the CODE slot. `Package->can('method')`
+    tests the GV's existence in the stash, not whether the CODE slot is defined,
+    so it may still return a truthy value.
 
-# DEBUGGING EXAMPLES
+    To test whether a sub is callable, use `defined(&Package::method)` rather
+    than `Package->can('method')`. `defined(&...)` correctly returns false
+    for the placeholder stub. Calling the stub dies with `"Undefined subroutine"`.
 
-This section provides practical examples of using the diagnostic routines
-to understand and debug complex mocking behaviour.
-All examples are safe to run inside test files and do not modify mocking semantics.
+    Deleting the GV from the stash (via `delete $stash{method}`) would make
+    `->can()` return false but would break subsequent mock/inject stacking:
+    compiled direct calls (`Package::method()`) cache the GV at compile time,
+    so a new GV installed after a delete is invisible to those compiled calls.
 
-## Example 1: Inspecting a simple mock
+- Prototype mismatch warning from `spy()`
 
-    {
-        package Demo::One;
-        sub value { 1 }
-    }
+    `spy()` installs its wrapper directly without going through `mock()`,
+    so `Scalar::Util::set_prototype` is not applied. Wrapping a prototyped
+    function with `spy()` still emits a `Prototype mismatch` warning. Use
+    `mock()` with a delegating wrapper if warning-free wrapping is required.
 
-    mock_return 'Demo::One::value' => 42;
+- No nested deep\_mock scopes
 
-    my $diag = diagnose_mocks();
-    print diagnose_mocks_pretty();
+    [Test::Mockingbird::DeepMock](https://metacpan.org/pod/Test%3A%3AMockingbird%3A%3ADeepMock) calls `restore_all()` at scope exit, which
+    removes every active mock. Nested `deep_mock` blocks cause the inner exit
+    to also tear down the outer mocks. Do not nest `deep_mock` calls.
 
-The output will resemble:
+- Thread safety
 
-    Demo::One::value:
-      depth: 1
-      original_existed: 1
-      - type: mock_return   installed_at: t/example.t line 12
+    The internal state (`%mocked`, `%mock_meta`, `@call_log`) is per-process
+    lexical state. Concurrent threads that install and restore mocks will race.
+    Do not use this module in threaded test harnesses without external locking.
 
-This confirms that the method has exactly one active mock layer and shows
-where it was installed.
+- Spy return value is a flat list
 
-## Example 2: Stacked mocks
+    `spy()` and `async_spy()` return a coderef that yields a flat list of
+    call records. A future version may return an arrayref to reduce stack
+    pressure; the API is not yet changed to avoid breaking callers.
 
-    {
-        package Demo::Two;
-        sub compute { 10 }
-    }
+- Private-function encapsulation
 
-    mock_return    'Demo::Two::compute' => 20;
-    mock_exception 'Demo::Two::compute' => 'fail';
-
-    print diagnose_mocks_pretty();
-
-Possible output:
-
-    Demo::Two::compute:
-      depth: 2
-      original_existed: 1
-      - type: mock_return   installed_at: t/example.t line 8
-      - type: mock_exception installed_at: t/example.t line 9
-
-This shows the order in which layers were applied. The most recent layer
-appears last.
-
-## Example 3: Spies and injected dependencies
-
-    {
-        package Demo::Three;
-        sub action { 1 }
-        sub dep    { 2 }
-    }
-
-    spy 'Demo::Three::action';
-    inject 'Demo::Three::dep' => sub { 99 };
-
-    print diagnose_mocks_pretty();
-
-Example output:
-
-    Demo::Three::action:
-      depth: 1
-      original_existed: 1
-      - type: spy           installed_at: t/example.t line 7
-
-    Demo::Three::dep:
-      depth: 1
-      original_existed: 1
-      - type: inject        installed_at: t/example.t line 8
-
-This confirms that both the spy and the injected dependency are active.
-
-## Example 4: After restore\_all
-
-    mock_return 'Demo::Four::x' => 5;
-    restore_all();
-
-    print diagnose_mocks_pretty();
-
-Output:
-
-    (no output)
-
-After restore\_all, all diagnostic metadata is cleared along with the
-mock layers.
-
-## Example 5: Using diagnostics inside a failing test
-
-When a test fails unexpectedly, adding the following line can help
-identify the active mocks:
-
-    diag diagnose_mocks_pretty();
-
-This prints the current mocking state into the test output without
-affecting the test run.
+    Functions prefixed with `_` are private by convention but are not enforced
+    at runtime (`Sub::Private` is not activated). White-box tests in `t/unit.t`
+    call private functions directly. If `Sub::Private` enforcement is added, a
+    testing-interface export mechanism will be required.
 
 # METHODS
 
-## mock($package, $method, $replacement)
+## mock
 
-Mocks a method in the specified package.
-Supports two forms:
+Replace a method with a coderef.
 
-    mock('My::Module', 'method', sub { ... });
+    mock('My::Module', 'method', sub { 'mocked' });
+    mock 'My::Module::method' => sub { 'mocked' };
 
-or the shorthand:
+Mocks stack in LIFO order. Each `mock()` call saves the current CODE slot
+(or the auto-vivified undef stub if the method does not exist) and installs
+the replacement. `unmock()` pops one layer; `restore_all()` drains all.
 
-    mock 'My::Module::method' => sub { ... };
+If the original carries a Perl prototype, the same prototype is stamped onto
+the replacement coderef before installation, suppressing `Prototype mismatch`
+warnings.
 
-If the original function carries a Perl prototype, the same prototype is
-automatically applied to the replacement coderef before it is installed.
-This prevents Perl from emitting `Prototype mismatch` warnings at call
-sites that were compiled against the original signature. The canonical
-case is functions declared with a `()` no-args prototype, such as
-`I18N::LangTags::Detect::detect`. The replacement is almost always an
-anonymous `sub {}` created for the mock, so mutating its prototype
-in-place is safe.
+### API SPECIFICATION
 
-If the original has no prototype, no prototype is imposed on the
-replacement.
+#### Input
 
-## unmock($package, $method)
+    target      -- Str, 'Pkg::method' or ('Pkg', 'method')
+    replacement -- CodeRef
 
-Restores the original method for a mocked method.
-Supports two forms:
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "Package, method and replacement are required" -- target or coderef missing
+
+## unmock
+
+Restore the previous implementation of a mocked method (one layer).
 
     unmock('My::Module', 'method');
-
-or the shorthand:
-
     unmock 'My::Module::method';
 
-Because `mock` stores the original coderef (not a copy), reinstating it
-via glob assignment also restores its prototype automatically. No explicit
-prototype handling is required in `unmock`.
+If the method did not exist before it was mocked, the original undef-stub
+is restored so that calling the method dies with `"Undefined subroutine"`.
+Note: `->can()` may still return truthy; use `defined(&...)` to test
+whether a method is callable. See ["LIMITATIONS"](#limitations).
+
+### API SPECIFICATION
+
+#### Input
+
+    target -- Str, 'Pkg::method' or ('Pkg', 'method')
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "Package and method are required for unmocking" -- target missing
 
 ## mock\_scoped
 
-Creates a scoped mock that is automatically restored when the returned guard
-goes out of scope.
-
-This behaves like `mock`, but instead of requiring an explicit call to
-`unmock` or `restore_all`, all mocked methods are reverted automatically
-when the guard object is destroyed.
+Create a scoped mock that restores automatically when the guard goes out of scope.
 
 ### Single-method forms
 
-Shorthand:
-
     my $g = mock_scoped 'My::Module::method' => sub { 'mocked' };
-
-Longhand:
-
     my $g = mock_scoped('My::Module', 'method', sub { ... });
 
 ### Multi-method forms
 
-Mock several methods on one package with a single guard:
-
     my $g = mock_scoped('My::Module',
         fetch  => sub { 'mocked_fetch'  },
         save   => sub { 'mocked_save'   },
-        delete => sub { 'mocked_delete' },
     );
-
-Mock methods across different packages in one call (shorthand pairs):
 
     my $g = mock_scoped(
         'My::Module::fetch'  => sub { 'mocked_fetch'  },
         'Other::Module::save' => sub { 'mocked_save'  },
     );
 
-In both multi-method forms, every mocked method is restored when `$g`
-goes out of scope or is explicitly undefed.
+All mocked methods are restored when `$g` goes out of scope.
 
-### Scoped lifecycle
+### API SPECIFICATION
 
-    {
-        my $g = mock_scoped 'My::Module::method' => sub { 'mocked' };
-        My::Module::method();   # returns 'mocked'
-    }
+#### Input
 
-    My::Module::method();       # original behaviour restored
+    args -- four recognised forms (see above)
 
-### Interaction with spy
+#### Output
 
-A `spy` is not automatically restored when a `mock_scoped` guard
-goes out of scope. `mock_scoped` only manages the specific mock
-layer it installs. If you install a spy inside a scoped block, you
-must restore it explicitly:
+    returns: Test::Mockingbird::Guard
 
-    {
-        my $g   = mock_scoped 'My::Module::method' => sub { 1 };
-        my $spy = spy 'My::Module::method';
+### MESSAGES
 
-        My::Module->method('arg');
-    }
-    # $g is destroyed here -- the mock_scoped layer is restored
-    # but the spy layer is still active
+    "mock_scoped: unrecognised argument form" -- none of the four forms matched
+    "mock_scoped: expected coderef for '$target'" -- non-CODE value provided
 
-    restore_all();    # needed to fully restore method
+## spy
 
-The safe pattern when combining `mock_scoped` and `spy` is to
-call `restore_all` at the end of the block, or to avoid combining
-them and use `mock` with an explicit `restore_all` instead:
+Wrap a method so that every call is recorded. The original method is still
+called and its return value is passed back to the caller.
 
-    spy 'My::Module::method';
-    My::Module->method('arg');
-    my @calls = $spy->();
+    my $spy = spy 'My::Module::method';
+    My::Module::method('arg');
+    my @calls = $spy->();   # ( ['My::Module::method', 'arg'], ... )
     restore_all();
 
-### Notes
+Returns a coderef that, when invoked, returns the list of captured call
+records. Each record is an arrayref `[ $full_method, @args ]`.
 
-If you need both a modified implementation and call recording in
-the same test, install the spy first and then the mock. The spy
-will still capture calls even when the implementation is replaced
-by the mock layer above it, because the spy wraps the layer below
-it at installation time, not the current top of the stack. To avoid
-confusion, prefer explicit `restore_all` over `mock_scoped` when
-combining with spies.
+### Limitation
 
-## spy($package, $method)
-
-Wraps a method so that all calls and arguments are recorded.
-Supports two forms:
-
-    spy('My::Module', 'method');
-
-or the shorthand:
-
-    spy 'My::Module::method';
-
-Returns a coderef which, when invoked, returns the list of captured calls.
-The original method is preserved and still executed.
-
-### Call record format
-
-Each captured call is an arrayref with the following structure:
-
-    [ $method_name, $invocant, @arguments ]
-
-where:
-
-- `$method_name` - the fully qualified method name as a string
-(e.g. `'My::Module::method'`)
-- `$invocant` - the first argument to the call, typically `$self`
-for method calls or the first positional argument for function calls
-- `@arguments` - the remaining arguments passed to the method,
-in the order they were supplied. For named-parameter calls these will
-be alternating key/value pairs suitable for assignment to a hash:
-`my %args = @{$call}[2..$#{$call}]`
-
-### Example
-
-    spy 'My::Module::process';
-    My::Module->process(name => 'foo', value => 42);
-
-    my @calls = $spy->();
-    my $call  = $calls[0];
-
-    # $call->[0] eq 'My::Module::process'
-    # $call->[1] is the My::Module object
-    # @{$call}[2..$#{$call}] gives (name => 'foo', value => 42)
-
-    my %args = @{$call}[2..$#{$call}];
-    is($args{name},  'foo', 'name arg captured');
-    is($args{value}, 42,    'value arg captured');
-
-### Limitations
-
-`spy` installs its wrapper coderef directly into the glob without going
-through `mock`, so the prototype-preservation logic in `mock` does not
-apply. If the target function carries a Perl prototype (for example a
-`()` no-args prototype), installing a spy will emit a
+`spy()` does not call `mock()` internally and therefore does not apply
+prototype preservation. Wrapping a prototyped function emits a
 `Prototype mismatch` warning.
 
-If you need warning-free wrapping of a prototyped function, install the
-spy on a non-prototyped alias, or use `mock` with a wrapper that records
-calls and delegates to the original:
+### API SPECIFICATION
 
-    my @calls;
-    mock 'My::Module::detect' => sub {
-        push @calls, [@_];
-        return My::Module::_real_detect(@_);   # delegate manually
-    };
+#### Input
 
-This limitation will be addressed in a future release.
+    target -- Str, 'Pkg::method' or ('Pkg', 'method')
 
-## inject($package, $dependency, $mock\_object)
+#### Output
 
-Injects a mock dependency. Supports two forms:
+    returns: CodeRef   # yields list of call records on invocation
+
+### MESSAGES
+
+    "Package and method are required for spying" -- target missing or incomplete
+
+## inject
+
+Inject a mock dependency into a package.
 
     inject('My::Module', 'Dependency', $mock_object);
-
-or the shorthand:
-
     inject 'My::Module::Dependency' => $mock_object;
 
-The injected dependency can be restored with `restore_all` or `unmock`.
+Injecting `undef` is valid; use argument count (not definedness of the
+third argument) to distinguish shorthand from longhand.
+
+### API SPECIFICATION
+
+#### Input
+
+    package    -- Str
+    dependency -- Str
+    value      -- Any (including undef)
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "Package and dependency are required for injection" -- missing name
+
+## inject\_all
+
+Inject multiple dependencies into a package in one call.
+
+    inject_all('My::Service', {
+        DB     => $mock_db,
+        Logger => $mock_logger,
+    });
+
+An empty hashref is a no-op. Each pair is equivalent to a separate
+`inject()` call and participates in the same mock stack.
+
+### API SPECIFICATION
+
+#### Input
+
+    package      -- Str
+    dependencies -- HashRef
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "inject_all requires a package name"            -- undef or empty package
+    "inject_all requires a hashref of dependencies" -- second arg not a HashRef
+
+## intercept\_new
+
+Intercept the `new` constructor of a class.
+
+    intercept_new 'My::Service' => $stub_obj;
+    intercept_new 'My::Service' => sub { My::Double->new(@_[1..$#_]) };
+
+When given a plain value (including undef), every call to
+`My::Service->new` returns that value. When given a coderef, every
+call invokes the coderef with the original arguments (including the class
+name as the first argument) and returns its result.
+
+This is a thin wrapper around `mock()`; `restore_all()`, `unmock()`,
+and `diagnose_mocks()` all work identically.
+
+### API SPECIFICATION
+
+#### Input
+
+    class   -- Str (non-empty)
+    factory -- Any; CodeRef invoked per call, or scalar returned verbatim
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "intercept_new requires a class name"                    -- undef/empty class
+    "intercept_new requires a replacement object or coderef" -- factory missing
 
 ## restore\_all
 
-Restores all mocked methods and injected dependencies.
+Restore all mocked methods and injected dependencies.
 
-Called with no arguments, restores everything that has been mocked
-in the current test run:
+    restore_all();            # restore everything
+    restore_all 'My::Module'; # restore only My::Module's mocks
 
-    restore_all();
+When called with a package name, only mocks whose fully-qualified names
+begin with that package are restored. The call-order log is pruned to
+remove entries for the restored package.
 
-Called with a package name, restores only the mocks whose fully
-qualified names begin with that package:
-
-    restore_all 'My::Module';
-
-This is useful when a test installs mocks across multiple packages
-and needs to tear down only one package's mocks without disturbing
-the others:
-
-    mock 'My::Module::fetch'   => sub { 'mocked_fetch' };
-    mock 'Other::Module::save' => sub { 'mocked_save'  };
-
-    # Tear down only My::Module mocks
-    restore_all 'My::Module';
-
-    # Other::Module::save is still mocked here
-    restore_all();    # now everything is restored
-
-### Notes
-
-Restoring a package that was never mocked is a no-op and does not
-warn or croak.
-
-## mock\_return
-
-Mock a method so that it always returns a fixed value.
-
-Takes a single target (either `'Pkg::method'` or `('Pkg','method')`) and
-a value to return. Returns nothing. Side effects: installs a mock layer
-using `mock`.
-
-### API specification
+### API SPECIFICATION
 
 #### Input
 
-Params::Validate::Strict schema:
-
-\- `target`: required, scalar, string; method target in shorthand or longhand form
-\- `value`: required, any type; value to be returned by the mock
+    package -- Str, optional
 
 #### Output
 
-Returns::Set schema:
-
-\- `return`: undef
-
-## mock\_exception
-
-Mock a method so that it always throws an exception.
-
-Takes a single target (either `'Pkg::method'` or `('Pkg','method')`) and
-an exception message. Returns nothing. Side effects: installs a mock layer
-using `mock`.
-
-### API specification
-
-#### Input
-
-Params::Validate::Strict schema:
-
-\- `target`: required, scalar, string; method target in shorthand or longhand form
-\- `message`: required, scalar, string; exception text to `croak` with
-
-#### Output
-
-Returns::Set schema:
-
-\- `return`: undef
-
-## mock\_sequence
-
-Mock a method so that it returns a sequence of values over successive calls.
-
-Takes a single target (either `'Pkg::method'` or `('Pkg','method')`) and
-one or more values. Returns nothing. Side effects: installs a mock layer
-using `mock`. When the sequence is exhausted, the last value is repeated.
-
-### API specification
-
-#### Input
-
-Params::Validate::Strict schema:
-
-\- `target`: required, scalar, string; method target in shorthand or longhand form
-\- `values`: required, array; one or more values to be returned in order
-
-#### Output
-
-Returns::Set schema:
-
-\- `return`: undef
-
-## mock\_once
-
-Install a mock that is executed exactly once. After the first call, the
-previous implementation is automatically restored. This is useful for
-testing retry logic, fallback behaviour, and state transitions.
-
-### API specification
-
-#### Input (Params::Validate::Strict schema)
-
-\- `target`: required, scalar, string; method target in shorthand or longhand form
-\- `code`: required, coderef; mock implementation to run once
-
-#### Output (Returns::Set schema)
-
-\- `return`: undef
+    returns: undef
 
 ## restore
 
-Restore all mock layers for a single method target. This is similar to
-`restore_all`, but applies only to one method. If the method was never
-mocked, this routine has no effect.
+Restore all mock layers for a single method target.
 
-### API specification
+    restore 'My::Module::method';
 
-#### Input (Params::Validate::Strict schema)
+If the method was never mocked this is a no-op.
 
-\- `target`: required, scalar, string; method target in shorthand or longhand form
+### API SPECIFICATION
 
-#### Output (Returns::Set schema)
+#### Input
 
-\- `return`: undef
+    target -- Str
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "restore requires a target" -- undef target
+
+## mock\_return
+
+Mock a method to always return a fixed value.
+
+    mock_return 'My::Module::method' => 42;
+
+### API SPECIFICATION
+
+#### Input
+
+    target -- Str
+    value  -- Any
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "mock_return requires a target and a value" -- target undefined
+
+## mock\_exception
+
+Mock a method to always throw an exception.
+
+    mock_exception 'My::Module::method' => 'something went wrong';
+
+### API SPECIFICATION
+
+#### Input
+
+    target  -- Str
+    message -- Str
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "mock_exception requires a target and an exception message" -- either missing
+
+## mock\_sequence
+
+Mock a method to return a sequence of values over successive calls.
+The last value repeats when the sequence is exhausted.
+
+    mock_sequence 'My::Module::method' => (1, 2, 3);
+
+### API SPECIFICATION
+
+#### Input
+
+    target -- Str
+    values -- Array (one or more)
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "mock_sequence requires a target and at least one value" -- empty value list
+
+## mock\_once
+
+Install a mock that fires exactly once. After the first call the previous
+implementation is automatically restored.
+
+    mock_once 'My::Module::method' => sub { 'temporary' };
+
+### API SPECIFICATION
+
+#### Input
+
+    target -- Str
+    code   -- CodeRef
+
+#### Output
+
+    returns: undef
+
+### MESSAGES
+
+    "mock_once requires a target and a coderef" -- missing or non-CODE factory
+
+### PSEUDOCODE
+
+    parse target → (package, method)
+    wrapper = sub {
+        result = code(@_)
+        unmock(package, method)   -- pop this very layer
+        return result
+    }
+    install wrapper via mock() with TYPE='mock_once'
+
+## assert\_call\_order
+
+Assert that the named methods were called in left-to-right order.
+
+    assert_call_order('A::fetch', 'B::process', 'C::save');
+
+Produces one TAP ok/not-ok line and returns a boolean. Intervening calls
+to other methods are ignored.
+
+### API SPECIFICATION
+
+#### Input
+
+    methods -- Array of Str (two or more fully-qualified names)
+
+#### Output
+
+    returns: Bool
+
+### MESSAGES
+
+    "assert_call_order requires at least two method names" -- fewer than two given
+
+## clear\_call\_log
+
+Clear the call-order log without restoring mocks or spies.
+
+    clear_call_log();
+
+`restore_all()` also clears the log automatically.
+
+### API SPECIFICATION
+
+#### Input
+
+    none
+
+#### Output
+
+    returns: undef
 
 ## diagnose\_mocks
 
-Return a structured hashref describing all currently active mock layers.
-This routine is purely observational and does not modify any state.
+Return a structured hashref of all currently active mock layers.
 
-### API specification
+    my $diag = diagnose_mocks();
+    # $diag->{'My::Pkg::method'} = {
+    #   depth            => 1,
+    #   layers           => [ { type => 'mock_return', installed_at => '...' } ],
+    # }
+
+### API SPECIFICATION
 
 #### Input
 
-Params::Validate::Strict schema:
-
-\- none
+    none
 
 #### Output
 
-Returns::Set schema:
-
-\- `return`: hashref; keys are fully qualified method names, values are
-  hashrefs containing:
-  - `depth`: integer; number of active mock layers
-  - `layers`: arrayref of hashrefs; each layer has:
-      - `type`: string
-      - `installed_at`: string
-  - `original_existed`: boolean
+    returns: HashRef
 
 ## diagnose\_mocks\_pretty
 
-Return a human-readable string describing all currently active mock layers.
-This routine is purely observational and does not modify any state.
+Return a human-readable multi-line string of all active mock layers.
 
-### API specification
+### API SPECIFICATION
 
 #### Input
 
-Params::Validate::Strict schema:
-
-\- none
+    none
 
 #### Output
 
-Returns::Set schema:
-
-\- `return`: scalar string; formatted multi-line description of all active
-  mock layers, including:
-  - fully qualified method name
-  - depth (number of active layers)
-  - whether the original method existed
-  - each layer's type and installation location
-
-### Behaviour
-
-#### Entry
-
-\- No arguments are accepted.
-
-#### Exit
-
-\- Returns a formatted string describing the current mocking state.
-
-#### Side effects
-
-\- None. This routine does not modify `%mocked`, `%mock_meta`, or any
-  symbol table entries.
-
-#### Notes
-
-\- This routine is intended for debugging and diagnostics. It is safe to
-  call at any point during a test run.
-\- The output format is stable and suitable for human inspection, but not
-  guaranteed to remain fixed for machine parsing.
-
-## DESTROY
-
-If `Test::Mockingbird` goes out of scope, restore everything.
+    returns: Str
 
 # SUPPORT
 
-This module is provided as-is without any warranty.
-
-Please report any bugs or feature requests to `bug-test-mockingbird at rt.cpan.org`,
-or through the web interface at
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Mockingbird](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Mockingbird).
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Test::Mockingbird
+Please report bugs at [https://github.com/nigelhorne/Test-Mockingbird/issues](https://github.com/nigelhorne/Test-Mockingbird/issues).
 
 # AUTHOR
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
-# BUGS
-
 # SEE ALSO
 
+- [Test Dashboard](https://nigelhorne.github.io/Test-Mockingbird/coverage/)
+- [Test::Mockingbird::Async](https://metacpan.org/pod/Test%3A%3AMockingbird%3A%3AAsync)
 - [Test::Mockingbird::DeepMock](https://metacpan.org/pod/Test%3A%3AMockingbird%3A%3ADeepMock)
 - [Test::Mockingbird::TimeTravel](https://metacpan.org/pod/Test%3A%3AMockingbird%3A%3ATimeTravel)
 
@@ -620,14 +571,130 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 [https://github.com/nigelhorne/Test-Mockingbird](https://github.com/nigelhorne/Test-Mockingbird)
 
-# SUPPORT
+# FORMAL SPECIFICATION
 
-This module is provided as-is without any warranty.
+## mock
+
+    mock ≙
+      ∀ target : Str; replacement : CodeRef •
+        pre  target ≠ '' ∧ defined(replacement)
+        post mocked'[target] = ⟨saved(target)⟩ ⌢ mocked[target]
+             ∧ sym_table'[target].CODE = replacement
+             ∧ prototype(replacement) = prototype(saved(target))
+
+## unmock
+
+    unmock ≙
+      ∀ target : Str •
+        let prev = head(mocked[target]) •
+          post mocked'[target] = tail(mocked[target])
+               ∧ sym_table'[target].CODE = prev
+               ∧ mock_meta'[target] = tail(mock_meta[target])
+
+## mock\_scoped
+
+    mock_scoped ≙
+      install all mocks via mock()
+      ∧ return Guard(full_methods)
+      ∧ Guard.DESTROY ⇒ ∀ m ∈ full_methods • unmock(m)
+
+## spy
+
+    spy ≙
+      ∀ target : Str •
+        pre  defined(target)
+        post sym_table'[target].CODE = wrapper(orig)
+             ∧ wrapper: @args → (calls' = calls ⌢ ⟨[target, @args]⟩ ∧ orig(@args))
+
+## inject
+
+    inject ≙
+      ∀ pkg : Str; dep : Str; val : Any •
+        pre  pkg ≠ '' ∧ dep ≠ ''
+        post sym_table'["${pkg}::${dep}"].CODE = sub { val }
+
+## inject\_all
+
+    inject_all ≙
+      ∀ pkg : Str; deps : HashRef •
+        post ∀ (k,v) ∈ deps • inject(pkg, k, v)
+
+## intercept\_new
+
+    intercept_new ≙
+      ∀ class : Str; factory : Any •
+        pre  class ≠ '' ∧ @args ≥ 2
+        let  rep = (factory : CodeRef) ? factory : sub { factory } •
+          post mock("${class}::new", rep)
+
+## restore\_all
+
+    restore_all ≙
+      global: mocked' = {} ∧ mock_meta' = {} ∧ call_log' = []
+      scoped: ∀ target ∈ dom(mocked) • target =~ /^pkg::/ ⇒ unmock_all(target)
+              ∧ call_log' = [ e ∈ call_log | e !~ /^pkg::/ ]
+
+## restore
+
+    restore ≙
+      ∀ target : Str •
+        pre  defined(target)
+        post mocked[target] = []
+
+## mock\_return
+
+    mock_return ≙
+      ∀ target : Str; value : Any •
+        post sym_table'[target].CODE = sub { value }
+
+## mock\_exception
+
+    mock_exception ≙
+      ∀ target : Str; msg : Str •
+        post sym_table'[target].CODE = sub { croak msg }
+
+## mock\_sequence
+
+    mock_sequence ≙
+      ∀ target : Str; values : Seq(Any) •
+        pre  |values| ≥ 1
+        post let queue = values •
+          sym_table'[target].CODE = sub { head(queue) if |queue|=1 else shift(queue) }
+
+## mock\_once
+
+    mock_once ≙
+      ∀ target : Str; code : CodeRef •
+        post sym_table'[target] = sub {
+          result = code(@args)
+          unmock(target)
+          return result
+        }
+
+## assert\_call\_order
+
+    assert_call_order ≙
+      ∀ expected : Seq(Str) •
+        pre  |expected| ≥ 2
+        post result = (∀ i • ∃ p_i : ℕ | p_0 < p_1 < … ∧ call_log[p_i] = expected[i])
+
+## clear\_call\_log
+
+    clear_call_log ≙ post call_log' = []
+
+## diagnose\_mocks
+
+    diagnose_mocks ≙
+      returns { target ↦ { depth, layers } | target ∈ dom(mocked) }
+
+## diagnose\_mocks\_pretty
+
+    diagnose_mocks_pretty ≙ stringify(diagnose_mocks())
 
 # LICENCE AND COPYRIGHT
 
 Copyright 2025-2026 Nigel Horne.
 
-Usage is subject to GPL2 licence terms.
+Usage is subject to the GPL2 licence terms.
 If you use it,
 please let me know.

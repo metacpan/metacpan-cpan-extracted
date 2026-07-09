@@ -2,10 +2,10 @@ MODULE = Data::Buffer::Shared    PACKAGE = Data::Buffer::Shared::U32
 PROTOTYPES: DISABLE
 
 SV*
-new(char* class, char* path, UV capacity)
+new(char* class, char* path, UV capacity, UV file_mode = 0600)
     CODE:
         char errbuf[BUF_ERR_BUFLEN];
-        BufHandle* buf = buf_u32_create(path, (uint64_t)capacity, errbuf);
+        BufHandle* buf = buf_u32_create(path, (uint64_t)capacity, (mode_t)file_mode, errbuf);
         if (!buf) croak("Data::Buffer::Shared::U32: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
@@ -219,6 +219,7 @@ get_raw(SV* self_sv, UV byte_off, UV nbytes)
         RETVAL = newSV(nbytes ? nbytes : 1);
         SvPOK_on(RETVAL);
         SvCUR_set(RETVAL, nbytes);
+        if (nbytes) SvPVX(RETVAL)[nbytes] = '\0';  /* NUL-terminate; newSV reserved nbytes+1 */
         if (!buf_u32_get_raw(h, (uint64_t)byte_off, (uint64_t)nbytes, SvPVX(RETVAL))) {
             SvREFCNT_dec(RETVAL);
             croak("Data::Buffer::Shared::U32: get_raw out of bounds");

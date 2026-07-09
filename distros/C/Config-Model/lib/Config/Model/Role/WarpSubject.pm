@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::WarpSubject 2.164;
+package Config::Model::Role::WarpSubject 2.165;
 
 # ABSTRACT: common methods for a warped element
 
@@ -68,7 +68,7 @@ Config::Model::Role::WarpSubject - common methods for a warped element
 
 =head1 VERSION
 
-version 2.164
+version 2.165
 
 =head1 SYNOPSIS
 

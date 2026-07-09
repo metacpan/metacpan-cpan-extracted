@@ -4,7 +4,7 @@
  * Two variants:
  *   Int -- lock-free MPMC publish, lock-free subscribe (int64 values)
  *   Str -- mutex-protected publish, lock-free subscribe (variable-length
- *          byte strings up to msg_size, stored in a circular arena)
+ *          byte strings up to msg_size, one fixed arena region per slot)
  *
  * Ring buffer broadcast: publishers write, each subscriber independently
  * reads with its own cursor. Messages are never consumed -- the ring
@@ -132,6 +132,7 @@ typedef struct {
     uint32_t      capacity;
     uint32_t      cap_mask;
     uint32_t      msg_size;
+    uint32_t      mode;       /* validated variant; NOT re-read from peer-writable hdr->mode */
     uint64_t      arena_cap;
     char         *path;
     int           notify_fd;
@@ -146,6 +147,7 @@ typedef struct {
     uint32_t      capacity;
     uint32_t      cap_mask;
     uint32_t      msg_size;
+    uint64_t      arena_cap;
     char         *copy_buf;
     uint32_t      copy_buf_cap;
     uint64_t      overflow_count;
@@ -340,6 +342,7 @@ static PubSubHandle *pubsub_init_handle(void *base, size_t map_size,
     h->capacity   = hdr->capacity;
     h->cap_mask   = hdr->capacity - 1;
     h->msg_size   = hdr->msg_size;
+    h->mode       = mode;
     h->arena_cap  = hdr->arena_cap;
     h->path       = path ? strdup(path) : NULL;
     h->notify_fd  = -1;
@@ -404,9 +407,26 @@ static int pubsub_calc_layout(uint32_t cap, uint32_t mode, uint32_t msg_size,
     return 1;
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int pubsub_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { PUBSUB_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        PUBSUB_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    PUBSUB_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
                                     uint32_t mode, uint32_t msg_size,
-                                    char *errbuf) {
+                                    mode_t fmode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
 
     uint32_t cap = pubsub_next_pow2(capacity);
@@ -437,8 +457,8 @@ static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
         pubsub_init_header(base, mode, cap, total_size, slots_off, data_off,
                             msg_size, arena_cap);
     } else {
-        int fd = open(path, O_RDWR | O_CREAT, 0666);
-        if (fd < 0) { PUBSUB_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
+        int fd = pubsub_secure_open(path, fmode, errbuf);
+        if (fd < 0) return NULL;
 
         if (flock(fd, LOCK_EX) < 0) {
             PUBSUB_ERR("flock(%s): %s", path, strerror(errno));
@@ -598,6 +618,7 @@ static PubSubSub *pubsub_subscribe(PubSubHandle *h, int from_oldest) {
     sub->capacity = h->capacity;
     sub->cap_mask = h->cap_mask;
     sub->msg_size = h->msg_size;
+    sub->arena_cap = h->arena_cap;
 
     sub->notify_fd = h->notify_fd;
 
@@ -752,9 +773,8 @@ DEFINE_INT_PUBSUB(int16, PubSubInt16Slot, int16_t, uint32_t, int32_t)
 /* ================================================================
  * Str: mutex-protected publish, lock-free subscribe
  *
- * Variable-length messages stored in a circular arena. Each slot
- * records the arena offset; the seqlock (sequence double-check)
- * guarantees readers see consistent data.
+ * Variable-length messages: each slot owns a fixed dedicated arena region.
+ * The seqlock (sequence double-check) guarantees readers see consistent data.
  * ================================================================ */
 
 /* Publish one Str message while mutex is already held (no lock/wake). */
@@ -776,16 +796,30 @@ static inline int pubsub_str_publish_locked(PubSubHandle *h, const char *str,
     uint32_t alloc = (len + 7) & ~7u;
     if (alloc == 0) alloc = 8;
     if (alloc > h->arena_cap) return -1;
-    uint32_t apos = __atomic_load_n(&hdr->arena_wpos, __ATOMIC_RELAXED);
-    if ((uint64_t)apos + alloc > h->arena_cap)
-        apos = 0;
+
+    /* Each slot owns a fixed, dedicated arena region
+     * [idx*stride, idx*stride + stride), with
+     * stride = arena_cap/capacity == msg_size+8 > round_up(len).
+     * A publish therefore writes only within its own slot's region and can
+     * never touch another slot's still-live bytes, so the per-slot seqlock
+     * fully guards every message. (The previous circular byte arena could, at
+     * small capacity with variable-length messages, wrap its write frontier
+     * onto a still-current slot's region WITHOUT bumping that slot's sequence,
+     * so a lagging subscriber read corrupted bytes the seqlock never caught.) */
+    uint32_t stride = (uint32_t)(h->arena_cap / h->capacity);
+    uint32_t apos = idx * stride;
+
+    /* Bound the arena write position against the cached (open-time-validated)
+     * region size, using cached capacity/arena_cap (not live hdr->) for the
+     * stride: a peer that corrupted the shared header must not be able to make
+     * this publish memcpy past the mapped arena. Never taken for a valid
+     * layout (apos+alloc < arena_cap always). */
+    if ((uint64_t)apos + alloc > h->arena_cap) return -1;
 
     memcpy(h->data + apos, str, len);
 
     slot->arena_off = apos;
     slot->packed_len = len | (utf8 ? PUBSUB_STR_UTF8_FLAG : 0);
-
-    __atomic_store_n(&hdr->arena_wpos, apos + alloc, __ATOMIC_RELAXED);
 
     __atomic_store_n(&slot->sequence, pos + 1, __ATOMIC_RELEASE);
     __atomic_store_n(&hdr->write_pos, pos + 1, __ATOMIC_RELAXED);
@@ -842,9 +876,14 @@ static inline int pubsub_str_poll(PubSubSub *sub, const char **out_str,
         uint32_t len = plen & PUBSUB_STR_LEN_MASK;
         bool utf8 = (plen & PUBSUB_STR_UTF8_FLAG) != 0;
 
-        /* Safety: if metadata looks corrupted, retry */
+        /* Safety: bound the file-stored length and arena offset against the
+         * subscriber's cached (open-time-validated) msg_size / arena_cap
+         * before dereferencing, so a peer that corrupted the shared header
+         * or slot metadata cannot drive this memcpy past the mapped arena.
+         * Cached (not live hdr->) values: a concurrent header corruption
+         * must not be able to widen the bound. Never taken for valid data. */
         if (len > sub->msg_size) continue;
-        if ((uint64_t)aoff + len > sub->hdr->arena_cap) continue;
+        if ((uint64_t)aoff + len > sub->arena_cap) continue;
 
         if (!pubsub_ensure_copy_buf(sub, len + 1)) return 0;
 
@@ -910,25 +949,25 @@ static int pubsub_str_poll_wait(PubSubSub *sub, const char **out_str,
 
 static void pubsub_clear(PubSubHandle *h) {
     PubSubHeader *hdr = h->hdr;
-    if (hdr->mode == PUBSUB_MODE_STR)
+    if (h->mode == PUBSUB_MODE_STR)
         pubsub_mutex_lock(hdr);
 
     __atomic_store_n(&hdr->write_pos, 0, __ATOMIC_RELAXED);
     __atomic_store_n(&hdr->stat_publish_ok, 0, __ATOMIC_RELAXED);
-    if (hdr->mode == PUBSUB_MODE_STR)
+    if (h->mode == PUBSUB_MODE_STR)
         __atomic_store_n(&hdr->arena_wpos, 0, __ATOMIC_RELAXED);
 
     /* Zero all slot sequences */
     uint32_t cap = h->capacity;
-    if (hdr->mode == PUBSUB_MODE_INT) {
+    if (h->mode == PUBSUB_MODE_INT) {
         PubSubIntSlot *s = (PubSubIntSlot *)h->slots;
         for (uint32_t i = 0; i < cap; i++)
             __atomic_store_n(&s[i].sequence, 0, __ATOMIC_RELAXED);
-    } else if (hdr->mode == PUBSUB_MODE_INT32) {
+    } else if (h->mode == PUBSUB_MODE_INT32) {
         PubSubInt32Slot *s = (PubSubInt32Slot *)h->slots;
         for (uint32_t i = 0; i < cap; i++)
             __atomic_store_n(&s[i].sequence, 0, __ATOMIC_RELAXED);
-    } else if (hdr->mode == PUBSUB_MODE_INT16) {
+    } else if (h->mode == PUBSUB_MODE_INT16) {
         PubSubInt16Slot *s = (PubSubInt16Slot *)h->slots;
         for (uint32_t i = 0; i < cap; i++)
             __atomic_store_n(&s[i].sequence, 0, __ATOMIC_RELAXED);
@@ -938,7 +977,7 @@ static void pubsub_clear(PubSubHandle *h) {
             __atomic_store_n(&s[i].sequence, 0, __ATOMIC_RELAXED);
     }
 
-    if (hdr->mode == PUBSUB_MODE_STR)
+    if (h->mode == PUBSUB_MODE_STR)
         pubsub_mutex_unlock(hdr);
     pubsub_wake_subscribers(hdr);
 }

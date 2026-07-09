@@ -1,14 +1,17 @@
 ---
 abstract: 'Advanced mocking library for Perl with support for dependency injection and spies'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   Class::Simple: '0'
   ExtUtils::MakeMaker: '0'
+  IPC::System::Simple: '0'
   Readonly: '0'
   Test::DescribeMe: '0'
+  Test::Memory::Cycle: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::Returns: '0'
   Test::Strict: '0'
   Test::Vars: '0'
   Test::Warnings: '0'
@@ -16,7 +19,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
-license: open_source
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -25,12 +28,17 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Future: '0.33'
 requires:
   Carp: '0'
   Exporter: '0'
   ExtUtils::MakeMaker: '6.64'
+  Test::Deep: '0'
+  Test::More: '0'
+  perl: '5.016003'
 resources:
-  bugtracker: https://github.com/nigelhorne/Test-Mockingbird/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Mockingbird
   repository: git://github.com/nigelhorne/Test-Mockingbird.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

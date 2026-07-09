@@ -17,3 +17,7 @@
 \.tar$
 \.tar\.gz$
 \.sw[po]$
+
+# local tool artifacts / built dists (not shipped)
+(^|/)\.pcg($|/)
+(^|/)\.claude($|/)

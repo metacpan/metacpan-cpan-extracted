@@ -2,19 +2,19 @@ MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SI16
 PROTOTYPES: DISABLE
 
 SV*
-new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0)
+new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0, UV file_mode = 0600)
     CODE:
-        char errbuf[SHM_ERR_BUFLEN]; const char* path = SvOK(path_sv) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_si16_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, errbuf);
+        char errbuf[SHM_ERR_BUFLEN]; const char* path = (SvGETMAGIC(path_sv), SvOK(path_sv)) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_si16_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, (mode_t)file_mode, errbuf);
         if (!map) croak("Data::HashMap::Shared::SI16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
 
 SV*
-new_sharded(char* class, SV* path_prefix_sv, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0)
+new_sharded(char* class, SV* path_prefix_sv, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0, UV file_mode = 0600)
     CODE:
-        const char* path_prefix = SvOK(path_prefix_sv) ? SvPV_nolen(path_prefix_sv) : NULL;
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_si16_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, errbuf);
+        const char* path_prefix = (SvGETMAGIC(path_prefix_sv), SvOK(path_prefix_sv)) ? SvPV_nolen(path_prefix_sv) : NULL;
+        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_si16_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, (mode_t)file_mode, errbuf);
         if (!map) croak("Data::HashMap::Shared::SI16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
@@ -25,7 +25,7 @@ SV*
 new_memfd(char* class, SV* name_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN];
-        const char* name = SvOK(name_sv) ? SvPV_nolen(name_sv) : NULL;
+        const char* name = (SvGETMAGIC(name_sv), SvOK(name_sv)) ? SvPV_nolen(name_sv) : NULL;
         ShmHandle* map = shm_si16_create_memfd(name, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, errbuf);
         if (!map) croak("Data::HashMap::Shared::SI16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
@@ -768,6 +768,7 @@ cursor(SV* self_sv)
         EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
         ShmCursor* c = shm_cursor_create(h);
         if (!c) croak("Failed to allocate cursor");
+        c->owner = SvREFCNT_inc(SvRV(self_sv));
         RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::SI16::Cursor", (void*)c);
     OUTPUT:
         RETVAL
@@ -782,8 +783,10 @@ DESTROY(SV* self_sv)
         ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
         if (!c) return;
         ShmHandle* h = c->current;
+        SV* owner = c->owner;
         shm_cursor_destroy(c);
         if (h) shm_si16_flush_deferred(h);
+        if (owner) SvREFCNT_dec(owner);
         sv_setiv(SvRV(self_sv), 0);
 
 void

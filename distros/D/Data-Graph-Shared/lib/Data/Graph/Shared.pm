@@ -1,9 +1,11 @@
 package Data::Graph::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::Graph::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 
 sub nodes {
     my ($self) = @_;
@@ -39,11 +41,11 @@ Data::Graph::Shared - Shared-memory directed weighted graph for Linux
     my $b = $g->add_node(20);
     my $c = $g->add_node(30);
 
-    $g->add_edge($a, $b, 5);     # a→b weight 5
-    $g->add_edge($a, $c, 3);     # a→c weight 3
-    $g->add_edge($b, $c, 1);     # b→c weight 1
+    $g->add_edge($a, $b, 5);     # a->b weight 5
+    $g->add_edge($a, $c, 3);     # a->c weight 3
+    $g->add_edge($b, $c, 1);     # b->c weight 1
 
-    my @nbrs = $g->neighbors($a);  # ([1,5], [2,3]) — [dst, weight] pairs
+    my @nbrs = $g->neighbors($a);  # ([2,3], [1,5]) - [dst,weight] pairs, newest edge first
     say $g->degree($a);            # 2
     say $g->node_data($a);         # 10
 
@@ -57,7 +59,7 @@ Mutex-protected mutations with PID-based stale recovery.
 
 B<Note>: C<remove_node> removes the node and its outgoing edges only.
 Incoming edges from other nodes are NOT automatically removed (this is
-an O(1) design choice) — their C<dst> is left dangling until the slot's
+an O(1) design choice) -- their C<dst> is left dangling until the slot's
 bit is reused. Use C<remove_node_full> when this matters; it additionally
 splices incoming edges in O(N+E).
 
@@ -77,8 +79,8 @@ B<Linux-only>. Requires 64-bit Perl.
     my $id = $g->add_node($data);            # returns node index or undef
     $g->add_edge($src, $dst);                # weight defaults to 1
     $g->add_edge($src, $dst, $weight);
-    $g->remove_node($id);                    # O(1) — outgoing edges only
-    $g->remove_node_full($id);               # O(N+E) — also splices incoming
+    $g->remove_node($id);                    # O(1) -- outgoing edges only
+    $g->remove_node_full($id);               # O(N+E) -- also splices incoming
     $g->has_node($id);
     $g->node_data($id);
     $g->set_node_data($id, $data);
@@ -124,8 +126,14 @@ C<max_edges>, C<ops>, C<mmap_size>.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it.
-Do not share backing files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 SEE ALSO
 

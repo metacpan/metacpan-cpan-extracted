@@ -1,5 +1,9 @@
 Revision history for Data::Graph::Shared
 
+0.04  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.03  2026-06-01
     - new/new_memfd: reject max_nodes/max_edges > 2^32 instead of silently
       truncating the uint32 cast to a tiny graph

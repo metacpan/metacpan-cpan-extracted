@@ -43,6 +43,8 @@ _define_constants();
   our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 }
 
+*available = \&ipcrypt_available;
+
 package Crypt::Sodium::XS::OO::ipcrypt;
 use parent 'Crypt::Sodium::XS::OO::Base';
 
@@ -95,8 +97,7 @@ my %methods = (
 
 sub Crypt::Sodium::XS::ipcrypt::primitives { keys %methods }
 *primitives = \&Crypt::Sodium::XS::ipcrypt::primitives;
-
-sub available { goto \&Crypt::Sodium::XS::ipcrypt::ipcrypt_available }
+*available = \&Crypt::Sodium::XS::ipcrypt::available;
 
 sub BYTES { my $self = shift; goto $methods{$self->{primitive}}->{BYTES} }
 sub INPUTBYTES { my $self = shift; goto $methods{$self->{primitive}}->{INPUTBYTES} }
@@ -205,10 +206,13 @@ even though for ipcrypt these are called variants.
 =head2 available
 
   my $has_ipcrypt = $ipcrypt->available;
+  my $has_ipcrypt = Crypt::Sodium::XS::ipcrypt->available;
 
 Returns true if L<Crypt::Sodium::XS> supports ipcrypt, false otherwise. ipcrypt
 will only be supported if L<Crypt::Sodium::XS> was built with a new enough (>=
 1.0.21) version of libsodium.
+
+Can be called as a class method.
 
 =head2 primitives
 
@@ -378,14 +382,11 @@ and constants documented below can be imported instead (or in addition, though
 that's unlikely to be necessary).
 
 Nothing is exported by default. A C<:default> tag imports the functions and
-constants documented below. A C<:features> tag imports the C<ipcrypt_available>
-feature test function. A separate C<:E<lt>variantE<gt>> import tag is provided
-for each of the variants listed in L</VARIANTS>. These tags import the
+constants documented below. A separate C<:E<lt>variantE<gt>> import tag is
+provided for each of the variants listed in L</VARIANTS>. These tags import the
 C<iprypt_E<lt>variantE<gt>_*> functions and constants for that variant.
 
 =head2 ipcrypt_available
-
-  my $has_ipcrypt = ipcrypt_available();
 
 Same as L</available>.
 

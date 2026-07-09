@@ -72,7 +72,7 @@ if ($Config{myuname} =~ /sunos|solaris/i) {
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Sign a Certificate Signing Request in XS.",
-  "AUTHOR" => "Timothy Legge <timlegge\@cpan.org>",
+  "AUTHOR" => "Timothy Legge <timlegge\@gmail.com>",
   "BUILD_REQUIRES" => {
     "Crypt::OpenSSL::ConfiguredAPI" => 0,
     "Crypt::OpenSSL::Guess" => 0
@@ -99,7 +99,7 @@ my %WriteMakefileArgs = (
     "File::Which" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::WarpedNode 2.164;
+package Config::Model::WarpedNode 2.165;
 
 use v5.20;
 use Mouse;
@@ -317,7 +317,7 @@ Config::Model::WarpedNode - Node that change config class properties
 
 =head1 VERSION
 
-version 2.164
+version 2.165
 
 =head1 SYNOPSIS
 

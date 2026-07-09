@@ -126,7 +126,7 @@ static inline int deq_remaining(const struct timespec *dl, struct timespec *rem)
 }
 
 static inline uint8_t *deq_slot(DeqHandle *h, uint32_t idx) {
-    return h->data + (idx % (uint32_t)h->hdr->capacity) * h->elem_size;
+    return h->data + (size_t)(idx % (uint32_t)h->hdr->capacity) * h->elem_size;
 }
 
 static inline uint32_t deq_size(DeqHandle *h) {
@@ -192,9 +192,13 @@ static inline uint64_t deq_slot_claim_read(uint64_t *ctl_word) {
     }
 }
 
-/* Release slot after read: READING -> EMPTY with gen+1. */
+/* Release slot after read: READING@gen -> EMPTY@gen+1, via CAS not a blind
+ * store (a drain force-recovery may have reused the slot; mirror publish-CAS). */
 static inline void deq_slot_release(uint64_t *ctl_word, uint64_t gen) {
-    __atomic_store_n(ctl_word, ((gen + 1) << 2) | DEQ_SLOT_EMPTY, __ATOMIC_RELEASE);
+    uint64_t expected = (gen << 2) | DEQ_SLOT_READING;
+    uint64_t desired  = ((gen + 1) << 2) | DEQ_SLOT_EMPTY;
+    __atomic_compare_exchange_n(ctl_word, &expected, desired,
+            0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
 }
 
 /* ================================================================
@@ -219,6 +223,8 @@ static inline int deq_try_push_back(DeqHandle *h, const void *val, uint32_t vlen
             if (cp < sz) memset(deq_slot(h, t) + cp, 0, sz - cp);
             deq_slot_publish(&h->ctl[idx], gen);
             __atomic_add_fetch(&hdr->stat_pushes, 1, __ATOMIC_RELAXED);
+            /* StoreLoad: publish our slot/cursor change before reading waiters. */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters_pop, __ATOMIC_RELAXED) > 0) {
                 __atomic_add_fetch(&hdr->pop_wake_seq, 1, __ATOMIC_RELEASE);
                 syscall(SYS_futex, &hdr->pop_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -251,6 +257,8 @@ static inline int deq_try_push_front(DeqHandle *h, const void *val, uint32_t vle
             if (cp < sz) memset(deq_slot(h, new_hd) + cp, 0, sz - cp);
             deq_slot_publish(&h->ctl[idx], gen);
             __atomic_add_fetch(&hdr->stat_pushes, 1, __ATOMIC_RELAXED);
+            /* StoreLoad: publish our slot/cursor change before reading waiters. */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters_pop, __ATOMIC_RELAXED) > 0) {
                 __atomic_add_fetch(&hdr->pop_wake_seq, 1, __ATOMIC_RELEASE);
                 syscall(SYS_futex, &hdr->pop_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -279,6 +287,8 @@ static inline int deq_try_pop_front(DeqHandle *h, void *out) {
             memcpy(out, deq_slot(h, hd), h->elem_size);
             deq_slot_release(&h->ctl[idx], gen);
             __atomic_add_fetch(&hdr->stat_pops, 1, __ATOMIC_RELAXED);
+            /* StoreLoad: publish our slot/cursor change before reading waiters. */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
                 __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
                 syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -307,6 +317,8 @@ static inline int deq_try_pop_back(DeqHandle *h, void *out) {
             memcpy(out, deq_slot(h, t - 1), h->elem_size);
             deq_slot_release(&h->ctl[idx], gen);
             __atomic_add_fetch(&hdr->stat_pops, 1, __ATOMIC_RELAXED);
+            /* StoreLoad: publish our slot/cursor change before reading waiters. */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
                 __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
                 syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -337,6 +349,9 @@ static inline int deq_push_wait(DeqHandle *h, const void *val, uint32_t vlen,
     for (;;) {
         uint32_t wseq = __atomic_load_n(&hdr->push_wake_seq, __ATOMIC_ACQUIRE);
         __atomic_add_fetch(&hdr->waiters_push, 1, __ATOMIC_RELEASE);
+        /* StoreLoad: publish waiters++ before re-reading the cursor, so a
+         * concurrent waker can't read waiters==0 while we read a stale cursor. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint64_t c = __atomic_load_n(&hdr->cursor, __ATOMIC_ACQUIRE);
         if (DEQ_CURSOR_SIZE(c) >= cap) {
             struct timespec *pts = NULL;
@@ -374,6 +389,9 @@ static inline int deq_pop_wait(DeqHandle *h, void *out, int back, double timeout
     for (;;) {
         uint32_t wseq = __atomic_load_n(&hdr->pop_wake_seq, __ATOMIC_ACQUIRE);
         __atomic_add_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELEASE);
+        /* StoreLoad: publish waiters++ before re-reading the cursor, so a
+         * concurrent waker can't read waiters==0 while we read a stale cursor. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint64_t c = __atomic_load_n(&hdr->cursor, __ATOMIC_ACQUIRE);
         if (DEQ_CURSOR_SIZE(c) == 0) {
             struct timespec *pts = NULL;
@@ -428,15 +446,20 @@ static inline void deq_init_header(void *base, uint64_t total,
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
-static inline DeqHandle *deq_setup(void *base, size_t ms, const char *path, int bfd) {
-    DeqHeader *hdr = (DeqHeader *)base;
+/* Layout fields are passed in by the caller — either from a validated
+ * header snapshot or locally computed — never re-read from the live
+ * mapping, which a hostile peer could rewrite between validation and
+ * here (double-fetch TOCTOU). */
+static inline DeqHandle *deq_setup(void *base, size_t ms, const char *path, int bfd,
+                                    uint64_t data_off, uint64_t ctl_off,
+                                    uint32_t elem_size) {
     DeqHandle *h = (DeqHandle *)calloc(1, sizeof(DeqHandle));
     if (!h) { munmap(base, ms); return NULL; }
-    h->hdr = hdr;
-    h->data = (uint8_t *)base + hdr->data_off;
-    h->ctl  = (uint64_t *)((uint8_t *)base + hdr->ctl_off);
+    h->hdr = (DeqHeader *)base;
+    h->data = (uint8_t *)base + data_off;
+    h->ctl  = (uint64_t *)((uint8_t *)base + ctl_off);
     h->mmap_size = ms;
-    h->elem_size = hdr->elem_size;
+    h->elem_size = elem_size;
     h->path = path ? strdup(path) : NULL;
     h->notify_fd = -1;
     h->backing_fd = bfd;
@@ -450,7 +473,7 @@ static inline int deq_validate_header(const DeqHeader *hdr, uint64_t file_size,
     if (hdr->version != DEQ_VERSION) return 0;
     if (hdr->variant_id != expected_variant) return 0;
     if (hdr->elem_size == 0 || hdr->capacity == 0) return 0;
-    if (hdr->capacity > 0x7FFFFFFFu) return 0;
+    if (hdr->capacity > 0x80000000u) return 0;
     /* Variant-specific elem_size sanity: prevents buffer overflows in the
      * XS push paths if a corrupted/tampered file claims an impossibly-small
      * elem_size (e.g. < 4 for a Str variant where push writes a 4-byte
@@ -466,13 +489,45 @@ static inline int deq_validate_header(const DeqHeader *hdr, uint64_t file_size,
     return 1;
 }
 
+/* Ring slots map via idx % capacity on a free-running 32-bit index; that tiles the
+   2^32 index space correctly only when capacity divides 2^32, i.e. is a power of two,
+   so a non-power-of-2 request would collide slots across the 2^32 wrap seam. Round up. */
+static inline uint64_t deq_next_pow2(uint64_t n) {
+    if (n <= 1) return 1;
+    n--; n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16; n |= n >> 32;
+    return n + 1;
+}
+
+/* Securely obtain a fd for the path-based backing store. Either create it fresh
+ * (O_CREAT|O_EXCL|O_NOFOLLOW at `mode`, default 0600 = owner-only), or, if it
+ * already exists, attach to it (O_RDWR|O_NOFOLLOW, no O_CREAT). O_EXCL blocks a
+ * pre-seeded or hard-linked file and O_NOFOLLOW a symlink swap, so a local
+ * attacker can no longer redirect or poison the backing store through the path.
+ * Cross-user sharing is opt-in via a wider `mode` (e.g. 0660); the caller still
+ * validates the file's contents. */
+static int deq_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { DEQ_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        DEQ_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    DEQ_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static DeqHandle *deq_create(const char *path, uint64_t capacity,
                               uint32_t elem_size, uint32_t variant_id,
-                              char *errbuf) {
+                              mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { DEQ_ERR("capacity must be > 0"); return NULL; }
     if (elem_size == 0) { DEQ_ERR("elem_size must be > 0"); return NULL; }
-    if (capacity > 0x7FFFFFFFu) {
+    capacity = deq_next_pow2(capacity);
+    if (capacity == 0 || capacity > 0x80000000u) {
         DEQ_ERR("capacity must be <= 2^31 (32-bit cursor halves)"); return NULL;
     }
 
@@ -487,8 +542,8 @@ static DeqHandle *deq_create(const char *path, uint64_t capacity,
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { DEQ_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { DEQ_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = deq_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { DEQ_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) {
@@ -506,16 +561,21 @@ static DeqHandle *deq_create(const char *path, uint64_t capacity,
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) { DEQ_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
-            if (!deq_validate_header((DeqHeader *)base, (uint64_t)st.st_size, variant_id)) {
+            DeqHeader snap;  /* single fetch: validate + setup use one copy */
+            memcpy(&snap, base, sizeof snap);
+            if (!deq_validate_header(&snap, (uint64_t)st.st_size, variant_id)) {
                 DEQ_ERR("invalid deque file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            return deq_setup(base, map_size, path, -1);
+            return deq_setup(base, map_size, path, -1,
+                             snap.data_off, snap.ctl_off, snap.elem_size);
         }
     }
     deq_init_header(base, total, elem_size, variant_id, capacity);
     if (fd >= 0) { flock(fd, LOCK_UN); close(fd); }
-    return deq_setup(base, map_size, path, -1);
+    return deq_setup(base, map_size, path, -1,
+                     sizeof(DeqHeader), deq_ctl_offset(elem_size, capacity),
+                     elem_size);
 }
 
 static DeqHandle *deq_create_memfd(const char *name, uint64_t capacity,
@@ -524,7 +584,8 @@ static DeqHandle *deq_create_memfd(const char *name, uint64_t capacity,
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { DEQ_ERR("capacity must be > 0"); return NULL; }
     if (elem_size == 0) { DEQ_ERR("elem_size must be > 0"); return NULL; }
-    if (capacity > 0x7FFFFFFFu) {
+    capacity = deq_next_pow2(capacity);
+    if (capacity == 0 || capacity > 0x80000000u) {
         DEQ_ERR("capacity must be <= 2^31 (32-bit cursor halves)"); return NULL;
     }
     uint64_t total = deq_total_size(elem_size, capacity);
@@ -535,7 +596,9 @@ static DeqHandle *deq_create_memfd(const char *name, uint64_t capacity,
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { DEQ_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
     deq_init_header(base, total, elem_size, variant_id, capacity);
-    return deq_setup(base, (size_t)total, NULL, fd);
+    return deq_setup(base, (size_t)total, NULL, fd,
+                     sizeof(DeqHeader), deq_ctl_offset(elem_size, capacity),
+                     elem_size);
 }
 
 static DeqHandle *deq_open_fd(int fd, uint32_t variant_id, char *errbuf) {
@@ -546,12 +609,15 @@ static DeqHandle *deq_open_fd(int fd, uint32_t variant_id, char *errbuf) {
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { DEQ_ERR("mmap: %s", strerror(errno)); return NULL; }
-    if (!deq_validate_header((DeqHeader *)base, (uint64_t)st.st_size, variant_id)) {
+    DeqHeader snap;  /* single fetch: validate + setup use one copy */
+    memcpy(&snap, base, sizeof snap);
+    if (!deq_validate_header(&snap, (uint64_t)st.st_size, variant_id)) {
         DEQ_ERR("invalid deque"); munmap(base, ms); return NULL;
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { DEQ_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
-    return deq_setup(base, ms, NULL, myfd);
+    return deq_setup(base, ms, NULL, myfd,
+                     snap.data_off, snap.ctl_off, snap.elem_size);
 }
 
 static void deq_destroy(DeqHandle *h) {
@@ -571,10 +637,14 @@ static void deq_clear(DeqHandle *h) {
     memset(h->ctl, 0, (size_t)h->hdr->capacity * sizeof(uint64_t));
     /* clear() frees the entire deque at once — wake all waiters so they
      * can re-evaluate state, not just one. */
+    /* StoreLoad: publish our slot/cursor change before reading waiters. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&h->hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&h->hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->push_wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
     }
+    /* StoreLoad: publish our slot/cursor change before reading waiters. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&h->hdr->waiters_pop, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&h->hdr->pop_wake_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->pop_wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -601,72 +671,70 @@ static void deq_clear(DeqHandle *h) {
 static inline uint32_t deq_drain(DeqHandle *h) {
     DeqHeader *hdr = h->hdr;
     uint32_t cap = (uint32_t)hdr->capacity;
-    for (;;) {
+    /* Snapshot how many items are present at entry.  We drain at most this many:
+     * concurrent pops may take some, and pushes that arrive after entry are left
+     * for the next call. */
+    uint64_t c0 = __atomic_load_n(&hdr->cursor, __ATOMIC_ACQUIRE);
+    uint32_t target = (uint32_t)(DEQ_CURSOR_TAIL(c0) - DEQ_CURSOR_HEAD(c0));
+    uint32_t drained = 0;
+    /* Reclaim ONE head slot per iteration (not bulk-advance-then-walk): never
+     * expose a freed slot for a wrapping push to reuse before we reclaim it --
+     * that raced drain/pop/push on a reused slot (gen-agnostic claim_read). */
+    while (drained < target) {
         uint64_t c = __atomic_load_n(&hdr->cursor, __ATOMIC_ACQUIRE);
         uint32_t hd = DEQ_CURSOR_HEAD(c), t = DEQ_CURSOR_TAIL(c);
-        uint32_t count = (uint32_t)(t - hd);
-        if (count == 0) return 0;
-        uint64_t nc = DEQ_CURSOR(t, t);
-        if (__atomic_compare_exchange_n(&hdr->cursor, &c, nc,
-                1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
-            for (uint32_t i = 0; i < count; i++) {
-                uint32_t idx = (hd + i) % cap;
-                uint64_t *ctl_word = &h->ctl[idx];
-                int recovered = 0;
-                int dl_set = 0;
-                uint32_t spins = 0;
-                struct timespec dl;
-                for (;;) {
-                    uint64_t cw = __atomic_load_n(ctl_word, __ATOMIC_ACQUIRE);
-                    uint32_t st = DEQ_SLOT_STATE(cw);
-                    if (st == DEQ_SLOT_FILLED) {
-                        uint64_t nw = (DEQ_SLOT_GEN(cw) << 2) | DEQ_SLOT_READING;
-                        if (__atomic_compare_exchange_n(ctl_word, &cw, nw,
-                                0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-                            deq_slot_release(ctl_word, DEQ_SLOT_GEN(cw));
-                            break;
-                        }
-                        continue;
-                    }
-                    /* Non-FILLED: hot-spin first, then short sleeps; on
-                     * timeout force the slot to EMPTY@(gen+1) regardless of
-                     * current state (covers both stall windows above). */
-                    deq_spin_pause();
-                    if ((++spins & 0x3F) == 0) {
-                        if (!dl_set) {
-                            deq_make_deadline((double)DEQ_DRAIN_RECOVERY_SEC, &dl);
-                            dl_set = 1;
-                        }
-                        struct timespec rem;
-                        if (!deq_remaining(&dl, &rem)) {
-                            uint64_t nw = ((DEQ_SLOT_GEN(cw) + 1) << 2) | DEQ_SLOT_EMPTY;
-                            if (__atomic_compare_exchange_n(ctl_word, &cw, nw,
-                                    0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
-                                recovered = 1;
-                                break;
-                            }
-                            /* CAS lost: state advanced concurrently
-                             * (publish/release/another recoverer). Re-observe. */
-                            continue;
-                        }
-                        /* Short sleep to keep CPU usage low during the long wait. */
-                        struct timespec ts = { 0, 100000L }; /* 100us */
-                        nanosleep(&ts, NULL);
-                    }
+        if ((uint32_t)(t - hd) == 0) break;     /* emptied by a concurrent consumer */
+        uint64_t nc = DEQ_CURSOR(hd + 1, t);
+        if (!__atomic_compare_exchange_n(&hdr->cursor, &c, nc,
+                1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+            continue;                            /* lost the CAS -- re-read + retry */
+        /* We now exclusively own item hd's slot.  Reclaim it, with the same
+         * bounded recovery the old drain used for a dead/slow writer's slot. */
+        uint32_t idx = hd % cap;
+        uint64_t *ctl_word = &h->ctl[idx];
+        int recovered = 0, dl_set = 0;
+        uint32_t spins = 0;
+        struct timespec dl;
+        for (;;) {
+            uint64_t cw = __atomic_load_n(ctl_word, __ATOMIC_ACQUIRE);
+            if (DEQ_SLOT_STATE(cw) == DEQ_SLOT_FILLED) {
+                uint64_t nw = (DEQ_SLOT_GEN(cw) << 2) | DEQ_SLOT_READING;
+                if (__atomic_compare_exchange_n(ctl_word, &cw, nw,
+                        0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+                    deq_slot_release(ctl_word, DEQ_SLOT_GEN(cw));
+                    break;
                 }
-                if (recovered)
-                    __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+                continue;
             }
-            /* drain freed `count` slots at once — wake up to that many. */
-            if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
-                __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
-                syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE,
-                        count < INT_MAX ? (int)count : INT_MAX,
-                        NULL, NULL, 0);
+            /* Non-FILLED: hot-spin, then short sleeps; on timeout force the slot
+             * to EMPTY@(gen+1) (a dead/stalled writer left it WRITING). */
+            deq_spin_pause();
+            if ((++spins & 0x3F) == 0) {
+                if (!dl_set) { deq_make_deadline((double)DEQ_DRAIN_RECOVERY_SEC, &dl); dl_set = 1; }
+                struct timespec rem;
+                if (!deq_remaining(&dl, &rem)) {
+                    uint64_t nw = ((DEQ_SLOT_GEN(cw) + 1) << 2) | DEQ_SLOT_EMPTY;
+                    if (__atomic_compare_exchange_n(ctl_word, &cw, nw,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) { recovered = 1; break; }
+                    continue;   /* CAS lost: state advanced concurrently -- re-observe */
+                }
+                struct timespec ts = { 0, 100000L }; /* 100us */
+                nanosleep(&ts, NULL);
             }
-            return count;
+        }
+        if (recovered) __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+        drained++;
+    }
+    if (drained > 0) {
+        /* StoreLoad: publish our slot/cursor changes before reading waiters. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
+            __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
+            syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE,
+                    drained < INT_MAX ? (int)drained : INT_MAX, NULL, NULL, 0);
         }
     }
+    return drained;
 }
 
 static int deq_create_eventfd(DeqHandle *h) {

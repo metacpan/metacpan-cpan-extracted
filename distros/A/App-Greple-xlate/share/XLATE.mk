@@ -5,19 +5,38 @@
 # XLATE_MAXLEN: Set maximum length for API call
 # XLATE_USEAPI: Use API
 # XLATE_UPDATE: Force update cache
+# XLATE_ANONYMIZE:      Anonymization dictionary file
+# XLATE_MARK:           Inline anonymization marks (1 or custom regex)
+# XLATE_TEMPLATE:       Protect template expressions (1 or custom regex)
+# XLATE_FRONTMATTER:    Exclude/anonymize YAML front matter
+# XLATE_SEED:           Seed cache from another cache file
+# XLATE_CONTEXT_WINDOW: Context blocks for re-translation
+#
+# XOPT single-quotes XLATE_ANONYMIZE/XLATE_MARK/XLATE_TEMPLATE/XLATE_SEED/
+# XLATE_CONTEXT_WINDOW (and FILE.ANONYMIZE) so a value such as a custom
+# --mark/--template regex containing parentheses survives /bin/sh
+# unharmed.  This leaves residual limits:
+#   - values must not contain a single quote (') -- there is no escaping
+#     for it inside the single-quoted recipe argument;
+#   - a literal $ in a value must be written as $$ at the make layer,
+#     or make will try to expand it as its own variable reference;
+#   - REMOVE_QUOTE (below) strips embedded double quotes from these
+#     variables before XOPT ever sees them, so double quotes in a value
+#     do not need separate handling here.
 #
 
 #
 # PARAMETER FILES
-#   If the source file is acompanied with parameter files with 
+#   If the source file is acompanied with parameter files with
 #   following extension, they are used to override default parameters.
 #
 # .LANG:   Languages translated to
 # .FORMAT: Format of output files
+# .ANONYMIZE: Anonymization dictionary for the file
 #
 
 XLATE_FORMAT ?= xtxt cm
-XLATE_ENGINE ?= deepl
+XLATE_ENGINE ?= gpt5
 
 ifeq ($(strip $(XLATE_FILES)),)
 override XLATE_FILES := \
@@ -34,7 +53,9 @@ override XLATE_LANG := $(subst $(comma), ,$(XLATE_LANG))
 define REMOVE_QUOTE
   override $1 := $$(subst ",,$$($1))
 endef
-$(foreach name,XLATE_LANG XLATE_FORMAT XLATE_FILES,\
+$(foreach name,XLATE_LANG XLATE_FORMAT XLATE_FILES \
+	XLATE_ANONYMIZE XLATE_MARK XLATE_TEMPLATE \
+	XLATE_FRONTMATTER XLATE_SEED XLATE_CONTEXT_WINDOW,\
 	$(eval $(call REMOVE_QUOTE,$(name))))
 
 define FOREACH
@@ -74,10 +95,10 @@ TEMPFILES += $(foreach file,$(XLATE_FILES),$(call STXT,$(file)))
 define DEFINE_RULE
 ifeq ($5,1)
 $(basename $3).$1.$2: $3 $(call STXT,$3)
-	$$(XLATE) -e $4 -t $1 -o $2 $$< > $$@
+	$$(XLATE) $$(call XOPT,$3) -e $4 -t $1 -o $2 $$< > $$@
 else
 $(basename $3).$4-$1.$2: $3 $(call STXT,$3)
-	$$(XLATE) -e $4 -t $1 -o $2 $$< > $$@
+	$$(XLATE) $$(call XOPT,$3) -e $4 -t $1 -o $2 $$< > $$@
 endif
 endef
 $(eval $(call FOREACH,DEFINE_RULE))
@@ -87,6 +108,14 @@ XLATE = xlate \
 	$(if $(XLATE_MAXLEN),-m$(XLATE_MAXLEN)) \
 	$(if $(XLATE_USEAPI),-a) \
 	$(if $(XLATE_UPDATE),-u)
+
+XOPT = $(if $(wildcard $1.ANONYMIZE),--anonymize='$1.ANONYMIZE',\
+	$(if $(XLATE_ANONYMIZE),--anonymize='$(XLATE_ANONYMIZE)')) \
+	$(if $(XLATE_MARK),$(if $(filter 1,$(XLATE_MARK)),--mark,--mark='$(XLATE_MARK)')) \
+	$(if $(XLATE_TEMPLATE),$(if $(filter 1,$(XLATE_TEMPLATE)),--template,--template='$(XLATE_TEMPLATE)')) \
+	$(if $(XLATE_FRONTMATTER),--frontmatter) \
+	$(if $(XLATE_SEED),--seed='$(XLATE_SEED)') \
+	$(if $(XLATE_CONTEXT_WINDOW),--context='$(XLATE_CONTEXT_WINDOW)')
 
 .PHONY: clean
 clean:

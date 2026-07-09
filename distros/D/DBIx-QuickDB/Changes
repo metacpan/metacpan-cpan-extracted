@@ -1,3 +1,8 @@
+0.000052  2026-07-08 21:46:58-07:00 America/Los_Angeles
+
+    - MariaDB driver now reports not viable for server releases that hang unkillably on information_schema table_constraints/referential_constraints scans under --skip-grant-tables (upstream MDEV-38811, introduced by MDEV-38209): 10.11.16, 11.4.10, 11.8.6, 12.2.2 (final 12.2 release, never fixed), and 12.3.1. The affected query thread blocks on a never-initialized ACL mutex: immune to KILL, prevents graceful shutdown, and the stuck client cannot be interrupted by Perl-level %SIG/alarm. Override with QDB_MARIADB_IGNORE_BROKEN=1; documented in a new "KNOWN BROKEN SERVER VERSIONS" POD section.
+    - Added t/broken_mariadb_versions.t.
+
 0.000051  2026-06-13 22:02:33-07:00 America/Los_Angeles
 
 0.000050  2026-06-10 14:14:43-07:00 America/Los_Angeles

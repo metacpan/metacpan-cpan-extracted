@@ -178,6 +178,7 @@ t/12_cache.t
 t/13_mask.t
 t/14_anon.t
 t/15_template.t
+t/16_cli.t
 t/Util.pm
 t/bin/llm
 xt/author/api_translate.t

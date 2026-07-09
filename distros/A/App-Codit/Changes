@@ -1,5 +1,11 @@
 Revision history for Perl extension App::Codit.
 
+0.20 Wed Jul 08 2026
+	- Facilitated the use of Tk::FileBrowser version 0.13.
+	- Plugin Snippets needed some more time to fetch fonts now.
+	- Plugin SearchReplace now only reports when a search is active.
+	- Fixed bug in plugin Bookmarks.
+
 0.19 Sat Mar 29 2025
 	- Fixed -contentshowspaces on opening document.
 	- Added option -contentautobrackets and tool menu entry for it.

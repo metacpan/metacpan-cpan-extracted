@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.164;
+package Config::Model::Loader 2.165;
 
 use Carp;
 use strict;
@@ -429,8 +429,14 @@ sub unquote {
         if (defined $_) {
             s/(?<!\\)\\n/\n/g;
             s/\\\\/\\/g;
-            s/^"// && s/"$// && s!\\"!"!g;
-            s/^'// && s/'$// && s!\\'!'!g;
+            # handle double quote
+            if (s/^"//) {
+                s/"$// && s!\\"!"!g;
+            }
+            # or single quotes, but not both!
+            elsif (s/^'//) {
+                s/'$// && s!\\'!'!g;
+            }
         }
     }
     return;
@@ -1128,7 +1134,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.164
+version 2.165
 
 =head1 SYNOPSIS
 

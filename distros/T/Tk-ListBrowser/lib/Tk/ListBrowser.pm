@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -507,6 +507,7 @@ sub Populate {
 	$self->{HANDLER} = undef;
 	$self->{POOL} = new Tk::ListBrowser::HashList;
 	$self->{SORTACTIVE} = '';
+	$self->geoSave(0,0);
 	$self->listWidth(100);
 	$self->priorityMax(0);
 	$self->refreshLoopActive(0);
@@ -1070,6 +1071,7 @@ sub cellSize {
 	for (@pool) {
 		my $entry = $_;
 		my ($cw, $ch, $iw, $ih, $tw, $th) = $entry->requestedSize;
+		
 		$cellheight = $ch if $ch > $cellheight;
 		$cellwidth = $cw if $cw > $cellwidth;
 		$imageheight = $ih if $ih > $imageheight;
@@ -1613,6 +1615,13 @@ sub forceWidth {
 	my $self = shift;
 	$self->{FORCEWIDTH} = shift if @_;
 	return $self->{FORCEWIDTH}
+}
+
+sub geoSave {
+	my $self = shift;
+	$self->{GEOSAVE} = \@_ if @_;
+	my $gs = $self->{GEOSAVE};
+	return @$gs;
 }
 
 =item B<get>I<(?$name?)>
@@ -2917,32 +2926,19 @@ sub moveRow {
 sub OnConfigure {
 	my ($self, $timer) = @_;
 
-	#redraw headers, anchor and selection in list mode
+	#limit ourself to resize events.
+	my ($sx, $sy) = $self->geoSave;
+	my ($x, $y) = $self->canvasSize;
+	return if ($sx eq $x) and ($sy eq $y);
+
+	$self->geoSave($x, $y);
+
+	#redraw headers in list mode
 	if ($self->listMode) {
 		$self->headerPlace;
-		$self->anchorRefresh;
-	}
-
-	if (my $id = $self->{'timer_id'}) {
-		$self->afterCancel($id);
-		my $nid = $self->after(50, ['OnConfigureTimer', $self]);
-		$self->{'timer_id'} = $nid;
-	}
-
-	unless (defined $timer) {
-		$self->update;
-		my $id = $self->after(50, ['OnConfigureTimer', $self]);
-		$self->{'timer_id'} = $id;
-		return
 	}
 
 	$self->refreshPurge;
-}
-
-sub OnConfigureTimer {
-	my $self = shift;
-	delete $self->{'timer_id'};
-	$self->OnConfigure(1);
 }
 
 =item B<open>I<($name)>
@@ -3413,14 +3409,18 @@ sub setScrollRegion {
 		my $l = $self->get($last);
 		my $x = $l->maxX + $self->cget('-marginright');
 		my $y = $l->maxY + $self->cget('-marginbottom');
+		if ($self->listMode) {
+			$x --;
+			$y --;
+		}
 
 		my ($sx, $sy) = $self->canvasSize;
 		$sx ++;
 		$sy ++;
 		my $xscroll = $self->Subwidget('XScrollbar');
-		$sy = $sy - $xscroll->width if $xscroll->ismapped;
+		$sy = $sy - $xscroll->width if $y > $sy;
 		my $yscroll = $self->Subwidget('YScrollbar');
-		$sx = $sx - $yscroll->width if $yscroll->ismapped;
+		$sx = $sx - $yscroll->width if $x > $sx;
 
 		$x = $sx if $x < $sx;
 		$y = $sy if $y < $sy;

@@ -1,43 +1,43 @@
 package Dist::Zilla::PluginBundle::GEEKRUTH;
 use Modern::Perl;
-our $VERSION   = '2.0002';           # VERSION
-our $AUTHORITY = 'cpan:GEEKRUTH';    # AUTHORITY
+our $VERSION = '4.0000'; # VERSION
+our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 
 # ABSTRACT: Be like GeekRuthie when you build your dists
 
 use Moose;
 use Dist::Zilla;
 with qw/
-   Dist::Zilla::Role::PluginBundle::Easy
-   Dist::Zilla::Role::PluginBundle::Config::Slicer
-   Dist::Zilla::Role::PluginBundle::PluginRemover
-   /;
+    Dist::Zilla::Role::PluginBundle::Easy
+    Dist::Zilla::Role::PluginBundle::Config::Slicer
+    Dist::Zilla::Role::PluginBundle::PluginRemover
+    /;
 use Type::Tiny;
 use Types::Standard qw/ Str ArrayRef /;
 
 sub version_range {
-   my ( $from, $to ) = @_;
-   return join ',', grep { not $_ % 2 } $from .. $to;
+    my ( $from, $to ) = @_;
+    return join ',', grep { not $_ % 2 } $from .. $to;
 }
 
 has badge => (
-   isa     => 'ArrayRef',
-   is      => 'ro',
-   default => sub { [] },
+    isa     => 'ArrayRef',
+    is      => 'ro',
+    default => sub { [] },
 );
 
 sub configure {
-   my ($self) = @_;
-   my $arg = $self->payload;
+    my ($self) = @_;
+    my $arg = $self->payload;
 
-   my $release_branch = $arg->{release_branch} || 'releases';
-   my $dev_branch     = $arg->{dev_branch}     || 'main';
-   my $upstream       = $arg->{upstream}       || 'origin';
+    my $release_branch = $arg->{release_branch} || 'releases';
+    my $dev_branch     = $arg->{dev_branch}     || 'main';
+    my $upstream       = $arg->{upstream}       || 'origin';
 
-   my %mb_args;
-   $mb_args{mb_class} = $arg->{mb_class} if $arg->{mb_class};
+    my %mb_args;
+    $mb_args{mb_class} = $arg->{mb_class} if $arg->{mb_class};
 
-   my $builder = $arg->{builder} || 'MakeMaker';
+    my $builder = $arg->{builder} || 'MakeMaker';
 
    $self->add_plugins(
       [ $builder, ( \%mb_args ) x ( $builder eq 'ModuleBuild' ) ] );
@@ -50,14 +50,18 @@ sub configure {
          InstallGuide
          Covenant
          ContributorCovenant
-         GitLab::Update
+   
+         Codeberg::Update
          /,
       [
-         'GitLab::Meta' => {
+         'Codeberg::Meta' => {
             remote   => $upstream,
             p3rl     => 1,
             metacpan => 0,
-         }
+         },
+         'SecurityPolicy' => {
+            '-policy' => 'Individual'
+         },
       ],
       qw/
          MetaYAML
@@ -90,6 +94,7 @@ sub configure {
       qw/ Test::ReportPrereqs /,
       [
          AutoPrereqs => {
+            skip => 'parent',
             ( skip => $arg->{autoprereqs_skip} ) x !!$arg->{autoprereqs_skip}
          }
       ],
@@ -115,64 +120,61 @@ sub configure {
       ],
    );
 
-   $self->add_plugins(
-      'PreviousVersion::Changelog',
-      [
-         'NextVersion::Semantic' => {
-            major    => 'MAJOR, API CHANGES',
-            minor    => 'MINOR, NEW FEATURES, ENHANCEMENTS',
-            revision => 'REVISION, BUG FIXES, DOCUMENTATION, STATISTICS',
-            format   => '%d.%02d%02d',
-         }
-      ],
-      [
-         'ChangeStats::Git' => {
-            group          => 'STATISTICS',
-            develop_branch => $dev_branch,
-            release_branch => $release_branch,
-         }
-      ],
-      'Git::Commit',
-   );
-
-   if ( $ENV{FAKE} or $arg->{fake_release} ) {
-      $self->add_plugins('FakeRelease');
-   }
-   else {
-      $self->add_plugins(
-         [
-            'Git::Push' => {
-               push_to => join q{ }, $upstream, $dev_branch, $release_branch
+    $self->add_plugins(
+        'PreviousVersion::Changelog',
+        [
+            'NextVersion::Semantic' => {
+                major    => 'MAJOR, API CHANGES',
+                minor    => 'MINOR, NEW FEATURES, ENHANCEMENTS',
+                revision => 'REVISION, BUG FIXES, DOCUMENTATION, STATISTICS',
+                format   => '%d.%02d%02d',
             }
-         ],
-         qw/FakeRelease/,
-         [ 'InstallRelease' => { install_command => 'cpanm .' } ],
-      );
-   }
+        ],
+        [
+            'ChangeStats::Git' => {
+                group          => 'STATISTICS',
+                develop_branch => $dev_branch,
+                release_branch => $release_branch,
+            }
+        ],
+        'Git::Commit',
+    );
 
-   $self->add_plugins(
-      qw/
-         SchwartzRatio
-         RunExtraTests
-         /,
-   );
+    if ( $ENV{FAKE} or $arg->{fake_release} ) {
+        $self->add_plugins('FakeRelease');
+    } else {
+        $self->add_plugins(
+            [
+                'Git::Push' => { push_to => join q{ }, $upstream, $dev_branch, $release_branch }
+            ],
+            qw/FakeRelease/,
+            [ 'InstallRelease' => { install_command => 'cpanm .' } ],
+        );
+    }
 
-   if ( my $help_wanted = $arg->{help_wanted} ) {
-      $self->add_plugins(
-         [
-            'HelpWanted' => { map { $_ => 1 } split q{ }, $help_wanted },
-         ]
-      );
-   }
+    $self->add_plugins(
+        qw/
+            SchwartzRatio
+            RunExtraTests
+            /,
+    );
 
-   $self->add_plugins(
-      qw/CPANFile/,
-      [ 'MinimumPerl' => { default_version => '5.012' } ],
-   );
+    if ( my $help_wanted = $arg->{help_wanted} ) {
+        $self->add_plugins(
+            [
+                'HelpWanted' => { map { $_ => 1 } split q{ }, $help_wanted },
+            ]
+        );
+    }
 
-   $self->config_slice('mb_class');
+    $self->add_plugins(
+       qw/CPANFile/,
+       [ 'MinimumPerl' => { default_version => '5.012' } ],
+    );
 
-   return;
+    $self->config_slice('mb_class');
+
+    return;
 }
 
 1;
@@ -189,7 +191,7 @@ Dist::Zilla::PluginBundle::GEEKRUTH - Be like GeekRuthie when you build your dis
 
 =head1 VERSION
 
-version 2.0002
+version 4.0000
 
 =head1 DESCRIPTION
 
@@ -204,8 +206,11 @@ her distributions. It's roughly equivalent to
    [InstallGuide]
    [Covenant]
    [ContributorCovenant]
-   [GitLab::Update]
-   [GitLab::Meta]
+   [SecurityPolicy]
+   -policy = Individual
+
+   [Codeberg::Update]
+   [Codeberg::Meta]
       p3rl = 1
       metacpan = 0
 
@@ -258,12 +263,9 @@ her distributions. It's roughly equivalent to
    branch     = releases
    
    [Git::Commit]
-   [UploadToCPAN]
+   [FakeRelease]
    [Git::Push]
    push_to = origin main releases
-   
-   [InstallRelease]
-   install_command = cpanm .
    
    [SchwartzRatio]
    [RunExtraTests]
@@ -284,16 +286,6 @@ Passed as C<skip> to AutoPrereqs.
 Passed to L<Dist::Zilla::Plugin::Authority>.
 
 Defaults to C<cpan:GEEKRUTH>.
-
-=item C<fake_release>
-
-If given a true value, uses L<Dist::Zilla::Plugin::FakeRelease>
-instead of
-L<Dist::Zilla::Plugin::Git::Push>,
-L<Dist::Zilla::Plugin::UploadToCPAN>, and
-L<Dist::Zilla::Plugin::InstallRelease>
-
-Can also be triggered via the I<FAKE> environment variable.
 
 =item C<builder>
 
@@ -337,7 +329,7 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by D Ruth Holloway.
+This software is copyright (c) 2026 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

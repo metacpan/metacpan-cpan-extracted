@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/mjohnson108/p5-App-GUI-GoLP/issues
   homepage: https://github.com/mjohnson108/
   repository: https://github.com/mjohnson108/p5-App-GUI-GoLP.git
-version: '1.2'
+version: '1.3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,6 +2,7 @@ Changes
 CONTRIBUTIONS.md
 cpanfile
 lib/Test/Mockingbird.pm
+lib/Test/Mockingbird/Async.pm
 lib/Test/Mockingbird/DeepMock.pm
 lib/Test/Mockingbird/TimeTravel.pm
 LICENSE
@@ -11,6 +12,8 @@ MANIFEST.SKIP
 README.md
 t/00-load.t
 t/30-basic.t
+t/async.t
+t/call_order.t
 t/class.t
 t/comment-spelling.t
 t/cover.t
@@ -24,12 +27,16 @@ t/fixme.t
 t/function.t
 t/gv.t
 t/inject.t
+t/inject_all.t
 t/integration.t
+t/intercept_new.t
 t/kwalitee.t
+t/locales.t
 t/manifest.t
 t/mock.t
 t/mock_scoped.t
 t/mock_scoped_multi.t
+t/mutant_killers.t
 t/object.t
 t/pod-cm.t
 t/pod-coverage.t

@@ -66,7 +66,7 @@ sub Populate {
 	
 	for ($self, $label, $sort) {
 		my $item = $_;
-		$item->bind('<Button-3>', [$self, 'Callback', '-contextcall', Ev('x'), Ev('y')]);
+		$item->bind('<ButtonRelease-3>', [$self, 'Callback', '-contextcall', Ev('x'), Ev('y')]);
 #		$item->bind('<Button-1>', [$self, 'SortClick']);
 		$item->bind('<B1-Motion>', [$self, 'B1Motion', $item, Ev('x')]);
 		$item->bind('<ButtonRelease-1>', [$self, 'B1', $item, Ev('x')]);

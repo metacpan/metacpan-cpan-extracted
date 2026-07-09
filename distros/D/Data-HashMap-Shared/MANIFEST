@@ -1,6 +1,6 @@
 .gitignore
-bench/stress.pl
 bench/rdlock_bench.pl
+bench/stress.pl
 bench/vs.pl
 Changes
 eg/aggregator.pl
@@ -84,8 +84,8 @@ xt/cloexec_exec.t
 xt/concurrent_open.t
 xt/crash_recovery.t
 xt/eacces.t
-xt/eg_runs.t
 xt/edge-cases.t
+xt/eg_runs.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/fork_live.t
@@ -99,6 +99,7 @@ xt/mpmc_fuzz.t
 xt/new_ops_fuzz.t
 xt/reader_starvation_guard.t
 xt/rwlock_scaling.t
+xt/slotless_reader_recovery.t
 xt/stale_recovery_crash.t
 xt/take-flush-mmap.t
 xt/torn_write.t

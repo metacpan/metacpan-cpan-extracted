@@ -29,6 +29,7 @@ if (defined $app) {
 	$pext = $app->extGet('Plugins');
 	pause(1000);
 	$snp = $pext->plugGet('Snippets');
+	pause(1000);
 }
 
 testaccessors($snp, 'current');

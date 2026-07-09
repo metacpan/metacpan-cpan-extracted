@@ -1,3 +1,15 @@
+0.002000 Jun 13 2026
+
+- bump libsodium to version 1.0.22
+
+- add support for KEM from libsodium 1.0.22
+
+- add support for SHA-3 from libsodium 1.0.22
+
+- add support for XOF from libsodium 1.0.21
+
+- minor improvements
+
 0.001001 Mar 7 2026
 
 SECURITY UPDATE (CVE-2026-30910): Combined aead encryption, combined signature

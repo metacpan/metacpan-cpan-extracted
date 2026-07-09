@@ -2,13 +2,13 @@ package Tk::DocumentTree;
 
 =head1 NAME
 
-Tk::DocumentTree - ITree based document list
+Tk::DocumentTree - Tk::ListBrowser based document list
 
 =cut
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -52,17 +52,13 @@ static char *save[]={
 
 =head1 DESCRIPTION
 
-B<Tk::DocumentTree> is a Tree like megawidget. It consists of a Label and an ITree Widget.
-
-You can use all of the options of an ITree widget except for I<-itemtype>, I<-browsecmd>,
-I<-separator>, I<-selectmode> and I<-exportselection>.
+B<Tk::DocumentTree> is a Tree like megawidget. It consists of a Label and a ListBrowser widget.
 
 The Label on top displays the path all added entries have in commom.
 It automatically creates a folder tree as entries are added.
 
 Entries can have the status I<file> or I<untracked>
 An entry is untracked when it does not exist as a file.
-
 
 =head1 CONFIG VARIABLES
 
@@ -118,7 +114,7 @@ sub Populate {
 		-browsecmd => ['EntryClick', $self],
 		-filterforce => 1,
 		-itemtype => 'imagetext',
-		-selectmode => 'single',
+		-selectmode => 'exclusive',
 		-separator => $sep,
 		-textanchor => 'w',
 		-textside => 'right',
@@ -437,8 +433,11 @@ sub entryShow {
 	$entry = $self->StripPath($entry);
 	my $parent = $self->infoParent($entry);
 	while (defined $parent) {
-		$self->open($parent);
-		$self->refreshPurge($self->index($parent));
+		my $p = $self->get($parent);
+		unless ($p->opened) {
+			$self->open($parent);
+			$self->refreshPurge($self->index($parent));
+		}
 		$parent = $self->infoParent($parent);
 	}
 	$self->see($entry);
