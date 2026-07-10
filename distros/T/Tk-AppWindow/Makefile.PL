@@ -24,6 +24,7 @@ my %prereq = (
 	'Tk::DocumentTree'       => '0.08',
 	'Tk::DynaMouseWheelBind' => '0.07',
 	'Tk::FileBrowser'        => '0.13',
+	'Tk::ITree'              => '0.03',
 	'Tk::PodViewer'          => '0.03',
 	'Tk::QuickForm'          => '0.06',
 	'Tk::YADialog'           => '0.04',

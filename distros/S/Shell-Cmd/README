@@ -752,8 +752,8 @@ KNOWN PROBLEMS
         entered if accurate error tracking is needed.
 
 BUGS AND QUESTIONS
-    If you find a bug in Shell::Cmd, please let me know. The best ways to
-    contact me are:
+    If you find a bug in Shell::Cmd, please let me know. As CPAN has removed
+    email support, the only supported way to submit a bug is via ticket:
 
     GitHub
         You can submit an issue or question on GitHub. This can be done at
@@ -763,17 +763,6 @@ BUGS AND QUESTIONS
 
         This is the preferred method. Please submit problems requests as
         GitHub issues if at all possible.
-
-    Direct email
-        You are welcome to send it directly to me by email. The email
-        address to use is: sbeck@cpan.org.
-
-        There is some discussion of discontinuing CPAN email, so please use
-        this as a last resort. The GitHub method is strongly preferred.
-        Also, because cpan.org addresses are published, they are used by a
-        lot of spammers and phishers. Please include the name of the perl
-        module in the subject line of ALL messages sent to my cpan.org
-        address or it will likely be overlooked.
 
     Please do not use other means to report bugs (such as forums for a
     specific OS or Linux distribution) as it is impossible for me to keep up
@@ -798,5 +787,5 @@ LICENSE
     under the same terms as Perl itself.
 
 AUTHOR
-    Sullivan Beck (sbeck@cpan.org)
+    Sullivan Beck (https://github.com/SBECK-github/)
 

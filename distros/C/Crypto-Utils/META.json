@@ -1,0 +1,56 @@
+{
+   "abstract" : "Crypt Protocol",
+   "author" : [
+      "Pan Lanlan <abbypan@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypto-Utils",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Crypt::OpenSSL::Guess" : "0.12",
+            "Dist::Zilla::Plugin::FFI::Build" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "FFI::Build::MM" : "0.83"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CBOR::XS" : "1.87",
+            "Carp" : "1.50",
+            "FFI::CheckLib" : "0.31",
+            "FFI::Platypus" : "2.11",
+            "List::Util" : "1.70",
+            "bignum" : "0.67"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Smart::Comments" : "0",
+            "Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/abbypan/Crypto-Utils.git",
+         "web" : "https://github.com/abbypan/Crypto-Utils"
+      }
+   },
+   "version" : "0.003",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "JSON::XS version 4.04",
+   "x_spdx_expression" : "MPL-2.0"
+}
+

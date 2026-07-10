@@ -1,9 +1,11 @@
 package Data::BloomFilter::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::BloomFilter::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 1;
 __END__
 
@@ -197,8 +199,14 @@ the union of what all of them have added.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it. Do not share backing
-files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 

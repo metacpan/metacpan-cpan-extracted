@@ -110,7 +110,7 @@ time lines, different levels of attention to detail, and different
 amounts of time they can devote to the task.  As such, if you give
 them a list of messages to maintain, in order to do so effectively,
 they need to know something about which ones are up-to-date, and which
-need some work.
+ones require attention.
 
 This is the step which prompted me to write this set of tools.  It
 seemed to me that the standard tools for localization were missing
@@ -131,7 +131,7 @@ of modules and tools to create, use, and maintain messages for use by
 an application.
 
 Although several different tools exist for handling the localization
-process, I'll concentrate on three: Locale::gettext, Locale::Maketext,
+process, I'll concentrate on three: L<Locale::gettext>, L<Locale::Maketext>,
 and this one (Locale::VersionedMessages).
 
 In contrasting Locale::VersionedMessages with the other modules, it should be
@@ -213,7 +213,7 @@ B<Locale::Maketext> in addition to B<Locale::VersionedMessages>.
 
 =over 4
 
-=item B<Locale::gettext>
+=item L<Locale::gettext>
 
 The Locale::gettext module is probably the most widely used of the
 localization modules, and has a number of advantages.  The single most
@@ -264,9 +264,10 @@ version information) which might aid in maintaining the messages.
 Another thing to note is that the order of the substitution values
 (%s) must be the same in all translations.
 
-The gettext does handle plural values, but it is tedious.  You have to
-have a full translation for each case, which makes translating a long
-message tedious (a lot of repetition).  As an example:
+Another note is that gettext does handle plural values, but it is done
+in a very tedious manner.  You have to have a full translation for each
+case, which makes translating a long message entail a lot of repetition.
+As an example:
 
    "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 :"
    "n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
@@ -282,8 +283,8 @@ number of plural forms, and handle them specially.  In this example,
 the first form (msgstr[0]) is used any time the number ends in 1, but
 not 11; the second is used when the number ends in 2, 3, or 4, but not
 12, 13, or 14, and the last form is used in all other cases.  The fact
-that this is a real case illustrates how complex localization can be,
-and the need for a very flexible tool.
+that this is a real case rather than a made-up one illustrates how
+complex localization can be, and the need for a very flexible tool.
 
 One problem with gettext is that the plurality problem is handled on
 the entire message.  If the message is long and has a lot of text
@@ -307,9 +308,13 @@ Unlike the Locale::gettext method, it store all of the data in perl
 modules, however I disagree with the way it is done.
 
 The primary module is:
+
    _PROGRAM_::_SOMETHING_
+
 This contains the default lexicon.  In addition, there are other modules:
+
    _PROGRAM_::_SOMETHING_::_LOCALE_
+
 which contain additional lexicons.  Here, _SOMETHING_ can be any
 string chosen by the programmer to specify that these are messages used
 by _PROGRAM_.  By convention, it is something like: 'I18N', or
@@ -318,7 +323,7 @@ by _PROGRAM_.  By convention, it is something like: 'I18N', or
 I dislike this convention for one primary reason: it's bad practice to
 make every application (or set of messages) a top-level name in the
 hierarchy of perl modules.  That is a great way to mess up the perl module
-namespace.
+namespace and to accidentally create conflicts with other modules.
 
 A Locale::Maketext lexicon module contains similar information to the
 gettext PO file, but is stored in the form of a hash:
@@ -443,8 +448,9 @@ There are too many problems with using the untranslated message as
 the message ID.
 
 If you ever need to change the text of the message, for any reason,
-it involves both changes to the lexicons AND changes to the program
-using the lexicons.
+it involves both changes to the lexicons AND changes to every program
+that uses the lexicons.  This greatly impacts the practicality of
+having universal message sets.
 
 If the message is multi-line, it is simply not practical to use it
 as the message ID, so you'll end up using a shorter message description
@@ -532,7 +538,7 @@ lexicon, and this is a significant weakness in them.
 
 =back
 
-=head1 LOCALE::MESSAGES TOOLS
+=head1 Locale::VersionedMessages TOOLS
 
 Currently, the Locale::VersionedMessages distribution includes one tool
 (B<lm_gui>) which is a Perl-Tk based graphical tool for managing
@@ -570,7 +576,7 @@ a directory and the name of the set.
 
 The directory be where the Locale::VersionedMessages hierarchy of perl modules
 describing this set will live.  Inside the specified directory will
-be a hierarchy B<Locale/Message/Sets> and the modules will be created
+be a hierarchy F<Locale/Message/Sets> and the modules will be created
 and placed in that directory.
 
 The set name is a simple alphanumeric/undersocre label naming the message
@@ -667,7 +673,7 @@ modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Sullivan Beck (sbeck@cpan.org)
+Sullivan Beck (https://github.com/SBECK-github/)
 
 =cut
 

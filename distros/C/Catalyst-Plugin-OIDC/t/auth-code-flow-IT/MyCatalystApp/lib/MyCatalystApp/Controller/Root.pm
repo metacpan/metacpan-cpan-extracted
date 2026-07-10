@@ -68,11 +68,14 @@ sub my_resource :Path('my-resource') :Args(0) {
 sub authorize : Global {
     my ( $self, $c ) = @_;
 
-    my $redirect_uri  = $c->req->param('redirect_uri');
-    my $client_id     = $c->req->param('client_id');
-    my $state         = $c->req->param('state');
-    my $response_type = $c->req->param('response_type');
-    if ($response_type eq 'code' && $client_id eq 'my_id') {
+    my $redirect_uri   = $c->req->param('redirect_uri');
+    my $client_id      = $c->req->param('client_id');
+    my $state          = $c->req->param('state');
+    my $code_challenge = $c->req->param('code_challenge');
+    my $response_type  = $c->req->param('response_type');
+    if ($response_type eq 'code'
+          && $client_id eq 'my_id'
+          && $code_challenge eq 'oqtdK0vIPNvI5ejQ6RqbJoSu0bVMZ7IAPA_dqAejh7E') {
         $c->response->redirect("$redirect_uri?client_id=$client_id&state=$state&code=abc&iss=my_issuer");
     }
     else {

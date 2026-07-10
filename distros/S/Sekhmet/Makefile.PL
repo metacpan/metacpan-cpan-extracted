@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Sekhmet.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.008003',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'Horus'               => '0.02',

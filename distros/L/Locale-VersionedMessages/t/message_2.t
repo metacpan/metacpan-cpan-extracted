@@ -1,43 +1,39 @@
 #!/usr/bin/perl
 
-use Test::Inter 1.04;
+use warnings;
+use warnings;
+use strict;
+use Test::Inter;
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-BEGIN {
-   $t       = new Test::Inter 'message (substitution)';
-   $testdir = $t->testdir();
-}
-
-use Locale::VersionedMessages;
-use lib "$testdir/lib";
-
-$lm = new Locale::VersionedMessages;
-$lm->set('Test2');
+$::lm->set('Test2');
 
 sub test {
    my($op,@test) = @_;
 
    my @ret;
    if ($op eq 'message') {
-      $tmp = $lm->message(@test);
+      my $tmp = $::lm->message(@test);
       @ret = ($tmp);
 
    } elsif ($op eq 'search') {
-      @ret = $lm->search(@test);
+      @ret = $::lm->search(@test);
 
    } elsif ($op eq 'query_msg_locales') {
-      @ret = $lm->query_msg_locales(@test);
+      @ret = $::lm->query_msg_locales(@test);
    
    } elsif ($op eq 'query_msg_vers') {
-      @ret = $lm->query_msg_vers(@test);
+      @ret = $::lm->query_msg_vers(@test);
    
    }
 
-   $err = $lm->err();
+   my $err = $::lm->err();
    return $err  if ($err);
    return @ret;
 }
 
-$tests = "
+my $tests = "
 
 # Errors
 
@@ -115,9 +111,9 @@ message Test2 Subst_3b en_US n 2 =>
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

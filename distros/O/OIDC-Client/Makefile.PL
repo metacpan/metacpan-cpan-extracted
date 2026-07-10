@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "CHI" => "0.60",
     "Carp" => 0,
     "Crypt::JWT" => "0.035",
-    "Data::UUID" => "1.227",
+    "Crypt::PRNG" => "0.085",
     "Digest::SHA" => "6.01",
     "List::MoreUtils" => "0.423",
     "List::Util" => 0,
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warn" => 0
   },
-  "VERSION" => "1.07",
+  "VERSION" => "1.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +62,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Clone" => 0,
   "Crypt::JWT" => "0.035",
-  "Data::UUID" => "1.227",
+  "Crypt::PRNG" => "0.085",
   "Digest::SHA" => "6.01",
   "File::Spec" => 0,
   "IO::Handle" => 0,

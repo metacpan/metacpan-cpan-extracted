@@ -1,19 +1,21 @@
 # Generated from Makefile.PL using makefilepl2cpanfile
 
-requires 'perl', '5.008';
+requires 'perl', '5.010';
 
 requires 'Carp';
+requires 'Class::Abstract';
 requires 'Cwd';
+requires 'DBI', '1.6';
 requires 'DBD::SQLite::Constants';
-requires 'Data::Dumper';
 requires 'Data::Reuse';
 requires 'ExtUtils::MakeMaker', '6.64';
 requires 'File::Spec';
 requires 'File::Temp';
-requires 'File::pfopen', '0.03';
+requires 'List::Util', '1.33';
 requires 'Log::Abstraction', '0.26';
 requires 'Object::Configure', '0.16';
 requires 'Params::Get', '0.13';
+requires 'Return::Set';
 requires 'Scalar::Util';
 requires 'autodie';
 requires 'boolean';
@@ -41,9 +43,12 @@ on 'test' => sub {
 	requires 'Test::Carp';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
+	requires 'Test::Memory::Cycle';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';
+	requires 'Test::Returns';
+	requires 'Test::Without::Module';
 	requires 'Text::xSV::Slurp';
 	requires 'XML::Simple';
 };

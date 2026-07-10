@@ -38,6 +38,7 @@
 * [METHODS AND SUBROUTINES](#methods-and-subroutines)
   * [new](#new)
   * [command](#command)
+  * [command\_args](#command\args)
   * [commands (required)](#commands-required)
   * [main](#main)
   * [run](#run)
@@ -67,6 +68,7 @@
 * [LICENSE AND COPYRIGHT](#license-and-copyright)
 * [SEE ALSO](#see-also)
 * [AUTHOR](#author)
+* [POD ERRORS](#pod-errors)
 # NAME
 
 CLI::Simple - a minimalist object oriented base class for CLI applications
@@ -969,6 +971,46 @@ name and its arguments._
     [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong). These define the command-line options your program
     recognizes.
 
+- validate\_command
+
+    Normally, `CLI::Simple` will validate the command and throw an
+    exception if the command has not been registered. You can prevent this
+    behavior by setting this attribute to a non-true value.
+
+    Typically you might use this to allow a script to assume a default
+    command and allow arguments. For example suppose you have a script
+    `foo` with a command "get" with arguments:
+
+        foo get something
+
+    ...but want to allow users to also do:
+
+        foo something
+
+    To do this you should follow this recipe:
+
+        sub init {
+          my ($self) = @__;
+          
+          my @args = $self->get_args;
+        
+          if ( ! @args ) {
+            $self->command_args($self->command()); # set the args to the command
+            $self->command('get'); # set the command to your default
+          }
+          else {
+            die "ERROR: unknown command\n"
+              if !$self->commands->{$self->command}; # validate the command
+          }
+          ...
+          return;
+        }
+
+    _NOTE: This only works if your commands have a deterministic number
+    of arguments. For example you might always require at least 1
+    argument. If you have no arguments as in the above recipe you would
+    assume command is the argument to your default command._
+
 ## command
 
     command
@@ -978,6 +1020,18 @@ Get or sets the command to execute. Usually this is the first argument
 on the command line after all options have been parsed. There are
 times when you might want to override the argument. You can pass a new
 command that will be executed when you call the `run()` method.
+
+## command\_args
+
+    my $args = $self->command_args();
+
+Get or sets the argument list. Similar to `get_args` when no
+arguments are passed except it returns an array reference.
+
+To replace or add to the argument list, pass an array or list.
+
+    my $args = $self->command_args;
+    $self->command_args(@{$args}, 'foo');
 
 ## commands (required)
 
@@ -1557,3 +1611,11 @@ under the same terms as Perl itself.  See
 # AUTHOR
 
 Rob Lauer - <rlauer@treasurersbriefcase.com>
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 1836:
+
+    &#x3d;back without =over

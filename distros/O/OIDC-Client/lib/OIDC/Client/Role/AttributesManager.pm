@@ -43,6 +43,8 @@ Readonly my %DEFAULT_CHI_CONFIG => (
 );
 Readonly my $DEFAULT_GRANT_TYPE                 => 'authorization_code';
 Readonly my $DEFAULT_TOKEN_TYPE                 => 'Bearer';
+Readonly my $DEFAULT_USE_PKCE                   => 1;
+Readonly my $DEFAULT_PKCE_CODE_CHALLENGE_METHOD => 'S256';
 Readonly my $DEFAULT_STORE_MODE                 => 'session';
 Readonly my $DEFAULT_CLIENT_AUTH_METHOD         => 'client_secret_basic';
 Readonly my $DEFAULT_TOKEN_VALIDATION_METHOD    => 'jwt';
@@ -262,6 +264,20 @@ has 'default_token_type' => (
   isa     => 'Str',
   lazy    => 1,
   default => sub { $DEFAULT_TOKEN_TYPE },
+);
+
+has 'use_pkce' => (
+  is      => 'ro',
+  isa     => 'Bool',
+  default => sub { shift->config->{use_pkce}
+                     // $DEFAULT_USE_PKCE },
+);
+
+has 'pkce_code_challenge_method' => (
+  is      => 'ro',
+  isa     => 'CodeChallengeMethod',
+  default => sub { shift->config->{pkce_code_challenge_method}
+                     || $DEFAULT_PKCE_CODE_CHALLENGE_METHOD },
 );
 
 has 'provider_metadata' => (

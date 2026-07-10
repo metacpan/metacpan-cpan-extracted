@@ -13,7 +13,6 @@
 * [AUTHOR](#author)
 * [SEE ALSO](#see-also)
 * [LICENSE](#license)
-* [POD ERRORS](#pod-errors)
 # NAME
 
 Data::NestedKey - Object-oriented handling of deeply nested hash structures.
@@ -39,12 +38,22 @@ Data::NestedKey - Object-oriented handling of deeply nested hash structures.
     $nk->delete('foo.bar.baz');
     print $nk->as_string();
 
+    # use the CLI version
+    cat ecr-response.json | dnk 'repositories[0].repositoryUri'
+
 # DESCRIPTION
 
-Data::NestedKey provides an object-oriented approach to managing deeply nested
-hash structures using dot-separated keys. This allows structured data to be
-manipulated in a clean and intuitive way without requiring manual traversal
-of nested hashes.
+`Data::NestedKey` (and the CLI script `dnk`) provide a lightweight
+way to manipulate deeply nested data structures use dot-separated
+keys.
+
+`Data::NestedKey` provides an object-oriented approach to this
+functionality. These tools allow structured data to be manipulated in a
+clean and intuitive way without requiring manual traversal of nested
+hashes.
+
+These tools can be particularly useful in replacing `jq` as a
+dependency when the full power of `jq` is not required.
 
 Path strings use dots to separate hash keys. Array elements may be accessed
 by appending a zero-based subscript in square brackets to any hash key segment.
@@ -63,9 +72,6 @@ bare subscript indexes the top-level array directly:
 Array subscript notation is supported in `get`, `exists_key`, and `delete`
 (including bare leading subscripts against an array root). It is **not**
 supported in `set` (see below).
-
-Array subscript notation is supported in `get`, `exists_key`, and `delete`.
-`set` continues to operate on plain dot-separated hash paths only.
 
 A key motivation for this module is configuration file and API response
 manipulation. Many applications use structured data (e.g., JSON, YAML) where
@@ -199,11 +205,3 @@ Rob Lauer <rlauer@treasurersbriefcase.com>
 
 This library is free software; you may redistribute it and/or modify it
 under the same terms as Perl itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 480:
-
-    Non-ASCII character seen before =encoding in '—'. Assuming UTF-8

@@ -5,7 +5,7 @@ use Test::More;
 
 use Algorithm::Classifier::IsolationForest;
 
-sub exception (&) {
+sub exception (&) {    ## no critic (Subroutines::ProhibitSubroutinePrototypes)
 	my $code = shift;
 	my $ok   = eval { $code->(); 1 };
 	return $ok ? undef : ( $@ // 'died' );

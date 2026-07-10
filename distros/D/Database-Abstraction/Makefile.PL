@@ -13,11 +13,11 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	NAME		=> 'Database::Abstraction',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	VERSION_FROM	=> 'lib/Database/Abstraction.pm',
 	ABSTRACT_FROM	=> 'lib/Database/Abstraction.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-		? ('LICENSE'=> 'GPL')
+		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
@@ -25,6 +25,27 @@ WriteMakefile(
 	PL_FILES	=> {},
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	}, PREREQ_PM => {
+		'autodie' => 0,
+		'boolean' => 0,
+		'strict' => 0,
+		'warnings' => 0,
+		'Carp' => 0,
+		'Class::Abstract' => 0,
+		'Cwd' => 0,
+		'DBI' => 1.6,
+		'Data::Reuse' => 0,	# Required for result-set memory deduplication; see also RT#100461
+		# 'Error' => 0,
+		'DBD::SQLite::Constants' => 0,
+		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
+		'File::Spec' => 0,
+		'File::Temp' => 0,
+		'List::Util' => 1.33,
+		'Log::Abstraction' => 0.26,
+		'Object::Configure' => 0.16,
+		'Params::Get' => 0.13,
+		'Return::Set' => 0,
+		'Scalar::Util' => 0,
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
 		'DBD::XMLSimple' => 0.07,
@@ -42,30 +63,14 @@ WriteMakefile(
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Memory::Cycle' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,
+		'Test::Returns' => 0,
+		'Test::Without::Module' => 0,
 		'Text::xSV::Slurp' => 0,
 		'XML::Simple' => 0
-	}, PREREQ_PM => {
-		'autodie' => 0,
-		'boolean' => 0,
-		'strict' => 0,
-		'warnings' => 0,
-		'Carp' => 0,
-		'Cwd' => 0,
-		'Data::Dumper' => 0,
-		'Data::Reuse' => 0,	# Fails installation tests on recent Perls, RT#100461
-		# 'Error' => 0,
-		'DBD::SQLite::Constants' => 0,
-		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
-		'File::Spec' => 0,
-		'File::pfopen' => 0.03,
-		'File::Temp' => 0,
-		'Log::Abstraction' => 0.26,
-		'Object::Configure' => 0.16,
-		'Params::Get' => 0.13,
-		'Scalar::Util' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Database-Abstraction-*' },
 	# META_ADD => {
@@ -81,13 +86,10 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/Database-Abstraction',
 				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction',
-				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction',
-				# web => 'https://github.com/nigelhorne/Database-Abstraction/issues',
-				# url => 'https://github.com/nigelhorne/Database-Abstraction/issues',
-				mailto => 'bug-Database-Abstraction@rt.cpan.org'
+				web    => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction',
+				mailto => 'bug-Database-Abstraction@rt.cpan.org',
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.008'
+	MIN_PERL_VERSION	=> '5.010'
 );

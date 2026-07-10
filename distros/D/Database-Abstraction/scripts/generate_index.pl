@@ -1,5 +1,42 @@
 #!/usr/bin/env perl
 
+=head1 NAME
+
+generate_index.pl - Generate an HTML coverage dashboard for Database::Abstraction
+
+=head1 SYNOPSIS
+
+    cd /path/to/Database-Abstraction
+    cover -test
+    perl scripts/generate_index.pl
+
+The output is written to C<cover_html/index.html>.
+
+=head1 DESCRIPTION
+
+Reads the JSON coverage summary produced by C<Devel::Cover> (C<cover_db/cover.json>),
+compares it against historical snapshots in C<coverage_history/>, and renders a
+sortable HTML table with per-file coverage metrics, delta indicators, and a
+Chart.js trend line.  A git commit SHA is embedded so each row links back to
+the corresponding source on GitHub.
+
+=head1 PREREQUISITES
+
+C<Devel::Cover> must have been run first (C<cover -test>) to populate
+C<cover_db/cover.json>.  The script also requires a git repository and
+network access to load Chart.js from a CDN at view time.
+
+=head1 AUTHOR
+
+Nigel Horne C<< <njh@nigelhorne.com> >>
+
+=head1 LICENSE
+
+Same as Database::Abstraction — GPL2 for personal single-user use;
+contact the author for all other uses.
+
+=cut
+
 use strict;
 use warnings;
 use autodie qw(:all);

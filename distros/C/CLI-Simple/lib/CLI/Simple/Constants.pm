@@ -7,7 +7,7 @@ use Log::Log4perl::Level;
 
 use parent qw(Exporter);
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 use Readonly;
 
@@ -92,8 +92,20 @@ Readonly::Scalar our $FALSE => 0;
 Readonly::Scalar our $SUCCESS => 0;
 Readonly::Scalar our $FAILURE => 1;
 
+# valid args
+Readonly::Array our @VALID_OPTIONS => qw(
+  abbreviations
+  alias
+  commands
+  default_options
+  error_handler
+  extra_options
+  option_specs
+  validate_command
+);
+
 foreach my $k ( keys %EXPORT_TAGS ) {
-  push @EXPORT_OK, @{ $EXPORT_TAGS{$k} };
+  push @EXPORT_OK, @{ $EXPORT_TAGS{$k} }, '@VALID_OPTIONS';
 }
 
 $EXPORT_TAGS{'all'} = [@EXPORT_OK];

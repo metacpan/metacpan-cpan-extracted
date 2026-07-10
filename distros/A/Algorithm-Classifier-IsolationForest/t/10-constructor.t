@@ -7,7 +7,7 @@ use Algorithm::Classifier::IsolationForest;
 
 # A dependency-free equivalent of Test::Fatal::exception so the suite needs
 # nothing beyond Test::More (matching the dist's TEST_REQUIRES).
-sub exception (&) {
+sub exception (&) {    ## no critic (Subroutines::ProhibitSubroutinePrototypes)
 	my $code = shift;
 	my $ok   = eval { $code->(); 1 };
 	return $ok ? undef : ( $@ // 'died' );

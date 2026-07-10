@@ -1,6 +1,4 @@
-.travis.yml
 bin/lm_gui
-Build.PL
 Changes
 INSTALL
 internal/build.yaml
@@ -19,8 +17,14 @@ lib/Locale/VersionedMessages/Sets/lm_gui/fr_FR.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
+MANIFEST.SKIP
 README
+t/_pod.ign
+t/_pod.t
+t/_pod_coverage.ign
+t/_pod_coverage.t
+t/_version.ign
+t/_version.t
 t/lib/Locale/VersionedMessages/Sets/Empty.pm
 t/lib/Locale/VersionedMessages/Sets/Empty/en_US.pm
 t/lib/Locale/VersionedMessages/Sets/Test1.pm
@@ -32,12 +36,10 @@ t/lib/Locale/VersionedMessages/Sets/Test2/en_US.pm
 t/lib/Locale/VersionedMessages/Sets/Test2/fr_FR.pm
 t/message.t
 t/message_2.t
-t/pod.ign
-t/pod.t
-t/pod_coverage.ign
-t/pod_coverage.t
 t/runtests
 t/runtests.bat
 t/search.t
 t/set.t
-META.yml
+t/tests.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

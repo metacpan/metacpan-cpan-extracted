@@ -1,5 +1,9 @@
 Revision history for Data-SortedSet-Shared
 
+0.03      2026-07-03
+          - Security and robustness hardening; backing files now created mode
+            0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.02      2026-06-24
           - Bundle string-keyed sets: Data::SortedSet::Shared::Strings (string
             members, interned to ids via Data::Intern::Shared) now ships in this

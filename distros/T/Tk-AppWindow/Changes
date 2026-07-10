@@ -1,8 +1,14 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.24 Date
+	- Moved creation of the file dialog module to the moment it is needed. Icons have reappeared without using the -t switch.
+	- Added Tk::ITree to the requirements. If anybody uses it in the context of this framework it will be mousewheel supported.
+	- Set the width of the selector list to 200.
+	- Fixed a liability in the pause method.
+
+
 0.23 Sun Jul 05 2026
 	- Facilitating version 0.13 of Tk::FileBrowser.
-
 
 0.22 Sat Mar 22 2025
 	- Removed all references to a previously existing extension Balloon.

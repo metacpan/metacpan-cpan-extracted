@@ -1,16 +1,26 @@
 benchmark.pl
 Changes
+LICENSE
 lib/Algorithm/EventsPerSecond.pm
+lib/Algorithm/EventsPerSecond/Sukkal.pm
 lib/Algorithm/EventsPerSecond/XS.pm
 lib/Algorithm/EventsPerSecond/XS.xs
 Makefile.PL
+rc/freebsd/iqbi_damiq
+rc/systemd/iqbi-damiq.service
+src_bin/iqbi-damiq
 MANIFEST			This list of files
 README.md
 t/00-load.t
 t/basic.t
+t/iqbi-damiq.t
 t/pure-perl.t
+t/sukkal.t
+t/sukkal-lifecycle.t
+t/sukkal-protocol.t
 t/xs.t
 t/lib/AEPS_TestSuite.pm
+t/lib/Sukkal_TestUtil.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

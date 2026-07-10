@@ -1,4 +1,6 @@
 package Algorithm::Classifier::IsolationForest::App::Command;
+use strict;
+use warnings;
 use App::Cmd::Setup -command;
 
 sub global_opt_spec {

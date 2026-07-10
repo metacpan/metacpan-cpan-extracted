@@ -49,7 +49,9 @@
 #define BF_MAGIC        0x4D4F4F42U  /* "BOOM" (little-endian) */
 #define BF_VERSION      1
 #define BF_ERR_BUFLEN   256
+#ifndef BF_READER_SLOTS
 #define BF_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
+#endif
 #define BF_MIN_BITS     64           /* floor on the bit array size (power of two) */
 #define BF_MAX_BITS     0x4000000000ULL /* 2^38 bits = 32 GiB bit array cap */
 #define BF_MIN_K        1
@@ -87,7 +89,7 @@ struct BfHeader {
     uint32_t rwlock;                  /* 72 */
     uint32_t rwlock_waiters;          /* 76 */
     uint32_t rwlock_writers_waiting;  /* 80 */
-    uint32_t _pad1;                   /* 84 */
+    uint32_t slotless_readers;  /* live readers holding the lock with no reader-slot (was padding) */
     uint64_t stat_ops;                /* 88 */
     uint8_t  _pad[160];               /* 96..255 */
 };
@@ -101,12 +103,14 @@ typedef struct BfHandle {
     BfHeader     *hdr;
     BfReaderSlot *reader_slots;  /* BF_READER_SLOTS entries */
     void         *base;          /* mmap base */
+    uint64_t      bits_off;      /* validated bit-array offset, cached: never re-read from the peer-writable header */
     size_t        mmap_size;
     char         *path;          /* backing file path (strdup'd) */
     int           backing_fd;    /* memfd or reopened-fd to close on destroy, -1 for file/anon */
     uint32_t      my_slot_idx;   /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t      cached_pid;    /* getpid() cached at last slot claim */
     uint32_t      cached_fork_gen; /* bf_fork_gen value at last slot claim */
+    uint32_t slotless_held; /* rwlock read-locks held with no reader-slot */
 } BfHandle;
 
 /* ================================================================
@@ -189,6 +193,7 @@ static inline void bf_claim_reader_slot(BfHandle *h) {
     cur_gen = __atomic_load_n(&bf_fork_gen, __ATOMIC_RELAXED);
     uint32_t now_pid = (uint32_t)getpid();
     h->cached_pid = now_pid;
+    if (cur_gen != h->cached_fork_gen) h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
     h->cached_fork_gen = cur_gen;
     h->my_slot_idx = UINT32_MAX;
     uint32_t start = now_pid % BF_READER_SLOTS;
@@ -300,19 +305,39 @@ static inline void bf_recover_dead_readers(BfHandle *h) {
      *       rwlock(0 -> 1) succeeds cleanly.
      * Only after the CAS resolves do we wipe the deferred dead slots,
      * keeping that work outside the race-sensitive window. */
+    /* A live reader with no slot (table was full) is invisible to the scan
+     * above but still holds a +1 in the lock word; never force-reset under it. */
+    if (__atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0)
+        any_live_reader = 1;
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < BF_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = __atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0;
+            for (uint32_t i = 0; !live_now && i < BF_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && bf_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < BF_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || bf_pid_alive(pid)) continue;
-            bf_drain_dead_slot(h, i, pid);
+        if (drain_ok) {
+            for (uint32_t i = 0; i < BF_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || bf_pid_alive(p)) continue;
+                bf_drain_dead_slot(h, i, p);
+            }
         }
     }
 }
@@ -364,6 +389,28 @@ static inline void bf_unpark_writer(BfHandle *h) {
     }
 }
 
+/* Reader accounting: a reader mirrors its +1 in the lock word so dead-reader
+ * recovery can see it. A slotted reader uses its slot subcount; a reader that
+ * could not claim a slot (table full) uses the global hdr->slotless_readers,
+ * so recovery's force-reset never fires out from under it. leave() peels
+ * slotless first so a later slot claim cannot misattribute the decrement. */
+static inline void bf_reader_enter(BfHandle *h) {
+    if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    } else {
+        __atomic_add_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        h->slotless_held++;
+    }
+}
+static inline void bf_reader_leave(BfHandle *h) {
+    if (h->slotless_held > 0) {
+        h->slotless_held--;
+        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+    } else if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    }
+}
+
 static inline void bf_rwlock_rdlock(BfHandle *h) {
     bf_claim_reader_slot(h);
     BfHeader *hdr = h->hdr;
@@ -376,8 +423,7 @@ static inline void bf_rwlock_rdlock(BfHandle *h) {
      * killed between rwlock CAS-success and subcount++ would let recovery
      * force-reset rwlock to 0 underneath us, causing a UINT32_MAX wrap on
      * our eventual rdunlock dec. */
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    bf_reader_enter(h);
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         /* Write-preferring: when lock is free (cur==0) and writers are
@@ -385,11 +431,11 @@ static inline void bf_rwlock_rdlock(BfHandle *h) {
          * already active (cur>=1), new readers may join freely. */
         if (cur > 0 && cur < BF_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < BF_RWLOCK_SPIN_LIMIT, 1)) {
@@ -422,8 +468,7 @@ static inline void bf_rwlock_rdunlock(BfHandle *h) {
      * window where we still own a unit of rwlock but our slot subcount is
      * 0, letting recovery force-reset rwlock underneath us. */
     uint32_t after = __atomic_sub_fetch(&hdr->rwlock, 1, __ATOMIC_RELEASE);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    bf_reader_leave(h);
     if (after == 0 && __atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -517,7 +562,21 @@ static inline void bf_init_header(void *base, uint32_t k, uint64_t m_bits,
 }
 
 static inline uint64_t *bf_bits(BfHandle *h) {
-    return (uint64_t *)((char *)h->base + h->hdr->bits_off);
+    return (uint64_t *)((char *)h->base + h->bits_off);
+}
+
+/* Layer B trusted bound: the number of 64-bit words in the bit array that are
+ * guaranteed to lie within the real mapping.  Derived from the process-local
+ * mmap_size (fixed at attach time, not writable by a peer) and the SAME
+ * bits_off that bf_bits() uses, so bits[0 .. bf_bits_words_max()-1] can never
+ * fall outside the mapping even if a peer sharing the backing file corrupts the
+ * header (m_bits / m_mask / bits_off) after attach-time validation.  For a
+ * valid filter this equals m_bits/64 exactly, so every clamp below it is a
+ * never-taken branch in normal use. */
+static inline uint64_t bf_bits_words_max(BfHandle *h) {
+    uint64_t off = h->bits_off;
+    if (off >= h->mmap_size) return 0;
+    return (h->mmap_size - off) / sizeof(uint64_t);
 }
 
 static inline BfHandle *bf_setup(void *base, size_t map_size,
@@ -532,6 +591,7 @@ static inline BfHandle *bf_setup(void *base, size_t map_size,
     h->hdr          = hdr;
     h->base         = base;
     h->reader_slots = (BfReaderSlot *)((uint8_t *)base + hdr->reader_slots_off);
+    h->bits_off     = hdr->bits_off;   /* single validated read; bound and pointer stay consistent */
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
@@ -582,7 +642,29 @@ static int bf_validate_create_args(uint64_t capacity, double fp_rate,
     return 1;
 }
 
-static BfHandle *bf_create(const char *path, uint64_t capacity, double fp_rate, char *errbuf) {
+/* Securely obtain a fd for a path-backed segment: create it exclusively
+ * (O_CREAT|O_EXCL|O_NOFOLLOW at `mode`, default 0600 = owner-only), or, if it
+ * already exists, attach to it (O_RDWR|O_NOFOLLOW, no O_CREAT). O_EXCL blocks a
+ * pre-seeded or hard-linked file and O_NOFOLLOW a symlink swap, so a local
+ * attacker can no longer redirect or poison the backing store through the path.
+ * Cross-user sharing is opt-in via a wider `mode` (e.g. 0660); the caller still
+ * validates the file's contents via bf_validate_header. */
+static int bf_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { BF_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        BF_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    BF_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
+static BfHandle *bf_create(const char *path, uint64_t capacity, double fp_rate, mode_t mode, char *errbuf) {
     uint32_t k;
     uint64_t m_bits;
     if (!bf_validate_create_args(capacity, fp_rate, &k, &m_bits, errbuf)) return NULL;
@@ -598,8 +680,8 @@ static BfHandle *bf_create(const char *path, uint64_t capacity, double fp_rate, 
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { BF_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { BF_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = bf_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { BF_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { BF_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -663,6 +745,15 @@ static BfHandle *bf_open_fd(int fd, char *errbuf) {
 
 static void bf_destroy(BfHandle *h) {
     if (!h) return;
+    /* Release our reader slot on clean teardown (else short-lived-reader churn
+     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+    if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
+        h->cached_fork_gen == __atomic_load_n(&bf_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        uint32_t expected = h->cached_pid;
+        __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
+                &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
     free(h->path);
@@ -694,6 +785,12 @@ static int bf_add_locked(BfHandle *h, const void *item, size_t len) {
     uint64_t mask = h->hdr->m_mask;
     uint32_t k = h->hdr->k;
     uint64_t *bits = bf_bits(h);
+    /* Layer B: the highest word any masked probe can reach is (mask >> 6).
+     * m_mask lives in the shared segment, so a peer that shares the backing
+     * file could widen it past the real bit array after validation; bound it
+     * against the mapping.  For a valid filter (mask == m_bits-1) this is
+     * m_bits/64 - 1 < word_count, so the branch is never taken. */
+    if ((mask >> 6) >= bf_bits_words_max(h)) return 0;
     int was_new = 0;
     for (uint32_t i = 0; i < k; i++) {
         uint64_t idx = (h1 + (uint64_t)i * h2) & mask;
@@ -711,6 +808,10 @@ static int bf_contains_locked(BfHandle *h, const void *item, size_t len) {
     uint64_t mask = h->hdr->m_mask;
     uint32_t k = h->hdr->k;
     uint64_t *bits = bf_bits(h);
+    /* Layer B: bound the highest reachable word against the mapping (see
+     * bf_add_locked).  A corrupt mask cannot confirm membership -> "not
+     * present" is the safe answer; never-taken for a valid filter. */
+    if ((mask >> 6) >= bf_bits_words_max(h)) return 0;
     for (uint32_t i = 0; i < k; i++) {
         uint64_t idx = (h1 + (uint64_t)i * h2) & mask;
         uint64_t word = idx >> 6;
@@ -724,6 +825,8 @@ static int bf_contains_locked(BfHandle *h, const void *item, size_t len) {
 static uint64_t bf_popcount_locked(BfHandle *h) {
     uint64_t *bits = bf_bits(h);
     uint64_t words = h->hdr->m_bits / 64;
+    uint64_t words_max = bf_bits_words_max(h);   /* Layer B: clamp scan to the mapping */
+    if (words > words_max) words = words_max;
     uint64_t n = 0;
     for (uint64_t i = 0; i < words; i++)
         n += (uint64_t)__builtin_popcountll(bits[i]);
@@ -746,17 +849,24 @@ static uint64_t bf_count_locked(BfHandle *h) {
     return bf_count_from_popcount(h, bf_popcount_locked(h));
 }
 
-/* merge src words into dst (caller guarantees equal m_bits); bitwise OR */
-static void bf_merge_words(BfHandle *dst, const uint64_t *src_words) {
+/* merge src words into dst (caller guarantees equal m_bits); bitwise OR.
+ * src_count is the number of words the src_words buffer actually holds. */
+static void bf_merge_words(BfHandle *dst, const uint64_t *src_words, uint64_t src_count) {
     uint64_t *bits = bf_bits(dst);
     uint64_t words = dst->hdr->m_bits / 64;
+    uint64_t words_max = bf_bits_words_max(dst);  /* Layer B: clamp writes to dst mapping */
+    if (words > words_max) words = words_max;
+    if (words > src_count) words = src_count;     /* ...and reads to the src buffer */
     for (uint64_t i = 0; i < words; i++)
         bits[i] |= src_words[i];
 }
 
 /* reset all bits to 0 (caller holds the write lock) */
 static inline void bf_clear_locked(BfHandle *h) {
-    memset(bf_bits(h), 0, (size_t)(h->hdr->m_bits / 8));
+    uint64_t words = h->hdr->m_bits / 64;
+    uint64_t words_max = bf_bits_words_max(h);    /* Layer B: clamp memset to the mapping */
+    if (words > words_max) words = words_max;
+    memset(bf_bits(h), 0, (size_t)(words * sizeof(uint64_t)));
 }
 
 #endif /* BLOOM_H */

@@ -1,5 +1,11 @@
 Revision history for Numeric-Matrix
 
+0.04    2026-07-09
+        - nmat_compat.h: fix Perl_xs_boot_epilog compat macro on Perl < 5.22 by
+          using variadic form (...) so argument count matches regardless of
+          whether aTHX_ expands to a context pointer (MULTIPLICITY builds) or
+          nothing (non-MULTIPLICITY builds).
+
 0.03    2026-04-13
         - Fix SSE2 header include guard (#ifndef vs #if !) so emmintrin.h is included when needed
         - Convert all C99 for-loop declarations to C89 for portability with older compilers 

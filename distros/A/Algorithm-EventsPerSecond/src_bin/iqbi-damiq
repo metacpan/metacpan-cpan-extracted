@@ -1,0 +1,215 @@
+#!/usr/bin/env perl
+#
+# iqbi-damiq - launcher for Algorithm::EventsPerSecond::Sukkal
+
+use 5.006;
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage   qw(pod2usage);
+use Algorithm::EventsPerSecond;
+use Algorithm::EventsPerSecond::Sukkal;
+
+my (
+	$socket,      $window, $max_keys,  $max_key_length, $idle_timeout, $sweep_interval,
+	$max_clients, $mode,   $daemonize, $pidfile,        $require_xs,
+);
+
+GetOptions(
+	'socket|s=s'       => \$socket,
+	'require-xs|x'     => \$require_xs,
+	'window|w=i'       => \$window,
+	'max-keys=i'       => \$max_keys,
+	'max-key-length=i' => \$max_key_length,
+	'idle-timeout=i'   => \$idle_timeout,
+	'sweep-interval=i' => \$sweep_interval,
+	'max-clients=i'    => \$max_clients,
+	'mode|m=s'         => \$mode,
+	'daemonize|d'      => \$daemonize,
+	'pidfile|p=s'      => \$pidfile,
+	'help|h'           => sub { pod2usage( -exitval => 0, -verbose => 1 ) },
+	'version|v'        => sub {
+		print "iqbi-damiq (Algorithm::EventsPerSecond::Sukkal) " . "$Algorithm::EventsPerSecond::Sukkal::VERSION\n";
+		exit 0;
+	},
+) or pod2usage( -exitval => 2 );
+
+pod2usage( -exitval => 2, -message => "iqbi-damiq: --socket is required\n" )
+	unless defined $socket;
+
+die "iqbi-damiq: --require-xs given but the " . Algorithm::EventsPerSecond->backend . " backend is loaded, not XS\n"
+	if $require_xs && Algorithm::EventsPerSecond->backend ne 'XS';
+
+my $sukkal = Algorithm::EventsPerSecond::Sukkal->new(
+	socket => $socket,
+	( defined $window         ? ( window         => $window )         : () ),
+	( defined $max_keys       ? ( max_keys       => $max_keys )       : () ),
+	( defined $max_key_length ? ( max_key_length => $max_key_length ) : () ),
+	( defined $idle_timeout   ? ( idle_timeout   => $idle_timeout )   : () ),
+	( defined $sweep_interval ? ( sweep_interval => $sweep_interval ) : () ),
+	( defined $max_clients    ? ( max_clients    => $max_clients )    : () ),
+	( defined $mode           ? ( socket_mode    => $mode )           : () ),
+);
+
+if ($daemonize) {
+	require POSIX;
+
+	defined( my $pid = fork ) or die "iqbi-damiq: cannot fork: $!\n";
+	exit 0 if $pid;
+	POSIX::setsid() != -1  or die "iqbi-damiq: setsid failed: $!\n";
+	defined( $pid = fork ) or die "iqbi-damiq: cannot fork: $!\n";
+	exit 0 if $pid;
+
+	chdir '/';
+	open STDIN,  '<', '/dev/null';
+	open STDOUT, '>', '/dev/null';
+	open STDERR, '>', '/dev/null';
+} ## end if ($daemonize)
+
+my $pidfile_owner;
+if ( defined $pidfile ) {
+	open my $fh, '>', $pidfile
+		or die "iqbi-damiq: cannot write pidfile $pidfile: $!\n";
+	print $fh "$$\n";
+	close $fh;
+	$pidfile_owner = $$;
+}
+
+END {
+	unlink $pidfile
+		if defined $pidfile && defined $pidfile_owner && $$ == $pidfile_owner;
+}
+
+$SIG{INT} = $SIG{TERM} = sub { $sukkal->stop };
+$SIG{HUP} = 'IGNORE';
+
+printf "iqbi-damiq: serving %s (window=%ds, backend=%s)\n",
+	$socket, $sukkal->{window}, Algorithm::EventsPerSecond->backend
+	unless $daemonize;
+
+$sukkal->run;
+
+print "iqbi-damiq: shut down\n" unless $daemonize;
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+iqbi-damiq - a unix-socket daemon tracking per-key event rates
+
+=head1 SYNOPSIS
+
+iqbi-damiq -s <socket> [options]
+
+    iqbi-damiq -s /var/run/iqbi-damiq.sock
+    iqbi-damiq -s /var/run/iqbi-damiq.sock -w 300 --max-keys 500000
+    iqbi-damiq -s /var/run/iqbi-damiq.sock -d -p /var/run/iqbi-damiq.pid
+
+=head1 DESCRIPTION
+
+iqbi-damiq ("She said 'it is fine!'") runs a
+L<Algorithm::EventsPerSecond::Sukkal> daemon: clients connect to the
+unix socket, mark events against keys of their choosing, and query the
+sliding-window rate, in-window count, and lifetime total per key. See
+L<Algorithm::EventsPerSecond::Sukkal/PROTOCOL> for the line protocol.
+
+A quick poke with socat:
+
+    printf 'MARK requests 5\nRATE requests\nQUIT\n' \
+        | socat - UNIX:/var/run/iqbi-damiq.sock
+
+Or C<MARKRATE> to mark and read the rate back in a single command:
+
+    printf 'MARKRATE requests 5\nQUIT\n' \
+        | socat - UNIX:/var/run/iqbi-damiq.sock
+
+By default the daemon stays in the foreground, which suits systemd and
+similar supervisors; C<-d> for classic double-fork daemonization.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -s, --socket PATH
+
+Unix socket path to listen on. Required.
+
+=item -w, --window SECONDS
+
+Averaging window used for every meter. Default 60.
+
+=item --max-keys N
+
+Maximum distinct keys tracked at once; 0 for unlimited. Default
+100000.
+
+=item --max-key-length N
+
+Maximum key length in bytes. Default 255.
+
+=item --idle-timeout SECONDS
+
+Evict keys unmarked for this long; must be at least the window.
+Default is twice the window.
+
+=item --sweep-interval SECONDS
+
+Seconds between eviction sweeps. Default 30.
+
+=item --max-clients N
+
+Maximum simultaneous client connections; 0 for unlimited, the
+default.
+
+=item -m, --mode OCTAL
+
+Permissions for the socket file, e.g. C<0770>. Default is whatever
+the umask allows.
+
+=item -x, --require-xs
+
+Refuse to start unless the XS backend of
+L<Algorithm::EventsPerSecond> is loaded, rather than silently falling
+back to pure Perl. For hosts where the pure-Perl backend's speed or
+L<memory use|Algorithm::EventsPerSecond::Sukkal/MEMORY USAGE> is not
+acceptable.
+
+=item -d, --daemonize
+
+Detach from the terminal: double-fork, setsid, chdir to /, and point
+std streams at /dev/null.
+
+=item -p, --pidfile PATH
+
+Write the daemon PID here after any daemonization; removed on exit.
+
+=item -h, --help
+
+Show usage and options.
+
+=item -v, --version
+
+Show the version.
+
+=back
+
+=head1 SIGNALS
+
+SIGTERM and SIGINT shut the daemon down cleanly, closing clients and
+unlinking the socket. SIGHUP is ignored.
+
+=head1 AUTHOR
+
+Zane C. Bowers-Hadley, C<< <vvelox at vvelox.net> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The GNU Lesser General Public License, Version 2.1, February 1999
+
+=cut

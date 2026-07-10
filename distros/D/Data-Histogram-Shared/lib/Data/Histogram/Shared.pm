@@ -1,9 +1,11 @@
 package Data::Histogram::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::Histogram::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 
 *percentile = \&value_at_percentile;
 *count      = \&total_count;
@@ -83,7 +85,7 @@ the two input streams. B<Linux-only>. Requires 64-bit Perl.
 
 =head2 Constructors
 
-    my $h = Data::Histogram::Shared->new($path, $lowest, $highest, $sig_figs);
+    my $h = Data::Histogram::Shared->new($path, $lowest, $highest, $sig_figs, $mode);
     my $h = Data::Histogram::Shared->new(undef, 1, 3_600_000_000, 3);   # defaults
     my $h = Data::Histogram::Shared->new_memfd($name, $lowest, $highest, $sig_figs);
     my $h = Data::Histogram::Shared->new_from_fd($fd);
@@ -95,6 +97,13 @@ must be C<E<gt>= 2 * $lowest> (default C<3_600_000_000>, i.e. one hour in
 microseconds). C<$sig_figs> is the number of significant figures of precision
 and must be in the range 1..5 (default 3). C<new> and C<new_memfd> croak if any
 argument is out of range.
+
+C<$mode> sets the permission bits used when C<new> B<creates> the backing file
+(still subject to the process umask); the default is C<0600>, owner-only. Pass
+e.g. C<0660> to opt in to sharing the file with other users in the group. It
+applies only at creation: reopening an existing file does not change its
+permissions, and the argument is ignored for anonymous histograms (C<$path>
+undef or omitted). C<new_memfd> and C<new_from_fd> do not take a mode.
 
 C<$lowest> additionally must satisfy
 C<floor(log2($lowest)) + ceil(log2(2 * 10**$sig_figs)) - 1 E<lt>= 61> (a
@@ -241,8 +250,14 @@ combined stream all of them have recorded.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it. Do not share backing
-files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 

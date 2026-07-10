@@ -179,6 +179,24 @@ subtest 'ambiguous abbrev croaks' => sub {
   like $err, qr/\bambiguous\b/ixsm, 'croaks on ambiguous command';
 };
 
+########################################################################
+subtest 'unknown option' => sub {
+########################################################################
+
+  eval {
+    CLI::Simple->new(
+      commands      => { runit => sub { }, runner => sub { } },
+      abbreviations => 1,
+      option_specs  => [],
+      foo           => 'bar',
+    )->run;
+  };
+
+  my $err = $EVAL_ERROR;
+
+  like $err, qr/\bunknown\soption\b/ixsm, 'croaks on unknow option';
+};
+
 done_testing;
 
 1;

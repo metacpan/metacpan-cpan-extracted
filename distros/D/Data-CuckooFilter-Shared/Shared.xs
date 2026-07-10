@@ -22,17 +22,22 @@ MODULE = Data::CuckooFilter::Shared  PACKAGE = Data::CuckooFilter::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path = &PL_sv_undef, capacity = 0)
+new(class, path = &PL_sv_undef, capacity = 0, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[CF_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 4th arg: file mode for the exclusive create of a NEW backing
+       file (default 0600, owner-only). Pass e.g. 0660 to opt into group
+       sharing. Ignored for anonymous mappings and when attaching an existing
+       file. Subject to the process umask, like any open(). */
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     if (capacity < 1)
         croak("Data::CuckooFilter::Shared->new: capacity must be >= 1");
-    CfHandle *h = cf_create(p, (uint64_t)capacity, errbuf);
+    CfHandle *h = cf_create(p, (uint64_t)capacity, mode, errbuf);
     if (!h) croak("Data::CuckooFilter::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -46,7 +51,7 @@ new_memfd(class, name = &PL_sv_undef, capacity = 0)
   PREINIT:
     char errbuf[CF_ERR_BUFLEN];
   CODE:
-    const char *nm = SvOK(name) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     if (capacity < 1)
         croak("Data::CuckooFilter::Shared->new_memfd: capacity must be >= 1");
     CfHandle *h = cf_create_memfd(nm, (uint64_t)capacity, errbuf);
@@ -141,6 +146,22 @@ contains(self, item)
     s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
     cf_rwlock_rdlock(h);
     RETVAL = cf_contains_locked(h, s, n);
+    cf_rwlock_rdunlock(h);
+  OUTPUT:
+    RETVAL
+
+int
+count_of(self, item)
+    SV *self
+    SV *item
+  PREINIT:
+    EXTRACT(self);
+    STRLEN n;
+    const char *s;
+  CODE:
+    s = SvPVbyte(item, n);                 /* may croak (wide char) -- BEFORE the lock */
+    cf_rwlock_rdlock(h);
+    RETVAL = cf_count_of_locked(h, s, n);
     cf_rwlock_rdunlock(h);
   OUTPUT:
     RETVAL
@@ -284,6 +305,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::CuckooFilter::Shared")) {
         CfHandle *h = INT2PTR(CfHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

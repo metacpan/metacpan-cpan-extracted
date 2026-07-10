@@ -2,17 +2,22 @@ MANIFEST
 LICENSE
 Changes
 lib/Algorithm/Classifier/IsolationForest.pm
+lib/Algorithm/Classifier/IsolationForest/Online.pm
 lib/Algorithm/Classifier/IsolationForest/App.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/gblob.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/fit.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/predict.pm
+lib/Algorithm/Classifier/IsolationForest/App/Command/proto.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/csv2plot.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/accel.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/bench.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/info.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/pack.pm
 lib/Algorithm/Classifier/IsolationForest/App/Command/set_voting.pm
+lib/Algorithm/Classifier/IsolationForest/App/Command/stream.pm
+lib/Algorithm/Classifier/IsolationForest/App/Command/streamd.pm
+lib/Algorithm/Classifier/IsolationForest/App/Command/streamc.pm
 src_bin/iforest
 Makefile.PL
 t/pod.t
@@ -27,13 +32,21 @@ t/50-contamination.t
 t/60-extended-mode.t
 t/70-persistence.t
 t/80-sklearn-comparison-undef.t
+t/80-sklearn-comparison-online.t
 t/80-sklearn-comparison.t
 t/31-undef-column-no-warnings.t
 t/32-pack-data.t
 t/33-parallel-fit.t
 t/34-missing-values.t
+t/35-online-accel.t
 t/36-tagged-methods.t
 t/37-majority-voting.t
+t/38-online-basic.t
+t/39-online-stream.t
+t/41-mungers.t
+t/42-prototype.t
+t/91-streamd.t
+t/92-streamc.t
 t/01-accel-flags.t
 t/90-cli-commands.t
 t/02-accel-selection.t
@@ -46,6 +59,7 @@ examples/axis-vs-extended.pl
 examples/contamination-threshold.pl
 examples/save-and-load.pl
 examples/server-metrics.pl
+examples/online-streaming.pl
 benchmarking/bench-sklearn-scoring.pl
 benchmarking/bench-fit.pl
 benchmarking/bench-score.pl
@@ -57,5 +71,7 @@ benchmarking/bench-extended-predict-accel.pl
 benchmarking/bench-axis-predict-accel.pl
 benchmarking/BenchAccel.pm
 benchmarking/bench-voting.pl
+benchmarking/bench-online-score-accel.pl
+benchmarking/bench-streamd.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

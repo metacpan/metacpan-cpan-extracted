@@ -1,0 +1,18 @@
+Changes
+LICENSE
+lib/Algorithm/ToNumberMunger.pm
+lib/Algorithm/ToNumberMunger.xs
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/manifest.t
+t/mungers.t
+t/mungers-datetime-fast.t
+t/mungers-datetime-strptime.t
+t/mungers-eps.t
+t/mungers-plan.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

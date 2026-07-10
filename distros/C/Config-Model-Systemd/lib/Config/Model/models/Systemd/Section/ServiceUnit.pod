@@ -507,7 +507,12 @@ C<inactive-or-failed>: in this case, the unit is unloaded even if the unit is in
 C<failed> state, and thus an explicitly resetting of the C<failed> state is
 not necessary. Note that if this mode is used unit results (such as exit codes, exit signals, consumed
 resources, …) are flushed out immediately after the unit completed, except for what is stored in the logging
-subsystem. Defaults to C<inactive>. I< Optional. Type enum. choice: 'inactive', 'inactive-or-failed'.  > 
+subsystem. Defaults to C<inactive>.
+
+Since v261, if C<FileDescriptorStorePreserve> is set to C<yes>,
+and the unit has file descriptors stored, garbage collection will be disabled until the unit is
+removed, the service manager exits, or the file descriptors get C<EPOLLHUP> or
+C<EPOLLERR>. I< Optional. Type enum. choice: 'inactive', 'inactive-or-failed'.  > 
 
 =head2 FailureActionExitStatus
 
@@ -708,6 +713,33 @@ a 128bit ID or UUID, formatted as string. The latter is compared against machine
 firmware product UUID if there is any. See
 L<machine-id(5)> for
 details about the machine ID. The test may be negated by prepending an exclamation mark. I< Optional. Type list of uniline.  > 
+
+=head2 ConditionFraction
+
+C<ConditionFraction> may be used to enable a unit on a stable,
+pseudo-random subset of a fleet of machines. It is primarily useful for staged rollouts: the same
+unit (or drop-in) is distributed to every machine in a fleet, but only the configured fraction of
+them will actually have it enabled. The decision is derived locally from the machine ID (see
+L<machine-id(5)>), so
+it requires no central coordination and is stable over time: a given machine always lands on the
+same side of the threshold.
+
+The argument consists of an optional tag followed by a percentage,
+separated by whitespace, for example C<30%> or
+C<myrollout 30%>. The percentage may include up to two decimal places (e.g.
+C<0.5%>). The condition is satisfied on approximately the configured percentage of
+all machines; C<0%> matches no machine and C<100%> matches every
+machine.
+
+The optional tag is an arbitrary string (not containing whitespace) that is mixed into the
+derivation, so that independent rollouts select independent subsets of the
+fleet. Without it, all untagged C<ConditionFraction> checks would select the very
+same machines (the same machines would always be picked first). Use distinct tags for unrelated
+rollouts, and a shared tag to deliberately target the same machines across several units.
+
+The test may be negated by prepending an exclamation mark, in which case it is satisfied on the
+complementary fraction of machines (e.g. C<!myrollout 30%> matches the other ≈70%).
+If the machine ID cannot be determined, the condition fails. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionKernelCommandLine
 
@@ -1066,6 +1098,20 @@ supported with the C<$=> (match) and C<!$=> (non-match).
 
 If the given key is not found in the file, the match is done against an empty value. I< Optional. Type list of uniline.  > 
 
+=head2 ConditionMachineTag
+
+C<ConditionMachineTag> may be used to match against the tags
+assigned to the local machine. Machine tags are short labels that classify and group machines for
+management purposes; they are configured in the C<TAGS> field of
+L<machine-info(5)> and
+may be queried and changed with the tags command of
+L<hostnamectl(1)>. The
+argument is a single tag pattern, which is compared against each of the configured tags using
+shell-style globbing (C<*>, C<?>, C<[]>). The
+condition is satisfied if at least one of the configured tags matches the pattern. The test may be
+negated by prepending an exclamation mark, in which case it is satisfied if none of the configured
+tags matches. I< Optional. Type list of uniline.  > 
+
 =head2 ConditionMemoryPressure
 
 Verify that the overall system (memory, CPU or IO) pressure is below or equal to a threshold.
@@ -1147,6 +1193,18 @@ requirements are not met, and when this is something the administrator or user s
 into. I< Optional. Type uniline.  > 
 
 =head2 AssertHost
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertFraction
 
 Similar to the C<ConditionArchitecture>,
 C<ConditionVirtualization>, …, condition settings described above, these settings
@@ -1494,6 +1552,18 @@ only the job queued for it. Use assertion expressions for units that cannot oper
 requirements are not met, and when this is something the administrator or user should look
 into. I< Optional. Type uniline.  > 
 
+=head2 AssertMachineTag
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
 =head2 AssertMemoryPressure
 
 Similar to the C<ConditionArchitecture>,
@@ -1562,6 +1632,16 @@ C<halt-force> and C<halt-immediate>. In system mode, all options are
 allowed. In user mode, only C<none>, C<exit>, and
 C<exit-force> are allowed. Both options default to C<none>.
 
+These actions are tied to the unit's state transitions and fire only when the unit actually
+transitions out of an C<active> or C<activating> state. As a
+consequence, C<Condition…=> and C<Assert…=> directives that fail do
+not trigger C<SuccessAction> or
+C<FailureAction>: they prevent activation in the first place, so no state transition
+occurs. By contrast, the C<ExecCondition> directive in
+L<systemd.service(5)>
+runs as part of activation, so an C<ExecCondition> skip will
+trigger C<SuccessAction>.
+
 If C<none> is set, no action will be triggered. C<reboot> causes a
 reboot following the normal shutdown procedure (i.e. equivalent to systemctl
 reboot).  C<reboot-force> causes a forced reboot which will terminate all
@@ -1607,6 +1687,16 @@ C<kexec>, C<kexec-force>, C<halt>,
 C<halt-force> and C<halt-immediate>. In system mode, all options are
 allowed. In user mode, only C<none>, C<exit>, and
 C<exit-force> are allowed. Both options default to C<none>.
+
+These actions are tied to the unit's state transitions and fire only when the unit actually
+transitions out of an C<active> or C<activating> state. As a
+consequence, C<Condition…=> and C<Assert…=> directives that fail do
+not trigger C<SuccessAction> or
+C<FailureAction>: they prevent activation in the first place, so no state transition
+occurs. By contrast, the C<ExecCondition> directive in
+L<systemd.service(5)>
+runs as part of activation, so an C<ExecCondition> skip will
+trigger C<SuccessAction>.
 
 If C<none> is set, no action will be triggered. C<reboot> causes a
 reboot following the normal shutdown procedure (i.e. equivalent to systemctl

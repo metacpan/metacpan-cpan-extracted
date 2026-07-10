@@ -28,37 +28,42 @@ srand(3);    # reproducible data
 # A tight band along the line y = x, with both features spanning roughly [-3, 3].
 my @data;
 for ( 1 .. 400 ) {
-    my $t = -3 + 6 * rand();
-    push @data, [ $t + 0.05 * ( rand() - 0.5 ), $t + 0.05 * ( rand() - 0.5 ) ];
+	my $t = -3 + 6 * rand();
+	push @data, [ $t + 0.05 * ( rand() - 0.5 ), $t + 0.05 * ( rand() - 0.5 ) ];
 }
 
 my $axis = Algorithm::Classifier::IsolationForest->new(
-    mode => 'axis', n_trees => 200, sample_size => 256, seed => 1 )->fit( \@data );
+	mode        => 'axis',
+	n_trees     => 200,
+	sample_size => 256,
+	seed        => 1
+)->fit( \@data );
 
 my $ext = Algorithm::Classifier::IsolationForest->new(
-    mode => 'extended', n_trees => 200, sample_size => 256, seed => 1 )
-    ->fit( \@data );
+	mode        => 'extended',
+	n_trees     => 200,
+	sample_size => 256,
+	seed        => 1
+)->fit( \@data );
 
 # name => [x, y], with a note on what we expect
 my @probes = (
-    [ 'on the line, centre',   [ 0,  0 ],  'normal' ],
-    [ 'on the line, far end',  [ 3,  3 ],  'edge of normal' ],
-    [ 'off-diagonal, in range',[ 3,  -3 ], 'ANOMALY (within each axis range)' ],
-    [ 'off-diagonal, in range',[ -3, 3 ],  'ANOMALY (within each axis range)' ],
-    [ 'far outside everything',[ 10, 10 ], 'ANOMALY (obvious)' ],
+	[ 'on the line, centre',    [  0,  0 ], 'normal' ],
+	[ 'on the line, far end',   [  3,  3 ], 'edge of normal' ],
+	[ 'off-diagonal, in range', [  3, -3 ], 'ANOMALY (within each axis range)' ],
+	[ 'off-diagonal, in range', [ -3,  3 ], 'ANOMALY (within each axis range)' ],
+	[ 'far outside everything', [ 10, 10 ], 'ANOMALY (obvious)' ],
 );
 
 print "Anomaly scores (higher = more anomalous), trained on a diagonal band:\n\n";
-printf "  %-26s %-11s  %-6s  %-9s  %s\n",
-    'probe point', '(x, y)', 'axis', 'extended', 'note';
+printf "  %-26s %-11s  %-6s  %-9s  %s\n", 'probe point', '(x, y)', 'axis', 'extended', 'note';
 print '  ', '-' x 78, "\n";
 
 for my $p (@probes) {
-    my ( $name, $xy, $note ) = @$p;
-    my $a = $axis->score_samples( [$xy] )->[0];
-    my $e = $ext->score_samples(  [$xy] )->[0];
-    printf "  %-26s (%-3g,%3g)  %-6.3f  %-9.3f  %s\n",
-        $name, $xy->[0], $xy->[1], $a, $e, $note;
+	my ( $name, $xy, $note ) = @$p;
+	my $a = $axis->score_samples( [$xy] )->[0];
+	my $e = $ext->score_samples( [$xy] )->[0];
+	printf "  %-26s (%-3g,%3g)  %-6.3f  %-9.3f  %s\n", $name, $xy->[0], $xy->[1], $a, $e, $note;
 }
 
 print <<'NOTE';

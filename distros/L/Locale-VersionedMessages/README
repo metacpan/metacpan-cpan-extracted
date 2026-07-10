@@ -138,7 +138,7 @@ METHODS
 
            $obj->search('BUTTONS','en','en_US','en_GB');
 
-        would look for a messages in the 'BUTTONS' set in the locales: 'en',
+        would look for a messages in the BUTTONS set in the locales: 'en',
         'en_US', and 'en_GB' in that order. If a message were not found in
         any of those three, the default locale would be used.
 
@@ -157,9 +157,9 @@ METHODS
            ($text,$locale) = $obj(SET, MSGID [,LOCALE] [,VALUES]);
 
         This method is used to look up a message in the given set and
-        substitutes in VALUES (described below in MESSAGE SUBSTITUTIONS). If
-        LOCALE is present, it only looks up the message in that locale. By
-        default, it will look in the search order for that set.
+        substitutes in VALUES (described below in ""MESSAGE SUBSTITUTIONS").
+        If LOCALE is present, it only looks up the message in that locale.
+        By default, it will look in the search order for that set.
 
         If the message is not found, $text will be the empty string.
 
@@ -218,10 +218,10 @@ MESSAGE SUBSTITUTIONS
 
     [foo:FORMAT]
         The value can be formatted using standard sprintf formats. Only
-        simple formats are allowed, so FORMAT can be something like '%.3f'
-        but not 'the number %3d'. To be exact, FORMAT must be any valid
-        format that can be handled by sprintf that takes exactly one
-        argument, so something like %% is not allowed, but any %d format is.
+        simple formats (i.e. that start with "%" with no trailing strings)
+        are allowed, so FORMAT can be something like "%.3f" but not "the
+        number %3d" or "%3d foo". It must also take exactly one argument, so
+        "%%" is not allowed as it does not take any arguments.
 
            Set:        Set1
            Message ID: Foo value [foo]
@@ -320,6 +320,38 @@ MESSAGE SUBSTITUTIONS
 KNOWN PROBLEMS
     None at this point.
 
+BUGS AND QUESTIONS
+    If you find a bug in Locale::VersionedMessages, please let me know. As
+    CPAN has removed email support, the only supported way to submit a bug
+    is via ticket:
+
+    GitHub
+        You can submit an issue or question on GitHub. This can be done at
+        the following URL:
+
+        <https://github.com/SBECK-github/Locale-VersionedMessages>
+
+        This is the preferred method. Please submit problems requests as
+        GitHub issues if at all possible.
+
+    Please do not use other means to report bugs (such as forums for a
+    specific OS or Linux distribution) as it is impossible for me to keep up
+    with all of them. These are the current methods that are guaranteed to
+    notify me.
+
+    When filing a bug report, please include the following information:
+
+    Locale::VersionedMessages version
+        Please include the version of Locale::VersionedMessages you are
+        using. You can get this by using the script:
+
+           use Locale::VersionedMessages; 
+           print $Locale::VersionedMessages::VERSION,"\n";
+
+    If you find any problems with the documentation (errors, typos, or items
+    that are not clear), please send them to me. I welcome any suggestions
+    that will allow me to improve the documentation.
+
 SEE ALSO
     Locale::VersionedMessages::Overview An overview of the
     internationalization problem with a comparison to other Locale::*
@@ -333,5 +365,5 @@ LICENSE
     under the same terms as Perl itself.
 
 AUTHOR
-    Sullivan Beck (sbeck@cpan.org)
+    Sullivan Beck (https://github.com/SBECK-github/)
 

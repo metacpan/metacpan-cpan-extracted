@@ -1,6 +1,9 @@
 Written by:
-   Sullivan Beck (sbeck@cpan.org)
+   Sullivan Beck (https://github.com/SBECK-github/)
 Any suggestions, bug reports, or donations :-) should be sent to me.
+
+1.13  2026-07-09
+  - Removed all references to the cpan.org email which is no longer supported.
 
 1.12  2024-12-09
   - Fixed some comparisons so that perl 5.41.* won't give warnings.  Reported in

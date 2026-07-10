@@ -3,7 +3,7 @@ package Numeric::Matrix;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Numeric::Matrix', $VERSION);

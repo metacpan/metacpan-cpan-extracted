@@ -83,6 +83,12 @@ sub execute {
 
 	my $iforest = Algorithm::Classifier::IsolationForest->load( $opt->{'m'} );
 
+	# A model carrying Algorithm::ToNumberMunger specs takes raw values in
+	# its munged CSV columns: skip the per-field numeric check at read
+	# time and munge the rows before scoring (re-checking numerics after).
+	# Packed input is never munged -- it is already doubles.
+	my $has_mungers = ref $iforest->{mungers} eq 'HASH' && %{ $iforest->{mungers} } ? 1 : 0;
+
 	my @data;           # arrayref-of-arrayrefs OR re-derived on demand from $packed
 	my $score_input;    # what we hand to score_predict_samples
 
@@ -133,24 +139,46 @@ sub execute {
 						. $expected_cols );
 			}
 
-			my $col_int = 1;
-			for my $field (@fields) {
-				die(      'Line '
-						. $line_int . ' of "'
-						. $opt->{'i'}
-						. '" value for column '
-						. $col_int . ',"'
-						. $field
-						. '", does not appear to be a number' )
-					unless looks_like_number($field);
-				$col_int++;
-			} ## end for my $field (@fields)
+			if ( !$has_mungers ) {
+				my $col_int = 1;
+				for my $field (@fields) {
+					die(      'Line '
+							. $line_int . ' of "'
+							. $opt->{'i'}
+							. '" value for column '
+							. $col_int . ',"'
+							. $field
+							. '", does not appear to be a number' )
+						unless looks_like_number($field);
+					$col_int++;
+				} ## end for my $field (@fields)
+			} ## end if ( !$has_mungers )
 
 			push @data, \@fields;
 
 			$line_int++;
 		} ## end foreach my $line ( read_file( $opt->{'i'} ) )
-		$score_input = \@data;
+		if ($has_mungers) {
+
+			# Munge into a separate structure so -d still prints the raw
+			# input columns as given.
+			my $munged = $iforest->munge_rows( \@data );
+			for my $i ( 0 .. $#$munged ) {
+				for my $col ( 0 .. $#{ $munged->[$i] } ) {
+					die(      'Line '
+							. ( $i + 1 ) . ' of "'
+							. $opt->{'i'}
+							. '" value for column '
+							. ( $col + 1 ) . ',"'
+							. ( defined $munged->[$i][$col] ? $munged->[$i][$col] : 'undef' )
+							. '", is not a number after munging' )
+						unless looks_like_number( $munged->[$i][$col] );
+				} ## end for my $col ( 0 .. $#{ $munged->[$i] } )
+			} ## end for my $i ( 0 .. $#$munged )
+			$score_input = $munged;
+		} else {
+			$score_input = \@data;
+		}
 	} ## end else [ if ( Algorithm::Classifier::IsolationForest::App::Command::pack::is_packed_file...)]
 
 	my $results = $iforest->score_predict_samples( $score_input, $opt->{'t'} );

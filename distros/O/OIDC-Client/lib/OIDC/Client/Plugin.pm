@@ -15,6 +15,7 @@ use OIDC::Client::AccessToken;
 use OIDC::Client::AccessTokenBuilder  qw(build_access_token_from_token_response
                                          build_access_token_from_claims);
 use OIDC::Client::ApiUserAgentBuilder qw(build_api_useragent_from_access_token);
+use OIDC::Client::Utils ();
 use OIDC::Client::Identity;
 use OIDC::Client::Error;
 use OIDC::Client::Error::Authentication;
@@ -159,7 +160,15 @@ after delete_session => sub { shift->after_touching_session->() };
   $c->oidc->redirect_to_authorize();
 
 Redirect the browser to the authorize URL to initiate an authorization code flow.
-The C<state> parameter contains a generated UUID but other data can be added.
+
+The C<state> parameter contains a generated random string but other data can be added.
+
+Another random string is generated and included in the C<nonce> parameter. This helps
+prevent replay attacks by binding the resulting ID token to the user's session.
+
+When PKCE is enabled, a code verifier/challenge pair is generated. The verifier is
+stored in the session, and the challenge/challenge methode are included as parameters
+in the authorization request.
 
 The optional hash parameters are:
 
@@ -182,7 +191,7 @@ Hashref which can be used to send extra query parameters.
 
 =item other_state_params
 
-List (arrayref) of strings to add before the auto-generated UUID string to build
+List (arrayref) of strings to add before the auto-generated random string to build
 the C<state> parameter. All these strings are separated by a comma.
 
 =back
@@ -199,13 +208,22 @@ sub redirect_to_authorize {
     other_state_params => { isa => 'ArrayRef[Str]', optional => 1 },
   );
 
-  my $nonce = $self->client->generate_uuid_string();
-  my $state = join ',', (@{$params{other_state_params} || []}, $self->client->generate_uuid_string());
+  my $nonce = OIDC::Client::Utils::generate_nonce();
+  my $state = join ',', (@{$params{other_state_params} || []}, OIDC::Client::Utils::generate_state());
 
   my %args = (
     nonce => $nonce,
     state => $state,
   );
+
+  my $code_verifier;
+  if ($self->client->use_pkce) {
+    $self->log_msg(debug => "OIDC: generating code_verifier and code_challenge for PKCE");
+    $code_verifier = OIDC::Client::Utils::generate_code_verifier();
+    my $code_challenge_method = $self->client->pkce_code_challenge_method;
+    $args{code_challenge} = OIDC::Client::Utils::generate_code_challenge($code_verifier, $code_challenge_method);
+    $args{code_challenge_method} = $code_challenge_method;
+  }
 
   if (my $redirect_uri = $params{redirect_uri} || $self->login_redirect_uri) {
     $args{redirect_uri} = $redirect_uri;
@@ -220,8 +238,8 @@ sub redirect_to_authorize {
   $self->write_session(['oidc_auth', $state], {
     nonce      => $nonce,
     provider   => $self->client->provider,
-    target_url => $params{target_url} ? $params{target_url}
-                                      : $self->current_url,
+    target_url => $params{target_url} ? $params{target_url} : $self->current_url,
+    $code_verifier ? (code_verifier => $code_verifier) : (),
   });
 
   $self->log_msg(debug => "OIDC: redirecting to provider : $authorize_url");
@@ -276,10 +294,12 @@ sub get_token {
       OIDC::Client::Error::Provider->throw({response_parameters => $self->request_params});
     }
     $auth_data = $self->_extract_auth_data();
+    my $code_verifier = $auth_data->{code_verifier};  # PKCE
     my $redirect_uri = $params{redirect_uri} || $self->login_redirect_uri;
     $token_response = $self->client->get_token(
       code => $self->request_params->{code},
-      $redirect_uri ? (redirect_uri => $redirect_uri) : (),
+      $code_verifier ? (code_verifier => $code_verifier) : (),
+      $redirect_uri  ? (redirect_uri  => $redirect_uri)  : (),
     );
   }
   else {
@@ -747,7 +767,7 @@ Hashref which can be used to send extra query parameters.
 
 =item other_state_params
 
-List (arrayref) of strings to add before the auto-generated UUID string to build
+List (arrayref) of strings to add before the auto-generated random string to build
 the C<state> parameter. All these strings are separated by a comma.
 
 =back
@@ -765,7 +785,7 @@ sub redirect_to_logout {
     other_state_params       => { isa => 'ArrayRef[Str]', optional => 1 },
   );
 
-  my $state = join ',', (@{$params{other_state_params} || []}, $self->client->generate_uuid_string());
+  my $state = join ',', (@{$params{other_state_params} || []}, OIDC::Client::Utils::generate_state());
 
   my %args = (
     state => $state,

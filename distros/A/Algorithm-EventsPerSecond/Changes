@@ -1,5 +1,13 @@
 Revision history for Algorithm-EventsPerSecond
 
+0.1.0   2026-07-09/08:15
+        - Add the vizier Iqbi-damiq at src_bin/iqbi-damiq, a unix-socket
+          daemon with the backend of Algorithm::EventsPerSecond::Sukkal,
+          for the purpose of being able to simplify EPS tracking for multiple
+          items in a shared manner.
+        - Add rc/ with example startup scripts for iqbi-damiq:
+          FreeBSD rc.d and Linux systemd.
+
 0.0.1   2026-07-04/13:30
         - init
 

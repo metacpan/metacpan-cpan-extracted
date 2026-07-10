@@ -1,0 +1,10 @@
+use Crypt::OpenSSL::Guess qw(openssl_inc_paths openssl_lib_paths);
+
+my $openssl_local_lib = q[ -L/usr/local/openssl/lib64 -L/usr/local/openssl/lib -L/usr/local/lib64 -L/usr/local/lib ];
+my $openssl_local_inc = q[ -I/usr/local/openssl/include -I/usr/local/include ];
+
+{
+    source => ["$DIR/*.c"],
+    cflags => $openssl_local_inc . openssl_inc_paths() . ' -DOPENSSL_NO_KRB5',
+    libs   => $openssl_local_lib . openssl_lib_paths() . ' -lssl -lcrypto',
+};

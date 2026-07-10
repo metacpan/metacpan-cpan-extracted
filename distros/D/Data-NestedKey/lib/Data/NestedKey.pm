@@ -15,7 +15,7 @@ use Scalar::Util qw(reftype);
 use Storable qw(nfreeze);
 use YAML::XS ();
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.2.1';
 
 # Package variables for serialization options
 our $JSON_PRETTY = 1;  # Controls whether JSON output is pretty or compact
@@ -264,6 +264,7 @@ sub as_string {
 
   return JSON->new->pretty->encode( $self->{data} ) if $FORMAT eq 'JSON' && $JSON_PRETTY;
   return JSON->new->encode( $self->{data} )         if $FORMAT eq 'JSON';
+  return YAML::XS::Dump( $self->{data} )            if $FORMAT eq 'YML';
   return YAML::XS::Dump( $self->{data} )            if $FORMAT eq 'YAML';
   return Dumper( $self->{data} )                    if $FORMAT eq 'Dumper';
   return nfreeze( $self->{data} )                   if $FORMAT eq 'Storable';
@@ -383,6 +384,8 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
 Data::NestedKey - Object-oriented handling of deeply nested hash structures.
@@ -408,12 +411,22 @@ Data::NestedKey - Object-oriented handling of deeply nested hash structures.
   $nk->delete('foo.bar.baz');
   print $nk->as_string();
 
+  # use the CLI version
+  cat ecr-response.json | dnk 'repositories[0].repositoryUri'
+
 =head1 DESCRIPTION
 
-Data::NestedKey provides an object-oriented approach to managing deeply nested
-hash structures using dot-separated keys. This allows structured data to be
-manipulated in a clean and intuitive way without requiring manual traversal
-of nested hashes.
+C<Data::NestedKey> (and the CLI script C<dnk>) provide a lightweight
+way to manipulate deeply nested data structures use dot-separated
+keys.
+
+C<Data::NestedKey> provides an object-oriented approach to this
+functionality. These tools allow structured data to be manipulated in a
+clean and intuitive way without requiring manual traversal of nested
+hashes.
+
+These tools can be particularly useful in replacing C<jq> as a
+dependency when the full power of C<jq> is not required.
 
 Path strings use dots to separate hash keys. Array elements may be accessed
 by appending a zero-based subscript in square brackets to any hash key segment.
@@ -432,9 +445,6 @@ bare subscript indexes the top-level array directly:
 Array subscript notation is supported in C<get>, C<exists_key>, and C<delete>
 (including bare leading subscripts against an array root). It is B<not>
 supported in C<set> (see below).
-
-Array subscript notation is supported in C<get>, C<exists_key>, and C<delete>.
-C<set> continues to operate on plain dot-separated hash paths only.
 
 A key motivation for this module is configuration file and API response
 manipulation. Many applications use structured data (e.g., JSON, YAML) where

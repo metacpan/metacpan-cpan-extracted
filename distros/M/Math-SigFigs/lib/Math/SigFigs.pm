@@ -25,7 +25,7 @@ use base qw(Exporter);
 %EXPORT_TAGS = ('all' => \@EXPORT_OK);
 
 our($VERSION);
-$VERSION='1.21';
+$VERSION='1.22';
 
 use strict;
 

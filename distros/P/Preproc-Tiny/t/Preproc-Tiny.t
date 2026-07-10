@@ -11,11 +11,9 @@ BEGIN { use_ok('Preproc::Tiny') };
 
 my @in_files;
 my @out_files;
-my @pl_files;
 for (1..2) {
 	push @in_files,  "test.$_.c.pp";
 	push @out_files, "test.$_.c";
-	push @pl_files,  "test.$_.c.pl";
 }
 
 sub write_input {
@@ -36,31 +34,43 @@ sub check_output {
 sub test {
 	my($in, $out) = @_;
 	
+	local $SIG{__WARN__} = sub { warn @_ unless $_[0] =~ /redefined/ }; # sub dup redefined on each pp_text() call
+
+	# test pp
 	write_input($in);
 	
 	ok 1, "line ".(caller)[2]." - call script";
 	unlink @out_files;
-	ok 0 == system $^X, 'blib/bin/pp.pl', @in_files;
+	capture_stderr { ok 0 == system $^X, 'blib/bin/pp.pl', @in_files };
 	check_output($out);
 	
 	ok 1, "line ".(caller)[2]." - call module";
 	unlink @out_files;
-	ok 0 == system $^X, 'blib/lib/Preproc/Tiny.pm', @in_files;
+	capture_stderr { ok 0 == system $^X, 'blib/lib/Preproc/Tiny.pm', @in_files };
 	check_output($out);
 	
-	ok 1, "line ".(caller)[2]." - use module";
+	ok 1, "line ".(caller)[2]." - use module old interface";
 	unlink @out_files;
 	pp(@in_files);
 	check_output($out);
 	
+	ok 1, "line ".(caller)[2]." - use module new interface";
+	unlink @out_files;
+	pp_files(@in_files);
+	check_output($out);
+	
 	unlink @in_files, @out_files;
+	
+	# test filter
+	my $result = pp_text($in);
+	eq_or_diff $result, $out;
 }
 
 test(<<'IN', <<'OUT');
 @@sub dup {
 @@	$_[0]*2;
 @@}
-@@$name = "John Doe";
+@@my $name = "John Doe";
 Hello [@> $name @]!
 Hi there [@> $name -@]
 
@@ -90,7 +100,7 @@ OUT
 
 
 test(<<'IN', <<'OUT');
-@@ $ret = 0;
+@@ my $ret = 0;
 int main() { 
   return @@ $OUT .= $ret.";";
 }
@@ -163,7 +173,7 @@ OUT
 
 
 test(<<'IN', <<'OUT');
-@@ $ok = 1;
+@@ my $ok = 1;
 int main() {
   return [@ if ($ok) { @] 0 [@ } else { @] 1 [@ } @];
 }
@@ -175,7 +185,7 @@ OUT
 
 
 write_input(<<'IN');
-@@ ok=1
+@@ ok=1;
 IN
 
 
@@ -185,9 +195,8 @@ like $stderr, qr/Usage: pp\.pl file\.pp\.\.\./;
 
 ($stderr, $result) = capture_stderr { system $^X, 'blib/bin/pp.pl', $in_files[0] };
 ok $result != 0;
-like $stderr, qr/Can't modify constant item in scalar assignment at test.1.c.pl line/;
-like $stderr, qr/$in_files[0]: parse error/;
+like $stderr, qr/Can't modify constant item in scalar assignment/;
+like $stderr, qr/parse error:/;
 
-
-unlink @in_files, @out_files, @pl_files;
+unlink @in_files, @out_files;
 done_testing;

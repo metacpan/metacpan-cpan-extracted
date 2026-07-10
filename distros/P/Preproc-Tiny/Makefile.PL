@@ -10,10 +10,10 @@ WriteMakefile(
 		'Path::Tiny'		=> 0,
 		'Test::Differences'	=> 0,
 	},
-    ($] >= 5.005 ?
-      (ABSTRACT_FROM  => 'lib/Preproc/Tiny.pm',
-       AUTHOR         => 'Paulo Custodio, <pscust@cpan.org>',
-	   META_MERGE => {
+    ABSTRACT_FROM  => 'lib/Preproc/Tiny.pm',
+    AUTHOR         => 'Paulo Custodio, <pscust@cpan.org>',
+	LICENSE        => 'perl',
+	META_MERGE => {
 				'meta-spec' => { version => 2 },
 				resources => {
 					repository  => {
@@ -22,7 +22,10 @@ WriteMakefile(
 						web  => 'https://github.com/pauloscustodio/perl-Preproc-Tiny',
 					},
 				},
-	  }) : ()),
+				bugtracker => {
+                		web => 'https://github.com/pauloscustodio/perl-Preproc-Tiny/issues',
+            },
+	  },
 );
 
 sub MY::postamble {

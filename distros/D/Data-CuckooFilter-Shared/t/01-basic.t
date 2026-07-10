@@ -64,18 +64,48 @@ is $cf->remove("never-added-zzz"), 0, 'remove of a never-added item returns 0';
     is $h->count, 2000, 'count == 2000 after a second identical add_many (duplicates stored)';
 }
 
-# self-op edge: add the same item twice stores a duplicate; both removable
+# self-op edge: add the same item twice stores a duplicate; both removable.
+# count_of tracks the per-item occurrence count alongside.
 {
     my $h = Data::CuckooFilter::Shared->new(undef, 1000);
+    is $h->count_of("dup"), 0, 'count_of is 0 before any add';
     is $h->add("dup"), 1, 'first add of dup';
+    is $h->count_of("dup"), 1, 'count_of is 1 after the first add';
     is $h->add("dup"), 1, 'second add of dup also stored';
+    is $h->count_of("dup"), 2, 'count_of is 2 after adding the same item twice';
     is $h->count, 2, 'count is 2 after adding the same item twice';
     ok $h->contains("dup"), 'dup is contained';
     is $h->remove("dup"), 1, 'first remove of dup';
+    is $h->count_of("dup"), 1, 'count_of drops to 1 after one remove';
     ok $h->contains("dup"), 'dup still contained after one remove (a duplicate remains)';
     is $h->remove("dup"), 1, 'second remove of dup';
+    is $h->count_of("dup"), 0, 'count_of is 0 after removing both copies';
     ok !$h->contains("dup"), 'dup gone after both removes';
     is $h->count, 0, 'count back to 0';
+}
+
+# count_of: occurrence count 0..8, saturating at 2*slots_per_bucket, tracks
+# successful adds exactly, matches contains, and croaks on wide chars.
+{
+    my $h = Data::CuckooFilter::Shared->new(undef, 2000);
+    is $h->count_of("nope"), 0, 'count_of is 0 for a never-added item';
+    # add the same item repeatedly: it can occupy at most its two candidate
+    # buckets (4 slots each), so count_of tracks the stored copies up to 8.
+    my $stored = 0;
+    $stored += $h->add("k") for 1 .. 8;
+    my $c = $h->count_of("k");
+    is $c, $stored, "count_of equals the number of successful adds ($stored)";
+    cmp_ok $c, '<=', 8, 'count_of never exceeds 2 * slots_per_bucket (8)';
+    cmp_ok $c, '>=', 1, 'count_of >= 1 while stored';
+    ok $h->contains("k"), 'contains true whenever count_of > 0';
+    is $h->add("k"), 0, 'add of a fully-saturated item returns 0 (no more room)';
+    is $h->count_of("k"), $c, 'count_of unchanged after a failed (full) add';
+    # remove every copy; count_of decrements to 0
+    $h->remove("k") while $h->count_of("k") > 0;
+    is $h->count_of("k"), 0, 'count_of is 0 after removing every copy';
+    ok !$h->contains("k"), 'contains false once count_of hits 0';
+    ok !eval { $h->count_of("snow-\x{2603}"); 1 }, 'count_of croaks on a wide-char item';
+    like $@, qr/[Ww]ide/, 'count_of wide-char croak mentions Wide character';
 }
 
 # stats keys + fill_ratio in [0,1]

@@ -75,6 +75,7 @@ DESCRIPTION
 METHODS
   Constructors
         my $d = Data::DisjointSet::Shared->new($path, $n);
+        my $d = Data::DisjointSet::Shared->new($path, $n, $mode);   # custom file mode
         my $d = Data::DisjointSet::Shared->new(undef, $n);          # anonymous
         my $d = Data::DisjointSet::Shared->new_memfd($name, $n);
         my $d = Data::DisjointSet::Shared->new_from_fd($fd);
@@ -90,6 +91,13 @@ METHODS
     only used when the file is brand new. "new_memfd" creates a Linux memfd
     (transferable via its "memfd" descriptor); "new_from_fd" reopens one in
     another process.
+
+    Backing files are created exclusively ("O_EXCL", symlinks rejected) with
+    mode 0600 by default, so only the creating user can attach. Pass an
+    octal $mode (e.g. 0664 or 0666, masked by the process umask) as the
+    optional third argument to permit group/other access for cross-user
+    sharing. $mode applies only when the file is newly created; reopening an
+    existing file never changes its permissions.
 
   Union and query
         my $merged = $d->union($a, $b);      # merge; 1 if newly merged, 0 if already together
@@ -169,13 +177,14 @@ STATS
 SHARING ACROSS PROCESSES
     The structure lives in a shared mapping, shared the same three ways as
     the rest of the family: a backing file (every process calls "new($path,
-    $n)" on the same path), an anonymous mapping inherited across "fork", or
-    a memfd whose descriptor is passed to an unrelated process (over a UNIX
-    socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened with
-    new_from_fd($fd). Because the mapping is shared, every process unions
-    into and queries the same partition. All mutation is serialized by the
-    write lock, so the final partition is independent of how the processes
-    interleave.
+    $n)" on the same path; pass a $mode to "new" if the attaching processes
+    run as different users), an anonymous mapping inherited across "fork",
+    or a memfd whose descriptor is passed to an unrelated process (over a
+    UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n") and reopened
+    with new_from_fd($fd). Because the mapping is shared, every process
+    unions into and queries the same partition. All mutation is serialized
+    by the write lock, so the final partition is independent of how the
+    processes interleave.
 
         # parent and children share one disjoint-set with no coordination
         my $d = Data::DisjointSet::Shared->new(undef, 100);   # before fork
@@ -184,8 +193,15 @@ SHARING ACROSS PROCESSES
         print $d->num_sets, "\n";   # reflects the child's unions
 
 SECURITY
-    The mmap region is writable by all processes that open it. Do not share
-    backing files with untrusted processes.
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with

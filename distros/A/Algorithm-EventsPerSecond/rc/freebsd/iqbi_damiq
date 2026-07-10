@@ -1,0 +1,66 @@
+#!/bin/sh
+#
+# PROVIDE: iqbi_damiq
+# REQUIRE: DAEMON
+# KEYWORD: shutdown
+#
+# rc.d script for iqbi-damiq, the Algorithm::EventsPerSecond::Sukkal
+# daemon. Install as /usr/local/etc/rc.d/iqbi_damiq and add to
+# /etc/rc.conf or /etc/rc.conf.local:
+#
+# iqbi_damiq_enable (bool):        Set to "YES" to enable. Default "NO".
+# iqbi_damiq_socket (path):        Unix socket to listen on.
+#                                  Default "/var/run/iqbi-damiq/iqbi-damiq.sock".
+# iqbi_damiq_socket_mode (octal):  Socket file mode. Clients need write
+#                                  permission to connect; tighten to 0660
+#                                  and a shared group where any local
+#                                  user marking keys is unwanted.
+#                                  Default "0666".
+# iqbi_damiq_window (int):         Averaging window in seconds.
+#                                  Default "60".
+# iqbi_damiq_max_keys (int):       Distinct-key ceiling, 0 for
+#                                  unlimited. Default "100000".
+# iqbi_damiq_idle_timeout (int):   Evict keys unmarked this long, in
+#                                  seconds; may not be less than the
+#                                  window. Default is twice the window.
+# iqbi_damiq_sweep_interval (int): Seconds between eviction sweeps.
+#                                  Default "30".
+# iqbi_damiq_user (user):          User to run as. Default "nobody".
+# iqbi_damiq_group (group):        Group owning the run directory.
+#                                  Default "nobody".
+# iqbi_damiq_flags (str):          Extra iqbi-damiq flags, e.g. "-x".
+
+. /etc/rc.subr
+
+name="iqbi_damiq"
+rcvar="iqbi_damiq_enable"
+
+load_rc_config $name
+
+: ${iqbi_damiq_enable:="NO"}
+: ${iqbi_damiq_socket:="/var/run/iqbi-damiq/iqbi-damiq.sock"}
+: ${iqbi_damiq_socket_mode:="0666"}
+: ${iqbi_damiq_window:="60"}
+: ${iqbi_damiq_max_keys:="100000"}
+: ${iqbi_damiq_idle_timeout:="$((iqbi_damiq_window * 2))"}
+: ${iqbi_damiq_sweep_interval:="30"}
+: ${iqbi_damiq_user:="nobody"}
+: ${iqbi_damiq_group:="nobody"}
+
+rundir="${iqbi_damiq_socket%/*}"
+pidfile="${rundir}/iqbi-damiq.pid"
+command="/usr/local/bin/iqbi-damiq"
+command_interpreter="/usr/local/bin/perl"
+command_args="-d -p ${pidfile} -s ${iqbi_damiq_socket} \
+	-m ${iqbi_damiq_socket_mode} -w ${iqbi_damiq_window} \
+	--max-keys ${iqbi_damiq_max_keys} \
+	--idle-timeout ${iqbi_damiq_idle_timeout} \
+	--sweep-interval ${iqbi_damiq_sweep_interval}"
+start_precmd="iqbi_damiq_prestart"
+
+iqbi_damiq_prestart()
+{
+	install -d -o "${iqbi_damiq_user}" -g "${iqbi_damiq_group}" "${rundir}"
+}
+
+run_rc_command "$1"

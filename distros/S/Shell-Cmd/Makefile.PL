@@ -41,13 +41,13 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Shell::Cmd",
-   VERSION          => "3.05",
+   VERSION          => "3.06",
    ABSTRACT         => "run shell commands with enhanced support",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
     ? (MIN_PERL_VERSION => "5.008")
     : ()),
-   AUTHOR           => "Sullivan Beck (sbeck\@cpan.org)",
+   AUTHOR           => "Sullivan Beck (https://github.com/SBECK-github/)",
    "dist"           => {COMPRESS=>"gzip",SUFFIX=>"gz"},
    PL_FILES         => {},
    PREREQ_PM        => \%module_prereq,
@@ -62,7 +62,7 @@ WriteMakefile(
           provides     => {
              'Shell::Cmd' => {
                 file    => 'lib/Shell/Cmd.pm',
-                version => '3.05',
+                version => '3.06',
              },
 
           },

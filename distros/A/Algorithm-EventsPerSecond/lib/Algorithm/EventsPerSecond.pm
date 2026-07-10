@@ -10,22 +10,22 @@ Algorithm::EventsPerSecond - A sliding-window events-per-second rate counter wit
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 our $BACKEND;
 
 BEGIN {
-    $BACKEND = 'PP';
-    unless ( $ENV{ALGORITHM_EVENTSPERSECOND_PP} ) {
-        local $@;
-        if ( eval { require Algorithm::EventsPerSecond::XS; 1 } ) {
-            $BACKEND = 'XS';
-        }
-    }
+	$BACKEND = 'PP';
+	unless ( $ENV{ALGORITHM_EVENTSPERSECOND_PP} ) {
+		local $@;
+		if ( eval { require Algorithm::EventsPerSecond::XS; 1 } ) {
+			$BACKEND = 'XS';
+		}
+	}
 }
 
 =head1 SYNOPSIS
@@ -62,73 +62,79 @@ seconds and defaults to 60.
 =cut
 
 sub new {
-    my ($class, %args) = @_;
+	my ( $class, %args ) = @_;
 
-    my $window = $args{window} // 60;
-    die "window must be a positive integer" unless $window =~ /^\d+$/ && $window > 0;
+	my $window = $args{window} // 60;
+	die "window must be a positive integer" unless $window =~ /^\d+$/ && $window > 0;
 
-    my $self = {
-        window  => $window,
-        total   => 0,                   # lifetime event count
-        started => time(),
-    };
+	my $self = {
+		window  => $window,
+		total   => 0,         # lifetime event count
+		started => time(),
+	};
 
-    if ( $BACKEND eq 'XS' ) {
-        # packed int64_t ring buffers, scanned in C
-        $self->{buckets} = "\0" x ( $window * 8 );
-        $self->{stamps}  = "\0" x ( $window * 8 );
-    }
-    else {
-        $self->{buckets} = [ (0) x $window ];   # counts, indexed by (epoch_sec % window)
-        $self->{stamps}  = [ (0) x $window ];   # epoch second each bucket belongs to
-    }
+	if ( $BACKEND eq 'XS' ) {
+		# packed int64_t ring buffers, scanned in C
+		$self->{buckets} = "\0" x ( $window * 8 );
+		$self->{stamps}  = "\0" x ( $window * 8 );
+	} else {
+		$self->{buckets} = [ (0) x $window ];    # counts, indexed by (epoch_sec % window)
+		$self->{stamps}  = [ (0) x $window ];    # epoch second each bucket belongs to
+	}
 
-    return bless $self, $class;
-}
+	return bless $self, $class;
+} ## end sub new
 
 # Internal, PP backend: get the bucket for the current second, clearing it if stale.
 sub _bucket_index {
-    my ($self, $now_sec) = @_;
-    my $i = $now_sec % $self->{window};
-    if ($self->{stamps}[$i] != $now_sec) {
-        $self->{buckets}[$i] = 0;
-        $self->{stamps}[$i]  = $now_sec;
-    }
-    return $i;
+	my ( $self, $now_sec ) = @_;
+	my $i = $now_sec % $self->{window};
+	if ( $self->{stamps}[$i] != $now_sec ) {
+		$self->{buckets}[$i] = 0;
+		$self->{stamps}[$i]  = $now_sec;
+	}
+	return $i;
 }
 
 =head2 mark( [$count] )
 
-Record one event, or C<$count> events. Returns the meter object, so calls
-can be chained.
+Record one event, or C<$count> events. C<$count> must be a
+non-negative integer; zero is a no-op. Anything else dies. Returns the
+meter object, so calls can be chained.
 
 =cut
 
 sub _mark_pp {
-    my ($self, $count) = @_;
-    $count //= 1;
+	my ( $self, $count ) = @_;
+	if ( defined $count ) {
+		die "count must be a non-negative integer" unless $count =~ /^\d+$/;
+	} else {
+		$count = 1;
+	}
 
-    my $now_sec = int(time());
-    my $i = $self->_bucket_index($now_sec);
+	my $now_sec = int( time() );
+	my $i       = $self->_bucket_index($now_sec);
 
-    $self->{buckets}[$i] += $count;
-    $self->{total}       += $count;
+	$self->{buckets}[$i] += $count;
+	$self->{total} += $count;
 
-    return $self;
-}
+	return $self;
+} ## end sub _mark_pp
 
 sub _mark_xs {
-    my ($self, $count) = @_;
-    $count //= 1;
+	my ( $self, $count ) = @_;
+	if ( defined $count ) {
+		die "count must be a non-negative integer" unless $count =~ /^\d+$/;
+	} else {
+		$count = 1;
+	}
 
-    Algorithm::EventsPerSecond::XS::_xs_mark(
-        $self->{buckets}, $self->{stamps},
-        $self->{window},  int(time()), $count,
-    );
-    $self->{total} += $count;
+	Algorithm::EventsPerSecond::XS::_xs_mark( $self->{buckets}, $self->{stamps},
+		$self->{window}, int( time() ), $count, );
+	$self->{total} += $count;
 
-    return $self;
-}
+	return $self;
+} ## end sub _mark_xs
 
 =head2 count
 
@@ -137,37 +143,35 @@ Number of events recorded within the current window.
 =cut
 
 sub _count_pp {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    my $now_sec = int(time());
-    my $window  = $self->{window};
-    my $oldest  = $now_sec - $window + 1;
+	my $now_sec = int( time() );
+	my $window  = $self->{window};
+	my $oldest  = $now_sec - $window + 1;
 
-    my $sum = 0;
-    for my $i (0 .. $window - 1) {
-        $sum += $self->{buckets}[$i]
-            if $self->{stamps}[$i] >= $oldest;
-    }
-    return $sum;
-}
+	my $sum = 0;
+	for my $i ( 0 .. $window - 1 ) {
+		$sum += $self->{buckets}[$i]
+			if $self->{stamps}[$i] >= $oldest;
+	}
+	return $sum;
+} ## end sub _count_pp
 
 sub _count_xs {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    my $now_sec = int(time());
-    return Algorithm::EventsPerSecond::XS::_xs_count(
-        $self->{buckets}, $self->{stamps},
-        $self->{window},  $now_sec - $self->{window} + 1,
-    );
+	my $now_sec = int( time() );
+	return Algorithm::EventsPerSecond::XS::_xs_count( $self->{buckets}, $self->{stamps},
+		$self->{window}, $now_sec - $self->{window} + 1,
+	);
 }
 
 if ( $BACKEND eq 'XS' ) {
-    *mark  = \&_mark_xs;
-    *count = \&_count_xs;
-}
-else {
-    *mark  = \&_mark_pp;
-    *count = \&_count_pp;
+	*mark  = \&_mark_xs;
+	*count = \&_count_xs;
+} else {
+	*mark  = \&_mark_pp;
+	*count = \&_count_pp;
 }
 
 =head2 rate
@@ -179,13 +183,13 @@ early readings are not artificially deflated.
 =cut
 
 sub rate {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    my $elapsed = time() - $self->{started};
-    my $span    = $elapsed < $self->{window} ? $elapsed : $self->{window};
-    return 0 if $span <= 0;
+	my $elapsed = time() - $self->{started};
+	my $span    = $elapsed < $self->{window} ? $elapsed : $self->{window};
+	return 0 if $span <= 0;
 
-    return $self->count / $span;
+	return $self->count / $span;
 }
 
 =head2 total
@@ -211,19 +215,18 @@ Clear all counts and restart the clock. Returns the meter object.
 =cut
 
 sub reset {
-    my ($self) = @_;
-    if ( $BACKEND eq 'XS' ) {
-        $self->{buckets} = "\0" x ( $self->{window} * 8 );
-        $self->{stamps}  = "\0" x ( $self->{window} * 8 );
-    }
-    else {
-        @{ $self->{buckets} } = (0) x $self->{window};
-        @{ $self->{stamps} }  = (0) x $self->{window};
-    }
-    $self->{total}   = 0;
-    $self->{started} = time();
-    return $self;
-}
+	my ($self) = @_;
+	if ( $BACKEND eq 'XS' ) {
+		$self->{buckets} = "\0" x ( $self->{window} * 8 );
+		$self->{stamps}  = "\0" x ( $self->{window} * 8 );
+	} else {
+		@{ $self->{buckets} } = (0) x $self->{window};
+		@{ $self->{stamps} }  = (0) x $self->{window};
+	}
+	$self->{total}   = 0;
+	$self->{started} = time();
+	return $self;
+} ## end sub reset
 
 =head2 backend
 
@@ -243,8 +246,8 @@ auto-vectorizer). Returns undef when the pure Perl backend is in use.
 =cut
 
 sub simd {
-    return undef unless $BACKEND eq 'XS';
-    return Algorithm::EventsPerSecond::XS::_xs_simd();
+	return undef unless $BACKEND eq 'XS';
+	return Algorithm::EventsPerSecond::XS::_xs_simd();
 }
 
 =head1 ACCELERATION
@@ -337,4 +340,4 @@ This is free software, licensed under:
 
 =cut
 
-1; # End of Algorithm::EventsPerSecond
+1;    # End of Algorithm::EventsPerSecond

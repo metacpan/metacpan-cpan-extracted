@@ -35,6 +35,7 @@ xt/mpmc_fuzz.t
 xt/pod.t
 xt/pool_exhaustion.t
 xt/reader_starvation_guard.t
+xt/slotless_reader_recovery.t
 xt/strings_fork.t
 xt/tsan.t
 xt/valgrind.t

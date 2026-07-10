@@ -22,15 +22,17 @@ MODULE = Data::DisjointSet::Shared  PACKAGE = Data::DisjointSet::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path = &PL_sv_undef, n = 0)
+new(class, path = &PL_sv_undef, n = 0, ...)
     const char *class
     SV *path
     UV n
   PREINIT:
     char errbuf[DSU_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    DsuHandle *h = dsu_create(p, (uint64_t)n, errbuf);   /* validates args into errbuf */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 4th arg: file mode for exclusive create (default 0600, owner-only). */
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    DsuHandle *h = dsu_create(p, (uint64_t)n, mode, errbuf);   /* validates args into errbuf */
     if (!h) croak("Data::DisjointSet::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -44,7 +46,7 @@ new_memfd(class, name = &PL_sv_undef, n = 0)
   PREINIT:
     char errbuf[DSU_ERR_BUFLEN];
   CODE:
-    const char *nm = SvOK(name) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     DsuHandle *h = dsu_create_memfd(nm, (uint64_t)n, errbuf);   /* validates args into errbuf */
     if (!h) croak("Data::DisjointSet::Shared->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -292,6 +294,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::DisjointSet::Shared")) {
         DsuHandle *h = INT2PTR(DsuHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

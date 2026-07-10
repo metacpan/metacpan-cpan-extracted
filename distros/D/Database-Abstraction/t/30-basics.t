@@ -84,5 +84,5 @@ subtest 'Test loading configuration from a file' => sub {
 
 	my $obj = Database::test1->new(config_file => $config_file);
 
-	cmp_ok($obj->{'directory'}, 'eq', '/', 'Can read configuration in from a file');
+	cmp_ok($obj->{'directory'}, 'eq', '/tmp', 'Can read configuration in from a file');
 };

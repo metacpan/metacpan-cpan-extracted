@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
     AUTHOR           => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
     VERSION_FROM     => 'lib/Algorithm/EventsPerSecond.pm',
     ABSTRACT_FROM    => 'lib/Algorithm/EventsPerSecond.pm',
+    EXE_FILES        => ['src_bin/iqbi-damiq'],
     LICENSE          => 'lgpl_2_1',
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {

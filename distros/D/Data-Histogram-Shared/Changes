@@ -1,4 +1,10 @@
 Revision history for Data-Histogram-Shared
 
+0.02      2026-07-03
+          - Security and robustness hardening; backing files now created mode
+            0600 (pass a file-mode argument to new() for cross-user sharing).
+          - record() now croaks on a value above highest_trackable_value
+            (previously such a value was silently bucketed to the top).
+
 0.01      2026-06-25
           - Initial release.

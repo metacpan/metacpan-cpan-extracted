@@ -1,5 +1,8 @@
 Revision history for Sekhmet
 
+0.02	2026-07-09
+	- Remove pax headers
+
 0.01    2026-03-26
         - Initial release
         - ULID generation: ulid(), ulid_binary()

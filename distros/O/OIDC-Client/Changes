@@ -1,5 +1,9 @@
 Changes for OIDC-Client distribution
 
+1.08 2026-07-10
+  - Added support for PKCE
+  - Random strings are generated using Crypt::PRNG instead of Data::UUID
+
 1.07 2026-07-01
   - No Data::UUID instance attribute to prevent glibc double free / segmentation fault
   - Added support for the 'tls_client_auth' method

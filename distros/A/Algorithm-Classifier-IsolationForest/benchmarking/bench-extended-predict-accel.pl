@@ -35,52 +35,54 @@ use Algorithm::Classifier::IsolationForest;
 use constant PI => 3.14159265358979;
 
 sub gaussian {
-    my ( $mu, $sigma ) = @_;
-    return $mu + $sigma
-        * sqrt( -2 * log( rand() || 1e-12 ) )
-        * cos( 2 * PI * rand() );
+	my ( $mu, $sigma ) = @_;
+	return $mu + $sigma * sqrt( -2 * log( rand() || 1e-12 ) ) * cos( 2 * PI * rand() );
 }
 
 sub make_data {
-    my ( $n, $nf ) = @_;
-    my @rows = map { [ map { gaussian( 0, 1 ) } 1 .. $nf ] } 1 .. $n;
-    for ( 1 .. int( $n * 0.05 ) ) {
-        my $r = 5 + rand() * 3;
-        push @rows, [ map { $r * ( rand() > 0.5 ? 1 : -1 ) } 1 .. $nf ];
-    }
-    return \@rows;
-}
+	my ( $n, $nf ) = @_;
+	my @rows = map {
+		[ map { gaussian( 0, 1 ) } 1 .. $nf ]
+	} 1 .. $n;
+	for ( 1 .. int( $n * 0.05 ) ) {
+		my $r = 5 + rand() * 3;
+		push @rows, [ map { $r * ( rand() > 0.5 ? 1 : -1 ) } 1 .. $nf ];
+	}
+	return \@rows;
+} ## end sub make_data
 
 my $HAS_C      = $Algorithm::Classifier::IsolationForest::HAS_C;
 my $HAS_OPENMP = $Algorithm::Classifier::IsolationForest::HAS_OPENMP;
 
 sub build_models {
-    my (%opts) = @_;
-    my $data = delete $opts{_data};
-    my %m;
-    $m{pure_perl} = Algorithm::Classifier::IsolationForest->new(
-        %opts, use_c => 0,
-    )->fit($data);
-    if ($HAS_C) {
-        $m{c_serial} = Algorithm::Classifier::IsolationForest->new(
-            %opts, use_c => 1, use_openmp => 0,
-        )->fit($data);
-    }
-    if ( $HAS_C && $HAS_OPENMP ) {
-        $m{c_openmp} = Algorithm::Classifier::IsolationForest->new(
-            %opts, use_c => 1, use_openmp => 1,
-        )->fit($data);
-    }
-    return \%m;
-}
+	my (%opts) = @_;
+	my $data = delete $opts{_data};
+	my %m;
+	$m{pure_perl} = Algorithm::Classifier::IsolationForest->new( %opts, use_c => 0, )->fit($data);
+	if ($HAS_C) {
+		$m{c_serial} = Algorithm::Classifier::IsolationForest->new(
+			%opts,
+			use_c      => 1,
+			use_openmp => 0,
+		)->fit($data);
+	}
+	if ( $HAS_C && $HAS_OPENMP ) {
+		$m{c_openmp} = Algorithm::Classifier::IsolationForest->new(
+			%opts,
+			use_c      => 1,
+			use_openmp => 1,
+		)->fit($data);
+	}
+	return \%m;
+} ## end sub build_models
 
 print "=" x 70, "\n";
 print " extended-mode scoring/predict accel benchmarks\n";
 print " Algorithm::Classifier::IsolationForest\n";
 print "=" x 70, "\n";
 printf "Backend availability: HAS_C=%d  HAS_OPENMP=%d  HAS_SIMD=%d\n",
-    $HAS_C, $HAS_OPENMP,
-    $Algorithm::Classifier::IsolationForest::HAS_SIMD;
+	$HAS_C, $HAS_OPENMP,
+	$Algorithm::Classifier::IsolationForest::HAS_SIMD;
 print "(rates shown as calls/second wall-clock; higher is faster)\n";
 
 # -----------------------------------------------------------------------
@@ -88,34 +90,36 @@ print "(rates shown as calls/second wall-clock; higher is faster)\n";
 # -----------------------------------------------------------------------
 print "\n--- scoring methods  (n_trees=100, 1000 query points, 2 features) ---\n";
 srand(42);
-my $train = make_data( 1000, 2 );
-my $q1k   = make_data( 1000, 2 );
+my $train  = make_data( 1000, 2 );
+my $q1k    = make_data( 1000, 2 );
 my $models = build_models(
-    n_trees     => 100,
-    sample_size => 256,
-    mode        => 'extended',
-    seed        => 1,
-    _data       => $train,
+	n_trees     => 100,
+	sample_size => 256,
+	mode        => 'extended',
+	seed        => 1,
+	_data       => $train,
 );
 
-for my $method (qw(score_samples predict score_predict_samples
-    score_predict_split path_lengths))
+for my $method (
+	qw(score_samples predict score_predict_samples
+	score_predict_split path_lengths)
+	)
 {
-    printf "\n  %s\n", $method;
-    my %v;
-    for my $accel ( sort keys %$models ) {
-        my $m = $models->{$accel};
-        if ( $method eq 'predict' || $method eq 'score_predict_samples'
-            || $method eq 'score_predict_split' )
-        {
-            $v{$accel} = sub { $m->$method( $q1k, 0.5 ) };
-        }
-        else {
-            $v{$accel} = sub { $m->$method($q1k) };
-        }
-    }
-    wall_cmpthese( -2, \%v );
-}
+	printf "\n  %s\n", $method;
+	my %v;
+	for my $accel ( sort keys %$models ) {
+		my $m = $models->{$accel};
+		if (   $method eq 'predict'
+			|| $method eq 'score_predict_samples'
+			|| $method eq 'score_predict_split' )
+		{
+			$v{$accel} = sub { $m->$method( $q1k, 0.5 ) };
+		} else {
+			$v{$accel} = sub { $m->$method($q1k) };
+		}
+	} ## end for my $accel ( sort keys %$models )
+	wall_cmpthese( -2, \%v );
+} ## end for my $method ( qw(score_samples predict score_predict_samples...))
 
 # -----------------------------------------------------------------------
 # 2. Query set size scaling  (n_trees=100, score_samples)
@@ -125,12 +129,12 @@ srand(99);
 my %q;
 $q{$_} = make_data( $_, 2 ) for ( 100, 500, 1_000, 5_000, 10_000 );
 for my $n ( 100, 500, 1_000, 5_000, 10_000 ) {
-    printf "\n  %d query points\n", $n;
-    my %v;
-    for my $accel ( sort keys %$models ) {
-        $v{$accel} = sub { $models->{$accel}->score_samples( $q{$n} ) };
-    }
-    wall_cmpthese( -2, \%v );
+	printf "\n  %d query points\n", $n;
+	my %v;
+	for my $accel ( sort keys %$models ) {
+		$v{$accel} = sub { $models->{$accel}->score_samples( $q{$n} ) };
+	}
+	wall_cmpthese( -2, \%v );
 }
 
 # -----------------------------------------------------------------------
@@ -140,20 +144,20 @@ print "\n--- n_trees effect  (1000 query points, 2 features) ---\n";
 srand(42);
 my $train2 = make_data( 1000, 2 );
 for my $nt ( 10, 50, 100, 200, 500 ) {
-    printf "\n  n_trees=%d\n", $nt;
-    my $ms = build_models(
-        n_trees     => $nt,
-        sample_size => 256,
-        mode        => 'extended',
-        seed        => 1,
-        _data       => $train2,
-    );
-    my %v;
-    for my $accel ( sort keys %$ms ) {
-        $v{$accel} = sub { $ms->{$accel}->score_samples($q1k) };
-    }
-    wall_cmpthese( -2, \%v );
-}
+	printf "\n  n_trees=%d\n", $nt;
+	my $ms = build_models(
+		n_trees     => $nt,
+		sample_size => 256,
+		mode        => 'extended',
+		seed        => 1,
+		_data       => $train2,
+	);
+	my %v;
+	for my $accel ( sort keys %$ms ) {
+		$v{$accel} = sub { $ms->{$accel}->score_samples($q1k) };
+	}
+	wall_cmpthese( -2, \%v );
+} ## end for my $nt ( 10, 50, 100, 200, 500 )
 
 # -----------------------------------------------------------------------
 # 4. Feature count (wide range)
@@ -161,22 +165,22 @@ for my $nt ( 10, 50, 100, 200, 500 ) {
 print "\n--- feature count  (n_trees=100, 1000 query points) ---\n";
 srand(42);
 for my $nf ( 2, 5, 10, 20, 50 ) {
-    printf "\n  %d features\n", $nf;
-    my $tr = make_data( 1000, $nf );
-    my $qr = make_data( 1000, $nf );
-    my $ms = build_models(
-        n_trees     => 100,
-        sample_size => 256,
-        mode        => 'extended',
-        seed        => 1,
-        _data       => $tr,
-    );
-    my %v;
-    for my $accel ( sort keys %$ms ) {
-        $v{$accel} = sub { $ms->{$accel}->score_samples($qr) };
-    }
-    wall_cmpthese( -2, \%v );
-}
+	printf "\n  %d features\n", $nf;
+	my $tr = make_data( 1000, $nf );
+	my $qr = make_data( 1000, $nf );
+	my $ms = build_models(
+		n_trees     => 100,
+		sample_size => 256,
+		mode        => 'extended',
+		seed        => 1,
+		_data       => $tr,
+	);
+	my %v;
+	for my $accel ( sort keys %$ms ) {
+		$v{$accel} = sub { $ms->{$accel}->score_samples($qr) };
+	}
+	wall_cmpthese( -2, \%v );
+} ## end for my $nf ( 2, 5, 10, 20, 50 )
 
 # -----------------------------------------------------------------------
 # 5. Feature count (fine-grained 2-10)
@@ -184,19 +188,19 @@ for my $nf ( 2, 5, 10, 20, 50 ) {
 print "\n--- feature count 2-10  (n_trees=100, 1000 query points) ---\n";
 srand(42);
 for my $nf ( 2 .. 10 ) {
-    printf "\n  %d columns\n", $nf;
-    my $tr = make_data( 1000, $nf );
-    my $qr = make_data( 1000, $nf );
-    my $ms = build_models(
-        n_trees     => 100,
-        sample_size => 256,
-        mode        => 'extended',
-        seed        => 1,
-        _data       => $tr,
-    );
-    my %v;
-    for my $accel ( sort keys %$ms ) {
-        $v{$accel} = sub { $ms->{$accel}->score_samples($qr) };
-    }
-    wall_cmpthese( -2, \%v );
-}
+	printf "\n  %d columns\n", $nf;
+	my $tr = make_data( 1000, $nf );
+	my $qr = make_data( 1000, $nf );
+	my $ms = build_models(
+		n_trees     => 100,
+		sample_size => 256,
+		mode        => 'extended',
+		seed        => 1,
+		_data       => $tr,
+	);
+	my %v;
+	for my $accel ( sort keys %$ms ) {
+		$v{$accel} = sub { $ms->{$accel}->score_samples($qr) };
+	}
+	wall_cmpthese( -2, \%v );
+} ## end for my $nf ( 2 .. 10 )

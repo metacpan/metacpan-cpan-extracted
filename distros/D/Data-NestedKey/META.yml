@@ -24,14 +24,14 @@ no_index:
 provides:
   Data::NestedKey:
     file: lib/Data/NestedKey.pm
-    version: v1.2.0
+    version: v1.2.1
   Data::NestedKey::CLI:
     file: lib/Data/NestedKey/CLI.pm
     version: '0'
 requires:
-  CLI::Simple: v2.0.11
-  CLI::Simple::Constants: v2.0.11
-  CLI::Simple::Utils: v2.0.11
+  CLI::Simple: v2.0.12
+  CLI::Simple::Constants: v2.0.12
+  CLI::Simple::Utils: v2.0.12
   JSON: '4.10'
   YAML::XS: v0.904.0
   perl: '5.010'
@@ -39,5 +39,5 @@ resources:
   bugtracker: https://github.com/rlauer6/Data-NestedKey/issues
   homepage: https://github.com/rlauer6/Data-NestedKey
   repository: https://github.com/rlauer6/Data-NestedKey
-version: v1.2.0
+version: v1.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 # Preproc::Tiny - Minimal stand-alone preprocessor for code generation using perl
-# Copyright (C) 2016 by Paulo Custodio
+# Copyright (C) 2016-2026 by Paulo Custodio
 #------------------------------------------------------------------------------
 
 package Preproc::Tiny;
@@ -13,8 +13,8 @@ use File::Basename;
 require Exporter;
 
 our @ISA = qw( Exporter );
-our @EXPORT = qw( pp );
-our $VERSION = '0.02';
+our @EXPORT = qw( pp pp_files pp_text );
+our $VERSION = '0.03';
 
 #------------------------------------------------------------------------------
 # Code borrowed from Data::Dump
@@ -67,50 +67,64 @@ sub slurp {
 }
 
 #------------------------------------------------------------------------------
-# pp(), the only export
+# pp(), preprocess a list of files, backwards compatibility
 #------------------------------------------------------------------------------
 sub pp {
+	pp_files(@_);
+}
+
+#------------------------------------------------------------------------------
+# pp_files(), preprocess a list of files
+#------------------------------------------------------------------------------
+sub pp_files {
 	for my $infile (@_) {
 		(my $outfile = $infile) =~ s/\.pp$//i 
 			or die "Error: input file needs .pp extension\n";
-		my $plfile = "$outfile.pl";
-
-		# build code to pre-process
-		my $pl = 'my $OUT = "";'."\n";
-
-		local $_ = slurp($infile);
-		while (! at_end($_) ) {
-			if (/\G (?| ^ \@\@ (.*) \n? 
-			          |   \@\@ (.*) 
-					) /gcxim) {
-				$pl .= $1."\n";
-			}
-			elsif (/\G \[\@> \s* (.*?)  (?: -\@\] \s* | \@\] ) /gcxis) {
-				$pl .= '$OUT .= '.$1.";\n";
-			}
-			elsif (/\G \[\@  \s* (.*?)  (?: -\@\] \s* | \@\] ) /gcxis) {
-				$pl .= $1.";\n";
-			}
-			elsif (/ ( [^\[\@]+ ) /gcxi) {
-				$pl .= '$OUT .= '.quote($1).";\n";
-			}
-			else {
-				die "$infile: parse error at ".quote(substr($_, pos($_)||0, 100))."\n";
-			}
-		}
 		
-		# build code to generate output file
-		$pl .=  'open(my $fh, ">", '.quote($outfile).') or die $!;'."\n".
-				'print $fh $OUT;'."\n".
-				"1;\n";
-
-		# run template
-		spew($plfile, $pl);
-		system($^X, $plfile)==0 or die "$infile: parse error\n";
-		
-		# delete temp file
-		unlink $plfile;
+		my $input = slurp($infile);
+		my $result = pp_text($input);
+		spew($outfile, $result);
 	}
+}
+
+#------------------------------------------------------------------------------
+# pp_text(), transform input string in output preprocessed text
+#------------------------------------------------------------------------------
+sub pp_text {
+	my($input) = @_;
+
+	# build code to pre-process
+	my $pl = 'my $OUT = "";'."\n";
+
+	local $_ = $input;
+	while (! at_end($_) ) {
+		if (/\G (?| ^ \@\@ (.*) \n? 
+				  |   \@\@ (.*) 
+				) /gcxim) {
+			$pl .= $1."\n";
+		}
+		elsif (/\G \[\@> \s* (.*?)  (?: -\@\] \s* | \@\] ) /gcxis) {
+			$pl .= '$OUT .= '.$1.";\n";
+		}
+		elsif (/\G \[\@  \s* (.*?)  (?: -\@\] \s* | \@\] ) /gcxis) {
+			$pl .= $1.";\n";
+		}
+		elsif (/ ( [^\[\@]+ ) /gcxi) {
+			$pl .= '$OUT .= '.quote($1).";\n";
+		}
+		else {
+			die "parse error at ".quote(substr($_, pos($_)||0, 100))."\n";
+		}
+	}
+	
+	# build code to output preprocessed text
+	$pl .= '$OUT;'."\n";
+
+	# run code
+	my $output = eval($pl);
+	$@ and die "parse error: $@\n$pl\n";
+
+	return $output;
 }
 
 sub at_end {
@@ -136,7 +150,8 @@ Preproc::Tiny - Minimal stand-alone preprocessor for code generation using perl
 
    # in perl
    use Preproc::Tiny;
-   pp("main.c.pp");
+   pp_files("main.c.pp");
+   my $result = pp_text($input);
    
    # in the shell
    $ pp.pl main.c.pp
@@ -169,7 +184,7 @@ Any text after '@@' is interpreted as perl code and executed. The
 global variable $OUT contains the text to be dumped to the output file, e.g.
 
    // main.c.pp:
-   @@ $ret = 0;
+   @@ my $ret = 0;
    int main() { 
       return @@ $OUT .= $ret.";";
    }
@@ -262,20 +277,25 @@ Any perl control structure can be used in the code blocks, e.g.
 
 =over 4
 
-=item pp
+=item pp_files
 
 Input argument is the list of the input file names; runs the preprocessor 
 for each input and generates the corresponding output file.
+
+=item pp_text
+
+Work horse of pp_files; receives the inptiu string with template text
+and returns the output text after running the preprocessor.
 
 =back
 
 =head2 INTERNALS
 
-The module works by transforming the input file into a perl script and 
-executing it. At the end the perl script is removed.
+The module works by transforming the input file into perl code and 
+executing it with eval.
 
 If there is any error in the input that causes a compile error in the script, 
-the module dies and does not remove the script. This allows the error
+the module dies and shows the result perl code. This allows the error
 to be investigated, e.g.
 
    // main.c.pp
@@ -283,9 +303,7 @@ to be investigated, e.g.
 
 causes the error:
 
-   Can't modify constant item in scalar assignment at main.c.pl line N
-
-The file main.c.pl is kept for investigating the error.
+   Can't modify constant item in scalar assignment
 
 =head1 SEE ALSO
 
@@ -297,7 +315,7 @@ Paulo Custodio, E<lt>pscust@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Paulo Custodio
+Copyright (C) 2016-2026 by Paulo Custodio
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.1 or,

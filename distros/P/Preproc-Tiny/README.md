@@ -25,7 +25,7 @@ None non-core for running. There are dependendencies for running the tests.
 
 # Copyright and Licence
 
-Copyright (C) 2016 by Paulo Custodio
+Copyright (C) 2016-2026 by Paulo Custodio
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.1 or,

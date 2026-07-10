@@ -22,6 +22,7 @@ Each script seeds the RNG so its output is reproducible.
 | `contamination-threshold.pl` | Letting `contamination` auto-learn a cutoff at `fit` time, reading it back with `decision_threshold`, and how `predict` uses it by default vs a naive fixed 0.5.                               |
 | `save-and-load.pl`           | Persisting a trained model with `save`/`to_json` and restoring it with `load`/`from_json`, confirming a reloaded model scores bit-for-bit identically.                                         |
 | `server-metrics.pl`          | An applied take: ranking server requests `[latency_ms, response_bytes]` by anomaly score, using `path_lengths` alongside `score_samples`, and writing the scored data to `request_scores.csv`. |
+| `online-streaming.pl`        | Online Isolation Forest (`::Online`) on a drifting stream: prequential `score_learn`, and how the sliding window makes the old regime anomalous and the new one normal after a drift.          |
 
 
 ## Quick reference

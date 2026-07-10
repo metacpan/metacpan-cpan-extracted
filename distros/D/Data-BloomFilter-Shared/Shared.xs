@@ -22,7 +22,7 @@ MODULE = Data::BloomFilter::Shared  PACKAGE = Data::BloomFilter::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path = &PL_sv_undef, capacity = 0, fp_rate = 0.01)
+new(class, path = &PL_sv_undef, capacity = 0, fp_rate = 0.01, ...)
     const char *class
     SV *path
     UV capacity
@@ -30,12 +30,16 @@ new(class, path = &PL_sv_undef, capacity = 0, fp_rate = 0.01)
   PREINIT:
     char errbuf[BF_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     if (capacity < 1)
         croak("Data::BloomFilter::Shared->new: capacity must be >= 1");
     if (!(fp_rate > 0.0 && fp_rate < 1.0))
         croak("Data::BloomFilter::Shared->new: fp_rate must be between 0 and 1 (exclusive)");
-    BfHandle *h = bf_create(p, (uint64_t)capacity, fp_rate, errbuf);
+    /* Optional 5th arg: file mode for a newly-created file-backed segment
+     * (default 0600, owner-only). Pass e.g. 0660 to opt into cross-user
+     * sharing. Ignored for anonymous segments and existing files. */
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    BfHandle *h = bf_create(p, (uint64_t)capacity, fp_rate, mode, errbuf);
     if (!h) croak("Data::BloomFilter::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -50,7 +54,7 @@ new_memfd(class, name = &PL_sv_undef, capacity = 0, fp_rate = 0.01)
   PREINIT:
     char errbuf[BF_ERR_BUFLEN];
   CODE:
-    const char *nm = SvOK(name) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     if (capacity < 1)
         croak("Data::BloomFilter::Shared->new_memfd: capacity must be >= 1");
     if (!(fp_rate > 0.0 && fp_rate < 1.0))
@@ -177,6 +181,11 @@ merge(self, other)
      * holding two locks at once (deadlock-free regardless of acquisition
      * order between two processes merging each other). */
     uint64_t words = om / 64;
+    /* Layer B: never read past o's real mapping when snapshotting its words --
+     * o->hdr->m_bits is in the shared segment and a peer could widen it after
+     * validation.  Equals om/64 for a valid filter, so no behavior change. */
+    uint64_t o_words_max = bf_bits_words_max(o);
+    if (words > o_words_max) words = o_words_max;
     uint64_t *tmp;
     Newx(tmp, (size_t)words, uint64_t);
     SAVEFREEPV(tmp);                 /* freed on normal return OR croak unwind */
@@ -185,7 +194,7 @@ merge(self, other)
     bf_rwlock_rdunlock(o);
 
     bf_rwlock_wrlock(h);
-    bf_merge_words(h, tmp);
+    bf_merge_words(h, tmp, words);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     bf_rwlock_wrunlock(h);
 
@@ -326,6 +335,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::BloomFilter::Shared")) {
         BfHandle *h = INT2PTR(BfHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

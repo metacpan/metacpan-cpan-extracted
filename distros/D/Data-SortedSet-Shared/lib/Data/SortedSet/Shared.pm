@@ -1,9 +1,11 @@
 package Data::SortedSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::SortedSet::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 
 # String-keyed sets: members are arbitrary byte strings instead of int64 ids.
 # Convenience constructor that builds a Data::SortedSet::Shared::Strings, which
@@ -67,14 +69,17 @@ B<Linux-only>.  Requires 64-bit Perl.
 
 =head2 Constructors
 
-    my $z = Data::SortedSet::Shared->new($path, $max);
+    my $z = Data::SortedSet::Shared->new($path, $max [, $mode]);
     my $z = Data::SortedSet::Shared->new(undef, $max);        # anonymous
     my $z = Data::SortedSet::Shared->new_memfd($name, $max);
     my $z = Data::SortedSet::Shared->new_from_fd($fd);
 
 C<$path> is the backing file (C<undef> for an anonymous mapping); C<$max> is the
 maximum number of members.  When reopening an existing file or memfd, the stored
-header wins and the caller's C<$max> is ignored.  C<new_memfd> creates a Linux
+header wins and the caller's C<$max> is ignored.  Backing files are created with
+mode 0600 by default; pass an octal C<$mode> (e.g. C<0660>) to opt into cross-user
+sharing.  The mode applies only when the file is created (it is ignored when
+attaching an existing file) and is subject to umask.  C<new_memfd> creates a Linux
 memfd (transferable via its C<memfd> descriptor); C<new_from_fd> reopens one in
 another process.
 
@@ -89,8 +94,8 @@ this class but with B<string members>.  Keys are interned to dense ids via
 L<Data::Intern::Shared> (a prerequisite of this distribution), so the set is still
 shared across processes by id.  Ties among equal scores break by interning id, not
 lexicographically.  See L<Data::SortedSet::Shared::Strings> for the full options
-(C<set>/C<keys> backing paths, C<max_keys>, C<arena>), and the separate C<wrap>
-constructor that adopts two existing objects.
+(C<set>/C<keys> backing paths, C<max_keys>, C<arena>, C<mode>), and the separate
+C<wrap> constructor that adopts two existing objects.
 
 =head2 Mutators
 
@@ -226,8 +231,14 @@ calls, whether or not they changed the set), and C<mmap_size> (bytes).
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it.  Do not share backing
-files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 

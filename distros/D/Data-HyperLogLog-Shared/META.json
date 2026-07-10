@@ -53,6 +53,6 @@
          "web" : "https://github.com/vividsnow/perl5-data-hyperloglog-shared"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

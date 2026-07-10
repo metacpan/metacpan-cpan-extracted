@@ -1272,22 +1272,10 @@ L<Test::More> - the 'industry standard' of perl test frameworks
 
 =head1 BUGS AND QUESTIONS
 
-If you find a bug in Test::Inter, there are three ways to send it to me.
-Any of them are fine, so use the method that is easiest for you.
+If you find a bug in Test::Inter, please let me know.  As CPAN has removed
+email support, the only supported way to submit a bug is via ticket:
 
 =over 4
-
-=item Direct email
-
-You are welcome to send it directly to me by email.  The email address
-to use is:  sbeck@cpan.org.
-
-=item CPAN Bug Tracking
-
-You can submit it using the CPAN tracking too.  This can be done at the
-following URL:
-
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Inter>
 
 =item GitHub
 
@@ -1330,6 +1318,6 @@ terms as Perl itself.
 
 =head1 AUTHOR
 
-Sullivan Beck (sbeck@cpan.org)
+Sullivan Beck (https://github.com/SBECK-github/)
 
 =cut

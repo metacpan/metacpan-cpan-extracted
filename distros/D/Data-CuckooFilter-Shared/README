@@ -17,6 +17,10 @@ SYNOPSIS
         $cf->remove("alice");
         $cf->contains("alice");             # 0
 
+        # occurrence count (0..8): how many copies of an item are stored
+        $cf->add("x"); $cf->add("x");
+        $cf->count_of("x");                 # 2
+
         # add returns 0 when the table is full (a true no-op)
         my $ok = $cf->add("item");          # 1 if stored, 0 if full
 
@@ -106,6 +110,7 @@ METHODS
         my $ok    = $cf->add($item);            # 1 if stored, 0 if the table is full
         my $added = $cf->add_many(\@items);     # count of items stored
         my $in    = $cf->contains($item);       # 1 if probably present, 0 if definitely absent
+        my $c     = $cf->count_of($item);       # occurrence count 0..8 (times added minus removed)
         my $gone  = $cf->remove($item);         # 1 if a fingerprint was removed, else 0
         $cf->clear;                             # reset to empty
 
@@ -127,6 +132,18 @@ METHODS
     may be a false positive (a different item happens to share a fingerprint
     and bucket). There are never false negatives for items that are
     currently stored.
+
+    "count_of" returns how many copies of $item are stored -- the number of
+    times it was added minus the number of times it was removed -- as an
+    integer from 0 to 8. Because a fingerprint can live only in its two
+    candidate buckets (four slots each), the count saturates at 8 ("2 *
+    slots_per_bucket"): once an item fills those slots a further "add" of it
+    returns 0 (full). Like "contains" it is probabilistic -- 0 means
+    definitely absent, while a positive count is an estimate that a
+    colliding fingerprint can inflate (the same caveat as "remove": trust it
+    only for items you added). It takes a read lock and is safe to call
+    concurrently. This makes the filter usable as a small counting set
+    (counts below 8) without the extra memory of a counting Bloom filter.
 
     "remove" deletes one stored fingerprint of $item, returning 1 if one was
     found and cleared or 0 if none matched. See the Removal caveat in
@@ -193,8 +210,15 @@ SHARING ACROSS PROCESSES
         print $cf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
 
 SECURITY
-    The mmap region is writable by all processes that open it. Do not share
-    backing files with untrusted processes.
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with

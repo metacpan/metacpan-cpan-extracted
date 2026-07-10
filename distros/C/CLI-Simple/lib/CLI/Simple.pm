@@ -4,7 +4,7 @@ package CLI::Simple;
 use strict;
 use warnings;
 
-use CLI::Simple::Constants qw(:booleans :chars :log-levels);
+use CLI::Simple::Constants qw(:booleans :chars :log-levels @VALID_OPTIONS);
 use CLI::Simple::Utils qw(normalize_options slurp dmp choose);
 use CLI::Simple::DumpSpec qw(_cmd_dump_spec);
 use CLI::Simple::Migrate qw(_cmd_migrate);
@@ -24,7 +24,7 @@ use Log::Log4perl qw();
 use Pod::Usage;
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -33,6 +33,7 @@ our $GETOPT_ERROR_MESSAGE;
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_accessors(
   qw(
+    _validate_command
     _command
     _command_args
     _commands
@@ -218,8 +219,15 @@ sub new {
 
   my %args = ref $params[0] ? %{ $params[0] } : @params;
 
-  my ( $default_options, $option_specs, $commands, $extra_options, $abbreviations, $error_handler, $alias )
-    = @args{qw(default_options option_specs commands extra_options abbreviations error_handler alias)};
+  foreach my $o ( keys %args ) {
+    die "ERROR: unknown option '$o'\n"
+      if none { $o eq $_ } @VALID_OPTIONS;
+  }
+
+  my ( $default_options, $option_specs, $commands, $extra_options, $abbreviations, $error_handler, $alias, $validate_command )
+    = @args{qw(default_options option_specs commands extra_options abbreviations error_handler alias validate_command)};
+
+  $validate_command //= $TRUE;
 
   no strict 'refs'; ## no critic
 
@@ -378,6 +386,8 @@ sub new {
       $command = 'help';
     }
   }
+
+  $self->set__validate_command($validate_command);
 
   $self->set__command($command);
 
@@ -563,6 +573,24 @@ sub command {
 }
 
 ########################################################################
+sub command_args {
+########################################################################
+  my ( $self, @args ) = @_;
+
+  return $self->get__command_args
+    if !@args;
+
+  if ( ref $args[0] ) {
+    $self->set__command_args( $args[0] );
+    return;
+  }
+
+  $self->set__command_args( [@args] );
+
+  return;
+}
+
+########################################################################
 sub commands {
 ########################################################################
   my ( $self, $command, $handler ) = @_;
@@ -596,7 +624,7 @@ sub validate_command {
   my $command = $self->command;
 
   return
-    if !$command;
+    if !$command || !$self->get__validate_command;
 
   my $commands = $self->commands;
 
@@ -1763,6 +1791,48 @@ An array reference of option specifications, as accepted by
 L<Getopt::Long>. These define the command-line options your program
 recognizes.
 
+=item * validate_command
+
+Normally, C<CLI::Simple> will validate the command and throw an
+exception if the command has not been registered. You can prevent this
+behavior by setting this attribute to a non-true value.
+
+Typically you might use this to allow a script to assume a default
+command and allow arguments. For example suppose you have a script
+C<foo> with a command "get" with arguments:
+
+  foo get something
+
+...but want to allow users to also do:
+
+  foo something
+
+To do this you should follow this recipe:
+
+  sub init {
+    my ($self) = @__;
+    
+    my @args = $self->get_args;
+  
+    if ( ! @args ) {
+      $self->command_args($self->command()); # set the args to the command
+      $self->command('get'); # set the command to your default
+    }
+    else {
+      die "ERROR: unknown command\n"
+        if !$self->commands->{$self->command}; # validate the command
+    }
+    ...
+    return;
+  }
+
+I<NOTE: This only works if your commands have a deterministic number
+of arguments. For example you might always require at least 1
+argument. If you have no arguments as in the above recipe you would
+assume command is the argument to your default command.>
+
+=back
+
 =back
 
 =head2 command
@@ -1774,6 +1844,18 @@ Get or sets the command to execute. Usually this is the first argument
 on the command line after all options have been parsed. There are
 times when you might want to override the argument. You can pass a new
 command that will be executed when you call the C<run()> method.
+
+=head2 command_args
+
+ my $args = $self->command_args();
+
+Get or sets the argument list. Similar to C<get_args> when no
+arguments are passed except it returns an array reference.
+
+To replace or add to the argument list, pass an array or list.
+
+  my $args = $self->command_args;
+  $self->command_args(@{$args}, 'foo');
 
 =head2 commands (required)
 
@@ -1866,6 +1948,7 @@ positional arguments.
 If you define your own C<init()> method, it will be called by the
 constructor. Use this method to perform any actions you require before
 you execute the C<run()> method.
+
 
 =head1 USING PACKAGE VARIABLES
 

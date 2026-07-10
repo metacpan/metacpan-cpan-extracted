@@ -62,4 +62,4 @@ This is free software, licensed under:
 
 =cut
 
-1; # End of Algorithm::EventsPerSecond::XS
+1;    # End of Algorithm::EventsPerSecond::XS

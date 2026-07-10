@@ -53,14 +53,14 @@
 #  define dXSBOOTARGSXSAPIVERCHK dXSARGS
 #endif
 
-/* Perl_xs_boot_epilog - introduced in 5.21.6 (use 5.22 as safe boundary) */
+/* Perl_xs_boot_epilog - introduced in 5.21.6 (use 5.22 as safe boundary).
+ * Variadic so the macro works regardless of whether aTHX_ expands to a
+ * context pointer + comma (MULTIPLICITY) or nothing (non-MULTIPLICITY).
+ * The C preprocessor counts arguments before expanding aTHX_, so a fixed
+ * arity macro would fail on MULTIPLICITY builds. */
 #if !PERL_VERSION_GE(5,22,0)
 #  ifndef Perl_xs_boot_epilog
-#    ifdef PERL_IMPLICIT_CONTEXT
-#      define Perl_xs_boot_epilog(ctx, ax) XSRETURN_YES
-#    else
-#      define Perl_xs_boot_epilog(ax) XSRETURN_YES
-#    endif
+#    define Perl_xs_boot_epilog(...) XSRETURN_YES
 #  endif
 #endif
 

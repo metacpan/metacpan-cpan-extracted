@@ -1,4 +1,11 @@
 Revision history for Data-CuckooFilter-Shared
 
+0.02      2026-07-09
+          - Security and robustness hardening; backing files now created mode
+            0600 (pass a file-mode argument to new() for cross-user sharing).
+          - New count_of($item) method: occurrence count 0..8 (times added minus
+            removed), saturating at 2*slots_per_bucket. Lets the filter double as
+            a small counting set without a counting Bloom filter's overhead.
+
 0.01      2026-06-25
           - Initial release.

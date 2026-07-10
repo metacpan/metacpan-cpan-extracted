@@ -39,7 +39,7 @@
             "CHI" : "0.60",
             "Carp" : "0",
             "Crypt::JWT" : "0.035",
-            "Data::UUID" : "1.227",
+            "Crypt::PRNG" : "0.085",
             "Digest::SHA" : "6.01",
             "List::MoreUtils" : "0.423",
             "List::Util" : "0",
@@ -74,6 +74,96 @@
          }
       }
    },
+   "provides" : {
+      "OIDC::Client" : {
+         "file" : "lib/OIDC/Client.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::AccessToken" : {
+         "file" : "lib/OIDC/Client/AccessToken.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::AccessTokenBuilder" : {
+         "file" : "lib/OIDC/Client/AccessTokenBuilder.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::ApiUserAgentBuilder" : {
+         "file" : "lib/OIDC/Client/ApiUserAgentBuilder.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Error" : {
+         "file" : "lib/OIDC/Client/Error.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Error::Authentication" : {
+         "file" : "lib/OIDC/Client/Error/Authentication.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Error::InvalidResponse" : {
+         "file" : "lib/OIDC/Client/Error/InvalidResponse.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Error::Provider" : {
+         "file" : "lib/OIDC/Client/Error/Provider.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Error::TokenValidation" : {
+         "file" : "lib/OIDC/Client/Error/TokenValidation.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Identity" : {
+         "file" : "lib/OIDC/Client/Identity.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Plugin" : {
+         "file" : "lib/OIDC/Client/Plugin.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::ResponseParser" : {
+         "file" : "lib/OIDC/Client/ResponseParser.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Role::AttributesManager" : {
+         "file" : "lib/OIDC/Client/Role/AttributesManager.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Role::ClaimsValidator" : {
+         "file" : "lib/OIDC/Client/Role/ClaimsValidator.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Role::ClientAuthenticationHelper" : {
+         "file" : "lib/OIDC/Client/Role/ClientAuthenticationHelper.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Role::ConfigurationChecker" : {
+         "file" : "lib/OIDC/Client/Role/ConfigurationChecker.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Role::LoggerWrapper" : {
+         "file" : "lib/OIDC/Client/Role/LoggerWrapper.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::TokenResponse" : {
+         "file" : "lib/OIDC/Client/TokenResponse.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::TokenResponseParser" : {
+         "file" : "lib/OIDC/Client/TokenResponseParser.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Trait::HashStore" : {
+         "file" : "lib/OIDC/Client/Trait/HashStore.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::User" : {
+         "file" : "lib/OIDC/Client/User.pm",
+         "version" : "1.08"
+      },
+      "OIDC::Client::Utils" : {
+         "file" : "lib/OIDC/Client/Utils.pm",
+         "version" : "1.08"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -86,7 +176,7 @@
          "web" : "https://github.com/sebmourlhou/oidc-client"
       }
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_generated_by_perl" : "v5.28.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "Artistic-2.0"

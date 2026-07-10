@@ -1,0 +1,11 @@
+Revision history for Perl extension Crypto::Utils.
+
+0.003  2026/06/11
+    - merge Crypto::Utils::OpenSSL (bundled OpenSSL base functions, FFI C source, ec_conv.pl) into this distribution
+
+0.002  2025/07/24   
+    - speke
+
+0.001  2025/07/05   
+    - init
+

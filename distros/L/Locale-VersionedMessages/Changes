@@ -1,13 +1,26 @@
 Written by:
-   Sullivan Beck (sbeck@cpan.org)
+   Sullivan Beck (https://github.com/SBECK-github/)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
-0.90  2013-03-13
-  - Initial release (beta)
+0.96
+  - Removed all references to the old cpan.org email
+  - Improvements to POD documenation formatting.
+  - Changed RELEASE_TESTING variable.
+    Now use a release-specific testing variable rather than RELEASE_TESTING.
+    See GitHub #17 in my Locale-Codes module for details.
 
-0.91  2013-03-18
-  - Removed some optional packages from requirement list.
-  - Fixed requirement for Test::Inter so that tests would not fail.
+0.95  2015-01-05
+  - Put repository on GitHub. Gabor Szabo
+  - Fixed a test which failed with perl 5.21.* .  Slaven Rezic
+
+0.94  2014-01-31
+  - Minor release to fix CPAN POD indexing issue (doe not affect the
+    module at all).
+
+0.93  2014-01-29
+  - Fixed pod files to not give any errors.
+  - Added copyright to the generated lexicons.
+  - Cleaned up pod in generated files.
 
 0.92  2013-12-06
   - Removed a require line for perl 5.10 (earlier versions should work).
@@ -21,17 +34,9 @@ Any suggestions, bug reports, or donations :-) should be sent to me.
   - Documentation improvements.
   - Changed HISTORY file to new Changes specification.
 
-0.93  2014-01-29
-  - Fixed pod files to not give any errors.
-  - Added copyright to the generated lexicons.
-  - Cleaned up pod in generated files.
+0.91  2013-03-18
+  - Removed some optional packages from requirement list.
+  - Fixed requirement for Test::Inter so that tests would not fail.
 
-0.94  2014-01-31
-  - Minor release to fix CPAN POD indexing issue (doe not affect the
-    module at all).
-
-0.95  2015-01-05
-  - Put repository on GitHub. Gabor Szabo
-  - Fixed a test which failed with perl 5.21.* .  Slaven Rezic
-
-0.96
+0.90  2013-03-13
+  - Initial release (beta)

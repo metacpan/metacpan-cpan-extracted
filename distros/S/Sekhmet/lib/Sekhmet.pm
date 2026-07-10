@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -37,7 +37,7 @@ __END__
 
 =head1 NAME
 
-Sekhmet - Ultra-fast XS ULID generator built on Horus
+Sekhmet - ULID generator built on Horus
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ base32 encoding, CSPRNG random bytes, and millisecond timestamps.
 
 =head1 AUTHOR
 
-LNATION E<lt>email@lnation.orgE<gt>
+LNATION C<< <email@lnation.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 

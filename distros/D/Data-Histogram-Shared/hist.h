@@ -47,7 +47,9 @@
 #define HIST_MAGIC        0x54534948U  /* "HIST" (little-endian) */
 #define HIST_VERSION      1
 #define HIST_ERR_BUFLEN   256
+#ifndef HIST_READER_SLOTS
 #define HIST_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
+#endif
 #define HIST_MIN_SIG      1            /* significant figures range */
 #define HIST_MAX_SIG      5
 
@@ -104,7 +106,7 @@ struct HistHeader {
     uint32_t rwlock;                  /* 128 */
     uint32_t rwlock_waiters;          /* 132 */
     uint32_t rwlock_writers_waiting;  /* 136 */
-    uint32_t _pad3;                   /* 140 */
+    uint32_t slotless_readers;  /* live readers holding the lock with no reader-slot (was padding) */
     uint64_t stat_ops;                /* 144 */
     uint8_t  _pad[104];               /* 152..255 */
 };
@@ -119,11 +121,13 @@ typedef struct HistHandle {
     HistReaderSlot *reader_slots;  /* HIST_READER_SLOTS entries */
     void           *base;          /* mmap base */
     size_t          mmap_size;
+    uint64_t        counts_off;    /* validated counts offset, cached: never re-read from the peer-writable header */
     char           *path;          /* backing file path (strdup'd) */
     int             backing_fd;    /* memfd or reopened-fd to close on destroy, -1 for file/anon */
     uint32_t        my_slot_idx;   /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t        cached_pid;    /* getpid() cached at last slot claim */
     uint32_t        cached_fork_gen; /* hist_fork_gen value at last slot claim */
+    uint32_t slotless_held; /* rwlock read-locks held with no reader-slot */
 } HistHandle;
 
 /* ================================================================
@@ -206,6 +210,7 @@ static inline void hist_claim_reader_slot(HistHandle *h) {
     cur_gen = __atomic_load_n(&hist_fork_gen, __ATOMIC_RELAXED);
     uint32_t now_pid = (uint32_t)getpid();
     h->cached_pid = now_pid;
+    if (cur_gen != h->cached_fork_gen) h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
     h->cached_fork_gen = cur_gen;
     h->my_slot_idx = UINT32_MAX;
     uint32_t start = now_pid % HIST_READER_SLOTS;
@@ -317,19 +322,39 @@ static inline void hist_recover_dead_readers(HistHandle *h) {
      *       rwlock(0 -> 1) succeeds cleanly.
      * Only after the CAS resolves do we wipe the deferred dead slots,
      * keeping that work outside the race-sensitive window. */
+    /* A live reader with no slot (table was full) is invisible to the scan
+     * above but still holds a +1 in the lock word; never force-reset under it. */
+    if (__atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0)
+        any_live_reader = 1;
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < HIST_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = __atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0;
+            for (uint32_t i = 0; !live_now && i < HIST_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && hist_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < HIST_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || hist_pid_alive(pid)) continue;
-            hist_drain_dead_slot(h, i, pid);
+        if (drain_ok) {
+            for (uint32_t i = 0; i < HIST_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || hist_pid_alive(p)) continue;
+                hist_drain_dead_slot(h, i, p);
+            }
         }
     }
 }
@@ -381,6 +406,28 @@ static inline void hist_unpark_writer(HistHandle *h) {
     }
 }
 
+/* Reader accounting: a reader mirrors its +1 in the lock word so dead-reader
+ * recovery can see it. A slotted reader uses its slot subcount; a reader that
+ * could not claim a slot (table full) uses the global hdr->slotless_readers,
+ * so recovery's force-reset never fires out from under it. leave() peels
+ * slotless first so a later slot claim cannot misattribute the decrement. */
+static inline void hist_reader_enter(HistHandle *h) {
+    if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    } else {
+        __atomic_add_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        h->slotless_held++;
+    }
+}
+static inline void hist_reader_leave(HistHandle *h) {
+    if (h->slotless_held > 0) {
+        h->slotless_held--;
+        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+    } else if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    }
+}
+
 static inline void hist_rwlock_rdlock(HistHandle *h) {
     hist_claim_reader_slot(h);
     HistHeader *hdr = h->hdr;
@@ -393,8 +440,7 @@ static inline void hist_rwlock_rdlock(HistHandle *h) {
      * killed between rwlock CAS-success and subcount++ would let recovery
      * force-reset rwlock to 0 underneath us, causing a UINT32_MAX wrap on
      * our eventual rdunlock dec. */
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    hist_reader_enter(h);
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         /* Write-preferring: when lock is free (cur==0) and writers are
@@ -402,11 +448,11 @@ static inline void hist_rwlock_rdlock(HistHandle *h) {
          * already active (cur>=1), new readers may join freely. */
         if (cur > 0 && cur < HIST_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < HIST_RWLOCK_SPIN_LIMIT, 1)) {
@@ -416,7 +462,10 @@ static inline void hist_rwlock_rdlock(HistHandle *h) {
         hist_park_reader(h);
         cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         /* Sleep when write-locked OR when yielding to waiting writers */
-        if (cur >= HIST_RWLOCK_WRITER_BIT || cur == 0) {
+        if (cur >= HIST_RWLOCK_WRITER_BIT ||
+            (cur == 0 && __atomic_load_n(writers_waiting, __ATOMIC_RELAXED))) {
+            /* park on a free lock only to yield to a waiting writer; with no
+             * writer, re-loop and acquire -- else nobody would ever wake us. */
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
                               &hist_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
@@ -439,8 +488,7 @@ static inline void hist_rwlock_rdunlock(HistHandle *h) {
      * window where we still own a unit of rwlock but our slot subcount is
      * 0, letting recovery force-reset rwlock underneath us. */
     uint32_t after = __atomic_sub_fetch(&hdr->rwlock, 1, __ATOMIC_RELEASE);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    hist_reader_leave(h);
     if (after == 0 && __atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -508,7 +556,29 @@ static inline uint64_t hist_total_size(int64_t counts_len) {
 }
 
 static inline int64_t *hist_counts(HistHandle *h) {
-    return (int64_t *)((char *)h->base + h->hdr->counts_off);
+    return (int64_t *)((char *)h->base + h->counts_off);
+}
+
+/* ---- Layer B: at-use bounds for attacker-controlled file-stored values ----
+ * The backing file is mmap'd MAP_SHARED, so a local peer with write access can
+ * mutate counts_off / counts_len live, AFTER the open-time header validation.
+ * Anchor every counts[] index/length on the process-local mmap_size (kept in
+ * our PRIVATE handle, not the shared segment, hence trustworthy).  For a valid
+ * histogram counts_off == the layout constant and counts_off + counts_len*8 ==
+ * mmap_size, so all clamps below are never-taken branches in normal use. */
+
+/* int64 count cells that actually fit in our mapping given (untrusted) counts_off. */
+static inline int64_t hist_counts_capacity(HistHandle *h) {
+    uint64_t off = h->counts_off;
+    if (off > (uint64_t)h->mmap_size) return 0;             /* wild offset: nothing fits */
+    return (int64_t)(((uint64_t)h->mmap_size - off) / sizeof(int64_t));
+}
+
+/* counts_len clamped to what fits (also rejects a negative/huge stored len). */
+static inline int64_t hist_counts_len_safe(HistHandle *h) {
+    int64_t cap = hist_counts_capacity(h);
+    int64_t len = h->hdr->counts_len;
+    return (len < 0 || len > cap) ? cap : len;
 }
 
 /* ================================================================
@@ -618,6 +688,7 @@ static inline HistHandle *hist_setup(void *base, size_t map_size,
     h->base         = base;
     h->reader_slots = (HistReaderSlot *)((uint8_t *)base + hdr->reader_slots_off);
     h->mmap_size    = map_size;
+    h->counts_off   = hdr->counts_off;   /* validated at open (== L.counts); cache so the bound and the pointer use one value */
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
     h->my_slot_idx  = UINT32_MAX;
@@ -655,8 +726,25 @@ static inline int hist_validate_header(const HistHeader *hdr, uint64_t file_size
     return 1;
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int hist_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { HIST_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        HIST_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    HIST_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static HistHandle *hist_create(const char *path, int64_t lowest, int64_t highest,
-                               int32_t sig_figs, char *errbuf) {
+                               int32_t sig_figs, mode_t mode, char *errbuf) {
     HistGeometry g;
     if (!hist_validate_create_args(lowest, highest, sig_figs, &g, errbuf)) return NULL;
 
@@ -671,8 +759,8 @@ static HistHandle *hist_create(const char *path, int64_t lowest, int64_t highest
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { HIST_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { HIST_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = hist_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { HIST_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { HIST_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -736,6 +824,15 @@ static HistHandle *hist_open_fd(int fd, char *errbuf) {
 
 static void hist_destroy(HistHandle *h) {
     if (!h) return;
+    /* Release our reader slot on clean teardown (else short-lived-reader churn
+     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+    if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
+        h->cached_fork_gen == __atomic_load_n(&hist_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        uint32_t expected = h->cached_pid;
+        __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
+                &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
     free(h->path);
@@ -806,6 +903,9 @@ static inline int64_t hist_median_equiv(HistHandle *h, int64_t v) {
  * Returns the counts index for v, or -1 if v falls outside the trackable
  * range (idx < 0 or idx >= counts_len).  v must be >= 0. */
 static inline int64_t hist_index_for(HistHandle *h, int64_t v) {
+    if (v > h->hdr->highest) return -1;   /* documented croak contract: reject
+                                           * values above highest that the last
+                                           * bucket's pow2 span would else absorb */
     int32_t bi = hist_bucket_index(h, v);
     if (bi < 0 || bi >= h->hdr->bucket_count) return -1;
     int32_t sbi = hist_sub_bucket_index(h, v, bi);
@@ -822,11 +922,14 @@ static inline int64_t hist_index_for(HistHandle *h, int64_t v) {
  * checked 0 <= value <= highest and idx < counts_len before locking. */
 static void hist_record_locked(HistHandle *h, int64_t value, int64_t count) {
     int64_t idx = hist_counts_index_for(h, value);
+    if (idx < 0 || idx >= hist_counts_capacity(h)) return;  /* Layer B: reject OOB idx (untrusted geometry) */
     int64_t *counts = hist_counts(h);
     counts[idx] += count;
     h->hdr->total_count += count;
-    if (value < h->hdr->min_value) h->hdr->min_value = value;
-    if (value > h->hdr->max_value) h->hdr->max_value = value;
+    if (count != 0) {   /* record(value, 0) records nothing -> no phantom min/max */
+        if (value < h->hdr->min_value) h->hdr->min_value = value;
+        if (value > h->hdr->max_value) h->hdr->max_value = value;
+    }
 }
 
 /* Highest equivalent value at or below which `p` percent of recorded values
@@ -839,7 +942,7 @@ static int64_t hist_value_at_percentile_locked(HistHandle *h, double p) {
     if (want > total) want = total;
     int64_t *counts = hist_counts(h);
     int64_t running = 0;
-    int64_t len = h->hdr->counts_len;
+    int64_t len = hist_counts_len_safe(h);     /* Layer B: never read past our mapping */
     for (int64_t idx = 0; idx < len; idx++) {
         if (!counts[idx]) continue;            /* skip empty cells (sparse); a 0 cell can never be the first to reach want */
         running += counts[idx];
@@ -855,7 +958,7 @@ static double hist_mean_locked(HistHandle *h) {
     int64_t total = h->hdr->total_count;
     if (total == 0) return 0.0;
     int64_t *counts = hist_counts(h);
-    int64_t len = h->hdr->counts_len;
+    int64_t len = hist_counts_len_safe(h);     /* Layer B: never read past our mapping */
     double sum = 0.0;
     for (int64_t idx = 0; idx < len; idx++) {
         int64_t c = counts[idx];
@@ -877,7 +980,8 @@ static void hist_merge_counts(int64_t *dst, const int64_t *src, int64_t counts_l
 
 /* reset all counts to 0; reset total/min/max (caller holds the write lock) */
 static inline void hist_reset_locked(HistHandle *h) {
-    memset(hist_counts(h), 0, (size_t)((uint64_t)h->hdr->counts_len * sizeof(int64_t)));
+    int64_t len = hist_counts_len_safe(h);     /* Layer B: never zero past our mapping */
+    memset(hist_counts(h), 0, (size_t)((uint64_t)len * sizeof(int64_t)));
     h->hdr->total_count = 0;
     h->hdr->min_value   = INT64_MAX;
     h->hdr->max_value   = 0;

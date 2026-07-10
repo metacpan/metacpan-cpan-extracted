@@ -1,0 +1,30 @@
+---
+abstract: 'Compile declarative specs into closures that munge raw values into numbers.'
+author:
+  - 'Zane C. Bowers-Hadley <vvelox@vvelox.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-ToNumberMunger
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Time::Piece: '0'
+requires:
+  Carp: '0'
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/vvelox/Algorithm-ToNumberMunger.git
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,7 +1,7 @@
 ---
 abstract: 'run shell commands with enhanced support'
 author:
-  - 'Sullivan Beck (sbeck@cpan.org)'
+  - 'Sullivan Beck (https://github.com/SBECK-github/)'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Inter: '1.09'
@@ -22,7 +22,7 @@ no_index:
 provides:
   Shell::Cmd:
     file: lib/Shell/Cmd.pm
-    version: '3.05'
+    version: '3.06'
 requires:
   Capture::Tiny: '0'
   Cwd: '0'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/SBECK-github/Shell-Cmd/issues
   homepage: https://github.com/SBECK-github/Shell-Cmd
   repository: git://github.com/SBECK-github/Shell-Cmd.git
-version: '3.05'
+version: '3.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -36,6 +36,8 @@ sub _check_configuration ($self) {
     store_mode                         => { isa => 'StoreMode', optional => 1 },
     proxy_detect                       => { isa => 'Bool', optional => 1 },
     user_agent                         => { isa => 'Str', optional => 1 },
+    use_pkce                           => { isa => 'Bool', optional => 1 },
+    pkce_code_challenge_method         => { isa => 'Str', optional => 1 },
     id                                 => { isa => 'Str', optional => 1 },
     secret                             => { isa => 'Str', optional => 1 },
     private_jwk_file                   => { isa => 'Str', optional => 1 },

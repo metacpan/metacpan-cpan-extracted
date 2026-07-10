@@ -18,7 +18,7 @@ createapp(
 	-extensions => [qw[Art MenuBar MDI ToolBar]],
 	-configfolder => 't/settings',
 	-contentmanagerclass => 'TestTextManager',
-	-icontheme => 'Oxygen',
+#	-icontheme => 'Oxygen',
 );
 
 my $ext;

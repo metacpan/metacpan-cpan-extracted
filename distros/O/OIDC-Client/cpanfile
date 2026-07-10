@@ -2,7 +2,7 @@ requires 'perl', '5.20.0';
 requires 'Carp';
 requires 'CHI', '0.60';
 requires 'Crypt::JWT', '0.035';
-requires 'Data::UUID', '1.227';
+requires 'Crypt::PRNG', '0.085';
 requires 'Digest::SHA', '6.01';
 requires 'List::Util';
 requires 'List::MoreUtils', '0.423';

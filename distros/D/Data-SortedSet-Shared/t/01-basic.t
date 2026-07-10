@@ -40,6 +40,21 @@ ok !eval { Data::SortedSet::Shared->new(undef, 0); 1 }, 'max_entries 0 rejected'
 ok !eval { Data::SortedSet::Shared->new($path, 100); 1 }, 'too-small/corrupt file rejected';
 unlink $path;
 
+# opt-in file mode: applied exactly at create (fchmod after the O_EXCL create,
+# so an explicit mode is honored regardless of umask); ignored when attaching
+{
+    my $mp = "/tmp/ss-mode-$$.bin";
+    unlink $mp;
+    { my $w = Data::SortedSet::Shared->new($mp, 10, 0660); }
+    is +((stat $mp)[2] & 07777), 0660, 'explicit mode honored at create';
+    { my $r = Data::SortedSet::Shared->new($mp, 10, 0644); }
+    is +((stat $mp)[2] & 07777), 0660, 'mode ignored when attaching an existing file';
+    unlink $mp;
+    { my $d = Data::SortedSet::Shared->new($mp, 10); }
+    is +((stat $mp)[2] & 07777), 0600, 'default mode is 0600';
+    unlink $mp;
+}
+
 # eventfd
 my $e = Data::SortedSet::Shared->new(undef, 10);
 my $efd = $e->eventfd;

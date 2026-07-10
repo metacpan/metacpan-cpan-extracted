@@ -38,13 +38,13 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Test::Inter",
-   VERSION          => "1.12",
+   VERSION          => "1.13",
    ABSTRACT         => "framework for more readable interactive test scripts",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
     ? (MIN_PERL_VERSION => "5.006")
     : ()),
-   AUTHOR           => "Sullivan Beck (sbeck\@cpan.org)",
+   AUTHOR           => "Sullivan Beck (https://github.com/SBECK-github/)",
    "dist"           => {COMPRESS=>"gzip",SUFFIX=>"gz"},
    PL_FILES         => {},
    PREREQ_PM        => \%module_prereq,
@@ -59,7 +59,7 @@ WriteMakefile(
           provides     => {
              'Test::Inter' => {
                 file    => 'lib/Test/Inter.pm',
-                version => '1.12',
+                version => '1.13',
              },
 
           },

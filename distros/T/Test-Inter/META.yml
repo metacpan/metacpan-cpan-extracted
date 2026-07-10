@@ -1,14 +1,14 @@
 ---
 abstract: 'framework for more readable interactive test scripts'
 author:
-  - 'Sullivan Beck (sbeck@cpan.org)'
+  - 'Sullivan Beck (https://github.com/SBECK-github/)'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ no_index:
 provides:
   Test::Inter:
     file: lib/Test/Inter.pm
-    version: '1.12'
+    version: '1.13'
 requires:
   Cwd: '0'
   File::Basename: '0'
@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/SBECK-github/Test-Inter/issues
   homepage: https://github.com/SBECK-github/Test-Inter
   repository: git://github.com/SBECK-github/Test-Inter.git
-version: '1.12'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

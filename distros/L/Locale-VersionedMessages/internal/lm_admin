@@ -83,151 +83,151 @@ our $usage=
 
 ";
 
-#pod
+# #pod
 
-#head1 NAME
+# #head1 NAME
 
-lm_admin - simple tool for managine Locale::VersionedMessages lexicons
+# lm_admin - simple tool for managine Locale::VersionedMessages lexicons
 
-#head1 SYNOPSIS
+# #head1 SYNOPSIS
 
-This tool can be used to maintain the lexicon files used by the
-Locale::VersionedMessages perl module.
+# This tool can be used to maintain the lexicon files used by the
+# Locale::VersionedMessages perl module.
 
-   lm_admin [OPERATION] [OPTIONS]
+#    lm_admin [OPERATION] [OPTIONS]
 
-#head1 DESCRIPTION
+# #head1 DESCRIPTION
 
-The Locale::VersionedMessages module allows translation tables (i.e. lexicons) for
-a set of message to be stored in perl modules to be used in a localized
-program.
+# The Locale::VersionedMessages module allows translation tables (i.e. lexicons) for
+# a set of message to be stored in perl modules to be used in a localized
+# program.
 
-This tool allows you to create a new set of messages, a new lexicon (i.e.
-a new locale which the messages can be translated into), as well as add
-or update any information in the lexicons.
+# This tool allows you to create a new set of messages, a new lexicon (i.e.
+# a new locale which the messages can be translated into), as well as add
+# or update any information in the lexicons.
 
-Operations available are:
+# Operations available are:
 
-=over 5
+# =over 5
 
-=item -h, --help
+# =item -h, --help
 
-Print online help.
+# Print online help.
 
-=item -c, --create
+# =item -c, --create
 
-Create the infrastructure (i.e. the framework of a set of perl modules) which
-will contain the new set of messages.
+# Create the infrastructure (i.e. the framework of a set of perl modules) which
+# will contain the new set of messages.
 
-The -s/--set option is required.  The -L/--locale and -d/--dir options
-may be given.
+# The -s/--set option is required.  The -L/--locale and -d/--dir options
+# may be given.
 
-=item -l, --lexicon
+# =item -l, --lexicon
 
-This can be used to create a perl module containing a new translation of a
-set of messages.
+# This can be used to create a perl module containing a new translation of a
+# set of messages.
 
-The -s/--set option is required.  The -L/--locale and -d/--dir options
-may be given.
+# The -s/--set option is required.  The -L/--locale and -d/--dir options
+# may be given.
 
-=item -m, --message
+# =item -m, --message
 
-This can be used to add or update a message in the set.
+# This can be used to add or update a message in the set.
 
-The -s/--set and -M/--msgid options are required.  The -L/--locale, -d/--dir,
-and -U/--no-update options may be given.
+# The -s/--set and -M/--msgid options are required.  The -L/--locale, -d/--dir,
+# and -U/--no-update options may be given.
 
-=item -u, --update
+# =item -u, --update
 
-This can be used to update all messages in a single locale that are out-of-date.
+# This can be used to update all messages in a single locale that are out-of-date.
 
-The -s/--set option is required.  The -L/--locale, -d/--dir, and
--U/--no-update options may be given.
+# The -s/--set option is required.  The -L/--locale, -d/--dir, and
+# -U/--no-update options may be given.
 
-=back
+# =back
 
-The following options are available for the above operations:
+# The following options are available for the above operations:
 
-=item -s, --set SET
+# =item -s, --set SET
 
-This can be used to specify the name of the set of messages.  SET must
-be composed of characters that can make up the name of a perl module.
-It is recommended that it be alphanumeric or underscore (though other
-characters may work).
+# This can be used to specify the name of the set of messages.  SET must
+# be composed of characters that can make up the name of a perl module.
+# It is recommended that it be alphanumeric or underscore (though other
+# characters may work).
 
-=item -d, --dir DIR
+# =item -d, --dir DIR
 
-This option is used to specify the directory where the perl module
-hierarchy will live.  DIR must already exist, and a new set
-of message modules will live in:
+# This option is used to specify the directory where the perl module
+# hierarchy will live.  DIR must already exist, and a new set
+# of message modules will live in:
 
-   DIR/Locale/VersionedMessages/Sets/SET.pm
-   DIR/Locale/VersionedMessages/Sets/SET/LOCALE.pm
+#    DIR/Locale/VersionedMessages/Sets/SET.pm
+#    DIR/Locale/VersionedMessages/Sets/SET/LOCALE.pm
 
-If this option is not given, DIR defaults to the current directory.
+# If this option is not given, DIR defaults to the current directory.
 
-=item -L, --locale LOCALE
+# =item -L, --locale LOCALE
 
-This specifies the name of the locale to work with.  If you are creating
-a new set of messages, this will be the default locale for that set.
+# This specifies the name of the locale to work with.  If you are creating
+# a new set of messages, this will be the default locale for that set.
 
-Some operations (such as adding a message) could be done which apply
-to multiple existing locales.  In this case, LOCALE could be the word
-'default' which refers to the default locale, or 'all' which refers to
-all locales defined for that set of messages.
+# Some operations (such as adding a message) could be done which apply
+# to multiple existing locales.  In this case, LOCALE could be the word
+# 'default' which refers to the default locale, or 'all' which refers to
+# all locales defined for that set of messages.
 
-=item -M, --msgid MSGID
+# =item -M, --msgid MSGID
 
-Operations that work on a message require this option to specify
-which message to work on.
+# Operations that work on a message require this option to specify
+# which message to work on.
 
-MSGID is the string which will be used to refer to the message
-in the localized program.
+# MSGID is the string which will be used to refer to the message
+# in the localized program.
 
-=item -U, --no-update
+# =item -U, --no-update
 
-One feature unique to Locale::VersionedMessages is that it keeps track of a
-version number for every message in every locale.  When you update a
-message in the default locale, the version number is incremented.
-When you add or update a message in another locale, it is set to the
-version in the default locale.
+# One feature unique to Locale::VersionedMessages is that it keeps track of a
+# version number for every message in every locale.  When you update a
+# message in the default locale, the version number is incremented.
+# When you add or update a message in another locale, it is set to the
+# version in the default locale.
 
-This allows you to easily see which messages are out-of-date with
-respect to the default locale.
+# This allows you to easily see which messages are out-of-date with
+# respect to the default locale.
 
-If this option is given, the version is not changed.  This would only
-be done if the change did not impact the actual translation (for
-example, you are fixing a typo or spelling error, but not actually
-changing the text).
+# If this option is given, the version is not changed.  This would only
+# be done if the change did not impact the actual translation (for
+# example, you are fixing a typo or spelling error, but not actually
+# changing the text).
 
-This would allow you to make simple corrections to the default locale
-without flagging all other locales as out-of-date, or making a similar
-simple correction to another locale without actually comparing it to
-the default locale (which might have changed in more extensive ways).
+# This would allow you to make simple corrections to the default locale
+# without flagging all other locales as out-of-date, or making a similar
+# simple correction to another locale without actually comparing it to
+# the default locale (which might have changed in more extensive ways).
 
-#head1 KNOWN BUGS
+# #head1 KNOWN BUGS
 
-None known.
+# None known.
 
-#head1 BUGS AND QUESTIONS
+# #head1 BUGS AND QUESTIONS
 
-Please refer to the Locale::VersionedMessages documentation for information on
-submitting bug reports or questions to the author.
+# Please refer to the Locale::VersionedMessages documentation for information on
+# submitting bug reports or questions to the author.
 
-#head1 SEE ALSO
+# #head1 SEE ALSO
 
-Locale::VersionedMessages
+# Locale::VersionedMessages
 
-#head1 LICENSE
+# #head1 LICENSE
 
-This script is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+# This script is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
 
-#head1 AUTHOR
+# #head1 AUTHOR
 
-Sullivan Beck (sbeck@cpan.org)
+# Sullivan Beck (https://github.com/SBECK-github/)
 
-=cut
+# =cut
 
 ###############################################################################
 # PARSE ARGUMENTS

@@ -4,13 +4,13 @@
       "Paulo Custodio, <pscust@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.68, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Preproc-Tiny",
    "no_index" : {
@@ -45,6 +45,9 @@
          "web" : "https://github.com/pauloscustodio/perl-Preproc-Tiny"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.03",
+   "x_bugtracker" : {
+      "web" : "https://github.com/pauloscustodio/perl-Preproc-Tiny/issues"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

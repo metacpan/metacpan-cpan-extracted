@@ -22,18 +22,22 @@ MODULE = Data::HyperLogLog::Shared  PACKAGE = Data::HyperLogLog::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path = &PL_sv_undef, precision = 14)
+new(class, path = &PL_sv_undef, precision = 14, ...)
     const char *class
     SV *path
     UV precision
   PREINIT:
     char errbuf[HLL_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* optional 4th arg = file mode for the exclusive create of a NEW backing
+       file (opt-in cross-user sharing); default 0600 (owner-only).  Ignored
+       for anonymous/undef path and when attaching an existing file. */
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
     if (precision < HLL_MIN_PRECISION || precision > HLL_MAX_PRECISION)
         croak("Data::HyperLogLog::Shared->new: precision must be between %d and %d",
               HLL_MIN_PRECISION, HLL_MAX_PRECISION);
-    HllHandle *h = hll_create(p, (uint32_t)precision, errbuf);
+    HllHandle *h = hll_create(p, (uint32_t)precision, mode, errbuf);
     if (!h) croak("Data::HyperLogLog::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -47,7 +51,7 @@ new_memfd(class, name = &PL_sv_undef, precision = 14)
   PREINIT:
     char errbuf[HLL_ERR_BUFLEN];
   CODE:
-    const char *nm = SvOK(name) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     if (precision < HLL_MIN_PRECISION || precision > HLL_MAX_PRECISION)
         croak("Data::HyperLogLog::Shared->new_memfd: precision must be between %d and %d",
               HLL_MIN_PRECISION, HLL_MAX_PRECISION);
@@ -161,20 +165,32 @@ merge(self, other)
      * buffer, then release before taking self's write lock.  Copying to
      * a temp avoids holding two locks at once (deadlock-free regardless
      * of acquisition order between two processes merging each other). */
-    uint32_t om = o->hdr->m;          /* m is immutable after creation -- compare lock-free */
-    if (om != h->hdr->m)
+    uint32_t dm = 0;
+    if (!hll_regs_checked(h, &dm, NULL))   /* validate self + bound the scratch size */
+        croak("Data::HyperLogLog::Shared->merge: invalid destination header");
+    uint32_t om = o->hdr->m;               /* m is immutable after creation -- compare lock-free */
+    if (om != dm)
         croak("Data::HyperLogLog::Shared->merge: precision mismatch (%u vs %u registers)",
-              h->hdr->m, om);
+              dm, om);
 
     uint8_t *tmp;
-    Newx(tmp, (size_t)om, uint8_t);
-    SAVEFREEPV(tmp);                 /* freed on normal return OR croak unwind */
+    Newxz(tmp, (size_t)dm, uint8_t);       /* dm bounded to 2^HLL_MAX_PRECISION by the check above */
+    SAVEFREEPV(tmp);                       /* freed on normal return OR croak unwind */
+    uint32_t copied = 0;
     hll_rwlock_rdlock(o);
-    memcpy(tmp, hll_regs(o), (size_t)om);
+    {
+        uint32_t sm = 0;
+        uint8_t *src = hll_regs_checked(o, &sm, NULL);  /* bound the memcpy against o's mapping */
+        if (src) {
+            uint32_t n = (sm < dm) ? sm : dm;           /* never overflow tmp (dm bytes) */
+            memcpy(tmp, src, (size_t)n);
+            copied = n;
+        }
+    }
     hll_rwlock_rdunlock(o);
 
     hll_rwlock_wrlock(h);
-    hll_merge_regs(h, tmp);
+    hll_merge_regs(h, tmp, copied);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     hll_rwlock_wrunlock(h);
 
@@ -274,6 +290,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::HyperLogLog::Shared")) {
         HllHandle *h = INT2PTR(HllHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

@@ -394,6 +394,7 @@ sub DoPostConfig {
 	my $size = $self->configGet('-iconsize');
 	$size = $self->getAlternateSize($size);
 	$self->configPut(-iconsize => $size);
+#	$self->pause(150);
 }
 
 sub fontFile {

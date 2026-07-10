@@ -26,11 +26,14 @@ get('/error/:code' => sub {
 # provider server routes
 get('/authorize' => sub {
       my $c = shift;
-      my $redirect_uri  = $c->param('redirect_uri');
-      my $client_id     = $c->param('client_id');
-      my $state         = $c->param('state');
-      my $response_type = $c->param('response_type');
-      if ($response_type eq 'code' && $client_id eq 'my_id') {
+      my $redirect_uri   = $c->param('redirect_uri');
+      my $client_id      = $c->param('client_id');
+      my $state          = $c->param('state');
+      my $code_challenge = $c->param('code_challenge');
+      my $response_type  = $c->param('response_type');
+      if ($response_type eq 'code'
+            && $client_id eq 'my_id'
+            && $code_challenge eq 'oqtdK0vIPNvI5ejQ6RqbJoSu0bVMZ7IAPA_dqAejh7E') {
         $c->redirect_to("$redirect_uri?client_id=$client_id&state=$state&code=abc&iss=my_issuer");
       }
       else {
@@ -40,11 +43,12 @@ get('/authorize' => sub {
 post('/token' => sub {
        my $c = shift;
        my ($client_id, $client_secret) = split(':', $c->req->url->to_abs->userinfo);
-       my $grant_type = $c->param('grant_type');
-       my $code       = $c->param('code');
+       my $grant_type    = $c->param('grant_type');
+       my $code          = $c->param('code');
+       my $code_verifier = $c->param('code_verifier');
        if ($grant_type eq 'authorization_code'
-           && $client_id eq 'my_id' && $client_secret eq 'my_secret'
-           && $code eq 'abc') {
+             && $client_id eq 'my_id' && $client_secret eq 'my_secret'
+             && $code eq 'abc' && $code_verifier eq 'fake_code_verifier') {
          $c->render(json => {id_token      => 'my_id_token',
                              access_token  => 'my_access_token',
                              refresh_token => 'my_refresh_token',
@@ -62,8 +66,9 @@ post('/token' => sub {
 my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
 $mock_oidc_client->redefine('kid_keys' => sub { {} });
 
-my $mock_data_uuid = Test::MockModule->new('Data::UUID');
-$mock_data_uuid->redefine('create_str' => sub { 'fake_uuid' });
+my $mock_oidc_client_utils = Test::MockModule->new('OIDC::Client::Utils');
+$mock_oidc_client_utils->redefine('generate_nonce'         => sub { 'fake_nonce' });
+$mock_oidc_client_utils->redefine('generate_code_verifier' => sub { 'fake_code_verifier' });
 
 plugin 'OIDC' => {
   authentication_error_path => '/error/401',
@@ -100,7 +105,7 @@ $mock_crypt_jwt->redefine('decode_jwt' => sub {
     exp   => time + 30,
     aud   => 'my_id',
     sub   => 'my_subject',
-    nonce => 'fake_uuid',
+    nonce => 'fake_nonce',
   );
   return (
     $params{decode_header} ? { 'alg' => 'whatever' } : (),

@@ -1,9 +1,11 @@
 package Data::DisjointSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::DisjointSet::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 
 *same  = \&connected;
 *merge = \&union;
@@ -102,6 +104,7 @@ within a single structure. B<Linux-only>. Requires 64-bit Perl.
 =head2 Constructors
 
     my $d = Data::DisjointSet::Shared->new($path, $n);
+    my $d = Data::DisjointSet::Shared->new($path, $n, $mode);   # custom file mode
     my $d = Data::DisjointSet::Shared->new(undef, $n);          # anonymous
     my $d = Data::DisjointSet::Shared->new_memfd($name, $n);
     my $d = Data::DisjointSet::Shared->new_from_fd($fd);
@@ -117,6 +120,13 @@ existing partition is preserved; the C<$n> you pass to C<new> on a reopen is
 only used when the file is brand new. C<new_memfd> creates a Linux memfd
 (transferable via its C<memfd> descriptor); C<new_from_fd> reopens one in
 another process.
+
+Backing files are created B<exclusively> (C<O_EXCL>, symlinks rejected) with
+mode C<0600> by default, so only the creating user can attach. Pass an octal
+C<$mode> (e.g. C<0664> or C<0666>, masked by the process umask) as the optional
+third argument to permit group/other access for cross-user sharing. C<$mode>
+applies only when the file is newly created; reopening an existing file never
+changes its permissions.
 
 =head2 Union and query
 
@@ -204,7 +214,8 @@ C<stats()> returns a hashref describing the structure:
 
 The structure lives in a shared mapping, shared the same three ways as the rest
 of the family: a B<backing file> (every process calls C<< new($path, $n) >> on
-the same path), an B<anonymous mapping inherited across C<fork>>, or a B<memfd>
+the same path; pass a C<$mode> to C<new> if the attaching processes run as
+different users), an B<anonymous mapping inherited across C<fork>>, or a B<memfd>
 whose descriptor is passed to an unrelated process (over a UNIX socket via
 C<SCM_RIGHTS>, or via C</proc/$pid/fd/$n>) and reopened with
 C<< new_from_fd($fd) >>. Because the mapping is shared, B<every process unions
@@ -219,8 +230,14 @@ lock, so the final partition is independent of how the processes interleave.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it. Do not share backing
-files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 

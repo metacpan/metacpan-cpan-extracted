@@ -11,10 +11,18 @@ use FindBin qw($Bin);
 use lib "$Bin/lib";
 use OIDCClientTest qw(launch_tests);
 
+my $B64_URL_ENCODED_22_CHAR_RE = qr/^[A-Za-z0-9_-]{22,22}$/i;
+my $B64_URL_ENCODED_43_CHAR_RE = qr/^[A-Za-z0-9_-]{43,43}$/i;
+
 use_ok 'OIDC::Client::Utils', qw/get_values_from_space_delimited_string
                                  reach_data
                                  affect_data
-                                 delete_data/;
+                                 delete_data
+                                 generate_state
+                                 generate_nonce
+                                 generate_jti
+                                 generate_code_verifier
+                                 generate_code_challenge/;
 
 my $test = OIDCClientTest->new();
 
@@ -22,7 +30,9 @@ launch_tests();
 done_testing;
 
 sub test_get_values_from_space_delimited_string {
-  subtest "get_values_from_space_delimited_string() with a single value" => sub {
+  note 'get_values_from_space_delimited_string()';
+
+  subtest "single value" => sub {
 
     # Given
     my $str = 'single_value';
@@ -35,7 +45,7 @@ sub test_get_values_from_space_delimited_string {
                'expected result');
   };
 
-  subtest "get_values_from_space_delimited_string() with multiple values" => sub {
+  subtest "multiple values" => sub {
 
     # Given
     my $str = 'value1 value2';
@@ -48,7 +58,7 @@ sub test_get_values_from_space_delimited_string {
                'expected result');
   };
 
-  subtest "get_values_from_space_delimited_string() with multiple spaces" => sub {
+  subtest "multiple spaces" => sub {
 
     # Given
     my $str = ' value1  value2 value3   ';
@@ -64,7 +74,9 @@ sub test_get_values_from_space_delimited_string {
 
 
 sub test_reach_data {
-  subtest "reach_data() not a hashref" => sub {
+  note 'reach_data()';
+
+  subtest "not a hashref" => sub {
 
     # Given
     my %data = (
@@ -78,7 +90,7 @@ sub test_reach_data {
      'exception is thrown';
   };
 
-  subtest "reach_data() scalar is reached" => sub {
+  subtest "scalar is reached" => sub {
 
     # Given
     my %data = (
@@ -99,7 +111,7 @@ sub test_reach_data {
                'expected result');
   };
 
-  subtest "reach_data() object is reached" => sub {
+  subtest "object is reached" => sub {
 
     # Given
     my %data = (
@@ -120,7 +132,7 @@ sub test_reach_data {
                'expected result');
   };
 
-  subtest "reach_data() not reached and optional - no autovivification" => sub {
+  subtest "not reached and optional - no autovivification" => sub {
 
     # Given
     my %data = (
@@ -141,7 +153,7 @@ sub test_reach_data {
                'expected data');
   };
 
-  subtest "reach_data() not reached and mandatory" => sub {
+  subtest "not reached and mandatory" => sub {
 
     # Given
     my %data = (
@@ -158,7 +170,9 @@ sub test_reach_data {
 
 
 sub test_affect_data {
-  subtest "affect_data() invalid path parameter" => sub {
+  note 'affect_data()';
+
+  subtest "invalid path parameter" => sub {
 
     # Given
     my %data = (
@@ -173,7 +187,7 @@ sub test_affect_data {
      'exception is thrown';
   };
 
-  subtest "affect_data() not a hashref" => sub {
+  subtest "not a hashref" => sub {
 
     # Given
     my %data = (
@@ -188,7 +202,7 @@ sub test_affect_data {
      'exception is thrown';
   };
 
-  subtest "affect_data() data is affected" => sub {
+  subtest "data is affected" => sub {
 
     # Given
     my %data = (
@@ -210,7 +224,7 @@ sub test_affect_data {
                'expected result');
   };
 
-  subtest "affect_data() data is deeply affected" => sub {
+  subtest "data is deeply affected" => sub {
 
     # Given
     my %data = (
@@ -240,7 +254,7 @@ sub test_affect_data {
                'expected result');
   };
 
-  subtest "affect_data() new keys are created" => sub {
+  subtest "new keys are created" => sub {
 
     # Given
     my %data = (
@@ -268,7 +282,9 @@ sub test_affect_data {
 
 
 sub test_delete_data {
-  subtest "delete_data() invalid path parameter" => sub {
+  note 'delete_data()';
+
+  subtest "invalid path parameter" => sub {
 
     # Given
     my %data = (
@@ -282,7 +298,7 @@ sub test_delete_data {
      'exception is thrown';
   };
 
-  subtest "delete_data() not a hashref" => sub {
+  subtest "not a hashref" => sub {
 
     # Given
     my %data = (
@@ -296,7 +312,7 @@ sub test_delete_data {
      'exception is thrown';
   };
 
-  subtest "delete_data() data is deleted" => sub {
+  subtest "data is deleted" => sub {
 
     # Given
     my %data = (
@@ -319,7 +335,7 @@ sub test_delete_data {
                'expected data');
   };
 
-  subtest "delete_data() data is deeply deleted" => sub {
+  subtest "data is deeply deleted" => sub {
 
     # Given
     my %data = (
@@ -356,7 +372,7 @@ sub test_delete_data {
                'expected data');
   };
 
-  subtest "delete_data() data to delete is not present - no autovivification" => sub {
+  subtest "data to delete is not present - no autovivification" => sub {
 
     # Given
     my %data = (
@@ -376,5 +392,138 @@ sub test_delete_data {
     );
     cmp_deeply(\%data, \%expected_data,
                'expected data');
+  };
+}
+
+
+sub test_generate_state {
+  note 'generate_state()';
+
+  subtest "expected format and unicity" => sub {
+
+    # When
+    my $state1 = generate_state();
+    my $state2 = generate_state();
+
+    # Then
+    cmp_deeply([$state1, $state2], array_each(re($B64_URL_ENCODED_22_CHAR_RE)),
+               'matches expected format');
+    isnt($state1, $state2,
+         'two consecutive calls differ');
+  };
+}
+
+
+sub test_generate_nonce {
+  note 'generate_nonce()';
+
+  subtest "expected format and unicity" => sub {
+
+    # When
+    my $nonce1 = generate_nonce();
+    my $nonce2 = generate_nonce();
+
+    # Then
+    cmp_deeply([$nonce1, $nonce2], array_each(re($B64_URL_ENCODED_22_CHAR_RE)),
+               'matches expected format');
+    isnt($nonce1, $nonce2,
+         'two consecutive calls differ');
+  };
+}
+
+
+sub test_generate_jti {
+  note 'generate_jti()';
+
+  subtest "expected format and unicity" => sub {
+
+    # When
+    my $jti1 = generate_jti();
+    my $jti2 = generate_jti();
+
+    # Then
+    cmp_deeply([$jti1, $jti2], array_each(re($B64_URL_ENCODED_22_CHAR_RE)),
+               'matches expected format');
+    isnt($jti1, $jti2,
+         'two consecutive calls differ');
+  };
+}
+
+
+sub test_generate_code_verifier {
+  note 'generate_code_verifier()';
+
+  subtest "expected format and unicity" => sub {
+
+    # When
+    my $code_verfier1 = generate_code_verifier();
+    my $code_verfier2 = generate_code_verifier();
+
+    # Then
+    cmp_deeply([$code_verfier1, $code_verfier2], array_each(re($B64_URL_ENCODED_43_CHAR_RE)),
+               'only Base64URL characters and always 43 characters');
+    isnt($code_verfier1, $code_verfier2,
+         'two consecutive calls differ');
+  };
+}
+
+
+sub test_generate_code_challenge {
+  note 'generate_code_challenge()';
+
+  subtest "plain method" => sub {
+
+    # Given
+    my $code_verifier = 'my_code_verifier';
+
+    # When
+    my $code_challenge = generate_code_challenge($code_verifier, 'plain');
+
+    # Then
+    is($code_challenge, $code_verifier,
+       'code challenge equals code verifier');
+  };
+
+  subtest "S256 method - RFC 7636 test case" => sub {
+
+    # Given
+    # Reference values from RFC 7636 Appendix B
+    # https://datatracker.ietf.org/doc/html/rfc7636#appendix-B
+    my $code_verifier           = 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
+    my $expected_code_challenge = 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM';
+
+    # When
+    my $code_challenge = generate_code_challenge($code_verifier, 'S256');
+
+    # Then
+    is($code_challenge, $expected_code_challenge,
+       'expected code challenge');
+  };
+
+  subtest 'S256 method - deterministic output' => sub {
+
+    # Given
+    my $code_verifier = 'same-verifier-each-time';
+
+    # When
+    my $code_challenge1 = generate_code_challenge($code_verifier, 'S256');
+    my $code_challenge2 = generate_code_challenge($code_verifier, 'S256');
+
+    # Then
+    is($code_challenge1, $code_challenge2,
+       'same verifier produces same challenge');
+  };
+
+  subtest 'S256 method - different verifiers produce different challenges' => sub {
+
+    # Given
+    my $code_verifier1 = 'verifier-one';
+    my $code_verifier2 = 'verifier-two';
+
+    my $code_challenge1 = generate_code_challenge($code_verifier1, 'S256');
+    my $code_challenge2 = generate_code_challenge($code_verifier2, 'S256');
+
+    isnt($code_challenge1, $code_challenge2,
+         'different verifiers produce different challenges');
   };
 }

@@ -26,8 +26,7 @@ my $if_opt = '-O3';
 if ( defined $ENV{IF_OPT} ) {
 	if ( $ENV{IF_OPT} =~ /\A-O[0123sgz]\z/ ) {
 		$if_opt = $ENV{IF_OPT};
-	}
-	else {
+	} else {
 		warn "Makefile.PL: ignoring invalid IF_OPT value '$ENV{IF_OPT}' "
 			. "(expected one of -O0 -O1 -O2 -O3 -Os -Og -Oz); using $if_opt\n";
 	}
@@ -36,15 +35,12 @@ my $if_arch = '';
 if ( defined $ENV{IF_ARCH} ) {
 	if ( $ENV{IF_ARCH} eq '' or $ENV{IF_ARCH} eq 'none' ) {
 		$if_arch = '';    # explicit opt-out, same as the module's handling
-	}
-	elsif ( $ENV{IF_ARCH} =~ /\A[A-Za-z0-9_.+=-]+\z/ ) {
+	} elsif ( $ENV{IF_ARCH} =~ /\A[A-Za-z0-9_.+=-]+\z/ ) {
 		$if_arch = $ENV{IF_ARCH};
-	}
-	else {
+	} else {
 		warn "Makefile.PL: ignoring invalid IF_ARCH value '$ENV{IF_ARCH}'\n";
 	}
-}
-elsif ( $ENV{IF_NATIVE} ) {
+} elsif ( $ENV{IF_NATIVE} ) {
 	$if_arch = 'native';
 }
 my $if_no_openmp = $ENV{IF_NO_OPENMP} ? 1 : 0;
@@ -53,11 +49,10 @@ my $if_no_openmp = $ENV{IF_NO_OPENMP} ? 1 : 0;
 # syntax (env assignment prefixing the command) that nmake doesn't grok;
 # without it the module simply keeps its historic behaviour of compiling
 # at first load when Inline::C is present then.
-my $prebuilt = (
-	       !$ENV{IF_NO_C}
-		&& $^O ne 'MSWin32'
-		&& eval { require Inline; Inline->VERSION('0.44'); require Inline::C; 1 }
-) ? 1 : 0;
+my $prebuilt
+	= ( !$ENV{IF_NO_C} && $^O ne 'MSWin32' && eval { require Inline; Inline->VERSION('0.44'); require Inline::C; 1 } )
+	? 1
+	: 0;
 
 # Record the captured configuration where the module can read it at load
 # time.  Generated before WriteMakefile so ExtUtils::MakeMaker's lib/ scan
@@ -132,7 +127,7 @@ Algorithm-Classifier-IsolationForest.inl : pm_to_blib
 dynamic :: Algorithm-Classifier-IsolationForest.inl
 
 POSTAMBLE
-}
+} ## end sub MY::postamble
 
 my %WriteMakefileArgs = (
 	NAME               => 'Algorithm::Classifier::IsolationForest',
@@ -153,20 +148,25 @@ my %WriteMakefileArgs = (
 		'List::Util' => '0',
 	},
 	PREREQ_PM => {
-		'App::Cmd'     => '0',
-		'Carp'         => '0',
-		'Config'       => '0',
-		'File::Slurp'  => '0',
-		'File::Spec'   => '0',
-		'File::Temp'   => '0',
-		'JSON::PP'     => '0',
-		'List::Util'   => '0',
-		'POSIX'        => '0',
-		'Scalar::Util' => '0',
-		'Storable'     => '0',
+		'App::Cmd'    => '0',
+		'Carp'        => '0',
+		'Config'      => '0',
+		'File::Slurp' => '0',
+		'File::Spec'  => '0',
+		'File::Temp'  => '0',
+		'JSON::PP'    => '0',
+
+		# iforest streamd's wire protocol; XS-backed JSON when available,
+		# pure-Perl JSON::PP fallback otherwise, so it is safe as a hard
+		# prereq (streamd itself also degrades to a clear error without it).
+		'JSON::MaybeXS' => '0',
+		'List::Util'    => '0',
+		'POSIX'         => '0',
+		'Scalar::Util'  => '0',
+		'Storable'      => '0',
 	},
-	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	clean      => {
+	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	clean => {
 		FILES => 'Algorithm-Classifier-IsolationForest-* *.inl '
 			. 'lib/Algorithm/Classifier/IsolationForest/BuildFlags.pm'
 	},
@@ -182,6 +182,11 @@ my %WriteMakefileArgs = (
 				recommends => {
 					'Inline'    => '0',
 					'Inline::C' => '0',
+
+					# Unlocks the mungers knob: declarative raw-value ->
+					# number munging for tagged data, with the spec saved
+					# in the model.  Everything else works without it.
+					'Algorithm::ToNumberMunger' => '0.0.1',
 				},
 			},
 		},

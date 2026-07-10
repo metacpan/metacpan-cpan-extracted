@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2025 by Dominique Dumont.
+# This software is Copyright (c) 2008-2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,6 +9,8 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
@@ -55,10 +57,58 @@ by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-
       '2010-2016 Lennart Poettering and others',
       '2016 Dominique Dumont'
     ],
-    'element' => [
-      'OnActiveSec',
-      {
-        'description' => 'Defines monotonic timers relative to different
+    'description' => {
+      'AccuracySec' => 'Specify the accuracy the timer shall elapse
+with. Defaults to 1min. The timer is scheduled to elapse
+within a time window starting with the time specified in
+C<OnCalendar>,
+C<OnActiveSec>,
+C<OnBootSec>,
+C<OnStartupSec>,
+C<OnUnitActiveSec> or
+C<OnUnitInactiveSec> and ending the time
+configured with C<AccuracySec> later. Within
+this time window, the expiry time will be placed at a
+host-specific, randomized, but stable position that is
+synchronized between all local timer units. This is done in
+order to optimize power consumption to suppress unnecessary
+CPU wake-ups. To get best accuracy, set this option to
+1us. Note that the timer is still subject to the timer slack
+configured via
+L<systemd-system.conf(5)>\'s
+C<TimerSlackNSec> setting. See
+L<prctl(2)>
+for details. To optimize power consumption, make sure to set
+this value as high as possible and as low as
+necessary.
+
+Note that this setting is primarily a power saving option that allows coalescing CPU
+wake-ups. It should not be confused with C<RandomizedDelaySec> (see below) which
+adds a random value to the time the timer shall elapse next and whose purpose is the opposite: to
+stretch elapsing of timer events over a longer period to reduce workload spikes. For further details
+and explanations and how both settings play together, see below.',
+      'DeferReactivation' => 'Takes a boolean argument. When enabled, the timer schedules the next elapse based on
+the trigger unit entering inactivity, instead of the last trigger time.
+This is most apparent in the case where the service unit takes longer to run than the timer interval.
+With this setting enabled, the timer will schedule the next elapse based on when the service finishes
+running, and so it will have to wait until the next realtime elapse time to trigger.
+Otherwise, the default behavior is for the timer unit to immediately trigger again once the service
+finishes running. This happens because the timer schedules the next elapse based on the previous trigger
+time, and since the interval is shorter than the service runtime, that elapse will be in the past,
+causing it to immediately trigger once done.
+
+This setting has an effect only if a realtime timer has been specified with
+C<OnCalendar>. Defaults to C<false>.',
+      'FixedRandomDelay' => 'Takes a boolean argument. When enabled, the randomized delay specified by
+C<RandomizedDelaySec> is chosen deterministically, and remains stable between all
+firings of the same timer, even if the manager is restarted. The delay is derived from the machine
+ID, the manager\'s user identifier, and the timer unit\'s name. This effectively creates a unique fixed
+offset for each timer, reducing the jitter in firings of an individual timer while still avoiding
+firing at the same time as other similarly configured timers.
+
+This setting has an effect only if C<RandomizedDelaySec> is not 0. Defaults to
+C<false>.',
+      'OnActiveSec' => 'Defines monotonic timers relative to different
 starting points:
 
 Multiple directives may be combined of the same and of different types, in which case the timer
@@ -95,184 +145,8 @@ Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
 subject to the C<AccuracySec> setting
 below.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'OnBootSec',
-      {
-        'description' => 'Defines monotonic timers relative to different
-starting points:
-
-Multiple directives may be combined of the same and of different types, in which case the timer
-unit will trigger whenever any of the specified timer expressions elapse. For example, by combining
-C<OnBootSec> and C<OnUnitActiveSec>, it is possible to define a
-timer that elapses in regular intervals and activates a specific service each time. Moreover, both
-monotonic time expressions and C<OnCalendar> calendar expressions may be combined in
-the same timer unit.
-
-The arguments to the directives are time spans
-configured in seconds. Example: "OnBootSec=50" means 50s after
-boot-up. The argument may also include time units. Example:
-"OnBootSec=5h 30min" means 5 hours and 30 minutes after
-boot-up. For details about the syntax of time spans, see
-L<systemd.time(7)>.
-
-If a timer configured with C<OnBootSec>
-or C<OnStartupSec> is already in the past
-when the timer unit is activated, it will immediately elapse
-and the configured unit is started. This is not the case for
-timers defined in the other directives.
-
-These are monotonic timers, independent of wall-clock time and timezones. If the computer is
-temporarily suspended, the monotonic clock generally pauses, too. Note that if
-C<WakeSystem> is used, a different monotonic clock is selected that continues to
-advance while the system is suspended and thus can be used as the trigger to resume the
-system.
-
-If the empty string is assigned to any of these options, the list of timers is reset (both
-monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
-will have no effect.
-
-Note that timers do not necessarily expire at the
-precise time configured with these settings, as they are
-subject to the C<AccuracySec> setting
-below.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'OnStartupSec',
-      {
-        'description' => 'Defines monotonic timers relative to different
-starting points:
-
-Multiple directives may be combined of the same and of different types, in which case the timer
-unit will trigger whenever any of the specified timer expressions elapse. For example, by combining
-C<OnBootSec> and C<OnUnitActiveSec>, it is possible to define a
-timer that elapses in regular intervals and activates a specific service each time. Moreover, both
-monotonic time expressions and C<OnCalendar> calendar expressions may be combined in
-the same timer unit.
-
-The arguments to the directives are time spans
-configured in seconds. Example: "OnBootSec=50" means 50s after
-boot-up. The argument may also include time units. Example:
-"OnBootSec=5h 30min" means 5 hours and 30 minutes after
-boot-up. For details about the syntax of time spans, see
-L<systemd.time(7)>.
-
-If a timer configured with C<OnBootSec>
-or C<OnStartupSec> is already in the past
-when the timer unit is activated, it will immediately elapse
-and the configured unit is started. This is not the case for
-timers defined in the other directives.
-
-These are monotonic timers, independent of wall-clock time and timezones. If the computer is
-temporarily suspended, the monotonic clock generally pauses, too. Note that if
-C<WakeSystem> is used, a different monotonic clock is selected that continues to
-advance while the system is suspended and thus can be used as the trigger to resume the
-system.
-
-If the empty string is assigned to any of these options, the list of timers is reset (both
-monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
-will have no effect.
-
-Note that timers do not necessarily expire at the
-precise time configured with these settings, as they are
-subject to the C<AccuracySec> setting
-below.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'OnUnitActiveSec',
-      {
-        'description' => 'Defines monotonic timers relative to different
-starting points:
-
-Multiple directives may be combined of the same and of different types, in which case the timer
-unit will trigger whenever any of the specified timer expressions elapse. For example, by combining
-C<OnBootSec> and C<OnUnitActiveSec>, it is possible to define a
-timer that elapses in regular intervals and activates a specific service each time. Moreover, both
-monotonic time expressions and C<OnCalendar> calendar expressions may be combined in
-the same timer unit.
-
-The arguments to the directives are time spans
-configured in seconds. Example: "OnBootSec=50" means 50s after
-boot-up. The argument may also include time units. Example:
-"OnBootSec=5h 30min" means 5 hours and 30 minutes after
-boot-up. For details about the syntax of time spans, see
-L<systemd.time(7)>.
-
-If a timer configured with C<OnBootSec>
-or C<OnStartupSec> is already in the past
-when the timer unit is activated, it will immediately elapse
-and the configured unit is started. This is not the case for
-timers defined in the other directives.
-
-These are monotonic timers, independent of wall-clock time and timezones. If the computer is
-temporarily suspended, the monotonic clock generally pauses, too. Note that if
-C<WakeSystem> is used, a different monotonic clock is selected that continues to
-advance while the system is suspended and thus can be used as the trigger to resume the
-system.
-
-If the empty string is assigned to any of these options, the list of timers is reset (both
-monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
-will have no effect.
-
-Note that timers do not necessarily expire at the
-precise time configured with these settings, as they are
-subject to the C<AccuracySec> setting
-below.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'OnUnitInactiveSec',
-      {
-        'description' => 'Defines monotonic timers relative to different
-starting points:
-
-Multiple directives may be combined of the same and of different types, in which case the timer
-unit will trigger whenever any of the specified timer expressions elapse. For example, by combining
-C<OnBootSec> and C<OnUnitActiveSec>, it is possible to define a
-timer that elapses in regular intervals and activates a specific service each time. Moreover, both
-monotonic time expressions and C<OnCalendar> calendar expressions may be combined in
-the same timer unit.
-
-The arguments to the directives are time spans
-configured in seconds. Example: "OnBootSec=50" means 50s after
-boot-up. The argument may also include time units. Example:
-"OnBootSec=5h 30min" means 5 hours and 30 minutes after
-boot-up. For details about the syntax of time spans, see
-L<systemd.time(7)>.
-
-If a timer configured with C<OnBootSec>
-or C<OnStartupSec> is already in the past
-when the timer unit is activated, it will immediately elapse
-and the configured unit is started. This is not the case for
-timers defined in the other directives.
-
-These are monotonic timers, independent of wall-clock time and timezones. If the computer is
-temporarily suspended, the monotonic clock generally pauses, too. Note that if
-C<WakeSystem> is used, a different monotonic clock is selected that continues to
-advance while the system is suspended and thus can be used as the trigger to resume the
-system.
-
-If the empty string is assigned to any of these options, the list of timers is reset (both
-monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
-will have no effect.
-
-Note that timers do not necessarily expire at the
-precise time configured with these settings, as they are
-subject to the C<AccuracySec> setting
-below.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'OnCalendar',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Defines realtime (i.e. wallclock) timers with calendar event expressions. See
+      'OnBootSec' => '*OnActiveSec',
+      'OnCalendar' => 'Defines realtime (i.e. wallclock) timers with calendar event expressions. See
 L<systemd.time(7)> for
 more information on the syntax of calendar event expressions. Otherwise, the semantics are similar to
 C<OnActiveSec> and related settings.
@@ -304,45 +178,29 @@ the system was continuously sleeping the timer will only result in a single serv
 C<WakeSystem> (see below) is enabled a calendar time event elapsing while the system
 is suspended will cause the system to wake up (under the condition the system\'s hardware supports
 time-triggered wake-up functionality).',
-        'type' => 'list'
-      },
-      'AccuracySec',
-      {
-        'description' => 'Specify the accuracy the timer shall elapse
-with. Defaults to 1min. The timer is scheduled to elapse
-within a time window starting with the time specified in
-C<OnCalendar>,
-C<OnActiveSec>,
-C<OnBootSec>,
-C<OnStartupSec>,
-C<OnUnitActiveSec> or
-C<OnUnitInactiveSec> and ending the time
-configured with C<AccuracySec> later. Within
-this time window, the expiry time will be placed at a
-host-specific, randomized, but stable position that is
-synchronized between all local timer units. This is done in
-order to optimize power consumption to suppress unnecessary
-CPU wake-ups. To get best accuracy, set this option to
-1us. Note that the timer is still subject to the timer slack
-configured via
-L<systemd-system.conf(5)>\'s
-C<TimerSlackNSec> setting. See
-L<prctl(2)>
-for details. To optimize power consumption, make sure to set
-this value as high as possible and as low as
-necessary.
+      'OnClockChange' => 'These options take boolean arguments. When true, the service unit will be triggered
+when the system clock (C<CLOCK_REALTIME>) jumps relative to the monotonic clock
+(C<CLOCK_MONOTONIC>), or when the local system timezone is modified. These options
+can be used alone or in combination with other timer expressions (see above) within the same timer
+unit. These options default to C<false>.',
+      'OnStartupSec' => '*OnActiveSec',
+      'OnTimezoneChange' => '*OnClockChange',
+      'OnUnitActiveSec' => '*OnActiveSec',
+      'OnUnitInactiveSec' => '*OnActiveSec',
+      'Persistent' => "Takes a boolean argument. If true, the time when the service unit was last triggered
+is stored on disk.  When the timer is activated, the service unit is triggered immediately if it
+would have been triggered at least once during the time when the timer was inactive. Such triggering
+is nonetheless subject to the delay imposed by C<RandomizedDelaySec>.
+This is useful to catch up on missed runs of the service when the system was powered down. Note that
+this setting only has an effect on timers configured with C<OnCalendar>. Defaults to
+C<false>.
 
-Note that this setting is primarily a power saving option that allows coalescing CPU
-wake-ups. It should not be confused with C<RandomizedDelaySec> (see below) which
-adds a random value to the time the timer shall elapse next and whose purpose is the opposite: to
-stretch elapsing of timer events over a longer period to reduce workload spikes. For further details
-and explanations and how both settings play together, see below.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'RandomizedDelaySec',
-      {
-        'description' => 'Delay the timer by a randomly selected, evenly distributed amount of time between 0
+Use systemctl clean --what=state \x{2026} on the timer unit to remove the timestamp
+file maintained by this option from disk. In particular, use this command before uninstalling a timer
+unit. See
+L<systemctl(1)> for
+details.",
+      'RandomizedDelaySec' => 'Delay the timer by a randomly selected, evenly distributed amount of time between 0
 and the specified time value. Defaults to 0, indicating that no randomized delay shall be applied.
 Each timer unit will determine this delay randomly before each iteration, unless modified with
 C<FixedRandomDelay>, see below. The delay is added on top of the next determined
@@ -363,31 +221,7 @@ C<RandomizedDelaySec> to 0, thus encouraging coalescing of timer events. In orde
 optimally stretch timer events over a certain range of time, set
 C<AccuracySec=1us> and C<RandomizedDelaySec> to some higher value.
 ',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'FixedRandomDelay',
-      {
-        'description' => 'Takes a boolean argument. When enabled, the randomized delay specified by
-C<RandomizedDelaySec> is chosen deterministically, and remains stable between all
-firings of the same timer, even if the manager is restarted. The delay is derived from the machine
-ID, the manager\'s user identifier, and the timer unit\'s name. This effectively creates a unique fixed
-offset for each timer, reducing the jitter in firings of an individual timer while still avoiding
-firing at the same time as other similarly configured timers.
-
-This setting has an effect only if C<RandomizedDelaySec> is not 0. Defaults to
-C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'RandomizedOffsetSec',
-      {
-        'description' => 'Offsets the timer by a stable, randomly-selected, and evenly distributed amount of
+      'RandomizedOffsetSec' => 'Offsets the timer by a stable, randomly-selected, and evenly distributed amount of
 time between 0 and the specified time value. Defaults to 0, indicating that no such offset shall be
 applied. The offset is chosen deterministically, and is derived the same way as
 C<FixedRandomDelay>, see above. The offset is added on top of the next determined
@@ -410,54 +244,16 @@ laptop randomly chooses a delay of 4 days. If this laptop is restarted more ofte
 timer will never fire: on each fresh boot, the 4 day delay is restarted and will not be finished by
 the time of the next shutdown. Instead, you should use C<RandomizedOffsetSec>, which
 will maintain the configured weekly cadence of timer events, even across reboots.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'DeferReactivation',
-      {
-        'description' => 'Takes a boolean argument. When enabled, the timer schedules the next elapse based on
-the trigger unit entering inactivity, instead of the last trigger time.
-This is most apparent in the case where the service unit takes longer to run than the timer interval.
-With this setting enabled, the timer will schedule the next elapse based on when the service finishes
-running, and so it will have to wait until the next realtime elapse time to trigger.
-Otherwise, the default behavior is for the timer unit to immediately trigger again once the service
-finishes running. This happens because the timer schedules the next elapse based on the previous trigger
-time, and since the interval is shorter than the service runtime, that elapse will be in the past,
-causing it to immediately trigger once done.
-
-This setting has an effect only if a realtime timer has been specified with
-C<OnCalendar>. Defaults to C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'OnClockChange',
-      {
-        'description' => 'These options take boolean arguments. When true, the service unit will be triggered
-when the system clock (C<CLOCK_REALTIME>) jumps relative to the monotonic clock
-(C<CLOCK_MONOTONIC>), or when the local system timezone is modified. These options
-can be used alone or in combination with other timer expressions (see above) within the same timer
-unit. These options default to C<false>.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'OnTimezoneChange',
-      {
-        'description' => 'These options take boolean arguments. When true, the service unit will be triggered
-when the system clock (C<CLOCK_REALTIME>) jumps relative to the monotonic clock
-(C<CLOCK_MONOTONIC>), or when the local system timezone is modified. These options
-can be used alone or in combination with other timer expressions (see above) within the same timer
-unit. These options default to C<false>.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'Unit',
-      {
-        'description' => 'The unit to activate when this timer elapses.
+      'RemainAfterElapse' => 'Takes a boolean argument. If true, a timer will stay loaded, and its state remains
+queryable even after it elapsed and the associated unit (as configured with C<Unit>,
+see above) deactivated again. If false, an elapsed timer unit that cannot elapse anymore is unloaded
+once its associated unit deactivated again. Turning this off is particularly useful for transient
+timer units. Note that this setting has an effect when repeatedly starting a timer unit: if
+C<RemainAfterElapse> is on, starting the timer a second time has no effect. However,
+if C<RemainAfterElapse> is off and the timer unit was already unloaded, it can be
+started again, and thus the service can be triggered multiple times. Defaults to
+C<true>.',
+      'Unit' => 'The unit to activate when this timer elapses.
 The argument is a unit name, whose suffix is not
 C<.timer>. If not specified, this value
 defaults to a service that has the same name as the timer
@@ -465,35 +261,7 @@ unit, except for the suffix. (See above.) It is recommended
 that the unit name that is activated and the unit name of the
 timer unit are named identically, except for the
 suffix.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'Persistent',
-      {
-        'description' => "Takes a boolean argument. If true, the time when the service unit was last triggered
-is stored on disk.  When the timer is activated, the service unit is triggered immediately if it
-would have been triggered at least once during the time when the timer was inactive. Such triggering
-is nonetheless subject to the delay imposed by C<RandomizedDelaySec>.
-This is useful to catch up on missed runs of the service when the system was powered down. Note that
-this setting only has an effect on timers configured with C<OnCalendar>. Defaults to
-C<false>.
-
-Use systemctl clean --what=state \x{2026} on the timer unit to remove the timestamp
-file maintained by this option from disk. In particular, use this command before uninstalling a timer
-unit. See
-L<systemctl(1)> for
-details.",
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'WakeSystem',
-      {
-        'description' => 'Takes a boolean argument. If true, an elapsing timer will cause the system to resume
+      'WakeSystem' => 'Takes a boolean argument. If true, an elapsing timer will cause the system to resume
 from suspend, should it be suspended and if the system supports this. Note that this option will only
 make sure the system resumes on the appropriate times, it will not take care of suspending it again
 after any work that is to be done is finished. Defaults to
@@ -509,7 +277,39 @@ depending on this option. If false, a monotonic clock is used that is paused dur
 (C<CLOCK_MONOTONIC>), if true a different monotonic clock is used that continues
 advancing during system suspend (C<CLOCK_BOOTTIME>), see
 L<clock_getres(2)> for
-details.',
+details.'
+    },
+    'element' => [
+      'OnActiveSec',
+      {
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'OnBootSec',
+      '*OnActiveSec',
+      'OnStartupSec',
+      '*OnActiveSec',
+      'OnUnitActiveSec',
+      '*OnActiveSec',
+      'OnUnitInactiveSec',
+      '*OnActiveSec',
+      'OnCalendar',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'type' => 'list'
+      },
+      'AccuracySec',
+      {
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'RandomizedDelaySec',
+      '*AccuracySec',
+      'FixedRandomDelay',
+      {
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'boolean',
@@ -518,17 +318,44 @@ details.',
           'yes'
         ]
       },
+      'RandomizedOffsetSec',
+      {
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'DeferReactivation',
+      {
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'OnClockChange',
+      {
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'OnTimezoneChange',
+      '*OnClockChange',
+      'Unit',
+      '*OnClockChange',
+      'Persistent',
+      {
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'WakeSystem',
+      '*Persistent',
       'RemainAfterElapse',
       {
-        'description' => 'Takes a boolean argument. If true, a timer will stay loaded, and its state remains
-queryable even after it elapsed and the associated unit (as configured with C<Unit>,
-see above) deactivated again. If false, an elapsed timer unit that cannot elapse anymore is unloaded
-once its associated unit deactivated again. Turning this off is particularly useful for transient
-timer units. Note that this setting has an effect when repeatedly starting a timer unit: if
-C<RemainAfterElapse> is on, starting the timer a second time has no effect. However,
-if C<RemainAfterElapse> is off and the timer unit was already unloaded, it can be
-started again, and thus the service can be triggered multiple times. Defaults to
-C<true>.',
         'type' => 'leaf',
         'upstream_default' => 'yes',
         'value_type' => 'boolean',
@@ -538,10 +365,9 @@ C<true>.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 260 doc',
+    'generated_by' => 'parse-man.pl from systemd 261 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Timer'
   }
 ]
 ;
-

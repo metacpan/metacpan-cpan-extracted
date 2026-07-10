@@ -1,7 +1,7 @@
 {
    "abstract" : "run shell commands with enhanced support",
    "author" : [
-      "Sullivan Beck (sbeck@cpan.org)"
+      "Sullivan Beck (https://github.com/SBECK-github/)"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -50,7 +50,7 @@
    "provides" : {
       "Shell::Cmd" : {
          "file" : "lib/Shell/Cmd.pm",
-         "version" : "3.05"
+         "version" : "3.06"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "web" : "https://github.com/SBECK-github/Shell-Cmd"
       }
    },
-   "version" : "3.05",
+   "version" : "3.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

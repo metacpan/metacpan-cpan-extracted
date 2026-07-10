@@ -1,23 +1,17 @@
 #!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
-
-BEGIN {
-   $t       = new Test::Inter 'set';
-   $testdir = $t->testdir();
-}
-
-use Locale::VersionedMessages;
-use lib "$testdir/lib";
-
-my $lm = new Locale::VersionedMessages;
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
 sub test {
    my($op,@test) = @_;
 
    if ($op eq 'set') {
-      $lm->set(@test);
-      $err = $lm->err();
+      $::lm->set(@test);
+      my $err = $::lm->err();
       if ($err) {
          $err =~ s/ in \@INC.*$//;
          return $err;
@@ -26,15 +20,15 @@ sub test {
    }
 
    if      ($op eq 'query_set_default') {
-      return $lm->query_set_default(@test);
+      return $::lm->query_set_default(@test);
    } elsif ($op eq 'query_set_locales') {
-      return $lm->query_set_locales(@test);
+      return $::lm->query_set_locales(@test);
    } elsif ($op eq 'query_set_msgid') {
-      return $lm->query_set_msgid(@test);
+      return $::lm->query_set_msgid(@test);
    }
 }
 
-$tests = "
+my $tests = "
 
 set foo     => 'Unable to load set: foo: Can't locate Locale/VersionedMessages/Sets/foo.pm'
 
@@ -53,9 +47,9 @@ query_set_msgid Test1
   Message_3
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

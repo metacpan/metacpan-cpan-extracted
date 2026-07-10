@@ -2,7 +2,7 @@
 # Configuration for Database::Abstraction
 
 # Directory where the database files are stored
-directory: /
+directory: /tmp
 
 # Cache settings
 cache_duration: 3600  # Cache duration in seconds (default is 1 hour)

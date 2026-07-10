@@ -1,5 +1,5 @@
 package Locale::VersionedMessages;
-# Copyright (c) 2010-2014 Sullivan Beck. All rights reserved.
+# Copyright (c) 2010-2015 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION='0.95';
+$VERSION='0.96';
 
 ########################################################################
 # METHODS

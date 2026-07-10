@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Selector - Navigate opened documents and files
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.16";
+$VERSION = "0.24";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -90,7 +90,7 @@ sub Add {
 sub CreateSideBar {
 	my ($self, $panel) = @_;
 	my $sb = $self->extGet('SideBars');
-	my $page = $sb->pageAdd('navigator panel', 'Documents', 'document-open', undef, 'Document list', 250);
+	my $page = $sb->pageAdd('navigator panel', 'Documents', 'document-open', undef, 'Document list', 20);
 	my $dt = $page->DocumentTree(
 		-entryselect => ['SelectDocument', $self],
 		-diriconcall => ['GetDirIcon', $self],

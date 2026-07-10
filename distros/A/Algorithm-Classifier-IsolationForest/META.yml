@@ -22,6 +22,7 @@ no_index:
     - t
     - inc
 recommends:
+  Algorithm::ToNumberMunger: v0.0.1
   Inline: '0'
   Inline::C: '0'
 requires:
@@ -31,6 +32,7 @@ requires:
   File::Slurp: '0'
   File::Spec: '0'
   File::Temp: '0'
+  JSON::MaybeXS: '0'
   JSON::PP: '0'
   List::Util: '0'
   POSIX: '0'
@@ -39,5 +41,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/LilithSec/Algorithm-Classifier-IsolationForest
-version: v0.5.0
+version: v0.6.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -303,18 +303,34 @@ static inline void cf_recover_dead_readers(CfHandle *h) {
      * Only after the CAS resolves do we wipe the deferred dead slots,
      * keeping that work outside the race-sensitive window. */
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < CF_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = 0;   /* no slotless readers here: scanning slots is complete */
+            for (uint32_t i = 0; !live_now && i < CF_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && cf_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < CF_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || cf_pid_alive(pid)) continue;
-            cf_drain_dead_slot(h, i, pid);
+        if (drain_ok) {
+            for (uint32_t i = 0; i < CF_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || cf_pid_alive(p)) continue;
+                cf_drain_dead_slot(h, i, p);
+            }
         }
     }
 }
@@ -387,11 +403,11 @@ static inline void cf_rwlock_rdlock(CfHandle *h) {
          * already active (cur>=1), new readers may join freely. */
         if (cur > 0 && cur < CF_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < CF_RWLOCK_SPIN_LIMIT, 1)) {
@@ -522,7 +538,12 @@ static inline void cf_init_header(void *base, uint64_t num_buckets,
 }
 
 static inline uint16_t *cf_slots(CfHandle *h) {
-    return (uint16_t *)((char *)h->base + h->hdr->slots_off);
+    /* Layer B: locate the slot array via the trusted compile-time layout, NOT
+     * the attacker-writable hdr->slots_off -- a peer that corrupts slots_off in
+     * shared memory must not be able to relocate the base outside the mapping.
+     * Validation at open guarantees hdr->slots_off == cf_layout().slots for a
+     * valid filter, so this is identical for valid data. */
+    return (uint16_t *)((char *)h->base + cf_layout().slots);
 }
 
 static inline CfHandle *cf_setup(void *base, size_t map_size,
@@ -536,7 +557,7 @@ static inline CfHandle *cf_setup(void *base, size_t map_size,
     }
     h->hdr          = hdr;
     h->base         = base;
-    h->reader_slots = (CfReaderSlot *)((uint8_t *)base + hdr->reader_slots_off);
+    h->reader_slots = (CfReaderSlot *)((uint8_t *)base + cf_layout().reader_slots);
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
@@ -580,7 +601,24 @@ static int cf_validate_create_args(uint64_t capacity,
     return 1;
 }
 
-static CfHandle *cf_create(const char *path, uint64_t capacity, char *errbuf) {
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int cf_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { CF_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        CF_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    CF_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
+static CfHandle *cf_create(const char *path, uint64_t capacity, mode_t mode, char *errbuf) {
     uint64_t num_buckets;
     if (!cf_validate_create_args(capacity, &num_buckets, errbuf)) return NULL;
 
@@ -595,8 +633,8 @@ static CfHandle *cf_create(const char *path, uint64_t capacity, char *errbuf) {
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { CF_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { CF_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = cf_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { CF_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { CF_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -659,6 +697,15 @@ static CfHandle *cf_open_fd(int fd, char *errbuf) {
 
 static void cf_destroy(CfHandle *h) {
     if (!h) return;
+    /* Release our reader slot on clean teardown (else short-lived-reader churn
+     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+    if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
+        h->cached_fork_gen == __atomic_load_n(&cf_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        uint32_t expected = h->cached_pid;
+        __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
+                &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
     free(h->path);
@@ -705,8 +752,28 @@ static inline uint64_t cf_alt(CfHandle *h, uint64_t i, uint16_t fp) {
     return (i ^ fh) & mask;
 }
 
-/* pointer to bucket i's CF_SLOTS fingerprint slots */
+/* Buckets that physically fit in the mapping, derived from the trusted
+ * process-local mmap_size and the compile-time layout -- NOT from the
+ * attacker-writable header geometry (num_buckets/bucket_mask/slots_off).
+ * For any filter that passed validation at open this equals hdr->num_buckets
+ * (mmap_size == cf_layout().slots + num_buckets*CF_SLOTS*2), so bounding
+ * against it never changes behavior for valid data. */
+static inline uint64_t cf_phys_buckets(CfHandle *h) {
+    uint64_t base_off = cf_layout().slots;
+    if (h->mmap_size <= base_off) return 0;
+    return (uint64_t)(h->mmap_size - base_off) / ((uint64_t)CF_SLOTS * sizeof(uint16_t));
+}
+
+/* pointer to bucket i's CF_SLOTS fingerprint slots.
+ * Layer B: the bucket index i is derived from hdr->bucket_mask (attacker-
+ * writable), so fold any out-of-range i back into the physically-mapped bucket
+ * range before indexing -- the returned pointer can then never fall outside the
+ * mapping. i & (phys-1) <= phys-1 < phys for any i (AND only clears bits), so
+ * this is in-bounds regardless of the corrupted value; for valid data i < phys
+ * already, so it is a no-op. */
 static inline uint16_t *cf_bucket(CfHandle *h, uint64_t i) {
+    uint64_t phys = cf_phys_buckets(h);
+    if (phys && i >= phys) i &= (phys - 1);
     return cf_slots(h) + i * (uint64_t)CF_SLOTS;
 }
 
@@ -792,6 +859,28 @@ static int cf_contains_locked(CfHandle *h, const void *item, size_t len) {
     return cf_bucket_find(h, i1, fp) >= 0 || cf_bucket_find(h, i2, fp) >= 0;
 }
 
+/* Number of stored fingerprints matching (item,len) across its two candidate
+ * buckets: 0 .. 2*CF_SLOTS. Since add stores a fresh copy each time and a given
+ * fingerprint can only ever live in these two buckets, this is the item's
+ * occurrence count -- how many times it was added minus removed -- capped at the
+ * structural ceiling 2*CF_SLOTS (== 8). Probabilistic like contains(): a distinct
+ * item whose 16-bit fingerprint collides AND maps into a candidate bucket inflates
+ * the result (the remove() caveat). Guards i2 == i1 (a fingerprint can map both
+ * candidates to the same bucket) so those 4 slots are not double-counted. */
+static int cf_count_of_locked(CfHandle *h, const void *item, size_t len) {
+    uint16_t fp;
+    uint64_t i1, i2;
+    cf_hash(h, item, len, &fp, &i1, &i2);
+    int n = 0;
+    uint16_t *b = cf_bucket(h, i1);
+    for (int j = 0; j < CF_SLOTS; j++) if (b[j] == fp) n++;
+    if (i2 != i1) {
+        b = cf_bucket(h, i2);
+        for (int j = 0; j < CF_SLOTS; j++) if (b[j] == fp) n++;
+    }
+    return n;
+}
+
 /* remove ONE matching fingerprint of (item,len): clear the slot, return 1 if
  * found, else 0. Removing an item that was never added (or one whose 16-bit
  * fingerprint collides with a present item) can delete the wrong fingerprint --
@@ -809,7 +898,12 @@ static int cf_remove_locked(CfHandle *h, const void *item, size_t len) {
 
 /* reset all slots to 0, count = 0 (caller holds the write lock) */
 static inline void cf_clear_locked(CfHandle *h) {
-    memset(cf_slots(h), 0, (size_t)(h->hdr->num_buckets * (uint64_t)CF_SLOTS * sizeof(uint16_t)));
+    /* Layer B: bound the memset length by the physically-mapped bucket count so
+     * a corrupted hdr->num_buckets can't drive an out-of-bounds write. For
+     * valid data num_buckets == phys, so the clamp is a no-op. */
+    uint64_t nb = h->hdr->num_buckets, phys = cf_phys_buckets(h);
+    if (nb > phys) nb = phys;
+    memset(cf_slots(h), 0, (size_t)(nb * (uint64_t)CF_SLOTS * sizeof(uint16_t)));
     h->hdr->count = 0;
 }
 

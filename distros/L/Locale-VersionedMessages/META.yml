@@ -1,32 +1,74 @@
 ---
 abstract: 'handle all aspects of the localization process'
 author:
-  - 'Sullivan Beck <sbeck@cpan.org>'
+  - 'Sullivan Beck (https://github.com/SBECK-github/)'
 build_requires:
-  Module::Build: '0.21'
-  Test::Inter: '1.04'
+  ExtUtils::MakeMaker: '0'
+  Test::Inter: '1.09'
   Test::More: '0'
-  lib: '0'
 configure_requires:
-  Module::Build: '0.21'
+  ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Locale-VersionedMessages
+no_index:
+  directory:
+    - t
+    - inc
 provides:
   Locale::VersionedMessages:
     file: lib/Locale/VersionedMessages.pm
-    version: '0.95'
+    version: '0.96'
+  Locale::VersionedMessages::Sets::Empty:
+    file: t/lib/Locale/VersionedMessages/Sets/Empty.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::Empty::en_US:
+    file: t/lib/Locale/VersionedMessages/Sets/Empty/en_US.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::Test1:
+    file: t/lib/Locale/VersionedMessages/Sets/Test1.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::Test1::de_DE:
+    file: t/lib/Locale/VersionedMessages/Sets/Test1/de_DE.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::Test1::en_US:
+    file: t/lib/Locale/VersionedMessages/Sets/Test1/en_US.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::Test1::fr_FR:
+    file: t/lib/Locale/VersionedMessages/Sets/Test1/fr_FR.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::Test2:
+    file: t/lib/Locale/VersionedMessages/Sets/Test2.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::Test2::en_US:
+    file: t/lib/Locale/VersionedMessages/Sets/Test2/en_US.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::Test2::fr_FR:
+    file: t/lib/Locale/VersionedMessages/Sets/Test2/fr_FR.pm
+    version: '0'
   Locale::VersionedMessages::Sets::lm_gui:
     file: lib/Locale/VersionedMessages/Sets/lm_gui.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::lm_gui::en_US:
+    file: lib/Locale/VersionedMessages/Sets/lm_gui/en_US.pm
+    version: '0'
+  Locale::VersionedMessages::Sets::lm_gui::fr_FR:
+    file: lib/Locale/VersionedMessages/Sets/lm_gui/fr_FR.pm
+    version: '0'
+  Locale::VersionedMessages::lm:
+    file: lib/Locale/VersionedMessages/lm.pm
+    version: '0.96'
 requires:
   File::Path: '0'
   IO::File: '0'
   perl: '5.008'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/SBECK-github/Locale-VersionedMessages
-version: '0.95'
+  bugtracker: https://github.com/SBECK-github/Locale-VersionedMessages/issues
+  homepage: https://github.com/SBECK-github/Locale-VersionedMessages
+  repository: git://github.com/SBECK-github/Locale-VersionedMessages.git
+version: '0.96'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

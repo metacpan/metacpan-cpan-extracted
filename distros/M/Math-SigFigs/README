@@ -135,10 +135,42 @@ KNOWN PROBLEMS
         this module, use numbers stored as strings in order to avoid
         unexpected results.
 
+BUGS AND QUESTIONS
+    If you find a bug in Math::SigFigs, please let me know. As CPAN has
+    removed email support, the only supported way to submit a bug is via
+    ticket:
+
+    GitHub
+        You can submit an issue or question on GitHub. This can be done at
+        the following URL:
+
+        <https://github.com/SBECK-github/Math-SigFigs>
+
+        This is the preferred method. Please submit problems requests as
+        GitHub issues if at all possible.
+
+    Please do not use other means to report bugs (such as forums for a
+    specific OS or Linux distribution) as it is impossible for me to keep up
+    with all of them. These are the current methods that are guaranteed to
+    notify me.
+
+    When filing a bug report, please include the following information:
+
+    Math::SigFigs version
+        Please include the version of Math::SigFigs you are using. You can
+        get this by using the script:
+
+           use Math::SigFigs;
+           print $Math::SigFigs::VERSION,"\n";
+
+    If you find any problems with the documentation (errors, typos, or items
+    that are not clear), please send them to me. I welcome any suggestions
+    that will allow me to improve the documentation.
+
 LICENSE
     This script is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
 AUTHOR
-    Sullivan Beck (sbeck@cpan.org)
+    Sullivan Beck (https://github.com/SBECK-github/)
 

@@ -5,7 +5,7 @@ use Carp ();
 use Data::Intern::Shared ();
 use Data::SortedSet::Shared ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # ---- construction ----
 
@@ -13,8 +13,10 @@ sub new {
     my ($class, %opt) = @_;
     my $max = $opt{max};
     Carp::croak("new: 'max' is required") unless defined $max;
-    my $set  = Data::SortedSet::Shared->new($opt{set}, $max);
-    my $keys = Data::Intern::Shared->new($opt{keys}, $opt{max_keys} // $max, $opt{arena} // 0);
+    my $set  = Data::SortedSet::Shared->new($opt{set}, $max, $opt{mode});
+    # pass mode only when given: Data::Intern::Shared 0.01 predates the mode argument
+    my $keys = Data::Intern::Shared->new($opt{keys}, $opt{max_keys} // $max, $opt{arena} // 0,
+        defined $opt{mode} ? $opt{mode} : ());
     return bless { set => $set, keys => $keys }, $class;
 }
 
@@ -185,12 +187,15 @@ stay interned until C<clear> (see L<Data::Intern::Shared/LIMITS>). B<Linux-only>
         keys     => $path_or_undef,   # Intern backing    (undef = anonymous)
         max_keys => $max_members,     # distinct-key capacity (default: max)
         arena    => $bytes,           # key-arena bytes (default: max_keys * 32)
+        mode     => $octal,           # file mode for both backing files (default: 0600)
     );
 
     my $z = Data::SortedSet::Shared::Strings->wrap($set, $intern);
 
 C<new> creates (or reopens) both backing stores; for cross-process file-backed use,
-every process passes the same C<set>/C<keys> paths. C<wrap> wraps two
+every process passes the same C<set>/C<keys> paths. C<mode> sets the file mode for
+both backing files (default 0600, subject to umask); it is used only when a file is
+created and ignored when attaching an existing one. C<wrap> wraps two
 already-constructed objects (e.g. memfd-backed ones shared by fd). C<set> and
 C<key_table> return the underlying L<Data::SortedSet::Shared> and
 L<Data::Intern::Shared> objects.

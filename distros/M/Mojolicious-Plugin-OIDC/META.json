@@ -39,7 +39,7 @@
             "Carp" : "0",
             "Clone" : "0",
             "Mojolicious" : "8.24",
-            "OIDC::Client" : "1.07",
+            "OIDC::Client" : "1.08",
             "Scalar::Util" : "0",
             "Try::Tiny" : "0",
             "perl" : "v5.20.0"
@@ -58,7 +58,7 @@
    "provides" : {
       "Mojolicious::Plugin::OIDC" : {
          "file" : "lib/Mojolicious/Plugin/OIDC.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/sebmourlhou/mojolicious-plugin-oidc"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_generated_by_perl" : "v5.28.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "Artistic-2.0"

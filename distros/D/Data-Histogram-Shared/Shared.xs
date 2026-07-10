@@ -22,7 +22,7 @@ MODULE = Data::Histogram::Shared  PACKAGE = Data::Histogram::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path = &PL_sv_undef, lowest = 1, highest = 3600000000LL, sig_figs = 3)
+new(class, path = &PL_sv_undef, lowest = 1, highest = 3600000000LL, sig_figs = 3, ...)
     const char *class
     SV *path
     IV lowest
@@ -31,9 +31,12 @@ new(class, path = &PL_sv_undef, lowest = 1, highest = 3600000000LL, sig_figs = 3
   PREINIT:
     char errbuf[HIST_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    /* Optional trailing mode arg (ST(5)) sets the create permissions; default
+     * 0600 (owner-only). Pass e.g. 0660 to opt in to group sharing. */
+    mode_t mode = (items > 5 && (SvGETMAGIC(ST(5)), SvOK(ST(5)))) ? (mode_t)SvUV(ST(5)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     HistHandle *h = hist_create(p, (int64_t)lowest, (int64_t)highest,
-                                (int32_t)sig_figs, errbuf);   /* validates args into errbuf */
+                                (int32_t)sig_figs, mode, errbuf);   /* validates args into errbuf */
     if (!h) croak("Data::Histogram::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -49,7 +52,7 @@ new_memfd(class, name = &PL_sv_undef, lowest = 1, highest = 3600000000LL, sig_fi
   PREINIT:
     char errbuf[HIST_ERR_BUFLEN];
   CODE:
-    const char *nm = SvOK(name) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     HistHandle *h = hist_create_memfd(nm, (int64_t)lowest, (int64_t)highest,
                                       (int32_t)sig_figs, errbuf);   /* validates args into errbuf */
     if (!h) croak("Data::Histogram::Shared->new_memfd: %s", errbuf);
@@ -92,6 +95,10 @@ record(self, value, count = 1)
     /* Range-check + index-compute BEFORE locking so a croak holds no lock. */
     if (value < 0)
         croak("Data::Histogram::Shared->record: negative value (%lld)", (long long)value);
+    /* count is a UV: a negative arg wraps to a huge unsigned and would silently
+     * inflate the bucket.  Reject it via a signed check on the raw SV. */
+    if (items > 2 && SvNV(ST(2)) < 0)
+        croak("Data::Histogram::Shared->record: negative count (%lld)", (long long)SvIV(ST(2)));
     idx = hist_index_for(h, (int64_t)value);
     if (idx < 0)
         croak("Data::Histogram::Shared->record: value %lld exceeds highest_trackable_value (%lld)",
@@ -174,7 +181,7 @@ count_at_value(self, value)
         croak("Data::Histogram::Shared->count_at_value: value %lld exceeds highest_trackable_value (%lld)",
               (long long)value, (long long)h->hdr->highest);
     hist_rwlock_rdlock(h);
-    c = (IV)hist_counts(h)[idx];
+    c = (idx < hist_counts_capacity(h)) ? (IV)hist_counts(h)[idx] : 0;  /* Layer B: reject OOB idx (untrusted geometry) */
     hist_rwlock_rdunlock(h);
     RETVAL = c;
   OUTPUT:
@@ -268,12 +275,19 @@ merge(self, other)
      * acquisition order between two processes merging each other). */
     {
         int64_t counts_len = h->hdr->counts_len;
+        /* Layer B: never read from o's mapping nor write to h's past what each
+         * actually maps (file-stored counts_off/counts_len are untrusted). For a
+         * valid pair this is a no-op: counts_len == both capacities. */
+        int64_t h_cap = hist_counts_capacity(h), o_cap = hist_counts_capacity(o);
+        if (counts_len < 0) counts_len = 0;
+        if (counts_len > h_cap) counts_len = h_cap;
+        if (counts_len > o_cap) counts_len = o_cap;
         int64_t other_total, other_min, other_max;
         int64_t *tmp;
-        Newx(tmp, (size_t)counts_len, int64_t);
+        Newx(tmp, (size_t)(counts_len ? counts_len : 1), int64_t);
         SAVEFREEPV(tmp);                 /* freed on normal return OR croak unwind */
         hist_rwlock_rdlock(o);
-        memcpy(tmp, hist_counts(o), (size_t)counts_len * sizeof(int64_t));
+        if (counts_len > 0) memcpy(tmp, hist_counts(o), (size_t)counts_len * sizeof(int64_t));
         other_total = o->hdr->total_count;
         other_min   = o->hdr->min_value;
         other_max   = o->hdr->max_value;
@@ -422,6 +436,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::Histogram::Shared")) {
         HistHandle *h = INT2PTR(HistHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

@@ -61,16 +61,17 @@ MODULE = Data::SortedSet::Shared  PACKAGE = Data::SortedSet::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, max_entries)
+new(class, path, max_entries, ...)
     const char *class
     SV *path
     UV max_entries
   PREINIT:
     char errbuf[SS_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     if (max_entries > UINT32_MAX) croak("Data::SortedSet::Shared->new: max_entries exceeds 2^32");
-    SsHandle *h = ss_create(p, (uint32_t)max_entries, errbuf);
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    SsHandle *h = ss_create(p, (uint32_t)max_entries, mode, errbuf);
     if (!h) croak("Data::SortedSet::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -312,7 +313,7 @@ at_rank(self, rank)
         IV r = rank; if (r < 0) r += (IV)cnt;
         if (r >= 0 && (uint64_t)r < cnt) {          /* compare in 64-bit; large r must not truncate to an in-range index */
             int pos; uint32_t leaf = ss_at_rank(h, (uint32_t)r, &pos);
-            RETVAL = newSViv((IV)h->nodes[leaf].members[pos]);
+            RETVAL = (leaf != SS_NONE) ? newSViv((IV)h->nodes[leaf].members[pos]) : &PL_sv_undef;
         } else RETVAL = &PL_sv_undef;
     }
     ss_rwlock_rdunlock(h);
@@ -417,7 +418,7 @@ peek_min(self)
     EXTRACT(self);
   PPCODE:
     ss_rwlock_rdlock(h);
-    if (h->hdr->root != SS_NONE) {
+    if (h->hdr->root != SS_NONE && ss_node_ok(h, h->hdr->leftmost)) {
         SsNode *nd = &h->nodes[h->hdr->leftmost];
         IV m = (IV)nd->members[0]; NV s = nd->scores[0];
         ss_rwlock_rdunlock(h);
@@ -433,7 +434,7 @@ peek_max(self)
     EXTRACT(self);
   PPCODE:
     ss_rwlock_rdlock(h);
-    if (h->hdr->root != SS_NONE) {
+    if (h->hdr->root != SS_NONE && ss_node_ok(h, h->hdr->rightmost)) {
         SsNode *nd = &h->nodes[h->hdr->rightmost];
         IV m = (IV)nd->members[nd->num - 1]; NV s = nd->scores[nd->num - 1];
         ss_rwlock_rdunlock(h);
@@ -505,7 +506,7 @@ unlink(self, ...)
         if (sv_isobject(self) && sv_derived_from(self, "Data::SortedSet::Shared")) {
             SsHandle *h = INT2PTR(SsHandle*, SvIV(SvRV(self)));
             if (h) p = h->path;
-        } else if (items >= 2 && SvOK(ST(1))) {
+        } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
             p = SvPV_nolen(ST(1));
         }
         if (p && unlink(p) != 0 && errno != ENOENT) croak("unlink: %s", strerror(errno));
@@ -600,7 +601,10 @@ stats(self)
         ss_rwlock_rdlock(h);
         SsHeader *hd = h->hdr;
         uint32_t nfree = 0, f = hd->node_free_head;
-        while (f != SS_NONE) { nfree++; f = h->nodes[f].parent; }
+        /* node_free_head / parent free-links are file-stored: bound the index and
+           cap iterations so a crafted out-of-range or cyclic free-list can't OOB
+           or spin (never taken for a valid free-list of length <= node_capacity) */
+        while (f != SS_NONE && ss_node_ok(h, f) && nfree <= hd->node_capacity) { nfree++; f = h->nodes[f].parent; }
         uint32_t iload = hd->count;   /* backward-shift delete leaves no tombstones: occupied slots == count */
         hv_stores(hv, "count",         newSVuv(hd->count));
         hv_stores(hv, "max_entries",   newSVuv(hd->max_entries));

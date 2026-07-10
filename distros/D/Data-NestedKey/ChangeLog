@@ -1,3 +1,22 @@
+Thu Jul  9 09:18:49 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.1]:
+	* release-notes.md: updated
+	* release-notes/release-notes-1.2.1.md: new
+	* README.md: generated
+	* VERSION: bump
+	* lib/Data/NestedKey.pm.in
+	- pod updates, utf8
+	(as_string): support YML or YAML
+	* lib/Data/NestedKey/CLI.pm.in
+	(init)
+	- allow default command to be 'get'
+	(main): set validate_command to false to allow above
+	* buildspec.yml
+	(man-links): dnk
+	* requires: +CLI::Simple 2.0.12
+	* cpanfile: likewise
+
 Tue Jul  7 07:18:55 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.2.0]:

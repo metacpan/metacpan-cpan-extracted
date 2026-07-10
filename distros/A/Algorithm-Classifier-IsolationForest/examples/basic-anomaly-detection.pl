@@ -24,70 +24,67 @@ use constant PI => 3.14159265358979;
 srand(7);
 
 sub gaussian {
-    my ( $mu, $sigma ) = @_;
-    my $u1 = rand() || 1e-12;
-    my $u2 = rand();
-    return $mu + $sigma * sqrt( -2 * log($u1) ) * cos( 2 * PI * $u2 );
+	my ( $mu, $sigma ) = @_;
+	my $u1 = rand() || 1e-12;
+	my $u2 = rand();
+	return $mu + $sigma * sqrt( -2 * log($u1) ) * cos( 2 * PI * $u2 );
 }
 
 # --- build a labelled dataset -------------------------------------------------
 my ( @data, @truth );
 
-for ( 1 .. 500 ) {                 # normal points: a unit Gaussian blob
-    push @data,  [ gaussian( 0, 1 ), gaussian( 0, 1 ) ];
-    push @truth, 0;
+for ( 1 .. 500 ) {    # normal points: a unit Gaussian blob
+	push @data,  [ gaussian( 0, 1 ), gaussian( 0, 1 ) ];
+	push @truth, 0;
 }
-for ( 1 .. 20 ) {                  # anomalies: a ring at radius 5..8
-    my $angle  = rand() * 2 * PI;
-    my $radius = 5 + rand() * 3;
-    push @data,  [ $radius * cos($angle), $radius * sin($angle) ];
-    push @truth, 1;
+for ( 1 .. 20 ) {    # anomalies: a ring at radius 5..8
+	my $angle  = rand() * 2 * PI;
+	my $radius = 5 + rand() * 3;
+	push @data,  [ $radius * cos($angle), $radius * sin($angle) ];
+	push @truth, 1;
 }
 
 # --- train --------------------------------------------------------------------
 my $iforest = Algorithm::Classifier::IsolationForest->new(
-    n_trees     => 100,
-    sample_size => 256,
-    seed        => 42,
+	n_trees     => 100,
+	sample_size => 256,
+	seed        => 42,
 );
 $iforest->fit( \@data );
 
 # --- score and label ----------------------------------------------------------
 my $scores = $iforest->score_samples( \@data );    # each in (0, 1]
-my $labels = $iforest->predict( \@data, 0.6 );      # 1 = anomaly, 0 = normal
+my $labels = $iforest->predict( \@data, 0.6 );     # 1 = anomaly, 0 = normal
 
 # --- how did we do? -----------------------------------------------------------
 my ( $tp, $fp, $fn, $tn ) = ( 0, 0, 0, 0 );
 for my $i ( 0 .. $#data ) {
-    my ( $p, $t ) = ( $labels->[$i], $truth[$i] );
-    if    ( $t && $p )   { $tp++ }
-    elsif ( $t && !$p )  { $fn++ }
-    elsif ( !$t && $p )  { $fp++ }
-    else                 { $tn++ }
+	my ( $p, $t ) = ( $labels->[$i], $truth[$i] );
+	if    ( $t && $p )  { $tp++ }
+	elsif ( $t && !$p ) { $fn++ }
+	elsif ( !$t && $p ) { $fp++ }
+	else                { $tn++ }
 }
 my $precision = $tp + $fp ? $tp / ( $tp + $fp ) : 0;
 my $recall    = $tp + $fn ? $tp / ( $tp + $fn ) : 0;
 
-my $n_anom   = grep {$_} @truth;
+my $n_anom   = grep { $_ } @truth;
 my $n_normal = @truth - $n_anom;
 
-printf "Trained on %d points (%d normal, %d anomalies)\n",
-    scalar @data, $n_normal, $n_anom;
+printf "Trained on %d points (%d normal, %d anomalies)\n", scalar @data, $n_normal, $n_anom;
 print "Threshold: 0.60\n\n";
-printf "  true anomalies caught (recall):    %d/%d  (%.0f%%)\n",
-    $tp, $tp + $fn, 100 * $recall;
-printf "  flagged points that were real (prec): %.0f%%\n", 100 * $precision;
-printf "  false alarms: %d   missed: %d\n\n", $fp, $fn;
+printf "  true anomalies caught (recall):    %d/%d  (%.0f%%)\n", $tp, $tp + $fn, 100 * $recall;
+printf "  flagged points that were real (prec): %.0f%%\n",       100 * $precision;
+printf "  false alarms: %d   missed: %d\n\n",                    $fp, $fn;
 
 # --- the 10 most anomalous points ---------------------------------------------
-my @ranked =
-    sort { $scores->[$b] <=> $scores->[$a] } 0 .. $#data;
+my @ranked = sort { $scores->[$b] <=> $scores->[$a] } 0 .. $#data;
 
 print "Top 10 most anomalous points:\n";
 printf "  %-8s %-8s  %-6s  %-7s  %s\n", 'x', 'y', 'score', 'flagged', 'truth';
 for my $i ( @ranked[ 0 .. 9 ] ) {
-    printf "  %-8.3f %-8.3f  %-6.3f  %-7s  %s\n",
-        $data[$i][0], $data[$i][1], $scores->[$i],
-        ( $labels->[$i] ? 'YES' : 'no' ),
-        ( $truth[$i]    ? 'anomaly' : 'normal' );
+	printf "  %-8.3f %-8.3f  %-6.3f  %-7s  %s\n",
+		$data[$i][0], $data[$i][1], $scores->[$i],
+		( $labels->[$i] ? 'YES'     : 'no' ),
+		( $truth[$i]    ? 'anomaly' : 'normal' );
 }

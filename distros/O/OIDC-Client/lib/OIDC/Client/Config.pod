@@ -73,6 +73,36 @@ If true, detects the proxy server based on environment variables.
 
 Changes the user agent name.
 
+=head2 provider."provider".use_pkce
+
+Boolean indicating whether to use PKCE (Proof Key for Code Exchange, RFC 7636)
+for the authorization code flow.
+
+Default: 1 (enabled)
+
+=head2 provider."provider".pkce_code_challenge_method
+
+The method used to derive the PKCE code challenge from the code verifier,
+as defined in RFC 7636.
+
+Accepted values:
+
+=over
+
+=item S256
+
+SHA-256 hash of the code verifier (recommended, default)
+
+=item plain
+
+The code verifier is used as-is (not recommended)
+
+=back
+
+Only relevant when C<use_pkce> is enabled.
+
+Default: S256
+
 =head2 provider."provider".id
 
 OIDC client ID supplied by your provider. Mandatory

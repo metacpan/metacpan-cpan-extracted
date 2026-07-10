@@ -1,6 +1,6 @@
 package Perl::Dist::APPerl;
-# Copyright (c) 2024 Gavin Hayes, see LICENSE in the root of the project
-use version 0.77; our $VERSION = qv(v0.6.1);
+# Copyright (c) 2026 Gavin Hayes, see LICENSE in the root of the project
+use version 0.77; our $VERSION = qv(v0.7.0);
 use strict;
 use warnings;
 use JSON::PP 2.0104 qw(decode_json);
@@ -700,8 +700,8 @@ my %defconfig = (
         },
         'full-vista' => { desc => 'moving target: full for vista', base => 'v5.36.0-full-v0.1.0-vista', perl_id => '239a05bbef291b8de3309c95852d41fc027cacab', cosmo_id => 'fea68b142e59b5861fe09375eb5bcb256b69b70e', '+perl_extra_flags' => ['-Dprivlib=/zip/lib/perl5', '-Darchlib=/zip/lib/perl5/x86_64-cosmo', '-Dsitelib=/zip/lib/perl5/site_perl', '-Dsitearch=/zip/lib/perl5/site_perl/x86_64-cosmo']},
         'small-vista' => { desc => 'moving target: small for vista', base => 'v5.36.0-small-v0.1.0-vista', perl_id => '239a05bbef291b8de3309c95852d41fc027cacab', cosmo_id => 'fea68b142e59b5861fe09375eb5bcb256b69b70e', '+perl_extra_flags' => ['-Dprivlib=/zip/lib/perl5', '-Darchlib=/zip/lib/perl5/x86_64-cosmo', '-Dsitelib=/zip/lib/perl5/site_perl', '-Dsitearch=/zip/lib/perl5/site_perl/x86_64-cosmo']},
-        'full' => {
-            desc => 'moving target: full',
+        'full-536' => {
+            desc => 'moving target: full-536',
             perl_flags => ['-Dprefix=/zip', '-Uversiononly', '-Dmyhostname=cosmo', '-Dmydomain=invalid'],
             perl_extra_flags => ['-Doptimize=-Os', '-de', '-Dprivlib=/zip/lib/perl5', '-Darchlib=/zip/lib/perl5/x86_64-cosmo', '-Dsitelib=/zip/lib/perl5/site_perl', '-Dsitearch=/zip/lib/perl5/site_perl/x86_64-cosmo'],
             MANIFEST => ['lib', 'bin'],
@@ -709,19 +709,52 @@ my %defconfig = (
             perl_repo_files => {},
             zip_extra_files => {},
             cosmo3 => 1,
-            dest => 'perl.com',
+            dest => 'perl-536.com',
             perl_url => 'https://github.com/Perl/perl5/archive/refs/tags/v5.36.3.tar.gz',
             patches => ['__sharedir__/5.36-cosmo3.patch', '__sharedir__/5.36-cosmo-apperl.patch'],
             install_modules => [],
         },
-        'small' => {
-            desc => 'moving target: small',
-            base => 'full',
+        'small-536' => {
+            desc => 'moving target: small-536',
+            base => 'full-536',
             perl_onlyextensions => [qw(Cwd ErrnoRuntime Fcntl File/Glob Hash/Util IO List/Util POSIX Socket attributes re)],
             MANIFEST => \@smallmanifest,
             'include_Perl-Dist-APPerl' => 0,
-            dest => 'perl-small.com',
+            dest => 'perl-536-small.com',
             install_modules => [],
+        },
+        'full-540' => {
+            desc => 'moving target: full-540',
+            perl_flags => ['-Dprefix=/zip', '-Uversiononly', '-Dmyhostname=cosmo', '-Dmydomain=invalid'],
+            perl_extra_flags => ['-Doptimize=-Os', '-de', '-Dprivlib=/zip/lib/perl5', '-Darchlib=/zip/lib/perl5/x86_64-cosmo', '-Dsitelib=/zip/lib/perl5/site_perl', '-Dsitearch=/zip/lib/perl5/site_perl/x86_64-cosmo'],
+            MANIFEST => ['lib', 'bin'],
+            'include_Perl-Dist-APPerl' => 1,
+            perl_repo_files => {},
+            zip_extra_files => {},
+            cosmo3 => 1,
+            dest => 'perl-540.com',
+            perl_url => 'https://github.com/Perl/perl5/archive/refs/tags/v5.40.4.tar.gz',
+            patches => ['__sharedir__/5.40-cosmo3.patch', '__sharedir__/5.36-cosmo-apperl.patch'],
+            install_modules => [],
+        },
+        'small-540' => {
+            desc => 'moving target: small-540',
+            base => 'full-540',
+            perl_onlyextensions => [qw(Cwd ErrnoRuntime Fcntl File/Glob Hash/Util IO List/Util POSIX Socket attributes re)],
+            MANIFEST => \@smallmanifest,
+            'include_Perl-Dist-APPerl' => 0,
+            dest => 'perl-540-small.com',
+            install_modules => [],
+        },
+        'full' => {
+            desc => 'moving target: full',
+            base => 'full-540',
+            dest => 'perl.com',
+        },
+        'small' => {
+            desc => 'moving target: small',
+            base => 'small-540',
+            dest => 'perl-small.com',
         },
         'nobuild' => {
             desc => 'base nobuild config',
@@ -731,18 +764,46 @@ my %defconfig = (
             nobuild_perl_bin => ['src/perl.com', $^X],
         },
         # development configs
-        perl_cosmo_dev => {
+        perl_cosmo_dev_536 => {
             desc => "For developing cosmo platform perl without apperl additions",
             base => 'full',
             perl_id => 'v5.36.3',
             perl_url => undef,
             patches => ['__sharedir__/5.36-cosmo3.patch'],
         },
+        # static builds on 5.38 are broken https://github.com/Perl/perl5/issues/21319
+        perl_cosmo_dev_538 => {
+            desc => "For developing cosmo platform perl without apperl additions",
+            base => 'full',
+            perl_id => 'v5.38.5',
+            perl_url => undef,
+            patches => ['__sharedir__/5.38-cosmo3.patch'],
+        },
+        perl_cosmo_dev_540 => {
+            desc => "For developing cosmo platform perl without apperl additions",
+            base => 'full',
+            perl_id => 'v5.40.4',
+            perl_url => undef,
+            patches => ['__sharedir__/5.40-cosmo3.patch'],
+        },
+        perl_cosmo_dev => {
+            desc => "For developing cosmo platform perl without apperl additions",
+            base => 'perl_cosmo_dev_540',
+        },
+        perl_apperl_dev_536 => {
+            desc => "For developing apperl",
+            base => 'perl_cosmo_dev',
+            '+patches' => ['__sharedir__/5.36-cosmo-apperl.patch'],
+        },
+        perl_apperl_dev_540 => {
+            desc => "For developing apperl",
+            base => 'perl_cosmo_dev_540',
+            '+patches' => ['__sharedir__/5.36-cosmo-apperl.patch'],
+        },
         perl_apperl_dev => {
             desc => "For developing apperl",
-            base => 'perl_cosmo3_dev',
-            '+patches' => ['__sharedir__/5.36-cosmo-apperl.patch'],
-        }
+            base => 'perl_apperl_dev_540',
+        },
     }
 );
 $defconfig{defaultconfig} = 'full';
@@ -894,16 +955,16 @@ sub Status {
         @projectitems = sort (keys %{$projectconfig->{apperl_configs}});
         _remove_arr_items_from_arr(\@configlist, \@projectitems);
     }
-    my @rolling = grep(/^(full|small|nobuild)$/, @configlist);
+    my @rolling = grep(/^(full|small|nobuild|full-540|small-540)$/, @configlist);
     {
-        my %preferences = ( full => 0, small => 1, nobuild => 2);
+        my %preferences = ( full => 0, small => 1, 'full-540' => 2, 'small-540' => 3, nobuild => 4);
         @rolling = sort {$preferences{$a} <=> $preferences{$b}} @rolling;
     }
     _remove_arr_items_from_arr(\@configlist, \@rolling);
-    my @deprecated = grep(/(\-vista|v0\.1\.0)$/, @configlist);
-    _remove_arr_items_from_arr(\@configlist, \@deprecated);
-    my @internal = grep(/^(dontuse_threads|perl_cosmo_dev|perl_apperl_dev|dbg)$/, @configlist);
+    my @internal = grep(/^(perl_cosmo_dev|perl_apperl_dev|dbg)/, @configlist);
     _remove_arr_items_from_arr(\@configlist, \@internal);
+    my @deprecated = grep(/(\-vista|v0\.1\.0|536)$/, @configlist);
+    _remove_arr_items_from_arr(\@configlist, \@deprecated);
     my @stable = grep( /v\d+\.\d+\.\d+$/, @configlist);
     _remove_arr_items_from_arr(\@configlist, \@stable);
     my @categories = (
@@ -987,12 +1048,13 @@ sub Checkout {
             my $tomove = "perl5-$version";
             print "mv $tomove $perl_build_dir\n";
             move($tomove, $perl_build_dir) or die "Failed to move perl src";
+            print "cd $perl_build_dir\n";
             chdir($perl_build_dir) or die "Failed to enter perl build_dir";
         }
         foreach my $patch (@{$itemconfig->{patches}}) {
             my $realpatch = _fix_bases($patch, {__sharedir__ => SHARE_DIR});
             # can't `git apply` to ignored files within a git repository :(
-            _cmdinputfile_or_die('patch', '-p1', $realpatch);
+            _cmdinputfile_or_die('patch', '-p1', '--merge', $realpatch);
         }
         print "cd ".START_WD."\n";
         chdir(START_WD) or die "Failed to restore cwd";
@@ -1224,6 +1286,19 @@ sub Build {
         local $ENV{PERL_MM_OPT} = $mmopt;
         local $ENV{PERL5LIB} = $perllib;
         local $ENV{PERL_LOCAL_LIB_ROOT} = '';
+        # Some distributions such as CPanel-JSON-XS depend on the core perl
+        # scripts (such as pod2text). Add apperl's versions of them to PATH so
+        # they get picked up instead of the system's versions.
+        my $perlbindir = "$TEMPDIR/perlbin";
+        print "mkdir -p $perlbindir\n";
+        make_path($perlbindir);
+        opendir(my $dh, $perlbin) or die "failed to open perlbin";
+        while (my $file = readdir($dh)) {
+            next if ($file eq '.' || $file eq '..');
+            print "ln -s $APPPATH $perlbindir/$file\n";
+            symlink($APPPATH, "$perlbindir/$file") or die "failed to setup perlbins";
+        }
+        local $ENV{PATH} = "$perlbindir:".$ENV{PATH};
         foreach my $module (@{$itemconfig->{install_modules}}) {
             my $modulepath = "$startdir/$module";
             if(-d $modulepath) {
@@ -1379,7 +1454,7 @@ END_USAGE
     elsif($command =~ /^(\-)*(version|v)$/i) {
         my $message = <<"END_USAGE";
 apperlm $VERSION
-Copyright (C) 2022 Gavin Arthur Hayes
+Copyright (C) 2026 Gavin Arthur Hayes
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 END_USAGE
@@ -1458,6 +1533,7 @@ END_USAGE
     elsif($command eq 'get-config-key') {
         scalar(@_) == 2 or die('bad args');
         my $itemconfig = _load_apperl_config(_load_apperl_configs()->{apperl_configs}, $_[0]);
+        exists $itemconfig->{$_[1]} or die "'".$_[1]."'".' does not exist in config '."'".$_[0]."'";
         print $itemconfig->{$_[1]};
     }
     else {
@@ -2145,7 +2221,7 @@ Gavin Hayes, C<< <gahayes at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2024 by Gavin Hayes.
+This software is copyright (c) 2026 by Gavin Hayes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

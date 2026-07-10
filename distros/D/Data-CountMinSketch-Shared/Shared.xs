@@ -22,7 +22,7 @@ MODULE = Data::CountMinSketch::Shared  PACKAGE = Data::CountMinSketch::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path = &PL_sv_undef, epsilon = 0.001, delta = 0.001)
+new(class, path = &PL_sv_undef, epsilon = 0.001, delta = 0.001, ...)
     const char *class
     SV *path
     double epsilon
@@ -30,8 +30,11 @@ new(class, path = &PL_sv_undef, epsilon = 0.001, delta = 0.001)
   PREINIT:
     char errbuf[CMS_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    CmsHandle *h = cms_create(p, epsilon, delta, errbuf);   /* validates epsilon/delta into errbuf */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 4th arg: file mode for a newly-created backing file (default 0600,
+     * owner-only). Pass a wider mode (e.g. 0660) to opt in to cross-user sharing. */
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    CmsHandle *h = cms_create(p, epsilon, delta, mode, errbuf);   /* validates epsilon/delta into errbuf */
     if (!h) croak("Data::CountMinSketch::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -46,7 +49,7 @@ new_memfd(class, name = &PL_sv_undef, epsilon = 0.001, delta = 0.001)
   PREINIT:
     char errbuf[CMS_ERR_BUFLEN];
   CODE:
-    const char *nm = SvOK(name) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     CmsHandle *h = cms_create_memfd(nm, epsilon, delta, errbuf);   /* validates epsilon/delta into errbuf */
     if (!h) croak("Data::CountMinSketch::Shared->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -174,17 +177,29 @@ merge(self, other)
      * avoids holding two locks at once (deadlock-free regardless of acquisition
      * order between two processes merging each other). */
     uint64_t cells = (uint64_t)od * ow;
+    /* od/ow/counters_off are read from the peer's shared segment and can be
+     * poisoned by a local writer after we validated its header; bound the
+     * copy/merge length to what BOTH mappings actually back (process-local
+     * mmap_size, trusted) so a poisoned geometry can neither over-read `other`
+     * nor over-write self. Snapshot each counters_off once and use it for both
+     * the pointer and the bound. Equal to od*ow for valid data. */
+    uint64_t ooff = o->hdr->counters_off;
+    uint64_t hoff = h->hdr->counters_off;
+    uint64_t avail_o = (ooff <= o->mmap_size) ? (o->mmap_size - ooff) / sizeof(uint64_t) : 0;
+    uint64_t avail_h = (hoff <= h->mmap_size) ? (h->mmap_size - hoff) / sizeof(uint64_t) : 0;
+    if (cells > avail_o) cells = avail_o;
+    if (cells > avail_h) cells = avail_h;
     uint64_t other_total;
     uint64_t *tmp;
     Newx(tmp, (size_t)cells, uint64_t);
     SAVEFREEPV(tmp);                 /* freed on normal return OR croak unwind */
     cms_rwlock_rdlock(o);
-    memcpy(tmp, cms_counters(o), (size_t)cells * sizeof(uint64_t));
+    memcpy(tmp, (char *)o->base + ooff, (size_t)cells * sizeof(uint64_t));
     other_total = o->hdr->total;
     cms_rwlock_rdunlock(o);
 
     cms_rwlock_wrlock(h);
-    cms_merge_counters(cms_counters(h), tmp, cells);
+    cms_merge_counters((uint64_t *)((char *)h->base + hoff), tmp, cells);
     if (h->hdr->total > UINT64_MAX - other_total) h->hdr->total = UINT64_MAX;
     else h->hdr->total += other_total;
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -313,6 +328,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::CountMinSketch::Shared")) {
         CmsHandle *h = INT2PTR(CmsHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

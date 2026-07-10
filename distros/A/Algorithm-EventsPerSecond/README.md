@@ -31,6 +31,39 @@ print "events seen in window: ", $meter->count, "\n";
 print "lifetime total:        ", $meter->total, "\n";
 ```
 
+## The iqbi-damiq daemon
+
+The dist ships `iqbi-damiq`, a unix-socket daemon built on
+`Algorithm::EventsPerSecond::Sukkal`. Clients mark events against keys of
+their choosing and query per-key rates over a simple line protocol; each key
+gets its own meter, idle keys are evicted automatically, and marks are
+coalesced so the hot path is socket I/O, not the meters.
+
+```sh
+iqbi-damiq -s /var/run/iqbi-damiq.sock -w 60
+
+printf 'MARK requests 5\nRATE requests\nQUIT\n' \
+    | socat - UNIX:/var/run/iqbi-damiq.sock
+
+# or MARKRATE to mark and read the rate back in a single command
+printf 'MARKRATE requests 5\nQUIT\n' \
+    | socat - UNIX:/var/run/iqbi-damiq.sock
+```
+
+Memory is bounded by `max_keys` and the window: each key owns one meter of
+two ring buffers with a slot per window second, so worst case is
+`max_keys * bytes_per_key`, where per key is roughly `16 * window + 800`
+bytes on the XS backend and `48 * window + 2000` bytes pure-Perl —
+about 170 MB (XS) or 490 MB (PP) at the defaults of a 60 second window
+and 100000 keys. Idle keys are evicted, so the worst case needs that
+many distinct keys live at once.
+
+See `perldoc Algorithm::EventsPerSecond::Sukkal` for the protocol and
+memory-sizing details, and `iqbi-damiq --help` for options. Example
+startup scripts ship in `rc/`: a FreeBSD rc.d script
+(`rc/freebsd/iqbi_damiq`) and a systemd unit
+(`rc/systemd/iqbi-damiq.service`).
+
 ## Installation
 
 The module builds with the standard Perl toolchain. The XS backend is optional:
@@ -77,18 +110,8 @@ make && make test && make install
 Install a compiler and the Perl build tools, then build as above:
 
 ```sh
-sudo apt-get update
 sudo apt-get install build-essential perl cpanminus
 cpanm Algorithm::EventsPerSecond
-```
-
-To build and install a native `.deb` instead (so the module is tracked by
-`dpkg`), use `dh-make-perl`:
-
-```sh
-sudo apt-get install dh-make-perl fakeroot
-dh-make-perl make --build --version 0.0.1 ./Algorithm-EventsPerSecond
-sudo dpkg -i libalgorithm-eventspersecond-perl_0.0.1-1_*.deb
 ```
 
 ### FreeBSD
@@ -96,17 +119,8 @@ sudo dpkg -i libalgorithm-eventspersecond-perl_0.0.1-1_*.deb
 Install Perl and a CPAN client from packages, then build from source:
 
 ```sh
-pkg install perl5 p5-App-cpanminus
-cpanm Algorithm-EventsPerSecond-0.0.1.tar.gz
-```
-
-Or use the plain toolchain directly:
-
-```sh
-perl Makefile.PL
-make
-make test
-make install
+pkg install p5-App-cpanminus
+cpanm Algorithm::EventsPerSecond
 ```
 
 ## Acceleration

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2025 by Dominique Dumont.
+# This software is Copyright (c) 2008-2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,6 +9,8 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
@@ -105,437 +107,8 @@ by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-
       '2010-2016 Lennart Poettering and others',
       '2016 Dominique Dumont'
     ],
-    'element' => [
-      'ListenStream',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Specifies an address to listen on for a stream
-(C<SOCK_STREAM>), datagram
-(C<SOCK_DGRAM>), or sequential packet
-(C<SOCK_SEQPACKET>) socket, respectively.
-The address can be written in various formats:
-
-If the address starts with a slash
-(C</>), it is read as file system socket in
-the C<AF_UNIX> socket family.
-
-If the address starts with an at symbol
-(C<@>), it is read as abstract namespace
-socket in the C<AF_UNIX> family. The
-C<@> is replaced with a
-C<NUL> character before binding. For
-details, see
-L<unix(7)>.
-
-If the address string is a single number, it is read as
-port number to listen on via IPv6. Depending on the value of
-C<BindIPv6Only> (see below) this might result
-in the service being available via both IPv6 and IPv4
-(default) or just via IPv6.
-
-If the address string is a string in the format
-C<v.w.x.y:z>, it is interpreted
-as IPv4 address v.w.x.y and port z.
-
-If the address string is a string in the format
-C<[x]:y>, it is interpreted as
-IPv6 address x and port y. An optional
-interface scope (interface name or number) may be specified after a C<%> symbol:
-C<[x]:y%dev>.
-Interface scopes are only useful with link-local addresses, because the kernel ignores them in other
-cases. Note that if an address is specified as IPv6, it might still make the service available via
-IPv4 too, depending on the C<BindIPv6Only> setting (see below).
-
-If the address string is a string in the format
-C<vsock:x:y>, it is read as CID
-x on a port y address in the
-C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
-C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
-set to the empty string. C<vsock> may be replaced with
-C<vsock-stream>, C<vsock-dgram> or C<vsock-seqpacket>
-to force usage of the corresponding socket type.
-
-Note that C<SOCK_SEQPACKET> (i.e.
-C<ListenSequentialPacket>) is only available
-for C<AF_UNIX> sockets.
-C<SOCK_STREAM> (i.e.
-C<ListenStream>) when used for IP sockets
-refers to TCP sockets, C<SOCK_DGRAM> (i.e.
-C<ListenDatagram>) to UDP.
-
-These options may be specified more than once, in which
-case incoming traffic on any of the sockets will trigger
-service activation, and all listed sockets will be passed to
-the service, regardless of whether there is incoming traffic
-on them or not. If the empty string is assigned to any of
-these options, the list of addresses to listen on is reset,
-all prior uses of any of these options will have no
-effect.
-
-It is also possible to have more than one socket unit
-for the same service when using C<Service>,
-and the service will receive all the sockets configured in all
-the socket units. Sockets configured in one unit are passed in
-the order of configuration, but no ordering between socket
-units is specified.
-
-If an IP address is used here, it is often desirable to
-listen on it before the interface it is configured on is up
-and running, and even regardless of whether it will be up and
-running at any point. To deal with this, it is recommended to
-set the C<FreeBind> option described
-below.',
-        'type' => 'list'
-      },
-      'ListenDatagram',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Specifies an address to listen on for a stream
-(C<SOCK_STREAM>), datagram
-(C<SOCK_DGRAM>), or sequential packet
-(C<SOCK_SEQPACKET>) socket, respectively.
-The address can be written in various formats:
-
-If the address starts with a slash
-(C</>), it is read as file system socket in
-the C<AF_UNIX> socket family.
-
-If the address starts with an at symbol
-(C<@>), it is read as abstract namespace
-socket in the C<AF_UNIX> family. The
-C<@> is replaced with a
-C<NUL> character before binding. For
-details, see
-L<unix(7)>.
-
-If the address string is a single number, it is read as
-port number to listen on via IPv6. Depending on the value of
-C<BindIPv6Only> (see below) this might result
-in the service being available via both IPv6 and IPv4
-(default) or just via IPv6.
-
-If the address string is a string in the format
-C<v.w.x.y:z>, it is interpreted
-as IPv4 address v.w.x.y and port z.
-
-If the address string is a string in the format
-C<[x]:y>, it is interpreted as
-IPv6 address x and port y. An optional
-interface scope (interface name or number) may be specified after a C<%> symbol:
-C<[x]:y%dev>.
-Interface scopes are only useful with link-local addresses, because the kernel ignores them in other
-cases. Note that if an address is specified as IPv6, it might still make the service available via
-IPv4 too, depending on the C<BindIPv6Only> setting (see below).
-
-If the address string is a string in the format
-C<vsock:x:y>, it is read as CID
-x on a port y address in the
-C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
-C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
-set to the empty string. C<vsock> may be replaced with
-C<vsock-stream>, C<vsock-dgram> or C<vsock-seqpacket>
-to force usage of the corresponding socket type.
-
-Note that C<SOCK_SEQPACKET> (i.e.
-C<ListenSequentialPacket>) is only available
-for C<AF_UNIX> sockets.
-C<SOCK_STREAM> (i.e.
-C<ListenStream>) when used for IP sockets
-refers to TCP sockets, C<SOCK_DGRAM> (i.e.
-C<ListenDatagram>) to UDP.
-
-These options may be specified more than once, in which
-case incoming traffic on any of the sockets will trigger
-service activation, and all listed sockets will be passed to
-the service, regardless of whether there is incoming traffic
-on them or not. If the empty string is assigned to any of
-these options, the list of addresses to listen on is reset,
-all prior uses of any of these options will have no
-effect.
-
-It is also possible to have more than one socket unit
-for the same service when using C<Service>,
-and the service will receive all the sockets configured in all
-the socket units. Sockets configured in one unit are passed in
-the order of configuration, but no ordering between socket
-units is specified.
-
-If an IP address is used here, it is often desirable to
-listen on it before the interface it is configured on is up
-and running, and even regardless of whether it will be up and
-running at any point. To deal with this, it is recommended to
-set the C<FreeBind> option described
-below.',
-        'type' => 'list'
-      },
-      'ListenSequentialPacket',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Specifies an address to listen on for a stream
-(C<SOCK_STREAM>), datagram
-(C<SOCK_DGRAM>), or sequential packet
-(C<SOCK_SEQPACKET>) socket, respectively.
-The address can be written in various formats:
-
-If the address starts with a slash
-(C</>), it is read as file system socket in
-the C<AF_UNIX> socket family.
-
-If the address starts with an at symbol
-(C<@>), it is read as abstract namespace
-socket in the C<AF_UNIX> family. The
-C<@> is replaced with a
-C<NUL> character before binding. For
-details, see
-L<unix(7)>.
-
-If the address string is a single number, it is read as
-port number to listen on via IPv6. Depending on the value of
-C<BindIPv6Only> (see below) this might result
-in the service being available via both IPv6 and IPv4
-(default) or just via IPv6.
-
-If the address string is a string in the format
-C<v.w.x.y:z>, it is interpreted
-as IPv4 address v.w.x.y and port z.
-
-If the address string is a string in the format
-C<[x]:y>, it is interpreted as
-IPv6 address x and port y. An optional
-interface scope (interface name or number) may be specified after a C<%> symbol:
-C<[x]:y%dev>.
-Interface scopes are only useful with link-local addresses, because the kernel ignores them in other
-cases. Note that if an address is specified as IPv6, it might still make the service available via
-IPv4 too, depending on the C<BindIPv6Only> setting (see below).
-
-If the address string is a string in the format
-C<vsock:x:y>, it is read as CID
-x on a port y address in the
-C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
-C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
-set to the empty string. C<vsock> may be replaced with
-C<vsock-stream>, C<vsock-dgram> or C<vsock-seqpacket>
-to force usage of the corresponding socket type.
-
-Note that C<SOCK_SEQPACKET> (i.e.
-C<ListenSequentialPacket>) is only available
-for C<AF_UNIX> sockets.
-C<SOCK_STREAM> (i.e.
-C<ListenStream>) when used for IP sockets
-refers to TCP sockets, C<SOCK_DGRAM> (i.e.
-C<ListenDatagram>) to UDP.
-
-These options may be specified more than once, in which
-case incoming traffic on any of the sockets will trigger
-service activation, and all listed sockets will be passed to
-the service, regardless of whether there is incoming traffic
-on them or not. If the empty string is assigned to any of
-these options, the list of addresses to listen on is reset,
-all prior uses of any of these options will have no
-effect.
-
-It is also possible to have more than one socket unit
-for the same service when using C<Service>,
-and the service will receive all the sockets configured in all
-the socket units. Sockets configured in one unit are passed in
-the order of configuration, but no ordering between socket
-units is specified.
-
-If an IP address is used here, it is often desirable to
-listen on it before the interface it is configured on is up
-and running, and even regardless of whether it will be up and
-running at any point. To deal with this, it is recommended to
-set the C<FreeBind> option described
-below.',
-        'type' => 'list'
-      },
-      'ListenFIFO',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Specifies a file system FIFO (see L<fifo(7)> for
-details) to listen on.	This expects an absolute file system path as argument.	Behavior otherwise is
-very similar to the C<ListenDatagram> directive above.',
-        'type' => 'list'
-      },
-      'ListenSpecial',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Specifies a special file in the file system to
-listen on. This expects an absolute file system path as
-argument. Behavior otherwise is very similar to the
-C<ListenFIFO> directive above. Use this to
-open character device nodes as well as special files in
-C</proc/> and
-C</sys/>.',
-        'type' => 'list'
-      },
-      'ListenNetlink',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Specifies a Netlink family to create a socket
-for to listen on. This expects a short string referring to the
-C<AF_NETLINK> family name (such as
-C<audit> or C<kobject-uevent>)
-as argument, optionally suffixed by a whitespace followed by a
-multicast group integer. Behavior otherwise is very similar to
-the C<ListenDatagram> directive
-above.',
-        'type' => 'list'
-      },
-      'ListenMessageQueue',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Specifies a POSIX message queue name to listen on (see L<mq_overview(7)>
-for details). This expects a valid message queue name (i.e. beginning with
-C</>). Behavior otherwise is very similar to the C<ListenFIFO>
-directive above. On Linux message queue descriptors are actually file descriptors and can be
-inherited between processes.',
-        'type' => 'list'
-      },
-      'ListenUSBFunction',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Specifies a L<USB
-FunctionFS|https://docs.kernel.org/usb/functionfs.html> endpoints location to listen on, for
-implementation of USB gadget functions. This expects an
-absolute file system path of a FunctionFS mount point as the argument.
-Behavior otherwise is very similar to the C<ListenFIFO>
-directive above. Use this to open the FunctionFS endpoint
-C<ep0>. When using this option, the
-activated service has to have the
-C<USBFunctionDescriptors> and
-C<USBFunctionStrings> options set.
-',
-        'type' => 'list'
-      },
-      'SocketProtocol',
-      {
-        'choice' => [
-          'mptcp',
-          'sctp',
-          'udplite'
-        ],
-        'description' => 'Takes one of C<udplite>,
-C<sctp> or C<mptcp>. The socket will use
-the UDP-Lite (C<IPPROTO_UDPLITE>), SCTP
-(C<IPPROTO_SCTP>) or MPTCP
-(C<IPPROTO_MPTCP>) protocol, respectively.',
-        'type' => 'leaf',
-        'value_type' => 'enum'
-      },
-      'BindIPv6Only',
-      {
-        'choice' => [
-          'both',
-          'default',
-          'ipv6-only'
-        ],
-        'description' => 'Takes one of C<default>,
-C<both> or C<ipv6-only>. Controls
-the IPV6_V6ONLY socket option (see
-L<ipv6(7)>
-for details). If C<both>, IPv6 sockets bound
-will be accessible via both IPv4 and IPv6. If
-C<ipv6-only>, they will be accessible via IPv6
-only. If C<default> (which is the default,
-surprise!), the system wide default setting is used, as
-controlled by
-C</proc/sys/net/ipv6/bindv6only>, which in
-turn defaults to the equivalent of
-C<both>.',
-        'type' => 'leaf',
-        'value_type' => 'enum'
-      },
-      'Backlog',
-      {
-        'description' => 'Takes an unsigned 32-bit integer argument. Specifies the number of connections to
-queue that have not been accepted yet. This setting matters only for stream and sequential packet
-sockets. See
-L<listen(2)> for
-details. Defaults to 4294967295. Note that this value is silently capped by the
-C<net.core.somaxconn> sysctl, which typically defaults to 4096, so typically
-the sysctl is the setting that actually matters.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'BindToDevice',
-      {
-        'description' => 'Specifies a network interface name to bind this socket to. If set, traffic will only
-be accepted from the specified network interfaces. This controls the
-C<SO_BINDTODEVICE> socket option (see L<socket(7)> for
-details). If this option is used, an implicit dependency from this socket unit on the network
-interface device unit is created
-(see L<systemd.device(5)>).
-Note that setting this parameter might result in additional dependencies to be added to the unit (see
-above).',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'SocketUser',
-      {
-        'description' => 'Takes a UNIX user/group name. When specified, all C<AF_UNIX>
-sockets, FIFO nodes, and message queues are owned by the specified user and group. If unset (the
-default), the nodes are owned by the root user/group (if run in system context) or the invoking
-user/group (if run in user context).  If only a user is specified but no group, then the group is
-derived from the user\'s default group.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'SocketGroup',
-      {
-        'description' => 'Takes a UNIX user/group name. When specified, all C<AF_UNIX>
-sockets, FIFO nodes, and message queues are owned by the specified user and group. If unset (the
-default), the nodes are owned by the root user/group (if run in system context) or the invoking
-user/group (if run in user context).  If only a user is specified but no group, then the group is
-derived from the user\'s default group.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'SocketMode',
-      {
-        'description' => 'If listening on a file system socket, FIFO, or message queue, this option specifies
-the file system access mode used when creating the file node. Takes an access mode in octal notation.
-Defaults to 0666.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'DirectoryMode',
-      {
-        'description' => 'If listening on a file system socket or FIFO,
-the parent directories are automatically created if needed.
-This option specifies the file system access mode used when
-creating these directories. Takes an access mode in octal
-notation. Defaults to 0755.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'Accept',
-      {
-        'description' => 'Takes a boolean argument. If yes, a service instance is spawned for each incoming
+    'description' => {
+      'Accept' => 'Takes a boolean argument. If yes, a service instance is spawned for each incoming
 connection and only the connection socket is passed to it. If no, all listening sockets themselves
 are passed to the started service unit, and only one service unit is spawned for all connections
 (also see above). This value is ignored for datagram sockets and FIFOs where a single service unit
@@ -584,145 +157,42 @@ integer. The socket cookie can otherwise be acquired via L<getsockopt(7)>.
 It is recommended to set C<CollectMode=inactive-or-failed> for service
 instances activated via C<Accept=yes>, to ensure that failed connection services are
 cleaned up and released from memory, and do not accumulate.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'Writable',
-      {
-        'description' => 'Takes a boolean argument. May only be used in
-conjunction with C<ListenSpecial>. If true,
-the specified special file is opened in read-write mode, if
-false, in read-only mode. Defaults to false.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'FlushPending',
-      {
-        'description' => 'Takes a boolean argument. May only be used when
-C<Accept=no>. If yes, the socket\'s buffers are cleared after the
-triggered service exited. This causes any pending data to be
-flushed and any pending incoming connections to be rejected. If no, the
-socket\'s buffers will not be cleared, permitting the service to handle any
-pending connections after restart, which is the usually expected behaviour.
-Defaults to C<no>.
-',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'MaxConnections',
-      {
-        'description' => 'The maximum number of connections to simultaneously run services instances for, when
-C<Accept=yes> is set. If more concurrent connections are coming in, they will be refused
-until at least one existing connection is terminated. This setting has no effect on sockets configured
-with C<Accept=no> or datagram sockets. Defaults to 64.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'MaxConnectionsPerSource',
-      {
-        'description' => 'The maximum number of connections for a service per source IP address (in case of
-IPv4/IPv6), per source CID (in case of C<AF_VSOCK>), or source UID (in case of
-C<AF_UNIX>). This is very similar to the C<MaxConnections>
-directive above. Defaults to 0, i.e. disabled.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'KeepAlive',
-      {
-        'description' => 'Takes a boolean argument. If true, the TCP/IP stack will send a keep alive message
-after 2h (depending on the configuration of
-C</proc/sys/net/ipv4/tcp_keepalive_time>) for all TCP streams accepted on this
-socket. This controls the C<SO_KEEPALIVE> socket option (see L<socket(7)> and
-the L<TCP Keepalive
-HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Defaults to C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'KeepAliveTimeSec',
-      {
-        'description' => 'Takes time (in seconds) as argument. The connection needs to remain
-idle before TCP starts sending keepalive probes. This controls the TCP_KEEPIDLE
-socket option (see
-L<socket(7)>
-and the L<TCP
-Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.)
-Default value is 7200 seconds (2 hours).',
-        'type' => 'leaf',
-        'upstream_default' => '7200',
-        'value_type' => 'integer'
-      },
-      'KeepAliveIntervalSec',
-      {
-        'description' => 'Takes time (in seconds) as argument between individual keepalive probes, if the
-socket option C<SO_KEEPALIVE> has been set on this socket. This controls the
-C<TCP_KEEPINTVL> socket option (see L<socket(7)> and
-the L<TCP Keepalive
-HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Default value is 75 seconds.',
-        'type' => 'leaf',
-        'upstream_default' => '75',
-        'value_type' => 'integer'
-      },
-      'KeepAliveProbes',
-      {
-        'description' => 'Takes an integer as argument. It is the number of
-unacknowledged probes to send before considering the
-connection dead and notifying the application layer. This
-controls the TCP_KEEPCNT socket option (see
-L<socket(7)>
-and the L<TCP
-Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Default value is
-9.',
-        'type' => 'leaf',
-        'upstream_default' => '9',
-        'value_type' => 'integer'
-      },
-      'NoDelay',
-      {
-        'description' => 'Takes a boolean argument. TCP Nagle\'s
-algorithm works by combining a number of small outgoing
-messages, and sending them all at once. This controls the
-TCP_NODELAY socket option (see
-L<tcp(7)>).
-Defaults to C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'Priority',
-      {
-        'description' => 'Takes an integer argument controlling the priority for all traffic sent from this
-socket. This controls the C<SO_PRIORITY> socket option (see L<socket(7)> for
-details.).',
-        'type' => 'leaf',
-        'value_type' => 'integer'
-      },
-      'DeferAcceptSec',
-      {
-        'description' => 'Takes time (in seconds) as argument. If set,
+      'AcceptFileDescriptors' => 'Takes a boolean value. This controls the C<SO_PASSRIGHTS> socket
+option, which when disabled prohibits the peer from sending C<SCM_RIGHTS>
+ancillary messages (aka file descriptors) via C<AF_UNIX> sockets. Defaults to
+C<true>.',
+      'Backlog' => 'Takes an unsigned 32-bit integer argument. Specifies the number of connections to
+queue that have not been accepted yet. This setting matters only for stream and sequential packet
+sockets. See
+L<listen(2)> for
+details. Defaults to 4294967295. Note that this value is silently capped by the
+C<net.core.somaxconn> sysctl, which typically defaults to 4096, so typically
+the sysctl is the setting that actually matters.',
+      'BindIPv6Only' => 'Takes one of C<default>,
+C<both> or C<ipv6-only>. Controls
+the IPV6_V6ONLY socket option (see
+L<ipv6(7)>
+for details). If C<both>, IPv6 sockets bound
+will be accessible via both IPv4 and IPv6. If
+C<ipv6-only>, they will be accessible via IPv6
+only. If C<default> (which is the default,
+surprise!), the system wide default setting is used, as
+controlled by
+C</proc/sys/net/ipv6/bindv6only>, which in
+turn defaults to the equivalent of
+C<both>.',
+      'BindToDevice' => 'Specifies a network interface name to bind this socket to. If set, traffic will only
+be accepted from the specified network interfaces. This controls the
+C<SO_BINDTODEVICE> socket option (see L<socket(7)> for
+details). If this option is used, an implicit dependency from this socket unit on the network
+interface device unit is created
+(see L<systemd.device(5)>).
+Note that setting this parameter might result in additional dependencies to be added to the unit (see
+above).',
+      'Broadcast' => 'Takes a boolean value. This controls the C<SO_BROADCAST> socket
+option, which allows broadcast datagrams to be sent from this socket. Defaults to
+C<false>.',
+      'DeferAcceptSec' => 'Takes time (in seconds) as argument. If set,
 the listening process will be awakened only when data arrives
 on the socket, and not immediately when connection is
 established. When this option is set, the
@@ -745,115 +215,307 @@ send data in the final packet establishing the connection (the
 third packet in the "three-way handshake").
 
 Disabled by default.',
-        'type' => 'leaf',
-        'value_type' => 'integer'
-      },
-      'ReceiveBuffer',
-      {
-        'description' => 'Takes an integer argument controlling the receive or send buffer sizes of this
-socket, respectively.  This controls the C<SO_RCVBUF> and
-C<SO_SNDBUF> socket options (see L<socket(7)> for
-details.). The usual suffixes K, M, G are supported and are understood to the base of
-1024.',
-        'match' => '^\\d+(?i)[KMG]$',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'SendBuffer',
-      {
-        'description' => 'Takes an integer argument controlling the receive or send buffer sizes of this
-socket, respectively.  This controls the C<SO_RCVBUF> and
-C<SO_SNDBUF> socket options (see L<socket(7)> for
-details.). The usual suffixes K, M, G are supported and are understood to the base of
-1024.',
-        'match' => '^\\d+(?i)[KMG]$',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'IPTOS',
-      {
-        'description' => 'Takes an integer argument controlling the IP Type-Of-Service field for packets
+      'DeferTrigger' => 'Takes a boolean argument, or C<patient>. May only be used when C<Accept=no>.
+If enabled, job mode C<lenient> instead of C<replace> is used when
+triggering the service, which means currently activating/running units that conflict with the service
+won\'t be disturbed/brought down. Furthermore, if a conflict exists, the socket unit will wait for
+current job queue to complete and potentially defer the activation by then. An upper limit of total time
+to wait can be configured via C<DeferTriggerMaxSec>. If set to C<yes>,
+the socket unit will fail if all jobs have finished or the timeout has been reached but the conflict remains.
+If C<patient>, always wait until C<DeferTriggerMaxSec> elapses.
+Defaults to no.
+
+This setting is particularly useful if the socket unit should stay active across switch-root/soft-reboot
+operations while the triggered service is stopped.',
+      'DeferTriggerMaxSec' => 'Configures the maximum time to defer the triggering when C<DeferTrigger>
+is enabled. If the service cannot be activated within the specified time, the socket will be considered
+failed and get terminated. Takes a unit-less value in seconds, or a time span value such as "5min 20s".
+Pass C<0> or C<infinity> to disable the timeout logic (the default).
+',
+      'DirectoryMode' => 'If listening on a file system socket or FIFO,
+the parent directories are automatically created if needed.
+This option specifies the file system access mode used when
+creating these directories. Takes an access mode in octal
+notation. Defaults to 0755.',
+      'ExecStartPost' => 'Takes one or more command lines, which are
+executed before or after the listening sockets/FIFOs are
+created and bound, respectively. The first token of the
+command line must be an absolute filename, then followed by
+arguments for the process. Multiple command lines may be
+specified following the same scheme as used for
+C<ExecStartPre> of service unit
+files.',
+      'ExecStartPre' => '*ExecStartPost',
+      'ExecStopPost' => 'Additional commands that are executed before
+or after the listening sockets/FIFOs are closed and removed,
+respectively. Multiple command lines may be specified
+following the same scheme as used for
+C<ExecStartPre> of service unit
+files.',
+      'ExecStopPre' => '*ExecStopPost',
+      'FileDescriptorName' => 'Assigns a name to all file descriptors this socket unit encapsulates.
+This is useful to help activated services identify specific file descriptors, if multiple fds are passed.
+Services may use the
+L<sd_listen_fds_with_names(3)>
+call to acquire the names configured for the received file descriptors. Names may contain any ASCII character,
+but must exclude control characters and C<:>, and must be at most 255 characters in length.
+If this setting is not used, the file descriptor name defaults to the name of the socket unit
+(including its C<.socket> suffix) when C<Accept=no>,
+C<connection> otherwise.',
+      'FlushPending' => 'Takes a boolean argument. May only be used when
+C<Accept=no>. If yes, the socket\'s buffers are cleared after the
+triggered service exited. This causes any pending data to be
+flushed and any pending incoming connections to be rejected. If no, the
+socket\'s buffers will not be cleared, permitting the service to handle any
+pending connections after restart, which is the usually expected behaviour.
+Defaults to C<no>.
+',
+      'FreeBind' => 'Takes a boolean value. Controls whether the socket can be bound to non-local IP
+addresses. This is useful to configure sockets listening on specific IP addresses before those IP
+addresses are successfully configured on a network interface. This sets the
+C<IP_FREEBIND>/C<IPV6_FREEBIND> socket option. For robustness
+reasons it is recommended to use this option whenever you bind a socket to a specific IP
+address. Defaults to C<false>.',
+      'IPTOS' => 'Takes an integer argument controlling the IP Type-Of-Service field for packets
 generated from this socket.  This controls the C<IP_TOS> socket option (see
 L<ip(7)> for
 details.). Either a numeric string or one of C<low-delay>, C<throughput>,
 C<reliability> or C<low-cost> may be specified.',
-        'type' => 'leaf',
-        'value_type' => 'integer'
-      },
-      'IPTTL',
-      {
-        'description' => 'Takes an integer argument controlling the IPv4 Time-To-Live/IPv6 Hop-Count field for
+      'IPTTL' => 'Takes an integer argument controlling the IPv4 Time-To-Live/IPv6 Hop-Count field for
 packets generated from this socket. This sets the
 C<IP_TTL>/C<IPV6_UNICAST_HOPS> socket options (see L<ip(7)> and
 L<ipv6(7)> for
 details.)',
-        'type' => 'leaf',
-        'value_type' => 'integer'
-      },
-      'Mark',
-      {
-        'description' => 'Takes an integer value. Controls the firewall mark of packets generated by this
+      'KeepAlive' => 'Takes a boolean argument. If true, the TCP/IP stack will send a keep alive message
+after 2h (depending on the configuration of
+C</proc/sys/net/ipv4/tcp_keepalive_time>) for all TCP streams accepted on this
+socket. This controls the C<SO_KEEPALIVE> socket option (see L<socket(7)> and
+the L<TCP Keepalive
+HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Defaults to C<false>.',
+      'KeepAliveIntervalSec' => 'Takes time (in seconds) as argument between individual keepalive probes, if the
+socket option C<SO_KEEPALIVE> has been set on this socket. This controls the
+C<TCP_KEEPINTVL> socket option (see L<socket(7)> and
+the L<TCP Keepalive
+HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Default value is 75 seconds.',
+      'KeepAliveProbes' => 'Takes an integer as argument. It is the number of
+unacknowledged probes to send before considering the
+connection dead and notifying the application layer. This
+controls the TCP_KEEPCNT socket option (see
+L<socket(7)>
+and the L<TCP
+Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Default value is
+9.',
+      'KeepAliveTimeSec' => 'Takes time (in seconds) as argument. The connection needs to remain
+idle before TCP starts sending keepalive probes. This controls the TCP_KEEPIDLE
+socket option (see
+L<socket(7)>
+and the L<TCP
+Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.)
+Default value is 7200 seconds (2 hours).',
+      'ListenDatagram' => 'Specifies an address to listen on for a stream
+(C<SOCK_STREAM>), datagram
+(C<SOCK_DGRAM>), or sequential packet
+(C<SOCK_SEQPACKET>) socket, respectively.
+The address can be written in various formats:
+
+If the address starts with a slash
+(C</>), it is read as file system socket in
+the C<AF_UNIX> socket family.
+
+If the address starts with an at symbol
+(C<@>), it is read as abstract namespace
+socket in the C<AF_UNIX> family. The
+C<@> is replaced with a
+C<NUL> character before binding. For
+details, see
+L<unix(7)>.
+
+If the address string is a single number, it is read as
+port number to listen on via IPv6. Depending on the value of
+C<BindIPv6Only> (see below) this might result
+in the service being available via both IPv6 and IPv4
+(default) or just via IPv6.
+
+If the address string is a string in the format
+C<v.w.x.y:z>, it is interpreted
+as IPv4 address v.w.x.y and port z.
+
+If the address string is a string in the format
+C<[x]:y>, it is interpreted as
+IPv6 address x and port y. An optional
+interface scope (interface name or number) may be specified after a C<%> symbol:
+C<[x]:y%dev>.
+Interface scopes are only useful with link-local addresses, because the kernel ignores them in other
+cases. Note that if an address is specified as IPv6, it might still make the service available via
+IPv4 too, depending on the C<BindIPv6Only> setting (see below).
+
+If the address string is a string in the format
+C<vsock:x:y>, it is read as CID
+x on a port y address in the
+C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
+C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
+set to the empty string. C<vsock> may be replaced with
+C<vsock-stream>, C<vsock-dgram> or C<vsock-seqpacket>
+to force usage of the corresponding socket type.
+
+Note that C<SOCK_SEQPACKET> (i.e.
+C<ListenSequentialPacket>) is only available
+for C<AF_UNIX> sockets.
+C<SOCK_STREAM> (i.e.
+C<ListenStream>) when used for IP sockets
+refers to TCP sockets, C<SOCK_DGRAM> (i.e.
+C<ListenDatagram>) to UDP.
+
+These options may be specified more than once, in which
+case incoming traffic on any of the sockets will trigger
+service activation, and all listed sockets will be passed to
+the service, regardless of whether there is incoming traffic
+on them or not. If the empty string is assigned to any of
+these options, the list of addresses to listen on is reset,
+all prior uses of any of these options will have no
+effect.
+
+It is also possible to have more than one socket unit
+for the same service when using C<Service>,
+and the service will receive all the sockets configured in all
+the socket units. Sockets configured in one unit are passed in
+the order of configuration, but no ordering between socket
+units is specified.
+
+If an IP address is used here, it is often desirable to
+listen on it before the interface it is configured on is up
+and running, and even regardless of whether it will be up and
+running at any point. To deal with this, it is recommended to
+set the C<FreeBind> option described
+below.',
+      'ListenFIFO' => 'Specifies a file system FIFO (see L<fifo(7)> for
+details) to listen on.	This expects an absolute file system path as argument.	Behavior otherwise is
+very similar to the C<ListenDatagram> directive above.',
+      'ListenMessageQueue' => 'Specifies a POSIX message queue name to listen on (see L<mq_overview(7)>
+for details). This expects a valid message queue name (i.e. beginning with
+C</>). Behavior otherwise is very similar to the C<ListenFIFO>
+directive above. On Linux message queue descriptors are actually file descriptors and can be
+inherited between processes.',
+      'ListenNetlink' => 'Specifies a Netlink family to create a socket
+for to listen on. This expects a short string referring to the
+C<AF_NETLINK> family name (such as
+C<audit> or C<kobject-uevent>)
+as argument, optionally suffixed by a whitespace followed by a
+multicast group integer. Behavior otherwise is very similar to
+the C<ListenDatagram> directive
+above.',
+      'ListenSequentialPacket' => '*ListenDatagram',
+      'ListenSpecial' => 'Specifies a special file in the file system to
+listen on. This expects an absolute file system path as
+argument. Behavior otherwise is very similar to the
+C<ListenFIFO> directive above. Use this to
+open character device nodes as well as special files in
+C</proc/> and
+C</sys/>.',
+      'ListenStream' => '*ListenDatagram',
+      'ListenUSBFunction' => 'Specifies a L<USB
+FunctionFS|https://docs.kernel.org/usb/functionfs.html> endpoints location to listen on, for
+implementation of USB gadget functions. This expects an
+absolute file system path of a FunctionFS mount point as the argument.
+Behavior otherwise is very similar to the C<ListenFIFO>
+directive above. Use this to open the FunctionFS endpoint
+C<ep0>. When using this option, the
+activated service has to have the
+C<USBFunctionDescriptors> and
+C<USBFunctionStrings> options set.
+',
+      'Mark' => 'Takes an integer value. Controls the firewall mark of packets generated by this
 socket. This can be used in the firewall logic to filter packets from this socket. This sets the
 C<SO_MARK> socket option. See L<iptables(8)> for
 details.',
-        'type' => 'leaf',
-        'value_type' => 'integer'
-      },
-      'ReusePort',
-      {
-        'description' => 'Takes a boolean value. If true, allows multiple
+      'MaxConnections' => 'The maximum number of connections to simultaneously run services instances for, when
+C<Accept=yes> is set. If more concurrent connections are coming in, they will be refused
+until at least one existing connection is terminated. This setting has no effect on sockets configured
+with C<Accept=no> or datagram sockets. Defaults to 64.',
+      'MaxConnectionsPerSource' => 'The maximum number of connections for a service per source IP address (in case of
+IPv4/IPv6), per source CID (in case of C<AF_VSOCK>), or source UID (in case of
+C<AF_UNIX>). This is very similar to the C<MaxConnections>
+directive above. Defaults to 0, i.e. disabled.',
+      'MessageQueueMaxMessages' => 'These two settings take integer values and
+control the mq_maxmsg field or the mq_msgsize field,
+respectively, when creating the message queue. Note that
+either none or both of these variables need to be set. See
+L<mq_setattr(3)>
+for details.',
+      'NoDelay' => 'Takes a boolean argument. TCP Nagle\'s
+algorithm works by combining a number of small outgoing
+messages, and sending them all at once. This controls the
+TCP_NODELAY socket option (see
+L<tcp(7)>).
+Defaults to C<false>.',
+      'PassCredentials' => 'Takes a boolean value. This controls the C<SO_PASSCRED> socket
+option, which allows C<AF_UNIX> sockets to receive the credentials of the sending
+process in an ancillary message. Defaults to C<false>.',
+      'PassFileDescriptorsToExec' => 'Takes a boolean argument. Defaults to off. If enabled, file descriptors created by
+the socket unit are passed to C<ExecStartPost>, C<ExecStopPre>, and
+C<ExecStopPost> commands from the socket unit. The passed file descriptors can be
+accessed with
+L<sd_listen_fds(3)> as
+if the commands were invoked from the associated service units.  Note that
+C<ExecStartPre> command cannot access socket file descriptors.',
+      'PassPIDFD' => 'Takes a boolean value. This controls the C<SO_PASSPIDFD> socket
+option, which allows C<AF_UNIX> sockets to receive the pidfd of the sending
+process in an ancillary message. Defaults to C<false>.',
+      'PassPacketInfo' => 'Takes a boolean value. This controls the C<IP_PKTINFO>,
+C<IPV6_RECVPKTINFO>, C<NETLINK_PKTINFO> or
+C<PACKET_AUXDATA> socket options, which enable reception of additional per-packet
+metadata as ancillary message, on C<AF_INET>, C<AF_INET6>,
+C<AF_UNIX> and C<AF_PACKET> sockets.  Defaults to
+C<false>.',
+      'PassSecurity' => 'Takes a boolean value. This controls the C<SO_PASSSEC> socket
+option, which allows C<AF_UNIX> sockets to receive the security context of the
+sending process in an ancillary message.  Defaults to C<false>.',
+      'PipeSize' => 'Takes a size in bytes. Controls the pipe
+buffer size of FIFOs configured in this socket unit. See
+L<fcntl(2)>
+for details. The usual suffixes K, M, G are supported and are
+understood to the base of 1024.',
+      'PollLimitBurst' => 'Configures a limit on how often polling events on the file descriptors backing this
+socket unit will be considered. This pair of settings is similar to
+C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> but instead of
+putting a (fatal) limit on the activation frequency puts a (transient) limit on the polling
+frequency. The expected parameter syntax and range are identical to that of the aforementioned
+options, and can be disabled the same way.
+
+If the polling limit is hit polling is temporarily disabled on it until the specified time
+window passes. The polling limit hence slows down connection attempts if hit, but unlike the trigger
+limit will not cause permanent failures. It\'s the recommended mechanism to deal with DoS attempts
+through packet flooding.
+
+The polling limit is enforced per file descriptor to listen on, as opposed to the trigger limit
+which is enforced for the entire socket unit. This distinction matters for socket units that listen
+on multiple file descriptors (i.e. have multiple C<ListenXYZ> stanzas).
+
+These setting defaults to 150 (in case of C<Accept=yes>) and 15 (otherwise)
+polling events per 2s. This is considerably lower than the default values for the trigger limit (see
+above) and means that the polling limit should typically ensure the trigger limit is never hit,
+unless one of them is reconfigured or disabled.',
+      'PollLimitIntervalSec' => '*PollLimitBurst',
+      'Priority' => 'Takes an integer argument controlling the priority for all traffic sent from this
+socket. This controls the C<SO_PRIORITY> socket option (see L<socket(7)> for
+details.).',
+      'ReceiveBuffer' => 'Takes an integer argument controlling the receive or send buffer sizes of this
+socket, respectively.  This controls the C<SO_RCVBUF> and
+C<SO_SNDBUF> socket options (see L<socket(7)> for
+details.). The usual suffixes K, M, G are supported and are understood to the base of
+1024.',
+      'RemoveOnStop' => 'Takes a boolean argument. If enabled, any file nodes created by this socket unit are
+removed when it is stopped. This applies to C<AF_UNIX> sockets in the file system,
+POSIX message queues, FIFOs, as well as any symlinks to them configured with
+C<Symlinks>. Normally, it should not be necessary to use this option, and is not
+recommended as services might continue to run after the socket unit has been terminated and it should
+still be possible to communicate with them via their file system node. Defaults to
+off.',
+      'ReusePort' => 'Takes a boolean value. If true, allows multiple
 L<bind(2)>s to this TCP
 or UDP port. This controls the C<SO_REUSEPORT> socket option. See L<socket(7)> for
 details.',
-        'type' => 'leaf',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'SmackLabel',
-      {
-        'description' => 'Takes a string value. Controls the extended
-attributes C<security.SMACK64>,
-C<security.SMACK64IPIN> and
-C<security.SMACK64IPOUT>, respectively, i.e.
-the security label of the FIFO, or the security label for the
-incoming or outgoing connections of the socket, respectively.
-See L<Smack|https://docs.kernel.org/admin-guide/LSM/Smack.html>
-for details.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'SmackLabelIPIn',
-      {
-        'description' => 'Takes a string value. Controls the extended
-attributes C<security.SMACK64>,
-C<security.SMACK64IPIN> and
-C<security.SMACK64IPOUT>, respectively, i.e.
-the security label of the FIFO, or the security label for the
-incoming or outgoing connections of the socket, respectively.
-See L<Smack|https://docs.kernel.org/admin-guide/LSM/Smack.html>
-for details.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'SmackLabelIPOut',
-      {
-        'description' => 'Takes a string value. Controls the extended
-attributes C<security.SMACK64>,
-C<security.SMACK64IPIN> and
-C<security.SMACK64IPOUT>, respectively, i.e.
-the security label of the FIFO, or the security label for the
-incoming or outgoing connections of the socket, respectively.
-See L<Smack|https://docs.kernel.org/admin-guide/LSM/Smack.html>
-for details.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'SELinuxContextFromNet',
-      {
-        'description' => 'Takes a boolean argument. When true, systemd
+      'SELinuxContextFromNet' => 'Takes a boolean argument. When true, systemd
 will attempt to figure out the SELinux label used for the
 instantiated service from the information handed by the peer
 over the network. Note that only the security level is used
@@ -868,236 +530,51 @@ services triggered by exactly one socket unit. Also note
 that this option is useful only when MLS/MCS SELinux policy
 is deployed. Defaults to
 C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'PipeSize',
-      {
-        'description' => 'Takes a size in bytes. Controls the pipe
-buffer size of FIFOs configured in this socket unit. See
-L<fcntl(2)>
-for details. The usual suffixes K, M, G are supported and are
-understood to the base of 1024.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'MessageQueueMaxMessages',
-      {
-        'description' => 'These two settings take integer values and
-control the mq_maxmsg field or the mq_msgsize field,
-respectively, when creating the message queue. Note that
-either none or both of these variables need to be set. See
-L<mq_setattr(3)>
+      'SendBuffer' => '*ReceiveBuffer',
+      'Service' => 'Specifies the service unit name to activate on
+incoming traffic. This setting is only allowed for sockets
+with C<Accept=no>. It defaults to the service
+that bears the same name as the socket (with the suffix
+replaced). In most cases, it should not be necessary to use
+this option. Note that setting this parameter might result in
+additional dependencies to be added to the unit (see
+above).',
+      'SmackLabel' => 'Takes a string value. Controls the extended
+attributes C<security.SMACK64>,
+C<security.SMACK64IPIN> and
+C<security.SMACK64IPOUT>, respectively, i.e.
+the security label of the FIFO, or the security label for the
+incoming or outgoing connections of the socket, respectively.
+See L<Smack|https://docs.kernel.org/admin-guide/LSM/Smack.html>
 for details.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'FreeBind',
-      {
-        'description' => 'Takes a boolean value. Controls whether the socket can be bound to non-local IP
-addresses. This is useful to configure sockets listening on specific IP addresses before those IP
-addresses are successfully configured on a network interface. This sets the
-C<IP_FREEBIND>/C<IPV6_FREEBIND> socket option. For robustness
-reasons it is recommended to use this option whenever you bind a socket to a specific IP
-address. Defaults to C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'Transparent',
-      {
-        'description' => 'Takes a boolean value. Controls the
-C<IP_TRANSPARENT>/C<IPV6_TRANSPARENT> socket option. Defaults to
-C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'Broadcast',
-      {
-        'description' => 'Takes a boolean value. This controls the C<SO_BROADCAST> socket
-option, which allows broadcast datagrams to be sent from this socket. Defaults to
-C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'PassCredentials',
-      {
-        'description' => 'Takes a boolean value. This controls the C<SO_PASSCRED> socket
-option, which allows C<AF_UNIX> sockets to receive the credentials of the sending
-process in an ancillary message. Defaults to C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'PassPIDFD',
-      {
-        'description' => 'Takes a boolean value. This controls the C<SO_PASSPIDFD> socket
-option, which allows C<AF_UNIX> sockets to receive the pidfd of the sending
-process in an ancillary message. Defaults to C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'PassSecurity',
-      {
-        'description' => 'Takes a boolean value. This controls the C<SO_PASSSEC> socket
-option, which allows C<AF_UNIX> sockets to receive the security context of the
-sending process in an ancillary message.  Defaults to C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'PassPacketInfo',
-      {
-        'description' => 'Takes a boolean value. This controls the C<IP_PKTINFO>,
-C<IPV6_RECVPKTINFO>, C<NETLINK_PKTINFO> or
-C<PACKET_AUXDATA> socket options, which enable reception of additional per-packet
-metadata as ancillary message, on C<AF_INET>, C<AF_INET6>,
-C<AF_UNIX> and C<AF_PACKET> sockets.  Defaults to
-C<false>.',
-        'type' => 'leaf',
-        'upstream_default' => 'no',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'AcceptFileDescriptors',
-      {
-        'description' => 'Takes a boolean value. This controls the C<SO_PASSRIGHTS> socket
-option, which when disabled prohibits the peer from sending C<SCM_RIGHTS>
-ancillary messages (aka file descriptors) via C<AF_UNIX> sockets. Defaults to
-C<true>.',
-        'type' => 'leaf',
-        'upstream_default' => 'yes',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
-      'Timestamping',
-      {
-        'choice' => [
-          'ns',
-          'nsec',
-          'off',
-          'us',
-          'usec',
-          "\x{3bc}s"
-        ],
-        'description' => "Takes one of C<off>, C<us> (alias:
-C<usec>, C<\x{3bc}s>) or C<ns> (alias:
-C<nsec>). This controls the C<SO_TIMESTAMP> or
-C<SO_TIMESTAMPNS> socket options, and enables whether ingress network traffic shall
-carry timestamping metadata. Defaults to C<off>.",
-        'type' => 'leaf',
-        'value_type' => 'enum'
-      },
-      'TCPCongestion',
-      {
-        'description' => 'Takes a string value. Controls the TCP congestion algorithm used by this
+      'SmackLabelIPIn' => '*SmackLabel',
+      'SmackLabelIPOut' => '*SmackLabel',
+      'SocketGroup' => 'Takes a UNIX user/group name. When specified, all C<AF_UNIX>
+sockets, FIFO nodes, and message queues are owned by the specified user and group. If unset (the
+default), the nodes are owned by the root user/group (if run in system context) or the invoking
+user/group (if run in user context).  If only a user is specified but no group, then the group is
+derived from the user\'s default group.',
+      'SocketMode' => 'If listening on a file system socket, FIFO, or message queue, this option specifies
+the file system access mode used when creating the file node. Takes an access mode in octal notation.
+Defaults to 0666.',
+      'SocketProtocol' => 'Takes one of C<udplite>,
+C<sctp> or C<mptcp>. The socket will use
+the UDP-Lite (C<IPPROTO_UDPLITE>), SCTP
+(C<IPPROTO_SCTP>) or MPTCP
+(C<IPPROTO_MPTCP>) protocol, respectively.',
+      'SocketUser' => '*SocketGroup',
+      'Symlinks' => 'Takes a list of file system paths. The specified paths will be created as symlinks to the
+C<AF_UNIX> socket path or FIFO path of this socket unit. If this setting is used, only one
+C<AF_UNIX> socket in the file system or one FIFO may be configured for the socket unit. Use
+this option to manage one or more symlinked alias names for a socket, binding their lifecycle together. Note
+that if creation of a symlink fails this is not considered fatal for the socket unit, and the socket unit may
+still start. If an empty string is assigned, the list of paths is reset. Defaults to an empty
+list.',
+      'TCPCongestion' => 'Takes a string value. Controls the TCP congestion algorithm used by this
 socket. Should be one of C<westwood>, C<reno>,
 C<cubic>, C<lp> or any other available algorithm supported by the IP
 stack. This setting applies only to stream sockets.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'ExecStartPre',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Takes one or more command lines, which are
-executed before or after the listening sockets/FIFOs are
-created and bound, respectively. The first token of the
-command line must be an absolute filename, then followed by
-arguments for the process. Multiple command lines may be
-specified following the same scheme as used for
-C<ExecStartPre> of service unit
-files.',
-        'type' => 'list'
-      },
-      'ExecStartPost',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Takes one or more command lines, which are
-executed before or after the listening sockets/FIFOs are
-created and bound, respectively. The first token of the
-command line must be an absolute filename, then followed by
-arguments for the process. Multiple command lines may be
-specified following the same scheme as used for
-C<ExecStartPre> of service unit
-files.',
-        'type' => 'list'
-      },
-      'ExecStopPre',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Additional commands that are executed before
-or after the listening sockets/FIFOs are closed and removed,
-respectively. Multiple command lines may be specified
-following the same scheme as used for
-C<ExecStartPre> of service unit
-files.',
-        'type' => 'list'
-      },
-      'ExecStopPost',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'Additional commands that are executed before
-or after the listening sockets/FIFOs are closed and removed,
-respectively. Multiple command lines may be specified
-following the same scheme as used for
-C<ExecStartPre> of service unit
-files.',
-        'type' => 'list'
-      },
-      'TimeoutSec',
-      {
-        'description' => 'Configures the time to wait for the commands
+      'TimeoutSec' => 'Configures the time to wait for the commands
 specified in C<ExecStartPre>,
 C<ExecStartPost>,
 C<ExecStopPre> and
@@ -1116,31 +593,288 @@ C<DefaultTimeoutStartSec> from the manager
 configuration file (see
 L<systemd-system.conf(5)>).
 ',
+      'Timestamping' => "Takes one of C<off>, C<us> (alias:
+C<usec>, C<\x{3bc}s>) or C<ns> (alias:
+C<nsec>). This controls the C<SO_TIMESTAMP> or
+C<SO_TIMESTAMPNS> socket options, and enables whether ingress network traffic shall
+carry timestamping metadata. Defaults to C<off>.",
+      'Transparent' => 'Takes a boolean value. Controls the
+C<IP_TRANSPARENT>/C<IPV6_TRANSPARENT> socket option. Defaults to
+C<false>.',
+      'TriggerLimitBurst' => "Configures a limit on how often this socket unit may be activated within a specific
+time interval. The C<TriggerLimitIntervalSec> setting may be used to configure the
+length of the time interval in the usual time units C<us>, C<ms>,
+C<s>, C<min>, C<h>, \x{2026} and defaults to 2s (See
+L<systemd.time(7)> for
+details on the various time units understood). The C<TriggerLimitBurst> setting
+takes a positive integer value and specifies the number of permitted activations per time interval,
+and defaults to 200 for C<Accept=yes> sockets (thus by default permitting 200
+activations per 2s), and 20 otherwise (20 activations per 2s). Set either to 0 to disable any form of
+trigger rate limiting.
+
+If the limit is hit, the socket unit is placed into a failure mode, and will not be connectible
+anymore until restarted. Note that this limit is enforced before the service activation is
+enqueued.
+
+Compare with C<PollLimitIntervalSec>/C<PollLimitBurst>
+described below, which implements a temporary slowdown if a socket unit is flooded with incoming
+traffic, as opposed to the permanent failure state
+C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> results in.",
+      'TriggerLimitIntervalSec' => '*TriggerLimitBurst',
+      'Writable' => 'Takes a boolean argument. May only be used in
+conjunction with C<ListenSpecial>. If true,
+the specified special file is opened in read-write mode, if
+false, in read-only mode. Defaults to false.'
+    },
+    'element' => [
+      'ListenStream',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'type' => 'list'
+      },
+      'ListenDatagram',
+      '*ListenStream',
+      'ListenSequentialPacket',
+      '*ListenStream',
+      'ListenFIFO',
+      '*ListenStream',
+      'ListenSpecial',
+      '*ListenStream',
+      'ListenNetlink',
+      '*ListenStream',
+      'ListenMessageQueue',
+      '*ListenStream',
+      'ListenUSBFunction',
+      '*ListenStream',
+      'SocketProtocol',
+      {
+        'choice' => [
+          'mptcp',
+          'sctp',
+          'udplite'
+        ],
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
+      'BindIPv6Only',
+      {
+        'choice' => [
+          'both',
+          'default',
+          'ipv6-only'
+        ],
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
+      'Backlog',
+      {
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'BindToDevice',
+      '*Backlog',
+      'SocketUser',
+      '*Backlog',
+      'SocketGroup',
+      '*Backlog',
+      'SocketMode',
+      '*Backlog',
+      'DirectoryMode',
+      '*Backlog',
+      'Accept',
+      {
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'Writable',
+      '*Accept',
+      'FlushPending',
+      '*Accept',
+      'MaxConnections',
+      {
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'MaxConnectionsPerSource',
+      '*MaxConnections',
+      'KeepAlive',
+      {
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'KeepAliveTimeSec',
+      {
+        'type' => 'leaf',
+        'upstream_default' => '7200',
+        'value_type' => 'integer'
+      },
+      'KeepAliveIntervalSec',
+      {
+        'type' => 'leaf',
+        'upstream_default' => '75',
+        'value_type' => 'integer'
+      },
+      'KeepAliveProbes',
+      {
+        'type' => 'leaf',
+        'upstream_default' => '9',
+        'value_type' => 'integer'
+      },
+      'NoDelay',
+      {
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'Priority',
+      {
+        'type' => 'leaf',
+        'value_type' => 'integer'
+      },
+      'DeferAcceptSec',
+      '*Priority',
+      'ReceiveBuffer',
+      {
+        'match' => '^\\d+(?i)[KMG]$',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'SendBuffer',
+      '*ReceiveBuffer',
+      'IPTOS',
+      {
+        'type' => 'leaf',
+        'value_type' => 'integer'
+      },
+      'IPTTL',
+      '*IPTOS',
+      'Mark',
+      '*IPTOS',
+      'ReusePort',
+      {
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'SmackLabel',
+      {
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'SmackLabelIPIn',
+      '*SmackLabel',
+      'SmackLabelIPOut',
+      '*SmackLabel',
+      'SELinuxContextFromNet',
+      {
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'PipeSize',
+      {
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'MessageQueueMaxMessages',
+      '*PipeSize',
+      'FreeBind',
+      {
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'Transparent',
+      '*FreeBind',
+      'Broadcast',
+      '*FreeBind',
+      'PassCredentials',
+      '*FreeBind',
+      'PassPIDFD',
+      '*FreeBind',
+      'PassSecurity',
+      '*FreeBind',
+      'PassPacketInfo',
+      '*FreeBind',
+      'AcceptFileDescriptors',
+      {
+        'type' => 'leaf',
+        'upstream_default' => 'yes',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'Timestamping',
+      {
+        'choice' => [
+          'ns',
+          'nsec',
+          'off',
+          'us',
+          'usec',
+          "\x{3bc}s"
+        ],
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
+      'TCPCongestion',
+      {
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'ExecStartPre',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'type' => 'list'
+      },
+      'ExecStartPost',
+      '*ExecStartPre',
+      'ExecStopPre',
+      '*ExecStartPre',
+      'ExecStopPost',
+      '*ExecStartPre',
+      'TimeoutSec',
+      {
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'Service',
-      {
-        'description' => 'Specifies the service unit name to activate on
-incoming traffic. This setting is only allowed for sockets
-with C<Accept=no>. It defaults to the service
-that bears the same name as the socket (with the suffix
-replaced). In most cases, it should not be necessary to use
-this option. Note that setting this parameter might result in
-additional dependencies to be added to the unit (see
-above).',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
+      '*TimeoutSec',
       'RemoveOnStop',
       {
-        'description' => 'Takes a boolean argument. If enabled, any file nodes created by this socket unit are
-removed when it is stopped. This applies to C<AF_UNIX> sockets in the file system,
-POSIX message queues, FIFOs, as well as any symlinks to them configured with
-C<Symlinks>. Normally, it should not be necessary to use this option, and is not
-recommended as services might continue to run after the socket unit has been terminated and it should
-still be possible to communicate with them via their file system node. Defaults to
-off.',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'boolean',
@@ -1151,128 +885,19 @@ off.',
       },
       'Symlinks',
       {
-        'description' => 'Takes a list of file system paths. The specified paths will be created as symlinks to the
-C<AF_UNIX> socket path or FIFO path of this socket unit. If this setting is used, only one
-C<AF_UNIX> socket in the file system or one FIFO may be configured for the socket unit. Use
-this option to manage one or more symlinked alias names for a socket, binding their lifecycle together. Note
-that if creation of a symlink fails this is not considered fatal for the socket unit, and the socket unit may
-still start. If an empty string is assigned, the list of paths is reset. Defaults to an empty
-list.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'FileDescriptorName',
-      {
-        'description' => 'Assigns a name to all file descriptors this socket unit encapsulates.
-This is useful to help activated services identify specific file descriptors, if multiple fds are passed.
-Services may use the
-L<sd_listen_fds_with_names(3)>
-call to acquire the names configured for the received file descriptors. Names may contain any ASCII character,
-but must exclude control characters and C<:>, and must be at most 255 characters in length.
-If this setting is not used, the file descriptor name defaults to the name of the socket unit
-(including its C<.socket> suffix) when C<Accept=no>,
-C<connection> otherwise.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
+      '*Symlinks',
       'TriggerLimitIntervalSec',
-      {
-        'description' => "Configures a limit on how often this socket unit may be activated within a specific
-time interval. The C<TriggerLimitIntervalSec> setting may be used to configure the
-length of the time interval in the usual time units C<us>, C<ms>,
-C<s>, C<min>, C<h>, \x{2026} and defaults to 2s (See
-L<systemd.time(7)> for
-details on the various time units understood). The C<TriggerLimitBurst> setting
-takes a positive integer value and specifies the number of permitted activations per time interval,
-and defaults to 200 for C<Accept=yes> sockets (thus by default permitting 200
-activations per 2s), and 20 otherwise (20 activations per 2s). Set either to 0 to disable any form of
-trigger rate limiting.
-
-If the limit is hit, the socket unit is placed into a failure mode, and will not be connectible
-anymore until restarted. Note that this limit is enforced before the service activation is
-enqueued.
-
-Compare with C<PollLimitIntervalSec>/C<PollLimitBurst>
-described below, which implements a temporary slowdown if a socket unit is flooded with incoming
-traffic, as opposed to the permanent failure state
-C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> results in.",
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
+      '*Symlinks',
       'TriggerLimitBurst',
-      {
-        'description' => "Configures a limit on how often this socket unit may be activated within a specific
-time interval. The C<TriggerLimitIntervalSec> setting may be used to configure the
-length of the time interval in the usual time units C<us>, C<ms>,
-C<s>, C<min>, C<h>, \x{2026} and defaults to 2s (See
-L<systemd.time(7)> for
-details on the various time units understood). The C<TriggerLimitBurst> setting
-takes a positive integer value and specifies the number of permitted activations per time interval,
-and defaults to 200 for C<Accept=yes> sockets (thus by default permitting 200
-activations per 2s), and 20 otherwise (20 activations per 2s). Set either to 0 to disable any form of
-trigger rate limiting.
-
-If the limit is hit, the socket unit is placed into a failure mode, and will not be connectible
-anymore until restarted. Note that this limit is enforced before the service activation is
-enqueued.
-
-Compare with C<PollLimitIntervalSec>/C<PollLimitBurst>
-described below, which implements a temporary slowdown if a socket unit is flooded with incoming
-traffic, as opposed to the permanent failure state
-C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> results in.",
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
+      '*Symlinks',
       'PollLimitIntervalSec',
-      {
-        'description' => 'Configures a limit on how often polling events on the file descriptors backing this
-socket unit will be considered. This pair of settings is similar to
-C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> but instead of
-putting a (fatal) limit on the activation frequency puts a (transient) limit on the polling
-frequency. The expected parameter syntax and range are identical to that of the aforementioned
-options, and can be disabled the same way.
-
-If the polling limit is hit polling is temporarily disabled on it until the specified time
-window passes. The polling limit hence slows down connection attempts if hit, but unlike the trigger
-limit will not cause permanent failures. It\'s the recommended mechanism to deal with DoS attempts
-through packet flooding.
-
-The polling limit is enforced per file descriptor to listen on, as opposed to the trigger limit
-which is enforced for the entire socket unit. This distinction matters for socket units that listen
-on multiple file descriptors (i.e. have multiple C<ListenXYZ> stanzas).
-
-These setting defaults to 150 (in case of C<Accept=yes>) and 15 (otherwise)
-polling events per 2s. This is considerably lower than the default values for the trigger limit (see
-above) and means that the polling limit should typically ensure the trigger limit is never hit,
-unless one of them is reconfigured or disabled.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
+      '*Symlinks',
       'PollLimitBurst',
-      {
-        'description' => 'Configures a limit on how often polling events on the file descriptors backing this
-socket unit will be considered. This pair of settings is similar to
-C<TriggerLimitIntervalSec>/C<TriggerLimitBurst> but instead of
-putting a (fatal) limit on the activation frequency puts a (transient) limit on the polling
-frequency. The expected parameter syntax and range are identical to that of the aforementioned
-options, and can be disabled the same way.
-
-If the polling limit is hit polling is temporarily disabled on it until the specified time
-window passes. The polling limit hence slows down connection attempts if hit, but unlike the trigger
-limit will not cause permanent failures. It\'s the recommended mechanism to deal with DoS attempts
-through packet flooding.
-
-The polling limit is enforced per file descriptor to listen on, as opposed to the trigger limit
-which is enforced for the entire socket unit. This distinction matters for socket units that listen
-on multiple file descriptors (i.e. have multiple C<ListenXYZ> stanzas).
-
-These setting defaults to 150 (in case of C<Accept=yes>) and 15 (otherwise)
-polling events per 2s. This is considerably lower than the default values for the trigger limit (see
-above) and means that the polling limit should typically ensure the trigger limit is never hit,
-unless one of them is reconfigured or disabled.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
+      '*Symlinks',
       'DeferTrigger',
       {
         'choice' => [
@@ -1280,18 +905,6 @@ unless one of them is reconfigured or disabled.',
           'patient',
           'yes'
         ],
-        'description' => 'Takes a boolean argument, or C<patient>. May only be used when C<Accept=no>.
-If enabled, job mode C<lenient> instead of C<replace> is used when
-triggering the service, which means currently activating/running units that conflict with the service
-won\'t be disturbed/brought down. Furthermore, if a conflict exists, the socket unit will wait for
-current job queue to complete and potentially defer the activation by then. An upper limit of total time
-to wait can be configured via C<DeferTriggerMaxSec>. If set to C<yes>,
-the socket unit will fail if all jobs have finished or the timeout has been reached but the conflict remains.
-If C<patient>, always wait until C<DeferTriggerMaxSec> elapses.
-Defaults to no.
-
-This setting is particularly useful if the socket unit should stay active across switch-root/soft-reboot
-operations while the triggered service is stopped.',
         'replace' => {
           '0' => 'no',
           '1' => 'yes',
@@ -1304,23 +917,11 @@ operations while the triggered service is stopped.',
       },
       'DeferTriggerMaxSec',
       {
-        'description' => 'Configures the maximum time to defer the triggering when C<DeferTrigger>
-is enabled. If the service cannot be activated within the specified time, the socket will be considered
-failed and get terminated. Takes a unit-less value in seconds, or a time span value such as "5min 20s".
-Pass C<0> or C<infinity> to disable the timeout logic (the default).
-',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'PassFileDescriptorsToExec',
       {
-        'description' => 'Takes a boolean argument. Defaults to off. If enabled, file descriptors created by
-the socket unit are passed to C<ExecStartPost>, C<ExecStopPre>, and
-C<ExecStopPost> commands from the socket unit. The passed file descriptors can be
-accessed with
-L<sd_listen_fds(3)> as
-if the commands were invoked from the associated service units.  Note that
-C<ExecStartPre> command cannot access socket file descriptors.',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'boolean',
@@ -1330,10 +931,9 @@ C<ExecStartPre> command cannot access socket file descriptors.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 260 doc',
+    'generated_by' => 'parse-man.pl from systemd 261 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }
 ]
 ;
-

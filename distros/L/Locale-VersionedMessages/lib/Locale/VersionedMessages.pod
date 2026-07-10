@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2014 Sullivan Beck. All rights reserved.
+# Copyright (c) 2010-2015 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -89,7 +89,7 @@ up messages from sets that have been loaded.
 
    @set = $obj->set();
 
-This returns the names of the message sets that have been loaded.  SETi
+This returns the names of the message sets that have been loaded.  B<SETi>
 is a string containing alphanumeric and underscore characters.
 
 =item B<query_set_default>
@@ -125,8 +125,8 @@ can change this using these methods.
 
 This specifies the global search order.  This is the default search
 order of locales used for all message sets.  This specifies that, in
-all message sets, the default is to use LOCALE0, followed by LOCALE1,
-LOCALE2, etc.
+all message sets, the default is to use B<LOCALE0>, followed by B<LOCALE1>,
+B<LOCALE2>, etc.
 
 If the message is not found in any of the locales, the default locale
 for the set will be used.
@@ -156,7 +156,7 @@ For example:
 
    $obj->search('BUTTONS','en','en_US','en_GB');
 
-would look for a messages in the 'BUTTONS' set in the locales: 'en',
+would look for a messages in the B<BUTTONS> set in the locales: 'en',
 'en_US', and 'en_GB' in that order.  If a message were not found in
 any of those three, the default locale would be used.
 
@@ -176,11 +176,11 @@ set-specific search order is not set.
    ($text,$locale) = $obj(SET, MSGID [,LOCALE] [,VALUES]);
 
 This method is used to look up a message in the given set and
-substitutes in VALUES (described below in MESSAGE SUBSTITUTIONS).  If
-LOCALE is present, it only looks up the message in that locale.  By
+substitutes in B<VALUES> (described below in L</"MESSAGE SUBSTITUTIONS>).  If
+B<LOCALE> is present, it only looks up the message in that locale.  By
 default, it will look in the search order for that set.
 
-If the message is not found, $text will be the empty string.
+If the message is not found, C<$text> will be the empty string.
 
 In list context, the text will be returned along with the name of
 the locale in which the message was found.
@@ -200,7 +200,7 @@ one will be the default locale.
 
    $vers = $obj->query_msg_vers(SET, MSGID [,LOCALE]);
 
-returns the version of the message in the given locale.  If LOCALE is
+returns the version of the message in the given locale.  If B<LOCALE> is
 not given, it defaults to the default locale.  If the message is not defined
 in the locale, a version of 0 is returned.
 
@@ -246,10 +246,10 @@ Then:
 =item [foo:FORMAT]
 
 The value can be formatted using standard sprintf formats.  Only
-simple formats are allowed, so FORMAT can be something like '%.3f' but
-not 'the number %3d'.  To be exact, FORMAT must be any valid format
-that can be handled by sprintf that takes exactly one argument, so
-something like %% is not allowed, but any %d format is.
+simple formats (i.e. that start with C<%> with no trailing strings) are
+allowed, so B<FORMAT> can be something like C<%.3f> but not C<the number %3d>
+or C<%3d foo>.  It must also take exactly one argument, so C<%%> is not
+allowed as it does not take any arguments.
 
    Set:        Set1
    Message ID: Foo value [foo]
@@ -352,9 +352,50 @@ as are:
 
 None at this point.
 
+=head1 BUGS AND QUESTIONS
+
+If you find a bug in Locale::VersionedMessages, please let me know.  As CPAN has removed
+email support, the only supported way to submit a bug is via ticket:
+
+=over 4
+
+=item GitHub
+
+You can submit an issue or question on GitHub.  This can be done at
+the following URL:
+
+L<https://github.com/SBECK-github/Locale-VersionedMessages>
+
+This is the preferred method.  Please submit problems requests as GitHub issues
+if at all possible.
+
+=back 
+
+Please do not use other means to report bugs (such as forums for a specific
+OS or Linux distribution) as it is impossible for me to keep up with all of
+them.  These are the current methods that are guaranteed to notify me.
+
+When filing a bug report, please include the following information:
+
+=over 4 
+
+=item B<Locale::VersionedMessages version> 
+
+Please include the version of Locale::VersionedMessages you are using.  You can get
+this by using the script:
+
+   use Locale::VersionedMessages; 
+   print $Locale::VersionedMessages::VERSION,"\n";
+
+=back
+
+If you find any problems with the documentation (errors, typos, or items
+that are not clear), please send them to me. I welcome any suggestions
+that will allow me to improve the documentation.
+
 =head1 SEE ALSO
 
-Locale::VersionedMessages::Overview
+L<Locale::VersionedMessages::Overview>
      An overview of the internationalization problem with
      a comparison to other Locale::* modules
 
@@ -369,6 +410,6 @@ modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Sullivan Beck (sbeck@cpan.org)
+Sullivan Beck (https://github.com/SBECK-github/)
 
 =cut

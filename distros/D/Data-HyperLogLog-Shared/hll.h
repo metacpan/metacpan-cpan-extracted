@@ -297,18 +297,34 @@ static inline void hll_recover_dead_readers(HllHandle *h) {
      * Only after the CAS resolves do we wipe the deferred dead slots,
      * keeping that work outside the race-sensitive window. */
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < HLL_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = 0;   /* no slotless readers here: scanning slots is complete */
+            for (uint32_t i = 0; !live_now && i < HLL_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && hll_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < HLL_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || hll_pid_alive(pid)) continue;
-            hll_drain_dead_slot(h, i, pid);
+        if (drain_ok) {
+            for (uint32_t i = 0; i < HLL_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || hll_pid_alive(p)) continue;
+                hll_drain_dead_slot(h, i, p);
+            }
         }
     }
 }
@@ -381,11 +397,11 @@ static inline void hll_rwlock_rdlock(HllHandle *h) {
          * already active (cur>=1), new readers may join freely. */
         if (cur > 0 && cur < HLL_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < HLL_RWLOCK_SPIN_LIMIT, 1)) {
@@ -506,6 +522,26 @@ static inline uint8_t *hll_regs(HllHandle *h) {
     return (uint8_t *)((char *)h->base + h->hdr->regs_off);
 }
 
+/* Snapshot the peer-writable register geometry (precision, m, regs_off) ONCE
+ * and bound it against the trusted mapping size (h->mmap_size comes from fstat
+ * at attach, NOT from the segment a local peer can rewrite via MAP_SHARED).
+ * Returns a pointer to the register array plus its count/precision via the
+ * out-params, or NULL if the header does not describe a region wholly inside
+ * the mapping.  Callers hold the lock; the NULL branch is a predictable
+ * never-taken path for a valid, untampered file.  Reading each field into a
+ * local and validating the local (not re-reading) closes the TOCTOU window. */
+static inline uint8_t *hll_regs_checked(HllHandle *h, uint32_t *m_out, uint32_t *p_out) {
+    uint32_t p   = h->hdr->precision;
+    uint32_t m   = h->hdr->m;
+    uint64_t off = h->hdr->regs_off;
+    if (p < HLL_MIN_PRECISION || p > HLL_MAX_PRECISION) return NULL;
+    if (m != (1u << p)) return NULL;                              /* ties m to p */
+    if (off > h->mmap_size || (uint64_t)m > (uint64_t)h->mmap_size - off) return NULL;
+    if (m_out) *m_out = m;
+    if (p_out) *p_out = p;
+    return (uint8_t *)((char *)h->base + off);
+}
+
 static inline HllHandle *hll_setup(void *base, size_t map_size,
                                    const char *path, int backing_fd) {
     HllHeader *hdr = (HllHeader *)base;
@@ -517,7 +553,7 @@ static inline HllHandle *hll_setup(void *base, size_t map_size,
     }
     h->hdr          = hdr;
     h->base         = base;
-    h->reader_slots = (HllReaderSlot *)((uint8_t *)base + hdr->reader_slots_off);
+    h->reader_slots = (HllReaderSlot *)((uint8_t *)base + sizeof(HllHeader));  /* trusted layout, not the peer-writable header offset */
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
@@ -550,7 +586,24 @@ static int hll_validate_create_args(uint32_t precision, uint32_t *m_out, char *e
     return 1;
 }
 
-static HllHandle *hll_create(const char *path, uint32_t precision, char *errbuf) {
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int hll_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { HLL_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        HLL_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    HLL_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
+static HllHandle *hll_create(const char *path, uint32_t precision, mode_t mode, char *errbuf) {
     uint32_t m;
     if (!hll_validate_create_args(precision, &m, errbuf)) return NULL;
 
@@ -565,8 +618,8 @@ static HllHandle *hll_create(const char *path, uint32_t precision, char *errbuf)
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { HLL_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { HLL_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = hll_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { HLL_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { HLL_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -629,6 +682,15 @@ static HllHandle *hll_open_fd(int fd, char *errbuf) {
 
 static void hll_destroy(HllHandle *h) {
     if (!h) return;
+    /* Release our reader slot on clean teardown (else short-lived-reader churn
+     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+    if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
+        h->cached_fork_gen == __atomic_load_n(&hll_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        uint32_t expected = h->cached_pid;
+        __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
+                &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
     free(h->path);
@@ -646,20 +708,22 @@ static inline int hll_msync(HllHandle *h) {
 
 /* add one item; returns 1 if a register increased, else 0 */
 static int hll_add_locked(HllHandle *h, const void *item, size_t len) {
+    uint32_t p = 0, m = 0;
+    uint8_t *regs = hll_regs_checked(h, &m, &p);        /* bound peer-writable geometry */
+    if (!regs) return 0;                                /* tampered header: skip, never trap */
     uint64_t x = XXH3_64bits(item, len);
-    uint32_t p = h->hdr->precision;
-    uint32_t idx = (uint32_t)(x >> (64 - p));           /* top p bits = register index */
+    uint32_t idx = (uint32_t)(x >> (64 - p));           /* top p bits; < 2^p == m by the check */
     uint64_t rest = (x << p) | (1ULL << (p - 1));       /* guard bit so clz terminates */
     uint8_t  rho  = (uint8_t)(__builtin_clzll(rest) + 1);
-    uint8_t *regs = hll_regs(h);
     if (regs[idx] < rho) { regs[idx] = rho; return 1; }
     return 0;
 }
 
 /* estimate; returns a double */
 static double hll_count_locked(HllHandle *h) {
-    uint32_t m = h->hdr->m;
-    uint8_t *regs = hll_regs(h);
+    uint32_t m = 0;
+    uint8_t *regs = hll_regs_checked(h, &m, NULL);
+    if (!regs) return 0.0;                          /* tampered header: report empty */
     double sum = 0.0;
     uint32_t V = 0;
     for (uint32_t j = 0; j < m; j++) {
@@ -677,17 +741,23 @@ static double hll_count_locked(HllHandle *h) {
     return E;
 }
 
-/* merge src registers into dst (caller guarantees equal m); register-wise max */
-static void hll_merge_regs(HllHandle *dst, const uint8_t *src_regs) {
-    uint32_t m = dst->hdr->m;
-    uint8_t *regs = hll_regs(dst);
-    for (uint32_t j = 0; j < m; j++)
+/* merge src registers into dst; register-wise max over the in-bounds prefix.
+ * src_len bounds reads of src_regs (a temp sized to the source's registers). */
+static void hll_merge_regs(HllHandle *dst, const uint8_t *src_regs, uint32_t src_len) {
+    uint32_t m = 0;
+    uint8_t *regs = hll_regs_checked(dst, &m, NULL);
+    if (!regs) return;
+    uint32_t n = (src_len < m) ? src_len : m;         /* never read past either array */
+    for (uint32_t j = 0; j < n; j++)
         if (src_regs[j] > regs[j]) regs[j] = src_regs[j];
 }
 
 /* reset all registers to 0 (caller holds the write lock) */
 static inline void hll_clear_locked(HllHandle *h) {
-    memset(hll_regs(h), 0, (size_t)h->hdr->m);
+    uint32_t m = 0;
+    uint8_t *regs = hll_regs_checked(h, &m, NULL);   /* bound the memset length */
+    if (!regs) return;
+    memset(regs, 0, (size_t)m);
 }
 
 #endif /* HLL_H */

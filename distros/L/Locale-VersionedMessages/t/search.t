@@ -1,29 +1,24 @@
 #!/usr/bin/perl
 
+use warnings;
+use strict;
 use Test::Inter;
+$::ti = new Test::Inter $0;
+require "tests.pl";
 
-BEGIN {
-   $t       = new Test::Inter 'search';
-   $testdir = $t->testdir();
-}
-
-use Locale::VersionedMessages;
-use lib "$testdir/lib";
-
-my $lm = new Locale::VersionedMessages;
-$lm->set('Test1');
+$::lm->set('Test1');
 
 sub test {
    my ($op,@test) = @_;
 
    if ($op eq 'search') {
-      $lm->search(@test);
+      $::lm->search(@test);
       return ();
    }
 
    if ($op eq 'query') {
-      @ret = $lm->query_search(@test);
-      $err = $lm->err();
+      my @ret = $::lm->query_search(@test);
+      my $err = $::lm->err();
       if ($err) {
          return $err;
       }
@@ -31,7 +26,7 @@ sub test {
    }
 }
 
-$tests = "
+my $tests = "
 
 query                    =>
 
@@ -55,9 +50,9 @@ query Test1              =>
 
 ";
 
-$t->tests(func  => \&test,
-          tests => $tests);
-$t->done_testing();
+$::ti->tests(func  => \&test,
+             tests => $tests);
+$::ti->done_testing();
 
 #Local Variables:
 #mode: cperl

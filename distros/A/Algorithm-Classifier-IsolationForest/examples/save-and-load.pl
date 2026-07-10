@@ -22,26 +22,26 @@ use constant PI => 3.14159265358979;
 srand(23);
 
 sub gaussian {
-    my ( $mu, $sigma ) = @_;
-    my $u1 = rand() || 1e-12;
-    return $mu + $sigma * sqrt( -2 * log($u1) ) * cos( 2 * PI * rand() );
+	my ( $mu, $sigma ) = @_;
+	my $u1 = rand() || 1e-12;
+	return $mu + $sigma * sqrt( -2 * log($u1) ) * cos( 2 * PI * rand() );
 }
 
 # --- train a model ------------------------------------------------------------
 my @train = map { [ gaussian( 0, 1 ), gaussian( 0, 1 ) ] } 1 .. 400;
 
 my $model = Algorithm::Classifier::IsolationForest->new(
-    n_trees       => 100,
-    sample_size   => 256,
-    contamination => 0.05,
-    seed          => 42,
+	n_trees       => 100,
+	sample_size   => 256,
+	contamination => 0.05,
+	seed          => 42,
 );
 $model->fit( \@train );
 print "Trained a forest on ", scalar @train, " points.\n";
 
 # Some unseen points we want to score now and again after reloading.
 my @new_points = ( [ 0, 0 ], [ 1.5, -0.5 ], [ 4, 4 ], [ -5, 2 ] );
-my $before = $model->score_samples( \@new_points );
+my $before     = $model->score_samples( \@new_points );
 
 # --- persist to a file --------------------------------------------------------
 my ( $fh, $path ) = tempfile( 'iforest-XXXX', SUFFIX => '.json', TMPDIR => 1 );
@@ -54,28 +54,22 @@ my $reloaded = Algorithm::Classifier::IsolationForest->load($path);
 my $after    = $reloaded->score_samples( \@new_points );
 
 # --- in-memory round-trip (no file) -------------------------------------------
-my $json  = $model->to_json;
-my $clone = Algorithm::Classifier::IsolationForest->from_json($json);
+my $json   = $model->to_json;
+my $clone  = Algorithm::Classifier::IsolationForest->from_json($json);
 my $cloned = $clone->score_samples( \@new_points );
 
 # --- show that everything agrees ----------------------------------------------
 print "\nScoring the same unseen points three ways:\n";
-printf "  %-12s  %-10s  %-12s  %-12s\n",
-    'point', 'original', 'from file', 'from string';
+printf "  %-12s  %-10s  %-12s  %-12s\n", 'point', 'original', 'from file', 'from string';
 for my $i ( 0 .. $#new_points ) {
-    printf "  (%4.1f,%4.1f)  %-10.6f  %-12.6f  %-12.6f\n",
-        $new_points[$i][0], $new_points[$i][1],
-        $before->[$i], $after->[$i], $cloned->[$i];
+	printf "  (%4.1f,%4.1f)  %-10.6f  %-12.6f  %-12.6f\n",
+		$new_points[$i][0], $new_points[$i][1],
+		$before->[$i], $after->[$i], $cloned->[$i];
 }
 
-my $identical =
-    !grep { $before->[$_] != $after->[$_] || $before->[$_] != $cloned->[$_] }
-    0 .. $#new_points;
+my $identical = !grep { $before->[$_] != $after->[$_] || $before->[$_] != $cloned->[$_] } 0 .. $#new_points;
 
-print "\nReloaded scores are ",
-    ( $identical ? "bit-for-bit identical to the original." : "DIFFERENT (!)" ),
-    "\n";
-printf "The learned threshold survived too: %.4f -> %.4f\n",
-    $model->decision_threshold, $reloaded->decision_threshold;
+print "\nReloaded scores are ", ( $identical ? "bit-for-bit identical to the original." : "DIFFERENT (!)" ), "\n";
+printf "The learned threshold survived too: %.4f -> %.4f\n", $model->decision_threshold, $reloaded->decision_threshold;
 
 unlink $path;

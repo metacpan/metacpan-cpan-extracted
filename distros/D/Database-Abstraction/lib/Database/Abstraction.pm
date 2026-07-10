@@ -21,7 +21,6 @@ package Database::Abstraction;
 # TODO:	The maximum number to return should be tuneable (as a LIMIT)
 # TODO:	Add full CRUD support
 # TODO:	It would be better for the default sep_char to be ',' rather than '!'
-# FIXME:	t/xml.t fails in slurping mode
 # TODO:	Other databases e.g., Redis, noSQL, remote databases such as MySQL, PostgreSQL
 # TODO: The no_entry/entry terminology is confusing.  Replace with no_id/id_column
 # TODO: Add support for DBM::Deep
@@ -29,21 +28,22 @@ package Database::Abstraction;
 
 use warnings;
 use strict;
+use autodie qw(:all);
 
 use boolean;
 use Carp;
-use Data::Dumper;
+use Class::Abstract;
 use Data::Reuse;
-use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
+use DBI;
 use Fcntl;	# For O_RDONLY
 use Cwd;
 use File::Spec;
-use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
+use List::Util qw(all);
 use Log::Abstraction 0.26;
 use Object::Configure 0.16;
 use Params::Get 0.13;
-# use Error::Simple;	# A nice idea to use this, but it doesn't play well with "use lib"
+use Return::Set qw(set_return);
 use Scalar::Util;
 
 our %defaults;
@@ -55,138 +55,282 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 DESCRIPTION
 
-C<Database::Abstraction> is a read-only database abstraction layer (ORM) for Perl,
-designed to provide a simple interface for accessing and querying various types of databases such as CSV, XML, and SQLite without the need to write SQL queries.
-It promotes code maintainability by abstracting database access logic into a single interface,
-allowing users to switch between different storage formats seamlessly.
-The module supports caching for performance optimization,
-flexible logging for debugging and monitoring,
-and includes features like the AUTOLOAD method for convenient access to database columns.
-By handling numerous database and file formats,
-C<Database::Abstraction> adds versatility and simplifies the management of read-intensive applications.
+C<Database::Abstraction> is a read-only ORM for Perl that gives a uniform
+interface over CSV, PSV, XML, SQLite, and BerkeleyDB files - without writing
+any SQL.
 
-=head1 SYNOPSIS
-
-Abstract class giving read-only access to CSV,
-XML,
-BerkeleyDB and SQLite databases via Perl without writing any SQL,
-using caching for performance optimization.
-
-The module promotes code maintainability by abstracting database access logic into a single interface.
-Users can switch between different storage formats without changing application logic.
-The ability to handle numerous database and file formats adds versatility and makes it useful for a variety of applications.
-
-It's a simple ORM like interface which,
-for all of its simplicity,
-allows you to do a lot of the heavy lifting of simple database operations without any SQL.
-It offers functionalities like opening the database and fetching data based on various criteria.
-
-Built-in support for flexible and configurable caching improves performance for read-intensive applications.
-
-Supports logging to debug and monitor database operations.
-
-Look for databases in $directory in this order:
+Key features:
 
 =over 4
 
-=item 1 C<SQLite>
+=item *
 
-File ends with .sql
+B<No SQL required.>  Use plain Perl method calls for simple lookups and
+scans; switch storage formats without changing application code.
 
-=item 2 C<PSV>
+=item *
 
-Pipe separated file, file ends with .psv
+B<Rich query criteria.>  Pass plain values, SQL wildcards, C<undef> (IS NULL),
+comparison operators (C<< > >> C<< < >> C<< >= >> C<< <= >> C<!=>), pattern
+operators (C<-like>, C<-not_like>), set operators (C<-in>, C<-not_in>,
+C<-between>), and logical groupings (C<-or>, C<-and>).
 
-=item 3 C<CSV>
+=item *
 
-File ends with .csv or .db, can be gzipped. Note the default sep_char is '!' not ','
+B<Automatic joins.>  Add a C<join> parameter to any select method to
+combine tables with INNER, LEFT, RIGHT, FULL, or CROSS joins.
 
-=item 4 C<XML>
+=item *
 
-File ends with .xml
+B<Chained query builder.>  The C<query()> method returns a
+L<Database::Abstraction::Query> object for fluent, composable queries:
+C<< $db->query->where(...)->order_by(...)->limit(...)->all() >>.
 
-=item 5 C<BerkeleyDB>
+=item *
 
-File ends with .db
+B<Schema introspection.>  C<columns()> lists column names; C<schema()>
+returns full type/nullability metadata, using native driver introspection
+(C<PRAGMA table_info> for SQLite, C<column_info> for others).
+
+=item *
+
+B<DSN portability.>  Pass a C<dsn> (plus optional C<username>/C<password>)
+to connect to any DBI-supported database (SQLite, PostgreSQL, MySQL, ...)
+instead of pointing at a local file.
+
+=item *
+
+B<Performance.>  Small files are slurped into a RAM hash for sub-millisecond
+lookups.  All DBI statement handles are cached with C<prepare_cached()>.
+A CHI-compatible cache layer is also supported.
 
 =back
 
-The AUTOLOAD feature allows for convenient access to database columns using method calls.
-It hides the complexity of querying the underlying data storage.
+=head1 SYNOPSIS
 
-If the table has a key column,
-entries are keyed on that and sorts are based on it.
-To turn that off, pass 'no_entry' to the constructor, for legacy
-reasons it's enabled by default.
-The key column's default name is 'entry', but it can be overridden by the 'id' parameter.
+    # 1. Create a thin subclass for your table (e.g. Database/Foo.pm)
+    package Database::Foo;
+    use parent 'Database::Abstraction';
 
-Arrays are made read-only before being returned.
-To disable that, pass C<no_fixate> to the constructor.
+    # 2. Open the database - file is auto-detected from the class name
+    #    (looks for foo.sql / foo.psv / foo.csv / foo.xml / foo.db)
+    my $db = Database::Foo->new(directory => '/path/to/data');
 
-CSV files that are not no_entry can have empty lines or comment lines starting with '#',
-to make them more readable.
+    # 3. Simple lookups -----------------------------------------------
 
-=head1 EXAMPLE
+    # Fetch one row
+    my $row = $db->fetchrow_hashref(entry => 'key1');
 
-If the file /var/dat/foo.csv contains something like:
+    # Fetch all rows matching a criterion
+    my $rows = $db->selectall_arrayref(status => 'active');
+
+    # Column shortcut via AUTOLOAD
+    my $name = $db->name(entry => 'key1');
+
+    # 4. Rich criteria ------------------------------------------------
+
+    # Comparison operators
+    my $high = $db->selectall_arrayref(score => { '>' => 90 });
+
+    # Set membership
+    my $selected = $db->selectall_arrayref(
+        name => { -in => ['Alice', 'Bob'] }
+    );
+
+    # Range
+    my $mid = $db->selectall_arrayref(
+        score => { -between => [60, 80] }
+    );
+
+    # OR grouping
+    my $either = $db->selectall_arrayref(
+        -or => [
+            { status => 'active'    },
+            { score  => { '>' => 95 } },
+        ]
+    );
+
+    # 5. Joins --------------------------------------------------------
+
+    my $joined = $db->selectall_arrayref(
+        join => { table => 'dept', on => 'foo.dept_id = dept.id', type => 'LEFT' }
+    );
+
+    # 6. Chained query builder ----------------------------------------
+
+    my $results = $db->query
+        ->where(status => 'active')
+        ->where(score  => { '>=' => 80 })
+        ->order_by('score DESC')
+        ->limit(10)
+        ->all();
+
+    my $first = $db->query->where(name => 'Alice')->first();
+    my $count = $db->query->where(status => 'active')->count();
+
+    # 7. Connect via DSN (PostgreSQL, MySQL, SQLite, ...) ---------------
+
+    my $db2 = Database::Foo->new(
+        dsn      => 'dbi:Pg:dbname=mydb;host=db.example.com',
+        username => 'myuser',
+        password => 's3cret',
+    );
+
+    # 8. Schema introspection -----------------------------------------
+
+    my $cols   = $db->columns();  # ['entry', 'name', 'score', ...]
+    my $schema = $db->schema();   # { name => { type=>'TEXT', nullable=>1, ... }, ... }
+
+=head1 QUICK START EXAMPLE
+
+If F</var/dat/foo.csv> contains:
 
     "customer_id","name"
     "plugh","John"
     "xyzzy","Jane"
 
-Create a driver for the file in .../Database/foo.pm:
+Create a driver in F<.../Database/foo.pm>:
 
     package Database::foo;
+    use parent 'Database::Abstraction';
 
-    use Database::Abstraction;
-
-    our @ISA = ('Database::Abstraction');
-
-    # Regular CSV: There is no entry column and the separators are commas
-    sub new
-    {
-	my $class = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-
-	return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
+    # Regular CSV: no entry column, comma-separated
+    sub new {
+        my ($class, %args) = @_;
+        return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
     }
 
-You can then use this code to access the data via the driver:
+Then query it:
 
-    # Opens the file, e.g. /var/dat/foo.csv
     my $foo = Database::foo->new(directory => '/var/dat');
 
     # Prints "John"
-    print 'Customer name ', $foo->name(customer_id => 'plugh'), "\n";
+    print 'Customer: ', $foo->name(customer_id => 'plugh'), "\n";
 
-    # Prints:
-    #  $VAR1 = {
-    #     'customer_id' => 'xyzzy',
-    #     'name' => 'Jane'
-    #  };
+    # Returns { customer_id => 'xyzzy', name => 'Jane' }
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
-    print Data::Dumper->new([$row])->Dump();
+
+=head1 FILE FORMATS
+
+The module probes the C<directory> for files in this priority order:
+
+=over 4
+
+=item 1. C<SQLite>
+
+File ending C<.sql>
+
+=item 2. C<PSV>
+
+Pipe-separated file, ending C<.psv>
+
+=item 3. C<CSV>
+
+Comma (or custom) separated file, ending C<.csv> or C<.db>; can be
+gzipped.  B<Note:> the default separator is C<!> not C<,> for historical
+reasons - pass C<< sep_char => ',' >> for standard CSVs.
+
+=item 4. C<XML>
+
+File ending C<.xml>
+
+=item 5. C<BerkeleyDB>
+
+Binary key-value file ending C<.db>
+
+=back
+
+Pass C<dsn> to bypass file detection entirely and connect via any DBI driver.
+
+=head1 QUERY CRITERIA
+
+All select methods (C<selectall_arrayref>, C<selectall_array>,
+C<fetchrow_hashref>, C<count>) accept the same criteria syntax.
+
+=head2 Plain value
+
+    status => 'active'          # status = 'active'
+    name   => undef             # name IS NULL
+
+Values containing C<%> or C<_> are matched with C<LIKE>:
+
+    name => 'A%'                # name LIKE 'A%'
+
+=head2 Comparison operator hashref
+
+    score => { '>'  => 90  }   # score > 90
+    score => { '<'  => 50  }   # score < 50
+    score => { '>=' => 80  }   # score >= 80
+    score => { '<=' => 100 }   # score <= 100
+    score => { '!=' => 0   }   # score != 0
+
+Multiple operators on one column are ANDed:
+
+    score => { '>' => 60, '<' => 90 }   # 60 < score < 90
+
+=head2 Pattern matching
+
+    name => { -like     => 'A%'  }   # name LIKE 'A%'
+    name => { -not_like => 'Z%'  }   # name NOT LIKE 'Z%'
+
+=head2 Set membership
+
+    name => { -in     => ['Alice', 'Bob'] }   # name IN (...)
+    name => { -not_in => ['Alice', 'Bob'] }   # name NOT IN (...)
+
+=head2 Range
+
+    score => { -between => [60, 90] }   # score BETWEEN 60 AND 90
+
+=head2 Logical groupings
+
+C<-or> and C<-and> take an arrayref of condition hashrefs:
+
+    -or => [
+        { status => 'active'        },
+        { score  => { '>' => 95 }   },
+    ]
+
+    -and => [
+        { status => 'active'        },
+        { score  => { '>=' => 80 }  },
+    ]
+
+=head2 Joins
+
+Any select method accepts a C<join> key with a hashref (or arrayref of
+hashrefs) describing the join:
+
+    join => {
+        table => 'dept',
+        on    => 'employees.dept_id = dept.id',
+        type  => 'LEFT',    # INNER (default) | LEFT | RIGHT | FULL | CROSS
+    }
+
+    # Multiple joins
+    join => [
+        { table => 'dept',    on => 'e.dept_id   = dept.id'   },
+        { table => 'country', on => 'e.country_id = country.id' },
+    ]
 
 =head1 SUBROUTINES/METHODS
 
 =head2 init
 
-Initializes the abstraction class and its subclasses with optional arguments for configuration.
+Set class-level defaults shared by all instances.
 
     Database::Abstraction::init(directory => '../data');
 
-See the documentation for new to see what variables can be set.
-
-Returns a reference to a hash of the current values.
-Therefore when given with no arguments you can get the current default values:
+Accepts the same parameters as L</new>.  Returns a reference to the
+current defaults hash, so you can read them back:
 
     my $defaults = Database::Abstraction::init();
     print $defaults->{'directory'}, "\n";
@@ -237,88 +381,139 @@ sub import
 
 =head2 new
 
-Create an object to point to a read-only database.
+Create an object pointing to a read-only database.
 
-Arguments:
+Accepts arguments as a hash, a hashref, or - as a shortcut - a single bare
+string which is taken to be C<directory>.
 
-Takes different argument formats (hash or positional)
+=head3 Connection parameters
 
 =over 4
 
-=item * C<auto_load>
+=item * C<directory>
 
-Enable/disable the AUTOLOAD feature.
-The default is to have it enabled.
+Directory containing the data files.  The module probes this directory for
+files named after the subclass (see L</FILE FORMATS>).  Required unless
+C<dsn> is given.
 
-=item * C<cache>
+=item * C<dsn>
 
-Place to store results
+A DBI data-source string (e.g. C<dbi:SQLite:dbname=/path/to/db> or
+C<dbi:Pg:dbname=mydb;host=db.example.com>).  When present, file detection
+is skipped entirely and the DSN is used directly.  The SQL dialect is
+inferred from the DSN prefix (C<sqlite>, C<postgres>, C<mysql>).
 
-=item * C<cache_duration>
+=item * C<username>
 
-How long to store results in the cache (default is 1 hour).
+Database username.  Used only with C<dsn>; ignored for file-based backends.
 
-=item * C<config_file>
+=item * C<password>
 
-Points to a configuration file which contains the parameters to C<new()>.
-The file can be in any common format including C<YAML>, C<XML>, and C<INI>.
-This allows the parameters to be set at run time.
-
-=item * C<expires_in>
-
-Synonym of C<cache_duration>, for compatibility with C<CHI>.
+Database password.  Used only with C<dsn>; ignored for file-based backends.
 
 =item * C<dbname>
 
-The prefix of name of the database file (default is name of the table).
-The database will be held in a file such as $dbname.csv.
-
-=item * C<directory>
-
-Where the database file is held.
-If only one argument is given to C<new()>, it is taken to be C<directory>.
+Override the filename stem searched in C<directory> (default: the table
+name derived from the class name).
 
 =item * C<filename>
 
-Filename containing the data.
-When not given,
-the filename is derived from the tablename
-which in turn comes from the class name.
-
-=item * C<logger>
-
-Takes an optional parameter logger, which is used for warnings and traces.
-Can be an object that understands warn() and trace() messages,
-such as a L<Log::Log4perl> or L<Log::Any> object,
-a reference to code,
-or a filename.
-
-=item * C<max_slurp_size>
-
-CSV/PSV/XML files smaller than this are held in a HASH in RAM (default is 16K),
-falling back to SQL on larger data sets.
-Setting this value to 0 will turn this feature off,
-thus forcing SQL to be used to access the database
+Override the full filename (relative to C<directory>).  Takes precedence
+over C<dbname>.
 
 =back
 
-If the arguments are not set, tries to take from class level defaults.
+=head3 Behaviour parameters
 
-Checks for abstract class usage.
+=over 4
 
-Slurp mode assumes that the key column (entry) is unique.
-If it isn't, searches will be incomplete.
-Turn off slurp mode on those databases,
-by setting a low value for max_slurp_size.
+=item * C<no_entry>
 
-Clones existing objects with or without modifications.
-Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
+Set to C<1> when the table has no key column (standard CSVs, for example).
+Default is C<0> (keyed on C<entry>).
+
+=item * C<id>
+
+Name of the key column.  Default is C<entry>.
+
+=item * C<sep_char>
+
+Field separator for CSV/PSV files.
+Default is C<!> - pass C<< sep_char => ',' >>
+for standard comma-separated files.
+
+=item * C<max_slurp_size>
+
+Files smaller than this (in bytes) are loaded entirely into memory for fast
+lookups.  Default is 16 KB.  Set to C<0> to force SQL mode for all sizes.
+
+=item * C<no_fixate>
+
+Set to C<1> to return mutable arrays.  Default is C<0> (arrays are made
+read-only via L<Data::Reuse>).
+
+=item * C<auto_load>
+
+Set to C<0> to disable the AUTOLOAD column shortcut.  Default is C<1>
+(enabled).
+
+=back
+
+=head3 Caching and logging
+
+=over 4
+
+=item * C<cache>
+
+A L<CHI>-compatible cache object.  When set, query results are stored and
+retrieved from the cache.
+
+=item * C<cache_duration> / C<expires_in>
+
+TTL for cached results.  Default is C<'1 hour'>.  C<expires_in> is a
+synonym for compatibility with L<CHI>.
+
+=item * C<logger>
+
+An object that understands C<warn()> and C<trace()> (e.g.
+L<Log::Log4perl>, L<Log::Any>), a code reference, or a filename.
+
+=item * C<config_file>
+
+Path to a YAML, XML, or INI configuration file whose keys are merged into
+the constructor arguments.  Loaded via L<Object::Configure>.
+
+=back
+
+=head3 Notes
+
+=over 4
+
+=item *
+
+If no arguments are set, class-level defaults set via C<init()> or C<use>
+are used.
+
+=item *
+
+Slurp mode assumes the key column (C<entry>) is unique.  If it is not,
+searches will be incomplete - disable slurp mode by setting
+C<< max_slurp_size => 0 >>.
+
+=item *
+
+Passing an existing object as C<$class> clones it, merging any new
+arguments.
+
+=back
 
 =cut
 
 sub new {
 	my $class = shift;
 	my %args;
+
+	Class::Abstract::check_abstract($class);	# enforces abstract contract
 
 	# Handle hash or hashref arguments
 	if((scalar(@_) == 1) && !ref($_[0])) {
@@ -345,33 +540,27 @@ sub new {
 	# Load the configuration from a config file, if provided
 	%args = %{Object::Configure::configure($class, \%args)};
 
-	# Validate logger object has required methods
-	if(defined $args{'logger'}) {
-		unless(Scalar::Util::blessed($args{'logger'}) && $args{'logger'}->can('info') && $args{'logger'}->can('error')) {
-			Carp::croak("Logger must be an object with info() and error() methods");
+	# Normalise logger: wrap code-refs, filenames, and strings in Log::Abstraction
+	# so that the rest of the code can always call ->$level(...) uniformly.
+	if(defined $args{'logger'} && !Scalar::Util::blessed($args{'logger'})) {
+		$args{'logger'} = Log::Abstraction->new($args{'logger'});
+	}
+
+	unless($args{'dsn'} || $defaults{'dsn'}) {
+		croak("$class: where are the files?") unless($args{'directory'} || $defaults{'directory'});
+
+		croak("$class: ", $args{'directory'} || $defaults{'directory'}, ' is not a directory') unless(-d ($args{'directory'} || $defaults{'directory'}));
+	}
+
+	# Validate the primary-key column name to prevent SQL injection via ORDER BY / WHERE
+	for my $src (\%defaults, \%args) {
+		if(defined $src->{'id'}) {
+			croak("$class: unsafe id column name '$src->{id}'")
+				unless $src->{'id'} =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 		}
 	}
 
-	croak("$class: where are the files?") unless($args{'directory'} || $defaults{'directory'});
-
-	croak("$class: ", $args{'directory'} || $defaults{'directory'}, ' is not a directory') unless(-d ($args{'directory'} || $defaults{'directory'}));
-
-	# init(\%args);
-
-	# return bless {
-		# logger => $args{'logger'} || $logger,
-		# directory => $args{'directory'} || $directory,	# The directory containing the tables in XML, SQLite or CSV format
-		# cache => $args{'cache'} || $cache,
-		# cache_duration => $args{'cache_duration'} || $cache_duration || '1 hour',
-		# table => $args{'table'},	# The name of the file containing the table, defaults to the class name
-		# no_entry => $args{'no_entry'} || 0,
-	# }, $class;
-
-	# Re-seen keys take precedence, so defaults come first
-	# print STDERR ">>>>>>>>>>>>>>>>>>>\n";
-	# print STDERR __LINE__, "\n";
-	# print STDERR $args{'id'} || 'undef';
-	# print STDERR "\n";
+	# Defaults are set first so that %args keys override them
 	return bless {
 		no_entry => 0,
 		no_fixate => 0,
@@ -411,9 +600,9 @@ sub set_logger
 
 sub _open
 {
-	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
-		Carp::croak('Illegal Operation: This method can only be called by a subclass');
-	}
+	# Enforce that _open is only reachable from within this class hierarchy;
+	# caller() returns the calling package name as a plain string.
+	do { my $c = (caller)[0]; Carp::croak('Illegal Operation: _open may only be called within ', __PACKAGE__) unless $c && $c->isa(__PACKAGE__) };
 
 	my $self = shift;
 	my $params = Params::Get::get_params(undef, @_);
@@ -431,8 +620,42 @@ sub _open
 	# Read in the database
 	my $dbh;
 
+	# DSN-based connection bypasses file detection entirely
+	if(my $dsn = $self->{'dsn'} || $defaults{'dsn'}) {
+		require DBI && DBI->import() unless DBI->can('connect');
+
+		my $dialect = 'generic';
+		if    ($dsn =~ /^dbi:SQLite:/i) { $dialect = 'sqlite'   }
+		elsif ($dsn =~ /^dbi:Pg:/i)     { $dialect = 'postgres' }
+		elsif ($dsn =~ /^dbi:mysql:/i)  { $dialect = 'mysql'    }
+		$self->{'_dialect'} = $dialect;
+
+		$dbh = DBI->connect(
+			$dsn,
+			$self->{'username'},
+			$self->{'password'},
+			{ RaiseError => 1, AutoCommit => 1 },
+		) or Carp::croak(ref($self), ": cannot connect: $DBI::errstr");
+
+		if($dialect eq 'sqlite') {
+			$dbh->do('PRAGMA synchronous = OFF');
+			$dbh->do('PRAGMA cache_size = -4096');
+			$dbh->do('PRAGMA journal_mode = OFF');
+			$dbh->do('PRAGMA temp_store = MEMORY');
+			$dbh->do('PRAGMA mmap_size = 1048576');
+			$dbh->sqlite_busy_timeout(100000);
+		}
+
+		$self->{'type'} = 'DBI';
+		$self->{$table} = $dbh;
+		$self->{'_updated'} = time();
+		return $self;
+	}
+
 	my $dir = Cwd::abs_path($self->{'directory'} || $defaults{'directory'});
 	my $dbname = $self->{'dbname'} || $defaults{'dbname'} || $table;
+	Carp::croak(ref($self), ": unsafe dbname '$dbname'")
+		unless $dbname =~ /^[a-zA-Z0-9_.-]+$/ && $dbname !~ /\.\./;
 	my $slurp_file = File::Spec->catfile($dir, "$dbname.sql");
 
 	$self->_debug("_open: try to open $slurp_file");
@@ -442,8 +665,9 @@ sub _open
 		# SQLite file
 		require DBI && DBI->import() unless DBI->can('connect');
 
+		require DBD::SQLite::Constants;
 		$dbh = DBI->connect("dbi:SQLite:dbname=$slurp_file", undef, undef, {
-			sqlite_open_flags => SQLITE_OPEN_READONLY,
+			sqlite_open_flags => DBD::SQLite::Constants::SQLITE_OPEN_READONLY(),
 		});
 	}
 	if($dbh) {
@@ -460,27 +684,46 @@ sub _open
 		$self->{'type'} = 'BerkeleyDB';
 	} else {
 		my $fin;
-		($fin, $slurp_file) = File::pfopen::pfopen($dir, $dbname, 'csv.gz:db.gz', '<');
+		# File::pfopen splits $path on ':' which breaks Windows drive letters
+		# (C:\foo becomes ['C', '\foo']).  Since we always have a single directory
+		# we use File::Spec->catfile directly — same behaviour, portable.
+		for my $ext (qw(csv.gz db.gz)) {
+			my $candidate = File::Spec->catfile($dir, "$dbname.$ext");
+			next unless -r $candidate;
+			open($fin, '<', $candidate) or next;
+			$slurp_file = $candidate;
+			last;
+		}
 		if(defined($slurp_file) && (-r $slurp_file)) {
 			require Gzip::Faster;
 			Gzip::Faster->import();
 
 			close($fin);
-			$fin = File::Temp->new(SUFFIX => '.csv', UNLINK => 0);
+			$fin = File::Temp->new(SUFFIX => '.csv', UNLINK => 1);
 			print $fin gunzip_file($slurp_file);
+			$fin->flush();
 			$slurp_file = $fin->filename();
-			$self->{'temp'} = $slurp_file;
+			$self->{'_temp_fh'} = $fin;	# Keep object alive; auto-unlinks at DESTROY
 		} else {
-			($fin, $slurp_file) = File::pfopen::pfopen($dir, $dbname, 'psv', '<');
-			if(defined($fin)) {
+			my $psv = File::Spec->catfile($dir, "$dbname.psv");
+			if(-r $psv && open($fin, '<', $psv)) {
 				# Pipe separated file
+				$slurp_file = $psv;
 				$params->{'sep_char'} = '|';
 			} else {
-				# CSV file
-				($fin, $slurp_file) = File::pfopen::pfopen($dir, $dbname, 'csv:db', '<');
+				# CSV or BerkeleyDB-extension file
+				for my $ext (qw(csv db)) {
+					my $candidate = File::Spec->catfile($dir, "$dbname.$ext");
+					next unless -r $candidate;
+					open($fin, '<', $candidate) or next;
+					$slurp_file = $candidate;
+					last;
+				}
 			}
 		}
 		if(my $filename = $self->{'filename'} || $defaults{'filename'}) {
+			Carp::croak(ref($self), ": unsafe filename '$filename'")
+				unless $filename =~ /^[a-zA-Z0-9_.-]+$/ && $filename !~ /\.\./;
 			$self->_debug("Looking for $filename in $dir");
 			$slurp_file = File::Spec->catfile($dir, $filename);
 		}
@@ -539,25 +782,8 @@ sub _open
 				# }
 			};
 
-			# my %options = (
-				# allow_loose_quotes => 1,
-				# blank_is_undef => 1,
-				# empty_is_undef => 1,
-				# binary => 1,
-				# f_file => $slurp_file,
-				# escape_char => '\\',
-				# sep_char => $sep_char,
-			# );
-
-			# $dbh->{csv_tables}->{$table} = \%options;
-			# delete $options{f_file};
-
-			# require Text::CSV::Slurp;
-			# Text::CSV::Slurp->import();
-			# $self->{'data'} = Text::CSV::Slurp->load(file => $slurp_file, %options);
-
-			# Can't slurp when we want to use our own column names as Text::xSV::Slurp has no way to override the names
-			# FIXME: Text::xSV::Slurp can't cope well with quotes in field contents
+			# Text::xSV::Slurp cannot override column names, so skip slurp when
+			# column_names is set — the DBI CSV connection will supply names instead.
 			if(((-s $slurp_file) <= $max_slurp_size) && !$params->{'column_names'}) {
 				if((-s $slurp_file) == 0) {
 					# Empty file
@@ -582,19 +808,17 @@ sub _open
 						file => $slurp_file
 					);
 
-					# Ignore blank lines or lines starting with # in the CSV file
+					# Filter out blank lines and comment rows (lines starting with #)
 					my @data = grep { $_->{$self->{'id'}} !~ /^\s*#/ } grep { defined($_->{$self->{'id'}}) } @{$dataref};
 
 					if($self->{'no_entry'}) {
-						# Not keyed, will need to scan each entry
-						$self->{'data'} = @data;
+						# Not keyed on a primary column — keep as ordered list.
+						# Only store a reference when rows were found; an empty-array ref
+						# is truthy, which would activate the in-memory fast-path and
+						# silently return 0 results instead of falling through to SQL.
+						$self->{'data'} = @data ? \@data : undef;
 					} else {
-						# keyed on the $self->{'id'} (default: "entry") column
-						# while(my $d = shift @data) {
-							# $self->{'data'}->{$d->{$self->{'id'}}} = $d;
-						# }
-						# Build hash directly from the filtered array, better to use map to avoid data copy
-						# and enclose in { } to ensure it's a hash ref
+						# Key the hash by $self->{'id'} for O(1) entry lookups
 						$self->{'data'} = { map { $_->{$self->{'id'}} => $_ } @data };
 					}
 				}
@@ -620,13 +844,13 @@ sub _open
 							if($xml->{$table}) {
 								@data = $xml->{$table};
 							} else {
-								die 'TODO: import arbitrary XML with "entry" field';
+								Carp::croak('XML slurp: complex documents with an "entry" field are not yet supported');
 							}
 						} else {
-							die 'TODO: import arbitrary XML (differnt number of keys)';
+							Carp::croak('XML slurp: multi-key documents are not yet supported');
 						}
 					} else {
-						die 'TODO: import arbitrary XML, cannot currently handle ', ref($xml);
+						Carp::croak('XML slurp: cannot handle ', ref($xml), ' structure');
 					}
 					$self->{'data'} = ();
 					if($self->{'no_entry'}) {
@@ -655,7 +879,8 @@ sub _open
 		}
 	}
 
-	Data::Reuse::fixate(%{$self->{'data'}}) if($self->{'data'} && (ref($self->{'data'} eq 'HASH')));
+	# ref() must be called on the variable, not on the result of 'eq'
+	Data::Reuse::fixate(%{$self->{'data'}}) if($self->{'data'} && (ref($self->{'data'}) eq 'HASH'));
 
 	$self->{$table} = $dbh;
 	my @statb = stat($slurp_file);
@@ -664,23 +889,59 @@ sub _open
 	return $self;
 }
 
-=head2	selectall_arrayref
+=head2 selectall_arrayref
 
-Returns a reference to an array of hash references of all the data meeting
-the given criteria.
+Returns a reference to an array of hash references for every row that
+matches the given criteria, or C<undef> when there are no matches.
 
-Note that since this returns an array ref,
-optimisations such as "LIMIT 1" will not be used.
+    my $rows = $db->selectall_arrayref();                    # all rows
+    my $rows = $db->selectall_arrayref(status => 'active');  # exact match
+    my $rows = $db->selectall_arrayref(score => { '>' => 8 });  # operator
 
-Use caching if that is available.
+The full criteria syntax is described in L</QUERY CRITERIA>.
 
-Returns undef if there are no matches.
+Pass a C<join> key to combine with another table:
+
+    my $rows = $db->selectall_arrayref(
+        dept_name => 'Engineering',
+        join      => { table => 'dept', on => 'e.dept_id = dept.id' },
+    );
+
+Results are returned in the cache (if configured) and the returned array
+reference is made read-only unless C<no_fixate> was set.
+
+B<Note:> this always returns all matching rows.  Use L</selectall_array>
+in scalar context, or C<< $db->query->limit(1)->all() >>, to fetch just one row.
+
+=head3 PSEUDOCODE
+
+    1. Parse criteria; extract and build any JOIN clause.
+    2. If data is slurped AND no joins AND criteria are simple:
+       a. No criteria -> return all rows as arrayref.
+       b. entry-only lookup -> return [$data{entry}].
+       c. Otherwise -> scan rows in-memory with _match_criterion.
+    3. Otherwise build SQL: SELECT * FROM table [JOIN] [WHERE] ORDER BY id.
+    4. Check cache; return cached arrayref on HIT.
+    5. prepare_cached + execute; fetch all rows.
+    6. Store result in cache; fixate the array; return arrayref.
 
 =cut
 
 sub selectall_arrayref {
 	my $self = shift;
+
+	# Fire _open() first so $self->{'berkeley'} is known before we parse @_.
+	# BerkeleyDB param parsing must use get_params(undef, \@_) so that
+	# key-value pairs like (join => {...}) are not mangled by the positional
+	# 'entry' mapping that non-BerkeleyDB paths use.
+	$self->_open_table({});
+
 	my $params;
+
+	if($self->{'berkeley'}) {
+		$params = Params::Get::get_params(undef, \@_) // {};
+		return set_return($self->_scan_berkeley($params), { type => 'arrayref' });
+	}
 
 	if($self->{'no_entry'}) {
 		$params = Params::Get::get_params(undef, \@_);
@@ -688,84 +949,60 @@ sub selectall_arrayref {
 		$params = Params::Get::get_params('entry', @_);
 	}
 
-	if($self->{'berkeley'}) {
-		$self->_fatal(ref($self), ': selectall_arrayref is meaningless on a NoSQL database');
-	}
-
 	my $table = $self->_open_table($params);
 
-	if($self->{'data'}) {
+	$params //= {};
+
+	my $join_clause = '';
+	if(my $join_spec = delete $params->{'join'}) {
+		$join_clause = $self->_build_joins($join_spec);
+	}
+
+	if(!$join_clause && $self->{'data'} && !$self->_has_complex_criteria($params)) {
 		if(scalar(keys %{$params}) == 0) {
 			$self->_trace("$table: selectall_arrayref fast track return");
 			if(ref($self->{'data'}) eq 'HASH') {
-				# $self->{'data'} looks like this:
-				#	key1 => {
-				#		entry => key1,
-				#		field1 => value1,
-				#		field2 => value2
-				#	}, key2 => {
-				#		entry => key2,
-				#		field1 => valuea,
-				#		field2 => valueb
-				#	}
 				$self->_debug("$table: returning ", scalar keys %{$self->{'data'}}, ' entries');
 				if(scalar keys %{$self->{'data'}} <= 10) {
-					$self->_debug(Dumper($self->{'data'}));
+					$self->_debug(do { require Data::Dumper; Data::Dumper::Dumper($self->{'data'}) });
 				}
-				my @rc;
-				foreach my $k (keys %{$self->{'data'}}) {
-					push @rc, $self->{'data'}->{$k};
-				}
-				return Return::Set::set_return(\@rc, { type => 'arrayref' });
+				my @rc = values %{$self->{'data'}};
+				return set_return(\@rc, { type => 'arrayref' });
 			}
-			return Return::Set::set_return($self->{'data'}, { type => 'arrayref'});
-			# my @rc = values %{$self->{'data'}};
-			# return @rc;
+			return set_return($self->{'data'}, { type => 'arrayref'});
 		} elsif((scalar(keys %{$params}) == 1) && defined($params->{'entry'}) && !$self->{'no_entry'}) {
-			return Return::Set::set_return([$self->{'data'}->{$params->{'entry'}}], { type => 'arrayref' });
+			# exists() guard: fixate() locks all keys in the slurp hash; return []
+			# (not [undef]) when the key is missing so callers get an empty result
+			return set_return([], { type => 'arrayref' })
+				unless exists($self->{'data'}->{$params->{'entry'}});
+			return set_return([$self->{'data'}->{$params->{'entry'}}], { type => 'arrayref' });
+		} elsif(ref($self->{'data'}) eq 'HASH') {
+			# Scan in-memory hash for simple column criteria without touching DBI.
+			# fixate() locks hash keys, so use exists() to avoid throwing on unknown columns.
+			$self->_debug("$table: selectall_arrayref in-memory scan with criteria");
+			my @rc = grep {
+				my $row = $_;
+				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}) } keys %{$params}
+			} values %{$self->{'data'}};
+			return set_return(\@rc, { type => 'arrayref' });
 		}
 	}
 
-	my $query;
-	my $done_where = 0;
+	my ($where, $wargs) = $self->_build_where($params);
+	my @query_args = @{$wargs};
 
-	if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-		$query = "SELECT * FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
-		$done_where = 1;
+	my $query = "SELECT * FROM $table";
+	$query .= " $join_clause" if $join_clause;
+	if($join_clause) {
+		$query .= " WHERE $where" if $where;
+	} elsif(($self->{'type'} eq 'CSV') && !$self->{'no_entry'}) {
+		my $id = $self->{'id'};
+		$query .= " WHERE $id IS NOT NULL AND $id NOT LIKE '#%'";
+		$query .= " AND ($where)" if $where;
 	} else {
-		$query = "SELECT * FROM $table";
+		$query .= " WHERE $where" if $where;
 	}
-
-	my @query_args;
-	foreach my $c1(sort keys(%{$params})) {	# sort so that the key is always the same
-		my $arg = $params->{$c1};
-		if(ref($arg)) {
-			# throw Error::Simple("$query: argument is not a string: " . ref($arg));
-			$self->_fatal("selectall_arrayref(): $query: argument is not a string: ", ref($arg));
-		}
-		if(!defined($arg)) {
-			my @call_details = caller(0);
-			# throw Error::Simple("$query: value for $c1 is not defined in call from " .
-				# $call_details[2] . ' of ' . $call_details[1]);
-			Carp::croak("$query: value for $c1 is not defined in call from ",
-				$call_details[2], ' of ', $call_details[1]);
-		}
-
-		my $keyword;
-		if($done_where) {
-			$keyword = 'AND';
-		} else {
-			$keyword = 'WHERE';
-			$done_where = 1;
-		}
-		if($arg =~ /[%_]/) {
-			$query .= " $keyword $c1 LIKE ?";
-		} else {
-			$query .= " $keyword $c1 = ?";
-		}
-		push @query_args, $arg;
-	}
-	if(!$self->{no_entry}) {
+	if(!$self->{'no_entry'}) {
 		$query .= ' ORDER BY ' . $self->{'id'};
 	}
 
@@ -797,38 +1034,34 @@ sub selectall_arrayref {
 		$self->_debug('cache not used');
 	}
 
-	if(my $sth = $self->{$table}->prepare($query)) {
-		$sth->execute(@query_args) ||
-			# throw Error::Simple("$query: @query_args");
-			croak("$query: @query_args");
+	if(my $sth = $self->{$table}->prepare_cached($query)) {
+		$sth->execute(@query_args) || croak("$query: @query_args");
 
 		my $rc;
 		while(my $href = $sth->fetchrow_hashref()) {
 			push @{$rc}, $href if(scalar keys %{$href});
 		}
-		if($c) {
-			$c->set($key, $rc, $self->{'cache_duration'});	# Store a ref to the array
-		}
+		$c->set($key, $rc, $self->{'cache_duration'}) if $c;
 
-		Data::Reuse::fixate(@{$rc}) if(!$self->{'no_fixate'});
+		if(!$self->{'no_fixate'}) {
+			# forget() clears stale address→canonical mappings from prior calls;
+			# fixate() then deduplicates values within this result set only.
+			# Without forget(), freed hashref addresses from previous fixate calls
+			# can collide with new DBI hashrefs and return wrong canonical rows.
+			Data::Reuse::forget();
+			Data::Reuse::fixate(@{$rc});
+		}
 
 		return $rc;
 	}
-	$self->_warn("selectall_array failure on $query: @query_args");
-	# throw Error::Simple("$query: @query_args");
+	$self->_warn("selectall_arrayref failure on $query: @query_args");
 	croak("$query: @query_args");
-
-	# my @rc = grep { defined $_ } $self->selectall_array(@_);
-
-	# return if(scalar(@rc) == 0);
-
-	# Data::Reuse::fixate(@rc) if(!$self->{'no_fixate'});
-	# return \@rc;
 }
 
-=head2	selectall_hashref
+=head2 selectall_hashref
 
-Deprecated misleading legacy name for selectall_arrayref.
+Deprecated alias for L</selectall_arrayref>.  Use C<selectall_arrayref> in
+new code.
 
 =cut
 
@@ -838,14 +1071,18 @@ sub selectall_hashref
 	return $self->selectall_arrayref(@_);
 }
 
-=head2	selectall_array
+=head2 selectall_array
 
-Similar to selectall_array but returns an array of hash references.
+Similar to L</selectall_arrayref> but returns a list of hash references
+rather than a reference to an array.
 
-Con:	Copies more data around than selectall_arrayref
-Pro:	Better determination of list vs scalar mode than selectall_arrayref by setting "LIMIT 1"
+    my @rows = $db->selectall_array(status => 'active');
 
-TODO:	Remove duplicated code
+In B<scalar context> it applies C<LIMIT 1> and returns just the first
+matching hash reference - making it more efficient than C<selectall_arrayref>
+when you only need one row.  In B<list context> all matching rows are returned.
+
+Accepts the same criteria and C<join> parameter as L</selectall_arrayref>.
 
 =cut
 
@@ -853,64 +1090,61 @@ sub selectall_array
 {
 	my $self = shift;
 
+	$self->_open_table({});
+
 	if($self->{'berkeley'}) {
-		Carp::croak(ref($self), ': selectall_array is meaningless on a NoSQL database');
+		my $params = Params::Get::get_params(undef, \@_) // {};
+		my $rows = $self->_scan_berkeley($params);
+		return wantarray ? @{$rows} : $rows->[0];
 	}
 
 	my $params = Params::Get::get_params(undef, \@_);
 	my $table = $self->_open_table($params);
 
-	if($self->{'data'}) {
+	$params //= {};
+	my $join_clause = '';
+	if(my $join_spec = delete $params->{'join'}) {
+		$join_clause = $self->_build_joins($join_spec);
+	}
+
+	if(!$join_clause && $self->{'data'} && !$self->_has_complex_criteria($params)) {
 		if(scalar(keys %{$params}) == 0) {
 			$self->_trace("$table: selectall_array fast track return");
 			if(ref($self->{'data'}) eq 'HASH') {
 				return values %{$self->{'data'}};
 			}
 			return @{$self->{'data'}};
-			# my @rc = values %{$self->{'data'}};
-			# return @rc;
 		} elsif((scalar(keys %{$params}) == 1) && defined($params->{'entry'}) && !$self->{'no_entry'}) {
+			# exists() guard: fixate() locks all keys; return empty list (not undef)
+			# for a missing entry so callers in list context get 0 elements not 1
+			return () unless exists($self->{'data'}->{$params->{'entry'}});
 			return $self->{'data'}->{$params->{'entry'}};
+		} elsif(ref($self->{'data'}) eq 'HASH') {
+			# Same as selectall_arrayref scan but returns a list
+			$self->_debug("$table: selectall_array in-memory scan with criteria");
+			my @rc = grep {
+				my $row = $_;
+				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}) } keys %{$params}
+			} values %{$self->{'data'}};
+			return @rc;
 		}
 	}
 
-	my $query;
-	my $done_where = 0;
+	my ($where, $wargs) = $self->_build_where($params);
+	my @query_args = @{$wargs};
 
-	if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-		$query = "SELECT * FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
-		$done_where = 1;
+	my $query = "SELECT * FROM $table";
+	$query .= " $join_clause" if $join_clause;
+	if($join_clause) {
+		$query .= " WHERE $where" if $where;
+	} elsif(($self->{'type'} eq 'CSV') && !$self->{'no_entry'}) {
+		my $id = $self->{'id'};
+		$query .= " WHERE $id IS NOT NULL AND $id NOT LIKE '#%'";
+		$query .= " AND ($where)" if $where;
 	} else {
-		$query = "SELECT * FROM $table";
+		$query .= " WHERE $where" if $where;
 	}
-
-	my @query_args;
-	foreach my $c1(sort keys(%{$params})) {	# sort so that the key is always the same
-		my $arg = $params->{$c1};
-		if(ref($arg)) {
-			# throw Error::Simple("$query: argument is not a string: " . ref($arg));
-			$self->_fatal("selectall_array(): $query: argument is not a string: ", ref($arg));
-		}
-
-		my $keyword;
-		if($done_where) {
-			$keyword = 'AND';
-		} else {
-			$keyword = 'WHERE';
-			$done_where = 1;
-		}
-		if(!defined($arg)) {
-			$query .= " $keyword $c1 IS NULL"
-		} else {
-			if($arg =~ /[%_]/) {
-				$query .= " $keyword $c1 LIKE ?";
-			} else {
-				$query .= " $keyword $c1 = ?";
-			}
-			push @query_args, $arg;
-		}
-	}
-	if(!$self->{no_entry}) {
+	if(!$self->{'no_entry'}) {
 		$query .= ' ORDER BY ' . $self->{'id'};
 	}
 	if(!wantarray) {
@@ -948,34 +1182,38 @@ sub selectall_array
 		$self->_debug('cache not used');
 	}
 
-	if(my $sth = $self->{$table}->prepare($query)) {
-		$sth->execute(@query_args) ||
-			# throw Error::Simple("$query: @query_args");
-			croak("$query: @query_args");
+	if(my $sth = $self->{$table}->prepare_cached($query)) {
+		$sth->execute(@query_args) || croak("$query: @query_args");
 
 		my $rc;
 		while(my $href = $sth->fetchrow_hashref()) {
-			return $href if(!wantarray);	# FIXME: Doesn't store in the cache
+			if(!wantarray) {
+				# Scalar context: return just the first row; cache it too
+				$sth->finish();
+				$c->set($key, [$href], $self->{'cache_duration'}) if $c;
+				return $href;
+			}
 			push @{$rc}, $href;
 		}
-		if($c) {
-			$c->set($key, $rc, $self->{'cache_duration'});	# Store a ref to the array
-		}
+		$c->set($key, $rc, $self->{'cache_duration'}) if $c;
 
 		if($rc) {
-			Data::Reuse::fixate(@{$rc}) if(!$self->{'no_fixate'});
+			if(!$self->{'no_fixate'}) {
+				Data::Reuse::forget();
+				Data::Reuse::fixate(@{$rc});
+			}
 			return @{$rc};
 		}
 		return;
 	}
 	$self->_warn("selectall_array failure on $query: @query_args");
-	# throw Error::Simple("$query: @query_args");
 	croak("$query: @query_args");
 }
 
-=head2	selectall_hash
+=head2 selectall_hash
 
-Deprecated misleading legacy name for selectall_array.
+Deprecated alias for L</selectall_array>.  Use C<selectall_array> in new
+code.
 
 =cut
 
@@ -985,9 +1223,15 @@ sub selectall_hash
 	return $self->selectall_array(@_);
 }
 
-=head2	count
+=head2 count
 
-Return the number items/rows matching the given criteria
+Returns the number of rows matching the given criteria.
+
+    my $total  = $db->count();
+    my $active = $db->count(status => 'active');
+    my $high   = $db->count(score  => { '>' => 90 });
+
+Accepts the full criteria syntax described in L</QUERY CRITERIA>.
 
 =cut
 
@@ -995,8 +1239,11 @@ sub count
 {
 	my $self = shift;
 
+	$self->_open_table({});
+
 	if($self->{'berkeley'}) {
-		Carp::croak(ref($self), ': count is meaningless on a NoSQL database');
+		my $params = Params::Get::get_params(undef, \@_) // {};
+		return scalar @{$self->_scan_berkeley($params)};
 	}
 
 	my $params = Params::Get::get_params(undef, \@_);
@@ -1010,53 +1257,25 @@ sub count
 			}
 			return scalar @{$self->{'data'}};
 		} elsif((scalar(keys %{$params}) == 1) && defined($params->{'entry'}) && !$self->{'no_entry'}) {
-			return $self->{'data'}->{$params->{'entry'}} ? 1 : 0;
+			# exists() guard: fixate() locks all keys in the slurp hash
+			return (exists($self->{'data'}->{$params->{'entry'}}) && $self->{'data'}->{$params->{'entry'}}) ? 1 : 0;
 		}
 	}
+
+	my ($where, $wargs) = $self->_build_where($params);
+	my @query_args = @{$wargs};
 
 	my $query;
-	my $done_where = 0;
-
-	if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-		$query = "SELECT COUNT(*) FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
-		$done_where = 1;
-	} elsif($self->{no_entry}) {
+	if(($self->{'type'} eq 'CSV') && !$self->{'no_entry'}) {
+		my $id = $self->{'id'};
+		$query = "SELECT COUNT(*) FROM $table WHERE $id IS NOT NULL AND $id NOT LIKE '#%'";
+		$query .= " AND ($where)" if $where;
+	} elsif($self->{'no_entry'}) {
 		$query = "SELECT COUNT(*) FROM $table";
+		$query .= " WHERE $where" if $where;
 	} else {
-		$query = "SELECT COUNT(entry) FROM $table";
-	}
-
-	my @query_args;
-	foreach my $c1(sort keys(%{$params})) {	# sort so that the key is always the same
-		my $arg = $params->{$c1};
-		if(ref($arg)) {
-			# throw Error::Simple("$query: argument is not a string: " . ref($arg));
-			$self->_fatal("count(): $query: argument is not a string: ", ref($arg));
-		}
-		if(!defined($arg)) {
-			my @call_details = caller(0);
-			# throw Error::Simple("$query: value for $c1 is not defined in call from " .
-				# $call_details[2] . ' of ' . $call_details[1]);
-			Carp::croak("$query: value for $c1 is not defined in call from ",
-				$call_details[2], ' of ', $call_details[1]);
-		}
-
-		my $keyword;
-		if($done_where) {
-			$keyword = 'AND';
-		} else {
-			$keyword = 'WHERE';
-			$done_where = 1;
-		}
-		if($arg =~ /[%_]/) {
-			$query .= " $keyword $c1 LIKE ?";
-		} else {
-			$query .= " $keyword $c1 = ?";
-		}
-		push @query_args, $arg;
-	}
-	if(!$self->{no_entry}) {
-		$query .= ' ORDER BY ' . $self->{'id'};
+		$query = "SELECT COUNT(" . $self->{'id'} . ") FROM $table";
+		$query .= " WHERE $where" if $where;
 	}
 
 	if(defined($query_args[0])) {
@@ -1067,7 +1286,10 @@ sub count
 
 	my $key;
 	my $c;
-	if($c = $self->{cache}) {
+	if($c = $self->{'cache'}) {
+		# Opportunistic: if a selectall_arrayref for the same criteria is already
+		# in cache, derive the count from that array rather than hitting the DB.
+		# The key is built to match what selectall_arrayref would store.
 		$key = ref($self) . '::' . $query;
 		$key =~ s/COUNT\((.+?)\)/$1/;
 		$key .= ' array';
@@ -1075,43 +1297,49 @@ sub count
 			$key .= ' ' . join(', ', @query_args);
 		}
 		if(my $rc = $c->get($key)) {
-			# Unlikely
-			$self->_debug('cache HIT');
-			return scalar @{$rc};	# We stored a ref to the array
+			$self->_debug('count: cache HIT (selectall array)');
+			return ref($rc) eq 'ARRAY' ? scalar @{$rc} : 0;
 		}
-		$self->_debug('cache MISS');
+		$self->_debug('count: cache MISS');
 	} else {
 		$self->_debug('cache not used');
 	}
 
-	if(my $sth = $self->{$table}->prepare($query)) {
-		$sth->execute(@query_args) ||
-			# throw Error::Simple("$query: @query_args");
-			croak("$query: @query_args");
+	if(my $sth = $self->{$table}->prepare_cached($query)) {
+		$sth->execute(@query_args) || croak("$query: @query_args");
 
 		my $count = $sth->fetchrow_arrayref()->[0];
-
 		$sth->finish();
 
 		return $count;
 	}
 	$self->_warn("count failure on $query: @query_args");
-	# throw Error::Simple("$query: @query_args");
 	croak("$query: @query_args");
 }
 
-=head2	fetchrow_hashref
+=head2 fetchrow_hashref
 
-Returns a hash reference for a single row in a table.
+Returns a hash reference for the first row matching the given criteria,
+or C<undef> when there is no match.  Always applies C<LIMIT 1>.
 
-It searches for the given arguments, searching IS NULL if the value is C<undef>
+    my $row = $db->fetchrow_hashref(entry => 'key1');
+    my $row = $db->fetchrow_hashref(score => { '>=' => 10 });
 
-   my $res = $foo->fetchrow_hashref(entry => 'one');
+When C<no_entry> is B<not> set you may pass a single bare value and it is
+used as the C<entry> key:
 
-Special argument: table: determines the table to read from if not the default,
-which is worked out from the class name
+    my $row = $db->fetchrow_hashref('key1');    # same as entry => 'key1'
 
-When no_entry is not set allow just one argument to be given: the entry value.
+Accepts the full criteria syntax described in L</QUERY CRITERIA>, including
+the C<join> parameter:
+
+    my $row = $db->fetchrow_hashref(
+        name => 'Alice',
+        join => { table => 'dept', on => 'e.dept_id = dept.id' },
+    );
+
+Pass C<< table => $other_table >> to query a table other than the one
+derived from the class name.
 
 =cut
 
@@ -1131,9 +1359,10 @@ sub fetchrow_hashref {
 	my $table = $self->_open_table($params);
 
 	# ::diag($self->{'type'});
-	if($self->{'data'} && (!$self->{'no_entry'}) && (scalar keys(%{$params}) == 1) && defined($params->{'entry'})) {
+	if($self->{'data'} && (!$self->{'no_entry'}) && (scalar keys(%{$params}) == 1) && defined($params->{'entry'}) && !$self->_has_complex_criteria($params)) {
 		$self->_debug('Fast return from slurped data');
-		return $self->{'data'}->{$params->{'entry'}};
+		# Use exists() — fixate() locks the outer hash; accessing a missing key throws
+		return exists($self->{'data'}->{$params->{'entry'}}) ? $self->{'data'}->{$params->{'entry'}} : undef;
 	}
 
 	if($self->{'berkeley'}) {
@@ -1152,50 +1381,23 @@ sub fetchrow_hashref {
 		Carp::croak(ref($self), ': fetchrow_hashref is meaningless on a NoSQL database');
 	}
 
-	my $query = 'SELECT * FROM ';
-	if(my $t = delete $params->{'table'}) {
-		$query .= $t;
+	my $target = delete($params->{'table'}) // $table;
+	my $join_spec = delete $params->{'join'};
+	my $join_clause = $join_spec ? $self->_build_joins($join_spec) : '';
+	my ($where, $wargs) = $self->_build_where($params);
+	my @query_args = @{$wargs};
+
+	my $query = "SELECT * FROM $target";
+	$query .= " $join_clause" if $join_clause;
+	if($join_clause) {
+		$query .= " WHERE $where" if $where;
+	} elsif(($self->{'type'} eq 'CSV') && !$self->{'no_entry'}) {
+		my $id = $self->{'id'};
+		$query .= " WHERE $id IS NOT NULL AND $id NOT LIKE '#%'";
+		$query .= " AND ($where)" if $where;
 	} else {
-		$query .= $table;
+		$query .= " WHERE $where" if $where;
 	}
-	my $done_where = 0;
-
-	if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-		$query .= ' WHERE ' . $self->{'id'} . ' IS NOT NULL AND ' . $self->{'id'} . " NOT LIKE '#%'";
-		$done_where = 1;
-	}
-	my @query_args;
-	foreach my $c1(sort keys(%{$params})) {	# sort so that the key is always the same
-		my $keyword;
-
-		if($done_where) {
-			$keyword = 'AND';
-		} else {
-			$keyword = 'WHERE';
-			$done_where = 1;
-		}
-		if(my $arg = $params->{$c1}) {
-			if(ref($arg)) {
-				# throw Error::Simple("$query: argument is not a string: " . ref($arg));
-				$self->_fatal("fetchrow_hash(): $query: argument is not a string: ", ref($arg));
-			}
-
-			if($arg =~ /[%_]/) {
-				$query .= " $keyword $c1 LIKE ?";
-			} else {
-				$query .= " $keyword $c1 = ?";
-			}
-			push @query_args, $arg;
-		} else {
-			$query .= " $keyword $c1 IS NULL";
-			# my @call_details = caller(0);
-			# # throw Error::Simple("$query: value for $c1 is not defined in call from " .
-				# # $call_details[2] . ' of ' . $call_details[1]);
-			# Carp::croak("$query: value for $c1 is not defined in call from ",
-				# $call_details[2], ' of ', $call_details[1]);
-		}
-	}
-	# $query .= ' ORDER BY entry LIMIT 1';
 	$query .= ' LIMIT 1';
 	if(defined($query_args[0])) {
 		my @call_details = caller(0);
@@ -1226,14 +1428,15 @@ sub fetchrow_hashref {
 		}
 	}
 
-	my $sth = $self->{$table}->prepare($query) or die $self->{$table}->errstr();
-	# $sth->execute(@query_args) || throw Error::Simple("$query: @query_args");
+	my $sth = $self->{$table}->prepare_cached($query)
+		or Carp::croak(ref($self), ": prepare failed: ", $self->{$table}->errstr());
 	$sth->execute(@query_args) || croak("$query: @query_args");
 	my $rc = $sth->fetchrow_hashref();
+	$sth->finish();
 	if($c) {
 		if($rc) {
 			$self->_debug("stash $key=>$rc in the cache for ", $self->{'cache_duration'});
-			$self->_debug("returns ", Data::Dumper->new([$rc])->Dump());
+			$self->_debug("returns ", do { require Data::Dumper; Data::Dumper->new([$rc])->Dump() });
 		} else {
 			$self->_debug("Stash $key=>undef in the cache for ", $self->{'cache_duration'});
 		}
@@ -1242,20 +1445,26 @@ sub fetchrow_hashref {
 	return $rc;
 }
 
-=head2	execute
+=head2 execute
 
-Execute the given SQL query on the database.
-In an array context, returns an array of hash refs,
-in a scalar context returns a hash of the first row
+Execute a raw SQL query on the underlying database.
 
-On CSV tables without no_entry, it may help to add
-"WHERE entry IS NOT NULL AND entry NOT LIKE '#%'"
-to the query.
+    # Scalar context: returns the first row as a hashref
+    my $row = $db->execute(query => 'SELECT * FROM foo WHERE id = 1');
 
-If the data have been slurped,
-this will still work by accessing that actual database.
+    # List context: returns all rows as a list of hashrefs
+    my @rows = $db->execute(query => 'SELECT * FROM foo WHERE score > ?',
+                            args  => [80]);
 
-If "args" is given, it's an array of the arguments (see C<execute()> in L<DBI>).
+The C<FROM E<lt>tableE<gt>> clause is appended automatically if omitted.
+
+On CSV tables without C<no_entry> it may help to add
+C<WHERE entry IS NOT NULL AND entry NOT LIKE '#%'> to filter comment rows.
+
+If the data have been slurped into memory this method still hits the actual
+database file directly.
+
+C<args> is an arrayref of bind values (see L<DBI/execute>).
 
 =cut
 
@@ -1284,18 +1493,23 @@ sub execute
 	$self->_debug("execute $query");
 
 	# Prepare and execute the query
-	my $sth = $self->{$table}->prepare($query);
-	if(exists($args->{args})) {
-		$sth->execute($args->{args}) or croak("$query: ", join(', ', $args->{args}));	# Die with the query in case of error
+	my $sth = $self->{$table}->prepare_cached($query);
+	# DBI->execute() takes a list; normalise args to an array whether it
+	# was passed as an arrayref ([30]) or a bare scalar/list (30).
+	if(exists($args->{'args'})) {
+		my @bind = ref($args->{'args'}) eq 'ARRAY' ? @{$args->{'args'}} : ($args->{'args'});
+		$sth->execute(@bind) or croak("$query: ", join(', ', @bind));
 	} else {
-		$sth->execute() or croak($query);	# Die with the query in case of error
+		$sth->execute() or croak($query);
 	}
 
 	# Fetch the results
 	my @results;
 	while (my $row = $sth->fetchrow_hashref()) {
-		# Return a single hashref if scalar context is expected
-		return $row unless wantarray;
+		unless(wantarray) {
+			$sth->finish();
+			return $row;
+		}
 		push @results, $row;
 	}
 
@@ -1305,7 +1519,9 @@ sub execute
 
 =head2 updated
 
-Returns the timestamp of the last database update.
+Returns the Unix timestamp of the last database update (mtime for
+file-based backends, or the time of the most recent C<new()> call for
+DSN-based connections).
 
 =cut
 
@@ -1315,26 +1531,238 @@ sub updated {
 	return $self->{'_updated'};
 }
 
-=head2 AUTOLOAD
+=head2 columns
 
-Directly access a database column.
+Returns an array reference of column names for the current table.
 
-Returns all entries in a column, a single entry based on criteria.
-Uses cached data if available.
+    my $cols = $db->columns();    # e.g. ['entry', 'name', 'score', 'status']
 
-Returns an array of the matches,
-or only the first when called in scalar context
+The column list is determined by the backend:
 
-If the database has a column called "entry" you can do a quick lookup with
+=over 4
 
-    my $value = $foo->column('123');	# where "column" is the value you're after
+=item * B<Slurp mode> - sorted keys of the first row in memory.
 
-    my @entries = $foo->entry();
-    print 'There are ', scalar(@entries), " entries in the database\n";
+=item * B<SQLite / other DBI> - a zero-row C<SELECT *> exposes the driver's
+C<NAME> attribute.
 
-Set distinct or unique to 1 if you're after a unique list.
+=item * B<BerkeleyDB> - always returns C<['entry', 'value']>.
 
-Throws an error in slurp mode when an invalid column name is given.
+=back
+
+The result is cached inside the object after the first call.
+
+=cut
+
+sub columns {
+	my $self = shift;
+
+	return $self->{'_columns'} if $self->{'_columns'};
+
+	my $table = $self->_open_table({});
+
+	my @cols;
+
+	if($self->{'berkeley'}) {
+		return $self->{'_columns'} = ['entry', 'value'];
+	}
+
+	if(my $data = $self->{'data'}) {
+		if(ref($data) eq 'HASH') {
+			my ($first) = values %{$data};
+			@cols = sort keys %{$first} if $first;
+		}
+	} else {
+		my $sth = $self->{$table}->prepare_cached("SELECT * FROM $table WHERE 1=0");
+		$sth->execute();
+		@cols = @{$sth->{NAME}};
+		$sth->finish();
+	}
+
+	return $self->{'_columns'} = \@cols;
+}
+
+=head2 schema
+
+Returns a hash reference describing the schema of the current table.
+Each key is a column name; each value is a hash reference with these keys:
+
+=over 4
+
+=item * C<type> - data type string (e.g. C<TEXT>, C<INTEGER>, C<REAL>)
+
+=item * C<nullable> - C<1> if the column may be NULL, C<0> if NOT NULL
+
+=item * C<default> - default value string, or C<undef>
+
+=item * C<pk> - C<1> if this column is (part of) the primary key, C<0> otherwise
+
+=back
+
+    my $schema = $db->schema();
+
+    for my $col (sort keys %{$schema}) {
+        my $info = $schema->{$col};
+        printf "%s  %s  %s\n",
+            $col,
+            $info->{type},
+            $info->{nullable} ? 'NULL' : 'NOT NULL';
+    }
+
+The schema is determined by the backend:
+
+=over 4
+
+=item * B<SQLite> - C<PRAGMA table_info(table)>
+
+=item * B<Other DBI drivers> - C<< $dbh->column_info(...) >>
+
+=item * B<Slurp mode> - inferred from the first row (all columns typed as C<TEXT>)
+
+=item * B<BerkeleyDB> - always returns C<entry> (pk) and C<value>
+
+=back
+
+The result is cached inside the object after the first call.
+
+=cut
+
+sub schema {
+	my $self = shift;
+
+	return $self->{'_schema'} if $self->{'_schema'};
+
+	my $table = $self->_open_table({});
+	my %schema;
+
+	if($self->{'berkeley'}) {
+		return $self->{'_schema'} = {
+			entry => { type => 'TEXT', nullable => 0, default => undef, pk => 1 },
+			value => { type => 'TEXT', nullable => 1, default => undef, pk => 0 },
+		};
+	}
+
+	if(my $data = $self->{'data'}) {
+		if(ref($data) eq 'HASH') {
+			my ($first) = values %{$data};
+			if($first) {
+				my $id = $self->{'id'};
+				for my $col (keys %{$first}) {
+					$schema{$col} = {
+						type     => 'TEXT',
+						nullable => ($col eq $id ? 0 : 1),
+						default  => undef,
+						pk       => ($col eq $id ? 1 : 0),
+					};
+				}
+			}
+		}
+	} else {
+		my $driver = $self->{$table}->{'Driver'}{'Name'} // '';
+		if($driver eq 'SQLite') {
+			my $sth = $self->{$table}->prepare_cached("PRAGMA table_info($table)");
+			$sth->execute();
+			while(my $row = $sth->fetchrow_hashref()) {
+				$schema{$row->{'name'}} = {
+					type     => $row->{'type'},
+					nullable => !$row->{'notnull'},
+					default  => $row->{'dflt_value'},
+					pk       => $row->{'pk'},
+				};
+			}
+			$sth->finish();
+		} else {
+			my $sth = $self->{$table}->column_info(undef, undef, $table, '%');
+			if($sth) {
+				while(my $row = $sth->fetchrow_hashref()) {
+					$schema{$row->{'COLUMN_NAME'}} = {
+						type     => $row->{'TYPE_NAME'},
+						nullable => $row->{'NULLABLE'},
+						default  => $row->{'COLUMN_DEF'},
+						pk       => 0,
+					};
+				}
+				$sth->finish();
+			}
+		}
+	}
+
+	return $self->{'_schema'} = \%schema;
+}
+
+=head2 query
+
+Returns a new L<Database::Abstraction::Query> builder object bound to this
+database instance, for fluent method-chaining queries.
+
+    # All active rows with high scores, newest first, max 10
+    my $rows = $db->query
+        ->where(status => 'active')
+        ->where(score  => { '>' => 80 })
+        ->order_by('score DESC')
+        ->limit(10)
+        ->all();
+
+    # Single row
+    my $row = $db->query->where(name => 'Alice')->first();
+
+    # Just a count
+    my $n = $db->query->where(status => 'active')->count();
+
+See L<Database::Abstraction::Query> for the full API.
+
+=cut
+
+sub query
+{
+	my $self = shift;
+	require Database::Abstraction::Query;
+	return Database::Abstraction::Query->new(_db => $self);
+}
+
+=head2 AUTOLOAD - column shortcut
+
+Calling an unknown method whose name matches a column name performs a column
+lookup.  The method name is the column you want; the arguments are criteria.
+
+    # Scalar context: return the first match
+    my $name = $db->name(entry => 'key1');
+
+    # List context: return all matching values
+    my @names = $db->name();
+
+    # Shortcut when the table has an 'entry' key column
+    my $name = $db->name('key1');    # same as name(entry => 'key1')
+
+    # Unique/distinct values
+    my @statuses = $db->status(distinct => 1);
+
+B<In list context> the full column is returned (all rows), ordered by the
+column value.  B<In scalar context> only the first match is returned
+(C<LIMIT 1>).
+
+Results come from the slurp cache when available.
+
+Throws an error if the column does not exist (slurp mode) or if AUTOLOAD
+has been disabled with C<< auto_load => 0 >>.
+
+=head3 PSEUDOCODE
+
+    1. Extract column name from $AUTOLOAD; guard on DESTROY.
+    2. Croak if auto_load => 0.
+    3. Validate $column against /^[a-zA-Z_][a-zA-Z0-9_]*$/.
+    4. If data is slurped:
+       a. List context, no params -> map column over all rows (exists guard).
+       b. entry-only param -> direct hash lookup (exists guard).
+       c. No params, scalar -> first value in hash.
+       d. no_entry set -> scan array for matching key/value pair.
+       e. Other params -> scan keyed hash for matching column.
+    5. If not slurped, build SQL:
+       - List:   SELECT column FROM table [WHERE ...] ORDER BY column
+       - Scalar: SELECT DISTINCT column FROM table [WHERE ...] LIMIT 1
+    6. Check cache; return on HIT.
+    7. prepare_cached + execute; fetch result.
+    8. Store in cache; fixate; return.
 
 =cut
 
@@ -1349,7 +1777,7 @@ sub AUTOLOAD {
 	Carp::croak(__PACKAGE__, ": Unknown column $column") if(!ref($self));
 
 	# Allow the AUTOLOAD feature to be disabled
-	Carp::croak(__PACKAGE__, ": Unknown column $column") if(exists($self->{'auto_load'}) && boolean($self->{'auto_load'})->isFalse());
+	Carp::croak(__PACKAGE__, ": AUTOLOAD disabled (auto_load => 0)") if(exists($self->{'auto_load'}) && !$self->{'auto_load'});
 
 	# Validate column name - only allow safe column name
 	Carp::croak(__PACKAGE__, ": Invalid column name: $column") unless $column =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
@@ -1383,11 +1811,16 @@ sub AUTOLOAD {
 
 	if(wantarray && !$distinct) {
 		if(((scalar keys %params) == 0) && (my $data = $self->{'data'})) {
-			# Return all the entries in the column
-			return map { $_->{$column} } values %{$data};
+			# Return all column values from the in-memory hash.
+			# Use exists() because fixate() locks inner row hashes —
+			# accessing a disallowed key would throw without the guard.
+			# Handle both HASH (keyed data) and ARRAY (no_entry CSV slurp).
+			my @_rows = ref($data) eq 'ARRAY' ? @{$data} : values %{$data};
+			return map { exists($_->{$column}) ? $_->{$column} : undef } @_rows;
 		}
-		if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-			$query = "SELECT $column FROM $table WHERE " . $self->{'id'} . " IS NOT NULL AND entry NOT LIKE '#%'";
+		my $id = $self->{'id'};
+		if(($self->{'type'} eq 'CSV') && !$self->{'no_entry'}) {
+			$query = "SELECT $column FROM $table WHERE $id IS NOT NULL AND $id NOT LIKE '#%'";
 			$done_where = 1;
 		} else {
 			$query = "SELECT $column FROM $table";
@@ -1403,26 +1836,20 @@ sub AUTOLOAD {
 				if(defined($key)) {
 					$self->_debug("key = $key, value = $value, column = $column");
 					foreach my $row(@{$data}) {
-						if(defined($row->{$key}) && ($row->{$key} eq $value) && (my $rc = $row->{$column})) {
-							if(defined($rc)) {
-								$self->_trace(__LINE__, ": AUTOLOAD $key: return '$rc' from slurped data");
-							} else {
-								$self->_trace(__LINE__, ": AUTOLOAD $key: return undef from slurped data");
-							}
-							return $rc
-						}
+						# exists() guards: fixate() locks row hashes recursively
+						next unless exists($row->{$key}) && defined($row->{$key}) && $row->{$key} eq $value;
+						my $rc = exists($row->{$column}) ? $row->{$column} : undef;
+						$self->_trace(__LINE__, ": AUTOLOAD $key: return ", defined($rc) ? "'$rc'" : 'undef', ' from slurped data');
+						return $rc;
 					}
 					$self->_debug('not found in slurped data');
 				}
 			} elsif(((scalar keys %params) == 1) && defined(my $key = $params{'entry'})) {
-				# Look up the key
-
-				# This weird code is to stop the data hash becoming polluted with empty
-				#	values as we look things up
-				# my $rc = $data->{$key}->{$column};
+				# Look up a single entry by its key.
+				# Use exists() before accessing — fixate() locks the outer hash and
+				# dereferencing a missing key on a locked hash throws an exception.
 				my $rc;
-				if(defined(my $hash = $data->{$key})) {
-					# Look up the key
+				if(exists($data->{$key}) && defined(my $hash = $data->{$key})) {
 					if(!exists($hash->{$column})) {
 						Carp::croak(__PACKAGE__, ": There is no column $column in $table");
 					}
@@ -1437,26 +1864,26 @@ sub AUTOLOAD {
 			} elsif((scalar keys %params) == 0) {
 				if(wantarray) {
 					if($distinct) {
-						# https://stackoverflow.com/questions/7651/how-do-i-remove-duplicate-items-from-an-array-in-perl
-						my %h = map { $_, 1 } map { $_->{$column} } values %{$data};
+						my %h = map { $_ => 1 } grep { defined } map { exists($_->{$column}) ? $_->{$column} : undef } values %{$data};
 						return keys %h;
 					}
-					return map { $_->{$column} } values %{$data}
+					# DEAD CODE: unreachable because the outer `if(wantarray && !$distinct)`
+					# handles the wantarray+!distinct case. In this else branch, wantarray
+					# implies $distinct (which returns above), so this line is never executed.
+					# return map { exists($_->{$column}) ? $_->{$column} : undef } values %{$data}
 				}
-				# FIXME - this works but really isn't the right way to do it
+				# Scalar: return the first value found without building a full list
 				foreach my $v (values %{$data}) {
-					return $v->{$column}
+					return exists($v->{$column}) ? $v->{$column} : undef;
 				}
 			} else {
-				# It's keyed, but we're not querying off it
+				# Keyed data but filtering on a non-key column
 				my ($key, $value) = %params;
 				foreach my $row (values %{$data}) {
-					if(defined($row->{$key}) && ($row->{$key} eq $value) && (my $rc = $row->{$column})) {
-						if(defined($rc)) {
-							$self->_trace(__LINE__, ": AUTOLOAD $key: return '$rc' from slurped data");
-						} else {
-							$self->_trace(__LINE__, ": AUTOLOAD $key: return undef from slurped data");
-						}
+					next unless exists($row->{$key}) && defined($row->{$key}) && $row->{$key} eq $value;
+					next unless exists($row->{$column});
+					if(my $rc = $row->{$column}) {
+						$self->_trace(__LINE__, ": AUTOLOAD $key: return '$rc' from slurped data");
 						return $rc
 					}
 				}
@@ -1464,32 +1891,29 @@ sub AUTOLOAD {
 			return
 		}
 		# Data has not been slurped in
-		if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-			$query = "SELECT DISTINCT $column FROM $table WHERE " . $self->{'id'} . " IS NOT NULL AND entry NOT LIKE '#%'";
+		my $id = $self->{'id'};
+		if(($self->{'type'} eq 'CSV') && !$self->{'no_entry'}) {
+			$query = "SELECT DISTINCT $column FROM $table WHERE $id IS NOT NULL AND $id NOT LIKE '#%'";
 			$done_where = 1;
 		} else {
 			$query = "SELECT DISTINCT $column FROM $table";
 		}
 	}
 	my @args;
-	while(my ($key, $value) = each %params) {
-		$self->_debug(__PACKAGE__, ": AUTOLOAD adding key/value pair $key=>$value");
+	# Avoid `each` — it carries hidden iterator state across calls
+	for my $k (sort keys %params) {
+		# Guard against SQL injection via column names — same rule as _build_where_conditions
+		Carp::croak(__PACKAGE__, ": unsafe column name '$k'")
+			unless $k =~ /^[a-zA-Z_][a-zA-Z0-9_.]*$/;
+		my $value = $params{$k};
+		$self->_debug(__PACKAGE__, ": AUTOLOAD adding key/value pair $k=>", defined($value) ? $value : 'NULL');
 		if(defined($value)) {
-			if($done_where) {
-				$query .= " AND $key = ?";
-			} else {
-				$query .= " WHERE $key = ?";
-				$done_where = 1;
-			}
+			$query .= $done_where ? " AND $k = ?" : " WHERE $k = ?";
+			$done_where = 1;
 			push @args, $value;
 		} else {
-			$self->_debug("AUTOLOAD params $key isn't defined");
-			if($done_where) {
-				$query .= " AND $key IS NULL";
-			} else {
-				$query .= " WHERE $key IS NULL";
-				$done_where = 1;
-			}
+			$query .= $done_where ? " AND $k IS NULL" : " WHERE $k IS NULL";
+			$done_where = 1;
 		}
 	}
 	if(wantarray) {
@@ -1521,9 +1945,7 @@ sub AUTOLOAD {
 	} else {
 		$self->_debug('cache not used');
 	}
-	# my $sth = $self->{$table}->prepare($query) || throw Error::Simple($query);
-	my $sth = $self->{$table}->prepare($query) || croak($query);
-	# $sth->execute(@args) || throw Error::Simple($query);
+	my $sth = $self->{$table}->prepare_cached($query) || croak($query);
 	$sth->execute(@args) || croak($query);
 
 	if(wantarray) {
@@ -1537,7 +1959,8 @@ sub AUTOLOAD {
 	my $rc = $sth->fetchrow_array();	# Return the first match only
 	$sth->finish();
 	if($cache) {
-		return $cache->set($key, $rc, $self->{'cache_duration'});
+		# Store the value, then return it — cache->set() return value is unreliable
+		$cache->set($key, $rc, $self->{'cache_duration'});
 	}
 	return $rc;
 }
@@ -1549,10 +1972,8 @@ sub DESTROY
 	}
 	my $self = shift;
 
-	# Clean up temporary file
-	if($self->{'temp'}) {
-		unlink delete $self->{'temp'};
-	}
+	# Clean up temporary file — deleting the File::Temp object triggers auto-unlink
+	delete $self->{'_temp_fh'};
 
 	# Clean up database handles
 	my $table_name = $self->{'table'} || ref($self);
@@ -1577,6 +1998,266 @@ sub DESTROY
 	}
 }
 
+# Build the JOIN clause(s) from a single join hashref or arrayref of hashrefs.
+# Each spec needs keys: table (required), on (required), type (default INNER).
+sub _build_joins
+{
+	my ($self, $join_spec) = @_;
+
+	my @specs = ref($join_spec) eq 'ARRAY' ? @{$join_spec} : ($join_spec);
+	my %valid_types = map { $_ => 1 } qw(INNER LEFT RIGHT FULL CROSS);
+	my @clauses;
+
+	for my $j (@specs) {
+		my $type  = uc($j->{'type'}  // 'INNER');
+		my $jtable = $j->{'table'} or Carp::croak('join: missing "table"');
+		Carp::croak("join: unsafe table name '$jtable'")
+			unless $jtable =~ /^[a-zA-Z_][a-zA-Z0-9_.]*$/;
+		my $on     = $j->{'on'}    or Carp::croak('join: missing "on" condition');
+		Carp::croak("Invalid JOIN type: $type") unless $valid_types{$type};
+		push @clauses, "$type JOIN $jtable ON ($on)";
+	}
+
+	return join(' ', @clauses);
+}
+
+# Return true when $params contains operator hashrefs, -or, or -and groupings
+# that the simple slurp fast-path cannot handle.
+sub _has_complex_criteria
+{
+	my ($self, $params) = @_;
+	return 0 unless defined $params;
+	return 1 if exists $params->{'-or'} || exists $params->{'-and'};
+	for my $v (values %{$params}) {
+		return 1 if ref($v);
+	}
+	return 0;
+}
+
+# Build the WHERE clause body (everything after "WHERE") from a criteria hash.
+# Handles -or / -and groupings then delegates per-column work to _build_where_conditions.
+# Returns ($sql_fragment, \@bind_values).
+sub _build_where
+{
+	my ($self, $params) = @_;
+
+	$params //= {};
+	my %p = %{$params};	# work on a copy so we can delete -or/-and
+	my @clauses;
+	my @args;
+
+	if(my $or_list = delete $p{'-or'}) {
+		my (@sub_clauses, @sub_args);
+		for my $cond (@{$or_list}) {
+			my ($s, $a) = $self->_build_where_conditions($cond);
+			if($s) {
+				push @sub_clauses, "($s)";
+				push @sub_args, @{$a};
+			}
+		}
+		if(@sub_clauses) {
+			push @clauses, '(' . join(' OR ', @sub_clauses) . ')';
+			push @args, @sub_args;
+		}
+	}
+	if(my $and_list = delete $p{'-and'}) {
+		my (@sub_clauses, @sub_args);
+		for my $cond (@{$and_list}) {
+			my ($s, $a) = $self->_build_where_conditions($cond);
+			if($s) {
+				push @sub_clauses, "($s)";
+				push @sub_args, @{$a};
+			}
+		}
+		if(@sub_clauses) {
+			push @clauses, '(' . join(' AND ', @sub_clauses) . ')';
+			push @args, @sub_args;
+		}
+	}
+
+	my ($more, $margs) = $self->_build_where_conditions(\%p);
+	if($more) {
+		push @clauses, $more;
+		push @args, @{$margs};
+	}
+
+	return (join(' AND ', @clauses), \@args);
+}
+
+# Build a WHERE-body fragment for a flat col => val hash.
+# Values may be plain scalars (= / LIKE / IS NULL) or operator hashrefs
+# ({ '>' => n }, { -in => [...] }, { -between => [lo,hi] }, etc.).
+sub _build_where_conditions
+{
+	my ($self, $params) = @_;
+
+	my @clauses;
+	my @args;
+
+	for my $col (sort keys %{$params}) {
+		my $val = $params->{$col};
+
+		# Guard against SQL injection via column names; allow table.column notation for JOINs
+		Carp::croak("_build_where_conditions: unsafe column name '$col'")
+			unless $col =~ /^[a-zA-Z_][a-zA-Z0-9_.]*$/;
+
+		if(ref($val) eq 'HASH') {
+			for my $op (sort keys %{$val}) {
+				my $operand = $val->{$op};
+				if($op eq '-in' || $op eq '-not_in') {
+					my $sql_op = $op eq '-in' ? 'IN' : 'NOT IN';
+					my $ph = join(', ', ('?') x scalar(@{$operand}));
+					push @clauses, "$col $sql_op ($ph)";
+					push @args, @{$operand};
+				} elsif($op eq '-between') {
+					push @clauses, "$col BETWEEN ? AND ?";
+					push @args, $operand->[0], $operand->[1];
+				} elsif($op eq '-like') {
+					push @clauses, "$col LIKE ?";
+					push @args, $operand;
+				} elsif($op eq '-not_like') {
+					push @clauses, "$col NOT LIKE ?";
+					push @args, $operand;
+				} elsif($op eq '!=') {
+					if(!defined($operand)) {
+						push @clauses, "$col IS NOT NULL";
+					} else {
+						push @clauses, "$col != ?";
+						push @args, $operand;
+					}
+				} elsif($op =~ /^(?:>|<|>=|<=)$/) {
+					push @clauses, "$col $op ?";
+					push @args, $operand;
+				} else {
+					Carp::croak("Unknown operator '$op' for column '$col'");
+				}
+			}
+		} elsif(ref($val)) {
+			Carp::croak("$col: expected scalar or operator hashref, got ", ref($val));
+		} elsif(!defined($val)) {
+			push @clauses, "$col IS NULL";
+		} elsif($val =~ /[%_]/) {
+			push @clauses, "$col LIKE ?";
+			push @args, $val;
+		} else {
+			push @clauses, "$col = ?";
+			push @args, $val;
+		}
+	}
+
+	return (join(' AND ', @clauses), \@args);
+}
+
+# Test a single in-memory row value against a criteria value.
+# $crit_val may be a plain scalar or an operator hashref.
+# Returns true when the row value satisfies the criterion.
+# Scan the entire BerkeleyDB tied hash, building rows as {entry=>$k, value=>$v},
+# and filter by $params criteria using _match_criterion.
+# Croaks when JOINs or -or/-and groupings are requested (unsupported for key-value stores).
+sub _scan_berkeley
+{
+	my ($self, $params) = @_;
+	$params //= {};
+
+	if(delete $params->{'join'}) {
+		Carp::croak(ref($self), ': BerkeleyDB does not support JOINs');
+	}
+	if(grep { $_ eq '-or' || $_ eq '-and' } keys %{$params}) {
+		Carp::croak(ref($self), ': BerkeleyDB does not support -or/-and groupings');
+	}
+
+	my $bdb = $self->{'berkeley'};
+	my @rows = map { { entry => $_, value => $bdb->{$_} } } keys %{$bdb};
+
+	if(my @cols = keys %{$params}) {
+		@rows = grep {
+			my $row = $_;
+			my $match = 1;
+			for my $col (@cols) {
+				unless($self->_match_criterion($row->{$col}, $params->{$col})) {
+					$match = 0;
+					last;
+				}
+			}
+			$match;
+		} @rows;
+	}
+
+	return \@rows;
+}
+
+# SQL LIKE match using dynamic programming (O(m*n), no catastrophic backtracking).
+# % matches any sequence of chars; _ matches exactly one char.  Case-insensitive.
+sub _like_match
+{
+	my ($str, $pattern) = @_;
+	my @s = split //, lc($str);
+	my @p = split //, lc($pattern);
+	my $m = scalar @s;
+	my $n = scalar @p;
+
+	my @dp = map { [ (0) x ($m + 1) ] } 0 .. $n;
+	$dp[0][0] = 1;
+
+	for my $i (1 .. $n) {
+		if($p[$i - 1] eq '%') {
+			$dp[$i][0] = $dp[$i - 1][0];
+			for my $j (1 .. $m) {
+				$dp[$i][$j] = ($dp[$i - 1][$j] || $dp[$i][$j - 1]) ? 1 : 0;
+			}
+		} else {
+			for my $j (1 .. $m) {
+				$dp[$i][$j] = ($dp[$i - 1][$j - 1]
+					&& ($p[$i - 1] eq '_' || $p[$i - 1] eq $s[$j - 1])) ? 1 : 0;
+			}
+		}
+	}
+	return $dp[$n][$m];
+}
+
+sub _match_criterion
+{
+	my ($self, $row_val, $crit_val) = @_;
+
+	if(ref($crit_val) eq 'HASH') {
+		for my $op (keys %{$crit_val}) {
+			my $operand = $crit_val->{$op};
+			if($op eq '-in') {
+				return 0 unless defined($row_val) && grep { $row_val eq $_ } @{$operand};
+			} elsif($op eq '-not_in') {
+				return 0 if defined($row_val) && grep { $row_val eq $_ } @{$operand};
+			} elsif($op eq '-between') {
+				return 0 unless defined($row_val) && $row_val >= $operand->[0] && $row_val <= $operand->[1];
+			} elsif($op eq '-like') {
+				return 0 unless defined($row_val);
+				return 0 unless _like_match($row_val, $operand);
+			} elsif($op eq '-not_like') {
+				return 0 unless defined($row_val);
+				return 0 if _like_match($row_val, $operand);
+			} elsif($op eq '!=') {
+				if(!defined($operand)) {
+					return 0 unless defined($row_val);
+				} else {
+					return 0 unless defined($row_val) && $row_val ne $operand;
+				}
+			} elsif($op eq '>') {
+				return 0 unless defined($row_val) && $row_val > $operand;
+			} elsif($op eq '<') {
+				return 0 unless defined($row_val) && $row_val < $operand;
+			} elsif($op eq '>=') {
+				return 0 unless defined($row_val) && $row_val >= $operand;
+			} elsif($op eq '<=') {
+				return 0 unless defined($row_val) && $row_val <= $operand;
+			}
+		}
+		return 1;
+	}
+
+	return !defined($row_val) && !defined($crit_val) ? 1
+		: !defined($row_val) || !defined($crit_val) ? 0
+		: $row_val eq $crit_val;
+}
+
 # Determine the table and open the database
 sub _open_table
 {
@@ -1586,10 +2267,26 @@ sub _open_table
 	my $table = $params->{'table'} || $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
 
-	# Open a connection if it's not already open
-	$self->_open() if((!$self->{$table}) && (!$self->{'data'}));
+	# Open a connection if it's not already open.
+	# BerkeleyDB never sets $self->{$table} (no DBI handle) or $self->{'data'},
+	# so we also guard on $self->{'berkeley'} to avoid re-tying on every call.
+	$self->_open() if((!$self->{$table}) && (!$self->{'data'}) && (!$self->{'berkeley'}));
 
 	return $table;
+}
+
+# Quote a SQL identifier using the current connection's dialect rules.
+# Falls back to ANSI double-quoting when no connection is available.
+sub _quote_identifier
+{
+	my ($self, $name) = @_;
+
+	my $table = $self->{'table'} || ref($self);
+	$table =~ s/.*:://;
+	if(my $dbh = $self->{$table}) {
+		return $dbh->quote_identifier($name);
+	}
+	return qq{"$name"};
 }
 
 # Determine whether a given file is a valid Berkeley DB file.
@@ -1600,7 +2297,9 @@ sub _is_berkeley_db {
 	my ($self, $file) = @_;
 
 	# Step 1: Check magic number
-	open my $fh, '<', $file or return 0;
+	# no autodie here: the file may not exist, and we want a silent false return
+	my $fh;
+	do { no autodie qw(open); open $fh, '<', $file } or return 0;
 	binmode $fh;
 
 	my $is_db = (($self->_is_berkeley_db_0($fh)) || ($self->_is_berkeley_db_12($fh)));
@@ -1687,7 +2386,7 @@ sub _trace {
 # Emit a warning message somewhere
 sub _warn {
 	my $self = shift;
-	my $params = Params::Get::get_params('warning', @_);
+	my $params = Params::Get::get_params('warning', \@_);
 
 	$self->_log('warn', $params->{'warning'});
 	Carp::carp(join('', grep defined, $params->{'warning'}));
@@ -1696,7 +2395,7 @@ sub _warn {
 # Die
 sub _fatal {
 	my $self = shift;
-	my $params = Params::Get::get_params('warning', @_);
+	my $params = Params::Get::get_params('warning', \@_);
 
 	$self->_log('error', $params->{'warning'});
 	Carp::croak(join('', grep defined, $params->{'warning'}));
@@ -1716,29 +2415,137 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Database-Abstraction>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-=head1 BUGS
+=head1 MESSAGES
 
-The default delimiter for CSV files is set to '!', not ',' for historical reasons.
-I really ought to fix that.
+The table below lists every error that the module can croak or carp, what
+triggers it, and how to resolve it.
 
-It would be nice for the key column to be called key, not entry,
-however key's a reserved word in SQL.
+=over 4
 
-The no_entry parameter should be no_id.
+=item C<< I<Class>: abstract class >>
 
-XML slurping is hard,
-so if XML fails for you on a small file force non-slurping mode with
+Direct instantiation of C<Database::Abstraction> was attempted.
+Create a subclass and instantiate that instead.
 
-    $foo = MyPackageName::Database::Foo->new({
-	directory => '/var/dat',
-	max_slurp_size => 0	# force to not use slurp and therefore to use SQL
-    });
+=item C<< I<Class>: where are the files? >>
+
+Neither C<directory> nor C<dsn> was supplied to C<new()>.
+
+=item C<< I<Class>: I</path> is not a directory >>
+
+The C<directory> argument exists on disk but is not a directory.
+
+=item C<< I<Class>: cannot connect: I<$DBI::errstr> >>
+
+DBI failed to connect to the given C<dsn>.  Check credentials and host.
+
+=item C<< Can't find a file called 'I<name>' for the table I<T> in I<dir> >>
+
+None of the probe extensions (C<.sql>, C<.psv>, C<.csv>, C<.db>, C<.xml>)
+matched in C<directory>.
+
+=item C<< I<Class>: prepare failed: I<$errstr> >>
+
+C<prepare_cached()> returned false.  Usually a syntax error in an internally
+built query; file a bug if you see this from a normal API call.
+
+=item C<< _build_where_conditions: unsafe column name 'I<name>' >>
+
+A criteria key contained characters outside C<[A-Za-z0-9_.]>.
+This is a SQL-injection guard.  Use only valid SQL identifier characters.
+
+=item C<< join: missing "table" >> / C<< join: missing "on" condition >>
+
+A join spec hashref is incomplete.  Both C<table> and C<on> are required.
+
+=item C<< Invalid JOIN type: I<TYPE> >>
+
+C<type> in a join spec was not one of C<INNER LEFT RIGHT FULL CROSS>.
+
+=item C<< I<Class>: Unknown column I<col> >> / C<< I<Class>: AUTOLOAD disabled >>
+
+An AUTOLOAD call was made for a column that does not exist, or AUTOLOAD
+was disabled with C<< auto_load => 0 >>.
+
+=item C<< Usage: set_logger(logger => $logger) >>
+
+C<set_logger()> was called without a C<logger> argument.
+
+=item C<< Usage: execute(query => $query) >>
+
+C<execute()> was called without a C<query> argument.
+
+=item C<< XML slurp: I<...> is not yet supported >>
+
+The XML file structure is too complex for slurp mode.
+Use C<< max_slurp_size => 0 >> to force the DBI/XMLSimple SQL path.
+
+=item C<< I<Class>: I<method> is meaningless on a NoSQL database >>
+
+A relational method (C<selectall_arrayref>, C<count>, C<execute>, etc.)
+was called on a BerkeleyDB backend, which only supports key-value lookup
+via C<fetchrow_hashref>.
+
+=back
+
+=head1 KNOWN LIMITATIONS
+
+=over 4
+
+=item *
+
+B<Read-only.>  No INSERT, UPDATE, or DELETE is provided.  C<execute()>
+runs raw read-only SQL.
+
+=item *
+
+B<Default CSV separator is C<!>>, not C<,>, for historical reasons.
+Pass C<< sep_char => ',' >> for standard RFC 4180 files.
+
+=item *
+
+B<Primary-key column is named C<entry>>, not C<key>, because C<key>
+is a SQL reserved word.  Override with the C<id> parameter.
+
+=item *
+
+B<XML slurp is limited.>  Only simple flat XML structures are supported
+in slurp mode.  Multi-key or deeply nested documents will croak.
+Force SQL mode with C<< max_slurp_size => 0 >> if slurp fails.
+
+=item *
+
+B<Unique key assumption in slurp mode.>  Duplicate values in the key
+column silently overwrite earlier rows.  Disable slurp with
+C<< max_slurp_size => 0 >> if duplicates are expected.
+
+=item *
+
+B<BerkeleyDB does not support joins or the chained query builder.>
+
+=item *
+
+B<Column names must be valid SQL identifiers> (letters, digits,
+underscores, and a single dot for C<table.column> join notation).
+Other characters will cause a croak.
+
+=item *
+
+B<count() cache is opportunistic.>  Count results are served from cache
+only when a prior C<selectall_arrayref()> or C<count()> call with the
+same criteria has already populated it.
+
+=back
 
 =head1 SEE ALSO
 
 =over 4
 
-=item * Test coverage report: L<https://nigelhorne.github.io/Database-Abstraction/coverage/>
+=item * L<Database::Abstraction::Query> - chained query builder
+
+=item * L<Configure an Object at Runtime|Object::Configure>
+
+=item * L<Test Dashboard|https://nigelhorne.github.io/Database-Abstraction/coverage/>
 
 =back
 

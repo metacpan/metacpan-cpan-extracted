@@ -63,6 +63,19 @@ sub init {
 ########################################################################
   my ($self) = @_;
 
+  my @args = $self->get_args;
+
+  my $command = $self->command;
+
+  if ( !@args && !$self->commands->{$command} ) {
+    $self->command('get');
+    $self->command_args( [$command] );
+  }
+  else {
+    die "ERROR: Unknown command ($command)\n"
+      if !$self->commands->{$command};
+  }
+
   my $format = $self->get_format;
 
   die sprintf "ERROR: not a valid format - %s (must be one of: xml, json, yml)\n", $format
@@ -203,9 +216,10 @@ sub main {
   my @extra_options = qw(fh data dnk);
 
   my $cli = __PACKAGE__->new(
-    commands      => \%commands,
-    option_specs  => \@option_specs,
-    extra_options => \@extra_options,
+    commands         => \%commands,
+    option_specs     => \@option_specs,
+    extra_options    => \@extra_options,
+    validate_command => $FALSE,
   );
 
   return $cli->run;
@@ -236,9 +250,6 @@ __END__
    # retrieve a value from a JSON file
    cat alb-listener-rule.json | dnk get .ListenerArn
 
-=head1 DESCRIPTION
-
- 
 =head1 OPTIONS
 
  --help, -h                this help message
@@ -262,8 +273,8 @@ __END__
 
 =head2 Example:
 
- dnky -i infile.json set foo.bar buz foo.buz bar
+ dnk -i infile.json set foo.bar buz foo.buz bar
 
- dnky -i infile.json -b bak set foo.bar buz
+ dnk -i infile.json -b bak set foo.bar buz
 
 =cut

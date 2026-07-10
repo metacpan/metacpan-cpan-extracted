@@ -1,5 +1,14 @@
 Revision history for Algorithm-Classifier-IsolationForest
 
+0.6.0   2026-07-09/08:15
+        - Implement Online Isolation Forest (Filippo Leveni, Guilherme
+          Weigert Cassales, Bernhard Pfahringer, Albert Bifet, Giacomo
+          Boracchi (2024)) as the new companion class
+          Algorithm::Classifier::IsolationForest::Online and releated
+          CLI commands.
+        - initial prototype support
+        - munging via Algorithm::ToNumberMunger
+
 0.5.0   2026-07-04/14:30
         - Wide-NV perls (-Duselongdouble / -Dusequadmath(maybe? does this
           even exist? but possibly some idiot on github... but would fix

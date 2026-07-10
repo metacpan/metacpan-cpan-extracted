@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.23";
+$VERSION="0.24";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -222,16 +222,6 @@ sub Populate {
 	}
 
 
-	#create file picker widget
-	my $picker = $self->FilePicker(
-		-diriconcall => ['getDirIcon', $self],
-		-fileiconcall => ['getFileIcon', $self],
-		-linkiconcall => ['getLinkIcon', $self],
-	);
-	$self->Advertise('FilePicker', $picker);
-	$picker->geometry('640x400+100+100');
-
-
 	my $pre = $self->{PRECONFIG};
 	my $logcall = sub {
 		my $message = shift;
@@ -253,11 +243,6 @@ sub Populate {
 	);
 	
 	$self->Delegates(
-		pick => $picker,
-		pickFileOpen => $picker,
-		pickFileOpenMulti => $picker,
-		pickFileSave => $picker,
-		pickFolderSelect => $picker,
 		DEFAULT => $self,
 	);
 
@@ -970,10 +955,71 @@ Pauses the app for $time miliseconds in a non blocking way.
 sub pause {
 	my ($self, $time) = @_;
 	my $var = 0;
-	$self->after($time, sub { $time = 1 });
-	$self->waitVariable(\$time);
+	$self->after($time, sub { $var = 1 });
+	$self->waitVariable(\$var);
 }
 
+sub pick {
+	my $self = shift;
+	my $picker = $self->pickGet;
+	return $picker->pick(@_);
+}
+
+sub pickGet {
+	my $self = shift;
+	my $picker = $self->Subwidget('FilePicker');
+	unless (defined $picker) {
+		#create file picker widget
+		$picker = $self->FilePicker(
+			-diriconcall => ['getDirIcon', $self],
+			-fileiconcall => ['getFileIcon', $self],
+			-linkiconcall => ['getLinkIcon', $self],
+		);
+		$self->Advertise('FilePicker', $picker);
+		$picker->geometry('640x400+100+100');
+	
+		#create filepicker images
+		my @images = (
+			['-compactimage', 'view-list-details', 16],
+			['-detailsimage', 'view-list-tree', 16],
+			['-iconviewimage', 'view-list-icons', 16],
+			['-msgimage', 'dialog-information', 32],
+			['-newfolderimage', 'folder-new', 16],
+			['-reloadimage', 'appointment-recurring', 16],
+			['-warnimage', 'dialog-warning', 32],
+		);
+		for (@images) {
+			my ($opt, $icon, $size) = @$_;
+			my $img = $self->getArt($icon, $size);
+			$picker->configure($opt, $img) if defined $img;
+		}
+	}
+	return $picker
+}
+
+sub pickFileOpen {
+	my $self = shift;
+	my $picker = $self->pickGet;
+	return $picker->pickFileOpen(@_);
+}
+
+sub pickFileOpenMulti {
+	my $self = shift;
+	my $picker = $self->pickGet;
+	return $picker->pickFileOpenMulti(@_);
+}
+
+sub pickFileSave {
+	my $self = shift;
+	my $picker = $self->pickGet;
+	return $picker->pickFileSave(@_);
+}
+
+sub pickFolderSelect {
+	my $self = shift;
+	my $picker = $self->pickGet;
+	return $picker->pickFolderSelect(@_);
+}
 
 =item B<popDialog>I<($title, $message, $icon, @buttons)>
 
@@ -1185,24 +1231,11 @@ sub PostConfig {
 		}
 	}
 	my $pc = $self->{POSTCONFIG};
-	for (@$pc) { $_->execute }
-
-	#create filepicker images
-	my @images = (
-		['-compactimage', 'view-list-details', 16],
-		['-detailsimage', 'view-list-tree', 16],
-		['-iconviewimage', 'view-list-icons', 16],
-		['-msgimage', 'dialog-information', 32],
-		['-newfolderimage', 'folder-new', 16],
-		['-reloadimage', 'appointment-recurring', 16],
-		['-warnimage', 'dialog-warning', 32],
-	);
-	my $picker = $self->Subwidget('FilePicker');
-	for (@images) {
-		my ($opt, $icon, $size) = @$_;
-		my $img = $self->getArt($icon, $size);
-		$picker->configure($opt, $img) if defined $img;
+	for (@$pc) {
+#		$self->pause(100);
+		$_->execute
 	}
+
 
 }
 

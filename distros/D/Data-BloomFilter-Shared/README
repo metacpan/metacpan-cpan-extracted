@@ -178,8 +178,15 @@ SHARING ACROSS PROCESSES
         print $bf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
 
 SECURITY
-    The mmap region is writable by all processes that open it. Do not share
-    backing files with untrusted processes.
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with

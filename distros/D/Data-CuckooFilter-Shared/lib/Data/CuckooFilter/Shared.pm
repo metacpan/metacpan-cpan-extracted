@@ -1,9 +1,11 @@
 package Data::CuckooFilter::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::CuckooFilter::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 1;
 __END__
 
@@ -29,6 +31,10 @@ Data::CuckooFilter::Shared - shared-memory Cuckoo filter for Linux
     # unlike a Bloom filter, you can delete
     $cf->remove("alice");
     $cf->contains("alice");             # 0
+
+    # occurrence count (0..8): how many copies of an item are stored
+    $cf->add("x"); $cf->add("x");
+    $cf->count_of("x");                 # 2
 
     # add returns 0 when the table is full (a true no-op)
     my $ok = $cf->add("item");          # 1 if stored, 0 if full
@@ -117,6 +123,7 @@ another process.
     my $ok    = $cf->add($item);            # 1 if stored, 0 if the table is full
     my $added = $cf->add_many(\@items);     # count of items stored
     my $in    = $cf->contains($item);       # 1 if probably present, 0 if definitely absent
+    my $c     = $cf->count_of($item);       # occurrence count 0..8 (times added minus removed)
     my $gone  = $cf->remove($item);         # 1 if a fingerprint was removed, else 0
     $cf->clear;                             # reset to empty
 
@@ -136,6 +143,17 @@ definitely absent>. A 0 means B<definitely absent>: an item you added and have
 not removed will never return 0 (there are B<no false negatives>). A 1 may be a
 B<false positive> (a different item happens to share a fingerprint and bucket).
 There are B<never false negatives> for items that are currently stored.
+
+C<count_of> returns B<how many copies of C<$item> are stored> -- the number of
+times it was added minus the number of times it was removed -- as an integer
+from B<0 to 8>. Because a fingerprint can live only in its two candidate buckets
+(four slots each), the count B<saturates at 8> (C<2 * slots_per_bucket>): once an
+item fills those slots a further C<add> of it returns 0 (full). Like C<contains>
+it is probabilistic -- 0 means B<definitely absent>, while a positive count is an
+estimate that a colliding fingerprint can inflate (the same caveat as C<remove>:
+trust it only for items you added). It takes a read lock and is safe to call
+concurrently. This makes the filter usable as a small B<counting> set (counts
+below 8) without the extra memory of a counting Bloom filter.
 
 C<remove> deletes one stored fingerprint of C<$item>, returning B<1 if one was
 found and cleared> or B<0 if none matched>. See the B<Removal caveat> in
@@ -208,8 +226,14 @@ the combined effect of what all of them have done.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it. Do not share backing
-files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 

@@ -1,12 +1,12 @@
 {
    "abstract" : "Read-only Database Abstraction Layer (ORM)",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,21 +33,23 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Class::Abstract" : "0",
             "Cwd" : "0",
             "DBD::SQLite::Constants" : "0",
-            "Data::Dumper" : "0",
+            "DBI" : "1.6",
             "Data::Reuse" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "File::pfopen" : "0.03",
+            "List::Util" : "1.33",
             "Log::Abstraction" : "0.26",
             "Object::Configure" : "0.16",
             "Params::Get" : "0.13",
+            "Return::Set" : "0",
             "Scalar::Util" : "0",
             "autodie" : "0",
             "boolean" : "0",
-            "perl" : "5.008",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -70,9 +72,12 @@
             "Test::Carp" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Memory::Cycle" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
+            "Test::Returns" : "0",
+            "Test::Without::Module" : "0",
             "Text::xSV::Slurp" : "0",
             "XML::Simple" : "0"
          }
@@ -82,8 +87,7 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Database-Abstraction@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction",
-         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction"
       },
       "repository" : {
          "type" : "git",
@@ -92,6 +96,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

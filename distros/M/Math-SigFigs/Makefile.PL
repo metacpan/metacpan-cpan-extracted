@@ -20,14 +20,8 @@ my %script_prereq = (
 );
 
 my %test_prereq = (
-   'Cwd'                      => '0',
-   'File::Basename'           => '0',
-   'File::Find::Rule'         => '0',
-   'IO::File'                 => '0',
    'Test::Inter'              => '1.09',
    'Test::More'               => '0',
-   'Test::Pod'                => '1.00',
-   'Test::Pod::Coverage'      => '1.00',
 );
 
 my %config_prereq = (
@@ -43,13 +37,13 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Math::SigFigs",
-   VERSION          => "1.21",
+   VERSION          => "1.22",
    ABSTRACT         => "do math with correct handling of significant figures",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
     ? (MIN_PERL_VERSION => "5.006")
     : ()),
-   AUTHOR           => "Sullivan Beck (sbeck\@cpan.org)",
+   AUTHOR           => "Sullivan Beck (https://github.com/SBECK-github/)",
    "dist"           => {COMPRESS=>"gzip",SUFFIX=>"gz"},
    PL_FILES         => {},
    PREREQ_PM        => \%module_prereq,
@@ -64,7 +58,7 @@ WriteMakefile(
           provides     => {
              'Math::SigFigs' => {
                 file    => 'lib/Math/SigFigs.pm',
-                version => '1.21',
+                version => '1.22',
              },
 
           },
@@ -78,6 +72,10 @@ WriteMakefile(
              version   => 2,
           },
           resources    => {
+             bugtracker => {
+                web  => 'https://github.com/SBECK-github/Math-SigFigs/issues',
+             },
+             homepage => 'https://github.com/SBECK-github/Math-SigFigs',
              repository => {
                 type => 'git',
                 web  => 'https://github.com/SBECK-github/Math-SigFigs',

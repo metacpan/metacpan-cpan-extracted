@@ -6,7 +6,7 @@ use Devel::PPPort; Devel::PPPort::WriteFile();
 WriteMakefile(
     NAME               => 'Data::SortedSet::Shared',
     VERSION_FROM       => 'lib/Data/SortedSet/Shared.pm',
-    PREREQ_PM          => { 'Data::Intern::Shared' => '0.01' },   # for new_strings / Data::SortedSet::Shared::Strings
+    PREREQ_PM          => { 'Data::Intern::Shared' => '0.02' },   # for new_strings / Data::SortedSet::Shared::Strings
     TEST_REQUIRES      => { 'Test::More' => 0 },
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => 0, 'Devel::PPPort' => 0 },
     ABSTRACT_FROM      => 'lib/Data/SortedSet/Shared.pm',

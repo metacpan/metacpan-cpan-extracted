@@ -16,3 +16,7 @@
 (^|/)\.gitignore$
 ^[^/]+\.tar\.gz$
 ~$
+
+# local tool artifacts / built dists (not shipped)
+(^|/)\.pcg($|/)
+(^|/)\.claude($|/)

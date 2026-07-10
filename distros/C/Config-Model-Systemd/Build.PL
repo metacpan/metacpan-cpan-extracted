@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2025 by Dominique Dumont.
+# This software is Copyright (c) 2008-2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -28,7 +28,7 @@ my $build = Module::Build->new(
     dist_author   => 'Dominique Dumont (ddumont at cpan dot org)',
 
   'build_requires' => {
-    'Config::Model' => '2.143',
+    'Config::Model' => '2.163',
     'Config::Model::Tester' => '4.007',
     'Config::Model::Tester::Setup' => '0',
     'English' => '0',
@@ -48,7 +48,7 @@ my $build = Module::Build->new(
     'Config::Model::TkUI' => '0'
   },
   'requires' => {
-    'Config::Model' => '2.143',
+    'Config::Model' => '2.163',
     'Config::Model::Backend::Any' => '0',
     'Config::Model::Backend::IniFile' => '0',
     'Log::Log4perl' => '0',

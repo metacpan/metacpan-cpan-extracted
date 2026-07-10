@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2025 by Dominique Dumont.
+# This software is Copyright (c) 2008-2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,6 +9,8 @@
 #
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
@@ -47,4 +49,3 @@ return [
   }
 ]
 ;
-

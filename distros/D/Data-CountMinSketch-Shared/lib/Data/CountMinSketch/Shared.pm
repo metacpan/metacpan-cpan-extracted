@@ -1,9 +1,11 @@
 package Data::CountMinSketch::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::CountMinSketch::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 1;
 __END__
 
@@ -84,6 +86,7 @@ Requires 64-bit Perl.
 
     my $cms = Data::CountMinSketch::Shared->new($path, $epsilon, $delta);
     my $cms = Data::CountMinSketch::Shared->new(undef, 0.001, 0.001);   # defaults
+    my $cms = Data::CountMinSketch::Shared->new($path, 0.001, 0.001, 0660); # opt-in group share
     my $cms = Data::CountMinSketch::Shared->new_memfd($name, $epsilon, $delta);
     my $cms = Data::CountMinSketch::Shared->new_from_fd($fd);
 
@@ -92,6 +95,14 @@ C<$epsilon> is the target error factor and C<$delta> the target failure
 probability; both are optional, default to B<0.001>, and must be strictly
 between 0 and 1. C<new> and C<new_memfd> croak if C<$epsilon> or C<$delta> is
 out of range.
+
+For a file-backed sketch, C<new> accepts an optional fourth argument: the octal
+permission mode used when it B<creates> the backing file (default C<0600>,
+owner-only). Pass a wider mode such as C<0660> to opt in to sharing the sketch
+with another user, typically via a common group. The backing file is always
+opened with C<O_NOFOLLOW>, so a pre-existing symlink at C<$path> is refused
+rather than followed. The mode is ignored when attaching an already-existing
+file, for anonymous mappings, and for C<new_memfd>/C<new_from_fd>.
 
 From C<$epsilon> and C<$delta> the sketch derives its geometry: a width of
 C<w = next_power_of_two(ceil(e / epsilon))> columns (with a floor of 2 columns)
@@ -206,8 +217,14 @@ reflect the combined stream all of them have added.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it. Do not share backing
-files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 CRASH SAFETY
 

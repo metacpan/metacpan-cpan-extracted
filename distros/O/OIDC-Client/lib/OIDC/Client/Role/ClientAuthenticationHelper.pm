@@ -8,6 +8,7 @@ use Readonly;
 use Carp qw(croak);
 use Mojo::Util qw(b64_encode);
 use Crypt::JWT ();
+use OIDC::Client::Utils ();
 
 =encoding utf8
 
@@ -28,7 +29,6 @@ requires qw(log_msg
             private_key
             client_assertion_lifetime
             client_assertion_audience
-            generate_uuid_string
             private_key_jwt_encoding_options
             client_secret_jwt_encoding_options);
 
@@ -75,7 +75,7 @@ sub _build_client_assertion ($self, $use_private_key, $url) {
   my $now = time;
   my $exp = $now + $self->client_assertion_lifetime;
   my $aud = $self->client_assertion_audience // $url;
-  my $jti = $self->generate_uuid_string();
+  my $jti = OIDC::Client::Utils::generate_jti();
 
   my %claims = (
     iss => $self->id,

@@ -10,13 +10,13 @@ Locale::VersionedMessages::Sets::lm_gui::en_US;
 # Any changes to this file may be lost the next
 # time these commands are run.
 ####################################################
-# Copyright 2014-2014
+# Copyright 2014-2015
 
 use strict;
 use warnings;
 
 our $CopyrightBeg = 2014;
-our $CopyrightEnd = 2014;
+our $CopyrightEnd = 2015;
 
 our(%Messages);
 

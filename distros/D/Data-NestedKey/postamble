@@ -1,0 +1,3 @@
+install ::
+	-$(NOECHO) ln -sf $(INSTALLMAN3DIR)/Data::NestedKey::CLI.3pm $(DESTINSTALLMAN3DIR)/dnk.3pm; 
+	$(NOECHO) echo $(INSTALLMAN3DIR)/dnk.3pm >> $(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist

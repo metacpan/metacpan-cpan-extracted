@@ -1,0 +1,74 @@
+# systemd unit for iqbi-damiq, the Algorithm::EventsPerSecond::Sukkal
+# daemon. Install as /etc/systemd/system/iqbi-damiq.service, then:
+#
+#     systemctl daemon-reload
+#     systemctl enable --now iqbi-damiq
+#
+# Tunables are read from an environment file — set any of these in
+# /etc/default/iqbi-damiq (Debian-family) or /etc/sysconfig/iqbi-damiq
+# (RHEL-family):
+#
+#     IQBI_DAMIQ_WINDOW=300          # averaging window, seconds
+#     IQBI_DAMIQ_MAX_KEYS=500000     # distinct-key ceiling, 0 unlimited
+#     IQBI_DAMIQ_IDLE_TIMEOUT=600    # evict keys unmarked this long;
+#                                    # must be at least the window, so
+#                                    # raise it when raising the window
+#     IQBI_DAMIQ_SWEEP_INTERVAL=30   # seconds between eviction sweeps
+#     IQBI_DAMIQ_SOCKET_MODE=0660    # socket file mode
+#
+# Neither file existing is fine; everything falls back to the defaults
+# below. Adjust other flags with `systemctl edit iqbi-damiq` (an
+# override.conf with an emptied and re-set ExecStart), e.g. to add -x.
+
+[Unit]
+Description=iqbi-damiq per-key sliding-window event rate daemon
+Documentation=man:iqbi-damiq(1)
+After=local-fs.target
+
+[Service]
+Type=exec
+# The daemon stays in the foreground and shuts down cleanly on TERM.
+# Clients need write permission on the socket to connect; the default
+# mode 0666 admits every local user. To restrict, create a static user
+# and group, replace DynamicUser with User=/Group=, and set the mode
+# to 0660 so only members of the group can mark and query.
+#
+# Defaults matching the daemon's own, overridden by whichever
+# environment file exists; a later file wins if both do. The idle
+# timeout default is twice the default window; the daemon refuses an
+# idle timeout shorter than the window, so the two move together.
+Environment=IQBI_DAMIQ_WINDOW=60
+Environment=IQBI_DAMIQ_MAX_KEYS=100000
+Environment=IQBI_DAMIQ_IDLE_TIMEOUT=120
+Environment=IQBI_DAMIQ_SWEEP_INTERVAL=30
+Environment=IQBI_DAMIQ_SOCKET_MODE=0666
+EnvironmentFile=-/etc/default/iqbi-damiq
+EnvironmentFile=-/etc/sysconfig/iqbi-damiq
+ExecStart=/usr/local/bin/iqbi-damiq -s /run/iqbi-damiq/iqbi-damiq.sock \
+    -w ${IQBI_DAMIQ_WINDOW} \
+    --max-keys ${IQBI_DAMIQ_MAX_KEYS} \
+    --idle-timeout ${IQBI_DAMIQ_IDLE_TIMEOUT} \
+    --sweep-interval ${IQBI_DAMIQ_SWEEP_INTERVAL} \
+    -m ${IQBI_DAMIQ_SOCKET_MODE}
+DynamicUser=yes
+RuntimeDirectory=iqbi-damiq
+Restart=on-failure
+
+# Hardening: the daemon needs nothing but its unix socket.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

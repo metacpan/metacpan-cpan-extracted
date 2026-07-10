@@ -1,0 +1,64 @@
+{
+   "abstract" : "Perl client and protocol support for Blossom",
+   "author" : [
+      "Net::Blossom contributors"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Blossom",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "strictures" : "2"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage" : "0.23",
+            "Test::Pod" : "1.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Tiny" : "0",
+            "JSON" : "0",
+            "Net::Nostr::Core" : "0",
+            "URI" : "0",
+            "perl" : "5.016",
+            "strictures" : "2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/NicholasBHubbard/Net-Blossom/issues"
+      },
+      "homepage" : "https://github.com/NicholasBHubbard/Net-Blossom",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/NicholasBHubbard/Net-Blossom.git",
+         "web" : "https://github.com/NicholasBHubbard/Net-Blossom"
+      }
+   },
+   "version" : "0.001000",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -50,7 +50,9 @@
 #define CMS_MAGIC        0x534D4F43U  /* "COMS" (little-endian) */
 #define CMS_VERSION      1
 #define CMS_ERR_BUFLEN   256
+#ifndef CMS_READER_SLOTS
 #define CMS_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
+#endif
 #define CMS_MIN_W        2            /* floor on the column count (power of two) */
 #define CMS_MAX_W        0x100000000ULL /* 2^32 columns cap */
 #define CMS_MIN_D        1
@@ -87,7 +89,7 @@ struct CmsHeader {
     uint32_t rwlock;                  /* 64 */
     uint32_t rwlock_waiters;          /* 68 */
     uint32_t rwlock_writers_waiting;  /* 72 */
-    uint32_t _pad1;                   /* 76 */
+    uint32_t slotless_readers;  /* live readers holding the lock with no reader-slot (was padding) */
     uint64_t stat_ops;                /* 80 */
     uint8_t  _pad[168];               /* 88..255 */
 };
@@ -107,6 +109,7 @@ typedef struct CmsHandle {
     uint32_t       my_slot_idx;   /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t       cached_pid;    /* getpid() cached at last slot claim */
     uint32_t       cached_fork_gen; /* cms_fork_gen value at last slot claim */
+    uint32_t slotless_held; /* rwlock read-locks held with no reader-slot */
 } CmsHandle;
 
 /* ================================================================
@@ -189,6 +192,7 @@ static inline void cms_claim_reader_slot(CmsHandle *h) {
     cur_gen = __atomic_load_n(&cms_fork_gen, __ATOMIC_RELAXED);
     uint32_t now_pid = (uint32_t)getpid();
     h->cached_pid = now_pid;
+    if (cur_gen != h->cached_fork_gen) h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
     h->cached_fork_gen = cur_gen;
     h->my_slot_idx = UINT32_MAX;
     uint32_t start = now_pid % CMS_READER_SLOTS;
@@ -300,19 +304,39 @@ static inline void cms_recover_dead_readers(CmsHandle *h) {
      *       rwlock(0 -> 1) succeeds cleanly.
      * Only after the CAS resolves do we wipe the deferred dead slots,
      * keeping that work outside the race-sensitive window. */
+    /* A live reader with no slot (table was full) is invisible to the scan
+     * above but still holds a +1 in the lock word; never force-reset under it. */
+    if (__atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0)
+        any_live_reader = 1;
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < CMS_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = __atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0;
+            for (uint32_t i = 0; !live_now && i < CMS_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && cms_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < CMS_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || cms_pid_alive(pid)) continue;
-            cms_drain_dead_slot(h, i, pid);
+        if (drain_ok) {
+            for (uint32_t i = 0; i < CMS_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || cms_pid_alive(p)) continue;
+                cms_drain_dead_slot(h, i, p);
+            }
         }
     }
 }
@@ -364,6 +388,28 @@ static inline void cms_unpark_writer(CmsHandle *h) {
     }
 }
 
+/* Reader accounting: a reader mirrors its +1 in the lock word so dead-reader
+ * recovery can see it. A slotted reader uses its slot subcount; a reader that
+ * could not claim a slot (table full) uses the global hdr->slotless_readers,
+ * so recovery's force-reset never fires out from under it. leave() peels
+ * slotless first so a later slot claim cannot misattribute the decrement. */
+static inline void cms_reader_enter(CmsHandle *h) {
+    if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    } else {
+        __atomic_add_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        h->slotless_held++;
+    }
+}
+static inline void cms_reader_leave(CmsHandle *h) {
+    if (h->slotless_held > 0) {
+        h->slotless_held--;
+        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+    } else if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    }
+}
+
 static inline void cms_rwlock_rdlock(CmsHandle *h) {
     cms_claim_reader_slot(h);
     CmsHeader *hdr = h->hdr;
@@ -376,8 +422,7 @@ static inline void cms_rwlock_rdlock(CmsHandle *h) {
      * killed between rwlock CAS-success and subcount++ would let recovery
      * force-reset rwlock to 0 underneath us, causing a UINT32_MAX wrap on
      * our eventual rdunlock dec. */
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    cms_reader_enter(h);
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         /* Write-preferring: when lock is free (cur==0) and writers are
@@ -385,11 +430,11 @@ static inline void cms_rwlock_rdlock(CmsHandle *h) {
          * already active (cur>=1), new readers may join freely. */
         if (cur > 0 && cur < CMS_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < CMS_RWLOCK_SPIN_LIMIT, 1)) {
@@ -422,8 +467,7 @@ static inline void cms_rwlock_rdunlock(CmsHandle *h) {
      * window where we still own a unit of rwlock but our slot subcount is
      * 0, letting recovery force-reset rwlock underneath us. */
     uint32_t after = __atomic_sub_fetch(&hdr->rwlock, 1, __ATOMIC_RELEASE);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    cms_reader_leave(h);
     if (after == 0 && __atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -530,7 +574,11 @@ static inline CmsHandle *cms_setup(void *base, size_t map_size,
     }
     h->hdr          = hdr;
     h->base         = base;
-    h->reader_slots = (CmsReaderSlot *)((uint8_t *)base + hdr->reader_slots_off);
+    /* Derive reader_slots from the trusted fixed layout, not the stored
+     * (shared-segment, attacker-mutable) reader_slots_off. validate_header
+     * requires reader_slots_off to equal this for any file we open, so this is
+     * identical for valid data and never trusts a poisoned offset. */
+    h->reader_slots = (CmsReaderSlot *)((uint8_t *)base + cms_layout().reader_slots);
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
@@ -582,7 +630,24 @@ static int cms_validate_create_args(double epsilon, double delta,
     return 1;
 }
 
-static CmsHandle *cms_create(const char *path, double epsilon, double delta, char *errbuf) {
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int cms_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { CMS_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        CMS_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    CMS_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
+static CmsHandle *cms_create(const char *path, double epsilon, double delta, mode_t mode, char *errbuf) {
     uint64_t w;
     uint32_t d;
     if (!cms_validate_create_args(epsilon, delta, &w, &d, errbuf)) return NULL;
@@ -598,8 +663,8 @@ static CmsHandle *cms_create(const char *path, double epsilon, double delta, cha
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { CMS_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { CMS_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = cms_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { CMS_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { CMS_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -663,6 +728,15 @@ static CmsHandle *cms_open_fd(int fd, char *errbuf) {
 
 static void cms_destroy(CmsHandle *h) {
     if (!h) return;
+    /* Release our reader slot on clean teardown (else short-lived-reader churn
+     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+    if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
+        h->cached_fork_gen == __atomic_load_n(&cms_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        uint32_t expected = h->cached_pid;
+        __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
+                &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
     free(h->path);
@@ -694,10 +768,18 @@ static void cms_add_locked(CmsHandle *h, const void *item, size_t len, uint64_t 
     uint64_t w = h->hdr->w;
     uint64_t mask = h->hdr->mask;
     uint32_t d = h->hdr->d;
-    uint64_t *counters = cms_counters(h);
+    /* w/mask/d/counters_off are read from the shared segment; a local peer with
+     * write access to the backing file can corrupt them after we validated the
+     * header at open. Snapshot the offset once and bound every derived cell
+     * index against the process-local mmap_size (trusted) so a poisoned header
+     * can never drive an out-of-bounds write. Never-taken for valid data. */
+    uint64_t off = h->hdr->counters_off;
+    uint64_t avail = (off <= h->mmap_size) ? (h->mmap_size - off) / sizeof(uint64_t) : 0;
+    uint64_t *counters = (uint64_t *)((char *)h->base + off);
     for (uint32_t r = 0; r < d; r++) {
         uint64_t c = (h1 + (uint64_t)r * h2) & mask;
-        counters[(uint64_t)r * w + c] += n;
+        uint64_t idx = (uint64_t)r * w + c;
+        if (idx < avail) counters[idx] += n;
     }
     h->hdr->total += n;
 }
@@ -710,12 +792,19 @@ static uint64_t cms_estimate_locked(CmsHandle *h, const void *item, size_t len) 
     uint64_t w = h->hdr->w;
     uint64_t mask = h->hdr->mask;
     uint32_t d = h->hdr->d;
-    uint64_t *counters = cms_counters(h);
+    /* Same at-use bound as cms_add_locked: reject any poisoned-header index that
+     * would fall outside the mapping instead of reading out of bounds. */
+    uint64_t off = h->hdr->counters_off;
+    uint64_t avail = (off <= h->mmap_size) ? (h->mmap_size - off) / sizeof(uint64_t) : 0;
+    uint64_t *counters = (uint64_t *)((char *)h->base + off);
     uint64_t m = UINT64_MAX;
     for (uint32_t r = 0; r < d; r++) {
         uint64_t c = (h1 + (uint64_t)r * h2) & mask;
-        uint64_t v = counters[(uint64_t)r * w + c];
-        if (v < m) m = v;
+        uint64_t idx = (uint64_t)r * w + c;
+        if (idx < avail) {
+            uint64_t v = counters[idx];
+            if (v < m) m = v;
+        }
     }
     return m;
 }
@@ -731,8 +820,14 @@ static void cms_merge_counters(uint64_t *dst, const uint64_t *src, uint64_t cell
 
 /* reset all counters to 0 and total to 0 (caller holds the write lock) */
 static inline void cms_clear_locked(CmsHandle *h) {
+    /* d/w/counters_off are attacker-controlled shared-segment reads; clamp the
+     * memset length to what the process-local mmap_size actually backs so a
+     * poisoned geometry can never memset past the mapping. Equal for valid data. */
+    uint64_t off = h->hdr->counters_off;
+    uint64_t avail = (off <= h->mmap_size) ? (h->mmap_size - off) / sizeof(uint64_t) : 0;
     uint64_t cells = (uint64_t)h->hdr->d * h->hdr->w;
-    memset(cms_counters(h), 0, (size_t)(cells * sizeof(uint64_t)));
+    if (cells > avail) cells = avail;
+    memset((char *)h->base + off, 0, (size_t)(cells * sizeof(uint64_t)));
     h->hdr->total = 0;
 }
 

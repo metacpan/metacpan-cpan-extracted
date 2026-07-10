@@ -1,5 +1,54 @@
 Revision history for Database-Abstraction
 
+0.36	Thu Jul  9 21:38:49 EDT 2026
+	[ Bug fixes ]
+	- Data::Reuse stale-address hazard: selectall_arrayref() and
+	  selectall_array() now call Data::Reuse::forget() immediately before
+	  fixate() to clear stale address→canonical mappings that could cause
+	  one row's data to be silently substituted for another's on repeated
+	  DBI calls (intermittent wrong-row returns in join queries)
+	- Windows-portable file detection: replaced File::pfopen (which splits
+	  the path on ':' and breaks Windows drive letters) with
+	  File::Spec->catfile + -r checks in _open_table()
+	- t/locales.t: trim_loc() regex now uses /s flag so it correctly strips
+	  multi-line Carp::confess stack traces, not just single-line croak output
+
+	[ Security ]
+	- Input validation / SQL injection guards: id column name (new()),
+	  dbname and filename (_open()), and join table name (_build_joins())
+	  are now validated against strict identifier regexes; invalid values
+	  croak with a descriptive message before any SQL is constructed
+	- _like_match(): replaced regex-based LIKE translation (%->.*) with an
+	  O(m*n) dynamic-programming matcher in slurp mode, eliminating
+	  catastrophic backtracking on patterns such as %a%a%a%a%b
+
+	[ Enhancements ]
+	- Prepared statement caching: all DBI prepare() calls replaced with
+	  prepare_cached() for statement-handle reuse across queries
+	- Schema introspection: new columns() and schema() methods; SQLite uses
+	  PRAGMA table_info, other DBI drivers use column_info, slurp mode
+	  inspects the first row; results are cached after the first call
+	- DSN portability: new() now accepts dsn/username/password parameters,
+	  bypassing file detection entirely; dialect is auto-detected from the
+	  DSN prefix (sqlite/postgres/mysql); SQLite performance PRAGMAs are
+	  only applied when connecting via a sqlite DSN
+	- Operator-hash query criteria: all select methods now accept hashref
+	  values for comparison operators (> < >= <= != -like -not_like
+	  -in -not_in -between) and logical groupings (-or -and); backed by
+	  new private helpers _build_where / _build_where_conditions /
+	  _match_criterion / _has_complex_criteria
+	- Automatic joins: selectall_arrayref(), selectall_array(), and
+	  fetchrow_hashref() accept a join parameter (hashref or arrayref of
+	  hashrefs with keys table/on/type); backed by _build_joins(); valid
+	  JOIN types are INNER LEFT RIGHT FULL CROSS (default INNER)
+	- Chained query builder: new query() method returns a
+	  Database::Abstraction::Query object supporting fluent method chaining:
+	  ->select()->where()->join()->order_by()->limit()->offset()->all()/
+	  first()/count()
+	- Use Class::Abstract to ensure it's not instantiated directly
+	- DBD::SQLite::Constants and Data::Dumper are now loaded lazily (only
+	  when the relevant code path is actually exercised)
+
 0.35	Mon Jun  8 08:25:03 EDT 2026
 	[ Bug fixes ]
 	- Pass f_dir on open

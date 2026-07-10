@@ -3,8 +3,12 @@ package OIDC::Client::Utils;
 use utf8;
 use Moose;
 use Moose::Exporter;
+use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
 use Carp qw(croak);
+use Crypt::PRNG qw(random_bytes_b64u);
+use Digest::SHA qw(sha256);
+use MIME::Base64 qw(encode_base64url);
 
 =encoding utf8
 
@@ -21,7 +25,12 @@ Exports utility functions.
 Moose::Exporter->setup_import_methods(as_is => [qw/get_values_from_space_delimited_string
                                                    reach_data
                                                    affect_data
-                                                   delete_data/]);
+                                                   delete_data
+                                                   generate_state
+                                                   generate_nonce
+                                                   generate_jti
+                                                   generate_code_verifier
+                                                   generate_code_challenge/]);
 
 
 =head1 FUNCTIONS
@@ -132,6 +141,71 @@ sub delete_data {
   }
 
   return delete $data_tree->{$key_to_delete};
+}
+
+
+=head2 generate_state
+
+Generates a cryptographically secure OAuth 2.0 C<state> value.
+Returns a base64url-encoded string of 22 characters.
+
+=cut
+
+sub generate_state {
+  return random_bytes_b64u(16);
+}
+
+
+=head2 generate_nonce
+
+Generates a cryptographically secure OpenID Connect C<nonce> value.
+Returns a base64url-encoded string of 22 characters.
+
+=cut
+
+sub generate_nonce {
+  return random_bytes_b64u(16);
+}
+
+
+=head2 generate_jti
+
+Generates a cryptographically secure JWT ID (C<jti>) value.
+Returns a base64url-encoded string of 22 characters.
+
+=cut
+
+sub generate_jti {
+  return random_bytes_b64u(16);
+}
+
+
+=head2 generate_code_verifier
+
+Generates a cryptographically secure random code verifier for PKCE.
+Returns a base64url-encoded string of 43 characters.
+
+=cut
+
+sub generate_code_verifier {
+  return random_bytes_b64u(32);
+}
+
+
+=head2 generate_code_challenge($code_verifier, $code_challenge_method)
+
+Generates the code challenge from a code verifier and a code challenge method.
+
+=cut
+
+sub generate_code_challenge {
+  my ($code_verifier, $code_challenge_method) = pos_validated_list(\@_, { isa => 'Str', optional => 0 },
+                                                                        { isa => enum([qw(plain S256)]), optional => 0 });
+  if ($code_challenge_method eq 'plain') {
+    return $code_verifier;
+  }
+
+  return encode_base64url(sha256($code_verifier));
 }
 
 
