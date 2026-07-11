@@ -6,7 +6,7 @@ BEGIN {
 		use strict;
 
 		# a.ammr a.a année écoulées, mm mois, r release
-		$VERSION	= 2.1065;
+		$VERSION	= 2.1071;
 		$YEAR	= '2026';
 		@ISA		= qw(Exporter);
 		@EXPORT	= qw(oEdtk_release);

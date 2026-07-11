@@ -119,15 +119,18 @@ BOOT:
 /* XSMARKER: end of BOOT — INCLUDE_COMMAND regex must strip BOOT from generated sections */
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[QUEUE_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_INT, 0, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 4th arg: file mode for a new file-backed segment (default 0600,
+     * owner-only); pass e.g. 0660 to opt into cross-user sharing. */
+    mode_t fmode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_INT, 0, fmode, errbuf);
     if (!h) croak("Data::Queue::Shared::Int->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -495,8 +498,10 @@ new(class, path, capacity, ...)
         arena_cap = (uint64_t)SvUV(ST(3));
     else
         arena_cap = (uint64_t)capacity * 256;
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_STR, arena_cap, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 5th arg: file mode (default 0600); arena_cap is the optional 4th. */
+    mode_t fmode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_STR, arena_cap, fmode, errbuf);
     if (!h) croak("Data::Queue::Shared::Str->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:

@@ -22,7 +22,7 @@ MODULE = Data::RadixTree::Shared  PACKAGE = Data::RadixTree::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path = &PL_sv_undef, node_capacity = 4096, arena_capacity = 65536)
+new(class, path = &PL_sv_undef, node_capacity = 4096, arena_capacity = 65536, ...)
     const char *class
     SV *path
     UV node_capacity
@@ -30,8 +30,12 @@ new(class, path = &PL_sv_undef, node_capacity = 4096, arena_capacity = 65536)
   PREINIT:
     char errbuf[RDX_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    RdxHandle *h = rdx_create(p, (uint64_t)node_capacity, (uint64_t)arena_capacity, errbuf);   /* validates args into errbuf */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 5th arg: file mode for a newly-created file-backed segment
+     * (default 0600, owner-only). Pass e.g. 0660 to opt into cross-user
+     * sharing. Ignored for anonymous/existing segments. */
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    RdxHandle *h = rdx_create(p, (uint64_t)node_capacity, (uint64_t)arena_capacity, mode, errbuf);   /* validates args into errbuf */
     if (!h) croak("Data::RadixTree::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -46,7 +50,7 @@ new_memfd(class, name = &PL_sv_undef, node_capacity = 4096, arena_capacity = 655
   PREINIT:
     char errbuf[RDX_ERR_BUFLEN];
   CODE:
-    const char *nm = SvOK(name) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     RdxHandle *h = rdx_create_memfd(nm, (uint64_t)node_capacity, (uint64_t)arena_capacity, errbuf);   /* validates args into errbuf */
     if (!h) croak("Data::RadixTree::Shared->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -266,6 +270,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::RadixTree::Shared")) {
         RdxHandle *h = INT2PTR(RdxHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

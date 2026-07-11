@@ -4,6 +4,9 @@
 
 use strict;
 use warnings;
+
+use Test::RequiresInternet('geocoder.ca' => 'https');
+
 use LWP;
 use Test::Most tests => 18;
 

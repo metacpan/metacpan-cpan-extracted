@@ -61,6 +61,7 @@ use strict;
 use warnings;
 # use autodie qw(:all);
 use autodie;	# Don't want system() to die, we catch failures
+use Cache::LRU;
 use Cwd;
 use Data::Dumper;
 # use BerkeleyDB;
@@ -916,6 +917,16 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20135
 		}, {
+			'LAT' => 39.092207,
+			'LON' => -77.591987,
+			'NUMBER' => 404,
+			'STREET' => 'BRINDLEY PLACE SW',
+			'CITY' => 'LEESBURG',
+			'COUNTY' => 'LOUDOUN',
+			'STATE' => 'VA',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20175
+		}, {
 			'LAT' => 39.124843,
 			'LON' => -77.535445,
 			'NUMBER' => 818,
@@ -1232,8 +1243,8 @@ if($ENV{'REDIS_SERVER'}) {
 	# FIXME: ask for user name and password
 	my ($user, $password) = split(/:/, $ENV{'MARIADB_USER'});
 	$dbh = DBI->connect("dbi:MariaDB:host=$e;database=geo_coder_free",
-		$user,
-		$password,
+			$user,
+			$password,
 		{ RaiseError => 1, AutoCommit => 0 }
 	);
 	$| = 1;
@@ -1429,7 +1440,7 @@ if(($force_flag || ((!(DEBUG&DEBUG_KNOWN_PLACES)) && (-r $filename))) &&
    # open(my $fin1, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db') &&
    # open(my $fin2, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
    (my $all_countries = File::Open::NoCache::ReadOnly->new($filename)) &&
-   (!(DEBUG&(DEBUG_OSM|DEBUG_WOF|DEBUG_GET_WOF|DEBUG_DR5HN))) &&
+   (!(DEBUG&(DEBUG_OSM|DEBUG_WOF|DEBUG_GET_WOF|DEBUG_DR5HN|DEBUG_KNOWN_PLACES))) &&
    (my $admin1 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin1.db')) &&
    (my $admin2 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin2.db'))) {
 	my $fin = $all_countries->fd();
@@ -1600,7 +1611,9 @@ foreach my $csv_file (create_tree($oa, 1)) {
 		my $state;
 		my $file;
 
-		next unless($openaddresses_countries{lc($country)});
+		unless(DEBUG&DEBUG_KNOWN_PLACES) {
+			next unless($openaddresses_countries{lc($country)});
+		}
 
 		if($components[1] =~ /\.csv$/) {
 			$file = $components[1];
@@ -1639,36 +1652,6 @@ foreach my $csv_file (create_tree($oa, 1)) {
 		my $fin = $fh->fd();
 
 		aio_readahead($fin, 0, AIO_READAHEAD_SIZE) if($^O ne 'solaris');
-
-		# Import this state's hand curated data
-		if(my $k = $known_places{$f}) {
-			print __LINE__, ": known place ($f):\n\t", Data::Dumper->new([$k])->Dump() if(DEBUG&DEBUG_KNOWN_PLACES);
-			foreach my $row(@{$k}) {
-				$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh, berkeley_db => $berkeley_db, redis => $redis, mongodb => $mongodb, global => 1);
-				if(defined($row->{'STREET'}) && ($row->{'STREET'} =~ /MEDLARS DR/i) && (DEBUG&DEBUG_KNOWN_PLACES)) {
-					# 'CITY' => 'BETHESDA',
-					# 'COUNTRY' => 'US',
-					# 'COUNTY' => 'MONTGOMERY',
-					# 'LAT' => '38.99516556',
-					# 'LON' => '-77.09943963',
-					# 'NAME' => 'NCBI',
-					# 'POSTCODE' => 20894,
-					# 'STATE' => 'MD',
-					# 'STREET' => 'MEDLARS DR'
-					# global NCBIMEDLARS DRBETHESDAMONTGOMERYMDUS => RFa5+GhoBmCb91M8
-					# global NCBIMEDLARS DRBETHESDAMDUS => tMt972yoDCKkdE5u
-					# global MEDLARS DRBETHESDAMDUS => KZCIB0nblX/Etlnx
-					# global NCBIBETHESDAMDUS => aQ1pIla9rwruGeg0
-					print __LINE__, ': ', Data::Dumper->new([$row])->Dump();
-				}
-			}
-			if($inserts >= MAX_INSERT_COUNT) {
-				flush_queue($dbh, $redis, $mongodb, $berkeley_db);
-				$inserts = 0;
-			}
-		}
-
-		next if(DEBUG&DEBUG_KNOWN_PLACES);
 
 		my $offset = AIO_READAHEAD_SIZE;
 
@@ -1721,6 +1704,47 @@ foreach my $csv_file (create_tree($oa, 1)) {
 	}
 }
 
+# Import the hand curated data
+# 404BRINDLEYPLACESWLEESBURGLOUDOUNVAUS => I2I4//UDI4r48iNI
+# 404BRINDLEYPLACESWLEESBURGVAUS => nyi+l225MKEpfFi4
+foreach my $file(sort keys %known_places) {
+	print __LINE__, ": known place dealing with $file:\n\t" if(DEBUG&DEBUG_KNOWN_PLACES);
+	my @components = split(/\//, $file);
+	my $country = uc($components[0]);
+	my $state = uc($components[1]) if($components[1]);
+	foreach my $row(@{$known_places{$file}}) {
+		print "\t", __LINE__, ": known place:\n\t\t", Data::Dumper->new([$row])->Dump() if(DEBUG&DEBUG_KNOWN_PLACES);
+		# $inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh, berkeley_db => $berkeley_db, redis => $redis, mongodb => $mongodb, global => 1);
+		$row->{'COUNTRY'} ||= $country;
+		$row->{'STATE'} ||= $state;
+		$inserts += insert($dbh, $redis, $mongodb, $berkeley_db, 1, %{$row});
+		if(defined($row->{'STREET'}) && ($row->{'STREET'} =~ /MEDLARS DR/i) && (DEBUG&DEBUG_KNOWN_PLACES)) {
+			# 'CITY' => 'BETHESDA',
+			# 'COUNTRY' => 'US',
+			# 'COUNTY' => 'MONTGOMERY',
+			# 'LAT' => '38.99516556',
+			# 'LON' => '-77.09943963',
+			# 'NAME' => 'NCBI',
+			# 'POSTCODE' => 20894,
+			# 'STATE' => 'MD',
+			# 'STREET' => 'MEDLARS DR'
+			# global NCBIMEDLARS DRBETHESDAMONTGOMERYMDUS => RFa5+GhoBmCb91M8
+			# global NCBIMEDLARS DRBETHESDAMDUS => tMt972yoDCKkdE5u
+			# global MEDLARS DRBETHESDAMDUS => KZCIB0nblX/Etlnx
+			# global NCBIBETHESDAMDUS => aQ1pIla9rwruGeg0
+			print __LINE__, ': ', Data::Dumper->new([$row])->Dump();
+		}
+		if($row->{'COUNTRY'} eq 'US') {
+			delete local $row->{'COUNTY'};
+			$inserts += insert($dbh, $redis, $mongodb, $berkeley_db, 1, %{$row});
+		}
+	}
+	if($inserts >= MAX_INSERT_COUNT) {
+		flush_queue($dbh, $redis, $mongodb, $berkeley_db);
+		$inserts = 0;
+	}
+}
+
 if(BUILDMODE eq 'ONE') {
 	undef $ENV{'DR5HN_HOME'};
 	undef $ENV{'OSM_HOME'};
@@ -1728,22 +1752,20 @@ if(BUILDMODE eq 'ONE') {
 	undef $oa;
 }
 
-if($dbh) {
-	$dbh->commit();
-}
+flush_queue($dbh, $redis, $mongodb, $berkeley_db);	# Check for hanging dups in last state
 
 # print "Debug exit\n" if(DEBUG&DEBUG_ALL);
 # $dbh->disconnect();
 # $wof_global_dbh->disconnect();
 # exit(0);
 
-flush_queue($dbh, $redis, $mongodb, $berkeley_db);	# Check for hanging dups in last state
 # undef %digests_added;
 undef %state_md5s;
 undef %state_parent_md5s;
 
-my %l1_cache;
+my $l1_cache = Cache::LRU->new(size => 1_000);
 my $l2_cache;
+my %wof_index;
 
 print STDERR __LINE__, ': >>>>', Devel::Size::total_size(\%queued_commits), "\n" if(DEBUG&DEBUG_SIZE);
 
@@ -1752,6 +1774,16 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 	my %address_parsers;
 	my $j = JSON::MaybeXS->new()->utf8();
 	my $string = '';
+	my $region_id;
+	my $region_name;
+
+	# Build a one-time ID->path index so get_wof() can do a hash lookup
+	# instead of a full File::Find scan on every cache miss.
+	print "Indexing WhosonFirst files in $whosonfirst (this may take a few minutes)\n";
+	find({ wanted => sub {
+			if(-f $File::Find::name && $File::Find::name =~ /(\d+)\.geojson$/) { $wof_index{$1} = $File::Find::name }
+		}, follow => 0, no_chdir => 1 }, $whosonfirst);
+	print 'Indexed ', scalar(keys %wof_index), " WhosonFirst files\n";
 
 	# Find all of the .geojson files in $WHOSONFIRST_HOME
 	foreach my $geojson_file (create_tree_from_git($whosonfirst, 0)) {
@@ -1862,8 +1894,6 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 		}
 
 		if(!defined($state)) {
-			my $region_id;
-			my $region_name;
 			my @hierarchy = @{$properties->{'wof:hierarchy'}};
 			if(scalar(@hierarchy) && (my $region = $hierarchy[0]->{'region_id'})) {
 				if(defined($region_id) && ($region == $region_id)) {
@@ -1910,11 +1940,16 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 		if(($placetype eq 'locality') || ($placetype eq 'neighbourhood') || ($placetype eq 'borough')) {
 			$city = $properties->{'wof:name'};
 			if(($placetype eq 'borough') && (my $parent = $properties->{'wof:parent_id'})) {
-				if($parent = get_wof($properties, $parent, $geojson_file)) {
-					$city = "$city, $parent";
-				# } else {
-					# Most likely the parent is in a different database
-					# die "Can't determine the parent for $city in ", $properties->{'wof:id'}, "->$parent";
+				# Prefer the hierarchy's locality_id to jump directly past any
+				# intermediate boroughs to the containing city.
+				my $parent_name;
+				my @hier = @{$properties->{'wof:hierarchy'}};
+				if(scalar(@hier) && (my $locality = $hier[0]->{'locality_id'})) {
+					$parent_name = get_wof($properties, $locality, $geojson_file);
+				}
+				$parent_name //= get_wof($properties, $parent, $geojson_file);
+				if($parent_name) {
+					$city = "$city, $parent_name";
 				}
 			}
 			die "Can't determine the city" if(!defined($city));
@@ -2049,9 +2084,8 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 		}
 	}
 
-	%l1_cache = ();
+	undef $l1_cache;
 	$l2_cache->clear();
-	undef %l1_cache;
 	undef $l2_cache;
 
 	if(BUILDMODE eq 'ONE') {
@@ -2066,12 +2100,14 @@ if($dbh) {
 	$dbh->commit();
 }
 
-if(!(DEBUG&(DEBUG_OSM|DEBUG_WOF|DEBUG_GET_WOF))) {
+# if(!(DEBUG&(DEBUG_OSM|DEBUG_WOF|DEBUG_GET_WOF))) {
+# TODO: Already done above, so check if this is now needed
+if(0) {
 	foreach my $country(@whosonfirst_only_countries) {
 		# Import this country's hand curated data
 
 		$| = 1;
-		printf "%-70s\r", "Known place $country";
+		printf "%-70s\r", "WOF: Known place $country";
 		print "\n" if(DEBUG);
 		$| = 0;
 
@@ -2114,8 +2150,6 @@ if((!(DEBUG&DEBUG_WOF)) && (my $osm = $ENV{'OSM_HOME'})) {
 
 		# TODO: check for the presence of bzcat
 		open(my $pin, '-|', "bzcat $filename");
-		my $reader = XML::LibXML::Reader->new(FD => $pin)
-			or die "cannot read $filename";
 
 		my $in_node;
 		my $key;
@@ -2125,7 +2159,11 @@ if((!(DEBUG&DEBUG_WOF)) && (my $osm = $ENV{'OSM_HOME'})) {
 		my $lon;
 		my $place;
 		my $country;
+		$inserts = 0;
 
+		eval {
+		my $reader = XML::LibXML::Reader->new(FD => $pin)
+			or die "cannot read $filename";
 		while($reader->read()) {
 			# These constants are not exported by default :-(
 			# print $reader->document->toString(1);
@@ -2618,8 +2656,13 @@ print __LINE__, ": add_record = $add_record (city/state/country = $city/$state/$
 					$lon = $reader->getAttribute('lon');
 				}
 			} else {
-				warn 'Unknown reader type ', $reader->nodeType(), ' in ', $reader->document->toString(1), "\n"
+				warn 'Unknown reader type ', $reader->nodeType(), ' in ', $reader->name(), "\n"
 			}
+		}
+		}; # end eval
+		if(my $err = $@) {
+			die $err unless ref($err) && $err->isa('XML::LibXML::Error');
+			print STDERR "XML parse error in $filename, skipping: $err\n";
 		}
 		close $pin;
 	}
@@ -2660,7 +2703,7 @@ print __LINE__, ": add_record = $add_record (city/state/country = $city/$state/$
 				foreach my $city(@{$state->{'cities'}}) {
 					my $row = {
 						'COUNTRY' => $country->{'name'},
-						'STATE' => $state->{'state_code'},
+						'STATE' => $state->{'state_code'} || $state->{iso2} || $state->{'name'},
 						'CITY' => $city->{'name'},
 						'LAT' => $city->{'latitude'},
 						'LON' => $city->{'longitude'},
@@ -2694,6 +2737,7 @@ print __LINE__, ": add_record = $add_record (city/state/country = $city/$state/$
 	}
 }
 
+flush_queue($dbh, $redis, $mongodb, $berkeley_db);
 
 # undef %digests_added;
 # $| = 1;
@@ -2803,7 +2847,7 @@ sub create_tree_from_git {
 	$| = 0;
 
 	foreach my $dir(<"$where/*/.git">) {
-		my($d1, $d2) = fileparse($dir);	# File::BaseName
+		my($d1, $d2) = fileparse($dir);	# File::Basename
 		chdir $d2;
 		# Some call the main branch master, some call it main
 		# So use HEAD
@@ -3140,7 +3184,7 @@ sub import
 	}
 	if(($city && ($city !~ /^\s+$/)) || $county || $state) {
 		if(!defined($state)) {
-			if(($country eq 'AU') && ($file =~ /\/au\/(...)\/.+.csv$/)) {
+			if((($country eq 'Australia') || ($country eq 'AU')) && ($file =~ /\/au\/(...)\/.+.csv$/)) {
 				$state = uc($1);
 			} elsif(my $region = $row->{'REGION'}) {
 				delete $row->{'REGION'};
@@ -3148,7 +3192,7 @@ sub import
 			}
 
 			if(!defined($state)) {
-				print __LINE__, ': ', Data::Dumper->new([$row])->Dump();
+				print "\n", __LINE__, ': ', Data::Dumper->new([$row])->Dump();
 				my $i = 0;
 				while(my @call_details = caller($i++)) {
 					print STDERR "\tCalled at line ", $call_details[2], "\n";
@@ -3467,6 +3511,7 @@ sub flush_queue
 		if($berkeley_db) {
 			# $berkeley_db->put($md5, $geo_hash->encode($row->{'LAT'}, $row->{'LON'}, 10));
 			$db_tie{$md5} = $geo_hash->encode($row->{'LAT'}, $row->{'LON'}, 10);
+			# print "stash $md5 in berkeley DB\n";
 		}
 		if($dbh) {
 			if(!defined($query)) {
@@ -3682,9 +3727,12 @@ sub create_md5
 	# $digests_added{$digest} = 1;
 
 	my $rc;
+	$digest =~ s/^\s+//;
+	$digest =~ s/,\s*//g;
 	$digest =~ tr/ž/z/;	# Remove wide characters
 	$digest =~ s/\N{U+017E}/z/g;
 	$digest =~ s/\xc5\xbe/z/g;
+	$digest =~ s/\s+//g;
 	if(length($digest) <= 16) {
 		$rc = $digest;
 	} else {
@@ -3740,22 +3788,16 @@ sub get_wof {
 	my ($properties, $id, $geojson_file) = @_;
 
 	return if($id < 0);
-	if($l1_cache{$id}) {
+	if(my $rc = $l1_cache->get($id)) {
 		# my @call_details = caller(0);
-		# print "get_wof: stored $l1_cache{$id} at line ", $call_details[2], "\n" if(DEBUG&DEBUG_GET_WOF);
-		return $l1_cache{$id};
+		# print "get_wof: stored $rc at line ", $call_details[2], "\n" if(DEBUG&DEBUG_GET_WOF);
+		return $rc;
 	}
-	if(scalar(keys %l1_cache) >= 100) {
-		# TODO: LRU
-		print "get_wof: emptying l1_cache\n" if(DEBUG&DEBUG_GET_WOF);
-		%l1_cache = ();
-	}
-
 	if(defined($l2_cache)) {
 		if(my $name = $l2_cache->get($id)) {
 			my @call_details = caller(0);
 			print "get_wof: cached $name at line ", $call_details[2], "\n" if(DEBUG&DEBUG_GET_WOF);
-			$l1_cache{$id} = $name;
+			$l1_cache->set($id => $name);
 			return $name;
 		}
 	} else {
@@ -3796,24 +3838,9 @@ sub get_wof {
 	}
 
 	if($repo eq '*') {
-		# Do a glob expansion on the string, useful if it's something like
-		#	$ENV{'WHOSONFIRST_HOME'} . "/*/data/286/455/973/286455973.geojson"
-		print "Glob expand $filename\n" if(DEBUG&DEBUG_GET_WOF);
-
-		# Because of the layout of WOF (lots of small directories), this can be slow on EXT4, it would be nice to find a better way
-		# my @filelist = <"$filename">;
-		# $filename = $filelist[0];
-
-		# File::Find
-		find({	
-			wanted => sub {
-				return unless $_ =~ qr/$id.geojson$/;
-				$filename = $File::Find::name;
-				$File::Find::prune = 1;	# stop descending further
-			},
-			no_chdir => 1,
-		}, $ENV{'WHOSONFIRST_HOME'});
-		print "Found: $filename\n" if(DEBUG & DEBUG_GET_WOF);
+		print "Index lookup for $id\n" if(DEBUG&DEBUG_GET_WOF);
+		$filename = $wof_index{$id};
+		print "Found: $filename\n" if((DEBUG & DEBUG_GET_WOF) && $filename);
 	}
 	if((!$filename) || (! -r $filename)) {
 		# Probably shouldn't die here
@@ -3845,11 +3872,11 @@ sub get_wof {
 			my $country = uc($properties->{'wof:country'});
 			if(($country eq 'US') || ($country eq 'CA') || ($country eq 'AU')) {
 				print "\t", $properties->{'wof:abbreviation'} // $properties->{'wof:shortcode'} // $properties->{'wof:name'}, "\n" if(DEBUG&DEBUG_GET_WOF);
-				return $l1_cache{$id} = $l2_cache->set($id, $properties->{'wof:abbreviation'} // $properties->{'wof:shortcode'} // $properties->{'wof:name'}, '1 minute');
+				return $l1_cache->set($id, $l2_cache->set($id, $properties->{'wof:abbreviation'} // $properties->{'wof:shortcode'} // $properties->{'wof:name'}, '1 minute'));;
 			}
 		}
 		print "\tname: ", $properties->{'wof:name'}, "\n" if(DEBUG&DEBUG_GET_WOF);
-		return $l1_cache{$id} = $l2_cache->set($id, $properties->{'wof:name'}, '1 minute');
+		return $l1_cache->set($id, $l2_cache->set($id, $properties->{'wof:name'}, '1 minute'));
 	# }
 }
 

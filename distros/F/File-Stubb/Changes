@@ -1,5 +1,17 @@
 Revision history for stubb (File::Stubb)
 
+0.05  Jul 10 2026
+  - Improved how stubb handles non-targets.
+    - Non-targets are now preceded by a single backslash instead of an
+      exclamation mark.
+    - Non-targets no longer cause stubb to ignore the next caret pair.
+  - A literal backslash can be placed behind a basic target by putting two
+    backslashes behind the target.
+  - stubb now dies on invalid basic and conditional targets.
+  - Allow rendering to standard output when using the -t option with more than
+    one output target.
+  - Fix file handle leaks during failed file rendering.
+
 0.04  Sep 16 2025
   - Overhauled template rendering code.
   - Fix rendering '!' targets.

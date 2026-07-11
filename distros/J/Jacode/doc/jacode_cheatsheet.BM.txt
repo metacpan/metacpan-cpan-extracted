@@ -2,7 +2,7 @@
 # Helaian Panduan Jacode (BM)
 # Jacode - Program Perl untuk penukaran kod aksara bahasa Jepun
 # https://metacpan.org/dist/Jacode
-# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ################################################################################
 
 ■ PEMASANGAN

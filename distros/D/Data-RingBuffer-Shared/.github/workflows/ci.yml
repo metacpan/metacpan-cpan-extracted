@@ -87,3 +87,21 @@ jobs:
       - run: AUTHOR_TESTING=1 prove -b -j2 xt/*.t
         env:
           AUTHOR_TESTING: 1
+
+  test-valgrind:
+    runs-on: ubuntu-latest
+    name: valgrind
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: sudo apt-get update && sudo apt-get install -y valgrind
+      - run: cpanm -n Devel::PPPort
+      - run: perl Makefile.PL && make
+      - name: test under valgrind
+        run: |
+          for t in t/*.t; do
+            echo "== valgrind $t =="
+            valgrind --leak-check=full --error-exitcode=42 --errors-for-leak-kinds=definite perl -Mblib "$t" || exit 1
+          done

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tube name="LoopMap">
+  <lines>
+    <line id="x" name="Line X" color="black"/>
+    <line id="y" name="Line Y" color="blue"/>
+  </lines>
+  <stations>
+    <station id="A" name="A" line="x,y" link="B"/>
+    <station id="B" name="B" line="x,y" link="A:x,C"/>
+    <station id="C" name="C" line="x,y" link="B:x,D"/>
+    <station id="D" name="D" line="y"   link="A"/>
+  </stations>
+</tube>

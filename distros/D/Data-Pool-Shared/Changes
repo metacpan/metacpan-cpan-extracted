@@ -1,5 +1,12 @@
 Revision history for Data::Pool::Shared
 
+0.07  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+    - new() on an existing backing file now requires a matching capacity and
+      elem_size, croaking on a mismatch (previously the requested geometry
+      was silently ignored).
+
 0.06  2026-06-30
     - scan_from($slot): pin the per-handle allocation scan start for deterministic,
       sequential id order (overrides the getpid()-derived spread default). Purely

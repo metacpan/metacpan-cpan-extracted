@@ -41,6 +41,7 @@ t/10-int32-int16.t
 t/11-keywords.t
 t/12-edges.t
 t/13-push-multi-exception-safety.t
+t/14-deque-oracle.t
 t/pod_synopsis.t
 t/version_check.t
 typemap

@@ -326,9 +326,28 @@ static inline void queue_init_new_header(void *base, uint32_t cap, uint64_t aren
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at
+ * file_mode, default 0600 = owner-only), or attach an existing file
+ * (O_RDWR|O_NOFOLLOW, no O_CREAT). Blocks a symlink swap or a pre-seeded/
+ * hard-linked backing file; cross-user sharing is opt-in via a wider file_mode. */
+static int queue_secure_open(const char *path, mode_t file_mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, file_mode);
+        if (fd >= 0) { (void)fchmod(fd, file_mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { QUEUE_ERR("create(%s): %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;
+        QUEUE_ERR("open(%s): %s", path, strerror(errno));
+        return -1;
+    }
+    QUEUE_ERR("open(%s): create/attach kept racing", path);
+    return -1;
+}
+
 static QueueHandle *queue_create(const char *path, uint32_t capacity,
                                   uint32_t mode, uint64_t arena_cap_hint,
-                                  char *errbuf) {
+                                  mode_t file_mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
 
     uint32_t cap = queue_next_pow2(capacity);
@@ -370,8 +389,8 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
         queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
     } else {
         /* File-backed shared mmap */
-        int fd = open(path, O_RDWR | O_CREAT, 0666);
-        if (fd < 0) { QUEUE_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
+        int fd = queue_secure_open(path, file_mode, errbuf);
+        if (fd < 0) return NULL;
 
         if (flock(fd, LOCK_EX) < 0) {
             QUEUE_ERR("flock(%s): %s", path, strerror(errno));
@@ -855,6 +874,10 @@ static inline int queue_str_pop_locked(QueueHandle *h, const char **out_str,
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
 
     uint32_t len = slot->packed_len & QUEUE_STR_LEN_MASK;
+    /* arena_off/len come from the mmap'd slot; a local peer can corrupt the
+     * backing file. Bound the record against the arena so a poisoned slot
+     * yields an empty payload instead of an out-of-bounds read (CWE-125). */
+    if ((uint64_t)slot->arena_off + len > h->arena_cap) len = 0;
     *out_utf8 = (slot->packed_len & QUEUE_STR_UTF8_FLAG) != 0;
 
     if (!queue_ensure_copy_buf(h, len + 1))
@@ -1001,6 +1024,7 @@ static inline int queue_str_peek(QueueHandle *h, const char **out_str,
     uint32_t idx = (uint32_t)(hdr->head & h->cap_mask);
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
     uint32_t len = slot->packed_len & QUEUE_STR_LEN_MASK;
+    if ((uint64_t)slot->arena_off + len > h->arena_cap) len = 0;
     *out_utf8 = (slot->packed_len & QUEUE_STR_UTF8_FLAG) != 0;
     if (!queue_ensure_copy_buf(h, len + 1)) {
         queue_mutex_unlock(hdr);
@@ -1039,27 +1063,43 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
         queue_mutex_unlock(hdr);
         return -2;
     }
-    uint32_t saved_wpos = hdr->arena_wpos;
-    uint32_t pos = saved_wpos;
-    uint64_t skip = alloc;
 
-    if ((uint64_t)pos + alloc > h->arena_cap) {
-        skip += h->arena_cap - pos;
-        pos = 0;
-    }
+    /* Allocate at the READ end of the circular arena, growing BACKWARD, so
+     * the new element sits just before the current front in ring order. The
+     * arena is thus always laid out in queue order (front..back is a single
+     * contiguous ring region), which the free accounting relies on. The
+     * invariant arena_wpos == (read_frontier + arena_used) mod arena_cap is
+     * preserved by every op, so pop_back can just retreat arena_wpos by the
+     * slot's skip. (The old code allocated at the WRITE frontier but inserted
+     * at the head; a following pop_front then freed the newest arena bytes,
+     * leaving a hole the single-counter model cannot represent, so later
+     * wrapping pushes overwrote live elements.) */
+    uint32_t cap = (uint32_t)h->arena_cap;
+    uint32_t pos, skip;
 
-    if ((uint64_t)hdr->arena_used + skip > h->arena_cap) {
-        if (hdr->tail == hdr->head) {
-            hdr->arena_wpos = 0;
-            hdr->arena_used = 0;
-            saved_wpos = 0;
-            pos = 0;
+    if (hdr->tail == hdr->head) {
+        /* Empty: the element is both front and back. Place it at the arena
+         * start, resetting the ring (also defragments a drained arena). */
+        pos  = 0;
+        skip = alloc;
+        hdr->arena_used = alloc;
+        hdr->arena_wpos = alloc;
+    } else {
+        uint32_t rpos = (uint32_t)(((uint64_t)hdr->arena_wpos
+                          + cap - hdr->arena_used) % cap);
+        if (alloc <= rpos) {
+            pos  = rpos - alloc;   /* fits contiguously below the front */
             skip = alloc;
         } else {
+            pos  = cap - alloc;    /* wrap: place at the top of the arena, */
+            skip = alloc + rpos;   /* wasting the [0, rpos) bytes below it  */
+        }
+        if ((uint64_t)hdr->arena_used + skip > cap) {
             __atomic_add_fetch(&hdr->stat_push_full, 1, __ATOMIC_RELAXED);
             queue_mutex_unlock(hdr);
             return 0;
         }
+        hdr->arena_used += skip;   /* arena_wpos unchanged: rpos moved down */
     }
 
     memcpy(h->arena + pos, str, len);
@@ -1067,15 +1107,12 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
     hdr->head--;
     uint32_t idx = (uint32_t)(hdr->head & h->cap_mask);
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
-    slot->arena_off = pos;
+    slot->arena_off  = pos;
     slot->packed_len = len | (utf8 ? QUEUE_STR_UTF8_FLAG : 0);
-    slot->arena_skip = (uint32_t)skip;
-    slot->prev_wpos = saved_wpos;
+    slot->arena_skip = skip;
+    slot->prev_wpos  = hdr->arena_wpos;   /* retained for layout stability */
 
-    hdr->arena_wpos = pos + alloc;
-    hdr->arena_used += (uint32_t)skip;
     __atomic_add_fetch(&hdr->stat_push_ok, 1, __ATOMIC_RELAXED);
-
     queue_mutex_unlock(hdr);
     queue_wake_consumers(hdr);
     return 1;
@@ -1136,6 +1173,7 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
 
     uint32_t len = slot->packed_len & QUEUE_STR_LEN_MASK;
+    if ((uint64_t)slot->arena_off + len > h->arena_cap) len = 0;
     *out_utf8 = (slot->packed_len & QUEUE_STR_UTF8_FLAG) != 0;
 
     if (!queue_ensure_copy_buf(h, len + 1)) {
@@ -1149,18 +1187,18 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
     *out_str = h->copy_buf;
     *out_len = len;
 
+    /* Retreat the write frontier past this (back) element. The arena is kept
+     * in queue order with arena_wpos == (read_frontier + arena_used) mod cap,
+     * and pop_back does not move the front, so the new write frontier is just
+     * the old one minus this slot's skip (its span plus any wrap waste). This
+     * holds whether the element was appended (push) or prepended
+     * (push_front). */
     hdr->arena_used -= slot->arena_skip;
-    /* Restore arena_wpos to before this slot's push if it's the frontier.
-     * prev_wpos correctly handles wrap waste — it's the pre-push state
-     * including the original position before any wrap adjustment. */
-    {
-        uint32_t slot_alloc = (len + 7) & ~7u;
-        if (slot_alloc == 0) slot_alloc = 8;
-        if (slot->arena_off + slot_alloc == hdr->arena_wpos)
-            hdr->arena_wpos = slot->prev_wpos;
-    }
-    if (hdr->arena_used == 0)
+    if (hdr->arena_used == 0 || h->arena_cap == 0)   /* arena_cap==0: corrupt file, avoid % 0 (CWE-369) */
         hdr->arena_wpos = 0;
+    else
+        hdr->arena_wpos = (uint32_t)(((uint64_t)hdr->arena_wpos
+                          + h->arena_cap - slot->arena_skip) % h->arena_cap);
 
     __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_RELAXED);
     queue_mutex_unlock(hdr);

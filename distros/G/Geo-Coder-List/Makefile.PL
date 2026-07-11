@@ -32,6 +32,7 @@ my $test_requires = {
 	'Test::Number::Delta' => 0,	# Always needed since used in free.t
 	'Test::RequiresInternet' => 0,
 	'Test::Returns' => 0,
+	'Test::Warnings' => 0,
 	'Test::Which' => 0,
 	'Test::Without::Module' => 0,
 };

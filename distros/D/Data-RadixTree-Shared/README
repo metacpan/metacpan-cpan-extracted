@@ -74,6 +74,7 @@ DESCRIPTION
 METHODS
   Constructors
         my $t = Data::RadixTree::Shared->new($path, $node_capacity, $arena_capacity);
+        my $t = Data::RadixTree::Shared->new($path, $node_capacity, $arena_capacity, $mode);
         my $t = Data::RadixTree::Shared->new(undef, $node_capacity, $arena_capacity); # anonymous
         my $t = Data::RadixTree::Shared->new_memfd($name, $node_capacity, $arena_capacity);
         my $t = Data::RadixTree::Shared->new_from_fd($fd);
@@ -91,6 +92,14 @@ METHODS
     reopen are only used when the file is brand new. "new_memfd" creates a
     Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
     reopens one in another process.
+
+    $mode (default 0600, owner-only) is the permission mode for a newly
+    created backing file; pass e.g. 0660 to opt into cross-user sharing (it
+    is applied via open(), so subject to the process umask). It is ignored
+    for anonymous mappings and when attaching to an existing file or memfd
+    -- on attach the existing file's permissions apply, so a file created
+    with the 0600 default is not openable by other users unless a wider mode
+    was passed at creation.
 
   Insert, lookup, prefix queries
         my $new   = $t->insert($key, $value);   # 1 if newly inserted, 0 if updated
@@ -193,11 +202,15 @@ SHARING ACROSS PROCESSES
         print $t->count, "\n";   # reflects the child's inserts
 
 SECURITY
-    The mmap region is writable by all processes that open it, and a
-    reopened file is trusted: validation checks the header geometry but
-    cannot vet every internal node index against a maliciously crafted file.
-    A hostile file could direct a walk to an out-of-range node index. Do not
-    share backing files with, or reopen files from, untrusted processes.
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with

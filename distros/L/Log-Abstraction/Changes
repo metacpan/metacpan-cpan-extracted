@@ -1,5 +1,72 @@
 Revision history for Log-Abstraction
 
+0.33	Fri Jul 10 11:03:49 EDT 2026
+
+	[ Architecture ]
+	- Added Sub::Private (enforce mode) to mark _log, _high_priority,
+	  _validate_file_path, _format_message, _journald_send, and
+	  _sanitize_email_header as private via the :Private attribute.
+	  Enforcement is active in production; HARNESS_ACTIVE bypass keeps
+	  white-box tests functional without special setup.
+	- Converted _journald_send from a bare package function to a proper
+	  OOP method ($self->_journald_send), consistent with all other
+	  private helpers in the class.
+	- Fixed caller-depth resolution for warn/error/fatal: file and line
+	  reported to CODE-ref callbacks and all file/fd format backends now
+	  correctly resolve to the caller's source location.  Previously the
+	  extra _high_priority stack frame caused them to point to the module's
+	  internal dispatch code.  _format_message now accepts pre-computed
+	  caller_file/caller_line parameters rather than calling caller(2)
+	  internally; _log computes the correct depth (1 for trace/debug/info/
+	  notice; 2 for warn/error) and passes the values down.
+	- Removed unreachable UNIVERSAL::isa call in _log's private-method
+	  guard; replaced with the idiomatic method form (caller)[0]->isa().
+	- Removed spurious File::Basename->import() guard; require + fully-
+	  qualified call is sufficient.
+	- Added =head1 LIMITATIONS section to Log::Abstraction documenting
+	  syslog hash mutation, no-structured-fields, single-threaded email
+	  throttle, and OpenTelemetry status.
+	- Added =head1 LIMITATIONS section to Log::Any::Adapter::Abstraction
+	  documenting nine-to-six level collapse, no-structured-fields, and
+	  the recommended-not-required Log::Any dependency.
+
+	[ Bug Fixes ]
+	- Fixed warn()/error()/fatal() calls: file and line now correctly
+	  identify the caller's source location in all backends (CODE-ref,
+	  file, fd, hash-file, hash-fd).  Previously these resolved to
+	  Abstraction.pm's internal _high_priority frame.
+
+	[ Tests ]
+	- Added t/caller_depth.t: verifies that file/line in CODE-ref
+	  callbacks correctly identify the caller's source location for all
+	  six log levels (trace, debug, info, notice, warn, error, fatal).
+
+	[ Enhancements ]
+	- Added Log::Any::Adapter::Abstraction: route Log::Any-using CPAN modules
+	  through Log::Abstraction with a single Log::Any::Adapter->set() call.
+	  Covers all nine Log::Any levels (critical/alert/emergency collapse to error).
+	- Added format => 'json' magic value: file and fd backends now emit compact
+	  JSON objects (timestamp/level/message/file/line, plus class for subclasses)
+	  compatible with journald, Loki, Elasticsearch, and Splunk.
+	- Added journald sub-backend to the HASH logger: sends structured fields
+	  (MESSAGE, PRIORITY, SYSLOG_IDENTIFIER, plus any caller-supplied extras)
+	  as a Unix-domain datagram using the systemd native journal protocol.
+	  Extra config keys are forwarded as uppercase journald fields.
+	  Delivery failures are silent (carp only); the app is never crashed.
+	- Added JSON::PP as a runtime dependency (core since 5.014; used by json format).
+	- Added Log::Any as a recommended (not required) runtime dependency.
+
+	[ Tests ]
+	- Added t/log_any_adapter.t: routing, level mapping, is_* detection, threshold
+	  filtering, and adapter-built-from-constructor-args subtests.
+	- Added t/json_format.t: JSON line validity, field types (line as integer),
+	  class suppression for base class, class inclusion for subclass, all backend
+	  variants (scalar-path, fd, hash-file).
+	- Added t/journald.t: uses a temporary Unix-domain datagram socket as a fake
+	  journald receiver to verify field encoding (text and binary framing),
+	  PRIORITY mapping, extra fields, coexistence with other sub-backends, and
+	  silent failure on an unreachable socket path.
+
 0.32	Tue Jun  9 19:34:45 EDT 2026
 	[ Bug Fixes ]
 	- Fixed SMTP host/port validation in sendmail backend: croak calls were

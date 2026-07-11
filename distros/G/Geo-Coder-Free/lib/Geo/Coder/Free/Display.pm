@@ -5,27 +5,36 @@ package Geo::Coder::Free::Display;
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
+use v5.20;
 use strict;
 use warnings;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
 
-use Config::Auto;
+use Config::Abstraction;
 use CGI::Info;
 use Data::Dumper;
+use Digest::MD5 qw(md5_hex);
+use Digest::SHA qw(sha256_hex);
 use File::Spec;
+use Object::Configure;
+use Params::Get;
 use Template::Filters;
 use Template::Plugin::EnvHash;
 use Template::Plugin::Math;
+use Template::Plugin::JSON;
 use HTML::SocialMedia;
-use Geo::Coder::Free::Utils;
+use Geo::Coder::Free::Utils qw(create_memory_cache);
 use Error;
 use Fatal qw(:void open);
 use File::pfopen;
+use Params::Get;
 use Scalar::Util;
 
 # TODO: read this from the config file
@@ -48,13 +57,15 @@ my %blacklist = (
 );
 
 our $sm;
-our $smcache;
 
-sub new {
+# Main display handler for generating web pages using Template Toolkit
+# Handles security, throttling, localization, and template selection
+sub new
+{
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = Params::Get::get_params(undef, @_);
 
 	if(!defined($class)) {
 		# Using Geo::Coder::Free::Display->new(), not Geo::Coder::Free::Display::new()
@@ -65,73 +76,35 @@ sub new {
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
 	if(defined($ENV{'HTTP_REFERER'})) {
 		# Protect against Shellshocker
-		require Data::Validate::URI;
-		Data::Validate::URI->import();
+		unless(Data::Validate::URI->can('new')) {
+			require Data::Validate::URI;
+			Data::Validate::URI->import();
+		}
 
 		unless(Data::Validate::URI->new()->is_uri($ENV{'HTTP_REFERER'})) {
-			return 0;
+			return;	# Block invalid referrers
 		}
 	}
 
-	my $info = $args{info} || CGI::Info->new();
+	$params = Object::Configure::configure($class, $params);
 
-	unless($info->is_search_engine() || !defined($ENV{'REMOTE_ADDR'})) {
-		require CGI::IDS;
-		CGI::IDS->import();
+	my $info = $params->{info} || CGI::Info->new();
 
-		my $ids = CGI::IDS->new();
-		$ids->set_scan_keys(scan_keys => 1);
-		my $impact = $ids->detect_attacks(request => $info->params());
-		if($impact > 0) {
-			die "IDS impact is $impact";
-		}
-
-		require Data::Throttler;
-		Data::Throttler->import();
-
-		# Handle YAML Errors
-		my $db_file = File::Spec->catdir($info->tmpdir(), 'throttle');
-		eval {
-			my $throttler = Data::Throttler->new(
-				max_items => 30,
-				interval => 90,
-				backend => 'YAML',
-				backend_options => {
-					db_file => $db_file
-				}
-			);
-
-			unless($throttler->try_push(key => $ENV{'REMOTE_ADDR'})) {
-				sleep(1);
-				die "$ENV{REMOTE_ADDR} connexion throttled";
-			}
-		};
-		if($@) {
-			unlink($db_file);
-		}
-		if(my $lingua = $args{lingua}) {
-			if($blacklist{uc($lingua->country())}) {
-				die "$ENV{REMOTE_ADDR} is from a blacklisted country ", $lingua->country();
-			}
-		}
-	}
-	my $config_dir = _find_config_dir(\%args, $info);
-	if($args{'logger'}) {
-		$args{'logger'}->debug(__PACKAGE__, ': ', __LINE__, " path = $config_dir");
+	# Configuration loading
+	my $config_dir = _find_config_dir($params, $info);
+	if($params->{'logger'}) {
+		$params->{'logger'}->debug(__PACKAGE__, ' (', __LINE__, "): path = $config_dir");
 	}
 	my $config;
 	eval {
-		if(-r File::Spec->catdir($config_dir, $info->domain_name())) {
-			$config = Config::Auto::parse($info->domain_name(), path => $config_dir);
-		} elsif (-r File::Spec->catdir($config_dir, 'default')) {
-			$config = Config::Auto::parse('default', path => $config_dir);
-		} else {
-			die 'no suitable config file found';
+		# Try default first, then domain-specific config first
+		if($config = Config::Abstraction->new(config_dirs => [$config_dir], config_files => ['default', $info->domain_name()], logger => $params->{'logger'})) {
+			$config = $config->all();
 		}
 	};
 	if($@ || !defined($config)) {
@@ -139,27 +112,88 @@ sub new {
 	}
 
 	# The values in config are defaults which can be overridden by
-	# the values in args{config}
-	if(defined($args{'config'})) {
-		$config = { %{$config}, %{$args{'config'}} };
+	# the values in params->{config}
+	if(defined($params->{'config'})) {
+		$config = { %{$config}, %{$params->{'config'}} };
 	}
 
+	unless($info->is_search_engine() || !defined($ENV{'REMOTE_ADDR'})) {
+		if(my $params = $info->params()) {
+			# Intrusion Detection System integration
+			require CGI::IDS;
+			CGI::IDS->import();
+
+			my $ids = CGI::IDS->new();
+			$ids->set_scan_keys(scan_keys => 1);
+
+			my $impact = $ids->detect_attacks(request => $params);
+			my $threshold = $config->{security}->{ids_threshold} // 50;
+			if($impact > $threshold) {
+				die $ENV{'REMOTE_ADDR'}, ": IDS impact is $impact";	# Block detected attacks
+			}
+		}
+
+		if($ENV{'REMOTE_ADDR'}) {
+			# Connection throttling system
+			require Data::Throttler;
+
+			my $db_file = $config->{'throttle'}->{'file'} // File::Spec->catdir($info->tmpdir(), 'throttle');
+			eval {	# Handle YAML Errors
+				my %options = (
+					max_items => $config->{'throttle'}->{'max_items'} // 30,	# Allow 30 requests
+					interval => $config->{'throttle'}->{'interval'} // 90,	# Per 90 second window
+					backend => 'YAML',
+					backend_options => {
+						db_file => $db_file
+					}
+				);
+
+				if(my $throttler = Data::Throttler->new(%options)) {
+					# Block if over the limit
+					if(!$throttler->try_push(key => $ENV{'REMOTE_ADDR'})) {
+						$info->status(429);	# Too many requests
+						sleep(1);	# Slow down attackers
+						if($params->{'logger'}) {
+							$params->{'logger'}->info("$ENV{REMOTE_ADDR} connexion throttled");
+						}
+						return;
+					}
+				}
+			};
+			if($@) {
+				if($params->{'logger'}) {
+					$params->{'logger'}->notice("Removing unparsable YAML file $db_file: $@");
+				}
+				unlink($db_file);
+			}
+
+			# Country based blocking
+			if(my $lingua = $params->{lingua}) {
+				if($blacklist{uc($lingua->country())}) {
+					if($params->{'logger'}) {
+						$params->{'logger'}->warn("$ENV{REMOTE_ADDR} is from a blacklisted country " . $lingua->country());
+					}
+					die "$ENV{REMOTE_ADDR} is from a blacklisted country ", $lingua->country();
+				}
+			}
+		}
+	}
+
+	# Initialise the template system
 	Template::Filters->use_html_entities();
 
 	# _ names included for legacy reasons, they will go away
 	my $self = {
-		cachedir => $args{cachedir},
-		_cachedir => $args{cachedir},
+		_cachedir => $params->{cachedir},
 		config => $config,
 		_config => $config,
 		info => $info,
 		_info => $info,
-		logger => $args{logger},
-		_logger => $args{logger},
-		%args,
+		_logger => $params->{logger},
+		%{$params},
 	};
 
-	if(my $lingua = $args{'lingua'}) {
+	if(my $lingua = $params->{'lingua'}) {
 		$self->{'lingua'} = $lingua;
 		$self->{'_lingua'} = $lingua;
 	}
@@ -172,13 +206,14 @@ sub new {
 		$self->{'_page'} = $page;
 	}
 
+	# Social media integration
 	if(my $twitter = $config->{'twitter'}) {
-		$smcache ||= create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
-		$sm ||= HTML::SocialMedia->new({ twitter => $twitter, cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
+		my $smcache = create_memory_cache(config => $config, logger => $params->{'logger'}, namespace => 'HTML::SocialMedia');
+		$sm ||= HTML::SocialMedia->new({ twitter => $twitter, cache => $smcache, lingua => $params->{lingua}, logger => $params->{logger} });
 		$self->{'_social_media'}->{'twitter_tweet_button'} = $sm->as_string(twitter_tweet_button => 1);
 	} elsif(!defined($sm)) {
-		$smcache = create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
-		$sm = HTML::SocialMedia->new({ cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
+		my $smcache = create_memory_cache(config => $config, logger => $params->{'logger'}, namespace => 'HTML::SocialMedia');
+		$sm = HTML::SocialMedia->new({ cache => $smcache, lingua => $params->{lingua}, logger => $params->{logger} });
 	}
 	$self->{'_social_media'}->{'facebook_share_button'} = $sm->as_string(facebook_share_button => 1);
 	# $self->{'_social_media'}->{'google_plusone'} = $sm->as_string(google_plusone => 1);
@@ -187,7 +222,7 @@ sub new {
 	return bless $self, $class;
 }
 
-# Determine the configuration directory
+# Internal method to determine the configuration directory
 sub _find_config_dir
 {
 	my($args, $info) = @_;
@@ -196,7 +231,18 @@ sub _find_config_dir
 		return $ENV{'CONFIG_DIR'};
 	}
 
-	my $config_dir = File::Spec->catdir(
+	# Look first in $root_dir/conf
+
+	my $config_dir = $ENV{'root_dir'};
+	if(defined($config_dir) && (-d $config_dir)) {
+		$config_dir = File::Spec->catdir($config_dir, 'conf');
+
+		if(-d $config_dir) {
+			return $config_dir;
+		}
+	}
+
+	$config_dir = File::Spec->catdir(
 			$info->script_dir(),
 			File::Spec->updir(),
 			File::Spec->updir(),
@@ -272,6 +318,16 @@ sub as_string {
 		}
 	}
 
+	my($cache, $key);
+
+	if(!$args->{itemsincart}) {
+		$cache = create_memory_cache(config => $self->{config}, logger => $self->{'logger'}, namespace => ref($self));
+		$key = cache_key_from_hashref($args);
+		if(my $rc = $cache->get($key)) {
+			return $rc;
+		}
+	}
+
 	# my $html = $self->html($args);
 	# unless($html) {
 		# return;
@@ -279,8 +335,16 @@ sub as_string {
 	# return $self->http() . $html;
 
 	# Build the HTTP response
-	my $rc = $self->http();
-	return $rc =~ /^Location:\s/ms ? $rc : $rc . $self->html($args);
+	my $rc = $self->http($args);
+	if($rc =~ /^Location:\s/ms) {
+		return $rc;
+	}
+	$rc .= $self->html($args);
+	if($cache) {
+		$self->{cache_duration} ||= '5 minutes';
+		$cache->set($key, $rc, $self->{cache_duration});
+	}
+	return $rc;
 }
 
 # Determine the path to the correct template file based on various criteria such as language settings, browser type, and module path
@@ -294,10 +358,13 @@ sub get_template_path
 	}
 
 	if($self->{_filename}) {
+		if($self->{_logger}) {
+			$self->{_logger}->trace({ message => 'returning ' . $self->{_filename} });
+		}
 		return $self->{_filename};
 	}
 
-	my $dir = $self->{_config}->{root_dir} || $self->{_info}->root_dir();
+	my $dir = $ENV{'root_dir'} || $self->{_config}->{root_dir} || $self->{_info}->root_dir();
 	if($self->{_logger}) {
 		$self->{_logger}->debug(__PACKAGE__, ': ', __LINE__, ": root_dir $dir");
 		$self->{_logger}->debug(Data::Dumper->new([$self->{_config}])->Dump());
@@ -319,10 +386,10 @@ sub get_template_path
 				}
 				$prefix .= "$dir/$language/$browser_type:" if(-d "$dir/$language/$browser_type");
 				$prefix .= "$dir/$browser_type/$language:" if(-d "$dir/$browser_type/$language");
-				$prefix .= "$dir/$browser_type/default:" if(-d "$dir/$browser_type/default");
-				$prefix .= "$dir/default/$browser_type/:" if(-d "$dir/default/$browser_type");
 			}
 		}
+		$prefix .= "$dir/$browser_type/default:" if(-d "$dir/$browser_type/default");
+		$prefix .= "$dir/default/$browser_type/:" if(-d "$dir/default/$browser_type");
 		$prefix .= "$dir/$browser_type:" if(-d "$dir/$browser_type");
 	}
 
@@ -344,10 +411,10 @@ sub get_template_path
 
 	my ($fh, $filename) = File::pfopen::pfopen($prefix, $modulepath, 'tmpl:tt:html:htm:txt');
 	if((!defined($filename)) || (!defined($fh))) {
-		throw Error::Simple("Can't find suitable $modulepath html or tmpl file in $prefix in $dir or a subdir");
+		throw Error::Simple("Can't find suitable $modulepath html or tmpl/tt file in $prefix in $dir or a subdir (check " . join(':', @{$self->{'config'}->{'config_path'}}) . ')');
 	}
 	close($fh);
-	$self->_debug({ message => "using $filename" });
+	$self->_debug({ message => "Using $filename" });
 	$self->{_filename} = $filename;
 
 	# Remember the template filename
@@ -360,9 +427,10 @@ sub get_template_path
 
 =head2 set_cookie
 
-Sets cookie values in the object.
+Safely set cookie values with validation.
+
 Takes either a hash reference or a list of key-value pairs as input.
-Iterates over the CGI parameters and stores them in the object's _cookies hash.
+Iterates over the parameters and stores them in the object's _cookies hash.
 Returns the object itself, allowing for method chaining.
 
 =cut
@@ -372,9 +440,19 @@ sub set_cookie
 	my $self = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	foreach my $key(keys(%params)) {
-		$self->{_cookies}->{$key} = $params{$key};
+	# Validate cookie parameters
+	for my $key (keys %params) {
+		# Sanitize cookie names and values
+		next unless $key =~ /^[a-zA-Z0-9_-]+$/;
+
+		my $value = $params{$key};
+		next unless defined $value;
+
+		# Basic value sanitization
+		$value =~ s/[;\r\n]//g;
+		$self->{_cookies}->{$key} = $value;
 	}
+
 	return $self;
 }
 
@@ -387,15 +465,24 @@ Returns the HTTP header section, terminated by an empty line
 sub http
 {
 	my $self = shift;
-	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = Params::Get::get_params(undef, @_);
 
 	# Handle session cookies
 	# TODO: Only session cookies as the moment
 	if(my $cookies = $self->{_cookies}) {
 		foreach my $cookie (keys(%{$cookies})) {
 			my $value = exists $cookies->{$cookie} ? $cookies->{$cookie} : '0:0';
-			print "Set-Cookie: $cookie=$value; path=/; HttpOnly\n";
+
+			# Secure cookie settings
+			my $secure = ($self->{'info'}->protocol() eq 'https') ? '; Secure' : '';
+			print "Set-Cookie: $cookie=$value; path=/; HttpOnly; SameSite=Strict$secure\n";
 		}
+	}
+
+	# Generate CSRF token for forms
+	if($self->{config}->{security}->{csrf}->{enable} // 1) {
+		my $csrf_token = $self->_generate_csrf_token();
+		print "Set-Cookie: csrf_token=$csrf_token; path=/; HttpOnly; SameSite=Strict\n";
 	}
 
 	# Determine language, defaulting to English
@@ -403,9 +490,9 @@ sub http
 	# my $language = $self->{_lingua} ? $self->{_lingua}->language() : 'English';
 
 	my $rc;
-	if($params{'Content-Type'}) {
+	if($params->{'Content-Type'}) {
 		# Allow the content type to be forceably set
-		$rc = $params{'Content-Type'} . "\n";
+		$rc = $params->{'Content-Type'} . "\n";
 	} else {
 		# Determine content type
 		my $filename = $self->get_template_path();
@@ -417,14 +504,25 @@ sub http
 		}
 	}
 
+	if($params->{'Retry-After'}) {
+		$rc = $params->{'Retry-After'} . "\n";
+	}
+
 	# Security headers
+	# - Clickjacking protection
+	# - MIME type enforcement
+	# - Referrer policy
 	# https://www.owasp.org/index.php/Clickjacking_Defense_Cheat_Sheet
 	# https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
 
-	# TODO: investigate Content-Security-Policy
-	return $rc . "X-Frame-Options: SAMEORIGIN\n"
-		. "X-Content-Type-Options: nosniff\n"
-		. "Referrer-Policy: strict-origin-when-cross-origin\n\n";
+	# Enhanced security headers
+	return $rc .
+		"X-Frame-Options: SAMEORIGIN\n" .
+		"X-Content-Type-Options: nosniff\n" .
+		"X-XSS-Protection: 1; mode=block\n" .
+		"Referrer-Policy: strict-origin-when-cross-origin\n" .
+		"Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'\n" .
+		"Strict-Transport-Security: max-age=31536000; includeSubDomains\n\n";
 }
 
 # Run the given data through the template to create HTML
@@ -438,7 +536,7 @@ sub html {
 	my $filename = $self->get_template_path();
 	my $rc;
 
-	# Handle template files (.tmpl or .t)
+	# Handle template files (.tmpl or .tt)
 	if($filename =~ /.+\.t(mpl|t)$/) {
 		require Template;
 		Template->import();
@@ -474,6 +572,7 @@ sub html {
 			INTERPOLATE => 1,
 			POST_CHOMP => 1,
 			ABSOLUTE => 1,
+			PLUGINS => { JSON => 'Template::Plugin::JSON' },
 		});
 
 		$self->_debug({ message => __PACKAGE__ . ': ' . __LINE__ . ': Passing these to the template: ' . join(', ', keys %{$vals}) });
@@ -540,7 +639,36 @@ sub _types
 	}
 	push @rc, 'web';
 
+	if(my $logger = $self->{'_logger'}) {
+		$logger->trace('< ', __PACKAGE__, '::_types returning ', join(':', @rc));
+	}
+
 	return @rc;
+}
+
+sub _generate_csrf_token($self) {
+	my $timestamp = time();
+	my $random = sprintf('%08x', int(rand(0xFFFFFFFF)));
+	my $secret = $self->{config}->{security}->{csrf}->{secret} // 'default_secret';
+
+	my $token_data = "$timestamp:$random";
+	my $signature = sha256_hex("$token_data:$secret");
+
+	return "$token_data:$signature";
+}
+
+sub cache_key_from_hashref {
+	my $hashref = $_[0];
+
+	# Use Data::Dumper with sorted keys for consistent output
+	local $Data::Dumper::Sortkeys = 1;
+	local $Data::Dumper::Terse = 1;
+	local $Data::Dumper::Indent = 0;
+
+	my $dumped = Dumper($hashref);
+
+	# Create an MD5 hash for a compact key
+	return md5_hex($dumped);
 }
 
 1;

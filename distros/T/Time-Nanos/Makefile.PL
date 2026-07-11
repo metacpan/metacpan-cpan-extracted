@@ -55,8 +55,8 @@ WriteMakefile(
 	},
 	META_MERGE => {
 		resources => {
-			repository => 'https://github.com/scottchiefbaker/time-Perl-Nanos',
-			bugtracker => 'https://github.com/scottchiefbaker/time-Perl-Nanos/issues',
+			repository => 'https://github.com/scottchiefbaker/perl-Time-Nanos',
+			bugtracker => 'https://github.com/scottchiefbaker/perl-Time-Nanos/issues',
 		},
 	},
 );

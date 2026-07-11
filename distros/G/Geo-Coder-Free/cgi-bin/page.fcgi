@@ -6,13 +6,11 @@
 # Based on VWF - https://github.com/nigelhorne/vwf
 
 # Can be tested at the command line, e.g.:
-#	root_dir=$(pwd)/.. ./page.fcgi page=index
+#	LANG=en_GB root_dir=$(pwd)/.. ./page.fcgi page=index
 # To mimic a French mobile site:
-#	root_dir=$(pwd)/.. ./page.fcgi mobile=1 page=index lang=fr
-# To turn off linting of HTML on a search-engine landing page
-#	root_dir=$(pwd)/.. ./page.fcgi --search-engine page=index lint_content=0
-
-# TODO: use the memory_cache in the config file for the database searches
+#	root_dir=$(pwd)/.. ./page.fcgi --mobile page=index lang=fr
+# To turn off the linting of HTML on a search engine landing page
+#	LANG=en_GB root_dir=$(pwd)/.. ./page.fcgi --search-engine page=index lint_content=0
 
 use strict;
 use warnings;
@@ -26,28 +24,28 @@ BEGIN {
 
 no lib '.';
 
-use Log::Log4perl qw(:levels);	# Put first to cleanup last
+use Log::WarnDie 0.09;
+use Carp::Always;
+use CGI::ACL;
 use CGI::Carp qw(fatalsToBrowser);
 use CGI::Info 0.94;	# Gets all messages
-use CGI::Lingua;
+use CGI::Lingua 0.61;
+use CHI;
 use Class::Simple;
+use Config::Abstraction;
 use Database::Abstraction;
 use File::Basename;
 # use CGI::Alert $ENV{'SERVER_ADMIN'} || 'you@example.com';
 use FCGI;
 use FCGI::Buffer;
 use File::HomeDir;
-use Log::Any::Adapter;
+use HTTP::Status;
+use Log::Abstraction;
 use Error qw(:try);
 use File::Spec;
-use Log::WarnDie 0.09;
-use CGI::ACL;
-use HTTP::Date;
-# FIXME: Gives Insecure dependency in require while running with -T switch in Module/Runtime.pm
-# use Taint::Runtime qw($TAINT taint_env);
 use POSIX qw(strftime);
 use Readonly;
-use autodie qw(:all);
+use Time::HiRes;
 
 # use lib '/usr/lib';	# This needs to point to the Geo::Coder::Free directory lives,
 			# i.e. the contents of the lib directory in the
@@ -64,10 +62,8 @@ use Geo::Coder::Free::Utils;
 # taint_env();
 
 # Set rate limit parameters
-Readonly my $MAX_REQUESTS => 100;	# Max requests allowed
-Readonly my $TIME_WINDOW => 10 * 60;	# Time window in seconds (10 minutes)
-
-sub vwflog($$$$$$);	# Ensure all arguments are given
+Readonly my $MAX_REQUESTS => 100;	# Default max requests allowed
+Readonly my $TIME_WINDOW => '60s';	# Time window for the maximum requests
 
 my $info = CGI::Info->new();
 my @suffixlist = ('.pl', '.fcgi');
@@ -90,8 +86,9 @@ my $buffercache;
 my $geocoder;
 
 my $script_dir = $info->script_dir();
-Log::Log4perl::init("$script_dir/../conf/$script_name.l4pconf");
-my $logger = Log::Log4perl->get_logger($script_name);
+my $env_prefix = uc($info->host_name()) . '_';
+$env_prefix =~ tr/\./_/;
+my $logger = Log::Abstraction->new(Config::Abstraction->new(env_prefix => $env_prefix, flatten => 0, config_file => $info->domain_name(), config_dirs => ["$script_dir/../conf/", "$script_dir/../../conf"])->all());
 Log::WarnDie->dispatcher($logger);
 
 # my $pagename = "Geo::Coder::Free::Display::$script_name";
@@ -118,7 +115,7 @@ Database::Abstraction::init({
 
 my $openaddresses = Geo::Coder::Free::DB::openaddresses->new(openaddr => $config->OPENADDR_HOME());
 if($@) {
-	$logger->error($@);
+	$logger->error($@) if($logger);
 	Log::WarnDie->dispatcher(undef);
 	die $@;
 }
@@ -165,13 +162,16 @@ $SIG{PIPE} = 'IGNORE';
 # my ($stdin, $stdout, $stderr) = (IO::Handle->new(), IO::Handle->new(), IO::Handle->new());
 # https://stackoverflow.com/questions/14563686/how-do-i-get-errors-in-from-a-perl-script-running-fcgi-pm-to-appear-in-the-apach
 $SIG{__DIE__} = $SIG{__WARN__} = sub {
-	if(open(my $fout, '>>', File::Spec->catfile($tmpdir, "$script_name.stderr"))) {
-		print $fout $info->domain_name(), ": @_";
-	# } else {
-		# print $stderr @_;
-	}
+	my $msg = join '', @_;
 	Log::WarnDie->dispatcher(undef);
-	CORE::die @_
+	if(open(my $fout, '>>', File::Spec->catfile($tmpdir, "$script_name.stderr"))) {
+		print $fout $info->domain_name(), ": $msg";
+		close $fout;
+	# } else {
+		# print $stderr $msg;
+	}
+	$logger->fatal($msg) if($logger);
+	CORE::die $msg;
 };
 
 # my $request = FCGI::Request($stdin, $stdout, $stderr);
@@ -188,11 +188,13 @@ while($handling_request = ($request->Accept() >= 0)) {
 			$lang =~ tr/_/-/;
 			$ENV{'HTTP_ACCEPT_LANGUAGE'} = lc($lang);
 		}
-		Log::Any::Adapter->set('Stdout', log_level => 'trace');
-		$logger = Log::Any->get_logger(category => $script_name);
-		Log::WarnDie->dispatcher($logger);
+
 		Database::Abstraction::init({ logger => $logger });
+
+		$logger = Log::Abstraction->new(logger => sub { print join(', ', @{$_[0]->{'message'}}), "\n" }, level => 'debug');
+		Log::WarnDie->dispatcher($logger);
 		$info->set_logger($logger);
+		# TODO - set logger on all databases
 		$openaddresses->set_logger($logger);
 		$vwf_log->set_logger($logger);
 		# $Config::Auto::Debug = 1;
@@ -210,8 +212,6 @@ while($handling_request = ($request->Accept() >= 0)) {
 	}
 
 	$requestcount++;
-	Log::Any::Adapter->set( { category => $script_name }, 'Log4perl');
-	$logger = Log::Any->get_logger(category => $script_name);
 	$logger->info("Request $requestcount: ", $ENV{'REMOTE_ADDR'});
 	$info->set_logger($logger);
 	$openaddresses->set_logger($logger);
@@ -219,7 +219,7 @@ while($handling_request = ($request->Accept() >= 0)) {
 
 	my $start = [Time::HiRes::gettimeofday()];
 
-	# TODO:  Make this neater
+	# TODO:	Make this neater
 	try {
 		doit(debug => 0);
 		my $timetaken = Time::HiRes::tv_interval($start);
@@ -252,7 +252,9 @@ if($buffercache) {
 	$buffercache->purge();
 }
 if($rate_limit_cache) {
-	$rate_limit_cache->purge();
+	# Memcached can't purge().
+	# I don't like this hardwired code, it would be better if I could find a way to determine if a driver can run purge()
+	$rate_limit_cache->purge() if($rate_limit_cache->short_driver_name() ne 'Memcached');
 }
 if($info_cache) {
 	$info_cache->purge();
@@ -267,12 +269,17 @@ exit(0);
 # Create and send response to the client for each request
 sub doit
 {
+	my $request_start = Time::HiRes::time();
+
 	CGI::Info->reset();
 
-	$logger->debug('In doit - domain is ', $info->domain_name());
+	# Call domain_name in a class context to ensure it's reread now that FCGI has started up
+	$logger->debug('In doit - domain is ', CGI::Info->domain_name());
 
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
+	# Don't pass $info in since it was created before the connection, so it doesn't know the domain name
+	#	config file to read
 	$config ||= Geo::Coder::Free::Config->new({
 		logger => $logger,
 		info => $info,
@@ -297,6 +304,64 @@ sub doit
 	}
 	$info = CGI::Info->new($options);
 
+	# Configure cache for rate limiting
+	$rate_limit_cache ||= create_memory_cache(config => $config, logger => $logger, namespace => 'rate_limit');
+
+	# Get client IP
+	my $client_ip = $ENV{'REMOTE_ADDR'} || 'unknown';
+
+	# Check for CAPTCHA bypass token
+	my $captcha_bypass_key = "$script_name:captcha_bypass:$client_ip";
+	my $has_captcha_bypass = $rate_limit_cache->get($captcha_bypass_key);
+
+	# Check and increment request count
+	my $request_count = $rate_limit_cache->get("$script_name:rate_limit:$client_ip") || 0;
+
+	# Get rate limit thresholds
+	my $max_requests = $config->{'security'}->{'rate_limiting'}->{'max_requests'} || $MAX_REQUESTS;
+	my $max_requests_hard = $config->{'security'}->{'rate_limiting'}->{'max_requests_hard'} || ($max_requests * 1.5);
+
+	# Check if this is a CAPTCHA verification attempt
+	if ($info->param('g-recaptcha-response')) {
+		unless(VWF::CAPTCHA->can('new')) {
+			require VWF::CAPTCHA;
+			VWF::CAPTCHA->import();
+		}
+
+		my $recaptcha_config = $config->recaptcha();
+		if ($recaptcha_config && $recaptcha_config->{enabled}) {
+			my $captcha = VWF::CAPTCHA->new(
+				site_key => $recaptcha_config->{site_key},
+				secret_key => $recaptcha_config->{secret_key},
+				logger => $logger
+			);
+
+			if ($captcha->verify($info->param('g-recaptcha-response'), $client_ip)) {
+				# CAPTCHA verified - grant bypass
+				my $bypass_duration = $config->{'security'}->{'rate_limiting'}->{'captcha_bypass_duration'} || '300s';
+				$rate_limit_cache->set($captcha_bypass_key, 1, $bypass_duration);
+				$rate_limit_cache->set("$script_name:rate_limit:$client_ip", 0, '60s'); # Reset counter
+
+				$logger->info("CAPTCHA verified for $client_ip - rate limit bypass granted");
+				$has_captcha_bypass = 1;
+
+				# Redirect to original page or home
+				my $redirect_page = $info->param('page') || 'index';
+				$info->status(302);
+				print "Status: 302 Found\n",
+					"Location: $ENV{SCRIPT_NAME}?page=$redirect_page\n\n";
+				return;
+			} else {
+				$logger->warn("CAPTCHA verification failed for $client_ip");
+				# Fall through to show CAPTCHA again
+			}
+		}
+	}
+
+	# TODO: update the vwf_log variable to point here
+	$vwflog ||= $config->vwflog() || File::Spec->catfile($info->logdir(), 'vwf.log');
+	my $log = Class::Simple->new();
+
 	# Stores things for a month or longer
 	$lingua_cache ||= create_disc_cache(config => $config, logger => $logger, namespace => 'CGI::Lingua');
 
@@ -310,38 +375,72 @@ sub doit
 		syslog => $syslog,
 	});
 
-	# Configure cache for rate limiting (change to create_disc_cache for persistence)
-	$rate_limit_cache ||= create_memory_cache(config => $config, logger => $logger, namespace => 'rate_limit');
+	my $cachedir = $params{'cachedir'} || $config->{disc_cache}->{root_dir} || File::Spec->catfile($tmpdir, 'cache');
 
-	# Get client IP
-	my $client_ip = $ENV{'REMOTE_ADDR'} || 'unknown';
+	# Rate limit by IP (unless bypassed)
+	unless($has_captcha_bypass || grep { $_ eq $client_ip } @rate_limit_trusted_ips) {
+		if ($request_count >= $max_requests_hard) {
+			# Hard limit exceeded - show CAPTCHA with warning
+			my $recaptcha_config = $config->recaptcha();
 
-	# Check and increment request count
-	my $request_count = $rate_limit_cache->get("$script_name:rate_limit:$client_ip") || 0;
+			if ($recaptcha_config && $recaptcha_config->{enabled}) {
+				$logger->warn("Hard rate limit exceeded for $client_ip ($request_count requests)");
+				$info->status(429);
 
-	# TODO: update the vwf_log variable to point here
-	$vwflog ||= $config->vwflog() || File::Spec->catfile($info->logdir(), 'vwf.log');
-	my $log = Class::Simple->new();
+				unless(VWF::Display::captcha->can('new')) {
+					require VWF::Display::captcha;
+					VWF::Display::captcha->import();
+				}
+				my $display = VWF::Display::captcha->new({
+					cachedir => $cachedir,
+					info => $info,
+					logger => $logger,
+					lingua => $lingua,
+					config => $config,
+				});
 
-	# Rate limit by IP
-	unless(grep { $_ eq $client_ip } @rate_limit_trusted_ips) {	# Bypass rate limiting
-		if($request_count >= $MAX_REQUESTS) {
-			# Block request: Too many requests
-			print "Status: 429 Too Many Requests\n",
-				"Content-type: text/plain\n",
-				"Pragma: no-cache\n\n";
+				# print "Pragma: no-cache\n\n";
+				print $display->as_string({
+					Retry_After => 60,
+					hard_block => 1,
+					request_count => $request_count,
+				});
 
-			$logger->warn("Too many requests from $client_ip");
-			# TODO: Work out how to add the "Retry-After" header, setting to $TIME_WINDOW
-			$info->status(429);
+				vwflog($vwflog, $info, $lingua, $syslog, 'Hard rate limit - CAPTCHA shown', $log, $request_start);
+				return;
+			}
+		} elsif ($request_count >= $max_requests) {
+			# Soft limit exceeded - show CAPTCHA
+			my $recaptcha_config = $config->recaptcha();
 
-			vwflog($vwflog, $info, $lingua, $syslog, 'Too many requests', $log);
-			return;
+			if ($recaptcha_config && $recaptcha_config->{enabled}) {
+				$logger->info("Soft rate limit exceeded for $client_ip ($request_count requests) - CAPTCHA challenge issued");
+				$info->status(429);
+
+				my $display = VWF::Display::captcha->new({
+					cachedir => $cachedir,
+					info => $info,
+					logger => $logger,
+					lingua => $lingua,
+					config => $config,
+				});
+
+				# print "Pragma: no-cache\n\n";
+				print $display->as_string({
+					Retry_After => 60,
+					hard_block => 0,
+					request_count => $request_count,
+				});
+
+				vwflog($vwflog, $info, $lingua, $syslog, 'Soft rate limit - CAPTCHA shown', $log, $request_start);
+				return;
+			}
 		}
 	}
 
 	# Increment request count
-	$rate_limit_cache->set("$script_name:rate_limit:$client_ip", $request_count + 1, $TIME_WINDOW);
+	my $time_window = $config->{'security'}->{'rate_limiting'}->{'time_window'} || $TIME_WINDOW;
+	$rate_limit_cache->set("$script_name:rate_limit:$client_ip", $request_count + 1, $time_window);
 
 	if(!defined($info->param('page'))) {
 		$logger->info('No page given in ', $info->as_string());
@@ -368,7 +467,7 @@ sub doit
 			}
 			$logger->info("$remote_addr: access denied: $reason");
 			$info->status(403);
-			vwflog($vwflog, $info, $lingua, $syslog, $reason, $log);
+			vwflog($vwflog, $info, $lingua, $syslog, $reason, $log, $request_start);
 			return;
 		}
 	}
@@ -396,8 +495,6 @@ sub doit
 	}
 
 	my $fb = FCGI::Buffer->new()->init($args);
-
-	my $cachedir = $params{'cachedir'} || $config->{disc_cache}->{root_dir} || File::Spec->catfile($tmpdir, 'cache');
 
 	if($fb->can_cache()) {
 		$buffercache ||= create_disc_cache(config => $config, logger => $logger, namespace => $script_name, root_dir => $cachedir);
@@ -442,7 +539,10 @@ sub doit
 
 			# TODO: consider creating a whitelist of valid modules
 			$logger->debug("doit(): Loading module $display_module from @INC");
-			eval "require $display_module";
+			unless($display_module->can('new')) {
+				eval "require $display_module; 1";
+				$display_module->import();
+			}
 			if($@) {
 				$logger->debug("Failed to load module $display_module: $@");
 				$logger->info("Unknown page $page");
@@ -451,7 +551,6 @@ sub doit
 					$info->status(404);
 				}
 			} else {
-				$display_module->import();
 				# use Class::Inspector;
 				# my $methods = Class::Inspector->methods($display_module);
 				# print "$display_module exports ", join(', ', @{$methods}), "\n";
@@ -461,8 +560,9 @@ sub doit
 				if(!defined($display)) {
 					if($@) {
 						$logger->warn("$display_module->new(): $@");
+					} else {
+						$logger->notice("Can't instantiate page $page");
 					}
-					$logger->info("Unknown page $page");
 					$invalidpage = 1;
 					if($info->status() == 200) {
 						$info->status(404);
@@ -500,10 +600,10 @@ sub doit
 			geocoder => $geocoder,
 			vwf_log => $vwf_log,
 		});
-		vwflog($vwflog, $info, $lingua, $syslog, '', $log);
+		vwflog($vwflog, $info, $lingua, $syslog, '', $log, $request_start);
 	} elsif($invalidpage) {
 		choose();
-		vwflog($vwflog, $info, $lingua, $syslog, 'Unknown page', $log);
+		vwflog($vwflog, $info, $lingua, $syslog, 'Unknown page', $log, $request_start);
 		return;
 	} else {
 		$logger->debug('disabling cache');
@@ -545,7 +645,6 @@ sub doit
 			$log->status(403);
 		} else {
 			my $status = $info->status();
-			# No permission to show this page
 			print "Status: $status ",
 				HTTP::Status::status_message($status),
 				"Content-type: text/plain\n",
@@ -556,7 +655,7 @@ sub doit
 			}
 			$log->status($status);
 		}
-		vwflog($vwflog, $info, $lingua, $syslog, $error ? $error : 'Access denied', $log);
+		vwflog($vwflog, $info, $lingua, $syslog, $error ? $error : 'Access denied', $log, $request_start);
 		throw Error::Simple($error ? $error : $info->as_string());
 	}
 }
@@ -568,9 +667,6 @@ sub choose
 	my $status = $info->status();
 
 	if($status != 200) {
-		require HTTP::Status;
-		HTTP::Status->import();
-
 		print "Status: $status ",
 			HTTP::Status::status_message($status),
 			"\n\n";
@@ -606,16 +702,16 @@ sub choose
 sub blacklisted
 {
 	if(my $remote = $ENV{'REMOTE_ADDR'}) {
+		my $info = shift;
 		if($blacklisted_ip{$remote}) {
-			$info->status(301);
+			$info->status(403);
 			return 1;
 		}
 
-		my $info = shift;
 		if(my $string = $info->as_string()) {
-			if(($string =~ /SELECT.+AND.+/) || ($string =~ /ORDER BY /) || ($string =~ / OR NOT /) || ($string =~ / AND \d+=\d+/) || ($string =~ /THEN.+ELSE.+END/) || ($string =~ /.+AND.+SELECT.+/) || ($string =~ /\sAND\s.+\sAND\s/) || ($string =~ /AND\sCASE\sWHEN/)) {
+			if(($string =~ /SELECT.+AND.+/i) || ($string =~ /ORDER BY /i) || ($string =~ / OR NOT /i) || ($string =~ / AND \d+=\d+/i) || ($string =~ /THEN.+ELSE.+END/i) || ($string =~ /.+AND.+SELECT.+/i) || ($string =~ /\sAND\s.+\sAND\s/i) || ($string =~ /AND\sCASE\sWHEN/i)) {
 				$blacklisted_ip{$remote} = 1;
-				$info->status(301);
+				$info->status(403);
 				return 1;
 			}
 		}
@@ -630,15 +726,19 @@ sub filter
 	# return 0 if($_[0] =~ /Can't locate auto\/NetAddr\/IP\/InetBase\/AF_INET6.al in /);
 	# return 0 if($_[0] =~ /S_IFFIFO is not a valid Fcntl macro at /);
 
-	return 0 if $_[0] =~ /Can't locate (Net\/OAuth\/V1_0A\/ProtectedResourceRequest\.pm|auto\/NetAddr\/IP\/InetBase\/AF_INET6\.al) in |
-		   S_IFFIFO is not a valid Fcntl macro at /x;
+	return 0 if $_[0] =~ /Can't locate (Net\/OAuth\/V1_0A\/ProtectedResourceRequest\.pm|auto\/NetAddr\/IP\/InetBase\/AF_INET6\.al) in |S_IFFIFO is not a valid Fcntl macro at /;
 	return 1;
 }
 
 # Put something to vwf.log
-sub vwflog($$$$$$)
+sub vwflog
 {
-	my ($vwflog, $info, $lingua, $syslog, $message, $log) = @_;
+	my ($vwflog, $info, $lingua, $syslog, $message, $log, $request_start) = @_;
+
+	my $duration_ms = '';
+	if($request_start) {
+		$duration_ms = int((Time::HiRes::time() - $request_start) * 1000);
+	}
 
 	my $template;
 	if($log) {
@@ -649,17 +749,20 @@ sub vwflog($$$$$$)
 	}
 	$message ||= '';
 
-	if(!-r $vwflog) {
+	if(!-e $vwflog) {
 		# First run - put in the heading row
 		open(my $fout, '>', $vwflog);
-		print $fout '"domain_name","time","IP","country","type","language","http_code","template","args","messages","error"',
+		print $fout '"domain_name","time","IP","country","type","language","http_code","template","args","messages","error","duration_ms"',
 			"\n";
 		close $fout;
 	}
 
-	my $warnings = join('; ',
-		grep defined, map { (($_->{'level'} eq 'warn') || ($_->{'level'} eq 'notice')) ? $_->{'message'} : undef } @{$info->messages()}
-	);
+	my $warnings;
+        if(my $messages = $info->messages()) {
+                $warnings = join('; ',
+                        grep defined, map { (($_->{'level'} eq 'warn') || ($_->{'level'} eq 'notice')) ? $_->{'message'} : undef } @{$messages}
+                        )
+        }
 	$warnings ||= '';
 
 	if(open(my $fout, '>>', $vwflog)) {
@@ -674,20 +777,23 @@ sub vwflog($$$$$$)
 			'"', $template, '",',
 			'"', $info->as_string(raw => 1), '",',
 			'"', $warnings, '",',
-			'"', $message, '"',
+			'"', $message, '",',
+			$duration_ms,
 			"\n";
 		close($fout);
 	}
 
 	if($syslog) {
-		require Sys::Syslog;
+		unless(Sys::Syslog->can('openlog')) {
+			require Sys::Syslog;
+			Sys::Syslog->import();
+		}
 
-		Sys::Syslog->import();
 		if(ref($syslog) eq 'HASH') {
 			Sys::Syslog::setlogsock($syslog);
 		}
 		Sys::Syslog::openlog($script_name, 'cons,pid', 'user');
-		Sys::Syslog::syslog('info|local0', '%s %s %s %s %s %d %s %s %s %s',
+		Sys::Syslog::syslog('info|local0', '%s %s %s %s %s %d %s %s %d %s %s',
 			$info->domain_name() || '',
 			$ENV{REMOTE_ADDR} || '',
 			$lingua->country() || '',
@@ -696,6 +802,7 @@ sub vwflog($$$$$$)
 			$info->status() || '',
 			$template || '',
 			$info->as_string(raw => 1) || '',
+			$duration_ms,
 			$warnings,
 			$message
 		);

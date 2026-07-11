@@ -1,5 +1,5 @@
 package BarefootJS;
-our $VERSION = "0.18.4";
+our $VERSION = "0.18.5";
 use strict;
 use warnings;
 use utf8;
@@ -303,16 +303,17 @@ sub render_child ($self, $name, @args) {
     # Template languages whose method calls can't splat a hash into positional
     # args (Text::Xslate Kolon, Template Toolkit) pass one hashref instead.
     my %props = (@args == 1 && ref $args[0] eq 'HASH') ? %{ $args[0] } : @args;
-    # JSX children come in via the engine's children-capture mechanism
-    # (Mojo's `begin %>...<% end`, which produces a CODE ref returning a
-    # Mojo::ByteStream). Materialize it through the backend before handing
-    # the props to the child renderer so the child template sees
-    # `$children` as already-rendered HTML. Guard on `exists` so a
-    # childless invocation (`bf->render_child('counter')`) doesn't gain a
-    # spurious `children => undef` key — preserving the historical "only
-    # touch children when present" behaviour.
-    $props{children} = $self->backend->materialize($props{children})
-        if exists $props{children};
+    # JSX children AND any other named JSX-valued slot (`header={<strong/>}`,
+    # #2168 jsx-element-prop) come in via the engine's children-capture
+    # mechanism (Mojo's `begin %>...<% end`, which produces a CODE ref
+    # returning a Mojo::ByteStream). Materialize every prop value through
+    # the backend before handing the props to the child renderer, so the
+    # child template sees each slot as already-rendered HTML rather than a
+    # bare CODE ref — `materialize` is a no-op for a value that isn't a
+    # CODE ref (see e.g. `BarefootJS::Backend::Mojo::materialize`), so this
+    # is safe to apply unconditionally rather than naming `children`
+    # specifically.
+    $props{$_} = $self->backend->materialize($props{$_}) for keys %props;
     # Renderer contract (#1897): the renderer is invoked with TWO
     # arguments — the props hashref and the INVOKING instance. A renderer
     # registered on the root may be called from a nested child render
@@ -627,6 +628,32 @@ sub round ($self, $value) {
     return POSIX::floor($n + 0.5);
 }
 
+# `Math.min(a, b)` / `Math.max(a, b)` -- two-arg forms only (#2168
+# math-methods). JS returns NaN if either operand is NaN.
+sub min ($self, $a, $b) {
+    my $x = $self->number($a);
+    my $y = $self->number($b);
+    return $x if _is_nan($x);
+    return $y if _is_nan($y);
+    return $x < $y ? $x : $y;
+}
+
+sub max ($self, $a, $b) {
+    my $x = $self->number($a);
+    my $y = $self->number($b);
+    return $x if _is_nan($x);
+    return $y if _is_nan($y);
+    return $x > $y ? $x : $y;
+}
+
+# `Math.abs()` (#2168 math-methods). `CORE::abs` avoids Perl's
+# ambiguous-call warning against this package's own `abs` sub.
+sub abs ($self, $value) {
+    my $n = $self->number($value);
+    return $n if _is_nan($n);
+    return CORE::abs($n);
+}
+
 # ---------------------------------------------------------------------------
 # Array / String method helpers (#1448 Tier A)
 # ---------------------------------------------------------------------------
@@ -800,22 +827,39 @@ sub concat ($self, $a, $b) {
     return \@out;
 }
 
-# `Array.prototype.slice(start, end?)` — carves out a sub-range
-# into a new ARRAY ref. Mirrors the Go `bf_slice` arithmetic so
-# adapter output stays symmetric:
+# `Array.prototype.slice(start, end?)` AND `String.prototype.slice`
+# (the `string-slice` divergence) — carves out a sub-range. The
+# adapter emits the same call for both receiver shapes (it can't
+# disambiguate string vs. array at compile time), so this dispatches
+# at runtime on `ref($recv)`, mirroring `includes` above. Mirrors the
+# Go `bf_slice` arithmetic so adapter output stays symmetric:
 #   - start < 0          → length + start  (e.g. -1 = last index)
 #   - end < 0            → length + end
 #   - start < 0 after clamp → 0
 #   - end > length       → length
 #   - start >= end       → empty
 #   - end undef          → "to length"
-# Non-array receivers return an empty ARRAY ref.
+# String length/positions are characters (`use utf8` is active), not
+# bytes. Any other receiver returns an empty ARRAY ref.
 
 sub slice ($self, $recv, $start, $end) {
+    if (!ref($recv) && defined $recv) {
+        my $len = CORE::length($recv);
+        my ($s, $e) = _clamp_slice_range($len, $start, $end);
+        return '' if $s >= $e;
+        return substr($recv, $s, $e - $s);
+    }
     return [] unless ref($recv) eq 'ARRAY';
     my $len = scalar @$recv;
     return [] if $len == 0;
 
+    my ($s, $e) = _clamp_slice_range($len, $start, $end);
+    return [] if $s >= $e;
+    return [ @{$recv}[$s .. $e - 1] ];
+}
+
+# Shared bounds arithmetic for both `slice` branches above.
+sub _clamp_slice_range ($len, $start, $end) {
     my $s = $start // 0;
     $s = $len + $s if $s < 0;
     $s = 0    if $s < 0;
@@ -826,8 +870,7 @@ sub slice ($self, $recv, $start, $end) {
     $e = 0    if $e < 0;
     $e = $len if $e > $len;
 
-    return [] if $s >= $e;
-    return [ @{$recv}[$s .. $e - 1] ];
+    return ($s, $e);
 }
 
 # `Array.prototype.reverse()` / `Array.prototype.toReversed()` —
@@ -979,6 +1022,26 @@ sub trim ($self, $recv) {
     return $s;
 }
 
+# `String.prototype.trimStart()` / `.trimEnd()` — the one-sided
+# siblings of `trim` above (#2183 follow-up), same `\s` /u regex
+# semantics restricted to one side.
+
+sub trim_start ($self, $recv) {
+    return '' unless defined $recv;
+    return '' if ref($recv);
+    my $s = "$recv";
+    $s =~ s/^\s+//u;
+    return $s;
+}
+
+sub trim_end ($self, $recv) {
+    return '' unless defined $recv;
+    return '' if ref($recv);
+    my $s = "$recv";
+    $s =~ s/\s+$//u;
+    return $s;
+}
+
 # `Number.prototype.toFixed(digits)` (#1897) — fixed-decimal string with
 # zero-padding. JS rounds the scaled integer half toward +Infinity (the
 # spec's "pick the larger n" tie-break), so `(2.5).toFixed(0)` is "3";
@@ -1119,6 +1182,33 @@ sub replace ($self, $recv, $pattern, $replacement) {
     my $i = index($s, $o);
     return $s if $i < 0;
     return substr($s, 0, $i) . $n . substr($s, $i + CORE::length($o));
+}
+
+# `String.prototype.replaceAll(pattern, replacement)` — string-pattern
+# form only (#2182), replacing EVERY occurrence (the all-occurrences
+# sibling of `replace` above). Same literal-splice approach (no regex
+# metacharacters, no `$1`/`$&` interpolation) as `replace`, looped
+# forward from each match's end. An empty pattern inserts the
+# replacement at every boundary, including before the first and after
+# the last character (`"abc".replaceAll("", "X")` -> "XaXbXcX"),
+# matching JS.
+
+sub replace_all ($self, $recv, $pattern, $replacement) {
+    my $s = defined $recv && !ref($recv) ? "$recv" : '';
+    my $o = defined $pattern ? "$pattern" : '';
+    my $n = defined $replacement ? "$replacement" : '';
+    return CORE::join($n, '', split(//, $s), '') if $o eq '';
+    my $out = '';
+    my $pos = 0;
+    my $olen = CORE::length($o);
+    while (1) {
+        my $i = index($s, $o, $pos);
+        last if $i < 0;
+        $out .= substr($s, $pos, $i - $pos) . $n;
+        $pos = $i + $olen;
+    }
+    $out .= substr($s, $pos);
+    return $out;
 }
 
 # `queryHref(base, { … })` (#2042) — build `"$base?k=v&…"` from a flat list of

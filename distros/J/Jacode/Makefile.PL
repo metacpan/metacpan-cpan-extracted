@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{Jacode},
-    'VERSION'   => q{2.13.4.34},
+    'VERSION'   => q{2.13.4.35},
     'ABSTRACT'  => q{Perl program for Japanese character code conversion},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',
@@ -42,7 +42,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'Jacode' => {
                 'file'    => 'lib/Jacode.pm',
-                'version' => '2.13.4.34',
+                'version' => '2.13.4.35',
             }
         },
     };

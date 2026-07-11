@@ -1,5 +1,9 @@
 Revision history for Data::RingBuffer::Shared
 
+0.04  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.03  2026-05-26
     - Bounded recovery (~2s) for slots abandoned in WRITING after a dead writer
     - slot_idx widened to uint64_t (was truncating for capacity > UINT32_MAX)

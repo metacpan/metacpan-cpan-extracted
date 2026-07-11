@@ -78,6 +78,28 @@ subtest 'floor / ceil / round — Math.* mirrors; propagate NaN' => sub {
     ok is_nan($bf->round('not')), 'round: NaN propagates';
 };
 
+# `Math.min(a, b)` / `Math.max(a, b)` (two-arg forms only) and
+# `Math.abs()` (#2168 math-methods). JS returns NaN if EITHER min/max
+# operand is NaN.
+subtest 'min / max / abs — Math.* mirrors; propagate NaN' => sub {
+    is $bf->min(3, 7),    3, 'min(3, 7) → 3';
+    is $bf->min(7, 3),    3, 'min(7, 3) → 3 (order-independent)';
+    is $bf->min(-2, -5), -5, 'min(-2, -5) → -5';
+    ok is_nan($bf->min('not', 5)), 'min: NaN in first arg propagates';
+    ok is_nan($bf->min(5, 'not')), 'min: NaN in second arg propagates';
+
+    is $bf->max(3, 7),    7, 'max(3, 7) → 7';
+    is $bf->max(7, 3),    7, 'max(7, 3) → 7 (order-independent)';
+    is $bf->max(-2, -5), -2, 'max(-2, -5) → -2';
+    ok is_nan($bf->max('not', 5)), 'max: NaN in first arg propagates';
+    ok is_nan($bf->max(5, 'not')), 'max: NaN in second arg propagates';
+
+    is $bf->abs(-7.6), 7.6, 'abs(-7.6) → 7.6';
+    is $bf->abs(7.6),  7.6, 'abs(7.6) → 7.6 (no-op)';
+    is $bf->abs(0),    0,   'abs(0) → 0';
+    ok is_nan($bf->abs('not')), 'abs: NaN propagates';
+};
+
 # `Array.prototype.includes(x)` + `String.prototype.includes(sub)` lower
 # to the same `$bf->includes($recv, $elem)` shape — see #1448 Tier A.
 # The Perl helper dispatches on `ref()`: ARRAY ref scans elements with
@@ -189,7 +211,7 @@ subtest 'concat — merges two arrays into a new array ref' => sub {
 # into a new ARRAY ref (#1448 Tier A). Mirrors the Go `bf_slice`
 # JS-compat semantics: negative-index normalisation, out-of-bounds
 # clamping, `start >= end` returns empty, undef `end` means "to
-# length". Non-array receivers return an empty ARRAY ref.
+# length". Non-array, non-string receivers return an empty ARRAY ref.
 subtest 'slice — array sub-range with negative-index + clamping' => sub {
     my $arr = ['a', 'b', 'c', 'd', 'e'];
 
@@ -213,13 +235,29 @@ subtest 'slice — array sub-range with negative-index + clamping' => sub {
     # Edge cases.
     is $bf->slice([],     0, undef), [],                   'empty array → empty';
     is $bf->slice(undef,  0, undef), [],                   'undef receiver → empty';
-    is $bf->slice('scalar', 0, undef), [],                 'scalar receiver → empty';
+    is $bf->slice({foo => 1}, 0, undef), [],                'hashref receiver → empty (not array, not string)';
 
     # Mutation isolation.
     my $src = ['a', 'b', 'c'];
     my $out = $bf->slice($src, 0, 2);
     push @$out, 'mutated';
     is $src, ['a', 'b', 'c'], 'source unchanged after mutating slice result';
+};
+
+# `String.prototype.slice(start, end?)` — the `string-slice`
+# divergence (#2182): a scalar receiver used to fall through the
+# array-only branch above and return an empty ARRAY ref instead of a
+# substring. Mirrors the array subtest's shape with a string receiver.
+subtest 'slice — string sub-range with negative-index + clamping' => sub {
+    my $word = 'barefootjs';
+
+    is $bf->slice($word, 0, 4),      'bare',   'start+end carves the prefix';
+    is $bf->slice($word, -4, undef), 'otjs',   'negative start counts from the end';
+    is $bf->slice($word, 4, undef),  'footjs', 'undef end → to length';
+    is $bf->slice($word, 5, 2),      '',       'start > end → empty string';
+
+    # Multi-byte: index by character, not byte.
+    is $bf->slice('héllo', 0, 2), 'hé', 'multi-byte characters count as one unit each';
 };
 
 # `Array.prototype.reverse()` / `Array.prototype.toReversed()` —
@@ -265,6 +303,33 @@ subtest 'trim — strip leading + trailing whitespace' => sub {
 
     # Numeric coercion: JS would stringify `42.trim()` first.
     is $bf->trim(42),                  '42',             'numeric receiver stringifies';
+};
+
+# `String.prototype.trimStart()` / `.trimEnd()` — the one-sided
+# siblings of `trim` above (#2183). Padding BOTH sides of the test
+# input so a swapped side (or a routed-through-both-sides regression)
+# fails visibly.
+subtest 'trim_start / trim_end — strip only their own side' => sub {
+    is $bf->trim_start('   padded   '), 'padded   ',  'trim_start leaves trailing spaces';
+    is $bf->trim_end('   padded   '),   '   padded',  'trim_end leaves leading spaces';
+
+    is $bf->trim_start("\t\nleading"),  'leading',    'trim_start strips tab + newline';
+    is $bf->trim_end('trailing  '),     'trailing',   'trim_end strips trailing spaces';
+
+    is $bf->trim_start('no-pad'),       'no-pad',     'trim_start no-op passthrough';
+    is $bf->trim_end('no-pad'),         'no-pad',     'trim_end no-op passthrough';
+
+    is $bf->trim_start('   '),          '',           'trim_start all whitespace → empty';
+    is $bf->trim_end('   '),            '',           'trim_end all whitespace → empty';
+
+    is $bf->trim_start(''),             '',           'trim_start empty input → empty';
+    is $bf->trim_end(''),               '',           'trim_end empty input → empty';
+
+    # Non-string receivers.
+    is $bf->trim_start(undef),          '',           'trim_start undef receiver → empty';
+    is $bf->trim_end(undef),            '',           'trim_end undef receiver → empty';
+    is $bf->trim_start({a => 1}),       '',           'trim_start hash ref receiver → empty';
+    is $bf->trim_end(['arr']),          '',           'trim_end array ref receiver → empty';
 };
 
 # `String.prototype.split(sep)` — string → ARRAY ref (#1448 Tier B).

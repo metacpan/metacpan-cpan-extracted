@@ -2,7 +2,7 @@
 # Jacode အမြန်ကိုးကားစာ (MY)
 # Jacode - ဂျပန်အက္ခရာကုဒ်ပြောင်းလဲခြင်းအတွက် Perl ပရိုဂရမ်
 # https://metacpan.org/dist/Jacode
-# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ################################################################################
 
 ■ ထည့်သွင်းခြင်း

@@ -2,10 +2,12 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 111;
+
+use Test::Most tests => 127;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
+
 use lib 't/lib';
 use MyLogger;
 # use Test::Without::Module qw(Geo::libpostal);
@@ -67,7 +69,7 @@ LOCAL: {
 	);
 
 	check($geo_coder,
-		'E Chatsworth Road, Reisterstown, Maryland, USA',
+		'E Chatsworth Road, Reisterstown, Maryland, United States',
 		39.467270,
 		-76.823947,
 		'All Saints Episcopal Church, 203 E Chatsworth Rd, Reisterstown, Baltimore, MD, USA',
@@ -97,6 +99,13 @@ LOCAL: {
 
 	cmp_deeply($geo_coder->geocode(location => '106 Tothill St, Minster, Thanet, Kent, England'),
 		methods('lat' => num(51.34, 1e-2), 'long' => num(1.32, 1e-2)));
+
+	# Calculated town in the middle of Ramsgate locations in the database
+	$res = check($geo_coder,
+		'Ramsgate, Kent, GB',
+		51.340395,
+		1.349197
+	);
 
 	ok(!defined($geo_coder->geocode('Eastbourne, Sussex, England')));
 

@@ -4,7 +4,7 @@ Text::Names::Abbreviate - Create abbreviated name formats from full names
 
 ## VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -13,6 +13,8 @@ Version 0.03
     say abbreviate('John Quincy Adams');                            # J. Q. Adams
     say abbreviate('Adams, John Quincy');                          # J. Q. Adams
     say abbreviate('George R R Martin', { format => 'initials' }); # G.R.R.M.
+    say abbreviate('Ludwig van Beethoven');                         # L. van Beethoven
+    say abbreviate("R\x{e9}mi Dupr\x{e9}");                       # R. Dupr\x{e9}
 
 # DESCRIPTION
 
@@ -34,7 +36,10 @@ Produce an abbreviated form of a personal name.
 
 Accept a full name in either `First Middle Last` or `Last, First Middle`
 form and return a formatted abbreviated string according to the requested
-`format`, `style`, and `separator`.
+`format`, `style`, `separator`, and `particles` options.  Input is
+NFC-normalised before processing, so strings differing only in Unicode
+normalisation form produce identical output.  Surname particles (`van`,
+`de`, `von`, etc.) are absorbed into the last-name component by default.
 
 ### Args
 
@@ -65,6 +70,21 @@ form and return a formatted abbreviated string according to the requested
 - separator (optional, default `.`)
 
     String appended after each initial.  Empty string removes all punctuation.
+
+- particles (optional, default enabled)
+
+    Controls detection of surname particles (`van`, `de`, `von`, etc.) that
+    prefix the last name.  Tokens immediately before the last name that appear in
+    the particle list are absorbed into the last-name component.  Matching is
+    case-sensitive: only lowercase tokens are eligible.
+
+    - omitted or `1` - use the built-in particle list
+    - `0` - disable particle detection entirely
+    - arrayref of strings - use that list instead of the built-in one
+
+        abbreviate('Ludwig van Beethoven');                           # L. van Beethoven
+        abbreviate('Ludwig van Beethoven', { particles => 0 });      # L. v. Beethoven
+        abbreviate('Felipe de la Cruz', { particles => ['de','la'] }); # F. de la Cruz
 
 ### Returns
 
@@ -99,6 +119,7 @@ None.  The function is purely functional with no persistent state.
                      memberof => [qw(first_last last_first)],
                      optional => 1 },
       separator => { type => 'string', optional => 1 },
+      particles => { type => ['boolean', 'arrayref'], optional => 1 },
     }
 
     OUTPUT
@@ -112,21 +133,26 @@ None.  The function is purely functional with no persistent state.
     name must be a non-empty string          Passed '' or undef; supply a non-empty string.
     format must be one of: ...               Invalid format constant; see API SPECIFICATION.
     style must be one of: ...               Invalid style constant; see API SPECIFICATION.
+    particles: must be one of boolean,       Passed a string or hashref; pass 0/1 or an
+      arrayref                               arrayref of particle strings instead.
 
 ### PSEUDOCODE
 
     FUNCTION abbreviate(name, options):
        Validate parameters via %PARAM_SCHEMA       (croak on violation)
-       Assign defaults: format=default, style=first_last, sep="."
+       Assign defaults: format=default, style=first_last, sep=".", particles=built-in list
        _normalize_name(name):
+           - NFC-normalize to precomposed Unicode form
            - collapse consecutive commas
            - detect and reorder "Last, First" form
            - track $had_leading_comma (input had no last-name component)
            - collapse internal whitespace; trim
        Return '' if normalized name is empty
-       _extract_parts(name, had_leading_comma, format, style):
+       _extract_parts(name, had_leading_comma, format, style, particles):
            - tokenize on whitespace
            - pop last token as $last_name (unless leading-comma form)
+           - if particles enabled: while last remaining token is a particle,
+             pop it and prepend to $last_name
            - build @initials from remaining tokens (first char each)
            - if style=last_first and format!=default: unshift last initial, clear $last_name
            - filter empty initials
@@ -146,6 +172,16 @@ Non-alphabetic leading characters (digits, punctuation) are included as-is.
 Names with two legitimate comma-separated clauses are not supported.
 - `compact` and `initials` formats are lossy: passing their output back into
 `abbreviate` does not reproduce the original result.
+- Particle detection is case-sensitive.  A token is only absorbed into the
+last-name component when it exactly matches a particle string (all lowercase).
+Capitalised tokens such as `Van` or `De` are treated as ordinary name
+components.
+- For `compact` and `initials` formats with `last_first` style, only the
+first character of the full particle-inclusive last name is used as the last
+initial (e.g. `van Beethoven` contributes initial `v`).
+- Unicode input is NFC-normalised before processing.  Strings that differ only
+in normalisation form (e.g. precomposed `\x{e9}` vs. combining `e\x{301}`)
+produce identical output.
 
 # AUTHOR
 
@@ -189,7 +225,8 @@ This module is provided as-is without any warranty.
 
     normalize : Sigma+ -> Sigma* x Bool
     normalize(n) =
-      let n1 = gsub(n, ",+", ",")
+      let n0 = NFC(n)             -- Unicode NFC normalisation
+      let n1 = gsub(n0, ",+", ",")
       if "," not-in n1 then (collapse(n1), false)
       else
         let (L, R) = split(n1, ",", 2) each trimmed
@@ -200,20 +237,34 @@ This module is provided as-is without any warranty.
           L = epsilon ^ R = epsilon   ->  (epsilon, false)
         end
 
-    extract : Sigma* x Bool x Format x Style -> (seq Sigma) x Sigma*
-    extract(n, leading, fmt, sty) =
+    Particles = seq Sigma* | undef    -- arrayref of particle strings, or disabled
+
+    collect_particles : seq Sigma* x Particles -> Sigma* x seq Sigma*
+    collect_particles(ps, P) =
+      if P = undef then (epsilon, ps)
+      else
+        let particle_set = { p | p <- P }
+        iterate: while ps != [] ^ last(ps) in particle_set:
+          prepend last(ps) to accumulator; remove from ps
+        (join(" ", accumulator), ps)
+
+    extract : Sigma* x Bool x Format x Style x Particles -> (seq Sigma) x Sigma*
+    extract(n, leading, fmt, sty, P) =
       let ps = tokenize(n)    -- split on whitespace
       if ps = [] then ([], epsilon)
       else if leading then
         ([ first(p) | p <- ps ], epsilon)
       else
-        let last  = ps[#ps]
-            inits = [ first(p) | p <- ps[1..#ps-1] ]
-        if sty = last_first ^ fmt != default ^ last != epsilon
+        let base  = ps[#ps]
+            rest  = ps[1..#ps-1]
+        let (prefix, rest') = collect_particles(rest, P)
+        let last  = if prefix != epsilon then prefix ++ " " ++ base else base
+            inits = [ first(p) | p <- rest' ]
+        if sty = last_first ^ fmt != default ^ fmt != shortlast ^ last != epsilon
           then ([first(last)] ++ inits, epsilon)
           else (inits, last)
 
-    abbreviate : Sigma+ x Format x Style x Sigma* -> Sigma*
+    abbreviate : Sigma+ x Format x Style x Sigma* x Particles -> Sigma*
     abbreviate = format_result . extract . normalize
 
 # LICENCE AND COPYRIGHT

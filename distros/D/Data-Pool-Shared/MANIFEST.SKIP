@@ -14,3 +14,7 @@
 ^Makefile\.old$
 ^MYMETA\.
 ^MANIFEST\.bak$
+
+# local tool artifacts / built dists (not shipped)
+(^|/)\.pcg($|/)
+(^|/)\.claude($|/)

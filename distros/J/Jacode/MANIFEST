@@ -941,6 +941,7 @@ t/9040_roundtrip_invariant.t
 t/9050_pod_G11.t
 t/9051_pod_G12.t
 t/9060_perl4_baby_cart.t
+t/9070_autoload_context.t
 t/9080_cheatsheets.t
 doc/jacode_cheatsheet.BM.txt
 doc/jacode_cheatsheet.BN.txt

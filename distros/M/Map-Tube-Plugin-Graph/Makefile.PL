@@ -23,7 +23,7 @@ WriteMakefile(
         'namespace::autoclean' => '0.28',
         'GraphViz2'            => '2.63',
         'MIME::Base64'         => '3.14',
-        'Map::Tube'            => '3.96',
+        'Map::Tube'            => '5.1.0',
         'Map::Tube::Exception' => '3.18',
         'Graph'                => '0.9732',
     },

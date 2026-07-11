@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000052';
+our $VERSION = '0.000053';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
@@ -97,21 +97,22 @@ sub watch {
     my $ssig = $self->{+DB}->stop_sig // 'TERM';
     my $fsig = $self->{+DB}->fast_stop_sig // 'KILL';
 
-    # Ignore SIGTERM/SIGINT before exec so the watcher cannot be killed
-    # during startup before _do_watch installs its signal handlers.
-    # SIG_IGN persists across exec, and any pending signal will be held
-    # until _do_watch replaces these with proper handlers.
-    $SIG{TERM} = 'IGNORE';
-    $SIG{INT}  = 'IGNORE';
-
-    # Block (rather than ignore) the fast-eliminate signal across the exec. A
-    # blocked signal stays *pending* instead of being discarded, so a
-    # fast_eliminate() that races server startup -- arriving after the socket is
-    # up (so the caller's start() has returned) but before _do_watch has
-    # installed its handler -- is not lost: _do_watch unblocks it once the
-    # handler is in place and it fires immediately. SIG_IGN would silently drop
-    # it, leaving the caller's wait() to block for the full stop-grace timeout.
-    POSIX::sigprocmask(POSIX::SIG_BLOCK(), POSIX::SigSet->new(POSIX::SIGUSR1()));
+    # Block (rather than ignore) every teardown signal across the exec. A
+    # blocked signal stays *pending* instead of being discarded, so a stop(),
+    # eliminate(), or fast_eliminate() that races server startup -- arriving
+    # after the socket is up (so the caller's start() has returned) but before
+    # _do_watch has installed its handlers -- is not lost: _do_watch unblocks
+    # them once the handlers are in place and a pending one fires immediately.
+    #
+    # SIGTERM/SIGINT used to be SIG_IGN'd here instead, on the wrong belief
+    # that an ignored signal is "held" across exec -- it is DISCARDED. A
+    # stop() landing in the exec window (perl startup + module load in the
+    # fresh watcher) was silently dropped, the watcher never learned it should
+    # stop, and the caller's wait() eventually gave up and killed the watcher,
+    # orphaning a still-running server whose data dir stayed locked. The
+    # build-then-immediately-stop pattern (DBIx::QuickDB::Pool) hit that
+    # window constantly.
+    POSIX::sigprocmask(POSIX::SIG_BLOCK(), POSIX::SigSet->new(POSIX::SIGUSR1(), POSIX::SIGINT(), POSIX::SIGTERM()));
 
     exec(
         $^X, '-Ilib',
@@ -142,11 +143,11 @@ sub _do_watch {
     local $SIG{USR1} = sub { $kill = 'FAST_TERM' };
     local $SIG{HUP}  = sub { $hup  = 1 };
 
-    # watch() blocked SIGUSR1 before exec so a fast_eliminate() racing startup
-    # would stay pending rather than be discarded. Now that the handler above is
-    # installed, unblock it -- any pending fast-eliminate fires here and sets
-    # $kill before we enter the watch loop.
-    POSIX::sigprocmask(POSIX::SIG_UNBLOCK(), POSIX::SigSet->new(POSIX::SIGUSR1()));
+    # watch() blocked the teardown signals before exec so a stop/eliminate/
+    # fast_eliminate racing startup stays pending rather than being discarded.
+    # Now that the handlers above are installed, unblock them -- any pending
+    # teardown fires here and sets $kill before we enter the watch loop.
+    POSIX::sigprocmask(POSIX::SIG_UNBLOCK(), POSIX::SigSet->new(POSIX::SIGUSR1(), POSIX::SIGINT(), POSIX::SIGTERM()));
 
     my $blah;
     close(STDIN);
@@ -216,9 +217,11 @@ sub _watcher_terminate {
     if ($got_sig && $got_sig eq 'FAST_TERM') {
         $class->_watcher_kill_fast($pid, $params{fast_sig});
 
-        # Ignore errors here.
+        # Ignore errors here. eval because File::Path hard-dies (not routed
+        # through the 'error' handler) if the owner process deletes this same
+        # tree concurrently; deletion is idempotent best-effort.
         my $err = [];
-        remove_tree($dir, {safe => 1, error => \$err}) if -d $dir;
+        eval { remove_tree($dir, {safe => 1, error => \$err}) } if -d $dir;
 
         return;
     }
@@ -226,9 +229,9 @@ sub _watcher_terminate {
     $class->_watcher_kill($send_sig, $pid, $params{fast_sig});
 
     if ($got_sig && $got_sig eq 'TERM') {
-        # Ignore errors here.
+        # Ignore errors here (eval: see FAST_TERM above).
         my $err = [];
-        remove_tree($dir, {safe => 1, error => \$err}) if -d $dir;
+        eval { remove_tree($dir, {safe => 1, error => \$err}) } if -d $dir;
     }
 }
 
@@ -282,6 +285,22 @@ sub _watcher_kill_fast {
     return;
 }
 
+# Seconds a graceful stop may take before the watcher escalates (and before
+# wait() starts worrying). The default must comfortably exceed a NORMAL clean
+# shutdown on a loaded host: MySQL 8's InnoDB shutdown and PostgreSQL's
+# shutdown checkpoint both routinely take more than the old default of 4s
+# under a parallel test load, which made escalation (and its warning, and for
+# MySQL a straight SIGKILL plus crash recovery on the next clone start) the
+# common case rather than the pathological one. Historically this was kept
+# small because wedged shutdowns "never finish no matter how long we wait" --
+# that wedge was stop() signals being lost across the watcher exec, fixed by
+# blocking them; real shutdowns do finish.
+sub _stop_grace {
+    my $grace = $ENV{QDB_STOP_GRACE};
+    $grace = 10 unless defined($grace) && $grace =~ /^\d+$/ && $grace > 0;
+    return $grace;
+}
+
 sub _watcher_kill {
     my $class = shift;
     my ($sig, $pid, $fast_sig) = @_;
@@ -297,8 +316,7 @@ sub _watcher_kill {
     # in a crash-recovery state, and a clone of that dir then replays WAL on
     # first start, jumping SERIAL sequences forward by SEQ_LOG_VALS (32) --
     # silently corrupting cloned databases. Tunable via QDB_STOP_GRACE.
-    my $kill_after = $ENV{QDB_STOP_GRACE};
-    $kill_after = 4 unless defined($kill_after) && $kill_after =~ /^\d+$/ && $kill_after > 0;
+    my $kill_after = _stop_grace();
 
     # Two-stage escalation once the graceful signal has not stopped the server by
     # $kill_after. First send the driver's fast-stop signal -- an immediate but
@@ -406,28 +424,65 @@ sub wait {
     my $self = shift;
     my $pid = $self->{+WATCHER_PID} or return;
 
-    # Give the watcher long enough to finish a graceful shutdown before we
-    # SIGKILL it. The watcher escalates to SIGKILL on the server after
-    # QDB_STOP_GRACE and gives up at twice that, so this must outlast the
-    # watcher's give-up or we would kill it mid-shutdown and orphan a
-    # half-stopped server. Defaults to 10s (grace 4 -> give-up 8 -> 10).
-    my $grace = $ENV{QDB_STOP_GRACE};
-    $grace = 4 unless defined($grace) && $grace =~ /^\d+$/ && $grace > 0;
-    my $timeout = $grace * 2 + 2;
+    # Give the watcher long enough to finish a graceful shutdown. The watcher
+    # escalates to SIGKILL on the server after QDB_STOP_GRACE and then BLOCKS
+    # until the server is reaped, so this must outlast the watcher's own
+    # escalation schedule (grace + grace/2, plus slack).
+    my $timeout = _stop_grace() * 2 + 2;
 
+    # A watcher that outlives $timeout is almost never hung -- the usual
+    # cause is a server the kernel has not been able to kill yet (e.g. stuck
+    # in disk-sleep under heavy I/O), with the watcher dutifully blocking on
+    # the post-SIGKILL reap. Killing the watcher at that point orphans a
+    # still-alive server, so stop() would return "success" while the data dir
+    # is locked by a live postmaster/mysqld and the next start on that dir
+    # fails on the stale lock file. So past $timeout we only warn, keep
+    # waiting on a much longer leash, and SIGKILL the watcher purely as a
+    # last resort. Tunable via QDB_STOP_LEASH (extra seconds past $timeout).
+    my $extra = $ENV{QDB_STOP_LEASH};
+    $extra = 60 unless defined($extra) && $extra =~ /^\d+$/ && $extra > 0;
+    my $leash = $timeout + $extra;
+
+    my ($warned, $nuked);
     my $start = time;
     while(kill(0, $pid)) {
         my $waited = time - $start;
-        if ($waited > $timeout) {
-            kill('KILL', $pid);
-            $start = time;
+
+        if ($waited > $timeout && !$warned++) {
+            warn "Watcher (pid $pid) did not finish within ${timeout}s; the server is probably stuck mid-shutdown, waiting up to ${extra}s longer for it to die";
         }
+
+        if ($waited > $leash && !$nuked++) {
+            warn "Watcher (pid $pid) still running after ${leash}s, killing it; the server may survive as an orphan";
+            kill('KILL', $pid);
+            $start = time;    # from here just wait for the SIGKILL to land
+        }
+
         sleep 0.02;
     }
 
     # The watcher has exited; forget its pid so no later teardown signal (e.g.
     # from DESTROY) can land on a recycled pid now owned by another process.
     delete $self->{+WATCHER_PID};
+
+    # A voluntary watcher exit guarantees the server was reaped first, but the
+    # watcher can also die abnormally (or we just SIGKILLed it above), leaving
+    # the server alive. Verify with a read-only kill(0) probe -- NEVER send
+    # the server pid a real signal here: the pid may already be recycled to an
+    # unrelated process (the pid-reuse hazard the watcher teardown guards
+    # against), so a false "alive" can only cost a bounded wait and a warning,
+    # never a wrong-process kill. In the normal case the server is long dead
+    # and this costs a single failed kill(0).
+    if (my $spid = $self->{+SERVER_PID}) {
+        my $sstart = time;
+        while (kill(0, $spid)) {
+            if (time - $sstart > $timeout) {
+                warn "Server (pid $spid) still appears to be alive after its watcher exited; its data dir may still be locked";
+                last;
+            }
+            sleep 0.02;
+        }
+    }
 }
 
 sub DESTROY {

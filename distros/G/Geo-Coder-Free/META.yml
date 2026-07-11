@@ -1,7 +1,7 @@
 ---
 abstract: 'Provides a Geo-Coding functionality using free databases'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   App::csv2sqlite: '0'
   CGI::IDS: '0'
@@ -9,8 +9,10 @@ build_requires:
   CHI: '0'
   CHI::Driver::Null: '0'
   CHI::Driver::RawMemory: '0'
+  Cache::LRU: '0'
   Config::Abstraction: '0'
   Cwd: '0'
+  DB_File: '0'
   Data::Throttler: '0'
   Database::Abstraction: '0'
   Devel::Size: '0'
@@ -40,9 +42,9 @@ build_requires:
   Try::Tiny: '0'
   autodie: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -67,6 +69,7 @@ requires:
   File::Spec: '0'
   File::Temp: '0'
   File::pfopen: '0.02'
+  Geo::Address::Parser: '0'
   Geo::Hash: '0'
   Geo::StreetAddress::US: '0'
   Gzip::Faster: '0'
@@ -85,8 +88,8 @@ requires:
   Text::xSV::Slurp: '0'
   perl: '5.006002'
 resources:
-  bugtracker: https://github.com/nigelhorne/Geo-Coder-Free/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free
   homepage: https://geocode.nigelhorne.com
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

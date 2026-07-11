@@ -66,6 +66,24 @@ END_TEX
 }
 
 #--------
+# byte-exact output for the default (row.names ON): the same AoA now gains a
+# numeric row-label column, and tex.bold.1st.col bolds that label
+#--------
+{
+	my ($csv, $tex) = paths();
+	write_table([[qw(k v)], ['x', 1], ['y', 2]], $tex);
+	my $expected = <<'END_TEX';
+\begin{tabular}{|c|c|c|} \hline
+\textbf{} & \textbf{k} & \textbf{v} \\ \hline
+\textbf{1} & x & 1\\
+\textbf{2} & y & 2\\
+\hline \end{tabular}
+END_TEX
+	is(body_after_provenance(slurp($tex)), $expected,
+		'default row.names on: AoA output is byte-exact with a numeric label column');
+}
+
+#--------
 # provenance comment + structural scaffolding
 #--------
 {
@@ -257,12 +275,22 @@ END_TEX
 	has(slurp($tex), spec(2), 'AoH: 2 columns');
 }
 {
-	# row.names now defaults OFF: no leading label column unless asked for
+	# tex now defaults row.names ON (R-compatible write.table): a leading label
+	# column is added when the caller does not pass row.names.
 	my ($csv, $tex) = paths();
 	write_table({ a => 1, b => 2, c => 3 }, $tex);
 	my $body = body_after_provenance(slurp($tex));
-	has($body, spec(3), 'row.names default off: flat hash has no label column');
-	lacks($body, '\textbf{} &', 'row.names default off: no empty leading header cell');
+	has($body, spec(4), 'row.names default on (tex): label col + a,b,c = 4 columns');
+	has($body, '\textbf{} &', 'row.names default on (tex): empty leading header cell');
+	has($body, '\textbf{1} &', 'row.names default on (tex): flat-hash label is 1');
+}
+{
+	# an explicit row.names => 0 still wins over the tex default
+	my ($csv, $tex) = paths();
+	write_table({ a => 1, b => 2, c => 3 }, $tex, 'row.names' => 0);
+	my $body = body_after_provenance(slurp($tex));
+	has($body, spec(3), 'explicit row.names => 0 wins: no label column');
+	lacks($body, '\textbf{} &', 'explicit row.names => 0 wins: no empty leading header');
 }
 
 #--------
@@ -320,6 +348,7 @@ END_TEX
 # By now an earlier tex write has already loaded Cwd (used for the provenance
 # line), so no module-load allocations are mistaken for leaks here.
 #--------
+done_testing() if $INC{'Devel/Cover.pm'};
 no_leaks_ok {
 	my ($csv, $tex) = paths();
 	eval {
@@ -327,33 +356,33 @@ no_leaks_ok {
 			'tex.format' => 1, 'tex.size' => '\small',
 			'tex.comment' => ['run 3', 'q < 0.05'], 'row.names' => 0)
 	}
-} 'write_table(tex): no memory leaks on success' unless $INC{'Devel/Cover.pm'};
+} 'write_table(tex): no memory leaks on success';
 
 no_leaks_ok {
 	my ($csv, $tex) = paths();
 	eval {
 		write_table([[qw(k v)], [1, 2]], $csv, 'tex' => 0, 'row.names' => 0)
 	}
-} 'write_table(tex => 0): no leaks on the delimited path' unless $INC{'Devel/Cover.pm'};
+} 'write_table(tex => 0): no leaks on the delimited path';
 
 no_leaks_ok {
 	my ($csv, $tex) = paths();
 	eval {
-		write_table([{ x => 1, y => [1, 2] }], $tex)
+		write_table([{ x => 1, 'y' => [1, 2] }], $tex)
 	}
-} 'write_table(tex): no leaks on AoH nested-ref croak' unless $INC{'Devel/Cover.pm'};
+} 'write_table(tex): no leaks on AoH nested-ref croak';
 
 no_leaks_ok {
 	my ($csv, $tex) = paths();
 	eval {
 		write_table([[qw(h)], [[1]]], $tex, 'row.names' => 0)
 	}
-} 'write_table(tex): no leaks on AoA nested-ref croak' unless $INC{'Devel/Cover.pm'};
+} 'write_table(tex): no leaks on AoA nested-ref croak';
 
 no_leaks_ok {
 	eval {
 		write_table([[qw(k v)], [1, 2]], "$dir/no_such_subdir/out.tex", 'row.names' => 0)
 	}
-} 'write_table(tex): no leaks when the tex file cannot be opened' unless $INC{'Devel/Cover.pm'};
+} 'write_table(tex): no leaks when the tex file cannot be opened';
 
 done_testing();

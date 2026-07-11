@@ -2,23 +2,19 @@ package Test::Pool;
 BEGIN { $INC{'Test/Pool.pm'} = __FILE__ }
 
 # These pool tests build, clone, start, and stop many servers in sequence. On a
-# slow or loaded host (e.g. a CPAN smoke box) the library's default start/stop
-# timeouts are too tight and the test spuriously fails. Ask for generous
-# timeouts here -- this only affects the test, not normal consumers of the
-# library, which keep the default timeouts. Respect any value already set.
+# slow or loaded host (e.g. a CPAN smoke box) the library's default start
+# timeout is too tight and the test spuriously fails. Ask for a generous one
+# here -- this only affects the test, not normal consumers of the library.
+# Respect any value already set.
 #
-# Keep the stop grace small. stop() forces a CHECKPOINT first, so a SIGKILL
-# cannot corrupt a clone. Some servers (notably PostgreSQL 9.3, which the
-# FreeBSD smokers run) intermittently wedge during shutdown under this test's
-# rapid start/stop churn -- the postmaster acknowledges the shutdown signal but
-# never completes it (no clients connected), so it can only be reaped by the
-# eventual SIGKILL. Those stops never finish no matter how long we wait, so a
-# large grace just stalls each one for the whole window. A small grace reaps
-# them quickly; the start timeout stays generous since startup genuinely needs
-# time on a slow host.
+# This used to also pin QDB_STOP_GRACE to a small value, on the theory that
+# wedged shutdowns "never finish no matter how long we wait" (the historical
+# PostgreSQL shutdown wedge on the FreeBSD smokers). That wedge turned out to
+# be stop() signals lost across the watcher's exec -- fixed in the watcher by
+# blocking them -- so real shutdowns do finish, and the library default grace
+# now accommodates a normal slow shutdown. No override needed.
 BEGIN {
     $ENV{QDB_START_TIMEOUT} = 120 unless defined $ENV{QDB_START_TIMEOUT};
-    $ENV{QDB_STOP_GRACE}    = 5   unless defined $ENV{QDB_STOP_GRACE};
 }
 
 use Test2::V0 -target => 'DBIx::QuickDB::Pool';

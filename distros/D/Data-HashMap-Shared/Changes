@@ -1,5 +1,8 @@
 Revision history for Data-HashMap-Shared
 
+0.15  2026-07-11
+    - Fix flaky dead-reader-recovery precondition test.
+
 0.14  2026-07-03
     - Security and robustness hardening; backing files now created mode
       0600 (pass a file-mode argument to new() for cross-user sharing).

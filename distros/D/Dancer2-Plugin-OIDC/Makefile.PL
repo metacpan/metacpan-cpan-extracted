@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Clone" => 0,
     "Dancer2" => "1.0.0",
-    "OIDC::Client" => "1.07",
+    "OIDC::Client" => "1.08",
     "Scalar::Util" => 0,
     "Try::Tiny" => 0
   },
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => "0.177.0",
     "Test::More" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Mojolicious" => "8.24",
-  "OIDC::Client" => "1.07",
+  "OIDC::Client" => "1.08",
   "Plack" => "1.0048",
   "Scalar::Util" => 0,
   "Test::MockModule" => "0.177.0",

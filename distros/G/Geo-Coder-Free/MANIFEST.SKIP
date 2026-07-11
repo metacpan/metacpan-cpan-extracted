@@ -54,6 +54,8 @@
 
 # Avoid Devel::Cover and Devel::CoverX::Covered files.
 \bcover_db\b
+\bcover_html\b
+\bcoverage_history\b
 \bcovered\b
 
 # Avoid MYMETA files
@@ -68,6 +70,7 @@
 typescript
 Geo-.*
 conf/GSLAL032003003
+CLAUDE.md
 
 # Downloaded databases
 \bdatabases/*.txt$
@@ -81,5 +84,5 @@ conf/GSLAL032003003
 \bcounties.txt
 \bstates.txt
 \ballCountries.txt
-doanloads/*
+downloads/*
 downloads/allCountries.txt

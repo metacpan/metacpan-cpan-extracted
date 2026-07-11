@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+use utf8;
+use open ':std', ':utf8';
 
 use Readonly;
 use Test::Memory::Cycle;
@@ -248,11 +250,11 @@ subtest 'abbreviate short-circuits to "" when _normalize_name returns empty' => 
 
 subtest 'abbreviate forwards all options to _extract_parts' => sub {
 	# Strategy: stub _normalize_name so its output is predictable, then
-	# spy on _extract_parts to verify that format and style reach it.
+	# spy on _extract_parts to verify that format, style, and particles reach it.
 	mock("${PKG}::_normalize_name", sub { ('Stub Name', 0) });
 	my $spy = spy("${PKG}::_extract_parts");
 
-	abbreviate('anything', { format => 'compact', style => 'last_first', separator => '-' });
+	abbreviate('anything', { format => 'compact', style => 'last_first', separator => '-', particles => 0 });
 
 	my @calls = $spy->();
 	is(scalar @calls, 1,            '_extract_parts called exactly once');
@@ -260,8 +262,124 @@ subtest 'abbreviate forwards all options to _extract_parts' => sub {
 	is($calls[0][2],  0,            'had_leading_comma forwarded');
 	is($calls[0][3],  'compact',    'format forwarded');
 	is($calls[0][4],  'last_first', 'style forwarded');
+	is($calls[0][5],  undef,        'particles=0 resolves to undef (disabled)');
 
 	restore_all();
+	done_testing();
+};
+
+subtest 'abbreviate forwards default particle list when particles omitted' => sub {
+	mock("${PKG}::_normalize_name", sub { ('Stub Name', 0) });
+	my $spy = spy("${PKG}::_extract_parts");
+
+	abbreviate('anything');
+
+	my @calls = $spy->();
+	ok(ref $calls[0][5] eq 'ARRAY' && @{ $calls[0][5] } > 0,
+		'omitting particles passes non-empty arrayref (default list)');
+
+	restore_all();
+	done_testing();
+};
+
+subtest 'abbreviate forwards custom particle arrayref unchanged' => sub {
+	mock("${PKG}::_normalize_name", sub { ('Stub Name', 0) });
+	my $spy = spy("${PKG}::_extract_parts");
+
+	my $custom = ['van', 'de'];
+	abbreviate('anything', { particles => $custom });
+
+	my @calls = $spy->();
+	is($calls[0][5], $custom, 'custom arrayref passed through as-is');
+
+	restore_all();
+	done_testing();
+};
+
+# ===========================================================================
+# SECTION 3b — _normalize_name: Unicode NFC normalization
+# ===========================================================================
+
+subtest '_normalize_name: NFD input precomposed to NFC before processing' => sub {
+	use Unicode::Normalize ();
+	# Construct NFD form of é (e + combining acute) and NFC form (precomposed).
+	my $nfd_name = Unicode::Normalize::NFD("Rémi Dupré");
+	my $nfc_name = "Rémi Dupré";
+
+	my ($out_nfd) = $normalize->($nfd_name);
+	my ($out_nfc) = $normalize->($nfc_name);
+	is($out_nfd, $out_nfc, 'NFD and NFC inputs produce identical normalised output');
+
+	my ($out) = $normalize->($nfd_name);
+	is($out, Unicode::Normalize::NFC($out), 'output is in NFC form');
+
+	done_testing();
+};
+
+subtest '_normalize_name: NFC form preserved through comma reordering' => sub {
+	use Unicode::Normalize ();
+	my $nfd = Unicode::Normalize::NFD('Björk, Anna');
+	my ($out) = $normalize->($nfd);
+	is($out, 'Anna Björk', 'comma-reordered name with diacritics normalised correctly');
+	done_testing();
+};
+
+# ===========================================================================
+# SECTION 3c — _extract_parts: surname particle collection
+# ===========================================================================
+
+subtest '_extract_parts: single particle absorbed into last name' => sub {
+	my @particles = qw(van de von);
+	my ($inits, $last) = $extract->('Ludwig van Beethoven', 0, 'default', 'first_last', \@particles);
+	is_deeply($inits, ['L'],          'only given-name initial');
+	is($last,         'van Beethoven', 'particle prepended to last name');
+	done_testing();
+};
+
+subtest '_extract_parts: two consecutive particles absorbed' => sub {
+	my @particles = qw(de la van);
+	my ($inits, $last) = $extract->('Felipe de la Cruz', 0, 'default', 'first_last', \@particles);
+	is_deeply($inits, ['F'],       'one given-name initial');
+	is($last,         'de la Cruz', 'both particles absorbed');
+	done_testing();
+};
+
+subtest '_extract_parts: particles=undef disables detection' => sub {
+	my ($inits, $last) = $extract->('Ludwig van Beethoven', 0, 'default', 'first_last', undef);
+	is_deeply($inits, ['L', 'v'], 'particle treated as middle initial when disabled');
+	is($last,         'Beethoven', 'only plain last name');
+	done_testing();
+};
+
+subtest '_extract_parts: empty particle list disables detection' => sub {
+	my ($inits, $last) = $extract->('Ludwig van Beethoven', 0, 'default', 'first_last', []);
+	is_deeply($inits, ['L', 'v'], 'particle treated as middle initial with empty list');
+	is($last,         'Beethoven', 'only plain last name with empty list');
+	done_testing();
+};
+
+subtest '_extract_parts: capitalised token not treated as particle' => sub {
+	my @particles = qw(van de);
+	my ($inits, $last) = $extract->('Edward Van Halen', 0, 'default', 'first_last', \@particles);
+	is_deeply($inits, ['E', 'V'], 'capitalised Van is not a particle');
+	is($last,         'Halen',     'Halen is last name');
+	done_testing();
+};
+
+subtest '_extract_parts: particle with last_first/initials reorder uses particle initial' => sub {
+	my @particles = qw(van);
+	my ($inits, $last) = $extract->('Ludwig van Beethoven', 0, 'initials', 'last_first', \@particles);
+	is_deeply($inits, ['v', 'L'], 'v from "van Beethoven" moves to front');
+	is($last,         '',          'last_name cleared by reorder');
+	done_testing();
+};
+
+subtest '_extract_parts: particle not absorbed in leading-comma form' => sub {
+	# had_leading_comma=1 means no last-name exists; all tokens are initials.
+	my @particles = qw(van de);
+	my ($inits, $last) = $extract->('van de', 1, 'default', 'first_last', \@particles);
+	is_deeply($inits, ['v', 'd'], 'all tokens become initials in leading-comma form');
+	is($last,         '',          'no last name');
 	done_testing();
 };
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tube name="LinkRestrictionMulti">
+  <lines>
+    <line id="x" name="Line X" color="black"/>
+    <line id="y" name="Line Y" color="blue"/>
+    <line id="z" name="Line Z" color="red"/>
+  </lines>
+  <stations>
+    <station id="A" name="A street" line="x,y,z" link="B"/>
+    <station id="B" name="B street" line="x,y,z" link="A:x|y"/>
+  </stations>
+</tube>

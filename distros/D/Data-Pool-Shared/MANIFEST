@@ -79,6 +79,7 @@ xt/stress.t
 xt/symlink_attack.t
 xt/taint.t
 xt/truncation.t
+xt/tsan.t
 xt/ubsan.t
 xt/ulimit_nofile.t
 xt/umask_compliance.t

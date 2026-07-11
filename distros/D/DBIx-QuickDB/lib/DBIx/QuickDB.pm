@@ -2,7 +2,7 @@ package DBIx::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000052';
+our $VERSION = '0.000053';
 
 use Carp;
 use List::Util qw/first/;
@@ -37,7 +37,14 @@ sub build_db {
         if $name && $CACHE{$name} && !$spec->{nocache};
 
     unless ($spec->{dir}) {
-        $spec->{dir}       = tempdir('DB-QUICK-XXXXXXXX', CLEANUP => 0, $ENV{QDB_TMPDIR} ? (DIR => $ENV{QDB_TMPDIR}) : (TMPDIR => 1));
+        # $$ in the template: File::Temp draws names from rand(), and forked
+        # processes (or processes given the same srand seed, e.g. by
+        # Test2::Plugin::SRand) draw identical name sequences. Names must
+        # differ by pid or two processes can converge on one dir -- the
+        # EEXIST retry does not help when the first dir has already been
+        # cleaned up and the second process recreates it while a stale
+        # watcher deletes it by path.
+        $spec->{dir}       = tempdir("DB-QUICK-$$-XXXXXXXX", CLEANUP => 0, $ENV{QDB_TMPDIR} ? (DIR => $ENV{QDB_TMPDIR}) : (TMPDIR => 1));
         $spec->{cleanup}   = 1 unless defined $spec->{cleanup};
         $spec->{bootstrap} = 1 unless defined $spec->{bootstrap};
     }

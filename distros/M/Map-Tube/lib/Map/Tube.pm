@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v5.0.1');
+our $VERSION   = qv('v5.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version v5.0.1
+Version v5.1.0
 
 =cut
 
@@ -120,7 +120,7 @@ documented in L<Map::Tube::Cookbook>.
 
 =cut
 
-has [qw(name name_to_id plugins _active_link _other_links _line_stations _line_station_index _common_lines)] => (is => 'rw');
+has [qw(name name_to_id plugins _active_link _other_links _link_lines _line_stations _line_station_index _common_lines)] => (is => 'rw');
 has experimental => (is => 'ro', default => sub { 0 });
 has nodes   => (is => 'rw', isa => NodeMap);
 has lines   => (is => 'rw', isa => Lines  );
@@ -280,6 +280,7 @@ sub get_shortest_route {
         { from  => $start,
           to    => $end,
           nodes => $_nodes,
+          link_lines => $self->_link_lines,
         }
     );
 }
@@ -514,7 +515,7 @@ of type L<Map::Tube::Node>.
 =cut
 
 sub get_next_stations {
-    my ($self, $station_name) = @_;
+    my ($self, $station_name, $line_name) = @_;
 
     my @caller = caller(0);
     @caller    = caller(2) if $caller[3] eq '(eval)';
@@ -531,26 +532,70 @@ sub get_next_stations {
         filename    => $caller[1],
         line_number => $caller[2] }) unless defined $node_id;
 
+    # Optional: restrict results to stations reachable from this one on a
+    # specific line. This takes any per-edge line restriction (set via the
+    # "A:x" style link syntax) into account, so a link that physically only
+    # runs on line x will correctly be excluded when asking about line y,
+    # even though both stations are nominally on both lines.
+    my $_line_id;
+    if (defined $line_name) {
+        my $_line = $self->_get_line_object_by_name($line_name);
+        Map::Tube::Exception::InvalidLineName->throw({
+            method      => __PACKAGE__."::get_next_stations",
+            message     => "ERROR: Invalid Line Name [$line_name].",
+            filename    => $caller[1],
+            line_number => $caller[2] }) unless defined $_line;
+        $_line_id = uc($_line->id);
+    }
+
     my $nodes = [];
     my $node  = $self->get_node_by_id($node_id);
+
+    if (defined $_line_id) {
+        my %_node_lines = map { uc($_->{id}) => 1 } @{$node->{line}};
+        # If the starting station isn't even served by this line, it has
+        # no neighbors on it, full stop.
+        return $nodes unless $_node_lines{$_line_id};
+    }
+
     foreach my $link (split /,/,$node->{link}) {
-        push @$nodes, $self->get_node_by_id($link);
+        my $_next_node = $self->get_node_by_id($link);
+
+        if (defined $_line_id) {
+            my %_next_lines = map { uc($_->{id}) => 1 } @{$_next_node->{line}};
+
+            my $_node_restrictions = $self->{_link_lines}->{uc($node_id)};
+            my $_restriction = defined($_node_restrictions) ? $_node_restrictions->{uc($link)} : undef;
+            if (defined $_restriction) {
+                my %_allowed = map { uc($_) => 1 } @$_restriction;
+                next unless $_allowed{$_line_id};
+            }
+            next unless $_next_lines{$_line_id};
+        }
+
+        push @$nodes, $_next_node;
     }
 
     return $nodes;
 }
 
-=head2 get_linked_stations($station_name)
+=head2 get_linked_stations($station_name, $line_name)
 
 Returns a ref to the list of the names of the linked stations from the given
 C<$station_name> as strings.
 
+The C<$line_name> param is optional. If passed, only stations linked via that
+specific line are returned -- this respects any per-edge line restriction set
+via the "A:x" style link syntax, so a link that only physically runs on one
+line will not be listed as reachable via another line the two stations
+otherwise share.
+
 =cut
 
 sub get_linked_stations {
-    my ($self, $station_name) = @_;
+    my ($self, $station_name, $line_name) = @_;
 
-    my $nodes = $self->get_next_stations($station_name);
+    my $nodes = $self->get_next_stations($station_name, $line_name);
     my $linked_stations = [];
     foreach my $node (@$nodes) {
         push @$linked_stations, $node->name;
@@ -875,6 +920,16 @@ sub _get_shortest_route {
             next unless defined $v_node;
 
             my @v_line_ids = map { $_->{id} } @{$v_node->{line}};
+
+            # If this specific edge (u -> v) is restricted to a subset of
+            # lines, only those lines are eligible to "continue" through it.
+            my $_u_restrictions = $self->{_link_lines}->{uc($u)};
+            my $_restriction = defined($_u_restrictions) ? $_u_restrictions->{uc($v)} : undef;
+            if (defined $_restriction) {
+                my %_allowed = map { $_ => 1 } @$_restriction;
+                @v_line_ids = grep { $_allowed{uc($_)} } @v_line_ids;
+            }
+
             my @continuing = grep { $active_set{$_} } @v_line_ids;
 
             my $penalty  = (@continuing == 0) ? $self->line_change_penalty : 0;
@@ -888,7 +943,8 @@ sub _get_shortest_route {
             if (!$visited || $new_cost < $old_cost) {
                 $self->_set_length($v, $new_cost);
                 $self->_set_path($v, $u);
-                my @next = @continuing ? @continuing : $self->_capture_common_lines($u_node, $v_node);
+                my @next = @continuing ? @continuing
+                         : (defined $_restriction ? @v_line_ids : $self->_capture_common_lines($u_node, $v_node));
                 $self->_set_current_lines($v, \@next);
 
                 # Re-queue only if not already waiting in the queue.
@@ -973,6 +1029,7 @@ sub _init_map {
     my $nodes  = {};
     my $tables = {};
     my $_other_links = {};
+    my $_link_lines  = {};
     my $_seen_nodes  = {};
 
     my @caller = caller(0);
@@ -998,6 +1055,41 @@ sub _init_map {
     my $has_station_index = {};
     foreach my $station (@{$data->{stations}->{station}}) {
         my $id = $station->{id};
+
+        # Support per-link line restrictions in the 'link' attribute, e.g.
+        # link="A:x,C" means the link to station A only runs on line 'x',
+        # while the link to C is unrestricted (all lines common between the
+        # two stations apply, as before). Multiple restricted lines for a
+        # single link are pipe-separated, e.g. link="A:x|y,C".
+        # This is fully backward compatible: a plain "A,C" with no colon is
+        # untouched and behaves exactly as it always has.
+        if (defined $station->{link} && $station->{link} =~ /\:/) {
+            my @_clean_links = ();
+            my $_restrictions_for_station = {};
+            foreach my $_raw_link (split /\,/, $station->{link}) {
+                if ($_raw_link =~ /\:/) {
+                    my ($_target, $_line_list) = split /\:/, $_raw_link, 2;
+                    my @_restricted_lines = split /\|/, $_line_list;
+                    foreach my $_rline (@_restricted_lines) {
+                        my $_decoded_rline = _decode_utf8_if_needed($_rline);
+                        unless (exists $master_line_data->{NFC(lc $_decoded_rline)}) {
+                            Map::Tube::Exception::InvalidStationLineId->throw({
+                                method      => $method,
+                                message     => "ERROR: Invalid restricted line [$_rline] for link to [$_target] at station [$id].",
+                                filename    => $caller[1],
+                                line_number => $caller[2] });
+                        }
+                    }
+                    $_restrictions_for_station->{uc($_target)} = [ map { uc(_decode_utf8_if_needed($_)) } @_restricted_lines ];
+                    push @_clean_links, $_target;
+                }
+                else {
+                    push @_clean_links, $_raw_link;
+                }
+            }
+            $station->{link} = join(",", @_clean_links);
+            $_link_lines->{uc($id)} = $_restrictions_for_station;
+        }
 
         Map::Tube::Exception::DuplicateStationId->throw({
             method      => $method,
@@ -1091,6 +1183,7 @@ sub _init_map {
     $self->lines([ values %$lines ]);
     $self->_lines($_lines);
     $self->_other_links($_other_links);
+    $self->_link_lines($_link_lines);
 
     # Populate Node links as ref to Node object
     foreach my $node_id (keys %$nodes) {
@@ -1295,7 +1388,7 @@ sub _set_routes {
 
     my $from  = $_routes->[0];
     my $to    = $_routes->[-1];
-    my $route = Map::Tube::Route->new({ from => $from, to => $to, nodes => $_routes });
+    my $route = Map::Tube::Route->new({ from => $from, to => $to, nodes => $_routes, link_lines => $self->_link_lines });
     push @{$self->{routes}}, $route;
 }
 
@@ -1487,7 +1580,7 @@ L<https://metacpan.org/dist/Map-Tube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2025 Mohammad Sajid Anwar.
+Copyright (C) 2010 - 2026 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

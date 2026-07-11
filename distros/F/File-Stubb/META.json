@@ -59,6 +59,6 @@
          "web" : "https://codeberg.org/1-1sam/stubb"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

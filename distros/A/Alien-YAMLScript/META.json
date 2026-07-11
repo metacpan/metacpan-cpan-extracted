@@ -25,9 +25,9 @@
             "Alien::Build::MM" : "0.25",
             "Alien::Build::Plugin::Download::Negotiate" : "1.30",
             "Config" : "0",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
+            "Mojo::DOM58" : "1.00",
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "URI" : "0",
@@ -70,16 +70,16 @@
          "web" : "https://github.com/yaml/yamlscript"
       }
    },
-   "version" : "v0.2.26",
+   "version" : "v0.2.27",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Download::Negotiate" : "1.30",
             "Config" : "0",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
+            "Mojo::DOM58" : "1.00",
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "URI" : "0",

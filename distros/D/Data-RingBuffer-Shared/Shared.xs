@@ -213,15 +213,21 @@ MODULE = Data::RingBuffer::Shared  PACKAGE = Data::RingBuffer::Shared::Int
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[RING_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    RingHandle *h = ring_create(p, capacity, sizeof(int64_t), RING_VAR_INT, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 4th arg: file mode for a newly-created file-backed segment
+     * (default 0600, owner-only). Pass e.g. 0660 to opt into cross-user
+     * sharing. Ignored for anonymous/existing segments. */
+    UV mv = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? SvUV(ST(3)) : 0600;
+    if (mv & ~(UV)0777) croak("file mode 0%o out of range (max 0777; did you pass the mode as a string?)", (unsigned)mv);
+    mode_t mode = (mode_t)mv;
+    RingHandle *h = ring_create(p, capacity, sizeof(int64_t), RING_VAR_INT, mode, errbuf);
     if (!h) croak("Data::RingBuffer::Shared::Int->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -296,15 +302,20 @@ MODULE = Data::RingBuffer::Shared  PACKAGE = Data::RingBuffer::Shared::F64
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[RING_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    RingHandle *h = ring_create(p, capacity, sizeof(double), RING_VAR_F64, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 4th arg: file mode for a new file-backed segment (default 0600);
+     * pass e.g. 0660 to opt into cross-user sharing. */
+    UV mv = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? SvUV(ST(3)) : 0600;
+    if (mv & ~(UV)0777) croak("file mode 0%o out of range (max 0777; did you pass the mode as a string?)", (unsigned)mv);
+    mode_t mode = (mode_t)mv;
+    RingHandle *h = ring_create(p, capacity, sizeof(double), RING_VAR_F64, mode, errbuf);
     if (!h) croak("Data::RingBuffer::Shared::F64->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:

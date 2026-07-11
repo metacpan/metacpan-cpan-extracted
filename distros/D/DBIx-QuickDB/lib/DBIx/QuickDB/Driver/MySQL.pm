@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000052';
+our $VERSION = '0.000053';
 
 use Capture::Tiny qw/capture/;
 use Carp qw/confess croak/;
@@ -255,6 +255,14 @@ sub _default_config {
             'skip_external_locking'          => '',
             'skip_networking'                => '1',
             'skip_name_resolve'              => '1',
+
+            # The X Plugin (MySQL/Percona 5.7.12+) defaults ON with a GLOBAL
+            # default socket (/tmp/mysqlx.sock) and TCP port (33060), so
+            # concurrent instances contend on shared resources even though
+            # each has its own datadir/socket. The loose- prefix downgrades
+            # the option to a warning on servers without the plugin (MariaDB,
+            # old MySQL) instead of a fatal unknown-variable error.
+            'loose-mysqlx'                   => 'OFF',
             'max_allowed_packet'             => '1M',
             'max_binlog_size'                => '20M',
             'myisam_sort_buffer_size'        => '8M',

@@ -53,6 +53,7 @@ xt/seq_wraparound.t
 xt/stress.t
 xt/timeout_validation.t
 xt/truncation.t
+xt/tsan.t
 xt/valgrind.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

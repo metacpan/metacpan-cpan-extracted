@@ -215,12 +215,13 @@ SHARING ACROSS PROCESSES
         print $a->cardinality, "\n";   # reflects the child's adds
 
 SECURITY
-    The mmap region is writable by all processes that open it, and a
-    reopened file is trusted: validation checks the header geometry but
-    cannot vet every internal container offset against a maliciously crafted
-    file. A hostile file could direct a read to an out-of-range container
-    slot. Do not share backing files with, or reopen files from, untrusted
-    processes.
+    Backing files are created mode 0600 (owner-only) by default; opt in to
+    cross-user sharing by passing a wider file mode as the last argument to
+    "new". Reads and writes bound-check the file-stored container offsets
+    and counts, so reopening a crafted or corrupted backing file cannot
+    drive an out-of-bounds access. A process granted write access to a
+    shared mapping is still trusted not to corrupt the structure while other
+    processes are actively using it.
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with

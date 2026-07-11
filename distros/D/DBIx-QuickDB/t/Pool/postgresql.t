@@ -1,30 +1,22 @@
+use FindBin qw/$Bin/;
+use lib "$Bin/../lib";
+use QDB::Installs qw/run_per_install/;    # before Test2::V0: it loads Test2::IPC
 use Test2::V0;
-use Test2::Tools::QuickDB;
-use File::Spec;
 
-my @ENV_VARS;
+# The parent process must not load DBIx::QuickDB or Test2::Tools::QuickDB;
+# each install's body runs in a forked child that sets $PATH first. See
+# t/lib/QDB/Installs.pm.
+run_per_install(PostgreSQL => sub {
+    # Contaminate the env vars the driver should mask, to prove it does.
+    QDB::Installs::contaminate_env('PostgreSQL');
 
-# Contaminate the ENV vars to make sure things work even when these are all
-# set.
-BEGIN {
-    @ENV_VARS = qw{
-        DBI_USER DBI_PASS DBI_DSN
-        PGAPPNAME PGCLIENTENCODING PGCONNECT_TIMEOUT PGDATABASE PGDATESTYLE
-        PGGEQO PGGSSLIB PGHOST PGHOSTADDR PGKRBSRVNAME PGLOCALEDIR PGOPTIONS
-        PGPASSFILE PGPASSWORD PGPORT PGREQUIREPEER PGREQUIRESSL PGSERVICE
-        PGSERVICEFILE PGSSLCERT PGSSLCOMPRESSION PGSSLCRL PGSSLKEY PGSSLMODE
-        PGSSLROOTCERT PGSYSCONFDIR PGTARGETSESSIONATTRS PGTZ PGUSER
-    };
-    $ENV{$_} = 'fake' for @ENV_VARS;
-}
+    require Test2::Tools::QuickDB;
+    Test2::Tools::QuickDB::skipall_unless_can_db('PostgreSQL');
 
-skipall_unless_can_db('PostgreSQL');
+    no strict 'refs';
+    *{"main::DRIVER"} = sub() { 'PostgreSQL' };
 
-sub DRIVER() { 'PostgreSQL' }
-
-my $file = __FILE__;
-$file =~ s/postgresql\.t$/Pool.pm/;
-$file = File::Spec->rel2abs($file);
-require $file;
+    require "$Bin/Pool.pm";
+});
 
 done_testing;

@@ -1,6 +1,44 @@
 Revision history for Map::Tube
 
-v5.0.1  2026-04-01
+v5.1.0  2026-07-10
+        This release is only possible because of help from @GWS.
+        - A new function has been added that allows for limitations on the
+          links of a station. The station has an attribute called "link,"
+          which now refers to a specific link limited to certain lines.
+          For instance, link="A:x,C" reveals that the link to station A can
+          run only on line "x" even if the stations claim to be using more
+          than one common line. If more than one link is forbidden from
+          operating on one particular line, the lines are separated by pipes
+          like this link="A:x|y,C." The previous links will not change as
+          there are no additional signs. The invalid id will trigger
+          Map::Tube::Exception::InvalidStationLineId.
+
+        - The function get_shortest_route() is updated to accept line
+          limitations of individual links. As a result, a link becomes
+          charged for using a link that travels on a line which is not
+          included in its limitations.
+
+        - get_next_stations() and get_linked_stations now accept an optional
+          $line_name parameter, allowing users to inquire "what is
+          specifically linked to this station on this line" in a way that
+          enforces link-by-link restrictions, as opposed to simply returning
+          all physically linked neighbors regardless of the line.
+
+        - The preferred() method of Map::Tube::Route also considers link
+          restrictions when determining the ride line(s) to display for each
+          segment, in accordance with the cost logic of get_shortest_route()
+          (verifiable via t/02-preferred.t on a map that employs the new
+          syntax).
+
+        - A flaw was fixed that caused an error to occur due to the reading
+          of unset link restriction via chained hash dereferencing. Although
+          this flaw did not affect routing results, it did lead to faulty
+          deep object comparison in Test::Map::Tube's ok_map_routes(), which
+          then resulted in passing spurious test failures on maps that do
+          not even employ the new syntax (stated in t/ok_map_other_link.t
+          and t/ok_map_common_lines.t).
+
+v5.0.1  2026-06-24
         This release is only possible because of help from @GWS.
         - The routing algorithm is line-change-aware now:
           when two candidate routes have the same number of stops, the one

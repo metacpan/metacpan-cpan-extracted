@@ -19,6 +19,10 @@ sub warn {
 	debug(@_);
 }
 
+sub error {
+	error(@_);
+}
+
 sub debug {
 	my $self = shift;
 

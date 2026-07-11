@@ -4,53 +4,30 @@ use warnings;
 use Time::Nanos;
 use v5.16;
 
-my $st = stopwatch(1);
-
-#print "Using Time::Nanos " . $Time::Nanos::VERSION . "\n\n";
 printf("Using %s %s\n\n", color('white', 'Time::Nanos'), color(228, $Time::Nanos::VERSION));
+
+################################################################################
+
+#Time::Nanos::clock_source('monotonic');
+my $st = stopwatch(1);
 
 for (1 .. 4) {
 	my $ns = nanos();
-	printf "Time (monotonic): %s nanoseconds\n", $ns;
+	printf "%s nanoseconds\n", $ns;
 }
 
 print "\n";
 
 for (1 .. 4) {
 	my $us = micros();
-	printf "Time (monotonic): %s microseconds\n", $us;
+	printf "%s microseconds\n", $us;
 }
 
 print "\n";
 
 for (1 .. 4) {
 	my $ms = millis();
-	printf "Time (monotonic): %s milliseconds\n", $ms;
-}
-
-print "\n";
-
-for (1 .. 4) {
-	my ($sec, $nsec) = nanos(1);
-	printf "Time (monotonic): %d.%09d seconds\n", $sec, $nsec;
-}
-
-print "\n";
-
-{
-	local $Time::Nanos::CLOCK = 'realtime';
-
-	for (1 .. 4) {
-		my $ns = nanos();
-		printf "Time (realtime): %s nanoseconds\n", $ns;
-	}
-
-	print "\n";
-
-	for (1 .. 4) {
-		my ($sec, $nsec) = nanos(1);
-		printf "Time (realtime): %d.%09d seconds\n", $sec, $nsec;
-	}
+	printf "%s milliseconds\n", $ms;
 }
 
 my $total = stopwatch();

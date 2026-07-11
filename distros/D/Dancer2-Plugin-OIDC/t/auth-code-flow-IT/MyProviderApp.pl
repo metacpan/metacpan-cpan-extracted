@@ -24,11 +24,12 @@ get('/jwks' => sub {
 post('/token' => sub {
        my $c = shift;
        my ($client_id, $client_secret) = split(':', $c->req->url->to_abs->userinfo);
-       my $grant_type = $c->param('grant_type');
-       my $code       = $c->param('code');
+       my $grant_type    = $c->param('grant_type');
+       my $code          = $c->param('code');
+       my $code_verifier = $c->param('code_verifier');
        if ($grant_type eq 'authorization_code'
-           && $client_id eq 'my_id' && $client_secret eq 'my_secret'
-           && $code eq 'abc') {
+             && $client_id eq 'my_id' && $client_secret eq 'my_secret'
+             && $code eq 'abc' && $code_verifier eq 'fake_code_verifier') {
          $c->render(json => {id_token      => 'my_id_token',
                              access_token  => 'my_access_token',
                              refresh_token => 'my_refresh_token',

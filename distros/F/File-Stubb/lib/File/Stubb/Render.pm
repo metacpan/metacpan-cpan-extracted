@@ -1,6 +1,6 @@
 package File::Stubb::Render;
 use 5.016;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -22,7 +22,8 @@ our $SUBST_TARGET_NAME_RX = qr/[a-zA-Z0-9_]+/;
 my $STDOUT_PATH = '-';
 
 my $SUBST_TARGET_RX = qr{
-    (?<SIGIL> \\? [\?\$!\#])?
+    (?<NONTARGET> (?<!\\)\\\^\^) |
+    (?<SIGIL> (?: \\? [\?\$\#]) | \\\\)?
     \^\^
     \s* (?<TARGET> .*?) \s*
     \^\^
@@ -200,54 +201,69 @@ sub _render_file {
     if ($out eq $STDOUT_PATH) {
         $wh = *STDOUT;
     } else {
-        open $wh, '>', $out
-            or die "Failed to open $out for writing: $!\n";
+        open $wh, '>', $out or do {
+            close $rh;
+            die "Failed to open $out for writing: $!\n";
+        };
     }
     binmode $wh;
 
-    while (my $l = readline $rh) {
-        $l =~ s{($SUBST_TARGET_RX)}{
-            my $m = $1;
-            my %c = %+;
-            my $repl = '';
-            {
-                if (defined $c{ SIGIL } and $c{ SIGIL } =~ /^\\/) {
-                    # Copy escaped sigil
-                    $repl .= substr $c{ SIGIL }, 1, 1;
-                    $m = substr $m, length $c{ SIGIL };
-                }
-                if (not defined $c{ SIGIL } or $c{ SIGIL } =~ /^\\/) {
-                    my ($targ, $def) = split /\s*\/\/\s*/, $c{ TARGET };
-                    if ($targ !~ /^$SUBST_TARGET_NAME_RX$/) {
-                        $repl = $m;
+    my $ln = 0;
+    eval {
+        while (my $l = readline $rh) {
+            $ln++;
+            $l =~ s{($SUBST_TARGET_RX)}{
+                my $m = $1;
+                my %c = %+;
+                my $repl = '';
+                {
+                    if (defined $c{ NONTARGET }) {
+                        $repl = '^^';
                         last;
                     }
-                    $repl .= exists $self->{ Subst }{ $targ }
-                        ? $self->{ Subst }{ $targ }
-                        : $def // $m;
-                } elsif ($c{ SIGIL } eq '?') {
-                    if ($c{ TARGET } !~ /^$SUBST_TARGET_NAME_RX$/) {
-                        $repl = $m;
-                        last;
+                    if (defined $c{ SIGIL } and $c{ SIGIL } =~ /^\\/) {
+                        # Copy escaped sigil
+                        $repl .= substr $c{ SIGIL }, 1, 1;
+                        $m = substr $m, length $c{ SIGIL };
                     }
-                    $repl = exists $self->{ Subst }{ $c{ TARGET } }
-                        ? $self->{ Subst }{ $c{ TARGET } }
-                        : '';
-                } elsif ($c{ SIGIL } eq '$') {
-                    $repl = $self->{ Restricted }
-                        ? $m
-                        : $self->_pl_subst($c{ TARGET });
-                } elsif ($c{ SIGIL } eq '#') {
-                    $repl = $self->{ Restricted }
-                        ? $m
-                        : $self->_qx_subst($c{ TARGET });
-                } elsif ($c{ SIGIL } eq '!') {
-                    $repl = substr $m, 1;
+                    if (not defined $c{ SIGIL } or $c{ SIGIL } =~ /^\\/) {
+                        my ($targ, $def) = split /\s*\/\/\s*/, $c{ TARGET };
+                        if ($targ !~ /^$SUBST_TARGET_NAME_RX$/) {
+                            die "$template line $ln: invalid target\n";
+                        }
+                        $repl .= exists $self->{ Subst }{ $targ }
+                            ? $self->{ Subst }{ $targ }
+                            : $def // $m;
+                    } elsif ($c{ SIGIL } eq '?') {
+                        if ($c{ TARGET } !~ /^$SUBST_TARGET_NAME_RX$/) {
+                            die "$template line $ln: invalid target\n";
+                        }
+                        $repl = exists $self->{ Subst }{ $c{ TARGET } }
+                            ? $self->{ Subst }{ $c{ TARGET } }
+                            : '';
+                    } elsif ($c{ SIGIL } eq '$') {
+                        $repl = $self->{ Restricted }
+                            ? $m
+                            : $self->_pl_subst($c{ TARGET });
+                    } elsif ($c{ SIGIL } eq '#') {
+                        $repl = $self->{ Restricted }
+                            ? $m
+                            : $self->_qx_subst($c{ TARGET });
+                    }
                 }
-            }
-            $repl;
-        }ge;
-        print { $wh } $l;
+                $repl;
+            }ge;
+            print { $wh } $l;
+        }
+    };
+
+    if ($@ ne '') {
+        close $rh;
+        if ($out ne $STDOUT_PATH) {
+            close $wh;
+            unlink $out;
+        }
+        die $@;
     }
 
     close $rh;
@@ -286,7 +302,9 @@ sub _file_targets {
     while (my $l = readline $fh) {
         while (my $m = $l =~ m/($SUBST_TARGET_RX)/g) {
             my %c = %+;
-            if (not defined $c{ SIGIL } or $c{ SIGIL } eq '?' or $c{ SIGIL } =~ /^\\/) {
+            if (defined $c{ NONTARGET }) {
+                next;
+            } elsif (not defined $c{ SIGIL } or $c{ SIGIL } eq '?' or $c{ SIGIL } =~ /^\\/) {
                 my $t = $c{ TARGET } =~ s/\s*\/\/.*$//r;
                 next unless $t =~ /^$SUBST_TARGET_NAME_RX$/;
                 $targets->{ basic }{ $t } = 1;
@@ -717,7 +735,7 @@ requests are welcome!
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

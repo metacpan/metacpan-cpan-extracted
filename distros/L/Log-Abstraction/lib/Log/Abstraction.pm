@@ -1,5 +1,57 @@
 package Log::Abstraction;
 
+# TODO: OpenTelemetry (OTel) Logs backend — not yet implemented.
+#
+# The goal is to route log messages to an OTel collector via
+# OpenTelemetry::Logs::Logger->emit_record(), allowing Log::Abstraction
+# to participate in a unified traces+logs+metrics pipeline.
+#
+# Why it is blocked (last assessed 2026-07-10, OTel Perl v0.033):
+#
+#   1. emit_record() is a no-op stub.  OpenTelemetry::Logs::Logger
+#      contains "method emit_record ( %args ) { }" — every call is
+#      silently discarded.  This has been the case since logs were added
+#      as "experimental" in v0.023 (June 2024).
+#
+#   2. The SDK has no Logs implementation at all.  SDK::Trace::* is
+#      complete (providers, processors, samplers, OTLP exporter), but
+#      there is no SDK::Logs::LogRecord, no Batch/Simple processor, and
+#      no SDK::Logs::LoggerProvider.  OpenTelemetry::Exporter::OTLP::Logs
+#      exists as a module but has no processor pipeline to feed it.
+#
+#   3. The official Log::Any::Adapter::OpenTelemetry has a documented
+#      FIXME: it cannot safely cache the Logger at construction time,
+#      because acquiring a Logger before a real LoggerProvider is
+#      registered returns a no-op that can never be upgraded.  This is
+#      an unresolved architectural issue upstream.
+#
+#   4. is_debug() / is_* detection in the OTel adapter reads
+#      otel_config('LOG_LEVEL'), which is the SDK's own internal
+#      diagnostic level, not the application log level — a semantic bug
+#      that would propagate into any adapter we write on top.
+#
+#   5. The Logs stack depends on Object::Pad (Corinna), adding a
+#      non-trivial dependency and Perl >= 5.26 requirement in practice.
+#
+# When to revisit: watch for OpenTelemetry::SDK::Logs::LogRecord::Processor
+# appearing on CPAN.  That signals the end-to-end SDK pipe is functional.
+# Estimated: late 2026, based on the Trace SDK timeline (~6-9 months after
+# the Trace API stabilised).
+#
+# Implementation sketch (for when the above blockers are resolved):
+#   - Add an 'opentelemetry' sub-key to the HASH logger backend.
+#   - In _log: call otel_logger_provider()->logger()->emit_record(
+#         timestamp       => Time::HiRes::time(),
+#         severity_text   => $level,
+#         severity_number => $OTEL_SEVERITY{$level},
+#         body            => $str,
+#         attributes      => $self->{ctx} ? { ctx => $self->{ctx} } : {},
+#     );
+#   - Map internal levels: trace=1, debug=5, info=9, notice=10,
+#     warn=13, error=17 (OTel SeverityNumber spec, table 5).
+#   - Store the provider reference, not a cached Logger, to survive
+#     provider swaps (workaround for blocker 3 above).
+
 # Enforce strict variable declarations and enable common warnings
 use strict;
 use warnings;
@@ -17,6 +69,12 @@ use Readonly;
 use Readonly::Values::Syslog 0.04;
 use Return::Set;
 use Scalar::Util 'blessed';
+
+# Sub::Private in enforce mode: _-prefixed subs decorated :Private croak when
+# called from outside this package.  HARNESS_ACTIVE bypasses checks during
+# make test so white-box tests can still reach private methods.
+BEGIN { $Sub::Private::config{mode} = 'enforce' }
+use Sub::Private;
 
 # Sys::Syslog imported with bare-function names used in _log
 use Sys::Syslog 0.28;
@@ -67,17 +125,20 @@ Readonly::Scalar my $RE_SAFE_HOST => qr/[^a-zA-Z0-9.\-]/;
 # Regex: a valid TCP port number string (decimal digits only; range checked separately)
 Readonly::Scalar my $RE_PORT => qr/^\d+$/;
 
+# Default path to the journald native-protocol socket on systemd systems
+Readonly::Scalar my $DEFAULT_JOURNALD_SOCKET => '/run/systemd/journal/socket';
+
 =head1 NAME
 
 Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.32
+0.33
 
 =cut
 
-our $VERSION = 0.32;
+our $VERSION = 0.33;
 
 =head1 SYNOPSIS
 
@@ -149,6 +210,15 @@ Format string for file/fd backends.  Tokens expanded at log time:
   %timestamp%   YYYY-MM-DD HH:MM:SS (local time)
   %env_FOO%     value of $ENV{FOO}, or empty string if unset
 
+The special value C<"json"> (not a format string but a magic keyword) switches
+all file and fd backends to emit one compact JSON object per log line:
+
+  {"timestamp":"...","level":"info","message":"...","file":"...","line":42}
+
+This format is compatible with log aggregators such as journald, Loki,
+Elasticsearch, and Splunk.  C<class> is included when the logger is a subclass
+of C<Log::Abstraction>.
+
 B<Security note:> because C<format> may contain C<%env_*%> tokens, avoid
 granting untrusted sources write access to config files that set this key.
 
@@ -168,7 +238,7 @@ One of:
 
 =item * An object -- method matching the level name is called on it
 
-=item * A hash reference -- may contain C<file>, C<array>, C<fd>, C<syslog>, and/or C<sendmail> keys
+=item * A hash reference -- may contain C<file>, C<array>, C<fd>, C<syslog>, C<journald>, and/or C<sendmail> keys
 
 =item * An array reference -- C<{ level, message }> hashrefs are pushed onto it
 
@@ -181,6 +251,22 @@ When not supplied, L<Log::Log4perl> is initialised as the default backend.
 The C<sendmail> sub-hash supports:
 C<host>, C<port>, C<to>, C<from>, C<subject>, C<level>, C<min_interval>.
 At most one email is sent per C<min_interval> seconds per instance.
+
+The C<journald> sub-hash sends each message as a single datagram to the
+systemd journal using the journald native protocol.  Supported keys:
+
+=over 4
+
+=item * C<socket> -- path to the journald socket (default: F</run/systemd/journal/socket>)
+
+=item * C<identifier> -- value for the C<SYSLOG_IDENTIFIER> field (default: basename of C<$0>)
+
+=item * any other key -- included verbatim as an uppercase journald field name
+
+=back
+
+The C<PRIORITY> field is set automatically from the log level (0=emerg...7=debug).
+Delivery failures are silent (C<Carp::carp> only); the application is never crashed by a journald error.
 
 =item * C<script_name>
 
@@ -216,15 +302,15 @@ not supplied.  Loads C<Log::Log4perl> if no logger backend is specified.
 =head4 Input
 
   {
-      carp_on_warn   => { type => BOOLEAN, optional => 1 },
-      config_file    => { type => SCALAR,  optional => 1 },
-      croak_on_error => { type => BOOLEAN, optional => 1 },
+      carp_on_warn   => { type => 'boolean', optional => 1 },
+      config_file    => { type => 'string',  optional => 1 },
+      croak_on_error => { type => 'boolean', optional => 1 },
       ctx            => { optional => 1 },
-      format         => { type => SCALAR,  optional => 1 },
-      level          => { type => SCALAR,  regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
+      format         => { type => 'string',  optional => 1 },
+      level          => { type => 'string',  regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
       logger         => { optional => 1 },
-      script_name    => { type => SCALAR,  optional => 1 },
-      verbose        => { type => BOOLEAN, optional => 1 },
+      script_name    => { type => 'string',  optional => 1 },
+      verbose        => { type => 'boolean', optional => 1 },
   }
 
 =head4 Output
@@ -328,7 +414,7 @@ sub new {
 		}
 	}
 
-	# Normalise $class: handle undef (function call) and blessed (clone) forms
+	# Handle function-call form: Log::Abstraction::new() with no class
 	if(!defined($class)) {
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
@@ -349,7 +435,6 @@ sub new {
 	# Auto-detect script name when syslog backend is requested
 	if($args{'syslog'} && !$args{'script_name'}) {
 		require File::Basename;
-		File::Basename->import() unless File::Basename->can('basename');
 		$args{'script_name'} = File::Basename::basename($ENV{'SCRIPT_NAME'} || $0);
 		croak("$class: syslog needs to know the script name")
 			if(!defined($args{'script_name'}));
@@ -406,8 +491,8 @@ sub new {
 # Exit:         Returns the sanitised scalar, or undef if input was undef.
 # Notes:        Called from _log before every header_set() call.
 # ---------------------------------------------------------------------------
-sub _sanitize_email_header {
-	my $value = $_[0];
+sub _sanitize_email_header :Private {
+	my ($value) = @_;
 
 	return unless defined $value;
 
@@ -433,7 +518,7 @@ sub _sanitize_email_header {
 # Notes:        Blocks the character set <, >, |, *, ?, ;, !, `, $, "
 #               and all C0 control characters, as well as ".." sequences.
 # ---------------------------------------------------------------------------
-sub _validate_file_path {
+sub _validate_file_path :Private {
 	my ($self, $path) = @_;
 
 	# Block ".." path-traversal and all dangerous shell metacharacters
@@ -444,21 +529,74 @@ sub _validate_file_path {
 }
 
 # ---------------------------------------------------------------------------
+# _journald_send -- encode fields and send one datagram to the journald socket
+#
+# Purpose:      Format key=value fields in the journald native protocol and
+#               deliver them as a single Unix-domain SOCK_DGRAM packet.
+# Entry:        $self        -- the logger object (unused but required for
+#                              consistent OOP dispatch; enforces Sub::Private).
+#               $socket_path -- filesystem path of the journald socket.
+#               %fields      -- FIELD_NAME => value pairs; names must be
+#                              uppercase ASCII + digits + underscore.
+# Exit:         Returns nothing.  Croaks on socket or send failure (the caller
+#               wraps every call in eval{} so failures are silent to the app).
+# Side effects: Opens a transient Unix datagram socket, sends, closes.
+# Notes:        Values containing newline or NUL use the binary framing
+#               (field-name NL uint64-LE-length value NL) as specified by
+#               https://systemd.io/JOURNAL_NATIVE_PROTOCOL/.
+#               Values without newlines or NULs use the simpler FIELD=VALUE NL
+#               text format.
+# ---------------------------------------------------------------------------
+sub _journald_send :Private {
+	my ($self, $socket_path, %fields) = @_;
+
+	# Build the datagram payload from all supplied fields
+	my $payload = '';
+	for my $key (sort keys %fields) {
+		my $value = defined($fields{$key}) ? "$fields{$key}" : '';
+		if($value =~ /[\n\0]/) {
+			# Binary framing: field-name LF uint64LE-length value LF
+			$payload .= $key . "\n" . pack('Q<', length($value)) . $value . "\n";
+		} else {
+			$payload .= "$key=$value\n";
+		}
+	}
+
+	# Open a Unix-domain datagram socket, send, and close
+	require Socket;
+	socket(my $sock, Socket::AF_UNIX(), Socket::SOCK_DGRAM(), 0);
+	my $dest = Socket::sockaddr_un($socket_path);
+	send($sock, $payload, 0, $dest);
+	close $sock;
+}
+
+# ---------------------------------------------------------------------------
 # _format_message -- expand a log-format string into a final log line
 #
 # Purpose:      Centralise the repeated format-token substitution so that
 #               file, fd, and scalar-path backends all share one code path.
-# Entry:        $self      -- the logger object (source of 'format' setting).
-#               $level     -- log level string (e.g. 'debug').
-#               $str       -- the already-joined message string.
-#               $use_class -- 1 to include %class% in the default format,
-#                             0 to use the no-class format.
+# Entry:        $self        -- the logger object (source of 'format' setting).
+#               $level       -- log level string (e.g. 'debug').
+#               $str         -- the already-joined message string.
+#               $use_class   -- 1 to include %class% in the default format,
+#                               0 to use the no-class format.
+#               $caller_file -- pre-resolved source file of the logging call.
+#               $caller_line -- pre-resolved source line of the logging call.
 # Exit:         Returns the formatted log line (without trailing newline).
 # Notes:        %env_FOO% tokens are expanded with a // '' fallback so that
 #               missing environment variables expand silently to empty string.
+#               caller_file/caller_line are computed by _log at the correct
+#               stack depth (adjusted for the extra _high_priority frame on
+#               warn/error calls) so the reported location is always the
+#               caller's code, not an internal dispatch frame.
 #
 # Pseudocode:
-#   FUNCTION _format_message(self, level, str, use_class)
+#   FUNCTION _format_message(self, level, str, use_class, caller_file, caller_line)
+#     IF self->{'format'} eq 'json':
+#       Build hash: timestamp, level, message, file=caller_file, line=caller_line
+#                   (+ class if subclass)
+#       RETURN JSON::PP::encode_json(\%hash)   [single compact line]
+#
 #     Choose default format template:
 #       use_class=1 → DEFAULT_FORMAT (includes %class%)
 #       use_class=0 → DEFAULT_FORMAT_NOCLASS
@@ -467,7 +605,7 @@ sub _validate_file_path {
 #     Compute token values:
 #       ulevel    = uc(level)
 #       class     = blessed class if it is a subclass, else '' (base package)
-#       callstack = filename and line number from caller(2)
+#       callstack = caller_file and caller_line
 #       timestamp = strftime 'YYYY-MM-DD HH:MM:SS'
 #
 #     Expand tokens in format string:
@@ -481,12 +619,30 @@ sub _validate_file_path {
 #     RETURN formatted line string
 #   END FUNCTION
 # ---------------------------------------------------------------------------
-sub _format_message {
-	my ($self, $level, $str, $use_class) = @_;
+sub _format_message :Private {
+	my ($self, $level, $str, $use_class, $caller_file, $caller_line) = @_;
 
-	# Select the appropriate default when no custom format is configured
+	my $format = $self->{'format'};
+
+	# 'json' is a magic format value: emit a compact JSON object per line
+	if(defined($format) && ($format eq 'json')) {
+		require JSON::PP;
+		my $bclass = blessed($self);
+		my $class  = ($bclass && $bclass ne __PACKAGE__) ? $bclass : undef;
+		my %obj = (
+			timestamp => strftime('%Y-%m-%d %H:%M:%S', localtime),
+			level     => $level,
+			message   => $str,
+			file      => $caller_file,
+			line      => $caller_line + 0,
+		);
+		$obj{class} = $class if defined($class);
+		return JSON::PP::encode_json(\%obj);
+	}
+
+	# Select the appropriate default when no custom format is configured ('' is falsy)
 	my $default = $use_class ? $DEFAULT_FORMAT : $DEFAULT_FORMAT_NOCLASS;
-	my $format  = $self->{'format'} || $default;
+	$format = $format || $default;
 
 	my $ulevel = uc($level);
 
@@ -494,7 +650,7 @@ sub _format_message {
 	my $bclass = blessed($self);
 	my $class  = ($bclass && $bclass ne __PACKAGE__) ? $bclass : '';
 
-	my $callstack = (caller(2))[1] . ' ' . (caller(2))[2];
+	my $callstack = "$caller_file $caller_line";
 	my $timestamp = strftime '%Y-%m-%d %H:%M:%S', localtime;
 
 	# Expand all recognised tokens in a single pass per token type
@@ -559,9 +715,13 @@ sub _format_message {
 #           Open syslog connection on first use (setlogsock, openlog)
 #           (eval) map level to syslog priority; call Sys::Syslog::syslog;
 #                  carp with Data::Dumper output on failure
+#       IF 'journald' key present:
+#         Map level to syslog PRIORITY integer
+#         Build fields: MESSAGE, PRIORITY, SYSLOG_IDENTIFIER, plus any extra
+#         (eval) _journald_send(socket_path, %fields); carp on failure
 #       IF 'fd' key present:
 #         Format line; print to filehandle
-#       ELSIF no actionable key:
+#       ELSIF no actionable key (no file/array/syslog/sendmail/journald/fd):
 #         CROAK (configuration error)
 #
 #     ELSIF self->{'logger'} is an unblessed scalar (file path):
@@ -581,11 +741,11 @@ sub _format_message {
 #       Format line; print to filehandle
 #   END FUNCTION
 # ---------------------------------------------------------------------------
-sub _log {
+sub _log :Private {
 	my ($self, $level, @messages) = @_;
 
-	# Reject direct calls from outside this package
-	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
+	# Reject direct calls from outside this package (also enforced by :Private)
+	if(!(caller)[0]->isa(__PACKAGE__)) {
 		Carp::croak('Illegal Operation: _log is a private method');
 	}
 
@@ -618,17 +778,23 @@ sub _log {
 		$class = '';
 	}
 
+	# Resolve caller file/line at the correct stack depth.
+	# For trace/debug/info/notice: _log ← public_method ← user → depth=1
+	# For warn/error: _log ← _high_priority ← public_method ← user → depth=2
+	my $depth = ((caller(1))[3] // '') =~ /::_high_priority$/ ? 2 : 1;
+	my $caller_file = (caller($depth))[1];
+	my $caller_line = (caller($depth))[2];
+
 	# -----------------------------------------------------------------------
 	# Dispatch to the configured backend(s)
 	# -----------------------------------------------------------------------
 	if(my $logger = $self->{'logger'}) {
-
 		if(ref($logger) eq 'CODE') {
 			# CODE-ref backend: build the args hashref and invoke the callback
 			my $args = {
 				class   => blessed($self) || __PACKAGE__,
-				file    => (caller(1))[1],
-				line    => (caller(1))[2],
+				file    => $caller_file,
+				line    => $caller_line,
 				level   => $level,
 				message => \@messages,
 			};
@@ -636,11 +802,9 @@ sub _log {
 				$args->{ctx} = $ctx;
 			}
 			$logger->($args);
-
 		} elsif(ref($logger) eq 'ARRAY') {
 			# ARRAY-ref backend: push a simple hashref
 			push @{$logger}, { level => $level, message => $str };
-
 		} elsif(ref($logger) eq 'HASH') {
 			# HASH backend: route to whichever sub-keys are present
 
@@ -648,7 +812,7 @@ sub _log {
 			if(my $raw_file = $logger->{'file'}) {
 				my $file = $self->_validate_file_path($raw_file);
 				my $use_class = ($class ne '') ? 1 : 0;
-				my $line = $self->_format_message($level, $str, $use_class);
+				my $line = $self->_format_message($level, $str, $use_class, $caller_file, $caller_line);
 				# Log failures are silent by design; the app must not crash on I/O errors
 				eval {
 					open(my $fout, '>>', $file);
@@ -772,15 +936,45 @@ sub _log {
 				}
 			}
 
+			# -- journald sub-backend --------------------------------------
+			if(my $jd = $logger->{'journald'}) {
+				# Map internal level name to journald/syslog PRIORITY integer (0=emerg, 7=debug)
+				my $priority  = $syslog_values{$level};
+				my $sock_path = $jd->{'socket'} || $DEFAULT_JOURNALD_SOCKET;
+
+				# Determine the syslog identifier (script name or basename of $0)
+				my $ident = $jd->{'identifier'} || $self->{'script_name'} || do {
+					require File::Basename;
+					File::Basename::basename($0);
+				};
+
+				# Mandatory journald fields
+				my %fields = (
+					MESSAGE           => $str,
+					PRIORITY          => $priority,
+					SYSLOG_IDENTIFIER => $ident,
+				);
+
+				# Include any extra fields from the journald config hash
+				for my $key (keys %{$jd}) {
+					next if lc($key) =~ /^(?:socket|identifier)$/;
+					$fields{uc($key)} = $jd->{$key};
+				}
+
+				# Delivery failures are silent; the app must not crash on log errors
+				eval { $self->_journald_send($sock_path, %fields) };
+				Carp::carp(ref($self), ": journald send failed: $@") if $@;
+			}
+
 			# -- fd sub-backend ---------------------------------------------
 			if(my $fout = $logger->{'fd'}) {
 				my $use_class = ($class ne '') ? 1 : 0;
-				my $line = $self->_format_message($level, $str, $use_class);
+				my $line = $self->_format_message($level, $str, $use_class, $caller_file, $caller_line);
 				print $fout "$line\n";
 
 			} elsif(!$logger->{'file'} && !$logger->{'array'}
 					&& !$logger->{'syslog'} && !exists($logger->{'sendmail'})
-					&& !$logger->{'fd'}) {
+					&& !$logger->{'fd'} && !$logger->{'journald'}) {
 				# Hash logger with no recognised sub-key -- configuration error
 				croak(ref($self), ": Don't know how to deal with the $level message");
 			}
@@ -789,7 +983,7 @@ sub _log {
 			# Scalar-path backend: validate path then append to the file
 			my $safe_path = $self->_validate_file_path($logger);
 			my $use_class = ($class ne '') ? 1 : 0;
-			my $line = $self->_format_message($level, $str, $use_class);
+			my $line = $self->_format_message($level, $str, $use_class, $caller_file, $caller_line);
 			# Log failures are silent by design; the app must not crash on I/O errors
 			eval {
 				open(my $fout, '>>', $safe_path);
@@ -828,7 +1022,7 @@ sub _log {
 	if($self->{'file'}) {
 		my $file = $self->_validate_file_path($self->{'file'});
 		my $use_class = ($class ne '') ? 1 : 0;
-		my $line = $self->_format_message($level, $str, $use_class);
+		my $line = $self->_format_message($level, $str, $use_class, $caller_file, $caller_line);
 		# Log failures are silent by design; the app must not crash on I/O errors
 		eval {
 			open(my $fout, '>>', $file);
@@ -839,7 +1033,7 @@ sub _log {
 
 	if(my $fout = $self->{'fd'}) {
 		my $use_class = ($class ne '') ? 1 : 0;
-		my $line = $self->_format_message($level, $str, $use_class);
+		my $line = $self->_format_message($level, $str, $use_class, $caller_file, $caller_line);
 		print $fout "$line\n";
 	}
 }
@@ -887,7 +1081,7 @@ sub _log {
 #       CARP with warning text
 #   END FUNCTION
 # ---------------------------------------------------------------------------
-sub _high_priority {
+sub _high_priority :Private {
 	my $self  = shift;
 	my $level = shift;    # 'warn' or 'error'
 
@@ -987,7 +1181,7 @@ When setting, updates C<$self-E<gt>{level}>.
 =head4 Input
 
   {
-      level => { type => SCALAR, regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
+      level => { type => 'string', regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
   }
 
 =head4 Output
@@ -1115,7 +1309,7 @@ internal history.
 
 =head4 Output
 
-  { type => 'arrayref', element_type => { level => SCALAR, message => SCALAR } }
+  { type => 'arrayref', element_type => { level => 'string', message => 'string' } }
 
 =cut
 
@@ -1164,7 +1358,7 @@ Appends to the internal message history and dispatches to configured backends.
 
 =head4 Input
 
-  { messages => { type => ARRAYREF | SCALAR } }
+  { messages => { type => [ 'arrayref', 'scalar' ] } }
 
 =head4 Output
 
@@ -1211,7 +1405,7 @@ Appends to the internal message history and dispatches to configured backends.
 
 =head4 Input
 
-  { messages => { type => ARRAYREF | SCALAR } }
+  { messages => { type => [ 'arrayref', 'scalar' ] } }
 
 =head4 Output
 
@@ -1258,7 +1452,7 @@ Appends to the internal message history and dispatches to configured backends.
 
 =head4 Input
 
-  { messages => { type => ARRAYREF | SCALAR } }
+  { messages => { type => [ 'arrayref', 'scalar' ] } }
 
 =head4 Output
 
@@ -1306,7 +1500,7 @@ Appends to the internal message history and dispatches to configured backends.
 
 =head4 Input
 
-  { messages => { type => ARRAYREF | SCALAR } }
+  { messages => { type => [ 'arrayref', 'scalar' ] } }
 
 =head4 Output
 
@@ -1365,9 +1559,9 @@ May call C<Carp::carp> if C<carp_on_warn> is set or no backend is active.
 =head4 Input
 
   # Named form
-  { warning => { type => SCALAR | ARRAYREF } }
+  { warning => { type => [ 'scalar', 'arrayref' ] } }
   # Plain-list form
-  { messages => { type => ARRAYREF } }
+  { messages => { type => 'arrayref' } }
 
 =head4 Output
 
@@ -1419,7 +1613,7 @@ Same as C<warn()> plus optional C<Carp::croak> escalation.
 
 =head4 Input
 
-  { warning => { type => SCALAR | ARRAYREF, optional => 1 } }
+  { warning => { type => [ 'scalar', 'arrayref' ], optional => 1 } }
 
 =head4 Output
 
@@ -1467,7 +1661,7 @@ Same as C<error()>.
 
 =head4 Input
 
-  { warning => { type => SCALAR | ARRAYREF, optional => 1 } }
+  { warning => { type => [ 'scalar', 'arrayref' ], optional => 1 } }
 
 =head4 Output
 
@@ -1605,6 +1799,47 @@ CSV.  To produce CSV rows I<and> send email alerts from the same logger,
 embed both the CSV-write and the mail-send logic inside a single code-ref
 callback as described above.
 
+=head1 LIMITATIONS
+
+=over 4
+
+=item B<Syslog hash mutation>
+
+The C<syslog> sub-hash passed to C<new()> is mutated in-place on the first
+log call: C<facility> and C<level> are temporarily removed before
+C<setlogsock()> is called, then restored; C<server> is permanently renamed
+to C<host>.  Sharing a syslog hashref between two C<Log::Abstraction>
+instances is not supported and produces undefined behaviour on the second
+instance.
+
+=item B<No structured log fields>
+
+All backends except the CODE-ref backend reduce the message to a flat string.
+To log structured key/value pairs, use a CODE-ref backend that formats the
+data itself.
+
+=item B<Single-threaded email throttle>
+
+The C<min_interval> throttle for the C<sendmail> backend and the
+C<_syslog_opened> first-open flag are stored on the object without mutex
+protection.  Under Perl ithreads or other concurrency models, objects shared
+between threads are not safe.
+
+=item B<OpenTelemetry not yet supported>
+
+The OTel Logs SDK for Perl is incomplete; see the TODO block at the top of
+F<lib/Log/Abstraction.pm> for a full status report and the list of blockers.
+Monitor L<https://metacpan.org/pod/OpenTelemetry::SDK> for progress.
+
+=item B<Log::Log4perl is a de-facto required dependency>
+
+When no C<logger>, C<file>, or C<array> backend is configured, C<new()>
+loads L<Log::Log4perl> and uses it as the default backend.  Although listed
+as an optional runtime dependency, it is required in that default-backend
+path.
+
+=back
+
 =head1 AUTHOR
 
 Nigel Horne C<njh@nigelhorne.com>
@@ -1612,6 +1847,11 @@ Nigel Horne C<njh@nigelhorne.com>
 =head1 SEE ALSO
 
 =over 4
+
+=item * L<Log::Any> and L<Log::Any::Adapter::Abstraction>
+
+Route messages from any C<Log::Any>-using CPAN module through
+C<Log::Abstraction> with a single C<Log::Any::Adapter-E<gt>set()> call.
 
 =item * L<Test Dashboard|https://nigelhorne.github.io/Log-Abstraction/coverage/>
 
@@ -1653,9 +1893,9 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
 
 =back
 
-=head2 FORMAL SPECIFICATION
+=head1 FORMAL SPECIFICATION
 
-=head3 new
+=head2 new
 
   ┌─ LogState ──────────────────────────────────────────────────
   │ level    : ℤ
@@ -1683,7 +1923,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ result!.logger   = overrides?.logger ∨ logger
   └─────────────────────────────────────────────────────────────
 
-=head3 level
+=head2 level
 
   ┌─ LevelGet ─────────────────────────────────────────────────
   │ ΞLogState
@@ -1701,7 +1941,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ level' = syslog_values(new_level?)
   └─────────────────────────────────────────────────────────────
 
-=head3 is_debug
+=head2 is_debug
 
   ┌─ IsDebug ──────────────────────────────────────────────────
   │ ΞLogState
@@ -1710,7 +1950,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ result! = (level ≥ syslog_values('debug'))
   └─────────────────────────────────────────────────────────────
 
-=head3 messages
+=head2 messages
 
   ┌─ Messages ─────────────────────────────────────────────────
   │ ΞLogState
@@ -1719,7 +1959,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ result! = messages
   └─────────────────────────────────────────────────────────────
 
-=head3 trace
+=head2 trace
 
   ┌─ Trace ────────────────────────────────────────────────────
   │ ΔLogState
@@ -1730,7 +1970,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ messages' = messages ⌢ ⟨{level ↦ 'trace', message ↦ ⊕(msg?)}⟩
   └─────────────────────────────────────────────────────────────
 
-=head3 debug
+=head2 debug
 
   ┌─ Debug ────────────────────────────────────────────────────
   │ ΔLogState
@@ -1741,7 +1981,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ messages' = messages ⌢ ⟨{level ↦ 'debug', message ↦ ⊕(msg?)}⟩
   └─────────────────────────────────────────────────────────────
 
-=head3 info
+=head2 info
 
   ┌─ Info ─────────────────────────────────────────────────────
   │ ΔLogState
@@ -1752,7 +1992,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ messages' = messages ⌢ ⟨{level ↦ 'info', message ↦ ⊕(msg?)}⟩
   └─────────────────────────────────────────────────────────────
 
-=head3 notice
+=head2 notice
 
   ┌─ Notice ───────────────────────────────────────────────────
   │ ΔLogState
@@ -1763,7 +2003,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ messages' = messages ⌢ ⟨{level ↦ 'notice', message ↦ ⊕(msg?)}⟩
   └─────────────────────────────────────────────────────────────
 
-=head3 warn
+=head2 warn
 
   ┌─ Warn ─────────────────────────────────────────────────────
   │ ΔLogState
@@ -1774,7 +2014,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ messages' = messages ⌢ ⟨{level ↦ 'warn', message ↦ join(msg?)}⟩
   └─────────────────────────────────────────────────────────────
 
-=head3 error
+=head2 error
 
   ┌─ Error ────────────────────────────────────────────────────
   │ ΔLogState
@@ -1786,7 +2026,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ croak_on_error = 1 ⟹ execution_continues = false
   └─────────────────────────────────────────────────────────────
 
-=head3 fatal
+=head2 fatal
 
   fatal ≡ error   (identical operation schema)
 

@@ -28,7 +28,7 @@ WriteMakefile(
         'namespace::autoclean' => '0.28',
         'MIME::Base64'         => '3.14',
         'Map::Tube::Exception' => '3.25',
-        'Map::Tube'            => '4.10',
+        'Map::Tube'            => '5.1.0',
         'Carp'                 => 0,
         'Path::Tiny'           => 0,
         'Encode::Locale'       => '1.05',

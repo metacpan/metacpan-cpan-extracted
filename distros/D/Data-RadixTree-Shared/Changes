@@ -1,4 +1,8 @@
 Revision history for Data-RadixTree-Shared
 
+0.02      2026-07-03
+          - Security and robustness hardening; backing files now created mode
+            0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.01      2026-06-26
           - Initial release.

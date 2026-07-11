@@ -1,7 +1,9 @@
 package Map::Tube::Plugin::Graph;
 
-$Map::Tube::Plugin::Graph::VERSION     = '0.49';
-$Map::Tube::Plugin::Graph::AUTHORITY = 'cpan:MANWAR';
+use version;
+
+our $VERSION   = qv('v1.0.0');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +11,7 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version 0.49
+Version v1.0.0
 
 =cut
 
@@ -105,7 +107,10 @@ Or you can show only two lines using L<Graph/filter_edges>:
 sub as_graph {
   my ($self) = @_;
   my $g = Graph->new(multiedged=>1);
-  my (%station2line, %station2station);
+  my (%station2line, %station2station, %line_name2id);
+  for my $line (@{ $self->lines }) {
+    $line_name2id{$line->name} = $line->id;
+  }
   for my $station (@{ $self->get_stations }) {
     my $from = $station->id;
     @{ $station2line{$from} }{ map $_->name, @{$station->line} } = ();
@@ -118,7 +123,13 @@ sub as_graph {
   for my $from (keys %station2station) {
     my @tos = keys %{$station2station{$from}};
     for my $line (keys %{ $station2line{$from} }) {
-      for my $to_on_line (grep exists $station2line{$_}{$line}, @tos) {
+      my $line_id = $line_name2id{$line};
+      for my $to_on_line (
+        grep {
+          exists $station2line{$_}{$line}
+            && !_line_restricted_out($self, $from, $_, $line_id)
+        } @tos
+      ) {
         # gives false positive for Northern between Waterloo and Bank
         $g->add_edge_by_id($from, $to_on_line, $line);
         delete $station2station{$from}{$to_on_line};
@@ -135,6 +146,23 @@ sub as_graph {
     map +($_->name=>$_->color), @{$self->lines}
   });
   $g;
+}
+
+# Returns true if the map's data says the link from $from to $to is
+# restricted to a subset of lines that does NOT include $line_id -- i.e.
+# the physical link exists, but this particular line doesn't run on it in
+# this direction, even though both stations otherwise share the line.
+# See Map::Tube's "A:x" style link syntax.
+sub _line_restricted_out {
+  my ($self, $from, $to, $line_id) = @_;
+  return 0 unless defined $line_id;
+  my $restrictions = $self->{_link_lines};
+  return 0 unless ref $restrictions eq 'HASH';
+  my $from_restrictions = $restrictions->{uc($from)};
+  return 0 unless defined $from_restrictions;
+  my $allowed = $from_restrictions->{uc($to)};
+  return 0 unless defined $allowed;
+  return !(grep { uc($_) eq uc($line_id) } @$allowed);
 }
 
 =head2 as_png($line_name)
@@ -224,7 +252,7 @@ L<https://metacpan.org/dist/Map-Tube-Plugin-Graph>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2025 Mohammad Sajid Anwar.
+Copyright (C) 2015 - 2026 Mohammad Sajid Anwar.
 
 This program is free software; you can redistribute it and / or modify it under
 the terms of the the Artistic License (2.0). You may obtain a copy of the full

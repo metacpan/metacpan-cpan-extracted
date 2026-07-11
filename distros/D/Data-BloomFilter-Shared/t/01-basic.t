@@ -7,11 +7,11 @@ use Data::BloomFilter::Shared;
 my $bf = Data::BloomFilter::Shared->new(undef, 1000);
 isa_ok $bf, 'Data::BloomFilter::Shared';
 is $bf->capacity, 1000, 'capacity stored';
-is $bf->fp_rate, 0.01, 'default fp_rate is 0.01';
+cmp_ok abs($bf->fp_rate - 0.01), '<', 1e-9, 'default fp_rate is 0.01';
 ok !defined($bf->path), 'anonymous path is undef';
 
 my $bf2 = Data::BloomFilter::Shared->new(undef, 1000, 0.001);
-is $bf2->fp_rate, 0.001, 'explicit fp_rate honored';
+cmp_ok abs($bf2->fp_rate - 0.001), '<', 1e-9, 'explicit fp_rate honored';
 
 # geometry sanity: bits a power of two, k >= 1
 my $bits = $bf->bits;
@@ -170,7 +170,7 @@ unlink $path;
 {
     my $r = Data::BloomFilter::Shared->new($path, 1, 0.5);   # caller args ignored on reopen
     is $r->capacity, 5000, 'reopen: stored capacity wins';
-    is $r->fp_rate, 0.01, 'reopen: stored fp_rate wins';
+    cmp_ok abs($r->fp_rate - 0.01), '<', 1e-9, 'reopen: stored fp_rate wins';
     ok $r->contains("p-1500"), 'reopen: membership persisted';
     my $miss = 0;
     $r->contains("p-$_") or $miss++ for 1 .. 3000;

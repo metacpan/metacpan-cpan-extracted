@@ -3,6 +3,7 @@ package Geo::Coder::Free::Local;
 use strict;
 use warnings;
 
+use Carp;
 use Geo::Location::Point 0.14;
 use Geo::Coder::Free;
 use Geo::StreetAddress::US;
@@ -26,11 +27,11 @@ or by using the app GPSCF which are included here.
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
@@ -86,6 +87,8 @@ sub new
 
 	$params = Object::Configure::configure($class, $params);
 
+	my @data = <DATA>;
+
 	# TODO: since 'hoh' doesn't allow a CODEREF as a key,
 	#	I could build an hoh manually from this aoh,
 	#	it would make searching much quicker
@@ -99,30 +102,28 @@ sub new
 				binary => 1,
 				escape_char => '\\',
 			},
-			string => \join('', grep(!/^\s*(#|$)/, <DATA>))
+			string => \join('', grep(!/^\s*(#|$)/, @data))
 		),
 		%{$params}
 	}, $class;
 
-	# Build the hash-based index
-	foreach my $row (@{ $self->{data} }) {
-		my $key = lc(Geo::Location::Point->new($row)->as_string());
-		$self->{index}{$key} = $row;
+	# Process the data to find geographic centres of location clusters.
+	# This will identify groups with 3+ locations in the same city/state/country,
+	#	thus adding towns/cities to the local database
+	my $towns = _find_geographic_centres(\@data);
+	foreach my $town (@{$towns}) {
+		push @{$self->{data}}, $town;
 	}
 
-	# TODO:  Perhaps the cache can be prepopulated, or stored in less volitile location?
+	# Build the hash-based index
+	foreach my $row (@{$self->{data} }) {
+		my $key = lc(Geo::Location::Point->new($row)->as_string());
+		$self->{'index'}{$key} = $row;
+	}
+
+	# TODO:  Perhaps the cache can be prepopulated, or stored in a less volatile location?
 	# The cache attribute stores normalized location strings as keys and Geo::Location::Point objects as values
 	return $self;
-}
-
-# Helper function to normalize location strings
-sub _normalize_location {
-	my $location = shift;
-
-	$location = lc($location);                 # Convert to lowercase
-	$location =~ s/^\s+|\s+$//g;               # Trim leading and trailing whitespace
-	$location =~ s/\s+/ /g;                    # Collapse multiple spaces
-	return $location;
 }
 
 =head2 geocode
@@ -147,15 +148,15 @@ sub geocode {
 	my $self = shift;
 	my %params;
 
-	# Try hard to support whatever API that the user wants to use
+	# Try hard to support whatever API the user wants to use
 	if(!ref($self)) {
 		if(scalar(@_)) {
 			return(__PACKAGE__->new()->geocode(@_));
 		} elsif(!defined($self)) {
 			# Geo::Coder::Free->geocode()
-			Carp::croak('Usage: ', __PACKAGE__, '::geocode(location => $location|scantext => $text)');
+			Carp::croak('Usage: ', __PACKAGE__, '::geocode(location => $location)');
 		} elsif($self eq __PACKAGE__) {
-			Carp::croak("Usage: $self", '::geocode(location => $location|scantext => $text)');
+			Carp::croak("Usage: $self", '::geocode(location => $location)');
 		}
 		return(__PACKAGE__->new()->geocode($self));
 	} elsif(ref($self) eq 'HASH') {
@@ -164,7 +165,7 @@ sub geocode {
 		%params = %{$_[0]};
 	# } elsif(ref($_[0]) && (ref($_[0] !~ /::/))) {
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: ', __PACKAGE__, '::geocode(location => $location|scantext => $text)');
+		Carp::croak('Usage: ', __PACKAGE__, '::geocode(location => $location)');
 	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
 		%params = @_;
 	} else {
@@ -230,7 +231,7 @@ sub geocode {
 	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', $location);
 
 	my $ap;
-	if(($location =~ /USA$/) || ($location =~ /United States$/)) {
+	if(($location =~ /USA?$/) || ($location =~ /United States$/)) {
 		$ap = $self->{'ap'}->{'us'} // Lingua::EN::AddressParse->new(country => 'US', auto_clean => 1, force_case => 1, force_post_code => 0);
 		$self->{'ap'}->{'us'} = $ap;
 	} elsif($location =~ /(England|Scotland|Wales|Northern Ireland|UK|GB)$/i) {
@@ -339,7 +340,7 @@ sub geocode {
 		}
 	}
 
-	if($location =~ /^(.+?)[,\s]+(United States|USA|US)$/i) {
+	if($location =~ /^(.+?)[,\s]+(United States|USA|USA?)$/i) {
 		# Try Geo::StreetAddress::US, which is rather buggy
 
 		my $l = $1;
@@ -488,6 +489,23 @@ sub geocode {
 		# If we're here, it's not going to be found because the
 		# above parsers will have worked
 		return;
+	}
+
+	require Geo::Address::Parser && Geo::Address::Parser->import() unless Geo::Address::Parser->can('parse');
+
+	my $addr_parser = Geo::Address::Parser->new(country => 'UK');
+	if(my $fields = $addr_parser->parse($location)) {
+		for my $key (keys %{$fields}) {
+			delete $fields->{$key} unless defined $fields->{$key};
+		}
+		if(my $rc = $self->_search($fields, keys %{$fields})) {
+			$rc->{'country'} = 'UK';
+
+			# Store the result in the cache for future requests
+			$self->{cache}{$lc} = $rc;
+
+			return $rc;
+		}
 	}
 
 	# Finally try libpostal,
@@ -672,12 +690,12 @@ sub _search
 
 		foreach my $column(@columns) {
 			if(defined($data->{$column})) {
-				# ::diag("$column: ", $row->{$column}, '/', $data->{$column});
-				# print "$column: ", $row->{$column}, '/', $data->{$column}, "\n";
 				if(!defined($row->{$column})) {
 					$match = 0;
 					last;
 				}
+				# ::diag("$column: ", $row->{$column}, '/', $data->{$column});
+				# print "$column: ", $row->{$column}, '/', $data->{$column}, "\n";
 				if(uc($row->{$column}) ne uc($data->{$column})) {
 					$match = 0;
 					last;
@@ -811,6 +829,158 @@ Does nothing, here for compatibility with other geocoders
 sub ua {
 }
 
+# find_geographic_centres($csv_data)
+#
+# Helper function that processes CSV geographic data to find centres of location clusters.
+# Takes a string containing CSV data with headers and analyzes it to find groups of
+# 3 or more locations in the same city/state/country combination. For each qualifying
+# group, it calculates the geographic centre and prints the results.
+#
+# Parameters:
+#   $csv_data - String containing complete CSV data including header row
+#
+# Processing steps:
+#   1. Parses CSV header to get field names
+#   2. Parses each data row into location hash objects
+#   3. Validates that coordinates are numeric
+#   4. Groups locations by city/state/country key
+#   5. For groups with 3+ locations, calculates and prints centre coordinates
+#
+sub _find_geographic_centres
+{
+	my $csv_data = $_[0];
+
+	# Parse CSV data into an array of hashes
+	# my @lines = split /\n/, $csv_data;
+	my @lines = @{$csv_data};
+
+	return if(scalar(@lines) == 0);
+
+	my $header = shift @lines;
+
+	# Remove quotes from header and split
+	$header =~ s/"//g;
+	chomp $header;
+	my @fields = split /,/, $header;
+
+	my @locations = ();
+
+	# Parse each data line
+	foreach my $line (@lines) {
+		next if $line =~ /^\s*$/;	# Skip empty lines
+		chomp $line;
+
+		# Simple CSV parsing - handles quoted fields
+		my @values = ();
+		my $current_field = '';
+		my $in_quotes = 0;
+
+		for my $char (split //, $line) {
+			if ($char eq '"') {
+				$in_quotes = !$in_quotes;
+			} elsif ($char eq ',' && !$in_quotes) {
+				push @values, $current_field;
+				$current_field = '';
+			} else {
+				$current_field .= $char;
+			}
+		}
+		push @values, $current_field;	# Don't forget the last field
+
+		# Create location hash
+		my %location = ();
+		for my $i (0..$#fields) {
+			$location{$fields[$i]} = $values[$i] || '';
+		}
+
+		# Only include locations with valid coordinates
+		if($location{latitude} && $location{longitude} &&
+		   ($location{latitude} =~ /^-?\d+\.?\d*$/) &&
+		   ($location{longitude} =~ /^-?\d+\.?\d*$/)) {
+			push @locations, \%location;
+		}
+	}
+
+	# Group locations by city, state, country
+	my %groups = ();
+
+	foreach my $loc (@locations) {
+		my $key = join('|', $loc->{city}, $loc->{state}, $loc->{country});
+		push @{$groups{$key}}, $loc;
+	}
+
+	my $rc;
+
+	# Process groups with 3 or more locations
+	foreach my $group_key (keys %groups) {
+		my $locations_ref = $groups{$group_key};
+
+		if (@$locations_ref >= 3) {
+			my ($city, $state, $country) = split /\|/, $group_key;
+
+			# Calculate geographic centre
+			my ($centre_lat, $centre_lon) = _calculate_centre($locations_ref);
+
+			# printf("Center of %d locations in %s, %s, %s: %.6f, %.6f\n",
+				 # scalar(@$locations_ref), $city, $state, $country,
+				 # $centre_lat, $centre_lon);
+
+			push @{$rc}, {
+				'city' => $city,
+				'state' => $state,
+				'country' => $country,
+				'lat' => $centre_lat,
+				'latitude' => $centre_lat,
+				'longitude' => $centre_lon,
+				'long' => $centre_lon,
+				'lng' => $centre_lon
+			};
+		}
+	}
+
+	return $rc;
+}
+
+# _calculate_centre($locations_ref)
+#
+# Helper funcation that calculates the geographic centre (centroid) of a group of locations using
+# the arithmetic mean method to 6 decimal places. This works well for small geographic areas but
+# may be less accurate for locations spread over large distances due to
+# Earth's curvature.
+#
+# Parameters:
+#   $locations_ref - Reference to array of location hash objects, each containing
+#                   latitude and longitude fields
+#
+# Returns:
+#   ($centre_lat, $centre_lon) - Two-element list containing the calculated
+#                               centre coordinates as decimal degrees
+#
+# Algorithm:
+#   - Sums all latitude values and divides by count
+#   - Sums all longitude values and divides by count
+#   - Returns the arithmetic mean of both coordinates
+sub _calculate_centre
+{
+	my $locations_ref = $_[0];
+
+	my $total_lat = 0;
+	my $total_lon = 0;
+	my $count = 0;
+
+	foreach my $loc (@$locations_ref) {
+		$total_lat += $loc->{latitude};
+		$total_lon += $loc->{longitude};
+		$count++;
+	}
+
+	# Round to 6 decimal places
+	my $centre_lat = sprintf('%.6f', $total_lat / $count);
+	my $centre_lon = sprintf('%.6f', $total_lon / $count);
+
+	return ($centre_lat, $centre_lon);
+}
+
 =head1 AUTHOR
 
 Nigel Horne <njh@bandsman.co.uk>
@@ -830,14 +1000,14 @@ they should be read in from somewhere else to make it easier for non-authors to 
 Copyright 2020-2024 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
-All other users (including Commercial, Charity, Educational, Government)
+All other users (including Commercial, Charity, Educational, and Government)
 must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
 
 =cut
 
 1;
 
-# Ensure you use abbreviations, e.g. RD not ROAD
+# Ensure you use abbreviations, e.g., RD not ROAD
 __DATA__
 "name","number","road","city","state_district","state","country","latitude","longitude"
 "ST ANDREWS CHURCH",,"CHURCH HILL","EARLS COLNE",,"ESSEX","GB",51.926793,0.70408
@@ -854,7 +1024,7 @@ __DATA__
 "TOBY CARVERY",,"NEW HAINE RD","RAMSGATE",,"KENT","GB",51.357510,1.388894
 "",,"WESTCLIFF PROMENADE","RAMSGATE",,"KENT","GB",51.32711,1.406806
 "TOWER OF LONDON",35,"TOWER HILL","LONDON",,"LONDON","GB",51.5082675,-0.0754225
-"",5350,"CHILLUM PLACE NE","WASHINGTON",,"DC","US",38.955403,-76.996241
+"",5350,"CHILLUM PL NE","WASHINGTON",,"DC","US",38.955403,-76.996241
 "WALTER E. WASHINGTON CONVENTION CENTER",801,"MT VERNON PL NW","WASHINGTON","","DC","US",38.904022,-77.023113
 "",7,"JORDAN MILL COURT","WHITE HALL","BALTIMORE","MD","US",39.6852333333333,-76.6071166666667
 "ALL SAINTS EPISCOPAL CHURCH",203,"E CHATSWORTH RD","REISTERSTOWN","BALTIMORE","MD","US",39.467270,-76.823947
@@ -896,7 +1066,7 @@ __DATA__
 "",9411,"WARREN ST","SILVER SPRING","MONTGOMERY","MD","US",39.010447,-77.048548
 "SILVER DINER",12276,"ROCKVILLE PK","ROCKVILLE","MONTGOMERY","MD","US",39.05798753,-77.12165374
 "",1605,"VIERS MILL RD","ROCKVILLE","MONTGOMERY","MD","US",39.07669788,-77.12306436
-"",1406,"LANGBROOK PLACE","ROCKVILLE","MONTGOMERY","MD","US",39.075583,-77.123833
+"",1406,"LANGBROOK PL","ROCKVILLE","MONTGOMERY","MD","US",39.075583,-77.123833
 "",2225,"FOREST GLEN RD","SILVER SPRING","MONTGOMERY","MD","US",39.015394,-77.048357
 "BP",2601,"FOREST GLEN RD","SILVER SPRING","MONTGOMERY","MD","US",39.0147541,-77.05466857
 "OMEGA STUDIOS",12412,,"ROCKVILLE","MONTGOMERY","MD","US",39.06412645,-77.11252263
@@ -922,6 +1092,7 @@ __DATA__
 "",14900,"CONFERENCE CENTER DR","CHANTILLY","FAIRFAX","VA","US",38.873934,-77.461939
 "THE PURE PASTY COMPANY",128C,"MAPLE AVE W","VIENNA","FAIRFAX","VA","US",44.40662476,-68.59610059
 "DIRT FARM BREWERY",18701,"FOGGY BOTTOM RD","BLUEMONT","LOUDON","VA","US",39.099655,-77.836975
+"",404,"BRINDLEY PL SW","LEESBURG","LOUDOUN","VA","US",39.092207,-77.591987
 "",818,"FERNDALE TERRACE NE","LEESBURG","LOUDOUN","VA","US",39.124843,-77.535445
 "",,"OATLANDS PLANTATION LN","OATLANDS","LOUDOUN","VA","US",39.04071,-77.61682
 "",,"PURCELLVILLE GATEWAY DR","PURCELLVILLE","LOUDOUN","VA","US",39.136193,-77.693198

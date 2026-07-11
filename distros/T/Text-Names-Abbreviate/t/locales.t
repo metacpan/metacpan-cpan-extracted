@@ -87,7 +87,10 @@ subtest 'country sanity: FR -- accented characters' => sub {
 };
 
 subtest 'country sanity: DE -- umlauts preserved' => sub {
-	is(abbreviate('Johann Wolfgang von Goethe'), 'J. W. v. Goethe', 'DE: particle treated as token');
+	is(abbreviate('Johann Wolfgang von Goethe'), 'J. W. von Goethe',
+		'DE: von absorbed into last name by default');
+	is(abbreviate('Johann Wolfgang von Goethe', { particles => 0 }), 'J. W. v. Goethe',
+		'DE: particles=0 treats von as middle-name token');
 	done_testing();
 };
 

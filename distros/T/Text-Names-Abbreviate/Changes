@@ -1,5 +1,42 @@
 Revision history for Text-Names-Abbreviate
 
+0.04	Fri Jul 10 20:18:12 EDT 2026
+	[ Enhancements ]
+	- Unicode NFC normalisation: _normalize_name() now calls
+	  Unicode::Normalize::NFC() before any processing. Strings that differ only
+	  in normalisation form (e.g. precomposed vs. combining-accent forms of the
+	  same character) now produce identical output. Unicode::Normalize is a Perl
+	  core module (no new dependency).
+	- Surname particle detection: abbreviate() gains a new optional 'particles'
+	  parameter. Lowercase tokens immediately before the last name that appear in
+	  a built-in list (van, de, di, da, von, der, den, des, du, la, le, las, los,
+	  el, al, te, ten, ter, af, av, bin, bint, ibn, y, do, dos, das, del, zu, zum,
+	  zur) are absorbed into the last-name component rather than treated as
+	  middle-name initials. Omit the param or pass 1 to use the built-in list,
+	  pass 0 to disable, or pass an arrayref of strings to supply a custom list.
+	  Matching is case-sensitive: capitalised tokens (Van, De) are not absorbed.
+	[ Tests ]
+	- t/unit.t, t/function.t: added use utf8 (required for non-ASCII string
+	  literals); added 7 particle subtests and 4 Unicode subtests in unit.t;
+	  added 7 _extract_parts particle subtests and 2 Unicode normalisation
+	  subtests in function.t; updated _extract_parts spy test to include the
+	  particles argument; added two forwarding subtests for the default and
+	  custom particle lists.
+	- t/locales.t: updated DE name test to expect 'J. W. von Goethe' (von now
+	  absorbed); added particles => 0 variant to document the old token behaviour.
+	- t/edge_cases.t: added Section 4b with hostile particles option inputs
+	  (string and hashref rejected; undef and empty-list accepted).
+	- t/integration.t: added Section 13 with particle pipeline and statefulness
+	  integration tests, including a Unicode + particle combined case.
+	[ Documentation ]
+	- Added 'particles' to Args, API SPECIFICATION, MESSAGES, PSEUDOCODE, and
+	  FORMAL SPECIFICATION in module POD.
+	- Updated LIMITATIONS to document case-sensitivity of particle matching,
+	  the compact/initials + last_first initial behaviour for particle-inclusive
+	  last names, and the NFC normalisation guarantee.
+	- Updated SYNOPSIS with particle and Unicode examples.
+	- Updated CLAUDE.md: Architecture, Known pitfalls, and test-table entries.
+
 0.03	Sun Jun 21 07:08:25 EDT 2026
 	[ Enhancements ]
 	- Extract _normalize_name and _extract_parts as private helpers

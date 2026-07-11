@@ -1,5 +1,26 @@
 Revision history for Geo-Coder-Free
 
+0.42	Fri Jul 10 11:48:02 EDT 2026
+	Try Geo::Address::Parser before libpostal() as that uses less memory
+	createdatabase.PL - borough parent lookup now uses locality_id from hierarchy to skip intermediate boroughs
+	createdatabase.PL - File::Find glob fallback replaced with a pre-built ID->path index, eliminating per-miss tree scans
+	createdatabase.PL - fix WhosonFirst index building regex broken by no_chdir => 1
+	createdatabase.PL - catch XML parse errors in corrupt OSM files and continue to next file
+	createdatabase.PL - eval scope narrowed to re-throw non-XML exceptions (business-logic die was silently swallowed)
+	createdatabase.PL - XML::LibXML::Reader constructor moved inside eval so reader-open failures skip the file
+	createdatabase.PL - $inserts reset per OSM file to prevent cross-file flush accounting errors
+	createdatabase.PL - fix warn inside eval calling ->document->toString(1) which could throw on corrupt documents
+	createdatabase.PL - fix operator precedence in DEBUG&DEBUG_GET_WOF && $filename debug print
+	createdatabase.PL - add -f guard to WhosonFirst index builder to skip directories matching *.geojson pattern
+	Local: Added _find_geographic_centres to add towns to the database where more than 3 places are known
+	Improve handling of Australian states
+	Ensure known_places are all loaded
+	Don't put spaces in digest, helps to find known_places match
+	Added test dashboard
+	Updated from upstream VWF
+	Openstreetmap now uses PBF files
+	createdatabase.PL - l1_cache is now an LRU cache
+
 0.41	Mon Jul  7 13:45:41 EDT 2025
 	Use Object::Configure
 	Attempt improvement on EXT4

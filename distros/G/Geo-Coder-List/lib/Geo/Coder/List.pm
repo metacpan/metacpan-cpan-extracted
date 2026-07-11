@@ -23,11 +23,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.37
+Version 0.38
 
 =cut
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 # ── Module-level constants (not user-configurable) ────────────────────────────
 
@@ -302,6 +302,10 @@ sub geocode {
 	# Params::Get enforces 'location'; calling geocode() with no args causes
 	# get_params itself to croak with "Usage:" matching t/carp.t expectations
 	my $params = Params::Get::get_params('location', @_);
+	if(!defined($params)) {
+		$self->_error(__PACKAGE__, ' usage: geocode(location => $location)');
+		return;
+	}
 
 	my $location = $params->{'location'};
 

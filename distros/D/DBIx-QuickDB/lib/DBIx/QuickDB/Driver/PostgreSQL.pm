@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000052';
+our $VERSION = '0.000053';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults env_timeout/;
@@ -103,6 +103,14 @@ sub _default_config {
     my $self = shift;
 
     return (
+        # QuickDB databases are short-lived test instances: autovacuum buys
+        # nothing, and on PostgreSQL <= 14 its launcher can stall shutdown for
+        # PGSTAT_MAX_WAIT_TIME (10s) waiting on the stats collector ("using
+        # stale statistics instead of current ones because stats collector is
+        # not responding"), which made stop() blow the whole stop grace and
+        # get escalated. Consumers who need it can override.
+        autovacuum                 => "off",
+
         datestyle                  => "'iso, mdy'",
         default_text_search_config => "'pg_catalog.english'",
         lc_messages                => "'en_US.UTF-8'",
@@ -142,6 +150,14 @@ sub viable {
 
     if ($spec->{autostart}) {
         push @bad => "'postgres' command is missing, needed for autostart" unless $check{postgres} && -x $check{postgres};
+    }
+
+    # PostgreSQL's initdb and postgres flatly refuse to run as root (geteuid()
+    # == 0), and there is no override flag; running as root manifests as a start
+    # timeout otherwise. This check is Unix-only, mirroring initdb's own
+    # #ifndef WIN32 guard. Only bootstrap/autostart spawn those binaries.
+    if (($spec->{bootstrap} || $spec->{autostart}) && $^O ne 'MSWin32' && $> == 0) {
+        push @bad => "PostgreSQL's initdb and postgres refuse to run as root (EUID 0); run as an unprivileged user";
     }
 
     if ($spec->{load_sql}) {

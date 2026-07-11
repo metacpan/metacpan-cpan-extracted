@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v5.0.1');
+our $VERSION   = qv('v5.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube::Cookbook - Cookbook for Map::Tube library.
 
 =head1 VERSION
 
-Version v5.0.1
+Version v5.1.0
 
 =cut
 
@@ -26,7 +26,7 @@ Cookbook for L<Map::Tube> library.
 
 =head1 CREATE A MAP
 
-C<Map::Tube v3.22> or above now supports map data in XML and JSON format. Here is
+C<Map::Tube v3.22> or above supports map data in XML and JSON format. Here is
 the structure of a map in XML format:
 
     <?xml version="1.0" encoding="UTF-8"?>
@@ -139,10 +139,11 @@ an attribute C<other_link>.
     |            | by ",". For example, "Red:9,Green:16".                        |
     |            | The lines are referenced by id, not by name.                  |
     |            |                                                               |
-    | link       | Represents all linked stations to this station, e.g. "B04"    |
+    | link       | Represents all stations linked to this station, e.g. "B04".   |
     |            | If it is linked to more than one station, they should all be  |
     |            | listed, separated by ",". For example, "B04,B02".             |
-    |            | The stations are referenced by id, not by name.               |
+    |            | The stations are referenced by id, not by name. See below     |
+    |            | for how to restrict links to specific lines.                  |
     |            |                                                               |
     | other_link | This attribute is optional. This is useful if the station is  |
     |            | linked via some other form of link and not by any of the      |
@@ -278,55 +279,67 @@ terminology, which straightforwardly translates into JSON.)
 
 =item * The value of the C<line> attribute MUST be a list of one or more I<line-spec>s. If there
         is more than one I<line-spec>, they MUST be separated by commas (","). Lines MUST NOT
-        be named more than once in any station's C<line> attribute.
+        be named more than once in any station's I<line-spec>s.
 
 =item * A I<line-spec> MUST consist of a defined line C<id>, which MAY be followed by a colon
         (":") and a positive integer. The line C<id> signifies a line serving this station. If the
-        extended form is used, the integer signifies the position of this station on the line.
-        Typically, the station at one (arbitrarily chosen) end will be denoted by 1, the next one
-        by 2, etc. The numbers NEED NOT be consecutive, but they MUST be in strictly increasing
-        order.
+        extended form (with colon) is used, the integer signifies the position of this station on
+        the line. Typically, the station at one (arbitrarily chosen) end will be denoted by 1, the
+        next one by 2, etc. The numbers NEED NOT be consecutive, but they MUST be in strictly
+        increasing order.
 
 =item * Each line MUST either throughout use the extended I<line-spec> form or the short form.
         Any given line MUST NOT use the extended form at some stations and the short form at
         others. However, different lines MAY differ in this respect from each other.
 
-=item * The value of the C<link> attribute MUST be a list of one or more defined station C<id>s.
-        If there is more than one station, they MUST be separated by commas (","). Stations MUST
-        NOT be named more than once in any station's C<link> attribute.
+=item * The value of the C<link> attribute MUST be a list of one or more I<link-spec>s. If there is
+        more than one I<link-spec>, they MUST be separated by commas (","). Stations MUST
+        NOT be named more than once in any station's I<link-spec>s.
 
-=item * For each line named by a station's C<line> attribute, at least one of the stations named
-        in its C<link> atttribute MUST also name this line in its C<line> attribute.
+=item * A I<link-spec> MUST consist of a defined station C<id>, which MAY be followed by a colon
+        (":") and one or more line C<id>s, separated from each other by vertical bars ("|"). To
+        explain, assume we are looking at the C<< <station> >> element for some station I<A>, and
+        assume one of it's I<link-spec>s names a station I<B>. In the simple form (without colon),
+        it is assumed that all lines shared by stations I<A> and I<B> will connect station I<A> to
+        station I<B>. In the restricted form (with colon), only the lines that are named in the
+        I<link-spec> for station I<B> will be assumed to connect station I<A> to station I<B>.
+        Simple and restricted I<line-spec>s MAY be intermixed freely. The restricted form is useful
+        (and necessary) only in very special circumstances.
 
-=item * For each station named in a station's C<link> attribute there MUST be at least one line
-        named in both these stations' C<line> attributes.
+=item * Any line C<id> named in a restricted I<link-spec> of a station MUST also be named in this
+        station's I<line-spec>s.
 
-=item * If a station (say, with C<id> I<A>) names a station (say, with C<id> I<B>) in its C<link>
-        attribute I<and> vice-versa, this is called a I<bidirectional> link, otherwise it is
+=item * For each line named in a station's I<line-spec>s, at least one of the stations named in its
+        I<link-spec>s MUST also name this line in its I<line-spec>s.
+
+=item * For each station named in a station's C<link-spec>s there MUST be at least one line named
+        in both these stations' I<line-spec>s.
+
+=item * If a station (say, with C<id> I<A>) names a station (say, with C<id> I<B>) in its
+        I<link-spec>s I<and> vice-versa, this is called a I<bidirectional> link, otherwise it is
         called a I<unidirectional> link.
 
 =item * The value of the C<other_link> attribute, if present, MUST be a list of one or more
-        I<other-link-spec>s. If there is more than one C<other-link-spec>, they MUST be separated
+        I<other-link-spec>s. If there is more than one I<other-link-spec>, they MUST be separated
         by commas (","). An I<other-link-spec> describes a non-tube connection between two
         different stations, usually through some passageway, tunnel or escalator link.
 
-=item * An C<other-link-spec> MUST consist of an identifier, followed by a colon (":"), followed
+=item * An I<other-link-spec> MUST consist of an identifier, followed by a colon (":"), followed
         by the C<id> of a defined station. The identifier doubles as both an id (in that it
         uniquely identifies an entity) and a name (in that it may be displayed to end users).
         As such, it SHOULD follow the rules for line C<id>s. The identifier MAY be the C<id> of
-        a defined line. Any line C<id>  MUST NOT come up both in some station's C<line> attribute
-        I<and> in some (possibly different) station's C<other_link> attribute.
+        a defined line. Any line C<id>  MUST NOT come up both in some station's CI<link-spec>s
+        I<and> in some (possibly different) station's I<other-link-spec>s.
 
-=item * A station MAY be named both in another station's C<link> and its C<other_link> attributes,
+=item * A station MAY be named both in another station's I<link-spec>s and its I<other-link-spec>s,
         although this is unusual.
 
-=item * For each C<other-link-spec> at some station (say, with C<id> I<A>) that names another
-        station (say, with C<id> I<B>), there MUST be a corresponding C<other-link-spec> at
+=item * For each I<other-link-spec> at some station (say, with C<id> I<A>) that names another
+        station (say, with C<id> I<B>), there MUST be a corresponding I<other-link-spec> at
         station I<B> that uses the same identifier and names station I<A>. (In other words,
-        C<other-link-spec>s MUST come in pairs, making all such connections bidirectional.)
+        I<other-link-spec>s MUST come in pairs, making all such connections bidirectional.)
 
-=item * A station MUST NOT name itself in its C<link> attribute nor in its C<other_link>
-        atttribute.
+=item * A station MUST NOT name itself in its I<link-spec>s nor in its I<other-link-spec>s.
 
 =item * Usually, lines are I<connected> in the sense that any station on a given line is
         reachable from each other station on the same line. However, this is not required.
@@ -376,9 +389,9 @@ with
 
 =head1 MAP GRAPH
 
-To print the entire map or just a particular line map, just install the
-plugin L<Map::Tube::Plugin::Graph> and you have all the tools to create
-map image.
+For a graphical representation of the entire map or just a particular line map,
+just install the plugin L<Map::Tube::Plugin::Graph>, and you have all the tools
+to create a map image.
 
     use strict; use warnings;
     use MIME::Base64;
@@ -394,7 +407,7 @@ map image.
 =head1 FUZZY FIND
 
 To enable the fuzzy search ability to the sample map, you would need to
-install L<Map::Tube::Plugin::FuzzyFind> and you have everything you need
+install L<Map::Tube::Plugin::FuzzyFind>, and you have everything you need
 to perform the task.
 
     use strict; use warnings;
@@ -541,11 +554,10 @@ L<https://github.com/manwar/Map-Tube>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-map-tube at
-rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube>. I will be
-notified and then you'll automatically be notified of progress on your
-bug as I make changes.
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/manwar/Map-Tube/issues>. I will be notified and
+then you'll automatically be notified of progress on your bug as I make
+changes.
 
 =head1 SUPPORT
 
@@ -573,7 +585,7 @@ L<https://metacpan.org/dist/Map-Tube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2025 Mohammad Sajid Anwar.
+Copyright (C) 2010 - 2026 Mohammad Sajid Anwar.
 
 This  program  is  free software;  you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You  may obtain a copy of the full

@@ -28,6 +28,6 @@ my $long_path = "$dir/" . join("/", ($long_seg) x 20);   # ~4KB
 
 my $p3 = eval { Data::Pool::Shared->new($long_path, 1, 8) };
 ok !$p3, "4KB path rejected cleanly";
-like $@, qr/open|too long|name too|ENAMETOOLONG/i, "meaningful error";
+like $@, qr/open|create|too long|name too|ENAMETOOLONG/i, "meaningful error";
 
 done_testing;

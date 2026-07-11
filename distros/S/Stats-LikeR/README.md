@@ -614,7 +614,7 @@ Add new columns to a data frame, computed from the columns already there — or 
   - **AoH** — arrayref of row hashrefs: `[ {weight=>70, height=>1.75}, ... ]`
   - **HoA** — hashref of column arrayrefs: `{ weight=>[70,...], height=>[1.75,...] }`
   - **HoH** — hashref of row hashrefs, keyed by row name: `{ Alice=>{weight=>65}, ... }`
-- **`new_name => VALUE`** — one or more pairs. `VALUE` is either a **coderef** (computed) or an **arrayref** (a ready-made column).
+- **`new_name => VALUE`** — one or more pairs. `VALUE` is a **coderef** (computed from the row), an **arrayref** (a ready-made column), or a **`map_cell { ... }`** block (an in-place edit of the named column — see below).
 
 It changes `$df` in place and also returns it (handy for chaining).
 
@@ -638,11 +638,34 @@ Pass a column you already have and it is copied in:
 
 This is also how you install a computed *list* when you'd otherwise trip the "single arrayref = one cell" rule above.
 
+### In-place edits with `map_cell`
+A plain coderef stores its **return value**, so an in-place transform of an existing column means the "copy, edit, return" dance — and `s///r` isn't available on the older perls this module supports:
+
+    # awkward: copy to $v, edit $v, return $v
+    assign($df, 'Res.' => sub { (my $v = $_->{'Res.'}) =~ s/^[A-Z]://; $v });
+
+`map_cell { ... }` removes the ceremony. Inside the block, **`$_` is the named column's current cell** (not the whole row), the block's return value is **ignored**, and the modified `$_` is stored back:
+
+    use Stats::LikeR;   # exports map_cell alongside assign
+
+    assign($df, 'Res.' => map_cell { s/^[A-Z]:// });   # strip a leading "X:"
+    assign($df, 'Res.' => map_cell { $_ = uc });        # upper-case in place
+
+The row is still reachable as **`$_[0]`** for sibling columns, the index as **`$_[1]`**, and (HoH only) the row key as **`$_[2]`**:
+
+    assign($df, label => map_cell { $_ = "$_[0]{name} ($_[1])" });
+
+Notes:
+- **Undef cells pass through untouched** (undef in → undef out). The block never runs on an undefined or missing cell, so `s///` and friends don't warn on uninitialized values and a missing cell stays missing rather than becoming `''`.
+- Works on all three shapes (AoH, HoA, HoH). For HoA the target column **must already exist** (there's no column to edit otherwise) — `map_cell` on a missing HoA column dies.
+- A plain `sub { ... }` keeps its existing meaning (`$_` = the whole row, return value stored); `map_cell` is purely additive and changes nothing for existing callers.
+
 ### Ordering and length
 - **AoH** distributes by array order; **HoH** by **sorted key order** — so any list you compute or hand in must be in `sort keys %$df` order.
 - Whole-column and arrayref values must have exactly one entry per row; a length mismatch dies.
 
 ### Example
+
     my $df = [
         { weight => 70, height => 1.75 },
         { weight => 90, height => 1.80 },
@@ -987,7 +1010,7 @@ More parts than elements gives empty trailing groups, losing nothing:
     my @groups = chunk([1, 2, 3], parts => 5);
     # 5 groups; flattening them back gives (1, 2, 3)
 
-## `col2col`
+## col2col
 
 Apply a **two-column function** to every pair of columns in a table and collect
 the answers in a hash of hashes.
@@ -1906,7 +1929,10 @@ all become hash of arrays:
         ]
     }
 
-returns an empty array of hashes if neither target nor group keys are found.
+A column that is present in some rows but missing in others is fine (those rows
+are simply skipped), but naming a target, group, or filter column that is absent
+from the data entirely is fatal: `group_by` dies with
+`group_by: "<column>" is not present in the dataset`.
 
 ### Filtering
 
@@ -3010,6 +3036,7 @@ minimal example:
 |`row.names` | include row names in retrieved data; off by default | |
 |`sep` | field separator character; synonym with `delim`| `sep => "\t"` |
 | `delim`| field separator character; synonym with `sep`| `delim => "\t"` |
+| `sheet`| which worksheet to read from an `.xlsx` file: a 1-based index or a sheet name (default: first sheet). Ignored for text files | `sheet => 'Sheet2'` |
 output types can be AOH (aoh), HOA (hoa), HOH (hoh)
     read_table($filename, 'output.type' => 'aoh');
     read_table($filename, 'output.type' => 'hoa');
@@ -3035,70 +3062,99 @@ leading comments are never mistaken for one. You may name such a column in a
 `filter` either as it appears in the file or by its clean name:
     read_table('ranks.tabular.tsv', filter => { '# PDB' => sub { $_ == 2 } });
 
+### Excel (.xlsx) files
+A file whose name ends in `.xlsx` is read directly, with **no extra
+dependencies** — the parser uses the core `IO::Uncompress::Unzip` module to pull
+the parts out of the (zipped) workbook and reads the XML itself. All
+`output.type`, `filter`, and `row.names` options work exactly as they do for
+text files:
+
+    my $data = read_table('samples.xlsx');
+    my $data = read_table('samples.xlsx', sheet => 'Results');   # by name
+    my $data = read_table('samples.xlsx', sheet => 2);           # 1-based index
+
+**Multiple worksheets.** If the workbook has more than one worksheet and no
+`sheet` is given, `read_table` returns a **hashref keyed by worksheet name**,
+each value being that sheet parsed just as a single table would be (honouring
+`output.type`, `filter`, etc.):
+
+    my $book = read_table('report.xlsx');   # { Sheet1 => [...], Sheet2 => [...] }
+    my $rows = $book->{Results};
+
+A workbook with a single worksheet, or a call that names a `sheet` explicitly,
+returns that one table directly (not wrapped in a hash).
+
+Limitations: dates and times are returned as their raw Excel serial numbers
+(cell number formats are not applied); and shared-string rich-text runs are
+concatenated into a single value. The `sep`, `delim`, and `comment` options do
+not apply to `.xlsx` files. Tested in `t/read_table.xlsx.t`.
+
 ## rename_cols
 
-Return a new data frame with columns renamed — `df.rename(columns={...})`.
-Columns not named are kept unchanged. The mapping may be given as
-`old => new` pairs or as a single hashref. `AoA` frames have no column
-labels, so `rename_cols` on an `AoA` dies (convert to `AoH`/`HoA` first).
+    rename_cols($df, old => new, ...)
+    rename_cols($df, { old => new, ... })
 
-    my $aoh = [ { a => 1, b => 2 }, { a => 3, b => 4 } ];
-    rename_cols($aoh, a => 'x');
-    # [ { x => 1, b => 2 }, { x => 3, b => 4 } ]
+Rename one or more columns of a data frame. Works on the labelled shapes
+(`AoH`, `HoA`, `HoH`); an `AoA` has no column names and dies (convert to
+`AoH`/`HoA` first). Identifiers are the inner-row keys for `AoH`/`HoH` and the
+top-level keys for `HoA`.
 
-    my $hoa = { a => [1,4], b => [2,5] };
-    rename_cols($hoa, { b => 'B' });
-    # { a => [1,4], B => [2,5] }
+Behaviour depends on calling context:
 
-A swap is fine because the target names stay distinct:
+* **Non-void** (scalar or list context) returns a fresh shallow **view** and
+  never mutates the source. Row shapes (`AoH`/`HoH`) share the cell scalars by
+  reference via XS; a `HoA` aliases the whole column arrayrefs under their new
+  keys.
+* **Void** context renames the source **in place** and returns nothing: the
+  edit lands in each `AoH`/`HoH` row hash, or on the top-level keys of a `HoA`.
 
-    rename_cols($aoh, a => 'b', b => 'a');   # columns exchanged
+<!-- -->
 
-### views, speed, and memory
+    # HoH: rename an inner-row key in every row, in place
+    rename_cols(\%d, resolution => 'Resolution (Å)');
 
-All three verbs return a **new frame** and never modify the source, but the
-result is a **shallow view** built for speed on large frames:
+    # capture a fresh view instead; %d is left untouched by rename_cols itself
+    %d = %{ rename_cols(\%d, resolution => 'Resolution (Å)') };
 
-  * the row shapes (`AoH`, `HoH`, `AoA`) build fresh row containers but
-    **share the cell scalars** with the source — no per-cell copy;
-  * `HoA` **shares the whole column arrayrefs**.
+    # pairs or a single hashref; both forms are equivalent
+    my $view = rename_cols($aoh, a => 'x', c => 'z');
+    my $view = rename_cols($hoa, { b => 'B' });
 
-The operation itself never mutates the source. Because the underlying data is
-shared, a later *in-place* change reaches the source: mutating a result cell
-(`$r->[0]{a}++`, `chomp $r->[0]{a}`) or a `push`/`splice` on a result `HoA`
-column will be visible through the original. Assigning a whole cell
-(`$r->[0]{a} = ...`) is always safe. If you need a fully independent frame,
-clone the result (e.g. `Storable::dclone`).
+Both the in-place and view paths are swap-safe (gather-then-set), so an
+exchange renames correctly:
 
-The row shapes run in XS, which shares cells and hashes each column key once
-instead of once per row. Measured against the equivalent pure-Perl rebuild
-(300k-row `AoH`, 8 columns):
+    rename_cols($sw, a => 'b', b => 'a');   # {a=>1,b=>2} -> {b=>1,a=>2}
 
-    select 3/8 cols :  ~2x faster, and lower peak RAM (no copied cells)
-    drop   2/8 cols :  ~3x faster
-    rename 2/8 cols :  ~4x faster
+Ragged `AoH`/`HoH` frames stay ragged: an old key that is absent from a given
+row is simply skipped for that row. For a `HoA`, the renamed key points at the
+*same* column arrayref (no copy), so a later `push`/`splice` on it is shared
+with the source.
 
-`HoA` and `AoA`-by-drop are pure-Perl aliases and already near-free (a slice
-of an 8-column, million-row `HoA` is sub-second). The memory saving grows
-with rows × selected columns: at scale the row shapes allocate only the new
-row containers, never a second copy of every cell.
+Dies (all validation runs **before** any mutation, so a dying void call leaves
+the source unchanged):
 
-### strictness
+* an old column that is not present anywhere in the frame,
+* a new name that is `undef`,
+* a rename whose target collides with a kept column or another renamed target,
+* an odd-length `old => new` argument list,
+* an `AoA` (no column names to rename).
 
-Mistakes are fatal rather than silently corrupting a frame (validated in Perl
-before any XS runs):
+Note: `\%d = rename_cols(...)` is **not** valid Perl — a reference constructor
+is not an lvalue before 5.22 refaliasing, which is out under the module's 5.10
+back-compatibility. Use the void form or the `%d = %{ ... }` capture idiom
+above.
 
-  * a requested (or renamed) column not present anywhere dies;
-  * a duplicate column in a `select_cols`/`drop_cols` list dies (a hash-keyed
-    shape would otherwise collapse it);
-  * a `rename_cols` whose targets are not distinct — two columns landing on
-    one name — dies (checked against the whole column set, so an `a<->b` swap
-    is fine but `a->b` onto an existing `b` is caught).
+## _rename_inplace
 
-Shape is classified by the same `_df_shape` detector `agg` uses, so these
-accept exactly the frames `agg`/`view` accept; as with that family the check
-is `ref`-based, so hand it an unblessed frame.
+    _rename_inplace($df, $shape, \%map)
 
+Private helper (not exported) that backs `rename_cols`'s void-context path;
+`rename_cols` performs all argument checking first, so this never has to croak.
+For a `HoA` it renames the top-level column keys; for `AoH`/`HoH` it renames
+the keys inside each row hash. It gathers the moved values before re-storing
+them, which makes it swap-safe, and it only touches keys that actually `exists`
+in a given row, which preserves ragged frames. Mutates `$df` and returns
+nothing.
 
 ## rnorm
 
@@ -3749,39 +3805,23 @@ For the signed-rank test, exact zero differences are discarded before ranking (m
 Ties are detected during ranking and trigger the tie-corrected variance in the normal approximation; they also rule out the exact p-value. When `exact` is left on auto, the size thresholds (`< 50` per group, or `< 50` differences) are what gate the exact vs. approximate decision.
 
 ## write_table
-
 mimics R's `write.table`, with data as first argument to subroutine, and output file as second
-
     write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
-
 `write_table` accepts every data-frame shape: a flat hash (one row), a hash of arrays (HoA), a hash of hashes (HoH), an array of hashes (AoH), and an array of arrays (AoA). For an AoA the first inner array is taken as the header row unless `col.names` is given, in which case every inner array is treated as data:
-
     write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
     write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
-
 You can also precisely filter and reorder which columns are written by passing an array reference to `col.names`:
-
     write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
-
 undefined variables are printed as `NA` by default, but can be set as you wish using `undef.val`
-
     write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
-
 as of version 0.07, `write_table` determines comma and tab-separated delimiters from the filename, but will override if `sep` or `delim` are explicitly set.
-
 Args can also be accepted:
-
     write_table( 'data' => \%flat, 'file' => $f );
-
 ### LaTeX output (`tex`)
-
 `write_table` can write the output file as a LaTeX `tabular` instead of a delimited table. This is selected either by naming the file `*.tex` (auto-detected) or by passing `tex => 1`; an explicit `tex => 0` forces a delimited file even when the name ends in `.tex`. The LaTeX table is built from the same rows as the delimited writer, so it works for every shape above (including arrays of arrays):
-
     write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
     write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
-
-The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. The `tex.*` options tune the output:
-
+The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. Unlike the delimited writer, LaTeX output includes a row-label column as its first column by default: `row.names` defaults on for LaTeX (matching R's `write.table`), so pass `row.names => 0` to omit it. The labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. The `tex.*` options tune the output:
     write_table(\@rows, 'table.tex',
         'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
         'tex.bold.1st.col' => 0,                     # default 1: bold the first column
@@ -3789,27 +3829,120 @@ The file begins with a `%written by <cwd>/<script>` provenance comment (the work
         'tex.size'         => '\small',              # size directive after \begin{tabular}
         'tex.comment'      => ['run 3', 'q < 0.05'], # % comment line(s): string or array ref
     );
+For a table that must span page breaks, `tex.longtable => 1` writes only the table *body* — the bold header row and the data rows, ruled with `\hline` — but no `\begin{tabular}`/`\end{tabular}` and no column spec, so you can `\input{}` it into a `longtable` environment you write yourself. Setting `tex.longtable` implies `tex => 1`, so it applies to any file name (and overrides `tex => 0`). After the provenance comment (and any `tex.comment` lines) the file emits a `% \begin{longtable}{...}` hint with one `tex.col.align` character per column, so you can copy a column spec with the right count. In this mode `tex.col.align` affects only that hint — the real alignment lives on your own `\begin{longtable}`; the other `tex.*` options (`tex.bold.1st.col`, `tex.format`, `tex.size`, `tex.comment`) still apply:
+    write_table(\@rows, 'output.file.tex', 'tex.longtable' => 1);
+writes a body-only file such as
+    %written by /home/con/Scripts/stats/make_table.pl
+    % \begin{longtable}{ccc}
+    \hline
+    \textbf{a} & \textbf{b} & \textbf{c} \\ \hline
+    1 & 2 & 3\\
+    \hline
+which you wrap yourself:
+    \begin{longtable}{ccc}
+    \input{output.file.tex}
+    \caption{}
+    \label{}
+    \end{longtable}
 
-The `xlsx`, worksheet, and JSON side outputs of the original stand-alone routine are not included.
+### Excel output (`xlsx`)
+`write_table` can write a real Excel `.xlsx` workbook with **no extra
+dependencies** — it is built entirely in XS, packing hand-written XML parts into
+an (uncompressed) ZIP, so there is no `Excel::Writer::XLSX` or other CPAN
+requirement. It is selected either by naming the file `*.xlsx` (auto-detected)
+or by passing `xlsx => 1`; an explicit `xlsx => 0` forces a delimited file even
+for a `.xlsx` name. Like LaTeX, it is built from the same rows as the delimited
+writer, so it works for every shape above:
+
+    write_table(\@data_aoh, 'table.xlsx');            # .xlsx name selects Excel
+    write_table(\%data_hoa, $tmp_file, 'xlsx' => 1);  # force Excel for any name
+
+A numeric-looking cell is written as a number; every other non-empty cell as an
+inline string (`undef`/empty cells are omitted). The result reads straight back
+with [`read_table`](#read_table).
+
+Mirroring `Excel::Writer::XLSX`'s
+`$workbook->set_properties(comments => comments())`, the same
+`written by <cwd>/<script>` provenance line the LaTeX writer emits is stored in
+the workbook's document **comments** property (`dc:description` in
+`docProps/core.xml`); a `xlsx.comment` string (or array ref of strings) is
+appended after it. `xlsx.sheet` sets the worksheet name (default `Sheet1`):
+
+    write_table(\@rows, 'report.xlsx',
+        'xlsx.sheet'   => 'Results',
+        'xlsx.comment' => 'batch 9',
+    );
+
+`xlsx.freeze.rows` and `xlsx.freeze.cols` freeze that many leading rows/columns in place (Excel's *freeze panes*), so they stay visible while scrolling — most often used to pin the header row:
+
+    write_table(\@rows, 'report.xlsx', 'xlsx.freeze.rows' => 1);                        # pin the header row
+    write_table(\@rows, 'report.xlsx', 'xlsx.freeze.rows' => 1, 'xlsx.freeze.cols' => 2); # pin header + first two columns
+
+`tex` and `xlsx` are mutually exclusive. Note: dates/times are written as their
+raw values (no cell number formats), matching the round-trip behaviour of
+`read_table`.
 
 ### Options
-
 | option | default | applies to | meaning |
 |---|---|---|---|
 | `data` (1st positional, or `data =>`) | *required* | both | the table: flat hash, HoA, HoH, AoH, or AoA |
 | `file` (2nd positional, or `file =>`) | *required* | both | output path; written as a delimited table, or as LaTeX when `tex` is on |
 | `sep` / `delim` | from extension (`,` for `.csv`, tab for `.tsv`), else `,` | delimited | field separator; the two are aliases |
-| `row.names` | `1` (on) | both | true prepends a label column (numeric index, or the outer key for a HoH); `0` omits it; for a HoA/AoH a non-numeric *column name* uses that column's values as the labels and drops it from the body |
+| `row.names` | LaTeX: `1` (on); delimited: `0` (off) | both | true prepends a label column (numeric 1-based index, or the outer key for a HoH); `0` omits it. LaTeX output defaults on (R-compatible); delimited output defaults off; an explicit value overrides in either case. For a HoA/AoH a non-numeric *column name* uses that column's values as the labels and drops it from the body |
 | `col.names` | all columns, sorted | both | array ref selecting and ordering columns; for an AoA it also supplies the column names |
 | `undef.val` | `''` (empty field) | both | text written for an undefined/missing cell, e.g. `'NA'` |
 | `tex` | auto: `1` when `file` ends in `.tex`, else `0` | LaTeX | write the output file as a LaTeX `tabular` instead of a delimited table; `tex => 0` forces delimited even for a `.tex` name |
-| `tex.col.align` | `'c'` | LaTeX | per-column alignment: `'c'`, `'l'`, or `'r'` |
+| `tex.col.align` | `'c'` | LaTeX | per-column alignment: `'c'`, `'l'`, or `'r'`; with `tex.longtable` on it sets only the `% \begin{longtable}{...}` hint |
 | `tex.bold.1st.col` | `1` (on) | LaTeX | bold the first column of each data row |
 | `tex.format` | `0` (off) | LaTeX | render numeric cells with `%.4g` |
 | `tex.size` | *(none)* | LaTeX | size directive emitted after `\begin{tabular}`, e.g. `\small` |
 | `tex.comment` | *(none)* | LaTeX | `%` comment line(s) at the top of the LaTeX file: a string, or an array ref of strings |
+| `tex.longtable` | `0` (off) | LaTeX | write only the table body (header + data rows + `\hline`, no `\begin{tabular}`/`\end{tabular}` or column spec) for `\input{}` into a caller-supplied `longtable`; implies `tex => 1`, and emits a `% \begin{longtable}{...}` hint with one `tex.col.align` char per column |
+| `xlsx` | auto: `1` when `file` ends in `.xlsx`, else `0` | Excel | write a real `.xlsx` workbook (dependency-free, built in XS) instead of a delimited table; `xlsx => 0` forces delimited even for a `.xlsx` name. Mutually exclusive with `tex` |
+| `xlsx.sheet` | `'Sheet1'` | Excel | worksheet name |
+| `xlsx.comment` | *(none)* | Excel | extra line(s) appended after the provenance in the workbook's document *comments* property (`dc:description`): a string, or an array ref of strings |
+| `xlsx.freeze.rows` | `0` (none) | Excel | number of leading rows to freeze in place (freeze panes), e.g. `1` to pin the header row |
+| `xlsx.freeze.cols` | `0` (none) | Excel | number of leading columns to freeze in place (freeze panes) |
 
 # Changes
+
+## 0.23 2026-07-08 CDT
+
+`rename_cols` takes HoH as input
+
+`write_table` prints row names as first column; writes longtable with comments
+
+`assign` gains `map_cell { ... }` for in-place per-cell column edits
+
+### assign
+
+`assign` now accepts a third kind of column value, `map_cell { ... }`, for editing an existing column in place — no "copy, substitute, return" boilerplate and no dependence on `s///r` (unavailable on the older perls this module supports).
+
+- Inside a `map_cell` block, `$_` is the **named column's current cell** (not the whole row), the block's return value is **ignored**, and the modified `$_` is stored back: `assign($df, 'Res.' => map_cell { s/^[A-Z]:// })`.
+- The row is still available as `$_[0]` (sibling columns), the index as `$_[1]`, and the row key as `$_[2]` (HoH only).
+- **Undef/missing cells pass through untouched** (undef in → undef out): the block is skipped for them, so `s///` never warns on an uninitialized value.
+- Supported on all three shapes; for HoA the target column must already exist. A plain `sub { ... }` is unchanged, so `map_cell` is purely additive.
+- `map_cell` is exported alongside `assign`.
+
+Tests: `assign.t` (AoH + HoA) and `assign.HoH.t` gained `map_cell` coverage — in-place `s///`, `$_[0]`/`$_[1]`/`$_[2]` context, new-column-from-undef, the missing-HoA-column death path, and `no_leaks_ok` guards. Verified building and passing the full suite on perl 5.10.1, 5.12.5 (long-double), and 5.42.2.
+
+### `group_by`
+
+Fixed group_by to honor all filter hashrefs (option 1)
+
+Root cause: the XS captured only ST(3), so every filter hashref after the first was silently dropped — including the README's documented multi-hashref form.
+
+Change (LikeR.xs):
+- Removed the single-ST(3) capture and the filter_hv PREINIT var.
+- Added a FOR_EACH_FILTER(body) macro that walks the arg stack from ST(3) to ST(items-1), iterating every { column => sub } pair and ANDing them together. It iterates the stack directly rather than heap-collecting the hashrefs, so a croaking filter sub still can't leak anything (verified). Non-hashref args are skipped.
+- Rewrote the filter loop in all three branches (AoH / HoA / HoH) to use the macro, keeping each branch's own value-fetch logic.
+
+One build wrinkle worth noting: xsubpp parses every non-# line in the inter-XSUB region as a candidate function signature, so a /* ... */ comment there breaks the build (it tried to parse column => sub / (ST(3)..) as a signature). I moved the macro's documentation into the XSUB body (real C) and left the macro comment-free, matching the existing EVAL_FILTER style.
+
+Tests (t/group_by.HoH.filter.t, 17 assertions):
+- HoH single-column filter, AND filter (both the one-hashref and separate-hashref forms now give identical results), no-match → empty hash, missing/undef target excluded despite passing the filter, and no_leaks_ok
+
+Mentioning a non-existent column is now fatal.
 
 ## 0.22 2026-07-07 CDT
 
@@ -3823,7 +3956,7 @@ addition of `agg`, `concat`, `drop_cols`, `rank`, `rename_cols`, `select_cols` f
 
 Improving Kwalitee (sic): added `[PodWeaver]` to dist.ini; as well as `Changes` file
 
-### assign
+### `assign`
 
 `assign` now accepts two kinds of column value, so a function that already returns a whole column (like `rank`) drops in without wrapping.
 
@@ -3835,7 +3968,7 @@ The coderef is probed once (row 0 for AoH/HoH, the first synthesized view for Ho
 
 Tests: `assign.t` (AoH + HoA) and `assign_HoH.t` were expanded to cover every shape × value-kind combination — per-row scalar, whole-column list, arrayref value, single-arrayref-as-cell, `rank()` integration, chaining, `$_[1]` index, `$_[2]` row key (HoH), overwrite, ragged HoA columns, empty frames, length-mismatch and bad-value / odd-arg / non-hash-row death paths, and `no_leaks_ok` guards on the new whole-column and arrayref paths.
 
-### read_table
+### `read_table`
 
 Fixed handling of commented-out header lines and made filter columns
 referenceable by the name as it appears in the file.

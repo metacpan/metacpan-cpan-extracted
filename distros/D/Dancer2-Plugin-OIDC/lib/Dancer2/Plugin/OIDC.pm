@@ -1,5 +1,7 @@
 package Dancer2::Plugin::OIDC;
 use 5.020;
+use strict;
+use warnings;
 use Dancer2::Plugin;
 
 use Carp qw(croak);

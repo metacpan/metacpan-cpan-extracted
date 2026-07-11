@@ -1,5 +1,28 @@
 Revision history for this software.
 
+2.13.4.35 2026-07-11 00:00:00
+  - lib/Jacode.pm: fix the AUTOLOAD wrapper so that it preserves the
+    caller's list/scalar context. The previous wrapper evaluated the
+    callee in scalar context only ("my $return = eval { &$callee }"),
+    which silently broke the list form of getcode() and convert():
+    "($matched_length, $encoding) = Jacode::getcode(\$line)" received
+    the encoding name in $matched_length and undef in $encoding. The
+    wrapper now dispatches with wantarray and returns a list or a scalar
+    accordingly.
+  - add t/9070_autoload_context.t: assert the AUTOLOAD wrapper keeps
+    list and scalar context for getcode() and convert()
+  - t/9080_cheatsheets.t: give sub ok() the ($$) prototype so that its
+    first argument is evaluated in scalar context. Without the prototype
+    a failing "ok( $x =~ /.../, $label )" produced an empty list on
+    match failure; the label then slid into $cond (a true value) and the
+    failing check was silently reported as a pass, while $label became
+    undef. This masked the CS7 email-mismatch failures below.
+  - doc/jacode_cheatsheet.*.txt: change author email address from
+    ina@cpan.org to ina.cpan@gmail.com in all 21 language files, so that
+    they match Jacode.pm and pass the CS7 check of t/9080_cheatsheets.t
+    (these files were the only ones left with the old address)
+  - created by INABA Hitoshi
+
 2.13.4.34 2026-06-15 00:00:00
   - lib/jacode.pl: rewrite the UTF-8 source self-check on line 2 so that
     it no longer uses perl 5 only syntax. The previous form embedded the

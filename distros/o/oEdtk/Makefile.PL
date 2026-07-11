@@ -6,7 +6,7 @@
 #	These modules are under GNU GENERAL PUBLIC LICENSE (see COPYING file)
 #	You can use oEdtk as is without any warranty.
 #
-#	Copyright (c) 2005-2024  David AUNAY - GJ CHAILLOU DOMINGO
+#	Copyright (c) 2005-2026  David AUNAY - GJ CHAILLOU DOMINGO
 #
 #	See COPYRIGHT section in oEdtk.pm for usage and distribution rights.
 use POSIX;

@@ -4,14 +4,14 @@ require 5.010;
 use strict;
 use feature 'say';
 package Stats::LikeR;
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 require XSLoader;
 use warnings FATAL => 'all';
 use autodie ':default';
 use Exporter 'import';
 use Scalar::Util qw(reftype looks_like_number);
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(add_data agg anova aoh2hoa aoh2hoh aov assign binom_test cfilter chisq_test chunk col col2col colnames concat cor cor_test cov csort dnorm drop_cols dropna filter fisher_test get_union get_unique glm group_by hoa2aoh hoa2hoh hoh2hoa hist intersection is_equivalent kruskal_test ks_test Lonly ljoin lm matrix max mean median min mode ncol nrow oneway_test p_adjust pnorm power_t_test predict prcomp ptukey qcut qtukey quantile rank Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test sum summary t_test transpose TukeyHSD uniq vals value_counts var var_test view wilcox_test write_table);
+our @EXPORT_OK = qw(add_data agg anova aoh2hoa aoh2hoh aov assign binom_test cfilter chisq_test chunk col col2col colnames concat cor cor_test cov csort dnorm drop_cols dropna filter fisher_test get_union get_unique glm group_by hoa2aoh hoa2hoh hoh2hoa hist intersection is_equivalent kruskal_test ks_test Lonly ljoin lm map_cell matrix max mean median min mode ncol nrow oneway_test p_adjust pnorm power_t_test predict prcomp ptukey qcut qtukey quantile rank Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test sum summary t_test transpose TukeyHSD uniq vals value_counts var var_test view wilcox_test write_table);
 our @EXPORT = @EXPORT_OK;
 
 # =====================================================================
@@ -126,6 +126,19 @@ sub rownames {
 # cell ($r->[0]{a} = ...) is always safe.  Need an independent copy?  Clone
 # the result (e.g. Storable::dclone).
 #
+# IN-PLACE RENAME (rename_cols only).  Called in VOID context, rename_cols
+# mutates the source frame in place -- it renames the keys inside each AoH/HoH
+# row, or the column keys of a HoA -- and returns nothing.  In ANY other
+# context it returns a fresh view (as above) and never touches the source:
+#
+#     rename_cols(\%d, resolution => 'Resolution (A)'); # void   -> %d in place
+#     %d = %{ rename_cols(\%d, resolution => 'Resolution (A)') }; # capture view
+#
+# (select_cols/drop_cols are always pure and ignore calling context -- a void
+# call to either is a no-op.)  Note: `\%d = rename_cols(...)` is not valid Perl
+# (a reference constructor is not an lvalue before 5.22 refaliasing); use one
+# of the two forms above.
+#
 # The row shapes are dispatched to XS (_cols_* ), which shares cells and
 # hashes each column key once instead of once per row -- ~2x (select), ~3x
 # (drop), ~4x (rename) faster than the pure-Perl rebuild at scale, and lower
@@ -174,6 +187,30 @@ sub _present_keys {                     # union of keys over AoH/HoH rows
 	my %seen;
 	for my $r (@rows) { next unless ref $r eq 'HASH'; $seen{$_} = 1 for keys %$r }
 	return \%seen;
+}
+
+sub _rename_inplace {                   # VOID-context rename: mutate the source
+	my ($df, $shape, $map) = @_;
+	if ($shape eq 'HoA') {                          # rename the column keys
+		my %vals;                                   # gather-then-set = swap-safe
+		for my $o (keys %$map) {
+			next unless exists $df->{$o};
+			$vals{ $map->{$o} } = delete $df->{$o};
+		}
+		$df->{$_} = $vals{$_} for keys %vals;
+		return;
+	}
+	my @rows = $shape eq 'AoH' ? @$df : values %$df;    # AoH / HoH row hashes
+	for my $row (@rows) {
+		next unless ref $row eq 'HASH';
+		my %vals;                                   # gather-then-set = swap-safe
+		for my $o (keys %$map) {
+			next unless exists $row->{$o};
+			$vals{ $map->{$o} } = delete $row->{$o};
+		}
+		$row->{$_} = $vals{$_} for keys %vals;
+	}
+	return;
 }
 
 # shape code passed to the XS: 1 = AoH, 2 = HoH, 3 = AoA
@@ -259,6 +296,13 @@ sub rename_cols {
 		my $nn = exists $map{$c} ? $map{$c} : $c;
 		die "rename_cols: rename collides -- two columns would both become '$nn'\n"
 			if $final{$nn}++;
+	}
+
+	# VOID context -> mutate the source in place and return nothing; any other
+	# context returns a fresh shallow view exactly as before.
+	unless (defined wantarray) {
+		_rename_inplace($df, $shape, \%map);
+		return;
 	}
 
 	if ($shape eq 'HoA') {                          # alias under new keys
@@ -583,6 +627,37 @@ sub _df_shape {
 # Modifies $df in place (lowest RAM/CPU) and returns it for chaining.
 # To keep the original intact, hand it a copy: assign(clone($df), ...).
 #
+# A value may also be a map_cell { ... } block (see below) for an in-place
+# per-cell edit of the named column, instead of a CODE ref or ready-made ARRAY.
+#
+
+# ---------------------------------------------------------------------------
+# map_cell { ... }   -- in-place per-cell transform for assign().
+#
+# Wraps a block so assign() runs it once per row with $_ aliased to a copy of
+# the NAMED column's current cell; the (possibly modified) $_ is stored back and
+# the block's return value is ignored.  This makes an in-place edit read
+# naturally, without the "copy, substitute, return" dance a plain sub needs
+# (perl 5.10 has no s///r):
+#
+#   assign($tbl, 'Res.' => map_cell { s/^[A-Z]:// });   # strip a leading "X:"
+#   assign($tbl, 'Res.' => map_cell { $_ = uc });        # upper-case in place
+#
+# The row is still available as $_[0] (and the index as $_[1]) if the transform
+# needs a sibling column.  A plain sub { ... } keeps its existing meaning
+# ($_ = the whole row, the return value is stored), so map_cell is purely
+# additive and changes nothing for existing callers.
+#
+# An undef cell is left untouched (undef in -> undef out): the block never runs
+# on it, so s/// and friends don't warn on uninitialized values and a missing
+# cell stays missing rather than becoming ''.
+# ---------------------------------------------------------------------------
+sub map_cell (&) {
+	my ($code) = @_;
+	die "map_cell: expects a code block, e.g. map_cell { s/x//g }\n"
+		unless ref $code eq 'CODE';
+	return bless { code => $code }, 'Stats::LikeR::map_cell';
+}
 
 sub assign {
 	my $df = shift;
@@ -602,6 +677,18 @@ sub assign {
 		while (@_) {
 			my ($name, $spec) = (shift, shift);
 			my $sref = ref $spec;
+			if ($sref eq 'Stats::LikeR::map_cell') {   # in-place per-cell edit; $_ = current cell
+				my $code = $spec->{code};
+				for my $i (0 .. $n - 1) {
+					my $row = $df->[$i];
+					die "$current_sub: row $i is not a hashref" unless ref $row eq 'HASH';
+					local $_ = $row->{$name};
+					next unless defined $_;   # undef cells pass through untouched (undef in -> undef out)
+					$code->($row, $i);
+					$row->{$name} = $_;
+				}
+				next;
+			}
 			die "$current_sub: value for '$name' must be a CODE or ARRAY ref"
 				unless $sref eq 'CODE' or $sref eq 'ARRAY';
 
@@ -659,6 +746,18 @@ sub assign {
 			while (@_) {
 				my ($name, $spec) = (shift, shift);
 				my $sref = ref $spec;
+				if ($sref eq 'Stats::LikeR::map_cell') {   # in-place per-cell edit; $_ = current cell
+					my $code = $spec->{code};
+					for my $i (0 .. $n - 1) {
+						my $row = $df->{ $rk[$i] };
+						die "$current_sub: row '$rk[$i]' is not a hashref" unless ref $row eq 'HASH';
+						local $_ = $row->{$name};
+						next unless defined $_;   # undef cells pass through untouched (undef in -> undef out)
+						$code->($row, $i, $rk[$i]);
+						$row->{$name} = $_;
+					}
+					next;
+				}
 				die "$current_sub: value for '$name' must be a CODE or ARRAY ref"
 					unless $sref eq 'CODE' or $sref eq 'ARRAY';
 
@@ -710,6 +809,24 @@ sub assign {
 			while (@_) {
 				my ($name, $spec) = (shift, shift);
 				my $sref = ref $spec;
+				if ($sref eq 'Stats::LikeR::map_cell') {   # in-place per-cell edit; $_ = current cell
+					my $code = $spec->{code};
+					my $tgt  = $df->{$name};
+					die "$current_sub: map_cell target column '$name' must already exist as an ARRAY ref\n"
+						unless ref $tgt eq 'ARRAY';
+					my @keys = keys %$df;
+					my @col  = map { my $c = $df->{$_}; ref $c eq 'ARRAY' ? $c : undef } @keys;
+					for my $i (0 .. $n - 1) {
+						my %view;
+						$view{ $keys[$_] } = defined $col[$_] ? $col[$_][$i] : $df->{ $keys[$_] }
+							for 0 .. $#keys;
+						local $_ = $tgt->[$i];
+						next unless defined $_;   # undef cells pass through untouched (undef in -> undef out)
+						$code->(\%view, $i);
+						$tgt->[$i] = $_;
+					}
+					next;
+				}
 				die "$current_sub: value for '$name' must be a CODE or ARRAY ref"
 					unless $sref eq 'CODE' or $sref eq 'ARRAY';
 
@@ -895,8 +1012,6 @@ sub col { Stats::LikeR::col::_new(@_) }
 		return bless { code => sub { $c->($_[0]) ? 0 : 1 } }, __PACKAGE__;
 	}
 }
-
-use Scalar::Util qw(reftype);
 
 # ---------------------------------------------------------------------------
 # concat(@frames)   /   rbind(@frames)   -- row-bind data frames (pandas concat
@@ -1493,6 +1608,178 @@ sub summary {
 	return \@out;
 }
 
+# --- .xlsx support (pure Perl, no CPAN deps) -------------------------------
+# An .xlsx file is a ZIP archive of XML parts. IO::Uncompress::Unzip is a core
+# module, so we can pull the parts out and parse the (very regular) XML with
+# regexes, then feed rows to read_table's callback exactly like _parse_csv_file
+# does. A workbook with more than one worksheet is read into a hash keyed by
+# sheet name (see read_table). Limitations: dates/times come back as their raw
+# serial numbers (no style-based formatting); shared-string rich-text runs are
+# concatenated.
+
+# Return the decompressed bytes of a named archive member, or undef if absent.
+sub _unzip_member {
+	my ($file, $member) = @_;
+	require IO::Uncompress::Unzip;
+	my $z = IO::Uncompress::Unzip->new($file, Name => $member)
+		or return undef;
+	my $content = '';
+	my $buf;
+	while ((my $n = $z->read($buf)) > 0) { $content .= $buf }
+	$z->close;
+	return $content;
+}
+
+# Decode the five predefined XML entities plus numeric character references.
+# Numeric refs are re-encoded to UTF-8 bytes so the result stays byte-consistent
+# with the rest of the file (which we read, and return, as raw UTF-8 bytes).
+sub _xml_unescape {
+	my ($s) = @_;
+	return $s unless defined $s && index($s, '&') >= 0;
+	$s =~ s/&#x([0-9a-fA-F]+);/my $c = chr hex $1; utf8::encode($c); $c/ge;
+	$s =~ s/&#([0-9]+);/my $c = chr $1; utf8::encode($c); $c/ge;
+	$s =~ s/&lt;/</g;
+	$s =~ s/&gt;/>/g;
+	$s =~ s/&quot;/"/g;
+	$s =~ s/&apos;/'/g;
+	$s =~ s/&amp;/&/g;	# must be last so "&amp;lt;" -> "&lt;", not "<"
+	return $s;
+}
+
+# "AB12" (or "AB") -> 0-based column index (A=0, Z=25, AA=26, ...).
+sub _xlsx_col_idx {
+	my ($ref) = @_;
+	(my $letters = $ref) =~ s/[^A-Za-z].*\z//s;
+	my $idx = 0;
+	$idx = $idx * 26 + (ord(uc $_) - ord('A') + 1) for split //, $letters;
+	return $idx - 1;
+}
+
+# Shared strings (optional part): each <si> may hold several <t> runs, which
+# are concatenated. Returns an arrayref indexed by shared-string id.
+sub _xlsx_shared_strings {
+	my ($file) = @_;
+	my @sst;
+	if (defined(my $ss = _unzip_member($file, 'xl/sharedStrings.xml'))) {
+		while ($ss =~ m{<si\b[^>]*>(.*?)</si>}gs) {
+			my $si  = $1;
+			my $str = '';
+			$str .= _xml_unescape($1) while $si =~ m{<t\b[^>]*>(.*?)</t>}gs;
+			push @sst, $str;
+		}
+	}
+	return \@sst;
+}
+
+# The workbook's worksheets, in document order, as a list of
+# { name => $sheet_name, path => 'xl/worksheets/sheetN.xml' } hashrefs. The path
+# is resolved through workbook.xml.rels; a sheet with no resolvable relationship
+# (or a workbook with no metadata at all) falls back to a positional sheetN.xml.
+sub _xlsx_sheets {
+	my ($file) = @_;
+	my %target;
+	if (defined(my $rels = _unzip_member($file, 'xl/_rels/workbook.xml.rels'))) {
+		while ($rels =~ m{<Relationship\b([^>]*?)/?>}gs) {
+			my $a = $1;
+			my ($id) = $a =~ /\bId="([^"]*)"/;
+			my ($tg) = $a =~ /\bTarget="([^"]*)"/;
+			$target{$id} = $tg if defined $id && defined $tg;
+		}
+	}
+	my @sheets;
+	if (defined(my $wb = _unzip_member($file, 'xl/workbook.xml'))) {
+		while ($wb =~ m{<sheet\b([^>]*?)/?>}gs) {
+			my $a = $1;
+			my ($name) = $a =~ /\bname="([^"]*)"/;
+			my ($rid)  = $a =~ /\br:id="([^"]*)"/;
+			my $path;
+			if (defined $rid && defined $target{$rid}) {
+				(my $tg = $target{$rid}) =~ s{^/}{};	# strip absolute-package "/"
+				$path = $tg =~ m{^xl/} ? $tg : "xl/$tg";	# else relative to xl/
+			}
+			push @sheets, {
+				name => defined $name ? _xml_unescape($name) : undef,
+				path => $path,
+			};
+		}
+	}
+	@sheets = ({ name => undef, path => undef }) unless @sheets;	# no metadata
+	# any sheet still lacking a path falls back to its positional worksheet file
+	$sheets[$_]{path} //= 'xl/worksheets/sheet' . ($_ + 1) . '.xml'
+		for 0 .. $#sheets;
+	return \@sheets;
+}
+
+# Resolve a 'sheet' argument (undef -> first; a 1-based index; or a name) to one
+# of the hashrefs from _xlsx_sheets, dying with a clear message on a bad request.
+sub _xlsx_choose_sheet {
+	my ($file, $sheets, $sheet) = @_;
+	return $sheets->[0] unless defined $sheet;
+	if ($sheet =~ /^\d+\z/) {
+		die "read_table: sheet index $sheet is out of range (1..${\ scalar @$sheets}) in $file\n"
+			if $sheet < 1 || $sheet > @$sheets;
+		return $sheets->[$sheet - 1];
+	}
+	my ($chosen) = grep { defined $_->{name} && $_->{name} eq $sheet } @$sheets;
+	die "read_table: sheet '$sheet' not found in $file (have: "
+		. join(', ', map { defined $_->{name} ? "'$_->{name}'" : '?' } @$sheets)
+		. ")\n"
+		unless $chosen;
+	return $chosen;
+}
+
+# Parse one worksheet, invoking $callback->(\@fields) once per non-empty row
+# (header row included) with all rows padded to the same width -- the same
+# contract _parse_csv_file offers read_table's callback. $sst is the shared
+# strings arrayref from _xlsx_shared_strings.
+sub _parse_xlsx_sheet {
+	my ($file, $sst, $path, $callback) = @_;
+	my $ws = _unzip_member($file, $path);
+	die "read_table: could not read worksheet '$path' in $file\n"
+		unless defined $ws;
+
+	# collect cells, positioning each by its column reference so gaps stay
+	# aligned, then pad every row to the widest row seen.
+	my @rows;
+	my $global_max = -1;
+	while ($ws =~ m{<row\b[^>]*>(.*?)</row>}gs) {
+		my $rowxml = $1;
+		my @cells;
+		my $maxc = -1;
+		while ($rowxml =~ m{<c\b([^>]*?)(?:/>|>(.*?)</c>)}gs) {
+			my ($cattrs, $cbody) = ($1, $2);
+			my ($r) = $cattrs =~ /\br="([^"]*)"/;
+			my ($t) = $cattrs =~ /\bt="([^"]*)"/;
+			my $ci  = defined $r ? _xlsx_col_idx($r) : $maxc + 1;
+			my $val = '';
+			if (!defined $cbody) {			# <c .../> -- empty cell
+				$val = '';
+			} elsif (defined $t && $t eq 's') {	# shared-string index
+				my ($v) = $cbody =~ m{<v\b[^>]*>(.*?)</v>}s;
+				$val = (defined $v && $v =~ /^\d+\z/) ? ($sst->[$v] // '') : '';
+			} elsif (defined $t && $t eq 'inlineStr') {
+				my $s = '';
+				$s .= _xml_unescape($1) while $cbody =~ m{<t\b[^>]*>(.*?)</t>}gs;
+				$val = $s;
+			} else {				# number / formula str / bool / error
+				my ($v) = $cbody =~ m{<v\b[^>]*>(.*?)</v>}s;
+				$val = defined $v ? _xml_unescape($v) : '';
+			}
+			$cells[$ci] = $val;
+			$maxc = $ci if $ci > $maxc;
+		}
+		push @rows, \@cells;
+		$global_max = $maxc if $maxc > $global_max;
+	}
+
+	for my $cells (@rows) {
+		my @line = map { defined $_ ? $_ : '' } @{$cells}[0 .. $global_max];
+		next unless grep { length } @line;	# skip fully blank rows, as CSV does
+		$callback->(\@line);
+	}
+	return;
+}
+
 sub read_table {
 	my $file = shift;
 	die "read_table: \"$file\" is not a file\n"   unless -f $file;
@@ -1506,6 +1793,7 @@ sub read_table {
 		$input_args{sep} = delete $input_args{delim};
 	}
 
+	my $is_xlsx = $file =~ /\.xlsx\z/i;
 	my $default_sep = $file =~ /\.tsv$/i ? "\t" : ',';
 	my %args = (
 		sep => $default_sep, comment => '#', %input_args,
@@ -1513,7 +1801,7 @@ sub read_table {
 
 	my %allowed_args = map { $_ => 1 } (
 		'comment', 'output.type', 'filter', 'row.names', 'sep',
-		'auto.row.names',
+		'auto.row.names', 'sheet',
 	);
 	my @undef_args = sort grep { !$allowed_args{$_} } keys %args;
 	if (@undef_args) {
@@ -1523,6 +1811,24 @@ sub read_table {
 	my $otype = $args{'output.type'} // 'aoh';
 	die "read_table: output.type \"$otype\" isn't allowed (aoh, hoa, hoh)\n"
 		unless $otype =~ m/^(?:aoh|hoa|hoh)$/;
+
+	# A multi-worksheet .xlsx with no explicit 'sheet' is returned as a hash
+	# keyed by worksheet name, each value being that sheet parsed with the same
+	# options (recursing one sheet at a time keeps every table's state, and any
+	# hoh row.names default, independent). A single-worksheet workbook, or an
+	# explicit 'sheet', still returns that one table directly.
+	if ($is_xlsx && !defined $args{sheet}) {
+		my $sheets = _xlsx_sheets($file);
+		if (@$sheets > 1) {
+			my %book;
+			for my $i (0 .. $#$sheets) {
+				my $name = $sheets->[$i]{name};
+				$name = 'Sheet' . ($i + 1) unless defined $name;
+				$book{$name} = read_table($file, %input_args, sheet => $i + 1);
+			}
+			return \%book;
+		}
+	}
 
 # R's write.table(col.names=TRUE) default omits the header label for the
 # row-names column, so a header comes out one field short of every data
@@ -1606,7 +1912,7 @@ sub read_table {
 	# comment and is discarded. A marker hugging its text ("#id,val") is
 	# delivered by the parser and un-commented in the callback as usual, so it
 	# never reaches this branch.
-	if (length( $args{comment} // '' ) && length( $args{sep} // '' )) {
+	if (!$is_xlsx && length( $args{comment} // '' ) && length( $args{sep} // '' )) {
 		open my $fh, '<', $file
 			or die "read_table: can't open $file: $!\n";
 		my $first = <$fh>;
@@ -1623,7 +1929,7 @@ sub read_table {
 		}
 	}
 
-	_parse_csv_file($file, $args{sep} // '', $args{comment} // '', sub {
+	my $on_line = sub {
 		my ($line_ref) = @_;
 
 		if (!$header_seen) {
@@ -1720,7 +2026,15 @@ sub read_table {
 				$data{$row_name}{$col} = $line_hash{$col};
 			}
 		}
-	});
+	};
+	if ($is_xlsx) {
+		my $sst    = _xlsx_shared_strings($file);
+		my $sheets = _xlsx_sheets($file);
+		my $chosen = _xlsx_choose_sheet($file, $sheets, $args{sheet});
+		_parse_xlsx_sheet($file, $sst, $chosen->{path}, $on_line);
+	} else {
+		_parse_csv_file($file, $args{sep} // '', $args{comment} // '', $on_line);
+	}
 	# header-only files never hit a data row. A provisional (commented-out)
 	# header was never confirmed against a data row, but with no data to
 	# contradict it we accept it; either way still validate.
@@ -2321,7 +2635,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 Synopsis
 
@@ -3165,7 +3479,7 @@ Add new columns to a data frame, computed from the columns already there — or 
 
 =back
 
-=item * B<< C<< new_name =E<gt> VALUE >> >> — one or more pairs. C<VALUE> is either a B<coderef> (computed) or an B<arrayref> (a ready-made column).
+=item * B<< C<< new_name =E<gt> VALUE >> >> — one or more pairs. C<VALUE> is a B<coderef> (computed from the row), an B<arrayref> (a ready-made column), or a B<< C<map_cell { ... }> >> block (an in-place edit of the named column — see below).
 
 =back
 
@@ -3205,6 +3519,29 @@ Pass a column you already have and it is copied in:
  assign($df, 'ΔG rank' => [ rank( vals($df, 'dG_kcal_mol') ) ]);
 
 This is also how you install a computed I<list> when you'd otherwise trip the "single arrayref = one cell" rule above.
+
+=head3 In-place edits with C<map_cell>
+
+A plain coderef stores its B<return value>, so an in-place transform of an existing column means the "copy, edit, return" dance — and C<s///r> isn't available on the older perls this module supports:
+
+ # awkward: copy to $v, edit $v, return $v
+ assign($df, 'Res.' => sub { (my $v = $_->{'Res.'}) =~ s/^[A-Z]://; $v });
+
+C<map_cell { ... }> removes the ceremony. Inside the block, B<< C<$_> is the named column's current cell >> (not the whole row), the block's return value is B<ignored>, and the modified C<$_> is stored back:
+
+ use Stats::LikeR;   # exports map_cell alongside assign
+ 
+ assign($df, 'Res.' => map_cell { s/^[A-Z]:// });   # strip a leading "X:"
+ assign($df, 'Res.' => map_cell { $_ = uc });        # upper-case in place
+
+The row is still reachable as B<< C<$_[0]> >> for sibling columns, the index as B<< C<$_[1]> >>, and (HoH only) the row key as B<< C<$_[2]> >>:
+
+ assign($df, label => map_cell { $_ = "$_[0]{name} ($_[1])" });
+
+Notes:
+- B<Undef cells pass through untouched> (undef in → undef out). The block never runs on an undefined or missing cell, so C<s///> and friends don't warn on uninitialized values and a missing cell stays missing rather than becoming C<''>.
+- Works on all three shapes (AoH, HoA, HoH). For HoA the target column B<must already exist> (there's no column to edit otherwise) — C<map_cell> on a missing HoA column dies.
+- A plain C<sub { ... }> keeps its existing meaning (C<$_> = the whole row, return value stored); C<map_cell> is purely additive and changes nothing for existing callers.
 
 =head3 Ordering and length
 
@@ -3651,7 +3988,7 @@ More parts than elements gives empty trailing groups, losing nothing:
  my @groups = chunk([1, 2, 3], parts => 5);
  # 5 groups; flattening them back gives (1, 2, 3)
 
-=head2 C<col2col>
+=head2 col2col
 
 Apply a B<two-column function> to every pair of columns in a table and collect
 the answers in a hash of hashes.
@@ -4830,7 +5167,10 @@ all become hash of arrays:
      ]
  }
 
-returns an empty array of hashes if neither target nor group keys are found.
+A column that is present in some rows but missing in others is fine (those rows
+are simply skipped), but naming a target, group, or filter column that is absent
+from the data entirely is fatal: C<group_by> dies with
+C<< group_by: "E<lt>columnE<gt>" is not present in the dataset >>.
 
 =head3 Filtering
 
@@ -6367,6 +6707,11 @@ minimal example:
   <td>field separator character; synonym with <code>sep</code></td>
   <td><code>delim => "\t"</code></td>
 </tr>
+<tr>
+  <td><code>sheet</code></td>
+  <td>which worksheet to read from an <code>.xlsx</code> file: a 1-based index or a sheet name (default: first sheet). Ignored for text files</td>
+  <td><code>sheet => 'Sheet2'</code></td>
+</tr>
 </tbody>
 </table>
 
@@ -6397,80 +6742,113 @@ leading comments are never mistaken for one. You may name such a column in a
 C<filter> either as it appears in the file or by its clean name:
     read_table('ranks.tabular.tsv', filter => { '# PDB' => sub { $_ == 2 } });
 
+=head3 Excel (.xlsx) files
+
+A file whose name ends in C<.xlsx> is read directly, with B<no extra
+dependencies> — the parser uses the core C<IO::Uncompress::Unzip> module to pull
+the parts out of the (zipped) workbook and reads the XML itself. All
+C<output.type>, C<filter>, and C<row.names> options work exactly as they do for
+text files:
+
+ my $data = read_table('samples.xlsx');
+ my $data = read_table('samples.xlsx', sheet => 'Results');   # by name
+ my $data = read_table('samples.xlsx', sheet => 2);           # 1-based index
+
+B<Multiple worksheets.> If the workbook has more than one worksheet and no
+C<sheet> is given, C<read_table> returns a B<hashref keyed by worksheet name>,
+each value being that sheet parsed just as a single table would be (honouring
+C<output.type>, C<filter>, etc.):
+
+ my $book = read_table('report.xlsx');   # { Sheet1 => [...], Sheet2 => [...] }
+ my $rows = $book->{Results};
+
+A workbook with a single worksheet, or a call that names a C<sheet> explicitly,
+returns that one table directly (not wrapped in a hash).
+
+Limitations: dates and times are returned as their raw Excel serial numbers
+(cell number formats are not applied); and shared-string rich-text runs are
+concatenated into a single value. The C<sep>, C<delim>, and C<comment> options do
+not apply to C<.xlsx> files. Tested in C<t/read_table.xlsx.t>.
+
 =head2 rename_cols
 
-Return a new data frame with columns renamed — C<df.rename(columns={...})>.
-Columns not named are kept unchanged. The mapping may be given as
-C<< old =E<gt> new >> pairs or as a single hashref. C<AoA> frames have no column
-labels, so C<rename_cols> on an C<AoA> dies (convert to C<AoH>/C<HoA> first).
+ rename_cols($df, old => new, ...)
+ rename_cols($df, { old => new, ... })
 
- my $aoh = [ { a => 1, b => 2 }, { a => 3, b => 4 } ];
- rename_cols($aoh, a => 'x');
- # [ { x => 1, b => 2 }, { x => 3, b => 4 } ]
+Rename one or more columns of a data frame. Works on the labelled shapes
+(C<AoH>, C<HoA>, C<HoH>); an C<AoA> has no column names and dies (convert to
+C<AoH>/C<HoA> first). Identifiers are the inner-row keys for C<AoH>/C<HoH> and the
+top-level keys for C<HoA>.
+
+Behaviour depends on calling context:
+
+=over
+
+=item * B<Non-void> (scalar or list context) returns a fresh shallow B<view> and
+never mutates the source. Row shapes (C<AoH>/C<HoH>) share the cell scalars by
+reference via XS; a C<HoA> aliases the whole column arrayrefs under their new
+keys.
+
+=item * B<Void> context renames the source B<in place> and returns nothing: the
+edit lands in each C<AoH>/C<HoH> row hash, or on the top-level keys of a C<HoA>.
+
+=back
+
+<!-- -->
+
+ # HoH: rename an inner-row key in every row, in place
+ rename_cols(\%d, resolution => 'Resolution (Å)');
  
- my $hoa = { a => [1,4], b => [2,5] };
- rename_cols($hoa, { b => 'B' });
- # { a => [1,4], B => [2,5] }
+ # capture a fresh view instead; %d is left untouched by rename_cols itself
+ %d = %{ rename_cols(\%d, resolution => 'Resolution (Å)') };
+ 
+ # pairs or a single hashref; both forms are equivalent
+ my $view = rename_cols($aoh, a => 'x', c => 'z');
+ my $view = rename_cols($hoa, { b => 'B' });
 
-A swap is fine because the target names stay distinct:
+Both the in-place and view paths are swap-safe (gather-then-set), so an
+exchange renames correctly:
 
- rename_cols($aoh, a => 'b', b => 'a');   # columns exchanged
+ rename_cols($sw, a => 'b', b => 'a');   # {a=>1,b=>2} -> {b=>1,a=>2}
 
-=head3 views, speed, and memory
+Ragged C<AoH>/C<HoH> frames stay ragged: an old key that is absent from a given
+row is simply skipped for that row. For a C<HoA>, the renamed key points at the
+I<same> column arrayref (no copy), so a later C<push>/C<splice> on it is shared
+with the source.
 
-All three verbs return a B<new frame> and never modify the source, but the
-result is a B<shallow view> built for speed on large frames:
-
-=over
-
-=item * the row shapes (C<AoH>, C<HoH>, C<AoA>) build fresh row containers but
-B<share the cell scalars> with the source — no per-cell copy;
-
-=item * C<HoA> B<shares the whole column arrayrefs>.
-
-=back
-
-The operation itself never mutates the source. Because the underlying data is
-shared, a later I<in-place> change reaches the source: mutating a result cell
-(C<< $r-E<gt>[0]{a}++ >>, C<< chomp $r-E<gt>[0]{a} >>) or a C<push>/C<splice> on a result C<HoA>
-column will be visible through the original. Assigning a whole cell
-(C<< $r-E<gt>[0]{a} = ... >>) is always safe. If you need a fully independent frame,
-clone the result (e.g. C<Storable::dclone>).
-
-The row shapes run in XS, which shares cells and hashes each column key once
-instead of once per row. Measured against the equivalent pure-Perl rebuild
-(300k-row C<AoH>, 8 columns):
-
- select 3/8 cols :  ~2x faster, and lower peak RAM (no copied cells)
- drop   2/8 cols :  ~3x faster
- rename 2/8 cols :  ~4x faster
-
-C<HoA> and C<AoA>-by-drop are pure-Perl aliases and already near-free (a slice
-of an 8-column, million-row C<HoA> is sub-second). The memory saving grows
-with rows × selected columns: at scale the row shapes allocate only the new
-row containers, never a second copy of every cell.
-
-=head3 strictness
-
-Mistakes are fatal rather than silently corrupting a frame (validated in Perl
-before any XS runs):
+Dies (all validation runs B<before> any mutation, so a dying void call leaves
+the source unchanged):
 
 =over
 
-=item * a requested (or renamed) column not present anywhere dies;
+=item * an old column that is not present anywhere in the frame,
 
-=item * a duplicate column in a C<select_cols>/C<drop_cols> list dies (a hash-keyed
-shape would otherwise collapse it);
+=item * a new name that is C<undef>,
 
-=item * a C<rename_cols> whose targets are not distinct — two columns landing on
-one name — dies (checked against the whole column set, so an C<< aE<lt>-E<gt>b >> swap
-is fine but C<< a-E<gt>b >> onto an existing C<b> is caught).
+=item * a rename whose target collides with a kept column or another renamed target,
+
+=item * an odd-length C<< old =E<gt> new >> argument list,
+
+=item * an C<AoA> (no column names to rename).
 
 =back
 
-Shape is classified by the same C<_df_shape> detector C<agg> uses, so these
-accept exactly the frames C<agg>/C<view> accept; as with that family the check
-is C<ref>-based, so hand it an unblessed frame.
+Note: C<\%d = rename_cols(...)> is B<not> valid Perl — a reference constructor
+is not an lvalue before 5.22 refaliasing, which is out under the module's 5.10
+back-compatibility. Use the void form or the C<%d = %{ ... }> capture idiom
+above.
+
+=head2 I<rename>inplace
+
+ _rename_inplace($df, $shape, \%map)
+
+Private helper (not exported) that backs C<rename_cols>'s void-context path;
+C<rename_cols> performs all argument checking first, so this never has to croak.
+For a C<HoA> it renames the top-level column keys; for C<AoH>/C<HoH> it renames
+the keys inside each row hash. It gathers the moved values before re-storing
+them, which makes it swap-safe, and it only touches keys that actually C<exists>
+in a given row, which preserves ragged frames. Mutates C<$df> and returns
+nothing.
 
 =head2 rnorm
 
@@ -7399,46 +7777,84 @@ Ties are detected during ranking and trigger the tie-corrected variance in the n
 =head2 write_table
 
 mimics R's C<write.table>, with data as first argument to subroutine, and output file as second
-
- write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
-
+    write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
 C<write_table> accepts every data-frame shape: a flat hash (one row), a hash of arrays (HoA), a hash of hashes (HoH), an array of hashes (AoH), and an array of arrays (AoA). For an AoA the first inner array is taken as the header row unless C<col.names> is given, in which case every inner array is treated as data:
-
- write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
- write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
-
+    write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
+    write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
 You can also precisely filter and reorder which columns are written by passing an array reference to C<col.names>:
-
- write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
-
+    write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
 undefined variables are printed as C<NA> by default, but can be set as you wish using C<undef.val>
-
- write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
-
+    write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
 as of version 0.07, C<write_table> determines comma and tab-separated delimiters from the filename, but will override if C<sep> or C<delim> are explicitly set.
-
 Args can also be accepted:
-
- write_table( 'data' => \%flat, 'file' => $f );
+    write_table( 'data' => \%flat, 'file' => $f );
 
 =head3 LaTeX output (C<tex>)
 
 C<write_table> can write the output file as a LaTeX C<tabular> instead of a delimited table. This is selected either by naming the file C<*.tex> (auto-detected) or by passing C<< tex =E<gt> 1 >>; an explicit C<< tex =E<gt> 0 >> forces a delimited file even when the name ends in C<.tex>. The LaTeX table is built from the same rows as the delimited writer, so it works for every shape above (including arrays of arrays):
+    write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
+    write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
+The file begins with a C<< %written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance comment (the working directory and script name). The header row is bold and the table is ruled with C<\hline>. Unlike the delimited writer, LaTeX output includes a row-label column as its first column by default: C<row.names> defaults on for LaTeX (matching R's C<write.table>), so pass C<< row.names =E<gt> 0 >> to omit it. The labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: C<#>, C<_>, C<%>, and C<&> are backslash-escaped, C<< E<gt> >> becomes C<\textgreater{}>, and a cell consisting solely of C<\includesvg{...svg}> is passed through untouched. The C<tex.*> options tune the output:
+    write_table(\@rows, 'table.tex',
+        'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
+        'tex.bold.1st.col' => 0,                     # default 1: bold the first column
+        'tex.format'       => 1,                     # %.4g-format numeric cells
+        'tex.size'         => '\small',              # size directive after \begin{tabular}
+        'tex.comment'      => ['run 3', 'q < 0.05'], # % comment line(s): string or array ref
+    );
+For a table that must span page breaks, C<< tex.longtable =E<gt> 1 >> writes only the table I<body> — the bold header row and the data rows, ruled with C<\hline> — but no C<\begin{tabular}>/C<\end{tabular}> and no column spec, so you can C<\input{}> it into a C<longtable> environment you write yourself. Setting C<tex.longtable> implies C<< tex =E<gt> 1 >>, so it applies to any file name (and overrides C<< tex =E<gt> 0 >>). After the provenance comment (and any C<tex.comment> lines) the file emits a C<% \begin{longtable}{...}> hint with one C<tex.col.align> character per column, so you can copy a column spec with the right count. In this mode C<tex.col.align> affects only that hint — the real alignment lives on your own C<\begin{longtable}>; the other C<tex.*> options (C<tex.bold.1st.col>, C<tex.format>, C<tex.size>, C<tex.comment>) still apply:
+    write_table(\@rows, 'output.file.tex', 'tex.longtable' => 1);
+writes a body-only file such as
+    %written by /home/con/Scripts/stats/make_table.pl
+    % \begin{longtable}{ccc}
+    \hline
+    \textbf{a} & \textbf{b} & \textbf{c} \ \hline
+    1 & 2 & 3\
+    \hline
+which you wrap yourself:
+    \begin{longtable}{ccc}
+    \input{output.file.tex}
+    \caption{}
+    \label{}
+    \end{longtable}
 
- write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
- write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
+=head3 Excel output (C<xlsx>)
 
-The file begins with a C<< %written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance comment (the working directory and script name). The header row is bold and the table is ruled with C<\hline>. Cell text is LaTeX-escaped: C<#>, C<_>, C<%>, and C<&> are backslash-escaped, C<< E<gt> >> becomes C<\textgreater{}>, and a cell consisting solely of C<\includesvg{...svg}> is passed through untouched. The C<tex.*> options tune the output:
+C<write_table> can write a real Excel C<.xlsx> workbook with B<no extra
+dependencies> — it is built entirely in XS, packing hand-written XML parts into
+an (uncompressed) ZIP, so there is no C<Excel::Writer::XLSX> or other CPAN
+requirement. It is selected either by naming the file C<*.xlsx> (auto-detected)
+or by passing C<< xlsx =E<gt> 1 >>; an explicit C<< xlsx =E<gt> 0 >> forces a delimited file even
+for a C<.xlsx> name. Like LaTeX, it is built from the same rows as the delimited
+writer, so it works for every shape above:
 
- write_table(\@rows, 'table.tex',
-     'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
-     'tex.bold.1st.col' => 0,                     # default 1: bold the first column
-     'tex.format'       => 1,                     # %.4g-format numeric cells
-     'tex.size'         => '\small',              # size directive after \begin{tabular}
-     'tex.comment'      => ['run 3', 'q < 0.05'], # % comment line(s): string or array ref
+ write_table(\@data_aoh, 'table.xlsx');            # .xlsx name selects Excel
+ write_table(\%data_hoa, $tmp_file, 'xlsx' => 1);  # force Excel for any name
+
+A numeric-looking cell is written as a number; every other non-empty cell as an
+inline string (C<undef>/empty cells are omitted). The result reads straight back
+with L<#read_table>.
+
+Mirroring C<Excel::Writer::XLSX>'s
+C<< $workbook-E<gt>set_properties(comments =E<gt> comments()) >>, the same
+C<< written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance line the LaTeX writer emits is stored in
+the workbook's document B<comments> property (C<dc:description> in
+C<docProps/core.xml>); a C<xlsx.comment> string (or array ref of strings) is
+appended after it. C<xlsx.sheet> sets the worksheet name (default C<Sheet1>):
+
+ write_table(\@rows, 'report.xlsx',
+     'xlsx.sheet'   => 'Results',
+     'xlsx.comment' => 'batch 9',
  );
 
-The C<xlsx>, worksheet, and JSON side outputs of the original stand-alone routine are not included.
+C<xlsx.freeze.rows> and C<xlsx.freeze.cols> freeze that many leading rows/columns in place (Excel's I<freeze panes>), so they stay visible while scrolling — most often used to pin the header row:
+
+ write_table(\@rows, 'report.xlsx', 'xlsx.freeze.rows' => 1);                        # pin the header row
+ write_table(\@rows, 'report.xlsx', 'xlsx.freeze.rows' => 1, 'xlsx.freeze.cols' => 2); # pin header + first two columns
+
+C<tex> and C<xlsx> are mutually exclusive. Note: dates/times are written as their
+raw values (no cell number formats), matching the round-trip behaviour of
+C<read_table>.
 
 =head3 Options
 
@@ -7472,9 +7888,9 @@ The C<xlsx>, worksheet, and JSON side outputs of the original stand-alone routin
 </tr>
 <tr>
   <td><code>row.names</code></td>
-  <td><code>1</code> (on)</td>
+  <td>LaTeX: <code>1</code> (on); delimited: <code>0</code> (off)</td>
   <td>both</td>
-  <td>true prepends a label column (numeric index, or the outer key for a HoH); <code>0</code> omits it; for a HoA/AoH a non-numeric <i>column name</i> uses that column's values as the labels and drops it from the body</td>
+  <td>true prepends a label column (numeric 1-based index, or the outer key for a HoH); <code>0</code> omits it. LaTeX output defaults on (R-compatible); delimited output defaults off; an explicit value overrides in either case. For a HoA/AoH a non-numeric <i>column name</i> uses that column's values as the labels and drops it from the body</td>
 </tr>
 <tr>
   <td><code>col.names</code></td>
@@ -7498,7 +7914,7 @@ The C<xlsx>, worksheet, and JSON side outputs of the original stand-alone routin
   <td><code>tex.col.align</code></td>
   <td><code>'c'</code></td>
   <td>LaTeX</td>
-  <td>per-column alignment: <code>'c'</code>, <code>'l'</code>, or <code>'r'</code></td>
+  <td>per-column alignment: <code>'c'</code>, <code>'l'</code>, or <code>'r'</code>; with <code>tex.longtable</code> on it sets only the <code>% \begin{longtable}{...}</code> hint</td>
 </tr>
 <tr>
   <td><code>tex.bold.1st.col</code></td>
@@ -7524,10 +7940,92 @@ The C<xlsx>, worksheet, and JSON side outputs of the original stand-alone routin
   <td>LaTeX</td>
   <td><code>%</code> comment line(s) at the top of the LaTeX file: a string, or an array ref of strings</td>
 </tr>
+<tr>
+  <td><code>tex.longtable</code></td>
+  <td><code>0</code> (off)</td>
+  <td>LaTeX</td>
+  <td>write only the table body (header + data rows + <code>\hline</code>, no <code>\begin{tabular}</code>/<code>\end{tabular}</code> or column spec) for <code>\input{}</code> into a caller-supplied <code>longtable</code>; implies <code>tex => 1</code>, and emits a <code>% \begin{longtable}{...}</code> hint with one <code>tex.col.align</code> char per column</td>
+</tr>
+<tr>
+  <td><code>xlsx</code></td>
+  <td>auto: <code>1</code> when <code>file</code> ends in <code>.xlsx</code>, else <code>0</code></td>
+  <td>Excel</td>
+  <td>write a real <code>.xlsx</code> workbook (dependency-free, built in XS) instead of a delimited table; <code>xlsx => 0</code> forces delimited even for a <code>.xlsx</code> name. Mutually exclusive with <code>tex</code></td>
+</tr>
+<tr>
+  <td><code>xlsx.sheet</code></td>
+  <td><code>'Sheet1'</code></td>
+  <td>Excel</td>
+  <td>worksheet name</td>
+</tr>
+<tr>
+  <td><code>xlsx.comment</code></td>
+  <td><i>(none)</i></td>
+  <td>Excel</td>
+  <td>extra line(s) appended after the provenance in the workbook's document <i>comments</i> property (<code>dc:description</code>): a string, or an array ref of strings</td>
+</tr>
+<tr>
+  <td><code>xlsx.freeze.rows</code></td>
+  <td><code>0</code> (none)</td>
+  <td>Excel</td>
+  <td>number of leading rows to freeze in place (freeze panes), e.g. <code>1</code> to pin the header row</td>
+</tr>
+<tr>
+  <td><code>xlsx.freeze.cols</code></td>
+  <td><code>0</code> (none)</td>
+  <td>Excel</td>
+  <td>number of leading columns to freeze in place (freeze panes)</td>
+</tr>
 </tbody>
 </table>
 
 =head1 Changes
+
+=head2 0.23 2026-07-08 CDT
+
+C<rename_cols> takes HoH as input
+
+C<write_table> prints row names as first column; writes longtable with comments
+
+C<assign> gains C<map_cell { ... }> for in-place per-cell column edits
+
+=head3 assign
+
+C<assign> now accepts a third kind of column value, C<map_cell { ... }>, for editing an existing column in place — no "copy, substitute, return" boilerplate and no dependence on C<s///r> (unavailable on the older perls this module supports).
+
+=over
+
+=item * Inside a C<map_cell> block, C<$_> is the B<named column's current cell> (not the whole row), the block's return value is B<ignored>, and the modified C<$_> is stored back: C<< assign($df, 'Res.' =E<gt> map_cell { s/^[A-Z]:// }) >>.
+
+=item * The row is still available as C<$_[0]> (sibling columns), the index as C<$_[1]>, and the row key as C<$_[2]> (HoH only).
+
+=item * B<Undef/missing cells pass through untouched> (undef in → undef out): the block is skipped for them, so C<s///> never warns on an uninitialized value.
+
+=item * Supported on all three shapes; for HoA the target column must already exist. A plain C<sub { ... }> is unchanged, so C<map_cell> is purely additive.
+
+=item * C<map_cell> is exported alongside C<assign>.
+
+=back
+
+Tests: C<assign.t> (AoH + HoA) and C<assign.HoH.t> gained C<map_cell> coverage — in-place C<s///>, C<$_[0]>/C<$_[1]>/C<$_[2]> context, new-column-from-undef, the missing-HoA-column death path, and C<no_leaks_ok> guards. Verified building and passing the full suite on perl 5.10.1, 5.12.5 (long-double), and 5.42.2.
+
+=head3 C<group_by>
+
+Fixed group_by to honor all filter hashrefs (option 1)
+
+Root cause: the XS captured only ST(3), so every filter hashref after the first was silently dropped — including the README's documented multi-hashref form.
+
+Change (LikeR.xs):
+- Removed the single-ST(3) capture and the filter_hv PREINIT var.
+- Added a FOR_EACH_FILTER(body) macro that walks the arg stack from ST(3) to ST(items-1), iterating every { column => sub } pair and ANDing them together. It iterates the stack directly rather than heap-collecting the hashrefs, so a croaking filter sub still can't leak anything (verified). Non-hashref args are skipped.
+- Rewrote the filter loop in all three branches (AoH / HoA / HoH) to use the macro, keeping each branch's own value-fetch logic.
+
+One build wrinkle worth noting: xsubpp parses every non-# line in the inter-XSUB region as a candidate function signature, so a /* ... */ comment there breaks the build (it tried to parse column => sub / (ST(3)..) as a signature). I moved the macro's documentation into the XSUB body (real C) and left the macro comment-free, matching the existing EVAL_FILTER style.
+
+Tests (t/group_by.HoH.filter.t, 17 assertions):
+- HoH single-column filter, AND filter (both the one-hashref and separate-hashref forms now give identical results), no-match → empty hash, missing/undef target excluded despite passing the filter, and no_leaks_ok
+
+Mentioning a non-existent column is now fatal.
 
 =head2 0.22 2026-07-07 CDT
 
@@ -7541,7 +8039,7 @@ addition of C<agg>, C<concat>, C<drop_cols>, C<rank>, C<rename_cols>, C<select_c
 
 Improving Kwalitee (sic): added C<[PodWeaver]> to dist.ini; as well as C<Changes> file
 
-=head3 assign
+=head3 C<assign>
 
 C<assign> now accepts two kinds of column value, so a function that already returns a whole column (like C<rank>) drops in without wrapping.
 
@@ -7559,7 +8057,7 @@ The coderef is probed once (row 0 for AoH/HoH, the first synthesized view for Ho
 
 Tests: C<assign.t> (AoH + HoA) and C<assign_HoH.t> were expanded to cover every shape × value-kind combination — per-row scalar, whole-column list, arrayref value, single-arrayref-as-cell, C<rank()> integration, chaining, C<$_[1]> index, C<$_[2]> row key (HoH), overwrite, ragged HoA columns, empty frames, length-mismatch and bad-value / odd-arg / non-hash-row death paths, and C<no_leaks_ok> guards on the new whole-column and arrayref paths.
 
-=head3 read_table
+=head3 C<read_table>
 
 Fixed handling of commented-out header lines and made filter columns
 referenceable by the name as it appears in the file.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v5.0.1');
+our $VERSION   = qv('v5.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube::Route - Class to represent the route in the map.
 
 =head1 VERSION
 
-Version v5.0.1
+Version v5.1.0
 
 =cut
 
@@ -28,6 +28,7 @@ use overload q{""} => 'as_string', fallback => 1;
 
 has [ qw(from to) ] => (is => 'ro', isa => Node,  required => 1);
 has nodes => (is => 'ro', isa => Nodes, required => 1);
+has link_lines => (is => 'ro', default => sub { {} });
 with 'Map::Tube::Plugin::Formatter';
 
 =head1 SYNOPSIS
@@ -91,6 +92,17 @@ sub preferred {
         $active[0] = { %cur };
         for my $i (1 .. $n - 1) {
             my %here = map { $_->id => 1 } @{$all_nodes[$i]->{line}};
+
+            # If this specific edge (previous node -> this node) is
+            # restricted to a subset of lines, only those lines are
+            # eligible here, matching _get_shortest_route's cost logic.
+            my $_node_restrictions = $self->link_lines->{uc($all_nodes[$i - 1]->id)};
+            my $_restriction = defined($_node_restrictions) ? $_node_restrictions->{uc($all_nodes[$i]->id)} : undef;
+            if (defined $_restriction) {
+                my %_allowed = map { uc($_) => 1 } @$_restriction;
+                %here = map { $_ => 1 } grep { $_allowed{uc($_)} } keys %here;
+            }
+
             my %cont = map { $_ => 1 } grep { $cur{$_} } keys %here;
             %cur = %cont ? %cont : %here;
             $active[$i] = { %cur };
@@ -187,7 +199,7 @@ L<https://metacpan.org/dist/Map-Tube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2025 Mohammad Sajid Anwar.
+Copyright (C) 2010 - 2026 Mohammad Sajid Anwar.
 
 This  program  is  free software;  you can redistribute it and/or modify it under
 the  terms  of the the Artistic  License (2.0). You may obtain a copy of the full

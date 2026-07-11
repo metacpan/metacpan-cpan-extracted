@@ -19,6 +19,8 @@ input:
     min: 1
     optional: 0
     type: string
+  # particles omitted: fuzz-harness-generator does not support union types
+  # (boolean|arrayref).  Particle coverage lives in t/unit.t and t/function.t.
   separator:
     optional: 1
     type: string

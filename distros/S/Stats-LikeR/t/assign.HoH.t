@@ -126,6 +126,33 @@ is($ow->{a}{x}, 10, 'HoH: overwrites existing column (a)');
 is($ow->{b}{x}, 20, 'HoH: overwrites existing column (b)');
 
 # --------
+# map_cell: in-place per-cell edit; $_ is the cell, return value ignored
+# --------
+my $mc = {
+	Alice => { 'Res.' => 'A:foo' },
+	Bob   => { 'Res.' => 'B:bar' },
+};
+my $mc_ret = assign($mc, 'Res.' => map_cell { s/^[A-Z]:// });
+is(refaddr($mc_ret), refaddr($mc), 'HoH map_cell: returns the original ref for chaining');
+is($mc->{Alice}{'Res.'}, 'foo', 'HoH map_cell: in-place s/// (Alice), return value ignored');
+is($mc->{Bob}{'Res.'}, 'bar', 'HoH map_cell: in-place s/// (Bob)');
+
+# map_cell exposes the row as $_[0], the index as $_[1], and the row key as $_[2]
+my $mk = { a => { v => 'x' }, b => { v => 'y' } };
+assign($mk, v => map_cell { $_ = "$_-$_[1]-$_[2]" });
+is($mk->{a}{v}, 'x-0-a', 'HoH map_cell: $_[1] index and $_[2] row key (a)');
+is($mk->{b}{v}, 'y-1-b', 'HoH map_cell: $_[1] index and $_[2] row key (b)');
+
+# map_cell leaves undef cells untouched (undef in -> undef out)
+my $mu = { a => { 'Res.' => 'A:foo' }, b => { 'Res.' => undef }, c => {} };
+my $mu_ran = 0;
+assign($mu, 'Res.' => map_cell { $mu_ran++; s/^[A-Z]:// });
+is($mu_ran, 1, 'HoH map_cell: block runs only for the defined cell');
+is($mu->{a}{'Res.'}, 'foo', 'HoH map_cell: defined cell edited');
+ok(!defined $mu->{b}{'Res.'}, 'HoH map_cell: undef cell stays undef');
+ok(!exists $mu->{c}{'Res.'}, 'HoH map_cell: missing cell stays missing');
+
+# --------
 # Length mismatch dies for both column-value kinds
 # --------
 throws_ok { assign({ a => {}, b => {} }, bad => [1]) }
@@ -166,5 +193,12 @@ no_leaks_ok {
         assign($t, num => [10, 20]);
     }
 } 'assign(HoH): no memory leaks (arrayref value)' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+    eval {
+        my $t = { a => { s => 'A:1' }, b => { s => 'B:2' } };
+        assign($t, s => map_cell { s/^[A-Z]:// });
+    }
+} 'assign(HoH): no memory leaks (map_cell)' unless $INC{'Devel/Cover.pm'};
 
 done_testing();

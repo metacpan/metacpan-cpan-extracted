@@ -52,9 +52,20 @@ fi
 
 mkdir -p $OSM_HOME
 # cd $HOME/Downloads && wget -N -c https://ftpmirror.your.org/pub/openstreetmap/planet/planet-latest.osm.bz2
-cd $OSM_HOME && wget -N -c https://download.geofabrik.de/europe-latest.osm.bz2
-wget -N -c https://download.geofabrik.de/north-america-latest.osm.bz2
-wget -N -c https://download.geofabrik.de/australia-oceania-latest.osm.bz2
+# cd $OSM_HOME && wget -N -c https://download.geofabrik.de/europe-latest.osm.bz2
+# wget -N -c https://download.geofabrik.de/north-america-latest.osm.bz2
+# wget -N -c https://download.geofabrik.de/australia-oceania-latest.osm.bz2
+cd $OSM_HOME
+# apt install osmium-tool
+for i in europe north-america australia-oceania; do
+	wget -N -c https://download.geofabrik.de/$i-latest.osm.pbf
+	rm -f $i-latest.osm
+	osmium cat $i-latest.osm.pbf -o $i-latest.osm
+	rm $i-latest.osm.pbf
+	bzip2 $i-latest.osm&
+done
+
+wait
 
 # If you're paranoid, enable this line to verify the download
 # bunzip2 -t *.osm.bz2

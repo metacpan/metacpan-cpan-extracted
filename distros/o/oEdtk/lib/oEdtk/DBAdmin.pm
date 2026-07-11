@@ -19,7 +19,7 @@ use Data::Dumper qw(Dumper);
 # SHOW CREATE DATABASE oEdtk;
 
 use Exporter;
-our $VERSION		= 2.1063; #version lc Mysql / PG / Oracle / SQLite
+our $VERSION		= 2.1071; #version lc Mysql / PG / Oracle / SQLite
 our $VERSION_TXT 	= $VERSION =~ s/\./_/gr;
 our @ISA			= qw(Exporter);
 our @EXPORT_OK		= qw(
@@ -674,8 +674,31 @@ sub _get_col_meta {
             }xi) ? 1 : 0;
             my $is_num = ($num_codes{$type} || $by_name) ? 1 : 0;
 
-            $meta{$col} = { numeric => $is_num, size => $size };
-            &logger(7, "_get_col_meta: col=$col TYPE=$name($size) is_num=$is_num");
+            # COLUMN_SIZE n'est une longueur de caracteres exploitable pour la
+            # troncature que pour les types texte. Pour les types numeriques,
+            # date, heure, etc., column_info (en particulier DBD::Pg) retourne
+            # la taille de stockage interne (ex: date(4), comme un int4), ce
+            # qui provoque une troncature erronee des valeurs (ex: une date
+            # "2026-07-09" tronquee a "2026" avant l'insertion en base).
+            my $is_text = ($name =~ m{
+                ^( varchar | character(\s+varying)? | char | bpchar | text )
+            }xi) ? 1 : 0;
+
+            # Types necessitant la conversion '' => NULL a l'insertion :
+            # les numeriques (deja couverts par is_num) ainsi que les types
+            # date/heure, pour lesquels PostgreSQL rejette une chaine vide
+            # ('ERROR: invalid input syntax for type date: ""').
+            my $is_datetime = ($name =~ m{
+                ^( date | time | timestamp(tz)? | datetime )
+            }xi) ? 1 : 0;
+            my $blank_to_null = ($is_num || $is_datetime) ? 1 : 0;
+
+            $meta{$col} = {
+                numeric       => $is_num,
+                blank_to_null => $blank_to_null,
+                size          => ($is_text ? $size : 0),
+            };
+            &logger(7, "_get_col_meta: col=$col TYPE=$name($size) is_num=$is_num is_text=$is_text blank_to_null=$blank_to_null");
         }
         &logger(5, "_get_col_meta: $found colonnes pour '$table_name'");
     };
@@ -699,8 +722,8 @@ sub _make_clean_val {
         my $m = $col_meta->{ $col } // {};
 
         if ($val eq '') {
-            if ($m->{numeric}) {
-                &logger(7, "clean_val: col '$col' numerique, '' => undef");
+            if ($m->{blank_to_null}) {
+                &logger(7, "clean_val: col '$col' numerique/date, '' => undef");
                 return undef;
             }
             return $val;

@@ -8,7 +8,7 @@ build_requires:
   File::Spec: '0'
   Hash::Util: '0'
   Scalar::Util: '0'
-  Sereal::Decoder: '5.007'
+  Sereal::Decoder: '5.008'
   Test::Deep: '0'
   Test::Differences: '0'
   Test::LongString: '0'
@@ -29,11 +29,11 @@ no_index:
     - t
     - inc
 requires:
-  Sereal::Decoder: '5.007'
+  Sereal::Decoder: '5.008'
   XSLoader: '0'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/Sereal/Sereal/issues
   repository: git://github.com/Sereal/Sereal.git
-version: '5.007'
+version: '5.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

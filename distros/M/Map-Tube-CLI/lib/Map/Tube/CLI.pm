@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v0.850.0');
+our $VERSION   = qv('v1.0.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version v0.850.0
+Version v1.0.0
 
 =cut
 
@@ -448,7 +448,7 @@ sub _prepare_line_mappings {
     $map_table->setCols('Station Name','Connected To');
 
     foreach my $station (map { $_->name } @{ $map->get_stations($line_name) }) {
-        $map_table->addRow($station, join(", ", @{$map->get_linked_stations($station)}));
+        $map_table->addRow($station, join(", ", @{$map->get_linked_stations($station, $line_name)}));
     }
 
     return $map_table;

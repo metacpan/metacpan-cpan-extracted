@@ -51,15 +51,16 @@ MODULE = Data::RoaringBitmap::Shared  PACKAGE = Data::RoaringBitmap::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path = &PL_sv_undef, container_capacity = 256)
+new(class, path = &PL_sv_undef, container_capacity = 256, file_mode = 0600)
     const char *class
     SV *path
     UV container_capacity
+    UV file_mode
   PREINIT:
     char errbuf[RB_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    RbHandle *h = rb_create(p, (uint64_t)container_capacity, errbuf);   /* validates args into errbuf */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    RbHandle *h = rb_create(p, (uint64_t)container_capacity, (mode_t)file_mode, errbuf);   /* validates args into errbuf */
     if (!h) croak("Data::RoaringBitmap::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -73,7 +74,7 @@ new_memfd(class, name = &PL_sv_undef, container_capacity = 256)
   PREINIT:
     char errbuf[RB_ERR_BUFLEN];
   CODE:
-    const char *nm = SvOK(name) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;   /* undef -> default label */
     RbHandle *h = rb_create_memfd(nm, (uint64_t)container_capacity, errbuf);   /* validates args into errbuf */
     if (!h) croak("Data::RoaringBitmap::Shared->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -292,7 +293,8 @@ to_array(self)
             if (bt[hi].type == RB_TYPE_NONE) continue;
             if (bt[hi].type == RB_TYPE_ARRAY) {
                 uint16_t *vals = rb_array(h, bt[hi].container_off);
-                for (uint32_t i = 0; i < bt[hi].cardinality && idx < card; i++)
+                uint32_t ac = rb_array_card(&bt[hi]);
+                for (uint32_t i = 0; i < ac && idx < card; i++)
                     av_store(av, (SSize_t)idx++, newSVuv(((UV)hi << 16) | vals[i]));
             } else {
                 uint64_t *bits = rb_bitmap(h, bt[hi].container_off);
@@ -460,6 +462,6 @@ unlink(self, ...)
     if (sv_isobject(self) && sv_derived_from(self, "Data::RoaringBitmap::Shared")) {
         RbHandle *h = INT2PTR(RbHandle*, SvIV(SvRV(self)));
         if (h && h->path) unlink(h->path);
-    } else if (items >= 2 && SvOK(ST(1))) {
+    } else if (items >= 2 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) {
         unlink(SvPV_nolen(ST(1)));
     }

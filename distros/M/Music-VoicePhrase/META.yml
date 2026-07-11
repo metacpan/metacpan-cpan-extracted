@@ -1,5 +1,5 @@
 ---
-abstract: 'Construct a measured phrase of notes'
+abstract: 'Construct measured phrases of notes'
 author:
   - 'Gene Boggs <gene.boggs@gmail.com>'
 build_requires:
@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-VoicePhrase
   repository: https://github.com/ology/Music-VoicePhrase.git
-version: '0.0116'
+version: '0.0117'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

@@ -11,7 +11,7 @@ enhancement of data tracking and knowledge for industrial printing
 processing.
 
 
-    oEdtk Copyright (C) 2005-2024 G Chaillou Domingo, D Aunay, M Henrion, G Ballin
+    oEdtk Copyright (C) 2005-2026 G Chaillou Domingo, D Aunay, M Henrion, G Ballin
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

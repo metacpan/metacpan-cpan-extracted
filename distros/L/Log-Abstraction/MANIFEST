@@ -1,6 +1,7 @@
 Changes
 cpanfile
 lib/Log/Abstraction.pm
+lib/Log/Any/Adapter/Abstraction.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -10,8 +11,12 @@ t/00-load.t
 t/10-compile.t
 t/20-new.t
 t/30-basics.t
+t/caller_depth.t
 t/code.t
 t/comment-spelling.t
+t/conf/is_debug.yml
+t/conf/messages.yml
+t/conf/new.yml
 t/config_file.t
 t/edge_cases.t
 t/eof.t
@@ -20,7 +25,10 @@ t/error.t
 t/extended_tests.t
 t/function.t
 t/integration.t
+t/journald.t
+t/json_format.t
 t/locales.t
+t/log_any_adapter.t
 t/manifest.t
 t/mutant_killers.t
 t/pod-cm.t

@@ -7,6 +7,8 @@
 
 use strict;
 use warnings;
+use utf8;
+use open ':std', ':utf8';
 
 use POSIX        qw(ENOENT);
 use Readonly;
@@ -576,6 +578,101 @@ subtest 'LIMITATION pipeline: lossy formats do not round-trip through any style'
 # POD §Returns: "A plain string."  Every combination of format and style, and
 # every edge-case input, must produce a value satisfying { type => 'string' }.
 # ===========================================================================
+
+# ===========================================================================
+# SECTION 13 -- Particle detection: pipeline and statefulness
+#
+# Verifies that particle absorption works end-to-end across calling forms,
+# that the particles option does not leak state between calls, and that
+# Unicode + particle combinations are handled correctly.
+# ===========================================================================
+
+subtest 'particles pipeline: particle name in a multi-format batch' => sub {
+	# The same particle name abbreviated in every format must produce a string.
+	my $name = 'Ludwig van Beethoven';
+	my %expected = (
+		default   => 'L. van Beethoven',
+		shortlast => 'L. van Beethoven',
+		initials  => 'L.v.',
+		compact   => 'Lv',
+	);
+
+	for my $fmt (@ALL_FORMATS) {
+		my $result = abbreviate($name, { format => $fmt });
+		is($result, $expected{$fmt}, "particles pipeline: format=$fmt");
+		returns_ok($result, { type => 'string' }, "particles pipeline: format=$fmt returns string");
+	}
+
+	done_testing();
+};
+
+subtest 'particles pipeline: stateless — particles option does not bleed between calls' => sub {
+	# A call with particles enabled must not infect a subsequent plain call,
+	# and a call with particles disabled must not suppress them in the next call.
+	my $particle_name = 'Ludwig van Beethoven';
+	my $plain_name    = $THREE_PART;
+
+	my $r1 = abbreviate($particle_name);                        # particles on (default)
+	my $r2 = abbreviate($plain_name);                           # plain name, default options
+	my $r3 = abbreviate($particle_name, { particles => 0 });    # particles off
+	my $r4 = abbreviate($particle_name);                        # particles on again (default)
+
+	is($r1, 'L. van Beethoven', 'particle call: van absorbed');
+	is($r2, 'J. Q. Adams',      'plain call after particle call: unaffected');
+	is($r3, 'L. v. Beethoven',  'particle=0 call: van treated as initial');
+	is($r4, 'L. van Beethoven', 'particle call after particle=0: back to default');
+
+	done_testing();
+};
+
+subtest 'particles pipeline: last_first style end-to-end' => sub {
+	is(
+		abbreviate('Ludwig van Beethoven', { style => 'last_first' }),
+		'van Beethoven, L.',
+		'particle + last_first: particle-inclusive last name placed first',
+	);
+	is(
+		abbreviate('Felipe de la Cruz', { style => 'last_first' }),
+		'de la Cruz, F.',
+		'two particles + last_first',
+	);
+	done_testing();
+};
+
+subtest 'particles pipeline: custom list end-to-end' => sub {
+	# Particles are absorbed from the token immediately before the last name
+	# working leftward.  With only 'de' in the list:
+	#   tokens: [Felipe, de, la, Cruz] -> pop Cruz -> check 'la' -> not in list -> stop
+	# So neither 'la' nor 'de' is absorbed; both become middle initials.
+	my $result = abbreviate('Felipe de la Cruz', { particles => ['de'] });
+	is($result, 'F. d. l. Cruz', 'custom list with only de: la blocks de, both become initials')
+		or note("actual: '$result'");
+
+	# Two particles both in the custom list: both absorbed.
+	my $r2 = abbreviate('Felipe de la Cruz', { particles => ['de', 'la'] });
+	is($r2, 'F. de la Cruz', 'custom list [de, la]: both absorbed');
+
+	returns_ok($result, { type => 'string' }, 'custom particle list result is a string');
+	returns_ok($r2,     { type => 'string' }, 'custom particle list result 2 is a string');
+	done_testing();
+};
+
+subtest 'particles pipeline: Unicode + particle combined' => sub {
+	use utf8;
+	use Unicode::Normalize ();
+
+	my $nfc_name = 'André de Rêve';
+	my $nfd_name = Unicode::Normalize::NFD($nfc_name);
+
+	my $r_nfc = abbreviate($nfc_name);
+	my $r_nfd = abbreviate($nfd_name);
+
+	is($r_nfc, 'A. de Rêve',  'NFC input: de absorbed, accented last name preserved');
+	is($r_nfd, $r_nfc,         'NFD and NFC inputs produce identical output');
+	returns_ok($r_nfc, { type => 'string' }, 'Unicode+particle result is a string');
+
+	done_testing();
+};
 
 subtest 'Test::Returns: every pipeline output satisfies the string return schema' => sub {
 	Readonly my %STR_SCHEMA => (type => 'string');

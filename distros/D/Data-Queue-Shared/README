@@ -74,7 +74,7 @@ DESCRIPTION
 
         For fixed-length FIFO workloads that need maximum throughput: use
         Data::Deque::Shared::Str with only "push_back" / "pop_front". It's
-        fixed-slot-per-entry (memory use = capacity × max_len), uses a
+        fixed-slot-per-entry (memory use = capacity x max_len), uses a
         per-slot publication state machine instead of a shared mutex, and
         measures 1.3x-4.7x faster than Queue::Str depending on contention (1
         vs 8 writers, 32-byte payloads, single box). Use that if your
@@ -118,7 +118,7 @@ DESCRIPTION
         my $q = Data::Queue::Shared::Str->new_memfd($name, $capacity);
         my $q = Data::Queue::Shared::Str->new_memfd($name, $cap, $arena);
 
-    Creates a queue backed by memfd_create(2). No filesystem path — the
+    Creates a queue backed by memfd_create(2). No filesystem path -- the
     backing memory is identified by a file descriptor. Use memfd() to
     retrieve the fd and pass it to other processes via "SCM_RIGHTS" (Unix
     domain socket fd passing) or fork() inheritance.
@@ -157,9 +157,9 @@ DESCRIPTION
         my $val = $q->pop_back_wait;            # blocking pop from back
         my $val = $q->pop_back_wait($timeout);  # with timeout
 
-    "push_front" inserts at the head — useful for requeueing failed jobs.
-    "pop_back" removes from the tail — useful for work-stealing or undo. Not
-    available for Int (Vyukov algorithm is strictly FIFO).
+    "push_front" inserts at the head -- useful for requeueing failed jobs.
+    "pop_back" removes from the tail -- useful for work-stealing or undo.
+    Not available for Int (Vyukov algorithm is strictly FIFO).
 
    Batch operations
         my $n  = $q->push_multi(@values);          # non-blocking, returns pushed count
@@ -184,7 +184,7 @@ DESCRIPTION
 
    Management
         $q->clear;                  # remove all elements
-        $q->sync;                   # msync — flush to disk for crash durability
+        $q->sync;                   # msync -- flush to disk for crash durability
         $q->unlink;                 # remove backing file
         Class->unlink($path);       # class method form
         my $p = $q->path;           # backing file path
@@ -320,6 +320,17 @@ SEE ALSO
     Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
 
     Data::RingBuffer::Shared - fixed-size overwriting ring buffer
+
+SECURITY
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 AUTHOR
     vividsnow

@@ -43,11 +43,14 @@ get('/error/:code' => sub {
 
 # provider server routes
 get('/authorize' => sub {
-      my $redirect_uri  = request->param('redirect_uri');
-      my $client_id     = request->param('client_id');
-      my $state         = request->param('state');
-      my $response_type = request->param('response_type');
-      if ($response_type eq 'code' && $client_id eq 'my_id') {
+      my $redirect_uri   = request->param('redirect_uri');
+      my $client_id      = request->param('client_id');
+      my $state          = request->param('state');
+      my $code_challenge = request->param('code_challenge');
+      my $response_type  = request->param('response_type');
+      if ($response_type eq 'code'
+            && $client_id eq 'my_id'
+            && $code_challenge eq 'oqtdK0vIPNvI5ejQ6RqbJoSu0bVMZ7IAPA_dqAejh7E') {
         app->logger_engine->info("redirecting to $redirect_uri");
         redirect("$redirect_uri?client_id=$client_id&state=$state&code=abc&iss=my_issuer");
       }

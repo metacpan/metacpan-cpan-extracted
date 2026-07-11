@@ -17,8 +17,9 @@ my $provider_app = require "$Bin/auth-code-flow-IT/MyProviderApp.pl";
 my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
 $mock_oidc_client->redefine('user_agent' => $provider_app->ua);
 
-my $mock_data_uuid = Test::MockModule->new('Data::UUID');
-$mock_data_uuid->redefine('create_str' => sub { 'fake_uuid' });
+my $mock_oidc_client_utils = Test::MockModule->new('OIDC::Client::Utils');
+$mock_oidc_client_utils->redefine('generate_nonce'         => sub { 'fake_nonce' });
+$mock_oidc_client_utils->redefine('generate_code_verifier' => sub { 'fake_code_verifier' });
 
 use lib "$Bin/auth-code-flow-IT";
 use_ok('MyTestApp');
@@ -48,7 +49,7 @@ $mock_crypt_jwt->redefine('decode_jwt' => sub {
     exp   => time + 30,
     aud   => 'my_id',
     sub   => 'my_subject',
-    nonce => 'fake_uuid',
+    nonce => 'fake_nonce',
   );
   return (
     $params{decode_header} ? { 'alg' => 'whatever' } : (),

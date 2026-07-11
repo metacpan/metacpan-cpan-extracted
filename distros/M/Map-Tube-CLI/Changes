@@ -1,5 +1,19 @@
 Revision history for Map::Tube::CLI
 
+v1.0.0 Fri Jul 10 2026
+      This release prepared by @GWS
+      - Corrected the --line_mappings so it truly limits the "Connected To"
+        table by the given --line, instead of providing the list of all
+        stations connected regardless of the requested line. There were cases
+        before when a station being connected to its neighbour only on one
+        line (see new line-restricted syntax by Map::Tube) appeared to be
+        connected along all lines it had been assigned to.
+        prepareline_mappings() is now sending the line name to
+        Map::Tube::get_linked_stations() which has started considering such
+        restrictions since Map::Tube v5.1.0.
+      - Upgraded dependency on Map::Tube v5.1.0.
+      - Switched to dotted-decimal versioning (v-strings).
+
 v0.85.0 Wed Jun 10 01:45:00 2026 (GWS)
       This release prepared by @GWS
       - Updated README.

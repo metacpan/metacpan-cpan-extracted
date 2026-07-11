@@ -45,7 +45,7 @@ MODULE = Data::Pool::Shared  PACKAGE = Data::Pool::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity, elem_size)
+new(class, path, capacity, elem_size, ...)
     const char *class
     SV *path
     UV capacity
@@ -53,8 +53,9 @@ new(class, path, capacity, elem_size)
   PREINIT:
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    PoolHandle *h = pool_create(p, capacity, (uint32_t)elem_size, POOL_VAR_RAW, errbuf);
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    PoolHandle *h = pool_create(p, capacity, (uint32_t)elem_size, POOL_VAR_RAW, mode, errbuf);
     if (!h) croak("Data::Pool::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -497,7 +498,10 @@ slot_sv(self, slot)
     SvPOK_on(RETVAL);
     /* Pin pool alive while this SV is referenced — magic before READONLY */
     MAGIC *mg = sv_magicext(RETVAL, NULL, PERL_MAGIC_ext, &pool_scalar_magic_vtbl, NULL, 0);
-    mg->mg_obj = SvREFCNT_inc_simple_NN(self);
+    /* Pin the REFERENT (the blessed handle), not the container RV: pinning self
+     * lets `$pool = undef` still drop the referent -> DESTROY munmaps -> the
+     * view SV's PV into the mapping dangles (SEGV).  Guard SvRV(self). */
+    mg->mg_obj = SvREFCNT_inc_simple_NN(SvRV(self));
     SvREADONLY_on(RETVAL);
   OUTPUT:
     RETVAL
@@ -508,15 +512,16 @@ MODULE = Data::Pool::Shared  PACKAGE = Data::Pool::Shared::I64
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    PoolHandle *h = pool_create(p, capacity, sizeof(int64_t), POOL_VAR_I64, errbuf);
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    PoolHandle *h = pool_create(p, capacity, sizeof(int64_t), POOL_VAR_I64, mode, errbuf);
     if (!h) croak("Data::Pool::Shared::I64->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -664,15 +669,16 @@ MODULE = Data::Pool::Shared  PACKAGE = Data::Pool::Shared::F64
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    PoolHandle *h = pool_create(p, capacity, sizeof(double), POOL_VAR_F64, errbuf);
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    PoolHandle *h = pool_create(p, capacity, sizeof(double), POOL_VAR_F64, mode, errbuf);
     if (!h) croak("Data::Pool::Shared::F64->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -736,15 +742,16 @@ MODULE = Data::Pool::Shared  PACKAGE = Data::Pool::Shared::I32
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    PoolHandle *h = pool_create(p, capacity, sizeof(int32_t), POOL_VAR_I32, errbuf);
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    PoolHandle *h = pool_create(p, capacity, sizeof(int32_t), POOL_VAR_I32, mode, errbuf);
     if (!h) croak("Data::Pool::Shared::I32->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -892,7 +899,7 @@ MODULE = Data::Pool::Shared  PACKAGE = Data::Pool::Shared::Str
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity, max_len)
+new(class, path, capacity, max_len, ...)
     const char *class
     SV *path
     UV capacity
@@ -900,12 +907,13 @@ new(class, path, capacity, max_len)
   PREINIT:
     char errbuf[POOL_ERR_BUFLEN];
   CODE:
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     if (max_len == 0) croak("Data::Pool::Shared::Str->new: max_len must be > 0");
     if (max_len > (UV)(UINT32_MAX - sizeof(uint32_t)))
         croak("Data::Pool::Shared::Str->new: max_len too large");
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    PoolHandle *h = pool_create(p, capacity, elem_size, POOL_VAR_STR, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    PoolHandle *h = pool_create(p, capacity, elem_size, POOL_VAR_STR, mode, errbuf);
     if (!h) croak("Data::Pool::Shared::Str->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -977,6 +985,6 @@ max_len(self)
   PREINIT:
     EXTRACT_POOL(self);
   CODE:
-    RETVAL = h->hdr->elem_size - sizeof(uint32_t);
+    RETVAL = h->hdr->elem_size > sizeof(uint32_t) ? h->hdr->elem_size - sizeof(uint32_t) : 0;
   OUTPUT:
     RETVAL

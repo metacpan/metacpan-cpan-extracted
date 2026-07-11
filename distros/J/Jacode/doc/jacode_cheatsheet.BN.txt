@@ -2,7 +2,7 @@
 # Jacode দ্রুত তথ্যপত্র (BN)
 # Jacode - জাপানি অক্ষর কোড রূপান্তরের Perl প্রোগ্রাম
 # https://metacpan.org/dist/Jacode
-# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ################################################################################
 
 ■ ইনস্টলেশন

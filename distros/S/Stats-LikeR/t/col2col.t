@@ -1,11 +1,15 @@
 #!/usr/bin/env perl
 require 5.010;
+use utf8;    # non-ASCII column names (e.g. ΔG) appear as literals below
 use warnings FATAL => 'all';
 use Scalar::Util 'looks_like_number';
 use Stats::LikeR;
 use Test::Exception; # dies_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
+# some test descriptions carry non-ASCII column names; give the TAP handles a
+# UTF-8 layer so they do not warn about wide characters.
+binmode Test::More->builder->$_, ':encoding(UTF-8)' for qw(output failure_output todo_output);
 # Custom helper for floating-point comparisons
 sub is_approx {
 	my ($got, $expected, $test_name, $epsilon) = @_;
@@ -210,4 +214,29 @@ my $hash_off = col2col( \%gap4, sub { my ( $x, $y ) = @_; scalar(@$x) . ',' . sc
 is( $hash_off->{'a'}{'b'}, '3,3', 'skip.errors => 0 via the hash-ref form (default na still pairwise)' );
 dies_ok { col2col( \%se, $boom, { 'skip.errors' => 1 }, 'na' => 'keep' ) } 'a hash ref of options must be the last argument';
 dies_ok { col2col( \%se, $boom, { 'bogus' => 1 } ) } 'an unknown option in the hash ref dies';
+
+# 20. Non-ASCII (UTF-8) column names must survive the round trip: they are
+#     stored and looked up by the SV so the UTF-8 flag rides along. Cover all
+#     three data shapes plus a column restriction on a non-ASCII name.
+{
+	my %hoa = ( 'ΔG' => [ 1, 2, 3, 4, 5 ], 'temp' => [ 2, 4, 6, 8, 10 ], 'σ' => [ 5, 3, 8, 1, 9 ] );
+	my $u = col2col( \%hoa, 'cor' );
+	is_deeply( [ sort keys %$u ], [ sort 'ΔG', 'temp', 'σ' ], 'HoA: non-ASCII keys round-trip in the result' );
+	is_approx( $u->{'ΔG'}{'temp'}, 1, 'HoA: cor(ΔG, temp) reachable by non-ASCII key' );
+	ok( exists $u->{'σ'}{'ΔG'}, 'HoA: inner non-ASCII key present' );
+	# restrict the outer side to a non-ASCII column name
+	my $ur = col2col( \%hoa, 'cor', 'ΔG' );
+	is_deeply( [ keys %$ur ], ['ΔG'], 'HoA: restriction to a non-ASCII column name works' );
+	is_approx( $ur->{'ΔG'}{'temp'}, 1, 'HoA: restricted result reachable by non-ASCII key' );
+	# a non-ASCII name that is not in the data still croaks
+	dies_ok { col2col( \%hoa, 'cor', 'ΨΨ' ) } 'unknown non-ASCII column name croaks';
+	# row-major shapes: values live behind a non-ASCII key inside each row
+	my @aoh = ( { 'ΔG' => 1, 'temp' => 2 }, { 'ΔG' => 2, 'temp' => 4 }, { 'ΔG' => 3, 'temp' => 6 } );
+	my $ua = col2col( \@aoh, 'cor' );
+	is_approx( $ua->{'ΔG'}{'temp'}, 1, 'AoH: non-ASCII key fetched from each row' );
+	my %hoh = ( r1 => { 'ΔG' => 1, 'temp' => 2 }, r2 => { 'ΔG' => 2, 'temp' => 4 }, r3 => { 'ΔG' => 3, 'temp' => 6 } );
+	my $uh = col2col( \%hoh, 'cor' );
+	is_approx( $uh->{'ΔG'}{'temp'}, 1, 'HoH: non-ASCII key fetched from each row' );
+	no_leaks_ok { col2col( \%hoa, 'cor' ) } 'no leaks: non-ASCII column names' unless $INC{'Devel/Cover.pm'};
+}
 done_testing();

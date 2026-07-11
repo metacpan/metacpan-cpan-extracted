@@ -343,6 +343,69 @@ subtest 'hostile option: format value that is long invalid string' => sub {
 };
 
 # ---------------------------------------------------------------------------
+# SECTION 4b — Hostile 'particles' option inputs
+# Valid types: boolean (0/1) or arrayref.  Every other type must be rejected.
+# ---------------------------------------------------------------------------
+
+subtest 'hostile particles: string value — rejected by validator' => sub {
+	# MESSAGES: "particles: must be one of boolean, arrayref"
+	throws_ok(
+		sub { abbreviate($THREE, { particles => 'van' }) },
+		qr/particles/i,
+		'string particles value causes croak mentioning "particles"',
+	);
+	done_testing();
+};
+
+subtest 'hostile particles: hashref value — rejected by validator' => sub {
+	throws_ok(
+		sub { abbreviate($THREE, { particles => { van => 1 } }) },
+		qr/particles/i,
+		'hashref particles value causes croak mentioning "particles"',
+	);
+	done_testing();
+};
+
+subtest 'hostile particles: undef — treated as default (built-in list)' => sub {
+	# Params::Validate::Strict skips validation of undef optional params;
+	# abbreviate() then treats undef as "use the built-in list".
+	my $result;
+	lives_ok(
+		sub { $result = abbreviate('Ludwig van Beethoven', { particles => undef }) },
+		'undef particles accepted (optional param)',
+	);
+	is($result, 'L. van Beethoven', 'undef particles falls back to built-in list');
+	returns_ok($result, { type => 'string' }, 'return is a string');
+	done_testing();
+};
+
+subtest 'hostile particles: empty arrayref — no particles absorbed' => sub {
+	# An empty list is a valid arrayref; none of its (absent) members match,
+	# so no tokens are absorbed — same observable effect as particles => 0.
+	my $result;
+	lives_ok(
+		sub { $result = abbreviate('Ludwig van Beethoven', { particles => [] }) },
+		'empty arrayref particles accepted',
+	);
+	is($result, 'L. v. Beethoven', 'empty particle list absorbs nothing');
+	returns_ok($result, { type => 'string' }, 'return is a string');
+	done_testing();
+};
+
+subtest 'hostile particles: arrayref containing undef — no crash, undef entry inert' => sub {
+	# undef in the arrayref becomes a key undef=>1 in the particle hash.
+	# No real name token is undef, so it never matches; must not crash.
+	my $result;
+	lives_ok(
+		sub { $result = abbreviate('Ludwig van Beethoven', { particles => [undef, 'van'] }) },
+		'arrayref with undef element accepted without crash',
+	);
+	is($result, 'L. van Beethoven', 'van still absorbed; undef entry is inert');
+	returns_ok($result, { type => 'string' }, 'return is a string');
+	done_testing();
+};
+
+# ---------------------------------------------------------------------------
 # SECTION 5 — Pathological comma and whitespace inputs
 # ---------------------------------------------------------------------------
 

@@ -4,6 +4,12 @@ use File::Temp qw/tempdir/;
 # Unit tests for the MDEV-38811 broken-version refusal. Uses stub "server"
 # binaries that only answer -V, so no real MariaDB is needed for most of this.
 
+# The stubs are #!/bin/sh scripts; without a POSIX shell they never execute, so
+# broken_version_check sees no -V output and returns undef for everything. The
+# MariaDB driver is unusable on Windows regardless.
+skip_all "stub servers require a POSIX shell (#!/bin/sh), unavailable on $^O"
+    if $^O eq 'MSWin32';
+
 my $dir = tempdir(CLEANUP => 1);
 
 sub stub_bin {

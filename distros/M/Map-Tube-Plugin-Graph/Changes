@@ -1,5 +1,37 @@
 Revision history for Map::Tube::Plugin::Graph
 
+v1.0.0  2026-07-10
+        - The function as_graph() now takes into account the data regarding
+          the per-link line restrictions from the class Map::Tube (see
+          version 5.1.0 of Map::Tube); that is, the method now is able to
+          figure out which lines an edge belongs to. until now an edge was
+          created for each line that the two stations had in common despite
+          the fact that the physical link did not go through all those lines
+          in one direction which caused the two-way edges to be created for
+          a link that was actually one-directed.
+          The function as_graph() previouslly created a directed graph for
+          each link defined in the link object, therefore, no changes to the
+          graph structure is required, however, now the processing of the
+          link restrictions means that no edges are created for lines that
+          are blocked in one direction, thus allowing for the creation of
+          one-directional edges rather than a loop. Thanks @gws.
+        - Corrected graph_line_image() (used by as_image($line)/as_png($line),
+          for instance, map-tube --gen --line X) misrepresenting stations
+          that cannot be reached at all from the chosen line.
+          The "which of the off-line stations to include for reference"
+          calculation employed Graph's neighbours_by_radius(), which for
+          directed graphs counts both successors AND predecessors as
+          neighbours. So any station connected via a one-way connection to
+          one of the line's station (but no way back) would be included even
+          if it is currently impossible to reach the station by means of the
+          line. It would be depicted as a completely isolated node not
+          having any edges at all as all its (one-way) edges don't lead in
+          the necessary direction. Now only the successors of the line's
+          station are considered, thus keeping the picture true to
+          reality. Thanks @gws.
+        - Upgraded dependency on Map::Tube v5.1.0.
+        - Switched to dotted-decimal versioning (v-strings).
+
 0.49  2025-02-21T16:50:00+00:00
       - Patched the method graph_map_image(), missed it last time.
       - Upgraded dependency on Map::Tube v3.96.

@@ -1,9 +1,11 @@
 package Data::RoaringBitmap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::RoaringBitmap::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 
 *set       = \&add;
 *test      = \&contains;
@@ -253,11 +255,12 @@ the final contents are independent of how the processes interleave.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it, and a reopened file
-is trusted: validation checks the header geometry but cannot vet every internal
-container offset against a maliciously crafted file. A hostile file could direct
-a read to an out-of-range container slot. Do B<not> share backing files with, or
-reopen files from, untrusted processes.
+Backing files are created mode C<0600> (owner-only) by default; opt in to
+cross-user sharing by passing a wider file mode as the last argument to C<new>. Reads and writes
+bound-check the file-stored container offsets and counts, so reopening a crafted
+or corrupted backing file cannot drive an out-of-bounds access. A process
+granted write access to a shared mapping is still trusted not to corrupt the
+structure while other processes are actively using it.
 
 =head1 CRASH SAFETY
 

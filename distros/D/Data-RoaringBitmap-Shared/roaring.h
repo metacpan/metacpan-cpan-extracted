@@ -307,18 +307,34 @@ static inline void rb_recover_dead_readers(RbHandle *h) {
      * CAS FIRST (narrow window since pass 1), then wipe the deferred dead
      * slots outside the race-sensitive window. */
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < RB_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = 0;   /* no slotless readers here: scanning slots is complete */
+            for (uint32_t i = 0; !live_now && i < RB_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && rb_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < RB_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || rb_pid_alive(pid)) continue;
-            rb_drain_dead_slot(h, i, pid);
+        if (drain_ok) {
+            for (uint32_t i = 0; i < RB_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || rb_pid_alive(p)) continue;
+                rb_drain_dead_slot(h, i, p);
+            }
         }
     }
 }
@@ -384,11 +400,11 @@ static inline void rb_rwlock_rdlock(RbHandle *h) {
          * readers are already active (cur>=1), new readers may join freely. */
         if (cur > 0 && cur < RB_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < RB_RWLOCK_SPIN_LIMIT, 1)) {
@@ -493,9 +509,19 @@ static inline RbBucket *rb_buckets(RbHandle *h) {
 static inline uint8_t *rb_pool(RbHandle *h) {
     return (uint8_t *)((char *)h->base + h->hdr->container_pool_off);
 }
-/* Base pointer of container slot `i` (1-based; i==0 is the NULL sentinel). */
+/* Base pointer of container slot `i` (1-based; i==0 is the NULL sentinel).
+ * `i` originates from a bucket's file-stored container_off, which a local peer
+ * can corrupt to an out-of-range slot; clamp to the reserved sentinel (0) so the
+ * returned pointer always lands inside the container pool. */
 static inline void *rb_slot(RbHandle *h, uint32_t i) {
+    if (i >= h->hdr->container_cap) i = 0;
     return (void *)(rb_pool(h) + (size_t)i * RB_CONTAINER_BYTES);
+}
+/* An array container holds at most RB_ARRAY_MAX entries in its fixed-size slot;
+ * a corrupt file could store a larger cardinality and drive a search or scan
+ * past the slot.  Clamp the file-stored count to the physical slot capacity. */
+static inline uint32_t rb_array_card(const RbBucket *bt) {
+    return bt->cardinality > RB_ARRAY_MAX ? RB_ARRAY_MAX : bt->cardinality;
 }
 static inline uint16_t *rb_array(RbHandle *h, uint32_t i) {
     return (uint16_t *)rb_slot(h, i);
@@ -577,7 +603,7 @@ static inline int rb_array_search(const uint16_t *vals, uint32_t card, uint16_t 
  * first.  The array is at most RB_ARRAY_MAX entries (a full array container). */
 static inline void rb_array_to_bitmap(RbHandle *h, uint32_t hi) {
     RbBucket *bt = &rb_buckets(h)[hi];
-    uint32_t card = bt->cardinality;
+    uint32_t card = rb_array_card(bt);
     uint16_t tmp[RB_ARRAY_MAX];
     uint16_t *vals = rb_array(h, bt->container_off);
     memcpy(tmp, vals, (size_t)card * sizeof(uint16_t));
@@ -610,7 +636,7 @@ static inline int rb_add_locked(RbHandle *h, uint32_t x) {
     if (bt->type == RB_TYPE_ARRAY) {
         uint16_t *vals = rb_array(h, bt->container_off);
         uint32_t pos;
-        if (rb_array_search(vals, bt->cardinality, lo, &pos)) return 0;
+        if (rb_array_search(vals, rb_array_card(bt), lo, &pos)) return 0;
         /* A full array container (RB_ARRAY_MAX entries) cannot hold one more
          * value without overflowing its fixed-size slot; promote it to a
          * bitmap FIRST, then set the bit.  (The new value is genuinely absent,
@@ -650,7 +676,7 @@ static inline int rb_contains_locked(RbHandle *h, uint32_t x) {
     if (bt->type == RB_TYPE_NONE) return 0;
     if (bt->type == RB_TYPE_ARRAY) {
         uint32_t pos;
-        return rb_array_search(rb_array(h, bt->container_off), bt->cardinality, lo, &pos);
+        return rb_array_search(rb_array(h, bt->container_off), rb_array_card(bt), lo, &pos);
     }
     {
         uint64_t *bits = rb_bitmap(h, bt->container_off);
@@ -668,9 +694,10 @@ static inline int rb_remove_locked(RbHandle *h, uint32_t x) {
     if (bt->type == RB_TYPE_NONE) return 0;
     if (bt->type == RB_TYPE_ARRAY) {
         uint16_t *vals = rb_array(h, bt->container_off);
+        uint32_t card = rb_array_card(bt);
         uint32_t pos;
-        if (!rb_array_search(vals, bt->cardinality, lo, &pos)) return 0;
-        memmove(&vals[pos], &vals[pos + 1], (size_t)(bt->cardinality - pos - 1) * sizeof(uint16_t));
+        if (!rb_array_search(vals, card, lo, &pos)) return 0;
+        memmove(&vals[pos], &vals[pos + 1], (size_t)(card - pos - 1) * sizeof(uint16_t));
         bt->cardinality--;
         h->hdr->cardinality--;
         if (bt->cardinality == 0) {
@@ -738,7 +765,9 @@ static inline int rb_max_locked(RbHandle *h, uint32_t *out) {
     for (uint32_t hi = RB_NUM_BUCKETS; hi-- > 0; ) {
         if (bt[hi].type == RB_TYPE_NONE) continue;
         if (bt[hi].type == RB_TYPE_ARRAY) {
-            *out = (hi << 16) | rb_array(h, bt[hi].container_off)[bt[hi].cardinality - 1];
+            uint32_t c = rb_array_card(&bt[hi]);
+            if (c == 0) continue;   /* corrupt: an array container with 0 entries */
+            *out = (hi << 16) | rb_array(h, bt[hi].container_off)[c - 1];
             return 1;
         }
         {
@@ -777,7 +806,8 @@ static inline uint32_t rb_buckets_used(RbHandle *h) {
 static inline uint32_t rb_or_into_bitmap(uint64_t *abits, RbHandle *b, const RbBucket *bbt) {
     if (bbt->type == RB_TYPE_ARRAY) {
         const uint16_t *bv = rb_array(b, bbt->container_off);
-        for (uint32_t i = 0; i < bbt->cardinality; i++) {
+        uint32_t bc = rb_array_card(bbt);
+        for (uint32_t i = 0; i < bc; i++) {
             uint16_t lo = bv[i];
             abits[lo >> 6] |= (uint64_t)1 << (lo & 63);
         }
@@ -832,7 +862,7 @@ static inline void rb_union_locked(RbHandle *a, RbHandle *b) {
             uint16_t *av = rb_array(a, abt[hi].container_off);
             const uint16_t *bv = rb_array(b, bbt[hi].container_off);
             uint32_t ai = 0, bi = 0, n = 0;
-            uint32_t ac = abt[hi].cardinality, bc = bbt[hi].cardinality;
+            uint32_t ac = rb_array_card(&abt[hi]), bc = rb_array_card(&bbt[hi]);
             while (ai < ac && bi < bc) {
                 uint16_t x = av[ai], y = bv[bi];
                 if (x < y) { tmp[n++] = x; ai++; }
@@ -859,7 +889,7 @@ static inline void rb_union_locked(RbHandle *a, RbHandle *b) {
              * array values back in.  Snapshot a's array first (slot reused). */
             uint16_t tmp[RB_ARRAY_MAX];
             uint16_t *av = rb_array(a, abt[hi].container_off);
-            uint32_t ac = abt[hi].cardinality;
+            uint32_t ac = rb_array_card(&abt[hi]);
             memcpy(tmp, av, (size_t)ac * sizeof(uint16_t));
             uint64_t *abits = rb_bitmap(a, abt[hi].container_off);
             memcpy(abits, rb_bitmap(b, bbt[hi].container_off), RB_CONTAINER_BYTES);
@@ -901,7 +931,7 @@ static inline void rb_intersect_locked(RbHandle *a, RbHandle *b) {
             uint16_t *av = rb_array(a, abt[hi].container_off);
             const uint16_t *bv = rb_array(b, bbt[hi].container_off);
             uint32_t ai = 0, bi = 0, n = 0;
-            uint32_t ac = abt[hi].cardinality, bc = bbt[hi].cardinality;
+            uint32_t ac = rb_array_card(&abt[hi]), bc = rb_array_card(&bbt[hi]);
             while (ai < ac && bi < bc) {
                 uint16_t x = av[ai], y = bv[bi];
                 if (x < y) ai++;
@@ -915,8 +945,8 @@ static inline void rb_intersect_locked(RbHandle *a, RbHandle *b) {
             /* array(a) & bitmap(b): keep a's values whose bit is set in b. */
             uint16_t *av = rb_array(a, abt[hi].container_off);
             const uint64_t *bb = rb_bitmap(b, bbt[hi].container_off);
-            uint32_t n = 0;
-            for (uint32_t i = 0; i < abt[hi].cardinality; i++) {
+            uint32_t n = 0, ac = rb_array_card(&abt[hi]);
+            for (uint32_t i = 0; i < ac; i++) {
                 uint16_t lo = av[i];
                 if ((bb[lo >> 6] >> (lo & 63)) & 1) av[n++] = lo;
             }
@@ -929,8 +959,8 @@ static inline void rb_intersect_locked(RbHandle *a, RbHandle *b) {
             uint16_t tmp[RB_ARRAY_MAX];
             const uint16_t *bv = rb_array(b, bbt[hi].container_off);
             uint64_t *abits = rb_bitmap(a, abt[hi].container_off);
-            uint32_t n = 0;
-            for (uint32_t i = 0; i < bbt[hi].cardinality; i++) {
+            uint32_t n = 0, bc = rb_array_card(&bbt[hi]);
+            for (uint32_t i = 0; i < bc; i++) {
                 uint16_t lo = bv[i];
                 if ((abits[lo >> 6] >> (lo & 63)) & 1) tmp[n++] = lo;
             }
@@ -1051,7 +1081,26 @@ static inline int rb_validate_header(const RbHeader *hdr, uint64_t file_size) {
     return 1;
 }
 
-static RbHandle *rb_create(const char *path, uint64_t container_cap_in, char *errbuf) {
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at
+ * file_mode, default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no
+ * O_CREAT). Blocks a symlink swap or pre-seeded/hard-linked backing file;
+ * cross-user sharing is opt-in via a wider file_mode. */
+static int rb_secure_open(const char *path, mode_t file_mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, file_mode);
+        if (fd >= 0) { (void)fchmod(fd, file_mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { RB_ERR("create(%s): %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;
+        RB_ERR("open(%s): %s", path, strerror(errno));
+        return -1;
+    }
+    RB_ERR("open(%s): create/attach kept racing", path);
+    return -1;
+}
+
+static RbHandle *rb_create(const char *path, uint64_t container_cap_in, mode_t file_mode, char *errbuf) {
     if (!rb_validate_create_args(container_cap_in, errbuf)) return NULL;
     uint32_t container_cap = (uint32_t)container_cap_in;
 
@@ -1066,8 +1115,8 @@ static RbHandle *rb_create(const char *path, uint64_t container_cap_in, char *er
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { RB_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { RB_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = rb_secure_open(path, file_mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { RB_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { RB_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -1130,6 +1179,15 @@ static RbHandle *rb_open_fd(int fd, char *errbuf) {
 
 static void rb_destroy(RbHandle *h) {
     if (!h) return;
+    /* Release our reader slot on clean teardown (else short-lived-reader churn
+     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+    if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
+        h->cached_fork_gen == __atomic_load_n(&rb_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        uint32_t expected = h->cached_pid;
+        __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
+                &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    }
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->base) munmap(h->base, h->mmap_size);
     free(h->path);

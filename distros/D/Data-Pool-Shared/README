@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
         use Data::Pool::Shared;
 
-        # Raw byte pool — 100 slots of 64 bytes each
+        # Raw byte pool -- 100 slots of 64 bytes each
         my $pool = Data::Pool::Shared->new('/tmp/pool.shm', 100, 64);
         my $idx = $pool->alloc;           # allocate a slot
         $pool->set($idx, "hello world");  # write data
@@ -22,7 +22,7 @@ SYNOPSIS
         my $floats = Data::Pool::Shared::F64->new('/tmp/f.shm', 100);
         my $strs = Data::Pool::Shared::Str->new('/tmp/s.shm', 100, 256);
 
-        # Guard — auto-free on scope exit
+        # Guard -- auto-free on scope exit
         {
             my ($idx, $guard) = $pool->alloc_guard;
             $pool->set($idx, $data);
@@ -125,6 +125,19 @@ METHODS
 
         $pool->free($idx);                  # release slot (returns true/false)
 
+   Deterministic allocation order
+        $pool->scan_from(0);   # next alloc scans from slot 0 (reproducible low-to-high)
+
+    By default each handle begins its bitmap scan at a getpid()-derived word
+    offset, spreading concurrent allocators across the bitmap to cut CAS
+    contention -- but that makes the allocated ids non-reproducible across
+    runs. For a single allocator that wants deterministic, sequential ids,
+    scan_from($slot) pins the scan start to $slot's 64-slot word (pass 0 for
+    low-to-high order). It is per-handle (does not affect other processes),
+    takes effect on the next "alloc", and an out-of-range $slot wraps. The
+    bitmap is still the source of truth, so this only changes *where* the
+    scan starts, never correctness. All typed variants inherit it.
+
   Batch Operations
         my $slots = $pool->alloc_n($n);            # allocate N slots (blocking)
         my $slots = $pool->alloc_n($n, $timeout);  # with timeout
@@ -171,14 +184,23 @@ METHODS
         my $sv = $pool->slot_sv($idx);  # SV backed by slot memory
 
     Returns a read-only scalar whose PV points directly into the shared
-    memory slot. Reading the scalar reads the slot with no "memcpy". Useful
-    for large slots where avoiding copy matters.
+    memory slot. Reading the returned scalar reads the slot with no
+    "memcpy", which matters for large slots. It keeps the pool object alive
+    for as long as that scalar (or a reference to it) is live.
 
-    The scalar holds a reference to the pool object, keeping it alive for as
-    long as the scalar (or any copy of it) is live. However, the scalar
-    still reflects the current contents of the slot: if the slot is free()d
-    and later re-allocated, reads will see the new data. To modify the slot,
-    use set().
+    Note that binding it with plain assignment makes an ordinary private
+    *copy* -- Perl copies the string on assignment, so
+
+        my $snap = $pool->slot_sv($idx);   # a SNAPSHOT of the slot right now
+
+    is frozen and does not track later writes. To keep the live zero-copy
+    view that continues to reflect the slot's current contents (including
+    after a free()/re-allocation), use the return value directly or hold a
+    reference:
+
+        my $ref = \$pool->slot_sv($idx);   # live view; $$ref reads current slot
+
+    To modify the slot, use set().
 
   Status
         my $ok  = $pool->is_allocated($idx);
@@ -222,25 +244,28 @@ STATS
     stats() returns a hashref with diagnostic counters. All values are
     approximate under concurrency.
 
-    "capacity" — total slot count (immutable)
-    "elem_size" — bytes per slot (immutable)
-    "used" — currently allocated slot count
-    "available" — currently free slot count ("capacity - used")
-    "waiters" — processes currently blocked on "alloc"
-    "mmap_size" — total mmap region size in bytes
-    "allocs" — cumulative successful allocations
-    "frees" — cumulative frees (including stale recovery)
-    "waits" — "alloc" calls that entered the retry loop
-    "timeouts" — "alloc" calls that timed out
-    "recoveries" — slots freed by "recover_stale"
+    "capacity" -- total slot count (immutable)
+    "elem_size" -- bytes per slot (immutable)
+    "used" -- currently allocated slot count
+    "available" -- currently free slot count ("capacity - used")
+    "waiters" -- processes currently blocked on "alloc"
+    "mmap_size" -- total mmap region size in bytes
+    "allocs" -- cumulative successful allocations
+    "frees" -- cumulative frees (including stale recovery)
+    "waits" -- "alloc" calls that entered the retry loop
+    "timeouts" -- "alloc" calls that timed out
+    "recoveries" -- slots freed by "recover_stale"
 
 SECURITY
-    The shared memory region (mmap) is writable by all processes that open
-    it. A malicious process with write access to the backing file or memfd
-    can corrupt header fields (bitmap, counters, slot data) and cause other
-    processes to crash, spin, or return incorrect data. Do not share backing
-    files with untrusted processes. Use anonymous mode or memfd with
-    restricted fd passing for isolation.
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 PERFORMANCE
     *   Allocation scans a bitmap of ceil(capacity/64) words. O(capacity/64)
@@ -253,13 +278,13 @@ PERFORMANCE
         single "FUTEX_WAKE" syscall on "free".
 
     *   "free_n" batches N frees into a single "used" decrement and a single
-        "FUTEX_WAKE" syscall — faster than N individual frees.
+        "FUTEX_WAKE" syscall -- faster than N individual frees.
 
     *   "slot_sv" provides zero-copy access to slot data, avoiding "memcpy"
         overhead for large slots.
 
     *   Typed variants (I64, I32) use atomic load/store/CAS/add directly on
-        the mmap'd memory — no locking overhead.
+        the mmap'd memory -- no locking overhead.
 
 BENCHMARKS
     Measured on a single-socket x86_64 Linux system, Perl 5.40.

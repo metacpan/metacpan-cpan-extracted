@@ -2,7 +2,7 @@
 # Jacode Hızlı Başvuru Kılavuzu (TR)
 # Jacode - Japonca karakter kodu dönüştürme için Perl programı
 # https://metacpan.org/dist/Jacode
-# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ################################################################################
 
 ■ KURULUM

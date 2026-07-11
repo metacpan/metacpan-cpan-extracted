@@ -74,6 +74,15 @@ called on an object.
         %timestamp%   YYYY-MM-DD HH:MM:SS (local time)
         %env_FOO%     value of $ENV{FOO}, or empty string if unset
 
+    The special value `"json"` (not a format string but a magic keyword) switches
+    all file and fd backends to emit one compact JSON object per log line:
+
+        {"timestamp":"...","level":"info","message":"...","file":"...","line":42}
+
+    This format is compatible with log aggregators such as journald, Loki,
+    Elasticsearch, and Splunk.  `class` is included when the logger is a subclass
+    of `Log::Abstraction`.
+
     **Security note:** because `format` may contain `%env_*%` tokens, avoid
     granting untrusted sources write access to config files that set this key.
 
@@ -89,7 +98,7 @@ called on an object.
 
     - A code reference -- called with a hashref `{ class, file, line, level, message, ctx }`
     - An object -- method matching the level name is called on it
-    - A hash reference -- may contain `file`, `array`, `fd`, `syslog`, and/or `sendmail` keys
+    - A hash reference -- may contain `file`, `array`, `fd`, `syslog`, `journald`, and/or `sendmail` keys
     - An array reference -- `{ level, message }` hashrefs are pushed onto it
     - A scalar string -- treated as a file path to append to
 
@@ -98,6 +107,16 @@ called on an object.
     The `sendmail` sub-hash supports:
     `host`, `port`, `to`, `from`, `subject`, `level`, `min_interval`.
     At most one email is sent per `min_interval` seconds per instance.
+
+    The `journald` sub-hash sends each message as a single datagram to the
+    systemd journal using the journald native protocol.  Supported keys:
+
+    - `socket` -- path to the journald socket (default: `/run/systemd/journal/socket`)
+    - `identifier` -- value for the `SYSLOG_IDENTIFIER` field (default: basename of `$0`)
+    - any other key -- included verbatim as an uppercase journald field name
+
+    The `PRIORITY` field is set automatically from the log level (0=emerg...7=debug).
+    Delivery failures are silent (`Carp::carp` only); the application is never crashed by a journald error.
 
 - `script_name`
 
@@ -131,15 +150,15 @@ not supplied.  Loads `Log::Log4perl` if no logger backend is specified.
 #### Input
 
     {
-        carp_on_warn   => { type => BOOLEAN, optional => 1 },
-        config_file    => { type => SCALAR,  optional => 1 },
-        croak_on_error => { type => BOOLEAN, optional => 1 },
+        carp_on_warn   => { type => 'boolean', optional => 1 },
+        config_file    => { type => 'string',  optional => 1 },
+        croak_on_error => { type => 'boolean', optional => 1 },
         ctx            => { optional => 1 },
-        format         => { type => SCALAR,  optional => 1 },
-        level          => { type => SCALAR,  regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
+        format         => { type => 'string',  optional => 1 },
+        level          => { type => 'string',  regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
         logger         => { optional => 1 },
-        script_name    => { type => SCALAR,  optional => 1 },
-        verbose        => { type => BOOLEAN, optional => 1 },
+        script_name    => { type => 'string',  optional => 1 },
+        verbose        => { type => 'boolean', optional => 1 },
     }
 
 #### Output
@@ -243,7 +262,7 @@ When setting, updates `$self->{level}`.
 #### Input
 
     {
-        level => { type => SCALAR, regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
+        level => { type => 'string', regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
     }
 
 #### Output
@@ -340,7 +359,7 @@ internal history.
 
 #### Output
 
-    { type => 'arrayref', element_type => { level => SCALAR, message => SCALAR } }
+    { type => 'arrayref', element_type => { level => 'string', message => 'string' } }
 
 ## trace
 
@@ -377,7 +396,7 @@ Appends to the internal message history and dispatches to configured backends.
 
 #### Input
 
-    { messages => { type => ARRAYREF | SCALAR } }
+    { messages => { type => [ 'arrayref', 'scalar' ] } }
 
 #### Output
 
@@ -412,7 +431,7 @@ Appends to the internal message history and dispatches to configured backends.
 
 #### Input
 
-    { messages => { type => ARRAYREF | SCALAR } }
+    { messages => { type => [ 'arrayref', 'scalar' ] } }
 
 #### Output
 
@@ -447,7 +466,7 @@ Appends to the internal message history and dispatches to configured backends.
 
 #### Input
 
-    { messages => { type => ARRAYREF | SCALAR } }
+    { messages => { type => [ 'arrayref', 'scalar' ] } }
 
 #### Output
 
@@ -483,7 +502,7 @@ Appends to the internal message history and dispatches to configured backends.
 
 #### Input
 
-    { messages => { type => ARRAYREF | SCALAR } }
+    { messages => { type => [ 'arrayref', 'scalar' ] } }
 
 #### Output
 
@@ -530,9 +549,9 @@ May call `Carp::carp` if `carp_on_warn` is set or no backend is active.
 #### Input
 
     # Named form
-    { warning => { type => SCALAR | ARRAYREF } }
+    { warning => { type => [ 'scalar', 'arrayref' ] } }
     # Plain-list form
-    { messages => { type => ARRAYREF } }
+    { messages => { type => 'arrayref' } }
 
 #### Output
 
@@ -572,7 +591,7 @@ Same as `warn()` plus optional `Carp::croak` escalation.
 
 #### Input
 
-    { warning => { type => SCALAR | ARRAYREF, optional => 1 } }
+    { warning => { type => [ 'scalar', 'arrayref' ], optional => 1 } }
 
 #### Output
 
@@ -612,7 +631,7 @@ Same as `error()`.
 
 #### Input
 
-    { warning => { type => SCALAR | ARRAYREF, optional => 1 } }
+    { warning => { type => [ 'scalar', 'arrayref' ], optional => 1 } }
 
 #### Output
 
@@ -719,11 +738,53 @@ CSV.  To produce CSV rows _and_ send email alerts from the same logger,
 embed both the CSV-write and the mail-send logic inside a single code-ref
 callback as described above.
 
+# LIMITATIONS
+
+- **Syslog hash mutation**
+
+    The `syslog` sub-hash passed to `new()` is mutated in-place on the first
+    log call: `facility` and `level` are temporarily removed before
+    `setlogsock()` is called, then restored; `server` is permanently renamed
+    to `host`.  Sharing a syslog hashref between two `Log::Abstraction`
+    instances is not supported and produces undefined behaviour on the second
+    instance.
+
+- **No structured log fields**
+
+    All backends except the CODE-ref backend reduce the message to a flat string.
+    To log structured key/value pairs, use a CODE-ref backend that formats the
+    data itself.
+
+- **Single-threaded email throttle**
+
+    The `min_interval` throttle for the `sendmail` backend and the
+    `_syslog_opened` first-open flag are stored on the object without mutex
+    protection.  Under Perl ithreads or other concurrency models, objects shared
+    between threads are not safe.
+
+- **OpenTelemetry not yet supported**
+
+    The OTel Logs SDK for Perl is incomplete; see the TODO block at the top of
+    `lib/Log/Abstraction.pm` for a full status report and the list of blockers.
+    Monitor [https://metacpan.org/pod/OpenTelemetry::SDK](https://metacpan.org/pod/OpenTelemetry::SDK) for progress.
+
+- **Log::Log4perl is a de-facto required dependency**
+
+    When no `logger`, `file`, or `array` backend is configured, `new()`
+    loads [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) and uses it as the default backend.  Although listed
+    as an optional runtime dependency, it is required in that default-backend
+    path.
+
 # AUTHOR
 
 Nigel Horne `njh@nigelhorne.com`
 
 # SEE ALSO
+
+- [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) and [Log::Any::Adapter::Abstraction](https://metacpan.org/pod/Log%3A%3AAny%3A%3AAdapter%3A%3AAbstraction)
+
+    Route messages from any `Log::Any`-using CPAN module through
+    `Log::Abstraction` with a single `Log::Any::Adapter->set()` call.
 
 - [Test Dashboard](https://nigelhorne.github.io/Log-Abstraction/coverage/)
 
@@ -759,9 +820,9 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=Log::Abstraction](http://deps.cpantesters.org/?module=Log::Abstraction)
 
-## FORMAL SPECIFICATION
+# FORMAL SPECIFICATION
 
-### new
+## new
 
     ┌─ LogState ──────────────────────────────────────────────────
     │ level    : ℤ
@@ -789,7 +850,7 @@ You can also look for information at:
     │ result!.logger   = overrides?.logger ∨ logger
     └─────────────────────────────────────────────────────────────
 
-### level
+## level
 
     ┌─ LevelGet ─────────────────────────────────────────────────
     │ ΞLogState
@@ -807,7 +868,7 @@ You can also look for information at:
     │ level' = syslog_values(new_level?)
     └─────────────────────────────────────────────────────────────
 
-### is\_debug
+## is\_debug
 
     ┌─ IsDebug ──────────────────────────────────────────────────
     │ ΞLogState
@@ -816,7 +877,7 @@ You can also look for information at:
     │ result! = (level ≥ syslog_values('debug'))
     └─────────────────────────────────────────────────────────────
 
-### messages
+## messages
 
     ┌─ Messages ─────────────────────────────────────────────────
     │ ΞLogState
@@ -825,7 +886,7 @@ You can also look for information at:
     │ result! = messages
     └─────────────────────────────────────────────────────────────
 
-### trace
+## trace
 
     ┌─ Trace ────────────────────────────────────────────────────
     │ ΔLogState
@@ -836,7 +897,7 @@ You can also look for information at:
     │ messages' = messages ⌢ ⟨{level ↦ 'trace', message ↦ ⊕(msg?)}⟩
     └─────────────────────────────────────────────────────────────
 
-### debug
+## debug
 
     ┌─ Debug ────────────────────────────────────────────────────
     │ ΔLogState
@@ -847,7 +908,7 @@ You can also look for information at:
     │ messages' = messages ⌢ ⟨{level ↦ 'debug', message ↦ ⊕(msg?)}⟩
     └─────────────────────────────────────────────────────────────
 
-### info
+## info
 
     ┌─ Info ─────────────────────────────────────────────────────
     │ ΔLogState
@@ -858,7 +919,7 @@ You can also look for information at:
     │ messages' = messages ⌢ ⟨{level ↦ 'info', message ↦ ⊕(msg?)}⟩
     └─────────────────────────────────────────────────────────────
 
-### notice
+## notice
 
     ┌─ Notice ───────────────────────────────────────────────────
     │ ΔLogState
@@ -869,7 +930,7 @@ You can also look for information at:
     │ messages' = messages ⌢ ⟨{level ↦ 'notice', message ↦ ⊕(msg?)}⟩
     └─────────────────────────────────────────────────────────────
 
-### warn
+## warn
 
     ┌─ Warn ─────────────────────────────────────────────────────
     │ ΔLogState
@@ -880,7 +941,7 @@ You can also look for information at:
     │ messages' = messages ⌢ ⟨{level ↦ 'warn', message ↦ join(msg?)}⟩
     └─────────────────────────────────────────────────────────────
 
-### error
+## error
 
     ┌─ Error ────────────────────────────────────────────────────
     │ ΔLogState
@@ -892,7 +953,7 @@ You can also look for information at:
     │ croak_on_error = 1 ⟹ execution_continues = false
     └─────────────────────────────────────────────────────────────
 
-### fatal
+## fatal
 
     fatal ≡ error   (identical operation schema)
 

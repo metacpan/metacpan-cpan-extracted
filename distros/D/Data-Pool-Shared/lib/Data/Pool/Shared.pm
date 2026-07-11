@@ -1,19 +1,21 @@
 package Data::Pool::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Data::Pool::Shared', $VERSION);
 
-# Variant @ISA — inherit alloc/free/is_allocated/capacity/etc. from base
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
+
+# Variant @ISA -- inherit alloc/free/is_allocated/capacity/etc. from base
 
 @Data::Pool::Shared::I64::ISA = ('Data::Pool::Shared');
 @Data::Pool::Shared::F64::ISA = ('Data::Pool::Shared');
 @Data::Pool::Shared::I32::ISA = ('Data::Pool::Shared');
 @Data::Pool::Shared::Str::ISA = ('Data::Pool::Shared');
 
-# Guard — auto-free on scope exit
+# Guard -- auto-free on scope exit
 
 package Data::Pool::Shared::Guard {
     sub DESTROY {
@@ -38,7 +40,7 @@ sub try_alloc_guard {
     return wantarray ? ($idx, $guard) : $guard;
 }
 
-# Convenience — alloc + set in one call
+# Convenience -- alloc + set in one call
 
 sub alloc_set {
     my ($self, $val, $timeout) = @_;
@@ -77,7 +79,7 @@ Data::Pool::Shared - Fixed-size shared-memory object pool for Linux
 
     use Data::Pool::Shared;
 
-    # Raw byte pool — 100 slots of 64 bytes each
+    # Raw byte pool -- 100 slots of 64 bytes each
     my $pool = Data::Pool::Shared->new('/tmp/pool.shm', 100, 64);
     my $idx = $pool->alloc;           # allocate a slot
     $pool->set($idx, "hello world");  # write data
@@ -95,7 +97,7 @@ Data::Pool::Shared - Fixed-size shared-memory object pool for Linux
     my $floats = Data::Pool::Shared::F64->new('/tmp/f.shm', 100);
     my $strs = Data::Pool::Shared::Str->new('/tmp/s.shm', 100, 256);
 
-    # Guard — auto-free on scope exit
+    # Guard -- auto-free on scope exit
     {
         my ($idx, $guard) = $pool->alloc_guard;
         $pool->set($idx, $data);
@@ -277,13 +279,21 @@ is destroyed. Do not use after the pool goes out of scope.
     my $sv = $pool->slot_sv($idx);  # SV backed by slot memory
 
 Returns a read-only scalar whose PV points directly into the shared
-memory slot. Reading the scalar reads the slot with no C<memcpy>.
-Useful for large slots where avoiding copy matters.
+memory slot. Reading the returned scalar reads the slot with no C<memcpy>,
+which matters for large slots. It keeps the pool object alive for as long
+as that scalar (or a reference to it) is live.
 
-The scalar holds a reference to the pool object, keeping it alive
-for as long as the scalar (or any copy of it) is live. However, the
-scalar still reflects the current contents of the slot: if the slot
-is C<free()>d and later re-allocated, reads will see the new data.
+Note that binding it with plain assignment makes an ordinary private
+I<copy> -- Perl copies the string on assignment, so
+
+    my $snap = $pool->slot_sv($idx);   # a SNAPSHOT of the slot right now
+
+is frozen and does not track later writes. To keep the live zero-copy view
+that continues to reflect the slot's current contents (including after a
+C<free()>/re-allocation), use the return value directly or hold a reference:
+
+    my $ref = \$pool->slot_sv($idx);   # live view; $$ref reads current slot
+
 To modify the slot, use C<set()>.
 
 =head2 Status
@@ -337,38 +347,40 @@ approximate under concurrency.
 
 =over
 
-=item C<capacity> — total slot count (immutable)
+=item C<capacity> -- total slot count (immutable)
 
-=item C<elem_size> — bytes per slot (immutable)
+=item C<elem_size> -- bytes per slot (immutable)
 
-=item C<used> — currently allocated slot count
+=item C<used> -- currently allocated slot count
 
-=item C<available> — currently free slot count (C<capacity - used>)
+=item C<available> -- currently free slot count (C<capacity - used>)
 
-=item C<waiters> — processes currently blocked on C<alloc>
+=item C<waiters> -- processes currently blocked on C<alloc>
 
-=item C<mmap_size> — total mmap region size in bytes
+=item C<mmap_size> -- total mmap region size in bytes
 
-=item C<allocs> — cumulative successful allocations
+=item C<allocs> -- cumulative successful allocations
 
-=item C<frees> — cumulative frees (including stale recovery)
+=item C<frees> -- cumulative frees (including stale recovery)
 
-=item C<waits> — C<alloc> calls that entered the retry loop
+=item C<waits> -- C<alloc> calls that entered the retry loop
 
-=item C<timeouts> — C<alloc> calls that timed out
+=item C<timeouts> -- C<alloc> calls that timed out
 
-=item C<recoveries> — slots freed by C<recover_stale>
+=item C<recoveries> -- slots freed by C<recover_stale>
 
 =back
 
 =head1 SECURITY
 
-The shared memory region (mmap) is writable by all processes that open
-it. A malicious process with write access to the backing file or memfd
-can corrupt header fields (bitmap, counters, slot data) and cause other
-processes to crash, spin, or return incorrect data. Do not share backing
-files with untrusted processes. Use anonymous mode or memfd with
-restricted fd passing for isolation.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 PERFORMANCE
 
@@ -384,13 +396,13 @@ Under contention, CAS retries on the same word are ~10ns each.
 Woken by a single C<FUTEX_WAKE> syscall on C<free>.
 
 =item * C<free_n> batches N frees into a single C<used> decrement
-and a single C<FUTEX_WAKE> syscall — faster than N individual frees.
+and a single C<FUTEX_WAKE> syscall -- faster than N individual frees.
 
 =item * C<slot_sv> provides zero-copy access to slot data, avoiding
 C<memcpy> overhead for large slots.
 
 =item * Typed variants (I64, I32) use atomic load/store/CAS/add
-directly on the mmap'd memory — no locking overhead.
+directly on the mmap'd memory -- no locking overhead.
 
 =back
 

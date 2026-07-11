@@ -126,6 +126,42 @@ SKIP: {
 		'AoH: whole-column length mismatch dies';
 }
 
+# AoH: map_cell -- in-place per-cell edit; $_ is the cell, return value ignored
+{
+	my $d = [ { 'Res.' => 'A:foo' }, { 'Res.' => 'B:bar' }, { 'Res.' => 'nocolon' } ];
+	my $ret = assign($d, 'Res.' => map_cell { s/^[A-Z]:// });
+	is($ret, $d, 'AoH map_cell: returns the same ref (modified in place)');
+	is_deeply([ map { $_->{'Res.'} } @$d ], ['foo', 'bar', 'nocolon'],
+		'AoH map_cell: in-place s/// edits the named column, return value ignored');
+}
+
+# AoH: map_cell exposes the row as $_[0] and the row index as $_[1]
+{
+	my $d = [ { v => 'x', n => 2 }, { v => 'y', n => 5 } ];
+	assign($d, v => map_cell { $_ = "$_-$_[0]{n}-$_[1]" });
+	is_deeply([ map { $_->{v} } @$d ], ['x-2-0', 'y-5-1'],
+		'AoH map_cell: $_[0] is the row, $_[1] is the index');
+}
+
+# AoH: map_cell leaves undef cells untouched (undef in -> undef out); the block
+# never runs on them, so no uninitialized-value warnings under FATAL warnings
+{
+	my $d = [ { s => 'A:foo' }, { s => undef }, {} ];   # defined, undef, missing
+	my $ran = 0;
+	assign($d, s => map_cell { $ran++; s/^[A-Z]:// });
+	is($ran, 1, 'AoH map_cell: block runs only for the defined cell');
+	is($d->[0]{s}, 'foo', 'AoH map_cell: defined cell edited');
+	ok(!defined $d->[1]{s}, 'AoH map_cell: undef cell stays undef');
+	ok(!exists $d->[2]{s}, 'AoH map_cell: missing cell stays missing');
+}
+
+# AoH: map_cell on a non-hash row dies with the offending index
+{
+	throws_ok { assign([ { ok => 1 }, 'notahash' ], x => map_cell { $_ = 1 }) }
+		qr/row 1 is not a hashref/,
+		'AoH map_cell: non-hash row croaks (with index)';
+}
+
 # ----------------------------------------------------------------------
 # HoA: basic derivation, chaining, branching, originals shared/untouched
 # ----------------------------------------------------------------------
@@ -174,6 +210,32 @@ SKIP: {
 	throws_ok { assign({ a => [1, 2, 3] }, bad => sub { (1, 2) }) }
 		qr/produced 2 values but data frame has 3 rows/,
 		'HoA: whole-column length mismatch dies';
+}
+
+# HoA: map_cell -- in-place per-cell edit; $_[0] is a row view for sibling cols
+{
+	my $hoa = { 'Res.' => ['A:foo', 'B:bar'], other => [1, 2] };
+	my $ret = assign($hoa, 'Res.' => map_cell { s/^[A-Z]://; $_ .= '-' . $_[0]{other} });
+	is($ret, $hoa, 'HoA map_cell: returns the same ref (modified in place)');
+	is_deeply($hoa->{'Res.'}, ['foo-1', 'bar-2'],
+		'HoA map_cell: in-place edit plus sibling column via $_[0]');
+	is_deeply($hoa->{other}, [1, 2], 'HoA map_cell: sibling column untouched');
+}
+
+# HoA: map_cell leaves undef cells untouched (undef in -> undef out)
+{
+	my $hoa = { s => ['A:foo', undef, 'C:baz'] };
+	my $ran = 0;
+	assign($hoa, s => map_cell { $ran++; s/^[A-Z]:// });
+	is($ran, 2, 'HoA map_cell: block skips the undef cell');
+	is_deeply($hoa->{s}, ['foo', undef, 'baz'], 'HoA map_cell: undef cell stays undef');
+}
+
+# HoA: map_cell on a column that does not exist dies
+{
+	throws_ok { assign({ a => [1, 2] }, nope => map_cell { $_ = 1 }) }
+		qr/map_cell target column 'nope' must already exist/,
+		'HoA map_cell: missing target column croaks';
 }
 
 # ----------------------------------------------------------------------
@@ -235,6 +297,16 @@ SKIP: {
 		my $d = { w => [70, 90], h => [1.8, 1.7] };
 		assign($d, bmi => sub { $_->{w} / $_->{h} ** 2 }, tag => sub { $_->{bmi} > 25 ? 1 : 0 });
 	} 'no SV leak: HoA derivation (synthesized row views)';
+
+	no_leaks_ok {
+		my $d = [ { s => 'A:1' }, { s => 'B:2' } ];
+		assign($d, s => map_cell { s/^[A-Z]:// });
+	} 'no SV leak: AoH map_cell in-place edit';
+
+	no_leaks_ok {
+		my $d = { s => ['A:1', 'B:2'], k => [1, 2] };
+		assign($d, s => map_cell { s/^[A-Z]://; $_ .= $_[0]{k} });
+	} 'no SV leak: HoA map_cell in-place edit';
 
 	no_leaks_ok {
 		eval { assign([ { a => 1 } ], bad => 'notcode') };

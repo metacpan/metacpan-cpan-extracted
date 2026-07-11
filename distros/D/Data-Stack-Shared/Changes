@@ -1,5 +1,9 @@
 Revision history for Data::Stack::Shared
 
+0.06  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.05  2026-06-01
     - create: reject capacity > 2^31-1 (matches validate_header), so it can
       no longer silently truncate the uint32 capacity / fail on reopen

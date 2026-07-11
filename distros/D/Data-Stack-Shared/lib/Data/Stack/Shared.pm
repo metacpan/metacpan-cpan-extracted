@@ -1,10 +1,12 @@
 package Data::Stack::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Data::Stack::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 
 @Data::Stack::Shared::Int::ISA = ('Data::Stack::Shared');
 @Data::Stack::Shared::Str::ISA = ('Data::Stack::Shared');
@@ -59,8 +61,8 @@ B<Linux-only>. Requires 64-bit Perl.
 Push and pop are safe under multi-producer / multi-consumer workloads.
 Each slot carries a 64-bit control word (state + generation) that acts
 as a publication gate: a pusher atomically transitions the slot through
-C<empty → writing → filled>, and a popper transitions it through
-C<filled → reading → empty> with the generation bumped on completion.
+C<empty -> writing -> filled>, and a popper transitions it through
+C<filled -> reading -> empty> with the generation bumped on completion.
 A consumer that claims position C<t-1> via the C<top> CAS therefore
 always observes the matching pusher's transition to C<filled> before
 reading the value. C<peek> is a seqlock-style read: it retries if the
@@ -74,7 +76,7 @@ between its position CAS and publish cannot wedge drain forever. Because
 the slot control word does not encode owner PID, this recovery cannot
 distinguish a crashed pusher from one stalled longer than 2s; if a live
 pusher is falsely reclaimed, its later publish observes the bumped
-generation and is silently dropped (the value is lost — equivalent to a
+generation and is silently dropped (the value is lost -- equivalent to a
 crash). A legitimate publish-in-flight delay is many orders of magnitude
 shorter than the threshold under normal load.
 
@@ -142,8 +144,14 @@ C<waits>, C<timeouts>, C<mmap_size>.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it.
-Do not share backing files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 BENCHMARKS
 

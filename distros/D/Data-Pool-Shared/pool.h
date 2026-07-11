@@ -213,6 +213,13 @@ static inline int64_t pool_alloc(PoolHandle *h, double timeout) {
         }
 
         __atomic_add_fetch(&hdr->waiters, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier: we must publish waiters++ before re-reading
+         * `used`, so a concurrent releaser either sees our waiters++ (and
+         * wakes us) or we see its used-- here (and don't sleep). Release/
+         * acquire does not order a store before a later load to a different
+         * address; without this fence both sides can miss each other on a
+         * weakly-ordered CPU -> lost wakeup -> hang. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
 
         cur_used = __atomic_load_n(&hdr->used, __ATOMIC_ACQUIRE);
         if ((uint64_t)cur_used >= hdr->capacity) {
@@ -259,11 +266,21 @@ static inline int pool_free_slot(PoolHandle *h, uint64_t slot) {
         if (!(word & mask)) return 0;
 
         uint64_t new_word = word & ~mask;
+        /* Zero owner BEFORE releasing the bit: once the bit is clear a peer's
+         * try_alloc may set owners[slot]=its pid, and doing owner=0 after the
+         * release CAS would race and clobber that pid to 0 (recover_stale then
+         * skips the slot -> a later crash leaks it).  recover_stale is
+         * owner-first for the same reason. */
+        __atomic_store_n(&h->owners[slot], 0, __ATOMIC_RELAXED);
         if (__atomic_compare_exchange_n(&h->bitmap[widx], &word, new_word,
                 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-            __atomic_store_n(&h->owners[slot], 0, __ATOMIC_RELAXED);
             __atomic_sub_fetch(&hdr->used, 1, __ATOMIC_RELEASE);
             __atomic_add_fetch(&hdr->stat_frees, 1, __ATOMIC_RELAXED);
+            /* StoreLoad barrier: publish used-- before reading waiters, so we
+             * observe a waiter that registered just before our free (else the
+             * wake is lost and it sleeps until timeout). Pairs with the fence
+             * in the alloc-wait path. */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
                 syscall(SYS_futex, &hdr->used, FUTEX_WAKE, 1, NULL, NULL, 0);
             return 1;
@@ -291,9 +308,9 @@ static inline uint32_t pool_free_n(PoolHandle *h, uint64_t *slots, uint32_t coun
             uint64_t word = __atomic_load_n(&h->bitmap[widx], __ATOMIC_RELAXED);
             if (!(word & mask)) break;
             uint64_t new_word = word & ~mask;
+            __atomic_store_n(&h->owners[slot], 0, __ATOMIC_RELAXED);  /* owner-first (see pool_free_slot) */
             if (__atomic_compare_exchange_n(&h->bitmap[widx], &word, new_word,
                     1, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-                __atomic_store_n(&h->owners[slot], 0, __ATOMIC_RELAXED);
                 freed++;
                 break;
             }
@@ -303,6 +320,8 @@ static inline uint32_t pool_free_n(PoolHandle *h, uint64_t *slots, uint32_t coun
     if (freed > 0) {
         __atomic_sub_fetch(&hdr->used, freed, __ATOMIC_RELEASE);
         __atomic_add_fetch(&hdr->stat_frees, freed, __ATOMIC_RELAXED);
+        /* StoreLoad barrier: see pool_free_slot. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0) {
             int wake = freed < (uint32_t)INT_MAX ? (int)freed : INT_MAX;
             syscall(SYS_futex, &hdr->used, FUTEX_WAKE, wake, NULL, NULL, 0);
@@ -331,28 +350,41 @@ static inline int pool_alloc_n(PoolHandle *h, uint64_t *out, uint32_t count,
         return 1;
     }
 
+    /* count > capacity can never be satisfied: fail fast rather than grab the
+     * whole pool and block forever. */
+    if ((uint64_t)count > h->hdr->capacity) return 0;
+
+    PoolHeader *hdr = h->hdr;
     struct timespec deadline, remaining;
     int has_deadline = (timeout > 0);
     if (has_deadline) pool_make_deadline(timeout, &deadline);
 
-    for (uint32_t i = 0; i < count; i++) {
-        double t = timeout;
-        if (has_deadline) {
-            if (!pool_remaining_time(&deadline, &remaining)) {
-                __atomic_add_fetch(&h->hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
-                if (i > 0) pool_free_n(h, out, i);
-                return 0;
-            }
-            t = (double)remaining.tv_sec + (double)remaining.tv_nsec / 1e9;
+    /* All-or-nothing with retry, releasing any partial claim BEFORE waiting:
+     * holding it across the wait let two over-demanding alloc_n callers deadlock. */
+    uint32_t backoff = 0;
+    for (;;) {
+        uint32_t got = 0;
+        for (; got < count; got++) {
+            int64_t s = pool_try_alloc(h);
+            if (s < 0) break;
+            out[got] = (uint64_t)s;
         }
-        int64_t slot = pool_alloc(h, t);
-        if (slot < 0) {
-            if (i > 0) pool_free_n(h, out, i);
+        if (got == count) return 1;
+        if (got > 0) pool_free_n(h, out, got);   /* don't hold across the wait */
+
+        if (has_deadline && !pool_remaining_time(&deadline, &remaining)) {
+            __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
             return 0;
         }
-        out[i] = (uint64_t)slot;
+        /* Jittered (pid-seeded) backoff desyncs competing alloc_n callers,
+         * breaking the symmetric grab/release livelock. */
+        {
+            long us = (long)(((getpid() & 0x7u) + backoff) % 40u) * 25 + 25;  /* 25..1000 us */
+            if (backoff < 40) backoff++;
+            struct timespec bt = { 0, us * 1000L };
+            nanosleep(&bt, NULL);
+        }
     }
-    return 1;
 }
 
 /* ================================================================
@@ -419,6 +451,8 @@ static inline uint32_t pool_recover_stale(PoolHandle *h) {
                             &cur, cur - 1, 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED))
                     ; /* CAS failed: cur reloaded with current value; retry */
                 __atomic_add_fetch(&h->hdr->stat_frees, 1, __ATOMIC_RELAXED);
+                /* StoreLoad barrier: see pool_free_slot. */
+                __atomic_thread_fence(__ATOMIC_SEQ_CST);
                 if (__atomic_load_n(&h->hdr->waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &h->hdr->used, FUTEX_WAKE, 1, NULL, NULL, 0);
                 recovered++;
@@ -482,12 +516,25 @@ static inline void pool_init_header(void *base, uint64_t total,
 /* Max capacity to prevent bitmap_words (uint32_t) truncation */
 #define POOL_MAX_CAPACITY ((uint64_t)UINT32_MAX * 64)
 
+/* Fixed element width for the typed variants; 0 for RAW/STR (caller-chosen).
+ * A crafted file could pair a typed variant_id with a wrong elem_size and drive
+ * the typed accessors past a slot or into a misaligned atomic; pin it here. */
+static inline uint32_t pool_variant_elem_size(uint32_t variant_id) {
+    switch (variant_id) {
+        case POOL_VAR_I64: case POOL_VAR_F64: return 8;
+        case POOL_VAR_I32:                    return 4;
+        default:                              return 0;
+    }
+}
+
 /* Validate header: magic, version, variant, sizes, AND layout offsets. */
 static inline int pool_validate_header(const PoolHeader *hdr, uint64_t file_size,
                                         uint32_t expected_variant) {
     if (hdr->magic != POOL_MAGIC) return 0;
     if (hdr->version != POOL_VERSION) return 0;
     if (hdr->variant_id != expected_variant) return 0;
+    { uint32_t w = pool_variant_elem_size(hdr->variant_id);
+      if (w && hdr->elem_size != w) return 0; }   /* typed variant: elem_size must match its fixed width */
     if (hdr->capacity == 0 || hdr->capacity > POOL_MAX_CAPACITY) return 0;
     if (hdr->elem_size == 0) return 0;
     if (hdr->capacity > (UINT64_MAX - sizeof(PoolHeader)) / hdr->elem_size) return 0;
@@ -523,9 +570,26 @@ static inline PoolHandle *pool_setup_handle(void *base, size_t map_size,
     return h;
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int pool_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { POOL_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        POOL_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    POOL_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static PoolHandle *pool_create(const char *path, uint64_t capacity,
                                 uint32_t elem_size, uint32_t variant_id,
-                                char *errbuf) {
+                                mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
 
     if (capacity == 0) { POOL_ERR("capacity must be > 0"); return NULL; }
@@ -552,8 +616,8 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
             return NULL;
         }
     } else {
-        fd = open(path, O_RDWR | O_CREAT, 0666);
-        if (fd < 0) { POOL_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
+        fd = pool_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
 
         if (flock(fd, LOCK_EX) < 0) {
             POOL_ERR("flock(%s): %s", path, strerror(errno));
@@ -590,6 +654,16 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
         if (!is_new) {
             if (!pool_validate_header((PoolHeader *)base, (uint64_t)st.st_size, variant_id)) {
                 POOL_ERR("%s: invalid or incompatible pool file", path);
+                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+            }
+            /* Attaching an existing file must match the requested geometry, else
+             * a caller that grew capacity/elem_size in code but kept the old file
+             * would silently get the old (smaller) pool (shmget-style EINVAL). */
+            PoolHeader *ehdr = (PoolHeader *)base;
+            if (ehdr->capacity != capacity || ehdr->elem_size != elem_size) {
+                POOL_ERR("%s: geometry mismatch (file capacity=%llu elem_size=%u; requested capacity=%llu elem_size=%u)",
+                         path, (unsigned long long)ehdr->capacity, ehdr->elem_size,
+                         (unsigned long long)capacity, elem_size);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN);
@@ -805,9 +879,17 @@ static inline void pool_set_f64(PoolHandle *h, uint64_t slot, double val) {
  * ================================================================ */
 
 static inline uint32_t pool_get_str_len(PoolHandle *h, uint64_t slot) {
+    /* elem_size is attacker-controlled (a local peer can craft the backing file);
+     * a Str slot must be large enough to hold the 4-byte length prefix. If it is
+     * not, the file is corrupt: skip the prefix read and return 0 rather than let
+     * max_len underflow and defeat the clamp below (which would otherwise return a
+     * ~4 GiB length -> OOB read). Legit Str pools have elem_size >= 5, so this is a
+     * never-taken branch for valid data. */
+    uint32_t elem = h->hdr->elem_size;
+    if (elem <= sizeof(uint32_t)) return 0;
     uint32_t len;
     memcpy(&len, pool_slot_ptr(h, slot), sizeof(uint32_t));
-    uint32_t max_len = h->hdr->elem_size - sizeof(uint32_t);
+    uint32_t max_len = elem - (uint32_t)sizeof(uint32_t);
     if (len > max_len) len = max_len;
     return len;
 }
@@ -818,7 +900,12 @@ static inline const char *pool_get_str_ptr(PoolHandle *h, uint64_t slot) {
 
 static inline void pool_set_str(PoolHandle *h, uint64_t slot,
                                  const char *str, uint32_t len) {
-    uint32_t max_len = h->hdr->elem_size - sizeof(uint32_t);
+    /* See pool_get_str_len: reject slots too small to hold the length prefix so
+     * the max_len computation cannot underflow (which would defeat the clamp and
+     * let the data memcpy run off the end of the data region -> OOB write). */
+    uint32_t elem = h->hdr->elem_size;
+    if (elem <= sizeof(uint32_t)) return;
+    uint32_t max_len = elem - (uint32_t)sizeof(uint32_t);
     if (len > max_len) len = max_len;
     memcpy(pool_slot_ptr(h, slot), &len, sizeof(uint32_t));
     memcpy(pool_slot_ptr(h, slot) + sizeof(uint32_t), str, len);
@@ -834,6 +921,9 @@ static inline void pool_reset(PoolHandle *h) {
     memset(h->bitmap, 0, (size_t)h->bitmap_words * 8);
     memset(h->owners, 0, (size_t)hdr->capacity * 4);
     __atomic_store_n(&hdr->used, 0, __ATOMIC_RELEASE);
+    /* StoreLoad barrier: see pool_free_slot (reset is documented single-writer,
+     * but keep the handshake correct if a waiter is nonetheless parked). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->used, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }

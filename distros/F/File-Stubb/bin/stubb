@@ -152,15 +152,16 @@ instead of as a special target.
   # be rendered as a '#'.
   Today is \#^^date^^
 
-=item B<!^^ I<not a target> ^^>
+=item B<\^^>
 
-A non-target is preceded by an exclamation mark (C<!>) sigil. Should be used
-when you have a piece of text that you do not want B<stubb> to interpret as a
-normal substitution target. When rendered, B<stubb> will render the text as-is
-except with the exclamation mark removed.
+A "^^" can be placed literally within text by escaping with a single
+backslash.
 
-  # Will be rendered literally, except with the '!' gone.
-  This isn't a target: !^^phony^^
+  # will be rendered as "^^ not a target ^^"
+  \^^ not a target \^^
+
+If two backslashes precede two carets, the target will be rendered
+as a literal backslash followed by a basic target.
 
 =back
 
@@ -326,7 +327,7 @@ requests are welcome!
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tube name="LinkRestrictionTest">
+  <lines>
+    <line id="x" name="Line X" color="black"/>
+    <line id="y" name="Line Y" color="blue"/>
+  </lines>
+  <stations>
+    <station id="A" name="A street" line="x,y" link="B,D"/>
+    <station id="B" name="B street" line="x,y" link="A:x,C"/>
+    <station id="C" name="C street" line="x,y" link="B,D"/>
+    <station id="D" name="D street" line="y"   link="A,C"/>
+  </stations>
+</tube>

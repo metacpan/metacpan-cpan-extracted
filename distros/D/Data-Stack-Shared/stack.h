@@ -83,6 +83,7 @@ typedef struct {
     uint64_t  *ctl;            /* per-slot state+generation word */
     size_t     mmap_size;
     uint32_t   elem_size;      /* cached from header at open time */
+    uint64_t   capacity;       /* cached from header at open time — trusted bound */
     char      *path;
     int        notify_fd;
     int        backing_fd;
@@ -172,7 +173,7 @@ static inline void stk_slot_release(uint64_t *ctl_word, uint64_t gen) {
 
 static inline int stk_try_push(StkHandle *h, const void *val, uint32_t vlen) {
     StkHeader *hdr = h->hdr;
-    uint32_t cap = (uint32_t)hdr->capacity;
+    uint32_t cap = (uint32_t)h->capacity;  /* trusted cached bound, not live mmap */
     for (;;) {
         uint32_t t = __atomic_load_n(&hdr->top, __ATOMIC_RELAXED);
         if (t >= cap) return 0;
@@ -185,6 +186,9 @@ static inline int stk_try_push(StkHandle *h, const void *val, uint32_t vlen) {
             if (cp < sz) memset(stk_slot(h, t) + cp, 0, sz - cp);
             stk_slot_publish(&h->ctl[t], gen);
             __atomic_add_fetch(&hdr->stat_pushes, 1, __ATOMIC_RELAXED);
+            /* StoreLoad barrier: publish top++ before reading waiters_pop, so
+             * we observe a popper that registered just before this push. */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters_pop, __ATOMIC_RELAXED) > 0) {
                 __atomic_add_fetch(&hdr->pop_wake_seq, 1, __ATOMIC_RELEASE);
                 syscall(SYS_futex, &hdr->pop_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -199,7 +203,7 @@ static inline int stk_push(StkHandle *h, const void *val, uint32_t vlen, double 
     if (timeout == 0) return 0;
 
     StkHeader *hdr = h->hdr;
-    uint32_t cap = (uint32_t)hdr->capacity;
+    uint32_t cap = (uint32_t)h->capacity;  /* trusted cached bound, not live mmap */
     struct timespec dl, rem;
     int has_dl = (timeout > 0);
     if (has_dl) stk_make_deadline(timeout, &dl);
@@ -208,6 +212,11 @@ static inline int stk_push(StkHandle *h, const void *val, uint32_t vlen, double 
     for (;;) {
         uint32_t wseq = __atomic_load_n(&hdr->push_wake_seq, __ATOMIC_ACQUIRE);
         __atomic_add_fetch(&hdr->waiters_push, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier: publish waiters_push++ before re-reading `top`,
+         * so a concurrent popper sees our registration (and wakes us) or we
+         * see its top-- (and don't sleep). Release/acquire lets these reorder
+         * on weak memory -> lost wakeup -> hang. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint32_t t = __atomic_load_n(&hdr->top, __ATOMIC_ACQUIRE);
         if (t >= cap) {
             struct timespec *pts = NULL;
@@ -239,12 +248,15 @@ static inline int stk_try_pop(StkHandle *h, void *out) {
     for (;;) {
         uint32_t t = __atomic_load_n(&hdr->top, __ATOMIC_ACQUIRE);
         if (t == 0) return 0;
+        if (t > h->capacity) return 0;  /* corrupted top: reject rather than OOB h->ctl[t-1]/slot */
         if (__atomic_compare_exchange_n(&hdr->top, &t, t - 1,
                 1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
             uint64_t gen = stk_slot_claim_read(&h->ctl[t - 1]);
             memcpy(out, stk_slot(h, t - 1), h->elem_size);
             stk_slot_release(&h->ctl[t - 1], gen);
             __atomic_add_fetch(&hdr->stat_pops, 1, __ATOMIC_RELAXED);
+            /* StoreLoad barrier: publish top-- before reading waiters_push. */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
                 __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
                 syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -267,6 +279,8 @@ static inline int stk_pop(StkHandle *h, void *out, double timeout) {
     for (;;) {
         uint32_t wseq = __atomic_load_n(&hdr->pop_wake_seq, __ATOMIC_ACQUIRE);
         __atomic_add_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier: see the push-wait path (pairs with a pusher). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint32_t t = __atomic_load_n(&hdr->top, __ATOMIC_ACQUIRE);
         if (t == 0) {
             struct timespec *pts = NULL;
@@ -300,6 +314,7 @@ static inline int stk_peek(StkHandle *h, void *out) {
     for (int tries = 0; tries < 64; tries++) {
         uint32_t t = __atomic_load_n(&h->hdr->top, __ATOMIC_ACQUIRE);
         if (t == 0) return 0;
+        if (t > h->capacity) return 0;  /* corrupted top: reject rather than OOB h->ctl[t-1]/slot */
         uint64_t c1 = __atomic_load_n(&h->ctl[t - 1], __ATOMIC_ACQUIRE);
         if (STK_SLOT_STATE(c1) != STK_SLOT_FILLED) {
             stk_spin_pause();
@@ -348,16 +363,22 @@ static inline void stk_init_header(void *base, uint64_t total,
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
+/* Layout fields are passed in by the caller — either from a validated
+ * header snapshot or locally computed — never re-read from the live
+ * mapping, which a hostile peer could rewrite between validation and
+ * here (double-fetch TOCTOU). */
 static inline StkHandle *stk_setup(void *base, size_t msize,
-                                    const char *path, int bfd) {
-    StkHeader *hdr = (StkHeader *)base;
+                                    const char *path, int bfd,
+                                    uint64_t data_off, uint64_t ctl_off,
+                                    uint32_t elem_size, uint64_t capacity) {
     StkHandle *h = (StkHandle *)calloc(1, sizeof(StkHandle));
     if (!h) { munmap(base, msize); return NULL; }
-    h->hdr        = hdr;
-    h->data       = (uint8_t *)base + hdr->data_off;
-    h->ctl        = (uint64_t *)((uint8_t *)base + hdr->ctl_off);
+    h->hdr        = (StkHeader *)base;
+    h->data       = (uint8_t *)base + data_off;
+    h->ctl        = (uint64_t *)((uint8_t *)base + ctl_off);
     h->mmap_size  = msize;
-    h->elem_size  = hdr->elem_size;  /* cached — safe from shared-mem tampering */
+    h->elem_size  = elem_size;  /* cached — safe from shared-mem tampering */
+    h->capacity   = capacity;   /* cached — trusted index/length bound */
     h->path       = path ? strdup(path) : NULL;
     h->notify_fd  = -1;
     h->backing_fd = bfd;
@@ -379,9 +400,28 @@ static inline int stk_validate_header(const StkHeader *hdr, uint64_t file_size,
     return 1;
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT).
+ * O_EXCL blocks a pre-seeded/hard-linked file and O_NOFOLLOW a symlink swap,
+ * so a local peer cannot redirect or pre-own the backing segment. */
+static int stk_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { STK_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        STK_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    STK_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static StkHandle *stk_create(const char *path, uint64_t capacity,
                               uint32_t elem_size, uint32_t variant_id,
-                              char *errbuf) {
+                              mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { STK_ERR("capacity must be > 0"); return NULL; }
     if (capacity > 0x7FFFFFFFu) { STK_ERR("capacity too large (max 2147483647)"); return NULL; }
@@ -402,8 +442,8 @@ static StkHandle *stk_create(const char *path, uint64_t capacity,
                      MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { STK_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { STK_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
+        fd = stk_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { STK_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
 
         struct stat st;
@@ -427,18 +467,24 @@ static StkHandle *stk_create(const char *path, uint64_t capacity,
         if (base == MAP_FAILED) { STK_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
 
         if (!is_new) {
-            if (!stk_validate_header((StkHeader *)base, (uint64_t)st.st_size, variant_id)) {
+            StkHeader snap;  /* single fetch: validate + setup use one copy */
+            memcpy(&snap, base, sizeof snap);
+            if (!stk_validate_header(&snap, (uint64_t)st.st_size, variant_id)) {
                 STK_ERR("invalid or incompatible stack file");
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            return stk_setup(base, map_size, path, -1);
+            return stk_setup(base, map_size, path, -1,
+                             snap.data_off, snap.ctl_off,
+                             snap.elem_size, snap.capacity);
         }
     }
 
     stk_init_header(base, total, elem_size, variant_id, capacity);
     if (fd >= 0) { flock(fd, LOCK_UN); close(fd); }
-    return stk_setup(base, map_size, path, -1);
+    return stk_setup(base, map_size, path, -1,
+                     sizeof(StkHeader), stk_ctl_offset(elem_size, capacity),
+                     elem_size, capacity);
 }
 
 static StkHandle *stk_create_memfd(const char *name, uint64_t capacity,
@@ -460,7 +506,9 @@ static StkHandle *stk_create_memfd(const char *name, uint64_t capacity,
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { STK_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
     stk_init_header(base, total, elem_size, variant_id, capacity);
-    return stk_setup(base, (size_t)total, NULL, fd);
+    return stk_setup(base, (size_t)total, NULL, fd,
+                     sizeof(StkHeader), stk_ctl_offset(elem_size, capacity),
+                     elem_size, capacity);
 }
 
 static StkHandle *stk_open_fd(int fd, uint32_t variant_id, char *errbuf) {
@@ -471,12 +519,15 @@ static StkHandle *stk_open_fd(int fd, uint32_t variant_id, char *errbuf) {
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { STK_ERR("mmap: %s", strerror(errno)); return NULL; }
-    if (!stk_validate_header((StkHeader *)base, (uint64_t)st.st_size, variant_id)) {
+    StkHeader snap;  /* single fetch: validate + setup use one copy */
+    memcpy(&snap, base, sizeof snap);
+    if (!stk_validate_header(&snap, (uint64_t)st.st_size, variant_id)) {
         STK_ERR("invalid stack"); munmap(base, ms); return NULL;
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { STK_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
-    return stk_setup(base, ms, NULL, myfd);
+    return stk_setup(base, ms, NULL, myfd,
+                     snap.data_off, snap.ctl_off, snap.elem_size, snap.capacity);
 }
 
 static void stk_destroy(StkHandle *h) {
@@ -491,8 +542,10 @@ static void stk_destroy(StkHandle *h) {
 /* NOT concurrency-safe — use drain() for concurrent scenarios */
 static void stk_clear(StkHandle *h) {
     __atomic_store_n(&h->hdr->top, 0, __ATOMIC_RELEASE);
-    memset(h->ctl, 0, (size_t)h->hdr->capacity * sizeof(uint64_t));
-    /* clear() frees the entire stack at once — wake all waiters. */
+    memset(h->ctl, 0, (size_t)h->capacity * sizeof(uint64_t));  /* trusted cached length */
+    /* clear() frees the entire stack at once — wake all waiters.
+     * StoreLoad barrier: publish top=0 before reading the waiter counts. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&h->hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&h->hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &h->hdr->push_wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -524,6 +577,7 @@ static inline uint32_t stk_drain(StkHandle *h) {
     StkHeader *hdr = h->hdr;
     uint32_t t = __atomic_exchange_n(&hdr->top, 0, __ATOMIC_ACQ_REL);
     if (t == 0) return 0;
+    if (t > h->capacity) t = (uint32_t)h->capacity;  /* corrupted top: clamp loop to real ctl array */
     /* Wall-clock deadline for the per-slot wait. We hot-spin first, then
      * fall back to short sleeps to avoid burning a core for 2s on a stuck
      * slot. The deadline is checked periodically (every 64 iterations) to
@@ -566,7 +620,9 @@ static inline uint32_t stk_drain(StkHandle *h) {
             }
         }
     }
-    /* drain freed `t` slots at once — wake up to that many. */
+    /* drain freed `t` slots at once — wake up to that many.
+     * StoreLoad barrier: publish the freed slots before reading waiters_push. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE,

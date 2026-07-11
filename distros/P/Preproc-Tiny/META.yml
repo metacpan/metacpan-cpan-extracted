@@ -23,7 +23,7 @@ no_index:
 requires: {}
 resources:
   repository: https://github.com/pauloscustodio/perl-Preproc-Tiny.git
-version: '0.03'
+version: '0.04'
 x_bugtracker:
   web: https://github.com/pauloscustodio/perl-Preproc-Tiny/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

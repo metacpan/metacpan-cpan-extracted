@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker;
 
 my @needfull;
 
@@ -154,7 +154,7 @@ if(scalar(keys(%urls)) > 1) {
 
 		$pm = Parallel::ForkManager->new(10);
 	} else {
-		print "Consider installing Parallel::Forkmanager to speed up downloads\n";
+		print "Consider installing Parallel::ForkManager to speed up downloads\n";
 	}
 }
 
@@ -264,6 +264,8 @@ if(open(my $admin2, '>>', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
 # For bin/create_sqlite
 my $build_requires = {
 	'App::csv2sqlite' => 0,
+	'DB_File' => 0,
+	'Cache::LRU' => 0,
 	'CHI' => 0,
 	'CHI::Driver::RawMemory' => 0,
 	'Cwd' => 0,
@@ -339,7 +341,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	NAME		=> 'Geo::Coder::Free',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	VERSION_FROM	=> 'lib/Geo/Coder/Free.pm',
 	ABSTRACT_FROM   => 'lib/Geo/Coder/Free.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
@@ -347,7 +349,9 @@ WriteMakefile(
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
 	BUILD_REQUIRES => $build_requires,
-	TEST_REQUIRES => $test_requires,
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	}, TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'Carp' => 0,
 		# 'BerkeleyDB' => 0,
@@ -367,6 +371,7 @@ WriteMakefile(
 		'Locale::SubCountry' => 0,
 		'Locale::US' => 0,
 		'Lingua::EN::AddressParse' => 0,
+		'Geo::Address::Parser' => 0,
 		'Geo::Hash' => 0,
 		'Geo::StreetAddress::US' => 0,
 		'Gzip::Faster' => 0,
@@ -403,18 +408,23 @@ WriteMakefile(
 			# }
 		# }
 	# },
-	META_MERGE		=> {
+	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
+			homepage => 'https://geocode.nigelhorne.com',
 			repository => {
+				repository => 'https://github.com/nigelhorne/Geo-Coder-Free',
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Geo-Coder-Free.git',
 				web => 'https://github.com/nigelhorne/Geo-Coder-Free',
+				# license => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free',
-				web => 'https://github.com/nigelhorne/Geo-Coder-Free/issues',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free',
+				# web => 'https://github.com/nigelhorne/Geo-Coder-Free/issues',
+				# url => 'https://github.com/nigelhorne/Geo-Coder-Free/issues',
 				mailto => 'bug-Geo-Coder-Free@rt.cpan.org'
-			}, homepage => 'https://geocode.nigelhorne.com'
+			}
 		},
 	},
 	# PL_FILES => (defined($ENV{'AUTOMATED_TESTING'}) ? {} : {'bin/create_db.PL' => 'bin/create_db'}),

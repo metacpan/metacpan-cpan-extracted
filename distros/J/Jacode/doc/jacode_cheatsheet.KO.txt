@@ -2,7 +2,7 @@
 # Jacode 치트시트 (KO)
 # Jacode - 일본어 문자 코드 변환 Perl 프로그램
 # https://metacpan.org/dist/Jacode
-# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ################################################################################
 
 ■ 설치

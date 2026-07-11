@@ -51,7 +51,7 @@ print "1..$total\n";
 
 my $test_num = 0;
 
-sub ok {
+sub ok ($$) {
     my ($cond, $label) = @_;
     $test_num++;
     if ($cond) {

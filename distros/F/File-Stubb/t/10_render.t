@@ -317,7 +317,7 @@ is(
     <<'HERE',
 My favorite number: $1
 My third favorite number: #3
-My three favorite numbers: !1, ?2, $3
+My three favorite numbers: \1, ?2, $3
 Maybe a number? ?4
 HERE
     'Escaped target rendering ok'
@@ -341,7 +341,7 @@ is(
     <<'HERE',
 My favorite number: $^^ one ^^
 My third favorite number: #^^ three ^^
-My three favorite numbers: !^^ one ^^, ?^^ two ^^, $^^ three ^^
+My three favorite numbers: \^^ one ^^, ?^^ two ^^, $^^ three ^^
 Maybe a number? ?4
 HERE
     'Escaped target rendering ok'

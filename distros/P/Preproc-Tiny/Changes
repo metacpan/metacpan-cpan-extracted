@@ -1,9 +1,12 @@
+0.04	2026-07-10
+	* fix typo in documentation
+	* show error message after Perl code on error
+
 0.03	2026-07-09
 	Features:
 	* export the internal template processor as pp_text()
 
 0.02	2016-05-12
-
 	Bug Fixes
 	* Decrease perl version requirement to v5.10
 	* Minor documentation fixes

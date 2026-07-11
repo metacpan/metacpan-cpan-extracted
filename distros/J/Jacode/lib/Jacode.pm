@@ -8,7 +8,7 @@ package Jacode;
 # Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$VERSION = '2.13.4.34';
+$VERSION = '2.13.4.35';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -27,13 +27,21 @@ sub AUTOLOAD {
     *{$AUTOLOAD} = sub {
         require Carp;
         local $@;
-        my $return = eval {
-            &$callee;
-        };
+        my @return = ();
+        if (wantarray) {
+            @return = eval {
+                &$callee;
+            };
+        }
+        else {
+            $return[0] = eval {
+                &$callee;
+            };
+        }
         if ($@) {
             Carp::croak($@);
         }
-        return $return;
+        return wantarray ? @return : $return[0];
     };
 
     goto &$AUTOLOAD;

@@ -2,7 +2,7 @@
 # សន្លឹកយោង Jacode (KM)
 # Jacode - កម្មវិធី Perl សម្រាប់បំប្លែងកូដតួអក្សរភាសាជប៉ុន
 # https://metacpan.org/dist/Jacode
-# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ################################################################################
 
 ■ ការដំឡើង

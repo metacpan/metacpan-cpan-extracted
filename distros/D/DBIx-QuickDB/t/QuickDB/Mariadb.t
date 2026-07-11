@@ -1,9 +1,15 @@
-BEGIN {
-    $ENV{PATH}="$ENV{HOME}/dbs/mariadb11/bin:$ENV{PATH}" if $ENV{HOME} && -d "$ENV{HOME}/dbs/mariadb11/bin";
-}
+use FindBin qw/$Bin/;
+use lib "$Bin/../lib";
+use QDB::Installs qw/run_per_install/;             # before any Test2 tools: it loads Test2::IPC
+use Test2::Tools::Basic qw/done_testing/;          # not Test2::V0: QuickDB.pm imports V0 into main in the child
 
-$main::DRIVERS = ['MariaDB'];
-my $file = __FILE__;
-$file =~ s{[^/]+\.t$}{QuickDB.pm}g;
-$file = "./$file" if -f "./$file";
-do $file;
+# The parent process must not load DBIx::QuickDB or Test2::Tools::QuickDB;
+# each install's body runs in a forked child that sets $PATH first. See
+# t/lib/QDB/Installs.pm.
+run_per_install(MariaDB => sub {
+    our $DRIVERS = ['MariaDB'];
+    do "$Bin/QuickDB.pm";
+    die $@ if $@;
+});
+
+done_testing;

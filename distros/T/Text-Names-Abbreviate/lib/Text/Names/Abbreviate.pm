@@ -10,6 +10,7 @@ use Exporter 'import';
 use Params::Get 0.13;
 use Params::Validate::Strict 0.13;
 use Readonly;
+use Unicode::Normalize ();
 
 our @EXPORT_OK = qw(abbreviate);
 
@@ -19,11 +20,11 @@ Text::Names::Abbreviate - Create abbreviated name formats from full names
 
 =head2 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # ---------------------------------------------------------------------------
 # Named constants -- eliminate magic strings throughout the logic
@@ -35,6 +36,19 @@ Readonly my $FMT_SHORTLAST => 'shortlast';
 Readonly my $STY_FIRST     => 'first_last';
 Readonly my $STY_LAST      => 'last_first';
 Readonly my $DEFAULT_SEP   => '.';
+
+# Common surname particles across Dutch, German, French, Italian, Spanish,
+# Portuguese, Arabic, and Scandinavian naming traditions.  Matching is
+# case-sensitive: only lowercase tokens are eligible.
+Readonly my @DEFAULT_PARTICLES => qw(
+    van de di da von der den des du
+    la le las los el al
+    te ten ter
+    af av
+    bin bint ibn
+    y do dos das del
+    zu zum zur
+);
 
 # Single source of truth for parameter validation; also reflected in POD below.
 Readonly my %PARAM_SCHEMA => (
@@ -57,6 +71,10 @@ Readonly my %PARAM_SCHEMA => (
 		type     => 'string',
 		optional => 1,
 	},
+	particles => {
+		type     => ['boolean', 'arrayref'],
+		optional => 1,
+	},
 );
 
 =head1 SYNOPSIS
@@ -66,6 +84,8 @@ Readonly my %PARAM_SCHEMA => (
   say abbreviate('John Quincy Adams');                            # J. Q. Adams
   say abbreviate('Adams, John Quincy');                          # J. Q. Adams
   say abbreviate('George R R Martin', { format => 'initials' }); # G.R.R.M.
+  say abbreviate('Ludwig van Beethoven');                         # L. van Beethoven
+  say abbreviate("R\x{e9}mi Dupr\x{e9}");                       # R. Dupr\x{e9}
 
 =head1 DESCRIPTION
 
@@ -87,7 +107,10 @@ Produce an abbreviated form of a personal name.
 
 Accept a full name in either C<First Middle Last> or C<Last, First Middle>
 form and return a formatted abbreviated string according to the requested
-C<format>, C<style>, and C<separator>.
+C<format>, C<style>, C<separator>, and C<particles> options.  Input is
+NFC-normalised before processing, so strings differing only in Unicode
+normalisation form produce identical output.  Surname particles (C<van>,
+C<de>, C<von>, etc.) are absorbed into the last-name component by default.
 
 =head3 Args
 
@@ -133,6 +156,27 @@ One of C<first_last>, C<last_first>.  All formats honour this option.
 
 String appended after each initial.  Empty string removes all punctuation.
 
+=item particles (optional, default enabled)
+
+Controls detection of surname particles (C<van>, C<de>, C<von>, etc.) that
+prefix the last name.  Tokens immediately before the last name that appear in
+the particle list are absorbed into the last-name component.  Matching is
+case-sensitive: only lowercase tokens are eligible.
+
+=over 4
+
+=item omitted or C<1> - use the built-in particle list
+
+=item C<0> - disable particle detection entirely
+
+=item arrayref of strings - use that list instead of the built-in one
+
+=back
+
+  abbreviate('Ludwig van Beethoven');                           # L. van Beethoven
+  abbreviate('Ludwig van Beethoven', { particles => 0 });      # L. v. Beethoven
+  abbreviate('Felipe de la Cruz', { particles => ['de','la'] }); # F. de la Cruz
+
 =back
 
 =head3 Returns
@@ -168,6 +212,7 @@ None.  The function is purely functional with no persistent state.
                    memberof => [qw(first_last last_first)],
                    optional => 1 },
     separator => { type => 'string', optional => 1 },
+    particles => { type => ['boolean', 'arrayref'], optional => 1 },
   }
 
   OUTPUT
@@ -181,21 +226,26 @@ None.  The function is purely functional with no persistent state.
   name must be a non-empty string          Passed '' or undef; supply a non-empty string.
   format must be one of: ...               Invalid format constant; see API SPECIFICATION.
   style must be one of: ...               Invalid style constant; see API SPECIFICATION.
+  particles: must be one of boolean,       Passed a string or hashref; pass 0/1 or an
+    arrayref                               arrayref of particle strings instead.
 
 =head3 PSEUDOCODE
 
   FUNCTION abbreviate(name, options):
      Validate parameters via %PARAM_SCHEMA       (croak on violation)
-     Assign defaults: format=default, style=first_last, sep="."
+     Assign defaults: format=default, style=first_last, sep=".", particles=built-in list
      _normalize_name(name):
+         - NFC-normalize to precomposed Unicode form
          - collapse consecutive commas
          - detect and reorder "Last, First" form
          - track $had_leading_comma (input had no last-name component)
          - collapse internal whitespace; trim
      Return '' if normalized name is empty
-     _extract_parts(name, had_leading_comma, format, style):
+     _extract_parts(name, had_leading_comma, format, style, particles):
          - tokenize on whitespace
          - pop last token as $last_name (unless leading-comma form)
+         - if particles enabled: while last remaining token is a particle,
+           pop it and prepend to $last_name
          - build @initials from remaining tokens (first char each)
          - if style=last_first and format!=default: unshift last initial, clear $last_name
          - filter empty initials
@@ -221,6 +271,7 @@ None.  The function is purely functional with no persistent state.
 sub _normalize_name {
 	my ($raw) = @_;
 
+	$raw = Unicode::Normalize::NFC($raw);
 	$raw =~ s/,+/,/g;    # collapse any run of commas to one before splitting
 
 	my $had_leading_comma = 0;
@@ -250,16 +301,17 @@ sub _normalize_name {
 }
 
 # Purpose:      Derive the ordered list of initials and the preserved last name
-#               from a normalized name string, honouring format and style.
+#               from a normalized name string, honouring format, style, and particles.
 # Entry Criteria: $name is output of _normalize_name (trimmed, single-spaced).
 #                 $had_leading_comma is the boolean from _normalize_name.
 #                 $format and $style are validated constants (FMT_*/STY_*).
+#                 $particles is an arrayref of particle strings, or undef to disable.
 # Exit Status:  Returns ($initials_ref, $last_name).  $initials_ref is an
 #               arrayref of single-character strings with empty entries removed.
 #               $last_name is '' when consumed by style/format reordering.
 # Side Effects: None.
 sub _extract_parts {
-	my ($name, $had_leading_comma, $format, $style) = @_;
+	my ($name, $had_leading_comma, $format, $style, $particles) = @_;
 
 	my @parts = split /\s+/, $name;
 	return ([], q{}) unless @parts;
@@ -271,6 +323,15 @@ sub _extract_parts {
 		@initials  = map { substr $_, 0, 1 } @parts;
 	} else {
 		$last_name = pop @parts;
+
+		# Absorb surname particles immediately preceding the last name.
+		if ($particles && @parts) {
+			my %is_particle = map { $_ => 1 } grep { defined } @{$particles};
+			while (@parts && $is_particle{ $parts[-1] }) {
+				$last_name = (pop @parts) . q{ } . $last_name;
+			}
+		}
+
 		@initials  = map { substr $_, 0, 1 } @parts;
 
 		# last_first on non-default formats (except shortlast, which keeps the full last name):
@@ -303,10 +364,17 @@ sub abbreviate {
 	my $style  = $params->{style}     // $STY_FIRST;
 	my $sep    = $params->{separator} // $DEFAULT_SEP;
 
+	my $raw_particles = $params->{particles};
+	my $particles_ref =
+		!defined $raw_particles          ? \@DEFAULT_PARTICLES
+		: ref $raw_particles eq 'ARRAY'  ? $raw_particles
+		: $raw_particles                 ? \@DEFAULT_PARTICLES
+		:                                  undef;
+
 	my ($name, $had_leading_comma) = _normalize_name($params->{name});
 	return q{} unless length $name;
 
-	my ($initials, $last_name) = _extract_parts($name, $had_leading_comma, $format, $style);
+	my ($initials, $last_name) = _extract_parts($name, $had_leading_comma, $format, $style, $particles_ref);
 
 	if ($format eq $FMT_COMPACT) {
 		return join q{}, @{$initials},
@@ -365,6 +433,25 @@ Names with two legitimate comma-separated clauses are not supported.
 C<compact> and C<initials> formats are lossy: passing their output back into
 C<abbreviate> does not reproduce the original result.
 
+=item *
+
+Particle detection is case-sensitive.  A token is only absorbed into the
+last-name component when it exactly matches a particle string (all lowercase).
+Capitalised tokens such as C<Van> or C<De> are treated as ordinary name
+components.
+
+=item *
+
+For C<compact> and C<initials> formats with C<last_first> style, only the
+first character of the full particle-inclusive last name is used as the last
+initial (e.g. C<van Beethoven> contributes initial C<v>).
+
+=item *
+
+Unicode input is NFC-normalised before processing.  Strings that differ only
+in normalisation form (e.g. precomposed C<\x{e9}> vs. combining C<e\x{301}>)
+produce identical output.
+
 =back
 
 =head1 AUTHOR
@@ -419,7 +506,8 @@ This module is provided as-is without any warranty.
 
   normalize : Sigma+ -> Sigma* x Bool
   normalize(n) =
-    let n1 = gsub(n, ",+", ",")
+    let n0 = NFC(n)             -- Unicode NFC normalisation
+    let n1 = gsub(n0, ",+", ",")
     if "," not-in n1 then (collapse(n1), false)
     else
       let (L, R) = split(n1, ",", 2) each trimmed
@@ -430,20 +518,34 @@ This module is provided as-is without any warranty.
         L = epsilon ^ R = epsilon   ->  (epsilon, false)
       end
 
-  extract : Sigma* x Bool x Format x Style -> (seq Sigma) x Sigma*
-  extract(n, leading, fmt, sty) =
+  Particles = seq Sigma* | undef    -- arrayref of particle strings, or disabled
+
+  collect_particles : seq Sigma* x Particles -> Sigma* x seq Sigma*
+  collect_particles(ps, P) =
+    if P = undef then (epsilon, ps)
+    else
+      let particle_set = { p | p <- P }
+      iterate: while ps != [] ^ last(ps) in particle_set:
+        prepend last(ps) to accumulator; remove from ps
+      (join(" ", accumulator), ps)
+
+  extract : Sigma* x Bool x Format x Style x Particles -> (seq Sigma) x Sigma*
+  extract(n, leading, fmt, sty, P) =
     let ps = tokenize(n)    -- split on whitespace
     if ps = [] then ([], epsilon)
     else if leading then
       ([ first(p) | p <- ps ], epsilon)
     else
-      let last  = ps[#ps]
-          inits = [ first(p) | p <- ps[1..#ps-1] ]
-      if sty = last_first ^ fmt != default ^ last != epsilon
+      let base  = ps[#ps]
+          rest  = ps[1..#ps-1]
+      let (prefix, rest') = collect_particles(rest, P)
+      let last  = if prefix != epsilon then prefix ++ " " ++ base else base
+          inits = [ first(p) | p <- rest' ]
+      if sty = last_first ^ fmt != default ^ fmt != shortlast ^ last != epsilon
         then ([first(last)] ++ inits, epsilon)
         else (inits, last)
 
-  abbreviate : Sigma+ x Format x Style x Sigma* -> Sigma*
+  abbreviate : Sigma+ x Format x Style x Sigma* x Particles -> Sigma*
   abbreviate = format_result . extract . normalize
 
 =head1 LICENCE AND COPYRIGHT

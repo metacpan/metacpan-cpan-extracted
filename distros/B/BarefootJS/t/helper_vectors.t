@@ -87,6 +87,9 @@ my %bindings = (
     floor  => sub { $bf->floor($_[0]) },
     ceil   => sub { $bf->ceil($_[0]) },
     round  => sub { $bf->round($_[0]) },
+    min    => sub { $bf->min($_[0], $_[1]) },
+    max    => sub { $bf->max($_[0], $_[1]) },
+    abs    => sub { $bf->abs($_[0]) },
     to_fixed => sub { $bf->to_fixed(@_) },
 
     # The Mojo renderer emits native lc()/uc(); Xslate emits $bf.lc /
@@ -95,9 +98,12 @@ my %bindings = (
     lower       => sub { $bf->lc($_[0]) },
     upper       => sub { $bf->uc($_[0]) },
     trim        => sub { $bf->trim($_[0]) },
+    trim_start  => sub { $bf->trim_start($_[0]) },
+    trim_end    => sub { $bf->trim_end($_[0]) },
     starts_with => sub { $bf->starts_with(@_) },
     ends_with   => sub { $bf->ends_with(@_) },
     replace     => sub { $bf->replace(@_) },
+    replace_all => sub { $bf->replace_all(@_) },
     repeat      => sub { $bf->repeat(@_) },
     pad_start   => sub { $bf->pad_start(@_) },
     pad_end     => sub { $bf->pad_end(@_) },

@@ -28,11 +28,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 our $alternatives;
 our $abbreviations;
@@ -797,6 +797,8 @@ Also, only Australia, Canada and the US is imported, as the UK data is difficult
 
 Run bin/download_databases - this will download the WhosOnFirst, Openaddr,
 Open Street Map and dr5hn databases.
+Open Street Map now uses PBF files,
+so you will need to C<apt instsall osmium_tool> first.
 Check the values of OSM_HOME, OPENADDR_HOME,
 DR5HN_HOME and WHOSONFIRST_HOME within that script,
 you may wish to change them.
@@ -858,6 +860,12 @@ The various scripts in NJH-Snippets ought to be in this module.
 
 =head1 SEE ALSO
 
+=over 4
+
+=item * L<Test Dashboard|https://nigelhorne.github.io/Geo-Coder-Free/coverage/>
+
+=back
+
 L<https://openaddresses.io/>,
 L<https://www.maxmind.com/en/home>,
 L<https://www.geonames.org/>,
@@ -874,7 +882,7 @@ L<http://results.openaddresses.io/>.
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh@bandsman.co.uk> >>
+Nigel Horne, C<< <njh@nigelhorne.com> >>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -919,11 +927,11 @@ L<http://search.cpan.org/dist/Geo-Coder-Free/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2025 Nigel Horne.
+Copyright 2017-2026 Nigel Horne.
 
-The program code is released under the following licence: GPL for personal use on a single computer.
-All other users (including Commercial, Charity, Educational, Government)
-must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 This product uses GeoLite2 data created by MaxMind, available from
 L<https://www.maxmind.com/en/home>. See their website for licensing information.

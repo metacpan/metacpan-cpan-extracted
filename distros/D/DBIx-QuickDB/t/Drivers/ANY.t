@@ -3,12 +3,9 @@ use Test2::Tools::QuickDB;
 
 use List::Util qw/shuffle/;
 
-BEGIN {
-    $ENV{PATH} = "$ENV{HOME}/dbs/mysql8/bin:$ENV{PATH}"    if $ENV{HOME} && -d "$ENV{HOME}/dbs/mysql8/bin";
-    $ENV{PATH} = "$ENV{HOME}/dbs/percona8/bin:$ENV{PATH}"  if $ENV{HOME} && -d "$ENV{HOME}/dbs/percona8/bin";
-    $ENV{PATH} = "$ENV{HOME}/dbs/mariadb11/bin:$ENV{PATH}" if $ENV{HOME} && -d "$ENV{HOME}/dbs/mariadb11/bin";
-}
-
+# This test exercises driver *selection*, not server versions, so it runs
+# against the system install only -- no ~/dbs iteration here (see
+# t/lib/QDB/Installs.pm for the tests that do iterate).
 my @drivers = shuffle qw/MariaDB Percona MySQL AnyMySQL PostgreSQL SQLite/;
 my %load    = (
     MariaDB    => [quickdb => 't/schema/mariadb.sql'],

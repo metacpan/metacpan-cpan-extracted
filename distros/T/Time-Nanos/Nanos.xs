@@ -1,3 +1,15 @@
+/*
+ * Nanos.xs - XS implementation of Time::Nanos
+ *
+ * Provides a single XS function, hrtime(), that returns a high-resolution
+ * timestamp in nanoseconds.  Two backends are supported:
+ *
+ *   HAS_CLOCK_GETTIME - POSIX clock_gettime(2) (Linux, macOS, BSD, ...)
+ *   HAS_WINHR         - Windows high-resolution timers
+ *
+ * If neither is defined at compile time, hrtime() croaks at runtime.
+ */
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -13,6 +25,12 @@
 #include <windows.h>
 #endif
 
+/*
+ * Populate *sec_out / *nsec_out with the current time from the requested
+ * clock source.
+ * use_realtime=1 -> CLOCK_REALTIME  (wall-clock),
+ * use_realtime=0 -> CLOCK_MONOTONIC (time since boot, immune to jumps).
+ */
 #if defined(HAS_CLOCK_GETTIME) || defined(HAS_WINHR)
 static void
 get_hrtime(int use_realtime, uint64_t *sec_out, uint64_t *nsec_out)
@@ -29,15 +47,18 @@ get_hrtime(int use_realtime, uint64_t *sec_out, uint64_t *nsec_out)
     }
 #else
     if (use_realtime) {
+        /* Windows: GetSystemTimePreciseAsFileTime gives 100 ns intervals
+         * since 1601-01-01.  Adjust epoch to 1970-01-01 and convert. */
         FILETIME ft;
         ULARGE_INTEGER ul;
         GetSystemTimePreciseAsFileTime(&ft);
         ul.LowPart  = ft.dwLowDateTime;
         ul.HighPart = ft.dwHighDateTime;
-        ul.QuadPart -= 116444736000000000ULL;
-        *sec_out    = ul.QuadPart / 10000000ULL;
-        *nsec_out   = (ul.QuadPart % 10000000ULL) * 100ULL;
+        ul.QuadPart -= 116444736000000000ULL;                /* 1601 -> 1970 offset */
+        *sec_out    = ul.QuadPart / 10000000ULL;             /* 100 ns -> sec       */
+        *nsec_out   = (ul.QuadPart % 10000000ULL) * 100ULL;  /* remainder -> ns     */
     } else {
+        /* Windows: QueryPerformanceCounter for monotonic time */
         LARGE_INTEGER freq, counter;
         int64_t remainder;
         if (!QueryPerformanceFrequency(&freq)) {
@@ -59,51 +80,49 @@ MODULE = Time::Nanos    PACKAGE = Time::Nanos
 PROTOTYPES: DISABLE
 
 void
-hrtime(...)
+hrtime(int clock_source)
     PPCODE:
+        /*
+         * Returns a nanosecond-precision timestamp as a single integer.
+         *
+         * clock_source:
+         *   0 -> CLOCK_REALTIME  (wall-clock, default)
+         *   1 -> CLOCK_MONOTONIC (time since boot, immune to jumps)
+         *
+         * Any other value croaks.
+         */
 #if !defined(HAS_CLOCK_GETTIME) && !defined(HAS_WINHR)
         croak("hrtime(): high-resolution clock is not available on this platform");
 #else
         {
             uint64_t sec_part, nsec_part;
-            int want_list = 0;
             int use_realtime = 0;
 
-            if (items > 0 && SvTRUE(ST(0))) {
-                want_list = 1;
-            }
-
-            {
-                STRLEN len;
-                const char *clock_name;
-                SV *sv = get_sv("Time::Nanos::CLOCK", GV_ADD);
-
-                if (!sv || !SvOK(sv)) {
-                    /* undef → default to monotonic */
-                    use_realtime = 0;
-                } else {
-                    clock_name = SvPV(sv, len);
-                    if (len == 9 && strnEQ(clock_name, "monotonic", 9)) {
-                        use_realtime = 0;
-                    } else if (len == 8 && strnEQ(clock_name, "realtime", 8)) {
-                        use_realtime = 1;
-                    } else {
-                        croak("hrtime(): unknown clock source '%s' (valid: 'monotonic', 'realtime')", clock_name);
-                    }
-                }
+            if (clock_source == 0) {
+                use_realtime = 1;
+            } else if (clock_source == 1) {
+                use_realtime = 0;
+            } else {
+                croak("hrtime(): invalid clock source %d (valid: 0 = realtime, 1 = monotonic)", clock_source);
             }
 
             get_hrtime(use_realtime, &sec_part, &nsec_part);
 
-            if (want_list) {
-                EXTEND(SP, 2);
-                PUSHs(sv_2mortal(newSVuv((UV)sec_part)));
-                PUSHs(sv_2mortal(newSVuv((UV)nsec_part)));
-            } else {
+            {
+                uint64_t total = sec_part * 1000000000ULL + nsec_part;
+
                 EXTEND(SP, 1);
-                PUSHs(sv_2mortal(newSVuv(
-                    (UV)(sec_part * 1000000000ULL + nsec_part)
-                )));
+#if UVSIZE >= 8
+                /* 64-bit UV (typical): exact integer nanoseconds. */
+                PUSHs(sv_2mortal(newSVuv((UV)total)));
+#else
+                /* 32-bit UV perl: a 64-bit ns cannot fit in UV and a plain
+                 * scalar cannot hold a 64-bit int, so return it as an NV
+                 * (double). This avoids silently wrapping to garbage; the
+                 * value loses precision (~256 ns at the current epoch) but
+                 * stays "close" and keeps the array split sane. */
+                PUSHs(sv_2mortal(newSVnv((NV)total)));
+#endif
             }
         }
 #endif

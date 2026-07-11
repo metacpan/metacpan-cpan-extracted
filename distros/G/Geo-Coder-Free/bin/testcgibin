@@ -26,17 +26,18 @@ sub doit
 
 	if($test == 1) {
 		# print "Test 1 - q\n";
-		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='1600+Pennsylvania+Avenue+NW+Washington+DC+USA'");
+		# system("$^X $Bin/../cgi-bin/page.fcgi page=query q='1600+Pennsylvania+Avenue+NW+Washington+DC+USA'");
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US'");
 	} elsif($test == 2) {
 		# print "Test 2 - scantext\n";
 		system("$^X $Bin/../cgi-bin/page.fcgi page=query scantext='Washington+DC+USA'");
 	} elsif($test == 3) {
 		$ENV{'REMOTE_ADDR'} = '207.241.237.233';	# An IP address in the US
 		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
-		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='1600+Pennsylvania+Avenue+NW+Washington+DC'");
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD+US'");
 	} elsif($test == 4) {
-		$ENV{'REMOTE_ADDR'} = '207.241.237.233';	# An IP address in the US
+		$ENV{'REMOTE_ADDR'} = '207.241.237.233';	# An IP address in the US, so no need for country in the address
 		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
-		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='1600+Pennsylvania+Avenue+NW+Washington+DC+USA'");
+		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='NASA+TIROS+RD+GREENBELT+MD'");
 	}
 }

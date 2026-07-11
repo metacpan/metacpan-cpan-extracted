@@ -213,15 +213,16 @@ MODULE = Data::Stack::Shared  PACKAGE = Data::Stack::Shared::Int
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[STK_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    StkHandle *h = stk_create(p, capacity, sizeof(int64_t), STK_VAR_INT, errbuf);
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    StkHandle *h = stk_create(p, capacity, sizeof(int64_t), STK_VAR_INT, mode, errbuf);
     if (!h) croak("Data::Stack::Shared::Int->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -322,7 +323,7 @@ MODULE = Data::Stack::Shared  PACKAGE = Data::Stack::Shared::Str
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity, max_len)
+new(class, path, capacity, max_len, ...)
     const char *class
     SV *path
     UV capacity
@@ -333,9 +334,10 @@ new(class, path, capacity, max_len)
     if (max_len == 0) croak("max_len must be > 0");
     if (max_len > (UV)(UINT32_MAX - sizeof(uint32_t)))
         croak("max_len too large");
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    StkHandle *h = stk_create(p, capacity, elem_size, STK_VAR_STR, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    StkHandle *h = stk_create(p, capacity, elem_size, STK_VAR_STR, mode, errbuf);
     if (!h) croak("Data::Stack::Shared::Str->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:

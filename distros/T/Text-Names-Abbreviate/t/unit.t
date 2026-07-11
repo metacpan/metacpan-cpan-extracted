@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+use utf8;
+use open ':std', ':utf8';
 
 use POSIX qw(ENOENT);
 use Readonly;
@@ -581,6 +583,125 @@ subtest 'global state: stateless across repeated calls' => sub {
 	abbreviate($FULL_NAME, { format => 'compact' });
 	my $r3 = abbreviate($FULL_NAME);
 	is($r1, $r3, 'identical inputs yield identical outputs before and after unrelated call');
+	done_testing();
+};
+
+# ===========================================================================
+# SECTION 14 — Surname particles
+# POD §particles: tokens immediately before the last name that match the
+# particle list are absorbed into the last-name component.
+# ===========================================================================
+
+subtest 'particles: single particle absorbed (default list, default format)' => sub {
+	is(abbreviate('Ludwig van Beethoven'),  'L. van Beethoven', 'van absorbed into last name');
+	is(abbreviate('Charles de Gaulle'),     'C. de Gaulle',     'de absorbed');
+	is(abbreviate('Felipe de la Cruz'),     'F. de la Cruz',    'two particles absorbed');
+	is(abbreviate('Leonardo da Vinci'),     'L. da Vinci',      'da absorbed');
+	done_testing();
+};
+
+subtest 'particles: last_first style with particle' => sub {
+	is(
+		abbreviate('Ludwig van Beethoven', { style => 'last_first' }),
+		'van Beethoven, L.',
+		'last_first places particle-inclusive last name first',
+	);
+	done_testing();
+};
+
+subtest 'particles: shortlast format with particle' => sub {
+	is(
+		abbreviate('Ludwig van Beethoven', { format => 'shortlast' }),
+		'L. van Beethoven',
+		'shortlast: initials then full particle-inclusive last name',
+	);
+	is(
+		abbreviate('Ludwig van Beethoven', { format => 'shortlast', style => 'last_first' }),
+		'van Beethoven, L.',
+		'shortlast last_first with particle',
+	);
+	done_testing();
+};
+
+subtest 'particles: disabled via particles => 0' => sub {
+	is(
+		abbreviate('Ludwig van Beethoven', { particles => 0 }),
+		'L. v. Beethoven',
+		'particles=0: van treated as middle initial',
+	);
+	is(
+		abbreviate('Charles de Gaulle', { particles => 0 }),
+		'C. d. Gaulle',
+		'particles=0: de treated as middle initial',
+	);
+	done_testing();
+};
+
+subtest 'particles: custom list overrides built-in' => sub {
+	is(
+		abbreviate('Felipe de la Cruz', { particles => ['de', 'la'] }),
+		'F. de la Cruz',
+		'custom list: de and la absorbed',
+	);
+	is(
+		abbreviate('Ludwig van Beethoven', { particles => ['de'] }),
+		'L. v. Beethoven',
+		'custom list without van: van treated as middle initial',
+	);
+	done_testing();
+};
+
+subtest 'particles: capitalised token not treated as particle' => sub {
+	is(
+		abbreviate('Edward Van Halen'),
+		'E. V. Halen',
+		'capitalised Van is not a particle; treated as middle initial',
+	);
+	done_testing();
+};
+
+subtest 'particles: all formats produce string schema output' => sub {
+	for my $fmt (qw(default initials compact shortlast)) {
+		my $result = abbreviate('Ludwig van Beethoven', { format => $fmt });
+		returns_ok($result, { type => 'string' }, "particles: format=$fmt returns string");
+	}
+	done_testing();
+};
+
+# ===========================================================================
+# SECTION 15 — Unicode normalization
+# POD §LIMITATIONS: input is NFC-normalised before processing.
+# ===========================================================================
+
+subtest 'unicode: NFD and NFC inputs produce identical output' => sub {
+	use Unicode::Normalize ();
+	my $nfc = 'Rémi Dupré';
+	my $nfd = Unicode::Normalize::NFD($nfc);
+
+	is(abbreviate($nfd), abbreviate($nfc), 'NFD and NFC inputs are equivalent');
+	done_testing();
+};
+
+subtest 'unicode: NFC-normalized name abbreviated correctly' => sub {
+	is(abbreviate('Rémi Dupré'),     'R. Dupré',    'accented first name → initial R.');
+	is(abbreviate('Ångström Björk'), 'Å. Björk',    'Å initial preserved');
+	done_testing();
+};
+
+subtest 'unicode: NFD particle name equivalent to NFC' => sub {
+	use Unicode::Normalize ();
+	my $nfc = 'André de Rêve';
+	my $nfd = Unicode::Normalize::NFD($nfc);
+	is(abbreviate($nfd), abbreviate($nfc), 'NFD particle name equivalent to NFC');
+	is(abbreviate($nfc), 'A. de Rêve',    'particle absorbed in NFC name with diacritics');
+	done_testing();
+};
+
+subtest 'unicode: output is always a plain string' => sub {
+	use Unicode::Normalize ();
+	my $nfd_name = Unicode::Normalize::NFD('Ångström Björk');
+	my $result   = abbreviate($nfd_name);
+	returns_ok($result, { type => 'string' }, 'unicode input produces string output');
 	done_testing();
 };
 

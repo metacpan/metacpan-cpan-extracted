@@ -1,18 +1,22 @@
+use FindBin qw/$Bin/;
+use lib "$Bin/../lib";
+use QDB::Installs qw/run_per_install/;    # before Test2::V0: it loads Test2::IPC
 use Test2::V0;
-use Test2::Tools::QuickDB;
-use File::Spec;
 
-# Contaminate the ENV vars to make sure things work even when these are all
-# set.
-BEGIN { $ENV{$_} = 'fake' for qw{DBI_USER DBI_PASS DBI_DSN} }
+# The parent process must not load DBIx::QuickDB or Test2::Tools::QuickDB;
+# each install's body runs in a forked child that sets $PATH first. See
+# t/lib/QDB/Installs.pm.
+run_per_install(SQLite => sub {
+    # Contaminate the env vars the driver should mask, to prove it does.
+    QDB::Installs::contaminate_env('SQLite');
 
-skipall_unless_can_db(driver => 'SQLite');
+    require Test2::Tools::QuickDB;
+    Test2::Tools::QuickDB::skipall_unless_can_db('SQLite');
 
-sub DRIVER() { 'SQLite' }
+    no strict 'refs';
+    *{"main::DRIVER"} = sub() { 'SQLite' };
 
-my $file = __FILE__;
-$file =~ s/sqlite\.t$/Pool.pm/;
-$file = File::Spec->rel2abs($file);
-require $file;
+    require "$Bin/Pool.pm";
+});
 
 done_testing;

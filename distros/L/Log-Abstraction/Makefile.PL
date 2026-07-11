@@ -15,13 +15,14 @@ WriteMakefile(
 	VERSION_FROM => 'lib/Log/Abstraction.pm', # finds $VERSION
 	AUTHOR	 => 'Nigel Horne <njh@nigelhorne.com>',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-		? ('LICENSE'=> 'GPL')
+		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	PREREQ_PM => {
 		'Carp'	 => 0,
 		'Config::Abstraction' => 0.36,
 		'Data::Dumper' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+		'JSON::PP' => 0,
 		'Log::Log4perl' => 0,
 		'Params::Get' => 0.13,
 		'POSIX' => 0,
@@ -29,7 +30,8 @@ WriteMakefile(
 		'Readonly::Values::Syslog' => 0.04,
 		'Return::Set' => 0,
 		'Sys::Syslog' => 0.28,
-		'Scalar::Util'=> 0
+		'Scalar::Util'=> 0,
+		'Sub::Private' => 0,
 	},
 	TEST_REQUIRES => {
 		'File::Glob' => 0,	# scripts/generate_index
@@ -59,6 +61,8 @@ WriteMakefile(
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Log-Abstraction.git',
 				web => 'https://github.com/nigelhorne/Log-Abstraction'
+			}, recommends => {
+				'Log::Any' => 0,
 			}, bugtracker => {
 				mailto => 'bug-Log-Abstraction@rt.cpan.org',
 				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction',

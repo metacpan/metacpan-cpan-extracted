@@ -1,10 +1,19 @@
 package Data::Queue::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Data::Queue::Shared', $VERSION);
+
+# ithreads: blessed shared-memory handles must never be cloned into a
+# child thread -- the clone would double-free the handle on thread exit.
+{ no strict 'refs'; *{"${_}::CLONE_SKIP"} = sub { 1 } for qw(
+  Data::Queue::Shared::Int
+  Data::Queue::Shared::Int16
+  Data::Queue::Shared::Int32
+  Data::Queue::Shared::Str
+); }
 
 # Keyword API hint activation (requires XS::Parse::Keyword)
 sub _enable_keywords {
@@ -118,7 +127,7 @@ because all pushes serialize on one mutex.
 
 B<For fixed-length FIFO workloads that need maximum throughput:> use
 L<Data::Deque::Shared::Str> with only C<push_back> / C<pop_front>. It's
-fixed-slot-per-entry (memory use = capacity × max_len), uses a per-slot
+fixed-slot-per-entry (memory use = capacity x max_len), uses a per-slot
 publication state machine instead of a shared mutex, and measures
 1.3x-4.7x faster than Queue::Str depending on contention (1 vs 8 writers,
 32-byte payloads, single box). Use that if your messages share an upper
@@ -170,7 +179,7 @@ processes via C<fork()> but cannot be opened by unrelated processes.
     my $q = Data::Queue::Shared::Str->new_memfd($name, $capacity);
     my $q = Data::Queue::Shared::Str->new_memfd($name, $cap, $arena);
 
-Creates a queue backed by C<memfd_create(2)>. No filesystem path — the
+Creates a queue backed by C<memfd_create(2)>. No filesystem path -- the
 backing memory is identified by a file descriptor. Use C<memfd()> to
 retrieve the fd and pass it to other processes via C<SCM_RIGHTS>
 (Unix domain socket fd passing) or C<fork()> inheritance.
@@ -212,8 +221,8 @@ For Str, this is exact (mutex-protected).
     my $val = $q->pop_back_wait;            # blocking pop from back
     my $val = $q->pop_back_wait($timeout);  # with timeout
 
-C<push_front> inserts at the head — useful for requeueing failed jobs.
-C<pop_back> removes from the tail — useful for work-stealing or undo.
+C<push_front> inserts at the head -- useful for requeueing failed jobs.
+C<pop_back> removes from the tail -- useful for work-stealing or undo.
 Not available for Int (Vyukov algorithm is strictly FIFO).
 
 =head3 Batch operations
@@ -241,7 +250,7 @@ C<$timeout> is seconds (C<-1> = infinite, C<0> = try once).
 =head3 Management
 
     $q->clear;                  # remove all elements
-    $q->sync;                   # msync — flush to disk for crash durability
+    $q->sync;                   # msync -- flush to disk for crash durability
     $q->unlink;                 # remove backing file
     Class->unlink($path);       # class method form
     my $p = $q->path;           # backing file path
@@ -386,6 +395,17 @@ L<Data::Graph::Shared> - directed weighted graph
 L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
 
 L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
+=head1 SECURITY
+
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 AUTHOR
 

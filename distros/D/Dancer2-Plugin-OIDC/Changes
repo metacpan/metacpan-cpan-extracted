@@ -1,5 +1,9 @@
 Changes for Dancer2-Plugin-OIDC distribution
 
+1.02 2026-07-10
+  - Bump dependency on OIDC::Client v1.08
+  - Update tests to align with OIDC::Client v1.08 (PKCE)
+
 1.01 2026-07-02
   - Bump dependency on OIDC::Client v1.07
   - Update doc

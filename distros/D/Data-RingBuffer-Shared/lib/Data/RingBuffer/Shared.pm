@@ -1,9 +1,11 @@
 package Data::RingBuffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::RingBuffer::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 @Data::RingBuffer::Shared::Int::ISA = ('Data::RingBuffer::Shared');
 @Data::RingBuffer::Shared::F64::ISA = ('Data::RingBuffer::Shared');
 
@@ -34,7 +36,7 @@ Data::RingBuffer::Shared - Shared-memory fixed-size ring buffer for Linux
     say $ring->latest(1);     # 42 (previous)
     say $ring->size;          # 2
 
-    # overwrites oldest when full — never blocks
+    # overwrites oldest when full -- never blocks
     $ring->write($_) for 1..200;
     say $ring->size;          # 100 (capacity)
     say $ring->latest;        # 200
@@ -57,7 +59,7 @@ Data::RingBuffer::Shared - Shared-memory fixed-size ring buffer for Linux
 =head1 DESCRIPTION
 
 Fixed-size circular buffer in shared memory. Writes overwrite the
-oldest entry when the buffer is full — writes never block or fail.
+oldest entry when the buffer is full -- writes never block or fail.
 Readers access data by relative position (0=latest) or absolute
 sequence number.
 
@@ -144,8 +146,14 @@ C<writes>, C<overwrites>, C<mmap_size>.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it.
-Do not share backing files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 SEE ALSO
 

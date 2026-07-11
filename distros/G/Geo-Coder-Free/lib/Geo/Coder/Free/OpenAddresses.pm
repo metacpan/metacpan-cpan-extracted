@@ -48,11 +48,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 =head1 SYNOPSIS
 
@@ -312,6 +312,10 @@ sub geocode
 	if($location !~ /,/) {
 		if($location =~ /^(.+?)\s+(United States|USA|US)$/i) {
 			my $l = $1;
+			if(my $rc = $self->_get($l, 'US')) {
+				$rc->{'country'} = 'US';
+				return $rc;
+			}
 			$l =~ s/\s+//g;
 			if(my $rc = $self->_get($l, 'US')) {
 				$rc->{'country'} = 'US';
@@ -532,6 +536,9 @@ sub geocode
 						}
 					}
 				} elsif(my $href = Geo::StreetAddress::US->parse_address("$city, $state")) {
+				# warn __LINE__;
+				# use Data::Dumper;
+				# warn Dumper($href);
 					# Well formed, simple street address in the US
 					# ::diag(Data::Dumper->new([\$href])->Dump());
 					$state = $href->{'state'};
@@ -545,7 +552,9 @@ sub geocode
 					}
 					# Unabbreviated - look up both, helps with fallback to Maxmind
 					my $fullstreet = $href->{'street'};
+				# warn __LINE__;
 					if($street = $fullstreet) {
+				# warn __LINE__;
 						$fullstreet .= ' ' . $href->{'type'};
 						if(my $type = Geo::Coder::Free::_abbreviate($href->{'type'})) {
 							$street .= " $type";
@@ -556,6 +565,7 @@ sub geocode
 						}
 					}
 					if($street) {
+				# warn __LINE__;
 						if(my $prefix = $href->{prefix}) {
 							$street = "$prefix $street";
 							$fullstreet = "$prefix $fullstreet";
@@ -572,15 +582,23 @@ sub geocode
 							}
 						}
 						# ::diag("$street$city$state", 'US');
+						# warn("$street$city$state", 'US');
+						if($rc = $self->_get("$street$city$state", 'US')) {
+							$rc->{'country'} = 'US';
+							return $rc;
+						}
+						$street =~ s/\s+//g;
 						if($rc = $self->_get("$street$city$state", 'US')) {
 							$rc->{'country'} = 'US';
 							return $rc;
 						}
 						# ::diag("$fullstreet$city$state", 'US');
+						# warn("$fullstreet$city$state", 'US');
 						if($rc = $self->_get("$fullstreet$city$state", 'US')) {
 							$rc->{'country'} = 'US';
 							return $rc;
 						}
+						$fullstreet =~ s/\s+//g;
 					}
 					warn "Fast lookup of US location '$location' failed";
 				} else {
@@ -846,6 +864,22 @@ sub geocode
 		}
 	}
 
+	if($country) {
+		require Geo::Address::Parser && Geo::Address::Parser->import() unless Geo::Address::Parser->can('parse');
+
+		if($country eq 'US') {
+			my $addr_parser = Geo::Address::Parser->new(country => 'US');
+			if(my $fields = $addr_parser->parse($location)) {
+				for my $key (keys %{$fields}) {
+					delete $fields->{$key} unless defined $fields->{$key};
+				}
+				if(my $rc = $self->_search($fields, keys %{$fields})) {
+					return $rc;
+				}
+			}
+		}
+	}
+
 	# Finally try libpostal,
 	# which is good but uses a lot of memory
 	# ::diag("try libpostal on $location");
@@ -931,6 +965,7 @@ sub _get {
 	$location =~ tr/ž/z/;	# Remove wide characters
 	$location =~ s/\xc5\xbe/z/g;
 	$location =~ s/\N{U+017E}/z/g;
+	$location =~ s/\s+//g;
 
 	# ::diag(__PACKAGE__, ': ', __LINE__, ": _get: $location");
 	my $digest;
@@ -939,7 +974,12 @@ sub _get {
 	} else {
 		$digest = substr Digest::MD5::md5_base64(uc($location)), 0, 16;
 	}
+
 	# print __PACKAGE__, ': ', __LINE__, ': ', uc($location), " = $digest\n";
+	# my @call_details = caller(0);
+	# print "\t", ' called from line ', $call_details[2], "\n";
+	# @call_details = caller(1);
+	# print "\t", ' called from line ', $call_details[2], "\n";
 
 	if(defined($unknown_locations{$digest})) {
 		return;

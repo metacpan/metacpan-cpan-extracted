@@ -2,7 +2,7 @@
 # Jacode त्वरित संदर्भ पत्र (HI)
 # Jacode - जापानी वर्ण कोड रूपांतरण के लिए Perl प्रोग्राम
 # https://metacpan.org/dist/Jacode
-# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ################################################################################
 
 ■ स्थापना

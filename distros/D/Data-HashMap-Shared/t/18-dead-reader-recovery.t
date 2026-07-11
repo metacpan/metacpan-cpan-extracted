@@ -55,8 +55,13 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_dead_rdr') . '.shm' }
         last if $rwlock_word > 0 && $rwlock_word < 0x80000000;
         select(undef, undef, undef, 0.02);
     }
-    ok($rwlock_word > 0 && $rwlock_word < 0x80000000,
-       "children entered rdlock (rwlock=$rwlock_word)");
+    # Best-effort observation, NOT a pass/fail assertion: on a loaded smoker
+    # the brief rdlock windows can all fall between the 20ms polls even though
+    # the children are hammering incr_by, so this used to fail spuriously
+    # (~11% of CPAN Testers reports).  It does not invalidate the recovery test
+    # below -- the $stuck guard distinguishes the exercised vs benign paths
+    # regardless of whether we caught a live rdlock here.
+    note("children entered rdlock (rwlock=" . (defined $rwlock_word ? $rwlock_word : 'undef') . ")");
 
     kill 'KILL', @pids;
     waitpid($_, 0) for @pids;

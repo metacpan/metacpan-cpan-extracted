@@ -1,11 +1,12 @@
 package File::Stubb;
 use 5.016;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use strict;
 use warnings;
 
 use File::Basename;
 use Getopt::Long;
+use List::Util qw(any);
 
 use File::Stubb::Home;
 use File::Stubb::Render;
@@ -54,7 +55,7 @@ HERE
 my $VER_MSG = <<"HERE";
 $PRGNAM - $PRGVER
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -129,13 +130,14 @@ sub render {
         restricted      => $self->{ Restricted  },
     );
 
-    my @created;
+    my $to_stdout = any { $_ eq '-' } @{ $self->{ Files } };
 
+    my @created;
     for my $f (@{ $self->{ Files } }) {
         push @created, $render->render($f);
     }
 
-    if ($self->{ Verbose } and $self->{ Files }[0] ne '-') {
+    if ($self->{ Verbose } and not $to_stdout) {
         say "Created:";
         for my $f (@created) {
             say "  $f";
@@ -271,9 +273,6 @@ sub init {
         die $HELP unless @ARGV;
         $self->{ Template } = $self->_get_template($temp);
         $self->{ Files } = [ @ARGV ];
-        if (@{ $self->{ Files } } > 1 and grep { $_ eq '-' } @{ $self->{ Files } }) {
-            die "Cannot write stub to stdout in batch stub creation\n";
-        }
     } elsif ($self->{ Mode } == MODE_LIST) {
         $temp = shift @ARGV // die $HELP;
         $self->{ Template } = $self->_get_template($temp)
@@ -349,7 +348,7 @@ requests are welcome!
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

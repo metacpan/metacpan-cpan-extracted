@@ -183,7 +183,10 @@ static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen)
     __atomic_add_fetch(&hdr->stat_writes, 1, __ATOMIC_RELAXED);
     __atomic_add_fetch(&hdr->wake_seq, 1, __ATOMIC_RELEASE);
 
-    /* Wake readers */
+    /* Wake readers. StoreLoad barrier: publish wake_seq++ before reading
+     * waiters, so we observe a reader that registered just before this write
+     * (else its wakeup is lost). Pairs with the fence in ring_wait. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 
@@ -269,6 +272,12 @@ static inline int ring_wait(RingHandle *h, uint64_t expected_count, double timeo
 
     for (;;) {
         __atomic_add_fetch(&h->hdr->waiters, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier: publish waiters++ before reading wake_seq/count,
+         * so a concurrent writer either sees our waiters++ (and wakes us) or
+         * we observe its wake_seq bump here (futex value check -> no sleep).
+         * Release/acquire alone lets these reorder on weak memory -> lost
+         * wakeup -> hang until timeout. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint32_t seq = __atomic_load_n(&h->hdr->wake_seq, __ATOMIC_ACQUIRE);
         uint64_t cur = __atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE);
         if (cur == expected_count) {
@@ -320,6 +329,20 @@ static inline void ring_init_header(void *base, uint64_t total,
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
+/* Fixed element size implied by a variant. Reads copy a slot into a
+ * destination sized by the variant's C type, so a header whose elem_size does
+ * not match this MUST be rejected at attach -- otherwise a tampered backing
+ * file drives ring_read_seq to memcpy elem_size bytes past a fixed 8-byte
+ * destination (CWE-787). Returns 0 for an unknown variant (validation then
+ * rejects it via the variant_id check). */
+static inline uint32_t ring_variant_elem_size(uint32_t variant_id) {
+    switch (variant_id) {
+        case RING_VAR_INT: return (uint32_t)sizeof(int64_t);
+        case RING_VAR_F64: return (uint32_t)sizeof(double);
+        default:           return 0;
+    }
+}
+
 /* Validate a mapped header (shared by ring_create reopen and ring_open_fd). */
 static inline int ring_validate_header(const RingHeader *hdr, uint64_t file_size,
                                         uint32_t expected_variant) {
@@ -327,6 +350,8 @@ static inline int ring_validate_header(const RingHeader *hdr, uint64_t file_size
     if (hdr->version != RING_VERSION) return 0;
     if (hdr->variant_id != expected_variant) return 0;
     if (hdr->elem_size == 0 || hdr->capacity == 0) return 0;
+    /* Pin elem_size to the variant's fixed element size (see above). */
+    if (hdr->elem_size != ring_variant_elem_size(expected_variant)) return 0;
     /* capacity * 8 + capacity * elem_size + header must fit in uint64_t */
     if (hdr->capacity > (UINT64_MAX - sizeof(RingHeader)) / (sizeof(uint64_t) + hdr->elem_size)) return 0;
     if (hdr->total_size != file_size) return 0;
@@ -351,9 +376,31 @@ static inline RingHandle *ring_setup(void *base, size_t ms, const char *path, in
     return h;
 }
 
+/* Securely obtain a fd for a file-backed segment: create it exclusively
+ * (O_CREAT|O_EXCL|O_NOFOLLOW at `mode`, default 0600 = owner-only), or, if it
+ * already exists, attach to it (O_RDWR|O_NOFOLLOW, no O_CREAT). O_EXCL blocks a
+ * pre-seeded or hard-linked file and O_NOFOLLOW a symlink swap, so a local
+ * attacker can no longer redirect or poison the backing store through the path.
+ * Cross-user sharing is opt-in via a wider `mode` (e.g. 0660); the caller still
+ * validates the file's contents. */
+static int ring_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) return fd;
+        if (errno != EEXIST) { RING_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        RING_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    RING_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static RingHandle *ring_create(const char *path, uint64_t capacity,
                                 uint32_t elem_size, uint32_t variant_id,
-                                char *errbuf) {
+                                mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { RING_ERR("capacity must be > 0"); return NULL; }
     if (elem_size == 0) { RING_ERR("elem_size must be > 0"); return NULL; }
@@ -372,14 +419,18 @@ static RingHandle *ring_create(const char *path, uint64_t capacity,
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { RING_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { RING_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = ring_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { RING_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { RING_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         int is_new = (st.st_size == 0);
         if (!is_new && (uint64_t)st.st_size < sizeof(RingHeader)) {
             RING_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            RING_ERR("%s: refusing to initialize file not owned by us", path);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
@@ -456,7 +507,9 @@ static void ring_clear(RingHandle *h) {
     __atomic_store_n(&h->hdr->head, 0, __ATOMIC_RELEASE);
     __atomic_store_n(&h->hdr->count, 0, __ATOMIC_RELEASE);
     __atomic_add_fetch(&h->hdr->wake_seq, 1, __ATOMIC_RELEASE);
-    /* Wake any ring_wait callers parked with timeout=-1 so they re-check. */
+    /* Wake any ring_wait callers parked with timeout=-1 so they re-check.
+     * StoreLoad barrier: see the wake in the write path. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&h->hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &h->hdr->wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }

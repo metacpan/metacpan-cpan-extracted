@@ -7,7 +7,7 @@ use 5.036000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Construct a measured phrase of notes",
+  "ABSTRACT" => "Construct measured phrases of notes",
   "AUTHOR" => "Gene Boggs <gene.boggs\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0116",
+  "VERSION" => "0.0117",
   "test" => {
     "TESTS" => "t/*.t"
   }
